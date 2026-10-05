@@ -14,9 +14,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * The {@code random_enemy} selector (2026-09-30), reader 1505 \u7eef\u82f1\u2019s ultimate: \u300c\u5bf9\u7ec8\u7ed3\u6280<b>\u968f\u673a</b>\u9020\u6210\u4f24\u5bb9\u7684\u654c\u65b9\u76ee\u6807\u9020\u6210 14%\u2026\u300d.
+ * The {@code random_enemy} selector (2026-09-30), reader 1505 绯英’s ultimate: 「对终结技<b>随机</b>造成伤容的敌方目标造成 14%…」.
  *
- * <p>\u2b50 Three readings, all on real battles: the pick is always one of the opponents; the SAME seed picks the same unit twice (so the
+ * <p>⭐ Three readings, all on real battles: the pick is always one of the opponents; the SAME seed picks the same unit twice (so the
  * engine is reproducible); and across many seeds the pick is not always the same one (so it really is a roll, not a constant).
  */
 public class RandomEnemySelectorTest {
@@ -25,7 +25,7 @@ public class RandomEnemySelectorTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** Sums the health a fixed-seed ultimate takes off the enemies, and reports which one lost more (the rider\u2019s pick). */
+    /** Sums the health a fixed-seed ultimate takes off the enemies, and reports which one lost more (the rider’s pick). */
     private List<Double> losses(long seed) {
         Character elation = CharacterFactory.create(WEARER, LEVEL);
         Enemy first = EnemyFactory.create(MONSTER, 90, 1);
@@ -63,7 +63,7 @@ public class RandomEnemySelectorTest {
                 "the roll really varies (it favoured the first enemy " + firstBigger + " times out of 12)");
     }
 
-    /** \u2605 The shipped rule, read off the compiled table (discipline 232). */
+    /** ★ The shipped rule, read off the compiled table (discipline 232). */
     @Test
     public void theShippedRuleNamesTheRandomSelector() {
         Character elation = CharacterFactory.create(WEARER, LEVEL);
@@ -75,6 +75,6 @@ public class RandomEnemySelectorTest {
                 + " target=" + effect.getTarget() + " damage_type=" + effect.getDamageType());
         Assertions.assertEquals(0.14, effect.getPercent(), 1e-9, "14% of her attack");
         Assertions.assertEquals("random_enemy", effect.getTarget(), "aimed by the roll");
-        Assertions.assertEquals("ELATION", effect.getDamageType(), "as \u6b22\u6109\u4f24\u5bb9");
+        Assertions.assertEquals("ELATION", effect.getDamageType(), "as 欢愉伤容");
     }
 }

@@ -12,11 +12,11 @@ import java.util.List;
 /**
  * The conditions of every shipped cone rule, asserted against the text (2026-09-30).
  *
- * <p>A fourth mutation layer (rewriting a rule's \u300cwhen\u300d) stayed green for seventeen of these, because the cone
+ * <p>A fourth mutation layer (rewriting a rule's 「when」) stayed green for seventeen of these, because the cone
  * judges asserted effects but never conditions. Conditions decide WHEN a rule is in force, so a wrong one makes a rule
  * fire at the wrong time while every numeric assertion still passes.
  *
- * <p>\u26a0 Measured: the parser LOWERS the attribute name, so the condition text the engine produces is
+ * <p>⚠ Measured: the parser LOWERS the attribute name, so the condition text the engine produces is
  * {@code self_attr:breaking_effect >= 1.5} even though the content writes it in upper case.
  */
 public class ConeConditionCoverageTest {

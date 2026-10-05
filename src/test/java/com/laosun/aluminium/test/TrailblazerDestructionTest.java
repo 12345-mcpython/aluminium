@@ -24,7 +24,7 @@ public class TrailblazerDestructionTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** \u26a0 「每次击破敌方目标的弱点后，攻击力提高20%…最多叠加2层」. */
+    /** ⚠ 「每次击破敌方目标的弱点后，攻击力提高20%…最多叠加2层」. */
     @Test
     public void hisTalentStacksAttackOnBreaksAndStopsAtTwo() {
         Character tb = CharacterFactory.create(TB, LEVEL);
@@ -40,10 +40,10 @@ public class TrailblazerDestructionTest {
         battle.fireTriggers(TriggerEvent.BREAK, tb, enemy, 0, 0);
         double afterThree = tb.getAttribute(AttributeType.ATTACK).get();
 
-        Assertions.assertTrue(afterOne > before, "\u300c\u6bcf\u6b21\u51fb\u7834\u654c\u65b9\u76ee\u6807\u7684\u5f31\u70b9\u540e\uff0c\u653b\u51fb\u529b\u63d0\u9ad820%\u300d: " + before + " -> " + afterOne);
+        Assertions.assertTrue(afterOne > before, "「每次击破敌方目标的弱点后，攻击力提高20%」: " + before + " -> " + afterOne);
         Assertions.assertTrue(afterTwo > afterOne, "the second layer must add again");
         Assertions.assertEquals(afterTwo, afterThree, 1e-9,
-                "\u300c\u8be5\u6548\u679c\u6700\u591a\u53e0\u52a02\u5c42\u300d -- a third break must not add a third layer");
+                "「该效果最多叠加2层」 -- a third break must not add a third layer");
     }
 
     /** Census: the talent and the level convention. */

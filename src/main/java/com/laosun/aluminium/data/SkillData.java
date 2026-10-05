@@ -339,10 +339,10 @@ public class SkillData {
     public com.laosun.aluminium.enums.AttributeType damageBaseAttribute() {
         if (description != null) {
             String text = MARKUP.matcher(description).replaceAll("");
-            if (text.contains("\u9632\u5fa1\u529b")) {
+            if (text.contains("防御力")) {
                 return com.laosun.aluminium.enums.AttributeType.DEFENCE;
             }
-            if (text.contains("\u751f\u547d\u4e0a\u9650")) {
+            if (text.contains("生命上限")) {
                 return com.laosun.aluminium.enums.AttributeType.HEALTH;
             }
         }

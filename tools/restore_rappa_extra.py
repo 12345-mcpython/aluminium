@@ -34,13 +34,13 @@ rules.append({
         "turns": 2,
         "target": "target",
     }],
-    "source": ("1317 \u4e71\u7834 \u884c\u8ff9 \u5fcd\u6cd5\u5e16\u2022\u67af\u53f6\uff08\u540e\u534a\uff09: "
-               "\u300c\u82e5\u4e71\u7834\u5f53\u524d\u653b\u51fb\u529b\u9ad8\u4e8e **2400** \u70b9\uff0c**\u6bcf\u8d85\u8fc7 100 \u70b9\u653b\u51fb\u529b**"
-               "\u53ef\u4f7f\u8be5\u6570\u503c\u989d\u5916\u63d0\u9ad8 **1%**\uff0c**\u6700\u591a\u989d\u5916\u63d0\u9ad8 8%**\u300d"),
-    "note": ("\u2b50 \u4e0a\u4e00\u8f6e\u66fe\u56e0\u201c\u5224\u636e\u6478\u4e0d\u5230\u201d\u800c\u64a4\u4e0b \u2713\uff1b\u672c\u8f6e\u627e\u5230\u4e86\u6760\u6746 \u2713\uff1a"
-             "`TriggerTable.plus(...)` \u2713 \u21d2 \u5224\u636e\u53ef\u4ee5**\u8ffd\u52a0**\u4e00\u6761\u624b\u642d\u89c4\u5219\u628a\u653b\u51fb\u529b\u62ac\u8fc7 2400 \u2713\u3002"
-             "\u2b50 `scale: \"self_attr_above:ATTACK:2400\"` \u2713\uff08**\u6bcf 100 \u70b9 1% = \u6bcf\u70b9 0.01%** \u21d2 `percent: 0.0001` \u2713\uff09"
-             "\uff0b `cap_amount: 0.08` \u2713\uff08\u201c\u6700\u591a\u989d\u5916\u63d0\u9ad8 8%\u201d\u21d2 \u5bf9**\u6700\u7ec8\u503c**\u7684\u5e38\u6570\u4e0a\u9650 \u2713\uff09\u3002"),
+    "source": ("1317 乱破 行迹 忍法帖•枯叶（后半）: "
+               "「若乱破当前攻击力高于 **2400** 点，**每超过 100 点攻击力**"
+               "可使该数值额外提高 **1%**，**最多额外提高 8%**」"),
+    "note": ("⭐ 上一轮曾因“判据摸不到”而撤下 ✓；本轮找到了杠杆 ✓："
+             "`TriggerTable.plus(...)` ✓ ⇒ 判据可以**追加**一条手搭规则把攻击力抬过 2400 ✓。"
+             "⭐ `scale: \"self_attr_above:ATTACK:2400\"` ✓（**每 100 点 1% = 每点 0.01%** ⇒ `percent: 0.0001` ✓）"
+             "＋ `cap_amount: 0.08` ✓（“最多额外提高 8%”⇒ 对**最终值**的常数上限 ✓）。"),
 })
 out = doc if isinstance(doc, dict) else {"rules": rules}
 if isinstance(doc, dict):
@@ -73,7 +73,7 @@ import java.util.Random;
  * Rappa's trait (1317:440, 2026-10-02): 「受到的击破伤害提高2%，若当前攻击力高于2400点，每超过100点攻击力额外提高1%，
  * 最多额外提高8%」.
  *
- * <p>\u2b50 Two things this judge binds, and one trick it needs:
+ * <p>⭐ Two things this judge binds, and one trick it needs:
  * <ul>
  *   <li>SELECTIVITY -- `damage_type` is not validated at load, so the same base damage must move for BREAK and not for
  *       NORMAL; a silently ignored field would move both;</li>
@@ -88,7 +88,7 @@ public class BreakDamageTakenTest {
     private static final int OWNER = 1317;
     private static final int MONSTER = 1002011;
 
-    /** \u2b50 Break damage is raised, normal damage is not. */
+    /** ⭐ Break damage is raised, normal damage is not. */
     @Test
     public void onlyBreakDamageIsRaised() {
         double breakDealt = dealt(DamageType.BREAK, 0);
@@ -98,7 +98,7 @@ public class BreakDamageTakenTest {
                 "break damage must be raised by the rule (" + breakDealt + " vs " + normalDealt + ")");
     }
 
-    /** \u2b50 Past the threshold the bonus grows, and past 800 points over it stops at 8%. */
+    /** ⭐ Past the threshold the bonus grows, and past 800 points over it stops at 8%. */
     @Test
     public void theExtraBonusStopsAtEightPercent() {
         double none = dealt(DamageType.BREAK, 0);

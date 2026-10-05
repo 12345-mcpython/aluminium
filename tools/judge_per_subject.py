@@ -32,7 +32,7 @@ JAVA = ('package com.laosun.aluminium.test;' + NL + NL
         + 'import org.junit.jupiter.api.Test;' + NL + NL
         + 'import java.util.List;' + NL + 'import java.util.Random;' + NL + NL
         + '/**' + NL
-        + ' * \u300c\u8be5\u6548\u679c\u6bcf\u4e2a\u89d2\u8272\u6700\u591a\u89e6\u53d1 1 \u6b21\u300d (1403) -- a firing count that belongs to the TRIGGERER, not the owner.' + NL
+        + ' * 「该效果每个角色最多触发 1 次」 (1403) -- a firing count that belongs to the TRIGGERER, not the owner.' + NL
         + ' *' + NL
         + ' * <p>The probe stack must be allowed past one (addStack caps at 1 by default), otherwise the reading' + NL
         + ' * saturates and a working scope looks like a frozen failure -- the six rounds lost in 734-747.' + NL

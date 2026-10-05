@@ -18,7 +18,7 @@ import java.util.Random;
 /**
  * Light cone 23010: the wearer's SKILL and ULTIMATE damage are 18% higher (its crit damage is the row's own props).
  *
- * <p>\u2b50 The two halves are two rules, because {@code from_category} takes a single value. The judge checks both directions: each
+ * <p>⭐ The two halves are two rules, because {@code from_category} takes a single value. The judge checks both directions: each
  * category must be lifted, and a plain attack must not be -- a rule written without the condition would lift all three.
  */
 public class Cone23010Test {
@@ -45,7 +45,7 @@ public class Cone23010Test {
 
     private int rulesFor(SkillCategory category) {
         int seen = 0;
-        // \u26a0 Build first: reading wearer on the same line as its own construction is an NPE (measured).
+        // ⚠ Build first: reading wearer on the same line as its own construction is an NPE (measured).
         Battle battle = battle(true);
         for (var rule : wearer.getTriggerTable().matching(TriggerEvent.DEALING_DAMAGE,
                 new TriggerTable.TriggerContext(wearer, wearer, enemy, 0, 0, null, battle, category))) {
@@ -64,7 +64,7 @@ public class Cone23010Test {
     }
 
     /**
-     * \u2605 The third sentence: after an Ultimate the wearer's FOLLOW-UP damage is 48% higher for one turn. It is a written
+     * ★ The third sentence: after an Ultimate the wearer's FOLLOW-UP damage is 48% higher for one turn. It is a written
      * modifier on the category attribute, not a damage-type scope -- measured: the attribute exists
      * (`FOLLOW_UP_DAMAGE_BOOST`), which is what an earlier note of mine wrongly called missing.
      */
@@ -84,7 +84,7 @@ public class Cone23010Test {
                 pinned++;
                 System.out.println("[23010] ult rule: attribute=" + effect.getAttribute() + " percent="
                         + effect.getPercent() + " turns=" + effect.getTurns());
-                // \u26a0 `getAttribute()` is a String, not the enum (measured): compare the spelling.
+                // ⚠ `getAttribute()` is a String, not the enum (measured): compare the spelling.
                 Assertions.assertEquals("FOLLOW_UP_DAMAGE_BOOST", effect.getAttribute(),
                         "the follow-up dimension is an attribute");
                 Assertions.assertEquals(0.48, effect.getPercent(), 1e-9, "48% at rank 1");

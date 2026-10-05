@@ -33,7 +33,7 @@ NEW_SET = ('    private static final Set<String> TARGET_SELECTORS =' + NL
            + '            Set.of("party_first", "next_ally", "self", "target", "attacker", "all_allies", "party", "other_allies", "summon",' + NL
            + '                    "target_and_summon", "all_enemies", "lowest_hp_ally",' + NL
            + '            "random_enemy", "random_hit_enemy",' + NL
-           + '            // \u2b50 \u300c\u82e5\u8ffd\u52a0\u653b\u51fb\u65bd\u653e\u524d\u76ee\u6807\u88ab\u6d88\u706d\u5219\u5bf9\u654c\u65b9\u968f\u673a\u5355\u4f53\u53d1\u52a8\u300d (2026-09-30; three registered readers:' + NL
+           + '            // ⭐ 「若追加攻击施放前目标被消灭则对敌方随机单体发动」 (2026-09-30; three registered readers:' + NL
            + '            // 1220 reason 1, 1221 reason 2, 1305). The preferred target is dead -> take a random enemy.' + NL
            + '            // CanHit:88-90 keeps death orthogonal to invulnerability, so this is the clause own wording.' + NL
            + '            "target_else_random_enemy");')
@@ -43,7 +43,7 @@ if saved.count(OLD_SET) != 1:
 
 # 2) and it resolves
 OLD_CASE = '            case TARGET_RANDOM_ENEMY -> require('
-NEW_CASE = ('''            // \u2b50 The fallback (2026-09-30): 「\u82e5\u2026\u76ee\u6807\u88ab\u6d88\u706d\u5219\u5bf9\u654c\u65b9\u968f\u673a\u5355\u4f53\u53d1\u52a8\u300d. The preferred target
+NEW_CASE = ('''            // ⭐ The fallback (2026-09-30): 「若…目标被消灭则对敌方随机单体发动」. The preferred target
             // is the trigger's own, and CanHit has a real "defeated" flag orthogonal to invulnerability (CanHit:88-90),
             // so a dead preferred target -- and only that -- falls through to the battle's seeded random opponent.
             case "target_else_random_enemy" -> {

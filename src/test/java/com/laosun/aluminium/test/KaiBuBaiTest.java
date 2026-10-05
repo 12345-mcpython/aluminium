@@ -24,7 +24,7 @@ public class KaiBuBaiTest {
     private static final int TEAMMATE = 1513;
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
-    private static final String GIFT = "\u597d\u6d3b\u5f53\u8d4f";
+    private static final String GIFT = "好活当赏";
 
     /** Four instances end, and she converts half of them. */
     @Test

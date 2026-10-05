@@ -16,8 +16,8 @@ PATH = "src/main/java/com/laosun/aluminium/models/TriggerInterpreter.java"
 text = io.open(PATH, encoding="utf-8").read()
 
 OLD = """        battle.fireTriggers(TriggerEvent.INSERTED_CAST_END, actor, actor, 0, 0);"""
-NEW = """        // \u2b50 The event carries the unit the commanded cast was AIMED at, not the caster (2026-10-02; reader: 1415's
-        // \u300c\u5947\u88ad\u7ed3\u675f\u540e\uff0c\u4f7f\u523b\u5f8b\u5fb7\u83c8\u83b7\u5f97 1 \u70b9\u5145\u80fd\u300d). The actor is still the actor; the target slot now answers "who was it cast on",
+NEW = """        // ⭐ The event carries the unit the commanded cast was AIMED at, not the caster (2026-10-02; reader: 1415's
+        // 「奇袭结束后，使刻律德菈获得 1 点充能」). The actor is still the actor; the target slot now answers "who was it cast on",
         // which is what that sentence needs -- and 1412's own subscriber states no target, so nothing shipped moves.
         CanHit aimed = victims == null || victims.isEmpty() ? actor : victims.getFirst();
         battle.fireTriggers(TriggerEvent.INSERTED_CAST_END, actor, aimed, 0, 0);"""

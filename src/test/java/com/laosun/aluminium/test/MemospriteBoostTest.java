@@ -67,7 +67,7 @@ public class MemospriteBoostTest {
     /** One hit by the memosprite, against a victim that cannot die, with or without the synthetic grant. */
     private static double memospriteDamage(boolean boosted) {
         Character master = CharacterFactory.create(SUMMONER, LEVEL);
-        // \u26a0 Both runs must be equally free of SHIPPED content: 1413's talent is real now and fires at one enemy, and while
+        // ⚠ Both runs must be equally free of SHIPPED content: 1413's talent is real now and fires at one enemy, and while
         // the boosted run replaces the table, the plain run would keep it -- measured as 222.43 versus 219.46, i.e. the control
         // was contaminated by content rather than by the grant under test.
         master.setTriggerTable(new TriggerTable(9402, List.of()));

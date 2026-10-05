@@ -28,9 +28,9 @@ for r in rules:
             if isinstance(s, dict) and s.get("attribute") == "ALL_DAMAGE_TYPE_BOOST":
                 s["max_stacks"] = 1
         r["note"] = ((r.get("note") or "") +
-                     " \u2b50 2026-10-02\uff1a`\"max_stacks\": 1` \u2713 \u2014\u2014 \u672c\u6bb5\u5b9e\u6d4b\uff1a**\u540c\u5c5e\u6027\u4e24\u6761\u52a0\u6210**"
-                     "\u8981\u4e48\u90fd\u5199 `max_stacks`\uff08\u8d70 `addStackable` \u21d2 \u76f8\u52a0 \u2713\uff09\uff0c\u8981\u4e48\u540e\u5199\u7684\u628a\u5148\u5199\u7684**\u66ff\u6362\u6389** \u2717"
-                     "\uff08`BuffManager.addBuff` \u7684 `isSameKind` \u5206\u652f \u2713\uff0c\u8bbe\u8ba1\u5982\u6b64 \u2713\uff09\u3002")
+                     " ⭐ 2026-10-02：`\"max_stacks\": 1` ✓ —— 本段实测：**同属性两条加成**"
+                     "要么都写 `max_stacks`（走 `addStackable` ⇒ 相加 ✓），要么后写的把先写的**替换掉** ✗"
+                     "（`BuffManager.addBuff` 的 `isSameKind` 分支 ✓，设计如此 ✓）。")
 
 # 2) the trace, same shape
 rules = [r for r in rules if not (isinstance(r, dict) and r.get("id") == TRACE)]
@@ -46,11 +46,11 @@ rules.append({
         "max_stacks": 1,
         "target": "all_allies",
     }],
-    "source": ("1415 \u6614\u6d9f \u884c\u8ff9 \u4e09\u76f8\u7684\u56e0\u679c (1415103): "
-               "\u300c\u6614\u6d9f\u7684\u901f\u5ea6\u5927\u4e8e\u7b49\u4e8e **180** \u70b9\u65f6\uff0c"
-               "\u6211\u65b9\u5168\u4f53\u9020\u6210\u7684\u4f24\u5bb3\u63d0\u9ad8 **20%**\u300d"),
-    "note": ("\u2b50 \u4e0e\u5929\u8d4b\u540c\u5c5e\u6027 \u2713 \u21d2 \u4e24\u6761\u90fd\u5199 `\"max_stacks\": 1` \u2713"
-             "\uff08\u5b9e\u6d4b\uff1a\u53ea\u7ed9\u4e00\u6761\u5199 \u21d2 \u6574\u8868\u4e0a\u4ecd\u662f **0.2** \u2717\uff09\u3002"),
+    "source": ("1415 昔涟 行迹 三相的因果 (1415103): "
+               "「昔涟的速度大于等于 **180** 点时，"
+               "我方全体造成的伤害提高 **20%**」"),
+    "note": ("⭐ 与天赋同属性 ✓ ⇒ 两条都写 `\"max_stacks\": 1` ✓"
+             "（实测：只给一条写 ⇒ 整表上仍是 **0.2** ✗）。"),
 })
 out = doc if isinstance(doc, dict) else {"rules": rules}
 if isinstance(doc, dict):
@@ -78,16 +78,16 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * \u300c\u901f\u5ea6 \u2265 180 \u65f6\u5168\u961f\u4f24\u5bb3 +20%\u300d\u4e0e\u5979\u5929\u8d4b\u90a3\u6761 +20% \u5e76\u5b58 (1415, 2026-10-02).
+ * 「速度 ≥ 180 时全队伤害 +20%」与她天赋那条 +20% 并存 (1415, 2026-10-02).
  *
- * <p>\u2b50 FILE-DRIVEN, and the TOTAL is the claim: 0.2 below the threshold (talent only), 0.4 past it (talent + trace). Both
+ * <p>⭐ FILE-DRIVEN, and the TOTAL is the claim: 0.2 below the threshold (talent only), 0.4 past it (talent + trace). Both
  * readings are only possible when both rules are counted, which is what `max_stacks` on both buys.
  */
 public class CyreneSpeedThresholdTest {
     private static final int OWNER = 1415;
     private static final int MONSTER = 1002011;
 
-    /** \u2b50 Talent alone below 180; talent plus trace past it. */
+    /** ⭐ Talent alone below 180; talent plus trace past it. */
     @Test
     public void theTwoWritersAdd() {
         Assertions.assertEquals(0.2, total(0), 1e-6, "below the threshold, her talent alone");

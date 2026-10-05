@@ -27,10 +27,10 @@ for path in sorted(glob.glob(os.path.join(ROOT, "*.html"))):
     except Exception:
         continue
     text = strip(raw)
-    for keyword in ("\u5947\u88ad\u7ed3\u675f\u540e", "\u597d\u6d3b\u5f53\u8d4f"):
+    for keyword in ("奇袭结束后", "好活当赏"):
         for match in re.finditer(re.escape(keyword) + r".{0,120}", text):
             piece = match.group(0)
-            if keyword == "\u597d\u6d3b\u5f53\u8d4f" and "\u7ed3\u675f" not in piece and "\u8f6c\u5316" not in piece:
+            if keyword == "好活当赏" and "结束" not in piece and "转化" not in piece:
                 continue
             out.append("[%s] %s" % (name, piece))
 

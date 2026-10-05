@@ -52,14 +52,14 @@ rules.append({
         boost("ATTACK", 0, "summon"),
         boost("CRIT_CHANCE", 1, "summon"),
     ],
-    "source": ("1415 \u6614\u6d9f \u5fc6\u7075\u6280\u80fd 10 \u300c" + name + "\u300d\uff08\u6570\u636e\u69fd\u4f4d 13\uff0cSkillID 1141513\uff09\uff1a"
-               "\u300c**\u5bf9\u5f00\u62d3\u8005\u2022\u8bb0\u5fc6\u65bd\u653e\u65f6\uff0c\u4f7f\u5f00\u62d3\u8005\u2022\u8bb0\u5fc6\u7684\u653b\u51fb\u529b\u63d0\u9ad8\uff0c"
-               "\u63d0\u9ad8\u6570\u503c\u7b49\u540c\u4e8e**\u5fb7\u8c2c\u6b4c\u751f\u547d\u4e0a\u9650**\u7684 #1%\uff0c\u540c\u65f6\u4f7f\u5176\u66b4\u51fb\u7387\u63d0\u9ad8\uff0c"
-               "\u63d0\u9ad8\u6570\u503c\u7b49\u540c\u4e8e**\u5fb7\u8c2c\u6b4c\u66b4\u51fb\u7387**\u7684 #2%\u3002**\u8be5\u6548\u679c\u5bf9\u8ff7\u8ff7\u4e5f\u751f\u6548\u3002**\u300d"),
-    "note": ("\u2b50 \u4e24\u4e2a\u4e3b\u4f53\u5404\u81ea\u53d6\u81ea\u54ea\u91cc\uff0c\u90fd\u662f**\u91cf\u8fc7**\u7684\uff1a"
-             "\u5360\u6bd4 #1/#2 \u6765\u81ea**\u65bd\u653e\u6280\u80fd\u7684\u53c2\u6570**\uff08`percent_from_cast_param`\uff0c\u6309\u65bd\u653e\u8005\u7684**\u5f53\u524d\u7b49\u7ea7**\u53d6\u884c\uff09\uff1b"
-             "\u800c\u5b83\u4eec\u6240**\u4e58**\u7684\u5c5e\u6027\u6765\u81ea**\u52a8\u4f5c\u65b9**\uff08`actor_attr:`\uff0c\u5373\u5fb7\u8c2c\u6b4c\u81ea\u5df1\uff09\u2014\u2014"
-             "`self_attr:` \u8bfb\u7684\u662f\u6301\u6709\u8005\u3001`summon_attr:` \u8bfb\u7684\u662f\u6301\u6709\u8005\u7684\u5fc6\u7075\uff08\u5bf9 8007 \u800c\u8a00\u662f\u8ff7\u8ff7\uff09\uff0c\u4e24\u8005\u90fd\u4e0d\u662f\u5fb7\u8c2c\u6b4c\u3002"),
+    "source": ("1415 昔涟 忆灵技能 10 「" + name + "」（数据槽位 13，SkillID 1141513）："
+               "「**对开拓者•记忆施放时，使开拓者•记忆的攻击力提高，"
+               "提高数值等同于**德谬歌生命上限**的 #1%，同时使其暴击率提高，"
+               "提高数值等同于**德谬歌暴击率**的 #2%。**该效果对迷迷也生效。**」"),
+    "note": ("⭐ 两个主体各自取自哪里，都是**量过**的："
+             "占比 #1/#2 来自**施放技能的参数**（`percent_from_cast_param`，按施放者的**当前等级**取行）；"
+             "而它们所**乘**的属性来自**动作方**（`actor_attr:`，即德谬歌自己）——"
+             "`self_attr:` 读的是持有者、`summon_attr:` 读的是持有者的忆灵（对 8007 而言是迷迷），两者都不是德谬歌。"),
 })
 
 if isinstance(doc, list):
@@ -73,9 +73,9 @@ print("ok   %s now carries %s (%d rules)" % (CHARS, RULE_ID, len(rules)))
 effects = json.load(io.open(SE, encoding="utf-8"))
 effects.setdefault("11415", {})[str(SLOT)] = {
     "effect": "Rules",
-    "source": ("1415 \u6614\u6d9f \u5fc6\u7075\u6280\u80fd 10 \u300c" + name + "\u300d\uff08\u6570\u636e\u69fd\u4f4d 13\uff0cSkillID 1141513\uff09\uff1a"
-               "\u5b83\u7684\u5de5\u4f5c\u5728**\u89c4\u5219\u4fa7**\uff0c\u6240\u4ee5\u662f `Rules` \u5f62\u72b6\u3002"),
-    "note": "\u2b50 \u6ca1\u6709\u6761\u76ee\u5c31\u4e0d\u53ef\u4ea4\u4ed8\uff08`SkillExecutor.canDeliver`\uff09\uff0c\u6574\u6761\u5fc6\u7075\u6280\u80fd\u5c31\u6c38\u8fdc\u65bd\u653e\u4e0d\u4e86\u3002",
+    "source": ("1415 昔涟 忆灵技能 10 「" + name + "」（数据槽位 13，SkillID 1141513）："
+               "它的工作在**规则侧**，所以是 `Rules` 形状。"),
+    "note": "⭐ 没有条目就不可交付（`SkillExecutor.canDeliver`），整条忆灵技能就永远施放不了。",
 }
 io.open(SE, "w", encoding="utf-8", newline="\n").write(json.dumps(effects, ensure_ascii=False, indent=2) + "\n")
 print("ok   skill_effects.json: 11415/%d = Rules" % SLOT)

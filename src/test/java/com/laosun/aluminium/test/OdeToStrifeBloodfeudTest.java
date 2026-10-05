@@ -53,7 +53,7 @@ public class OdeToStrifeBloodfeudTest {
         int slot = mydei.getSkills().get(SkillType.SKILL).getSkillSlot();
         System.out.println("[ode] his SKILL slot " + before + " -> " + slot + " (want " + GODSLAYER + ")");
         Assertions.assertEquals(GODSLAYER, slot,
-                "\u300c\u4f7f\u5176\u81ea\u52a8\u65bd\u653e 1 \u6b21\u3010\u5f11\u795e\u767b\u795e\u3011\u300d-- the swap his own rule performs");
+                "「使其自动施放 1 次【弑神登神】」-- the swap his own rule performs");
     }
 
     /** Outside 【血仇】 the same cast leaves him alone -- the other half of 「若…处于…则…」. */
@@ -68,7 +68,7 @@ public class OdeToStrifeBloodfeudTest {
 
         int slot = mydei.getSkills().get(SkillType.SKILL).getSkillSlot();
         System.out.println("[ode] outside bloodfeud his SKILL slot " + before + " -> " + slot + " (want it unchanged)");
-        Assertions.assertEquals(before, slot, "\u300c\u82e5\u4e07\u654c\u5904\u4e8e\u3010\u8840\u4ec7\u3011\u300d-- this branch needs it");
+        Assertions.assertEquals(before, slot, "「若万敌处于【血仇】」-- this branch needs it");
     }
 
     // ==================================================================

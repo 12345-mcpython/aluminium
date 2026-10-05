@@ -1,6 +1,6 @@
-"""Probe: does her `\u79d8\u6280` state make the technique rule fire? (2026-10-02)
+"""Probe: does her `秘技` state make the technique rule fire? (2026-10-02)
 
-`1401`'s technique rule is `BATTLE_START` + `when: ["self has_state \u79d8\u6280"] -> +60% ATTACK`, and her ult is
+`1401`'s technique rule is `BATTLE_START` + `when: ["self has_state 秘技"] -> +60% ATTACK`, and her ult is
 `ULT_CAST -> +80% ATTACK`. A judge gives her no state, so the technique may never fire there -- which would explain why
 the earlier judge's assertions held even with `max_stacks` removed (a false positive).
 
@@ -30,7 +30,7 @@ import java.util.Random;
 public class StateProbeTest {
     private static final int OWNER = 1401;
 
-    /** \u2b50 Does giving her \u79d8\u6280 change her ATTACK at battle start? */
+    /** ⭐ Does giving her 秘技 change her ATTACK at battle start? */
     @Test
     public void theStateMakesTheTechniqueFire() {
         double plain = attackAtStart(false);
@@ -44,7 +44,7 @@ public class StateProbeTest {
         if (giveState) {
             EffectSpec state = new EffectSpec();
             TriggerSpecs.set(state, "op", "APPLY_BUFF");
-            TriggerSpecs.set(state, "buff", "\u79d8\u6280");
+            TriggerSpecs.set(state, "buff", "秘技");
             TriggerSpecs.set(state, "turns", 3);
             TriggerSpecs.set(state, "target", "self");
             owner.setTriggerTable(owner.getTriggerTable()

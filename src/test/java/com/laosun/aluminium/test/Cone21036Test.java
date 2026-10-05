@@ -16,12 +16,12 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Light cone 21036: whichever of basic / skill / ultimate the wearer cast LAST decides which category the whole party\u2019s damage
+ * Light cone 21036: whichever of basic / skill / ultimate the wearer cast LAST decides which category the whole party’s damage
  * is lifted by 12%, and only that one is ever up.
  *
- * <p>\u2b50 "Only the latest" is built from the engine\u2019s own removal rule: a stat modifier is matched BY ATTRIBUTE
+ * <p>⭐ "Only the latest" is built from the engine’s own removal rule: a stat modifier is matched BY ATTRIBUTE
  * ({@code BuffManager.isNamed} answers a StatModifierBuff by its attribute, and a StateBuff by its name), so each rule removes the
- * other two attributes\u2019 modifiers with REMOVE_STACK. No new capability was needed -- the pieces were already there.
+ * other two attributes’ modifiers with REMOVE_STACK. No new capability was needed -- the pieces were already there.
  */
 public class Cone21036Test {
     private static final int CONE = 21036;
@@ -77,7 +77,7 @@ public class Cone21036Test {
         build(false);
         cast(SkillCategory.BPSKILL);
         System.out.println("[21036] without the cone: " + boosts());
-        Assertions.assertEquals("basic=0.0 skill=0.0 ult=0.0", boosts(), "no cone, no \u7ae5\u5fc3 (false case)");
+        Assertions.assertEquals("basic=0.0 skill=0.0 ult=0.0", boosts(), "no cone, no 童心 (false case)");
     }
 
     @Test

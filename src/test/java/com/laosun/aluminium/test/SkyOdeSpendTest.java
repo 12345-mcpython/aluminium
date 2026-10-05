@@ -27,7 +27,7 @@ public class SkyOdeSpendTest {
     private static final int HYACINE = 1409;
     private static final int ALLY = 1002;
     private static final int MONSTER = 1002011;
-    private static final String MARK = "\u732e\u4e88\u300c\u5929\u7a7a\u300d\u4e4b\u8bd7";
+    private static final String MARK = "献予「天空」之诗";
 
     @Test
     public void aSkillAndAnUltimateSpendOneLayerEachAndABasicSpendsNone() {
@@ -40,7 +40,7 @@ public class SkyOdeSpendTest {
         hyacine = battle.characters.get(0);
         ally = battle.characters.get(1);
 
-        // \u26a0\u26a0 The layers are placed by ANOTHER character rule, NOT by replacing Hyacine own table: the two rules under test live in that table, and
+        // ⚠⚠ The layers are placed by ANOTHER character rule, NOT by replacing Hyacine own table: the two rules under test live in that table, and
         // `setTriggerTable` would have deleted them. This exact mistake has been made six times in this project; it is discipline #1 in GAPS.md.
         EffectSpec layers = new EffectSpec();
         TriggerSpecs.set(layers, "op", "ADD_STACK");
@@ -64,13 +64,13 @@ public class SkyOdeSpendTest {
         System.out.println("[sky_spend] layers after basic = " + afterBasic + " ; after skill = " + afterSkill
                 + " ; after ultimate = " + afterUlt);
 
-        Assertions.assertEquals(3, afterBasic, "\u300c\u6218\u6280/终\u7ed3\u6280\u300d-- a BASIC is neither, so it must not spend");
-        Assertions.assertEquals(2, afterSkill, "\u6218\u6280 (slot 2) spends one");
-        Assertions.assertEquals(1, afterUlt, "\u7ec8\u7ed3\u6280 (slot 3) spends another");
+        Assertions.assertEquals(3, afterBasic, "「战技/终结技」-- a BASIC is neither, so it must not spend");
+        Assertions.assertEquals(2, afterSkill, "战技 (slot 2) spends one");
+        Assertions.assertEquals(1, afterUlt, "终结技 (slot 3) spends another");
     }
 
     private static int cast(Battle battle, Character who, int slot) {
-        // \u26a0 `skillAt` is the MEMOSPRITE's API; a character's skills are keyed by slot enum
+        // ⚠ `skillAt` is the MEMOSPRITE's API; a character's skills are keyed by slot enum
         SkillType type = switch (slot) {
             case 1 -> SkillType.COMMON;
             case 2 -> SkillType.SKILL;

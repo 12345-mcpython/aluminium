@@ -26,7 +26,7 @@ public class DebuffAppliedTierTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
     private static final int RELIC_LEVEL = 15;
-    private static final String COUNTER = "\u8d1f\u9762\u6fc0\u5316";
+    private static final String COUNTER = "负面激化";
 
     @Test
     public void theFourthPieceScalesWithTheTargetsDebuffCount() {

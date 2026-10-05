@@ -19,13 +19,13 @@ import java.util.Random;
  * limit threw. The guard is the positive condition `damage_is_attack`, which is TRUE for an ordinary attack and FALSE
  * for additional damage.
  *
- * <p>\u26a0 <b>Why this file was rewritten (round 4 of the current goal).</b> It used to assert
+ * <p>⚠ <b>Why this file was rewritten (round 4 of the current goal).</b> It used to assert
  * {@code energy >= before + 5} after one basic attack -- but a basic attack grants energy on its own, so the assertion was
  * satisfied whether or not the talent fired. Measured: with {@code damage_is_attack} inverted (its implementation until
  * 2026-09-30) the talent did NOT fire on ordinary attacks, and this test stayed green. The reading is now the
  * <b>difference</b> between attacking a burning target and attacking a plain one: only the talent can produce it.
  *
- * <p>\u26a0 <b>That this test finishes is itself the assertion about recursion.</b> If the guard were missing or
+ * <p>⚠ <b>That this test finishes is itself the assertion about recursion.</b> If the guard were missing or
  * ineffective, the engine would raise "Trigger recursion exceeded" and the test would fail with that, not with a number.
  */
 public class HookTalentTest {
@@ -46,7 +46,7 @@ public class HookTalentTest {
         battle.startBattle();
         if (burning) {
             battle.castImmediate(hook.getSkills().get(SkillType.SKILL), hook, List.of(enemy));
-            Assertions.assertTrue(enemy.getBuffManager().hasState("\u707c\u70e7"), "precondition: the target burns");
+            Assertions.assertTrue(enemy.getBuffManager().hasState("灼烧"), "precondition: the target burns");
         }
         double before = hook.getCurrentEnergy();
         battle.castImmediate(hook.getSkills().get(SkillType.COMMON), hook, List.of(enemy));

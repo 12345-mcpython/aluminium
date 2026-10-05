@@ -63,7 +63,7 @@ public class Cone21024Test {
                 pinned++;
                 System.out.println("[21024] spec attribute=" + effect.getAttribute() + " percent=" + effect.getPercent()
                         + " target=" + effect.getTarget());
-                // \u2605 The SHARES, not just their existence: without this the `8/12 -> 4/6` mutation was 0 red (measured) --
+                // ★ The SHARES, not just their existence: without this the `8/12 -> 4/6` mutation was 0 red (measured) --
                 // `delta > 0` cannot tell 8% from 4%, which is discipline 192 again.
                 if ("SPEED".equals(effect.getAttribute())) {
                     Assertions.assertEquals(0.08, effect.getPercent(), 1e-9, "speed 8% at rank 1");

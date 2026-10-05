@@ -37,7 +37,7 @@ public class LightConeHealthyTargetTest {
         double rankFive = damage(5);
         Assertions.assertTrue(rankOne > 0, "precondition: the attack lands: " + rankOne);
         double ratio = rankFive / rankOne;
-        // \u26a0 Measured, not derived: the observable ratio is 1.1404494, because BOOST_DAMAGE adds into a zone that already
+        // ⚠ Measured, not derived: the observable ratio is 1.1404494, because BOOST_DAMAGE adds into a zone that already
         // holds other contributions, so the naive 1.4/1.2 = 1.1667 compresses. The band is tight enough that a wrong boost
         // falls outside it (making both ranks equal gives 1.0).
         Assertions.assertTrue(ratio > 1.13 && ratio < 1.15,

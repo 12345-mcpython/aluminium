@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * \u300c\u654c\u65b9\u5bf9\u6211\u65b9\u65bd\u52a0\u4e86**\u63a7\u5236\u7c7b**\u8d1f\u9762\u72b6\u6001\u300d\u53ef\u4ee5\u88ab\u95ee\u4e86 (2026-10-02).
+ * 「敌方对我方施加了**控制类**负面状态」可以被问了 (2026-10-02).
  *
  * <p>Two-way on purpose: the same rule must fire for a CONTROL debuff and stay silent for a DOT one, which is the only way this
  * reading tells "the filter works" apart from "the event fired at all".
@@ -36,11 +36,11 @@ public class DebuffClassConditionTest {
     @Test
     public void theFilterTellsTheTwoFamiliesApart() {
         Assertions.assertEquals(1, hitsFor("APPLY_CONTROL", "control"),
-                "\u300c\u63a7\u5236\u7c7b\u300d-- a landed control fires the rule that asked for it");
+                "「控制类」-- a landed control fires the rule that asked for it");
         Assertions.assertEquals(0, hitsFor("APPLY_CONTROL", "dot"),
-                "and the same control does NOT fire a rule that asked for \u300c\u6301\u7eed\u4f24\u5bb3\u7c7b\u300d");
+                "and the same control does NOT fire a rule that asked for 「持续伤害类」");
         Assertions.assertEquals(1, hitsFor("APPLY_DOT", "dot"),
-                "\u300c\u6301\u7eed\u4f24\u5bb3\u7c7b\u300d-- a landed dot fires the dot rule");
+                "「持续伤害类」-- a landed dot fires the dot rule");
         Assertions.assertEquals(0, hitsFor("APPLY_DOT", "control"),
                 "and it does NOT fire the control one");
     }
@@ -51,7 +51,7 @@ public class DebuffClassConditionTest {
         EffectSpec land = new EffectSpec();
         TriggerSpecs.set(land, "op", op);
         if ("APPLY_CONTROL".equals(op)) {
-            // \u26a0 The key the validator names: `APPLY_CONTROL requires "control" (known: \u51bb\u7ed3 / \u7981\u9522 / \u7f20\u7ed5)`.
+            // ⚠ The key the validator names: `APPLY_CONTROL requires "control" (known: 冻结 / 禁锢 / 缠绕)`.
             TriggerSpecs.set(land, "control", "\\u51bb\\u7ed3");
         } else {
             TriggerSpecs.set(land, "dot", "probeDot");

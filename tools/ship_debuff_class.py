@@ -34,9 +34,9 @@ patch(
     "    private String lastChangedResource;",
     "    private String lastChangedResource;\n\n"
     "    /**\n"
-    "     * \u2b50 The CLASS of the debuff that just landed (2026-10-02; reader: 1506's \u300c\u654c\u65b9\u5bf9\u6211\u65b9\u65bd\u52a0\u4e86**\u63a7\u5236\u7c7b**\n"
-    "     * \u8d1f\u9762\u72b6\u6001\u300d). Same shape as {@link #lastChangedResource}: a battle-level fact the condition DSL reads, set at the one chokepoint\n"
-    "     * every landed debuff passes through. \u26a0 Deliberately NOT folded into an existing argument slot -- the STATE_ENDED magnitude was once\n"
+    "     * ⭐ The CLASS of the debuff that just landed (2026-10-02; reader: 1506's 「敌方对我方施加了**控制类**\n"
+    "     * 负面状态」). Same shape as {@link #lastChangedResource}: a battle-level fact the condition DSL reads, set at the one chokepoint\n"
+    "     * every landed debuff passes through. ⚠ Deliberately NOT folded into an existing argument slot -- the STATE_ENDED magnitude was once\n"
     "     * put in `hitCount` and every reading of it was 0 until that was found.\n"
     "     */\n"
     "    private com.laosun.aluminium.enums.DebuffClass lastAppliedDebuffClass;",
@@ -61,7 +61,7 @@ patch(
 patch(
     BATTLE,
     "        fireTriggers(TriggerEvent.DEBUFF_APPLIED, caster, target, 0, 0);",
-    "        // \u2b50 Tell the tables WHICH FAMILY landed, before the event goes out (2026-10-02): the class is already read one line up for\n"
+    "        // ⭐ Tell the tables WHICH FAMILY landed, before the event goes out (2026-10-02): the class is already read one line up for\n"
     "        // the resistance roll, so it costs nothing to make the same fact askable.\n"
     "        noteAppliedDebuffClass(buff.debuffClass());\n"
     "        fireTriggers(TriggerEvent.DEBUFF_APPLIED, caster, target, 0, 0);",
@@ -74,7 +74,7 @@ patch(
     """        java.util.regex.Matcher changed =
                 java.util.regex.Pattern.compile("resource_changed:([^\\\\s]+)", java.util.regex.Pattern.CASE_INSENSITIVE)
                         .matcher(text);""",
-    """        // \u2b50 \u300c\u65bd\u52a0\u7684\u662f\u63a7\u5236\u7c7b\uff0f\u6301\u7eed\u4f24\u5bb3\u7c7b\u8d1f\u9762\u72b6\u6001\u300d (2026-10-02; reader: 1506's warehouse skill). Read like
+    """        // ⭐ 「施加的是控制类／持续伤害类负面状态」 (2026-10-02; reader: 1506's warehouse skill). Read like
         // `resource_changed:` -- a battle-level fact recorded at the chokepoint -- and placed beside it, first in the chain.
         java.util.regex.Matcher debuffClass =
                 java.util.regex.Pattern.compile("debuff_class:([^\\\\s]+)", java.util.regex.Pattern.CASE_INSENSITIVE)
@@ -92,7 +92,7 @@ patch(
 patch(
     TABLE,
     "    private static final class ResourceChanged implements Condition {",
-    "    /** \u2705 \u300c\u65bd\u52a0\u7684\u662f\u3010X\u3011\u7c7b\u8d1f\u9762\u72b6\u6001\u300d: the family of the debuff that just landed (control / dot). */\n"
+    "    /** ✅ 「施加的是【X】类负面状态」: the family of the debuff that just landed (control / dot). */\n"
     "    private static final class AppliedDebuffClass implements Condition {\n"
     "        private final String raw;\n"
     "        private final com.laosun.aluminium.enums.DebuffClass expected;\n\n"
@@ -133,7 +133,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * \u300c\u654c\u65b9\u5bf9\u6211\u65b9\u65bd\u52a0\u4e86**\u63a7\u5236\u7c7b**\u8d1f\u9762\u72b6\u6001\u300d\u53ef\u4ee5\u88ab\u95ee\u4e86 (2026-10-02).
+ * 「敌方对我方施加了**控制类**负面状态」可以被问了 (2026-10-02).
  *
  * <p>Two-way on purpose: the same rule must fire for a CONTROL debuff and stay silent for a DOT one, which is the only way the
  * reading tells "the filter works" apart from "the event fired at all".
@@ -147,11 +147,11 @@ public class DebuffClassConditionTest {
     @Test
     public void theFilterTellsTheTwoFamiliesApart() {
         Assertions.assertEquals(1, hitsFor("APPLY_CONTROL", "control"),
-                "\u300c\u63a7\u5236\u7c7b\u300d-- a landed control fires the rule");
+                "「控制类」-- a landed control fires the rule");
         Assertions.assertEquals(0, hitsFor("APPLY_CONTROL", "dot"),
-                "and the same control does NOT fire a rule that asked for \u300c\u6301\u7eed\u4f24\u5bb3\u7c7b\u300d");
+                "and the same control does NOT fire a rule that asked for 「持续伤害类」");
         Assertions.assertEquals(1, hitsFor("APPLY_DOT", "dot"),
-                "\u300c\u6301\u7eed\u4f24\u5bb3\u7c7b\u300d-- a landed dot fires the dot rule");
+                "「持续伤害类」-- a landed dot fires the dot rule");
         Assertions.assertEquals(0, hitsFor("APPLY_DOT", "control"),
                 "and does not fire the control one");
     }

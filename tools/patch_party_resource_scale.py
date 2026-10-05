@@ -35,8 +35,8 @@ patch(
     if (fromStacks != null) {
         return fromStacks;
     }
-    // \u2b50 A battle-level PARTY counter as a magnitude (2026-10-02; reader: 1513's reward, which hands \u3010\u597d\u6d3b\u5f53\u8d4f\u3011 the
-    // \u3010\u7b11\u70b9\u3011 the Aha moment spent). The counter lives on the battle, not on any unit, so `self_stacks:` cannot reach it.
+    // ⭐ A battle-level PARTY counter as a magnitude (2026-10-02; reader: 1513's reward, which hands 【好活当赏】 the
+    // 【笑点】 the Aha moment spent). The counter lives on the battle, not on any unit, so `self_stacks:` cannot reach it.
     if (key.startsWith("party_resource:")) {
         String counter = key.substring("party_resource:".length()).trim();
         if (ctx.battle() == null) {

@@ -56,7 +56,7 @@ public class TrailblazerDefencePerStackTest {
                 "precondition: the talent marked exactly " + layers + " layer(s)");
         double after = trailblazer.getAttribute(AttributeType.DEFENCE).get();
         Assertions.assertEquals(shareOfBase * base, after - before, EPS,
-                "\u300c\u5929\u8d4b\u7684\u6548\u679c\u6bcf\u5c42\u540c\u65f6\u4f7f\u5f00\u62d3\u8005\u7684"
-                        + "\u9632\u5fa1\u529b\u63d0\u9ad810%\u300d with " + layers + " layer(s)");
+                "「天赋的效果每层同时使开拓者的"
+                        + "防御力提高10%」 with " + layers + " layer(s)");
     }
 }

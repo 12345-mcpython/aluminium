@@ -21,7 +21,7 @@ public class SilverWolfTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** \u26a0 Exactly 45% of the enemy's own defence, and nothing at all until the Ultimate is cast. */
+    /** ⚠ Exactly 45% of the enemy's own defence, and nothing at all until the Ultimate is cast. */
     @Test
     public void theUltimateShredsFortyFivePercentOfTheDefence() {
         Character silverWolf = CharacterFactory.create(SILVER_WOLF, LEVEL);
@@ -40,7 +40,7 @@ public class SilverWolfTest {
         double after = enemy.getAttribute(AttributeType.DEFENCE).get();
 
         Assertions.assertEquals(0.45, (before - after) / before, 1e-6,
-                "\u300c\u4f7f\u6307\u5b9a\u654c\u65b9\u5355\u4f53\u9632\u5fa1\u529b\u964d\u4f4e45.00%\u300d of its own defence: " + before + " -> " + after);
+                "「使指定敌方单体防御力降低45.00%」 of its own defence: " + before + " -> " + after);
     }
 
     private static Random fixed() {

@@ -22,7 +22,7 @@ if 'EVENT_AMOUNT' in interp:
 else:
     OLD = ("        if (SELF_MAX_ENERGY.equals(effect.getScale().trim())) {\n")
     NEW = ("        if (EVENT_AMOUNT.equals(effect.getScale().trim())) {\n"
-           "            // \u2b50 \u300c\u672c\u6b21\u653b\u51fb\u6bcf\u6d88\u8017\u4e86 1 \u70b9\u3010\u4ebf\u8d28\u3011\u989d\u5916\u4f7f\u957f\u591c\u6708\u7684\u901f\u5ea6\u63d0\u9ad8 1%\u300d (2026-10-02): the\n"
+           "            // ⭐ 「本次攻击每消耗了 1 点【亿质】额外使长夜月的速度提高 1%」 (2026-10-02): the\n"
            "            // triggering event's own magnitude, taken as a quantity (a spend arrives negative). Before the\n"
            "            // attribute branch below, for the reason `cast_energy_spent` states: this source is not an attribute.\n"
            "            return effect.getPercent() * Math.abs(ctx.amount())\n"
@@ -37,7 +37,7 @@ else:
     ANCHOR = '    private static final String CAST_ENERGY_SPENT = "cast_energy_spent";\n'
     NEW_CONST = (ANCHOR + '\n'
                  '    /**\n'
-                 '     * \u300c\u6bcf\u6d88\u8017/\u6bcf\u635f\u5931 1 \u70b9\u2026\u300d (2026-10-02): a magnitude that follows the <b>triggering event</b>.\n'
+                 '     * 「每消耗/每损失 1 点…」 (2026-10-02): a magnitude that follows the <b>triggering event</b>.\n'
                  '     *\n'
                  '     * <p>Sits beside {@link #CAST_ENERGY_SPENT} on purpose -- that one is the same shape bound to the cast\n'
                  '     * instead of the event -- and, like it, is deliberately not an {@code AttributeType}.\n'
@@ -55,7 +55,7 @@ if "MODIFY_ATTR" in judge:
     print("skip judge")
 else:
     MARKER = "    // ==================================================================\n"
-    CASE = '''    /** \u2b50 The same number as a MODIFIER: 1 speed per 100 points of health lost. */
+    CASE = '''    /** ⭐ The same number as a MODIFIER: 1 speed per 100 points of health lost. */
     @Test
     public void theModifierFollowsTheEvent() {
         Character owner = CharacterFactory.create(OWNER, LEVEL, false, null, null, 0);

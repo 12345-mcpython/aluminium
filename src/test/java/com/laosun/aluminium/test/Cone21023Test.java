@@ -18,10 +18,10 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Light cone 21023: at battle start, damage taken is reduced for 5 turns AND \u300c\u540c\u65f6\u7acb\u5373\u4e3a\u6211\u65b9\u5168\u4f53\u56de\u590d\u7b49\u540c\u4e8e
- * \u5404\u81ea\u5df2\u635f\u5931\u751f\u547d\u503c 30% \u7684\u751f\u547d\u503c\u300d.
+ * Light cone 21023: at battle start, damage taken is reduced for 5 turns AND 「同时立即为我方全体回复等同于
+ * 各自已损失生命值 30% 的生命值」.
  *
- * <p>\u2b50 \u300c\u5404\u81ea\u300d is the whole point of the new `target_lost_hp` scale: the share is read per RECIPIENT, so a
+ * <p>⭐ 「各自」 is the whole point of the new `target_lost_hp` scale: the share is read per RECIPIENT, so a
  * full-HP ally heals nothing while a hurt one heals 30% of its own gap. Measuring both in one battle is what makes this
  * reading attributable.
  */
@@ -69,7 +69,7 @@ public class Cone21023Test {
                 + " expected=" + (allyLost * SHARE) + " wearerHealed=" + wearerHealed);
         Assertions.assertEquals(allyLost * SHARE, allyHealed, 1e-6, "30% of the ALLY's own lost HP");
         Assertions.assertEquals(0.0, wearerHealed, 1e-9,
-                "and an ally at full HP heals nothing -- \u300c\u5404\u81ea\u300d, not a share of one pool");
+                "and an ally at full HP heals nothing -- 「各自」, not a share of one pool");
     }
 
     @Test

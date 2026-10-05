@@ -20,7 +20,7 @@ import java.util.Random;
 /**
  * Light cone 23053: every skill point the wearer SPENDS makes its elation damage ignore 5% more defence, up to 4 layers.
  *
- * <p>\u2b50 `SKILL_POINT_SPENT` is already a trigger event (fired by the policy's own listener, so a spend at the cap -- which
+ * <p>⭐ `SKILL_POINT_SPENT` is already a trigger event (fired by the policy's own listener, so a spend at the cap -- which
  * credits nothing -- does not fire it), and the instance route already supports DEFENCE_IGNORE with per_stack. The judge
  * therefore spends for real and re-reads the settled damage, and it also checks that a NON-elation hit is untouched.
  */
@@ -52,7 +52,7 @@ public class Cone23053Test {
     }
 
     /**
-     * \u2605 Spend through a REAL Skill cast: the camp check lives in the policy ({@code Battle.applySkillPointCost}'s doc says
+     * ★ Spend through a REAL Skill cast: the camp check lives in the policy ({@code Battle.applySkillPointCost}'s doc says
      * so), and a bare {@code spendSkillPoint()} therefore refuses when no actor is set up -- measured.
      */
     private void spend(Battle battle, int times) {
@@ -78,9 +78,9 @@ public class Cone23053Test {
         spend(battle, 2);
         double capped = hit(battle, DamageType.ELATION);
         System.out.println("[23053] none=" + none + " one=" + one + " four=" + four + " after six=" + capped
-                + " layers=" + wearer.getBuffManager().stacksOf("\u6d88\u8017\u5c42\u6570"));
+                + " layers=" + wearer.getBuffManager().stacksOf("消耗层数"));
         Assertions.assertTrue(one > none, "one spent point must raise the settled elation damage");
-        // \u2605 The VALUE, not just the direction (discipline 189): the settled damage is `base / (effDef + 200 + 10L)`, and
+        // ★ The VALUE, not just the direction (discipline 189): the settled damage is `base / (effDef + 200 + 10L)`, and
         // the ignore multiplies effDef. Everything here comes from the engine's own numbers, so a wrong `percent` has to
         // move this line -- a monotonicity-only judge let `5% -> 2.5%` pass (measured, 0 red).
         double defence = enemy.getAttribute(AttributeType.DEFENCE).get();
@@ -96,7 +96,7 @@ public class Cone23053Test {
         }
         Assertions.assertTrue(four > one, "and four must raise it further (" + PER_POINT + " per layer)");
         Assertions.assertEquals(four, capped, 1e-9, "but the clause caps at " + CAP + " layers");
-        Assertions.assertEquals(CAP, wearer.getBuffManager().stacksOf("\u6d88\u8017\u5c42\u6570"), "counter at the cap");
+        Assertions.assertEquals(CAP, wearer.getBuffManager().stacksOf("消耗层数"), "counter at the cap");
     }
 
     @Test

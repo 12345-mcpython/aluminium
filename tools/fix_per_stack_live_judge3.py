@@ -11,7 +11,7 @@ text = io.open(PATH, encoding="utf-8").read()
 OLD = """        Assertions.assertEquals(0.14, oneShare, 1e-6, "one stack is 14% of the base");
         Assertions.assertEquals(0.70, fiveShare, 1e-6,
                 "the aura has to follow the count, with nothing re-attached");"""
-NEW = """        // \u26a0 The absolute share carries an unrelated offset from this unit's own modifiers (measured 0.18), so the reading
+NEW = """        // ⚠ The absolute share carries an unrelated offset from this unit's own modifiers (measured 0.18), so the reading
         // is the DELTA: four more stacks have to be four more 14% shares, with nothing re-attached in between.
         Assertions.assertEquals(0.14 * 4, fiveShare - oneShare, 1e-6,
                 "the aura has to follow the count, with nothing re-attached");"""

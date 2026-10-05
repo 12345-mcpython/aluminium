@@ -18,7 +18,7 @@ import java.util.Random;
 /**
  * A resource gain whose amount is a SHARE of an attribute (2026-09-30).
  *
- * <p>\u2b50 Reader: 1505 \u7eef\u82f1\u2019s talent, verbatim \u300c\u7eef\u82f1\u83b7\u5f97\u7b49\u540c\u4e8e\u66b4\u51fb\u4f24\u5bb9 50% \u7684\u6b22\u6109\u5ea6\u300d. A `GAIN_RESOURCE` effect could
+ * <p>⭐ Reader: 1505 绯英’s talent, verbatim 「绯英获得等同于暴击伤容 50% 的欢愉度」. A `GAIN_RESOURCE` effect could
  * only add a literal before this, so that sentence had no spelling at all.
  */
 public class AttributeShareResourceTest {
@@ -55,7 +55,7 @@ public class AttributeShareResourceTest {
         return spec;
     }
 
-    /** \u2605 The resource has a declared `initial` value, so every claim here is about the DELTA the event produced. */
+    /** ★ The resource has a declared `initial` value, so every claim here is about the DELTA the event produced. */
     private int gained(Runnable action) {
         int before = wearer.getResources().value(RESOURCE);
         action.run();

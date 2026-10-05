@@ -25,13 +25,13 @@ public class ElationRowTest {
     private static final int AVENTURINE = 8009;
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
-    private static final String COUNTER = "\u547d\u4e2d\u6b21\u6570";
+    private static final String COUNTER = "命中次数";
 
     /** ⭐ Eight hits plus the final split instance, with a single enemy that every random draw must pick. */
     @Test
     public void theRowSettlesEightHitsAndTheSplit() {
         Assertions.assertEquals(9, instancesFromTheElationRow(), 0,
-                "8 \u6b21\u4f24\u5bb3 + \u6700\u540e\u4e00\u6b21\u5747\u5206");
+                "8 次伤害 + 最后一次均分");
     }
 
     /** ⚠ And the same reading must NOT be a single 8x instance, which is what the AOE path did before the branch. */

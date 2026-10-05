@@ -26,7 +26,7 @@ public class HimekoNovaTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** \u26a0 The Skill puts 【领航旗语】 on HER for the document's three turns, and hands the party no damage boost (that clause is registered). */
+    /** ⚠ The Skill puts 【领航旗语】 on HER for the document's three turns, and hands the party no damage boost (that clause is registered). */
     @Test
     public void theSkillPutsSemaphoreOnHerselfAndNothingElse() {
         Character himeko = CharacterFactory.create(HIMEKO, LEVEL);
@@ -38,12 +38,12 @@ public class HimekoNovaTest {
 
         battle.fireTriggers(TriggerEvent.SKILL_CAST, himeko, enemy, 0, 0);
 
-        Assertions.assertTrue(himeko.getBuffManager().hasState("\u9886\u822a\u65d7\u8bed"),
-                "\u300c\u59ec\u5b50\u2022\u542f\u884c\u83b7\u5f97\u3010\u9886\u822a\u65d7\u8bed\u3011\u300d");
-        Assertions.assertFalse(ally.getBuffManager().hasState("\u9886\u822a\u65d7\u8bed"),
+        Assertions.assertTrue(himeko.getBuffManager().hasState("领航旗语"),
+                "「姬子•启行获得【领航旗语】」");
+        Assertions.assertFalse(ally.getBuffManager().hasState("领航旗语"),
                 "the state is on HER, not on the party");
         Assertions.assertEquals(0.0, ally.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get() - allyBoostBefore, 1e-9,
-                "\u26a0 \u300c\u5f53\u59ec\u5b50\u2022\u542f\u884c\u62e5\u6709\u3010\u9886\u822a\u65d7\u8bed\u3011\u65f6\uff0c\u6211\u65b9\u5168\u4f53\u9020\u6210\u7684\u4f24\u5bb3\u63d0\u9ad820%\u300d is REGISTERED, not written: a permanent modifier would outlive the state");
+                "⚠ 「当姬子•启行拥有【领航旗语】时，我方全体造成的伤害提高20%」 is REGISTERED, not written: a permanent modifier would outlive the state");
     }
 
     private static Random fixed() {

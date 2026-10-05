@@ -19,11 +19,11 @@ t = io.open(WORK + '/' + ENG, encoding='utf-8').read()
 const_anchor = '    private static final String SELF_MAX_ENERGY = "self_max_energy";'
 const_new = ('    private static final String SELF_MAX_ENERGY = "self_max_energy";' + NL + NL
              + '    /**' + NL
-             + '     * \u300c\u6bcf\u6d88\u8017 1 \u70b9\u80fd\u91cf\u503c\u300d (light cone 23062): the points are the energy THE CAST ITSELF spent.' + NL
+             + '     * 「每消耗 1 点能量值」 (light cone 23062): the points are the energy THE CAST ITSELF spent.' + NL
              + '     *' + NL
-             + '     * <p>\u26a0 Not an attribute, so it cannot go through \u7b97\u5b50 \u300cscaleAttribute\u300d \u2014 its branch below returns first.' + NL
+             + '     * <p>⚠ Not an attribute, so it cannot go through 算子 「scaleAttribute」 — its branch below returns first.' + NL
              + '     * The value rides on the damage instance because DEALING_DAMAGE is the only event that hands it over.' + NL
-             + '     * \u26a0 A missing instance and a non-ultimate both read 0, which is the right answer for both: this' + NL
+             + '     * ⚠ A missing instance and a non-ultimate both read 0, which is the right answer for both: this' + NL
              + '     * clause adds nothing when no energy was spent.' + NL
              + '     */' + NL
              + '    private static final String CAST_ENERGY_SPENT = "cast_energy_spent";')
@@ -35,7 +35,7 @@ t = t.replace(const_anchor, const_new, 1)
 
 branch_anchor = '        if (SELF_MAX_ENERGY.equals(effect.getScale().trim())) {'
 branch_new = ('        if (CAST_ENERGY_SPENT.equals(effect.getScale().trim())) {' + NL
-              + '            // \u26a0 Before the attribute branch below, because this source is not an attribute and' + NL
+              + '            // ⚠ Before the attribute branch below, because this source is not an attribute and' + NL
               + '            // scaleAttribute would throw a message that reads like missing unit data.' + NL
               + '            com.laosun.aluminium.models.Damage hit = ctx.damage();' + NL
               + '            double spent = hit == null ? 0 : hit.getCastEnergySpent();' + NL

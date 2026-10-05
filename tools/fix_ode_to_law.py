@@ -20,9 +20,9 @@ for rule in doc["rules"]:
     if isinstance(rule, dict) and rule.get("id") == "memosprite_ode_to_law_pays_charge":
         rule.pop("when", None)
         rule["note"] = rule["note"] + (
-            " \u26a0 **\u6761\u4ef6\u5df2\u5220\uff08\u540c\u65e5\u5b9e\u6d4b \u2713\uff09**\uff1a\u4e8b\u4ef6\u672c\u8eab\u5c31\u662f\u6761\u4ef6 \u2713\uff08\u53ea\u6709\u88ab\u547d\u4ee4\u7684\u65bd\u653e\u7ed3\u675f\u624d\u4f1a\u89e6\u53d1 \u2713\uff09\uff0c"
-            "\u800c `1412` \u81ea\u5df1\u7684\u8ba2\u9605\u8005**\u5728\u540c\u4e00\u4e8b\u4ef6\u4e0a\u6458\u6389\u3010\u7235\u4f4d\u3011** \u2717 \u21d2 \u4e24\u6761\u89c4\u5219\u7684**\u5148\u540e\u987a\u5e8f**\u4f1a\u51b3\u5b9a\u6761\u4ef6\u662f\u5426\u6210\u7acb \u2717 "
-            "\u21d2 \u5220\u6389\u6761\u4ef6\u53ea\u662f\u53bb\u6389\u8fd9\u4e2a**\u4e0d\u786e\u5b9a\u6027** \u2713\uff0c\u4e0d\u51cf\u5f31\u53e5\u5b50\u7684\u610f\u601d \u2713\u3002")
+            " ⚠ **条件已删（同日实测 ✓）**：事件本身就是条件 ✓（只有被命令的施放结束才会触发 ✓），"
+            "而 `1412` 自己的订阅者**在同一事件上摘掉【爵位】** ✗ ⇒ 两条规则的**先后顺序**会决定条件是否成立 ✗ "
+            "⇒ 删掉条件只是去掉这个**不确定性** ✓，不减弱句子的意思 ✓。")
         touched += 1
 if touched != 1:
     sys.exit("REFUSING: found %d matching rules" % touched)

@@ -24,8 +24,8 @@ public class TransformationEndClausesTest {
     private static final int OWNER = 1408;
     private static final int ALLY = 1002;
     private static final int MONSTER = 1002011;
-    private static final String STATE = "\u53d8\u8eab";
-    private static final String SEEDS = "\u706b\u79cd";
+    private static final String STATE = "变身";
+    private static final String SEEDS = "火种";
 
     /** 「变身结束时，使我方全体速度提高 15%，持续 1 回合」 -- and 「我方全体」 is read on two units, not one. */
     @Test

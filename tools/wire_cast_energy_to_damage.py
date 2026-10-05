@@ -18,9 +18,9 @@ NL = chr(10)
 t = io.open(WORK + '/' + BATTLE, encoding='utf-8').read()
 anchor = ('        fireTriggers(TriggerEvent.DEALING_DAMAGE, attacker, defender, 0, damage.getSkillBaseValue(), damage, damage.getCastCategory(),'
           + NL + '                damage.getSkillKey());')
-new = ('        // \u2b50 \u300c\u6bcf\u6d88\u8017 1 \u70b9\u80fd\u91cf\u503c\u300d (light cone 23062) scales off THIS cast\u2019s spend, which is why it rides on the' + NL
+new = ('        // ⭐ 「每消耗 1 点能量值」 (light cone 23062) scales off THIS cast’s spend, which is why it rides on the' + NL
        + '        // instance: the settlement reads the instance, and this is the only event that hands it over.' + NL
-       + '        // \u26a0 The guard is load-bearing: lastUltEnergySpent is written only on the ultimate path and never' + NL
+       + '        // ⚠ The guard is load-bearing: lastUltEnergySpent is written only on the ultimate path and never' + NL
        + '        // cleared, so without it every later hit -- basics, DOT ticks, break damage -- would inherit it, an' + NL
        + '        // error with no symptom.' + NL
        + '        if (damage.getCastCategory() == com.laosun.aluminium.enums.SkillCategory.ULTRA) {' + NL

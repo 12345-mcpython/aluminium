@@ -4,13 +4,13 @@ Document, verbatim (`data/weapons.json` -> 23004, `skill_value` = [#1 vs-debuffe
   「使装备者对陷入负面效果的敌方目标造成的伤害提高 **#1**%。**当装备者施放战技时，装备者此次攻击的效果命中提高 #2%，攻击力提高 #3%**。」
   L1 [0.24, 0.18, 0.24] / L2 [0.28, 0.21, 0.28] / L3 [0.32, 0.24, 0.32] / L4 [0.36, 0.27, 0.36] / L5 [0.40, 0.30, 0.40]
 
-\u2b50\u2b50 THE SCOPE ALREADY EXISTS -- 「施放瞬间作用域」 is **not** a missing capability (the seventh time a registered gap turned out to be
+⭐⭐ THE SCOPE ALREADY EXISTS -- 「施放瞬间作用域」 is **not** a missing capability (the seventh time a registered gap turned out to be
 in the tree): `EffectSpec`'s `"until"` field names a LIFETIME, `AbstractBuff.Lifetime` provides `NEXT_ATTACK` / `NEXT_SKILL` /
 `NEXT_ULTIMATE` / `CAST_END`, and light cone **20001 already ships four rules with `"until": "cast_end"`**:
   `CAST_SETUP` + `actor == self` + `from_skill SKILL` -> `MODIFY_ATTR { ..., "until": "cast_end", "target": "self" }`.
 This shipment copies that spelling exactly; what was missing was only 23004's own second sentence.
 
-\u26a0 Attributes read from `AttributeType`: 「效果命中」 = `EFFECT_HIT_RATE` (`effect_hit_rate`), 「攻击力」 = `ATTACK`.
+⚠ Attributes read from `AttributeType`: 「效果命中」 = `EFFECT_HIT_RATE` (`effect_hit_rate`), 「攻击力」 = `ATTACK`.
 """
 import io
 import json
@@ -19,14 +19,14 @@ DATA = "src/main/resources/light_cones/23004.json"
 JUDGE = "src/test/java/com/laosun/aluminium/test/Cone23004CastScopeTest.java"
 RULE = "cone23004_cast_scope_stats"
 STATS = {"1": (0.18, 0.24), "2": (0.21, 0.28), "3": (0.24, 0.32), "4": (0.27, 0.36), "5": (0.30, 0.40)}
-SOURCE = ("\u5149\u9525 23004 \u4ee5\u4e16\u754c\u4e4b\u540d\uff1a\u300c\u5f53\u88c5\u5907\u8005\u65bd\u653e\u6218\u6280\u65f6\uff0c\u88c5\u5907\u8005**\u6b64\u6b21\u653b\u51fb**\u7684"
-          "\u6548\u679c\u547d\u4e2d\u63d0\u9ad8 #2%\uff0c\u653b\u51fb\u529b\u63d0\u9ad8 #3%\u300d\uff08`skill_value` \u7684 #2\uff0f#3 \u2713\uff1a"
-          "L1 [0.18, 0.24] \u2026 L5 [0.30, 0.40] \u2713\uff09")
-NOTE = ("\u2b50 2026-10-02\uff08\u7b2c 56 \u4ef6\uff09\uff1a\u2b50\u2b50 **\u201c\u65bd\u653e\u77ac\u95f4\u4f5c\u7528\u57df\u201d\u65e9\u5df2\u5b58\u5728** \u2713\uff08\u7b2c\u4e03\u6b21"
-        "\u201c\u767b\u8bb0\u7684\u7f3a\u53e3\u5176\u5b9e\u5728\u6811\u91cc\u201d \u2717\uff09\uff1a`EffectSpec` \u7684 **`until`** \u5b57\u6bb5\u547d\u540d\u7684\u662f**\u751f\u547d\u5468\u671f** \u2713\uff0c"
-        "`AbstractBuff.Lifetime` \u63d0\u4f9b `NEXT_ATTACK`\uff0f`NEXT_SKILL`\uff0f`NEXT_ULTIMATE`\uff0f**`CAST_END`** \u2713\uff0c"
-        "\u800c\u5149\u9525 **20001 \u5df2\u6709\u56db\u6761** `\"until\": \"cast_end\"` \u89c4\u5219 \u2713 \u21d2 \u672c\u6761**\u7167\u62c4**\u5b83\u7684\u62fc\u6cd5 \u2713\u3002"
-        "\u26a0 \u201c\u6b64\u6b21\u653b\u51fb\u201d \u5c31\u662f `until: cast_end` \u2713\uff08\u65bd\u653e\u7ed3\u675f\u5373\u6e05 \u2713\uff09\u3002")
+SOURCE = ("光锥 23004 以世界之名：「当装备者施放战技时，装备者**此次攻击**的"
+          "效果命中提高 #2%，攻击力提高 #3%」（`skill_value` 的 #2／#3 ✓："
+          "L1 [0.18, 0.24] … L5 [0.30, 0.40] ✓）")
+NOTE = ("⭐ 2026-10-02（第 56 件）：⭐⭐ **“施放瞬间作用域”早已存在** ✓（第七次"
+        "“登记的缺口其实在树里” ✗）：`EffectSpec` 的 **`until`** 字段命名的是**生命周期** ✓，"
+        "`AbstractBuff.Lifetime` 提供 `NEXT_ATTACK`／`NEXT_SKILL`／`NEXT_ULTIMATE`／**`CAST_END`** ✓，"
+        "而光锥 **20001 已有四条** `\"until\": \"cast_end\"` 规则 ✓ ⇒ 本条**照拄**它的拼法 ✓。"
+        "⚠ “此次攻击” 就是 `until: cast_end` ✓（施放结束即清 ✓）。")
 
 
 def levels(doc):
@@ -72,9 +72,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * \u5149\u9525 23004 \u4ee5\u4e16\u754c\u4e4b\u540d\uff1a\u300c\u5f53\u88c5\u5907\u8005\u65bd\u653e\u6218\u6280\u65f6\uff0c\u88c5\u5907\u8005\u6b64\u6b21\u653b\u51fb\u7684\u6548\u679c\u547d\u4e2d\u63d0\u9ad8 #2%\uff0c\u653b\u51fb\u529b\u63d0\u9ad8 #3%\u300d (2026-10-02).
+ * 光锥 23004 以世界之名：「当装备者施放战技时，装备者此次攻击的效果命中提高 #2%，攻击力提高 #3%」 (2026-10-02).
  *
- * <p>\u2b50 THE SCOPE IS `until: cast_end`, and that is what these readings pin:
+ * <p>⭐ THE SCOPE IS `until: cast_end`, and that is what these readings pin:
  * <ul>
  *   <li>the boost is <b>gone the moment the cast is over</b> -- if the lifetime were longer (a turn, or permanent) the
  *       attributes would stay lifted, which is the mutation this guards;</li>
@@ -82,7 +82,7 @@ import java.util.Random;
  *       content itself (the same file-reading guard the cone census tests use).</li>
  * </ul>
  *
- * <p>\u26a0 What this judge does NOT measure: the boost's effect <i>during</i> the cast. The spelling it rides on is not new --
+ * <p>⚠ What this judge does NOT measure: the boost's effect <i>during</i> the cast. The spelling it rides on is not new --
  * light cone 20001 ships four `"until": "cast_end"` rules today -- so the during-the-cast half is inherited, and this test
  * pins the half that is this cone's own (the numbers and the expiry).
  */
@@ -94,7 +94,7 @@ public class Cone23004CastScopeTest {
     private static final int RANK = 5;
     private static final String RULE = "cone23004_cast_scope_stats";
 
-    /** \u2b50 No residue: both attributes are back to where they started once the cast is over. */
+    /** ⭐ No residue: both attributes are back to where they started once the cast is over. */
     @Test
     public void theBoostDoesNotOutliveTheCast() {
         Character unit = CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(CONE, LEVEL, false, RANK));
@@ -120,7 +120,7 @@ public class Cone23004CastScopeTest {
                 "\\u653b\\u51fb\\u529b\\u4e5f\\u4e00\\u6837\\uff1a`until: cast_end` \\u5230\\u6b64\\u4e3a\\u6b62");
     }
 
-    /** \u2b50 The content guard: every rank carries the rule, with that rank's own two numbers and the cast-end lifetime. */
+    /** ⭐ The content guard: every rank carries the rule, with that rank's own two numbers and the cast-end lifetime. */
     @Test
     public void everyRankCarriesTheCastScopedRule() throws java.io.IOException {
         String raw = java.nio.file.Files.readString(
@@ -129,7 +129,7 @@ public class Cone23004CastScopeTest {
         Assertions.assertTrue(raw.contains(RULE), "the shipped file must carry " + RULE);
         Assertions.assertEquals(5, count(raw, "\\"id\\": \\"" + RULE + "\\""),
                 "one rule per superimposition rank");
-        // \u26a0 TEN, not five: each rank carries TWO effects (effect hit and attack) and both state the lifetime.
+        // ⚠ TEN, not five: each rank carries TWO effects (effect hit and attack) and both state the lifetime.
         Assertions.assertEquals(10, count(raw, "\\"until\\": \\"cast_end\\""),
                 "both effects of every rank are scoped to the cast");
         Assertions.assertEquals(5, count(raw, "\\"attribute\\": \\"EFFECT_HIT_RATE\\""), "the effect-hit half");

@@ -39,10 +39,10 @@ final class TestCharacters {
         // file" -- a MOVING TARGET: shipping 1112 (round 207/240) handed every caller a DIFFERENT character, and
         // a suite measuring HP numbers went red far from the change. The id below is a key of
         // data/character_data.json with no content file; if it ever gains one, the guard fails loudly.
-        int cid = 1506;   // \u2705 2026-09-30: the pin moved because 1502 \u723b\u5149 was SHIPPED. 1506 (\u94f6\u72fcLV.999) is now
-        // the last key of character_data.json without a content file. \u26a0 Its max energy is 0, which is why the suite that
-        // asserted "an empty table still recovers energy" no longer uses this control -- it builds an empty table itself.   // \u2705 2026-09-30: the pin moved because 1505 \u7eef\u82f1 was SHIPPED -- the guard failed loudly
-        // exactly as designed. 1502 \u723b\u5149 is still a key of character_data.json with no content file. \u26a0 Note what the
+        int cid = 1506;   // ✅ 2026-09-30: the pin moved because 1502 爻光 was SHIPPED. 1506 (银狼LV.999) is now
+        // the last key of character_data.json without a content file. ⚠ Its max energy is 0, which is why the suite that
+        // asserted "an empty table still recovers energy" no longer uses this control -- it builds an empty table itself.   // ✅ 2026-09-30: the pin moved because 1505 绯英 was SHIPPED -- the guard failed loudly
+        // exactly as designed. 1502 爻光 is still a key of character_data.json with no content file. ⚠ Note what the
         // failure taught: this control is used as a PARTY MEMBER in some suites, so its data (element, speed, whether slot 1
         // is single-target) can move their numbers. `HimekoChargeTest` now names its own single-target ally for that reason.
         if (TriggerTables.exists(cid)) {

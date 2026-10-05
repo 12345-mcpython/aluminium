@@ -25,11 +25,11 @@ for r in rules:
             if isinstance(s, dict) and s.get("attribute") == "BREAKING_EFFECT":
                 s["max_stacks"] = 2
         r["note"] = ((r.get("note") or "") +
-                     " \u2b50 2026-10-02\uff1a`\"max_stacks\": 2` \u2713 \u2014\u2014 \u540c\u4e00\u6279\u961f\u53cb\u4e0a\u6709**\u4e24\u4e2a\u6765\u6e90**"
-                     "\uff08\u672c\u6761\u56fa\u5b9a **+30%** \u2713 \u4e0e\u884c\u8ff9\u90a3\u6761**\u6309\u81ea\u8eab\u51fb\u7834\u7279\u653b\u7684 15%** \u2713\uff0c"
-                     "`other_allies` ✓\uff09\u21d2 \u6309\u5b9e\u6d4b\u673a\u5236\uff0c**\u540e\u5199\u7684\u90a3\u6761\u5fc5\u987b\u53ef\u53e0\u52a0** \u2713"
-                     "\uff08`StatModifierBuff.isStackable()` \u2261 `maxStacks > 1` \u2713\uff09\uff1b\u672c\u6761\u662f**\u540e\u89e6\u53d1**\u7684\u90a3\u4e2a"
-                     "\uff08`ULT_CAST` \u665a\u4e8e `BATTLE_START` \u2713\uff09\u3002")
+                     " ⭐ 2026-10-02：`\"max_stacks\": 2` ✓ —— 同一批队友上有**两个来源**"
+                     "（本条固定 **+30%** ✓ 与行迹那条**按自身击破特攻的 15%** ✓，"
+                     "`other_allies` ✓）⇒ 按实测机制，**后写的那条必须可叠加** ✓"
+                     "（`StatModifierBuff.isStackable()` ≡ `maxStacks > 1` ✓）；本条是**后触发**的那个"
+                     "（`ULT_CAST` 晚于 `BATTLE_START` ✓）。")
 json.dump(doc, io.open(DATA, "w", encoding="utf-8", newline="\n"), ensure_ascii=False, indent=2)
 print("ok   8006.json: ult_dance states max_stacks 2")
 
@@ -50,7 +50,7 @@ import java.util.Random;
 /**
  * The ult's +30% and the trace's 15% must both reach a teammate (8006, 2026-10-02).
  *
- * <p>\u2b50 FILE-DRIVEN, and the reading is a TEAMMATE's: the 15% rule targets `other_allies` while the ult targets `all_allies`, so
+ * <p>⭐ FILE-DRIVEN, and the reading is a TEAMMATE's: the 15% rule targets `other_allies` while the ult targets `all_allies`, so
  * only a second ally sees both. The difference the ult adds must be its own +30% of that ally's base; with `max_stacks`
  * removed it must be nothing, because the ult would replace the trace's modifier.
  */
@@ -59,7 +59,7 @@ public class BreakingEffectStacking8006Test {
     private static final int ALLY = 1209;
     private static final int MONSTER = 1002011;
 
-    /** \u2b50 The ult's share must land ON TOP of the trace's, on a teammate. */
+    /** ⭐ The ult's share must land ON TOP of the trace's, on a teammate. */
     @Test
     public void theUltsShareLandsOnTopOfTheTraces() {
         double beforeUlt = teammate(0.0);

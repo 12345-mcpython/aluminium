@@ -10,10 +10,10 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Random;
 
-/** \u300c\u5904\u4e8e\u3010\u5f80\u6614\u7684\u6d9f\u6f2a\u3011\u72b6\u6001\u65f6\u5728\u3010\u8ffd\u5fc6\u3011\u8fbe\u5230 12 \u70b9\u65f6\u53ef\u6fc0\u6d3b\u7ec8\u7ed3\u6280\u300d (2026-10-02). */
+/** 「处于【往昔的涟漪】状态时在【追忆】达到 12 点时可激活终结技」 (2026-10-02). */
 public class CyreneRippleTierTest {
-    private static final String STATE = "\u5f80\u6614\u7684\u6d9f\u6f2a";
-    private static final String MEMORY = "\u8ffd\u5fc6";
+    private static final String STATE = "往昔的涟漪";
+    private static final String MEMORY = "追忆";
 
     @Test
     public void twelveCleansesOnlyInsideTheRipple() {

@@ -13,13 +13,13 @@ import java.util.Random;
 /**
  * 1415's memosprite skill 21, the ever-burning clause (2026-10-02): 「且在变身时获得【永续的燃烧】…持有【永续的燃烧】时，卡厄斯兰那的暴击率提高 #1%」 (#1 = 0.08).
  *
- * \u2b50 Two-sided: his ultimate grants the state AND raises his CRIT RATE by exactly 0.08; before he transforms he has neither.
+ * ⭐ Two-sided: his ultimate grants the state AND raises his CRIT RATE by exactly 0.08; before he transforms he has neither.
  */
 public class WorldOdeEverburningTest {
     private static final int LEVEL = 80;
     private static final int PHAINON = 1408;
     private static final int MONSTER = 1002011;
-    private static final String STATE = "\u6c38\u7eed\u7684\u71c3\u70e7";
+    private static final String STATE = "永续的燃烧";
 
     @Test
     public void theTransformationGrantsTheStateAndItsCritRate() {
@@ -43,7 +43,7 @@ public class WorldOdeEverburningTest {
         him = battle.characters.getFirst();
         him = battle.characters.getFirst();
         if (castUlt) {
-        // \u2b50 The ode grants 【永续的燃烧】 (2026-10-02), so it must land before his transformation.
+        // ⭐ The ode grants 【永续的燃烧】 (2026-10-02), so it must land before his transformation.
         var odeSprite = battle.summonServant(CharacterFactory.create(1415, LEVEL));
         battle.processRequests();
         var ode = odeSprite.skillAt(21);

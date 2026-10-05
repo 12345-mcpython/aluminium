@@ -10,8 +10,8 @@ import sys
 P = "src/test/java/com/laosun/aluminium/test/HyacineTest.java"
 s = io.open(P, encoding="utf-8").read()
 
-ULT_NOTE = "        // \u2b50 Two now: her own ultimate, and the sky ode spending a layer on a ULT_CAST (2026-10-02)."
-SKILL_NOTE = "        // \u2b50 Two now as well: the summon, and the sky ode spending a layer on a SKILL_CAST (2026-10-02)."
+ULT_NOTE = "        // ⭐ Two now: her own ultimate, and the sky ode spending a layer on a ULT_CAST (2026-10-02)."
+SKILL_NOTE = "        // ⭐ Two now as well: the summon, and the sky ode spending a layer on a SKILL_CAST (2026-10-02)."
 
 out = []
 ult = skill = 0

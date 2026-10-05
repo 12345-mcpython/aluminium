@@ -49,7 +49,7 @@ public class CastSkillParamScaleTest {
         System.out.println("[skill_param] level = " + level + " of " + rows.size() + " ; the row used = " + used
                 + " ; the gain = " + gained);
         Assertions.assertEquals(used.get(0), gained, 1e-6,
-                "\u300c\u63d0\u9ad8\u6570\u503c\u7b49\u540c\u4e8e\u2026\u7684 #1%\u300d-- #1 is the skill own parameter, at the level the cast is at");
+                "「提高数值等同于…的 #1%」-- #1 is the skill own parameter, at the level the cast is at");
     }
 
     /** A different index gives a different member of the same row, so the reading really is the index. */

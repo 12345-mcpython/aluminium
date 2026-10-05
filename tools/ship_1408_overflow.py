@@ -19,7 +19,7 @@ import json
 
 DATA = "src/main/resources/characters/1408.json"
 JUDGE = "src/test/java/com/laosun/aluminium/test/CoreflameOverflowTest.java"
-COREFLAME = "\u706b\u79cd"
+COREFLAME = "火种"
 
 doc = json.load(io.open(DATA, encoding="utf-8"))
 resources = doc.get("resources") if isinstance(doc, dict) else None
@@ -33,12 +33,12 @@ if len(hit) != 1:
 res = hit[0]
 res["overflow"] = 3
 res["source"] = ((res.get("source") or "") +
-                 "\n\u2b50 2026-10-02\uff08\u6587\u6863\uff0c\u767d\u5384\u7684\u5929\u8d4b\uff09\uff1a\u300c\u3010\u706b\u79cd\u3011\u8fbe\u5230 12 \u70b9\u65f6\u53ef\u6fc0\u6d3b\u7ec8\u7ed3\u6280\uff0c"
-                 "**\u8fbe\u5230\u4e0a\u9650\u540e\u8fd8\u53ef\u6700\u591a\u6ea2\u51fa 3 \u70b9**\u300d\u2713")
+                 "\n⭐ 2026-10-02（文档，白厄的天赋）：「【火种】达到 12 点时可激活终结技，"
+                 "**达到上限后还可最多溢出 3 点**」✓")
 res["note"] = ((res.get("note") or "") +
-               "\n\u2b50 2026-10-02\uff1a**\u6ea2\u51fa\u4e0a\u9650 3** \u2713\uff08`\"overflow\": 3` \u2713 \u2014\u2014 \u672c\u5b57\u6bb5\u5df2\u6709\u51fa\u8d27\u8bfb\u8005\uff1a1506 \u7684\u3010\u9690\u85cf\u5206\u3011 \u2713\uff09"
-               "\u21d2 \u706b\u79cd\u53ef\u8fbe **15** \u2713\u3002\u26a0 \u4ecd\u767b\u8bb0\uff1a\u201c**\u53d8\u8eab\u7ed3\u675f\u65f6\u4f1a\u57fa\u4e8e\u6ea2\u51fa\u70b9\u6570\u83b7\u5f97\u3010\u706b\u79cd\u3011**\u201d \u2717"
-               "\u2014\u2014 \u5b83\u9700\u8981**\u4e00\u4e2a\u91cf\u7b49\u4e8e\u67d0\u8d44\u6e90\u5f53\u524d\u503c\u7684\u6548\u679c** \u2717\uff0c\u800c `EffectSpec` \u7684\u6570\u503c\u6765\u6e90\u53ea\u6709\u4e09\u8def \u2717\u3002")
+               "\n⭐ 2026-10-02：**溢出上限 3** ✓（`\"overflow\": 3` ✓ —— 本字段已有出货读者：1506 的【隐藏分】 ✓）"
+               "⇒ 火种可达 **15** ✓。⚠ 仍登记：“**变身结束时会基于溢出点数获得【火种】**” ✗"
+               "—— 它需要**一个量等于某资源当前值的效果** ✗，而 `EffectSpec` 的数值来源只有三路 ✗。")
 
 if not isinstance(doc, dict):
     raise SystemExit("1408.json must be an object")
@@ -61,28 +61,28 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1408\uff1a\u300c\u3010\u706b\u79cd\u3011\u8fbe\u5230 12 \u70b9\u65f6\u53ef\u6fc0\u6d3b\u7ec8\u7ed3\u6280\uff0c**\u8fbe\u5230\u4e0a\u9650\u540e\u8fd8\u53ef\u6700\u591a\u6ea2\u51fa 3 \u70b9**\u300d (2026-10-02).
+ * 1408：「【火种】达到 12 点时可激活终结技，**达到上限后还可最多溢出 3 点**」 (2026-10-02).
  *
- * <p>\u2b50 BOTH ENDS ARE PINNED: a value of 14 proves the pool really goes past its max of 12, and a ceiling of 15 proves the
- * overflow allowance is exactly three (\u300c\u6700\u591a\u6ea2\u51fa 3 \u70b9\u300d). Her skill grants two points per cast, so the casts are the dial.
+ * <p>⭐ BOTH ENDS ARE PINNED: a value of 14 proves the pool really goes past its max of 12, and a ceiling of 15 proves the
+ * overflow allowance is exactly three (「最多溢出 3 点」). Her skill grants two points per cast, so the casts are the dial.
  */
 public class CoreflameOverflowTest {
     private static final int OWNER = 1408;
     private static final int MONSTER = 1002011;
-    private static final String COREFLAME = "\u706b\u79cd";
+    private static final String COREFLAME = "火种";
 
-    /** \u2b50 Past the maximum: seven casts reach fourteen, which a cap of twelve could never allow. */
+    /** ⭐ Past the maximum: seven casts reach fourteen, which a cap of twelve could never allow. */
     @Test
     public void thePoolGoesPastItsMaximum() {
         Assertions.assertEquals(14.0, afterCasts(7), 1e-9,
-                "\u300c\u8fbe\u5230\u4e0a\u9650\u540e\u8fd8\u53ef\u6ea2\u51fa\u300d-- 14 is above the declared max of 12");
+                "「达到上限后还可溢出」-- 14 is above the declared max of 12");
     }
 
-    /** \u2b50 The allowance is exactly three: ten casts stop at fifteen. */
+    /** ⭐ The allowance is exactly three: ten casts stop at fifteen. */
     @Test
     public void theAllowanceIsExactlyThree() {
         Assertions.assertEquals(15.0, afterCasts(10), 1e-9,
-                "\u300c\u6700\u591a\u6ea2\u51fa 3 \u70b9\u300d-- 12 + 3 is the ceiling");
+                "「最多溢出 3 点」-- 12 + 3 is the ceiling");
     }
 
     private static double afterCasts(int casts) {
@@ -95,14 +95,14 @@ public class CoreflameOverflowTest {
         Skill skill = owner.getSkills().get(SkillType.SKILL);
         Assertions.assertNotNull(skill, "precondition: she has a skill");
         for (int i = 0; i < casts; i++) {
-            // \u26a0 AIMED AT AN ENEMY. The first version of this judge aimed her skill at HERSELF, and that single choice made the
+            // ⚠ AIMED AT AN ENEMY. The first version of this judge aimed her skill at HERSELF, and that single choice made the
             // resource read a constant 3 for every cast count: the first self-aimed cast landed (+2 for the skill, +1 for item 38's
             // "being targeted" rule) and the later ones did nothing at all. Measured step by step, aimed at an enemy, the pool is
             // 2, 4, 6, 8, 10, 12 -- exactly two per cast, up to its declared cap.
             SkillExecutor.execute(battle, skill, owner, List.of(battle.enemies.get(0)));
             battle.processRequests();
         }
-        // \u26a0 `owner.getResources().value(...)`, and NOT `battle.partyResource(...)`: Coreflame is not a party resource, so the
+        // ⚠ `owner.getResources().value(...)`, and NOT `battle.partyResource(...)`: Coreflame is not a party resource, so the
         // party view is null. The reader itself is innocent -- measured against 1412's Charge in the same probe, which accumulates
         // exactly (+1 per cast).
         return owner.getResources().value(COREFLAME);

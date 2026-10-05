@@ -22,7 +22,7 @@ import java.util.Random;
 /**
  * Light cone 21066: while the wearer casts an ELATION skill, its damage ignores 8% of the target's defence.
  *
- * <p>\u2b50 The expectation is DERIVED, not guessed: the engine's defence zone is {@code (200 + 10L) / (def + 200 + 10L)},
+ * <p>⭐ The expectation is DERIVED, not guessed: the engine's defence zone is {@code (200 + 10L) / (def + 200 + 10L)},
  * so ignoring a share s of the defence multiplies the settled value by {@code (def + K) / (def * (1 - s) + K)}. The judge
  * computes that from the enemy's own DEFENCE attribute, which is what makes the reading attributable.
  */

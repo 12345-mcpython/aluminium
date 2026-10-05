@@ -32,14 +32,14 @@ rules.append({
         "max_stacks": 3,
         "target": "all_allies",
     }],
-    "source": ("1306 \u82b1\u706b \u6218\u6280 \u5f3a\u5316\u524d\uff08`:159`\uff09: "
-               "\u300c\u5f53\u6211\u65b9\u76ee\u6807**\u6bcf\u6d88\u80171\u70b9\u6218\u6280\u70b9**\uff0c\u5219\u4f7f\u6211\u65b9\u5168\u4f53\u9020\u6210\u7684\u4f24\u5bb3\u63d0\u9ad8 "
-               "**6.00%**\uff0c\u8be5\u6548\u679c\u6301\u7eed **2** \u56de\u5408\uff0c\u6700\u591a\u53ef\u53e0\u52a0 **3** \u5c42\u300d"),
-    "note": ("\u2b50 \u7528\u7684\u662f**\u540c\u65e5\u51fa\u8d27**\u7684 `scale: \"event_amount\"` \u2713\uff08\u4fee\u9970\u7b26\u90a3\u4e00\u6863 \u2713\uff09"
-             "\u21d2 **\u63d0\u9ad8\u91cf = \u82b1\u6389\u7684\u70b9\u6570 \u00d7 6%** \u2713\u3002"
-             "\u26a0 \u89e6\u53d1\u662f**\u5df2\u6709**\u7684 `SKILL_POINT_SPENT` \u2713\uff0c**\u4e0d\u9700\u8981\u4efb\u4f55\u65b0\u8d44\u6e90** \u2713\u3002"
-             "\u26a0 `target: \"all_allies\"` \u662f\u5185\u5bb9\u91cc\u7528\u4e86 **158** \u6b21\u7684\u300c\u6211\u65b9\u5168\u4f53\u300d\u62fc\u5199 \u2713\u3002"
-             "\u26a0 \u300c\u6700\u591a\u53e0\u52a0 3 \u5c42\u300d\u5199\u6210 `max_stacks: 3` \u2713\uff08\u540c 1407 \u5929\u8d4b\u7684\u5199\u6cd5 \u2713\uff09\u3002"),
+    "source": ("1306 花火 战技 强化前（`:159`）: "
+               "「当我方目标**每消耗1点战技点**，则使我方全体造成的伤害提高 "
+               "**6.00%**，该效果持续 **2** 回合，最多可叠加 **3** 层」"),
+    "note": ("⭐ 用的是**同日出货**的 `scale: \"event_amount\"` ✓（修饰符那一档 ✓）"
+             "⇒ **提高量 = 花掉的点数 × 6%** ✓。"
+             "⚠ 触发是**已有**的 `SKILL_POINT_SPENT` ✓，**不需要任何新资源** ✓。"
+             "⚠ `target: \"all_allies\"` 是内容里用了 **158** 次的「我方全体」拼写 ✓。"
+             "⚠ 「最多叠加 3 层」写成 `max_stacks: 3` ✓（同 1407 天赋的写法 ✓）。"),
 })
 out = doc if isinstance(doc, dict) else {"rules": rules}
 if isinstance(doc, dict):
@@ -65,7 +65,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * \u300c\u6211\u65b9\u76ee\u6807\u6bcf\u6d88\u80171\u70b9\u6218\u6280\u70b9\uff0c\u5219\u4f7f\u6211\u65b9\u5168\u4f53\u9020\u6210\u7684\u4f24\u5bb3\u63d0\u9ad8 6%\u300d (1306:159, 2026-10-02).
+ * 「我方目标每消耗1点战技点，则使我方全体造成的伤害提高 6%」 (1306:159, 2026-10-02).
  *
  * <p>File-driven: the rule is hers, on the existing `SKILL_POINT_SPENT` event, and the magnitude follows what was spent.
  */
@@ -73,7 +73,7 @@ public class SkillPointBoostTest {
     private static final int OWNER = 1306;
     private static final int MONSTER = 1002011;
 
-    /** \u2b50 Three points spent raise it three times as far as one, and the rule is hers (she shares the target). */
+    /** ⭐ Three points spent raise it three times as far as one, and the rule is hers (she shares the target). */
     @Test
     public void thePartyBoostFollowsThePointsSpent() {
         double one = boostAfterSpending(1);

@@ -55,7 +55,7 @@ public class ExtraTurnLoudnessTest {
 
         Throwable thrown = Assertions.assertThrows(RuntimeException.class,
                 () -> battle.fireTriggers(TriggerEvent.TURN_START),
-                "\u300c\u5fb7\u8c2c\u6b4c\u7acb\u5373\u83b7\u5f97 1 \u4e2a\u989d\u5916\u56de\u5408\u300d-- and when it cannot be granted, say so");
+                "「德谬歌立即获得 1 个额外回合」-- and when it cannot be granted, say so");
         String message = String.valueOf(thrown.getMessage());
         System.out.println("[loud_turn] memosprite -> " + thrown.getClass().getSimpleName() + ": "
                 + message.substring(0, Math.min(150, message.length())));

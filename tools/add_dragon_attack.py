@@ -34,13 +34,13 @@ spec["attack"] = {
     "stance": 30,
 }
 spec["note"] = (spec.get("note", "").replace(
-    " \u26a0 2026-10-02\uff1a**\u6280\u80fd\u672c\u8eab\u6682\u4e0d\u5199** \u2713 \u2014\u2014 \u9762\u677f\u7684 ATTACK \u4e00\u9879\uff08\u4e3b\u4eba\u751f\u547d\u4e0a\u9650\uff09\u5df2\u7ecf\u8fdb\u53bb\u5e76\u88ab\u5224\u636e\u9a8c\u8fc7 \u2713\uff0c\u4f46 `EnemySkill` \u90a3\u4e00\u8fb9\u53d6\u57fa\u6570\u7684\u65b9\u6cd5\u540d\u8fd8\u6ca1\u8ba4\u5b9a \u2717\uff08\u5224\u636e\u62a5\u4e0d\u5230\u7b26\u53f7 \u2717\uff09\u21d2 \u5148\u767b\u8bb0 \u2713\uff0c\u4e0b\u4e00\u6b65\u8bfb `EnemySkill` \u7684\u53d6\u6570 API \u518d\u8865 \u2713\u3002", "")
-    + " \u2b50 2026-10-02 \u8865\u9f50**\u5fc6\u7075\u6280\u80fd 1**\uff08`:316` \u2713\uff09\uff1a`element Quantum` \u2713\u3001"
-      "`base ATTACK` \u2713\uff08\u672c\u5fc6\u7075\u7684 ATTACK \u69fd\u5b58\u7684\u662f**\u4e3b\u4eba\u751f\u547d\u4e0a\u9650** \u2713\uff09\u3001"
-      "`percent 0.4` \u2713\uff08\u6563\u6587\u5f15\u7528\u7684\u90a3\u4e00\u7ea7 \u2713\uff0c\u6574\u8868 `0.2 \u2192 0.56` \u2713\uff0c\u540c 1413 \u7684\u5904\u7406 \u2713\uff09\u3001"
-      "`shape AoEAttack` \u2713\uff08\u6587\u6863\u300c\u5168\u4f53\u653b\u51fb\u300d\u2713\uff0c\u9a8c\u8bc1\u5668\u7ed9\u7684\u4f8b\u5b50\u5c31\u662f `SingleAttack / AoEAttack / Blast` \u2713\uff09\u3001"
-      "`stance 30` \u2713\uff08\u6587\u6863\u300c\u7834\u97e7\u503c: \u5355\u4f53 0, **\u5168\u4f53 30**, \u6269\u6563 0\u300d\u2713\uff09\u3002"
-      "\u26a0 \u6563\u6587\u8bf4 40.00% \u800c\u8868\u7ed9 Lv10 = 0.56 \u2717 \u2014\u2014 \u672c\u4ef6\u53d6**\u6563\u6587\u90a3\u4e00\u7ea7** \u2713\uff0c\u4e0e 1413 \u540c\u4f8b \u2713\u3002")
+    " ⚠ 2026-10-02：**技能本身暂不写** ✓ —— 面板的 ATTACK 一项（主人生命上限）已经进去并被判据验过 ✓，但 `EnemySkill` 那一边取基数的方法名还没认定 ✗（判据报不到符号 ✗）⇒ 先登记 ✓，下一步读 `EnemySkill` 的取数 API 再补 ✓。", "")
+    + " ⭐ 2026-10-02 补齐**忆灵技能 1**（`:316` ✓）：`element Quantum` ✓、"
+      "`base ATTACK` ✓（本忆灵的 ATTACK 槽存的是**主人生命上限** ✓）、"
+      "`percent 0.4` ✓（散文引用的那一级 ✓，整表 `0.2 → 0.56` ✓，同 1413 的处理 ✓）、"
+      "`shape AoEAttack` ✓（文档「全体攻击」✓，验证器给的例子就是 `SingleAttack / AoEAttack / Blast` ✓）、"
+      "`stance 30` ✓（文档「破韧值: 单体 0, **全体 30**, 扩散 0」✓）。"
+      "⚠ 散文说 40.00% 而表给 Lv10 = 0.56 ✗ —— 本件取**散文那一级** ✓，与 1413 同例 ✓。")
 json.dump(spec, io.open(SPEC, "w", encoding="utf-8", newline="\n"), ensure_ascii=False, indent=2)
 print("ok   the attack block is back, with the level choice stated")
 
@@ -48,16 +48,16 @@ judge = io.open(JUDGE, encoding="utf-8").read()
 if "theDragonSkillIsWhatTheDocumentSays" in judge:
     print("skip judge")
 else:
-    ADD = '''    /** \u2b50 忆灵技能 1 as the document states it, and the panel slot it scales off. */
+    ADD = '''    /** ⭐ 忆灵技能 1 as the document states it, and the panel slot it scales off. */
     @Test
     public void theDragonSkillIsWhatTheDocumentSays() {
         MemospriteSpec spec = Memosprites.of(1407);
         Assertions.assertNotNull(spec.attack(), "the skill must be stated (忆灵技能 1)");
-        Assertions.assertEquals("Quantum", spec.attack().element(), "document: \u91cf\u5b50\u5c5e\u6027\u4f24\u5bb3");
+        Assertions.assertEquals("Quantum", spec.attack().element(), "document: 量子属性伤害");
         Assertions.assertEquals("ATTACK", spec.attack().base(), "scales off this memosprite's ATTACK slot");
         Assertions.assertEquals(0.4, spec.attack().percent(), 1e-9, "40.00%, the level the prose quotes");
-        Assertions.assertEquals("AoEAttack", spec.attack().shape(), "document: \u5168\u4f53\u653b\u51fb");
-        Assertions.assertEquals(30, spec.attack().stance(), 1e-9, "document: \u5168\u4f53 30");
+        Assertions.assertEquals("AoEAttack", spec.attack().shape(), "document: 全体攻击");
+        Assertions.assertEquals(30, spec.attack().stance(), 1e-9, "document: 全体 30");
 
         Character master = CharacterFactory.create(1407, 80, false, null, null, 0);
         Summon dragon = SummonFactory.memosprite(master, spec, name -> 34000);

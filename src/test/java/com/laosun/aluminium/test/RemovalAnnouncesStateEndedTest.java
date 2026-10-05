@@ -26,8 +26,8 @@ import java.util.Random;
 public class RemovalAnnouncesStateEndedTest {
     private static final int OWNER = 1513;
     private static final int MONSTER = 1002011;
-    private static final String MOMENT = "\u963f\u54c8\u65f6\u523b";
-    private static final String REWARD = "\u597d\u6d3b\u5f53\u8d4f";
+    private static final String MOMENT = "阿哈时刻";
+    private static final String REWARD = "好活当赏";
 
     /** ⭐ Taking the state off by hand is an end, so the reader pays. */
     @Test

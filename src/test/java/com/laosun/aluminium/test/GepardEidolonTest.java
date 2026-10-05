@@ -30,7 +30,7 @@ public class GepardEidolonTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** \u26a0 E1 files a +0.35 base-chance amendment under the id of the rule that applies the freeze. */
+    /** ⚠ E1 files a +0.35 base-chance amendment under the id of the rule that applies the freeze. */
     @Test
     public void eidolonOneFilesTheBaseChanceAmendment() {
         Character atE0 = gepardAt(0);
@@ -42,7 +42,7 @@ public class GepardEidolonTest {
         Assertions.assertEquals(0.0, none, 1e-9,
                 "at E0 nothing is filed for that rule");
         Assertions.assertEquals(0.35, raised, 1e-9,
-                "\u300c\u65bd\u653e\u6218\u6280\u65f6\uff0c\u4f7f\u53d7\u5230\u653b\u51fb\u7684\u654c\u65b9\u76ee\u6807\u9677\u5165\u51bb\u7ed3\u72b6\u6001\u7684\u57fa\u7840\u6982\u7387\u63d0\u9ad835%\u300d \u2014 filed as a BASE CHANCE amendment, "
+                "「施放战技时，使受到攻击的敌方目标陷入冻结状态的基础概率提高35%」 — filed as a BASE CHANCE amendment, "
                         + "which is what a plain `percent` on MODIFY_RULE means");
     }
 

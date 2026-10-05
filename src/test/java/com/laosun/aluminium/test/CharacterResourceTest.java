@@ -50,7 +50,7 @@ public class CharacterResourceTest {
     /** 姬子: the shipped character whose file declares a resource. */
     private static final int HIMEKO = 1003;
     /** An ordinary character with no rules and no declarations ({@link TestCharacters}). */
-    // \u2705 2026-09-30: a REAL character with no `resources` block (1002 is a bare rule list). This used to be a cid with
+    // ✅ 2026-09-30: a REAL character with no `resources` block (1002 is a bare rule list). This used to be a cid with
     // no content file at all, which no longer exists -- see TestCharacters. The assertions here are about DECLARATIONS, and
     // every one of them installs its own rule table, so the character’s own rules never enter the measurement.
     private static final int PLAIN = 1002;

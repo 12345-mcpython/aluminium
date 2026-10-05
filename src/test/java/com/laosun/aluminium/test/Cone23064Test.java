@@ -17,9 +17,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Light cone 23064: casting an ELATION skill grants \u3010\u98ce\u53e3\u3011, which raises SPEED by 24%.
+ * Light cone 23064: casting an ELATION skill grants 【风口】, which raises SPEED by 24%.
  *
- * <p>\u2b50 The state has no duration upstream ({@code Equip45.json} states {@code OnStack} and {@code ReplaceByCaster} for
+ * <p>⭐ The state has no duration upstream ({@code Equip45.json} states {@code OnStack} and {@code ReplaceByCaster} for
  * {@code MEquip_23064_Buff_1} and no {@code Duration} / {@code LifeTime} anywhere), the same signature as 21065's layers -- so
  * the state persists and the modifier is permanent with it (there is no counter here, so nothing can come apart).
  */
@@ -56,8 +56,8 @@ public class Cone23064Test {
         double base = wearer.getAttribute(AttributeType.SPEED).get();
         cast(battle, SkillCategory.ELATION_DAMAGE);
         double delta = wearer.getAttribute(AttributeType.SPEED).get() - base;
-        boolean state = wearer.getBuffManager().hasState("\u98ce\u53e3");
-        System.out.println("[23064] after an elation cast: speed +" + delta + " (base " + base + ") has \u98ce\u53e3=" + state);
+        boolean state = wearer.getBuffManager().hasState("风口");
+        System.out.println("[23064] after an elation cast: speed +" + delta + " (base " + base + ") has 风口=" + state);
         Assertions.assertTrue(state, "the state itself is granted");
         Assertions.assertEquals(base * 0.24, delta, 1e-6, "and it is +24% SPEED (a share of the base)");
     }
@@ -69,7 +69,7 @@ public class Cone23064Test {
         cast(battle, SkillCategory.ULTRA);
         System.out.println("[23064] after an ULTRA cast: speed delta="
                 + (wearer.getAttribute(AttributeType.SPEED).get() - base));
-        Assertions.assertFalse(wearer.getBuffManager().hasState("\u98ce\u53e3"), "the clause names an ELATION skill");
+        Assertions.assertFalse(wearer.getBuffManager().hasState("风口"), "the clause names an ELATION skill");
         Assertions.assertEquals(base, wearer.getAttribute(AttributeType.SPEED).get(), 1e-9, "false case");
     }
 
@@ -86,7 +86,7 @@ public class Cone23064Test {
                     states++;
                     System.out.println("[23064] spec state=" + effect.getBuff() + " turns=" + effect.getTurns()
                             + " permanent=" + effect.getPermanent());
-                    Assertions.assertEquals("\u98ce\u53e3", effect.getBuff(), "the document's name for the state");
+                    Assertions.assertEquals("风口", effect.getBuff(), "the document's name for the state");
                     Assertions.assertEquals(Boolean.TRUE, effect.getPermanent(), "no duration upstream");
                 } else if ("MODIFY_ATTR".equals(effect.getOp())) {
                     modifiers++;

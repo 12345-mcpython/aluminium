@@ -31,7 +31,7 @@ public class LightConeMomentTest {
         double without = aggro(false);
         double with = aggro(true);
         Assertions.assertEquals(2.0, with / without, 1e-9,
-                "\u540c\u65f6\u4f7f\u81ea\u8eab\u53d7\u5230\u653b\u51fb\u7684\u6982\u7387\u63d0\u9ad8 -- the data says the factor is 2");
+                "同时使自身受到攻击的概率提高 -- the data says the factor is 2");
     }
 
     @Test
@@ -41,7 +41,7 @@ public class LightConeMomentTest {
         Assertions.assertEquals(0.16, defenceFive - defenceOne, 1e-9,
                 "defence is 40% at rank 5 and 24% at rank 1, over the base: " + defenceOne + " vs " + defenceFive);
 
-        // \u26a0 Effect hit has NO base value (it is a pure percentage), so a ratio over the base is Infinity -- the raw
+        // ⚠ Effect hit has NO base value (it is a pure percentage), so a ratio over the base is Infinity -- the raw
         // value is the bonus itself, and the progression is asserted on that.
         double hitOne = raw(AttributeType.EFFECT_HIT_RATE, 1);
         double hitFive = raw(AttributeType.EFFECT_HIT_RATE, 5);

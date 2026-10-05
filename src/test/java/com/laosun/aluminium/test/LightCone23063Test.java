@@ -41,7 +41,7 @@ public class LightCone23063Test {
         var state = effects.stream().filter(e -> "APPLY_BUFF".equals(e.getOp()))
                 .findFirst().orElseThrow();
         System.out.println("[23063] the state is " + state.getBuff());
-        Assertions.assertEquals("\u65b0\u58f0", state.getBuff(), "the state name");
+        Assertions.assertEquals("新声", state.getBuff(), "the state name");
         var speed = effects.stream().filter(e -> "MODIFY_ATTR".equals(e.getOp()))
                 .findFirst().orElseThrow();
         System.out.println("[23063] speed percent=" + speed.getPercent() + " target=" + speed.getTarget());

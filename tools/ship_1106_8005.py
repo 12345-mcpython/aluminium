@@ -1,6 +1,6 @@
 """1106 and 8005: the other two "technique + ult" pairs (2026-10-02).
 
-Both have the same shape as 1401, which is now shipped and measured: a BATTLE_START rule gated on `self has_state \u79d8\u6280`, and a
+Both have the same shape as 1401, which is now shipped and measured: a BATTLE_START rule gated on `self has_state 秘技`, and a
 ULT_CAST rule writing the SAME slot on the SAME units. The later writer is the ult in both, so the ult states `max_stacks: 2`.
 
   * 1106: `ult_zone_suppression` (-40% DEFENCE, all enemies) vs `technique_defence_down` (-20% DEFENCE, all enemies)
@@ -16,11 +16,11 @@ import json
 
 def note_for(block, other):
     return (block +
-            " \u2b50 2026-10-02\uff1a`\"max_stacks\": 2` \u2713 \u2014\u2014 \u540c\u4e00\u5355\u4f4d\u540c\u4e00\u69fd\u4e0a\u6709**\u4e24\u4e2a\u6765\u6e90**\uff08"
-            + other + "\uff09\u21d2 \u6309\u5b9e\u6d4b\u673a\u5236\uff0c**\u540e\u5199\u7684\u90a3\u6761\u5fc5\u987b\u53ef\u53e0\u52a0** \u2713"
-            "（`StatModifierBuff.isStackable()` \u2261 `maxStacks > 1` \u2713\uff09\uff1b\u672c\u6761\u662f**\u540e\u89e6\u53d1**\u7684\u90a3\u4e2a"
-            "\uff08`ULT_CAST` \u665a\u4e8e `BATTLE_START` \u2713\uff09\u3002\u26a0 \u5224\u636e\u7528 **`battle.markTechniqueUsed(owner)`**"
-            "\u5728 `startBattle()` \u4e4b\u524d\u7ed9\u72b6\u6001 \u2713\uff08\u2b50 \u800c\u4e0d\u662f\u81ea\u5df1\u9020 `APPLY_BUFF` \u89c4\u5219 \u2717\uff09\u3002")
+            " ⭐ 2026-10-02：`\"max_stacks\": 2` ✓ —— 同一单位同一槽上有**两个来源**（"
+            + other + "）⇒ 按实测机制，**后写的那条必须可叠加** ✓"
+            "（`StatModifierBuff.isStackable()` ≡ `maxStacks > 1` ✓）；本条是**后触发**的那个"
+            "（`ULT_CAST` 晚于 `BATTLE_START` ✓）。⚠ 判据用 **`battle.markTechniqueUsed(owner)`**"
+            "在 `startBattle()` 之前给状态 ✓（⭐ 而不是自己造 `APPLY_BUFF` 规则 ✗）。")
 
 def add_max_stacks(path, rule_id, attribute, block, other):
     doc = json.load(io.open(path, encoding="utf-8"))
@@ -35,9 +35,9 @@ def add_max_stacks(path, rule_id, attribute, block, other):
     print("ok  ", path, rule_id)
 
 add_max_stacks("src/main/resources/characters/1106.json", "ult_zone_suppression", "DEFENCE",
-               "\u7ec8\u7ed3\u6280\u964d\u9632\uff08-40%\uff09", "\u79d8\u6280\u964d\u9632 -20% \u2713")
+               "终结技降防（-40%）", "秘技降防 -20% ✓")
 add_max_stacks("src/main/resources/characters/8005.json", "ult_dance", "BREAKING_EFFECT",
-               "\u7ec8\u7ed3\u6280\u52a0\u51fb\u7834\u7279\u653b\uff08+30%\uff09", "\u79d8\u6280 +30% \u2713")
+               "终结技加击破特攻（+30%）", "秘技 +30% ✓")
 
 JUDGE = '''package com.laosun.aluminium.test;
 
@@ -57,14 +57,14 @@ import java.util.Random;
 /**
  * %TITLE% (2026-10-02).
  *
- * <p>\u2b50 FILE-DRIVEN, four readings, and SUPERPOSITION is the claim: with both sources present the two differences must add.
- * \u26a0 `\u79d8\u6280` comes from `battle.markTechniqueUsed(owner)` BEFORE `startBattle()` -- the engine's own entry point.
+ * <p>⭐ FILE-DRIVEN, four readings, and SUPERPOSITION is the claim: with both sources present the two differences must add.
+ * ⚠ `秘技` comes from `battle.markTechniqueUsed(owner)` BEFORE `startBattle()` -- the engine's own entry point.
  */
 public class %CLASS% {
     private static final int OWNER = %OWNER%;
     private static final int MONSTER = 1002011;
 
-    /** \u2b50 Both sources present means the two differences add. */
+    /** ⭐ Both sources present means the two differences add. */
     @Test
     public void bothSourcesAreCounted() {
         double plain = read(false, false);

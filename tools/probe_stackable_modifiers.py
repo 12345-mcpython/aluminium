@@ -30,7 +30,7 @@ import java.util.Random;
 /**
  * Two +20% rules on one attribute, both STACKABLE (`max_stacks`), on a clean table (1415, 2026-10-02).
  *
- * <p>\u26a0 Measured: without `max_stacks` the second replaces the first (0.2) -- by design, per `BuffManager.addBuff`'s javadoc
+ * <p>⚠ Measured: without `max_stacks` the second replaces the first (0.2) -- by design, per `BuffManager.addBuff`'s javadoc
  * ("Stacking is a different question", answered by `isStackable`). This asserts 0.4: a red saying "was 0.2" tells us
  * `max_stacks` is not the switch.
  */
@@ -38,7 +38,7 @@ public class CyreneSpeedThresholdTest {
     private static final int OWNER = 1415;
     private static final int MONSTER = 1002011;
 
-    /** \u2b50 Two stackable +20% modifiers on one attribute sum to 0.4. */
+    /** ⭐ Two stackable +20% modifiers on one attribute sum to 0.4. */
     @Test
     public void stackableModifiersAdd() {
         Assertions.assertEquals(0.4, total(), 1e-6,

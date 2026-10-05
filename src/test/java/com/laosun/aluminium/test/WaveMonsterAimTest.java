@@ -59,7 +59,7 @@ public class WaveMonsterAimTest {
         new WaveManager(battle, stage);
         Assertions.assertTrue(battle.getWaveManager().nextWave(), "310030 has a wave to enter");
 
-        // \u26a0 The reading is the SPEED DELTA, not "was it touched at all": every enemy has a positive base speed, so the first version of
+        // ⚠ The reading is the SPEED DELTA, not "was it touched at all": every enemy has a positive base speed, so the first version of
         // this judge counted all four. Exactly one enemy carries +100, and the other three are equal to each other.
         List<CanHit> boosted = new ArrayList<>();
         List<Double> speeds = new ArrayList<>();
@@ -74,7 +74,7 @@ public class WaveMonsterAimTest {
                 + " of them (speeds " + speeds + ")");
 
         Assertions.assertEquals(1, boosted.size(),
-                "\u300c\u5bf9\u65b0\u5165\u573a\u7684\u654c\u65b9\u76ee\u6807\u65bd\u653e\u300d-- a commanded cast names ONE aim, so exactly one enemy carries the boost");
+                "「对新入场的敌方目标施放」-- a commanded cast names ONE aim, so exactly one enemy carries the boost");
         Assertions.assertSame(battle.waveMonsters().getFirst(), boosted.getFirst(),
                 "and it is the wave's own first arrival, not some other enemy");
     }

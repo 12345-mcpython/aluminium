@@ -24,7 +24,7 @@ public class CipherTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** \u26a0 The reaction needs the Patron mark, and its 150% is compared with a hand-built 300% reference in the same pipeline. */
+    /** ⚠ The reaction needs the Patron mark, and its 150% is compared with a hand-built 300% reference in the same pipeline. */
     @Test
     public void theReactionNeedsThePatronAndDealsItsShare() {
         double unmarked = reactionLoss(true, false);
@@ -32,13 +32,13 @@ public class CipherTest {
         double reference = reactionLoss(false, true);
 
         Assertions.assertEquals(0.0, unmarked, 1e-9,
-                "\u300c\u3010\u8001\u4e3b\u987e\u3011\u53d7\u5230\u6211\u65b9\u5176\u4ed6\u76ee\u6807\u653b\u51fb\u540e\u300d -- without the mark, nothing");
+                "「【老主顾】受到我方其他目标攻击后」 -- without the mark, nothing");
         Assertions.assertTrue(marked > 0, "with the mark, the follow-up lands");
         Assertions.assertEquals(0.5, marked / reference, 0.05,
                 "150% against a hand-built 300% reference: " + marked + " vs " + reference);
     }
 
-    /** \u26a0 「使赛飞儿的攻击力提高30%」 -- a share of her own BASE attack. */
+    /** ⚠ 「使赛飞儿的攻击力提高30%」 -- a share of her own BASE attack. */
     @Test
     public void theSkillRaisesHerOwnAttack() {
         Character cipher = CharacterFactory.create(CIPHER, LEVEL);
@@ -52,7 +52,7 @@ public class CipherTest {
         battle.castImmediate(cipher.getSkills().get(com.laosun.aluminium.enums.SkillType.SKILL), cipher, List.of(enemy));
 
         Assertions.assertEquals(base * 0.3, cipher.getAttribute(AttributeType.ATTACK).get() - before, base * 0.3 * 0.02,
-                "\u300c\u4f7f\u8d5b\u98de\u513f\u7684\u653b\u51fb\u529b\u63d0\u9ad830%\u300d of the BASE: base " + base);
+                "「使赛飞儿的攻击力提高30%」 of the BASE: base " + base);
     }
 
     /** Fires a teammate's attack at the enemy; optionally marks it first, optionally uses a hand-built 300% reference rule. */
@@ -68,7 +68,7 @@ public class CipherTest {
             TriggerSpecs.set(effect, "target", "target");
             EffectSpec markEffect = new EffectSpec();
             TriggerSpecs.set(markEffect, "op", "APPLY_BUFF");
-            TriggerSpecs.set(markEffect, "buff", "\u8001\u4e3b\u987e");
+            TriggerSpecs.set(markEffect, "buff", "老主顾");
             TriggerSpecs.set(markEffect, "permanent", true);
             TriggerSpecs.set(markEffect, "target", "target");
             // ⚠ The reference must carry her presence aura too. Round 1040 shipped 「赛飞儿在场时，敌方全体受到的伤害提高
@@ -83,7 +83,7 @@ public class CipherTest {
                     TriggerSpecs.rule(TriggerEvent.SKILL_CAST.name(), List.of("actor == self"), markEffect),
                     TriggerSpecs.rule(TriggerEvent.BATTLE_START.name(), List.of(), aura),
                     TriggerSpecs.rule(TriggerEvent.ALLY_ATTACK.name(),
-                            List.of("actor is_other_ally", "target has_state \u8001\u4e3b\u987e"), effect))));
+                            List.of("actor is_other_ally", "target has_state 老主顾"), effect))));
         }
         Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
         Battle battle = new Battle(List.of(cipher, ally), List.of(enemy), fixed());
@@ -91,7 +91,7 @@ public class CipherTest {
         if (mark) {
             // Applied directly in BOTH paths: casting the Skill would also raise her ATTACK by 30% (its own rule), and the reference cannot
             // reproduce that without reproducing the whole rule. One difference between the paths is the point.
-            enemy.getBuffManager().addBuff(new com.laosun.aluminium.models.buff.StateBuff("\u8001\u4e3b\u987e", 1, true));
+            enemy.getBuffManager().addBuff(new com.laosun.aluminium.models.buff.StateBuff("老主顾", 1, true));
         }
         double before = enemy.getCurrentHp();
         battle.fireTriggers(TriggerEvent.ALLY_ATTACK, ally, enemy, 0, 0);

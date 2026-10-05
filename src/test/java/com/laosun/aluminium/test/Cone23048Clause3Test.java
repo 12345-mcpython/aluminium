@@ -17,7 +17,7 @@ import java.util.List;
  * the ally but fires after and is refused by from_category; CAST_SETUP had (a) and (b) with a null target. So the
  * engine gained (c) and this test pins the resulting rule.
  *
- * <p>\u26a0 target must stay `target` -- the ally the cast was aimed at. `self` would buff the wearer instead, which is
+ * <p>⚠ target must stay `target` -- the ally the cast was aimed at. `self` would buff the wearer instead, which is
  * the wrong sentence, so the sweep flips it.
  */
 public class Cone23048Clause3Test {

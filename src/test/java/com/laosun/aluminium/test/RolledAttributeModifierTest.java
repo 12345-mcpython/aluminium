@@ -41,7 +41,7 @@ public class RolledAttributeModifierTest {
         battle.castImmediate(wolf.getSkills().get(SkillType.SKILL), wolf, List.of(enemy));
 
         Assertions.assertEquals(0.1, enemy.getAttribute(AttributeType.RESISTANCE_REDUCTION).get(), EPS,
-                "\u300c\u6709100%\u7684\u57fa\u7840\u6982\u7387\u4f7f\u8be5\u76ee\u6807\u7684\u5168\u5c5e\u6027\u6297\u6027\u964d\u4f4e10.00%\u300d");
+                "「有100%的基础概率使该目标的全属性抗性降低10.00%」");
     }
 
     /**
@@ -88,9 +88,9 @@ public class RolledAttributeModifierTest {
     @Test
     public void twoTechniquesLowerAnEnemyAttributeThroughTheRoll() {
         Assertions.assertEquals(0.8, appliedRatio(1106, AttributeType.DEFENCE, false), 1e-6,
-                "\u300c\u6709100%\u7684\u57fa\u7840\u6982\u7387\u4f7f\u654c\u65b9\u6bcf\u4e2a\u5355\u4f53\u76ee\u6807\u9632\u5fa1\u529b\u964d\u4f4e20%\u300d");
+                "「有100%的基础概率使敌方每个单体目标防御力降低20%」");
         Assertions.assertEquals(0.75, appliedRatio(1217, AttributeType.ATTACK, false), 1e-6,
-                "\u300c\u6709100%\u7684\u57fa\u7840\u6982\u7387\u4f7f\u654c\u65b9\u6bcf\u4e2a\u5355\u4f53\u76ee\u6807\u653b\u51fb\u529b\u964d\u4f4e25%\u300d");
+                "「有100%的基础概率使敌方每个单体目标攻击力降低25%」");
     }
 
     /**
@@ -141,6 +141,6 @@ public class RolledAttributeModifierTest {
     @Test
     public void weltsSkillSlowsTheTargetThroughItsBaseChance() {
         Assertions.assertEquals(0.9, appliedRatio(1004, AttributeType.SPEED, true), 1e-6,
-                "\u300c\u653b\u51fb\u547d\u4e2d\u65f6\u670975%\u7684\u57fa\u7840\u6982\u7387\u4f7f\u53d7\u5230\u653b\u51fb\u7684\u654c\u65b9\u76ee\u6807\u901f\u5ea6\u964d\u4f4e10%\u300d");
+                "「攻击命中时有75%的基础概率使受到攻击的敌方目标速度降低10%」");
     }
 }

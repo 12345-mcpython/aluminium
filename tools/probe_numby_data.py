@@ -23,7 +23,7 @@ for root in ROOTS:
                 body = io.open(path, encoding="utf-8", errors="replace").read()
             except OSError:
                 continue
-            for keyword in ("\u8d26\u8d26", "Numby"):
+            for keyword in ("账账", "Numby"):
                 if keyword in body:
                     rel = os.path.relpath(path, root)
                     out.append("HIT %-58s (%s, %d chars)" % (rel, keyword, len(body)))

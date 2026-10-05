@@ -343,7 +343,7 @@ public final class SummonFactory {
         if (spec.attack() != null) {
             summon.setSkill(SkillType.COMMON, attackOf(spec, DamageType.NORMAL));
         }
-        // \u2b50 \u4ebf\u7075\u6280\u672c\u6765\u5c31\u8be5\u662f `Skill` (2026-10-02): each stated row becomes a real skill, addressed by (ServantID, slot) exactly
+        // ⭐ 亿灵技本来就该是 `Skill` (2026-10-02): each stated row becomes a real skill, addressed by (ServantID, slot) exactly
         // like a character's -- so `SkillEffects.forSkill`, `SkillExecutor.canDeliver` and every op that takes a skill work
         // on a memosprite's skill with no special case.
         installSpecSkills(summon, spec, master);

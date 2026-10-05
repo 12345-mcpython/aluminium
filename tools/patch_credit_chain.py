@@ -36,7 +36,7 @@ DISPATCH = "                gainResource(effect, ctx);"
 BRANCH_ANCHOR = "        if (Boolean.TRUE.equals(effect.getAmountFromEvent())) {"
 
 NEW_CALL_SITE = '''            if ("GAIN_RESOURCE".equals(normalizeOp(effect, null))) {
-                // \u2b50 2026-10-02: the amount this effect ACTUALLY credits (after the cap) is what the next effect may
+                // ⭐ 2026-10-02: the amount this effect ACTUALLY credits (after the cap) is what the next effect may
                 // take a share of. Measured from the holder itself, so the cap is included by construction.
                 CanHit holder = resolveTarget(effect, effectCtx);
                 String resourceId = effect.getResource();
@@ -52,8 +52,8 @@ NEW_CALL_SITE = '''            if ("GAIN_RESOURCE".equals(normalizeOp(effect, nu
 '''
 
 NEW_BRANCH = '''        if (Boolean.TRUE.equals(effect.getAmountFromPrevious())) {
-            // \u2b50 2026-10-02 \u8bfb\u8005\uff1a1505 \u661f\u9b42 \u300c\u989d\u5916\u83b7\u5f97\u7b49\u540c\u4e8e\u672c\u6b21\u83b7\u5f97\u7684\u3010\u597d\u6d3b\u5f53\u8d4f\u301150%/100%\u300d\u3002
-            // \u53d6\u7684\u662f\u524d\u4e00\u6761\u6548\u679c\u5df2\u7ecf\u8fc7\u4e0a\u9650\u622a\u65ad\u7684\u5165\u8d26\u91cf\u3002
+            // ⭐ 2026-10-02 读者：1505 星魂 「额外获得等同于本次获得的【好活当赏】50%/100%」。
+            // 取的是前一条效果已经过上限截断的入账量。
             amount = (int) Math.round(previousCredited
                     * (effect.getAmountPercent() == null ? 1 : effect.getAmountPercent()));
         } else ''' + BRANCH_ANCHOR

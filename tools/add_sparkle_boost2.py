@@ -28,11 +28,11 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * \u300c\u6211\u65b9\u76ee\u6807\u6bcf\u6d88\u80171\u70b9\u6218\u6280\u70b9\uff0c\u5219\u4f7f\u6211\u65b9\u5168\u4f53\u9020\u6210\u7684\u4f24\u5bb3\u63d0\u9ad8 6%\u300d (1306:159, 2026-10-02).
+ * 「我方目标每消耗1点战技点，则使我方全体造成的伤害提高 6%」 (1306:159, 2026-10-02).
  *
  * <p>File-driven: the rule is hers, on the existing `SKILL_POINT_SPENT` event, and the magnitude follows what was spent.
  *
- * <p>\u26a0 The BASELINE is not zero -- measured, spending 1 point reads 0.12 (two 6% stacks) and spending 3 reads 0.24
+ * <p>⚠ The BASELINE is not zero -- measured, spending 1 point reads 0.12 (two 6% stacks) and spending 3 reads 0.24
  * (four), i.e. one firing happens on its own. So each reading is taken against the no-spend case, and this judge never
  * claims the baseline is zero.
  */
@@ -40,7 +40,7 @@ public class SkillPointBoostTest {
     private static final int OWNER = 1306;
     private static final int MONSTER = 1002011;
 
-    /** \u2b50 Three points spent raise it three times as far as one, beyond the baseline. */
+    /** ⭐ Three points spent raise it three times as far as one, beyond the baseline. */
     @Test
     public void thePartyBoostFollowsThePointsSpent() {
         double zero = boostAfterSpending(0);

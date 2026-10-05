@@ -31,11 +31,11 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * \u300c\u4f7f\u4e07\u654c\u81ea\u52a8\u65bd\u653e\u3010\u5f11\u795e\u767b\u795e\u3011\u300d\u6240\u9700\u7684\u201c\u547d\u4ee4**\u53e6\u4e00\u4e2a\u5355\u4f4d**\u65bd\u653e\u201d (2026-10-02).
+ * 「使万敌自动施放【弑神登神】」所需的“命令**另一个单位**施放” (2026-10-02).
  *
  * <p>The point is attribution: the commanded unit carries its OWN rule that marks a resource when it casts, so the reading says who
  * cast rather than inferring it from damage. The commander names it with `holder_of:<state>` -- the selector a sentence like
- * \u300c\u5bf9\u4e07\u654c\u65bd\u653e\u65f6\u300d needs -- and a mutation that points `target` at `self` moves the mark to the commander.
+ * 「对万敌施放时」 needs -- and a mutation that points `target` at `self` moves the mark to the commander.
  */
 public class CastSkillCommandsAnotherUnitTest {
     private static final int COMMANDER = 1002;
@@ -48,8 +48,8 @@ public class CastSkillCommandsAnotherUnitTest {
     public void theOtherUnitsCastIsTheOneThatHappens() {
         int[] marks = run();
         System.out.println("[command] mark on commander=" + marks[0] + " commanded=" + marks[1]);
-        Assertions.assertEquals(0, marks[0], "\u547d\u4ee4**\u4ed6\u4eba**\u65bd\u653e\u65f6\uff0c\u53d1\u8bdd\u7684\u90a3\u4e00\u4f4d\u81ea\u5df1\u5e76\u6ca1\u6709\u65bd\u653e");
-        Assertions.assertEquals(1, marks[1], "\u88ab\u547d\u4ee4\u7684\u90a3\u4e00\u4f4d\u65bd\u653e\u4e86\u4e00\u6b21");
+        Assertions.assertEquals(0, marks[0], "命令**他人**施放时，发话的那一位自己并没有施放");
+        Assertions.assertEquals(1, marks[1], "被命令的那一位施放了一次");
     }
 
     /** { mark on the commander, mark on the commanded }. */

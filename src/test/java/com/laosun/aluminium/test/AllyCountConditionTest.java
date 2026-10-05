@@ -27,7 +27,7 @@ public class AllyCountConditionTest {
     private static final int TEAMMATE = 1002;
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
-    /** \u26a0 Measured: a battle opens with 3 skill points. */
+    /** ⚠ Measured: a battle opens with 3 skill points. */
     private static final int OPENING = 3;
 
     @Test

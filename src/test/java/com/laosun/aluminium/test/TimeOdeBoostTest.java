@@ -15,7 +15,7 @@ import java.util.Random;
  *
  * The capture half: `#1` is captured into a resource on her as the ode is cast. The boost half: when HER memosprite's data slot 7 deals damage, that share raises its damage.
  *
- * \u2b50 Two-sided: with the ode the memosprite's boost is the ode's own #1; without it, nothing was captured and nothing is boosted.
+ * ⭐ Two-sided: with the ode the memosprite's boost is the ode's own #1; without it, nothing was captured and nothing is boosted.
  */
 public class TimeOdeBoostTest {
     private static final int LEVEL = 80;
@@ -25,7 +25,7 @@ public class TimeOdeBoostTest {
     private static final int MONSTER = 1002011;
     private static final int ODE_SLOT = 24;
     private static final int DREAM_SLOT = 7;
-    private static final String SHARE = "\u957f\u591c\u7684\u8ff7\u68a6\u589e\u4f24";
+    private static final String SHARE = "长夜的迷梦增伤";
 
     @Test
     public void theOdeCapturesAndThenBoostsTheDreamSkill() {
@@ -35,7 +35,7 @@ public class TimeOdeBoostTest {
                 + " ; without the ode captured " + without[1] + " boost " + without[0]);
         Assertions.assertEquals(Math.round(with[2] * 10000), with[1], "the captured value is #1 in basis points");
         Assertions.assertEquals(with[2], with[0], Math.abs(with[2]) * 1e-6,
-                "\u300c\u300c\u957f\u591c\u300d\u65bd\u653e\u5fc6\u7075\u6280\u3010\u8ff7\u68a6\uff0c\u6d41\u5931\uff0c\u5982\u9732\u3011\u65f6\u9020\u6210\u7684\u4f24\u5bb3\u63d0\u9ad8 #1%\u300d-- the captured share");
+                "「「长夜」施放忆灵技【迷梦，流失，如露】时造成的伤害提高 #1%」-- the captured share");
         Assertions.assertEquals(0, without[1], EPS, "without the ode nothing is captured");
         Assertions.assertEquals(0.0, without[0], EPS, "and nothing is boosted");
     }

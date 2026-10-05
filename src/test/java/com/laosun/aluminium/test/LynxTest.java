@@ -20,8 +20,8 @@ import java.util.Random;
 /**
  * 玲可 (1110), from her own file (2026-09-28): 【求生反应】, the two regenerations, and the party cleanse.
  *
- * <p><b>What it needed.</b> The \u300cshare + constant\u300d magnitude on `MODIFY_ATTR`, `APPLY_REGEN`, `DISPEL` over a list, and
- * `target_when` for \u300c\u82e5\u8be5\u76ee\u6807\u6301\u6709\u3010\u6c42\u751f\u53cd\u5e94\u3011\u5219**\u989d\u5916**\u56de\u590d\u300d.
+ * <p><b>What it needed.</b> The 「share + constant」 magnitude on `MODIFY_ATTR`, `APPLY_REGEN`, `DISPEL` over a list, and
+ * `target_when` for 「若该目标持有【求生反应】则**额外**回复」.
  */
 public class LynxTest {
     private static final int LYNX = 1110;
@@ -29,7 +29,7 @@ public class LynxTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** \u26a0 The state lands on the aimed ally, and it raises THEIR Max HP. */
+    /** ⚠ The state lands on the aimed ally, and it raises THEIR Max HP. */
     @Test
     public void herSkillGrantsTheStateAndRaisesMaxHp() {
         Fixture f = new Fixture();
@@ -37,10 +37,10 @@ public class LynxTest {
 
         f.skill();
 
-        Assertions.assertTrue(f.ally.getBuffManager().hasState("\u6c42\u751f\u53cd\u5e94"), "\u300c\u9644\u4e0a\u3010\u6c42\u751f\u53cd\u5e94\u3011\u300d");
-        Assertions.assertTrue(f.ally.getMaxHp() > before, "\u300c\u63d0\u9ad8\u7b49\u540c\u4e8e\u73b2\u53ef7.50%\u751f\u547d\u4e0a\u9650+200\u7684\u751f\u547d\u4e0a\u9650\u300d");
-        Assertions.assertFalse(f.lynx.getBuffManager().hasState("\u6c42\u751f\u53cd\u5e94"),
-                "\u26a0 \u300c\u6307\u5b9a\u6211\u65b9**\u5355\u4f53**\u300d: not party-wide");
+        Assertions.assertTrue(f.ally.getBuffManager().hasState("求生反应"), "「附上【求生反应】」");
+        Assertions.assertTrue(f.ally.getMaxHp() > before, "「提高等同于玲可7.50%生命上限+200的生命上限」");
+        Assertions.assertFalse(f.lynx.getBuffManager().hasState("求生反应"),
+                "⚠ 「指定我方**单体**」: not party-wide");
     }
 
     /** Her ultimate cleanses the whole side. */
@@ -48,12 +48,12 @@ public class LynxTest {
     public void herUltimateCleansesTheParty() {
         Fixture f = new Fixture();
         f.ally.getBuffManager().addBuff(new DotBuff(f.lynx, DamageElement.FIRE, 10, 2));
-        Assertions.assertTrue(f.ally.getBuffManager().hasState("\u707c\u70e7"), "precondition: one negative effect");
+        Assertions.assertTrue(f.ally.getBuffManager().hasState("灼烧"), "precondition: one negative effect");
 
         f.ultimate();
 
-        Assertions.assertFalse(f.ally.getBuffManager().hasState("\u707c\u70e7"),
-                "\u300c\u89e3\u9664\u6211\u65b9\u5168\u4f53\u76841\u4e2a\u8d1f\u9762\u6548\u679c\u300d -- the cleanse reaches every ally, not just the aimed one");
+        Assertions.assertFalse(f.ally.getBuffManager().hasState("灼烧"),
+                "「解除我方全体的1个负面效果」 -- the cleanse reaches every ally, not just the aimed one");
     }
 
     /** Census: the clauses are where the notes say they are. */

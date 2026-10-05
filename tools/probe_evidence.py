@@ -20,7 +20,7 @@ def rules_of(cid):
     return doc["rules"] if isinstance(doc, dict) and "rules" in doc else doc
 
 
-out.append("=== \u2460 STATE_ENDED subscribers in the tree ===")
+out.append("=== ① STATE_ENDED subscribers in the tree ===")
 for cid in ("1211", "1501", "1505", "1513", "1415", "1412"):
     for rule in rules_of(cid):
         if isinstance(rule, dict) and rule.get("on") == "STATE_ENDED":
@@ -31,14 +31,14 @@ for cid in ("1211", "1501", "1505", "1513", "1415", "1412"):
                                                                     json.dumps(rule.get("when"), ensure_ascii=False)))
 
 out.append("")
-out.append("=== \u2461 1412's peerage chain ===")
+out.append("=== ② 1412's peerage chain ===")
 for rule in rules_of("1412"):
     if isinstance(rule, dict) and ("coup" in str(rule.get("id")) or "peerage" in str(rule.get("id"))):
         out.append("  %-30s on=%-18s do=%s" % (rule.get("id"), rule.get("on"),
                                                json.dumps(rule.get("do"), ensure_ascii=False)[:120]))
 
 out.append("")
-out.append("=== \u2462 the memosprite files ===")
+out.append("=== ③ the memosprite files ===")
 for name in sorted(os.listdir("src/main/resources/memosprites")):
     out.append("  %s" % name)
 

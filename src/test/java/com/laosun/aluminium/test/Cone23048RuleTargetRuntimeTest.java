@@ -20,7 +20,7 @@ import java.util.Random;
  * <p>Measured: with the event's target set to an ally, the rule raises THAT ally's skill-damage boost (0.54 at rank 1)
  * and leaves the wearer at 0. So it proves the rule's target binding.
  *
- * <p>\u26a0 It does NOT prove that SkillExecutor hands the aimed unit to CAST_SETUP: this test passes the ally to
+ * <p>⚠ It does NOT prove that SkillExecutor hands the aimed unit to CAST_SETUP: this test passes the ally to
  * fireTriggers ITSELF, so it never executes that engine line. Measured proof: disarming the engine (aimed -> null)
  * leaves this test GREEN. An end-to-end judge must go through
  * SkillExecutor.execute(battle, &lt;a BPSKILL skill&gt;, wearer, List.of(ally)), and only a mutation OF THE ENGINE LINE can

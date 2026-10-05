@@ -15,7 +15,7 @@ import json
 DATA = "src/main/resources/characters/1211.json"
 JUDGE = "src/test/java/com/laosun/aluminium/test/StateEndedEnergyProbeTest.java"
 ID = "trace_invigoration_ending_energy"
-STATE = "\u751f\u606f"
+STATE = "生息"
 
 doc = json.load(io.open(DATA, encoding="utf-8"))
 rules = doc["rules"] if isinstance(doc, dict) else doc
@@ -25,8 +25,8 @@ rules.append({
     "id": ID,
     "when": ["self state_ended " + STATE],
     "do": [{"op": "GAIN_ENERGY", "amount": 8.0, "target": "self"}],
-    "source": "1211 \u767d\u9732\uff1a\u3010\u751f\u606f\u3011\u7ed3\u675f\u65f6\u6062\u590d 8 \u70b9\u80fd\u91cf\u3002",
-    "note": "\u2b50 \u7528 `Battle.fireStateEnded` \u6d4b\u201c\u80fd\u91cf\u80fd\u4e0d\u80fd\u5230\u4f4d\u201d\u3002",
+    "source": "1211 白露：【生息】结束时恢复 8 点能量。",
+    "note": "⭐ 用 `Battle.fireStateEnded` 测“能量能不能到位”。",
 })
 if isinstance(doc, dict):
     doc["rules"] = rules
@@ -50,15 +50,15 @@ import java.util.Random;
 /**
  * Does `GAIN_ENERGY` land when the engine's own announcement is fired? (1211, 2026-10-02).
  *
- * <p>\u2b50 FILE-DRIVEN, and the event is fired through `Battle.fireStateEnded` -- the only entry that sets the state name the
+ * <p>⭐ FILE-DRIVEN, and the event is fired through `Battle.fireStateEnded` -- the only entry that sets the state name the
  * condition reads (`lastStateEndedName`).
  */
 public class StateEndedEnergyProbeTest {
     private static final int OWNER = 1211;
     private static final int MONSTER = 1002011;
-    private static final String STATE = "\u751f\u606f";
+    private static final String STATE = "生息";
 
-    /** \u2b50 The reader must hand back 8 energy for this event. */
+    /** ⭐ The reader must hand back 8 energy for this event. */
     @Test
     public void theReaderLandsEnergyForTheAnnouncedState() {
         Character owner = CharacterFactory.create(OWNER, 80, false, null, null, 0);

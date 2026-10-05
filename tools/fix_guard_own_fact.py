@@ -20,9 +20,9 @@ NL = chr(10)
 
 t = io.open(WORK + '/' + BATTLE, encoding='utf-8').read()
 old_guard = '        if (damage.getCastCategory() == com.laosun.aluminium.enums.SkillCategory.ULTRA) {'
-new_guard = ('        // \u2b50 The guard is our OWN fact, not another component\'s: lastUltEnergySpent is set only on the ultimate' + NL
+new_guard = ('        // ⭐ The guard is our OWN fact, not another component\'s: lastUltEnergySpent is set only on the ultimate' + NL
              + '        // path and cleared right after it settles, so "> 0" means exactly "this hit is that ultimate".' + NL
-             + '        // \u26a0 An earlier version asked damage.getCastCategory() == ULTRA instead, and measured, that does NOT' + NL
+             + '        // ⚠ An earlier version asked damage.getCastCategory() == ULTRA instead, and measured, that does NOT' + NL
              + '        // hold on the castImmediate path -- the write was skipped and the clause silently read 0.' + NL
              + '        if (lastUltEnergySpent > 0) {')
 print('guard anchor: %d' % t.count(old_guard))
@@ -33,7 +33,7 @@ t = t.replace(old_guard, new_guard, 1)
 
 old_after = '        applyEnergyGain(user, ultraGain);   // then the 5 points of its own (× energy gain rate)'
 new_after = (old_after + NL
-             + '        lastUltEnergySpent = 0;             // \u26a0 cleared, so the instance write cannot leak into later hits')
+             + '        lastUltEnergySpent = 0;             // ⚠ cleared, so the instance write cannot leak into later hits')
 print('clear anchor: %d' % t.count(old_after))
 if t.count(old_after) != 1:
     print('REFUSING: the clear anchor is not unique (or missing)')

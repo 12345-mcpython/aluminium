@@ -15,10 +15,10 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Light cone 23053, its \u3010\u63a8\u6d41\u3011 clause: spending 4 skill points WITHIN ONE TURN grants the state, and it lifts the whole party's
+ * Light cone 23053, its 【推流】 clause: spending 4 skill points WITHIN ONE TURN grants the state, and it lifts the whole party's
  * elation damage by 20%.
  *
- * <p>\u2b50 \u300c\u540c\u4e00\u56de\u5408\u5185\u300d is the new {@code until: turn_end} lifetime, swept at the carrier's own turn end. The
+ * <p>⭐ 「同一回合内」 is the new {@code until: turn_end} lifetime, swept at the carrier's own turn end. The
  * discriminating reading spreads the same four spends over TWO turns: three, then a turn boundary, then one must NOT pay out.
  */
 public class Cone23053PushTest {
@@ -29,8 +29,8 @@ public class Cone23053PushTest {
     private static final int MONSTER = 1002011;
     private static final int THRESHOLD = 4;
     private static final double BURST = 0.2;
-    private static final String SPENT = "\u672c\u56de\u5408\u6d88\u8017";
-    private static final String PUSH = "\u63a8\u6d41";
+    private static final String SPENT = "本回合消耗";
+    private static final String PUSH = "推流";
 
     private Character wearer;
     private Character ally;
@@ -70,7 +70,7 @@ public class Cone23053PushTest {
         double allyDelta = ally.getAttribute(AttributeType.ELATION_DAMAGE_BOOST).get() - allyBase;
         System.out.println("[23053push] after four spends in one turn: push=" + wearer.getBuffManager().hasState(PUSH)
                 + " party elation +" + allyDelta + " counter=" + wearer.getBuffManager().stacksOf(SPENT));
-        Assertions.assertTrue(wearer.getBuffManager().hasState(PUSH), "four spends in one turn grant \u3010\u63a8\u6d41\u3011");
+        Assertions.assertTrue(wearer.getBuffManager().hasState(PUSH), "four spends in one turn grant 【推流】");
         Assertions.assertEquals(BURST, allyDelta, 1e-9, "and the whole party gains 20% elation damage");
         Assertions.assertEquals(0, wearer.getBuffManager().stacksOf(SPENT), "the counter is cleared by the payout");
     }
@@ -84,7 +84,7 @@ public class Cone23053PushTest {
         spend(battle, 1);
         System.out.println("[23053push] three, then a turn boundary (counter=" + afterBoundary + "), then one: push="
                 + wearer.getBuffManager().hasState(PUSH));
-        Assertions.assertEquals(0, afterBoundary, "the turn boundary clears the counter -- \u540c\u4e00\u56de\u5408\u5185");
+        Assertions.assertEquals(0, afterBoundary, "the turn boundary clears the counter -- 同一回合内");
         Assertions.assertFalse(wearer.getBuffManager().hasState(PUSH),
                 "so the fourth spend in ANOTHER turn must not pay out (false case)");
     }

@@ -34,7 +34,7 @@ HELPER_NEW = '''    /**
      * The unit with the highest <b>current HP</b> among the ones the attack behind this context hit (2026-10-02).
      *
      * <p>⭐ The pool is read exactly as {@link #randomHitEnemy} reads it, for the reason its own comment gives: an `ATTACK_FINISHED` context
-     * carries the attack's FROZEN hit set, while a per-hit context (`DEALING_DAMAGE`) only has its instance's snapshot. \u26a0 Reading
+     * carries the attack's FROZEN hit set, while a per-hit context (`DEALING_DAMAGE`) only has its instance's snapshot. ⚠ Reading
      * `attackHitTargets` alone was the first attempt, and it answered "empty" on precisely the event this selector is for.
      *
      * <p>The comparison is 当前生命值 -- absolute current HP, not a percentage -- and the pool is filtered to the owner's opponents, because the

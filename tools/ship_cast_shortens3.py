@@ -3,7 +3,7 @@
 Probe, measured: a memosprite's cast raises the master's DEFENCE through a `CAST_SETUP` rule and raises her ATTACK through a `SKILL_CAST` rule by **0.0** -- so `SKILL_CAST` is
 NOT fired for a memosprite's skill use, and the shortening rule (which hung on it) never ran. That is why two rounds of judging saw no change: the rule was not reached.
 
-\u2b50 `CAST_SETUP` is the event a memosprite's cast does announce. The sentence says 「施放技能**后**」, and the ordering is UNOBSERVABLE here: the effect only shortens the
+⭐ `CAST_SETUP` is the event a memosprite's cast does announce. The sentence says 「施放技能**后**」, and the ordering is UNOBSERVABLE here: the effect only shortens the
 remaining turns of effects that already exist, and nothing in the cast's own resolution reads those durations. So hanging it on the setup event changes no observable.
 
 The reading puts a 2-turn mark on BOTH units (an ally's rule, `all_allies`): the master's is shortened to 1 and one tick ends it, while the memosprite's own is untouched and
@@ -16,7 +16,7 @@ import sys
 MEMOSPRITE = "src/main/resources/characters/1415.json"
 SE = "src/main/resources/data/skill_effects.json"
 SLOT = 3
-MARK = "\u6d4b\u8bd5\u6301\u7eed\u6548\u679c"
+MARK = "测试持续效果"
 
 doc = json.load(io.open(MEMOSPRITE, encoding="utf-8"))
 rules = doc if isinstance(doc, list) else doc.get("rules", [])
@@ -30,13 +30,13 @@ rules.append({
     "on": "CAST_SETUP",
     "when": ["actor is_summon"],
     "do": [{"op": "EXTEND_BUFF", "kind": "all", "turns": -1, "target": "self"}],
-    "source": ("1415 \u6614\u6d9f \u5fc6\u7075\u6280\u80fd 03 \u300c\u7b49\u5f85\uff0c\u5728\u6240\u6709\u7684\u8fc7\u53bb\u300d\uff08\u6570\u636e\u69fd\u4f4d 03\uff0cSkillID 1141503\uff09\uff1a"
-               "\u300c**\u5fb7\u8c2c\u6b4c\u65bd\u653e\u6280\u80fd\u540e\u4f7f\u81ea\u8eab\u6240\u6709\u6301\u7eed\u6548\u679c\u6301\u7eed\u56de\u5408\u6570\u51cf 1**\u3002\u300d"),
-    "note": ("\u2b50 **\u6240\u6709**\u2192 `EXTEND_BUFF` + `\"kind\": \"all\"`\uff1b**\u51cf 1** \u2192 `turns: -1`\uff08`requireSignedTurns` \u5141\u8bb8\u8d1f\u6570\uff09\uff1b"
-             "`self` \u5728\u672c\u6587\u4ef6\u91cc\u662f**\u4e3b\u4eba**\uff08**\u5b9e\u6d4b**\uff09\u3002"
-             "\u2b50 **\u6302 `CAST_SETUP` \u800c\u4e0d\u662f `SKILL_CAST`**\uff1a**\u5b9e\u6d4b**\uff08\u63a2\u9488\uff09\u2014\u2014 \u5fc6\u7075\u7684\u65bd\u653e\u4f1a\u53d1 `CAST_SETUP`\uff08\u4e3b\u4eba DEFENCE +291.06\uff09"
-             "\u4f46**\u4e0d\u53d1** `SKILL_CAST`\uff08\u4e3b\u4eba ATTACK +0.0\uff09\u3002\u26a0 \u800c\u201c\u65bd\u653e**\u540e**\u201d\u8fd9\u4e2a\u987a\u5e8f**\u4e0d\u53ef\u89c2\u6d4b**\uff1a"
-             "\u6548\u679c\u53ea\u6539\u5df2\u6709\u6301\u7eed\u6548\u679c\u7684\u5269\u4f59\u56de\u5408\uff0c\u800c\u65bd\u653e\u672c\u8eab\u7684\u7ed3\u7b97\u4e0d\u8bfb\u5b83\u4eec\u3002"),
+    "source": ("1415 昔涟 忆灵技能 03 「等待，在所有的过去」（数据槽位 03，SkillID 1141503）："
+               "「**德谬歌施放技能后使自身所有持续效果持续回合数减 1**。」"),
+    "note": ("⭐ **所有**→ `EXTEND_BUFF` + `\"kind\": \"all\"`；**减 1** → `turns: -1`（`requireSignedTurns` 允许负数）；"
+             "`self` 在本文件里是**主人**（**实测**）。"
+             "⭐ **挂 `CAST_SETUP` 而不是 `SKILL_CAST`**：**实测**（探针）—— 忆灵的施放会发 `CAST_SETUP`（主人 DEFENCE +291.06）"
+             "但**不发** `SKILL_CAST`（主人 ATTACK +0.0）。⚠ 而“施放**后**”这个顺序**不可观测**："
+             "效果只改已有持续效果的剩余回合，而施放本身的结算不读它们。"),
 })
 if isinstance(doc, list):
     out = rules
@@ -50,8 +50,8 @@ effects = json.load(io.open(SE, encoding="utf-8"))
 if str(SLOT) not in effects.get("11415", {}):
     effects.setdefault("11415", {})[str(SLOT)] = {
         "effect": "Rules",
-        "source": "1415 \u6614\u6d9f \u5fc6\u7075\u6280\u80fd 03 \u300c\u7b49\u5f85\uff0c\u5728\u6240\u6709\u7684\u8fc7\u53bb\u300d\uff08\u6570\u636e\u69fd\u4f4d 03\uff09\uff1a\u5de5\u4f5c\u5728\u89c4\u5219\u4fa7\u3002",
-        "note": "\u2b50 \u672c\u6761\u6280\u80fd\u7684\u7b2c\u56db\u53e5\u5df2\u6210\u53e5\u3002",
+        "source": "1415 昔涟 忆灵技能 03 「等待，在所有的过去」（数据槽位 03）：工作在规则侧。",
+        "note": "⭐ 本条技能的第四句已成句。",
     }
     io.open(SE, "w", encoding="utf-8", newline="\n").write(json.dumps(effects, ensure_ascii=False, indent=2) + "\n")
     print("ok   skill_effects.json: 11415/%d = Rules" % SLOT)
@@ -75,12 +75,12 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1415's memosprite skill 03, fourth sentence: \u300c\u5fb7\u8c2c\u6b4c\u65bd\u653e\u6280\u80fd\u540e\u4f7f\u81ea\u8eab\u6240\u6709\u6301\u7eed\u6548\u679c\u6301\u7eed\u56de\u5408\u6570\u51cf 1\u300d (2026-10-02).
+ * 1415's memosprite skill 03, fourth sentence: 「德谬歌施放技能后使自身所有持续效果持续回合数减 1」 (2026-10-02).
  *
- * <p>\u2b50 One scene, two halves (`self` in this file is the MASTER): an ally's rule puts a 2-turn mark on `all_allies`, the memosprite uses its skill, and one tick follows.
+ * <p>⭐ One scene, two halves (`self` in this file is the MASTER): an ally's rule puts a 2-turn mark on `all_allies`, the memosprite uses its skill, and one tick follows.
  * The master's mark went 2 -> 1 and that tick ends it; the memosprite's own is untouched and survives.
  *
- * <p>\u26a0 A one-turn mark cannot discriminate: `extendDuration` is `Math.max(0, remaining + turns)` and a 1-turn buff ticks away on its own either way.
+ * <p>⚠ A one-turn mark cannot discriminate: `extendDuration` is `Math.max(0, remaining + turns)` and a 1-turn buff ticks away on its own either way.
  */
 public class CastShortensOwnEffectsTest {
     private static final int LEVEL = 80;

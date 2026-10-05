@@ -38,7 +38,7 @@ public class CyreneSpeedThresholdTest {
     private static final int OWNER = 1415;
     private static final int MONSTER = 1002011;
 
-    /** \u2b50 Both +20% rules present: do they add? */
+    /** ⭐ Both +20% rules present: do they add? */
     @Test
     public void twoRulesOnOneAttributeAdd() {
         Character owner = CharacterFactory.create(OWNER, 80, false, null, null, 0);

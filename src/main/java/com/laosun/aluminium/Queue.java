@@ -82,7 +82,7 @@ public final class Queue {
     /**
      * A unit that will act BEFORE the heap is consulted (2026-10-02; an inserted action -- the game's {@code TurnInsertAction}).
      *
-     * <p>\u2b50 Why a separate slot rather than a heap entry: the heap is a schedule, and a unit with no action value cannot have one. This is
+     * <p>⭐ Why a separate slot rather than a heap entry: the heap is a schedule, and a unit with no action value cannot have one. This is
      * "who acts next regardless of the clock", which is what an inserted action is, and it is what `move()` hands out first.
      */
     private Signal insertedSignal;
@@ -227,11 +227,11 @@ public final class Queue {
                 return;
             }
         }
-        // \u2b50 A unit at zero speed has no action value at all (cycleTime = 10000 / speed), so there is nothing to schedule: it is
+        // ⭐ A unit at zero speed has no action value at all (cycleTime = 10000 / speed), so there is nothing to schedule: it is
         // skipped rather than refused (2026-10-02). The game states this for the two memosprites whose panel says so --
-        // \u300c\u5c0f\u4f0a\u5361\u7684\u901f\u5ea6\u4fdd\u6301\u4e3a0\u2026\u5e76\u4e14\u4e0d\u4f1a\u51fa\u73b0\u5728\u884c\u52a8\u5e8f\u5217\u4e0a\u300d (1409's 1140903; 1415's \u5fb7\u8c2c\u6b4c has the same panel row). Such a unit stays in the battle --
+        // 「小伊卡的速度保持为0…并且不会出现在行动序列上」 (1409's 1140903; 1415's 德谬歌 has the same panel row). Such a unit stays in the battle --
         // targetable, castable at, commandable -- and simply never takes a turn.
-        // \u26a0 Before this, {@link Signal}'s guard turned the whole battle into an exception the moment one was summoned, which made
+        // ⚠ Before this, {@link Signal}'s guard turned the whole battle into an exception the moment one was summoned, which made
         // every clause that needs such a memosprite on the field unjudgeable.
         if (combatant.getAttribute(com.laosun.aluminium.enums.AttributeType.SPEED).get() <= 0) {
             return;

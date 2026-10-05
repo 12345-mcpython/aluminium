@@ -31,13 +31,13 @@ public class RuanMeiEidolonSixTest {
     public void theZoneExpiresOnHerSecondWholeTurn() {
         Assertions.assertEquals(0.25, afterTurns(0, 1), EPS, "still up after one whole turn of hers");
         Assertions.assertEquals(0.0, afterTurns(0, 2), EPS,
-                "\u81ea\u8eab\u6bcf\u56de\u5408\u5f00\u59cb\u65f6\u7ed3\u754c\u6301\u7eed\u56de\u5408\u6570\u51cf1 -- so two end it");
+                "自身每回合开始时结界持续回合数减1 -- so two end it");
     }
 
     @Test
     public void theSixthEidolonKeepsItForOneMoreTurn() {
         Assertions.assertEquals(0.25, afterTurns(6, 2), EPS,
-                "\u7ed3\u754c\u6301\u7eed\u65f6\u95f4\u5ef6\u957f1\u56de\u5408 -- two turns no longer end it");
+                "结界持续时间延长1回合 -- two turns no longer end it");
         Assertions.assertEquals(0.0, afterTurns(6, 3), EPS, "but three do");
     }
 

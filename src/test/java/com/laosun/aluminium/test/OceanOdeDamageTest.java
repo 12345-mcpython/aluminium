@@ -32,7 +32,7 @@ public class OceanOdeDamageTest {
                 + " (the cast row says " + with[1] + ")");
 
         Assertions.assertEquals(with[1], with[0], Math.abs(with[1]) * 1e-6,
-                "\u300c\u672c\u573a\u6218\u6597\u4e2d\uff0c\u6d77\u745f\u97f3\u9020\u6210\u7684\u4f24\u5bb3\u63d0\u9ad8 #1%\u300d-- and #1 runs with level");
+                "「本场战斗中，海瑟音造成的伤害提高 #1%」-- and #1 runs with level");
         Assertions.assertNotEquals(without, with[0], 1e-9, "precondition + reading: the ode changes her boost");
     }
 

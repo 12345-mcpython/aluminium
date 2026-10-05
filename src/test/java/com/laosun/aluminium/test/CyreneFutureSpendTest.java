@@ -9,14 +9,14 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Random;
 
-/** \u300c\u6301\u6709\u3010\u672a\u6765\u3011\u7684\u6211\u65b9\u76ee\u6807\u884c\u52a8\u65f6\u6d88\u8017\u3010\u672a\u6765\u3011\u4f7f\u6614\u6d9f\u83b7\u5f97 1 \u70b9\u3010\u8ffd\u5fc6\u3011\u300d (2026-10-02). */
+/** 「持有【未来】的我方目标行动时消耗【未来】使昔涟获得 1 点【追忆】」 (2026-10-02). */
 public class CyreneFutureSpendTest {
     private static final int LEVEL = 80;
     private static final int CYRENE = 1415;
     private static final int ANAXA = 1405;
     private static final int MONSTER = 1002011;
-    private static final String FUTURE = "\u672a\u6765";
-    private static final String MEMORY = "\u8ffd\u5fc6";
+    private static final String FUTURE = "未来";
+    private static final String MEMORY = "追忆";
 
     @Test
     public void theAllyPaysALayerAndSheIsCredited() {
@@ -36,8 +36,8 @@ public class CyreneFutureSpendTest {
         boolean still = battle.characters.get(1).getBuffManager().hasState(FUTURE);
         double after = battle.characters.get(0).getResources().has(MEMORY)
                 ? battle.characters.get(0).getResources().value(MEMORY) : 0;
-        System.out.println("[future_spend] after the ally acts: 【\u672a\u6765\u3011 still on it = " + still
-                + " ; 昔涟's 【\u8ffd\u5fc6\u3011 " + before + " -> " + after);
+        System.out.println("[future_spend] after the ally acts: 【未来】 still on it = " + still
+                + " ; 昔涟's 【追忆】 " + before + " -> " + after);
         Assertions.assertFalse(still, "acting consumes it");
         Assertions.assertEquals(before + 1, after, 1e-9, "and she is credited one point");
     }

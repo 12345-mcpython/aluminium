@@ -81,10 +81,10 @@ public class ResourceManager {
     }
 
     /**
-     * The same, for a declaration that also states an <b>overflow</b> (2026-09-30; reader: 1506\u2019s \u3010\u9690\u85cf\u5206\u3011).
+     * The same, for a declaration that also states an <b>overflow</b> (2026-09-30; reader: 1506’s 【隐藏分】).
      *
-     * <p>\u2605 `Resource` has had both tiers all along; a DECLARATION could not state the second one, so
-     * \u300c\u8fbe\u5230\u4e0a\u9650\u540e\u8fd8\u53ef\u6ea2\u51fa 240 \u70b9\u300d could only be written as one flat cap -- a different rule.
+     * <p>★ `Resource` has had both tiers all along; a DECLARATION could not state the second one, so
+     * 「达到上限后还可溢出 240 点」 could only be written as one flat cap -- a different rule.
      */
     public Resource register(String id, int max, int initial, int overflow) {
         Resource resource = register(new Resource(id, ResourceScope.SELF, max, initial));

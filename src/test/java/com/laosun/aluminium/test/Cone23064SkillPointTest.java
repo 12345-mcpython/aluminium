@@ -16,10 +16,10 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Light cone 23064, its last sentence: \u300c\u6bcf\u4e2a\u6ce2\u6b21\u5f00\u59cb\u65f6\u6216\u88c5\u5907\u8005\u6bcf\u65bd\u653e 3 \u6b21\u6b22\u6109\u6280\u540e\uff0c
- * \u6062\u590d 1 \u4e2a\u6218\u6280\u70b9\u300d.
+ * Light cone 23064, its last sentence: 「每个波次开始时或装备者每施放 3 次欢愉技后，
+ * 恢复 1 个战技点」.
  *
- * <p>\u2b50 Both gates are written "fill first, judge on the full value" (discipline 184): the counting rule stops at the cap and
+ * <p>⭐ Both gates are written "fill first, judge on the full value" (discipline 184): the counting rule stops at the cap and
  * the granting rule fires on the same event once the counter is full, clearing it.
  */
 public class Cone23064SkillPointTest {
@@ -28,7 +28,7 @@ public class Cone23064SkillPointTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
     private static final int CYCLE = 3;
-    private static final String COUNT = "\u6b22\u6109\u6280\u8ba1\u6570";
+    private static final String COUNT = "欢愉技计数";
 
     private Character wearer;
     private Enemy enemy;
@@ -77,7 +77,7 @@ public class Cone23064SkillPointTest {
         Battle battle = battle(true);
         cast(battle, SkillCategory.ULTRA);
         cast(battle, SkillCategory.BPSKILL);
-        System.out.println("[23064] after two non-elation casts: \u6b22\u6109\u6280\u8ba1\u6570="
+        System.out.println("[23064] after two non-elation casts: 欢愉技计数="
                 + wearer.getBuffManager().stacksOf(COUNT));
         Assertions.assertEquals(0, wearer.getBuffManager().stacksOf(COUNT),
                 "the clause counts ELATION casts only (false case)");

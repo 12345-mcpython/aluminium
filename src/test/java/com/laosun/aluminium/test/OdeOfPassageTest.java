@@ -57,7 +57,7 @@ public class OdeOfPassageTest {
                 + " (=" + expected + ")");
 
         Assertions.assertEquals(expected, tribbieGain, Math.abs(expected) * 1e-6,
-                "\u300c\u4f7f\u7f07\u5b9d\u9020\u6210\u7684\u4f24\u5bb3\u65e0\u89c6\u654c\u65b9\u76ee\u6807 #2% \u7684\u9632\u5fa1\u529b\u300d-- #2 runs with the level");
+                "「使缇宝造成的伤害无视敌方目标 #2% 的防御力」-- #2 runs with the level");
 
         // and the same ode aimed at somebody else does nothing for him
         SkillExecutor.execute(battle, ode, demiurge, List.of(bystander));
@@ -66,6 +66,6 @@ public class OdeOfPassageTest {
         System.out.println("[passage] aimed at a bystander instead: the bystander gained " + bystanderGain
                 + " ; Tribbie is now at " + tribbie.getAttribute(AttributeType.DEFENCE_IGNORE).get());
         Assertions.assertEquals(0.0, bystanderGain, 1e-9,
-                "\u300c**\u5bf9\u7f07\u5b9d**\u65bd\u653e\u65f6\u300d-- the sentence names him, so nobody else is touched");
+                "「**对缇宝**施放时」-- the sentence names him, so nobody else is touched");
     }
 }

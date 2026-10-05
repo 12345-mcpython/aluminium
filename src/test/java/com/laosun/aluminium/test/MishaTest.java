@@ -21,7 +21,7 @@ public class MishaTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** \u26a0 Exactly 2 Energy per SKILL_POINT_SPENT, and an unrelated event grants nothing. */
+    /** ⚠ Exactly 2 Energy per SKILL_POINT_SPENT, and an unrelated event grants nothing. */
     @Test
     public void theTalentReturnsEnergyOnEverySkillPointSpent() {
         Character misha = CharacterFactory.create(MISHA, LEVEL);
@@ -34,13 +34,13 @@ public class MishaTest {
         // A control: an event that is not "a Skill Point was spent" must do nothing.
         battle.fireTriggers(TriggerEvent.ALLY_ATTACK, ally, enemy, 0, 0);
         Assertions.assertEquals(0.0, misha.getCurrentEnergy() - before, 1e-9,
-                "\u300c\u6211\u65b9\u5168\u4f53\u6bcf\u6d88\u8017 1 \u4e2a\u6218\u6280\u70b9\u300d -- an attack is not a spend");
+                "「我方全体每消耗 1 个战技点」 -- an attack is not a spend");
 
         // 2026-09-30: the amount is the number of points spent -- 1, not 0. It used to be 0, which only passed
         // while the literal `amount: 2` ignored the context entirely (measured rounds 680-682).
         battle.fireTriggers(TriggerEvent.SKILL_POINT_SPENT, ally, enemy, 0, 1);
         Assertions.assertEquals(2.0, misha.getCurrentEnergy() - before, 1e-6,
-                "\u300c\u540c\u65f6\u7c73\u6c99\u6062\u590d2.00\u70b9\u80fd\u91cf\u300d");
+                "「同时米沙恢复2.00点能量」");
     }
 
     private static Random fixed() {

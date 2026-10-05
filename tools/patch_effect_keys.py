@@ -32,7 +32,7 @@ def patch(old, new, label, count=1):
 
 patch(
     """        specs = GSON.fromJson(rules, SPEC_LIST);""",
-    """        // \u2b50 The same guard, one level deeper (2026-10-02). The comment on the resource check describes this exact trap --
+    """        // ⭐ The same guard, one level deeper (2026-10-02). The comment on the resource check describes this exact trap --
         // \"Gson drops a key it does not know\" -- but only the resource declaration was walked, and an effect writing
         // `maxStacks` (the Java name) was accepted here and then dropped, leaving a stackable state with a cap of 1. The allowed
         // set comes from `EffectSpec`'s own `@SerializedName` annotations, so it cannot drift from what Gson maps.
@@ -44,7 +44,7 @@ patch(
 patch(
     """    private static void requireKnownKeys(JsonElement value, Set<String> known, String what) {""",
     """    /**
-     * \u2b50 The keys {@link EffectSpec} actually maps, read from its own annotations (2026-10-02).
+     * ⭐ The keys {@link EffectSpec} actually maps, read from its own annotations (2026-10-02).
      *
      * <p>Reflection rather than a hand-kept list: the failure this guards is exactly a key the loader \"knows\" and Gson does
      * not, so the two must be the same source of truth.

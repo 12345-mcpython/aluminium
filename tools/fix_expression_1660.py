@@ -8,7 +8,7 @@ import io
 PATH = "EXPRESSION.md"
 text = io.open(PATH, encoding="utf-8").read()
 
-START = "| **\u5e26\u8ba1\u6570\u7684\u72b6\u6001**\uff08\u201c\u5c06 N \u8ba1\u5165\u8be5\u72b6\u6001\u201d\uff09"
+START = "| **带计数的状态**（“将 N 计入该状态”）"
 lines = text.split("\n")
 misplaced = [i for i, line in enumerate(lines) if line.startswith(START)]
 if len(misplaced) != 1:
@@ -16,7 +16,7 @@ if len(misplaced) != 1:
 row = lines.pop(misplaced[0])
 print("ok   row removed from where it landed")
 
-ANCHOR = "| \u300c\u83b7\u5f97 N \u4e2a**\u7b11\u70b9**\u300d"
+ANCHOR = "| 「获得 N 个**笑点**」"
 target = [i for i, line in enumerate(lines) if line.startswith(ANCHOR)]
 if len(target) != 1:
     raise SystemExit("REFUSING: %d §2 anchors" % len(target))

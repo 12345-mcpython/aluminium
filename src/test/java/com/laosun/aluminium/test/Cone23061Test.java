@@ -14,9 +14,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Light cone 23061: ANY of our characters spending 4 skill points inside ITS OWN turn grants the wearer \u3010\u95ea\u8000\u738b\u51a0\u3011.
+ * Light cone 23061: ANY of our characters spending 4 skill points inside ITS OWN turn grants the wearer 【闪耀王冠】.
  *
- * <p>\u2b50 This is the first consumer of two new pieces: {@code SKILL_POINT_SPENT} names its spender as the actor, and
+ * <p>⭐ This is the first consumer of two new pieces: {@code SKILL_POINT_SPENT} names its spender as the actor, and
  * {@code actor_stacks:<NAME>} reads that spender's counter from the WEARER's own rule. The discriminating readings are (a) the
  * spender being the ALLY rather than the wearer and (b) the same four spends split across two of the ally's turns.
  */
@@ -27,8 +27,8 @@ public class Cone23061Test {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
     private static final int THRESHOLD = 4;
-    private static final String SPENT = "\u672c\u56de\u5408\u6d88\u8017";
-    private static final String CROWN = "\u95ea\u8000\u738b\u51a0";
+    private static final String SPENT = "本回合消耗";
+    private static final String CROWN = "闪耀王冠";
 
     private Character wearer;
     private Character ally;
@@ -72,7 +72,7 @@ public class Cone23061Test {
         spendAs(battle, wearer, THRESHOLD);
         System.out.println("[23061] after the WEARER's own four spends: crown="
                 + wearer.getBuffManager().hasState(CROWN));
-        Assertions.assertTrue(wearer.getBuffManager().hasState(CROWN), "\u6211\u65b9\u4efb\u610f\u89d2\u8272 includes the wearer");
+        Assertions.assertTrue(wearer.getBuffManager().hasState(CROWN), "我方任意角色 includes the wearer");
     }
 
     @Test

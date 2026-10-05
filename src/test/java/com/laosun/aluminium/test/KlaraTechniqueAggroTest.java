@@ -48,7 +48,7 @@ public class KlaraTechniqueAggroTest {
         withTechnique.startBattle();
 
         Assertions.assertEquals(base * 6.0, withTechnique.aggroOf(clara), EPS,
-                "\u300c\u514b\u62c9\u62c9\u53d7\u5230\u654c\u65b9\u653b\u51fb\u7684\u6982\u7387\u63d0\u9ad8\u300d "
+                "「克拉拉受到敌方攻击的概率提高」 "
                         + "-- the unclaimed parameter 5 reads as weight x (1 + 5)");
     }
 

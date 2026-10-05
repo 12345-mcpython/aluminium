@@ -45,9 +45,9 @@ public class ConeStateAndDebuffTest {
                 .addModifier(DoubleValue.Modifier.pure(2.0, DoubleValue.Modifier.ModifierSource.BUFF, 210150));
         double before = enemy.getAttribute(AttributeType.DEFENCE).get();
         battle.fireTriggers(TriggerEvent.DEALING_DAMAGE, unit, enemy, 0, 0);
-        System.out.println("[21015] state=" + enemy.getBuffManager().hasState("\u653b\u9677")
+        System.out.println("[21015] state=" + enemy.getBuffManager().hasState("攻陷")
                 + " defence " + before + " -> " + enemy.getAttribute(AttributeType.DEFENCE).get());
-        Assertions.assertTrue(enemy.getBuffManager().hasState("\u653b\u9677"), "the state landed");
+        Assertions.assertTrue(enemy.getBuffManager().hasState("攻陷"), "the state landed");
         // The state rule fires on the same event, so the defence drop is visible immediately.
         Assertions.assertTrue(enemy.getAttribute(AttributeType.DEFENCE).get() <= before,
                 "the defence drop follows the state");
@@ -64,7 +64,7 @@ public class ConeStateAndDebuffTest {
             }
         }
         Assertions.assertEquals(1, pinned, "the defence-drop effect exists");
-        // \u26a0 The guard itself is only observable with a CONTRAST: a clean enemy must expose the "apply the state"
+        // ⚠ The guard itself is only observable with a CONTRAST: a clean enemy must expose the "apply the state"
         // rule and NOT the defence-drop one; an enemy that carries the state must expose exactly the opposite
         // (measured before this: dropping the guard changed no reading at all).
         int cleanApply = 0;
@@ -104,7 +104,7 @@ public class ConeStateAndDebuffTest {
 
     /** A real debuff, attached through the engine's own roll path, so `target_debuff_count` is genuinely >= 1. */
     private void giveTheEnemyADebuff(Character unit, Enemy enemy, Battle battle) {
-        // \u26a0 A 1.0 base chance STILL rolls against the target's effect RES (discipline 145): without this the
+        // ⚠ A 1.0 base chance STILL rolls against the target's effect RES (discipline 145): without this the
         // helper silently attached nothing and the spec query saw 0 debuffs.
         unit.getAttribute(AttributeType.EFFECT_HIT_RATE)
                 .addModifier(DoubleValue.Modifier.pure(5.0, DoubleValue.Modifier.ModifierSource.BUFF, 230208));
@@ -124,7 +124,7 @@ public class ConeStateAndDebuffTest {
         Character unit = wearer(23020);
         Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
         Battle battle = battleWith(unit, enemy);
-        // \u26a0 The spec query EVALUATES conditions, so the enemy must really carry a debuff before asking
+        // ⚠ The spec query EVALUATES conditions, so the enemy must really carry a debuff before asking
         // (discipline from round 254: a count on a false condition is 0 by construction).
         giveTheEnemyADebuff(unit, enemy, battle);
         System.out.println("[23020] enemy debuffs=" + enemy.getBuffManager().countBuffs(com.laosun.aluminium.models.buff.DotBuff.class));
@@ -149,9 +149,9 @@ public class ConeStateAndDebuffTest {
         Enemy clean = EnemyFactory.create(MONSTER, 90, 1);
         Battle plainBattle = battleWith(plain, clean);
         double withoutDebuff = critHit(plain, clean, plainBattle);
-        // \u26a0 Derive the expectation from the wearer's OWN crit-damage attribute, not from a hard-coded 1.5: this cone
+        // ⚠ Derive the expectation from the wearer's OWN crit-damage attribute, not from a hard-coded 1.5: this cone
         // also grants a 0.2 constant, so the base multiplier here is 1.7 (measured 1.0470588235 = 1.78/1.7).
-        // \u26a0 Two corrections in one place: (a) the expectation must come from the wearer's OWN attribute (this cone
+        // ⚠ Two corrections in one place: (a) the expectation must come from the wearer's OWN attribute (this cone
         // grants a 0.2 constant, so 0.5 alone would be wrong), and (b) the ATTRIBUTE and the damage ZONE differ by one --
         // the zone is 1 + CRIT_ATTACK, which is why 0.7 reads as a 1.7 multiplier.
         double critAttribute = unit.getAttribute(AttributeType.CRIT_ATTACK).get();
@@ -162,14 +162,14 @@ public class ConeStateAndDebuffTest {
         Assertions.assertEquals((zone + 0.08) / zone, withDebuff / withoutDebuff, 1e-6,
                 "8 points of instance crit damage inside the wearer's own crit zone");
 
-        // \u26a0 The two readings must differ ONLY in the debate state: same enemy, same debuffs, same crit setup.
+        // ⚠ The two readings must differ ONLY in the debate state: same enemy, same debuffs, same crit setup.
         // Comparing two different enemies conflated the per-debuff crit rule (measured 1.424 instead of 1.0).
         double additionalBefore = battle.applyAdditionalDamage(unit, enemy, DamageElement.FIRE, 1000, 0.0, 1.5);
         double ordinaryBefore = battle.applyDamage(enemy, new Damage(unit, enemy, DamageElement.FIRE, DamageType.NORMAL, 1000));
         battle.fireTriggers(TriggerEvent.ULT_CAST, unit, enemy, 0, 0);
-        System.out.println("[23020] debate state=" + unit.getBuffManager().hasState("\u8bba\u8fa9")
+        System.out.println("[23020] debate state=" + unit.getBuffManager().hasState("论辩")
                 + " damage boost=" + unit.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get());
-        Assertions.assertTrue(unit.getBuffManager().hasState("\u8bba\u8fa9"), "the debate state is on the wearer");
+        Assertions.assertTrue(unit.getBuffManager().hasState("论辩"), "the debate state is on the wearer");
         Assertions.assertEquals(0.36, unit.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get(), 1e-9,
                 "36 points of damage while it lasts");
         double additionalAfter = battle.applyAdditionalDamage(unit, enemy, DamageElement.FIRE, 1000, 0.0, 1.5);
@@ -178,7 +178,7 @@ public class ConeStateAndDebuffTest {
                 + " ratio=" + (additionalAfter / additionalBefore)
                 + " ; ordinary " + ordinaryBefore + " -> " + ordinaryAfter
                 + " ratio=" + (ordinaryAfter / ordinaryBefore));
-        // \u26a0 The state itself boosts EVERY hit by the authored 36%, so the ordinary ratio is 1.36, not 1.0 (my first
+        // ⚠ The state itself boosts EVERY hit by the authored 36%, so the ordinary ratio is 1.36, not 1.0 (my first
         // wording was simply wrong). What proves the SCOPE is that the follow-up lands strictly higher: 1.5556 against
         // 1.36 -- the extra factor is the defence ignore, and it exists only on ADDITIONAL instances.
         Assertions.assertEquals(1.0 + 0.36, ordinaryAfter / ordinaryBefore, 1e-6,

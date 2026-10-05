@@ -20,7 +20,7 @@ NL = chr(10)
 
 t = io.open(WORK + '/' + ENG, encoding='utf-8').read()
 anchor = '        damage.addBoost(magnitude);'
-new = ('        // \u2b50 The ceiling too, and through the same wrapper MODIFY_ATTR\'s instance route ends with: copying only' + NL
+new = ('        // ⭐ The ceiling too, and through the same wrapper MODIFY_ATTR\'s instance route ends with: copying only' + NL
        + '        // derivedMagnitude left `cap_amount` unread (measured: 1,000,000 points gave 16498 instead of the cap).' + NL
        + '        damage.addBoost(applyDerivedCeiling(effect, ctx, magnitude));')
 print('anchor: %d' % t.count(anchor))

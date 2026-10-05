@@ -7,7 +7,7 @@ replacing the EFFECT with an observable mark -- and it tests BOTH candidate even
     ALLY_ATTACK     (SkillExecutor:203)  ->  marks  diag_mark_ally
     ATTACK_FINISHED (Battle:2489)        ->  marks  diag_mark_finished
 
-\u26a0 This is a DIAGNOSTIC, not a shipment: the `HEAL` is gone, the marks are throwaway, and the caller is expected to restore
+⚠ This is a DIAGNOSTIC, not a shipment: the `HEAL` is gone, the marks are throwaway, and the caller is expected to restore
 1408.json afterwards. Nothing here belongs in the tree.
 ASCII only.
 """
@@ -16,7 +16,7 @@ import json
 
 DATA = "src/main/resources/characters/1408.json"
 JUDGE = "src/test/java/com/laosun/aluminium/test/DiagAfterAttackTest.java"
-STATE = "\u53d8\u8eab"
+STATE = "变身"
 IDS = ("diag_mark_on_ally_attack", "diag_mark_on_attack_finished")
 
 doc = json.load(io.open(DATA, encoding="utf-8"))
@@ -60,7 +60,7 @@ import java.util.Random;
 public class DiagAfterAttackTest {
     private static final int OWNER = 1408;
     private static final int MONSTER = 1002011;
-    private static final String STATE = "\u53d8\u8eab";
+    private static final String STATE = "变身";
 
     @Test
     public void reportWhichMarksAppeared() {
@@ -75,7 +75,7 @@ public class DiagAfterAttackTest {
         battle.processRequests();
         boolean transformed = owner.getBuffManager().hasState(STATE);
 
-        // \u26a0 Hurt her FIRST, so a heal has somewhere to go: fully-qualified so the diagnostic needs no new import.
+        // ⚠ Hurt her FIRST, so a heal has somewhere to go: fully-qualified so the diagnostic needs no new import.
         battle.applyTrueDamage(battle.enemies.get(0), owner, com.laosun.aluminium.enums.DamageElement.ICE,
                 owner.getMaxHp() * 0.5);
         battle.processRequests();

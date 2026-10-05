@@ -27,9 +27,9 @@ for r in rules:
             if isinstance(s, dict) and s.get("attribute") == "ALL_DAMAGE_TYPE_BOOST":
                 s["max_stacks"] = 2
         r["note"] = ((r.get("note") or "") +
-                     " \u2b50 2026-10-02\uff1a`\"max_stacks\": 2` \u2713 \u2014\u2014 \u5b9e\u6d4b\uff1a`StatModifierBuff.isStackable()`"
-                     "\u5c31\u662f `maxStacks > 1` \u2713\uff0c`stackGroupKey()` = `\u5c5e\u6027|\u4fee\u9970\u7c7b\u578b|\u6765\u6e90\u89d2\u8272` \u2713"
-                     "\uff1b\u540c\u5c5e\u6027\u4e24\u6761\u8981\u76f8\u52a0\uff0c**\u4e24\u8fb9\u90fd\u5f97 > 1** \u2713\uff08=1 \u65f6 `isStackable()` \u4e3a\u5047 \u2717\uff09\u3002")
+                     " ⭐ 2026-10-02：`\"max_stacks\": 2` ✓ —— 实测：`StatModifierBuff.isStackable()`"
+                     "就是 `maxStacks > 1` ✓，`stackGroupKey()` = `属性|修饰类型|来源角色` ✓"
+                     "；同属性两条要相加，**两边都得 > 1** ✓（=1 时 `isStackable()` 为假 ✗）。")
 
 rules = [r for r in rules if not (isinstance(r, dict) and r.get("id") == TRACE)]
 rules.append({
@@ -44,11 +44,11 @@ rules.append({
         "max_stacks": 2,
         "target": "all_allies",
     }],
-    "source": ("1415 \u6614\u6d9f \u884c\u8ff9 \u4e09\u76f8\u7684\u56e0\u679c (1415103): "
-               "\u300c\u6614\u6d9f\u7684\u901f\u5ea6\u5927\u4e8e\u7b49\u4e8e **180** \u70b9\u65f6\uff0c"
-               "\u6211\u65b9\u5168\u4f53\u9020\u6210\u7684\u4f24\u5bb3\u63d0\u9ad8 **20%**\u300d"),
-    "note": ("\u2b50 \u4e0e\u5929\u8d4b\u540c\u5c5e\u6027 \u2713 \u21d2 \u4e24\u8fb9\u90fd\u5199 `\"max_stacks\": 2` \u2713"
-             "\uff08\u5b9e\u6d4b\uff1a\u53ea\u8981\u4efb\u4e00\u8fb9 = 1 \u21d2 `isStackable()` \u4e3a\u5047 \u21d2 \u8bfb\u6570\u56de\u5230 **0.2** \u2717\uff09\u3002"),
+    "source": ("1415 昔涟 行迹 三相的因果 (1415103): "
+               "「昔涟的速度大于等于 **180** 点时，"
+               "我方全体造成的伤害提高 **20%**」"),
+    "note": ("⭐ 与天赋同属性 ✓ ⇒ 两边都写 `\"max_stacks\": 2` ✓"
+             "（实测：只要任一边 = 1 ⇒ `isStackable()` 为假 ⇒ 读数回到 **0.2** ✗）。"),
 })
 out = doc if isinstance(doc, dict) else {"rules": rules}
 if isinstance(doc, dict):
@@ -78,7 +78,7 @@ import java.util.Random;
 /**
  * Her talent and her trace both write +20% to the party; both must be counted (1415, 2026-10-02).
  *
- * <p>\u2b50 FILE-DRIVEN, and the TOTAL is the claim: 0.2 below the threshold (talent alone), 0.4 past it. The measured switch is
+ * <p>⭐ FILE-DRIVEN, and the TOTAL is the claim: 0.2 below the threshold (talent alone), 0.4 past it. The measured switch is
  * `max_stacks > 1` -- `StatModifierBuff.isStackable()` is exactly that, and `stackGroupKey()` is the attribute, the
  * modifier type and the source role -- so both writers state 2.
  */
@@ -86,7 +86,7 @@ public class CyreneSpeedThresholdTest {
     private static final int OWNER = 1415;
     private static final int MONSTER = 1002011;
 
-    /** \u2b50 Talent alone below 180; talent plus trace past it. */
+    /** ⭐ Talent alone below 180; talent plus trace past it. */
     @Test
     public void theTwoWritersAdd() {
         Assertions.assertEquals(0.2, total(0), 1e-6, "below the threshold, her talent alone");

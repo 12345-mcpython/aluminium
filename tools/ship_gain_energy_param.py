@@ -25,7 +25,7 @@ VAL_ANCHOR = """            case "GAIN_ENERGY" -> {
                 requireNoStackArguments(effect, op, spec);
             }"""
 VAL_NEW = """            case "GAIN_ENERGY" -> {
-                // \u2b50 A cast parameter is a third spelling (2026-10-02; reader: 1415's ode of sky, \u300c\u4e3a\u98ce\u5807\u6062\u590d #2 \u70b9\u80fd\u91cf\u300d, whose
+                // ⭐ A cast parameter is a third spelling (2026-10-02; reader: 1415's ode of sky, 「为风堇恢复 #2 点能量」, whose
                 // #2 runs 12 -> 33.6). `ENERGY_SCALES` holds only a share of max energy, so the op could not read a number out of the skill that produced it.
                 if (isCastParamScale(effect)) {
                     requireNoStackArguments(effect, op, spec);
@@ -43,7 +43,7 @@ WORK_NEW = """        if (effect.getScale() == null || effect.getScale().isBlank
             battle.grantEnergy(target, scaledAmount(effect, ctx));
             return;
         }
-        // \u2b50 \u300c\u4e3a\u98ce\u5807\u6062\u590d #2 \u70b9\u80fd\u91cf\u300d (2026-10-02): an ABSOLUTE amount out of the skill that produced the event. The reader is the same one
+        // ⭐ 「为风堇恢复 #2 点能量」 (2026-10-02): an ABSOLUTE amount out of the skill that produced the event. The reader is the same one
         // `MODIFY_ATTR` uses for `cast_skill_param:`, so the two cannot drift.
         if (isCastParamScale(effect)) {
             battle.grantEnergy(target, Math.round(castParamValue(effect, ctx,
@@ -85,11 +85,11 @@ rules.append({
     "on": "CAST_SETUP",
     "when": ["target == self", "actor is_summon", "from_skill_id == " + str(SLOT)],
     "do": [{"op": "GAIN_ENERGY", "scale": "cast_skill_param:1", "percent": 1.0, "target": "self"}],
-    "source": ("1415 \u6614\u6d9f \u5fc6\u7075\u6280\u80fd 19 \u300c\u732e\u4e88\u300c\u5929\u7a7a\u300d\u4e4b\u8bd7\u300d\uff08\u6570\u636e\u69fd\u4f4d 19\uff0cSkillID 1141519\uff09\uff1a"
-               "\u300c**\u5bf9\u98ce\u5807\u65bd\u653e\u65f6\uff0c\u4e3a\u98ce\u5807\u6062\u590d #2 \u70b9\u80fd\u91cf**\u3002\u300d"),
-    "note": ("\u2b50 `#2` **\u968f\u7b49\u7ea7\u53d8**\uff08**\u5b9e\u6d4b**\uff1a12 \u2192 33.6\uff09\u2192 \u8d70 `cast_skill_param:1`\u3002"
-             "\u2b50 \u800c `GAIN_ENERGY` \u672c\u6765**\u53ea\u6536** `amount` \u6216 `target_max_energy` \u7684\u4efd\u989d\uff08**\u5b9e\u6d4b**\uff1a"
-             "`ENERGY_SCALES = Set.of(\"target_max_energy\")`\uff09\u2014\u2014 **\u672c\u8f6e\u7ed9\u5b83\u52a0\u4e86\u7b2c\u4e09\u79cd\u62fc\u6cd5**\u3002"),
+    "source": ("1415 昔涟 忆灵技能 19 「献予「天空」之诗」（数据槽位 19，SkillID 1141519）："
+               "「**对风堇施放时，为风堇恢复 #2 点能量**。」"),
+    "note": ("⭐ `#2` **随等级变**（**实测**：12 → 33.6）→ 走 `cast_skill_param:1`。"
+             "⭐ 而 `GAIN_ENERGY` 本来**只收** `amount` 或 `target_max_energy` 的份额（**实测**："
+             "`ENERGY_SCALES = Set.of(\"target_max_energy\")`）—— **本轮给它加了第三种拼法**。"),
 })
 if isinstance(doc, list):
     out = rules
@@ -103,8 +103,8 @@ effects = json.load(io.open(SE, encoding="utf-8"))
 if str(SLOT) not in effects.get("11415", {}):
     effects.setdefault("11415", {})[str(SLOT)] = {
         "effect": "Rules",
-        "source": "1415 \u6614\u6d9f \u5fc6\u7075\u6280\u80fd 19 \u300c\u732e\u4e88\u300c\u5929\u7a7a\u300d\u4e4b\u8bd7\u300d\uff08\u6570\u636e\u69fd\u4f4d 19\uff09\uff1a\u5de5\u4f5c\u5728\u89c4\u5219\u4fa7\u3002",
-        "note": "\u2b50 \u6ca1\u6709\u6761\u76ee\u5c31\u4e0d\u53ef\u4ea4\u4ed8\u3002",
+        "source": "1415 昔涟 忆灵技能 19 「献予「天空」之诗」（数据槽位 19）：工作在规则侧。",
+        "note": "⭐ 没有条目就不可交付。",
     }
     io.open(SE, "w", encoding="utf-8", newline="\n").write(json.dumps(effects, ensure_ascii=False, indent=2) + "\n")
     print("ok   skill_effects.json: 11415/%d = Rules" % SLOT)
@@ -123,10 +123,10 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1415's memosprite skill 19 \u300c\u732e\u4e88\u300c\u5929\u7a7a\u300d\u4e4b\u8bd7\u300d: \u300c\u5bf9\u98ce\u5807\u65bd\u653e\u65f6\uff0c\u4e3a\u98ce\u5807\u6062\u590d #2 \u70b9\u80fd\u91cf\u300d (2026-10-02).
+ * 1415's memosprite skill 19 「献予「天空」之诗」: 「对风堇施放时，为风堇恢复 #2 点能量」 (2026-10-02).
  *
- * <p>\u2b50 Two scenes that differ by exactly one thing: whether the ode was cast at her. #2 runs with the level (12 -> 33.6), so the expected number comes out of the CAST
- * skill's row. \u26a0 Her energy is zeroed BEFORE the cast -- reading an increment needs its baseline set before the action.
+ * <p>⭐ Two scenes that differ by exactly one thing: whether the ode was cast at her. #2 runs with the level (12 -> 33.6), so the expected number comes out of the CAST
+ * skill's row. ⚠ Her energy is zeroed BEFORE the cast -- reading an increment needs its baseline set before the action.
  */
 public class SkyOdeEnergyTest {
     private static final int LEVEL = 80;

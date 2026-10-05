@@ -23,7 +23,7 @@ public class SparkleTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** \u26a0 「等同于花火24.00%暴击伤害+45.00%」 -- a derived share PLUS a flat amount, both read from the engine. */
+    /** ⚠ 「等同于花火24.00%暴击伤害+45.00%」 -- a derived share PLUS a flat amount, both read from the engine. */
     @Test
     public void theSkillHandsOverHerCritDamageShare() {
         Character sparkle = CharacterFactory.create(SPARKLE, LEVEL);
@@ -40,7 +40,7 @@ public class SparkleTest {
                 "24% of her CRIT_ATTACK plus a flat 45%: expected " + expected);
     }
 
-    /** \u26a0 The talent's party-wide boost on a Skill Point spent, capped at the document's three stacks. */
+    /** ⚠ The talent's party-wide boost on a Skill Point spent, capped at the document's three stacks. */
     @Test
     public void everySpentSkillPointRaisesThePartysDamage() {
         Character sparkle = CharacterFactory.create(SPARKLE, LEVEL);
@@ -58,12 +58,12 @@ public class SparkleTest {
         double afterFive = ally.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
 
         Assertions.assertEquals(0.06, afterOne - before, 1e-6,
-                "\u300c\u6bcf\u6d88\u8017 1 \u70b9\u6218\u6280\u70b9\u2026\u4f24\u5bb3\u63d0\u9ad8 6.00%\u300d");
+                "「每消耗 1 点战技点…伤害提高 6.00%」");
         Assertions.assertEquals(0.18, afterFive - before, 1e-6,
-                "\u300c\u6700\u591a\u53ef\u53e0\u52a0 3 \u5c42\u300d -- five firings must still read three stacks of 6%");
+                "「最多可叠加 3 层」 -- five firings must still read three stacks of 6%");
     }
 
-    /** \u26a0 The Ultimate: four Skill Points and the 【谜诡】 state on every ally. */
+    /** ⚠ The Ultimate: four Skill Points and the 【谜诡】 state on every ally. */
     @Test
     public void theUltimateGrantsSkillPointsAndCipher() {
         Character sparkle = CharacterFactory.create(SPARKLE, LEVEL);
@@ -77,9 +77,9 @@ public class SparkleTest {
         battle.fireTriggers(TriggerEvent.ULT_CAST, sparkle, enemy, 0, 0);
 
         Assertions.assertEquals(Math.min(before + 4, battle.getSkillPointMax()), battle.getSkillPoints(),
-                "\u300c\u4e3a\u6211\u65b9\u6062\u590d 4 \u4e2a\u6218\u6280\u70b9\u300d (clamped by the pool's ceiling)");
-        Assertions.assertTrue(ally.getBuffManager().hasState("\u8c1c\u8be1"),
-                "\u300c\u5e76\u4f7f\u6211\u65b9\u5168\u4f53\u83b7\u5f97\u3010\u8c1c\u8be1\u3011\u300d");
+                "「为我方恢复 4 个战技点」 (clamped by the pool's ceiling)");
+        Assertions.assertTrue(ally.getBuffManager().hasState("谜诡"),
+                "「并使我方全体获得【谜诡】」");
     }
 
     private static Random fixed() {

@@ -13,13 +13,13 @@ T = "src/main/java/com/laosun/aluminium/models/TriggerInterpreter.java"
 txt = io.open(T, encoding="utf-8").read()
 
 CHECK = "                } else if ((effect.getPercent() == null) == (effect.getAmount() == null)) {"
-CHECK_NEW = ("                // \u26a0 `percent_from_cast_param` is a SECOND way to state the share (2026-10-02): a share from the cast skill with\n"
+CHECK_NEW = ("                // ⚠ `percent_from_cast_param` is a SECOND way to state the share (2026-10-02): a share from the cast skill with\n"
              "                // no `scale` is exactly as well-formed as one with `percent`, and this check used to call it \"neither\".\n"
              "                } else if ((effect.getPercent() == null && effect.getPercentFromCastParam() == null)\n"
              "                        == (effect.getAmount() == null)) {")
 
 SIGNATURE = "    private static double derivedMagnitude(EffectSpec effect, TriggerContext ctx) {"
-EARLY = '''        // \u2b50 A share from the cast skill with NO scale (2026-10-02). This method is entered whenever `derived` is true, and `derived`
+EARLY = '''        // ⭐ A share from the cast skill with NO scale (2026-10-02). This method is entered whenever `derived` is true, and `derived`
         // is "(has a scale) OR (no percent)", so the flat-`amount` case arrives here too -- hence the guard: only the cast-skill share, and
         // only when there is no scale to read.
         if ((effect.getScale() == null || effect.getScale().isBlank())

@@ -16,7 +16,7 @@ import sys
 
 TRIBBIE = "src/main/resources/characters/1403.json"
 SKILLS = "src/main/resources/data/skills.json"
-ZONE = "\u7ed3\u754c"
+ZONE = "结界"
 
 table = json.load(io.open(SKILLS, encoding="utf-8"))
 rows = table["1403"]["3"].get("param_list") or []
@@ -36,18 +36,18 @@ rules.append({
     "when": ["self has_state " + ZONE],
     "do": [{
         "op": "DAMAGE",
-        "scale": "owner_max_hp",                             # \u26a0 the spelling the DAMAGE op reads (self_attr:HEALTH settled 1.0, measured)
-        "percent_from_skill_param": "ULTRA:2",               # \u00d7 #3 of HIS OWN ultimate, at its own level
+        "scale": "owner_max_hp",                             # ⚠ the spelling the DAMAGE op reads (self_attr:HEALTH settled 1.0, measured)
+        "percent_from_skill_param": "ULTRA:2",               # × #3 of HIS OWN ultimate, at its own level
         "element": "Quantum",
-        "target": "highest_hp_attack_hit",                   # \u300c\u88ab\u653b\u51fb\u76ee\u6807\u4e2d\u5f53\u524d\u751f\u547d\u503c\u6700\u9ad8\u7684\u76ee\u6807\u300d
+        "target": "highest_hp_attack_hit",                   # 「被攻击目标中当前生命值最高的目标」
     }],
-    "source": ("1403 \u7f07\u5b9d \u7ec8\u7ed3\u6280 (140303)\uff1a\u300c\u53d7\u5230\u6211\u65b9\u76ee\u6807\u653b\u51fb\u540e\uff0c**\u6bcf\u6709 1 \u540d\u76ee\u6807\u53d7\u5230\u653b\u51fb**\uff0c"
-               "\u4f1a\u5bf9**\u88ab\u653b\u51fb\u76ee\u6807\u4e2d\u5f53\u524d\u751f\u547d\u503c\u6700\u9ad8\u7684\u76ee\u6807**\u9020\u6210 1 \u6b21**\u7b49\u540c\u4e8e\u7f07\u5b9d #3% \u751f\u547d\u4e0a\u9650**\u7684"
-               "\u91cf\u5b50\u5c5e\u6027\u9644\u52a0\u4f24\u5bb3\u3002\u300d"),
-    "note": ("\u2b50 **\u4e3a\u4ec0\u4e48\u6302 `ATTACK_FINISHED`**\uff1a\u5b83\u81ea\u5df1\u7684\u6ce8\u91ca\u5199\u7740 "
-             "\u201csettlement complete, **hit set frozen**\u201d \u2014\u2014 \u6b63\u662f\u672c\u53e5\u8981\u7684\u201c\u88ab\u653b\u51fb\u76ee\u6807\u201d\u96c6\u5408\uff0c"
-             "\u800c\u4e14\u5b83**\u5b58\u5728**\uff08\u6302 `DAMAGE_SETTLED` \u65f6\u4f1a\u5728\u6ca1\u6709\u547d\u4e2d\u96c6\u7684\u573a\u5408\u629b\u9519\uff0c**\u5b9e\u6d4b**\uff1aTrinnonZoneTest \u56e0\u6b64\u53d8\u7ea2\uff09\u3002"
-             "\u2b50 **\u4e14 `scale` \u5fc5\u987b\u662f `owner_max_hp`**\uff08**\u5b9e\u6d4b**\uff1a\u5148\u5199\u7684 `self_attr:HEALTH` \u4e0d\u5728\u90a3\u4e2a\u96c6\u91cc\uff0c\u9759\u9ed8\u5730\u7b97\u6210 1.0\uff09\u3002"),
+    "source": ("1403 缇宝 终结技 (140303)：「受到我方目标攻击后，**每有 1 名目标受到攻击**，"
+               "会对**被攻击目标中当前生命值最高的目标**造成 1 次**等同于缇宝 #3% 生命上限**的"
+               "量子属性附加伤害。」"),
+    "note": ("⭐ **为什么挂 `ATTACK_FINISHED`**：它自己的注释写着 "
+             "“settlement complete, **hit set frozen**” —— 正是本句要的“被攻击目标”集合，"
+             "而且它**存在**（挂 `DAMAGE_SETTLED` 时会在没有命中集的场合抛错，**实测**：TrinnonZoneTest 因此变红）。"
+             "⭐ **且 `scale` 必须是 `owner_max_hp`**（**实测**：先写的 `self_attr:HEALTH` 不在那个集里，静默地算成 1.0）。"),
 })
 
 if isinstance(doc, list):

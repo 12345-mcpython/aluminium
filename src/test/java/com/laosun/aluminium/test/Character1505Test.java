@@ -14,8 +14,8 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1505 \u7eef\u82f1, the two clauses her own text states completely (2026-09-30):
- * \u300c\u7eef\u82f1\u83b7\u5f97\u7b49\u540c\u4e8e\u66b4\u51fb\u4f24\u5bb9 50% \u7684\u6b22\u6109\u5ea6\u300d and the technique\u2019s 20 \u3010\u597d\u6d3b\u5f53\u8d4f\u3011.
+ * 1505 绯英, the two clauses her own text states completely (2026-09-30):
+ * 「绯英获得等同于暴击伤容 50% 的欢愉度」 and the technique’s 20 【好活当赏】.
  */
 public class Character1505Test {
     private static final int WEARER = 1505;
@@ -26,7 +26,7 @@ public class Character1505Test {
     private static EffectSpec derive() {
         EffectSpec spec = new EffectSpec();
         TriggerSpecs.set(spec, "op", "GAIN_RESOURCE");
-        TriggerSpecs.set(spec, "resource", "\u6b22\u6109\u5ea6");
+        TriggerSpecs.set(spec, "resource", "欢愉度");
         TriggerSpecs.set(spec, "amountFromAttr", "CRIT_ATTACK");
         TriggerSpecs.set(spec, "amountPercent", 0.5);
         return spec;
@@ -49,10 +49,10 @@ public class Character1505Test {
                 List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
         double critDamage = elation.getAttribute(AttributeType.CRIT_ATTACK).get();
         battle.startBattle();
-        int elationValue = elation.getResources().value("\u6b22\u6109\u5ea6");
-        int gifts = elation.getResources().value("\u597d\u6d3b\u5f53\u8d4f");
-        System.out.println("[1505] crit damage=" + critDamage + " -> \u6b22\u6109\u5ea6=" + elationValue
-                + " (half is " + Math.round(critDamage * 0.5) + ") ; \u597d\u6d3b\u5f53\u8d4f=" + gifts);
+        int elationValue = elation.getResources().value("欢愉度");
+        int gifts = elation.getResources().value("好活当赏");
+        System.out.println("[1505] crit damage=" + critDamage + " -> 欢愉度=" + elationValue
+                + " (half is " + Math.round(critDamage * 0.5) + ") ; 好活当赏=" + gifts);
         Assertions.assertEquals((int) Math.round(critDamage * 0.5), elationValue,
                 "the talent sets the Elation value to half the crit-damage panel");
         Assertions.assertEquals(20, gifts, "and the technique grants 20 gifts at battle start");
@@ -68,8 +68,8 @@ public class Character1505Test {
                 List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
         battle.startBattle();
         double critDamage = elation.getAttribute(AttributeType.CRIT_ATTACK).get();
-        int elationValue = elation.getResources().value("\u6b22\u6109\u5ea6");
-        System.out.println("[1505] with a raised panel: crit damage=" + critDamage + " -> \u6b22\u6109\u5ea6="
+        int elationValue = elation.getResources().value("欢愉度");
+        System.out.println("[1505] with a raised panel: crit damage=" + critDamage + " -> 欢愉度="
                 + elationValue + " (half is " + Math.round(critDamage * 0.5) + ")");
         Assertions.assertTrue(critDamage >= 1.4, "the panel really moved (it reads " + critDamage + ")");
         Assertions.assertEquals((int) Math.round(critDamage * 0.5), elationValue,
@@ -77,9 +77,9 @@ public class Character1505Test {
     }
 
     /**
-     * \u2605 The shipped numbers themselves (2026-09-30). The behavioural tests above build their own effect in Java, so a
+     * ★ The shipped numbers themselves (2026-09-30). The behavioural tests above build their own effect in Java, so a
      * json-only change to `amountPercent` slipped past them -- measured: `0.5 -> 0.25` came back with 0 red. This reads the
-     * character\u2019s OWN compiled rules, which is exactly what the content file says.
+     * character’s OWN compiled rules, which is exactly what the content file says.
      */
     @Test
     public void theShippedRulesCarryTheStatedNumbers() {
@@ -100,11 +100,11 @@ public class Character1505Test {
                             "the talent derives the value from the crit-damage panel");
                     Assertions.assertEquals(0.5, effect.getAmountPercent(), 1e-9, "and takes half of it");
                 } else if (Boolean.TRUE.equals(effect.getAmountFromEvent())) {
-                    // \u2705 the third source (2026-09-30): \u300c\u83b7\u5f97\u80fd\u91cf\u65f6\u540c\u6b65\u83b7\u5f97\u7b49\u503c\u3010\u597d\u6d3b\u5f53\u8d4f\u3011\u300d -- the amount is the event\u2019s own
-                    Assertions.assertEquals("\u597d\u6d3b\u5f53\u8d4f", effect.getResource(),
-                            "the mirrored resource is \u3010\u597d\u6d3b\u5f53\u8d4f\u3011");
+                    // ✅ the third source (2026-09-30): 「获得能量时同步获得等值【好活当赏】」 -- the amount is the event’s own
+                    Assertions.assertEquals("好活当赏", effect.getResource(),
+                            "the mirrored resource is 【好活当赏】");
                 } else if ("DAMAGE".equals(effect.getOp())) {
-                    // \u2705 the technique\u2019s own damage (2026-09-30): a rule-driven ORDINARY instance, so it has no `amount` at all
+                    // ✅ the technique’s own damage (2026-09-30): a rule-driven ORDINARY instance, so it has no `amount` at all
                     Assertions.assertEquals(1.0, effect.getPercent(), 1e-9, "100% of her attack");
                     Assertions.assertEquals(Boolean.TRUE, effect.getOrdinary(), "as an ordinary hit");
                 } else {
@@ -112,10 +112,10 @@ public class Character1505Test {
                 }
             }
         }
-        Assertions.assertEquals(3, seen, "BATTLE_START carries the derive, the technique\u2019s twenty and its damage");
+        Assertions.assertEquals(3, seen, "BATTLE_START carries the derive, the technique’s twenty and its damage");
 
-        // \u2705 The third clause lives on a DIFFERENT event (2026-09-30): \u300c\u83b7\u5f97\u80fd\u91cf\u65f6\u540c\u6b65\u83b7\u5f97\u7b49\u503c\u7684\u3010\u597d\u6d3b\u5f53\u8d4f\u3011\u300d
-        // is triggered by ENERGY_GAINED, so it is pinned by reading that event\u2019s rules -- the first version of this test counted
+        // ✅ The third clause lives on a DIFFERENT event (2026-09-30): 「获得能量时同步获得等值的【好活当赏】」
+        // is triggered by ENERGY_GAINED, so it is pinned by reading that event’s rules -- the first version of this test counted
         // BATTLE_START only and read 2, which is exactly what made it obvious.
         var theSyncRule = elation.getTriggerTable().rulesFor(
                 com.laosun.aluminium.enums.TriggerEvent.ENERGY_GAINED).stream()
@@ -125,6 +125,6 @@ public class Character1505Test {
         System.out.println("[1505] spec " + theSyncRule.getFirst().id() + " resource=" + syncEffect.getResource()
                 + " amountFromEvent=" + syncEffect.getAmountFromEvent());
         Assertions.assertEquals(Boolean.TRUE, syncEffect.getAmountFromEvent(),
-                "and its amount is the event\u2019s own magnitude");
+                "and its amount is the event’s own magnitude");
     }
 }

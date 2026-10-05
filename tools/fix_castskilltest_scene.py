@@ -27,14 +27,14 @@ if carrier is None:
 name = carrier.group(1)
 print("carrier variable: %s" % name)
 
-if "\u8840\u4ec7" in body:
+if "血仇" in body:
     sys.exit("REFUSING: the scene already enters the state")
 
 STARTER = "battle.startBattle();"
 if body.count(STARTER) != 1:
     sys.exit("REFUSING: %d startBattle() calls in the method" % body.count(STARTER))
 INSERT = (STARTER + "\n"
-          "        // \u26a0 \u300c\u3010\u8840\u4ec7\u3011\u72b6\u6001\u671f\u95f4\u2026\u81ea\u8eab\u56de\u5408\u5f00\u59cb\u65f6\u81ea\u52a8\u65bd\u653e\u3010\u5f11\u738b\u6210\u738b\u3011\u300d: the gate is part of the sentence, so the scene\n"
+          "        // ⚠ 「【血仇】状态期间…自身回合开始时自动施放【弑王成王】」: the gate is part of the sentence, so the scene\n"
           "        // enters the state. The rule used to fire unconditionally, which is the defect that gate corrects.\n"
           "        " + name + ".getBuffManager().addBuff(\n"
           "                new com.laosun.aluminium.models.buff.StateBuff(\"\\u8840\\u4ec7\", 9, true));\n"

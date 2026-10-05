@@ -211,7 +211,7 @@ public class CastSkillTest {
         // ⚠ 「【血仇】状态期间…自身回合开始时自动施放【弑王成王】」: the gate is part of the sentence, so the scene
         // enters the state. The rule used to fire unconditionally, which is the defect that gate corrects.
         him.getBuffManager().addBuff(
-                new com.laosun.aluminium.models.buff.StateBuff("\u8840\u4ec7", 9, true));
+                new com.laosun.aluminium.models.buff.StateBuff("血仇", 9, true));
         battle.processRequests();
 
         double before = enemy.getCurrentHp();

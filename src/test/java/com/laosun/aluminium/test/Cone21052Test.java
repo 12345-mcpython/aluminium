@@ -21,7 +21,7 @@ import java.util.Random;
 /**
  * Light cone 21052: while the wearer's MEMOSPRITE is on the field, both the wearer and the memosprite deal 24% more damage.
  *
- * <p>\u2b50 "While it is on the field" is a LIVE fact, so the rules are instance modifiers guarded by {@code self_summon_count} -- a
+ * <p>⭐ "While it is on the field" is a LIVE fact, so the rules are instance modifiers guarded by {@code self_summon_count} -- a
  * written modifier would only be a snapshot of the moment it was granted. The judge measures all three states: no memosprite,
  * after summoning it, and without the cone.
  */
@@ -81,13 +81,13 @@ public class Cone21052Test {
         Summon plainSprite = battle.summonMemosprite(wearer);
         double plain = hit(plainSprite);
         System.out.println("[21052] summons: plain=" + plain + " boosted=" + boosted + " (x" + (boosted / plain) + ")");
-        Assertions.assertEquals(1.24, boosted / plain, 0.02, "the memosprite\u2019s own damage rises by 24% too");
+        Assertions.assertEquals(1.24, boosted / plain, 0.02, "the memosprite’s own damage rises by 24% too");
     }
 
     @Test
     public void theSpecPinsBothRules() {
         build(true);
-        // \u2605 The rule is gated on \u5fc6\u7075\u5728\u573a, and matching evaluates conditions (discipline 182): without a memosprite
+        // ★ The rule is gated on 忆灵在场, and matching evaluates conditions (discipline 182): without a memosprite
         // on the field the rule does not exist at all -- measured, a fresh state found zero rules where one was expected.
         battle.summonMemosprite(wearer);
         int pinned = 0;
@@ -104,6 +104,6 @@ public class Cone21052Test {
                 Assertions.assertEquals(0.24, effect.getPercent(), 1e-9, "24% at rank 1");
             }
         }
-        Assertions.assertEquals(1, pinned, "only the wearer\u2019s rule is live for a wearer-driven hit");
+        Assertions.assertEquals(1, pinned, "only the wearer’s rule is live for a wearer-driven hit");
     }
 }

@@ -151,14 +151,14 @@ return copy;
     @SerializedName("amount")
     private Double amount;
     /**
-     * \u2705 An amount read from an ATTRIBUTE instead of a literal (2026-09-30; reader: light cone/character 1505
-     * \u7eef\u82f1\u2019s talent \u300c\u7eef\u82f1\u83b7\u5f97\u7b49\u540c\u4e8e\u66b4\u51fb\u4f24\u5bb9 <b>50%</b> \u7684\u6b22\u6109\u5ea6\u300d). The clause names a SHARE of a panel
+     * ✅ An amount read from an ATTRIBUTE instead of a literal (2026-09-30; reader: light cone/character 1505
+     * 绯英’s talent 「绯英获得等同于暴击伤容 <b>50%</b> 的欢愉度」). The clause names a SHARE of a panel
      * value, which no literal can carry -- until this field a `GAIN_RESOURCE` rule could only add a fixed number, so
      * that sentence had no spelling at all.
      */
     private String amountFromAttr;
     /**
-     * The share of {@link #amountFromAttr} to take (0.5 for \u300c50%\u300d). Null means the whole value.
+     * The share of {@link #amountFromAttr} to take (0.5 for 「50%」). Null means the whole value.
      */
     private Double amountPercent;
 
@@ -211,8 +211,8 @@ return copy;
     @com.google.gson.annotations.SerializedName("skill_param_cid")
     private Integer skillParamCid;
     /**
-     * \u2705 Take the amount from the EVENT itself (2026-09-30; reader: 1505 \u7eef\u82f1\u2019s talent \u300c\u7eef\u82f1\u83b7\u5f97\u80fd\u91cf\u65f6\uff0c
-     * \u5c06\u540c\u6b65\u83b7\u5f97\u7b49\u503c\u7684\u3010\u597d\u6d3b\u5f53\u8d4f\u3011\u300d). The magnitude a rule reacts to -- energy credited, damage dealt -- is already on the
+     * ✅ Take the amount from the EVENT itself (2026-09-30; reader: 1505 绯英’s talent 「绯英获得能量时，
+     * 将同步获得等值的【好活当赏】」). The magnitude a rule reacts to -- energy credited, damage dealt -- is already on the
      * context ({@code TriggerContext.amount}); until this flag no op could spend it, so "as much as it just gained" had no spelling.
      */
     private Boolean amountFromEvent;
@@ -232,14 +232,14 @@ return copy;
      */
     private Boolean amountFromPrevious;
     /**
-     * \u2705 A ceiling on a single conversion (2026-09-30; reader: 1505 \u7eef\u82f1\u2019s \u300c\u5355\u6b21\u901a\u8fc7\u6b64\u65b9\u5f0f\u8ba1\u7b97\u7684
-     * \u3010\u597d\u6d3b\u5f53\u8d4f\u3011\u4e0d\u8d85\u8fc7 100 \u70b9\u300d). The clause bounds one conversion, not the resource: \u300c\u83b7\u5f97\u4e00\u70b9\u80fd\u91cf\n     * \u5c31\u5f97\u4e00\u70b9\u793c\u5305\uff0c\u4f46\u4e00\u6b21\u6700\u591a\u7ed9 100\u300d is two different statements, and only the first had a spelling before this.
+     * ✅ A ceiling on a single conversion (2026-09-30; reader: 1505 绯英’s 「单次通过此方式计算的
+     * 【好活当赏】不超过 100 点」). The clause bounds one conversion, not the resource: 「获得一点能量\n     * 就得一点礼包，但一次最多给 100」 is two different statements, and only the first had a spelling before this.
      */
     private Double amountCap;
     /**
-     * \u2705 Settle this {@code DAMAGE} effect as an ORDINARY instance rather than additional damage (2026-09-30;
-     * reader: 1505 \u7eef\u82f1\u2019s technique, \u300c\u8fdb\u5165\u6218\u6597\u540e\uff0c\u5bf9\u654c\u65b9\u5168\u4f53\u9020\u6210\u7b49\u540c\u4e8e\u7eef\u82f1 <b>100%</b> \u653b\u51fb\u529b\u7684
-     * <b>\u7269\u7406\u5c5e\u6027\u4f24\u5bb9</b>\u300d). The two are not the same thing and the difference is measurable: additional damage is
+     * ✅ Settle this {@code DAMAGE} effect as an ORDINARY instance rather than additional damage (2026-09-30;
+     * reader: 1505 绯英’s technique, 「进入战斗后，对敌方全体造成等同于绯英 <b>100%</b> 攻击力的
+     * <b>物理属性伤容</b>」). The two are not the same thing and the difference is measurable: additional damage is
      * boostable-only-as-additional, does not count as an attack and credits the victim energy only on a kill, while the
      * sentence above describes an ordinary hit.\n     */
     private Boolean ordinary;
@@ -786,11 +786,11 @@ return copy;
     private Double speed;
 
     /**
-     * \u300c\u8be5\u4f24\u5bb3\u66b4\u51fb\u7387\u56fa\u5b9a\u4e3a 100%\u300d -- a damage instance that does not roll to crit (M-55 姊妹).
+     * 「该伤害暴击率固定为 100%」 -- a damage instance that does not roll to crit (M-55 姊妹).
      *
      * <p>⚠ Only {@code 1.0} is a legal value, and that is the vocabulary being closed rather than lazy: a
      * <b>probabilistic</b> crit rate is the {@code CRIT_CHANCE} attribute and always has been, while this field says
-     * \u300c\u56fa\u5b9a\u4e3a\u300d -- the outcome is not rolled at all (`Damage.fixedCrit`). A "fixed 50%" would be a third thing
+     * 「固定为」 -- the outcome is not rolled at all (`Damage.fixedCrit`). A "fixed 50%" would be a third thing
      * nobody can read, so the loader refuses it by name.
      */
     @SerializedName("suspends_turns")
@@ -800,7 +800,7 @@ return copy;
     private Double critRate;
 
     /**
-     * \u300c\u66b4\u51fb\u4f24\u5bb3\u56fa\u5b9a\u4e3a 150%\u300d -- the crit damage a {@code fixed_crit} instance uses instead of the
+     * 「暴击伤害固定为 150%」 -- the crit damage a {@code fixed_crit} instance uses instead of the
      * attacker's own crit damage stat (1.5 = 150%). Stated together with {@link #critRate}, never alone.
      */
     @SerializedName("crit_damage")

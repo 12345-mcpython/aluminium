@@ -17,9 +17,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Relic set 129, four pieces (2026-09-30): \u300c\u88c5\u5907\u8005\u53ca\u5176\u5fc6\u7075\u9020\u6210\u7684\u6b22\u6109\u4f24\u5bb9\u65e0\u89c6\u76ee\u6807 10% \u9632\u5fa1\u300d.
+ * Relic set 129, four pieces (2026-09-30): 「装备者及其忆灵造成的欢愉伤容无视目标 10% 防御」.
  *
- * <p>\u2b50 Two-sided on the same wearer: an ELATION instance is bigger with the set on, an ordinary one is untouched -- the scope is
+ * <p>⭐ Two-sided on the same wearer: an ELATION instance is bigger with the set on, an ordinary one is untouched -- the scope is
  * the whole point of the clause, and it is the capability that was measured when the Elation slice landed.
  */
 public class Relic129Test {
@@ -27,7 +27,7 @@ public class Relic129Test {
     private static final int ALLY = 1003;
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
-    /** \u26a0 Relic pieces cap at level 15, not at the character\u2019s level (measured: a RelicException said so). */
+    /** ⚠ Relic pieces cap at level 15, not at the character’s level (measured: a RelicException said so). */
     private static final int RELIC_LEVEL = 15;
 
     private Battle battle;
@@ -57,16 +57,16 @@ public class Relic129Test {
         double normalSet = settled(DamageType.NORMAL);
         System.out.println("[129] ELATION " + elationPlain + " -> " + elationSet + " (x" + (elationSet / elationPlain)
                 + ") ; NORMAL " + normalPlain + " -> " + normalSet + " (x" + (normalSet / normalPlain) + ")");
-        // \u26a0 The cross-build comparison is NOT a clean control (measured): the relic pieces move the wearer\u2019s own panel, and
+        // ⚠ The cross-build comparison is NOT a clean control (measured): the relic pieces move the wearer’s own panel, and
         // `DamageType.ELATION` is deliberately not boostable, so the two ratios are not comparable. What IS specific: ignoring
-        // 10% of the target\u2019s DEF lifts an Elation instance by a small, bounded factor. The scope and the number are pinned by
+        // 10% of the target’s DEF lifts an Elation instance by a small, bounded factor. The scope and the number are pinned by
         // the spec half below.
         double factor = elationSet / elationPlain;
         System.out.println("[129] the Elation factor is " + factor + " ; the ordinary one " + (normalSet / normalPlain)
                 + " (its own stats, which is why it is not the control)");
         Assertions.assertTrue(factor > 1.0 && factor < 1.15,
                 "the set lifts Elation damage by the DEF-ignore effect alone (x" + factor + ")");
-        Assertions.assertTrue(normalSet > normalPlain, "and the relic\u2019s own stats show on ordinary damage");
+        Assertions.assertTrue(normalSet > normalPlain, "and the relic’s own stats show on ordinary damage");
     }
 
     @Test
@@ -79,7 +79,7 @@ public class Relic129Test {
         System.out.println("[129] spec " + rules.getFirst().id() + " attribute=" + effect.getAttribute()
                 + " percent=" + effect.getPercent() + " damage_type=" + effect.getDamageType()
                 + " instance=" + effect.getInstance());
-        Assertions.assertEquals(0.1, effect.getPercent(), 1e-9, "10% of the target\u2019s DEF");
+        Assertions.assertEquals(0.1, effect.getPercent(), 1e-9, "10% of the target’s DEF");
         Assertions.assertEquals("ELATION", effect.getDamageType(), "scoped to Elation damage");
         Assertions.assertEquals(Boolean.TRUE, effect.getInstance(), "as an instance modifier");
     }

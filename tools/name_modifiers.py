@@ -27,11 +27,11 @@ PATH = '%s/src/main/resources/characters/%s.json' % (WORK, CID)
 MODIFIER_OPS = {'MODIFY_ATTR', 'MODIFY_DAMAGE_TAKEN', 'MODIFY_DAMAGE_DEALT', 'MODIFY_RULE'}
 
 NOTE = (
-    '\u2b50 2026-09-30 \u8865\u5b8c\u6574\uff1a\u4e0a\u4e00\u6b21\u53ea\u8f6c\u79fb\u4e86**\u4e00\u534a** \u2717 \u2014\u2014 \u26a0 '
-    '`REMOVE_STATE` \u6309**\u540d\u5b57**\u6458\uff0c\u800c\u672c\u6761\u91cc\u9664\u4e86 `APPLY_BUFF` \u8fd8\u6709\u4e00\u4e2a**\u4e0d\u5177\u540d**\u7684 '
-    '`MODIFY_ATTR` \u2717 \u21d2 \u5b83\u4f1a\u7559\u5728\u65e7\u76ee\u6807\u8eab\u4e0a \u2717\u3002\u26a0 `TriggerInterpreter:2241` \u7684\u539f\u8bdd\uff1a'
-    '*A NAMED modifier is what REMOVE_STATE can take off* \u2713 \u21d2 \u73b0\u5728\u7ed9\u5b83\u540c\u540d `buff` \u2713\uff0c'
-    '\u4e8e\u662f\u4e00\u6761 `REMOVE_STATE` \u540c\u65f6\u6458\u6389**\u72b6\u6001\u4e0e\u6570\u503c** \u2713\u3002'
+    '⭐ 2026-09-30 补完整：上一次只转移了**一半** ✗ —— ⚠ '
+    '`REMOVE_STATE` 按**名字**摘，而本条里除了 `APPLY_BUFF` 还有一个**不具名**的 '
+    '`MODIFY_ATTR` ✗ ⇒ 它会留在旧目标身上 ✗。⚠ `TriggerInterpreter:2241` 的原话：'
+    '*A NAMED modifier is what REMOVE_STATE can take off* ✓ ⇒ 现在给它同名 `buff` ✓，'
+    '于是一条 `REMOVE_STATE` 同时摘掉**状态与数值** ✓。'
 )
 
 doc = json.load(io.open(PATH, encoding='utf-8'))

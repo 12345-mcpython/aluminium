@@ -44,7 +44,7 @@ patch(
     SPEC,
     '    @SerializedName("once_per_attack")',
     '    /**\n'
-    '     * \u300c\u8be5\u6548\u679c**\u6bcf\u4e2a\u6ce2\u6b21**\u6700\u591a\u89e6\u53d1 1 \u6b21\u300d (2026-10-02; reader: 1506's warehouse skill). \u26a0 `per_turn` cannot say it and neither can\n'
+    '     * 「该效果**每个波次**最多触发 1 次」 (2026-10-02; reader: 1506's warehouse skill). ⚠ `per_turn` cannot say it and neither can\n'
     '     * `once_per_battle`: a wave is neither, so it gets the same treatment `once_per_attack` got -- a SEQUENCE comparison, which needs no\n'
     '     * reset because a new wave is a new number.\n'
     '     */\n'
@@ -111,7 +111,7 @@ patch(
     "    private String lastChangedResource;",
     "    private String lastChangedResource;\n\n"
     "    /**\n"
-    "     * \u2705 How many waves have begun (2026-10-02). A SEQUENCE, not a flag: \u300c\u6bcf\u4e2a\u6ce2\u6b21\u6700\u591a 1 \u6b21\u300d is then a comparison against the number the\n"
+    "     * ✅ How many waves have begun (2026-10-02). A SEQUENCE, not a flag: 「每个波次最多 1 次」 is then a comparison against the number the\n"
     "     * rule last fired in, so nothing has to be reset -- the same reason the per-attack cap works this way.\n"
     "     */\n"
     "    private int waveSequence;\n\n"
@@ -130,7 +130,7 @@ patch(
 patch(
     WAVE,
     "        battle.fireTriggers(TriggerEvent.WAVE_START);",
-    "        // \u26a0 Before the event: a per-wave limit is a comparison against this number, so the rule that fires ON the wave's start already\n"
+    "        // ⚠ Before the event: a per-wave limit is a comparison against this number, so the rule that fires ON the wave's start already\n"
     "        // belongs to the new wave (otherwise the first wave's own rule would be compared against the previous number).\n"
     "        battle.beginWave();\n"
     "        battle.fireTriggers(TriggerEvent.WAVE_START);",
@@ -148,7 +148,7 @@ patch(
                     && !owner.isAttackLimitReady(limitKey, battle.attackSequence(), rule.perAttack())) {
                 continue;
             }
-            // \u300c\u6bcf\u4e2a\u6ce2\u6b21\u6700\u591a\u89e6\u53d1 1 \u6b21\u300d: the same shape as the attack cap above, compared against the wave number instead.
+            // 「每个波次最多触发 1 次」: the same shape as the attack cap above, compared against the wave number instead.
             if (owner != null && Boolean.TRUE.equals(rule.oncePerWave())
                     && !owner.isWaveLimitReady(limitKey, battle.waveSequence())) {
                 continue;
@@ -187,7 +187,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * \u300c\u8be5\u6548\u679c**\u6bcf\u4e2a\u6ce2\u6b21**\u6700\u591a\u89e6\u53d1 1 \u6b21\u300d (2026-10-02).
+ * 「该效果**每个波次**最多触发 1 次」 (2026-10-02).
  *
  * <p>Two-way: twice in one wave fires once, and the next wave fires again -- which is the whole difference between a wave cap and a
  * battle-long one, and what a mutant that ignores the cap turns red.
@@ -228,7 +228,7 @@ public class WaveLimitTest {
         System.out.println("[wave-limit] two casts in wave 1 -> " + firstWave + " ; one more in wave 2 -> " + secondWave);
 
         Assertions.assertEquals(1, firstWave,
-                "\u300c\u6bcf\u4e2a\u6ce2\u6b21\u6700\u591a\u89e6\u53d1 1 \u6b21\u300d-- the second cast in the same wave changes nothing");
+                "「每个波次最多触发 1 次」-- the second cast in the same wave changes nothing");
         Assertions.assertEquals(2, secondWave,
                 "and the NEXT wave fires again, which is what tells a wave cap apart from a battle-long one");
     }

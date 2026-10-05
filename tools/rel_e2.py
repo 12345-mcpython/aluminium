@@ -7,6 +7,6 @@ if len(t) != 1:
     sys.exit("REFUSING: %d rules" % len(t))
 r = t[0]
 if "EXTEND_BUFF" not in [e.get("op") for e in r["do"]]:
-    r["do"].append({"op": "EXTEND_BUFF", "buff": "\u7a79\u547d", "turns": -1, "target": "self"})
+    r["do"].append({"op": "EXTEND_BUFF", "buff": "穹命", "turns": -1, "target": "self"})
 io.open(P, "w", encoding="utf-8", newline="\n").write(json.dumps(d, ensure_ascii=False, indent=2) + "\n")
 print("ok   the E2 carries the third sentence")

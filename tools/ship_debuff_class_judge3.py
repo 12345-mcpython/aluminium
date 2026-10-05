@@ -24,10 +24,10 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * \u300c\u654c\u65b9\u5bf9\u6211\u65b9\u65bd\u52a0\u4e86**\u63a7\u5236\u7c7b**\u8d1f\u9762\u72b6\u6001\u300d\u53ef\u4ee5\u88ab\u95ee\u4e86 (2026-10-02).
+ * 「敌方对我方施加了**控制类**负面状态」可以被问了 (2026-10-02).
  *
- * <p>The pair is the reading: one landed control, watched by a rule that asked for \u300c\u63a7\u5236\u7c7b\u300d (fires) and by one that asked for
- * \u300c\u6301\u7eed\u4f24\u5bb3\u7c7b\u300d (silent). A filter that ignored the class would fire both, so the second half is what pins it.
+ * <p>The pair is the reading: one landed control, watched by a rule that asked for 「控制类」 (fires) and by one that asked for
+ * 「持续伤害类」 (silent). A filter that ignored the class would fire both, so the second half is what pins it.
  */
 public class DebuffClassConditionTest {
     private static final int OWNER = 1002;
@@ -37,19 +37,19 @@ public class DebuffClassConditionTest {
     @Test
     public void theFilterTellsTheTwoFamiliesApart() {
         Assertions.assertEquals(1, hitsFor("control"),
-                "\u300c\u63a7\u5236\u7c7b\u300d-- the landed control fires the rule that asked for it");
+                "「控制类」-- the landed control fires the rule that asked for it");
         Assertions.assertEquals(0, hitsFor("dot"),
-                "and it does NOT fire the rule that asked for \u300c\u6301\u7eed\u4f24\u5bb3\u7c7b\u300d");
+                "and it does NOT fire the rule that asked for 「持续伤害类」");
     }
 
-    /** How many times a rule asking for {@code wanted} fires when ONE control (\u51bb\u7ed3) lands. */
+    /** How many times a rule asking for {@code wanted} fires when ONE control (冻结) lands. */
     private static int hitsFor(String wanted) {
         Character owner = CharacterFactory.create(OWNER, 80, false, null, null, 0);
         String probe = "probe" + wanted;
 
         EffectSpec land = new EffectSpec();
         TriggerSpecs.set(land, "op", "APPLY_CONTROL");
-        // \u26a0 The keys the validator names: `APPLY_CONTROL requires "control"` and `requires "turns"`.
+        // ⚠ The keys the validator names: `APPLY_CONTROL requires "control"` and `requires "turns"`.
         TriggerSpecs.set(land, "control", "\\u51bb\\u7ed3");
         TriggerSpecs.set(land, "turns", 2);
         TriggerSpecs.set(land, "baseChance", 1.0);

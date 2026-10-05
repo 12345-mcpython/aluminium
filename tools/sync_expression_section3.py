@@ -14,25 +14,25 @@ PATH = "EXPRESSION.md"
 lines = io.open(PATH, encoding="utf-8").read().split("\n")
 
 # 1) the 1217 row leaves section 3 (shipped)
-P1217 = "| **\u300c\u7f29\u77ed\u3010\u7a79\u547d\u3011\u7684\u6301\u7eed**\u65f6\u957f**\u300d**"
+P1217 = "| **「缩短【穹命】的持续**时长**」**"
 hits = [i for i, l in enumerate(lines) if l.startswith(P1217)]
 if len(hits) != 1:
     sys.exit("REFUSING: %d rows for 1217" % len(hits))
 del lines[hits[0]]
 
 # 2) the 1415 row is rewritten: the prerequisite landed, the sentence itself is what is left
-P1415 = "| **\u300c\u4f7f\u4e07\u654c\u81ea\u52a8\u65bd\u653e1\u6b21\u4e0d\u6d88\u8017\u5145\u80fd\u7684\u3010\u5f11\u795e\u767b\u795e\u3011\u300d**"
+P1415 = "| **「使万敌自动施放1次不消耗充能的【弑神登神】」**"
 hits = [i for i, l in enumerate(lines) if l.startswith(P1415)]
 if len(hits) != 1:
     sys.exit("REFUSING: %d rows for 1415" % len(hits))
 lines[hits[0]] = (
-    "| **\u300c\u4f7f\u4e07\u654c\u81ea\u52a8\u65bd\u653e1\u6b21\u4e0d\u6d88\u8017\u5145\u80fd\u7684\u3010\u5f11\u795e\u767b\u795e\u3011\u300d**\uff08`1415` \u5fc6\u7075\u6280\u80fd 8 \u2713\uff09 "
-    "| \u2705 **\u524d\u7f6e\u5df2\u6ee1\u8db3** \u2713\uff1a\u5fc6\u7075\u7684\u6280\u80fd**\u5df2\u662f `Skill` \u5bf9\u8c61** \u2713\uff08`MemospriteSpec` \u5e26 `servant_id` \u2713 \u4e0e `skills` \u884c \u2713\uff1b"
-    "`SummonFactory` \u7528 `DefaultSkill(11415, slot, level)` \u5efa \u2713\uff1b`skill_effects.json` \u91cc `\"11415\": {\"8\": {\"effect\": \"Rules\"}}` \u2713\uff09"
-    "\u2014\u2014 \u2757 \u73b0\u5728\u53ea\u5dee\u628a\u90a3\u53e5\u8bdd**\u9010\u53e5\u5199\u51fa** \u2713\uff08\u2500\u300c\u89e3\u9664\u63a7\u5236\u7c7b\u8d1f\u9762\u72b6\u6001\u300d\u2713\u3001\u300c\u82e5\u5904\u4e8e\u3010\u8840\u4ec7\u3011\u5219\u4f7f\u5176\u81ea\u52a8\u65bd\u653e\u3010\u5f11\u795e\u767b\u795e\u3011\u300d\u2713\u3001"
-    "\u300c\u5426\u5219\u884c\u52a8\u63d0\u524d 100%\u300d\u2713\uff09 "
-    "| `1415`\uff081 \u4f4d\uff09 "
-    "| \u5199\u51fa\u8be5\u53e5\uff08\u8bcd\u90fd\u5df2\u51fa\u8d27 \u2713\uff09 |")
+    "| **「使万敌自动施放1次不消耗充能的【弑神登神】」**（`1415` 忆灵技能 8 ✓） "
+    "| ✅ **前置已满足** ✓：忆灵的技能**已是 `Skill` 对象** ✓（`MemospriteSpec` 带 `servant_id` ✓ 与 `skills` 行 ✓；"
+    "`SummonFactory` 用 `DefaultSkill(11415, slot, level)` 建 ✓；`skill_effects.json` 里 `\"11415\": {\"8\": {\"effect\": \"Rules\"}}` ✓）"
+    "—— ❗ 现在只差把那句话**逐句写出** ✓（─「解除控制类负面状态」✓、「若处于【血仇】则使其自动施放【弑神登神】」✓、"
+    "「否则行动提前 100%」✓） "
+    "| `1415`（1 位） "
+    "| 写出该句（词都已出货 ✓） |")
 
 io.open(PATH, "w", encoding="utf-8", newline="\n").write("\n".join(lines))
-print("ok   section 3 now has %d rows" % sum(1 for l in lines if l.startswith("| ") and "\u4f4d" in l))
+print("ok   section 3 now has %d rows" % sum(1 for l in lines if l.startswith("| ") and "位" in l))

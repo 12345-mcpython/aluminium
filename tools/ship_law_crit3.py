@@ -5,7 +5,7 @@ was left was the judge itself: it put the mark on 刻律德菈 with
 
     cerydra.setTriggerTable(new TriggerTable(CERYDRA, List.of(markRule)))
 
-which REPLACES her whole table -- including the very rule under test. \u26a0 That is the table-replacement trap again, this time silently deleting the subject.
+which REPLACES her whole table -- including the very rule under test. ⚠ That is the table-replacement trap again, this time silently deleting the subject.
 
 So the mark now comes from HER OWN kit: her skill's rule is what grants 【军功】 (1412's own note says so), so the judge casts her skill and lets the game do it. Nothing is
 replaced.
@@ -17,7 +17,7 @@ import sys
 CERYDRA = "src/main/resources/characters/1412.json"
 SE = "src/main/resources/data/skill_effects.json"
 SLOT = 23
-MARK = "\u519b\u529f"
+MARK = "军功"
 
 doc = json.load(io.open(CERYDRA, encoding="utf-8"))
 rules = doc if isinstance(doc, list) else doc.get("rules", [])
@@ -38,11 +38,11 @@ rules.append({
         "target": "all_allies",
         "target_when": ["target has_state " + MARK],
     }],
-    "source": ("1415 \u6614\u6d9f \u5fc6\u7075\u6280\u80fd 17 \u300c\u732e\u4e88\u300c\u5f8b\u6cd5\u300d\u4e4b\u8bd7\u300d\uff08\u6570\u636e\u69fd\u4f4d 23\uff0cSkillID 1141523\uff09\uff1a"
-               "\u300c\u6574\u573a\u751f\u6548\uff0c\u5bf9\u523b\u5f8b\u5fb7\u83c8\u65bd\u653e\u540e\uff0c**\u6301\u6709\u3010" + MARK + "\u3011\u7684\u89d2\u8272\u66b4\u51fb\u4f24\u5bb3\u63d0\u9ad8 #1%**\u3002\u300d"),
-    "note": ("\u2b50 \u516d\u8f6e\u5355\u53d8\u91cf\u5b9e\u9a8c\u540e\uff0c\u5f62\u72b6\u4e0e\u5f15\u64ce\u884c\u4e3a\u90fd\u5df2\u9a8c\u8bc1\uff1a`all_allies` \u597d\u3001`target_when` \u5728\u5df2\u51fa\u8d27\u8bcd\u6c47\u91cc\u3001"
-             "\u5b57\u9762\u91cf\u4e0e**\u6d3e\u751f**\u4efd\u989d\u90fd\u80fd\u843d\u5730\uff08\u5b9e\u6d4b\uff1a\u5b57\u9762\u91cf +0.25\u3001\u6d3e\u751f +0.4199999999999591\uff09\u3002"
-             "\u2b50 \u5360\u6bd4\u662f**\u65bd\u653e\u6280\u80fd\u7684\u7b2c 0 \u53c2\u6570**\uff08\u968f\u7b49\u7ea7\u53d8\uff1a0.15 \u2192 0.42\uff09\u3002"),
+    "source": ("1415 昔涟 忆灵技能 17 「献予「律法」之诗」（数据槽位 23，SkillID 1141523）："
+               "「整场生效，对刻律德菈施放后，**持有【" + MARK + "】的角色暴击伤害提高 #1%**。」"),
+    "note": ("⭐ 六轮单变量实验后，形状与引擎行为都已验证：`all_allies` 好、`target_when` 在已出货词汇里、"
+             "字面量与**派生**份额都能落地（实测：字面量 +0.25、派生 +0.4199999999999591）。"
+             "⭐ 占比是**施放技能的第 0 参数**（随等级变：0.15 → 0.42）。"),
 })
 if isinstance(doc, list):
     out = rules
@@ -56,8 +56,8 @@ effects = json.load(io.open(SE, encoding="utf-8"))
 if str(SLOT) not in effects.get("11415", {}):
     effects.setdefault("11415", {})[str(SLOT)] = {
         "effect": "Rules",
-        "source": "1415 \u6614\u6d9f \u5fc6\u7075\u6280\u80fd 17 \u300c\u732e\u4e88\u300c\u5f8b\u6cd5\u300d\u4e4b\u8bd7\u300d\uff08\u6570\u636e\u69fd\u4f4d 23\uff09\uff1a\u5de5\u4f5c\u5728\u89c4\u5219\u4fa7\u3002",
-        "note": "\u2b50 \u6ca1\u6709\u6761\u76ee\u5c31\u4e0d\u53ef\u4ea4\u4ed8\u3002",
+        "source": "1415 昔涟 忆灵技能 17 「献予「律法」之诗」（数据槽位 23）：工作在规则侧。",
+        "note": "⭐ 没有条目就不可交付。",
     }
     io.open(SE, "w", encoding="utf-8", newline="\n").write(json.dumps(effects, ensure_ascii=False, indent=2) + "\n")
     print("ok   skill_effects.json: 11415/%d = Rules" % SLOT)
@@ -78,12 +78,12 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1415's memosprite skill 23 \u300c\u732e\u4e88\u300c\u5f8b\u6cd5\u300d\u4e4b\u8bd7\u300d: \u300c\u6301\u6709\u3010\u519b\u529f\u3011\u7684\u89d2\u8272\u66b4\u51fb\u4f24\u5bb3\u63d0\u9ad8 #1%\u300d (2026-10-02).
+ * 1415's memosprite skill 23 「献予「律法」之诗」: 「持有【军功】的角色暴击伤害提高 #1%」 (2026-10-02).
  *
- * <p>\u2b50 Nothing is replaced here. The mark 【\u519b\u529f】 is granted by 1412's OWN kit, so the judge casts her skill and lets the game do it -- an earlier version
+ * <p>⭐ Nothing is replaced here. The mark 【军功】 is granted by 1412's OWN kit, so the judge casts her skill and lets the game do it -- an earlier version
  * replaced her whole trigger table with a hand-built mark rule, which silently deleted the very rule under test (the table-replacement trap, again).
  *
- * <p>\u2b50 The reading is TWO-SIDED: the ally carrying the mark gains the crit damage, the ally without it gains nothing.
+ * <p>⭐ The reading is TWO-SIDED: the ally carrying the mark gains the crit damage, the ally without it gains nothing.
  */
 public class LawOdeCritDamageTest {
     private static final int LEVEL = 80;
@@ -106,7 +106,7 @@ public class LawOdeCritDamageTest {
         cerydra = battle.characters.get(1);
         plain = battle.characters.get(2);
 
-        // \u2b50 HER OWN skill is what grants \u3010\u519b\u529f\u3011 -- cast it at herself, and no table is ever replaced
+        // ⭐ HER OWN skill is what grants 【军功】 -- cast it at herself, and no table is ever replaced
         var herSkill = cerydra.getSkills().get(SkillType.SKILL);
         Assertions.assertNotNull(herSkill, "precondition: 1412 has a SKILL");
         SkillExecutor.execute(battle, herSkill, cerydra, List.of(cerydra));

@@ -71,7 +71,7 @@ public class ActorAttrScaleTest {
                 + " ; 10% of the actor = " + fromActor + " ; 10% of the owner = " + fromOwner);
 
         Assertions.assertEquals(fromActor, gained, Math.abs(fromActor) * 1e-6,
-                "\u300c\u63d0\u9ad8\u6570\u503c\u7b49\u540c\u4e8e**\u5fb7\u8c2c\u6b4c**\u751f\u547d\u4e0a\u9650\u7684 #1%\u300d-- the ACTOR is the unit the share is of");
+                "「提高数值等同于**德谬歌**生命上限的 #1%」-- the ACTOR is the unit the share is of");
         Assertions.assertNotEquals(fromOwner, gained, Math.abs(fromActor) * 1e-6,
                 "and the rule owner is a different unit here, so the two readings are distinguishable");
     }

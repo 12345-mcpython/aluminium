@@ -10,12 +10,12 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Random;
 
-/** \u300c\u3010\u8ffd\u5fc6\u3011\u8fbe\u5230 24 \u70b9\u65f6\u53ef\u6fc0\u6d3b\u7ec8\u7ed3\u6280\u5e76\u89e3\u9664\u81ea\u8eab\u6240\u6709\u8d1f\u9762\u6548\u679c\u300d\u4e0e\u300c\u6700\u591a\u6ea2\u51fa\u81f3 27 \u70b9\u300d (2026-10-02). */
+/** 「【追忆】达到 24 点时可激活终结技并解除自身所有负面效果」与「最多溢出至 27 点」 (2026-10-02). */
 public class CyreneRecollectionCapTest {
     private static final int LEVEL = 80;
     private static final int CYRENE = 1415;
     private static final int MONSTER = 1002011;
-    private static final String MEMORY = "\u8ffd\u5fc6";
+    private static final String MEMORY = "追忆";
 
     @Test
     public void thecapCanOverflowToTwentySeven() {
@@ -47,6 +47,6 @@ public class CyreneRecollectionCapTest {
         battle.processRequests();
         int left = battle.characters.getFirst().getBuffManager().debuffCount();
         System.out.println("[recollection] after reaching 24, her debuffs read " + left);
-        Assertions.assertEquals(0, left, "a full 【\u8ffd\u5fc6\u3011 cleanses her");
+        Assertions.assertEquals(0, left, "a full 【追忆】 cleanses her");
     }
 }

@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Light cone 23031: a follow-up attack grants a stack of \u3010\u6d41\u5149\u3011 (max 2), each layer makes Ultimate damage ignore 27% of the
+ * Light cone 23031: a follow-up attack grants a stack of 【流光】 (max 2), each layer makes Ultimate damage ignore 27% of the
  * target's defence, and the wearer's turn end removes one layer.
  */
 public class Cone23031Test {
@@ -24,7 +24,7 @@ public class Cone23031Test {
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
-    private static final String GLOW = "\u6d41\u5149";
+    private static final String GLOW = "流光";
 
     private Character wearer;
     private Enemy enemy;

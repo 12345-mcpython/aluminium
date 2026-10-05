@@ -1,6 +1,6 @@
 """1513 砂金•戏浪: the 笑点 half of her three clauses (2026-10-02, item 55).
 
-\u2b50\u2b50 WHY THIS IS A SHIPMENT AND NOT A CAPABILITY: the shared, party-scoped, UNCAPPED resource 「笑点」 already exists -- declared
+⭐⭐ WHY THIS IS A SHIPMENT AND NOT A CAPABILITY: the shared, party-scoped, UNCAPPED resource 「笑点」 already exists -- declared
 in `1502.json` as `{"id": "笑点", "max": 2147483647, "scope": "PARTY"}` with a `source` that says exactly that ("数据里没有上限，
 所以 max 用 Integer.MAX_VALUE"), and `1502`'s own rule already grants five of them, judged by `Character1502Test`.
 What was missing was HER half: `1513.json` declares only 【热意】, so its three sentences could not hand out 笑点.
@@ -10,10 +10,10 @@ Document, verbatim (per-clause; the numbers are the sentences' own):
   * 战技 「获得 **4 个笑点**和 **4 点【热意】**」
   * 终结技 「获得 **6 个笑点**和 **8 点【热意】**。并使自身速度提高 30%，持续 4 回合」
 
-\u26a0 The effect ORDER follows each sentence (笑点 first where the sentence says it first), which is the project's rule for a
+⚠ The effect ORDER follows each sentence (笑点 first where the sentence says it first), which is the project's rule for a
 sentence that lists two grants.
 
-\u2b50 THE SECOND READER of the family, so this closes the「按数量…」拉 family's sibling: `EXPRESSION.md` §3's row about the elation
+⭐ THE SECOND READER of the family, so this closes the「按数量…」拉 family's sibling: `EXPRESSION.md` §3's row about the elation
 gauge was **half wrong** -- the gauge resource was already there, only her grants were not.
 """
 import io
@@ -21,8 +21,8 @@ import json
 
 DATA = "src/main/resources/characters/1513.json"
 JUDGE = "src/test/java/com/laosun/aluminium/test/Character1513LaughterTest.java"
-LAUGH = "\u7b11\u70b9"
-FERVOR = "\u70ed\u610f"
+LAUGH = "笑点"
+FERVOR = "热意"
 GRANTS = {"talent_fervor_on_teammate_attack": 1, "skill_fervor": 4, "ult_fervor_and_speed": 6}
 
 doc = json.load(io.open(DATA, encoding="utf-8"))
@@ -37,9 +37,9 @@ resources.append({
     "max": 2147483647,
     "initial": 0,
     "scope": "PARTY",
-    "source": ("1513 \u7802\u91d1\u2022\u620f\u6d6a \u5929\u8d4b\uff0f\u6218\u6280\uff0f\u7ec8\u7ed3\u6280\uff1a\u300c\u83b7\u5f97 1\uff0f4\uff0f6 \u4e2a\u7b11\u70b9\u300d\u3002"
-               "\u26a0 \u4e0e `1502`\uff0f`1505` \u5171\u7528\u540c\u540d\u7684**\u961f\u4f0d\u7ea7**\u8ba1\u6570 \u2713\uff08\u6570\u636e\u91cc\u6ca1\u6709\u4e0a\u9650 \u21d2 "
-               "\u540c `1502` \u7684\u5199\u6cd5\u7528 `Integer.MAX_VALUE` \u2713\uff09"),
+    "source": ("1513 砂金•戏浪 天赋／战技／终结技：「获得 1／4／6 个笑点」。"
+               "⚠ 与 `1502`／`1505` 共用同名的**队伍级**计数 ✓（数据里没有上限 ⇒ "
+               "同 `1502` 的写法用 `Integer.MAX_VALUE` ✓）"),
 })
 
 patched = {}
@@ -54,7 +54,7 @@ for rule in doc["rules"]:
         raise SystemExit("rule " + rule["id"] + " already grants " + LAUGH)
     grant = {"op": "GAIN_RESOURCE", "resource": LAUGH, "amount": amount}
     fervor_at = next((i for i, e in enumerate(ops) if e.get("resource") == FERVOR), None)
-    # \u26a0 Order follows the sentence: the talent says 【热意】 first ("1 点【热意】以及 1 个笑点"), the other two say 笑点 first.
+    # ⚠ Order follows the sentence: the talent says 【热意】 first ("1 点【热意】以及 1 个笑点"), the other two say 笑点 first.
     if rule["id"] == "talent_fervor_on_teammate_attack" and fervor_at is not None:
         ops.insert(fervor_at + 1, grant)
     elif fervor_at is not None:
@@ -82,10 +82,10 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1513\uff1a\u300c\u83b7\u5f97 1\uff0f4\uff0f6 \u4e2a\u7b11\u70b9\u300d\u2014\u2014 \u4e09\u53e5\u5404\u81ea\u7ed9\u7684\u90a3\u4e00\u534a (2026-10-02).
+ * 1513：「获得 1／4／6 个笑点」—— 三句各自给的那一半 (2026-10-02).
  *
- * <p>\u2b50\u2b50 \u7b11\u70b9 is a PARTY-scoped, uncapped counter that already existed (declared by 1502); these three readings are about
- * HER grants, and each one is the sentence's own number. \u26a0 The counter is shared, so the assertions are cumulative on purpose --
+ * <p>⭐⭐ 笑点 is a PARTY-scoped, uncapped counter that already existed (declared by 1502); these three readings are about
+ * HER grants, and each one is the sentence's own number. ⚠ The counter is shared, so the assertions are cumulative on purpose --
  * that IS what 「队伍级」 means, and `partyResourceValue` is the accessor `Character1502Test` already uses.
  */
 public class Character1513LaughterTest {
@@ -94,7 +94,7 @@ public class Character1513LaughterTest {
     private static final int MONSTER = 1002011;
     private static final String LAUGH = "\\u7b11\\u70b9";
 
-    /** \u300c\u6218\u6280\u2026\u83b7\u5f97 4 \u4e2a\u7b11\u70b9\u300d */
+    /** 「战技…获得 4 个笑点」 */
     @Test
     public void herSkillGivesFour() {
         Battle battle = fight();
@@ -105,7 +105,7 @@ public class Character1513LaughterTest {
         Assertions.assertEquals(4, battle.partyResourceValue(LAUGH), "\\u300c\\u83b7\\u5f97 4 \\u4e2a\\u7b11\\u70b9\\u300d");
     }
 
-    /** \u300c\u7ec8\u7ed3\u6280\u2026\u83b7\u5f97 6 \u4e2a\u7b11\u70b9\u300d */
+    /** 「终结技…获得 6 个笑点」 */
     @Test
     public void herUltimateGivesSix() {
         Battle battle = fight();
@@ -113,7 +113,7 @@ public class Character1513LaughterTest {
         Assertions.assertEquals(6, battle.partyResourceValue(LAUGH), "\\u300c\\u83b7\\u5f97 6 \\u4e2a\\u7b11\\u70b9\\u300d");
     }
 
-    /** \u300c\u961f\u53cb\u65bd\u653e\u653b\u51fb\u540e\u2026\u4ee5\u53ca 1 \u4e2a\u7b11\u70b9\u300d -- a REAL teammate attack, not a hand-fired event. */
+    /** 「队友施放攻击后…以及 1 个笑点」 -- a REAL teammate attack, not a hand-fired event. */
     @Test
     public void aTeammateAttackGivesOne() {
         Battle battle = fight();
@@ -122,7 +122,7 @@ public class Character1513LaughterTest {
         Assertions.assertEquals(1, battle.partyResourceValue(LAUGH), "\\u300c\\u4ee5\\u53ca 1 \\u4e2a\\u7b11\\u70b9\\u300d");
     }
 
-    /** \u2b50 THE SHARED COUNTER: all three in one battle sum, because 笑点 is party-scoped. */
+    /** ⭐ THE SHARED COUNTER: all three in one battle sum, because 笑点 is party-scoped. */
     @Test
     public void theCounterIsSharedAcrossTheParty() {
         Battle battle = fight();

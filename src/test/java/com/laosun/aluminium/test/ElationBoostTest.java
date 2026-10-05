@@ -18,9 +18,9 @@ import java.util.Random;
 
 /**
  * Elation slice 1b (2026-09-30): {@code ELATION_DAMAGE_BOOST} is folded into the base of an Elation instance, because that damage
- * type is deliberately not boostable (so `addBoost` would be silently ignored by the zone\u2019s own `applies(type)` gate).
+ * type is deliberately not boostable (so `addBoost` would be silently ignored by the zone’s own `applies(type)` gate).
  *
- * <p>\u2b50 Judged on a SHIPPED character\u2019s REAL Elation skill (1501, slot 20): the enemy\u2019s health is what moves, and the boost
+ * <p>⭐ Judged on a SHIPPED character’s REAL Elation skill (1501, slot 20): the enemy’s health is what moves, and the boost
  * arrives through CONTENT (a hand-added modifier does not stick on this attribute -- measured twice).
  */
 public class ElationBoostTest {
@@ -60,7 +60,7 @@ public class ElationBoostTest {
 
     @Test
     public void theElationBoostLiftsTheElationSkillOnly() {
-        // \u2605 The character carries an Elation boost of its OWN in the data (measured: 0.28), and the fold puts BOTH into the
+        // ★ The character carries an Elation boost of its OWN in the data (measured: 0.28), and the fold puts BOTH into the
         // base -- so the expected ratio is (1 + own + added) / (1 + own), not (1 + added). Reading `own` here keeps the judge
         // honest about that: with own = 0.28 the measured 1.390625 is exactly 1.78 / 1.28.
         build(0);

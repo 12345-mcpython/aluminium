@@ -27,7 +27,7 @@ import java.util.Random;
 /**
  * Two +20% rules on one attribute, both declared stackable (1415, 2026-10-02).
  *
- * <p>\u26a0 `maxStacks` here is the JAVA field; the JSON content writes `max_stacks`. \u26a0 Measured earlier: without it the second
+ * <p>⚠ `maxStacks` here is the JAVA field; the JSON content writes `max_stacks`. ⚠ Measured earlier: without it the second
  * modifier replaces the first (0.2), which `BuffManager.addBuff`'s javadoc calls deliberate. This asserts 0.4 -- a red
  * saying "was 0.2" would mean `maxStacks` is not the switch that makes same-attribute modifiers accumulate.
  */
@@ -35,7 +35,7 @@ public class CyreneSpeedThresholdTest {
     private static final int OWNER = 1415;
     private static final int MONSTER = 1002011;
 
-    /** \u2b50 Two stackable +20% modifiers on one attribute sum to 0.4. */
+    /** ⭐ Two stackable +20% modifiers on one attribute sum to 0.4. */
     @Test
     public void stackableModifiersAdd() {
         Assertions.assertEquals(0.4, total(), 1e-6,

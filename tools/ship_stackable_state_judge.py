@@ -31,7 +31,7 @@ import java.util.Random;
  * never announces STATE_ENDED. The corpus needs both at once for Bondmate-of-Appreciation ("the laugh points are counted
  * into that state"), which is what 1505's "turns 50% of it into her own" then reads.
  *
- * <p>\u26a0 Three effects in ONE rule on purpose: measured, three separate rules of the same event fire only one of them, which
+ * <p>⚠ Three effects in ONE rule on purpose: measured, three separate rules of the same event fire only one of them, which
  * reads as zero instances and has nothing to do with this capability.
  */
 public class StackableStateTest {

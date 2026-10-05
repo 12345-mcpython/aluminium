@@ -18,7 +18,7 @@ import java.util.Random;
 /**
  * Light cone 24006: casting a Skill or Ultimate ON AN ALLY raises THAT ALLY's elation damage by 12% for 2 turns.
  *
- * <p>\u2b50 Two things carry the clause: the cast events already mean "after the cast", and their target is the unit that was
+ * <p>⭐ Two things carry the clause: the cast events already mean "after the cast", and their target is the unit that was
  * aimed at -- so `target is_ally` picks the recipient, and the modifier goes on `target`, not on the wearer. The judge
  * therefore reads THREE units: the aimed ally (raised), the wearer (NOT raised) and an enemy-targeted cast (nothing).
  */
@@ -66,7 +66,7 @@ public class Cone24006Test {
         battle.fireTriggers(TriggerEvent.ULT_CAST, wearer, ally, 1, 0);
         double afterAlly = ally.getAttribute(AttributeType.ELATION_DAMAGE_BOOST).get() - allyBase;
         System.out.println("[24006] ult on enemy: +" + afterEnemy + " ; ult on ally: +" + afterAlly);
-        Assertions.assertEquals(0.0, afterEnemy, 1e-9, "an enemy is not \u6211\u65b9\u5355\u4f53\u89d2\u8272 (false case)");
+        Assertions.assertEquals(0.0, afterEnemy, 1e-9, "an enemy is not 我方单体角色 (false case)");
         Assertions.assertEquals(0.12, afterAlly, 1e-9, "an ally is, and the Ultimate counts too");
     }
 

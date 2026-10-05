@@ -13,17 +13,17 @@ import sys
 sys.stdout.reconfigure(encoding='utf-8', errors='replace')
 WORK = r'E:\code\java\aluminium'
 PATH = WORK + '/src/main/resources/characters/1402.json'
-NAME = '\u95f4\u9699\u7ec7\u7ebf'   # 间隙织线
+NAME = '间隙织线'   # 间隙织线
 
 NOTE = (
-    '\u2b50 2026-09-30 \u8f6c\u6b63\uff1a\u300c\u3010\u95f4\u9699\u7ec7\u7ebf\u3011**\u4ec5\u5bf9\u6700\u65b0\u88ab\u65bd\u52a0\u7684\u76ee\u6807\u751f\u6548**\u300d'
-    '\u2014\u2014 \u26a0 **\u4e0d\u9700\u8981\u65b0\u80fd\u529b** \u2713\uff1a`REMOVE_STATE` \u5148\u628a\u8fd9\u4e2a\u540d\u5b57\u4ece**\u5168\u4f53**\u6458\u6389\uff0c'
-    '\u518d `APPLY_BUFF` \u7ed9\u65b0\u76ee\u6807 \u21d2 \u26a0 **\u987a\u5e8f\u5373\u8bed\u4e49** \u2713\u3002'
-    '\u26a0 `TriggerInterpreter:2515` \u7684\u6ce8\u91ca\u539f\u8bdd\uff1a*REMOVE_STATE takes the named state off every resolved target '
-    '-- the only-the-newest-one-holds-it half of \u661f\u671f\u65e5\u7684\u3010\u8499\u798f\u8005\u3011*\uff1b'
-    '\u26a0 \u800c `1215` \u7684\u6ce8\u8bb0\u8bf4\u5f97\u66f4\u76f4\u767d\uff1a*the state goes off everybody, then onto the new target '
-    '-- there is no only-one-holder flag, the removal IS that clause*\u3002'
-    '\u26a0 \u6458\u4e0d\u5b58\u5728\u7684\u72b6\u6001**\u4e0d\u662f\u9519** \u2713\uff08`:2518` \u2713\uff09\u2014\u2014 \u6bcf\u6b21\u65bd\u653e\u90fd\u4f1a\u8dd1\u4e00\u904d\u3002'
+    '⭐ 2026-09-30 转正：「【间隙织线】**仅对最新被施加的目标生效**」'
+    '—— ⚠ **不需要新能力** ✓：`REMOVE_STATE` 先把这个名字从**全体**摘掉，'
+    '再 `APPLY_BUFF` 给新目标 ⇒ ⚠ **顺序即语义** ✓。'
+    '⚠ `TriggerInterpreter:2515` 的注释原话：*REMOVE_STATE takes the named state off every resolved target '
+    '-- the only-the-newest-one-holds-it half of 星期日的【蒙福者】*；'
+    '⚠ 而 `1215` 的注记说得更直白：*the state goes off everybody, then onto the new target '
+    '-- there is no only-one-holder flag, the removal IS that clause*。'
+    '⚠ 摘不存在的状态**不是错** ✓（`:2518` ✓）—— 每次施放都会跑一遍。'
 )
 
 

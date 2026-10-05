@@ -47,17 +47,17 @@ precedent_tail = ('        attack.execute(battle, summon, victims);' + NL
 method = precedent_tail + NL + NL + (
     '    /**' + NL
     + '     * {@code CAST_SKILL}: the resolved target performs <b>one cast, right now</b>, with the numbers of the skill' + NL
-    + '     * the rule names -- \u300c\u4f7f\u5176\u7acb\u5373\u65bd\u653e 1 \u6b21\u2026\u300d\u3002' + NL
+    + '     * the rule names -- 「使其立即施放 1 次…」。' + NL
     + '     *' + NL
-    + '     * <p>\u26a0 It is {@code commandSummon} with three spots loosened, and nothing else (see `aggro \u56de\u6536\u4e4b\u4e03\u767e\u516b\u5341\u4e94`):' + NL
+    + '     * <p>⚠ It is {@code commandSummon} with three spots loosened, and nothing else (see `aggro 回收之七百八十五`):' + NL
     + '     *' + NL
-    + '     * <ol><li>the <b>actor</b> is the resolved target, not the owner\u2019s summon;</li>' + NL
+    + '     * <ol><li>the <b>actor</b> is the resolved target, not the owner’s summon;</li>' + NL
     + '     * <li>the <b>skill</b> is looked up on that actor, not on the rule owner;</li>' + NL
     + '     * <li>no {@code SUMMON_ATTACK} is announced -- that event belongs to a memosprite (the swing itself still' + NL
     + '     * announces itself through {@code EnemySkill.execute}).</li></ol>' + NL
     + '     *' + NL
-    + '     * <p>\u26a0 <b>\u97e7\u6027\u5fc5\u987b\u81ea\u5df1\u5e26</b> \u2014\u2014 \u5148\u4f8b\u7684\u539f\u8bdd\uff1a*when a cast is DELEGATED the executor expands no damage of its' + NL
-    + '     * own, so the stance would otherwise be dropped on the floor*. \u26a0 Do not drop {@code stanceFor(true)}.' + NL
+    + '     * <p>⚠ <b>韧性必须自己带</b> —— 先例的原话：*when a cast is DELEGATED the executor expands no damage of its' + NL
+    + '     * own, so the stance would otherwise be dropped on the floor*. ⚠ Do not drop {@code stanceFor(true)}.' + NL
     + '     */' + NL
     + '    private static void castSkill(Battle battle, EffectSpec effect, TriggerContext ctx) {' + NL
     + '        CanHit actor = require(resolveTarget(effect, ctx), "target", ctx);' + NL
@@ -119,7 +119,7 @@ if s.returncode != 0:
                 if m is not None:
                     print('  FAIL %s: %s' % (c.get('name'), (m.get('message') or '')[:260]))
     for l in ((s.stdout or '') + (s.stderr or '')).split(NL):
-        if '.java:' in l or 'error:' in l or '\u9519\u8bef' in l:
+        if '.java:' in l or 'error:' in l or '错误' in l:
             print('  DIAG ' + l.strip()[:180])
     print('REFUSING to commit')
     sys.exit(1)

@@ -54,7 +54,7 @@ public class ResistanceReductionTest {
         // a 20% reduction against a victim whose physical resistance is 20% (0.8 -> 1.0 = 1/0.8). It is also the
         // evidence for the zone's shape: damage is multiplied by (1 - resistance).
         Assertions.assertEquals(1.25, after / before, EPS,
-                "\u5168\u5c5e\u6027\u6297\u6027\u964d\u4f4e 20%: " + before + " -> " + after);
+                "全属性抗性降低 20%: " + before + " -> " + after);
     }
 
     /** 1321's shipped aura: 「大丽花在场时，敌方全体全属性抗性降低20%」 — a stated 0.2 on every enemy. */
@@ -97,7 +97,7 @@ public class ResistanceReductionTest {
         firstBattle.castImmediate(fuxuan.getSkills().get(SkillType.ULTRA), fuxuan, List.of(first));
 
         Assertions.assertEquals(0.2, first.getAttribute(AttributeType.RESISTANCE_REDUCTION).get(), EPS,
-                "\u300c\u65bd\u653e\u7ec8\u7ed3\u6280\u65f6\u2026\u654c\u65b9\u5168\u4f53\u5168\u5c5e\u6027\u6297\u6027\u964d\u4f4e20%\u300d");
+                "「施放终结技时…敌方全体全属性抗性降低20%」");
 
         Character nihility = CharacterFactory.create(1304, LEVEL);
         Enemy second = EnemyFactory.create(MONSTER, 90, 1);
@@ -107,6 +107,6 @@ public class ResistanceReductionTest {
         secondBattle.castImmediate(nihility.getSkills().get(SkillType.COMMON), nihility, List.of(second));
 
         Assertions.assertEquals(0.12, second.getAttribute(AttributeType.RESISTANCE_REDUCTION).get(), EPS,
-                "\u300c\u65bd\u653e\u666e\u653b\u65f6\u4f7f\u76ee\u6807\u7684\u5168\u5c5e\u6027\u6297\u6027\u964d\u4f4e12%\u300d");
+                "「施放普攻时使目标的全属性抗性降低12%」");
     }
 }

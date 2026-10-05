@@ -77,7 +77,7 @@ public class PercentFromCastParamScaleTest {
                 + " ; expected = " + expected + " ; the gain = " + gained);
 
         Assertions.assertEquals(expected, gained, Math.abs(expected) * 1e-6,
-                "\u300c\u63d0\u9ad8\u6570\u503c\u7b49\u540c\u4e8e\u5fb7\u8c2c\u6b4c\u751f\u547d\u4e0a\u9650\u7684 #1%\u300d-- the param TIMES the attribute");
+                "「提高数值等同于德谬歌生命上限的 #1%」-- the param TIMES the attribute");
     }
 
     /** Stating both shares is refused at load time rather than letting one silently win. */

@@ -18,7 +18,7 @@ import sys
 MEMOSPRITE = "src/main/resources/characters/1415.json"
 SE = "src/main/resources/data/skill_effects.json"
 SLOT = 19
-MARK = "\u732e\u4e88\u300c\u5929\u7a7a\u300d\u4e4b\u8bd7"
+MARK = "献予「天空」之诗"
 CID = 1409
 
 doc = json.load(io.open(MEMOSPRITE, encoding="utf-8"))
@@ -39,16 +39,16 @@ rules.append({
         "permanent": True,
         "target": "ally_cid:" + str(CID),
     }],
-    "source": ("1415 \u6614\u6d9f \u5fc6\u7075\u6280\u80fd 19 \u300c\u732e\u4e88\u300c\u5929\u7a7a\u300d\u4e4b\u8bd7\u300d\uff08\u6570\u636e\u69fd\u4f4d 19\uff0cSkillID 1141519\uff09\uff1a"
-               "\u300c**\u5fb7\u8c2c\u6b4c\u65bd\u653e\u5fc6\u7075\u6280\u65f6\uff0c\u4f7f\u98ce\u5807\u83b7\u5f972\u5c42\u3010" + MARK + "\u3011**\u3002\u300d"),
-    "note": ("\u2b50 \u80fd\u529b\u6570\u636e\u81ea\u5df1\u5c31\u662f\u8fd9\u4e48\u5199\u7684\uff08**\u5b9e\u6d4b**\uff09\uff1a"
-             "`AddModifier` **`MServant_CyreneServant_00_AmazingBuff_Hyacine`** + `LayerAddWhenStack: 2`\uff0c"
-             "\u800c\u524d\u7f6e\u662f **`ByCompareCharacterID` = 1409** \u2014\u2014 \u6e38\u620f\u5c31\u662f\u201c\u6309 cid \u70b9\u540d\u201d\uff0c"
-             "\u4e0e `ally_cid:` \u662f\u540c\u4e00\u4ef6\u4e8b\u3002"
-             "\u2b50 **\u4e0a\u9650\u5199 99999 \u662f\u6e38\u620f\u81ea\u5df1\u7684\u60ef\u4f8b**\uff0c\u4e0d\u662f\u6211\u7f16\u7684\uff1a"
-             "\u63d0\u5230\u8be5\u4fee\u9970\u7684\u56db\u4e2a\u6587\u4ef6\u91cc\uff0c\u5b83\u65c1\u8fb9**\u6ca1\u6709** `MaxLayer`\uff08`AvatarStatusConfig` \u7684\u884c\u751a\u81f3\u6ca1\u6709\u8ba1\u6570\u5217\uff09\uff0c"
-             "\u800c\u540c\u4e00\u4e2a\u80fd\u529b\u6587\u4ef6\u91cc\u201c\u4e0d\u9650\u201d\u5199\u7684\u5c31\u662f `MaxLayer: 99999`\uff08\u4e24\u5904\uff09\u21d2 \u7f3a\u7701\u5c31\u662f\u201c\u4e0d\u9650\u201d\u3002"
-             "\u26a0 \u4e0d\u5199\u5b83\u7684\u8bdd\uff0c\u5f15\u64ce\u7684 `StackBuff`\uff08`Math.max(1, maxStacks)`\uff09\u4f1a\u53ea\u7ed9 **1** \u5c42\u3002"),
+    "source": ("1415 昔涟 忆灵技能 19 「献予「天空」之诗」（数据槽位 19，SkillID 1141519）："
+               "「**德谬歌施放忆灵技时，使风堇获得2层【" + MARK + "】**。」"),
+    "note": ("⭐ 能力数据自己就是这么写的（**实测**）："
+             "`AddModifier` **`MServant_CyreneServant_00_AmazingBuff_Hyacine`** + `LayerAddWhenStack: 2`，"
+             "而前置是 **`ByCompareCharacterID` = 1409** —— 游戏就是“按 cid 点名”，"
+             "与 `ally_cid:` 是同一件事。"
+             "⭐ **上限写 99999 是游戏自己的惯例**，不是我编的："
+             "提到该修饰的四个文件里，它旁边**没有** `MaxLayer`（`AvatarStatusConfig` 的行甚至没有计数列），"
+             "而同一个能力文件里“不限”写的就是 `MaxLayer: 99999`（两处）⇒ 缺省就是“不限”。"
+             "⚠ 不写它的话，引擎的 `StackBuff`（`Math.max(1, maxStacks)`）会只给 **1** 层。"),
 })
 if isinstance(doc, list):
     out = rules
@@ -60,7 +60,7 @@ print("ok   1415 carries %s (%d rules)" % (RULE_ID, len(rules)))
 
 effects = json.load(io.open(SE, encoding="utf-8"))
 if str(SLOT) in effects.get("11415", {}):
-    effects["11415"][str(SLOT)]["note"] = ("\u2b50 2026-10-02\uff1a\u540c\u4e00\u6761\u6280\u80fd\u7684**\u80fd\u91cf\u90a3\u534a**\u4e0e**\u5c42\u6570\u90a3\u534a**\u5747\u5df2\u6210\u53e5\u3002")
+    effects["11415"][str(SLOT)]["note"] = ("⭐ 2026-10-02：同一条技能的**能量那半**与**层数那半**均已成句。")
     io.open(SE, "w", encoding="utf-8", newline="\n").write(json.dumps(effects, ensure_ascii=False, indent=2) + "\n")
     print("ok   skill_effects.json 11415/19 note updated")
 
@@ -78,10 +78,10 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1415's memosprite skill 19, first sentence: \u300c\u5fb7\u8c2c\u6b4c\u65bd\u653e\u5fc6\u7075\u6280\u65f6\uff0c\u4f7f\u98ce\u5807\u83b7\u5f972\u5c42\u3010\u732e\u4e88\u300c\u5929\u7a7a\u300d\u4e4b\u8bd7\u3011\u300d (2026-10-02).
+ * 1415's memosprite skill 19, first sentence: 「德谬歌施放忆灵技时，使风堇获得2层【献予「天空」之诗】」 (2026-10-02).
  *
- * <p>\u2b50 TWO-SIDED in one battle: the character the game NAMES BY CID (1409, measured in the ability data) gets the 2 layers the data states, and a different ally present gets
- * none. \u26a0 A cap had to be stated -- the data puts no `MaxLayer` beside this modifier, and our `StackBuff` clamps to 1 without one; 99999 is how this kit spells "no limit".
+ * <p>⭐ TWO-SIDED in one battle: the character the game NAMES BY CID (1409, measured in the ability data) gets the 2 layers the data states, and a different ally present gets
+ * none. ⚠ A cap had to be stated -- the data puts no `MaxLayer` beside this modifier, and our `StackBuff` clamps to 1 without one; 99999 is how this kit spells "no limit".
  */
 public class SkyOdeStackTest {
     private static final int LEVEL = 80;

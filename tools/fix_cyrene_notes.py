@@ -17,17 +17,17 @@ import json
 DATA = "src/main/resources/characters/1415.json"
 
 NEW_TALENT_NOTE = (
-    " \u2b50 2026-10-02 \u5b9e\u6d4b\uff1a`\"max_stacks\": 2` \u2713 \u2014\u2014 \u540c\u5c5e\u6027\u591a\u6765\u6e90\u80fd\u4e0d\u80fd\u76f8\u52a0\uff0c"
-    "**\u770b\u7684\u662f\u540e\u5199\u7684\u90a3\u4e00\u6761** \u2713\uff08`BuffManager.addBuff` \u5148\u5224 `buff.isStackable()` \u2713\uff0c"
-    "\u53ea\u6709**\u4e0d\u53ef\u53e0\u52a0**\u7684\u6765\u8005\u624d\u8d70 `isSameKind` \u66ff\u6362\u5faa\u73af \u2713\uff09\uff1b"
-    "\u2b50 \u800c `StatModifierBuff.isStackable()` \u5c31\u662f `maxStacks > 1` \u2713\u3002"
-    "\u26a0 \u672c\u6761\uff08\u5165\u573a\u66f4\u65e9\u7684\u90a3\u4e2a\uff09\u5199\u591a\u5c11**\u4e0d\u5f71\u54cd**\u7ed3\u679c \u2713\uff1a"
-    "\u628a\u5b83\u6539\u6210 1 \u540e\u8bfb\u6570**\u4ecd\u662f 0.4** \u2713\uff08\u5df2\u6d4b \u2713\uff09\u3002")
+    " ⭐ 2026-10-02 实测：`\"max_stacks\": 2` ✓ —— 同属性多来源能不能相加，"
+    "**看的是后写的那一条** ✓（`BuffManager.addBuff` 先判 `buff.isStackable()` ✓，"
+    "只有**不可叠加**的来者才走 `isSameKind` 替换循环 ✓）；"
+    "⭐ 而 `StatModifierBuff.isStackable()` 就是 `maxStacks > 1` ✓。"
+    "⚠ 本条（入场更早的那个）写多少**不影响**结果 ✓："
+    "把它改成 1 后读数**仍是 0.4** ✓（已测 ✓）。")
 
 NEW_TRACE_NOTE = (
-    "\u2b50 \u4e0e\u5929\u8d4b\u540c\u5c5e\u6027 \u2713 \u21d2 **\u5b83\u662f\u540e\u5199\u7684\u90a3\u4e00\u6761** \u2713 \u21d2 \u5fc5\u987b `\"max_stacks\": 2` \u2713"
-    "\uff08\u5b9e\u6d4b\uff1a\u5b83\u5199 1 \u65f6\u8bfb\u6570\u56de\u5230 **0.2** \u2717 \u2014\u2014 \u4e0d\u53ef\u53e0\u52a0\u7684\u6765\u8005\u4f1a\u628a\u5929\u8d4b\u90a3\u6761**\u66ff\u6362\u6389** \u2713\uff09\u3002"
-    "\u26a0 \u4e0e `permanent` **\u65e0\u5173** \u2717\uff08\u8be5\u731c\u6d4b\u5df2\u8bc1\u4f2a \u2713\uff09\u3002")
+    "⭐ 与天赋同属性 ✓ ⇒ **它是后写的那一条** ✓ ⇒ 必须 `\"max_stacks\": 2` ✓"
+    "（实测：它写 1 时读数回到 **0.2** ✗ —— 不可叠加的来者会把天赋那条**替换掉** ✓）。"
+    "⚠ 与 `permanent` **无关** ✗（该猜测已证伪 ✓）。")
 
 doc = json.load(io.open(DATA, encoding="utf-8"))
 rules = doc["rules"] if isinstance(doc, dict) else doc
@@ -38,7 +38,7 @@ for r in rules:
         continue
     if r.get("id") == "talent_party_damage":
         note = r.get("note") or ""
-        marker = " \u2b50 2026-10-02"
+        marker = " ⭐ 2026-10-02"
         if marker in note:
             note = note[:note.index(marker)]
         r["note"] = note + NEW_TALENT_NOTE

@@ -42,7 +42,7 @@ public class OdeToStrifeCritTest {
     public void theCommandedStrikeCarriesTheCritBoost() {
         Character cyrene = CharacterFactory.create(CYRENE, LEVEL);
         Character mydei = CharacterFactory.create(MYDEI, LEVEL);
-        // \u2b50 every roll crits: without this the boost has nothing to multiply
+        // ⭐ every roll crits: without this the boost has nothing to multiply
         Random alwaysCrit = new Random(0) {
             @Override
             public double nextDouble() {
@@ -71,7 +71,7 @@ public class OdeToStrifeCritTest {
 
         Assertions.assertTrue(strike > 0, "precondition: the commanded 【弑神登神】 lands");
         Assertions.assertEquals(EXPECTED, strike, EXPECTED * 1e-9,
-                "\u300c\u672c\u6b21\u653b\u51fb\u4e2d\u4e07\u654c\u7684\u66b4\u51fb\u4f24\u5bb3\u63d0\u9ad8 #1[i]%\u300d-- on a crit, the boost is what this number is");
+                "「本次攻击中万敌的暴击伤害提高 #1[i]%」-- on a crit, the boost is what this number is");
     }
 
     /** Measured with the clause in place. */

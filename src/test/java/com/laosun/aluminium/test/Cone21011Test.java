@@ -16,9 +16,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Light cone 21011: damage of the WEARER\u2019S OWN element, dealt by anyone on our side, is 12% stronger.
+ * Light cone 21011: damage of the WEARER’S OWN element, dealt by anyone on our side, is 12% stronger.
  *
- * <p>\u2b50 Read on the two sides of the new keyword: the same element as the wearer\u2019s own, and a different one. The wearer\u2019s element
+ * <p>⭐ Read on the two sides of the new keyword: the same element as the wearer’s own, and a different one. The wearer’s element
  * is read from the unit itself rather than assumed, so the test does not depend on which element character 1205 happens to be.
  */
 public class Cone21011Test {
@@ -65,15 +65,15 @@ public class Cone21011Test {
         build(true);
         double boostedSame = dealtBy(ally, mine);
         double boostedOther = dealtBy(ally, otherElement(mine));
-        System.out.println("[21011] the wearer\u2019s element=" + mine + " ; the ally\u2019s=" + ally.getElement()
+        System.out.println("[21011] the wearer’s element=" + mine + " ; the ally’s=" + ally.getElement()
                 + " ; same element " + plainSame + " -> " + boostedSame + " (x" + (boostedSame / plainSame) + ")"
                 + " ; another element " + plainOther + " -> " + boostedOther + " (x" + (boostedOther / plainOther) + ")");
         Assertions.assertNotNull(mine, "the wearer has an element of its own");
-        // \u2605 The ally\u2019s side is read as a DIRECTION with its number printed: the two measurements come from two
-        // battles, and the same-element ally hit measured x1.0980392156862728 (= 1.12 / 1.02) where the wearer\u2019s own
+        // ★ The ally’s side is read as a DIRECTION with its number printed: the two measurements come from two
+        // battles, and the same-element ally hit measured x1.0980392156862728 (= 1.12 / 1.02) where the wearer’s own
         // hit of that element measured exactly x1.12. The 2% baseline difference between the two battles is an open
-        // question, recorded rather than hidden -- the exact claim is pinned on the wearer\u2019s own hit below.
-        Assertions.assertTrue(boostedSame > plainSame, "an ally\u2019s hit of MY element is boosted");
+        // question, recorded rather than hidden -- the exact claim is pinned on the wearer’s own hit below.
+        Assertions.assertTrue(boostedSame > plainSame, "an ally’s hit of MY element is boosted");
         Assertions.assertEquals(1.0, boostedOther / plainOther, 0.01, "and another element is not (false case)");
     }
 
@@ -85,8 +85,8 @@ public class Cone21011Test {
         double plain = dealtBy(wearer, mine);
         build(true);
         double boosted = dealtBy(wearer, mine);
-        System.out.println("[21011] the wearer\u2019s own hit: " + plain + " -> " + boosted + " (x" + (boosted / plain) + ")");
-        Assertions.assertEquals(1.12, boosted / plain, 0.01, "\u6211\u65b9\u76ee\u6807 includes the wearer");
+        System.out.println("[21011] the wearer’s own hit: " + plain + " -> " + boosted + " (x" + (boosted / plain) + ")");
+        Assertions.assertEquals(1.12, boosted / plain, 0.01, "我方目标 includes the wearer");
     }
 
     @Test

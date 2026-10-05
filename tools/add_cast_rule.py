@@ -24,11 +24,11 @@ WHEN = list(sys.argv[6:])
 PATH = '%s/src/main/resources/characters/%s.json' % (WORK, CID)
 
 NOTE = (
-    '\u2b50 2026-09-30\uff1a\u7528 `CAST_SKILL` \u8ba9\u90a3\u4e2a\u5355\u4f4d**\u7acb\u5373\u65bd\u653e\u4e00\u6b21** `' + SLOT + '` \u2713 \u2014\u2014 '
-    '\u26a0 \u8bfb\u7684\u662f**\u5b83\u81ea\u5df1\u7684\u6570\u636e\u884c** \u2713\uff08\u800c\u4e0d\u662f\u624b\u5199\u500d\u7387 \u2717\uff09\uff0c'
-    '\u26a0 \u800c\u62a4\u680f\u4f1a\u62d2\u7edd**\u4e0d\u9020\u6210\u4f24\u5bb3**\u7684\u6280\u80fd \u2717\u3002'
-    '\u26a0 \u6765\u6e90\uff1a`CAST_SKILL` \u662f `commandSummon` \u653e\u5bbd\u4e09\u5904\u800c\u6765\uff08\u89c1 `aggro \u56de\u6536\u4e4b\u4e03\u767e\u516b\u5341\u4e94`\uff09\uff1b'
-    '\u26a0 \u5b83\u4e0d\u7ecf\u8fc7\u6218\u6280\u70b9\u6d88\u8017 \u2713\u3002'
+    '⭐ 2026-09-30：用 `CAST_SKILL` 让那个单位**立即施放一次** `' + SLOT + '` ✓ —— '
+    '⚠ 读的是**它自己的数据行** ✓（而不是手写倍率 ✗），'
+    '⚠ 而护栏会拒绝**不造成伤害**的技能 ✗。'
+    '⚠ 来源：`CAST_SKILL` 是 `commandSummon` 放宽三处而来（见 `aggro 回收之七百八十五`）；'
+    '⚠ 它不经过战技点消耗 ✓。'
 )
 
 doc = json.load(io.open(PATH, encoding='utf-8'))

@@ -13,7 +13,7 @@ import java.util.Random;
 /**
  * Slot 20's last two clauses (2026-10-02): 「【老主顾】的防御力降低 #2(10)%，【老主顾】以外的敌方目标的防御力降低 #3(6)%」.
  *
- * \u2b50 Two-sided on the SAME enemy: the mark takes 10% and the unmarked one 6%, so a rule that ignored `target_when` would be caught either way.
+ * ⭐ Two-sided on the SAME enemy: the mark takes 10% and the unmarked one 6%, so a rule that ignored `target_when` would be caught either way.
  */
 public class TrickeryOdeDefenceTest {
     private static final int LEVEL = 80;
@@ -21,7 +21,7 @@ public class TrickeryOdeDefenceTest {
     private static final int CIPHER = 1406;
     private static final int MONSTER = 1002011;
     private static final int ODE_SLOT = 20;
-    private static final String PATRON = "\u8001\u4e3b\u987e";
+    private static final String PATRON = "老主顾";
 
     @Test
     public void theMarkLosesMoreThanTheRest() {
@@ -40,7 +40,7 @@ public class TrickeryOdeDefenceTest {
         Battle battle = new Battle(List.of(cyrene, cipher), List.of(marked, plain), new Random(0));
         battle.startBattle();
         battle.processRequests();
-        // \u2b50 The mark is applied by 赛飞儿's OWN ultimate rule (`talent_patron_on_ult`, ULT_CAST -> APPLY_BUFF 老主顾), so the judge does not have to construct a buff by hand.
+        // ⭐ The mark is applied by 赛飞儿's OWN ultimate rule (`talent_patron_on_ult`, ULT_CAST -> APPLY_BUFF 老主顾), so the judge does not have to construct a buff by hand.
         cipher = battle.characters.get(1);
         com.laosun.aluminium.models.skill.Skill ult =
                 cipher.getSkills().get(com.laosun.aluminium.enums.SkillType.ULTRA);

@@ -24,7 +24,7 @@ public class CerydraTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** \u26a0 The mark's own claims: the state on the ally, her +1 Charge, and the ATTACK share = 24% of HER attack (a derived, absolute number). */
+    /** ⚠ The mark's own claims: the state on the ally, her +1 Charge, and the ATTACK share = 24% of HER attack (a derived, absolute number). */
     @Test
     public void theSkillMarksTheAllyAndSharesHerAttack() {
         Character cerydra = CharacterFactory.create(CERYDRA, LEVEL);
@@ -33,27 +33,27 @@ public class CerydraTest {
         Battle battle = new Battle(List.of(cerydra, ally), List.of(enemy), fixed());
         battle.startBattle();
         double allyAttackBefore = ally.getAttribute(AttributeType.ATTACK).get();
-        int chargeBefore = cerydra.getResources().get("\u5145\u80fd").getValue();
+        int chargeBefore = cerydra.getResources().get("充能").getValue();
         double expected = cerydra.getAttribute(AttributeType.ATTACK).get() * 0.24;
 
         battle.castImmediate(cerydra.getSkills().get(com.laosun.aluminium.enums.SkillType.SKILL), cerydra, List.of(ally));
 
-        Assertions.assertTrue(ally.getBuffManager().hasState("\u519b\u529f"),
-                "\u300c\u4f7f\u6307\u5b9a\u6211\u65b9\u5355\u4f53\u89d2\u8272\u83b7\u5f97\u3010\u519b\u529f\u3011\u300d");
+        Assertions.assertTrue(ally.getBuffManager().hasState("军功"),
+                "「使指定我方单体角色获得【军功】」");
         Assertions.assertEquals(expected, ally.getAttribute(AttributeType.ATTACK).get() - allyAttackBefore, expected * 0.02,
-                "\u300c\u63d0\u9ad8\u6570\u503c\u7b49\u540c\u4e8e\u523b\u5f8b\u5fb7\u83c8\u653b\u51fb\u529b\u768424.00%\u300d: expected " + expected);
-        Assertions.assertEquals(chargeBefore + 1, cerydra.getResources().get("\u5145\u80fd").getValue(),
-                "\u300c\u5e76\u4f7f\u523b\u5f8b\u5fb7\u83c8\u83b7\u5f971\u70b9\u5145\u80fd\u300d");
+                "「提高数值等同于刻律德菈攻击力的24.00%」: expected " + expected);
+        Assertions.assertEquals(chargeBefore + 1, cerydra.getResources().get("充能").getValue(),
+                "「并使刻律德菈获得1点充能」");
     }
 
-    /** \u26a0 The mark's reaction: a marked ally's attack grants Charge AND draws her 60% additional damage; an unmarked one does neither. */
+    /** ⚠ The mark's reaction: a marked ally's attack grants Charge AND draws her 60% additional damage; an unmarked one does neither. */
     @Test
     public void theMarkDrivesBothTheChargeAndTheAdditionalDamage() {
         double unmarked = markedAttackLoss(false);
         double marked = markedAttackLoss(true);
 
         Assertions.assertEquals(0.0, unmarked, 1e-9,
-                "\u300c\u6301\u6709\u3010\u519b\u529f\u3011\u7684\u89d2\u8272\u65bd\u653e\u653b\u51fb\u540e\u300d -- without the mark, nothing");
+                "「持有【军功】的角色施放攻击后」 -- without the mark, nothing");
         Assertions.assertTrue(marked > 0, "with the mark, the additional damage lands: " + marked);
     }
 

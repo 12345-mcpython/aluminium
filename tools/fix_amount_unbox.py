@@ -8,7 +8,7 @@ old = "        double amount = effect.getAmount();"
 if lines.count(old) != 1:
     raise SystemExit("REFUSING: the unguarded unbox occurs %d times" % lines.count(old))
 i = lines.index(old)
-lines[i] = ("        // \u26a0 Guarded (2026-10-02): with `percent_from_cast_param` a derived modifier may state NO `percent` and NO `amount`,\n"
+lines[i] = ("        // ⚠ Guarded (2026-10-02): with `percent_from_cast_param` a derived modifier may state NO `percent` and NO `amount`,\n"
             "        // and this unboxed read turned that into a NullPointerException instead of a magnitude.\n"
             "        double amount = effect.getAmount() == null ? 0 : effect.getAmount();")
 io.open(P, "w", encoding="utf-8", newline="\n").write("\n".join(lines))

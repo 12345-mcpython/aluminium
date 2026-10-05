@@ -23,7 +23,7 @@ import java.util.Random;
 public class DebuffClassConditionTest {
     private static final int OWNER = 1002;
     private static final int MONSTER = 1002011;
-    private static final String FREEZE = "\u51bb\u7ed3";
+    private static final String FREEZE = "冻结";
     private static final double EPS = 1e-9;
 
     /** The control rule fires; the dot rule does not. */

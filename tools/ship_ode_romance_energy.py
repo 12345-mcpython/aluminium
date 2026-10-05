@@ -32,7 +32,7 @@ chs = json.load(io.open(TB + "/TextMap/TextMapCHS.json", encoding="utf-8"))
 desc_rows = json.load(io.open(TB + "/ExcelOutput/AvatarServantSkillConfig.json", encoding="utf-8"))
 row = [x for x in desc_rows if x["SkillID"] == 1141514 and x.get("Level") == 1][0]
 desc = chs.get(str(row["SkillDesc"]["Hash"]), "")
-names = re.findall(r"\u83b7\u5f97\u3010([^\u3011]+)\u3011", desc)
+names = re.findall(r"获得【([^】]+)】", desc)
 if len(names) != 1:
     sys.exit("REFUSING: expected exactly one 获得【…】, got %d" % len(names))
 state = names[0]
@@ -52,12 +52,12 @@ rules.append({
         {"op": "GAIN_ENERGY", "amount": ENERGY, "target": "self"},
         {"op": "REMOVE_STATE", "buff": state, "target": "self"},
     ],
-    "source": ("1415 \u6614\u6d9f \u5fc6\u7075\u6280\u80fd 12 \u300c\u732e\u4e88\u300c\u6d6a\u6f2b\u300d\u4e4b\u8bd7\u300d\uff08\u6570\u636e\u69fd\u4f4d 14\uff09\uff1a"
-               "\u300c**\u963f\u683c\u83b1\u96c5\u6216\u8863\u5320\u653b\u51fb\u540e\uff0c\u6d88\u8017\u3010" + state + "\u3011\u4e3a\u81ea\u8eab\u6062\u590d " + str(int(ENERGY)) + " \u70b9\u80fd\u91cf\u3002**\u300d"),
-    "note": ("\u2b50 \u89e6\u53d1\u7528 `ALLY_ATTACK`\uff1a\u539f\u53e5\u662f\u300c\u963f\u683c\u83b1\u96c5**\u6216\u8863\u5320**\u653b\u51fb\u540e\u300d\u2014\u2014"
-             "\u4e24\u4e2a\u4e3b\u4f53\u90fd\u7b97\uff0c\u800c\u80fd\u91cf\u7ed9\u7684\u662f**\u89c4\u5219\u6301\u6709\u8005**\uff08\u5373\u963f\u683c\u83b1\u96c5\uff09\uff0c"
-             "\u6240\u4ee5\u4e24\u4e2a\u6548\u679c\u90fd\u662f `target: \"self\"`\u3002\u2b50 `#1` \u5728\u6570\u636e\u91cc**\u6bcf\u4e00\u7ea7\u90fd\u662f 70**\uff0c"
-             "\u6240\u4ee5\u5199\u6210\u5b57\u9762\u91cf**\u4e0d\u662f**\u8fd1\u4f3c\u3002"),
+    "source": ("1415 昔涟 忆灵技能 12 「献予「浪漫」之诗」（数据槽位 14）："
+               "「**阿格莱雅或衣匠攻击后，消耗【" + state + "】为自身恢复 " + str(int(ENERGY)) + " 点能量。**」"),
+    "note": ("⭐ 触发用 `ALLY_ATTACK`：原句是「阿格莱雅**或衣匠**攻击后」——"
+             "两个主体都算，而能量给的是**规则持有者**（即阿格莱雅），"
+             "所以两个效果都是 `target: \"self\"`。⭐ `#1` 在数据里**每一级都是 70**，"
+             "所以写成字面量**不是**近似。"),
 })
 
 if isinstance(doc, list):

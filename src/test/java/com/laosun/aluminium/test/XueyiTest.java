@@ -24,14 +24,14 @@ public class XueyiTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** \u26a0 The ratio, the wiring and the control. */
+    /** ⚠ The ratio, the wiring and the control. */
     @Test
     public void theTechniqueDealsEightyPercentOfHerAttack() {
         double content = openingLoss(0);
         double reference = openingLoss(1);
         double undeclared = openingLoss(2);
 
-        Assertions.assertEquals(0.0, undeclared, 1e-9, "\u300c\u4f7f\u7528\u79d8\u6280\u540e\u300d -- undeclared, so nothing");
+        Assertions.assertEquals(0.0, undeclared, 1e-9, "「使用秘技后」 -- undeclared, so nothing");
         Assertions.assertTrue(reference > 0, "the reference must deal damage");
         Assertions.assertEquals(0.8 / 0.5, content / reference, 0.05,
                 "content " + content + " vs reference " + reference + " (expected " + (0.8 / 0.5) + ")");
@@ -48,7 +48,7 @@ public class XueyiTest {
             TriggerSpecs.set(effect, "element", "Quantum");
             TriggerSpecs.set(effect, "target", "all_enemies");
             xueyi.setTriggerTable(new TriggerTable(XUEYI, List.of(TriggerSpecs.rule(
-                    TriggerEvent.BATTLE_START.name(), List.of("self has_state \u79d8\u6280"), effect))));
+                    TriggerEvent.BATTLE_START.name(), List.of("self has_state 秘技"), effect))));
         }
         Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
         Battle battle = new Battle(List.of(xueyi), List.of(enemy), fixed());

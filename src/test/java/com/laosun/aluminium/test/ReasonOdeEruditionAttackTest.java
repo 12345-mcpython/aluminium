@@ -12,7 +12,7 @@ import java.util.Random;
 /**
  * `allies_of_path:智识` and the clause it unlocks (2026-10-02): 「所有「智识」命途角色攻击力提高 #3(30)%」.
  *
- * \u2b50 The party is chosen so the selector's REACH is what the reading shows: 那刻夏 (1405) and 景元 (1204) are Erudition, 缇宝 (1403) is Harmony, 昔涟 (1415) is Remembrance. A raise
+ * ⭐ The party is chosen so the selector's REACH is what the reading shows: 那刻夏 (1405) and 景元 (1204) are Erudition, 缇宝 (1403) is Harmony, 昔涟 (1415) is Remembrance. A raise
  * aimed at the path must move exactly the first two.
  */
 public class ReasonOdeEruditionAttackTest {
@@ -28,13 +28,13 @@ public class ReasonOdeEruditionAttackTest {
     public void theRaiseReachesTheEruditionAllyOnly() {
         double[] with = run(true);
         double[] without = run(false);
-        // \u2b50 ROSTER order: [0] 昔涟 (Remembrance), [1] 那刻夏 (Erudition), [2] 景元 (Erudition), [3] 缇宝 (Harmony).
+        // ⭐ ROSTER order: [0] 昔涟 (Remembrance), [1] 那刻夏 (Erudition), [2] 景元 (Erudition), [3] 缇宝 (Harmony).
         System.out.println("[erudition_attack] gains: 那刻夏 " + (with[1] - without[1])
                 + " ; 景元 " + (with[2] - without[2])
                 + " ; 缇宝 " + (with[3] - without[3]) + " ; 昔涟 " + (with[0] - without[0]));
         System.out.println("[erudition_attack]   absolute with: " + java.util.Arrays.toString(with)
                 + " ; without: " + java.util.Arrays.toString(without));
-        // \u2b50 What the selector must do: reach BOTH Erudition allies by the same amount, and neither of the others at all.
+        // ⭐ What the selector must do: reach BOTH Erudition allies by the same amount, and neither of the others at all.
         double named = with[1] - without[1];
         double otherErudition = with[2] - without[2];
         Assertions.assertTrue(named > 0, "the one the ode names gains");

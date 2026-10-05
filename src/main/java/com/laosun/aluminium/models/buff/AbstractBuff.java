@@ -135,22 +135,22 @@ public abstract class AbstractBuff implements Buff, AttackEvent, SkillCastEvent 
          */
         NEXT_ULTIMATE,
         /**
-         * \u2605 Ends when the cast being delivered right now finishes (2026-09-30, cones 20001 / 21000).
+         * ★ Ends when the cast being delivered right now finishes (2026-09-30, cones 20001 / 21000).
          *
-         * <p>\u300c\u65bd\u653e\u6218\u6280\u548c\u7ec8\u7ed3\u6280\u65f6\uff0c\u6cbb\u7597\u91cf\u63d0\u9ad8 12%\u300d is neither a turn nor permanent: upstream scopes it to the cast
+         * <p>「施放战技和终结技时，治疗量提高 12%」 is neither a turn nor permanent: upstream scopes it to the cast
          * itself ({@code MEquip_20001_Main} adds on {@code OnBeforeSkillUse} and removes on {@code OnAfterSkillUse}).
          * `turns` would over-apply to later heals in the same turn, and heals have no instance scope (only damage
          * does, as {@code BOOST_DAMAGE}) -- so this is the shape that states what the documents state.
          */
         CAST_END,
     /**
-     * \u2705 Until the carrier's own turn ends (2026-09-30; readers: cone 23053's \u300c\u82e5\u5728\u540c\u4e00\u56de\u5408\u5185\u6d88\u8017 \u2265 4 \u4e2a\u6218\u6280\u70b9\u300d
-     * and cone 23061's \u300c\u6211\u65b9\u4efb\u610f\u89d2\u8272\u5728\u81ea\u8eab\u540c\u4e00\u56de\u5408\u5185\u7d2f\u8ba1\u6d88\u8017\u2026\u300d).
+     * ✅ Until the carrier's own turn ends (2026-09-30; readers: cone 23053's 「若在同一回合内消耗 ≥ 4 个战技点」
+     * and cone 23061's 「我方任意角色在自身同一回合内累计消耗…」).
      *
-     * <p>\u2605 The symmetric partner of {@link #CAST_END}: that one scopes a value to one cast, this one to one turn. It is
+     * <p>★ The symmetric partner of {@link #CAST_END}: that one scopes a value to one cast, this one to one turn. It is
      * swept by {@code BuffManager.afterMove}, which is the carrier's OWN turn end -- the tick point that already advances
      * every duration, so no battle handle is needed. Measured before adding it: a plain {@code turns: 1} stack is NOT
-     * cleared by beforeMove / afterMove / tickForeign, so \u300c\u540c\u4e00\u56de\u5408\u5185\u300d had no spelling at all.
+     * cleared by beforeMove / afterMove / tickForeign, so 「同一回合内」 had no spelling at all.
      */
     TURN_END,
     

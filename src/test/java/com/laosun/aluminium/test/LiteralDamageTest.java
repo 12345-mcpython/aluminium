@@ -29,7 +29,7 @@ public class LiteralDamageTest {
     private static final double HEAVY = 0.8;
     private static final double LIGHT = 0.4;
 
-    /** \u26a0 The stated percent is applied linearly: half the percent, half the damage. */
+    /** ⚠ The stated percent is applied linearly: half the percent, half the damage. */
     @Test
     public void theStatedPercentIsAppliedLinearly() {
         double heavy = openingDamage(HEAVY);
@@ -40,7 +40,7 @@ public class LiteralDamageTest {
                 "percent " + HEAVY + " vs " + LIGHT + " must differ by exactly two: heavy " + heavy + ", light " + light);
     }
 
-    /** \u26a0 The control: with no technique declared, the opening rule does not fire at all. */
+    /** ⚠ The control: with no technique declared, the opening rule does not fire at all. */
     @Test
     public void withoutTheTechniqueNoOpeningDamage() {
         Character tb = CharacterFactory.create(SUSHANG, LEVEL);
@@ -50,7 +50,7 @@ public class LiteralDamageTest {
         battle.startBattle();
 
         Assertions.assertEquals(before, enemy.getCurrentHp(), 1e-9,
-                "\u300c\u4f7f\u7528\u79d8\u6280\u540e\u300d -- undeclared, so no damage");
+                "「使用秘技后」 -- undeclared, so no damage");
     }
 
     /** Fires one literal-ratio DAMAGE at the given percent and returns what it cost the enemy. */

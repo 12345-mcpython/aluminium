@@ -23,7 +23,7 @@ public class HuohuoTalismanDurationTest {
     private static final int HUOHUO = 1217;
     private static final int ALLY = 1002;
     private static final int MONSTER = 1002011;
-    private static final String STATE = "\u79b3\u547d";
+    private static final String STATE = "禳命";
 
     /** A teammate's turn does not spend it; hers does, and the count is the one the sentence states. */
     @Test

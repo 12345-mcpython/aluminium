@@ -47,10 +47,10 @@ import com.google.gson.annotations.SerializedName;
 public record ResourceSpec(@SerializedName("id") String id,
                            @SerializedName("max") Integer max,
                            @SerializedName("initial") Integer initial,
-        // \u2705 A declared OVERFLOW (2026-09-30; reader: 1506\u2019s \u3010\u9690\u85cf\u5206\u3011: \u300c\u8fbe\u5230 60 \u70b9\u540e\u53ef\u6fc0\u6d3b\u7ec8\u7ed3\u6280\uff0c\n        // \u8fbe\u5230\u4e0a\u9650\u540e\u8fd8\u53ef\u6ea2\u51fa 240 \u70b9\u300d). `Resource` has had both tiers all along (`max` + `maxOverflow`);
+        // ✅ A declared OVERFLOW (2026-09-30; reader: 1506’s 【隐藏分】: 「达到 60 点后可激活终结技，\n        // 达到上限后还可溢出 240 点」). `Resource` has had both tiers all along (`max` + `maxOverflow`);
         // what was missing was a way for a DECLARATION to state the second number.
         @SerializedName("overflow") Integer overflow,
-        // \u2705 A declared SCOPE (2026-09-30; reader: the shared \u7b11\u70b9 counter, \u300c\u83b7\u5f97 10 \u70b9\u7b11\u70b9\u300d). \u26a0 A party-level resource needs a
+        // ✅ A declared SCOPE (2026-09-30; reader: the shared 笑点 counter, 「获得 10 点笑点」). ⚠ A party-level resource needs a
         // PER-BATTLE owner rather than a copy per character -- which is exactly what `ResourceManager.register` says when it
         // refuses an unwired scope, and what `Battle` now provides.
         @SerializedName("scope") String scope,

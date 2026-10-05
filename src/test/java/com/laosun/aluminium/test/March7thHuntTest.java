@@ -28,7 +28,7 @@ public class March7thHuntTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** \u26a0 The Skill marks the ally AND speeds them by 10%, measured against a hand-built 20% reference. */
+    /** ⚠ The Skill marks the ally AND speeds them by 10%, measured against a hand-built 20% reference. */
     @Test
     public void theSkillMarksTheShifuAndSpeedsThem() {
         double content = skillSpeedGain(0);
@@ -39,7 +39,7 @@ public class March7thHuntTest {
                 "content " + content + " vs reference " + reference);
     }
 
-    /** \u26a0 The charge is granted by HER basic attack and by the SHIFU's attack, and by nobody else. */
+    /** ⚠ The charge is granted by HER basic attack and by the SHIFU's attack, and by nobody else. */
     @Test
     public void theChargeComesFromHerBasicAndFromTheShifu() {
         Character march = CharacterFactory.create(MARCH, LEVEL);
@@ -52,21 +52,21 @@ public class March7thHuntTest {
         // 1) an ordinary ally attack: nobody is the Shifu yet, so nothing is granted
         battle.fireTriggers(TriggerEvent.ALLY_ATTACK, ally, enemy, 0, 0);
         Assertions.assertEquals(start, chargeOf(march),
-                "\u300c\u3010\u5e08\u7236\u3011\u65bd\u653e\u653b\u51fb\u300d -- before the Skill, no ally is the Shifu");
+                "「【师父】施放攻击」 -- before the Skill, no ally is the Shifu");
 
         // 2) her own basic attack: +1
         battle.fireTriggers(TriggerEvent.BASIC_ATTACK, march, enemy, 0, 0);
         Assertions.assertEquals(start + 1, chargeOf(march),
-                "\u300c\u968f\u540e\u83b7\u5f971\u70b9\u5145\u80fd\u300d");
+                "「随后获得1点充能」");
 
         // 3) mark the ally as the Shifu, then their attack: +1 again
         battle.castImmediate(march.getSkills().get(SkillType.SKILL), march, List.of(ally));
         Assertions.assertTrue(ally.getBuffManager().hasState("师父"),
-                "\u300c\u4f7f\u9664\u81ea\u8eab\u4ee5\u5916\u7684\u6211\u65b9\u6307\u5b9a\u5355\u4f53\u6210\u4e3a\u3010\u5e08\u7236\u3011\u300d");
+                "「使除自身以外的我方指定单体成为【师父】」");
         int beforeShifu = chargeOf(march);
         battle.fireTriggers(TriggerEvent.ALLY_ATTACK, ally, enemy, 0, 0);
         Assertions.assertEquals(beforeShifu + 1, chargeOf(march),
-                "\u300c\u3010\u5e08\u7236\u3011\u65bd\u653e\u653b\u51fb\u540e\uff0c\u4e09\u6708\u4e03\u6bcf\u6b21\u83b7\u5f97\u6700\u591a1\u70b9\u5145\u80fd\u300d");
+                "「【师父】施放攻击后，三月七每次获得最多1点充能」");
     }
 
     /** The declared resource's value, read through the combatant's own manager. */

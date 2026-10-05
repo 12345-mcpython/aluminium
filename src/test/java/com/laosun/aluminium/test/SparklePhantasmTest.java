@@ -33,7 +33,7 @@ public class SparklePhantasmTest {
         Battle battle = new Battle(List.of(unit), List.of(enemy), new Random(0));
         battle.startBattle();
         battle.fireTriggers(TriggerEvent.SKILL_POINT_SPENT, unit, enemy, 1, 0);
-        int layers = unit.getBuffManager().stacksOf("\u5e7b\u76f8");
+        int layers = unit.getBuffManager().stacksOf("幻相");
         System.out.println("[1306] layersAfterOneSpend=" + layers);
         var rules = unit.getTriggerTable().matching(TriggerEvent.SKILL_POINT_SPENT,
                 new TriggerTable.TriggerContext(unit, unit, enemy, 1, 0));
@@ -52,7 +52,7 @@ public class SparklePhantasmTest {
             }
         }
         Assertions.assertEquals(1, layers, "the spend stacked one layer");
-        Assertions.assertEquals("self_stacks:\u5e7b\u76f8", scale, "the layers live on the wearer");
+        Assertions.assertEquals("self_stacks:幻相", scale, "the layers live on the wearer");
         Assertions.assertEquals(0.04, percent, 1e-9, "each layer adds 4%");
         Assertions.assertEquals(0.12, cap, 1e-9, "three layers cap it at 12%");
     }

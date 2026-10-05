@@ -24,8 +24,8 @@ public class OdeToLawChargeTest {
     private static final int CYRENE = 1415;
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
-    private static final String CHARGE = "\u5145\u80fd";
-    private static final String PEERAGE = "\u7235\u4f4d";
+    private static final String CHARGE = "充能";
+    private static final String PEERAGE = "爵位";
 
     /** After the coup: the charge she had, minus the six the coup costs, plus the one 1415 pays. */
     @Test
@@ -43,7 +43,7 @@ public class OdeToLawChargeTest {
             battle.processRequests();
         }
         Assertions.assertEquals(6, cerydra.getResources().value(CHARGE), "precondition: six charge");
-        // \u26a0 Applied directly: measured, the six-charge upgrade's RESOURCE_CHANGED trigger does not fire in this scene, and
+        // ⚠ Applied directly: measured, the six-charge upgrade's RESOURCE_CHANGED trigger does not fire in this scene, and
         // this reading is about the ode's rule, not about that one.
         cerydra.getBuffManager().addBuff(
                 new com.laosun.aluminium.models.buff.StateBuff(PEERAGE, 9, true));
@@ -57,7 +57,7 @@ public class OdeToLawChargeTest {
         System.out.println("[ode-to-law] charge after the coup=" + after
                 + " peerage=" + cerydra.getBuffManager().hasState(PEERAGE));
         Assertions.assertFalse(cerydra.getBuffManager().hasState(PEERAGE), "the coup took the peerage off");
-        // \u2b50 The arithmetic the engine produces, and every term of it is a sentence: 6 + 1 (her own skill grants one) +
+        // ⭐ The arithmetic the engine produces, and every term of it is a sentence: 6 + 1 (her own skill grants one) +
         // 1 (the COMMANDED COPY casts the same skill again -- 「复制一次即将施放的技能并提前施放，随后施放原技能」) - 6 (the coup's end
         // spends six) + 1 (1415's ode pays one) = 3.
         Assertions.assertEquals(3, after,

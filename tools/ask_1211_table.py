@@ -14,7 +14,7 @@ import json
 DATA = "src/main/resources/characters/1211.json"
 JUDGE = "src/test/java/com/laosun/aluminium/test/ReaderInTableTest.java"
 ID = "trace_invigoration_ending_energy"
-STATE = "\u751f\u606f"
+STATE = "生息"
 
 doc = json.load(io.open(DATA, encoding="utf-8"))
 rules = doc["rules"] if isinstance(doc, dict) else doc
@@ -24,8 +24,8 @@ rules.append({
     "id": ID,
     "when": ["self state_ended " + STATE],
     "do": [{"op": "GAIN_ENERGY", "amount": 8.0, "target": "self"}],
-    "source": "1211 \u767d\u9732\uff1a\u3010\u751f\u606f\u3011\u7ed3\u675f\u65f6\u6062\u590d 8 \u70b9\u80fd\u91cf\u3002",
-    "note": "\u2b50 \u672c\u6761\u7528\u6765\u56de\u7b54\u201c\u5b83\u5230\u5e95\u8fdb\u6ca1\u8fdb\u8868\u201d\u3002",
+    "source": "1211 白露：【生息】结束时恢复 8 点能量。",
+    "note": "⭐ 本条用来回答“它到底进没进表”。",
 })
 if isinstance(doc, dict):
     doc["rules"] = rules
@@ -51,7 +51,7 @@ import org.junit.jupiter.api.Test;
 public class ReaderInTableTest {
     private static final int OWNER = 1211;
 
-    /** \u2b50 The rule the document asks for must be loaded and selectable. */
+    /** ⭐ The rule the document asks for must be loaded and selectable. */
     @Test
     public void theReaderIsInHerTable() {
         Character owner = CharacterFactory.create(OWNER, 80, false, null, null, 0);

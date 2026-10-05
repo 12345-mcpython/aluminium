@@ -48,7 +48,7 @@ public class OdeOfRomanceTest {
         Skill ode = demiurge.skillAt(ODE_OF_ROMANCE);
         Assertions.assertNotNull(ode, "precondition: the memosprite carries its own skill 14");
         Assertions.assertTrue(SkillExecutor.canDeliver(ode),
-                "\u300c\u5355\u6b21\u751f\u6548\u300d-- the Rules entry is what makes this skill deliverable at all");
+                "「单次生效」-- the Rules entry is what makes this skill deliverable at all");
 
         SkillExecutor.execute(battle, ode, demiurge, List.of(aglaea));
         battle.processRequests();
@@ -56,7 +56,7 @@ public class OdeOfRomanceTest {
         boolean marked = aglaea.getBuffManager().hasState(STATE);
         System.out.println("[romance] canDeliver = true ; Aglaea carries " + STATE + " = " + marked);
         Assertions.assertTrue(marked,
-                "\u300c\u5bf9\u963f\u683c\u83b1\u96c5\u65bd\u653e\u65f6\uff0c\u4f7f\u963f\u683c\u83b1\u96c5\u83b7\u5f97\u3010" + STATE + "\u3011\u300d");
+                "「对阿格莱雅施放时，使阿格莱雅获得【" + STATE + "】」");
     }
 
     /** And the other ally is untouched -- the ode is aimed at ONE unit. */
@@ -77,6 +77,6 @@ public class OdeOfRomanceTest {
 
         System.out.println("[romance] bystander carries it = " + bystander.getBuffManager().hasState(STATE));
         Assertions.assertFalse(bystander.getBuffManager().hasState(STATE),
-                "\u300c\u5bf9\u963f\u683c\u83b1\u96c5\u65bd\u653e\u65f6\u300d-- one aim, not the whole party");
+                "「对阿格莱雅施放时」-- one aim, not the whole party");
     }
 }

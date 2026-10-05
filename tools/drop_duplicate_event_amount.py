@@ -34,7 +34,7 @@ for old, new in DROPS:
     text = text.replace(old, new)
 
 # the constant and the derivedMagnitude branch, dropped together
-start = text.index("    /**\n     * \u300c\u6bcf\u6d88\u8017/\u6bcf\u635f\u5931 1 \u70b9\u2026\u300d (2026-10-02): a magnitude that follows the <b>triggering event</b>.")
+start = text.index("    /**\n     * 「每消耗/每损失 1 点…」 (2026-10-02): a magnitude that follows the <b>triggering event</b>.")
 end = text.index('    private static final String EVENT_AMOUNT = "event_amount";\n') + len('    private static final String EVENT_AMOUNT = "event_amount";\n')
 text = text[:start] + text[end:]
 
@@ -50,8 +50,8 @@ print("ok   interp: the duplicate magnitude spelling is gone, times_from stays")
 
 judge = io.open(JUDGE, encoding="utf-8").read()
 for marker_start, marker_end in (
-    ("    /** \u2b50 A magnitude off the event", "    /** \u2b50 The same number as a MODIFIER"),
-    ("    /** \u2b50 The same number as a MODIFIER", "    /** \u2b50 A repeat count off the event"),
+    ("    /** ⭐ A magnitude off the event", "    /** ⭐ The same number as a MODIFIER"),
+    ("    /** ⭐ The same number as a MODIFIER", "    /** ⭐ A repeat count off the event"),
 ):
     if marker_start in judge and marker_end in judge:
         a = judge.index(marker_start)

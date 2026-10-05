@@ -28,10 +28,10 @@ print("ok   the stack clause is rolled back (%d -> %d rules)" % (len(rules), len
 
 effects = json.load(io.open(SE, encoding="utf-8"))
 if str(19) in effects.get("11415", {}):
-    effects["11415"]["19"]["note"] = ("\u2b50 2026-10-02\uff1a\u540c\u4e00\u6761\u6280\u80fd\u7684**\u80fd\u91cf\u90a3\u534a**\u5df2\u6210\u53e5\uff1b"
-                                      "\u800c\u201c\u4f7f\u98ce\u5807\u83b7\u5f97 **2 \u5c42**\u201d\u90a3\u53e5**\u4ecd\u767b\u8bb0** \u2014\u2014 "
-                                      "\u5b83\u9700\u8981\u90a3\u4e2a\u72b6\u6001\u7684**\u5c42\u6570\u4e0a\u9650**\uff0c\u800c\u5b83**\u4e0d\u5728\u6211\u80fd\u8bfb\u5230\u7684\u8868\u91cc**"
-                                      "\uff08\u5b9e\u6d4b\uff1a\u5fc6\u7075\u6280\u80fd\u8868\u65e0\u5c42\u6570\u5b57\u6bb5\uff1b`StatusConfig` \u65e0\u8be5\u72b6\u6001\u540d\uff09\u3002")
+    effects["11415"]["19"]["note"] = ("⭐ 2026-10-02：同一条技能的**能量那半**已成句；"
+                                      "而“使风堇获得 **2 层**”那句**仍登记** —— "
+                                      "它需要那个状态的**层数上限**，而它**不在我能读到的表里**"
+                                      "（实测：忆灵技能表无层数字段；`StatusConfig` 无该状态名）。")
     io.open(SE, "w", encoding="utf-8", newline="\n").write(json.dumps(effects, ensure_ascii=False, indent=2) + "\n")
     print("ok   skill_effects.json 11415/19 note records the registration")
 
@@ -56,7 +56,7 @@ import java.util.Random;
  * <p>Reader: 1415's sky ode -- 「德谬歌施放忆灵技时，使<b>风堇</b>获得2层…」 -- a rule that lives in the memosprite's file, where `self` is the MASTER, so it has to reach another
  * character. The closed selector set had positions (`party_first`, `next_ally`) and predicates (`lowest_hp_ally`), but nothing that NAMES one.
  *
- * <p>\u2b50 The reading is exactly the selector's contract, in one battle: the named cid gets the stacks and a DIFFERENT ally present gets none. The rule is in-test so the
+ * <p>⭐ The reading is exactly the selector's contract, in one battle: the named cid gets the stacks and a DIFFERENT ally present gets none. The rule is in-test so the
  * judge is about the selector and nothing else -- in particular it does not depend on any state's stack cap.
  */
 public class AllyCidSelectorTest {

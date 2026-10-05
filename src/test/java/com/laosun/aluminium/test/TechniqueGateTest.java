@@ -24,7 +24,7 @@ public class TechniqueGateTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** \u26a0 With the technique declared, the party is healed for 15% of its own Max HP. */
+    /** ⚠ With the technique declared, the party is healed for 15% of its own Max HP. */
     @Test
     public void aDeclaredTechniqueHealsTheParty() {
         Character tb = CharacterFactory.create(TB, LEVEL);
@@ -45,10 +45,10 @@ public class TechniqueGateTest {
         double healed = ally.getCurrentHp() - hurt;
         double expected = ally.getMaxHp() * 0.15;
         Assertions.assertEquals(expected, healed, expected * 0.05,
-                "\u300c\u4f7f\u7528\u79d8\u6280\u540e\u7acb\u5373\u4e3a\u6211\u65b9\u5168\u4f53\u56de\u590d\u7b49\u540c\u4e8e\u5404\u81ea\u751f\u547d\u4e0a\u965015%\u7684\u751f\u547d\u503c\u300d: expected " + expected + ", healed " + healed);
+                "「使用秘技后立即为我方全体回复等同于各自生命上限15%的生命值」: expected " + expected + ", healed " + healed);
     }
 
-    /** \u26a0 The control: with NO technique declared, the same battle heals nobody. */
+    /** ⚠ The control: with NO technique declared, the same battle heals nobody. */
     @Test
     public void anUndeclaredTechniqueDoesNothing() {
         Character tb = CharacterFactory.create(TB, LEVEL);
@@ -57,11 +57,11 @@ public class TechniqueGateTest {
         Battle battle = new Battle(List.of(tb, ally), List.of(enemy), fixed());
         battle.startBattle();
 
-        Assertions.assertFalse(tb.getBuffManager().hasState("\u79d8\u6280"),
+        Assertions.assertFalse(tb.getBuffManager().hasState("秘技"),
                 "without the marker the state must not exist");
     }
 
-    /** \u26a0 And the state itself is what content asks for. */
+    /** ⚠ And the state itself is what content asks for. */
     @Test
     public void theMarkerCreatesTheState() {
         Character tb = CharacterFactory.create(TB, LEVEL);
@@ -70,8 +70,8 @@ public class TechniqueGateTest {
         battle.markTechniqueUsed(tb);
         battle.startBattle();
 
-        Assertions.assertTrue(tb.getBuffManager().hasState("\u79d8\u6280"),
-                "\u300c\u4f7f\u7528\u79d8\u6280\u540e\u300d -- the declared technique must be visible as a state");
+        Assertions.assertTrue(tb.getBuffManager().hasState("秘技"),
+                "「使用秘技后」 -- the declared technique must be visible as a state");
     }
 
     /** Census: the technique rule and the level convention. */

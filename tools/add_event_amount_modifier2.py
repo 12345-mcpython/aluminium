@@ -23,8 +23,8 @@ if "EVENT_AMOUNT" in text:
 else:
     OLD = "        if (SELF_MAX_ENERGY.equals(effect.getScale().trim())) {\n"
     NEW = ("        if (EVENT_AMOUNT.equals(effect.getScale().trim())) {\n"
-           "            // \u2b50 \u300c\u6bcf\u6d88\u8017 1 \u70b9\u2026\u63d0\u9ad8 X%\u300d (2026-10-02): the triggering event's own magnitude, as a\n"
-           "            // modifier. \u26a0 Not a duplicate of `amount_from_event`: that spelling is read in `gainResource` ONLY\n"
+           "            // ⭐ 「每消耗 1 点…提高 X%」 (2026-10-02): the triggering event's own magnitude, as a\n"
+           "            // modifier. ⚠ Not a duplicate of `amount_from_event`: that spelling is read in `gainResource` ONLY\n"
            "            // (it was withdrawn from `grantAmount` for exactly that reason), while these readers are all modifiers.\n"
            "            // Before the attribute branch below, for the reason `cast_energy_spent` gives.\n"
            "            return effect.getPercent() * Math.abs(ctx.amount())\n"
@@ -46,9 +46,9 @@ else:
     ANCHOR = '    private static final String CAST_ENERGY_SPENT = "cast_energy_spent";\n'
     CONST = (ANCHOR + '\n'
              '    /**\n'
-             '     * \u300c\u6bcf\u6d88\u8017/\u6bcf\u635f\u5931 1 \u70b9\u2026\u63d0\u9ad8 X%\u300d (2026-10-02): a modifier\u2019s magnitude that follows the event.\n'
+             '     * 「每消耗/每损失 1 点…提高 X%」 (2026-10-02): a modifier’s magnitude that follows the event.\n'
              '     *\n'
-             '     * <p>Sits beside {@link #CAST_ENERGY_SPENT} on purpose \u2014 the same shape bound to the cast \u2014 and, like it,\n'
+             '     * <p>Sits beside {@link #CAST_ENERGY_SPENT} on purpose — the same shape bound to the cast — and, like it,\n'
              '     * is deliberately not an {@code AttributeType}.\n'
              '     */\n'
              '    private static final String EVENT_AMOUNT = "event_amount";\n')
@@ -76,7 +76,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * \u300c\u6bcf\u6d88\u80171\u70b9\u6218\u6280\u70b9\u2026\u9020\u6210\u7684\u4f24\u5bb3\u63d0\u9ad8 6%\u300d (1306:159, 2026-10-02): `scale: "event_amount"` on a MODIFIER.
+ * 「每消耗1点战技点…造成的伤害提高 6%」 (1306:159, 2026-10-02): `scale: "event_amount"` on a MODIFIER.
  *
  * <p>File-driven character, one hand-built rule on the existing `SKILL_POINT_SPENT` event, and the amount spent is the
  * magnitude -- so 3 points is 3x one point, and no spend is no change at all.
@@ -85,7 +85,7 @@ public class EventAmountModifierTest {
     private static final int OWNER = 1306;
     private static final int MONSTER = 1002011;
 
-    /** \u2b50 Three points spent raise the modifier three times as far as one. */
+    /** ⭐ Three points spent raise the modifier three times as far as one. */
     @Test
     public void theModifierFollowsTheEvent() {
         double one = boostAfterSpending(1);

@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Random;
 
-/** \u300c\u83b7\u5f97\u5f3a\u5316\u666e\u653b\u300d (2026-10-02). */
+/** 「获得强化普攻」 (2026-10-02). */
 public class RippleReinforcedBasicTest {
     @Test
     public void herUltimateReplacesHerBasic() {

@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
  * <p>ATK +18..30% and energy regeneration +10..20%, both permanent. Entering battle or casting the ultimate grants the
  * state for 3 turns, and while it holds EVERY ally's crit damage is up 24..48%. The per-energy clause is REGISTERED.
  *
- * <p>\u26a0 Two rules rather than one, because the condition DSL has no OR; and all three effects of a grant share the
+ * <p>⚠ Two rules rather than one, because the condition DSL has no OR; and all three effects of a grant share the
  * state's own 3-turn life, so they live and die together (the engine has no "as long as the state lasts" spelling).
  */
 public class Cone23062Test {

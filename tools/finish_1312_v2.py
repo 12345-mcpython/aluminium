@@ -68,7 +68,7 @@ eng = io.open(WORK + '/' + ENG, encoding='utf-8').read()
 OLD = ('    private static void gainEnergyFor(Battle battle, EffectSpec effect, TriggerContext ctx, CanHit target) {'
        + NL + '        if (effect.getScale() == null || effect.getScale().isBlank()) {')
 NEW = ('    private static void gainEnergyFor(Battle battle, EffectSpec effect, TriggerContext ctx, CanHit target) {' + NL
-       + '        // \u2b50 The event own magnitude (2026-09-30; reader: 1312 per-spent-point energy), as gainResource does.' + NL
+       + '        // ⭐ The event own magnitude (2026-09-30; reader: 1312 per-spent-point energy), as gainResource does.' + NL
        + '        if (Boolean.TRUE.equals(effect.getAmountFromEvent())) {' + NL
        + '            double share = effect.getAmountPercent() == null ? 1 : effect.getAmountPercent();' + NL
        + '            battle.grantEnergy(target, Math.round(ctx.amount() * share));' + NL

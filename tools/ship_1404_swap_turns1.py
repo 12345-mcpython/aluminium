@@ -23,10 +23,10 @@ if any(effect.get("op") == "REPLACE_SKILL" for effect in rule["do"]):
     sys.exit("REFUSING: the swap is already there")
 rule["do"].insert(0, {"op": "REPLACE_SKILL", "skill": "SKILL", "skill_id": 9, "turns": 1, "target": "self"})
 rule["note"] = rule["note"].replace(
-    "\u2462 **\u65e7\u62a5\u7684 `CAST_SKILL{SKILL}` \u653e\u7684\u662f\u666e\u901a\u6218\u6280** \u2717\uff08\u69fd 2 \u2713\uff09\u3002",
-    "\u2462 **\u65e7\u62a5\u7684 `CAST_SKILL{SKILL}` \u653e\u7684\u662f\u666e\u901a\u6218\u6280** \u2717\uff08\u69fd 2 \u2713\uff09\u3002"
-    "\u2b50 **2026-10-02 \u7b2c\u4e8c\u6b21\u5c1d\u8bd5\uff1a\u6362\u88c5\u7684\u5bff\u547d\u6539\u6210 `turns: 1`** \u2713\uff08\u2757 \u7b2c\u4e00\u6b21\u7528 `until: next_attack` \u2717\uff0c"
-    "\u800c\u5b83**\u5728\u653b\u51fb\u5f00\u59cb\u65f6\u5c31\u8fd8\u539f** \u2717 \u21d2 \u4f24\u5bb3\u4ecd\u7528\u65e7\u884c\u7b97 \u2717\uff1b\u8fd9\u6b63\u662f `1301` \u6ce8\u8bb0\u91cc\u5199\u7740\u201c**\u5c1a\u672a\u9489\u4f4f**\u201d\u7684\u90a3\u4ef6\u4e8b \u2713\uff09\u3002")
+    "③ **旧报的 `CAST_SKILL{SKILL}` 放的是普通战技** ✗（槽 2 ✓）。",
+    "③ **旧报的 `CAST_SKILL{SKILL}` 放的是普通战技** ✗（槽 2 ✓）。"
+    "⭐ **2026-10-02 第二次尝试：换装的寿命改成 `turns: 1`** ✓（❗ 第一次用 `until: next_attack` ✗，"
+    "而它**在攻击开始时就还原** ✗ ⇒ 伤害仍用旧行算 ✗；这正是 `1301` 注记里写着“**尚未钉住**”的那件事 ✓）。")
 
 with io.open(CHAR, "w", encoding="utf-8", newline="\n") as handle:
     json.dump(doc, handle, ensure_ascii=False, indent=2)
@@ -37,7 +37,7 @@ print("ok   the swap is back, with turns: 1")
 text = io.open(JUDGE, encoding="utf-8").read()
 ADD = '''
     /**
-     * \u2b50 And the swap must REACH the cast: the commanded cast has to deal what casting \u69fd 9 directly deals.
+     * ⭐ And the swap must REACH the cast: the commanded cast has to deal what casting 槽 9 directly deals.
      *
      * <p>This is the reading that was missing. The first attempt used `until: next_attack` and the swap was restored at the START of
      * the attack, so the damage came from the old row (767.585 against 383.793) -- visible only because the two numbers were
@@ -77,7 +77,7 @@ ADD = '''
         System.out.println("[mydei-skills] commanded=" + commanded + " direct slot 9=" + direct);
 
         Assertions.assertEquals(direct, commanded, direct * 1e-6,
-                "\u300c\u81ea\u52a8\u65bd\u653e\u3010\u5f11\u738b\u6210\u738b\u3011\u300d-- the commanded cast runs the row the swap installed, not the slot's original one");
+                "「自动施放【弑王成王】」-- the commanded cast runs the row the swap installed, not the slot's original one");
     }
 }
 '''

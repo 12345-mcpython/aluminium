@@ -26,7 +26,7 @@ if "timesFrom" not in spec:
     ANCHOR = '    @SerializedName("times")'
     NEW = ('    /**\n'
            '     * How many times the effect repeats, read from the triggering EVENT instead of a constant (2026-10-02);\n'
-           '     * the only value today is {@code "event_amount"} (\u300c\u6bcf\u6d88\u8017 1 \u70b9\u2026\u989d\u5916 1 \u6b21\u300d). {@code null} = use {@code times}.\n'
+           '     * the only value today is {@code "event_amount"} (「每消耗 1 点…额外 1 次」). {@code null} = use {@code times}.\n'
            '     */\n'
            '    @SerializedName("times_from")\n'
            '    private String timesFrom;\n'
@@ -54,8 +54,8 @@ if 'case "event_amount"' in interp:
 else:
     OLD_SCALE = '            case "owner_attack" -> ownerAttributeOf(ctx, "owner_attack", AttributeType.ATTACK) * share + flat;'
     NEW_SCALE = (OLD_SCALE + '\n'
-                 '            // \u2b50 \u300c\u6bcf\u6d88\u8017/\u6bcf\u635f\u5931 1 \u70b9\u2026\u300d (2026-10-02): the triggering EVENT\'s own magnitude.\n'
-                 '            // The absolute value, because a spend arrives negative and "\u6bcf 1 \u70b9" counts points.\n'
+                 '            // ⭐ 「每消耗/每损失 1 点…」 (2026-10-02): the triggering EVENT\'s own magnitude.\n'
+                 '            // The absolute value, because a spend arrives negative and "每 1 点" counts points.\n'
                  '            case "event_amount" -> Math.abs(ctx.amount()) * share + flat;')
     if interp.count(OLD_SCALE) != 1:
         print("FAIL interp: scale anchor matched %d times" % interp.count(OLD_SCALE))
@@ -63,7 +63,7 @@ else:
     interp = interp.replace(OLD_SCALE, NEW_SCALE)
 
     OLD_TIMES = "                int times = effect.getTimes() == null ? 1 : effect.getTimes();"
-    NEW_TIMES = ("                // \u2b50 \u300c\u6bcf\u6d88\u8017 1 \u70b9\u2026\u989d\u5916 1 \u6b21\u300d (2026-10-02): the repeat count can follow the event.\n"
+    NEW_TIMES = ("                // ⭐ 「每消耗 1 点…额外 1 次」 (2026-10-02): the repeat count can follow the event.\n"
                  "                int times = effect.getTimes() == null ? 1 : effect.getTimes();\n"
                  "                if (effect.getTimesFrom() != null) {\n"
                  "                    if (!\"event_amount\".equals(effect.getTimesFrom().trim())) {\n"
@@ -114,14 +114,14 @@ import java.util.Random;
  * <p>Readers (all with data files): 1407's talent 「我方全体每损失1点生命值遐蝶获得1点【新蕊】」, 1413's 「每消耗了1点【忆质】…」,
  * and the per-spent-point instance family 1408 / 1510 / 1513. The engine already hands the number over --
  * {@code RESOURCE_CHANGED} fires with {@code amount = delta} -- and a spend arrives NEGATIVE, so both readings take the
- * absolute value: "\u6bcf 1 \u70b9" counts points.
+ * absolute value: "每 1 点" counts points.
  */
 public class EventAmountTest {
     private static final int OWNER = 1003;
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** \u2b50 A magnitude off the event: 1 energy per point of health lost. */
+    /** ⭐ A magnitude off the event: 1 energy per point of health lost. */
     @Test
     public void theMagnitudeFollowsTheEvent() {
         Character owner = CharacterFactory.create(OWNER, LEVEL, false, null, null, 0);
@@ -142,7 +142,7 @@ public class EventAmountTest {
         Assertions.assertEquals(20, owner.getCurrentEnergy() - before, 1e-6, "1 energy per point lost");
     }
 
-    /** \u2b50 A repeat count off the event, driven by a real resource change. */
+    /** ⭐ A repeat count off the event, driven by a real resource change. */
     @Test
     public void theRepeatCountFollowsTheEvent() {
         double one = loss(1);

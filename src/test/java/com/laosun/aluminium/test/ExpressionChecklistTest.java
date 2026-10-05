@@ -29,7 +29,7 @@ import java.util.regex.Pattern;
  *       refuses, so an empty cell fails here.</li>
  * </ul>
  *
- * <p>\u26a0 It deliberately does NOT try to check the prose's meaning -- it checks that every claim has a file behind it, and
+ * <p>⚠ It deliberately does NOT try to check the prose's meaning -- it checks that every claim has a file behind it, and
  * that no row is half-filled. Meaning is the reviewer's job; existence is this test's.
  */
 public class ExpressionChecklistTest {
@@ -133,7 +133,7 @@ public class ExpressionChecklistTest {
     private static List<String> cells(String row) {
         List<String> out = new ArrayList<>();
         for (String cell : row.split("\\|")) {
-            // \u26a0 Backticks are markdown, not part of the name: without this the judge cell reads
+            // ⚠ Backticks are markdown, not part of the name: without this the judge cell reads
             // "`TalismanSavesAnAllyTest`" and no such file exists. Measured -- the first version of this guard failed on it.
             String trimmed = cell.trim().replace("`", "");
             if (!trimmed.isEmpty()) {

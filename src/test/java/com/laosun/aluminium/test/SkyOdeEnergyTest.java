@@ -37,7 +37,7 @@ public class SkyOdeEnergyTest {
         var demiurge = probe.summonServant(probe.characters.get(0));
         var ode = demiurge.skillAt(19);
         Assertions.assertNotNull(ode, "precondition: the memosprite carries slot 19");
-        // \u26a0 Energy is granted as a WHOLE number -- `gainEnergyFor` rounds the derived amount -- so the expectation is the rounded row value, not the row value.
+        // ⚠ Energy is granted as a WHOLE number -- `gainEnergyFor` rounds the derived amount -- so the expectation is the rounded row value, not the row value.
         double expected = Math.round(ode.getData().getSkills().get(demiurge.skillLevel(ode) - 1).get(1));
 
         System.out.println("[sky] her energy without the ode = " + withoutOde + " ; with it = " + withOde
@@ -45,7 +45,7 @@ public class SkyOdeEnergyTest {
 
         Assertions.assertEquals(0.0, withoutOde, 1e-9, "precondition: the ode is what moves it");
         Assertions.assertEquals(expected, withOde, Math.abs(expected) * 1e-6,
-                "\u300c\u4e3a\u98ce\u5807\u6062\u590d #2 \u70b9\u80fd\u91cf\u300d-- and #2 runs with level");
+                "「为风堇恢复 #2 点能量」-- and #2 runs with level");
     }
 
     private static double energyAfter(boolean castTheOde) {

@@ -19,7 +19,7 @@ NL = chr(10)
 
 t = io.open(WORK + '/' + ENG, encoding='utf-8').read()
 anchor = '        damage.addBoost(effect.getPercent());'
-new = ('        // \u2b50 A stated `scale` must actually be read (2026-09-30; reader: light cone 23062). \u26a0 This method' + NL
+new = ('        // ⭐ A stated `scale` must actually be read (2026-09-30; reader: light cone 23062). ⚠ This method' + NL
        + '        // once ignored `damage_type` the same way and the loader accepted it -- see the comment above, round 258.' + NL
        + '        // The same semantics the note names: MODIFY_ATTR\'s instance route, i.e. derivedMagnitude.' + NL
        + '        double magnitude = effect.getScale() == null || effect.getScale().isBlank()' + NL

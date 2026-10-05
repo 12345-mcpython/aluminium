@@ -58,7 +58,7 @@ SHARE_NEW = """    private static double shareOf(EffectSpec effect, TriggerConte
             return effect.getPercent();
         }
         if (effect.getPercentFromSkillParam() != null) {
-            // \u2b50 The share out of one of the owner's OWN skills (2026-10-02): 「等同于缇宝 #3% 生命上限」, where #3 lives in HIS ultimate.
+            // ⭐ The share out of one of the owner's OWN skills (2026-10-02): 「等同于缇宝 #3% 生命上限」, where #3 lives in HIS ultimate.
             return ownerSkillParamValue(effect, ctx, effect.getPercentFromSkillParam().trim());
         }"""
 
@@ -75,9 +75,9 @@ HELPER_NEW = """    private static double ownerSkillParamValue(EffectSpec effect
         Character owner = requireCharacterOwner(effect, ctx);
         String[] parts = spelled.split(":", 2);"""
 
-# \u26a0 the line the NPE came from: the share may also come from the owner's own skill
+# ⚠ the line the NPE came from: the share may also come from the owner's own skill
 MAG_ANCHOR = "        if (effect.getPercent() != null || effect.getPercentFromCastParam() != null) {\n            magnitude = derived ? derivedMagnitude(effect, ctx) : effect.getPercent();"
-MAG_NEW = ("        // \u26a0\u26a0 `percent_from_skill_param` is the THIRD way to state a share (2026-10-02), and this condition is the one the comment above warns\n"
+MAG_NEW = ("        // ⚠⚠ `percent_from_skill_param` is the THIRD way to state a share (2026-10-02), and this condition is the one the comment above warns\n"
            "        // about: leaving a share spelling out of it sends the effect down the flat `amount` arm and unboxes a null. That is exactly what happened here.\n"
            "        if (effect.getPercent() != null || effect.getPercentFromCastParam() != null\n"
            "                || effect.getPercentFromSkillParam() != null) {\n"
@@ -127,14 +127,14 @@ import java.util.Random;
 /**
  * `percent_from_skill_param: "<SKILLTYPE>:<index>"` (2026-10-02).
  *
- * <p>Reader: 1403 \u7f07\u5b9d's ultimate, whose zone rider deals \u300c\u7b49\u540c\u4e8e\u7f07\u5b9d #3% \u751f\u547d\u4e0a\u9650\u300d damage on somebody
+ * <p>Reader: 1403 缇宝's ultimate, whose zone rider deals 「等同于缇宝 #3% 生命上限」 damage on somebody
  * else's attack. #3 lives in HIS ultimate, and it runs with level (0.06 -> 0.15), so neither `percent_from_cast_param` (the skill that produced the event) nor a
  * literal can say it.
  *
- * <p>\u2b50 Two readings: the share is multiplied by 生命上限 as the sentence says, and the INDEX is load-bearing -- the neighbouring member of the same row is a
+ * <p>⭐ Two readings: the share is multiplied by 生命上限 as the sentence says, and the INDEX is load-bearing -- the neighbouring member of the same row is a
  * different number, so a reader that grabbed the wrong member cannot pass.
  *
- * <p>\u26a0 The first attempt at this crashed with an NPE on a null `amount`, because `modifyAttr` asked "is a share stated?" as `percent != null ||
+ * <p>⚠ The first attempt at this crashed with an NPE on a null `amount`, because `modifyAttr` asked "is a share stated?" as `percent != null ||
  * percent_from_cast_param != null` -- the very line its own comment warns about. This judge is what caught it.
  */
 public class PercentFromSkillParamTest {

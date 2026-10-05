@@ -20,16 +20,16 @@ exec(io.open("tools/add_spend_all3.py", encoding="utf-8").read())
 
 DATA = "src/main/resources/characters/1513.json"
 JUDGE = "src/test/java/com/laosun/aluminium/test/SpendAllTest.java"
-RES = "\u70ed\u610f"
+RES = "热意"
 
 doc = json.load(io.open(DATA, encoding="utf-8"))
 rules = doc["rules"] if isinstance(doc, dict) else doc
 for r in rules:
     if isinstance(r, dict) and r.get("id") == "elation_spend_all_fervor":
         r["when"] = ["from_category ElationDamage"]
-        r["note"] = ("\u2b50 \u9996\u4e2a `spendAll` \u8bfb\u8005 \u2713\u3002\u26a0 \u89e6\u53d1\u7528 **`from_category ELATION_DAMAGE`** \u2713"
-                     "\uff08`SkillCategory.ELATION_DAMAGE` \u2713\uff0c\u5185\u5bb9\u91cc `from_category` \u7528\u4e86 **153** \u6b21 \u2713\uff09"
-                     "\u2014\u2014 \u26a0 \u6211\u524d\u4e09\u8f6e\u4ee5\u4e3a\u8981\u5199**\u6570\u636e\u884c id** \u2717\uff0c\u90a3\u662f\u9519\u7684 \u2713\u3002")
+        r["note"] = ("⭐ 首个 `spendAll` 读者 ✓。⚠ 触发用 **`from_category ELATION_DAMAGE`** ✓"
+                     "（`SkillCategory.ELATION_DAMAGE` ✓，内容里 `from_category` 用了 **153** 次 ✓）"
+                     "—— ⚠ 我前三轮以为要写**数据行 id** ✗，那是错的 ✓。")
 out = doc if isinstance(doc, dict) else {"rules": rules}
 json.dump(out, io.open(DATA, "w", encoding="utf-8", newline="\n"), ensure_ascii=False, indent=2)
 print("ok   1513.json: trigger is from_category ELATION_DAMAGE")
@@ -51,11 +51,11 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * \u300c\u6d88\u8017\u6240\u6709\u3010\u70ed\u610f\u3011\uff0c\u6bcf\u6d88\u80171\u70b9\u90fd\u4f1a\u989d\u5916\u9020\u62101\u6b21 21% \u4f24\u5bb3\u300d (1513:283, 2026-10-02).
+ * 「消耗所有【热意】，每消耗1点都会额外造成1次 21% 伤害」 (1513:283, 2026-10-02).
  *
- * <p>File-driven throughout: the resource and the primer (\u961f\u53cb\u653b\u51fb\u540e +1 \u3010\u70ed\u610f\u3011, `actor is_other_ally`) come from her
+ * <p>File-driven throughout: the resource and the primer (队友攻击后 +1 【热意】, `actor is_other_ally`) come from her
  * own file, and the cast that spends it goes through `SkillExecutor.execute` -- the engine's own path, so the event
- * carries the cast category the rule keys off. \u26a0 Measured earlier: hand-firing an event reaches nothing.
+ * carries the cast category the rule keys off. ⚠ Measured earlier: hand-firing an event reaches nothing.
  */
 public class SpendAllTest {
     private static final int OWNER = 1513;
@@ -63,7 +63,7 @@ public class SpendAllTest {
     private static final int MONSTER = 1002011;
     private static final String RES = "\\u70ed\\u610f";
 
-    /** \u2b50 The cast spends everything, and each point it spent adds one more instance. */
+    /** ⭐ The cast spends everything, and each point it spent adds one more instance. */
     @Test
     public void theCastSpendsAllFervorAndEachPointAddsAHit() {
         double one = lossAfterCastingWith(1);
@@ -75,7 +75,7 @@ public class SpendAllTest {
 
     // ==================================================================
 
-    /** Prime 【\u70ed\u610f】 to {@code start} with her own rule, cast, and report the ENEMY's loss. */
+    /** Prime 【热意】 to {@code start} with her own rule, cast, and report the ENEMY's loss. */
     private static double lossAfterCastingWith(int start) {
         Character owner = CharacterFactory.create(OWNER, 80, false, null, null, 0);
         Character ally = CharacterFactory.create(ALLY, 80, false, null, null, 0);

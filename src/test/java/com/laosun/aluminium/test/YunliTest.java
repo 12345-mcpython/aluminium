@@ -21,7 +21,7 @@ public class YunliTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** \u26a0 The heal is 30% of her ATTACK plus a flat 200, and it heals HER. */
+    /** ⚠ The heal is 30% of her ATTACK plus a flat 200, and it heals HER. */
     @Test
     public void theSkillHealsHerByASharePlusAFlatAmount() {
         Character yunli = CharacterFactory.create(YUNLI, LEVEL);
@@ -37,10 +37,10 @@ public class YunliTest {
         battle.fireTriggers(TriggerEvent.SKILL_CAST, yunli, enemy, 0, 0);
 
         Assertions.assertEquals(expected, yunli.getCurrentHp() - before, expected * 0.02,
-                "\u300c\u6062\u590d\u7b49\u540c\u4e8e\u4e91\u748330.00%\u653b\u51fb\u529b+200\u7684\u751f\u547d\u503c\u300d: expected " + expected);
+                "「恢复等同于云璃30.00%攻击力+200的生命值」: expected " + expected);
     }
 
-    /** \u26a0 The counter reaches the ATTACKER and nobody else, and its 120% is pinned against a hand-built 240% reference. */
+    /** ⚠ The counter reaches the ATTACKER and nobody else, and its 120% is pinned against a hand-built 240% reference. */
     @Test
     public void theCounterHitsTheAttackerOnly() {
         double shipped = counterLoss(true);
@@ -57,7 +57,7 @@ public class YunliTest {
         battle.fireTriggers(TriggerEvent.TAKING_HIT, attacker, yunli, 0, 100);
 
         Assertions.assertEquals(15.0, yunli.getCurrentEnergy() - energyBefore, 1e-6,
-                "\u300c\u989d\u5916\u6062\u590d15\u70b9\u80fd\u91cf\u300d");
+                "「额外恢复15点能量」");
         Assertions.assertEquals(bystanderBefore, bystander.getCurrentHp(), 1e-9,
                 "and a bystander does not: `target: attacker` is what makes this exact");
         Assertions.assertTrue(reference > 0, "the reference must land at all");

@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1414 Dan Heng \u2022 Permansor Terrae, from his own file (2026-09-29, round 176): ATK-scaled shields and the Bondmate designation.
+ * 1414 Dan Heng • Permansor Terrae, from his own file (2026-09-29, round 176): ATK-scaled shields and the Bondmate designation.
  *
  * <p>The shield case asserts the DOCUMENT'S arithmetic — 20.00% of his ATK plus 400 — which needs the new `owner_attack` scale; the mutation that drops the
  * flat addend makes it red.
@@ -27,7 +27,7 @@ public class PermansorTerraeTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** \u26a0 「抵消等同于丹恒\u2022腾荒20.00%攻击力+400伤害的护盾，持续3回合」. */
+    /** ⚠ 「抵消等同于丹恒•腾荒20.00%攻击力+400伤害的护盾，持续3回合」. */
     @Test
     public void hisSkillShieldsThePartyForAShareOfHisAttackPlusAFlatNumber() {
         Character dhpt = CharacterFactory.create(DHPT, LEVEL);
@@ -39,13 +39,13 @@ public class PermansorTerraeTest {
 
         battle.castImmediate(dhpt.getSkills().get(SkillType.SKILL), dhpt, List.of(ally));
 
-        Assertions.assertTrue(ally.getShield() > 0, "\u300c\u4e3a\u6211\u65b9\u5168\u4f53\u63d0\u4f9b\u2026\u62a4\u76fe\u300d -- the designated ally");
+        Assertions.assertTrue(ally.getShield() > 0, "「为我方全体提供…护盾」 -- the designated ally");
         Assertions.assertEquals(expected, ally.getShield(), expected * 0.02,
-                "\u300c\u62b5\u6d88\u7b49\u540c\u4e8e\u4e39\u6052\u2022\u817e\u835220.00%\u653b\u51fb\u529b+400\u4f24\u5bb3\u7684\u62a4\u76fe\u300d: expected " + expected + ", shield " + ally.getShield());
-        Assertions.assertTrue(ally.getBuffManager().hasState("\u540c\u888d"), "\u300c\u4f7f\u6307\u5b9a\u6211\u65b9\u5355\u4f53\u89d2\u8272\u6210\u4e3a\u3010\u540c\u888d\u3011\u300d");
+                "「抵消等同于丹恒•腾荒20.00%攻击力+400伤害的护盾」: expected " + expected + ", shield " + ally.getShield());
+        Assertions.assertTrue(ally.getBuffManager().hasState("同袍"), "「使指定我方单体角色成为【同袍】」");
     }
 
-    /** \u26a0 The ultimate states the same shield, so the party is covered even without the Skill. */
+    /** ⚠ The ultimate states the same shield, so the party is covered even without the Skill. */
     @Test
     public void hisUltimateAlsoShieldsTheParty() {
         Character dhpt = CharacterFactory.create(DHPT, LEVEL);
@@ -56,7 +56,7 @@ public class PermansorTerraeTest {
 
         battle.castImmediate(dhpt.getSkills().get(SkillType.ULTRA), dhpt, List.of(enemy));
 
-        Assertions.assertTrue(ally.getShield() > 0, "\u300c\u4e3a\u6211\u65b9\u5168\u4f53\u63d0\u4f9b\u2026\u62a4\u76fe\u300d");
+        Assertions.assertTrue(ally.getShield() > 0, "「为我方全体提供…护盾」");
     }
 
     /** Census: his skill and its trace, the ultimate, the technique, and the two halves of 葳蕤. */

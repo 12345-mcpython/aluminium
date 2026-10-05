@@ -111,12 +111,12 @@ public class DotBuff extends AbstractBuff {
     }
 
     /**
-     * A DOT with the <b>document's own name</b> for it (2026-09-30, cone 23006's \u3010\u6e38\u4e1d\u3011).
+     * A DOT with the <b>document's own name</b> for it (2026-09-30, cone 23006's 【游丝】).
      *
-     * <p>\u2605 Why a name and not just an element: the corpus has states that ARE damage over time and are asked about by
-     * name (\u300c\u5982\u679c\u8be5\u76ee\u6807\u4e0d\u5904\u4e8e\u3010\u6e38\u4e1d\u3011\u72b6\u6001\u300d), while the element alone only answers \u707c\u70e7/\u89e6\u7535/\u88c2\u4f24/\u98ce\u5316.
-     * Naming one is also how \u300c\u3010\u6e38\u4e1d\u3011\u4e5f\u4f1a\u88ab\u89c6\u4e3a\u9677\u5165\u4e86\u89e6\u7535\u72b6\u6001\u300d comes out right for free: a named THUNDER
-     * DOT still answers \u89e6\u7535 through the element table.
+     * <p>★ Why a name and not just an element: the corpus has states that ARE damage over time and are asked about by
+     * name (「如果该目标不处于【游丝】状态」), while the element alone only answers 灼烧/触电/裂伤/风化.
+     * Naming one is also how 「【游丝】也会被视为陷入了触电状态」 comes out right for free: a named THUNDER
+     * DOT still answers 触电 through the element table.
      */
     public DotBuff(CanHit source, DamageElement element, double baseDamage, int turns, int maxStacks, String name) {
         this(source, element, baseDamage, turns, maxStacks);

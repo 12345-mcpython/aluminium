@@ -25,7 +25,7 @@ public class RuanMeiTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** \u26a0 「除自身以外」: the TEAMMATE gains 10% speed and she does not — measured against a hand-built 20% reference. */
+    /** ⚠ 「除自身以外」: the TEAMMATE gains 10% speed and she does not — measured against a hand-built 20% reference. */
     @Test
     public void theTalentSpeedsTeammatesButNotHerself() {
         Character ruanmei = CharacterFactory.create(RUANMEI, LEVEL);
@@ -40,13 +40,13 @@ public class RuanMeiTest {
         battle.startBattle();
 
         Assertions.assertEquals(allyBase * 0.1, ally.getAttribute(AttributeType.SPEED).get() - before, allyBase * 0.02,
-                "\u300c\u4f7f\u9664\u81ea\u8eab\u4ee5\u5916\u7684\u961f\u53cb\u901f\u5ea6\u63d0\u9ad810.00%\u300d: ally base " + allyBase);
+                "「使除自身以外的队友速度提高10.00%」: ally base " + allyBase);
         Assertions.assertEquals(0.0, ruanmei.getAttribute(AttributeType.SPEED).get() - herBefore, 1e-9,
-                "\u300c\u9664\u81ea\u8eab\u4ee5\u5916\u300d -- she is excluded, so her own speed must not move (base " + herBase + ")");
+                "「除自身以外」 -- she is excluded, so her own speed must not move (base " + herBase + ")");
         Assertions.assertTrue(battle.getSkillPoints() >= 0, "the battle ran");
     }
 
-    /** \u26a0 The Skill puts 【弦外音】 on HER, for the document's three turns. */
+    /** ⚠ The Skill puts 【弦外音】 on HER, for the document's three turns. */
     @Test
     public void theSkillPutsOvertoneOnHerself() {
         Character ruanmei = CharacterFactory.create(RUANMEI, LEVEL);
@@ -57,9 +57,9 @@ public class RuanMeiTest {
 
         battle.castImmediate(ruanmei.getSkills().get(SkillType.SKILL), ruanmei, List.of(ally));
 
-        Assertions.assertTrue(ruanmei.getBuffManager().hasState("\u5f26\u5916\u97f3"),
-                "\u300c\u65bd\u653e\u6218\u6280\u540e\u962e\u2022\u6885\u83b7\u5f97\u3010\u5f26\u5916\u97f3\u3011\u300d");
-        Assertions.assertFalse(ally.getBuffManager().hasState("\u5f26\u5916\u97f3"),
+        Assertions.assertTrue(ruanmei.getBuffManager().hasState("弦外音"),
+                "「施放战技后阮•梅获得【弦外音】」");
+        Assertions.assertFalse(ally.getBuffManager().hasState("弦外音"),
                 "the state is on HER, not on the ally she aimed at");
     }
 

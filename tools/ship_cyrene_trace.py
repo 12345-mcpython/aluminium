@@ -31,15 +31,15 @@ rules.append({
         "max_stacks": 1,
         "target": "all_allies",
     }],
-    "source": ("1415 \u6614\u6d9f \u884c\u8ff9 \u4e09\u76f8\u7684\u56e0\u679c (1415103): "
-               "\u300c\u6614\u6d9f\u7684\u901f\u5ea6\u5927\u4e8e\u7b49\u4e8e **180** \u70b9\u65f6\uff0c"
-               "\u6211\u65b9\u5168\u4f53\u9020\u6210\u7684\u4f24\u5bb3\u63d0\u9ad8 **20%**\u300d"),
-    "note": ("\u2b50 `\"max_stacks\": 1` **\u662f\u6545\u610f\u5199\u7684** \u2713 \u2014\u2014 \u672c\u6bb5\u5b9e\u6d4b\u94fe\u6761\uff1a"
-             "\u5979\u7684\u5929\u8d4b\u5df2\u7ecf\u5199\u4e86 `ALL_DAMAGE_TYPE_BOOST` +20% \u2713\uff1b"
-             "\u800c `BuffManager.addBuff` \u5bf9 **\u540c kind** \u7684\u5904\u7406\u662f**\u5148\u6458\u65e7\u7684\u518d\u6302\u65b0\u7684** \u2713"
-             "\uff08\u8bbe\u8ba1\u5982\u6b64 \u2713\uff0c`BuffManagerTest` \u4e0e `BuffRuleTest` \u5404\u6709\u4e00\u6761\u5224\u636e\u9489\u7740 \u2713\uff09"
-             "\u21d2 \u4e0d\u5199\u5b83\u5c31\u662f **0.2** \u2717\uff1b\u5199\u4e86\u5b83\u8d70 `addStackable` \u2713 \u21d2 **0.4** \u2713\uff08\u5b9e\u6d4b \u2713\uff09\u3002"
-             "\u26a0 \u53e6\uff1a**\u540d\u5b57\uff08`buff`\uff09\u4e0d\u7b97\u6570** \u2717 \u2014\u2014 \u7ed9\u4e24\u6761\u5404\u8d77\u4e00\u4e2a\u540d\u5b57\u4ecd\u662f 0.2 \u2717\uff08\u5df2\u8bc1\u4f2a \u2713\uff09\u3002"),
+    "source": ("1415 昔涟 行迹 三相的因果 (1415103): "
+               "「昔涟的速度大于等于 **180** 点时，"
+               "我方全体造成的伤害提高 **20%**」"),
+    "note": ("⭐ `\"max_stacks\": 1` **是故意写的** ✓ —— 本段实测链条："
+             "她的天赋已经写了 `ALL_DAMAGE_TYPE_BOOST` +20% ✓；"
+             "而 `BuffManager.addBuff` 对 **同 kind** 的处理是**先摘旧的再挂新的** ✓"
+             "（设计如此 ✓，`BuffManagerTest` 与 `BuffRuleTest` 各有一条判据钉着 ✓）"
+             "⇒ 不写它就是 **0.2** ✗；写了它走 `addStackable` ✓ ⇒ **0.4** ✓（实测 ✓）。"
+             "⚠ 另：**名字（`buff`）不算数** ✗ —— 给两条各起一个名字仍是 0.2 ✗（已证伪 ✓）。"),
 })
 out = doc if isinstance(doc, dict) else {"rules": rules}
 if isinstance(doc, dict):
@@ -67,16 +67,16 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * \u300c\u901f\u5ea6\u5927\u4e8e\u7b49\u4e8e 180 \u70b9\u65f6\uff0c\u6211\u65b9\u5168\u4f53\u9020\u6210\u7684\u4f24\u5bb3\u63d0\u9ad8 20%\u300d against her own table (1415:823, 2026-10-02).
+ * 「速度大于等于 180 点时，我方全体造成的伤害提高 20%」 against her own table (1415:823, 2026-10-02).
  *
- * <p>\u2b50 FILE-DRIVEN, and the total is the claim: her talent's 20% plus the trace's 20% must read 0.4 past the threshold -- which
+ * <p>⭐ FILE-DRIVEN, and the total is the claim: her talent's 20% plus the trace's 20% must read 0.4 past the threshold -- which
  * is only possible when both rules are counted. Below the threshold only the talent is there, so 0.2.
  */
 public class CyreneSpeedThresholdTest {
     private static final int OWNER = 1415;
     private static final int MONSTER = 1002011;
 
-    /** \u2b50 Below 180 only the talent; past it, talent plus trace. */
+    /** ⭐ Below 180 only the talent; past it, talent plus trace. */
     @Test
     public void theThresholdAddsTheTracesTwentyPercent() {
         Assertions.assertEquals(0.2, total(0), 1e-6, "below the threshold, her talent alone");

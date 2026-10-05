@@ -23,7 +23,7 @@ public class JingliuTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** \u26a0 One stack per Skill, stopped at the document's three. */
+    /** ⚠ One stack per Skill, stopped at the document's three. */
     @Test
     public void theSkillAddsOneStackUpToThree() {
         Character jingliu = CharacterFactory.create(JINGLIU, LEVEL);
@@ -32,17 +32,17 @@ public class JingliuTest {
         battle.startBattle();
 
         battle.fireTriggers(TriggerEvent.SKILL_CAST, jingliu, enemy, 0, 0);
-        Assertions.assertEquals(1, jingliu.getBuffManager().stacksOf("\u6714\u671b"),
-                "\u300c\u5e76\u83b7\u5f971\u5c42\u3010\u6714\u671b\u3011\u300d");
+        Assertions.assertEquals(1, jingliu.getBuffManager().stacksOf("朔望"),
+                "「并获得1层【朔望】」");
 
         for (int i = 0; i < 4; i++) {
             battle.fireTriggers(TriggerEvent.SKILL_CAST, jingliu, enemy, 0, 0);
         }
-        Assertions.assertEquals(3, jingliu.getBuffManager().stacksOf("\u6714\u671b"),
-                "\u300c\u3010\u6714\u671b\u3011\u6700\u591a\u53ef\u7d2f\u8ba13\u5c42\u300d -- five casts must still read three");
+        Assertions.assertEquals(3, jingliu.getBuffManager().stacksOf("朔望"),
+                "「【朔望】最多可累计3层」 -- five casts must still read three");
     }
 
-    /** \u26a0 The threshold: the SECOND cast reaches two stacks and must Advance; the first must not. */
+    /** ⚠ The threshold: the SECOND cast reaches two stacks and must Advance; the first must not. */
     @Test
     public void theAdvanceNeedsTwoStacks() {
         double afterOne = waitAfterCasts(1);
@@ -53,7 +53,7 @@ public class JingliuTest {
         Assertions.assertEquals(1.0, afterOne / untouched, 1e-6,
                 "with ONE stack the Advance must not fire: " + untouched + " -> " + afterOne);
         Assertions.assertEquals(0.0, afterTwo, 1e-6,
-                "\u300c\u5f53\u62e5\u67092\u5c42\u3010\u6714\u671b\u3011\u65f6\u2026\u4f7f\u884c\u52a8\u63d0\u524d100%\u300d: " + untouched + " -> " + afterTwo);
+                "「当拥有2层【朔望】时…使行动提前100%」: " + untouched + " -> " + afterTwo);
     }
 
     /** Casts the Skill `casts` times (the RULES build the stacks) and returns her remaining wait. */

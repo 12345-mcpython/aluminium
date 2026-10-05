@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * What \u6614\u6d9f's talent actually leaves on a teammate (2026-10-02): \u300c\u6218\u6597\u5f00\u59cb\u65f6\u2026\u6211\u65b9\u5168\u4f53\u76ee\u6807\u9020\u6210\u7684\u4f24\u5bb3\u63d0\u9ad8\u300d.
+ * What 昔涟's talent actually leaves on a teammate (2026-10-02): 「战斗开始时…我方全体目标造成的伤害提高」.
  *
  * Her file states it as `ALL_DAMAGE_TYPE_BOOST, percent: 0.2, permanent, max_stacks: 2`, i.e. two layers. An earlier judge reported the attribute as 0.2, and a reverse-solved baseline came
  * out at 0.4184 -- this settles which number `get()` answers with, so the two readings can be reconciled rather than guessed at.

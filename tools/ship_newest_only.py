@@ -23,15 +23,15 @@ CID, NAME, STRIP_TARGET = sys.argv[1], sys.argv[2], sys.argv[3]
 PATH = '%s/src/main/resources/characters/%s.json' % (WORK, CID)
 
 NOTE = (
-    '\u2b50 2026-09-30 \u8f6c\u6b63\uff1a\u300c\u3010' + NAME + '\u3011**\u4ec5\u5bf9\u6700\u65b0\u88ab\u65bd\u52a0\u7684\u76ee\u6807\u751f\u6548**\u300d'
-    '\u2014\u2014 \u26a0 **\u4e0d\u9700\u8981\u65b0\u80fd\u529b** \u2713\uff1a`REMOVE_STATE buff: ' + NAME + ' target: ' + STRIP_TARGET + '` '
-    '\u5148\u628a\u8fd9\u4e2a\u540d\u5b57\u4ece**\u5df2\u89e3\u6790\u7684\u6bcf\u4e2a\u76ee\u6807**\u4e0a\u6458\u6389\uff0c\u518d `APPLY_BUFF` \u7ed9\u65b0\u76ee\u6807 '
-    '\u21d2 \u26a0 **\u987a\u5e8f\u5373\u8bed\u4e49** \u2713\u3002'
-    '\u26a0 \u51fa\u5904\uff1a`TriggerInterpreter:2515` \u7684\u6ce8\u91ca\u539f\u8bdd\uff08*REMOVE_STATE takes the named state off every '
-    'resolved target -- the only-the-newest-one-holds-it half*\uff09\uff0c\u4ee5\u53ca `1215` \u7684\u6ce8\u8bb0\uff08*the state goes off everybody, '
-    'then onto the new target -- there is no only-one-holder flag, the removal IS that clause*\uff09\uff1b'
-    '\u26a0 \u5224\u636e `NewestHolderOnlyTest` \u5df2\u628a\u8fd9\u4e00\u62db\u8fde\u540c**\u5bf9\u7167\u7ec4**\u8bc1\u660e\u8fc7 \u2713\uff08`de7cfa2` \u2713\uff09\u3002'
-    '\u26a0 \u6458\u4e0d\u5b58\u5728\u7684\u72b6\u6001**\u4e0d\u662f\u9519** \u2713\uff08`:2518` \u2713\uff09\u3002'
+    '⭐ 2026-09-30 转正：「【' + NAME + '】**仅对最新被施加的目标生效**」'
+    '—— ⚠ **不需要新能力** ✓：`REMOVE_STATE buff: ' + NAME + ' target: ' + STRIP_TARGET + '` '
+    '先把这个名字从**已解析的每个目标**上摘掉，再 `APPLY_BUFF` 给新目标 '
+    '⇒ ⚠ **顺序即语义** ✓。'
+    '⚠ 出处：`TriggerInterpreter:2515` 的注释原话（*REMOVE_STATE takes the named state off every '
+    'resolved target -- the only-the-newest-one-holds-it half*），以及 `1215` 的注记（*the state goes off everybody, '
+    'then onto the new target -- there is no only-one-holder flag, the removal IS that clause*）；'
+    '⚠ 判据 `NewestHolderOnlyTest` 已把这一招连同**对照组**证明过 ✓（`de7cfa2` ✓）。'
+    '⚠ 摘不存在的状态**不是错** ✓（`:2518` ✓）。'
 )
 
 

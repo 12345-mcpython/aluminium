@@ -19,13 +19,13 @@ SPEC = "src/main/java/com/laosun/aluminium/beans/EffectSpec.java"
 INTERP = "src/main/java/com/laosun/aluminium/models/TriggerInterpreter.java"
 DATA = "src/main/resources/characters/1513.json"
 JUDGE = "src/test/java/com/laosun/aluminium/test/SpendAllTest.java"
-RES = "\u70ed\u610f"
+RES = "热意"
 
 spec = io.open(SPEC, encoding="utf-8").read()
 if "spendAll" not in spec:
     ANCHOR = '    @SerializedName("times_from")'
     FIELD = ('    /**\n'
-             '     * \u300c\u6d88\u8017\u6240\u6709\u3010X\u3011\u300d (2026-10-02): {@code SPEND_RESOURCE} takes whatever the holder has.\n'
+             '     * 「消耗所有【X】」 (2026-10-02): {@code SPEND_RESOURCE} takes whatever the holder has.\n'
              '     * Mutually exclusive with {@code amount}, because "all of it" and "5 of it" are different claims.\n'
              '     */\n'
              '    @SerializedName("spendAll")\n'
@@ -54,7 +54,7 @@ else:
                '            }\n')
     NEW_ARM = ('            case "GAIN_RESOURCE", "SPEND_RESOURCE" -> {\n'
                '                if (Boolean.TRUE.equals(effect.getSpendAll())) {\n'
-               '                    // \u300c\u6d88\u8017\u6240\u6709\u3010X\u3011\u300d (2026-10-02): a spend with no stated SIZE -- and stating one\n'
+               '                    // 「消耗所有【X】」 (2026-10-02): a spend with no stated SIZE -- and stating one\n'
                '                    // beside it is a contradiction, so it is refused rather than silently preferring one.\n'
                '                    if (!"SPEND_RESOURCE".equals(op)) {\n'
                '                        throw new IllegalArgumentException(\n'
@@ -80,7 +80,7 @@ else:
     OLD_SPEND = ('        int amount = (int) Math.round(scaledAmount(effect, ctx));\n'
                  '        String id = effect.getResource();\n')
     NEW_SPEND = ('        String id = effect.getResource();\n'
-                 '        // \u300c\u6d88\u8017\u6240\u6709\u3010X\u3011\u300d (2026-10-02): the size is whatever is there; the "not enough"\n'
+                 '        // 「消耗所有【X】」 (2026-10-02): the size is whatever is there; the "not enough"\n'
                  '        // failure below cannot happen for it, which is why the two spellings are kept apart.\n'
                  '        int amount = Boolean.TRUE.equals(effect.getSpendAll())\n'
                  '                ? (holder.getResources().has(id) ? holder.getResources().value(id) : 0)\n'
@@ -103,10 +103,10 @@ rules.append({
     "id": "elation_spend_all_fervor",
     "when": ["from_skill_id:151307"],
     "do": [{"op": "SPEND_RESOURCE", "resource": RES, "spendAll": True, "target": "self"}],
-    "source": ("1513 \u7802\u91d1\u2022\u620f\u6d6a \u5f3a\u5316\u6b22\u6109\u6280 \u4e0b\u534a\u53e5\uff08`:283`\uff09: "
-               "\u300c\u65bd\u653e\u65f6\u4f1a**\u6d88\u8017\u6240\u6709**\u3010\u70ed\u610f\u3011\u300d"),
-    "note": ("\u2b50 \u9996\u4e2a `spendAll` \u8bfb\u8005 \u2713\u3002\u26a0 \u89e6\u53d1\u5199\u6210 `CAST_SETUP` + `from_skill_id` \u2713 "
-             "\uff08\u5f3a\u5316\u6b22\u6109\u6280\u7684 id \u2192 \u6b63\u4e0b\u534a\u53e5\u7684\u7b2c\u4e8c\u534a\u63a5\u5728 `RESOURCE_CHANGED` \u4e0a \u2713\uff09\u3002"),
+    "source": ("1513 砂金•戏浪 强化欢愉技 下半句（`:283`）: "
+               "「施放时会**消耗所有**【热意】」"),
+    "note": ("⭐ 首个 `spendAll` 读者 ✓。⚠ 触发写成 `CAST_SETUP` + `from_skill_id` ✓ "
+             "（强化欢愉技的 id → 正下半句的第二半接在 `RESOURCE_CHANGED` 上 ✓）。"),
 })
 rules.append({
     "on": "RESOURCE_CHANGED",
@@ -119,16 +119,16 @@ rules.append({
         "times_from": "event_amount",
         "element": "Quantum",
         "target": "random_enemy",
-        # \u26a0 \u771f\u540d\u662f `crit_rate` / `crit_damage` (EffectSpec)\uff0c\u800c `crit_rate` \u662f**\u56fa\u5b9a\u66b4\u51fb**\u7684\u610f\u601d
-        # (`Damage.fixedCrit`)\uff0c\u4e0d\u662f\u6982\u7387\u66b4\u51fb -- \u6240\u4ee5\u4e0d\u5199\u5b83\u4eec\u3002
+        # ⚠ 真名是 `crit_rate` / `crit_damage` (EffectSpec)，而 `crit_rate` 是**固定暴击**的意思
+        # (`Damage.fixedCrit`)，不是概率暴击 -- 所以不写它们。
     }],
-    "source": ("1513 \u7802\u91d1\u2022\u620f\u6d6a \u5f3a\u5316\u6b22\u6109\u6280 \u4e0b\u534a\u53e5\uff08`:283`\uff09: "
-               "\u300c**\u6bcf\u6d88\u80171\u70b9**\u3010\u70ed\u610f\u3011\u90fd\u4f1a\u989d\u5916\u5bf9\u968f\u673a\u654c\u65b9\u5355\u4f53"
-               "\u9020\u62101\u6b21 **21.00%** \u91cf\u5b50\u5c5e\u6027\u6b22\u6109\u4f24\u5bb3\u300d"),
-    "note": ("\u2b50 \u7528\u7684\u662f\u5df2\u6709\u7684 `times_from: \"event_amount\"` \u2713\uff08\u540c\u65e5\u51fa\u8d27 \u2713\uff09"
-             "\u21d2 **\u70b9\u6570 = \u82b1\u6389\u7684\u91cf** \u2713\u3002\u26a0 \u4f24\u5bb3\u7c7b\u578b\u672a\u5199**\u6b22\u6109**"
-             "\uff08\u9694\u79bb\u5728\u53e6\u4e00\u6761\u7ebf \u2717\uff09\u21d2 \u672c\u6761\u5148\u6309\u666e\u901a\u91cf\u5b50\u5c5e\u6027\u4f24\u5bb3\u7ed9 \u2713\uff0c"
-             "\u5f85\u300c\u6b22\u6109\u4f24\u5bb3\u300d\u90a3\u4e00\u6863\u843d\u5730\u540e\u518d\u6539 \u2713\u3002"),
+    "source": ("1513 砂金•戏浪 强化欢愉技 下半句（`:283`）: "
+               "「**每消耗1点**【热意】都会额外对随机敌方单体"
+               "造成1次 **21.00%** 量子属性欢愉伤害」"),
+    "note": ("⭐ 用的是已有的 `times_from: \"event_amount\"` ✓（同日出货 ✓）"
+             "⇒ **点数 = 花掉的量** ✓。⚠ 伤害类型未写**欢愉**"
+             "（隔离在另一条线 ✗）⇒ 本条先按普通量子属性伤害给 ✓，"
+             "待「欢愉伤害」那一档落地后再改 ✓。"),
 })
 out = doc if isinstance(doc, dict) else {"rules": rules}
 if isinstance(doc, dict):

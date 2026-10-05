@@ -56,6 +56,6 @@ public class AddDamageCountTest {
 
         Character owner = CharacterFactory.create(WEARER, 80);
         Assertions.assertDoesNotThrow(() -> owner.setTriggerTable(new TriggerTable(WEARER, List.of(rule))),
-                "\u300c\u4f7f\u53cd\u51fb\u9020\u6210\u7684\u4f24\u5bb3\u503c\u63d0\u9ad8\u2026\u300d(1001) is exactly this shape and must keep working");
+                "「使反击造成的伤害值提高…」(1001) is exactly this shape and must keep working");
     }
 }

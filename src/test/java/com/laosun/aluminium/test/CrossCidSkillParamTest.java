@@ -39,10 +39,10 @@ public class CrossCidSkillParamTest {
         System.out.println("[cross_cid] the owner's own row value " + own[1] + " gave a boost of " + own[0]
                 + " ; naming cid " + OTHER + " (row value " + cross[1] + ") gave " + cross[0]);
 
-        // \u2b50 the own-row run pins the reader exactly: the gain IS the row value
+        // ⭐ the own-row run pins the reader exactly: the gain IS the row value
         Assertions.assertEquals(own[1], own[0], 1e-9, "without the field the owner's own row is read, exactly");
-        // \u2b50 and the cross run's claim is the capability's own: naming a cid reads a DIFFERENT row
-        // \u26a0 its size is not compared to the raw row value: the battle fires its own TURN_START as well, so the two runs apply the rule a different number of times
+        // ⭐ and the cross run's claim is the capability's own: naming a cid reads a DIFFERENT row
+        // ⚠ its size is not compared to the raw row value: the battle fires its own TURN_START as well, so the two runs apply the rule a different number of times
         // (measured: 0.7 = the owner's row exactly, while the cross run read 0.24 = the other row's #0 * its #1). A reader that ignored the field would give 0.7 twice.
         Assertions.assertNotEquals(own[0], cross[0], 1e-9,
                 "with the field a different character's row is read -- ignoring the field would give the owner's value again");
@@ -59,7 +59,7 @@ public class CrossCidSkillParamTest {
         var otherSkill = other.getSkills().get(slot);
         var ownRow = ownSkill.getData().getSkills().get(owner.skillLevel(ownSkill) - 1);
         var otherRow = otherSkill.getData().getSkills().get(other.skillLevel(otherSkill) - 1);
-        // \u2b50 find an index whose two values DIFFER, so the reading can only be right one way
+        // ⭐ find an index whose two values DIFFER, so the reading can only be right one way
         int index = -1;
         for (int i = 0; i < Math.min(ownRow.size(), otherRow.size()); i++) {
             if (!ownRow.get(i).equals(otherRow.get(i))) {
@@ -92,11 +92,11 @@ public class CrossCidSkillParamTest {
         battle.processRequests();
         Character subject = battle.characters.get(0);
         double before = subject.getAttribute(AttributeType.ATTACK).get();
-        // \u26a0 fire it for the RULE OWNER only: the no-argument form fires for every unit, which made the two runs accumulate a different number of times
+        // ⚠ fire it for the RULE OWNER only: the no-argument form fires for every unit, which made the two runs accumulate a different number of times
         battle.fireTriggers(TriggerEvent.TURN_START, subject, null, 0, 0);
         battle.processRequests();
         double after = subject.getAttribute(AttributeType.ATTACK).get();
-        // \u26a0 the ABSOLUTE delta is the share: MODIFY_ATTR adds `scale * percent` to the attribute, so `after - before` is the row value itself
+        // ⚠ the ABSOLUTE delta is the share: MODIFY_ATTR adds `scale * percent` to the attribute, so `after - before` is the row value itself
         return new double[]{after - before, expected};
     }
 }

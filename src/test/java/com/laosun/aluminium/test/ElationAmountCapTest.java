@@ -12,10 +12,10 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * \u300c\u5355\u6b21\u901a\u8fc7\u6b64\u65b9\u5f0f\u8ba1\u7b97\u7684\u3010\u597d\u6d3b\u5f53\u8d4f\u3011\u4e0d\u8d85\u8fc7 100 \u70b9\u300d (2026-09-30): a single conversion of 150 energy mirrors only
+ * 「单次通过此方式计算的【好活当赏】不超过 100 点」 (2026-09-30): a single conversion of 150 energy mirrors only
  * 100, while 60 mirrors all 60.
  *
- * <p>\u2b50 The energy is delivered as the EVENT\u2019s own magnitude through `fireTriggers`, which is exactly the quantity the mirror rule reads --
+ * <p>⭐ The energy is delivered as the EVENT’s own magnitude through `fireTriggers`, which is exactly the quantity the mirror rule reads --
  * the real crediting path was already exercised by Character1505EnergySyncTest, and this test is about the ceiling.
  */
 public class ElationAmountCapTest {
@@ -23,7 +23,7 @@ public class ElationAmountCapTest {
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
-    private static final String GIFTS = "\u597d\u6d3b\u5f53\u8d4f";
+    private static final String GIFTS = "好活当赏";
 
     private int mirrored(double energy) {
         Character elation = CharacterFactory.create(WEARER, LEVEL);
@@ -40,11 +40,11 @@ public class ElationAmountCapTest {
         int big = mirrored(150);
         int small = mirrored(60);
         System.out.println("[cap] a 150-energy conversion mirrored " + big + " and a 60-energy one mirrored " + small);
-        Assertions.assertEquals(100, big, "\u5355\u6b21\u4e0d\u8d85\u8fc7 100 \u70b9");
+        Assertions.assertEquals(100, big, "单次不超过 100 点");
         Assertions.assertEquals(60, small, "a conversion below the ceiling is untouched (false case)");
     }
 
-    /** \u2605 The shipped ceiling, read off the compiled rule (discipline 232). */
+    /** ★ The shipped ceiling, read off the compiled rule (discipline 232). */
     @Test
     public void theShippedRuleCarriesTheCeiling() {
         Character elation = CharacterFactory.create(WEARER, LEVEL);

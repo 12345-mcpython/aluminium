@@ -28,25 +28,25 @@ if len(doc["rules"]) != before - 1:
 print("ok   the temporary probe is gone")
 
 rule = next(entry for entry in doc["rules"] if isinstance(entry, dict) and entry.get("id") == RULE_ID)
-LAUGHS_MAX = next(entry.get("max") for entry in doc["resources"] if entry.get("id") == "\u7b11\u70b9")
+LAUGHS_MAX = next(entry.get("max") for entry in doc["resources"] if entry.get("id") == "笑点")
 rule["do"] = [{
     "op": "APPLY_BUFF",
-    "buff": "\u597d\u6d3b\u5f53\u8d4f",
+    "buff": "好活当赏",
     "turns": 2,
     "target": "self",
     "stackable": True,
     "max_stacks": LAUGHS_MAX,
-    "scale": "party_resource:\u7b11\u70b9",
+    "scale": "party_resource:笑点",
     "percent": 1.0,
 }]
 rule["note"] = (
-    "\u300c\u963f\u54c8\u65f6\u523b\u7ed3\u675f\u65f6\uff0c\u4f7f\u53c2\u6f14\u7684\u89d2\u8272\u83b7\u5f97\u672c\u6b21\u8ba1\u5165\u7b11\u70b9\u7684\u3010\u597d\u6d3b\u5f53\u8d4f\u3011\u72b6\u6001\uff0c\u6301\u7eed 2 \u56de\u5408\u300d\u2713 \u21d2 "
-    "`STATE_ENDED[\"\u81ea\u5df1\u7684\u963f\u54c8\u65f6\u523b\"]` \u21d2 ⭐ **\u53ef\u53e0\u52a0\u72b6\u6001** \u2713\uff0c**\u5c42\u6570\uff1d\u7b11\u70b9**\uff1a"
-    "`scale: party_resource:\u7b11\u70b9` \u00d7 1 \u2713\uff08\u7b2c 69\uff0b70 \u4ef6\u7684\u4e24\u4e2a\u96f6\u4ef6 \u2713\uff09\u3002"
-    "\u26a0 **\u4e0a\u9650\u7528\u3010\u7b11\u70b9\u3011\u81ea\u5df1\u58f0\u660e\u7684\u4e0a\u9650** \u2713\uff08\u4e0d\u81c6\u9020\u6570\u5b57 \u2713\uff09\u3002"
-    "\u26a0\u26a0 **\u5751\uff08\u4e09\u6b21\u63a2\u9488\u624d\u91cf\u51fa \u2713\uff09**\uff1a\u5199 `maxStacks`\uff08Java \u540d \u2717\uff09\u4f1a\u88ab\u952e\u5b88\u536b\u63a5\u53d7\u3001"
-    "\u7136\u540e\u88ab Gson **\u9759\u9ed8\u4e22\u5f03** \u2717\uff08\u5b83\u53ea\u8ba4 `@SerializedName(\"max_stacks\")` \u2713\uff09\u21d2 cap \u53d8\u6210 **1** \u21d2 \u53ea\u52a0 **1** \u5c42 \u2717\u3002"
-    "\u26a0 \u540c\u53e5\u300c\u963f\u54c8\u884c\u52a8\u540e\u4f1a\u6d88\u8017\u5168\u90e8\u7b11\u70b9\u300d\uff08\u6d88\u8017 \u2717\uff09\u4ecd\u672a\u5199 \u2713\u3002"
+    "「阿哈时刻结束时，使参演的角色获得本次计入笑点的【好活当赏】状态，持续 2 回合」✓ ⇒ "
+    "`STATE_ENDED[\"自己的阿哈时刻\"]` ⇒ ⭐ **可叠加状态** ✓，**层数＝笑点**："
+    "`scale: party_resource:笑点` × 1 ✓（第 69＋70 件的两个零件 ✓）。"
+    "⚠ **上限用【笑点】自己声明的上限** ✓（不臆造数字 ✓）。"
+    "⚠⚠ **坑（三次探针才量出 ✓）**：写 `maxStacks`（Java 名 ✗）会被键守卫接受、"
+    "然后被 Gson **静默丢弃** ✗（它只认 `@SerializedName(\"max_stacks\")` ✓）⇒ cap 变成 **1** ⇒ 只加 **1** 层 ✗。"
+    "⚠ 同句「阿哈行动后会消耗全部笑点」（消耗 ✗）仍未写 ✓。"
 )
 with io.open(CHAR, "w", encoding="utf-8", newline="\n") as handle:
     json.dump(doc, handle, ensure_ascii=False, indent=2)

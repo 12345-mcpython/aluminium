@@ -15,7 +15,7 @@ written, and the game's servant table states every field it needs except one:
     stance_list             ShowStanceList  (single / all / spread)
     element                 *** NOT IN THIS TABLE ***  -> recorded, not invented
 
-\u26a0 The element is deliberately left out: it is not in the skill table (only `StanceDamageType`, a toughness type), and a made-up default
+⚠ The element is deliberately left out: it is not in the skill table (only `StanceDamageType`, a toughness type), and a made-up default
 would settle a memosprite's damage as Physical when the game says Ice. `Config/ConfigAbility/Servant/*` does carry `DamageType`, so that
 is where it must come from -- a separate step, recorded rather than guessed.
 """

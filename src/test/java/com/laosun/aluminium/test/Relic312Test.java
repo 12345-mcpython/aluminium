@@ -17,8 +17,8 @@ import java.util.Random;
 /**
  * Relic set 312 (2-piece): other allies with the SAME Type as the wearer deal 10% more damage.
  *
- * <p>\u2b50 The elements are read from the units rather than assumed, and the allies are chosen by searching a handful of characters
- * for one that shares the wearer\u2019s element and one that does not -- so the test states the RULE ("same element, not me") and not a
+ * <p>⭐ The elements are read from the units rather than assumed, and the allies are chosen by searching a handful of characters
+ * for one that shares the wearer’s element and one that does not -- so the test states the RULE ("same element, not me") and not a
  * fact about which character happens to be which element.
  */
 public class Relic312Test {
@@ -56,13 +56,13 @@ public class Relic312Test {
             }
             party.add(candidate);
         }
-        Assertions.assertFalse(same.isEmpty(), "the search found an ally of the wearer\u2019s own element");
+        Assertions.assertFalse(same.isEmpty(), "the search found an ally of the wearer’s own element");
         Assertions.assertFalse(different.isEmpty(), "and one of another element");
         Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
         battle = new Battle(party, List.of(enemy), new Random(0));
         battle.startBattle();
         double mineBoost = wearer.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
-        System.out.println("[312] the wearer\u2019s element=" + mine + " ; same-element allies=" + same.size()
+        System.out.println("[312] the wearer’s element=" + mine + " ; same-element allies=" + same.size()
                 + " different=" + different.size());
         for (Character ally : same) {
             System.out.println("[312] same-element ally " + ally.getName() + " (" + ally.getElement()
@@ -77,7 +77,7 @@ public class Relic312Test {
                     "and another element gets nothing (false case)");
         }
         System.out.println("[312] the wearer itself: boost=" + mineBoost);
-        Assertions.assertEquals(0.0, mineBoost, 1e-9, "\u5176\u4ed6\u6211\u65b9\u89d2\u8272 excludes the wearer (false case)");
+        Assertions.assertEquals(0.0, mineBoost, 1e-9, "其他我方角色 excludes the wearer (false case)");
     }
 
     @Test
@@ -92,7 +92,7 @@ public class Relic312Test {
                 break;
             }
         }
-        Assertions.assertNotNull(ally, "the search found an ally of the wearer\u2019s element");
+        Assertions.assertNotNull(ally, "the search found an ally of the wearer’s element");
         Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
         battle = new Battle(List.of(wearer, ally), List.of(enemy), new Random(0));
         battle.startBattle();

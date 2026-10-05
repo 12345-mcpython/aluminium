@@ -17,11 +17,11 @@ import java.util.Random;
 /**
  * `DEALING_DAMAGE` carries the skill key (2026-09-28, round 121), verified through the shipped clause it was built for.
  *
- * <p>Gallagher's enhanced basic attack says \u300c\u5e76\u4f7f\u76ee\u6807\u653b\u51fb\u529b\u964d\u4f4e15.00%\uff0c\u6301\u7eed2\u56de\u5408\u300d. That sentence cannot live on
+ * <p>Gallagher's enhanced basic attack says 「并使目标攻击力降低15.00%，持续2回合」. That sentence cannot live on
  * `ALLY_ATTACK` — that event deliberately carries no aim — so it needed an event with <b>both</b> a target and the skill key.
  * `DEALING_DAMAGE` has the target, and this round taught its instance to carry the key.
  *
- * <p>\u26a0 Both preconditions are asserted first (round 109's lesson), and the deeper one too (round 113's): the swapped skill
+ * <p>⚠ Both preconditions are asserted first (round 109's lesson), and the deeper one too (round 113's): the swapped skill
  * must actually LOAD, otherwise the attack does nothing at all and a failure below would be blamed on the wrong thing.
  */
 public class GallagherEnhancedAttackTest {
@@ -36,7 +36,7 @@ public class GallagherEnhancedAttackTest {
 
         var enhanced = f.gallagher.getSkills().get(SkillType.COMMON);
         Assertions.assertEquals(SkillCategory.NORMAL, enhanced.getData().getCategory(),
-                "\u26a0 deep precondition: the swapped skill LOADS (a data-row id would have been EMPTY)");
+                "⚠ deep precondition: the swapped skill LOADS (a data-row id would have been EMPTY)");
         Assertions.assertTrue(enhanced.getSkillSlot() == 8, "the enhanced row lives under loader key 8");
 
         double before = f.enemy.getAttribute(AttributeType.ATTACK).get();
@@ -44,10 +44,10 @@ public class GallagherEnhancedAttackTest {
         f.battle.fireAfterAttack(f.gallagher, f.enemy, List.of(f.enemy), 1.0);
 
         Assertions.assertTrue(f.enemy.getAttribute(AttributeType.ATTACK).get() < before,
-                "\u300c\u5e76\u4f7f\u76ee\u6807\u653b\u51fb\u529b\u964d\u4f4e 15.00%\uff0c\u6301\u7eed 2 \u56de\u5408\u300d \u2014 an ordinary basic attack would not have done this");
+                "「并使目标攻击力降低 15.00%，持续 2 回合」 — an ordinary basic attack would not have done this");
     }
 
-    /** \u26a0 The negative control: the ordinary basic attack must NOT lower anything. */
+    /** ⚠ The negative control: the ordinary basic attack must NOT lower anything. */
     @Test
     public void theOrdinaryBasicAttackDoesNothing() {
         Fixture f = new Fixture();

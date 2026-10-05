@@ -26,12 +26,12 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * \u82e5\u76ee\u6807\u62e5\u6709\u6b22\u6109\u6280\uff1a\u76ee\u6807\u989d\u5916\u83b7\u5f97 **10** \u70b9\u3010\u597d\u6d3b\u5f53\u8d4f\u3011\uff0c\u5e76**\u4f7f\u5176\u7acb\u5373\u65bd\u653e 1 \u6b21**\u2026\u6b22\u6109\u6280 (2026-10-02).
+ * 若目标拥有欢愉技：目标额外获得 **10** 点【好活当赏】，并**使其立即施放 1 次**…欢愉技 (2026-10-02).
  *
- * <p>\u2b50 The caster is 8009 and the target is 1505: 1505 is one of the nine \u6b22\u6109\u6280 holders (data slot 20) and its own file
- * declares \u3010\u597d\u6d3b\u5f53\u8d4f\u3011, so every half of the sentence has somewhere to land.
+ * <p>⭐ The caster is 8009 and the target is 1505: 1505 is one of the nine 欢愉技 holders (data slot 20) and its own file
+ * declares 【好活当赏】, so every half of the sentence has somewhere to land.
  *
- * <p>\u26a0 The ultimate deals NO damage of its own -- its first parameter is the crit-damage share it grants -- so the enemy's HP
+ * <p>⚠ The ultimate deals NO damage of its own -- its first parameter is the crit-damage share it grants -- so the enemy's HP
  * loss below is the commanded Elation cast and nothing else.
  */
 public class UltElationBranchTest {
@@ -42,7 +42,7 @@ public class UltElationBranchTest {
     private static final String LAUGH = "\\u7b11\\u70b9";
     private static final String GIFT = "\\u597d\\u6d3b\\u5f53\\u8d4f";
 
-    /** \u300c\u83b7\u5f97 5 \u4e2a\u7b11\u70b9\u300d -- onto the SHARED party counter. */
+    /** 「获得 5 个笑点」 -- onto the SHARED party counter. */
     @Test
     public void theUltimateGivesFiveLaughs() {
         Scene scene = fight();
@@ -51,7 +51,7 @@ public class UltElationBranchTest {
         Assertions.assertEquals(5, scene.battle.partyResourceValue(LAUGH), "\\u300c\\u83b7\\u5f97 5 \\u4e2a\\u7b11\\u70b9\\u300d");
     }
 
-    /** \u300c\u76ee\u6807\u989d\u5916\u83b7\u5f97 10 \u70b9\u3010\u597d\u6d3b\u5f53\u8d4f\u3011\u300d -- on the TARGET, not the caster. */
+    /** 「目标额外获得 10 点【好活当赏】」 -- on the TARGET, not the caster. */
     @Test
     public void theTargetGainsTenGift() {
         Scene scene = fight();
@@ -59,10 +59,10 @@ public class UltElationBranchTest {
         cast(scene);
         Assertions.assertEquals(10, scene.target.getResources().value(GIFT),
                 "\\u300c\\u76ee\\u6807\\u989d\\u5916\\u83b7\\u5f97 10 \\u70b9\\u3010\\u597d\\u6d3b\\u5f53\\u8d4f\\u3011\\u300d");
-        Assertions.assertEquals(0, scene.caster.getResources().value(GIFT), "\u800c\\u4e0d\\u662f\\u65bd\\u653e\\u8005\\u81ea\\u5df1\\u7684");
+        Assertions.assertEquals(0, scene.caster.getResources().value(GIFT), "而\\u4e0d\\u662f\\u65bd\\u653e\\u8005\\u81ea\\u5df1\\u7684");
     }
 
-    /** \u300c\u5e76\u4f7f\u5176\u7acb\u5373\u65bd\u653e 1 \u6b21\\u2026\\u6b22\\u6109\\u6280\\u300d -- the commanded cast really lands on the enemy. */
+    /** 「并使其立即施放 1 次\\u2026\\u6b22\\u6109\\u6280\\u300d -- the commanded cast really lands on the enemy. */
     @Test
     public void theCommandedElationCastLands() {
         Scene scene = fight();

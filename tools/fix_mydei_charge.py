@@ -16,7 +16,7 @@ if match is None:
 indent = " " * (len(match.group(1)) - len(match.group(1).lstrip()))
 line = match.group(1)
 # build the CHARGE literal from the BLOODFEUD one's own escape style, by asking the file what it uses
-charge_escaped = line.split('"')[1].replace("\u8840\u4ec7", "\u5929\u8d4b\u5145\u80fd")
+charge_escaped = line.split('"')[1].replace("血仇", "天赋充能")
 if charge_escaped == line.split('"')[1]:
     sys.exit("REFUSING: could not derive the CHARGE literal from %r" % line)
 insert = '\n%sprivate static final String CHARGE = "%s";' % (indent, charge_escaped)

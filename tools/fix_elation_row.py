@@ -14,12 +14,12 @@ text = io.open(PATH, encoding="utf-8").read()
 
 OLD_DECL = """        CanHit mainTarget = targets.getFirst();
 
-        // \u2b50 An ElationDamage row reads its params as [hits, per-hit share, final split share]"""
+        // ⭐ An ElationDamage row reads its params as [hits, per-hit share, final split share]"""
 NEW_DECL = """        CanHit mainTarget = targets.getFirst();
 
         double totalDamage = 0;
 
-        // \u2b50 An ElationDamage row reads its params as [hits, per-hit share, final split share]"""
+        // ⭐ An ElationDamage row reads its params as [hits, per-hit share, final split share]"""
 if text.count(OLD_DECL) != 1:
     raise SystemExit("REFUSING: the declaration anchor appears %d times" % text.count(OLD_DECL))
 text = text.replace(OLD_DECL, NEW_DECL, 1)
@@ -37,7 +37,7 @@ if text.count(OLD_TAIL) != 1:
 text = text.replace(OLD_TAIL, NEW_TAIL, 1)
 
 OLD_IF = "        if (data.getSkillType() == com.laosun.aluminium.enums.SkillType.ELATION_SKILL) {"
-NEW_IF = ("        // \u26a0 `getSkillType()` hands back the DATA's own spelling, which for these rows is `ElationDamage`; the enum's name is\n"
+NEW_IF = ("        // ⚠ `getSkillType()` hands back the DATA's own spelling, which for these rows is `ElationDamage`; the enum's name is\n"
           "        // accepted too, so the branch does not depend on which of the two the loader kept (the first version compared a String\n"
           "        // to the enum and did not compile).\n"
           "        String elationKind = data.getSkillType();\n"

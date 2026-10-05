@@ -17,7 +17,7 @@ import sys
 CHARS = "src/main/resources/characters/1402.json"
 SKILLS = "src/main/resources/data/skills.json"
 SLOT = 14
-STANCE = "\u81f3\u9ad8\u4e4b\u59ff"
+STANCE = "至高之姿"
 HANDLE = "MServant_CyreneServant_00_AmazingBuff_Aglaea"
 BOOST, PIERCE = "ALL_DAMAGE_TYPE_BOOST", "DEFENCE_IGNORE"
 ENOUGH = "self_summon_count >= 1"
@@ -38,11 +38,11 @@ for new_id in NEW_IDS:
     if any(r.get("id") == new_id for r in rules):
         sys.exit("REFUSING: %s is already there" % new_id)
 
-SOURCE = ("1415 \u6614\u6d9f \u5fc6\u7075\u6280\u80fd 12 \u300c\u732e\u4e88\u300c\u6d6a\u6f2b\u300d\u4e4b\u8bd7\u300d\uff08\u6570\u636e\u69fd\u4f4d 14\uff09\uff1a"
-          "\u300c\u963f\u683c\u83b1\u96c5\u4e0e\u8863\u5320\u9020\u6210\u7684\u4f24\u5bb3\u63d0\u9ad8 #2% \u5e76\u65e0\u89c6\u76ee\u6807 #3% \u7684\u9632\u5fa1\uff0c"
-          "\u6301\u7eed\u81f3\u963f\u683c\u83b1\u96c5\u9000\u51fa\u3010" + STANCE + "\u3011\u72b6\u6001\u3002\u300d")
-NOTE = ("\u2b50 \u4e24\u4e2a\u4fee\u9970\u5e26\u540d\u5b57\uff08`buff`\uff0c\u7528\u6e38\u620f\u81ea\u5df1\u7684\u4fee\u9970\u540d `" + HANDLE + "`\uff09\uff0c"
-        "\u2b50 \u6570\u503c\u8d70 `percent_from_cast_param`\uff08#2 \u21d2 \u7d22\u5f15 1\uff0c#3 \u21d2 \u7d22\u5f15 2\uff09\uff0c\u56e0\u4e3a\u5b83\u4eec\u968f\u7b49\u7ea7\u53d8\u3002")
+SOURCE = ("1415 昔涟 忆灵技能 12 「献予「浪漫」之诗」（数据槽位 14）："
+          "「阿格莱雅与衣匠造成的伤害提高 #2% 并无视目标 #3% 的防御，"
+          "持续至阿格莱雅退出【" + STANCE + "】状态。」")
+NOTE = ("⭐ 两个修饰带名字（`buff`，用游戏自己的修饰名 `" + HANDLE + "`），"
+        "⭐ 数值走 `percent_from_cast_param`（#2 ⇒ 索引 1，#3 ⇒ 索引 2），因为它们随等级变。")
 
 def named(target):
     return [{"op": "MODIFY_ATTR", "attribute": BOOST, "percent_from_cast_param": 1,
@@ -54,30 +54,30 @@ rules.append({
     "id": NEW_IDS[0], "on": "CAST_SETUP",
     "when": ["target == self", "actor is_summon", "from_skill_id == " + str(SLOT)],
     "do": named("self"), "source": SOURCE,
-    "note": NOTE + " \u26a0 \u8fd9\u4e00\u6761\u53ea\u7ba1\u5979\u81ea\u5df1\uff1a\u300c\u5bf9\u8863\u5320\u4e5f\u751f\u6548\u300d\u9700\u8981\u5fc6\u7075\u5728\u573a\uff0c\u800c\u90a3\u4e2a\u6761\u4ef6\u4e0d\u8be5\u538b\u5728\u5979\u8eab\u4e0a\u3002",
+    "note": NOTE + " ⚠ 这一条只管她自己：「对衣匠也生效」需要忆灵在场，而那个条件不该压在她身上。",
 })
 rules.append({
     "id": NEW_IDS[1], "on": "CAST_SETUP",
     "when": ["target == self", "actor is_summon", "from_skill_id == " + str(SLOT), ENOUGH],
     "do": named("summon"), "source": SOURCE,
-    "note": "\u300c\u963f\u683c\u83b1\u96c5**\u4e0e\u8863\u5320**\u300d\u7684\u8863\u5320\u90a3\u4e00\u534a\u3002" + NOTE,
+    "note": "「阿格莱雅**与衣匠**」的衣匠那一半。" + NOTE,
 })
 rules.append({
     "id": NEW_IDS[2], "on": "STATE_ENDED",
     "when": ["self state_ended " + STANCE],
     "do": [{"op": "REMOVE_STATE", "buff": HANDLE, "kind": "own", "target": "self"}],
     "source": SOURCE,
-    "note": ("\u2b50 \u65f6\u957f\uff1a\u770b\u7740 `STATE_ENDED` \u7684\u4f34\u968f\u89c4\u5219\u3002\u2b50 `\"kind\": \"own\"` \u662f\u5173\u952e\uff1a"
-             "\u4e0a\u4e00\u8f6e\u53ea\u6309**\u540d\u5b57**\u6458\uff0c\u628a\u5979**\u672c\u6765\u5c31\u6709\u7684 0.2** \u4e5f\u6458\u4e86\u4e0b\u6765\uff08\u5b9e\u6d4b\uff1a"
-             "\u4e24\u8fb9\u90fd\u53d8 0.0\uff0c\u800c\u5b83\u4eec\u5728\u8fd9\u53e5\u8bd7\u4e4b\u524d\u90fd\u662f 0.2\uff09\u3002\u8fd9\u4e2a\u6765\u6e90\u7b5b\u5b50\u5c31\u662f "
-             "`EXTEND_BUFF` \u4e00\u76f4\u5728\u7528\u7684\u90a3\u4e2a\uff08`extendBuffsFrom(ctx.owner(), \u2026)`\uff09\u3002"),
+    "note": ("⭐ 时长：看着 `STATE_ENDED` 的伴随规则。⭐ `\"kind\": \"own\"` 是关键："
+             "上一轮只按**名字**摘，把她**本来就有的 0.2** 也摘了下来（实测："
+             "两边都变 0.0，而它们在这句诗之前都是 0.2）。这个来源筛子就是 "
+             "`EXTEND_BUFF` 一直在用的那个（`extendBuffsFrom(ctx.owner(), …)`）。"),
 })
 rules.append({
     "id": NEW_IDS[3], "on": "STATE_ENDED",
     "when": ["self state_ended " + STANCE, ENOUGH],
     "do": [{"op": "REMOVE_STATE", "buff": HANDLE, "kind": "own", "target": "summon"}],
     "source": SOURCE,
-    "note": "\u540c\u4e0a\uff0c\u4f46\u6458\u7684\u662f\u8863\u5320\u8eab\u4e0a\u90a3\u4efd\u3002",
+    "note": "同上，但摘的是衣匠身上那份。",
 })
 
 if isinstance(doc, list):

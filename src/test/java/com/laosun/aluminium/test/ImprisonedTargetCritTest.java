@@ -28,7 +28,7 @@ public class ImprisonedTargetCritTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
     private static final int RELIC_LEVEL = 15;
-    private static final String IMPRISONED = "\u7981\u9522";
+    private static final String IMPRISONED = "禁锢";
 
     @Test
     public void theFourthPieceAddsCritDamageAgainstAnImprisonedTarget() {

@@ -24,7 +24,7 @@ public class MozeTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** \u26a0 The additional damage needs the Prey mark, and its 30% is compared with a hand-built 60% reference in the same pipeline. */
+    /** ⚠ The additional damage needs the Prey mark, and its 30% is compared with a hand-built 60% reference in the same pipeline. */
     @Test
     public void theAdditionalDamageNeedsPrey() {
         double unmarked = additionalLoss(true, false);
@@ -32,13 +32,13 @@ public class MozeTest {
         double reference = additionalLoss(false, true);
 
         Assertions.assertEquals(0.0, unmarked, 1e-9,
-                "\u300c\u6211\u65b9\u76ee\u6807\u653b\u51fb\u3010\u730e\u7269\u3011\u540e\u300d -- without the mark, nothing");
+                "「我方目标攻击【猎物】后」 -- without the mark, nothing");
         Assertions.assertTrue(marked > 0, "with the mark, the additional damage lands");
         Assertions.assertEquals(0.5, marked / reference, 0.05,
                 "30% against a hand-built 60% reference: " + marked + " vs " + reference);
     }
 
-    /** \u26a0 The Ultimate fires the talent's follow-up, and the number is the talent's own 160%. */
+    /** ⚠ The Ultimate fires the talent's follow-up, and the number is the talent's own 160%. */
     @Test
     public void theUltimateFiresTheTalentsFollowUp() {
         double fired = ultFollowUp();
@@ -62,14 +62,14 @@ public class MozeTest {
             TriggerSpecs.set(effect, "element", "Thunder");
             TriggerSpecs.set(effect, "target", "target");
             moze.setTriggerTable(new TriggerTable(MOZE, List.of(TriggerSpecs.rule(
-                    TriggerEvent.ALLY_ATTACK.name(), List.of("target has_state \u730e\u7269"), effect))));
+                    TriggerEvent.ALLY_ATTACK.name(), List.of("target has_state 猎物"), effect))));
         }
         Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
         Battle battle = new Battle(List.of(moze, ally), List.of(enemy), fixed());
         battle.startBattle();
         if (mark) {
             // Applied directly in BOTH paths, so the only difference between them is the percentage (round 207's lesson).
-            enemy.getBuffManager().addBuff(new com.laosun.aluminium.models.buff.StateBuff("\u730e\u7269", 1, true));
+            enemy.getBuffManager().addBuff(new com.laosun.aluminium.models.buff.StateBuff("猎物", 1, true));
         }
         double before = enemy.getCurrentHp();
         battle.fireTriggers(TriggerEvent.ALLY_ATTACK, ally, enemy, 0, 0);

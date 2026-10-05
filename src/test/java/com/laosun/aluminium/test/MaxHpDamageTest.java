@@ -25,7 +25,7 @@ public class MaxHpDamageTest {
     private static final double CONTENT = 0.4;
     private static final double REFERENCE = 0.5;
 
-    /** \u26a0 The content's 40% against a reference 50%, same pipeline and same scale. */
+    /** ⚠ The content's 40% against a reference 50%, same pipeline and same scale. */
     @Test
     public void theTraceAddsFortyPercentOfHerMaxHp() {
         double content = basicAttackLoss(false, 0.0);
@@ -36,14 +36,14 @@ public class MaxHpDamageTest {
                 "content " + content + " vs reference " + reference + " (expected ratio " + (CONTENT / REFERENCE) + ")");
     }
 
-    /** \u26a0 The control: with no rule installed, a basic attack adds nothing beyond its own data. */
+    /** ⚠ The control: with no rule installed, a basic attack adds nothing beyond its own data. */
     @Test
     public void withoutTheRuleNothingExtra() {
         Assertions.assertEquals(0.0, basicAttackLoss(false, 0.0) - basicAttackLoss(false, 0.0), 1e-9,
                 "the fixture is deterministic");
     }
 
-    /** \u26a0 The engine refuses a Max-HP share it cannot read rather than guessing. */
+    /** ⚠ The engine refuses a Max-HP share it cannot read rather than guessing. */
     @Test
     public void anUnknownScaleIsRefused() {
         Character hero = CharacterFactory.create(NATASHA, LEVEL);

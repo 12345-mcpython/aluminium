@@ -29,7 +29,7 @@ public class CastShortensOwnEffectsTest {
     private static final int CYRENE = 1415;
     private static final int ALLY = 1002;
     private static final int MONSTER = 1002011;
-    private static final String MARK = "\u6d4b\u8bd5\u6301\u7eed\u6548\u679c";
+    private static final String MARK = "测试持续效果";
 
     @Test
     public void theMastersEffectShortensButTheMemospriteOwnDoesNot() {
@@ -71,7 +71,7 @@ public class CastShortensOwnEffectsTest {
                 + " ; the memosprite still has it = " + spriteStill);
 
         Assertions.assertFalse(masterStill,
-                "\u300c\u5fb7\u8c2c\u6b4c\u65bd\u653e\u6280\u80fd\u540e\u4f7f\u81ea\u8eab\u6240\u6709\u6301\u7eed\u6548\u679c\u6301\u7eed\u56de\u5408\u6570\u51cf 1\u300d-- 2 became 1, so one tick ends it");
+                "「德谬歌施放技能后使自身所有持续效果持续回合数减 1」-- 2 became 1, so one tick ends it");
         Assertions.assertTrue(spriteStill,
                 "and the MEMOSPRITE's own mark is untouched -- `self` in this file is the master");
     }

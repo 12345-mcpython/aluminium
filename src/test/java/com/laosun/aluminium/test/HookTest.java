@@ -25,7 +25,7 @@ public class HookTest {
     private static final int HOOK = 1109;
     private static final int LEVEL = 80;
 
-    /** \u26a0 His skill's burn lands as a DOT with the document's magnitude, and the trace pays energy on the ultimate. */
+    /** ⚠ His skill's burn lands as a DOT with the document's magnitude, and the trace pays energy on the ultimate. */
     @Test
     public void hisBurnLandsAndHisUltimateTracePaysEnergy() {
         Fixture f = new Fixture(0);
@@ -34,14 +34,14 @@ public class HookTest {
         f.battle.castImmediate(f.hook.getSkills().get(SkillType.SKILL), f.hook, List.of(f.enemy));
 
         Assertions.assertTrue(f.enemy.getBuffManager().hasState("灼烧"),
-                "\u300c\u6709100%\u7684\u57fa\u7840\u6982\u7387\u4f7f\u5176\u9677\u5165\u707c\u70e7\u72b6\u6001\u300d");
-        Assertions.assertFalse(f.enemy.getBuffManager().allBuffsOf(DotBuff.class).isEmpty(), "\u2026as a damage-over-time state");
+                "「有100%的基础概率使其陷入灼烧状态」");
+        Assertions.assertFalse(f.enemy.getBuffManager().allBuffsOf(DotBuff.class).isEmpty(), "…as a damage-over-time state");
 
         double energyBefore = f.hook.getCurrentEnergy();
         f.battle.castImmediate(f.hook.getSkills().get(SkillType.ULTRA), f.hook, List.of(f.enemy));
 
         Assertions.assertTrue(f.hook.getCurrentEnergy() > energyBefore,
-                "\u300c\u65bd\u653e\u7ec8\u7ed3\u6280\u540e\uff0c\u864e\u514b\u7684\u884c\u52a8\u63d0\u524d20%\u5e76\u989d\u5916\u6062\u590d5\u70b9\u80fd\u91cf\u300d \u2014 the trace pays on the cast");
+                "「施放终结技后，虎克的行动提前20%并额外恢复5点能量」 — the trace pays on the cast");
     }
 
     /** Census: the burn, the level convention, and the five traces/eidolons are all there. */

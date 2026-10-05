@@ -31,13 +31,13 @@ public class TrickeryOdeDamageTest {
         System.out.println("[trickery] without the ode = " + withoutOde + " ; with it = " + withOde.gain
                 + " (the cast row says " + withOde.expected + ")");
 
-        // \u2b50 Her OWN kit already carries an `ALL_DAMAGE_TYPE_BOOST` (measured 0.2), and the ode's modifier REPLACES it rather than adding to it --
+        // ⭐ Her OWN kit already carries an `ALL_DAMAGE_TYPE_BOOST` (measured 0.2), and the ode's modifier REPLACES it rather than adding to it --
         // same attribute, same target, and that is the engine's own rule. So the control is a FRESH character, not zero.
         double hers = CharacterFactory.create(CIPHER, LEVEL).getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
         Assertions.assertNotEquals(withoutOde.gain, withOde.gain, 1e-9,
-                "casting the ode CHANGES her boost -- and the change is the cast row\u2019s own #1");
+                "casting the ode CHANGES her boost -- and the change is the cast row’s own #1");
         Assertions.assertEquals(withOde.expected, withOde.gain, Math.abs(withOde.expected) * 1e-6,
-                "\u300c\u4f7f\u8d5b\u98de\u513f\u9020\u6210\u7684\u4f24\u5bb3\u63d0\u9ad8 #1%\u300d-- and #1 runs with level");
+                "「使赛飞儿造成的伤害提高 #1%」-- and #1 runs with level");
     }
 
     private record Boost(double gain, double expected) {

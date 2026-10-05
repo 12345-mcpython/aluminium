@@ -24,7 +24,7 @@ doc["rules"].append({
     "id": PROBE_ID,
     "do": [{
         "op": "APPLY_BUFF",
-        "buff": "\u597d\u6d3b\u5f53\u8d4f",
+        "buff": "好活当赏",
         "turns": 2,
         "target": "self",
         "stackable": True,

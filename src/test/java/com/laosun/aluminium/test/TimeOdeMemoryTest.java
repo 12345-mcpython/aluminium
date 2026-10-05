@@ -12,7 +12,7 @@ import java.util.Random;
 /**
  * 1415's memosprite skill 24, second sentence (2026-10-02): 「长夜月施放战技/终结技后，额外获得 #2 点【忆质】」.
  *
- * \u2b50 Two-sided: with the ode cast at her, her skill grants the captured #2 (1 at this level); without it nothing was captured, so nothing is granted. The value never appears as
+ * ⭐ Two-sided: with the ode cast at her, her skill grants the captured #2 (1 at this level); without it nothing was captured, so nothing is granted. The value never appears as
  * a literal in content: it is read from the ode's own row and handed over through a resource.
  */
 public class TimeOdeMemoryTest {
@@ -21,7 +21,7 @@ public class TimeOdeMemoryTest {
     private static final int CYRENE = 1415;
     private static final int MONSTER = 1002011;
     private static final int ODE_SLOT = 24;
-    private static final String MEM = "\u4ebf\u8d28";
+    private static final String MEM = "亿质";
 
     @Test
     public void herSkillGrantsTheCapturedMemory() {
@@ -53,7 +53,7 @@ public class TimeOdeMemoryTest {
 
         Character her = battle.characters.get(1);
         int before = her.getResources().value(MEM);
-        // \u2b50 The sentence covers 战技 OR 终结技, and her own kit has a DELEGATE_DAMAGE rule on the skill slot that names the ultimate -- measured: casting the skill
+        // ⭐ The sentence covers 战技 OR 终结技, and her own kit has a DELEGATE_DAMAGE rule on the skill slot that names the ultimate -- measured: casting the skill
         // trips that rule with "names ULTRA (slot 3) but the cast in progress is slot 2". The ultimate path is the same clause and does not collide.
         var skill = her.getSkills().get(com.laosun.aluminium.enums.SkillType.ULTRA);
         Assertions.assertNotNull(skill, "precondition: she has an ultimate");

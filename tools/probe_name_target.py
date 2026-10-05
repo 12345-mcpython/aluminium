@@ -22,8 +22,8 @@ for keyword in ("character:", "ally_with", "has_state", "by_id", "the_duke"):
 
 # 2. readers: 「使<name>获得」
 corpus = "E:/turnbasedgamedata/aluminium_texts"
-NAMES = ["\u523b\u5f8b\u5fb7\u83c8", "\u6258\u5e15", "\u666f\u5143", "\u7075\u7802", "\u6614\u6d9f", "\u98ce\u5807",
-         "\u963f\u683c\u83b1\u96c5", "\u9050\u8776", "\u957f\u591c\u6708", "\u77e5\u66f4\u9e1f"]
+NAMES = ["刻律德菈", "托帕", "景元", "灵砂", "昔涟", "风堇",
+         "阿格莱雅", "遐蝶", "长夜月", "知更鸟"]
 counts = {}
 examples = []
 if os.path.isdir(corpus):
@@ -34,7 +34,7 @@ if os.path.isdir(corpus):
         text = re.sub(r"<[^>]+>", " ", text)
         text = re.sub(r"\s+", " ", text)
         for character in NAMES:
-            for pattern in ("\u4f7f" + character + "\u83b7\u5f97", character + "\u83b7\u5f97"):
+            for pattern in ("使" + character + "获得", character + "获得"):
                 hits = text.count(pattern)
                 if hits:
                     counts[pattern] = counts.get(pattern, 0) + hits

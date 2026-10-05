@@ -14,14 +14,14 @@ substring built inside a shell one-liner kept failing.
 import io
 
 PATH = "EXPRESSION.md"
-PREFIX = "| \u89d2\u8272\u6280\u80fd\u300c\u6309\u5217\u4f4d\uff0f\u6bb5\u6570\u7ed3\u7b97\u300d"
-NEW = ("| \u6b22\u4e50\u6280\u300c**8 \u6b21**\u968f\u673a\u5355\u4f53\u2026\u300d\u7684**\u6309\u6b21\u6570\u7ed3\u7b97** "
-       "| \u5f15\u64ce\u7684\u201cN \u6b21\u547d\u4e2d\u201d\u662f**\u6309\u6280\u80fd\u79cd\u7c7b**\u8bfb\u7684\uff08\u5982 `BOUNCE` \u53d6**\u7b2c\u4e8c\u4e2a**\u53c2\u6570 \u2713\uff09\uff0c"
-       "\u800c**\u6b22\u4e50\u6280\u7684\u884c\u9996\u5217\u5c31\u662f\u6b21\u6570**\u8fd9\u4e00\u79cd\u6ca1\u6709\u8868\u793a \u2717\uff1b\u26a0 \u53e6\u7f3a\uff1a"
-       "**\u6211\u65b9 `data/` \u91cc\u4e00\u4e2a elation \u6280\u80fd\u884c\u90fd\u6ca1\u6709**\uff08\u626b\u5230 0 \u4e2a \u2717\uff09 "
-       "| `8009`\uff0f`8010`\uff08**2 \u4f4d**\uff0c\u9010\u6761\u8bfb\u5230 \u2713\uff1b\u26a0 \u539f\u767b\u8bb0\u5199 5 \u4f4d\u800c "
-       "`1505`\uff0f`1502`\uff0f`1506` **\u9010\u6761\u8bfb\u4e0d\u5230** \u2717 \u21d2 \u6309\u672c\u8282\u89c4\u77e9\u6539\u4e3a 2 \u4f4d\uff09 "
-       "| \u6280\u80fd\u884c\u6a21\u578b \uff0b \u6b22\u4e50\u6280\u7684\u6570\u636e\u884c |")
+PREFIX = "| 角色技能「按列位／段数结算」"
+NEW = ("| 欢乐技「**8 次**随机单体…」的**按次数结算** "
+       "| 引擎的“N 次命中”是**按技能种类**读的（如 `BOUNCE` 取**第二个**参数 ✓），"
+       "而**欢乐技的行首列就是次数**这一种没有表示 ✗；⚠ 另缺："
+       "**我方 `data/` 里一个 elation 技能行都没有**（扫到 0 个 ✗） "
+       "| `8009`／`8010`（**2 位**，逐条读到 ✓；⚠ 原登记写 5 位而 "
+       "`1505`／`1502`／`1506` **逐条读不到** ✗ ⇒ 按本节规矩改为 2 位） "
+       "| 技能行模型 ＋ 欢乐技的数据行 |")
 
 lines = io.open(PATH, encoding="utf-8").read().split("\n")
 hits = [i for i, line in enumerate(lines) if line.startswith(PREFIX)]

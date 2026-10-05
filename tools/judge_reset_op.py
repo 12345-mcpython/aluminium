@@ -32,7 +32,7 @@ JAVA = ('package com.laosun.aluminium.test;' + NL + NL
         + 'import org.junit.jupiter.api.Test;' + NL + NL
         + 'import java.util.List;' + NL + 'import java.util.Random;' + NL + NL
         + '/**' + NL
-        + ' * RESET_TRIGGER_LIMIT (2026-09-30; readers 1305, 1207, 1403): 「\u65bd\u653e\u7ec8\u7ed3\u6280\u540e\u91cd\u7f6e\u8be5\u6548\u679c\u89e6\u53d1\u6b21\u6570\u300d.' + NL
+        + ' * RESET_TRIGGER_LIMIT (2026-09-30; readers 1305, 1207, 1403): 「施放终结技后重置该效果触发次数」.' + NL
         + ' *' + NL
         + ' * <p>One rule is capped at one firing per turn; a second rule on ULT_CAST clears exactly that rule limit, so' + NL
         + ' * the capped rule fires again. ⚠ resetTriggerLimits() would clear EVERY rule of the unit instead.' + NL
@@ -53,7 +53,7 @@ JAVA = ('package com.laosun.aluminium.test;' + NL + NL
         + '        TriggerSpecs.set(stack, ' + Q + 'target' + Q + ', ' + Q + 'self' + Q + ');' + NL
         + '        // ADD_STACK has no default lifetime: the loader names turns / permanent / until (measured in round 733).' + NL
         + '        TriggerSpecs.set(stack, ' + Q + 'permanent' + Q + ', Boolean.TRUE);' + NL
-        + '        // \u26a0 addStack defaults the cap to 1, so a probe without this saturates at one and looks like a' + NL
+        + '        // ⚠ addStack defaults the cap to 1, so a probe without this saturates at one and looks like a' + NL
         + '        // frozen failure (measured in round 747 after six rounds of chasing the wrong thing).' + NL
         + '        TriggerSpecs.set(stack, ' + Q + 'maxStacks' + Q + ', 3);' + NL
         + '        TriggerSpec capped = TriggerSpecs.rule(TriggerEvent.SKILL_CAST.name(), List.of(), stack);' + NL

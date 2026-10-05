@@ -28,9 +28,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * \u300c\u901f\u5ea6\u5927\u4e8e\u7b49\u4e8e 180 \u70b9\u65f6\uff0c\u6211\u65b9\u5168\u4f53\u9020\u6210\u7684\u4f24\u5bb3\u63d0\u9ad8 20%\u300d against her own table (1415:823, 2026-10-02).
+ * 「速度大于等于 180 点时，我方全体造成的伤害提高 20%」 against her own table (1415:823, 2026-10-02).
  *
- * <p>\u26a0 Her talent writes the SAME attribute at BATTLE_START (measured 0.2), so the reading here is the TOTAL, not a delta:
+ * <p>⚠ Her talent writes the SAME attribute at BATTLE_START (measured 0.2), so the reading here is the TOTAL, not a delta:
  * 0.4 means the two add, 0.2 means the slot does not stack. This asserts 0.4 on purpose -- a red saying "was 0.2" is the
  * answer.
  */
@@ -38,7 +38,7 @@ public class CyreneSpeedThresholdTest {
     private static final int OWNER = 1415;
     private static final int MONSTER = 1002011;
 
-    /** \u2b50 The three readings: talent alone, and talent plus the trace past the threshold. */
+    /** ⭐ The three readings: talent alone, and talent plus the trace past the threshold. */
     @Test
     public void theTraceAndTheTalentStack() {
         Assertions.assertEquals(0.2, totalWithExtraSpeed(0), 1e-6, "her talent alone is 20%");

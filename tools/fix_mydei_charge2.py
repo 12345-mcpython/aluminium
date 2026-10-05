@@ -18,7 +18,7 @@ print("stored literal: %r" % stored)
 
 two = "\\\\"          # two characters: backslash backslash
 prefix = two if two in stored else "\\"
-charge = "".join(prefix + "u%04X" % ord(ch) for ch in "\u5929\u8d4b\u5145\u80fd")
+charge = "".join(prefix + "u%04X" % ord(ch) for ch in "天赋充能")
 indent = " " * (len(match.group(1)) - len(match.group(1).lstrip()))
 insert = '\n%sprivate static final String CHARGE = "%s";' % (indent, charge)
 text = text[:match.end(1)] + insert + text[match.end(1):]

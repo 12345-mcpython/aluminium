@@ -18,7 +18,7 @@ import java.util.Random;
 /**
  * Light cone 22007: after the wearer's Ultimate, the WHOLE party gains 8% elation damage for 1 turn.
  *
- * <p>\u2b50 \u300c\u6211\u65b9\u5168\u4f53\u300d includes the wearer, so the judge reads two allies and expects both to move -- a modifier
+ * <p>⭐ 「我方全体」 includes the wearer, so the judge reads two allies and expects both to move -- a modifier
  * aimed only at the wearer would show up here.
  */
 public class Cone22007Test {
@@ -53,7 +53,7 @@ public class Cone22007Test {
         double wearerDelta = wearer.getAttribute(AttributeType.ELATION_DAMAGE_BOOST).get() - wearerBase;
         double allyDelta = ally.getAttribute(AttributeType.ELATION_DAMAGE_BOOST).get() - allyBase;
         System.out.println("[22007] after the Ultimate: wearer +" + wearerDelta + " ally +" + allyDelta);
-        Assertions.assertEquals(SHARE, wearerDelta, 1e-9, "the wearer is part of \u6211\u65b9\u5168\u4f53");
+        Assertions.assertEquals(SHARE, wearerDelta, 1e-9, "the wearer is part of 我方全体");
         Assertions.assertEquals(SHARE, allyDelta, 1e-9, "and so is the ally");
     }
 

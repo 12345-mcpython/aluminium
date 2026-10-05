@@ -26,12 +26,12 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1407\uff1a\u300c\u82e5\u6211\u65b9\u89d2\u8272\u53d7\u5230\u81f4\u547d\u653b\u51fb\uff0c\u5219\u2026\u83b7\u5f97\u3010\u6708\u8327\u3011\u72b6\u6001\u3002\u3010\u6708\u8327\u3011\u72b6\u6001\u4e0b\u7684\u89d2\u8272\u4f1a\u6682\u65f6\u5ef6\u540e\u9677\u5165\u65e0\u6cd5\u6218\u6597\u72b6\u6001\uff0c
- * \u4e14\u53ef\u4ee5\u6b63\u5e38\u884c\u52a8\u3002\u82e5\u884c\u52a8\u540e\u3001\u4e0b\u4e00\u6b21\u56de\u5408\u5f00\u59cb\u524d\u5f53\u524d\u751f\u547d\u503c\u63d0\u9ad8\u6216\u83b7\u5f97\u62a4\u76fe\uff0c\u5219\u89e3\u9664\u3010\u6708\u8327\u3011\u72b6\u6001\uff0c\u5426\u5219\u5c06\u7acb\u5373\u9677\u5165\u65e0\u6cd5\u6218\u6597\u72b6\u6001\u300d (2026-10-02).
+ * 1407：「若我方角色受到致命攻击，则…获得【月茧】状态。【月茧】状态下的角色会暂时延后陷入无法战斗状态，
+ * 且可以正常行动。若行动后、下一次回合开始前当前生命值提高或获得护盾，则解除【月茧】状态，否则将立即陷入无法战斗状态」 (2026-10-02).
  *
- * <p>\u2b50 ONE SENTENCE, THREE READINGS: it does not fall; it falls once its own turn is over; a heal before that saves it.
+ * <p>⭐ ONE SENTENCE, THREE READINGS: it does not fall; it falls once its own turn is over; a heal before that saves it.
  *
- * <p>\u26a0 TWO SCENES, because a healing teammate is a confound for the first two readings: measured, 1211's own kit answered
+ * <p>⚠ TWO SCENES, because a healing teammate is a confound for the first two readings: measured, 1211's own kit answered
  * the lethal blow and left the victim at half HP, which is a heal, which is exactly what ends the trace. Scene A therefore
  * holds the owner and the victim alone.
  */
@@ -40,19 +40,19 @@ public class MooncocoonTest {
     private static final int HEALER = 1211;
     private static final int VICTIM = 1002;
     private static final int MONSTER = 1002011;
-    private static final String STATE = "\u6708\u8327";
+    private static final String STATE = "月茧";
 
-    /** \u2b50\u2b50 \u300c\u6682\u65f6\u5ef6\u540e\u9677\u5165\u65e0\u6cd5\u6218\u6597\u72b6\u6001\u300d: the blow is HELD -- the victim is alive, at zero HP, carrying the trace. */
+    /** ⭐⭐ 「暂时延后陷入无法战斗状态」: the blow is HELD -- the victim is alive, at zero HP, carrying the trace. */
     @Test
     public void theBlowIsHeld() {
         Scene scene = alone();
         strike(scene);
-        Assertions.assertFalse(scene.victim.isDeath(), "\u300c\u4e0d\u4f1a\u9677\u5165\u65e0\u6cd5\u6218\u6597\u72b6\u6001\u300d");
-        Assertions.assertEquals(0.0, scene.victim.getCurrentHp(), 1e-9, "\u5b83\u771f\u7684\u505c\u5728 0 \u8840 \u2014\u2014 \u90a3\u5c31\u662f\u300c\u5ef6\u540e\u300d");
-        Assertions.assertTrue(scene.victim.getBuffManager().hasState(STATE), "\u300c\u83b7\u5f97\u3010\u6708\u8327\u3011\u72b6\u6001\u300d");
+        Assertions.assertFalse(scene.victim.isDeath(), "「不会陷入无法战斗状态」");
+        Assertions.assertEquals(0.0, scene.victim.getCurrentHp(), 1e-9, "它真的停在 0 血 —— 那就是「延后」");
+        Assertions.assertTrue(scene.victim.getBuffManager().hasState(STATE), "「获得【月茧】状态」");
     }
 
-    /** \u2b50\u2b50 \u300c\u884c\u52a8\u540e\u2026\u5426\u5219\u5c06\u7acb\u5373\u9677\u5165\u65e0\u6cd5\u6218\u6597\u72b6\u6001\u300d: nothing saved it, so its own turn's END commits the death. */
+    /** ⭐⭐ 「行动后…否则将立即陷入无法战斗状态」: nothing saved it, so its own turn's END commits the death. */
     @Test
     public void itsOwnTurnEndsIt() {
         Scene scene = alone();
@@ -60,13 +60,13 @@ public class MooncocoonTest {
         Assertions.assertFalse(scene.victim.isDeath(), "precondition: the blow was held");
         takeItsTurn(scene);
         Assertions.assertTrue(scene.victim.isDeath(),
-                "\u6ca1\u6709\u4eba\u6551\u5b83 \u21d2 \u5b83\u81ea\u5df1\u7684\u56de\u5408\u7ed3\u675f\u65f6\u5019\u5012\u4e0b\uff08\u4e14\u5b83\u786e\u5b9e\u884c\u52a8\u8fc7 \u2713\uff09");
+                "没有人救它 ⇒ 它自己的回合结束时候倒下（且它确实行动过 ✓）");
     }
 
     /**
-     * \u2b50\u2b50 \u300c\u82e5\u884c\u52a8\u540e\u2026\u5f53\u524d\u751f\u547d\u503c\u63d0\u9ad8\u2026\u5219\u89e3\u9664\u3010\u6708\u8327\u3011\u72b6\u6001\u300d: a real heal ends the trace, and then it does NOT fall.
+     * ⭐⭐ 「若行动后…当前生命值提高…则解除【月茧】状态」: a real heal ends the trace, and then it does NOT fall.
      *
-     * <p>\u26a0 The heal is 1211's own answer to the same lethal blow -- i.e. a second, shipped reader of `LETHAL_DAMAGE`
+     * <p>⚠ The heal is 1211's own answer to the same lethal blow -- i.e. a second, shipped reader of `LETHAL_DAMAGE`
      * intervening -- which is what makes this a real end-to-end reading: one character's lethal-damage heal fires
      * `HEALED`, and 1407's trace is removed by it.
      */
@@ -76,9 +76,9 @@ public class MooncocoonTest {
         strike(scene);
         Assertions.assertTrue(scene.victim.getCurrentHp() > 0, "precondition: the teammate's heal really restored HP");
         Assertions.assertFalse(scene.victim.getBuffManager().hasState(STATE),
-                "\u751f\u547d\u503c\u63d0\u9ad8 \u21d2 \u3010\u6708\u8327\u3011\u89e3\u9664");
+                "生命值提高 ⇒ 【月茧】解除");
         takeItsTurn(scene);
-        Assertions.assertFalse(scene.victim.isDeath(), "\u3010\u6708\u8327\u3011\u5df2\u89e3\u9664 \u21d2 \u5b83\u4e0d\u518d\u5012\u4e0b");
+        Assertions.assertFalse(scene.victim.isDeath(), "【月茧】已解除 ⇒ 它不再倒下");
     }
 
     // ==================================================================
@@ -93,7 +93,7 @@ public class MooncocoonTest {
         }
     }
 
-    /** \u2b50 The unpolluted scene: nobody in it can heal, so the deferral is observable on its own. */
+    /** ⭐ The unpolluted scene: nobody in it can heal, so the deferral is observable on its own. */
     private static Scene alone() {
         Character owner = CharacterFactory.create(OWNER, 80, false, null, null, 0);
         Character victim = CharacterFactory.create(VICTIM, 80, false, null, null, 0);
@@ -122,7 +122,7 @@ public class MooncocoonTest {
         scene.battle.processRequests();
     }
 
-    /** \u26a0 A WHOLE turn: the early tick on `beforeMove`, the late tick and TURN_END on `afterMove`. */
+    /** ⚠ A WHOLE turn: the early tick on `beforeMove`, the late tick and TURN_END on `afterMove`. */
     private static void takeItsTurn(Scene scene) {
         Signal signal = scene.battle.queue.snapshot().stream()
                 .filter(candidate -> candidate.getCanHit() == scene.victim).findFirst()

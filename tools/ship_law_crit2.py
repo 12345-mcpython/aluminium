@@ -14,7 +14,7 @@ import sys
 CERYDRA = "src/main/resources/characters/1412.json"
 SE = "src/main/resources/data/skill_effects.json"
 SLOT = 23
-MARK = "\u519b\u529f"
+MARK = "军功"
 
 doc = json.load(io.open(CERYDRA, encoding="utf-8"))
 rules = doc if isinstance(doc, list) else doc.get("rules", [])
@@ -36,11 +36,11 @@ rules.append({
         "target": "all_allies",
         "target_when": ["target has_state " + MARK],
     }],
-    "source": ("1415 \u6614\u6d9f \u5fc6\u7075\u6280\u80fd 17 \u300c\u732e\u4e88\u300c\u5f8b\u6cd5\u300d\u4e4b\u8bd7\u300d\uff08\u6570\u636e\u69fd\u4f4d 23\uff0cSkillID 1141523\uff09\uff1a"
-               "\u300c\u6574\u573a\u751f\u6548\uff0c\u5bf9\u523b\u5f8b\u5fb7\u83c8\u65bd\u653e\u540e\uff0c**\u6301\u6709\u3010" + MARK + "\u3011\u7684\u89d2\u8272\u66b4\u51fb\u4f24\u5bb3\u63d0\u9ad8 #1%**\u3002\u300d"),
-    "note": ("\u2b50 \u5f62\u72b6\u7ecf**\u63a2\u9488\u5b9e\u9a8c\u9a8c\u8bc1**\uff08\u540c\u4e00\u5f20\u8868\u3001\u540c\u4e00\u9053\u95e8\uff1a`getSkillSlot() = 23`\u3001\u76ee\u6807\u53d7\u76ca +155.232\uff09\u3002"
-             "\u2b50 \u4e0e\u63a2\u9488\u7684\u5dee\u522b\u53ea\u6709\u4e24\u5904\uff1a\u5360\u6bd4\u53d6\u81ea**\u65bd\u653e\u6280\u80fd\u7684\u7b2c 0 \u53c2\u6570**\uff08\u968f\u7b49\u7ea7\u53d8\uff09\uff0c"
-             "\u53d7\u76ca\u8005\u662f**\u6301\u6709\u3010" + MARK + "\u3011\u7684\u4eba**\uff08`all_allies` + `target_when`\uff09\u3002"),
+    "source": ("1415 昔涟 忆灵技能 17 「献予「律法」之诗」（数据槽位 23，SkillID 1141523）："
+               "「整场生效，对刻律德菈施放后，**持有【" + MARK + "】的角色暴击伤害提高 #1%**。」"),
+    "note": ("⭐ 形状经**探针实验验证**（同一张表、同一道门：`getSkillSlot() = 23`、目标受益 +155.232）。"
+             "⭐ 与探针的差别只有两处：占比取自**施放技能的第 0 参数**（随等级变），"
+             "受益者是**持有【" + MARK + "】的人**（`all_allies` + `target_when`）。"),
 })
 
 if isinstance(doc, list):
@@ -55,8 +55,8 @@ effects = json.load(io.open(SE, encoding="utf-8"))
 if str(SLOT) not in effects.get("11415", {}):
     effects.setdefault("11415", {})[str(SLOT)] = {
         "effect": "Rules",
-        "source": "1415 \u6614\u6d9f \u5fc6\u7075\u6280\u80fd 17 \u300c\u732e\u4e88\u300c\u5f8b\u6cd5\u300d\u4e4b\u8bd7\u300d\uff08\u6570\u636e\u69fd\u4f4d 23\uff09\uff1a\u5de5\u4f5c\u5728\u89c4\u5219\u4fa7\u3002",
-        "note": "\u2b50 \u6ca1\u6709\u6761\u76ee\u5c31\u4e0d\u53ef\u4ea4\u4ed8\u3002",
+        "source": "1415 昔涟 忆灵技能 17 「献予「律法」之诗」（数据槽位 23）：工作在规则侧。",
+        "note": "⭐ 没有条目就不可交付。",
     }
     io.open(SE, "w", encoding="utf-8", newline="\n").write(json.dumps(effects, ensure_ascii=False, indent=2) + "\n")
     print("ok   skill_effects.json: 11415/%d = Rules" % SLOT)
@@ -80,9 +80,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1415's memosprite skill 23 \u300c\u732e\u4e88\u300c\u5f8b\u6cd5\u300d\u4e4b\u8bd7\u300d: \u300c\u6301\u6709\u3010\u519b\u529f\u3011\u7684\u89d2\u8272\u66b4\u51fb\u4f24\u5bb3\u63d0\u9ad8 #1%\u300d (2026-10-02).
+ * 1415's memosprite skill 23 「献予「律法」之诗」: 「持有【军功】的角色暴击伤害提高 #1%」 (2026-10-02).
  *
- * <p>\u2b50 The reading is TWO-SIDED because the sentence names a SUBSET: the ally carrying the mark gains it, the ally without it does not. A rule that boosted
+ * <p>⭐ The reading is TWO-SIDED because the sentence names a SUBSET: the ally carrying the mark gains it, the ally without it does not. A rule that boosted
  * everybody would pass the first half and be wrong about the sentence.
  */
 public class LawOdeCritDamageTest {

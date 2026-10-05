@@ -23,7 +23,7 @@ public class TechniqueShieldTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** \u26a0 「为我方全体提供\u2026等同于杰帕德24%防御力+150伤害的护盾，持续2回合」. */
+    /** ⚠ 「为我方全体提供…等同于杰帕德24%防御力+150伤害的护盾，持续2回合」. */
     @Test
     public void aDeclaredTechniqueShieldsTheParty() {
         Character gepard = CharacterFactory.create(GEPARD, LEVEL);
@@ -35,12 +35,12 @@ public class TechniqueShieldTest {
         battle.startBattle();
 
         double expected = gepard.getAttribute(AttributeType.DEFENCE).get() * 0.24 + 150;
-        Assertions.assertTrue(gepard.getShield() > 0, "\u300c\u4e3a\u6211\u65b9\u5168\u4f53\u63d0\u4f9b\u2026\u62a4\u76fe\u300d -- himself");
+        Assertions.assertTrue(gepard.getShield() > 0, "「为我方全体提供…护盾」 -- himself");
         Assertions.assertEquals(expected, ally.getShield(), expected * 0.02,
-                "\u300c\u7b49\u540c\u4e8e\u6770\u5e15\u5fb724%\u9632\u5fa1\u529b+150\u7684\u62a4\u76fe\u300d: expected " + expected + ", shield " + ally.getShield());
+                "「等同于杰帕德24%防御力+150的护盾」: expected " + expected + ", shield " + ally.getShield());
     }
 
-    /** \u26a0 The control: no technique declared, no shield. */
+    /** ⚠ The control: no technique declared, no shield. */
     @Test
     public void withoutTheTechniqueNobodyIsShielded() {
         Character gepard = CharacterFactory.create(GEPARD, LEVEL);
@@ -51,7 +51,7 @@ public class TechniqueShieldTest {
         battle.startBattle();
 
         Assertions.assertEquals(0.0, ally.getShield(), 1e-9,
-                "\u300c\u4f7f\u7528\u79d8\u6280\u540e\u300d -- the shield is the technique's, so without it there is none");
+                "「使用秘技后」 -- the shield is the technique's, so without it there is none");
     }
 
     private static Random fixed() {

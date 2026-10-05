@@ -22,7 +22,7 @@ public class SiblingHarmonyTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** \u26a0 「持有\u3010\u4f34\u821e\u3011\u7684\u6211\u65b9\u76ee\u6807\u51fb\u7834\u7279\u653b\u63d0\u9ad830%」 -- the state and the modifier, for the party. */
+    /** ⚠ 「持有【伴舞】的我方目标击破特攻提高30%」 -- the state and the modifier, for the party. */
     @Test
     public void herUltimateGrantsTheDanceAndTheBreakEffect() {
         Character tb = CharacterFactory.create(TB, LEVEL);
@@ -34,15 +34,15 @@ public class SiblingHarmonyTest {
 
         battle.castImmediate(tb.getSkills().get(SkillType.ULTRA), tb, List.of(enemy));
 
-        Assertions.assertTrue(ally.getBuffManager().hasState("\u4f34\u821e"),
-                "\u300c\u4e3a\u6211\u65b9\u5168\u4f53\u9644\u4e0a\u3010\u4f34\u821e\u3011\u6548\u679c\u300d");
+        Assertions.assertTrue(ally.getBuffManager().hasState("伴舞"),
+                "「为我方全体附上【伴舞】效果」");
         // Measured: BREAKING_EFFECT is a FRACTION attribute whose base is 0, and the engine lands this modifier as an absolute 0.3 — i.e. exactly the
         // document's 30%. Asserting a share of the base (the first attempt) expected 0 and compared nothing.
         Assertions.assertEquals(0.3, ally.getAttribute(AttributeType.BREAKING_EFFECT).get() - before, 1e-9,
-                "\u300c\u51fb\u7834\u7279\u653b\u63d0\u9ad830%\u300d: gain " + (ally.getAttribute(AttributeType.BREAKING_EFFECT).get() - before));
+                "「击破特攻提高30%」: gain " + (ally.getAttribute(AttributeType.BREAKING_EFFECT).get() - before));
     }
 
-    /** \u26a0 The technique's own +30% for two turns, gated on the marker, with the control. */
+    /** ⚠ The technique's own +30% for two turns, gated on the marker, with the control. */
     @Test
     public void theTechniqueRaisesThePartysBreakEffect() {
         Character tb = CharacterFactory.create(TB, LEVEL);
@@ -55,7 +55,7 @@ public class SiblingHarmonyTest {
         battle.startBattle();
 
         Assertions.assertTrue(ally.getAttribute(AttributeType.BREAKING_EFFECT).get() > before,
-                "\u300c\u4f7f\u6211\u65b9\u5168\u4f53\u7684\u51fb\u7834\u7279\u653b\u63d0\u9ad830%\uff0c\u6301\u7eed2\u56de\u5408\u300d");
+                "「使我方全体的击破特攻提高30%，持续2回合」");
 
         Character plain = CharacterFactory.create(TB, LEVEL);
         Character ally2 = CharacterFactory.create(ALLY, LEVEL);
@@ -64,7 +64,7 @@ public class SiblingHarmonyTest {
         double untouched = ally2.getAttribute(AttributeType.BREAKING_EFFECT).get();
         plainBattle.startBattle();
         Assertions.assertEquals(untouched, ally2.getAttribute(AttributeType.BREAKING_EFFECT).get(), 1e-9,
-                "\u300c\u4f7f\u7528\u79d8\u6280\u540e\u300d -- undeclared, so nothing");
+                "「使用秘技后」 -- undeclared, so nothing");
     }
 
     /** Census: the ultimate, the super-break rule, the talent, the technique and the convention. */

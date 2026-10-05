@@ -22,7 +22,7 @@ rules.append({
     "when": ["target == self", "actor is_summon", "from_skill_id == 23"],
     "do": [{"op": "MODIFY_ATTR", "attribute": "ATTACK", "percent": 0.25, "permanent": True, "target": "self"}],
     "source": "DIAGNOSTIC 2026-10-02: the same three gates the real rule uses, on the table the real rule lives on.",
-    "note": "\u26a0 \u4e34\u65f6\u63a2\u9488\uff0c\u5b9e\u9a8c\u540e\u5fc5\u987b\u56de\u6eda\u3002",
+    "note": "⚠ 临时探针，实验后必须回滚。",
 })
 if isinstance(doc, list):
     out = rules

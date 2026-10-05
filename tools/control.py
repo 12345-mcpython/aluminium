@@ -26,7 +26,7 @@ class Control:
     def __init__(self, work, *paths):
         self.work = work
         self.paths = list(paths)
-        # \u26a0 BYTES, not text: reading with universal newlines folds CRLF to LF, and writing that back leaves the
+        # ⚠ BYTES, not text: reading with universal newlines folds CRLF to LF, and writing that back leaves the
         # working tree dirty with no content change (measured round 260). A control must be invisible when it restores.
         self.saved = {p: open(os.path.join(work, p), 'rb').read() for p in self.paths}
 
@@ -50,7 +50,7 @@ class Control:
         print('control: compile exit=%s' % comp.returncode)
         if comp.returncode != 0:
             print(((comp.stdout or '') + (comp.stderr or ''))[-600:])
-            # \u2605 `ok` exists because `reds=None` LOOKS like a result (round 345, discipline 179): a control that
+            # ★ `ok` exists because `reds=None` LOOKS like a result (round 345, discipline 179): a control that
             # failed to compile says nothing about the code it aimed at, and reading its None as "0 red" would be the
             # same mistake in a new coat. Callers should test `ok` (or use `verdict`) before believing `reds`.
             return {'ok': False, 'why': 'the control did not compile, so it proves nothing',
@@ -76,7 +76,7 @@ class Control:
 
     @staticmethod
     def verdict(result):
-        """\u2605 The one way to read a control (disciplines 173 / 174 / 178 / 179).
+        """★ The one way to read a control (disciplines 173 / 174 / 178 / 179).
 
         A check is evidence only when: the control COMPILED (`ok`), the XML is from this run, and the test class really
         failed (`reds > 0`). Everything else -- 0 red with a live judge, a replacement identical to the original, an

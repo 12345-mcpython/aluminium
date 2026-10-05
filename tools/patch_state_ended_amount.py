@@ -5,13 +5,13 @@ state's NAME (so a reader can tell which state ended), but its amount was hard-c
 read the "it" from. The corpus says the state carries the count itself (「将本次阿哈时刻的笑点**计入该状态**」), which in this
 engine is N stacked instances of the state, i.e. exactly what `BuffManager.stacksOf(name)` counts.
 
-\u26a0 THE MAGNITUDE MUST BE READ BEFORE THE REMOVAL -- the state is gone by the time the event fires (that is why the name rides on
+⚠ THE MAGNITUDE MUST BE READ BEFORE THE REMOVAL -- the state is gone by the time the event fires (that is why the name rides on
 the event in the first place), so reading the count inside the firing would always give 0. Both call sites compute it at the
 call, while the buffs are still there:
 
   * the spent-duration path fires for the one instance that expired, with the count as it stands (N);
   * the explicit-removal path sweeps every matching instance and fires per instance, so its FIRST firing carries the full
-    total and the later ones one less each. \u26a0 Stated, not hidden: a reader wants the first, and single-instance states (every
+    total and the later ones one less each. ⚠ Stated, not hidden: a reader wants the first, and single-instance states (every
     reader that exists today) see exactly one firing with 1.
 """
 import io
@@ -35,10 +35,10 @@ B_NEW = """    public void fireStateEnded(CanHit carrier, String stateName) {
     }
 
     /**
-     * \u2b50 The same moment, carrying <b>how many instances of that state</b> the carrier held (2026-10-02; reader: 1505's
-     * \u300c\u5f00\u4e0d\u8d25\u300d, \u300c\u961f\u53cb\u6301\u6709\u7684\u3010\u597d\u6d3b\u5f53\u8d4f\u3011\u7ed3\u675f\u65f6\u2026\u5c06\u5176\u4e2d\u7684 50% \u8f6c\u5316\u4e3a\u81ea\u8eab\u7684\u3010\u597d\u6d3b\u5f53\u8d4f\u3011\u300d).
+     * ⭐ The same moment, carrying <b>how many instances of that state</b> the carrier held (2026-10-02; reader: 1505's
+     * 「开不败」, 「队友持有的【好活当赏】结束时…将其中的 50% 转化为自身的【好活当赏】」).
      *
-     * <p>\u26a0 The caller reads the count BEFORE removing the buffs: by the time this fires the state is already gone, which is
+     * <p>⚠ The caller reads the count BEFORE removing the buffs: by the time this fires the state is already gone, which is
      * why the name itself rides on the event too.
      */
     public void fireStateEnded(CanHit carrier, String stateName, int magnitude) {

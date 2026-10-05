@@ -18,7 +18,7 @@ txt = io.open(T, encoding="utf-8").read()
 
 OLD_TURN = '            case "EXTRA_TURN" -> battle.grantExtraTurn(resolveTarget(effect, ctx));'
 NEW_TURN = '''            case "EXTRA_TURN" -> {
-                // \u26a0\u26a0 A refused grant used to vanish (2026-10-02): `grantExtraTurn` answers false for a unit that is not in the action
+                // ⚠⚠ A refused grant used to vanish (2026-10-02): `grantExtraTurn` answers false for a unit that is not in the action
                 // order -- and a memosprite at Speed 0 is exactly that -- so the rule looked like it had worked. Measured on 1415's ode of
                 // genesis, whose clause grants 德谬歌 an extra turn: the judge read "extra turn actor = none" and nothing said why.
                 CanHit holder = require(resolveTarget(effect, ctx), "target", ctx);
@@ -33,7 +33,7 @@ OLD_CAST = '''        if (victims.isEmpty()) {
             return;                                  // nothing left to reach: an empty battlefield, not a bad rule
         }'''
 NEW_CAST = '''        if (victims.isEmpty()) {
-            // \u26a0 An empty battlefield stays a no-op, but a caster with NO CAMP is a different thing: `getOpponents` answers an empty list
+            // ⚠ An empty battlefield stays a no-op, but a caster with NO CAMP is a different thing: `getOpponents` answers an empty list
             // for it, so the commanded cast silently did nothing at all (2026-10-02). Say which one it is.
             if (actor.getCamp() == null) {
                 throw new IllegalStateException("a commanded cast by " + actor.getName()

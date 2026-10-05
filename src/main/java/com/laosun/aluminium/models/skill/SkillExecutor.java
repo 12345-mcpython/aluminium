@@ -74,7 +74,7 @@ public final class SkillExecutor {
         // P11-1 (M-40): the **pre-cast hook**, and the only moment at which a rule can still change what this cast
         // does. It fires before the damage is expanded because "this cast's damage is not mine to deal" is a fact
         // about the CAST: a rule that learns it afterwards (on ULT_CAST, say) can no longer stop the swing.
-        // \u2605 Which cast this is, computed ONCE and early (2026-09-30): `CAST_SETUP` is the pre-cast hook and the only
+        // ★ Which cast this is, computed ONCE and early (2026-09-30): `CAST_SETUP` is the pre-cast hook and the only
         // place a rule can raise something the cast's OWN heal must see, so it has to know the slot -- cones 20001 /
         // 21000 state exactly that. The expression is the same one the after-events use, so the two cannot disagree.
         SkillCategory category = skill == null || skill.getData() == null
@@ -90,7 +90,7 @@ public final class SkillExecutor {
             // fires BEFORE settlement and names the ally -- SKILL_CAST names it but fires after, and it is refused by
             // `from_category` for that reason (see CAST_CARRYING_EVENTS).
             CanHit aimed = targets == null || targets.isEmpty() ? null : targets.getFirst();
-            // \u2b50 The slot rides along (2026-10-02): the comment above already states that the pre-cast hook "has to know the slot",
+            // ⭐ The slot rides along (2026-10-02): the comment above already states that the pre-cast hook "has to know the slot",
             // but the call did not pass one, so `from_skill_id` read 0 on this event -- measured: a rule gated on
             // `self has_state <state>` + `target == self` + `actor is_summon` FIRED, and the same rule plus `from_skill_id == 0` also
             // fired while `from_skill_id == 16` and `== 1141516` did not. Passing it is what makes a NON-attack cast nameable: a
@@ -173,7 +173,7 @@ public final class SkillExecutor {
         // field was null for every cast, and "the ally I chose" was unexpressible.
         CanHit aimed = chosen.isEmpty() ? null : chosen.getFirst();
 
-        // \u2705 How many of the targets this attack CONNECTED WITH carry its own element's weakness (2026-09-30; reader:
+        // ✅ How many of the targets this attack CONNECTED WITH carry its own element's weakness (2026-09-30; reader:
         // cone 21040). Counted here because this is the only place holding the whole set; the per-target events cannot
         // reconstruct it, since a multi-target attack fires them one target at a time.
         int weakHitCount = 0;
@@ -608,12 +608,12 @@ public final class SkillExecutor {
      * @return the settled damage of this hit (0 if the target was dead / invulnerable)
      */
     /**
-     * \u2705 Which {@link DamageType} a cast produces, read from the parsed skill data (2026-09-30).
+     * ✅ Which {@link DamageType} a cast produces, read from the parsed skill data (2026-09-30).
      *
-     * <p>\u2605 The only distinction today is \u6b22\u6109: the data spells it {@code ElationDamage} on the attack type, and
+     * <p>★ The only distinction today is 欢愉: the data spells it {@code ElationDamage} on the attack type, and
      * {@link SkillCategory} has parsed that value since the type table was written -- so a skill the game calls Elation damage
      * settles as {@link DamageType#ELATION}. Everything else stays NORMAL, exactly as before.
-     * \u26a0 Its boost is folded into the base in slice 1b (the type is deliberately not boostable).
+     * ⚠ Its boost is folded into the base in slice 1b (the type is deliberately not boostable).
      */
     public static DamageType damageTypeOf(SkillData data) {
         if (data != null && data.getCategory() == SkillCategory.ELATION_DAMAGE) {
@@ -632,9 +632,9 @@ public final class SkillExecutor {
         // DMG boost ("普攻/战技/终结技造成的伤害提高 X%"), which the damage *type* cannot express -- every
         // in-battle cast produces DamageType.NORMAL. `data` is null for a hand-made or placeholder skill, and
         // then the instance has no scoped boost rather than a guessed one.
-        // \u2705 The DAMAGE TYPE follows the data (2026-09-30; readers: the nine `ElationDamage` skills -- 1501/1502/1505/1506/
-        // 8009/8010/1513, four of them already shipped and until now settling their \u6b22\u6109 damage as NORMAL).
-        // \u2705 The \u6b22\u6109 damage boost is folded into the BASE (2026-09-30, slice 1b). `DamageType.ELATION` is deliberately
+        // ✅ The DAMAGE TYPE follows the data (2026-09-30; readers: the nine `ElationDamage` skills -- 1501/1502/1505/1506/
+        // 8009/8010/1513, four of them already shipped and until now settling their 欢愉 damage as NORMAL).
+        // ✅ The 欢愉 damage boost is folded into the BASE (2026-09-30, slice 1b). `DamageType.ELATION` is deliberately
         // NOT boostable -- the ordinary DMG-boost zone must not touch it -- so its own zone cannot ride `addBoost`, which is
         // gated on `isBoostable()`. Measured before this line: with `ELATION_DAMAGE_BOOST` at 0.78 the instance still read
         // x1.0. Super break folds `SUPER_BREAK_BOOST` into its base the same way, for the same reason.

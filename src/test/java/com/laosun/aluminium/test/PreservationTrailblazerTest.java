@@ -27,7 +27,7 @@ public class PreservationTrailblazerTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** \u26a0 「每受到1次攻击，叠加1层【灼热意志】，最多可叠加8层」. */
+    /** ⚠ 「每受到1次攻击，叠加1层【灼热意志】，最多可叠加8层」. */
     @Test
     public void hisTalentStacksMagmaWillUpToEight() {
         Character tb = CharacterFactory.create(TB3, LEVEL);
@@ -38,14 +38,14 @@ public class PreservationTrailblazerTest {
         for (int i = 0; i < 8; i++) {
             battle.fireTriggers(TriggerEvent.TAKING_HIT, enemy, tb, 0, 0);
         }
-        Assertions.assertEquals(8, tb.getBuffManager().stacksOf("\u707c\u70ed\u610f\u5fd7"),
-                "\u300c\u6bcf\u53d7\u52301\u6b21\u653b\u51fb\uff0c\u53e0\u52a01\u5c42\u3010\u707c\u70ed\u610f\u5fd7\u3011\uff0c\u6700\u591a\u53ef\u53e0\u52a08\u5c42\u300d");
+        Assertions.assertEquals(8, tb.getBuffManager().stacksOf("灼热意志"),
+                "「每受到1次攻击，叠加1层【灼热意志】，最多可叠加8层」");
 
         battle.fireTriggers(TriggerEvent.TAKING_HIT, enemy, tb, 0, 0);
-        Assertions.assertEquals(8, tb.getBuffManager().stacksOf("\u707c\u70ed\u610f\u5fd7"), "the ninth hit must not pass the cap");
+        Assertions.assertEquals(8, tb.getBuffManager().stacksOf("灼热意志"), "the ninth hit must not pass the cap");
     }
 
-    /** \u26a0 「施放普攻、战技、终结技后，为我方全体提供\u2026\u7b49\u540c\u4e8e6.00%\u9632\u5fa1\u529b+80\u7684\u62a4\u76fe\uff0c\u6301\u7eed2\u56de\u5408」 -- all three casts, both ids. */
+    /** ⚠ 「施放普攻、战技、终结技后，为我方全体提供…等同于6.00%防御力+80的护盾，持续2回合」 -- all three casts, both ids. */
     @Test
     public void everyCastShieldsThePartyForBothIds() {
         for (int cid : new int[]{TB3, TB4}) {
@@ -58,11 +58,11 @@ public class PreservationTrailblazerTest {
             battle.castImmediate(tb.getSkills().get(com.laosun.aluminium.enums.SkillType.SKILL), tb, List.of(enemy));
 
             Assertions.assertEquals(expected, ally.getShield(), expected * 0.02,
-                    "cid " + cid + ": \u300c\u65bd\u653e\u6218\u6280\u540e\uff0c\u4e3a\u6211\u65b9\u5168\u4f53\u63d0\u4f9b\u20266.00%\u9632\u5fa1\u529b+80\u7684\u62a4\u76fe\u300d");
+                    "cid " + cid + ": 「施放战技后，为我方全体提供…6.00%防御力+80的护盾」");
         }
     }
 
-    /** \u26a0 The technique's self-shield, gated on the marker; and the control. */
+    /** ⚠ The technique's self-shield, gated on the marker; and the control. */
     @Test
     public void theTechniqueShieldsHimOnlyWhenDeclared() {
         Character withTechnique = CharacterFactory.create(TB3, LEVEL);
@@ -72,14 +72,14 @@ public class PreservationTrailblazerTest {
         battle.startBattle();
         double expected = withTechnique.getAttribute(AttributeType.DEFENCE).get() * 0.3 + 384;
         Assertions.assertEquals(expected, withTechnique.getShield(), expected * 0.02,
-                "\u300c\u7ed9\u81ea\u8eab\u63d0\u4f9b\u2026\u7b49\u540c\u4e8e30%\u9632\u5fa1\u529b+384\u7684\u62a4\u76fe\uff0c\u6301\u7eed1\u56de\u5408\u300d");
+                "「给自身提供…等同于30%防御力+384的护盾，持续1回合」");
 
         Character without = CharacterFactory.create(TB3, LEVEL);
         Enemy enemy2 = EnemyFactory.create(MONSTER, 90, 1);
         Battle plain = new Battle(List.of(without), List.of(enemy2), fixed());
         plain.startBattle();
         Assertions.assertEquals(0.0, without.getShield(), 1e-9,
-                "\u300c\u4f7f\u7528\u79d8\u6280\u540e\u300d -- undeclared, so no shield");
+                "「使用秘技后」 -- undeclared, so no shield");
     }
 
     /** Census: the stacks, the three shields, the skill's two effects, the technique and the convention. */

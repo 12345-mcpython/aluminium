@@ -34,7 +34,7 @@ JAVA = ('package com.laosun.aluminium.test;' + NL + NL
         + 'import java.util.List;' + NL + 'import java.util.Random;' + NL + NL
         + '/**' + NL
         + ' * ADD_ELEMENTAL_WEAKNESS (2026-09-30; readers 1315 and 1310, both registered):' + NL
-        + ' * 「\u4e3a\u6307\u5b9a\u654c\u65b9\u5355\u4f53\u6dfb\u52a0\u7269\u7406\u5f31\u70b9\u300d.' + NL
+        + ' * 「为指定敌方单体添加物理弱点」.' + NL
         + ' *' + NL
         + ' * <p>isWeakTo is both the engine judgement point and a ready-made observable, so no two-enemy or hand-read' + NL
         + ' * trickery is needed: false before, true after. The rule is built by hand because the reader has not shipped.' + NL

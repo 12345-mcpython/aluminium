@@ -28,9 +28,9 @@ def bail(msg):
 # 1) the field, declared at class level just before a uniquely named method
 anchor = '    private void registerPartyResources() {'
 field = ('    /**' + NL
-         + '     * The energy the ultimate now settling consumed, for {@code ULT_CAST}\u2019s amount.' + NL
+         + '     * The energy the ultimate now settling consumed, for {@code ULT_CAST}’s amount.' + NL
          + '     *' + NL
-         + '     * <p>\u26a0 It cannot be read one layer down: Battle zeroes the energy BEFORE the ultimate body settles' + NL
+         + '     * <p>⚠ It cannot be read one layer down: Battle zeroes the energy BEFORE the ultimate body settles' + NL
          + '     * (see the H-5 comment above), so by the time the event fires the unit already reads 0.' + NL
          + '     */' + NL
          + '    private double lastUltEnergySpent;' + NL + NL
@@ -45,7 +45,7 @@ t = saved[BATTLE].replace(anchor, field, 1)
 
 # 2) capture it before zeroing
 old_zero = '        user.setCurrentEnergy(0);'
-new_zero = ('        lastUltEnergySpent = user.getCurrentEnergy();   // \u2b50 read it BEFORE the zeroing below' + NL
+new_zero = ('        lastUltEnergySpent = user.getCurrentEnergy();   // ⭐ read it BEFORE the zeroing below' + NL
             + old_zero)
 if t.count(old_zero) != 1:
     bail('the zeroing anchor is not unique')

@@ -27,7 +27,7 @@ public class HyacineTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** \u26a0 「风堇进入【雨过天晴】状态」 and 「我方全体目标生命上限提高30.00%」. */
+    /** ⚠ 「风堇进入【雨过天晴】状态」 and 「我方全体目标生命上限提高30.00%」. */
     @Test
     public void herUltimateMarksHerAndRaisesThePartysMaxHp() {
         Character hyacine = CharacterFactory.create(HYACINE, LEVEL);
@@ -40,10 +40,10 @@ public class HyacineTest {
 
         battle.castImmediate(hyacine.getSkills().get(SkillType.ULTRA), hyacine, List.of(ally));
 
-        Assertions.assertTrue(hyacine.getBuffManager().hasState("\u96e8\u8fc7\u5929\u6674"),
-                "\u300c\u98ce\u5807\u8fdb\u5165\u3010\u96e8\u8fc7\u5929\u6674\u3011\u72b6\u6001\u300d");
-        Assertions.assertTrue(ally.getMaxHp() > allyMaxBefore, "\u300c\u6211\u65b9\u5168\u4f53\u76ee\u6807\u751f\u547d\u4e0a\u9650\u63d0\u9ad830.00%\u300d -- ally");
-        Assertions.assertTrue(hyacine.getMaxHp() > herMaxBefore, "\u300c\u6211\u65b9\u5168\u4f53\u300d includes Hyacine herself");
+        Assertions.assertTrue(hyacine.getBuffManager().hasState("雨过天晴"),
+                "「风堇进入【雨过天晴】状态」");
+        Assertions.assertTrue(ally.getMaxHp() > allyMaxBefore, "「我方全体目标生命上限提高30.00%」 -- ally");
+        Assertions.assertTrue(hyacine.getMaxHp() > herMaxBefore, "「我方全体」 includes Hyacine herself");
     }
 
     /** Census: the ultimate's rule and the level convention; the heals belong to the skill data, not to rules. */

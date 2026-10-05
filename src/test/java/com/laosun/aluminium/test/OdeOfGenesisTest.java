@@ -63,9 +63,9 @@ public class OdeOfGenesisTest {
                 + "\n           crit:   expected " + expectedCrit + " got " + critGain);
 
         Assertions.assertEquals(expectedAttack, attackGain, Math.abs(expectedAttack) * 1e-6,
-                "\u300c\u653b\u51fb\u529b\u63d0\u9ad8\uff0c\u6570\u503c\u7b49\u540c\u4e8e\u5fb7\u8c2c\u6b4c\u751f\u547d\u4e0a\u9650\u7684 #1%\u300d");
+                "「攻击力提高，数值等同于德谬歌生命上限的 #1%」");
         Assertions.assertEquals(expectedCrit, critGain, Math.abs(expectedCrit) * 1e-6,
-                "\u300c\u66b4\u51fb\u7387\u63d0\u9ad8\uff0c\u6570\u503c\u7b49\u540c\u4e8e\u5fb7\u8c2c\u6b4c\u66b4\u51fb\u7387\u7684 #2%\u300d");
+                "「暴击率提高，数值等同于德谬歌暴击率的 #2%」");
     }
 
     /** 「该效果对迷迷也生效」 -- the same two effects reach the recipient's own memosprite. */
@@ -90,9 +90,9 @@ public class OdeOfGenesisTest {
         double gain = mimi.getAttribute(AttributeType.ATTACK).get() - before;
         double expected = used.get(0) * demiurge.getMaxHp();
 
-        System.out.println("[genesis] \u8ff7\u8ff7 (" + mimi.getName() + ") attack gain = " + gain
+        System.out.println("[genesis] 迷迷 (" + mimi.getName() + ") attack gain = " + gain
                 + " ; expected " + expected);
         Assertions.assertEquals(expected, gain, Math.abs(expected) * 1e-6,
-                "\u300c\u8be5\u6548\u679c\u5bf9\u8ff7\u8ff7\u4e5f\u751f\u6548\u300d-- aimed at `summon`, the spelling 1402 and 1413 already use");
+                "「该效果对迷迷也生效」-- aimed at `summon`, the spelling 1402 and 1413 already use");
     }
 }

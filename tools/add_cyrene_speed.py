@@ -36,14 +36,14 @@ rules.append({
         "turns": 1,
         "target": "all_allies",
     }],
-    "source": ("1415 \u6614\u6d9f \u884c\u8ff9 \u4e09\u76f8\u7684\u56e0\u679c (1415103): "
-               "\u300c\u6614\u6d9f\u7684\u901f\u5ea6\u5927\u4e8e\u7b49\u4e8e **180** \u70b9\u65f6\uff0c"
-               "\u6211\u65b9\u5168\u4f53\u9020\u6210\u7684\u4f24\u5bb3\u63d0\u9ad8 **20%**\u300d"),
-    "note": ("\u2b50 \u53ea\u505a\u8fd9\u4e00\u534a \u2713\uff08\u53e6\u4e00\u534a\u2014\u2014\u201c\u4e4b\u540e\u6bcf\u8d85\u8fc7 1 \u70b9\u901f\u5ea6\uff0c"
-             "\u6614\u6d9f\u4e0e**\u5fb7\u8c2c\u6b4c**\u7684\u51b0\u5c5e\u6027\u6297\u6027\u7a7f\u900f\u63d0\u9ad8 2%\uff0c\u6700\u591a\u8ba1\u5165 60 \u70b9\u201d\u2717\uff09"
-             "\u2014\u2014 \u56e0\u4e3a\u5b83\u7684 `target` \u5199\u6cd5\u53d6\u51b3\u4e8e**\u5fb7\u8c2c\u6b4c\u4e0e\u6614\u6d9f\u7684\u5173\u7cfb** \u2717\uff08\u5c1a\u672a\u67e5\u6e05 \u2713\uff09\u3002"
-             "\u2b50 \u89e6\u53d1\u5199 TURN_START \u2713\uff08\u4e0d\u662f BATTLE_START \u2717\uff0c\u540e\u8005\u4f1a\u628a\u503c\u70d8\u6b7b\u4e00\u6b21 \u2717\uff09\u3002"
-             "\u26a0 \u5df2\u6d4b\uff1a\u5979 Lv80 \u901f\u5ea6 = **101** \u2713 \u21d2 \u5224\u636e\u5fc5\u987b\u5148\u62ac\u901f\u5ea6 \u2713\u3002"),
+    "source": ("1415 昔涟 行迹 三相的因果 (1415103): "
+               "「昔涟的速度大于等于 **180** 点时，"
+               "我方全体造成的伤害提高 **20%**」"),
+    "note": ("⭐ 只做这一半 ✓（另一半——“之后每超过 1 点速度，"
+             "昔涟与**德谬歌**的冰属性抗性穿透提高 2%，最多计入 60 点”✗）"
+             "—— 因为它的 `target` 写法取决于**德谬歌与昔涟的关系** ✗（尚未查清 ✓）。"
+             "⭐ 触发写 TURN_START ✓（不是 BATTLE_START ✗，后者会把值烘死一次 ✗）。"
+             "⚠ 已测：她 Lv80 速度 = **101** ✓ ⇒ 判据必须先抬速度 ✓。"),
 })
 out = doc if isinstance(doc, dict) else {"rules": rules}
 if isinstance(doc, dict):
@@ -71,16 +71,16 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * \u300c\u6614\u6d9f\u7684\u901f\u5ea6\u5927\u4e8e\u7b49\u4e8e 180 \u70b9\u65f6\uff0c\u6211\u65b9\u5168\u4f53\u9020\u6210\u7684\u4f24\u5bb3\u63d0\u9ad8 20%\u300d (1415:823, 2026-10-02).
+ * 「昔涟的速度大于等于 180 点时，我方全体造成的伤害提高 20%」 (1415:823, 2026-10-02).
  *
- * <p>\u2b50 The threshold is the thing under test, so the judge raises her speed with a hand-built rule APPENDED to hers
+ * <p>⭐ The threshold is the thing under test, so the judge raises her speed with a hand-built rule APPENDED to hers
  * (`TriggerTable.plus`) and fires her own TURN_START: below 180 the rule must not fire, at 180+ it must.
  */
 public class CyreneSpeedThresholdTest {
     private static final int OWNER = 1415;
     private static final int MONSTER = 1002011;
 
-    /** \u2b50 Below the threshold nothing happens; at or above it the party gains 20%. */
+    /** ⭐ Below the threshold nothing happens; at or above it the party gains 20%. */
     @Test
     public void theThresholdGatesThePartyBoost() {
         double speed = CharacterFactory.create(OWNER, 80, false, null, null, 0)

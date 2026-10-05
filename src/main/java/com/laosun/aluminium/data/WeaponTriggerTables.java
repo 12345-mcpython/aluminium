@@ -50,8 +50,8 @@ public final class WeaponTriggerTables {
         if (cached != null) {
             return cached;
         }
-        // \u2605 A light cone may DECLARE resources (2026-09-30): its file allows a top-level "resources" array next to the
-        // rank keys, the same declaration shape a character's file uses. \u26a0 The merged table refuses two declaring
+        // ★ A light cone may DECLARE resources (2026-09-30): its file allows a top-level "resources" array next to the
+        // rank keys, the same declaration shape a character's file uses. ⚠ The merged table refuses two declaring
         // sides, so this is a cone-side declaration only while no character declares the same name.
         TriggerTable table = new TriggerTable(weaponId, read(weaponId, rank), readResources(weaponId));
         CACHE.put(key, table);
@@ -61,7 +61,7 @@ public final class WeaponTriggerTables {
     /**
      * The resource declarations of a light cone's file ({@code { "resources": [...], "1": [...], ... }}).
      *
-     * <p>\u2605 P8-8's shape, reused: {@code TriggerTable.plus} already carries declarations across a merge, and
+     * <p>★ P8-8's shape, reused: {@code TriggerTable.plus} already carries declarations across a merge, and
      * {@code CharacterFactory} already registers whatever the merged table declares -- so the only missing piece was a
      * loader that reads them.
      *
@@ -105,7 +105,7 @@ public final class WeaponTriggerTables {
         // rows than the game's five still works.
         com.google.gson.JsonElement exact = file.get(String.valueOf(rank));
         if (exact == null) {
-            // \u2605 Only NUMERIC keys are ranks: a cone's file may also carry a top-level "resources" declaration, and
+            // ★ Only NUMERIC keys are ranks: a cone's file may also carry a top-level "resources" declaration, and
             // parsing that as a rank would throw. (Measured: the shape is new, the fallback was written before it.)
             String lowest = file.keySet().stream()
                     .filter(key -> !key.isEmpty() && key.chars().allMatch(Character::isDigit))

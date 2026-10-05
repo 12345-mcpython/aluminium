@@ -9,9 +9,9 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Random;
 
-/** \u300c\u6bcf\u4ece 1 \u4e2a\u9664\u5fb7\u8c2c\u6b4c\u4ee5\u5916**\u4e0d\u540c\u7684\u961f\u53cb**\u5904\u83b7\u5f97\u3010\u8ffd\u5fc6\u3011\u540e\u300d (2026-10-02). */
+/** 「每从 1 个除德谬歌以外**不同的队友**处获得【追忆】后」 (2026-10-02). */
 public class TrueSelfOdeDistinctAlliesTest {
-    private static final String COUNTER = "\u5fc6\u7075\u6280\u7684\u989d\u5916\u4e00\u51fb";
+    private static final String COUNTER = "忆灵技的额外一击";
 
     @Test
     public void onlyTheFirstTimeEachAllyCounts() {
@@ -28,7 +28,7 @@ public class TrueSelfOdeDistinctAlliesTest {
         int afterOne = counter(dragon);
         act(battle, 2);
         int afterTwo = counter(dragon);
-        // her ultimate hands 【\u672a\u6765\u3011 out afresh, so the FIRST ally can act again
+        // her ultimate hands 【未来】 out afresh, so the FIRST ally can act again
         Character her = battle.characters.get(0);
         // "after she acts" is her TURN_END, which is what hands the future out again.
         battle.currentMove = new Signal(her);

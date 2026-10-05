@@ -26,7 +26,7 @@ rules.append({
     "do": [{"op": "MODIFY_ATTR", "attribute": "ATTACK", "percent": 0.5, "permanent": True,
             "target": "owner"}],
     "source": "DIAGNOSTIC 2026-10-02: if this fires, characters/1415.json is loaded and its rules run.",
-    "note": "\u26a0 \u4e34\u65f6\u63a2\u9488\uff0c\u5b9e\u9a8c\u540e\u5fc5\u987b\u56de\u6eda\u3002",
+    "note": "⚠ 临时探针，实验后必须回滚。",
 })
 rules.append({
     "id": "probe_cast_setup_fires",
@@ -35,7 +35,7 @@ rules.append({
     "do": [{"op": "MODIFY_ATTR", "attribute": "ATTACK", "percent": 0.25, "permanent": True,
             "target": "owner"}],
     "source": "DIAGNOSTIC 2026-10-02: if a memosprite's cast announces CAST_SETUP, this fires.",
-    "note": "\u26a0 \u4e34\u65f6\u63a2\u9488\uff0c\u5b9e\u9a8c\u540e\u5fc5\u987b\u56de\u6eda\u3002",
+    "note": "⚠ 临时探针，实验后必须回滚。",
 })
 
 if isinstance(doc, list):

@@ -16,7 +16,7 @@ INT = "src/main/java/com/laosun/aluminium/models/TriggerInterpreter.java"
 MEMOSPRITE = "src/main/resources/characters/1415.json"
 SE = "src/main/resources/data/skill_effects.json"
 SLOT = 19
-MARK = "\u732e\u4e88\u300c\u5929\u7a7a\u300d\u4e4b\u8bd7"
+MARK = "献予「天空」之诗"
 CID = 1409
 
 canhit = io.open(CANHIT, encoding="utf-8").read()
@@ -38,7 +38,7 @@ CID_NEW = """    private int cid;
 
 # ---- 2) the selector family: spelling ----
 SPELL_ANCHOR = "        requireSelectorSpelling(effect.getTarget(), \"target\", op, spec);"
-SPELL_NEW = """        // \u2b50 A selector FAMILY, admitted by prefix (2026-10-02): `ally_cid:<cid>` names a character outright. The closed set below stays closed --
+SPELL_NEW = """        // ⭐ A selector FAMILY, admitted by prefix (2026-10-02): `ally_cid:<cid>` names a character outright. The closed set below stays closed --
         // this is an explicit door, not a fallback, which is why it is checked BEFORE the membership test.
         if (effect.getTarget().startsWith(ALLY_CID_PREFIX)) {
             String rest = effect.getTarget().substring(ALLY_CID_PREFIX.length()).trim();
@@ -55,7 +55,7 @@ SPELL_NEW = """        // \u2b50 A selector FAMILY, admitted by prefix (2026-10-
 
 # ---- 3) the selector family: resolution ----
 RESOLVE_ANCHOR = "    private static CanHit resolveSelector(String selector, EffectSpec effect, TriggerContext ctx) {"
-RESOLVE_NEW = """    /** \u2b50 \u300c\u5411**\u98ce\u5807**\u2026\u300d: a selector that names a character by cid (2026-10-02). */
+RESOLVE_NEW = """    /** ⭐ 「向**风堇**…」: a selector that names a character by cid (2026-10-02). */
     static final String ALLY_CID_PREFIX = "ally_cid:";
 
     /** The party member whose cid is this one, or {@code null} when nobody matches. */
@@ -90,7 +90,7 @@ for body, old, label in ((interp, SPELL_ANCHOR, "the spelling check"),
     if n != 1:
         sys.exit("REFUSING: %s occurs %d times -- nothing written" % (label, n))
 
-# \u26a0 `private int cid;` appears TWICE in Character (the field and the Builder's own) -- only the FIRST is the field
+# ⚠ `private int cid;` appears TWICE in Character (the field and the Builder's own) -- only the FIRST is the field
 n = char.count(CID_ANCHOR)
 print("anchor %-20s : %d (replacing the first only)" % ("the cid field", n))
 if n < 1:
@@ -120,11 +120,11 @@ rules.append({
         "permanent": True,
         "target": "ally_cid:" + str(CID),
     }],
-    "source": ("1415 \u6614\u6d9f \u5fc6\u7075\u6280\u80fd 19 \u300c\u732e\u4e88\u300c\u5929\u7a7a\u300d\u4e4b\u8bd7\u300d\uff08\u6570\u636e\u69fd\u4f4d 19\uff0cSkillID 1141519\uff09\uff1a"
-               "\u300c**\u5fb7\u8c2c\u6b4c\u65bd\u653e\u5fc6\u7075\u6280\u65f6\uff0c\u4f7f\u98ce\u5807\u83b7\u5f972\u5c42\u3010" + MARK + "\u3011**\u3002\u300d"),
-    "note": ("\u2b50 \u539f\u53e5\u70b9\u540d**\u98ce\u5807**\uff0c\u800c\u9009\u62e9\u5668\u96c6\u5408\u91cc\u6ca1\u6709\u201c\u70b9\u540d\u67d0\u4e2a\u89d2\u8272\u201d\u7684\u4e1c\u897f\uff08**\u5b9e\u6d4b**\uff1a`party_first`\u2192\u4f4d\u7f6e\u3001"
-             "`next_ally`\u2192\u4f4d\u7f6e\u3001`lowest_hp_ally`/`random_ally_below_half_energy`\u2192\u8c13\u8bcd\uff09\u21d2 **\u672c\u8f6e\u52a0\u4e86 `ally_cid:<cid>`**\u3002"
-             "\u2b50 `ADD_STACK` \u8981\u6c42 `buff` + \u6301\u7eed\uff08**\u5b9e\u6d4b**\uff09\uff0c\u6240\u4ee5 `permanent: true`\uff1b\u800c\u201c2 \u5c42\u201d\u5c31\u662f\u539f\u53e5\u7684\u6570\u5b57\u3002"),
+    "source": ("1415 昔涟 忆灵技能 19 「献予「天空」之诗」（数据槽位 19，SkillID 1141519）："
+               "「**德谬歌施放忆灵技时，使风堇获得2层【" + MARK + "】**。」"),
+    "note": ("⭐ 原句点名**风堇**，而选择器集合里没有“点名某个角色”的东西（**实测**：`party_first`→位置、"
+             "`next_ally`→位置、`lowest_hp_ally`/`random_ally_below_half_energy`→谓词）⇒ **本轮加了 `ally_cid:<cid>`**。"
+             "⭐ `ADD_STACK` 要求 `buff` + 持续（**实测**），所以 `permanent: true`；而“2 层”就是原句的数字。"),
 })
 if isinstance(doc, list):
     out = rules
@@ -137,7 +137,7 @@ print("ok   1415 now carries %s (%d rules)" % (RULE_ID, len(rules)))
 effects = json.load(io.open(SE, encoding="utf-8"))
 if str(SLOT) in effects.get("11415", {}):
     effects["11415"][str(SLOT)]["note"] = (effects["11415"][str(SLOT)].get("note", "") +
-                                           " \u2b50 2026-10-02\uff1a\u540c\u4e00\u6761\u6280\u80fd\u7684**\u53e6\u4e00\u53e5**\uff08\u5c42\u6570\uff09\u4e5f\u5df2\u6210\u53e5\u3002")
+                                           " ⭐ 2026-10-02：同一条技能的**另一句**（层数）也已成句。")
     io.open(SE, "w", encoding="utf-8", newline="\n").write(json.dumps(effects, ensure_ascii=False, indent=2) + "\n")
     print("ok   skill_effects.json: 11415/%d note updated (the entry already existed)" % SLOT)
 
@@ -155,9 +155,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1415's memosprite skill 19, first sentence: \u300c\u5fb7\u8c2c\u6b4c\u65bd\u653e\u5fc6\u7075\u6280\u65f6\uff0c\u4f7f\u98ce\u5807\u83b7\u5f972\u5c42\u3010\u732e\u4e88\u300c\u5929\u7a7a\u300d\u4e4b\u8bd7\u3011\u300d (2026-10-02).
+ * 1415's memosprite skill 19, first sentence: 「德谬歌施放忆灵技时，使风堇获得2层【献予「天空」之诗】」 (2026-10-02).
  *
- * <p>\u2b50 TWO-SIDED, which is the whole point of the new `ally_cid:` selector: the NAMED character gets 2 stacks, and a different ally present in the same battle gets 0. A
+ * <p>⭐ TWO-SIDED, which is the whole point of the new `ally_cid:` selector: the NAMED character gets 2 stacks, and a different ally present in the same battle gets 0. A
  * selector that quietly fell back to "the owner" -- or to "everybody" -- would pass one half and fail the other.
  */
 public class SkyOdeStackTest {

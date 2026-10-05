@@ -19,9 +19,9 @@ anchor = '    /** Extra DEF-ignore carried by THIS hit, added by a rule firing o
 new = ('    /**' + NL
        + '     * The energy the cast that produced THIS hit spent, or {@code 0} (2026-09-30; reader: light cone 23062).' + NL
        + '     *' + NL
-       + '     * <p>\u26a0 It rides on the instance for the same reason the extras below do: \u300c\u6bcf\u6d88\u8017 1 \u70b9\u80fd\u91cf\u503c\u300d' + NL
+       + '     * <p>⚠ It rides on the instance for the same reason the extras below do: 「每消耗 1 点能量值」' + NL
        + '     * modifies the hit BEING SETTLED, and {@code DEALING_DAMAGE} is the only event that hands that instance over.' + NL
-       + '     * \u26a0 Not a constructor parameter like {@code castCategory}: its value is only known after the damage is built' + NL
+       + '     * ⚠ Not a constructor parameter like {@code castCategory}: its value is only known after the damage is built' + NL
        + '     * (Battle reads the energy just before zeroing it) and before the settlement.' + NL
        + '     */' + NL
        + '    private double castEnergySpent = 0;' + NL + NL
@@ -32,7 +32,7 @@ if t.count(anchor) != 1:
     sys.exit(1)
 t = t.replace(anchor, new, 1)
 
-setter_anchor = '    /** \u300c\u5bf9\u9677\u5165\u8d1f\u9762\u6548\u679c\u7684\u654c\u65b9\u76ee\u6807\u9020\u6210\u4f24\u5bb3\u65f6\u66b4\u51fb\u7387\u63d0\u9ad8 X%\u300d is a property of the hit, not of the wearer. */'
+setter_anchor = '    /** 「对陷入负面效果的敌方目标造成伤害时暴击率提高 X%」 is a property of the hit, not of the wearer. */'
 setter = ('    /** Records how much energy the producing cast spent; the settlement reads it (light cone 23062). */' + NL
           + '    public Damage withCastEnergySpent(double value) {' + NL
           + '        this.castEnergySpent = value;' + NL

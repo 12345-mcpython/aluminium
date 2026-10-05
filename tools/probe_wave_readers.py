@@ -14,7 +14,7 @@ for name in sorted(os.listdir(corpus)):
         continue
     body = io.open(os.path.join(corpus, name), encoding="utf-8", errors="replace").read()
     flat = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", body))
-    for match in list(re.finditer("\u6bcf\u4e2a\u6ce2\u6b21", flat))[:2]:
+    for match in list(re.finditer("每个波次", flat))[:2]:
         hits.append("[%s] ...%s..." % (name, flat[max(0, match.start() - 110):match.start() + 130]))
 out = ["=== documents stating 每个波次: %d ===" % len(hits)]
 out.extend(hits[:16])

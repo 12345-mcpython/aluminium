@@ -12,7 +12,7 @@ Three edits, each with an exactly-once ASCII anchor:
   3. `get()` recomputes first when any attached modifier is live -- which is what makes the value follow the stacks with NO
      hook on the stack path, and costs nothing for every attribute that has no live modifier.
 
-\u26a0 The content spelling (`per_stack_live` + the `modifyAttr` hook) is deliberately NOT in this patch: it touches a path this
+⚠ The content spelling (`per_stack_live` + the `modifyAttr` hook) is deliberately NOT in this patch: it touches a path this
 round has not read, and the engine half is judgeable on its own.
 """
 import io
@@ -37,9 +37,9 @@ patch(
 """,
     """        private int sourceRoleId;
         /**
-         * \u2b50 A modifier whose magnitude is resolved when it is READ, not when it was attached (2026-10-02).
+         * ⭐ A modifier whose magnitude is resolved when it is READ, not when it was attached (2026-10-02).
          *
-         * <p>The reader family is the 「每拥有 1 层\u2026提高 X%」 auras (fourteen documents): their number has to follow the stack
+         * <p>The reader family is the 「每拥有 1 层…提高 X%」 auras (fourteen documents): their number has to follow the stack
          * count, and a stored number can only be right at the instant it was stored.
          */
         private java.util.function.DoubleSupplier live;
@@ -50,7 +50,7 @@ patch(
 patch(
     """        public static Modifier addPercentNumber(double percentValue) {""",
     """        /**
-         * \u2b50 A modifier whose ADD_PERCENT share is asked for on every computation (2026-10-02).
+         * ⭐ A modifier whose ADD_PERCENT share is asked for on every computation (2026-10-02).
          *
          * @param share the supplier, read each time the owning attribute is computed
          */
@@ -98,9 +98,9 @@ patch(
         return value;
     }""",
     """    public double get() {
-        // \u2b50 A live modifier has to be re-resolved here, because compute() otherwise runs only when modifiers are attached
+        // ⭐ A live modifier has to be re-resolved here, because compute() otherwise runs only when modifiers are attached
         // or removed. Scanning costs nothing for the attributes that have none -- which is every attribute until a rule
-        // asks for 「每拥有 1 层\u2026」.
+        // asks for 「每拥有 1 层…」.
         if (hasLiveModifier()) {
             compute();
         }

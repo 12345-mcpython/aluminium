@@ -21,7 +21,7 @@ public class BlackSwanTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** \u26a0 One Arcana per Skill, stopped at the document's fifty, and exactly 20.80% of the enemy's own defence. */
+    /** ⚠ One Arcana per Skill, stopped at the document's fifty, and exactly 20.80% of the enemy's own defence. */
     @Test
     public void theSkillStacksArcanaAndShredsDefence() {
         Character blackSwan = CharacterFactory.create(BLACK_SWAN, LEVEL);
@@ -30,19 +30,19 @@ public class BlackSwanTest {
         battle.startBattle();
         double defenceBefore = enemy.getAttribute(AttributeType.DEFENCE).get();
         Assertions.assertTrue(defenceBefore > 0, "the fixture must have defence to shred: " + defenceBefore);
-        Assertions.assertEquals(0, enemy.getBuffManager().stacksOf("\u5965\u8ff9"), "nothing before the Skill");
+        Assertions.assertEquals(0, enemy.getBuffManager().stacksOf("奥迹"), "nothing before the Skill");
 
         battle.fireTriggers(TriggerEvent.SKILL_CAST, blackSwan, enemy, 0, 0);
-        Assertions.assertEquals(1, enemy.getBuffManager().stacksOf("\u5965\u8ff9"),
-                "\u300c\u4f7f\u76ee\u6807\u2026\u9677\u51651\u5c42\u3010\u5965\u8ff9\u3011\u300d");
+        Assertions.assertEquals(1, enemy.getBuffManager().stacksOf("奥迹"),
+                "「使目标…陷入1层【奥迹】」");
         Assertions.assertEquals(0.208, (defenceBefore - enemy.getAttribute(AttributeType.DEFENCE).get()) / defenceBefore, 1e-6,
-                "\u300c\u9632\u5fa1\u529b\u964d\u4f4e20.80%\u300d of its own defence");
+                "「防御力降低20.80%」 of its own defence");
 
         for (int i = 0; i < 60; i++) {
             battle.fireTriggers(TriggerEvent.SKILL_CAST, blackSwan, enemy, 0, 0);
         }
-        Assertions.assertEquals(50, enemy.getBuffManager().stacksOf("\u5965\u8ff9"),
-                "\u300c\u3010\u5965\u8ff9\u3011\u6700\u591a\u53e0\u52a050\u5c42\u300d -- sixty-one casts must still read fifty");
+        Assertions.assertEquals(50, enemy.getBuffManager().stacksOf("奥迹"),
+                "「【奥迹】最多叠加50层」 -- sixty-one casts must still read fifty");
     }
 
     private static Random fixed() {

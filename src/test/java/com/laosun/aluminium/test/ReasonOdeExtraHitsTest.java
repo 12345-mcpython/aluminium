@@ -11,9 +11,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * \u300c\u4f7f\u5176\u6218\u6280\u7684\u4f24\u5bb3\u6b21\u6570\u589e\u52a0 3 \u6b21\u300d (2026-10-02).
+ * 「使其战技的伤害次数增加 3 次」 (2026-10-02).
  *
- * \u2b50 One variable: the same battle, the same seed, the same ode; the control takes the three segments back with the op's own negative amount. Nothing else differs, so what moves is the segments.
+ * ⭐ One variable: the same battle, the same seed, the same ode; the control takes the three segments back with the op's own negative amount. Nothing else differs, so what moves is the segments.
  */
 public class ReasonOdeExtraHitsTest {
     private static final int LEVEL = 80;

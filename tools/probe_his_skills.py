@@ -6,7 +6,7 @@ headings carry the names, and each row has an id.
 import io
 import re
 
-path = "E:/turnbasedgamedata/aluminium_texts/1404_\u4e07\u654c.md"
+path = "E:/turnbasedgamedata/aluminium_texts/1404_万敌.md"
 flat = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", io.open(path, encoding="utf-8", errors="replace").read()))
 out = []
 
@@ -16,13 +16,13 @@ for match in re.finditer(r"###\s*([^#]{0,60})", flat):
 
 out.append("")
 out.append("=== every id-looking token near a skill name ===")
-for term in ("\u5f3a\u5316", "\u5f3a\u5316\u666e\u653b", "\u5f3a\u5316\u6218\u6280"):
+for term in ("强化", "强化普攻", "强化战技"):
     for match in list(re.finditer(term, flat))[:6]:
         out.append("   [%s] ...%s..." % (term, flat[max(0, match.start() - 120):match.start() + 170]))
 
 out.append("")
 out.append("=== rows mentioning 弑王成王 or 弑神登神, with ids ===")
-for term in ("\u5f11\u738b\u6210\u738b", "\u5f11\u795e\u767b\u795e"):
+for term in ("弑王成王", "弑神登神"):
     for match in list(re.finditer(term, flat))[:4]:
         out.append("   [%s] ...%s..." % (term, flat[max(0, match.start() - 200):match.start() + 230]))
 

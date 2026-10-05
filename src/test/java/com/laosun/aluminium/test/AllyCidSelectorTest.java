@@ -28,7 +28,7 @@ public class AllyCidSelectorTest {
     private static final int NAMED = 1409;
     private static final int OTHER = 1002;
     private static final int MONSTER = 1002011;
-    private static final String MARK = "\u6d4b\u8bd5\u5c42\u6570";
+    private static final String MARK = "测试层数";
 
     @Test
     public void theNamedCidGetsItAndADifferentAllyDoesNot() {
@@ -58,7 +58,7 @@ public class AllyCidSelectorTest {
         int otherHas = other.getBuffManager().stacksOf(MARK);
         System.out.println("[ally_cid] the NAMED character has " + namedHas + " ; a different ally has " + otherHas);
 
-        Assertions.assertEquals(2, namedHas, "\u300c\u4f7f**\u98ce\u5807**\u83b7\u5f97 2 \u5c42\u300d-- the named cid, and the count the rule states");
+        Assertions.assertEquals(2, namedHas, "「使**风堇**获得 2 层」-- the named cid, and the count the rule states");
         Assertions.assertEquals(0, otherHas,
                 "and a different ally gets nothing -- a fallback to \"the owner\" (or to everybody) would pass one half and fail this one");
     }

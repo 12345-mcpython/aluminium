@@ -23,7 +23,7 @@ public class SkyOdeStackTest {
     private static final int HYACINE = 1409;
     private static final int OTHER = 1002;
     private static final int MONSTER = 1002011;
-    private static final String MARK = "\u732e\u4e88\u300c\u5929\u7a7a\u300d\u4e4b\u8bd7";
+    private static final String MARK = "献予「天空」之诗";
 
     @Test
     public void theNamedCharacterGetsTwoLayersAndNobodyElseDoes() {
@@ -52,7 +52,7 @@ public class SkyOdeStackTest {
         System.out.println("[sky_stacks] the named character has " + named + " ; the other ally has " + bystander);
 
         Assertions.assertEquals(2, named,
-                "\u300c\u4f7f\u98ce\u5807\u83b7\u5f97 2 \u5c42\u300d-- the data states LayerAddWhenStack: 2, and the sentence agrees");
+                "「使风堇获得 2 层」-- the data states LayerAddWhenStack: 2, and the sentence agrees");
         Assertions.assertEquals(0, bystander, "and nobody else -- the game names the cid, and so does `ally_cid:`");
     }
 
@@ -82,7 +82,7 @@ public class SkyOdeStackTest {
                     SkillExecutor.execute(battle, ode, demiurge, List.of(battle.enemies.getFirst()));
                     battle.processRequests();
                 },
-                "\u540d\u70b9\u7684\u89d2\u8272\u4e0d\u5728\u573a\u65f6\uff0c\u8fd9\u6761\u5e94\u8be5\u4ec0\u4e48\u4e5f\u4e0d\u505a");
+                "名点的角色不在场时，这条应该什么也不做");
         Assertions.assertEquals(0, other.getBuffManager().stacksOf(MARK),
                 "and it lands on nobody -- not on a bystander");
         System.out.println("[sky_stacks] with the named character absent: no throw, and the bystander has "

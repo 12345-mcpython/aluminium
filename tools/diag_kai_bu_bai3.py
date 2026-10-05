@@ -16,10 +16,10 @@ rules = doc["rules"] if isinstance(doc, dict) and "rules" in doc else doc
 touched = 0
 for rule in rules:
     if isinstance(rule, dict) and rule.get("id") == RULE_ID:
-        rule["do"] = [{"op": "GAIN_RESOURCE", "resource": "\u597d\u6d3b\u5f53\u8d4f",
+        rule["do"] = [{"op": "GAIN_RESOURCE", "resource": "好活当赏",
                        "amountFromEvent": True, "target": "self"}]
-        rule["note"] = rule.get("note", "") + " \u26a0 \u672c\u6b21\u53ea\u7528 `amountFromEvent`\uff08\u53d6**\u5168\u90e8**\u91cf\uff09\u2713\uff0c\u56e0\u4e3a\u5b9e\u6d4b\u53d1\u73b0 " \
-            "`amountFromEvent` \u4e0e `amountPercent` **\u5408\u7528\u65f6\u4e0d\u751f\u6548** \u2717 \u21d2 \u90a3\u4e00\u534a\u5355\u72ec\u767b\u8bb0 \u2713\u3002"
+        rule["note"] = rule.get("note", "") + " ⚠ 本次只用 `amountFromEvent`（取**全部**量）✓，因为实测发现 " \
+            "`amountFromEvent` 与 `amountPercent` **合用时不生效** ✗ ⇒ 那一半单独登记 ✓。"
         touched += 1
 if touched != 1:
     sys.exit("REFUSING: found %d" % touched)

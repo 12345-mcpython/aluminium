@@ -28,7 +28,7 @@ public class DanHengTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** \u26a0 An ally's skill aimed at him raises his penetration; a skill aimed elsewhere does not. */
+    /** ⚠ An ally's skill aimed at him raises his penetration; a skill aimed elsewhere does not. */
     @Test
     public void anAllysSkillAimedAtHimRaisesHisPenetration() {
         Fixture f = new Fixture();
@@ -37,11 +37,11 @@ public class DanHengTest {
         f.battle.castImmediate(f.ally.getSkills().get(SkillType.SKILL), f.ally, List.of(f.danheng));
 
         Assertions.assertTrue(f.danheng.getAttribute(AttributeType.DAMAGE_PENETRATION).get() > before,
-                "\u300c\u5f53\u4e39\u6052\u6210\u4e3a\u6211\u65b9\u6280\u80fd\u7684\u65bd\u653e\u76ee\u6807\u65f6\uff0c\u4e0b\u4e00\u6b21\u653b\u51fb\u7684\u98ce\u5c5e\u6027\u6297\u6027\u7a7f\u900f\u63d0\u9ad836%\u300d: "
+                "「当丹恒成为我方技能的施放目标时，下一次攻击的风属性抗性穿透提高36%」: "
                         + before + " -> " + f.danheng.getAttribute(AttributeType.DAMAGE_PENETRATION).get());
     }
 
-    /** \u26a0 The control: an ally's skill aimed at someone ELSE must leave his penetration alone. */
+    /** ⚠ The control: an ally's skill aimed at someone ELSE must leave his penetration alone. */
     @Test
     public void anAllysSkillAimedElsewhereLeavesItAlone() {
         Fixture f = new Fixture();
@@ -50,7 +50,7 @@ public class DanHengTest {
         f.battle.castImmediate(f.ally.getSkills().get(SkillType.SKILL), f.ally, List.of(f.ally));
 
         Assertions.assertEquals(before, f.danheng.getAttribute(AttributeType.DAMAGE_PENETRATION).get(), 1e-9,
-                "\u300c\u6210\u4e3a\u6211\u65b9\u6280\u80fd\u7684\u65bd\u653e\u76ee\u6807\u300d -- being on the field is not enough");
+                "「成为我方技能的施放目标」 -- being on the field is not enough");
     }
 
     /** Census: the talent and the level convention are where the notes say. */

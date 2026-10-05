@@ -31,8 +31,8 @@ if not any("AttributeType" in o for o in overloads):
 OLD_VALIDATE = """                   requireBuff(effect, op, spec);
                    requireNoDuration(effect, op, spec);
                    requireNoStackArguments(effect, op, spec);"""
-NEW_VALIDATE = """                   // \u2b50 `buff` (the state's name) OR `attribute` (what a modifier modifies) -- exactly one (2026-10-02). The by-attribute
-                   // form is what makes 「\u6301\u7eed\u81f3\u2026\u72b6\u6001\u7ed3\u675f」 expressible: the state that ends is one thing, the modifiers that must
+NEW_VALIDATE = """                   // ⭐ `buff` (the state's name) OR `attribute` (what a modifier modifies) -- exactly one (2026-10-02). The by-attribute
+                   // form is what makes 「持续至…状态结束」 expressible: the state that ends is one thing, the modifiers that must
                    // come off with it may be several, and naming them by attribute is the only handle a rule has on them.
                    boolean byAttribute = effect.getAttribute() != null && !effect.getAttribute().isBlank();
                    if (byAttribute) {
@@ -48,7 +48,7 @@ OLD_WORKER = """    private static void removeState(EffectSpec effect, TriggerCo
         }
     }"""
 NEW_WORKER = """    private static void removeState(EffectSpec effect, TriggerContext ctx) {
-        // \u2b50 A NAME or an ATTRIBUTE (2026-10-02): the second is how 「\u6301\u7eed\u81f3\u3010\u81f3\u9ad8\u4e4b\u59ff\u3011\u72b6\u6001\u7ed3\u675f」 takes its own modifiers off.
+        // ⭐ A NAME or an ATTRIBUTE (2026-10-02): the second is how 「持续至【至高之姿】状态结束」 takes its own modifiers off.
         AttributeType byAttribute = effect.getAttribute() == null || effect.getAttribute().isBlank()
                 ? null
                 : AttributeType.fromString(effect.getAttribute().trim());

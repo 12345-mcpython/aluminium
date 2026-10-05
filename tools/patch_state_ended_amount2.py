@@ -5,11 +5,11 @@ Two changes on top of the ready-made patch:
   1. `fireStateEnded(carrier, name, magnitude)` -- the overload from `tools/patch_state_ended_amount.py` (re-run here);
   2. `BuffManager.removeState` fires ONCE with the total, instead of once per removed instance.
 
-\u2b50 Why (2) is not optional: measured in the previous judge attempt, three instances removed in one sweep fired three times,
+⭐ Why (2) is not optional: measured in the previous judge attempt, three instances removed in one sweep fired three times,
 so a reader that turns "50% of it" into a resource would apply its 50% three times over three different totals. The sentence
 is about the state ending, which happens once.
 
-\u26a0 The spent-duration path keeps firing per instance: there each instance really does expire on its own, and that is the
+⚠ The spent-duration path keeps firing per instance: there each instance really does expire on its own, and that is the
 moment the event is about.
 """
 import io
@@ -37,8 +37,8 @@ OLD_HEAD = """        String wanted = state.trim();
         int removed = 0;"""
 NEW_HEAD = """        String wanted = state.trim();
         int removed = 0;
-        // \u2b50 ONE announcement per sweep, with the total (2026-10-02): a sweep can take several instances of one state, and
-        // the rule that reads the amount (\u300c\u5c06\u5176\u4e2d\u7684 50% \u8f6c\u5316\u4e3a\u81ea\u8eab\u7684\u3010\u597d\u6d3b\u5f53\u8d4f\u3011\u300d) must see "how much ended" once, not once per
+        // ⭐ ONE announcement per sweep, with the total (2026-10-02): a sweep can take several instances of one state, and
+        // the rule that reads the amount (「将其中的 50% 转化为自身的【好活当赏】」) must see "how much ended" once, not once per
         // instance with a shrinking number.
         int ending = 0;
         for (AbstractBuff carried : List.copyOf(buffs)) {

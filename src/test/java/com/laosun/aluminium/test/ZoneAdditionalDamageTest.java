@@ -20,7 +20,7 @@ import java.util.Random;
  * <p>「受到我方目标攻击后，每有1名目标受到攻击，会对被攻击目标中当前生命值最高的目标造成 1 次等同于缇宝 #3% 生命上限的量子属性附加伤害。」
  *
  * <p>The two scenes differ by EXACTLY one rule, and the zone is open in both. ⚠ An earlier version replaced his table with an EMPTY one to remove that rule, which also
- * dropped `level_convention` -- the trap `literalBase`\u2019s own comment records being sprung by a judge three times. This one keeps every loaded rule and filters out
+ * dropped `level_convention` -- the trap `literalBase`’s own comment records being sprung by a judge three times. This one keeps every loaded rule and filters out
  * exactly the rider.
  */
 public class ZoneAdditionalDamageTest {
@@ -28,7 +28,7 @@ public class ZoneAdditionalDamageTest {
     private static final int TRIBBIE = 1403;
     private static final int ATTACKER = 1402;
     private static final int MONSTER = 1002011;
-    private static final String ZONE = "\u7ed3\u754c";
+    private static final String ZONE = "结界";
 
     @Test
     public void theZoneAddsExactlyItsOwnInstance() {
@@ -42,7 +42,7 @@ public class ZoneAdditionalDamageTest {
                 + " ; the rider's own instance = " + delta + " (raw #3 x Max HP = " + rawAt80 + ")");
 
         Assertions.assertTrue(withoutRider > 0, "precondition: the ally attack lands");
-        Assertions.assertTrue(delta > 0, "\u300c\u9020\u6210 1 \u6b21\u2026\u9644\u52a0\u4f24\u5bb3\u300d-- the zone's own instance");
+        Assertions.assertTrue(delta > 0, "「造成 1 次…附加伤害」-- the zone's own instance");
         Assertions.assertTrue(delta < rawAt80,
                 "it is a real damage instance, so the target's zones scale it: " + delta + " < " + rawAt80);
         Assertions.assertTrue(delta > rawAt80 / 4,
@@ -50,7 +50,7 @@ public class ZoneAdditionalDamageTest {
         Assertions.assertTrue(rawAt80 > rawAtLow, "#3 x Max HP runs with level, which is what percent_from_skill_param reads");
     }
 
-    /** `#3 \u00d7 Max HP` at a level, read the way the engine reads it -- at the skill level that character actually has. */
+    /** `#3 × Max HP` at a level, read the way the engine reads it -- at the skill level that character actually has. */
     private static double rawShare(int level) {
         Character tribbie = CharacterFactory.create(TRIBBIE, level);
         Skill ultra = tribbie.getSkills().get(SkillType.ULTRA);
@@ -74,7 +74,7 @@ public class ZoneAdditionalDamageTest {
         battle.processRequests();
 
         if (!withRider) {
-            // \u2b50 EVERY rule stays loaded (level_convention included) and the ultimate has already been cast, so the vulnerability is on the enemies in both scenes.
+            // ⭐ EVERY rule stays loaded (level_convention included) and the ultimate has already been cast, so the vulnerability is on the enemies in both scenes.
             // The one thing taken away is the STATE the rider's gate reads -- `removeState` takes the state name off him and touches nothing else.
             int taken = tribbie.getBuffManager().removeState(ZONE);
             Assertions.assertTrue(taken > 0, "precondition: the zone state was on him to remove");

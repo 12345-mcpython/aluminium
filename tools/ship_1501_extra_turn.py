@@ -23,7 +23,7 @@ import json
 DATA = "src/main/resources/characters/1501.json"
 JUDGE = "src/test/java/com/laosun/aluminium/test/AhaEndExtraTurnTest.java"
 RULE = "aha_end_extra_turn"
-MOMENT = "\u963f\u54c8\u65f6\u523b"
+MOMENT = "阿哈时刻"
 
 doc = json.load(io.open(DATA, encoding="utf-8"))
 rules = doc["rules"] if isinstance(doc, dict) else doc
@@ -34,17 +34,17 @@ rules.append({
     "id": RULE,
     "when": ["self state_ended " + MOMENT],
     "do": [{"op": "EXTRA_TURN", "target": "self"}],
-    "source": ("1501 \u706b\u82b1 \u884c\u8ff9\uff08\u6587\u6863 `:145`\uff09\uff1a"
-               "\u300c**\u963f\u54c8\u65f6\u523b\u7ed3\u675f\u65f6\u4f7f\u706b\u82b1\u83b7\u5f97 1 \u4e2a\u3010\u989d\u5916\u56de\u5408\u3011**\u548c 2 \u4e2a\u3010\u7206\u70b9\u3011\u300d"),
-    "note": ("\u2b50 2026-10-02\uff1a\u89e6\u53d1 **\u5df2\u901a** \u2713\uff08\u663e\u5f0f\u79fb\u9664\u4f1a\u516c\u544a `STATE_ENDED` \u2713 \u2014\u2014 \u672c\u6bb5\u7b2c 20 \u4ef6\uff09\uff1b"
-             "\u91cf\u7528 **`EXTRA_TURN`** \u2713\uff08\u5df2\u63a5\u7ebf \u2713\uff1a`TriggerInterpreter:1165` \u76f4\u63a5\u8c03 `battle.grantExtraTurn(...)` \u2713\uff09\u3002"
-             "\u26a0 **\u5df2\u767b\u8bb0**\uff1a\u540c\u53e5\u7684\u3010\u7206\u70b9\u3011\uff08\u8d44\u6e90\u4e0a\u9650\u5728\u7f16\u8bd1\u8868\u8fbe\u5f0f\u91cc \u2717\uff09\u3002"),
+    "source": ("1501 火花 行迹（文档 `:145`）："
+               "「**阿哈时刻结束时使火花获得 1 个【额外回合】**和 2 个【爆点】」"),
+    "note": ("⭐ 2026-10-02：触发 **已通** ✓（显式移除会公告 `STATE_ENDED` ✓ —— 本段第 20 件）；"
+             "量用 **`EXTRA_TURN`** ✓（已接线 ✓：`TriggerInterpreter:1165` 直接调 `battle.grantExtraTurn(...)` ✓）。"
+             "⚠ **已登记**：同句的【爆点】（资源上限在编译表达式里 ✗）。"),
 })
 
 if isinstance(doc, dict):
     doc["rules"] = rules
 else:
-    doc = rules            # \u26a0 1501.json is a bare list (measured)
+    doc = rules            # ⚠ 1501.json is a bare list (measured)
 json.dump(doc, io.open(DATA, "w", encoding="utf-8", newline="\n"), ensure_ascii=False, indent=2)
 print("ok   1501.json: the Aha ending grants an extra turn")
 
@@ -64,18 +64,18 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1501\uff1a\u300c\u963f\u54c8\u65f6\u523b\u7ed3\u675f\u65f6\u4f7f\u706b\u82b1\u83b7\u5f97 1 \u4e2a\u3010\u989d\u5916\u56de\u5408\u3011\u300d (2026-10-02).
+ * 1501：「阿哈时刻结束时使火花获得 1 个【额外回合】」 (2026-10-02).
  *
- * <p>\u2b50 FILE-DRIVEN, with the applier on the ALLY: 1501 has no Aha-moment creator of her own, and rebuilding HER table would
+ * <p>⭐ FILE-DRIVEN, with the applier on the ALLY: 1501 has no Aha-moment creator of her own, and rebuilding HER table would
  * destroy the very reader under test. The ally lays the state on the whole camp instead, and the judge then ends it by hand.
  */
 public class AhaEndExtraTurnTest {
     private static final int OWNER = 1501;
     private static final int ALLY = 1002;
     private static final int MONSTER = 1002011;
-    private static final String MOMENT = "\u963f\u54c8\u65f6\u523b";
+    private static final String MOMENT = "阿哈时刻";
 
-    /** \u2b50 Ending the moment owes her an extra turn. */
+    /** ⭐ Ending the moment owes her an extra turn. */
     @Test
     public void endingTheMomentGrantsAnExtraTurn() {
         Character owner = CharacterFactory.create(OWNER, 80);

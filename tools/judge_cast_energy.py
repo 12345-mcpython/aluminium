@@ -33,7 +33,7 @@ JAVA = ('package com.laosun.aluminium.test;' + NL + NL
         + 'import org.junit.jupiter.api.Test;' + NL + NL
         + 'import java.util.List;' + NL + 'import java.util.Random;' + NL + NL
         + '/**' + NL
-        + ' * Light cone 23062, sentence 4: 「\u6bcf\u6d88\u8017 1 \u70b9\u80fd\u91cf\u503c\uff0c\u4f7f\u672c\u6b21\u9020\u6210\u7684\u7ec8\u7ed3\u6280\u4f24\u5bb3\u63d0\u9ad8 #3%\uff0c\u6700\u591a #6%\u300d.' + NL
+        + ' * Light cone 23062, sentence 4: 「每消耗 1 点能量值，使本次造成的终结技伤害提高 #3%，最多 #6%」.' + NL
         + ' *' + NL
         + ' * <p>The end-to-end half fires a real ultimate at full energy, so the spend IS the max energy. The cap half' + NL
         + ' * cannot be reached that way -- 72% at 0.2%/point needs 360 energy -- so it sets the instance field directly.' + NL

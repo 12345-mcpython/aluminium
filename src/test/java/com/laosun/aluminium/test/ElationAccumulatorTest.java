@@ -12,17 +12,17 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1505 \u7eef\u82f1\u2019s energy accumulator (2026-09-30): \u300c\u7d2f\u8ba1\u83b7\u5f97 240 \u70b9\u80fd\u91cf\u65f6\u2026\u5355\u6b21\u83b7\u5f97\u80fd\u91cf\u65f6\u6700\u591a\u83b7\u5f97 240 \u70b9\u7d2f\u8ba1\u503c\u300d.
+ * 1505 绯英’s energy accumulator (2026-09-30): 「累计获得 240 点能量时…单次获得能量时最多获得 240 点累计值」.
  *
- * <p>\u2b50 Two-sided on the same resource: a 300-energy gain adds only 240 (the per-conversion ceiling), a 100-energy gain adds all 100,
- * and two gains in a row accumulate -- which is what \u300c\u7d2f\u8ba1\u300d means.
+ * <p>⭐ Two-sided on the same resource: a 300-energy gain adds only 240 (the per-conversion ceiling), a 100-energy gain adds all 100,
+ * and two gains in a row accumulate -- which is what 「累计」 means.
  */
 public class ElationAccumulatorTest {
     private static final int WEARER = 1505;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
-    private static final String ACC = "\u7d2f\u8ba1\u80fd\u91cf";
+    private static final String ACC = "累计能量";
 
     private Character elation;
     private Battle battle;
@@ -48,12 +48,12 @@ public class ElationAccumulatorTest {
         int first = elation.getResources().value(ACC);
         System.out.println("[acc] a 300-energy gain added " + big + " ; a 100 one added " + small
                 + " ; the counter now reads " + first + " (240 + 100)");
-        Assertions.assertEquals(240, big, "\u5355\u6b21\u83b7\u5f97\u80fd\u91cf\u65f6\u6700\u591a\u83b7\u5f97 240 \u70b9\u7d2f\u8ba1\u503c");
+        Assertions.assertEquals(240, big, "单次获得能量时最多获得 240 点累计值");
         Assertions.assertEquals(100, small, "below the ceiling a gain is taken whole");
         Assertions.assertEquals(340, first, "and the counter accumulates rather than resetting");
     }
 
-    /** \u2605 The shipped rule, read off the compiled table (discipline 232). */
+    /** ★ The shipped rule, read off the compiled table (discipline 232). */
     @Test
     public void theShippedRuleCarriesTheCeiling() {
         build();

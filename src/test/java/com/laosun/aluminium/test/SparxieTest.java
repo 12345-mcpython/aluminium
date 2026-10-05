@@ -20,7 +20,7 @@ public class SparxieTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** \u26a0 The technique hits and restores exactly two Skill Points, and only when declared. */
+    /** ⚠ The technique hits and restores exactly two Skill Points, and only when declared. */
     @Test
     public void theTechniqueHitsAndRestoresSkillPoints() {
         Character sparxie = CharacterFactory.create(SPARXIE, LEVEL);
@@ -32,7 +32,7 @@ public class SparxieTest {
         battle.startBattle();
 
         Assertions.assertTrue(before - enemy.getCurrentHp() > 0,
-                "\u300c\u5bf9\u654c\u65b9\u5168\u4f53\u9020\u6210\u7b49\u540c\u4e8e\u706b\u82b150%\u653b\u51fb\u529b\u7684\u706b\u5c5e\u6027\u4f24\u5bb3\u300d");
+                "「对敌方全体造成等同于火花50%攻击力的火属性伤害」");
 
         Character plain = CharacterFactory.create(SPARXIE, LEVEL);
         Enemy enemy2 = EnemyFactory.create(MONSTER, 90, 1);
@@ -40,10 +40,10 @@ public class SparxieTest {
         double untouched = enemy2.getCurrentHp();
         plainBattle.startBattle();
         Assertions.assertEquals(untouched, enemy2.getCurrentHp(), 1e-9,
-                "\u300c\u4f7f\u7528\u79d8\u6280\u540e\u300d -- undeclared, so nothing");
+                "「使用秘技后」 -- undeclared, so nothing");
     }
 
-    /** \u26a0 Exactly two Skill Points: spend two first so the pool's cap cannot clamp the grant, then observe it in isolation. */
+    /** ⚠ Exactly two Skill Points: spend two first so the pool's cap cannot clamp the grant, then observe it in isolation. */
     @Test
     public void theTechniqueGrantsExactlyTwoSkillPoints() {
         Character sparxie = CharacterFactory.create(SPARXIE, LEVEL);
@@ -61,7 +61,7 @@ public class SparxieTest {
         battle.fireTriggers(TriggerEvent.BATTLE_START, sparxie, sparxie, 0, 0);
 
         Assertions.assertEquals(before + 2, battle.getSkillPoints(),
-                "\u300c\u5e76\u4e3a\u6211\u65b9\u6062\u590d2\u4e2a\u6218\u6280\u70b9\u300d: " + before + " -> " + battle.getSkillPoints());
+                "「并为我方恢复2个战技点」: " + before + " -> " + battle.getSkillPoints());
     }
 
     private static Random fixed() {

@@ -14,7 +14,7 @@ rules = doc["rules"] if isinstance(doc, dict) and "rules" in doc else doc
 touched = 0
 for rule in rules:
     if isinstance(rule, dict) and rule.get("id") == RULE_ID:
-        rule["do"] = [{"op": "GAIN_RESOURCE", "resource": "\u597d\u6d3b\u5f53\u8d4f", "amount": 2.0, "target": "self"}]
+        rule["do"] = [{"op": "GAIN_RESOURCE", "resource": "好活当赏", "amount": 2.0, "target": "self"}]
         touched += 1
 if touched != 1:
     sys.exit("REFUSING: found %d" % touched)

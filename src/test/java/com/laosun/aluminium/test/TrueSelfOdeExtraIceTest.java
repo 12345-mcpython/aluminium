@@ -11,7 +11,7 @@ import java.util.Random;
 
 /** The extra Ice hits of slot 26's second clause (2026-10-02). */
 public class TrueSelfOdeExtraIceTest {
-    private static final String COUNTER = "\u5fc6\u7075\u6280\u7684\u989d\u5916\u4e00\u51fb";
+    private static final String COUNTER = "忆灵技的额外一击";
 
     @Test
     public void eachCounterPointAddsAHit() {
@@ -26,7 +26,7 @@ public class TrueSelfOdeExtraIceTest {
         Battle battle = new Battle(List.of(cyrene), List.of(EnemyFactory.create(1002011, 100, 1)), new Random(0));
         battle.startBattle();
         battle.processRequests();
-        // \u2b50 `summonMemosprite` builds through `memospriteWith`, which does NOT install the spec's `skills` (measured: the map is empty);
+        // ⭐ `summonMemosprite` builds through `memospriteWith`, which does NOT install the spec's `skills` (measured: the map is empty);
         // `summonServant` does, and both make the same unit (measured in an earlier round).
         var dragon = battle.summonServant(battle.characters.get(0));
         battle.processRequests();

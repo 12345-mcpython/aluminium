@@ -48,18 +48,18 @@ public enum AttributeType {
 
     @SerializedName("breaking_effect") BREAKING_EFFECT("breaking_effect"),
     /**
-     * \u2705 How much a BREAK hit is worth (2026-09-30; reader: cone 21056's \u300c\u4f7f\u6211\u65b9\u5168\u4f53\u9020\u6210\u7684\u51fb\u7834\u4f24\u5bb9\u63d0\u9ad8\u300d).
+     * ✅ How much a BREAK hit is worth (2026-09-30; reader: cone 21056's 「使我方全体造成的击破伤容提高」).
      *
-     * <p>\u2605 A channel of its own because {@link DamageType#BREAK} is deliberately NOT boostable: the ordinary DMG
+     * <p>★ A channel of its own because {@link DamageType#BREAK} is deliberately NOT boostable: the ordinary DMG
      * boost zone never touches break damage, so a sentence about break damage needs somewhere else to land. It
      * multiplies the break BASE (see {@code BreakDamageCalculator.build}), next to break effect.
      */
     @SerializedName("break_damage_boost") BREAK_DAMAGE_BOOST("break_damage_boost"),
     /**
-     * \u2705 How much less damage this unit TAKES, across every element (2026-09-30; reader: cone 21002's
-     * \u300c\u4f7f\u6211\u65b9\u5168\u4f53\u7684\u5168\u5c5e\u6027\u6297\u6027\u63d0\u9ad8\u300d).
+     * ✅ How much less damage this unit TAKES, across every element (2026-09-30; reader: cone 21002's
+     * 「使我方全体的全属性抗性提高」).
      *
-     * <p>\u2605 The victim-side twin of {@link #RESISTANCE_REDUCTION}: that one is stated on the ATTACKER and
+     * <p>★ The victim-side twin of {@link #RESISTANCE_REDUCTION}: that one is stated on the ATTACKER and
      * lowers the target's resistance, this one is stated on the VICTIM and raises its own. Both feed the same
      * subtraction in the resistance zone, and neither is folded into penetration -- a negative resistance is
      * meant to be fully effective, which is why the zone's clamp must not swallow them.

@@ -17,7 +17,7 @@ public class TrueSelfOdeSpendsThreeStoryTest {
     private static final int CYRENE = 1415;
     private static final int MONSTER = 1002011;
     private static final int ODE_SLOT = 26;
-    private static final String STORY = "\u6545\u4e8b";
+    private static final String STORY = "故事";
 
     @Test
     public void threePointsAreSpentForTheExtraTurn() {

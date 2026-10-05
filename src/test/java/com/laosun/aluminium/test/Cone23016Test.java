@@ -22,7 +22,7 @@ import java.util.Random;
  * Light cone 23016: follow-up damage +30%, a follow-up tames the target (max 2 layers), and every layer lifts the wearer's
  * CRIT damage by 12% against a tamed target.
  *
- * <p>\u2b50 The per-layer part rides the instance crit slot with {@code per_stack: target_stacks:...}, so the judge reads the CRIT
+ * <p>⭐ The per-layer part rides the instance crit slot with {@code per_stack: target_stacks:...}, so the judge reads the CRIT
  * number itself (the chance is pinned at 1) at one layer and at two -- the DIFFERENCE is one layer's worth.
  */
 public class Cone23016Test {
@@ -31,7 +31,7 @@ public class Cone23016Test {
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
-    private static final String TAME = "\u6e29\u9a6f";
+    private static final String TAME = "温驯";
 
     private Character wearer;
     private Enemy enemy;
@@ -80,9 +80,9 @@ public class Cone23016Test {
         double atTwo = critHit();
         System.out.println("[23016] untamed=" + untamed + " at 1 layer=" + atOne + " at 2 layers=" + atTwo
                 + " ; one layer=" + (atOne - untamed) + " second layer=" + (atTwo - atOne));
-        // \u2605 The per-layer AMOUNT, anchored to the crit base the engine reports (discipline 200). A crit multiplies by
+        // ★ The per-layer AMOUNT, anchored to the crit base the engine reports (discipline 200). A crit multiplies by
         // (1 + crit damage), so one layer of +12% must add `untamed * 0.12 / (1 + base)`.
-        // \u26a0 A ratio-of-deltas does NOT work here: halving the share halves BOTH deltas, so the equality survives --
+        // ⚠ A ratio-of-deltas does NOT work here: halving the share halves BOTH deltas, so the equality survives --
         // measured, the `12 -> 6 percent` mutation was still 0 red with that shape.
         double base = wearer.getAttribute(AttributeType.CRIT_ATTACK).get();
         double expected = untamed * 0.12 / (1 + base);

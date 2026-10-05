@@ -19,7 +19,7 @@ public class BladeEidolonStateTest {
     private static final int WEARER = 1205;
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
-    private static final String STATE = "\u5730\u72f1\u53d8";
+    private static final String STATE = "地狱变";
 
     @Test
     public void theSecondEidolonRaisesCritRateOnlyWhileTheStateHolds() {

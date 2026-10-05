@@ -15,13 +15,13 @@ t = io.open(WORK + '/' + ENG, encoding='utf-8').read()
 set_anchor = '    private static final Set<String> WIRED = Set.of('
 special = (
     '    /**' + NL
-    + '     * \u2b50 The two element sources `ADD_ELEMENTAL_WEAKNESS` accepts besides a real element name' + NL
-    + '     * (2026-09-30). \u26a0 A closed set on purpose: without it a misspelled element would only blow up at' + NL
+    + '     * ⭐ The two element sources `ADD_ELEMENTAL_WEAKNESS` accepts besides a real element name' + NL
+    + '     * (2026-09-30). ⚠ A closed set on purpose: without it a misspelled element would only blow up at' + NL
     + '     * RUN time, and only if the rule ever fired -- a wrong answer that reports nothing.' + NL
     + '     *' + NL
-    + '     * <p>`party_first` -- \u300c\u573a\u4e0a\u6211\u65b9\u76ee\u6807\u6301\u6709\u5c5e\u6027\u7684\u5f31\u70b9\u300d (character 1006); its' + NL
-    + '     * skill text names the rule: \u300c\u4f18\u5148\u6dfb\u52a0\u6211\u65b9\u7f16\u961f\u7b2c\u4e00\u4f4d\u89d2\u8272\u6301\u6709\u5c5e\u6027\u7684\u5f31\u70b9\u300d.' + NL
-    + '     * <p>`random_absent` -- \u300c\u6dfb\u52a0 1 \u4e2a\u968f\u673a\u5c5e\u6027\u5f31\u70b9\uff0c\u4f18\u5148\u6dfb\u52a0\u76ee\u6807\u5c1a\u672a\u62e5\u6709\u7684\u5f31\u70b9\u300d (character 1405).' + NL
+    + '     * <p>`party_first` -- 「场上我方目标持有属性的弱点」 (character 1006); its' + NL
+    + '     * skill text names the rule: 「优先添加我方编队第一位角色持有属性的弱点」.' + NL
+    + '     * <p>`random_absent` -- 「添加 1 个随机属性弱点，优先添加目标尚未拥有的弱点」 (character 1405).' + NL
     + '     */' + NL
     + '    private static final Set<String> SPECIAL_ELEMENTS = Set.of("party_first", "random_absent");' + NL + NL
     + set_anchor)
@@ -38,7 +38,7 @@ load_old = ('                if (effect.getElement() == null || effect.getElemen
 load_new = ('                if (effect.getElement() == null || effect.getElement().isBlank()) {' + NL
             + '                    throw new IllegalArgumentException("Op ADD_ELEMENTAL_WEAKNESS requires element (source: " + spec.getSource() + ")");' + NL
             + '                }' + NL
-            + '                // \u26a0 Reject it HERE, not at run time: an unknown element that only blows up when the rule' + NL
+            + '                // ⚠ Reject it HERE, not at run time: an unknown element that only blows up when the rule' + NL
             + '                // finally fires is exactly the silent mistake this library keeps closing.' + NL
             + '                String named = effect.getElement().trim();' + NL
             + '                if (!SPECIAL_ELEMENTS.contains(named)' + NL
@@ -58,8 +58,8 @@ exec_old = ('                DamageElement weakness = DamageElement.fromString(e
             + '                if (weakness == null) {' + NL
             + '                    throw new IllegalStateException("Op ADD_ELEMENTAL_WEAKNESS names an element that is not a DamageElement");' + NL
             + '                }')
-exec_new = ('                // \u26a0 Two named sources beside a real element name (the loader keeps this a closed set):' + NL
-            + '                //   `party_first` -- the first character of the party, per 1006\u2019s own skill text.' + NL
+exec_new = ('                // ⚠ Two named sources beside a real element name (the loader keeps this a closed set):' + NL
+            + '                //   `party_first` -- the first character of the party, per 1006’s own skill text.' + NL
             + '                //   `random_absent` -- a random element the target does NOT already have (1405).' + NL
             + '                String named = effect.getElement().trim();' + NL
             + '                DamageElement weakness;' + NL
@@ -82,7 +82,7 @@ exec_new = ('                // \u26a0 Two named sources beside a real element n
             + '                    weakness = DamageElement.fromString(named);' + NL
             + '                }' + NL
             + '                if (weakness == null) {' + NL
-            + '                    // \u26a0 Not an error for the two named sources: 1006 may have no party attribute to offer and' + NL
+            + '                    // ⚠ Not an error for the two named sources: 1006 may have no party attribute to offer and' + NL
             + '                    // 1405 may find no absent element. The clause simply does nothing then.' + NL
             + '                    if (SPECIAL_ELEMENTS.contains(named)) { break; }' + NL
             + '                    throw new IllegalStateException("Op ADD_ELEMENTAL_WEAKNESS names an element that is not a DamageElement");' + NL
@@ -117,7 +117,7 @@ if s.returncode != 0:
                 if m is not None:
                     print('  FAIL %s: %s' % (c.get('name'), (m.get('message') or '')[:280]))
     for l in ((s.stdout or '') + (s.stderr or '')).split(NL):
-        if '.java:' in l or 'error:' in l or '\u9519\u8bef' in l:
+        if '.java:' in l or 'error:' in l or '错误' in l:
             print('  DIAG ' + l.strip()[:180])
     print('REFUSING to commit')
     sys.exit(1)

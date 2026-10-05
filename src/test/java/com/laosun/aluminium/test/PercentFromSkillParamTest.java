@@ -69,7 +69,7 @@ public class PercentFromSkillParamTest {
                 + " (neighbour " + neighbour + ") ; gained " + gained);
 
         Assertions.assertEquals(expected, gained, Math.abs(expected) * 1e-6,
-                "\u300c\u7b49\u540c\u4e8e\u7f07\u5b9d #3% \u751f\u547d\u4e0a\u9650\u300d-- #3 of HIS ultimate, times Max HP");
+                "「等同于缇宝 #3% 生命上限」-- #3 of HIS ultimate, times Max HP");
         Assertions.assertNotEquals(neighbour, gained, Math.abs(expected) * 1e-6, "and the index is load-bearing");
     }
 }

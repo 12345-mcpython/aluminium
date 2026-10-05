@@ -25,36 +25,36 @@ ADDITIONS = [
     {
         "on": "STATE_ENDED",
         "id": "transformation_end_speeds_the_party",
-        "when": ["self state_ended \u53d8\u8eab"],
+        "when": ["self state_ended 变身"],
         "do": [{"op": "MODIFY_ATTR", "attribute": "SPEED", "percent": 0.15, "turns": 1, "target": "all_allies"}],
-        "source": "1408 \u767d\u5384 \u5929\u8d4b\uff1a\u300c\u53d8\u8eab\u7ed3\u675f\u65f6\uff0c\u4f7f\u6211\u65b9\u5168\u4f53\u901f\u5ea6\u63d0\u9ad8 **15%**\uff0c\u6301\u7eed **1** \u56de\u5408\u300d",
-        "note": "\u300c\u53d8\u8eab\u7ed3\u675f\u65f6\u2026\u6211\u65b9\u5168\u4f53\u901f\u5ea6 +15%\uff0c\u6301\u7eed 1 \u56de\u5408\u300d\u21d2 `STATE_ENDED` \uff0b `self state_ended \u53d8\u8eab` \u21d2 `MODIFY_ATTR{SPEED, 15%, turns: 1, all_allies}` \u2713\u3002",
+        "source": "1408 白厄 天赋：「变身结束时，使我方全体速度提高 **15%**，持续 **1** 回合」",
+        "note": "「变身结束时…我方全体速度 +15%，持续 1 回合」⇒ `STATE_ENDED` ＋ `self state_ended 变身` ⇒ `MODIFY_ATTR{SPEED, 15%, turns: 1, all_allies}` ✓。",
     },
     {
         "on": "STATE_ENDED",
         "id": "trace_worlds_end_three_seeds",
-        "when": ["self state_ended \u53d8\u8eab"],
-        "do": [{"op": "GAIN_RESOURCE", "resource": "\u706b\u79cd", "amount": 3, "target": "self"}],
-        "source": "1408 \u767d\u5384 \u884c\u8ff9 \u884c\u5411\u4e16\u754c\u7ec8\u70b9 (1408101): \u300c\u6218\u6597\u5f00\u59cb\u65f6\uff0c\u83b7\u5f97 1 \u70b9\u3010\u706b\u79cd\u3011\u3002\u53d8\u8eab\u7ed3\u675f\u65f6\uff0c\u83b7\u5f97 **3** \u70b9\u3010\u706b\u79cd\u3011\u300d",
-        "note": "\u300c\u53d8\u8eab\u7ed3\u675f\u65f6\u83b7\u5f97 **3** \u70b9\u3010\u706b\u79cd\u3011\u300d\u21d2 `STATE_ENDED` \u21d2 `GAIN_RESOURCE{\u706b\u79cd, 3}` \u2713\u3002"
-                "\u26a0 \u540c\u53e5\u7684\u300c\u6218\u6597\u5f00\u59cb\u65f6\u83b7\u5f97 **1** \u70b9\u300d\uff08\u53e6\u4e00\u534a \u2717\uff09\u4ecd\u672a\u5199 \u2713\u3002",
+        "when": ["self state_ended 变身"],
+        "do": [{"op": "GAIN_RESOURCE", "resource": "火种", "amount": 3, "target": "self"}],
+        "source": "1408 白厄 行迹 行向世界终点 (1408101): 「战斗开始时，获得 1 点【火种】。变身结束时，获得 **3** 点【火种】」",
+        "note": "「变身结束时获得 **3** 点【火种】」⇒ `STATE_ENDED` ⇒ `GAIN_RESOURCE{火种, 3}` ✓。"
+                "⚠ 同句的「战斗开始时获得 **1** 点」（另一半 ✗）仍未写 ✓。",
     },
     {
         "on_any": ["BATTLE_START", "STATE_ENDED"],
         "id": "trace_hero_true_colors_attack_up",
-        "when": ["self state_ended \u53d8\u8eab"],
+        "when": ["self state_ended 变身"],
         "do": [{"op": "MODIFY_ATTR", "attribute": "ATTACK", "percent": 0.5, "permanent": True,
                 "max_stacks": 2, "target": "self"}],
-        "source": "1408 \u767d\u5384 \u884c\u8ff9 \u7167\u89c1\u82f1\u96c4\u672c\u8272 (1408103): \u300c\u8fdb\u5165\u6218\u6597\u6216\u53d8\u8eab\u7ed3\u675f\u65f6\uff0c\u653b\u51fb\u529b\u63d0\u9ad8 **50%**\u3002\u8be5\u6548\u679c\u6700\u591a\u53e0\u52a0 **2** \u5c42\u300d",
-        "note": "\u300c\u8fdb\u5165\u6218\u6597**\u6216**\u53d8\u8eab\u7ed3\u675f\u65f6\u653b\u51fb\u529b +50%\uff0c\u6700\u591a 2 \u5c42\u300d\u21d2 \u26a0 \u4e24\u4e2a\u4e8b\u4ef6\u5171\u7528\u4e00\u6761\u89c4\u5219 \u2713 "
-                "\u2014\u2014 \u7528 `on_any: [BATTLE_START, STATE_ENDED]` \u2713\uff08`TriggerSpec.onAny` \u5df2\u6709 \u2713\uff09\uff1b"
-                "\u26a0 \u6761\u4ef6 `self state_ended \u53d8\u8eab` \u5728 `BATTLE_START` \u4e0a\u4e0d\u6210\u7acb \u2717 \u21d2 \u767b\u8bb0 \u2713\uff08\u9700\u8981\u201c\u4e8b\u4ef6\u5404\u81ea\u7684\u6761\u4ef6\u201d \u2717\uff09\u3002",
+        "source": "1408 白厄 行迹 照见英雄本色 (1408103): 「进入战斗或变身结束时，攻击力提高 **50%**。该效果最多叠加 **2** 层」",
+        "note": "「进入战斗**或**变身结束时攻击力 +50%，最多 2 层」⇒ ⚠ 两个事件共用一条规则 ✓ "
+                "—— 用 `on_any: [BATTLE_START, STATE_ENDED]` ✓（`TriggerSpec.onAny` 已有 ✓）；"
+                "⚠ 条件 `self state_ended 变身` 在 `BATTLE_START` 上不成立 ✗ ⇒ 登记 ✓（需要“事件各自的条件” ✗）。",
     },
 ]
 for rule in ADDITIONS:
     if rule["id"] in [entry.get("id") for entry in rules if isinstance(entry, dict)]:
         sys.exit("REFUSING: %s is already there" % rule["id"])
-    if rule["id"] == "trace_worlds_end_three_seeds" and "\u706b\u79cd" not in declared:
+    if rule["id"] == "trace_worlds_end_three_seeds" and "火种" not in declared:
         sys.exit("REFUSING: 1408 does not declare 火种, so the resource rule cannot be written yet")
     rules.append(rule)
 

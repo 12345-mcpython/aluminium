@@ -57,11 +57,11 @@ rules.append({
         {"op": "MODIFY_ATTR", "attribute": PIERCE, "percent_from_cast_param": 1,
          "permanent": True, "target": "self"},
     ],
-    "source": ("1415 \u6614\u6d9f \u5fc6\u7075\u6280\u80fd 14 \u300c" + name + "\u300d\uff08\u6570\u636e\u69fd\u4f4d 15\uff0cSkillID 1141515\uff09\uff1a"
-               "\u300c\u6574\u573a\u751f\u6548\uff0c**\u5bf9\u7f07\u5b9d\u65bd\u653e\u65f6\uff0c\u4f7f\u7f07\u5b9d\u9020\u6210\u7684\u4f24\u5bb3\u65e0\u89c6\u654c\u65b9\u76ee\u6807 #2% \u7684\u9632\u5fa1\u529b\u3002**\u300d"),
-    "note": ("\u2b50 `DEFENCE_IGNORE` \u662f\u5df2\u51fa\u8d27\u7684\u5c5e\u6027\uff081302\uff0f1303 \u5df2\u5728\u7528\uff1a\u300c\u65e0\u89c6\u654c\u65b9\u76ee\u6807 30% \u7684\u9632\u5fa1\u529b\u300d\uff09\uff1b"
-             "\u2b50 `#2` **\u968f\u7b49\u7ea7\u53d8**\uff080.06 \u2192 0.168\uff09\uff0c\u6240\u4ee5\u8d70 `percent_from_cast_param`\uff08\u7d22\u5f15 1\uff09\uff1b"
-             "\u2b50 \u539f\u53e5\u8bf4\u300c**\u6574\u573a\u751f\u6548**\u300d\uff0c\u6240\u4ee5\u540c\u65f6\u7559\u4e0b\u4e00\u4e2a\u6301\u4e45\u5370\u8bb0\uff08\u5c31\u662f\u8fd9\u53e5\u8bd7\u7684\u540d\u5b57\uff09\u3002"),
+    "source": ("1415 昔涟 忆灵技能 14 「" + name + "」（数据槽位 15，SkillID 1141515）："
+               "「整场生效，**对缇宝施放时，使缇宝造成的伤害无视敌方目标 #2% 的防御力。**」"),
+    "note": ("⭐ `DEFENCE_IGNORE` 是已出货的属性（1302／1303 已在用：「无视敌方目标 30% 的防御力」）；"
+             "⭐ `#2` **随等级变**（0.06 → 0.168），所以走 `percent_from_cast_param`（索引 1）；"
+             "⭐ 原句说「**整场生效**」，所以同时留下一个持久印记（就是这句诗的名字）。"),
 })
 
 if isinstance(doc, list):
@@ -78,9 +78,9 @@ if str(SLOT) in effects.get("11415", {}):
 else:
     effects.setdefault("11415", {})[str(SLOT)] = {
         "effect": "Rules",
-        "source": ("1415 \u6614\u6d9f \u5fc6\u7075\u6280\u80fd 14 \u300c" + name + "\u300d\uff08\u6570\u636e\u69fd\u4f4d 15\uff09\uff1a"
-                   "\u5de5\u4f5c\u5728**\u89c4\u5219\u4fa7**\uff0c\u6240\u4ee5\u662f `Rules` \u5f62\u72b6\u3002"),
-        "note": "\u2b50 \u6ca1\u6709\u6761\u76ee\u5c31\u4e0d\u53ef\u4ea4\u4ed8\uff0c\u6574\u6761\u5fc6\u7075\u6280\u80fd\u5c31\u6c38\u8fdc\u65bd\u653e\u4e0d\u4e86\u3002",
+        "source": ("1415 昔涟 忆灵技能 14 「" + name + "」（数据槽位 15）："
+                   "工作在**规则侧**，所以是 `Rules` 形状。"),
+        "note": "⭐ 没有条目就不可交付，整条忆灵技能就永远施放不了。",
     }
     io.open(SE, "w", encoding="utf-8", newline="\n").write(json.dumps(effects, ensure_ascii=False, indent=2) + "\n")
     print("ok   skill_effects.json: 11415/%d = Rules" % SLOT)

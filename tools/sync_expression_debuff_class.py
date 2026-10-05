@@ -17,27 +17,27 @@ PATH = "EXPRESSION.md"
 lines = io.open(PATH, encoding="utf-8").read().split("\n")
 
 # §3: the merged row's blocker is gone for the filter, so the row is rewritten around what is actually left
-PREFIX = "| **\u300c\u4f7f\u4e07\u654c\u81ea\u52a8\u65bd\u653e1\u6b21\u4e0d\u6d88\u8017\u5145\u80fd\u7684\u3010\u5f11\u795e\u767b\u795e\u3011\u300d**"
+PREFIX = "| **「使万敌自动施放1次不消耗充能的【弑神登神】」**"
 hits = [index for index, line in enumerate(lines) if line.startswith(PREFIX)]
 if len(hits) != 1:
     sys.exit("REFUSING: %d rows start with that prefix" % len(hits))
 lines[hits[0]] = (
-    "| **\u300c\u4f7f\u4e07\u654c\u81ea\u52a8\u65bd\u653e1\u6b21\u4e0d\u6d88\u8017\u5145\u80fd\u7684\u3010\u5f11\u795e\u767b\u795e\u3011\u300d**\uff08`1415` \u7684\u5fc6\u7075\u6280\u80fd 8 \u2713\uff09 "
-    "| \u2b50 \u4e24\u4e2a\u66fe\u7ecf\u7684\u524d\u7f6e**\u90fd\u5df2\u51fa\u8d27** \u2713\uff1a\u201c\u547d\u4ee4\u4ed6\u4eba\u65bd\u653e\u201d \u2713\uff08`CAST_SKILL` \u7684\u65bd\u653e\u8005\u5c31\u662f `target` \u2713\uff0c`1412` \u5728\u7528 \u2713\uff09"
-    "\u4e0e\u201c**\u63a7\u5236\u7c7b**\u7b5b\u9009\u201d \u2713\uff08`debuff_class:control` \u2713\uff0c\u672c\u8f6e\u51fa\u8d27 \u2713\uff09\u3002"
-    "\u2757 \u771f\u6b63\u5269\u4e0b\u7684\uff1a\u8be5**\u5fc6\u7075\u6280\u80fd 8 \u672c\u8eab\u80fd\u4e0d\u80fd\u88ab\u65bd\u653e** \u2717\uff08\u5b83\u9700\u8981 `skill_effects.json` \u6761\u76ee \u2713\uff09\u2014\u2014 \u26a0 \u8fd9\u4ef6\u8981**\u6d4b**\uff0c\u4e0d\u80fd\u5047\u8bbe \u2713 "
-    "| `1415`\uff081 \u4f4d\uff09 "
-    "| \u4e00\u6b21\u6d4b\u91cf\uff1a\u8be5\u6280\u80fd\u80fd\u5426\u65bd\u653e \u2713 |")
+    "| **「使万敌自动施放1次不消耗充能的【弑神登神】」**（`1415` 的忆灵技能 8 ✓） "
+    "| ⭐ 两个曾经的前置**都已出货** ✓：“命令他人施放” ✓（`CAST_SKILL` 的施放者就是 `target` ✓，`1412` 在用 ✓）"
+    "与“**控制类**筛选” ✓（`debuff_class:control` ✓，本轮出货 ✓）。"
+    "❗ 真正剩下的：该**忆灵技能 8 本身能不能被施放** ✗（它需要 `skill_effects.json` 条目 ✓）—— ⚠ 这件要**测**，不能假设 ✓ "
+    "| `1415`（1 位） "
+    "| 一次测量：该技能能否施放 ✓ |")
 
 # §2: the shipped spelling
-ANCHOR = "| **\u300c**\u672a**\u5904\u4e8e\u3010X\u3011\u72b6\u6001\u65f6\u2026\u300d**"
+ANCHOR = "| **「**未**处于【X】状态时…」**"
 target = [index for index, line in enumerate(lines) if line.startswith(ANCHOR)]
 if len(target) != 1:
     sys.exit("REFUSING: %d §2 anchors" % len(target))
-ROW = ("| **\u300c\u65bd\u52a0\u7684\u662f**\u63a7\u5236\u7c7b**\uff0f**\u6301\u7eed\u4f24\u5bb3\u7c7b**\u8d1f\u9762\u72b6\u6001\u300d** "
-       "| **`debuff_class:control`**\uff0f**`debuff_class:dot`**\uff08\u521a\u843d\u5730\u7684\u8d1f\u9762\u72b6\u6001\u7684**\u65cf** \u2713\uff1b"
-       "\u4e8b\u5b9e\u5728\u54bd\u5589\u70b9\u8bb0\u5f55 \u2713\uff0c\u800c\u90a3\u91cc\u672c\u6765\u5c31\u8bfb\u5b83\u7b97\u6297\u6027 \u2713\uff09 "
-       "| `src/main/java/com/laosun/aluminium/Battle.java`\u3001`src/main/java/com/laosun/aluminium/models/TriggerTable.java` "
+ROW = ("| **「施加的是**控制类**／**持续伤害类**负面状态」** "
+       "| **`debuff_class:control`**／**`debuff_class:dot`**（刚落地的负面状态的**族** ✓；"
+       "事实在咽喉点记录 ✓，而那里本来就读它算抗性 ✓） "
+       "| `src/main/java/com/laosun/aluminium/Battle.java`、`src/main/java/com/laosun/aluminium/models/TriggerTable.java` "
        "| `DebuffClassConditionTest` |")
 lines.insert(target[0] + 1, ROW)
 io.open(PATH, "w", encoding="utf-8", newline="\n").write("\n".join(lines))

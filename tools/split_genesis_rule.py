@@ -20,9 +20,9 @@ split = {
     "when": list(rule["when"]) + ["self_summon_count >= 1"],
     "do": summon_effects,
     "source": rule["source"],
-    "note": ("\u300c**\u8be5\u6548\u679c\u5bf9\u8ff7\u8ff7\u4e5f\u751f\u6548\u3002**\u300d\u2014\u2014 \u2b50 \u5b83\u662f**\u72ec\u7acb\u4e00\u53e5**\uff0c"
-             "\u6240\u4ee5\u4e5f\u662f**\u72ec\u7acb\u4e00\u6761\u89c4\u5219**\uff1a\u300c\u5bf9\u8ff7\u8ff7\u300d\u53ea\u5728**\u6301\u6709\u8005\u8eab\u8fb9\u786e\u5b9e\u6709\u5fc6\u7075**\u65f6\u624d\u6210\u7acb\uff0c"
-             "\u800c\u68c0\u67e5\u5b83\u7684\u5c31\u662f `self_summon_count >= 1`\uff08\u5f15\u64ce\u5728\u76ee\u6807\u843d\u7a7a\u65f6**\u81ea\u5df1\u62a5\u51fa\u8fd9\u4e2a\u95e8\u63a7\u7684\u540d\u5b57**\uff09\u3002"),
+    "note": ("「**该效果对迷迷也生效。**」—— ⭐ 它是**独立一句**，"
+             "所以也是**独立一条规则**：「对迷迷」只在**持有者身边确实有忆灵**时才成立，"
+             "而检查它的就是 `self_summon_count >= 1`（引擎在目标落空时**自己报出这个门控的名字**）。"),
 }
 rules.insert(rules.index(rule) + 1, split)
 if isinstance(doc, list):

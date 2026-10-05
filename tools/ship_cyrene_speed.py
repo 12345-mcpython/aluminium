@@ -32,10 +32,10 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * \u300c\u6614\u6d9f\u7684\u901f\u5ea6\u5927\u4e8e\u7b49\u4e8e 180 \u70b9\u65f6\uff0c\u6211\u65b9\u5168\u4f53\u9020\u6210\u7684\u4f24\u5bb3\u63d0\u9ad8 20%\u300d (1415:823, 2026-10-02).
+ * 「昔涟的速度大于等于 180 点时，我方全体造成的伤害提高 20%」 (1415:823, 2026-10-02).
  *
- * <p>\u2b50 The shape below is the one three probes PASSED: a clean table whose BATTLE_START raises SPEED and whose TURN_START
- * carries her `when: ["self_attr:SPEED >= 180"]`, fired by hand. \u26a0 It is hand-built on purpose: her real table carries
+ * <p>⭐ The shape below is the one three probes PASSED: a clean table whose BATTLE_START raises SPEED and whose TURN_START
+ * carries her `when: ["self_attr:SPEED >= 180"]`, fired by hand. ⚠ It is hand-built on purpose: her real table carries
  * other TURN_START rules, which is the only difference between the earlier failing judge and the passing probes. And the
  * threshold is what is under test, so below it the rule must do nothing.
  */
@@ -43,7 +43,7 @@ public class CyreneSpeedThresholdTest {
     private static final int OWNER = 1415;
     private static final int MONSTER = 1002011;
 
-    /** \u2b50 Below the threshold nothing; past it, the document's 20%. */
+    /** ⭐ Below the threshold nothing; past it, the document's 20%. */
     @Test
     public void theThresholdGatesThePartyBoost() {
         Assertions.assertEquals(0, boost(0), 1e-9, "at 110 the rule must not fire");

@@ -22,8 +22,8 @@ if match is None:
     raise SystemExit(1)
 indent = match.group(1)
 addition = (
-    indent + "// \u2b50 A battle-level PARTY counter as a magnitude (2026-10-02; reader: 1513's reward, which hands \u3010\u597d\u6d3b\u5f53\u8d4f\u3011\n"
-    + indent + "// the \u3010\u7b11\u70b9\u3011 the Aha moment spent). The counter lives on the battle, not on a unit, so `self_stacks:` cannot reach it.\n"
+    indent + "// ⭐ A battle-level PARTY counter as a magnitude (2026-10-02; reader: 1513's reward, which hands 【好活当赏】\n"
+    + indent + "// the 【笑点】 the Aha moment spent). The counter lives on the battle, not on a unit, so `self_stacks:` cannot reach it.\n"
     + indent + "if (key.startsWith(\"party_resource:\")) {\n"
     + indent + "    String counter = key.substring(\"party_resource:\".length()).trim();\n"
     + indent + "    if (ctx.battle() == null || ctx.battle().partyResource(counter) == null) {\n"

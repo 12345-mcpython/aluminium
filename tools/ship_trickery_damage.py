@@ -50,12 +50,12 @@ rules.append({
         "permanent": True,
         "target": "self",
     }],
-    "source": ("1415 \u6614\u6d9f \u5fc6\u7075\u6280\u80fd 20 \u300c\u732e\u4e88\u300c\u8be1\u8ba1\u300d\u4e4b\u8bd7\u300d\uff08\u6570\u636e\u69fd\u4f4d 20\uff0cSkillID 1141520\uff09\uff1a"
-               "\u300c\u6574\u573a\u751f\u6548\uff0c\u5bf9\u8d5b\u98de\u513f\u65bd\u653e\u65f6\uff0c**\u4f7f\u8d5b\u98de\u513f\u9020\u6210\u7684\u4f24\u5bb3\u63d0\u9ad8 #1%**\u3002\u300d"),
-    "note": ("\u2b50 \u5f62\u72b6\u7167 1414 \u7684\u6d6a\u6f2b\u4e4b\u8bd7\uff08\u540c\u4e00\u5c5e\u6027 `ALL_DAMAGE_TYPE_BOOST`\uff0c`target: \"self\"`\uff0c\u6c38\u4e45\uff09\u3002"
-             "\u2b50 `#1` \u968f\u7b49\u7ea7\u53d8\uff08**\u5b9e\u6d4b**\uff1a0.18 \u2192 0.504\uff09\u2192 `percent_from_cast_param: 0`\u3002"
-             "\u26d4 \u540c\u53e5\u7684\u4e24\u53e5\u964d\u9632**\u5df2\u767b\u8bb0**\uff1a\u3010\u8001\u4e3b\u987e\u3011\u6211\u4eec\u6ca1\u5efa\u6a21\uff0c"
-             "\u800c\u300c\u3010\u8001\u4e3b\u987e\u3011**\u4ee5\u5916**\u7684\u654c\u65b9\u76ee\u6807\u300d\u9700\u8981\u4e00\u4e2a**\u5426\u5b9a\u8fc7\u6ee4**\uff0c`target_when` \u6ca1\u6709\u3002"),
+    "source": ("1415 昔涟 忆灵技能 20 「献予「诡计」之诗」（数据槽位 20，SkillID 1141520）："
+               "「整场生效，对赛飞儿施放时，**使赛飞儿造成的伤害提高 #1%**。」"),
+    "note": ("⭐ 形状照 1414 的浪漫之诗（同一属性 `ALL_DAMAGE_TYPE_BOOST`，`target: \"self\"`，永久）。"
+             "⭐ `#1` 随等级变（**实测**：0.18 → 0.504）→ `percent_from_cast_param: 0`。"
+             "⛔ 同句的两句降防**已登记**：【老主顾】我们没建模，"
+             "而「【老主顾】**以外**的敌方目标」需要一个**否定过滤**，`target_when` 没有。"),
 })
 
 if isinstance(doc, list):
@@ -70,8 +70,8 @@ effects = json.load(io.open(SE, encoding="utf-8"))
 if str(SLOT) not in effects.get("11415", {}):
     effects.setdefault("11415", {})[str(SLOT)] = {
         "effect": "Rules",
-        "source": "1415 \u6614\u6d9f \u5fc6\u7075\u6280\u80fd 20 \u300c\u732e\u4e88\u300c\u8be1\u8ba1\u300d\u4e4b\u8bd7\u300d\uff08\u6570\u636e\u69fd\u4f4d 20\uff09\uff1a\u5de5\u4f5c\u5728\u89c4\u5219\u4fa7\u3002",
-        "note": "\u2b50 \u6ca1\u6709\u6761\u76ee\u5c31\u4e0d\u53ef\u4ea4\u4ed8\u3002",
+        "source": "1415 昔涟 忆灵技能 20 「献予「诡计」之诗」（数据槽位 20）：工作在规则侧。",
+        "note": "⭐ 没有条目就不可交付。",
     }
     io.open(SE, "w", encoding="utf-8", newline="\n").write(json.dumps(effects, ensure_ascii=False, indent=2) + "\n")
     print("ok   skill_effects.json: 11415/%d = Rules" % SLOT)
@@ -91,9 +91,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1415's memosprite skill 20 \u300c\u732e\u4e88\u300c\u8be1\u8ba1\u300d\u4e4b\u8bd7\u300d: \u300c\u4f7f\u8d5b\u98de\u513f\u9020\u6210\u7684\u4f24\u5bb3\u63d0\u9ad8 #1%\u300d (2026-10-02).
+ * 1415's memosprite skill 20 「献予「诡计」之诗」: 「使赛飞儿造成的伤害提高 #1%」 (2026-10-02).
  *
- * <p>\u2b50 Two scenes that differ by exactly one thing: whether the ode was cast at her. \u26a0 Nothing is ever replaced -- the table trap has already deleted a rule under
+ * <p>⭐ Two scenes that differ by exactly one thing: whether the ode was cast at her. ⚠ Nothing is ever replaced -- the table trap has already deleted a rule under
  * test once in this project.
  */
 public class TrickeryOdeDamageTest {

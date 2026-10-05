@@ -6,10 +6,10 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
- * \u2b50 CHARACTERISATION of {@code Enemy.weaknessCount()} (2026-09-30, first step of the cone-22004 diagnosis): the accessor must
+ * ⭐ CHARACTERISATION of {@code Enemy.weaknessCount()} (2026-09-30, first step of the cone-22004 diagnosis): the accessor must
  * agree with the data's own {@code stance_weak} list -- measured against 1002011, which lists Fire and Thunder.
  *
- * <p>\u2605 Why this exists as its own step: cone 22004's per-weakness boost moved the damage by NOTHING (measured x1.0), and the
+ * <p>★ Why this exists as its own step: cone 22004's per-weakness boost moved the damage by NOTHING (measured x1.0), and the
  * cheap way to find out why is to ask one question at a time. This is question one: does the count have a value at all?
  */
 public class EnemyWeaknessCountTest {

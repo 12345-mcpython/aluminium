@@ -22,7 +22,7 @@ public class AventurineWaveflairTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** \u26a0 One Fervor per TEAMMATE's attack, and the document's cap of 30 enforced by exceeding it. */
+    /** ⚠ One Fervor per TEAMMATE's attack, and the document's cap of 30 enforced by exceeding it. */
     @Test
     public void teammateAttacksFeedFervorUpToThirty() {
         Character aventurine = CharacterFactory.create(AVENTURINE, LEVEL);
@@ -34,7 +34,7 @@ public class AventurineWaveflairTest {
         Assertions.assertEquals(0, fervorOf(aventurine), "no initial value is stated, so it starts at 0");
         battle.fireTriggers(TriggerEvent.ALLY_ATTACK, ally, enemy, 0, 0);
         Assertions.assertEquals(1, fervorOf(aventurine),
-                "\u300c\u961f\u53cb\u65bd\u653e\u653b\u51fb\u540e\uff0c\u7802\u91d1\u2022\u620f\u6d6a\u83b7\u5f971\u70b9\u3010\u70ed\u610f\u3011\u300d");
+                "「队友施放攻击后，砂金•戏浪获得1点【热意】」");
 
         battle.fireTriggers(TriggerEvent.ALLY_ATTACK, aventurine, enemy, 0, 0);
         Assertions.assertEquals(1, fervorOf(aventurine),
@@ -44,10 +44,10 @@ public class AventurineWaveflairTest {
             battle.fireTriggers(TriggerEvent.ALLY_ATTACK, ally, enemy, 0, 0);
         }
         Assertions.assertEquals(30, fervorOf(aventurine),
-                "\u300c\u3010\u70ed\u610f\u3011\u4e0a\u9650\u4e3a30\u70b9\u300d -- forty-one firings must still read thirty");
+                "「【热意】上限为30点」 -- forty-one firings must still read thirty");
     }
 
-    /** \u26a0 The Ultimate: 8 Fervor and 30% more SPEED for the document's four turns. */
+    /** ⚠ The Ultimate: 8 Fervor and 30% more SPEED for the document's four turns. */
     @Test
     public void theUltimateAddsFervorAndSpeed() {
         Character aventurine = CharacterFactory.create(AVENTURINE, LEVEL);
@@ -61,14 +61,14 @@ public class AventurineWaveflairTest {
 
         battle.fireTriggers(TriggerEvent.ULT_CAST, aventurine, enemy, 0, 0);
 
-        Assertions.assertEquals(fervor + 8, fervorOf(aventurine), "\u300c\u83b7\u5f978\u70b9\u3010\u70ed\u610f\u3011\u300d");
+        Assertions.assertEquals(fervor + 8, fervorOf(aventurine), "「获得8点【热意】」");
         Assertions.assertEquals(base * 0.3, aventurine.getAttribute(AttributeType.SPEED).get() - before, base * 0.02,
-                "\u300c\u4f7f\u81ea\u8eab\u901f\u5ea6\u63d0\u9ad830%\uff0c\u6301\u7eed4\u56de\u5408\u300d of the BASE speed: base " + base);
+                "「使自身速度提高30%，持续4回合」 of the BASE speed: base " + base);
     }
 
     /** The declared resource's value, read through the combatant's own manager. */
     private static int fervorOf(Character unit) {
-        return unit.getResources().get("\u70ed\u610f").getValue();
+        return unit.getResources().get("热意").getValue();
     }
 
     private static Random fixed() {

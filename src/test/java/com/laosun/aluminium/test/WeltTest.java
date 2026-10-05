@@ -16,7 +16,7 @@ import java.util.Random;
 /**
  * 1004 Welt, from his own file (2026-09-28, round 143): the ultimate's Imprison and the level convention.
  *
- * <p>\u26a0 The target is hand-made with no resistances on purpose: the project's fixture monster is immune to controls
+ * <p>⚠ The target is hand-made with no resistances on purpose: the project's fixture monster is immune to controls
  * (round 131 measured `STAT_CTRL_Frozen` at 1.0, which clamps the chance to 0). A 100% BASE chance still rolls, so an
  * unresisting target is what makes this deterministic.
  *
@@ -35,7 +35,7 @@ public class WeltTest {
         f.battle.castImmediate(f.welt.getSkills().get(SkillType.ULTRA), f.welt, List.of(f.enemy));
 
         Assertions.assertTrue(f.enemy.getBuffManager().hasState("禁锢"),
-                "\u300c\u6709100%\u7684\u57fa\u7840\u6982\u7387\u4f7f\u53d7\u5230\u653b\u51fb\u7684\u654c\u65b9\u76ee\u6807\u9677\u5165\u7981\u9522\u72b6\u6001\uff0c\u6301\u7eed1\u56de\u5408\u300d");
+                "「有100%的基础概率使受到攻击的敌方目标陷入禁锢状态，持续1回合」");
     }
 
     @Test
@@ -60,7 +60,7 @@ public class WeltTest {
         }
     }
 
-    /** \u26a0 Bounce: his skill's own damage must land at all (it computed zero hits before the round-170 fix). */
+    /** ⚠ Bounce: his skill's own damage must land at all (it computed zero hits before the round-170 fix). */
     @Test
     public void hisSkillActuallyDealsDamage() {
         Fixture f = new Fixture();
@@ -70,6 +70,6 @@ public class WeltTest {
 
         double loss = before - f.enemy.getCurrentHp();
         Assertions.assertTrue(loss > 0,
-                "\u300c\u5bf9\u6307\u5b9a\u654c\u65b9\u5355\u4f53\u9020\u6210\u7b49\u540c\u4e8e\u7ef4\u5c14\u7279#1[i]%\u653b\u51fb\u529b\u7684\u865a\u6570\u4f24\u5bb3\uff0c\u5e76\u989d\u5916\u9020\u6210 2 \u6b21\u4f24\u5bb3\u300d \u2014 the skill must land: loss " + loss);
+                "「对指定敌方单体造成等同于维尔特#1[i]%攻击力的虚数伤害，并额外造成 2 次伤害」 — the skill must land: loss " + loss);
     }
 }

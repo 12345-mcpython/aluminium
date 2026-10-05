@@ -56,13 +56,13 @@ if not any(isinstance(rule, dict) and rule.get("id") == "trace_worlds_end_one_se
     rules.append({
         "on": "BATTLE_START",
         "id": "trace_worlds_end_one_seed_at_battle_start",
-        "do": [{"op": "GAIN_RESOURCE", "resource": "\u706b\u79cd", "amount": 1, "target": "self"}],
-        "source": "1408 \u767d\u5384 \u884c\u8ff9 \u884c\u5411\u4e16\u754c\u7ec8\u70b9 (1408101)\uff1a\u300c**\u6218\u6597\u5f00\u59cb\u65f6\uff0c\u83b7\u5f97 1 \u70b9\u3010\u706b\u79cd\u3011**\u3002\u53d8\u8eab\u7ed3\u675f\u65f6\uff0c\u83b7\u5f97 3 \u70b9\u3010\u706b\u79cd\u3011\u300d",
-        "note": "\u300c**\u6218\u6597\u5f00\u59cb\u65f6**\uff0c\u83b7\u5f97 **1** \u70b9\u3010\u706b\u79cd\u3011\u300d\u21d2 `BATTLE_START` \u21d2 `GAIN_RESOURCE{\u706b\u79cd, 1}` \u2713\u3002"
-                "\u26a0 \u4e0e\u540c\u53e5\u7684\u53e6\u4e00\u534a\uff08\u53d8\u8eab\u7ed3\u675f +3 \u2713\uff09\u662f**\u4e24\u6761\u89c4\u5219** \u2713\uff1a"
-                "\u4e24\u4e2a\u4e8b\u4ef6\u3001\u4e24\u5957\u6761\u4ef6\uff08\u4e00\u4e2a\u65e0\u6761\u4ef6 \u2713\u3001\u4e00\u4e2a `self state_ended \u53d8\u8eab` \u2713\uff09"
-                "\u2014\u2014 \u26a0 \u5b9e\u6d4b\uff1a`on_any` **\u662f**\u53ef\u7528\u7684\uff08`@SerializedName(\"on_any\")` \u2713\u3001`TriggerTable` \u4f1a\u8bfb \u2713\uff09\uff0c"
-                "\u4f46\u5b83\u53ea\u80fd**\u8ffd\u52a0\u4e8b\u4ef6**\u3001**\u5171\u7528\u540c\u4e00\u5957\u6761\u4ef6** \u2717 \u21d2 \u672c\u53e5\u7528\u4e0d\u4e0a \u2713\u3002",
+        "do": [{"op": "GAIN_RESOURCE", "resource": "火种", "amount": 1, "target": "self"}],
+        "source": "1408 白厄 行迹 行向世界终点 (1408101)：「**战斗开始时，获得 1 点【火种】**。变身结束时，获得 3 点【火种】」",
+        "note": "「**战斗开始时**，获得 **1** 点【火种】」⇒ `BATTLE_START` ⇒ `GAIN_RESOURCE{火种, 1}` ✓。"
+                "⚠ 与同句的另一半（变身结束 +3 ✓）是**两条规则** ✓："
+                "两个事件、两套条件（一个无条件 ✓、一个 `self state_ended 变身` ✓）"
+                "—— ⚠ 实测：`on_any` **是**可用的（`@SerializedName(\"on_any\")` ✓、`TriggerTable` 会读 ✓），"
+                "但它只能**追加事件**、**共用同一套条件** ✗ ⇒ 本句用不上 ✓。",
     })
     with io.open(CHAR, "w", encoding="utf-8", newline="\n") as handle:
         json.dump(doc, handle, ensure_ascii=False, indent=2)
@@ -75,8 +75,8 @@ else:
 text = io.open(JUDGE, encoding="utf-8").read()
 OLD = "        int before = owner.getResources().value(SEEDS);"
 NEW = ("        int before = owner.getResources().value(SEEDS);\n"
-       "        // \u2b50 \u300c\u6218\u6597\u5f00\u59cb\u65f6\uff0c\u83b7\u5f97 1 \u70b9\u3010\u706b\u79cd\u3011\u300d -- the other half of the same trace line (1408101).\n"
-       "        Assertions.assertEquals(1, before, \"\u300c\u6218\u6597\u5f00\u59cb\u65f6\uff0c\u83b7\u5f97 1 \u70b9\u3010\u706b\u79cd\u3011\u300d\");")
+       "        // ⭐ 「战斗开始时，获得 1 点【火种】」 -- the other half of the same trace line (1408101).\n"
+       "        Assertions.assertEquals(1, before, \"「战斗开始时，获得 1 点【火种】」\");")
 if "the other half of the same trace line" not in text:
     if text.count(OLD) != 1:
         sys.exit("REFUSING: the seed anchor appears %d times" % text.count(OLD))
@@ -84,9 +84,9 @@ if "the other half of the same trace line" not in text:
 
 CAP_TEST = """
     /**
-     * \u300c\u8fdb\u5165\u6218\u6597\u6216\u53d8\u8eab\u7ed3\u675f\u65f6\uff0c\u653b\u51fb\u529b\u63d0\u9ad8 50%\u3002\u8be5\u6548\u679c**\u6700\u591a\u53e0\u52a0 2 \u5c42**\u300d-- read by firing the end clause more times than the cap allows.
+     * 「进入战斗或变身结束时，攻击力提高 50%。该效果**最多叠加 2 层**」-- read by firing the end clause more times than the cap allows.
      *
-     * <p>\u26a0 The state is applied directly for these ends: the transformation is only granted by the ultimate, and what this reading
+     * <p>⚠ The state is applied directly for these ends: the transformation is only granted by the ultimate, and what this reading
      * is about is the CAP. The seed clause beside it has no cap, so its growth proves the later firings really happened --
      * without that, a flat ATK could just mean "nothing fired".
      */
@@ -115,7 +115,7 @@ CAP_TEST = """
         Assertions.assertEquals(seedsAfterOneEnd + 3, seedsAfterTwoEnds,
                 "the second end really fired -- the seed clause has no cap");
         Assertions.assertEquals(0.0, atkAfterTwoEnds - atkAfterOneEnd, 1e-9,
-                "\u300c\u6700\u591a\u53e0\u52a0 2 \u5c42\u300d: with the battle-start layer that is already two, so the third is dropped");
+                "「最多叠加 2 层」: with the battle-start layer that is already two, so the third is dropped");
     }
 }
 """

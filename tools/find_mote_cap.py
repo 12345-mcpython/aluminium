@@ -1,4 +1,4 @@
-"""Look for Evernight's 【\u5fc6\u8d28】 cap by its NUMERIC signature, not by key name (2026-10-02).
+"""Look for Evernight's 【忆质】 cap by its NUMERIC signature, not by key name (2026-10-02).
 
 Two name-based searches failed: her ability file's only `MaxCount` is a summoner energy bar, and her character config has
 no max/count/sp-ish scalar key at the levels walked. The document gives three numbers for this resource -- 16 (the

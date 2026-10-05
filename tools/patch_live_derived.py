@@ -39,9 +39,9 @@ patch(
     DOUBLE,
     """        /** Whether this modifier re-resolves its magnitude on every computation. */""",
     """        /**
-         * \u2b50 The same, for a modifier whose magnitude is an ABSOLUTE number in the attribute's own units.
+         * ⭐ The same, for a modifier whose magnitude is an ABSOLUTE number in the attribute's own units.
          *
-         * <p>The derived form \u300c\u6bcf\u5c42\u3010\u5f53\u54c1\u3011\u4f7f\u66b4\u51fb\u4f24\u5bb3\u63d0\u9ad8 2.40%\u300d is absolute, and a ratio attribute takes it as
+         * <p>The derived form 「每层【当品】使暴击伤害提高 2.40%」 is absolute, and a ratio attribute takes it as
          * a pure value -- so the live kind needs a pure factory as well as a percentage one.
          */
         public static Modifier livePure(java.util.function.DoubleSupplier value,
@@ -112,7 +112,7 @@ patch(
                 }
                 if (buff instanceof com.laosun.aluminium.models.buff.StatModifierBuff liveBuff) {
                     if (derivedCounter) {
-                        // \u2b50 The derived form is ABSOLUTE: percent x layers (+ amount), read on every computation. Building it from
+                        // ⭐ The derived form is ABSOLUTE: percent x layers (+ amount), read on every computation. Building it from
                         // `magnitude` would square the count, because magnitude already contains it.
                         String own = effect.getScale().trim().substring("self_stacks:".length()).trim();
                         double extra = effect.getAmount() == null ? 0 : effect.getAmount();

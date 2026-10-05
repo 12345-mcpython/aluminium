@@ -5,7 +5,7 @@ exactly as it stood when that item finished -- so the grouped commit is semantic
 operation (and no conflict resolution) is involved at all. Author/committer dates are taken from the group's newest
 commit so the timeline stays readable.
 
-\u26a0 Safety: a `backup/pre-squash` ref already points at the old head. This script only moves `refs/heads/main` at the
+⚠ Safety: a `backup/pre-squash` ref already points at the old head. This script only moves `refs/heads/main` at the
 very end, and prints the old and new heads so the result can be checked before any push.
 
 Groups are given as CUT LINES in the newest-first log (`window[i]` = the i-th line of `git log --pretty=format:'%h %s'`).

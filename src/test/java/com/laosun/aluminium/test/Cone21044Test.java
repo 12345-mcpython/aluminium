@@ -60,14 +60,14 @@ public class Cone21044Test {
         System.out.println("[21044] rules matching -- plain=" + plain + " defence lowered=" + lowered
                 + " defence+speed lowered=" + both);
         Assertions.assertEquals(0, plain, "a plain target has no rule");
-        Assertions.assertEquals(1, lowered, "\u9632\u5fa1\u964d\u4f4e is one of them");
-        Assertions.assertEquals(2, both, "\u6216 \u51cf\u901f is the other");
+        Assertions.assertEquals(1, lowered, "防御降低 is one of them");
+        Assertions.assertEquals(2, both, "或 减速 is the other");
     }
 
     @Test
     public void theSpecPinsTheShareAndTheAttribute() {
         build();
-        // \u2605 Arm the condition FIRST (discipline 182): `matching` evaluates conditions, and without a lowered attribute
+        // ★ Arm the condition FIRST (discipline 182): `matching` evaluates conditions, and without a lowered attribute
         // no cone rule exists at all -- which is how the `24 -> 12 percent` mutation escaped this half (measured: 0 red).
         lower(AttributeType.DEFENCE);
         lower(AttributeType.SPEED);

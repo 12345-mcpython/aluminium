@@ -23,7 +23,7 @@ public class QingqueTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** \u26a0 The count: one per TEAMMATE's turn start, two from the technique, and the document's cap of four enforced by exceeding it. */
+    /** ⚠ The count: one per TEAMMATE's turn start, two from the technique, and the document's cap of four enforced by exceeding it. */
     @Test
     public void theTileCountFollowsTheDocumentAndStopsAtFour() {
         Character qingque = CharacterFactory.create(QINGQUE, LEVEL);
@@ -34,7 +34,7 @@ public class QingqueTest {
 
         Assertions.assertEquals(0, tilesOf(qingque), "the document states no initial value, so it starts at 0");
         battle.fireTriggers(TriggerEvent.TURN_START, ally, enemy, 0, 0);
-        Assertions.assertEquals(1, tilesOf(qingque), "\u300c\u6211\u65b9\u76ee\u6807\u56de\u5408\u5f00\u59cb\u65f6\u2026\u968f\u673a\u62bd\u53d61\u5f20\u300d");
+        Assertions.assertEquals(1, tilesOf(qingque), "「我方目标回合开始时…随机抽取1张」");
         battle.fireTriggers(TriggerEvent.TURN_START, qingque, enemy, 0, 0);
         Assertions.assertEquals(1, tilesOf(qingque),
                 "the gate is `actor is_other_ally`: her OWN turn start adds nothing (the document's wording is ambiguous and the rule says so)");
@@ -43,10 +43,10 @@ public class QingqueTest {
             battle.fireTriggers(TriggerEvent.TURN_START, ally, enemy, 0, 0);
         }
         Assertions.assertEquals(4, tilesOf(qingque),
-                "\u300c\u6700\u591a\u6301\u67094\u5f20\u743c\u7389\u724c\u300d -- eight draws must still read four");
+                "「最多持有4张琼玉牌」 -- eight draws must still read four");
     }
 
-    /** \u26a0 The technique's two tiles, only when the technique was declared. */
+    /** ⚠ The technique's two tiles, only when the technique was declared. */
     @Test
     public void theTechniqueDrawsTwoTiles() {
         Character qingque = CharacterFactory.create(QINGQUE, LEVEL);
@@ -56,10 +56,10 @@ public class QingqueTest {
 
         battle.startBattle();
 
-        Assertions.assertEquals(2, tilesOf(qingque), "\u300c\u8fdb\u5165\u6218\u6597\u65f6\u9752\u96c0\u4f1a\u62bd\u53d62\u5f20\u743c\u7389\u724c\u300d");
+        Assertions.assertEquals(2, tilesOf(qingque), "「进入战斗时青雀会抽取2张琼玉牌」");
     }
 
-    /** \u26a0 The Skill's self damage boost, capped at the document's four stacks. */
+    /** ⚠ The Skill's self damage boost, capped at the document's four stacks. */
     @Test
     public void theSkillRaisesHerOwnDamageUpToFourStacks() {
         Character qingque = CharacterFactory.create(QINGQUE, LEVEL);
@@ -74,12 +74,12 @@ public class QingqueTest {
         }
 
         Assertions.assertEquals(0.28 * 4, qingque.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get() - before, 1e-6,
-                "\u300c\u589e\u4f24 28%\u300d\u53e0\u5230\u300c\u6700\u591a 4 \u5c42\u300d -- five casts must still read four");
+                "「增伤 28%」叠到「最多 4 层」 -- five casts must still read four");
     }
 
     /** The declared resource's value, read through the combatant's own manager. */
     private static int tilesOf(Character qingque) {
-        return qingque.getResources().get("\u743c\u7389\u724c").getValue();
+        return qingque.getResources().get("琼玉牌").getValue();
     }
 
     private static Random fixed() {

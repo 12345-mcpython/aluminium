@@ -32,12 +32,12 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * \u300c\u654c\u65b9\u5bf9\u6211\u65b9\u65bd\u52a0\u4e86**\u63a7\u5236\u7c7b**\u8d1f\u9762\u72b6\u6001\u300d\u53ef\u4ee5\u88ab\u95ee\u4e86 (2026-10-02).
+ * 「敌方对我方施加了**控制类**负面状态」可以被问了 (2026-10-02).
  *
- * <p>ONE landed control, TWO watchers: a rule that asked for \u300c\u63a7\u5236\u7c7b\u300d must move ATTACK, and one that asked for \u300c\u6301\u7eed\u4f24\u5bb3\u7c7b\u300d
+ * <p>ONE landed control, TWO watchers: a rule that asked for 「控制类」 must move ATTACK, and one that asked for 「持续伤害类」
  * must leave DEFENCE alone. The first is also the proof that the event happened at all, which is what gives the second meaning.
  *
- * <p>\u26a0 The readings are PANELS, not resources: a `ResourceSpec`-declared probe id was what made the earlier version of this test
+ * <p>⚠ The readings are PANELS, not resources: a `ResourceSpec`-declared probe id was what made the earlier version of this test
  * report "nothing fired" when in fact both the landing and the event were fine.
  */
 public class DebuffClassConditionTest {
@@ -55,9 +55,9 @@ public class DebuffClassConditionTest {
                 + " ; dot-watch DEFENCE gain = " + defenceGain);
 
         Assertions.assertTrue(attackGain > EPS,
-                "\u300c\u63a7\u5236\u7c7b\u300d-- the rule that asked for it fired, so the event really happened");
+                "「控制类」-- the rule that asked for it fired, so the event really happened");
         Assertions.assertEquals(0.0, defenceGain, EPS,
-                "\u300c\u6301\u7eed\u4f24\u5bb3\u7c7b\u300d-- the same event does NOT fire the rule that asked for the other family");
+                "「持续伤害类」-- the same event does NOT fire the rule that asked for the other family");
     }
 
     /** { the control-watch's ATTACK gain, the dot-watch's DEFENCE gain } after ONE control lands. */
@@ -66,7 +66,7 @@ public class DebuffClassConditionTest {
 
         EffectSpec land = new EffectSpec();
         TriggerSpecs.set(land, "op", "APPLY_CONTROL");
-        // \u26a0 The keys the validator names: `APPLY_CONTROL requires "control"` and `requires "turns"`.
+        // ⚠ The keys the validator names: `APPLY_CONTROL requires "control"` and `requires "turns"`.
         TriggerSpecs.set(land, "control", "\\u51bb\\u7ed3");
         TriggerSpecs.set(land, "turns", 2);
         TriggerSpecs.set(land, "baseChance", 1.0);
