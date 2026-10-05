@@ -15,11 +15,11 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 121: "while 藿藿 holds [禳命], if one of our targets takes a lethal blow ... immediately restore HP equal to 50% of its own Max HP.
- * This effect can trigger 2 times per battle" (2026-10-02).
+ * 121: "while Huohuo (藿藿) holds [禳命], if one of our targets takes a lethal blow ... immediately restore HP equal to 50% of its own Max HP.
+ * This effect can trigger 2 times per battle".
  *
  * <p>ONE VARIABLE per test: the eidolon rank, or the NUMBER OF LETHAL BLOWS. Same party, same skill (which is what puts
- * [禳命] on her), same blow.
+ * [禳命] ("Divine Provision") on her), same blow.
  */
 public class TalismanSavesAnAllyTest {
     private static final int HUOHUO = 1217;
@@ -46,7 +46,7 @@ public class TalismanSavesAnAllyTest {
      * "this effect can trigger 2 times per battle": the first two blows are answered, the third is not.
      *
      * <p>The count is a shipped spelling, not a new capability: a counter is `ADD_STACK` plus a `self_stacks:` condition
-     * (sample: 1111's [斗志]). Note: The two answered blows each leave her ALLY at half of ITS OWN Max HP, so the third
+     * (sample: 1111's [斗志] ("Fighting Will")). Note: The two answered blows each leave her ALLY at half of ITS OWN Max HP, so the third
      * blow is lethal again -- the assertion is about the count, not about a first-blow-only effect.
      */
     @Test
@@ -71,12 +71,12 @@ public class TalismanSavesAnAllyTest {
         battle.startBattle();
         battle.processRequests();
 
-        // Her skill is what puts [禳命] on her (2 turns, ticking on her own turns).
+        // Her skill is what puts [禳命] ("Divine Provision") on her (2 turns, ticking on her own turns).
         Skill skill = her.getSkills().get(SkillType.SKILL);
         Assertions.assertNotNull(skill, "precondition: she has a skill");
         SkillExecutor.execute(battle, skill, her, List.of(battle.enemies.getFirst()));
         battle.processRequests();
-        Assertions.assertTrue(her.getBuffManager().hasState(STATE), "precondition: [禳命] is on her");
+        Assertions.assertTrue(her.getBuffManager().hasState(STATE), "precondition: [禳命] (\"Divine Provision\") is on her");
 
         for (int blow = 0; blow < blows; blow++) {
             if (ally.isDeath()) {

@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1220's 行迹 (trace) "解形" (1220102): "the follow-up attack's CRIT DMG is increased by 36%".
+ * 1220's trace (行迹) "解形" (1220102): "the follow-up attack's CRIT DMG is increased by 36%".
  *
  * <p>Judged on one wearer with both readings fixed-crit, so the only difference between them is the damage type the rule is scoped to.
  */

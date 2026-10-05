@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Target selection (P5-4): decides "who this attack hits".
+ * Target selection: decides "who this attack hits".
  *
  * <p>Two strategies, in priority order:
  * <ol>

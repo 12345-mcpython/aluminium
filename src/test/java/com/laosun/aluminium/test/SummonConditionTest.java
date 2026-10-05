@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * {@code actor == summon} / {@code target == summon} and the {@code SUMMON_ATTACK} event - "装备者的忆灵攻击时".
+ * {@code actor == summon} / {@code target == summon} and the {@code SUMMON_ATTACK} event - "装备者的忆灵攻击时" (when the wearer's Memosprite attacks).
  *
  * <p><b>Why the vocabulary needed both halves.</b> A memosprite's attack became a real attack (it deals its own
  * damage and the engine tells our side about it), but <em>data</em> could not act on it:
@@ -38,7 +38,7 @@ import java.util.Random;
  *       over-trigger, not a near miss;</li>
  *   <li>{@code ALLY_ATTACK} is deliberately <b>not</b> widened to cover summons: three shipped rules mean
  *       "我方其他目标攻击后" / "after an ally attacks" by it ({@code characters/1309.json},
- *       {@code characters/1403.json}, relic set 105), and whether a memosprite counts as one of those "目标" is
+ *       {@code characters/1403.json}, relic set 105), and whether a Memosprite counts as one of those "目标" is
  *       not something the documents settle. Widening it would silently change what they fire on, so a summon's
  *       attack has an event of its own.</li>
  * </ul>
@@ -61,7 +61,7 @@ import java.util.Random;
 public class SummonConditionTest {
     private static final double EPS = 1e-6;
 
-    /** Cyrene (长夜月) - has a memosprite spec, and a hand-built table replaces her own rules cleanly. */
+    /** Evernight (长夜月) - has a memosprite spec, and a hand-built table replaces her own rules cleanly. */
     private static final int OWNER = 1413;
     /** Aglaea (阿格莱雅) - the second memosprite owner, for "a teammate's summon does not count". */
     private static final int TEAMMATE = 1402;
@@ -199,7 +199,7 @@ public class SummonConditionTest {
     }
 
     // ==================================================================
-    // 1b. `target_summon_count` - the same question about the other unit (M-41)
+    // 1b. `target_summon_count` - the same question about the other unit
     // ==================================================================
 
     /**
@@ -310,7 +310,7 @@ public class SummonConditionTest {
     public void theHitCountIsTheNumberOfTargetsReached() {
         Character owner = characterWith(rule("SUMMON_ATTACK", List.of("actor == summon", "hit_count >= 2")));
         Battle battle = new Battle(List.of(owner), List.of(dummy()), new Random(0));
-        Summon evey = battle.summonMemosprite(owner);          // 忆灵技能1 is a single-target attack
+        Summon evey = battle.summonMemosprite(owner);          // Memosprite skill 1 is a single-target attack
         battle.processRequests();
         double before = critDamageOf(owner);
 
@@ -399,7 +399,7 @@ public class SummonConditionTest {
     @Test
     public void theSpeedClauseNeedsTheMemospriteOut() {
         // Aglaea, not Cyrene: her rule summons on her ULTIMATE, so the battlefield really starts without one
-        // (Cyrene's "进入战斗时召唤" would make the "before" half of this case impossible to reach).
+        // (Evernight (长夜月)'s "进入战斗时召唤" ("summon on entering battle") would make the "before" half of this case impossible to reach).
         Character wearer = CharacterFactory.create(TEAMMATE, LEVEL, true, null,
                 RelicFactory.suit(HERO_OF_TRIUMPHANT_SONG, 5, 15));
         wearer.setAttribute(AttributeType.SPEED, new DoubleValue(100));   // a clean base: +6% is +6

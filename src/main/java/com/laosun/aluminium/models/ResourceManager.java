@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 /**
- * Every {@link Resource} a combatant owns (P8-8), keyed by id.
+ * Every {@link Resource} a combatant owns, keyed by id.
  *
  * <p>This is what lets a "stack character" work without its own class: the character holds a
  * manager, its data declares which resources exist, and the trigger table adds to or spends them.

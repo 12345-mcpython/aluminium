@@ -8,10 +8,10 @@ import com.laosun.aluminium.models.CanHit;
  *
  * <p><b>Why this class had to exist.</b> {@code Battle.grantShield} writes a bare number on the combatant
  * ({@code CanHit.shield}) and nothing ever takes it off again - so before this class, a {@code SHIELD} effect's
- * {@code "turns"} was <b>accepted and silently ignored</b>: 三月七's shield said "持续3回合" and stayed for the
+ * {@code "turns"} was <b>accepted and silently ignored</b>: March 7th (三月七)'s shield said "持续3回合" and stayed for the
  * rest of the battle. That is the failure mode this project refuses (a wrong number with nothing to report), and
  * it is worse than it looks, because a shield that never comes off keeps every "持有护盾的…" clause true - the
- * the 天赋 (talent) counter this class was written for would have counted attacks for the whole fight instead of for three
+ * the talent (天赋) counter this class was written for would have counted attacks for the whole fight instead of for three
  * turns.
  *
  * <p><b>What it does.</b> It <b>installs</b> the shield when it is attached and <b>takes it off</b> when it

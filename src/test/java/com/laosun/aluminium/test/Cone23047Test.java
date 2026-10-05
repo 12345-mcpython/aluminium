@@ -10,12 +10,12 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 /**
- * Light cone 2304(2026-09-30): two of its five clauses.
+ * Light cone 23047: two of its five clauses.
  *
- * <p>Effect hit +40..60%; when an enemy falls into a debuff the WEARER applied, an 80% base chance puts 魂迷 on it
+ * <p>Effect hit +40..60%; when an enemy falls into a debuff the WEARER applied, an 80% base chance puts Enthrallment (魂迷) on it
  * for 3 turns. The other three clauses are REGISTERED, not approximated: the per-debuff DoT bonus counts "debuffs the
  * wearer applied" (per_stack reads the target's own count), the speed gift belongs to the ATTACKER, and "removes every
- * 魂迷 when the wearer is knocked out" needs a knocked-out event the engine does not fire.
+ * Enthrallment (魂迷) when the wearer is knocked out" needs a knocked-out event the engine does not fire.
  */
 public class Cone23047Test {
     private static final int CONE = 23047;

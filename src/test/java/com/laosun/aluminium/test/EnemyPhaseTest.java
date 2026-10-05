@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
- * P9-5: an enemy swaps its skill at an HP threshold.
+ * an enemy swaps its skill at an HP threshold.
  *
  * <p>The design point worth pinning is that <b>nothing has to be scheduled</b>: {@code activeSkill()} reads
  * the current HP each time it is asked, so there is no transition flag and no "hold the bar at 1 HP"

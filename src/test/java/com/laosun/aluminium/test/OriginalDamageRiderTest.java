@@ -47,7 +47,7 @@ public class OriginalDamageRiderTest {
     }
 
     /**
-     * 姬子's shipped Eidolon 6, through her own file.
+     * Himeko (姬子)'s shipped Eidolon 6, through her own file.
      *
      * <p>Note: <b>The baseline is NOT "her total damage at E0".</b> In the same battle another of her file's rules lands a
      * 1064.438828 instance, so the E0 total (11482.69) is mostly damage this clause must <b>not</b> scale: "the original damage" is

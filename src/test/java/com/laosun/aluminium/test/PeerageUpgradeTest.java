@@ -14,15 +14,15 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1412 刻律德菈's Skill, second half: "when charge reaches 6 points, automatically upgrade the character's [军功] to [爵位]" (2026-10-02).
+ * 1412 Cerydra (刻律德菈)'s Skill, second half: "when charge reaches 6 points, automatically upgrade the character's [军功] to [爵位]".
  *
  * <p>Nothing new was needed for this: {@code RESOURCE_CHANGED} + {@code self_resource:充能 >= 6} + {@code holder_of:军功}
  * all ship already. Her skill grants 1 charge per cast, so six casts cross the threshold - and five must not, which is
  * the whole point of the case.
  *
- * <p>Note: "a character holding [爵位] is considered to also hold [军功]" is why the rule ADDS 爵位 and does not remove 军功: the sentence's
+ * <p>Note: "a character holding [爵位] is considered to also hold [军功]" is why the rule ADDS Peerage (爵位) and does not remove Merit (军功): the sentence's
  * "counts as holding both" then holds by construction. Note: The same sentence's clause "and removes its control-class negative states" is registered,
- * not written: the engine has no "clear a class of debuffs" capability today.
+ * not written: the engine has no "clear a class of debuffs" capability.
  */
 public class PeerageUpgradeTest {
     private static final int CERYDRA = 1412;

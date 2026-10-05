@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Trailblazer (Destruction) (开拓者(毁灭))'s Eidolon 4: "击中处于弱点击破状态的敌方目标时，暴击率提高25%" -- a state-gated boost for that hit.
+ * Trailblazer (Destruction) (开拓者 (毁灭))'s Eidolon 4: "击中处于弱点击破状态的敌方目标时，暴击率提高25%" -- a state-gated boost for that hit.
  *
  * <p>Two ways: an enemy whose toughness is emptied is weakness broken and the boost is stated; one that is not gets nothing. The
  * state is produced through the engine's own entry point, the same way SuperBreakTest's fixture does it.

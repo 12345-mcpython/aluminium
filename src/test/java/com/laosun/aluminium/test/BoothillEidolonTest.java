@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1315 波提欧's Eidolon 1: "when 波提欧 deals damage, ignore 16% of the enemy target's DEF".
+ * 1315 Boothill (波提欧)'s Eidolon 1: "when 波提欧 deals damage, ignore 16% of the enemy target's DEF".
  *
  * <p>An unconditional passive, so it is stated at the start of the battle rather than when a damage instance is handed over
  * (a modifier added there would be one step too late for the hit it describes). Two ways: rank 1 reads 16%, rank 0 nothing.

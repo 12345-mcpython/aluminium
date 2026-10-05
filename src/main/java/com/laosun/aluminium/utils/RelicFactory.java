@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.StringJoiner;
 
 /**
- * Deterministic relics from the real set data (P10-3).
+ * Deterministic relics from the real set data.
  *
  * <pre>{@code
  * RelicSuit musketeer = RelicFactory.suit(102, 5, 15);        // 4 pieces of "Musketeer of Wild Wheat"

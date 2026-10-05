@@ -34,7 +34,7 @@ import java.util.Objects;
  *   <li>Randomness does not live here. {@code Battle} rolls crit with its injected
  *   {@code Random} and hands the decided boolean to {@link #crit(boolean, double)};
  *   {@link CritArea} only keeps the books.</li>
- *   <li>Zone clamping (vulnerable cap, reduction floor, …) is declared by the
+ *   <li>Zone clamping (vulnerable cap, reduction floor, ...) is declared by the
  *   subclass's {@link Area#min()}/{@link Area#max()} and applied by the {@code final}
  *   {@link Area#getRate()}, so no subclass can bypass it.</li>
  *   <li>"This hit does not use that zone" (break damage is not boosted, DOT cannot
@@ -67,7 +67,7 @@ public class Damage {
     private final double skillBaseValue;
 
     /**
-     * Which kind of cast produced this instance - the fact behind "普攻/战技/终结技造成的伤害提高 X%".
+     * Which kind of cast produced this instance - the fact behind "basic attack / Skill / Ultimate DMG Boost".
      *
      * <p>It cannot be derived from {@link #type}: a basic attack and a skill are both
      * {@code DamageType.NORMAL}, so "which scope does this instance belong to" has to be carried. Never
@@ -134,9 +134,9 @@ public class Damage {
 
     /**
      * The <b>toughness reduction this instance intends</b>, recorded by {@code SkillExecutor} before the instance is
-     * settled (2026-09-28).
+     * settled.
      *
-     * <p>"对处于弱点击破状态的敌方目标造成伤害后，会将本次伤害的<b>削韧值</b>转化为 1 次超击破伤害"(1321 Dahlia (大丽花)) needs a number
+     * <p>"对处于弱点击破状态的敌方目标造成伤害后,会将本次伤害的<b>削韧值</b>转化为 1 次超击破伤害" (1321 Dahlia (大丽花)) needs a number
      * no rule could otherwise reach: the reduction is computed beside the damage and only {@code applyStanceDamage} ever
      * sees it. It travels on the instance for the same reason {@code addFlat} and {@code fixedCrit} do - the instance is
      * what a {@code DEALING_DAMAGE} rule is handed, and the settlement is still in progress.
@@ -145,10 +145,10 @@ public class Damage {
     private double stance;
 
     /**
-     * The skill key (the loader's slot) of the cast that produced this instance (2026-09-28).
+     * The skill key (the loader's slot) of the cast that produced this instance.
      *
      * <p>Why it rides on the instance: {@code DEALING_DAMAGE} is the only event that has BOTH a target and, with this, the
-     * skill -- which is what "强化普攻命中后使目标…" needs, because {@code ALLY_ATTACK} deliberately carries no aim.
+     * skill -- which is what "强化普攻命中后使目标..." needs, because {@code ALLY_ATTACK} deliberately carries no aim.
      */
     private int skillKey;
 
@@ -194,7 +194,7 @@ public class Damage {
     /**
      * The full constructor: the same instance, plus which kind of cast produced it.
      *
-     * <p>The category is what makes a <b>scoped</b> DMG boost possible - "普攻造成的伤害提高 X%" must not
+     * <p>The category is what makes a <b>scoped</b> DMG boost possible - "basic attack DMG Boost" must not
      * reach a skill, and the damage type cannot tell the two apart. Instances that are not an in-battle cast
      * (break, super break, DOT, additional/follow-up, true damage, a technique used outside battle) leave it
      * {@link SkillCategory#UNSPECIFIED}; follow-up damage has its own
@@ -334,17 +334,17 @@ public class Damage {
     }
 
     /**
-     * A flat amount added to this instance's <b>base</b> - "伤害值提高，提高数值等同于三月七防御力的 30%".
+     * A flat amount added to this instance's <b>base</b> - "伤害值提高,提高数值等同于三月七防御力的 30%".
      *
      * <p><b>Why it is not {@link #addBoost}.</b> The boost zone is multiplicative ({@code 1 + Σ}) and therefore
      * expresses "this hit deals X% more"; the documents also state an <b>absolute</b> increase ("提高数值等同于
-     * &lt;某属性&gt; 的 Y%", 12 of the 9character files), and folding that number into a percentage zone is only
+     * &lt;某属性&gt; 的 Y%" in 12 of the 93 character files), and folding that number into a percentage zone is only
      * equal to the sentence when the instance's base happens to equal the attribute - otherwise it is a different
      * number that looks right.
      *
      * <p><b>Where it enters.</b> The <b>base layer</b>: {@code Battle.assemble} adds it before the first zone, so the
      * addition takes crit / DMG boost / defence / resistance exactly like the skill multiplier does. That is the
-     * documented decision (ROADMAP M-55, {@code engine.md} the zone table (乘区表)) rather than an accident: "伤害<b>值</b>提高" names a
+     * documented decision (the {@code engine.md} zone table) rather than an accident: "伤害<b>值</b>提高" names a
      * value, and a value that did not crit would be a different mechanic from the one the text describes.
      *
      * @param value the amount to add (may be negative, and the assembled total is still floored at 1)
@@ -430,7 +430,7 @@ public class Damage {
      * @param defenceIgnore   DEF-ignore ratio, clamped to [0,1]
      */
     /**
-     * The energy the cast that produced THIS hit spent, or {@code 0} (2026-09-30; reader: light cone 23062).
+     * The energy the cast that produced THIS hit spent, or {@code 0} (the reader is light cone 23062).
      *
      * <p>Note: It rides on the instance for the same reason the extras below do: "每消耗 1 点能量值"
      * modifies the hit BEING SETTLED, and {@code DEALING_DAMAGE} is the only event that hands that instance over.
@@ -439,7 +439,7 @@ public class Damage {
      */
     private double castEnergySpent = 0;
 
-    /** Extra DEF-ignore carried by THIS hit, added by a rule firing on {@code DEALING_DAMAGE} (2026-09-29). */
+    /** Extra DEF-ignore carried by THIS hit, added by a rule firing on {@code DEALING_DAMAGE}. */
     private double extraDefenceIgnore = 0;
 
     /** Extra CRIT CHANCE carried by THIS hit, added by a rule on {@code DEALING_DAMAGE} (2026-09-29). */
@@ -532,7 +532,7 @@ public class Damage {
      * @return the final value of this hit
      */
     public double toValue() {
-        // The base layer = the skill multiplier plus any absolute addend («提高数值等同于…的 Y%», M-55), so the
+        // The base layer = the skill multiplier plus any absolute addend ("提高数值等同于...的 Y%"), so the
         // addition is multiplied by every zone below exactly like the multiplier is. Note: A true-damage instance skips
         // the zones, and it takes the addend the same way - a value is a value.
         double base = skillBaseValue + flatAddend;
@@ -586,7 +586,7 @@ public class Damage {
      *
      * <p>{@link #getRate()} is {@code final} on purpose - every zone's raw rate goes
      * through {@link #min()}/{@link #max()}, so a subclass cannot forget its cap
-     * (vulnerable 3.5, reduction 0.01, …).
+     * (vulnerable 3.5, reduction 0.01, ...).
      */
     public abstract static class Area {
         /**
@@ -604,7 +604,7 @@ public class Damage {
         /**
          * Lower bound of this zone's multiplier.
          *
-         * <p>No policy by default ({@code -∞}, symmetric with {@link #max()}'s {@code +∞}):
+         * <p>No policy by default, symmetric with {@link #max()}'s {@code +∞}:
          * the base class does not invent bounds. Every official floor is declared by the
          * zone that owns it - reduction 0.01 and weakness 0.2 (HSR.md §2.2), resistance
          * 0.1 (HSR.md §2.5), crit 1.0.
@@ -623,7 +623,7 @@ public class Damage {
         /**
          * Whether this zone applies to the given damage type.
          *
-         * <p>Break damage is not boosted, DOT cannot crit, … Declaring it here keeps the
+         * <p>Break damage is not boosted, DOT cannot crit, ... Declaring it here keeps the
          * rule in one place instead of relying on callers to skip the modifier.
          *
          * @param type the damage type of the hit being settled

@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Light cone 23004 以世界之名 (In the Name of the World): "when the wearer casts the Skill, the effect hit rate of the wearer's attack this time is increased by #2%, and ATK by #3%" (2026-10-02).
+ * Light cone 23004 In the Name of the World (以世界之名): "when the wearer casts the Skill, the effect hit rate of the wearer's attack this time is increased by #2%, and ATK by #3%".
  *
  * <p>THE SCOPE IS `until: cast_end`, and that is what these readings pin:
  * <ul>

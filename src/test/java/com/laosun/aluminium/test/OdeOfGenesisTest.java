@@ -16,10 +16,11 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1415's memosprite skill 10 "献予'创世'之诗" (data slot 13, SkillID 1141513) -- the half the capabilities now support (2026-10-02).
+ * 1415's memosprite skill 10 "献予'创世'之诗" (data slot 13, SkillID 1141513) -- the half the capabilities now support.
  *
  * <p>"整场生效，<b>对开拓者-记忆施放时，使开拓者-记忆的攻击力提高，提高数值等同于德谬歌生命上限的 #1%</b>，同时使其暴击率提高，提高数值等同于<b>德谬歌暴击率</b>的 #2%。
- * <b>该效果对迷迷也生效。</b>"
+ * <b>该效果对迷迷也生效。</b>" ("Effective for the whole battle: <b>when cast on Trailblazer - Remembrance, raise Trailblazer - Remembrance's ATK, the raise being equal to #1% of Demiurge's Max HP</b>, and at the same time raise their CRIT Rate, the raise being equal to #2% of <b>Demiurge's CRIT Rate</b>.
+ * <b>This effect also applies to Mem.</b>")
  *
  * <p>Both factors are read where the engine reads them: the row of the CASTER'S CURRENT LEVEL (never row 1 by hand) and the ACTOR's own
  * attributes (`actor_attr:`) -- Demiurge (德谬歌) is the caster, and the recipient's own memosprite is Mem (迷迷), a different unit entirely.

@@ -18,7 +18,7 @@ import java.util.Map;
 import java.util.Random;
 
 /**
- * A memosprite's own skills are real skills (2026-10-02).
+ * A memosprite's own skills are real skills.
  *
  * <p>The engine addresses a skill by {@code (cid, slot)} -- {@code SkillEffects.forSkill} keys on {@code skill.getCid()} and
  * {@code skill.getSkillSlot()}, and {@code DefaultSkill(cid, slot, level)} is the one implementation. A memosprite's cid is its
@@ -49,7 +49,7 @@ public class MemospriteSkillTest {
                 "「ServantID 11415」-- a memosprite's skill is keyed by the SERVANT's id, which is what SkillEffects looks up");
         Assertions.assertEquals(ODE_TO_STRIFE, skill.getSkillSlot(), "and by the DATA slot the table states (16, not the checklist's 8)");
         Assertions.assertTrue(deliverable,
-                "「献予「纷争」之诗」is a 辅助 skill whose work is on the rule side, so the Rules entry is what makes it deliverable");
+                "「献予「纷争」之诗」is a support skill whose work is on the rule side, so the Rules entry is what makes it deliverable");
     }
 
     /** Every memosprite that the servant table knows carries all of its skills, keyed by the servant's id. */
@@ -64,7 +64,7 @@ public class MemospriteSkillTest {
                     List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
             battle.startBattle();
             battle.processRequests();
-            // Note: `Battle.summonServant` is the seam that hands the panel its resource reader (140's derives from 新蕊 (New Bud))
+            // Note: `Battle.summonServant` is the seam that hands the panel its resource reader (140's derives from New Bud (新蕊))
             Summon servant = battle.summonServant(master);
             Map<Integer, Skill> skills = servant.skillsByDataSlot();
             Assertions.assertFalse(skills.isEmpty(), cid + " carries its imported skills");

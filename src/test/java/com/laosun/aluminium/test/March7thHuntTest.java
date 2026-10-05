@@ -17,9 +17,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1224 Hunt March th, from her own file (2026-09-29, round 203): the 师父 (master) marker, the charge it enables, and the speed share.
+ * 1224 Hunt March 7th, from her own file: the Shifu (师父) marker, the charge it enables, and the speed share.
  *
- * <p>The speed is asserted against a hand-built 20% reference in the SAME pipeline (ratio 0.5), because round 19showed a share of a zero base compares nothing and a
+ * <p>The speed is asserted against a hand-built 20% reference in the SAME pipeline (ratio 0.5), because a share of a zero base compares nothing and a
  * bare "greater than before" lets any percentage pass.
  */
 public class March7thHuntTest {
@@ -52,21 +52,21 @@ public class March7thHuntTest {
         // 1) an ordinary ally attack: nobody is the Shifu yet, so nothing is granted
         battle.fireTriggers(TriggerEvent.ALLY_ATTACK, ally, enemy, 0, 0);
         Assertions.assertEquals(start, chargeOf(march),
-                "「【师父】施放攻击」 -- before the Skill, no ally is the Shifu");
+                "「【师父】施放攻击」 (the Shifu casts an attack) -- before the Skill, no ally is the Shifu");
 
         // 2) her own basic attack: +1
         battle.fireTriggers(TriggerEvent.BASIC_ATTACK, march, enemy, 0, 0);
         Assertions.assertEquals(start + 1, chargeOf(march),
-                "「随后获得1点充能」");
+                "「随后获得1点充能」 (then gains 1 point of charge)");
 
         // 3) mark the ally as the Shifu, then their attack: +1 again
         battle.castImmediate(march.getSkills().get(SkillType.SKILL), march, List.of(ally));
         Assertions.assertTrue(ally.getBuffManager().hasState("师父"),
-                "「使除自身以外的我方指定单体成为【师父】」");
+                "「使除自身以外的我方指定单体成为【师父】」 (make a designated single ally other than herself the Shifu)");
         int beforeShifu = chargeOf(march);
         battle.fireTriggers(TriggerEvent.ALLY_ATTACK, ally, enemy, 0, 0);
         Assertions.assertEquals(beforeShifu + 1, chargeOf(march),
-                "「【师父】施放攻击后，三月七每次获得最多1点充能」");
+                "「【师父】施放攻击后，三月七每次获得最多1点充能」 (after the Shifu attacks, March 7th gains at most 1 point of charge each time)");
     }
 
     /** The declared resource's value, read through the combatant's own manager. */

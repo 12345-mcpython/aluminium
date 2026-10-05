@@ -48,9 +48,9 @@ public class SkillData {
      * <p><b>Why this question needs a name.</b> {@code Character.Builder} fills every intrinsic slot with a
      * {@code DefaultSkill}, and a slot whose character has no such row still ends up <b>present in the map</b> - 
      * holding this placeholder. So "the slot is there" and "the character has that skill" are different facts, and
-     * the difference is invisible to a null check: {@code getData()} answers non-null either way. Measured
-     * (2026-10-02): Himeko carries a {@code ELATION_SKILL} key whose row is this placeholder, while 8010's is a real
-     * one - the first version of the {@code has_skill} condition asked about the key and answered "yes" for every
+     * the difference is invisible to a null check: {@code getData()} answers non-null either way. Measured:
+     * Himeko carries a {@code ELATION_SKILL} key whose row is this placeholder, while 8010's is a real
+     * one - so asking about the key answers "yes" for every
      * character in the game.
      *
      * <p>Note: The marker is {@code maxLevel}: a real row has at least one level of parameters, the placeholder has
@@ -92,7 +92,7 @@ public class SkillData {
      *
      * <p>It is exactly tbgd's {@code AvatarSkillConfig.SPNeed}. Note: It is NOT equal to the energy
      * cap: of the 93 characters, 5 have a 2:1 ratio between the two (Yunli 240/120, Argenti
-     * 180/90, Evanescia 480/240, Feixiao 12/6, Cyrene (昔涟) 24/12).
+     * 180/90, Evanescia (绯英) 480/240, Feixiao (飞霄) 12/6, Cyrene (昔涟) 24/12).
      * See also {@link #spBase}.
      */
     private final Double spNeed;
@@ -110,7 +110,7 @@ public class SkillData {
      * to be multiplied by the hit count to be correct - but multiplying by hit count depends on
      * the ability config's {@code SPHitRatio} (absent from this project's data). The constants
      * happen to give the correct total instead.
-     * The proper data-driven path is ROADMAP P3-4 (aggregate {@code SPHitRatio} first).
+     * The proper data-driven path aggregates {@code SPHitRatio} first.
      *
      * <p>Value of keeping the read: it is the input for aggregating {@code SPHitRatio}, and it is
      * also the raw fact of "which skills grant no energy gain" ({@code null} = that skill grants
@@ -177,40 +177,40 @@ public class SkillData {
     /**
      * The debuff's base chance, read out of the description, or {@code null} when the skill states none.
      *
-     * <h2>Which parameter it is (P10-6)</h2>
-     * Note: <b>Not a fixed slot.</b> The plan for this task said "the chance is the 3rd {@code param_list}
-     * entry"; measured against the real data that is wrong for <b>every</b> skill examined, and wrong
+     * <h2>Which parameter it is</h2>
+     * Note: <b>Not a fixed slot.</b> The chance is <b>not</b> the 3rd {@code param_list}
+     * entry: against the real data that is wrong for <b>every</b> skill examined, and wrong
      * in the worst way - for Himeko's technique (1003/) index 3 holds {@code 15}, so the "chance"
      * would be 1500%, clamped to 1.0 by {@link com.laosun.aluminium.Battle#hitChance}, i.e. "always lands" and nothing
      * would look broken.
      *
      * <p>The description <b>says</b> which index it is: the placeholder that directly precedes the
-     * words 基础概率 (base chance) / 固定概率 (fixed chance). Five measured anchors:
+     * words base chance (基础概率) / fixed chance (固定概率). Five measured anchors:
      *
      * <table border="1">
      *   <caption>skill, the text, and where the number really lives</caption>
      *   <tr><th>skill</th><th>text</th><th>param index</th><th>value</th></tr>
-     *   <tr><td>1003/姬子 不完全燃烧</td><td>{@code 有#1%的<u>基础概率</u>}</td><td>0</td><td>1.0</td></tr>
-     *   <tr><td>1004/瓦尔特 画地为牢</td><td>{@code 有#1%的<u>基础概率</u>}</td><td>0</td><td>1.0</td></tr>
-     *   <tr><td>1108/桑博 你最闪亮</td><td>{@code 有#2%<u>固定概率</u>} (no 的)</td><td><b>1</b></td><td>1.0</td></tr>
-     *   <tr><td>1006/4 银狼 等待程序响应…</td><td>{@code 有#4%的<u>基础概率</u>}</td><td><b>3</b></td><td>0.6</td></tr>
-     *   <tr><td>130/4 黑天鹅 无端命运的机杼</td><td>{@code 有#2%的<u>基础概率</u>}</td><td><b>1</b></td><td>0.5</td></tr>
+     *   <tr><td>1003/Himeko (姬子) Incomplete Combustion (不完全燃烧)</td><td>{@code 有#1%的<u>基础概率</u>}</td><td>0</td><td>1.0</td></tr>
+     *   <tr><td>1004/Welt (瓦尔特) Gravitational Imprisonment (画地为牢)</td><td>{@code 有#1%的<u>基础概率</u>}</td><td>0</td><td>1.0</td></tr>
+     *   <tr><td>1108/Sampo (桑博) Shining Bright (你最闪亮)</td><td>{@code 有#2%<u>固定概率</u>} (no 的)</td><td><b>1</b></td><td>1.0</td></tr>
+     *   <tr><td>1006/4 Silver Wolf (银狼) waiting for the program to respond...</td><td>{@code 有#4%的<u>基础概率</u>}</td><td><b>3</b></td><td>0.6</td></tr>
+     *   <tr><td>130/4 Black Swan (黑天鹅) Loom of Fate's Caprice (无端命运的机杼)</td><td>{@code 有#2%的<u>基础概率</u>}</td><td><b>1</b></td><td>0.5</td></tr>
      * </table>
      *
      * <p>So the rule is textual, and the two wordings are <b>not</b> interchangeable in game terms:
-     * 基础概率 (base chance) is scaled by the caster's effect hit rate and reduced by the target's resistance
-     * (what {@link com.laosun.aluminium.Battle#hitChance} computes), while 固定概率 (fixed chance) is applied as-is. Both are returned
-     * here, because both are "the chance this skill states"; a caller that feeds a 固定概率 (fixed chance) through
+     * base chance (基础概率) is scaled by the caster's effect hit rate and reduced by the target's resistance
+     * (what {@link com.laosun.aluminium.Battle#hitChance} computes), while fixed chance (固定概率) is applied as-is. Both are returned
+     * here, because both are "the chance this skill states"; a caller that feeds a fixed chance (固定概率) through
      * {@code hitChance} will over-apply it. Distinguishing them is left to whoever builds the
-     * Impair dispatch - the data needed to know <i>which</i> debuff is applied is still missing
-     * (see ROADMAP P10-6), so an API for it here would have no caller.
+     * Impair dispatch - the data needed to know <i>which</i> debuff is applied is still missing,
+     * so an API for it here would have no caller.
      *
      * <p>Matching stops at the first hit, which is what the data needs: when a description names the
      * chance twice (130/4 Black Swan) both spellings point at the same placeholder.
      *
      * @return the chance ({@code param_list} of level 1), or {@code null} when the description states
      * no chance at all - which is a real answer, not a failure: 14 of the 28 {@code Impair}
-     * skills (e.g. 1315/2 Boothill's [绝命对峙]) apply their effect unconditionally
+     * skills (e.g. 1315/2 Boothill (波提欧)'s [Standoff (绝命对峙)]) apply their effect unconditionally
      */
     public Double debuffChance() {
         if (description == null || skills.isEmpty()) {
@@ -263,9 +263,9 @@ public class SkillData {
      *
      * <p><b>Why it lives here rather than in the executor.</b> Two callers need the same answer and must not
      * drift: {@code SkillExecutor} (a skill's own cast) and the trigger interpreter's {@code COMMAND_SUMMON}
-     * (a <b>commanded</b> attack, which is the same swing delivered by a summon). Note: It used to be split three
-     * ways - AOE and BLAST read {@code getStanceList()} themselves while only BOUNCE went through a helper - and
-     * a mutant that zeroed the helper's AOE arm survived the whole suite (2026-09-2), which is what a dead
+     * (a <b>commanded</b> attack, which is the same swing delivered by a summon). Note: Splitting it three
+     * ways - AOE and BLAST read {@code getStanceList()} themselves while only BOUNCE went through a helper -
+     * lets a mutant that zeroed the helper's AOE arm survive the whole suite, which is what a dead
      * branch looks like from the outside.
      *
      * <p>{@code mainTarget} is what separates BLAST's centre ({@code single}) from its neighbours ({@code spread}).
@@ -284,7 +284,7 @@ public class SkillData {
     }
 
     /**
-     * A Bounce skill's damage share, taken from the description (2026-09-29).
+     * A Bounce skill's damage share, taken from the description.
      *
      * <p>Bounce rows do not agree on layout: 1009 is `[0.25]` (its "额外造成4次", "4 extra hits", is prose only), 1108 is `[4, 0.28]` (count first) and 1004 is
      * `[0.36, 0.65, 0.1, 2]` (count last). The only reliable map is the description: the share is the parameter a `#N[i]` placeholder
@@ -311,8 +311,8 @@ public class SkillData {
     }
 
     /**
-     * The number of ADDITIONAL hits a Bounce skill's description states: the integer parameter that is not the damage share
-     * (2026-09-29). 1004's `2` and 1108's `4` are such numbers; 1009 states its count in prose, so this returns {@code null} for it.
+     * The number of ADDITIONAL hits a Bounce skill's description states: the integer parameter that is not the damage share.
+     * 1004's `2` and 1108's `4` are such numbers; 1009 states its count in prose, so this returns {@code null} for it.
      */
     public Integer bounceAdditionalHits(Double damageShare) {
         if (skills.isEmpty()) {
@@ -331,10 +331,10 @@ public class SkillData {
     }
 
     /**
-     * Which of the caster's attributes a damage clause scales off (2026-09-29).
+     * Which of the caster's attributes a damage clause scales off.
      *
      * <p>The description names it: "等同于砂金100%防御力" (equal to 100% of Aventurine's DEF) is DEF, "等同于风堇50%生命上限" (equal to 50% of Hyacine's Max HP) is Max HP, and everything else is ATK. 18 documents scale a damage
-     * clause off Max HP and 3 off DEF, while the executor used to multiply {@code ATTACK} unconditionally - so those skills dealt the wrong damage.
+     * clause off Max HP and 3 off DEF, while multiplying {@code ATTACK} unconditionally would deal the wrong damage for those skills.
      */
     public com.laosun.aluminium.enums.AttributeType damageBaseAttribute() {
         if (description != null) {

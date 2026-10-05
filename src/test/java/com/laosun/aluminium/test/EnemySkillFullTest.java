@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * P9-2: an enemy skill reaches whoever its <b>shape</b> says, not always the main target.
+ * an enemy skill reaches whoever its <b>shape</b> says, not always the main target.
  *
  * <p>Before this, {@code EnemySkill.execute} hit the first target {@link #SEGMENTS} times and nothing
  * else, so a multi-target enemy skill in the data had no way to reach a second character - an AoE would

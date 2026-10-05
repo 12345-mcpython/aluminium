@@ -12,9 +12,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1513: "gain 1/4/6 笑点" - - the half each of the three sentences gives (2026-10-02).
+ * 1513: "gain 1/4/6 笑点" - the half each of the three sentences gives.
  *
- * <p>笑点 is a PARTY-scoped, uncapped counter that ALREADY existed (declared by 1502 as `max: 21448364`); these
+ * <p>Punchline (笑点) is a PARTY-scoped, uncapped counter (declared by 1502 as `max: 21448364`); these
  * readings are about HER grants, each the sentence's own number. Note: The counter is shared, so the sum test is the point --
  * that is what "party-level" means, and `partyResourceValue` is the accessor `Character1502Test` already uses.
  */
@@ -50,7 +50,7 @@ public class Character1513LaughterTest {
         Assertions.assertEquals(1, scene.battle.partyResourceValue(LAUGH), "\"and 1 笑点\"");
     }
 
-    /** THE SHARED COUNTER: all three in one battle sum, because 笑点 is party-scoped. */
+    /** THE SHARED COUNTER: all three in one battle sum, because Punchline (笑点) is party-scoped. */
     @Test
     public void theCounterIsSharedAcrossTheParty() {
         Scene scene = fight();

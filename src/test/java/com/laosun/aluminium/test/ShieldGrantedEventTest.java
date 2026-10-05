@@ -18,10 +18,10 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * {@code SHIELD_GRANTED} - "a shield was granted" as an event (M-43), and Dahlia (大丽花)'s trace that needs it.
+ * {@code SHIELD_GRANTED} - "a shield was granted" as an event, and Dahlia (大丽花)'s trace that needs it.
  *
  * <p><b>Why the engine needed it.</b> Shields were only an <i>op</i> ({@code SHIELD}): the engine could make one but
- * nothing was announced, so "when receiving healing <b>or a shield</b> provided by a teammate" (Dahlia (大丽花)'s trace, 1321101) could be written only
+ * nothing is announced, so "when receiving healing <b>or a shield</b> provided by a teammate" (Dahlia (大丽花)'s trace, 1321101) can be written only
  * as its healing half - an effect that is too weak exactly when a shield arrives, with nothing to report. The event
  * follows {@code HEALED}'s convention ({@code actor} = who provided it, {@code target} = who received it), so "provided
  * by a teammate" needs no new vocabulary: {@code target == self} + {@code actor is_ally} + {@code actor != self}.
@@ -30,10 +30,10 @@ import java.util.Random;
  * timed {@code ShieldBuff} (the interpreter's {@code SHIELD} arm, which has no {@code Battle} handle of its own). Both
  * are covered here, because a fix that only announced one of them would leave half the game's shields invisible.
  *
- * <p><b>Note: And the reading that shrank this round's plan.</b> "triggers <b>this effect</b> again" was checked against the trace's
- * own text before anything was built: 该效果 is the sentence above's effect ("raises other characters' Break Effect by a value equal to
- * 24% of Dahlia (大丽花)'s Break Effect + 0.5"), so re-triggering it is that <b>same buff granted again with a longer duration</b> - 
- * which the existing {@code MODIFY_ATTR} already says. A planned {@code RETRIGGER_RULE} op would have had no reader.
+ * <p><b>Note: And the reading that bounds the plan.</b> "triggers <b>this effect</b> again" is checked against the trace's
+ * own text: 该效果 is the sentence above's effect ("raises other characters' Break Effect by a value equal to
+ * 24% of Dahlia (大丽花)'s Break Effect + 0.5"), so re-triggering it is that <b>same buff granted again with a longer duration</b> -
+ * which the existing {@code MODIFY_ATTR} already says. A separate {@code RETRIGGER_RULE} op would have no reader.
  */
 public class ShieldGrantedEventTest {
     private static final double EPS = 1e-6;

@@ -14,11 +14,11 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 真实伤害 (true damage) through the {@code DAMAGE} op (2026-10-02): {@code "damage_type": "TRUE"} must <b>skip every zone</b>.
+ * True DMG (真实伤害) through the {@code DAMAGE} op: {@code "damage_type": "TRUE"} must <b>skip every zone</b>.
  *
- * <p>The engine always had the path ({@code Battle.applyTrueDamage} sets {@code Damage.trueDamage()}, which
- * {@code toValue()} honours by skipping the zones) but no op reached it: a rule stating the type got an instance that
- * was <i>labelled</i> TRUE while defence still multiplied it.
+ * <p>The engine has the path ({@code Battle.applyTrueDamage} sets {@code Damage.trueDamage()}, which
+ * {@code toValue()} honours by skipping the zones), and this op is what reaches it: without it a rule stating the type gets an instance that
+ * is <i>labelled</i> TRUE while defence still multiplies it.
  *
  * <p>Note: <b>The fixture needs a REAL cast.</b> A hand-fired event carries no instance, so `damage_is_attack` - the guard
  * that keeps a rider from re-triggering itself - is false and the rule never fires; without the guard it recurses

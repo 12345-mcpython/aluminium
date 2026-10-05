@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * The cast events carry the unit they were <b>aimed at</b> - "designate one of our characters" (M-35).
+ * The cast events carry the unit they were <b>aimed at</b> - "designate one of our characters".
  *
  * <p><b>What was missing.</b> Bronya (布洛妮娅)'s skill is "removes 1 negative effect from <b>the designated one of our characters</b>, and makes <b>that target</b> act immediately ... when this skill is cast on herself the immediate-action effect cannot be triggered". The trigger events carried the caster (`actor`) and, for attacks, how many
  * targets were hit (`hit_count`) - but not <em>who</em> was chosen, so "the ally I aimed at" was unwritable. The

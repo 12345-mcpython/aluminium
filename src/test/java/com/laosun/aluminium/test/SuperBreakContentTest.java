@@ -17,14 +17,14 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * The first <b>content</b> readers of the round-5 pair, from the characters' own files (2026-09-28).
+ * The first <b>content</b> readers of the super-break pair, from the characters' own files.
  *
- * <p>"持有[伴舞]的我方目标…攻击处于弱点击破状态下的敌方目标后，会将本次攻击的削韧值转化为 1 次超击破伤害" (8006) and "结界持续期间，我方全体的
+ * <p>"持有[伴舞]的我方目标...攻击处于弱点击破状态下的敌方目标后,会将本次攻击的削韧值转化为 1 次超击破伤害" (8006) and "结界持续期间,我方全体的
  * 弱点击破效率提高 50%" (1321). The engine's own behaviour is pinned in {@link SuperBreakTest} and
  * {@link ToughnessBoostTest}; what is pinned here is that the <b>files</b> say it.
  *
- * <p>Note: <b>The discipline this file exists to demonstrate</b>: never hard-code a monster id to mean "it is weak to X" - 
- * three earlier cases were burned by exactly that (a hard-coded enemy is simply not weak to the element a sentence needs,
+ * <p>Note: <b>The discipline this file exists to demonstrate</b>: never hard-code a monster id to mean "it is weak to X" -
+ * a hard-coded enemy is simply not weak to the element a sentence needs,
  * and the toughness reduction is then zero with no error). Every enemy here is chosen by <b>asking it</b>
  * ({@code hasToughnessBar()} / {@code getStanceWeak()}), and a break uses the element the enemy itself declares.
  */

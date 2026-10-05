@@ -87,8 +87,8 @@ public class Cone21052Test {
     @Test
     public void theSpecPinsBothRules() {
         build(true);
-        // The rule is gated on 忆灵在场 (while the memosprite is out), and matching evaluates conditions (discipline 182): without a memosprite
-        // on the field the rule does not exist at all -- measured, a fresh state found zero rules where one was expected.
+        // The rule is gated on the memosprite being on the field (忆灵在场), and matching evaluates conditions (discipline 182): without a memosprite
+        // on the field the rule does not exist at all -- measured, a fresh state finds zero rules where one is expected.
         battle.summonMemosprite(wearer);
         int pinned = 0;
         for (var rule : wearer.getTriggerTable().matching(com.laosun.aluminium.enums.TriggerEvent.DEALING_DAMAGE,

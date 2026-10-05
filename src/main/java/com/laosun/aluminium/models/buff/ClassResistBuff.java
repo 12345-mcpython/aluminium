@@ -7,7 +7,7 @@ import com.laosun.aluminium.models.CanHit;
  * "the chance to resist <b>control-class</b> negative states is increased by 35%" / "immune to <b>control-class</b> negative states" - a <b>class</b> resistance, carried by the
  * unit that resists.
  *
- * <p><b>Why a buff and not a field.</b> The sentences come in two shapes: an unconditional trace (Clara (克拉拉)'s 守护 (Guardian)) and an
+ * <p><b>Why a buff and not a field.</b> The sentences come in two shapes: an unconditional trace (Clara (克拉拉)'s Guardian (守护)) and an
  * ability that protects for a while ("while in the [防火墙] state, our targets are immune to control-class negative states applied by enemy targets", 1 turn). A raw number on
  * the combatant can only express the first; a buff expires, can be dispelled and can be removed by name through the
  * same machinery every other state uses.
@@ -22,7 +22,7 @@ import com.laosun.aluminium.models.CanHit;
  *       1), because they are two boosts to one probability rather than two independent rolls.</li>
  * </ul>
  *
- * <p>Note: It is a <b>positive</b> effect on its bearer ({@link #isDebuff()} is {@code false}), exactly like 减伤 (damage reduction): being
+ * <p>Note: It is a <b>positive</b> effect on its bearer ({@link #isDebuff()} is {@code false}), exactly like DMG Reduction (减伤): being
  * harder to control is good for the unit carrying it, and "dispel N negative effects" must not take it off.
  */
 public class ClassResistBuff extends AbstractBuff {
@@ -38,7 +38,7 @@ public class ClassResistBuff extends AbstractBuff {
      * @param kind      which family of states it protects against (control class (控制类) / damage-over-time class (持续伤害类))
      * @param percent   the resistance fraction, in {@code (0, 1]}
      * @param turns     how many of the carrier's turns it lasts
-     * @param permanent {@code true} for "the whole battle" (整场战斗) - the shape every 行迹 (trace) with this sentence has
+     * @param permanent {@code true} for "the whole battle" (整场战斗) - the shape every trace (行迹) with this sentence has
      */
     public ClassResistBuff(DebuffClass kind, double percent, int turns, boolean permanent) {
         super(turns, false, permanent);
@@ -51,7 +51,7 @@ public class ClassResistBuff extends AbstractBuff {
         if (!(percent > 0) || percent > 1) {
             throw new IllegalArgumentException(
                     "ClassResistBuff percent must be in (0, 1], got " + percent
-                            + " (1.0 = 免疫, 0.35 = 「抵抗…的概率提高35%」)");
+                            + " (1.0 = immunity (免疫), 0.35 = 「抵抗…的概率提高35%」)");
         }
         if (turns < 1) {
             throw new IllegalArgumentException("ClassResistBuff turns must be >= 1, got " + turns);
@@ -102,7 +102,7 @@ public class ClassResistBuff extends AbstractBuff {
     /**
      * Identity is <b>(class, applier)</b>, not class alone.
      *
-     * <p>Two different appliers are two <b>contributions</b> to one probability, and they must coexist: Clara (克拉拉)'s 守护 (Guardian)
+     * <p>Two different appliers are two <b>contributions</b> to one probability, and they must coexist: Clara (克拉拉)'s Guardian (守护)
      * is a permanent 35%, while a "[防火墙]... immune to control-class negative states" is a one-turn 100%. Were kind alone the identity, the
      * second would <b>replace</b> the first and the trace would be gone for good the moment the timed immunity
      * expired - a wrong number with nothing to report.

@@ -8,7 +8,7 @@ import com.laosun.aluminium.enums.DamageType;
 import com.laosun.aluminium.models.enemy.Enemy;
 
 /**
- * Weakness break damage (P4-3).
+ * Weakness break damage.
  *
  * <pre>
  * break damage = break base (level)  x  (1 + break effect)  x  toughness reduction value  x  DEF zone  x  RES zone  x  reduction zone
@@ -81,7 +81,7 @@ public final class BreakDamageCalculator {
     }
 
     /**
-     * Builds one instance of super break damage (P4-6): same structure as {@link #build},
+     * Builds one instance of super break damage: same structure as {@link #build},
      * plus one independent DMG boost zone, with the type switched to
      * {@link DamageType#SUPER_BREAK}.
      *

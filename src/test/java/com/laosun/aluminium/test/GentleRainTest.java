@@ -16,8 +16,8 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Relic set 125 "烈阳惊雷的女武神" (Valkyrie of the Scorching Sun and Thunder) 4-piece: "当装备者及其忆灵为装备者及其忆灵以外的我方目标提供治疗后，使装备者获得[甘霖]，
- * 每回合最多触发1次，持续2回合。装备者持有[甘霖]时，速度提高6%，我方全体暴击伤害提高15%，该效果无法叠加。" (when the wearer and its memosprite heal one of our targets other than the wearer and its memosprite, the wearer gains [甘霖], at most once per turn, for 2 turns; while the wearer holds [甘霖], SPD +6% and all of our side's CRIT DMG +15%, and the effect does not stack) (param [0.06, 0.15, 2])
+ * Relic set 125 "烈阳惊雷的女武神" (Warrior Goddess of Sun and Thunder) 4-piece: "当装备者及其忆灵为装备者及其忆灵以外的我方目标提供治疗后,使装备者获得[甘霖],
+ * 每回合最多触发1次,持续2回合。装备者持有[甘霖]时,速度提高6%,我方全体暴击伤害提高15%,该效果无法叠加。" (when the wearer and its memosprite heal one of our targets other than the wearer and its memosprite, the wearer gains Gentle Rain (甘霖), at most once per turn, for 2 turns; while the wearer holds Gentle Rain (甘霖), SPD +6% and all of our side's CRIT DMG +15%, and the effect does not stack) (param [0.06, 0.15, 2])
  *
  * <p>Every expectation is a DIFFERENCE between two otherwise-identical battles -- one with the heal, one without -- because the wearer's SPD moves
  * for reasons of its own between construction and reading (the set's own 2-piece `SpeedAddedRatio`, and traits that fire at BATTLE_START). A share

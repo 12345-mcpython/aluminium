@@ -16,11 +16,11 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Pela (佩拉) (1106), from her own file (2026-09-28): the two "in a negative effect" clauses and the party's effect hit rate.
+ * Pela (佩拉) (1106), from her own file: the two "in a negative effect" clauses and the party's effect hit rate.
  *
  * <p><b>What it needed.</b> Nothing new - {@code target_debuff_count} is the numerical variable that reads how many
  * negative buffs the event's target carries, and this file is its first shipped reader (both the talent's energy and the damage bonus of the trace
- * 痛击 are gated on it). What is <b>registered</b> is the Skill's "removes an enemy's buff" (the engine's `DISPEL` cleanses
+ * Bash (痛击) are gated on it). What is <b>registered</b> is the Skill's "removes an enemy's buff" (the engine's `DISPEL` cleanses
  * our own side's debuffs; removing an <i>enemy's</i> buff is the opposite direction) and the ultimate's [通解], which is a
  * state with a 100% <b>base chance</b> (a roll the `APPLY_BUFF` path does not have).
  */
@@ -38,7 +38,7 @@ public class PelaDebuffTest {
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.DEALING_DAMAGE), "trace 痛击");
 
         // Note: Two separate fixtures: adding a DOT is not undone, so reusing one enemy would leave the "no debuff" check
-        // looking at a debuffed target (an earlier version of this case did exactly that).
+        // looking at a debuffed target.
         Fixture debuffed = new Fixture();
         Assertions.assertFalse(table.matching(TriggerEvent.DEALING_DAMAGE, debuffed.ctx(true)).isEmpty(),
                 "with a debuff on the target, 痛击 matches");
@@ -47,7 +47,7 @@ public class PelaDebuffTest {
                 "Note: with none it does not: 「to an enemy target in a **negative effect**」");
     }
 
-    /** trace 秘策 hands the whole side the effect-hit rate, and the file says so. */
+    /** trace The Secret Strategy (秘策) hands the whole side the effect-hit rate, and the file says so. */
     @Test
     public void herTraceRaisesThePartysEffectHitRate() {
         Fixture f = new Fixture();

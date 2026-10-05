@@ -23,7 +23,7 @@ import java.util.Random;
 import java.util.Set;
 
 /**
- * P3-2 acceptance: energy gain is really wired into battle - skill casts / taking hits / kills gain
+ * acceptance: energy gain is really wired into battle - skill casts / taking hits / kills gain
  * energy automatically, and the ultimate needs full energy, then clears to zero before regaining 5.
  *
  * <p>Anchors (ROADMAP P3-0 convention 2): basic attack 20 / skill 30 / ultimate 5 / taking a hit 10 / kill 5.

@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * {@code MODIFY_RULE}'s <b>third form</b> (2026-09-28): raise another rule's effect <b>value</b> or <b>duration</b>,
+ * {@code MODIFY_RULE}'s <b>third form</b>: raise another rule's effect <b>value</b> or <b>duration</b>,
  * rather than how often it runs.
  *
  * <p><b>The sentences that need it.</b> 1215 Hanya (寒鸦) Eidolon 4 "终结技的持续时间额外增加1回合" and Eidolon 6 "天赋的伤害提高效果额外提高
@@ -123,7 +123,7 @@ public class RuleEffectAmendmentTest {
     public void theCopyCarriesEveryField() throws Exception {
         // Note: The bean has getters but no setters (Gson fills it by reflection), so the fields are filled through the
         // same reflection helper the other data tests use -- and the comparison below is field-by-field through the
-        // getters, which is what catches a field that `copy()` forgot.
+        // getters, which is what catches a field that `copy` forgot.
         EffectSpec original = new EffectSpec();
         int filled = 0;
         for (java.lang.reflect.Field field : EffectSpec.class.getDeclaredFields()) {

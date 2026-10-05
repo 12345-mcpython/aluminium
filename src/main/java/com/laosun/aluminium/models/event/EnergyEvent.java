@@ -4,7 +4,7 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.models.CanHit;
 
 /**
- * Energy credit event (P8-6): fired once after someone actually gains energy.
+ * Energy credit event: fired once after someone actually gains energy.
  *
  * <p>{@code actuallyAdded} is the return value of {@code gainEnergy} (the value after being truncated
  * by the cap), not the theoretical energy gain - this is deliberate: cases like Robin (知更鸟) / Tribbie (缇宝)'s

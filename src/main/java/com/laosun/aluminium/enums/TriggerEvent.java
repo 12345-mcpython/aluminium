@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * The trigger sources a character mechanic can subscribe to (P8-).
+ * The trigger sources a character mechanic can subscribe to.
  *
  * <p>This is the data-side name of an engine event. The whole point of the trigger table is that
  * character content is expressed as "on &lt;event&gt;, if &lt;condition&gt;, do &lt;effects&gt;", so
@@ -18,16 +18,16 @@ import java.util.Map;
  */
 public enum TriggerEvent {
     /**
-     * The wearer successfully applied a debuff to a target (2026-09-29).
+     * The wearer successfully applied a debuff to a target.
      *
      * <p>Emitted from `Battle.tryApplyDebuff`, the one chokepoint every landed debuff passes through (controls and DoTs alike).
      * Note: It also fires when an ENEMY debuffs our side, with the enemy as the actor, so content written here should say `actor == self`
-     * to mean "mine". Readers: relic 11/4's third clause and relic 132/4's second.
+     * to mean "mine". Two readers: relic 11/4's third clause and relic 132/4's second.
      */
     DEBUFF_APPLIED("DEBUFF_APPLIED", true),
 
     /**
-     * A named state has just left the unit that carried it (2026-10-02).
+     * A named state has just left the unit that carried it.
      *
      * <p>Note: <b>The name must ride on the event, not be read off the carrier</b>: by the time this fires the state is
      * already gone (the removal happens first), so a {@code has_state} condition on the carrier can never be true.
@@ -37,7 +37,7 @@ public enum TriggerEvent {
     STATE_ENDED("STATE_ENDED", true),
 
     /**
-     * The end of a cast that a RULE commanded -- "an inserted cast" (2026-10-02).
+     * The end of a cast that a RULE commanded -- "an inserted cast".
      *
      * <p>Note: A commanded cast IS a real cast: it announces CAST_SETUP / SKILL_CAST and settles its own energy, so no existing
      * event tells it apart from the original it was copied from. This is the moment that names it, and the reader is
@@ -52,7 +52,7 @@ public enum TriggerEvent {
     INSERTED_CAST_END("INSERTED_CAST_END", true),
 
     /**
-     * An incoming hit that WOULD kill the target, announced before it is applied (2026-10-02).
+     * An incoming hit that WOULD kill the target, announced before it is applied.
      *
      * <p>"when taking a lethal attack it will not fall into the unable-to-fight state, but instead restore health equal to 20%/50% of its own Max HP" - two readers, both registered
      * before this existed (1408's transformed form, and 1104, whose own file records the sentence as missing).
@@ -68,10 +68,10 @@ public enum TriggerEvent {
      * {@code Battle.startBattle()} - delivered once to <b>every character's own table</b>, after the opening
      * hooks and before {@code processRequests}.
      *
-     * <p>Note: <b>It carries no {@code actor} and no {@code target}.</b> This used to read "once for every combatant",
-     * which is true about the <i>delivery</i> and misleading about the <i>context</i>: a rule written here as
-     * {@code "when": ["actor == self"]} can never fire, and it looks entirely reasonable (hand-written that way on
-     * 2026-09-2, and the loader now refuses the spelling). "My own battle start" needs no condition because the
+     * <p>Note: <b>It carries no {@code actor} and no {@code target}.</b> Reading it as "once for every combatant" is
+     * true about the <i>delivery</i> and misleading about the <i>context</i>: a rule written here as
+     * {@code "when": ["actor == self"]} can never fire, and it looks entirely reasonable (hand-written that way
+     * once, and the loader now refuses the spelling). "My own battle start" needs no condition because the
      * table being fired <b>is</b> the owner's.
      */
     BATTLE_START("BATTLE_START", true),
@@ -82,9 +82,9 @@ public enum TriggerEvent {
     /**
      * An ally cast their <b>Skill</b> (the data's {@code BPSkill}) - including non-damaging ones.
      *
-     * <p>Note: <b>Narrowed on 2026-09-2.</b> This used to fire for <b>every</b> cast that was not an
+     * <p>Note: <b>The Skill cast is the narrow one.</b> A single cast event for everything that was not an
      * ultimate, which silently included basic attacks, techniques, map attacks and talents - so
-     * "when the wearer uses their Skill" content (relic set 109's ATK buff, Robin's 模进乐段) also
+     * "when the wearer uses their Skill" content (relic set 109's ATK buff, Robin's Sequential Passage (模进乐段)) also
      * fired on a basic attack. That is the failure this vocabulary is shaped to prevent: an over-trigger is a
      * wrong number with no error attached. The three in-battle casts now have three events
      * ({@link #BASIC_ATTACK} / this / {@link #ULT_CAST}), split at the emitter from the parsed
@@ -115,7 +115,7 @@ public enum TriggerEvent {
     HP_LOST("HP_LOST", true),
 
     /**
-     * <b>A damage instance was SETTLED</b> - "how much did this hit I dealt actually settle" (2026-10-02).
+     * <b>A damage instance was SETTLED</b> - "how much did this hit I dealt actually settle".
      *
      * <p><b>Why it had to exist.</b> The engine already announced damage <i>before</i> it was settled
      * ({@link #DEALING_DAMAGE}, deliberately: that is where a rule can still change the instance, and its
@@ -128,14 +128,14 @@ public enum TriggerEvent {
      *
      * <p>Note: It is the <b>dealer's</b> event, not the victim's: {@code actor} = whoever dealt it, {@code target} =
      * whoever took it, both sides. That is the honest reading of "the damage I dealt", and it is why this is a new event
-     * rather than "let TAKING_HIT reach enemies" - that one is the victim's fact and stays ours (P9 owns monsters).
+     * rather than "let TAKING_HIT reach enemies" - that one is the victim's fact and stays ours (the enemy side owns monsters).
      *
      * <p>Its {@code amount} is the <b>settled</b> value, which is what {@code scale: "original_damage"} reads.
      */
     DAMAGE_SETTLED("DAMAGE_SETTLED", true),
 
     /**
-     * "HP consumed" (2026-09-29): HP paid as a PRICE. The texts list it separately from "taking damage"
+     * "HP consumed": HP paid as a PRICE. The texts list it separately from "taking damage"
      * ("after the wearer is attacked <b>or</b> has HP consumed by one of our targets", 113/4) because a hit can be shielded and can kill, and a price can do neither.
      */
     HP_CONSUMED("HP_CONSUMED", true),
@@ -144,7 +144,7 @@ public enum TriggerEvent {
      */
     HEALED("HEALED", true),
     /**
-     * A <b>shield was granted</b> to one of our characters (2026-09-28, M-43).
+     * A <b>shield was granted</b> to one of our characters.
      *
      * <p>{@code actor} = <b>who provided it</b>, {@code target} = who received it - the same convention
      * {@link #HEALED} uses, so "when receiving healing <b>or a shield provided by a teammate</b>" is
@@ -185,7 +185,7 @@ public enum TriggerEvent {
      */
     SKILL_POINT_GAINED("SKILL_POINT_GAINED", true),
     /**
-     * Skill points that were ASKED for but NOT credited, because the pool was already at its cap (2026-09-30; readers:
+     * Skill points that were ASKED for but NOT credited, because the pool was already at its cap (readers:
      * cone 23021's "the skill points that overflow on restore are also counted" and character 1306's "if skill points overflow, record the number of overflowed skill points").
      *
      * <p>Without it the swallowed points are invisible: {@code SKILL_POINT_GAINED} only fires when something was really
@@ -201,12 +201,12 @@ public enum TriggerEvent {
      * {@code MoveEvent.beforeMove/afterMove} for buffs - that decision is pinned by
      * {@code EventBusTest.turnBoundariesAreStillMoveEvent} and nothing here revives it. What
      * {@code TURN_START} adds is only the ability for <b>data</b> to subscribe to the same moment
-     * ("at the beginning of the turn, if …"), which the buff interfaces cannot express because a JSON
+     * ("at the beginning of the turn, if ..."), which the buff interfaces cannot express because a JSON
      * rule is not a Java class.
      */
     TURN_START("TURN_START", true),
     /**
-     * A unit's turn ended (2026-09-28).
+     * A unit's turn ended.
      *
      * <p>"at the end of each of our targets' turns, remove 1 stack of [鸣弦号令] from Yukong (驭空)" (120 Yukong) needed this moment, and nothing else could stand
      * in for it: the *next* unit's {@code TURN_START} is a different fact (the last turn of a fight has no next unit), and
@@ -271,7 +271,7 @@ public enum TriggerEvent {
      *
      * <p><b>What counts as one.</b> The engine has exactly one notion of an attack that "does not
      * count as dealing 1 attack": {@code DamageType.ADDITIONAL}, which is what a talent-driven
-     * follow-up (Clara's counter, the P8-3 shape) is settled as. So this fires from that single
+     * follow-up (Clara's counter, the shape) is settled as. So this fires from that single
      * settlement point, and nothing else in the engine fires it.
      *
      * <p>It is emitted for every such instance <b>whether or not it dealt damage</b>: the texts that
@@ -284,7 +284,7 @@ public enum TriggerEvent {
      */
     FOLLOW_UP("FOLLOW_UP", true),
     /**
-     * A <b>summon</b> finished an attack (2026-09-28, P9-4 memosprites): fired by {@code EnemySkill.execute}
+     * A <b>summon</b> finished an attack ( memosprites): fired by {@code EnemySkill.execute}
      * after every segment of its attack has been settled, with the summon as {@code actor} and the
      * hit-target count riding along like {@link #ALLY_ATTACK}'s.
      *
@@ -306,7 +306,7 @@ public enum TriggerEvent {
      */
     SUMMON_ATTACK("SUMMON_ATTACK", true),
     /**
-     * A <b>summon entered the field</b> (2026-09-28, P9-4 memosprites): fired by {@code Battle.processRequests} for
+     * A <b>summon entered the field</b> ( memosprites): fired by {@code Battle.processRequests} for
      * everything {@code Battle.summon} / {@code Battle.summonMemosprite} placed, with the summoned unit as
      * {@code actor}.
      *
@@ -326,7 +326,7 @@ public enum TriggerEvent {
     SUMMONED("SUMMONED", true),
     /**
      * A cast is <b>about to resolve</b>: fired by {@code SkillExecutor.execute} after the caster is known and
-     * <b>before any damage is expanded</b>, so a rule can still change what this cast does (P11-1, M-40).
+     * <b>before any damage is expanded</b>, so a rule can still change what this cast does.
      *
      * <p><b>Why a pre-cast event exists at all.</b> Every other cast event ({@link #BASIC_ATTACK},
      * {@link #SKILL_CAST}, {@link #ULT_CAST}, {@link #ALLY_ATTACK}) fires <i>after</i> the damage has been
@@ -351,7 +351,7 @@ public enum TriggerEvent {
      */
     CAST_SETUP("CAST_SETUP", true),
     /**
-     * A <b>countdown</b> unit's turn began (2026-09-28, M-49): fired from {@code Battle.beforeMove} with the
+     * A <b>countdown</b> unit's turn began: fired from {@code Battle.beforeMove} with the
      * countdown as {@code actor} (and as the subject), so a rule can answer "at the start of the countdown's turn ...".
      *
      * <p><b>Why the moment needs an event at all.</b> Robin (知更鸟)'s [协奏] lasts "until its countdown's turn arrives", which is a fact about
@@ -375,16 +375,16 @@ public enum TriggerEvent {
      */
     CRIT_DEALT("CRIT_DEALT", true),
     /**
-     * A <b>wave entered the field</b> (2026-09-30; readers: cones 23011 and 23064, "at the start of each wave").
+     * A <b>wave entered the field</b> (cones 23011 and 23064, "at the start of each wave").
      *
      * <p>Fired by {@code WaveManager.nextWave} right after the wave's monsters are spawned, and with neither actor nor
      * subject -- the same shape as {@code BATTLE_START}, because a wave arriving is a fact about the battle rather than
      * about one unit. That class already documented this exact spot as the extension point ("if between-wave config ever
-     * appears, the extension point is inside nextWave()").
+     * appears, the extension point is inside nextWave").
      */
     WAVE_START("WAVE_START", true),
     /**
-     * A <b>resource changed</b> (2026-09-30; readers: cone 20024's "when the [笑点] held is >= 10 ...").
+     * A <b>resource changed</b> (cone 20024's "when the [笑点] held is >= 10 ...").
      *
      * <p>Fired by {@code GAIN_RESOURCE} / {@code SPEND_RESOURCE} with the <b>holder</b> as the actor: a battle is at hand
      * there, while {@code ResourceManager} owns none and so cannot raise a trigger itself. Note: The consequence is stated
@@ -393,7 +393,7 @@ public enum TriggerEvent {
     RESOURCE_CHANGED("RESOURCE_CHANGED", true),
 
     /**
-     * An attack has FINISHED: settlement complete, hit set frozen (2026-09-30).
+     * An attack has FINISHED: settlement complete, hit set frozen.
      *
      * <p>{@code Battle.fireAfterAttack} already decides "an attack happened" and holds the whole set; this
      * exposes that boundary to content. A per-hit event cannot assemble it (Note: as {@code weakHitCount} notes).
@@ -401,7 +401,7 @@ public enum TriggerEvent {
     ATTACK_FINISHED("ATTACK_FINISHED", true),
 
     /**
-     * The wearer added a weakness to an enemy target (light cone 23050 随心: "when the wearer adds a weakness to an enemy target,
+     * The wearer added a weakness to an enemy target (light cone 23050, "At Will" (随心): "when the wearer adds a weakness to an enemy target,
      * restore 1 skill point"). Note: Three readers: 23050, 1405's talent, 1006's Skill.
      * Note: Fired in {@code ADD_ELEMENTAL_WEAKNESS}'s success branch, so it only fires when one was really added.
      */

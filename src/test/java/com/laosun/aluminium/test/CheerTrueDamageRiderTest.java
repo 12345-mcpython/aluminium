@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 800: "every time a target holding [迷迷的声援] deals 1 instance of damage, it additionally deals 1 instance of true damage equal to 28% of the original damage" (2026-10-02).
+ * 800: "every time a target holding [迷迷的声援] (Mem's Support) deals 1 instance of damage, it additionally deals 1 instance of true damage equal to 28% of the original damage".
  *
  * <p>TWO-WAY, and driven by REAL content: his skill lays the cheer on the ally, the ally then attacks. The control battle is
  * the same fight without the cheer, so the EXCESS the enemy loses must be exactly 28% of what it lost in the control --
@@ -45,7 +45,7 @@ public class CheerTrueDamageRiderTest {
         battle.startBattle();
         battle.processRequests();
 
-        // BOTH branches summon: his skill summons 迷迷 (Mimi), and the first draft only cast it in the "with" branch -- so the
+        // BOTH branches summon: his skill summons 迷迷 (Mimi), and a draft that cast it only in the "with" branch would put the
         // excess contained the memosprite's own damage too. Same scene, one variable: the control removes the cheer instead.
         Skill his = owner.getSkills().get(SkillType.SKILL);
         Assertions.assertNotNull(his, "precondition: he has a skill");

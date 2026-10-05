@@ -20,10 +20,10 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * A <b>scoped, rolled</b> taken-side modifier (2026-09-28): {@code MODIFY_DAMAGE_TAKEN} with {@code damage_type} and
+ * A <b>scoped, rolled</b> taken-side modifier: {@code MODIFY_DAMAGE_TAKEN} with {@code damage_type} and
  * {@code base_chance}.
  *
- * <p>Readers: shipped 1301 Gallagher's talent "受到的击破伤害提高 12%", and 1108 Sampo's ultimate "有 100% 的基础概率使
+ * <p>shipped 1301 Gallagher's talent "受到的击破伤害提高 12%", and 1108 Sampo's ultimate "有 100% 的基础概率使
  * 被攻击的敌方目标受到的持续伤害提高 30%". Note: `Battle.tickDots` settles DOT ticks as {@link DamageType#DOT}, which is what
  * makes the second one expressible - and the trap on the other side of those words is {@code DOT_DAMAGE_BOOST} ("how hard
  * <b>my</b> DOTs hit") versus this ("how hard DOTs hurt <b>me</b>").

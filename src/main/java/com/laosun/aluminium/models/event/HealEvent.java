@@ -4,7 +4,7 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.models.CanHit;
 
 /**
- * Heal event (P8-6): fired once after someone's HP is actually restored.
+ * Heal event: fired once after someone's HP is actually restored.
  *
  * <p>{@code actuallyHealed} is the amount actually restored, not the base healing amount passed in - 
  * being healed at full HP is 0, and then it does not fire ("received healing" and "got HP back" are two

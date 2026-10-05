@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1408 白厄: "transform into 卡厄斯兰那, and during the transformation open the zone [时墟铁墓]" (2026-10-02).
+ * 1408 Phainon (白厄): "transform into Khaslana (卡厄斯兰那), and during the transformation open the zone Ruinous Irontomb (时墟铁墓)".
  *
  * <p>FILE-DRIVEN, and only the half the document states with no number in it: her ultimate puts the transformation STATE
  * on. It is permanent because its end is the last countdown turn (document :120) -- an explicit removal, which this arc made

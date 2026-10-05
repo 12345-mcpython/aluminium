@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Natasha (1105), from her own file (2026-09-28): the two heals, the cleanse and the outgoing-heal trace.
+ * Natasha (1105), from her own file: the two heals, the cleanse and the outgoing-heal trace.
  *
  * <p><b>What it needed.</b> A derived magnitude read off the healer's <b>settled max HP</b> ({@code scale: self_max_hp}) - 
  * "回复等同于娜塔莎生命上限的 10.50% + 280" (restores an amount equal to 10.50% of Natasha's Max HP + 280). Note: Not {@code self_attr:HEALTH}: that is the attribute table's HEALTH,
@@ -34,14 +34,14 @@ public class NatashaHealTest {
     @Test
     public void herSkillHealsTheAimedAlly() {
         Fixture f = new Fixture();
-        // Note: A fraction of max HP, not a flat 3000: a level-80 ally has far less than that, and the first version of this
-        // test killed the ally it was about to heal (measured: the 命中 (hit) assertion read 0.0).
+        // Note: A fraction of max HP, not a flat 3000: a level-80 ally has far less than that, and a flat 3000 would kill the
+        // ally the heal is for (measured: the hit (命中) assertion reads 0.0).
         f.ally.takeDamage(f.ally.getMaxHp() * 0.5);
         double before = f.ally.getCurrentHp();
-        // "医者" (the Healer trace, +10% outgoing healing) is on the same file, so the settled heal is the row times 1.1.
+        // The Healer (医者) trace (+10% outgoing healing) is on the same file, so the settled heal is the row times 1.1.
         // Note: The ENGINE's skill execution is at level 1 (params [0.0, 0.048, 2, 0, 48]), not at the Lv10 row the
         // document quotes -- a *rule* states its own magnitude, which is why 1105's file needed no rule for this heal at
-        // all. The +10% is the 行迹 医者 (the Healer trace), which is live on this character.
+        // all. The +10% is the Healer (医者) trace, which is live on this character.
         double expected = (0.07 * f.natasha.getMaxHp() + 70) * 1.1;
 
         double herBefore = f.natasha.getCurrentHp();
@@ -66,14 +66,14 @@ public class NatashaHealTest {
         // resolved upstream), so both allies are named here.
         f.battle.castImmediate(f.natasha.getSkills().get(SkillType.ULTRA), f.natasha, List.of(f.ally, f.natasha));
 
-        double expected = (0.092 * f.natasha.getMaxHp() + 92) * 1.1;   // Lv1 row [0.092, 92], plus the 行迹 医者 (Healer) trace
+        double expected = (0.092 * f.natasha.getMaxHp() + 92) * 1.1;   // Lv1 row [0.092, 92], plus the Healer (医者) trace
         Assertions.assertEquals(Math.min(f.ally.getMaxHp(), allyBefore + expected), f.ally.getCurrentHp(), 1.0,
                 "「立即为我方全体回复等同于娜塔莎13.80%生命上限+368」 (the Lv10 row the prose quotes; the engine runs Lv1)");
         Assertions.assertEquals(Math.min(f.natasha.getMaxHp(), herBefore + expected), f.natasha.getCurrentHp(), 1.0,
                 "…and 「我方全体」 (all of our side) includes her");
     }
 
-    /** The 行迹 医者 (Healer) trace raises the outgoing healing, which is read from the healer while the amount is computed. */
+    /** The Healer (医者) trace raises the outgoing healing, which is read from the healer while the amount is computed. */
     @Test
     public void herTraceRaisesHerOutgoingHealing() {
         Fixture f = new Fixture();
@@ -83,19 +83,19 @@ public class NatashaHealTest {
     }
 
     /**
-     * The regeneration settles on each of the carrier's turns, and then stops (2026-09-28).
+     * The regeneration settles on each of the carrier's turns, and then stops.
      *
-     * <p>Note: This is the case that used to be impossible to write at all: "同时目标每回合开始时为其回复…持续2回合" cannot be a
+     * <p>Note: This is the case a plain turn count cannot express: "同时目标每回合开始时为其回复…持续2回合" cannot be a
      * {@code TURN_START} rule, because buffs are counted down by the early tick that runs <b>before</b> that event - a
      * {@code turns: 2} state would heal once where the document says twice. `APPLY_REGEN` settles beside the DOT pass,
-     * which runs before the countdown, so two turns really are two heals (three here: the 行迹 调理 trace adds a turn).
+     * which runs before the countdown, so two turns really are two heals (three here: the Recuperation (调理) trace adds a turn).
      */
     @Test
     public void theRegenerationTicksOnEachOfTheCarriersTurns() {
         Fixture f = new Fixture();
         f.ally.takeDamage(f.ally.getMaxHp() * 0.5);
         f.castSkillOn(f.ally);
-        double perTick = (0.072 * f.natasha.getMaxHp() + 192) * 1.1;    // Lv10 row #2/#5, plus the 行迹 医者 (Healer) trace
+        double perTick = (0.072 * f.natasha.getMaxHp() + 192) * 1.1;    // Lv10 row #2/#5, plus the Healer (医者) trace
         double afterCast = f.ally.getCurrentHp();
 
         f.allyTurn();
@@ -120,8 +120,8 @@ public class NatashaHealTest {
     /**
      * Note: A second cast <b>restarts</b> the regeneration instead of piling another one on: one tick's worth, not two.
      *
-     * <p>This case exists because the first version of the suite did not cover refresh at all - flipping
-     * {@code RegenBuff.isSameKind} to {@code false} (i.e. letting them stack) left every assertion green (measured
+     * <p>This case exists because refresh is easy to miss: flipping
+     * {@code RegenBuff.isSameKind} to {@code false} (i.e. letting them stack) leaves every assertion green (measured
      * mutation m2, 0 red). "同时目标每回合开始时为其回复…" describes one regeneration that a new cast restarts.
      */
     @Test

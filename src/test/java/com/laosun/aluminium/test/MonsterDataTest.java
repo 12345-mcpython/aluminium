@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Map;
 
 /**
- * P2-1 acceptance: the three monster data files load with the right shapes and values.
+ * acceptance: the three monster data files load with the right shapes and values.
  *
  * <p>Anchor data (matching `E:\code\blog\hsr\HSR.md` §1.2 / the measurements taken in the session):
  * Ice Edge (冰锋) 1002011 template `18 / 210 / 69.5 / 100 / 60`, weak to fire+lightning, resistance to

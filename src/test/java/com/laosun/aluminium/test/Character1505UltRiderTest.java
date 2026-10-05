@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1505 绯英's ultimate rider (2026-09-30): "while 绯英 holds [好活当赏], casting the Ultimate deals 12% Physical Elation damage to all enemies".
+ * 1505 Evanescia (绯英)'s ultimate rider: "while Evanescia (绯英) holds [好活当赏], casting the Ultimate deals 12% Physical Elation damage to all enemies".
  *
  * <p>The rider is wired to CAST_SETUP, which fires ONCE per cast: on DEALING_DAMAGE an all-target ultimate would produce one
  * instance per victim and the rider would follow N times. The judge reads the two enemies' health and pins the shipped rule too,

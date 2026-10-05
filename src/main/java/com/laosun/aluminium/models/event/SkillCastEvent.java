@@ -7,7 +7,7 @@ import com.laosun.aluminium.models.skill.Skill;
 import java.util.List;
 
 /**
- * Skill cast event (P8-6): fired once after a skill is cast, also for non-damaging skills.
+ * Skill cast event: fired once after a skill is cast, also for non-damaging skills.
  *
  * <p>Do not confuse how it divides the work with {@link AttackEvent}:
  * <ul>

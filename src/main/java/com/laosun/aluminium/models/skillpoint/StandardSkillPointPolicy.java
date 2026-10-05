@@ -7,7 +7,7 @@ import com.laosun.aluminium.models.Resource;
 import com.laosun.aluminium.models.skill.Skill;
 
 /**
- * Standard skill point (SP) policy (P8-4): start at 3, cap 5, our side's basic attack +1,
+ * Standard skill point (SP) policy: start at 3, cap 5, our side's basic attack +1,
  * skill -1, everything else neutral.
  *
  * <p>Rule table (see the full comparison and gap list in {@code engine.md} §9.6):
@@ -39,7 +39,7 @@ import com.laosun.aluminium.models.skill.Skill;
  * "50% chance to +1 on skill", Sushang's (素裳) "+1 on a skill that hits a broken target", Sparkle's
  * (花火) "cap +2" and so on all have to wait for the P8-trigger table. This class deliberately knows
  * no character - when adding these, extend and override {@link #gainForCast} (or drive it from the
- * P8-effect table), and do not write {@code cid} checks here.
+ * -effect table), and do not write {@code cid} checks here.
  */
 public class StandardSkillPointPolicy implements SkillPointPolicy {
 
@@ -78,7 +78,7 @@ public class StandardSkillPointPolicy implements SkillPointPolicy {
     }
 
     /**
-     * Reporting hook for the skill points' actual change (P8-6).
+     * Reporting hook for the skill points' actual change.
      *
      * <p>Why the policy reports it instead of {@code Battle} comparing the before/after values: the
      * policy is the only component that knows "whether it actually went up this time and by how much"

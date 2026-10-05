@@ -108,7 +108,7 @@ public class Character extends CanHit {
     private EnumMap<SkillType, Integer> skillLevel;
 
     /**
-     * Path (命途) (P5-1): determines the base aggro value, and thereby the probability that an enemy
+     * Path (命途): determines the base aggro value, and thereby the probability that an enemy
      * selects this character. Parsed from {@code mt} in {@code character_data.json}; {@link Path#OTHER}
      * when the data is missing.
      */
@@ -124,7 +124,7 @@ public class Character extends CanHit {
     private int aggro;
 
     /**
-     * Attack element (P8-1): comes from {@code attribute} in {@code character_data.json}.
+     * Attack element: comes from {@code attribute} in {@code character_data.json}.
      *
      * <p>Note: That field is all lowercase ({@code "thunder"}), while {@code element} in
      * {@code skills.json} is capitalized ({@code "Thunder"}) - so parsing goes through
@@ -176,7 +176,7 @@ public class Character extends CanHit {
     /**
      * Creates a character directly from pre-computed attributes.
      *
-     * <p>Note: <b>For tests / placeholders only; new code after P8 MUST NOT use it</b> (P8-1).
+     * <p>Note: <b>For tests / placeholders only; new code after P8 MUST NOT use it</b>.
      * The characters it makes have no element, no path differences, an energy cap of 0, and skills that are
      * all {@link DefaultSkill} placeholders - for a real character use
      * {@link com.laosun.aluminium.utils.CharacterFactory#create(int, int)}.
@@ -393,11 +393,11 @@ public class Character extends CanHit {
             for (Map.Entry<SkillType, Integer> entry : skillLevel.entrySet()) {
                 SkillType type = entry.getKey();
                 int level = entry.getValue();
-                // P8-2: every slot resolves its own skill_id (previously it was always 1, so all six
+                // every slot resolves its own skill_id (previously it was always 1, so all six
                 // slots had the basic attack's data).
                 // Only equip the "always-on character" slots: the overworld basic attack (6) / technique ()
                 // are overworld skills attached by Battle.startBattle(); the summon slot belongs to memosprites
-                // (P9-4), so neither is equipped here.
+                // , so neither is equipped here.
                 if (!type.isIntrinsic()) {
                     continue;
                 }
@@ -412,17 +412,17 @@ public class Character extends CanHit {
             character.setSkillLevel(skillLevel);
             character.setLevel(level);
             character.setCid(cid);
-            // P5-1: path and aggro come from the character data (mt = path string, aggro = the game multiplier itself)
+            // path and aggro come from the character data (mt = path string, aggro = the game multiplier itself)
             character.setPath(this.path != null ? this.path : Path.fromMt(characterData.mt()));
             character.setAggro(characterData.aggro() > 0 ? characterData.aggro() : 0);
-            // P8-1: the element likewise comes from the character data (attribute is all lowercase; for the
+            // the element likewise comes from the character data (attribute is all lowercase; for the
             // parsing convention see DamageElement#fromString)
             character.setElement(DamageElement.fromString(characterData.attribute()));
-            // P8-1: the energy cap follows the data. A null MUST stay 0 (= no energy bar); it must NOT fall
+            // the energy cap follows the data. A null MUST stay 0 (= no energy bar); it must NOT fall
             // back to 100 - 140 Castorice (遐蝶) is the only null in the whole data set, and a fallback would conjure
             // an energy bar for her out of thin air (P3-0 table A).
             character.setMaxEnergy(characterData.maxEnergy() != null ? characterData.maxEnergy() : 0);
-            // P8-: the character's mechanics as data. Always non-null -- an unregistered character
+            // -: the character's mechanics as data. Always non-null -- an unregistered character
             // has the empty table, which is normal (the trigger interpreter treats it as a no-op and
             // Battle never has to null-check).
             character.setTriggerTable(triggerTable);

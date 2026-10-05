@@ -179,12 +179,12 @@ public final class StageFactory {
     }
 
     /**
-     * The real 4-character reference team (P8-5), each with a light cone of its own path and a real
+     * The real 4-character reference team, each with a light cone of its own path and a real
      * relic suit.
      *
      * <p>Every member comes from {@link CharacterFactory#create(int, int)}, so it carries a real stat
      * sheet (level scaling, traces), path, element, aggro, energy cap, real skill slots and - since
-     * P8-/P8-8 - its data-driven trigger table and stack resources.
+     * -/P8-8 - its data-driven trigger table and stack resources.
      *
      * <p><b>On the light cones</b>: the cone is picked by path (the same key
      * {@code Path.fromMt} uses for characters), and the <b>smallest matching id</b> wins. That rule is
@@ -192,7 +192,7 @@ public final class StageFactory {
      * non-deterministic pick would make every stage battle irreproducible. Note: Only the cone's
      * <b>panel</b> is applied - its passive is not (a weapon passive needs the buff system, P10-3).
      *
-     * <p><b>On the relics (P10-3)</b>: every member wears the same {@link #referenceRelics()} build - four
+     * <p><b>On the relics</b>: every member wears the same {@link #referenceRelics()} build - four
      * pieces of Musketeer of Wild Wheat (set 102) plus two pieces of Space Sealing Station (set 301) - so
      * both a 4-piece and a 2-piece set bonus are live on every sheet. The build is a pure function of the
      * data ({@link RelicFactory}), with no rolled main attributes and no rolled sub-stats, because a
@@ -240,7 +240,7 @@ public final class StageFactory {
      * irreproducible.
      *
      * <p>Note: Only the cone's <b>panel</b> is applied. Its passive is not: a weapon passive needs the
-     * buff system (P10-3).
+     * buff system.
      *
      * @param path the character's path
      * @return the cone, or {@code null} when no weapon of that path exists (the caller then leaves the

@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * P1-5 acceptance: {@code Battle.applyDamage} assembles the zones onto a {@link Damage},
+ * acceptance: {@code Battle.applyDamage} assembles the zones onto a {@link Damage},
  * settles it, applies it once, and is the only way in.
  *
  * <p>Attackers are plain {@code Character.fromAttributes} combatants (Lv80, no light cone

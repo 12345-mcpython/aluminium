@@ -9,7 +9,7 @@ import lombok.ToString;
  * A summoned entity that participates in combat.
  *
  * <p>Summons are aligned with whoever called them: an enemy boss's minions fight alongside the monsters in
- * {@code Battle.enemies} (P9-4), and a player-side summon would join our own side.
+ * {@code Battle.enemies}, and a player-side summon would join our own side.
  *
  * <p><b>Where they come from.</b> {@code SummonFactory} builds one from the same monster data
  * ({@code monster_config.json}) an {@link com.laosun.aluminium.models.enemy.Enemy} is built from, and

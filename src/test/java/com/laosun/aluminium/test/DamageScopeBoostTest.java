@@ -19,12 +19,12 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Scoped DMG boosts (P10-4): "普攻 / 战技 / 终结技 造成的伤害提高 X%".
+ * Scoped DMG boosts: "普攻 / 战技 / 终结技 造成的伤害提高 X%".
  *
  * <p><b>Why this needed engine work at all.</b> A basic attack and a skill are both
  * {@code DamageType.NORMAL}, so the damage <i>type</i> cannot say which one produced an instance - which is
- * why relic set 131's "the DMG dealt by their Skill and Ultimate increases by 18%" was registered as
- * unmodelled for exactly this reason. The fact is now carried explicitly: {@code SkillExecutor} puts the
+ * why relic set 131's "the DMG dealt by their Skill and Ultimate increases by 18%" is registered as
+ * unmodelled. The fact is carried explicitly instead: {@code SkillExecutor} puts the
  * cast's {@link SkillCategory} onto the instance and {@code Battle.assemble} asks
  * {@link SkillCategory#damageBoost()} which attribute to add.
  *
@@ -133,7 +133,7 @@ public class DamageScopeBoostTest {
     }
 
     /**
-     * A DOT is not a cast either: 触电 (shock) / 灼烧 (burn) damage must not grow because the wearer boosted their basic
+     * A DOT is not a cast either: shock (触电) / burn (灼烧) damage must not grow because the wearer boosted their basic
      * attacks.
      */
     @Test

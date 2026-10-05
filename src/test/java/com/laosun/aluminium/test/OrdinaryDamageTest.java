@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * A rule-driven ORDINARY damage instance (2026-09-30), reader 1505 绯英's technique:
+ * A rule-driven ORDINARY damage instance, 1505 Evanescia (绯英)'s technique:
  * "after entering battle, deal Physical damage equal to 100% of 绯英's ATK to all enemies".
  *
  * <p>Note: The first version of this test believed an ordinary instance credits the VICTIM ENERGY inside `applyDamage` and measured

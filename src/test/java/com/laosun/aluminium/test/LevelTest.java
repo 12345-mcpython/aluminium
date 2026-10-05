@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
- * P1-4 acceptance: the level travels from the builder / factory into the combatant,
+ * acceptance: the level travels from the builder / factory into the combatant,
  * and it stays mutable for scaling / test setups.
  */
 public class LevelTest {

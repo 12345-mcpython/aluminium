@@ -36,7 +36,7 @@ public class Enemy extends CanHit {
     private Map<DamageElement, Double> damageResist = Map.of();
 
     /**
-     * Specific debuff resistance (P6-1): the key is a {@code STAT_*} string from the data,
+     * Specific debuff resistance: the key is a {@code STAT_*} string from the data,
      * the value is the mitigation ratio.
      *
      * <p>Example: Ice Edge {@code {"STAT_CTRL_Frozen": 1}} = fully immune to freeze
@@ -89,7 +89,7 @@ public class Enemy extends CanHit {
     private DamageElement stanceType;
 
     /**
-     * This monster's summon roster (P9-4): the monster ids it may bring onto the field, straight from
+     * This monster's summon roster: the monster ids it may bring onto the field, straight from
      * {@code monster_config.json}'s {@code summon_id} (non-positive entries already dropped at load).
      *
      * <p>An empty roster is the norm (195of 2649 monsters) and means "this monster summons nothing".
@@ -111,12 +111,12 @@ public class Enemy extends CanHit {
 
     /**
      * Remaining turns of the broken state (turn skipping / action delay is maintained by
-     * P4-4; P4-1 only keeps the field).
+     * ; P4-1 only keeps the field).
      */
     private int brokenRemainTurns;
 
     /**
-     * Phase table (P9-5): a skill that becomes the active one once the enemy is at or below an HP ratio,
+     * Phase table: a skill that becomes the active one once the enemy is at or below an HP ratio,
      * kept in <b>ascending</b> threshold order.
      *
      * <p>{@link #activeSkill()} reads the current HP every time it is asked, so a phase change needs no
@@ -282,7 +282,7 @@ public class Enemy extends CanHit {
      * <p><b>Returns the amount actually consumed (H-4)</b>: break damage must be settled on
      * "how much did this segment really shave off", not on the skill's nominal toughness
      * reduction - 10 points of toughness left taking a 30-point skill means only 10 counts.
-     * Callers must also note: super break (P4-6) uses the excess {@code amount - consumed},
+     * Callers must also note: super break uses the excess {@code amount - consumed},
      * so the return value of this method and the nominal value the caller holds are needed
      * together; do not keep only one of them.
      *

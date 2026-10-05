@@ -1,7 +1,7 @@
 package com.laosun.aluminium.enums;
 
 /**
- * Who a {@link com.laosun.aluminium.models.Resource} belongs to (P8-8).
+ * Who a {@link com.laosun.aluminium.models.Resource} belongs to.
  *
  * <p>This is the difference between "my own stacks" and "our team's stacks", and the game has both:
  * <ul>

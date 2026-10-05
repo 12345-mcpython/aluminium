@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Slot 20's last two clauses (2026-10-02): "[老主顾]的防御力降低 #2(10)%，[老主顾]以外的敌方目标的防御力降低 #3(6)%".
+ * Slot 20's last two clauses: "[老主顾]的防御力降低 #2(10)%，[老主顾]以外的敌方目标的防御力降低 #3(6)%".
  *
  * Two-sided on the SAME enemy: the mark takes 10% and the unmarked one 6%, so a rule that ignored `target_when` would be caught either way.
  */

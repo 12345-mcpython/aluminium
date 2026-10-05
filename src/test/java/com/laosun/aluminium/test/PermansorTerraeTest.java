@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1414 Dan Heng - Permansor Terrae, from his own file (2026-09-29, round 16): ATK-scaled shields and the Bondmate designation.
+ * 1414 Dan Heng - Permansor Terrae, from his own file: ATK-scaled shields and the Bondmate designation.
  *
  * <p>The shield case asserts the DOCUMENT'S arithmetic - 20.00% of his ATK plus 400 - which needs the new `owner_attack` scale; the mutation that drops the
  * flat addend makes it red.
@@ -59,7 +59,7 @@ public class PermansorTerraeTest {
         Assertions.assertTrue(ally.getShield() > 0, "「为我方全体提供…护盾」 (a shield for all of our side)");
     }
 
-    /** Census: his skill and its trace, the ultimate, the technique, and the two halves of the 葳蕤 (Lush) trace. */
+    /** Census: his skill and its trace, the ultimate, the technique, and the two halves of the Sylvanity (葳蕤) trace. */
     @Test
     public void hisFileCarriesTheClauses() {
         var table = TriggerTables.of(DHPT);

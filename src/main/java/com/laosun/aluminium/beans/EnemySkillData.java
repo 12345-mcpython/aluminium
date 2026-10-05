@@ -10,7 +10,7 @@ import com.laosun.aluminium.enums.DamageElement;
  * contains only character skills, and tbgd's delivered data has no monster skill multipliers either.
  * So the multipliers in this table are guesses (each entry carries a {@link #guessed()} flag); the
  * only goal is to make enemies "able to hit people with values of a sensible magnitude". Once the
- * source data is found (P9-1/P9-2), only the data file and the loading in {@code Constant} get
+ * source data is found, only the data file and the loading in {@code Constant} get
  * replaced - the engine side needs no change.
  *
  * @param id         skill id (unique; kept as the key for wiring up the real skill table in P9)

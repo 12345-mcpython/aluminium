@@ -31,7 +31,7 @@ import java.util.Random;
 import java.util.Set;
 
 /**
- * A memosprite's <b>attack</b>: its damage is a share of an attribute of its own, not of its summoner (P9-4 memosprites).
+ * A memosprite's <b>attack</b>: its damage is a share of an attribute of its own, not of its summoner.
  *
  * <p><b>Why this is not a rule on the summoning character.</b> A memosprite's damage is written against the
  * memosprite - Evernight (长夜月)'s memosprite skill 1 is "deals to a single enemy ice damage equal to <b>50%</b> of '长夜''s Max HP" - and the panel
@@ -42,12 +42,12 @@ import java.util.Set;
  *
  * <p><b>What these cases are guarding.</b>
  * <ol>
- *   <li>the shipped attack is 长夜's own memosprite skill 1 (element / share / base / shape), not an ATK-based fallback
+ *   <li>the shipped attack is Evey (长夜)'s own memosprite skill 1 (element / share / base / shape), not an ATK-based fallback
  *       invented for a unit the text gives no ATK;</li>
  *   <li>the damage really is proportional to the memosprite's Max HP - doubling the panel's share doubles the
  *       hit, with everything else held fixed;</li>
- *   <li>it lands on the <b>opposing camp</b>: ours, so the monsters, never our own side. The shape dispatch
- *       used to sweep {@code battle.allies} because only enemies cast it;</li>
+ *   <li>it lands on the <b>opposing camp</b>: ours, so the monsters, never our own side. Sweeping
+ *       {@code battle.allies} would only be right while enemies were the only casters;</li>
  *   <li>{@code hits} are separate instances, and a spec that states no attack installs none (the engine does
  *       not fall back to something no document states);</li>
  *   <li>a wrong attack is refused where the spec is read, including "scales off an attribute the panel never
@@ -69,7 +69,7 @@ public class MemospriteAttackTest {
     // 1. The shipped attack
     // ==================================================================
 
-    /** 长夜 acts with its own memosprite skill 1, and the numbers are that skill's. */
+    /** Evey (长夜) acts with its own memosprite skill 1, and the numbers are that skill's. */
     @Test
     public void theShippedAttackIsTheMemospriteSkillsOwnNumbers() {
         Character summoner = CharacterFactory.create(CASTORICE_LIKE, LEVEL);
@@ -120,7 +120,7 @@ public class MemospriteAttackTest {
     public void theAttackLandsOnTheOpposingCampAndNotOnOurs() {
         Character summoner = CharacterFactory.create(CASTORICE_LIKE, LEVEL);
         Battle battle = new Battle(List.of(summoner), List.of(monster()), new Random(11));
-        battle.startBattle();                        // her own rule summons 长夜: the real path, not a fixture
+        battle.startBattle();                        // her own rule summons Evey (长夜): the real path, not a fixture
         Summon evey = battle.memospriteOf(summoner);
         Assertions.assertNotNull(evey, "precondition: Evernight (长夜月)'s BATTLE_START rule put it on the field");
 
@@ -156,7 +156,7 @@ public class MemospriteAttackTest {
     }
 
     /**
-     * {@code hits} are separate instances: 3  x  20% is the same total as 1  x  60%.
+     * {@code hits} are separate instances: 3 x 20% is the same total as 1 x 60%.
      *
      * <p>Crit is pinned to 0 so the total is exact - otherwise the two specs would draw different crit rolls and
      * the case would prove nothing. If {@code hits} were ignored (always one segment), the first total would be
@@ -199,7 +199,7 @@ public class MemospriteAttackTest {
     }
 
     // ==================================================================
-    // 2b. The attack is announced - once, and to the right owner (M-30)
+    // 2b. The attack is announced - once, and to the right owner
     // ==================================================================
 
     /**
@@ -223,7 +223,7 @@ public class MemospriteAttackTest {
     }
 
     /**
-     * …and the <b>summoner's</b> own {@code until} buff is <b>not</b> consumed by the memosprite's attack.
+     *  ...and the <b>summoner's</b> own {@code until} buff is <b>not</b> consumed by the memosprite's attack.
      *
      * <p>This is the owner test doing its job on a new path. A memosprite's attack is a real attack by a unit of
      * ours, so the whole side hears about it; but "until the wearer's next attack" is about the <em>wearer</em> attacking,
@@ -298,7 +298,7 @@ public class MemospriteAttackTest {
     }
 
     // ==================================================================
-    // 2c. The attack pushes the toughness bar (M-29's toughness-reduction half)
+    // 2c. The attack pushes the toughness bar (the toughness-reduction half)
     // ==================================================================
 
     /**
@@ -466,7 +466,7 @@ public class MemospriteAttackTest {
             battle.afterMove();                      // somebody else's turn: let it pass unplayed
         }
         Assertions.fail("the summon never reached its turn within 20 actions");
-        return null;                                 // unreachable: fail() throws
+        return null;                                 // unreachable: fail throws
     }
 
     /** One memosprite, one monster, one cast - the damage dealt, for comparing two specs. */

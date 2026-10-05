@@ -22,37 +22,38 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Sunday's (1313) Skill "纸醉金迷" (131302) - the shipped content that the two conditions of M-41 were added for.
+ * Sunday's (1313) Skill "纸醉金迷" (131302) - the shipped content the two conditions here were built for.
  *
  * <p><b>The document, and what each clause needed.</b> "使指定我方单体角色<b>及其召唤物</b>立即行动，并使其造成的伤害提高
- * #2[i]%，若目标拥有召唤物，则造成的伤害提高效果额外提高 #4[i]%，持续 #3[i]回合。…当星期日对"同谐"命途的角色施放该
- * 技能时，<b>无法触发</b>立即行动效果。" - 
+ * #2[i]%，若目标拥有召唤物，则造成的伤害提高效果额外提高 #4[i]%，持续 #3[i]回合。 ...当星期日对"同谐"命途的角色施放该
+ * 技能时，<b>无法触发</b>立即行动效果。" - the Skill names the chosen ally and its memosprite, the ally's own damage
+ * share, and the exception that a Harmony path target is not advanced.
  * <ul>
- *   <li>"及其召唤物" is the {@code target_and_summon} selector (M-3): the chosen ally <b>and its</b>
+ *  <li>"及其召唤物" is the {@code target_and_summon} selector: the chosen ally <b>and its</b>
  *       memosprite, not the caster's;</li>
- *   <li>"若目标拥有召唤物" is {@code target_summon_count} - the same question relic 12 asks about the wearer,
+ *  <li>"若目标拥有召唤物" is {@code target_summon_count} - the same question relic 12 asks about the wearer,
  *       asked about the ally;</li>
- *   <li>"对同谐…无法触发" is the {@code !} prefix on {@code target has_path 同谐} - an <b>exception</b>, and the
+ *  <li>"对同谐 ...无法触发" is the {@code !} prefix on {@code target has_path 同谐} - an <b>exception</b>, and the
  *       reason a negation exists at all (the DSL's condition list is an AND).</li>
  * </ul>
  *
- * <p><b>What is pinned here.</b> That the ally AND its memosprite act; that a 同谐 target does <b>not</b> act
- * (but still gets the damage share, because the sentence only blocks 立即行动); that the share is the
+ * <p><b>What is pinned here.</b> That the ally AND its memosprite act; that a Harmony (同谐) target does <b>not</b> act
+ * (but still gets the damage share, because the sentence only blocks the advance); that the share is the
  * document's own arithmetic - 15%, or 15% + 25% = 40% when the target has a summon - for 2 turns; and that the
  * file really carries three clauses (a missing one would show up in one of the cases above).
  *
- * <p>Note: Not authored from this Skill: "对[蒙福者]施放战技后恢复1个技能点", which needs his ultimate's state
- * (registered as M-42).
+ * <p>Note: Not authored from this Skill: "对[蒙福者]施放战技后恢复1个技能点" (casting the Skill on the Beatified
+ * returns one Skill Point), which needs his ultimate's state.
  */
 public class SundaySkillTest {
     private static final double EPS = 1e-6;
 
     private static final int SUNDAY = 1313;
-    /** Himeko - 智识 (Erudition), so the advance happens; and she owns no summon, which is the 15% side. */
+    /** Himeko - Erudition (智识), so the advance happens; and she owns no summon, which is the 15% side. */
     private static final int ERUDITION_ALLY = 1003;
-    /** Robin - 同谐 (Harmony), so the advance must <b>not</b> happen. */
+    /** Robin - Harmony (同谐), so the advance must <b>not</b> happen. */
     private static final int HARMONY_ALLY = 1309;
-    /** Aglaea - 记忆 (Remembrance) and a memosprite owner, so she is the "target has a summon" side. */
+    /** Aglaea - Remembrance (记忆) and a memosprite owner, so she is the "target has a summon" side. */
     private static final int MEMOSPRITE_ALLY = 1402;
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
@@ -88,9 +89,9 @@ public class SundaySkillTest {
     }
 
     /**
-     * 同谐 gets no advance - the sentence's exception, and the half a positive spelling could not express.
+     * Harmony (同谐) gets no advance - the sentence's exception, and the half a positive spelling could not express.
      *
-     * <p>Robin and Sunday himself are both 同谐, so without the gate this rule would push exactly the units the
+     * <p>Robin and Sunday himself are both Harmony, so without the gate this rule would push exactly the units the
      * sentence excludes (and self-cast would push him too).
      */
     @Test
@@ -107,7 +108,7 @@ public class SundaySkillTest {
                 "「当星期日对「同谐」命途的角色施放该技能时，无法触发立即行动效果」");
     }
 
-    /** …but the damage share is a different clause, and it is granted to a 同谐 target all the same. */
+    /** ...but the damage share is a different clause, and it is granted to a Harmony (同谐) target all the same. */
     @Test
     public void theShareIsStillGrantedToAHarmonyTarget() {
         Character sunday = CharacterFactory.create(SUNDAY, LEVEL);
@@ -134,7 +135,7 @@ public class SundaySkillTest {
                 "「若目标拥有召唤物，则…额外提高#4[i]%」 -- 0.15 + 0.25, the sum the target ends up with");
     }
 
-    /** …and it lasts the 2 turns the row says (#3), not a number this file invented. */
+    /**  ...and it lasts the 2 turns the row says (#3), not a number this file invented. */
     @Test
     public void theShareLastsTheStatedTurns() {
         Character sunday = CharacterFactory.create(SUNDAY, LEVEL);
@@ -164,7 +165,7 @@ public class SundaySkillTest {
         Assertions.assertEquals(0.12 * critDamageOf(sunday) + 0.08, critDamageOf(first) - HARMONY_BARE_CRIT_DMG, EPS,
                 "「提高数值等同于星期日#2%暴击伤害+#4%」 -- his own number, not the target's");
 
-        // …and casting it on somebody new takes it off the previous holder: "仅对…最新的施放目标生效".
+        //  ...and casting it on somebody new takes it off the previous holder: "仅对 ...最新的施放目标生效".
         Character second = CharacterFactory.create(ERUDITION_ALLY, LEVEL);
         Battle next = new Battle(List.of(sunday, first, second), List.of(dummy()), new Random(0));
         next.startBattle();
@@ -202,7 +203,9 @@ public class SundaySkillTest {
                 "20% of HER maximum (" + max + "), not of his, and not a literal");
     }
 
-    /** His death takes the state off the ally: "当星期日陷入无法战斗状态时，[蒙福者]效果也会被解除". */
+    /** His death takes the state off the ally: "当星期日陷入无法战斗状态时，[蒙福者]效果也会被解除" (the state is
+     * released when Sunday is knocked out).
+     */
     @Test
     public void hisDeathTakesTheStateOff() {
         Battle battle = ultimateBattle(MEMOSPRITE_ALLY, null);
@@ -254,7 +257,7 @@ public class SundaySkillTest {
     /**
      * The three clauses are three rules - and the count is what makes the cases above evidence.
      *
-     * <p>They cannot be read back individually the way 遗器 rules are ({@code matching} only returns rules whose
+     * <p>They cannot be read back individually the way relic (遗器) rules are ({@code matching} only returns rules whose
      * conditions hold, and the two share-clauses are deliberately disjoint), so this pins the shape and the
      * behaviour above pins the numbers.
      */
@@ -263,9 +266,9 @@ public class SundaySkillTest {
         Character sunday = CharacterFactory.create(SUNDAY, LEVEL);
 
         Assertions.assertEquals(4, TriggerTables.of(SUNDAY).ruleCount(TriggerEvent.SKILL_CAST),
-                "advance (unless 同谐) + share without a summon + share with one + the 【蒙福者】 refund");
+                "advance (unless Harmony) + share without a summon + share with one + the 【蒙福者】 refund");
         Assertions.assertEquals(1, TriggerTables.of(SUNDAY).ruleCount(TriggerEvent.ULT_CAST),
-                "the 【蒙福者】 clause; the energy restore is still registered with M-42");
+                "the 【蒙福者】 clause; the energy restore is registered separately");
     }
 
     // ==================================================================

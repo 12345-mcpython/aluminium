@@ -17,7 +17,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Loads memosprite panels from {@code resources/memosprites/<ownerCid>.json} (P9-4, the memosprite half).
+ * Loads memosprite panels from {@code resources/memosprites/<ownerCid>.json} (the memosprite half).
  *
  * <p>Same contract as {@link TriggerTables}, and for the same reasons: it is <b>hand-written</b> content
  * rather than generated data (so it does not belong in {@code Constant}), it lives outside the gitignored
@@ -25,7 +25,7 @@ import java.util.Set;
  * <b>missing file is an ordinary state</b> while a file that exists and is wrong throws.
  *
  * <p><b>Keyed by the owner, not by the memosprite.</b> The file is named after the character who summons it
- * ({@code 1402.json} = 阿格莱雅's 衣匠) because the panel is <em>stated against that character</em>: the
+ * ({@code 1402.json} = Aglaea (阿格莱雅)'s Garmentmaker (衣匠)) because the panel is <em>stated against that character</em>: the
  * percentages mean "of the summoner's sheet". A file named after the memosprite would have to repeat the
  * owner inside it, and the two could then disagree.
  */
@@ -38,7 +38,7 @@ public final class Memosprites {
 
     /**
      * The directory a general SERVANT's panel lives in (the servant directory, not the memosprite one): the same panel vocabulary -- shares and flats of the
-     * OWNER's sheet -- as a different category, and (slice 2) a different damage type.
+     * OWNER's sheet -- as a different category, and a different damage type.
      */
     public static final String SERVANT_DIR = "servants";
 
@@ -165,7 +165,7 @@ public final class Memosprites {
     }
 
     /**
-     * Checks the optional {@code attack} block (P9-4, the memosprite half). Every rejection is a wrong attack that would
+     * Checks the optional {@code attack} block (the memosprite half). Every rejection is a wrong attack that would
      * otherwise only show up as a number in a battle log:
      *
      * <ul>
@@ -179,7 +179,7 @@ public final class Memosprites {
      * </ul>
      */
     /**
-     * Checks the optional {@code aggro} (2026-09-28). Only one rejection, but it is the one that would be
+     * Checks the optional {@code aggro}. Only one rejection, but it is the one that would be
      * invisible: a weight of zero or less would give the memosprite a zero share of the aggro table, i.e. the
      * enemy would simply never pick it -- which looks like "the enemy prefers other targets" rather than like a
      * data error. (Leaving the field out is the honest way to say "no document states one"; the engine then
@@ -298,8 +298,8 @@ public final class Memosprites {
                             + entry.flat() + ", but a flat addition must be finite and not negative "
                             + "(" + source + ")");
         }
-        // Note: A zero the DATA states is not the same as a value nobody stated (2026-10-02). Measured: the game's own
-        // `AvatarServantConfig.json` gives 小伊卡 and 德谬歌 `SpeedBase "0"` and `SpeedInherit "0"`, and their servant configs
+        // Note: A zero the DATA states is not the same as a value nobody stated. Measured: the game's own
+        // `AvatarServantConfig.json` gives Little Ica (小伊卡) and Demiurge (德谬歌) `SpeedBase "0"` and `SpeedInherit "0"`, and their servant configs
         // keep Speed OUT of the summoner sync -- an ability moves it. `by_ability` is how a file says that, so a zero can be
         // written down instead of being silently accepted (`positive` alone would hide it).
         if ((attribute == AttributeType.HEALTH || attribute == AttributeType.SPEED)

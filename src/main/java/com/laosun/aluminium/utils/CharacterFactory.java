@@ -19,7 +19,7 @@ import it.unimi.dsi.fastutil.ints.Int2IntMap;
 import java.util.Set;
 
 /**
- * Character factory (P8-1): build a real character with one call.
+ * Character factory: build a real character with one call.
  *
  * <pre>{@code
  * Character jingYuan = CharacterFactory.create(1204, 80);
@@ -31,7 +31,7 @@ import java.util.Set;
  *
  * <p>It is essentially a thin wrapper around {@code Character.builder()} - the stat pipeline
  * (level scaling / light cone / relics / traces / extra bonuses) was already complete in P2; what
- * P8-1 added is the character identity fields: element, path, aggro, max energy (see
+ * added is the character identity fields: element, path, aggro, max energy (see
  * {@code Character.Builder#build()}).
  *
  * <p>Division of labour with {@link Character#fromAttributes}: that one is the test/placeholder
@@ -153,7 +153,7 @@ public final class CharacterFactory {
      * The full entry point: the same character, with a number of active Eidolon ranks (星魂).
      *
      * <p><b>Why the rank is a parameter here rather than a lookup.</b> This method is the assembly point - the
-     * one place allowed to go from "which character" to "which rules" (P8-0) - and "which Eidolons are active" is
+     * one place allowed to go from "which character" to "which rules" - and "which Eidolons are active" is
      * part of that question. The engine never resolves it from the cid, and a rule that belongs to an Eidolon
      * carries {@code min_eidolon} so the gate lives in the same file as the mechanic.
      *
@@ -178,8 +178,8 @@ public final class CharacterFactory {
         if (relicSuit != null) {
             builder = builder.relicSuit(relicSuit);
         }
-        // P8-: attach the character's data-driven mechanics. This is the assembly point -- the
-        // one place allowed to go from "which character" to "which rules" (P8-0). Characters with no
+        // -: attach the character's data-driven mechanics. This is the assembly point -- the
+        // one place allowed to go from "which character" to "which rules". Characters with no
         // file get the empty table, which is the normal state for the ones not data-ised yet.
         // Worn relic sets contribute their own rules on top (see `effectiveTriggerTable`).
         TriggerTable table = effectiveTriggerTable(cid, relicSuit);
@@ -190,7 +190,7 @@ public final class CharacterFactory {
         }
         builder = builder.triggerTable(table);
         Character character = builder.build();
-        // P8-8: the resources this character declares ("charge, cap 3 points"). Registered after the build
+        // the resources this character declares ("charge, cap 3 points"). Registered after the build
         // because the manager belongs to the combatant, and from the declaration rather than from the JSON
         // directly, so the cap a rule is gated on is the same number that was registered -- there is one
         // reader of the declaration (`requireReadableResources`), not two.
@@ -220,7 +220,7 @@ public final class CharacterFactory {
      * same events - see {@link com.laosun.aluminium.data.RelicTriggerTables}), so "which set bonuses
      * are live" is a table merge rather than a second mechanism. This is the assembly point where the
      * merge happens: whoever builds the character decides, and the engine never looks a table up by
-     * cid or by set id at battle time (P8-0).
+     * cid or by set id at battle time.
      *
      * <p>Composition rules, spelled out because they are the whole content of this method:
      * <ul>
@@ -250,7 +250,7 @@ public final class CharacterFactory {
     }
 
     /**
-     * Refuses a merged table that reads a resource this character never declares (P8-8).
+     * Refuses a merged table that reads a resource this character never declares.
      *
      * <p><b>Why the check lives here</b>, exactly like {@link #requireSummonable}: {@code self_resource:<NAME>}
      * is read from the combatant's own {@code ResourceManager}, and a rule file cannot know its own cid - while a
@@ -291,7 +291,7 @@ public final class CharacterFactory {
     }
 
     /**
-     * Refuses a merged table whose {@code SUMMON} rules this character could never satisfy (P9-4).
+     * Refuses a merged table whose {@code SUMMON} rules this character could never satisfy.
      *
      * <p><b>Why the check lives here.</b> "summon a memosprite on entering battle" is only meaningful for a character with a
      * memosprite spec ({@code resources/memosprites/<cid>.json}), and a rule file cannot know its own cid:

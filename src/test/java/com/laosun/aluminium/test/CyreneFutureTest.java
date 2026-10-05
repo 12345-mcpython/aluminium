@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * At battle start... other characters gain [未来] (2026-10-02). Two-sided: the OTHER ally gets it, Cyrene (昔涟) herself does not (the text says 其他, "other").
+ * At battle start... other characters gain [未来]. Two-sided: the OTHER ally gets it, Cyrene (昔涟) herself does not (the text says 其他, "other").
  */
 public class CyreneFutureTest {
     private static final int LEVEL = 80;

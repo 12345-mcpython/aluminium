@@ -78,7 +78,7 @@ public enum SkillType {
      * (for the assembly point see {@code Constant.SKILL_SLOT} and {@code Battle#startBattle()}).
      *
      * <p>The two summon slots also return {@code false}: they belong to a memosprite/summon, not to the
-     * character's own skills (P9-4).
+     * character's own skills.
      */
     public boolean isIntrinsic() {
         // 2026-09-30: the Elation damage skills are part of the always-on kit. This method is the gate that kept

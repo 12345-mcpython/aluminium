@@ -5,7 +5,7 @@ import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.models.CanHit;
 
 /**
- * Weakness break event (P8-6): fired once when an enemy has just been broken (the moment the
+ * Weakness break event: fired once when an enemy has just been broken (the moment the
  * toughness bar hits zero).
  *
  * <p>The trigger point is unique: the one place in {@code Battle.reduceToughness} that drains the

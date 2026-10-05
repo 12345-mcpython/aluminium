@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 开拓者(毁灭)'s trace 坚韧: "each layer of the talent's effect also raises the Trailblazer's DEF by 10%" -- the counter scale again, on a counter the
+ * Trailblazer - Destruction (开拓者(毁灭))'s trace Tenacity (坚韧): "each layer of the talent's effect also raises the Trailblazer's DEF by 10%" -- the counter scale again, on a counter the
  * character's own talent marks.
  *
  * <p>Both the counter's name and the tally come from the data: the name is copied out of the JSON by the script that wrote

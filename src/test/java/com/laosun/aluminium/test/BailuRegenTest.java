@@ -13,14 +13,14 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Bailu (白露) (1211), from her own file (2026-09-28): [生息] (Regeneration) and the trace that rides on it.
+ * Bailu (白露) (1211): [生息] (Regeneration) and the trace that rides on it.
  *
- * <p><b>What it needed.</b> The round-63 per-target conditions: "for our targets that <b>do not have</b> [生息] ... apply [生息], and for our targets that <b>already have</b> [生息] ...
+ * <p><b>What it needed.</b> Per-target conditions: "for our targets that <b>do not have</b> [生息] ... apply [生息], and for our targets that <b>already have</b> [生息] ...
  * extend it by 1 turn" is two branches of one sentence over the same selector, and `target_when` is what keeps them apart.
  *
  * <p><b>What is registered</b> (the file's notes): the Skill's random double heal with its decaying multiplier, the
  * talent's "this effect can trigger 2 times" (registered whole, because shipping the heal without the count would heal on every hit)
- * and its death prevention, trace 持明龙脉, and the eidolons.
+ * and its death prevention, trace Vidyadhara Ichor Lines (持明龙脉), and the eidolons.
  */
 public class BailuRegenTest {
     private static final int BAILU = 1211;
@@ -56,7 +56,7 @@ public class BailuRegenTest {
                 "「this effect cannot stack」: the second branch EXTENDS the state instead of applying another one");
     }
 
-    /** trace 鳞渊福泽 rides on the state: the bearer takes 10% less while it lasts. */
+    /** trace Aquatic Benediction (鳞渊福泽) rides on the state: the bearer takes 10% less while it lasts. */
     @Test
     public void theTraceReducesDamageTakenForTheBearers() {
         Fixture f = new Fixture();

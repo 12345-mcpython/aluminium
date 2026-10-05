@@ -30,7 +30,7 @@ import java.util.Random;
  * {@code COMMAND_SUMMON} - "make the memosprite deal damage equal to X% of the memosprite's Max HP to all enemies".
  *
  * <p><b>What the op is.</b> The rule's owner orders its summon to attack <b>now</b>, with the numbers of a skill
- * the rule names. 长夜月's ultimate is the first user: "summon the memosprite '长夜', then make the memosprite '长夜' deal Ice damage equal to
+ * the rule names. Evernight (长夜月)'s ultimate is the first user: "summon the memosprite '长夜', then make the memosprite '长夜' deal Ice damage equal to
  * '长夜''s #1[i]% Max HP to all enemies".
  *
  * <p><b>Where each number comes from, because that is the whole design.</b>
@@ -43,7 +43,7 @@ import java.util.Random;
  *       half the damage with nothing to report - the case below pins the row by measuring the ratio between
  *       three levels of the same skill;</li>
  *   <li>the <b>base attribute</b> is the one thing the skill's row does not say: "equal to the <b>memosprite</b>'s Max HP",
- *       not 长夜月's attack - so the rule states it, and the case that doubles the summon's Max HP (and then the
+ *       not Evernight (长夜月)'s attack - so the rule states it, and the case that doubles the summon's Max HP (and then the
  *       owner's) is what tells the two apart;</li>
  *   <li>the <b>toughness</b> (90) is the same kind of fact and is therefore <b>not</b> a field of this op either:
  *       it is 141303's own {@code stance_list}, and the engine's ordinary damage path removes it during the cast.
@@ -58,7 +58,7 @@ import java.util.Random;
 public class SummonCommandTest {
     private static final double EPS = 1e-6;
 
-    /** 长夜月 - her ultimate is the first user of {@code COMMAND_SUMMON}. */
+    /** Evernight (长夜月) - her ultimate is the first user of {@code COMMAND_SUMMON}. */
     private static final int OWNER = 1413;
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
@@ -264,7 +264,7 @@ public class SummonCommandTest {
     }
 
     // ==================================================================
-    // 3. The shipped content: 长夜月's ultimate
+    // 3. The shipped content: Evernight (长夜月)'s ultimate
     // ==================================================================
 
     /**
@@ -316,7 +316,7 @@ public class SummonCommandTest {
         Assertions.assertNull(command.getDamageLevel(),
                 "⚠ no `damage_level` any more (M-32): the row is not pinned per effect but stated as the skill's own "
                         + "level, so an Eidolon's \"Ultimate Lv. +2\" composes with it instead of being ignored");
-        // …and the file really does state that level, as a BATTLE_START raise of the ULTRA slot (10 - 1).
+        // ...and the file really does state that level, as a BATTLE_START raise of the ULTRA slot (10 - 1).
         TriggerTable table = TriggerTables.of(OWNER);
         Assertions.assertTrue(table.matching(TriggerEvent.BATTLE_START,
                         new TriggerTable.TriggerContext(owner, owner, null, 0, 0, null, battle)).stream()
@@ -339,9 +339,9 @@ public class SummonCommandTest {
      *
      * <p>Note: The column is a <b>0-based array index</b> while the document writes its placeholders 1-based:
      * 141303's {@code #1[i]} (the Max HP share) is column <b>0</b>. Writing 1 there reads {@code #2} - the
-     * [至暗之谜] charge count, which is 2 at <em>every</em> level - and at Lv10 that happens to equal the right
+     * Darkest Riddle (至暗之谜) charge count, which is 2 at <em>every</em> level - and at Lv10 that happens to equal the right
      * answer, so the rule looks correct until the level changes. {@link #theMultiplierComesFromTheStatedRow} is
-     * the case that caught it.
+     * the case that catches it.
      */
     private static EffectSpec command(int column, int level) {
         EffectSpec effect = new EffectSpec();

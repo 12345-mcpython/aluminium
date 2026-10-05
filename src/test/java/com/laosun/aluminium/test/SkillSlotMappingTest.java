@@ -49,7 +49,7 @@ public class SkillSlotMappingTest {
                         SkillType.ELATION_EXTRA, 21),
                 Constant.SKILL_SLOT);
 
-        // The summon's two slots belong to the memosprite (P9-4) and are not in the character slot table
+        // The summon's two slots belong to the memosprite and are not in the character slot table
         Assertions.assertFalse(Constant.SKILL_SLOT.containsKey(SkillType.SUMMON_SKILL));
         Assertions.assertFalse(Constant.SKILL_SLOT.containsKey(SkillType.SUMMON_TALENT));
 

@@ -4,7 +4,7 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.models.CanHit;
 
 /**
- * Kill event (P8-6): fired once after a unit is killed.
+ * Kill event: fired once after a unit is killed.
  *
  * <p>The test is "this instance of damage took the target from alive to dead" (the return value of
  * {@code takeDamage} inside {@code Battle.applyDamage}), so:

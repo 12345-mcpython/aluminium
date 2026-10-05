@@ -10,9 +10,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * What 昔涟's talent actually leaves on a teammate (2026-10-02): "at battle start ... raise the damage dealt by all of our targets".
+ * What Cyrene (昔涟)'s talent actually leaves on a teammate: "at battle start ... raise the damage dealt by all of our targets".
  *
- * Her file states it as `ALL_DAMAGE_TYPE_BOOST, percent: 0.2, permanent, max_stacks: 2`, i.e. two layers. An earlier judge reported the attribute as 0.2, and a reverse-solved baseline came
+ * Her file states it as `ALL_DAMAGE_TYPE_BOOST, percent: 0.2, permanent, max_stacks: 2`, i.e. two layers. Reading the attribute directly reports 0.2, while a reverse-solved baseline comes
  * out at 0.4184 -- this settles which number `get()` answers with, so the two readings can be reconciled rather than guessed at.
  */
 public class CyreneTalentBoostReadingTest {

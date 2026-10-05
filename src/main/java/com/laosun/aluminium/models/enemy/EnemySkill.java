@@ -19,11 +19,11 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Enemy skill (P5-3): data-driven from {@code enemy_skills.json}, not hard-coded.
+ * Enemy skill: data-driven from {@code enemy_skills.json}, not hard-coded.
  *
  * <p>Difference from character skills: it does not go through {@link SkillData}/the multiplier
  * table (that is the character-skill structure); instead it deals damage directly as
- * "attack  x  multiplier  x  hits". That is why {@link #getData()} returns {@code null} and
+ * "attack x multiplier x hits". That is why {@link #getData()} returns {@code null} and
  * {@link #execute} is fully custom - and also why {@code SkillExecutor} must not be reused for it
  * (the character-skill toughness-reduction/shape-dispatch logic does not apply to enemies: enemies
  * do not attack the toughness bar).
@@ -31,7 +31,7 @@ import java.util.Set;
  * <p>Each hit goes through {@link Battle#applyDamage} independently: each hit rolls crit and
  * settles on its own (consistent with character skills).
  *
- * <p>P9-4 忆灵 (memosprite): the class also serves memosprites. Their damage is written in the documents the same way
+ * <p>Memosprites (忆灵): the class also serves memosprites. Their damage is written in the documents the same way
  * an enemy's is (one number times one of the caster's attributes) - "对敌方单体造成等同于'长夜'50%生命上限的
  * 冰属性伤害" - so the only thing that had to change was naming the attribute ({@link #getBaseAttribute()})
  * and taking the target side from the caster's camp rather than assuming "the enemy is casting".
@@ -41,7 +41,7 @@ import java.util.Set;
  *
  * @param element    damage element (already resolved at construction time from the data / the
  *                   monster's {@code stance_type}, never null)
- * @param multiplier multiplier (damage base = {@code baseAttribute}  x  multiplier)
+ * @param multiplier multiplier (damage base = {@code baseAttribute} x multiplier)
  * @param hits       number of hits (at least 1)
  * @param type       damage type
  */
@@ -74,7 +74,7 @@ public class EnemySkill extends Skill {
     }
 
     /**
-     * @param effect the skill's shape; {@code null} = single target, which is what every pre-P9-2
+     * @param effect the skill's shape; {@code null} = single target, which is what every earlier
      *               entry relied on, so the default keeps them bit-for-bit unchanged
      */
     public EnemySkill(DamageElement element, double multiplier, int hits, DamageType type,
@@ -131,7 +131,7 @@ public class EnemySkill extends Skill {
      * ({@code Blast}). {@link #hits} segments land on <b>each</b> of them, each settling independently
      * (so each rolls crit on its own).
      *
-     * <p>P9-2: before this, every enemy skill hit the primary target - a multi-target enemy skill in the
+     * <p>Before this dispatch existed, every enemy skill hit the primary target - a multi-target enemy skill in the
      * data had no way to reach a second character, so an AoE would silently under-hit. The dispatch
      * mirrors {@code SkillExecutor}'s character-skill shapes so the two sides read the same way, without
      * sharing code: enemies do not reduce toughness and do not expand parameters, which is why
@@ -155,12 +155,12 @@ public class EnemySkill extends Skill {
         for (CanHit struck : struckBy(victim, user, battle)) {
             total += strike(battle, user, struck, hitTargets);
         }
-        // P9-4 忆灵 (memosprite) / M-30: a summon's attack is an attack, so our side hears about it exactly once, after
-        // every segment has been settled -- the same notification a character's skill raises. Before this, a
-        // memosprite's attack told nobody, so a buff on the memosprite itself
-        // ({@code "target": "summon"} + {@code "until": "next_attack"}) was never consumed and simply stayed.
+        // Memosprites (忆灵) / a summon's attack is an attack, so our side hears about it exactly once, after
+        // every segment has been settled -- the same notification a character's skill raises. Otherwise a
+        // memosprite's attack tells nobody, so a buff on the memosprite itself
+        // ({@code "target": "summon"} + {@code "until": "next_attack"}) is never consumed and simply stays.
         battle.fireAfterAttack(user, victim, hitTargets, total);
-        // …and the data-facing half of the same fact: a rule can subscribe to "a summon attacked"
+        // ...and the data-facing half of the same fact: a rule can subscribe to "a summon attacked"
         // (TriggerEvent.SUMMON_ATTACK), which is what "装备者的忆灵攻击时" needs. Fired for a summon of
         // either camp -- it is delivered to every character's table, so `actor == summon` is what narrows it
         // to the rule owner's own. Not raised when nothing was hit: "an attack happened" is not "a unit
@@ -175,12 +175,12 @@ public class EnemySkill extends Skill {
      */
     private List<CanHit> struckBy(CanHit mainTarget, CanHit user, Battle battle) {
         // Note: Deliberately NOT filtered to the living here. A dead unit settles nothing and is not recorded as
-        // hit, because strike() answers both questions itself (it returns 0 without touching hitTargets) --
+        // hit, because strike answers both questions itself (it returns 0 without touching hitTargets) --
         // and that is the one guard a test can reach. An earlier version filtered here too, and mutation
         // testing showed the outer filter changed no observable outcome (removing it left every test green),
         // i.e. it was an untestable second guard for the same fact. One guard, exercised.
         // Note: The OPPOSING CAMP of the user, not `battle.allies` (the friendly half of L-8). An enemy AOE
-        // has to reach a player-side summon too, and (P9-4 忆灵) a memosprite's AOE has to reach the enemy
+        // has to reach a player-side summon too, and a memosprite's AOE has to reach the enemy
         // camp. Hard-coding `allies` made every AOE one-sided: it read right while only enemies cast
         // this skill, and silently hit nothing the moment our own summon did.
         List<CanHit> team = new ArrayList<>();

@@ -6,7 +6,7 @@ import lombok.Getter;
 import java.util.List;
 
 /**
- * One entry of {@code data/skill_effects.json} (P10-3): <b>how to read a non-damaging skill's
+ * One entry of {@code data/skill_effects.json}: <b>how to read a non-damaging skill's
  * parameters</b>.
  *
  * <p>Why this table has to exist: {@code skills.json} carries a bare {@code param_list}, and the

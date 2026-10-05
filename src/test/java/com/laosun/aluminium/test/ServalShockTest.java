@@ -18,15 +18,15 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Serval (1103), from her own file (2026-09-28): the shock, the extension, the traces and Eidolon 6.
+ * Serval (1103), from her own file: the shock, the extension, the traces and Eidolon 6.
  *
  * <p><b>What it needed.</b> {@code APPLY_DOT} for the shock (base chance and per-turn damage out of her Skill's own row),
  * {@code EXTEND_BUFF} for "使触电状态下的敌方目标延长 2 回合" - which needs no condition, because the extension only
- * matches buffs carrying that state's name - and the engine's DOT-by-name resolution, which is what makes both 触电 (shock) and
+ * matches buffs carrying that state's name - and the engine's DOT-by-name resolution, which is what makes both shock (触电) and
  * Eidolon 6's "对触电状态下的敌方目标" reachable.
  *
  * <p><b>What is registered</b> (the file's notes): the talent's "对所有触电状态下的敌方目标", the blast's neighbour
- * rolls, Eidolon 1 and Eidolon 4 - three of the four are the same missing piece (`M-53`: an effect reaches what a *selector*
+ * rolls, Eidolon 1 and Eidolon 4 - three of the four are the same missing piece (an effect reaches what a *selector*
  * names, so a per-target condition cannot filter the set).
  */
 public class ServalShockTest {
@@ -35,7 +35,7 @@ public class ServalShockTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** Her 摇滚 (Rock) trace makes the 80% roll certain - and the same roll misses without an amendment (pinned below). */
+    /** Her Rock 'n' Roll (摇滚) trace makes the 80% roll certain - and the same roll misses without an amendment (pinned below). */
     @Test
     public void theShockIsCertainWithHerTrace() {
         Fixture f = new Fixture(0.9);

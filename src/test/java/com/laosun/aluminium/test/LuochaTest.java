@@ -15,9 +15,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1203 Luocha, from his own file (2026-09-28, round 144): the Abyss Flower counter and the low-HP retrigger.
+ * 1203 Luocha, from his own file: the Abyss Flower counter and the low-HP retrigger.
  *
- * <p>Both clauses were built from vocabularies verified in earlier rounds: `ADD_STACK` for a named counter (1111's 斗志 (Fighting Spirit)), and the
+ * <p>Both clauses are built from vocabularies that already exist: `ADD_STACK` for a named counter (1111's Fighting Will (斗志)), and the
  * `HP_LOST` event together with the `target_hp_percent` numeric variable for the threshold. The retrigger's 2-turn cooldown and
  * the ultimate's "解除增益" (dispel buffs) are registered, not written.
  */
@@ -43,7 +43,7 @@ public class LuochaTest {
     @Test
     public void hisFileCarriesTheClauses() {
         var table = TriggerTables.of(LUOCHA);
-        // Note: 2 since 2026-09-30: the counter, plus the rule that opens the 白花之刻 (Abyss Flower) zone at two stacks
+        // Note: the count is 2: the counter, plus the rule that opens the Abyss Flower (白花之刻) zone at two stacks
         Assertions.assertEquals(2, table.ruleCount(TriggerEvent.SKILL_CAST), "the counter and the zone opener");
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.BATTLE_START), "the level convention");
     }

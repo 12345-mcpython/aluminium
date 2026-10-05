@@ -14,7 +14,7 @@ import com.laosun.aluminium.models.Summon;
 import com.laosun.aluminium.utils.AttributeBuilder;
 
 /**
- * Builds a {@link Summon} from <b>real monster data</b> (P9-4).
+ * Builds a {@link Summon} from <b>real monster data</b>.
  *
  * <pre>
  * SummonFactory.create(1002040, 90, 1, Camp.ENEMY)
@@ -74,10 +74,10 @@ public final class SummonFactory {
     }
 
     /**
-     * Registers the resources a summon's SPEC declares on the summon itself (2026-10-02).
+     * Registers the resources a summon's SPEC declares on the summon itself.
      *
-     * <p>A resource is only usable where it is declared, and until this existed a summon had nowhere to declare one: `GAIN_RESOURCE{target: "summon"}` was accepted by the loader and then
-     * silently granted nothing (measured -- it is why 1141526's [故事] could not land).
+     * <p>A resource is only usable where it is declared, and a summon has nowhere else to declare one: `GAIN_RESOURCE{target: "summon"}` is accepted by the loader and then
+     * silently grants nothing (measured -- which is why 1141526's [故事] cannot land).
      */
     private static void declareResources(Summon summon, MemospriteSpec spec) {
         if (spec.resources() == null) {
@@ -99,10 +99,10 @@ public final class SummonFactory {
     }
 
     /**
-     * Installs the skills a spec states on the summon (2026-10-02).
+     * Installs the skills a spec states on the summon.
      *
-     * <p>One helper for BOTH paths, because they were not symmetric: `servantWith` installed them and `memospriteWith` did not, and since both make the same unit, which one a caller used
-     * silently decided whether the memosprite had any skills of its own (measured: `skillsByDataSlot()` was empty on the memosprite path).
+     * <p>One helper for BOTH paths: both make the same unit, so which one a caller uses must not decide whether the memosprite has any skills of its own
+     * (measured: `skillsByDataSlot()` is empty on a path that does not install them).
      *
      * <p>Each stated row becomes a real `Skill`, just like a character's, so `SkillEffects.forSkill`, `SkillExecutor.canDeliver` and every op that takes a skill work on a memosprite's skill
      * with no special case.
@@ -129,7 +129,7 @@ public final class SummonFactory {
     }
 
     /**
-     * Builds a character's <b>memosprite</b> (忆灵) with a panel derived from its summoner (P9-4).
+     * Builds a character's <b>memosprite</b> (忆灵) with a panel derived from its summoner.
      *
      * <pre>
      * SummonFactory.memosprite(Aglaea (阿格莱雅) at level 80)
@@ -215,8 +215,8 @@ public final class SummonFactory {
 
     /**
      * The panel every summon shares: each entry is a share of the <b>master's attribute</b> plus a flat term
-     * -- or, when it names {@code resource:<name>}, a share of a <b>battle-level resource</b> (2026-10-02;
-     * reader: 140/1415's dead dragon).
+     * -- or, when it names {@code resource:<name>}, a share of a <b>battle-level resource</b>
+     * (140/1415's dead dragon).
      *
      * <p>Note: The resource reader is handed in rather than reached for: resources live on the battle, and this
      * derivation was deliberately split out to be exercised on its own. A {@code resource:} panel with no reader
@@ -231,10 +231,10 @@ public final class SummonFactory {
             double flat = entry.flat() == null ? 0 : entry.flat();
             double value;
             if (entry.source() != null && entry.source().startsWith("attr:")) {
-                // "equal to X% of the summoner's Max HP" (2026-10-02): a share of ANOTHER of the
+                // "equal to X% of the summoner's Max HP": a share of ANOTHER of the
                 // master's attributes. The plain branch below reads `master.getAttribute(attribute)` -- the
                 // SAME attribute the entry names -- which is why the Jing Yuan (景元)-style trick ("神君" = 66% of his
-                // ATTACK, carried in the ATTACK slot) works but "40% of the summoner's Max HP" did not.
+                // ATTACK, carried in the ATTACK slot) works but "40% of the summoner's Max HP" does not.
                 String other = entry.source().substring("attr:".length()).trim();
                 value = share * master.getAttribute(AttributeType.fromString(other)).get() + flat;
             } else if (entry.source() != null && entry.source().startsWith("resource:")) {
@@ -298,7 +298,7 @@ public final class SummonFactory {
         summon.setLevel(master.getLevel());
         declareResources(summon, spec);
         if (spec.aggro() != null) {
-            // The servant's own 仇恨 (aggro) ("ServantID 11413 - 仇恨: 125"). Only stated when a document states it:
+            // The servant's own aggro (仇恨) ("ServantID 11413 - 仇恨: 125"). Only stated when a document states it:
             // Battle.aggroOf answers its regular tier for anything left at 0, which is a different claim from
             // "the document says 100".
             summon.setAggro((int) Math.round(spec.aggro()));
@@ -335,7 +335,7 @@ public final class SummonFactory {
         summon.setLevel(master.getLevel());
         declareResources(summon, spec);
         if (spec.aggro() != null) {
-            // The servant's own 仇恨 (aggro) ("ServantID 11413 - 仇恨: 125"). Only stated when a document states it:
+            // The servant's own aggro (仇恨) ("ServantID 11413 - 仇恨: 125"). Only stated when a document states it:
             // Battle.aggroOf answers its regular tier for anything left at 0, which is a different claim from
             // "the document says 100".
             summon.setAggro((int) Math.round(spec.aggro()));
@@ -343,7 +343,7 @@ public final class SummonFactory {
         if (spec.attack() != null) {
             summon.setSkill(SkillType.COMMON, attackOf(spec, DamageType.NORMAL));
         }
-        // A memosprite skill was always meant to be a `Skill` (2026-10-02): each stated row becomes a real skill, addressed by (ServantID, slot) exactly
+        // A memosprite skill is a `Skill`: each stated row becomes a real skill, addressed by (ServantID, slot) exactly
         // like a character's -- so `SkillEffects.forSkill`, `SkillExecutor.canDeliver` and every op that takes a skill work
         // on a memosprite's skill with no special case.
         installSpecSkills(summon, spec, master);
@@ -351,7 +351,7 @@ public final class SummonFactory {
     }
 
     /**
-     * Compiles the spec's {@code attack} block into the skill the memosprite acts with (P9-4 memosprite).
+     * Compiles the spec's {@code attack} block into the skill the memosprite acts with.
      *
      * <p>Note: The spec was validated immediately above, so an unknown element / base / shape cannot reach this
      * point; the lookups are the plain {@code fromString} ones rather than a second set of checks, because
@@ -376,7 +376,7 @@ public final class SummonFactory {
                 attack.percent(),
                 attack.hits() == null ? 1 : attack.hits(),
                 // Note: `type` is memosprite damage (忆灵伤害, GLOSSARY.md), and a memosprite's own skill is exactly that -- not NORMAL.
-                // The type has been declared since the table was written (its javadoc notes only some constants are in use);
+                // The type is declared in the table (its javadoc notes only some constants are in use);
                 // labelling it here is what lets a rule scope a bonus to memosprite damage, and it is the game's own word.
                 type,
                 SkillEffectType.fromString(attack.shape()),

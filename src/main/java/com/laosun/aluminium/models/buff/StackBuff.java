@@ -1,10 +1,10 @@
 package com.laosun.aluminium.models.buff;
 
 /**
- * A <b>named counter</b>: a buff that carries no modifier at all and exists only to be <b>counted</b> (2026-09-28).
+ * A <b>named counter</b>: a buff that carries no modifier at all and exists only to be <b>counted</b>.
  *
  * <p><b>The sentence that needs it.</b> Hanya's (寒鸦) Skill: "每当我方目标对[承负]状态下的敌方目标施放 <b>2</b> 次普攻、战技、终结技后，立即
- * 为我方恢复 1 个战技点；[承负]…会在触发 <b>2</b> 次战技点恢复效果后自动解除" - two thresholds over two different things, and
+ * 为我方恢复 1 个战技点；[承负] ...会在触发 <b>2</b> 次战技点恢复效果后自动解除" - two thresholds over two different things, and
  * neither is a turn count or a probability: they are "how many times has this happened so far".
  *
  * <p><b>Why a buff and not a new kind of state.</b> The engine's existing stacking already means "several instances that
@@ -20,7 +20,7 @@ package com.laosun.aluminium.models.buff;
 public class StackBuff extends AbstractBuff {
 
     /**
-     * @param name      what it is counting (the key {@code *_stacks:<name>} reads; never blank)
+     * @param name what it is counting (the key {@code *_stacks:<name>} reads; never blank)
      * @param turns     how many of the owner's turns it lasts, at least 1
      * @param permanent {@code true} = lasts until the battle ends and is never counted down ({@code turns} is then
      *                  only a placeholder)

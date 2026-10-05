@@ -4,12 +4,12 @@ import com.google.gson.annotations.SerializedName;
 
 /**
  * One resource a character <b>declares</b>, from the {@code resources} block of
- * {@code resources/characters/<cid>.json} (P8-8, item 4 of the capability backlog):
+ * {@code resources/characters/<cid>.json}:
  *
  * <pre>
  * {
  *   "resources": [
- *     { "id": "充能", "max": 3, "source": "1003 姬子 talent 乘胜追击: \"... cap 3 points\"" }
+ *     { "id": "Charge (充能)", "max": 3, "source": "1003 Himeko (姬子) talent Victory Rush (乘胜追击): \"... cap 3 points\"" }
  *   ],
  *   "rules": [ ... ]
  * }
@@ -18,7 +18,7 @@ import com.google.gson.annotations.SerializedName;
  * <p><b>Why a declaration is needed at all.</b> {@link com.laosun.aluminium.models.ResourceManager#gain}
  * answers {@code 0} for an id it has never seen, and {@code value} answers {@code 0} too - so without a
  * declaration a {@code GAIN_RESOURCE} rule would load, fire, and quietly do nothing, and a
- * {@code self_resource:充能 >= 3} condition would be read as "0, so no". Both are wrong answers with no
+ * {@code self_resource:Charge (充能) >= 3} condition would be read as "0, so no". Both are wrong answers with no
  * symptom, which is the one failure mode this project refuses. The declaration is where "cap 3 points" - the
  * number a character's text actually states - is written down.
  *
@@ -36,7 +36,7 @@ import com.google.gson.annotations.SerializedName;
  * path specifically, since the alternative would be a declaration that silently validated nothing.)
  *
  * @param id      the identifier, as the rules spell it in {@code "resource"} and in
- *                {@code self_resource:<NAME>} (e.g. {@code 充能})
+ *                {@code self_resource:<NAME>} (e.g. {@code Charge (充能)})
  * @param max     the normal cap: "cap 3 points" is {@code 3}
  * @param initial the value the resource starts a battle with ({@code 0} when the JSON omits it)
  * @param source  where the cap comes from - the document, the ability and the sentence, with the parameter
@@ -47,10 +47,10 @@ import com.google.gson.annotations.SerializedName;
 public record ResourceSpec(@SerializedName("id") String id,
                            @SerializedName("max") Integer max,
                            @SerializedName("initial") Integer initial,
-        // A declared OVERFLOW (2026-09-30; reader: 1506's [隐藏分]: "the Ultimate can be activated after reaching 60 points, and a further 240 points can overflow past the cap"). `Resource` has had both tiers all along (`max` + `maxOverflow`);
+        // A declared OVERFLOW (reader: 1506's [隐藏分] (Hidden MMR): "the Ultimate can be activated after reaching 60 points, and a further 240 points can overflow past the cap"). `Resource` has both tiers all along (`max` + `maxOverflow`);
         // what was missing was a way for a DECLARATION to state the second number.
         @SerializedName("overflow") Integer overflow,
-        // A declared SCOPE (2026-09-30; reader: the shared 笑点 counter, "gain 10 笑点"). Note: A party-level resource needs a
+        // A declared SCOPE (reader: the shared Punchline (笑点) counter, "gain 10 Punchline (笑点)"). Note: A party-level resource needs a
         // PER-BATTLE owner rather than a copy per character -- which is exactly what `ResourceManager.register` says when it
         // refuses an unwired scope, and what `Battle` now provides.
         @SerializedName("scope") String scope,

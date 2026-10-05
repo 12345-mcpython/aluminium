@@ -10,15 +10,15 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 /**
- * Light cone 23031 (2026-09-30): the DEF-ignore belongs to the HIT, not to the wearer.
+ * Light cone 23031: the DEF-ignore belongs to the HIT, not to the wearer.
  *
  * <p>Note: PARTIAL ON PURPOSE, and the missing half is written down rather than implied. This asserts the SPELLING: every
  * DEFENCE_IGNORE effect on DEALING_DAMAGE for this cone carries {@code instance: true}, so it lands on the damage
  * instance and its {@code per_stack} is resolved by {@code perStackFactor} (which knows {@code self_stacks:}). It does
- * NOT yet assert the NUMBER the engine ends up using (0.2x the 流光 (Flowing Light) stacks): that runtime judgement is still owed.
+ * NOT yet assert the NUMBER the engine ends up using (0.2x the Luminflux (流光) stacks): that runtime judgement is still owed.
  *
- * <p>Why it exists: before 2026-09-30 this effect had no {@code instance}, so it raised the WEARER's attribute and its
- * {@code per_stack: self_stacks:流光} was read as {@code stacksOf("self_stacks:流光")} = 0 -- a multiplier that made the
+ * <p>Why it exists: without {@code instance} this effect has no damage instance, so it raises the WEARER's attribute and its
+ * {@code per_stack: self_stacks:流光} is read as {@code stacksOf("self_stacks:流光")} = 0 -- a multiplier that makes the
  * whole bonus vanish. The spelling is the thing that was wrong, so the spelling is the thing this pins.
  */
 public class Cone23031InstanceTest {

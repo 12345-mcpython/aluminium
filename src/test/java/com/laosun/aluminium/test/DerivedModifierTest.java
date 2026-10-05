@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * A {@code MODIFY_ATTR} whose value is <b>derived</b>: {@code scale: "self_attr:<ATTRIBUTE>"} (P11-2, M-42).
+ * A {@code MODIFY_ATTR} whose value is <b>derived</b>: {@code scale: "self_attr:<ATTRIBUTE>"}.
  *
  * <p><b>Why a literal is not enough.</b> "the raise is equal to #1% of 大丽花's Break Effect + #3%" / "equal to #2% of 星期日's CRIT DMG +
  * #4%" state the granted value as a function of <b>the rule owner's own attribute</b>. `percent` can only be a
@@ -28,27 +28,27 @@ import java.util.Random;
  *
  * <p><b>What each case is for.</b>
  * <ol>
- *   <li>the value really is {@code percent  x  (the owner's attribute) + amount};</li>
+ *  <li>the value really is {@code percent  x  (the owner's attribute) + amount};</li>
  *   <li>it reads the <b>owner's</b> attribute, not the receiving unit's (they are two different characters, and the
  *       rule's whole point is that the value travels);</li>
- *   <li>it stays <b>absolute</b> even on a base attribute - where a literal {@code percent} would mean "a share of
+ *  <li>it stays <b>absolute</b> even on a base attribute - where a literal {@code percent} would mean "a share of
  *       the target's base". The two readings differ by a factor of the target's own stat, so one case separates
  *       them;</li>
  *   <li>it is <b>computed once</b>: changing the owner's attribute afterwards does not retro-rewrite the buff;</li>
- *   <li>every way of spelling it wrong is refused while the file is read - including the one that used to be
+ *   <li>every way of spelling it wrong is refused while the file is read - including the one that would otherwise be
  *       silently dropped ({@code amount} without a {@code scale}).</li>
  * </ol>
  *
- * <p>The shipped user is 大丽花's trace "又一场葬礼" (checked end to end below).
+ * <p>The shipped user is The Dahlia (大丽花)'s trace "又一场葬礼" (checked end to end below).
  */
 public class DerivedModifierTest {
     private static final double EPS = 1e-6;
 
-    /** 姬子 - a plain character with no rule file of its own; the derived value is put on it. */
+    /** Himeko (姬子) - a plain character with no rule file of its own; the derived value is put on it. */
     private static final int OWNER = 1003;
-    /** 停云 - "the other character" the party-wide grant reaches. */
+    /** Tingyun (停云) - "the other character" the party-wide grant reaches. */
     private static final int ALLY = 1202;
-    /** 大丽花 - her trace is the first content that needs this. */
+    /** The Dahlia (大丽花) - her trace is the first content that needs this. */
     private static final int DAHLIA = 1321;
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
@@ -147,7 +147,7 @@ public class DerivedModifierTest {
      *
      * <p>Note: It has to be an event that <b>carries a target</b>. The party-wide case above fires on {@code BATTLE_START},
      * where {@code ctx.target()} is null - so "reads the owner" and "reads the target" are the same code path there,
-     * and a mutant that swapped them survived the suite until this case existed (2026-09-2).
+     * and a mutant that swapped them survived the suite until this case existed.
      */
     @Test
     public void theOwnerIsNotSimplyTheEventSubject() {
@@ -172,7 +172,7 @@ public class DerivedModifierTest {
     // 3. Refusals, while the file is read
     // ==================================================================
 
-    /** A flat part with no scale has nothing to derive from, and used to be dropped on the floor. */
+    /** A flat part with no scale has nothing to derive from, so it is refused rather than dropped silently. */
     @Test
     public void anAmountWithoutAScaleIsRefused() {
         EffectSpec effect = new EffectSpec();
@@ -251,7 +251,7 @@ public class DerivedModifierTest {
     }
 
     // ==================================================================
-    // 4. The shipped content: 大丽花's trace
+    // 4. The shipped content: The Dahlia (大丽花)'s trace
     // ==================================================================
 
     /**

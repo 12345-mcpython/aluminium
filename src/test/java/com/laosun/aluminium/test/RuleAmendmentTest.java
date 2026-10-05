@@ -32,14 +32,14 @@ import java.util.Random;
  *
  * <p><b>What this file pins.</b> That the raise really reaches the two consumers (the per-turn cap and the roll), that
  * it is the <b>stated</b> number plus the raise rather than a replacement, that all the ambiguous or meaningless shapes
- * are refused at load time, and that 三月七's own file ships both sentences.
+ * are refused at load time, and that March 7th (三月七)'s own file ships both sentences.
  */
 public class RuleAmendmentTest {
     private static final double EPS = 1e-9;
 
     private static final int MARCH_7TH = 1001;
     private static final int LEVEL = 80;
-    /** 1003010 states no {@code STAT_CTRL_*} resistances (冰锋 cannot be frozen at all). */
+    /** 1003010 states no {@code STAT_CTRL_*} resistances (Ice Edge (冰锋) cannot be frozen at all). */
     private static final int MONSTER = 1003010;
 
     /**

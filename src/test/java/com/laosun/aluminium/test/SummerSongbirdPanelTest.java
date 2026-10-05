@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1512 Robin - Summer Songbird's memosprite panel (2026-10-02).
+ * 1512 Robin - Summer Songbird's memosprite panel.
  *
  * <p>Document, verbatim (1512_知更鸟-晴歌.html:81): "忆灵'晴空乐手'<b>初始拥有等同于知更鸟-晴歌 0% 生命上限的生命上限</b>和
  * <b>等同于知更鸟-晴歌 180% 速度的速度</b>。"

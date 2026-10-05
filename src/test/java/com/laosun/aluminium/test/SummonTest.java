@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * P9-4: a monster's summon roster becomes a combatant that can actually be put on the field.
+ * a monster's summon roster becomes a combatant that can actually be put on the field.
  *
  * <p><b>What was missing before this.</b> Two halves of "summons exist" had each been paid for and neither
  * was usable alone: {@code Battle.enemies} was widened to {@code List<CanHit>} (L-8), so the camp

@@ -19,9 +19,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * The <b>countdown</b> unit (M-49): a unit that exists on the action order in order to <b>have a turn</b>.
+ * The <b>countdown</b> unit: a unit that exists on the action order in order to <b>have a turn</b>.
  *
- * <p><b>The sentence that needs it.</b> 知更鸟's [协奏] lasts "until the turn the [协奏] countdown begins", and that countdown "has a fixed
+ * <p><b>The sentence that needs it.</b> Robin (知更鸟)'s [协奏] lasts "until the turn the [协奏] countdown begins", and that countdown "has a fixed
  * 90 SPD" - the state's duration is a fact about the <b>action order</b>, not a number of anybody's turns. A
  * `turns: N` spelling would be a different duration in every fight (advances, delays and breaks all move the order),
  * which is why the engine had to grow a unit rather than a field.
@@ -59,7 +59,7 @@ public class CountdownTest {
 
     /**
      * Note: `actor == countdown` means <b>my</b> countdown, not "a countdown": another unit's clock must not answer her
-     * rule (2026-09-28).
+     * rule.
      */
     @Test
     public void somebodyElsesCountdownIsNotMine() {

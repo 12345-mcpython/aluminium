@@ -19,9 +19,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Aglaea (阿格莱雅) 1402's memosprite kit - "衣匠", as data.
+ * Aglaea (阿格莱雅) 1402's memosprite kit - "衣匠" ("Garmentmaker"), as data.
  *
- * <p><b>Why this character.</b> Her two abilities are the densest test of everything the last few changes added,
+ * <p><b>Why this character.</b> Her two abilities are the densest test of everything the engine does,
  * and none of it needed a new engine piece: the panel is inherited from her ({@code memosprites/1402.json}), the
  * memosprite is summoned by a rule, healed by a scaled {@code HEAL} aimed with {@code target: "summon"}, and her
  * own place in the turn order is moved with {@code ADVANCE}.
@@ -31,15 +31,15 @@ import java.util.Random;
  * Ultimate (终结技): "召唤忆灵衣匠，若衣匠已在场，则使其生命值回复至上限。阿格莱雅进入[至高之姿]状态并使自身立即行动。"
  * </pre>
  *
- * <p><b>The two halves are two rules, and the split is the interesting part.</b> "并使自身立即行动" hangs off the
- * "若衣匠不在场" branch (the 并, "and", continues the summoning clause), so the skill's two sentences become two rules
+ * <p><b>The two halves are two rules, and the split is the interesting part.</b> "并使自身立即行动" ("and make herself act immediately") hangs off the
+ * "若衣匠不在场" ("if the Garmentmaker is not on the field") branch (the "并" ("and") continues the summoning clause), so the skill's two sentences become two rules
  * gated by {@code self_summon_count >= 1} and {@code == 0} - mutually exclusive by construction, rather than by
  * asking whether the summon "really happened" (which {@code SUMMON}'s idempotence makes unobservable afterwards).
- * Her ultimate, in contrast, needs no branch at all: the "若已在场则回复至上限" clause is covered by summoning
+ * Her ultimate, in contrast, needs no branch at all: the "若已在场则回复至上限" ("if it is already out, restore it to the maximum") clause is covered by summoning
  * first and then healing, because a fresh memosprite is at full HP.
  *
  * <p>Note: What is deliberately <b>not</b> authored, and why it is not an oversight: the Garmentmaker's own attack. Its Memosprite Skill 1 is
- * a Blast for "110% 攻击力" of Lightning damage, but no document gives the Garmentmaker an ATK - the panel states HP and SPD only - 
+ * a Blast for "110% ATK (攻击力)" of Lightning damage, but no document gives the Garmentmaker an ATK - the panel states HP and SPD only - 
  * and scaling it off Aglaea's ATK would be a guess. The loader would refuse it anyway: an attack whose base the
  * panel never states is exactly the "every hit deals zero" case {@code Memosprites.validateAttack} exists for.
  */
@@ -56,7 +56,7 @@ public class AglaeaMemospriteTest {
     // 1. The skill: heal, or summon and advance
     // ==================================================================
 
-    /** "衣匠已在场": the skill restores 50% of the memosprite's Max HP. */
+    /** "衣匠已在场" ("the Garmentmaker is already on the field"): the skill restores 50% of the memosprite's Max HP. */
     @Test
     public void herSkillHealsTheMemospriteThatIsAlreadyOut() {
         Battle battle = battle();
@@ -74,7 +74,7 @@ public class AglaeaMemospriteTest {
         Assertions.assertEquals(1, battle.summonCountOf(aglaea), "…and no second one appeared");
     }
 
-    /** "衣匠不在场": the skill brings it out <b>and</b> makes her act immediately. */
+    /** "衣匠不在场" ("the Garmentmaker is not on the field"): the skill brings it out <b>and</b> makes her act immediately. */
     @Test
     public void herSkillSummonsAndAdvancesHerWhenItIsNotOut() {
         Battle battle = battle();
@@ -89,7 +89,7 @@ public class AglaeaMemospriteTest {
         Assertions.assertNotNull(tailor, "「若衣匠不在场，则召唤忆灵衣匠」");
         Assertions.assertEquals(0, timeRemaining(battle, aglaea), EPS, "「并使自身立即行动」");
         Assertions.assertTrue(timeRemaining(battle, tailor) > 0,
-                "the advance is HERS: the memosprite's own turn is untouched (it is not 忆灵技能3)");
+                "the advance is HERS: the memosprite's own turn is untouched (it is not memosprite skill 3 (忆灵技能3))");
     }
 
     /** The two halves are mutually exclusive, so a skill cast never heals and summons at once. */
@@ -132,7 +132,7 @@ public class AglaeaMemospriteTest {
     /**
      * From already-out: it is restored to full without a branch, and there is still only one.
      *
-     * <p>The text's "若衣匠已在场，则使其生命值回复至上限" needs no second rule: {@code SUMMON} is idempotent, and
+     * <p>The text's "若衣匠已在场，则使其生命值回复至上限" ("if the Garmentmaker is already on the field, restore its HP to the maximum") needs no second rule: {@code SUMMON} is idempotent, and
      * the {@code HEAL} that follows tops up whatever is standing.
      */
     @Test
@@ -209,11 +209,11 @@ public class AglaeaMemospriteTest {
     // ==================================================================
 
     /**
-     * "阿格莱雅进入[至高之姿]状态" + "衣匠消失时阿格莱雅解除[至高之姿]状态" - the state's whole
+     * "阿格莱雅进入[至高之姿]状态" + "衣匠消失时阿格莱雅解除[至高之姿]状态" ("Aglaea enters the [至高之姿] state" + "when the Garmentmaker disappears, Aglaea removes the [至高之姿] state") - the state's whole
      * <b>lifecycle</b>, through the anchor ({@code ticks_on: "summon"}).
      *
      * <p><b>Why the anchor rather than a turn count.</b> The document gives the stance no duration: it ends when the
-     * the Garmentmaker is gone ("行动序列上出现倒计时…回合开始时使衣匠自毁。衣匠消失时阿格莱雅解除[至高之姿]状态"). The
+     * the Garmentmaker is gone ("行动序列上出现倒计时…回合开始时使衣匠自毁。衣匠消失时阿格莱雅解除[至高之姿]状态" - "a Countdown (倒计时) appears on the action order ... at its turn the Garmentmaker self-destructs. When the Garmentmaker disappears, Aglaea removes the [至高之姿] state"). The
      * engine's anchor <i>is</i> the tick owner - {@code BuffManager.removeBuffsAnchoredTo} asks
      * {@code buff.ticksOn(dead)} - so one field says both things, and this case measures both ends of it:
      * <ul>
@@ -238,7 +238,7 @@ public class AglaeaMemospriteTest {
         battle.beforeMove();
         battle.afterMove();
         Assertions.assertTrue(aglaea.getBuffManager().hasState(STANCE),
-                "⚠ nothing counts it down: the document gives the stance NO turn count, and a turn of hers must not "
+                "nothing counts it down: the document gives the stance NO turn count, and a turn of hers must not "
                         + "spend it (that is what 「permanent」 is for here)");
 
         tailor.takeDamage(tailor.getMaxHp() * 10);

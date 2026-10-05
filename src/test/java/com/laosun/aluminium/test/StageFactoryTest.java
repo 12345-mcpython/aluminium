@@ -159,7 +159,7 @@ public class StageFactoryTest {
     }
 
     /**
-     * The reference team (P8-5): 4 real characters, each with an identity, an energy bar and a light
+     * The reference team: 4 real characters, each with an identity, an energy bar and a light
      * cone of its own path.
      *
      * <p>Replaces the old P-5 assertion, which checked 3 placeholders with deliberately distinct

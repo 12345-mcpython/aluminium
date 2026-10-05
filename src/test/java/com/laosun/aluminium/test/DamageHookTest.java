@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * P1-acceptance: buffs inject zones through {@code DamageEvent} during settlement.
+ * -acceptance: buffs inject zones through {@code DamageEvent} during settlement.
  *
  * <p>Every defender here has DEFENCE = 0 and the attacker has no boost / crit attributes,
  * so a base of 1000 isolates the hooked zone.

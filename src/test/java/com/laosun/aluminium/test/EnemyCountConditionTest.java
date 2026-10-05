@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * The `enemy_count` condition variable: "the number of enemy targets on the field", whose reader is 1413 长夜月's talent.
+ * The `enemy_count` condition variable: "the number of enemy targets on the field", whose reader is 1413 Evernight (长夜月)'s talent.
  *
  * <p>Note: The event matters: `enemyCount` returns NaN when there is no battlefield in context (the rule this whole vocabulary
  * follows -- "cannot read it" must fail, never read as zero), and BATTLE_START can be exactly that. Measured: on BATTLE_START the

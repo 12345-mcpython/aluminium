@@ -32,7 +32,7 @@ import java.util.Random;
  *   <li>it takes a turn: it is on the action bar like anything else.</li>
  * </ol>
  *
- * <p>A {@code Summon} is used rather than a fake subclass on purpose - it is the real type P9-4 needs, and
+ * <p>A {@code Summon} is used rather than a fake subclass on purpose - it is the real type the enemy-side summon needs, and
  * it is the type that could not be placed at all before this change.
  */
 public class EnemyCampSummonTest {
@@ -116,7 +116,7 @@ public class EnemyCampSummonTest {
     /** A hero, one real monster, and one enemy-side summon. */
     private static Fixture fixture() {
         Character hero = Character.fromAttributes("hero", 10_000, 100, 100, 100);
-        Enemy monster = EnemyFactory.create(1002011, 90, 1);        // 冰锋, toughness 60
+        Enemy monster = EnemyFactory.create(1002011, 90, 1);        // Ice Edge (冰锋), toughness 60
         Summon summon = new Summon("minion", Camp.ENEMY,
                 new AttributeBuilder()
                         .setBase(AttributeType.HEALTH, 2_000)

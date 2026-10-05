@@ -28,9 +28,9 @@ import java.util.Random;
  *
  * <p><b>Why the vocabulary needed it.</b> The engine could already be resistant to <i>one named state</i>
  * ({@code STAT_CTRL_Frozen} and friends, straight from a monster's own data). The corpus asks for something else:
- * 8 of the 9documents say a unit is <b>immune to the control class</b> (Mydei (万敌)'s [血仇], 卡厄斯兰那, Evernight (长夜月)'s memosprite
- * "长夜", Silver Wolf LV.999 (银狼LV.999)'s [防火墙], 小伊卡 ...) and two more say it is <b>35% / 50% more likely to resist</b> a class
- * (Clara (克拉拉) 守护, 1008 坚韧). A list of keys cannot say that - a control written tomorrow would fall outside the list.
+ * 8 of the 9 documents say a unit is <b>immune to the control class</b> (Mydei (万敌)'s [血仇], Khaslana (卡厄斯兰那), Evernight (长夜月)'s memosprite
+ * "长夜", Silver Wolf LV.999 (银狼LV.999)'s [防火墙], Little Ica (小伊卡) ...) and two more say it is <b>35% / 50% more likely to resist</b> a class
+ * (Clara (克拉拉) Under Protection (守护), 1008 Tenacity (坚韧)). A list of keys cannot say that - a control written tomorrow would fall outside the list.
  *
  * <p><b>One mechanism, both spellings.</b> A class resistance multiplies the remaining chance by {@code 1 - r}, so
  * {@code percent: 0.35} is "increased by 35%" and {@code percent: 1.0} is immunity - the same mechanic at its limit, which is why
@@ -40,7 +40,7 @@ import java.util.Random;
  * unstated chance is a 100% <i>base</i> chance, and without that rule every "immune to control-class debuffs" clause would have been
  * silently ineffective against exactly the controls the documents write without a number.
  *
- * <p>Note: <b>What the corpus says about the class itself</b> (measured 2026-09-28): "control-class debuffs" is defined
+ * <p>Note: <b>What the corpus says about the class itself</b>: "control-class debuffs" is defined
  * <b>in the documents</b>, 28 times, always as the same twelve names (Frozen, Entanglement, Imprisonment, Domination, Enraged Noise, Strong Shock, Strange Dream, Binding,
  * Fear, Action Lock, Blissful Puppet, Grudgefire Burning). That is why this is a <i>class</i> and not a list of resistance keys - the list is
  * the game's, it is long, and it grows with the next character. It is also why Taunt is <b>not</b> covered (it is in
@@ -55,8 +55,8 @@ public class DebuffResistTest {
 
     /**
      * Note: Not 1002011. That one is Ice Edge (冰锋), whose own data carries {@code STAT_CTRL_Frozen = 1.0} - a "the state lands"
-     * assertion on it would pass for the wrong reason (and did, in this suite's first draft: immunity was indistinguishable
-     * from the monster's data). 1003010 has no specific resistances, like {@code ControlTest}'s landing cases.
+     * assertion on it would pass for the wrong reason: immunity would be indistinguishable
+     * from the monster's data. 1003010 has no specific resistances, like {@code ControlTest}'s landing cases.
      */
     private static final int MONSTER = 1003010;
 
@@ -119,7 +119,7 @@ public class DebuffResistTest {
      * instead of adding a second one, while the other applier's stands.
      *
      * <p>That is what keeps Clara (克拉拉)'s permanent 35% ward alive when a one-turn [防火墙] (Firewall)-style immunity lands on her and
-     * later expires: with class alone as the identity, the timed 100% would have replaced the trace and taken it with
+     * later expires: with class alone as the identity, the timed 100% would replace the trace and take it with
      * it. The numbers below are chosen so a fourth buff would be visible (0.2 + 0.3 = 0.5, and 0.2 + 0.3 + 0.2 = 0.).
      */
     @Test
@@ -182,7 +182,7 @@ public class DebuffResistTest {
      * Note: The taunt goes through the same pipeline now.
      *
      * <p>"makes the target enter the taunted state" states no probability, i.e. a 100% <b>base</b> chance - which the game still runs through
-     * effect hit rate / effect resistance. The engine used to attach the marker unconditionally, which no document says; the fix is
+     * effect hit rate / effect resistance. No document says the marker is unconditional, and the roll is
      * pinned here by giving the victim full effect resistance.
      */
     @Test
@@ -200,7 +200,7 @@ public class DebuffResistTest {
      * A state that is in no class is not covered by any class resistance - and that is the documents' own answer
      * here, not a placeholder.
      *
-     * <p>Note: <b>Measured (2026-09-28).</b> "control-class debuffs" is <b>defined by the corpus itself</b>, 28 times, always
+     * <p>Note: <b>Measured.</b> "control-class debuffs" is <b>defined by the corpus itself</b>, 28 times, always
      * the same twelve names: "Frozen, Entanglement, Imprisonment, Domination, Enraged Noise, Strong Shock, Strange Dream, Binding, Fear, Action Lock, Blissful Puppet, Grudgefire Burning". Taunt is
      * <b>not</b> one of them, so leaving {@code TauntBuff} outside the control class matches the game's own list
      * rather than dodging a decision. Note: The other side of that measurement is a registered gap: of those twelve

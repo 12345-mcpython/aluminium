@@ -21,11 +21,11 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * The {@code SUMMON} op: a rule bringing its owner's <b>memosprite</b> (忆灵) onto the field (P9-4).
+ * The {@code SUMMON} op: a rule bringing its owner's <b>memosprite</b> (忆灵) onto the field.
  *
  * <p><b>Where this sits in the chain.</b> {@code resources/memosprites/<cid>.json} says how a memosprite's
  * panel derives from its summoner, {@code Battle.summonMemosprite} puts one on the field, and this op is what
- * lets <b>content</b> ask for it: "summon the memosprite '长夜' on entering battle" (1413) and "summon the memosprite 衣匠" (1402) are now rule files
+ * lets <b>content</b> ask for it: "summon the memosprite '长夜' on entering battle" (1413) and "summon the memosprite 衣匠" (1402) are rule files
  * rather than prose.
  *
  * <p><b>Three design choices, each pinned below.</b>
@@ -44,11 +44,11 @@ import java.util.Random;
 public class SummonOpTest {
     private static final double EPS = 1e-6;
 
-    /** 长夜月 - "summon the memosprite '长夜' on entering battle", authored in characters/1413.json. */
+    /** Evernight (长夜月) - "summon the memosprite '长夜' on entering battle", authored in characters/1413.json. */
     private static final int CASTORICE_LIKE = 1413;
-    /** 阿格莱雅 - "summon the memosprite 衣匠" on her Ultimate, authored in characters/1402.json. */
+    /** Aglaea (阿格莱雅) - "summon the memosprite 衣匠" on her Ultimate, authored in characters/1402.json. */
     private static final int AGLAEA = 1402;
-    /** 姬子 - a character with no memosprite spec, for the refusal cases. */
+    /** Himeko (姬子) - a character with no memosprite spec, for the refusal cases. */
     private static final int NO_MEMOSPRITE = 1003;
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
@@ -57,7 +57,7 @@ public class SummonOpTest {
     // 1. The shipped content summons through the real event path
     // ==================================================================
 
-    /** 长夜月 has the memosprite out as soon as the battle starts. */
+    /** Evernight (长夜月) has the memosprite out as soon as the battle starts. */
     @Test
     public void theBattleStartClauseBringsItOut() {
         Character castorice = CharacterFactory.create(CASTORICE_LIKE, LEVEL);
@@ -80,14 +80,14 @@ public class SummonOpTest {
     /** The op is the only thing her file says so far, and the loader reads exactly it. */
     @Test
     public void herFileContainsTheSummoningClauseAndHerLevel() {
-        // Note: 2 since M-32: the summoning clause and the rule that states which level her ultimate's numbers were
-        // quoted at ("quoted at Lv10" as an ULTRA +9 raise). Before that, the level lived in a `damage_level` field
-        // on the damage effect, so the file had one battle-start rule.
+        // Note: two rules: the summoning clause and the rule that states which level her ultimate's numbers were
+        // quoted at ("quoted at Lv10" as an ULTRA +9 raise). The level lives in that rule rather than in a `damage_level`
+        // field on the damage effect.
         Assertions.assertEquals(2, TriggerTables.of(CASTORICE_LIKE).ruleCount(TriggerEvent.BATTLE_START));
         Assertions.assertFalse(TriggerTables.of(CASTORICE_LIKE).isEmpty());
     }
 
-    /** 阿格莱雅's Ultimate summons 衣匠 - and it is HER Ultimate, not a teammate's. */
+    /** Aglaea (阿格莱雅)'s Ultimate summons the Garmentmaker (衣匠) - and it is HER Ultimate, not a teammate's. */
     @Test
     public void herUltimateSummonsItAndSomeoneElsesDoesNot() {
         Character aglaea = CharacterFactory.create(AGLAEA, LEVEL);
@@ -166,7 +166,7 @@ public class SummonOpTest {
         Assertions.assertTrue(refused.getMessage().contains(String.valueOf(NO_MEMOSPRITE)),
                 "the message names the file to write: " + refused.getMessage());
 
-        // …and the same table passes for a character that does have one.
+        // ...and the same table passes for a character that does have one.
         Assertions.assertSame(summoning, CharacterFactory.requireSummonable(CASTORICE_LIKE, summoning),
                 "only the character without a spec is a problem; the check is about the pair, not the table");
         Assertions.assertNotNull(himeko, "and building her normally is untouched");
@@ -181,7 +181,7 @@ public class SummonOpTest {
      * every wearer, so no rule file can know the cid it will be checked against.
      *
      * <p>Note: The fixture lives on set <b>99001</b>: its 2-piece is a plain stat (so that tier is outside the census) and it has no rule file of its own, so this fixture shadows nothing: a file in {@code src/test/resources} shadows the shipped -- which is exactly why it must not sit on a set that HAS a rule file (set 108 did, and hid its 4-piece)
-     * file of the same name, and 103 became real content on 2026-09-28 (see the fixture's own note).
+     * file of the same name (see the fixture's own note).
      *
      * <p>Without a case like this, "the check is correct" and "the check is never called" look identical.
      */

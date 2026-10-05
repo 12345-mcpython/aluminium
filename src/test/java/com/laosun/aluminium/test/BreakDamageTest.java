@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * P4-3 acceptance: the break damage formula.
+ * acceptance: the break damage formula.
  *
  * <p>Anchor (ROADMAP P4-3): attacker Lv80, break effect 300%, toughness reduction 112.5 points,
  * enemy DEF 1150, no resistance and no reduction to 

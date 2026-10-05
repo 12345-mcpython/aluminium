@@ -16,10 +16,10 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * "all <b>of those</b> lethally hit in one action" -- one set, not one save per blow (2026-10-02).
+ * "all <b>of those</b> lethally hit in one action" -- one set, not one save per blow.
  *
- * <p>Reader: 140月茇之庇. Its first half was already in the engine (`BuffManager.defersDeath()`: a state may hold the death instead of
- * committing it), and what was missing was this: the SAME action can land a lethal blow on several allies and the effect has to reach all
+ * <p>140's Sanctuary of Mooncocoon (月茧之庇). Its first half is already in the engine (`BuffManager.defersDeath`: a state may hold the death instead of
+ * committing it), and what is missing is this: the SAME action can land a lethal blow on several allies and the effect has to reach all
  * of them.
  *
  * <p>The action boundary is not new either: `TURN_START` (Battle:1031) and `TURN_END` (Battle:1301) already bracket `performAction`

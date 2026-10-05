@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
- * P2-3 acceptance: enemy attribute = template base value  x  level group multiplier  x  per-instance
+ * acceptance: enemy attribute = template base value  x  level group multiplier  x  per-instance
  * adjustment  x  elite group multiplier.
  *
  * <p>Anchors: Ice Edge (冰锋) (1002011)'s stat sheet at group 1 - Lv90; and the Despair Starcrusher

@@ -16,18 +16,16 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Luka (卢卡) (1111), from his own file (2026-09-28): [斗志] layers, the ultimate's rolled vulnerability, and 动能过载, Kinetic Overload.
+ * Luka (卢卡) (1111), from his own file: [斗志] (Fighting Will) layers, the ultimate's rolled vulnerability, and Kinetic Overload (动能过载).
  *
- * <p><b>What it needed.</b> Three capabilities that landed in the days before: a capped stack counter (`ADD_STACK` +
+ * <p><b>What it needs.</b> Three capabilities: a capped stack counter (`ADD_STACK` +
  * `max_stacks`), a rolled taken-side zone (`MODIFY_DAMAGE_TAKEN` + `base_chance`), and `REMOVE_BUFF` (the mirror of
  * `DISPEL`). The 330% ultimate damage and the Skill's damage are the engine's own skill rows.
  *
- * <p>Note: <b>A measured correction, since closed (2026-09-29).</b> This class used to record that `ADD_STACK`'s `amount`
- * did <b>not</b> mean "this many layers at once" - one firing added exactly <b>one</b> layer whatever `amount` said - so
- * "获得2层[斗志]" could not be said and his file registered it rather than pretending. `ADD_STACK` now attaches
- * `amount` layers (stopping at `max_stacks`), which is what the "获得 N 层" family states: his own file already says
- * `amount: 2` on the ultimate, and 1314 翡翠 states 5, 15, 1 and 3. So one ultimate is +2 layers, and the cap is still
- * real and is what the six-cast case below measures.
+ * <p>Note: <b>The `amount` of `ADD_STACK` is load-bearing.</b> It means "this many layers at once", not one layer
+ * per firing: one firing attaches exactly `amount` layers (stopping at `max_stacks`), which is what the "获得 N 层"
+ * family states. His own file says `amount: 2` on the ultimate, and 1314 Jade (翡翠) states 5, 15, 1 and 3. So one
+ * ultimate is +2 layers, and the cap is still real and is what the six-cast case below measures.
  */
 public class LukaTest {
     private static final int LUKA = 1111;
@@ -35,7 +33,7 @@ public class LukaTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** "战斗开始时，卢卡持有1层[斗志]", and each ultimate adds the two his document states. */
+    /** "战斗开始时,卢卡持有1层[斗志]", and each ultimate adds the two his document states. */
     @Test
     public void theLayersStartAtOneAndGrow() {
         Fixture f = new Fixture();

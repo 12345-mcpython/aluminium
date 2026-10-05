@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * {@code ULT_CAST} (P8-follow-up): the event an ultimate's "after the wearer uses their Ultimate"
+ * {@code ULT_CAST}: the event an ultimate's "after the wearer uses their Ultimate"
  * relic bonuses and talents subscribe to.
  *
  * <p>Before this, {@code ULT_CAST} was declared in {@link TriggerEvent} but had no emitter, so a rule
@@ -42,9 +42,9 @@ import java.util.Random;
  * this was" (see {@code TriggerTable}), so "when the wearer uses their Skill" can only avoid also
  * firing on the ultimate -- or on a basic attack -- if the events cannot both fire.
  *
- * <p><b>2026-09-2: the split is three-way, not two-way.</b> {@code SKILL_CAST} used to mean "any cast
- * that is not an ultimate", so basic attacks fired it too, and shipped content that says "when casting the Skill" (relic set
- * 109's ATK buff, Robin's 模进乐段) silently fired on basic attacks. {@code BASIC_ATTACK} now carries
+ * <p><b>The split is three-way, not two-way.</b> {@code SKILL_CAST} means the <b>Skill</b> cast alone; left as
+ * "any cast that is not an ultimate" it would take in basic attacks too, and shipped content that says "when casting the Skill" (relic set
+ * 109's ATK buff, Robin's Sequential Passage (模进乐段)) would silently fire on basic attacks. {@code BASIC_ATTACK} carries
  * the basic attack, a map attack / technique / talent fires none of the three, and
  * {@code ALLY_ATTACK} is unchanged (every attack that lands, ultimate included).
  */
@@ -66,7 +66,7 @@ public class UltCastTriggerTest {
      * The skill-point fingerprint of each event, all different so one number identifies the event.
      *
      * <p>Note: Kept small on purpose: the pool <b>caps at 5</b> ({@code Constant.SKILL_POINT_MAX}), so a
-     * combination whose sum exceeds 5 saturates and can no longer tell "one rule fired" from "two".
+     * combination whose sum exceeds 5 saturates and cannot tell "one rule fired" from "two".
      * That is why these are 1/2/3/4 and not, say, 1/2/4/8 - a lesson learned the hard way (8 + 4
      * reported 5).
      */
@@ -154,8 +154,8 @@ public class UltCastTriggerTest {
     /**
      * A basic attack is {@code BASIC_ATTACK} and <b>not</b> {@code SKILL_CAST}.
      *
-     * <p>This pins the over-trigger that had shipped rather than a behaviour that was already right:
-     * {@code SKILL_CAST} used to mean "any cast that is not an ultimate", so relic set 109
+     * <p>This pins the over-trigger that would otherwise ship: with
+     * {@code SKILL_CAST} meaning "any cast that is not an ultimate", relic set 109
      * ("when casting the Skill, ATK is increased by 20%") was handing out its ATK buff on basic attacks as well - and the note inside
      * that file claimed the emitter's split already covered it. The fingerprints (2 vs 4) say which
      * rule ran without touching the engine's internals.
@@ -205,8 +205,8 @@ public class UltCastTriggerTest {
     /**
      * A map basic attack and a talent are not in-battle casts, so they fire none of the three.
      *
-     * <p>This is the half of the old behaviour that was <b>removed</b> rather than split: those
-     * categories used to fall into {@code SKILL_CAST} (the {@code else} branch). A rule that needs one
+     * <p>This is the half of the old behaviour that is <b>removed</b> rather than split: those
+     * categories fall into no cast event at all (they were the {@code else} branch of the split). A rule that needs one
      * of them must ask for its own event, which is a loud load-time failure until it exists - better
      * than a rule that fires on something the text never mentioned.
      */

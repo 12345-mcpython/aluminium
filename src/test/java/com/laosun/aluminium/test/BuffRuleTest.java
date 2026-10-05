@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * P10-3: the generic stat buff / debuff.
+ * the generic stat buff / debuff.
  *
  * <p>The point of this class is that one buff class covers every "stat X becomes X ⊕ value for N
  * turns" effect, so 93 characters' buffs stay data instead of becoming 93 Java classes. What has to be

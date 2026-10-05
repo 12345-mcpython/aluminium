@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName;
 import java.util.List;
 
 /**
- * A character's memosprite (忆灵) as data: its name, and how its panel is <b>derived from its
+ * A character's memosprite (Memosprite, 忆灵) as data: its name, and how its panel is <b>derived from its
  * summoner</b>.
  *
  * <p>Loaded from {@code resources/memosprites/<ownerCid>.json} by {@link com.laosun.aluminium.data.Memosprites}.
@@ -14,10 +14,10 @@ import java.util.List;
  * Every memosprite in the documents is described that way, and the ratios differ per character:
  *
  * <pre>
- * 1402 Aglaea (阿格莱雅) - 衣匠   "speed equal to #1[i]% of Aglaea (阿格莱雅)'s speed, and Max HP equal to #2[i]% of Aglaea (阿格莱雅)'s Max HP + #3[i]"
+ * 1402 Aglaea (阿格莱雅) - Garmentmaker (衣匠)   "speed equal to #1[i]% of Aglaea (阿格莱雅)'s speed, and Max HP equal to #2[i]% of Aglaea (阿格莱雅)'s Max HP + #3[i]"
  * 1413 Evernight (长夜月)   - "长夜" "initially has #1[i] speed, and its Max HP is #2[i]% of Evernight (长夜月)'s"
- * 1512 Robin (知更鸟)-晴歌 - 晴空乐手 "Max HP equal to #1[i]% of ...'s Max HP and speed equal to #2[i]% of ...'s speed"
- * 800/8 Trailblazer (开拓者) - 迷迷 "initially has #1[i] speed and Max HP equal to #2[i]% of the Trailblazer (开拓者)'s Max HP + #3[i]"
+ * 1512 Robin (知更鸟)-晴歌 - Summer Songbirds (晴空乐手) "Max HP equal to #1[i]% of ...'s Max HP and speed equal to #2[i]% of ...'s speed"
+ * 800/8 Trailblazer (开拓者) - Mem (迷迷) "initially has #1[i] speed and Max HP equal to #2[i]% of the Trailblazer (开拓者)'s Max HP + #3[i]"
  * </pre>
  *
  * <p>So a memosprite's panel is <b>not</b> a stat block of its own - it is a function of the summoner's
@@ -31,13 +31,13 @@ import java.util.List;
  * have no number in any document and no memosprite stat table in this data set, so they are deliberately
  * left at 0 and registered as a gap rather than guessed at.
  *
- * @param name   the memosprite's name as the text writes it (e.g. 衣匠, the Garmentmaker)
+ * @param name   the memosprite's name as the text writes it (e.g. the Garmentmaker (衣匠))
  * @param source where the panel numbers come from - the document and rule, with the placeholders and the
  *               parameter list, so a number can be traced back
  * @param note   free-form note for the next reader (may be absent)
  * @param panel  one entry per attribute this memosprite takes from its summoner
- * @param attack the memosprite's own attack, or {@code null} when no document states one (P9-4 memosprite)
- * @param aggro  the servant's 仇恨 (aggro) weight, or {@code null} to leave the engine's regular tier (100). Every
+ * @param attack the memosprite's own attack, or {@code null} when no document states one
+ * @param aggro  the servant's aggro (仇恨) weight, or {@code null} to leave the engine's regular tier (100). Every
  *               document that describes a servant states one ("ServantID 11413 - 仇恨: 125"), so {@code null}
  *               means "no document says", not "it is an ordinary unit"
  */
@@ -50,14 +50,14 @@ public record MemospriteSpec(@SerializedName("name") String name,
                              @SerializedName("servant_id") Integer servantId,
                              @SerializedName("skills") List<SkillRow> skills,
                              /**
-                              * Resources this summon DECLARES (2026-10-02; reader: 1141526's [故事], which the sentence puts on the memosprite).
+                              * Resources this summon DECLARES (1141526's [故事], which the sentence puts on the memosprite).
                               *
-                              * <p>Before this a summon had no declaration site, so a `GAIN_RESOURCE` aimed at one was accepted by the loader and then silently granted nothing -- measured.
+                              * <p>Without a declaration site, a `GAIN_RESOURCE` aimed at a summon is accepted by the loader and then silently grants nothing -- measured.
                               */
                              @SerializedName("resources") List<com.laosun.aluminium.beans.ResourceSpec> resources) {
 
     /**
-     * One memosprite skill (忆灵技能) of this memosprite, as the game states it: a SLOT and the level its row is read at.
+     * One Memosprite skill (忆灵技能) of this memosprite, as the game states it: a SLOT and the level its row is read at.
      *
      * <p>Note: Why these two numbers are enough: the engine addresses a skill by `(cid, slot)`, and a memosprite's cid IS its
      * `ServantID` ("ServantID 11415"). Both facts were measured -- `SkillEffects.forSkill` keys on
@@ -97,7 +97,7 @@ public record MemospriteSpec(@SerializedName("name") String name,
      * @param percent   the share of the summoner's own value ({@code 0.35} = 35%), or {@code null} for none
      * @param flat      a flat addition after the share, or {@code null} for none
      * @param source    {@code "resource:<name>"} to derive from a battle-level RESOURCE instead of an attribute, or
-     *                  {@code null} for the attribute behaviour every shipped panel uses (2026-10-02)
+     *                  {@code null} for the attribute behaviour every shipped panel uses
      */
     public record Panel(@SerializedName("attribute") String attribute,
                         @SerializedName("percent") Double percent,
@@ -106,13 +106,13 @@ public record MemospriteSpec(@SerializedName("name") String name,
                         @SerializedName("by_ability") Boolean byAbility) {
 
         /**
-         * The attribute-derived panel, which is every panel shipped before 2026-10-02: no {@code source}.
+         * The attribute-derived panel, which is every panel with no {@code source}.
          */
         public Panel(String attribute, Double percent, Double flat) {
             this(attribute, percent, flat, null, null);
         }
 
-        /** The resource-derived panel (2026-10-02), with nothing said about abilities. */
+        /** The resource-derived panel, with nothing said about abilities. */
         public Panel(String attribute, Double percent, Double flat, String source) {
             this(attribute, percent, flat, source, null);
         }

@@ -73,7 +73,7 @@ public enum DamageElement {
 
     /**
      * An element table indexed by lowercase key, so {@link #fromString} can look up
-     * case-insensitively (P8-1).
+     * case-insensitively.
      *
      * <p>Why it is needed: {@code skills.json} writes {@code "Thunder"} (capitalised first
      * letter), while the {@code attribute} of {@code character_data.json} writes
@@ -92,7 +92,7 @@ public enum DamageElement {
     /**
      * Looks up an element by its raw game-data string (e.g. {@code "Fire"}).
      *
-     * <p><b>Case insensitive</b> (P8-1): {@code skills.json} uses {@code "Thunder"},
+     * <p><b>Case insensitive</b>: {@code skills.json} uses {@code "Thunder"},
      * {@code character_data.json} uses {@code "thunder"} - both spellings occur in the same
      * data set. Leading and trailing whitespace is ignored as well.
      *

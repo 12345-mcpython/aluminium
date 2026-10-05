@@ -18,15 +18,15 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Hanya (1215), from her own file (2026-09-28): the ultimate, Eidolons 1/2/3/5.
+ * Hanya (寒鸦) (1215): the ultimate, Eidolons 1/2/3/5.
  *
  * <p><b>What her kit needed from the engine.</b> The SPD share is a <b>derived</b> magnitude read off her own panel
  * (`scale: self_attr:SPEED`), the ATK boost and the level raises are ordinary content, and Eidolon 1's "持有<b>终结技效果</b>
- * 的我方目标消灭敌方目标时" is readable only because the ultimate also plants a marker <b>state</b> - a named modifier
+ * 的我方目标消灭敌方目标时" ("when one of our targets holding the <b>Ultimate's effect</b> defeats an enemy target") is readable only because the ultimate also plants a marker <b>state</b> - a named modifier
  * is invisible to `has_state`.
  *
  * <p><b>What is registered instead of approximated</b> (see the file's own note): the whole [承负] family - it needs a
- * state counter with a threshold ("每 2 次…恢复1个战技点"/"触发 2 次后自动解除") - plus Eidolons 4 and 6, which need a way to
+ * state counter with a threshold ("每 2 次…恢复1个战技点"/"触发 2 次后自动解除" - "every 2 times ... restore 1 skill point"/"automatically removed after triggering 2 times") - plus Eidolons 4 and 6, which need a way to
  * raise another rule's effect value or duration.
  */
 public class HanyaKitTest {
@@ -78,7 +78,7 @@ public class HanyaKitTest {
     /**
      * Note: The other half of Eidolon 1: a kill by somebody <b>without</b> her ultimate's effect does not advance her.
      *
-     * <p>This case exists because the gate `actor has_state 敕令` (the decree state) was <b>not covered</b> by the positive test alone - 
+     * <p>This case exists because the gate `actor has_state 敕令` (the decree state, 敕令) is <b>not covered</b> by the positive test alone - 
      * removing the condition left every assertion green (measured mutation m1, 0 red), which is exactly the
      * "a test that cannot fail" shape this project keeps hunting.
      */
@@ -90,7 +90,7 @@ public class HanyaKitTest {
         f.allyKills();
 
         Assertions.assertEquals(before, remainingWait(f, f.hanya), 1.0,
-                "the ally never received 敕令 (the decree state), so 「持有终结技效果的我方目标消灭敌方目标时」 does not apply");
+                "the ally never received the decree state (敕令), so 「持有终结技效果的我方目标消灭敌方目标时」 does not apply");
     }
 
     /** Eidolon 2: her own Skill raises her speed for a turn. */
@@ -105,7 +105,7 @@ public class HanyaKitTest {
                 "「施放战技后，速度提高20%，持续1回合」");
     }
 
-    /** Eidolon 3 / 5: the level raises, and the talent's base level composes with them (M-32). */
+    /** Eidolon 3 / 5: the level raises, and the talent's base level composes with them. */
     @Test
     public void herEidolonLevelRaisesAreStated() {
         Fixture atThree = new Fixture(3);

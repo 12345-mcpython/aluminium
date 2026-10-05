@@ -33,9 +33,9 @@ import java.util.Random;
  * decided in exactly one place ({@code AbstractBuff.isDebuff()}), the set of classes that answer "yes" is pinned
  * here as a table, and each entry says why in the game's own terms.
  *
- * <p>The interesting entries are the ones that <i>don't</i> follow from where the buff sits: 减伤 (damage reduction)
- * ({@code ReductionBuff}) is a positive effect on the defender, 易伤 (vulnerability) ({@code VulnerabilityBuff}) is a negative
- * one, 嘲讽 (taunt) is negative <b>on its bearer</b>, and a named state's side depends on who applied it - which is why a
+ * <p>The interesting entries are the ones that <i>don't</i> follow from where the buff sits: damage reduction (减伤)
+ * ({@code ReductionBuff}) is a positive effect on the defender, vulnerability (易伤) ({@code VulnerabilityBuff}) is a negative
+ * one, taunt (嘲讽) is negative <b>on its bearer</b>, and a named state's side depends on who applied it - which is why a
  * state answers "no" and says so.
  */
 public class DebuffTest {
@@ -80,7 +80,7 @@ public class DebuffTest {
         Assertions.assertEquals(2, modifiers.size(), "precondition: one debuff and one buff");
         long debuffs = modifiers.stream().filter(AbstractBuff::isDebuff).count();
         Assertions.assertEquals(1, debuffs,
-                "「攻击力 −30%」 is a debuff and 「攻击力 +50%」 is not, both decided by the sign the rule wrote");
+                "「攻击力 -30%」 is a debuff and 「攻击力 +50%」 is not, both decided by the sign the rule wrote");
     }
 
     // ==================================================================

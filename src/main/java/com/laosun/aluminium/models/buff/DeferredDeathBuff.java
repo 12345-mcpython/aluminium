@@ -1,9 +1,9 @@
 package com.laosun.aluminium.models.buff;
 
 /**
- * A state that <b>defers a lethal blow</b> -- "temporarily defer entering the unable-to-fight state, and one can act normally" (2026-10-02).
+ * A state that <b>defers a lethal blow</b> -- "temporarily defer entering the unable-to-fight state, and one can act normally".
  *
- * <p><b>The reader.</b> {@code 140} 遐蝶's warehouse ability "月茧之庇": a lethal blow gives the victim [月茧] instead of killing it,
+ * <p><b>The reader.</b> {@code 140} Castorice (遐蝶)'s warehouse ability "月茧之庇" (Sanctuary of Mooncocoon): a lethal blow gives the victim [月茧] instead of killing it,
  * and the victim then either recovers (the state is removed by a heal or a shield) or falls at its next turn.
  *
  * <p><b>Why a class rather than a field on the state's name.</b> The deferral has to be readable at the moment the

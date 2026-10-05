@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1412 Cerydra, from her own file (2026-09-29, round 205): the 军功 (military merit) mark, the ATTACK share it carries, and the Charge the mark feeds.
+ * 1412 Cerydra (刻律德菈): the Military Merit (军功) mark, the ATTACK share it carries, and the Charge the mark feeds.
  */
 public class CerydraTest {
     private static final int CERYDRA = 1412;
@@ -24,7 +24,7 @@ public class CerydraTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** Note: The mark's own claims: the state on the ally, her +1 Charge, and the ATTACK share = 24% of HER attack (a derived, absolute number). */
+    /** Note: The mark's own claims: the state on the ally, her +1 Charge (充能), and the ATTACK share = 24% of HER attack (a derived, absolute number). */
     @Test
     public void theSkillMarksTheAllyAndSharesHerAttack() {
         Character cerydra = CharacterFactory.create(CERYDRA, LEVEL);

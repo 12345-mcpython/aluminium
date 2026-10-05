@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1505 绯英's skill rider (2026-09-30): "while 绯英 holds [好活当赏], casting the Skill deals 8% Physical Elation damage to the enemy targets that were attacked".
+ * 1505 Evanescia (绯英)'s skill rider: "while 绯英 holds [好活当赏], casting the Skill deals 8% Physical Elation damage to the enemy targets that were attacked".
  *
  * <p>Two-sided on the SAME cast: with the resource her skill costs the enemy extra health, and after spending it the same cast
  * deals strictly less. That is what "while holding [好活当赏]" means, read on real numbers.
@@ -51,9 +51,9 @@ public class Character1505RiderTest {
     }
 
     /**
-     * The shipped numbers and the type, read off the compiled rule (2026-09-30). The behavioural test above only asks
+     * The shipped numbers and the type, read off the compiled rule. The behavioural test above only asks
      * whether holding [好活当赏] adds damage, so a change to `percent` (8 -> 4) or to `damageType` would still satisfy it --
-     * measured: both mutations came back with 0 red before this test existed (discipline 232).
+     * measured: both mutations came back with 0 red without this test (discipline 232).
      */
     @Test
     public void theShippedRiderStatesItsNumberAndType() {

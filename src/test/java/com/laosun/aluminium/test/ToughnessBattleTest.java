@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * P4-2 acceptance: each damage instance reduces toughness by the skill's {@code stance_list}, only a
+ * acceptance: each damage instance reduces toughness by the skill's {@code stance_list}, only a
  * weakness hit reduces it, and emptying it triggers a weakness break.
  *
  * <p>Anchors: Ice Edge 1002011 @group 1 - Lv90 to toughness 60, weak to fire/lightning (neither ice nor

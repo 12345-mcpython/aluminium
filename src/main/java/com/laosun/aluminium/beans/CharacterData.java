@@ -16,12 +16,12 @@ import org.jetbrains.annotations.Nullable;
  * <p>{@code mt} is the path string ({@code protection / destruction / single / all / help /
  * debuff / healing / elation / memory}), and {@code aggro} is the aggro value itself (not a percentage):
  * Preservation 150 / Destruction 125 / others 100 / Hunt-Erudition 5 - checked across the whole data set, matching
- * the official tiers (P5-1).
+ * the official tiers.
  *
  * <p>{@code rarity} (star rating) is 4 or 5 (added before P8-2): in the data 93 characters are 23 4+ 0 5.
  * It is derived by the generator from the last digit of {@code AvatarConfig.Rarity} (shaped like
  * {@code CombatPowerAvatarRarityType5}).
- * P8-2 needs it: the skill level cap differs by star rating (a 4basic attack/skill caps at 10/12 or so,
+ * needs it: the skill level cap differs by star rating (a 4basic attack/skill caps at 10/12 or so,
  * a 5caps higher), so the star rating must be readable before skills are assembled. {@code 0} = missing data.
  */
 public record CharacterData(Translate name, String attribute, String mt, String id, double attack, double defence,

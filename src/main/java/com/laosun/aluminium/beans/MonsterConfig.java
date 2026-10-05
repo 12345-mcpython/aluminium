@@ -23,7 +23,7 @@ import java.util.Map;
  * {@code Constant}, so a loaded instance is never {@code null}.
  *
  * <p>Mechanic fields: {@code debuff_resistance} is wired up in P6-1 (example: Ice Edge (冰锋)
- * {@code {"STAT_CTRL_Frozen": 1}} = fully immune to Frozen). {@code summon_id} (P9-4) is the monster's
+ * {@code {"STAT_CTRL_Frozen": 1}} = fully immune to Frozen). {@code summon_id} is the monster's
  * <b>summon roster</b> - see the note below.
  *
  * <p><b>The summon roster</b> ({@code summon_id} to {@link #summonIds()}): the ids of the monsters this one
