@@ -997,7 +997,10 @@ public final class TriggerInterpreter {
             // The rule's own id travels with the effect: `MODIFY_RULE` can raise a rule's base chance, and the only
             // op that consumes that amendment (APPLY_CONTROL) has to know which rule it is running inside. Passing it
             // down beats a field on the context -- a nested firing would clobber shared state, and this is per-rule.
-            if ("GAIN_RESOURCE".equals(normalizeOp(effect, null))) {
+            // ⭐ BOTH resource-moving ops (2026-10-02): the first version measured only a GAIN, so a SPEND went down the `else` and never set
+            // `previousCredited` at all -- measured: 「每消耗 1% 溢出值…」 read 0 instead of the amount spent.
+            String movingOp = normalizeOp(effect, null);
+            if ("GAIN_RESOURCE".equals(movingOp) || "SPEND_RESOURCE".equals(movingOp)) {
                 // ⭐ 2026-10-02: the amount this effect ACTUALLY credits (after the cap) is what the next effect may
                 // take a share of. Measured from the holder itself, so the cap is included by construction.
                 CanHit holder = resolveTarget(effect, effectCtx);
@@ -1007,7 +1010,10 @@ public final class TriggerInterpreter {
                 applyOne(battle, effect, effectCtx, previousCredited);
                 int creditedAfter = holder.getResources().has(resourceId)
                         ? holder.getResources().value(resourceId) : 0;
-                previousCredited = creditedAfter - creditedBefore;
+                // ⭐ The MAGNITUDE of what the previous effect moved (2026-10-02; reader: 1141517 「每消耗 1% 溢出值…」). A gain arrives positive and a spend
+            // NEGATIVE, and `amount_from_previous` is asked for a size, not a direction -- measured: this is the only place `previousCredited` is set, and `gainResource` is its
+            // only reader, so the sign carried no information anyone used.
+            previousCredited = Math.abs(creditedAfter - creditedBefore);
             } else {
                 applyOne(battle, effect, effectCtx, previousCredited);
             }
