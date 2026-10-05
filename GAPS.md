@@ -36446,3 +36446,26 @@
 >   ⭐ 是**近似** ✗（⭐ 原句是**有条件的** ✓）⇒ ⭐ **不写** ✓。
 >   ⭐ **前置（已具名 ✓）**：⭐ 一个"**这次命令原本瞄准谁**"的概念 ✓（⭐ 有了它 ⭐ `cast_target: "…_else_wave_monster"` ✓ 才等于原句 ✓）。
 > * **实测（本轮）**：⭐ 全量 **0**（--rerun-tasks，**2266** 例 ✓）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
+
+> **2026-10-02 更新（新目标第 1 轮：🎉🎉🎉 **第 93 件出货 ＝ `1415` 忆灵技能 8 第五句成句** ✓✓ —— ⭐ 按 tbgd 的原话形状 ✓）**）**：
+>
+> * ⭐⭐⭐ **tbgd 的原话形状（本轮核心 ✓）**：⭐ `MServant_CyreneServant_00_AmazingBuff_Mydeimos_OnWaveMonster` 监听
+>   ⭐ **`OnWaveMonster`** ✓（⭐ 以及 `OnEnterBattle`／`OnCustomEvent`／`OnListenAllowAction`／`OnListenInsertAbilityFinish` ✓），
+>   ⭐ 跑模板 ⭐ `…_Mydeimos_InsertActionCheck` ✓，⭐ 其谓词是 ⭐ `ByTargetAliveState{ModifierOwnerEntity, Mask_AliveOrRevivable}` ✓；
+>   ⭐ 动作是 ⭐ **`TurnInsertAction{TargetType: ModifierOwnerEntity, SkillIndex: 4, AutoCast: true}`** ✓
+>   ⇒ ⭐⭐ 语义 ＝ ⭐ **"有波次怪物入场 ⇒ 万敌**自己**再行动一次"** ✓，⭐ 而 ⭐ **打谁由技能自己决定** ✓（⭐ 与我们的 `CAST_SKILL` 同形 ✓）。
+> * ✅ **内容（两条 ✓）**：⭐ `memosprite_ode_marks_him_for_the_battle` ✓（⭐ `CAST_SETUP` ＋ ⭐ 那三个条件 ⇒ ⭐ `APPLY_BUFF{<那句的名字>, permanent: true}` ✓ ——
+>   ⭐ 名字**从 `skills.json` 读** ✓，⭐ 不是我起的 ✓）＋ ⭐ `memosprite_ode_restrikes_when_a_wave_monster_enters` ✓
+>   （⭐ `on: WAVE_START` ＋ ⭐ `self has_state <那句的名字>` ⇒ ⭐ `REPLACE_SKILL{SKILL, 11}` ＋ ⭐ `CAST_SKILL{SKILL, target: self}` ✓）。
+> * ✅ **判据（两个用例 ✓）**：⭐ `OdeWaveRestrikeTest` ⇒ ⭐
+>   ⭐ 有印记时：⭐ `wave monsters = 4 ; his SKILL slot 2 -> 11` ✓✓（⭐ 波次怪物入场 ⇒ ⭐ 他再打一次 ✓）；
+>   ⭐ 无印记时：⭐ `without the mark: his SKILL slot 2 -> 2` ✓（⭐ 门控是**那句留下的印记** ✓，⭐ 不是"任何波次" ✓）。
+>   ⭐ **实测变异** ✓：⭐ 删掉"挂印记"那条 ⇒ ⭐ 正例红 ✓。
+> * ⭐⭐ **并纠正了一处理解** ✓：⭐ 英文里 ⭐ *"the target gets defeated"* ✗ **不是**这句的谓词 ✓ —— ⭐ 游戏看的是 ⭐ **万敌自己**还活不活 ✓
+>   （⭐ `ByTargetAliveState{ModifierOwnerEntity}` ✓，⭐ 而且 ⭐ `TurnInsertAction` 的 ⭐ `TargetType` 也是 ⭐ `ModifierOwnerEntity` ✓）
+>   ⇒ ⭐ 所以 ⭐ 那半**不写** ✓（⭐ 已登记 ✓，⭐ 理由从"没有可放的位置"精确成了"游戏看的不是敌人" ✓）。
+> * ⚠⚠ **我脚本的一个真错（记 ✓，⭐ 教训很值 ✓）**：⭐ 第一版变异脚本对 **dict** 形态的文件忘了 ⭐ `d["rules"] = kept` ✗
+>   ⇒ ⭐ **源文件根本没被改动** ✓（⭐ 而它照样打印了 `MUTATION: … 13 -> 12` ✓）⇒ ⭐ 我一度以为"变异不打红 ＝ 判据没判别力" ✗
+>   ⇒ ⭐⭐ **教训：变异脚本要自检** ✓ —— ⭐ 改完之后 ⭐ **grep 一下源文件**（⭐ 我这次加了 ⭐ `source still has the rule: …` 那行才抓到 ✓）。
+> * ⭐ **① 五句现状**：⭐ **五句全部成句** ✓✓（⭐ 第 85／86／87／90 件 ＋ **本轮第 93 件** ✓）。
+> * **实测（本轮）**：⭐ 全量 **0**（--rerun-tasks，**2268** 例 ✓）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
