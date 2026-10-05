@@ -1019,6 +1019,54 @@ public class BuffManager {
         return false;
     }
 
+    /**
+     * Takes off only the buffs <b>this source</b> applied, named by a state or by the attribute a modifier sits on (2026-10-02).
+     *
+     * <p>The source filter is the whole point, and it is not new: `extendBuffsFrom` has filtered by origin since it was written. Reader:
+     * 1415's ode of romance -- the lifetime is 「持续至阿格莱雅退出【至高之姿】状态」 -- where removing by NAME alone also took a pre-existing
+     * `ALL_DAMAGE_TYPE_BOOST` of hers with it (measured: both units went to 0.0 although both held 0.2 before the ode).
+     */
+    /**
+     * Takes off every modifier sitting on <b>this attribute</b>, whoever applied it (2026-10-02). `isNamed` has answered by attribute since
+     * it was written; only the LENGTHENING path could reach that form, so removal had no entrance for it.
+     */
+    public int removeState(AttributeType attribute) {
+        if (attribute == null) {
+            return 0;
+        }
+        int removed = 0;
+        for (AbstractBuff carried : List.copyOf(buffs)) {
+            if (isNamed(carried, null, attribute)) {
+                removeBuff(carried);
+                removed++;
+            }
+        }
+        return removed;
+    }
+
+    public int removeStateFrom(CanHit source, String stateName, AttributeType attribute) {
+        if (source == null || (stateName == null && attribute == null)) {
+            return 0;
+        }
+        int ending = 0;
+        for (AbstractBuff carried : List.copyOf(buffs)) {
+            if (carried.getSource() == source && isNamed(carried, stateName, attribute)) {
+                ending++;
+            }
+        }
+        if (ending > 0 && battle != null && stateName != null) {
+            battle.fireStateEnded(instance, stateName, ending);
+        }
+        int removed = 0;
+        for (AbstractBuff carried : List.copyOf(buffs)) {
+            if (carried.getSource() == source && isNamed(carried, stateName, attribute)) {
+                removeBuff(carried);
+                removed++;
+            }
+        }
+        return removed;
+    }
+
     public int removeState(String state) {
         if (state == null || state.isBlank()) {
             return 0;

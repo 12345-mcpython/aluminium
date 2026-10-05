@@ -662,7 +662,20 @@ public final class TriggerInterpreter {
                 // `buff` is the state's name — the same spelling `has_state` reads and `APPLY_BUFF` writes, so the
                 // three are one vocabulary. ⚠ No count: 「解除…状态」 takes the state off, it does not take N of
                 // them, and an `amount` here would be silently ignored (which is what this op exists to avoid).
-                requireBuff(effect, op, spec);
+                // `buff` (a name) OR `attribute` (what a modifier modifies), and optionally `"kind": "own"` for
+                // "only what THIS rule's owner applied" (2026-10-02) -- the origin filter `EXTEND_BUFF` has always had.
+                if (effect.getAttribute() != null && !effect.getAttribute().isBlank()) {
+                    requireAttribute(effect, op, spec);
+                } else {
+                    requireBuff(effect, op, spec);
+                }
+                if (effect.getKind() != null && !effect.getKind().isBlank()
+                        && !"own".equalsIgnoreCase(effect.getKind().trim())) {
+                    throw new IllegalArgumentException(
+                            "Op " + op + " has \"kind\": \"" + effect.getKind()
+                                    + "\"; the only kind it knows is \"own\" (only what this rule's owner applied)"
+                                    + " (source: " + spec.getSource() + ")");
+                }
                 requireNoDuration(effect, op, spec);
                 requireNoStackArguments(effect, op, spec);
                 if (effect.getAmount() != null) {
@@ -3826,8 +3839,18 @@ public final class TriggerInterpreter {
     }
 
     private static void removeState(EffectSpec effect, TriggerContext ctx) {
+        AttributeType byAttribute = effect.getAttribute() == null || effect.getAttribute().isBlank()
+                ? null
+                : AttributeType.fromString(effect.getAttribute().trim());
+        boolean own = effect.getKind() != null && "own".equalsIgnoreCase(effect.getKind().trim());
         for (CanHit target : resolveTargets(ctx.battle(), effect, ctx)) {
-            target.getBuffManager().removeState(effect.getBuff());
+            if (own) {
+                target.getBuffManager().removeStateFrom(ctx.owner(), effect.getBuff(), byAttribute);
+            } else if (byAttribute == null) {
+                target.getBuffManager().removeState(effect.getBuff());
+            } else {
+                target.getBuffManager().removeState(byAttribute);
+            }
         }
     }
 
