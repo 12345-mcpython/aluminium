@@ -263,7 +263,7 @@
       "id": "true_self_ode_gives_story_when_the_memosprite_arrives",
       "on": "SUMMONED",
       "when": [
-        "actor is_summon",
+        "actor == summon",
         "self has_state 献予「真我」之诗"
       ],
       "do": [
@@ -275,7 +275,7 @@
         }
       ],
       "source": "同上：「…或**德谬歌被召唤时**，使德谬歌获得 1 点【故事】」。",
-      "note": "⭐ 另一个触发。⚠ 下一步才是第四句（该读**召唤物自己**的资源）。"
+      "note": "⭐ 另一个触发。⚠ **2026-10-02 实测**：门从 `actor is_summon` 换成 `actor == summon`——探针在整个判据运行里**只看到一次**【故事】规则被应用（而那一次的 `actor` 是昔涟自己，即终结技那条）⇒ `actor is_summon` 在 `SUMMONED` 上**从未命中**；而 `1413.json` 已有同样的记录。"
     }
   ]
 }
