@@ -821,3 +821,19 @@
 - ⛔ **仍登记**：⭐ 【追忆】达 24 点（⭐ 【往昔的涟漪】下 12 点）可激活终结技并解除自身所有负面效果、上限后可溢出至 27 点 ✓；
   ⭐ 槽位 18 的「战技伤害次数 +3」✓；⭐ 槽位 26 的第一句（⭐ **不同队友**的计数 ✓）与第二句 ✓。
 - ⭐ **进展说明**：⭐ 槽位 26 第一句的前置（⭐ 「⭐ 使昔涟获得 1 点【追忆】 ✗」）**已经落地** ✓ ⇒ ⭐ 剩下的只是"⭐ **哪些队友**给过 ✗"⭐ 这一层去重 ✓。
+
+- ✅ **已出货（新目标第 9 件）：天赋最后一句里可表达的两项**。
+  ⭐ 形状：⭐ 【追忆】 声明 **`overflow: 3`** ✗（⭐ `max: 24` ⇒ ⭐ **可达 27** ✓，⭐ 正合「达到上限后还可最多溢出至27点」✓）；
+  ⭐ 以及一条 `RESOURCE_CHANGED` ✗ 规则（⭐ 实测其 holder **就是规则主人** ✓）⭐ `when: ["self_resource:追忆 >= 24"]` ✗
+  ⭐ `do: [DISPEL{kind: control, target: self}, DISPEL{kind: dot, target: self}]` ✗ ✓。
+  ⭐ 判据 `CyreneRecollectionCapTest`：`max=24 overflow=3` ＋ `after reaching 24, her debuffs read 0` ✓；
+  ⭐ **变异（阈值 24 → 25）⇒ RED**（`debuffs read 2`）✓。
+- ⭐⭐⭐ **三条引擎事实（本轮量到）**：
+  1. ⭐ **`DISPEL{kind: "all"}` 被拒**（⭐ 报错原文：*"names the class 'all', which the documents do not: known classes are control / dot"* ✓）
+     ⇒ ⭐ 所以「**所有**负面效果」⭐ 要**按类别**写 ✓。
+  2. ⭐⭐ **"重复句子守卫"的键是 `事件 ＋ when ＋ op ＋ target`** ✗ —— ⭐ 所以**只有 `kind` 不同的两条规则会被判为"同一句写了两遍"**
+     ⇒ ⭐ 正确写法是**一条规则带两个效果** ✓（⭐ 语义上也确实是一句话 ✓）。
+  3. ⭐ **`overflow` 是资源自身的字段** ✗ ⇒ ⭐ `max: 24` ＋ `overflow: 3` ＝ **27** ✓。
+- ⚠ **一条已出货判据因此移动**：⭐ `CyreneTest.bothWritersFeedRecollectionUpToTwentyFour` ✗ 原本断言 **24**
+  —— ⭐ 它在本条落地**之前是对的、现在错了**（⭐ 数据自己说可溢出至 27 ✓）⇒ ⭐ 已改名为 `…UpToItsStatedOverflow` ✗ 并把期望改为 **27** ✓ ✓。
+- ⛔ **仍登记**：⭐ 「⭐ 处于【往昔的涟漪】状态时…**12 点** ✗」（⭐ 需要该状态，⭐ 套装尚未建模 ✓）⭐ 与 ⭐ 「⭐ **可激活终结技** ✗」本身 ✓。
