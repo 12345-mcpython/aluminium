@@ -35623,3 +35623,16 @@
 >   ⇒ 任何变身都会得到它，于是弄坏了已出货的 `TransformationEndsOnLastCountdownTest`。
 >   ⭐ 改成两条（状态由 `CAST_SETUP` + `from_skill_id == 21` 授予；暴击率由状态把门）⇒ 既有判据重新通过 ✓。
 > * **实测（本轮）**：全量 **0**（2320 例，--rerun-tasks）、`mechanics` **rc 0** ✓、树干净 ✓。
+
+> **2026-10-02 更新（第 100 轮：第 143 件出货 ＝ `1141521`（负世）**第六句** ⇒ **该技能六句全成** ✓✓）**：
+>
+> * ✅ **判据读数**：`with the state he lost 215.3844 of 1435.896 (15% would be 215.3844) ; without it he lost 0.0` ✓✓
+>   ⇒ ⭐ **变异**（`0.15` → `0.10`）⇒ `lost 143.59` ⇒ 红 ✓。
+> * ✅ **实现**：`CONSUME_HP{scale: "target_current_hp", percent: 0.15, target: "self"}`；门是 `COUNTDOWN_TURN` + `actor == countdown` + 状态。
+> * ⭐⭐ **两条引擎事实**：
+>   1. ⚠ **`owner_current_hp` 通过校验但没有实现**：*"Scale 'owner_current_hp' passed validation but has no implementation"*
+>      ⇒ 校验集与实现集不一致（真实瑕疵，已登记）；
+>   2. ⭐ **“消耗者自己的当前生命”就是 `target_current_hp`** —— 它的注释原话是
+>      *"⚠ `target` is the unit being resolved (for CONSUME_HP, the spender)"*。
+> * ⭐ **账：忆灵技能只剩 `17`（生死）一个。**
+> * **实测（本轮）**：全量 **0**（--rerun-tasks）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
