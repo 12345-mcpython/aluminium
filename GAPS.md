@@ -744,3 +744,19 @@
   ⭐ 而 `EXTRA_TURN` 现在会**响亮地拒绝**，⭐ 它的注记说明**同一情形早前已在创世「迷迷」上量到** ✗ ⇒ ⭐ 这是**已知的引擎分歧（忆灵不在行动顺序）** ✓ 登记。
 - ⭐ **槽位 26 现状**：6 条规则（⭐ 打标记 ＋ 终结技给【故事】 ＋ 被召唤时给【故事】 ＋ 3 点消耗与自动施放 ✓）
   ⇒ ⭐ 第三、四句的**机械核心**已落；⭐ 第一句（不同队友计数）、第二句（额外冰伤）、⭐ 以及「额外回合」仍登记 ✓。
+
+- ✅ **已出货（新目标第 5 件）：槽位 26 第四句**完整**落地**，且「额外回合」的**正确读法**被查明：
+  ⭐⭐ 关键在 `Queue.addCombatant` 自己写下的决定：
+  > *"A unit at zero speed has no action value at all (`cycleTime = 10000 / speed`), so there is nothing to schedule — **skipped rather than refused** (2026-10-02). **The game states this** for the two
+  > memosprite whose panel says so — 「小伊卡的速度保持为0…并且不会出现在行动…」 — and **simply never takes a turn**."*
+  ⭐ 而**德谬歌的速度据数据就是 0**（`memosprites/1415.json` 记录游戏行 `SpeedBase: "0"`）
+  ⇒ ⭐⭐ **所以「额外回合」对它不可能是排程意义上的回合** ⇒ ⭐ **「立即获得」的语义是 `INSERT_ACTION`**（⭐ 该 op 的自述：*"makes X act now"* ✓）。
+- ⭐ **落地内容**：`summon_resource:故事 >= 3` ＋ `SPEND_RESOURCE{spendAll}` ＋ **`INSERT_ACTION`** ＋ `CAST_SKILL{skill: SKILL, skill_id: 1}`（⭐ 花与箭的舞曲 = `SkillID 1141501`／忆灵槽位 1 ✓）。
+- ⭐ **判据**：`with 3 points the counter reads 0.0 ; with only 2 it reads 2.0`；
+  ⭐ **变异（换回 `EXTRA_TURN`）⇒ RED**，⭐ 报的正是那句拒绝：*"EXTRA_TURN gives 德谬歌 an extra turn, but it is not in the action order (a memosprite at Speed 0 is skipped…)"* ✓。
+- ⛔ **本轮试过并撤回**：给 `Queue.grantExtraTurn` 加"缺席时先 `addCombatant`" —— ⭐ **它失败了**（`addCombatant` 对速度 0 直接 return ✓），
+  而 ⭐ 失败本身**就是证据**：⭐ 那处跳过是**有意且与游戏一致**的 ✓ ⇒ ⭐ 撤回，⭐ 不留任何引擎改动 ✓。
+- ⚠ **仍登记两条**：
+  1. ⭐ **插入的那次行动是否真的执行了自动施放**，⭐ 判据目前只证到"消耗"（⭐ 独立断言需要行动条的可观测点 ✓）；
+  2. ⭐ **`EXTRA_TURN` 的其它读者**（⭐ 创世的「迷迷」：它的 `EXTRA_TURN` 注记记录了同一测量 ✓）⭐ 若「迷迷」速度也是 0 ⇒ ⭐ 它需要同样的改读 ✓。
+- ⭐ **槽位 26 现状**：6 条规则 ⇒ ⭐ **第三、四句已完整**；⭐ 第一句（不同队友计数）、第二句（额外冰伤）仍登记 ✓。

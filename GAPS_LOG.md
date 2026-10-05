@@ -36030,3 +36030,14 @@
 > * ⛔ **仍登记**：⭐ 「立即获得 1 个额外回合」—— ⭐ `grantExtraTurn` 拒绝**不在行动顺序**的单位，⭐ 而忆灵速度**据数据就是 0**；
 >   ⭐ `EXTRA_TURN` 的注记说同一情形早在创世「迷迷」上量到 ⇒ ⭐ **已知引擎分歧** ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
+
+> **2026-10-02 更新（新目标第 8 轮：✅ 槽位 26 **第四句完整出货**，⭐ 并查明「额外回合」对速度 0 忆灵的正确读法是 `INSERT_ACTION`）**：
+>
+> * ⭐⭐ **关键**：`Queue.addCombatant` 自述速度 0 的单位**没有行动值可排**（`cycleTime = 10000 / speed`）⇒
+>   **"skipped rather than refused"**，⭐ 且**游戏对这些忆灵正是这么说的**（"simply never takes a turn"）；⭐ 德谬歌速度**据数据就是 0**
+>   ⇒ ⭐ **「立即获得」= `INSERT_ACTION`**（"makes X act now"）✓。
+> * ✅ **落地**：`summon_resource:` ＋ `SPEND_RESOURCE{spendAll}` ＋ **`INSERT_ACTION`** ＋ `CAST_SKILL{skill_id: 1}`。
+> * ⭐ **判据**：`0.0 / 2.0`；⭐ **变异（换回 `EXTRA_TURN`）⇒ RED**（⭐ 报的正是那句 "not in the action order" 拒绝 ✓）。
+> * ⛔ **试过并撤回**：给 `grantExtraTurn` 加"先 `addCombatant`" —— ⭐ **失败即证据**（速度 0 被直接 return），⭐ 引擎零改动 ✓。
+> * ⚠ **仍登记**：插入行动是否真的执行了自动施放（⭐ 判据只证到消耗 ✓）；⭐ `EXTRA_TURN` 的其它读者（创世「迷迷」）是否同样需要改读 ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
