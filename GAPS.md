@@ -37236,3 +37236,25 @@
 > * ⭐ **状态**：⭐ 内容**全部回滚** ✓（⭐ 引擎两件保留 ✓），⭐ 全量 **rc 0**（**2292** 例 ✓）、⭐ `mechanics` **rc 0** ✓、⭐ 树干净 ✓ 已推送 ✓。
 >   ⚠ 按纪律 ⭐ **没有判据的引擎能力不计为出货** ✗ ⇒ ⭐ **下一轮先补判据** ✓。
 > * **实测（本轮）**：⭐ 全量 **0**、`mechanics` **rc 0**、树干净 ✓ 已推送 ✓。
+
+> **2026-10-02 更新（新目标第 35 轮：⚠ **本轮没有出货** ✗ —— ⭐ 但两个读数把下一轮的**每一步都钉死了** ✓✓）**）**：
+>
+> * ⭐⭐⭐ **① NPE 的真身（⭐ 一行 ✓，⭐ 而且注释早就写着这件事 ✓）**：⭐ `TriggerInterpreter:2297` ✗ ——
+>   ⭐ `if (effect.getPercent() != null || effect.getPercentFromCastParam() != null) { … } else { magnitude = effect.getAmount(); }` ✓
+>   ⭐ 它上面的注释 ⭐ **已经把整件事讲透了** ✓：
+>   ⭐ *"The share may come from the skill parameter now (2026-10-02), so 'is a share stated' is **NOT** `percent != null` -- asking only that sent a
+>   `percent_from_cast_param` modifier down the flat `amount` arm **and unboxed a null**. A share is `percent` OR `percent_from_cast_param`;
+>   the derived flag above already covers the latter."* ✓
+>   ⇒ ⭐⭐ **同一句注释预告了我这一轮犯的**同一个错 ✗ —— ⭐ 我的新拼法 ⭐ `percent_from_skill_param` ✗ ⭐ 也漏在这个条件外 ✓
+>   ⇒ ⭐⭐ **下一轮：一行修法** ✓（⭐ 把 ⭐ `percent_from_skill_param` ✗ 也放进那个 `if` ✓）。
+> * ⭐⭐⭐ **② `times_from: "hit_count"` 是错的形状** ✗ —— ⭐ 读数：⭐
+>   `[zone_pieces] a cast hitting 1 target dealt 276.6234305862745 ; the same rule hitting 2 targets dealt 276.6234305862745` ✓
+>   ⇒ ⭐⭐ **两次完全相同** ✗ ⇒ ⭐ `hitCount` ✗ 在 ⭐ `DEALING_DAMAGE` 上 ⭐ **每次命中都是 1** ✗
+>   ⇒ ⭐⭐ **所以「每有 1 名目标受到攻击」根本不需要重复** ✗ —— ⭐ 挂在**每次命中**上的规则 ⭐ **本来就会每个被击目标各触发一次** ✓
+>   ⇒ ⭐ 原句只要 ⭐ `DAMAGE`（⭐ **不带** `times` ✓）⭐ 就够了 ✓✓ ⇒ ⭐⭐ **下一轮不要落 `times_from: hit_count`** ✗。
+> * ⭐⭐ **另一个量到的（⭐ 血泪 ✓）**：⭐ `TriggerSpecs.set` ✗ 用的是 ⭐ `getDeclaredField` ✗ ⇒ ⭐ **字段名要写原样的 Java 名** ✗ ——
+>   ⭐ `timesFrom` ✓ ⭐ 而不是 ⭐ `times_from` ✗；⭐ `percentFromSkillParam` ✓ ⭐ 而不是 ⭐ `percent_from_skill_param` ✗ ⇒ ⭐ 我为此白跑两次 ✓。
+> * ⭐ **下一轮（⭐ 三步，⭐ 全部已钉死 ✓）**：⭐ ① ⭐ 重落 ⭐ `percent_from_skill_param` ✓ ＋ ⭐ 补 ⭐ `modifyAttr:2297` 的条件 ✓；
+>   ⭐ ② ⭐ **不要**落 ⭐ `times_from: hit_count` ✗；⭐ ③ ⭐ 判据：⭐ 一条读 ⭐ 他自己终结技的 `#3` 占比 ✓ ＋ ⭐ 一条读 ⭐ "每个被击目标各一次" ✓
+>   （⭐ 一次命中两个目标 ⇒ ⭐ 两笔 ✓，⭐ 而这条**不用新能力** ✓ —— ⭐ 用已有的 ⭐ `DEALING_DAMAGE` ✓）。
+> * **实测（本轮）**：⭐ 全量 **0**（--rerun-tasks，**2292** 例 ✓）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓（⭐ 全部回滚后 ✓）。
