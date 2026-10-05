@@ -2450,3 +2450,10 @@
   2. 改挂 `DAMAGE_SETTLED` + `actor is_summon` + `from_skill_id == 7` ⇒ **仍为 0**；而同一个文件的 `zone_true_damage_rider`
      用 `DAMAGE_SETTLED` + **`actor is_ally`** 是**通的**（已出货且有判据）。
   - ⭐ **下一问**：把门换成 `actor is_ally`，并先量一次 **`from_skill_id` 在 `DAMAGE_SETTLED` 上到底装什么**。
+
+- ⭐⭐ **第 81 轮：两个探针把加成半句的门问题锁定了**（2026-10-02，临时探针已回滚）：
+  在长夜月表上放**两条**探针，同一次运行：
+  - ① `on: DAMAGE_SETTLED` + `actor is_ally` ⇒ 读数 **1** ✓ ⇒ **该事件确实会送到她的表上**（忆灵造成的伤害）；
+  - ② 同一条加上 `from_skill_id == 7` ⇒ **0** ✗；换成**数据行 id** `1141307` ⇒ **仍是 0** ✗。
+  ⭐⭐ **所以 `from_skill_id` 在伤害事件上装的既不是数据槽位、也不是数据行 id** ✗ —— 而这**同时解释了第 80 轮 `DEALING_DAMAGE` 那次失败**（当时也是按 7 做门）。
+  - ⭐ **下一问**：把 `from_skill_id` 在 `DAMAGE_SETTLED` 上**实际装的值**量出来（例如逐个候选值探，或用一条把它记进资源的规则）—— 一旦知道，加成半句就能**精确**落地。
