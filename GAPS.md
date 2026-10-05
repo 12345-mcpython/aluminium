@@ -36385,3 +36385,24 @@
 > * ⭐⭐ **下一轮可直接落地（全部已量 ✓）**：⭐ 选择器 ⭐ **`wave_monsters`** ✓（⭐ 用游戏的词 ✓）＋ ⭐ `Battle.waveMonsters` ✓（⭐ 清空点 = ⭐ `nextWave()` 里 **spawn 之前** ✓）＋
 >   ⭐ 判据场景照 ⭐ `Cone23011Test` ✓：⭐ `Constant.stages().get(310030)` ✓ ＋ ⭐ `new WaveManager(battle, stage)` ✓ ＋ ⭐ `battle.getWaveManager().nextWave()` ✓（⭐ 那是**真**的波次边界 ✓）。
 > * **实测（本轮）**：⭐ 全量 **0**（--rerun-tasks，**2263** 例 ✓）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓（⭐ 回滚后 ✓）。
+
+> **2026-10-02 更新（新目标第 4 轮：🎉🎉🎉 **第 91 件出货 ＝ ② `wave_monsters`（新入场的敌方目标）** ✓✓ —— ⭐ 名字用的是**游戏自己的事件** ✓）**）**：
+>
+> * ✅ **出货内容（引擎三处 ✓）**：
+>   ⭐ `Battle`：⭐ `waveMonsters` ✓ ＋ ⭐ `forgetWaveMonsters()` ✓ ＋ ⭐ `noteWaveMonster(CanHit)` ✓ ＋ ⭐ `waveMonsters()` ✓；
+>   ⭐ `WaveManager`：⭐ `nextWave()` 里 ⭐ **在 `spawnWave` 之前**调用 ⭐ `battle.forgetWaveMonsters()` ✓，⭐ `spawnWave` 里逐个 ⭐ `battle.noteWaveMonster(enemy)` ✓；
+>   ⭐ `TriggerInterpreter`：⭐ 选择器 ⭐ **`wave_monsters`** ✓（⭐ 注册 ＋ 解析 ✓）。
+> * ⭐⭐⭐ **名字来自游戏 ✓**：⭐ `MServant_CyreneServant_00_AmazingBuff_Mydeimos_OnWaveMonster` 监听 ⭐ `"Event": "OnWaveMonster"`
+>   并以 ⭐ `TurnInsertAction` 回应 ✓ ⇒ ⭐「新入场」＝ ⭐ **"有波次怪物入场"** ✓ ⇒ ⭐ 选择器就叫 ⭐ `wave_monsters` ✓。
+> * ✅ **判据（走真波次路径 ✓）**：⭐ `WaveMonstersTest` ⇒ ⭐
+>   `[wave] after wave 1: enemies=4 in the set=4 speeds=[199.6, …]` ✓（⭐ 本波 4 个都在集合里、⭐ 规则够到它们 ✓）；
+>   `[wave] after wave 2: in the set=4 ; any of the first wave still in it = false` ✓✓（⭐ 集合**重新开始** ✓ ＝ ⭐ 清空点正确 ✓）。
+>   ⭐ **实测变异** ✓：⭐ 删掉那行记录 ⇒ ⭐ `in the set=0 speeds=[]` ⇒ 红 ✓。
+> * ⭐⭐ **顺序是承重的 ✓**：⭐ `waveIndex++` ⇒ ⭐ **`forgetWaveMonsters()`** ⇒ ⭐ `spawnWave` ⇒ ⭐ `beginWave` ⇒ ⭐ `WAVE_START` ✓。
+> * ⚠ **本轮我自己的三个坑（记 ✓）**：
+>   ⭐ ① ⭐ **撇号落进单引号 Python 字符串** ✗ ⇒ ⭐ 语法错 ⇒ ⭐ **什么都没应用** ✓，⭐ 而 ⭐ `compileJava` 仍打印 `BUILD SUCCESSFUL` ✓
+>     （⭐ 它跑在**未打补丁**的树上 ✓）⇒ ⭐⭐ **纪律：这批脚本不用撇号** ✓；⭐ 且 ⭐ **不能把 `BUILD SUCCESSFUL` 当"应用成功"** ✗ —— ⭐ 要看装载脚本自己的 `ok` 行 ✓（⭐ 本轮后半我就这么做了 ✓）；
+>   ⭐ ② ⭐ 锚点带错空白 ✗ ⇒ ⭐ 脚本**正确拒绝** ✓ ⇒ ⭐ 改用**单行唯一锚点** ＋ ⭐ 复用锚点自身缩进 ✓；
+>   ⭐ ③ ⭐ 判据里又给 ⭐ `TriggerSpecs` 写了错包名 ✗ ⇒ ⭐ 它在**测试包**里 ✓、⭐ **不需要 import** ✓（⭐ 上一轮刚量到过 ✗）。
+> * ⭐ **① 五支现状**：⭐ **5/5 都已落地** ✓（⭐ 前四支在内容里 ✓；⭐ 第五支的**选择器**本轮出货 ✓，⭐ 而**接进那句**还差一步 —— ⭐ 见下一轮 ✓）。
+> * **实测（本轮）**：⭐ 全量 **0**（--rerun-tasks，**2264** 例 ✓）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。

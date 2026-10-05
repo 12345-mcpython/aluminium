@@ -3022,6 +3022,36 @@ public class Battle {
      * <p>\u26a0 Cleared when an action starts ({@code TURN_START}, which brackets {@code performAction} and its settlement), so
      * "this action" is the action boundary the engine already had -- not a new one.
      */
+    /**
+     * The enemies that ENTERED with the current wave (2026-10-02).
+     *
+     * <p>\u2b50 The word is the game own, and it is an EVENT rather than a target type:
+     * `MServant_CyreneServant_00_AmazingBuff_Mydeimos_OnWaveMonster` listens for `"Event": "OnWaveMonster"` and answers with a
+     * `TurnInsertAction` -- a wave monster has entered. Reader: 1415's memosprite skill 8,
+     * \u300c\u82e5\u65bd\u653e\u524d\u76ee\u6807\u88ab\u6d88\u706d\u5219\u5bf9**\u65b0\u5165\u573a**\u7684\u654c\u65b9\u76ee\u6807\u65bd\u653e\u300d.
+     */
+    private final List<CanHit> waveMonsters = new ArrayList<>();
+
+    /**
+     * Forgets the previous wave's monsters. Called by {@code WaveManager.nextWave} BEFORE the new spawn, because the order measured there
+     * is `waveIndex++` -> `spawnWave` -> `beginWave` -> `WAVE_START`: clearing any later would erase the wave that just arrived.
+     */
+    public void forgetWaveMonsters() {
+        waveMonsters.clear();
+    }
+
+    /** Records an enemy that has just entered with a wave ({@code WaveManager.spawnWave}). */
+    public void noteWaveMonster(CanHit enemy) {
+        if (enemy != null && !waveMonsters.contains(enemy)) {
+            waveMonsters.add(enemy);
+        }
+    }
+
+    /** The enemies that entered with the current wave. */
+    public List<CanHit> waveMonsters() {
+        return List.copyOf(waveMonsters);
+    }
+
     private final List<CanHit> lethallyHitThisAction = new ArrayList<>();
 
     /** The allies a lethal blow has landed on since this action began, in the order it happened. */
