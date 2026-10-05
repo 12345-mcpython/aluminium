@@ -248,3 +248,22 @@
   1. ⭐ **那个测量块只对 `GAIN_RESOURCE` 运行** ⇒ 消耗走 `else`、**从不设置 `previousCredited`**（第一版判据读到 0 就是这个）；
   2. ⭐ **满上限的资源入账为 0**（判据的对照侧因此读到 0）⇒ 造判据时资源要**有余额又有余地**。
 - ⭐ **待办表**：第 2 项已完成 ✓；**剩最后一件引擎小件**（`MODIFY_RULE{effect_percent_from_resource}`）⇒ 然后 `17` 第二句的倍率加成就能落。
+
+- ⛔ **第 108 轮：回滚**（第 15 次）。目标是待办 3（`MODIFY_RULE{effect_percent_from_resource}`）与它服务的句子。
+- ⭐⭐ **能力已写完且编译通过（六处，下一轮可照此重做）**：
+  1. `EffectSpec`：`@SerializedName("effect_percent_from_resource") private String effectPercentFromResource;` + copy；
+  2. `modifyRule`：新增一支 `} else if (effect.getEffectPercentFromResource() != null) {`，内用
+     `resourceAmount(ctx.battle(), owner, id) / 10000.0` 当增量；
+  3. `requireOneAmendment`：候选数组加上它（否则它不算“一个修正”）；
+  4. `MODIFY_RULE` 的**校验链**（`TriggerInterpreter`）：在 `effect_percent` 那一支后插入新支；
+     ⚠ **而不能调 `requireResource`**（它查的是 `resource`，不是这个字段）；
+  5. `TriggerTable.requireAmendable`（**在 `TriggerTable` 里，不是 `TriggerInterpreter`**）：同样加一支，
+     要求被改规则**有 `percent`**；
+  6. `MODIFY_RULE` 的**事件守卫**：放宽到也接受 `SUMMONED`（理由同「整场生效」）。
+- ⛔ **而它服务的链条读数不动**：内容已写（`SUMMONED` + `actor == summon`，三个效果同一条规则：
+  消耗（`overflow_only`）→ 捕获（`amount_from_previous` + `amount_percent: 12`）→ 用它给修正案定大小）。
+  **而两侧读数完全相同**（`3099.8347865249507`）。下一步是**仪表化**：把捕获到的资源值与已立案的修正量打印出来。
+- ⭐⭐ **一条新事实**：`previousCredited` 是**每条规则独立**的（源码自述 “this is per-rule”）⇒
+  **消耗与捕获必须在同一条规则里**。
+- ⭐ 而 `TriggerSpecs.rule(...)`（测试帮手）的重载里**没有给规则命 id 的那个**：一个被 `MODIFY_RULE`
+  引用的规则必须在**同一张表**里有 id ⇒ 隔离判据要么手动构 `TriggerSpec`，要么改用内容文件。
