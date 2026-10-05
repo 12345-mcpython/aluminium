@@ -2531,3 +2531,16 @@
   **插错了位置**，`gainResource` 的梯子多出两个花括号 ⇒ 编译不过；我又**删错了一个**（缺口上移）⇒ 回滚。
   ⭐ **下一次的确切做法**：先把 `gainResource` **整个梯子**（从方法头到方法尾）读出来，**整段重写**—— 就像第 79 轮对份额检查做的那样。
   ⚠ 而这是连续第**4**个无出货的轮次（83、4、87、88）。
+
+- ✅ **已出货（2026-10-02，第 135 件）：`1141524` **第二句成句** ——
+  「长夜月施放战技/终结技后，额外获得 `#2` 点【亿质】」。
+  ⭐ **新能力 `amount_from_resource`**（第三个对称件：取一个资源的**原值**当量）；
+  ⭐ `1413.json`：【亿质】资源 + `#2` 捕获 + `SKILL_CAST`/`ULT_CAST` 两条入账。
+  判据 `TimeOdeMemoryTest`：`is 1 with the ode ; 0 without it`；变异（索引 1 → 0）⇒ `0` ⇒ 红 ✓。
+- ⭐⭐⭐ **三条新事实（第 89 轮）**：
+  1. **`amount_from_resource` 取的是原值** ⇒ **点数不能乘 10000**（与“份额存基点”**相反**）；
+  2. **`ResourceSpec.max` 是必填** ⇒ 数据没给上限时用 **`Integer.MAX_VALUE`**（表示“**不设上限**”），并在 `source` 里写明**为什么不是游戏数值**；
+  3. ⚠ **长夜月自己的 kit 有一条可疑规则**：一条 `DELEGATE_DAMAGE` 挂在**战技槽**上却命名 **ULTRA**，
+     铸她的战技会抛 `DELEGATE_DAMAGE names ULTRA (slot 3) but the cast in progress is slot 2` —— **本条与本轮句子无关**，已单独登记。
+- ⭐ **第 88 轮那次事故的正确做法已验证**：先把 `gainResource` **整个梯子**（L1470–1516）读出来，
+  再把那一行 `} else if (isCastParamScale(effect)) {` **整行换成** `} else if (getAmountFromResource() != null) { … } else if (isCastParamScale(effect)) {` —— 形状平衡，一次编译通过。

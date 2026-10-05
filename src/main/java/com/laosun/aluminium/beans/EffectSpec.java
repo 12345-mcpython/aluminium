@@ -47,6 +47,7 @@ public class EffectSpec {
         copy.amount = this.amount;
         copy.amountFromAttr = amountFromAttr;
         copy.amountPercent = amountPercent;
+        copy.amountFromResource = amountFromResource;
         copy.amountPercentFromResource = amountPercentFromResource;
         copy.percentFromResource = percentFromResource;
         copy.skillParamCid = skillParamCid;
@@ -158,6 +159,15 @@ return copy;
      * The share of {@link #amountFromAttr} to take (0.5 for \u300c50%\u300d). Null means the whole value.
      */
     private Double amountPercent;
+
+    /**
+     * ⭐ An amount that IS a resource's value (2026-10-02).
+     *
+     * <p>Reader: 1415's time ode -- 「长夜月施放战技/终结技后，额外获得 #2 点【亿质】」. #2 lives in the memosprite's own row (unreachable later), so it is captured
+     * into a resource while the ode is cast and handed over by name here.
+     */
+    @com.google.gson.annotations.SerializedName("amount_from_resource")
+    private String amountFromResource;
 
     /**
      * ⭐ The share of an EVENT's magnitude carried in a resource, in basis points (2026-10-02).

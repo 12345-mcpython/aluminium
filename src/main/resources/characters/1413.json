@@ -206,6 +206,60 @@
       ],
       "source": "1415 昔涟 忆灵技能 24：「「长夜」施放忆灵技【迷梦，流失，如露】时造成的伤害提高 #1%」。",
       "note": "⭐ **实测**：`DAMAGE_SETTLED` 是**广播**（不带 `skillId`，所以 `from_skill_id` 在它上是 0），而 `DEALING_DAMAGE` 只送到**攻击者**的表（主人表收不到）。两边都不行 ⇒ 本轮加了条件 `damage_skill_key`（读事件已携带的 `Damage.getSkillKey()`，文档原话：“the loader's slot”）⇒ 在 `DAMAGE_SETTLED` 上精确限定到 7 号。⭐ 而份额用 `percent_from_resource` 读回捕获的基点（捕获那条已出货）。  ⚠ 门换成 `actor is_ally`（2026-10-02）：探针实测过它在 DAMAGE_SETTLED 上会发（读到 1），而 `actor is_summon` 在这里未命中。  ⭐ 目标改成 `attacker`（2026-10-02 实测）：`target: \"summon\"` 在这里**解析不到任何单位**（探针读到 0），而造成这次伤害的 actor **就是那个忆灵** ⇒ 更精确。"
+    },
+    {
+      "id": "time_ode_captures_its_extra_point",
+      "on": "CAST_SETUP",
+      "when": [
+        "target == self",
+        "from_skill_id == 24"
+      ],
+      "do": [
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "岁月之诗的亿质点数",
+          "scale": "cast_skill_param:1",
+          "target": "self"
+        }
+      ],
+      "source": "1415 昔涟 忆灵技能 24 的 `MDF_ExtraPoint`（从能力文件读到）⇒ 它就是 `#2`，而 `#2` 来自技能参数。",
+      "note": "⭐ **不乘 10000**（与份额那些相反）：`#2` 是**点数**，不是小于 1 的份额，而 `amount_from_resource` 取的是**原值**。"
+    },
+    {
+      "id": "time_ode_grants_memory_after_skill",
+      "on": "SKILL_CAST",
+      "when": [
+        "actor == self",
+        "from_skill_id == 2"
+      ],
+      "do": [
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "亿质",
+          "amount_from_resource": "岁月之诗的亿质点数",
+          "target": "self"
+        }
+      ],
+      "source": "1415 昔涟 忆灵技能 24：「长夜月施放战技/终结技后，**额外获得 #2 点【亿质】**」（战技 那半）。",
+      "note": "⭐ 数值路径：施放 24 号时把 `#2` 捕获进 `岁月之诗的亿质点数`，战技/终结技时再用 `amount_from_resource` 取出。"
+    },
+    {
+      "id": "time_ode_grants_memory_after_ult",
+      "on": "ULT_CAST",
+      "when": [
+        "actor == self",
+        "from_skill_id == 3"
+      ],
+      "do": [
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "亿质",
+          "amount_from_resource": "岁月之诗的亿质点数",
+          "target": "self"
+        }
+      ],
+      "source": "1415 昔涟 忆灵技能 24：「长夜月施放战技/终结技后，**额外获得 #2 点【亿质】**」（终结技 那半）。",
+      "note": "⭐ 数值路径：施放 24 号时把 `#2` 捕获进 `岁月之诗的亿质点数`，战技/终结技时再用 `amount_from_resource` 取出。"
     }
   ],
   "resources": [
@@ -213,6 +267,16 @@
       "id": "长夜的迷梦增伤",
       "max": 2147483647,
       "source": "⚠ **不是数据里的名字** —— 它是「献予「岁月」之诗」（数据行 24）的 `#1` 在**施放那一刻被捕获**后存放的地方（基点）。"
+    },
+    {
+      "id": "亿质",
+      "source": "【亿质】本身（TextMap 哈希 14616362604670218887 = 亿质；引擎里是 `ByAvatarBaseType = \"Memory\"`）。⚠ **数据没给上限**：长夜月的能力文件都不引用那个哈希，所以 `max` 用 **`Integer.MAX_VALUE`**（表示**不设上限**），而不是臆造一个游戏数值。",
+      "max": 2147483647
+    },
+    {
+      "id": "岁月之诗的亿质点数",
+      "max": 2147483647,
+      "source": "⚠ **不是数据里的名字** —— 数据行 24 的 `#2`（ParamList 下标 1）在施放那一刻被捕获后存放的地方（基点）。"
     }
   ]
 }
