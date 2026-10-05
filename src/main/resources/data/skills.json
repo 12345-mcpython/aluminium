@@ -48082,7 +48082,7 @@
         "all": 0,
         "spread": 0
       },
-      "element": null,
+      "element": "Ice",
       "sp_base": null,
       "sp_need": null
     },
@@ -48328,7 +48328,7 @@
         "all": 60,
         "spread": 0
       },
-      "element": null,
+      "element": "Ice",
       "sp_base": null,
       "sp_need": null
     }
@@ -48394,7 +48394,7 @@
         "all": 30,
         "spread": 0
       },
-      "element": null,
+      "element": "Ice",
       "sp_base": null,
       "sp_need": null
     },
