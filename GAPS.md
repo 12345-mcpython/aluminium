@@ -914,3 +914,19 @@
 - ⛔ **仍登记（槽位 26 第二句）**：⭐ 「⭐ 额外对敌方随机单体造成 1 次等同于**德谬歌** `#1`(0.3)% 生命上限的冰属性伤害 ✗」
   —— ⭐ 需要两处新引擎件：⭐ **`times_from: "resource:<名字>"`** ✗（⭐ 现在只收 `event_amount`/`hit_count` ✓）
   ⭐ 与 ⭐ **"⭐ 施放者／召唤物的生命上限 ✗"** ⭐ 这一档 scale（⭐ `owner_max_hp` ✗ 读的是规则主人 ✓）。
+
+- ⛔ **新目标第 18 轮：回滚（第 14 次）—— 但槽位 26 第二句的**引擎侧已跑通**，卡点缩到一个数据细节。**
+- ⭐ **本轮做了什么**：为第二句加了两处引擎件（⭐ 都编译通过 ✓）：
+  1. ⭐ **`times_from: "resource:<名字>"`** ✗ —— ⭐ 重复次数读**事件的 actor** ✗ 的该资源（⭐ "⭐ 计数器有几点就多打几次 ✗" ✓）；
+  2. ⭐ **`actor_max_hp`** ✗ —— ⭐ "⭐ **施放者**的生命上限 ✗"（⭐ 而 `owner_max_hp` ✗ 读的是规则主人 ✓）。
+- ⭐⭐ **一条新事实（有意思的坑）**：⭐ 一个新 scale **要在三处同时登记**才会被接受 ——
+  ⭐ ① 共享的已知 scale 集合 ✓；⭐ ② ⭐ `TriggerInterpreter` L494 ✗ 的 `maxHpShare` ✗（⭐ DAMAGE ✗ 自己的白名单 ✓）；⭐ ③ ⭐ `literalBase` ✗ 的 `case` ✗ ✓
+  —— ⭐ 只加前两处时，⭐ 加载器仍报 *"Op DAMAGE has \"scale\": \"actor_max_hp\", which is not a spelling this op knows"* ✗ ✓。
+- ⚠ **卡点（一个数据细节）**：⭐ 判据里 `dragon.skillAt(1)` ✗ **返回 null** ✗
+  ⇒ ⭐ 而【花与箭的舞曲】⭐ 就是**忆灵槽位 1** ✗ ✓ ⇒ ⭐ 所以这句的**触发读不到** ✓。
+  ⭐ `memosprites/1415.json` ✗ 里**明明有** `{"slot": 1, "level": 10}` ✗ ✓，⭐ 而 `SummonFactory` L324-331 ✗ 也逐个 `setSkillAt(row.slot(), …)` ✗ ✓
+  ⇒ ⭐ 最可能的是 ⭐ **槽位 1 就是 `COMMON` ✗ 槽**、⭐ 所以要用 ⭐ `getSkills().get(SkillType.COMMON)` ✗ ⭐ 而不是 `skillAt(1)` ✗ ✓ ——
+  ⭐ **下一轮的第一行**（⭐ 另外：⭐ 改判据时**锚点不要带转义中文**，⭐ 本轮两次因此空转 ✓）。
+- ⛔ **因此本轮全部回滚**（⭐ 两处引擎件 ＋ ⭐ 那条内容规则 ＋ ⭐ 判据 ✓）：⭐ 按纪律"**没有可归因效果的词汇不算出货**" ✓。
+  ⭐ 但**登记已经把落法写到最后一行**：⭐ 引擎件（⭐ 三处 ✓）＋ ⭐ 内容（⭐ `CAST_SETUP` ✗ ＋ ⭐ `actor is_summon` ✗ ＋ ⭐ `from_skill_id == 1` ✗ ⇒ ⭐ `DAMAGE{scale: actor_max_hp, percent: 0.003, element: Ice, times_from: "resource:…", target: random_enemy}` ✗）
+  ⭐ ＋ ⭐ 判据（⭐ 读 `COMMON` ✗ 槽 ✓）。
