@@ -36802,3 +36802,22 @@
 > * ⚠ **我自己的两个坑**：⭐ ① ⭐ python 的 `print` 撞 ⭐ GBK ✗（⭐ 输出里有 `\u2b50` ✓）⇒ ⭐ 脚本在**打补丁之前**就死了 ✓ ⇒ ⭐ 改成**只写不打印** ✓；
 >   ⭐ ② ⭐ 正则配不上 ⭐ `WIRED` 的声明 ✗ ⇒ ⭐ 改用"`WIRED` 之后第一个字符串之前插入" ✓。
 > * **实测（本轮）**：⭐ 全量 **0**（--rerun-tasks，**2280** 例 ✓）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
+
+> **2026-10-02 更新（新目标第 15 轮：⚠ **本轮没有出货** ✗ —— ⭐ 但把最后一件的**病因精确定位到门控** ✓）**）**：
+>
+> * ⭐⭐ **量到的现成件（都在手 ✓）**：⭐ `EffectSpec` **已经有** ⭐ `@SerializedName("skill_id") private Integer skillId` ✓；
+>   ⭐ `CAST_SKILL` 的 ⭐ `requireNoRowArguments` ⭐ **并不拦它** ✓（⭐ 那张单子里没有 `skill_id` ✓）；
+>   ⭐ 忆灵的技能存在 ⭐ `Summon.skillsByDataSlot` ✓（⭐ `skillAt(int)`／⭐ `setSkillAt(int, Skill)` ✓），
+>   ⭐ 而 ⭐ `castSkill` ⭐ 只查 ⭐ `actor.getSkills().get(SkillType.SKILL)` ✗（⭐ 那是**角色**的表 ✓）。
+>   ⇒ ⭐ 我据此写了一条**回退查找** ✓（⭐ `skill == null && effect.getSkillId() != null && actor instanceof Summon` ⇒ ⭐ `from.skillAt(skillId)` ✓），⭐ 编译通过 ✓。
+> * ⛔ **回滚的原因（⭐ 精确 ✓）**：⭐ 那条内容规则 ⭐ **根本没触发** ✗ —— 判据读数 ⭐
+>   `[slotted] the enemy HP 16498.2960225 -> 16498.2960225 ; the step forward gives 冰锋 ; the memosprite slot 1 = 1` ✓
+>   ⇒ ⭐ `skillAt(1)` 解析成功 ✓（⭐ 槽位表是通的 ✓）⭐ **但规则的门没过** ✗ ⇒ ⭐ **病在 ⭐ `from_skill_id == 4`** ✗。
+> * ⭐⭐ **下一轮的第一问（⭐ 已具名 ✓，⭐ 打印一下就知道 ✓）**：⭐ 用 ⭐ `SkillExecutor.execute(reinforced, recipient, …)` ⭐ 施放持有者**槽位 4** 的技能时，
+>   ⭐ `ctx.skillId()`（⭐ 也就是 `from_skill_id` 比的那个值 ✓）到底是 ⭐ **槽位** ✗ 还是 ⭐ **数据行 id** ✗。
+>   ⚠ 我此前在 `cast_skill_param` 那条路上量到它**是槽位** ✓ —— ⚠ 但那次事件是 ⭐ `CAST_SETUP` 且由 ⭐ **忆灵**发起 ✓ ⇒ ⭐ 角色自己施放时可能不同 ✓。
+> * ⭐⚠ **门控的一道缝（⭐ 值得记 ✓）**：⭐ 我一度把条件写成 ⭐ `from_skill_id 4` ✗（⭐ 缺 `==` ✓）⭐ **`mechanics` 没抓到** ✗，⭐ 是判据抓到的 ✓
+>   ⇒ ⭐ 那四个场景 ⭐ **没有加载 8007 的表** ✗ ⇒ ⭐ 一个"**每个已出货角色的表都能装载**"的检查 ✗ 会更有用 ✓（⭐ 登记为建议 ✓）。
+> * ⚠⚠ **我自己的坑（记 ✓）**：⭐ `\u2a0` 那个**残缺转义这一轮又犯了一次** ✗（⭐ 累计三次 ✗）⇒ ⭐ 我已决定 ⭐ **不再把 ⭐／⚠ 这类符号写成转义** ✓，
+>   ⭐ 需要时用 ⭐ 中文或 ASCII ✓。
+> * **实测（本轮）**：⭐ 全量 **0**（--rerun-tasks，**2280** 例 ✓）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓（⭐ 回滚后 ✓）。
