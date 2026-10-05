@@ -117,6 +117,12 @@
         "percent_from_cast_param": 1,
         "permanent": true,
         "target": "self"
+      },
+      {
+        "op": "APPLY_BUFF",
+        "buff": "献予「创世」之诗",
+        "permanent": true,
+        "target": "self"
       }
     ],
     "source": "1415 昔涟 忆灵技能 10 「献予「创世」之诗」（数据槽位 13，SkillID 1141513）：「**对开拓者•记忆施放时，使开拓者•记忆的攻击力提高，提高数值等同于**德谬歌生命上限**的 #1%，同时使其暴击率提高，提高数值等同于**德谬歌暴击率**的 #2%。**该效果对迷迷也生效。**」",
@@ -151,5 +157,35 @@
     ],
     "source": "1415 昔涟 忆灵技能 10 「献予「创世」之诗」（数据槽位 13，SkillID 1141513）：「**对开拓者•记忆施放时，使开拓者•记忆的攻击力提高，提高数值等同于**德谬歌生命上限**的 #1%，同时使其暴击率提高，提高数值等同于**德谬歌暴击率**的 #2%。**该效果对迷迷也生效。**」",
     "note": "「**该效果对迷迷也生效。**」—— ⭐ 它是**独立一句**，所以也是**独立一条规则**：「对迷迷」只在**持有者身边确实有忆灵**时才成立，而检查它的就是 `self_summon_count >= 1`（引擎在目标落空时**自己报出这个门控的名字**）。"
+  },
+  {
+    "id": "memosprite_ode_of_genesis_gives_it_an_extra_turn_after_the_reinforced_basic_attack",
+    "on": "CAST_SETUP",
+    "when": [
+      "self has_state 献予「创世」之诗",
+      "actor == self",
+      "from_skill_id == 4"
+    ],
+    "do": [
+      {
+        "op": "INSERT_ACTION",
+        "target": "attacker"
+      },
+      {
+        "op": "REPLACE_SKILL",
+        "skill": "SKILL",
+        "skill_id": 1,
+        "turns": 1,
+        "target": "attacker"
+      },
+      {
+        "op": "CAST_SKILL",
+        "skill": "SKILL",
+        "skill_id": 1,
+        "target": "attacker"
+      }
+    ],
+    "source": "1415 昔涟 忆灵技能 10 「献予「创世」之诗」（数据槽位 13）：「本场战斗中，**开拓者•记忆施放强化普攻后，德谬歌立即获得 1 个额外回合并自动施放【花与箭的舞曲】」。",
+    "note": "⭐ 三个效果各自对应原句的一部分：「立即获得 1 个额外回合」⇒ `INSERT_ACTION`（**不是** `EXTRA_TURN`：游戏用 `SpeedOverride = 0` 把忆灵的速度钉在 0，它在行动顺序里**没有位置**）；「自动施放【花与箭的舞曲】」⇒ `skill_id = 1`（忆灵自己的**数据槽位**）。 TWO subjects again, and the same trap as `summon_attr:`: the effects are aimed at `attacker` (德谬歌, the unit casting the memosprite skill), NOT at `summon` -- that one resolves the RULE OWNER's memosprite, which for 8007 is 迷迷. Measured: with `summon` the inserted action went to 迷迷."
   }
 ]

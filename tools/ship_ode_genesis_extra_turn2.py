@@ -40,7 +40,7 @@ if any(r.get("id") == RULE_ID for r in rules):
 rules.append({
     "id": RULE_ID,
     "on": "CAST_SETUP",
-    "when": ["self has_state " + ode, "actor == self", "from_skill_id " + str(REINFORCED), "self_summon_count >= 1"],
+    "when": ["self has_state " + ode, "actor == self", "from_skill_id == " + str(REINFORCED), "self_summon_count >= 1"],
     "do": [
         {"op": "INSERT_ACTION", "target": "summon"},
         {"op": "REPLACE_SKILL", "skill": "SKILL", "skill_id": MINUET, "turns": 1, "target": "summon"},
