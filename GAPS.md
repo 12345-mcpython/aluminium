@@ -1730,7 +1730,14 @@
 - ⚠⚠ **这次修复的回归（我的错，已记录）**：第一版规则**漏了 `from_skill_id`**，于是**任何**忆灵的施放都会触发它，而队伍里没有风堇时 `ally_cid:1409` 会**抛异常** ⇒ **22 例红**（全是既有判据）。⭐ 修法有二：① 补上数据自己就有的那道门（该修饰写在 **19 号技能**的 `TaskList` 里）；② 判据要铸 **19 号**。
 - ✅ **已修（2026-10-02，第 63 轮）**：`ally_cid:<cid>` 现在在**复数**解析路径里解析 —— 点名的人不在场时返回**空列表**（与 `lowest_hp_ally` 同一形状：`return lowest == null ? List.of() : List.of(lowest);`），**不再抛异常**。⭐ 判据 `SkyOdeStackTest` 现在读**两侧**：她在场 ⇒ 2 层、旁人 0 层；她**不在场** ⇒ **不抛异常**、且不落到旁人身上。⭐ 变异（改回 `require(...)`）⇒ 第二条断言报 `Unexpected exception thrown: IllegalStateException` ⇒ 红。
 - ⭐⭐ **而数据已经证实了两件事**（`Config/ConfigAbility/Servant/Servant_CyreneServant_00_Ability.json` —— 目标点名的那个文件在 `Config/` 下，**不在** `ExcelOutput/`）：① 游戏用 **`ByCompareCharacterID` ＝ 1409** 点名风堇 —— **这与 `ally_cid:` 是同一件事**，所以那个设计是**源头确认过的**，不是猜的；② `LayerAddWhenStack: 2` —— **层数就是 2**，与原句一致。
-- ⛔「计入小伊卡忆灵技的治疗数值额外提高…等同于本次治疗数值的 `#1%`」：**载体已经找到了，卡在别处**（2026-10-02 实测）：
+- ⛔「计入小伊卡忆灵技的治疗数值额外提高…等同于本次治疗数值的 `#1%`」：**机制已经量清，卡在判据的载体上**（2026-10-02，一次探针取三位）：
+  - ✅ `HEALED` **带量**，且 actor 是**治疗者**；`GAIN_RESOURCE` 已支持 `amount_from_event` × `amount_percent`；
+  - ✅ **修正上一轮的误判**：上一轮读数 0 不是引擎的错 —— **满血单位被治疗时治疗量为 0，根本不会发 `HEALED`**（实测：血量 1047.816 → 1047.816）；受伤后再治疗，记账**会**走到（实测：读数 2）；
+  - ⛔ **而那个 2 是被资源上限截断的**（姬子「充能」上限 3、起始 1）⇒ **它无法区分“份额被读到了”与“份额被忽略了”**；
+  - ⛔ **缺口一**：选择器点不了**别人的忆灵**（「累计治疗数值」属于风堇的小伊卡）；
+  - ⛔ **缺口二**：`characters/1409.json` 是**列表**，装不下 `resources`；
+  - ⛔ **缺口三**：`amount_percent` 只能是字面量，需要 `amount_percent_from_skill_param`（本轮又做了一遍又回滚）。
+  - ⭐ **下一问**：哪个角色声明了**余量足够大**的资源（或：`TriggerTable` 收不收**测试内**声明的资源）—— 没有它，这条判据永远分不出对错。
   - ✅ `HEALED` **带量**（`fireTriggersForAlly(TriggerEvent.HEALED, healer, target, healed)`），且该事件的 **actor 是治疗者** ⇒「风堇…提供治疗」可用 `actor has_state`；
   - ✅ `GAIN_RESOURCE` 已支持 `amount_from_event` × `amount_percent`（字面量）；
   - ⛔ **缺口一**：「累计治疗数值」属于**风堇的小伊卡**，而选择器只能点名**角色**（`ally_cid:`），点不了**别人的忆灵** ⇒ 需要「某角色的忆灵」这样的选择器；
