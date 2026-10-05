@@ -543,3 +543,20 @@
   而 `SummonFactory.servant(master, spec)` 与 `memosprite(master, spec)` 对同一 spec 造出**同一个单位**（同名、`memospriteOf` 都指向它）。
 - ⭐ **于是目标里四件的最终状态**：① ✅ 出货；② ✅ 出货；③ ⏳ **词汇已在**（`damage_is_additional`），卡在自触发守卫与量级来源；
   ④ ✅ **已消除**（不需要）。
+
+- ⛔ **新目标第 6 件（能力 ③）：已回滚**（第 6 次）。而这一轮把它的边界量到了**很窄的一条**。
+- ⭐⭐⭐ **计数探针证明：基础值本来就一样**。在 `DAMAGE` 的份额分支里打印：
+  ```
+  [probe-dmg] attacker=Tribbie maxHp=1152.5976 share=0.12 flat=0.0 victim=冰锋 outcome=138.311712
+  [probe-dmg] attacker=Tribbie maxHp=1152.5976 share=0.12 flat=0.0 victim=冰锋 outcome=138.311712
+  ```
+  ⇒ 结界那一下与本规则加的那一下，**基础值完全相同**（138.311712）⇒ **量级差不在基础值**。
+- ⭐⭐ **也不是血量钳位**：把敌人换成 **25377 血**（`create(MONSTER, 100, 1)`）后，
+  判据里的差值**仍是 35.62**（而结界那一下是 179.81）。
+- ⭐⭐ **`DAMAGE` 的结算分两支**（`TriggerInterpreter` L4971）：**`ordinary: true`** ⇒ `applyDamage(..., NORMAL)`（⭐ 正戏那一支 ✓）；
+  **缺省** ⇒ `applyAdditionalDamage`。而结界那条规则**没有** `ordinary` ⇒ 两支规则**走同一条**。
+  ⇒ 所以 35.62 的差额发生在 **`applyAdditionalDamage` 内部**，而且 ⭐ **35.62 / 138.31 = 0.2575**，与已知的减伤 **0.4358** 又不是一个数。
+- ✅ **守卫有效**：`damage_skill_key == 3` **确实挡住了自触发**（否则 Trigger recursion exceeded 8 levels）。
+- ⭐ **因此槽位 15 的规则仍保留旧形态**（`ATTACK_FINISHED` ＋ 两个状态，绿灯），
+  ⭐ 而**下一步的入口**已经只剩一层：读 `applyAdditionalDamage` 内部，看**规则驱动**的 ADDITIONAL 实例与**技能驱动**的
+  （`ult_zone_additional_damage` 由 `ATTACK_FINISHED` 触发）在哪个乘区上分叉。
