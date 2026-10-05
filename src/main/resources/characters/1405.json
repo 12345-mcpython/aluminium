@@ -80,5 +80,27 @@
       }
     ],
     "note": "「每当那刻夏击中 1 次敌方目标后，为目标添加 **1 个随机属性弱点**，持续 **3 回合**，**优先添加目标尚未拥有的弱点**」—— ⭐ **2026-09-30 转正** ✓：三件都已具备 —— ① 事件 `ALLY_ATTACK` ✓（本文件星魂 1 那条已在用 ✓，注释说「每次施放只发一次」✓）；② `element: \"random_absent\"` ✓（`cacb8b8` ✓：从 `DamageElement.values()` 里挑一个 `!isWeakTo` 的 ✓，⚠ 取不到就**什么都不做** ✓ —— 那正是「优先未拥有」在无候选时的语义 ✓）；③ `turns: 3` ✓（`95ff510` ✓：计时弱点按**目标自己的回合**递减 ✓）。⚠ 而「击中 1 次」用 `ALLY_ATTACK` 表达 ✓：它每次施放只发一次 ✓，⚠ 若文档指的是**每一段**伤害都算，那是另一件事 ✗ —— 本条的登记里原本没有这句，按现有事件取最近的读法 ✓。"
+  },
+  {
+    "id": "memosprite_ode_of_reason_gives_a_point_and_advances_him",
+    "on": "CAST_SETUP",
+    "when": [
+      "target == self",
+      "actor is_summon",
+      "from_skill_id == 18"
+    ],
+    "do": [
+      {
+        "op": "GAIN_SKILL_POINT",
+        "amount": 1
+      },
+      {
+        "op": "ADVANCE",
+        "percent": 1.0,
+        "target": "self"
+      }
+    ],
+    "source": "1415 昔涟 忆灵技能 18 「献予「理性」之诗」（数据槽位 18，SkillID 1141518）：「单次生效，对那刻夏施放时，**为我方恢复 #4 个战技点并使那刻夏立即行动**。」",
+    "note": "⭐ 两半都有**出货拼法**（**实测**）：`GAIN_SKILL_POINT`（读者 1101：`{\"amount\": 1}`）与 `ADVANCE`（读者 1101：`{\"percent\": 1.0, \"target\": \"target\"}`）。⭐ `#4` 在 1141518 的**十行里全是 1**（**实测**）。"
   }
 ]
