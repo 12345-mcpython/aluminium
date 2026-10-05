@@ -35295,3 +35295,16 @@
 >   ⛔ 因此 `1141524` 第一句与 `1141522` 最后一句都需要**同一个能力**：**施放时把数记下来，之后再用**。
 >   ⭐ 而形状已有一半：`GAIN_ENERGY` 已能读 `cast_skill_param:`（第 58 件），`GAIN_RESOURCE` 还不能 ⇒ 最小一步是**把同一条路加给 `GAIN_RESOURCE`**。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
+
+> **2026-10-02 更新（第 73 轮：⚠ **没有出货** ✗ —— ⭐ 引擎改动写对了、编译过了，**但判据挂点没找对** ⇒ 按纪律回滚（第 5 次 ✗ ⚠）；⭐ 而引擎的**拒绝原话**给出了机制的关键 ✓）**：
+>
+> * ⭐⭐ **机制关键句（⭐ 引擎说的 ✓）**：`castParamValue` 要求**演员是忆灵** ——
+>   `the scale "cast_skill_param:0" reads the parameter of the skill that produced the event, but the actor is Hysilens, which is not a memosprite` ✓
+>   ⇒ ⭐ 这正是两句诗需要的时刻（⭐ 德谬歌施放忆灵技 ✓），⭐ 也说明"⭐ 捕获 ✗"**只能在忆灵施放那一刻**发生 ✓。
+> * ⭐ **改动的两处（⭐ 都已按行定位 ✓）**：`GAIN_RESOURCE` 的校验（`requireAmount` 处 ✓）＋ `gainResource` 的量（`amountFromAttr == null` 分支前 ✓），
+>   ⭐ 形状与第 58 件给 `GAIN_ENERGY` 加的**完全一致** ✓ ⇒ ⭐ 编译通过 ✓ ⭐ 只是**判据没证成** ✓。
+> * ⛔ **两次挂点都失败** ✗：① ⭐ 规则放**其他角色**的表（`CAST_SETUP`）⇒ 0 ✓；② ⭐ 放**忆灵主人**的表 ＋ `actor is_summon`（⭐ 已出货奥词的布局 ✓）⇒ **仍是 0，连字面量 5 也是 0** ✓
+>   ⇒ ⭐ 说明规则**根本没被触发**，⭐ 而不是读数为空 ✓。
+> * ⭐ **下一问（⭐ 很具体 ✓）**：⭐ 拿**已出货的 `SkyOdeEnergyTest`** ✗ 做骨架（⭐ 它证明 `CAST_SETUP` ＋ `actor is_summon` ＋ `from_skill_id == 19` 能触发 ✓），
+>   ⭐ 只把 `GAIN_ENERGY` ✗ 换成 `GAIN_RESOURCE` ✗ ＋ `scale: "cast_skill_param:1"` ✗。
+> * **实测（本轮）**：⭐ 回滚后 ⭐ 全量 **0**（--rerun-tasks ✓）、⭐ `mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。

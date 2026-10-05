@@ -2371,3 +2371,13 @@
   模型自数据行 **15**），判据 `OdeToLawChargeTest` 实测 `[ode-to-law] charge after the coup=3 peerage=false`，**0 红** ✓。
 
 ⭐ **顺带量到的数据事实**：数据里 slot **15** 与 **23** 是**同名同诗**的两行（15 是固定 **30%** 的旧行，23 是 `#1%` 的现版本）。
+
+- ⛔ **本轮试过并回滚**（2026-10-02，第 73 轮）：给 `GAIN_RESOURCE` 加 `cast_skill_param:`（两处：校验在 `requireAmount` 处、量在 `gainResource` 的
+  `amountFromAttr == null` 分支前）—— **形状与第 58 件给 `GAIN_ENERGY` 加的完全一致**，代码也编译通过，**只是判据的挂点没找对** ⇒ 按纪律回滚。
+  - ⭐⭐ **而引擎给出了机制的关键句**：`castParamValue` 要求**演员是忆灵** —— 原话：
+    `the scale "cast_skill_param:0" reads the parameter of the skill that produced the event, but the actor is Hysilens, which is not a memosprite`
+    ⇒ 这正是两句诗需要的时刻（德谬歌施放忆灵技），但也说明“捕获”只能发生在忆灵施放那一刻。
+  - ⛔ **判据挂点两次都没触发**：① 规则放在**其他角色**的表上（`CAST_SETUP`）⇒ 读数 0；
+    ② 放在**忆灵主人**的表上加 `actor is_summon`（即已出货奥词的布局）⇒ **仍是 0（连字面量 5 也是 0）**。
+  - ⭐ **下一问（很具体）**：拿**已出货的 `SkyOdeEnergyTest`** 做骨架 —— 它证明 `CAST_SETUP` + `actor is_summon` + `from_skill_id == 19` 是**能触发**的，
+    只把 `GAIN_ENERGY` 换成 `GAIN_RESOURCE`＋`scale: "cast_skill_param:1"`，并把资源声明照那个判据的写法放。
