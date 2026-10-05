@@ -504,3 +504,21 @@
 - ⭐ **因此这一处仍按旧形态保留**（`ATTACK_FINISHED` + 两个状态），
   ⭐ 而**下一步的入口**是：查清"规则在实例事件上产生的伤害，其 `percent_from_skill_param` 解析到哪一行"
   （⭐ 结界那一下是终结技产生的，而触发时**进行中的攻击是缇宝的普攻** —— 这很可能就是 0.1985 的来源）。
+
+- ⛔ **新目标第 4 件（"这个召唤物是哪一个"）：已回滚 —— 而回滚的理由是它"不需要"**（第 4 次回滚）。
+- ⭐⭐⭐ **实测把一件登记项**消除了**：`SummonFactory` 的两条路 `memosprite(master, spec)` 与 `servant(master, spec)` 对遐蝶**造出同一个单位**：
+  ```
+  path=memosprite created=死龙•玻吕刻斯 summons=1 memospriteOf=死龙•玻吕刻斯 createdIsMemospriteOf=true
+  path=servant    created=死龙•玻吕刻斯 summons=1 memospriteOf=死龙•玻吕刻斯 createdIsMemospriteOf=true
+  ```
+  ⇒ 名字相同、场上只有一个召唤物、而 `Battle.memospriteOf(她)` **两次都指向它**。
+- ⭐⭐ **因此**：「召唤**死龙**时」**不需要新词汇** —— 遐蝶只有一种到达（她的忆灵就是死龙），没有"别的召唤物"要排除。
+- ⛔ **而第 111 轮那条解释被推翻**：那次"规则被触发两次、第二次的消耗差为 0"**不是两次到达**
+  （实测 `summons=1`）。⇒ **新问题**：**一条 `SUMMONED` 规则为什么会对**一次**到达触发两次**？
+  ⭐ 已有的线索：`Battle.justSummoned` 是 `List`、`fireSummoned()` 逐个触发、触发后清空
+  ⇒ 所以重复**不在**那里；下一步要查的是"一次 `summonMemosprite` 会 `fireSummoned()` 几次"
+  以及"规则本身是否按目标/效果重入"。
+- ⭐ **本轮新增的条件 `actor_is_memosprite` 也已回滚**：它能编译、也能求值，但**量不出可归因的差别**
+  （两条路都一样）⇒ 按纪律"没有可归因效果的词汇不算出货"。
+- ⭐ **一条可复用的实测**：`Battle.memospriteOf(CanHit)` 的语义是"**这个主人的忆灵**"，
+  而 `SummonFactory.servant(...)` 对同一个 spec 造出来的**也是它** —— 所以该方法是"主人的忆灵"，不是"某种到达"。
