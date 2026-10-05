@@ -1039,6 +1039,8 @@ public class Battle {
         // `performAction` and its settlement), so the lethal set is cleared at it.
         lethallyHitThisAction.clear();
         fireTriggers(TriggerEvent.TURN_START, actor, actor, 0, 0);
+        // ⭐ 「持续至下一个…回合开始时」 ends HERE: the owner's own turn is beginning (2026-10-02).
+        actor.getBuffManager().removeWithLifetime(AbstractBuff.Lifetime.NEXT_TURN_START);
         // P12 (M-49): a countdown exists to HAVE a turn -- this is the moment its reader waits for
         // (「倒计时回合开始时知更鸟退出【协奏】状态并立即行动」). The countdown has no table of its own, and our
         // characters' tables are what subscribe, so the ordinary ally broadcaster is the right one.

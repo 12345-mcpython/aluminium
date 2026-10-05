@@ -36000,3 +36000,12 @@
 > * ⭐ **结论**：⭐ 这句触发只能在"诗已在、之后再发生一次召唤"时观察到 ⇒ **逐条登记**，不写成已出货。
 > * ⭐ **可复用**：`self has_state` 在 `SUMMONED` 上读**规则主人**；而主人自己的那次到达发生在它被标记**之前**。
 > * **实测（本轮）**：判据恢复为出货形态后 全量 **0**（--rerun-tasks）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
+
+> **2026-10-02 更新（新目标第 5 轮：✅ 出货 `until: "next_turn_start"` —— **目标 ③ 的第二半查明并修好**）**：
+>
+> * ⭐⭐ **查明**：引擎原本只有 `next_attack / next_skill / cast_end / next_ultimate / turn_end` ⇒
+>   **「持续至下一个…回合开始时」没有拼法**；⭐ 而【真知】写成 `next_attack` ⇒ ⭐ **授予它的那次施放（本身就是 attack）当场消耗掉它** ✗。
+> * ✅ **修法**：`Lifetime.NEXT_TURN_START` ＋ 拼写 `"next_turn_start"` ＋ 在**主人自己的 `TURN_START`** 消费。
+> * ⭐ **判据**：`after the cast that grants it, 【真知】 is still on him`；⭐ **变异（换回 `next_attack`）⇒ RED**（`【真知】 is gone`）✓。
+> * ⭐ **提醒**：⭐ `next_attack` 用错时**两边都不报错**（`EnemySkill` 注记：`target: summon` ＋ `until: next_attack` "never consumed and simply stayed"）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。

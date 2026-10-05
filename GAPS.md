@@ -698,3 +698,17 @@
 - ⛔ **本轮的处置**：⭐ 判据恢复为上一轮出货的形态（⭐ 那条判据量的是**能力本身** ✓，⭐ 它一直是绿的 ✓），
   ⭐ 而⭐ **不**把"到达"写成已出货 —— ⭐ **逐条登记**：它的门（`self has_state`）与"同一次到达"的时序关系需要**一个能制造第二次召唤的判据**才能量。
 - ⭐ **一条可复用的事实**：⭐ `self has_state …` 在 `SUMMONED` 上读的是**规则主人**（⭐ 与文件注记一致 ✓）；⭐ 而⭐ **规则主人自己的那次到达**发生在它被标记**之前**。
+
+- ✅ **已出货（新目标第 3 件）：`until: "next_turn_start"` —— 目标 ③ 的第二半同时被"查明并修好"**。
+  ⭐⭐ **查明**：引擎的时长集合原本是 `LIFETIMES = {next_attack, next_skill, cast_end, next_ultimate, turn_end}`
+  ⇒ ⭐ **「持续至下一个…回合开始时」根本没有拼法**；⭐ 而槽位 18 的【真知】原话正是
+  「⭐ **持续至下一个那刻夏回合开始时**」⭐ 却写成 `until: next_attack` ✗ ⇒ ⭐ **而授予它的那次施放本身就是 attack**
+  ⇒ ⭐⭐ **状态在它被创建的那一次施放上就被消耗掉了**（实测：变异回 `next_attack` ⇒ *"【真知】 is gone"* ✓）。
+  ⭐ **修法**：`AbstractBuff.Lifetime` 增加 **`NEXT_TURN_START`**、拼写 **`"next_turn_start"`**、
+  并在 **主人自己的 `TURN_START`** 处消费（`Battle` 的 `TURN_START` 触发点旁 ＋ `BuffManager.removeWithLifetime` ✓）。
+  ⭐ 判据 `TrueKnowledgeLifetimeTest`：`after the cast that grants it, 【真知】 is still on him`；
+  ⭐ **变异（换回 `next_attack`）⇒ RED**（`【真知】 is gone`）✓。
+- ⭐ **一条提醒**：`AbstractBuff` 与 `EnemySkill` 的注记里都有 `next_attack` 的坑
+  （⭐ `EnemySkill.java:161`：`target: summon` ＋ `until: next_attack` **"never consumed and simply stayed"** ✓）
+  ⇒ ⭐ 所以这个时长**两边都会出错**，⭐ 用错时不会报错 ✓。
+- ⭐ **审计表的状态**：槽位 18 的「持续至下一个那刻夏回合开始时」⭐ **现已按原话落地**（⭐ 而「战技伤害次数增加 3 次」仍登记 ✓）。

@@ -116,14 +116,14 @@
         {
           "op": "APPLY_BUFF",
           "buff": "真知",
-          "until": "next_attack",
+          "until": "next_turn_start",
           "target": "self"
         },
         {
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
           "percent_from_cast_param": 2,
-          "until": "next_attack",
+          "until": "next_turn_start",
           "target": "allies_of_path:智识"
         },
         {
@@ -135,7 +135,7 @@
         }
       ],
       "source": "1415 昔涟 忆灵技能 18 「献予「理性」之诗」（SkillID 1141518，`SkillCY06`，参数 `[3, 0.2, 0.3, 1]`）：「…**那刻夏在下一次施放普攻、战技时获得【真知】：所有「智识」命途角色攻击力提高 #3%、造成的战技伤害提高 #2%**，持续至下一个那刻夏回合开始时」（#2 = 0.20）。「…所有「智识」命途角色**攻击力提高 #3%**、造成的战技伤害提高 #2%…」（#3 = 0.30）。",
-      "note": "⭐ **两件能精确表达的**：状态本身（`until: next_attack`，已出货的取值）与它的**战技伤害**提高（`damage_type: SKILL`）。⚠ **而“所有「智识」命途角色攻击力提高 #3(30)%”没落**：条件词汇里**没有命途选择器**（实测：`actor`/`ally_count`/`enemy_count`/`self`/`target`/… 里没有一个是命途）—— 它会影响**队伍里的多人**，写成“被指名的那一个”就是近似。已登记。⭐ 而 `Path.ERUDITION`（`Map.entry(\"智识\", ERUDITION)`）**已在**，只差一个能读它的条件。  ⭐ **2026-10-02 实测**：第一版还想用 `MODIFY_ATTR{damage_type: SKILL}` 抬“战技伤害”，而**加载器拒绝**：*“Op MODIFY_ATTR states \\\"damage_type\\\" without \\\"instance\\\": true”*（它只能做**逐次**修正，像 `1406.json` 的 `trace_followup_crit_damage`）。⇒ 本条只落**状态本身**（它正是句子的一个从句）；而它的**两个数值**（智识命途攻击力 #3(30)%、战技伤害 #2(20)%）分别需要**命途选择器**与**“持续地抬某一类伤害”的词汇**，两者都不存在**——登记。  ⭐ **2026-10-02：攻击力那半已落**，用新能力 **`allies_of_path:智识`**（逐个名字的选择器族，同 `ally_cid:` 的形状）。⚠ 而“战技伤害 #2(20)%”**仍登记**：它需要“**持续地**抬高某一类伤害”的词汇（`damage_type` 只能配 `instance: true`，即逐次）。"
+      "note": "⭐ **两件能精确表达的**：状态本身（`until: next_attack`，已出货的取值）与它的**战技伤害**提高（`damage_type: SKILL`）。⚠ **而“所有「智识」命途角色攻击力提高 #3(30)%”没落**：条件词汇里**没有命途选择器**（实测：`actor`/`ally_count`/`enemy_count`/`self`/`target`/… 里没有一个是命途）—— 它会影响**队伍里的多人**，写成“被指名的那一个”就是近似。已登记。⭐ 而 `Path.ERUDITION`（`Map.entry(\"智识\", ERUDITION)`）**已在**，只差一个能读它的条件。  ⭐ **2026-10-02 实测**：第一版还想用 `MODIFY_ATTR{damage_type: SKILL}` 抬“战技伤害”，而**加载器拒绝**：*“Op MODIFY_ATTR states \\\"damage_type\\\" without \\\"instance\\\": true”*（它只能做**逐次**修正，像 `1406.json` 的 `trace_followup_crit_damage`）。⇒ 本条只落**状态本身**（它正是句子的一个从句）；而它的**两个数值**（智识命途攻击力 #3(30)%、战技伤害 #2(20)%）分别需要**命途选择器**与**“持续地抬某一类伤害”的词汇**，两者都不存在**——登记。  ⭐ **2026-10-02：攻击力那半已落**，用新能力 **`allies_of_path:智识`**（逐个名字的选择器族，同 `ally_cid:` 的形状）。⚠ 而“战技伤害 #2(20)%”**仍登记**：它需要“**持续地**抬高某一类伤害”的词汇（`damage_type` 只能配 `instance: true`，即逐次）。  ⭐ **2026-10-02：时长改成 `until: next_turn_start`**—— 原话是「持续至下一个那刻夏回合开始时」，而 `next_attack` 是“他下一次命中攻击”（两者不同）。"
     },
     {
       "id": "true_knowledge_raises_his_skill_damage",
