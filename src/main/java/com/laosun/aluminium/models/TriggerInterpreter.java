@@ -129,6 +129,9 @@ public final class TriggerInterpreter {
             "ADD_ELEMENTAL_WEAKNESS",
             "GAIN_ENERGY", "GAIN_SKILL_POINT", "HEAL", "SHIELD", "EXTRA_TURN", "ADVANCE",
             "GAIN_RESOURCE", "SPEND_RESOURCE", "DAMAGE", "MODIFY_ATTR", "APPLY_BUFF", "REMOVE_STACK",
+            // ⭐ 「【新蕊】可以溢出至 #3%」 (2026-10-02; reader: 1141517 on 遐蝶): a declaration states a resource's overflow,
+            // and `Resource` has had both tiers all along -- this widens the second one in battle.
+            "RAISE_RESOURCE_CAP",
             "MODIFY_DAMAGE_TAKEN", "BOOST_DAMAGE", "DISPEL", "SUMMON", "SUMMON_SERVANT", "COMMAND_SUMMON", "CAST_SKILL", "DELEGATE_DAMAGE",
             "REMOVE_STATE", "TAUNT", "APPLY_CONTROL", "APPLY_DOT", "EXTEND_BUFF", "RESIST_DEBUFF",
             "MODIFY_RULE", "ADD_DAMAGE", "RAISE_SKILL_LEVEL", "START_COUNTDOWN", "ADD_STACK", "APPLY_REGEN", "BOOST_TOUGHNESS", "SUPER_BREAK", "REMOVE_BUFF", "REPLACE_SKILL", "TICK_DOT", "CONSUME_HP");
@@ -416,6 +419,16 @@ public final class TriggerInterpreter {
             case "ADVANCE" -> {
                 requirePercent(effect, op, spec);
                 requireNoStackArguments(effect, op, spec);
+            }
+            case "RAISE_RESOURCE_CAP" -> {
+                // ⭐ A resource the owner DECLARES, and how far to widen its overflow.
+                requireResource(effect, op, spec);
+                if (effect.getAmount() == null || effect.getAmount() <= 0) {
+                    throw new IllegalArgumentException(
+                            "Op " + op + " widens a resource's overflow, so \"amount\" is a positive count of points: got "
+                                    + (effect.getAmount() == null ? "nothing" : effect.getAmount())
+                                    + " (source: " + spec.getSource() + ")");
+                }
             }
             case "GAIN_RESOURCE", "SPEND_RESOURCE" -> {
                 if (Boolean.TRUE.equals(effect.getSpendAll())) {
@@ -1260,6 +1273,7 @@ public final class TriggerInterpreter {
                     battle.queue.advanceActionByPercent(target, effect.getPercent());
                 }
             }
+            case "RAISE_RESOURCE_CAP" -> raiseResourceCap(effect, ctx);
             case "GAIN_RESOURCE" -> {
                 CanHit mover = ctx.owner();
                 String movedId = effect.getResource();
@@ -1473,6 +1487,27 @@ public final class TriggerInterpreter {
             return holder.getResources().value(effect.getAmountPercentFromResource().trim()) / 10000.0;
         }
         return effect.getAmountPercent() == null ? 1 : effect.getAmountPercent();
+    }
+
+    /**
+     * ⭐ Widens a resource's OVERFLOW for its owner (2026-10-02; reader: 1141517 「【新蕊】可以溢出至 #3%」).
+     *
+     * <p>A declaration states one overflow; a sentence can raise it for the battle. The NORMAL cap is untouched -- this is only the second tier, which is what the sentence is about.
+     */
+    private static void raiseResourceCap(EffectSpec effect, TriggerContext ctx) {
+        CanHit holder = resolveTarget(effect, ctx);
+        // \u2b50 A PARTY-scoped resource has no home on the unit (the same fact `gainResource` records) -- \u3010\u65b0\u854a\u3011 is declared `scope: PARTY` -- so the fallback is the
+        // battle-level counter, which is the SAME `Resource` object and therefore carries the settable overflow.
+        com.laosun.aluminium.models.Resource resource = holder.getResources().get(effect.getResource());
+        if (resource == null) {
+            resource = ctx.battle() == null ? null : ctx.battle().partyResource(effect.getResource());
+        }
+        if (resource == null) {
+            throw new IllegalStateException("RAISE_RESOURCE_CAP names the resource '" + effect.getResource()
+                    + "', which this unit neither declares nor has at party level");
+        }
+        int raise = (int) Math.round(effect.getAmount());
+        resource.setMaxOverflow(resource.getMaxOverflow() + raise);
     }
 
     private static void gainResource(EffectSpec effect, TriggerContext ctx,
