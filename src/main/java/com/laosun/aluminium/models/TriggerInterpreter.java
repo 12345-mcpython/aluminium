@@ -3461,7 +3461,9 @@ public final class TriggerInterpreter {
     /** {@code TICK_DOT}: 「立即产生 1 次…伤害」 — one extra instance of the named state, at the stated share. */
     private static void tickDot(Battle battle, EffectSpec effect, TriggerContext ctx) {
         DamageElement element = DamageElement.fromString(effect.getElement());
-        double percent = effect.getPercent();
+        // \u26a0 The share comes from `shareOf`, not from `percent` directly (2026-10-02): a rule may state it as `percent_from_resource`, and unboxing `percent` here
+        // NPEs. `shareOf` is the engine\u2019s own resolver for every share spelling.
+        double percent = shareOf(effect, ctx);
         for (CanHit target : resolveTargets(battle, effect, ctx)) {
             if (target != null && !target.isDeath()) {
                 battle.tickDotStateNow(target, element, percent);
