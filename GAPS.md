@@ -930,3 +930,22 @@
 - ⛔ **因此本轮全部回滚**（⭐ 两处引擎件 ＋ ⭐ 那条内容规则 ＋ ⭐ 判据 ✓）：⭐ 按纪律"**没有可归因效果的词汇不算出货**" ✓。
   ⭐ 但**登记已经把落法写到最后一行**：⭐ 引擎件（⭐ 三处 ✓）＋ ⭐ 内容（⭐ `CAST_SETUP` ✗ ＋ ⭐ `actor is_summon` ✗ ＋ ⭐ `from_skill_id == 1` ✗ ⇒ ⭐ `DAMAGE{scale: actor_max_hp, percent: 0.003, element: Ice, times_from: "resource:…", target: random_enemy}` ✗）
   ⭐ ＋ ⭐ 判据（⭐ 读 `COMMON` ✗ 槽 ✓）。
+
+- ✅ **已出货（新目标第 12 件）：槽位 26 第二句**「⭐ 德谬歌施放【花与箭的舞曲】时额外对敌方随机单体造成 1 次等同于**德谬歌** `#1`(0.3)% 生命上限的冰属性伤害 ✗」
+  ⇒ ⭐ **槽位 26 现在只剩第三句的「被召唤时」时序问题** ✓。
+  ⭐ **两处新引擎件**：
+  1. ⭐ **`times_from: "resource:<名字>"`** ✗ —— ⭐ 重复次数读**事件的 actor** ✗ 的该资源 ✓；
+  2. ⭐ **`actor_max_hp`** ✗ —— ⭐ "⭐ **施放者**的生命上限 ✗"（⭐ 而 `owner_max_hp` ✗ 读的是规则主人 ✓），
+     ⭐ **必须在三处同时登记**：⭐ 已知 scale 集合 ✓ ＋ ⭐ `TriggerInterpreter` L494 ✗ 的 `maxHpShare` ✗ ＋ ⭐ `literalBase` ✗ 的 `case` ✗ ✓。
+  ⭐ **内容**：⭐ `CAST_SETUP` ✗ ＋ `["actor is_summon", "from_skill_id == 1"]` ✗ ⇒
+  ⭐ `DAMAGE{scale: "actor_max_hp", percent: 0.003, element: "Ice", times_from: "resource:忆灵技的额外一击", target: "random_enemy"}` ✗ ✓。
+  ⭐ **判据** `TrueSelfOdeExtraIceTest`：`the dance costs the enemy 469.421555197594 at zero points and 558.6753578962525 at forty` ✓
+  （⭐ 40 点 ≈ 40 × 0.3% × 生命上限 × 减免 ≈ 89 ✓ ⭐ 数字自洽 ✓）；
+  ⭐ **变异（去掉那条规则）⇒ RED**（⭐ 两侧读数**相等** ✓）。
+- ⭐⭐⭐ **一条重要的引擎缺口（本轮量到，已登记）**：⭐
+  **`summonMemosprite` ✗ 走的是 `memospriteWith` ✗，⭐ 而那条路径**不装** spec 的 `skills` ✗** ——
+  ⭐ 实测：⭐ 这样造出来的忆灵 ⭐ `skillsByDataSlot()` ✗ **是空的** ✗ ✓（⭐ 而 ⭐ `summonServant` ✗ 走的 `servantWith` ✗ **装了全部 18 个槽位** ✓，
+  ⭐ 且第 4 轮已证两者造的是**同一个单位** ✓）⇒ ⭐ **要读到忆灵自己的技能，必须走 servant 路径** ✓；
+  ⭐ 而 ⭐ `memospriteWith` ✗ 应当与它**对称** ✓ ⇒ ⭐ **登记为引擎缺口** ✓。
+- ⭐ **另一条事实**：⭐ 忆灵自己的技能**只在 `skillsByDataSlot` ✗ 里**，⭐ **不进** `SkillType.COMMON` ✗ ——
+  ⭐ 实测：⭐ `SkillType.COMMON present = false` ✗ ✓（⭐ 所以 `getSkills().get(COMMON)` ✗ 对它恒为 null ✓）。

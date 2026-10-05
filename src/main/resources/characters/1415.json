@@ -420,6 +420,26 @@
       ],
       "source": "1415 昔涟 天赋 141504：「昔涟在【追忆】达到 24 点时可激活终结技并**解除自身所有负面效果**」。  （本条只管 **control** 类的负面状态。）",
       "note": "⭐ **2026-10-02**：事件用 `RESOURCE_CHANGED` —— 实测它的 holder **就是规则主人**（即昔涟），所以 `self_resource:追忆` 正好读她自己的计数器。⭐ `DISPEL{kind: \"all\"}`：该词汇只能由**显式**的 `kind` 到达（`BuffManager` 的注记）。⛔ 仍登记：**12 点**那一档（需要【往昔的涟漪】状态，套装尚未建模）与「**可激活终结技**」本身。  ⭐ 本条只管 **control** 一类：`DISPEL` 的 `kind` **只收 `control` / `dot`**（实测：`\"all\"` 会被拒）⇒「**所有**负面效果」写成**按类各一条**。  ⭐ 两个类别写在**同一条**里：`DISPEL` 的 `kind` **只收 `control` / `dot`**（实测：`\"all\"` 会被拒），而拆成两条会被**重复句子守卫**判为同一句写了两遍。"
+    },
+    {
+      "id": "true_self_ode_extra_ice_hit",
+      "on": "CAST_SETUP",
+      "when": [
+        "actor is_summon",
+        "from_skill_id == 1"
+      ],
+      "do": [
+        {
+          "op": "DAMAGE",
+          "scale": "actor_max_hp",
+          "percent": 0.003,
+          "element": "Ice",
+          "times_from": "resource:忆灵技的额外一击",
+          "target": "random_enemy"
+        }
+      ],
+      "source": "1415 昔涟 忆灵技能 26 「献予「真我」之诗」（SkillID 1141526，`SkillCY14`，参数 `[0.3, 3]`）：「…德谬歌施放【花与箭的舞曲】时**额外**对敌方随机单体造成 1 次同等于德谬歌 **0.3%生命上限**的冰属性伤害」。",
+      "note": "⭐ **2026-10-02**：数值用 **level-10 行的 `#1` = 0.3%**（槽位 26 的参数表在 level 1 是 `[0.3, 3]`；本库的 `level_convention` 对昔涟系列统一用 Lv10 行）。**两处新引擎件**：① `times_from: \"resource:<名字>\"`（重复次数读**事件的 actor**）；② `actor_max_hp`（“**施放者**的生命上限”；而 `owner_max_hp` 读的是规则主人昔涟）。⭐ 【花与箭的舞曲】= `SkillID 1141501`，即忆灵的 **`COMMON`** 槽（数据槽位 1）。"
     }
   ]
 }
