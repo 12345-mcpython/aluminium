@@ -40,8 +40,7 @@
         "scale": "owner_max_hp",
         "percent": 0.18,
         "element": "Quantum",
-        "target": "all_enemies",
-        "cast_category": "FOLLOW_UP"
+        "target": "all_enemies"
       }
     ],
     "source": "1403 缇宝 天赋 好忙好忙的缇宝 (140304, 全体攻击/Quantum): 「我方其他角色施放终结技后，缇宝发动追加攻击，对敌方全体造成等同于缇宝18.00%生命上限的量子属性伤害。该效果每个角色最多触发1次，缇宝施放终结技时重置我方其他角色可触发次数。…」",
