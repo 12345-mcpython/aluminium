@@ -64,5 +64,24 @@
     ],
     "source": "1409 风堇 战技 彩虹尽头的… (140902): 「召唤忆灵 小伊卡，为除小伊卡以外的我方全体目标回复等同于风堇 8.00% 生命上限+ 160 的生命值。」",
     "note": "「**召唤忆灵 小伊卡**」⇒ `SKILL_CAST` ⇒ **`SUMMON`** ✓（无参数 ✓：忆灵属于召唤者 ✓）；面板在 `resources/memosprites/1409.json` ✓。⚠ 同句的**治疗部分**（我方全体 8% 生命 + 160 ✗、小伊卡自己 10% + 200 ✗）尚未写 ✗ ⇒ 登记 ✓（它需要“除小伊卡以外”的目标词汇 ✗）。"
+  },
+  {
+    "id": "memosprite_ode_of_sky_gives_her_energy",
+    "on": "CAST_SETUP",
+    "when": [
+      "target == self",
+      "actor is_summon",
+      "from_skill_id == 19"
+    ],
+    "do": [
+      {
+        "op": "GAIN_ENERGY",
+        "scale": "cast_skill_param:1",
+        "percent": 1.0,
+        "target": "self"
+      }
+    ],
+    "source": "1415 昔涟 忆灵技能 19 「献予「天空」之诗」（数据槽位 19，SkillID 1141519）：「**对风堇施放时，为风堇恢复 #2 点能量**。」",
+    "note": "⭐ `#2` **随等级变**（**实测**：12 → 33.6）→ 走 `cast_skill_param:1`。⭐ 而 `GAIN_ENERGY` 本来**只收** `amount` 或 `target_max_energy` 的份额（**实测**：`ENERGY_SCALES = Set.of(\"target_max_energy\")`）—— **本轮给它加了第三种拼法**。"
   }
 ]

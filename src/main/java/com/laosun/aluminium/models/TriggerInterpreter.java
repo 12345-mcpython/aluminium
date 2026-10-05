@@ -378,8 +378,14 @@ public final class TriggerInterpreter {
                 requireNoStackArguments(effect, op, spec);
             }
             case "GAIN_ENERGY" -> {
-                requireAmountOrScale(effect, op, spec, ENERGY_SCALES, "max energy");
-                requireNoStackArguments(effect, op, spec);
+                // ⭐ A cast parameter is a third spelling (2026-10-02; reader: 1415's ode of sky, 「为风堇恢复 #2 点能量」, whose
+                // #2 runs 12 -> 33.6). `ENERGY_SCALES` holds only a share of max energy, so the op could not read a number out of the skill that produced it.
+                if (isCastParamScale(effect)) {
+                    requireNoStackArguments(effect, op, spec);
+                } else {
+                    requireAmountOrScale(effect, op, spec, ENERGY_SCALES, "max energy");
+                    requireNoStackArguments(effect, op, spec);
+                }
             }
             case "GAIN_SKILL_POINT" -> {
                 requireAmount(effect, op, spec);
@@ -1400,6 +1406,12 @@ public final class TriggerInterpreter {
      * target made the party-wide reading impossible, and the fix cannot be "pay the resolved unit N times": the amount
      * differs per recipient, so the resolution — not the amount — had to become a list.
      */
+    /** Whether a {@code GAIN_ENERGY} effect takes its amount out of the skill that produced the event. */
+    private static boolean isCastParamScale(EffectSpec effect) {
+        return effect.getScale() != null
+                && effect.getScale().trim().startsWith(TriggerTable.CAST_SKILL_PARAM_PREFIX);
+    }
+
     private static void gainEnergy(Battle battle, EffectSpec effect, TriggerContext ctx) {
         for (CanHit target : resolveTargets(battle, effect, ctx)) {
             gainEnergyFor(battle, effect, ctx, target);
@@ -1416,6 +1428,13 @@ public final class TriggerInterpreter {
         }
         if (effect.getScale() == null || effect.getScale().isBlank()) {
             battle.grantEnergy(target, scaledAmount(effect, ctx));
+            return;
+        }
+        // ⭐ 「为风堇恢复 #2 点能量」 (2026-10-02): an ABSOLUTE amount out of the skill that produced the event. The reader is the same one
+        // `MODIFY_ATTR` uses for `cast_skill_param:`, so the two cannot drift.
+        if (isCastParamScale(effect)) {
+            battle.grantEnergy(target, Math.round(castParamValue(effect, ctx,
+                    effect.getScale().trim().substring(TriggerTable.CAST_SKILL_PARAM_PREFIX.length()))));
             return;
         }
         String scale = effect.getScale().trim();
