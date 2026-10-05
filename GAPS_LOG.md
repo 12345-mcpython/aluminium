@@ -36175,3 +36175,12 @@
 > * ⛔ **只剩两处**：⭐ 槽位 25 的【龙灵】/【同袍】四句；⭐ 槽位 26 的「被召唤时」一半（⭐ 引擎的重复召唤是 no-op ✓）与 12 点档 ✓。
 > * ⭐ **目标 ③ 两项均已查明并落档**：⭐ 0.4184 = 天赋 0.2 ＋ 痕迹 0.2（⭐ 实测 0.2 ✓）；⭐ `until: next_attack` 与「持续至下一个回合开始时」**不同** ⇒ 已出货 `next_turn_start` ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
+
+> **2026-10-02 更新（新目标第 22 轮：✅ 出货槽位 25 第三句；并实测出一条带数字的 `MODIFY_ATTR` 事实）**：
+>
+> * ✅ **形状**：⭐ `CAST_SETUP`（`target == self` ＋ `from_skill_id == 25`）⇒
+>   ⭐ `MODIFY_ATTR{ALL_DAMAGE_TYPE_BOOST, percent: 0.0012, permanent, coexist: true, max_stacks: 1, target: "holder_of:同袍"}` ✓。
+> * ⭐ **判据**：`the bondmate's damage boost reads 0.2 -> 0.20120000000000002`；⭐ **变异（去掉 `coexist`）⇒ RED**（⭐ `0.2 -> 0.0012`）✓。
+> * ⭐⭐ **实测事实**：⭐ **同属性 `MODIFY_ATTR` 默认"替换"** —— ⭐ 不写 `coexist` 时队友的 0.2 **直接变 0.0012** ⇒ ⭐ **要叠加就必须 `coexist: true` ＋ `max_stacks`** ✓。
+> * ⚠ **仍登记**：⭐ 原话的「当…持有…时」是期间性的，⭐ 本条是永久 ⇒ ⭐ 需要"状态在则加成在"的写法；⭐ ＋ 【龙灵】/【同袍】护盾/护盾传递三句 ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
