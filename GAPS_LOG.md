@@ -35979,3 +35979,13 @@
 > * ⭐ **缺的能力**：给召唤物一个资源声明处 ⇒ 一到位，槽位 26 的**第三、四句**可一起落。
 > * ⭐ **确认**：【花与箭的舞曲】= `SkillID 1141501`／槽位 1；`EXTRA_TURN` 与 `CAST_SKILL{skill, skill_id}` 均已出货。
 > * **实测（本轮）**：回滚后 全量 **0**（--rerun-tasks）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
+
+> **2026-10-02 更新（新目标第 3 轮：✅ 出货**召唤物的资源声明处**；槽位 26 拿到规则与条目）**：
+>
+> * ✅ **能力**：`MemospriteSpec` 新增 `resources`（record 组件，`ResourceSpec` 形状）＋ `SummonFactory.declareResources(...)`；
+>   ⭐ 判据 `TrueSelfOdeGivesStoryTest`：`1.0 with the ode and 0.0 without it`；⭐ **变异（去掉登记）⇒ RED**（`0.0 with the ode`）✓。
+> * ⭐⭐ **新事实**：（1）⭐ 加载器要求"规则用到的资源必须在**角色自己**的文件里声明" ⇒ 【故事】在**两处**声明；
+>   （2）⭐ `GAIN_RESOURCE{target: "summon"}` 在无声明处时**既不报错也不生效**。
+> * ✅ **槽位 26**：4 条规则 ＋ 交付条目 ⇒ `11415` 现有 **15** 个槽位。
+> * ⚠ **登记**：⭐ 同句的「被召唤时」触发**没有推动计数器**（⭐ 终结技那条推动了 ✓）；第一、二、四句仍登记。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。

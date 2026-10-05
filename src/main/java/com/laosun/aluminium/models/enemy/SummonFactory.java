@@ -73,6 +73,31 @@ public final class SummonFactory {
         return summon;
     }
 
+    /**
+     * ⭐ Registers the resources a summon's SPEC declares on the summon itself (2026-10-02).
+     *
+     * <p>A resource is only usable where it is declared, and until this existed a summon had nowhere to declare one: `GAIN_RESOURCE{target: "summon"}` was accepted by the loader and then
+     * silently granted nothing (measured -- it is why 1141526's 【故事】 could not land).
+     */
+    private static void declareResources(Summon summon, MemospriteSpec spec) {
+        if (spec.resources() == null) {
+            return;
+        }
+        for (com.laosun.aluminium.beans.ResourceSpec declared : spec.resources()) {
+            if (declared == null || declared.id() == null || declared.id().isBlank()) {
+                throw new IllegalStateException(
+                        "a memosprite spec declares a resource without an id; the id is what a rule names");
+            }
+            if (declared.max() == null) {
+                throw new IllegalStateException("the memosprite resource '" + declared.id()
+                        + "' states no \"max\"; a resource needs a cap (Integer.MAX_VALUE means \"the data states none\")");
+            }
+            summon.getResources().register(declared.id(), declared.max(),
+                    declared.initial() == null ? 0 : declared.initial(),
+                    declared.overflow() == null ? 0 : declared.overflow());
+        }
+    }
+
     private static String displayName(EnemyFactory.Resolved resolved) {
         return resolved.config().name() == null
                 ? "Summon#" + resolved.monsterId()
@@ -247,6 +272,7 @@ public final class SummonFactory {
         AttributeBuilder panel = panelOf(master, spec, resourceValue);
         Summon summon = new Summon(spec.name(), Camp.PLAYER, panel.build());
         summon.setLevel(master.getLevel());
+        declareResources(summon, spec);
         if (spec.aggro() != null) {
             // The servant's own 仇恨 (「ServantID 11413 · 仇恨: 125」). Only stated when a document states it:
             // Battle.aggroOf answers its regular tier for anything left at 0, which is a different claim from
@@ -282,6 +308,7 @@ public final class SummonFactory {
         AttributeBuilder panel = panelOf(master, spec, resourceValue);
         Summon summon = new Summon(spec.name(), Camp.PLAYER, panel.build());
         summon.setLevel(master.getLevel());
+        declareResources(summon, spec);
         if (spec.aggro() != null) {
             // The servant's own 仇恨 (「ServantID 11413 · 仇恨: 125」). Only stated when a document states it:
             // Battle.aggroOf answers its regular tier for anything left at 0, which is a different claim from
