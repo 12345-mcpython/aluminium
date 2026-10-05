@@ -19718,7 +19718,7 @@
 >     （⚠ 本段判据里**用过** `DamageElement.IMAGINARY` ✓ 且**编译通过** ✓ ⇒ ⭐ **所以它确实存在** ✓）。
 > * ⚠ **于是第 48 行的错另有原因** ✗ —— ⭐ **下一轮第一步（一次读，直接看那一行）** ✗：
 >   ⚠ **先把判据重新生成** ✓（`python tools/ship_1211_hp_clause.py` ✓）⇒ ⭐ **然后 `read` 生成出来的
->   `src/test/java/com/laosun/aluminium/test/StateEndedEnergyProbeTest.java` 的第 44–52 行** ✓
+>   `src/test/java/com/laosun/aluminium/test/engine/StateEndedEnergyProbeTest.java` 的第 44–52 行** ✓
 >   ⇒ ⭐ **看第 48 行到底是哪一句** ✗（⚠ 这比继续猜快得多 ✓ —— ⚠ 本段第 **二十三** 次提醒自己：**别猜，读** ✓）
 >     ⇒ ⭐ 拿到那一句后改一处 ⇒ 绿 ⇒ **变异** ⇒ `1211` 的血线半句补齐 ✓。
 > * ⭐ **同时记一条**：⚠ **编译器的行号是"生成后文件"的行号** ✗ ⇒ ⚠ **对着"脚本模板"数行号会数错** ✓
@@ -26969,7 +26969,7 @@
 >     （⚠ 本段判据里**用过** `DamageElement.IMAGINARY` ✓ 且**编译通过** ✓ ⇒ ⭐ **所以它确实存在** ✓）。
 > * ⚠ **于是第 48 行的错另有原因** ✗ —— ⭐ **下一轮第一步（一次读，直接看那一行）** ✗：
 >   ⚠ **先把判据重新生成** ✓（`python tools/ship_1211_hp_clause.py` ✓）⇒ ⭐ **然后 `read` 生成出来的
->   `src/test/java/com/laosun/aluminium/test/StateEndedEnergyProbeTest.java` 的第 44–52 行** ✓
+>   `src/test/java/com/laosun/aluminium/test/engine/StateEndedEnergyProbeTest.java` 的第 44–52 行** ✓
 >   ⇒ ⭐ **看第 48 行到底是哪一句** ✗（⚠ 这比继续猜快得多 ✓ —— ⚠ 本段第 **二十三** 次提醒自己：**别猜，读** ✓）
 >     ⇒ ⭐ 拿到那一句后改一处 ⇒ 绿 ⇒ **变异** ⇒ `1211` 的血线半句补齐 ✓。
 > * ⭐ **同时记一条**：⚠ **编译器的行号是"生成后文件"的行号** ✗ ⇒ ⚠ **对着"脚本模板"数行号会数错** ✓
@@ -33744,7 +33744,7 @@
 > * ⛔ **为什么仍然回滚** ✗：⭐ 判据**写不出来** ✓ —— ⭐ `TriggerTable` 的构造是 ⭐ `TriggerTable(int cid, List<TriggerSpec> specs)` ✓，
 >   ⭐ 要的是 ⭐ **`TriggerSpec` 对象** ✗，⭐ 而我在判据里**没能**构造它 ✗（⭐ `CastSkillTest` 用的 `command(...)` 工厂我 grep 不到定义 ✓），
 >   ⭐ 于是连着两次编译失败 ✓ ⇒ ⭐ 按 ⑤ **不留未判的引擎改动** ⇒ 回滚 ✓（⭐ 树恢复全绿 ✓）。
-> * ⭐⭐ **下一轮第一步（已具名 ✓）**：⭐ 读 ⭐ `src/test/java/com/laosun/aluminium/test/CastSkillTest.java` 里那个 ⭐ **`command(...)` 的定义** ✓
+> * ⭐⭐ **下一轮第一步（已具名 ✓）**：⭐ 读 ⭐ `src/test/java/com/laosun/aluminium/test/trigger/CastSkillTest.java` 里那个 ⭐ **`command(...)` 的定义** ✓
 >   （⭐ 它的返回类型 ＋ 构造方式 ✓），⭐ 照它写判据 ⇒ ⭐ 再落这套改动 ⇒ ⭐ 判据 ＋ 变异 ＋ 闸门 ✓。
 > * ⚠ **又一条我自己的教训（记 ✓）**：⭐ 我**先写判据、后在编译期才发现 API 不对** ✗（⭐ 本轮两次编译错 ✓）
 >   ⇒ ⭐ **写判据之前先确认它要构造/调用的类型** ✓ —— ⭐ 这与本会话反复出现的"没量就写"是同一族 ✓。
