@@ -37461,3 +37461,24 @@
 >   ⭐ slot 03「等待，在所有的过去」✗（⭐ 速度保持 0 ✗、⭐ 生命上限 ＋`#1%` ✗、⭐ 施放技能后持续效果 −1 回合 ✓）、
 >   ⭐ slot 19「献予「天空」之诗」✗（⭐ 层数 ✗、⭐ 治疗加成 ✗、⭐ 消耗层数 ✓）—— ⭐ 都已在文件里读全 ✓。
 > * **实测（本轮）**：⭐ 回滚后 ⭐ 全量 **0**（--rerun-tasks，**2294** 例 ✓）、⭐ `mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
+
+> **2026-10-02 更新（新目标第 46 轮：🎉🎉🎉 **第 116 件出货 ＝ `1415` 忆灵技能 slot 05「你好，世界♪」整句成句** ✓✓）**）**：
+>
+> * ✅ **原话（⭐ 技能表 `SkillDesc` ✓）**：⭐ `1141505` ⭐ 「**德谬歌被召唤时，解除我方全体控制类负面状态。**」✓ —— ⭐ **参数表是空的** ✓（⭐ 这句话一个数字都没有 ✓）。
+> * ✅ **出货内容** ✓：⭐ `characters/1415.json` 新增 ⭐ `summoned_clears_every_control` ✓ ——
+>   ⭐ `on: SUMMONED` ✗ ＋ ⭐ `when: [actor is_summon]` ✓ ⇒ ⭐ `DISPEL{kind: "control", target: "all_allies"}` ✓；
+>   ⭐ 并补 ⭐ `skill_effects.json` 的 ⭐ `11415/5 = Rules` ✓（⭐ 否则整条技能不可交付 ✓）。
+> * ⭐⭐⭐ **上一轮为什么没触发（⭐ 本轮量到的 ✓）**：⭐ `Battle.fireSummoned()` ⭐ **就在 `processRequests()` 里** ✓（⭐ L1346 ✓，⭐ 注释：
+>   ⭐ *"The newly placed summons are on the roster AND in the action bar by now, which is what a rule answering 「被召唤时」 needs"* ✓）
+>   ⭐ 而它发的是 ⭐ `fireTriggers(SUMMONED, **summon**, null, 0, 0)` ✓ ⇒ ⭐ **actor ＝ 被召唤者** ✓
+>   ⇒ ⭐⭐ **而 `characters/1415.json` 里规则的 `self` 是它的**主人** ✗** ⇒ ⭐ 所以 ⭐ `actor == self` ✗ ⭐ **永远不成立** ✗
+>   ⇒ ⭐⭐ **门必须是 `actor is_summon`** ✓（⭐ 已出货词汇 ✓）—— ⭐ 换掉之后，⭐ 一次就绿 ✓。
+> * ✅ **判据 ＋ 实测变异** ✓：⭐ `SummonedClearsControlTest` ⇒ ⭐ `[summoned_clears] control -> false ; dot -> true` ✓✓
+>   ⇒ ⭐ **控制类被解除** ✓ ⭐ **持续伤害类留着** ✓（⭐ 这条判据刻意读**类别** ✓ —— ⭐ 一个"什么都摘掉"的扫法能过前半、⭐ 错在后半 ✓）；
+>   ⭐ **变异** ✓：⭐ 把 `kind` 改成 `"dot"` ✗ ⇒ ⭐ `control -> true ; dot -> false` ⇒ ⭐ **正好镜像** ⇒ 红 ✓。
+> * ⭐ **顺带量到的（⭐ 写进记忆 ✓）**：
+>   ⭐ ① ⭐ `dispel` ✗ op **早就存在** ✓，⭐ 且它的注释**正指着这句话** ✓：⭐ *"A CLASS may be named … 「解除…所有**控制类**负面状态」 (1415's memosprite skill 8)"* ✓；
+>   ⭐ ② ⭐ `DebuffClass = {control, dot}` ✓ ⭐ 而 ⭐ 每个 buff 自己报类别 ✓（⭐ `AbstractBuff.debuffClass()` ✓）；
+>   ⭐ ③ ⭐ `REMOVE_STATE` ✗ **没有**按类别扫的拼法 ✗ ⇒ ⭐ 这类句子要用 ⭐ `DISPEL` ✗；
+>   ⭐ ④ ⭐ 造 DOT 的最小形状 ＝ ⭐ `scale` ＋ ⭐ `percent` ＋ ⭐ `element` ＋ ⭐ `kind: "dot"` ＋ ⭐ `turns` ✓。
+> * **实测（本轮）**：⭐ 全量 **0**（--rerun-tasks，**2295** 例 ✓）、⭐ `mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
