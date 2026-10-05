@@ -712,3 +712,19 @@
   （⭐ `EnemySkill.java:161`：`target: summon` ＋ `until: next_attack` **"never consumed and simply stayed"** ✓）
   ⇒ ⭐ 所以这个时长**两边都会出错**，⭐ 用错时不会报错 ✓。
 - ⭐ **审计表的状态**：槽位 18 的「持续至下一个那刻夏回合开始时」⭐ **现已按原话落地**（⭐ 而「战技伤害次数增加 3 次」仍登记 ✓）。
+
+- ⛔ **新目标第 6 轮：回滚（第 10 次）—— 但槽位 26 第四句的阻碍已定位到一处，且很窄。**
+- ⭐ **本轮做了什么**：为"⭐ 读**召唤物自己**的资源 ✗"加了词汇 **`actor_resource:` / `target_resource:`**（⭐ 复用 `Numeric` ✗ 已有的 `stacksOnActor`/`stacksOnTarget` ✗ 两个标志 ⇒ ⭐ **零新字段** ✓：
+  `selfResourceOf` ✗ 接受三个前缀、两个构造点的标志放宽、变量白名单放行、`value()` ✗ 的资源读取改走**与计数相同的持有者解析** ✓）⇒ ⭐ **编译通过、加载器接受** ✓。
+- ⚠ **但第四句仍然落不下来**，且阻碍已经量清：
+  1. ⭐ 规则挂在 **`RESOURCE_CHANGED`** ✗ 上；⭐ 而那个事件是 `fireResourceChanged` ✗ 以**持有者**为 actor 广播的
+     （`battle.fireTriggers(RESOURCE_CHANGED, holder, holder, 0, delta)` ✗）⇒ ⭐ **持有者是忆灵** ✗，⭐ **而忆灵没有规则表** ✓
+     ⇒ ⭐ 规则**压根没发**（⭐ 实测：带去状态门、⭐ 去状态门，⭐ 两种写法的读数都是 **3.0**，⭐ 即从未消耗 ✓）。
+  2. ⭐ 这与已登记的一条同源：`1413.json` ✗ 的注记说 **`DAMAGE_SETTLED` 只送到攻击者的表、主人表收不到** ✗
+     ⇒ ⭐ **`RESOURCE_CHANGED`** ✗ ⭐ 很可能同样是"⭐ 只到 actor 的表 ✗" ✓。
+  3. ⇒ ⭐ **正确的形状**应当是：⭐ 把 3 点检查**挂在她收得到的触发上**（⭐ `ULT_CAST` ✗ / ⭐ `SUMMONED` ✗ ✓）
+     ⭐ 并读 **"⭐ 主人的召唤物 ✗"** 的资源 ⇒ ⭐ 那需要一个 **`summon_resource:<id>`** ✗ 形式（⭐ 在我这次的 `actor_/target_resource:` ✗ 之上再加一向 ✓）。
+     ⚠ 而顺序也要照顾（⭐ 102 轮的教训：⭐ 计数的规则必须排在增益之后 ✓）。
+- ⛔ **因此本轮回滚**：`true_self_ode_spends_three_story` 规则、`actor_resource:`/`target_resource:` 两个前缀、
+  以及那条判据（⭐ 按项目纪律：**没有可归因效果的词汇不算出货** ✓）。
+  ⭐ **而阻碍被写成两条可执行的话**：⭐ （a）⭐ `RESOURCE_CHANGED` ✗ 的投递范围要**探针证实**；⭐ （b）⭐ 需要一个 ⭐ `summon_resource:` ✗。
