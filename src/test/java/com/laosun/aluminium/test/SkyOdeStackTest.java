@@ -41,9 +41,10 @@ public class SkyOdeStackTest {
         var demiurge = battle.summonServant(cyrene);
         battle.processRequests();
         Assertions.assertNotNull(demiurge, "precondition: the memosprite is out");
-        Assertions.assertNotNull(demiurge.skillAt(1), "precondition: slot 1 exists");
+        var ode = demiurge.skillAt(19);
+        Assertions.assertNotNull(ode, "precondition: the memosprite carries slot 19 -- the skill the sentence belongs to");
 
-        SkillExecutor.execute(battle, demiurge.skillAt(1), demiurge, List.of(battle.enemies.getFirst()));
+        SkillExecutor.execute(battle, ode, demiurge, List.of(hyacine));
         battle.processRequests();
 
         int named = hyacine.getBuffManager().stacksOf(MARK);
