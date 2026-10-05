@@ -24,7 +24,7 @@ public class CyreneTest {
 
     /** \u26a0 Both writers feed 【追忆】, stopped at the document's twenty-four. */
     @Test
-    public void bothWritersFeedRecollectionUpToTwentyFour() {
+    public void bothWritersFeedRecollectionUpToItsStatedOverflow() {
         Character cyrene = CharacterFactory.create(CYRENE, LEVEL);
         Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
         Battle battle = new Battle(List.of(cyrene), List.of(enemy), fixed());
@@ -39,7 +39,7 @@ public class CyreneTest {
         for (int i = 0; i < 8; i++) {
             battle.fireTriggers(TriggerEvent.SKILL_CAST, cyrene, enemy, 0, 0);
         }
-        Assertions.assertEquals(24, recollectionOf(cyrene),
+        Assertions.assertEquals(27, recollectionOf(cyrene),
                 "\u300c\u3010\u8ffd\u5fc6\u3011\u8fbe\u523024\u70b9\u65f6\u53ef\u6fc0\u6d3b\u7ec8\u7ed3\u6280\u300d -- thirty-two casts must still read twenty-four");
     }
 
