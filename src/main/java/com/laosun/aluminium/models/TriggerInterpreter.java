@@ -2294,7 +2294,10 @@ public final class TriggerInterpreter {
         // asking only that sent a `percent_from_cast_param` modifier down the flat `amount` arm and unboxed a null. A share is
         // `percent` OR `percent_from_cast_param`; the derived flag above already covers the latter.
         double magnitude;
-        if (effect.getPercent() != null || effect.getPercentFromCastParam() != null) {
+        // ⚠⚠ `percent_from_skill_param` is the THIRD way to state a share (2026-10-02), and this is the very condition the comment above warns
+        // about: a share spelling left out of it sends the effect down the flat `amount` arm and unboxes a null. Measured: that is exactly what happened.
+        if (effect.getPercent() != null || effect.getPercentFromCastParam() != null
+                || effect.getPercentFromSkillParam() != null) {
             magnitude = derived ? derivedMagnitude(effect, ctx) : effect.getPercent();
         } else {
             magnitude = effect.getAmount();
@@ -2629,7 +2632,9 @@ public final class TriggerInterpreter {
                     "MODIFY_ATTR derives its value from " + source + ", which " + owner.getName()
                             + " has no resolved value for; the rule's \"scale\" cannot be read");
         }
-        return effect.getPercent() * value.get() + (effect.getAmount() == null ? 0 : effect.getAmount());
+        // ⚠ `shareOf`, not `effect.getPercent()` (2026-10-02): the share may also come from one of the owner's own skills, and reading the raw field
+        // NPEs on a rule that states it that way. Every other branch of this method already goes through `shareOf`; this line was the one left behind.
+        return shareOf(effect, ctx) * value.get() + (effect.getAmount() == null ? 0 : effect.getAmount());
     }
 
     /**
