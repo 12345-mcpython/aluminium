@@ -36509,3 +36509,25 @@
 > * ⭐ **下一轮（已具名 ✓）**：⭐ 从 ⭐「**忆灵属性作 scale**」✗ 开始 —— ⭐ 它会同时解开 ⭐ `1141513` 的第一半 ✓
 >   （⭐ 其形状已有兄弟可比：⭐ `owner_max_hp` ✓ ⇒ ⭐ 只需一个"**召唤者的忆灵**"前缀 ✓）。
 > * **实测（本轮）**：⭐ 全量 **0**（--rerun-tasks，**2270** 例 ✓）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
+
+> **2026-10-02 更新（新目标第 2 轮：⭐ **`summon_attr:` 的设计与三处落点全部量清** ✓ —— ⚠ 但落地被**锚点歧义**挡下 ✗ ⇒ 按 ⑤ 回滚 ✓）**）**：
+>
+> * ⭐⭐ **要解决什么** ✓：⭐ `1141513` 献予「创世」之诗 的原话是 ⭐ *「使开拓者•记忆的攻击力提高，提高数值等同于**德谬歌生命上限**的 `#1%`，
+>   同时使其暴击率提高，提高数值等同于**德谬歌暴击率**的 `#2%`」* ✓ ⇒ ⭐ 它要的是 ⭐ **忆灵自己的属性** ✗，⭐ 而现有 scale 族（⭐ `self_attr:`／⭐ `owner_max_hp`／
+>   ⭐ `owner_attack`／⭐ `owner_def` ✓）⭐ 说的都是 ⭐ **规则持有者自己**的 ✓ ⇒ ⭐ 说不了这一句 ✓。
+> * ⭐⭐⭐ **三处落点（已量清 ✓，⭐ 全部是加法 ✓）**：
+>   ⭐ ① ⭐ `TriggerTable`：⭐ 紧挨 ⭐ **`static final String SELF_ATTR_PREFIX = "self_attr:";`** ✓ 加一个同族常量 ⭐ `SUMMON_ATTR_PREFIX = "summon_attr:"` ✓
+>     ⚠ 注意 ⭐ 它是**包级可见** ✗（⭐ 没有 `public` ✓ —— ⭐ 我第一版正则写了 `public` ⇒ ⭐ 配不上 ✓）；
+>   ⭐ ② ⭐ **装载期**：⭐ 加在 ⭐ **`requireDerivedScale`** ✓ 里、⭐ 锚点 ⭐ `String scale = effect.getScale().trim();` ✓ 之后 ✓
+>     —— ⭐⭐ **不能加在** `scaleAttribute` 里 ✗：⭐ 那个函数被 ⭐ **DAMAGE** 路径也用了 ✓（⭐ 那里的主体是**攻击者** ✗）⇒ ⭐ 教会它这个拼法会让**伤害**静默地读错单位 ✗；
+>   ⭐ ③ ⭐ **运行期**：⭐ 加在 ⭐ **`derivedMagnitude`**（L2332 ✓）的属性分支**之前** ✓ —— ⭐ 照 ⭐ `cast_energy_spent`／⭐ `event_amount`／⭐ `party_resource:` 的先例 ✓，
+>     ⭐ 用 ⭐ `Battle.summonOf(owner)` ✓（⭐ `summon` 选择器用的同一个口 ✓）⭐ 并在没有忆灵时 ⭐ **响亮报错** ✓（⭐ "a share of a unit that is not there is not a number" ✓）。
+> * ⚠ **本轮为什么回滚（✗ 两个我自己的坑 ✓）**：
+>   ⭐ ① ⭐ 我把装载期那段插进了 ⭐ **一处文档注释** ✗ —— ⭐ 锚点行 ⭐ `// The spelling and (for the attribute family) the name; …` ⭐ **出现了两次** ✗
+>     （⭐ 一次在 `scaleAttribute` 体内 ✓、⭐ 一次在 DAMAGE 路径附近那段 javadoc 里 ✓）⇒ ⭐ 代码落进注释 ⇒ ⭐ `TriggerInterpreter.java:2419 非法的表达式开始` ✗；
+>   ⭐ ② ⭐ 修正脚本 ⭐ **先删后插** ✗，⭐ 而插入前的唯一性检查**失败** ⇒ ⭐ 它在**写回之前**就 `sys.exit` 了 ✗ ⇒ ⭐ 于是文件停在"删了没插"的坏状态 ✓
+>     ⇒ ⭐ 我按 ⑤ ⭐ `git checkout` 两个文件 ✓ ⇒ ⭐ 树恢复全绿 ✓。
+> * ⭐⭐ **下一轮一次落地（全部已具名 ✓）**：⭐ 锚点用 ⭐ `String scale = effect.getScale().trim();` ⭐（⭐ 先**断言它唯一** ✓，⭐ 我这次量到它有 **2** 处 ✗ ⇒
+>   ⭐ 要带上**足够的上文**（⭐ 例如连同前一行 `if (scale.startsWith(TriggerTable.SELF_STACKS_PREFIX)` 一起 ✓）⭐ 或 ⭐ 改用 ⭐ `requireDerivedScale` 的**方法头**作锚 ✓）；
+>   ⭐ 且 ⭐ **修改脚本必须先确认所有锚点都唯一，再动笔写文件** ✓（⭐ 先收集、⭐ 后写入 ✓）。
+> * **实测（本轮）**：⭐ 全量 **0**（--rerun-tasks，**2270** 例 ✓）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓（⭐ 回滚后 ✓）。
