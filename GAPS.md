@@ -37436,3 +37436,28 @@
 >   ⇒ ⭐ 下一轮的路只有两条 ✓：⭐ ① ⭐ 让"⭐ 是追加攻击 ✗"由 ⭐ **规则 id** ✗ 表达（⭐ 需要"⭐ 这次事件由哪条规则引起 ✗"的读法 ✓，⭐ 引擎没有 ✓）；
 >   ⭐ ② ⭐ 或 ⭐ 把它登记为**模型边界** ✓（⭐ 原句两半里 ⭐ 「⭐ 触发结界的附加伤害 ✗」那半已出货 ✓）。
 > * **实测（本轮）**：⭐ 全量 **0**（--rerun-tasks，**2294** 例 ✓ —— 少的那一例是 ⭐ 被撤回的 `DamageIsFollowUpTest` ✓）、⭐ `mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
+
+> **2026-10-02 更新（新目标第 45 轮：⚠ **本轮没有出货** ✗ —— ⭐ 但换了技能（⭐ slot 05 ✓），⭐ 而且发现 `dispel` op **早就在那儿** ✓）**）**：
+>
+> * ⭐⭐⭐ **本轮的四条实测（⭐ 决定了 slot 05 怎么落 ✓）**：
+>   ⭐ ① ⭐ `TriggerEvent.SUMMONED` ✓ ⭐ 由 ⭐ `Battle.fireSummoned()` ✗ 发出：⭐ `fireTriggers(SUMMONED, **summon**, null, 0, 0)` ✓
+>     ⇒ ⭐ **actor ＝ 被召唤者** ✓ ⭐ 所以门 ⭐ `actor == self` ✗ 是对的 ✓；
+>   ⭐ ② ⭐ 引擎里**早就有** ⭐ `dispel` ✗ op ✓，⭐ 而它的注释**正指着这句话** ✓：⭐
+>     *"⭐ A CLASS may be named (2026-10-02): 「解除…所有**控制类**负面状态」 (**1415's memosprite skill 8**). With a class and no amount it means
+>     **ALL** of that class —— 「所有」 spells no count"* ✓✓；
+>   ⭐ ③ ⭐ `DebuffClass = {control, dot}` ✓ ⭐ 且 ⭐ **每个 buff 自己报类别** ✓（⭐ `AbstractBuff.debuffClass()` ✓ ——
+>     ⭐ *"a control written tomorrow is covered by a resistance written today"* ✓）；
+>   ⭐ ④ ⭐ `REMOVE_STATE` ✗ ⭐ **没有**按类别扫的拼法 ✗（⭐ 只收 ⭐ `buff` ✗／⭐ `attribute` ✗／⭐ `kind: "own"` ✗ ✓）
+>     ⇒ ⭐⭐ **所以"控制类整批解除"要用 ⭐ `DISPEL` ✗，⭐ 不是 `REMOVE_STATE` ✗** ✓ —— ⭐ 我一开始找错了 op ✗。
+> * ⭐⭐ **写出来又回滚的（⭐ 诚实 ✓）**：⭐ `1415.json` 一条 ⭐ `on: SUMMONED` ✗ ＋ ⭐ `when: [actor == self]` ✗ ⇒
+>   ⭐ `DISPEL{kind: "control", target: "all_allies"}` ✓ ＋ ⭐ 交付条目 ⭐ `11415/5 = Rules` ✓ ＋ ⭐ 判据（⭐ 控制类走／⭐ 持续伤害类留 ✓）。
+>   ⚠ **读数**：⭐ `[summoned_clears] control true -> true ; dot true -> true` ✗ ⇒ ⭐ **规则没有触发** ✗
+>   （⭐ 而 ⭐ **加载是成功的** ✓ ⇒ ⭐ op 名与形状都对 ✓）
+>   ⇒ ⭐⭐ **下一轮第一问**：⭐ **谁调 `fireSummoned()`** ✗ —— ⭐ 它大概是**结算／回合推进**时调 ✓，⭐ 而 ⭐ `summonServant` ✗ ⭐ 只把新来者**入队** ✓
+>     ⇒ ⭐ 判据的场景必须**真的跑到那一步** ✓（⭐ 而不是只调 `summonServant` ＋ `processRequests` ✓）。
+> * ⭐ **顺带（⭐ 白跑两次换来的 ✓）**：⭐ 造一个 DOT 的最小形状 ＝ ⭐ `scale` ✗ ＋ ⭐ `percent` ✗ ＋ ⭐ `element` ✗ ＋ ⭐ `kind: "dot"` ✗ ＋ ⭐ `turns` ✓
+>   （⭐ `APPLY_DOT` 会依次索要 ⭐ element ✗ ⭐ 和 ⭐ magnitude ✗ ✓）。
+> * ⭐ **下一条技能（⭐ 备选已看好 ✓）**：⭐ slot 02「此诗，献予一切生命」✗（⭐ 黄金裔／⭐ 非黄金裔两个分支 ✓）、
+>   ⭐ slot 03「等待，在所有的过去」✗（⭐ 速度保持 0 ✗、⭐ 生命上限 ＋`#1%` ✗、⭐ 施放技能后持续效果 −1 回合 ✓）、
+>   ⭐ slot 19「献予「天空」之诗」✗（⭐ 层数 ✗、⭐ 治疗加成 ✗、⭐ 消耗层数 ✓）—— ⭐ 都已在文件里读全 ✓。
+> * **实测（本轮）**：⭐ 回滚后 ⭐ 全量 **0**（--rerun-tasks，**2294** 例 ✓）、⭐ `mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
