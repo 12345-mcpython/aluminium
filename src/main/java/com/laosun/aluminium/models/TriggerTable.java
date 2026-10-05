@@ -891,6 +891,12 @@ public class TriggerTable {
  * {@code summon_attr:<ATTRIBUTE>} -- the rule owner MEMOSPRITE's own attribute, as a magnitude: "等同于德谬歌生命上限的 #1%"
  * (1415 memosprite skill 10, data slot 13). The sibling of {@link #SELF_ATTR_PREFIX}, one subject further out.
  */
+/**
+ * {@code actor_attr:<ATTRIBUTE>} -- the ACTOR's own attribute, as a magnitude: 「提高数值等同于德谬歌生命上限的 #1%」, where 德谬歌 is the unit
+ * casting (1415 memosprite skill 10). The sibling of {@link #SELF_ATTR_PREFIX} (the owner) and {@link #SUMMON_ATTR_PREFIX} (the owner's
+ * memosprite), one subject across: this one is whoever the event is about.
+ */
+static final String ACTOR_ATTR_PREFIX = "actor_attr:";
 static final String SUMMON_ATTR_PREFIX = "summon_attr:";
 
 /**

@@ -2382,6 +2382,19 @@ public final class TriggerInterpreter {
             return effect.getPercent() * values.get(index)
                     + (effect.getAmount() == null ? 0 : effect.getAmount());
         }
+        if (effect.getScale().trim().startsWith(TriggerTable.ACTOR_ATTR_PREFIX)) {
+            // ⭐ The unit the event is ABOUT (1415 memosprite skill 10: 「等同于德谬歌生命上限的 #1%」, and 德谬歌 is the actor of the
+            // memosprite skill). Before the attribute branch below, which reads the rule OWNER.
+            CanHit subject = ctx.actor();
+            if (subject == null) {
+                throw new IllegalStateException("the scale \"" + effect.getScale()
+                        + "\" reads the actor's attribute, but this event has no actor");
+            }
+            AttributeType from = AttributeType.fromString(
+                    effect.getScale().trim().substring(TriggerTable.ACTOR_ATTR_PREFIX.length()).trim());
+            return effect.getPercent() * subject.getAttribute(from).get()
+                    + (effect.getAmount() == null ? 0 : effect.getAmount());
+        }
         if (effect.getScale().trim().startsWith(TriggerTable.SUMMON_ATTR_PREFIX)) {
             // The owner's MEMOSPRITE (1415 memosprite skill 10). Resolved through `Battle.summonOf`, the same accessor the `summon`
             // target selector reads, and before the attribute branch because the subject here is not the owner.
@@ -3862,6 +3875,20 @@ public final class TriggerInterpreter {
                         "Op " + op + " scales off skill parameter \"" + raw2
                                 + "\", which is not a zero-based index (source: " + spec.getSource() + ")");
             }
+            requirePercent(effect, op, spec);
+            return;
+        }
+        // ⭐ The ACTOR's own attribute (2026-10-02; 1415 memosprite skill 10, whose share is of the CASTER's Max HP). Accepted here for
+        // the same reason as the line below: `scaleAttribute` is shared with the DAMAGE path, where the subject is already the attacker
+        // and a second spelling there would be a second meaning.
+        if (scale.startsWith(TriggerTable.ACTOR_ATTR_PREFIX)) {
+            String actorAttr = scale.substring(TriggerTable.ACTOR_ATTR_PREFIX.length()).trim();
+            if (actorAttr.isEmpty()) {
+                throw new IllegalArgumentException(
+                        "Op " + op + " scales off the actor but names no attribute: \"" + scale
+                                + "\" (source: " + spec.getSource() + ")");
+            }
+            AttributeType.fromString(actorAttr);
             requirePercent(effect, op, spec);
             return;
         }
