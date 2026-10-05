@@ -2806,7 +2806,18 @@ public class Battle {
      */
     public double applyAdditionalDamage(CanHit attacker, CanHit target, DamageElement element, double base,
                                         Double fixedCritRate, Double fixedCritDamage, DamageType type) {
-        Damage extra = new Damage(attacker, target, element, type == null ? DamageType.ADDITIONAL : type, base);
+        return applyAdditionalDamage(attacker, target, element, base, fixedCritRate, fixedCritDamage, type, null);
+    }
+
+    /**
+     * The same, with the instance’s CAST CATEGORY stated (2026-10-02; reader: 1415's ode of passage, whose clause is about a 「追加攻击」). ⚠ The
+     * body stays here and the six/seven-argument forms delegate to it -- a second way to build and settle an instance is exactly what the single-settlement
+     * invariant exists to prevent, as the note above says.
+     */
+    public double applyAdditionalDamage(CanHit attacker, CanHit target, DamageElement element, double base,
+                                        Double fixedCritRate, Double fixedCritDamage, DamageType type,
+                                        com.laosun.aluminium.enums.SkillCategory castCategory) {
+        Damage extra = new Damage(attacker, target, element, type == null ? DamageType.ADDITIONAL : type, base, castCategory);
         if (fixedCritRate != null) {
             // ⚠ A rate of 0.0 means "never crits" and must not REPORT a crit either (2026-10-02): the flag is what
             // CRIT_DEALT and `isCrit()` read, so `fixedCrit(true, 0)` would multiply by 1.0 (numerically the same

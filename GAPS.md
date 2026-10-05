@@ -37362,3 +37362,25 @@
 > * ⭐ **顺带**：⭐ 他的追加攻击（⭐ 我们的模型：⭐ `talent_followup_on_other_ult` ✗ ⭐ 的 ⭐ `DAMAGE` ✗）⭐ 走的正是
 >   ⭐ `damage(...)` 的第三个分支 ⭐ `applyAdditionalDamage` ✓ ⇒ ⭐ 所以 ⭐ 它**会**发 ⭐ `FOLLOW_UP` ✓ ✓。
 > * **实测（本轮）**：⭐ 全量 **0**（--rerun-tasks，**2294** 例 ✓）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
+
+> **2026-10-02 更新（新目标第 41 轮：🎉🎉🎉 **第 115 件出货 ＝ "追加攻击"这个词**
+> （`SkillCategory.FOLLOW_UP` ＋ `cast_category` ＋ `damage_is_follow_up`）** ✓✓）**）**：
+>
+> * ✅ **出货内容（引擎九处 ＋ 判据 ✓）**：⭐ `SkillCategory` 新增 ⭐ `FOLLOW_UP("FollowUp")` ✓；⭐ `Damage` 有了 ⭐ `getCastCategory()` ✓；
+>   ⭐ `Battle.applyAdditionalDamage(…, SkillCategory)` ✓ —— ⚠ **旧的那几个重载委托给它** ✓（⭐ 只有**一份**结算体 ✓，⭐ 因为它的注释写着
+>     ⭐ *"a second public way to build and settle an instance is exactly what that invariant exists to prevent"* ✓）；
+>   ⭐ `EffectSpec.cast_category` ✓ ＋ ⭐ `copy()` ✓；⭐ `DAMAGE` op 把它印在实例上 ✓；⭐ 条件 ⭐ `damage_is_follow_up` ✓（⭐ 常量＋解释处＋条件类 ✓）。
+> * ✅ **判据 ＋ 实测变异** ✓：⭐ `DamageIsFollowUpTest` ⇒ ⭐
+>   `[is_follow_up] before = 911.8512864279267 ; after a STAMPED instance = 912.8512864279267 ; after a plain one = 912.8512864279267` ✓✓
+>   ⇒ ⭐ **带标记的答是** ✓、⭐ **普通的答否** ✓（⭐ 两侧 ✓）；⭐ **变异** ✓：⭐ 让它答成别的类别 ✗ ⇒ 红 ✓。
+> * ⭐⭐⭐ **本轮的一句诗的尝试与它的回滚（⭐ 诚实 ✓）**：⭐ 我把 1415 那句也写了 ✓ —— ⭐ `on: DAMAGE_SETTLED` ＋
+>   `when: [actor == self, damage_is_follow_up, self has_state <那句诗>]` ⇒ ⭐ `DAMAGE{times: 1, scale: "owner_max_hp", percent_from_skill_param: "ULTRA:2", element: "Quantum", target: "target"}` ✓
+>   ⭐ 它**确实触发了一次、⭐ 也确实没有递归** ✓（⭐ 读数：⭐ 有诗 ⭐ `103.9938` ✗、⭐ 无诗 ⭐ `102.7458` ✓ ⇒ ⭐ 差 ⭐ `1.2479` ✓），
+>   ⚠ **但那 1.2479 不是"同一笔附加伤害"** ✗（⭐ 结界 rider 那笔 ≈ 68 ✗）⇒ ⭐⭐ **按纪律 ⑤ 回滚了那句诗** ✗，⭐ 只留词 ✓。
+>   ⇒ ⭐⭐ **下一轮第一问**：⭐ 那笔"额外实例"的量应为**同一笔**（⭐ ≈ 68 ✗）⭐ 而读数是 ⭐ 1.2479 ✗ ⇒ ⭐ 先量 ⭐ `owner_max_hp` ＋
+>     `percent_from_skill_param` 在 ⭐ `DAMAGE_SETTLED` 上下文里的 `owner` 是谁 ✗（⭐ 或 ⭐ 直接用 ⭐ `scale: "original_damage"` ✗ —— ⭐ 那个在 `DAMAGE_SETTLED` 上有载体 ✓，
+>     ⭐ 而且它**已经是**"同一笔"的拼法 ✓）。
+> * ⭐ **顺带量到的**：⭐ `FOLLOW_UP` 事件**不带伤害实例** ✗（⭐ `ctx.damage()` 是 null ✓ ⇒ ⭐ 加载器会**响亮拒绝**挂在它上面的实例条件 ✓）
+>   ⇒ ⭐⭐ **要问实例的问题，必须挂在 `DAMAGE_SETTLED`** ✓ —— ⭐ 而它**正是** rider 那笔实例结算的事件 ✓。
+> * ⭐ **还留着的一件 ✓**：⭐ 他的追加攻击现在**自己声明**了 ⭐ `cast_category: "FOLLOW_UP"` ✓（⭐ 这是他那条 rider 的既有内容 ＋ ⭐ 一个词 ✓）。
+> * **实测（本轮）**：⭐ 全量 **0**（--rerun-tasks，**2295** 例 ✓）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。

@@ -76,6 +76,11 @@ public class Damage {
      */
     private final SkillCategory castCategory;
 
+    /** @see #castCategory */
+    public SkillCategory getCastCategory() {
+        return castCategory;
+    }
+
     /**
      * Zone container: lazily filled, holds only the zones that were actually used
      * (a zone that never entered the list is equivalent to 1.0). Zones are pure

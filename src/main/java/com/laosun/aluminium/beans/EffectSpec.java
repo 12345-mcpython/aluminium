@@ -76,6 +76,7 @@ public class EffectSpec {
         copy.damageParam = this.damageParam;
         copy.percentFromCastParam = this.percentFromCastParam;
         copy.percentFromSkillParam = this.percentFromSkillParam;
+        copy.castCategory = this.castCategory;
         copy.damageLevel = this.damageLevel;
         copy.asAttack = this.asAttack;
         copy.rule = this.rule;
@@ -295,6 +296,15 @@ return copy;
      */
     @SerializedName("skill_id")
     private Integer skillId;
+
+    /**
+     * The cast category of the instance a DAMAGE effect produces, spelled as {@code SkillCategory} (2026-10-02).
+     *
+     * <p>Reader: 1415's ode of passage, 「缇宝施放**追加攻击**触发…时」 -- the follow-up half has to be stated somewhere, and
+     * `applyAdditionalDamage` fires `FOLLOW_UP` without one.
+     */
+    @SerializedName("cast_category")
+    private String castCategory;
 
     @SerializedName("damage_type")
     private String damageType;

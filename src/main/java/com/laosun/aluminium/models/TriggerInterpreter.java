@@ -4692,10 +4692,15 @@ public final class TriggerInterpreter {
                       damageType == null ? DamageType.NORMAL : damageType, settledBase));
               return;
           }
-          battle.applyAdditionalDamage(attacker, victim, skill == null
-                          ? DamageElement.fromString(effect.getElement().trim())
-                          : elementOf(effect, skill), settledBase,
-                  effect.getCritRate(), effect.getCritDamage(), damageType);
+                      battle.applyAdditionalDamage(attacker, victim, skill == null
+                            ? DamageElement.fromString(effect.getElement().trim())
+                            : elementOf(effect, skill), settledBase,
+                    effect.getCritRate(), effect.getCritDamage(), damageType,
+                    // ⭐ The rule may state that this instance is a 「追加攻击」 (2026-10-02): `applyAdditionalDamage` fires FOLLOW_UP without a
+                    // category, so the instance has to carry it for a listener to be able to ask.
+                    effect.getCastCategory() == null || effect.getCastCategory().isBlank()
+                            ? null
+                            : com.laosun.aluminium.enums.SkillCategory.fromString(effect.getCastCategory().trim()));
     }
 
     /**
