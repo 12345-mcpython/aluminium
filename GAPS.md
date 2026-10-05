@@ -1126,3 +1126,15 @@
 
 3. ⭐ **槽位 25 的「使龙灵下一次行动时获得终结技强化、护盾量为原护盾量的 `#5`(1.5)%、不消耗强化次数」**：
    ⭐ 需要“**预约下一次行动**”（`REPLACE_SKILL` 只能改技能，不能预约行为）＋ “**护盾倍率**”。
+
+- ⛔ **新目标第 30 轮：回滚（第 16 次）—— 而这次撞上的是一条**有意且被判据锁定**的引擎决定。**
+- ⭐⭐⭐ **实测**：⭐ 我让"⭐ 重复召唤也发一次到达 ✗"⭐ 之后，⭐ **`SummonEntryTest.summoningAgainWhileOneIsOutAnnouncesNothing` ✗ 立刻红了** ✗，
+  ⭐ 而它自己的失败信息就写着理由：⭐
+  > *"⭐ 「**若已在场，则…**」 clauses **depend on this: no arrival, no event** ✗"*
+  ⇒ ⭐⭐ **"⭐ 已在场就不发到达 ✗"⭐ 是文档里那句话的**前提** ✓，⭐ 不是疏忽 ✓** ⇒ ⭐ 我的改动**与它冲突** ✗ ✓（⭐ 与第 7 轮 `grantExtraTurn` 同类 ✓）。
+  ⭐ 另有两条本会话的判据也随之中断（⭐ `TrueSelfOdeGivesStoryTest` ✗ ⭐ 读数 `1.0 -> 0.0` ✓、⭐ `TrueSelfOdeSpendsThreeStoryTest` ✗ ⭐ `0.0 -> 1.0` ✓）
+  ⇒ ⭐ **一次改动同时推翻三处已出货行为** ✓ ⇒ ⭐ **回滚** ✓。
+- ⭐⭐ **而回滚之后有一条更有用的结论**：⭐ 在**我们的模型**里，⭐ 「⭐ 或德谬歌被召唤时 ✗」⭐ 与「⭐ 昔涟施放终结技后 ✗」**本来就同时发生** ——
+  ⭐ 因为 `ult_summons_demiurge` ✗（`SUMMON` ✗）⭐ 与 ⭐ `true_self_ode_gives_story_on_her_ultimate` ✗ ⭐ 都在 `ULT_CAST` ✗ 上 ✓
+  ⇒ ⭐ **这一半从句在行为上已被另一半覆盖** ✓ ✓ —— ⭐ 所以它应当**登记为"⭐ 与另一半同址、且被「若已在场」的语义挡住 ✗"** ✓，⭐ 而不是当成缺口 ✓。
+- ⛔ **回滚内容**：⭐ `Battle.summonMemosprite` ✗ 里那行 `justSummoned.add(existing)` ✗ ＋ ⭐ 对应判据 ✓。
