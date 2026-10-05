@@ -35575,3 +35575,12 @@
 > * ⭐⭐ **三条新事实**：（1）**同属性修饰符默认叠代** ⇒ 多条同时生效要 `coexist: true`；
 >   （2）⭐ **`coexist` 还要配 `max_stacks`**，否则层数被默认封顶；（3）**`stackScale` 读的是 buff 层数、不是资源**。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks）、`mechanics` **rc 0** ✓、树干净 ✓。
+
+> **2026-10-02 更新（第 96 轮：第 140 件出货 ＝ `1141521`（负世）**第三句成句** ✓ —— 一次绿，三次调用到提交）**：
+>
+> * ✅ **判据读数**：`[everburning] after his ultimate the state is 1.0 and CRIT RATE gained +0.08000000000000002 ; before it the state is 0.0 and the gain is +0.0` ✓✓
+>   ⇒ ⭐ **变异**（把增量改 0）⇒ `gained +0.0` ⇒ 红 ✓。
+> * ✅ **实现**：一条规则、两个效果、**按原文顺序**：`ADD_STACK{永续的燃烧, permanent}` → `MODIFY_ATTR{CRIT_CHANCE, 0.08, permanent}`。
+>   ⭐ 而“**持有它时**”对应的就是**从变身起** —— 两者都 `permanent`，变身结束由已出货的倒计时规则管。
+> * ⭐ **一次绿** —— 因为形态与已出货的三条完全同类（状态 + 属性修饰符）。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
