@@ -143,6 +143,23 @@
       "note": "⭐ 2% 的对象是**声明的上限**：【新蕊】在本文件里是 `max: 34000`（出处是 `Castorice_Passive_MaxCount` 的公式）⇒ 2% = **680** ⇒ 本条把**溢出容量**抬高 680（**不动正常上限**）。⭐ 而这只是本技能的**第一句**；后两句（消耗溢出、消耗量→死龙天赋倍率）仍登记。"
     },
     {
+      "id": "life_ode_raises_the_ratio_against_a_small_pack",
+      "on": "SUMMONED",
+      "when": [
+        "actor == summon",
+        "enemy_count <= 2"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_RULE",
+          "rule": "dragon_hollow_wing_damage",
+          "effect_percent": 0.0024
+        }
+      ],
+      "source": "1415 昔涟 忆灵技能 17：「…召唤时**若场上敌方目标小于等于 #6 名，伤害倍率额外提高 #5**」（#6 = 2，#5 = 0.0024）。",
+      "note": "⭐ 条件 `enemy_count >= 4`：**已出货的词汇**（`TriggerTable` 的 `enemy_count`，而 `1413.json` 的 `talent_memosprite_damage_enemy_count_4` 就是它的读者）。⭐ `#5` 与 `#1` **同单位**（都是 `0.56` 那种份额）⇒ 直接作为 `effect_percent` 加上去。⭐ 而它必须**在伤害那一条之前**立案。  ⭐ **2026-10-02 实测**：条件词汇是 `enemy_count` 加一个**比较**（`1413.json` 里那条叫 `…_enemy_count_4` 的写的是 `>= 4`）—— 而本句要的是 **`<= 2`**；直接把他人的条件整条搬过来会把意思弄反。"
+    },
+    {
       "id": "life_ode_summon_spends_captures_and_raises",
       "on": "SUMMONED",
       "when": [

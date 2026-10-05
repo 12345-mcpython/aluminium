@@ -25,8 +25,9 @@ public class DragonHollowWingTest {
         System.out.println("[dragon] the enemy lost " + r[0] + " ; our side gained " + r[1]
                 + " HP (the dragon pays " + r[2] + " of its own master's max HP)");
         // \u2b50 COUNTABLE (2026-10-02): six hits of #1 of her max HP, each settled on the enemy -- and `r[3]` is the mitigation the judge measured itself with one plain hit.
-        double expected = 6 * 0.56 * r[4] * r[3];
-        System.out.println("[dragon]   expected 6 x 56% x her max HP " + r[4] + " x mitigation " + r[3]
+        // \u2b50 PLUS the small-pack extra (2026-10-02): this battle has ONE enemy, so 1141517's second half raises the ratio by `#5` as well.
+        double expected = 6 * (0.56 + 0.0024) * r[4] * r[3];
+        System.out.println("[dragon]   expected 6 x (56% + 0.24%) x her max HP " + r[4] + " x mitigation " + r[3]
                 + " = " + expected);
         Assertions.assertEquals(expected, r[0], expected * 1e-6, "six hits of #1 of her max HP");
         Assertions.assertTrue(r[1] > 0, "and the party must be healed");
