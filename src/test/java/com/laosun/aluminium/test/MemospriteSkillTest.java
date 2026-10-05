@@ -122,6 +122,10 @@ public class MemospriteSkillTest {
                 {"1407", "1", "QUANTUM"},
                 {"1512", "1", "WIND"},
                 {"8007", "1", "ICE"},
+                // the second pass: their ability files are named after the SUMMONER, so the pairing runs through the master's English name
+                {"1413", "1", "ICE"},
+                {"1413", "7", "ICE"},
+                {"1415", "1", "ICE"},
         };
         StringBuilder report = new StringBuilder("[elements] ");
         for (String[] w : want) {
