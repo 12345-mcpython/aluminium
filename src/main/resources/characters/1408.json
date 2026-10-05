@@ -516,6 +516,27 @@
       ],
       "source": "1415 昔涟 忆灵技能 21：「…且在**变身时获得【永续的燃烧】**，…**持有【永续的燃烧】时，卡厄斯兰那的暴击率提高 #1%**」（#1 = 0.08）。",
       "note": "⭐ 两个效果按原文顺序：先**获得状态**、再**上暴击率**（同一条规则内依次生效）；⭐ 而“持有时”这个条件对应的就是**从变身起**，因为状态与修饰符都是 `permanent`（变身结束由倒计时管）。⭐ 数值不落字面的前提不成立：ParamList 里 `#1 = 0.08` 是常量，所以写成字面是诚实的。"
+    },
+    {
+      "id": "world_ode_adds_five_fire_hits",
+      "on": "DAMAGE_SETTLED",
+      "when": [
+        "actor == self",
+        "damage_is_attack",
+        "self has_state 永续的燃烧"
+      ],
+      "do": [
+        {
+          "op": "DAMAGE",
+          "times": 5,
+          "scale": "self_attr:ATTACK",
+          "percent": 0.05,
+          "element": "Fire",
+          "target": "random_enemy"
+        }
+      ],
+      "source": "1415 昔涟 忆灵技能 21：「…**施放攻击后，造成 #3 次附加伤害，每次伤害对敌方随机单体造成等同于卡厄斯兰那 #4% 攻击力的火属性附加伤害**」（#3 = 5、#4 = 0.05）。",
+      "note": "⭐ **为何用 `DAMAGE` 而不是 `ADD_DAMAGE`**（实测）：`ADD_DAMAGE` 自己拒绝 `times`，原话是“「额外造成 #1 次附加伤害」counts INSTANCES, and this op adds ONE amount to the damage being settled”。⭐ 而 `DAMAGE` 的出货读者是 1003 姬子星魂 6：`times` + `target: random_enemy` + `element`。⭐ 门里的 `self has_state 永续的燃烧` 就是**同段原文的前一句**（第 96 轮出货）。"
     }
   ]
 }
