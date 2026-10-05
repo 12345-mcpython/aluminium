@@ -196,6 +196,25 @@
       ],
       "source": "1415 昔涟 忆灵技能 03 「等待，在所有的过去」（数据槽位 03，SkillID 1141503）：「**德谬歌施放技能后使自身所有持续效果持续回合数减 1**。」",
       "note": "⭐ **所有**→ `EXTEND_BUFF` + `\"kind\": \"all\"`；**减 1** → `turns: -1`（`requireSignedTurns` 允许负数）；`self` 在本文件里是**主人**（**实测**）。⭐ **挂 `CAST_SETUP` 而不是 `SKILL_CAST`**：**实测**（探针）—— 忆灵的施放会发 `CAST_SETUP`（主人 DEFENCE +291.06）但**不发** `SKILL_CAST`（主人 ATTACK +0.0）。⚠ 而“施放**后**”这个顺序**不可观测**：效果只改已有持续效果的剩余回合，而施放本身的结算不读它们。"
+    },
+    {
+      "id": "memosprite_ode_of_sky_stacks_hyacine_when_it_casts",
+      "on": "CAST_SETUP",
+      "when": [
+        "actor is_summon"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "献予「天空」之诗",
+          "amount": 2,
+          "max_stacks": 99999,
+          "permanent": true,
+          "target": "ally_cid:1409"
+        }
+      ],
+      "source": "1415 昔涟 忆灵技能 19 「献予「天空」之诗」（数据槽位 19，SkillID 1141519）：「**德谬歌施放忆灵技时，使风堇获得2层【献予「天空」之诗】**。」",
+      "note": "⭐ 能力数据自己就是这么写的（**实测**）：`AddModifier` **`MServant_CyreneServant_00_AmazingBuff_Hyacine`** + `LayerAddWhenStack: 2`，而前置是 **`ByCompareCharacterID` = 1409** —— 游戏就是“按 cid 点名”，与 `ally_cid:` 是同一件事。⭐ **上限写 99999 是游戏自己的惯例**，不是我编的：提到该修饰的四个文件里，它旁边**没有** `MaxLayer`（`AvatarStatusConfig` 的行甚至没有计数列），而同一个能力文件里“不限”写的就是 `MaxLayer: 99999`（两处）⇒ 缺省就是“不限”。⚠ 不写它的话，引擎的 `StackBuff`（`Math.max(1, maxStacks)`）会只给 **1** 层。"
     }
   ]
 }
