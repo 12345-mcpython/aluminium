@@ -36102,3 +36102,15 @@
 > * ⛔ **仍回滚**：引擎侧三文件改完并**编译通过**，⭐ 但内容与判据来不及 ⇒ ⭐ 按纪律"**没有可归因效果的词汇不算出货**"⭐ 全部撤回 ✓。
 > * ⭐ **下一轮三步**：① 引擎（⭐ 表 ＋ op ＋ 执行器一行）② 内容（⭐ `RAISE_SKILL_HITS{skill_id:2, amount:3}` ＋ `TURN_END` 收回）③ 判据（⭐ 比较**同一技能加成前后**的命中，⭐ 避开诗带来的【真知】混杂）。
 > * **实测（本轮）**：回滚后 全量 **0**（--rerun-tasks）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
+
+> **2026-10-02 更新（新目标第 15 轮：✅ 出货 `RAISE_SKILL_HITS` ⇒ **槽位 18 完整**；并留下两条工程事实）**：
+>
+> * ✅ **引擎三处**：⭐ `CanHit.skillHitBonus`（**按数据槽位**的 `Map<Integer,Integer>`）＋ ⭐ op **`RAISE_SKILL_HITS{skill_id, amount}`**（⭐ `amount` 可为负）
+>   ＋ ⭐ `SkillExecutor` 的 BOUNCE 分支**一行**。
+> * ✅ **内容**：⭐ 槽位 18 加 `RAISE_SKILL_HITS{skill_id: 2, amount: 3}` ＋ ⭐ 一条 `TURN_END` 用 `-3` 收回 ⇒ ⭐ 「持续1回合」无需新时长机制 ✓。
+> * ⭐ **判据**：`1721.6988481718581 with the three extra segments, 1052.1492961050244 without them`；
+>   ⭐ **变异（`skill_id` 2→1）⇒ RED**（⭐ 两侧**相等**）✓。
+> * ⭐⭐ **两条工程事实**：（1）⭐ 新 op **还必须登记进已知 op 清单**，⭐ 否则 *"Unknown trigger op"*；
+>   （2）⭐⭐ **判据的控制侧要"读回真实值"**：⭐ 硬编码 `-3` 时，⭐ 加成被误导到别的槽位会让控制侧**减成负数**、
+>   ⭐ 于是"有多有少"仍然成立 ⇒ ⭐ **变异没咬** ✓；⭐ 改成 `-skillHitBonus(slot)` 后立刻打红 ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
