@@ -179,6 +179,23 @@
       ],
       "source": "1415 昔涟 忆灵技能 05 「你好，世界♪」（数据槽位 05，SkillID 1141505）：「德谬歌被召唤时，**解除我方全体控制类负面状态**。」",
       "note": "⭐ 原句**没有任何数值**（参数表是空的）。⭐ 门是 `actor is_summon`（**实测**：`SUMMONED` 的 `actor` 是**被召唤者**，而本文件的 `self` 是它的**主人** —— 所以 `actor == self` 永远不成立）。⭐ “**所有**控制类”是**按类别扫**（`AbstractBuff.debuffClass()`）。"
+    },
+    {
+      "id": "after_it_casts_every_ongoing_effect_shortens_by_one",
+      "on": "CAST_SETUP",
+      "when": [
+        "actor is_summon"
+      ],
+      "do": [
+        {
+          "op": "EXTEND_BUFF",
+          "kind": "all",
+          "turns": -1,
+          "target": "self"
+        }
+      ],
+      "source": "1415 昔涟 忆灵技能 03 「等待，在所有的过去」（数据槽位 03，SkillID 1141503）：「**德谬歌施放技能后使自身所有持续效果持续回合数减 1**。」",
+      "note": "⭐ **所有**→ `EXTEND_BUFF` + `\"kind\": \"all\"`；**减 1** → `turns: -1`（`requireSignedTurns` 允许负数）；`self` 在本文件里是**主人**（**实测**）。⭐ **挂 `CAST_SETUP` 而不是 `SKILL_CAST`**：**实测**（探针）—— 忆灵的施放会发 `CAST_SETUP`（主人 DEFENCE +291.06）但**不发** `SKILL_CAST`（主人 ATTACK +0.0）。⚠ 而“施放**后**”这个顺序**不可观测**：效果只改已有持续效果的剩余回合，而施放本身的结算不读它们。"
     }
   ]
 }
