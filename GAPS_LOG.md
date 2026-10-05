@@ -36158,3 +36158,12 @@
 >   ⭐ 实测 `skillsByDataSlot()` 为空；⭐ 而 `summonServant` 的 `servantWith` 装了全部 18 槽，⭐ 且两者造的是**同一个单位** ⇒ ⭐ **读忆灵技能要走 servant 路径** ✓。
 > * ⭐ **另一条**：⭐ 忆灵技能**只在 `skillsByDataSlot`**、⭐ 不进 `SkillType.COMMON`（⭐ 实测 `COMMON present = false`）✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
+
+> **2026-10-02 更新（新目标第 20 轮：✅ 出货**两条召唤路径的对称性**；并记下一条流程教训）**：
+>
+> * ✅ **形状**：⭐ 内联循环收成 **`SummonFactory.installSpecSkills(...)`**，⭐ 由 `memospriteWith` 与 `servantWith` **各调用一次** ✓。
+> * ⭐ **判据**：`via summonMemosprite: [1, 2, 3, 5, 13 … 26] ; via summonServant: 同上`；
+>   ⭐ **变异（去掉忆灵路径的调用）⇒ RED**（⭐ `via summonMemosprite: []` —— ⭐ **正是上一轮量到的缺口** ✓）。
+> * ⭐ **效果**：⭐ `summonMemosprite` 现在也自带全部 18 个槽位，⭐ 两条路等价 ✓。
+> * ⚠ **流程教训（第三次）**：⭐ **锚点不要带源码的中文注释** —— ⭐ 转义中文锚点**永远匹配不上**，⭐ 两轮因此空转 4 次 ⇒ ⭐ **一律用纯 ASCII 锚点** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。

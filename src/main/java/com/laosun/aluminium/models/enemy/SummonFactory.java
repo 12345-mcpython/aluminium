@@ -98,6 +98,30 @@ public final class SummonFactory {
         }
     }
 
+    /**
+     * ⭐ Installs the skills a spec states on the summon (2026-10-02).
+     *
+     * <p>One helper for BOTH paths, because they were not symmetric: `servantWith` installed them and `memospriteWith` did not, and since both make the same unit, which one a caller used
+     * silently decided whether the memosprite had any skills of its own (measured: `skillsByDataSlot()` was empty on the memosprite path).
+     *
+     * <p>Each stated row becomes a real `Skill`, just like a character's, so `SkillEffects.forSkill`, `SkillExecutor.canDeliver` and every op that takes a skill work on a memosprite's skill
+     * with no special case.
+     */
+    private static void installSpecSkills(Summon summon, MemospriteSpec spec, Character master) {
+        if (spec.skills() == null || spec.skills().isEmpty()) {
+            return;
+        }
+        int servantCid = spec.servantId() == null ? master.getCid() : spec.servantId();
+        for (MemospriteSpec.SkillRow row : spec.skills()) {
+            if (row == null || row.slot() == null) {
+                continue;
+            }
+            int level = row.level() == null ? 1 : row.level();
+            summon.setSkillAt(row.slot(),
+                    new com.laosun.aluminium.models.skill.DefaultSkill(servantCid, row.slot(), level));
+        }
+    }
+
     private static String displayName(EnemyFactory.Resolved resolved) {
         return resolved.config().name() == null
                 ? "Summon#" + resolved.monsterId()
@@ -282,6 +306,7 @@ public final class SummonFactory {
         if (spec.attack() != null) {
             summon.setSkill(SkillType.COMMON, attackOf(spec));
         }
+        installSpecSkills(summon, spec, master);
         return summon;
     }
 
@@ -321,17 +346,7 @@ public final class SummonFactory {
         // \u2b50 \u4ebf\u7075\u6280\u672c\u6765\u5c31\u8be5\u662f `Skill` (2026-10-02): each stated row becomes a real skill, addressed by (ServantID, slot) exactly
         // like a character's -- so `SkillEffects.forSkill`, `SkillExecutor.canDeliver` and every op that takes a skill work
         // on a memosprite's skill with no special case.
-        if (spec.skills() != null && !spec.skills().isEmpty()) {
-            int servantCid = spec.servantId() == null ? master.getCid() : spec.servantId();
-            for (MemospriteSpec.SkillRow row : spec.skills()) {
-                if (row == null || row.slot() == null) {
-                    continue;
-                }
-                int level = row.level() == null ? 1 : row.level();
-                summon.setSkillAt(row.slot(),
-                        new com.laosun.aluminium.models.skill.DefaultSkill(servantCid, row.slot(), level));
-            }
-        }
+        installSpecSkills(summon, spec, master);
         return summon;
     }
 
