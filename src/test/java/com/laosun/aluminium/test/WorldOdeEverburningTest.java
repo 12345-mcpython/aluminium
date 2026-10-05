@@ -41,6 +41,17 @@ public class WorldOdeEverburningTest {
         battle.startBattle();
         battle.processRequests();
         him = battle.characters.getFirst();
+        him = battle.characters.getFirst();
+        if (castUlt) {
+        // \u2b50 The ode grants 【永续的燃烧】 (2026-10-02), so it must land before his transformation.
+        var odeSprite = battle.summonServant(CharacterFactory.create(1415, LEVEL));
+        battle.processRequests();
+        var ode = odeSprite.skillAt(21);
+        Assertions.assertNotNull(ode, "precondition: slot 21");
+        SkillExecutor.execute(battle, ode, odeSprite, List.of(battle.characters.getFirst()));
+        battle.processRequests();
+        }
+        him = battle.characters.getFirst();
         double before = him.getAttribute(AttributeType.CRIT_CHANCE).get();
         if (castUlt) {
             var ult = him.getSkills().get(com.laosun.aluminium.enums.SkillType.ULTRA);

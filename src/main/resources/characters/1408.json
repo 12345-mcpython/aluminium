@@ -12,6 +12,11 @@
       "max": 8,
       "source": "1408 白厄（文档）：「卡厄斯兰那拥有 **8** 个卡厄斯兰那的额外回合」",
       "note": "⭐ 2026-10-02：这是**计数器**（不是游戏里的资源 ✓）—— 因为引擎里**没有倒计时剩余回合计数器** ✗，而「最后 1 个倒计时回合」需要数到 8 ✓。"
+    },
+    {
+      "id": "毁伤",
+      "max": 2147483647,
+      "source": "【毁伤】（TextMap 哈希 13175321313076641604 = 毁伤）。⚠ **数据没给上限**（只读到名字与 #9 = 4）⇒ `max` 用 **`Integer.MAX_VALUE`** 表示**不设上限**，不臆造游戏数值。"
     }
   ],
   "rules": [
@@ -214,7 +219,8 @@
       "id": "last_countdown_turn_ends_the_transformation",
       "when": [
         "actor == countdown",
-        "self_resource:额外回合计数 >= 8"
+        "self_resource:额外回合计数 >= 8",
+        "!self has_state 永续的燃烧"
       ],
       "do": [
         {
@@ -224,7 +230,7 @@
         }
       ],
       "source": "1408 白厄（文档）：「最后 1 个倒计时回合…**结束变身**」✓（同句的“960% 由敌方全体**均分**”已登记 ✗）",
-      "note": "⭐ 2026-10-02：用 **`REMOVE_STATE`** ✓ —— 它是**显式移除**那条路 ✓，⭐ **会公告 `STATE_ENDED`** ✓（第 1619 轮实测 ✓）⇒ 所以目标 ① 的“**1408 变身结束**”读者到这里**真正接上** ✓。⚠ 本条规则**必须在计数规则之后** ✓（同一事件上按文件顺序 ✓），否则第 8 次读不到 8 ✗。"
+      "note": "⭐ 2026-10-02：用 **`REMOVE_STATE`** ✓ —— 它是**显式移除**那条路 ✓，⭐ **会公告 `STATE_ENDED`** ✓（第 1619 轮实测 ✓）⇒ 所以目标 ① 的“**1408 变身结束**”读者到这里**真正接上** ✓。⚠ 本条规则**必须在计数规则之后** ✓（同一事件上按文件顺序 ✓），否则第 8 次读不到 8 ✗。  ⭐ **2026-10-02 补上的否定门**：「在卡厄斯兰那的额外回合耗尽后**不会结束变身**」。"
     },
     {
       "on": "CAST_SETUP",
@@ -492,20 +498,13 @@
       "note": "⭐ **为何是六条**：`#7 / #6 = 0.36 / 0.06 = 6`，所以“超出 12 点、每点 0.06、上限 0.36”**恰好是六步** ⇒ 六条各自由 `self_resource:火种 >= 18` 把门，上限天然成立。⭐ 门用**条件**拼法 `self_resource:`（已出货），因为 `stackScale` 读的是 **buff 层数**、不是资源。  ⭐ `coexist: true`（2026-10-02）：同属性修饰符**默认叠代**，而这六步必须**同时存在**。"
     },
     {
-      "id": "world_ode_grants_everburning_and_its_crit_rate",
+      "id": "world_ode_everburning_raises_his_crit_rate",
       "on": "ULT_CAST",
       "when": [
-        "actor == self"
+        "actor == self",
+        "self has_state 永续的燃烧"
       ],
       "do": [
-        {
-          "op": "ADD_STACK",
-          "buff": "永续的燃烧",
-          "amount": 1,
-          "max_stacks": 1,
-          "permanent": true,
-          "target": "self"
-        },
         {
           "op": "MODIFY_ATTR",
           "attribute": "CRIT_CHANCE",
@@ -515,7 +514,7 @@
         }
       ],
       "source": "1415 昔涟 忆灵技能 21：「…且在**变身时获得【永续的燃烧】**，…**持有【永续的燃烧】时，卡厄斯兰那的暴击率提高 #1%**」（#1 = 0.08）。",
-      "note": "⭐ 两个效果按原文顺序：先**获得状态**、再**上暴击率**（同一条规则内依次生效）；⭐ 而“持有时”这个条件对应的就是**从变身起**，因为状态与修饰符都是 `permanent`（变身结束由倒计时管）。⭐ 数值不落字面的前提不成立：ParamList 里 `#1 = 0.08` 是常量，所以写成字面是诚实的。"
+      "note": "⭐ **2026-10-02 修正**：状态的**授予**已移到诗的施放（原话里它是「整场生效，对白厄施放后…且在变身时获得【永续的燃烧】」的一部分）；本条只管**它带来的暴击率**，并由状态把门。"
     },
     {
       "id": "world_ode_adds_five_fire_hits",
@@ -537,6 +536,51 @@
       ],
       "source": "1415 昔涟 忆灵技能 21：「…**施放攻击后，造成 #3 次附加伤害，每次伤害对敌方随机单体造成等同于卡厄斯兰那 #4% 攻击力的火属性附加伤害**」（#3 = 5、#4 = 0.05）。",
       "note": "⭐ **为何用 `DAMAGE` 而不是 `ADD_DAMAGE`**（实测）：`ADD_DAMAGE` 自己拒绝 `times`，原话是“「额外造成 #1 次附加伤害」counts INSTANCES, and this op adds ONE amount to the damage being settled”。⭐ 而 `DAMAGE` 的出货读者是 1003 姬子星魂 6：`times` + `target: random_enemy` + `element`。⭐ 门里的 `self has_state 永续的燃烧` 就是**同段原文的前一句**（第 96 轮出货）。"
+    },
+    {
+      "id": "world_ode_refreshes_the_extra_turns",
+      "on": "COUNTDOWN_TURN",
+      "when": [
+        "actor == countdown",
+        "self has_state 永续的燃烧",
+        "self_resource:额外回合计数 >= 8"
+      ],
+      "do": [
+        {
+          "op": "SPEND_RESOURCE",
+          "resource": "额外回合计数",
+          "spendAll": true,
+          "target": "self"
+        },
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "毁伤",
+          "amount": 4,
+          "target": "self"
+        }
+      ],
+      "source": "1415 昔涟 忆灵技能 21：「在卡厄斯兰那的额外回合耗尽后**不会结束变身、刷新全部额外回合并获得 #9 点【毁伤】**」（#9 = 4）。",
+      "note": "⭐ 三件事：① “不结束变身” 由**上一条的否定门**；② “刷新” = `SPEND_RESOURCE` + `spendAll`；③ “获得 4 点【毁伤】”。⭐ 本条必须在**计数规则之后**。"
+    },
+    {
+      "id": "world_ode_grants_everburning",
+      "on": "CAST_SETUP",
+      "when": [
+        "target == self",
+        "from_skill_id == 21"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "永续的燃烧",
+          "amount": 1,
+          "max_stacks": 1,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "1415 昔涟 忆灵技能 21：「整场生效，对白厄施放后，使白厄获得 #8 点【火种】，**且在变身时获得【永续的燃烧】**…」—— 它是**诗的一部分**，所以由诗的落下授予。",
+      "note": "⭐ **修正的理由**：原话里该句属于诗的句子，而不是他自己变身的一部分 ⇒ 没有诗就没有这个状态（**实测**：旧实现把它挂在他的 `ULT_CAST` 上，结果弄坏了已出货的 `TransformationEndsOnLastCountdownTest`）。"
     }
   ]
 }
