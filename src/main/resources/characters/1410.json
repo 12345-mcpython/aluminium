@@ -71,5 +71,44 @@
       }
     ],
     "note": "⭐ 2026-09-30 转正 ✓：「海瑟音**展开结界**，使敌方目标攻击力降低 15%、防御力降低 25%…结界持续 3 回合，自身每回合开始时减 1。当海瑟音陷入无法战斗状态时，结界也会被解除」—— ⚠ 旧登记担心“用普通的 `turns: 3` 写会在**结界结束后**仍留着” ✗。⭐ 答案不是新 op，而是**同名** ✓：两句都带 `buff: 结界` + 同一个 `turns: 3` + `ticksOn: self` ⇒ 时间一到两句一起没 ✓；而「她倒下时结界也被解除」由 `removeBuffsAnchoredTo` 承担 ✓（⚠ 同样依赖 (b)：`ticks_on` 直到 `b275250` 才真正接在 `MODIFY_ATTR` 上 ✓）。"
+  },
+  {
+    "id": "memosprite_ode_of_ocean_marks_hysilens",
+    "on": "CAST_SETUP",
+    "when": [
+      "target == self",
+      "actor is_summon",
+      "from_skill_id == 22"
+    ],
+    "do": [
+      {
+        "op": "APPLY_BUFF",
+        "buff": "暖流",
+        "permanent": true,
+        "target": "self"
+      }
+    ],
+    "source": "1415 昔涟 忆灵技能 16 「献予「海洋」之诗」（数据槽位 22，SkillID 1141522）：「单次生效，对海瑟音施放时，使海瑟音获得【暖流】。」",
+    "note": "⭐ 形状照 1402 的 `memosprite_ode_of_romance_marks_aglaea`（同一句话的两个实例）。"
+  },
+  {
+    "id": "memosprite_ode_of_ocean_spends_itself_for_energy",
+    "on": "ALLY_ATTACK",
+    "when": [
+      "self has_state 暖流"
+    ],
+    "do": [
+      {
+        "op": "GAIN_ENERGY",
+        "amount": 60,
+        "target": "self"
+      },
+      {
+        "op": "REMOVE_STATE",
+        "buff": "暖流"
+      }
+    ],
+    "source": "1415 昔涟 忆灵技能 16 「献予「海洋」之诗」（数据槽位 22）：「**海瑟音施放攻击后消耗【暖流】为自身恢复 #4 点能量**。」",
+    "note": "⭐ 形状照 1402 的 `memosprite_ode_of_romance_spends_itself_for_energy`。⭐ `#4` 在 1141522 的**十行里全是 60**（**实测**）。"
   }
 ]
