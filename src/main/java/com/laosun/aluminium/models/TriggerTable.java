@@ -959,6 +959,14 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
     private static final String SELF_RESOURCE_PREFIX = "self_resource:";
 
     /**
+     * ⭐ A resource read off the rule owner's <b>summon</b> (2026-10-02; reader: 1141526's 【故事】, which the sentence puts on the memosprite: 「使德谬歌获得 1 点【故事】」).
+     *
+     * <p>Why the actor will not do: `RESOURCE_CHANGED` is raised with the RULE'S OWNER as both actor and target (measured in `fireResourceChanged`: `CanHit holder = ctx.owner()`), and its
+     * delta is measured on that owner's store. So a condition about the summon's own counter has to reach through the owner -- this prefix is that reach.
+     */
+    private static final String SUMMON_RESOURCE_PREFIX = "summon_resource:";
+
+    /**
      * The ops whose {@code "resource"} argument names a resource the character must declare.
      *
      * <p>Used only to collect {@link #referencedResources}; the ops themselves were validated long before this
@@ -1665,7 +1673,8 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
         }
         if (!NUMERIC_VARIABLES.contains(variable) && !variable.startsWith(SELF_ATTR_PREFIX)
                 && !variable.startsWith(SELF_RESOURCE_PREFIX) && !variable.startsWith(SELF_STACKS_PREFIX)
-                && !variable.startsWith(TARGET_STACKS_PREFIX) && !variable.startsWith(ACTOR_STACKS_PREFIX)) {
+                && !variable.startsWith(TARGET_STACKS_PREFIX) && !variable.startsWith(ACTOR_STACKS_PREFIX)
+                && !variable.startsWith(SUMMON_RESOURCE_PREFIX)) {
             throw new IllegalArgumentException(
                     "Condition '" + raw + "' compares unknown variable '" + variable
                             + "'; known numeric variables: " + String.join(", ", knownNumericVariables())
@@ -1796,13 +1805,15 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
     }
 
     private static String selfResourceOf(String variable, String raw, TriggerSpec spec) {
-        if (!variable.startsWith(SELF_RESOURCE_PREFIX)) {
+        String prefix = variable.startsWith(SELF_RESOURCE_PREFIX) ? SELF_RESOURCE_PREFIX
+                : variable.startsWith(SUMMON_RESOURCE_PREFIX) ? SUMMON_RESOURCE_PREFIX : null;
+        if (prefix == null) {
             return null;
         }
-        String name = variable.substring(SELF_RESOURCE_PREFIX.length()).trim();
+        String name = variable.substring(prefix.length()).trim();
         if (name.isEmpty()) {
             throw new IllegalArgumentException(
-                    "Condition '" + raw + "' writes \"" + SELF_RESOURCE_PREFIX + "\" with no resource after "
+                    "Condition '" + raw + "' writes \"" + prefix + "\" with no resource after "
                             + "it; give one of the resources the character declares, e.g. "
                             + "\"self_resource:充能 >= 3\" (source: " + spec.getSource() + ")");
         }
@@ -3505,7 +3516,12 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
                 return ownerAttribute(ctx.owner(), attribute);
             }
             if (resource != null) {
-                return resourceValue(ctx.owner(), resource, ctx.battle());
+                // ⭐ `summon_resource:` reaches through the owner to its summon (2026-10-02): the engine's `RESOURCE_CHANGED` names the RULE'S OWNER, so this is the only way to ask about
+                // the memosprite's own counter.
+                CanHit resourceHolder = variable.startsWith(SUMMON_RESOURCE_PREFIX) && ctx.battle() != null
+                        ? ctx.battle().memospriteOf(ctx.owner())
+                        : ctx.owner();
+                return resourceValue(resourceHolder == null ? ctx.owner() : resourceHolder, resource, ctx.battle());
             }
             if (stacksName != null) {
                 // 「每当我方目标对【承负】状态下的敌方目标施放 2 次…」 reads the counter on the ENEMY (target), while a

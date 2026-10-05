@@ -36019,3 +36019,14 @@
 > * ⭐ **正确形状**：把 3 点检查挂在**她收得到**的触发（`ULT_CAST`/`SUMMONED`）上，⭐ 并读"⭐ 主人的**召唤物**✗"的资源 ⇒ ⭐ 需要 **`summon_resource:`**。
 > * ⛔ **回滚**：规则 ＋ 两个前缀 ＋ 判据（⭐ 没有可归因效果的词汇不算出货 ✓）。
 > * **实测（本轮）**：回滚后 全量 **0**（--rerun-tasks）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
+
+> **2026-10-02 更新（新目标第 7 轮：✅ 出货 `summon_resource:` ＋ 槽位 26 第四句的可表达部分；⭐⭐ **查明 `RESOURCE_CHANGED` 的持有者是规则主人**）**：
+>
+> * ⭐⭐⭐ **真因**：`fireResourceChanged` 是 `CanHit holder = ctx.owner()` ⇒ 事件的 actor/target 都是**规则主人**，
+>   ⭐ delta 也在**她的**存储上量（⭐ 所以探针读到 `delta=0`）⇒ ⭐ `self_resource:`/`actor_resource:` **都看不到忆灵的【故事】**。
+> * ✅ **修法**：**`summon_resource:`**（⭐ 用 `Battle.memospriteOf(owner)` 从主人伸到它的召唤物 ✓）。
+> * ⭐ **判据**：`with 3 points the counter reads 0.0 ; with only 2 it reads 2.0`；
+>   ⭐ **变异（换成 `self_resource:`）⇒ RED**（`reads 3.0`）⭐ = 第 6 轮的症状 ⇒ **诊断闭环** ✓。
+> * ⛔ **仍登记**：⭐ 「立即获得 1 个额外回合」—— ⭐ `grantExtraTurn` 拒绝**不在行动顺序**的单位，⭐ 而忆灵速度**据数据就是 0**；
+>   ⭐ `EXTRA_TURN` 的注记说同一情形早在创世「迷迷」上量到 ⇒ ⭐ **已知引擎分歧** ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
