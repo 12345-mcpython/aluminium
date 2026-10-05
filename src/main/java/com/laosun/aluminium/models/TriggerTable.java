@@ -1149,6 +1149,17 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
      * this is true exactly when the instance is an ordinary attack, and false for additional damage.
      */
     static final String DAMAGE_IS_ATTACK = "damage_is_attack";
+
+    /**
+     * The bare keyword {@code damage_is_additional}: "the instance being settled is ADDITIONAL damage".
+     *
+     * <p>⭐ The complement of {@link #DAMAGE_IS_ATTACK}, and it has to be its own keyword: that one is stated positively on purpose (`!` is
+     * only for party conditions), so a rule that needs the OTHER side -- 1415's ode of passage, 「缇宝施放追加攻击触发缇宝的结界的附加伤害时，会额外造成
+     * #1 次附加伤害」 -- had no way to say it. ⚠ The negation lives HERE, where the name announces it; `TriggerTable` records what happened
+     * when it lived inside {@code damage_is_attack} instead: cone 23008's energy clause read +0.0, because every ordinary attack failed the
+     * guard it was written to pass (2026-09-30).
+     */
+    static final String DAMAGE_IS_ADDITIONAL = "damage_is_additional";
     /**
      * \u2705 The bare keyword \u300c\u9020\u6210**\u4e0e\u88c5\u5907\u8005\u76f8\u540c\u5c5e\u6027**\u7684\u4f24\u5bb9\u300d (2026-09-30; readers: light cone 21011 and
      * relic set 312). No subject and no value, like {@link #DAMAGE_IS_ATTACK}: the second party is the RULE\u2019S OWNER, so
@@ -1416,6 +1427,19 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
                                 + "(source: " + spec.getSource() + ")");
             }
             return new DamageIsAttack(raw);
+        }
+
+        // ⭐ The complement (2026-10-02): the instance is additional damage. Positive in its own name, negative in what it tests -- see
+        // DAMAGE_IS_ADDITIONAL for why that is the honest spelling and not a double negative.
+        if (text.trim().equalsIgnoreCase(DAMAGE_IS_ADDITIONAL)) {
+            TriggerEvent event = TriggerEvent.fromString(spec.getOn());
+            if (event == null || !DAMAGE_CARRYING_EVENTS.contains(event)) {
+                throw new IllegalArgumentException(
+                        "Condition '" + raw + "' asks whether the instance is additional damage, but " + spec.getOn()
+                                + " carries no damage instance; it belongs on an event that settles one "
+                                + "(source: " + spec.getSource() + ")");
+            }
+            return new DamageIsAdditional(raw);
         }
 
         // `damage_element_is_self`: the bare-keyword sibling of `damage_is_attack`, one clause further in --
@@ -2808,6 +2832,28 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
     }
 
     /** \u2605 The element half of {@link #DAMAGE_IS_ATTACK}: the instance\u2019s element against the rule owner\u2019s own. */
+    /** ⭐ The complement of {@link #DAMAGE_IS_ATTACK}: the instance is additional damage, not an ordinary attack. */
+    private static final class DamageIsAdditional implements Condition {
+        private final String raw;
+
+        DamageIsAdditional(String raw) {
+            this.raw = raw;
+        }
+
+        @Override
+        public boolean test(TriggerContext ctx) {
+            // ⚠ The negation is correct HERE and was a bug next door: `Damage.countsAsAttack` defaults to true, so `!…` is exactly
+            // "additional damage", which is what this keyword names. In `damage_is_attack` the same expression meant the opposite of
+            // that keyword's contract (cone 23008's clause read +0.0).
+            return ctx.damage() != null && !ctx.damage().isCountsAsAttack();
+        }
+
+        @Override
+        public String source() {
+            return raw;
+        }
+    }
+
     private static final class DamageElementIsSelf implements Condition {
         private final String raw;
 
