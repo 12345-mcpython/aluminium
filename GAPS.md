@@ -2318,3 +2318,23 @@
 >
 - ✅ 已出货（2026-10-02）：`1141522` 第三句「本场战斗中，海瑟音造成的伤害提高 `#1%`」—— `on: CAST_SETUP` + `target == self` + `actor is_summon` + `from_skill_id == 22` ⇒ `MODIFY_ATTR{ALL_DAMAGE_TYPE_BOOST, percent_from_cast_param: 0, permanent, target: "self"}`（形状照 1414/1406）。
 - ⛔ `1141522` 剩下一句：使目标身上的**持续伤害立即产生**相当于原伤害 `#2%`/`#3%` 的伤害（★ 形状已有先例：`characters/1111.json` 的「使其当前承受的裂伤状态立即产生 1 次」）。
+
+### ⭐⭐ 跨 cid 的份额（本轮量清的结构性缺口，挡住三句）
+
+⛔ **现状**：每一种份额拼法只能读**施放技能**（`percent_from_cast_param`）或**规则主人自己的**技能（`percent_from_skill_param` / `skill_param:`）。
+而下面三句要的是“**值在 A 的技能行里，而被修饰的事件属于 B**”：
+
+- `1141519` 「提高数值等同于本次治疗数值的 `#1%`」（值在 **slot 19** 行，事件是**风堇**的治疗）；
+- `1141524` 第一句「「长夜」施放忆灵技【迷梦】时伤害提高 `#1%`」（值在 **slot 24** 行，事件是**忆灵的槽位 7**）；
+- `1141522` 最后一句「使目标当前承受的所有持续伤害立即产生相当于原伤害 `#2%`/`#3%` 的伤害」（值在 **slot 22** 行，事件是**海瑟音**的攻击）。
+
+⭐ **本轮试过并被引擎正确拦下的设计**：把 cid 塞进槽位字符串（`"skill_param:1415|SKILL:0"`）——
+**原话**：`Op MODIFY_ATTR scales off skill slot "1415|SKILL", which is not a SkillType`。
+
+⭐⭐ **正确形状（下一步，约十行）**：给 `EffectSpec` 加一个**独立字段** `skill_param_cid`（`@SerializedName("skill_param_cid")`）——
+校验器看到的仍是合法槽位，而 `ownerSkillParamValue(effect, ctx, spelled)` 本来就拿得到 `effect`，所以只需一处读取。
+
+⭐ 另两条本轮量到的规则：
+- `GAIN_RESOURCE` **不读** `percentFromSkillParam`（它只认 `scaledAmount` / `amountFromEvent` / `amountFromAttr`）⇒ 判据要读份额就用 `MODIFY_ATTR`（它走 `shareOf` / `scale`）；
+- `TICK_DOT`（“立即结算”的出货 op，读者 `1111.json`）**要求 `element`** ⇒ 「所有持续伤害」要**每元素一条**；
+- 条件里**没有**“按 cid 认演员”的写法（只有 `actor == self` / `is_other_ally` / `is_summon` / `is_ally`）。

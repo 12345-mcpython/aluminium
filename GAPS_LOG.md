@@ -35254,3 +35254,17 @@
 >   ⭐⭐ **形状已有先例** ✓：⭐ `characters/1111.json` 的「使其当前承受的裂伤状态**立即产生 1 次**相当于原伤害 85% 的伤害」✗ ✓ ⇒ ⭐ **下一问**：⭐ 读那条规则的 op 与门 ✓。
 > * ⭐ **另外量到的**：⭐ 「迷梦，流失，如露」＝ ⭐ **cid `11413`、槽位 `7`** ✗（⭐ 长夜月的忆灵 ✓），⭐ 而 ⭐ slot 24 第一句仍受阻于"⭐ 值取自 slot 24、⭐ 生效限于 slot 7 ✗"这个**跨技能**缺口 ✓。
 > * **实测（本轮）**：⭐ 全量 **0**（--rerun-tasks，**2306** 例 ✓）、⭐ `mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
+
+> **2026-10-02 更新（第 70 轮：⚠ **本轮没有出货** ✗ —— ⭐ 但把**挡住三句**的那个结构性缺口的**精确形状**量清了 ✓）**：
+>
+> * ⭐⭐ **缺口**：⭐ 每一种份额拼法只能读 ⭐ **施放技能**（`percent_from_cast_param` ✓）⭐ 或 ⭐ **规则主人自己**的技能（`percent_from_skill_param` / `skill_param:` ✓）；
+>   ⭐ 而 ⭐ 三句要的是"⭐ 值在 A 的行里、⭐ 事件属于 B ✗"（⭐ slot 19 的治疗 ✓、⭐ slot 24 第一句 ✓、⭐ slot 22 最后一句 ✓）。
+> * ⭐⭐ **我试的设计被引擎正确拦下** ✓：⭐ 把 cid 塞进槽位字符串（`"skill_param:1415|SKILL:0"` ✗）⇒ ⭐ 原话 ⭐
+>   `Op MODIFY_ATTR scales off skill slot "1415|SKILL", which is not a SkillType` ✓ ⇒ ⭐ **拦得对** ✓。
+> * ⭐⭐ **正确形状（⭐ 下一步，⭐ 约十行 ✓）**：⭐ 给 `EffectSpec` 加一个**独立字段** `skill_param_cid` ✗
+>   ⇒ ⭐ 校验器看到的仍是合法槽位 ✓，⭐ 而 ⭐ `ownerSkillParamValue(effect, ctx, spelled)` ✗ ⭐ 本来就拿得到 `effect` ✗ ⇒ ⭐ **一处读取即可** ✓。
+> * ⭐ **另三条量到的规则**：⭐ `GAIN_RESOURCE` ✗ **不读** `percentFromSkillParam` ✗（⭐ 只认 `scaledAmount`／`amountFromEvent`／`amountFromAttr` ✓）
+>   ⇒ ⭐ 判据要读份额就用 `MODIFY_ATTR` ✗；⭐ `TICK_DOT` ✗（⭐ "⭐ 立即结算 ✗"的出货 op ✓，⭐ 读者 `1111.json` ✓）**要求 `element`** ✗ ⇒ ⭐ 「所有持续伤害」要**每元素一条** ✓；
+>   ⭐ 条件里**没有**"⭐ 按 cid 认演员 ✗"的写法 ✓。
+> * ⭐ **回滚** ✓：⭐ 引擎与判据都已回滚 ⇒ ⭐ 树干净、⭐ 全量 0、⭐ mechanics rc 0 ✓（⭐ 这是第四次为结构性能力回滚 ✗ ⚠）。
+> * **实测（本轮）**：⭐ 全量 **0**（--rerun-tasks ✓）、⭐ `mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
