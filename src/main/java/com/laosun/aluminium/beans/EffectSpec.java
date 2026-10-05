@@ -47,6 +47,7 @@ public class EffectSpec {
         copy.amount = this.amount;
         copy.amountFromAttr = amountFromAttr;
         copy.amountPercent = amountPercent;
+        copy.percentFromResource = percentFromResource;
         copy.skillParamCid = skillParamCid;
         copy.amountFromEvent = amountFromEvent;
         copy.amountFromPrevious = amountFromPrevious;
@@ -156,6 +157,16 @@ return copy;
      * The share of {@link #amountFromAttr} to take (0.5 for \u300c50%\u300d). Null means the whole value.
      */
     private Double amountPercent;
+
+    /**
+     * ⭐ A share CARRIED IN A RESOURCE, in basis points (2026-10-02).
+     *
+     * <p>Reader: 1415's odes -- a number that lives in an ode's own row cannot be read later (a memosprite's skill row is unreachable), so it is captured while the ode is cast and
+     * read back through this spelling. {@code percent_from_resource: "充能"} means the resource's value over 10000, which is why the capture stores {@code percent: 10000} times the
+     * share.
+     */
+    @com.google.gson.annotations.SerializedName("percent_from_resource")
+    private String percentFromResource;
 
     /**
      * ⭐ Whose skill row a {@code skill_param:} / {@code percent_from_skill_param} share is read from, when it is NOT the rule owner's own (2026-10-02).

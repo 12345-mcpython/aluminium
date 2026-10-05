@@ -358,11 +358,30 @@
           "op": "GAIN_RESOURCE",
           "resource": "充能",
           "scale": "cast_skill_param:1",
-          "target": "self"
+          "target": "self",
+          "percent": 10000
         }
       ],
       "source": "⚠ 本条**不是数据里的句子** —— 它是能力 `GAIN_RESOURCE{scale: \"cast_skill_param:\"}` 的**常驻读者**（2026-10-02）。⭐ 先例：`1415.json` 的 `level_convention` 也是同类“非句子”内容。",
       "note": "⭐ 为什么需要它：忆灵的技能行**任何份额拼法都读不到**（`Summon` 按 `int` 数据槽位存，而份额走 `Character.getSkills()`），但**施放那一刻**读得到（`castParamValue` 走事件的 actor）⇒ 先把数**捕获**进一个资源，以后再用。⛐ 实测：两个前提缺一不可 —— 规则必须在**被矄准者**的表上（忆灵的施放不送它自己的表），且资源必须**由内容声明**（战前 `setTriggerTable` 不会登记）；而读数要读**角色自己的 store**（队伍 store 是另一份）。"
+    },
+    {
+      "id": "share_from_resource_reader",
+      "on": "TURN_START",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent_from_resource": "充能",
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "⚠ 本条**不是数据里的句子** —— 它是能力 `percent_from_resource` 的**常驻读者**（2026-10-02），与 `level_convention` 同一先例。",
+      "note": "⭐ 读的是「充能」的**基点**：值 / 10000 = 份额。"
     }
   ]
 }

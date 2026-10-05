@@ -2431,3 +2431,12 @@
   - ⭐ **下一步（确切的两处）**：把 `percentFromResource` 加进那道检查（它在 `TriggerInterpreter` 的第 **509** 行附近，
     条件以 `} else if ((effect.getPercent() == null && effect.getPercentFromCastParam() == null` 开头）—— ⚠ 上一次我把它**拆成两行**，结果语法坏了 ✗；
     正确做法是**把那一行整体重写**，而不是往里面插换行。
+
+- ✅ **已出货（2026-10-02，第 130 件）：以**资源为份额**（`percent_from_resource: "<id>"`，基点：值 / 10000）。
+  ⭐ 为什么需要它：奥词行里的数以后读不到（忆灵技能行不可达），所以在施放那一刻**捕获**；
+  而它是个**小于 1 的份额**而资源是整数 ⇒ 内容存**基点**（`percent: 10000`），这个拼法再读回来。
+  判据 `ResourceShareTest`：`charge 8 ; boost 0.0 -> 8.0E-4 (expect +8.0E-4)`；变异（让那个分支返回 0）⇒ 红 ✓。
+- ⭐⭐⭐ **教训（花了两轮才学到）：加一种份额拼法要改**四处**，不是一处**：
+  ① `EffectSpec` 的字段；② `shareOf` 的分支；③ **加载器的“恰好一个份额”检查**；④ **`modifyAttr` 里选下份额路径的那个条件**（第 2355 行附近）。
+  ⭐ 而引擎自己的注释早就写着这件事：*"a share spelling left out of it sends the effect down the flat `amount` arm and unboxes a null"*（实测）。
+- ⭐ **同时更新了 `CaptureCastParamTest`**：捕获现在存基点，而她的「充能」上限是 **8** ⇒ 读数饱和在 8（`charge 0 -> 8`）。

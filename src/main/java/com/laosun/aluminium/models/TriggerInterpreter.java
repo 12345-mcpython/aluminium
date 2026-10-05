@@ -507,7 +507,7 @@ public final class TriggerInterpreter {
                 // ⚠ `percent_from_cast_param` is a SECOND way to state the share (2026-10-02): a share from the cast skill with
                 // no `scale` is exactly as well-formed as one with `percent`, and this check used to call it "neither".
                 } else if ((effect.getPercent() == null && effect.getPercentFromCastParam() == null
-                        && effect.getPercentFromSkillParam() == null)
+                        && effect.getPercentFromSkillParam() == null && effect.getPercentFromResource() == null)
                         == (effect.getAmount() == null)) {
                     throw new IllegalArgumentException(
                             "Op " + op + " needs exactly one of \"percent\" (a share) or \"amount\" (a flat value) unless it also states a \"scale\", in which "
@@ -1475,8 +1475,10 @@ public final class TriggerInterpreter {
             // amount is not a literal and not an attribute, it is what the trigger just reported.
             amount = (int) Math.round(ctx.amount() * (effect.getAmountPercent() == null ? 1 : effect.getAmountPercent()));
         } else if (isCastParamScale(effect)) {
+            // ⭐ × percent (2026-10-02): the share is usually BELOW 1 and a resource holds an integer, so content stores basis points (percent: 10000).
             amount = (int) Math.round(castParamValue(effect, ctx,
-                    effect.getScale().trim().substring(TriggerTable.CAST_SKILL_PARAM_PREFIX.length())));
+                    effect.getScale().trim().substring(TriggerTable.CAST_SKILL_PARAM_PREFIX.length()))
+                    * (effect.getPercent() == null ? 1 : effect.getPercent()));
         } else if (effect.getAmountFromAttr() == null) {
             amount = (int) Math.round(scaledAmount(effect, ctx));
         } else {
@@ -2351,7 +2353,7 @@ public final class TriggerInterpreter {
         // ⚠⚠ `percent_from_skill_param` is the THIRD way to state a share (2026-10-02), and this is the very condition the comment above warns
         // about: a share spelling left out of it sends the effect down the flat `amount` arm and unboxes a null. Measured: that is exactly what happened.
         if (effect.getPercent() != null || effect.getPercentFromCastParam() != null
-                || effect.getPercentFromSkillParam() != null) {
+                || effect.getPercentFromSkillParam() != null || effect.getPercentFromResource() != null) {
             magnitude = derived ? derivedMagnitude(effect, ctx) : effect.getPercent();
         } else {
             magnitude = effect.getAmount();
@@ -2578,6 +2580,11 @@ public final class TriggerInterpreter {
 
     /** The share a magnitude is multiplied by: the stated `percent`, or the cast skill's own parameter. */
     private static double shareOf(EffectSpec effect, TriggerContext ctx) {
+        // ⭐ A share CARRIED IN A RESOURCE, in basis points (2026-10-02): how a number captured at cast time is used later.
+        if (effect.getPercentFromResource() != null) {
+            Character holder = requireCharacterOwner(effect, ctx);
+            return holder.getResources().value(effect.getPercentFromResource().trim()) / 10000.0;
+        }
         if (effect.getPercent() != null) {
             return effect.getPercent();
         }
@@ -2597,7 +2604,7 @@ public final class TriggerInterpreter {
         // is "(has a scale) OR (no percent)", so the flat-`amount` case arrives here too -- hence the guard: only the cast-skill share, and
         // only when there is no scale to read.
         if ((effect.getScale() == null || effect.getScale().isBlank())
-                && effect.getPercentFromCastParam() != null) {
+                && (effect.getPercentFromCastParam() != null || effect.getPercentFromResource() != null)) {
             return shareOf(effect, ctx) + (effect.getAmount() == null ? 0 : effect.getAmount());
         }
         Character owner = requireCharacterOwner(effect, ctx);
