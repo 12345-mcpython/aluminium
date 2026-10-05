@@ -50,12 +50,14 @@ public class HyacineTest {
     @Test
     public void herFileCarriesTheClauses() {
         var table = TriggerTables.of(HYACINE);
-        Assertions.assertEquals(1, table.ruleCount(TriggerEvent.ULT_CAST), "state and Max HP");
+        // ⭐ Two now: her own ultimate, and the sky ode spending a layer on a ULT_CAST (2026-10-02).
+        Assertions.assertEquals(2, table.ruleCount(TriggerEvent.ULT_CAST), "state and Max HP");
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.BATTLE_START), "the level convention");
         // ⚠ Narrowed 2026-10-02: the reason is about the HEAL, and the same skill also says 「召唤忆灵 小伊卡」.
         // Exactly one SKILL_CAST rule exists and it only summons -- the heal is still absent from the file, so nothing is
         // double-counted. What the pin protects is unchanged; what it counts is now what the document states.
-        Assertions.assertEquals(1, table.ruleCount(TriggerEvent.SKILL_CAST),
+        // ⭐ Two now as well: the summon, and the sky ode spending a layer on a SKILL_CAST (2026-10-02).
+        Assertions.assertEquals(2, table.ruleCount(TriggerEvent.SKILL_CAST),
                 "the summon rule the document states -- the heal still comes from the skill data, so no rule states it");
     }
 
