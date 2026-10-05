@@ -36362,3 +36362,26 @@
 >   ⭐ 或 ⭐ 接受原句语义 ＝ ⭐ "**本次施放开始后入场的敌人**" ✓ ⇒ ⭐ 那需要 ⭐ **一个"敌人入场"的引擎概念** ✓（⭐ 与 `justSummoned` 同族 ✓，⭐ 但记在敌人身上 ✓）。
 > * ⭐ **目标 ① 已出货** ✓（⭐ 第 90 件 ✓：⭐ `DISPEL` 的类别过滤 ＋ 内容 ✓）。
 > * **实测（本轮）**：⭐ 全量 **0**（--rerun-tasks，**2263** 例 ✓）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
+
+> **2026-10-02 更新（新目标第 3 轮：⭐⭐⭐ **找到了「新入场」的游戏原文** ✓ —— ⭐ 而落地时**顺序**与我自己的一处脚本坑把它挡下了 ✗ ⇒ 按 ⑤ 回滚 ✓）**）**：
+>
+> * ⭐⭐⭐ **锚点（这才是本轮的价值 ✓）**：⭐ `1415` 那句的「**新入场**」＝ ⭐ 游戏自己的事件 ⭐ **`OnWaveMonster`** ✓ ——
+>   ⭐ 它出现在 ⭐ `Config/ConfigAbility/Servant/Servant_CyreneServant_00_Ability.json` 的 ⭐ `GlobalModifiers` 里 ✓，
+>   ⭐ 名字就叫 ⭐ **`MServant_CyreneServant_00_AmazingBuff_Mydeimos_OnWaveMonster`** ✓（⭐ `Mydeimos` ＝ 万敌 ✓），
+>   ⭐ 内容是 ⭐ `"Event": "OnWaveMonster"` ✓ ⇒ ⭐ `IncludeTaskListTemplate → …_InsertActionCheck` ✓ ＋
+>   ⭐ `TurnInsertAction{TargetType: ModifierOwnerEntity, SkillIndex: 4}` ✓ ＋ ⭐ `ByTargetAliveState{Mask_AliveOrRevivable}` ✓
+>   ＋ ⭐ `"Event": "OnListenInsertAbilityFinish"` ✓ ⇒ ⭐ 语义是 ⭐ **"有波次怪物入场 ⇒ 万敌获得一次插入行动"** ✓✓。
+>   ⇒ ⭐⭐ 所以「新入场」**不是**目标类型 ✗（⭐ 上一轮的 18 种清点因此没找到它 ✓），⭐ 而是一个**事件** ✓；⭐ 而**我们的引擎有波次** ✓ ⇒ 可以照这个词做 ✓。
+> * ⭐⭐ **定位它的路径（记 ✓，⭐ 下次同类问题照走 ✓）**：⭐ 技能行 ⭐ `SkillID 1141516` ⇒ ⭐ `SkillTriggerKey = SkillCY04` ✓ ⇒
+>   ⭐ 能力名 ⭐ `Servant_CyreneServant_00_SkillCY04` ✓ ⇒ ⚠ **但它是个空壳** ✗（⭐ `OnStart: []` ✓，⭐ 全文件只出现 1 次 ✓）
+>   ⇒ ⭐ 真正的行为在 ⭐ **`GlobalModifiers`** ✓ 里（⭐ 49 个 ✓），⭐ 而 ⭐ `AmazingBuff_Mydeimos*` 就是它 ✓。
+> * ⭐ **落地时量到的顺序（重要 ✓）**：⭐ `WaveManager.nextWave()` 是 ⭐ `waveIndex++` ⇒ ⭐ `spawnWave(waveIndex)` ⇒ ⭐ `battle.beginWave()` ⇒ ⭐ `WAVE_START` ✓
+>   ⇒ ⭐⭐ 所以"清空上一波记录"必须在 ⭐ **`spawnWave` 之前** ✓ —— ⭐ 我第一版把它挂在 ⭐ `beginWave()` ✓（⭐ 在 spawn **之后** ✓）⭐ 会把刚生成的那一波**擦掉** ✗。
+> * ⚠ **本轮我自己的两个坑（记 ✓）**：
+>   ⭐ ① ⭐ 补丁把 ⭐ `waveMonsters.clear();` 插到了**方法外面** ✗（⭐ 锚点取的是方法声明行 ✓ ⇒ ⭐ 该插在 `{` 之内 ✓）；
+>   ⭐ ② ⭐ **PowerShell 变量名大小写不敏感** ✗ —— ⭐ 我用 ⭐ `$W` 存路径、⭐ `$w` 存内容 ✓ ⇒ ⭐ 它们是**同一个变量** ✓
+>     ⇒ ⭐ 写入时拿内容当路径 ⇒ ⭐ `Illegal characters in path` ✗ ⇒ ⭐ 于是改动**半落地** ✓（⭐ 而 ⭐ `compileJava` 仍打印 `BUILD SUCCESSFUL` ✓
+>     ⭐ 因为那次失败的写入**没插入**对新方法的调用 ✓）⇒ ⭐ 我按 ⑤ 回滚 ✓。
+> * ⭐⭐ **下一轮可直接落地（全部已量 ✓）**：⭐ 选择器 ⭐ **`wave_monsters`** ✓（⭐ 用游戏的词 ✓）＋ ⭐ `Battle.waveMonsters` ✓（⭐ 清空点 = ⭐ `nextWave()` 里 **spawn 之前** ✓）＋
+>   ⭐ 判据场景照 ⭐ `Cone23011Test` ✓：⭐ `Constant.stages().get(310030)` ✓ ＋ ⭐ `new WaveManager(battle, stage)` ✓ ＋ ⭐ `battle.getWaveManager().nextWave()` ✓（⭐ 那是**真**的波次边界 ✓）。
+> * **实测（本轮）**：⭐ 全量 **0**（--rerun-tasks，**2263** 例 ✓）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓（⭐ 回滚后 ✓）。
