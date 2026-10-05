@@ -1034,3 +1034,15 @@
 - ⭐ **一条拼写事实**：⭐ 暴击率属性的拼写是 ⭐ **`crit_chance`（`CRIT_CHANCE`）** ✗，⭐ **不是** `CRIT_RATE` ✗（⭐ 实测被加载器拒绝 ✓）。
 - ⛔ **仍登记（她终结技里剩下三件）**：⭐ 「使德谬歌**立即获得 1 个额外回合**」、⭐ 「**激活全体队友的终结技**」
   （⭐ 引擎有 `Battle.isUltraReady` ✗（`Battle:688` ✓），⭐ 但**没有把终结技置位的 op** ✗）、⭐ 「使结界**没有持续时间**」✓。
+
+- ✅ **已出货（新目标第 16 件）：她终结技的「⭐ 激活全体队友的终结技 ✗」**。
+  ⭐ **引擎**：⭐ `Battle.ULTIMATE_ACTIVATED_STATE` ✗（`终结技已激活` ✓）＋ ⭐ `isUltraReady` ✗ ⭐ **认这个状态**（⭐ 带它的单位**当场可放** ✓，⭐ 三行 ✓）。
+  ⭐ **内容**：⭐ 她的终结技把这状态给 `other_allies` ✗ ✓。
+  ⭐ **判据** `UltimateActivationTest`：`the ally's ultimate readiness: false -> true` ✓（⭐ 双向 ✓）；
+  ⭐ **变异（去掉引擎那段）⇒ RED**（⭐ `false -> false` ✓）。
+- ⭐⭐⭐ **引擎自己的注释解释了这件事的边界**（`isUltraReady` L692-699 ✓）：
+  > *"the gate is the provider's to decide, not 'energy is full'. Characters who build a stack resource instead of energy
+  > (**Acheron … / Feixiao … / **Cyrene** …**) become ready when their resource fills, and their energy stays at 0 by design"*
+  ⇒ ⭐ **昔涟自己那一档早就是"⭐ 资源满即可激活 ✗"** ✓ ⇒ ⭐ 缺的只是"⭐ 让**别人**当场可放 ✗" ✓ ✓。
+- ⭐ **一条命名说明**：⭐ `终结技已激活` ✗ **不是数据里的名字** —— ⭐ 文档描述的是**效果**而不是状态 ✓
+  ⇒ ⭐ 所以它按引擎侧标记的惯例在 `Battle` ✗ 里**命名一次** ✓（⭐ 常量注释里写明了这一点 ✓）。

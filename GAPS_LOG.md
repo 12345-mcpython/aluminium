@@ -36205,3 +36205,13 @@
 > * ⭐ **拼写事实**：⭐ 暴击率是 **`crit_chance`／`CRIT_CHANCE`**，⭐ 不是 `CRIT_RATE` ✓。
 > * ⛔ **仍登记**：⭐ 使德谬歌立即额外回合、⭐ **激活全体队友的终结技**（⭐ 有 `isUltraReady` 但无置位 op ✓）、⭐ 结界无时长 ✓。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
+
+> **2026-10-02 更新（新目标第 25 轮：✅ 出货「激活全体队友的终结技」）**：
+>
+> * ✅ **引擎**：⭐ `Battle.ULTIMATE_ACTIVATED_STATE`（`终结技已激活`）＋ ⭐ `isUltraReady` 认它 ⇒ ⭐ 带此状态的单位**当场可放终结技** ✓；
+>   ⭐ **内容**：⭐ 她的终结技把它给 `other_allies` ✓。
+> * ⭐ **判据**：`the ally's ultimate readiness: false -> true`；⭐ **变异（去掉引擎那段）⇒ RED**（⭐ `false -> false`）✓。
+> * ⭐⭐⭐ **引擎自述**：⭐ *"the gate is the provider's to decide… Characters who build a stack resource instead of energy (Acheron…/Feixiao…/**Cyrene**…) become ready when their resource fills"*
+>   ⇒ ⭐ **她自己的激活档早已建模**，⭐ 缺的只是"让别人当场可放" ✓。
+> * ⭐ **命名说明**：⭐ `终结技已激活` **不是数据里的名字**（⭐ 文档描述效果而非状态 ✓）⇒ ⭐ 按惯例在 `Battle` 里命名一次并注明 ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
