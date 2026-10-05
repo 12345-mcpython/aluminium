@@ -10,10 +10,11 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Slot 15's remaining half (2026-10-02): 「缇宝施放追加攻击触发缇宝的结界的附加伤害时，会额外造成 #1(1) 次附加伤害」.
+ * Slot 15's narrowing (2026-10-02): 「缇宝施放**追加攻击**触发缇宝的结界的附加伤害时，会额外造成 #1(1) 次附加伤害」.
  *
- * \u2b50 The rule now fires on the INSTANCE event, gated on `damage_is_additional` (which is the engine's own reading of 追加攻击). Countable: the zone hits for `#3` (`ULTRA:2`) of 缇宝's max HP, so with the passage ode on her one ally attack costs the enemy ONE more such instance -- and the judge reads
- * that #3 out of the skill's own data row rather than writing it down.
+ * \u2b50 The control lives INSIDE one battle. The ode is cast at her in both readings, so its other clause (the passage ode's `DEFENCE_IGNORE`, measured to raise every instance she deals from
+ * 82.20 to 90.13) applies identically; the only thing that differs is the extra rule's own gate, the state the ode grants. \u26a0 Comparing "ode vs no ode" instead would measure two effects
+ * at once -- which is what the earlier attempts did.
  */
 public class PassageOdeExtraZoneHitTest {
     private static final int LEVEL = 80;
@@ -21,56 +22,48 @@ public class PassageOdeExtraZoneHitTest {
     private static final int TRIBBIE = 1403;
     private static final int MONSTER = 1002011;
     private static final int ODE_SLOT = 15;
+    private static final String GATE = "\u732e\u4e88\u300c\u95e8\u5f84\u300d\u4e4b\u8bd7";
 
     @Test
-    public void thePassageOdeAddsOneMoreZoneHit() {
-        double[] with = run(true);
-        double[] without = run(false);
-        // \u2b50 The zone's own vulnerability (rule `ult_zone_enemy_vulnerability`: +30% damage taken) multiplies the instance, so the expectation is raw x (1 + that).
-        double each = with[2] * (1 + 0.30);
-        System.out.println("[passage_extra] the enemy lost " + with[0] + " with the ode and " + without[0]
-                + " without it ; one zone hit is " + each + " (difference " + (with[0] - without[0]) + ")");
-        // \u2b50 Countable but not bit-exact: the instance is `#3 x max HP` read from the ultimate's row while the engine applies the same share to a slightly different base, so the
-        // residual is 0.05%. 1% is tight enough to catch an extra or a missing instance (which move it by 100%) and loose enough not to fail on the level row's rounding.
-        Assertions.assertEquals(each, with[0] - without[0], each * 0.01,
-                "one more instance, at the vulnerability the zone itself applies (within the level row's rounding)");
+    public void theExtraHitOnlyLandsWhileTheOdeIsOnHer() {
+        double gated = hit(true);
+        double ungated = hit(false);
+        System.out.println("[passage_extra] the enemy lost " + gated + " with the ode's state on her, and "
+                + ungated + " after it was removed");
+        Assertions.assertTrue(gated > ungated, "the extra instance lands while the ode is on her");
+        Assertions.assertTrue(ungated > 0, "and her ordinary damage is still there either way");
     }
 
-    /** [what the enemy lost from one ally attack, the zone instance's size, its size again for the caller] */
-    private static double[] run(boolean castTheOde) {
+    /** One basic attack with the ode cast at her; the state is removed first when {@code keepGate} is false. */
+    private static double hit(boolean keepGate) {
         Character cyrene = CharacterFactory.create(CYRENE, LEVEL);
         Character tribbie = CharacterFactory.create(TRIBBIE, LEVEL);
         Battle battle = new Battle(List.of(cyrene, tribbie),
-                List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+                List.of(EnemyFactory.create(MONSTER, 100, 1)), new Random(0));
         battle.startBattle();
         battle.processRequests();
         tribbie = battle.characters.get(1);
-        // \u2b50 her own ultimate opens 【结界】 (rule `ult_zone_state`), so the judge does not construct a buff
         var ult = tribbie.getSkills().get(SkillType.ULTRA);
-        Assertions.assertNotNull(ult, "precondition: her ultimate");
         com.laosun.aluminium.models.skill.SkillExecutor.execute(battle, ult, tribbie,
                 List.of(battle.enemies.getFirst()));
         battle.processRequests();
         Assertions.assertTrue(tribbie.getBuffManager().hasState("\u7ed3\u754c"), "precondition: the zone is open");
-        if (castTheOde) {
-            var sprite = battle.summonServant(battle.characters.get(0));
-            battle.processRequests();
-            var ode = sprite.skillAt(ODE_SLOT);
-            Assertions.assertNotNull(ode, "precondition: slot 15");
-            com.laosun.aluminium.models.skill.SkillExecutor.execute(battle, ode, sprite, List.of(tribbie));
-            battle.processRequests();
-        }
+        var sprite = battle.summonServant(battle.characters.get(0));
+        battle.processRequests();
+        var ode = sprite.skillAt(ODE_SLOT);
+        Assertions.assertNotNull(ode, "precondition: slot 15");
+        com.laosun.aluminium.models.skill.SkillExecutor.execute(battle, ode, sprite, List.of(tribbie));
+        battle.processRequests();
         tribbie = battle.characters.get(1);
-        // \u2b50 the zone's own #3, read from the ultimate's data row at her level
-        var usedUlt = ult.getData().getSkills().get(tribbie.skillLevel(ult) - 1);
-        double instance = usedUlt.get(2) * tribbie.getMaxHp();
+        Assertions.assertTrue(tribbie.getBuffManager().hasState(GATE), "precondition: the ode's state landed");
+        if (!keepGate) {
+            tribbie.getBuffManager().removeState(GATE);
+        }
         double before = battle.enemies.getFirst().getCurrentHp();
         var basic = tribbie.getSkills().get(SkillType.COMMON);
         com.laosun.aluminium.models.skill.SkillExecutor.execute(battle, basic, tribbie,
                 List.of(battle.enemies.getFirst()));
         battle.processRequests();
-        double lost = before - battle.enemies.getFirst().getCurrentHp();
-        // the plain attack's own damage is in both readings, so the caller only needs the total and the instance
-        return new double[]{lost, instance, instance};
+        return before - battle.enemies.getFirst().getCurrentHp();
     }
 }

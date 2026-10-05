@@ -228,10 +228,13 @@
   },
   {
     "id": "passage_ode_adds_one_more_zone_hit",
-    "on": "ATTACK_FINISHED",
+    "on": "DEALING_DAMAGE",
     "when": [
+      "actor == self",
       "self has_state 结界",
-      "self has_state 献予「门径」之诗"
+      "self has_state 献予「门径」之诗",
+      "damage_is_additional",
+      "damage_has_no_cast"
     ],
     "do": [
       {
@@ -239,10 +242,11 @@
         "scale": "owner_max_hp",
         "percent_from_skill_param": "ULTRA:2",
         "element": "Quantum",
-        "target": "highest_hp_attack_hit"
+        "cast_category": "ULTRA",
+        "target": "target"
       }
     ],
     "source": "1415 昔涟 忆灵技能 15 「献予「门径」之诗」（SkillID 1141515，`SkillCY03`，参数 `[1, 0.06, 3]`）：「…**缬宝施放追加攻击触发缬宝的结界的附加伤害时，会额外造成 #1 次附加伤害**」（#1 = 1）。",
-    "note": "⭐ **为何与结界那条同形**：“额外造成 1 次附加伤害”就是**再来一次结界的附加伤害**（`ult_zone_additional_damage` 的同一事件、同一口径、同一参数引用）。⭐ 而门径自己那条已经给她挂了 `献予「门径」之诗`，所以条件可靠。⚠ **而“追加攻击”这一层没收窄**（`ATTACK_FINISHED` 上没有“这次攻击是追加攻击”的词汇）—— **登记**。"
+    "note": "⭐ **2026-10-02：收紧完成**。事件在**实例上**，条件是 **`damage_is_additional`**（引擎自述：“additional damage 是它对追加攻击的唯一表示”）**＋`from_skill UNSPECIFIED`**（只收**引擎自己产生**的那一下）。⭐ 而本条加的那一下**声明 `cast_category: ULTRA`** ⇒ 它**不满足**上面的条件 ⇒ **不自触发**。⭐ **实测（为什么之前从未触发）**：结界那一下是 `type=ADDITIONAL skillKey=0 castCategory=UNSPECIFIED`，而我当初的守卫 `damage_skill_key == 3` 恰好把它排除了；而完全不守又会自触发。⭐ **目标必须是 `target`**：`highest_hp_attack_hit` 是攻击的命中集。"
   }
 ]

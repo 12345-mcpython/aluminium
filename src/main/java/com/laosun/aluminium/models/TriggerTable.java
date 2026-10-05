@@ -1184,6 +1184,15 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
     static final String DAMAGE_IS_ADDITIONAL = "damage_is_additional";
 
     /**
+     * ⭐ The bare keyword {@code damage_has_no_cast}: "the instance being settled names no cast" (2026-10-02; reader: 1415's passage ode, whose extra hit must react to the ENGINE's
+     * additional damage and not to its own).
+     *
+     * <p>Measured: the zone's additional damage arrives as {@code type=ADDITIONAL skillKey=0 castCategory=UNSPECIFIED}, while the instances a rule adds carry the {@code cast_category}
+     * the rule states. `from_skill` cannot express this -- it parses a {@code SkillType}, so `from_skill UNSPECIFIED` is refused -- and without a discriminator the rule recurses.
+     */
+    static final String DAMAGE_HAS_NO_CAST = "damage_has_no_cast";
+
+    /**
      * \u2705 The bare keyword \u300c\u9020\u6210**\u4e0e\u88c5\u5907\u8005\u76f8\u540c\u5c5e\u6027**\u7684\u4f24\u5bb9\u300d (2026-09-30; readers: light cone 21011 and
      * relic set 312). No subject and no value, like {@link #DAMAGE_IS_ATTACK}: the second party is the RULE\u2019S OWNER, so
      * "same Type as the wearer" is the only reading it can have.
@@ -1463,6 +1472,17 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
                                 + "(source: " + spec.getSource() + ")");
             }
             return new DamageIsAdditional(raw);
+        }
+
+        // ⭐ And whether the instance names a cast at all (2026-10-02).
+        if (text.trim().equalsIgnoreCase(DAMAGE_HAS_NO_CAST)) {
+            TriggerEvent event = TriggerEvent.fromString(spec.getOn());
+            if (event == null || !DAMAGE_CARRYING_EVENTS.contains(event)) {
+                throw new IllegalArgumentException(
+                        "Condition '" + raw + "' asks whether the instance names a cast, but " + spec.getOn()
+                                + " carries no damage instance (source: " + spec.getSource() + ")");
+            }
+            return new DamageHasNoCast(raw);
         }
 
 
@@ -2907,6 +2927,34 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
 
         @Override
         public String toString() {
+            return raw;
+        }
+    }
+
+    /**
+     * ⭐ {@code damage_has_no_cast}: the instance being settled was produced by the ENGINE, not by a rule that named a cast (2026-10-02).
+     */
+    private static final class DamageHasNoCast implements Condition {
+        private final String raw;
+
+        DamageHasNoCast(String raw) {
+            this.raw = raw;
+        }
+
+        @Override
+        public boolean test(TriggerContext ctx) {
+            // ⚠ Measured: the engine's own instances carry the ENUM `UNSPECIFIED`, not a null (the probe printed "castCategory=UNSPECIFIED"), so testing for null alone made this
+            // condition permanently false.
+            if (ctx.damage() == null) {
+                return false;
+            }
+            var category = ctx.damage().getCastCategory();
+            return category == null
+                    || category == com.laosun.aluminium.enums.SkillCategory.UNSPECIFIED;
+        }
+
+        @Override
+        public String source() {
             return raw;
         }
     }

@@ -35938,3 +35938,15 @@
 > * ⭐ ③ 的形态下差值是 **35.69**（既非 90 也非 179.8）⇒ 只落了一部分 ⇒ **入口缩到**：
 >   为什么同一个 base 会结算出 90.13 与 82.20 **两个值**（它依赖上下文 ⇒ 那个差别就是答案）。
 > * **实测（本轮）**：回滚后 全量 **0**（--rerun-tasks）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
+
+> **2026-10-02 更新（新目标第 7 轮：✅ 出货 能力 ③ ⇒ 槽位 15「缇宝施放**追加攻击**时」收紧完成；**目标四件全部有结论**）**：
+>
+> * ⭐ **新词汇 `damage_has_no_cast`**（"the instance names no cast" = 引擎自己产生的那一下），三处：常量、解析支、条件类。
+> * ⭐ **判据**（同一场战斗内撤掉门径状态作对照）：`with 475.06583639547534 ; without 388.6902297781162`
+>   ⇒ 差 **86.3756 ≈ 一个 ADDITIONAL 实例**；⭐ **变异**（去掉 `damage_has_no_cast`）⇒ **RED**（Trigger recursion exceeded 8 levels）✓。
+> * ⭐⭐⭐ **五条新事实**：（1）引擎实例是 `NORMAL/ULTRAskillKey=3/castCategory=ULTRA`、`NORMAL/basic/skillKey=1/NORMAL`、
+>   **`ADDITIONAL/skillKey=0/UNSPECIFIED`**；（2）⭐ 那些实例带**枚举 `UNSPECIFIED`**，不是 null（只判 null 恒假）；
+>   （3）⭐ `from_skill` 解析 `SkillType`，`from_skill UNSPECIFIED` 被拒；（4）⭐ **此前那 35.69 全部是 `DEFENCE_IGNORE`**
+>   （405.575/369.885 = 1.0965 = 90.13/82.20）⇒ **③ 的规则从未触发过**；（5）⭐ 结界那一下的 `skillKey=0` ⇒ 旧守卫 `== 3` 恰好看漏了它。
+> * ⚠ **诚实说明**：`damage_is_additional` 在本条下**冗余**（去掉读数不动），保留是因为原话如此；能咬的变异是本轮新增那件。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。

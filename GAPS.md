@@ -580,3 +580,24 @@
   ⇒ 该量级关系**仍未查明** ⇒ **登记的入口已缩到**：`applyDamage` 的乘区里，为什么同一个 base 会结算出 90.13 与 82.20
   **两个不同的值**（这说明它**依赖上下文**，而两个上下文的差别就是 ③ 的答案）。
 - ⭐ **槽位 15 的规则仍保留旧形态**（`ATTACK_FINISHED` ＋ 两个状态，绿灯）。
+
+- ✅ **已出货（2026-10-02，新目标第 7 件）**：能力 ③ "**这次攻击是追加攻击**" ⇒ **槽位 15 的收紧完成**。
+  ⭐ **新词汇 `damage_has_no_cast`**（裸关键词：*"the instance being settled names no cast"* —— 即**引擎自己产生的**那一下），
+  三处：常量 ＋ 解析支 ＋ 条件类。
+  ⭐ 内容：槽位 15 的规则移到**实例事件**，条件为
+  `["actor == self", "self has_state 结界", "self has_state 献予「门径」之诗", "damage_is_additional", "damage_has_no_cast"]`，
+  ⭐ 而**它加的那一下声明 `cast_category: ULTRA`** ⇒ 不满足上面的条件 ⇒ **不自触发**；目标用 `target`。
+  ⭐ 判据 `PassageOdeExtraZoneHitTest`（**同一场战斗内的对照**：施放诗之后**撤掉门径的状态**）：
+  `with 475.06583639547534 ; without 388.6902297781162` ⇒ 差 **86.3756 ≈ 一个 ADDITIONAL 实例**；
+  ⭐ 变异（去掉 `damage_has_no_cast`）⇒ **RED**，报 *"Trigger recursion exceeded 8 levels while firing DEALING_DAMAGE"* ✓。
+- ⭐⭐⭐ **五条新事实（新目标第 7 轮）**：
+  1. ⭐⭐ **引擎自己产生的实例长这样**（`DEALING_DAMAGE` 处实测）：
+     `type=NORMAL skillKey=3 castCategory=ULTRA`（终结技）、`type=NORMAL skillKey=1 castCategory=NORMAL`（普攻）、
+     **`type=ADDITIONAL skillKey=0 castCategory=UNSPECIFIED`（结界那一下）**；
+  2. ⭐⭐ **那些实例带的是枚举 `UNSPECIFIED`，不是 null** ⇒ 只判 null 的条件**恒假**（我第一版就这么错了）；
+  3. ⭐ **`from_skill` 解析的是 `SkillType`** ⇒ `from_skill UNSPECIFIED` 会被拒（*"names the unknown skill slot"*）；
+  4. ⭐⭐ **此前所有尝试里那 35.69 的"差值"全部是门径的 `DEFENCE_IGNORE`**：
+     `405.575 / 369.885 = 1.0965` 与 `90.13 / 82.20 = 1.0965` **完全一致** ⇒ **③ 的规则从未触发过**；
+  5. ⭐ **结界那一下的 `skillKey` 是 0** ⇒ 我当初的守卫 `damage_skill_key == 3` **恰好把要看的那一下排除了**。
+- ⚠ **一条诚实的说明**：对本条而言 `damage_is_additional` 在 `damage_has_no_cast` 之下是**冗余的**
+  （实测：去掉它读数不动）。它保留是因为**原话就是"附加伤害时"**，但**能咬的变异是本轮新增的那件**。
