@@ -153,6 +153,60 @@
       ],
       "source": "1415 昔浯 忆灵技能 17：「**召唤死龙时会消耗所有溢出【新蕊】**，每消耗 1% 溢出值，使本次召唤的死龙触发天赋【灼掠幽墟的晦翼】…」",
       "note": "⭐ **本条实现的是“消耗**所有溢出**”**：新拼法 `overflow_only`（只花**上限以上**那一段）。⚠ **而触发本身仍登记**：“召唤**死龙**时”—— 我们的 `1407.json` 里**并没有死龙**，所以本条挂在通用的 `SUMMONED` 上，精度已如实记下。⭐ 后半句（消耗量 → 天赋伤害倍率）仍登记。  ⭐ **2026-10-02 实测**：内容里的键是 **JSON 拼法 `overflow_only`**（它的 `@SerializedName` 就是这个），而不是 Java 字段名；写错会被**加载器当场拒绝**（“unknown key … known: […]”）。"
+    },
+    {
+      "id": "dragon_hollow_wing_damage",
+      "on": "SUMMONED",
+      "when": [
+        "actor == summon"
+      ],
+      "do": [
+        {
+          "op": "DAMAGE",
+          "times": 6,
+          "scale": "owner_max_hp",
+          "percent": 0.56,
+          "element": "Quantum",
+          "target": "random_enemy"
+        }
+      ],
+      "source": "1407 遐蝶 亿灵死龙的天赋 【灼掠幽墟的晦翼】（`SkillID 1140712`，`Skill23`，等级 10 参数 `[0.56, 6, 0.084, 1120]`）：「消耗全部生命，造成 #2 次伤害，每次伤害对敌方随机单体造成等同于遐蝶 #1% 生命上限的量子属性伤害…」—— **本条只管伤害**（另两条各自一条，因为 `MODIFY_RULE` 会改**整条规则**的份额）。",
+      "note": "⭐ **为何拆成三条**：`MODIFY_RULE{effect_percent}` 通过 `amendRuleEffectPercent` 加在**命名规则的每一个效果**上（`amendedEffect`）⇒ 若合并，诗会连**生命代价**与**治疗**一起抬高。⭐ 而数值全部来自数据行：`#1 = 0.56`、`#2 = 6`。口径 `owner_max_hp` = **遐蝶**的生命上限（规则主人是她）。"
+    },
+    {
+      "id": "dragon_hollow_wing_cost",
+      "on": "SUMMONED",
+      "when": [
+        "actor == summon"
+      ],
+      "do": [
+        {
+          "op": "CONSUME_HP",
+          "scale": "owner_max_hp",
+          "percent": 1.0,
+          "target": "self"
+        }
+      ],
+      "source": "同上：「**消耗全部生命**」。",
+      "note": "⭐ “全部”就是 `percent: 1.0`（主人生命上限的 100%）。"
+    },
+    {
+      "id": "dragon_hollow_wing_heal",
+      "on": "SUMMONED",
+      "when": [
+        "actor == summon"
+      ],
+      "do": [
+        {
+          "op": "HEAL",
+          "scale": "owner_max_hp",
+          "percent": 0.084,
+          "amount": 1120,
+          "target": "all_allies"
+        }
+      ],
+      "source": "同上：「同时为我方全体回复等同于遐蝶 #3% 生命上限 + #4 点的生命值」（`#3 = 0.084`、`#4 = 1120`）。",
+      "note": "⭐ 两部分都在：份额（`scale` + `percent`）与常量（`amount`）。"
     }
   ]
 }
