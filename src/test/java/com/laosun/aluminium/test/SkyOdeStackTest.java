@@ -1,0 +1,57 @@
+package com.laosun.aluminium.test;
+
+import com.laosun.aluminium.Battle;
+import com.laosun.aluminium.models.Character;
+import com.laosun.aluminium.models.enemy.EnemyFactory;
+import com.laosun.aluminium.models.skill.SkillExecutor;
+import com.laosun.aluminium.utils.CharacterFactory;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
+import java.util.List;
+import java.util.Random;
+
+/**
+ * 1415's memosprite skill 19, first sentence: 「德谬歌施放忆灵技时，使风堇获得2层【献予「天空」之诗】」 (2026-10-02).
+ *
+ * <p>⭐ TWO-SIDED in one battle: the character the game NAMES BY CID (1409, measured in the ability data) gets the 2 layers the data states, and a different ally present gets
+ * none. ⚠ A cap had to be stated -- the data puts no `MaxLayer` beside this modifier, and our `StackBuff` clamps to 1 without one; 99999 is how this kit spells "no limit".
+ */
+public class SkyOdeStackTest {
+    private static final int LEVEL = 80;
+    private static final int CYRENE = 1415;
+    private static final int HYACINE = 1409;
+    private static final int OTHER = 1002;
+    private static final int MONSTER = 1002011;
+    private static final String MARK = "\u732e\u4e88\u300c\u5929\u7a7a\u300d\u4e4b\u8bd7";
+
+    @Test
+    public void theNamedCharacterGetsTwoLayersAndNobodyElseDoes() {
+        Character cyrene = CharacterFactory.create(CYRENE, LEVEL);
+        Character hyacine = CharacterFactory.create(HYACINE, LEVEL);
+        Character other = CharacterFactory.create(OTHER, LEVEL);
+        Battle battle = new Battle(List.of(cyrene, hyacine, other),
+                List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+        battle.startBattle();
+        battle.processRequests();
+        cyrene = battle.characters.get(0);
+        hyacine = battle.characters.get(1);
+        other = battle.characters.get(2);
+
+        var demiurge = battle.summonServant(cyrene);
+        battle.processRequests();
+        Assertions.assertNotNull(demiurge, "precondition: the memosprite is out");
+        Assertions.assertNotNull(demiurge.skillAt(1), "precondition: slot 1 exists");
+
+        SkillExecutor.execute(battle, demiurge.skillAt(1), demiurge, List.of(battle.enemies.getFirst()));
+        battle.processRequests();
+
+        int named = hyacine.getBuffManager().stacksOf(MARK);
+        int bystander = other.getBuffManager().stacksOf(MARK);
+        System.out.println("[sky_stacks] the named character has " + named + " ; the other ally has " + bystander);
+
+        Assertions.assertEquals(2, named,
+                "\u300c\u4f7f\u98ce\u5807\u83b7\u5f97 2 \u5c42\u300d-- the data states LayerAddWhenStack: 2, and the sentence agrees");
+        Assertions.assertEquals(0, bystander, "and nobody else -- the game names the cid, and so does `ally_cid:`");
+    }
+}
