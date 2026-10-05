@@ -2316,3 +2316,5 @@
 >
 
 >
+- ✅ 已出货（2026-10-02）：`1141522` 第三句「本场战斗中，海瑟音造成的伤害提高 `#1%`」—— `on: CAST_SETUP` + `target == self` + `actor is_summon` + `from_skill_id == 22` ⇒ `MODIFY_ATTR{ALL_DAMAGE_TYPE_BOOST, percent_from_cast_param: 0, permanent, target: "self"}`（形状照 1414/1406）。
+- ⛔ `1141522` 剩下一句：使目标身上的**持续伤害立即产生**相当于原伤害 `#2%`/`#3%` 的伤害（★ 形状已有先例：`characters/1111.json` 的「使其当前承受的裂伤状态立即产生 1 次」）。
