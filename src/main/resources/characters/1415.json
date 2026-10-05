@@ -508,6 +508,41 @@
       ],
       "source": "1415 昔涟 天赋 141504：「昔涟在【追忆】达到 24 点时可激活终结技并解除自身所有负面效果，**处于【往昔的涟漪】状态时在【追忆】达到 12 点时可激活终结技**」。",
       "note": "⭐ **2026-10-02**：阈值由数据确认 —— `141503` 的 **Lv10** 行是 `[1, 24, 0.5, 12]`，即 `#4` = **12**、`#2` = **24**（两档阈值都在同一行里）。⭐ 「可激活终结技」本身仍登记：引擎有 `Battle.isUltraReady`，但**没有把它置位的 op**（能量满才能放）。"
+    },
+    {
+      "id": "talent_activates_the_ultimate_at_twenty_four",
+      "on": "RESOURCE_CHANGED",
+      "when": [
+        "self_resource:追忆 >= 24"
+      ],
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "终结技已激活",
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "1415 昔涟 天赋 141504：「昔涟在【追忆】达到 24 点时**可激活终结技**，处于【往昔的涟漪】状态时在【追忆】达到 12 点时可激活终结技」。",
+      "note": "⭐ **2026-10-02 实测**：`isUltraReady` 对她在 **0 / 12 / 12+涟漪 / 24** 四种情形下**都是 false** —— 原因是结构性的：`CharacterFactory` 给她 `NoConventionalEnergyProvider`，而那个类**没有覆盖 `canCastUltra`**，默认实现要求她**没有的能量条** ⇒ 她永远不可放。⭐ 而上一轮刚好把 `ULTIMATE_ACTIVATED_STATE`（`终结技已激活`）加进了引擎且 `isUltraReady` 认它 ⇒ 这两句**不需要再改引擎**。  ⭐ 满点档。"
+    },
+    {
+      "id": "talent_activates_the_ultimate_at_twelve_inside_the_ripple",
+      "on": "RESOURCE_CHANGED",
+      "when": [
+        "self has_state 往昔的涟漪",
+        "self_resource:追忆 >= 12"
+      ],
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "终结技已激活",
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "1415 昔涟 天赋 141504：「昔涟在【追忆】达到 24 点时**可激活终结技**，处于【往昔的涟漪】状态时在【追忆】达到 12 点时可激活终结技」。",
+      "note": "⭐ **2026-10-02 实测**：`isUltraReady` 对她在 **0 / 12 / 12+涟漪 / 24** 四种情形下**都是 false** —— 原因是结构性的：`CharacterFactory` 给她 `NoConventionalEnergyProvider`，而那个类**没有覆盖 `canCastUltra`**，默认实现要求她**没有的能量条** ⇒ 她永远不可放。⭐ 而上一轮刚好把 `ULTIMATE_ACTIVATED_STATE`（`终结技已激活`）加进了引擎且 `isUltraReady` 认它 ⇒ 这两句**不需要再改引擎**。  ⭐ 涟漪档（阈值 12 由数据确认：`141503` 的 Lv10 行 `[1, 24, 0.5, 12]`）。"
     }
   ]
 }
