@@ -25,7 +25,8 @@
     {
       "on": "CAST_SETUP",
       "when": [
-        "actor == self"
+        "actor == self",
+        "from_skill_id == 3"
       ],
       "do": [
         {
@@ -34,7 +35,7 @@
         }
       ],
       "source": "1413 长夜月 终结技 晚安，全世界无眠 (skill 141303, Ultimate/AoEAttack/Ice): 「召唤忆灵「长夜」，随后使忆灵「长夜」对敌方全体造成等同于「长夜」#1[i]%生命上限的冰属性伤害…」",
-      "note": "Her ultimate's damage is NOT hers to deal, and this rule is where that is said. ⚠ Without it the engine's ordinary damage path swings 141303's own `damage_list` with HER attack as the base (measured 2026-09-27: 8818.5 on 1002011 with an empty table), and the ULT_CAST rule below swings the memosprite's Max-HP share on top -- two damage instances where the document describes one, the first of them scaled off the wrong attribute (M-40). ⚠ It has to be CAST_SETUP and not ULT_CAST: the cast events fire AFTER the damage has been expanded, so a rule there can only describe the swing, never prevent it. ⚠ `actor == self` is required (CAST_SETUP reaches every character's table) and the op verifies it as well rather than trusting the condition. ⚠ `skill: \"ULTRA\"` is likewise a check, not decoration: the condition DSL has no variable for \"which slot is being cast\", so this comparison IS the gate -- naming SKILL here would delegate her Skill instead. ⚠ Its sibling is the ULT_CAST rule below, which delivers the swing this one hands over (SUMMON + COMMAND_SUMMON); the toughness (90, from 141303's own `stance_list`) rides along THERE, because a delegated cast expands no damage of its own and therefore removes no toughness of its own."
+      "note": "Her ultimate's damage is NOT hers to deal, and this rule is where that is said. ⚠ Without it the engine's ordinary damage path swings 141303's own `damage_list` with HER attack as the base (measured 2026-09-27: 8818.5 on 1002011 with an empty table), and the ULT_CAST rule below swings the memosprite's Max-HP share on top -- two damage instances where the document describes one, the first of them scaled off the wrong attribute (M-40). ⚠ It has to be CAST_SETUP and not ULT_CAST: the cast events fire AFTER the damage has been expanded, so a rule there can only describe the swing, never prevent it. ⚠ `actor == self` is required (CAST_SETUP reaches every character's table) and the op verifies it as well rather than trusting the condition. ⚠ `skill: \"ULTRA\"` is likewise a check, not decoration: the condition DSL has no variable for \"which slot is being cast\", so this comparison IS the gate -- naming SKILL here would delegate her Skill instead. ⚠ Its sibling is the ULT_CAST rule below, which delivers the swing this one hands over (SUMMON + COMMAND_SUMMON); the toughness (90, from 141303's own `stance_list`) rides along THERE, because a delegated cast expands no damage of its own and therefore removes no toughness of its own.  ⚠ **2026-10-02 补上的门**：原来只有 `actor == self`，而 `CAST_SETUP` 对**每一次**施放都会发 ⇒ 她施放**战技**时它也去交接一个终结技的挥击，引擎报 “DELEGATE_DAMAGE names ULTRA (slot 3) but the cast in progress is slot 2”。⚠ 这意味着**这条规则对她的战技从来没工作过**（一直抛异常），因为没有判据铸过她的战技。"
     },
     {
       "on": "SUMMONED",
@@ -260,6 +261,26 @@
       ],
       "source": "1415 昔涟 忆灵技能 24：「长夜月施放战技/终结技后，**额外获得 #2 点【亿质】**」（终结技 那半）。",
       "note": "⭐ 数值路径：施放 24 号时把 `#2` 捕获进 `岁月之诗的亿质点数`，战技/终结技时再用 `amount_from_resource` 取出。"
+    },
+    {
+      "id": "her_skill_raises_our_memosprites_crit_damage",
+      "on": "SKILL_CAST",
+      "when": [
+        "actor == self",
+        "from_skill_id == 2"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "scale": "self_attr:crit_attack",
+          "percent_from_skill_param": "SKILL:0",
+          "turns": 2,
+          "target": "all_summons"
+        }
+      ],
+      "source": "1413 长夜月 战技「白昼悄然离去」（SkillID 141302）：「…并**使我方全体忆灵的暴击伤害提高，提高数值等同于长夜月暴击伤害的 #1%**，持续 #2 回合…」。",
+      "note": "⭐ 数值不落字面：`percent_from_skill_param: SKILL:0` 读她自己战技的 `#1`（实测：0.12 → 0.264）；⭐ 份额的底是**她自己的暴伤**（`self_attr:crit_attack`，引擎里叫 `CRIT_ATTACK`）；⭐ 目标是新选择器 `all_summons`（本轮新增）。"
     }
   ],
   "resources": [

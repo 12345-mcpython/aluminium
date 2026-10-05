@@ -177,7 +177,10 @@ public final class TriggerInterpreter {
             "target_else_random_enemy",
             // ⭐ 「被攻击目标中**当前生命值最高**的目标」 (2026-10-02; reader: 1403 缇宝's ultimate, whose zone rider picks that unit, and 1415's
             // ode of passage, which names that rider). The sibling of `random_hit_enemy`: same pool, a different pick.
-            "highest_hp_attack_hit");
+            "highest_hp_attack_hit",
+            // ⭐ 「使我方**全体忆灵**的暴击伤害提高」 (2026-10-02; reader: 1413 长夜月的战技「白昼悄然离去」).
+            // `summon` says only "the owner's OWN summon", so a clause that speaks of the whole side needs its own name.
+            "all_summons");
 
     /**
      * The two spellings of "every one of our characters".
@@ -1859,6 +1862,19 @@ public final class TriggerInterpreter {
             return battle.waveMonsters();
         }
 
+        if ("all_summons".equals(selector)) {
+            if (battle == null) {
+                throw new IllegalStateException(
+                        "Effect targets \"all_summons\" but no battle was supplied to take the summons from");
+            }
+            // ⭐ EVERY memosprite on our side, not just the rule owner's (2026-10-02): the clause is 「使我方**全体**忆灵的暴击伤害提高」, and `summonsOf` is keyed
+            // by master -- so each of our characters is asked. `all_allies` answers "who is on that side" the same way.
+            List<CanHit> everySummon = new ArrayList<>();
+            for (Character ally : battle.characters) {
+                everySummon.addAll(battle.summonsOf(ally));
+            }
+            return List.copyOf(everySummon);
+        }
         if ("all_allies_lethally_hit_this_action".equals(selector)) {
             if (battle == null) {
                 throw new IllegalStateException(
