@@ -12,7 +12,7 @@ import java.util.Random;
 /**
  * Slot 15's remaining half (2026-10-02): 「缇宝施放追加攻击触发缇宝的结界的附加伤害时，会额外造成 #1(1) 次附加伤害」.
  *
- * \u2b50 Countable: the zone hits for `#3` (`ULTRA:2`) of 缇宝's max HP, so with the passage ode on her one ally attack costs the enemy ONE more such instance -- and the judge reads
+ * \u2b50 The rule now fires on the INSTANCE event, gated on `damage_is_additional` (which is the engine's own reading of 追加攻击). Countable: the zone hits for `#3` (`ULTRA:2`) of 缇宝's max HP, so with the passage ode on her one ally attack costs the enemy ONE more such instance -- and the judge reads
  * that #3 out of the skill's own data row rather than writing it down.
  */
 public class PassageOdeExtraZoneHitTest {
