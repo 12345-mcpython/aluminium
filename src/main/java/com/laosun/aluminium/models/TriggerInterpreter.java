@@ -1185,7 +1185,17 @@ public final class TriggerInterpreter {
                     }
                 }
             }
-            case "EXTRA_TURN" -> battle.grantExtraTurn(resolveTarget(effect, ctx));
+            case "EXTRA_TURN" -> {
+                // ⚠⚠ A refused grant used to vanish (2026-10-02): `grantExtraTurn` answers false for a unit that is not in the action
+                // order -- and a memosprite at Speed 0 is exactly that -- so the rule looked like it had worked. Measured on 1415's ode of
+                // genesis, whose clause grants 德谬歌 an extra turn: the judge read "extra turn actor = none" and nothing said why.
+                CanHit holder = require(resolveTarget(effect, ctx), "target", ctx);
+                if (!battle.grantExtraTurn(holder)) {
+                    throw new IllegalStateException("EXTRA_TURN gives " + holder.getName()
+                            + " an extra turn, but it is not in the action order (a memosprite at Speed 0 is skipped "
+                            + "when the battle starts), so no extra turn can be granted");
+                }
+            }
             case "ADVANCE" -> {
                 // One target or a group: 「使该目标立即行动」 and 「使除自身以外的队友立即行动」 are the same op, and
                 // the list resolver is what tells them apart (it is the one HEAL/SHIELD already use for "our
@@ -1911,6 +1921,12 @@ public final class TriggerInterpreter {
             }
         }
         if (victims.isEmpty()) {
+            // ⚠ An empty battlefield stays a no-op, but a caster with NO CAMP is a different thing: `getOpponents` answers an empty list
+            // for it, so the commanded cast silently did nothing at all (2026-10-02). Say which one it is.
+            if (actor.getCamp() == null) {
+                throw new IllegalStateException("a commanded cast by " + actor.getName()
+                        + " reaches nobody: the unit has no camp, so \"its opponents\" is an empty set rather than an empty battlefield");
+            }
             return;                                  // nothing left to reach: an empty battlefield, not a bad rule
         }
         // ⭐ The AIM, when the rule states one (2026-10-02): the commanded cast's main target goes first, because that
