@@ -37342,3 +37342,23 @@
 >   ⭐ 需要一个"⭐ **排除我自己刚造的那一笔**"的门 ✗（⭐ 它挂在附加伤害上、⭐ 又产出附加伤害 ✓ ⇒ ⭐ 会永久自触发 ✓，
 >   ⭐ 引擎的 ⭐ `Trigger recursion exceeded 8 levels` ✗ 就是为此 ✓）⇒ ⭐ 条件清单里**没有**现成拼法 ✗（⭐ `from_rule` 只管 `has_shield` ✓、`from_skill` 只认槽位 ✓）。
 > * **实测（本轮）**：⭐ 全量 **0**（--rerun-tasks，**2294** 例 ✓）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
+
+> **2026-10-02 更新（新目标第 40 轮：⚠ **本轮没有出货** ✗ —— ⭐ 但最后一道门的形状定死了 ✓，⭐ 而且发现一个**不会递归**的挂点 ✓）**）**：
+>
+> * ⭐⭐⭐ **发现 ①：那道"不会递归"的门找到了** ✓ —— ⭐ `ATTACK_FINISHED` ✗ ⭐ **只从** ⭐ `Battle:2637` 的 ⭐ `fireAfterAttack` ⭐ 发出 ✓
+>   （⭐ 命中数就是 ⭐ `targets.size()` ✓），⭐ 而 ⭐ `Battle.applyAdditionalDamage` ⭐ **不发**它 ✗（⭐ 它发的是 ⭐ `FOLLOW_UP` ✓）
+>   ⇒ ⭐⭐ **所以挂在 `ATTACK_FINISHED` 上的规则，⭐ 不会被它自己造出来的那笔附加伤害再次触发** ✓✓
+>   —— ⭐ 这正是 1415 那句需要的性质 ✓（⭐ 否则就是 ⭐ `Trigger recursion exceeded 8 levels` ✗）。
+> * ⭐⭐⭐ **发现 ②：缺的那个词是"追加攻击"** ✗ —— ⭐ `SkillCategory` 的值只有 ⭐
+>   `NORMAL`／`BPSKILL`／`ULTRA`／`MAZE_NORMAL`／`MAZE`／`ASSIST`／`ELATION_DAMAGE`／`UNSPECIFIED`／`UNKNOWN` ✓
+>   ⇒ ⭐⭐ **没有 `FOLLOW_UP`** ✗ ⇒ ⭐ 所以 ⭐ `from_category:` ✗ ⭐ **说不出"这次是追加攻击"** ✗ ✓
+>   ⭐ 而 ⭐ 引擎**自己的**追加攻击概念 ⭐ 是 ⭐ `TriggerEvent.FOLLOW_UP` ✗ ✓（⭐ `applyAdditionalDamage` 的注释写着
+>   ⭐ *"this is the engine's one and only notion of a follow-up attack"* ✓）。
+> * ⭐ **因此下一轮的两条路（⭐ 二选一，⭐ 都已具名 ✓）**：
+>   ⭐ ① ⭐ 给 ⭐ `SkillCategory` 加一个 ⭐ `FOLLOW_UP` ✗（⭐ 并让 ⭐ `DAMAGE` 的追加攻击分支带上它 ✓）⇒ ⭐ 于是 ⭐
+>     `on: ATTACK_FINISHED` ＋ ⭐ `when: [from_category: FOLLOW_UP, self has_state 结界]` ✗ ⭐ 就是**逐字**的原句 ✓；⭐ 或者
+>   ⭐ ② ⭐ 给 ⭐ `Damage` 一个"⭐ 这笔是追加攻击 ✗"的标记 ＋ ⭐ 对应的条件 ✗。
+>   ⚠ 而**不要**用 ⭐ `actor == self` ✗ 顶替 ✗ —— ⭐ 那会让他**普通攻击**也触发 ✓，⭐ 是近似 ✗。
+> * ⭐ **顺带**：⭐ 他的追加攻击（⭐ 我们的模型：⭐ `talent_followup_on_other_ult` ✗ ⭐ 的 ⭐ `DAMAGE` ✗）⭐ 走的正是
+>   ⭐ `damage(...)` 的第三个分支 ⭐ `applyAdditionalDamage` ✓ ⇒ ⭐ 所以 ⭐ 它**会**发 ⭐ `FOLLOW_UP` ✓ ✓。
+> * **实测（本轮）**：⭐ 全量 **0**（--rerun-tasks，**2294** 例 ✓）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
