@@ -276,6 +276,30 @@
       ],
       "source": "同上：「…或**德谬歌被召唤时**，使德谬歌获得 1 点【故事】」。",
       "note": "⭐ 另一个触发。⚠ **2026-10-02 实测**：门从 `actor is_summon` 换成 `actor == summon`——探针在整个判据运行里**只看到一次**【故事】规则被应用（而那一次的 `actor` 是昔涟自己，即终结技那条）⇒ `actor is_summon` 在 `SUMMONED` 上**从未命中**；而 `1413.json` 已有同样的记录。"
+    },
+    {
+      "id": "true_self_ode_spends_three_story",
+      "on": "RESOURCE_CHANGED",
+      "when": [
+        "summon_resource:故事 >= 3",
+        "self has_state 献予「真我」之诗"
+      ],
+      "do": [
+        {
+          "op": "SPEND_RESOURCE",
+          "resource": "故事",
+          "spendAll": true,
+          "target": "summon"
+        },
+        {
+          "op": "CAST_SKILL",
+          "skill": "SKILL",
+          "skill_id": 1,
+          "target": "summon"
+        }
+      ],
+      "source": "1415 昔涟 忆灵技能 26 「献予「真我」之诗」（SkillID 1141526）：「**当【故事】达到 3 点时，德谬歌消耗全部【故事】立即获得 1 个额外回合自动施放【花与箭的舞曲】**」。",
+      "note": "⭐ **2026-10-02**：⭐ **新词汇 `summon_resource:`**—— 实测 `fireResourceChanged` 是 `CanHit holder = ctx.owner()`（**规则主人**），而【故事】在**忆灵**身上 ⇒ 条件必须从主人**伸到它的召唤物**。⭐ 已落：**消耗全部【故事】**＋**立即自动施放【花与箭的舞曲】**（`SkillID 1141501`，忆灵槽位 1）。⛔ **仍登记**：「立即获得 1 个**额外回合**」—— `Battle.grantExtraTurn` 对**不在行动顺序**的单位返回 false，而本忆灵的速度**据数据就是 0**（本文件的 `memosprites/1415.json` 记录了游戏行：`SpeedBase: \"0\"`、`SpeedInherit: \"0\"`）。`EXTRA_TURN` 现在会**响亮地拒绝**，而它的注记说同一情形早前已在创世的「迷迷」上量到。"
     }
   ]
 }

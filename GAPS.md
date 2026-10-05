@@ -728,3 +728,19 @@
 - ⛔ **因此本轮回滚**：`true_self_ode_spends_three_story` 规则、`actor_resource:`/`target_resource:` 两个前缀、
   以及那条判据（⭐ 按项目纪律：**没有可归因效果的词汇不算出货** ✓）。
   ⭐ **而阻碍被写成两条可执行的话**：⭐ （a）⭐ `RESOURCE_CHANGED` ✗ 的投递范围要**探针证实**；⭐ （b）⭐ 需要一个 ⭐ `summon_resource:` ✗。
+
+- ✅ **已出货（新目标第 4 件）：`summon_resource:<资源>` ＋ 槽位 26 第四句的**可表达部分**。
+- ⭐⭐⭐ **查明（这才是第四句落不下来的真因）**：`fireResourceChanged` 的正文是
+  ```java
+  CanHit holder = ctx.owner();                                   // 规则主人，不是真正获得资源的那个单位
+  battle.fireTriggers(TriggerEvent.RESOURCE_CHANGED, holder, holder, 0, delta);
+  ```
+  ⇒ ⭐ **`RESOURCE_CHANGED` 会发、也会送到她的表** ✓ ⭐ 而它的 **actor/target 都是【规则主人】昔涟** ✗，⭐ **delta 也在她的存储上量**（⭐ 所以第 6 轮探针读到 `delta=0` ✓）
+  ⇒ ⭐⭐ 因此 `self_resource:` / `actor_resource:` **都看不到忆灵身上的【故事】** ✓ ⇒ ⭐ 正确的是 **`summon_resource:`**（用 `Battle.memospriteOf(owner)` 从主人**伸到它的召唤物** ✓）。
+- ✅ **判据** `TrueSelfOdeSpendsThreeStoryTest`：`with 3 points the counter reads 0.0 ; with only 2 it reads 2.0`；
+  ⭐ **变异（换成 `self_resource:`）⇒ RED**（`reads 3.0`）—— ⭐ **正是第 6 轮那个症状**，⭐ 诊断由此闭环 ✓。
+- ⛔ **同句仍登记**：⭐ 「**立即获得 1 个额外回合**」⇒ `Battle.grantExtraTurn` 对**不在行动顺序**的单位返回 false，
+  而本忆灵的速度 **据数据就是 0**（⭐ `memosprites/1415.json` 的 `source` 记录了游戏行：`SpeedBase: "0"`、`SpeedInherit: "0"` ✓）。
+  ⭐ 而 `EXTRA_TURN` 现在会**响亮地拒绝**，⭐ 它的注记说明**同一情形早前已在创世「迷迷」上量到** ✗ ⇒ ⭐ 这是**已知的引擎分歧（忆灵不在行动顺序）** ✓ 登记。
+- ⭐ **槽位 26 现状**：6 条规则（⭐ 打标记 ＋ 终结技给【故事】 ＋ 被召唤时给【故事】 ＋ 3 点消耗与自动施放 ✓）
+  ⇒ ⭐ 第三、四句的**机械核心**已落；⭐ 第一句（不同队友计数）、第二句（额外冰伤）、⭐ 以及「额外回合」仍登记 ✓。
