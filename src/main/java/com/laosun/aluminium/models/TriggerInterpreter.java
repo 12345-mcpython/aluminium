@@ -1861,6 +1861,14 @@ public final class TriggerInterpreter {
             }
             return List.copyOf(party);
         }
+        if (selector.startsWith(ALLY_CID_PREFIX)) {
+            // ⭐ 「使**风堇**获得…」 (2026-10-02): a selector that NAMES a character is handled HERE, in the plural path, because absence is not an error --
+            // it is a battle that does not contain that character, and the clause simply does nothing. The singular path's convention is the opposite (it throws), which is why
+            // this must not be left to it. Same shape as `lowest_hp_ally` just below.
+            int cid = Integer.parseInt(selector.substring(ALLY_CID_PREFIX.length()).trim());
+            CanHit named = allyWithCid(ctx, cid);
+            return named == null ? List.of() : List.of(named);
+        }
         if (TARGET_LOWEST_HP_ALLY.equals(selector)) {
             if (battle == null) {
                 throw new IllegalStateException(

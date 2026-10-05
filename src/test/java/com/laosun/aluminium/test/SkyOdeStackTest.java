@@ -55,4 +55,37 @@ public class SkyOdeStackTest {
                 "\u300c\u4f7f\u98ce\u5807\u83b7\u5f97 2 \u5c42\u300d-- the data states LayerAddWhenStack: 2, and the sentence agrees");
         Assertions.assertEquals(0, bystander, "and nobody else -- the game names the cid, and so does `ally_cid:`");
     }
+
+    /**
+     * ⭐ The OTHER half of `ally_cid:`: a battle that does not contain the named character. The clause must do nothing -- not throw. ⚠ This is not hypothetical: content that
+     * reached this branch with nobody to find turned 22 unrelated judges red before the fix.
+     */
+    @Test
+    public void theClauseDoesNothingWhenSheIsNotThere() {
+        Character cyrene = CharacterFactory.create(CYRENE, LEVEL);
+        Character other = CharacterFactory.create(OTHER, LEVEL);
+        Battle battle = new Battle(List.of(cyrene, other),
+                List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+        battle.startBattle();
+        battle.processRequests();
+        cyrene = battle.characters.get(0);
+        other = battle.characters.get(1);
+
+        var demiurge = battle.summonServant(cyrene);
+        battle.processRequests();
+        var ode = demiurge.skillAt(19);
+        Assertions.assertNotNull(ode, "precondition: slot 19");
+
+        // no assertion about layers -- the reading IS that this does not throw
+        Assertions.assertDoesNotThrow(
+                () -> {
+                    SkillExecutor.execute(battle, ode, demiurge, List.of(battle.enemies.getFirst()));
+                    battle.processRequests();
+                },
+                "\u540d\u70b9\u7684\u89d2\u8272\u4e0d\u5728\u573a\u65f6\uff0c\u8fd9\u6761\u5e94\u8be5\u4ec0\u4e48\u4e5f\u4e0d\u505a");
+        Assertions.assertEquals(0, other.getBuffManager().stacksOf(MARK),
+                "and it lands on nobody -- not on a bystander");
+        System.out.println("[sky_stacks] with the named character absent: no throw, and the bystander has "
+                + other.getBuffManager().stacksOf(MARK));
+    }
 }
