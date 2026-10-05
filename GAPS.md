@@ -778,3 +778,18 @@
   ⭐ 而两个速度 0 的忆灵（小伊卡、德谬歌）**都没有** `EXTRA_TURN` ✗ ✓ ⇒ ⭐ 无一处指向速度 0 的单位 ✓。
 - ⭐ **登记（槽位 18）**：⭐ 「使其**战技的伤害次数增加 `#1`(3) 次**，持续1回合」⭐ **没有词汇**（⭐ `hits` ✗ 只在 `MemospriteSpec` ✗；⭐ `hit_count` ✗ 是**条件** ✓）
   ⇒ ⭐ 需要"⭐ 运行期改某技能的命中次数 ✗"，⭐ 而**模板就在旁边**：`CanHit.raiseSkillLevel` ✗ 的 `skillLevelBonus` ✗ ＋ ⭐ `RAISE_SKILL_LEVEL` ✗ op ✓。
+
+- ✅ **已出货（新目标第 7 件）：天赋的【未来】授予**（⭐ 原话「⭐ 战斗开始时**或昔涟行动后**，我方任意状态的**其他**角色及其忆灵获得【未来】 ✗」）。
+  ⭐ 两条规则：**`BATTLE_START`** ＋ ⭐ **`TURN_END`**（`actor == self` ✗ = 「昔涟行动后」✓），⭐ 都是
+  `APPLY_BUFF{未来, target: "other_allies", permanent: true}` ✗ ✓。
+  ⭐ 判据 `CyreneFutureTest`：`the ally has it = true ; 昔涟 herself = false`；
+  ⭐ **变异（`other_allies` → `all_allies`）⇒ RED**（`昔涟 herself = true`）✓。
+- ⭐⭐ **本轮量到的三条引擎事实**：
+  1. ⭐ **选择器的准确拼写是 `other_allies`**（⭐ 不是 `all_other_allies`；⭐ 加载器会列出 `TARGET_SELECTORS` 的已知项 ✓）；
+  2. ⭐ **`APPLY_BUFF` 拒绝 `max_stacks`**（⭐ 报错原文：*"only MODIFY_ATTR accumulates"* ✓）⇒ ⭐ **buff 天生就是刷新** ✓，⭐ 正合「获得【未来】」✓；
+  3. ⭐ **`target_when` 不能在 `BATTLE_START` 上用**（⭐ *"carries no actor and no target"* ✓）；
+     ⭐ 而 ⭐ **`REMOVE_STACK` 必须写 `amount`**，⭐ 并且**"先给全体、再后置回收"的写法无效**（⭐ 同一事件内的应用顺序**不是文件序** ✓）。
+- ⛔ **仍登记（天赋 141504 的其余两句）**：⭐ 「⭐ 持有【未来】的我方目标行动时消耗【未来】使昔涟获得 1 点【追忆】 ✗」
+  （⭐ 需要读**行动者自己**的计数器：⭐ `actor_stacks:未来` ✗ ＋ ⭐ `REMOVE_STACK{target: actor}` ✗ ＋ ⭐ `GAIN_RESOURCE{追忆, 1}` ✗）；
+  ⭐ 以及 ⭐ 「⭐ 【追忆】达 24 点（⭐ 【往昔的涟漪】下 12 点）可激活终结技并解除自身所有负面效果，上限后可溢出至 27 点 ✗」✓。
+- ⭐ **一条可复用的事实**：⭐ **同一事件内的多条规则，其应用顺序不按文件顺序** —— ⭐ 所以"⭐ 先给再撤 ✗"⭐ 这种写法不可靠 ✓（⭐ 102 轮那条"⭐ 计数要排在增益之后 ✗"的教训由此扩展 ✓）。

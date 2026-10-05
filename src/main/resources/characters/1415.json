@@ -304,6 +304,38 @@
       ],
       "source": "1415 昔涟 忆灵技能 26 「献予「真我」之诗」（SkillID 1141526）：「**当【故事】达到 3 点时，德谬歌消耗全部【故事】立即获得 1 个额外回合自动施放【花与箭的舞曲】**」。",
       "note": "⭐ **2026-10-02**：⭐ **新词汇 `summon_resource:`**—— 实测 `fireResourceChanged` 是 `CanHit holder = ctx.owner()`（**规则主人**），而【故事】在**忆灵**身上 ⇒ 条件必须从主人**伸到它的召唤物**。⭐ 「立即获得 1 个额外回合」用 **`INSERT_ACTION`**：本忆灵的速度**据数据就是 0**，而 `Queue.addCombatant` 的注释写明这种单位**不会出现在行动条上、也不会轮到它**（“skipped rather than refused”）⇒ 所以「**立即**…」的语义是“**立即行动**”（`INSERT_ACTION` 的自述：“makes X act now”），而不是排程意义的额外回合。⭐ 「花与箭的舞曲」= `SkillID 1141501`（忆灵槽位 1）。"
+    },
+    {
+      "id": "talent_grants_future_at_battle_start",
+      "on": "BATTLE_START",
+      "when": null,
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "未来",
+          "permanent": true,
+          "target": "other_allies"
+        }
+      ],
+      "source": "1415 昔涟 天赋 众愿啊，汇流如歌 (141504, Enhance)：「**战斗开始时或昔涟行动后，我方任意状态的其他角色及其忆灵获得【未来】**」。",
+      "note": "⭐ **2026-10-02**：原话说**其他**角色 ⇒ 用 `target_when: [\"target != self\"]` 排除昔涟自己；⭐ `max_stacks: 1`：「获得【未来】」是**刷新**而不是叠加。⛔ 同句的**消耗部分**（「持有【未来】的我方目标行动时消耗【未来】使昔涟获得 1 点【追忆】」）仍登记：它要读**行动者自己**的计数器。  ⭐ 排除她自己的方式：`target_when` 在 `BATTLE_START` 上被拒（该事件**无目标**）⇒ 改用**后置的一条回收**（见 `talent_keeps_future_off_herself`）。"
+    },
+    {
+      "id": "talent_grants_future_after_she_acts",
+      "on": "TURN_END",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "未来",
+          "permanent": true,
+          "target": "other_allies"
+        }
+      ],
+      "source": "1415 昔涟 天赋 众愿啊，汇流如歌 (141504, Enhance)：「**战斗开始时或昔涟行动后，我方任意状态的其他角色及其忆灵获得【未来】**」。",
+      "note": "⭐ **2026-10-02**：原话说**其他**角色 ⇒ 用 `target_when: [\"target != self\"]` 排除昔涟自己；⭐ `max_stacks: 1`：「获得【未来】」是**刷新**而不是叠加。⛔ 同句的**消耗部分**（「持有【未来】的我方目标行动时消耗【未来】使昔涟获得 1 点【追忆】」）仍登记：它要读**行动者自己**的计数器。  ⭐ 「昔涟行动后」= 她自己的 `TURN_END`。  ⭐ 排除她自己的方式：`target_when` 在 `BATTLE_START` 上被拒（该事件**无目标**）⇒ 改用**后置的一条回收**（见 `talent_keeps_future_off_herself`）。"
     }
   ]
 }
