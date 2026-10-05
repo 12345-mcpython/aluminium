@@ -37419,3 +37419,20 @@
 > * ⚠ **为什么不本轮做**：⭐（b）⭐ 会改变**所有** op 伤害的行为 ✗（⭐ 它们从此会"宣告攻击" ✓）⇒ ⭐ 影响面大 ✓，
 >   ⭐ 需要先量 ⭐ 有多少既有判据依赖"⭐ op 伤害不宣告 ✗" ✓ ⇒ ⭐ 这一步要留整轮 ✓。⭐ 我不在余额不足时动它 ✓。
 > * **实测（本轮）**：⭐ 全量 **0**（--rerun-tasks，**2295** 例 ✓）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
+
+> **2026-10-02 更新（新目标第 44 轮（续）：⚠ **第 115 件被撤回** ✗ —— ⭐ 它建在一个**数据里不存在的值**上 ✓，
+> ⭐ 而枚举自己的注释独立印证了这一点 ✓）**）**：
+>
+> * ⭐⭐⭐ **两条独立证据（⭐ 都说数据里没有"追加攻击"这个类别 ✓）**：
+>   ⭐ ① ⭐ `SkillCategory.isCombatAction` 的注释：⭐ *"…{@code false}: map basic attack, technique (both outside battle), assist skill, elation damage,
+>     **talents and follow-up attacks (empty in the data)**."* ✓
+>   ⭐ ② ⭐ **`UNSPECIFIED("")` 自己的注释**（⭐ 更硬 ✓）：⭐ *"{@code attack_type} is empty in the data — **94 measured, all of them
+>     **talents and follow-up attacks** (they are not an 'active cast', so they have no attack type)."* ✓✓
+>   ⇒ ⭐⭐ **所以第 41 轮那个 ⭐ `FOLLOW_UP("FollowUp")` ✗ 是**凭空造的数据值** ✗** ⇒ ⭐ **已撤回** ✓，
+>   ⭐⭐ **连同建在它上面的 ⭐ `damage_is_follow_up` ✗、⭐ 它的判据 ✗、⭐ 以及第 115 件那次出货 ✗**。
+> * ⭐ **撤回后保留的（⭐ 它们不依赖那个值 ✓）**：⭐ `Damage.getCastCategory()` ✓、⭐ `EffectSpec.cast_category` ✓（⭐ 规则**可以**声明一个**数据里真有**的类别 ✓，
+>   ⭐ 例如 ⭐ `ULTRA` ✓）、⭐ `Battle.applyAdditionalDamage(…, SkillCategory)` ✓ —— ⭐ 它们都编译且全量绿 ✓，⚠ 但目前**没有被内容使用** ✓ ⇒ ⭐ 记在这里 ✓。
+> * ⭐ **缺口仍在，⭐ 性质已定** ✗：⭐ 「⭐ 缇宝施放**追加攻击** ✗」这句话 ⭐ **不能靠类别表达** ✗（⭐ 数据里就没有 ✓）
+>   ⇒ ⭐ 下一轮的路只有两条 ✓：⭐ ① ⭐ 让"⭐ 是追加攻击 ✗"由 ⭐ **规则 id** ✗ 表达（⭐ 需要"⭐ 这次事件由哪条规则引起 ✗"的读法 ✓，⭐ 引擎没有 ✓）；
+>   ⭐ ② ⭐ 或 ⭐ 把它登记为**模型边界** ✓（⭐ 原句两半里 ⭐ 「⭐ 触发结界的附加伤害 ✗」那半已出货 ✓）。
+> * **实测（本轮）**：⭐ 全量 **0**（--rerun-tasks，**2294** 例 ✓ —— 少的那一例是 ⭐ 被撤回的 `DamageIsFollowUpTest` ✓）、⭐ `mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
