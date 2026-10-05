@@ -949,3 +949,15 @@
   ⭐ 而 ⭐ `memospriteWith` ✗ 应当与它**对称** ✓ ⇒ ⭐ **登记为引擎缺口** ✓。
 - ⭐ **另一条事实**：⭐ 忆灵自己的技能**只在 `skillsByDataSlot` ✗ 里**，⭐ **不进** `SkillType.COMMON` ✗ ——
   ⭐ 实测：⭐ `SkillType.COMMON present = false` ✗ ✓（⭐ 所以 `getSkills().get(COMMON)` ✗ 对它恒为 null ✓）。
+
+- ✅ **已出货（新目标第 13 件）：两条召唤路径对 spec 的 `skills` 对称**。
+  ⭐ **形状**：⭐ 把原先内联在 `servantWith` ✗ 里的循环收成 **`SummonFactory.installSpecSkills(summon, spec, master)`** ✗，
+  ⭐ 由 **`memospriteWith` ✗ 与 `servantWith` ✗ 各调用一次** ✓（⭐ 重复代码也一并消失 ✓）。
+  ⭐ **判据** `MemospriteSkillsSymmetryTest`：`via summonMemosprite: [1, 2, 3, 5, 13, …, 26] ; via summonServant: [1, 2, 3, 5, 13, …, 26]` ✓；
+  ⭐ **变异（去掉忆灵路径那次调用）⇒ RED**（⭐ `via summonMemosprite: []` ✗ —— ⭐ **正是上一轮量到的那个缺口** ✓）。
+- ⭐ **效果**：⭐ 现在 `summonMemosprite` ✗ 造出来的忆灵**自带全部 18 个槽位** ✓ ⇒ ⭐ 判据不必再绕道 servant 路径 ✓
+  （⭐ 上一轮的额外冰伤判据仍用 `summonServant` ✗，⭐ 两条路现在等价 ✓）。
+- ⚠ **一条流程教训（第三次踩到，本轮记下）**：⭐ **锚点里不要带源码的中文注释** ✗ ——
+  ⭐ 脚本里用转义中文写锚点时**永远匹配不上** ✓，⭐ 本轮与上一轮共因此空转 **4 次** ✓
+  ⇒ ⭐ **一律用纯 ASCII 锚点**（⭐ 本轮改用 `if (spec.skills() != null && !spec.skills().isEmpty()) {` ✗ 后一次通过 ✓）。
+- ⭐ **另一处小修**：⭐ 第一次替换把调用**粘到了 `return summon;` ✗ 同一行**（⭐ 功能正确、⭐ 只是格式 ✓）⇒ ⭐ 当场整理 ✓。
