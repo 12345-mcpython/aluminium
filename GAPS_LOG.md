@@ -35525,3 +35525,17 @@
 >   （2）**`summon` = 主人自己的忆灵** ⇒ 要说“全体”必须自己遍历我方。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks）、`mechanics` **rc 0** ✓、树干净 ✓。
 > * ⚠ **流程事故**：本轮的文档脚本因一个**代理对字符**而 `UnicodeEncodeError` ⇒ 两份文档都没写成（而代码已提交）。⭐ 教训：**文档脚本里不放任何非 BMP 字符**。
+
+> **2026-10-02 更新（第 92 轮：⛔ **没有出货**（第 12 次回滚）—— 但 `1141524` 第三句的两道墙都摸清了）**：
+>
+> * ⭐⭐ **第一道墙（已摸清、已放宽过一次）**：`TriggerInterpreter` L881 的
+>   `if (TriggerEvent.fromString(spec.getOn()) != TriggerEvent.BATTLE_START)`，报文自己给的理由是
+>   *"a bonus granted mid-battle would have to be taken back when whatever granted it ended, and nothing does that"*。
+>   ⭐ 而本句的授予是「**整场生效**」—— **没有要收回的东西**，所以那个理由对它不成立。已验证放宽到 `CAST_SETUP` 后能过校验。
+> * ⛔ **第二道墙（本轮撞到）**：`TriggerTable.validateAmendments` 报
+>   *"MODIFY_RULE raises the value of rule \"her_skill_raises_our_memosprites_crit_damage\", but non…"* ⇒
+>   **被修正的规则必须把份额写成字面 `percent`**，而我的目标规则用 `percent_from_skill_param`（因为它随等级变）。
+> * ⭐ **下一轮的两个选择**：（a）让修正案也能抬**拼法份额**；
+>   （b）在施放那一刻直接把**额外份暴伤**加到忆灵身上（需先量同名叠代）。
+> * ⭐ **三句已出两句**（第 82、89 轮），**只差这一句**。
+> * **实测（本轮）**：回滚后 全量 **0**（--rerun-tasks）、树干净 ✓。
