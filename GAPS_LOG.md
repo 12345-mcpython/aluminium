@@ -36234,3 +36234,14 @@
 > * ⭐⭐ **她终结技六件已落**：✅ 召唤／✅ 激活全体终结技／✅ 进入涟漪／✅ 强化普攻／✅ 暴击率 50%／✅ 展开结界且无时长；
 >   ⛔ **只剩** ⭐ 「使德谬歌立即获得 1 个额外回合」（⭐ 与槽位 26 的「被召唤时」同源 ✓）。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
+
+> **2026-10-02 更新（新目标第 28 轮：✅ 出货「可激活终结技」两档；⭐⭐ 并查明它为何一直是 false）**：
+>
+> * ✅ **形状**：⭐ 两条 `RESOURCE_CHANGED` ⇒ ⭐ `APPLY_BUFF{终结技已激活, permanent}`（⭐ 24 点；⭐ 12 点那条加涟漪门 ✓）。
+> * ⭐ **判据**：`bare 0 = false ; reaching 12 = false ; reaching 12 in the ripple = true ; reaching 24 = true`（⭐ 四面 ✓）；
+>   ⭐ **变异（去掉 12 点的涟漪门）⇒ RED**（⭐ `reaching 12 = true`）✓。
+> * ⭐⭐⭐ **结构性发现**：⭐ `NoConventionalEnergyProvider` **覆盖了 `hasEnergyBar` 却没覆盖 `canCastUltra`** ⇒ ⭐ 走默认实现（要求能量条）
+>   ⇒ ⭐ **她永远不可放**；⭐ 而修它**不需要新引擎件**（⭐ 两轮前的 `ULTIMATE_ACTIVATED_STATE` 正好可用 ✓）。
+> * ⭐ **再学一次**：⭐ **直接 `gain` 不触发 `RESOURCE_CHANGED`** ⇒ ⭐ 判据要经由 op 越过阈值 ✓。
+> * ✅ **登记项收掉**：⭐ 「可激活终结技」（⭐ 两档 ✓）⭐ 已由内容承担 ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
