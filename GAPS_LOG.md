@@ -36194,3 +36194,14 @@
 >   （2）⭐ 一回合的 buff 不会在同一次 `beforeMove/afterMove` 里过期 ✓。
 > * ⛔ **回滚**：⭐ 探针规则 ＋ ⭐ 探针判据（⭐ 结论已落档 ✓）。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
+
+> **2026-10-02 更新（新目标第 24 轮：✅ 出货槽位 26 的 12 点档 ＋ 她终结技的三件；⭐ 发现整个终结技只有一条 `SUMMON`）**：
+>
+> * ⭐⭐ **审计发现**：⭐ 她的终结技在我们这边只有 `{"op": "SUMMON"}`，⭐ 而 TextMap 的原话有**六件**（⭐ 额外回合／激活全体终结技／进入【往昔的涟漪】／强化普攻／暴击率提高／结界无时长 ✓）。
+> * ✅ **本轮三件**：⭐ `ULT_CAST` ⇒ `APPLY_BUFF{往昔的涟漪, permanent}` ＋ ⭐ `MODIFY_ATTR{CRIT_CHANCE, 0.5, coexist}`；
+>   ⭐ 以及 12 点档：⭐ `RESOURCE_CHANGED` ＋ `["self has_state 往昔的涟漪", "self_resource:追忆 >= 12"]` ⇒ ⭐ 按类别 `DISPEL` ✓。
+> * ⭐ **判据**：`debuffs left inside the ripple = 0 ; outside it = 2`（⭐ 双向 ✓）；⭐ **变异（去掉状态门）⇒ RED**（⭐ `outside it = 0`）✓。
+> * ⭐⭐ **数据确认**：⭐ `141503` 的 Lv10 行 `[1, 24, 0.5, 12]` ⇒ ⭐ `#3` = 暴击率 **50%**、⭐ `#4` = **12** ✓。
+> * ⭐ **拼写事实**：⭐ 暴击率是 **`crit_chance`／`CRIT_CHANCE`**，⭐ 不是 `CRIT_RATE` ✓。
+> * ⛔ **仍登记**：⭐ 使德谬歌立即额外回合、⭐ **激活全体队友的终结技**（⭐ 有 `isUltraReady` 但无置位 op ✓）、⭐ 结界无时长 ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。

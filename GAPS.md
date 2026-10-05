@@ -1016,3 +1016,21 @@
 - ⛔ **回滚内容**：⭐ 探针规则（`1415.json` ✗）＋ ⭐ 探针判据 ✓ —— ⭐ 结论已落档 ✓。
 - ⭐ **槽位 25 剩余三句的落法（本轮查清 ✓）**：⭐ 【龙灵】那半句需要 ⭐ **按选择器读护盾**（⭐ `CanHit.getShield()` ✗ 可读 ✓，⭐ 但 `DAMAGE` ✗ 的 scale ✗ 是闭集 ✓）
   ＋ ⭐ **"⭐ 下 N 次攻击 ✗"** ⭐ 的计数 ✓；⭐ 而 `holder_of:同袍` ✗ 这个选择器**已经存在** ✓。
+
+- ✅ **已出货（新目标第 15 件）：槽位 26 的 12 点档 ＋ 她终结技里三件可表达的**。
+  ⭐⭐ **审计发现**：⭐ **她的终结技（`141503`）在我们这边只有 `{"op": "SUMMON"}` 一条**（`ult_summons_demiurge` ✗），
+  ⭐ 而 TextMap 的原话是：⭐
+  > 「⭐ 召唤忆灵德谬歌，使其立即获得 1 个额外回合并**激活全体队友的终结技**，随后**进入【往昔的涟漪】状态**，获得强化普攻。
+  > 昔涟和德谬歌的**暴击率提高**，展开战技的结界并使其没有持续时间 ✗」
+  ⭐ 本轮落了其中**三件**（⭐ 而第一件正是 12 点档的前置 ✓）：
+  1. ⭐ `ult_enters_the_ripple_and_sharpens` ✗ —— `ULT_CAST` ✗ ＋ `actor == self` ✗ ⇒
+     ⭐ `APPLY_BUFF{往昔的涟漪, permanent}` ✗ ＋ ⭐ `MODIFY_ATTR{CRIT_CHANCE, percent: 0.5, permanent, coexist: true, max_stacks: 1}` ✗ ✓；
+  2. ⭐ `talent_cleanses_in_the_ripple_at_twelve` ✗ —— `RESOURCE_CHANGED` ✗ ＋
+     `["self has_state 往昔的涟漪", "self_resource:追忆 >= 12"]` ✗ ⇒ ⭐ 按类别两条 `DISPEL` ✗ ✓。
+  ⭐ **判据** `CyreneRippleTierTest`：`debuffs left inside the ripple = 0 ; outside it = 2` ✓（⭐ **双向** ✓）；
+  ⭐ **变异（去掉状态门）⇒ RED**（⭐ `outside it = 0` ✓）。
+- ⭐⭐ **数据确认（两档阈值在同一行）**：⭐ `141503` ✗ 的 **Lv10** 参数是 `[1, **24**, **0.5**, **12**]` ✗
+  ⇒ ⭐ `#2` = 24（⭐ 满点档 ✓）、⭐ `#3` = **0.5（暴击率 50%）** ✓、⭐ `#4` = **12（涟漪档）** ✓ ✓。
+- ⭐ **一条拼写事实**：⭐ 暴击率属性的拼写是 ⭐ **`crit_chance`（`CRIT_CHANCE`）** ✗，⭐ **不是** `CRIT_RATE` ✗（⭐ 实测被加载器拒绝 ✓）。
+- ⛔ **仍登记（她终结技里剩下三件）**：⭐ 「使德谬歌**立即获得 1 个额外回合**」、⭐ 「**激活全体队友的终结技**」
+  （⭐ 引擎有 `Battle.isUltraReady` ✗（`Battle:688` ✓），⭐ 但**没有把终结技置位的 op** ✗）、⭐ 「使结界**没有持续时间**」✓。
