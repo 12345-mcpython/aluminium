@@ -5,7 +5,7 @@ Measured: the first version asserted five and failed with "expected: <5> but was
 """
 import io
 
-PATH = "src/test/java/com/laosun/aluminium/test/Cone23004CastScopeTest.java"
+PATH = "src/test/java/com/laosun/aluminium/test/InTheNameOfTheWorldCastScopeTest.java"
 OLD = '        Assertions.assertEquals(5, count(raw, "\\"until\\": \\"cast_end\\""),\n' \
       '                "every one of them is scoped to the cast");'
 NEW = '        // ⚠ TEN, not five: each rank carries TWO effects (effect hit and attack) and both state the lifetime.\n' \

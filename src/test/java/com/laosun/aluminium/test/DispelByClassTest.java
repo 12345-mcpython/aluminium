@@ -48,7 +48,7 @@ public class DispelByClassTest {
         var control = Constant.CONTROL_EFFECTS.get("IMPRISONED");
         mydei.getBuffManager().addBuff(new ControlBuff(control, 3));
         mydei.getBuffManager().addBuff(new DotBuff(mydei, DamageElement.FIRE, 100, 3));
-        // Note: a ControlBuff counts as TWO debuffs (measured; Cone21001Test says so in the same words), so the pair is 3
+        // Note: a ControlBuff counts as TWO debuffs (measured; GoodNightAndSleepWellTest says so in the same words), so the pair is 3
         Assertions.assertEquals(3, mydei.getBuffManager().debuffCount(), "precondition: one control (2) and one dot (1)");
 
         Skill ode = demiurge.skillAt(16);

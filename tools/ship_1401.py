@@ -16,7 +16,7 @@ import io
 import json
 
 DATA = "src/main/resources/characters/1401.json"
-JUDGE = "src/test/java/com/laosun/aluminium/test/AttackStacking1401Test.java"
+JUDGE = "src/test/java/com/laosun/aluminium/test/TheHertaAttackStackingTest.java"
 LATER = "ult_attack_advance_and_inspiration"
 
 doc = json.load(io.open(DATA, encoding="utf-8"))
@@ -62,7 +62,7 @@ import java.util.Random;
  * <p>⭐ FILE-DRIVEN, and the TOTAL is the claim: 1.4, not 0.6 and not 0.8. ⚠ The technique needs her `秘技` state, which a
  * judge cannot assume, so one rule applying it is APPENDED (`TriggerTable.plus`).
  */
-public class AttackStacking1401Test {
+public class TheHertaAttackStackingTest {
     private static final int OWNER = 1401;
     private static final int MONSTER = 1002011;
 

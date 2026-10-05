@@ -3,7 +3,7 @@
 Three repairs over v1:
   * strip the data's inline markup from a name -- `<unbreak>999</unbreak>` and `{NICKNAME}` are formatting, not part of the name;
   * the Trailblazer's row carries the literal placeholder `{NICKNAME}`, so 800x resolves to "Trailblazer" (only one numbered Trailblazer test exists, so no path suffix is needed to stay unique);
-  * a compound class name names two things (`Cone20001And21000Test`), so every id is resolved and joined, instead of only the first.
+  * a compound class name names two things (`CornucopiaAndPostOpConversationTest`), so every id is resolved and joined, instead of only the first.
 """
 import io
 import json

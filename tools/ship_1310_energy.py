@@ -20,8 +20,8 @@ sys.stdout.reconfigure(encoding='utf-8', errors='replace')
 WORK = r'E:\code\java\aluminium'
 CHAR = 'src/main/resources/characters/1310.json'
 ENG = 'src/main/java/com/laosun/aluminium/models/TriggerTable.java'
-JREL = 'src/test/java/com/laosun/aluminium/test/Cid1310EnergyFullDispelTest.java'
-NAME = 'Cid1310EnergyFullDispelTest'
+JREL = 'src/test/java/com/laosun/aluminium/test/FireflyEnergyFullDispelTest.java'
+NAME = 'FireflyEnergyFullDispelTest'
 
 RULE = {
     'on': 'ENERGY_GAINED',
@@ -77,7 +77,7 @@ import java.util.Random;
  * so both directions are pinned: at full energy the rule matches, below full it must not. The engine mutation (flip
  * the ratio) is caught by the SECOND assertion -- with the ratio inverted a zero-energy unit reads Infinity.
  */
-public class Cid1310EnergyFullDispelTest {
+public class FireflyEnergyFullDispelTest {
     private static final int CID = 1310;
     private static final int LEVEL = 80;
 

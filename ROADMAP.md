@@ -1801,7 +1801,7 @@ python .git\scan_clauses3.py                                # 从句扫描器（
 | 事实 | 证据 |
 |---|---|
 | **软仇恨的数值在数据里**，只是正文未引用 | 光锥 21009 的 `weapon_skill_data` = `[2, 0.16…0.24]`，正文只引用 `#2`；21009 已出货内容写 `"percent": 1` |
-| **槽位值 = 倍数，属性写"倍数 − 1"** | `Cone21009SemanticsTest` 实测 `battle.aggroOf`：**300 vs 150 ⇒ 倍数 2.0**（1001 存护基准 150）；`AGGRO_ADDED_RATIO` 本身是 `1.0` |
+| **槽位值 = 倍数，属性写"倍数 − 1"** | `LandauSChoiceSemanticsTest` 实测 `battle.aggroOf`：**300 vs 150 ⇒ 倍数 2.0**（1001 存护基准 150）；`AGGRO_ADDED_RATIO` 本身是 `1.0` |
 | **`per_stack` 可以数目标的减益** | 光锥 21001（已出货）：`engineCount 1 ⇒ 1.24`、`3 ⇒ 1.72`、`4 ⇒ 1.72`（上限保持） |
 | **一个 `ControlBuff` 在 `debuffCount()` 里算 2 个** | 同上实测（`fixture=2 ⇒ engineCount=3`） |
 | **实例级修饰来得及改当前这一击** | `Battle` 2539 触发 `DEALING_DAMAGE` ⇒ 2547 暴击判定 ⇒ 2551 防御区；遗器 108/4、112/4 因此出货 |

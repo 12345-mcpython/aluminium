@@ -15,7 +15,7 @@ import java.util.Random;
 /**
  * 1415's memosprite skill 22, last sentence (2026-10-02): "使受到攻击的敌方目标当前承受的所有持续伤害立即产生相当于原伤害 #2%/#3% 的伤害".
  *
- * The DoT goes on the enemy the SHIPPED way (`enemy.getBuffManager().addBuff(new DotBuff(...))`, as Cone21026Test does) -- two rounds were spent trying to apply it through a
+ * The DoT goes on the enemy the SHIPPED way (`enemy.getBuffManager().addBuff(new DotBuff(...))`, as WoofWalkTimeTest does) -- two rounds were spent trying to apply it through a
  * rule, and the probe showed it never landed. The event is fired by hand so that only the clause is under test.
  *
  * Two-sided: with the ode the captured basic-attack share (0.3) makes the 100-damage burn bite for 30; without it nothing was captured and TICK_DOT resolves nothing.
@@ -64,7 +64,7 @@ public class OceanOdeTickDotTest {
         }
 
         var enemy = battle.enemies.getFirst();
-        // the shipped way to put a damage-over-time on an enemy (Cone21026Test)
+        // the shipped way to put a damage-over-time on an enemy (WoofWalkTimeTest)
         enemy.getBuffManager().addBuff(new DotBuff(hysilens, DamageElement.FIRE, BURN, 3));
         double before = enemy.getCurrentHp();
         // fire the event by hand, with the skill key: only the clause is under test

@@ -5,7 +5,7 @@ back the very objects it created, which removes the lookup entirely.
 """
 import io
 
-JUDGE = "src/test/java/com/laosun/aluminium/test/Character1513LaughterTest.java"
+JUDGE = "src/test/java/com/laosun/aluminium/test/AventurineWaveflairLaughterTest.java"
 
 io.open(JUDGE, "w", encoding="utf-8", newline="").write('''package com.laosun.aluminium.test;
 
@@ -25,9 +25,9 @@ import java.util.Random;
  *
  * <p>⭐⭐ 笑点 is a PARTY-scoped, uncapped counter that ALREADY existed (declared by 1502 as `max: 2147483647`); these
  * readings are about HER grants, each the sentence's own number. ⚠ The counter is shared, so the sum test is the point --
- * that is what 「队伍级」 means, and `partyResourceValue` is the accessor `Character1502Test` already uses.
+ * that is what 「队伍级」 means, and `partyResourceValue` is the accessor `YaoGuangTest` already uses.
  */
-public class Character1513LaughterTest {
+public class AventurineWaveflairLaughterTest {
     private static final int AVENTURINE = 1513;
     private static final int ALLY = 1002;
     private static final int MONSTER = 1002011;

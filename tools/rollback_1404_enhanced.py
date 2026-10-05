@@ -62,7 +62,7 @@ lines[hits[0]] = (
     "| ⭐ 实测已把它缩到**两件** ✓：① **强化战技的自身代价没有被执行** ✗"
     "（判据：敌人挨打 16498.30→15730.71 ✓ 而他自己的血不动 ✗ —— ⚠ 尚未分开“换装没生效”与“该列没执行” ✗）；"
     "② 「`resource_changed:<名>`」**需要由 op 抬起事件** ✗（判据：直接 `fireTriggers(RESOURCE_CHANGED, …)` 时 充能 150→150、敌人毫发无损 ✗；"
-    "☠ `Cone20024Test` 的注记说的就是这件：“**the op's own change** fired RESOURCE_CHANGED — that is the wiring” ✓） "
+    "☠ `LingeringTearTest` 的注记说的就是这件：“**the op's own change** fired RESOURCE_CHANGED — that is the wiring” ✓） "
     "| `1404`（ 1 位）、**`1415` 的忆灵技能 8** ✓ **共 2 位** ✓ "
     "| ⭐ **槽位已指名** ✓：【弑王成王】=槽 **9** ✓、【弑神登神】=槽 **11** ✓"
     "（由 `SkillData.init(1404, 槽).stanceFor(…)` 的破韧 **60/30** 与 **90/60** 对上语料 ✓，标定用 `1301` 的槽 8 ✓）；"

@@ -16,7 +16,7 @@ import xml.etree.ElementTree as ET
 sys.stdout.reconfigure(encoding='utf-8', errors='replace')
 WORK = r'E:\code\java\aluminium'
 BATTLE = 'src/main/java/com/laosun/aluminium/Battle.java'
-TEST = 'com.laosun.aluminium.test.Cone23062SpendTest'
+TEST = 'com.laosun.aluminium.test.IAmAsYouBeholdSpendTest'
 NL = chr(10)
 
 path = WORK + '/' + BATTLE
@@ -31,12 +31,12 @@ if len(mut_re.findall(saved)) != 1:
 
 
 def run():
-    for f in glob.glob(WORK + r'\build\test-results\test\*Cone23062SpendTest*.xml'):
+    for f in glob.glob(WORK + r'\build\test-results\test\*IAmAsYouBeholdSpendTest*.xml'):
         os.remove(f)
     r = subprocess.run([r'.\gradlew.bat', 'test', '--tests', TEST, '--rerun-tasks', '--console=plain'],
                        cwd=WORK, capture_output=True, text=True, encoding='utf-8', errors='replace')
     reds, outs = [], []
-    for f in glob.glob(WORK + r'\build\test-results\test\*Cone23062SpendTest*.xml'):
+    for f in glob.glob(WORK + r'\build\test-results\test\*IAmAsYouBeholdSpendTest*.xml'):
         try:
             root = ET.parse(f).getroot()
         except Exception:

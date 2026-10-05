@@ -101,18 +101,18 @@ public class %CLASS% {
 }
 '''
 
-io.open("src/test/java/com/laosun/aluminium/test/DefenceStacking1106Test.java", "w",
+io.open("src/test/java/com/laosun/aluminium/test/PelaDefenceStackingTest.java", "w",
         encoding="utf-8", newline="").write(
     JUDGE.replace("%TITLE%", "\\u7ec8\\u7ed3\\u6280\\u7684 -40% \\u4e0e\\u79d8\\u6280\\u7684 -20% \\u964d\\u9632\\u90fd\\u8981\\u7b97 (1106)")
-         .replace("%CLASS%", "DefenceStacking1106Test")
+         .replace("%CLASS%", "PelaDefenceStackingTest")
          .replace("%OWNER%", "1106")
          .replace("%READ%", "enemy.getAttribute(AttributeType.DEFENCE).get()"))
-print("ok   DefenceStacking1106Test")
+print("ok   PelaDefenceStackingTest")
 
-io.open("src/test/java/com/laosun/aluminium/test/BreakingEffectStacking8005Test.java", "w",
+io.open("src/test/java/com/laosun/aluminium/test/TrailblazerBreakingEffectStackingTest.java", "w",
         encoding="utf-8", newline="").write(
     JUDGE.replace("%TITLE%", "\\u7ec8\\u7ed3\\u6280\\u4e0e\\u79d8\\u6280\\u7684 +30% \\u51fb\\u7834\\u7279\\u653b\\u90fd\\u8981\\u7b97 (8005)")
-         .replace("%CLASS%", "BreakingEffectStacking8005Test")
+         .replace("%CLASS%", "TrailblazerBreakingEffectStackingTest")
          .replace("%OWNER%", "8005")
          .replace("%READ%", "owner.getAttribute(AttributeType.BREAKING_EFFECT).get()"))
-print("ok   BreakingEffectStacking8005Test")
+print("ok   TrailblazerBreakingEffectStackingTest")

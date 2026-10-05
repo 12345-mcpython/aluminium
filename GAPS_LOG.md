@@ -2169,7 +2169,7 @@
 > 
 > **2026-09-29 更新（aggro 回收之一百六十三：软仇恨的倍数语义**实测钉住**；受伤降低的读数仍待解释）**：
 > 
-> * ⭐⭐⭐ **约定已由测量确定（不是推理）**：`Cone21009SemanticsTest` 实测 **`Battle.aggroOf(装备者)`**：
+> * ⭐⭐⭐ **约定已由测量确定（不是推理）**：`LandauSChoiceSemanticsTest` 实测 **`Battle.aggroOf(装备者)`**：
 >   **带光锥 300 / 不带 150** ✓（1001 是**存护**，基准 **150** ✓）=> **倍数恰好 2.0** ✓ =>
 >   * **已出货的 `light_cones/21009.json` 写 `"percent": 1` 是对的** ✓（`aggroOf = base × (1 + ratio)` ✓ => `1` 就是 ×2 ✓）；
 >   * 而 **`weapon_skill_data` 的槽位值 `2` 表示"×2"** ✓ => ⭐ **正确换算 = 槽位值 − 1** ✓，
@@ -3317,7 +3317,7 @@
 > 
 > **2026-09-29 更新（aggro 回收之二百四十四：遗器 113/4 **仍未落地（第四轮）** —— 夹具不能搬到 `9xxx`）**：
 > 
-> * ⚠ **状态** ✓：**内容本身已经全绿一轮** ✓ —— 夹具搬到 `9113` 之后，`Relic113FourPieceTest` **三条用例全过** ✓
+> * ⚠ **状态** ✓：**内容本身已经全绿一轮** ✓ —— 夹具搬到 `9113` 之后，`LongevousDiscipleFourPieceTest` **三条用例全过** ✓
 >   （实测 `percent=0.08 turns=2 maxStacks=2` ✓、`by hit=1 by price=1` ✓），
 >   ⇒ ⚠ 但**全量套件**有两处红 ✗ ⇒ 按纪律**整体回退** ✓（树干净、全量绿 ✓）。
 > * ⭐⭐ **两处红都很小，而且指出了真正的约束** ✓：
@@ -4597,7 +4597,7 @@
 > * **两个引擎级对照（`tools/control.py` ✓）** ✓：
 >   * 把 `damage_is_attack` 的 `!` **放回去** ✓ ⇒ `DamageIsAttackConditionTest` **reds=2** ✓
 >     ⇒ 该条件的判据**确实压在那行实现上** ✓（不是靠读者间接发现 ✓）；
->   * 把 `per_attack` 的检查**中和成 false** ✓ ⇒ `Cone23008Test` **reds=1** ✓
+>   * 把 `per_attack` 的检查**中和成 false** ✓ ⇒ `EchoesOfTheCoffinTest` **reds=1** ✓
 >     ⇒ 能量封顶**确实由引擎那行**保证 ✓。
 > * ⭐ **工具"拒绝"的第四次教学（第 164/142 条同族 ✓）** ✓：`mutate.py` 拒绝 `per_attack` ✗（"belongs to no known layer" ✓）——
 >   **拒绝是对的** ✓（宁可报错也不乱写 ✓）；我因此把它补进**规则级**字段集合 ✓
@@ -7188,7 +7188,7 @@
 > 
 > **2026-09-30 更新（aggro 回收之四百六十三：**1505 的判据补上"规格半"，上一轮那条无效变异被堵住**）**：
 > 
-> * ✅ **补的是什么** ✓：`Character1505Test` 新增一条**规格半**（`theShippedRulesCarryTheStatedNumbers` ✓）——
+> * ✅ **补的是什么** ✓：`EvanesciaTest` 新增一条**规格半**（`theShippedRulesCarryTheStatedNumbers` ✓）——
 >   直接读**角色自己的编译后规则**（`getTriggerTable().rulesFor(BATTLE_START)` ✓），断言
 >   **`amountFromAttr = CRIT_ATTACK`** ✓、**`amountPercent = 0.5`** ✓、**`amount = 20.0`** ✓，并数到**两条**规则 ✓。
 > * ⭐⭐ **为什么需要它（上一轮的实测教训 ✓）**：那两条**行为**判据里的 effect 是**在 Java 里手搭的** ✗
@@ -7304,7 +7304,7 @@
 > * **判据读数（实测 ✓）** ✓：`[cap] a 150-energy conversion mirrored 100 and a 60-energy one mirrored 60` ✓
 >   （**超限的被削到 100** ✓、**未超限的原样通过** ✓ —— 两向读数 ✓）；规格 `amountCap=100.0 amountFromEvent=true` ✓。
 >   ⚠ 判据是**直接发事件量**（`fireTriggers(ENERGY_GAINED, …, 1, 150)` ✓）—— 真实回能路径已由
->   `Character1505EnergySyncTest` 覆盖 ✓，这一条测的是**上限** ✓，注释里也这么写了 ✓。
+>   `EvanesciaEnergySyncTest` 覆盖 ✓，这一条测的是**上限** ✓，注释里也这么写了 ✓。
 > * **三条变异 + 一条对照（判红前先删 XML 并校验年龄 ✓）** ✓：the ceiling is 50 instead of 100(applied=True)=2 | the ceiling is effectively gone (1000)(applied=True)=2 | the clamp never runs(applied=True)=1
 > * ✅ 三条**全部为红** ✓。
 > * **引擎级对照** ✓（写成能编译的语句 ✓）：让封顶永不生效 ⇒ **evidence: reds=1 (compile=0, test=1)** ✓。
@@ -7538,7 +7538,7 @@
 > * **三条变异 + 一条对照（判红前先删 XML 并校验年龄 ✓）** ✓：the counter is declared per character again(applied=True)=2 | the skill adds 5 instead of 10(applied=True)=2 | the factory registers a private copy of a party counter(applied=True)=1
 > * ✅ 三条**全部为红** ✓。
 > * **引擎级对照** ✓（写成能编译的语句 ✓）：让写入永远到不了战斗容器 ⇒ **evidence: reds=1 (compile=0, test=1)** ✓。
-> * ⚠ **顺带修的旧判据** ✓：`Character1505UltRiderTest` 原先数"CAST_SETUP 上的 p1505 规则" ✗ ⇒ 现在**按 id** 只数那两条 rider ✓
+> * ⚠ **顺带修的旧判据** ✓：`EvanesciaUltRiderTest` 原先数"CAST_SETUP 上的 p1505 规则" ✗ ⇒ 现在**按 id** 只数那两条 rider ✓
 >   （它自己的注释也写清了原因 ✓）—— 守卫又一次先于我发现了变化 ✓。
 > * ⚠ **登记（未做 ✓）**：阿哈的摇奖与【欢愉】羁绊 ✗；1502 终结技的 5 点笑点与额外回合 ✗
 >   （前者现在**只差内容** ✓，下一轮可直接加 ✓）；1506「获得笑点时获得等量【隐藏分】」✗（还差"**资源变化时转发到另一个资源**"的写法 ✓）；
@@ -8848,7 +8848,7 @@
 >   * **访问器**：`CompiledRule.conditions()` ✓ 返回条件列表 ✓；
 >   * **条件原文**：**`conditions().getFirst().source()`** ✓ —— 现成模板：
 >     `SelfAttributeConditionTest.java:462-464` ✓（它断言 `conditions().size()` ✓ 再断言 `source()` ✓）；
->   * ⚠ 另一个现成用法是**打印**（`Cone23010Test.java:58` 里 `+ " conditions=" + rule.conditions()` ✓）——
+>   * ⚠ 另一个现成用法是**打印**（`BeforeDawnTest.java:58` 里 `+ " conditions=" + rule.conditions()` ✓）——
 >     可用于先看一眼形态 ✓，但**打印不算断言** ✗。
 > * ⭐⭐⭐ **下一轮的机械修法（8 个光锥判据 ✓，锚无关的写法 ✓）**：
 >   给每个判据**追加一个测试方法** ✓（追加到文件末尾 ⇒ **不需要找锚** ✓，避免了我反复踩的锚不匹配 ✗）：
@@ -8890,7 +8890,7 @@
 > **2026-09-30 更新（aggro 回收之五百五十八：**更正"17 处"的读法 —— 扫描漏跑了新判据；修正后：⚠ 仍有 17 处**）**：
 > 
 > * ⚠⚠ **更正上一条的读法 ✓**：它写着「重扫：仍有 17 处」✗ —— **17 这个数是对的 ✓，但它的含义被我写错了** ✓。
->   真因：扫描器只跑**每张光锥自己的判据**（`LightCone21061Test` 等 ✓），**没有跑**我新写的
+>   真因：扫描器只跑**每张光锥自己的判据**（`HolidayThermaeEscapadeTest` 等 ✓），**没有跑**我新写的
 >   **`ConeConditionCoverageTest`** ✗ ⇒ 所以条件变异在**被跑的那组判据**里依然是绿的 ✓。
 >   ⇒ ✅ **修法**：让扫描器**同时跑覆盖判据** ✓（一行改动 ✓）⇒ **重扫读数：⚠ 仍有 17 处** ✓。
 > * ⭐⭐⭐ **这条更正本身就是本段最重要的经验之一 ✓**：**变异扫描的"被测集合"也是被测量的对象** ✓ ——
@@ -9019,7 +9019,7 @@
 > * ⭐⭐⭐ **结论**：**条件维度在角色判据上同样缺失** ✓ —— 与光锥侧（第 143 轮 17 处）**同一形态** ✓：
 >   判据读了效果 ✓，没读 `when` ✓。⇒ ⚠ 这说明"**六维检查表**"应当**对全仓内容判据**执行 ✓，而不只是光锥 ✓。
 > * ✅ **下一轮的机械修法（已有现成模板 ✓）**：
->   ① **模板**：`Character1502Test` 的条件断言写法（它两条全红 ✓）+ 光锥侧新写的
+>   ① **模板**：`YaoGuangTest` 的条件断言写法（它两条全红 ✓）+ 光锥侧新写的
 >      **`ConeConditionCoverageTest`** ✓（结构照搬 ✓，只把 cone 换成 character ✓）；
 >   ② **新判据**：`CharacterConditionCoverageTest` ✓ —— 对 1505 / 1502 / 1506 的规则逐条断言
 >      `conditions().stream().map(c -> c.source())` ✓（⚠ 记住**属性名会被解析器小写化** ✓）；
@@ -10362,7 +10362,7 @@
 >   * ⭐ `ExtraTrueDamageTest` ✓ 里有 **`aoeAttack()` + "3 次附加伤害"** 的既有断言 ✓（⚠ 与"**按目标**结算"相关 ✓）。
 > * ⭐⭐⭐ **判据方案（定稿 ✓，两段 ✓）**：
 >   * **第一段（必做 ✓，弱但稳）**：在**多目标**场次之后 ✓，注册一条挂在 **`ATTACK_FINISHED`** 的**手工规则** ✓
->     （⚠ 规则要能在"没有任何内容读者"的情况下被触发 ✓ ⇒ 形式参考 `Cone21040Test` 里
+>     （⚠ 规则要能在"没有任何内容读者"的情况下被触发 ✓ ⇒ 形式参考 `TheDayTheCosmosFellTest` 里
 >       `caster.setTriggerTable(new TriggerTable(FIRE_BLAST, List.of(...)))` 的写法 ✓ —— ⭐ **那正是"直接装配一张表"的现成样板** ✓）；
 >     规则效果选一个**对敌方目标可观察**的 op ✓（⭐ 候选：`MODIFY_DAMAGE_TAKEN` ✓ —— 它**落在目标身上** ✓、
 >       不需要元素 ✗、也不需要新读者 ✓）⇒ ✅ **断言恰好一个敌人被加上 ✓、且它属于"被命中的那三个"** ✓；
@@ -10372,11 +10372,11 @@
 >       —— ⭐ 这是**行为级**证据 ✓，比"读内部字段"更结实 ✓。
 > * ⚠ **诚实的边界 ✓**：第二段是**概率性**的（多种子 ✓）⇒ ⚠ 若种子序列不覆盖三个 ✗，就**如实降级**为
 >   "**断言取到的目标属于被命中集合**" ✓ 并**登记**"冻结未能行为级证明" ✗（㉓ ✓）。
-> * ✅ **下一轮（机械 ✓）**：① 读 `Cone21040Test` 的表装配样板 ✓ + `TriggerTableTest` 的 AOE 场次 ✓；
+> * ✅ **下一轮（机械 ✓）**：① 读 `TheDayTheCosmosFellTest` 的表装配样板 ✓ + `TriggerTableTest` 的 AOE 场次 ✓；
 >   ② 写判据 ✓；③ `compileJava` → 全量 ✓；④ 提交 + 文档 ✓。
 > * **进度（实测 ✓）**：角色 **93 内容 / 93 数据** ✓；光锥 **142 / 170** ✓；遗器 **53 文件 / 登记表 7 条** ✓。
 > 
-> **2026-09-30 更新（aggro 回收之六百二十四：**判据配方到手（`Cone21040Test` 是完整样板 ✓）**）**：
+> **2026-09-30 更新（aggro 回收之六百二十四：**判据配方到手（`TheDayTheCosmosFellTest` 是完整样板 ✓）**）**：
 > 
 > * ⭐⭐⭐ **样板里的三件现成东西（按测试名/锚点记 ✓）**：
 >   ① **战斗夹具** ✓：`CharacterFactory.create(ALLY, LEVEL)` ✓、
@@ -10408,13 +10408,13 @@
 >     但**没实测过** ✗）⇒ ⚠ 若不行，换 **`APPLY_DOT`**（⚠ 需要元素 ✗）或 **`ADD_STACK`**（⚠ 需要状态名 ✗）
 >     ⇒ ⭐ 所以**先试 `MODIFY_DAMAGE_TAKEN`** ✓；
 >   ② **手工 `TriggerSpec` 的构造形状** ✓（⚠ 我是照 `21040` 的"直接 `new TriggerTable(cid, List.of(...))`" ✓，
->     但**规则对象的字段拼写**要先读一处实例 ✓ —— ⭐ `Cone21040Test` 里那段 `List.of(...)` 的**后半段**
+>     但**规则对象的字段拼写**要先读一处实例 ✓ —— ⭐ `TheDayTheCosmosFellTest` 里那段 `List.of(...)` 的**后半段**
 >       （第 95 行之后 ✓）应当就有 ✓ ⇒ 下一轮读它 ✓）。
 > * **进度（实测 ✓）**：角色 **93 内容 / 93 数据** ✓；光锥 **142 / 170** ✓；遗器 **53 文件 / 登记表 7 条** ✓。
 > 
 > **2026-09-30 更新（aggro 回收之六百二十五：**✅ 判据的最后一块到手 —— 两个测试助手 + 可换种子 + 免 `MODIFY_DAMAGE_TAKEN`**）**：
 > 
-> * ⭐⭐⭐ **`Cone21040Test` 后半段给出的三件东西（实测 ✓）**：
+> * ⭐⭐⭐ **`TheDayTheCosmosFellTest` 后半段给出的三件东西（实测 ✓）**：
 >   ① **`TriggerSpecs.rule(event, List.of(条件…), 效果…)`** ✓ —— **测试用的手工规则助手** ✓
 >      （实例：`TriggerSpecs.rule("ALLY_ATTACK", List.of("actor == self", "weakness_hit_count >= 1"), probe(...))` ✓）；
 >   ② **`TriggerSpecs.set(effect, "op", "ADD_STACK")`** ✓ / `"buff"` / `"amount"` / `"permanent"` / `"target"` ✓
@@ -10464,7 +10464,7 @@
 >   ⚠ 现在有两种可能 ✗，必须**分别证伪** ✓：
 >   * **可能 A：选择器本身坏了** ✓ ⇒ 用**手工构造的上下文**直接验 ✓：
 >     `new TriggerTable.TriggerContext(wearer, wearer, enemy, 1, 0, null, battle, null).withAttackHitTargets(List.of(e1,e2,e3))`
->     ✓（⚠ 形状照 `Cone21040Test:53` ✓）⇒ 若这样能选中 ✓ ⇒ **A 被证伪** ✓ ⇒ 问题在**触发路径** ✗；
+>     ✓（⚠ 形状照 `TheDayTheCosmosFellTest:53` ✓）⇒ 若这样能选中 ✓ ⇒ **A 被证伪** ✓ ⇒ 问题在**触发路径** ✗；
 >   * **可能 B：触发路径没把集合带上** ✓ ⇒ 检查 `fireAfterAttack` 到我那条 10 参重载的**实际调用** ✓
 >     —— ⚠ **最可能的疏漏** ✓：`fireAfterAttack` 里我传的 `targets` ✓ 是否**真的**进了
 >       `.withAttackHitTargets(...)` ✓（⚠ 也就是**我改的那条链是不是这条事件走的那条** ✗
@@ -11388,7 +11388,7 @@
 > **2026-09-30 更新（aggro 回收之六百六十九：**✅ `23007` 判据补齐"逐目标过滤器"维 ⇒ 判据覆盖升到**七维**）**）**：
 > 
 > * ✅ **落地（`test: assert the per-target filter of cone 23007 as well` ✓）**：
->   `Cone23007Test` 现在断言**两个效果的 `target_when`** ✓：
+>   `IncessantRainTest` 现在断言**两个效果的 `target_when`** ✓：
 >   * 施加那半：**`["!target has_state 以太编码"]`** ✓（"只挑**未持有**的" ✓）；
 >   * 增伤那半：**`["target has_state 以太编码"]`** ✓（"只有**持有者**吃增伤" ✓）。
 > * ⭐⭐⭐ **访问器的列名过程（㉖ ✓）**：`grep EffectSpec` ⇒
@@ -11630,7 +11630,7 @@
 >   **`instance: true` + `permanent: true`** ✓ ⇒ ✅ **"凡登记缺口，动手前先两搜"** 这条纪律
 >     （① 搜名字：**字段 + 方法** ✓；② 搜闭合名单：**条件 / 选择器 / op / 属性 / 时长字段** ✓）
 >     在**六次里有六次**改变了结论 ✓。
-> * ⭐⭐ **一条判据侧的收获 ✓**：本轮的唯一失败是**我的判据抓住的** ✓（`Cone23007Test` ✓），
+> * ⭐⭐ **一条判据侧的收获 ✓**：本轮的唯一失败是**我的判据抓住的** ✓（`IncessantRainTest` ✓），
 >   而且它的**报错原文（在 XML 里 ✓）就是修法** ✓ ⇒ ✅ **"判据的报错要写得像说明书"** ✓ 这条
 >     在引擎侧一直成立 ✓（⭐ 这次是引擎自己的校验信息 ✓）。
 > * **实测 ✓**：全量 **0** ✓、闸门 **[0, 0]** ✓、树干净 ✓、已推送 ✓。
@@ -12061,7 +12061,7 @@
 >   而**套件是绿的** ✗ ⇒ ⭐ **"全量绿"对这类错误不构成证据** ✗。
 > * **修复**（`fix: 23059 named an attribute the engine lacks and an event that carries no category`）：
 >   `HP → HEALTH`（5 处 ✓）、`SKILL_CAST → ATTACK_FINISHED`（5 处 ✓，类别条件保留 ✓）；
->   判据 `Cone23059Test` 覆盖 4 规则 × 5 档，**变异 7 处全红、0 盲区** ✓。
+>   判据 `ReforgedInHellfireTest` 覆盖 4 规则 × 5 档，**变异 7 处全红、0 盲区** ✓。
 > * ⭐ **变异真的抓到了我自己的判据盲区**：第 348 轮的 7 路扫里，改**标记名**那一处**没变红** ✗
 >   ⇒ 原因是我只断言了"回能"与"重置规则里的标记"，**没断言"回合规则自己施加的标记"** ✗
 >   ⇒ 补上该断言后**同一处变异变红** ✓（⚠ 这就是"实测变异"存在的意义 ✓）。
@@ -12941,15 +12941,15 @@
 >   `fireTriggers(TriggerEvent.BATTLE_START…` ✗ ⇒ 共 **173** 处 ✓。
 > * ✅ **结论：本项目的既有风格本来就满足这条纪律** ✓ —— 绝大多数判据走 **`matching(...)`** ✓（⚠ 即**求值条件** ✓），
 >   且**成对**给出反例 ✓：`PelaDebuffTest` ✓ ／ `SuperBreakContentTest` ✓ ／ `TalentTest`（`1` 与 `0` ✓）／
->   `Relic303TwoPieceTest` ✓ ／ `HuohuoTest` ✓ ／ `SummonFieldTest` ✓ ／ `TriggerTableTest` ✓ ／
->   `Relic113FourPieceTest` ✓ ⇒ ⭐ **第 501 轮对 `327` 的修正是"把它拉回房子风格"** ✓，不是发明新写法 ✓。
+>   `PanCosmicCommercialEnterpriseTwoPieceTest` ✓ ／ `HuohuoTest` ✓ ／ `SummonFieldTest` ✓ ／ `TriggerTableTest` ✓ ／
+>   `LongevousDiscipleFourPieceTest` ✓ ⇒ ⭐ **第 501 轮对 `327` 的修正是"把它拉回房子风格"** ✓，不是发明新写法 ✓。
 > * ⚠ **直接 `apply` 的少数几处，几乎都已配对** ✓：`PerStackRuntimeTest:63` ✓（⚠ 在 `matching` 循环内 ✓）、
 >   `TriggerTableTest:741` ✓（⚠ 同上 ✓）、`AllEnemiesTargetTest:91` ／ `LowestHpAllyTest:113` ✓（⚠ 都是反例测试 ✓）。
-> * ⛔ **唯一真正的缺口是我自己写的 `Relic317PartyFirstTest`** ✗：⚠ 它用 `rulesFor` ＋ `apply` ✗ ⇒
+> * ⛔ **唯一真正的缺口是我自己写的 `LushakaTheSunkenSeasPartyFirstTest`** ✗：⚠ 它用 `rulesFor` ＋ `apply` ✗ ⇒
 >   **它从不求值条件** ✗ ⇒ ⚠ 而它的引擎变异之所以变红 ✗，**只是因为效果的 target（`party_first` ✓）在 `apply` 内被解析** ✓
 >   ⇒ ⭐ 即：**它对"条件半边"是盲的** ✗（⚠ 与 `327` 同型 ✓）。
 > * ✅ **已补齐**（`test: relic 317 condition half -- matching both directions, the half apply never saw` ✓）：
->   新判据 `Relic317ConditionTest` ✓（⚠ 类注释写明"兄弟判据对条件半边是盲的、以及它为何仍能变红" ✓）⇒
+>   新判据 `LushakaTheSunkenSeasConditionTest` ✓（⚠ 类注释写明"兄弟判据对条件半边是盲的、以及它为何仍能变红" ✓）⇒
 >   ⭐ **双向断言** ✓：装备者**不是**第一名 ⇒ `matching` = **1** ✓；装备者**是**第一名 ⇒ `matching` = **0** ✓；
 >   实测 `[317-cond] both directions ok` ✓、套件 0 ✓、闸门 [0, 0] ✓。
 > * ⭐⭐ **这条纪律现在的完整形态（写入 GAPS ✓）**：**运行时判据必须穿过被测代码** ✓ ——
@@ -13890,7 +13890,7 @@
 >      （⚠ **绝对量** ✓ —— ⚠ 不是 `cap_scale`／`cap_percent` 那套「某属性的份额」 ✗，⚠ 见 `:406` ✓）
 >      ＋ ⚠ 算式 ⚠ `percent × scale + amount` ✗（⚠ `:396` ✓）⇒ ⚠ 消耗 50 点 ⇒ ⚠ 0.002×50 ＝ **10%** ✓。
 >   7. ⚠ **两个通用校验器会拦任何无效规则** ✓：⚠ `EveryConeRuleIsSelectedTest#everyConeRuleIsSelectedOnEveryEvent` ✗
->      与 ⚠ `Cone23062Test#everyTierStatesWhatTheTextStates` ✓ ⇒ ⚠ 挂错事件**第一次跑套件就红** ✓（⚠ 实测 ✓）。
+>      与 ⚠ `IAmAsYouBeholdTest#everyTierStatesWhatTheTextStates` ✓ ⇒ ⚠ 挂错事件**第一次跑套件就红** ✓（⚠ 实测 ✓）。
 > * ⚠ **剩余清单** ✓：⚠ ① `23062` 第 4 句 ✓（⚠ 设计如上 ✓）；⚠ ② 弱点族更难两档 ✓（`1006` 从全队属性选 ✓／
 >   `1405` 随机＋优先 ✓）＋ `23050` 的「添加弱点时」事件 ✓；⚠ ③ 光锥登记表 4 条 ✓（`20023`／`21021`／
 >   `21032`／`21038` ✓）；⚠ ④ 遗器 `132` ✓（⚠ 需「减防状态」＋「我造成了减防」事件 ✓）；
@@ -13907,7 +13907,7 @@
 >   ⇒ ⚠ 五档实测（`llms-full.txt` ✓）：⚠ `#3` ＝ 0.2/0.25/0.3/0.35/0.4% ✗（⚠ 分数 0.002…0.004 ✓）
 >   ⚠ `#6` ＝ 72/90/108/126/144% ✓。
 > * ✅ **读取端完整** ✓：⚠ 引擎（⚠ `Damage.castEnergySpent` ✓ ＋ ⚠ `Battle` 写入 ✓ ＋ ⚠ `cast_energy_spent` 量纲 ✓）
->   ＋ ⚠ 内容 × 5 阶 ✓ ＋ ⚠ 判据 ⚠ `Cone23062SpendTest` ✗（⚠ 两条断言 ✓：⚠ `ratio = 1.1272727272727265` ✗
+>   ＋ ⚠ 内容 × 5 阶 ✓ ＋ ⚠ 判据 ⚠ `IAmAsYouBeholdSpendTest` ✗（⚠ 两条断言 ✓：⚠ `ratio = 1.1272727272727265` ✗
 >   ⚠ vs ⚠ 预期 ⚠ `(1+0.24)/(1+0.10)` ✓，⚠ 且 ⚠ `huge == atCap == 946.170310655918` ✗ ⇒ ⚠ 上限也生效 ✓）
 >   ＋ ⭐ **变异红** ✓（⚠ 851 轮：⚠ 把 ⚠ `boostDamage` ✗ 退回只读 ⚠ `percent` ✓ ⇒ ⚠ 判据红 ✓）。
 > * ⛔ **写入端没有独立判据** ✗ —— ⚠ 而且**用自造探针分不开** ✓：⚠ 能读自定义 `scale` 的 op 实际上
@@ -13939,10 +13939,10 @@
 > * ✅✅ **光锥 23062 第 4 句完成** ✓：⚠ 「每消耗 1 点能量值，使本次造成的终结技伤害提高 `#3%`，最多 `#6%`」✗
 >   ⇒ ⚠ 五档：⚠ `#3` ＝ 0.002/0.0025/0.003/0.0035/0.004 ✗（⚠ 即 0.2…0.4% ✓）⚠ `#6` ＝ 0.72/0.9/1.08/1.26/1.44 ✗。
 > * ⭐⭐ **两半都有「绿 ＋ 变异红」** ✓：
->   * ⚠ **读取端** ✗ ⚠ `Cone23062SpendTest` ✗（⚠ 两条断言：⚠ `ratio = 1.1272727272727265` ✗ ⚠ vs ⚠ 预期
+>   * ⚠ **读取端** ✗ ⚠ `IAmAsYouBeholdSpendTest` ✗（⚠ 两条断言：⚠ `ratio = 1.1272727272727265` ✗ ⚠ vs ⚠ 预期
 >     ⚠ `(1+0.24)/(1+0.10)` ✓；⚠ 且 ⚠ `huge == atCap == 946.170310655918` ✗ ⇒ ⚠ 上限也生效 ✓）
 >     ⚠ 变异：⚠ 把 ⚠ `boostDamage` ✗ 退回只读 `percent` ⇒ ⚠ **红** ✓。
->   * ⚠ **写入端** ✗ ⚠ `Cone23062WriteSide2Test` ✗（⚠ 走**真实施放** ⚠ `castUltra` ✗，⚠ 不手工设值 ✓；
+>   * ⚠ **写入端** ✗ ⚠ `IAmAsYouBeholdWriteSide2Test` ✗（⚠ 走**真实施放** ⚠ `castUltra` ✗，⚠ 不手工设值 ✓；
 >     ⚠ 对照是**同一条规则、只换 scale** ✗：⚠ `scaled = 12891.039130134073` ✗ ⚠ vs ⚠ `flat = 11483.28136924003` ✓）
 >     ⚠ 变异：⚠ 去掉 ⚠ `Battle` ✗ 的写入 ⇒ ⚠ `scaled` 掉到 ⚠ `11482.694559002059` ✗ ⚠ ≈ ⚠ `flat` ⇒ ⚠ **红** ✓。
 > * ⭐⭐⭐ **探针的 op 是一张闭集（⚠ 本件最贵的一课 ✓）**：⚠ 想「造一条探针读实例上的消耗」，⚠ 试了两次都失败 ✓
@@ -14058,7 +14058,7 @@
 > * ⭐ **而对照证明了那条从句是真的** ✓：⚠ 同一个「只有装备者低」的场景、**不装光锥** ⇒ ⚠ 增量 **0** ✗
 >   ⇒ ⚠ 所以 ⚠ 场景 A 的 ⚠ `lowAlly = 8.0` ✗ **确实来自本从句** ✓（⚠ 引擎没有回合开始的自然回能 ✓）
 >   ⚠ —— ⚠ 而 ⚠ 我此前**猜**过「那是引擎的自然回能」 ✓ ⚠ 是**对照把它证伪的** ✓。
-> * ⚠ **判据现状**：⚠ `Cone21021EnergyTest` ✗ ⚠ 绿 ✓ ⚠ 三个对照（⚠ 30% 的队友 +8 ✓／⚠ 满的队友 0 ✓／
+> * ⚠ **判据现状**：⚠ `QuidProQuoEnergyTest` ✗ ⚠ 绿 ✓ ⚠ 三个对照（⚠ 30% 的队友 +8 ✓／⚠ 满的队友 0 ✓／
 >   ⚠ 装备者 0 ✓）⚠ ⇒ ⚠ 而 ⚠ **变异**：⚠ 因为**随机** ✓ ⚠ 单变异不保证必红 ✗（⚠ 候选多于一个时）
 >   ⇒ ⚠ 那正是「只有装备者低」那个场景要解决的问题 ✓ ⚠ 而 ⚠ 它现在被缺口挡住了 ✓ ⇒ ⚠ **补上缺口后才能加** ✓。
 > * ⚠ **仍欠**：⚠ ① 上面那个可空路径 ✓（⚠ 补完 ⇒ 加「只有装备者低」的场景 ⇒ 变异必红 ✓）；
@@ -18239,7 +18239,7 @@
 > * ✅ **进树** ✓：
 >   * **内容**（`1401.json` ✓）：**后触发**的 `ult_attack_advance_and_inspiration`（`ULT_CAST` ✓）的 `ATTACK` 写 **`max_stacks: 2`** ✓
 >     （⚠ 秘技那条 `BATTLE_START` **先** ✓ ⇒ 后写的必须可叠加 ✓）；
->   * **判据** `AttackStacking1401Test` ✓（**文件驱动** ✓）：`plus` **追加一条给她 `秘技` 状态**的规则 ✓（⚠ 走到第**三**个名字才对：
+>   * **判据** `TheHertaAttackStackingTest` ✓（**文件驱动** ✓）：`plus` **追加一条给她 `秘技` 状态**的规则 ✓（⚠ 走到第**三**个名字才对：
 >     `state` ✗ → `APPLY_STATE` ✗（**不是 op** ✓）→ `buff` ＋ **`APPLY_BUFF`** ✓）⇒ 断言"**施放终结技后 ATTACK 比开战时更高**" ✓
 >     ⇒ ⭐ 即"终结技那份**被算进去了** ✓，而不是把秘技那份替换掉 ✗"。
 > * ⚠ **变异没测成（如实记录 ✓）** ✓：变异脚本报 `TypeError: list indices must be integers or slices, not str` ✗
@@ -18612,7 +18612,7 @@
 >   | `UltraThresholdTest` | 2 |
 >   | ⭐ **`CharacterConditionLiteralsTest`** | **1** |
 >   | ⭐ **`EveryCharacterAndRelicRuleIsSelectedTest`** | **1** |
->   | `Cone21064Test` | 1 |
+>   | `MushyShroomySAdventuresTest` | 1 |
 >   ⇒ ⭐ **两条守卫是关键** ✓：
 >     * **`CharacterConditionLiteralsTest`** ✓ ⇒ 条件里的字面量必须**在允许表里** ✗ ⇒ ⭐ 强烈暗示
 >       **`self_resource:待演 <= 0` 这个写法**没被条件解析器接受**** ✗（⚠ 尽管 `TriggerTable` 里有那个常量 ✓
@@ -20297,7 +20297,7 @@
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓）、树干净 ✓、已推送且同步 ✓。
 > **2026-10-02 更新（aggro 回收之整千一百二十五：🎯 **两条"冲突"读出来了，而且它们判得**对**** —— ⭐ **我的改动越界了**：它按**未截断**的事件量给了 50%，⭐ 而文档要求按**已截断（≤100）的好活当赏**给）**）**：
 > * ✅ **实测（全量两红 ✓，名字与信息 ✓）** ✓：
->   * **`Character1505EnergySyncTest`** ✓：*"every point of energy is mirrored one-for-one into 【好活当赏】 ==> expected: **<40>** but was: **<50>**"* ✓
+>   * **`EvanesciaEnergySyncTest`** ✓：*"every point of energy is mirrored one-for-one into 【好活当赏】 ==> expected: **<40>** but was: **<50>**"* ✓
 >     ⇒ ⭐ 它守的是"**一分能量一分好活当赏**" ✓ ⇒ ⭐ 我的加成把它变成 40 ＋ 10 ✓；
 >   * **`ElationAmountCapTest`** ✓：*"单次不超过 100 点 ==> expected: **<100>** but was: **<175>**"* ✓
 >     ⇒ ⭐⭐ **`175 = 100 + 0.5 × 150`** ✓ ⇒ ⭐ **即：我的加成读的是**未截断的事件量**（150 点能量 ⇒ 75）** ✗
@@ -20615,7 +20615,7 @@
 >   * ⭐⭐ **`ElationAmountCapTest`**：*"单次不超过 100 点 ==> expected: **<100>** but was: **<150>**"* ✓
 >     ⇒ ⭐ **这条信息本身就是**证明**** ✓：**基础 100 被截断 ✓ ＋ 星魂 50% = 50** ✓ ⇒ ⭐ **合计 150** ✓✓
 >       —— ⭐ **引擎按"已截断的量"派生，正是文档要的** ✓（⚠ 若按未截断的 150 能量派生 ⇒ 会是 175 ✗ ⇒ ⭐ **不会** ✓）；
->   * ⭐ **`Character1505EnergySyncTest`**：*"…expected: **<40>** but was: **<50>**"* ✓ ⇒ ⚠ 同样是星魂那 50% 的等值增量 ✓。
+>   * ⭐ **`EvanesciaEnergySyncTest`**：*"…expected: **<40>** but was: **<50>**"* ✓ ⇒ ⚠ 同样是星魂那 50% 的等值增量 ✓。
 > * ⭐⭐ **结论（下一轮的正事）** ✓：**这两条既有判据的期望值需要更新** ✗ —— ⚠ 但**必须带证据** ✓：
 >   ⭐ 它们原本测的是"**行迹的换算**"（⚠ "一分能量一分好活当赏" ＋ "单次 ≤ 100" ✓）⇒ ⭐ 而**现在总量里多了星魂的 50%** ✓
 >     ⇒ ⭐ **两条改法（择一，都要写清依据）** ✗：
@@ -20629,7 +20629,7 @@
 > * ✅ **实测（读两条判据的断言 ✓）** ✓：
 >   | 判据 | 行 | 断言 | 含义 |
 >   |---|---|---|---|
->   | `Character1505EnergySyncTest` | `:46` | `assertEquals(giftsBefore + mirrored, giftsAfter, …)` | ⭐ **"一分能量一分好活当赏"（严格一对一）** ✓ |
+>   | `EvanesciaEnergySyncTest` | `:46` | `assertEquals(giftsBefore + mirrored, giftsAfter, …)` | ⭐ **"一分能量一分好活当赏"（严格一对一）** ✓ |
 >   | 同上 | `:58` | `assertEquals(20, gifts, "only the technique's 20 so far (the false side of the sync)")` | ⭐ **秘技那 20 点** ✓ |
 >   | `ElationAmountCapTest` | `:43` | `assertEquals(100, big, "单次不超过 100 点")` | ⭐ **单次上限** ✓ |
 >   | 同上 | `:44` | `assertEquals(60, small, "a conversion below the ceiling is untouched (false case)")` | ⭐ **未触顶时"原样"** ✓ |
@@ -20866,7 +20866,7 @@
 >     （⚠ 见 `AboveThresholdTest:54` ✓／`AglaeaFissureTest:64` ✓／`AddDamageOpTest:124` ✓）；
 >   * ⭐⭐ **`REMOVE_STATE` 的手搭模板**：**`BaitModifierLifetimeTest:39`** ＝ **`TriggerSpecs.set(strip, "op", "REMOVE_STATE");`** ✓
 >     ⇒ ⭐ **即"先 `TriggerSpecs.rule(...)` 建规则，再 `set(...)` 填 `op`／参数"** ✓✓；
->   * ⭐ 另有 **`Cone23026Test`**（⚠ 光锥 23026 ✓）是**内容里第一个把 `REMOVE_STATE` 与 `per_stack` 组合**的例子 ✓
+>   * ⭐ 另有 **`FlowingNightglowTest`**（⚠ 光锥 23026 ✓）是**内容里第一个把 `REMOVE_STATE` 与 `per_stack` 组合**的例子 ✓
 >     ⇒ ⭐ **也可作参考** ✓。
 > * ⭐⭐ **下一轮的判据（照 `BaitModifierLifetimeTest` 的骨架写）** ✗：
 >   1. ⭐ **手搭两条规则**：`APPLY_BUFF{状态: X, turns: 2}` ✓ ＋ 一条 **`REMOVE_STATE{X}`** ✓（⚠ 或直接调 `buffManager.removeState("X")` ✓ 更省 ✓）；
@@ -21227,7 +21227,7 @@
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2138** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
 > **2026-10-02 更新（aggro 回收之整千一百七十五：🎯🎯 **判据的手段定了** —— ⭐ 用 `self_attr:` 条件在手搭一条"探针规则"上读属性**）**）**：
 > * ✅ **实测（两条线索 ✓）** ✓：
->   * ⭐ **仓库已有"手工 fire ＋ 读属性"的先例** ✓：`DefenceStacking1106Test` ✓ 里
+>   * ⭐ **仓库已有"手工 fire ＋ 读属性"的先例** ✓：`PelaDefenceStackingTest` ✓ 里
 >     `battle.fireTriggers(TriggerEvent.ULT_CAST, owner, owner, 0, 0);` ✓（`:55` ✓）⇒ `enemy.getAttribute(AttributeType.DEFENCE).get()` ✓（`:58` ✓）
 >     ⇒ ⭐ 即**方案 (乙) 的形态在仓库里是常规写法** ✓；
 >   * ⚠ **但它对 `cast_end` 不适用** ✗：⚠ `from_category` 需要**真的施放上下文** ✗（⚠ 手工 fire 没有 ✓）
@@ -21450,9 +21450,9 @@
 > * ✅ **实测（两次机械扫描 ✓）** ✓：
 >   * ⭐ **没有任何测试文件里出现两次 `SkillExecutor.execute`** ✗（⚠ 逐文件计数，`>= 2` 的一个都没有 ✓）
 >     ⇒ ⭐⭐ **即："连放多次技能"在本仓库的判据里**从未被做过**** ✓ ⇒ ⚠ 我这几轮一直在**无人区**里试 ✗（⭐ 这解释了为什么六个假设全部落空 ✓）；
->   * ⭐ 而**已有先例**是"**手工 fire 事件**"（⚠ 本段见过的 `Character1505EnergySyncTest` ✓ 就是 fire `ENERGY_GAINED` ✓；`DefenceStacking1106Test` ✓ fire `ULT_CAST` ✓）。
+>   * ⭐ 而**已有先例**是"**手工 fire 事件**"（⚠ 本段见过的 `EvanesciaEnergySyncTest` ✓ 就是 fire `ENERGY_GAINED` ✓；`PelaDefenceStackingTest` ✓ fire `ULT_CAST` ✓）。
 > * ⭐⭐⭐ **于是判据改成"两条先例拼起来"** ✓（⚠ 下一轮照抄 ✓）：
->   1. ⭐ **充能 6 点：手工 fire `SKILL_CAST` 六次** ✓（⚠ `battle.fireTriggers(TriggerEvent.SKILL_CAST, owner, ally, 0, 0)` ✓ —— ⭐ 与 `Character1505EnergySyncTest` 同形 ✓）
+>   1. ⭐ **充能 6 点：手工 fire `SKILL_CAST` 六次** ✓（⚠ `battle.fireTriggers(TriggerEvent.SKILL_CAST, owner, ally, 0, 0)` ✓ —— ⭐ 与 `EvanesciaEnergySyncTest` 同形 ✓）
 >      ⇒ ⭐ **她的加充能规则（`SKILL_CAST` ＋ `actor == self`）每次都会走** ✓ ⇒ ⭐ **`RESOURCE_CHANGED` 触发 ⇒ `peerage_upgrade_at_six_charge` 把【爵位】挂到 `holder_of:军功`** ✓
 >      ⇒ ⭐ **这一半完全走"既有先例"** ✓；
 >   2. ⭐ **20% 那一半仍用**真施放**（⚠ 因为 `from_category` 需要真类别 ✓）：**让**队友**放一次自己的战技** ✓（⚠ 只放一次 ⇒ ⭐ **不碰无人区** ✓）
@@ -21463,7 +21463,7 @@
 > **2026-10-02 更新（aggro 回收之整千一百八十八：⚠ **"每回合一次"的封顶也不在她的规则上** —— ⚠ 六个字段里没有 `per_turn`／`per_attack`／`max_stacks` ✗
 > ⇒ ⭐ 所以"只给一次"一定发生在**事件的路由**那一侧**）**）**：
 > * ✅ **实测（两处 ✓）** ✓：
->   * ⚠ **手工 fire 六次 `SKILL_CAST`**（⚠ 与 `Character1505EnergySyncTest` 同形 ✓）⇒ ⭐ **充能仍然停在 1** ✗ —— ⭐ **所以"连放技能"与"手工 fire"都一样只给一次** ✓（⭐ 第五十四次自我纠正 ✓）；
+>   * ⚠ **手工 fire 六次 `SKILL_CAST`**（⚠ 与 `EvanesciaEnergySyncTest` 同形 ✓）⇒ ⭐ **充能仍然停在 1** ✗ —— ⭐ **所以"连放技能"与"手工 fire"都一样只给一次** ✓（⭐ 第五十四次自我纠正 ✓）；
 >   * ⭐ **她那条规则的键只有** `['do','id','note','on','source','when']`** ✓ ⇒ ⛔ **没有 `per_turn`／`per_attack`／`max_stacks`** ✗ ⇒ ⭐ **所以封顶不在内容里** ✓。
 > * ⭐⭐ **于是嫌疑只剩"事件路由"** ✗：⚠ `SkillExecutor` 收尾发的是 **`broadcastSkillCast(...)`** ✓（⚠ 本段读过它的 javadoc：
 >   *"Fires `SkillCastEvent` (P8-6) — … **every one of our members** receives it, and interested parties receive it directly"* ✓）
@@ -23006,9 +23006,9 @@
 > **实测证据（本轮与上一轮）**：
 > * ⭐ **含星魂的行为是对的** ✓：`ElationAmountCapTest` 报 *"单次不超过 100 点 ==> expected: <100> but was: **<150>**"* ✓
 >   ⇒ ⭐ **150 = 100（截断后）＋ 50（它的 50%）** ✓ —— ⭐ **新通道 `amountFromPrevious` 完全按设计工作** ✓（引擎三处改动见 `7dc9c5da`／`15d210c1`／`d319386d` ✓）；
-> * ⛔ **而两条既有判据的**前提**是"只有行迹在写"** ✗：`Character1505EnergySyncTest:46`（**一对一** ✓）／`:44`（**未触顶原样** ✓）／
+> * ⛔ **而两条既有判据的**前提**是"只有行迹在写"** ✗：`EvanesciaEnergySyncTest:46`（**一对一** ✓）／`:44`（**未触顶原样** ✓）／
 >   `ElationAmountCapTest:53·57·58`（**直接断言那条效果的字段** ✓）⇒ ⭐ **它们不是"过时"，而是"只覆盖基础层"** ✓；
-> * ⭐⭐ **同时有一条**互相印证**的证据** ✓：`Character1505EnergySyncTest:58`（*"only the technique's 20"* ✓）**在加星魂后仍是绿的** ✓
+> * ⭐⭐ **同时有一条**互相印证**的证据** ✓：`EvanesciaEnergySyncTest:58`（*"only the technique's 20"* ✓）**在加星魂后仍是绿的** ✓
 >   ⇒ ⭐ **证明"秘技不被加成"** ✓（⚠ 与我自己写的双向判据结论一致 ✓）。
 > **读者（≥2，逐个具名）**：
 > 1. ⭐ **`1505` 的星魂**：「触发行迹…的获得好活当赏效果时，额外获得等同于本次获得的【好活当赏】50%/100% 的【好活当赏】」✓
@@ -25490,7 +25490,7 @@
 > * ✅ **进树** ✓：
 >   * **内容**（`1401.json` ✓）：**后触发**的 `ult_attack_advance_and_inspiration`（`ULT_CAST` ✓）的 `ATTACK` 写 **`max_stacks: 2`** ✓
 >     （⚠ 秘技那条 `BATTLE_START` **先** ✓ ⇒ 后写的必须可叠加 ✓）；
->   * **判据** `AttackStacking1401Test` ✓（**文件驱动** ✓）：`plus` **追加一条给她 `秘技` 状态**的规则 ✓（⚠ 走到第**三**个名字才对：
+>   * **判据** `TheHertaAttackStackingTest` ✓（**文件驱动** ✓）：`plus` **追加一条给她 `秘技` 状态**的规则 ✓（⚠ 走到第**三**个名字才对：
 >     `state` ✗ → `APPLY_STATE` ✗（**不是 op** ✓）→ `buff` ＋ **`APPLY_BUFF`** ✓）⇒ 断言"**施放终结技后 ATTACK 比开战时更高**" ✓
 >     ⇒ ⭐ 即"终结技那份**被算进去了** ✓，而不是把秘技那份替换掉 ✗"。
 > * ⚠ **变异没测成（如实记录 ✓）** ✓：变异脚本报 `TypeError: list indices must be integers or slices, not str` ✗
@@ -25863,7 +25863,7 @@
 >   | `UltraThresholdTest` | 2 |
 >   | ⭐ **`CharacterConditionLiteralsTest`** | **1** |
 >   | ⭐ **`EveryCharacterAndRelicRuleIsSelectedTest`** | **1** |
->   | `Cone21064Test` | 1 |
+>   | `MushyShroomySAdventuresTest` | 1 |
 >   ⇒ ⭐ **两条守卫是关键** ✓：
 >     * **`CharacterConditionLiteralsTest`** ✓ ⇒ 条件里的字面量必须**在允许表里** ✗ ⇒ ⭐ 强烈暗示
 >       **`self_resource:待演 <= 0` 这个写法**没被条件解析器接受**** ✗（⚠ 尽管 `TriggerTable` 里有那个常量 ✓
@@ -27548,7 +27548,7 @@
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2132** 例 ✓）、树干净 ✓、已推送且同步 ✓。
 > **2026-10-02 更新（aggro 回收之整千一百二十五：🎯 **两条"冲突"读出来了，而且它们判得**对**** —— ⭐ **我的改动越界了**：它按**未截断**的事件量给了 50%，⭐ 而文档要求按**已截断（≤100）的好活当赏**给）**）**：
 > * ✅ **实测（全量两红 ✓，名字与信息 ✓）** ✓：
->   * **`Character1505EnergySyncTest`** ✓：*"every point of energy is mirrored one-for-one into 【好活当赏】 ==> expected: **<40>** but was: **<50>**"* ✓
+>   * **`EvanesciaEnergySyncTest`** ✓：*"every point of energy is mirrored one-for-one into 【好活当赏】 ==> expected: **<40>** but was: **<50>**"* ✓
 >     ⇒ ⭐ 它守的是"**一分能量一分好活当赏**" ✓ ⇒ ⭐ 我的加成把它变成 40 ＋ 10 ✓；
 >   * **`ElationAmountCapTest`** ✓：*"单次不超过 100 点 ==> expected: **<100>** but was: **<175>**"* ✓
 >     ⇒ ⭐⭐ **`175 = 100 + 0.5 × 150`** ✓ ⇒ ⭐ **即：我的加成读的是**未截断的事件量**（150 点能量 ⇒ 75）** ✗
@@ -27866,7 +27866,7 @@
 >   * ⭐⭐ **`ElationAmountCapTest`**：*"单次不超过 100 点 ==> expected: **<100>** but was: **<150>**"* ✓
 >     ⇒ ⭐ **这条信息本身就是**证明**** ✓：**基础 100 被截断 ✓ ＋ 星魂 50% = 50** ✓ ⇒ ⭐ **合计 150** ✓✓
 >       —— ⭐ **引擎按"已截断的量"派生，正是文档要的** ✓（⚠ 若按未截断的 150 能量派生 ⇒ 会是 175 ✗ ⇒ ⭐ **不会** ✓）；
->   * ⭐ **`Character1505EnergySyncTest`**：*"…expected: **<40>** but was: **<50>**"* ✓ ⇒ ⚠ 同样是星魂那 50% 的等值增量 ✓。
+>   * ⭐ **`EvanesciaEnergySyncTest`**：*"…expected: **<40>** but was: **<50>**"* ✓ ⇒ ⚠ 同样是星魂那 50% 的等值增量 ✓。
 > * ⭐⭐ **结论（下一轮的正事）** ✓：**这两条既有判据的期望值需要更新** ✗ —— ⚠ 但**必须带证据** ✓：
 >   ⭐ 它们原本测的是"**行迹的换算**"（⚠ "一分能量一分好活当赏" ＋ "单次 ≤ 100" ✓）⇒ ⭐ 而**现在总量里多了星魂的 50%** ✓
 >     ⇒ ⭐ **两条改法（择一，都要写清依据）** ✗：
@@ -27880,7 +27880,7 @@
 > * ✅ **实测（读两条判据的断言 ✓）** ✓：
 >   | 判据 | 行 | 断言 | 含义 |
 >   |---|---|---|---|
->   | `Character1505EnergySyncTest` | `:46` | `assertEquals(giftsBefore + mirrored, giftsAfter, …)` | ⭐ **"一分能量一分好活当赏"（严格一对一）** ✓ |
+>   | `EvanesciaEnergySyncTest` | `:46` | `assertEquals(giftsBefore + mirrored, giftsAfter, …)` | ⭐ **"一分能量一分好活当赏"（严格一对一）** ✓ |
 >   | 同上 | `:58` | `assertEquals(20, gifts, "only the technique's 20 so far (the false side of the sync)")` | ⭐ **秘技那 20 点** ✓ |
 >   | `ElationAmountCapTest` | `:43` | `assertEquals(100, big, "单次不超过 100 点")` | ⭐ **单次上限** ✓ |
 >   | 同上 | `:44` | `assertEquals(60, small, "a conversion below the ceiling is untouched (false case)")` | ⭐ **未触顶时"原样"** ✓ |
@@ -28117,7 +28117,7 @@
 >     （⚠ 见 `AboveThresholdTest:54` ✓／`AglaeaFissureTest:64` ✓／`AddDamageOpTest:124` ✓）；
 >   * ⭐⭐ **`REMOVE_STATE` 的手搭模板**：**`BaitModifierLifetimeTest:39`** ＝ **`TriggerSpecs.set(strip, "op", "REMOVE_STATE");`** ✓
 >     ⇒ ⭐ **即"先 `TriggerSpecs.rule(...)` 建规则，再 `set(...)` 填 `op`／参数"** ✓✓；
->   * ⭐ 另有 **`Cone23026Test`**（⚠ 光锥 23026 ✓）是**内容里第一个把 `REMOVE_STATE` 与 `per_stack` 组合**的例子 ✓
+>   * ⭐ 另有 **`FlowingNightglowTest`**（⚠ 光锥 23026 ✓）是**内容里第一个把 `REMOVE_STATE` 与 `per_stack` 组合**的例子 ✓
 >     ⇒ ⭐ **也可作参考** ✓。
 > * ⭐⭐ **下一轮的判据（照 `BaitModifierLifetimeTest` 的骨架写）** ✗：
 >   1. ⭐ **手搭两条规则**：`APPLY_BUFF{状态: X, turns: 2}` ✓ ＋ 一条 **`REMOVE_STATE{X}`** ✓（⚠ 或直接调 `buffManager.removeState("X")` ✓ 更省 ✓）；
@@ -28478,7 +28478,7 @@
 > * **实测（本轮）**：全量 **0**（--rerun-tasks，**2138** 例 ✓）、树干净 ✓（本轮**未改代码** ✓）。
 > **2026-10-02 更新（aggro 回收之整千一百七十五：🎯🎯 **判据的手段定了** —— ⭐ 用 `self_attr:` 条件在手搭一条"探针规则"上读属性**）**）**：
 > * ✅ **实测（两条线索 ✓）** ✓：
->   * ⭐ **仓库已有"手工 fire ＋ 读属性"的先例** ✓：`DefenceStacking1106Test` ✓ 里
+>   * ⭐ **仓库已有"手工 fire ＋ 读属性"的先例** ✓：`PelaDefenceStackingTest` ✓ 里
 >     `battle.fireTriggers(TriggerEvent.ULT_CAST, owner, owner, 0, 0);` ✓（`:55` ✓）⇒ `enemy.getAttribute(AttributeType.DEFENCE).get()` ✓（`:58` ✓）
 >     ⇒ ⭐ 即**方案 (乙) 的形态在仓库里是常规写法** ✓；
 >   * ⚠ **但它对 `cast_end` 不适用** ✗：⚠ `from_category` 需要**真的施放上下文** ✗（⚠ 手工 fire 没有 ✓）
@@ -28701,9 +28701,9 @@
 > * ✅ **实测（两次机械扫描 ✓）** ✓：
 >   * ⭐ **没有任何测试文件里出现两次 `SkillExecutor.execute`** ✗（⚠ 逐文件计数，`>= 2` 的一个都没有 ✓）
 >     ⇒ ⭐⭐ **即："连放多次技能"在本仓库的判据里**从未被做过**** ✓ ⇒ ⚠ 我这几轮一直在**无人区**里试 ✗（⭐ 这解释了为什么六个假设全部落空 ✓）；
->   * ⭐ 而**已有先例**是"**手工 fire 事件**"（⚠ 本段见过的 `Character1505EnergySyncTest` ✓ 就是 fire `ENERGY_GAINED` ✓；`DefenceStacking1106Test` ✓ fire `ULT_CAST` ✓）。
+>   * ⭐ 而**已有先例**是"**手工 fire 事件**"（⚠ 本段见过的 `EvanesciaEnergySyncTest` ✓ 就是 fire `ENERGY_GAINED` ✓；`PelaDefenceStackingTest` ✓ fire `ULT_CAST` ✓）。
 > * ⭐⭐⭐ **于是判据改成"两条先例拼起来"** ✓（⚠ 下一轮照抄 ✓）：
->   1. ⭐ **充能 6 点：手工 fire `SKILL_CAST` 六次** ✓（⚠ `battle.fireTriggers(TriggerEvent.SKILL_CAST, owner, ally, 0, 0)` ✓ —— ⭐ 与 `Character1505EnergySyncTest` 同形 ✓）
+>   1. ⭐ **充能 6 点：手工 fire `SKILL_CAST` 六次** ✓（⚠ `battle.fireTriggers(TriggerEvent.SKILL_CAST, owner, ally, 0, 0)` ✓ —— ⭐ 与 `EvanesciaEnergySyncTest` 同形 ✓）
 >      ⇒ ⭐ **她的加充能规则（`SKILL_CAST` ＋ `actor == self`）每次都会走** ✓ ⇒ ⭐ **`RESOURCE_CHANGED` 触发 ⇒ `peerage_upgrade_at_six_charge` 把【爵位】挂到 `holder_of:军功`** ✓
 >      ⇒ ⭐ **这一半完全走"既有先例"** ✓；
 >   2. ⭐ **20% 那一半仍用**真施放**（⚠ 因为 `from_category` 需要真类别 ✓）：**让**队友**放一次自己的战技** ✓（⚠ 只放一次 ⇒ ⭐ **不碰无人区** ✓）
@@ -28714,7 +28714,7 @@
 > **2026-10-02 更新（aggro 回收之整千一百八十八：⚠ **"每回合一次"的封顶也不在她的规则上** —— ⚠ 六个字段里没有 `per_turn`／`per_attack`／`max_stacks` ✗
 > ⇒ ⭐ 所以"只给一次"一定发生在**事件的路由**那一侧**）**）**：
 > * ✅ **实测（两处 ✓）** ✓：
->   * ⚠ **手工 fire 六次 `SKILL_CAST`**（⚠ 与 `Character1505EnergySyncTest` 同形 ✓）⇒ ⭐ **充能仍然停在 1** ✗ —— ⭐ **所以"连放技能"与"手工 fire"都一样只给一次** ✓（⭐ 第五十四次自我纠正 ✓）；
+>   * ⚠ **手工 fire 六次 `SKILL_CAST`**（⚠ 与 `EvanesciaEnergySyncTest` 同形 ✓）⇒ ⭐ **充能仍然停在 1** ✗ —— ⭐ **所以"连放技能"与"手工 fire"都一样只给一次** ✓（⭐ 第五十四次自我纠正 ✓）；
 >   * ⭐ **她那条规则的键只有** `['do','id','note','on','source','when']`** ✓ ⇒ ⛔ **没有 `per_turn`／`per_attack`／`max_stacks`** ✗ ⇒ ⭐ **所以封顶不在内容里** ✓。
 > * ⭐⭐ **于是嫌疑只剩"事件路由"** ✗：⚠ `SkillExecutor` 收尾发的是 **`broadcastSkillCast(...)`** ✓（⚠ 本段读过它的 javadoc：
 >   *"Fires `SkillCastEvent` (P8-6) — … **every one of our members** receives it, and interested parties receive it directly"* ✓）
@@ -30257,9 +30257,9 @@
 > **实测证据（本轮与上一轮）**：
 > * ⭐ **含星魂的行为是对的** ✓：`ElationAmountCapTest` 报 *"单次不超过 100 点 ==> expected: <100> but was: **<150>**"* ✓
 >   ⇒ ⭐ **150 = 100（截断后）＋ 50（它的 50%）** ✓ —— ⭐ **新通道 `amountFromPrevious` 完全按设计工作** ✓（引擎三处改动见 `7dc9c5da`／`15d210c1`／`d319386d` ✓）；
-> * ⛔ **而两条既有判据的**前提**是"只有行迹在写"** ✗：`Character1505EnergySyncTest:46`（**一对一** ✓）／`:44`（**未触顶原样** ✓）／
+> * ⛔ **而两条既有判据的**前提**是"只有行迹在写"** ✗：`EvanesciaEnergySyncTest:46`（**一对一** ✓）／`:44`（**未触顶原样** ✓）／
 >   `ElationAmountCapTest:53·57·58`（**直接断言那条效果的字段** ✓）⇒ ⭐ **它们不是"过时"，而是"只覆盖基础层"** ✓；
-> * ⭐⭐ **同时有一条**互相印证**的证据** ✓：`Character1505EnergySyncTest:58`（*"only the technique's 20"* ✓）**在加星魂后仍是绿的** ✓
+> * ⭐⭐ **同时有一条**互相印证**的证据** ✓：`EvanesciaEnergySyncTest:58`（*"only the technique's 20"* ✓）**在加星魂后仍是绿的** ✓
 >   ⇒ ⭐ **证明"秘技不被加成"** ✓（⚠ 与我自己写的双向判据结论一致 ✓）。
 > **读者（≥2，逐个具名）**：
 > 1. ⭐ **`1505` 的星魂**：「触发行迹…的获得好活当赏效果时，额外获得等同于本次获得的【好活当赏】50%/100% 的【好活当赏】」✓
@@ -30576,7 +30576,7 @@
 > * ✅ **判据** ✓（`PeerageCritDamageTest` ✓，**一个干净的设计** ✓）：⭐ **断言的是**倍率**而不是伤害** ✓ ——
 >   ⭐ 因为爵位还带 **+16% 无视防御**（第 22 件）／**+10% 抗性穿透**（第 29 件）／**+20% 战技穿透**（第 30 件）✓
 >   ⇒ ⭐ **这三项对"暴击"与"非暴击"同等作用** ✓ ⇒ ⭐ **相除即抵消** ✓ ⇒ ⭐ **剩下正好是 +72% 暴伤能改变的东西** ✓✓；
->   ⚠ **而暴击是**强制**的** ✗：⭐ **`Random` 返回 `0.0` ⇒ 必暴击；返回 `1.0` ⇒ 永不暴击** ✓（⭐ **这是树里自己的写法** ✓ —— `AnchorDeathTest:61` 的 *"never crits"* 与 `Cid1220FollowUpCritTest` ✓）。
+>   ⚠ **而暴击是**强制**的** ✗：⭐ **`Random` 返回 `0.0` ⇒ 必暴击；返回 `1.0` ⇒ 永不暴击** ✓（⭐ **这是树里自己的写法** ✓ —— `AnchorDeathTest:61` 的 *"never crits"* 与 `FeixiaoFollowUpCritTest` ✓）。
 > * ✅ **实测变异（1 红，且证据漂亮 ✓）** ✓：⭐ `percent` 0.72 → **0.0** ⇒ 全量 **2150 例 1 failed** ✓，判据报
 >   *"「战技伤害的暴击伤害提高 72%」（crit/non-crit: with=**1.5**, without=**1.5000000000000009**）==> expected: **<true>** but was: **<false>**"* ✓
 >   ⇒ ⭐⭐ **两支都恰好回到基础倍率 1.5**（＝1 + 0.5 暴伤 ✓）⇒ ⭐ **反证了"倍率比"确实把穿透那三项消掉了** ✓✓
@@ -31610,15 +31610,15 @@
 > * ⭐⭐⭐ **第六次同族发现（"树里早就有的"）** ✗：⭐ 我按 §3 的「欢愉度量表」去量，结果 **`1502.json:30` 就是笑点的声明** ✓ ——
 >   `{"id": "笑点", "max": 2147483647, "scope": "PARTY"}` ✓，它的 `source` **逐字写着**：*"笑点是**队伍级**计数（与 1505 共用同一个名字），
 >   **数据里没有上限，所以 max 用 Integer.MAX_VALUE**"* ✓；⭐ 而且 `1502` 那条规则的 `GAIN_RESOURCE 笑点` **也早在** ✓
->   （note 明写 ✅），**判据 `Character1502Test` 已在测"5 个笑点"** ✓。
+>   （note 明写 ✅），**判据 `YaoGuangTest` 已在测"5 个笑点"** ✓。
 >   ⇒ ⚠ 而 `1513` 自己文件里的登记写着 *"「以及 1 个笑点」✗（**笑点没有上限** ✗ ⇒ 不能声明 ✗ ⇒ 获取也无处可去 ✗）"* —— **这句是错的** ✗
 >     （无上限**有**拼法 ✓，且已用了两个月 ✓）⇒ ⭐ **真正缺的只是"她的半边"** ✓（她只声明了【热意】✓）。
-> * ✅ **判据** ✓（`Character1513LaughterTest` ✓，4 例全绿）：战技 ⇒ **4** ✓；终结技 ⇒ **6** ✓；⭐ **队友真实施放一次普攻** ⇒ **1** ✓；
->   ⭐ **共享计数**：三笔在同一场里相加 ⇒ **11** ✓（`partyResourceValue(...)` ✓ —— 就是 `Character1502Test` 用的那个读法 ✓）。
+> * ✅ **判据** ✓（`AventurineWaveflairLaughterTest` ✓，4 例全绿）：战技 ⇒ **4** ✓；终结技 ⇒ **6** ✓；⭐ **队友真实施放一次普攻** ⇒ **1** ✓；
+>   ⭐ **共享计数**：三笔在同一场里相加 ⇒ **11** ✓（`partyResourceValue(...)` ✓ —— 就是 `YaoGuangTest` 用的那个读法 ✓）。
 > * ✅ **行为变异** ✓：战技那笔 **4 → 5**（打印确认 ✓）⇒ 全量 **2201 例 2 failed** ✓，判据报
 >   *"「获得 4 个笑点」 ==> expected: **<4>** but was: **<5>**"* 与 *"4 + 6 + 1 on the SHARED counter ==> expected: **<11>** but was: **<12>**"* ✓。
 > * ⚠ **清单跟着改** ✓（目标 ⑥ ✓）：§3 的「欢愉度量表」整行**删掉** ✓（前提错 ✗），并在 §2 **新增一行** ✓：
->   「获得 N 个**笑点**（队伍级无上限共享计数）」⇒ 拼法 `max: 2147483647` ＋ `scope: "PARTY"` ✓，证据 `1513.json` ✓，判据 `Character1513LaughterTest` ✓（守清单判据 **3 例绿** ✓）。
+>   「获得 N 个**笑点**（队伍级无上限共享计数）」⇒ 拼法 `max: 2147483647` ＋ `scope: "PARTY"` ✓，证据 `1513.json` ✓，判据 `AventurineWaveflairLaughterTest` ✓（守清单判据 **3 例绿** ✓）。
 > * ⚠ **两处工具教训**（记下 ✓）：① 我猜的 `getCharacterId()` **不存在** ✗ ⇒ 判据改用 **`Scene` 直接持有建队对象** ✓
 >   （与月茧判据同一课 ✓）；② ⭐ 按新纪律，判据的修法单独放在 **`ship_1513_judge.py`** ✓（**一个脚本只写一类文件** ✓，
 >   上个月茧那轮的坑不再犯 ✓）。
@@ -31639,7 +31639,7 @@
 >   `EFFECT_HIT_RATE` #2 ✓ ＋ `ATTACK` #3 ✓，都 `until: "cast_end"` ✓）。⭐ 数值取自 `data/weapons.json` 的 `skill_value`
 >   ✓：**#2 = 0.18／0.21／0.24／0.27／0.30** ✓、**#3 = 0.24／0.28／0.32／0.36／0.40** ✓（⚠ 与既有 `BOOST_DAMAGE` 的
 >   0.24…0.40 逐层对上 ✓ ⇒ 读数自洽 ✓）。
-> * ✅ **判据** ✓（`Cone23004CastScopeTest` ✓，2 例）：①**施放结束后两个属性都回到基线** ✓（这正是 `until: cast_end` 的含义 ✓）；
+> * ✅ **判据** ✓（`InTheNameOfTheWorldCastScopeTest` ✓，2 例）：①**施放结束后两个属性都回到基线** ✓（这正是 `until: cast_end` 的含义 ✓）；
 >   ②**五层各自带该规则**、两条修饰、且数字与数据一致 ✓（读内容文件的守护式断言 ✓）。
 >   ⚠ **诚实标注** ✓：判据**不**测"施放**期间**"的那一半 —— 那条拼法不是新造的（`20001` 今天就在用 ✓）⇒ 继承 ✓，本判据钉的是这个光锥**自己的**那一半（数字与到期 ✓）。
 > * ✅ **行为变异** ✓：⭐ 把 10 处 `until: cast_end` 换成**合法但更长**的 `turns: 1`（**打印确认** ✓）
@@ -32486,7 +32486,7 @@
 > ⇒ 按纪律**回滚** ✓，并把 1408 那三条**按 ⑥ 的格式登记**（含读者数与前置 ✓））**）**：
 > * ⛔ **回滚** ✓（`StatModifierBuff.isSameKind` 复原 ✓，全量 **rc 0** ✓）：
 >   ⭐ 我按"两条规则 = 两个效果"改了 `isSameKind`（⭐ 保守版：**仅当两边 `ruleId` 都非空**时才按规则区分 ✓，其余照旧 ✓），
->   编译通过 ✓ ⇒ ⚠ 但全量 **7 例失败** ✗：`Cone20024Test` ✓／`Cone21037Test` ✓／`Cone23040Test` ✓／
+>   编译通过 ✓ ⇒ ⚠ 但全量 **7 例失败** ✗：`LingeringTearTest` ✓／`FinalVictorTest` ✓／`MakeFarewellsMoreBeautifulTest` ✓／
 >   `ConeBreakAndAuraTest` ✓／`JadeStackTest` ✓／`KephaleEidolonTest` ✓
 >   ⇒ ⭐⭐ **即："后挂的顶掉先挂的"对若干已出货内容是**载荷** ✓**（光锥的分档、翡翠的层、刻法勒的星魂都靠它 ✓）。
 > * ⭐⭐ **结论（本轮量到 ✓，比上一轮精确 ✓）**：⭐ 不能改成"不同规则一律共存" ✗ ⇒ ⭐ 需要的是
@@ -32652,7 +32652,7 @@
 >      ⭐ **分辨方法（下一步 ✓）**：⭐ 直接量 `him.getSkills().get(SKILL).getSkillSlot()` —— ⭐ 原始行是 **2** ✓、换入后是 **9** ✓
 >      （`DefaultSkill.getSkillSlot()` 返回的就是构造时的槽 ✓）。
 >   2. ⭐ 150 那条：**充能 `150 → 150`、敌人毫发无损** ✗ ⇒ ⭐⭐ **量到引擎的一条真实语义** ✓：
->      ⭐ 条件「`resource_changed:<名字>`」**需要由 op 抬起事件** ✓ —— ⭐ `Cone20024Test` 的注记说的正是这件事：
+>      ⭐ 条件「`resource_changed:<名字>`」**需要由 op 抬起事件** ✓ —— ⭐ `LingeringTearTest` 的注记说的正是这件事：
 >      *"the **op's own change** fired RESOURCE_CHANGED — that is the wiring, not the content"* ✓
 >      ⇒ ⚠ 我在判据里直接 `fireTriggers(RESOURCE_CHANGED, …)` **不携带资源名** ✗，所以条件不匹配 ✓（⭐ 这不是内容的错 ✓）。
 > * ⭐ **回滚** ✓：`1404.json` 复原到原样 ✓（含 `turn_start_autocasts_skill` 的原注记 ✓ ＋ 删掉新增那条 ✓）、未验证的判据删除 ✓；
@@ -33822,7 +33822,7 @@
 > * ✅ **判据（判别性 ✓）**：⭐ `DispelByClassTest` ⇒ ⭐ `[dispel] after the ode: debuffs = 1 ; dots = 1` ✓
 >   —— ⭐ 受害者同时带 ⭐ **一个控制** 与 ⭐ **一个持续伤害** ⇒ ⭐ 只有控制该走 ✓。
 >   ⭐ **实测变异** ✓：⭐ 把 `kind` 改成 `"dot"` ⇒ ⭐ `debuffs = 2 ; dots = 0` ⇒ 断言红 ✓✓（⭐ 两次断言**同时**翻 ✓）。
-> * ⚠ **一个计数陷阱（本轮量到 ✓）**：⭐ 一个 ⭐ `ControlBuff` **算两个**负面状态 ✓ —— ⭐ `Cone21001Test:25` 的注释写着同样一句
+> * ⚠ **一个计数陷阱（本轮量到 ✓）**：⭐ 一个 ⭐ `ControlBuff` **算两个**负面状态 ✓ —— ⭐ `GoodNightAndSleepWellTest:25` 的注释写着同样一句
 >   （*"measured: a `ControlBuff` contributes two"* ✓）⇒ ⭐ 所以"一个控制 ＋ 一个持续伤害"的 `debuffCount` 是 ⭐ **3** ✓（⭐ 我第一版写了 2 ⇒ ⭐ 前置当场红 ✓）。
 > * ⭐ **① 的五支现状**：⭐ 血仇⇒弑神登神 ✅；⭐ 不在血仇⇒行动提前 ✅；⭐ 本次攻击暴伤 ✅；⭐ **解除控制类** ✅（**本轮**，⭐ 4/5 ✓）；
 >   ⭐ 施放前目标被消灭⇒对新入场敌方目标 ⛔（⭐ 仍是登记 ✓，⭐ 那是本目标 ② 的事 ✓）。
@@ -33862,7 +33862,7 @@
 >     ⇒ ⭐ 写入时拿内容当路径 ⇒ ⭐ `Illegal characters in path` ✗ ⇒ ⭐ 于是改动**半落地** ✓（⭐ 而 ⭐ `compileJava` 仍打印 `BUILD SUCCESSFUL` ✓
 >     ⭐ 因为那次失败的写入**没插入**对新方法的调用 ✓）⇒ ⭐ 我按 ⑤ 回滚 ✓。
 > * ⭐⭐ **下一轮可直接落地（全部已量 ✓）**：⭐ 选择器 ⭐ **`wave_monsters`** ✓（⭐ 用游戏的词 ✓）＋ ⭐ `Battle.waveMonsters` ✓（⭐ 清空点 = ⭐ `nextWave()` 里 **spawn 之前** ✓）＋
->   ⭐ 判据场景照 ⭐ `Cone23011Test` ✓：⭐ `Constant.stages().get(310030)` ✓ ＋ ⭐ `new WaveManager(battle, stage)` ✓ ＋ ⭐ `battle.getWaveManager().nextWave()` ✓（⭐ 那是**真**的波次边界 ✓）。
+>   ⭐ 判据场景照 ⭐ `SheAlreadyShutHerEyesTest` ✓：⭐ `Constant.stages().get(310030)` ✓ ＋ ⭐ `new WaveManager(battle, stage)` ✓ ＋ ⭐ `battle.getWaveManager().nextWave()` ✓（⭐ 那是**真**的波次边界 ✓）。
 > * **实测（本轮）**：⭐ 全量 **0**（--rerun-tasks，**2263** 例 ✓）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓（⭐ 回滚后 ✓）。
 > **2026-10-02 更新（新目标第 4 轮：🎉🎉🎉 **第 91 件出货 ＝ ② `wave_monsters`（新入场的敌方目标）** ✓✓ —— ⭐ 名字用的是**游戏自己的事件** ✓）**）**：
 > * ✅ **出货内容（引擎三处 ✓）**：
@@ -34175,7 +34175,7 @@
 > * ⭐⭐ **对 `1141513` 第二半的结论（登记 ✓）**：⭐ 那句要 ⭐ **德谬歌获得 1 个额外回合** ✓，⭐ 而 ⭐ **它不在行动顺序里** ✗
 >   ⇒ ⭐⭐ 所以 ⭐ **前置 ＝ 一个"让忆灵进入行动顺序／以额外回合行动"的能力** ✗ —— ⭐ 要么 ⭐ 让被命令的忆灵能进入队列 ✓，
 >   ⭐ 要么 ⭐ 一个"立即行动"的 op ✓（⭐ 现有 ⭐ `ADVANCE` ✓ 也是按队列做的 ✗ ⇒ ⭐ 同样够不着 ✗）。⭐ 不近似，⭐ 登记 ✓。
-> * ⚠⚠ **我自己的两个坑（记 ✓）**：⭐ ① ⭐ `fireTriggers` 的**重载写错** ✗（⭐ 该用单参那个 ✓，⭐ 照 `Cone23011Test` ✓）；
+> * ⚠⚠ **我自己的两个坑（记 ✓）**：⭐ ① ⭐ `fireTriggers` 的**重载写错** ✗（⭐ 该用单参那个 ✓，⭐ 照 `SheAlreadyShutHerEyesTest` ✓）；
 >   ⭐ ② ⭐ 判据里给单参事件加了 ⭐ `actor == self` ✗ ⇒ ⭐ 那个条件**永远为假** ✗（⭐ 单参事件不带动作方 ✓）⇒ ⭐ 去掉 ✓。
 > * **实测（本轮）**：⭐ 全量 **0**（--rerun-tasks，**2279** 例 ✓）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
 > **2026-10-02 更新（新目标第 12 轮：⚠ **本轮没有出货** ✗ —— ⭐ 但把前置**钉死了**，⭐ 并证明"额外回合"这条路**走不通** ✓）**）**：
@@ -34328,7 +34328,7 @@
 >    ⭐ 而 `至高之姿` ✓ 已经是 `1402.json` 里的状态 ✓。）
 > * ⚠⚠ **坑一（⭐ 承重的假设，⭐ 差点改坏别的东西 ✓）**：⭐ `derived = (scale != null && !scale.isBlank()) || percent == null` ✓
 >   —— ⭐ 它**不是**"有没有 scale" ✗，⭐ 而是"**有没有 percent**" ✗ ⇒ ⭐ `derivedMagnitude` **也负责只有 `amount` 的平增量** ✓。
->   ⭐ 我一度把它改成"只看 scale" ✗ ⇒ ⭐ 立刻红了 **3 个既有判据** ✗：⭐ `AstaTest`（⭐ `50` → `5500` ✗）、⭐ `Cone23008Test`（⭐ `12` → `1164` ✗）、⭐ `ConeUltBreakSpeedTest`（⭐ `12` → `1212` ✗）
+>   ⭐ 我一度把它改成"只看 scale" ✗ ⇒ ⭐ 立刻红了 **3 个既有判据** ✗：⭐ `AstaTest`（⭐ `50` → `5500` ✗）、⭐ `EchoesOfTheCoffinTest`（⭐ `12` → `1164` ✗）、⭐ `ConeUltBreakSpeedTest`（⭐ `12` → `1212` ✗）
 >   ⇒ ⭐⭐ **教训：⭐ 一个布尔量的**名字**（derived）⭐ 不等于它的**含义** ✗；⭐ 改它之前要先看谁在用 ✓。**
 > * ⚠⚠ **坑二**：⭐ `percent_from_cast_param` 在**没有 `scale`** 时 ✗ 会踩两处旧假设 ✓：
 >   ⭐ ① ⭐ "恰好一个 `percent` 或 `amount`" 的检查 ✗（⭐ 我补了 ✓ —— 它把 ⭐ cast 参数也算成 share ✓）；
@@ -35434,7 +35434,7 @@
 > * ✅ **加固**：`tickDot` 里 `double percent = effect.getPercent();` **会拆箱 null** ⇒ 已改成 `shareOf(effect, ctx)`（引擎自己的份额解析器）。
 >   ⭐ 所以“加一种份额拼法”实际要改**七处**（多了“**每个直接读 `getPercent()` 的干活处**”）。
 > * ⭐ **判据为何未证成**：我判据里的 `APPLY_DOT` **没有把「灼烧」放上敌人**（探针：`灼烧 = false`）—— 与从句无关。
-> * ⭐ **下一问（有现成先例）**：抄 `Cone21026Test` 的 `settled(which)`（注释：“0 = clean, 1 = 灼烧, 2 = 裂伤, 3 = both”）
+> * ⭐ **下一问（有现成先例）**：抄 `WoofWalkTimeTest` 的 `settled(which)`（注释：“0 = clean, 1 = 灼烧, 2 = 裂伤, 3 = both”）
 >   —— **“给敌人上灼烧”在本仓库里已有现成做法**。
 > * **实测（本轮）**：回滚后 全量 **0**（--rerun-tasks）、树干净 ✓ 已推送 ✓。
 
@@ -35444,7 +35444,7 @@
 >   ⇒ ⭐ **份额大的那半咬得更狠** —— 这正是句子的主张（即时伤害是“捕获到的那个份额”的份额）；
 >   ⭐ **变异**（两个已捕获份额对调）⇒ 两个数字互换 ⇒ 红 ✓。
 > * ⭐⭐ **两条新事实**：
->   1. **判据里给敌人上 DoT 的出货做法**：`enemy.getBuffManager().addBuff(new DotBuff(unit, DamageElement.FIRE, 100, 3))`（抄 `Cone21026Test`）
+>   1. **判据里给敌人上 DoT 的出货做法**：`enemy.getBuffManager().addBuff(new DotBuff(unit, DamageElement.FIRE, 100, 3))`（抄 `WoofWalkTimeTest`）
 >      —— 靠 `APPLY_DOT` 规则**上不上去**（两轮的探针都读到 `灼烧 = false`）；
 >   2. **`ContentDuplicateGuardTest` 的签名里原本没有 `element`** ⇒ 一元素一条的 tick 规则被读成重复
 >      ⇒ 已把 `element` 加进操作数清单（**改进守卫**，不是放宽）。
@@ -36279,4 +36279,4 @@
 > * ⭐ **规模**：⭐ 1764 个被跟踪文件里 **746** 个含字面转义，⭐ 共 **53,970** 处 ⇒ ⭐ 解码 **53,915** 处／**743** 个文件；⭐ 二次扫描为 **0**（⭐ 幂等 ✓）；⭐ 差额 **55** ＝ 被守卫保留 ✓。
 > * ⭐ **保留三类**：⭐ 控制字符（⭐ JSON 不允许裸控制字符 ✓，⭐ 55 处 `\u0007`／`\u0000` ✓）／⭐ 引号与反斜杠（⭐ 会截断 Java 字面量 ✓，⭐ 2 处 ✓）／⭐ BOM 与孤立代理项 ✓；⭐ 成对代理项**已合并** ✓。
 > * ⭐ **验证**：⭐ `compileJava` ✓、⭐ 全量 **rc 0**、⭐ `mechanics` **rc 0** ✓。
-> * ⛔ **顺带发现**：⭐ `Cone22008Test.java` L64 的断言消息是中英混排（⭐ 不影响判据 ✓）。
+> * ⛔ **顺带发现**：⭐ `RaceToTheHorizonTest.java` L64 的断言消息是中英混排（⭐ 不影响判据 ✓）。
