@@ -1725,7 +1725,10 @@
 ### `11415` 忆灵技能 19「献予「天空」之诗」——**能量半已出货，另三半受阻**
 
 - ✅ 已出货：「对风堇施放时，为风堇恢复 `#2` 点能量」（为此给 `GAIN_ENERGY` 加了 `cast_skill_param:`）。
-- ⛔「德谬歌施放忆灵技时，使风堇获得 **2 层**【献予「天空」之诗】」：**跨表目标已不再是缺口**（2026-10-02 出货了 `ally_cid:<cid>`，判据两侧：点名的那位拿 2 层、旁人 0 层）。剩下的缺口是**层数上限** —— `StackBuff` 是 `Math.max(1, maxStacks)`，不给上限时**夹到 1**（实测：点名那位读到 1），而该状态的上限**不在我能读到的表里**（实测：忆灵技能表无层数字段；`StatusConfig`（2,457 行）无该状态名）⇒ 不发明一个上限来凑数。⭐ **下一问**：这个状态的**层数上限**在哪 —— 已实测：`AvatarStatusConfig`（778 行）里它叫 `MServant_CyreneServant_00_AmazingBuff_Hyacine`（`StatusID 10014155`）而**没有**计数列；能力文件里的 5 个 `MaxLayer` 都属于别的修饰（两个 `99999`、两个动态、一个 `1`）。
+- ✅ 已出货（2026-10-02）：「德谬歌施放忆灵技时，使风堇获得 **2 层**【献予「天空」之诗】」 —— `on: CAST_SETUP` ＋ `when: [actor is_summon, from_skill_id == 19]` ⇒ `ADD_STACK{buff, amount: 2, max_stacks: 99999, permanent, target: "ally_cid:1409"}`。⭐ 判据 `SkyOdeStackTest`：点名的风堇 **2 层**、同一场里另一个我方角色 **0 层**。
+- ⭐⭐ **上限为什么写 99999（数据自己的惯例）**：能力数据把这句话写成 `AddModifier` ＋ `LayerAddWhenStack: 2`，前置 `ByCompareCharacterID = 1409`（**游戏就是按 cid 点名**）；提到该修饰的四个文件里它旁边**没有** `MaxLayer`（`AvatarStatusConfig` 的行甚至没有计数列），而同一个能力文件里「不限」写的就是 `MaxLayer: 99999`（两处）⇒ **缺省 ＝ 不限**。⚠ 不写它，引擎的 `StackBuff`（`Math.max(1, maxStacks)`）只给 1 层。
+- ⚠⚠ **这次修复的回归（我的错，已记录）**：第一版规则**漏了 `from_skill_id`**，于是**任何**忆灵的施放都会触发它，而队伍里没有风堇时 `ally_cid:1409` 会**抛异常** ⇒ **22 例红**（全是既有判据）。⭐ 修法有二：① 补上数据自己就有的那道门（该修饰写在 **19 号技能**的 `TaskList` 里）；② 判据要铸 **19 号**。
+- ⭐ **引擎侧仍有一处锋利的边（已登记）**：`ally_cid:<cid>` 在**点名的人不在场**时走的是 `require(...)` ⇒ **抛异常**，而引擎自己的惯例是**空列表、不是错误**（`resolveTargets` 里 `lowest_hp_ally` 旁边那句注释：「clause does nothing」）。⭐ **下一问**：把 `ally_cid:` 移进**复数**解析路径，让它在人不在场时静默不生效。
 - ⭐⭐ **而数据已经证实了两件事**（`Config/ConfigAbility/Servant/Servant_CyreneServant_00_Ability.json` —— 目标点名的那个文件在 `Config/` 下，**不在** `ExcelOutput/`）：① 游戏用 **`ByCompareCharacterID` ＝ 1409** 点名风堇 —— **这与 `ally_cid:` 是同一件事**，所以那个设计是**源头确认过的**，不是猜的；② `LayerAddWhenStack: 2` —— **层数就是 2**，与原句一致。
 - ⛔「计入小伊卡忆灵技的治疗数值额外提高…等同本次治疗数值的 `#1%`」：需要"本次治疗量"这个载体。
 - ⛔「风堇施放战技/终结技后，消耗 1 层」：依赖上面那个状态。
