@@ -3229,8 +3229,10 @@ public final class TriggerInterpreter {
         }
         // ⭐ Both a stated `scale` and a stated ceiling must be read (2026-09-30; reader: light cone 23062).
         // ⚠ This method once ignored `damage_type` the same way -- see the comment above, round 258.
+        // ⭐ Through `shareOf`, like every other op that reads a share (2026-10-02; measured: `percent_from_resource` passed validation -- `requirePercent` has admitted it since round
+        // 83 -- and then died here with "getPercent() is null", so the op validated against a vocabulary it did not apply).
         double magnitude = effect.getScale() == null || effect.getScale().isBlank()
-                ? effect.getPercent()
+                ? shareOf(effect, ctx)
                 : derivedMagnitude(effect, ctx);
         damage.addBoost(applyDerivedCeiling(effect, ctx, magnitude));
     }
