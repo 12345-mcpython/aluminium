@@ -416,3 +416,16 @@
   3. ⭐ **【结界】自带 +30% 受伤**（`ult_zone_enemy_vulnerability`）⇒ 期望必须带上它，否则差值差 30%（实测比值 1.3006）。
 - ⭐ **而“追加攻击”这一层没收窄**：`ATTACK_FINISHED` 上没有“这次攻击是追加攻击”的词汇 ⇒ **登记**。
   ⭐ 而判据的容差是 **1%**（实测残差 0.05%，来自等级行的取整）—— 1% 足以捕到“多一次/少一次”（它们移动 100%）。
+
+- ✅ **已出货（2026-10-02，第 153 件）：槽位 18 的**【真知】从句**：「那刻夏在下一次施放普攻、战技时获得【真知】」。
+  ⭐ 内容：`1405.json`（那刻夏自己的文件）`on: CAST_SETUP` + `target == self` + `actor is_summon` + `from_skill_id == 18`
+  ⇒ `APPLY_BUFF{真知, until: next_attack}`。
+  判据 `ReasonOdeTrueKnowledgeTest`：`cast at him: … the state is 1.0 ; cast elsewhere: … the state is 0.0`；变异（去掉 `target == self`）⇒ 别处读 **1.0** ⇒ 红 ✓。
+- ⭐⭐⭐ **三条新事实（第 119 轮）**：
+  1. ⭐ **`MODIFY_ATTR{damage_type}` 必须配 `instance: true`**（加载器原话：*“states \"damage_type\" without \"instance\": true；
+     only an instance-scoped m…”*）⇒ 它只能做**逐次**修正（像 `1406.json` 的 `trace_followup_crit_damage`），
+     **不能**做“持续抬高某一类伤害”；
+  2. ⭐ **`until` 在内容里的取值是 `cast_end` 与 `next_attack`** ⇒ 「下一次施放普攻、战技时」= `next_attack`；
+  3. ⭐ **`Path.ERUDITION` 已在**（`Map.entry("智识", ERUDITION)`）但条件词汇里**没有命途选择器** ⇒ 「所有智识命途角色」**仍不可表达**。
+- ⭐ **而这个从句的两个数值各缺一件词汇**：智识命途攻击力 30% 需**命途选择器**；
+  战技伤害 20% 需**“持续地抬某一类伤害”**（`damage_type` 只能逐次）—— 两者都已登记。
