@@ -1,0 +1,97 @@
+================================================================================================
+SkillCY01 SkillID=1141513 slot=13 params=[0.08, 0.36, 1]
+  NAME: 献予「创世」之诗
+  DESC: <color=#f29e38ff>整场生效</color>，对开拓者•记忆施放时，使开拓者•记忆的攻击力提高，提高数值等同于德谬歌生命上限的<color=#f29e38ff><unbreak>#1[i]%</unbreak></color>，同时使开拓者•记忆的暴击率提高，提高数值等同于德谬歌暴击率的<color=#f29e38ff><unbreak>#2[i]%</unbreak></color>。该效果对迷迷也生效。本场战斗中，开拓者•记忆施放强化普攻后，德谬歌立即获得1个<u>额外回合</u>并自动施放【花与箭的舞曲】，若施放前目标被消灭则对新入场的敌方目标施放。
+  OUR RULES (3): memosprite_ode_of_genesis_raises_his_attack_and_crit, memosprite_ode_of_genesis_also_reaches_his_memosprite, memosprite_ode_of_genesis_gives_it_an_extra_turn_after_the_reinforced_basic_attack
+  OUR JUDGES (2): MemospriteSlotCastTest, OdeOfGenesisTest
+
+================================================================================================
+SkillCY02 SkillID=1141514 slot=14 params=[70, 0.36, 0.18]
+  NAME: 献予「浪漫」之诗
+  DESC: <color=#f29e38ff>单次生效</color>，对阿格莱雅施放时，使阿格莱雅获得【浪漫】并使衣匠忆灵天赋的速度提高效果层数立即叠加至上限。阿格莱雅或衣匠攻击后，消耗【浪漫】为自身恢复<unbreak>#1[i]</unbreak>点能量。阿格莱雅与衣匠造成的伤害提高<color=#f29e38ff><unbreak>#2[i]%</unbreak></color>并无视目标<color=#f29e38ff><unbreak>#3[i]%</unbreak></color>的防御，持续至阿格莱雅退出【至高之姿】状态。
+  OUR RULES (7): memosprite_ode_of_romance_marks_aglaea, memosprite_ode_of_romance_spends_itself_for_energy, memosprite_ode_of_romance_raises_damage_and_pierces_defence, memosprite_ode_of_romance_also_reaches_the_garmentmaker, memosprite_ode_of_romance_ends_with_her_stance, memosprite_ode_of_romance_stance_end_also_clears_the_garmentmaker, memosprite_ode_of_passage_makes_his_damage_ignore_defence
+  OUR JUDGES (5): ActorAttrScaleTest, CastSkillParamScaleTest, OdeOfRomanceStanceTest2, OdeOfRomanceTest, PercentFromCastParamScaleTest
+
+================================================================================================
+SkillCY03 SkillID=1141515 slot=15 params=[1, 0.06, 3]
+  NAME: 献予「门径」之诗
+  DESC: <color=#f29e38ff>整场生效</color>，对缇宝施放时，使缇宝造成的伤害无视敌方目标<color=#f29e38ff><unbreak>#2[i]%</unbreak></color>的防御力。缇宝施放追加攻击触发缇宝的结界的<u>附加伤害</u>时，会额外造成<unbreak>#1[i]</unbreak>次附加伤害。
+  OUR RULES (3): memosprite_ode_of_passage_makes_his_damage_ignore_defence, passage_ode_adds_one_more_zone_hit, memosprite_ode_to_law_pays_charge
+  OUR JUDGES (2): OdeOfPassageTest, PassageOdeExtraZoneHitTest
+
+================================================================================================
+SkillCY04 SkillID=1141516 slot=16 params=[1, 1]
+  NAME: 献予「纷争」之诗
+  DESC: <color=#f29e38ff>单次生效</color>，对万敌施放时解除万敌陷入的所有<u>控制类负面状态</u>，若万敌处于【血仇】状态，则使其自动施放1次不消耗充能的【弑神登神】，本次攻击中万敌的暴击伤害提高<color=#f29e38ff><unbreak>#1[i]%</unbreak></color>，若施放前目标被消灭则对新入场的敌方目标施放。若万敌不处于【血仇】状态，则使万敌<u>行动提前</u><unbreak>#2[i]%</unbreak>。
+  OUR RULES (7): memosprite_ode_raises_his_crit_damage_for_this_cast, memosprite_ode_commands_the_godslayer_in_bloodfeud, memosprite_ode_advances_him_outside_bloodfeud, memosprite_ode_dispels_his_control_debuffs, memosprite_ode_marks_him_for_the_battle, memosprite_ode_of_ocean_marks_hysilens, memosprite_ode_of_ocean_spends_itself_for_energy
+  OUR JUDGES (2): MemospriteSkillTest, OdeToStrifeBloodfeudTest
+
+================================================================================================
+SkillCY05 SkillID=1141517 slot=17 params=[0, 0.0012, 2, 0, 0.0024, 2]
+  NAME: 献予「生死」之诗
+  DESC: <color=#f29e38ff>整场生效</color>，对遐蝶施放时，【新蕊】可以溢出至<unbreak>#3[i]%</unbreak>。召唤死龙时会消耗所有溢出【新蕊】，每消耗1%溢出值，使本次召唤的死龙触发天赋【灼掠幽墟的晦翼】的技能效果时，造成的伤害倍率提高<color=#f29e38ff><unbreak>#2[f2]%</unbreak></color>，召唤时若场上敌方目标小于等于<unbreak>#6[i]</unbreak>名，伤害倍率额外提高<color=#f29e38ff><unbreak>#5[f2]%</unbreak></color>。
+  OUR RULES (4): life_ode_widens_newbud_overflow, life_ode_raises_the_ratio_against_a_small_pack, life_ode_summon_spends_captures_and_raises, memosprite_ode_of_law_raises_the_meritorious
+  OUR JUDGES (6): AmendmentFromResourceTest, DragonHollowWingTest, LifeOdeNewBudOverflowTest, LifeOdeRaisesTheDragonTalentTest, OverflowOnlySpendTest, SpentAmountIsPositiveTest
+
+================================================================================================
+SkillCY06 SkillID=1141518 slot=18 params=[3, 0.2, 0.3, 1]
+  NAME: 献予「理性」之诗
+  DESC: <color=#f29e38ff>单次生效</color>，对那刻夏施放时，为我方恢复<unbreak>#4[i]</unbreak>个战技点并使那刻夏立即行动，使其战技的伤害次数增加<unbreak>#1[i]</unbreak>次，持续1回合。那刻夏在下一次施放普攻、战技时获得【真知】：所有「智识」命途角色攻击力提高<color=#f29e38ff><unbreak>#3[i]%</unbreak></color>、造成的战技伤害提高<color=#f29e38ff><unbreak>#2[i]%</unbreak></color>，持续至下一个那刻夏回合开始时。
+  OUR RULES (4): memosprite_ode_of_reason_gives_a_point_and_advances_him, memosprite_ode_of_reason_grants_true_knowledge, true_knowledge_raises_his_skill_damage, memosprite_ode_of_reason_takes_the_extra_hits_back
+  OUR JUDGES (6): ReasonOdeEruditionAttackTest, ReasonOdeExtraHitsTest, ReasonOdePointAndActionTest, ReasonOdeTrueKnowledgeTest, TrueKnowledgeLifetimeTest, TrueKnowledgeSkillDamageTest
+
+================================================================================================
+SkillCY07 SkillID=1141519 slot=19 params=[0.36, 12]
+  NAME: 献予「天空」之诗
+  DESC: 德谬歌施放忆灵技时，使风堇获得2层【献予「天空」之诗】。对风堇施放时，为风堇恢复<color=#f29e38ff><unbreak>#2[i]</unbreak></color>点能量。当风堇持有【献予「天空」之诗】并提供治疗时，计入小伊卡忆灵技的治疗数值额外提高，提高数值等同于本次治疗数值的<color=#f29e38ff><unbreak>#1[i]%</unbreak></color>。风堇施放战技/终结技后，消耗1层【献予「天空」之诗】。
+  OUR RULES (6): memosprite_ode_of_sky_gives_her_energy, casting_a_skill_spends_one_layer_of_the_sky_ode, casting_the_ultimate_spends_one_layer_of_the_sky_ode, sky_ode_captures_its_healing_share, sky_ode_adds_a_share_of_each_heal_to_ikachis_total, memosprite_ode_of_sky_stacks_hyacine_when_it_casts
+  OUR JUDGES (3): SkyOdeEnergyTest, SkyOdeHealingTotalTest, SkyOdeStackTest
+
+================================================================================================
+SkillCY08 SkillID=1141520 slot=20 params=[0.18, 0.1, 0.06]
+  NAME: 献予「诡计」之诗
+  DESC: <color=#f29e38ff>整场生效</color>，对赛飞儿施放时，使赛飞儿造成的伤害提高<color=#f29e38ff><unbreak>#1[i]%</unbreak></color>，并使【老主顾】的防御力降低<color=#f29e38ff><unbreak>#2[i]%</unbreak></color>，【老主顾】以外的敌方目标的防御力降低<color=#f29e38ff><unbreak>#3[i]%</unbreak></color>。
+  OUR RULES (5): memosprite_ode_of_trickery_raises_her_damage, trick_ode_lowers_the_patrons_defence, trick_ode_lowers_everyone_elses_defence, level_convention, level_convention
+  OUR JUDGES (8): Cone21064Test, ElationBoostTest, ElationRowTest, SiblingElationTest, TrickeryOdeDamageTest, TrickeryOdeDefenceTest, TriggerStateTest, UltElationBranchTest
+
+================================================================================================
+SkillCY09 SkillID=1141521 slot=21 params=[0.08, 0.15, 5, 0.05, 12, 0.06, 0.36, 6, 4]
+  NAME: 献予「负世」之诗
+  DESC: <color=#f29e38ff>整场生效</color>，对白厄施放后，使白厄获得<unbreak>#8[i]</unbreak>点【火种】，且在变身时获得【永续的燃烧】，变身时若【火种】大于<unbreak>#5[i]</unbreak>点，每超出1点，卡厄斯兰那的暴击伤害提高<color=#f29e38ff><unbreak>#6[i]%</unbreak></color>，最多可提高<color=#f29e38ff><unbreak>#7[i]%</unbreak></color>。持有【永续的燃烧】时，卡厄斯兰那的暴击率提高<color=#f29e38ff><unbreak>#1[f1]%</unbreak></color>，在<u>卡厄斯兰那的额外回合</u>耗尽后不会结束变身、刷新全部<u>卡厄斯兰那的额外回合</u>并获得<unbreak>#9[i]</unbreak>点<u>【毁伤】</u>。<u>额外回合</u>开始时，卡厄斯兰那消耗等同于当前生命值<unbreak>#2[i]%</unbreak>的生命值。施放攻击后，造成<unbreak>#3[i]</unbreak>次<u>附加伤害</u>，每次伤害对敌方随机单体造成等同于卡厄斯兰那<color=#f29e38ff><unbreak>#4[f1]%</unbreak></color>攻击力的火属性<u>附加伤害</u>。
+  OUR RULES (12): world_ode_grants_fire_seed, world_ode_fire_seed_crit_step_1, world_ode_fire_seed_crit_step_2, world_ode_fire_seed_crit_step_3, world_ode_fire_seed_crit_step_4, world_ode_fire_seed_crit_step_5, world_ode_fire_seed_crit_step_6, world_ode_everburning_raises_his_crit_rate, world_ode_adds_five_fire_hits, world_ode_refreshes_the_extra_turns, world_ode_grants_everburning, world_ode_extra_turn_costs_hp
+  OUR JUDGES (5): WorldOdeAddedFireHitsTest, WorldOdeEverburningTest, WorldOdeExtraTurnCostsHpTest, WorldOdeExtraTurnsRefreshTest, WorldOdeFireSeedTest
+
+================================================================================================
+SkillCY10 SkillID=1141522 slot=22 params=[0.6, 0.3, 0.4, 60]
+  NAME: 献予「海洋」之诗
+  DESC: <color=#f29e38ff>单次生效</color>，对海瑟音施放时，使海瑟音获得【暖流】。海瑟音施放攻击后消耗【暖流】为自身恢复<unbreak>#4[i]</unbreak>点能量。本场战斗中，海瑟音造成的伤害提高<color=#f29e38ff><unbreak>#1[i]%</unbreak></color>，施放普攻/战技攻击敌方目标后，使受到攻击的敌方目标当前承受的所有持续伤害立即产生相当于原伤害<color=#f29e38ff><unbreak>#2[i]%</unbreak></color>/<color=#f29e38ff><unbreak>#3[i]%</unbreak></color>的伤害。
+  OUR RULES (18): memosprite_ode_of_ocean_marks_hysilens, memosprite_ode_of_ocean_spends_itself_for_energy, memosprite_ode_of_ocean_raises_her_damage, ocean_ode_captures_both_overflow_shares, ocean_ode_ticks_普攻_physical, ocean_ode_ticks_普攻_fire, ocean_ode_ticks_普攻_ice, ocean_ode_ticks_普攻_wind, ocean_ode_ticks_普攻_thunder, ocean_ode_ticks_普攻_quantum, ocean_ode_ticks_普攻_imaginary, ocean_ode_ticks_战技_physical, ocean_ode_ticks_战技_fire, ocean_ode_ticks_战技_ice, ocean_ode_ticks_战技_wind, ocean_ode_ticks_战技_thunder, ocean_ode_ticks_战技_quantum, ocean_ode_ticks_战技_imaginary
+  OUR JUDGES (3): OceanOdeDamageTest, OceanOdeEnergyTest, OceanOdeTickDotTest
+
+================================================================================================
+SkillCY11 SkillID=1141523 slot=23 params=[0.15, 1]
+  NAME: 献予「律法」之诗
+  DESC: <color=#f29e38ff>整场生效</color>，对刻律德菈施放后，持有【军功】的角色暴击伤害提高<color=#f29e38ff><unbreak>#1[i]%</unbreak></color>，<u>奇袭</u>结束后，使刻律德菈获得<unbreak>#2[i]</unbreak>点充能。
+  OUR RULES (2): memosprite_ode_of_law_raises_the_meritorious, capture_reader_cast_param
+  OUR JUDGES (3): CaptureCastParamTest, LawOdeCritDamageTest, ResourceShareTest
+
+================================================================================================
+SkillCY12 SkillID=1141524 slot=24 params=[0.09, 1, 0.06]
+  NAME: 献予「岁月」之诗
+  DESC: <color=#f29e38ff>整场生效</color>，对长夜月施放后，「长夜」施放忆灵技【迷梦，流失，如露】时造成的伤害提高<color=#f29e38ff><unbreak>#1[i]%</unbreak></color>，长夜月施放战技/终结技后，额外获得<unbreak>#2[i]</unbreak>点【忆质】。长夜月战技的暴击伤害提高效果额外提高，提高数值等同于长夜月暴击伤害的<color=#f29e38ff><unbreak>#3[i]%</unbreak></color>。
+  OUR RULES (6): time_ode_captures_its_own_share, time_ode_boosts_the_memosprite_dream_skill, time_ode_captures_its_extra_point, time_ode_grants_memory_after_skill, time_ode_grants_memory_after_ult, time_ode_raises_her_skill_crit
+  OUR JUDGES (4): EvernightCritForSummonsTest, TimeOdeBoostTest, TimeOdeMemoryTest, TimeOdeRaisesHerCritTest
+
+================================================================================================
+SkillCY13 SkillID=1141525 slot=25 params=[0.12, 2, 3, 0.4, 1.5]
+  NAME: 献予「大地」之诗
+  DESC: 德谬歌施放忆灵技时，使丹恒•腾荒获得【献予「大地」之诗】，并使【龙灵】的下<unbreak>#3[i]</unbreak>次攻击造成等同于【同袍】护盾量<color=#f29e38ff><unbreak>#4[i]%</unbreak></color>的相应属性<u>附加伤害</u>。当丹恒•腾荒持有【献予「大地」之诗】时，【同袍】造成的伤害提高<color=#f29e38ff><unbreak>#1[f1]%</unbreak></color>。对丹恒•腾荒施放时，使龙灵行动提前<unbreak>100%</unbreak>，并使龙灵下一次行动时获得丹恒•腾荒终结技的强化效果、提供的护盾量为原护盾量的<unbreak>#5[i]%</unbreak>，不消耗丹恒•腾荒终结技的强化次数。
+  OUR RULES (2): memosprite_ode_of_earth_marks_dan_heng, memosprite_ode_of_earth_advances_the_dragon_soul
+  OUR JUDGES (1): EarthOdeMarksDanHengTest
+
+================================================================================================
+SkillCY14 SkillID=1141526 slot=26 params=[0.3, 3]
+  NAME: 献予「真我」之诗
+  DESC: 昔涟每从1个除德谬歌以外不同的队友处获得【追忆】后，德谬歌施放【花与箭的舞曲】时额外对敌方随机单体造成1次等同于德谬歌<color=#f29e38ff><unbreak>#1[i]%</unbreak></color>生命上限的冰属性伤害。昔涟施放终结技后或德谬歌被召唤时，使德谬歌获得1点【故事】，当【故事】达到<unbreak>#2[i]</unbreak>点时，德谬歌消耗全部【故事】立即获得1个<u>额外回合</u>自动施放【花与箭的舞曲】。
+  OUR RULES (5): true_self_counts_a_new_allies_recollection_first, true_self_marks_the_allies_that_gave_one, true_self_ode_marks_cyrene, true_self_ode_spends_three_story, true_self_ode_extra_ice_hit
+  OUR JUDGES (3): TrueSelfOdeExtraIceTest, TrueSelfOdeGivesStoryTest, TrueSelfOdeSpendsThreeStoryTest
