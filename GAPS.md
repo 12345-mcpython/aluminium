@@ -37166,3 +37166,25 @@
 >   ⇒ ⭐⭐ **教训：⭐ 用一个**没验证过会被填**的上下文字段写判据之前，⭐ 先 grep 它的**赋值处** ✗** ——
 >   ⭐ 那一步只要一次调用 ✓，⭐ 而我为了省它 ⭐ 白花了两次 ✓。
 > * **实测（本轮）**：⭐ 全量 **0**（--rerun-tasks，**2289** 例 ✓）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓（⭐ 回滚后 ✓）。
+
+> **2026-10-02 更新（新目标第 32 轮：🎉🎉🎉 **第 111 件出货 ＝ `highest_hp_attack_hit`** ✓✓ —— ⭐ 并修好了上一轮那个 bug ✓）**）**：
+>
+> * ✅ **出货内容（三处 ✓）**：⭐ 选择器 ⭐ `highest_hp_attack_hit` ✓ —— ⭐「被攻击目标中**当前生命值最高**的目标」✓ ——
+>   ⭐ 注册进 ⭐ `TARGET_SELECTORS` ✓ ＋ ⭐ 单目标解析器里的分支 ✓ ＋ ⭐ 一个 helper ⭐ `highestHitTarget(ctx)` ✓。
+>   ⭐ 它是 ⭐ `random_hit_enemy` 的**兄弟** ✓：⭐ 同一个池 ✓，⭐ 换一个挑法（⭐ "⭐ 血最多" ⭐ 而不是"⭐ 随机" ✓）。
+> * ⭐⭐⭐ **上一轮的 bug 与它的修法（⭐ 引擎自己的注释就写着 ✓）**：⭐ `randomHitEnemy` 的注释说 ⭐
+>   *"**TWO carriers, one selector**: an `ATTACK_FINISHED` context carries the attack's **FROZEN** hit set, while a per-hit context
+>   (`DEALING_DAMAGE`) only has its **instance's snapshot** -- so the attack-level set wins and the instance is the fallback."* ✓
+>   ⇒ ⭐⭐ 我第一版只读 ⭐ `attackHitTargets` ✗ ⇒ ⭐ 在 ⭐ `DEALING_DAMAGE` 上**必然是空的** ✗ ⇒
+>   ⭐ 现在照兄弟读**两个载体** ✓：⭐ `!ctx.attackHitTargets().isEmpty() ? … : ctx.damage().hitTargets()` ✓。
+> * ⭐ **语义细节（⭐ 都照原话 ✓）**：⭐ 比较用 ⭐ **绝对 `getCurrentHp()`** ✗ ⭐ 而不是百分比 ✓（⭐ 已有的 `lowest_hp_ally` 读的是**百分比** ✗，⭐ 所以那个不能复用 ✓）；
+>   ⭐ 池 ⭐ 过滤到**持有者的对手** ✓（⭐ 因为原句是"⭐ 造成伤害" ✓）＋ ⭐ `passesTargetFilter` ✓。
+> * ✅ **判据 ＋ 实测变异** ✓：⭐ `HighestHpAmongHitsTest` ⇒ ⭐
+>   `[highest_hit] after a real cast, units of the hit set whose speed rose = 1` ✓✓
+>   ＋ ⭐ `[highest_hit] no instance -> IllegalStateException: Effect targets "highest_hp_attack_hit" but this event has no such party` ✓（⭐ 响亮 ✓）；
+>   ⭐ **变异** ✓：⭐ 把池改成只读 ⭐ `attackHitTargets` ✗ —— ⭐⭐ **那正是我上一轮那个 bug** ✓ ⇒ ⭐ 正例红 ✓ ⇒
+>   ⭐ 这条变异**重现了 bug** ✓，⭐ 所以它同时证明了修法是对的 ✓。
+> * ⭐⭐ **`1141515` 第二句现在只差一件** ✗：⭐ 那句要的**结界的附加伤害** ✗ ⇒ ⭐ 缺 ⭐ **（a）一个"读另一个技能的参数"的拼法** ✗
+>   （⭐ `#3` 是他**终结技**的参数 ✓：⭐ 0.06 → 0.126 ✓，⭐ 随级变 ✓；⭐ 而 ⭐ `from_skill_id`／⭐ `cast_skill_param` ✗ 指的是**造成事件的那个技能** ✗，
+>   ⭐ 这里会是**追加攻击** ✓，⭐ 不是终结技 ✗）。⭐ 选择器那件（b）⭐ **本轮已出货** ✓。
+> * **实测（本轮）**：⭐ 全量 **0**（--rerun-tasks，**2291** 例 ✓）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
