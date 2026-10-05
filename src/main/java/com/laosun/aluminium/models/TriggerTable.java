@@ -904,6 +904,14 @@ static final String SUMMON_ATTR_PREFIX = "summon_attr:";
  * (1415 memosprite skill 10). The damage path reads the same row through {@code multiplierOf}.
  */
 static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
+
+    /**
+     * {@code skill_param:<SKILLTYPE>:<index>} -- a parameter of one of the RULE OWNER's OWN skills, at its current level (2026-10-02).
+     *
+     * <p>Reader: 1403 缇宝's ultimate, whose zone rider deals 「等同于缇宝 #3% 生命上限」 damage on somebody else's attack. `cast_skill_param:` reads the skill
+     * that PRODUCED the event (the attack), which is the wrong one; this names the slot instead.
+     */
+    static final String SKILL_PARAM_PREFIX = "skill_param:";
     static final String SELF_ATTR_PREFIX = "self_attr:";
 
     /**

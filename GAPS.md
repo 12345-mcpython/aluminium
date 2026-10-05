@@ -37188,3 +37188,24 @@
 >   （⭐ `#3` 是他**终结技**的参数 ✓：⭐ 0.06 → 0.126 ✓，⭐ 随级变 ✓；⭐ 而 ⭐ `from_skill_id`／⭐ `cast_skill_param` ✗ 指的是**造成事件的那个技能** ✗，
 >   ⭐ 这里会是**追加攻击** ✓，⭐ 不是终结技 ✗）。⭐ 选择器那件（b）⭐ **本轮已出货** ✓。
 > * **实测（本轮）**：⭐ 全量 **0**（--rerun-tasks，**2291** 例 ✓）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
+
+> **2026-10-02 更新（新目标第 33 轮：🎉🎉🎉 **第 112 件出货 ＝ `skill_param:<SKILLTYPE>:<index>`** ✓✓ —— ⭐ `1141515` 的**最后一件前置** ✓）**）**：
+>
+> * ✅ **出货内容（三处 ＋ 一个 helper ✓）**：⭐ `TriggerTable` 新增前缀 ⭐ `skill_param:` ✓；⭐ 装载期分支 ✓（⭐ 校验 ⭐ `<SKILLTYPE>:<index>` 的形状 ✓
+>   ＋ ⭐ 槽位必须是 ⭐ `SkillType` ✓ ＋ ⭐ `requirePercent` ✓）；⭐ 运行期分支 ✓；⭐ helper ⭐ `ownerSkillParamValue(effect, ctx)` ✓。
+> * ⭐⭐⭐ **为什么需要它** ✗：⭐ 1403 缇宝 终结技那条结界 rider ✗ ——
+>   ⭐ 「受到我方目标攻击后…造成 1 次**等同于缇宝 `#3%` 生命上限**的量子属性附加伤害」 ✓ ——
+>   ⭐ 而 ⭐ `#3` 是 ⭐ **他终结技**的参数 ✗（⭐ 0.06 → 0.126 ✓，⭐ 随等级变 ✓）；⭐ 两个**现成**的读数器都**说不出它** ✗：
+>   ⭐ `cast_skill_param:` 与 ⭐ `percent_from_cast_param` ✓ 读的是 ⭐ **造成事件的那个技能** ✗（⭐ 这里是**追加攻击** ✓）；⭐ 而 ⭐ 写死一个字面量 ⭐ 会**冻结某一级** ✗。
+> * ⭐ **形状（⭐ 照 `castParamValue` 的镜子 ✓）**：⭐ `skill.getData().getSkills()` ✓ ＋ ⭐ `owner.skillLevel(skill)` 取行 ✓ ＋ ⭐ 该行第 index 个 ✓
+>   ⇒ ⭐ **唯一差别是"哪一个技能"** ✓：⭐ 它**点名槽位** ✓，⭐ 而不是问上下文 ✓。
+> * ✅ **判据 ＋ 实测变异** ✓：⭐ `SkillParamTest` ⇒ ⭐
+>   `[skill_param] his ULTRA row = [0.3, 0.3, 0.12, 2.0] ; expected 0.24 (the neighbour is 0.6) ; the gain = 0.2400000000000091` ✓✓
+>   ⇒ ⭐ 读到的正是 ⭐ `#3` ＝ 0.12（10 级 ✓）× 2.0 ✓，⭐ 而 ⭐ **邻居是 0.6** ✓ ⇒ ⭐ **索引是承重的** ✓（⭐ 第二条断言就钉这个 ✓）；
+>   ⭐ **变异** ✓：⭐ 让读数器取第 0 个 ✗ ⇒ ⭐ `the gain = 0.6000000000000227` ⇒ 红 ✓。
+> * ⭐⭐ **`1141515` 第二句现在件件齐了** ✓：⭐ `times` ✓、⭐ `original_damage` ✓、⭐ `damage_is_additional` ✓、⭐ `highest_hp_attack_hit` ✓、
+>   ⭐ **`skill_param:ULTRA:2`** ✓、⭐ 结界状态 ✓ ⇒ ⭐⭐ **下一轮一次成句** ✓。
+>   ⚠ 只剩一个**判断** ✗：⭐ 「**每有 1 名目标受到攻击**，会…造成 1 次」 ✗ ⇒ ⭐ 那笔附加伤害**每个被攻击目标各一次** ✓ ⇒
+>   ⭐ 但 ⭐ `DAMAGE` **拒绝** ⭐ `times` 与 ⭐ `per_target` **同时给** ✗（⭐ 注释：⭐ "one repeats the whole settlement and the other multiplies a single one, so the pair has two readings" ✓）
+>   ⇒ ⭐⭐ **所以要么全不给**（⭐ 让它按目标各一次 ✓）**要么用 `times_from`** ✗ ⇒ ⭐ 下一轮读那段注释再定 ✓。
+> * **实测（本轮）**：⭐ 全量 **0**（--rerun-tasks，**2292** 例 ✓）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。

@@ -2437,6 +2437,36 @@ public final class TriggerInterpreter {
      * <p>⚠ Shared by the {@code cast_skill_param:<index>} scale and by {@code percent_from_cast_param}, so the two cannot drift: the damage
      * path reads the same row the same way (`multiplierOf` -- `skill.getData().getSkills()`, `attacker.skillLevel(skill)`, `level - 1`).
      */
+    /**
+     * A parameter of one of the RULE OWNER's OWN skills, at that skill's current level (2026-10-02).
+     *
+     * <p>The sibling of {@link #castParamValue}, and the only difference is which skill: that one reads the skill that PRODUCED the event, this one reads
+     * the slot the scale names. Same row lookup (`getData().getSkills()` at `skillLevel`, then the index), so the two cannot drift.
+     */
+    private static double ownerSkillParamValue(EffectSpec effect, TriggerContext ctx) {
+        Character owner = requireCharacterOwner(effect, ctx);
+        String[] parts = effect.getScale().trim().substring(TriggerTable.SKILL_PARAM_PREFIX.length()).split(":", 2);
+        int index = Integer.parseInt(parts[1].trim());
+        SkillType slot = SkillType.valueOf(parts[0].trim().toUpperCase(Locale.ROOT));
+        Skill named = owner.getSkills().get(slot);
+        if (named == null || named.getData() == null || !named.getData().isLoaded()) {
+            throw new IllegalStateException("the scale \"" + effect.getScale() + "\" reads " + owner.getName()
+                    + "'s own " + slot + " skill, and there is no loaded such skill");
+        }
+        var rows = named.getData().getSkills();
+        int row = owner.skillLevel(named) - 1;
+        if (row < 0 || row >= rows.size()) {
+            throw new IllegalStateException("skill level " + owner.skillLevel(named) + " is outside " + owner.getName()
+                    + "'s " + slot + " parameter table (rows=" + rows.size() + ")");
+        }
+        var values = rows.get(row);
+        if (index >= values.size()) {
+            throw new IllegalStateException("the scale \"" + effect.getScale() + "\" names index " + index
+                    + ", which is outside that skill parameter row (size=" + values.size() + ")");
+        }
+        return values.get(index);
+    }
+
     private static double castParamValue(EffectSpec effect, TriggerContext ctx, String spelled) {
         int index = Integer.parseInt(spelled);
         CanHit caster = ctx.actor();
@@ -2531,6 +2561,9 @@ public final class TriggerInterpreter {
             // directly -- so a rule whose share is `percent_from_cast_param` crashed on a null here. Same fix as its sibling below.
             return shareOf(effect, ctx) * subject.getAttribute(from).get()
                     + (effect.getAmount() == null ? 0 : effect.getAmount());
+        }
+        if (effect.getScale().trim().startsWith(TriggerTable.SKILL_PARAM_PREFIX)) {
+            return shareOf(effect, ctx) * ownerSkillParamValue(effect, ctx) + (effect.getAmount() == null ? 0 : effect.getAmount());
         }
         if (effect.getScale().trim().startsWith(TriggerTable.SUMMON_ATTR_PREFIX)) {
             // The owner's MEMOSPRITE (1415 memosprite skill 10). Resolved through `Battle.summonOf`, the same accessor the `summon`
@@ -4036,6 +4069,25 @@ public final class TriggerInterpreter {
                                 + "\" (source: " + spec.getSource() + ")");
             }
             AttributeType.fromString(actorAttr);
+            requirePercent(effect, op, spec);
+            return;
+        }
+        // ⭐ The owner's OWN skill, named by slot (2026-10-02): `<SKILLTYPE>:<index>`. Checked here for the reason the family below gives --
+        // `scaleAttribute` is shared with the DAMAGE path, where the subject is already the attacker.
+        if (scale.startsWith(TriggerTable.SKILL_PARAM_PREFIX)) {
+            String[] parts = scale.substring(TriggerTable.SKILL_PARAM_PREFIX.length()).split(":", 2);
+            if (parts.length != 2 || parts[0].isBlank() || parts[1].isBlank()) {
+                throw new IllegalArgumentException(
+                        "Op " + op + " scales off one of the owner's skills but does not name it as <SKILLTYPE>:<index>: \"" + scale
+                                + "\" (source: " + spec.getSource() + ")");
+            }
+            try {
+                SkillType.valueOf(parts[0].trim().toUpperCase(Locale.ROOT));
+            } catch (IllegalArgumentException notASlot) {
+                throw new IllegalArgumentException(
+                        "Op " + op + " scales off skill slot \"" + parts[0] + "\", which is not a SkillType (source: "
+                                + spec.getSource() + ")");
+            }
             requirePercent(effect, op, spec);
             return;
         }
