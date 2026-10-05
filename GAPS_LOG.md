@@ -36051,3 +36051,14 @@
 > * ✅ **已消解**：⭐ `EXTRA_TURN` 那条 —— ⭐ 全库 4 处全部 `target: self`（持有者都是角色），⭐ 两个速度 0 的忆灵都没有它 ✓。
 > * ⭐ **登记（槽位 18）**：⭐ 「战技的伤害次数增加 3 次」⭐ 无词汇；⭐ 模板为 `CanHit.raiseSkillLevel` ✗ 的 `skillLevelBonus` ✗。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
+
+> **2026-10-02 更新（新目标第 10 轮：✅ 出货天赋的【未来】授予 ＋ 发现其整个子系统此前未落）**：
+>
+> * ✅ **落地**：`BATTLE_START` ＋ ⭐ `TURN_END`（= 「昔涟行动后」）⭐ `APPLY_BUFF{未来, target: "other_allies", permanent: true}`。
+> * ⭐ **判据**：`the ally has it = true ; 昔涟 herself = false`；⭐ **变异（`all_allies`）⇒ RED**（`herself = true`）✓。
+> * ⭐⭐ **三条引擎事实**：（1）⭐ 选择器拼写是 **`other_allies`**（⭐ 加载器会列出已知项 ✓）；
+>   （2）⭐ **`APPLY_BUFF` 拒绝 `max_stacks`**（"only MODIFY_ATTR accumulates"）⇒ ⭐ buff 天生刷新 ✓；
+>   （3）⭐ **`target_when` 不能在 `BATTLE_START` 用**（"carries no actor and no target"），⭐ 且 ⭐ **`REMOVE_STACK` 要 `amount`**、
+>   ⭐ **"先给再撤"无效** —— ⭐ **同一事件内的规则应用顺序不是文件序** ✓。
+> * ⛔ **仍登记**：⭐ 【未来】的**消耗**（⭐ 读行动者自己的计数器 ⇒ 给【追忆】1 点）⭐ ＋ ⭐ 24/12 点激活终结技与解除负面、溢出至 27 ✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
