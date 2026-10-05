@@ -1731,7 +1731,7 @@
 - ✅ **已修（2026-10-02，第 63 轮）**：`ally_cid:<cid>` 现在在**复数**解析路径里解析 —— 点名的人不在场时返回**空列表**（与 `lowest_hp_ally` 同一形状：`return lowest == null ? List.of() : List.of(lowest);`），**不再抛异常**。⭐ 判据 `SkyOdeStackTest` 现在读**两侧**：她在场 ⇒ 2 层、旁人 0 层；她**不在场** ⇒ **不抛异常**、且不落到旁人身上。⭐ 变异（改回 `require(...)`）⇒ 第二条断言报 `Unexpected exception thrown: IllegalStateException` ⇒ 红。
 - ⭐⭐ **而数据已经证实了两件事**（`Config/ConfigAbility/Servant/Servant_CyreneServant_00_Ability.json` —— 目标点名的那个文件在 `Config/` 下，**不在** `ExcelOutput/`）：① 游戏用 **`ByCompareCharacterID` ＝ 1409** 点名风堇 —— **这与 `ally_cid:` 是同一件事**，所以那个设计是**源头确认过的**，不是猜的；② `LayerAddWhenStack: 2` —— **层数就是 2**，与原句一致。
 - ⛔「计入小伊卡忆灵技的治疗数值额外提高…等同本次治疗数值的 `#1%`」：需要"本次治疗量"这个载体。
-- ⛔「风堇施放战技/终结技后，消耗 1 层」：依赖上面那个状态。
+- ✅ 已出货（2026-10-02）：「风堇施放**战技/终结技**后，消耗 1 层」 —— ⭐ **两条规则**（`from_skill_id` 是**单值**比较，实测读者 `1111.json`：`"from_skill_id == 8"`）：战技挂 `on: SKILL_CAST` ＋ `from_skill_id == 2`、终结技挂 **`on: ULT_CAST`** ＋ `from_skill_id == 3`（⭐ 实测：`SkillExecutor` 里 `case ULTRA` 发的是 **`ULT_CAST`**，只有 `case BPSKILL` 才发 `SKILL_CAST`）⇒ `REMOVE_STACK{buff, amount: 1, target: "self"}`。⭐ 判据 `SkyOdeSpendTest` 三档：普攻 **3** 层不消耗、战技 **2**、终结技 **1**（引擎报的槽位号实测为 `common=1 skill=2 ultra=3`）。
 
 ### `11415` 忆灵技能 20「献予「诡计」之诗」——**伤害半已出货，两句降防受阻**
 
@@ -1754,7 +1754,9 @@
   ⭐ 变异（让它回退到主人）⇒ `0 ; 0` ⇒ 红。
   配套：`Character.getCid()`。
 
-### 本弧新增的三条纪律（⭐ 都用失败换来的）
+### 本弧新增的三条纪律
+
+> ⚠ **第 63/64 轮又犯了一次换表陷阱**：给风堇上层的规则写成 `hyacine.setTriggerTable(...)`，把**被测的两条规则**一起删了，读数全是 3 ⇒ 改用**另一个队友**的表 ＋ `ally_cid:1409` 才读对。（⭐ 都用失败换来的）
 
 1. **判据里的"换表"会静默删掉被测的东西** —— 我曾用一个 hand-built 表给角色上状态，结果连**被测规则**一起删了，为此白跑六轮。动表前先问：**这张表里还有别的东西吗？**
 2. **一次运行可以取两位** —— 两条探针放在同一张表、用**不同属性**（互不替换），一个 run 同时回答两个问题。

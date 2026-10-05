@@ -16,10 +16,18 @@ text = text.replace(OLD, NEW)
 
 # and record the trap where the discipline list lives
 TRAP = "1. **判据里的「换表」会静默删掉被测的东西**"
-if text.count(TRAP) != 1:
-    sys.exit("REFUSING: the first discipline occurs %d times" % text.count(TRAP))
-text = text.replace(TRAP, "1. **判据里的「换表」会静默删掉被测的东西**（⚠ **第 63/64 轮又犯了一次**：给风堇上层的规则写成了 `hyacine.setTriggerTable(...)`，"
-                          "把**被测的两条规则**一起删了，读数全是 3 ⇒ 改用**另一个队友**的表 ＋ `ally_cid:1409` 才读对 ✓）")
+if text.count(TRAP) == 1:
+    text = text.replace(TRAP, "1. **判据里的「换表」会静默删掉被测的东西**（⚠ **第 63/64 轮又犯了一次**：给风堇上层的规则写成了 `hyacine.setTriggerTable(...)`，"
+                              "把**被测的两条规则**一起删了，读数全是 3 ⇒ 改用**另一个队友**的表 ＋ `ally_cid:1409` 才读对 ✓）")
+    print("the discipline line was annotated")
+else:
+    # the wording in the file differs; append the note to the section instead of guessing at an anchor
+    heading = "### 本弧新增的三条纪律"
+    if text.count(heading) != 1:
+        sys.exit("REFUSING: neither the discipline line nor its heading matches")
+    text = text.replace(heading, heading + "\n\n> ⚠ **第 63/64 轮又犯了一次换表陷阱**：给风堇上层的规则写成 `hyacine.setTriggerTable(...)`，"
+                                           "把**被测的两条规则**一起删了，读数全是 3 ⇒ 改用**另一个队友**的表 ＋ `ally_cid:1409` 才读对。")
+    print("the trap note was appended under the heading instead")
 
 io.open(GAPS, "w", encoding="utf-8", newline="\n").write(text)
 print("GAPS.md updated")
