@@ -625,7 +625,13 @@ public final class TriggerInterpreter {
                 requireNoStackArguments(effect, op, spec);
             }
             case "DISPEL" -> {
-                requirePositiveAmount(effect, op, spec);
+                // \u2b50 Either an amount, or a CLASS -- and with a class the amount is optional, because 「\u6240\u6709\u63a7\u5236\u7c7b\u8d1f\u9762\u72b6\u6001」
+                // counts nothing (2026-10-02). Both together is allowed too: "the newest two of that class".
+                if (effect.getKind() != null && !effect.getKind().isBlank()) {
+                    requireDebuffClass(effect, op, spec);
+                } else {
+                    requirePositiveAmount(effect, op, spec);
+                }
                 requireNoDuration(effect, op, spec);
                 requireNoStackArguments(effect, op, spec);
             }
@@ -3679,9 +3685,18 @@ public final class TriggerInterpreter {
     }
 
     private static void dispel(Battle battle, EffectSpec effect, TriggerContext ctx) {
-        int amount = (int) Math.round(effect.getAmount());
+        // \u2b50 A CLASS may be named (2026-10-02): 「解除\u2026\u6240\u6709**\u63a7\u5236\u7c7b**\u8d1f\u9762\u72b6\u6001\u300d (1415's memosprite skill 8). With a class and
+        // no amount it means ALL of that class -- 「\u6240\u6709」 spells no count -- which is why the validation below accepts either.
+        com.laosun.aluminium.enums.DebuffClass kind = effect.getKind() == null || effect.getKind().isBlank()
+                ? null
+                : com.laosun.aluminium.enums.DebuffClass.fromString(effect.getKind().trim());
+        int amount = effect.getAmount() == null ? 0 : (int) Math.round(effect.getAmount());
         for (CanHit target : resolveTargets(battle, effect, ctx)) {
-            target.getBuffManager().removeDebuffs(amount);
+            if (kind == null) {
+                target.getBuffManager().removeDebuffs(amount);
+            } else {
+                target.getBuffManager().removeDebuffs(amount, kind);
+            }
         }
     }
 
