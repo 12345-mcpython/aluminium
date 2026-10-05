@@ -36146,3 +36146,15 @@
 >   ⇒ ⭐ 最可能是"⭐ 槽位 1 = `COMMON` ✗ 槽" ⭐ ⇒ **下一轮第一行改读 `getSkills().get(SkillType.COMMON)`** ✓（⭐ 并注意**锚点别带转义中文** ✓）。
 > * ⛔ **全部回滚**（⭐ 没有可归因效果 ⇒ 不算出货 ✓），⭐ 但落法已写到最后一行 ✓。
 > * **实测（本轮）**：回滚后 全量 **0**（--rerun-tasks）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
+
+> **2026-10-02 更新（新目标第 19 轮：✅ 出货槽位 26 第二句的额外冰伤；并量出一条引擎缺口）**：
+>
+> * ✅ **引擎**：⭐ `times_from: "resource:<名字>"`（读事件 actor 的计数）＋ ⭐ `actor_max_hp`（"施放者的生命上限"），
+>   ⭐ 而新 scale **必须在三处登记**（⭐ 已知集合 ＋ ⭐ L494 的 `maxHpShare` ＋ ⭐ `literalBase` 的 `case`）✓。
+> * ✅ **内容**：⭐ `CAST_SETUP` ＋ `["actor is_summon", "from_skill_id == 1"]` ⇒ ⭐ `DAMAGE{scale: actor_max_hp, percent: 0.003, element: Ice, times_from: "resource:…", target: random_enemy}` ✓。
+> * ⭐ **判据**：`469.421555197594 at zero points and 558.6753578962525 at forty`（⭐ 40 点 ≈ 89 额外伤害，⭐ 自洽 ✓）；
+>   ⭐ **变异（去掉规则）⇒ RED**（⭐ 两侧相等 ✓）。
+> * ⭐⭐⭐ **引擎缺口（登记）**：⭐ **`summonMemosprite` 走的 `memospriteWith` **不装** spec 的 `skills`** ——
+>   ⭐ 实测 `skillsByDataSlot()` 为空；⭐ 而 `summonServant` 的 `servantWith` 装了全部 18 槽，⭐ 且两者造的是**同一个单位** ⇒ ⭐ **读忆灵技能要走 servant 路径** ✓。
+> * ⭐ **另一条**：⭐ 忆灵技能**只在 `skillsByDataSlot`**、⭐ 不进 `SkillType.COMMON`（⭐ 实测 `COMMON present = false`）✓。
+> * **实测（本轮）**：全量 **0**（--rerun-tasks）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。

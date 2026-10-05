@@ -491,7 +491,8 @@ public final class TriggerInterpreter {
                         requirePercent(effect, op, spec);
                         requireElement(effect, op, spec);
                     } else {
-                        boolean maxHpShare = "owner_max_hp".equals(literalScale) || "target_max_hp".equals(literalScale);
+                        boolean maxHpShare = "owner_max_hp".equals(literalScale) || "target_max_hp".equals(literalScale)
+                || "actor_max_hp".equals(literalScale);
                         if (maxHpShare) {
                             requirePercent(effect, op, spec);
                         } else {
@@ -1331,9 +1332,17 @@ public final class TriggerInterpreter {
                         // ⭐ 「每有 1 名目标受到攻击，会…造成 1 次」 (2026-10-02; reader: 1403 缇宝's zone rider): the repeat count is how many
                         // targets this attack connected with. It belongs HERE and not in `per_target`, which multiplies a magnitude.
                         times = Math.max(0, ctx.hitCount());
+                    } else if (from.startsWith("resource:")) {
+                        // ⭐ 「计数器有几点就多打几次」 (2026-10-02; reader: 1141526's extra hit).
+                        String id = from.substring("resource:".length()).trim();
+                        if (id.isEmpty()) {
+                            throw new IllegalStateException(
+                                    "times_from 'resource:' names no resource; say which counter drives the repeat count");
+                        }
+                        times = resourceAmount(battle, ctx.actor(), id);
                     } else {
                         throw new IllegalStateException("times_from '" + effect.getTimesFrom()
-                                + "' is not a spelling this engine has: only \"event_amount\" and \"hit_count\"");
+                                + "' is not a spelling this engine has: \"event_amount\", \"hit_count\" or \"resource:<name>\"");
                     }
                     if (times <= 0) {
                         return;
@@ -3258,7 +3267,7 @@ public final class TriggerInterpreter {
             "target_debuff_count", "target_dot_count", "target_weakness_count", "shielded_count");
 
     private static final Set<String> SCALES =
-        Set.of("target_max_hp", "target_lost_hp", "owner_max_hp", "owner_def", "owner_attack");
+        Set.of("target_max_hp", "target_lost_hp", "owner_max_hp", "actor_max_hp", "owner_def", "owner_attack");
 
     /**
      * The one scale {@code GAIN_ENERGY} accepts: a share of the <b>receiving</b> unit's maximum energy.
@@ -4925,6 +4934,14 @@ public final class TriggerInterpreter {
         switch (scale) {
             case "owner_max_hp" -> {
                 return attacker.getMaxHp() * share + flat;
+            }
+            case "actor_max_hp" -> {
+                // ⭐ The unit that CAUSED the event, not the rule's owner (2026-10-02; 1141526's extra hit is scaled by 德谬歌's own Max HP).
+                if (ctx == null || ctx.actor() == null) {
+                    throw new IllegalStateException(
+                            "a literal-ratio DAMAGE scaled by actor_max_hp has no actor to read it from");
+                }
+                return ctx.actor().getMaxHp() * share + flat;
             }
             case "target_max_hp" -> {
                 if (victim == null) {
