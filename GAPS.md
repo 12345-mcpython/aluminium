@@ -487,3 +487,20 @@
   5. ⭐ **拿"施放诗"对"不施放"作对照会引入 RNG 漂移**（施放会抽随机数）⇒ 对照必须**消耗同样的随机数**；
   6. ⭐ 而普攻那 0.111% 的移动**不是漂移也不是门漏**，而是**同一句的另一半**（智识 +30% 攻击力 ⇒ 实测 +0.84 / 757 = +0.111%）。
 - ⭐ **新目标剩下两件**：③ "这次攻击是追加攻击"（收紧槽位 15）；④ "这个召唤物是哪一个"（收紧槽位 17）。
+
+- ⛔ **新目标第 3 件（"这次攻击是追加攻击"）：已回滚，但边界已查清**（第 3 次回滚）。
+- ⭐⭐⭐ **最重要的一条：那件词汇早就存在** —— `TriggerTable` 里就有
+  **`DAMAGE_IS_ADDITIONAL = "damage_is_additional"`**（"the instance being settled is ADDITIONAL damage"），
+  而 `Battle.java:2913-2915` 自述：*"**additional damage is the engine's one representation of a follow-up attack**"*
+  ⇒ ⭐ 所以「追加攻击」在本引擎里的读法就是 **`DamageType.ADDITIONAL`**，登记时以为缺的那件词汇**不缺**。
+- ⭐⭐ **而在实例事件上收紧时，量到了四件事**：
+  1. ⭐ **目标必须是 `target`**：`highest_hp_attack_hit` 是**攻击的命中集**，实例事件上没有它
+     （实测报错：*"Effect targets \"highest_hp_attack_hit\" but this event has no such party"*）；
+  2. ⚠ **规则"看到附加伤害就再加一次伤害"会自触发**：*"Trigger recursion exceeded 8 levels while firing DEALING_DAMAGE"*；
+  3. ⚠ **`once_per_attack` 挡不住它**（实测仍然递归）；
+  4. ✅ **`damage_skill_key == 3` 挡得住**（结界那一下由终结技产生 ⇒ 键 = 3；本规则加的额外那一下不是 ⇒ 不会重入）。
+     ⭐ 但用上它之后，额外那一下的**量级是 35.69**，而结界那一下是 **179.81**（比值 0.1985）——
+     **它读的是哪一行参数没有查明**，所以**不写成出货**。
+- ⭐ **因此这一处仍按旧形态保留**（`ATTACK_FINISHED` + 两个状态），
+  ⭐ 而**下一步的入口**是：查清"规则在实例事件上产生的伤害，其 `percent_from_skill_param` 解析到哪一行"
+  （⭐ 结界那一下是终结技产生的，而触发时**进行中的攻击是缇宝的普攻** —— 这很可能就是 0.1985 的来源）。
