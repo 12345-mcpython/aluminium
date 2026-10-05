@@ -36009,3 +36009,13 @@
 > * ⭐ **判据**：`after the cast that grants it, 【真知】 is still on him`；⭐ **变异（换回 `next_attack`）⇒ RED**（`【真知】 is gone`）✓。
 > * ⭐ **提醒**：⭐ `next_attack` 用错时**两边都不报错**（`EnemySkill` 注记：`target: summon` ＋ `until: next_attack` "never consumed and simply stayed"）。
 > * **实测（本轮）**：全量 **0**（--rerun-tasks）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
+
+> **2026-10-02 更新（新目标第 6 轮：⛔ 回滚（第 10 次）—— 但槽位 26 第四句的阻碍定位到一处）**：
+>
+> * ⭐ **试做**：`actor_resource:` / `target_resource:`（⭐ 复用 `Numeric` 的 `stacksOnActor`/`stacksOnTarget` ⇒ **零新字段**）
+>   ⇒ ⭐ **编译通过、加载器接受**（⭐ 白名单也一并放行 ✓）。
+> * ⚠ **仍落不下来**：规则挂在 `RESOURCE_CHANGED`，⭐ 而该事件以**持有者**为 actor 广播，⭐ 持有者是**忆灵**（没有规则表）
+>   ⇒ ⭐ **规则从未发出**（⭐ 带去状态门／去状态门两种写法读数都是 **3.0** ✓）。⭐ 与 `1413.json` 记录的 `DAMAGE_SETTLED` 同源。
+> * ⭐ **正确形状**：把 3 点检查挂在**她收得到**的触发（`ULT_CAST`/`SUMMONED`）上，⭐ 并读"⭐ 主人的**召唤物**✗"的资源 ⇒ ⭐ 需要 **`summon_resource:`**。
+> * ⛔ **回滚**：规则 ＋ 两个前缀 ＋ 判据（⭐ 没有可归因效果的词汇不算出货 ✓）。
+> * **实测（本轮）**：回滚后 全量 **0**（--rerun-tasks）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
