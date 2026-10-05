@@ -2361,3 +2361,13 @@
 
 ⭐ 而形状已经有一半了：`GAIN_ENERGY` 已能读 `cast_skill_param:`（第 58 件），而 `GAIN_RESOURCE` 还不能 ⇒
 **最小的一步是把同一条路加给 `GAIN_RESOURCE`**（把那个分额存进一个资源），再加一个“以资源为份额”的读法。
+
+### ✅ 补正（2026-10-02，第 72 轮）：`1141523` 两半都已出货
+
+本份此前把「奇袭结束后，使刻律德菘获得 1 点充能」记为**受阻** ✗ —— **那是错的** ✗。本轮跑了它的判据：
+
+- ① 「持有【军功】的角色暴击伤害提高 `#1%`」⇒ `memosprite_ode_of_law_raises_the_meritorious`；
+- ② 「奇袭结束后，使刻律德菘获得 1 点充能」⇒ `memosprite_ode_to_law_pays_charge`（`on: INSERTED_CAST_END` ⇒ `GAIN_RESOURCE{充能, 1, target: target}`，
+  模型自数据行 **15**），判据 `OdeToLawChargeTest` 实测 `[ode-to-law] charge after the coup=3 peerage=false`，**0 红** ✓。
+
+⭐ **顺带量到的数据事实**：数据里 slot **15** 与 **23** 是**同名同诗**的两行（15 是固定 **30%** 的旧行，23 是 `#1%` 的现版本）。
