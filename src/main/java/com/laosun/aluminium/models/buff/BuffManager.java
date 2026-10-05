@@ -198,6 +198,31 @@ public class BuffManager {
      * @param count how many to remove at most (non-positive removes nothing)
      * @return how many were actually removed
      */
+    /**
+     * Removes the newest debuffs OF ONE CLASS (2026-10-02). Reader: 1415's memosprite skill 8, 「对万敌施放时解除万敌陷入的所有**控制类**
+     * 负面状态」 -- `removeDebuffs(int)` cannot say 「控制类」, and a class is a property of the state itself
+     * (`AbstractBuff.debuffClass()`, which is also what class resistance reads).
+     *
+     * @param count how many to remove, or a non-positive number for "all of that class" (「**所有**控制类负面状态」 spells no count)
+     * @param kind  the class to remove
+     */
+    public int removeDebuffs(int count, com.laosun.aluminium.enums.DebuffClass kind) {
+        if (kind == null) {
+            return removeDebuffs(count);
+        }
+        boolean all = count <= 0;
+        List<AbstractBuff> snapshot = List.copyOf(buffs);
+        int removed = 0;
+        for (int i = snapshot.size() - 1; i >= 0 && (all || removed < count); i--) {
+            AbstractBuff buff = snapshot.get(i);
+            if (buff.isDebuff() && kind == buff.debuffClass()) {
+                removeBuff(buff);
+                removed++;
+            }
+        }
+        return removed;
+    }
+
     public int removeDebuffs(int count) {
         if (count <= 0) {
             return 0;

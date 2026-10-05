@@ -36322,3 +36322,25 @@
 >   ⇒ ⭐ 按纪律**不猜** ✓。
 > * ⭐ **判据** ✓：⭐ `MemospriteSkillTest` 四条全绿 ✓（⭐ 其中 `theImportedElementsAreTheOnesTheAbilitiesState` 现在钉 **7** 个元素 ✓）。
 > * **实测（本轮）**：⭐ 全量 **0**（--rerun-tasks，**2261** 例 ✓）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
+
+> **2026-10-02 更新（新目标第 1 轮：🎉🎉🎉 **第 90 件出货 ＝ `DISPEL` 的类别过滤 ＋ ① 的第四支（解除控制类负面状态）** ✓✓）**）**：
+>
+> * ✅ **出货内容** ✓：
+>   ⭐ 引擎：⭐ `BuffManager.removeDebuffs(int count, DebuffClass kind)` ✓（⭐ 非正数 ＝ ⭐ "**该类全部**" ✓，⭐ 照已出货那个循环的写法 ✓）；
+>   ⭐ `TriggerInterpreter.dispel` ✓ 读 ⭐ `effect.getKind()` ✓（⭐ 解析成 ⭐ `DebuffClass` ✓）；
+>   ⭐ 校验 ⭐ `case "DISPEL"` ✓ 改成 ⭐ **"数量**或**类别"** ✓ —— ⭐ 有 `kind` 时数量可省 ✓（⭐ 原句的「**所有**控制类负面状态」**不说数量** ✓）；
+>   ⭐ 内容：⭐ `characters/1404.json` 新规则 ⭐ `memosprite_ode_dispels_his_control_debuffs` ✓ ——
+>   ⭐ `on: CAST_SETUP` ✓、⭐ `when: [target == self, actor is_summon, from_skill_id == 16]` ✓、
+>   ⭐ `do: [DISPEL{kind: "control", target: "self"}]` ✓（⭐ **不带量** ✓）。
+> * ⭐⭐⭐ **为什么这是自然的一改（有据 ✓）**：⭐ 类别是**状态自己的属性** ✓ —— ⭐ `AbstractBuff.debuffClass()` ✓，
+>   ⭐ 而 ⭐ `Battle:1883` 的注释明写 ⭐ *"is a property of the state itself (`AbstractBuff.debuffClass`)"* ✓，
+>   ⭐ 且 ⭐ 类别抗性读的就是它 ✓。⭐ 词也**本来就有** ✓：⭐ 条件关键字 ⭐ `debuff_class:control` ✓ ＋ ⭐ `RESIST_DEBUFF` 的 ⭐ `kind` ✓
+>   ⇒ ⭐ 这个 op 只是拿到了**同一个词** ✓（⭐ 不是新方言 ✓）。
+> * ✅ **判据（判别性 ✓）**：⭐ `DispelByClassTest` ⇒ ⭐ `[dispel] after the ode: debuffs = 1 ; dots = 1` ✓
+>   —— ⭐ 受害者同时带 ⭐ **一个控制** 与 ⭐ **一个持续伤害** ⇒ ⭐ 只有控制该走 ✓。
+>   ⭐ **实测变异** ✓：⭐ 把 `kind` 改成 `"dot"` ⇒ ⭐ `debuffs = 2 ; dots = 0` ⇒ 断言红 ✓✓（⭐ 两次断言**同时**翻 ✓）。
+> * ⚠ **一个计数陷阱（本轮量到 ✓）**：⭐ 一个 ⭐ `ControlBuff` **算两个**负面状态 ✓ —— ⭐ `Cone21001Test:25` 的注释写着同样一句
+>   （*"measured: a `ControlBuff` contributes two"* ✓）⇒ ⭐ 所以"一个控制 ＋ 一个持续伤害"的 `debuffCount` 是 ⭐ **3** ✓（⭐ 我第一版写了 2 ⇒ ⭐ 前置当场红 ✓）。
+> * ⭐ **① 的五支现状**：⭐ 血仇⇒弑神登神 ✅；⭐ 不在血仇⇒行动提前 ✅；⭐ 本次攻击暴伤 ✅；⭐ **解除控制类** ✅（**本轮**，⭐ 4/5 ✓）；
+>   ⭐ 施放前目标被消灭⇒对新入场敌方目标 ⛔（⭐ 仍是登记 ✓，⭐ 那是本目标 ② 的事 ✓）。
+> * **实测（本轮）**：⭐ 全量 **0**（--rerun-tasks，**2263** 例 ✓）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
