@@ -2381,3 +2381,12 @@
     ② 放在**忆灵主人**的表上加 `actor is_summon`（即已出货奥词的布局）⇒ **仍是 0（连字面量 5 也是 0）**。
   - ⭐ **下一问（很具体）**：拿**已出货的 `SkyOdeEnergyTest`** 做骨架 —— 它证明 `CAST_SETUP` + `actor is_summon` + `from_skill_id == 19` 是**能触发**的，
     只把 `GAIN_ENERGY` 换成 `GAIN_RESOURCE`＋`scale: "cast_skill_param:1"`，并把资源声明照那个判据的写法放。
+
+- ⛔ **第 74 轮又试一次、又回滚**（同一能力，第 6 次）：照**已出货判据的布局**镜像了一遍
+  （规则放在**被矄准者**的表上、`on: CAST_SETUP` + `target == self` + `actor is_summon` + `from_skill_id == 19`）——
+  **连字面量 5 也是 0** ✗，而槽位 19 的 `#1` 读到了 **33.6**（值没错）。
+  - ⭐⭐ **而本轮找到了差异的关键** ✓：**已出货的 `SkyOdeEnergyTest` 从不调用 `setTriggerTable`** ✓ —— 它的规则来自**内容文件**（`characters/1409.json`）。
+    而我两次都在判据里**手工换表**（`new TriggerTable(...)`）✗ ⇒ **规则没被送到**。
+    ⚠ 而 `AllyCidSelectorTest`（我写的、绿的）能用手工表，是因为它**手工发**事件（`battle.fireTriggers(...)`），而不是走 `SkillExecutor`。
+  - ⭐ **下一步（很具体、且不再猜判据布局）**：把捕获**临时写进已出货的 `1409.json` 奥词规则**（它正是发火的那一条），
+    跑一次看资源有没有进账 —— **先证明 op 本身**，再回去建判据。
