@@ -36344,3 +36344,21 @@
 > * ⭐ **① 的五支现状**：⭐ 血仇⇒弑神登神 ✅；⭐ 不在血仇⇒行动提前 ✅；⭐ 本次攻击暴伤 ✅；⭐ **解除控制类** ✅（**本轮**，⭐ 4/5 ✓）；
 >   ⭐ 施放前目标被消灭⇒对新入场敌方目标 ⛔（⭐ 仍是登记 ✓，⭐ 那是本目标 ② 的事 ✓）。
 > * **实测（本轮）**：⭐ 全量 **0**（--rerun-tasks，**2263** 例 ✓）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
+
+> **2026-10-02 更新（新目标第 2 轮：⭐ **②「新入场」查清了：游戏与引擎都没有这个表达** ✗ ⇒ 按 ⑥ 登记 ✓）**）**：
+>
+> * ⭐⭐⭐ **tbgd 侧（全树清点 ✓）**：⭐ 扫了 ⭐ `Config/ConfigAbility` 下 ⭐ **1519 个文件** ✓，⭐ 一共只有 ⭐ **18 种 `TargetType`** ✓：
+>   ⭐ `Caster`（4537）／⭐ `SkillTargetEntityList`（3457）／⭐ `InherentTargetEntity`（1587）／⭐ `AllEnemy`（1149）／⭐ `TeamFormation`（1018）／
+>   ⭐ `AbilityTargetEntity`（908）／⭐ `DarkTeamCenter`（238）／⭐ `EnemyTeamCenter`（219）／⭐ `AllDarkTeamMember`（190）／⭐ `LightTeamCenter`（152）／
+>   ⭐ `AllTeamMember`（86）／⭐ `AllLightTeamMember`（49）／⭐ `CustomTarget`（29）／⭐ `Warning`（20）／⭐ `SkillPointEntity`（17）／
+>   ⭐ `StanceBreakTargetEntity`（2）／⭐ `FriendSelect`（1）／⭐ `FriendServantSelect`（1）。
+>   ⇒ ⭐⭐ **没有一种与"入场"有关** ✗（⭐ 工具已固化：⭐ `tools/survey_target_types.py` ✓，⭐ 下次同类问题一行可答 ✓）。
+>   ⭐ 并抽查了 ⭐ `CustomTarget`／`InherentTargetEntity` 的 ⭐ 12 处上下文 ✓ ⇒ ⭐ 也不是"带入场筛选"的那一种 ✓（⭐ `InherentTargetEntity` 只是"能力的固有目标" ✓）。
+> * ⭐⭐ **引擎侧（也查清了 ✓）**：⭐ 敌人**只有波次**这个概念 ✓（⭐ `WaveManager.nextWave()` ⇒ ⭐ `waveIndex++` ⇒ ⭐ `spawnWave` ⇒ ⭐ `Battle.beginWave()` ＋ ⭐ `WAVE_START` ✓），
+>   ⭐ 而 ⭐ **"入场"标记只有召唤物的** `justSummoned` ✓（⭐ `Battle:196` ✓）⇒ ⭐ **敌人身上没有任何"何时入场"的记录** ✗。
+> * ⭐ **已有兄弟不等价（重申 ✓）**：⭐ `target_else_random_enemy` ✓（⭐ 读者 1220／1221／1305 ✓）⭐ 说的是"**随机**一个敌人" ✗ ⇒ ⭐ 与原句的「**新入场**」不是同一件事 ✓。
+> * ⚠ **为什么我没有直接造一个** ✗：⭐ 「新入场」的**锚点**在数据里没说清 ✓ —— ⭐ 相对于 ⭐ *这次施放* ✗、⭐ *这一波* ✗、⭐ 还是 ⭐ *上一个回合* ✗ ⇒ ⭐ 按纪律**不猜** ✓。
+>   ⭐ **下一步（已具名 ✓）**：⭐ 在 ⭐ **会招小怪／插入单位的机制**里找它 ✓ —— ⭐ 候选是 ⭐ `Insert`（⭐ Cyrene 文件里 42 次 ✓）⭐ 与 ⭐ `CustomTarget` 的**定义处**（⭐ 不是引用 ✓）；
+>   ⭐ 或 ⭐ 接受原句语义 ＝ ⭐ "**本次施放开始后入场的敌人**" ✓ ⇒ ⭐ 那需要 ⭐ **一个"敌人入场"的引擎概念** ✓（⭐ 与 `justSummoned` 同族 ✓，⭐ 但记在敌人身上 ✓）。
+> * ⭐ **目标 ① 已出货** ✓（⭐ 第 90 件 ✓：⭐ `DISPEL` 的类别过滤 ＋ 内容 ✓）。
+> * **实测（本轮）**：⭐ 全量 **0**（--rerun-tasks，**2263** 例 ✓）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
