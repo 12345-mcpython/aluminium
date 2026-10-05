@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 121藿藿 星魂 2 的第三句："…<b>使[禳命]的持续回合数减 1</b>" (2026-10-02).
+ * 121 Huohuo (藿藿) 星魂 (Eidolon) 2's third sentence: "...<b>decreases [禳命]'s remaining turns by 1</b>" (2026-10-02).
  *
  * <p>THE SCENE IS COPIED VERBATIM from the shipped judge for the same sentence, `TalismanSavesAnAllyTest.afterLethalBlows`: the same
  * party, the same skill, and -- the detail that cost two rounds -- `SkillExecutor.execute(battle, skill, her,

@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 真实伤害 through the {@code DAMAGE} op (2026-10-02): {@code "damage_type": "TRUE"} must <b>skip every zone</b>.
+ * 真实伤害 (true damage) through the {@code DAMAGE} op (2026-10-02): {@code "damage_type": "TRUE"} must <b>skip every zone</b>.
  *
  * <p>The engine always had the path ({@code Battle.applyTrueDamage} sets {@code Damage.trueDamage()}, which
  * {@code toValue()} honours by skipping the zones) but no op reached it: a rule stating the type got an instance that
@@ -36,7 +36,7 @@ public class TrueDamageJudgeTest {
         double hard = riderShare(2000, "TRUE");
         Assertions.assertTrue(soft > 0, "precondition: the rider deals damage (" + soft + ")");
         Assertions.assertEquals(soft, hard, 1e-6,
-                "真实伤害 skips the defence zone: " + soft + " on a 0-defence target vs " + hard + " on a 2000 one");
+                "真实伤害 (true damage) skips the defence zone: " + soft + " on a 0-defence target vs " + hard + " on a 2000 one");
 
         double ordinarySoft = riderShare(0, null);
         double ordinaryHard = riderShare(2000, null);

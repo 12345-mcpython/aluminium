@@ -14,22 +14,22 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 光锥 23050 随心：`装备者为敌方目标添加弱点时，恢复 1 个战技点，该效果最多触发 1 次，施放终结技时重置可触发次数`。
+ * Light cone 23050 随心: "when the wearer adds a weakness to an enemy target, restores 1 skill point; this effect can trigger at most 1 time, and casting the Ultimate resets the number of triggerable times".
  *
- * <p>Note: 这个判据不搭夹具：让两个真内容互相作用 -  - 角色 `1315` 的本体规则在终结技时给目标加物理弱点
- * （本段第 12 件 `ADD_ELEMENTAL_WEAKNESS` 的读者），而 `23050` 那条规则对"加了弱点"这件事作出反应。
- * Note: 早先的写法用 `setTriggerTable` 塞了一条探针，Note: 那一行把光锥自己的表顶掉了，于是判据其实在测
- * "装了 23050 但没有 23050 的规则" -  - 实测 `before=2 after=2`，而弱点确实加上了。
+ * <p>Note: This case builds no fixture: it lets two real pieces of content interact - character `1315`'s own rule adds a Physical weakness to the target on the Ultimate
+ * (the reader of this section's twelfth `ADD_ELEMENTAL_WEAKNESS`), and the `23050` rule reacts to "a weakness was added".
+ * Note: An earlier spelling used `setTriggerTable` to stuff in a probe; that line replaced the light cone's own table, so the case was really testing
+ * "23050 installed but without 23050's rules" - measured `before=2 after=2`, while the weakness really was added.
  *
- * <p>Note: 两条前置都必须断言，否则判据会绿着而什么都没测：① 满能量（`castUltra` 在不满时直接返回 false）；
- * ② 战技点在上限以下（策略是 start 3 / max 5，满了 `gainSkillPoint(1)` 会被静默截断）。
+ * <p>Note: Both preconditions must be asserted, or the case stays green while testing nothing: (1) full energy (`castUltra` returns false outright when it is not full);
+ * (2) skill points below the cap (the policy is start 3 / max 5, and at the cap `gainSkillPoint(1)` would be silently truncated).
  */
 public class Cone23050WeaknessTest {
     private static final int WEARER = 1315;
     private static final int MONSTER = 1002011;
     private static final int LEVEL = 80;
 
-    /** 装 23050（阶 1）的 1315，面对一个敌人；返回 {battle, wearer, enemy}。 */
+    /** 1315 at rank 1 wearing 23050, facing one enemy; returns {battle, wearer, enemy}. */
     private static Object[] scene() {
         Character wearer = CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(23050, LEVEL, false, 1));
         Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
@@ -38,10 +38,10 @@ public class Cone23050WeaknessTest {
         return new Object[]{battle, wearer, enemy};
     }
 
-    /** 放一次终结技（先灌满能量），返回 {战技点前, 战技点后}。 */
+    /** Casts the Ultimate once (filling energy first), returns {skill points before, skill points after}. */
     private static int[] castOnce(Battle battle, Character wearer, Enemy enemy) {
         wearer.setCurrentEnergy(wearer.getMaxEnergy());
-        battle.spendSkillPoint();                     // Note: 腾出空间：满了就什么都测不到
+        battle.spendSkillPoint();                     // Note: make room: at the cap nothing could be measured
         int before = battle.getSkillPoints();
         Assertions.assertTrue(before < battle.getSkillPointMax(),
                 "the judge needs room below the cap: " + before + "/" + battle.getSkillPointMax());
@@ -74,7 +74,7 @@ public class Cone23050WeaknessTest {
         Enemy enemy = (Enemy) s[2];
 
         int[] first = castOnce(battle, wearer, enemy);
-        int[] second = castOnce(battle, wearer, enemy);       // Note: 同一属性，敌人已经有了
+        int[] second = castOnce(battle, wearer, enemy);       // Note: the same element, which the enemy already has
         System.out.println("[23050] second ult: first=" + (first[1] - first[0])
                 + " second=" + (second[1] - second[0]) + " ; physical=" + enemy.isWeakTo(DamageElement.PHYSICAL));
         Assertions.assertEquals(1, first[1] - first[0], "the first insertion pays");

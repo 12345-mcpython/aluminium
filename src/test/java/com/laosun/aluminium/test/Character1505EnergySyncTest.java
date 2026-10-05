@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1505 绯英's energy sync (2026-09-30): "绯英获得能量时，将同步获得等值的[好活当赏]".
+ * 1505 Evanescia (绯英)'s energy sync (2026-09-30): "when Evanescia gains energy, she gains an equal amount of [好活当赏] at the same time".
  *
  * <p>The energy comes from the ENGINE's own credit (casting a basic attack), not from a hand-written rule, and the old table is
  * never replaced -- an earlier version of this test did that and silently removed the very rule under test (measured: it read 20,
@@ -44,7 +44,7 @@ public class Character1505EnergySyncTest {
                 + giftsBefore + " -> " + giftsAfter + " (expected " + (giftsBefore + mirrored) + ")");
         Assertions.assertTrue(mirrored > 0, "the cast really credited energy (it credited " + mirrored + ")");
         Assertions.assertEquals(giftsBefore + mirrored, giftsAfter,
-                "every point of energy is mirrored one-for-one into 【好活当赏】");
+                "every point of energy is mirrored one-for-one into [好活当赏]");
     }
 
     @Test

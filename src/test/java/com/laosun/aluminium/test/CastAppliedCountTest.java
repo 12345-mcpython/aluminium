@@ -35,17 +35,17 @@ import java.util.Random;
  *   <li>it belongs to <b>one cast</b>: the next cast starts from zero, and nothing later can read the old numbers;</li>
  *   <li>the loader refuses the spelling where the count cannot exist (a non-cast event) and where the state name is
  *       not one this engine rolls for - both are silent-zero mistakes otherwise;</li>
- *   <li>三月七's own file pays 6 per landed freeze and nothing at 星魂 0.</li>
+ *   <li>March 7th (三月七)'s own file pays 6 per landed freeze and nothing at 星魂 0.</li>
  * </ol>
  */
 public class CastAppliedCountTest {
     private static final double EPS = 1e-6;
 
-    /** 三月七 - the reader, and the character whose energy bar makes the count observable. */
+    /** March 7th (三月七) - the reader, and the character whose energy bar makes the count observable. */
     private static final int MARCH_7TH = 1001;
     private static final int LEVEL = 80;
     private static final int ULTIMATE_SLOT = 3;
-    /** 1003010 states no {@code STAT_CTRL_*} resistances, unlike 冰锋 (which cannot be frozen at all). */
+    /** 1003010 states no {@code STAT_CTRL_*} resistances, unlike Ice Edge (冰锋) (which cannot be frozen at all). */
     private static final int MONSTER = 1003010;
 
     /**
@@ -169,13 +169,13 @@ public class CastAppliedCountTest {
     }
 
     // ==================================================================
-    // The shipped content: 1001 星魂 1
+    // The shipped content: 1001 星魂 (Eidolon) 1
     // ==================================================================
 
     /**
-     * The shipped file pays 6 per landed freeze, and only from 星魂 1 up.
+     * The shipped file pays 6 per landed freeze, and only from 星魂 (Eidolon) 1 up.
      *
-     * <p>Both ranks are measured in the same battle shape, so the difference <b>is</b> the Eidolon: the 星魂 0 run
+     * <p>Both ranks are measured in the same battle shape, so the difference <b>is</b> the Eidolon: the 星魂 (Eidolon) 0 run
      * still freezes the same three enemies (that rule belongs to her base kit), and pays nothing for them.
      */
     @Test
@@ -227,7 +227,7 @@ public class CastAppliedCountTest {
         return castUltimate(battle);
     }
 
-    /** One cast of 三月七's ultimate data, measured as the energy it granted. */
+    /** One cast of 三月七 (March 7th)'s ultimate data, measured as the energy it granted. */
     private static double castUltimate(Battle battle) {
         Character hero = battle.characters.getFirst();
         double before = hero.getCurrentEnergy();
@@ -236,7 +236,7 @@ public class CastAppliedCountTest {
         return hero.getCurrentEnergy() - before;
     }
 
-    /** The shipped 星魂 1 measurement: her real file, her real ultimate, {@code rank} Eidolons active. */
+    /** The shipped 星魂 (Eidolon) 1 measurement: her real file, her real ultimate, {@code rank} Eidolons active. */
     private static double shippedUltimateEnergy(int rank) {
         Character hero = CharacterFactory.create(MARCH_7TH, LEVEL, true, null, null, rank);
         Battle battle = ultimateBattle(hero, 3, 0);
@@ -265,7 +265,7 @@ public class CastAppliedCountTest {
     /**
      * The counter's own table plus a freeze that happens on a hit she takes - an application outside any cast.
      *
-     * <p>It is the shape 三月七's own talent has (a {@code TAKING_HIT} rule), and the point is that its freeze must
+     * <p>It is the shape 三月七 (March 7th)'s own talent has (a {@code TAKING_HIT} rule), and the point is that its freeze must
      * not be inherited by the next ultimate.
      */
     private static Character heroWithAnOutOfCastFreeze() {
@@ -281,7 +281,7 @@ public class CastAppliedCountTest {
 
     private static Character hero() {
         Character hero = CharacterFactory.create(MARCH_7TH, LEVEL);
-        // The energy bar is the observable, so it must not be a stack-resource character's (三月七's is 120).
+        // The energy bar is the observable, so it must not be a stack-resource character's (三月七 (March 7th)'s is 120).
         Assertions.assertTrue(hero.getMaxEnergy() > 0, "precondition: the reader has an energy bar");
         return hero;
     }

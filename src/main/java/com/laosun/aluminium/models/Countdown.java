@@ -6,7 +6,7 @@ import com.laosun.aluminium.enums.Camp;
 /**
  * A <b>countdown</b>: a unit that exists on the action order and does nothing but <b>have a turn</b> (M-49).
  *
- * <p><b>Why it is a unit at all.</b> The documents describe things like 知更鸟's [协奏] as
+ * <p><b>Why it is a unit at all.</b> The documents describe things like Robin's (知更鸟) [协奏] as
  * "行动序列上出现[协奏]倒计时，倒计时回合开始时知更鸟退出[协奏]状态并立即行动，倒计时固定拥有 <b>90</b> 点速度" - the
  * duration of the state is not "N of somebody's turns", it is "until this thing's turn arrives", and its arrival time is
  * decided by a <b>speed</b>. Nothing in the engine could express that before: a timed buff counts somebody's turns, and
@@ -34,8 +34,8 @@ public class Countdown extends CanHit {
     /**
      * Builds a countdown that enters the order with the given speed.
      *
-     * @param name  what it is called in logs (e.g. {@code 协奏倒计时})
-     * @param speed the fixed speed that decides when its turn comes (90 for 知更鸟's [协奏])
+     * @param name  what it is called in logs (e.g. {@code 协奏倒计时}, the Concerto countdown)
+     * @param speed the fixed speed that decides when its turn comes (90 for Robin's (知更鸟) [协奏])
      */
     public Countdown(String name, double speed) {
         this(null, name, speed);

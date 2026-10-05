@@ -15,9 +15,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1415 昔涟's 结界 (2026-10-02): "结界持续期间，我方全体目标每造成 1 次伤害，都会再额外造成 1 次等同于原伤害 24% 的真实伤害".
+ * 1415 Cyrene (昔涟)'s zone (2026-10-02): "while the zone lasts, every time all of our targets deal 1 instance of damage, they additionally deal 1 instance of true damage equal to 24% of the original damage".
  *
- * <p>Her own file carries both halves: the skill marks 结界 ({@code APPLY_BUFF} with {@code ticks_on: "self"}), and the
+ * <p>Her own file carries both halves: the skill marks the zone ({@code APPLY_BUFF} with {@code ticks_on: "self"}), and the
  * rider listens on {@code DAMAGE_SETTLED}. The claim is therefore "with the zone up, an ALLY's attack costs the enemy
  * exactly 24% more than the ally's own settled damage" - the zone itself deals no damage, so the whole difference is
  * the rider's.
@@ -28,7 +28,7 @@ public class ElysiumZoneTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** With 结界 up, an ally's attack is followed by a true-damage rider of 24% of what it settled. */
+    /** With the zone up, an ally's attack is followed by a true-damage rider of 24% of what it settled. */
     @Test
     public void theZoneAddsAQuarterOfTheAllysDamage() {
         double with = enemyLoss(true);
@@ -36,14 +36,14 @@ public class ElysiumZoneTest {
 
         Assertions.assertTrue(without > 0, "precondition: the ally's attack deals damage (" + without + ")");
         Assertions.assertEquals(0.24 * without, with - without, without * 1e-6,
-                "结界's rider is 24% of the settled instance it triggered: " + without + " -> " + with);
+                "the zone's rider is 24% of the settled instance it triggered: " + without + " -> " + with);
     }
 
     // ==================================================================
     // Fixture
     // ==================================================================
 
-    /** The enemy's total HP loss when {@code ALLY} attacks, with 昔涟's skill cast first (or not). */
+    /** The enemy's total HP loss when {@code ALLY} attacks, with Cyrene (昔涟)'s skill cast first (or not). */
     private static double enemyLoss(boolean zone) {
         Character cyrene = CharacterFactory.create(CYRENE, LEVEL, false, null, null, 0);
         Character ally = CharacterFactory.create(ALLY, LEVEL, false, null, null, 0);
@@ -52,7 +52,7 @@ public class ElysiumZoneTest {
         Battle battle = new Battle(List.of(cyrene, ally), List.of(enemy), new Random(0));
         battle.startBattle();
         if (zone) {
-            // Her skill is 辅助 (no damage of its own), so announcing the cast is exactly what the marker rule needs.
+            // Her skill is a support skill (no damage of its own), so announcing the cast is exactly what the marker rule needs.
             battle.fireTriggers(TriggerEvent.SKILL_CAST, cyrene, enemy, 0, 0);
         }
         double before = enemy.getCurrentHp();

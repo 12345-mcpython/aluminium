@@ -30,9 +30,9 @@ public class AshveilTest {
         double fromSelf = energyGain(false);
 
         Assertions.assertEquals(8.0, fromAlly, 1e-6,
-                "「固定恢复8点能量」");
+                "「固定恢复8点能量」 (restores a fixed 8 energy)");
         Assertions.assertEquals(0.0, fromSelf, 1e-6,
-                "「我方**其他**目标攻击后」 -- her own attack must not trigger it");
+                "「我方**其他**目标攻击后」 (after another one of our targets attacks) -- her own attack must not trigger it");
     }
 
     /** Note: One layer per firing, and a LOUD refusal once the two declared charges are spent (measured, not assumed). */
@@ -69,7 +69,7 @@ public class AshveilTest {
         battle.startBattle();
 
         Assertions.assertTrue(before - enemy.getCurrentHp() > 0,
-                "「对敌方全体造成等同于不死途攻击力100%的雷属性伤害」");
+                "「对敌方全体造成等同于不死途攻击力100%的雷属性伤害」 (Lightning damage to all enemies equal to 100% of 不死途's ATK)");
     }
 
     /** The energy gain for a teammate's attack; mode false fires it from Ashveil herself. */

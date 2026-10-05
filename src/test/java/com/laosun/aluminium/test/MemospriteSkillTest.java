@@ -22,9 +22,9 @@ import java.util.Random;
  *
  * <p>The engine addresses a skill by {@code (cid, slot)} -- {@code SkillEffects.forSkill} keys on {@code skill.getCid()} and
  * {@code skill.getSkillSlot()}, and {@code DefaultSkill(cid, slot, level)} is the one implementation. A memosprite's cid is its
- * {@code ServantID}, so its 忆灵技能 are ordinary skills with no special case.
+ * {@code ServantID}, so its memosprite skills (忆灵技能) are ordinary skills with no special case.
  *
- * <p>THE SLOT IS THE DATA'S, NOT THE CHECKLIST'S: the item calls "献予'纷争'之诗" 忆灵技能 <b>8</b>, but the table keys it
+ * <p>THE SLOT IS THE DATA'S, NOT THE CHECKLIST'S: the item calls "Ode to Strife" (献予'纷争'之诗) memosprite skill <b>8</b>, but the table keys it
  * {@code SkillID 1141516} / {@code SkillTriggerKey SkillCY04} -- data slot <b>16</b> -- which is the row carrying
  * {@code ExtraEffectIDList [10000001, 10000011]}, exactly the two effect ids the item named. An earlier version used 8 on both sides,
  * so it passed while pointing at a slot that does not exist.
@@ -35,7 +35,7 @@ public class MemospriteSkillTest {
     private static final int ODE_TO_STRIFE = 16;
     private static final int MONSTER = 1002011;
 
-    /** 德谬歌 carries "献予'纷争'之诗" as a Skill with the SERVANT's cid, and the engine can deliver it. */
+    /** Demiurge (德谬歌) carries "Ode to Strife" (献予'纷争'之诗) as a Skill with the SERVANT's cid, and the engine can deliver it. */
     @Test
     public void theMemospriteCarriesItsOwnSkill() {
         Summon demiurge = servantOf(CYRENE);
@@ -64,7 +64,7 @@ public class MemospriteSkillTest {
                     List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
             battle.startBattle();
             battle.processRequests();
-            // Note: `Battle.summonServant` is the seam that hands the panel its resource reader (140's derives from 新蕊)
+            // Note: `Battle.summonServant` is the seam that hands the panel its resource reader (140's derives from 新蕊 (New Bud))
             Summon servant = battle.summonServant(master);
             Map<Integer, Skill> skills = servant.skillsByDataSlot();
             Assertions.assertFalse(skills.isEmpty(), cid + " carries its imported skills");

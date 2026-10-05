@@ -81,7 +81,7 @@ public class SiblingElationTest {
      * The ultimate's THIRD sentence, end to end: "若目标不拥有欢愉技，使其行动提前50%".
      *
      * <p>No scaffold - 8010's OWN shipped file drives it - and the pair of measurements is the discrimination: 1501
-     * carries an Elation skill (a real data row under slot 20) and 丹恒 does not, so the same cast must halve the
+     * carries an Elation skill (a real data row under slot 20) and Dan Heng (丹恒) does not, so the same cast must halve the
      * first one's remaining action value and leave the second's untouched. A guard that always passed would move
      * both; one that never passed would move neither.
      *

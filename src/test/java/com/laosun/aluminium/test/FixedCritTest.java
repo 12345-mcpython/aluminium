@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * A <b>stated</b> crit on a damage instance: "该伤害暴击率固定为100%，暴击伤害固定为150%" (知更鸟's [协奏] addendum).
+ * A <b>stated</b> crit on a damage instance: "this damage's CRIT Rate is fixed at 100%, and its CRIT DMG is fixed at 150%" (知更鸟's [协奏] addendum).
  *
  * <p><b>The gap it closes.</b> {@code Damage.fixedCrit(boolean, double)} has existed for a while - the crit zone skips
  * the roll for an instance that already knows its outcome - but <b>no op could state it</b>, so the sentence could not

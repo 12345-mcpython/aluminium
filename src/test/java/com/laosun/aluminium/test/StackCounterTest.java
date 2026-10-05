@@ -18,8 +18,8 @@ import java.util.Random;
 /**
  * A <b>named counter with a threshold</b> (2026-09-28): {@code ADD_STACK} plus {@code *_stacks:<name>}.
  *
- * <p><b>The sentence that needs it.</b> 寒鸦's 战技: "每当我方目标对[承负]状态下的敌方目标施放 <b>2</b> 次普攻、战技、终结技后，立即为
- * 我方恢复 1 个战技点；[承负]…会在触发 <b>2</b> 次战技点恢复效果后自动解除" - two counters, each with a threshold, and
+ * <p><b>The sentence that needs it.</b> 寒鸦's Skill: "after our target casts a basic attack, Skill or Ultimate <b>2</b> times on an enemy target in the [承负] state, immediately
+ * restore 1 skill point to our side; [承负] ... is automatically removed after triggering the skill-point restoration effect <b>2</b> times" - two counters, each with a threshold, and
  * neither is a turn count or a probability. The engine could already <i>stack</i> ({@code maxStacks}, {@code REMOVE_STACK})
  * but nothing could <b>read</b> a count, so "after N times" had no spelling at all.
  *
@@ -44,7 +44,7 @@ public class StackCounterTest {
 
         battle.fireTriggers(TriggerEvent.ALLY_ATTACK, hero, enemy, 0, 0);
         Assertions.assertEquals(1, enemy.getBuffManager().stacksOf("承负"),
-                "one mark is not two: 「每 2 次…后」 has not been reached");
+                "one mark is not two: \"after every 2 times ...\" has not been reached");
 
         battle.fireTriggers(TriggerEvent.ALLY_ATTACK, hero, enemy, 0, 0);
         Assertions.assertEquals(0, enemy.getBuffManager().stacksOf("承负"),
@@ -70,7 +70,7 @@ public class StackCounterTest {
 
         Assertions.assertEquals(2, enemy.getBuffManager().removeState("承负"),
                 "REMOVE_STATE by name clears the WHOLE counter (every buff carrying the name), which is what "
-                        + "「触发 2 次后自动解除」 needs");
+                        + "\"automatically removed after triggering 2 times\" needs");
         Assertions.assertEquals(0, enemy.getBuffManager().stacksOf("承负"));
     }
 

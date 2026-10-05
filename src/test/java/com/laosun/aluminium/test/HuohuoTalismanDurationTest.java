@@ -14,9 +14,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 121藿藿："施放战技后藿藿获得[禳命]，持续 2 回合，藿藿每回合开始时持续回合数减 1" (2026-10-02).
+ * 121 Huohuo (藿藿): "after casting the Skill, Huohuo gains [禳命], lasting 2 turns, and the remaining turns decrease by 1 at the start of each of Huohuo's turns" (2026-10-02).
  *
- * <p>The point is WHOSE clock spends it: the sentence names 藿藿, not the party. Note: The drive is the one a green sibling uses
+ * <p>The point is WHOSE clock spends it: the sentence names Huohuo (藿藿), not the party. Note: The drive is the one a green sibling uses
  * (`ArlanEidolonFourTest`): a timed buff ticks in two halves per turn, and expiry is announced on the late one.
  */
 public class HuohuoTalismanDurationTest {

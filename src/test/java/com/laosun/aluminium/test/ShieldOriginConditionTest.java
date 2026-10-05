@@ -21,9 +21,9 @@ import java.util.Random;
 /**
  * "在<b>战技提供的</b>护盾保护下的我方目标…" - a shield is asked about by <b>which rule created it</b>, not just "is there one".
  *
- * <p><b>Why the DSL needed it.</b> 1001 三月七's 星魂 6 heals the shielded ally on their turn - but only through the shield
+ * <p><b>Why the DSL needed it.</b> 1001 March 7th's 星魂 6 heals the shielded ally on their turn - but only through the shield
  * her <b>Skill</b> gives. She has two shields of her own (her Skill's and 星魂 2's at battle start), so a condition that
- * asked only "has a shield" - or even "a shield from 三月七" - would also heal through the 星魂 2 one for the three turns it
+ * asked only "has a shield" - or even "a shield from March 7th" - would also heal through the 星魂 2 one for the three turns it
  * lasts: a wrong number with nothing to report. So the shield remembers the rule that created it
  * ({@code CanHit.getShieldRuleId()}, stamped where every buff already gets its source) and the condition can require it:
  * {@code <who> has_shield from_rule <id>}.
@@ -53,7 +53,7 @@ public class ShieldOriginConditionTest {
     @Test
     public void theBattleStartShieldDoesNotSatisfyIt() {
         Assertions.assertFalse(healFires(false, "skill_shield"),
-                "the ally holds a shield from 三月七, but not from that rule");
+                "the ally holds a shield from March 7th, but not from that rule");
     }
 
     /** Plain {@code has_shield} still means "any living shield", whichever rule made it. */
@@ -104,7 +104,7 @@ public class ShieldOriginConditionTest {
     }
 
     // ==================================================================
-    // The shipped content: 1001 星魂 6
+    // The shipped content: 1001, 星魂 6
     // ==================================================================
 
     /**
@@ -174,7 +174,7 @@ public class ShieldOriginConditionTest {
         return turnStartHeals(battle, hero, ally);
     }
 
-    /** Fires the ally's own turn start and reports whether 三月七's rule healed them. */
+    /** Fires the ally's own turn start and reports whether March 7th's rule healed them. */
     private static boolean turnStartHeals(Battle battle, Character hero, Character ally) {
         double before = ally.getCurrentHp();
         battle.fireTriggers(TriggerEvent.TURN_START, ally, ally, 0, 0);
@@ -247,13 +247,13 @@ public class ShieldOriginConditionTest {
         return effect;
     }
 
-    /** 三月七 with her real file, one ally, and 星魂 6: heal on the ally's turn start, through one of the two shields. */
+    /** March 7th with her real file, one ally, and 星魂 6: heal on the ally's turn start, through one of the two shields. */
     private static double shippedTurnStartHeal(boolean throughTheSkill) {
         Character hero = CharacterFactory.create(MARCH_7TH, LEVEL, true, null, null, 6);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
         Battle battle = new Battle(List.of(hero, ally), List.of(monster()), fixed());
         // Note: Hurt the ally BEFORE the battle starts, so 星魂 2's lowest_hp_ally shield really lands on them (at full
-        // HP everybody ties and the first in party order wins, which would be 三月七 herself).
+        // HP everybody ties and the first in party order wins, which would be March 7th herself).
         hurt(ally);
         ally.heal(ally.getMaxHp());
         ally.takeDamage(ally.getMaxHp() * 0.5);

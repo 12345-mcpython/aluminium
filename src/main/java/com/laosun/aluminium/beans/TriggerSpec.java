@@ -32,7 +32,7 @@ public class TriggerSpec {
     private String on;
 
     /**
-     * Extra events this rule also listens to (一条规则听多个事件), e.g. "施放战技和终结技时".
+     * Extra events this rule also listens to (one rule listening to several events), e.g. "when casting the Skill and the Ultimate".
      *
      * <p>Note: The primary {@link #on} stays REQUIRED even when this is present, on purpose: four separate places parse it with
      * {@code TriggerEvent.fromString(spec.getOn())} to validate which event a clause may hang on, and leaving them alone is what makes this addition
@@ -53,8 +53,8 @@ public class TriggerSpec {
      * An optional <b>name for this rule</b>, so that another rule can raise one of its numbers
      * ({@code MODIFY_RULE}'s {@code "rule"} field).
      *
-     * <p><b>Why it exists.</b> A 星魂 or 行迹 can say "天赋的反击效果每回合可触发的次数<b>增加1次</b>" or
-     * "冻结敌方目标的基础概率<b>提高15%</b>" - sentences that modify a number that already exists on another rule
+     * <p><b>Why it exists.</b> An Eidolon (星魂) or a trace (行迹) can say "the number of times the talent's counter effect can trigger each turn is <b>increased by 1</b>" or
+     * "the base chance to freeze the enemy target is <b>increased by 15%</b>" - sentences that modify a number that already exists on another rule
      * in the same file. Without a name there is nothing to point at, and the two ways to fake it are both wrong: a
      * second rule with the raised number <i>adds</i> firings (a {@code per_turn: 3} rule next to the {@code per_turn: 2}
      * one = five per turn) and a second chance rule <i>rolls twice</i> (1 − 0.5  x  0.35 = 82.5% instead of 65%).
@@ -85,8 +85,8 @@ public class TriggerSpec {
     private Integer cooldown;
 
     /**
-     * How many times this rule may fire in <b>one of its owner's turns</b> - "该效果<b>每回合</b>可触发
-     * <b>2</b> 次" is {@code per_turn: 2}. Absent = no per-turn cap.
+     * How many times this rule may fire in <b>one of its owner's turns</b> - "this effect can trigger <b>2</b> times
+     * <b>per turn</b>" is {@code per_turn: 2}. Absent = no per-turn cap.
      *
      * <p><b>Why {@code cooldown} is not enough.</b> {@code cooldown: 1} says "at most once per own turn", which
      * is the {@code N = 1} case of this field and nothing more: "每回合可触发2次" needs a <b>count</b> within one
@@ -174,7 +174,7 @@ public class TriggerSpec {
     private Double chance;
 
     /**
-     * The Eidolon rank (星魂) this rule needs: "星魂 N 解锁". Absent = the rule is not gated.
+     * The Eidolon rank (星魂, Eidolon) this rule needs: "unlocked at Eidolon N". Absent = the rule is not gated.
      *
      * <p>An Eidolon's <b>mechanic</b> is written like every other one - as a rule in
      * {@code resources/characters/<cid>.json} - and this field is the whole of what makes it an Eidolon: the

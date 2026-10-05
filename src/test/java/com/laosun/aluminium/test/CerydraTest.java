@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1412 Cerydra, from her own file (2026-09-29, round 205): the 军功 mark, the ATTACK share it carries, and the Charge the mark feeds.
+ * 1412 Cerydra, from her own file (2026-09-29, round 205): the 军功 (military merit) mark, the ATTACK share it carries, and the Charge the mark feeds.
  */
 public class CerydraTest {
     private static final int CERYDRA = 1412;

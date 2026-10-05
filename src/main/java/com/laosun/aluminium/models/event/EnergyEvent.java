@@ -7,12 +7,12 @@ import com.laosun.aluminium.models.CanHit;
  * Energy credit event (P8-6): fired once after someone actually gains energy.
  *
  * <p>{@code actuallyAdded} is the return value of {@code gainEnergy} (the value after being truncated
- * by the cap), not the theoretical energy gain - this is deliberate: cases like 知更鸟 / 缇宝's
+ * by the cap), not the theoretical energy gain - this is deliberate: cases like Robin (知更鸟) / Tribbie (缇宝)'s
  * "after each ally attack, +N energy" care about "how much was really credited", and the amount clipped
  * by the cap must not be counted as another "energy gain".
  *
- * <p><b>Not fired for characters with no energy bar</b> ({@code maxEnergy == 0}, e.g. 遐蝶 140, plus the
- * stack-resource 飞霄/黄泉/白厄/昔涟/银狼LV.999) - their {@code EnergyGain} is always {@code null}, so
+ * <p><b>Not fired for characters with no energy bar</b> ({@code maxEnergy == 0}, e.g. Castorice (遐蝶) 140, plus the
+ * stack-resource characters Feixiao (飞霄) / Acheron (黄泉) / Phainon (白厄) / Cyrene (昔涟) / Silver Wolf LV.999) - their {@code EnergyGain} is always {@code null}, so
  * execution never reaches here at all.
  * In other words: this event = "the energy bar moved", not "someone gained a resource".
  *

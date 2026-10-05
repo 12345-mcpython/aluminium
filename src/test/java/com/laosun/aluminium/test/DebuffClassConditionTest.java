@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * "敌方对我方施加了控制类负面状态"可以被问了 (2026-10-02).
+ * "敌方对我方施加了控制类负面状态" (an enemy applied a control-class negative state to our side) can now be asked (2026-10-02).
  *
  * <p>One landed control, two watchers; both readings are deltas across startBattle. The landing is copied from the green
  * `ControlImmunityTest` - including its measured warning that `all_enemies` aims at the MONSTER - so that a failure here is about the
@@ -32,9 +32,9 @@ public class DebuffClassConditionTest {
         double[] gains = run();
         System.out.println("[debuff-class] control=" + gains[0] + " dot=" + gains[1]);
         Assertions.assertTrue(gains[0] > EPS,
-                "「控制类」-- the rule that asked for it fired, which also proves the event happened");
+                "「控制类」 (the control class)-- the rule that asked for it fired, which also proves the event happened");
         Assertions.assertEquals(0.0, gains[1], EPS,
-                "「持续伤害类」-- the same event does NOT fire the rule that asked for the other family");
+                "「持续伤害类」 (the DOT class)-- the same event does NOT fire the rule that asked for the other family");
     }
 
     /** { the control-watch's ATTACK gain, the dot-watch's DEFENCE gain }. */

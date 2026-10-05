@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1222 灵砂's Ultimate "幔亭缭霞": the [醇醉] break-damage mark on every enemy, and the second party heal.
+ * 1222 Lingsha (灵砂)'s Ultimate "幔亭缭霞" (Pavilion in Rosy Clouds): the [醇醉] break-damage mark on every enemy, and the second party heal.
  *
  * <p>The heal is judged numerically -- 12% of her ATK plus 360, her own Lv10 row. The mark is judged by the CLASS the op attaches:
  * a `MODIFY_DAMAGE_TAKEN` carrying a `buff` name lands as a VulnerabilityBuff, not a StateBuff (`hasState` asks a different

@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 虎克 (1109): his burn and the traces/eidolons that shipped with it (2026-09-28, round 134).
+ * Hook (虎克) (1109): his burn and the traces/eidolons that shipped with it (2026-09-28, round 134).
  *
  * <p><b>Why a hand-made target.</b> The project's fixture monster resists controls outright (round 131), and the burn is rolled
  * too - `APPLY_DOT` runs `tryApplyDebuff` with the document's base chance - so an unresisting target is what makes the test
@@ -29,19 +29,19 @@ public class HookTest {
     @Test
     public void hisBurnLandsAndHisUltimateTracePaysEnergy() {
         Fixture f = new Fixture(0);
-        Assertions.assertFalse(f.enemy.getBuffManager().hasState("灼烧"), "precondition: not burning yet");
+        Assertions.assertFalse(f.enemy.getBuffManager().hasState("灼烧"), "precondition: not burning (灼烧) yet");
 
         f.battle.castImmediate(f.hook.getSkills().get(SkillType.SKILL), f.hook, List.of(f.enemy));
 
         Assertions.assertTrue(f.enemy.getBuffManager().hasState("灼烧"),
-                "「有100%的基础概率使其陷入灼烧状态」");
+                "「有100%的基础概率使其陷入灼烧状态」 (100% base chance to put it in the burning state)");
         Assertions.assertFalse(f.enemy.getBuffManager().allBuffsOf(DotBuff.class).isEmpty(), "…as a damage-over-time state");
 
         double energyBefore = f.hook.getCurrentEnergy();
         f.battle.castImmediate(f.hook.getSkills().get(SkillType.ULTRA), f.hook, List.of(f.enemy));
 
         Assertions.assertTrue(f.hook.getCurrentEnergy() > energyBefore,
-                "「施放终结技后，虎克的行动提前20%并额外恢复5点能量」 — the trace pays on the cast");
+                "「施放终结技后，虎克的行动提前20%并额外恢复5点能量」 (after casting the ultimate, Hook advances 20% and restores 5 extra energy) — the trace pays on the cast");
     }
 
     /** Census: the burn, the level convention, and the five traces/eidolons are all there. */

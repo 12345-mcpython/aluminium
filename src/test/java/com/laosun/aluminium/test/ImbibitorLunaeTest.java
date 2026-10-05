@@ -19,7 +19,7 @@ import java.util.Random;
  * 1213 Dan Heng - Imbibitor Lunae, from his own file (2026-09-29, rounds 11-12).
  *
  * <p>His talent is the same stackable-modifier shape Argenti's file already ships, and the ultimate's [逆鳞] is an ADD_STACK resource.
- * Round 11's "ADD_STACK lands nothing" was a bad escape in the TEST (鱾 is 鱾, not 鳞); rounds 12's hand-built table and file-loaded
+ * Round 11's "ADD_STACK lands nothing" was a bad escape in the TEST (鱾 is 鱾, not 鳞, "that character is not this one"); rounds 12's hand-built table and file-loaded
  * comparison settled it.
  */
 public class ImbibitorLunaeTest {

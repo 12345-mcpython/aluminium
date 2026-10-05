@@ -20,23 +20,23 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 姬子 (1003) - the first character whose kit is built on a <b>declared resource</b>.
+ * Himeko (姬子) (1003) - the first character whose kit is built on a <b>declared resource</b>.
  *
- * <p><b>Why her.</b> Her document is the corpus's most common shape that had no spelling: "获得充能，上限3点",
- * "若充能达到上限则…", "消耗全部充能". The ops to write such a resource existed since P8-8, but nothing could
+ * <p><b>Why her.</b> Her document is the corpus's most common shape that had no spelling: "gains charge, cap 3 points",
+ * "if the charge reaches its cap then...", "consumes all charge". The ops to write such a resource existed since P8-8, but nothing could
  * <em>read</em> one back, and nothing could declare one at all - 41 of the 9character documents gate something on
  * a count, which is the largest single hole the corpus scan found (ROADMAP §13.). Her three rules are the reader
  * that pays for both capabilities: {@code self_resource:<NAME>} in the condition DSL, and the {@code resources}
  * block that says what the cap is.
  *
  * <p>Note: What is <b>not</b> authored, and the capability each clause would need, is listed in
- * {@code characters/1003.json}'s note - 星魂 4's "施放战技…击破时" and the ultimate's per-kill energy both need to
+ * {@code characters/1003.json}'s note - 星魂 (Eidolon) 4's "when casting the Skill... on a break" and the ultimate's per-kill energy both need to
  * know <em>which ability</em> caused the event, which no event carries.
  */
 public class HimekoChargeTest {
     private static final double EPS = 1e-6;
 
-    /** 姬子 herself. */
+    /** Himeko (姬子) herself. */
     private static final int HIMEKO = 1003;
     /**
      * An ordinary character with no rules of their own: the ally who attacks, so nothing but her own table can
@@ -50,13 +50,13 @@ public class HimekoChargeTest {
     // reach whatever the shared control happens to be.
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-    /** 冰刃 (Ice Edge) @90: Fire-weak with 60 toughness, so two Fire basic attacks break it. */
+    /** Ice Edge (冰刃) @90: Fire-weak with 60 toughness, so two Fire basic attacks break it. */
     private static final int ICE_EDGE = 1002011;
     /** The resource her Talent declares. */
     private static final String CHARGE = "充能";
 
     // ==================================================================
-    // The three clauses of 天赋"乘胜追击"
+    // The three clauses of the talent (天赋) "乘胜追击" (Press the Advantage)
     // ==================================================================
 
     /** "战斗开始时获得1点充能。" */
@@ -220,10 +220,10 @@ public class HimekoChargeTest {
      *
      * <p>Four clauses exist and each is pinned above; the counts here are what says nothing else was written. The one
      * missing clause would be a wrong number if it were spelled with the vocabulary that exists: the ultimate's
-     * "每消灭1个敌方目标额外恢复5点能量" needs to know the kill came from <b>that</b> ultimate - and while the
-     * attribution now exists ({@code from_skill}, added for 星魂 4 on 2026-09-28), what is still unresolved is a
+     * "recovers an extra 5 energy for each enemy target killed" needs to know the kill came from <b>that</b> ultimate - and while the
+     * attribution now exists ({@code from_skill}, added for 星魂 (Eidolon) 4 on 2026-09-28), what is still unresolved is a
      * <b>data</b> question: the engine's own rule already credits 5 energy to the killer, and the sentence says
-     * "额外恢复5点" - whether those are the same 5 has to be settled against the game's numbers, because guessing
+     * "an extra 5 recovered" - whether those are the same 5 has to be settled against the game's numbers, because guessing
      * it is a silent +/-5 energy (registered as {@code M-45}).
      */
     @Test

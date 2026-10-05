@@ -57,9 +57,9 @@ public class RelicAbilityBattleTest {
     /** "The Ashblazing Grand Duke" - 2-piece: +20% DMG dealt by Follow-Up ATK. */
     private static final int ASHBLAZING = 115;
 
-    /** "星如我见的领航员" - 4-piece: a Skill/Ultimate DMG stack counter that grows and shrinks. */
+    /** "the Navigator who sees the stars as I do" (星如我见的领航员) - 4-piece: a Skill/Ultimate DMG stack counter that grows and shrinks. */
     private static final int NAVIGATOR = 131;
-    /** "戍卫风雪的铁卫" - 2-piece: reduces the damage the wearer takes (a damage-taken zone). */
+    /** "the Iron Guard that wards the wind and snow" (戍卫风雪的铁卫) - 2-piece: reduces the damage the wearer takes (a damage-taken zone). */
     private static final int GUARD_OF_SNOW = 106;
 
     /** Himeko: basic attack / skill / ultimate are all real, damaging skill slots. */
@@ -556,7 +556,7 @@ public class RelicAbilityBattleTest {
     }
 
     // ==================================================================
-    // 131 "星如我见的领航员": the stack counter that also comes back down
+    // 131 "the Navigator who sees the stars as I do" (星如我见的领航员): the stack counter that also comes back down
     // ==================================================================
 
     /** One stack of the set's boost (param #1[i] = 0.18). */
@@ -605,7 +605,7 @@ public class RelicAbilityBattleTest {
                 "one comes off per turn start, so the counter never just sits at the cap");
     }
 
-    /** "或施放终结技后，移除1层" - the other half of the removal clause. */
+    /** "or after casting the Ultimate, remove 1 layer" - the other half of the removal clause. */
     @Test
     public void navigatorLosesAStackAfterTheWearersUltimate() {
         Battle battle = newBattle(List.of(wearing(HIMEKO, NAVIGATOR)), true);
@@ -633,14 +633,14 @@ public class RelicAbilityBattleTest {
     }
 
     // ==================================================================
-    // 106 "戍卫风雪的铁卫": a damage-taken zone the data could not reach
+    // 106 "the Iron Guard that wards the wind and snow" (戍卫风雪的铁卫): a damage-taken zone the data could not reach
     // ==================================================================
 
     /** The 2-piece's number (param #1[i] = 0.08). */
     private static final double SNOW_REDUCTION = 0.08;
 
     /**
-     * "受到的伤害降低 8%" - and the measurement is deliberately taken twice <b>on the same wearer in the
+     * "reduces the damage taken by 8%" - and the measurement is deliberately taken twice <b>on the same wearer in the
      * same battle</b>: once with the buff the rule installed and once after removing it.
      *
      * <p>Comparing "a character wearing the set" against "a character wearing nothing" would have been
@@ -709,7 +709,7 @@ public class RelicAbilityBattleTest {
 
         takeTurnOf(battle, hero);
 
-        Assertions.assertEquals(hpBefore, hero.getCurrentHp(), TOLERANCE, "「若生命百分比 ≤ 50%」");
+        Assertions.assertEquals(hpBefore, hero.getCurrentHp(), TOLERANCE, "「if the HP percentage <= 50%」");
         Assertions.assertEquals(energyBefore, hero.getCurrentEnergy(), TOLERANCE);
     }
 
@@ -816,5 +816,5 @@ public class RelicAbilityBattleTest {
         throw new IllegalStateException(unit.getName() + " is not on the action bar");
     }
 
-    /** 繁星璀璨的天才 (Genius of Brilliant Stars), 4-piece: "造成伤害时无视10%防御；若目标有量子弱点则额外无视10%". */
+    /** Genius of Brilliant Stars (繁星璀璨的天才), 4-piece: "ignores 10% of defence when dealing damage; if the target has a quantum weakness, additionally ignores 10%". */
 }

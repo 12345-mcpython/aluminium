@@ -13,7 +13,7 @@ public class StunBuff extends AbstractBuff {
     }
 
     /**
-     * A control state (眩晕, and by the P10-2 table 冻结) is a negative effect on its bearer.
+     * A control state (stun, and by the P10-2 table frozen) is a negative effect on its bearer.
      */
     @Override
     public boolean isDebuff() {

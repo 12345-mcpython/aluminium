@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1403 缇宝's zone deals its own additional damage (2026-10-02).
+ * 1403 Tribbie's (缇宝) zone deals its own additional damage (2026-10-02).
  *
  * <p>"受到我方目标攻击后，每有1名目标受到攻击，会对被攻击目标中当前生命值最高的目标造成 1 次等同于缇宝 #3% 生命上限的量子属性附加伤害。"
  *

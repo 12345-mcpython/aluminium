@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1222 灵砂's Skill: "同时为我方全体回复等同于灵砂14.00%攻击力+420的生命值" -- the first clause of a character who had no file at all.
+ * 1222 灵砂's Skill: "at the same time restore HP equal to 14.00% of 灵砂's ATK + 420 to all of our side" -- the first clause of a character who had no file at all.
  *
  * <p>Judged as the AMOUNT healed on a wounded teammate, against 14% of her ATK plus 420 (her own Lv10 row), so the assertion checks
  * the scale, the percentage and the flat part together.

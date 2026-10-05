@@ -4,8 +4,8 @@ import com.laosun.aluminium.models.CanHit;
 import lombok.Getter;
 
 /**
- * <b>"This attack's toughness reduction is higher"</b> (2026-09-28): "使本次攻击的削韧值提高 100%" (120驭空's talent),
- * "强化普攻的前 2 段攻击对指定敌方单体的削韧值提高 50%" (131乱破).
+ * <b>"This attack's toughness reduction is higher"</b> (2026-09-28): "使本次攻击的削韧值提高 100%" (120 Yukong's (驭空) talent),
+ * "强化普攻的前 2 段攻击对指定敌方单体的削韧值提高 50%" (131 Rappa (乱破)).
  *
  * <p><b>Why a buff rather than a field on the damage instance.</b> The reduction is not part of the damage: it is a second
  * number that travels beside it - {@code SkillExecutor} settles the damage first ({@code applyDamage}, where

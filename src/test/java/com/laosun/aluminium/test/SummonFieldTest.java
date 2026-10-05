@@ -25,9 +25,9 @@ import java.util.Random;
 
 /**
  * Questions about summons <b>on the field</b>: {@code self_summon_count}, and the {@code "summon"} target
- * selector (P9-4's 忆灵 family).
+ * selector (P9-4's memosprite family).
  *
- * <p><b>Why these two exist and why they need the battle.</b> "忆灵在场时" and "装备者及其忆灵" are not facts
+ * <p><b>Why these two exist and why they need the battle.</b> "while a memosprite is on the field" and "the wearer and their memosprite" are not facts
  * about the event - nothing just happened, or one of the two units named did not act. They are facts about the
  * battlefield, so {@code TriggerContext} now carries the {@link Battle} for exactly these questions (see its
  * javadoc), and a context built without one makes them <b>fail</b> rather than guess.
@@ -37,23 +37,23 @@ import java.util.Random;
  * bare {@code summon_count} reads like "how many summons are on the battlefield" - a different question with a
  * different answer that nobody has asked for yet.
  *
- * <p><b>The acceptance content is relic set 318</b> (奇想蕉乐园): its 2-piece grants the wearer an extra 32%
- * CRIT DMG "当存在装备者召唤的目标时". Its file is authored with the "while" technique - re-evaluated at each
+ * <p><b>The acceptance content is relic set 318</b> (Banana Paradise (奇想蕉乐园)): its 2-piece grants the wearer an extra 32%
+ * CRIT DMG "when a target summoned by the wearer exists". Its file is authored with the "while" technique - re-evaluated at each
  * of the wearer's turn starts for one turn - because a {@code permanent} buff would outlive the summon.
  */
 public class SummonFieldTest {
     private static final double EPS = 1e-6;
 
-    /** 阿格莱雅 - has a memosprite spec (1402), and no other test uses her id. */
+    /** Aglaea (阿格莱雅) - has a memosprite spec (1402), and no other test uses her id. */
     private static final int AGLAEA = 1402;
-    /** 姬子 - our plain character, no memosprite. */
+    /** Himeko (姬子) - our plain character, no memosprite. */
     private static final int PLAIN = 1003;
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
-    /** 银鬃近卫, the monster id used for an enemy-side summon. */
+    /** Silvermane Guard (银鬃近卫), the monster id used for an enemy-side summon. */
     private static final int MINION = 1002040;
 
-    /** 奇想蕉乐园 - the set whose 2-piece is authored with {@code self_summon_count}. */
+    /** Banana Paradise (奇想蕉乐园) - the set whose 2-piece is authored with {@code self_summon_count}. */
     private static final int BANANA_PARADISE = 318;
 
     // ==================================================================
@@ -72,7 +72,7 @@ public class SummonFieldTest {
 
         Assertions.assertEquals(1, battle.summonCountOf(owner));
         Assertions.assertEquals(0, battle.summonCountOf(teammate),
-                "a teammate's memosprite is not mine -- 「装备者的忆灵」 is possessive");
+                "a teammate's memosprite is not mine -- 「the wearer's memosprite」 is possessive");
     }
 
     /** A dead summon stops counting: the roster keeps corpses, the count does not. */
@@ -88,7 +88,7 @@ public class SummonFieldTest {
         Assertions.assertNull(f.battle.summonOf(f.owner));
     }
 
-    /** It counts all of them, not just the first - 知更鸟-晴歌's 晴空乐手 is a trio. */
+    /** It counts all of them, not just the first - Robin - Summeretto (知更鸟-晴歌)'s Sky Musician (晴空乐手) is a trio. */
     @Test
     public void severalSummonsAreAllCounted() {
         Fixture f = fixture();
@@ -133,7 +133,7 @@ public class SummonFieldTest {
      * {@code >= 1} the two readings agree by accident (0 is not >= 1 either), so a "cannot tell" that
      * degraded to 0 would pass that gate silently. Asking {@code == 0} is what tells them apart - it must not
      * match either, because the honest answer to "how many summons do I have" without a battlefield is
-     * "unknown", and a rule gated on "忆灵在场时" that read unknown as "none out" would be silently disabled.
+     * "unknown", and a rule gated on "while a memosprite is on the field" that read unknown as "none out" would be silently disabled.
      */
     @Test
     public void aContextWithoutABattleFailsTheCondition() {
@@ -153,7 +153,7 @@ public class SummonFieldTest {
                 "without a battlefield the answer is 'cannot tell', which fails the rule");
         Assertions.assertTrue(negative.matching(TriggerEvent.BATTLE_START, noBattle).isEmpty(),
                 "and it must not read as ZERO either -- 'unknown' and 'none' are different answers, and "
-                        + "conflating them would silently disable every 「忆灵在场时」 rule");
+                        + "conflating them would silently disable every 「while a memosprite is on the field」 rule");
     }
 
     // ==================================================================
@@ -172,7 +172,7 @@ public class SummonFieldTest {
 
         Assertions.assertEquals(memospriteBefore * 1.5,
                 f.memosprite.getAttribute(AttributeType.ATTACK).get(), 1e-6,
-                "「装备者及其忆灵」 names two units, and this is the second one");
+                "「the wearer and their memosprite」 names two units, and this is the second one");
         Assertions.assertEquals(ownerBefore, f.owner.getAttribute(AttributeType.ATTACK).get(), EPS,
                 "and the wearer is untouched by this rule");
     }
@@ -180,7 +180,7 @@ public class SummonFieldTest {
     /**
      * Naming a summon that is not there is a <b>loud</b> failure that says how to fix the rule.
      *
-     * <p>An author who writes "装备者及其忆灵" without a {@code self_summon_count >= 1} gate has a rule that fires
+     * <p>An author who writes "the wearer and their memosprite" without a {@code self_summon_count >= 1} gate has a rule that fires
      * exactly when the unit it names is absent. Silence would leave a wrong state; the message names the
      * condition to add.
      */
@@ -241,7 +241,7 @@ public class SummonFieldTest {
 
         Assertions.assertEquals(1, rules.size());
         Assertions.assertEquals(2, rules.getFirst().conditions().size(),
-                "「装备者」 and 「存在召唤的目标」 are two separate facts");
+                "「the wearer」 and 「a summoned target exists」 are two separate facts");
         EffectSpec effect = rules.getFirst().effects().getFirst();
         Assertions.assertEquals("CRIT_ATTACK", effect.getAttribute());
         Assertions.assertEquals(0.32, effect.getPercent(), EPS, "param #2 is 0.32, not 0.16");
@@ -278,7 +278,7 @@ public class SummonFieldTest {
         return battle.fireTriggers(TriggerEvent.BATTLE_START, owner, null, 0, 0);
     }
 
-    /** A rule that buffs "我的忆灵" - the {@code target: "summon"} selector. */
+    /** A rule that buffs "my memosprite" - the {@code target: "summon"} selector. */
     private static TriggerSpec summonAttackRule() {
         EffectSpec effect = TriggerSpecs.modifyAttr("ATTACK", 0.5, 2);
         TriggerSpecs.set(effect, "target", "summon");

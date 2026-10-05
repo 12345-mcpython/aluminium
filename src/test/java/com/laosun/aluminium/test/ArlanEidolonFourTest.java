@@ -13,11 +13,11 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1008："进入战斗后，受到致命攻击时阿兰不会陷入无法战斗状态，并立即回复至自身生命上限的 25%。
- * 该效果在触发 1 次后或持续 2 回合后自动解除" (2026-10-02).
+ * 1008: "after entering battle, when he takes a lethal attack 阿兰 will not enter the unable-to-fight state, and immediately restores to 25% of his own Max HP.
+ * This effect is automatically removed after triggering 1 time or after lasting 2 turns" (2026-10-02).
  *
  * <p>THREE READINGS, ONE VARIABLE EACH: the eidolon rank, the NUMBER of lethal blows, and the NUMBER of his own turns that
- * elapse before the blow. The trace is a state, so it can be asked about directly -- which is what makes "自动解除" testable.
+ * elapse before the blow. The trace is a state, so it can be asked about directly -- which is what makes "automatically removed" testable.
  */
 public class ArlanEidolonFourTest {
     private static final int ARLAN = 1008;
@@ -28,33 +28,33 @@ public class ArlanEidolonFourTest {
     @Test
     public void atEidolonFourHeSurvivesAtAQuarter() {
         double[] result = afterLethalBlows(4, 1, 0);
-        Assertions.assertTrue(result[0] > 0, "「不会陷入无法战斗状态」");
+        Assertions.assertTrue(result[0] > 0, "\"will not enter the unable-to-fight state\"");
         Assertions.assertEquals(result[1] * 0.25, result[0], result[1] * 0.01,
-                "「回复至自身生命上限的 25%」");
+                "\"restore to 25% of one's own Max HP\"");
     }
 
     /** Note: Below E4 he falls. */
     @Test
     public void belowEidolonFourHeFalls() {
-        Assertions.assertTrue(afterLethalBlows(0, 1, 0)[0] <= 0, "星魂 4 才有这一条");
+        Assertions.assertTrue(afterLethalBlows(0, 1, 0)[0] <= 0, "only Eidolon 4 has this clause");
     }
 
-    /** "该效果在触发 1 次后…自动解除": the second blow in the same battle is NOT answered. */
+    /** "this effect is automatically removed after triggering 1 time ...": the second blow in the same battle is NOT answered. */
     @Test
     public void theFirstBlowConsumesTheTrace() {
         double[] one = afterLethalBlows(4, 1, 0);
         double[] two = afterLethalBlows(4, 2, 0);
-        Assertions.assertTrue(one[0] > 0, "第一次被救");
-        Assertions.assertTrue(two[0] <= 0, "第二次**不再**被救（「触发 1 次后自动解除」）");
+        Assertions.assertTrue(one[0] > 0, "the first blow is answered");
+        Assertions.assertTrue(two[0] <= 0, "the second is **no longer** answered (\"automatically removed after triggering 1 time\")");
     }
 
-    /** "或持续 2 回合后自动解除": after two of HIS turns the trace is gone, even though it never triggered. */
+    /** "or automatically removed after lasting 2 turns": after two of HIS turns the trace is gone, even though it never triggered. */
     @Test
     public void twoTurnsEndTheTraceUntriggered() {
         double[] fresh = afterLethalBlows(4, 1, 0);
         double[] late = afterLethalBlows(4, 1, 2);
-        Assertions.assertTrue(fresh[0] > 0, "没过回合时仍然被救");
-        Assertions.assertTrue(late[0] <= 0, "过了两个回合后**不再**被救（「持续 2 回合后自动解除」）");
+        Assertions.assertTrue(fresh[0] > 0, "with no turns elapsed it is still answered");
+        Assertions.assertTrue(late[0] <= 0, "after two turns it is **no longer** answered (\"automatically removed after lasting 2 turns\")");
     }
 
     // ==================================================================

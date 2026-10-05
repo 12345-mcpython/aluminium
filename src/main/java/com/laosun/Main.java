@@ -107,9 +107,9 @@ public class Main {
 
         // -- Enemies: real data. Three simple mooks, each with its own weakness/resistance, and all of them
         //    carry the basic attack from enemy_skills.json --
-        //  冰锋 1002011  weak to fire/lightning, ice resistance 0.2, toughness 60
-        //  基层员工 8032010  physical
-        //  次元扑满 8002040  a low-multiplier (0.6) trash mob
+        //  Ice Edge (冰锋) 1002011  weak to fire/lightning, ice resistance 0.2, toughness 60
+        // Junior Staff - Field Agent (基层员工·外勤) 8032010  physical
+        //  Warp Trotter (次元扑满) 8002040  a low-multiplier (0.6) trash mob
         List<Enemy> enemies = new ArrayList<>(List.of(
                 EnemyFactory.create(1002011, 90, 1),
                 EnemyFactory.create(8032010, 90, 1),
@@ -131,7 +131,7 @@ public class Main {
         System.out.println();
 
         // -- P9-5: an enemy that hits back -------------------------------------
-        // 冰锋 wears a counter, so the demo exercises the mechanic instead of only describing it: hit it
+        // Ice Edge (冰锋) wears a counter, so the demo exercises the mechanic instead of only describing it: hit it
         // and it answers with 50% of its ATK. That answer is ADDITIONAL damage, so it does not count as an
         // attack -- the character it lands on gains no energy from it (worth watching in the log below).
         // Duration 99 because this is a demo, not a balance pass.
@@ -184,7 +184,7 @@ public class Main {
      * rather than to look like a fair fight. Four scenes:
      *
      * <ol>
-     *   <li><b>Break control states</b> (P10-1/P10-2) - 冰 = the victim cannot act, 量子/虚数 = it acts but
+     *   <li><b>Break control states</b> (P10-1/P10-2) - ice = the victim cannot act, quantum/imaginary = it acts but
      *       slower and later. Prints the speed and action-value change for each, because those are the
      *       observables the mechanics are made of.</li>
      *   <li><b>A DOT on our own character</b> (P10-0) - the engine settles it at the start of that
@@ -230,7 +230,7 @@ public class Main {
     private static void breakControlScene() {
         System.out.println("[1] Break control states — 冰 锁行动 / 量子·虚数 减速 + 推条");
         Character hero = Character.fromAttributes("hero", 10_000, 100, 100, 100);
-        Enemy enemy = EnemyFactory.create(8002040, 90, 1);          // 次元扑满
+        Enemy enemy = EnemyFactory.create(8002040, 90, 1);          // Warp Trotter (次元扑满)
         // Demo affordance #1: make one target weak to all three control elements so each can be shown.
         enemy.setStanceWeak(java.util.Set.of(DamageElement.ICE, DamageElement.QUANTUM,
                 DamageElement.IMAGINARY));
@@ -358,7 +358,7 @@ public class Main {
     /**
      * Which control buffs the target is wearing, as text (the demo prints rather than asserts).
      *
-     * <p>Since 2026-09-2the state itself is one {@code ControlBuff} that knows its own name (冻结 / 纠缠 / 禁锢),
+     * <p>Since 2026-09-2the state itself is one {@code ControlBuff} that knows its own name (freeze / entanglement / imprisonment),
      * so the printout reads the name instead of inferring "a StunBuff means frozen" - the same change that lets a
      * rule ask "冻结状态" about a unit a <i>skill</i> froze rather than only a break.
      */
@@ -398,9 +398,9 @@ public class Main {
      * Scene 4: one of OUR summons - a memosprite, whose panel is <b>derived from its summoner</b> and which
      * then takes its own turn (P9-4 忆灵).
      *
-     * <p>Nothing is fabricated here: 长夜月's own rule file summons "长夜" at battle start
+     * <p>Nothing is fabricated here: Cyrene's own rule file summons "长夜" at battle start
      * ({@code BATTLE_START to SUMMON}), the panel comes from {@code memosprites/1413.json} and the attack is
-     * the memosprite's own 忆灵技能1. The scene prints the derivation itself (share  x  the summoner's resolved
+     * the memosprite's own memosprite skill 1. The scene prints the derivation itself (share  x  the summoner's resolved
      * value) because "the panel is a function of the summoner" is the whole mechanic.
      */
     private static void memospriteScene() {
@@ -680,7 +680,7 @@ public class Main {
      * action bar schedules it like any other unit and {@code Battle.performAction} casts whatever skill it
      * was given. This is the demo's policy, written down in one place - attack the opposing camp with the
      * {@code COMMON} skill, main target picked by the same aggro-weighted selector the enemies use. A real
-     * client would pick differently (忆灵技能1 says "优先攻击长夜月上次攻击的敌方目标" - see ROADMAP §12.5);
+     * client would pick differently (memosprite skill 1 says "优先攻击长夜月上次攻击的敌方目标" - see ROADMAP §12.5);
      * the point here is that a summon <b>acts</b>, and that its damage is not a character's.
      *
      * <p>Which side it hits comes from {@code battle.getOpponents(summon)}, never from a hard-coded camp: an
@@ -781,7 +781,7 @@ public class Main {
     // ==================================================================
 
     private static Character himeko() {
-        // 姬子 1003: fire / speed 96 / max energy 120
+        // Himeko (姬子) 1003: fire / speed 96 / max energy 120
         RelicSuit relics = new RelicSuit();
         relics.addMore(
                 relic(RelicType.HEAD, AttributeType.HEALTH, 705.6, AttributeType.CRIT_CHANCE, 0.12),

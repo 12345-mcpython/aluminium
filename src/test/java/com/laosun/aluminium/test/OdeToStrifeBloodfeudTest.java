@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1415 昔涟's memosprite 德谬歌, 忆灵技能 8 "献予'纷争'之诗 / Ode to Strife", the 血仇 branch (2026-10-02).
+ * 1415 Cyrene's memosprite Demiurge, memosprite skill 8 "献予'纷争'之诗 / Ode to Strife", the Bloodfeud branch (2026-10-02).
  *
  * <p>The game's own words for this skill (data slot 16, SkillID 1141516):
  * "单次生效，对万敌施放时解除万敌陷入的所有控制类负面状态，若万敌处于[血仇]状态，则使其自动施放1次不消耗充能的[弑神登神]，
@@ -76,7 +76,7 @@ public class OdeToStrifeBloodfeudTest {
     private Battle battle;
     private Summon lastSummon;
 
-    /** The scene every case shares: 昔涟, 万敌 and her memosprite, with [血仇] stated or not. */
+    /** The scene every case shares: Cyrene, Mydei and her memosprite, with [血仇] stated or not. */
     private Character scene(boolean inBloodfeud) {
         Character cyrene = CharacterFactory.create(CYRENE, LEVEL);
         Character mydei = CharacterFactory.create(MYDEI, LEVEL);

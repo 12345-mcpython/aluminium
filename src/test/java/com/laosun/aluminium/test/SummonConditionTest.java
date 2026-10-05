@@ -54,26 +54,26 @@ import java.util.Random;
  *       three.</li>
  * </ol>
  *
- * <p>The shipped content is relic set 123 (凯歌祝捷的英豪), whose 4-piece is the first rule in the game's data
+ * <p>The shipped content is relic set 123 (Hero of Triumphant Song (凯歌祝捷的英豪)), whose 4-piece is the first rule in the game's data
  * that says "my memosprite attacked" - checked through the real loader, with the numbers read from the effect's
  * {@code param} rather than from its sentence.
  */
 public class SummonConditionTest {
     private static final double EPS = 1e-6;
 
-    /** 长夜月 - has a memosprite spec, and a hand-built table replaces her own rules cleanly. */
+    /** Cyrene (长夜月) - has a memosprite spec, and a hand-built table replaces her own rules cleanly. */
     private static final int OWNER = 1413;
-    /** 阿格莱雅 - the second memosprite owner, for "a teammate's summon does not count". */
+    /** Aglaea (阿格莱雅) - the second memosprite owner, for "a teammate's summon does not count". */
     private static final int TEAMMATE = 1402;
     /**
-     * 姬子 - a plain character with no memosprite spec at all, i.e. the "owns nothing" side of
+     * Himeko (姬子) - a plain character with no memosprite spec at all, i.e. the "owns nothing" side of
      * {@code target_summon_count}.
      */
     private static final int PLAIN = 1003;
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
     private static final int OTHER_MONSTER = 8002040;
-    /** 凯歌祝捷的英豪: 攻击力 +12%; 忆灵在场 -> 速度 +6%, 忆灵攻击时 -> 双方暴击伤害 +30% / 2 回合. */
+    /** Hero of Triumphant Song (凯歌祝捷的英豪): ATK +12%; a memosprite on the field -> SPD +6%, when the memosprite attacks -> both sides' CRIT DMG +30% / 2 turns. */
     private static final int HERO_OF_TRIUMPHANT_SONG = 123;
     /** The magnitude the fixture rules grant - a ratio attribute, so the delta is exact. */
     private static final double GRANT = 0.5;
@@ -147,7 +147,7 @@ public class SummonConditionTest {
     /**
      * "My summon" means <b>any</b> of them, not just the first.
      *
-     * <p>Nothing in the shipped data owns more than one yet - 知更鸟-晴歌's 晴空乐手 is a trio, and the documents
+     * <p>Nothing in the shipped data owns more than one yet - Robin - Summer Songbird (知更鸟-晴歌)'s Skyward Musician (晴空乐手) is a trio, and the documents
      * do describe multi-summon characters - so a condition that resolved {@code summon} to the first match would
      * look right today and be wrong the moment one lands. Two fixture memosprites for one owner is how that shows
      * up: the <em>second</em> one attacking is still "my summon".
@@ -206,7 +206,7 @@ public class SummonConditionTest {
      * {@code target_summon_count} counts the <b>subject's</b> summons, where {@code self_summon_count} counts the
      * owner's - the two are one word apart and both are read from the field.
      *
-     * <p>Its first user is 星期日's Skill: "若目标拥有召唤物，则造成的伤害提高效果额外提高…", i.e. a question about
+     * <p>Its first user is Sunday (星期日)'s Skill: "若目标拥有召唤物，则造成的伤害提高效果额外提高…", i.e. a question about
      * the ally the skill was cast on, not about the caster. The two rules are put on <b>one</b> table and the event
      * carries an ally who owns no summon while the owner owns one: exactly one of them may fire, which is the only
      * arrangement that tells the two variables apart.
@@ -384,7 +384,7 @@ public class SummonConditionTest {
         Character teammate = CharacterFactory.create(TEAMMATE, LEVEL);
         Battle battle = new Battle(List.of(wearer, teammate), List.of(dummy()), new Random(0));
         battle.startBattle();
-        // A fixture summon for the teammate: 阿格莱雅's own spec states a panel but no attack yet (her document
+        // A fixture summon for the teammate: Aglaea's own spec states a panel but no attack yet (her document
         // has not been read for one), and this case needs one that swings.
         Summon theirs = place(battle, teammate, aoeSpec());
         double before = critDamageOf(wearer);
@@ -398,8 +398,8 @@ public class SummonConditionTest {
     /** The SPD clause needs the memosprite out: it is a WHILE condition, re-read at the wearer's turn. */
     @Test
     public void theSpeedClauseNeedsTheMemospriteOut() {
-        // 阿格莱雅, not 长夜月: her rule summons on her ULTIMATE, so the battlefield really starts without one
-        // (长夜月's "进入战斗时召唤" would make the "before" half of this case impossible to reach).
+        // Aglaea, not Cyrene: her rule summons on her ULTIMATE, so the battlefield really starts without one
+        // (Cyrene's "进入战斗时召唤" would make the "before" half of this case impossible to reach).
         Character wearer = CharacterFactory.create(TEAMMATE, LEVEL, true, null,
                 RelicFactory.suit(HERO_OF_TRIUMPHANT_SONG, 5, 15));
         wearer.setAttribute(AttributeType.SPEED, new DoubleValue(100));   // a clean base: +6% is +6
@@ -427,7 +427,7 @@ public class SummonConditionTest {
         return owner;
     }
 
-    /** The 4-piece on 长夜月, whose own rule (BATTLE_START to SUMMON) is left in place. */
+    /** The 4-piece on Cyrene, whose own rule (BATTLE_START to SUMMON) is left in place. */
     private static Character wearer() {
         return CharacterFactory.create(OWNER, LEVEL, true, null,
                 RelicFactory.suit(HERO_OF_TRIUMPHANT_SONG, 5, 15));

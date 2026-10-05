@@ -18,10 +18,10 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 玲可 (1110), from her own file (2026-09-28): [求生反应], the two regenerations, and the party cleanse.
+ * Lynx (玲可) (1110), from her own file (2026-09-28): [求生反应] (Survival Reaction), the two regenerations, and the party cleanse.
  *
  * <p><b>What it needed.</b> The "share + constant" magnitude on `MODIFY_ATTR`, `APPLY_REGEN`, `DISPEL` over a list, and
- * `target_when` for "若该目标持有[求生反应]则额外回复".
+ * `target_when` for "if that target holds [求生反应], restores extra".
  */
 public class LynxTest {
     private static final int LYNX = 1110;

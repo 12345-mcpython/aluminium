@@ -21,8 +21,8 @@ import java.util.Random;
 /**
  * `summon_attr:<ATTRIBUTE>`: a magnitude that is a share of the RULE OWNER'S MEMOSPRITE (2026-10-02).
  *
- * <p>Reader: 1415's memosprite skill 10 "献予'创世'之诗" -- "使开拓者-记忆的攻击力提高，提高数值等同于<b>德谬歌生命上限</b>的 #1%，同时使其暴击率
- * 提高，提高数值等同于<b>德谬歌暴击率</b>的 #2%". The existing family names the owner's own attributes (`self_attr:`), so a share of the
+ * <p>Reader: 1415's memosprite skill 10 "献予'创世'之诗" -- "increases the ATK of Trailblazer - Remembrance by an amount equal to #1% of <b>the Demiurge (德谬歌)'s Max HP</b>, and at the same time
+ * increases its crit rate by an amount equal to #2% of <b>the Demiurge's crit rate</b>". The existing family names the owner's own attributes (`self_attr:`), so a share of the
  * MEMOSPRITE's had no spelling.
  *
  * <p>The reading is a comparison of two numbers, both readable: the modifier's value and `0.1 x the memosprite's Max HP`. A mutant that
@@ -72,7 +72,7 @@ public class SummonAttrScaleTest {
                 + " ; 10% of the memosprite = " + fromSummon + " ; 10% of her own = " + fromOwner);
 
         Assertions.assertEquals(fromSummon, gained, fromSummon * 1e-6,
-                "「提高数值等同于**德谬歌生命上限**的 #1%」-- the MEMOSPRITE's, not the owner's");
+                "「increase the value by an amount equal to **#1% of the Demiurge (德谬歌)'s Max HP**」-- the MEMOSPRITE's, not the owner's");
         Assertions.assertNotEquals(fromOwner, gained, fromSummon * 1e-6,
                 "and the Max HP of the summoner differs from the memosprite here, so the reading is not a coincidence");
     }

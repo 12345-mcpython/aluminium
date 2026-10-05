@@ -192,15 +192,15 @@ public class BuffManager {
      * deterministically is what makes a dispel testable at all. The order is stated here so that a reader - or a
      * future "remove the oldest instead" - has one place to change.
      *
-     * <p>Nothing to dispel is <b>not</b> an error (the return value reports what happened): "受到攻击时解除自身
-     * 1 个负面效果" fires on every hit, including the ones where there is nothing negative on you.
+     * <p>Nothing to dispel is <b>not</b> an error (the return value reports what happened): "when attacked, dispel 1
+     * negative effect from yourself" fires on every hit, including the ones where there is nothing negative on you.
      *
      * @param count how many to remove at most (non-positive removes nothing)
      * @return how many were actually removed
      */
     /**
-     * Removes the newest debuffs OF ONE CLASS (2026-10-02). Reader: 1415's memosprite skill 8, "对万敌施放时解除万敌陷入的所有控制类
-     * 负面状态" -- `removeDebuffs(int)` cannot say "控制类", and a class is a property of the state itself
+     * Removes the newest debuffs OF ONE CLASS (2026-10-02). Reader: 1415's memosprite skill 8, "when cast on Mydei, dispel all control-class
+     * negative states Mydei is in" -- `removeDebuffs(int)` cannot say "control-class", and a class is a property of the state itself
      * (`AbstractBuff.debuffClass()`, which is also what class resistance reads).
      *
      * @param count how many to remove, or a non-positive number for "all of that class" ("所有控制类负面状态" spells no count)
@@ -291,12 +291,12 @@ public class BuffManager {
      * and reports how many.
      *
      * <p><b>Why the two filters.</b> Every sentence in this family identifies the buff by its <b>origin</b> - 
-     * "<b>战技提供的</b>护盾持续时间增加1回合" (三月七 加护) - and then by <b>what it is</b>: "战技对指定我方目标造成的
-     * <b>伤害提高效果</b>的持续时间增加1回合" (布洛妮娅 星魂 6), "<b>天赋使敌方目标陷入的</b>风化状态的持续时间延长1回合"
-     * (桑博), "对于已拥有[<b>生息</b>]的我方目标…延长1回合" (白露). The origin is exact ({@code AbstractBuff.source});
+     * "<b>the shield provided by the Skill</b>'s duration is increased by 1 turn" (三月七 加护) - and then by <b>what it is</b>: "the
+     * <b>damage-increase effect</b> the Skill inflicted on the designated ally's duration is increased by 1 turn" (布洛妮娅 星魂 6), "the windshear state <b>the talent makes enemy targets enter</b> has its duration extended by 1 turn"
+     * (桑博), "for our targets that <b>already have</b> [<b>生息</b>]... extended by 1 turn" (白露). The origin is exact ({@code AbstractBuff.source});
      * the "what" is a <b>name</b> in the same vocabulary the condition DSL already reads - a {@code StateBuff}'s own
      * name, a DOT's element name (灼烧), a control's name (冻结), or {@link #SHIELD_STATE} for a shield - or, when
-     * the sentence names no state at all but an <i>effect</i> ("伤害提高效果"), the <b>attribute</b> the modifier sits
+     * the sentence names no state at all but an <i>effect</i> ("damage-increase effect"), the <b>attribute</b> the modifier sits
      * on.
      *
      * <p>Note: <b>Both filters are required</b>, and "everything of mine on that unit" is deliberately not a spelling:
@@ -335,9 +335,9 @@ public class BuffManager {
     /**
      * Lengthens <b>every</b> buff on this unit, whoever applied it (2026-10-02).
      *
-     * <p>Readers: 1506's two sentences -- "每回合首次触发该效果时，使自身所有增益效果延长 1 回合" and its E2 "进入[无敌玩家]状态后，
-     * 使自身所有增益效果延长 1 回合". {@link #extendBuffsFrom} filters by origin on purpose (its own note names "战技提供的护盾"), so
-     * "所有" had no spelling; the interpreter reaches this only through an explicit {@code "kind": "all"}, never implicitly.
+     * <p>Readers: 1506's two sentences -- "when this effect is first triggered each turn, extend all of your own positive effects by 1 turn" and its E2 "after entering the [无敌玩家] state,
+     * extend all of your own positive effects by 1 turn". {@link #extendBuffsFrom} filters by origin on purpose (its own note names "the shield provided by the Skill"), so
+     * "all" had no spelling; the interpreter reaches this only through an explicit {@code "kind": "all"}, never implicitly.
      *
      * <p>Note: Permanent and event-bound buffs are skipped for the same reason as above: they are never ticked, so there is no
      * countdown to lengthen.
@@ -364,18 +364,18 @@ public class BuffManager {
      * The name a rule uses for a shield ({@code "buff": "护盾"}).
      *
      * <p>It is <b>not</b> part of {@link #hasState}'s vocabulary, deliberately: a shield is a <i>scalar</i> on the
-     * combatant, and a raw grant ({@code Battle.grantShield}) leaves no buff behind - so "有盾" and
-     * "处于护盾状态" would answer differently in exactly the case where the difference is invisible. The name
+     * combatant, and a raw grant ({@code Battle.grantShield}) leaves no buff behind - so "has a shield" and
+     * "is in the shield state" would answer differently in exactly the case where the difference is invisible. The name
      * lives here, where it means "the timed shield buff", and the condition DSL keeps its own spelling
      * ({@code has_shield}).
      */
     public static final String SHIELD_STATE = "护盾";
 
     /**
-     * Whether one buff is the one a rule named - by state name (or 护盾), or by the attribute a modifier sits on.
+     * Whether one buff is the one a rule named - by state name (or 护盾, the shield state name), or by the attribute a modifier sits on.
      *
      * <p>The name vocabulary is the same one the documents and {@code has_state} use, and the translation from a
-     * DOT's element to its name ({@code FIRE} to 灼烧) is {@link #DOT_STATES}, reversed here so the two directions
+     * DOT's element to its name ({@code FIRE} to 灼烧 (burn)) is {@link #DOT_STATES}, reversed here so the two directions
      * cannot drift.
      */
     private static boolean isNamed(AbstractBuff buff, String stateName, AttributeType attribute) {
@@ -398,7 +398,7 @@ public class BuffManager {
     }
 
     /**
-     * The document's name for a DOT's element ({@code FIRE} to 灼烧), or {@code null} for an element no document
+     * The document's name for a DOT's element ({@code FIRE} to 灼烧 (burn)), or {@code null} for an element no document
      * names as a state.
      */
     private static String stateNameOf(DamageElement element) {
@@ -419,7 +419,7 @@ public class BuffManager {
      * than keeping a second element to name map that could drift from it.
      *
      * @param element the DOT's element, or {@code null}
-     * @return 灼烧 / 触电 / 裂伤 / 风化, or {@code null}
+     * @return 灼烧 (burn) / 触电 (shock) / 裂伤 (bleed) / 风化 (windshear), or {@code null}
      */
     /** The document's name for "韧性被削减至 0" (see {@link #hasState}). */
     public static final String BROKEN_STATE = "弱点击破";
@@ -432,8 +432,8 @@ public class BuffManager {
      * Whether {@code stateName} is a name the engine's state tables know as a <b>rolled</b> state.
      *
      * <p>Used to validate {@code "scale": "cast_applied:<状态名>"} at load time: the closed set is the control states
-     * (冻结 / 纠缠 / 禁锢) and the four DOT states (灼烧 / 触电 / 裂伤 / 风化) - the states that reach the field
-     * through {@code Battle.tryApplyDebuff}, which is what the counter counts. Note: 嘲讽 is deliberately absent: no
+     * (冻结 (frozen) / 纠缠 (entangled) / 禁锢 (imprisoned)) and the four DOT states (灼烧 / 触电 / 裂伤 / 风化) - the states that reach the field
+     * through {@code Battle.tryApplyDebuff}, which is what the counter counts. Note: 嘲讽 (taunt) is deliberately absent: no
      * document counts taunts, and whether the marker belongs to the control class is still an open decision (see
      * ROADMAP).
      *
@@ -451,7 +451,7 @@ public class BuffManager {
      * Removes up to {@code count} {@link StatModifierBuff} instances on one attribute, <b>newest first</b>.
      *
      * <p><b>Why this exists.</b> "…stacking up to 3 time(s). At the start of the wearer's turn or after using
-     * Ultimate, removes 1 stack(s) of this effect" (relic set 131 "星如我见的领航员") is a shape that appears
+     * Ultimate, removes 1 stack(s) of this effect" (relic set 131 "the Navigator who sees stars as I do") is a shape that appears
      * in many texts, and the engine already models the stacking half ({@code MODIFY_ATTR} with
      * {@code max_stacks}). What was missing is the way back: a stack could grow but never shrink, so such an
      * effect could only be modelled by dropping half of its text. The data side of that is the trigger op
@@ -531,7 +531,7 @@ public class BuffManager {
     }
 
     /**
-     * Lets every buff react to a finished attack（知更鸟[协奏]/缇宝结界的"after our side attacks"）.
+     * Lets every buff react to a finished attack (Robin's [协奏] / Tribbie's zone's "after our side attacks").
      * Called by {@link CanHit#afterAttack(Battle, CanHit, CanHit, List, double)}.
      */
     public void afterAttack(Battle battle, CanHit attacker, CanHit mainTarget,
@@ -671,8 +671,8 @@ public class BuffManager {
      * Removes every buff on this unit whose clock belongs to {@code clockOwner} - the anchor's death (M-42 ③).
      *
      * <p>Note: Without this, an anchored buff is a <b>leak</b>: its clock was somebody else's turns, and that somebody
-     * will never take another one. 星期日's [蒙福者] says it outright ("当星期日陷入无法战斗状态时，[蒙福者]效果
-     * 也会被解除"), and the generic reason is stronger than the sentence - "spend it on my turns" is meaningless
+     * will never take another one. 星期日's [蒙福者] says it outright ("when 星期日 falls into the cannot-fight state, the [蒙福者] effect
+     * is dispelled too"), and the generic reason is stronger than the sentence - "spend it on my turns" is meaningless
      * once I am gone.
      *
      * @param clockOwner the unit that just died
@@ -779,7 +779,7 @@ public class BuffManager {
      * @return {@code true} = a {@link StateBuff} with that name is on us
      */
     /**
-     * Whether any state on us <b>defers a lethal blow</b> (2026-10-02; reader: 140's 月茧之庇).
+     * Whether any state on us <b>defers a lethal blow</b> (2026-10-02; reader: 140's Moon Cocoon Ward (月茧之庇)).
      *
      * <p>Asked by {@code Battle} at the two moments that matter: before it commits a death, and at the carrier's own
      * turn (where a still-present deferral is committed). By type, not by name -- see {@link DeferredDeathBuff}.
@@ -836,7 +836,7 @@ public class BuffManager {
         if (BROKEN_STATE.equals(wanted)) {
             return instance instanceof com.laosun.aluminium.models.enemy.Enemy enemy && enemy.isBroken();
         }
-        // A named DOT answers to its NAME too (2026-09-30): the element table below only knows 灼烧/触电/裂伤/风化,
+        // A named DOT answers to its NAME too (2026-09-30): the element table below only knows the four DOT states (灼烧/触电/裂伤/风化),
         // while the corpus also asks about [游丝] by name. A named THUNDER DOT therefore answers BOTH 游丝 and 触电 -- which is
         // exactly the sentence "[游丝]状态下也被视为陷入了触电状态".
         for (DotBuff dot : allBuffsOf(DotBuff.class)) {

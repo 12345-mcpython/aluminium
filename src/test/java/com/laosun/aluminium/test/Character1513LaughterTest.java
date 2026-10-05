@@ -12,11 +12,11 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1513："获得 1／4／6 个笑点" -  - 三句各自给的那一半 (2026-10-02).
+ * 1513: "gain 1/4/6 笑点" - - the half each of the three sentences gives (2026-10-02).
  *
  * <p>笑点 is a PARTY-scoped, uncapped counter that ALREADY existed (declared by 1502 as `max: 21448364`); these
  * readings are about HER grants, each the sentence's own number. Note: The counter is shared, so the sum test is the point --
- * that is what "队伍级" means, and `partyResourceValue` is the accessor `Character1502Test` already uses.
+ * that is what "party-level" means, and `partyResourceValue` is the accessor `Character1502Test` already uses.
  */
 public class Character1513LaughterTest {
     private static final int AVENTURINE = 1513;
@@ -24,30 +24,30 @@ public class Character1513LaughterTest {
     private static final int MONSTER = 1002011;
     private static final String LAUGH = "笑点";
 
-    /** "战技…获得 4 个笑点" */
+    /** "Skill ... gain 4 笑点" */
     @Test
     public void herSkillGivesFour() {
         Scene scene = fight();
         Assertions.assertEquals(0, scene.battle.partyResourceValue(LAUGH), "the battle starts with none");
         scene.battle.castImmediate(scene.her.getSkills().get(SkillType.SKILL), scene.her, List.of());
-        Assertions.assertEquals(4, scene.battle.partyResourceValue(LAUGH), "「获得 4 个笑点」");
+        Assertions.assertEquals(4, scene.battle.partyResourceValue(LAUGH), "\"gain 4 笑点\"");
     }
 
-    /** "终结技…获得 6 个笑点" */
+    /** "Ultimate ... gain 6 笑点" */
     @Test
     public void herUltimateGivesSix() {
         Scene scene = fight();
         scene.battle.castImmediate(scene.her.getSkills().get(SkillType.ULTRA), scene.her, List.of());
-        Assertions.assertEquals(6, scene.battle.partyResourceValue(LAUGH), "「获得 6 个笑点」");
+        Assertions.assertEquals(6, scene.battle.partyResourceValue(LAUGH), "\"gain 6 笑点\"");
     }
 
-    /** "队友施放攻击后…以及 1 个笑点" -- a REAL teammate attack, not a hand-fired event. */
+    /** "after a teammate casts an attack ... and 1 笑点" -- a REAL teammate attack, not a hand-fired event. */
     @Test
     public void aTeammateAttackGivesOne() {
         Scene scene = fight();
         scene.battle.castImmediate(scene.mate.getSkills().get(SkillType.COMMON), scene.mate,
                 List.of(scene.battle.enemies.getFirst()));
-        Assertions.assertEquals(1, scene.battle.partyResourceValue(LAUGH), "「以及 1 个笑点」");
+        Assertions.assertEquals(1, scene.battle.partyResourceValue(LAUGH), "\"and 1 笑点\"");
     }
 
     /** THE SHARED COUNTER: all three in one battle sum, because 笑点 is party-scoped. */

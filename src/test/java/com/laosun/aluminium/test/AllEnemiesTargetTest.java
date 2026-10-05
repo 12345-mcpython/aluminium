@@ -24,19 +24,19 @@ import java.util.Random;
  *
  * <p><b>Why it had to exist.</b> Every group selector until now read {@code Battle.allies}:
  * {@code all_allies} / {@code party} / {@code other_allies} are the party, and {@code target} / {@code attacker}
- * are single units. So "对敌方全体" - a phrase in a large part of the corpus - had no spelling at all, and the only
- * way to write it was to hit one enemy, which is a different mechanic. Its first reader is 姬子's Talent
- * ("对敌方全体目标造成等同于姬子140%攻击力的火属性伤害", {@code HimekoChargeTest}); the same selector is what
- * 云璃's ultimate needs for "使敌方全体陷入嘲讽状态".
+ * are single units. So "all enemies" - a phrase in a large part of the corpus - had no spelling at all, and the only
+ * way to write it was to hit one enemy, which is a different mechanic. Its first reader is Himeko (姬子)'s Talent
+ * ("deals fire damage equal to 140% of Himeko's ATK to all enemy targets", {@code HimekoChargeTest}); the same selector is what
+ * Yunli (云璃)'s ultimate needs for "make all enemies enter the taunted state".
  *
  * <p>Note: The failure this guards against is the mirror image: a group selector that read the wrong list would apply
- * "敌方全体" to <b>our own team</b>. The battle here has two enemies and our side at full HP for exactly that
+ * "all enemies" to <b>our own team</b>. The battle here has two enemies and our side at full HP for exactly that
  * reason, and the assertion is on both.
  */
 public class AllEnemiesTargetTest {
     private static final double EPS = 1e-6;
 
-    /** 姬子: a real character with a damaging Talent (AoEAttack, Fire), which is what {@code DAMAGE} reads. */
+    /** Himeko (姬子): a real character with a damaging Talent (AoEAttack, Fire), which is what {@code DAMAGE} reads. */
     private static final int OWNER = 1003;
     private static final int LEVEL = 80;
     private static final int ICE_EDGE = 1002011;
@@ -55,11 +55,11 @@ public class AllEnemiesTargetTest {
         Assertions.assertTrue(fixture.first.getCurrentHp() < firstBefore, "the first enemy was hit");
         Assertions.assertTrue(fixture.second.getCurrentHp() < secondBefore, "and so was the second");
         Assertions.assertEquals(ourSideBefore, ourSideHp(fixture.battle), EPS,
-                "「敌方全体」 is the other camp -- our side must not be touched");
+                "「all enemies」 is the other camp -- our side must not be touched");
     }
 
     /**
-     * Two enemies take the <b>same</b> instance, because "全体" is one effect that reaches each of them.
+     * Two enemies take the <b>same</b> instance, because "all" is one effect that reaches each of them.
      *
      * <p>Identical monsters in identical state, so equal damage is the observable meaning of "the selector is a
      * list and the op settles one instance per victim" rather than "the first one is the target". Note: Crit is switched

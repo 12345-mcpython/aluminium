@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 杰帕德's eidolon 1, verified through the engine's own reading (2026-09-28, round 130).
+ * Gepard (杰帕德)'s eidolon 1, verified through the engine's own reading (2026-09-28, round 130).
  *
  * <p><b>How the source settled it.</b> `TriggerInterpreter.modifyRule` dispatches on which field the effect carries: `amount` is a
  * per-turn count, `effect_turns` is a duration, `effect_max_stacks` is a stack cap, `effect_percent` is the rule's effect

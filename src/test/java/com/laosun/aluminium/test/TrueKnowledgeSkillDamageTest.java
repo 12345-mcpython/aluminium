@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Capability ② and the clause it unlocks (2026-10-02): "…造成的战技伤害提高 #2(20)%".
+ * Capability (2) and the clause it unlocks (2026-10-02): "... raise the Skill damage dealt by #2(20)%".
  *
  * The control is RNG-identical: the ode is cast in BOTH readings, aimed at him in one and at 昔涟 in the other, so the same casts draw the same random numbers and the only difference is
  * whether [真知] landed on him. (Measured: comparing against "no ode at all" moved the basic attack by 0.11% of pure RNG drift, which swamped the gate.)
@@ -33,13 +33,13 @@ public class TrueKnowledgeSkillDamageTest {
         double[] skillElsewhere = hit(false, SkillType.SKILL);
         double[] basicAtHim = hit(true, SkillType.COMMON);
         double[] basicElsewhere = hit(false, SkillType.COMMON);
-        System.out.println("[true_knowledge_dmg] SKILL: " + skillAtHim[0] + " with 【真知】 on him, "
+        System.out.println("[true_knowledge_dmg] SKILL: " + skillAtHim[0] + " with [真知] on him, "
                 + skillElsewhere[0] + " without it (captured " + skillAtHim[1] + " bp)");
         System.out.println("[true_knowledge_dmg] COMMON: " + basicAtHim[0] + " with it, " + basicElsewhere[0]
                 + " without it");
         double skillRatio = skillAtHim[0] / skillElsewhere[0];
         double basicRatio = basicAtHim[0] / basicElsewhere[0];
-        Assertions.assertTrue(skillRatio > 1.05, "his SKILL hits much harder with 【真知】 up: " + skillRatio);
+        Assertions.assertTrue(skillRatio > 1.05, "his SKILL hits much harder with [真知] up: " + skillRatio);
         // The BASIC's move is the OTHER clause of the same sentence (the +30% attack for Erudition, which is +0.84 on ~5= +0.111%), NOT a gate leak. A boost that lost its
         // `from_skill SKILL` gate would move this ratio to the skill's own ~1.39 and fail here.
         Assertions.assertTrue(basicRatio < 1.01,

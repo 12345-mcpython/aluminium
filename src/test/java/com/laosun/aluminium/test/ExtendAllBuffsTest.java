@@ -17,9 +17,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * "使自身所有增益效果延长 1 回合" (2026-10-02): `EXTEND_BUFF` with `kind: all`.
+ * "extends all of your own positive effects by 1 turn" (2026-10-02): `EXTEND_BUFF` with `kind: all`.
  *
- * <p>ONE VARIABLE: 甲 puts a two-turn buff on 乙 in both runs, and 乙's own extender differs only in HOW it says what to lengthen.
+ * <p>ONE VARIABLE: A (甲) puts a two-turn buff on B (乙) in both runs, and B's own extender differs only in HOW it says what to lengthen.
  */
 public class ExtendAllBuffsTest {
     private static final int FIRST = 1002;
@@ -34,7 +34,7 @@ public class ExtendAllBuffsTest {
                 "「使自身**所有**增益效果延长 1 回合」-- the buff came from 甲, and it must still be lengthened");
     }
 
-    /** Note: Naming the buff keeps the shipped origin filter: 乙 did not apply it, 甲 did. */
+    /** Note: Naming the buff keeps the shipped origin filter: B (乙) did not apply it, A (甲) did. */
     @Test
     public void namingTheBuffKeepsTheOriginFilter() {
         Assertions.assertFalse(survivesTheTicks(ExtendKind.BY_NAME),
@@ -45,7 +45,7 @@ public class ExtendAllBuffsTest {
 
     // ==================================================================
 
-    /** builds the scene, extends, takes two ticks, and asks whether 甲's buff is still there. */
+    /** builds the scene, extends, takes two ticks, and asks whether A (甲)'s buff is still there. */
     private static boolean survivesTheTicks(ExtendKind kind) {
         Character first = CharacterFactory.create(FIRST, 80);
         first.setTriggerTable(new TriggerTable(FIRST, List.of(
@@ -78,7 +78,7 @@ public class ExtendAllBuffsTest {
         return second.getBuffManager().hasState(MARK);
     }
 
-    /** 甲's buff: two turns, put on the OTHER ally. */
+    /** A (甲)'s buff: two turns, put on the OTHER ally. */
     private static EffectSpec mark() {
         EffectSpec e = new EffectSpec();
         TriggerSpecs.set(e, "op", "APPLY_BUFF");
@@ -88,7 +88,7 @@ public class ExtendAllBuffsTest {
         return e;
     }
 
-    /** 乙's extender: one turn, either "所有" or the shipped name form -- the only difference between the runs. */
+    /** B (乙)'s extender: one turn, either "all" (所有) or the shipped name form -- the only difference between the runs. */
     private static EffectSpec extend(ExtendKind kind) {
         EffectSpec e = new EffectSpec();
         TriggerSpecs.set(e, "op", "EXTEND_BUFF");

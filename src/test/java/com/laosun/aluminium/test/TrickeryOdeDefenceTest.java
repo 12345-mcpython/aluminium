@@ -40,7 +40,7 @@ public class TrickeryOdeDefenceTest {
         Battle battle = new Battle(List.of(cyrene, cipher), List.of(marked, plain), new Random(0));
         battle.startBattle();
         battle.processRequests();
-        // The mark is applied by 赛飞儿's OWN ultimate rule (`talent_patron_on_ult`, ULT_CAST -> APPLY_BUFF 老主顾), so the judge does not have to construct a buff by hand.
+        // The mark is applied by Cipher (赛飞儿)'s OWN ultimate rule (`talent_patron_on_ult`, ULT_CAST -> APPLY_BUFF 老主顾), so the judge does not have to construct a buff by hand.
         cipher = battle.characters.get(1);
         com.laosun.aluminium.models.skill.Skill ult =
                 cipher.getSkills().get(com.laosun.aluminium.enums.SkillType.ULTRA);

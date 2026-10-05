@@ -22,9 +22,9 @@ import java.util.Random;
  * How long a <b>shield</b> lasts, and the {@code has_shield} condition that asks whether one is still up.
  *
  * <p><b>The hole this closes.</b> A shield used to be a bare number on the combatant
- * ({@code Battle.grantShield}) that <b>nothing ever took off</b>: 三月七's Skill said "持续3回合", the rule carried
+ * ({@code Battle.grantShield}) that <b>nothing ever took off</b>: March 7th's Skill said "持续3回合", the rule carried
  * {@code "turns": 3}, and the field was read, validated and then silently dropped - the shield stayed for the rest
- * of the battle. That is not a cosmetic difference, because "持有护盾的…" is a <b>condition</b>: 三月七's 天赋
+ * of the battle. That is not a cosmetic difference, because "持有护盾的…" is a <b>condition</b>: March 7th's talent (天赋)
  * counter fires "当持有护盾的我方目标受到敌方目标攻击后", so a shield that never expires would have kept that
  * counter alive for the whole fight instead of for three turns. Both halves are pinned here - the lifetime, and
  * what the condition answers while it runs out.
@@ -50,7 +50,7 @@ public class ShieldDurationTest {
      *
      * <p>Note: Not decoration: "持续N回合" is counted in the <b>carrier's</b> turns, so a test that takes "the caster's
      * turn" has to be sure the ally's turn did not slip in first - and two real characters' speeds are a fact
-     * about the data that changes whenever a panel is corrected (停云 is already faster than 姬子). The fixture
+     * about the data that changes whenever a panel is corrected (Tingyun (停云) is already faster than Himeko (姬子)). The fixture
      * therefore puts the caster far ahead and the ally far behind, which makes the order a property of the test.
      */
     private static final double CASTER_SPEED = 200;

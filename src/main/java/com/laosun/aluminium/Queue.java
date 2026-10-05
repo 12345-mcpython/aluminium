@@ -229,7 +229,7 @@ public final class Queue {
         }
         // A unit at zero speed has no action value at all (cycleTime = 10000 / speed), so there is nothing to schedule: it is
         // skipped rather than refused (2026-10-02). The game states this for the two memosprites whose panel says so --
-        // "小伊卡的速度保持为0…并且不会出现在行动序列上" (1409's 1140903; 1415's 德谬歌 has the same panel row). Such a unit stays in the battle --
+        // "小伊卡的速度保持为0…并且不会出现在行动序列上" (1409's 1140903; 1415's Demiurge (德谬歌) has the same panel row). Such a unit stays in the battle --
         // targetable, castable at, commandable -- and simply never takes a turn.
         // Note: Before this, {@link Signal}'s guard turned the whole battle into an exception the moment one was summoned, which made
         // every clause that needs such a memosprite on the field unjudgeable.

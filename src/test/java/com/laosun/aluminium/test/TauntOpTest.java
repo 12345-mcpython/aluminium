@@ -18,14 +18,14 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * {@code TAUNT} - "使目标陷入嘲讽状态，持续N回合" (2026-09-2).
+ * {@code TAUNT} - "使目标陷入嘲讽状态，持续N回合" (make the target enter the taunted state for N turns) (2026-09-2).
  *
  * <p><b>Why the op exists at all.</b> The engine already had the hard part: {@code TauntBuff} is a pure marker whose
  * constraint lives in target selection ("as long as it is attached to a living unit, single-target attacks and the
- * centre of a blast can only pick that unit"). What was missing was any way for <b>data</b> to attach it - 云璃's
- * ultimate (every enemy), 千冶-刃's skill (one enemy, 1 turn) and 波提欧's [绝命对峙] all say it.
+ * centre of a blast can only pick that unit"). What was missing was any way for <b>data</b> to attach it - Yunli's
+ * ultimate (every enemy), 千冶-刃 (Qianye - Blade)'s skill (one enemy, 1 turn) and Boothill's [绝命对峙] all say it.
  *
- * <p>Note: It is <b>not</b> the same thing as "被敌方攻击的概率提高" (三月七 / 杰帕德 / 玲可): that is a soft weight, it
+ * <p>Note: It is <b>not</b> the same thing as "被敌方攻击的概率提高" (March 7th / Gepard / Lynx): that is a soft weight, it
  * carries no number in any document, and it is registered as a data gap instead of being guessed here.
  */
 public class TauntOpTest {
@@ -79,7 +79,7 @@ public class TauntOpTest {
         Assertions.assertTrue(refused.getMessage().contains("permanent"), refused.getMessage());
     }
 
-    /** 千冶-刃's Skill states it: one cast, one taunted enemy. */
+    /** 千冶-刃 (Qianye - Blade)'s Skill states it: one cast, one taunted enemy. */
     @Test
     public void theAuthoredRuleTauntsTheAimedEnemy() {
         Assertions.assertEquals(1, TriggerTables.of(1507).ruleCount(TriggerEvent.SKILL_CAST),
@@ -107,7 +107,7 @@ public class TauntOpTest {
     private static Enemy dummy() {
         Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
         // Note: TAUNT goes through the resist pipeline now (an unstated probability is a 100% BASE chance, not "bypasses
-        // 效果抵抗"), so the fixture states the other side of that roll: 冰锋's own 30% 效果抵抗 would otherwise make
+        // 效果抵抗 (effect resistance)), so the fixture states the other side of that roll: Ice Edge (冰锋)'s own 30% effect resistance would otherwise make
         // every case here a coin flip. The pipeline itself is pinned by DebuffResistTest.
         enemy.setAttribute(com.laosun.aluminium.enums.AttributeType.EFFECT_RESISTANCE,
                 new com.laosun.aluminium.models.DoubleValue(0));

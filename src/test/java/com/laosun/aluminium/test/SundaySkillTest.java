@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 星期日（1313）的战技"纸醉金迷"(131302) - the shipped content that the two conditions of M-41 were added for.
+ * Sunday's (1313) Skill "纸醉金迷" (131302) - the shipped content that the two conditions of M-41 were added for.
  *
  * <p><b>The document, and what each clause needed.</b> "使指定我方单体角色<b>及其召唤物</b>立即行动，并使其造成的伤害提高
  * #2[i]%，若目标拥有召唤物，则造成的伤害提高效果额外提高 #4[i]%，持续 #3[i]回合。…当星期日对"同谐"命途的角色施放该
@@ -30,7 +30,7 @@ import java.util.Random;
  * <ul>
  *   <li>"及其召唤物" is the {@code target_and_summon} selector (M-3): the chosen ally <b>and its</b>
  *       memosprite, not the caster's;</li>
- *   <li>"若目标拥有召唤物" is {@code target_summon_count} - the same question 遗器 12asks about the wearer,
+ *   <li>"若目标拥有召唤物" is {@code target_summon_count} - the same question relic 12 asks about the wearer,
  *       asked about the ally;</li>
  *   <li>"对同谐…无法触发" is the {@code !} prefix on {@code target has_path 同谐} - an <b>exception</b>, and the
  *       reason a negation exists at all (the DSL's condition list is an AND).</li>
@@ -48,11 +48,11 @@ public class SundaySkillTest {
     private static final double EPS = 1e-6;
 
     private static final int SUNDAY = 1313;
-    /** 姬子 - 智识 (Erudition), so the advance happens; and she owns no summon, which is the 15% side. */
+    /** Himeko - 智识 (Erudition), so the advance happens; and she owns no summon, which is the 15% side. */
     private static final int ERUDITION_ALLY = 1003;
-    /** 知更鸟 - 同谐 (Harmony), so the advance must <b>not</b> happen. */
+    /** Robin - 同谐 (Harmony), so the advance must <b>not</b> happen. */
     private static final int HARMONY_ALLY = 1309;
-    /** 阿格莱雅 - 记忆 (Remembrance) and a memosprite owner, so she is the "target has a summon" side. */
+    /** Aglaea - 记忆 (Remembrance) and a memosprite owner, so she is the "target has a summon" side. */
     private static final int MEMOSPRITE_ALLY = 1402;
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
@@ -60,7 +60,7 @@ public class SundaySkillTest {
     private static final int SKILL_SLOT = 2;
     /** His ultimate's slot. */
     private static final int ULTIMATE_SLOT = 3;
-    /** 姬子's CRIT DMG with no buffs - she is the fixture the derived value is measured against. */
+    /** Himeko's CRIT DMG with no buffs - she is the fixture the derived value is measured against. */
     private static final double HARMONY_BARE_CRIT_DMG =
             CharacterFactory.create(ERUDITION_ALLY, LEVEL).getAttribute(AttributeType.CRIT_ATTACK).get();
 
@@ -90,7 +90,7 @@ public class SundaySkillTest {
     /**
      * 同谐 gets no advance - the sentence's exception, and the half a positive spelling could not express.
      *
-     * <p>知更鸟 and Sunday himself are both 同谐, so without the gate this rule would push exactly the units the
+     * <p>Robin and Sunday himself are both 同谐, so without the gate this rule would push exactly the units the
      * sentence excludes (and self-cast would push him too).
      */
     @Test
@@ -311,7 +311,7 @@ public class SundaySkillTest {
      * A battle where Sunday has already cast his ultimate at {@code allyCid}.
      *
      * <p>Note: The ally is made <b>faster</b> than him, deliberately: the case below has to observe "her turn, and his
-     * turn has not happened yet", and Sunday's own speed ties with 姬子's - a tie is an arbitrary order, so the
+     * turn has not happened yet", and Sunday's own speed ties with Himeko's - a tie is an arbitrary order, so the
      * window could contain his turn and the measurement would read two ticks as one (it did: 2 instead of 3).
      */
     private static Battle ultimateBattle(int allyCid, Character ignored) {

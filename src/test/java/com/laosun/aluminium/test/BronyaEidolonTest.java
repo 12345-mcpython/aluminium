@@ -14,9 +14,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1101 布洛妮娅 (Bronya): her 阵地 trace and her first <b>Eidolon</b>.
+ * 1101 Bronya (布洛妮娅): her 阵地 trace and her first <b>Eidolon</b>.
  *
- * <p>星魂 1 养精蓄锐 is the case {@code engine.md} §9 and {@code SkillPointGameParityTest} had carried as "not
+ * <p>Eidolon 1, 养精蓄锐, is the case {@code engine.md} §9 and {@code SkillPointGameParityTest} had carried as "not
  * implemented" for as long as the trigger table has existed - "施放战技时，有 50% 的固定概率恢复 1 个战技点，该效果
  * 有 1 回合的触发冷却". The missing part was never one hook: it is a rule-level probability, a cooldown, and a
  * way to say "this belongs to an Eidolon", all three of which arrived together, which is why the rule can now be
@@ -34,7 +34,7 @@ public class BronyaEidolonTest {
     private static final double DEFENCE_TRACE = 0.2;
 
     // ==================================================================
-    // 阵地: "战斗开始时，我方全体的防御力提高20%，持续2回合"
+    // 阵地 (the battlefield trace): "战斗开始时，我方全体的防御力提高20%，持续2回合"
     // ==================================================================
 
     @Test
@@ -45,7 +45,7 @@ public class BronyaEidolonTest {
 
         Assertions.assertEquals(List.of(DEFENCE_TRACE), defenceBuffsOn(bronya), "20% DEF on the wearer");
         Assertions.assertEquals(List.of(DEFENCE_TRACE), defenceBuffsOn(ally),
-                "and on 我方全体 -- without an explicit target the effect would have buffed only Bronya");
+                "and on all of our side -- without an explicit target the effect would have buffed only Bronya");
     }
 
     @Test
@@ -64,7 +64,7 @@ public class BronyaEidolonTest {
     }
 
     // ==================================================================
-    // 星魂 1 养精蓄锐
+    // Eidolon 1, 养精蓄锐
     // ==================================================================
 
     @Test
@@ -97,7 +97,7 @@ public class BronyaEidolonTest {
     }
 
     // ==================================================================
-    // 星魂 6: the Skill's damage boost lasts one turn longer
+    // Eidolon 6: the Skill's damage boost lasts one turn longer
     // ==================================================================
 
     /**
@@ -118,7 +118,7 @@ public class BronyaEidolonTest {
         castSkillOn(battle, bronya, ally);
 
         Assertions.assertEquals(2, durationsOf(ally, AttributeType.ALL_DAMAGE_TYPE_BOOST).getFirst(), 0.0,
-                "1 turn from the Skill + 1 from 星魂 6");
+                "1 turn from the Skill + 1 from Eidolon 6");
         Assertions.assertEquals(2, durationsOf(bronya, AttributeType.DEFENCE).getFirst(), 0.0,
                 "the DEFENCE trace is hers too, and its own duration is untouched");
     }
@@ -134,7 +134,7 @@ public class BronyaEidolonTest {
         castSkillOn(battle, bronya, ally);
 
         Assertions.assertEquals(1, durationsOf(ally, AttributeType.ALL_DAMAGE_TYPE_BOOST).getFirst(), 0.0,
-                "at 星魂 5 the boost still lasts exactly its own 1 turn");
+                "at Eidolon 5 the boost still lasts exactly its own 1 turn");
     }
 
     // ==================================================================

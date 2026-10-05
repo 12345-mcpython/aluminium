@@ -16,14 +16,14 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 四条内容的内容层判据 -  - 即"那条从句真的接上了引擎的能力吗"。
+ * Content-layer judges for four pieces of content - that is, "is that clause really wired to an engine capability".
  *
- * <p>底层的机制已各自验过（第 12 件 `ADD_ELEMENTAL_WEAKNESS`、第 18 件 `random_absent`／`party_first`、
- * 第 19 件 `turns`），所以这里只问内容的接线：加进去的正是那条从句该加的那个属性。
+ * <p>The underlying mechanics were each verified on their own (piece 12 {@code ADD_ELEMENTAL_WEAKNESS}, piece 18 {@code random_absent}/{@code party_first},
+ * piece 19 {@code turns}), so the only question here is the content's wiring: what is added is exactly the attribute that clause should add.
  *
- * <p>Note: 四条各用自己的触发方式 -  - 这也是"内容真的接上了"的一部分：
- * `1315` 用真实的终结技（满能量）；`1405`／`1006` 用两个事件；`1310` 用 `markTechniqueUsed` 再开战
- * （Note: 顺序：秘技状态必须在 `startBattle()` 之前登记，`Battle:42` 在任何 `BATTLE_START` 规则之前加它）。
+ * <p>Note: each of the four uses its own trigger - which is part of "the content is really wired":
+ * {@code 1315} uses the real ultimate (full energy); {@code 1405}/{@code 1006} use two events; {@code 1310} uses {@code markTechniqueUsed} and then starts the battle
+ * (Note: order: the technique state must be registered before {@code startBattle()}, {@code Battle:42} adds it before any {@code BATTLE_START} rule).
  */
 public class ContentWeaknessClausesTest {
     private static final int MONSTER = 1002011;
@@ -33,7 +33,7 @@ public class ContentWeaknessClausesTest {
         return (Enemy) battle.getOpponents(battle.characters.getFirst()).getFirst();
     }
 
-    /** 装光锥 23050 也好、什么都不装也好，都不影响这四条 -  - 它们是角色自己的规则。 */
+    /** Whether light cone 23050 is equipped or nothing is, neither affects these four - they are the character's own rules. */
     private static Battle battleWith(Character wearer) {
         Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
         Battle battle = new Battle(List.of(wearer), List.of(enemy), new Random(0));
@@ -53,7 +53,7 @@ public class ContentWeaknessClausesTest {
 
     @Test
     public void charactersOwnClausesLand() {
-        // ---- 1315 波提欧：终结技"为指定敌方单体添加物理弱点，持续 2 回合"（turns 由 13ccc3补上）
+        // ---- 1315 Boothill: the ultimate "adds a Physical weakness to one designated enemy, lasting 2 turns" (turns supplied by 13ccc3)
         Character bto = CharacterFactory.create(1315, LEVEL);
         Battle b1 = battleWith(bto);
         Enemy e1 = enemyOf(b1);
@@ -63,7 +63,7 @@ public class ContentWeaknessClausesTest {
         System.out.println("[content] 1315 ultimate -> physical=" + e1.isWeakTo(DamageElement.PHYSICAL));
         Assertions.assertTrue(e1.isWeakTo(DamageElement.PHYSICAL), "the ultimate's own clause inserts Physical");
 
-        // ---- 1405 那刻夏：天赋"击中后添加 1 个随机属性弱点，持续 3 回合，优先未拥有"
+        // ---- 1405 Anaxa: the talent "after a hit, adds 1 random elemental weakness for 3 turns, preferring one the target does not have"
         Character ana = CharacterFactory.create(1405, LEVEL);
         Battle b2 = battleWith(ana);
         Enemy e2 = enemyOf(b2);
@@ -75,7 +75,7 @@ public class ContentWeaknessClausesTest {
         Assertions.assertEquals(1, added.size(), "exactly one random weakness is inserted");
         Assertions.assertFalse(before.contains(added.getFirst()), "and it is one the target did not have");
 
-        // ---- 1006 银狼：战技"添加 1 个场上我方目标持有属性的弱点"（技能说明：编队第一位）
+        // ---- 1006 Silver Wolf: the skill "adds 1 weakness of an element held by a party target on the field" (skill description: the first slot)
         Character sw = CharacterFactory.create(1006, LEVEL);
         Battle b3 = battleWith(sw);
         Enemy e3 = enemyOf(b3);
@@ -87,12 +87,13 @@ public class ContentWeaknessClausesTest {
 
     @Test
     public void theTechniqueClauseAppliesToEveryEnemy() {
-        // ---- 1310 流萤：秘技"每个波次开始时为敌方全体添加火属性弱点，持续 2 回合"
+        // ---- 1310 Firefly: the technique "at the start of every wave, adds a Fire weakness to all enemies for 2 turns"
         Character firefly = CharacterFactory.create(1310, LEVEL);
-        // Note: 只需一个没有火弱点的（它是对照：技前没有、技后必须有），第二个不设条件 -  - 
-        // 需要的对照是"它原本没有"，不是"两个都没有"（实测那个区间里只有 1 个没有火）。
-        // Note: 两个都必须原本没有火弱点 -  - Note: 上一版让第二个随便一个，
-        // 而它挑中了本来就有火的 1002011 so 那句 true 从来没证明过任何事。
+        // Note: only one enemy with no Fire weakness is needed (it is the control: absent before the technique, and
+        // it must be present after it); the second has no condition - the control needed is "it did not have it
+        // originally", not "neither of them had it" (measured: only 1 in that id range had no Fire).
+        // Note: both must originally have no Fire weakness - Note: the previous version let the second be any enemy,
+        // and it picked 1002011, which already had Fire, so that true never proved anything.
         List<Enemy> picked = new ArrayList<>();
         for (int cid = 1002011; cid <= 1002100 && picked.size() < 2; cid++) {
             try {
@@ -101,20 +102,20 @@ public class ContentWeaknessClausesTest {
                     picked.add(candidate);
                 }
             } catch (RuntimeException ignored) {
-                // 没有这个 id 就跳过
+                // skip ids that do not exist
             }
         }
         Assertions.assertEquals(2, picked.size(),
                 "need TWO enemies that do NOT already have Fire, or the assertion proves nothing");
         Enemy a = picked.get(0);
         Enemy b = picked.get(1);
-        // Note: markTechniqueUsed 必须在 startBattle() 之前 -  - startBattle 会在任何 BATTLE_START 规则之前加那个状态
+        // Note: markTechniqueUsed must come before startBattle() - startBattle adds that state before any BATTLE_START rule
         Battle battle = new Battle(List.of(firefly), List.of(a, b), new Random(0));
         battle.markTechniqueUsed(firefly);
         battle.startBattle();
-        // Note: WAVE_START 由 WaveManager.nextWave() 发（它不在 startBattle() 里）。
-        // Note: 它不带 actor、不带 subject，像 BATTLE_START 一样是"关于战斗的事实"。
-        // Note: 这里直接发，因为本条要证的是"1310 的从句接上了引擎"；"WAVE_START 会被发出"本身已有 10 个先例。
+        // Note: WAVE_START is fired by WaveManager.nextWave() (it is not inside startBattle()).
+        // Note: it carries no actor and no subject, and like BATTLE_START it is "a fact about the battle".
+        // Note: it is fired directly here, because what this case must prove is "1310's clause is wired to the engine"; "WAVE_START does get fired" already has 10 precedents.
         battle.fireTriggers(TriggerEvent.WAVE_START);
         System.out.println("[content] 1310 technique -> a=" + a.isWeakTo(DamageElement.FIRE)
                 + " b=" + b.isWeakTo(DamageElement.FIRE));
@@ -123,13 +124,13 @@ public class ContentWeaknessClausesTest {
     }
 
     /**
-     * Note: 内容层的另一半：那条从句真的把 	urns 交给了引擎吗。
+     * Note: the other half of the content layer: does that clause really hand the turns to the engine.
      *
-     * <p>底层已证（第 19 件），所以这里只问内容：1315 那条规则带
-     * "turns": 2，于是它的物理弱点应当会过期。
+     * <p>The underlying layer is already proven (piece 19), so the only question here is the content: the 1315 rule carries
+     * "turns": 2, so its Physical weakness ought to expire.
      *
-     * <p>Note: 变异点：删掉 1315.json 里的 "turns": 2 so 这条必红。否则这弱点永久留着 -  - 
-     * 而"永久"与"文档说的 2 回合"在断言眼里长得一模一样，除非真的走几个回合。
+     * <p>Note: mutation point: delete "turns": 2 from 1315.json and this must go red. Otherwise the weakness stays forever - and
+     * "forever" and "the 2 turns the document states" look exactly alike to an assertion, unless some turns really pass.
      */
     @Test
     public void theInsertedWeaknessFromContentActuallyExpires() {
@@ -144,8 +145,8 @@ public class ContentWeaknessClausesTest {
 
         int steps = 0;
         while (enemy.isWeakTo(DamageElement.PHYSICAL) && !battle.isOver() && steps < 60) {
-            battle.stepForward();      // Note: 只换 currentMove（实测：它不执行回合）
-            battle.afterMove();        // 结束那次行动 - - 计时弱点就在这里递减
+            battle.stepForward();      // Note: it only swaps currentMove (measured: it does not execute a turn)
+            battle.afterMove();        // ends that action - the timed weakness is decremented right here
             steps++;
         }
         System.out.println("[content] 1315 timed: physical gone after " + steps + " steps (over=" + battle.isOver() + ")");

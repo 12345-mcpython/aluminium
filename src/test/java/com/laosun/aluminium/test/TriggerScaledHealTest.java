@@ -18,7 +18,7 @@ import java.util.Random;
  * {@code HEAL} / {@code SHIELD} scaled by a Max HP, instead of a flat amount.
  *
  * <p><b>Why.</b> The game states most heals and shields as a share of somebody's Max HP - relic set 106's
- * 4-piece is "恢复等同于生命上限 8% 的生命值", and the skill-side loader has carried the same idea in
+ * 4-piece is "restores health equal to 8% of Max HP", and the skill-side loader has carried the same idea in
  * {@code skill_effects.json}'s {@code scale} field since P10-3. The trigger table had only {@code amount}, so an
  * ability written that way could not be authored at all: the number is different for every character and every
  * level, which is exactly why writing one in the file would be wrong.
@@ -112,8 +112,8 @@ public class TriggerScaledHealTest {
     /**
      * {@code scale} + {@code amount} is NOT a conflict: the amount is the flat addend.
      *
-     * <p>Note: This case used to assert the opposite ("either a flat number or a share, not both"), and 1001 三月七's
-     * Skill is why it changed: "抵消等同于三月七 5% 防御力 + 60 伤害的护盾" is a share <b>plus</b> a constant, which
+     * <p>Note: This case used to assert the opposite ("either a flat number or a share, not both"), and 1001 March 7th (三月七)'s
+     * Skill is why it changed: "a shield that absorbs damage equal to 5% of March 7th's defence + 60" is a share <b>plus</b> a constant, which
      * the loader refused outright. Nothing shipped stated both (the refusal made that impossible), so allowing it
      * moved no existing content. What IS still refused is a {@code scale} with an {@code amount} and no
      * {@code percent} -- the scale names what the share is OF, so a missing share is a missing number.

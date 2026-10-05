@@ -64,7 +64,7 @@ public class EnemyScalerTest {
 
     @Test
     public void peakBossHpMatchesTheMeasuredValue() {
-        // 802501003 = Despair "将杀王棋" Starcrusher Swarm King (Simulated): template 8025010,
+        // 802501003 = Despair "将杀王棋" (Checkmate King's Gambit) Starcrusher Swarm King (Simulated): template 8025010,
         // HP multiplier 1.9916, group 3 - Lv120 (HP multiplier 1938.634), wave-group elite group
         // InfiniteEliteGroup 369's HPRatio 6.2.
         MonsterTemplate template = Constant.MONSTER_TEMPLATES.get(8025010);

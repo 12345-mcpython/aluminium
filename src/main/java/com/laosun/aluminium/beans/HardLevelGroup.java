@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName;
 
 /**
  * Level-based enemy scaling, deserialized from {@code hard_level_group.json}:
- * {@code {组号: {等级: {attack, defence, health, speed, stance, effect_hit_rate, effect_resistance}}}}.
+ * {@code {组号 (group number): {等级 (level): {attack, defence, health, speed, stance, effect_hit_rate, effect_resistance}}}}.
  *
  * <p>Note: The first five entries are <b>zone multipliers</b> (multiplied onto the template's base
  * values); the last two are <b>additive values</b> - {@code effect_resistance} is <b>added</b> to the

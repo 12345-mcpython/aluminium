@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1504's 行迹"头狼"(1504103): "不死途在场时，我方目标造成的暴击伤害提高 40%，我方目标追加攻击造成的暴击伤害额外提高 80%".
+ * 1504's 行迹 (trace) "头狼" (Alpha Wolf) (1504103): "不死途在场时，我方目标造成的暴击伤害提高 40%，我方目标追加攻击造成的暴击伤害额外提高 80%" (while 不死途 is on the field, our targets' CRIT DMG is raised by 40%, and our targets' follow-up attacks' CRIT DMG is raised by a further 80%).
  *
  * <p>Both halves are party-wide, and the fixture proves it with an ALLY: the ally's crit damage rises (first half) and its follow-up rises further (second half). The
  * control battle is the same ally without 1504 in the party.

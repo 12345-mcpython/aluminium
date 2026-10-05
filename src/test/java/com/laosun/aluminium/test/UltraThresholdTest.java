@@ -21,7 +21,7 @@ import java.util.Random;
  * <pre>
  *   Yunli (云璃) 1221  needs 120 / cap 240      Feixiao (飞霄) 1220  needs 6  / cap 12
  *   Argenti (银枝) 1302  needs  90 / cap 180      Cyrene (昔涟) 1415  needs 12 / cap 24 (stacks, see §9.5)
- *   绯英 1505  needs 240 / cap 480
+ *   Evanescia (绯英) 1505  needs 240 / cap 480
  * </pre>
  *
  * <p>The character docs say "energy required to cast 120 (cap 240)" - "required" is the threshold.

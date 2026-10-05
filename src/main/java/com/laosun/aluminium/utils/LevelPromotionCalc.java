@@ -23,7 +23,7 @@ public final class LevelPromotionCalc {
      *
      * <p>Note: <b>The promotion count MUST be clamped to >= 0</b> (fixed in P8-1): previously a low level
      * combined with {@code promotion=true} produced a negative value (Lv1 to {@code 1/10 - 1 = -1}),
-     * so "already promoted" actually squeezed the Lv1 stat sheet down to 0.6 x  (Jing Yuan's (景元) base
+     * so "already promoted" actually squeezed the Lv1 stat sheet down to 0.6 x  (Jing Yuan's (景元, 1204) base
      * HP 158.4 to 95.04, which happens to equal his attack 95.04 - misreading the two is very easy
      * and looks like an index shift). A level-1 character cannot have a "negative promotion", so the
      * lower bound must be 0.

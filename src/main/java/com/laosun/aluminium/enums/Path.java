@@ -14,10 +14,10 @@ import java.util.Map;
  * {@code character_data.json}</b>, every tier matches for all 93 characters):
  *
  * <pre>
- *   protection（存护）  150
- *   destruction（毁灭） 125
+ *   protection (存护)  150
+ *   destruction (毁灭) 125
  *   all other Paths     100
- *   single（巡猎）/ all（智识） 5 from lower than the standard tier, do not treat it as 100
+ *   single (巡猎) / all (智识) 5 - lower than the standard tier, do not treat it as 100
  * </pre>
  *
  * <p>{@code mt} is the raw string from {@code character_data.json}; it has only 9 possible
@@ -81,7 +81,7 @@ public enum Path {
 
     /**
      * The nine Paths by their <b>Chinese</b> name - the spelling a rule file writes
-     * ({@code target has_path 同谐}).
+     * ({@code target has_path 同谐} (Harmony)).
      *
      * <p>Kept here rather than in the condition DSL for the same reason {@link #BY_MT} is: "a Path name means
      * this Path" is one fact, and the aggro table and the DSL must not be able to disagree about it.
@@ -123,7 +123,7 @@ public enum Path {
     }
 
     /**
-     * Look up a Path by its Chinese name (for manual input such as "存护/毁灭").
+     * Look up a Path by its Chinese name (for manual input such as "存护/毁灭", i.e. "Preservation/Destruction").
      *
      * @param name the Chinese Path name; unlisted to {@link #OTHER}
      * @return the Path (never {@code null})
@@ -138,7 +138,7 @@ public enum Path {
      *
      * <p>Both answers are needed and they are not interchangeable. {@link #fromName} is for data that may
      * legitimately carry a Path this build does not know (it must degrade to the 100 aggro tier rather than
-     * blow up). A <b>rule file</b> is different: {@code target has_path 同谐} with a typo would otherwise
+     * blow up). A <b>rule file</b> is different: {@code target has_path 同谐} (Harmony) with a typo would otherwise
      * become "the target is on some other Path", i.e. a condition that quietly means something else - so the
      * condition DSL refuses it at load time, and it needs a lookup that can say "not a Path".
      *

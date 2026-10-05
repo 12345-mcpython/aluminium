@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1415 昔涟's aura: "昔涟在场时，我方全体目标造成的伤害提高20.00%" -- carried by the rule the file ALREADY had,
+ * 1415 Cyrene (昔涟)'s aura: "昔涟在场时，我方全体目标造成的伤害提高20.00%" (while Cyrene is on the field, all of our targets deal 20.00% more damage) -- carried by the rule the file ALREADY had,
  * `talent_party_damage` (round 1 added a byte-identical duplicate, which round 3 removed after the mutation failed to move
  * anything: the original kept supplying 0.2 whatever the duplicate said).
  *
@@ -37,7 +37,7 @@ public class CyreneAuraTest {
                 "the aura adds 20% to a teammate and nothing when she is absent: " + withoutHer + " -> " + withHer);
     }
 
-    /** A teammate's ALL_DAMAGE_TYPE_BOOST with 昔涟 on the team or not. */
+    /** A teammate's ALL_DAMAGE_TYPE_BOOST with Cyrene on the team or not. */
     private static double boost(boolean withCyrene) {
         Character teammate = CharacterFactory.create(TEAMMATE, LEVEL);
         Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);

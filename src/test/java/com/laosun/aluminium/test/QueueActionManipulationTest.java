@@ -335,7 +335,7 @@ public class QueueActionManipulationTest {
         return EnemyFactory.create(1002011, 90, 1);
     }
 
-    /** The enemy in the team (Ice Edge 冰锋, 132 speed): first round {@code 10000/132  x  1.5 ~= 113.64}, so it acts before a speed-100 character (150). */
+    /** The enemy in the team (Ice Edge, 冰锋, 132 speed): first round {@code 10000/132  x  1.5 ~= 113.64}, so it acts before a speed-100 character (150). */
     private static CanHit dummyOf(Battle battle) {
         return battle.enemies.getFirst();
     }

@@ -24,9 +24,9 @@ import java.util.Set;
  *
  * <p><b>The hole this closes.</b> Before this, {@code ResourceManager} could hold a value but no content could
  * declare one, and the condition DSL could not read one: {@code gain} answered {@code 0} for an unknown id and
- * {@code value} answered {@code 0} too, so a rule about "充能" was a no-op that reported nothing. 41 of the 9
+ * {@code value} answered {@code 0} too, so a rule about "充能" (charge) was a no-op that reported nothing. 41 of the 9
  * character documents in the corpus gate something on a count, which is the largest single gap the scan found
- * (ROADMAP §13.) - and a whole family of kits (Acheron's [残梦], Feixiao's [飞黄], Cyrene's [追忆]) is built on
+ * (ROADMAP §13.) - and a whole family of kits (Acheron's [残梦] (Dreamscape), Feixiao's [飞黄] (Flying Yellow), Cyrene's [追忆] (Recollection)) is built on
  * it.
  *
  * <p><b>Three things are pinned here</b>, each of which would otherwise be a rule that loads and quietly does the
@@ -47,7 +47,7 @@ import java.util.Set;
 public class CharacterResourceTest {
     private static final double EPS = 1e-6;
 
-    /** 姬子: the shipped character whose file declares a resource. */
+    /** Himeko: the shipped character whose file declares a resource. */
     private static final int HIMEKO = 1003;
     /** An ordinary character with no rules and no declarations ({@link TestCharacters}). */
     // 2026-09-30: a REAL character with no `resources` block (1002 is a bare rule list). This used to be a cid with
@@ -78,7 +78,7 @@ public class CharacterResourceTest {
         Assertions.assertEquals(1, table.resources().size(), "one declaration");
         ResourceSpec declared = table.resources().getFirst();
         Assertions.assertEquals(CHARGE, declared.id());
-        Assertions.assertEquals(3, declared.max(), "「上限3点」 is the cap, and it is stated, not inferred");
+        Assertions.assertEquals(3, declared.max(), "「上限3点」 (cap 3) is the cap, and it is stated, not inferred");
         Assertions.assertEquals(0, declared.initial(), "absent \"initial\" means 0");
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.BREAK), "and the rules are read from the same file");
         Assertions.assertEquals(Set.of(CHARGE), table.referencedResources(),
@@ -176,7 +176,7 @@ public class CharacterResourceTest {
 
         Assertions.assertTrue(himeko.getResources().has(CHARGE), "she declares it in characters/1003.json");
         Assertions.assertEquals(0, himeko.getResources().value(CHARGE),
-                "at 0: 「战斗开始时获得1点充能」 is a rule, so it is the battle that fills it");
+                "at 0: 「战斗开始时获得1点充能」 (gain 1 charge at battle start) is a rule, so it is the battle that fills it");
         Assertions.assertEquals(3, himeko.getResources().get(CHARGE).getMax(), "with the declared cap");
     }
 
@@ -194,7 +194,7 @@ public class CharacterResourceTest {
     @Test
     public void theThresholdDecidesWhetherTheRuleFires() {
         Assertions.assertEquals(0, fireAtCharge(2), "one short of the cap");
-        Assertions.assertEquals(1, fireAtCharge(3), "exactly at it -- 「达到上限」 is >=, not ==");
+        Assertions.assertEquals(1, fireAtCharge(3), "exactly at it -- 「达到上限」 (reaching the cap) is >=, not ==");
     }
 
     /**
@@ -365,14 +365,14 @@ public class CharacterResourceTest {
         return battle.fireTriggers(TriggerEvent.ALLY_ATTACK, owner, null, 1, 0);
     }
 
-    /** A plain character carrying {@code charge} of 充能, registered exactly as the assembly point would. */
+    /** A plain character carrying {@code charge} of 充能 (charge), registered exactly as the assembly point would. */
     private static Character characterWithCharge(int charge) {
         Character owner = CharacterFactory.create(PLAIN, LEVEL);
         owner.getResources().register(CHARGE, 3, charge);
         return owner;
     }
 
-    /** A rule gated on "充能达到上限". */
+    /** A rule gated on "充能达到上限" (charge reaching its cap). */
     private static TriggerSpec chargeThresholdRule() {
         return ruleWithCondition("self_resource:" + CHARGE + " >= 3");
     }

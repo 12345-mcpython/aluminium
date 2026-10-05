@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 行迹"医者": "娜塔莎<b>提供的</b>治疗量提高10%" - the provider's side, read from the healer.
+ * trace (行迹) "医者": "娜塔莎<b>提供的</b>治疗量提高10%" - the provider's side, read from the healer.
  *
  * <p>The reader is {@code OUTGOING_HEALING_BOOST}, which {@code Battle.heal} takes from the unit applying the heal, so the
  * number has to show up as a ratio between two healers healing the same kind of target by the same base amount. The

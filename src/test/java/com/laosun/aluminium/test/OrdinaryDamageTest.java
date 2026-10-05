@@ -16,7 +16,7 @@ import java.util.Random;
 
 /**
  * A rule-driven ORDINARY damage instance (2026-09-30), reader 1505 绯英's technique:
- * "进入战斗后，对敌方全体造成等同于绯英 100% 攻击力的物理属性伤容".
+ * "after entering battle, deal Physical damage equal to 100% of 绯英's ATK to all enemies".
  *
  * <p>Note: The first version of this test believed an ordinary instance credits the VICTIM ENERGY inside `applyDamage` and measured
  * 0 -> 0: the crediting lives in the attack pipeline, not there, so that reading cannot tell the two paths apart. The real

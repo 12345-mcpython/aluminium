@@ -19,12 +19,12 @@ import java.util.Random;
  * Firing limits on a trigger rule: {@code cooldown} (in the owner's own turns), {@code per_turn} (a count
  * within one of them) and {@code once_per_battle}.
  *
- * <p><b>Why this vocabulary exists.</b> The game's rule text is full of "该效果每回合只能触发1次" /
- * "该效果有1回合的触发冷却" / "单场战斗中只能触发1次" / "该效果每回合可触发<b>2</b>次" - a per-rule limit is the
+ * <p><b>Why this vocabulary exists.</b> The game's rule text is full of "this effect can trigger only 1 time per turn" /
+ * "this effect has a trigger cooldown of 1 turn" / "can trigger only 1 time per battle" / "this effect can trigger <b>2</b> times per turn" - a per-rule limit is the
  * difference between "Misha's counter counts attacks" and "Misha's counter counts attacks once per turn".
  * Without it a data author has to choose between over-triggering and not modelling the mechanic at all, and the
  * over-triggering version is a wrong number with nothing to see. Note: The last form is why {@code per_turn} is a
- * <b>count</b> and not a flag: 三月七's 天赋 counter is "每回合可触发2次", and {@code cooldown: 1} can only ever
+ * <b>count</b> and not a flag: 三月七's talent counter is "can trigger 2 times per turn", and {@code cooldown: 1} can only ever
  * say "once".
  *
  * <p><b>Where the state lives, and why that is the whole design.</b> A trigger table is compiled once
@@ -55,7 +55,7 @@ public class TriggerLimitTest {
         Character owner = battle.characters.getFirst();
 
         Assertions.assertEquals(1, fire(battle, owner), "the first event fires the rule");
-        Assertions.assertEquals(0, fire(battle, owner), "the second is refused: 单场战斗中只能触发1次");
+        Assertions.assertEquals(0, fire(battle, owner), "the second is refused: can trigger only 1 time per battle");
         Assertions.assertEquals(0, fire(battle, owner), "and it never comes back");
         Assertions.assertEquals(1, battle.getSkillPoints(), "exactly one of the three firings paid out");
     }
@@ -93,7 +93,7 @@ public class TriggerLimitTest {
      * The subtle half of "the owner's turns": a rule that reacts to <b>other people's</b> actions still
      * counts <b>its owner's</b> turns.
      *
-     * <p>This is what makes "每回合只能触发1次" mean "once on my turn" for a talent like Tingyun's
+     * <p>This is what makes "can trigger only 1 time per turn" mean "once on my turn" for a talent like Tingyun's
      * "when the buffed ally kills someone" - the limit belongs to the character whose table it is, not
      * to whoever happened to set the event off.
      */
@@ -116,7 +116,7 @@ public class TriggerLimitTest {
     // 3. Per-turn count, counted in the owner's turns like the cooldown
     // ==================================================================
 
-    /** "该效果每回合可触发2次": the third firing in one turn is refused, the first two are not. */
+    /** "this effect can trigger 2 times per turn": the third firing in one turn is refused, the first two are not. */
     @Test
     public void perTurnTwoLetsTheRuleFireTwiceInOneTurn() {
         Battle battle = battleWith(perTurn(2));
@@ -124,7 +124,7 @@ public class TriggerLimitTest {
 
         Assertions.assertEquals(1, fire(battle, owner), "the first firing is allowed");
         Assertions.assertEquals(1, fire(battle, owner), "and the second");
-        Assertions.assertEquals(0, fire(battle, owner), "the third is refused: 每回合可触发2次");
+        Assertions.assertEquals(0, fire(battle, owner), "the third is refused: can trigger 2 times per turn");
         Assertions.assertEquals(2, battle.getSkillPoints(), "exactly two firings paid out");
     }
 
@@ -148,7 +148,7 @@ public class TriggerLimitTest {
      * Somebody else's turn does not hand the count back.
      *
      * <p>The mirror of {@link #otherPeoplesTurnsDoNotCountTheCooldownDown}, and the reason both limits are
-     * counted on the <b>owner</b>: "每回合" belongs to the character whose rule it is, not to whoever happened to
+     * counted on the <b>owner</b>: "per turn" belongs to the character whose rule it is, not to whoever happened to
      * set the event off.
      */
     @Test
@@ -331,7 +331,7 @@ public class TriggerLimitTest {
     }
 
     /**
-     * The same rule with a per-turn count: "该效果每回合可触发 N 次".
+     * The same rule with a per-turn count: "this effect can trigger N times per turn".
      *
      * @param perTurn how many firings one of the owner's turns allows
      */

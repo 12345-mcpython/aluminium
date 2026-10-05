@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Random;
 
-/** 1209's trace 凌霜: "处于[智剑连心]效果时，效果抵抗提高 20%". */
+/** 1209's trace 凌霜: "while in the [智剑连心] effect, effect resistance is increased by 20%". */
 public class YanqingTraceTest {
     private static final int WEARER = 1209;
     private static final int LEVEL = 80;

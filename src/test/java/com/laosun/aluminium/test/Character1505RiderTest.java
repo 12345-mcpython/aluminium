@@ -13,10 +13,10 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1505 绯英's skill rider (2026-09-30): "当绯英持有[好活当赏]时，施放战技可对受到攻击的敌方目标造成 8% 的物理属性欢愉伤容".
+ * 1505 绯英's skill rider (2026-09-30): "while 绯英 holds [好活当赏], casting the Skill deals 8% Physical Elation damage to the enemy targets that were attacked".
  *
  * <p>Two-sided on the SAME cast: with the resource her skill costs the enemy extra health, and after spending it the same cast
- * deals strictly less. That is what "持有[好活当赏]时" means, read on real numbers.
+ * deals strictly less. That is what "while holding [好活当赏]" means, read on real numbers.
  */
 public class Character1505RiderTest {
     private static final int WEARER = 1505;
@@ -43,11 +43,11 @@ public class Character1505RiderTest {
     public void theRiderNeedsTheGifts() {
         double withGifts = skillDamage(true);
         double without = skillDamage(false);
-        System.out.println("[1505-rider] the skill took " + withGifts + " while holding 【好活当赏】 and "
+        System.out.println("[1505-rider] the skill took " + withGifts + " while holding [好活当赏] and "
                 + without + " after spending it (difference " + (withGifts - without) + ")");
         Assertions.assertTrue(without > 0, "the skill itself deals damage");
         Assertions.assertTrue(withGifts > without,
-                "and holding 【好活当赏】 adds the 8% Elation rider on top");
+                "and holding [好活当赏] adds the 8% Elation rider on top");
     }
 
     /**
@@ -68,6 +68,6 @@ public class Character1505RiderTest {
         Assertions.assertEquals(0.08, effect.getPercent(), 1e-9, "8% of the derived scale");
         Assertions.assertEquals("self_attr:ATTACK", effect.getScale(), "which is her own attack");
         Assertions.assertEquals("physical", effect.getElement(), "the element her text names");
-        Assertions.assertEquals("ELATION", effect.getDamageType(), "and the type it calls 欢愉伤容");
+        Assertions.assertEquals("ELATION", effect.getDamageType(), "and the type it calls Elation damage");
     }
 }

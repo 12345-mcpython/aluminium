@@ -43,7 +43,7 @@ import java.util.Random;
  * firing on the ultimate -- or on a basic attack -- if the events cannot both fire.
  *
  * <p><b>2026-09-2: the split is three-way, not two-way.</b> {@code SKILL_CAST} used to mean "any cast
- * that is not an ultimate", so 普攻 fired it too, and shipped content that says "施放战技时" (relic set
+ * that is not an ultimate", so basic attacks fired it too, and shipped content that says "when casting the Skill" (relic set
  * 109's ATK buff, Robin's 模进乐段) silently fired on basic attacks. {@code BASIC_ATTACK} now carries
  * the basic attack, a map attack / technique / talent fires none of the three, and
  * {@code ALLY_ATTACK} is unchanged (every attack that lands, ultimate included).
@@ -156,7 +156,7 @@ public class UltCastTriggerTest {
      *
      * <p>This pins the over-trigger that had shipped rather than a behaviour that was already right:
      * {@code SKILL_CAST} used to mean "any cast that is not an ultimate", so relic set 109
-     * ("施放战技时攻击力提高20%") was handing out its ATK buff on 普攻 as well - and the note inside
+     * ("when casting the Skill, ATK is increased by 20%") was handing out its ATK buff on basic attacks as well - and the note inside
      * that file claimed the emitter's split already covered it. The fingerprints (2 vs 4) say which
      * rule ran without touching the engine's internals.
      */
@@ -170,7 +170,7 @@ public class UltCastTriggerTest {
         cast(battle, battle.characters.getFirst(), SkillType.COMMON);
         Assertions.assertEquals(BASIC_ATTACK_POINTS, battle.getSkillPoints(),
                 "a basic attack must fire ONLY the BASIC_ATTACK rule: " + SKILL_CAST_POINTS
-                        + " would mean SKILL_CAST fired for 普攻");
+                        + " would mean SKILL_CAST fired for a basic attack");
     }
 
     /** A basic attack is still an attack: {@code ALLY_ATTACK} keeps firing for it. */

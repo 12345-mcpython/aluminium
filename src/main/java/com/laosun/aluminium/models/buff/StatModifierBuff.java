@@ -294,7 +294,7 @@ public class StatModifierBuff extends AbstractBuff {
     /**
      * A stat modifier is a negative effect exactly when it landed in the <b>debuff</b> half of the attribute - 
      * the same {@code sourceRole} that {@code TriggerInterpreter} decided from the sign of {@code percent}. So
-     * "攻击力 −30%" is a debuff 解除 can remove, while "攻击力 +50%" is not, without either of them needing a
+     * "ATK -30%" is a debuff that dispel (解除) can remove, while "ATK +50%" is not, without either of them needing a
      * separate flag.
      */
     @Override

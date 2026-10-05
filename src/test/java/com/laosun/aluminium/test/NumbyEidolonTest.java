@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 110's 星魂 2: "施放终结技后攻击力提高#1%，持续2回合".
+ * 110's eidolon 2: "after casting the ultimate, ATK is increased by #1%, lasting 2 turns".
  *
  * <p>ATTACK is a FLAT attribute, so the share scales `baseValue()`, read after the battle starts (rounds 125 and 133).
  */

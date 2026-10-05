@@ -12,10 +12,10 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1309 知更鸟："领域展开期间进入战斗后，每个波次开始时知更鸟恢复 5 点能量" (2026-10-02).
+ * 1309 Robin (知更鸟): "after entering battle while the field is expanded, Robin restores 5 energy at the start of each wave" (2026-10-02).
  *
  * <p>Two-way on purpose: with the technique's field up she gains five at each wave's start, and without it she gains nothing. The
- * gate is the repo's own convention for "秘技" (`self has_state 秘技`, the same one 1408's technique rule uses), and it holds because
+ * gate is the repo's own convention for "technique" (`self has_state 秘技`, the same one 1408's technique rule uses), and it holds because
  * `applyTechniqueStates()` runs before any rule.
  */
 public class RobinWaveEnergyTest {

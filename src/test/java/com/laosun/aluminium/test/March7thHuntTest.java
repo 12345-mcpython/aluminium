@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1224 Hunt March th, from her own file (2026-09-29, round 203): the 师父 marker, the charge it enables, and the speed share.
+ * 1224 Hunt March th, from her own file (2026-09-29, round 203): the 师父 (master) marker, the charge it enables, and the speed share.
  *
  * <p>The speed is asserted against a hand-built 20% reference in the SAME pipeline (ratio 0.5), because round 19showed a share of a zero base compares nothing and a
  * bare "greater than before" lets any percentage pass.

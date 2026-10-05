@@ -169,7 +169,7 @@ public final class SkillExecutor {
         // first entry, which for a support cast is the ally chosen. Note: It is NOT "everything the effect
         // reached": an AOE reaches several units and only the first of them is named here, so a rule that
         // cares about coverage still counts `hit_count`, and the per-target events (HP_LOST etc.) carry their
-        // own subject. The distinction is what "使指定我方单体…" needs (2026-09-28, M-35): before this the
+        // own subject. The distinction is what "make a designated single ally ..." needs (2026-09-28, M-35): before this the
         // field was null for every cast, and "the ally I chose" was unexpressible.
         CanHit aimed = chosen.isEmpty() ? null : chosen.getFirst();
 
@@ -205,7 +205,7 @@ public final class SkillExecutor {
             // OUR attacks, so the unit it was aimed at is always on the other side -- no rule of ours could ask
             // about it (`target == self` would be permanently false, and there is no selector for "an enemy").
             // Passing it would be information with no reader, which is the shape this project keeps refusing.
-            // Note: category rides along (2026-09-28): "施放 2 次普攻/战技/终结技" must tell the three slots apart, and this
+            // Note: category rides along (2026-09-28): "cast a basic attack/Skill/Ultimate 2 times" must tell the three slots apart, and this
             // is the one event that fires once per CAST (DEALING_DAMAGE would count hits).
             battle.fireTriggers(TriggerEvent.ALLY_ATTACK, user, aimed, hits.size(), 0, category, skill.getSkillSlot(), weakHitCount);
         }
@@ -294,7 +294,7 @@ public final class SkillExecutor {
             if ("Restore".equals(spec.getEffect())) {
                 battle.heal(user, target, amount);
             } else {
-                // `user` is the provider, so a Shield skill is boosted by ITS owner's "提供的护盾量提高" - the same
+                // `user` is the provider, so a Shield skill is boosted by ITS owner's "raise the shield amount provided" - the same
                 // rule the SHIELD op follows (see Battle.grantShield).
                 battle.grantShield(user, target, amount);
             }
@@ -435,7 +435,7 @@ public final class SkillExecutor {
         if (params == null || params.isEmpty()) {
             return;
         }
-        // ? The description names the base (2026-09-29): "防御力" -> DEF, "生命上限" -> Max HP, otherwise ATK. 18 documents scale a DAMAGE clause
+        // ? The description names the base (2026-09-29): "DEF" -> DEF, "Max HP" -> Max HP, otherwise ATK. 18 documents scale a DAMAGE clause
         // off Max HP and 3 off DEF, and multiplying ATTACK for those dealt the wrong damage.
         AttributeType baseAttribute = data.damageBaseAttribute();
         double base = user.getAttribute(baseAttribute).get() * params.getFirst();
@@ -451,7 +451,7 @@ public final class SkillExecutor {
         double totalDamage = 0;
 
         // An ElationDamage row reads its params as [hits, per-hit share, final split share] (2026-10-02; readers 8009/8010
-        // slot 20, whose text is "造成 #1 次伤害，每次对敌方随机单体造成 #2%…。最后造成 #3%…由敌方全体均分").
+        // slot 20, whose text is "deal #1 instances of damage, each dealing #2% to a random single enemy ... The last deals #3% ..., divided evenly among all enemies").
         // Note: The row's own `skill_effect` is AoEAttack, so without this branch the leading 8 is read as a MULTIPLIER -- 800% damage
         // -- which is the mis-reading the CAST_SKILL comment names as the reason the Elation auto-casts stay registered.
         // The damage type and the Elation boost already follow the data (2026-09-30 "slice 1b"), so only the row reading is new.
@@ -468,7 +468,7 @@ public final class SkillExecutor {
             // evenly over the instances this row settles (the hits plus the one final split instance).
             double elationStance = data.stanceFor(true) / Math.max(1, elationHits + 1);
             for (int i = 0; i < elationHits; i++) {
-                // "对敌方随机单体": re-drawn every hit, so a target that dies mid-way is simply not drawn again.
+                // "to a random single enemy": re-drawn every hit, so a target that dies mid-way is simply not drawn again.
                 CanHit victim = battle.randomOpponent(user);
                 if (victim == null) {
                     break;
@@ -532,7 +532,7 @@ public final class SkillExecutor {
                 Integer additional = data.bounceAdditionalHits(bounceShare);
                 int hits = (additional == null ? 0 : additional) + 1;
                 // plus whatever a rule has granted this slot (2026-10-02).
-                hits += user.skillHitBonus(skill.getSkillSlot());   // "额外造成 N 次": the total is N + 1
+                hits += user.skillHitBonus(skill.getSkillSlot());   // "additionally deal N instances": the total is N + 1
                 // H-3: for a bounce, `single` is the total toughness reduction of the whole skill,
                 // so it MUST be spread evenly over the hits; otherwise more hits means more reduction
                 double perHitStance = data.stanceFor(true) / Math.max(1, hits);
@@ -567,7 +567,7 @@ public final class SkillExecutor {
      */
     static SkillEffectSpec deliverableSpec(Skill skill) {
         SkillEffectSpec spec = SkillEffects.forSkill(skill);
-        // A third shape (2026-10-02): "奇袭" commands a copy of 1412's SKILL, which is a BUFF -- its work is done by the
+        // A third shape (2026-10-02): "surprise attack" commands a copy of 1412's SKILL, which is a BUFF -- its work is done by the
         // rule table (`skill_grants_military_merit` on SKILL_CAST), so there is no amount to restore or shield. `Rules` says
         // exactly that, and it has no parameter row to be ambiguous about.
         boolean supported = spec != null
@@ -581,7 +581,7 @@ public final class SkillExecutor {
      * Can this skill be delivered at all - as a swing, or as the one non-damaging shape the engine knows
      * ({@code Restore} / {@code Defence} with a clean parameter row)?
      *
-     * <p>Its reader is {@code CAST_SKILL}: "使其立即施放 1 次…" is a promise that something happens, and a rule
+     * <p>Its reader is {@code CAST_SKILL}: "make it cast 1 time immediately ..." is a promise that something happens, and a rule
      * pointing at a skill the engine has no definition for would keep that promise by doing nothing. 1414's own
      * skill is a {@code Defence} (a shield) and was refused by the earlier "must be damaging" guardrail; 1303's and
      * 1412's are {@code Support} buffs with no {@code skill_effects.json} entry, and are still refused - loudly.
@@ -610,7 +610,7 @@ public final class SkillExecutor {
     /**
      * Which {@link DamageType} a cast produces, read from the parsed skill data (2026-09-30).
      *
-     * <p>The only distinction today is 欢愉: the data spells it {@code ElationDamage} on the attack type, and
+     * <p>The only distinction today is Elation: the data spells it {@code ElationDamage} on the attack type, and
      * {@link SkillCategory} has parsed that value since the type table was written -- so a skill the game calls Elation damage
      * settles as {@link DamageType#ELATION}. Everything else stays NORMAL, exactly as before.
      * Note: Its boost is folded into the base in slice 1b (the type is deliberately not boostable).
@@ -629,12 +629,12 @@ public final class SkillExecutor {
         }
         hitTargets.add(target);                      // the fact of hitting (including targets that die afterwards) - "each time 1 target is attacked"
         // The cast's own category rides along (P10-4): it is what `Battle.assemble` reads to apply a scoped
-        // DMG boost ("普攻/战技/终结技造成的伤害提高 X%"), which the damage *type* cannot express -- every
+        // DMG boost ("damage dealt by basic attacks/Skills/Ultimates is raised by X%"), which the damage *type* cannot express -- every
         // in-battle cast produces DamageType.NORMAL. `data` is null for a hand-made or placeholder skill, and
         // then the instance has no scoped boost rather than a guessed one.
         // The DAMAGE TYPE follows the data (2026-09-30; readers: the nine `ElationDamage` skills -- 1501/1502/1505/1506/
-        // 8009/8010/1513, four of them already shipped and until now settling their 欢愉 damage as NORMAL).
-        // The 欢愉 damage boost is folded into the BASE (2026-09-30, slice 1b). `DamageType.ELATION` is deliberately
+        // 8009/8010/1513, four of them already shipped and until now settling their Elation damage as NORMAL).
+        // The Elation damage boost is folded into the BASE (2026-09-30, slice 1b). `DamageType.ELATION` is deliberately
         // NOT boostable -- the ordinary DMG-boost zone must not touch it -- so its own zone cannot ride `addBoost`, which is
         // gated on `isBoostable()`. Measured before this line: with `ELATION_DAMAGE_BOOST` at 0.8 the instance still read
         // x1.0. Super break folds `SUPER_BREAK_BOOST` into its base the same way, for the same reason.
@@ -653,7 +653,7 @@ public final class SkillExecutor {
         // CAST-LEVEL reader ("after the wearer casts a basic attack or skill", firing after settlement) sees all.
         damage.setHitTargets(hitTargets);
         // Note: The intended toughness reduction rides on the instance (2026-09-28): a `DEALING_DAMAGE` rule is handed this
-        // damage, and "本次伤害的削韧值" has to be readable there -- 1321/8006's super-break clauses are exactly that.
+        // damage, and "this damage's toughness reduction value" has to be readable there -- 1321/8006's super-break clauses are exactly that.
         // Note: Set BEFORE the settlement below: `DEALING_DAMAGE` is fired from inside `battle.applyDamage`.
         damage.setStance(stanceDamage);
         double settled = battle.applyDamage(target, damage);
@@ -686,12 +686,12 @@ public final class SkillExecutor {
         if (stanceDamage <= 0 || !damage.isCountsAsAttack() || !(target instanceof Enemy enemy)) {
             return 0;                                // additional damage / true damage does not reduce toughness
         }
-        // "使本次攻击的削韧值提高100%" (2026-09-28): the reduction this instance causes is multiplied by the attacker's
+        // "raise this attack's toughness reduction value by 100%" (2026-09-28): the reduction this instance causes is multiplied by the attacker's
         // toughness boosts -- read HERE, the one place that turns a nominal reduction into a settled one, and NOT inside
         // Battle.reduceToughness (which enemy skills and the demo script also call).
         double effectiveStance = stanceDamage * (1 + user.getBuffManager().toughnessBoost());
         // The instance is passed on: a weakness break caused by THIS cast has to be attributable to it
-        // ("施放战技…造成弱点击破时"), and damage is the only thing carrying the cast's category.
+        // ("when casting the Skill ... causes a weakness break"), and damage is the only thing carrying the cast's category.
         Battle.StanceResult stance = battle.reduceToughness(user, enemy, element, effectiveStance, damage.getCastCategory());
         return stance.breakDamage() + applySuperBreak(battle, user, enemy, element, stance.superBreakStance());
     }

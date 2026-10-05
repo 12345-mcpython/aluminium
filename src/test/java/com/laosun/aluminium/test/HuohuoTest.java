@@ -17,14 +17,14 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 藿藿 (121), from her own file (2026-09-28): 战技's cleanse, the ultimate's per-recipient energy, and [禳命].
+ * Huohuo (藿藿) (121), from her own file (2026-09-28): the Skill (战技)'s cleanse, the ultimate's per-recipient energy, and [禳命].
  *
  * <p><b>What it needed.</b> Nothing new: `DISPEL`, `other_allies`, `GAIN_ENERGY` with a per-target share of max energy, a
- * [`owner_max_hp` + constant] heal, `ticks_on: "self"`, and `target_when` with `target_hp_percent` for "每个当前生命值
- * 百分比 <= 50% 的我方目标各产生 1 次".
+ * [`owner_max_hp` + constant] heal, `ticks_on: "self"`, and `target_when` with `target_hp_percent` for "each of our targets whose current HP
+ * percentage is <= 50% produces 1 stack each".
  *
- * <p><b>What is registered</b> (the file's notes): 战技's "相邻目标" heal (no position axis), the talent's "强化后" variant
- * (a talent upgrade no gate can select) and its "或施放终结技时" trigger (no selector names a cast's caster for a heal).
+ * <p><b>What is registered</b> (the file's notes): the Skill (战技)'s "adjacent target" heal (no position axis), the talent's "after being enhanced" variant
+ * (a talent upgrade no gate can select) and its "or when casting the Ultimate" trigger (no selector names a cast's caster for a heal).
  */
 public class HuohuoTest {
     private static final int HUOHUO = 1217;

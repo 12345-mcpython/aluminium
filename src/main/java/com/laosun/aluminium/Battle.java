@@ -61,7 +61,7 @@ public class Battle {
 
     /**
      * The <b>player camp's roster</b> - every combatant fighting for us, in battlefield order: our
-     * characters plus any friendly {@link Summon} (a memosprite, 景元's [神君], …).
+     * characters plus any friendly {@link Summon} (a memosprite, Jing Yuan (景元)'s [神君], …).
      *
      * <p><b>Why this exists next to {@link #characters} rather than replacing it</b> (the friendly half of
      * L-8). The enemy side already has this split - {@link #enemies} is the camp and {@link #enemyUnits()}
@@ -115,7 +115,7 @@ public class Battle {
 
     /**
      * One living unit from the other side, chosen with the battle's own seeded randomness (2026-09-30; reader:
-     * 1505 绯英's ultimate, "对随机造成伤容的敌方目标造成 14%…").
+     * 1505 Evanescia (绯英)'s ultimate, "deals 14% to a random enemy target that deals damage…").
      *
      * <p>The roll lives here rather than in the interpreter for the same reason crit does: one seeded source means a judge
      * can pin determinism (same seed -> same pick) and still show the choice varies across seeds.
@@ -177,13 +177,13 @@ public class Battle {
      * The countdown units this battle has placed on the action order (M-49).
      *
      * <p>Kept in their own list, and Note: <b>not</b> in {@link #allies}: a countdown belongs to our camp (our rules react
-     * to its turn) but it is not a party member - were it in the roster, "我方全体" would buff it, `lowest_hp_ally`
+     * to its turn) but it is not a party member - were it in the roster, "all our side" would buff it, `lowest_hp_ally`
      * could pick it, and it would be a legal target for every ally-directed effect. See {@link Countdown}.
      */
     private final List<Countdown> countdowns = new ArrayList<>();
 
-    /** 2026-10-02：倒计时的只读入口（读者：1408 的变身倒计时判据，以及 150／1309 同类判据）。
-     *  Note: 名字避开字段 countdowns。 */
+    /** 2026-10-02: the read-only entry point for countdowns (readers: 1408's transformation countdown predicate, and the like predicates at 150/1309).
+     *  Note: The name avoids the field countdowns. */
     public List<Countdown> countdownUnits() {
         return List.copyOf(countdowns);
     }
@@ -199,7 +199,7 @@ public class Battle {
      *
      * <p>A technique happens OUTSIDE the battle, so the engine cannot observe it; the caller says so with {@link #markTechniqueUsed}, and
      * {@link #startBattle()} turns that into a plain {@code StateBuff} named "秘技" so content can ask for it with the vocabulary it already has
-     * (`self has_state 秘技`). 68 documents contain a "使用秘技后" clause and 29 a "下一次战斗开始时" one, so this is the gate they were all
+     * (`self has_state 秘技`). 68 documents contain a "after using the technique" clause and 29 a "when the next battle starts" one, so this is the gate they were all
      * waiting for.
      */
     private final List<CanHit> techniqueUsers = new ArrayList<>();
@@ -247,7 +247,7 @@ public class Battle {
         }
 
         /**
-         * The skill slot being cast (1 = 基本攻击, 2 = 战技, 3 = 终结技, …, the numbering {@code skills.json}
+         * The skill slot being cast (1 = basic attack, 2 = Skill, 3 = ultimate, …, the numbering {@code skills.json}
          * itself uses - see {@link Skill#getSkillSlot()}).
          */
         public int slot() {
@@ -280,7 +280,7 @@ public class Battle {
 
     /**
      * How many targets the <b>cast being delivered right now</b> has actually applied each named state to
-     * ("终结技每冻结1个目标，为三月七恢复6点能量").
+     * ("each target the ultimate freezes restores 6 energy to March 7th (三月七)").
      *
      * <p><b>Why the engine has to count it.</b> The number is not the number of targets <i>aimed at</i> - that one is
      * the event's hit count, which {@code per_target} already multiplies by. It is the number the <b>roll let
@@ -305,7 +305,7 @@ public class Battle {
      * <p>Called by the ops that roll for a state ({@code APPLY_CONTROL}, {@code APPLY_DOT}) and only when the roll
      * passed - a resisted application is not an application, which is the whole reason this counter exists.
      *
-     * @param stateName the state's name as the documents spell it (冻结 / 灼烧 / …)
+     * @param stateName the state's name as the documents spell it (Frozen / Burn / …)
      */
     public void recordCastApplied(String stateName) {
         if (stateName == null || stateName.isBlank()) {
@@ -317,7 +317,7 @@ public class Battle {
     /**
      * How many targets the current cast has applied {@code stateName} to ({@code 0} outside a cast's own events).
      *
-     * @param stateName the state's name (冻结 / 灼烧 / …)
+     * @param stateName the state's name (Frozen / Burn / …)
      * @return the landed count for this cast
      */
     public int castAppliedCount(String stateName) {
@@ -332,7 +332,7 @@ public class Battle {
      */
     public void endCastOutcome() {
         castApplied.clear();
-        // "施放…时" ends here: every event of this cast has been delivered, so a modifier stating
+        // "when casting ..." ends here: every event of this cast has been delivered, so a modifier stating
         // `"until": "cast_end"` has covered every heal the cast performed and nothing after it. Swept on both sides,
         // because either camp may carry one.
         for (CanHit unit : allies) {
@@ -376,7 +376,7 @@ public class Battle {
     }
 
     /**
-     * Skill points (战技点) policy (P8-4): one pool shared by the whole team, not one track per character.
+     * Skill points policy (P8-4): one pool shared by the whole team, not one track per character.
      *
      * <p>{@code Battle} itself does not know the skill point rules -- it only holds a
      * {@link SkillPointPolicy} and asks it once when "deciding to act" (see {@link #useSkill}).
@@ -417,7 +417,7 @@ public class Battle {
     /**
      * Directly restore skill points (P8-4), capped at the regular maximum.
      *
-     * <p>For explicit sources other than "basic attack +1": techniques, relics (the 4-piece 过客 set),
+     * <p>For explicit sources other than "basic attack +1": techniques, relics (the 4-piece Passerby set),
      * character mechanics.
      *
      * <p>This is also the single place the {@code SKILL_POINT_GAINED} trigger fires from,
@@ -501,7 +501,7 @@ public class Battle {
     /**
      * Units that are OWNED but NOT DEPLOYED, whose rules are asked without them ever acting (2026-10-02).
      *
-     * <p>Two documents start "获得该角色即生效，无需上场" (140's 月茇之庇, 1506's 999安全卫士), and the data files them under
+     * <p>Two documents start with "takes effect as soon as the character is obtained, no deployment needed" (140's Moon Cocoon's Ward (月茇之庇), 1506's 999 Safety Guard (999安全卫士)), and the data files them under
      * {@code AvatarGlobalBuffConfig} as global support skills. Note: Their tables cannot ride in `characters`: that list is the
      * roster the QUEUE is built from (L520), so a listener put there would take turns of its own. They are asked by a second
      * loop instead, and because they are in neither `allies` nor the queue they are never targeted and never act.
@@ -518,7 +518,7 @@ public class Battle {
     /**
      * The same, naming the table to ask.
      *
-     * <p>This is the overload "获得该角色后，或该角色在队伍中时" needs: a member of the party is heard through her WAREHOUSE clauses while
+     * <p>This is the overload "after the character is obtained, or while the character is in the party" needs: a member of the party is heard through her WAREHOUSE clauses while
      * keeping her own battle table, because replacing that table would silently delete her kit the moment she deployed.
      */
     public void registerWarehouseListener(Character listener, TriggerTable warehouse) {
@@ -534,15 +534,15 @@ public class Battle {
     }
 
     /**
-     * The CLASS of the debuff that just landed (2026-10-02; reader: 1506's "敌方对我方施加了控制类
-     * 负面状态"). Same shape as {@link #lastChangedResource}: a battle-level fact the condition DSL reads, set at the one chokepoint
+     * The CLASS of the debuff that just landed (2026-10-02; reader: 1506's "the enemy applied a control-type
+     * debuff to our side"). Same shape as {@link #lastChangedResource}: a battle-level fact the condition DSL reads, set at the one chokepoint
      * every landed debuff passes through. Note: Deliberately NOT folded into an existing argument slot -- the STATE_ENDED magnitude was once
      * put in `hitCount` and every reading of it was 0 until that was found.
      */
     private com.laosun.aluminium.enums.DebuffClass lastAppliedDebuffClass;
 
     /**
-     * The per-battle home of PARTY-scoped resources (2026-09-30; reader: the shared 笑点 counter). A resource like
+     * The per-battle home of PARTY-scoped resources (2026-09-30; reader: the shared [笑点] (laughs) counter). A resource like
      * that belongs to the party, not to whoever happened to declare it -- `ResourceManager` refuses to keep such a thing
      * per character, and this is the owner it asks for. Registered once at the start of the battle from the declarations.
      */
@@ -588,7 +588,7 @@ public class Battle {
         }
         listenToSkillPointChanges();
         // The units' buff managers hold the battle so a state that leaves a unit can be announced
-        // (2026-10-02; the STATE_ENDED event, whose reader is 1211's "[生息]结束时…").
+        // (2026-10-02; the STATE_ENDED event, whose reader is 1211's "when [生息] ends ...").
         for (Character c : characterQueue) {
             c.getBuffManager().setBattle(this);
         }
@@ -668,7 +668,7 @@ public class Battle {
     // NO BEFAN YOY DID IT
 
     /**
-     * The state that means "终结技已激活" (2026-10-02): a clause grants it and {@link #isUltraReady} honours it, which is the engine's one spelling of "激活终结技".
+     * The state that means "the ultimate is activated" (2026-10-02): a clause grants it and {@link #isUltraReady} honours it, which is the engine's one spelling of "activating the ultimate".
      * Not from the data -- the documents name the effect, not a state -- so it is named here once, like every other engine-side marker.
      */
     public static final String ULTIMATE_ACTIVATED_STATE = "终结技已激活";
@@ -680,7 +680,7 @@ public class Battle {
      * <p>The threshold comes from the skill data's {@code spNeed} (tbgd {@code AvatarSkillConfig.SPNeed},
      * see {@link SkillData#getSpNeed()}).
      * 5 of the 93 characters have a threshold below the maximum -- Yunli (云璃) 120/240,
-     * Argenti (银枝) 90/180, 绯英 240/480, Feixiao (飞霄) 6/12, Cyrene (昔涟) 12/24. When the data is missing
+     * Argenti (银枝) 90/180, Evanescia (绯英) 240/480, Feixiao (飞霄) 6/12, Cyrene (昔涟) 12/24. When the data is missing
      * it falls back to "fill {@code maxEnergy}" (the old behaviour).
      *
      * <p>After it is cast it is zeroed (see {@link #castUltra}): for the majority of characters whose
@@ -704,7 +704,7 @@ public class Battle {
         // EnergyProvider still applies exactly that rule (plus the threshold), so conventional
         // characters behave as before, while a stack provider may ignore energy entirely.
         if (user.getBuffManager().hasState(ULTIMATE_ACTIVATED_STATE)) {
-            // "激活终结技" (2026-10-02; reader: 1415's ultimate, "激活全体队友的终结技"): a clause can put a unit in a state where its ultimate is castable
+            // "activating the ultimate" (2026-10-02; reader: 1415's ultimate, "activates the ultimates of all teammates"): a clause can put a unit in a state where its ultimate is castable
             // NOW, whatever its own provider would say. Without this the sentence had no spelling at all -- readiness was the provider's alone.
             return true;
         }
@@ -830,7 +830,7 @@ public class Battle {
 
     public void startBattle() {
         status = Status.RUNNING;
-        // [WAREHOUSE] "获得该角色后，或该角色在队伍中时": a member carrying a `warehouse/<cid>.json` is heard through it, with her own
+        // [WAREHOUSE] "after the character is obtained, or while the character is in the party": a member carrying a `warehouse/<cid>.json` is heard through it, with her own
         // battle table untouched. Registered before every hook below, so a warehouse clause can answer the opening too.
         for (Character member : characters) {
             if (member == null) {
@@ -865,7 +865,7 @@ public class Battle {
      * In the data the map basic attack's attack type is {@code MazeNormal} and the technique's is {@code Maze},
      * while the in-battle basic attack is the {@code Normal} of slot 1; the two are not the same thing.
      *
-     * <p>The technique's effect (e.g. Jing Yuan (景元) "at the start of the next battle [神君]+3 hits")
+     * <p>The technique's effect (e.g. Jing Yuan (景元)'s "at the start of the next battle [神君]+3 hits")
      * has to wait for the P8-6 events plus the trigger table; this method only attaches the skill itself
      * (readable and executable from the data).
      *
@@ -988,7 +988,7 @@ public class Battle {
             return;
         }
         CanHit actor = currentMove.getCanHit();
-        // "[协奏]状态结束前不会进入自己的回合且无法行动" (M-49 的一环): a suspended unit's turn passes *without it* -- no DOT
+        // "before the [协奏] state ends it will not enter its own turn and cannot act" (one link of M-49): a suspended unit's turn passes *without it* -- no DOT
         // tick, no TURN_START, no own hooks. Note: Deliberately not a control: a control still lets the turn arrive (and
         // the DOTs tick), which is a different sentence; see AbstractBuff#suspendsTurns.
         if (actor.getBuffManager().suspendsTurns()) {
@@ -1013,8 +1013,8 @@ public class Battle {
         // for a 1-turn DOT it burns for nothing. `DotBuff` is an early buff precisely so this line is
         // what counts it down.
         actor.getBuffManager().beforeMove();
-        // M-42 ④: and the buffs on the rest of the field whose clock is this unit's ("星期日自身每回合开始时
-        // [蒙福者]状态持续回合减1"). Swept here rather than inside the manager, because "whose turns count it"
+        // M-42 (d): and the buffs on the rest of the field whose clock is this unit's ("at the start of Sunday (星期日)'s own every turn the
+        // [蒙福者] state's remaining turns are reduced by 1"). Swept here rather than inside the manager, because "whose turns count it"
         // is a fact about the battle's turn boundary, not about the unit that happens to carry the buff.
         tickForeignBuffs(actor, true);
         if (actor.isDeath()) {
@@ -1046,14 +1046,14 @@ public class Battle {
         // limit belongs to the rule's owner -- a rule of mine that fires on somebody else's attack still
         // comes back on MY turn (TriggerLimitTest.otherPeoplesTurnsDoNotCountTheCooldownDown).
         actor.tickTriggerCooldowns();
-        // "一次行动中" begins here: the action boundary already existed (this event brackets
+        // "within one action" begins here: the action boundary already existed (this event brackets
         // `performAction` and its settlement), so the lethal set is cleared at it.
         lethallyHitThisAction.clear();
         fireTriggers(TriggerEvent.TURN_START, actor, actor, 0, 0);
-        // "持续至下一个…回合开始时" ends HERE: the owner's own turn is beginning (2026-10-02).
+        // "lasting until the start of the next ... turn" ends HERE: the owner's own turn is beginning (2026-10-02).
         actor.getBuffManager().removeWithLifetime(AbstractBuff.Lifetime.NEXT_TURN_START);
         // P12 (M-49): a countdown exists to HAVE a turn -- this is the moment its reader waits for
-        // ("倒计时回合开始时知更鸟退出[协奏]状态并立即行动"). The countdown has no table of its own, and our
+        // ("at the start of the countdown turn, Robin (知更鸟) exits the [协奏] state and acts immediately"). The countdown has no table of its own, and our
         // characters' tables are what subscribe, so the ordinary ally broadcaster is the right one.
         if (actor instanceof Countdown countdown) {
             fireTriggersForAlly(TriggerEvent.COUNTDOWN_TURN, countdown, countdown, 0);
@@ -1081,13 +1081,13 @@ public class Battle {
      * Settles <b>one extra instance</b> of a damage-over-time state on a unit, right now, at {@code percent} of what that
      * state is currently dealing (2026-09-28).
      *
-     * <p>"使其当前承受的裂伤状态<b>立即产生 1 次</b>相当于原伤害 85% 的伤害" (1111 卢卡 天赋). It mirrors
+     * <p>"make the laceration state it is currently under <b>immediately produce 1 instance</b> of damage equal to 85% of the original damage" (1111 Luka (卢卡) talent). It mirrors
      * {@link #tickDots(CanHit)} - same source, element and {@link DamageType#DOT}, same {@code EnergyGrant.KILL_ONLY} - so
      * this is "the state ticked once more", not a new kind of damage. Note: The duration is <b>not</b> touched: the sentence
      * asks for one extra instance of damage, not for the state to age.
      *
      * <p>Note: The layer ceiling is honoured while summing (the same per-state grouping {@code tickDots} uses): a capped DOT
-     * ticks its <b>capped</b> total, because "当前承受的…伤害" is what it is dealing now.
+     * ticks its <b>capped</b> total, because "the damage it is currently under" is what it is dealing now.
      *
      * @param target  the unit carrying the state
      * @param element the element whose state is to tick (an element IS a state in this engine)
@@ -1106,7 +1106,7 @@ public class Battle {
                 continue;                                        // only the named state ticks
             }
             if (dot.getMaxStacks() > 0 && paid > dot.getMaxStacks()) {
-                continue;                                        // "最多叠加 N 层": this layer adds no damage
+                continue;                                        // "stack at most N layers": this layer adds no damage
             }
             Damage damage = new Damage(dot.getSource(), target, dot.getElement(), DamageType.DOT,
                     dot.getBaseDamage() * percent);
@@ -1129,7 +1129,7 @@ public class Battle {
         for (DotBuff dot : target.getBuffManager().allBuffsOf(DotBuff.class)) {
             int paidLayers = paidPerState.merge(dot.getElement(), 1, Integer::sum);
             if (dot.getMaxStacks() > 0 && paidLayers > dot.getMaxStacks()) {
-                continue;                                        // "最多叠加 N 层": this layer adds no damage
+                continue;                                        // "stack at most N layers": this layer adds no damage
             }
             if (target.isDeath()) {
                 break;                                           // killed by a DOT to the rest is not settled
@@ -1146,12 +1146,12 @@ public class Battle {
      * Settle every <b>heal over time</b> on one unit (2026-09-28): the twin of {@link #tickDots(CanHit)}, and placed
      * right beside it so the two cannot drift apart.
      *
-     * <p>"目标每回合开始时为其回复等同于娜塔莎 .20% 生命上限 + 192 的生命值，持续 2 回合" needs this rather than a
+     * <p>"at the start of each of the target's turns, restore to it health equal to 20% of Natasha (娜塔莎)'s Max HP + 192, lasting 2 turns" needs this rather than a
      * {@code TURN_START} rule: buffs are counted down by the early tick, which happens <b>after</b> this pass and
      * <b>before</b> {@code TURN_START}, so a {@code turns: 2} regeneration settles twice here while a {@code turns: 2}
      * state read from {@code TURN_START} would heal once.
      *
-     * <p>Note: The amount was derived when the rule fired ("等同于娜塔莎生命上限的…" is a share of the applier's panel) and
+     * <p>Note: The amount was derived when the rule fired ("equal to a share of Natasha's Max HP" is a share of the applier's panel) and
      * is frozen here; the applier is still carried, because {@code Battle.heal} reads their
      * {@code OUTGOING_HEALING_BOOST}.
      *
@@ -1207,23 +1207,23 @@ public class Battle {
      * The control part of a weakness break (P10-2): the element's own extra action delay, plus the control
      * state itself.
      *
-     * <p><b>What the three non-damaging elements do, and how that was decided.</b> The plan said "冻结期受
-     * 伤害 +30% 施加控制" - a guess. The encyclopedia text was probed instead, and it says something else,
+     * <p><b>What the three non-damaging elements do, and how that was decided.</b> The plan said "during the frozen period, the damage taken
+     * is +30%, apply control" - a guess. The encyclopedia text was probed instead, and it says something else,
      * consistently across every source that describes the states:
      * <ul>
-     *   <li>冻结 - {@code "冻结状态下，敌方目标不能行动同时每回合开始时受到等同于<施法者>#4%攻击力的冰属性伤害"}
-     *       (深寒徘徊者 / 永冬灾影 / 三月七 / 杰帕德 / 镜流, six independent entries). The damage is <b>ice
+     *   <li>Frozen - {@code "while in the frozen state, the enemy target cannot act and at the start of every turn takes ice damage equal to #4% of the caster's ATK"}
+     *       (深寒徘徊者 / 永冬灾影 / March 7th (三月七) / Gepard (杰帕德) / Jingliu (镜流), six independent entries). The damage is <b>ice
      *       damage over time</b>, not a "taken +30%" multiplier - which is why it is <b>not</b> implemented
      *       here: it is a DOT whose ratio is not in the data, and {@code BreakEffect.dotRatio} is that field.
      *       See the TODO in P10-2 rather than a number invented here.</li>
-     *   <li>禁锢 - {@code "禁锢状态下，敌方目标行动延后#2%，速度降低#4%"} (瓦尔特).</li>
-     *   <li>纠缠 - {@code ""纠缠"会使敌人行动延后，并在敌人下次行动时对其造成额外的量子属性伤害"}
-     *       (explicitly about 弱点击破 with Quantum). The delayed damage is again a DOT, left to the same
+     *   <li>Imprisonment - {@code "while in the imprisoned state, the enemy target's action is delayed by #2% and its speed is reduced by #4%"} (Welt (瓦尔特)).</li>
+     *   <li>Entanglement - {@code ""Entanglement" makes the enemy's action be delayed, and deals additional quantum damage to it on its next action"}
+     *       (explicitly about a weakness break with Quantum). The delayed damage is again a DOT, left to the same
      *       TODO.</li>
      * </ul>
-     * So all three are <b>行动延后</b>, and the difference is 冻结 = cannot act versus 禁锢/纠缠 = acts but slower
+     * So all three are <b>action delay</b>, and the difference is Frozen = cannot act versus Imprisonment/Entanglement = acts but slower
      * (a {@code SPEED} debuff). Both are existing primitives, and since 2026-09-2they are the two parts of
-     * {@code ControlBuff} - which is what gives a control its <b>name</b>, so "冻结状态" can be asked about no
+     * {@code ControlBuff} - which is what gives a control its <b>name</b>, so "the frozen state" can be asked about no
      * matter which path applied it.
      *
      * <p><b>No effect-hit roll, and no {@code resistKey} lookup, on this path.</b> A break is not a resisted
@@ -1252,12 +1252,12 @@ public class Battle {
         if (control != null) {
             // One buff, three parts (2026-09-2): before this, the composition was written out here as "a
             // StunBuff, plus a SPEED debuff if the element slows" -- which left the state with no name, so
-            // nothing could ask "冻结状态" about a break-frozen unit, and an ability-applied control (which
+            // nothing could ask "the frozen state" about a break-frozen unit, and an ability-applied control (which
             // needs exactly the same composition plus a resistance roll) had no shared place to live.
             enemy.getBuffManager().addBuff(new ControlBuff(control, control.turns()));
         }
         if (breakEffect.delayPercent() > 0) {
-            // An instant push, not a buff: 禁锢/纠缠's "行动延后" is a one-off on the action bar, so it must
+            // An instant push, not a buff: Imprisonment/Entanglement's "action delay" is a one-off on the action bar, so it must
             // not expire with the state (a state that lasts 1 turn leaving a delay that outlives it is the
             // data's own behaviour). Kept outside the control block so that an element may carry extra
             // delay without a state, and so the four DOT elements (delayPercent = 0) are untouched.
@@ -1317,15 +1317,15 @@ public class Battle {
             actor.afterMove(this);
             actor.getBuffManager().afterMove();
             tickForeignBuffs(actor, false);
-            // "回合结束时" (2026-09-28): the turn is over HERE -- after the actor's own hook and the late tick, so a rule
+            // "at the end of the turn" (2026-09-28): the turn is over HERE -- after the actor's own hook and the late tick, so a rule
             // sees the state the turn ended in.
             // A timed weakness is counted in the TARGET's own turns, so it runs down when that unit's turn ends.
             if (actor instanceof com.laosun.aluminium.models.enemy.Enemy ticking) {
                 ticking.tickTimedWeaknesses();
             }
             fireTriggers(TriggerEvent.TURN_END, actor, actor, 0, 0);
-        // "（若未回复）否则将立即陷入无法战斗状态" (140's 月茧之庇): a death that a deferring state held
-        // is committed HERE -- the carrier's turn is over (so it really did "正常行动"), and the next turn has not begun
+        // "(if not restored) otherwise it will immediately fall into the unable-to-fight state" (140's Moon Cocoon's Ward (月茧之庇)): a death that a deferring state held
+        // is committed HERE -- the carrier's turn is over (so it really did "act normally"), and the next turn has not begun
         // (so a heal or a shield up to this point still saves it). Nothing removed the state, so it falls now.
         if (actor.getCurrentHp() <= 0 && actor.getBuffManager().defersDeath()) {
             actor.perish();
@@ -1355,7 +1355,7 @@ public class Battle {
         processSkillRequests();
         processAddRequests();
         // The newly placed summons are on the roster AND in the action bar by now, which is what a rule
-        // answering "被召唤时" needs before it can touch their action value -- see TriggerEvent.SUMMONED.
+        // answering "when summoned" needs before it can touch their action value -- see TriggerEvent.SUMMONED.
         fireSummoned();
         processAdvanceRequests();
         removeDeadCombatants();
@@ -1364,7 +1364,7 @@ public class Battle {
     /**
      * Fires {@link TriggerEvent#SUMMONED} for everything summoned since the last settle, once each.
      *
-     * <p>The list is drained <b>before</b> the events are fired: a rule that answers "被召唤时" by summoning
+     * <p>The list is drained <b>before</b> the events are fired: a rule that answers "when summoned" by summoning
      * something else must not make this loop chase its own tail (that recursion is bounded by
      * {@code MAX_TRIGGER_DEPTH}, but there is no reason to build it), and the new arrival is picked up by the
      * next settle like any other.
@@ -1438,11 +1438,11 @@ public class Battle {
         }
         double settled = assemble(damage);                       // damage after the zones (this is "how much was dealt")
         double hpBefore = target.getCurrentHp();
-        // 致命一击（2026-10-02）: "受到致命攻击时不会陷入无法战斗状态，而是回复等同于自身生命上限 20%／50% 的生命值".
+        // Lethal blow (2026-10-02): "when taking a lethal attack it will not fall into the unable-to-fight state, but instead restore health equal to 20%/50% of its own Max HP".
         // Note: THE ORDER IS THE WHOLE MECHANIC, and the first attempt got it wrong (measured): announcing BEFORE the damage leaves the
         // target at full HP, where a heal is a no-op and nothing can ever answer. So the target is dropped to 0 HP first WITHOUT
         // being marked dead, the tables are asked, and `perish()` is called only if nobody answered -- which is precisely
-        // "不会陷入无法战斗状态".
+        // "will not fall into the unable-to-fight state".
         boolean lethal = settled >= hpBefore;
         boolean died;
         if (lethal) {
@@ -1451,8 +1451,8 @@ public class Battle {
                 lethallyHitThisAction.add(target);
             }
             fireTriggersForAlly(TriggerEvent.LETHAL_DAMAGE, target, target, 0);
-            // "暂时延后陷入无法战斗状态" (140's 月茧之庇): a state may hold the death instead of
-            // committing it. Note: The victim really is at zero HP here -- that IS "延后" -- so this is not a heal: what
+            // "temporarily defer falling into the unable-to-fight state" (140's Moon Cocoon's Ward (月茧之庇)): a state may hold the death instead of
+            // committing it. Note: The victim really is at zero HP here -- that IS "deferring" -- so this is not a heal: what
             // saves it is the state being GONE by its own turn (a heal or a shield removes it, in content).
             died = target.getCurrentHp() <= 0 && !target.getBuffManager().defersDeath();
             if (died) {
@@ -1484,15 +1484,15 @@ public class Battle {
             fireTriggersForAlly(TriggerEvent.HP_LOST, damage.getAttacker(), target, hpLoss);
         }
         // The DEALER-side fact, and the only post-settlement number that reaches BOTH camps (2026-10-02):
-        // "我打出的这一下结算了多少". `TAKING_HIT` above carries the same number but is fired through
+        // "how much did this hit I dealt actually settle". `TAKING_HIT` above carries the same number but is fired through
         // `fireTriggersForAlly`, which returns 0 for any target that is not on our side -- so an ENEMY victim never
-        // announced it, and "对敌方目标…等同于原伤害 X%" (姬子's 星魂 6) had no way to read what it had just dealt.
-        // The instance's cast category rides along, exactly like KILL below, so "终结技"-scoped clauses work.
+        // announced it, and "to an enemy target ... equal to X% of the original damage" (Himeko (姬子)'s eidolon 6) had no way to read what it had just dealt.
+        // The instance's cast category rides along, exactly like KILL below, so "ultimate"-scoped clauses work.
         fireTriggersWithSubject(TriggerEvent.DAMAGE_SETTLED, damage.getAttacker(), target, settled,
                 damage, damage.getCastCategory());
         if (died) {
             broadcastKill(damage.getAttacker(), target);
-            // The causing instance's cast category rides along: "每消灭1个敌方目标"-style rules have to be able to
+            // The causing instance's cast category rides along: "each time 1 enemy target is defeated"-style rules have to be able to
             // ask WHICH skill produced the kill (see the `from_skill` condition), and the instance already knows.
             fireTriggersWithSubject(TriggerEvent.KILL, damage.getAttacker(), target, 0, damage.getCastCategory());
         }
@@ -1569,7 +1569,7 @@ public class Battle {
      * <p>The rules (HSR.md §3.2 / §.1):
      * <ul>
      *   <li><b>Only hitting a weakness reduces toughness</b> -- a non-weakness element reduces none of it
-     *       ("toughness reduction ignoring weakness" is a character trait of Rappa (乱破)/Himeko (姬子)-启行
+     *       ("toughness reduction ignoring weakness" is a character trait of Rappa (乱破)/Himeko (姬子) - Nova
      *       and the like; wait for P8-to put it in data, do not open a default hole here)</li>
      *   <li><b>But super break is not restricted by weakness</b>: while the enemy is already in the broken
      *       state, the whole nominal toughness reduction counts as "the excess part", regardless of whether
@@ -1611,10 +1611,10 @@ public class Battle {
     /**
      * The same, stating the <b>cast</b> whose instance this toughness reduction belongs to.
      *
-     * <p>It matters for one sentence family: "施放战技…造成弱点击破时" (1003 姬子 星魂 4) asks not "was something
+     * <p>It matters for one sentence family: "when casting the Skill ... causing a weakness break" (1003 Himeko (姬子) eidolon 4) asks not "was something
      * broken" but "did <b>my Skill</b> break it", and the cast category is the only thing that answers it. A break left
      * by a talent's follow-up attack carries {@code UNSPECIFIED} (it is not an active cast) and is therefore correctly
-     * <b>not</b> a "施放战技" break.
+     * <b>not</b> a "cast the Skill" break.
      *
      * @param attacker     the attacker
      * @param enemy        the target being hit
@@ -1757,7 +1757,7 @@ public class Battle {
      * A unit's current aggro value (P5-1/P5-2): it decides the probability of the enemy selecting it.
      *
      * <p>This is the stated weight of {@link #baseAggroOf} with the unit's {@link AttributeType#AGGRO_ADDED_RATIO}
-     * applied - "受到攻击的概率大幅提高" is a <b>soft</b> modifier on the same weighted draw, which is why it is an
+     * applied - "the probability of being attacked is greatly increased" is a <b>soft</b> modifier on the same weighted draw, which is why it is an
      * attribute and not a {@code TauntBuff} (a taunt is the hard "can only be selected", and
      * {@link TargetSelector} is where that lives).
      *
@@ -1771,7 +1771,7 @@ public class Battle {
             return base;
         }
         double multiplier = 1 + added.get();
-        // "受到攻击的概率大幅提高" scales the weight; it never removes the unit from the draw. A stated change of
+        // "the probability of being attacked is greatly increased" scales the weight; it never removes the unit from the draw. A stated change of
         // -100% or worse would make the multiplier zero or negative, i.e. take a living unit out of the aggro table --
         // the exact thing Memosprites.validateAggro refuses for a stated weight (a zero share is a wrong number with
         // nothing to report) -- so the stated weight is kept instead of silently deleting the target.
@@ -1800,7 +1800,7 @@ public class Battle {
             return character.getPath().getAggro();
         }
         // A unit with no character data can still state its own weight (CanHit.aggro): every servant document
-        // gives a 仇恨 line (11413 / 11402 are both 125), and without this every summon sat at the 100 fallback
+        // gives an aggro line (11413 / 11402 are both 125), and without this every summon sat at the 100 fallback
         // -- a target the enemy treated as an ordinary character while the game makes it 25% more attractive.
         if (entity.getAggro() > 0) {
             return entity.getAggro();
@@ -1842,7 +1842,7 @@ public class Battle {
      *       (it never exceeds 100%, but there is also no "excess hit converted into some other benefit");</li>
      *   <li>Effect resistance multiplies the same way: with 30% resistance a 100% base chance to {@code 0.};</li>
      *   <li>{@code specificResistKey} is a {@code STAT_*} string from the data (see {@code Enemy.debuffResist}):
-     *       冰锋 {@code {"STAT_CTRL_Frozen": 1}} to the key factor {@code (1 - 1) = 0} to completely immune.
+     *       Ice Edge {@code {"STAT_CTRL_Frozen": 1}} makes the key factor {@code (1 - 1) = 0}, i.e. completely immune.
      *       Only {@link Enemy} has this table; characters do not.</li>
      * </ul>
      *
@@ -1901,9 +1901,9 @@ public class Battle {
         if (caster == null || target == null || buff == null || target.isDeath()) {
             return false;
         }
-        // Class resistance ("抵抗控制类负面状态的概率提高35%" / "免疫控制类负面状态"): the family the state belongs to
+        // Class resistance ("the probability of resisting control-type debuffs is increased by 35%" / "immune to control-type debuffs"): the family the state belongs to
         // is a property of the state itself (`AbstractBuff.debuffClass`), so a control written tomorrow is covered by
-        // a resistance written today. Note: Multiplied rather than folded into `specific`: "概率提高35%" means 35% of the
+        // a resistance written today. Note: Multiplied rather than folded into `specific`: "probability increased by 35%" means 35% of the
         // chances that would have landed do not, and 1.0 is immunity either way.
         double classResist = target.getBuffManager().debuffResistOf(buff.debuffClass());
         double chance = hitChance(caster, target, baseChance, specificResistKey) * (1 - classResist);
@@ -1988,7 +1988,7 @@ public class Battle {
      *
      * <p>Note: This overload states <b>no provider</b>, so no shield boost applies: it is the raw entry point the fixtures
      * and demos use, and the units that call it are stating "this shield came from nowhere in particular". Content
-     * goes through {@link #grantShield(CanHit, CanHit, double)} - which is what makes "装备者提供的护盾量提高 X%" mean
+     * goes through {@link #grantShield(CanHit, CanHit, double)} - which is what makes "the shield amount provided by the wearer is increased by X%" mean
      * the <i>giver's</i> shield and not everybody's ({@link #boostedShield}).
      *
      * @param target the one gaining the shield (no effect if already dead)
@@ -2000,10 +2000,10 @@ public class Battle {
      *
      * <p>Called by the {@code START_COUNTDOWN} op. The unit is scheduled by the same queue as everybody else, so every
      * mechanic that already moves the action order (advance, delay, weakness break) moves it too - for free and by
-     * construction, which is exactly why "直到倒计时回合" cannot be spelled as a `turns` count.
+     * construction, which is exactly why "until the countdown turn" cannot be spelled as a `turns` count.
      *
      * @param name  what it is called in logs
-     * @param speed its fixed speed (90 for 知更鸟's [协奏])
+     * @param speed its fixed speed (90 for Robin (知更鸟)'s [协奏])
      * @return the countdown, for tests and logs
      */
     public Countdown startCountdown(String name, double speed) {
@@ -2046,7 +2046,7 @@ public class Battle {
      * Gain a shield, <b>as created by {@code provider}</b>.
      *
      * <p>The provider is not decoration: {@code provider}'s {@link AttributeType#SHIELD_BOOST} multiplies the amount,
-     * which is the engine's answer to "使装备者提供的护盾量提高 20%" (遗器 103 / 128, 一件光锥). A {@code null} provider
+     * which is the engine's answer to "the shield amount provided by the wearer is increased by 20%" (relic 103 / 128, one light cone). A {@code null} provider
      * means "unknown giver" and applies no boost - the safe direction, since a boost that cannot be attributed would
      * silently strengthen every shield in the fight.
      *
@@ -2062,8 +2062,8 @@ public class Battle {
     /**
      * The same, also recording <b>which rule</b> created the shield.
      *
-     * <p>The rule id is what tells two shields from one giver apart: "战技提供的护盾" (1001 三月七 星魂 6) must not
-     * answer for the shield her 星魂 2 gives at battle start. A grant that names no rule states {@code ""}, and a
+     * <p>The rule id is what tells two shields from one giver apart: "the shield provided by the Skill" (1001 March 7th (三月七) eidolon 6) must not
+     * answer for the shield her eidolon 2 gives at battle start. A grant that names no rule states {@code ""}, and a
      * condition asking for a named rule then correctly answers "no".
      *
      * @param provider who is granting it ({@code null} = unknown, so unboosted)
@@ -2078,7 +2078,7 @@ public class Battle {
         }
         double value = boostedShield(provider, amount);
         target.setShield(value, provider, ruleId);
-        // P12 (M-43): "a shield was granted" is its own fact, so "受到队友提供的…护盾时" can subscribe to it.
+        // P12 (M-43): "a shield was granted" is its own fact, so "when receiving a shield provided by a teammate" can subscribe to it.
         // Note: Only a grant that leaves a shield standing (a grant of <= 0 is how this API spells "clear it"), and the
         // actor is the provider -- null for the raw overload, which then correctly fails `actor is_ally`.
         // Note: The TIMED path (`SHIELD` with `turns`) does not come through here: its shield is installed by a
@@ -2090,10 +2090,10 @@ public class Battle {
     }
 
     /**
-     * The shield amount a given provider's shield is actually worth: {@code amount  x  (1 + 提供的护盾量提高)}.
+     * The shield amount a given provider's shield is actually worth: {@code amount  x  (1 + shield amount provided boost)}.
      *
      * <p><b>One formula, two paths.</b> A {@code SHIELD} effect reaches the field either as a raw grant (no
-     * {@code turns}) or through a {@link com.laosun.aluminium.models.buff.ShieldBuff} (timed), and "提供的护盾量" has to
+     * {@code turns}) or through a {@link com.laosun.aluminium.models.buff.ShieldBuff} (timed), and "the shield amount provided" has to
      * mean the same number in both - otherwise a shield would be worth 120 for three turns and 100 forever after the
      * duration came off, which is exactly the class of silent discrepancy this project keeps hunting. The buff
      * snapshots this value when it is constructed; the raw path calls it here.
@@ -2135,7 +2135,7 @@ public class Battle {
      * The members of a unit's <b>own</b> camp - the counterpart of {@link #getOpponents(CanHit)} (2026-10-02).
      *
      * <p>It exists because an effect can speak about "our side" without being aimed at it: the state-holder selector
-     * ({@code holder_of:同袍}) asks which of <i>my</i> units carries a state, and an enemy carrying it would be a
+     * ({@code holder_of:同袍}) (the bondmate state) asks which of <i>my</i> units carries a state, and an enemy carrying it would be a
      * different sentence entirely. Like its counterpart it does <b>not</b> filter the dead (the caller decides), and
      * it answers an empty list for a unit with no camp rather than guessing one.
      *
@@ -2303,7 +2303,7 @@ public class Battle {
     private static final int MAX_TRIGGER_DEPTH = 8;
 
     /**
-     * Rolls a rule-level probability ("有 35% 的固定概率…") against the battle's own random source.
+     * Rolls a rule-level probability ("there is a 35% fixed probability ...") against the battle's own random source.
      *
      * <p>Deliberately not a fresh {@link Random}: every draw in this engine goes through the injected generator,
      * so a battle built from a seed is reproducible and a test can hand in its own generator to make a coin flip
@@ -2357,7 +2357,7 @@ public class Battle {
     /**
      * The same moment, carrying <b>how many instances of that state</b> the carrier held. Note: The number goes in the AMOUNT
      * slot, not the hit count: measured, `fireTriggers(event, actor, target, int hitCount, double amount)`, and putting it one
-     * place early left `ctx.amount()` at zero -- which is what "将其中的 50%" reads.
+     * place early left `ctx.amount()` at zero -- which is what "50% of it" reads.
      */
     public void fireStateEnded(CanHit carrier, String stateName, int magnitude) {
         String previous = lastStateEndedName;
@@ -2402,7 +2402,7 @@ public class Battle {
     /**
      * The same, stating <b>which cast</b> produced the event - the form {@code ALLY_ATTACK} uses.
      *
-     * <p>"每当我方目标…施放 <b>2 次普攻、战技、终结技</b>后"（1215 寒鸦）has to tell the three slots apart, and an attack
+     * <p>"each time one of our targets ... casts <b>2 basic attacks, Skills, ultimates</b>" (1215 Hanya (寒鸦)) has to tell the three slots apart, and an attack
      * event is the only place that count can be taken <b>once per cast</b>: counting on {@code DEALING_DAMAGE} would
      * count <i>hits</i> instead (a multi-hit skill would mark several times for one cast - a wrong number with no
      * symptom).
@@ -2438,7 +2438,7 @@ public class Battle {
      * <p>Kept separate from {@code damage} because the two answer different questions and are populated by different
      * events: {@code damage} is the instance itself (only {@code DEALING_DAMAGE} has one, because only there can a rule
      * still change it), while {@code fromCast} is the {@link SkillCategory} of the cast that built it - which a kill and
-     * a weakness break can also name, and which is what "施放战技…造成弱点击破时" asks about.
+     * a weakness break can also name, and which is what "when casting the Skill ... causing a weakness break" asks about.
      */
     private int fireTriggers(TriggerEvent event, CanHit actor, CanHit target, int hitCount, double amount,
                              Damage damage, SkillCategory fromCast) {
@@ -2448,7 +2448,7 @@ public class Battle {
     /**
      * The same, naming the <b>data row</b> of the skill that produced the event (2026-09-28).
      *
-     * <p>Note: The row, not the slot: an enhanced attack is a row of its own, so "强化普攻命中…" and "强化普攻消耗 2 层" can be
+     * <p>Note: The row, not the slot: an enhanced attack is a row of its own, so "an enhanced basic attack hits ..." and "an enhanced basic attack consumes 2 layers" can be
      * told apart from the ordinary basic attack they replace. Events that no skill produced (a DOT tick, a break) leave it 0.
      */
     public int fireTriggers(TriggerEvent event, CanHit actor, CanHit target, int hitCount, double amount,
@@ -2458,7 +2458,7 @@ public class Battle {
 
     /**
      * The same, plus how many of the hit targets carry the attack's own element weakness (2026-09-30; reader: cone
-     * 21040's "若有不少于 2 个被攻击的敌方目标具有对应属性弱点").
+     * 21040's "if no fewer than 2 of the attacked enemy targets have the corresponding attribute weakness").
      *
      * <p>A count over a predicate cannot be assembled from the parts: a multi-target attack fires the damage event once
      * per target, so "how many of them were weak" only exists where the whole set is in hand -- the caster's side.
@@ -2521,7 +2521,7 @@ public class Battle {
                                 fromCast).withSkillId(skillId).withWeakHitCount(weakHitCount)
                                 .withAttackHitTargets(attackHitTargets));
             }
-            // 获得该角色即生效，无需上场 (2026-10-02). Note: A SECOND pass, not extra entries in `characters`: that list is what
+            // Takes effect as soon as the character is obtained, no deployment needed (2026-10-02). Note: A SECOND pass, not extra entries in `characters`: that list is what
             // the queue is built from, so a listener in it would act. Note: The owner handed to the context is the listener itself,
             // which is what makes "self" mean "the character who owns this warehouse clause" rather than whoever is fighting.
             for (Character listener : warehouseListeners.keySet()) {
@@ -2579,7 +2579,7 @@ public class Battle {
      *
      * <p>Only some events can name one - a kill and a weakness break happen while an instance is being settled, and the
      * instance knows the {@link com.laosun.aluminium.enums.SkillCategory} of the cast that built it. That is what lets
-     * a rule say "施放战技对敌方目标造成弱点击破时" instead of "somebody broke something".
+     * a rule say "when casting the Skill on an enemy target causing a weakness break" instead of "somebody broke something".
      *
      * <p>Note: It carries the <b>category</b> rather than the instance: the settlement entry point is the only public API
      * that takes a {@code Damage} ({@code DamagePipelineTest.settlementHasExactlyOnePublicEntryPoint}), and an event
@@ -2601,7 +2601,7 @@ public class Battle {
      *
      * <p>{@code DAMAGE_SETTLED} is a fact about one damage instance - its amount AND its identity - so the rules that
      * read it must be able to ask the instance's own questions: {@code damage_is_attack} is the guard that keeps a
-     * rider from re-triggering itself ("额外造成 2 次伤害" is additional damage, which is not an attack), and it
+     * rider from re-triggering itself ("additionally deals 2 instances of damage" is additional damage, which is not an attack), and it
      * reads exactly this field.
      */
     private int fireTriggersWithSubject(TriggerEvent event, CanHit actor, CanHit subject, double amount,
@@ -2614,7 +2614,7 @@ public class Battle {
      * fired <b>once per attack</b>, after every instance of it has been settled.
      *
      * <p><b>Which attacks fire it.</b> A character's skill activation ({@code SkillExecutor}) and, since
-     * P9-4 忆灵, a summon's own attack ({@code EnemySkill.execute}) - both are attacks the engine drives from
+     * P9-4 memosprites, a summon's own attack ({@code EnemySkill.execute}) - both are attacks the engine drives from
      * beginning to end. Derived hits still never fire it: additional damage, true damage, DOT ticks and break
      * damage go straight through {@link #applyDamage} and are <em>part of</em> somebody else's attack. That
      * exclusion is not an oversight, it is what makes the notification safe to hand to arbitrary listeners:
@@ -2796,7 +2796,7 @@ public class Battle {
     }
 
     /**
-     * The same, for an instance whose crit is <b>stated rather than rolled</b> ("该伤害暴击率固定为100%，暴击伤害固定为150%").
+     * The same, for an instance whose crit is <b>stated rather than rolled</b> ("this damage's crit rate is fixed at 100%, and its crit damage is fixed at 150%").
      *
      * <p>Note: The numbers ride into the {@link Damage} here instead of being applied by the caller: this is the engine's
      * one additional-damage entry point (`DamagePipelineTest` pins the single-settlement invariant), so an extra
@@ -2812,8 +2812,8 @@ public class Battle {
     }
 
     /**
-     * The same, with the instance's DAMAGE TYPE stated (2026-09-30; reader: 1505 绯英's three 欢愉 riders, whose
-     * text says "造成…物理属性<b>欢愉伤容</b>"). A rule-driven rider could only ever be {@code ADDITIONAL} before,
+     * The same, with the instance's DAMAGE TYPE stated (2026-09-30; reader: 1505 Evanescia (绯英)'s three elation riders, whose
+     * text says "dealing ... physical-attribute <b>elation damage</b>"). A rule-driven rider could only ever be {@code ADDITIONAL} before,
      * so the one thing its sentence names -- the damage type -- had no spelling. {@code null} keeps the old meaning, which is why
      * the six-argument overload above still answers exactly as it did.
      */
@@ -2823,7 +2823,7 @@ public class Battle {
     }
 
     /**
-     * The same, with the instance's CAST CATEGORY stated (2026-10-02; reader: 1415's ode of passage, whose clause is about a "追加攻击"). Note: The
+     * The same, with the instance's CAST CATEGORY stated (2026-10-02; reader: 1415's ode of passage, whose clause is about a "follow-up attack"). Note: The
      * body stays here and the six/seven-argument forms delegate to it -- a second way to build and settle an instance is exactly what the single-settlement
      * invariant exists to prevent, as the note above says.
      */
@@ -2912,7 +2912,7 @@ public class Battle {
         CanHit defender = damage.getDefender();
 
         // 0) The base layer lives in Damage.toValue(): the skill multiplier plus any absolute addend
-        //    («提高数值等同于三月七防御力的30%», ROADMAP M-55), added BEFORE every zone below so it crits and is
+        //    ("increase the value by an amount equal to 30% of March 7th (三月七)'s defence", ROADMAP M-55), added BEFORE every zone below so it crits and is
         //    boosted exactly like the multiplier. Note: Deliberately not a percentage in the boost zone: that would only
         //    equal the sentence when the base happened to equal the attribute. See Damage#addFlat.
 
@@ -2929,7 +2929,7 @@ public class Battle {
         if (damage.getType() == DamageType.ADDITIONAL) {
             damage.addBoost(attacker.getAttribute(AttributeType.FOLLOW_UP_DAMAGE_BOOST).get());
         }
-        // ...and the same shape for damage over time (322's "使装备者造成的持续伤害额外提高 X%"): gated on the
+        // ...and the same shape for damage over time (322's "additionally increases the damage over time dealt by the wearer by X%"): gated on the
         // damage TYPE, because that is what the sentence names. Note: DoT is NOT one of the types the boost zone skips
         // (break / super break / true damage are), so this reaches the tick -- checked before writing it, since an
         // attribute nothing reads would look exactly like a working rule.
@@ -2937,17 +2937,17 @@ public class Battle {
             damage.addBoost(attacker.getAttribute(AttributeType.DOT_DAMAGE_BOOST).get());
         }
 
-        // ...and a memosprite-only sibling ("装备者忆灵造成的暴击伤害额外提高 X%", light cone 2105). Gated on WHO is attacking
+        // ...and a memosprite-only sibling ("additionally increases the crit damage dealt by the wearer's memosprite by X%", light cone 2105). Gated on WHO is attacking
         // rather than on the damage's type or cast category: a memosprite's skill is an ordinary NORMAL damage like any other.
-        // Note: `instanceof Summon` would be an approximation -- the documents distinguish 忆灵 from ordinary 召唤物 -- so the test
+        // Note: `instanceof Summon` would be an approximation -- the documents distinguish memosprites from ordinary summons -- so the test
         // is the precise one: the attacker IS the unit that its master's memospriteOf returns.
-        // ...and the memosprite sibling, gated on the damage TYPE the game itself names: `DamageType.MEMORY` is 忆灵伤害
+        // ...and the memosprite sibling, gated on the damage TYPE the game itself names: `DamageType.MEMORY` is memosprite damage
         // (GLOSSARY.md), and the constant has been declared since the type table was written -- its javadoc even notes that only
         // some of the constants are in use. Note: This replaces the earlier heuristic (`attacker == memospriteOf(master)` plus
         // reading the MASTER's attribute), which existed only because the type had not been found: the type is the game's own
         // vocabulary, and it holds for a memosprite that outlives its master.
         if (damage.getType() == DamageType.MEMORY) {
-            // Note: Two facts, both measured: the TYPE is what decides whether this clause applies (忆灵伤害), and the VALUE comes
+            // Note: Two facts, both measured: the TYPE is what decides whether this clause applies (memosprite damage), and the VALUE comes
             // from the memosprite's master -- a panel inherits only the attributes its spec NAMES (`SummonFactory` snapshots
             // them, `MemospriteSpec` says nothing else crosses), so an ability granted to the wearer is invisible on the
             // memosprite itself. Reading the attacker alone measured exactly 1.0, i.e. no boost at all.
@@ -2956,7 +2956,7 @@ public class Battle {
             damage.addBoost(owner.getAttribute(AttributeType.MEMOSPRITE_DAMAGE_BOOST).get());
         }
 
-        // Scoped boosts (P10-4): "普攻 / 战技 / 终结技造成的伤害提高 X%". These cannot be gated on the damage
+        // Scoped boosts (P10-4): "increases the damage dealt by basic attacks / Skills / ultimates by X%". These cannot be gated on the damage
         // *type* the way the follow-up boost above is -- a basic attack and a skill are both
         // DamageType.NORMAL -- so they are gated on the category of the cast that produced this instance,
         // which SkillExecutor threads through (`Damage.getCastCategory()`).
@@ -2965,13 +2965,13 @@ public class Battle {
         // does. Break / super break / DOT / additional instances stay UNSPECIFIED, so "the Skill's DMG" does
         // not silently grow to mean "the break damage that Skill caused" -- if content ever needs that, it is
         // a decision to take on purpose, not a side effect of this wiring. (A follow-up therefore collects
-        // FOLLOW_UP_DAMAGE_BOOST and never one of these, which is what the texts mean by 追加攻击.)
+        // FOLLOW_UP_DAMAGE_BOOST and never one of these, which is what the texts mean by a follow-up attack.)
         AttributeType scopeBoost = damage.getCastCategory().damageBoost();
         if (scopeBoost != null) {
             damage.addBoost(attacker.getAttribute(scopeBoost).get());
         }
 
-        // Damage-instance conditions (ROADMAP §3"伤害实例条件"): "对处于 X 状态的目标造成的伤害提高 Y%". Fired *before* the zones
+        // Damage-instance conditions (ROADMAP §3 "damage-instance conditions"): "increases the damage dealt to a target in state X by Y%". Fired *before* the zones
         // are read, because afterwards the number is final and all a rule could do is describe it. `target` is
         // the one about to take the damage; a rule that changes this instance uses BOOST_DAMAGE, which mutates
         // the instance itself -- the instance is the state, so there is no buff to attach, nothing to clean up,
@@ -2979,7 +2979,7 @@ public class Battle {
         //
         // It fires for every instance the engine settles, DOT ticks and break damage included: those are damage
         // too, and a rule that means "attacks only" says so with its own conditions.
-        // "每消耗 1 点能量值" (light cone 23062) scales off THIS cast's spend, which is why it rides on the
+        // "per 1 point of energy spent" (light cone 23062) scales off THIS cast's spend, which is why it rides on the
         // instance: the settlement reads the instance, and this is the only event that hands it over.
         // Note: The guard is load-bearing: lastUltEnergySpent is written only on the ultimate path and never
         // cleared, so without it every later hit -- basics, DOT ticks, break damage -- would inherit it, an
@@ -3006,7 +3006,7 @@ public class Battle {
         // `fireTriggersForAlly` refuses any subject that is not ours (round 266 measured exactly that).
         if (damage.critArea().isCrit()) {
             // subject = the VICTIM, actor = the critter. The victim has to be nameable, because a clause like
-            // "解除被攻击敌方目标的 1 个增益" acts on it. `fireTriggersWithSubject` (unlike its ally-only sibling)
+            // "removes 1 buff from the attacked enemy target" acts on it. `fireTriggersWithSubject` (unlike its ally-only sibling)
             // does not refuse a subject from the other camp -- and enemy crits still reach nobody, because every such
             // rule says `actor == self` and the actor here is whoever dealt it.
             fireTriggersWithSubject(TriggerEvent.CRIT_DEALT, attacker, defender, 0);
@@ -3023,12 +3023,12 @@ public class Battle {
         double rawResist = defender instanceof Enemy enemy
                 ? enemy.getDamageResist().getOrDefault(damage.getElement(), 0.0)
                 : 0.0;
-        // "使敌方全体全属性抗性降低 X%" (2026-09-29): the victim's side of the same zone, subtracted BEFORE
+        // "reduces the all-type resistance of all enemies by X%" (2026-09-29): the victim's side of the same zone, subtracted BEFORE
         // penetration is applied -- see RESISTANCE_REDUCTION for why it is not folded into the attacker's
         // penetration. Done here rather than inside `ResistArea` so that class's clamp (which exists for
         // penetration) cannot swallow a reduction: negative resistance is meant to be fully effective.
         rawResist -= defender.getAttribute(AttributeType.RESISTANCE_REDUCTION).get();
-        // The victim's own counterpart (2026-09-30; reader: cone 21002's "全属性抗性提高"):
+        // The victim's own counterpart (2026-09-30; reader: cone 21002's "increases all-type resistance"):
         // stated on the one being hit, so it is subtracted here beside the reducer rather than on the attacker.
         // Note: Measured sign (2026-09-30, cone 21002): a POSITIVE resistance has to be ADDED here. Writing it as a
         // subtraction -- the way the reducer beside it reads -- turned "+8% resistance" into +8% DAMAGE taken
@@ -3049,7 +3049,7 @@ public class Battle {
     /**
      * The allies a lethal blow has landed on during the CURRENT action (2026-10-02).
      *
-     * <p>Reader: 140月茉之庇, "在一次行动中受到致命攻击的全体". The set is what makes that ONE clause rather
+     * <p>Reader: 140 Moon Cocoon's Ward (月茉之庇), "all of those hit by a lethal attack within one action". The set is what makes that ONE clause rather
      * than one save per blow: the same action can land a lethal blow on several allies, and the effect reaches all of them.
      *
      * <p>Note: Cleared when an action starts ({@code TURN_START}, which brackets {@code performAction} and its settlement), so
@@ -3061,7 +3061,7 @@ public class Battle {
      * <p>The word is the game own, and it is an EVENT rather than a target type:
      * `MServant_CyreneServant_00_AmazingBuff_Mydeimos_OnWaveMonster` listens for `"Event": "OnWaveMonster"` and answers with a
      * `TurnInsertAction` -- a wave monster has entered. Reader: 1415's memosprite skill 8,
-     * "若施放前目标被消灭则对新入场的敌方目标施放".
+     * "if the target is defeated before the cast, then cast it on a newly entered enemy target".
      */
     private final List<CanHit> waveMonsters = new ArrayList<>();
 
@@ -3132,10 +3132,10 @@ public class Battle {
      * Takes off every buff whose duration was being spent by a unit that is now dead (M-42 ③).
      *
      * <p><b>Why this has to exist.</b> A buff can state that its clock is somebody else's turns
-     * ({@code AbstractBuff.ticksOn}, "星期日自身每回合开始时[蒙福者]状态持续回合减1"). If that somebody dies, the
+     * ({@code AbstractBuff.ticksOn}, "at the start of Sunday (星期日)'s own every turn the [蒙福者] state's remaining turns are reduced by 1"). If that somebody dies, the
      * clock never comes again - the buff would sit on its carrier for the rest of the battle, which is not "a long
-     * duration" but a different mechanic. 星期日's sentence says it outright ("当星期日陷入无法战斗状态时，
-     * [蒙福者]效果也会被解除"); this is the generic version of it.
+     * duration" but a different mechanic. Sunday's sentence says it outright ("when Sunday falls into the unable-to-fight state,
+     * [蒙福者] effect is also removed"); this is the generic version of it.
      *
      * <p>Swept from here rather than from the dying unit's own table because {@code fireTriggers} <b>skips dead
      * units</b>: the unit that needs to react is gone before it could, and the buffs live on other units anyway.
@@ -3262,7 +3262,7 @@ public class Battle {
     }
 
     /**
-     * Brings a character's <b>memosprite</b> (忆灵) onto the field, with a panel derived from that character.
+     * Brings a character's <b>memosprite</b> onto the field, with a panel derived from that character.
      *
      * <p>This is the character-side sibling of {@link #summon(CanHit, int, int)}: the monster path takes an
      * id from a roster, this one takes nothing but the summoner and reads
@@ -3271,7 +3271,7 @@ public class Battle {
      *
      * <p><b>Idempotent per summoner.</b> If that character already has a living memosprite on the field,
      * nothing happens and the existing one is returned. The documents actually say "if it is already present,
-     * restore it to full HP" (阿格莱雅's "若衣匠已在场，则使其生命值回复至上限"), and that refresh is <b>not</b>
+     * restore it to full HP" (Aglaea (阿格莱雅)'s "if the 衣匠 is already present, restore its health to the maximum"), and that refresh is <b>not</b>
      * modelled here: doing nothing is at least never a wrong <em>state</em>, whereas a second copy of the same
      * memosprite would be one - two units, one of which the player cannot see. The refresh is registered as
      * the next step rather than approximated.
@@ -3345,7 +3345,7 @@ public class Battle {
      * <p>The one place the predicate "is this unit mine" is written: {@link #summonOf} takes the first,
      * {@link #summonCountOf} counts them, and the {@code actor == summon} / {@code target == summon} conditions
      * ask whether an event's subject is among them. Three loops with the same test is how three answers to
-     * "which units are mine" start to differ - and a unit with several summons (知更鸟-晴歌's 晴空乐手 is a
+     * "which units are mine" start to differ - and a unit with several summons (Robin - Summeretto (知更鸟-晴歌)'s Sky Musician (晴空乐手) is a
      * trio) is exactly where a stop-at-the-first version would silently cap the answer at one.
      *
      * @param master the summoner (may be {@code null}, which owns nothing)
@@ -3370,7 +3370,7 @@ public class Battle {
      * <p>What {@code TriggerInterpreter}'s {@code "summon"} target selector resolves to. The difference from
      * {@link #memospriteOf(CanHit)} is the point: that one is about memsprites on <em>our</em> side (what
      * {@link #summonMemosprite(Character)} manages), while this one answers "which unit did <b>this</b> unit
-     * summon" for either camp - an enemy boss's minion is a summon too, and "装备者及其忆灵" and a monster's
+     * summon" for either camp - an enemy boss's minion is a summon too, and "the wearer and their memosprite" and a monster's
      * own text are the same shape.
      *
      * @param master the summoner (may be {@code null}, which owns nothing)
@@ -3385,7 +3385,7 @@ public class Battle {
      * How many living summons this unit owns - what {@code self_summon_count} evaluates.
      *
      * <p>Counted over the whole roster rather than stopping at the first match, so a unit with several
-     * summons is counted correctly: nothing has more than one yet, but 知更鸟-晴歌's 晴空乐手 is a trio, and a
+     * summons is counted correctly: nothing has more than one yet, but Robin - Summeretto (知更鸟-晴歌)'s Sky Musician (晴空乐手) is a trio, and a
      * query that stopped looking would silently cap it at one.
      *
      * @param master the summoner (may be {@code null}, which owns none)

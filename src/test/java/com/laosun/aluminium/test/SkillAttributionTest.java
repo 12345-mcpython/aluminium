@@ -27,24 +27,24 @@ import java.util.Random;
 import java.util.Set;
 
 /**
- * "施放<b>战技</b>对敌方目标造成弱点击破时" - an event that says <b>who</b>, and now also <b>which skill</b>.
+ * "when casting the <b>Skill</b> and breaking an enemy target's weakness" - an event that says <b>who</b>, and now also <b>which skill</b>.
  *
- * <p><b>Why the DSL needed it.</b> {@code BREAK} and {@code KILL} already carried the actor, so "当有敌方目标的弱点被击破时"
- * (姬子's talent: anybody's break) was expressible. "施放战技…造成弱点击破时" (her 星魂 4) was not: gating on
+ * <p><b>Why the DSL needed it.</b> {@code BREAK} and {@code KILL} already carried the actor, so "when an enemy target's weakness is broken"
+ * (Himeko (姬子)'s talent: anybody's break) was expressible. "when casting the Skill... and breaking a weakness" (her 星魂 (Eidolon) 4) was not: gating on
  * {@code actor == self} would also pay for a break left by her basic attack or by her talent's follow-up attack, and the
- * text excludes both - a wrong +1 充能 with nothing to report. So the causing instance now rides into the event
+ * text excludes both - a wrong +1 charge (充能) with nothing to report. So the causing instance now rides into the event
  * ({@code Battle.reduceToughness(…, Damage)} to {@code TriggerContext.damage()}) and {@code from_skill SKILL} compares its
  * cast category against {@code SkillCategory.of(SkillType.SKILL)}.
  *
  * <p><b>How the cases are built.</b> The mechanism cases use a hand-made table holding exactly two break rules - the
  * talent's (anybody's break) and the Eidolon's (my Skill's break) - so the numbers are the rules and not the rest of her
  * kit. The shipped-content cases drive her real file, where a skill break now reaches the 3-charge cap and her talent's
- * follow-up attack spends it (which is itself the observable: at 星魂 4 the follow-up happens, at 星魂 3 it does not).
+ * follow-up attack spends it (which is itself the observable: at 星魂 (Eidolon) 4 the follow-up happens, at 星魂 (Eidolon) 3 it does not).
  */
 public class SkillAttributionTest {
     private static final int HIMEKO = 1003;
     private static final int LEVEL = 80;
-    /** 冰锋: toughness 60, weak to FIRE/THUNDER - one 战技 (stance 60) breaks it. */
+    /** Ice Edge (冰锋): toughness 60, weak to FIRE/THUNDER - one Skill (战技) (stance 60) breaks it. */
     private static final int MONSTER = 1002011;
     private static final int SKILL_SLOT = 2;
     private static final int BASIC_SLOT = 1;
@@ -52,7 +52,7 @@ public class SkillAttributionTest {
     private static final String CHARGE = "充能";
     private static final int CAP = 3;
 
-    /** Her 战技 breaks it: both break rules pay, so two charges. */
+    /** Her Skill (战技) breaks it: both break rules pay, so two charges. */
     @Test
     public void theSkillThatBreaksPaysTheEidolon() {
         Fixture f = new Fixture();
@@ -64,7 +64,7 @@ public class SkillAttributionTest {
     }
 
     /**
-     * Note: The case the condition exists for: her <b>basic attack</b> breaks, and 星魂 4 must not pay.
+     * Note: The case the condition exists for: her <b>basic attack</b> breaks, and 星魂 (Eidolon) 4 must not pay.
      *
      * <p>The bar is chipped first through the raw API (which emits no break event), so the 30-point basic attack is what
      * empties it.
@@ -81,9 +81,9 @@ public class SkillAttributionTest {
     }
 
     /**
-     * Note: A different slot is a different slot: her <b>ultimate</b> breaks, and 星魂 4 (which names 战技) must not pay.
+     * Note: A different slot is a different slot: her <b>ultimate</b> breaks, and 星魂 (Eidolon) 4 (which names the Skill (战技)) must not pay.
      *
-     * <p>Note: The 天赋 branch cannot be exercised at all, and that is a fact about the engine worth stating rather than
+     * <p>Note: The talent (天赋) branch cannot be exercised at all, and that is a fact about the engine worth stating rather than
      * hiding: a follow-up attack is settled as <b>additional damage</b> ({@code Battle.applyAdditionalDamage}), which
      * never reduces toughness - so her talent's follow-up cannot leave a break here. The contrast that matters is
      * therefore slot against slot, and her ultimate is the other slot that can break (AoE stance 60).
@@ -97,7 +97,7 @@ public class SkillAttributionTest {
         Assertions.assertEquals(1, f.charge(), "「施放战技」 is not 「施放终结技」");
     }
 
-    /** The actor gate still matters: a break caused by an ally's 战技 pays the talent but not her Eidolon. */
+    /** The actor gate still matters: a break caused by an ally's Skill (战技) pays the talent but not her Eidolon. */
     @Test
     public void anAlliesSkillDoesNotPayHerEidolon() {
         Fixture f = new Fixture();
@@ -160,14 +160,14 @@ public class SkillAttributionTest {
     }
 
     // ==================================================================
-    // The shipped content: 1003 姬子 星魂 4
+    // The shipped content: 1003 Himeko (姬子) 星魂 (Eidolon) 4
     // ==================================================================
 
     /**
-     * End to end, through her real file: at 星魂 4 a 战技 break fills 充能 to the cap and her talent's follow-up fires.
+     * End to end, through her real file: at 星魂 (Eidolon) 4 a Skill (战技) break fills the charge (充能) to the cap and her talent's follow-up fires.
      *
      * <p>Note: Why the measurement is "did the follow-up happen" rather than a charge count: her own kit spends the charges
-     * as soon as they reach 3, so the follow-up <b>is</b> the observable consequence of the extra charge. At 星魂 3 the
+     * as soon as they reach 3, so the follow-up <b>is</b> the observable consequence of the extra charge. At 星魂 (Eidolon) 3 the
      * same break leaves 2 charges and nothing else happens - the contrast is the Eidolon.
      */
     @Test
@@ -226,7 +226,7 @@ public class SkillAttributionTest {
             List<TriggerSpec> rules = new ArrayList<>();
             rules.add(TriggerSpecs.rule("BREAK", null, chargeOne()));
             rules.add(TriggerSpecs.rule("BREAK", List.of("actor == self", "from_skill SKILL"), chargeOne()));
-            // Note: No manual registration: her own file declares 充能 and `CharacterFactory` registers it while the
+            // Note: No manual registration: her own file declares 充能 (charge) and `CharacterFactory` registers it while the
             // character is built, and the manager keeps it even though the table is replaced below.
             hero.setTriggerTable(new TriggerTable(HIMEKO, rules));
             this.enemy = breakableEnemy();
@@ -248,7 +248,7 @@ public class SkillAttributionTest {
         }
     }
 
-    /** What one skill break did to her 充能 and to the enemy, through her real file. */
+    /** What one skill break did to her 充能 (charge) and to the enemy, through her real file. */
     private record Outcome(int charge, double enemyHp) {
     }
 
@@ -281,7 +281,7 @@ public class SkillAttributionTest {
         return effect;
     }
 
-    /** One 充能, so the cases are about counting rather than about amounts. */
+    /** One 充能 (charge), so the cases are about counting rather than about amounts. */
     private static EffectSpec chargeOne() {
         EffectSpec effect = new EffectSpec();
         TriggerSpecs.set(effect, "op", "GAIN_RESOURCE");

@@ -16,11 +16,11 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 佩拉 (1106), from her own file (2026-09-28): the two "处于负面效果" clauses and the party's effect hit rate.
+ * Pela (佩拉) (1106), from her own file (2026-09-28): the two "in a negative effect" clauses and the party's effect hit rate.
  *
  * <p><b>What it needed.</b> Nothing new - {@code target_debuff_count} is the numerical variable that reads how many
- * negative buffs the event's target carries, and this file is its first shipped reader (both the talent's energy and 行迹
- * 痛击's damage bonus are gated on it). What is <b>registered</b> is 战技's "解除敌方增益" (the engine's `DISPEL` cleanses
+ * negative buffs the event's target carries, and this file is its first shipped reader (both the talent's energy and the damage bonus of the trace
+ * 痛击 are gated on it). What is <b>registered</b> is the Skill's "removes an enemy's buff" (the engine's `DISPEL` cleanses
  * our own side's debuffs; removing an <i>enemy's</i> buff is the opposite direction) and the ultimate's [通解], which is a
  * state with a 100% <b>base chance</b> (a roll the `APPLY_BUFF` path does not have).
  */
@@ -30,33 +30,32 @@ public class PelaDebuffTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** Note: Both "处于负面效果" clauses are gated on the target's debuff count. */
+    /** Note: Both "in a negative effect" clauses are gated on the target's debuff count. */
     @Test
     public void theDebuffConditionsAreOnTheRules() {
         TriggerTable table = TriggerTables.of(PELA);
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.ALLY_ATTACK), "the talent's energy trace");
-        Assertions.assertEquals(1, table.ruleCount(TriggerEvent.DEALING_DAMAGE), "行迹 痛击");
+        Assertions.assertEquals(1, table.ruleCount(TriggerEvent.DEALING_DAMAGE), "trace 痛击");
 
         // Note: Two separate fixtures: adding a DOT is not undone, so reusing one enemy would leave the "no debuff" check
         // looking at a debuffed target (an earlier version of this case did exactly that).
         Fixture debuffed = new Fixture();
         Assertions.assertFalse(table.matching(TriggerEvent.DEALING_DAMAGE, debuffed.ctx(true)).isEmpty(),
                 "with a debuff on the target, 痛击 matches");
-
         Fixture clean = new Fixture();
         Assertions.assertTrue(table.matching(TriggerEvent.DEALING_DAMAGE, clean.ctx(false)).isEmpty(),
-                "⚠ with none it does not: 「对处于**负面效果**的敌方目标」");
+                "Note: with none it does not: 「to an enemy target in a **negative effect**」");
     }
 
-    /** 行迹 秘策 hands the whole side the effect-hit rate, and the file says so. */
+    /** trace 秘策 hands the whole side the effect-hit rate, and the file says so. */
     @Test
     public void herTraceRaisesThePartysEffectHitRate() {
         Fixture f = new Fixture();
         Assertions.assertTrue(f.ally.getAttribute(AttributeType.EFFECT_HIT_RATE).get() > 0,
-                "「佩拉在场时，我方全体的效果命中提高10%」");
+                "「while Pela is on the field, the effect hit rate of all of our side is increased by 10%」");
         Assertions.assertEquals(2, TriggerTables.of(PELA).ruleCount(TriggerEvent.BATTLE_START) - 1,
                 "census: the 秘策 rule, the level-convention rule, and (2026-09-29) the technique's "
-                        + "「防御力降低20%」 which rolls a base chance");
+                        + "「defence reduced by 20%」 which rolls a base chance");
     }
 
     /**
@@ -76,9 +75,9 @@ public class PelaDebuffTest {
                 List.of(f.enemy));
 
         Assertions.assertFalse(f.enemy.getBuffManager().hasState("测试增益"),
-                "「解除指定敌方单体的1个增益效果」 -- the shield went");
+                "「removes 1 buff effect from the designated single enemy」 -- the shield went");
         Assertions.assertTrue(f.enemy.getBuffManager().hasState("灼烧"),
-                "⚠ …and the DOT stayed: REMOVE_BUFF is the mirror of DISPEL, not a second DISPEL");
+                "Note: ...and the DOT stayed: REMOVE_BUFF is the mirror of DISPEL, not a second DISPEL");
     }
 
     // ==================================================================

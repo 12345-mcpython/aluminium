@@ -26,7 +26,7 @@ import java.util.Set;
  * <p><b>What "control" means here was decided by the data, not by the plan.</b> The plan said "冻结期受伤害
  * +30%"; the encyclopedia text says something else, the same way in six independent entries - 
  * {@code "冻结状态下，敌方目标不能行动同时每回合开始时受到…冰属性伤害"} - and for the other two,
- * {@code "禁锢状态下，敌方目标行动延后#2%，速度降低#4%"} (瓦尔特) and
+ * {@code "禁锢状态下，敌方目标行动延后#2%，速度降低#4%"} (Welt) and
  * {@code ""纠缠"会使敌人行动延后，并在敌人下次行动时对其造成额外的量子属性伤害"}. So:
  *
  * <table border="1">
@@ -37,7 +37,7 @@ import java.util.Set;
  *   <tr><td>Imaginary to 禁锢</td><td>no</td><td>yes</td><td>yes</td></tr>
  * </table>
  *
- * <p>The damage component of 冻结 (每回合冰伤) and 纠缠 (下次行动时量子伤) is <b>real but not built here</b>:
+ * <p>The damage component of 冻结 (ice damage each turn) and 纠缠 (quantum damage on the next action) is <b>real but not built here</b>:
  * it is a DOT, {@code BreakEffect.dotRatio} is its field, and no source states the break-applied ratio. It
  * stays a recorded TODO instead of an invented number - and {@code BreakEffectTableTest} fails if someone
  * fills one in without deciding.
@@ -58,17 +58,17 @@ import java.util.Set;
  *   <caption>action-value movement of the same break, by how much it slows</caption>
  *   <tr><th>case</th><th>movement</th><th>assertable?</th></tr>
  *   <tr><td>plain break, no slow, no extra delay</td><td>18.94 (exactly 25%)</td><td>yes - this test's regression case pins it</td></tr>
- *   <tr><td>冻结, no slow, +50% delay</td><td>56.82</td><td><b>yes, to the digit</b> - nothing recomputes</td></tr>
- *   <tr><td>禁锢, 10% slow, without the extra delay</td><td>33.6</td><td>no - already above 18.94</td></tr>
- *   <tr><td>禁锢, 10% slow, with the +20% delay</td><td>50.51</td><td>no - indistinguishable in kind</td></tr>
- *   <tr><td>纠缠, 20% slow, without the extra delay</td><td>52.08</td><td>no - already above 18.94</td></tr>
- *   <tr><td>纠缠, 20% slow, with the +20% delay</td><td>1.02</td><td>no - indistinguishable in kind</td></tr>
+ *   <tr><td>Freeze, no slow, +50% delay</td><td>56.82</td><td><b>yes, to the digit</b> - nothing recomputes</td></tr>
+ *   <tr><td>Imprison, 10% slow, without the extra delay</td><td>33.6</td><td>no - already above 18.94</td></tr>
+ *   <tr><td>Imprison, 10% slow, with the +20% delay</td><td>50.51</td><td>no - indistinguishable in kind</td></tr>
+ *   <tr><td>Entangle, 20% slow, without the extra delay</td><td>52.08</td><td>no - already above 18.94</td></tr>
+ *   <tr><td>Entangle, 20% slow, with the +20% delay</td><td>1.02</td><td>no - indistinguishable in kind</td></tr>
  * </table>
  *
- * <p>So an action-bar delay assertion for 纠缠/禁锢 could not fail, and both were removed rather than kept
+ * <p>So an action-bar delay assertion for entanglement/imprisonment could not fail, and both were removed rather than kept
  * as decoration. Nothing is left unpinned by that, because the three links are covered where they can be
  * isolated: the <b>table</b> by {@code BreakEffectTableTest} ({@code delayPercent > 0} for every control
- * element), the <b>one call site</b> that reads it by 冻结 below (exact), and the <b>mechanism</b> - a push
+ * element), the <b>one call site</b> that reads it by freeze below (exact), and the <b>mechanism</b> - a push
  * surviving a speed change - by {@code QueueActionManipulationTest.aDelaySurvivesASpeedChange}, which is
  * where it can be observed alone.
  */
@@ -84,12 +84,12 @@ public class ControlTest {
         f.breakWith(DamageElement.ICE);
 
         Assertions.assertTrue(f.enemy.getBuffManager().hasBuff(ControlBuff.class),
-                "冻结 must attach an act lock");
+                "the freeze state must attach an act lock");
         Assertions.assertEquals("冻结", f.enemy.getBuffManager().findBuff(ControlBuff.class).getName(),
-                "and the state carries the NAME the documents use, which is what 「冻结状态」 is asked with");
+                "and the state carries the NAME the documents use, which is what the freeze state is asked with");
         Assertions.assertFalse(f.enemy.getBuffManager().canAct(),
-                "冻结 = 不能行动; this is the same predicate performAction refuses on");
-        Assertions.assertEquals(speedBefore, f.speed(), EPS, "冻结 does not slow -- 禁锢/纠缠 do");
+                "the freeze state = cannot act; this is the same predicate performAction refuses on");
+        Assertions.assertEquals(speedBefore, f.speed(), EPS, "the freeze state does not slow -- imprisonment/entanglement do");
         Assertions.assertEquals(f.period() * (Constant.BREAK_DELAY_RATIO + Constant.FREEZE_EXTRA_DELAY),
                 timeRemaining(f.battle, f.enemy) - delayBefore, EPS,
                 "the delay is the fixed 25% plus the element's own extra");
@@ -103,13 +103,13 @@ public class ControlTest {
         f.breakWith(DamageElement.QUANTUM);
 
         Assertions.assertTrue(f.enemy.getBuffManager().canAct(),
-                "纠缠 acts, just later and slower -- it must NOT be an act lock");
+                "entanglement acts, just later and slower -- it must NOT be an act lock");
         Assertions.assertEquals(speedBefore * (1 - Constant.CONTROL_EFFECTS.get("ENTANGLED").slowPercent()),
-                f.speed(), EPS, "纠缠 = 速度降低");
+                f.speed(), EPS, "entanglement = speed reduction");
         // Note: The push is NOT asserted here, deliberately -- see the class javadoc's measured table. A 20%
         // slow reschedules the action by more than the push, so with or without the element's extra delay
         // the movement clears every threshold this test could name: an assertion that cannot fail. The push
-        // being read out of the table is pinned by 冻结's exact figure, and the mechanism by
+        // being read out of the table is pinned by the freeze state's exact figure, and the mechanism by
         // QueueActionManipulationTest.aDelaySurvivesASpeedChange.
     }
 
@@ -120,11 +120,11 @@ public class ControlTest {
 
         f.breakWith(DamageElement.IMAGINARY);
 
-        Assertions.assertTrue(f.enemy.getBuffManager().canAct(), "禁锢 is not an act lock");
+        Assertions.assertTrue(f.enemy.getBuffManager().canAct(), "imprisonment is not an act lock");
         Assertions.assertEquals(speedBefore * (1 - Constant.CONTROL_EFFECTS.get("IMPRISONED").slowPercent()),
-                f.speed(), EPS, "禁锢 = 速度降低");
-        // Same as 纠缠 above: no push assertion, and for the same measured reason -- at a 10% slow the
-        // reschedule alone already moves the bar 33.6against a plain break's 18.94. (Before the L-26 fix
+                f.speed(), EPS, "imprisonment = speed reduction");
+        // Same as entanglement above: no push assertion, and for the same measured reason -- at a 10% slow the
+        // reschedule alone already moves the bar 33.6 against a plain break's 18.94. (Before the L-26 fix
         // it was 12.63, *below* the baseline, so this case used to be assertable; the fix removed that
         // accidental discrimination by no longer truncating the reschedule.)
     }
@@ -181,7 +181,7 @@ public class ControlTest {
 
     /**
      * "有 50% 基础概率使敌方目标陷入冻结状态，持续1回合": the state lands, the victim cannot act, and the name is
-     * readable - which is what makes "冻结状态" askable at all.
+     * readable - which is what makes the freeze state askable at all.
      */
     @Test
     public void aSkillAppliedFreezeStopsTheVictimActingAndCarriesItsName() {
@@ -195,10 +195,10 @@ public class ControlTest {
     }
 
     /**
-     * A base chance is a <b>base</b> chance: it goes through 效果命中 and 效果抵抗, per target.
+     * A base chance is a <b>base</b> chance: it goes through effect hit and effect resistance, per target.
      *
-     * <p>Driven from the two ends of the pipeline rather than from a lucky seed: with the applier's 效果命中 at
-     * +100% a 50% base chance becomes certain, and with the victim's 效果抵抗 at 100% it becomes impossible. A
+     * <p>Driven from the two ends of the pipeline rather than from a lucky seed: with the applier's effect hit at
+     * +100% a 50% base chance becomes certain, and with the victim's effect resistance at 100% it becomes impossible. A
      * rule-level {@code chance} could do neither (it is one fixed roll for the whole rule), which is why the
      * vocabulary needed this field rather than reusing that one.
      */
@@ -220,7 +220,7 @@ public class ControlTest {
     /**
      * A monster's own resistance to <b>this</b> state ({@code STAT_CTRL_Frozen}) is part of the same roll.
      *
-     * <p>Note: The fixture for this case is 冰锋 (1002011), whose data really does carry
+     * <p>Note: The fixture for this case is Ice Edge (1002011), whose data really does carry
      * {@code STAT_CTRL_Frozen = 1.0} - it cannot be frozen by a skill at all. That is why every other case above
      * uses 1003010 (no specific resistances): a "the state lands" assertion on a monster that is immune to it would
      * have been a test of the data, not of the pipeline.
@@ -243,7 +243,7 @@ public class ControlTest {
      * Note: <b>A break-frozen unit and a skill-frozen unit are the same state.</b>
      *
      * <p>This is the property that made the migration worth doing: before {@code ControlBuff}, a break produced an
-     * unnamed {@code StunBuff}, so "冻结状态" answered <b>false</b> for a unit that was, to the game and to the
+     * unnamed {@code StunBuff}, so a question about the freeze state answered <b>false</b> for a unit that was, to the game and to the
      * player, frozen - a condition that would have silently missed half the cases it exists for.
      */
     @Test
@@ -278,7 +278,7 @@ public class ControlTest {
 
         Assertions.assertEquals(1, f.fire(), "the freeze lands");
         Assertions.assertEquals(1, f.fire(com.laosun.aluminium.enums.TriggerEvent.BASIC_ATTACK),
-                "and a later event's rule sees 「冻结状态」 on the victim");
+                "and a later event's rule sees the freeze state on the victim");
 
         Applied resisted = new Applied(control(1.0),
                 TriggerSpecs.rule("BASIC_ATTACK", java.util.List.of("target has_state 冻结"),
@@ -290,21 +290,21 @@ public class ControlTest {
                 "so the gated rule is refused -- the gate is the only thing that changed");
     }
 
-    /** The parts of a state come off together: 纠缠's slow goes when the state is removed by name. */
+    /** The parts of a state come off together: entanglement's slow goes when the state is removed by name. */
     @Test
     public void removingTheNamedStateTakesItsSlowWithIt() {
         Applied f = new Applied(control("纠缠", null));
         double before = f.enemy.getAttribute(AttributeType.SPEED).get();
 
         f.fire();
-        Assertions.assertTrue(f.enemy.getAttribute(AttributeType.SPEED).get() < before, "纠缠 slows");
+        Assertions.assertTrue(f.enemy.getAttribute(AttributeType.SPEED).get() < before, "entanglement slows");
 
         Assertions.assertEquals(1, f.enemy.getBuffManager().removeState("纠缠"), "the state is taken off by name");
         Assertions.assertEquals(before, f.enemy.getAttribute(AttributeType.SPEED).get(), EPS,
                 "and the slow it attached goes with it -- one buff, so the parts cannot come apart");
     }
 
-    /** A control is a negative effect, so "解除 N 个负面效果" reaches it. */
+    /** A control is a negative effect, so a rule that dispels N negative effects reaches it. */
     @Test
     public void aControlIsADebuffAndCanBeDispelled() {
         Applied f = new Applied(control(1.0));
@@ -418,7 +418,7 @@ public class ControlTest {
      * One battle for the skill-applied cases: a hero with the rules under test and one enemy.
      *
      * <p>The hero is a placeholder character (no data file), so nothing but the rules built here is in play, and
-     * the enemy is 冰锋 - the same fixture the break cases use, so the two paths are compared on one enemy.
+     * the enemy is Ice Edge - the same fixture the break cases use, so the two paths are compared on one enemy.
      */
     private static final class Applied {
         private final Character hero;
@@ -433,7 +433,7 @@ public class ControlTest {
             this.hero = Character.fromAttributes("caster", 10_000, 100, 100, 100);
             this.enemy = enemy;
             // Note: The fixture STATES the two sides of the probability pipeline instead of inheriting them: every
-            // monster carries some 效果抵抗 (1003010 has 30%), so "a base chance of 1 lands" is only true once
+            // monster carries some effect resistance (1003010 has 30%), so "a base chance of 1 lands" is only true once
             // this is zero. The cases that want the resistance to bite set it back (see the two resistance
             // tests); the ones that want a certain landing rely on this line.
             enemy.setAttribute(AttributeType.EFFECT_RESISTANCE, new DoubleValue(0));
@@ -464,7 +464,7 @@ public class ControlTest {
     }
 
     /**
-     * 三月七's shape: the freeze plus its own per-turn ice damage (60% of the applier's ATTACK).
+     * March 7th's shape: the freeze plus its own per-turn ice damage (60% of the applier's ATTACK).
      *
      * <p>Note: The payload is stated on the <b>same</b> effect, which is what makes it land only when the freeze does
      * (see {@link #theStateCarriesItsOwnPerTurnDamage}).
@@ -498,7 +498,7 @@ public class ControlTest {
     private static Fixture fixture(DamageElement weakness) {
         Character hero = Character.fromAttributes("hero", 10_000, 100, 100, 100);
         hero.setAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST, new DoubleValue(0));
-        Enemy enemy = EnemyFactory.create(1002011, 90, 1);          // 冰锋, toughness 60
+        Enemy enemy = EnemyFactory.create(1002011, 90, 1);          // Ice Edge, toughness 60
         enemy.setStanceWeak(Set.of(weakness));                      // make exactly this element able to break it
         return new Fixture(new Battle(List.of(hero), List.of(enemy), new Random(0)), hero, enemy);
     }

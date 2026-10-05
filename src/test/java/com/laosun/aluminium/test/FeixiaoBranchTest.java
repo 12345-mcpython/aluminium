@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1220 飞霄's ultimate branches: "若目标处于弱点击破状态，伤害倍率提高30%" and "若目标未处于弱点击破状态，伤害倍率提高30%".
+ * 1220 Feixiao (飞霄)'s ultimate branches: "if the target is in the weakness-broken state, the damage multiplier is increased by 30%" and "if the target is not in the weakness-broken state, the damage multiplier is increased by 30%".
  *
  * <p>`BOOST_DAMAGE` boosts the DAMAGE INSTANCE, so the judgement is a damage number: measured on a 900k victim with a no-crit Random. Three arms --
  * the character with a synthetic level-only table (D0), the full content with the enemy NOT broken (D1, the negated branch) and with the enemy broken

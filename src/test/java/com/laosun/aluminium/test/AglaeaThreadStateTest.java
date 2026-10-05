@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1402 阿格莱雅's "施放攻击时使目标陷入[间隙织线]状态", judged both ways with "衣匠在场时" as the variable.
+ * 1402 Aglaea (阿格莱雅)'s "when casting an attack, make the target enter the [间隙织线] state", judged both ways with "while the 衣匠 is on the field" as the variable.
  *
  * <p>Note: The state is applied by a rule and read back through `hasState`, which is also what the follow-up damage's condition asks --
  * the two halves of the sentence compose, and this pins the applying half.
@@ -28,7 +28,7 @@ public class AglaeaThreadStateTest {
 
     @Test
     public void withTheMemoSpriteOutTheAttackThreadsTheTarget() {
-        Assertions.assertTrue(attacked(true), "the 衣匠 is out, so the attack marks the target");
+        Assertions.assertTrue(attacked(true), "the 衣匠 (Garmentmaker) is out, so the attack marks the target");
     }
 
     @Test

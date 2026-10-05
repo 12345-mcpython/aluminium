@@ -142,7 +142,7 @@ final class TriggerSpecs {
         return effect;
     }
 
-    /** {@code MODIFY_DAMAGE_TAKEN} with a turn count (positive = 易伤, negative = 减伤). */
+    /** {@code MODIFY_DAMAGE_TAKEN} with a turn count (positive = vulnerability, negative = damage reduction). */
     static EffectSpec modifyDamageTaken(double percent, int turns) {
         EffectSpec effect = new EffectSpec();
         set(effect, "op", "MODIFY_DAMAGE_TAKEN");
@@ -155,7 +155,7 @@ final class TriggerSpecs {
     /**
      * {@code APPLY_BUFF}: a named state.
      *
-     * @param state     the state's name as the documents spell it (协奏)
+     * @param state     the state's name as the documents spell it (concerto)
      * @param turns     how many turns it lasts, or {@code null} for a permanent one
      * @param permanent {@code true} for "整场战斗", or {@code null}
      */
@@ -181,7 +181,7 @@ final class TriggerSpecs {
     /**
      * An {@code EXTEND_BUFF} effect: "…的持续时间增加 N 回合".
      *
-     * @param buff      the state's name (or 护盾) the rule lengthens, or {@code null} when filtering by attribute
+     * @param buff      the state's name (or shield) the rule lengthens, or {@code null} when filtering by attribute
      * @param attribute the attribute a modifier sits on, or {@code null} when filtering by name
      * @param turns     how many turns to add, or {@code null} to leave the field out
      */
@@ -198,7 +198,7 @@ final class TriggerSpecs {
     /**
      * An {@code APPLY_DOT} effect: "使目标陷入…状态，每回合造成…伤害，持续 N 回合".
      *
-     * @param element  the {@code DamageElement} spelling ({@code "Fire"} to 灼烧), or {@code null} to leave it out
+     * @param element  the {@code DamageElement} spelling ({@code "Fire"} to burn), or {@code null} to leave it out
      * @param amount   a flat per-turn amount, or the constant term of a derived one, or {@code null}
      * @param scale    {@code "self_attr:<ATTRIBUTE>"} for a value derived from the rule owner, or {@code null}
      * @param percent  the share of that attribute, or {@code null}
@@ -224,7 +224,7 @@ final class TriggerSpecs {
     /**
      * An {@code APPLY_CONTROL} effect: "有 X% 基础概率使目标陷入…状态，持续 N 回合".
      *
-     * @param control the state's name as the documents spell it (冻结 / 纠缠 / 禁锢)
+     * @param control the state's name as the documents spell it (freeze / entanglement / imprisonment)
      * @param turns   how many of the victim's turns it lasts, or {@code null} to leave the field out (which the
      *                loader refuses - a control with no duration would never end)
      * @param chance  the base chance (基础概率), or {@code null} for a state that always lands

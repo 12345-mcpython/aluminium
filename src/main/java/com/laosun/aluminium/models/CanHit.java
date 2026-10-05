@@ -83,11 +83,11 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
 
     /**
      * Temporarily cannot take damage: boss phase transition / invulnerability window
-     * (转阶段无敌、锁血演出).
+     * (转阶段无敌、锁血演出 - invulnerable during a phase transition, a scripted HP lock).
      *
      * <p>Orthogonal to {@link #death}: an invulnerable target is still a legal target
      * (an AOE still "hits" it, for 0 damage) but {@code Battle.applyDamage} settles
-     * nothing on it - this is what keeps a transitioning boss from being 鞭尸.
+     * nothing on it - this is what keeps a transitioning boss from being 鞭尸 (a corpse that keeps being hit).
      */
     @Setter
     private boolean invulnerable = false;
@@ -99,13 +99,13 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
     private double currentEnergy = 0;
 
     /**
-     * Energy cap (P3). {@code 0} = no energy bar (140遐蝶 is like this): {@link #hasEnergyBar()} is
+     * Energy cap (P3). {@code 0} = no energy bar (140 Castorice is like this): {@link #hasEnergyBar()} is
      * {@code false}, no energy gain is ever credited, and there is no such thing as "casting the ultimate
      * at full energy".
      *
      * <p>The real caps come from {@code max_energy} in {@code character_data.json} (of the 93 characters
-     * only 遐蝶 is null). Many are way off the common tier: 飞霄/白厄 12, 黄泉 9, 昔涟 24,
-     * 流萤/云璃/长夜月 240, 银枝/爻光 180, 阿格莱雅 350, 绯英 480 - see the P3-0 D table in ROADMAP.
+     * only Castorice is null). Many are way off the common tier: Feixiao/Mydei 12, Acheron 9, Cyrene 24,
+     * Firefly/Yunli/Evernight 240, Argenti/Yao Guang 180, Aglaea 350, Evanescia 480 - see the P3-0 D table in ROADMAP.
      */
     @Setter
     private double maxEnergy = 0;
@@ -192,7 +192,7 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
      * <p><b>Why the numbers live here and not on the rule.</b> Exactly like the firing limits above: a trigger table
      * is compiled once and cached per cid, and a relic set's rules are merged into the same instance for every wearer,
      * so writing a raised {@code per_turn} onto the rule would leak it into every battle in the JVM. The amendment is
-     * a fact about <b>this combatant in this battle</b> ("I have 星魂 4 active"), so it is stored next to the counters
+     * a fact about <b>this combatant in this battle</b> ("I have 星魂 4 (Eidolon 4) active"), so it is stored next to the counters
      * and reset with them.
      *
      * <p>Note: Two fields, not one: the two sentences raise two different things, and a single "delta" would make it
@@ -224,7 +224,7 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
      * <p><b>Why the raise lives here and not on the {@code Skill}.</b> The same reasoning as the rule amendments
      * above: a skill instance belongs to a {@code Character} that a stage can put into more than one battle, so
      * writing a raised level onto it would stack once per battle and never come off. The raise is a fact about
-     * <b>this combatant in this battle</b> ("my 星魂 3 is active"), so it sits next to the firing counters and is
+     * <b>this combatant in this battle</b> ("my 星魂 3 (Eidolon 3) is active"), so it sits next to the firing counters and is
      * cleared with them.
      *
      * <p>The <b>base</b> level is the other half, and it is character data, not battle state: it comes from the
@@ -418,8 +418,8 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
      * Who provided the shield currently up, and <b>which rule</b> created it, or {@code null} / {@code ""}.
      *
      * <p><b>Why the shield has to remember this.</b> Two sentences ask about the shield's origin, not its existence:
-     * "在战技提供的护盾保护下的我方目标…" (1001 三月七 星魂 6) and "我方目标持有装备者提供的护盾时…" (遗器 128's
-     * 4-piece). Neither can be answered from the number - 三月七's Skill shield and her 星魂 2 shield are both hers - so
+     * "在战技提供的护盾保护下的我方目标…" (1001 March 7th, 星魂 6) and "我方目标持有装备者提供的护盾时…" (relic (遗器) 128's
+     * 4-piece). Neither can be answered from the number - March 7th's Skill shield and her 星魂 2 shield are both hers - so
      * the pair is recorded when the shield is installed and read by the {@code has_shield from_rule …} condition.
      *
      * <p>Note: A raw {@link #setShield(double)} says "somebody set the number directly", so it clears both: a shield with
@@ -537,7 +537,7 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
      * BEFORE it is dead -- a unit at full HP cannot be healed, so announcing the moment before the damage would make the answer a
      * no-op (that was this feature's first, wrong, attempt). With this overload {@code Battle.applyDamage} can drop the target to
      * 0, fire {@link com.laosun.aluminium.enums.TriggerEvent#LETHAL_DAMAGE}, and then call {@link #perish()} only if nothing
-     * answered -- which is exactly "不会陷入无法战斗状态".
+     * answered -- which is exactly "不会陷入无法战斗状态" (it does not enter the unable-to-fight state).
      */
     public boolean takeDamage(double damage, boolean mayDie) {
         lastShieldAbsorbed = 0;                      // clear it at the start of every settlement so a stale value cannot be read
@@ -581,7 +581,7 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
      * <p>Note: <b>No kill reward is paid, but not for the reason it first looks like.</b> This method fires no
      * events, and neither does {@link #takeDamage(double)} - the {@code HpLoss} / {@code Kill} events are
      * emitted by {@code Battle.applyDamage}, the pipeline's single settlement entry point. So the thing
-     * that actually keeps a vanishing minion from paying out "每消灭 1 敌 +5 能量" is that the callers of
+     * that actually keeps a vanishing minion from paying out "每消灭 1 敌 +5 能量" (+5 energy per enemy killed) is that the callers of
      * this method run <b>outside that entry point</b> (the orphan sweep in
      * {@code Battle.removeDeadCombatants}). A future caller that wants a death to pay out must go through
      * {@code Battle.applyDamage} and settle real damage; calling this instead is the way to say "it left,
@@ -604,11 +604,11 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
      * @param amount the amount to heal
      */
     /**
-     * Spends HP as a COST (2026-09-29): "消耗等同于刃生命上限 30% 的生命值".
+     * Spends HP as a COST (2026-09-29): "消耗等同于刃生命上限 30% 的生命值" (spends HP equal to 30% of Blade's Max HP).
      *
      * <p>Note: Deliberately NOT {@code takeDamage}: a price, not an attack -- no shield absorbs it, no {@code HP_LOST} fires
      * (the texts list them side by side: "受到伤害<b>或</b>消耗生命值"), and it never kills.
-     * The floor is the documents' own: "若当前生命值不足…当前生命值降低至 1 点".
+     * The floor is the documents' own: "若当前生命值不足…当前生命值降低至 1 点" (if HP is insufficient, HP is lowered to 1).
      *
      * @return the HP actually spent
      */

@@ -12,12 +12,12 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 杰帕德's freeze, made deterministic (2026-09-28, round 131), and the reason it looked broken for four rounds.
+ * Gepard (杰帕德)'s freeze, made deterministic (2026-09-28, round 131), and the reason it looked broken for four rounds.
  *
  * <p><b>What the source said.</b> `Battle.hitChance` computes
  * <pre>baseChance * (1 + EFFECT_HIT_RATE) * (1 - EFFECT_RESISTANCE) * (1 - specific)</pre>
  * where `specific` is, for an enemy target, `enemy.getDebuffResist().getOrDefault(specificResistKey, 0.0)` - and the control's
- * key for 冻结 is its own resist key. The monster this project's fixtures use by default carries that key at <b>1.0</b>, so the
+ * key for 冻结 (frozen) is its own resist key. The monster this project's fixtures use by default carries that key at <b>1.0</b>, so the
  * chance was clamped to <b>0</b> and the roll could never pass: the content was right, the enemy was immune.
  *
  * <p><b>What makes it deterministic now.</b> A hand-made target with no resistances at all, plus eidolon 1's +35% base chance on

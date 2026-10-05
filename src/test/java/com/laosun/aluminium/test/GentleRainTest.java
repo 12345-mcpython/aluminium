@@ -16,8 +16,8 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Relic set 125 "烈阳惊雷的女武神" 4-piece: "当装备者及其忆灵为装备者及其忆灵以外的我方目标提供治疗后，使装备者获得[甘霖]，
- * 每回合最多触发1次，持续2回合。装备者持有[甘霖]时，速度提高6%，我方全体暴击伤害提高15%，该效果无法叠加。" (param [0.06, 0.15, 2])
+ * Relic set 125 "烈阳惊雷的女武神" (Valkyrie of the Scorching Sun and Thunder) 4-piece: "当装备者及其忆灵为装备者及其忆灵以外的我方目标提供治疗后，使装备者获得[甘霖]，
+ * 每回合最多触发1次，持续2回合。装备者持有[甘霖]时，速度提高6%，我方全体暴击伤害提高15%，该效果无法叠加。" (when the wearer and its memosprite heal one of our targets other than the wearer and its memosprite, the wearer gains [甘霖], at most once per turn, for 2 turns; while the wearer holds [甘霖], SPD +6% and all of our side's CRIT DMG +15%, and the effect does not stack) (param [0.06, 0.15, 2])
  *
  * <p>Every expectation is a DIFFERENCE between two otherwise-identical battles -- one with the heal, one without -- because the wearer's SPD moves
  * for reasons of its own between construction and reading (the set's own 2-piece `SpeedAddedRatio`, and traits that fire at BATTLE_START). A share
@@ -48,7 +48,7 @@ public class GentleRainTest {
         Result with = run(true, true, false);
         Result without = run(false, true, false);
         Assertions.assertEquals(0.06 * with.baseSpeed, with.speed - without.speed, EPSILON,
-                "one rule covers both healers, because `actor is_ally` includes the 忆灵: "
+                "one rule covers both healers, because `actor is_ally` includes the 忆灵 (memosprite): "
                         + without.speed + " -> " + with.speed);
     }
 
@@ -57,7 +57,7 @@ public class GentleRainTest {
         Result with = run(true, false, true);
         Result without = run(false, false, true);
         Assertions.assertEquals(0.0, with.speed - without.speed, EPSILON,
-                "「以外的我方目标」 excludes the wearer: " + without.speed + " -> " + with.speed);
+                "「以外的我方目标」 (our targets other than it) excludes the wearer: " + without.speed + " -> " + with.speed);
     }
 
     @Test
@@ -65,7 +65,7 @@ public class GentleRainTest {
         Result with = run(true, false, false, true);
         Result without = run(false, false, false, false);
         Assertions.assertEquals(0.06 * with.baseSpeed, with.speed - without.speed, EPSILON,
-                "per_turn: 1 and max_stacks: 1 -- 「该效果无法叠加」 stays at one stack: "
+                "per_turn: 1 and max_stacks: 1 -- 「该效果无法叠加」 (the effect does not stack) stays at one stack: "
                         + without.speed + " -> " + with.speed);
     }
 

@@ -16,9 +16,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 开拓者(毁灭)'s 星魂 4: "击中处于弱点击破状态的敌方目标时，暴击率提高25%" -- a state-gated boost for that hit.
+ * Trailblazer (Destruction) (开拓者(毁灭))'s Eidolon 4: "击中处于弱点击破状态的敌方目标时，暴击率提高25%" -- a state-gated boost for that hit.
  *
- * <p>Two ways: an enemy whose toughness is emptied is 弱点击破 and the boost is stated; one that is not gets nothing. The
+ * <p>Two ways: an enemy whose toughness is emptied is weakness broken and the boost is stated; one that is not gets nothing. The
  * state is produced through the engine's own entry point, the same way SuperBreakTest's fixture does it.
  */
 public class TrailblazerEidolonTest {
@@ -42,7 +42,7 @@ public class TrailblazerEidolonTest {
         Character trailblazer = CharacterFactory.create(cid, LEVEL, true, null, null, 4);
         DamageElement element = trailblazer.getSkills().get(SkillType.COMMON).getData().getElement();
         // Note: A monster the element can actually break: breaking requires a weakness, and `reduceToughness` on a monster
-        // that is not weak to the element leaves the 弱点击破 state off entirely (measured: hasState false).
+        // that is not weak to the element leaves the weakness break state off entirely (measured: hasState false).
         Enemy enemy = null;
         for (int id = 1002010; id < 1002100 && enemy == null; id++) {
             try {

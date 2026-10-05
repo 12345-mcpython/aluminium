@@ -31,19 +31,19 @@ public enum TriggerEvent {
      *
      * <p>Note: <b>The name must ride on the event, not be read off the carrier</b>: by the time this fires the state is
      * already gone (the removal happens first), so a {@code has_state} condition on the carrier can never be true.
-     * Readers: 1211's "[生息]结束时…", 1505's "队友持有的[好活当赏]结束时…", 1408's three "变身结束时…",
-     * 1501's two "阿哈时刻结束时…" and the light cone's "奇袭结束后…".
+     * Readers: 1211's "when [生息] ends ...", 1505's "when a teammate's [好活当赏] ends ...", 1408's three "when the transformation ends ...",
+     * 1501's two "when the Aha moment ends ..." and the light cone's "when the coup de main ends ...".
      */
     STATE_ENDED("STATE_ENDED", true),
 
     /**
-     * The end of a cast that a RULE commanded -- "被插入的施放" (2026-10-02).
+     * The end of a cast that a RULE commanded -- "an inserted cast" (2026-10-02).
      *
      * <p>Note: A commanded cast IS a real cast: it announces CAST_SETUP / SKILL_CAST and settles its own energy, so no existing
      * event tells it apart from the original it was copied from. This is the moment that names it, and the reader is
-     * 1412's "奇袭结束后，消耗 6 点充能使[爵位]变回[军功]" -- "after the INSERTED one ended", not "after a skill was cast".
+     * 1412's "after the coup de main ends, spend 6 points of charge to turn [爵位] back into [军功]" -- "after the INSERTED one ended", not "after a skill was cast".
      *
-     * <p>Note: <b>A commanded cast may not command another one</b> (the same sentence: "奇袭不会再次触发奇袭"). The guard
+     * <p>Note: <b>A commanded cast may not command another one</b> (the same sentence: "a coup de main will not trigger a coup de main again"). The guard
      * lives in {@code TriggerInterpreter.castSkill} and reads the cast stack the engine already keeps:
      * {@code Battle.currentCast().outer() != null} means the open cast is itself a commanded one, which is exactly the
      * "inserting inside an insert" that would otherwise recurse forever -- the same shape as {@code castUltra}'s refusal
@@ -54,12 +54,12 @@ public enum TriggerEvent {
     /**
      * An incoming hit that WOULD kill the target, announced before it is applied (2026-10-02).
      *
-     * <p>"受到致命攻击时不会陷入无法战斗状态，而是回复等同于自身生命上限 20%／50% 的生命值" - two readers, both registered
+     * <p>"when taking a lethal attack it will not fall into the unable-to-fight state, but instead restore health equal to 20%/50% of its own Max HP" - two readers, both registered
      * before this existed (1408's transformed form, and 1104, whose own file records the sentence as missing).
      *
      * <p>The semantics the sentence states, and why "heal and then take the hit" is NOT it: the text says the unit does
      * <b>not</b> fall, so the killing blow is <b>cancelled</b> when a listener answers -- if the heal were simply applied first,
-     * any hit larger than the heal would still kill, which is the opposite of "不会陷入无法战斗状态".
+     * any hit larger than the heal would still kill, which is the opposite of "will not fall into the unable-to-fight state".
      *
      * <p>Fired from {@code Battle.applyDamage} right before {@code takeDamage}, which is the single place a target is hurt.
      */
@@ -85,7 +85,7 @@ public enum TriggerEvent {
      * <p>Note: <b>Narrowed on 2026-09-2.</b> This used to fire for <b>every</b> cast that was not an
      * ultimate, which silently included basic attacks, techniques, map attacks and talents - so
      * "when the wearer uses their Skill" content (relic set 109's ATK buff, Robin's 模进乐段) also
-     * fired on 普攻. That is the failure this vocabulary is shaped to prevent: an over-trigger is a
+     * fired on a basic attack. That is the failure this vocabulary is shaped to prevent: an over-trigger is a
      * wrong number with no error attached. The three in-battle casts now have three events
      * ({@link #BASIC_ATTACK} / this / {@link #ULT_CAST}), split at the emitter from the parsed
      * {@code SkillCategory}, because the condition DSL has no variable for the kind of cast.
@@ -95,7 +95,7 @@ public enum TriggerEvent {
      * An ally used their <b>basic attack</b> (the data's {@code Normal} - which also covers enhanced
      * basic attacks, since the data spells both of them {@code Normal}).
      *
-     * <p>This is the event for "施放普攻后 / after the wearer uses their Basic ATK". It is deliberately
+     * <p>This is the event for "after casting a basic attack / after the wearer uses their Basic ATK". It is deliberately
      * separate from {@link #ALLY_ATTACK}, which fires for <b>any</b> attack that lands (basic attack,
      * skill, ultimate, follow-up) and is what "after an ally attacks" content wants.
      *
@@ -115,19 +115,19 @@ public enum TriggerEvent {
     HP_LOST("HP_LOST", true),
 
     /**
-     * <b>A damage instance was SETTLED</b> - "我打出的这一下结算了多少" (2026-10-02).
+     * <b>A damage instance was SETTLED</b> - "how much did this hit I dealt actually settle" (2026-10-02).
      *
      * <p><b>Why it had to exist.</b> The engine already announced damage <i>before</i> it was settled
      * ({@link #DEALING_DAMAGE}, deliberately: that is where a rule can still change the instance, and its
      * {@code amount} is therefore the <b>base</b> - measured: 1093.02 where the victim really lost 260.23584).
      * The post-settlement number existed for <b>our own</b> units only: {@link #TAKING_HIT} carries {@code settled},
      * but it is fired through {@code fireTriggersForAlly}, whose first line returns 0 for any target that is not on
-     * our side - so an enemy taking a hit never announced it. 姬子's 星魂 6
-     * "终结技额外造成 2 次伤害，对随机敌方单体各造成等同于<b>原伤害 40%</b>的火属性伤害" needs exactly that
-     * number about an <b>enemy</b> victim, and "（本次/该次/原）伤害的 X%" is a whole family (14 + 6 documents).
+     * our side - so an enemy taking a hit never announced it. Himeko (姬子)'s eidolon 6
+     * "the ultimate additionally deals 2 instances of damage, each dealing fire damage equal to <b>40% of the original damage</b> to a random enemy" needs exactly that
+     * number about an <b>enemy</b> victim, and "(this/that/original) damage x X%" is a whole family (14 + 6 documents).
      *
      * <p>Note: It is the <b>dealer's</b> event, not the victim's: {@code actor} = whoever dealt it, {@code target} =
-     * whoever took it, both sides. That is the honest reading of "我造成的伤害", and it is why this is a new event
+     * whoever took it, both sides. That is the honest reading of "the damage I dealt", and it is why this is a new event
      * rather than "let TAKING_HIT reach enemies" - that one is the victim's fact and stays ours (P9 owns monsters).
      *
      * <p>Its {@code amount} is the <b>settled</b> value, which is what {@code scale: "original_damage"} reads.
@@ -135,8 +135,8 @@ public enum TriggerEvent {
     DAMAGE_SETTLED("DAMAGE_SETTLED", true),
 
     /**
-     * "消耗生命值" (2026-09-29): HP paid as a PRICE. The texts list it separately from "受到伤害"
-     * ("当装备者受到攻击<b>或</b>被我方目标消耗生命值后", 113/4) because a hit can be shielded and can kill, and a price can do neither.
+     * "HP consumed" (2026-09-29): HP paid as a PRICE. The texts list it separately from "taking damage"
+     * ("after the wearer is attacked <b>or</b> has HP consumed by one of our targets", 113/4) because a hit can be shielded and can kill, and a price can do neither.
      */
     HP_CONSUMED("HP_CONSUMED", true),
     /**
@@ -147,11 +147,11 @@ public enum TriggerEvent {
      * A <b>shield was granted</b> to one of our characters (2026-09-28, M-43).
      *
      * <p>{@code actor} = <b>who provided it</b>, {@code target} = who received it - the same convention
-     * {@link #HEALED} uses, so "受到<b>队友提供的</b>治疗效果或护盾时" is
+     * {@link #HEALED} uses, so "when receiving healing <b>or a shield provided by a teammate</b>" is
      * {@code target == self} + {@code actor is_ally} + {@code actor != self} with no new vocabulary at all.
      *
      * <p><b>Why it had to exist.</b> The engine had {@code HEALED} but no "a shield was given" event - shields
-     * were only an <i>op</i> ({@code SHIELD}). 大丽花's trace "当大丽花受到队友提供的治疗效果<b>或护盾</b>时…"
+     * were only an <i>op</i> ({@code SHIELD}). Dahlia (大丽花)'s trace "when Dahlia receives healing <b>or a shield</b> provided by a teammate ..."
      * subscribes to both, so writing only the healing half would leave the trace silent exactly when the shield
      * half applies: an effect that is too weak, with nothing anywhere reporting a problem.
      *
@@ -186,7 +186,7 @@ public enum TriggerEvent {
     SKILL_POINT_GAINED("SKILL_POINT_GAINED", true),
     /**
      * Skill points that were ASKED for but NOT credited, because the pool was already at its cap (2026-09-30; readers:
-     * cone 23021's "恢复时溢出的战技点也会被计算在内" and character 1306's "若战技点溢出，则记录溢出的战技点数").
+     * cone 23021's "the skill points that overflow on restore are also counted" and character 1306's "if skill points overflow, record the number of overflowed skill points").
      *
      * <p>Without it the swallowed points are invisible: {@code SKILL_POINT_GAINED} only fires when something was really
      * credited ("gained > 0"), so a gain at the cap is indistinguishable from no gain at all. The amount carried here is
@@ -208,7 +208,7 @@ public enum TriggerEvent {
     /**
      * A unit's turn ended (2026-09-28).
      *
-     * <p>"每次我方目标回合结束时，移除驭空 1 层[鸣弦号令]"（120驭空）needed this moment, and nothing else could stand
+     * <p>"at the end of each of our targets' turns, remove 1 stack of [鸣弦号令] from Yukong (驭空)" (120 Yukong) needed this moment, and nothing else could stand
      * in for it: the *next* unit's {@code TURN_START} is a different fact (the last turn of a fight has no next unit), and
      * a buff's duration tick is not an event at all.
      *
@@ -240,7 +240,7 @@ public enum TriggerEvent {
      *
      * <p><b>Why a pre-settlement event had to exist.</b> {@link #ALLY_ATTACK} fires <i>after</i> the whole
      * attack has been settled - correct for "after an ally attacks", useless for
-     * "对处于 X 状态的目标造成的伤害提高 Y%", because by then the number is final and all a rule could do is
+     * "increases the damage dealt to a target in state X by Y%", because by then the number is final and all a rule could do is
      * describe it. This event hands over the pending instance ({@code TriggerContext.damage()}), and
      * {@code BOOST_DAMAGE} is what changes it - <b>for that one instance only</b>, since the instance itself is
      * the state: there is no buff to attach, nothing to clean up, and nothing that can leak into the next hit.
@@ -284,14 +284,14 @@ public enum TriggerEvent {
      */
     FOLLOW_UP("FOLLOW_UP", true),
     /**
-     * A <b>summon</b> finished an attack (2026-09-28, P9-4 忆灵): fired by {@code EnemySkill.execute}
+     * A <b>summon</b> finished an attack (2026-09-28, P9-4 memosprites): fired by {@code EnemySkill.execute}
      * after every segment of its attack has been settled, with the summon as {@code actor} and the
      * hit-target count riding along like {@link #ALLY_ATTACK}'s.
      *
      * <p><b>Why its own event rather than widening {@link #ALLY_ATTACK}.</b> "An ally attacked" is what
      * three shipped rules mean today ({@code characters/1309.json}, {@code characters/1403.json}'s
-     * "我方其他目标攻击后", relic set 105's {@code actor == self}), and whether a memosprite counts as
-     * one of those "目标" is <b>not</b> something the documents settle here. Widening the event would
+     * "after another of our targets attacks", relic set 105's {@code actor == self}), and whether a memosprite counts as
+     * one of those "targets" is <b>not</b> something the documents settle here. Widening the event would
      * have silently changed what those three rules fire on - an over-trigger is a wrong number with no
      * error attached - so the distinction is drawn at the emitter instead, exactly as
      * {@link #SKILL_CAST} / {@link #BASIC_ATTACK} / {@link #ULT_CAST} are.
@@ -306,21 +306,21 @@ public enum TriggerEvent {
      */
     SUMMON_ATTACK("SUMMON_ATTACK", true),
     /**
-     * A <b>summon entered the field</b> (2026-09-28, P9-4 忆灵): fired by {@code Battle.processRequests} for
+     * A <b>summon entered the field</b> (2026-09-28, P9-4 memosprites): fired by {@code Battle.processRequests} for
      * everything {@code Battle.summon} / {@code Battle.summonMemosprite} placed, with the summoned unit as
      * {@code actor}.
      *
      * <p><b>Why it is fired at the settle point and not inside the summon call.</b> A summon enters the action
      * bar through {@code addRequestItems}, which {@code processRequests} drains - so during the call itself the
-     * unit is on the roster but <b>not yet scheduled</b>. A rule that answers "被召唤时" almost always wants to
-     * touch its action value ({@code ADVANCE}, i.e. "使自身立即行动"), and an advance against a unit with no
+     * unit is on the roster but <b>not yet scheduled</b>. A rule that answers "when summoned" almost always wants to
+     * touch its action value ({@code ADVANCE}, i.e. "make itself act immediately"), and an advance against a unit with no
      * signal is silently lost. Note: That is also why this cannot simply be fired from
      * {@code processAddRequests}: that queue is shared with <b>wave</b> entries, and a wave arriving is not a
      * summon.
      *
      * <p>Fired for a summon of either camp; {@code actor == summon} is what narrows it to the rule owner's own
      * (the same condition {@link #SUMMON_ATTACK} uses). Note that {@code SUMMON} is idempotent per summoner, so a
-     * second summoning while one is already out fires nothing - which is exactly what "若衣匠已在场，则…"
+     * second summoning while one is already out fires nothing - which is exactly what "if the 衣匠 is already present, then ..."
      * clauses need.
      */
     SUMMONED("SUMMONED", true),
@@ -334,9 +334,9 @@ public enum TriggerEvent {
      * itself. {@link #DEALING_DAMAGE} covers "change this damage instance"; this covers "this cast's damage is not
      * mine to deal", which is a fact about the <b>cast</b> and has to be known before the instance exists.
      *
-     * <p><b>The first user.</b> 长夜月's ultimate: 141303's own generated damage rows would swing at <b>her</b>
-     * attack as the base, while the document says the damage is the memosprite's ("使忆灵'长夜'对敌方全体造成
-     * 等同于"长夜"#1[i]%生命上限的冰属性伤害") - and the rule that delivers it as the memosprite's runs on
+     * <p><b>The first user.</b> Evernight (长夜月)'s ultimate: 141303's own generated damage rows would swing at <b>her</b>
+     * attack as the base, while the document says the damage is the memosprite's ("make the memosprite '长夜' deal to all enemies
+     * ice damage equal to #1[i]% of '长夜''s Max HP") - and the rule that delivers it as the memosprite's runs on
      * {@link #ULT_CAST}, i.e. too late to stop the first swing. Measured before this existed: 8818.5 from her own
      * rows plus the commanded hit, where the document describes one damage instance.
      *
@@ -352,15 +352,15 @@ public enum TriggerEvent {
     CAST_SETUP("CAST_SETUP", true),
     /**
      * A <b>countdown</b> unit's turn began (2026-09-28, M-49): fired from {@code Battle.beforeMove} with the
-     * countdown as {@code actor} (and as the subject), so a rule can answer "倒计时回合开始时…".
+     * countdown as {@code actor} (and as the subject), so a rule can answer "at the start of the countdown's turn ...".
      *
-     * <p><b>Why the moment needs an event at all.</b> 知更鸟's [协奏] lasts "until its countdown's turn arrives", which is a fact about
+     * <p><b>Why the moment needs an event at all.</b> Robin (知更鸟)'s [协奏] lasts "until its countdown's turn arrives", which is a fact about
      * the <b>action order</b> rather than about anybody's turn count - so the state cannot be given a `turns` and the
      * arrival has to be announced. The countdown is an ordinary {@link com.laosun.aluminium.models.Countdown} scheduled
      * by the queue, which is what makes advances/breaks move it for free.
      *
      * <p>Note: <b>{@code actor} is the countdown, not the character whose state it ends.</b> The rule that reacts is
-     * written on the character and reads its own state ("退出[协奏]"是 `REMOVE_STATE` 加 `EXTRA_TURN self`), so the actor is only ever used
+     * written on the character and reads its own state ("exiting [协奏]" is `REMOVE_STATE` plus `EXTRA_TURN self`), so the actor is only ever used
      * to recognise the moment - and a rule that wants "my own countdown" says so by naming it in its own table.
      */
     COUNTDOWN_TURN("COUNTDOWN_TURN", true),
@@ -369,13 +369,13 @@ public enum TriggerEvent {
      * A damage instance that CRIT.
      *
      * <p>{@code DEALING_DAMAGE} fires BEFORE the crit zone is read (the event at Battle:2542, the roll at
-     * 254), so "当装备者对敌方目标造成暴击后" was not expressible: at the moment a rule could see the
+     * 254), so "after the wearer crits an enemy target" was not expressible: at the moment a rule could see the
      * instance, nobody knew whether it would crit. This one fires right AFTER the zone and only when it did,
      * so a rule needs no predicate -- and its SUBJECT is the critter, not the victim.
      */
     CRIT_DEALT("CRIT_DEALT", true),
     /**
-     * A <b>wave entered the field</b> (2026-09-30; readers: cones 23011 and 23064, "每个波次开始时").
+     * A <b>wave entered the field</b> (2026-09-30; readers: cones 23011 and 23064, "at the start of each wave").
      *
      * <p>Fired by {@code WaveManager.nextWave} right after the wave's monsters are spawned, and with neither actor nor
      * subject -- the same shape as {@code BATTLE_START}, because a wave arriving is a fact about the battle rather than
@@ -384,7 +384,7 @@ public enum TriggerEvent {
      */
     WAVE_START("WAVE_START", true),
     /**
-     * A <b>resource changed</b> (2026-09-30; readers: cone 20024's "当拥有的笑点>= 10 时…").
+     * A <b>resource changed</b> (2026-09-30; readers: cone 20024's "when the [笑点] held is >= 10 ...").
      *
      * <p>Fired by {@code GAIN_RESOURCE} / {@code SPEND_RESOURCE} with the <b>holder</b> as the actor: a battle is at hand
      * there, while {@code ResourceManager} owns none and so cannot raise a trigger itself. Note: The consequence is stated
@@ -401,9 +401,9 @@ public enum TriggerEvent {
     ATTACK_FINISHED("ATTACK_FINISHED", true),
 
     /**
-     * 装备者为敌方目标添加了一个弱点（光锥 23050 随心："装备者为敌方目标添加弱点时，
-     * 恢复 1 个战技点"）。Note: 三个读者：23050 、 1405 的天赋、 1006 的战技。
-     * Note: 发在 {@code ADD_ELEMENTAL_WEAKNESS} 的成功分支里，所以只有真的添加了才会点着。
+     * The wearer added a weakness to an enemy target (light cone 23050 随心: "when the wearer adds a weakness to an enemy target,
+     * restore 1 skill point"). Note: Three readers: 23050, 1405's talent, 1006's Skill.
+     * Note: Fired in {@code ADD_ELEMENTAL_WEAKNESS}'s success branch, so it only fires when one was really added.
      */
     WEAKNESS_ADDED("WEAKNESS_ADDED", true);
 

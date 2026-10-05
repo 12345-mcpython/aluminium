@@ -152,7 +152,7 @@ return copy;
     private Double amount;
     /**
      * An amount read from an ATTRIBUTE instead of a literal (2026-09-30; reader: light cone/character 1505
-     * 绯英's talent "绯英获得等同于暴击伤容 <b>50%</b> 的欢愉度"). The clause names a SHARE of a panel
+     * Feixiao's talent "绯英获得等同于暴击伤容 <b>50%</b> 的欢愉度"). The clause names a SHARE of a panel
      * value, which no literal can carry -- until this field a `GAIN_RESOURCE` rule could only add a fixed number, so
      * that sentence had no spelling at all.
      */
@@ -202,8 +202,8 @@ return copy;
     /**
      * Whose skill row a {@code skill_param:} / {@code percent_from_skill_param} share is read from, when it is NOT the rule owner's own (2026-10-02).
      *
-     * <p>Readers: 1415's odes -- "提高数值等同于本次治疗数值的 #1%" (the value is in slot 19's row; the healing is 风堇's),
-     * the time ode's memosprite boost (value in slot 24; the damage is the memosprite's skill ), and the ocean ode's overflow sentence (value in slot 22; the attack is 海瑟音's).
+     * <p>Readers: 1415's odes -- "提高数值等同于本次治疗数值的 #1%" (the value is in slot 19's row; the healing is Hyacine's),
+     * the time ode's memosprite boost (value in slot 24; the damage is the memosprite's skill ), and the ocean ode's overflow sentence (value in slot 22; the attack is Hysilens's).
      *
      * <p>Note: It is a FIELD and not part of the spelling on purpose: measured, a cid inside the slot string is refused --
      * {@code Op MODIFY_ATTR scales off skill slot "1415|SKILL", which is not a SkillType}.
@@ -211,34 +211,34 @@ return copy;
     @com.google.gson.annotations.SerializedName("skill_param_cid")
     private Integer skillParamCid;
     /**
-     * Take the amount from the EVENT itself (2026-09-30; reader: 1505 绯英's talent "绯英获得能量时，
+     * Take the amount from the EVENT itself (2026-09-30; reader: 1505 Feixiao's talent "绯英获得能量时，
      * 将同步获得等值的[好活当赏]"). The magnitude a rule reacts to -- energy credited, damage dealt -- is already on the
      * context ({@code TriggerContext.amount}); until this flag no op could spend it, so "as much as it just gained" had no spelling.
      */
     private Boolean amountFromEvent;
 
     /**
-     * 2026-10-02：效果级的星魂分层。读者：1505 星魂的 50%／100%，
+     * 2026-10-02: per-effect Eidolon tiers. Readers: 1505's Eidolon 50%/100%,
      * 以及 1415 第二半那条"随层级"的穿透。规则级的 `min_eidolon`
-     * 只能关掉整条规则，而这里要关的只是其中一条效果。
+     * can only turn off the whole rule, while here the point is to turn off just one of its effects.
      */
     @com.google.gson.annotations.SerializedName("min_eidolon")
     private Integer minEidolon;
 
     /**
-     * Note: 2026-10-02（读者：1505 星魂"额外获得等同于本次获得的[好活当赏]50%/100%"）：
-     * 读的是<b>本条规则里前一条效果实际入账的量</b>（已经过上限截断），而不是原始事件量。
-     * 原始事件量请用 {@link #amountFromEvent}。
+     * Note: 2026-10-02 (reader: 1505's Eidolon "额外获得等同于本次获得的[好活当赏]50%/100%"):
+     * it reads <b>the amount the previous effect of this rule actually booked</b> (already truncated by the cap), not the raw event amount.
+     * For the raw event amount use {@link #amountFromEvent}.
      */
     private Boolean amountFromPrevious;
     /**
-     * A ceiling on a single conversion (2026-09-30; reader: 1505 绯英's "单次通过此方式计算的
+     * A ceiling on a single conversion (2026-09-30; reader: 1505 Feixiao's "单次通过此方式计算的
      * [好活当赏]不超过 100 点"). The clause bounds one conversion, not the resource: "获得一点能量\n     * 就得一点礼包，但一次最多给 100" is two different statements, and only the first had a spelling before this.
      */
     private Double amountCap;
     /**
      * Settle this {@code DAMAGE} effect as an ORDINARY instance rather than additional damage (2026-09-30;
-     * reader: 1505 绯英's technique, "进入战斗后，对敌方全体造成等同于绯英 <b>100%</b> 攻击力的
+     * reader: 1505 Feixiao's technique, "进入战斗后，对敌方全体造成等同于绯英 <b>100%</b> 攻击力的
      * <b>物理属性伤容</b>"). The two are not the same thing and the difference is measurable: additional damage is
      * boostable-only-as-additional, does not count as an attack and credits the victim energy only on a kill, while the
      * sentence above describes an ordinary hit.\n     */
@@ -260,8 +260,8 @@ return copy;
      * would say "some share of a Max HP", which is not a number.
      *
      * <p>Note: <b>{@code GAIN_ENERGY} names one more</b> (M-44): {@code "target_max_energy"} - "恢复等同于 #1% <b>能量
-     * 上限</b>的能量" (星期日's ultimate). It is the same idea as the Max-HP ones (a share of a per-character maximum
-     * that the rule cannot know), and it exists because the maximum is per character: 姬子 120 / 星期日 130 / 翡翠 140,
+     * 上限</b>的能量" (Sunday's ultimate). It is the same idea as the Max-HP ones (a share of a per-character maximum
+     * that the rule cannot know), and it exists because the maximum is per character: Himeko 120 / Sunday 130 / Jade 140,
      * so any flat number would be wrong for every one of them.
      *
      * <p>Note: <b>{@code MODIFY_ATTR} has a third spelling</b> (P11-2, M-42): {@code "self_attr:<ATTRIBUTE>"} - the
@@ -316,7 +316,7 @@ return copy;
     /**
      * A derived <b>ceiling</b> on this effect's magnitude: {@code cap_scale} + {@code cap_percent} (2026-09-28).
      *
-     * <p>"受到等同于自身 24.00% 生命上限的…持续伤害，<b>最多不超过卢卡攻击力的 338%</b>" (1111 卢卡 战技) is a
+     * <p>"受到等同于自身 24.00% 生命上限的…持续伤害，<b>最多不超过卢卡攻击力的 338%</b>" (1111 Luka's Skill) is a
      * {@code min_of_two}: the magnitude is the smaller of two derived values. Spell it as the primary value plus a ceiling --
      * {@code scale}/{@code percent} for the first, {@code cap_scale}/{@code cap_percent} for the second -- and the engine takes
      * the minimum.
@@ -468,7 +468,7 @@ return copy;
      * <ul>
      *   <li>{@code "next_attack"} - after the owner finishes an attack that landed (basic attack, Skill or
      *       Ultimate; relic set 305's "持续到施放首次攻击后结束" and set 10's "for the next attack"). A
-     *       <b>summon's</b> attack ends a buff on the <b>summon</b> the same way (P9-4 忆灵), and it does not
+     *       <b>summon's</b> attack ends a buff on the <b>summon</b> the same way (P9-4 memosprite), and it does not
      *       end its summoner's: the notification asks {@code attacker == owner};</li>
      *   <li>{@code "next_skill"} - after the owner casts a Skill (set 122's "the next Skill");</li>
      *   <li>{@code "next_ultimate"} - after the owner casts an Ultimate.</li>
@@ -542,7 +542,7 @@ return copy;
     private String buff;
 
     /**
-     * "暂时<b>延后</b>陷入无法战斗状态": the state this effect applies does not let its carrier die (2026-10-02; reader: 140's 月茧之庇).
+     * "暂时<b>延后</b>陷入无法战斗状态": the state this effect applies does not let its carrier die (2026-10-02; reader: 140's Cocoon of the Moon (月茧之庇)).
      *
      * <p>Note: Only {@code APPLY_BUFF} reads it. The engine holds the death instead of committing it, and commits it at the
      * carrier's next turn if the state is still there -- so the state's own removal is what saves the carrier. See
@@ -555,7 +555,7 @@ return copy;
      * Whose <b>turns</b> spend this buff's duration: {@code "self"} = the <b>rule owner's</b> (M-42 ④). Absent =
      * the unit that receives the buff.
      *
-     * <p><b>Why it has to be statable.</b> 星期日's [蒙福者] is granted to an ally and says "星期日自身每回合开始时
+     * <p><b>Why it has to be statable.</b> Sunday's [蒙福者] is granted to an ally and says "星期日自身每回合开始时
      * [蒙福者]状态持续回合减1" - the state sits on the ally while its clock is <b>his</b>. Left to itself the engine
      * counts a buff down on the turns of whoever carries it, so the same sentence would last a different number of
      * turns in every fight, with nothing to report.
@@ -586,7 +586,7 @@ return copy;
      *
      * <p><b>Why a cast needs two names.</b> {@link #target} says <i>who performs the cast</i>, and this one says
      * <i>which unit that cast is aimed at</i>. The sentence that needed it states both, and they are different units:
-     * 1414 丹恒-腾荒's technique says "下一次战斗开始时自动对<b>持有[同袍]的角色</b>施放 1 次战技" - <b>he</b> casts it
+     * 1414 Dan Heng - Permansor Terrae's technique says "下一次战斗开始时自动对<b>持有[同袍]的角色</b>施放 1 次战技" - <b>he</b> casts it
      * ({@code "target": "self"}), and it is aimed at <b>whoever holds [同袍]</b>
      * ({@code "cast_target": "holder_of:同袍"}). Folding the two into one field was not an option: with the aim
      * expressed as "the caster", the skill's own "使指定我方单体角色成为[同袍]" would re-designate the wrong ally.
@@ -655,8 +655,8 @@ return copy;
      *
      * <p>Note: This exists because a character's skills are all at <b>level 1</b> in this engine
      * ({@code Character.Builder} initialises every slot to 1 and nothing raises it), while the documents quote
-     * their figures at <em>whatever level that skill's prose happens to be written at</em> - 长夜月's ultimate
-     * quotes 200% (the Lv10 row) and its 忆灵技1 quotes 50% (the Lv6 row). Reading "the skill's level" therefore
+     * their figures at <em>whatever level that skill's prose happens to be written at</em> - Cyrene's ultimate
+     * quotes 200% (the Lv10 row) and its memosprite skill 1 quotes 50% (the Lv6 row). Reading "the skill's level" therefore
      * silently produces a different number from the text: her ultimate would deal 100% of the memosprite's Max HP
      * instead of 200%, with nothing to report. A rule that means the number the document states says which row
      * it read, exactly as it says which column ({@link #damageParam}).
@@ -673,7 +673,7 @@ return copy;
      *
      * <p>{@code true} - a follow-up attack: a real hit, so it participates in attack-level events and
      * the target's "on being hit" energy.
-     * {@code false} - supplementary damage (the officially defined 附加伤害/真伤, which explicitly
+     * {@code false} - supplementary damage (the officially defined additional damage / true damage, which explicitly
      * "does not count as dealing 1 attack").
      *
      * <p>Absent means {@code false}: the conservative reading, and what the engine's existing
@@ -746,27 +746,27 @@ return copy;
 
     /**
      * The <b>control state</b> this effect applies - the name the documents and the {@code has_state} condition
-     * use (冻结 / 纠缠 / 禁锢). Only {@code APPLY_CONTROL} reads it; the closed set is
+     * use (freeze / entanglement / imprisonment). Only {@code APPLY_CONTROL} reads it; the closed set is
      * {@code Constant.CONTROL_STATES}, and a name that is not in it is refused at load time.
      *
      * <p>What the state <i>does</i> (whether it blocks acting, how far it slows) is the engine's table, not the
-     * rule's: a rule says "陷入冻结状态", and 冻结 is one thing. What the rule states is how long it lasts
+     * rule's: a rule says "陷入冻结状态", and freeze is one thing. What the rule states is how long it lasts
      * ({@link #turns}) and how likely it is ({@link #baseChance}).
      */
     @SerializedName("control")
     private String control;
 
     /**
-     * The <b>base chance</b> (基础概率) that this effect lands, per target - "有 50% 基础概率陷入冻结状态" is
+     * The <b>base chance</b> (base chance) that this effect lands, per target - "有 50% 基础概率陷入冻结状态" is
      * {@code 0.5}. Absent = it always lands.
      *
      * <p>Note: <b>Not the same thing as the rule's {@code chance}</b>, which is why the two are spelled with
      * different words:
      * <ul>
-     *   <li>a rule's {@code chance} is a <b>fixed</b> probability (固定概率) for the whole rule: one roll per
+     *   <li>a rule's {@code chance} is a <b>fixed</b> probability (fixed chance) for the whole rule: one roll per
      *       firing, and nothing in the battle can change it;</li>
      *   <li>this is a <b>base</b> chance per target, which the engine runs through the real pipeline
-     *       ({@code Battle.hitChance}: base  x  (1 + the applier's 效果命中)  x  (1 − the victim's 效果抵抗)  x 
+     *       ({@code Battle.hitChance}: base  x  (1 + the applier's effect hit rate)  x  (1 - the victim's effect resistance)  x 
      *       (1 − its specific resistance for this state)). "50% 基础概率" is 50% <i>before</i> those, exactly
      *       as the text means it, and the roll happens once per victim - three enemies can see three different
      *       outcomes, which a rule-level roll could never express.</li>
@@ -786,7 +786,7 @@ return copy;
     private Double speed;
 
     /**
-     * "该伤害暴击率固定为 100%" -- a damage instance that does not roll to crit (M-55 姊妹).
+     * "该伤害暴击率固定为 100%" -- a damage instance that does not roll to crit (M-55 sibling).
      *
      * <p>Note: Only {@code 1.0} is a legal value, and that is the vocabulary being closed rather than lazy: a
      * <b>probabilistic</b> crit rate is the {@code CRIT_CHANCE} attribute and always has been, while this field says
@@ -812,7 +812,7 @@ return copy;
      * uses). Read by {@code APPLY_DOT}, and by {@code APPLY_CONTROL} for the state's own per-turn damage.
      *
      * <p>Note: Only the <b>element</b> is named in English; the <i>state</i> a DOT represents is spelled in Chinese
-     * (灼烧 / 触电 / 裂伤 / 风化) because that is what the documents and the {@code has_state} condition use - the
+     * (burn / shock / bleed / wind shear) because that is what the documents and the {@code has_state} condition use - the
      * engine's one translation between the two is {@code BuffManager.DOT_STATES}, deliberately the only place that
      * knows they are the same thing.
      */
@@ -820,7 +820,7 @@ return copy;
     private String element;
 
     /**
-     * The <b>class</b> of negative state an effect is about - {@code "control"} (控制类) or {@code "dot"} (持续伤害类).
+     * The <b>class</b> of negative state an effect is about - {@code "control"} (control class) or {@code "dot"} (damage-over-time class).
      * Read by {@code RESIST_DEBUFF}, whose sentence is about a whole family rather than one named state
      * ("抵抗<b>控制类</b>负面状态的概率提高35%").
      *
@@ -831,7 +831,7 @@ return copy;
     private String kind;
     /**
      * {@code MODIFY_RULE}: raise every {@code percent} read of the named rule's effects by this much
-     * ("天赋的伤害提高效果额外提高 10%"，1215 星魂 6).
+     * ("天赋的伤害提高效果额外提高 10%", 1215 Eidolon 6).
      */
     @SerializedName("effect_percent")
     private Double effectPercent;
@@ -845,7 +845,7 @@ return copy;
     private String effectPercentFromResource;
     /**
      * {@code MODIFY_RULE}: raise every {@code turns} read of the named rule's effects by this many turns
-     * ("终结技的持续时间额外增加 1 回合"，1215 星魂 4).
+     * ("终结技的持续时间额外增加 1 回合", 1215 Eidolon 4).
      */
     @SerializedName("effect_turns")
     private Integer effectTurns;
@@ -862,7 +862,7 @@ return copy;
     private List<String> targetWhen;
     /**
      * {@code MODIFY_RULE}: raise the <b>stack cap</b> of the named rule's effects by this many layers
-     * ("天赋的效果可叠加上限提高 2 层"，1302 星魂 4).
+     * ("天赋的效果可叠加上限提高 2 层", 1302 Eidolon 4).
      *
      * <p>Note: A cap is not a value: the difference only shows when the content *would* have exceeded the old limit, which is
      * why filing two extra stacks instead would be wrong (they cannot exceed 10).

@@ -21,7 +21,7 @@ import java.util.Random;
 /**
  * A {@code MODIFY_ATTR} whose value is <b>derived</b>: {@code scale: "self_attr:<ATTRIBUTE>"} (P11-2, M-42).
  *
- * <p><b>Why a literal is not enough.</b> "提高数值等同于大丽花 #1% 的击破特攻 + #3%" / "等同于星期日 #2% 暴击伤害 +
+ * <p><b>Why a literal is not enough.</b> "the raise is equal to #1% of 大丽花's Break Effect + #3%" / "equal to #2% of 星期日's CRIT DMG +
  * #4%" state the granted value as a function of <b>the rule owner's own attribute</b>. `percent` can only be a
  * number, so writing one here would be wrong for every build in which the owner's attribute is not exactly the
  * value the author had in front of them - the classic "wrong number with nothing to see".
@@ -68,7 +68,7 @@ public class DerivedModifierTest {
 
         Assertions.assertEquals(0.5 * OWNER_BREAK + 0.1,
                 grantedTo(battle, 0, AttributeType.BREAKING_EFFECT, OWNER_BREAK), EPS,
-                "0.5 x 2.0 + 0.1 = 1.1 -- the document's own arithmetic (「等同于 X% … + Y%」)");
+                "0.5 x 2.0 + 0.1 = 1.1 -- the document's own arithmetic (\"equal to X% ... + Y%\")");
     }
 
     /** The part that has to be stated: {@code amount} is optional, the percentage is not. */
@@ -255,7 +255,7 @@ public class DerivedModifierTest {
     // ==================================================================
 
     /**
-     * "进入战斗时，使其他角色的击破特攻提高，提高数值等同于 24% 大丽花的击破特攻 + 50%，持续 1 回合".
+     * "on entering battle, raise the other characters' Break Effect, the raise being equal to 24% of 大丽花's Break Effect + 50%, lasting 1 turn".
      *
      * <p>Measured as a delta on each <b>other</b> character, with her own value read from the built character rather
      * than hardcoded - the trace's whole point is that the number follows her build.
@@ -277,11 +277,11 @@ public class DerivedModifierTest {
         Assertions.assertTrue(expected > 0.5, "precondition: the trace grants something (her Break Effect is "
                 + herBreak + ")");
         Assertions.assertEquals(firstBare + expected, boostOf(first, AttributeType.BREAKING_EFFECT), EPS,
-                "「使其他角色的击破特攻提高…」 -- 0.24 x " + herBreak + " + 0.5");
+                "\"raise the other characters' Break Effect ...\" -- 0.24 x " + herBreak + " + 0.5");
         Assertions.assertEquals(secondBare + expected, boostOf(second, AttributeType.BREAKING_EFFECT), EPS,
                 "…for every other character");
         Assertions.assertEquals(herBare, boostOf(dahlia, AttributeType.BREAKING_EFFECT), EPS,
-                "「**其他**角色」: her own Break Effect is untouched");
+                "\"**other** characters\": her own Break Effect is untouched");
     }
 
     // ==================================================================

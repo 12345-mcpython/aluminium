@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1314 翡翠's 星魂 2: "[当品]叠加至15层时，翡翠暴击率提高18%" -- a threshold on the counter she now ships.
+ * 1314 Jade (翡翠)'s 星魂 (Eidolon) 2: "when [当品] stacks to 15 layers, Jade's CRIT Rate is increased by 18%" -- a threshold on the counter she now ships.
  *
  * <p>Two ways, and the difference is the whole clause: with the technique her battle-start total is sixteen, so the
  * threshold holds; without it she has one layer, so nothing is stated.

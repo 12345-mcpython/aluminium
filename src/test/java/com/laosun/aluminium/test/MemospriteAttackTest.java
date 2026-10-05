@@ -31,10 +31,10 @@ import java.util.Random;
 import java.util.Set;
 
 /**
- * A memosprite's <b>attack</b>: its damage is a share of an attribute of its own, not of its summoner (P9-4 忆灵).
+ * A memosprite's <b>attack</b>: its damage is a share of an attribute of its own, not of its summoner (P9-4 memosprites).
  *
  * <p><b>Why this is not a rule on the summoning character.</b> A memosprite's damage is written against the
- * memosprite - 长夜月's 忆灵技能1 is "对敌方单体造成等同于'长夜'<b>50%</b>生命上限的冰属性伤害" - and the panel
+ * memosprite - Evernight (长夜月)'s memosprite skill 1 is "deals to a single enemy ice damage equal to <b>50%</b> of '长夜''s Max HP" - and the panel
  * halves that number on the way in ("长夜" has 50% of her Max HP). Reading the share off the summoner would
  * therefore produce a hit <b>twice</b> as large: a wrong number that looks entirely plausible, which is the
  * kind a test has to catch. So the spec states the attack, {@code SummonFactory} installs it on the memosprite,
@@ -42,7 +42,7 @@ import java.util.Set;
  *
  * <p><b>What these cases are guarding.</b>
  * <ol>
- *   <li>the shipped attack is 长夜's own 忆灵技能1 (element / share / base / shape), not an ATK-based fallback
+ *   <li>the shipped attack is 长夜's own memosprite skill 1 (element / share / base / shape), not an ATK-based fallback
  *       invented for a unit the text gives no ATK;</li>
  *   <li>the damage really is proportional to the memosprite's Max HP - doubling the panel's share doubles the
  *       hit, with everything else held fixed;</li>
@@ -57,9 +57,9 @@ import java.util.Set;
 public class MemospriteAttackTest {
     private static final double EPS = 1e-6;
 
-    /** 长夜月 - the one shipped memosprite whose document states an attack (忆灵技能1). */
+    /** Evernight (长夜月) - the one shipped memosprite whose document states an attack (memosprite skill 1). */
     private static final int CASTORICE_LIKE = 1413;
-    /** 阿格莱雅 - used as the summoner for fixture specs; her rule summons only on her ultimate. */
+    /** Aglaea (阿格莱雅) - used as the summoner for fixture specs; her rule summons only on her ultimate. */
     private static final int AGLAEA = 1402;
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
@@ -69,7 +69,7 @@ public class MemospriteAttackTest {
     // 1. The shipped attack
     // ==================================================================
 
-    /** 长夜 acts with its own 忆灵技能1, and the numbers are that skill's. */
+    /** 长夜 acts with its own memosprite skill 1, and the numbers are that skill's. */
     @Test
     public void theShippedAttackIsTheMemospriteSkillsOwnNumbers() {
         Character summoner = CharacterFactory.create(CASTORICE_LIKE, LEVEL);
@@ -82,12 +82,12 @@ public class MemospriteAttackTest {
                         + attack.getClass().getName());
         EnemySkill direct = (EnemySkill) attack;
 
-        Assertions.assertEquals(DamageElement.ICE, direct.getElement(), "忆灵技能1 is 冰属性");
-        Assertions.assertEquals(0.5, direct.getMultiplier(), EPS, "「50%生命上限」 — the figure the text quotes");
+        Assertions.assertEquals(DamageElement.ICE, direct.getElement(), "memosprite skill 1 is ice");
+        Assertions.assertEquals(0.5, direct.getMultiplier(), EPS, "「50% of Max HP」 - the figure the text quotes");
         Assertions.assertEquals(AttributeType.HEALTH, direct.getBaseAttribute(),
                 "its OWN Max HP: the panel halves it on the way in, so a base read off the summoner would be "
                         + "twice this and would still look plausible");
-        Assertions.assertEquals(1, direct.getHits(), "忆灵技能1 is a single segment");
+        Assertions.assertEquals(1, direct.getHits(), "memosprite skill 1 is a single segment");
         Assertions.assertNull(attack.getData(),
                 "not a character skill: there is no multiplier table for it in the generated data at all");
 
@@ -122,7 +122,7 @@ public class MemospriteAttackTest {
         Battle battle = new Battle(List.of(summoner), List.of(monster()), new Random(11));
         battle.startBattle();                        // her own rule summons 长夜: the real path, not a fixture
         Summon evey = battle.memospriteOf(summoner);
-        Assertions.assertNotNull(evey, "precondition: 长夜月's BATTLE_START rule put it on the field");
+        Assertions.assertNotNull(evey, "precondition: Evernight (长夜月)'s BATTLE_START rule put it on the field");
 
         Enemy target = battle.enemyUnits().getFirst();
         double enemyBefore = target.getCurrentHp();
@@ -205,7 +205,7 @@ public class MemospriteAttackTest {
     /**
      * An {@code "until": "next_attack"} buff <b>on the memosprite</b> ends when the memosprite attacks.
      *
-     * <p>Written as a rule, because that is how such a buff ever gets onto a summon: "装备者及其忆灵" is two
+     * <p>Written as a rule, because that is how such a buff ever gets onto a summon: "the wearer and their memosprite" is two
      * rules, the second one {@code target: "summon"}. Before the engine announced a summon's attack, this buff
      * was never consumed - it stayed for the rest of the battle, silently.
      */
@@ -219,14 +219,14 @@ public class MemospriteAttackTest {
         takeItsTurn(battle, evey, List.of(battle.enemyUnits().getFirst()));
 
         Assertions.assertEquals(0, critDamageOf(evey), EPS,
-                "「持续到下次攻击后结束」 on the summon means the summon's own attack, and that has happened");
+                "「lasts until after the next attack ends」 on the summon means the summon's own attack, and that has happened");
     }
 
     /**
      * …and the <b>summoner's</b> own {@code until} buff is <b>not</b> consumed by the memosprite's attack.
      *
      * <p>This is the owner test doing its job on a new path. A memosprite's attack is a real attack by a unit of
-     * ours, so the whole side hears about it; but "直到装备者下次攻击" is about the <em>wearer</em> attacking,
+     * ours, so the whole side hears about it; but "until the wearer's next attack" is about the <em>wearer</em> attacking,
      * and a summon swinging is not its master swinging. Without the owner test, the announcement added for the
      * memosprite would silently eat its summoner's buff.
      */
@@ -298,11 +298,11 @@ public class MemospriteAttackTest {
     }
 
     // ==================================================================
-    // 2c. The attack pushes the toughness bar (M-29's 破韧 half)
+    // 2c. The attack pushes the toughness bar (M-29's toughness-reduction half)
     // ==================================================================
 
     /**
-     * A memosprite's attack removes the toughness its document states - "破韧值 单体 30".
+     * A memosprite's attack removes the toughness its document states - "toughness reduction, single target, 30".
      *
      * <p>Two affordances, both stated rather than hidden: the target's weakness set is rewritten to include the
      * attack's element (toughness only comes off a weakness, which is the engine's own rule and the demo's scene 1
@@ -321,7 +321,7 @@ public class MemospriteAttackTest {
         takeItsTurn(battle, evey, List.of(target));
 
         Assertions.assertEquals(before - 30, target.getStance(), EPS,
-                "「破韧值 单体 30」 is a number beside the damage numbers, not something to infer");
+                "「toughness reduction, single target, 30」 is a number beside the damage numbers, not something to infer");
     }
 
     /**
@@ -484,7 +484,7 @@ public class MemospriteAttackTest {
     }
 
     /**
-     * 长夜月 with a hand-built table: summon "长夜" at battle start, then hang an
+     * Evernight (长夜月) with a hand-built table: summon "长夜" at battle start, then hang an
      * {@code "until": "next_attack"} CRIT DMG buff on the memosprite and/or on herself.
      *
      * <p>A hand-built table rather than a file: a character fixture under {@code src/test/resources} would be

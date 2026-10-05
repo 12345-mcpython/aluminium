@@ -14,7 +14,7 @@ import java.util.List;
  * {@link SkillTrace#init(int)}.
  *
  * <p><b>Naming.</b> This used to be {@code SkillPoint} - the same name as the <b>battle</b> resource
- * (战技点, {@code models.skillpoint.SkillPointPolicy}), which is a different concept entirely. The trace
+ * (skill points, {@code models.skillpoint.SkillPointPolicy}), which is a different concept entirely. The trace
  * side is now consistently {@code SkillTrace*} on all three sides: this bean, {@code Constant.SKILL_TRACES},
  * and the generator's {@code trace_id} / {@code prev_trace} / {@code trace_type} export. The JSON keys had
  * to move <b>with</b> the data: {@code @SerializedName} is that contract, so renaming them ahead of the file

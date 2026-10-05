@@ -22,11 +22,11 @@ import java.util.Random;
 /**
  * The memosprite-SCOPED damage boost: `MEMOSPRITE_DAMAGE_BOOST`, judged through a memosprite's own damage.
  *
- * <p>Note: Why the boost is granted by a synthetic rule rather than by a light cone: its real reader is 1413 长夜月's
- * "我方忆灵造成的伤害为原伤害的120%/125%/130%/150%", which still needs an enemy-count condition the vocabulary does not have.
+ * <p>Note: Why the boost is granted by a synthetic rule rather than by a light cone: its real reader is 1413 Evernight (长夜月)'s
+ * "the damage dealt by our memosprites is 120%/125%/130%/150% of the original damage", which still needs an enemy-count condition the vocabulary does not have.
  * The capability is what this class judges, and a synthetic grant adds no stats, so with-versus-without isolates it.
  *
- * <p>Note: And why the gate is not `instanceof Summon`: the documents distinguish 忆灵 from ordinary 召唤物, so the predicate is
+ * <p>Note: And why the gate is not `instanceof Summon`: the documents distinguish memosprites from ordinary summons, so the predicate is
  * "this attacker IS what its master's memospriteOf returns" -- pinned here directly.
  *
  * <p>Disciplines 55/56: the victim has ~900k HP, the fixture asserts the hit neither kills it nor empties its bar, and the
@@ -58,7 +58,7 @@ public class MemospriteBoostTest {
         Battle battle = new Battle(List.of(master), List.of(enemy), new Random(0));
         battle.startBattle();
         Summon memosprite = battle.summonMemosprite(master);
-        Assertions.assertNotNull(memosprite, "precondition: the 忆灵 is out");
+        Assertions.assertNotNull(memosprite, "precondition: the memosprite is out");
         Assertions.assertSame(memosprite, battle.memospriteOf(master),
                 "the gate's predicate: this unit IS what memospriteOf returns for its master");
         Assertions.assertNotSame(master, battle.memospriteOf(master), "and the master is not its own memosprite");
@@ -93,7 +93,7 @@ public class MemospriteBoostTest {
         Battle battle = new Battle(List.of(master), List.of(enemy), noCrit);
         battle.startBattle();
         Summon memosprite = battle.summonMemosprite(master);
-        Assertions.assertNotNull(memosprite, "precondition: the 忆灵 is out");
+        Assertions.assertNotNull(memosprite, "precondition: the memosprite is out");
         double before = enemy.getCurrentHp();
         // Note: COMMON, not SKILL: a memosprite's stated attack is installed in its COMMON slot (MemospriteAttackTest:8).
         battle.castImmediate(memosprite.getSkills().get(SkillType.COMMON), memosprite, List.of(enemy));

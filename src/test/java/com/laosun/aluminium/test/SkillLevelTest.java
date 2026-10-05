@@ -21,10 +21,10 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * {@code RAISE_SKILL_LEVEL} and the one level resolver behind it (M-32): "战技等级+1""终结技等级+1".
+ * {@code RAISE_SKILL_LEVEL} and the one level resolver behind it (M-32): "战技等级+1""终结技等级+1" (Skill level +1, Ultimate level +1).
  *
  * <p><b>The gap.</b> Every skill in this engine is read at level 1 unless a rule pins the row with
- * {@code damage_level}, because a character had no skill levels at all. So "战技等级+1" had nowhere to land: writing
+ * {@code damage_level}, because a character had no skill levels at all. So "战技等级+1" (Skill level +1) had nowhere to land: writing
  * the rule again at another level would double the cast instead of raising it.
  *
  * <p><b>The model.</b> A level is <b>base + this battle's raises</b>, resolved in exactly one place
@@ -34,7 +34,7 @@ import java.util.Random;
  * "the document quotes this row", a different statement from "my skill is level N".
  *
  * <p>Note: The cases below <b>find</b> a slot whose parameter rows really differ between level 1 and level 10 instead of
- * naming one: the first version of this file asserted a raise on 姬子's ultimate and measured <b>the same number
+ * naming one: the first version of this file asserted a raise on Himeko's ultimate and measured <b>the same number
  * twice</b> (her ultimate's own rows are level-independent) - a test that looks like it checks the wiring and does not.
  */
 public class SkillLevelTest {
@@ -72,7 +72,7 @@ public class SkillLevelTest {
      * the cast's total.
      *
      * <p>Why not "the cast grew by the same factor": a skill's row has several parameters and only one of them is the
-     * multiplier this rule reads, so the cast's <i>total</i> does not scale linearly with it (measured on 姬子's SKILL:
+     * multiplier this rule reads, so the cast's <i>total</i> does not scale linearly with it (measured on Himeko's SKILL:
      * the cast went 11545 to 12325 (1.068) while its parameter 0 went 1.0 to 2.0). Comparing those two ratios would have
      * been an assertion about the skill's other parameters wearing the label "the resolver agrees with itself".
      */
@@ -171,7 +171,7 @@ public class SkillLevelTest {
     // ==================================================================
 
     /**
-     * A slot of 姬子's whose parameter row really changes between level 1 and level 10.
+     * A slot of Himeko's whose parameter row really changes between level 1 and level 10.
      *
      * <p>Note: Found, not assumed: her ultimate's rows are level-independent, so a hand-picked slot gave
      * "11841.82 vs 11841.82" and an assertion that could never fail.

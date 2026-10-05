@@ -25,7 +25,7 @@ import java.util.Random;
 /**
  * "受到攻击的概率大幅提高" - the SOFT aggro weight, and why it is an attribute rather than {@code TAUNT}.
  *
- * <p>三月七's Skill states no magnitude, which is why this clause sat registered for a long time. The magnitude is her
+ * <p>March 7th (三月七)'s Skill states no magnitude, which is why this clause sat registered for a long time. The magnitude is her
  * Skill's fifth parameter (the one her prose never references) and the property the game writes is
  * {@code AggroAddedRatio}; {@code characters/1001.json}'s {@code skill_soft_aggro} note carries the evidence chain.
  * This class pins the consequences: the arithmetic, the guard, the HP% gate, and whose shield carries it.
@@ -81,7 +81,7 @@ public class SoftAggroWeightTest {
                 "below 30% the game pins MDF_AggroUp to 0, so the weight must be untouched");
     }
 
-    /** Note: Only the aimed ally is affected, and 星魂 2's battle-start shield carries no aggro at all. */
+    /** Note: Only the aimed ally is affected, and 星魂 (Eidolon) 2's battle-start shield carries no aggro at all. */
     @Test
     public void onlyTheAimedAllyIsAffectedAndTheEidolonShieldIsNot() {
         Character march = CharacterFactory.create(MARCH, LEVEL);
@@ -96,7 +96,7 @@ public class SoftAggroWeightTest {
         Assertions.assertEquals(bystanderBefore, battle.aggroOf(bystander), EPS,
                 "「指定我方单体」 -- only the aimed ally, never the bystander");
 
-        // 星魂 2 grants a shield at battle start from a DIFFERENT modifier, which has no MDF_AggroUp in the game data.
+        // 星魂 (Eidolon) 2 grants a shield at battle start from a DIFFERENT modifier, which has no MDF_AggroUp in the game data.
         Character withEidolon = CharacterFactory.create(MARCH, LEVEL, true, null, null, 2);
         Character shielded = CharacterFactory.create(ALLY, LEVEL);
         Battle second = new Battle(List.of(withEidolon, shielded), List.of(dummy()), new Random(0));

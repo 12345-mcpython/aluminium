@@ -62,11 +62,11 @@ import java.util.Random;
 public class SummonTest {
     private static final double EPS = 1e-6;
 
-    /** 银鬃尉官, whose data roster is 银鬃近卫  x 2. */
+    /** Silvermane Lieutenant (银鬃尉官), whose data roster is Silvermane Guard (银鬃近卫)  x 2. */
     private static final int MASTER = 1003010;
-    /** One 银鬃近卫 - the id the master's roster names. */
+    /** One Silvermane Guard (银鬃近卫) - the id the master's roster names. */
     private static final int MINION = 1002040;
-    /** 冰锋, whose roster is empty (the common case: 195of 2649). */
+    /** Ice Edge (冰锋), whose roster is empty (the common case: 195of 2649). */
     private static final int NO_ROSTER = 1002011;
     /** The one monster whose roster is spelled {@code [0]}. */
     private static final int ZERO_ROSTER = 405301004;
@@ -82,7 +82,7 @@ public class SummonTest {
     /**
      * The roster's order and its duplicates both survive: it is a roster, not a set.
      *
-     * <p>银鬃尉官 really does summon the same minion twice, so "1002040  x 2" has to stay two entries. A
+     * <p>Silvermane Lieutenant (银鬃尉官) really does summon the same minion twice, so "1002040  x 2" has to stay two entries. A
      * {@code Set} would silently turn it into one, and nothing about the resulting battle would say so.
      */
     @Test
@@ -304,7 +304,7 @@ public class SummonTest {
      *
      * <p>This is why {@code CanHit.perish()} exists rather than a {@code takeDamage} call: a kill would fire
      * {@code HpLoss}/{@code Kill} and hand every on-kill talent in the game its reward for a death nobody
-     * caused. The rule below is the smallest stand-in for that whole family (姬子's "每消灭 1 敌 +5 能量"),
+     * caused. The rule below is the smallest stand-in for that whole family (Himeko's (姬子) "每消灭 1 敌 +5 能量"),
      * and the assertion is that <b>one death pays once</b>.
      *
      * <p>The precondition asserts the reward really was paid for the master - including the conventional
@@ -425,7 +425,7 @@ public class SummonTest {
         return Character.fromAttributes("hero", 100_000, 100, 100, 100);
     }
 
-    /** 姬子's id, but no shipped rule file, so the table built here is the only one in play. */
+    /** Himeko's (姬子) id, but no shipped rule file, so the table built here is the only one in play. */
     private static Character heroWithKillReward() {
         Character hero = CharacterFactory.create(1003, 80);
         EffectSpec reward = TriggerSpecs.gainEnergy(KILL_REWARD);

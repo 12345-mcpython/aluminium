@@ -21,34 +21,34 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * "无视目标 X% 的防御力" as data - {@code DEFENCE_IGNORE} reached from a rule for the first time.
+ * "ignores X% of the target's defence" as data - {@code DEFENCE_IGNORE} reached from a rule for the first time.
  *
  * <p><b>What already existed, and what did not.</b> The attribute has been read by
  * {@code Battle.assemble}'s defence zone since P1-6, and {@code Damage.DefenceArea} clamps it to
  * {@code [0,1]} while shrinking {@code effectiveDefence} - both covered by {@code DamagePipelineTest} and
  * {@code DamageZoneTest}. What had <b>never</b> run is the path in the middle: <b>no shipped rule file
  * granted it</b>, so "a rule can raise this attribute and the hit really gets bigger" was an untested
- * belief. That is the gap this class closes; 翡翠's Eidolon 4 is the first user.
+ * belief. That is the gap this class closes; Jade (翡翠)'s eidolon 4 is the first user.
  *
  * <p><b>Why the attribute is the right route here, and where it stops.</b> The text says
- * "使翡翠造成的伤害无视敌方目标 12% 的防御力，持续 3 回合" - a property of the wearer's damage <em>for a
- * while</em>, which is exactly an attribute buff. That covers most of the game's "无视防御" family
- * (波提欧 / 星期日 / 阮-梅 / 翡翠 all phrase it as a lasting effect on a unit), and it is worth recording
+ * "makes the damage dealt by Jade ignore 12% of the enemy target's defence, lasting 3 turns" - a property of the wearer's damage <em>for a
+ * while</em>, which is exactly an attribute buff. That covers most of the game's "ignore defence" family
+ * (Boothill (波提欧) / Sunday (星期日) / Ruan Mei (阮-梅) / Jade (翡翠) all phrase it as a lasting effect on a unit), and it is worth recording
  * because the roadmap had listed "a DEF-ignore op" as the missing capability. It does <b>not</b> cover the
- * minority that scopes the ignore to <em>one attack</em> - 银枝's "施放终结技时…", 云璃's
- * "发动反击造成伤害时…", relic set 119's break damage - because a turn-based buff would leak onto whatever
+ * minority that scopes the ignore to <em>one attack</em> - Argenti (银枝)'s "when casting the ultimate ...", Yunli (云璃)'s
+ * "when launching a counter and dealing damage ...", relic set 119's break damage - because a turn-based buff would leak onto whatever
  * else that unit does in the same window. Those stay registered and need the instance-scoped form plus a way
  * to ask what kind of damage the pending instance is.
  */
 public class DefenceIgnoreTest {
     private static final double EPS = 1e-6;
 
-    /** 翡翠 - no other test uses this id, so a rule file for her cannot invalidate anyone's premise. */
+    /** Jade (翡翠) - no other test uses this id, so a rule file for her cannot invalidate anyone's premise. */
     private static final int JADE = 1314;
-    /** 姬子, a plain attacker with no rule file of her own. */
+    /** Himeko (姬子), a plain attacker with no rule file of her own. */
     private static final int ATTACKER = 1003;
     private static final int LEVEL = 80;
-    /** 冰锋: a real monster with real defence, so the zone arithmetic is not on a hand-made number. */
+    /** Ice Edge (冰锋): a real monster with real defence, so the zone arithmetic is not on a hand-made number. */
     private static final int MONSTER = 1002011;
     private static final int MONSTER_LEVEL = 90;
 
@@ -81,8 +81,8 @@ public class DefenceIgnoreTest {
      * Two grants of the same attribute <b>replace</b> each other unless the rule asks for stacks, and the
      * defence zone clamps at "ignore everything".
      *
-     * <p>Note: <b>The replacement half surprised me and is worth pinning</b>: authoring 波提欧's 16% and
-     * 阮-梅's 20% as two plain rules gives <b>20%</b>, not 36% - {@code MODIFY_ATTR} defaults to
+     * <p>Note: <b>The replacement half surprised me and is worth pinning</b>: authoring Boothill (波提欧)'s 16% and
+     * Ruan Mei (阮-梅)'s 20% as two plain rules gives <b>20%</b>, not 36% - {@code MODIFY_ATTR} defaults to
      * {@code max_stacks: 1}, i.e. "re-application replaces" (the engine's long-standing convention, stated in
      * {@code TriggerInterpreter}'s op table and pinned for other attributes by
      * {@code StatModifierStackingTest}). A content author who wants sources to add says so with
@@ -112,7 +112,7 @@ public class DefenceIgnoreTest {
      * It is a <b>timed</b> buff: once its turns run out the bonus is gone.
      *
      * <p>Worth pinning because "ignore DEF" is exactly the kind of effect one is tempted to model as
-     * {@code permanent} - 翡翠's text gives a turn count, and a permanent grant would be a silently stronger
+     * {@code permanent} - Jade's text gives a turn count, and a permanent grant would be a silently stronger
      * character with nothing to show for it.
      */
     @Test
@@ -141,7 +141,7 @@ public class DefenceIgnoreTest {
     // ==================================================================
 
     /**
-     * 翡翠's Eidolon 4 is really authored, gated on the rank, and states the numbers from her text.
+     * Jade's eidolon 4 is really authored, gated on the rank, and states the numbers from her text.
      *
      * <p>Read back through the loader with a context that satisfies every gate, so a wrong attribute, a wrong
      * percentage or a lost {@code min_eidolon} fails here instead of in a battle nobody measures.
@@ -201,7 +201,7 @@ public class DefenceIgnoreTest {
         battle.fireTriggers(TriggerEvent.ULT_CAST, ally, null, 0, 0);
 
         Assertions.assertEquals(0, jade.getAttribute(AttributeType.DEFENCE_IGNORE).get(), EPS,
-                "the text says 施放终结技时 -- HER ultimate, so `actor == self` is doing its job");
+                "the text says when casting the ultimate -- HER ultimate, so `actor == self` is doing its job");
     }
 
     /** Her file is found by the ordinary per-character loader (it is data, not a test fixture). */

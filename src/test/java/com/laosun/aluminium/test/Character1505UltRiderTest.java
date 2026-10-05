@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1505 绯英's ultimate rider (2026-09-30): "当绯英持有[好活当赏]时，施放终结技可对敌方全体造成 12% 的物理属性欢愉伤容".
+ * 1505 绯英's ultimate rider (2026-09-30): "while 绯英 holds [好活当赏], casting the Ultimate deals 12% Physical Elation damage to all enemies".
  *
  * <p>The rider is wired to CAST_SETUP, which fires ONCE per cast: on DEALING_DAMAGE an all-target ultimate would produce one
  * instance per victim and the rider would follow N times. The judge reads the two enemies' health and pins the shipped rule too,
@@ -45,10 +45,10 @@ public class Character1505UltRiderTest {
     public void theUltimateRiderNeedsTheGifts() {
         double withGifts = ultimateDamage(true);
         double without = ultimateDamage(false);
-        System.out.println("[1505-ult] the ultimate took " + withGifts + " in total while holding 【好活当赏】 and "
+        System.out.println("[1505-ult] the ultimate took " + withGifts + " in total while holding [好活当赏] and "
                 + without + " after spending it (difference " + (withGifts - without) + ")");
         Assertions.assertTrue(without > 0, "the ultimate itself deals damage");
-        Assertions.assertTrue(withGifts > without, "holding 【好活当赏】 adds the all-enemy Elation rider");
+        Assertions.assertTrue(withGifts > without, "holding [好活当赏] adds the all-enemy Elation rider");
     }
 
     /** The shipped rule, read off the compiled table (discipline 232): the number, the scope and the type. */
@@ -64,6 +64,6 @@ public class Character1505UltRiderTest {
                 + " target=" + effect.getTarget() + " damage_type=" + effect.getDamageType());
         Assertions.assertEquals(0.12, effect.getPercent(), 1e-9, "12% of her attack");
         Assertions.assertEquals("all_enemies", effect.getTarget(), "over the whole enemy side");
-        Assertions.assertEquals("ELATION", effect.getDamageType(), "as 欢愉伤容");
+        Assertions.assertEquals("ELATION", effect.getDamageType(), "as Elation damage");
     }
 }

@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 流萤 (1310) TALENT: "当能量恢复至上限时解除自身所有负面效果" (2026-09-30).
+ * Firefly (流萤) (1310) TALENT: "when energy is restored to the maximum, remove all of its own negative effects" (2026-09-30).
  *
  * <p>The first shipped reader of the {@code self_energy_percent} condition variable. matching() evaluates conditions,
  * so both directions are pinned: at full energy the rule matches, below full it must not. The engine mutation (flip

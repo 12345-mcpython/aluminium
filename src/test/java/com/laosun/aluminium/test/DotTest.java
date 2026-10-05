@@ -213,7 +213,7 @@ public class DotTest {
 
     /**
      * "使目标陷入灼烧状态，每回合造成 500 点伤害": the rule attaches a real DOT, and the {@code has_state}
-     * name follows from the element (Fire to 灼烧) with no second field.
+     * name follows from the element (Fire to burn (灼烧)) with no second field.
      *
      * <p>Before this op only a weakness break could attach a DOT ({@code attachBreakDot}), so the whole
      * "使目标陷入灼烧/触电/裂伤/风化状态" family - 11 of the 9documents - had no spelling.

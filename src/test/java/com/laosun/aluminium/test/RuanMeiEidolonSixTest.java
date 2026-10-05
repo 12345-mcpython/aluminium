@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1303 阮-梅's 星魂 6: "终结技展开的结界持续时间延长1回合" -- judged over WHOLE turns.
+ * 1303 Ruan Mei (阮-梅)'s eidolon 6: "the duration of the zone unfolded by the ultimate is extended by 1 turn" -- judged over WHOLE turns.
  *
  * <p>The countdown is split into an early pass (`beforeMove`) and a late one (`afterMove`), and a stat modifier is a LATE
  * buff, so a whole turn is both calls. `turns: 2` expires after two of them; with the extension the zone must still stand.
@@ -31,13 +31,13 @@ public class RuanMeiEidolonSixTest {
     public void theZoneExpiresOnHerSecondWholeTurn() {
         Assertions.assertEquals(0.25, afterTurns(0, 1), EPS, "still up after one whole turn of hers");
         Assertions.assertEquals(0.0, afterTurns(0, 2), EPS,
-                "自身每回合开始时结界持续回合数减1 -- so two end it");
+                "at the start of each of her own turns the zone's remaining turns are reduced by 1 -- so two end it");
     }
 
     @Test
     public void theSixthEidolonKeepsItForOneMoreTurn() {
         Assertions.assertEquals(0.25, afterTurns(6, 2), EPS,
-                "结界持续时间延长1回合 -- two turns no longer end it");
+                "the zone's duration is extended by 1 turn -- two turns no longer end it");
         Assertions.assertEquals(0.0, afterTurns(6, 3), EPS, "but three do");
     }
 

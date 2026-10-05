@@ -146,7 +146,7 @@ public class PlayerSideSummonTest {
         // 10% of base. A summon built from monster data has no traces, so its resolved attack IS its base.
         Assertions.assertEquals(summonAttackBefore * 1.1,
                 f.summon.getAttribute(AttributeType.ATTACK).get(), 1e-6,
-                "「我方全体」 is the camp, so the summon is one of them: a rule resolved against "
+                "\"all of our side\" is the camp, so the summon is one of them: a rule resolved against "
                         + "`characters` would have buffed the hero alone");
     }
 
@@ -308,7 +308,7 @@ public class PlayerSideSummonTest {
         return new Fixture(battle, hero, monster, summon);
     }
 
-    /** {@code BATTLE_START} -> +10% ATK for "我方全体". */
+    /** {@code BATTLE_START} -> +10% ATK for "all of our side". */
     private static TriggerSpec partyAttackRule() {
         EffectSpec effect = new EffectSpec();
         TriggerSpecs.set(effect, "op", "MODIFY_ATTR");

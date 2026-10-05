@@ -16,13 +16,13 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * "仅对最新被施加的目标生效"这一族的那一招：`REMOVE_STATE` 先把名字从全体摘掉，再 `APPLY_BUFF` 给新目标
- *  so Note: 顺序即语义（`TriggerInterpreter:2515` 的注释：*takes the named state off every resolved target - 
- * the only-the-newest-one-holds-it half*；`1215` 的注记说得更直白：*the state goes off everybody, then onto the
- * new target - there is no only-one-holder flag, the removal IS that clause*）。
+ * The move of the "only the newest target it was applied to is affected" family: `REMOVE_STATE` first takes the name off everybody, then `APPLY_BUFF` gives it to the new target
+ *  so Note: order is meaning (the note at `TriggerInterpreter:2515`: *takes the named state off every resolved target - 
+ * the only-the-newest-one-holds-it half*; `1215`'s note says it even more plainly: *the state goes off everybody, then onto the
+ * new target - there is no only-one-holder flag, the removal IS that clause*).
  *
- * <p>Note: 这一条先证这一招本身成立，之后 12 个读者（1414/1224/1225/1202/1406/1412/1504/1112/1215/1305/1404/1006）
- * 才都可以照抄。变异：把 `REMOVE_STATE` 那一条删掉 so A 不会失去 so 必红。
+ * <p>Note: This one first proves the move itself holds, and only then can the 12 readers (1414/1224/1225/1202/1406/1412/1504/1112/1215/1305/1404/1006)
+ * all copy it. Mutation: delete the `REMOVE_STATE` line so A does not lose it, so it must go red.
  */
 public class NewestHolderOnlyTest {
     private static final int WEARER = 1003;
@@ -31,7 +31,7 @@ public class NewestHolderOnlyTest {
     private static final int LEVEL = 80;
     private static final String MARK = "最新标记";
 
-    /** 一条"把标记只留给这次瞄准的目标"的规则：先摘全体，再挂新的。 */
+    /** A rule that "leaves the mark only on the target aimed at this time": take it off everybody first, then attach the new one. */
     private static TriggerSpec newestOnlyRule(boolean removeFirst) {
         EffectSpec apply = new EffectSpec();
         TriggerSpecs.set(apply, "op", "APPLY_BUFF");
@@ -49,12 +49,12 @@ public class NewestHolderOnlyTest {
     }
 
     private static boolean marked(Battle battle, com.laosun.aluminium.models.CanHit who) {
-        // Note: APPLY_BUFF 造的是 StateBuff，而它的查询是 hasState -  - 不是 stacksOf（那查的是 ADD_STACK 的层数）。
-        // TriggerTable:2899 就是 `has_state` 的实现：`who.getBuffManager().hasState(state)`。
+        // Note: APPLY_BUFF creates a StateBuff, and the query for it is hasState - - not stacksOf (that queries ADD_STACK's layer count).
+        // TriggerTable:2899 is exactly `has_state`'s implementation: `who.getBuffManager().hasState(state)`.
         return who.getBuffManager().hasState(MARK);
     }
 
-    /** 放两次"战技"，第一次瞄 a、第二次瞄 b；返回 {a 还有标记吗, b 还有标记吗}。 */
+    /** Cast "Skill" twice, the first aimed at a and the second at b; returns {does a still have the mark, does b still have the mark}. */
     private static boolean[] twoCasts(boolean removeFirst) {
         Character wearer = CharacterFactory.create(WEARER, LEVEL);
         Character a = CharacterFactory.create(OTHER, LEVEL);
@@ -66,9 +66,9 @@ public class NewestHolderOnlyTest {
         Battle battle = new Battle(List.of(wearer, a), List.of(enemy), new Random(0));
         battle.startBattle();
 
-        battle.fireTriggers(TriggerEvent.SKILL_CAST, wearer, a, 0, 0);      // Note: a 拿到标记
+        battle.fireTriggers(TriggerEvent.SKILL_CAST, wearer, a, 0, 0);      // Note: a gets the mark
         boolean aHad = marked(battle, a);
-        battle.fireTriggers(TriggerEvent.SKILL_CAST, wearer, enemy, 0, 0);  // Note: 换成敌人
+        battle.fireTriggers(TriggerEvent.SKILL_CAST, wearer, enemy, 0, 0);  // Note: switch it to the enemy
         return new boolean[]{aHad, marked(battle, a), marked(battle, enemy)};
     }
 

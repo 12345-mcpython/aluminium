@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 卢卡 (1111), from his own file (2026-09-28): [斗志] layers, the ultimate's rolled vulnerability, and 动能过载.
+ * Luka (卢卡) (1111), from his own file (2026-09-28): [斗志] layers, the ultimate's rolled vulnerability, and 动能过载, Kinetic Overload.
  *
  * <p><b>What it needed.</b> Three capabilities that landed in the days before: a capped stack counter (`ADD_STACK` +
  * `max_stacks`), a rolled taken-side zone (`MODIFY_DAMAGE_TAKEN` + `base_chance`), and `REMOVE_BUFF` (the mirror of
@@ -69,7 +69,7 @@ public class LukaTest {
                 "「有100%的基础概率使指定敌方单体受到的伤害提高20.00%」 -- the zone is up (an easy draw)");
     }
 
-    /** Note: One layer per relevant cast, and `from_skill` is what keeps the ultimate off the 普攻/战技 rules. */
+    /** Note: One layer per relevant cast, and `from_skill` is what keeps the ultimate off the basic attack / Skill rules. */
     @Test
     public void eachCastCategoryAddsExactlyOneLayer() {
         Fixture f = new Fixture();
@@ -130,7 +130,7 @@ public class LukaTest {
     @Test
     public void theEnhancedAttackPaysTwoLayers() {
         Fixture f = new Fixture();
-        f.skillCast();                                   // 战技: applies 裂伤 and adds a layer (battle start gave one)
+        f.skillCast();                                   // Skill (战技): applies bleed and adds a layer (battle start gave one)
         Assertions.assertEquals(2, f.luka.getBuffManager().stacksOf("斗志"), "precondition: two layers");
 
         f.basicAttack();                                 // ordinary attack: +1 layer, and it INSTALLS the swap

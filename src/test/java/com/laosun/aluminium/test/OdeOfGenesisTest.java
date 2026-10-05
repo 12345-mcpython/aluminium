@@ -22,12 +22,12 @@ import java.util.Random;
  * <b>该效果对迷迷也生效。</b>"
  *
  * <p>Both factors are read where the engine reads them: the row of the CASTER'S CURRENT LEVEL (never row 1 by hand) and the ACTOR's own
- * attributes (`actor_attr:`) -- 德谬歌 is the caster, and the recipient's own memosprite is 迷迷, a different unit entirely.
+ * attributes (`actor_attr:`) -- Demiurge (德谬歌) is the caster, and the recipient's own memosprite is Mem (迷迷), a different unit entirely.
  */
 public class OdeOfGenesisTest {
     private static final int LEVEL = 80;
     private static final int CYRENE = 1415;
-    private static final int TRAILBLAZER = 8007;   // 开拓者-记忆
+    private static final int TRAILBLAZER = 8007;   // Trailblazer - Remembrance (开拓者-记忆)
     private static final int MONSTER = 1002011;
     private static final int ODE_OF_GENESIS = 13;
 

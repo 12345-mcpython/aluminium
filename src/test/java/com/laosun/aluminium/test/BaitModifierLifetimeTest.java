@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1504 不死途's "[饲饵]存在时，敌方全体目标防御力降低 40%", judged on a HAND-BUILT table.
+ * 1504 Ashveil (不死途)'s "while [饲饵] exists, the defence of all enemy targets is reduced by 40%", judged on a HAND-BUILT table.
  *
  * <p>Note: The table carries only the one rule under test. 1504's own file also has a talent that fires on
  * {@code ALLY_ATTACK} and pays out a follow-up -- and <b>any</b> probe attack is an {@code ALLY_ATTACK}, so a probe run
@@ -23,7 +23,7 @@ import java.util.Random;
  * aura). With the talent out of the picture, the cut is the only thing between the two numbers.
  *
  * <p>Note: The cut targets {@code all_enemies} and carries the state's name. So when the bait moves, the old enemy keeps
- * the cut -- because the NEW bait is out, and the sentence is "[饲饵]存在时，敌方全体…", i.e. it holds while a bait
+ * the cut -- because the NEW bait is out, and the sentence is "while [饲饵] exists, all enemies ...", i.e. it holds while a bait
  * exists at all, not only on the bait itself. What moves is the STATE; the cut is re-laid over the whole camp each cast.
  * That is why the second assertion below expects the cut to SURVIVE the move, not to disappear.
  */
@@ -90,7 +90,7 @@ public class BaitModifierLifetimeTest {
         Assertions.assertEquals(1.4, onBait / none, 0.06,
                 "while a bait exists, the cut raises the damage the first enemy takes");
         Assertions.assertEquals(1.4, moved / none, 0.06,
-                "⚠ and it STAYS up after the bait moves: the sentence is 「【饲饵】存在时，敌方全体…」, and the cut is "
+                "Note: and it STAYS up after the bait moves: the sentence is 「while [饲饵] exists, all enemies ...」, and the cut is "
                         + "re-laid over the whole camp on every cast -- what the state's own name buys is that the OLD "
                         + "cut goes off first, so they never stack");
     }

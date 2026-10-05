@@ -15,11 +15,11 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1208："[穷观阵]开启时，若我方目标受到致命伤害…立即回复等同于其自身生命上限 0% 的生命值。
- * 该效果单场战斗中可以触发 1 次" (2026-10-02).
+ * 1208: "when [穷观阵] is opened, if one of our targets takes lethal damage ... immediately restore HP equal to 0% of its own Max HP.
+ * This effect can trigger 1 time per battle" (2026-10-02).
  *
  * <p>TWO READINGS IN ONE SCENE: the first lethal blow is answered (the ally stands at 0% of its OWN Max HP), and the second is not --
- * which is exactly "单场战斗中可以触发 1 次". The zone is opened by her own skill, so no test-only shortcut is used.
+ * which is exactly "can trigger 1 time per battle". The zone is opened by her own skill, so no test-only shortcut is used.
  */
 public class FuxuanEidolonTwoTest {
     private static final int FUXUAN = 1208;
@@ -45,13 +45,13 @@ public class FuxuanEidolonTwoTest {
 
         battle.applyTrueDamage(battle.enemies.getFirst(), ally, DamageElement.ICE, ally.getCurrentHp() * 2.0);
         battle.processRequests();
-        Assertions.assertFalse(ally.isDeath(), "「不会陷入无法战斗状态」");
+        Assertions.assertFalse(ally.isDeath(), "\"will not enter the unable-to-fight state\"");
         Assertions.assertEquals(ally.getMaxHp() * 0.70, ally.getCurrentHp(), ally.getMaxHp() * 0.01,
-                "「回复等同于**其自身**生命上限 70% 的生命值」");
+                "\"restore HP equal to 70% of **its own** Max HP\"");
 
         battle.applyTrueDamage(battle.enemies.getFirst(), ally, DamageElement.ICE, ally.getCurrentHp() * 2.0);
         battle.processRequests();
         Assertions.assertTrue(ally.isDeath(),
-                "「该效果单场战斗中可以触发 1 次」-- the second one is not answered");
+                "\"this effect can trigger 1 time per battle\" -- the second one is not answered");
     }
 }

@@ -19,10 +19,10 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * The <b>state-holder</b> selector: {@code "target": "holder_of:同袍"} - "持有[同袍]的角色" (2026-10-02, 1414 丹恒-腾荒).
+ * The <b>state-holder</b> selector: {@code "target": "holder_of:同袍"} - "持有[同袍]的角色" (2026-10-02, 1414 Dan Heng - Permansor Terrae (丹恒-腾荒)).
  *
  * <p><b>Why the vocabulary had to exist.</b> 1414's kit is built on one marker: his skill designates one ally as
- * [同袍], and then two other clauses speak about <i>whoever holds it</i> - the trace 神秀 that raises that ally's ATK,
+ * [同袍], and then two other clauses speak about <i>whoever holds it</i> - the Shenxiu (神秀) trace that raises that ally's ATK,
  * and (next) the technique that re-aims his skill at that ally. A condition cannot say it (conditions decide whether a
  * <b>rule</b> runs, not which units an effect reaches), and no fixed selector could either: the holder is not a slot in
  * the roster, it is whoever the state landed on.
@@ -108,7 +108,7 @@ public class BondmateHolderTest {
     // 2. His shipped clauses
     // ==================================================================
 
-    /** 秘技"使用秘技后获得[同袍]" - and its control: without the technique there is no Bondmate. */
+    /** technique (秘技) "使用秘技后获得[同袍]" - and its control: without the technique there is no Bondmate. */
     @Test
     public void hisTechniqueGivesHimTheBondmate() {
         Character without = CharacterFactory.create(DHPT, LEVEL);
@@ -127,7 +127,7 @@ public class BondmateHolderTest {
     }
 
     /**
-     * 行迹 神秀 "施放战技时，使成为[同袍]的目标攻击力提高，等同于丹恒-腾荒15%攻击力" - no scaffold.
+     * trace (行迹) Shenxiu (神秀) "施放战技时，使成为[同袍]的目标攻击力提高，等同于丹恒-腾荒15%攻击力" - no scaffold.
      *
      * <p>Two things at once, and both are the reason the selector exists: the ally who was <b>just</b> designated by
      * this very cast is the one buffed (which is also an assertion about rule ORDER inside the file - the marking has
@@ -152,7 +152,7 @@ public class BondmateHolderTest {
                 "and not its own owner");
     }
 
-    /** 行迹 葳蕤 "战斗开始时，丹恒-腾荒行动提前40%" - measured on the action bar, against no rules at all. */
+    /** trace (行迹) Weirui (葳蕤) "战斗开始时，丹恒-腾荒行动提前40%" - measured on the action bar, against no rules at all. */
     @Test
     public void hisTraceAdvancesHimAtBattleStart() {
         Character plain = CharacterFactory.create(DHPT, LEVEL);
@@ -170,7 +170,7 @@ public class BondmateHolderTest {
                 "「行动提前40%」: " + untouched + " -> " + timeRemaining(battle, him));
     }
 
-    /** 行迹 葳蕤 后半 "[同袍]施放攻击时，丹恒-腾荒恢复6点能量" - gated on the ATTACKER holding it. */
+    /** trace (行迹) Weirui (葳蕤)'s second half "[同袍]施放攻击时，丹恒-腾荒恢复6点能量" - gated on the ATTACKER holding it. */
     @Test
     public void hisTracePaysEnergyWhenTheBondmateAttacks() {
         Character him = CharacterFactory.create(DHPT, LEVEL);

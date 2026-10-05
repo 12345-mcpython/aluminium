@@ -21,10 +21,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * The cast events carry the unit they were <b>aimed at</b> - "指定我方单体" (M-35).
+ * The cast events carry the unit they were <b>aimed at</b> - "designate one of our characters" (M-35).
  *
- * <p><b>What was missing.</b> 布洛妮娅's skill is "解除<b>指定我方单体</b>的 1 个负面效果，并使<b>该目标</b>立即行动…当对自身
- * 施放该技能时，无法触发立即行动效果". The trigger events carried the caster (`actor`) and, for attacks, how many
+ * <p><b>What was missing.</b> Bronya (布洛妮娅)'s skill is "removes 1 negative effect from <b>the designated one of our characters</b>, and makes <b>that target</b> act immediately ... when this skill is cast on herself the immediate-action effect cannot be triggered". The trigger events carried the caster (`actor`) and, for attacks, how many
  * targets were hit (`hit_count`) - but not <em>who</em> was chosen, so "the ally I aimed at" was unwritable. The
  * buff-side {@code SkillCastEvent} has carried {@code targets} all along; the data side did not.
  *
@@ -41,11 +40,11 @@ import java.util.Random;
 public class CastTargetTest {
     private static final double EPS = 1e-6;
 
-    /** 布洛妮娅 - her skill is the first user of "the ally this cast was aimed at". */
+    /** Bronya (布洛妮娅) - her skill is the first user of "the ally this cast was aimed at". */
     private static final int BRONYA = 1101;
-    /** 桂乃芬 - a plain teammate to aim at. */
+    /** Guinaifen (桂乃芬) - a plain teammate to aim at. */
     private static final int ALLY = 1210;
-    /** 停云 - a second plain teammate, so "aimed at" can be told apart from "also hit". */
+    /** Tingyun (停云) - a second plain teammate, so "aimed at" can be told apart from "also hit". */
     private static final int OTHER = 1202;
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
@@ -94,7 +93,7 @@ public class CastTargetTest {
     }
 
     // ==================================================================
-    // 2. 布洛妮娅's skill, end to end
+    // 2. Bronya's skill, end to end
     // ==================================================================
 
     /** Aimed at an ally: they act immediately, and Bronya's own place in the turn order is untouched. */
@@ -110,9 +109,9 @@ public class CastTargetTest {
 
         battle.castImmediate(new DefaultSkill(BRONYA, 2, 1), bronya, List.of(ally));
 
-        Assertions.assertEquals(0, timeRemaining(battle, ally), EPS, "「使该目标立即行动」");
+        Assertions.assertEquals(0, timeRemaining(battle, ally), EPS, "「make that target act immediately」");
         Assertions.assertEquals(bronyaBefore, timeRemaining(battle, bronya), EPS,
-                "she spends the skill, not the action: 「该目标」 is not her");
+                "she spends the skill, not the action: 「that target」 is not her");
         Assertions.assertEquals(0.66, damageBoostOf(ally), EPS,
                 "and both effects land on the AIMED unit: the damage boost too, not on the caster");
         Assertions.assertEquals(bronyaBoostBefore, damageBoostOf(bronya), EPS, "…not on her");
@@ -121,7 +120,7 @@ public class CastTargetTest {
     /**
      * Aimed at herself: the damage boost still lands, the immediate action does not.
      *
-     * <p>"当对自身施放该技能时，无法触发立即行动效果" - the whole reason her skill is two rules rather than one, and
+     * <p>"when this skill is cast on herself the immediate-action effect cannot be triggered" - the whole reason her skill is two rules rather than one, and
      * both halves are asserted here so the gate cannot be satisfied by dropping the rule altogether.
      */
     @Test
@@ -134,7 +133,7 @@ public class CastTargetTest {
         battle.castImmediate(new DefaultSkill(BRONYA, 2, 1), bronya, List.of(bronya));
 
         Assertions.assertEquals(before, timeRemaining(battle, bronya), EPS,
-                "「无法触发立即行动效果」");
+                "「the immediate-action effect cannot be triggered」");
         Assertions.assertEquals(boostBefore + 0.66, damageBoostOf(bronya), EPS,
                 "…while the damage boost still applies on a self-cast");
     }
@@ -156,7 +155,7 @@ public class CastTargetTest {
                 new TriggerTable.TriggerContext(bronya, bronya, ally, 0, 0, null, battle);
         List<TriggerTable.CompiledRule> onAlly = rulesFor(table, aimed);
         Assertions.assertEquals(4, onAlly.size(),
-                "her Eidolon 1 rule matches a skill cast too, and so does 星魂 6 (which lengthens the boost below); "
+                "her Eidolon 1 rule matches a skill cast too, and so does eidolon 6 (which lengthens the boost below); "
                         + "the two below are the skill's own sentences");
         EffectSpec advance = ruleWithCondition(onAlly, "target != self").effects().getFirst();
         Assertions.assertEquals("ADVANCE", advance.getOp());
@@ -175,7 +174,7 @@ public class CastTargetTest {
         TriggerTable.TriggerContext self =
                 new TriggerTable.TriggerContext(bronya, bronya, bronya, 0, 0, null, battle);
         Assertions.assertEquals(3, rulesFor(table, self).size(),
-                "aimed at herself the advance rule drops out (Eidolon 1 and 星魂 6 still match): the gate is a "
+                "aimed at herself the advance rule drops out (Eidolon 1 and eidolon 6 still match): the gate is a "
                         + "condition, not a branch");
     }
 

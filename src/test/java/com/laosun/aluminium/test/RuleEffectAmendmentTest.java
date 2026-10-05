@@ -20,7 +20,7 @@ import java.util.Random;
  * {@code MODIFY_RULE}'s <b>third form</b> (2026-09-28): raise another rule's effect <b>value</b> or <b>duration</b>,
  * rather than how often it runs.
  *
- * <p><b>The sentences that need it.</b> 1215 寒鸦 星魂 4 "终结技的持续时间额外增加1回合" and 星魂 6 "天赋的伤害提高效果额外提高
+ * <p><b>The sentences that need it.</b> 1215 Hanya (寒鸦) Eidolon 4 "终结技的持续时间额外增加1回合" and Eidolon 6 "天赋的伤害提高效果额外提高
  * 10%" (30% to 40%). Note: Neither may be written as <i>a second rule with a bigger number</i>: same-kind modifiers
  * <b>refresh instead of stacking</b>, so the extra rule would replace the first - 0.1 instead of 0.4, or a duration that
  * stays at 2 - and nothing would look broken.

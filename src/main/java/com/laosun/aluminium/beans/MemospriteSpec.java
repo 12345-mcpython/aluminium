@@ -14,10 +14,10 @@ import java.util.List;
  * Every memosprite in the documents is described that way, and the ratios differ per character:
  *
  * <pre>
- * 1402 阿格莱雅 - 衣匠   "等同于阿格莱雅#1[i]%速度的速度以及等同于阿格莱雅#2[i]%生命上限+#3[i]的生命上限"
- * 1413 长夜月   - "长夜" "初始拥有#1[i]点速度，生命上限为长夜月的#2[i]%"
- * 1512 知更鸟-晴歌 - 晴空乐手 "等同于…#1[i]%生命上限的生命上限和等同于…#2[i]%速度的速度"
- * 800/8 开拓者 - 迷迷 "初始拥有#1[i]点速度和等同于开拓者#2[i]%生命上限+#3[i]的生命上限"
+ * 1402 Aglaea (阿格莱雅) - 衣匠   "speed equal to #1[i]% of Aglaea (阿格莱雅)'s speed, and Max HP equal to #2[i]% of Aglaea (阿格莱雅)'s Max HP + #3[i]"
+ * 1413 Evernight (长夜月)   - "长夜" "initially has #1[i] speed, and its Max HP is #2[i]% of Evernight (长夜月)'s"
+ * 1512 Robin (知更鸟)-晴歌 - 晴空乐手 "Max HP equal to #1[i]% of ...'s Max HP and speed equal to #2[i]% of ...'s speed"
+ * 800/8 Trailblazer (开拓者) - 迷迷 "initially has #1[i] speed and Max HP equal to #2[i]% of the Trailblazer (开拓者)'s Max HP + #3[i]"
  * </pre>
  *
  * <p>So a memosprite's panel is <b>not</b> a stat block of its own - it is a function of the summoner's
@@ -31,13 +31,13 @@ import java.util.List;
  * have no number in any document and no memosprite stat table in this data set, so they are deliberately
  * left at 0 and registered as a gap rather than guessed at.
  *
- * @param name   the memosprite's name as the text writes it (e.g. 衣匠)
+ * @param name   the memosprite's name as the text writes it (e.g. 衣匠, the Garmentmaker)
  * @param source where the panel numbers come from - the document and rule, with the placeholders and the
  *               parameter list, so a number can be traced back
  * @param note   free-form note for the next reader (may be absent)
  * @param panel  one entry per attribute this memosprite takes from its summoner
- * @param attack the memosprite's own attack, or {@code null} when no document states one (P9-4 忆灵)
- * @param aggro  the servant's 仇恨 weight, or {@code null} to leave the engine's regular tier (100). Every
+ * @param attack the memosprite's own attack, or {@code null} when no document states one (P9-4 memosprite)
+ * @param aggro  the servant's 仇恨 (aggro) weight, or {@code null} to leave the engine's regular tier (100). Every
  *               document that describes a servant states one ("ServantID 11413 - 仇恨: 125"), so {@code null}
  *               means "no document says", not "it is an ordinary unit"
  */
@@ -57,7 +57,7 @@ public record MemospriteSpec(@SerializedName("name") String name,
                              @SerializedName("resources") List<com.laosun.aluminium.beans.ResourceSpec> resources) {
 
     /**
-     * One 忆灵技能 of this memosprite, as the game states it: a SLOT and the level its row is read at.
+     * One memosprite skill (忆灵技能) of this memosprite, as the game states it: a SLOT and the level its row is read at.
      *
      * <p>Note: Why these two numbers are enough: the engine addresses a skill by `(cid, slot)`, and a memosprite's cid IS its
      * `ServantID` ("ServantID 11415"). Both facts were measured -- `SkillEffects.forSkill` keys on
@@ -124,13 +124,13 @@ public record MemospriteSpec(@SerializedName("name") String name,
      *
      * <p><b>Why this lives here and not in a rule file.</b> A memosprite's attack is not a trigger - nothing
      * in the battle fires it, a turn does - so it is not a {@code TriggerSpec}. It also cannot live on the
-     * summoning character, because the numbers are stated against the <em>memosprite</em>: 长夜月's "长夜"
-     * hits for "等同于'长夜'200%生命上限", which is the memosprite's own Max HP, not the summoner's.
-     * Reading it off the summoner would produce a number 2 x  too large (the panel gives 长夜 half of 长夜月's
+     * summoning character, because the numbers are stated against the <em>memosprite</em>: Evernight (长夜月)'s "长夜"
+     * hits for "equal to 200% of '长夜''s Max HP", which is the memosprite's own Max HP, not the summoner's.
+     * Reading it off the summoner would produce a number 2 x  too large (the panel gives 长夜 half of Evernight (长夜月)'s
      * HP) - a wrong number that looks plausible, which is the worst kind.
      *
      * <p>Note: {@code base} names an attribute of the <b>memosprite</b>. Where a document instead scales off the
-     * <em>summoner</em> (景元's "神君" hits for "等同于景元攻击力66%"), the panel carries the share and the
+     * <em>summoner</em> (Jing Yuan (景元)'s "神君" hits for "equal to 66% of Jing Yuan (景元)'s ATK"), the panel carries the share and the
      * attack then scales off the memosprite's own ATTACK: the same number, stated the same way every other
      * inherited attribute is, and consistent with the panel's snapshot semantics.
      *

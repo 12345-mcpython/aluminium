@@ -16,7 +16,7 @@ import java.util.Random;
  *
  * <p>The number is the parameter her prose never names: the technique's table is {@code [2, 5]}, the text quotes only
  * the 2 turns, and {@code MAvatar_Klara_00_MazeSkill_AggroUP} writes {@code AggroAddedRatio} - so 5 is the ratio and the
- * weight becomes x(1 + 5) = <b>x6</b>. The gate is the engine's existing {@code self has_state 秘技}
+ * weight becomes x(1 + 5) = <b>x6</b>. The gate is the engine's existing {@code self has_state 秘技} (technique)
  * ({@link Battle#markTechniqueUsed}), which is also how 1104's technique shield is spelled.
  *
  * <p>Note: The 2-turn duration rides in {@code turns: 2} (the number the prose does name). Its countdown belongs to the

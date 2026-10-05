@@ -58,7 +58,7 @@ public class HitResistTest {
     }
 
     /**
-     * Specific debuff resistance: 冰锋's {@code debuff_resistance = {"STAT_CTRL_Frozen": 1}}
+     * Specific debuff resistance: Ice Edge (冰锋)'s {@code debuff_resistance = {"STAT_CTRL_Frozen": 1}}
      *  to fully immune to freeze (chance 0), other effects are unaffected.
      */
     @Test
@@ -72,7 +72,7 @@ public class HitResistTest {
                 newBattle(caster, iceEdge).hitChance(caster, iceEdge, 1.0, "STAT_CTRL_Frozen"), EPS,
                 "specific resistance 1.0 → the key factor (1-1) = 0 → fully immune");
 
-        // note that 冰锋 itself also has 30% effect resistance (template 0.2 + level group 0.1), so "unaffected by
+        // note that Ice Edge itself also has 30% effect resistance (template 0.2 + level group 0.1), so "unaffected by
         // the specific resistance" != a chance of 1.0, it is 1.0 x (1 - 0.3) = 0.
         Assertions.assertEquals(0.7,
                 newBattle(caster, iceEdge).hitChance(caster, iceEdge, 1.0, "STAT_DOT_Burn"), EPS,
@@ -132,7 +132,7 @@ public class HitResistTest {
                 "chance 1.0 → always attached");
         Assertions.assertTrue(target.getBuffManager().hasBuff(StunBuff.class));
 
-        // guaranteed to fail: 冰锋 is immune to freeze to chance 0.0
+        // guaranteed to fail: Ice Edge is immune to freeze to chance 0.0
         Enemy iceEdge = EnemyFactory.create(1002011, 90, 1);
         Battle battle2 = newBattle(caster, iceEdge);
         Assertions.assertFalse(battle2.tryApplyDebuff(caster, iceEdge, new StunBuff(2), 1.0, "STAT_CTRL_Frozen"),

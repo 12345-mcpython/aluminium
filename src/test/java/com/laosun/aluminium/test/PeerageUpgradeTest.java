@@ -14,14 +14,14 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1412 刻律德菈's 战技, second half: "当充能达到 6 点时，自动使角色的[军功]升级为[爵位]" (2026-10-02).
+ * 1412 刻律德菈's Skill, second half: "when charge reaches 6 points, automatically upgrade the character's [军功] to [爵位]" (2026-10-02).
  *
  * <p>Nothing new was needed for this: {@code RESOURCE_CHANGED} + {@code self_resource:充能 >= 6} + {@code holder_of:军功}
  * all ship already. Her skill grants 1 charge per cast, so six casts cross the threshold - and five must not, which is
  * the whole point of the case.
  *
- * <p>Note: "持有[爵位]的角色被视为同时持有[军功]" is why the rule ADDS 爵位 and does not remove 军功: the sentence's
- * "counts as holding both" then holds by construction. Note: The same sentence's "并解除其控制类负面状态" is registered,
+ * <p>Note: "a character holding [爵位] is considered to also hold [军功]" is why the rule ADDS 爵位 and does not remove 军功: the sentence's
+ * "counts as holding both" then holds by construction. Note: The same sentence's clause "and removes its control-class negative states" is registered,
  * not written: the engine has no "clear a class of debuffs" capability today.
  */
 public class PeerageUpgradeTest {
@@ -46,16 +46,16 @@ public class PeerageUpgradeTest {
             cerydra.getSkills().get(SkillType.SKILL).execute(battle, cerydra, List.of(ally));
             battle.processRequests();
         }
-        Assertions.assertTrue(ally.getBuffManager().hasState(MERIT), "precondition: the ally carries 【军功】");
+        Assertions.assertTrue(ally.getBuffManager().hasState(MERIT), "precondition: the ally carries [军功]");
         Assertions.assertFalse(ally.getBuffManager().hasState(PEERAGE),
-                "five charges is below the threshold, so no 【爵位】 yet");
+                "five charges is below the threshold, so no [爵位] yet");
 
         cerydra.getSkills().get(SkillType.SKILL).execute(battle, cerydra, List.of(ally));
         battle.processRequests();
 
         Assertions.assertTrue(ally.getBuffManager().hasState(PEERAGE),
-                "the sixth charge upgrades 【军功】 to 【爵位】");
+                "the sixth charge upgrades [军功] to [爵位]");
         Assertions.assertTrue(ally.getBuffManager().hasState(MERIT),
-                "and 【爵位】 COUNTS AS 【军功】, so both are on (the rule adds, it does not replace)");
+                "and [爵位] COUNTS AS [军功], so both are on (the rule adds, it does not replace)");
     }
 }

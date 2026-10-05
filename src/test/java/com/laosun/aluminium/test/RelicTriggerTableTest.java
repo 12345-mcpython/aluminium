@@ -79,53 +79,53 @@ public class RelicTriggerTableTest {
     // The seven MIXED (stat + ability) planar 2-pieces authored on 2026-09-2, when `self_attr` and
     // ADVANCE made their conditional sentence expressible. Before that they were not in this test's
     // world at all -- see MIXED_STAT_AND_ABILITY.
-    /** 太空封印站: 攻击力 +12%; SPD >= 120 -> 攻击力额外 +12%. */
+    /** Space Sealing Station (太空封印站): ATK +12%; SPD >= 120 -> ATK +12% more. */
     private static final int SPACE_SEALING_STATION = 301;
-    /** 不老者的仙舟: 生命上限 +12%; SPD >= 120 -> 我方全体攻击力 +8%. */
+    /** Fleet of the Ageless (不老者的仙舟): Max HP +12%; SPD >= 120 -> the whole party's ATK +8%. */
     private static final int FLEET_OF_THE_AGELESS = 302;
-    /** 筑城者的贝洛伯格: 防御力 +15%; 效果命中 >= 50% -> 防御力额外 +15%. */
+    /** Belobog of the Architects (筑城者的贝洛伯格): DEF +15%; effect hit rate >= 50% -> DEF +15% more. */
     private static final int BELOBOG = 304;
-    /** 停转的萨尔索图: 暴击率 +8%; 当前暴击率 >= 50% -> 终结技与追加攻击伤害 +15%. */
+    /** Inert Salsotto (停转的萨尔索图): CRIT Rate +8%; current CRIT Rate >= 50% -> Ultimate and follow-up attack DMG +15%. */
     private static final int INERT_SALSOTTO = 306;
-    /** 盗贼公国塔利亚: 击破特攻 +16%; SPD >= 145 -> 击破特攻额外 +20%. */
+    /** Talia - Kingdom of Banditry (盗贼公国塔利亚): break effect +16%; SPD >= 145 -> break effect +20% more. */
     private static final int TALIA = 307;
-    /** 生命的翁瓦克: 能量恢复效率 +5%; SPD >= 120 -> 进入战斗时行动提前 40%. */
+    /** Sprightly Vonwacq (生命的翁瓦克): energy regeneration rate +5%; SPD >= 120 -> action advance 40% at battle start. */
     private static final int SPRIGHTLY_VONWACQ = 308;
-    /** 繁星竞技场: 暴击率 +8%; 当前暴击率 >= 0% -> 普攻与战技伤害 +20%. */
+    /** Rutilant Arena (繁星竞技场): CRIT Rate +8%; current CRIT Rate >= 0% -> basic attack and Skill DMG +20%. */
     private static final int CELESTIAL_DIFFERENTIATOR = 309;
-    /** 星体差分机: 暴击伤害 +16%; 暴击伤害 >= 120% -> 暴击率 +60% 直到首次攻击后 (the first user of `until`). */
+    /** Celestial Differentiator (星体差分机): CRIT DMG +16%; CRIT DMG >= 120% -> CRIT Rate +60% until after the first attack (the first user of `until`). */
     private static final int STELLAR_DIFFERENTIATOR = 305;
-    /** 奇想蕉乐园: 暴击伤害 +16%; 有召唤物在场 -> 暴击伤害额外 +32% (the first user of `self_summon_count`). */
+    /** The Wondrous BananAmusement Park (奇想蕉乐园): CRIT DMG +16%; a summon on the field -> CRIT DMG +32% more (the first user of `self_summon_count`). */
     private static final int BANANA_PARADISE = 318;
-    /** 凯歌祝捷的英豪: 攻击力 +12%; 忆灵在场 -> 速度 +6%, 忆灵攻击时 -> 双方暴击伤害 +30% 2 回合. */
+    /** Hero of Triumphant Song (凯歌祝捷的英豪): ATK +12%; a memosprite on the field -> SPD +6%, when the memosprite attacks -> both sides' CRIT DMG +30% for 2 turns. */
     private static final int HERO_OF_TRIUMPHANT_SONG = 123;
-    /** 哀歌覆国的诗人: 速度 -8%; 战斗前速度 <110/<95 -> 暴击率 +20%/+32%，忆灵同享. */
+    /** Poet of Mourning Collapse (哀歌覆国的诗人): SPD -8%; SPD before battle <110/<95 -> CRIT Rate +20%/+32%, the memosprite shares it. */
     private static final int POET = 124;
-    /** 谧宁拾骨地: 生命上限 +12%; 生命上限 >= 5000 -> 装备者及忆灵暴击伤害 +28%. */
+    /** Bone Collection's Serene Demesne (谧宁拾骨地): Max HP +12%; Max HP >= 5000 -> the wearer's and the memosprite's CRIT DMG +28%. */
     private static final int SERENE_DEMESNE = 319;
-    /** 渊思寂虑的巨树: 速度 +6%; 速度 >=135/180 -> 装备者及忆灵治疗量 +12%/20%. */
+    /** Giant Tree of Rapt Brooding (渊思寂虑的巨树): SPD +6%; SPD >=135/180 -> the wearer's and the memosprite's healing +12%/20%. */
     private static final int RAPT_BROODING = 320;
-    /** 熔岩锻铸的火匠: 战技伤害 +12%; 终结技后下一次攻击的火伤 +12%. */
+    /** Firesmith of Lava-Forging (熔岩锻铸的火匠): Skill DMG +12%; after the Ultimate, the next attack's Fire DMG +12%. */
     private static final int FIRESMITH = 107;
-    /** 风举云飞的勇烈: 暴击率 +6%; 追加攻击后终结技伤害 +36% 1 回合. */
+    /** The Wind-Soaring Valorous (风举云飞的勇烈): CRIT Rate +6%; after a follow-up attack, Ultimate DMG +36% for 1 turn. */
     private static final int VALOROUS = 120;
-    /** 再创天地的救世主: 普攻/战技后忆灵在场 -> 装备者与忆灵生命上限 +24%、我方全体伤害 +15%. */
+    /** Hero of the Shattered World (再创天地的救世主): after a basic attack/Skill, a memosprite on the field -> the wearer's and the memosprite's Max HP +24%, the whole party's DMG +15%. */
     private static final int SHATTERED_WORLD = 127;
-    /** 苍穹战线格拉默: 攻击力 +12%; 速度 >= 135/160 -> 造成的伤害 +12%/18%. */
+    /** Glamoth's Iron Cavalry Regiment (苍穹战线格拉默): ATK +12%; SPD >= 135/160 -> DMG dealt +12%/18%. */
     private static final int GLAMOTH = 311;
-    /** 野穗伴行的快枪手: 速度 +6%; 普攻伤害 +10%. */
+    /** Musketeer of Wild Wheat (野穗伴行的快枪手): SPD +6%; basic attack DMG +10%. */
     private static final int MUSKETEER = 102;
-    /** 流星追迹的怪盗: 击破特攻 +16%; 击破弱点后回 3 点能量. */
+    /** Thief of Shooting Meteor (流星追迹的怪盗): break effect +16%; after breaking a weakness, restore 3 energy. */
     private static final int THIEF = 111;
-    /** 死水深潜的先驱: 对受负面状态影响的敌人造成的伤害 +12%. */
+    /** Pioneer Diver of Dead Waters (死水深潜的先驱): DMG dealt to an enemy affected by a negative state +12%. */
     private static final int PIONEER = 117;
-    /** 识海迷坠的学者: 战技与终结技伤害 +20%; 终结技后下一次战技 +25%. */
+    /** Scholar Lost in Erudition (识海迷坠的学者): Skill and Ultimate DMG +20%; after the Ultimate, the next Skill +25%. */
     private static final int SCHOLAR = 122;
-    /** 折断的龙骨: 效果抵抗 +10%; 效果抵抗 >= 30% 时我方全体暴击伤害 +10%. */
+    /** Broken Keel (折断的龙骨): effect resistance +10%; when effect resistance >= 30%, the whole party's CRIT DMG +10%. */
     private static final int BROKEN_KEEL = 310;
-    /** 净庭教宗的圣骑士: 防御力 +15%; 使装备者提供的护盾量提高 20%. */
+    /** Knight of Purity Palace (净庭教宗的圣骑士): DEF +15%; raise the shield the wearer provides by 20%. */
     private static final int KNIGHT_OF_PURITY = 103;
-    /** 自匿星芒的隐士: 提供的护盾量提高 10%; 再 +12%，且我方目标持有装备者提供的护盾时暴击伤害 +15%(M-53). */
+    /** Self-Enshrouded Recluse (自匿星芒的隐士): the shield provided is raised by 10%; 12% more, and when an ally holds a shield the wearer provided, CRIT DMG +15% (M-53). */
     private static final int RECLUSE = 128;
 
     /**
@@ -147,7 +147,7 @@ public class RelicTriggerTableTest {
      * An ordinary character with <b>no trigger rules of their own</b>, so every rule the tests below see comes
      * from the relic set: the merge must still yield the set's rules, and the counts must be the set's alone.
      *
-     * <p>Note: Looked up rather than named since 2026-09-2: it was 姬子 (1003) until her kit was authored, which put
+     * <p>Note: Looked up rather than named since 2026-09-2: it was Himeko (1003) until her kit was authored, which put
      * a {@code BATTLE_START} rule of her own into the counts pinned below. See {@link TestCharacters}.
      */
     // 2026-09-30: a REAL character whose own file carries NO BATTLE_START rule (this suite counts them), so the count it
