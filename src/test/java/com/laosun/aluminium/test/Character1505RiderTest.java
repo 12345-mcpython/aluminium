@@ -13,10 +13,10 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1505 绯英’s skill rider (2026-09-30): 「当绯英持有【好活当赏】时，施放战技可对受到攻击的敌方目标造成 8% 的物理属性欢愉伤容」.
+ * 1505 绯英's skill rider (2026-09-30): "当绯英持有[好活当赏]时，施放战技可对受到攻击的敌方目标造成 8% 的物理属性欢愉伤容".
  *
- * <p>⭐ Two-sided on the SAME cast: with the resource her skill costs the enemy extra health, and after spending it the same cast
- * deals strictly less. That is what 「持有【好活当赏】时」 means, read on real numbers.
+ * <p>Two-sided on the SAME cast: with the resource her skill costs the enemy extra health, and after spending it the same cast
+ * deals strictly less. That is what "持有[好活当赏]时" means, read on real numbers.
  */
 public class Character1505RiderTest {
     private static final int WEARER = 1505;
@@ -51,8 +51,8 @@ public class Character1505RiderTest {
     }
 
     /**
-     * ★ The shipped numbers and the type, read off the compiled rule (2026-09-30). The behavioural test above only asks
-     * whether holding 【好活当赏】 adds damage, so a change to `percent` (8 -> 4) or to `damageType` would still satisfy it --
+     * The shipped numbers and the type, read off the compiled rule (2026-09-30). The behavioural test above only asks
+     * whether holding [好活当赏] adds damage, so a change to `percent` (8 -> 4) or to `damageType` would still satisfy it --
      * measured: both mutations came back with 0 red before this test existed (discipline 232).
      */
     @Test

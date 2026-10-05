@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1205 Blade, from his own file (2026-09-29, round 194): the 【地狱变】 state, the technique's Max-HP opening and the charge's cap.
+ * 1205 Blade, from his own file (2026-09-29, round 194): the [地狱变] state, the technique's Max-HP opening and the charge's cap.
  *
  * <p>The cap is tested by EXCEEDING it (round 192's lesson): six hits must still read 5.
  */
@@ -24,7 +24,7 @@ public class BladeTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** ⚠ The Skill enters the state. */
+    /** Note: The Skill enters the state. */
     @Test
     public void theSkillEntersHellscape() {
         Character blade = CharacterFactory.create(BLADE, LEVEL);
@@ -38,7 +38,7 @@ public class BladeTest {
                 "「进入【地狱变】状态」");
     }
 
-    /** ⚠ The technique's 40% of his Max HP, measured against a hand-built 50% in the same pipeline, and the control. */
+    /** Note: The technique's 40% of his Max HP, measured against a hand-built 50% in the same pipeline, and the control. */
     @Test
     public void theTechniqueDealsFortyPercentOfHisMaxHp() {
         double content = openingLoss(true);
@@ -51,7 +51,7 @@ public class BladeTest {
                 "content " + content + " vs reference " + reference + " (expected " + (0.4 / 0.5) + ")");
     }
 
-    /** ⚠ The charge cap, tested by exceeding it. */
+    /** Note: The charge cap, tested by exceeding it. */
     @Test
     public void theChargeStopsAtFive() {
         Character blade = CharacterFactory.create(BLADE, LEVEL);

@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Light cone 20013: 「使装备者施放战技后额外恢复#1]点能量，该效果单个回合内不可重复触发」.
+ * Light cone 20013: "使装备者施放战技后额外恢复#1]点能量，该效果单个回合内不可重复触发".
  *
  * <p>Two things the probe (round 129) established and this test therefore does: the event is fired INSIDE a driven turn (`currentMove` + `beforeMove`), because
  * a `per_turn` counter has no turn to count in otherwise, and it is fired WITH a target -- an effect that resolves a target throws

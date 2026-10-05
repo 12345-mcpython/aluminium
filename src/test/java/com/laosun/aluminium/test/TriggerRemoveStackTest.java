@@ -20,9 +20,9 @@ import java.util.Random;
  * stack(s) of this effect".
  *
  * <p><b>Why the op had to exist.</b> {@code MODIFY_ATTR} with {@code max_stacks} already models the stacking
- * half, and {@code BuffManager.removeOneBuff} was already there — but a <b>rule</b> could only ever grow a
+ * half, and {@code BuffManager.removeOneBuff} was already there - but a <b>rule</b> could only ever grow a
  * stack. So a text whose second half takes a stack back could only be modelled by dropping that half, which
- * is exactly what relic set 131 (「星如我见的领航员」) was registered as: unmodelled.
+ * is exactly what relic set 131 ("星如我见的领航员") was registered as: unmodelled.
  *
  * <p>The observable is the attribute's value (the stacks are ordinary modifiers, summed), so these cases do
  * not need a damage pipeline: they apply stacks with real rules and take them back with real rules.
@@ -81,13 +81,13 @@ public class TriggerRemoveStackTest {
     }
 
     /**
-     * The newest stack goes first — the same order {@code BuffManager.removeOneBuff} uses.
+     * The newest stack goes first - the same order {@code BuffManager.removeOneBuff} uses.
      *
      * <p>The two stacks carry <b>different</b> values on purpose: with equal ones the order would be
      * invisible, and "which stack came off" is exactly what a reader would otherwise have to assume. They are
-     * also put on <b>different events</b>, so one firing adds exactly one stack — both rules on one event
+     * also put on <b>different events</b>, so one firing adds exactly one stack - both rules on one event
      * would add two stacks per firing and hit the shared cap of 3 immediately (measured while writing this:
-     * it read 0.7 instead of 0.6).
+     * it read 0.instead of 0.6).
      */
     @Test
     public void theMostRecentlyAddedStackGoesFirst() {
@@ -162,7 +162,7 @@ public class TriggerRemoveStackTest {
         return stackRuleOn("ALLY_ATTACK", percent, maxStacks);
     }
 
-    /** The same, on a named event — the stack cases need one firing to add exactly one stack. */
+    /** The same, on a named event - the stack cases need one firing to add exactly one stack. */
     private static TriggerSpec stackRuleOn(String event, double percent, int maxStacks) {
         EffectSpec effect = new EffectSpec();
         TriggerSpecs.set(effect, "op", "MODIFY_ATTR");

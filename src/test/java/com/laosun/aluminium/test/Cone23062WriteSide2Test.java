@@ -16,16 +16,16 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 写入端：`Battle.castUltra` 把"本次消耗"送到结算时的伤害实例上 —— ⚠ 走**真实施放**，不手工设值。
+ * 写入端：`Battle.castUltra` 把"本次消耗"送到结算时的伤害实例上 -  - Note: 走真实施放，不手工设值。
  *
- * <p>⚠ 为什么必须自己造规则：读取端的判据是手工设 `castEnergySpent` 的，它根本不经过 `Battle`；而实测过，
+ * <p>Note: 为什么必须自己造规则：读取端的判据是手工设 `castEnergySpent` 的，它根本不经过 `Battle`；而实测过，
  * 把写入那行注释掉，全量套件照样绿（845 轮）。
  *
- * <p>⚠ 而"造一条探针"也不自由：能读自定义 `scale` 的 op 是**闭集** —— `MODIFY_ATTR` 带
- * `cast_energy_spent` 在**装载期**就抛（856 轮实测），`ADD_STACK` 则**静默不读**（854 轮实测：
+ * <p>Note: 而"造一条探针"也不自由：能读自定义 `scale` 的 op 是闭集 -  - `MODIFY_ATTR` 带
+ * `cast_energy_spent` 在装载期就抛（856 轮实测），`ADD_STACK` 则静默不读（854 轮实测：
  * 探针恒为 2 层，写入被注释掉也照样 2 层）。实际上只有 `BOOST_DAMAGE` 认它。
  *
- * <p>所以对照是**同一条规则、只换 scale**：一次带 `scale: cast_energy_spent`（percent 0.02），
+ * <p>所以对照是同一条规则、只换 scale：一次带 `scale: cast_energy_spent`（percent 0.02），
  * 一次不带（percent 0.001）。写入发生时前者远高；写入被注释掉时前者读 0，于是低于后者。
  */
 public class Cone23062WriteSide2Test {

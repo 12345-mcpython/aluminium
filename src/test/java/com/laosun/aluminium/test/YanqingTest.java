@@ -21,7 +21,7 @@ public class YanqingTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** ⚠ The Skill applies the state AND its two modifiers, all on himself, all for the document's one turn. */
+    /** Note: The Skill applies the state AND its two modifiers, all on himself, all for the document's one turn. */
     @Test
     public void theSkillSyncsAndRaisesBothCritStats() {
         Character yanqing = CharacterFactory.create(YANQING, LEVEL);
@@ -41,7 +41,7 @@ public class YanqingTest {
                 "「和30%暴击伤害」");
     }
 
-    /** ⚠ The Ultimate's conditional half: +50% CRIT DMG ONLY while the state is up. */
+    /** Note: The Ultimate's conditional half: +50% CRIT DMG ONLY while the state is up. */
     @Test
     public void theUltimateAddsCritDamageOnlyWhileSynced() {
         double synced = ultCritDamageGain(true);
@@ -53,7 +53,7 @@ public class YanqingTest {
                 "without the state the extra 50% must not be granted");
     }
 
-    /** ⚠ A 60% chance, pinned from both sides by the fixture: 0.0 always fires, 1.0 never does. */
+    /** Note: A 60% chance, pinned from both sides by the fixture: 0.0 always fires, 1.0 never does. */
     @Test
     public void theFollowUpChanceIsPinnedByTwoFixtures() {
         double always = followUpLoss(0.0);

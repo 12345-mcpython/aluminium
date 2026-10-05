@@ -13,9 +13,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1502 爻光’s ultimate on both counts (2026-09-30): 「获得 5 个笑点…并使我方全体目标全属性抗性穿透提高 10%，持续 3 回合」.
+ * 1502 爻光's ultimate on both counts (2026-09-30): "获得 5 个笑点…并使我方全体目标全属性抗性穿透提高 10%，持续 3 回合".
  *
- * <p>⭐ The laughs are a PARTY counter (the capability shipped in the previous round), so the judge reads them from the BATTLE and
+ * <p>The laughs are a PARTY counter (the capability shipped in the previous round), so the judge reads them from the BATTLE and
  * checks that the caster does not carry a private copy -- the same discriminator that made the party store necessary.
  */
 public class Character1502Test {
@@ -64,7 +64,7 @@ public class Character1502Test {
         Assertions.assertFalse(yaoguang.getResources().has(LAUGH), "which no single unit owns");
     }
 
-    /** ★ The shipped rule, read off the compiled table (discipline 232). */
+    /** The shipped rule, read off the compiled table (discipline 232). */
     @Test
     public void theShippedRuleCarriesTheNumbersAndDuration() {
         build();

@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1305 Dr. Ratio: 「若追加攻击施放前目标被消灭则对敌方随机单体发动」 -- the fallback selector.
+ * 1305 Dr. Ratio: "若追加攻击施放前目标被消灭则对敌方随机单体发动" -- the fallback selector.
  *
  * <p><b>Two enemies.</b> With one, `target_else_random_enemy` and the plain `target` resolve to the same
  * unit, so the judge could not see the difference. <b>A is defeated first</b> via CanHit.perish(), which

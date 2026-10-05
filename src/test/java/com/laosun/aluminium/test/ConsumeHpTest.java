@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1205 Blade's skill: 「消耗等同于刃生命上限 30% 的生命值，进入【地狱变】状态…若当前生命值不足…降低至 1 点」.
+ * 1205 Blade's skill: "消耗等同于刃生命上限 30% 的生命值，进入[地狱变]状态…若当前生命值不足…降低至 1 点".
  *
  * <p>Judged by the HP difference -- a quantity nothing else in the fixture touches -- and the floor is reached by damaging her first.
  */
@@ -47,7 +47,7 @@ public class ConsumeHpTest {
         Battle battle = new Battle(List.of(unit), List.of(enemy), new Random(0));
         battle.startBattle();
         int guard = 0;
-        // ⚠ Small steps: `Damage`'s value is a SKILL BASE, not raw damage (round 193/240), so a big one-shot figure kills
+        // Note: Small steps: `Damage`'s value is a SKILL BASE, not raw damage (round 193/240), so a big one-shot figure kills
         // her and a dead unit answers nothing (0 HP for every reading).
         while (unit.getCurrentHp() / unit.getMaxHp() > 0.05 && guard++ < 400 && !unit.isDeath()) {
             battle.applyDamage(unit, new Damage(enemy, unit, DamageElement.PHYSICAL, DamageType.NORMAL,

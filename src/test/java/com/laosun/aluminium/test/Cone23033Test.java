@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Light cone 23033: energy at the start of the battle, and the 【雷遁】 state machine -- an Ultimate arms it, two basic attacks
+ * Light cone 23033: energy at the start of the battle, and the [雷遁] state machine -- an Ultimate arms it, two basic attacks
  * spend it for a 50% advance, and another Ultimate resets the count.
  */
 public class Cone23033Test {
@@ -68,7 +68,7 @@ public class Cone23033Test {
     }
 
     /**
-     * ★ The exact number, not "it went up" (discipline 200): `> 0` cannot tell 30 from 15 -- measured, the `30 -> 15`
+     * The exact number, not "it went up" (discipline 200): `> 0` cannot tell 30 from 15 -- measured, the `30 -> 15`
      * mutation was 0 red until this line existed.
      */
     @Test
@@ -83,7 +83,7 @@ public class Cone23033Test {
     }
 
     /**
-     * ★ The advance as a NUMBER, read off the action bar: `Signal.nextActionTime` is public and `Battle.queue.getHeap()` finds a
+     * The advance as a NUMBER, read off the action bar: `Signal.nextActionTime` is public and `Battle.queue.getHeap()` finds a
      * unit's signal, so nothing had to be built -- only used. Judged by RANKS again (discipline 200): the two ranks' shares
      * are 0.5 and 0.55, so their movements must be in that ratio, which a direction-only reading cannot see.
      */
@@ -98,7 +98,7 @@ public class Cone23033Test {
                 "the two ranks' advances must be in the ratio of their shares");
     }
 
-    /** ★ How far the wearer's next action moves when the payout fires, at the given superimposition rank. */
+    /** How far the wearer's next action moves when the payout fires, at the given superimposition rank. */
     private double advanceDistance(int rank) {
         wearer = CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(CONE, LEVEL, false, rank));
         Character ally = CharacterFactory.create(ALLY, LEVEL);
@@ -147,7 +147,7 @@ public class Cone23033Test {
     @Test
     public void theSpecPinsTheShares() {
         Battle battle = battle(true);
-        // ★ `matching` evaluates conditions (discipline 182): the payout branch is only reachable once the count is full --
+        // `matching` evaluates conditions (discipline 182): the payout branch is only reachable once the count is full --
         // and the count must be raised through the REAL path (handing the buff manager a StackBuff directly did not show up).
         battle.fireTriggers(TriggerEvent.ULT_CAST, wearer, enemy, 0, 0);
         for (int i = 0; i < 2; i++) {

@@ -16,9 +16,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Light cone 22007: after the wearer's Ultimate, the WHOLE party gains 8% elation damage for 1 turn.
+ * Light cone 2200: after the wearer's Ultimate, the WHOLE party gains 8% elation damage for 1 turn.
  *
- * <p>⭐ 「我方全体」 includes the wearer, so the judge reads two allies and expects both to move -- a modifier
+ * <p>"我方全体" includes the wearer, so the judge reads two allies and expects both to move -- a modifier
  * aimed only at the wearer would show up here.
  */
 public class Cone22007Test {

@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
- * Relic 113's four-piece: 「当装备者受到攻击或被我方目标消耗生命值后，暴击率提高 8%，持续 2 回合，最多 2 层」.
+ * Relic 113's four-piece: "当装备者受到攻击或被我方目标消耗生命值后，暴击率提高 8%，持续 2 回合，最多 2 层".
  *
  * <p>Read through the real assembly path. Four things had to agree before this could pass: the rule file, the registry (113 had to leave _unmodelled.json), the pinned
  * census, and the test fixture -- which sat on set 113 and SHADOWED the shipped file, exactly as its own note records happening to set 103.

@@ -27,7 +27,7 @@ follow = follow[0]
 if any(e.get("cast_category") for e in follow.get("do", [])):
     sys.exit("REFUSING: the follow-up already states a category")
 
-# ⭐ the ode's own name, taken from the mark its first clause applies -- no second spelling
+# the ode's own name, taken from the mark its first clause applies -- no second spelling
 odes = [r for r in rules if r.get("id") == "memosprite_ode_of_passage_makes_his_damage_ignore_defence"]
 if len(odes) != 1:
     sys.exit("REFUSING: the first clause is not unique (%d)" % len(odes))
@@ -61,9 +61,9 @@ rules.append({
     "when": ["actor == self", "damage_is_follow_up", "self has_state " + ODE],
     "do": [{
         "op": "DAMAGE",
-        "times": 1,                                              # 「额外造成 #1 次」, and #1 is 1 at EVERY level
+        "times": 1,                                              # "额外造成 #1 次", and #1 is 1 at EVERY level
         "scale": "owner_max_hp",
-        "percent_from_skill_param": "ULTRA:2",                    # 同一笔附加伤害：#3 × 生命上限
+        "percent_from_skill_param": "ULTRA:2",                    # 同一笔附加伤害：#3  x  生命上限
         "element": "Quantum",
         "target": "target",
     }],

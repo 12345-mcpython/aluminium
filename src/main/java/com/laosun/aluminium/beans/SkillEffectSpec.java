@@ -11,9 +11,9 @@ import java.util.List;
  *
  * <p>Why this table has to exist: {@code skills.json} carries a bare {@code param_list}, and the
  * meaning of each entry is written only in the skill's description prose. Measured, there is no
- * general convention — Natasha's heal is a percentage of <i>her</i> Max HP with the flat term at
+ * general convention - Natasha's heal is a percentage of <i>her</i> Max HP with the flat term at
  * index 3, Luocha's is a percentage of <b>ATK</b> with the flat term at index 1, Asta's speed buff
- * is a flat +36 and March 7th's is +6%. Guessing an index produces a wrong number that reports
+ * is a flat +36 and March th's is +6%. Guessing an index produces a wrong number that reports
  * nothing, so the table is generated and the engine only reads it.
  *
  * <p>Provenance is kept in {@link #getSource()} and {@link #getFormula()}: the parameter indices come
@@ -25,7 +25,7 @@ import java.util.List;
 public class SkillEffectSpec {
 
     /**
-     * {@code "Restore"} or {@code "Defence"} — the same vocabulary as {@code skill_effect}.
+     * {@code "Restore"} or {@code "Defence"} - the same vocabulary as {@code skill_effect}.
      */
     @SerializedName("effect")
     private String effect;
@@ -34,7 +34,7 @@ public class SkillEffectSpec {
      * What the percentage scales off: {@code healer_max_hp}, {@code target_max_hp}, {@code atk},
      * {@code def}, {@code target_missing_hp}, {@code max_energy} or {@code base} (flat only).
      *
-     * <p>{@code healer_*} means the caster's, {@code target_*} the recipient's — a distinction that
+     * <p>{@code healer_*} means the caster's, {@code target_*} the recipient's - a distinction that
      * cannot be dropped: "of Natasha's Max HP" and "of their respective Max HP" look identical once
      * reduced to "Max HP", and mixing them up silently heals for the wrong amount.
      */

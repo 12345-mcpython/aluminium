@@ -19,7 +19,7 @@ import java.util.Random;
  * P6-2 / P6-3 acceptance: the healing damage zone and shields.
  *
  * <pre>
- * healing = base amount × (1 + outgoing healing boost) × (1 + heal taken ratio)   ← the two factors come from different people
+ * healing = base amount  x  (1 + outgoing healing boost)  x  (1 + heal taken ratio) from the two factors come from different people
  * shield: damage drains the shield first, and you do not die before the shield breaks; shields do not stack
  * </pre>
  */
@@ -68,7 +68,7 @@ public class HealShieldTest {
         Assertions.assertEquals(1560, healed, EPS, "the actual amount restored = the heal amount after the damage zones");
         Assertions.assertEquals(before + 1560, target.getCurrentHp(), EPS);
 
-        // Heal once more: this time it hits the cap, and what is returned is the **actual** amount restored
+        // Heal once more: this time it hits the cap, and what is returned is the actual amount restored
         double healed2 = battle.heal(healer, target, 100_000);
         Assertions.assertEquals(target.getMaxHp(), target.getCurrentHp(), EPS, "does not exceed the cap");
         Assertions.assertEquals(target.getMaxHp() - (before + 1560), healed2, EPS,
@@ -110,7 +110,7 @@ public class HealShieldTest {
         Battle battle = newBattle(character("ally"), target);
         battle.grantShield(target, 500);
 
-        target.takeDamage(300);                                  // shield → 200
+        target.takeDamage(300);                                  // shield to 200
         boolean died = target.takeDamage(300);                   // the shield eats 200, the remaining 100 goes into HP
 
         Assertions.assertFalse(died, "breaking the shield does not kill");
@@ -120,7 +120,7 @@ public class HealShieldTest {
     }
 
     /**
-     * Shields **do not stack**: a new shield overwrites the old value instead of adding to it.
+     * Shields do not stack: a new shield overwrites the old value instead of adding to it.
      */
     @Test
     public void shieldDoesNotStack() {
@@ -136,7 +136,7 @@ public class HealShieldTest {
     }
 
     /**
-     * Damage that goes into the shield **must count towards the damage of this hit** (otherwise "hitting a
+     * Damage that goes into the shield must count towards the damage of this hit (otherwise "hitting a
      * shielded target" would show as 0, and {@code AttackEvent.totalDamage} and kill energy gain would both
      * be distorted).
      */
@@ -152,8 +152,8 @@ public class HealShieldTest {
         double dealt = battle.applyDamage(target, new Damage(attacker, target,
                 DamageElement.ICE, DamageType.NORMAL, 1000));
 
-        // The **settled value** of this hit must first go through the defence zone (character defence 100):
-        // 1000 × 1600/(100+1600) ≈ 941.18
+        // The settled value of this hit must first go through the defence zone (character defence 100):
+        // 1000  x  1600/(100+1600) ~= 941.18
         double levelTerm = com.laosun.aluminium.Constant.DEFENCE_CONST
                 + com.laosun.aluminium.Constant.DEFENCE_PER_LEVEL * attacker.getLevel();
         double settled = 1000 * levelTerm / (100 + levelTerm);

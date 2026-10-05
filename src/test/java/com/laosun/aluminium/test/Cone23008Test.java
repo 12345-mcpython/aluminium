@@ -113,11 +113,11 @@ public class Cone23008Test {
         Assertions.assertEquals(1.24, armedBonus, 1e-9,
                 "the 24% ATK constant comes from the row's ability_property, applied by the engine");
         Assertions.assertEquals(1.0, plainBonus, 1e-9, "and an unarmed unit has it not");
-        // ⭐ 1.24 IS the proof that the constant is stated once: had this cone's rules written 24% as well, the ratio
+        // 1.24 IS the proof that the constant is stated once: had this cone's rules written 24% as well, the ratio
         // would be about 1.54. No need to inspect the rule list for it.
 
         int energyRules = 0;
-        // ⚠ The context must CARRY a damage instance: `damage_is_attack` reads it, so a hand-built context without one
+        // Note: The context must CARRY a damage instance: `damage_is_attack` reads it, so a hand-built context without one
         // matches nothing (measured -- that was this test's first failure).
         Damage instance = new Damage(armed, first, DamageElement.FIRE, DamageType.NORMAL, 100);
         for (var rule : armed.getTriggerTable().matching(TriggerEvent.DEALING_DAMAGE,

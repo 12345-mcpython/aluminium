@@ -29,7 +29,7 @@ public class LiteralDamageTest {
     private static final double HEAVY = 0.8;
     private static final double LIGHT = 0.4;
 
-    /** ⚠ The stated percent is applied linearly: half the percent, half the damage. */
+    /** Note: The stated percent is applied linearly: half the percent, half the damage. */
     @Test
     public void theStatedPercentIsAppliedLinearly() {
         double heavy = openingDamage(HEAVY);
@@ -40,7 +40,7 @@ public class LiteralDamageTest {
                 "percent " + HEAVY + " vs " + LIGHT + " must differ by exactly two: heavy " + heavy + ", light " + light);
     }
 
-    /** ⚠ The control: with no technique declared, the opening rule does not fire at all. */
+    /** Note: The control: with no technique declared, the opening rule does not fire at all. */
     @Test
     public void withoutTheTechniqueNoOpeningDamage() {
         Character tb = CharacterFactory.create(SUSHANG, LEVEL);

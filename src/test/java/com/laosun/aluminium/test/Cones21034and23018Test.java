@@ -35,7 +35,7 @@ public class Cones21034and23018Test {
         double boost = unit.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get() - before;
         double expected = Math.min(energy * 0.004, 0.64);
         System.out.println("[21034] maxEnergy=" + energy + " boost=" + boost + " expected=" + expected);
-        // ⚠ 1e-6, not 1e-9: the engine stores magnitudes through a float, so a derived value lands ~3.6e-8 off.
+        // Note: 1e-6, not 1e-9: the engine stores magnitudes through a float, so a derived value lands ~3.6e-8 off.
         Assertions.assertEquals(expected, boost, 1e-6, "min(max energy x share, the stated ceiling)");
     }
 

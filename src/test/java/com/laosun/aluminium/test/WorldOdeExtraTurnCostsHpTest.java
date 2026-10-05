@@ -12,9 +12,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1415's memosprite skill 21, the last clause (2026-10-02): 「额外回合开始时，卡厄斯兰那消耗等同于当前生命值 #2% 的生命值」.
+ * 1415's memosprite skill 21, the last clause (2026-10-02): "额外回合开始时，卡厄斯兰那消耗等同于当前生命值 #2% 的生命值".
  *
- * ⭐ Two-sided: with the state the turn costs him about 15% of the HP he had; without it the same turn costs him nothing. The cost is a share of his CURRENT HP, so the judge
+ * Two-sided: with the state the turn costs him about 15% of the HP he had; without it the same turn costs him nothing. The cost is a share of his CURRENT HP, so the judge
  * computes the expectation from the HP it reads immediately before the turn -- the engine's own number.
  */
 public class WorldOdeExtraTurnCostsHpTest {
@@ -43,7 +43,7 @@ public class WorldOdeExtraTurnCostsHpTest {
         battle.processRequests();
         him = battle.characters.getFirst();
 
-        // ⭐ The ode lands first: it is the sentence that grants 【永续的燃烧】
+        // The ode lands first: it is the sentence that grants [永续的燃烧]
         var odeSprite = battle.summonServant(CharacterFactory.create(1415, LEVEL));
         battle.processRequests();
         var ode = odeSprite.skillAt(21);

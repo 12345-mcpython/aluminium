@@ -16,13 +16,13 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 「仅对最新被施加的目标生效」这一族的**那一招**：`REMOVE_STATE` 先把名字从**全体**摘掉，再 `APPLY_BUFF` 给新目标
- * ⇒ ⚠ **顺序即语义**（`TriggerInterpreter:2515` 的注释：*takes the named state off every resolved target —
+ * "仅对最新被施加的目标生效"这一族的那一招：`REMOVE_STATE` 先把名字从全体摘掉，再 `APPLY_BUFF` 给新目标
+ *  so Note: 顺序即语义（`TriggerInterpreter:2515` 的注释：*takes the named state off every resolved target - 
  * the only-the-newest-one-holds-it half*；`1215` 的注记说得更直白：*the state goes off everybody, then onto the
- * new target — there is no only-one-holder flag, the removal IS that clause*）。
+ * new target - there is no only-one-holder flag, the removal IS that clause*）。
  *
- * <p>⚠ 这一条先证**这一招本身**成立，之后 12 个读者（1414/1224/1225/1202/1406/1412/1504/1112/1215/1305/1404/1006）
- * 才都可以照抄。变异：把 `REMOVE_STATE` 那一条删掉 ⇒ A 不会失去 ⇒ 必红。
+ * <p>Note: 这一条先证这一招本身成立，之后 12 个读者（1414/1224/1225/1202/1406/1412/1504/1112/1215/1305/1404/1006）
+ * 才都可以照抄。变异：把 `REMOVE_STATE` 那一条删掉 so A 不会失去 so 必红。
  */
 public class NewestHolderOnlyTest {
     private static final int WEARER = 1003;
@@ -49,7 +49,7 @@ public class NewestHolderOnlyTest {
     }
 
     private static boolean marked(Battle battle, com.laosun.aluminium.models.CanHit who) {
-        // ⚠ APPLY_BUFF 造的是 StateBuff，而它的查询是 hasState —— 不是 stacksOf（那查的是 ADD_STACK 的层数）。
+        // Note: APPLY_BUFF 造的是 StateBuff，而它的查询是 hasState -  - 不是 stacksOf（那查的是 ADD_STACK 的层数）。
         // TriggerTable:2899 就是 `has_state` 的实现：`who.getBuffManager().hasState(state)`。
         return who.getBuffManager().hasState(MARK);
     }
@@ -66,9 +66,9 @@ public class NewestHolderOnlyTest {
         Battle battle = new Battle(List.of(wearer, a), List.of(enemy), new Random(0));
         battle.startBattle();
 
-        battle.fireTriggers(TriggerEvent.SKILL_CAST, wearer, a, 0, 0);      // ⚠ a 拿到标记
+        battle.fireTriggers(TriggerEvent.SKILL_CAST, wearer, a, 0, 0);      // Note: a 拿到标记
         boolean aHad = marked(battle, a);
-        battle.fireTriggers(TriggerEvent.SKILL_CAST, wearer, enemy, 0, 0);  // ⚠ 换成敌人
+        battle.fireTriggers(TriggerEvent.SKILL_CAST, wearer, enemy, 0, 0);  // Note: 换成敌人
         return new boolean[]{aHad, marked(battle, a), marked(battle, enemy)};
     }
 

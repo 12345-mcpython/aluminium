@@ -7,7 +7,7 @@ import com.laosun.aluminium.models.DoubleValue;
 import java.util.Locale;
 
 /**
- * A **generic** attribute buff / debuff: "stat X becomes X ⊕ value for N turns".
+ * A generic attribute buff / debuff: "stat X becomes X ⊕ value for N turns".
  *
  * <p>Before this class, every stat modifier needed its own Java class ({@code SpeedBoostBuff},
  * {@code BoostDamageBuff}, …), which is exactly the shape this project is trying to get away from:
@@ -17,14 +17,14 @@ import java.util.Locale;
  *
  * <p><b>Three things decide how it behaves</b>:
  * <ul>
- *   <li>{@code attribute} — which {@link AttributeType} is touched. Percentage attributes
+ *   <li>{@code attribute} - which {@link AttributeType} is touched. Percentage attributes
  *       ({@code ATTACK_PERCENT} and friends) are deliberately <b>not</b> usable here: the builder
  *       merges those into the base attribute's modifier list, so a buff must name the base
  *       attribute ({@code ATTACK}) and pass an {@code ADD_PERCENT} modifier.</li>
- *   <li>{@code modifierType} — {@code ADD_PERCENT} (summed with other add-percent modifiers),
+ *   <li>{@code modifierType} - {@code ADD_PERCENT} (summed with other add-percent modifiers),
  *       {@code MULTIPLY_PERCENT} (multiplied independently) or {@code PURE_VALUE} (flat, added
  *       last). See {@link DoubleValue} for the formula.</li>
- *   <li>{@code sourceRole} — {@code BUFF} or {@code DEBUFF}. It only decides which half of the
+ *   <li>{@code sourceRole} - {@code BUFF} or {@code DEBUFF}. It only decides which half of the
  *       attribute a modifier lands in, so an "ATK +50%" buff and an "ATK −30%" debuff can be on the
  *       same character at the same time and be removed independently.</li>
  * </ul>
@@ -38,7 +38,7 @@ import java.util.Locale;
  * <p><b>Stacking is opt-in and lives beside that identity, not inside it.</b> An instance built with
  * {@code maxStacks > 1} reports {@link #isStackable()} {@code true} and a
  * {@link #stackGroupKey()} equal to the same {@code (attribute, modifierType, sourceRole)} tuple.
- * {@link BuffManager#addBuff} then keeps the older instances — up to the cap — instead of evicting
+ * {@link BuffManager#addBuff} then keeps the older instances - up to the cap - instead of evicting
  * them, while {@link #isSameKind} is untouched, so the replace-on-same-kind tests keep meaning what
  * they always meant. Each stack is an ordinary buff with its own {@code id}, so every stack carries
  * its own modifier and can be removed on its own; expiry is therefore still exact (the attribute
@@ -61,9 +61,9 @@ public class StatModifierBuff extends AbstractBuff {
     private final DoubleValue.Modifier.ModifierSource sourceRole;
     private final int maxStacks;
     /**
-     * ⭐ When set, this modifier asks for its share on every read instead of holding the number it was built with
-     * (2026-10-02; reader: the fourteen 「每拥有 1 层…提高 X%」 auras). Only add-percent modifiers may be live -- a
-     * pure or multiply share has no spelling for 「随层数变化」 yet, and this refuses rather than guessing.
+     * When set, this modifier asks for its share on every read instead of holding the number it was built with
+     * (2026-10-02; reader: the fourteen "每拥有 1 层…提高 X%" auras). Only add-percent modifiers may be live -- a
+     * pure or multiply share has no spelling for "随层数变化" yet, and this refuses rather than guessing.
      */
     private java.util.function.DoubleSupplier liveShare;
 
@@ -132,7 +132,7 @@ public class StatModifierBuff extends AbstractBuff {
     // ------------------------------------------------------------------
 
     /**
-     * "ATK +50%" — additive percentage, i.e. {@code pct = 0.5}.
+     * "ATK +50%" - additive percentage, i.e. {@code pct = 0.5}.
      */
     public static StatModifierBuff percentBuff(AttributeType attribute, double pct, int duration) {
         return new StatModifierBuff(attribute, DoubleValue.Modifier.ModifierType.ADD_PERCENT,
@@ -140,7 +140,7 @@ public class StatModifierBuff extends AbstractBuff {
     }
 
     /**
-     * "ATK −30%" — additive percentage with a negative value.
+     * "ATK −30%" - additive percentage with a negative value.
      */
     public static StatModifierBuff percentDebuff(AttributeType attribute, double pct, int duration) {
         return new StatModifierBuff(attribute, DoubleValue.Modifier.ModifierType.ADD_PERCENT,
@@ -148,7 +148,7 @@ public class StatModifierBuff extends AbstractBuff {
     }
 
     /**
-     * "SPD +36" — a flat amount, added after all percentage maths.
+     * "SPD +36" - a flat amount, added after all percentage maths.
      */
     public static StatModifierBuff flatBuff(AttributeType attribute, double amount, int duration) {
         return new StatModifierBuff(attribute, DoubleValue.Modifier.ModifierType.PURE_VALUE,
@@ -156,7 +156,7 @@ public class StatModifierBuff extends AbstractBuff {
     }
 
     /**
-     * "SPD −20" — a flat negative amount.
+     * "SPD −20" - a flat negative amount.
      */
     public static StatModifierBuff flatDebuff(AttributeType attribute, double amount, int duration) {
         return new StatModifierBuff(attribute, DoubleValue.Modifier.ModifierType.PURE_VALUE,
@@ -169,7 +169,7 @@ public class StatModifierBuff extends AbstractBuff {
      *
      * @param type   {@code "add_percent"} / {@code "multiply_percent"} / {@code "pure"}
      * @param source {@code "buff"} or {@code "debuff"}
-     * @throws IllegalArgumentException when either name is unknown — a typo must not silently
+     * @throws IllegalArgumentException when either name is unknown - a typo must not silently
      *                                  become "no modifier at all"
      */
     public static StatModifierBuff of(AttributeType attribute, String type, double value,
@@ -185,7 +185,7 @@ public class StatModifierBuff extends AbstractBuff {
      * @param maxStacks how many copies may accumulate; {@code 1} = the classic replace behaviour
      * @throws IllegalArgumentException when either name is unknown, {@code maxStacks} is below 1, or
      *                                  {@code maxStacks > 1} is combined with a non-positive
-     *                                  {@code duration} while not being permanent — a stack that
+     *                                  {@code duration} while not being permanent - a stack that
      *                                  expires instantly would be a silent no-op
      */
     public static StatModifierBuff of(AttributeType attribute, String type, double value,
@@ -242,7 +242,7 @@ public class StatModifierBuff extends AbstractBuff {
     /**
      * How many copies of this modifier may be attached at once.
      *
-     * <p>{@code 1} — the default, and what every pre-existing factory produces — keeps the
+     * <p>{@code 1} - the default, and what every pre-existing factory produces - keeps the
      * replace-on-same-kind rule; anything above 1 lets {@link BuffManager} accumulate instances up to
      * this cap.
      */
@@ -258,7 +258,7 @@ public class StatModifierBuff extends AbstractBuff {
 
     /**
      * Two stackable stat buffs are siblings exactly when they touch the same attribute in the same
-     * way — the same tuple {@link #isSameKind} uses, deliberately: "stack with" and "replace" must
+     * way - the same tuple {@link #isSameKind} uses, deliberately: "stack with" and "replace" must
      * agree about what "the same buff" means, or a +ATK% stack could sit next to a +DEF% one and
      * neither could be reasoned about.
      */
@@ -292,9 +292,9 @@ public class StatModifierBuff extends AbstractBuff {
     }
 
     /**
-     * A stat modifier is a negative effect exactly when it landed in the <b>debuff</b> half of the attribute —
+     * A stat modifier is a negative effect exactly when it landed in the <b>debuff</b> half of the attribute - 
      * the same {@code sourceRole} that {@code TriggerInterpreter} decided from the sign of {@code percent}. So
-     * 「攻击力 −30%」 is a debuff 解除 can remove, while 「攻击力 +50%」 is not, without either of them needing a
+     * "攻击力 −30%" is a debuff 解除 can remove, while "攻击力 +50%" is not, without either of them needing a
      * separate flag.
      */
     @Override

@@ -6,7 +6,7 @@ import com.laosun.aluminium.enums.RelicType;
 import java.util.List;
 
 /**
- * One relic set as defined by {@code relic_sets.json} — the table of 2-piece / 4-piece bonuses
+ * One relic set as defined by {@code relic_sets.json} - the table of 2-piece / 4-piece bonuses
  * the engine needs in order to make a worn relic suit mean anything.
  *
  * <p>The top level of the file is a map keyed by the set id as a string, which is why it is read through
@@ -15,7 +15,7 @@ import java.util.List;
  * map.
  *
  * <h2>Two kinds of effect, and only one of them is modellable</h2>
- * An {@link Effect} carries both stats ({@code properties}) and, for many sets, an {@code ability} — a
+ * An {@link Effect} carries both stats ({@code properties}) and, for many sets, an {@code ability} - a
  * named behaviour such as "at the start of the battle, immediately regenerates 1 Skill Point"
  * ({@code Ability51011}). The engine applies {@code properties} as modifiers; it has <b>no ability
  * interpreter</b>, so an ability-only effect cannot be applied at all. That is a registered limitation,
@@ -42,7 +42,7 @@ public record RelicSet(@SerializedName("set_id") int setId,
      * The part of this set that occupies a given slot, or {@code null} when the set has no such piece.
      *
      * <p>Used by {@code RelicFactory} to check "this set really comes in this slot, at this rarity and
-     * level cap" before it builds anything — the point being that a mixed-up part is caught with a message
+     * level cap" before it builds anything - the point being that a mixed-up part is caught with a message
      * instead of producing a relic the game does not have.
      *
      * @param slot the equipment slot
@@ -82,7 +82,7 @@ public record RelicSet(@SerializedName("set_id") int setId,
      *                   {@code properties}
      * @param properties the stats the bonus grants; empty for an ability-only bonus
      * @param ability    the client's ability name, or {@code null}/blank when the bonus has no behaviour
-     *                   beyond its stats — <b>the engine cannot execute this</b>
+     *                   beyond its stats - <b>the engine cannot execute this</b>
      */
     public record Effect(@SerializedName("require") int require,
                          @SerializedName("desc") Translate desc,
@@ -93,7 +93,7 @@ public record RelicSet(@SerializedName("set_id") int setId,
         /**
          * Whether this bonus is (also) a named ability the engine cannot execute.
          *
-         * <p>Exists so that "the engine applied nothing here" is a fact a caller — or a test — can look at,
+         * <p>Exists so that "the engine applied nothing here" is a fact a caller - or a test - can look at,
          * rather than something that has to be guessed from an empty property list.
          */
         public boolean hasAbility() {

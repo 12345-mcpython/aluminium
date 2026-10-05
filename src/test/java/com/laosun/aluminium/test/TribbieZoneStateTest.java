@@ -13,12 +13,12 @@ import java.util.Random;
 /**
  * Tribbie's zone, as a state on him (2026-10-02).
  *
- * <p>His ultimate (140303): 「开启<b>结界</b>… <b>结界持续期间</b>，敌方目标受到的伤害提高 #2%… 结界持续 #4 回合，自身每回合开始时结界持续回合数减1。」
+ * <p>His ultimate (140303): "开启<b>结界</b>… <b>结界持续期间</b>，敌方目标受到的伤害提高 #2%… 结界持续 #4 回合，自身每回合开始时结界持续回合数减1。"
  *
- * <p>Our content already models the VULNERABILITY half as a debuff on the enemies, which is why 「结界持续期间」 had nothing to point at -- the zone was a
- * debuff, and no state said the zone was open. 1415's ode of passage names that state: 「缇宝施放追加攻击触发<b>缇宝的结界的附加伤害</b>时…」.
+ * <p>Our content already models the VULNERABILITY half as a debuff on the enemies, which is why "结界持续期间" had nothing to point at -- the zone was a
+ * debuff, and no state said the zone was open. 1415's ode of passage names that state: "缇宝施放追加攻击触发<b>缇宝的结界的附加伤害</b>时…".
  *
- * <p>⭐ Two readings: the state is on him right after his ultimate, and it runs out on its own -- a state that never ends would satisfy the first half
+ * <p>Two readings: the state is on him right after his ultimate, and it runs out on its own -- a state that never ends would satisfy the first half
  * while being wrong about the zone, which lasts #4 = 2 turns at every level of 140303.
  */
 public class TribbieZoneStateTest {

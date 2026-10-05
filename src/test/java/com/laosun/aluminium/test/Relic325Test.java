@@ -15,7 +15,7 @@ import java.util.List;
  * (enumerated), and there is no character-side writer. The "first time" limit is a one-way marker: the rule only fires
  * while the marker is absent, and applying the marker is what makes it first-time-only.
  *
- * <p>⚠ Read with rulesFor, not matching: matching evaluates the conditions, and a fresh context has no Elation.
+ * <p>Note: Read with rulesFor, not matching: matching evaluates the conditions, and a fresh context has no Elation.
  */
 public class Relic325Test {
     private static final int SET = 325;

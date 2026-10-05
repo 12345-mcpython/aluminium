@@ -98,7 +98,7 @@ public class ConeAggroAndStateTest {
 
     @Test
     public void theForgottenStateRaisesDamageAndTheThresholdRaisesItMore() {
-        // ⚠ No spec count here: `matching` EVALUATES conditions, and this context's target does not carry the state,
+        // Note: No spec count here: `matching` EVALUATES conditions, and this context's target does not carry the state,
         // so a count would be 0 by construction (measured). The three behaviour readings below pin both halves instead.
         double plain = hitWith(23032, false, 0);
         double withState = hitWith(23032, true, 0);

@@ -24,7 +24,7 @@ public class CerydraTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** ⚠ The mark's own claims: the state on the ally, her +1 Charge, and the ATTACK share = 24% of HER attack (a derived, absolute number). */
+    /** Note: The mark's own claims: the state on the ally, her +1 Charge, and the ATTACK share = 24% of HER attack (a derived, absolute number). */
     @Test
     public void theSkillMarksTheAllyAndSharesHerAttack() {
         Character cerydra = CharacterFactory.create(CERYDRA, LEVEL);
@@ -46,7 +46,7 @@ public class CerydraTest {
                 "「并使刻律德菈获得1点充能」");
     }
 
-    /** ⚠ The mark's reaction: a marked ally's attack grants Charge AND draws her 60% additional damage; an unmarked one does neither. */
+    /** Note: The mark's reaction: a marked ally's attack grants Charge AND draws her 60% additional damage; an unmarked one does neither. */
     @Test
     public void theMarkDrivesBothTheChargeAndTheAdditionalDamage() {
         double unmarked = markedAttackLoss(false);

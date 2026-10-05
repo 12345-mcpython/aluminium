@@ -16,10 +16,10 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * RESET_TRIGGER_LIMIT (2026-09-30; readers 1305, 1207, 1403): 「施放终结技后重置该效果触发次数」.
+ * RESET_TRIGGER_LIMIT (2026-09-30; readers 1305, 120, 1403): "施放终结技后重置该效果触发次数".
  *
  * <p>One rule is capped at one firing per turn; a second rule on ULT_CAST clears exactly that rule limit, so
- * the capped rule fires again. ⚠ resetTriggerLimits() would clear EVERY rule of the unit instead.
+ * the capped rule fires again. Note: resetTriggerLimits() would clear EVERY rule of the unit instead.
  */
 public class ResetTriggerLimitTest {
     private static final int OWNER = 1001;
@@ -37,10 +37,10 @@ public class ResetTriggerLimitTest {
         TriggerSpecs.set(stack, "buff", "探针");
         TriggerSpecs.set(stack, "amount", 1.0d);
         TriggerSpecs.set(stack, "target", "self");
-        // ADD_STACK has no default lifetime: the loader names turns / permanent / until (measured in round 733).
+        // ADD_STACK has no default lifetime: the loader names turns / permanent / until (measured in round 33).
         TriggerSpecs.set(stack, "permanent", Boolean.TRUE);
-        // ⚠ addStack defaults the cap to 1, so a probe without this saturates at one and looks like a
-        // frozen failure (measured in round 747 after six rounds of chasing the wrong thing).
+        // Note: addStack defaults the cap to 1, so a probe without this saturates at one and looks like a
+        // frozen failure (measured in round 4after six rounds of chasing the wrong thing).
         TriggerSpecs.set(stack, "maxStacks", 3);
         TriggerSpec capped = TriggerSpecs.rule(TriggerEvent.SKILL_CAST.name(), List.of(), stack);
         TriggerSpecs.set(capped, "id", CAPPED);

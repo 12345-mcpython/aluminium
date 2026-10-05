@@ -26,7 +26,7 @@ FIELD_NEW = '''    /**
      * The share itself, read from one of the RULE OWNER's OWN skills as {@code "<SKILLTYPE>:<index>"} (2026-10-02).
      *
      * <p>The sibling of {@link #percentFromCastParam}: that one reads the skill that produced the event, this one reads a slot the rule names -- which is what
-     * 「造成 1 次等同于缇宝 #3% 生命上限的…附加伤害」 needs, since #3 belongs to his ULTIMATE while the rider hangs on somebody else's attack.
+     * 「造成 1 次等同于缇宝 #3% 生命上限的…附加伤害" needs, since #3 belongs to his ULTIMATE while the rider hangs on somebody else's attack.
      */
     @SerializedName("percent_from_skill_param")
     private String percentFromSkillParam;
@@ -75,7 +75,7 @@ HELPER_NEW = """    private static double ownerSkillParamValue(EffectSpec effect
         Character owner = requireCharacterOwner(effect, ctx);
         String[] parts = spelled.split(":", 2);"""
 
-# ⚠ the line the NPE came from: the share may also come from the owner's own skill
+# Note: the line the NPE came from: the share may also come from the owner's own skill
 MAG_ANCHOR = "        if (effect.getPercent() != null || effect.getPercentFromCastParam() != null) {\n            magnitude = derived ? derivedMagnitude(effect, ctx) : effect.getPercent();"
 MAG_NEW = ("        // ⚠⚠ `percent_from_skill_param` is the THIRD way to state a share (2026-10-02), and this condition is the one the comment above warns\n"
            "        // about: leaving a share spelling out of it sends the effect down the flat `amount` arm and unboxes a null. That is exactly what happened here.\n"

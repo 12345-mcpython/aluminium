@@ -21,7 +21,7 @@ ANCHOR = "        CanHit mainTarget = targets.getFirst();\n\n        double tota
 BRANCH = '''        CanHit mainTarget = targets.getFirst();
 
         // ⭐ An ElationDamage row reads its params as [hits, per-hit share, final split share] (2026-10-02; readers 8009/8010
-        // slot 20, whose text is 「造成 #1 次伤害，每次对敌方随机单体造成 #2%…。最后造成 #3%…由敌方全体均分」).
+        // slot 20, whose text is 「造成 #1 次伤害，每次对敌方随机单体造成 #2%…。最后造成 #3%…由敌方全体均分").
         // ⚠ The row's own `skill_effect` is AoEAttack, so without this branch the leading 8 is read as a MULTIPLIER -- 800% damage
         // -- which is the mis-reading the CAST_SKILL comment names as the reason the Elation auto-casts stay registered.
         // ✅ The damage type and the Elation boost already follow the data (2026-09-30 "slice 1b"), so only the row reading is new.

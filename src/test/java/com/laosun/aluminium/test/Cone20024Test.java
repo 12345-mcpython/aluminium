@@ -17,9 +17,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Light cone 20024: 「当拥有的笑点 ≥ 10 时，装备者的暴击伤害提高 20%」.
+ * Light cone 20024: "当拥有的笑点 >= 10 时，装备者的暴击伤害提高 20%".
  *
- * <p>⭐ Three things had to exist together, which is why this took two rounds: the resource must be DECLARED (a cone file
+ * <p>Three things had to exist together, which is why this took two rounds: the resource must be DECLARED (a cone file
  * may now carry a top-level {@code "resources"} array, and {@code TriggerTable.plus} already carried declarations across a
  * merge), the panel must be re-stated on change ({@code RESOURCE_CHANGED}), and the layer it reads must be re-written with
  * it (a cleared counter does not recompute a written modifier).
@@ -75,7 +75,7 @@ public class Cone20024Test {
     }
 
     /**
-     * ★ One direction at a time: {@code matching} EVALUATES conditions, so with the resource at 10 only the "met" rule can
+     * One direction at a time: {@code matching} EVALUATES conditions, so with the resource at 10 only the "met" rule can
      * match and with it at 0 only the "lost" one -- the two cannot both be seen from one context. Each half is filtered by
      * rule id as well, because a table also holds the character's own rules.
      */
@@ -133,15 +133,15 @@ public class Cone20024Test {
                 "no cone, no panel (false case)");
     }
 
-    /** ★ The WIRING test: the resource moves through a real GAIN_RESOURCE, which is what must fire the event. */
+    /** The WIRING test: the resource moves through a real GAIN_RESOURCE, which is what must fire the event. */
     @Test
     public void aRealOpFiresTheEvent() {
         Character unit = CharacterFactory.create(ALLY, LEVEL);
-        // ⚠ Declared HERE because 1002's own file declares nothing: an undeclared resource absorbs a gain silently
+        // Note: Declared HERE because 1002's own file declares nothing: an undeclared resource absorbs a gain silently
         // (round 23's finding), which is exactly why a cone's file needed a way to declare one.
         unit.getResources().register(LAUGHTER, 999, 0);
         EffectSpec gain = TriggerSpecs.gainResource(LAUGHTER, THRESHOLD);
-        // ⚠ `GAIN_RESOURCE` credits `resolveTarget(effect, ctx)` -- a hand-built rule must say who (measured round 23:
+        // Note: `GAIN_RESOURCE` credits `resolveTarget(effect, ctx)` -- a hand-built rule must say who (measured round 23:
         // without a target the resource never moved, while the event did fire).
         TriggerSpecs.set(gain, "target", "self");
         var pour = TriggerSpecs.rule("TURN_START", null, gain);

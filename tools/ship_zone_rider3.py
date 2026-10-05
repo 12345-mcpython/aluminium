@@ -94,7 +94,7 @@ import java.util.Random;
 /**
  * 1403 缇宝's zone deals its own additional damage (2026-10-02).
  *
- * <p>「受到我方目标攻击后，每有1名目标受到攻击，会对被攻击目标中当前生命值最高的目标造成 1 次等同于缇宝 #3% 生命上限的量子属性附加伤害。」
+ * <p>「受到我方目标攻击后，每有1名目标受到攻击，会对被攻击目标中当前生命值最高的目标造成 1 次等同于缇宝 #3% 生命上限的量子属性附加伤害。"
  *
  * <p>The two scenes differ by EXACTLY one rule, and the zone is open in both. ⚠ An earlier version replaced his table with an EMPTY one to remove that rule, which also
  * dropped `level_convention` -- the trap `literalBase`\\u2019s own comment records being sprung by a judge three times. This one keeps every loaded rule and filters out
@@ -127,7 +127,7 @@ public class ZoneAdditionalDamageTest {
         Assertions.assertTrue(rawAt80 > rawAtLow, "#3 x Max HP runs with level, which is what percent_from_skill_param reads");
     }
 
-    /** `#3 \\u00d7 Max HP` at a level, read the way the engine reads it -- at the skill level that character actually has. */
+    /** `#3 \\u00dMax HP` at a level, read the way the engine reads it -- at the skill level that character actually has. */
     private static double rawShare(int level) {
         Character tribbie = CharacterFactory.create(TRIBBIE, level);
         Skill ultra = tribbie.getSkills().get(SkillType.ULTRA);

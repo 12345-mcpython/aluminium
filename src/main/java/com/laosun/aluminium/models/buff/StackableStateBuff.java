@@ -3,7 +3,7 @@ package com.laosun.aluminium.models.buff;
 /**
  * A named state that <b>stacks</b> -- the engine's spelling of "this state carries a COUNT" (2026-10-02).
  *
- * <p>⭐ It opts into the accumulate path that {@link StackBuff} already uses: {@code BuffManager.addBuff} sends every buff
+ * <p>It opts into the accumulate path that {@link StackBuff} already uses: {@code BuffManager.addBuff} sends every buff
  * whose {@link #isStackable()} is true to {@code addStackable}, grouped by {@link #stackGroupKey()} and capped by
  * {@link #maxStacks()}. The replace rule ({@code isSameKind}, still by name) is deliberately left alone -- it answers a
  * different question and two shipped tests pin it.

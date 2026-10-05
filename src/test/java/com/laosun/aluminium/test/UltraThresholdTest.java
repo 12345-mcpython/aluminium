@@ -13,10 +13,10 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * The ultimate's **cast threshold** (P3-4 follow-up): once {@code sp_need} is reached the ultimate can be cast; the
+ * The ultimate's cast threshold (P3-4 follow-up): once {@code sp_need} is reached the ultimate can be cast; the
  * {@code maxEnergy} bar does not have to be full.
  *
- * <p>5 of the 93 characters have a threshold **below** their cap (the data agrees with the character docs):
+ * <p>5 of the 93 characters have a threshold below their cap (the data agrees with the character docs):
  *
  * <pre>
  *   Yunli (云璃) 1221  needs 120 / cap 240      Feixiao (飞霄) 1220  needs 6  / cap 12
@@ -24,7 +24,7 @@ import java.util.Random;
  *   绯英 1505  needs 240 / cap 480
  * </pre>
  *
- * <p>The character docs say "**energy required to cast** 120 (cap 240)" — "required" is the threshold.
+ * <p>The character docs say "energy required to cast 120 (cap 240)" - "required" is the threshold.
  * Before the fix the engine tested {@code currentEnergy >= maxEnergy}, so Yunli would only cast after piling up to
  * 240.
  */
@@ -60,7 +60,7 @@ public class UltraThresholdTest {
         Assertions.assertEquals(jingYuan.getMaxEnergy(), battle.ultraEnergyCost(jingYuan), EPS);
     }
 
-    /** All 93 characters: the threshold must be ≤ the cap and > 0. */
+    /** All 93 characters: the threshold must be <= the cap and > 0. */
     @Test
     public void thresholdNeverExceedsTheCap() {
         for (var entry : Constant.CHARACTERS.entrySet()) {
@@ -78,7 +78,7 @@ public class UltraThresholdTest {
         }
     }
 
-    /** Exactly 5 characters have a threshold below their cap — exhaustively registered, one more or one fewer must be changed explicitly. */
+    /** Exactly 5 characters have a threshold below their cap - exhaustively registered, one more or one fewer must be changed explicitly. */
     @Test
     public void exactlyFiveCharactersHaveALowerThreshold() {
         int lower = 0;
@@ -101,7 +101,7 @@ public class UltraThresholdTest {
     // ==================================================================
 
     /**
-     * Core: Yunli can cast once she has **120**, she does not have to wait for 240.
+     * Core: Yunli can cast once she has 120, she does not have to wait for 240.
      */
     @Test
     public void yunliCanCastAtHalfOfHerCap() {
@@ -118,7 +118,7 @@ public class UltraThresholdTest {
     }
 
     /**
-     * After casting it is **zeroed**: for a character whose threshold < cap, that is equivalent to "consuming the
+     * After casting it is zeroed: for a character whose threshold < cap, that is equivalent to "consuming the
      * threshold part".
      */
     @Test
@@ -153,7 +153,7 @@ public class UltraThresholdTest {
     }
 
     /**
-     * A character with no energy bar (Castorice (遐蝶) 1407) can never cast — even her {@code hasEnergyBar()} is false.
+     * A character with no energy bar (Castorice (遐蝶) 140) can never cast - even her {@code hasEnergyBar()} is false.
      */
     @Test
     public void noEnergyBarStillCannotCast() {
@@ -167,10 +167,10 @@ public class UltraThresholdTest {
     }
 
     /**
-     * A special-resource character cannot cast even when force-fed to the cap — the provider gives her no energy,
+     * A special-resource character cannot cast even when force-fed to the cap - the provider gives her no energy,
      * but this verifies that the check itself does not let her through either
      * (her {@code sp_need} is 12 and her cap is 24, so feeding her to 20 would actually be "enough for the
-     *  threshold" — which is exactly why the real line of defence is {@code NoConventionalEnergyProvider} keeping
+     *  threshold" - which is exactly why the real line of defence is {@code NoConventionalEnergyProvider} keeping
      *  her from accumulating at all).
      */
     @Test

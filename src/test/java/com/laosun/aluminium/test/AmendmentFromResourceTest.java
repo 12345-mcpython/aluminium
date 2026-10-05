@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * `MODIFY_RULE{effect_percent_from_resource}` sizes an amendment from a resource (2026-10-02; reader: 1141517 「每消耗 1% 溢出值…」).
+ * `MODIFY_RULE{effect_percent_from_resource}` sizes an amendment from a resource (2026-10-02; reader: 114151"每消耗 1% 溢出值…").
  */
 public class AmendmentFromResourceTest {
     private static final int LEVEL = 80;
@@ -31,14 +31,14 @@ public class AmendmentFromResourceTest {
         TriggerSpecs.set(target, "permanent", Boolean.TRUE);
         TriggerSpecs.set(target, "target", "self");
         TriggerSpec targetRule = TriggerSpecs.rule("TURN_START", List.of(), target);
-        // ⭐ TriggerSpec is a POJO with no setter: the id goes in through the same reflection helper the rest of the tests use.
+        // TriggerSpec is a POJO with no setter: the id goes in through the same reflection helper the rest of the tests use.
         TriggerSpecs.set(targetRule, "id", TARGET);
 
         EffectSpec amend = new EffectSpec();
         TriggerSpecs.set(amend, "op", "MODIFY_RULE");
         TriggerSpecs.set(amend, "rule", TARGET);
         TriggerSpecs.set(amend, "effectPercentFromResource", SIZED_BY);
-        // ⭐ BATTLE_START first (the amendment is filed), then the turn that fires the amended rule.
+        // BATTLE_START first (the amendment is filed), then the turn that fires the amended rule.
         return new TriggerTable(SPARE, List.of(
                 TriggerSpecs.rule("BATTLE_START", List.of(), amend),
                 targetRule));
@@ -50,7 +50,7 @@ public class AmendmentFromResourceTest {
         double own = gained(0);
         System.out.println("[amend_resource] the amended rule granted " + sized
                 + " with 8000 basis points ; " + own + " with none");
-        // ⭐ `MODIFY_ATTR` scales the ATTRIBUTE, so the reading is `percent x base`: 0.5 alone, and 0.5 + 0.8 with 8000 basis points ⇒ the ratio is exactly 13/5.
+        // `MODIFY_ATTR` scales the ATTRIBUTE, so the reading is `percent x base`: 0.5 alone, and 0.5 + 0.8 with 8000 basis points so the ratio is exactly 13/5.
         Assertions.assertEquals(13.0 / 5.0, sized / own, 1e-6,
                 "0.5 of its own plus 8000 basis points = 1.3, and 1.3 / 0.5 = 13/5");
     }

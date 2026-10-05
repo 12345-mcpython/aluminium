@@ -51,19 +51,19 @@ public class ResistZoneTest {
 
     @Test
     public void resistanceIsReducedByPenetration() {
-        // ICE res 0.2 - penetration 0.4 = -0.2 → resistance zone 1.2
+        // ICE res 0.2 - penetration 0.4 = -0.2 to resistance zone 1.2
         Assertions.assertEquals(1200, settle(attacker(0.4), enemy(), DamageElement.ICE), EPS);
     }
 
     @Test
     public void negativeResistanceKeepsFullEffect() {
-        // ICE res 0.2 - penetration 0.5 = -0.3 → resistance zone 1.3 (negative resistance at full effect, HSR.md §2.5)
+        // ICE res 0.2 - penetration 0.5 = -0.3 to resistance zone 1.3 (negative resistance at full effect, HSR.md §2.5)
         Assertions.assertEquals(1300, settle(attacker(0.5), enemy(), DamageElement.ICE), EPS);
     }
 
     @Test
     public void resistanceIsClampedToNinetyPercent() {
-        // FIRE res 1.2 → clamp 0.9 → resistance zone 0.1
+        // FIRE res 1.2 to clamp 0.9 to resistance zone 0.1
         Assertions.assertEquals(100, settle(attacker(0.0), enemy(), DamageElement.FIRE), EPS);
     }
 

@@ -9,9 +9,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Slot 25 「献予「大地」之诗」 (2026-10-02): the audit found this whole skill missing, and these are the two clauses it can carry exactly.
+ * Slot 25 "献予'大地'之诗" (2026-10-02): the audit found this whole skill missing, and these are the two clauses it can carry exactly.
  *
- * ⭐ Two-sided: with the ode cast at 丹恒•腾荒 he gains the state; with it cast at 昔涟 he does not.
+ * Two-sided: with the ode cast at 丹恒-腾荒 he gains the state; with it cast at 昔涟 he does not.
  */
 public class EarthOdeMarksDanHengTest {
     private static final int LEVEL = 80;

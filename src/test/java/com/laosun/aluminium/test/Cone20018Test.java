@@ -23,7 +23,7 @@ import java.util.Random;
 /**
  * Light cone 20018: after a Skill, the wearer's NEXT basic attack deals extra damage equal to 60% of its own attack.
  *
- * <p>⭐ Two halves, because the clause is two rules on two different events: the spec half pins the ARMING rule (the spending one
+ * <p>Two halves, because the clause is two rules on two different events: the spec half pins the ARMING rule (the spending one
  * only exists while the marker is up, i.e. in a transient state), and the behavioural half casts a Skill for real, then compares
  * a plain damage instance with and without the cone.
  */
@@ -117,10 +117,10 @@ public class Cone20018Test {
                 "before the Skill the cone changes nothing");
         Assertions.assertTrue(afterSkill > beforeAnySkill,
                 "after a real Skill cast the next hit carries the extra damage");
-        // ★ The SHARE, judged by scaling (discipline 200): a direction-only assertion holds for ANY non-zero share, so the
+        // The SHARE, judged by scaling (discipline 200): a direction-only assertion holds for ANY non-zero share, so the
         // `60% -> 30%` mutation was 0 red. An absolute expectation is unavailable (the extra damage has its own defence zone),
         // and a HAND-BUILT half share is not comparable either -- its unit has a different table and a different attack
-        // (measured: 245.95 vs 77.62, i.e. 3.2:1). Two RANKS of the SAME cone on the SAME wearer are comparable, so the ratio
+        // (measured: 245.95 vs .62, i.e. 3.2:1). Two RANKS of the SAME cone on the SAME wearer are comparable, so the ratio
         // of their extras must be the ratio of their shares.
         double full = afterSkill - beforeAnySkill;
         double otherRank = extraDamageAtRank(2);

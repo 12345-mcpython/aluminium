@@ -10,13 +10,13 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 /**
- * Light cone 23007 (2026-09-30): three of its four clauses.
+ * Light cone 2300(2026-09-30): three of its four clauses.
  *
- * <p>Sentences: effect hit +24..40%; apply 【以太编码】 to a random HIT target not holding it (after a basic
- * attack / skill, and separately after an ultimate); the holder takes +12..20% damage for 1 turn. The 「≥N debuffs」
+ * <p>Sentences: effect hit +24..40%; apply [以太编码] to a random HIT target not holding it (after a basic
+ * attack / skill, and separately after an ultimate); the holder takes +12..20% damage for 1 turn. The ">=N debuffs"
  * clause is REGISTERED, not approximated.
  *
- * <p>⚠ The tier axis is the SUPERIMPOSITION RANK (exact rank, no accumulation), so each tier is read at its own rank.
+ * <p>Note: The tier axis is the SUPERIMPOSITION RANK (exact rank, no accumulation), so each tier is read at its own rank.
  */
 public class Cone23007Test {
     private static final int CONE = 23007;
@@ -48,7 +48,7 @@ public class Cone23007Test {
                 var conditions = rules.getFirst().conditions().stream().map(c -> c.source()).toList();
                 Assertions.assertEquals(2, conditions.size(), id + " has two conditions");
                 Assertions.assertEquals("actor == self", conditions.get(0), id);
-                // ⚠ The VALUE, not just the keyword: a mutation that swaps BPSKILL for ULTRA stayed green
+                // Note: The VALUE, not just the keyword: a mutation that swaps BPSKILL for ULTRA stayed green
                 // while this line only asked for the prefix -- measured, and the reason the expected text is literal.
                 Assertions.assertEquals(id.endsWith("bpskill") ? "from_category BPSKILL" : "from_category ULTRA",
                         conditions.get(1), id + ": the cast category the sentence names");
@@ -59,7 +59,7 @@ public class Cone23007Test {
                 Assertions.assertEquals(1, effects.get(0).getTurns(), id + ": 1 turn");
                 Assertions.assertEquals("random_hit_enemy", effects.get(0).getTarget(),
                         id + ": a random one of the targets that WAS HIT");
-                // ✅ The FILTER is a dimension of its own: the exclusion rides on the effect, tested per
+                // The FILTER is a dimension of its own: the exclusion rides on the effect, tested per
                 // candidate -- and since round 245 the random selector applies it BEFORE rolling.
                 Assertions.assertEquals(List.of("!target has_state 以太编码"),
                         effects.get(0).getTargetWhen(), id + ": only targets NOT holding the state");
@@ -76,10 +76,10 @@ public class Cone23007Test {
     /**
      * The second sentence: the crit rate against a target carrying three or more negative effects.
      *
-     * <p>⚠ The bonus belongs to THIS hit, so it carries {@code instance: true} -- without it the op would raise the
-     * WEARER's attribute for a while, a different sentence. ⚠ It also carries {@code permanent}, because the op's
+     * <p>Note: The bonus belongs to THIS hit, so it carries {@code instance: true} -- without it the op would raise the
+     * WEARER's attribute for a while, a different sentence. Note: It also carries {@code permanent}, because the op's
      * validation demands one of turn/permanent/until even on the instance path (measured 2026-09-30).
-     * ⚠ The threshold reads {@code >= 3.0}: the parser writes an integral threshold with a decimal point.
+     * Note: The threshold reads {@code >= 3.0}: the parser writes an integral threshold with a decimal point.
      */
     @Test
     public void theCritClauseIsAnInstanceModifier() {

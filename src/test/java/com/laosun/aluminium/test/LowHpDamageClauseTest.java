@@ -15,10 +15,10 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1003's clause: 「对当前生命值百分比小于等于50%的敌方目标造成的伤害提高15%」.
+ * 1003's clause: "对当前生命值百分比小于等于50%的敌方目标造成的伤害提高15%".
  *
- * <p>⚠ The attack is her BASIC ATTACK on purpose: the probe in this round showed one Skill cast settles as TWO damage instances, and an
- * instance-scoped boost gets diluted when both are summed (which is why round 106 measured 1.0057 and withdrew the clause). The fixture is two victims
+ * <p>Note: The attack is her BASIC ATTACK on purpose: the probe in this round showed one Skill cast settles as TWO damage instances, and an
+ * instance-scoped boost gets diluted when both are summed (which is why round 106 measured 1.005and withdrew the clause). The fixture is two victims
  * of the same monster -- one wounded to ~40%, one whole -- so the ratio isolates `target_hp_percent`, which is a FRACTION.
  */
 public class LowHpDamageClauseTest {

@@ -11,17 +11,17 @@ import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 /**
- * The lazy-loading guard rail for P7-4: {@code stage.json} (9 MB / about 29,000 stages) must not be parsed
+ * The lazy-loading guard rail for P-4: {@code stage.json} (9 MB / about 29,000 stages) must not be parsed
  * when {@code Constant} is initialized, but should wait until stages are really needed for the first time.
  *
  * <p>Why it deserves a guard rail: {@code stage.json} is larger than all the other data put together.
- * Moving it back into the static block would mean paying ~35 MB of heap + tens of milliseconds on **every**
+ * Moving it back into the static block would mean paying ~35 MB of heap + tens of milliseconds on every
  * {@code Constant} initialization.
  *
  * <p><b>How it is made independent of test-case order</b>: it does not look at runtime state but directly
  * at whether the static initializer block of {@code Constant.class} contains any stage-related symbol.
- * Runtime state (how many times it was parsed) **inevitably** depends on which test class ran first in the
- * shared JVM — my first version was written that way: green when run alone, red in the full suite. The class
+ * Runtime state (how many times it was parsed) inevitably depends on which test class ran first in the
+ * shared JVM - my first version was written that way: green when run alone, red in the full suite. The class
  * file, however, is dead and nobody can change it.
  */
 public class StageLazyLoadTest {
@@ -40,7 +40,7 @@ public class StageLazyLoadTest {
     }
 
     /**
-     * The core guard rail: the **static initializer block** of {@link Constant} must not mention the stage
+     * The core guard rail: the static initializer block of {@link Constant} must not mention the stage
      * table.
      *
      * <p>Why only the static block may be sliced out and the whole class must not be scanned: the body of
@@ -51,7 +51,7 @@ public class StageLazyLoadTest {
      * the next member declaration, and assert that this stretch contains neither {@code stage.json} nor
      * {@code StageHolder}.
      *
-     * <p>The reverse assertion is that {@code Constant$StageHolder} **really does** contain
+     * <p>The reverse assertion is that {@code Constant$StageHolder} really does contain
      * {@code stage.json}, otherwise this test would degenerate into an empty assertion of "the string is not
      * in the project at all".
      *
@@ -107,7 +107,7 @@ public class StageLazyLoadTest {
      * <p>javap's indentation rule: the static block itself is written flush left as {@code static {}};, the
      * block body is indented by 4 spaces, and the next member declaration is flush left (indented 2 spaces,
      * e.g. {@code public static final ...}).
-     * So "the first non-blank line with indent ≤ 2" marks the end of the block.
+     * So "the first non-blank line with indent <= 2" marks the end of the block.
      */
     private static String sliceStaticInitializer(String disassembly) {
         StringBuilder clinit = new StringBuilder();

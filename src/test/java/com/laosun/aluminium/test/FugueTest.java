@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1225 Fugue, from her own file (2026-09-29, round 217): the Foxian Prayer mark and the four things it drives.
+ * 1225 Fugue, from her own file (2026-09-29, round 21): the Foxian Prayer mark and the four things it drives.
  */
 public class FugueTest {
     private static final int FUGUE = 1225;
@@ -24,7 +24,7 @@ public class FugueTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** ⚠ The Skill marks the ally, puts 【炽灼】 on HER, and hands the ally 30% Break Effect -- a share, so it is compared with her own base. */
+    /** Note: The Skill marks the ally, puts [炽灼] on HER, and hands the ally 30% Break Effect -- a share, so it is compared with her own base. */
     @Test
     public void theSkillMarksTheAllyAndHandsOverBreakEffect() {
         Character fugue = CharacterFactory.create(FUGUE, LEVEL);
@@ -44,7 +44,7 @@ public class FugueTest {
                 "「持有【狐祈】的我方目标，击破特攻提高30%」");
     }
 
-    /** ⚠ The reaction: the mark is on the ATTACKER, and the shredded enemy is the one attacked. */
+    /** Note: The reaction: the mark is on the ATTACKER, and the shredded enemy is the one attacked. */
     @Test
     public void theDefenceShredNeedsAMarkedAttacker() {
         double unmarked = defenceLoss(false);
@@ -56,7 +56,7 @@ public class FugueTest {
                 "「使受到攻击的敌方目标防御力降低18%」 of the enemy's own defence");
     }
 
-    /** ⚠ The technique advances her by 40%: round 216's recipe says the remaining wait becomes 0.6 of what it was. */
+    /** Note: The technique advances her by 40%: round 216's recipe says the remaining wait becomes 0.6 of what it was. */
     @Test
     public void theTechniqueLeavesSixtyPercentOfTheWait() {
         Character fugue = CharacterFactory.create(FUGUE, LEVEL);

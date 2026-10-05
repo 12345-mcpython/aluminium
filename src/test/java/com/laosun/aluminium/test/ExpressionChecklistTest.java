@@ -13,7 +13,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Guards <b>EXPRESSION.md</b>, the 「完全表达」 checklist (objective ⑥, 2026-10-02).
+ * Guards <b>EXPRESSION.md</b>, the "完全表达" checklist (objective ⑥, 2026-10-02).
  *
  * <p><b>Why a test and not just a document.</b> A checklist written from memory rots: it cites files that were renamed,
  * rules that were withdrawn, and families that shipped without anyone updating the row. This test makes the document
@@ -23,13 +23,13 @@ import java.util.regex.Pattern;
  *   <li>§1 must keep all four steps of the procedure (find the sentence / split the clauses / try to write it /
  *       register what cannot be written) -- the checklist is about the METHOD as much as the rows;</li>
  *   <li>every row of §2 (a sentence family that IS writable) must cite at least one path that exists, and must name a
- *       judge whose file exists -- 「有出货内容或明确读者 ＋ 测试 ＋ 实测变异 ＋ 文档」 has to be checkable;</li>
+ *       judge whose file exists -- "有出货内容或明确读者 ＋ 测试 ＋ 实测变异 ＋ 文档" has to be checkable;</li>
  *   <li>every row of §3 (a registered family) must fill all three columns: what is missing, who the readers are, and
- *       what the prerequisite is. ⚠ A row that says "readers: to be named" is exactly the vague claim the objective
+ *       what the prerequisite is. Note: A row that says "readers: to be named" is exactly the vague claim the objective
  *       refuses, so an empty cell fails here.</li>
  * </ul>
  *
- * <p>⚠ It deliberately does NOT try to check the prose's meaning -- it checks that every claim has a file behind it, and
+ * <p>Note: It deliberately does NOT try to check the prose's meaning -- it checks that every claim has a file behind it, and
  * that no row is half-filled. Meaning is the reviewer's job; existence is this test's.
  */
 public class ExpressionChecklistTest {
@@ -133,7 +133,7 @@ public class ExpressionChecklistTest {
     private static List<String> cells(String row) {
         List<String> out = new ArrayList<>();
         for (String cell : row.split("\\|")) {
-            // ⚠ Backticks are markdown, not part of the name: without this the judge cell reads
+            // Note: Backticks are markdown, not part of the name: without this the judge cell reads
             // "`TalismanSavesAnAllyTest`" and no such file exists. Measured -- the first version of this guard failed on it.
             String trimmed = cell.trim().replace("`", "");
             if (!trimmed.isEmpty()) {

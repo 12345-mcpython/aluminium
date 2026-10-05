@@ -17,9 +17,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1408：「**解除自身所有负面效果**，随后造成…」 (2026-10-02).
+ * 1408："解除自身所有负面效果，随后造成…" (2026-10-02).
  *
- * <p>⭐ SAME SCENE, ONE VARIABLE, and the DOT is applied AFTER the transformation: item 41 made the transformed form immune to
+ * <p>SAME SCENE, ONE VARIABLE, and the DOT is applied AFTER the transformation: item 41 made the transformed form immune to
  * CONTROLS, so a control could not be used here even though it is a debuff -- a Thunder DOT is used instead, and the immunity
  * does not touch it.
  */
@@ -30,14 +30,14 @@ public class TransformationDispelsTest {
     private static final String STATE = "变身";
     private static final String DOT = "触电";
 
-    /** ⭐ Transformed: her own cast strips the debuff. */
+    /** Transformed: her own cast strips the debuff. */
     @Test
     public void theTransformedFormStripsItsDebuffs() {
         Assertions.assertFalse(debuffedAfterCast(true),
                 "「解除自身所有负面效果」");
     }
 
-    /** ⚠ Untransformed: the same cast leaves it there. */
+    /** Note: Untransformed: the same cast leaves it there. */
     @Test
     public void withoutTheTransformationNothingIsStripped() {
         Assertions.assertTrue(debuffedAfterCast(false),
@@ -67,7 +67,7 @@ public class TransformationDispelsTest {
             Assertions.assertFalse(owner.getBuffManager().hasState(STATE), "precondition: not transformed");
         }
 
-        // ⭐ The debuff lands NOW -- after the transformation (see the class comment), and before her own cast.
+        // The debuff lands NOW -- after the transformation (see the class comment), and before her own cast.
         Skill theirs = applier.getSkills().get(SkillType.SKILL);
         Assertions.assertNotNull(theirs, "precondition: the applier has a skill");
         SkillExecutor.execute(battle, theirs, applier, List.of(battle.enemies.getFirst()));
@@ -87,7 +87,7 @@ public class TransformationDispelsTest {
         EffectSpec e = new EffectSpec();
         TriggerSpecs.set(e, "op", "APPLY_DOT");
         TriggerSpecs.set(e, "element", "Thunder");
-        // ⚠ `baseChance`, the JAVA field name: `TriggerSpecs.set` uses reflection, so the JSON key (`base_chance`) is not what it
+        // Note: `baseChance`, the JAVA field name: `TriggerSpecs.set` uses reflection, so the JSON key (`base_chance`) is not what it
         // wants -- it failed loudly with "cannot set base_chance on class EffectSpec".
         TriggerSpecs.set(e, "baseChance", 1.0);
         TriggerSpecs.set(e, "scale", "self_attr:ATTACK");

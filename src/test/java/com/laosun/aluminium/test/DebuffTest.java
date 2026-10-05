@@ -25,17 +25,17 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Negative effects: what counts as one, how many are attached, and how 「解除 N 个负面效果」 removes them.
+ * Negative effects: what counts as one, how many are attached, and how "解除 N 个负面效果" removes them.
  *
  * <p><b>Why the classification is the centre of this class.</b> Two ops and one condition all depend on the same
- * question — "is this buff a debuff?" — and getting it wrong is invisible: a dispel that quietly removes a
+ * question - "is this buff a debuff?" - and getting it wrong is invisible: a dispel that quietly removes a
  * <i>shield</i> instead of a burn looks like a working rule until somebody reads the log. So the answer is
  * decided in exactly one place ({@code AbstractBuff.isDebuff()}), the set of classes that answer "yes" is pinned
  * here as a table, and each entry says why in the game's own terms.
  *
  * <p>The interesting entries are the ones that <i>don't</i> follow from where the buff sits: 减伤
  * ({@code ReductionBuff}) is a positive effect on the defender, 易伤 ({@code VulnerabilityBuff}) is a negative
- * one, 嘲讽 is negative <b>on its bearer</b>, and a named state's side depends on who applied it — which is why a
+ * one, 嘲讽 is negative <b>on its bearer</b>, and a named state's side depends on who applied it - which is why a
  * state answers "no" and says so.
  */
 public class DebuffTest {

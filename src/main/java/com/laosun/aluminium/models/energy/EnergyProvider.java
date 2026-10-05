@@ -21,7 +21,7 @@ import java.util.Set;
  *   <li>The returned {@link EnergyGain} is only "base value + whether it benefits from energy gain rate"; the
  *   actual crediting is done by {@link CanHit#gainEnergy(EnergyGain)} (clamping to the cap, returning the amount
  *   actually credited).</li>
- *   <li>No HP loss / cap / death checks happen here — that is the caller's ({@code Battle}) business.</li>
+ *   <li>No HP loss / cap / death checks happen here - that is the caller's ({@code Battle}) business.</li>
  * </ul>
  */
 public interface EnergyProvider {
@@ -31,8 +31,8 @@ public interface EnergyProvider {
      *
      * <p>This is the <b>gate</b> for casting, and it exists because "energy is full" is not the only
      * way to earn an ultimate. Characters who build stacks instead of energy (P8-8: Acheron's
-     * 【残梦】, Feixiao's 【飞黄】, Cyrene's 【追忆】…) become ready when their **resource** is full, so
-     * gating on {@code currentEnergy >= maxEnergy} would lock them out forever — their energy stays
+     * [残梦], Feixiao's [飞黄], Cyrene's [追忆]…) become ready when their resource is full, so
+     * gating on {@code currentEnergy >= maxEnergy} would lock them out forever - their energy stays
      * at 0 by design.
      *
      * <p>Keeping the decision here rather than in {@code Battle} means the engine still does not know

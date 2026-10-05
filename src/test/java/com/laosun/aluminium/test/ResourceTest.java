@@ -34,8 +34,8 @@ import java.util.Random;
  * <p>The abstraction itself is {@link Resource} (extracted during P8-4, where skill points became its
  * first user); this task adds the parts that make it usable by characters: a
  * {@link ResourceManager} each combatant owns, the "became full" signal, the two trigger ops
- * ({@code GAIN_RESOURCE} / {@code SPEND_RESOURCE}), and — the piece that actually unlocks the
- * characters — an energy-provider hook that can gate an ultimate on a resource instead of on energy.
+ * ({@code GAIN_RESOURCE} / {@code SPEND_RESOURCE}), and - the piece that actually unlocks the
+ * characters - an energy-provider hook that can gate an ultimate on a resource instead of on energy.
  */
 public class ResourceTest {
 
@@ -44,7 +44,7 @@ public class ResourceTest {
     private static final int ACHERON = 1308;
     private static final int ICE_EDGE = 1002011;
 
-    /** Acheron's 【残梦】 cap, from her character doc. */
+    /** Acheron's [残梦] cap, from her character doc. */
     private static final int ACHERON_STACKS = 9;
 
     // ==================================================================
@@ -95,10 +95,10 @@ public class ResourceTest {
     }
 
     /**
-     * ⚠ A {@code PARTY}-scoped resource is <b>refused</b> rather than silently treated as personal.
+     * Note: A {@code PARTY}-scoped resource is <b>refused</b> rather than silently treated as personal.
      *
      * <p>Hanging a shared pool on each character would give the team as many independent counters as
-     * it has members — and nothing at runtime would report it.
+     * it has members - and nothing at runtime would report it.
      */
     @Test
     public void partyScopedResourceIsRefusedUntilItHasARealOwner() {
@@ -129,10 +129,10 @@ public class ResourceTest {
     }
 
     /**
-     * ⚠ Sitting at the cap does <b>not</b> keep re-firing.
+     * Note: Sitting at the cap does <b>not</b> keep re-firing.
      *
      * <p>This is why the signal is a rising edge rather than a level: Cyrene can keep collecting into
-     * overflow above her pool (24 → 27), so a level signal would fire on every one of those gains even
+     * overflow above her pool (24 to 2), so a level signal would fire on every one of those gains even
      * though she arrived at the cap only once.
      */
     @Test
@@ -169,12 +169,12 @@ public class ResourceTest {
         Assertions.assertEquals(2, fired[0], "each arrival counts");
     }
 
-    /** Cyrene's shape: pool 24 that may overflow to 27. */
+    /** Cyrene's shape: pool 24 that may overflow to 2. */
     @Test
     public void overflowAllowsStoringAboveThePool() {
         Character cyrene = CharacterFactory.create(1415, 80);
         Resource memories = cyrene.getResources().register("memories", 24, 0);
-        memories.setMaxOverflow(3);                     // pool 24, may store up to 27
+        memories.setMaxOverflow(3);                     // pool 24, may store up to 2
 
         Assertions.assertEquals(24, cyrene.getResources().gain("memories", 24));
         Assertions.assertTrue(memories.isFull());
@@ -251,14 +251,14 @@ public class ResourceTest {
     // ==================================================================
 
     /**
-     * {@code HP_LOST} really reaches the owner's table: the wiring is byte-for-byte (real enemy turn →
-     * {@code Battle.applyDamage} → the event → the rule → the manager).
+     * {@code HP_LOST} really reaches the owner's table: the wiring is byte-for-byte (real enemy turn to 
+     * {@code Battle.applyDamage} to the event to the rule to the manager).
      *
-     * <p>Driven through a **real enemy turn** rather than firing the event by hand, so the test covers
+     * <p>Driven through a real enemy turn rather than firing the event by hand, so the test covers
      * the whole chain.
      *
-     * <p>⚠ Scope note: the rule below grants a <b>fixed 1</b> stack per HP-loss event. That is the
-     * strongest rule the current vocabulary can express — the effect's amount is a literal, so
+     * <p>Note: Scope note: the rule below grants a <b>fixed 1</b> stack per HP-loss event. That is the
+     * strongest rule the current vocabulary can express - the effect's amount is a literal, so
      * "grant as many stacks as HP lost" needs amount arithmetic it does not have yet. The 1:1
      * conversion itself is a manager-level property and is pinned by
      * {@link #oneStackPerPointOfLossIsAManagerCall()}.
@@ -284,7 +284,7 @@ public class ResourceTest {
     /**
      * The "1 stack per 1 HP lost" arithmetic itself, at the level that can actually express it.
      *
-     * <p>Castorice's 【新蕊】 converts loss at 1:1, and that is a property of the manager
+     * <p>Castorice's [新蕊] converts loss at 1:1, and that is a property of the manager
      * ({@code gain(id, lost)}); what the trigger vocabulary supplies is the *event*. Splitting the two
      * keeps each half testable instead of pretending a literal-amount rule scales.
      */
@@ -303,14 +303,14 @@ public class ResourceTest {
     }
 
     /**
-     * {@code HP_LOST} is a **team** event: it reaches the victim *and* every ally, which is what lets a
+     * {@code HP_LOST} is a team event: it reaches the victim *and* every ally, which is what lets a
      * healer or an off-field stack character react to a teammate's wounds.
      *
-     * <p>⚠ This is the opposite of what I first assumed (I wrote a test asserting a bystander stays at
+     * <p>Note: This is the opposite of what I first assumed (I wrote a test asserting a bystander stays at
      * 0 stacks, and it failed). The engine's broadcast rule for this event is documented in
      * {@code engine.md} §4.1 as "related parties + our whole side", so an ally *does* see it.
      * A character that only cares about its own wounds therefore needs a subject filter
-     * ({@code target == self}) — see {@link #subjectFilterIsNotExpressibleYet()} for where that stands.
+     * ({@code target == self}) - see {@link #subjectFilterIsNotExpressibleYet()} for where that stands.
      */
     @Test
     public void hpLossReachesEveryAllyNotJustTheVictim() {
@@ -331,9 +331,9 @@ public class ResourceTest {
     }
 
     /**
-     * ⚠ Known limit: the condition DSL cannot yet say "only my own wounds".
+     * Note: Known limit: the condition DSL cannot yet say "only my own wounds".
      *
-     * <p>{@code self} compares the **actor** (who caused the event) with the table's owner, and the
+     * <p>{@code self} compares the actor (who caused the event) with the table's owner, and the
      * numeric variables only cover {@code hit_count}. A rule watching {@code HP_LOST} therefore cannot
      * distinguish "I was hit" from "an ally was hit", so it fires for both. That is fine for Castorice
      * (who wants the whole team's losses) but wrong for a personal-stacks character.

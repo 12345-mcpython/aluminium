@@ -19,16 +19,16 @@ import java.util.Random;
 /**
  * 光锥 23062 随心，第 4 句：`每消耗 1 点能量值，使本次造成的终结技伤害提高 #3%，最多 #6%`。
  *
- * <p>⚠ 为什么是单元级：终结技**只在满能量时可放**（`Battle.castUltra` 第二行的 `isUltraReady`，实测 10 点能量
+ * <p>Note: 为什么是单元级：终结技只在满能量时可放（`Battle.castUltra` 第二行的 `isUltraReady`，实测 10 点能量
  * 直接 `return false`），所以"两种消耗"在端到端里造不出来。这里手工造 `Damage`、直接设实例上的
  * `castEnergySpent`，属性加成在比值里约掉，剩下的就是那条从句。
  *
- * <p>⚠ 四个对照上的坑，全是实测踩出来的：
+ * <p>Note: 四个对照上的坑，全是实测踩出来的：
  * <ol>
- *   <li>"装 / 不装"不行 —— 那测到的是光锥的 ATK +18%（实测 1.0878），拆掉引擎依然全绿；</li>
- *   <li>清空 `when` 不行 —— 当时毫无变化，但那一次实验里**同时**有"写入从未发生"，两个变量一起失效，结论无效；</li>
- *   <li>"能量 0"不行 —— `isUltraReady` 直接 `return false`，实验会在一个没被检查的 false 上跑完；</li>
- *   <li>⚠ 手工 `Damage` **必须带 ULTRA 类别** —— 否则 `from_skill ULTRA` 连匹配都不匹配，
+ *   <li>"装 / 不装"不行 - - 那测到的是光锥的 ATK +18%（实测 1.088），拆掉引擎依然全绿；</li>
+ *   <li>清空 `when` 不行 -  - 当时毫无变化，但那一次实验里同时有"写入从未发生"，两个变量一起失效，结论无效；</li>
+ *   <li>"能量 0"不行 -  - `isUltraReady` 直接 `return false`，实验会在一个没被检查的 false 上跑完；</li>
+ *   <li>Note: 手工 `Damage` 必须带 ULTRA 类别 -  - 否则 `from_skill ULTRA` 连匹配都不匹配，
  *       改与不改 `castEnergySpent` 得到同一个数（实测 550.099…）。</li>
  * </ol>
  */

@@ -19,13 +19,13 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Relic set 321 「妖精织梦的乐园」 2-piece: 「每少1名我方目标，使装备者及其忆灵造成的伤害提高12%，最多叠3层」.
+ * Relic set 321 "妖精织梦的乐园" 2-piece: "每少1名我方目标，使装备者及其忆灵造成的伤害提高12%，最多叠3层".
  *
- * <p>Every read happens after a DRIVEN TURN: the memosprite's half hangs on SUMMONED, which is fired from a settle, and rounds 78-79 recorded
+ * <p>Every read happens after a DRIVEN TURN: the memosprite's half hangs on SUMMONED, which is fired from a settle, and rounds 8-9 recorded
  * it as an engine defect only because their probes read before any settle existed. Measured: `no-settle -> 0.0`, `settle -> 0.12`.
  *
  * <p>The fixture is built in TARGETS, not characters: `ally_count` counts a memosprite as an ally target (two characters plus the 忆灵 is
- * three targets, one missing, +12%), which is the game's own reading of 「我方目标数量」.
+ * three targets, one missing, +12%), which is the game's own reading of "我方目标数量".
  */
 public class ArcadiaDamageTest {
     private static final int WEARER = 1001;
@@ -43,11 +43,11 @@ public class ArcadiaDamageTest {
 
     @Test
     public void theMemoSpriteIsBoostedToo() {
-        // ⚠ In targets: three characters plus the 忆灵 would be four (nothing missing), so the boosted case is two characters.
+        // Note: In targets: three characters plus the 忆灵 would be four (nothing missing), so the boosted case is two characters.
         double fourTargets = memospriteDamage(3);
         double threeTargets = memospriteDamage(2);
         double ratio = threeTargets / fourTargets;
-        // ⚠ Measured 1.08, not 1.12: the memosprite also carries 1413's own enemy-count talent in another zone, which compresses the
+        // Note: Measured 1.08, not 1.12: the memosprite also carries 1413's own enemy-count talent in another zone, which compresses the
         // ratio -- the same effect round 65 measured when a 1.48 zone ratio read 1.1404 on a skill hit. The attribute assertion inside
         // `memospriteDamage` is the exact one; this proves the boost reaches real damage.
         Assertions.assertTrue(fourTargets > 0, "precondition: the 忆灵 landed both hits");
@@ -64,7 +64,7 @@ public class ArcadiaDamageTest {
         return wearer.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
     }
 
-    /** ⚠ Takes the number of CHARACTERS: the 忆灵 adds one more target. */
+    /** Note: Takes the number of CHARACTERS: the 忆灵 adds one more target. */
     private static double memospriteDamage(int allies) {
         Character master = CharacterFactory.create(MEMOSPRITE_OWNER, LEVEL, true, null,
                 RelicFactory.suit(321, 5, RELIC_LEVEL));
@@ -94,7 +94,7 @@ public class ArcadiaDamageTest {
         return dealt;
     }
 
-    /** ⚠ A whole turn: SUMMONED and TURN_START both come out of a settle, so nothing may be read without one. */
+    /** Note: A whole turn: SUMMONED and TURN_START both come out of a settle, so nothing may be read without one. */
     private static void driveTurn(Battle battle, Character unit) {
         battle.currentMove = new Signal(unit);
         battle.beforeMove();

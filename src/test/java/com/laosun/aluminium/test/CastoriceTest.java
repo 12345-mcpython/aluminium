@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1407 Castorice, from her own file (2026-09-29, round 221): the talent's damage boost on HP loss — the HP_LOST event's first use here.
+ * 140Castorice, from her own file (2026-09-29, round 221): the talent's damage boost on HP loss - the HP_LOST event's first use here.
  */
 public class CastoriceTest {
     private static final int CASTORICE = 1407;
@@ -22,7 +22,7 @@ public class CastoriceTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** ⚠ The boost needs an HP loss, and its three-stack cap is enforced by exceeding it. */
+    /** Note: The boost needs an HP loss, and its three-stack cap is enforced by exceeding it. */
     @Test
     public void theBoostNeedsAnHpLossAndStopsAtThreeStacks() {
         Character castorice = CharacterFactory.create(CASTORICE, LEVEL);

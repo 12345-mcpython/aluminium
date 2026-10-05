@@ -21,13 +21,13 @@ import java.util.Random;
 /**
  * `percent_from_cast_param`: a magnitude that is a skill parameter TIMES an attribute (2026-10-02).
  *
- * <p>Reader: 1415's memosprite skill 10 「献予「创世」之诗」 -- 「使开拓者•记忆的攻击力提高，提高数值等同于<b>德谬歌生命上限的 #1%</b>」. The magnitude
+ * <p>Reader: 1415's memosprite skill 10 "献予'创世'之诗" -- "使开拓者-记忆的攻击力提高，提高数值等同于<b>德谬歌生命上限的 #1%</b>". The magnitude
  * is a product: `#1` comes from the casting skill and runs with its level; the max HP comes from the field. One `scale` names one factor, so
  * without this the sentence could only be written by freezing a level of `#1`.
  *
- * <p>⚠ Three lessons from earlier rounds are baked in here, each of which cost a round:
+ * <p>Note: Three lessons from earlier rounds are baked in here, each of which cost a round:
  * <ul>
- *   <li>the expectation is read from the ROW OF THE CASTER'S CURRENT LEVEL (this skill sits at level 10, and `70` is in every row -- which is
+ *   <li>the expectation is read from the ROW OF THE CASTER'S CURRENT LEVEL (this skill sits at level 10, and `0` is in every row -- which is
  *       how a wrong row stayed invisible for a whole round);</li>
  *   <li>the test helper keys on the FIELD NAME (`percentFromCastParam`), not on the JSON spelling;</li>
  *   <li>the unboxed `getAmount()` this field first crashed on is fixed, and the reader below is what would notice if it came back.</li>

@@ -29,7 +29,7 @@ FX_NEW = WORK + '/src/test/resources/relic_sets/99001.json'
 touched = {}
 orig = {}
 for p in (RS, RTT, SO):
-    # ⚠ Keep TWO dicts: `touched` is edited in place while patching, so restoring from it would write the MODIFIED
+    # Note: Keep TWO dicts: `touched` is edited in place while patching, so restoring from it would write the MODIFIED
     # text back (measured 2026-09-30: three test files left dirty). `orig` is never reassigned.
     touched[p] = io.open(p, encoding='utf-8').read()
     orig[p] = touched[p]
@@ -75,7 +75,7 @@ io.open(DATA_TEST, 'w', encoding='utf-8', newline='').write(
 print('1. test-side data copy written (%d sets, +%s)' % (len(dst), sorted(set(dst) - set(src))))
 
 # ---- 2. RelicSetTest: one filtered local per method, and the four counts read from it ---------------------------
-# 2a. the loaded-table method (:78 sets, :82 effects)
+# 2a. the loaded-table method (:8 sets, :82 effects)
 old = ('        Assertions.assertFalse(Constant.RELIC_SETS.isEmpty(),\n'
        '                "relic_sets.json was not loaded — the engine cannot apply any set bonus without it");\n'
        '        Assertions.assertEquals(60, Constant.RELIC_SETS.size(),')
@@ -95,7 +95,7 @@ if old not in touched[RS]:
 touched[RS] = touched[RS].replace(old, new, 1)
 
 # 2b. the census method (:412 loop, :424/:425 counts, :428 identity)
-# ⚠ The bare loop header is NOT unique in this file (measured: an earlier method has the same line, which is why the
+# Note: The bare loop header is NOT unique in this file (measured: an earlier method has the same line, which is why the
 # first attempt patched the wrong one and the identity's method never got `shipped`). Anchor with context, and assert.
 old = ('        int withStats = 0;\n'
        '        int abilityOnly = 0;\n'

@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1306 Sparkle: 「当我方目标每消耗 1 点战技点，花火获得 1 层【幻相】」 -- PER POINT, not per spending action.
+ * 1306 Sparkle: "当我方目标每消耗 1 点战技点，花火获得 1 层[幻相]" -- PER POINT, not per spending action.
  *
  * <p>Shipped 2026-09-30 by giving the rule `scale: event_amount` + `percent: 1`, which `addStack` already honoured
  * (built for cone 23021). The other 1306 judges all spend one point per call, where per-action and per-point agree, so

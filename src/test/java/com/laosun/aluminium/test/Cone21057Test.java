@@ -19,9 +19,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Light cone 21057: the wearer's MEMOSPRITE deals 24% more CRIT damage (the crit damage in {@code props} is the wearer's own).
+ * Light cone 2105: the wearer's MEMOSPRITE deals 24% more CRIT damage (the crit damage in {@code props} is the wearer's own).
  *
- * <p>⭐ A crit is forced (chance -1 then the instance is marked as critting) so the reading is the crit number itself, and the
+ * <p>A crit is forced (chance -1 then the instance is marked as critting) so the reading is the crit number itself, and the
  * wearer's own hit is measured beside the memosprite's to show the rule does not spill over.
  */
 public class Cone21057Test {
@@ -42,8 +42,8 @@ public class Cone21057Test {
         enemy = EnemyFactory.create(MONSTER, 90, 1);
         battle = new Battle(List.of(wearer, CharacterFactory.create(ALLY, LEVEL)), List.of(enemy), new Random(0));
         battle.startBattle();
-        // ★ The crit chance belongs to the one that ATTACKS: measured, pinning the WEARER's chance left the memosprite's hit
-        // uncritted (476.19 on both sides, while the wearer's own crit was 828.57), because the roll reads the attacker.
+        // The crit chance belongs to the one that ATTACKS: measured, pinning the WEARER's chance left the memosprite's hit
+        // uncritted (46.19 on both sides, while the wearer's own crit was 828.5), because the roll reads the attacker.
         wearer.getAttribute(AttributeType.CRIT_CHANCE)
                 .addModifier(DoubleValue.Modifier.pure(1.0, DoubleValue.Modifier.ModifierSource.BUFF, 210571));
         return battle;

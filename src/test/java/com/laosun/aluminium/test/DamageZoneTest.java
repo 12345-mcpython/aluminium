@@ -16,7 +16,7 @@ import static com.laosun.aluminium.models.DoubleValue.Modifier.ModifierSource.BU
  * multiplier against a base of 1000, plus the invariants of the zone container.
  *
  * <p>Pure algebra: {@code attacker}/{@code defender} take no part in zone settlement,
- * so they stay {@code null} here — that also keeps {@link com.laosun.aluminium.Constant}
+ * so they stay {@code null} here - that also keeps {@link com.laosun.aluminium.Constant}
  * from being initialised (no JSON is loaded for this test).
  */
 public class DamageZoneTest {
@@ -55,11 +55,11 @@ public class DamageZoneTest {
 
     @Test
     public void reductionIsMultiplicativeFlooredAndInputClamped() {
-        // Multiplication + floor: 0.1³ = 0.001 → 0.01
+        // Multiplication + floor: 0.1³ = 0.001 to 0.01
         Assertions.assertEquals(10,
                 damage().addReduction(0.9).addReduction(0.9).addReduction(0.9).toValue(), EPS);
 
-        // The input is clamped to [0,1] first: 1.5 → 1 (factor 0), -0.5 → 0 (factor 1) → product 0 → floor 0.01
+        // The input is clamped to [0,1] first: 1.5 to 1 (factor 0), -0.5 to 0 (factor 1) to product 0 to floor 0.01
         Assertions.assertEquals(10,
                 damage().addReduction(1.5).addReduction(-0.5).toValue(), EPS);
     }
@@ -68,7 +68,7 @@ public class DamageZoneTest {
     public void weaknessIsFloored() {
         Damage damage = damage().addWeakness(0.9).addWeakness(0.3);
 
-        // 1 - 1.2 = -0.2 → floored to 0.2
+        // 1 - 1.2 = -0.2 to floored to 0.2
         Assertions.assertEquals(200, damage.toValue(), EPS);
     }
 
@@ -108,27 +108,27 @@ public class DamageZoneTest {
 
     @Test
     public void defenceIgnoreIsClampedToUnitRange() {
-        // 1.5 → clamped to 1 → effective defence 0 → defence zone rate 1.0
+        // 1.5 to clamped to 1 to effective defence 0 to defence zone rate 1.0
         Assertions.assertEquals(1.0, damage().defence(80, 1150, 1.5).defenceArea().getRate(), EPS);
-        // -0.5 → clamped to 0 → equivalent to ignoring no defence at all
+        // -0.5 to clamped to 0 to equivalent to ignoring no defence at all
         Assertions.assertEquals(1000.0 / 2150.0, damage().defence(80, 1150, -0.5).defenceArea().getRate(), EPS);
     }
 
     @Test
     public void resistanceZone() {
-        // 0.2 - 0.4 = -0.2 → negative resistance (currently implemented at full effect)
+        // 0.2 - 0.4 = -0.2 to negative resistance (currently implemented at full effect)
         Assertions.assertEquals(1200, damage().resist(0.2, 0.4).toValue(), EPS);
     }
 
     @Test
     public void resistanceIsClampedToMax() {
-        // 1.2 → cap 0.9
+        // 1.2 to cap 0.9
         Assertions.assertEquals(100, damage().resist(1.2, 0).toValue(), EPS);
     }
 
     @Test
     public void resistanceIsClampedToMin() {
-        // HSR.md §2.5: resistance ranges over -100% ~ 90% ⇒ resistance zone 0.1 ~ 2.0 (negative resistance at full effect)
+        // HSR.md §2.5: resistance ranges over -100% ~ 90% so resistance zone 0.1 ~ 2.0 (negative resistance at full effect)
         Assertions.assertEquals(2000, damage().resist(-1.5, 0).toValue(), EPS);
         Assertions.assertEquals(2.0, damage().resist(-1.5, 0).resistArea().getRate(), EPS);
     }
@@ -223,7 +223,7 @@ public class DamageZoneTest {
                 .addBoost(0.2, ModifierSource.BUFF, 3)
                 .addBoost(0.3, ModifierSource.RELIC, 4);
 
-        // DMG boost 1+0.5, vulnerability 1+0.5 → 2250
+        // DMG boost 1+0.5, vulnerability 1+0.5 to 2250
         Assertions.assertEquals(2250, damage.toValue(), EPS);
         Assertions.assertEquals(1, damage.boostArea().raw().filterBySource(ModifierSource.BUFF).size());
         Assertions.assertEquals(1, damage.boostArea().raw().filterBySource(ModifierSource.RELIC).size());

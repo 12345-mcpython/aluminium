@@ -3,10 +3,10 @@ package com.laosun.aluminium.models.energy;
 /**
  * One energy grant, as produced by an {@link EnergyProvider}.
  *
- * <p>HSR rule (HSR.md §3.3): {@code final energy gained = base energy gained × (1 + energy
+ * <p>HSR rule (HSR.md §3.3): {@code final energy gained = base energy gained  x  (1 + energy
  * regeneration rate %)}.
  * A few sources deliberately bypass the efficiency multiplier (energy gain as a percentage of max
- * energy, e.g. Firefly's 「restores a fixed amount of energy equal to 60% of her own max energy」),
+ * energy, e.g. Firefly's "restores a fixed amount of energy equal to 60% of her own max energy"),
  * so the two cases are modelled explicitly instead of being conflated into one number.
  *
  * @param amount               base energy before {@code (1 + energy regeneration rate)}

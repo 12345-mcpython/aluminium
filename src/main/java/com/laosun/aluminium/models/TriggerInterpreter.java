@@ -37,7 +37,7 @@ import java.util.Locale;
 import java.util.Set;
 
 /**
- * Runs the effects of a {@link TriggerTable} (P8-7). The only place in the trigger system that
+ * Runs the effects of a {@link TriggerTable} (P8-). The only place in the trigger system that
  * touches engine state.
  *
  * <p><b>The op vocabulary is restricted on purpose</b> to capabilities the engine already has --
@@ -47,24 +47,24 @@ import java.util.Set;
  *
  * <table border="1">
  *   <tr><th>op</th><th>arguments</th><th>status</th></tr>
- *   <tr><td>{@code GAIN_ENERGY}</td><td>{@code amount}</td><td>✅ wired</td></tr>
- *   <tr><td>{@code GAIN_SKILL_POINT}</td><td>{@code amount}</td><td>✅ wired</td></tr>
- *   <tr><td>{@code HEAL}</td><td>{@code amount}, optional {@code target} — <b>or</b> {@code scale} +
- *       {@code percent} (a share of a Max HP)</td><td>✅ wired</td></tr>
- *   <tr><td>{@code SHIELD}</td><td>{@code amount}, optional {@code target} — <b>or</b> {@code scale} +
- *       {@code percent}</td><td>✅ wired</td></tr>
- *   <tr><td>{@code EXTRA_TURN}</td><td>optional {@code target}</td><td>✅ wired</td></tr>
- *   <tr><td>{@code ADVANCE}</td><td>{@code percent}, optional {@code target}</td><td>✅ wired (0.0–1.0 = the fraction of the target's <b>remaining</b> time to act that gets skipped)</td></tr>
+ *   <tr><td>{@code GAIN_ENERGY}</td><td>{@code amount}</td><td>wired</td></tr>
+ *   <tr><td>{@code GAIN_SKILL_POINT}</td><td>{@code amount}</td><td>wired</td></tr>
+ *   <tr><td>{@code HEAL}</td><td>{@code amount}, optional {@code target} - <b>or</b> {@code scale} +
+ *       {@code percent} (a share of a Max HP)</td><td>wired</td></tr>
+ *   <tr><td>{@code SHIELD}</td><td>{@code amount}, optional {@code target} - <b>or</b> {@code scale} +
+ *       {@code percent}</td><td>wired</td></tr>
+ *   <tr><td>{@code EXTRA_TURN}</td><td>optional {@code target}</td><td>wired</td></tr>
+ *   <tr><td>{@code ADVANCE}</td><td>{@code percent}, optional {@code target}</td><td>wired (0.0-1.0 = the fraction of the target's <b>remaining</b> time to act that gets skipped)</td></tr>
  *   <tr><td>{@code MODIFY_ATTR}</td><td>{@code attribute}, {@code percent}, <b>exactly one of</b>
  *       {@code turns} / {@code permanent} / {@code until}, optional {@code target}, {@code max_stacks} (alias
  *       {@code stacks})</td>
- *       <td>✅ wired (P10-3) — a negative {@code percent} becomes a {@code DEBUFF}, so a buff and a
+ *       <td>wired (P10-3) - a negative {@code percent} becomes a {@code DEBUFF}, so a buff and a
  *           debuff on the same attribute coexist; for a ratio attribute ({@code CRIT_ATTACK} and
  *           friends) {@code percent} is the value itself (0.25 = +25 percentage points), because an
  *           additive percentage would multiply their zero base and change nothing.
  *           <b>{@code permanent: true}</b> means "until the battle ends": the modifier is never
  *           ticked, so its duration is unbounded rather than merely long. <b>{@code until}</b> is the
- *           third duration and the one the texts keep asking for — 「持续到施放首次攻击后结束」 is not a
+ *           third duration and the one the texts keep asking for - "持续到施放首次攻击后结束" is not a
  *           number of turns; it ends the buff when its <b>owner</b> attacks / casts a Skill / casts an
  *           Ultimate ({@code AbstractBuff.Lifetime}), and such a buff is likewise never ticked.
  *           <b>{@code max_stacks}</b>
@@ -72,37 +72,37 @@ import java.util.Set;
  *           previous one; each stack is an ordinary buff instance with its own id, so it can be
  *           removed on its own. Absent {@code max_stacks} keeps the historical replace behaviour.</td></tr>
  *   <tr><td>{@code BOOST_DAMAGE}</td><td>{@code percent}</td>
- *       <td>✅ wired — changes <b>the instance being settled</b> when the rule fires on
- *           {@code DEALING_DAMAGE} (「对处于 X 状态的目标造成的伤害提高 Y%」). No duration, no target and no
+ *       <td>wired - changes <b>the instance being settled</b> when the rule fires on
+ *           {@code DEALING_DAMAGE} ("对处于 X 状态的目标造成的伤害提高 Y%"). No duration, no target and no
  *           buff: the instance is the state, so nothing persists and nothing can leak into the next hit</td></tr>
  *   <tr><td>{@code DISPEL}</td><td>{@code amount}, optional {@code target}</td>
- *       <td>✅ wired — removes up to {@code amount} <b>negative effects</b> (「解除 N 个负面效果」), newest
+ *       <td>wired - removes up to {@code amount} <b>negative effects</b> ("解除 N 个负面效果"), newest
  *           first. What counts as negative is {@code AbstractBuff.isDebuff()}, decided per buff class</td></tr>
  *   <tr><td>{@code MODIFY_DAMAGE_TAKEN}</td><td>{@code percent}, <b>exactly one of</b> {@code turns} /
  *       {@code permanent} / {@code until}, optional {@code target}</td>
- *       <td>✅ wired — the sign decides the zone: {@code percent > 0} is 「受到的伤害提高」 (vulnerability,
- *           a debuff on the defender), {@code percent < 0} is 「受到的伤害降低」 (reduction, a buff on the
+ *       <td>wired - the sign decides the zone: {@code percent > 0} is "受到的伤害提高" (vulnerability,
+ *           a debuff on the defender), {@code percent < 0} is "受到的伤害降低" (reduction, a buff on the
  *           defender). Neither is an attribute, which is why {@code MODIFY_ATTR} cannot express them</td></tr>
  *   <tr><td>{@code REMOVE_STACK}</td><td>{@code attribute}, {@code amount}, optional {@code target}</td>
- *       <td>✅ wired — takes up to {@code amount} stacks of that attribute's modifier off the target
- *           (「每回合移除 1 层」); removing nothing is not an error, because the rule fires every turn
+ *       <td>wired - takes up to {@code amount} stacks of that attribute's modifier off the target
+ *           ("每回合移除 1 层"); removing nothing is not an error, because the rule fires every turn
  *           anyway</td></tr>
  *   <tr><td>{@code APPLY_BUFF}</td><td>{@code buff}, <b>exactly one of</b> {@code turns} /
  *       {@code permanent} / {@code until}, optional {@code target}</td>
- *       <td>✅ wired — puts the target into a <b>named state</b> ({@code StateBuff}, e.g. 【协奏】/【转魄】/
- *           【触电】). What the state <i>does</i> is separate effects conditioned on {@code has_state}, which
+ *       <td>wired - puts the target into a <b>named state</b> ({@code StateBuff}, e.g. [协奏]/[转魄]/
+ *           [触电]). What the state <i>does</i> is separate effects conditioned on {@code has_state}, which
  *           keeps "what the state is" apart from "what it changes"; plain stat buffs stay {@code MODIFY_ATTR}</td></tr>
  *   <tr><td>{@code GAIN_RESOURCE} / {@code SPEND_RESOURCE}</td><td>{@code resource}, {@code amount}</td>
- *       <td>✅ wired (P8-8)</td></tr>
- *   <tr><td>{@code REDUCE_TOUGHNESS}</td><td>{@code amount}</td><td>☐ needs an element + enemy target</td></tr>
+ *       <td>wired (P8-8)</td></tr>
+ *   <tr><td>{@code REDUCE_TOUGHNESS}</td><td>{@code amount}</td><td>needs an element + enemy target</td></tr>
  *   <tr><td>{@code SUMMON}</td><td><b>no arguments</b></td>
- *       <td>✅ wired — brings the <b>rule owner's own memosprite</b> (忆灵) onto the field
+ *       <td>wired - brings the <b>rule owner's own memosprite</b> (忆灵) onto the field
  *           ({@code Battle.summonMemosprite}). No {@code target}: a memosprite belongs to its summoner and
- *           fights for that camp, so there is nothing to point at. Idempotent — 「若已在场，则使其生命值
- *           回复至上限」 is what the texts say and the refresh is <b>not</b> modelled, so a second firing
+ *           fights for that camp, so there is nothing to point at. Idempotent - "若已在场，则使其生命值
+ *           回复至上限" is what the texts say and the refresh is <b>not</b> modelled, so a second firing
  *           keeps the one already out rather than making a second copy</td></tr>
  *   <tr><td>{@code DAMAGE}</td><td>{@code skill}, {@code damage_param}, optional {@code target}</td>
- *       <td>✅ wired (P8-3)</td></tr>
+ *       <td>wired (P8-3)</td></tr>
  * </table>
  *
  * <p>Effects run in the order written. Every effect credits the <b>owner</b> (the character whose
@@ -111,23 +111,23 @@ import java.util.Set;
 public final class TriggerInterpreter {
 
     /**
-     * ⭐ The two element sources `ADD_ELEMENTAL_WEAKNESS` accepts besides a real element name
-     * (2026-09-30). ⚠ A closed set on purpose: without it a misspelled element would only blow up at
+     * The two element sources `ADD_ELEMENTAL_WEAKNESS` accepts besides a real element name
+     * (2026-09-30). Note: A closed set on purpose: without it a misspelled element would only blow up at
      * RUN time, and only if the rule ever fired -- a wrong answer that reports nothing.
      *
-     * <p>`party_first` -- 「场上我方目标持有属性的弱点」 (character 1006); its
-     * skill text names the rule: 「优先添加我方编队第一位角色持有属性的弱点」.
-     * <p>`random_absent` -- 「添加 1 个随机属性弱点，优先添加目标尚未拥有的弱点」 (character 1405).
+     * <p>`party_first` -- "场上我方目标持有属性的弱点" (character 1006); its
+     * skill text names the rule: "优先添加我方编队第一位角色持有属性的弱点".
+     * <p>`random_absent` -- "添加 1 个随机属性弱点，优先添加目标尚未拥有的弱点" (character 1405).
      */
     private static final Set<String> SPECIAL_ELEMENTS = Set.of("party_first", "random_absent");
 
     private static final Set<String> WIRED = Set.of(
             "INSERT_ACTION", "RESET_TRIGGER_LIMIT",
-            // ⭐ 「为指定敌方单体添加 X 属性弱点」 (2026-09-30; readers 1315, 1310).
+            // "为指定敌方单体添加 X 属性弱点" (2026-09-30; readers 1315, 1310).
             "ADD_ELEMENTAL_WEAKNESS",
             "GAIN_ENERGY", "GAIN_SKILL_POINT", "HEAL", "SHIELD", "EXTRA_TURN", "ADVANCE",
             "GAIN_RESOURCE", "SPEND_RESOURCE", "DAMAGE", "MODIFY_ATTR", "APPLY_BUFF", "REMOVE_STACK", "RAISE_SKILL_HITS",
-            // ⭐ 「【新蕊】可以溢出至 #3%」 (2026-10-02; reader: 1141517 on 遐蝶): a declaration states a resource's overflow,
+            // "[新蕊]可以溢出至 #3%" (2026-10-02; reader: 114151on 遐蝶): a declaration states a resource's overflow,
             // and `Resource` has had both tiers all along -- this widens the second one in battle.
             "RAISE_RESOURCE_CAP",
             "MODIFY_DAMAGE_TAKEN", "BOOST_DAMAGE", "DISPEL", "SUMMON", "SUMMON_SERVANT", "COMMAND_SUMMON", "CAST_SKILL", "DELEGATE_DAMAGE",
@@ -153,14 +153,14 @@ public final class TriggerInterpreter {
      *
      * <p>This set exists to close a silent-typo hole: the resolver used to fall back to "the owner"
      * for anything it did not recognise, so a misspelled {@code target} behaved exactly like
-     * {@code "self"} — a wrong answer that reports nothing. Same reasoning as the condition
+     * {@code "self"} - a wrong answer that reports nothing. Same reasoning as the condition
      * variables being a closed set.
      */
     private static final Set<String> TARGET_SELECTORS =
             Set.of("party_first", "next_ally", "self", "target", "attacker", "all_allies", "party", "other_allies", "summon",
                     "target_and_summon", "all_enemies", "lowest_hp_ally",
             "random_enemy", "random_hit_enemy",
-            // ⭐ 「在**一次行动**中受到致命攻击的**全体**」 (1407 月茉之庇): the allies a lethal blow has landed on since
+            // "在一次行动中受到致命攻击的全体" (140月茉之庇): the allies a lethal blow has landed on since
             // this action began. A SET, not a unit -- hence the `all_` prefix, like `all_allies`.
             // The game spells this as an EVENT, `OnWaveMonster`, so the selector is named after it -- an enemy
             // that entered with the current wave.
@@ -169,17 +169,17 @@ public final class TriggerInterpreter {
             "wave_monster",
             "wave_monsters",
             "all_allies_lethally_hit_this_action",
-            // ⭐ 「随机为 1 个当前能量百分比小于 50% 的我方其他目标」 (light cone 21021). ⚠ The 50%
-            // threshold is the text’s own and no tier changes it, so it is in the method and registered there.
+            // "随机为 1 个当前能量百分比小于 50% 的我方其他目标" (light cone 21021). Note: The 50%
+            // threshold is the text's own and no tier changes it, so it is in the method and registered there.
             "random_ally_below_half_energy",
-            // ⭐ 「若追加攻击施放前目标被消灭则对敌方随机单体发动」 (2026-09-30; three registered readers:
+            // "若追加攻击施放前目标被消灭则对敌方随机单体发动" (2026-09-30; three registered readers:
             // 1220 reason 1, 1221 reason 2, 1305). The preferred target is dead -> take a random enemy.
             // CanHit:88-90 keeps death orthogonal to invulnerability, so this is the clause own wording.
             "target_else_random_enemy",
-            // ⭐ 「被攻击目标中**当前生命值最高**的目标」 (2026-10-02; reader: 1403 缇宝's ultimate, whose zone rider picks that unit, and 1415's
+            // "被攻击目标中当前生命值最高的目标" (2026-10-02; reader: 1403 缇宝's ultimate, whose zone rider picks that unit, and 1415's
             // ode of passage, which names that rider). The sibling of `random_hit_enemy`: same pool, a different pick.
             "highest_hp_attack_hit",
-            // ⭐ 「使我方**全体忆灵**的暴击伤害提高」 (2026-10-02; reader: 1413 长夜月的战技「白昼悄然离去」).
+            // "使我方全体忆灵的暴击伤害提高" (2026-10-02; reader: 1413 长夜月的战技"白昼悄然离去").
             // `summon` says only "the owner's OWN summon", so a clause that speaks of the whole side needs its own name.
             "all_summons");
 
@@ -189,32 +189,32 @@ public final class TriggerInterpreter {
     private static final Set<String> TARGET_ALL_ALLIES = Set.of("all_allies", "party");
 
     /**
-     * "Our side except the rule's owner" — 「除自身以外」.
+     * "Our side except the rule's owner" - "除自身以外".
      *
-     * <p>Its first user is 知更鸟's ultimate: 「使<b>除自身以外的队友</b>立即行动」. {@code all_allies} cannot say it
-     * (302 不老者的仙舟's 「我方全体攻击力提高」 includes the wearer, and that is pinned), and a condition cannot
-     * say it either — conditions filter <b>rules</b>, not the units an effect reaches.
+     * <p>Its first user is 知更鸟's ultimate: "使<b>除自身以外的队友</b>立即行动". {@code all_allies} cannot say it
+     * (302 不老者的仙舟's "我方全体攻击力提高" includes the wearer, and that is pinned), and a condition cannot
+     * say it either - conditions filter <b>rules</b>, not the units an effect reaches.
      */
     private static final String TARGET_OTHER_ALLIES = "other_allies";
 
     /**
-     * The prefix of the <b>state-holder</b> selector: {@code "target": "holder_of:同袍"} — 「持有【同袍】的角色」
-     * (1414 丹恒•腾荒's trace 神秀, and the aim of his technique's auto-cast).
+     * The prefix of the <b>state-holder</b> selector: {@code "target": "holder_of:同袍"} - "持有[同袍]的角色"
+     * (1414 丹恒-腾荒's trace 神秀, and the aim of his technique's auto-cast).
      *
-     * <p><b>Why a parameterised selector had to exist.</b> The engine can already ask 「I am in state X」
+     * <p><b>Why a parameterised selector had to exist.</b> The engine can already ask "I am in state X"
      * ({@code has_state}, a condition) and it can name a fixed <i>role</i> ({@code target} = the unit this cast was
      * aimed at, {@code attacker}, {@code summon}, {@code party_first}…), but it had no way to say <b>the unit that
-     * carries a state</b> — and 1414's kit is built on exactly that: the skill marks one ally as 【同袍】, and both
+     * carries a state</b> - and 1414's kit is built on exactly that: the skill marks one ally as [同袍], and both
      * the trace that buffs it and the technique that re-aims the skill speak about whoever holds it, not about a
      * slot in the roster. A condition cannot do this job: conditions decide whether a <b>rule</b> runs, not which
      * units an effect reaches.
      *
-     * <p>⚠ <b>How many may hold it.</b> The marker is read on the <b>owner's own camp</b> and the <b>first</b> living
+     * <p>Note: <b>How many may hold it.</b> The marker is read on the <b>owner's own camp</b> and the <b>first</b> living
      * holder answers. Keeping it to one is the content's job, and it already has the spelling for it:
-     * {@code REMOVE_STATE} over {@code all_allies} followed by {@code APPLY_BUFF} on the new one (「顺序即语义」,
+     * {@code REMOVE_STATE} over {@code all_allies} followed by {@code APPLY_BUFF} on the new one ("顺序即语义",
      * the same two lines 1414's own skill rule uses).
      *
-     * <p>⚠ <b>Nobody holding it is not an error</b> — it is a legal state of the world for these clauses ("if there
+     * <p>Note: <b>Nobody holding it is not an error</b> - it is a legal state of the world for these clauses ("if there
      * is a 同袍, buff them"). So the selector answers <b>nobody</b>: a list op reaches nobody, and a single-target op
      * reports it through {@code require} like every other missing party. This is deliberately <i>not</i> the
      * {@code summon} treatment, which throws: a rule whose whole subject is the summon contradicts itself when there
@@ -226,74 +226,74 @@ public final class TriggerInterpreter {
     static final String HOLDER_OF_PREFIX = "holder_of:";
 
     /**
-     * "The unit this cast <b>aimed at</b>, and <b>its</b> summon" — 「指定我方单体<b>及其召唤物</b>」.
+     * "The unit this cast <b>aimed at</b>, and <b>its</b> summon" - "指定我方单体<b>及其召唤物</b>".
      *
-     * <p>Its first user is 星期日's Skill (131302): 「使指定我方单体角色<b>及其召唤物</b>立即行动」. It is a
+     * <p>Its first user is 星期日's Skill (131302): "使指定我方单体角色<b>及其召唤物</b>立即行动". It is a
      * <b>pair</b> and it is not the same pair as any existing selector:
      * <ul>
      *   <li>{@code target} advances the chosen ally but not its summon;</li>
-     *   <li>{@code summon} is the <b>rule owner's</b> summon — the wrong unit entirely (星期日's own 忆灵 is not
+     *   <li>{@code summon} is the <b>rule owner's</b> summon - the wrong unit entirely (星期日's own 忆灵 is not
      *       what his Skill advances);</li>
      *   <li>two effects cannot express it either, because the second one would have to name "the summon of the
      *       unit the first one resolved", and a selector cannot refer to another effect's result.</li>
      * </ul>
      *
-     * <p>⚠ A chosen unit <b>without</b> a summon is just that unit, not an error: 「及其召唤物」 only has something
-     * to add when there is one, and 星期日's Skill is cast on ordinary allies all the time. ⚠ Only the summon
+     * <p>Note: A chosen unit <b>without</b> a summon is just that unit, not an error: "及其召唤物" only has something
+     * to add when there is one, and 星期日's Skill is cast on ordinary allies all the time. Note: Only the summon
      * <b>that is out</b> counts ({@code Battle.summonsOf} skips the dead ones), which is why this selector needs a
      * battle like the other group selectors.
      */
     private static final String TARGET_AND_SUMMON = "target_and_summon";
 
     /**
-     * "The whole of the <b>other</b> side" — 「对敌方全体」.
+     * "The whole of the <b>other</b> side" - "对敌方全体".
      *
-     * <p>Its first user is 姬子's Talent (「对敌方全体目标造成等同于姬子140%攻击力的火属性伤害」). Every other
+     * <p>Its first user is 姬子's Talent ("对敌方全体目标造成等同于姬子140%攻击力的火属性伤害"). Every other
      * group selector reads {@link Battle#allies}, so "all enemies" had no spelling at all: the only way to reach
-     * the other camp was {@code target}, one unit at a time, which is not what 「全体」 says.
+     * the other camp was {@code target}, one unit at a time, which is not what "全体" says.
      *
-     * <p>Read through {@link Battle#getOpponents}, so 「敌方」 means "the camp opposing the rule's owner" rather
-     * than "the {@code enemies} list" — the same answer for every character (they are all on our side), and the
-     * honest one if a rule ever belongs to an enemy. ⚠ The dead are <b>not</b> filtered here: like
+     * <p>Read through {@link Battle#getOpponents}, so "敌方" means "the camp opposing the rule's owner" rather
+     * than "the {@code enemies} list" - the same answer for every character (they are all on our side), and the
+     * honest one if a rule ever belongs to an enemy. Note: The dead are <b>not</b> filtered here: like
      * {@code all_allies}, the selector answers "who is on that side", and the op decides what it can do with
      * them ({@code DAMAGE} skips a dead victim on its own). It needs a battle, which is why it is resolved in
      * the list resolver and not the single-target one.
      */
     private static final String TARGET_ALL_ENEMIES = "all_enemies";
     /**
-     * ✅ 「对<b>随机</b>1 个…的敌方目标」 (2026-09-30; reader: 1505’s ultimate rider, and the family of
-     * “random 1” sentences this project had registered as unexpressible: 21029 / 21021 / 21032).
+     * "对<b>随机</b>1 个…的敌方目标" (2026-09-30; reader: 1505's ultimate rider, and the family of
+     * "random 1" sentences this project had registered as unexpressible: 21029 / 21021 / 21032).
      *
-     * <p>⚠ It is a SINGLE target, so it answers in {@code resolveTarget}; an op that wants a list still refuses it, which is the
-     * honest answer -- 「随机 1 个」 is not a group.
+     * <p>Note: It is a SINGLE target, so it answers in {@code resolveTarget}; an op that wants a list still refuses it, which is the
+     * honest answer -- "随机 1 个" is not a group.
      */
     private static final String TARGET_RANDOM_ENEMY = "random_enemy";
 
     /**
-     * 「随机 1 个受到攻击的敌方目标」: a random ONE of the enemies this attack hit.
+     * "随机 1 个受到攻击的敌方目标": a random ONE of the enemies this attack hit.
      *
-     * <p>⚠ MEASURED SEMANTICS (see {@code Damage#hitTargets}): the set is snapshotted when each damage
-     * instance is built, so a PER-HIT reader sees 「so far」 while a CAST-LEVEL reader (firing after the cast
-     * settled) sees all of them. An empty or absent set means 「unknown」 and this selector FAILS rather
-     * than falling back to 「a random enemy」 -- a silent wrong target is worse than an error.
+     * <p>Note: MEASURED SEMANTICS (see {@code Damage#hitTargets}): the set is snapshotted when each damage
+     * instance is built, so a PER-HIT reader sees "so far" while a CAST-LEVEL reader (firing after the cast
+     * settled) sees all of them. An empty or absent set means "unknown" and this selector FAILS rather
+     * than falling back to "a random enemy" -- a silent wrong target is worse than an error.
      */
     private static final String TARGET_RANDOM_HIT_ENEMY = "random_hit_enemy";
 
     /**
-     * "The ally with the lowest HP <b>percentage</b>" — 「当前<b>生命值百分比</b>最低的我方目标」.
+     * "The ally with the lowest HP <b>percentage</b>" - "当前<b>生命值百分比</b>最低的我方目标".
      *
-     * <p>Its first user is 三月七's 星魂 2 (「进入战斗时，为当前生命值百分比最低的我方目标提供等同于三月七24%防御力+
-     * 320的护盾」), and 藿藿's 【禳命】 / 灵砂's 【浮元】 heal the same unit. Before it, "the most hurt one" could
-     * only be picked by a <b>condition</b> — which filters <em>rules</em>, not the units an effect reaches — so the
+     * <p>Its first user is 三月七's 星魂 2 ("进入战斗时，为当前生命值百分比最低的我方目标提供等同于三月七24%防御力+
+     * 320的护盾"), and 藿藿's [禳命] / 灵砂's [浮元] heal the same unit. Before it, "the most hurt one" could
+     * only be picked by a <b>condition</b> - which filters <em>rules</em>, not the units an effect reaches - so the
      * sentence had no spelling at all.
      *
-     * <p>⚠ <b>Percentage, not absolute HP</b>, and the difference is real: with allies at 100/1000 and 900/10000,
-     * the second has fewer HP <i>points</i> (900) but the first has the lower <i>share</i> (10% vs 9%) — the two
-     * questions have different answers, and the documents spell them differently (「生命值百分比最低」 vs 灵砂's
-     * 「生命值最低」). Only the percentage spelling is built, because that is the one three of the four readers use;
+     * <p>Note: <b>Percentage, not absolute HP</b>, and the difference is real: with allies at 100/1000 and 900/10000,
+     * the second has fewer HP <i>points</i> (900) but the first has the lower <i>share</i> (10% vs 9%) - the two
+     * questions have different answers, and the documents spell them differently ("生命值百分比最低" vs 灵砂's
+     * "生命值最低"). Only the percentage spelling is built, because that is the one three of the four readers use;
      * the absolute variant is registered with its reader (灵砂 1222) rather than guessed at now.
      *
-     * <p>⚠ <b>Ties go to the earliest unit in the party order</b>, which is what makes the answer deterministic —
+     * <p>Note: <b>Ties go to the earliest unit in the party order</b>, which is what makes the answer deterministic - 
      * and at {@code BATTLE_START} everybody is at 100%, so every 星魂-2-style rule hits a tie and the choice has to
      * be stated rather than left to the iteration order of a map. The dead are skipped (a corpse has no share to
      * speak of), and an empty camp resolves to <b>no target</b> rather than an error, like the other group
@@ -310,7 +310,7 @@ public final class TriggerInterpreter {
             java.util.Set.of("BOOST_DAMAGE", "DAMAGE", "MODIFY_ATTR", "MODIFY_DAMAGE_TAKEN");
 
     public static void validate(EffectSpec effect, TriggerSpec spec) {
-        // ⚠ A ceiling is only READ by APPLY_DOT today, so every other op refuses it: silently ignoring a field is exactly the
+        // Note: A ceiling is only READ by APPLY_DOT today, so every other op refuses it: silently ignoring a field is exactly the
         // kind of mistake this interpreter's closed sets exist to prevent.
         if ((effect.getCapScale() != null || effect.getCapPercent() != null)
                 && !"APPLY_DOT".equalsIgnoreCase(String.valueOf(effect.getOp()).trim())
@@ -322,7 +322,7 @@ public final class TriggerInterpreter {
 
         String op = normalizeOp(effect, spec);
         requireTargetSelector(effect, op, spec);
-        // ⚠ `cast_target` (who a COMMANDED cast is aimed at) is read by CAST_SKILL and by nothing else, so stating it
+        // Note: `cast_target` (who a COMMANDED cast is aimed at) is read by CAST_SKILL and by nothing else, so stating it
         // anywhere else is refused rather than dropped silently -- the same shape as the `cap_scale` and `damage_type`
         // checks around it, and the reason both of those exist.
         if (effect.getCastTarget() != null && !effect.getCastTarget().isBlank() && !"CAST_SKILL".equals(op)) {
@@ -331,7 +331,7 @@ public final class TriggerInterpreter {
                             + "it: it names the unit a COMMANDED cast is aimed at, which no other op performs "
                             + "(source: " + spec.getSource() + ")");
         }
-        // ⚠ A damage-type scope is only meaningful for the ops that actually READ it, and one of them used to accept it
+        // Note: A damage-type scope is only meaningful for the ops that actually READ it, and one of them used to accept it
         // while ignoring it (BOOST_DAMAGE, fixed 2026-09-29: "follow-up attacks only" silently raised every hit). The
         // closed set below is the fix's other half -- stating a scope an op cannot honour is refused at load time, never
         // silently dropped.
@@ -356,7 +356,7 @@ public final class TriggerInterpreter {
                 if (effect.getElement() == null || effect.getElement().isBlank()) {
                     throw new IllegalArgumentException("Op ADD_ELEMENTAL_WEAKNESS requires element (source: " + spec.getSource() + ")");
                 }
-                // ⚠ Reject it HERE, not at run time: an unknown element that only blows up when the rule
+                // Note: Reject it HERE, not at run time: an unknown element that only blows up when the rule
                 // finally fires is exactly the silent mistake this library keeps closing.
                 String named = effect.getElement().trim();
                 if (!SPECIAL_ELEMENTS.contains(named)
@@ -375,7 +375,7 @@ public final class TriggerInterpreter {
                 requireNoStackArguments(effect, op, spec);
             }
             case "GAIN_ENERGY" -> {
-                // ⭐ A cast parameter is a third spelling (2026-10-02; reader: 1415's ode of sky, 「为风堇恢复 #2 点能量」, whose
+                // A cast parameter is a third spelling (2026-10-02; reader: 1415's ode of sky, "为风堇恢复 #2 点能量", whose
                 // #2 runs 12 -> 33.6). `ENERGY_SCALES` holds only a share of max energy, so the op could not read a number out of the skill that produced it.
                 if (isCastParamScale(effect)) {
                     requireNoStackArguments(effect, op, spec);
@@ -412,7 +412,7 @@ public final class TriggerInterpreter {
                 requireNoStackArguments(effect, op, spec);
             }
             case "RAISE_RESOURCE_CAP" -> {
-                // ⭐ A resource the owner DECLARES, and how far to widen its overflow.
+                // A resource the owner DECLARES, and how far to widen its overflow.
                 requireResource(effect, op, spec);
                 if (effect.getAmount() == null || effect.getAmount() <= 0) {
                     throw new IllegalArgumentException(
@@ -423,7 +423,7 @@ public final class TriggerInterpreter {
             }
             case "GAIN_RESOURCE", "SPEND_RESOURCE" -> {
                 if (Boolean.TRUE.equals(effect.getSpendAll())) {
-                    // 「消耗所有【X】」 (2026-10-02): a spend with no stated SIZE -- and stating one
+                    // "消耗所有[X]" (2026-10-02): a spend with no stated SIZE -- and stating one
                     // beside it is a contradiction, so it is refused rather than silently preferring one.
                     if (!"SPEND_RESOURCE".equals(op)) {
                         throw new IllegalArgumentException(
@@ -448,7 +448,7 @@ public final class TriggerInterpreter {
                 requireNoStackArguments(effect, op, spec);
             }
             case "DAMAGE" -> {
-                // ⚠ `times` says "settle N independent times"; `per_target` says "multiply this one settlement
+                // Note: `times` says "settle N independent times"; `per_target` says "multiply this one settlement
                 // by the event's hit count". Together they have two readings, so the pair is refused -- the
                 // same house rule that refuses `scale` next to `per_target`.
                 if (effect.getTimes() != null && effect.getTimes() < 1) {
@@ -463,18 +463,18 @@ public final class TriggerInterpreter {
                                     + "readings (source: " + spec.getSource() + ")");
                 }
                 // ? Two ways to state the multiplier (2026-09-29): a SKILL ROW (`skill` + `damage_param`) or a LITERAL ratio
-                // (`scale` + `percent`, plus `element` because no skill lends one). 「造成等同于素裳80%攻击力的伤害」 in a technique, a
-                // talent's follow-up or an eidolon has no row to name — 53 and 15 documents state such a ratio.
+                // (`scale` + `percent`, plus `element` because no skill lends one). "造成等同于素裳80%攻击力的伤害" in a technique, a
+                // talent's follow-up or an eidolon has no row to name - 53 and 15 documents state such a ratio.
                 if (effect.getSkill() == null || effect.getSkill().isBlank()) {
                     // ? A literal ratio is scaled either by a derived attribute (`self_attr:ATTACK`) or by a Max HP share (`owner_max_hp` /
-                    // `target_max_hp`, added 2026-09-29 for 「造成等同于X%生命上限的伤害」 -- 16 documents). `requireDerivedScale` stays strict because
+                    // `target_max_hp`, added 2026-09-29 for "造成等同于X%生命上限的伤害" -- 16 documents). `requireDerivedScale` stays strict because
                     // MODIFY_ATTR shares it and a modifier must not name a Max HP.
                     String literalScale = effect.getScale() == null ? "" : effect.getScale().trim();
-                    // ⭐ A share of the SETTLED instance joins this branch (2026-10-02): it states a `percent` and no
+                    // A share of the SETTLED instance joins this branch (2026-10-02): it states a `percent` and no
                     // attribute, exactly like a Max HP share, and it needs `element` for the same reason (no skill row
-                    // lends one). ⚠ It is NOT a `requireDerivedScale` name -- that reader resolves an ATTRIBUTE, and
-                    // 「原伤害」 is not one -- and it must hang on the ONE event whose `amount` is a settled damage.
-                    // ⭐ A share of the SETTLED instance (2026-10-02): `percent` + `element` like a Max HP share, and it
+                    // lends one). Note: It is NOT a `requireDerivedScale` name -- that reader resolves an ATTRIBUTE, and
+                    // "原伤害" is not one -- and it must hang on the ONE event whose `amount` is a settled damage.
+                    // A share of the SETTLED instance (2026-10-02): `percent` + `element` like a Max HP share, and it
                     // must hang on the one event whose `amount` is a settled damage (`DAMAGE_SETTLED`).
                     if ("original_damage".equals(literalScale)) {
                         requireEvent(spec, op, TriggerEvent.DAMAGE_SETTLED);
@@ -498,7 +498,7 @@ public final class TriggerInterpreter {
                 requireFixedCrit(effect, op, spec);
             }
             case "MODIFY_ATTR" -> {
-                // ⚠ A damage-type scope is only read on the INSTANCE route (2026-09-29). Stating it on an ordinary modifier would
+                // Note: A damage-type scope is only read on the INSTANCE route (2026-09-29). Stating it on an ordinary modifier would
                 // be silently ignored, which is the hole the closed-set checks exist to close.
                 if (effect.getDamageType() != null && !effect.getDamageType().isBlank()
                         && !Boolean.TRUE.equals(effect.getInstance())) {
@@ -508,13 +508,13 @@ public final class TriggerInterpreter {
                 }
 
                 requireAttribute(effect, op, spec);
-                // ? A FLAT boost as well as a share (2026-09-29). 「速度提高50点」 states points, not a percentage; 17 documents do this (7 for SPD alone).
+                // ? A FLAT boost as well as a share (2026-09-29). "速度提高50点" states points, not a percentage; 1documents do this (for SPD alone).
                 // The rule is "exactly one": a DERIVED modifier reads `percent x attribute + amount`, while a plain one is either a share or a flat value,
                 // and writing both there would silently let one win.
                 boolean derivedModifier = effect.getScale() != null && !effect.getScale().isBlank();
                 if (derivedModifier) {
                     requirePercent(effect, op, spec);
-                // ⚠ `percent_from_cast_param` is a SECOND way to state the share (2026-10-02): a share from the cast skill with
+                // Note: `percent_from_cast_param` is a SECOND way to state the share (2026-10-02): a share from the cast skill with
                 // no `scale` is exactly as well-formed as one with `percent`, and this check used to call it "neither".
                 } else if ((effect.getPercent() == null && effect.getPercentFromCastParam() == null
                         && effect.getPercentFromSkillParam() == null && effect.getPercentFromResource() == null)
@@ -539,7 +539,7 @@ public final class TriggerInterpreter {
                                     + "(source: " + spec.getSource() + ")");
                 }
                requireDerivedScale(effect, op, spec, true);
-               // ⚠ `per_stack` multiplies the PLAIN magnitude, so a scale would be a second multiplier on the same
+               // Note: `per_stack` multiplies the PLAIN magnitude, so a scale would be a second multiplier on the same
                // number. Refusing the combination keeps "the value" unambiguous.
                if (effect.getPerStack() != null && !effect.getPerStack().isBlank()) {
                    if (derivedModifier) {
@@ -560,8 +560,8 @@ public final class TriggerInterpreter {
                 requireDuration(effect, op, spec);
                 requireNoStackArguments(effect, op, spec);
                 requireTickOwner(effect, op, spec);
-                // 「有 100% 的基础概率使敌方…陷入【通解】状态」 (2026-09-28): a state may be ROLLED, like a DOT or a control.
-                // ⚠ Unstated = applied directly, which keeps every existing file's behaviour exactly as it was.
+                // "有 100% 的基础概率使敌方…陷入[通解]状态" (2026-09-28): a state may be ROLLED, like a DOT or a control.
+                // Note: Unstated = applied directly, which keeps every existing file's behaviour exactly as it was.
                 if (effect.getBaseChance() != null && (effect.getBaseChance() <= 0 || effect.getBaseChance() > 1)) {
                     throw new IllegalArgumentException(
                             "Op " + op + " has \"base_chance\": " + effect.getBaseChance() + ", but a base chance is a "
@@ -569,8 +569,8 @@ public final class TriggerInterpreter {
                 }
             }
             case "REMOVE_STACK" -> {
-                // ⚠ `attribute` OR `buff` (a name), exactly one -- the same "name or attribute" filter `EXTEND_BUFF`
-                // takes, added 2026-09-28 for 【鸣弦号令】: 「移除驭空 1 层【鸣弦号令】」 is about a *named* stackable
+                // Note: `attribute` OR `buff` (a name), exactly one -- the same "name or attribute" filter `EXTEND_BUFF`
+                // takes, added 2026-09-28 for [鸣弦号令]: "移除驭空 1 层[鸣弦号令]" is about a *named* stackable
                 // modifier, which the attribute form cannot address (and REMOVE_STATE takes all of them off).
                 boolean byName = effect.getBuff() != null && !effect.getBuff().isBlank();
                 boolean byAttribute = effect.getAttribute() != null && !effect.getAttribute().isBlank();
@@ -587,7 +587,7 @@ public final class TriggerInterpreter {
                 requireNoStackArguments(effect, op, spec);
             }
             case "MODIFY_DAMAGE_TAKEN" -> {
-                // 「有 100% 的基础概率使…受到的持续伤害提高」: an optional roll (see requireBaseChance).
+                // "有 100% 的基础概率使…受到的持续伤害提高": an optional roll (see requireBaseChance).
                 requireBaseChance(effect, op, spec);
                 requirePercent(effect, op, spec);
                 requireNonZeroPercent(effect, op, spec);
@@ -595,24 +595,24 @@ public final class TriggerInterpreter {
                 requireNoStackArguments(effect, op, spec);
             }
             case "SUPER_BREAK" -> {
-                // 「会将本次伤害的削韧值转化为1次200%的超击破伤害」: needs the instance (`ctx.damage()`) for the same reason
+                // "会将本次伤害的削韧值转化为1次200%的超击破伤害": needs the instance (`ctx.damage()`) for the same reason
                 // ADD_DAMAGE does, plus a percentage of that instance's toughness reduction.
                 requirePercent(effect, op, spec);
                 requireNonZeroPercent(effect, op, spec);
                 requireNoStackArguments(effect, op, spec);
             }
             case "CONSUME_HP" -> {
-                // 「消耗等同于刃生命上限 30% 的生命值」: a COST paid in HP, not damage (2026-09-29).
+                // "消耗等同于刃生命上限 30% 的生命值": a COST paid in HP, not damage (2026-09-29).
                 requirePercent(effect, op, spec);
                 requireNonZeroPercent(effect, op, spec);
                 requireNoDuration(effect, op, spec);
                 requireNoStackArguments(effect, op, spec);
             }
             case "BOOST_TOUGHNESS" -> {
-                // 「使本次攻击的削韧值提高100%」 / 「前2段攻击…削韧值提高50%」: a multiplier on the toughness reduction this
-                // instance will cause. ⚠ Read at ONE place (SkillExecutor.applyStanceDamage), never inside
+                // "使本次攻击的削韧值提高100%" / "前2段攻击…削韧值提高50%": a multiplier on the toughness reduction this
+                // instance will cause. Note: Read at ONE place (SkillExecutor.applyStanceDamage), never inside
                 // Battle.reduceToughness -- that method is also called by enemy skills and by the demo script.
-                // ⚠⚠ A `scale` would be SILENTLY IGNORED (2026-09-29): the magnitude is read as a plain `percent` when the buff is built
+                // Note:Note: A `scale` would be SILENTLY IGNORED (2026-09-29): the magnitude is read as a plain `percent` when the buff is built
                 // (see boostToughness). Loading such a rule and doing nothing is the "wrong number with no symptom" this interpreter refuses
                 // elsewhere, so it is refused here until `scale` is actually wired -- 1315 优势口袋 is the reader that would need it.
                 if (effect.getScale() != null && !effect.getScale().isBlank()) {
@@ -633,14 +633,14 @@ public final class TriggerInterpreter {
                 requireEvent(spec, op, TriggerEvent.DEALING_DAMAGE);
             }
             case "TICK_DOT" -> {
-                // 「使其当前承受的裂伤状态立即产生 1 次相当于原伤害 85% 的伤害」: which state, and what share of it.
+                // "使其当前承受的裂伤状态立即产生 1 次相当于原伤害 85% 的伤害": which state, and what share of it.
                 requireElement(effect, op, spec);
                 requirePercent(effect, op, spec);
                 requireNonZeroPercent(effect, op, spec);
                 requireNoStackArguments(effect, op, spec);
             }
             case "REPLACE_SKILL" -> {
-                // 「将下一次普攻强化为【酒花奔涌】」: which slot, which data row, and how long the swap lasts.
+                // "将下一次普攻强化为[酒花奔涌]": which slot, which data row, and how long the swap lasts.
                 requireSkill(effect, op, spec);
                 if (effect.getSkillId() == null || effect.getSkillId() <= 0) {
                     throw new IllegalArgumentException(
@@ -651,14 +651,14 @@ public final class TriggerInterpreter {
                 requireNoStackArguments(effect, op, spec);
             }
             case "REMOVE_BUFF" -> {
-                // 「解除指定敌方单体的1个增益效果」: the mirror of DISPEL -- that one cleans OUR side's debuffs, this one
+                // "解除指定敌方单体的1个增益效果": the mirror of DISPEL -- that one cleans OUR side's debuffs, this one
                 // strips the TARGET's benefits. Permanent buffs are skipped (see BuffManager.removeBuffs): nobody's skill
                 // dispels a loadout.
                 requirePositiveAmount(effect, op, spec);
                 requireNoStackArguments(effect, op, spec);
             }
             case "DISPEL" -> {
-                // ⭐ Either an amount, or a CLASS -- and with a class the amount is optional, because 「所有控制类负面状态」
+                // Either an amount, or a CLASS -- and with a class the amount is optional, because "所有控制类负面状态"
                 // counts nothing (2026-10-02). Both together is allowed too: "the newest two of that class".
                 if (effect.getKind() != null && !effect.getKind().isBlank()) {
                     requireDebuffClass(effect, op, spec);
@@ -669,7 +669,7 @@ public final class TriggerInterpreter {
                 requireNoStackArguments(effect, op, spec);
             }
             case "TAUNT" -> {
-                // 「使目标陷入嘲讽状态，持续N回合」: the engine's TauntBuff is a pure marker with a hard
+                // "使目标陷入嘲讽状态，持续N回合": the engine's TauntBuff is a pure marker with a hard
                 // target-selection constraint, so all this op needs is the duration. No `permanent` / `until`: a
                 // marker with no turn count would never come off, and no document writes it that way.
                 Integer turns = effect.getTurns();
@@ -686,8 +686,8 @@ public final class TriggerInterpreter {
                 requireNoStackArguments(effect, op, spec);
             }
             case "REMOVE_STATE" -> {
-                // `buff` is the state's name — the same spelling `has_state` reads and `APPLY_BUFF` writes, so the
-                // three are one vocabulary. ⚠ No count: 「解除…状态」 takes the state off, it does not take N of
+                // `buff` is the state's name - the same spelling `has_state` reads and `APPLY_BUFF` writes, so the
+                // three are one vocabulary. Note: No count: "解除…状态" takes the state off, it does not take N of
                 // them, and an `amount` here would be silently ignored (which is what this op exists to avoid).
                 // `buff` (a name) OR `attribute` (what a modifier modifies), and optionally `"kind": "own"` for
                 // "only what THIS rule's owner applied" (2026-10-02) -- the origin filter `EXTEND_BUFF` has always had.
@@ -713,7 +713,7 @@ public final class TriggerInterpreter {
                 }
             }
             case "APPLY_CONTROL" -> {
-                // 「有 50% 基础概率使敌方目标陷入冻结状态，持续 1 回合」: a named control state, a duration, and
+                // "有 50% 基础概率使敌方目标陷入冻结状态，持续 1 回合": a named control state, a duration, and
                 // (optionally) a base chance that goes through 效果命中 / 效果抵抗. The effect may also carry the
                 // state's OWN per-turn damage (`element` + a magnitude), which lands with the state.
                 requireControl(effect, op, spec);
@@ -728,12 +728,12 @@ public final class TriggerInterpreter {
                 requireStateDamage(effect, op, spec);
             }
             case "APPLY_DOT" -> {
-                // 「使目标陷入灼烧状态，每回合造成等同于…的伤害」: a damage-over-time attached by a rule. The
-                // element is the engine's own spelling (Fire → 灼烧), the magnitude is either flat or derived
+                // "使目标陷入灼烧状态，每回合造成等同于…的伤害": a damage-over-time attached by a rule. The
+                // element is the engine's own spelling (Fire to 灼烧), the magnitude is either flat or derived
                 // from the RULE OWNER's attribute, and it is frozen into the buff when it lands.
                 requireElement(effect, op, spec);
                 requireDotMagnitude(effect, op, spec);
-        // 「最多不超过卢卡攻击力的 338%」: a derived ceiling -- the magnitude is the SMALLER of the two values.
+        // "最多不超过卢卡攻击力的 338%": a derived ceiling -- the magnitude is the SMALLER of the two values.
         if (effect.getCapScale() != null || effect.getCapPercent() != null) {
             if (effect.getCapScale() == null || effect.getCapPercent() == null) {
                 throw new IllegalArgumentException(
@@ -744,7 +744,7 @@ public final class TriggerInterpreter {
 
                 requirePositiveTurns(effect, op, spec);
                 requireBaseChance(effect, op, spec);
-                // ⚠ `max_stacks` IS allowed here (「最多叠加 N 层」, 2026-09-28): the general stack-family refusal would
+                // Note: `max_stacks` IS allowed here ("最多叠加 N 层", 2026-09-28): the general stack-family refusal would
                 // reject it, so the ceiling is validated on its own -- a positive count, nothing else from that family.
                 requireDotStackCap(effect, op, spec);
                 if (Boolean.TRUE.equals(effect.getPermanent()) || eventBound(effect)) {
@@ -756,9 +756,9 @@ public final class TriggerInterpreter {
                 requireNoMalformedArguments(effect, op, spec);
             }
             case "EXTEND_BUFF" -> {
-                // 「…的持续时间增加1回合」: lengthen the buffs THIS owner already applied to the target, named by
-                // their state (「战技提供的护盾」/「天赋使敌方目标陷入的风化状态」) or by the attribute a modifier
-                // sits on (「伤害提高效果」). Nothing else is stated.
+                // "…的持续时间增加1回合": lengthen the buffs THIS owner already applied to the target, named by
+                // their state ("战技提供的护盾"/"天赋使敌方目标陷入的风化状态") or by the attribute a modifier
+                // sits on ("伤害提高效果"). Nothing else is stated.
                 requireSignedTurns(effect, op, spec);
                 requireNoStackArguments(effect, op, spec);
                 if (Boolean.TRUE.equals(effect.getPermanent()) || eventBound(effect)) {
@@ -770,14 +770,14 @@ public final class TriggerInterpreter {
                 requireExtendFilter(effect, op, spec);
             }
             case "RESIST_DEBUFF" -> {
-                // 「抵抗控制类负面状态的概率提高35%」 / 「免疫控制类负面状态」: a class resistance the CARRIER holds, so
+                // "抵抗控制类负面状态的概率提高35%" / "免疫控制类负面状态": a class resistance the CARRIER holds, so
                 // it is a buff on the target (timed, or permanent for a 行迹).
                 requireDebuffClass(effect, op, spec);
                 requirePercent(effect, op, spec);
                 requireNoStackArguments(effect, op, spec);
                 requireDuration(effect, op, spec);
                 requireTickOwner(effect, op, spec);
-                // `buff` is READ (2026-09-28): the name the resistance carries, so 「处于【协奏】状态时免疫控制类」
+                // `buff` is READ (2026-09-28): the name the resistance carries, so "处于[协奏]状态时免疫控制类"
                 // can be taken off together with the state it belongs to (see `named`). It used to be refused here.
                 if (effect.getAmount() != null || effect.getScale() != null || effect.getAttribute() != null
                         || effect.getSkill() != null
@@ -798,7 +798,7 @@ public final class TriggerInterpreter {
                 }
             }
             case "START_COUNTDOWN" -> {
-                // 「行动序列上出现【协奏】倒计时…倒计时固定拥有 90 点速度」 (M-49): a unit whose only job is to have a turn.
+                // "行动序列上出现[协奏]倒计时…倒计时固定拥有 90 点速度" (M-49): a unit whose only job is to have a turn.
                 if (effect.getSpeed() == null || effect.getSpeed() <= 0) {
                     throw new IllegalArgumentException(
                             "Op " + op + " needs a positive \"speed\": the countdown's turn is decided by it, and a "
@@ -808,20 +808,20 @@ public final class TriggerInterpreter {
                 rejectCountdownExtras(effect, op, spec);
             }
             case "APPLY_REGEN" -> {
-                // 「每回合开始时为其回复等同于…生命上限的 X% + N，持续 M 回合」: the healing twin of APPLY_DOT.
+                // "每回合开始时为其回复等同于…生命上限的 X% + N，持续 M 回合": the healing twin of APPLY_DOT.
                 // Its magnitude is a HEAL amount, so it takes the heal/shield scale vocabulary (SCALES), NOT the
-                // self_attr: one the MODIFY_ATTR family uses -- 「等同于她生命上限的 7.2%」 is owner_max_hp.
+                // self_attr: one the MODIFY_ATTR family uses -- "等同于她生命上限的 .2%" is owner_max_hp.
                 requireAmountOrScale(effect, op, spec, SCALES, "Max HP");
                 requireDuration(effect, op, spec);
                 requireBuff(effect, op, spec);
             }
             case "ADD_STACK" -> {
-                // 「每当我方目标…施放2次…后」 / 「触发2次后自动解除」: a counter, which is a named stack buff (see StackBuff).
+                // "每当我方目标…施放2次…后" / "触发2次后自动解除": a counter, which is a named stack buff (see StackBuff).
                 requireBuff(effect, op, spec);
                 requireDuration(effect, op, spec);
             }
             case "RAISE_SKILL_HITS" -> {
-                // ⭐ The DATA SLOT, not a SkillType letter (2026-10-02): the executor knows the slot number.
+                // The DATA SLOT, not a SkillType letter (2026-10-02): the executor knows the slot number.
                 if (effect.getSkillId() == null || effect.getSkillId() <= 0) {
                     throw new IllegalArgumentException(
                             "Op " + op + " needs \"skill_id\": the data slot whose hit count changes (source: "
@@ -830,7 +830,7 @@ public final class TriggerInterpreter {
                 requireAmount(effect, op, spec);
             }
             case "RAISE_SKILL_LEVEL" -> {
-                // 「战技等级+1」「终结技等级+1」 (1001 星魂 3/5 and the same sentence in most kits): the level a skill is
+                // "战技等级+1""终结技等级+1" (1001 星魂 3/5 and the same sentence in most kits): the level a skill is
                 // READ at is character data plus this battle's raises (M-32), and one op is what raises it -- never a
                 // second copy of the rule at another level, which would double a cast like `per_turn` doubling does.
                 requireSkill(effect, op, spec);
@@ -845,7 +845,7 @@ public final class TriggerInterpreter {
                 rejectSkillLevelExtras(effect, op, spec);
             }
             case "MODIFY_RULE" -> {
-                // 「天赋的反击效果每回合可触发的次数增加1次」 / 「施放终结技时，冻结敌方目标的基础概率提高15%」: a passive
+                // "天赋的反击效果每回合可触发的次数增加1次" / "施放终结技时，冻结敌方目标的基础概率提高15%": a passive
                 // that RAISES a number on another rule in the same file. Which number is decided by which field is
                 // stated -- an `amount` is a count of firings, a `percent` is a probability -- and the shape of the
                 // named rule is checked by the table (TriggerTable.validateAmendments), which is the only place that
@@ -884,8 +884,8 @@ public final class TriggerInterpreter {
                                         + "(source: " + spec.getSource() + ")");
                     }
                 } else if (effect.getEffectPercentFromResource() != null) {
-                    // ⭐ A fifth amendment spelling (2026-10-02): the SIZE is a resource, in basis points.
-                    // ⚠ NOT `requireResource`: that checks `resource`, and this spelling names its resource in `effect_percent_from_resource`.
+                    // A fifth amendment spelling (2026-10-02): the SIZE is a resource, in basis points.
+                    // Note: NOT `requireResource`: that checks `resource`, and this spelling names its resource in `effect_percent_from_resource`.
                     rejectAmendmentExtras(effect, op, spec, "effect_percent_from_resource");
                     rejectAmendmentExtras(effect, op, spec, "effect_percent");
                 } else {
@@ -898,11 +898,11 @@ public final class TriggerInterpreter {
                     }
                     rejectAmendmentExtras(effect, op, spec, "percent");
                 }
-                // ⭐ A CAST_SETUP may file the amendment when the grant lasts the whole battle (2026-10-02; reader: 1141524 第三句). The guard's own reason is
-                // "a bonus granted mid-battle would have to be taken back when whatever granted it ended, and nothing does that" -- and this sentence's grant is 「整场生效」.
+                // A CAST_SETUP may file the amendment when the grant lasts the whole battle (2026-10-02; reader: 1141524 第三句). The guard's own reason is
+                // "a bonus granted mid-battle would have to be taken back when whatever granted it ended, and nothing does that" -- and this sentence's grant is "整场生效".
                 if (TriggerEvent.fromString(spec.getOn()) != TriggerEvent.BATTLE_START
                         && TriggerEvent.fromString(spec.getOn()) != TriggerEvent.CAST_SETUP
-                        // ⭐ And SUMMONED (2026-10-02; reader: 1141517, whose grant is 「整场生效」): the amendment is filed when the summon arrives.
+                        // And SUMMONED (2026-10-02; reader: 114151, whose grant is "整场生效"): the amendment is filed when the summon arrives.
                         && TriggerEvent.fromString(spec.getOn()) != TriggerEvent.SUMMONED) {
                     throw new IllegalArgumentException(
                             "Op " + op + " amends a rule for the whole battle, so it only makes sense on "
@@ -916,7 +916,7 @@ public final class TriggerInterpreter {
                 scaleAttribute(effect, op, spec);
                 requirePercent(effect, op, spec);
                 requireNoStackArguments(effect, op, spec);
-                // ⚠ A COUNT is not an amount (2026-10-02). 「额外造成 #1 次附加伤害」 counts INSTANCES, and this op adds one amount to the
+                // Note: A COUNT is not an amount (2026-10-02). "额外造成 #1 次附加伤害" counts INSTANCES, and this op adds one amount to the
                 // damage being settled -- a `times` here would be read by nobody and the rule would look right while delivering one flat
                 // addition. The sentence that led here is 1415's ode of passage; its second half is registered rather than approximated.
                 if (effect.getTimes() != null || effect.getTimesFrom() != null) {
@@ -945,7 +945,7 @@ public final class TriggerInterpreter {
                     throw new IllegalArgumentException("Op CAST_SKILL names skill \"" + effect.getSkill()
                             + "\", which is not a SkillType (source: " + spec.getSource() + ")");
                 }
-                // ⭐ The named skill is executed by the ENGINE's own path, so there is no column to name (2026-10-02):
+                // The named skill is executed by the ENGINE's own path, so there is no column to name (2026-10-02):
                 // the fields that would be a second reading of the row are refused rather than silently ignored.
                 requireNoRowArguments(effect, op, spec);
             }
@@ -988,12 +988,12 @@ public final class TriggerInterpreter {
         double previousCredited = 0;
         for (EffectSpec effect : rule.effects()) {
             final int thisEffect = effectIndex++;
-            // 「终结技的持续时间额外增加 1 回合」/「天赋的伤害提高效果额外提高 10%」 (2026-09-28): an amendment to the
-            // named rule's own effect values. ⚠ A COPY, not a mutation: the compiled EffectSpec is shared by every
+            // "终结技的持续时间额外增加 1 回合"/"天赋的伤害提高效果额外提高 10%" (2026-09-28): an amendment to the
+            // named rule's own effect values. Note: A COPY, not a mutation: the compiled EffectSpec is shared by every
             // battle, so adjusting it in place would leak the amendment (and, in the test suite, into other tests).
-            // The fast path returns the same instance, so the 57 places that read `percent`/`turns` stay untouched.
+            // The fast path returns the same instance, so the 5places that read `percent`/`turns` stay untouched.
             if (effect.getMinEidolon() != null && eidolonRankOf(ctx.owner()) < effect.getMinEidolon()) {
-                // ⭐ 2026-10-02: this EFFECT belongs to an Eidolon rank the unit does not have. The rule-level
+                // 2026-10-02: this EFFECT belongs to an Eidolon rank the unit does not have. The rule-level
                 // `min_eidolon` cannot express this -- it would switch off the whole rule, base part included.
                 continue;
             }
@@ -1004,24 +1004,24 @@ public final class TriggerInterpreter {
             // The rule's own id travels with the effect: `MODIFY_RULE` can raise a rule's base chance, and the only
             // op that consumes that amendment (APPLY_CONTROL) has to know which rule it is running inside. Passing it
             // down beats a field on the context -- a nested firing would clobber shared state, and this is per-rule.
-            // ⭐ BOTH resource-moving ops (2026-10-02): the first version measured only a GAIN, so a SPEND went down the `else` and never set
-            // `previousCredited` at all -- measured: 「每消耗 1% 溢出值…」 read 0 instead of the amount spent.
+            // BOTH resource-moving ops (2026-10-02): the first version measured only a GAIN, so a SPEND went down the `else` and never set
+            // `previousCredited` at all -- measured: "每消耗 1% 溢出值…" read 0 instead of the amount spent.
             String movingOp = normalizeOp(effect, null);
-            // ⭐ Match the RAW op too (2026-10-02): `normalizeOp` derives its name and a spend spelled `overflow_only` did not reach this branch, so the capture of a spend read 0.
+            // Match the RAW op too (2026-10-02): `normalizeOp` derives its name and a spend spelled `overflow_only` did not reach this branch, so the capture of a spend read 0.
             String rawOp = effect.getOp() == null ? "" : effect.getOp().trim().toUpperCase(java.util.Locale.ROOT);
             if ("GAIN_RESOURCE".equals(movingOp) || "SPEND_RESOURCE".equals(movingOp)
                     || "GAIN_RESOURCE".equals(rawOp) || "SPEND_RESOURCE".equals(rawOp)) {
-                // ⭐ 2026-10-02: the amount this effect ACTUALLY credits (after the cap) is what the next effect may
+                // 2026-10-02: the amount this effect ACTUALLY credits (after the cap) is what the next effect may
                 // take a share of. Measured from the holder itself, so the cap is included by construction.
                 CanHit holder = resolveTarget(effect, effectCtx);
                 String resourceId = effect.getResource();
-                // ⭐ Through `resourceAmount`, which knows BOTH stores (2026-10-02; measured: 【新蕊】 is `scope: PARTY`, so reading the holder's own store gave 0 on
+                // Through `resourceAmount`, which knows BOTH stores (2026-10-02; measured: [新蕊] is `scope: PARTY`, so reading the holder's own store gave 0 on
                 // both sides of the move and the capture of a spend read 0 even though the spend itself worked).
-                // ⭐ EITHER store, never both (2026-10-02; measured: `resourceAmount` ADDS the holder's store to the party's, so a SELF resource was counted twice and a capture of 4 read 8).
+                // EITHER store, never both (2026-10-02; measured: `resourceAmount` ADDS the holder's store to the party's, so a SELF resource was counted twice and a capture of 4 read 8).
                 int creditedBefore = measureForTheDelta(effectCtx, holder, resourceId);
                 applyOne(battle, effect, effectCtx, previousCredited);
                 int creditedAfter = measureForTheDelta(effectCtx, holder, resourceId);
-                // ⭐ The MAGNITUDE of what the previous effect moved (2026-10-02; reader: 1141517 「每消耗 1% 溢出值…」). A gain arrives positive and a spend
+                // The MAGNITUDE of what the previous effect moved (2026-10-02; reader: 114151"每消耗 1% 溢出值…"). A gain arrives positive and a spend
             // NEGATIVE, and `amount_from_previous` is asked for a size, not a direction -- measured: this is the only place `previousCredited` is set, and `gainResource` is its
             // only reader, so the sign carried no information anyone used.
             previousCredited = Math.abs(creditedAfter - creditedBefore);
@@ -1044,18 +1044,18 @@ public final class TriggerInterpreter {
         if (table == null || table.isEmpty()) {
             return 0;
         }
-        // ⚠ Per rule, not up front (2026-09-28): see TriggerTable.rulesFor. A condition that reads what an earlier
+        // Note: Per rule, not up front (2026-09-28): see TriggerTable.rulesFor. A condition that reads what an earlier
         // rule of the SAME event just changed (a counter marked on this attack, say) has to be evaluated when its own
         // rule is reached, or it can never be true.
         List<CompiledRule> rules = table.rulesFor(event);
         CanHit owner = ctx.owner();
         int fired = 0;
         for (CompiledRule rule : rules) {
-            // ⭐ ONE expression, read at all four sites below (2026-09-30; the count-and-reset family).
+            // ONE expression, read at all four sites below (2026-09-30; the count-and-reset family).
             // The comment on startTriggerCooldown names the failure this avoids: recording one key while
             // checking another makes a rule fire forever, or never again.
             String limitKey = rule.key() + subjectSuffix(rule, ctx);
-            // ⚠ The conditions are checked HERE, per rule, because rulesFor no longer filters (2026-09-28). Harmless
+            // Note: The conditions are checked HERE, per rule, because rulesFor no longer filters (2026-09-28). Harmless
             // to re-check: matches is the same pure predicate matching used.
             if (!rule.matches(ctx)) {
                 continue;
@@ -1068,13 +1068,13 @@ public final class TriggerInterpreter {
                     rule.perTurn() + owner.rulePerTurnBonus(rule.id()))) {
                 continue;
             }
-            // 「每次攻击只可触发 1 次」: the attack in progress is one sequence value for every instance it
+            // "每次攻击只可触发 1 次": the attack in progress is one sequence value for every instance it
             // settles, so this is the one cap a per-turn count cannot express.
             if (owner != null && rule.perAttack() > 0
                     && !owner.isAttackLimitReady(limitKey, battle.attackSequence(), rule.perAttack())) {
                 continue;
             }
-            // An Eidolon gate (「星魂 N 解锁」): the rank is a construction-time property of the rule's owner, so
+            // An Eidolon gate ("星魂 N 解锁"): the rank is a construction-time property of the rule's owner, so
             // the rule itself is the only place that has to know it is an Eidolon.
             // [WAVE CAP] the same shape as the attack cap above, compared against the wave number instead.
             if (owner != null && Boolean.TRUE.equals(rule.oncePerWave())
@@ -1083,14 +1083,14 @@ public final class TriggerInterpreter {
             }            if (rule.minEidolon() > 0 && eidolonRankOf(owner) < rule.minEidolon()) {
                 continue;
             }
-            // A rule-level probability (「有 35% 的固定概率…」). A failed roll costs nothing: no cooldown is
+            // A rule-level probability ("有 35% 的固定概率…"). A failed roll costs nothing: no cooldown is
             // started and no once-per-battle flag is set, because nothing happened.
             if (rule.chance() < 1 && !battle.rollChance(rule.chance())) {
                 continue;
             }
             apply(battle, rule, ctx.withRule(rule.id()));
             if (owner != null) {
-                // ⚠ The count recorded is the SAME number the check above used: recording the stated per_turn while
+                // Note: The count recorded is the SAME number the check above used: recording the stated per_turn while
                 // checking the amended one would make an amended rule fire forever (its counter would never reach the
                 // raised cap). One expression, read twice -- see `amendedPerTurn`.
                 owner.startTriggerCooldown(limitKey, rule.cooldownTurns(), rule.oncePerBattle(),
@@ -1127,7 +1127,7 @@ public final class TriggerInterpreter {
         }
         EffectSpec amended = effect;
         if (percentDelta != null && effect.getPercent() != null) {
-            // ⭐ Only a LITERAL share is raised in place (2026-10-02). When the share comes from a spelling (`percent_from_skill_param` and friends), writing a `percent`
+            // Only a LITERAL share is raised in place (2026-10-02). When the share comes from a spelling (`percent_from_skill_param` and friends), writing a `percent`
             // here would REPLACE it -- `shareOf` reads `percent` first -- so the amendment would erase the rule's own number instead of adding to it. `shareOf` adds it instead.
             amended = amended.withPercent(percentDelta);
         }
@@ -1143,8 +1143,8 @@ public final class TriggerInterpreter {
     /**
      * The suffix that scopes a firing count to another unit, or {@code ""} for the owner.
      *
-     * <p>「该效果每个角色最多触发 1 次」 counts per TRIGGERER, 「目标每有 1 个负面效果」-style
-     * limits count per TARGET. ⚠ The identity is System.identityHashCode: names are for messages and may
+     * <p>"该效果每个角色最多触发 1 次" counts per TRIGGERER, "目标每有 1 个负面效果"-style
+     * limits count per TARGET. Note: The identity is System.identityHashCode: names are for messages and may
      * repeat, and the counters live on the combatant, so an identity within one battle is exactly the scope
      * the counters have.
      */
@@ -1166,8 +1166,8 @@ public final class TriggerInterpreter {
         String op = normalizeOp(effect, null);
         switch (op) {
             case "ADD_ELEMENTAL_WEAKNESS" -> {
-                // ⚠ Two named sources beside a real element name (the loader keeps this a closed set):
-                //   `party_first` -- the first character of the party, per 1006’s own skill text.
+                // Note: Two named sources beside a real element name (the loader keeps this a closed set):
+                //   `party_first` -- the first character of the party, per 1006's own skill text.
                 //   `random_absent` -- a random element the target does NOT already have (1405).
                 String named = effect.getElement().trim();
                 DamageElement weakness;
@@ -1190,13 +1190,13 @@ public final class TriggerInterpreter {
                     weakness = DamageElement.fromString(named);
                 }
                 if (weakness == null) {
-                    // ⚠ Not an error for the two named sources: 1006 may have no party attribute to offer and
+                    // Note: Not an error for the two named sources: 1006 may have no party attribute to offer and
                     // 1405 may find no absent element. The clause simply does nothing then.
                     if (SPECIAL_ELEMENTS.contains(named)) { break; }
                     throw new IllegalStateException("Op ADD_ELEMENTAL_WEAKNESS names an element that is not a DamageElement");
                 }
                 for (CanHit victim : resolveTargets(battle, effect, ctx)) {
-                    // ⭐ 「为敌方目标添加弱点时」(cone 23050). ⚠ Asked first, then changed, then fired:
+                    // "为敌方目标添加弱点时"(cone 23050). Note: Asked first, then changed, then fired:
                     //    a repeat insertion is NOT an insertion, and firing then would be a quiet OVER-fire.
                     if (victim instanceof com.laosun.aluminium.models.enemy.Enemy en && !en.isWeakTo(weakness)) {
                         if (effect.getTurns() != null && effect.getTurns() > 0) {
@@ -1226,10 +1226,10 @@ public final class TriggerInterpreter {
             case "GAIN_SKILL_POINT" -> battle.gainSkillPoint((int) Math.round(scaledAmount(effect, ctx)));
             case "HEAL" -> {
                 for (CanHit target : resolveTargets(battle, effect, ctx)) {
-                    // ⚠ The healer is the RULE OWNER, not `null` (changed 2026-09-28 with M-43). A `HEAL` effect is
-                    // the owner healing somebody, and `HEALED`'s `actor` is what 「受到<b>队友提供的</b>治疗」 reads; with
+                    // Note: The healer is the RULE OWNER, not `null` (changed 2026-09-28 with M-43). A `HEAL` effect is
+                    // the owner healing somebody, and `HEALED`'s `actor` is what "受到<b>队友提供的</b>治疗" reads; with
                     // `null` there was no way to ask who healed, so that half of 大丽花's trace could not be written.
-                    // ⚠ Measured before the change: no shipped content subscribes to `HEALED` at all, and no shipped
+                    // Note: Measured before the change: no shipped content subscribes to `HEALED` at all, and no shipped
                     // content grants `OUTGOING_HEALING_BOOST`, so this changes no number today -- it only makes the
                     // attribution true (and a rule-driven heal now reads the owner's healing boost, as a skill's does).
                     battle.heal(ctx.owner(), target, grantAmount(effect, target, ctx));
@@ -1238,10 +1238,10 @@ public final class TriggerInterpreter {
             case "SHIELD" -> {
                 for (CanHit target : resolveTargets(battle, effect, ctx)) {
                     double amount = grantAmount(effect, target, ctx);
-                    // 「持续N回合」 is a *timed* shield: the ShieldBuff installs the value and takes it off
+                    // "持续N回合" is a *timed* shield: the ShieldBuff installs the value and takes it off
                     // again, so the number and its lifetime stay one fact. Without `turns` the shield is the
                     // raw grant it has always been (it comes off only when it is used up).
-                    // ⚠ Both arms name the provider (`ctx.owner()`): 「装备者提供的护盾量提高 X%」 is about the
+                    // Note: Both arms name the provider (`ctx.owner()`): "装备者提供的护盾量提高 X%" is about the
                     // *giver's* shields, so a grant with no provider would silently ignore the set bonus.
                     if (effect.getTurns() == null) {
                         battle.grantShield(ctx.owner(), target, amount, ctx.ruleId());
@@ -1250,7 +1250,7 @@ public final class TriggerInterpreter {
                                 withSource(new ShieldBuff(ctx.owner(), amount, effect.getTurns()), ctx));
                         // P12 (M-43): the timed path installs its shield through a buff, which has no Battle handle,
                         // so this is the only place that can announce it. Fired AFTER the buff is on, so a rule that
-                        // answers 「获得护盾时」 sees the shield it is reacting to.
+                        // answers "获得护盾时" sees the shield it is reacting to.
                         if (amount > 0) {
                             battle.fireTriggersForAlly(TriggerEvent.SHIELD_GRANTED, ctx.owner(), target, amount);
                         }
@@ -1258,8 +1258,8 @@ public final class TriggerInterpreter {
                 }
             }
             case "INSERT_ACTION" -> {
-                // ⭐ 「德谬歌立即获得 1 个额外回合并自动施放【花与箭的舞曲】」(1415 memosprite skill 10): a unit outside the action
-                // order acts now -- the game's `TurnInsertAction`. ⚠ NOT `EXTRA_TURN`: that one cuts into a queue the unit is already in, and
+                // "德谬歌立即获得 1 个额外回合并自动施放[花与箭的舞曲]"(1415 memosprite skill 10): a unit outside the action
+                // order acts now -- the game's `TurnInsertAction`. Note: NOT `EXTRA_TURN`: that one cuts into a queue the unit is already in, and
                 // a memosprite at Speed 0 is not in it at all (the game pins it there with `SpeedOverride`).
                 CanHit acting = require(resolveTarget(effect, ctx), "target", ctx);
                 if (!battle.insertAction(acting)) {
@@ -1268,7 +1268,7 @@ public final class TriggerInterpreter {
                 }
             }
             case "EXTRA_TURN" -> {
-                // ⚠⚠ A refused grant used to vanish (2026-10-02): `grantExtraTurn` answers false for a unit that is not in the action
+                // Note:Note: A refused grant used to vanish (2026-10-02): `grantExtraTurn` answers false for a unit that is not in the action
                 // order -- and a memosprite at Speed 0 is exactly that -- so the rule looked like it had worked. Measured on 1415's ode of
                 // genesis, whose clause grants 德谬歌 an extra turn: the judge read "extra turn actor = none" and nothing said why.
                 CanHit holder = require(resolveTarget(effect, ctx), "target", ctx);
@@ -1279,7 +1279,7 @@ public final class TriggerInterpreter {
                 }
             }
             case "ADVANCE" -> {
-                // One target or a group: 「使该目标立即行动」 and 「使除自身以外的队友立即行动」 are the same op, and
+                // One target or a group: "使该目标立即行动" and "使除自身以外的队友立即行动" are the same op, and
                 // the list resolver is what tells them apart (it is the one HEAL/SHIELD already use for "our
                 // side"). Advancing several units is what the group selectors were resolved for.
                 for (CanHit target : resolveTargets(battle, effect, ctx)) {
@@ -1302,22 +1302,22 @@ public final class TriggerInterpreter {
                 fireResourceChanged(battle, ctx, movedId, resourceAmount(battle, mover, movedId) - before);
             }
             case "DAMAGE" -> {
-                // A list, like HEAL/SHIELD: 「对敌方全体」 is one effect that reaches several units, and the
+                // A list, like HEAL/SHIELD: "对敌方全体" is one effect that reaches several units, and the
                 // engine settles one instance per victim (that is what a group attack is here).
-                // ⚠ `times` repeats the WHOLE settlement, and because resolveTargets is called INSIDE the outer
-                // loop, every repetition re-draws its target -- which is what 「每次对随机敌方单体」 means.
-                // ⭐ 「每消耗 1 点…额外 1 次」 (2026-10-02): the repeat count can follow the event.
+                // Note: `times` repeats the WHOLE settlement, and because resolveTargets is called INSIDE the outer
+                // loop, every repetition re-draws its target -- which is what "每次对随机敌方单体" means.
+                // "每消耗 1 点…额外 1 次" (2026-10-02): the repeat count can follow the event.
                 int times = effect.getTimes() == null ? 1 : effect.getTimes();
                 if (effect.getTimesFrom() != null) {
                     String from = effect.getTimesFrom().trim();
                     if ("event_amount".equals(from)) {
                         times = (int) Math.abs(ctx.amount());
                     } else if ("hit_count".equals(from)) {
-                        // ⭐ 「每有 1 名目标受到攻击，会…造成 1 次」 (2026-10-02; reader: 1403 缇宝's zone rider): the repeat count is how many
+                        // "每有 1 名目标受到攻击，会…造成 1 次" (2026-10-02; reader: 1403 缇宝's zone rider): the repeat count is how many
                         // targets this attack connected with. It belongs HERE and not in `per_target`, which multiplies a magnitude.
                         times = Math.max(0, ctx.hitCount());
                     } else if (from.startsWith("resource:")) {
-                        // ⭐ 「计数器有几点就多打几次」 (2026-10-02; reader: 1141526's extra hit).
+                        // "计数器有几点就多打几次" (2026-10-02; reader: 1141526's extra hit).
                         String id = from.substring("resource:".length()).trim();
                         if (id.isEmpty()) {
                             throw new IllegalStateException(
@@ -1360,13 +1360,13 @@ public final class TriggerInterpreter {
             case "START_COUNTDOWN" -> startCountdown(battle, effect, ctx);
             case "ADD_STACK" -> addStack(battle, effect, ctx);
             case "CONSUME_HP" -> {
-                // ⚠ The share vocabulary is the HEAL/SHIELD one, not the modifier one: 「消耗等同于刃生命上限 30%」
+                // Note: The share vocabulary is the HEAL/SHIELD one, not the modifier one: "消耗等同于刃生命上限 30%"
                 // is `owner_max_hp`, which derivedMagnitude refuses (it names an ATTRIBUTE).
                 for (CanHit spender : resolveTargets(battle, effect, ctx)) {
                     if (spender != null) {
                         double spent = spender.consumeHp(grantAmount(effect, spender, ctx));
                         if (spent > 0) {
-                            // 「受到伤害<b>或</b>消耗生命值」: the second half gets its own event (2026-09-29).
+                            // "受到伤害<b>或</b>消耗生命值": the second half gets its own event (2026-09-29).
                             battle.fireTriggers(TriggerEvent.HP_CONSUMED, spender, spender, (int) Math.round(spent), 0);
                         }
                     }
@@ -1389,17 +1389,17 @@ public final class TriggerInterpreter {
      * {@code DELEGATE_DAMAGE} (P11-1, M-40): the cast in progress must not deal its own damage.
      *
      * <p>This is the one op that fires <b>before</b> a swing exists, and it can only touch the cast that is in
-     * progress — so all three of its checks are about "is this rule talking about the swing it thinks it is":
+     * progress - so all three of its checks are about "is this rule talking about the swing it thinks it is":
      * <ul>
      *   <li>the cast must be the <b>rule owner's own</b>. {@code CAST_SETUP} is delivered to every ally's table,
-     *       so a rule that forgot {@code actor == self} would otherwise hand away <i>somebody else's</i> damage —
+     *       so a rule that forgot {@code actor == self} would otherwise hand away <i>somebody else's</i> damage - 
      *       an over-trigger that no later observation could distinguish from the intended one;</li>
      *   <li>the named {@code skill} must be the slot being cast. Without this the rule would delegate every cast
      *       the owner makes (the condition DSL has no variable for "which slot", so this comparison <i>is</i> the
      *       gate); naming a different slot is a rule that loads, fires, and silently does nothing;</li>
      *   <li>a cast must exist at all. Load-time validation already pins the op to
      *       {@link TriggerEvent#CAST_SETUP}, so a missing token here would be an <b>engine</b> fault, not a
-     *       content one — and it is reported as such rather than as a quiet no-op.</li>
+     *       content one - and it is reported as such rather than as a quiet no-op.</li>
      * </ul>
      */
     private static void delegateDamage(EffectSpec effect, TriggerContext ctx) {
@@ -1442,17 +1442,17 @@ public final class TriggerInterpreter {
     /**
      * {@code GAIN_ENERGY}: a flat amount, or a share of the receiving unit's <b>maximum energy</b>.
      *
-     * <p>⚠ A unit with <b>no energy bar</b> (the six that run on a stack resource instead) has a maximum of 0, and
-     * a share of nothing is not a number — that is a loud failure rather than a silent grant of 0, the same call the
+     * <p>Note: A unit with <b>no energy bar</b> (the six that run on a stack resource instead) has a maximum of 0, and
+     * a share of nothing is not a number - that is a loud failure rather than a silent grant of 0, the same call the
      * scale family makes everywhere else.
      */
     /**
-     * {@code GAIN_ENERGY}: 「恢复 N 点能量」 / 「恢复等同于各自 X% 能量上限的能量」.
+     * {@code GAIN_ENERGY}: "恢复 N 点能量" / "恢复等同于各自 X% 能量上限的能量".
      *
-     * <p>⚠ It resolves a <b>list</b> (2026-09-28): the sentences that pay a group say 「为除自身以外的<b>队友</b>恢复等同于
-     * <b>各自</b> 20% 能量上限的能量」 (1217 藿藿), i.e. every recipient gets a share of <b>its own</b> maximum. Resolving one
+     * <p>Note: It resolves a <b>list</b> (2026-09-28): the sentences that pay a group say "为除自身以外的<b>队友</b>恢复等同于
+     * <b>各自</b> 20% 能量上限的能量" (121藿藿), i.e. every recipient gets a share of <b>its own</b> maximum. Resolving one
      * target made the party-wide reading impossible, and the fix cannot be "pay the resolved unit N times": the amount
-     * differs per recipient, so the resolution — not the amount — had to become a list.
+     * differs per recipient, so the resolution - not the amount - had to become a list.
      */
     /** Whether a {@code GAIN_ENERGY} effect takes its amount out of the skill that produced the event. */
     private static boolean isCastParamScale(EffectSpec effect) {
@@ -1468,7 +1468,7 @@ public final class TriggerInterpreter {
 
     /** The amount one recipient gets: a flat sum, a share of ITS OWN maximum, or a per-landing count. */
     private static void gainEnergyFor(Battle battle, EffectSpec effect, TriggerContext ctx, CanHit target) {
-        // ⭐ The event own magnitude (2026-09-30; reader: 1312 per-spent-point energy), as gainResource does.
+        // The event own magnitude (2026-09-30; reader: 1312 per-spent-point energy), as gainResource does.
         if (Boolean.TRUE.equals(effect.getAmountFromEvent())) {
             double share = effect.getAmountPercent() == null ? 1 : effect.getAmountPercent();
             battle.grantEnergy(target, Math.round(ctx.amount() * share));
@@ -1478,7 +1478,7 @@ public final class TriggerInterpreter {
             battle.grantEnergy(target, scaledAmount(effect, ctx));
             return;
         }
-        // ⭐ 「为风堇恢复 #2 点能量」 (2026-10-02): an ABSOLUTE amount out of the skill that produced the event. The reader is the same one
+        // "为风堇恢复 #2 点能量" (2026-10-02): an ABSOLUTE amount out of the skill that produced the event. The reader is the same one
         // `MODIFY_ATTR` uses for `cast_skill_param:`, so the two cannot drift.
         if (isCastParamScale(effect)) {
             battle.grantEnergy(target, Math.round(castParamValue(effect, ctx,
@@ -1487,7 +1487,7 @@ public final class TriggerInterpreter {
         }
         String scale = effect.getScale().trim();
         if (scale.startsWith(TriggerTable.CAST_APPLIED_PREFIX)) {
-            // 「每冻结1个目标，恢复6点能量」: percent is the amount PER landed application, so the count multiplies it.
+            // "每冻结1个目标，恢复6点能量": percent is the amount PER landed application, so the count multiplies it.
             // The count is the cast's own outcome (Battle.recordCastApplied), never the number of targets aimed at.
             String state = scale.substring(TriggerTable.CAST_APPLIED_PREFIX.length()).trim();
             battle.grantEnergy(target, effect.getPercent() * battle.castAppliedCount(state));
@@ -1502,7 +1502,7 @@ public final class TriggerInterpreter {
         battle.grantEnergy(target, effect.getPercent() * maxEnergy);
     }
 
-    /** ⭐ The share of the EVENT's magnitude: a literal `amount_percent`, or basis points carried in a resource (2026-10-02). */
+    /** The share of the EVENT's magnitude: a literal `amount_percent`, or basis points carried in a resource (2026-10-02). */
     private static double eventShare(EffectSpec effect, TriggerContext ctx) {
         if (effect.getAmountPercentFromResource() != null) {
             Character holder = requireCharacterOwner(effect, ctx);
@@ -1512,13 +1512,13 @@ public final class TriggerInterpreter {
     }
 
     /**
-     * ⭐ Widens a resource's OVERFLOW for its owner (2026-10-02; reader: 1141517 「【新蕊】可以溢出至 #3%」).
+     * Widens a resource's OVERFLOW for its owner (2026-10-02; reader: 114151"[新蕊]可以溢出至 #3%").
      *
      * <p>A declaration states one overflow; a sentence can raise it for the battle. The NORMAL cap is untouched -- this is only the second tier, which is what the sentence is about.
      */
     private static void raiseResourceCap(EffectSpec effect, TriggerContext ctx) {
         CanHit holder = resolveTarget(effect, ctx);
-        // ⭐ A PARTY-scoped resource has no home on the unit (the same fact `gainResource` records) -- 【新蕊】 is declared `scope: PARTY` -- so the fallback is the
+        // A PARTY-scoped resource has no home on the unit (the same fact `gainResource` records) -- [新蕊] is declared `scope: PARTY` -- so the fallback is the
         // battle-level counter, which is the SAME `Resource` object and therefore carries the settable overflow.
         com.laosun.aluminium.models.Resource resource = holder.getResources().get(effect.getResource());
         if (resource == null) {
@@ -1535,25 +1535,25 @@ public final class TriggerInterpreter {
     private static void gainResource(EffectSpec effect, TriggerContext ctx,
             double previousCredited) {
         CanHit holder = resolveTarget(effect, ctx);
-        // ✅ A gain whose amount is a SHARE of an attribute (2026-09-30; reader: 1505’s talent 「获得等同于暴击伤容
-        // 50% 的欢愉度」). `scaledAmount` stays literal-only on purpose: this share is read off the HOLDER, which only
+        // A gain whose amount is a SHARE of an attribute (2026-09-30; reader: 1505's talent "获得等同于暴击伤容
+        // 50% 的欢愉度"). `scaledAmount` stays literal-only on purpose: this share is read off the HOLDER, which only
         // this method has resolved. Unknown attribute names are refused loudly rather than silently adding zero.
         int amount;
         if (Boolean.TRUE.equals(effect.getAmountFromPrevious())) {
-            // ⭐ 2026-10-02 读者：1505 星魂 「额外获得等同于本次获得的【好活当赏】50%/100%」。
+            // 2026-10-02 读者：1505 星魂 "额外获得等同于本次获得的[好活当赏]50%/100%"。
             // 取的是前一条效果已经过上限截断的入账量。
             amount = (int) Math.round(previousCredited
                     * (effect.getAmountPercent() == null ? 1 : effect.getAmountPercent()));
         } else         if (Boolean.TRUE.equals(effect.getAmountFromEvent())) {
-            // ✅ The event’s own magnitude (2026-09-30): 「获得能量时，将同步获得等值的【好活当赏】」 is exactly this -- the
+            // The event's own magnitude (2026-09-30): "获得能量时，将同步获得等值的[好活当赏]" is exactly this -- the
             // amount is not a literal and not an attribute, it is what the trigger just reported.
             amount = (int) Math.round(ctx.amount() * eventShare(effect, ctx));
         } else if (effect.getAmountFromResource() != null) {
-            // ⭐ The amount IS a resource's value (2026-10-02): a number captured while an ode was cast, handed over when the character later casts.
+            // The amount IS a resource's value (2026-10-02): a number captured while an ode was cast, handed over when the character later casts.
             Character owner = requireCharacterOwner(effect, ctx);
             amount = owner.getResources().value(effect.getAmountFromResource().trim());
         } else if (isCastParamScale(effect)) {
-            // ⭐ × percent (2026-10-02): the share is usually BELOW 1 and a resource holds an integer, so content stores basis points (percent: 10000).
+            //  x percent (2026-10-02): the share is usually BELOW 1 and a resource holds an integer, so content stores basis points (percent: 10000).
             amount = (int) Math.round(castParamValue(effect, ctx,
                     effect.getScale().trim().substring(TriggerTable.CAST_SKILL_PARAM_PREFIX.length()))
                     * (effect.getPercent() == null ? 1 : effect.getPercent()));
@@ -1564,15 +1564,15 @@ public final class TriggerInterpreter {
             double share = effect.getAmountPercent() == null ? 1 : effect.getAmountPercent();
             amount = (int) Math.round(holder.getAttribute(attribute).get() * share);
         }
-        // ✅ A single conversion may be capped (2026-09-30; reader: 1505’s 「单次…不超过 100 点」). The clamp is the LAST
-        // thing that happens, so it bounds whichever source answered -- a literal, an attribute share or the event‘s own magnitude.
+        // A single conversion may be capped (2026-09-30; reader: 1505's "单次…不超过 100 点"). The clamp is the LAST
+        // thing that happens, so it bounds whichever source answered -- a literal, an attribute share or the event's own magnitude.
         if (effect.getAmountCap() != null) {
             amount = (int) Math.min(amount, Math.round(effect.getAmountCap()));
         }
         com.laosun.aluminium.models.Resource party = holder.getResources().has(effect.getResource())
                 ? null
                 : (ctx.battle() == null ? null : ctx.battle().partyResource(effect.getResource()));
-        // ✅ A PARTY-scoped counter has no home on the unit (2026-09-30): the battle owns it, so any ally may add to it.
+        // A PARTY-scoped counter has no home on the unit (2026-09-30): the battle owns it, so any ally may add to it.
         if (party != null) {
             party.gain(amount);
             return;
@@ -1593,14 +1593,14 @@ public final class TriggerInterpreter {
     private static void spendResource(EffectSpec effect, TriggerContext ctx) {
         CanHit holder = resolveTarget(effect, ctx);
         String id = effect.getResource();
-        // ⭐ A PARTY counter has no home on the unit (the same fact `gainResource` records), so a spend has to fall back to the
-        // battle-level one -- measured: 【笑点】 is declared `scope: PARTY` (「笑点为全队共享」, glossary 10000027) and the holder's
-        // own Resources does not have it, so 「阿哈行动后会消耗全部笑点」 (10000026) could not be written at all.
+        // A PARTY counter has no home on the unit (the same fact `gainResource` records), so a spend has to fall back to the
+        // battle-level one -- measured: [笑点] is declared `scope: PARTY` ("笑点为全队共享", glossary 1000002) and the holder's
+        // own Resources does not have it, so "阿哈行动后会消耗全部笑点" (10000026) could not be written at all.
         com.laosun.aluminium.models.Resource partyCounter = holder.getResources().has(id)
                 ? null
                 : (ctx.battle() == null ? null : ctx.battle().partyResource(id));
         if (partyCounter != null) {
-            // ⭐ 「消耗所有溢出」 is the tier ABOVE the cap (2026-10-02; reader: 1141517) -- neither `spendAll` (everything) nor a stated amount says it.
+            // "消耗所有溢出" is the tier ABOVE the cap (2026-10-02; reader: 114151) -- neither `spendAll` (everything) nor a stated amount says it.
             int spend = Boolean.TRUE.equals(effect.getOverflowOnly())
                     ? Math.max(0, partyCounter.value() - partyCounter.getMax())
                     : Boolean.TRUE.equals(effect.getSpendAll())
@@ -1613,7 +1613,7 @@ public final class TriggerInterpreter {
             }
             return;
         }
-        // 「消耗所有【X】」 (2026-10-02): the size is whatever is there; the "not enough"
+        // "消耗所有[X]" (2026-10-02): the size is whatever is there; the "not enough"
         // failure below cannot happen for it, which is why the two spellings are kept apart.
         int amount = Boolean.TRUE.equals(effect.getOverflowOnly())
                 ? (holder.getResources().has(id)
@@ -1656,14 +1656,14 @@ public final class TriggerInterpreter {
      * "my own resource" mechanic wants, and what lets the JSON stay terse. Other selectors pick a
      * party of the event instead:
      * <ul>
-     *   <li>{@code "target"} — the event's subject (the one who lost HP, was healed, ...), which is
+     *   <li>{@code "target"} - the event's subject (the one who lost HP, was healed, ...), which is
      *       what an ally-affecting rule needs;</li>
-     *   <li>{@code "attacker"} — who caused the event, which is what a counter needs
+     *   <li>{@code "attacker"} - who caused the event, which is what a counter needs
      *       ("I was hit, so I hit the one who hit me").</li>
-     *   <li>{@code "summon"} — <b>the owner's own summon</b> ({@link Battle#summonOf}). This one reads the
-     *       field rather than the event, because 「装备者及其忆灵」 ("the wearer and their memosprite") names a
+     *   <li>{@code "summon"} - <b>the owner's own summon</b> ({@link Battle#summonOf}). This one reads the
+     *       field rather than the event, because "装备者及其忆灵" ("the wearer and their memosprite") names a
      *       unit that no event carries: the ability affects both, and only one of them acted. It is why a
-     *       partner condition {@code self_summon_count >= 1} usually sits next to it — without one, the rule
+     *       partner condition {@code self_summon_count >= 1} usually sits next to it - without one, the rule
      *       would fail (loudly) whenever nothing is out.</li>
      * </ul>
      *
@@ -1676,13 +1676,13 @@ public final class TriggerInterpreter {
      * A random enemy among the ones the attack behind this context actually hit.
      *
      * @return the pick, or {@code null} when the set is unknown/empty/entirely friendly -- the caller turns that
-     *         into an error, which is the point: never answer 「a random enemy」 for 「a random one that was hit」.
+     *         into an error, which is the point: never answer "a random enemy" for "a random one that was hit".
      */
     /**
      * The unit with the highest <b>current HP</b> among the ones the attack behind this context hit (2026-10-02).
      *
-     * <p>⭐ The pool is read exactly as {@link #randomHitEnemy} reads it, for the reason its own comment gives: an `ATTACK_FINISHED` context
-     * carries the attack's FROZEN hit set, while a per-hit context (`DEALING_DAMAGE`) only has its instance's snapshot. ⚠ Reading
+     * <p>The pool is read exactly as {@link #randomHitEnemy} reads it, for the reason its own comment gives: an `ATTACK_FINISHED` context
+     * carries the attack's FROZEN hit set, while a per-hit context (`DEALING_DAMAGE`) only has its instance's snapshot. Note: Reading
      * `attackHitTargets` alone was the first attempt, and it answered "empty" on precisely the event this selector is for.
      *
      * <p>The comparison is 当前生命值 -- absolute current HP, not a percentage -- and the pool is filtered to the owner's opponents, because the
@@ -1713,18 +1713,18 @@ public final class TriggerInterpreter {
         if (ctx.battle() == null) {
             return null;
         }
-        // ⭐ TWO carriers, one selector (2026-09-30): an ATTACK_FINISHED context carries the attack's FROZEN hit set,
+        // TWO carriers, one selector (2026-09-30): an ATTACK_FINISHED context carries the attack's FROZEN hit set,
         // while a per-hit context (DEALING_DAMAGE) only has its instance's snapshot -- so the attack-level set wins and
-        // the instance is the fallback. ⚠ That is why the doc says what a reader sees depends on its event.
+        // the instance is the fallback. Note: That is why the doc says what a reader sees depends on its event.
         java.util.Set<CanHit> pool = !ctx.attackHitTargets().isEmpty()
                 ? new java.util.LinkedHashSet<>(ctx.attackHitTargets())
                 : (ctx.damage() == null ? java.util.Set.of() : ctx.damage().hitTargets());
         if (pool.isEmpty()) {
             return null;                      // unknown or nothing hit: the caller turns this into an error
         }
-        // ✅ FILTER FIRST, ROLL SECOND (2026-09-30): `resolveTargets` resolves and only then applies the
+        // FILTER FIRST, ROLL SECOND (2026-09-30): `resolveTargets` resolves and only then applies the
         // effect's `target_when`, so a roll landing on an excluded unit would simply be dropped instead of
-        // re-rolled -- 「a random one of the hit targets NOT holding X」 needs the exclusion inside the roll.
+        // re-rolled -- "a random one of the hit targets NOT holding X" needs the exclusion inside the roll.
         List<CanHit> hitEnemies = pool.stream()
                 .filter(ctx.battle().getOpponents(ctx.owner())::contains)
                 .filter(ctx::passesTargetFilter)
@@ -1735,7 +1735,7 @@ public final class TriggerInterpreter {
     /**
      * The next unit on OUR side to act after the current one, walking the queue forward and wrapping (2026-09-30).
      *
-     * <p>For cone 21025's 「使下一个行动的我方其他目标造成的伤害提高」. "Next to act" is read from the queue order, and the
+     * <p>For cone 21025's "使下一个行动的我方其他目标造成的伤害提高". "Next to act" is read from the queue order, and the
      * walk starts AFTER the acting unit: the head alone is wrong (measured -- {@code peekNext()} returns the head, which
      * can be the acting unit itself), and taking the party's first ally is wrong too (that is the unit who just acted).
      */
@@ -1762,11 +1762,11 @@ public final class TriggerInterpreter {
     }
 
     /**
-     * 「随机为 1 个当前能量百分比小于 50% 的我方其他目标」 (light cone 21021).
+     * "随机为 1 个当前能量百分比小于 50% 的我方其他目标" (light cone 21021).
      *
-     * <p>⚠ FILTER FIRST, ROLL SECOND — the same order `randomHitEnemy` documents: a roll landing on an
+     * <p>Note: FILTER FIRST, ROLL SECOND - the same order `randomHitEnemy` documents: a roll landing on an
      * excluded ally would be dropped rather than re-rolled, which is a wrong answer that reports nothing.
-     * ⚠ The 50% is written in rather than carried by a field: the text states it once and no tier changes
+     * Note: The 50% is written in rather than carried by a field: the text states it once and no tier changes
      * it (the five tiers differ only in how much energy is restored).
      */
     private static CanHit randomAllyBelowHalfEnergy(TriggerContext ctx) {
@@ -1788,7 +1788,7 @@ public final class TriggerInterpreter {
                 : eligible.get(battle.getRng().nextInt(eligible.size()));
     }
 
-    /** The first character of the party (relic 317), or null when there is no battle. */
+    /** The first character of the party (relic 31), or null when there is no battle. */
     private static CanHit partyFirst(TriggerContext ctx) {
         Battle battle = ctx.battle();
         if (battle == null || battle.characters.isEmpty()) {
@@ -1803,23 +1803,23 @@ public final class TriggerInterpreter {
 
     /**
      * The same resolution, for a selector that is not the effect's own {@code target}
-     * ({@code cast_target}, 2026-10-02) — one switch, so the two spellings cannot drift apart.
+     * ({@code cast_target}, 2026-10-02) - one switch, so the two spellings cannot drift apart.
      *
      * @param selector the selector token (already lower-cased and trimmed)
      */
-    /** ⭐ 「向**风堇**…」: a selector that names a character by cid (2026-10-02). */
+    /** "向风堇…": a selector that names a character by cid (2026-10-02). */
     static final String ALLY_CID_PREFIX = "ally_cid:";
 
     /**
-     * ⭐ A second selector FAMILY, admitted by prefix (2026-10-02; reader: 1141518 「使所有「智识」命途角色攻击力提高」): every ALLY on the named path.
+     * A second selector FAMILY, admitted by prefix (2026-10-02; reader: 1141518 "使所有'智识'命途角色攻击力提高"): every ALLY on the named path.
      *
-     * <p>The name may be the path's Chinese name (「智识」) or the enum's own (「ERUDITION」), because the selector is lowercased on the way in and neither spelling is the other's.
+     * <p>The name may be the path's Chinese name ("智识") or the enum's own ("ERUDITION"), because the selector is lowercased on the way in and neither spelling is the other's.
      */
     static final String ALLIES_OF_PATH_PREFIX = "allies_of_path:";
 
     /** The party member whose cid is this one, or {@code null} when nobody matches. */
     /**
-     * ⭐ The path a selector names, or {@code null} if it names none (2026-10-02). Both spellings are accepted because the selector arrives lowercased: the Chinese name through
+     * The path a selector names, or {@code null} if it names none (2026-10-02). Both spellings are accepted because the selector arrives lowercased: the Chinese name through
      * {@link Path#fromNameOrNull}, the enum's own through {@code valueOf} on the upper-cased text.
      */
     private static Path pathNamed(String text) {
@@ -1856,15 +1856,15 @@ public final class TriggerInterpreter {
             case "target" -> require(ctx.target(), "target", ctx);
             case "attacker" -> require(ctx.actor(), "attacker", ctx);
             case "summon" -> requireSummon(ctx);
-            // ✅ 「随机 1 个敌方目标」: the roll is the battle’s own seeded one, so the same seed picks the
+            // "随机 1 个敌方目标": the roll is the battle's own seeded one, so the same seed picks the
             // same unit -- and the judge can therefore pin both determinism and genuine variation.
-            // 「下一个行动的我方其他目标」(cone 21025): the unit that will act after this one, walking the
+            // "下一个行动的我方其他目标"(cone 21025): the unit that will act after this one, walking the
             // queue forward and wrapping, skipping the other side and the owner itself. The text says
             // "下一个行动" -- the NEXT to act, not the party's first ally (which would be the one who just
             // acted). Read from the queue; the head alone is not enough (measured: peekNext() can be the
             // acting unit itself).
             case "next_ally" -> require(nextAllyToAct(ctx), "next_ally", ctx);
-            // 「队伍第一名」(relic 317): the FIRST CHARACTER of the party, in party order -- read from
+            // "队伍第一名"(relic 31): the FIRST CHARACTER of the party, in party order -- read from
             // battle.characters, not battle.allies (summons are appended to that one).
             case "party_first" -> require(partyFirst(ctx), "party_first", ctx);
             case "random_ally_below_half_energy" ->
@@ -1877,10 +1877,10 @@ public final class TriggerInterpreter {
                             : ctx.battle().waveMonsters().getFirst(),
                     "wave_monster", ctx);
             case TARGET_RANDOM_HIT_ENEMY -> require(randomHitEnemy(ctx), TARGET_RANDOM_HIT_ENEMY, ctx);
-            // ⭐ Among the units this attack hit, the one with the highest CURRENT HP (2026-10-02).
+            // Among the units this attack hit, the one with the highest CURRENT HP (2026-10-02).
             case "highest_hp_attack_hit" ->
                     require(highestHitTarget(ctx), "highest_hp_attack_hit", ctx);
-            // ⭐ The fallback (2026-09-30): 「若…目标被消灭则对敌方随机单体发动」. The preferred target
+            // The fallback (2026-09-30): "若…目标被消灭则对敌方随机单体发动". The preferred target
             // is the trigger's own, and CanHit has a real "defeated" flag orthogonal to invulnerability (CanHit:88-90),
             // so a dead preferred target -- and only that -- falls through to the battle's seeded random opponent.
             case "target_else_random_enemy" -> {
@@ -1892,7 +1892,7 @@ public final class TriggerInterpreter {
             }
             case TARGET_RANDOM_ENEMY -> require(ctx.battle() == null ? null : ctx.battle().randomOpponent(ctx.owner()),
                     TARGET_RANDOM_ENEMY, ctx);
-            // 「持有【同袍】的角色」: the single-target path asks the same question the list path does, and a
+            // "持有[同袍]的角色": the single-target path asks the same question the list path does, and a
             // single-target op has to name ONE unit -- so "nobody holds it" surfaces through `require`'s message
             // rather than silently applying to nobody (the list path's empty answer is documented on the prefix).
             default -> {
@@ -1913,8 +1913,8 @@ public final class TriggerInterpreter {
      * <p>{@code "all_allies"} (alias {@code "party"}) is what makes "all allies' ATK +X%" expressible.
      * It matters more than it looks: most buff talents in this game's data are party-wide, so without
      * this selector the trigger table would only cover self-buffs. It is resolved against
-     * {@link Battle#allies} — the camp, <b>not</b> {@code characters} — so a player-side summon counts as
-     * 「我方」 and receives the party buff too; and it therefore needs a battle, which the single-target
+     * {@link Battle#allies} - the camp, <b>not</b> {@code characters} - so a player-side summon counts as
+     * "我方" and receives the party buff too; and it therefore needs a battle, which the single-target
      * selectors do not.
      *
      * @param battle the running battle (may be {@code null} only when the selector is single-target)
@@ -1955,7 +1955,7 @@ public final class TriggerInterpreter {
                 throw new IllegalStateException(
                         "Effect targets \"all_summons\" but no battle was supplied to take the summons from");
             }
-            // ⭐ EVERY memosprite on our side, not just the rule owner's (2026-10-02): the clause is 「使我方**全体**忆灵的暴击伤害提高」, and `summonsOf` is keyed
+            // EVERY memosprite on our side, not just the rule owner's (2026-10-02): the clause is "使我方全体忆灵的暴击伤害提高", and `summonsOf` is keyed
             // by master -- so each of our characters is asked. `all_allies` answers "who is on that side" the same way.
             List<CanHit> everySummon = new ArrayList<>();
             for (Character ally : battle.characters) {
@@ -1978,7 +1978,7 @@ public final class TriggerInterpreter {
             }
             List<CanHit> party = new ArrayList<>();
             for (CanHit ally : battle.allies) {
-                // `other_allies` is the same camp minus the rule's owner (「除自身以外」); the order is the
+                // `other_allies` is the same camp minus the rule's owner ("除自身以外"); the order is the
                 // roster's either way, so a group effect reaches units in a stable order.
                 if (TARGET_OTHER_ALLIES.equals(selector) && ally == ctx.owner()) {
                     continue;
@@ -1988,8 +1988,8 @@ public final class TriggerInterpreter {
             return List.copyOf(party);
         }
         if (selector.startsWith(ALLIES_OF_PATH_PREFIX)) {
-            // ⭐ ALL of them, not the first (2026-10-02; reader: 1141518 「使**所有**「智识」命途角色…」): the sentence says 所有, so the answer is the
-            // whole path in roster order. ⚠ An unknown path name is a refused SPELLING, not an empty answer -- the validation refuses it at load, and this mirrors that.
+            // ALL of them, not the first (2026-10-02; reader: 1141518 "使所有'智识'命途角色…"): the sentence says 所有, so the answer is the
+            // whole path in roster order. Note: An unknown path name is a refused SPELLING, not an empty answer -- the validation refuses it at load, and this mirrors that.
             String rest = selector.substring(ALLIES_OF_PATH_PREFIX.length()).trim();
             Path wanted = pathNamed(rest);
             if (wanted == null) {
@@ -2009,7 +2009,7 @@ public final class TriggerInterpreter {
             return List.copyOf(ofPath);
         }
         if (selector.startsWith(ALLY_CID_PREFIX)) {
-            // ⭐ 「使**风堇**获得…」 (2026-10-02): a selector that NAMES a character is handled HERE, in the plural path, because absence is not an error --
+            // "使风堇获得…" (2026-10-02): a selector that NAMES a character is handled HERE, in the plural path, because absence is not an error --
             // it is a battle that does not contain that character, and the clause simply does nothing. The singular path's convention is the opposite (it throws), which is why
             // this must not be left to it. Same shape as `lowest_hp_ally` just below.
             int cid = Integer.parseInt(selector.substring(ALLY_CID_PREFIX.length()).trim());
@@ -2062,10 +2062,10 @@ public final class TriggerInterpreter {
             pair.addAll(battle.summonsOf(chosen));
             return List.copyOf(pair);
         }
-        // ⭐ 「随机为 1 个…当前能量百分比小于 50% 的我方其他目标」 (light cone 21021): this selector may
+        // "随机为 1 个…当前能量百分比小于 50% 的我方其他目标" (light cone 21021): this selector may
         // legitimately have NO candidate (the wearer is excluded, and everyone else may be full), and then the
-        // clause does nothing. ⚠ Same shape as lowest_hp_ally just above -- empty list, not an error.
-        // ⚠ Only THIS name is allowed to be empty: every other selector still goes through require(), so a
+        // clause does nothing. Note: Same shape as lowest_hp_ally just above -- empty list, not an error.
+        // Note: Only THIS name is allowed to be empty: every other selector still goes through require(), so a
         // misspelling keeps failing loudly.
         if ("random_ally_below_half_energy".equals(selector)) {
             CanHit one = randomAllyBelowHalfEnergy(ctx);
@@ -2076,29 +2076,29 @@ public final class TriggerInterpreter {
 
     /**
      * {@code COMMAND_SUMMON}: the owner's summon performs <b>one attack, right now</b>, with the numbers of the
-     * skill the rule names — 「召唤忆灵「长夜」，随后使忆灵「长夜」对敌方全体造成等同于「长夜」#1[i]%生命上限的冰属性伤害」.
+     * skill the rule names - "召唤忆灵'长夜'，随后使忆灵'长夜'对敌方全体造成等同于'长夜'#1[i]%生命上限的冰属性伤害".
      *
      * <p><b>Where every number comes from.</b> The rule names a {@code skill} + {@code damage_param} of the
-     * <b>owner's</b> skills — her ultimate, whose row says 2.0 at Lv10 and 2.5 at Lv15 — and the element (Ice) and
+     * <b>owner's</b> skills - her ultimate, whose row says 2.0 at Lv10 and 2.5 at Lv15 - and the element (Ice) and
      * the shape (AoEAttack) come from that same skill data. Only the <b>base attribute</b> ({@code HEALTH}) is
-     * stated here, because that is the one thing the row does not say: 「等同于<b>忆灵</b>的生命上限」, not 长夜月's
+     * stated here, because that is the one thing the row does not say: "等同于<b>忆灵</b>的生命上限", not 长夜月's
      * attack. A first draft of this op carried its own {@code element} / {@code shape} / {@code percent} fields
      * and would have been a second copy of data that already exists, one that also loses the per-level table.
      *
-     * <p>⚠ The skill is the owner's and the <b>attacker is the summon</b> — a first draft looked the skill up on
+     * <p>Note: The skill is the owner's and the <b>attacker is the summon</b> - a first draft looked the skill up on
      * the summon and failed with "长夜 has no ULTRA skill", which is exactly right: the numbers are hers, the
      * swing is its.
      *
      * <p><b>Whose action it is.</b> The owner's: the summon acts without spending its turn, exactly like a
      * follow-up, and its own turn (with its own skill) is untouched. The damage is settled with the
-     * <b>summon</b> as the attacker, so everything downstream is the summon's — its attribute is what the share
+     * <b>summon</b> as the attacker, so everything downstream is the summon's - its attribute is what the share
      * reads, kill credit is the summon's, and the attack announces itself to our side like any other attack by
      * it ({@code Battle.fireAfterAttack} + {@code TriggerEvent.SUMMON_ATTACK}, both reached through
      * {@link EnemySkill#execute}).
      *
-     * <p>⚠ Reusing {@link EnemySkill} is the point: it already owns the shape dispatch (single / AOE / blast),
+     * <p>Note: Reusing {@link EnemySkill} is the point: it already owns the shape dispatch (single / AOE / blast),
      * per-segment settlement and those two announcements. What it does not do is choose targets, which is the one
-     * thing this method adds — and it must filter to the <b>living</b>, because {@code EnemySkill} takes the
+     * thing this method adds - and it must filter to the <b>living</b>, because {@code EnemySkill} takes the
      * first entry of the list it is handed as the main target.
      */
     private static void commandSummon(Battle battle, EffectSpec effect, TriggerContext ctx) {
@@ -2129,18 +2129,18 @@ public final class TriggerInterpreter {
         }
         EnemySkill attack = new EnemySkill(
                 skill.getData().getElement(),
-                // ⚠ `owner`, not the summon: the skill and its parameter row are the OWNER's (see above), so its
-                // level — and any 「终结技等级+1」 this battle has raised — is the owner's too.
+                // Note: `owner`, not the summon: the skill and its parameter row are the OWNER's (see above), so its
+                // level - and any "终结技等级+1" this battle has raised - is the owner's too.
                 multiplierOf(skill, effect, owner),
-                1,                                   // one segment: 长夜月's ultimate is 「单目标段数: 1」 in its own split
+                1,                                   // one segment: 长夜月's ultimate is "单目标段数: 1" in its own split
                 DamageType.NORMAL,                   // a real attack by the summon, not 附加伤害
                 skill.getData().getEffect(),         // the shape the skill itself declares (AoEAttack)
                 AttributeType.fromString(effect.getAttribute()),
-                // ⚠ The toughness too, and for the same reason as the element and the shape: it is written down
+                // Note: The toughness too, and for the same reason as the element and the shape: it is written down
                 // once, in this skill's own `stance_list` (141303: `single 0 / all 90`), and the commanded swing
-                // is that skill's damage. ⚠ It has to be here rather than "the caster's cast already removed it":
+                // is that skill's damage. Note: It has to be here rather than "the caster's cast already removed it":
                 // when a cast is DELEGATED (`DELEGATE_DAMAGE`, M-40) the executor expands no damage of its own, so
-                // the stance would otherwise be dropped on the floor — exactly one of the two must carry it, and
+                // the stance would otherwise be dropped on the floor - exactly one of the two must carry it, and
                 // this is the one that actually swings. `stanceFor(true)` is the skill's main-target column: for
                 // an AOE that is `all` (per victim, matching the caster-side path), for BLAST `single`.
                 skill.getData().stanceFor(true));
@@ -2149,24 +2149,24 @@ public final class TriggerInterpreter {
 
     /**
      * {@code CAST_SKILL}: the resolved target performs <b>one cast, right now</b>, with the numbers of the skill
-     * the rule names -- 「使其立即施放 1 次…」。
+     * the rule names -- "使其立即施放 1 次…"。
      *
-     * <p>⚠ It is {@code commandSummon} with three spots loosened, and nothing else (see `aggro 回收之七百八十五`):
+     * <p>Note: It is {@code commandSummon} with three spots loosened, and nothing else (see `aggro 回收之七百八十五`):
      *
-     * <ol><li>the <b>actor</b> is the resolved target, not the owner’s summon;</li>
+     * <ol><li>the <b>actor</b> is the resolved target, not the owner's summon;</li>
      * <li>the <b>skill</b> is looked up on that actor, not on the rule owner;</li>
      * <li>no {@code SUMMON_ATTACK} is announced -- that event belongs to a memosprite (the swing itself still
      * announces itself through {@code EnemySkill.execute}).</li></ol>
      *
-     * <p>⚠ <b>韧性必须自己带</b> —— 先例的原话：*when a cast is DELEGATED the executor expands no damage of its
-     * own, so the stance would otherwise be dropped on the floor*. ⚠ Do not drop {@code stanceFor(true)}.
+     * <p>Note: <b>韧性必须自己带</b> -  - 先例的原话：*when a cast is DELEGATED the executor expands no damage of its
+     * own, so the stance would otherwise be dropped on the floor*. Note: Do not drop {@code stanceFor(true)}.
      */
     private static void castSkill(Battle battle, EffectSpec effect, TriggerContext ctx) {
         CanHit actor = require(resolveTarget(effect, ctx), "target", ctx);
         SkillType slot = SkillType.valueOf(effect.getSkill().trim().toUpperCase(Locale.ROOT));
         Skill skill = actor.getSkills().get(slot);
-        // ⭐ A MEMOSPRITE keeps its skills by DATA SLOT, not by SkillType (2026-10-02): its table is `Summon.skillsByDataSlot`, and
-        // 「自动施放【花与箭的舞曲】」 is its slot 1. Commanding that cast used to fail with "has no SKILL skill" because only
+        // A MEMOSPRITE keeps its skills by DATA SLOT, not by SkillType (2026-10-02): its table is `Summon.skillsByDataSlot`, and
+        // "自动施放[花与箭的舞曲]" is its slot 1. Commanding that cast used to fail with "has no SKILL skill" because only
         // the character table was consulted. The slot is named with `skill_id`, the same field `REPLACE_SKILL` uses for a data row.
         if (skill == null && effect.getSkillId() != null && actor instanceof Summon from) {
             skill = from.skillAt(effect.getSkillId());
@@ -2178,7 +2178,7 @@ public final class TriggerInterpreter {
                             + ", so a CAST_SKILL effect has nothing to read: the rule names the skill whose numbers the "
                             + "commanded cast uses");
         }
-        // ⭐ What the engine can DELIVER, not "is it a swing" (2026-10-02): a cast may be a shield or a heal as well,
+        // What the engine can DELIVER, not "is it a swing" (2026-10-02): a cast may be a shield or a heal as well,
         // and those go through `SkillExecutor.dispatchNonDamaging`, which reads `skill_effects.json`. A skill the
         // engine has no definition for must fail HERE, loudly -- commanding it would be a cast that does nothing at
         // all, with no symptom (1414's own skill is a shield; 1303/1412's are buffs the table has no entry for).
@@ -2192,7 +2192,7 @@ public final class TriggerInterpreter {
         }
         boolean damaging = skill.getData().getEffect().isDamaging();
         List<CanHit> victims = new ArrayList<>();
-        // ⚠ Which side the cast reaches is the SKILL's business, not the rule's: a swing lands on the caster's
+        // Note: Which side the cast reaches is the SKILL's business, not the rule's: a swing lands on the caster's
         // opponents, a shield or a heal on the caster's own camp. (Until this, every commanded cast was treated as a
         // swing -- a shield would have been granted to the ENEMY.)
         for (CanHit unit : damaging ? battle.getOpponents(actor) : battle.getSideOf(actor)) {
@@ -2201,7 +2201,7 @@ public final class TriggerInterpreter {
             }
         }
         if (victims.isEmpty()) {
-            // ⚠ An empty battlefield stays a no-op, but a caster with NO CAMP is a different thing: `getOpponents` answers an empty list
+            // Note: An empty battlefield stays a no-op, but a caster with NO CAMP is a different thing: `getOpponents` answers an empty list
             // for it, so the commanded cast silently did nothing at all (2026-10-02). Say which one it is.
             if (actor.getCamp() == null) {
                 throw new IllegalStateException("a commanded cast by " + actor.getName()
@@ -2209,16 +2209,16 @@ public final class TriggerInterpreter {
             }
             return;                                  // nothing left to reach: an empty battlefield, not a bad rule
         }
-        // ⭐ The AIM, when the rule states one (2026-10-02): the commanded cast's main target goes first, because that
+        // The AIM, when the rule states one (2026-10-02): the commanded cast's main target goes first, because that
         // is the unit `SkillExecutor` reads (`targets.getFirst()`) -- it decides which unit a single-target or blast
         // skill lands on, and which ally a skill's own cast events name as the unit it was aimed at (1414's skill
-        // designates THAT ally as 【同袍】).
+        // designates THAT ally as [同袍]).
         if (effect.getCastTarget() != null && !effect.getCastTarget().isBlank()) {
             CanHit aimed = resolveSelector(effect.getCastTarget().trim().toLowerCase(Locale.ROOT), effect, ctx);
             victims.remove(aimed);
             victims.addFirst(aimed);
         }
-        // ⭐⭐ THE ENGINE'S OWN CAST PATH (2026-10-02), and the whole point of this op is that there is only one
+        // THE ENGINE'S OWN CAST PATH (2026-10-02), and the whole point of this op is that there is only one
         // reading of a skill's row. This used to hand-build an `EnemySkill` beside `SkillExecutor`, and that second
         // reader was wrong in three ways at once -- measured, because no test had ever let the op fire:
         //   * it read the multiplier through `multiplierOf`, which REQUIRES `damage_param`, so all nine shipped
@@ -2230,28 +2230,28 @@ public final class TriggerInterpreter {
         // `SkillExecutor.execute` answers all three by construction: it reads `params.getFirst()` at the skill's own
         // level, the neighbouring column for BLAST, the element, the base attribute (`damageBaseAttribute`) and the
         // damage type from the row, and it dispatches a non-damaging skill the same way a real cast would.
-        // ⚠ What follows from that: the cast is announced (CAST_SETUP / SKILL_CAST / ULT_CAST / BASIC_ATTACK /
+        // Note: What follows from that: the cast is announced (CAST_SETUP / SKILL_CAST / ULT_CAST / BASIC_ATTACK /
         // ALLY_ATTACK) and settles its own energy, because a commanded cast IS a cast. A skill the engine's model
         // itself mis-reads (an Elation skill's row starts with a HIT COUNT) is mis-read here too -- which is why the
         // Elation auto-casts stay registered rather than shipped (see §24.12).
-        // ⚠ It does NOT spend a skill point: that is the caller's act, and it is why 「此次战技不消耗战技点」 holds
+        // Note: It does NOT spend a skill point: that is the caller's act, and it is why "此次战技不消耗战技点" holds
         // for free (pinned in `CastSkillTest`).
         //
-        // ⭐⭐ 被插入的施放：一个"被命令的施放"不能再命令另一个 (2026-10-02). 「奇袭不会再次触发奇袭」 is the document's own
+        // 被插入的施放：一个"被命令的施放"不能再命令另一个 (2026-10-02). "奇袭不会再次触发奇袭" is the document's own
         // sentence, and without this guard the copy's own CAST_SETUP would command a copy of the copy -- forever. The
         // engine already keeps the cast STACK: `beginCast` links a new cast to the one it interrupts and `endCast`
         // restores it, so "the open cast is itself a commanded one" is exactly `currentCast().outer() != null`.
-        // ⚠ Skipped, not thrown: this is a rule requirement of the sentence (like `castUltra` refusing inside an extra
+        // Note: Skipped, not thrown: this is a rule requirement of the sentence (like `castUltra` refusing inside an extra
         // turn), not an authoring mistake.
         if (battle.currentCast() != null && battle.currentCast().outer() != null) {
             return;
         }
         skill.execute(battle, actor, victims);
-        // ⭐ The moment 「奇袭结束后」 names: the commanded cast has finished, the original continues afterwards. A
+        // The moment "奇袭结束后" names: the commanded cast has finished, the original continues afterwards. A
         // commanded cast announces the same CAST_SETUP / SKILL_CAST a real one does, so this is the only event that
         // tells it apart -- see `TriggerEvent.INSERTED_CAST_END`.
-        // ⭐ The event carries the unit the commanded cast was AIMED at, not the caster (2026-10-02; reader: 1415's
-        // 「奇袭结束后，使刻律德菈获得 1 点充能」). The actor is still the actor; the target slot now answers "who was it cast on",
+        // The event carries the unit the commanded cast was AIMED at, not the caster (2026-10-02; reader: 1415's
+        // "奇袭结束后，使刻律德菈获得 1 点充能"). The actor is still the actor; the target slot now answers "who was it cast on",
         // which is what that sentence needs -- and 1412's own subscriber states no target, so nothing shipped moves.
         CanHit aimed = victims == null || victims.isEmpty() ? actor : victims.getFirst();
         battle.fireTriggers(TriggerEvent.INSERTED_CAST_END, actor, aimed, 0, 0);
@@ -2261,7 +2261,7 @@ public final class TriggerInterpreter {
      * The owner's summon, for the {@code "summon"} selector.
      *
      * <p>A missing summon is an {@link IllegalStateException} rather than a quiet no-op, and the message says
-     * what to do about it: an author who writes 「装备者及其忆灵」 without a {@code self_summon_count >= 1}
+     * what to do about it: an author who writes "装备者及其忆灵" without a {@code self_summon_count >= 1}
      * condition has a rule that fires exactly when the unit it names is not there. Silence would be a wrong
      * state; the loud version is a one-line fix in the rule file.
      */
@@ -2288,7 +2288,7 @@ public final class TriggerInterpreter {
      * <p>Why this can be a cast rather than a check worth worrying about: trigger tables only ever live on
      * characters ({@code Battle.fireTriggers} walks {@code battle.characters}), so anything else here means
      * the engine grew a second kind of table owner and this op needs a story for it. That is worth an
-     * exception rather than a silent skip — {@code SUMMON} would otherwise simply do nothing.
+     * exception rather than a silent skip - {@code SUMMON} would otherwise simply do nothing.
      */
     private static Character requireCharacterOwner(EffectSpec effect, TriggerContext ctx) {
         if (ctx.owner() instanceof Character character) {
@@ -2341,7 +2341,7 @@ public final class TriggerInterpreter {
      * Settles a {@code MODIFY_ATTR} effect (P10-3): "the target's {@code attribute} changes by
      * {@code percent} for {@code turns} turns" -- the generic stat buff / debuff.
      *
-     * <p><b>Why this op matters more than its size suggests.</b> 72 of the 93 characters have a
+     * <p><b>Why this op matters more than its size suggests.</b> 2 of the 93 characters have a
      * buff / enhance talent, and before this op the only way to express one was a new Java buff
      * class per character. With it, "ATK +33% for 2 turns" is data, and the engine gained no
      * character-specific knowledge at all: it forwards (attribute, value, turns) to
@@ -2390,8 +2390,8 @@ public final class TriggerInterpreter {
     }
 
     private static double perStackFactor(EffectSpec effect, CanHit target, TriggerContext ctx) {
-        // ★ A SELF counter (2026-09-30; reader: cone 23053's 「装备者每消耗 1 个战技点…最多叠加 4 层」).
-        // The bare name below is resolved on the TARGET, which is right for 「每层【当品】」 (a counter on the victim) but
+        // A SELF counter (2026-09-30; reader: cone 23053's "装备者每消耗 1 个战技点…最多叠加 4 层").
+        // The bare name below is resolved on the TARGET, which is right for "每层[当品]" (a counter on the victim) but
         // cannot say "MY counter" when the effect lands on somebody else -- so the condition vocabulary's own prefix is
         // accepted here too: `per_stack: self_stacks:<NAME>`. Same spelling, same meaning, one vocabulary.
         if (effect.getPerStack() != null && effect.getPerStack().trim().startsWith("self_stacks:")) {
@@ -2407,7 +2407,7 @@ public final class TriggerInterpreter {
             case "target_debuff_count" -> target.getBuffManager().debuffCount();
             case "target_dot_count" -> target.getBuffManager()
                     .countBuffs(com.laosun.aluminium.models.buff.DotBuff.class);
-            // ★ 「场上每有一名持有护盾的角色」 (cone 21043): OUR units currently holding a shield. A LIVE count,
+            // "场上每有一名持有护盾的角色" (cone 21043): OUR units currently holding a shield. A LIVE count,
             // read where the effect is evaluated -- it needs the battlefield because a unit does not know its own side.
             case "target_weakness_count" -> {
                 int weak = target instanceof com.laosun.aluminium.models.enemy.Enemy enemy ? enemy.weaknessCount() : -1;
@@ -2421,19 +2421,19 @@ public final class TriggerInterpreter {
 
     private static void modifyAttr(Battle battle, EffectSpec effect, TriggerContext ctx) {
         AttributeType attribute = AttributeType.fromString(effect.getAttribute());
-        // P11-2 (M-42): a **derived** magnitude — 「提高数值等同于<某人的属性>的 X% + Y%」. It is computed once,
+        // P11-2 (M-42): a derived magnitude - "提高数值等同于<某人的属性>的 X% + Y%". It is computed once,
         // when the rule fires, and it is an ABSOLUTE number in the target attribute's units: the documents that
         // need this state a value ("equal to 12% of Sunday's CRIT DMG plus 8%"), not a share of the target's base.
-        // ⚠ Which is why it does not go through `statModifier`'s usual base-attribute convention (`add_percent`).
+        // Note: Which is why it does not go through `statModifier`'s usual base-attribute convention (`add_percent`).
         // ? A flat `amount` is ABSOLUTE too (2026-09-29): measured, `amount: 50` on SPEED produced +5500, i.e. 50 x the target's base speed, because a
         // plain modifier is fed to `statModifier` as an `add_percent` fraction. The same reasoning the derived case already follows applies here.
-        // ⭐ A rule on DEALING_DAMAGE may say its modifier belongs to THIS hit (2026-09-29): 「对<某类目标>造成伤害时，
-        // 无视其 X% 防御力」 (relic 108/4) is a property of the instance, not of the wearer -- and `Battle` fires
+        // A rule on DEALING_DAMAGE may say its modifier belongs to THIS hit (2026-09-29): "对<某类目标>造成伤害时，
+        // 无视其 X% 防御力" (relic 108/4) is a property of the instance, not of the wearer -- and `Battle` fires
         // DEALING_DAMAGE (2539) before it settles the defence zone (2551), so a rule really can still change it.
         // Opt-in (`instance: true`) because seven shipped rules already use MODIFY_ATTR on that event.
         if (Boolean.TRUE.equals(effect.getInstance()) && ctx.damage() != null) {
-            // ★ An optional damage-type scope (2026-09-29): 「对目标造成的<b>击破伤害</b>无视其 X% 防御力」 (relic 119/4)
-            // and 「<b>追加攻击</b>无视其 X% 防御力」. The instance already knows its own type, so this is a comparison, not a new dimension.
+            // An optional damage-type scope (2026-09-29): "对目标造成的<b>击破伤害</b>无视其 X% 防御力" (relic 119/4)
+            // and "<b>追加攻击</b>无视其 X% 防御力". The instance already knows its own type, so this is a comparison, not a new dimension.
             com.laosun.aluminium.enums.DamageType instanceScope = parseDamageType(effect, "MODIFY_ATTR", null);
             if (instanceScope != null && ctx.damage().getType() != instanceScope) {
                 return;   // the instance belongs to another damage type: this rule does not speak about it
@@ -2449,7 +2449,7 @@ public final class TriggerInterpreter {
                 return;
             }
             if (attribute == AttributeType.CRIT_ATTACK) {
-                // ✅ per_stack belongs here too (2026-09-30; reader: cone 23016's 「每层【温驯】使暴击伤容提高」):
+                // per_stack belongs here too (2026-09-30; reader: cone 23016's "每层[温驯]使暴击伤容提高"):
                 // the two branches beside this one already scaled by the factor, and this one did not -- measured, a rule at
                 // one layer and at two layers produced the SAME number. Same shape as DEFENCE_IGNORE / the boost channel.
                 double critDamage = effect.getPercent() == null ? 0 : effect.getPercent();
@@ -2457,11 +2457,11 @@ public final class TriggerInterpreter {
                 ctx.damage().addCritDamage(critDamage);
                 return;
             }
-            // ★ 「造成的伤害提高 X%」 as a property of THIS hit (2026-09-30; reader: cone 21043's
-            // 「场上每有一名持有护盾的角色」). It reuses the same boost channel BOOST_DAMAGE writes, so the
+            // "造成的伤害提高 X%" as a property of THIS hit (2026-09-30; reader: cone 21043's
+            // "场上每有一名持有护盾的角色"). It reuses the same boost channel BOOST_DAMAGE writes, so the
             // number this rule adds is read by the damage formula exactly like any other boost of that instance -- and
             // `per_stack` is honoured, which is what makes a LIVE count ("the field right now") expressible at all.
-            // ⚠ Before this, such a rule had to be a written modifier, i.e. a snapshot taken at cast time.
+            // Note: Before this, such a rule had to be a written modifier, i.e. a snapshot taken at cast time.
             if (attribute == AttributeType.ALL_DAMAGE_TYPE_BOOST) {
                 double instanceBoost = effect.getPercent() == null ? 0 : effect.getPercent();
                 instanceBoost *= ctx.target() == null ? 1 : perStackFactor(effect, ctx.target(), ctx);
@@ -2474,11 +2474,11 @@ public final class TriggerInterpreter {
         boolean derived = (effect.getScale() != null && !effect.getScale().isBlank()) || effect.getPercent() == null;
         // ? A plain modifier is a share OR a flat value (2026-09-29): `amount` alone means "raise the attribute by this many points", which the
         // validator enforces as exactly one of the two.
-        // ⚠⚠ The share may come from the skill parameter now (2026-10-02), so "is a share stated" is NOT `percent != null`:
+        // Note:Note: The share may come from the skill parameter now (2026-10-02), so "is a share stated" is NOT `percent != null`:
         // asking only that sent a `percent_from_cast_param` modifier down the flat `amount` arm and unboxed a null. A share is
         // `percent` OR `percent_from_cast_param`; the derived flag above already covers the latter.
         double magnitude;
-        // ⚠⚠ `percent_from_skill_param` is the THIRD way to state a share (2026-10-02), and this is the very condition the comment above warns
+        // Note:Note: `percent_from_skill_param` is the THIRD way to state a share (2026-10-02), and this is the very condition the comment above warns
         // about: a share spelling left out of it sends the effect down the flat `amount` arm and unboxes a null. Measured: that is exactly what happened.
         if (effect.getPercent() != null || effect.getPercentFromCastParam() != null
                 || effect.getPercentFromSkillParam() != null || effect.getPercentFromResource() != null) {
@@ -2495,12 +2495,12 @@ public final class TriggerInterpreter {
             //   * a SHARE scales off the target's BASE value, so the ceiling is divided by that base first
             //     -- comparing a share with an absolute number (the first attempt) compares nothing.
             double applied = magnitude;
-            // 「每层【当品】额外使翡翠的攻击力提高0.50%」 (2026-09-29): a SHARE times a count. A plain modifier's magnitude is
-            // a share of the target's BASE, while the derived path yields ABSOLUTE units -- so 「每层…提高 X%」 on a flat
+            // "每层[当品]额外使翡翠的攻击力提高0.50%" (2026-09-29): a SHARE times a count. A plain modifier's magnitude is
+            // a share of the target's BASE, while the derived path yields ABSOLUTE units -- so "每层…提高 X%" on a flat
             // attribute had no spelling. Read PER TARGET, because the count differs from one victim to the next.
             if (effect.getPerStack() != null && !effect.getPerStack().isBlank()) {
-                // ⭐ `per_stack` may name the target's DEBUFF COUNT, not only a counter (2026-09-29): 「敌方目标每承受 1 个负面效果，
-                // 装备者对其造成的<属性>额外提高 X%，最多叠加 N 层」 is cone 21001 / 23020, and 116/4 counts a target's DoTs. A named
+                // `per_stack` may name the target's DEBUFF COUNT, not only a counter (2026-09-29): "敌方目标每承受 1 个负面效果，
+                // 装备者对其造成的<属性>额外提高 X%，最多叠加 N 层" is cone 21001 / 23020, and 116/4 counts a target's DoTs. A named
                 // counter keeps its old meaning, so nothing existing moves.
                 // ONE definition, one use (2026-09-30): this block used to compute per_stack itself and knew
                 // only `target_debuff_count` plus a generic counter, so `self_stacks:`, `shielded_count`,
@@ -2523,16 +2523,16 @@ public final class TriggerInterpreter {
             AbstractBuff buff = withSource(withTickOwner(
                     withLifetime(statModifier(attribute, applied, turns, permanent, maxStacks, derived), effect),
                     effect, ctx), ctx);
-            // 「处于【协奏】状态时，我方全体攻击力提高…」 (2026-09-28): the boost lasts as long as the STATE, and the state ends
+            // "处于[协奏]状态时，我方全体攻击力提高…" (2026-09-28): the boost lasts as long as the STATE, and the state ends
             // when a countdown's turn arrives -- a lifetime no `turns` can state. Naming the modifier is what lets
-            // `REMOVE_STATE <the same name>` take it off; ⚠ without a name the modifier is skipped by that loop, i.e.
+            // `REMOVE_STATE <the same name>` take it off; Note: without a name the modifier is skipped by that loop, i.e.
             // unnamed boosts keep exactly the lifetime they always had.
-            // ⭐ The ask travels onto the buff (2026-10-02), so `BuffManager` can honour it without knowing about effects.
+            // The ask travels onto the buff (2026-10-02), so `BuffManager` can honour it without knowing about effects.
             if (Boolean.TRUE.equals(effect.getCoexist())) {
                 buff.setKeepsSiblings(true);
             }
             if (Boolean.TRUE.equals(effect.getPerStackLive())) {
-                // ⭐ 「每拥有 1 层…提高 X%」 as a SUSTAINED aura (2026-10-02; reader family: fourteen documents). The share is
+                // "每拥有 1 层…提高 X%" as a SUSTAINED aura (2026-10-02; reader family: fourteen documents). The share is
                 // asked for on every read, so the aura follows the count -- a snapshot would only be right at the instant it
                 // was taken, and re-attaching on every change would stack the buff itself.
                 boolean derivedCounter = effect.getScale() != null
@@ -2546,7 +2546,7 @@ public final class TriggerInterpreter {
                 }
                 if (buff instanceof com.laosun.aluminium.models.buff.StatModifierBuff liveBuff) {
                     if (derivedCounter) {
-                        // ⭐ The derived form is ABSOLUTE: percent x layers (+ amount), read on every computation. Building it from
+                        // The derived form is ABSOLUTE: percent x layers (+ amount), read on every computation. Building it from
                         // `magnitude` would square the count, because magnitude already contains it.
                         String own = effect.getScale().trim().substring("self_stacks:".length()).trim();
                         double extra = effect.getAmount() == null ? 0 : effect.getAmount();
@@ -2561,31 +2561,31 @@ public final class TriggerInterpreter {
             if (effect.getBuff() != null && !effect.getBuff().isBlank()) {
                 buff.setBuffName(effect.getBuff().trim());
             }
-            // 「有100%的基础概率额外使该目标的全属性抗性降低10.00%」 (2026-09-29): an attribute modifier may be ROLLED,
-            // exactly like APPLY_DOT / APPLY_BUFF / APPLY_STATE / MODIFY_DAMAGE_TAKEN already are -- 17 corpus documents
-            // roll a base chance before an attribute change. ⚠ Unstated = attached directly, so no existing file changes
+            // "有100%的基础概率额外使该目标的全属性抗性降低10.00%" (2026-09-29): an attribute modifier may be ROLLED,
+            // exactly like APPLY_DOT / APPLY_BUFF / APPLY_STATE / MODIFY_DAMAGE_TAKEN already are -- 1corpus documents
+            // roll a base chance before an attribute change. Note: Unstated = attached directly, so no existing file changes
             // (no shipped file uses base_chance on MODIFY_ATTR).
             attachRolled(battle, target, buff, effect, ctx);
         }
     }
 
     /**
-     * The magnitude of a derived {@code MODIFY_ATTR}: {@code percent × <the rule owner's attribute> + amount}.
+     * The magnitude of a derived {@code MODIFY_ATTR}: {@code percent  x  <the rule owner's attribute> + amount}.
      *
-     * <p>The first user is 大丽花's trace 「又一场葬礼」: 「进入战斗时，使其他角色的击破特攻提高，提高数值等同于 #1% 大丽花的
-     * 击破特攻 + #3%」 — a percentage of her own Break Effect plus a flat part, granted to the rest of the party.
+     * <p>The first user is 大丽花's trace "又一场葬礼": "进入战斗时，使其他角色的击破特攻提高，提高数值等同于 #1% 大丽花的
+     * 击破特攻 + #3%" - a percentage of her own Break Effect plus a flat part, granted to the rest of the party.
      *
-     * <p>⚠ <b>Read at fire time, then frozen.</b> The value is taken from the owner's <b>resolved</b> attribute (so it
+     * <p>Note: <b>Read at fire time, then frozen.</b> The value is taken from the owner's <b>resolved</b> attribute (so it
      * includes whatever buffs are on them at that moment) and stored in an ordinary modifier, so a later change to
      * the owner's attribute does not retroactively rewrite it. That is the engine's existing snapshot convention
      * (§24.5: a memosprite's panel is derived once, at summon time) and it is also what "提高数值等同于" means in
-     * the documents — a number that was computed, then held for the duration.
+     * the documents - a number that was computed, then held for the duration.
      *
-     * <p>⚠ A missing attribute slot is a loud failure rather than {@code 0}: the alternative is a buff that grants
+     * <p>Note: A missing attribute slot is a loud failure rather than {@code 0}: the alternative is a buff that grants
      * nothing, which is a wrong number with no symptom.
      */
     /**
-     * The magnitude of a counter-scaled modifier: {@code percent × how many layers this unit carries}.
+     * The magnitude of a counter-scaled modifier: {@code percent  x  how many layers this unit carries}.
      *
      * <p>Spelled with the condition DSL's own two prefixes -- {@code self_stacks:<NAME>} reads the rule owner's counter
      * and {@code target_stacks:<NAME>} the event target's -- so "I have N layers" and "the number is N layers' worth"
@@ -2593,8 +2593,8 @@ public final class TriggerInterpreter {
      * wants the value to track a changing count must therefore be re-asserted when the count changes (the same-named
      * modifier replaces, so the newest application wins).
      *
-     * <p>⚠ Returns {@code null} for any other scale, so the caller falls through to the attribute/HP families.
-     * ⚠ A name nothing ever marks reads 0, which is a real answer ("no layers") and not an error; the loader's own
+     * <p>Note: Returns {@code null} for any other scale, so the caller falls through to the attribute/HP families.
+     * Note: A name nothing ever marks reads 0, which is a real answer ("no layers") and not an error; the loader's own
      * declared-counter check is what keeps a typo from looking like a zero.
      */
     private static Double stackScale(String key, double percent, TriggerContext ctx) {
@@ -2628,7 +2628,7 @@ public final class TriggerInterpreter {
     /**
      * The value of one parameter of the skill that produced the event, at the caster's CURRENT level (2026-10-02).
      *
-     * <p>⚠ Shared by the {@code cast_skill_param:<index>} scale and by {@code percent_from_cast_param}, so the two cannot drift: the damage
+     * <p>Note: Shared by the {@code cast_skill_param:<index>} scale and by {@code percent_from_cast_param}, so the two cannot drift: the damage
      * path reads the same row the same way (`multiplierOf` -- `skill.getData().getSkills()`, `attacker.skillLevel(skill)`, `level - 1`).
      */
     /**
@@ -2644,7 +2644,7 @@ public final class TriggerInterpreter {
 
     /** The same read, for a caller that spells the slot itself (`percent_from_skill_param`). */
     private static double ownerSkillParamValue(EffectSpec effect, TriggerContext ctx, String spelled) {
-        // ⭐ a share may name ANOTHER character's row (2026-10-02): the field says whose, and the slot stays a legal SkillType so the loader check still means something
+        // a share may name ANOTHER character's row (2026-10-02): the field says whose, and the slot stays a legal SkillType so the loader check still means something
         Character owner;
         if (effect.getSkillParamCid() != null) {
         CanHit found = allyWithCid(ctx, effect.getSkillParamCid());
@@ -2708,7 +2708,7 @@ public final class TriggerInterpreter {
 
     /** The share a magnitude is multiplied by: the stated `percent`, or the cast skill's own parameter. */
     /**
-     * ⭐ The amendment a `MODIFY_RULE{effect_percent}` filed for the rule that is firing (2026-10-02).
+     * The amendment a `MODIFY_RULE{effect_percent}` filed for the rule that is firing (2026-10-02).
      *
      * <p>It is added to a share the effect states by SPELLING -- a literal `percent` is raised by {@code amendedEffect} instead, so a rule is never raised twice.
      */
@@ -2725,7 +2725,7 @@ public final class TriggerInterpreter {
     }
 
     private static double shareOf(EffectSpec effect, TriggerContext ctx) {
-        // ⭐ A share CARRIED IN A RESOURCE, in basis points (2026-10-02): how a number captured at cast time is used later.
+        // A share CARRIED IN A RESOURCE, in basis points (2026-10-02): how a number captured at cast time is used later.
         if (effect.getPercentFromResource() != null) {
             Character holder = requireCharacterOwner(effect, ctx);
             return holder.getResources().value(effect.getPercentFromResource().trim()) / 10000.0;
@@ -2734,7 +2734,7 @@ public final class TriggerInterpreter {
             return effect.getPercent();
         }
         if (effect.getPercentFromSkillParam() != null) {
-            // ⭐ The share out of one of the owner's OWN skills (2026-10-02): 「等同于缇宝 #3% 生命上限」, where #3 lives in HIS ultimate.
+            // The share out of one of the owner's OWN skills (2026-10-02): "等同于缇宝 #3% 生命上限", where #3 lives in HIS ultimate.
             return ownerSkillParamValue(effect, ctx, effect.getPercentFromSkillParam().trim())
                     + amendmentDelta(effect, ctx);
         }
@@ -2746,7 +2746,7 @@ public final class TriggerInterpreter {
         return castParamValue(effect, ctx, spelled);
     }
     private static double derivedMagnitude(EffectSpec effect, TriggerContext ctx) {
-        // ⭐ A share from the cast skill with NO scale (2026-10-02). This method is entered whenever `derived` is true, and `derived`
+        // A share from the cast skill with NO scale (2026-10-02). This method is entered whenever `derived` is true, and `derived`
         // is "(has a scale) OR (no percent)", so the flat-`amount` case arrives here too -- hence the guard: only the cast-skill share, and
         // only when there is no scale to read.
         if ((effect.getScale() == null || effect.getScale().isBlank())
@@ -2754,23 +2754,23 @@ public final class TriggerInterpreter {
             return shareOf(effect, ctx) + (effect.getAmount() == null ? 0 : effect.getAmount());
         }
         Character owner = requireCharacterOwner(effect, ctx);
-        // ⚠⚠ `stackScale` takes a primitive, so handing it `effect.getPercent()` unboxes a null the moment a rule states
+        // Note:Note: `stackScale` takes a primitive, so handing it `effect.getPercent()` unboxes a null the moment a rule states
         // its share as `percent_from_cast_param` instead. The share is what the counter multiplies, so ask for it the one way.
         Double fromStacks = stackScale(effect.getScale(), shareOf(effect, ctx), ctx);
         if (fromStacks != null) {
             return fromStacks + (effect.getAmount() == null ? 0 : effect.getAmount());
         }
         if (CAST_ENERGY_SPENT.equals(effect.getScale().trim())) {
-            // ⚠ Before the attribute branch below, because this source is not an attribute and
+            // Note: Before the attribute branch below, because this source is not an attribute and
             // scaleAttribute would throw a message that reads like missing unit data.
             com.laosun.aluminium.models.Damage hit = ctx.damage();
             double spent = hit == null ? 0 : hit.getCastEnergySpent();
             return effect.getPercent() * spent + (effect.getAmount() == null ? 0 : effect.getAmount());
         }
         if (EVENT_AMOUNT.equals(effect.getScale().trim())) {
-            // ⭐ 「每消耗 1 点…提高 X%」 (2026-10-02): the triggering event's own magnitude, as a
-            // modifier. ⚠ `event_amount` is NOT a new spelling: `ADD_STACK` already read it (1306's
-            // `talent_phantasm_stack`, one 【幻相】 layer per point spent). What was missing is this ROUTE --
+            // "每消耗 1 点…提高 X%" (2026-10-02): the triggering event's own magnitude, as a
+            // modifier. Note: `event_amount` is NOT a new spelling: `ADD_STACK` already read it (1306's
+            // `talent_phantasm_stack`, one [幻相] layer per point spent). What was missing is this ROUTE --
             // modifiers read their magnitude here and had no way to ask the event. (It was ALSO withdrawn once from
             // `grantAmount`, where `amount_from_event` already served GAIN_RESOURCE; that note lives there.)
             // Before the attribute branch below, for the reason `cast_energy_spent` gives.
@@ -2786,7 +2786,7 @@ public final class TriggerInterpreter {
                     + (effect.getAmount() == null ? 0 : effect.getAmount());
         }
         if (effect.getScale().trim().startsWith(TriggerTable.ACTOR_ATTR_PREFIX)) {
-            // ⭐ The unit the event is ABOUT (1415 memosprite skill 10: 「等同于德谬歌生命上限的 #1%」, and 德谬歌 is the actor of the
+            // The unit the event is ABOUT (1415 memosprite skill 10: "等同于德谬歌生命上限的 #1%", and 德谬歌 is the actor of the
             // memosprite skill). Before the attribute branch below, which reads the rule OWNER.
             CanHit subject = ctx.actor();
             if (subject == null) {
@@ -2795,7 +2795,7 @@ public final class TriggerInterpreter {
             }
             AttributeType from = AttributeType.fromString(
                     effect.getScale().trim().substring(TriggerTable.ACTOR_ATTR_PREFIX.length()).trim());
-            // ⚠⚠ The share, not `percent` raw: this branch was written before `shareOf` existed, and left reading `percent`
+            // Note:Note: The share, not `percent` raw: this branch was written before `shareOf` existed, and left reading `percent`
             // directly -- so a rule whose share is `percent_from_cast_param` crashed on a null here. Same fix as its sibling below.
             return shareOf(effect, ctx) * subject.getAttribute(from).get()
                     + (effect.getAmount() == null ? 0 : effect.getAmount());
@@ -2818,8 +2818,8 @@ public final class TriggerInterpreter {
                     + (effect.getAmount() == null ? 0 : effect.getAmount());
         }
         if (effect.getScale().trim().startsWith(ABOVE_PREFIX)) {
-            // ⭐ 「速度大于等于 120 时…之后**每超过 1 点速度**…」 (2026-10-02): the EXCESS over a
-            // stated threshold, as a magnitude. ⚠ `self_max_energy` below is the same shape with the threshold
+            // "速度大于等于 120 时…之后每超过 1 点速度…" (2026-10-02): the EXCESS over a
+            // stated threshold, as a magnitude. Note: `self_max_energy` below is the same shape with the threshold
             // hard-wired to MAX ENERGY; this is that, parameterised.
             String[] parts = effect.getScale().trim().substring(ABOVE_PREFIX.length()).split(":", 2);
             if (parts.length != 2) {
@@ -2831,7 +2831,7 @@ public final class TriggerInterpreter {
             double excess = Math.max(0, owner.getAttribute(over).get() - threshold);
             return effect.getPercent() * excess + (effect.getAmount() == null ? 0 : effect.getAmount());
         }
-        // ⭐ A battle-level PARTY counter (2026-10-02; reader: 1513's reward): the counter lives on the battle, so it is
+        // A battle-level PARTY counter (2026-10-02; reader: 1513's reward): the counter lives on the battle, so it is
         // resolved here rather than through `scaleAttribute`, which answers "which attribute" and has no answer for it.
         if (effect.getScale().trim().startsWith("party_resource:")) {
             return resolveScale(effect.getScale(),
@@ -2839,7 +2839,7 @@ public final class TriggerInterpreter {
                     + (effect.getAmount() == null ? 0 : effect.getAmount());
         }
         if (SELF_MAX_ENERGY.equals(effect.getScale().trim())) {
-            // 「每超过 1 点」 where the points are MAX ENERGY: the same derived shape, off a value the attribute
+            // "每超过 1 点" where the points are MAX ENERGY: the same derived shape, off a value the attribute
             // table has no slot for (see the `self_max_energy` condition variable).
             return effect.getPercent() * owner.getMaxEnergy() + (effect.getAmount() == null ? 0 : effect.getAmount());
         }
@@ -2850,7 +2850,7 @@ public final class TriggerInterpreter {
                     "MODIFY_ATTR derives its value from " + source + ", which " + owner.getName()
                             + " has no resolved value for; the rule's \"scale\" cannot be read");
         }
-        // ⚠ `shareOf`, not `effect.getPercent()` (2026-10-02): the share may also come from one of the owner's own skills, and reading the raw field
+        // Note: `shareOf`, not `effect.getPercent()` (2026-10-02): the share may also come from one of the owner's own skills, and reading the raw field
         // NPEs on a rule that states it that way. Every other branch of this method already goes through `shareOf`; this line was the one left behind.
         return shareOf(effect, ctx) * value.get() + (effect.getAmount() == null ? 0 : effect.getAmount());
     }
@@ -2858,7 +2858,7 @@ public final class TriggerInterpreter {
     /**
      * The attribute a {@code "scale": "self_attr:<ATTRIBUTE>"} names.
      *
-     * <p>Deliberately the same spelling as the condition DSL's variable ({@code self_attr:SPEED} —
+     * <p>Deliberately the same spelling as the condition DSL's variable ({@code self_attr:SPEED} - 
      * {@code TriggerTable.SELF_ATTR_PREFIX}, shared so the two cannot drift): one says "my Speed matters", the
      * other says "the number is a share of my Speed", and both read the <b>rule owner</b>.
      *
@@ -2871,7 +2871,7 @@ public final class TriggerInterpreter {
     private static AttributeType scaleAttribute(EffectSpec effect, String op, TriggerSpec spec) {
         String raw = effect.getScale() == null ? "" : effect.getScale().trim();
         String origin = spec == null ? "" : " (source: " + spec.getSource() + ")";
-        // ⭐ `party_resource:<name>` joins this list (2026-10-02): like EVENT_AMOUNT it is a magnitude the op can read
+        // `party_resource:<name>` joins this list (2026-10-02): like EVENT_AMOUNT it is a magnitude the op can read
         // but not an AttributeType, so the question "which attribute does this scale name" has no answer for it.
         if (SELF_MAX_ENERGY.equals(raw) || EVENT_AMOUNT.equals(raw) || raw.startsWith(ABOVE_PREFIX)
                 || raw.startsWith("party_resource:")) {
@@ -2907,12 +2907,12 @@ public final class TriggerInterpreter {
      * <p><b>Why an event-bound buff counts as "permanent".</b> That flag means "never ticked"
      * ({@link AbstractBuff#isPermanent()}), which is exactly right here: a buff that ends 持续到施放首次攻击
      * must survive any number of turn boundaries, and giving it a placeholder turn count instead would make it
-     * expire on the first {@code afterMove} — a wrong answer that looks like a working rule. The flag's name
+     * expire on the first {@code afterMove} - a wrong answer that looks like a working rule. The flag's name
      * reads as "for the rest of the battle" in the JSON (where it is what authors write), but mechanically it
      * is "no turn limit", and an event ends this one.
      *
-     * <p>⚠ Also the reason this helper exists: {@code until} leaves {@code turns} null, and reading
-     * {@code getTurns()} into an {@code int} would throw at fire time — inside a battle, where the project
+     * <p>Note: Also the reason this helper exists: {@code until} leaves {@code turns} null, and reading
+     * {@code getTurns()} into an {@code int} would throw at fire time - inside a battle, where the project
      * puts nothing.
      */
     private static boolean unticked(EffectSpec effect) {
@@ -2927,7 +2927,7 @@ public final class TriggerInterpreter {
      * Attaches the {@code "until": …} a rule names to a buff it just created (see {@link EffectSpec#getUntil()}).
      *
      * <p>A no-op when the effect states no lifetime, so every buff that does not ask for one behaves exactly
-     * as before — the field's default is an <b>empty</b> set of ending events.
+     * as before - the field's default is an <b>empty</b> set of ending events.
      */
     private static AbstractBuff withLifetime(AbstractBuff buff, EffectSpec effect) {
         buff.setLifetimes(lifetimesOf(effect));
@@ -2942,16 +2942,16 @@ public final class TriggerInterpreter {
      * <b>event</b> that ends a buff, this names <b>whose turn boundary</b> spends it. A rule may state either, and
      * the state names are the same ones the rest of the op vocabulary uses.
      *
-     * <p>⭐ Two spellings since 2026-10-02, and the second one is what 「…消失时解除」 is built on:
+     * <p>Two spellings since 2026-10-02, and the second one is what "…消失时解除" is built on:
      * <ul>
-     *   <li>{@code "self"} — the rule owner's turns (星期日's 【蒙福者】, 1321's domain, 缇宝's 结界);</li>
-     *   <li>{@code "summon"} — <b>the owner's memosprite</b> (1402's 【至高之姿】 「<b>衣匠消失时</b>阿格莱雅解除
-     *       【至高之姿】状态」, and 1407/1415's 「随死龙消失而解除」).</li>
+     *   <li>{@code "self"} - the rule owner's turns (星期日's [蒙福者], 1321's domain, 缇宝's 结界);</li>
+     *   <li>{@code "summon"} - <b>the owner's memosprite</b> (1402's [至高之姿] "<b>衣匠消失时</b>阿格莱雅解除
+     *       [至高之姿]状态", and 140/1415's "随死龙消失而解除").</li>
      * </ul>
-     * ⚠ <b>The anchor IS the clock</b> ({@code BuffManager.removeBuffsAnchoredTo} asks {@code buff.ticksOn(dead)}),
+     * Note: <b>The anchor IS the clock</b> ({@code BuffManager.removeBuffsAnchoredTo} asks {@code buff.ticksOn(dead)}),
      * so this one field delivers both halves for free: the duration is spent on that unit's turn boundaries, and when
      * it dies the buff goes with it ({@code Battle.releaseBuffsAnchoredToTheDead}, which already sweeps both camps).
-     * ⚠ A missing summon is a <b>loud</b> error ({@link #requireSummon}) rather than a silent fall-back to the owner:
+     * Note: A missing summon is a <b>loud</b> error ({@link #requireSummon}) rather than a silent fall-back to the owner:
      * "my memosprite's turns" is meaningless when there is none, and a rule that quietly anchored to herself instead
      * would keep a buff alive for the rest of the battle.
      */
@@ -2964,13 +2964,13 @@ public final class TriggerInterpreter {
 
     /**
      * Validates {@code "ticks_on"} at load time: one value, spelled exactly, and only on ops that create a timed
-     * buff — the same "fail while the file is read" discipline as every other argument.
+     * buff - the same "fail while the file is read" discipline as every other argument.
      *
-     * <p>⚠ <b>A refusal can be invalidated by a later widening, and this one was</b> (2026-10-02). Until
+     * <p>Note: <b>A refusal can be invalidated by a later widening, and this one was</b> (2026-10-02). Until
      * {@code "summon"} existed, this method also refused {@code "ticks_on"} together with {@code "permanent": true},
      * because "nothing counts it down" made the field meaningless. That premise is gone: the same field is now the
-     * <b>anchor</b> as well, so a permanent buff anchored to another unit means exactly 「<i>that unit</b> disappears,
-     * so the buff ends</i>」 — which is a sentence two documents actually write (1402's 【至高之姿】, and the
+     * <b>anchor</b> as well, so a permanent buff anchored to another unit means exactly "<i>that unit</b> disappears,
+     * so the buff ends</i>" - which is a sentence two documents actually write (1402's [至高之姿], and the
      * 死龙 family). Read the <b>reason</b> a refusal was written, not just the code: what it was protecting against
      * may have stopped being true.
      */
@@ -2994,8 +2994,8 @@ public final class TriggerInterpreter {
      * The lifetimes a validated effect names; <b>empty</b> when it names none.
      *
      * <p>Every name has already been checked against {@link #LIFETIMES} at load time, so anything else here is an
-     * engine-side inconsistency rather than a content error — hence {@link IllegalStateException}, exactly as
-     * before. A rule may name several (「普攻<b>或</b>战技」): they are collected into one set, and the buff ends at
+     * engine-side inconsistency rather than a content error - hence {@link IllegalStateException}, exactly as
+     * before. A rule may name several ("普攻<b>或</b>战技"): they are collected into one set, and the buff ends at
      * the first of them.
      */
     private static Set<AbstractBuff.Lifetime> lifetimesOf(EffectSpec effect) {
@@ -3009,7 +3009,7 @@ public final class TriggerInterpreter {
                 case "next_attack" -> AbstractBuff.Lifetime.NEXT_ATTACK;
                 case "next_skill" -> AbstractBuff.Lifetime.NEXT_SKILL;
                 case "next_ultimate" -> AbstractBuff.Lifetime.NEXT_ULTIMATE;
-            // ★ The cast being delivered right now: raised inside the cast window, dropped when its events are done.
+            // The cast being delivered right now: raised inside the cast window, dropped when its events are done.
             case "cast_end" -> AbstractBuff.Lifetime.CAST_END;
             case "turn_end" -> AbstractBuff.Lifetime.TURN_END;
         case "next_turn_start" -> AbstractBuff.Lifetime.NEXT_TURN_START;
@@ -3030,8 +3030,8 @@ public final class TriggerInterpreter {
     /**
      * Settles an {@code APPLY_BUFF} effect: the target enters a <b>named state</b> for a duration.
      *
-     * <p><b>Why a state and not a stat buff.</b> The rule texts say 「处于【协奏】状态时」/「【转魄】状态下」/
-     * 「触电状态下的敌方目标」 — a <i>fact about the unit</i> that other rules read. {@code MODIFY_ATTR}
+     * <p><b>Why a state and not a stat buff.</b> The rule texts say "处于[协奏]状态时"/"[转魄]状态下"/
+     * "触电状态下的敌方目标" - a <i>fact about the unit</i> that other rules read. {@code MODIFY_ATTR}
      * already covers "the target's ATTACK changes"; this op covers "the target is now in a state", and the
      * two compose: the state is applied here, and whatever it changes is a separate effect conditioned on
      * {@code self has_state …} / {@code target has_state …}. Keeping them apart means one state can drive
@@ -3040,7 +3040,7 @@ public final class TriggerInterpreter {
      * <p>The state is an ordinary {@link StateBuff}, so it gets the whole buff lifecycle for free:
      * duration counted down on the owner's turns, refresh on re-application, removal by
      * {@code BuffManager.clearAll()}, and visibility to {@code hasBuff}-style queries. Applying a
-     * <b>different</b> state does not evict this one — {@code StateBuff.isSameKind} compares names, not
+     * <b>different</b> state does not evict this one - {@code StateBuff.isSameKind} compares names, not
      * classes.
      *
      * @param effect the effect ({@code buff}, exactly one of {@code turns} / {@code permanent}, optional
@@ -3051,8 +3051,8 @@ public final class TriggerInterpreter {
         boolean permanent = unticked(effect);
         int turns = permanent ? UNBOUNDED_DURATION_PLACEHOLDER : effect.getTurns();
         String state = effect.getBuff().trim();
-        // ⭐ How many instances this application carries (2026-10-02; reader: 1513's reward, whose state's INSTANCE COUNT is
-        // the 【符点】 it spent). A plain state refreshes on re-application, so only a STACKABLE one is repeated --
+        // How many instances this application carries (2026-10-02; reader: 1513's reward, whose state's INSTANCE COUNT is
+        // the [符点] it spent). A plain state refreshes on re-application, so only a STACKABLE one is repeated --
         // otherwise the loop would be a no-op dressed as a feature.
         int times = 1;
         if (Boolean.TRUE.equals(effect.getStackable())) {
@@ -3072,12 +3072,12 @@ public final class TriggerInterpreter {
                             : Boolean.TRUE.equals(effect.getDefersDeath())
                             ? new DeferredDeathBuff(state, turns, permanent)
                             : new StateBuff(state, turns, permanent), effect), effect, ctx), ctx);
-                // 「不会进入自己的回合」 rides on the state itself: a turn is not something a state could give back
+                // "不会进入自己的回合" rides on the state itself: a turn is not something a state could give back
                 // later, so the flag and the state share one lifetime by construction.
                 if (Boolean.TRUE.equals(effect.getSuspendsTurns())) {
                     buff.setSuspendsTurns(true);
                 }
-                // 「有 100% 的基础概率使敌方…陷入【通解】状态」: when the rule states one, the state is ROLLED (effect resistance
+                // "有 100% 的基础概率使敌方…陷入[通解]状态": when the rule states one, the state is ROLLED (effect resistance
                 // included); when it states none, this is the plain attach it has always been -- so no existing file changes.
                 attachRolled(battle, target, buff, effect, ctx);
             }
@@ -3086,7 +3086,7 @@ public final class TriggerInterpreter {
 
     /**
      * Settles a {@code REMOVE_STACK} effect: takes up to {@code amount} stacks of one attribute's modifier
-     * off the target — the "removes 1 stack(s) of this effect" half of effects like relic set 131's.
+     * off the target - the "removes 1 stack(s) of this effect" half of effects like relic set 131's.
      *
      * <p>The stack is the engine's existing stackable modifier ({@code MODIFY_ATTR} with {@code max_stacks}),
      * so nothing new is being modelled: what was missing was only that <b>data</b> could take one back. Until
@@ -3115,18 +3115,18 @@ public final class TriggerInterpreter {
     }
 
     /**
-     * Settles a {@code MODIFY_DAMAGE_TAKEN} effect: 「受到的伤害提高 X%」（易伤）/「受到的伤害降低 X%」（减伤）.
+     * Settles a {@code MODIFY_DAMAGE_TAKEN} effect: "受到的伤害提高 X%"（易伤）/"受到的伤害降低 X%"（减伤）.
      *
-     * <p><b>Why it is not {@code MODIFY_ATTR}.</b> Both are zones, not attributes: neither 「incoming damage
-     * ×1.12」 nor 「×0.92」 exists as an {@code AttributeType}, and the engine's two zone buffs
+     * <p><b>Why it is not {@code MODIFY_ATTR}.</b> Both are zones, not attributes: neither "incoming damage
+     *  x 1.12" nor " x 0.92" exists as an {@code AttributeType}, and the engine's two zone buffs
      * ({@link VulnerabilityBuff} / {@link ReductionBuff}) inject into the settlement of every hit instead of
-     * holding state — which is also why relic set 106's 2-piece ("Reduces DMG taken by 8%", a passive with no
+     * holding state - which is also why relic set 106's 2-piece ("Reduces DMG taken by 8%", a passive with no
      * turn count) sat in {@code _unmodelled.json} until this op existed.
      *
      * <p><b>The sign picks the zone</b>, the same convention {@code MODIFY_ATTR} uses for buff/debuff: a
      * positive percent is vulnerability on the defender (a debuff), a negative one is reduction (a buff).
      * One op rather than two, because the data spells them as one family and the two are mutually exclusive
-     * readings of one number — a content author writing {@code -0.08} means 减伤, and both buffs enforce
+     * readings of one number - a content author writing {@code -0.08} means 减伤, and both buffs enforce
      * their own sign so a mistake cannot end up as the other zone.
      *
      * @param effect the effect ({@code percent}, exactly one of {@code turns} / {@code permanent}, optional
@@ -3134,33 +3134,33 @@ public final class TriggerInterpreter {
      * @param ctx    the context
      */
     private static void modifyDamageTaken(Battle battle, EffectSpec effect, TriggerContext ctx) {
-        // ⚠ A DERIVED magnitude, not `percent` (2026-09-29): 「1 层时使敌人受到的伤害提高 15.00%，此后每叠加 1 层提高
-        // 5.00%」 (1218 椒丘) is `amount + percent x layers`, so a zone reads its own value the same way a MODIFY_ATTR
+        // Note: A DERIVED magnitude, not `percent` (2026-09-29): "1 层时使敌人受到的伤害提高 15.00%，此后每叠加 1 层提高
+        // 5.00%" (1218 椒丘) is `amount + percent x layers`, so a zone reads its own value the same way a MODIFY_ATTR
         // does. Before this, a `scale` on MODIFY_DAMAGE_TAKEN loaded fine and was silently IGNORED -- worse than refusing
         // it. A plain zone (no scale) still takes `percent` exactly as before.
         boolean derived = effect.getScale() != null && !effect.getScale().isBlank();
         double percent = derived ? derivedMagnitude(effect, ctx) : effect.getPercent();
         boolean permanent = unticked(effect);
         int turns = permanent ? UNBOUNDED_DURATION_PLACEHOLDER : effect.getTurns();
-        // 「受到的**击破伤害**提高」: an optional damage-type scope, spelled with the enum's own names (2026-09-28).
+        // "受到的击破伤害提高": an optional damage-type scope, spelled with the enum's own names (2026-09-28).
         com.laosun.aluminium.enums.DamageType scope = parseDamageType(effect, "MODIFY_DAMAGE_TAKEN", null);
         for (CanHit target : resolveTargets(battle, effect, ctx)) {
             AbstractBuff zone = withSource(withTickOwner(withLifetime(percent > 0
                     ? new VulnerabilityBuff(turns, percent, permanent, scope)
                     : new ReductionBuff(turns, -percent, permanent, scope), effect), effect, ctx), ctx);
-            // ⚠ `withTickOwner` joined this chain on 2026-09-30. It was missing, so `ticks_on` was a SILENT no-op on
+            // Note: `withTickOwner` joined this chain on 2026-09-30. It was missing, so `ticks_on` was a SILENT no-op on
             // this op: 1218's zone carried `ticks_on: "self"` and its clock still belonged to the carrier, which meant
-            // 「椒丘陷入无法战斗状态时结界解除」 could never fire -- measured at exactly 1.40x before and after she fell
+            // "椒丘陷入无法战斗状态时结界解除" could never fire -- measured at exactly 1.40x before and after she fell
             // (AnchorDeathTest). The other four buff-creating ops had it; this one did not.
             // A NAMED modifier is what REMOVE_STATE can take off (the same field MODIFY_ATTR has used since 2026-09-28;
             // BuffManager.removeState's last loop walks every buff that carries a name). Without it a zone-scoped
-            // 「受到的伤害降低」 could only be spelled `permanent`, i.e. it would stay on for the rest of the battle --
-            // which is why 1507's 千锻魂 needs it: the reduction lasts as long as the zone's countdown, not forever.
+            // "受到的伤害降低" could only be spelled `permanent`, i.e. it would stay on for the rest of the battle --
+            // which is why 150's 千锻魂 needs it: the reduction lasts as long as the zone's countdown, not forever.
             if (effect.getBuff() != null && !effect.getBuff().isBlank()) {
                 zone.setBuffName(effect.getBuff().trim());
             }
-            // 「有 100% 的基础概率使…受到的持续伤害提高 30%」 (1108 桑波): a zone may be ROLLED, through the same
-            // resist pipeline APPLY_BUFF/APPLY_DOT use. ⚠ Unstated = attached directly, so no existing file changes.
+            // "有 100% 的基础概率使…受到的持续伤害提高 30%" (1108 桑波): a zone may be ROLLED, through the same
+            // resist pipeline APPLY_BUFF/APPLY_DOT use. Note: Unstated = attached directly, so no existing file changes.
             attachRolled(battle, target, zone, effect, ctx);
         }
     }
@@ -3170,7 +3170,7 @@ public final class TriggerInterpreter {
      *
      * <p>Trigger tables only ever belong to characters ({@code Battle.fireTriggers} walks
      * {@code battle.characters} and enemies have none), so the branch is about the type system rather than about
-     * a real case — but a hand-built context can carry anything, and "0 ranks" is the answer that never unlocks
+     * a real case - but a hand-built context can carry anything, and "0 ranks" is the answer that never unlocks
      * an Eidolon by accident.
      */
     private static int eidolonRankOf(CanHit owner) {
@@ -3180,10 +3180,10 @@ public final class TriggerInterpreter {
     /**
      * Settles a {@code BOOST_DAMAGE} effect: raises (or lowers) <b>the damage instance being settled</b>.
      *
-     * <p>This is the op behind 「对处于 X 状态的目标造成的伤害提高 Y%」, and it exists because that sentence is
+     * <p>This is the op behind "对处于 X 状态的目标造成的伤害提高 Y%", and it exists because that sentence is
      * not a buff: it applies to the hits that happen to satisfy a condition, so the natural home for the state
      * is the hit itself. The rule fires on {@link TriggerEvent#DEALING_DAMAGE}, the engine hands the pending
-     * instance over in the context, and this adds one modifier to its DMG-boost zone — after which the instance
+     * instance over in the context, and this adds one modifier to its DMG-boost zone - after which the instance
      * is settled as usual. Nothing is attached to anybody, so nothing has to be removed, and a second hit is
      * unaffected unless its own firing says otherwise.
      *
@@ -3210,16 +3210,16 @@ public final class TriggerInterpreter {
             throw new IllegalStateException(
                     "Op BOOST_DAMAGE needs the damage instance being settled, but this context carries none");
         }
-        // ⚠ A `damage_type` here must actually SCOPE the boost (round 258: the loader accepted it while this method
+        // Note: A `damage_type` here must actually SCOPE the boost (round 258: the loader accepted it while this method
         // ignored it, so "follow-up attacks only" silently raised every hit -- measured: an ordinary hit against a low-HP
         // target came out 1.24x instead of 1.0x). Same semantics as MODIFY_ATTR's instance route.
         com.laosun.aluminium.enums.DamageType only = parseDamageType(effect, "BOOST_DAMAGE", null);
         if (only != null && damage.getType() != only) {
             return;
         }
-        // ⭐ Both a stated `scale` and a stated ceiling must be read (2026-09-30; reader: light cone 23062).
-        // ⚠ This method once ignored `damage_type` the same way -- see the comment above, round 258.
-        // ⭐ Through `shareOf`, like every other op that reads a share (2026-10-02; measured: `percent_from_resource` passed validation -- `requirePercent` has admitted it since round
+        // Both a stated `scale` and a stated ceiling must be read (2026-09-30; reader: light cone 23062).
+        // Note: This method once ignored `damage_type` the same way -- see the comment above, round 258.
+        // Through `shareOf`, like every other op that reads a share (2026-10-02; measured: `percent_from_resource` passed validation -- `requirePercent` has admitted it since round
         // 83 -- and then died here with "getPercent() is null", so the op validated against a vocabulary it did not apply).
         double magnitude = effect.getScale() == null || effect.getScale().isBlank()
                 ? shareOf(effect, ctx)
@@ -3242,42 +3242,42 @@ public final class TriggerInterpreter {
     /**
      * The one scale {@code GAIN_ENERGY} accepts: a share of the <b>receiving</b> unit's maximum energy.
      *
-     * <p>「为指定我方单体角色恢复等同于 #1[f1]% 能量上限的能量」 (星期日's ultimate). It cannot be a flat number,
-     * because the maximum is per character (姬子 120 / 星期日 130 / 翡翠 140) — writing 20 would be wrong for all of
+     * <p>"为指定我方单体角色恢复等同于 #1[f1]% 能量上限的能量" (星期日's ultimate). It cannot be a flat number,
+     * because the maximum is per character (姬子 120 / 星期日 130 / 翡翠 140) - writing 20 would be wrong for all of
      * them, and it would look right for whichever one the author happened to check.
      */
     private static final Set<String> ENERGY_SCALES = Set.of("target_max_energy");
 
     /**
      * The one derived scale that is not an attribute: {@code MODIFY_ATTR}'s magnitude may be a share of the rule
-     * owner's <b>maximum energy</b> (relic set 328's 「每超过 1 点」). Same spelling family as the condition variable
+     * owner's <b>maximum energy</b> (relic set 328's "每超过 1 点"). Same spelling family as the condition variable
      * above, and deliberately not an {@code AttributeType}.
      */
     private static final String SELF_MAX_ENERGY = "self_max_energy";
 
     /**
-     * 「每消耗 1 点能量值」 (light cone 23062): the points are the energy THE CAST ITSELF spent.
+     * "每消耗 1 点能量值" (light cone 23062): the points are the energy THE CAST ITSELF spent.
      *
-     * <p>⚠ Not an attribute, so it cannot go through 算子 「scaleAttribute」 — its branch below returns first.
+     * <p>Note: Not an attribute, so it cannot go through 算子 "scaleAttribute" - its branch below returns first.
      * The value rides on the damage instance because DEALING_DAMAGE is the only event that hands it over.
-     * ⚠ A missing instance and a non-ultimate both read 0, which is the right answer for both: this
+     * Note: A missing instance and a non-ultimate both read 0, which is the right answer for both: this
      * clause adds nothing when no energy was spent.
      */
     private static final String CAST_ENERGY_SPENT = "cast_energy_spent";
 
     /**
-     * 「每消耗/每损失 1 点…提高 X%」 (2026-10-02): a modifier’s magnitude that follows the event.
+     * "每消耗/每损失 1 点…提高 X%" (2026-10-02): a modifier's magnitude that follows the event.
      *
-     * <p>Sits beside {@link #CAST_ENERGY_SPENT} on purpose — the same shape bound to the cast — and, like it,
+     * <p>Sits beside {@link #CAST_ENERGY_SPENT} on purpose - the same shape bound to the cast - and, like it,
      * is deliberately not an {@code AttributeType}.
      */
     private static final String EVENT_AMOUNT = "event_amount";
 
     /**
-     * 「速度大于等于 X 时…每超过 1 点速度…」 (2026-10-02): {@code self_attr_above:<ATTRIBUTE>:<threshold>}.
+     * "速度大于等于 X 时…每超过 1 点速度…" (2026-10-02): {@code self_attr_above:<ATTRIBUTE>:<threshold>}.
      *
-     * <p>Like {@link #SELF_MAX_ENERGY} — the same shape, with the threshold stated instead of implied by the
-     * energy cap — and, like it, not an {@code AttributeType}.
+     * <p>Like {@link #SELF_MAX_ENERGY} - the same shape, with the threshold stated instead of implied by the
+     * energy cap - and, like it, not an {@code AttributeType}.
      */
     private static final String ABOVE_PREFIX = "self_attr_above:";
 
@@ -3306,7 +3306,7 @@ public final class TriggerInterpreter {
             requireAmount(effect, op, spec);
             return;
         }
-        // ⚠ `amount` together with a `scale` is the shape 「等同于 X% 防御力 + 760」: the scale is the share OF
+        // Note: `amount` together with a `scale` is the shape "等同于 X% 防御力 + 60": the scale is the share OF
         // something, and the amount is the flat addend. It used to be refused here ("which one wins?"), which is why
         // no shipped rule states both -- so allowing it now changes no existing content.
         if (effect.getAmount() != null && effect.getPercent() == null) {
@@ -3334,16 +3334,16 @@ public final class TriggerInterpreter {
     }
 
     /**
-     * Validates {@code "scale": "cast_applied:&lt;状态名&gt;"} — a per-<b>landed</b>-application multiplier.
+     * Validates {@code "scale": "cast_applied:&lt;状态名&gt;"} - a per-<b>landed</b>-application multiplier.
      *
      * <p>Two things are checked, and both are mistakes that would otherwise be silent:
      * <ul>
      *   <li><b>the state name is one the engine rolls for</b> ({@link BuffManager#isRolledStateName}): 冻结 / 纠缠 /
-     *       禁锢 and the four DOT states. A typo would make the counter answer 0 forever — a rule that pays nothing,
+     *       禁锢 and the four DOT states. A typo would make the counter answer 0 forever - a rule that pays nothing,
      *       with nothing to report;</li>
      *   <li><b>the rule fires on a cast</b>. The record only exists while a cast's own events are being delivered
      *       ({@code Battle.beginCast} … {@code endCastOutcome}); on {@code TAKING_HIT}, {@code TURN_START} or
-     *       {@code KILL} it would read the <i>previous</i> cast's numbers or 0 — the kind of stale value this project
+     *       {@code KILL} it would read the <i>previous</i> cast's numbers or 0 - the kind of stale value this project
      *       refuses to leave implicit. The four cast events are the ones {@code SkillExecutor} fires inside that
      *       window.</li>
      * </ul>
@@ -3400,22 +3400,22 @@ public final class TriggerInterpreter {
         double flat = effect.getAmount() == null ? 0 : effect.getAmount();
         return switch (scale.trim()) {
             case "target_max_hp" -> target.getMaxHp() * share + flat;
-            // ★ 「回复等同于各自**已损失生命值** X% 的生命值」 (cone 21023): "each one's own" is what
+            // "回复等同于各自已损失生命值 X% 的生命值" (cone 21023): "each one's own" is what
             // `target` already means here -- the heal is granted per recipient -- so the reading is `target`'s max HP minus
             // its current HP, never the healer's and never a battle-wide total (that is 1205's separate cumulative idea).
             case "target_lost_hp" -> Math.max(0, target.getMaxHp() - target.getCurrentHp()) * share + flat;
             case "owner_max_hp" -> ownerAttributeOf(ctx, "owner_max_hp", AttributeType.HEALTH) * share + flat;
-            // ⭐ 「消耗等同于万敌**当前生命值** 35% 的生命值」 (2026-10-02, reader: 1404's two enhanced skills). The
+            // "消耗等同于万敌当前生命值 35% 的生命值" (2026-10-02, reader: 1404's two enhanced skills). The
             // vocabulary had max-HP shares and a lost-HP share, and neither says "a share of what is left": 35% of MAX on a
             // wounded unit is a plausible-looking wrong number, which is exactly the kind this engine refuses to guess.
-            // ⚠ `target` is the unit being resolved (for CONSUME_HP, the spender), matching the `target_*` family.
+            // Note: `target` is the unit being resolved (for CONSUME_HP, the spender), matching the `target_*` family.
             case "target_current_hp" -> target.getCurrentHp() * share + flat;
-            // 三月七 100102: a shield of 「57% 防御力 + 760」 -- a share of the maker's DEFENCE plus a constant.
+            // 三月七 100102: a shield of "5% 防御力 + 60" -- a share of the maker's DEFENCE plus a constant.
             case "owner_def" -> ownerAttributeOf(ctx, "owner_def", AttributeType.DEFENCE) * share + flat;
-            // ? 1414's shield is 「20.00% 攻击力 + 400」 (2026-09-29): the same derived shape, off ATTACK. Seven documents state
+            // ? 1414's shield is "20.00% 攻击力 + 400" (2026-09-29): the same derived shape, off ATTACK. Seven documents state
             // an ATK-scaled shield or heal and the vocabulary had no name for it.
             case "owner_attack" -> ownerAttributeOf(ctx, "owner_attack", AttributeType.ATTACK) * share + flat;
-            // ⭐ 「每消耗/每损失 1 点…」 (2026-10-02): the triggering EVENT's own magnitude.
+            // "每消耗/每损失 1 点…" (2026-10-02): the triggering EVENT's own magnitude.
             // The absolute value, because a spend arrives negative and "每 1 点" counts points.
             default -> throw new IllegalStateException(
                     "Scale '" + scale + "' passed validation but has no implementation");
@@ -3425,8 +3425,8 @@ public final class TriggerInterpreter {
     /**
      * One attribute of the rule owner, for the {@code owner_*} scales of a heal or shield.
      *
-     * <p>⚠ A missing owner, or an owner without that attribute, is a loud failure rather than 0: a shield of
-     * 「some share of nothing」 would be a wrong number with no symptom.
+     * <p>Note: A missing owner, or an owner without that attribute, is a loud failure rather than 0: a shield of
+     * "some share of nothing" would be a wrong number with no symptom.
      */
     private static double ownerAttributeOf(TriggerContext ctx, String scale, AttributeType attribute) {
         if (ctx.owner() == null) {
@@ -3442,49 +3442,49 @@ public final class TriggerInterpreter {
     }
 
     /**
-     * Settles a {@code DISPEL} effect: removes up to {@code amount} <b>negative effects</b> from the target —
-     * 「解除 N 个负面效果」.
+     * Settles a {@code DISPEL} effect: removes up to {@code amount} <b>negative effects</b> from the target - 
+     * "解除 N 个负面效果".
      *
      * <p>What counts as negative is {@code AbstractBuff.isDebuff()}, i.e. a decision taken per buff class rather
      * than a guess made here: a DOT, a control, 易伤, 嘲讽 and a stat <i>debuff</i> are negative; 减伤, a speed
-     * boost and a named state are not. That is why this op needs no filter of its own — and why it cannot be
+     * boost and a named state are not. That is why this op needs no filter of its own - and why it cannot be
      * tricked into removing a shield.
      *
      * <p>Nothing to dispel is <b>not</b> an error, for the same reason as {@code REMOVE_STACK}: the shape
-     * 「受到攻击时，解除自身 1 个负面效果」 fires on every hit, including the ones where nothing is on you.
+     * "受到攻击时，解除自身 1 个负面效果" fires on every hit, including the ones where nothing is on you.
      *
      * @param effect the effect ({@code amount}, optional {@code target})
      * @param ctx    the context
      */
     /**
-     * {@code REMOVE_STATE}: takes the named state off every resolved target — the "only the newest one holds it"
-     * half of 星期日's 【蒙福者】.
+     * {@code REMOVE_STATE}: takes the named state off every resolved target - the "only the newest one holds it"
+     * half of 星期日's [蒙福者].
      *
-     * <p>⚠ Removing a state that is not there is <b>not</b> an error: an "only the latest target" rule runs on every
+     * <p>Note: Removing a state that is not there is <b>not</b> an error: an "only the latest target" rule runs on every
      * cast, and most of those casts find the state on somebody (or nobody) whose removal is simply nothing to do.
      * The op that <i>applies</i> a state to a unit that does not exist is loud ({@code "target": "summon"}); this one
      * has no such unit to miss.
      */
     /**
-     * {@code TAUNT}: puts the engine's {@link TauntBuff} on every resolved target — 「使目标陷入嘲讽状态，持续1回合」.
+     * {@code TAUNT}: puts the engine's {@link TauntBuff} on every resolved target - "使目标陷入嘲讽状态，持续1回合".
      *
      * <p>The buff is a pure marker, and the constraint it carries is a <b>hard one</b> implemented at target
      * selection (`TargetSelector`): as long as it is attached to a living unit, single-target attacks and the centre
-     * of a blast attack can only pick that unit. ⚠ That is the 「嘲讽」 the corpus asks for (云璃's ultimate puts it
-     * on every enemy, 千冶·刃's skill on one) and it is deliberately NOT the same thing as 「被敌方攻击的概率提高」
-     * (三月七/杰帕德/玲可), which is a soft weight — that sentence carries <b>no number</b> in any document, so it is
+     * of a blast attack can only pick that unit. Note: That is the "嘲讽" the corpus asks for (云璃's ultimate puts it
+     * on every enemy, 千冶-刃's skill on one) and it is deliberately NOT the same thing as "被敌方攻击的概率提高"
+     * (三月七/杰帕德/玲可), which is a soft weight - that sentence carries <b>no number</b> in any document, so it is
      * registered as a data gap rather than guessed at here.
      */
     /**
-     * {@code APPLY_BUFF}'s roll, when the rule states one: 「有 100% 的基础概率使敌方每个单体目标陷入【通解】状态」 (1106 佩拉).
+     * {@code APPLY_BUFF}'s roll, when the rule states one: "有 100% 的基础概率使敌方每个单体目标陷入[通解]状态" (1106 佩拉).
      *
      * <p>It goes through the <b>same</b> entry point {@code APPLY_DOT} and {@code APPLY_CONTROL} use, so a rolled state meets
-     * effect resistance exactly as they do — ⚠ which is the reason this exists at all: applying the state unconditionally
-     * would drop 「基础概率」, and that is a different mechanic rather than a smaller number (100% base chance is still
+     * effect resistance exactly as they do - Note: which is the reason this exists at all: applying the state unconditionally
+     * would drop "基础概率", and that is a different mechanic rather than a smaller number (100% base chance is still
      * resistible).
      *
-     * <p>⚠ A plain {@link com.laosun.aluminium.models.buff.StateBuff} reports {@code isDebuff() == false} and carries no
-     * {@code debuffClass}, so it meets <b>no class resistance</b> — correct for a state no document calls control or DOT,
+     * <p>Note: A plain {@link com.laosun.aluminium.models.buff.StateBuff} reports {@code isDebuff() == false} and carries no
+     * {@code debuffClass}, so it meets <b>no class resistance</b> - correct for a state no document calls control or DOT,
      * and the honest limit of what this spelling can say.
      *
      * @return {@code true} when the state was attached (or when the rule stated no chance at all)
@@ -3499,11 +3499,11 @@ public final class TriggerInterpreter {
     }
 
     /**
-     * {@code REMOVE_BUFF}: 「解除指定敌方单体的 1 个增益效果」 — takes up to {@code amount} positive, temporary buffs off
+     * {@code REMOVE_BUFF}: "解除指定敌方单体的 1 个增益效果" - takes up to {@code amount} positive, temporary buffs off
      * each resolved target.
      *
-     * <p>⚠ Its direction is what makes it a separate op rather than a flag on {@code DISPEL}: that one is defined as
-     * "negative effects on the carrier", and the two sentences mean opposite things about the same word (「解除」). Keeping
+     * <p>Note: Its direction is what makes it a separate op rather than a flag on {@code DISPEL}: that one is defined as
+     * "negative effects on the carrier", and the two sentences mean opposite things about the same word ("解除"). Keeping
      * them apart is also what lets each one be validated and tested on its own.
      */
     private static void removeBuffs(Battle battle, EffectSpec effect, TriggerContext ctx) {
@@ -3518,7 +3518,7 @@ public final class TriggerInterpreter {
     /**
      * Reads an optional {@code damage_type} and turns it into the engine's own spelling.
      *
-     * <p>⚠ A misspelling that silently meant "all damage types" would be a wrong number with no symptom — the same hole the
+     * <p>Note: A misspelling that silently meant "all damage types" would be a wrong number with no symptom - the same hole the
      * closed-set checks elsewhere in this interpreter exist to close, so the error names every legal value.
      */
     private static com.laosun.aluminium.enums.DamageType parseDamageType(EffectSpec effect, String op, TriggerSpec spec) {
@@ -3539,12 +3539,12 @@ public final class TriggerInterpreter {
     /**
      * Tells the holder that a resource moved ({@code RESOURCE_CHANGED}, 2026-09-30).
      *
-     * <p>★ From the OP, not from {@code ResourceManager}: the manager owns no battle, so it cannot raise a trigger.
+     * <p>From the OP, not from {@code ResourceManager}: the manager owns no battle, so it cannot raise a trigger.
      */
-    /** ✅ Tells the holder that a resource moved, WITH its name and delta (2026-09-30). */
-    /** ✅ How much of a resource exists right now: the unit’s own copy plus the party counter (2026-09-30). */
+    /** Tells the holder that a resource moved, WITH its name and delta (2026-09-30). */
+    /** How much of a resource exists right now: the unit's own copy plus the party counter (2026-09-30). */
     /**
-     * ⭐ What the DELTA between two moments must be measured with (2026-10-02): the holder's own store when it has the resource, otherwise the party's. ⚠ Not `resourceAmount`, which
+     * What the DELTA between two moments must be measured with (2026-10-02): the holder's own store when it has the resource, otherwise the party's. Note: Not `resourceAmount`, which
      * ADDS the two -- right for a total, wrong for a difference (measured: a SELF resource read as if it were twice as large, and a capture of 4 came out 8).
      */
     private static int measureForTheDelta(TriggerContext ctx, CanHit holder, String id) {
@@ -3572,7 +3572,7 @@ public final class TriggerInterpreter {
         return effect.stackCap() == null ? 0 : effect.stackCap();
     }
 
-    /** 「最多叠加 N 层」: the only stack-family field a DOT may state, and it must be a real ceiling. */
+    /** "最多叠加 N 层": the only stack-family field a DOT may state, and it must be a real ceiling. */
     private static void requireDotStackCap(EffectSpec effect, String op, TriggerSpec spec) {
         if (effect.stackCap() == null) {
             return;
@@ -3589,10 +3589,10 @@ public final class TriggerInterpreter {
      * {@code REPLACE_SKILL}: swaps one of the rule owner's skill slots for a data row, for the effect's lifetime.
      *
      * <p>The swap rides on {@link com.laosun.aluminium.models.buff.SkillSwapBuff}, which installs the replacement when it lands
-     * and puts the original back when it leaves — so `turns`, `permanent` and `until` (「下一次普攻」) are the lifetime
+     * and puts the original back when it leaves - so `turns`, `permanent` and `until` ("下一次普攻") are the lifetime
      * machinery this engine already has, not a second one.
      *
-     * <p>⚠ The replacement is built ONCE per rule firing and shared by every resolved target: it is a skill, not state, and
+     * <p>Note: The replacement is built ONCE per rule firing and shared by every resolved target: it is a skill, not state, and
      * the buff restores whatever each target had in that slot.
      */
     private static void replaceSkill(Battle battle, EffectSpec effect, TriggerContext ctx) {
@@ -3618,11 +3618,11 @@ public final class TriggerInterpreter {
         }
     }
 
-    /** {@code TICK_DOT}: 「立即产生 1 次…伤害」 — one extra instance of the named state, at the stated share. */
+    /** {@code TICK_DOT}: "立即产生 1 次…伤害" - one extra instance of the named state, at the stated share. */
     private static void tickDot(Battle battle, EffectSpec effect, TriggerContext ctx) {
         DamageElement element = DamageElement.fromString(effect.getElement());
-        // ⚠ The share comes from `shareOf`, not from `percent` directly (2026-10-02): a rule may state it as `percent_from_resource`, and unboxing `percent` here
-        // NPEs. `shareOf` is the engine’s own resolver for every share spelling.
+        // Note: The share comes from `shareOf`, not from `percent` directly (2026-10-02): a rule may state it as `percent_from_resource`, and unboxing `percent` here
+        // NPEs. `shareOf` is the engine's own resolver for every share spelling.
         double percent = shareOf(effect, ctx);
         for (CanHit target : resolveTargets(battle, effect, ctx)) {
             if (target != null && !target.isDeath()) {
@@ -3633,33 +3633,33 @@ public final class TriggerInterpreter {
 
     private static void taunt(Battle battle, EffectSpec effect, TriggerContext ctx) {
         for (CanHit target : resolveTargets(battle, effect, ctx)) {
-            // ⚠ Through the resist pipeline like every other negative state: 「使目标陷入嘲讽状态」 states no
-            // probability, which means a 100% BASE chance — the game still runs it through 效果命中 / 效果抵抗. Writing
+            // Note: Through the resist pipeline like every other negative state: "使目标陷入嘲讽状态" states no
+            // probability, which means a 100% BASE chance - the game still runs it through 效果命中 / 效果抵抗. Writing
             // the marker directly made the engine's taunt unconditionally certain, which no document says.
             battle.tryApplyDebuff(ctx.owner(), target, withSource(new TauntBuff(effect.getTurns()), ctx), 1.0, null);
         }
     }
 
     /**
-     * {@code APPLY_CONTROL}: 「有 50% 基础概率使敌方目标陷入冻结状态，持续1回合」 — a named control state with a
+     * {@code APPLY_CONTROL}: "有 50% 基础概率使敌方目标陷入冻结状态，持续1回合" - a named control state with a
      * duration, and (optionally) a <b>base chance</b> that runs through the real 效果命中 / 效果抵抗 pipeline.
      *
      * <p><b>What the state does is the engine's business, not the rule's.</b> 冻结 blocks acting; 纠缠 and 禁锢
-     * slow instead — those three facts live in {@code Constant.CONTROL_STATES} (one entry per state, with the
+     * slow instead - those three facts live in {@code Constant.CONTROL_STATES} (one entry per state, with the
      * resistance key the roll needs), and the rule states only <i>which</i> state, for how long, and how likely.
-     * A rule cannot say 「冻结但随便」, and a misspelled state is refused at load time rather than attaching
+     * A rule cannot say "冻结但随便", and a misspelled state is refused at load time rather than attaching
      * nothing.
      *
-     * <p><b>Why the roll is per target.</b> A base chance is rolled for each victim — three enemies can see three
-     * different outcomes, which is what 「每个目标各有 50% 概率」 means and what the rule-level {@code chance}
+     * <p><b>Why the roll is per target.</b> A base chance is rolled for each victim - three enemies can see three
+     * different outcomes, which is what "每个目标各有 50% 概率" means and what the rule-level {@code chance}
      * (one roll per firing) could not express. It goes through {@link Battle#tryApplyDebuff}, the same entry point
      * the enemy-side debuff path uses, so the applier's 效果命中, the victim's 效果抵抗 and its per-state
-     * resistance ({@code STAT_CTRL_Frozen} — the reason {@code ControlEffect.resistKey} exists) all apply.
+     * resistance ({@code STAT_CTRL_Frozen} - the reason {@code ControlEffect.resistKey} exists) all apply.
      *
-     * <p>⚠ The control's <b>per-turn damage</b> (「冻结状态下…每回合开始时受到等同于三月七60%攻击力的冰属性附加
-     * 伤害」) is <b>not</b> written by this op yet: it needs an "attach a damage-over-time" op of its own, and that
+     * <p>Note: The control's <b>per-turn damage</b> ("冻结状态下…每回合开始时受到等同于三月七60%攻击力的冰属性附加
+     * 伤害") is <b>not</b> written by this op yet: it needs an "attach a damage-over-time" op of its own, and that
      * is registered rather than folded in here as a field nobody else can use. What this op attaches is the state
-     * itself, so 「不能行动」 is complete.
+     * itself, so "不能行动" is complete.
      */
     private static void applyControl(Battle battle, EffectSpec effect, TriggerContext ctx) {
         Constant.ControlEffect control = Constant.CONTROL_STATES.get(effect.getControl().trim());
@@ -3670,12 +3670,12 @@ public final class TriggerInterpreter {
                     "APPLY_CONTROL ran with the unknown state '" + effect.getControl() + "'; the loader validates "
                             + "against Constant.CONTROL_STATES, so this is an engine fault");
         }
-        // ⚠ ALWAYS through the resist pipeline, even with no `base_chance` stated: 「使目标陷入冻结状态」 with no
+        // Note: ALWAYS through the resist pipeline, even with no `base_chance` stated: "使目标陷入冻结状态" with no
         // probability in the text is a 100% BASE chance, which the game still runs through 效果命中 / 效果抵抗 / the
-        // state's own resistance. Attaching it directly would have made every 「免疫控制类负面状态」 clause silently
+        // state's own resistance. Attaching it directly would have made every "免疫控制类负面状态" clause silently
         // ineffective against exactly the controls the documents write without a number.
         double baseChance = effect.getBaseChance() == null ? 1.0 : effect.getBaseChance();
-        // …plus whatever a 行迹 / 星魂 raised it by (「冻结敌方目标的基础概率提高15%」), filed on this combatant under
+        // …plus whatever a 行迹 / 星魂 raised it by ("冻结敌方目标的基础概率提高15%"), filed on this combatant under
         // THIS rule's id. Read here rather than written into the effect: rules are compiled once and cached per cid,
         // so the stated 0.5 stays the file's number and the amendment is a fact about this battle.
         if (ctx.owner() != null) {
@@ -3685,15 +3685,15 @@ public final class TriggerInterpreter {
             if (target == null || target.isDeath()) {
                 continue;
             }
-            // The state's own per-turn damage (「冻结状态下…每回合开始时受到…冰属性附加伤害」) rides WITH the
+            // The state's own per-turn damage ("冻结状态下…每回合开始时受到…冰属性附加伤害") rides WITH the
             // state: attached in ControlBuff.applyEffect, taken off in its removeBuff, and only ever created on
-            // the units the roll let through. ⚠ The magnitude is read here, once, and frozen into the DOT.
+            // the units the roll let through. Note: The magnitude is read here, once, and frozen into the DOT.
             ControlBuff applied = effect.getElement() == null || effect.getElement().isBlank()
                     ? new ControlBuff(control, effect.getTurns())
                     : new ControlBuff(control, effect.getTurns(), DamageElement.fromString(effect.getElement()),
                             dotMagnitude(effect, ctx));
             applied.setSource(ctx.owner());
-            // ⚠ The roll's RESULT is recorded as well as used: 「每冻结1个目标」 counts the targets this cast really
+            // Note: The roll's RESULT is recorded as well as used: "每冻结1个目标" counts the targets this cast really
             // froze, so a resisted application must not be counted (see Battle.recordCastApplied).
             if (battle.tryApplyDebuff(ctx.owner(), target, applied, baseChance, control.resistKey())) {
                 battle.recordCastApplied(control.name());
@@ -3702,22 +3702,22 @@ public final class TriggerInterpreter {
     }
 
     /**
-     * {@code APPLY_DOT}: 「使目标陷入灼烧状态，每回合造成等同于…#1[i]%攻击力的火属性伤害」 — a damage-over-time
+     * {@code APPLY_DOT}: "使目标陷入灼烧状态，每回合造成等同于…#1[i]%攻击力的火属性伤害" - a damage-over-time
      * attached by a <b>rule</b>.
      *
      * <p>Before this op only a weakness break could attach one ({@code Battle.attachBreakDot}), so the whole
-     * 「使目标陷入灼烧/触电/裂伤/风化状态」 family (11 of the 97 documents) had no spelling — and 三月七's frozen
-     * enemies took no 「每回合冰属性附加伤害」.
+     * "使目标陷入灼烧/触电/裂伤/风化状态" family (11 of the 9documents) had no spelling - and 三月七's frozen
+     * enemies took no "每回合冰属性附加伤害".
      *
      * <p><b>What the rule states.</b> The element (which picks the RES zone and doubles as the state's identity:
      * Fire is 灼烧), the magnitude (flat, or a share of one of the <b>rule owner's</b> attributes) and the turns.
-     * The damage is computed <b>once, when it lands</b>, and frozen into the buff — 「等同于三月七60%攻击力」
+     * The damage is computed <b>once, when it lands</b>, and frozen into the buff - "等同于三月七60%攻击力"
      * means her attack at that moment, not a live link to her panel (the same snapshot rule every derived value
      * follows).
      *
      * <p>A {@code base_chance} rolls per target through the same pipeline as a control ({@link Battle#tryApplyDebuff}),
      * with no specific-resistance key: the data's {@code STAT_*} resistances are per <i>state</i>, and a DOT's
-     * state is its element — which the four-element family has no key for. (That is a fact about the data, not a
+     * state is its element - which the four-element family has no key for. (That is a fact about the data, not a
      * shortcut: adding one later is passing a key here.)
      */
     private static void applyDot(Battle battle, EffectSpec effect, TriggerContext ctx) {
@@ -3728,29 +3728,29 @@ public final class TriggerInterpreter {
                             + "DamageElement, so this is an engine fault");
         }
         double damage = dotMagnitude(effect, ctx);
-        // ⚠ The same "always roll" rule as a control: an unstated chance is 100% BASE chance, not "bypasses 效果抵抗".
+        // Note: The same "always roll" rule as a control: an unstated chance is 100% BASE chance, not "bypasses 效果抵抗".
         double baseChance = effect.getBaseChance() == null ? 1.0 : effect.getBaseChance();
         for (CanHit target : resolveTargets(battle, effect, ctx)) {
             if (target == null || target.isDeath()) {
                 continue;
             }
-            // ★ A name, when the rule states one: it is what `has_state <name>` asks about (see DotBuff's named constructor).
+            // A name, when the rule states one: it is what `has_state <name>` asks about (see DotBuff's named constructor).
             // Without it the DOT keeps answering only to its element's state name, which is all the corpus needed until now.
             String dotName = effect.getBuff() == null ? null : effect.getBuff().trim();
             DotBuff dot = new DotBuff(ctx.owner(), element, damage, effect.getTurns(), dotStackCap(effect), dotName);
             if (battle.tryApplyDebuff(ctx.owner(), target, dot, baseChance, null)) {
                 // The DOT's state name is the document's name for the element (灼烧), from the one table that maps
-                // them — the same spelling 「每使1个目标陷入灼烧」 would count with.
+                // them - the same spelling "每使1个目标陷入灼烧" would count with.
                 battle.recordCastApplied(BuffManager.dotStateName(element));
             }
         }
     }
 
     /**
-     * How much damage one tick of a rule's DOT deals: the flat {@code amount}, or {@code percent} × one of the
+     * How much damage one tick of a rule's DOT deals: the flat {@code amount}, or {@code percent}  x  one of the
      * rule owner's own attributes (+ the optional constant {@code amount}).
      *
-     * <p>Shared by {@code APPLY_DOT} and by {@code APPLY_CONTROL}'s per-turn payload, so the two cannot drift —
+     * <p>Shared by {@code APPLY_DOT} and by {@code APPLY_CONTROL}'s per-turn payload, so the two cannot drift - 
      * and both read the <b>rule owner</b>, never the victim.
      */
     private static double dotMagnitude(EffectSpec effect, TriggerContext ctx) {
@@ -3758,7 +3758,7 @@ public final class TriggerInterpreter {
         if (effect.getScale() == null) {
             magnitude = effect.getAmount();
         } else if ("target_max_hp".equals(effect.getScale().trim())) {
-            // ⚠ The victim's own maximum: 「受到等同于**自身** 24.00% 生命上限的…持续伤害」 (1111 卢卡). Every other scale here
+            // Note: The victim's own maximum: "受到等同于自身 24.00% 生命上限的…持续伤害" (1111 卢卡). Every other scale here
             // is the rule OWNER's, which is why this spelling had to be added -- and it is read when the buff LANDS, so a
             // later change to the victim's Max HP does not move a DOT that is already ticking (the DOT's own convention).
             CanHit victim = ctx.target();
@@ -3774,13 +3774,13 @@ public final class TriggerInterpreter {
     }
 
     /**
-     * 「最多不超过卢卡攻击力的 338%」: when a rule states a derived ceiling, the magnitude is the SMALLER of the two.
+     * "最多不超过卢卡攻击力的 338%": when a rule states a derived ceiling, the magnitude is the SMALLER of the two.
      *
-     * <p>⚠ It is a ceiling, not a floor and not a replacement: a small victim keeps its small share, and only a value that
+     * <p>Note: It is a ceiling, not a floor and not a replacement: a small victim keeps its small share, and only a value that
      * would exceed the ceiling is brought down to it.
      */
     private static double applyDerivedCeiling(EffectSpec effect, TriggerContext ctx, double magnitude) {
-        // ⚠ The constant ceiling is applied HERE and not in the caller's cap branch (2026-09-29): this method used to
+        // Note: The constant ceiling is applied HERE and not in the caller's cap branch (2026-09-29): this method used to
         // return early when there was no `cap_scale`, so a `cap_amount` wired beside it never ran.
         double capped = magnitude;
         if (effect.getCapScale() != null) {
@@ -3799,8 +3799,8 @@ public final class TriggerInterpreter {
         if (fromStacks != null) {
             return fromStacks;
         }
-        // ⭐ A battle-level PARTY counter as a magnitude (2026-10-02; reader: 1513's reward, which hands
-        // 【好活当赏】 the 【笑点】 the Aha moment spent). The counter lives on the battle, not on a unit.
+        // A battle-level PARTY counter as a magnitude (2026-10-02; reader: 1513's reward, which hands
+        // [好活当赏] the [笑点] the Aha moment spent). The counter lives on the battle, not on a unit.
         if (key.startsWith("party_resource:")) {
             String counter = key.substring("party_resource:".length()).trim();
             if (ctx.battle() == null || ctx.battle().partyResource(counter) == null) {
@@ -3834,17 +3834,17 @@ public final class TriggerInterpreter {
     }
 
     /**
-     * {@code EXTEND_BUFF}: 「…的持续时间增加1回合」 — lengthen the buffs the rule's <b>owner</b> has already put on
+     * {@code EXTEND_BUFF}: "…的持续时间增加1回合" - lengthen the buffs the rule's <b>owner</b> has already put on
      * each resolved target.
      *
      * <p><b>Why the op names no buff.</b> Every sentence in this family identifies it by its origin instead:
-     * 「<b>战技提供的</b>护盾持续时间增加1回合」 (三月七 加护), 「<b>战技对指定我方目标造成的</b>伤害提高效果的持续时间增加1回合」
-     * (布洛妮娅), 「<b>天赋使敌方目标陷入的</b>风化状态的持续时间延长1回合」 (桑博), 「对于<b>已拥有</b>【生息】的我方目标…延长1回合」
-     * (白露). The engine already records that fact — {@code AbstractBuff.source}, the applier — and the filter is
-     * exact, so the author states the duration and nothing else. 10 of the 97 documents use one of the two
+     * "<b>战技提供的</b>护盾持续时间增加1回合" (三月七 加护), "<b>战技对指定我方目标造成的</b>伤害提高效果的持续时间增加1回合"
+     * (布洛妮娅), "<b>天赋使敌方目标陷入的</b>风化状态的持续时间延长1回合" (桑博), "对于<b>已拥有</b>[生息]的我方目标…延长1回合"
+     * (白露). The engine already records that fact - {@code AbstractBuff.source}, the applier - and the filter is
+     * exact, so the author states the duration and nothing else. 10 of the 9documents use one of the two
      * phrasings.
      *
-     * <p>⚠ <b>Folding the +1 into the ability it lengthens is the wrong fix</b>, and this op exists so that it is
+     * <p>Note: <b>Folding the +1 into the ability it lengthens is the wrong fix</b>, and this op exists so that it is
      * not tempting: the trace's own line would vanish from the data, and the base ability would state a duration
      * that is not its own. The two numbers belong to two rules because they are two sentences (and a trace could
      * one day be gated on its own).
@@ -3857,9 +3857,9 @@ public final class TriggerInterpreter {
             if (target == null || target.isDeath()) {
                 continue;
             }
-            // ⭐⭐ 「使自身**所有**增益效果延长 1 回合」 (2026-10-02; readers: 1506's talent and its E2): `EXTEND_BUFF` with an explicit
-            // `"kind": "all"`. The origin filter `extendBuffsFrom` applies is deliberate (its note names 「战技提供的护盾」), so
-            // 「所有」 -- whoever applied it -- had no spelling; the implicit filter-less form stays refused by `requireExtendFilter`,
+            // "使自身所有增益效果延长 1 回合" (2026-10-02; readers: 1506's talent and its E2): `EXTEND_BUFF` with an explicit
+            // `"kind": "all"`. The origin filter `extendBuffsFrom` applies is deliberate (its note names "战技提供的护盾"), so
+            // "所有" -- whoever applied it -- had no spelling; the implicit filter-less form stays refused by `requireExtendFilter`,
             // because that one would lengthen buffs the sentence never mentions.
             if (effect.getKind() != null && "all".equalsIgnoreCase(effect.getKind().trim())) {
                 target.getBuffManager().extendAllBuffs(effect.getTurns());
@@ -3872,74 +3872,74 @@ public final class TriggerInterpreter {
     }
 
     /**
-     * {@code MODIFY_RULE}: 「天赋的反击效果每回合可触发的次数增加1次」 / 「冻结敌方目标的基础概率提高15%」 — a passive that
+     * {@code MODIFY_RULE}: "天赋的反击效果每回合可触发的次数增加1次" / "冻结敌方目标的基础概率提高15%" - a passive that
      * <b>raises a number on another rule of the same file</b>.
      *
      * <p><b>Why it is not a second rule.</b> Both sentences modify something that already exists, and the honest
      * spellings are impossible without saying so: a second {@code per_turn: 3} rule <i>adds</i> firings (the engine
      * would fire 2 + 3 = 5 times a turn rather than raising the cap to 3), and a second {@code base_chance: 0.65}
-     * rule would roll <b>twice</b> (1 − 0.5 × 0.35 = 82.5% instead of 65%). Both are numbers that look right from the
-     * outside and are wrong in play — the failure mode this project refuses.
+     * rule would roll <b>twice</b> (1 − 0.5  x  0.35 = 82.5% instead of 65%). Both are numbers that look right from the
+     * outside and are wrong in play - the failure mode this project refuses.
      *
      * <p><b>Where the raised number lives.</b> On the <b>combatant</b>, not on the rule: a table is compiled once per
      * cid and a relic's rules are shared by every wearer, so an amendment written onto the rule would leak into every
      * battle in the JVM (the same reasoning as the firing limits in {@code CanHit}). The two consumers are
-     * {@code TriggerInterpreter.fire} (per-turn cap) and {@link #applyControl} (base chance) — both read the amendment
+     * {@code TriggerInterpreter.fire} (per-turn cap) and {@link #applyControl} (base chance) - both read the amendment
      * only when the rule they are running carries the id it was filed under.
      *
-     * <p>⚠ Which number moves is decided by <b>which field is stated</b>: {@code amount} raises a count, {@code
+     * <p>Note: Which number moves is decided by <b>which field is stated</b>: {@code amount} raises a count, {@code
      * percent} raises a probability. The load-time validator refuses both-at-once, neither, an out-of-range value, a
      * non-integer count, any other field, a non-{@code BATTLE_START} event, an unknown rule id, and a named rule that
      * does not state the number being raised.
      */
     /**
-     * {@code RAISE_SKILL_LEVEL}: 「战技等级+1」「终结技等级+1」 (M-32) — this battle reads one skill slot one level higher.
+     * {@code RAISE_SKILL_LEVEL}: "战技等级+1""终结技等级+1" (M-32) - this battle reads one skill slot one level higher.
      *
      * <p><b>Why an op and not a rule field.</b> The level is not a property of this rule: it changes what <b>another</b>
      * ability reads out of its parameter table (the skill's own execution in {@code SkillExecutor}, a rule-driven
      * {@code DAMAGE}, and a {@code COMMAND_SUMMON} swing). All three go through the one resolver
      * {@link CanHit#skillLevel}, which is the only place the base level and the raises are added together.
      *
-     * <p>⚠ <b>Per battle, not per character</b> (see {@code CanHit.skillLevelBonus}): the same {@code Character} can be
+     * <p>Note: <b>Per battle, not per character</b> (see {@code CanHit.skillLevelBonus}): the same {@code Character} can be
      * put into a second battle by a stage, so writing the raised level onto the skill would stack once per battle and
-     * never come off — the same leak the {@code MODIFY_RULE} amendments were moved off the rule for.
+     * never come off - the same leak the {@code MODIFY_RULE} amendments were moved off the rule for.
      *
-     * <p>⚠ <b>{@code BATTLE_START} only</b>, like {@code MODIFY_RULE}: a level raise is a passive fact of the loadout,
+     * <p>Note: <b>{@code BATTLE_START} only</b>, like {@code MODIFY_RULE}: a level raise is a passive fact of the loadout,
      * and a raise applied mid-battle would have to be taken back at a point nobody states.
      */
     /**
-     * {@code START_COUNTDOWN}: 「行动序列上出现【协奏】倒计时…倒计时固定拥有 90 点速度」 (M-49).
+     * {@code START_COUNTDOWN}: "行动序列上出现[协奏]倒计时…倒计时固定拥有 90 点速度" (M-49).
      *
      * <p>Its turn is announced as {@link TriggerEvent#COUNTDOWN_TURN}, and the content answers with vocabulary it
-     * already has (`REMOVE_STATE` + `EXTRA_TURN self` for 「退出【协奏】状态并立即行动」) — so this op does one thing only,
+     * already has (`REMOVE_STATE` + `EXTRA_TURN self` for "退出[协奏]状态并立即行动") - so this op does one thing only,
      * which is what keeps the countdown reusable for every other 倒计时 sentence in the corpus.
      *
-     * <p>⚠ The name comes from the rule's own {@code buff} when it states one (it is what the log shows, and nothing
+     * <p>Note: The name comes from the rule's own {@code buff} when it states one (it is what the log shows, and nothing
      * reads it back, so it needs no id).
      */
     /**
      * {@code APPLY_REGEN}: attaches a {@link com.laosun.aluminium.models.buff.RegenBuff}, whose amount is derived once
      * (the applier's panel) and settled on each of the carrier's turns by {@code Battle.tickRegens}.
      *
-     * <p>⚠ Its name is required, and not for bookkeeping: 「施放战技产生的持续回复效果延长1回合」 (1105 行迹 调理) and any
+     * <p>Note: Its name is required, and not for bookkeeping: "施放战技产生的持续回复效果延长1回合" (1105 行迹 调理) and any
      * removal by name reach it through that string, exactly as a 遗器 set's temporary buff does.
      */
     /**
-     * {@code BOOST_TOUGHNESS}: 「使本次攻击的**削韧值**提高 100%」 — a timed multiplier on the reduction the target's
+     * {@code BOOST_TOUGHNESS}: "使本次攻击的削韧值提高 100%" - a timed multiplier on the reduction the target's
      * attacks will cause.
      *
-     * <p>⚠ The documents say 「本次攻击」, and the engine's nearest honest spelling is a one-turn buff on the attacker: the
+     * <p>Note: The documents say "本次攻击", and the engine's nearest honest spelling is a one-turn buff on the attacker: the
      * reduction happens inside the settlement of the attack, there is no "this instance only" lifetime for a buff, and a
-     * bearer who attacks twice in one turn would have both boosted. That nuance is stated rather than hidden — the
+     * bearer who attacks twice in one turn would have both boosted. That nuance is stated rather than hidden - the
      * alternative (a field on the damage instance) would need the reduction to be part of the instance, which is exactly
      * what the engine's split (damage first, then a second number) avoids.
      */
     /**
-     * {@code SUPER_BREAK}: 「对处于弱点击破状态的敌方目标造成伤害后，会将本次伤害的**削韧值**转化为 1 次 X% 的超击破伤害」
+     * {@code SUPER_BREAK}: "对处于弱点击破状态的敌方目标造成伤害后，会将本次伤害的削韧值转化为 1 次 X% 的超击破伤害"
      * (1321 大丽花 / 8006 开拓者).
      *
-     * <p>⚠ The magnitude is the <b>instance's intended toughness reduction</b> ({@code ctx.damage().getStance()}), not its
-     * damage — the two differ by an order of magnitude, so reaching for the wrong one would still look plausible. It is
+     * <p>Note: The magnitude is the <b>instance's intended toughness reduction</b> ({@code ctx.damage().getStance()}), not its
+     * damage - the two differ by an order of magnitude, so reaching for the wrong one would still look plausible. It is
      * settled as one {@link DamageType#SUPER_BREAK} instance, taking the zones and resistance of the element the
      * triggering attack used.
      */
@@ -3975,7 +3975,7 @@ public final class TriggerInterpreter {
             if (target == null || target.isDeath()) {
                 continue;
             }
-            // ⚠ grantAmount, not derivedMagnitude: the regeneration's magnitude is a HEAL amount, so it shares the
+            // Note: grantAmount, not derivedMagnitude: the regeneration's magnitude is a HEAL amount, so it shares the
             // heal/shield scale vocabulary and is worked out per carrier (a 	arget_max_hp regeneration is a different
             // number for each one). The value is derived once, here, and frozen in the buff.
             double amount = grantAmount(effect, target, ctx);
@@ -3987,27 +3987,27 @@ public final class TriggerInterpreter {
     }
 
     /**
-     * {@code ADD_STACK}: 「每当我方目标对【承负】状态下的敌方目标施放 2 次普攻/战技/终结技后…」 (2026-09-28) — one more mark on a
+     * {@code ADD_STACK}: "每当我方目标对[承负]状态下的敌方目标施放 2 次普攻/战技/终结技后…" (2026-09-28) - one more mark on a
      * named counter.
      *
      * <p><b>Why an op and not a modifier.</b> A counter must not touch the panel: a {@code MODIFY_ATTR} with a zero
      * magnitude would be a lie about what the buff is, and picking some attribute to hang it on would be worse. So the
      * carrier is {@link com.laosun.aluminium.models.buff.StackBuff}: a buff with a name, a lifetime and no effect.
      *
-     * <p>⚠ <b>Capped by {@code max_stacks}</b> (default 1, i.e. a plain flag): 「2 次」 is a threshold the content reads
+     * <p>Note: <b>Capped by {@code max_stacks}</b> (default 1, i.e. a plain flag): "2 次" is a threshold the content reads
      * with {@code target_stacks:<name> >= 2}, and without a cap a stray extra event would push the count past it and
      * the rule that resets it would fire twice in a row.
      */
     private static void addStack(Battle battle, EffectSpec effect, TriggerContext ctx) {
         int cap = effect.stackCap() == null ? 1 : effect.stackCap();
         String name = effect.getBuff().trim();
-        // ⚠ How many marks this application carries (2026-09-29): 「立即获得15层【当品】」 (1314 翡翠's technique) grants
-        // FIFTEEN at once, and `amount` used to be ignored, so it granted one. The readers are the 「获得 N 层」 family --
+        // Note: How many marks this application carries (2026-09-29): "立即获得15层[当品]" (1314 翡翠's technique) grants
+        // FIFTEEN at once, and `amount` used to be ignored, so it granted one. The readers are the "获得 N 层" family --
         // 1314 alone states 5 (its talent's follow-up), 15 (its technique), 1 and 3 (its traces). One application still
         // means one mark unless it says otherwise, so no existing file changes.
         int wanted = effect.getAmount() == null ? 1 : Math.max(1, effect.getAmount().intValue());
-        // ★ 「每恢复 1 个战技点，获得 1 层【彩焰】」 (cone 23021): the marks follow the EVENT's own amount, not the
-        // number of times the event fired -- `Battle.gainSkillPoint(2)` raises one event carrying 2, and 「每 1 个」 means two
+        // "每恢复 1 个战技点，获得 1 层[彩焰]" (cone 23021): the marks follow the EVENT's own amount, not the
+        // number of times the event fired -- `Battle.gainSkillPoint(2)` raises one event carrying 2, and "每 1 个" means two
         // marks. `scale: event_amount` + `percent: 1` is the same "share of a live quantity" shape HEAL/SHIELD already use.
         if ("event_amount".equals(String.valueOf(effect.getScale()).trim())) {
             double share = effect.getPercent() == null ? 1 : effect.getPercent();
@@ -4016,7 +4016,7 @@ public final class TriggerInterpreter {
         for (CanHit target : resolveTargets(battle, effect, ctx)) {
             for (int i = 0; i < wanted; i++) {
                 if (target.getBuffManager().stacksOf(name) >= cap) {
-                    break;                      // 「2 次」 is a threshold, not an invitation to keep counting
+                    break;                      // "2 次" is a threshold, not an invitation to keep counting
                 }
                 boolean permanent = unticked(effect);
                 AbstractBuff stack = new com.laosun.aluminium.models.buff.StackBuff(
@@ -4059,9 +4059,9 @@ public final class TriggerInterpreter {
     }
 
     /**
-     * ⭐ {@code RAISE_SKILL_HITS}: adds damage segments to a data slot of the target (2026-10-02; reader: 1405's ode of reason).
+     * {@code RAISE_SKILL_HITS}: adds damage segments to a data slot of the target (2026-10-02; reader: 1405's ode of reason).
      *
-     * <p>A negative amount takes them back, which is how 「持续 1 回合」 is stated without a new lifetime.
+     * <p>A negative amount takes them back, which is how "持续 1 回合" is stated without a new lifetime.
      */
     private static void raiseSkillHits(EffectSpec effect, TriggerContext ctx) {
         CanHit owner = ctx.owner();
@@ -4091,7 +4091,7 @@ public final class TriggerInterpreter {
     /**
      * Exactly <b>one</b> amendment per {@code MODIFY_RULE}: a firing count, a probability, a value or a duration.
      *
-     * <p>⚠ Stated rather than inferred: two at once would make "which number did the author mean" a guess, and the
+     * <p>Note: Stated rather than inferred: two at once would make "which number did the author mean" a guess, and the
      * guess would be a silent one (the extra field would simply be ignored).
      */
     private static void requireOneAmendment(EffectSpec effect, String op, TriggerSpec spec) {
@@ -4122,19 +4122,19 @@ public final class TriggerInterpreter {
         if (effect.getAmount() != null) {
             owner.addRulePerTurnBonus(target, (int) Math.round(effect.getAmount()));
         } else if (effect.getEffectTurns() != null) {
-            // 「终结技的持续时间额外增加 1 回合」: the rule's own effect durations, raised where they are read
-            // (see amendedEffect). ⚠ Not an extra rule with a longer `turns`: the two modifiers of one skill are the
+            // "终结技的持续时间额外增加 1 回合": the rule's own effect durations, raised where they are read
+            // (see amendedEffect). Note: Not an extra rule with a longer `turns`: the two modifiers of one skill are the
             // same kind, so a second one would REPLACE the first rather than stack.
             owner.amendRuleEffectTurns(target, (int) Math.round(effect.getEffectTurns()));
         } else if (effect.getEffectMaxStacks() != null) {
-            // 「使天赋的效果可叠加上限提高 2 层」: a CAP, not a value -- and it must be in place before any stack is
+            // "使天赋的效果可叠加上限提高 2 层": a CAP, not a value -- and it must be in place before any stack is
             // attached, which it is: an amendment is filed at battle start and the stacks come from later firings.
             owner.amendRuleEffectMaxStacks(target, (int) Math.round(effect.getEffectMaxStacks()));
         } else if (effect.getEffectPercent() != null) {
-            // 「天赋的伤害提高效果额外提高 10%」: 30% -> 40%, the same rule, raised in place.
+            // "天赋的伤害提高效果额外提高 10%": 30% -> 40%, the same rule, raised in place.
             owner.amendRuleEffectPercent(target, effect.getEffectPercent());
         } else if (effect.getEffectPercentFromResource() != null) {
-            // ⭐ The SAME amendment, sized by a resource in basis points (2026-10-02; reader: 1141517 「每消耗 1% 溢出值…」).
+            // The SAME amendment, sized by a resource in basis points (2026-10-02; reader: 114151"每消耗 1% 溢出值…").
             int basisPoints = resourceAmount(ctx.battle(), owner, effect.getEffectPercentFromResource().trim());
             owner.amendRuleEffectPercent(target, basisPoints / 10000.0);
         } else {
@@ -4143,19 +4143,19 @@ public final class TriggerInterpreter {
     }
 
     /**
-     * {@code RESIST_DEBUFF}: 「抵抗<b>控制类</b>负面状态的概率提高35%」 / 「免疫<b>控制类</b>负面状态」 — the resolved targets
+     * {@code RESIST_DEBUFF}: "抵抗<b>控制类</b>负面状态的概率提高35%" / "免疫<b>控制类</b>负面状态" - the resolved targets
      * become harder to control (or burn), for the stated duration or for the whole battle.
      *
-     * <p><b>Why it is a buff on the carrier.</b> 克拉拉's 守护 is a permanent trace, while 银狼LV.999's 【防火墻】 lasts
+     * <p><b>Why it is a buff on the carrier.</b> 克拉拉's 守护 is a permanent trace, while 银狼LV.999's [防火墻] lasts
      * one turn; a buff covers both, expires by itself, and can be removed by name like any other state.
      *
-     * <p>⚠ <b>What it does NOT do</b> is touch a specific state: the check lives in
+     * <p>Note: <b>What it does NOT do</b> is touch a specific state: the check lives in
      * {@link Battle#tryApplyDebuff}, which asks the victim for its resistance to the <b>class</b> the incoming state
      * declares ({@code AbstractBuff.debuffClass()}). So a control written tomorrow is covered by a resistance written
-     * today — the property that makes 「免疫控制类负面状态」 mean the whole family rather than a list of keys.
+     * today - the property that makes "免疫控制类负面状态" mean the whole family rather than a list of keys.
      *
-     * <p>⚠ {@code percent: 1} is immunity in this vocabulary, and that is deliberate: 「免疫控制类负面状态」 and
-     * 「抵抗控制类负面状态的概率提高35%」 are the same mechanic at different strengths, and two spellings for one mechanic
+     * <p>Note: {@code percent: 1} is immunity in this vocabulary, and that is deliberate: "免疫控制类负面状态" and
+     * "抵抗控制类负面状态的概率提高35%" are the same mechanic at different strengths, and two spellings for one mechanic
      * is what the closed vocabularies exist to avoid.
      */
     private static void resistDebuff(Battle battle, EffectSpec effect, TriggerContext ctx) {
@@ -4179,7 +4179,7 @@ public final class TriggerInterpreter {
     /**
      * Gives a freshly built buff the <b>name the data stated</b> ({@code "buff": "协奏"}), when it states one.
      *
-     * <p>⚠ Unnamed is the normal case and stays exactly as it was: {@code BuffManager.removeState} skips modifiers and
+     * <p>Note: Unnamed is the normal case and stays exactly as it was: {@code BuffManager.removeState} skips modifiers and
      * resistances with no name, so only the content that asks for a name gets the "removable by that name" lifetime.
      */
     private static <T extends AbstractBuff> T named(T buff, EffectSpec effect) {
@@ -4194,13 +4194,13 @@ public final class TriggerInterpreter {
      *
      * <p><b>Why every path does this now.</b> The source used to be set only where a constructor demanded it
      * ({@code DotBuff} needs it for kill credit, {@code ShieldBuff}/{@code ControlBuff} take it), so a
-     * {@code StateBuff} or a stat modifier could be anonymous. {@code EXTEND_BUFF} filters by origin — 「战技提供的护盾」
-     * means "the one <i>I</i> gave" — and an anonymous buff would make that filter silently extend nothing at all.
+     * {@code StateBuff} or a stat modifier could be anonymous. {@code EXTEND_BUFF} filters by origin - "战技提供的护盾"
+     * means "the one <i>I</i> gave" - and an anonymous buff would make that filter silently extend nothing at all.
      * Recorded here once, for every op that creates a buff, rather than in each of them.
      */
     private static AbstractBuff withSource(AbstractBuff buff, TriggerContext ctx) {
         buff.setSource(ctx.owner());
-        // …and WHICH RULE created it, so a condition can ask 「战技提供的护盾」 rather than 「三月七给的盾」 (see
+        // …and WHICH RULE created it, so a condition can ask "战技提供的护盾" rather than "三月七给的盾" (see
         // AbstractBuff.ruleId). Stamped here, at the one place every buff-creating op already passes through.
         buff.setRuleId(ctx.ruleId());
         return buff;
@@ -4223,8 +4223,8 @@ public final class TriggerInterpreter {
     }
 
     private static void dispel(Battle battle, EffectSpec effect, TriggerContext ctx) {
-        // ⭐ A CLASS may be named (2026-10-02): 「解除…所有**控制类**负面状态」 (1415's memosprite skill 8). With a class and
-        // no amount it means ALL of that class -- 「所有」 spells no count -- which is why the validation below accepts either.
+        // A CLASS may be named (2026-10-02): "解除…所有控制类负面状态" (1415's memosprite skill 8). With a class and
+        // no amount it means ALL of that class -- "所有" spells no count -- which is why the validation below accepts either.
         com.laosun.aluminium.enums.DebuffClass kind = effect.getKind() == null || effect.getKind().isBlank()
                 ? null
                 : com.laosun.aluminium.enums.DebuffClass.fromString(effect.getKind().trim());
@@ -4271,8 +4271,8 @@ public final class TriggerInterpreter {
      * The same, for a magnitude that is already an <b>absolute</b> number in the attribute's own units.
      *
      * <p>See {@link #modifyAttr} for why a literal on a ratio attribute gets a flat modifier and a literal on a
-     * base attribute gets an additive percentage — and why a <b>derived</b> magnitude ({@code scale}) is flat even
-     * on a base attribute: 「提高数值等同于 X」 states a value, so treating it as "X% of the target's base" would
+     * base attribute gets an additive percentage - and why a <b>derived</b> magnitude ({@code scale}) is flat even
+     * on a base attribute: "提高数值等同于 X" states a value, so treating it as "X% of the target's base" would
      * multiply the derived number by the target's own stat.
      */
     private static StatModifierBuff statModifier(AttributeType attribute, double percent, int turns,
@@ -4291,7 +4291,7 @@ public final class TriggerInterpreter {
      * says" kind:
      * <ul>
      *   <li>a {@code scale} this op cannot read (a {@code HEAL}/{@code SHIELD} scale such as {@code target_max_hp},
-     *       or a typo) would otherwise be ignored, and the modifier would use {@code percent} as a literal — a
+     *       or a typo) would otherwise be ignored, and the modifier would use {@code percent} as a literal - a
      *       number that has nothing to do with the sentence;</li>
      *   <li>an {@code amount} <b>without</b> a scale. It used to be ignored outright (nothing on this op read it),
      *       and it is exactly what an author writes for "plus a flat part"; now that it means that, the case it
@@ -4316,7 +4316,7 @@ public final class TriggerInterpreter {
         // The owner MEMOSPRITE's attribute (2026-10-02). Accepted HERE and not in `scaleAttribute`, because that one is shared
         // with the DAMAGE path, where the subject is the attacker -- teaching it this spelling there would make damage quietly
         // read the wrong unit. The attribute name is still checked, so a typo is loud at load time.
-        // A parameter of the skill that produced the event (2026-10-02). 「等同于德谬歌生命上限的 #1%」: #1 is the skill own parameter
+        // A parameter of the skill that produced the event (2026-10-02). "等同于德谬歌生命上限的 #1%": #1 is the skill own parameter
         // and it RUNS WITH ITS LEVEL, so a literal `percent` would freeze one level -- the damage path reads it the same way, through
         // `multiplierOf`. The index is checked here; whether the event has such a skill can only be known when it fires.
         if (scale.startsWith(TriggerTable.CAST_SKILL_PARAM_PREFIX)) {
@@ -4338,7 +4338,7 @@ public final class TriggerInterpreter {
             requirePercent(effect, op, spec);
             return;
         }
-        // ⭐ The ACTOR's own attribute (2026-10-02; 1415 memosprite skill 10, whose share is of the CASTER's Max HP). Accepted here for
+        // The ACTOR's own attribute (2026-10-02; 1415 memosprite skill 10, whose share is of the CASTER's Max HP). Accepted here for
         // the same reason as the line below: `scaleAttribute` is shared with the DAMAGE path, where the subject is already the attacker
         // and a second spelling there would be a second meaning.
         if (scale.startsWith(TriggerTable.ACTOR_ATTR_PREFIX)) {
@@ -4352,7 +4352,7 @@ public final class TriggerInterpreter {
             requirePercent(effect, op, spec);
             return;
         }
-        // ⭐ The owner's OWN skill, named by slot (2026-10-02): `<SKILLTYPE>:<index>`. Checked here for the reason the family below gives --
+        // The owner's OWN skill, named by slot (2026-10-02): `<SKILLTYPE>:<index>`. Checked here for the reason the family below gives --
         // `scaleAttribute` is shared with the DAMAGE path, where the subject is already the attacker.
         if (scale.startsWith(TriggerTable.SKILL_PARAM_PREFIX)) {
             String[] parts = scale.substring(TriggerTable.SKILL_PARAM_PREFIX.length()).split(":", 2);
@@ -4403,7 +4403,7 @@ public final class TriggerInterpreter {
      * Validates an effect's optional {@code target} selector <b>at load time</b>.
      *
      * <p>This closes a silent-typo hole: the resolver used to fall back to "the owner" for anything
-     * it did not recognise, so {@code "target": "atacker"} behaved exactly like {@code "self"} —
+     * it did not recognise, so {@code "target": "atacker"} behaved exactly like {@code "self"} - 
      * the rule fired, nothing was reported, and the character just quietly did the wrong thing. The
      * condition variables are already a closed set for the same reason; the selector is now too.
      *
@@ -4417,10 +4417,10 @@ public final class TriggerInterpreter {
             }
             return;
         }
-        // ⭐ A selector FAMILY, admitted by prefix (2026-10-02): `ally_cid:<cid>` names a character outright. The closed set below stays closed --
+        // A selector FAMILY, admitted by prefix (2026-10-02): `ally_cid:<cid>` names a character outright. The closed set below stays closed --
         // this is an explicit door, not a fallback, which is why it is checked BEFORE the membership test.
         if (effect.getTarget().startsWith(ALLIES_OF_PATH_PREFIX)) {
-            // ⭐ Same door, for paths (2026-10-02): the name must be one the engine knows, so a typo is refused at load rather than silently targeting nobody.
+            // Same door, for paths (2026-10-02): the name must be one the engine knows, so a typo is refused at load rather than silently targeting nobody.
             String rest = effect.getTarget().substring(ALLIES_OF_PATH_PREFIX.length()).trim();
             if (pathNamed(rest) == null) {
                 throw new IllegalArgumentException(
@@ -4466,7 +4466,7 @@ public final class TriggerInterpreter {
                             + "); it used to fall back to the owner, which made a typo behave like self "
                             + "(source: " + spec.getSource() + ")");
         }
-        // ⚠ The prefix must be spelled exactly (lower-case, with the colon): the state name behind it is DATA and is
+        // Note: The prefix must be spelled exactly (lower-case, with the colon): the state name behind it is DATA and is
         // read as written, so a selector that only matches case-insensitively would slice the name in the wrong place.
         if (value.trim().startsWith(HOLDER_OF_PREFIX) && value.trim().length() == HOLDER_OF_PREFIX.length()) {
             throw new IllegalArgumentException(
@@ -4505,7 +4505,7 @@ public final class TriggerInterpreter {
     }
 
     private static void requirePercent(EffectSpec effect, String op, TriggerSpec spec) {
-        // ⭐ A share carried in a resource is a fourth spelling (2026-10-02): the way a number captured at cast time is spent later.
+        // A share carried in a resource is a fourth spelling (2026-10-02): the way a number captured at cast time is spent later.
         if (effect.getPercentFromResource() != null) {
             if (effect.getPercent() != null || effect.getPercentFromCastParam() != null
                     || effect.getPercentFromSkillParam() != null) {
@@ -4543,7 +4543,7 @@ public final class TriggerInterpreter {
      * Validates that an effect does <b>not</b> claim a duration.
      *
      * <p>Used by the ops whose effect is over the moment it is applied ({@code BOOST_DAMAGE} changes one damage
-     * instance). A {@code turns} written there would be silently ignored by Gson and by the interpreter — the
+     * instance). A {@code turns} written there would be silently ignored by Gson and by the interpreter - the
      * author would see a rule that loads and behaves as if the field were not there.
      */
     private static void requireNoDuration(EffectSpec effect, String op, TriggerSpec spec) {
@@ -4570,14 +4570,14 @@ public final class TriggerInterpreter {
     /**
      * Validates that an effect is <b>not</b> given a {@code target}.
      *
-     * <p>Used by ops that act on a unit no selector could name — {@code SUMMON} brings out the rule owner's
+     * <p>Used by ops that act on a unit no selector could name - {@code SUMMON} brings out the rule owner's
      * own memosprite, so a {@code target} there would be read by Gson, validated by
      * {@link #requireTargetSelector} (it is a real selector) and then <b>ignored</b>: the author would get a
      * rule that loads, fires and does something other than what the file says.
      *
-     * <p>⚠ The same hole exists for the ops that credit the owner by definition ({@code GAIN_ENERGY},
+     * <p>Note: The same hole exists for the ops that credit the owner by definition ({@code GAIN_ENERGY},
      * {@code GAIN_SKILL_POINT}, {@code BOOST_DAMAGE}, …): they ignore a stray {@code target} today. No shipped
-     * rule does that (checked 2026-09-27), so it is latent rather than live, and it is registered rather than
+     * rule does that (checked 2026-09-2), so it is latent rather than live, and it is registered rather than
      * fixed here because widening the guard would change the accepted vocabulary of seven ops at once.
      */
     private static void requireNoTarget(EffectSpec effect, String op, TriggerSpec spec) {
@@ -4593,7 +4593,7 @@ public final class TriggerInterpreter {
      *
      * <p>The "fail at load, not mid-battle" rule again: {@code BOOST_DAMAGE} changes the damage instance being
      * settled, and only {@link TriggerEvent#DEALING_DAMAGE} hands one over. A rule on any other event would
-     * load, fire, and have nothing to change — so it is refused while the file is read.
+     * load, fire, and have nothing to change - so it is refused while the file is read.
      */
     /**
      * Validates that an op is on the one event that hands it what it acts on.
@@ -4601,7 +4601,7 @@ public final class TriggerInterpreter {
      * <p>The "fail at load, not mid-battle" rule again: {@code BOOST_DAMAGE} changes the damage instance being
      * settled and only {@link TriggerEvent#DEALING_DAMAGE} hands one over; {@code DELEGATE_DAMAGE} changes the cast
      * being set up and only {@link TriggerEvent#CAST_SETUP} hands one over. A rule on any other event would load,
-     * fire, and have nothing to change — so it is refused while the file is read.
+     * fire, and have nothing to change - so it is refused while the file is read.
      */
     private static void requireEvent(TriggerSpec spec, String op, TriggerEvent expected) {
         TriggerEvent actual = TriggerEvent.fromString(spec.getOn());
@@ -4622,7 +4622,7 @@ public final class TriggerInterpreter {
      */
     private static void requireNonZeroPercent(EffectSpec effect, String op, TriggerSpec spec) {
         requirePercent(effect, op, spec);
-        // ⚠ null-safe (2026-10-02): a rule may state its share as `percent_from_resource`, in which case `percent` is null and this comparison used to unbox it.
+        // Note: null-safe (2026-10-02): a rule may state its share as `percent_from_resource`, in which case `percent` is null and this comparison used to unbox it.
         if (effect.getPercent() != null && effect.getPercent() == 0) {
             throw new IllegalArgumentException(
                     "Op " + op + " has \"percent\": 0, which would attach a buff that changes nothing; the "
@@ -4671,7 +4671,7 @@ public final class TriggerInterpreter {
      * Validates that an {@code APPLY_BUFF} effect names the state it applies <b>at load time</b>.
      *
      * <p>Same discipline as {@link #requireAttribute}: a missing {@code buff} would otherwise reach
-     * {@code StateBuff}, whose constructor rejects it — but that would be a mid-battle exception in the
+     * {@code StateBuff}, whose constructor rejects it - but that would be a mid-battle exception in the
      * middle of a turn, instead of "this rule file is wrong" while it is being read.
      */
     private static void requireBuff(EffectSpec effect, String op, TriggerSpec spec) {
@@ -4683,7 +4683,7 @@ public final class TriggerInterpreter {
     }
 
     /**
-     * Validates how long the buff lasts — <b>exactly one</b> of {@code turns}, {@code permanent: true} and
+     * Validates how long the buff lasts - <b>exactly one</b> of {@code turns}, {@code permanent: true} and
      * {@code until}.
      *
      * <p>There is deliberately no default: an omitted duration would be either "forever" (wrong: most
@@ -4692,7 +4692,7 @@ public final class TriggerInterpreter {
      *
      * <p>Stating <b>two</b> is rejected for the same reason a typo is: the answers disagree, and
      * silently letting one win would produce a rule that does not do what its text says. That includes
-     * {@code until} + {@code turns} — the one expires on an event, the other on a turn boundary.
+     * {@code until} + {@code turns} - the one expires on an event, the other on a turn boundary.
      */
     private static void requireDuration(EffectSpec effect, String op, TriggerSpec spec) {
         boolean permanent = Boolean.TRUE.equals(effect.getPermanent());
@@ -4711,7 +4711,7 @@ public final class TriggerInterpreter {
                             + "other one has to go (source: " + spec.getSource() + ")");
         }
         if (hasUntil) {
-            // Every name is checked, not just the first: 「普攻或战技」 written as a list must not let a typo in
+            // Every name is checked, not just the first: "普攻或战技" written as a list must not let a typo in
             // the second entry load (the buff would then end on one event while the file claims two).
             for (String name : effect.getUntil()) {
                 String normalized = name.trim().toLowerCase(Locale.ROOT);
@@ -4757,7 +4757,7 @@ public final class TriggerInterpreter {
      * <p>Same discipline as the rest of the vocabulary ("reject loudly at load, naming the phase"): a
      * cap of {@code 0} would create a modifier that never applies, a negative one is meaningless, and a
      * misspelled argument name would otherwise be ignored by Gson and quietly leave the rule
-     * non-stacking — the exact "rule fires, nothing accumulates" symptom the author would never notice.
+     * non-stacking - the exact "rule fires, nothing accumulates" symptom the author would never notice.
      *
      * <p>Also rejects the two spellings being stated at once, and any use of the argument on an op that
      * has no stacking concept.
@@ -4788,19 +4788,19 @@ public final class TriggerInterpreter {
      * Rejects the stacking / "until the battle ends" arguments on ops that do not have those concepts.
      *
      * <p>A Gson field is simply {@code null} when the JSON omits it, which means an argument written on
-     * the <b>wrong op</b> is silently ignored — the author sees the rule load and the effect never
+     * the <b>wrong op</b> is silently ignored - the author sees the rule load and the effect never
      * stack. That is the same class of silent failure the closed op vocabulary exists to prevent, so the
      * arguments are checked here rather than being read only by {@code MODIFY_ATTR}.
      *
-     * <p>⚠ The two arguments do <b>not</b> belong to the same set of ops, which is why they are checked
+     * <p>Note: The two arguments do <b>not</b> belong to the same set of ops, which is why they are checked
      * separately. {@code permanent} is a <i>duration</i>, and both buff-granting ops have one:
-     * {@code MODIFY_ATTR} grants a modifier and {@code APPLY_BUFF} grants a state, and 「直到战斗结束」 is a
-     * real duration for a state (镜流's 【转魄】 lasts the whole battle). {@code max_stacks} is a
+     * {@code MODIFY_ATTR} grants a modifier and {@code APPLY_BUFF} grants a state, and "直到战斗结束" is a
+     * real duration for a state (镜流's [转魄] lasts the whole battle). {@code max_stacks} is a
      * <i>modifier</i> concept and stays exclusive to {@code MODIFY_ATTR}: two states of the same name refresh
      * each other rather than accumulating.
      */
     private static void requireNoStackArguments(EffectSpec effect, String op, TriggerSpec spec) {
-        // ⚠ Relaxed for a STACKABLE STATE (2026-10-02): `max_stacks` is otherwise refused on every op but MODIFY_ATTR, and a
+        // Note: Relaxed for a STACKABLE STATE (2026-10-02): `max_stacks` is otherwise refused on every op but MODIFY_ATTR, and a
         // stackable state needs a cap -- that is the whole point of "counted into that state".
         if (!Boolean.TRUE.equals(effect.getStackable())
                 && (effect.getMaxStacks() != null || effect.getStacks() != null)) {
@@ -4822,7 +4822,7 @@ public final class TriggerInterpreter {
      *
      * <p>Why read the skill data instead of letting the data file carry a number: the attack is
      * <b>already defined</b> in {@code skills.json}. Clara's talent, for instance, says
-     * "单体攻击 / Physical / 削韧 30 / params [1, 0.8, 0.1]" — everything except <i>when</i> to fire it.
+     * "单体攻击 / Physical / 削韧 30 / params [1, 0.8, 0.1]" - everything except <i>when</i> to fire it.
      * The trigger table supplies the "when", so a follow-up attack stays a pure data rule rather than
      * a Java class with a duplicated multiplier.
      *
@@ -4831,11 +4831,11 @@ public final class TriggerInterpreter {
      * no on-hit energy and no toughness is reduced. It is a {@code FOLLOW_UP} for the trigger tables
      * (that is the event the texts about 追加攻击 subscribe to) while the attack-level notification
      * {@code AttackEvent} is deliberately not raised for it, so it does not consume an
-     * {@code "until": "next_attack"} buff — a derived hit is part of somebody else's attack, and letting it
-     * announce one would recurse (see {@code AttackEvent} and M-27). {@code as_attack} is accepted for
-     * future use but does not change that yet — the engine has one settlement path for supplementary hits.
+     * {@code "until": "next_attack"} buff - a derived hit is part of somebody else's attack, and letting it
+     * announce one would recurse (see {@code AttackEvent} and M-2). {@code as_attack} is accepted for
+     * future use but does not change that yet - the engine has one settlement path for supplementary hits.
      *
-     * <p>⚠ Consequence worth knowing: the hit causes HP loss, which fires {@code HP_LOST} again. Two
+     * <p>Note: Consequence worth knowing: the hit causes HP loss, which fires {@code HP_LOST} again. Two
      * characters who both counter each other therefore ping-pong until
      * {@code Battle.MAX_TRIGGER_DEPTH} stops it with an exception, rather than hanging.
      *
@@ -4847,37 +4847,37 @@ public final class TriggerInterpreter {
      * {@code DAMAGE}: one extra damage instance, settled with the numbers of one of the owner's own skills.
      *
      * <p>The victim is handed in by the caller ({@link #applyOne} walks the resolved list), because the same
-     * effect may reach a whole side: 「对敌方全体」 settles one instance per victim, and every number is read
+     * effect may reach a whole side: "对敌方全体" settles one instance per victim, and every number is read
      * from the skill's parameter row exactly as before.
      */
     /**
      * The base of a literal-ratio damage instance (2026-09-29).
      *
      * <p>Deliberately NOT `derivedMagnitude`: that reader resolves the BASE attribute, which is the right convention for `MODIFY_ATTR` (percent modifiers stack
-     * on the base) and the WRONG one for damage. Measured: a row-based instance at her Lv10 COMMON row dealt 674.365 while a literal 0.8 dealt 385.35 = 0.8 x
-     * 481.7 — the base ATK rather than the settled one. A damage instance uses the settled value, so this path reads it directly.
+     * on the base) and the WRONG one for damage. Measured: a row-based instance at her Lv10 COMMON row dealt 64.365 while a literal 0.8 dealt 385.35 = 0.8 x
+     * 481.- the base ATK rather than the settled one. A damage instance uses the settled value, so this path reads it directly.
      */
     private static double literalBase(CanHit attacker, CanHit victim, EffectSpec effect, TriggerContext ctx) {
         String scale = effect.getScale() == null ? "" : effect.getScale().trim();
-        // ⚠ `shareOf`, not the raw field (2026-10-02): a share may also come from one of the owner's own skills (`percent_from_skill_param`),
+        // Note: `shareOf`, not the raw field (2026-10-02): a share may also come from one of the owner's own skills (`percent_from_skill_param`),
         // and `derivedMagnitude` was fixed for exactly this one round earlier. Same family, same line.
         double share = shareOf(effect, ctx);
         double flat = effect.getAmount() == null ? 0.0 : effect.getAmount();
-        // ⚠⚠ A share of the TRIGGERING instance (「等同于原伤害 X%」) was implemented here on 2026-10-02 and ROLLED
+        // Note:Note: A share of the TRIGGERING instance ("等同于原伤害 X%") was implemented here on 2026-10-02 and ROLLED
         // BACK the same round, because it read the wrong quantity: at `DEALING_DAMAGE` -- the only event that carries
         // the instance -- `damage.toValue()` is 4.2x the value the victim actually loses (measured: 1093.02 vs
-        // 260.237584 on one 姬子 attack), since settlement happens AFTER that event by design. The scale itself was
+        // 260.23584 on one 姬子 attack), since settlement happens AFTER that event by design. The scale itself was
         // faithful and linear (a 50% rider gave exactly half of a 100% one) -- only the source number is too early.
-        // ⇒ It needs a POST-settlement carrier for the value; the reader table and the exact numbers are in GAPS
+        //  so It needs a POST-settlement carrier for the value; the reader table and the exact numbers are in GAPS
         // (entry "aggro 回收之八百"). Do not re-add it here without reading that entry first.
-        // ⭐⭐ 「等同于**原伤害** X%」 (2026-10-02): a share of the damage instance that triggered this rule -- of the
+        // "等同于原伤害 X%" (2026-10-02): a share of the damage instance that triggered this rule -- of the
         // number the victim actually took, which is what `DAMAGE_SETTLED`'s `amount` is.
-        // ⚠⚠ The division is the whole point, and it took a long detour to see: a `DAMAGE`'s value is a BASE, i.e. the
+        // Note:Note: The division is the whole point, and it took a long detour to see: a `DAMAGE`'s value is a BASE, i.e. the
         // settlement multiplies it by the instance's zones again. Feeding it the already-settled amount would multiply
         // those zones a second time (measured: a 40% share landed as 0.4 x 0.5829 = 0.233 of the original, with 0.5829
         // the shared zone factor). Dividing by the triggering instance's own factor -- `toValue() / skillBaseValue`,
         // both on the instance the event hands over -- makes the rider SETTLE to exactly the share the text states.
-        // ⚠ That detour was my own error, not the engine's: my first probes replaced the character's table with a
+        // Note: That detour was my own error, not the engine's: my first probes replaced the character's table with a
         // hand-built one to control variables, which also dropped `level_convention`, so the cast ran at the Lv1 row
         // (0.5) while my rider used the full ATK (1.0) -- a clean factor 2 that I read as a zone discrepancy and rolled
         // a CORRECT implementation back three times (M-32's own trap, sprung by the judge).
@@ -4887,10 +4887,10 @@ public final class TriggerInterpreter {
                         "a DAMAGE scaled by \"original_damage\" needs the instance that triggered it, and this rule was "
                                 + "evaluated without one (it must hang on DAMAGE_SETTLED)");
             }
-            // ⚠ The division corrects for the rider's OWN settlement, so a rider that skips the zones needs no
+            // Note: The division corrects for the rider's OWN settlement, so a rider that skips the zones needs no
             // correction at all: 真实伤害 (`damage_type: "TRUE"`) settles at a factor of exactly 1, and dividing by
             // the ORIGINAL's factor would multiply the share by 1/0.5829 (measured 2026-10-02: a 24% rider landed as
-            // 44% -- 77.43 where 42.01 was due). Readers: 1415 昔涟's 结界 rider.
+            // 44% -- .43 where 42.01 was due). Readers: 1415 昔涟's 结界 rider.
             if (effect.getDamageType() != null && DamageType.TRUE == DamageType.fromString(effect.getDamageType().trim())) {
                 return ctx.amount() * share + flat;
             }
@@ -4899,14 +4899,14 @@ public final class TriggerInterpreter {
                     : ctx.damage().toValue() / ctx.damage().getSkillBaseValue();
             return ctx.amount() / factor * share + flat;
         }
-        // ? A Max HP share (2026-09-29): 「造成等同于X%生命上限的伤害」 -- 16 documents state it. `owner_max_hp` is the attacker's own, `target_max_hp` the
+        // ? A Max HP share (2026-09-29): "造成等同于X%生命上限的伤害" -- 16 documents state it. `owner_max_hp` is the attacker's own, `target_max_hp` the
         // victim's, which is why the victim is passed in. These are not `self_attr:` names, so they are handled before the attribute reader.
         switch (scale) {
             case "owner_max_hp" -> {
                 return attacker.getMaxHp() * share + flat;
             }
             case "actor_max_hp" -> {
-                // ⭐ The unit that CAUSED the event, not the rule's owner (2026-10-02; 1141526's extra hit is scaled by 德谬歌's own Max HP).
+                // The unit that CAUSED the event, not the rule's owner (2026-10-02; 1141526's extra hit is scaled by 德谬歌's own Max HP).
                 if (ctx == null || ctx.actor() == null) {
                     throw new IllegalStateException(
                             "a literal-ratio DAMAGE scaled by actor_max_hp has no actor to read it from");
@@ -4936,7 +4936,7 @@ public final class TriggerInterpreter {
         if (victim == null || victim.isDeath()) {
             return;
         }
-        // ? A literal ratio states no skill at all (2026-09-29): 「造成等同于素裳80%攻击力的伤害」. The slot lookup is skipped, the multiplier comes
+        // ? A literal ratio states no skill at all (2026-09-29): "造成等同于素裳80%攻击力的伤害". The slot lookup is skipped, the multiplier comes
         // from `derivedMagnitude`, and `element` is required by the validator because there is no skill row to lend one.
         boolean literalRatio = effect.getSkill() == null || effect.getSkill().isBlank();
         SkillType slot = literalRatio ? null
@@ -4946,10 +4946,10 @@ public final class TriggerInterpreter {
             throw new IllegalStateException(
                     attacker.getName() + " has no " + slot + " skill to fire a DAMAGE effect from");
         }
-        // ⚠ A *rider* may legitimately read a row out of a skill that deals no damage of its own: 知更鸟's 【协奏】
-        // adds 「1 次等同于其自身 120% 攻击力的物理属性附加伤害」 and that 120% lives in her ultimate's own parameter row,
-        // while the ultimate itself is a Support skill. So a non-damaging slot is accepted **when the rule states the
-        // element** -- that is the part the skill could not have supplied, and without it the instance would be
+        // Note: A *rider* may legitimately read a row out of a skill that deals no damage of its own: 知更鸟's [协奏]
+        // adds "1 次等同于其自身 120% 攻击力的物理属性附加伤害" and that 120% lives in her ultimate's own parameter row,
+        // while the ultimate itself is a Support skill. So a non-damaging slot is accepted when the rule states the
+        // element -- that is the part the skill could not have supplied, and without it the instance would be
         // element-less, which is the silent hole this check was written for.
         boolean statesElement = effect.getElement() != null && !effect.getElement().isBlank();
         // ? Skipped for a literal ratio (2026-09-29): there is no slot to inspect, and the validator REQUIRES `element` for that form,
@@ -4964,7 +4964,7 @@ public final class TriggerInterpreter {
           double base = skill == null
                   ? literalBase(attacker, victim, effect, ctx)   // ? a literal ratio: off the SETTLED attribute, a Max HP share, or the triggering instance's settled value
                   : attacker.getAttribute(AttributeType.ATTACK).get() * multiplierOf(skill, effect, attacker);
-          // ✅ The instance’s type is the rule’s own when it states one (2026-09-30; reader: 1505’s 欢愉 riders). And because
+          // The instance's type is the rule's own when it states one (2026-09-30; reader: 1505's 欢愉 riders). And because
           // `DamageType.ELATION` is deliberately not boostable, its own boost is folded into the BASE here, exactly as the cast
           // path does it in `SkillExecutor.hit` -- a type that settles but ignores its own boost zone is the silent hole this
           // project refuses.
@@ -4974,11 +4974,11 @@ public final class TriggerInterpreter {
           double settledBase = damageType == DamageType.ELATION
                   ? base * (1 + attacker.getAttribute(com.laosun.aluminium.enums.AttributeType.ELATION_DAMAGE_BOOST).get())
                   : base;
-          // ⭐ `damage_type: "TRUE"` is 真实伤害: it SKIPS every zone (2026-10-02). Without this branch the op stamped the
+          // `damage_type: "TRUE"` is 真实伤害: it SKIPS every zone (2026-10-02). Without this branch the op stamped the
         // TYPE and still went through `applyAdditionalDamage`, so the instance was labelled TRUE while defence and
         // resistance multiplied it -- a right label on a wrong number, with no symptom. `Battle.applyTrueDamage` is the
         // engine's one true-damage entry: it sets `.trueDamage()`, which `toValue()` honours by skipping the zones.
-        // Readers (2): 8007 开拓者's 【迷迷的声援】 (28%) and 1415 昔涟's 结界 (24%), both 「等同于原伤害 X% 的真实伤害」.
+        // Readers (2): 800开拓者's [迷迷的声援] (28%) and 1415 昔涟's 结界 (24%), both "等同于原伤害 X% 的真实伤害".
         if (damageType == DamageType.TRUE) {
             battle.applyTrueDamage(attacker, victim, skill == null
                             ? DamageElement.fromString(effect.getElement().trim())
@@ -4987,8 +4987,8 @@ public final class TriggerInterpreter {
             return;
         }
         if (Boolean.TRUE.equals(effect.getOrdinary())) {
-              // ✅ An ORDINARY instance (2026-09-30): the public `applyDamage` settles it as the main instance of a hit, so the
-              // victim is credited energy and the instance is an attack -- exactly what 「造成等同于…的物理属性伤容」 means, and what the
+              // An ORDINARY instance (2026-09-30): the public `applyDamage` settles it as the main instance of a hit, so the
+              // victim is credited energy and the instance is an attack -- exactly what "造成等同于…的物理属性伤容" means, and what the
               // additional-damage path (KILL_ONLY, not-an-attack) could not express.
               battle.applyDamage(victim, new Damage(attacker, victim, skill == null
                               ? DamageElement.fromString(effect.getElement().trim())
@@ -5000,7 +5000,7 @@ public final class TriggerInterpreter {
                             ? DamageElement.fromString(effect.getElement().trim())
                             : elementOf(effect, skill), settledBase,
                     effect.getCritRate(), effect.getCritDamage(), damageType,
-                    // ⭐ The rule may state that this instance is a 「追加攻击」 (2026-10-02): `applyAdditionalDamage` fires FOLLOW_UP without a
+                    // The rule may state that this instance is a "追加攻击" (2026-10-02): `applyAdditionalDamage` fires FOLLOW_UP without a
                     // category, so the instance has to carry it for a listener to be able to ask.
                     effect.getCastCategory() == null || effect.getCastCategory().isBlank()
                             ? null
@@ -5012,7 +5012,7 @@ public final class TriggerInterpreter {
      *
      * <p>The <b>row</b> is {@link EffectSpec#getDamageLevel()} when the rule states one, and the skill's own
      * level otherwise; the <b>column</b> is {@link EffectSpec#getDamageParam()}. Both are stated by the author
-     * where the document's figure depends on them — see {@code damage_level}'s javadoc for why the engine's
+     * where the document's figure depends on them - see {@code damage_level}'s javadoc for why the engine's
      * default (level 1) is not the same thing as "the number in the text".
      *
      * @param skill  the skill
@@ -5024,9 +5024,9 @@ public final class TriggerInterpreter {
      * The element of a rule-driven damage instance: the rule's own {@code element} when it states one, otherwise the
      * skill's (2026-09-28).
      *
-     * <p>⚠ The rule's own spelling had to exist for 知更鸟's 【协奏】 rider: the number comes from her ultimate's row,
+     * <p>Note: The rule's own spelling had to exist for 知更鸟's [协奏] rider: the number comes from her ultimate's row,
      * but her ultimate is a Support skill with <b>no element</b>, while the text says the damage is Physical. Reading
-     * the skill's element there would have produced an element-less instance — and one that silently takes no element
+     * the skill's element there would have produced an element-less instance - and one that silently takes no element
      * bonus or resistance.
      */
     private static DamageElement elementOf(EffectSpec effect, Skill skill) {
@@ -5060,7 +5060,7 @@ public final class TriggerInterpreter {
      * Validates the state an {@code APPLY_CONTROL} names, at load time, against the engine's closed table.
      *
      * <p>A control is a <b>known state</b>, not a free-form name: 冻结 is one thing (it blocks acting), and a rule
-     * that misspelled it would attach nothing at all — the same silent-failure shape the target-selector and
+     * that misspelled it would attach nothing at all - the same silent-failure shape the target-selector and
      * condition-variable closed sets exist to close. The message lists the names so the author has the fix in hand.
      */
     private static void requireControl(EffectSpec effect, String op, TriggerSpec spec) {
@@ -5083,9 +5083,9 @@ public final class TriggerInterpreter {
     /**
      * Validates the duration of an {@code APPLY_CONTROL} (required and positive).
      *
-     * <p>Required rather than defaulted: 「陷入冻结状态」 with no turn count would be a <b>permanent</b> lock —
+     * <p>Required rather than defaulted: "陷入冻结状态" with no turn count would be a <b>permanent</b> lock - 
      * a wrong mechanic that reads like a working rule, which is the one thing this vocabulary refuses. The
-     * documents always state it (「持续1回合」).
+     * documents always state it ("持续1回合").
      */
     /** The delta of an EXTEND_BUFF: non-zero and signed (the game does `SetModifierValue{Add, LifeTime}` on a named modifier). */
     private static void requireSignedTurns(EffectSpec effect, String op, TriggerSpec spec) {
@@ -5115,7 +5115,7 @@ public final class TriggerInterpreter {
     /**
      * Validates {@code base_chance} (基础概率) when stated: a fraction of 1, and above 0.
      *
-     * <p>Absent means "always lands", which is how a rule with no roll is written — so {@code 0} is a mistake
+     * <p>Absent means "always lands", which is how a rule with no roll is written - so {@code 0} is a mistake
      * rather than a way to spell "never" (a state that can never land is not a mechanic), and {@code 1} is legal
      * and simply means the pipeline still runs (effect hit rate can never make it <i>more</i> than certain).
      */
@@ -5179,9 +5179,9 @@ public final class TriggerInterpreter {
      *
      * <p>Two shapes are refused rather than resolved:
      * <ul>
-     *   <li>a magnitude with <b>no element</b> — a number nothing can attach as damage (the author probably meant
+     *   <li>a magnitude with <b>no element</b> - a number nothing can attach as damage (the author probably meant
      *       a bare {@code APPLY_DOT}, which is a different op);</li>
-     *   <li>an element with <b>no magnitude</b> — a DOT that would settle 0 damage every turn, which reads as a
+     *   <li>an element with <b>no magnitude</b> - a DOT that would settle 0 damage every turn, which reads as a
      *       working rule and does nothing.</li>
      * </ul>
      * Everything else ({@code attribute} / {@code buff}) is refused too: this op reads neither (M-26's rule).
@@ -5212,7 +5212,7 @@ public final class TriggerInterpreter {
     /**
      * Validates the element of a per-turn damage: one of {@code DamageElement}'s spellings.
      *
-     * <p>An unknown name would otherwise become a DOT that applies to nothing — {@code DamageElement.fromString}
+     * <p>An unknown name would otherwise become a DOT that applies to nothing - {@code DamageElement.fromString}
      * answers {@code null} for "Unknown" and for typos alike, so the check has to be here.
      */
     private static void requireElement(EffectSpec effect, String op, TriggerSpec spec) {
@@ -5234,8 +5234,8 @@ public final class TriggerInterpreter {
      * ({@code scale} + {@code percent}, optionally plus {@code amount} as a constant term), or neither-and-both
      * is refused.
      *
-     * <p>⚠ Derived from the <b>rule owner</b> ({@code self_attr:<ATTRIBUTE>} / {@code self_max_energy}) and
-     * computed when the effect lands, then frozen into the DOT — the same 「触发时算一次」 semantics the other
+     * <p>Note: Derived from the <b>rule owner</b> ({@code self_attr:<ATTRIBUTE>} / {@code self_max_energy}) and
+     * computed when the effect lands, then frozen into the DOT - the same "触发时算一次" semantics the other
      * derived values follow (a later buff on the applier must not change damage that is already burning).
      */
     private static void requireDotMagnitude(EffectSpec effect, String op, TriggerSpec spec) {
@@ -5257,7 +5257,7 @@ public final class TriggerInterpreter {
         }
         // The spelling, and (for the attribute family) the name: `scaleAttribute` is the one reader of that
         // vocabulary, shared with MODIFY_ATTR's derived value so the two cannot drift.
-        // ⚠ 「等同于**自身** 24.00% 生命上限」 (1111 卢卡): the VICTIM's own maximum is the one scale
+        // Note: "等同于自身 24.00% 生命上限" (1111 卢卡): the VICTIM's own maximum is the one scale
         // outside the owner's attributes a DOT may name (2026-09-28). Accepted HERE rather than by widening
         // scaleAttribute, whose other reader (MODIFY_ATTR) must keep refusing it.
         if ("target_max_hp".equals(effect.getScale().trim())) {
@@ -5276,7 +5276,7 @@ public final class TriggerInterpreter {
      * reads is a rule that says one thing and does another (M-26).
      */
     private static void requireNoMalformedArguments(EffectSpec effect, String op, TriggerSpec spec) {
-        // ★ `buff` is allowed again as the DOT's NAME (2026-09-30): 「使其陷入【游丝】状态」 names a state the element
+        // `buff` is allowed again as the DOT's NAME (2026-09-30): "使其陷入[游丝]状态" names a state the element
         // alone cannot express. It is a name only -- the DOT's identity for merging stays its element.
         if (effect.getAttribute() != null || effect.getSkill() != null
                 || effect.getDamageParam() != null) {
@@ -5290,13 +5290,13 @@ public final class TriggerInterpreter {
      * Validates the <b>one</b> filter {@code EXTEND_BUFF} needs: {@code "buff"} (a state's name, or 护盾) or
      * {@code "attribute"} (the attribute a modifier sits on).
      *
-     * <p>⚠ <b>Exactly one, and it is required.</b> Without a filter the op would mean "lengthen everything I have on
+     * <p>Note: <b>Exactly one, and it is required.</b> Without a filter the op would mean "lengthen everything I have on
      * that unit", and that is a wrong number waiting to happen: 布洛妮娅's DEFENCE trace buff from {@code BATTLE_START}
      * is still ticking when she casts her Skill, so her 星魂 6 would silently lengthen that one too. Stating both is
-     * refused for the same reason — there is no reading in which a buff is named by a state <i>and</i> an attribute.
+     * refused for the same reason - there is no reading in which a buff is named by a state <i>and</i> an attribute.
      *
      * <p>The <b>name</b> is checked against the closed spellings the engine knows (the four DOT names, the three
-     * control names, 护盾) and otherwise accepted as a {@code StateBuff} name — which is free-form by design, exactly
+     * control names, 护盾) and otherwise accepted as a {@code StateBuff} name - which is free-form by design, exactly
      * like {@code has_state}'s argument. The <b>attribute</b> is a name from {@code AttributeType}.
      */
     private static void requireExtendFilter(EffectSpec effect, String op, TriggerSpec spec) {
@@ -5309,10 +5309,10 @@ public final class TriggerInterpreter {
                             + "(source: " + spec.getSource() + ")");
         }
         if (!byName && !byAttribute) {
-            // ⭐ 「使自身**所有**增益效果延长 1 回合」 (2026-10-02; readers: 1506 银狼LV.999 的天赋与其星魂 2).
-            // ⚠ 下面那条拒绝**继续生效** ✓ —— 它反对的是“**什么都不说**” ✗，
-            // 而这里放行的是“**明说全部**” ✓ —— 作者说了要延长的是什么，
-            // 所以那条拒绝的理由（“会延长句子从未提及的 buff”）在这里**不成立** ✓。
+            // "使自身所有增益效果延长 1 回合" (2026-10-02; readers: 1506 银狼LV.999 的天赋与其星魂 2).
+            // Note: 下面那条拒绝继续生效 - - 它反对的是"什么都不说" ，
+            // 而这里放行的是"明说全部" - - 作者说了要延长的是什么，
+            // 所以那条拒绝的理由（"会延长句子从未提及的 buff"）在这里不成立 。
             if (effect.getKind() != null && "all".equalsIgnoreCase(effect.getKind().trim())) {
                 return;
             }
@@ -5381,9 +5381,9 @@ public final class TriggerInterpreter {
     /**
      * Refuses every field a {@code RAISE_SKILL_LEVEL} effect does not read.
      *
-     * <p>⚠ It cannot reuse {@link #rejectAmendmentExtras}: that one forbids {@code skill} outright (a
+     * <p>Note: It cannot reuse {@link #rejectAmendmentExtras}: that one forbids {@code skill} outright (a
      * {@code MODIFY_RULE} names a <b>rule</b>, never a slot), and this op's whole meaning is <b>which</b> slot is
-     * raised. Written out rather than parameterised because the two lists really are different statements — the
+     * raised. Written out rather than parameterised because the two lists really are different statements - the
      * shared-looking version made the op refuse the field it needs (measured: five cases went red with
      * "raises exactly one number on the rule it names").
      */
@@ -5430,7 +5430,7 @@ public final class TriggerInterpreter {
      * ({@code DebuffClass}), refused at load time with the list in the message.
      *
      * <p>Same reasoning as every other closed vocabulary here: a misspelled class would attach a resistance to a family
-     * that no state belongs to — a rule that loads, fires, and does nothing, with nothing to report.
+     * that no state belongs to - a rule that loads, fires, and does nothing, with nothing to report.
      */
     private static void requireDebuffClass(EffectSpec effect, String op, TriggerSpec spec) {
         if (effect.getKind() == null || effect.getKind().isBlank()) {
@@ -5472,13 +5472,13 @@ public final class TriggerInterpreter {
     /**
      * Validates a <b>stated crit</b> on a damage instance: {@code crit_rate: 1} plus {@code crit_damage: X}.
      *
-     * <p>⚠ <b>Two legal rates, and they are the two ways of taking the roll away</b> (2026-10-02):
-     * {@code 1.0} = "always crits, no roll" (1505's riders) and {@code 0.0} = "<b>never</b> crits, no roll" — the
+     * <p>Note: <b>Two legal rates, and they are the two ways of taking the roll away</b> (2026-10-02):
+     * {@code 1.0} = "always crits, no roll" (1505's riders) and {@code 0.0} = "<b>never</b> crits, no roll" - the
      * second one exists because a rule that copies a settled damage needs a <b>controlled</b> comparison: two battles
      * consume {@code Random} differently, so without it one instance crits and the other does not, and the ratio reads
-     * exactly like a zone discrepancy (measured: 260.237584 -> 520.475168, a clean 2.0 that cost four rounds).
-     * ⚠ Any other number is still refused: a probabilistic rate is the {@code CRIT_CHANCE} attribute, and these two
-     * are not probabilities at all — they mean "the roll does not happen".
+     * exactly like a zone discrepancy (measured: 260.23584 -> 520.45168, a clean 2.0 that cost four rounds).
+     * Note: Any other number is still refused: a probabilistic rate is the {@code CRIT_CHANCE} attribute, and these two
+     * are not probabilities at all - they mean "the roll does not happen".
      */
     private static void requireFixedCrit(EffectSpec effect, String op, TriggerSpec spec) {
         if (effect.getCritRate() == null && effect.getCritDamage() == null) {

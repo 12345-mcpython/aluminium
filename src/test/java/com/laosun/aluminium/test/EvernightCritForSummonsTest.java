@@ -11,11 +11,11 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1413's skill, the clause that raises every memosprite's CRIT DMG (2026-10-02): 「使我方全体忆灵的暴击伤害提高，提高数值等同于长夜月暴击伤害的 #1%」.
+ * 1413's skill, the clause that raises every memosprite's CRIT DMG (2026-10-02): "使我方全体忆灵的暴击伤害提高，提高数值等同于长夜月暴击伤害的 #1%".
  *
- * ⭐ It is also the effect that 1141524's third sentence later raises, so it has to exist before that can be written.
+ * It is also the effect that 1141524's third sentence later raises, so it has to exist before that can be written.
  *
- * ⭐ Two-sided: after her skill, a memosprite's CRIT DMG rises by her own CRIT DMG times her skill's #1 (read from the skill row, never a literal); before it, it does not.
+ * Two-sided: after her skill, a memosprite's CRIT DMG rises by her own CRIT DMG times her skill's #1 (read from the skill row, never a literal); before it, it does not.
  */
 public class EvernightCritForSummonsTest {
     private static final int LEVEL = 80;
@@ -45,7 +45,7 @@ public class EvernightCritForSummonsTest {
         cyrene = battle.characters.get(0);
         longnight = battle.characters.get(1);
 
-        // ⭐ cyrene's memosprite stands in for "our memosprites": it is one of ours, which is all the clause asks
+        // cyrene's memosprite stands in for "our memosprites": it is one of ours, which is all the clause asks
         var sprite = battle.summonServant(cyrene);
         battle.processRequests();
         double before = sprite.getAttribute(AttributeType.CRIT_ATTACK).get();

@@ -10,20 +10,20 @@ import org.junit.jupiter.api.Test;
  * L-12: every input of a {@code DotBuff} comes from data, so each one has to be rejected at
  * <b>construction</b> time instead of producing a wrong answer later.
  *
- * <p>Why this is not "defensive programming for its own sake" — each parameter has a concrete wrong
+ * <p>Why this is not "defensive programming for its own sake" - each parameter has a concrete wrong
  * answer behind it:
  * <ul>
  *   <li>{@code turns = 0} is <b>one settlement, not zero</b>. {@code Battle.tickDots} settles
  *   everything in the buff list and only afterwards does {@code BuffManager.processBuffTick} expire
- *   it, so "0 turns" silently means "1 turn" — the class javadoc's own contract is "N turns settles
+ *   it, so "0 turns" silently means "1 turn" - the class javadoc's own contract is "N turns settles
  *   exactly N times". The same holds for a negative value.</li>
  *   <li>A negative {@code baseDamage} neither errors nor heals: it is swallowed by
  *   {@code Battle.assemble}'s {@code Math.max(1, …)} floor, so the burn settles exactly <b>1 damage
- *   per turn</b> — a wrong number that nothing ever complains about. (The registry's original wording
+ *   per turn</b> - a wrong number that nothing ever complains about. (The registry's original wording
  *   "silently no damage" was close but not exact.) NaN/infinity poisons the settlement the same way a
  *   NaN reaches the HP bar (see M-11).</li>
  *   <li>A {@code null} element is only caught much later by {@code Damage}'s
- *   {@code Objects.requireNonNull(element)} — at settlement time, in {@code tickDots}, far from the
+ *   {@code Objects.requireNonNull(element)} - at settlement time, in {@code tickDots}, far from the
  *   code that built the buff.</li>
  *   <li>A {@code null} source is not checked <b>anywhere</b> ({@code Damage} requires only element and
  *   type), so a DOT kill would be credited to nobody. {@code DotBuff}'s own javadoc already says the
@@ -31,7 +31,7 @@ import org.junit.jupiter.api.Test;
  * </ul>
  *
  * <p>The production caller is {@code Battle.attachBreakDot}, whose element and turn count come from
- * {@code Constant.BREAK_EFFECTS} — i.e. from a table in the data pipeline. Validation is what turns a
+ * {@code Constant.BREAK_EFFECTS} - i.e. from a table in the data pipeline. Validation is what turns a
  * typo there into a loud error instead of a burn that lasts one turn too few.
  */
 public class DotBuffValidationTest {

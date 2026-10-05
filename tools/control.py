@@ -26,7 +26,7 @@ class Control:
     def __init__(self, work, *paths):
         self.work = work
         self.paths = list(paths)
-        # ⚠ BYTES, not text: reading with universal newlines folds CRLF to LF, and writing that back leaves the
+        # Note: BYTES, not text: reading with universal newlines folds CRLF to LF, and writing that back leaves the
         # working tree dirty with no content change (measured round 260). A control must be invisible when it restores.
         self.saved = {p: open(os.path.join(work, p), 'rb').read() for p in self.paths}
 
@@ -50,7 +50,7 @@ class Control:
         print('control: compile exit=%s' % comp.returncode)
         if comp.returncode != 0:
             print(((comp.stdout or '') + (comp.stderr or ''))[-600:])
-            # ★ `ok` exists because `reds=None` LOOKS like a result (round 345, discipline 179): a control that
+            # `ok` exists because `reds=None` LOOKS like a result (round 345, discipline 19): a control that
             # failed to compile says nothing about the code it aimed at, and reading its None as "0 red" would be the
             # same mistake in a new coat. Callers should test `ok` (or use `verdict`) before believing `reds`.
             return {'ok': False, 'why': 'the control did not compile, so it proves nothing',

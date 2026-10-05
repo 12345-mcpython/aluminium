@@ -25,7 +25,7 @@ public class RuanMeiTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** ⚠ 「除自身以外」: the TEAMMATE gains 10% speed and she does not — measured against a hand-built 20% reference. */
+    /** Note: "除自身以外": the TEAMMATE gains 10% speed and she does not - measured against a hand-built 20% reference. */
     @Test
     public void theTalentSpeedsTeammatesButNotHerself() {
         Character ruanmei = CharacterFactory.create(RUANMEI, LEVEL);
@@ -46,7 +46,7 @@ public class RuanMeiTest {
         Assertions.assertTrue(battle.getSkillPoints() >= 0, "the battle ran");
     }
 
-    /** ⚠ The Skill puts 【弦外音】 on HER, for the document's three turns. */
+    /** Note: The Skill puts [弦外音] on HER, for the document's three turns. */
     @Test
     public void theSkillPutsOvertoneOnHerself() {
         Character ruanmei = CharacterFactory.create(RUANMEI, LEVEL);

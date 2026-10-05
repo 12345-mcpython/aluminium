@@ -16,17 +16,17 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 「处于【协奏】状态时，知更鸟免疫控制类负面状态」 — the immunity, asserted BOTH ways.
+ * "处于[协奏]状态时，知更鸟免疫控制类负面状态" - the immunity, asserted BOTH ways.
  *
  * <p>The clause has been shipped since 2026-09-28, together with ③'s party ATK boost, in one ULT_CAST rule that carries
  * the name 协奏; this class pins what nothing else did: the same control that lands after the countdown cannot land while
  * the state lasts, because the immunity ends with the state rather than with a turn count. It also records that ULT_CAST
  * arrives at the tables exactly once per cast.
  *
- * <p>⚠ <b>How this class was born.</b> I first wrote a second copy of ③⑤ and measured a party ATK gain of
- * 475.0818748 where 0.228 x the pre-cast ATK + 200 is 386.8744908 -- and misread that as an engine bug. The duplicate
- * was the cause: the first rule computes 386.8744908 (her ATK then reads 1206.499) and the second recomputes
- * 475.0818748 from that boosted value, replacing the first because both carry the same name. The instrument was too
+ * <p>Note: <b>How this class was born.</b> I first wrote a second copy of ③⑤ and measured a party ATK gain of
+ * 45.081848 where 0.228 x the pre-cast ATK + 200 is 386.844908 -- and misread that as an engine bug. The duplicate
+ * was the cause: the first rule computes 386.844908 (her ATK then reads 1206.499) and the second recomputes
+ * 45.081848 from that boosted value, replacing the first because both carry the same name. The instrument was too
  * coarse to see it (the counter counts EVENTS, not rules), and the probe that would have shown the existing rule printed
  * into a report I read truncated. See GAPS and HANDOFF's discipline 31.
  */

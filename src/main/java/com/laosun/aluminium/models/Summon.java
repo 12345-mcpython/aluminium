@@ -13,7 +13,7 @@ import lombok.ToString;
  *
  * <p><b>Where they come from.</b> {@code SummonFactory} builds one from the same monster data
  * ({@code monster_config.json}) an {@link com.laosun.aluminium.models.enemy.Enemy} is built from, and
- * {@code Battle.summon(master, summonId, group)} is what puts it on the field — into <b>the master's own
+ * {@code Battle.summon(master, summonId, group)} is what puts it on the field - into <b>the master's own
  * camp</b>: an enemy's minion joins {@code Battle.enemies}, ours joins {@code Battle.allies}. The roster of
  * "which monsters may be summoned" lives on the master
  * ({@link com.laosun.aluminium.models.enemy.Enemy#getSummonIds()}).
@@ -21,13 +21,13 @@ import lombok.ToString;
  * <p><b>What a summon is not (yet).</b> It is a {@code CanHit}, not an {@code Enemy}, so it has a stat
  * sheet, a level, a skill and buffs, but <b>none of the monster-only mechanics</b>: no toughness bar
  * (nothing to break), no weakness list, no per-element damage resistance, no specific debuff resistance
- * and no phase table. That split is the L-8 one — the enemy camp holds any {@code CanHit} while
- * {@code Battle.enemyUnits()} is "the monsters in it" — and it is why those mechanics say
+ * and no phase table. That split is the L-8 one - the enemy camp holds any {@code CanHit} while
+ * {@code Battle.enemyUnits()} is "the monsters in it" - and it is why those mechanics say
  * {@code instanceof Enemy} at their call sites instead of assuming every enemy-camp unit has them.
  *
- * <p>🚧 <b>Still open</b> (the P9-4 remainder, all of it content or mechanism rather than placement):
- * memosprites (忆灵) as they are actually described — a stat <b>snapshot</b> of the summoner and joint
- * attacks — and whatever decides <em>when</em> a roster entry is used, since an enemy skill's {@code SUMMON}
+ * <p><b>Still open</b> (the P9-4 remainder, all of it content or mechanism rather than placement):
+ * memosprites (忆灵) as they are actually described - a stat <b>snapshot</b> of the summoner and joint
+ * attacks - and whatever decides <em>when</em> a roster entry is used, since an enemy skill's {@code SUMMON}
  * effect needs a "what to summon" column this data does not have (see {@code SkillEffectType.SUMMON}).
  */
 @Getter
@@ -38,7 +38,7 @@ public class Summon extends CanHit {
     /**
      * This memosprite's own skills, keyed by their <b>data slot</b> -- the number `SkillEffects` and `DefaultSkill` use.
      *
-     * <p>⚠ Not {@code CanHit.skills}: that map is keyed by {@link com.laosun.aluminium.enums.SkillType}, which has exactly two
+     * <p>Note: Not {@code CanHit.skills}: that map is keyed by {@link com.laosun.aluminium.enums.SkillType}, which has exactly two
      * summon entries (亿灵技能 / 亿灵天赋), and a memosprite's own skill list runs to eighteen.
      */
     private final java.util.Map<Integer, com.laosun.aluminium.models.skill.Skill> skillsByDataSlot =
@@ -67,7 +67,7 @@ public class Summon extends CanHit {
      * <p>The link is one-way and lives here rather than as a list on the master because its only job is the
      * lifecycle: <b>a summon leaves when its master does</b> ({@code Battle.removeDeadCombatants}). Keeping
      * the pointer on the summon means "who owns this" is answerable from the summon alone, with no registry
-     * to keep in sync — and no way for a summon to outlive its owner because a list somewhere was not
+     * to keep in sync - and no way for a summon to outlive its owner because a list somewhere was not
      * cleaned up.
      */
     private CanHit master;

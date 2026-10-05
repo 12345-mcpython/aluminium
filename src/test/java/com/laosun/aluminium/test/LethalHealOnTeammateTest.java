@@ -12,17 +12,17 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1211：「当白露的队友受到致命攻击时…白露会立即为其提供治疗，回复等同于白露 18.00% 生命上限 + 480 的生命值」
+ * 1211："当白露的队友受到致命攻击时…白露会立即为其提供治疗，回复等同于白露 18.00% 生命上限 + 480 的生命值"
  * (2026-10-02).
  *
- * <p>⭐ ONE VARIABLE: whether the blow would have killed the teammate. Nothing else differs -- same party, same heal amount, same scene.
+ * <p>ONE VARIABLE: whether the blow would have killed the teammate. Nothing else differs -- same party, same heal amount, same scene.
  */
 public class LethalHealOnTeammateTest {
     private static final int BAILU = 1211;
     private static final int TEAMMATE = 1002;
     private static final int MONSTER = 1002011;
 
-    /** ⭐ A lethal blow: the teammate is saved, at 白露’s 18% Max HP plus 480. */
+    /** A lethal blow: the teammate is saved, at 白露's 18% Max HP plus 480. */
     @Test
     public void aLethalBlowIsHealed() {
         double[] result = afterBlow(true);
@@ -32,7 +32,7 @@ public class LethalHealOnTeammateTest {
                 "「回复等同于白露 18.00% 生命上限 + 480」");
     }
 
-    /** ⚠ A survivable blow: the clause has not started, so the damage simply lands. */
+    /** Note: A survivable blow: the clause has not started, so the damage simply lands. */
     @Test
     public void aSurvivableBlowIsNotHealed() {
         double[] result = afterBlow(false);

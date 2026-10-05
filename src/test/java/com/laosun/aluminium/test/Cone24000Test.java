@@ -18,8 +18,8 @@ import java.util.Random;
  * Light cone 24000: every attack the wearer makes stacks 8% attack (up to four), and breaking a weakness adds 12% damage for two
  * turns.
  *
- * <p>⭐ The wearer is Dan Heng -- chosen because it carries no self-stacking mechanic of its own (a lesson measured on 21010).
- * Every claim is read on the attribute, and the "nothing happened" cases are compared against that same battle’s baseline.
+ * <p>The wearer is Dan Heng -- chosen because it carries no self-stacking mechanic of its own (a lesson measured on 21010).
+ * Every claim is read on the attribute, and the "nothing happened" cases are compared against that same battle's baseline.
  */
 public class Cone24000Test {
     private static final int CONE = 24000;
@@ -62,8 +62,8 @@ public class Cone24000Test {
         System.out.println("[24000] attack " + base + " -> one attack=" + one + " (delta " + (one - base)
                 + ", 8% of the base is " + (0.08 * base) + ") -> after eight attacks=" + many
                 + " (delta " + (many - base) + ", four layers would be " + (4 * 0.08 * base) + ")");
-        // ★ A percent modifier is a share of the PRE-BONUS base, not of the panel it is read on (measured: the delta is
-        // 86.0832, i.e. 8% of 1076.04, while the panel reads 1269.7272), so the exact claims are the LAYER ARITHMETIC
+        // A percent modifier is a share of the PRE-BONUS base, not of the panel it is read on (measured: the delta is
+        // 86.0832, i.e. 8% of 106.04, while the panel reads 1269.22), so the exact claims are the LAYER ARITHMETIC
         // (four layers are four of one) and the numbers themselves, which the spec half below pins.
         Assertions.assertTrue(one > base, "an attack adds attack");
         Assertions.assertEquals(4 * (one - base), many - base, 1e-6, "and the layers stop at four");
@@ -98,7 +98,7 @@ public class Cone24000Test {
 
     @Test
     public void theSpecPinsTheNumbers() {
-        // ★ The shares and the ceiling, read straight off the compiled rule: the behaviour above pins the ARITHMETIC, and
+        // The shares and the ceiling, read straight off the compiled rule: the behaviour above pins the ARITHMETIC, and
         // these two numbers are what a `8 -> 4 percent` or `max_stacks 4 -> 2` change would otherwise slip past.
         build(true);
         var rules = wearer.getTriggerTable().matching(com.laosun.aluminium.enums.TriggerEvent.ALLY_ATTACK,

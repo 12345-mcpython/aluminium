@@ -20,14 +20,14 @@ import java.util.Random;
 /**
  * 1210 桂乃芬 (Guinaifen): the first character whose file is <b>content</b> for the damage-instance vocabulary.
  *
- * <p>Her 逾锋 is 「对陷入灼烧状态的敌方目标造成的伤害提高20%」 — a bonus that depends on the <i>target's state
+ * <p>Her 逾锋 is "对陷入灼烧状态的敌方目标造成的伤害提高20%" - a bonus that depends on the <i>target's state
  * at the moment of the hit</i>, which is neither a timed buff nor something {@code ALLY_ATTACK} could drive
  * (that event fires after the attack is settled). It is the first shipped rule that uses
  * {@code DEALING_DAMAGE} + {@code BOOST_DAMAGE}, and the first that reads a state name resolving to a DoT
  * ({@code 灼烧} = a Fire {@code DotBuff}) rather than to a {@code StateBuff}.
  *
  * <p>Her 投狭 (advance 25% at battle start) is in the same file, so this also keeps pinning "one character,
- * several mechanics, one table" — the property Robin's file established.
+ * several mechanics, one table" - the property Robin's file established.
  *
  * <p>Her third trace (缘竿: "a Basic ATK has an 80% base chance to burn") is <b>not</b> here: it needs a chance
  * roll on a trigger rule and an op that applies a DoT, neither of which exists. Two of three is the honest
@@ -43,7 +43,7 @@ public class GuinaifenTraceTest {
     private static final double EPS = 1e-9;
 
     // ==================================================================
-    // 1210103 逾锋: 「对陷入灼烧状态的敌方目标造成的伤害提高20%」
+    // 1210103 逾锋: "对陷入灼烧状态的敌方目标造成的伤害提高20%"
     // ==================================================================
 
     @Test
@@ -92,7 +92,7 @@ public class GuinaifenTraceTest {
     }
 
     // ==================================================================
-    // 1210102 投狭: 「战斗开始时，桂乃芬的行动提前25%」
+    // 1210102 投狭: "战斗开始时，桂乃芬的行动提前25%"
     // ==================================================================
 
     @Test
@@ -138,7 +138,7 @@ public class GuinaifenTraceTest {
     }
 
     /**
-     * Removes crit and her own typed DMG boosts, so the ratio assertions are exact — the boost under test lands
+     * Removes crit and her own typed DMG boosts, so the ratio assertions are exact - the boost under test lands
      * in the same additive zone as her fire DMG traces.
      */
     private static void neutralise(Character who) {

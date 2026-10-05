@@ -25,7 +25,7 @@ import java.util.stream.Stream;
  *
  * <p>`TriggerTable` resolves its numeric variables; {@code target_hp_percent} and {@code hp_percent} yield a FRACTION (the engine's own
  * comment for the latter spells {@code hp_percent <= 0.5}). Herta's file compared {@code target_hp_percent >= 50}, so the condition was
- * false for every damage instance and the rule was silently dead — which read as "BOOST_DAMAGE does nothing" for two rounds.
+ * false for every damage instance and the rule was silently dead - which read as "BOOST_DAMAGE does nothing" for two rounds.
  *
  * <p>This test reads every shipped character file and fails on:
  * <ul>
@@ -38,7 +38,7 @@ public class UnitDisciplineTest {
     private static final Set<String> KNOWN = Set.of(
             "hit_count", "hp_percent", "target_hp_percent", "target_debuff_count",
             "self_summon_count", "target_summon_count", "self_max_energy", "self_energy_percent", "from_skill_id",
-        // ⭐ Added with the condition itself (2026-10-02): the skill that produced a SETTLED damage. The discipline test mirrors TriggerTable switch, so a new
+        // Added with the condition itself (2026-10-02): the skill that produced a SETTLED damage. The discipline test mirrors TriggerTable switch, so a new
         // condition belongs in BOTH -- that is the fifth place a condition name lives (closed set, switch, this list, and the docs that describe them).
         "damage_skill_key",
             "target_hp_percent_before", "enemy_count", "ally_count");   // added with the crossing variable (round 181)

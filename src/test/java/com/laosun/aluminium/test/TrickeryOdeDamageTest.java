@@ -13,9 +13,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1415's memosprite skill 20 「献予「诡计」之诗」: 「使赛飞儿造成的伤害提高 #1%」 (2026-10-02).
+ * 1415's memosprite skill 20 "献予'诡计'之诗": "使赛飞儿造成的伤害提高 #1%" (2026-10-02).
  *
- * <p>⭐ Two scenes that differ by exactly one thing: whether the ode was cast at her. ⚠ Nothing is ever replaced -- the table trap has already deleted a rule under
+ * <p>Two scenes that differ by exactly one thing: whether the ode was cast at her. Note: Nothing is ever replaced -- the table trap has already deleted a rule under
  * test once in this project.
  */
 public class TrickeryOdeDamageTest {
@@ -31,7 +31,7 @@ public class TrickeryOdeDamageTest {
         System.out.println("[trickery] without the ode = " + withoutOde + " ; with it = " + withOde.gain
                 + " (the cast row says " + withOde.expected + ")");
 
-        // ⭐ Her OWN kit already carries an `ALL_DAMAGE_TYPE_BOOST` (measured 0.2), and the ode's modifier REPLACES it rather than adding to it --
+        // Her OWN kit already carries an `ALL_DAMAGE_TYPE_BOOST` (measured 0.2), and the ode's modifier REPLACES it rather than adding to it --
         // same attribute, same target, and that is the engine's own rule. So the control is a FRESH character, not zero.
         double hers = CharacterFactory.create(CIPHER, LEVEL).getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
         Assertions.assertNotEquals(withoutOde.gain, withOde.gain, 1e-9,

@@ -34,8 +34,8 @@ import java.util.Set;
  * A memosprite's <b>attack</b>: its damage is a share of an attribute of its own, not of its summoner (P9-4 忆灵).
  *
  * <p><b>Why this is not a rule on the summoning character.</b> A memosprite's damage is written against the
- * memosprite — 长夜月's 忆灵技能1 is 「对敌方单体造成等同于「长夜」<b>50%</b>生命上限的冰属性伤害」 — and the panel
- * halves that number on the way in (「长夜」 has 50% of her Max HP). Reading the share off the summoner would
+ * memosprite - 长夜月's 忆灵技能1 is "对敌方单体造成等同于'长夜'<b>50%</b>生命上限的冰属性伤害" - and the panel
+ * halves that number on the way in ("长夜" has 50% of her Max HP). Reading the share off the summoner would
  * therefore produce a hit <b>twice</b> as large: a wrong number that looks entirely plausible, which is the
  * kind a test has to catch. So the spec states the attack, {@code SummonFactory} installs it on the memosprite,
  * and the base is read from the memosprite every time it swings.
@@ -44,7 +44,7 @@ import java.util.Set;
  * <ol>
  *   <li>the shipped attack is 长夜's own 忆灵技能1 (element / share / base / shape), not an ATK-based fallback
  *       invented for a unit the text gives no ATK;</li>
- *   <li>the damage really is proportional to the memosprite's Max HP — doubling the panel's share doubles the
+ *   <li>the damage really is proportional to the memosprite's Max HP - doubling the panel's share doubles the
  *       hit, with everything else held fixed;</li>
  *   <li>it lands on the <b>opposing camp</b>: ours, so the monsters, never our own side. The shape dispatch
  *       used to sweep {@code battle.allies} because only enemies cast it;</li>
@@ -57,9 +57,9 @@ import java.util.Set;
 public class MemospriteAttackTest {
     private static final double EPS = 1e-6;
 
-    /** 长夜月 — the one shipped memosprite whose document states an attack (忆灵技能1). */
+    /** 长夜月 - the one shipped memosprite whose document states an attack (忆灵技能1). */
     private static final int CASTORICE_LIKE = 1413;
-    /** 阿格莱雅 — used as the summoner for fixture specs; her rule summons only on her ultimate. */
+    /** 阿格莱雅 - used as the summoner for fixture specs; her rule summons only on her ultimate. */
     private static final int AGLAEA = 1402;
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
@@ -115,7 +115,7 @@ public class MemospriteAttackTest {
     // 2. What it deals, measured
     // ==================================================================
 
-    /** The attack lands on the monsters — and takes nothing off our own side. */
+    /** The attack lands on the monsters - and takes nothing off our own side. */
     @Test
     public void theAttackLandsOnTheOpposingCampAndNotOnOurs() {
         Character summoner = CharacterFactory.create(CASTORICE_LIKE, LEVEL);
@@ -141,7 +141,7 @@ public class MemospriteAttackTest {
      * The damage is proportional to the memosprite's <b>own</b> Max HP.
      *
      * <p>Two specs that differ only in the panel's HEALTH share, the same summoner, the same seed. Doubling the
-     * share doubles the derived Max HP and must double the hit — the ratio is exact because a direct hit's only
+     * share doubles the derived Max HP and must double the hit - the ratio is exact because a direct hit's only
      * randomness is the crit roll, and both runs draw it from the same seed. Comparing two runs, rather than
      * comparing against an absolute number, is what keeps this case from re-implementing the damage zones.
      */
@@ -156,9 +156,9 @@ public class MemospriteAttackTest {
     }
 
     /**
-     * {@code hits} are separate instances: 3 × 20% is the same total as 1 × 60%.
+     * {@code hits} are separate instances: 3  x  20% is the same total as 1  x  60%.
      *
-     * <p>Crit is pinned to 0 so the total is exact — otherwise the two specs would draw different crit rolls and
+     * <p>Crit is pinned to 0 so the total is exact - otherwise the two specs would draw different crit rolls and
      * the case would prove nothing. If {@code hits} were ignored (always one segment), the first total would be
      * a third of the second and this fails.
      */
@@ -175,7 +175,7 @@ public class MemospriteAttackTest {
                 "3 × 20% and 1 × 60% of the same Max HP are the same total");
     }
 
-    /** An AOE attack reaches <b>every</b> monster — the multi-target half of "opposing camp". */
+    /** An AOE attack reaches <b>every</b> monster - the multi-target half of "opposing camp". */
     @Test
     public void anAoeAttackReachesEveryMonster() {
         Character summoner = CharacterFactory.create(AGLAEA, LEVEL);
@@ -199,15 +199,15 @@ public class MemospriteAttackTest {
     }
 
     // ==================================================================
-    // 2b. The attack is announced — once, and to the right owner (M-30)
+    // 2b. The attack is announced - once, and to the right owner (M-30)
     // ==================================================================
 
     /**
      * An {@code "until": "next_attack"} buff <b>on the memosprite</b> ends when the memosprite attacks.
      *
-     * <p>Written as a rule, because that is how such a buff ever gets onto a summon: 「装备者及其忆灵」 is two
+     * <p>Written as a rule, because that is how such a buff ever gets onto a summon: "装备者及其忆灵" is two
      * rules, the second one {@code target: "summon"}. Before the engine announced a summon's attack, this buff
-     * was never consumed — it stayed for the rest of the battle, silently.
+     * was never consumed - it stayed for the rest of the battle, silently.
      */
     @Test
     public void theMemospriteOwnUntilBuffEndsWhenItAttacks() {
@@ -226,7 +226,7 @@ public class MemospriteAttackTest {
      * …and the <b>summoner's</b> own {@code until} buff is <b>not</b> consumed by the memosprite's attack.
      *
      * <p>This is the owner test doing its job on a new path. A memosprite's attack is a real attack by a unit of
-     * ours, so the whole side hears about it; but 「直到装备者下次攻击」 is about the <em>wearer</em> attacking,
+     * ours, so the whole side hears about it; but "直到装备者下次攻击" is about the <em>wearer</em> attacking,
      * and a summon swinging is not its master swinging. Without the owner test, the announcement added for the
      * memosprite would silently eat its summoner's buff.
      */
@@ -249,8 +249,8 @@ public class MemospriteAttackTest {
      * An enemy's attack is announced to our side too, and <b>nothing of ours reacts</b>: every listener is
      * keyed to its own owner.
      *
-     * <p>Pinned because the announcement is broadcast to the whole side whatever the attacker's camp — which is
-     * what lets a future "when I am attacked" buff exist — and this is the case that says that widening did not
+     * <p>Pinned because the announcement is broadcast to the whole side whatever the attacker's camp - which is
+     * what lets a future "when I am attacked" buff exist - and this is the case that says that widening did not
      * quietly start consuming our buffs. Driven through the enemy's own skill, which is the path in question.
      */
     @Test
@@ -274,7 +274,7 @@ public class MemospriteAttackTest {
      * The announcement says <b>which targets</b> the attack connected with and <b>how much</b> it settled, once.
      *
      * <p>Every shipped listener answers a question about itself ("is this my attack?" / "does this end my
-     * buff?"), so the payload is only visible from outside — via a listener that records instead of reacting.
+     * buff?"), so the payload is only visible from outside - via a listener that records instead of reacting.
      * Without this case, the targets a summon's attack reports would be asserted nowhere, and "one attack, one
      * announcement" would too: firing it per segment would still consume the buff exactly once.
      */
@@ -302,7 +302,7 @@ public class MemospriteAttackTest {
     // ==================================================================
 
     /**
-     * A memosprite's attack removes the toughness its document states — 「破韧值 单体 30」.
+     * A memosprite's attack removes the toughness its document states - "破韧值 单体 30".
      *
      * <p>Two affordances, both stated rather than hidden: the target's weakness set is rewritten to include the
      * attack's element (toughness only comes off a weakness, which is the engine's own rule and the demo's scene 1
@@ -328,7 +328,7 @@ public class MemospriteAttackTest {
      * An attack that states no toughness leaves the bar alone.
      *
      * <p>The fixture's spec has no {@code stance}, which is what every enemy attack means too (they do not attack a
-     * toughness bar) — so 0 is the default and the enemy path is unchanged.
+     * toughness bar) - so 0 is the default and the enemy path is unchanged.
      */
     @Test
     public void anAttackWithoutAStatedToughnessLeavesTheBarAlone() {
@@ -469,7 +469,7 @@ public class MemospriteAttackTest {
         return null;                                 // unreachable: fail() throws
     }
 
-    /** One memosprite, one monster, one cast — the damage dealt, for comparing two specs. */
+    /** One memosprite, one monster, one cast - the damage dealt, for comparing two specs. */
     private static double damageFrom(Character summoner, MemospriteSpec spec) {
         Enemy target = monster();
         Battle battle = battleWith(summoner, List.of(target), 7);
@@ -484,7 +484,7 @@ public class MemospriteAttackTest {
     }
 
     /**
-     * 长夜月 with a hand-built table: summon 「长夜」 at battle start, then hang an
+     * 长夜月 with a hand-built table: summon "长夜" at battle start, then hang an
      * {@code "until": "next_attack"} CRIT DMG buff on the memosprite and/or on herself.
      *
      * <p>A hand-built table rather than a file: a character fixture under {@code src/test/resources} would be
@@ -517,7 +517,7 @@ public class MemospriteAttackTest {
         return effect;
     }
 
-    /** The memosprite's/character's own CRIT DMG (spelled {@code CRIT_ATTACK} here) — 0 on a memosprite. */
+    /** The memosprite's/character's own CRIT DMG (spelled {@code CRIT_ATTACK} here) - 0 on a memosprite. */
     private static double critDamageOf(CanHit unit) {
         return unit.getAttribute(AttributeType.CRIT_ATTACK).get();
     }

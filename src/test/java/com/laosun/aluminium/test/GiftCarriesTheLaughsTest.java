@@ -15,9 +15,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * The gift carries the 【笑点】 count, and 1505 takes half of it (2026-10-02) -- objective ①-a's whole chain.
+ * The gift carries the [笑点] count, and 1505 takes half of it (2026-10-02) -- objective ①-a's whole chain.
  *
- * <p>Content only: 1513's skill grants 4 【笑点】, an 【阿哈时刻】 ends, her reward applies the gift with FOUR instances, and ending
+ * <p>Content only: 1513's skill grants 4 [笑点], an [阿哈时刻] ends, her reward applies the gift with FOUR instances, and ending
  * it pays 1505 half of four. The cap is spelled `max_stacks`, which is the trap this reading was written around: the Java name
  * is accepted by the key guard and then dropped by Gson, leaving one instance.
  */
@@ -51,7 +51,7 @@ public class GiftCarriesTheLaughsTest {
         int instances = sparkle.getBuffManager().stacksOf(GIFT);
         System.out.println("[gift-laughs] gift instances=" + instances);
         Assertions.assertEquals(4, instances, "the state carries one instance per laugh");
-        // ⭐ 「阿哈行动后会消耗全部笑点」 (glossary 10000026): the count was read FIRST, then the counter was emptied --
+        // "阿哈行动后会消耗全部笑点" (glossary 10000026): the count was read FIRST, then the counter was emptied --
         // asserting both in one scene is what makes the ordering part of the reading rather than of the prose.
         Assertions.assertEquals(0, battle.partyResourceValue(LAUGHS),
                 "and all the laughs are spent at the same moment, after the gift has taken its count");

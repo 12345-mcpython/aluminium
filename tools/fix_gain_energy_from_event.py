@@ -32,9 +32,9 @@ NEW = '''    private static void gainEnergyFor(Battle battle, EffectSpec effect,
         }
         if (effect.getScale() == null || effect.getScale().isBlank()) {'''
 
-# ⭐ The key: EffectSpec has NO @SerializedName for this field, so Gson maps it by its JAVA name -- `amountFromEvent`.
+# The key: EffectSpec has NO @SerializedName for this field, so Gson maps it by its JAVA name -- `amountFromEvent`.
 # Round 668 wrote `amount_from_event`, which Gson silently drops, so the flag never lit and the change was a no-op that
-# passed the load check, the full suite and both demo gates. Measured in round 675/676.
+# passed the load check, the full suite and both demo gates. Measured in round 65/66.
 CHAR = 'src/main/resources/characters/1312.json'
 cdoc = json.load(io.open(WORK + '/' + CHAR, encoding='utf-8'))
 cwhere = cdoc if isinstance(cdoc, list) else cdoc.get('rules')

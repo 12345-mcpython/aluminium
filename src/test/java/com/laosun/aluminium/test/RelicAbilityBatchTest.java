@@ -28,29 +28,29 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * The 2026-09-28 content pass over the {@code Writable now:} backlog — five relic abilities whose every clause
+ * The 2026-09-28 content pass over the {@code Writable now:} backlog - five relic abilities whose every clause
  * already had a spelling, written out.
  *
  * <p><b>Why a content pass needs tests at all.</b> Each of these was "already expressible", which is exactly the
  * kind of change that can be wrong in ways nothing reports: the wrong attribute, the wrong tier, a number read
  * from the wrong row, or a stacking default that silently replaces instead of adding. Four of the five registered
- * reasons carried a figure that <b>no parameter supports</b> — 102's Basic-ATK share (12% vs param 0.1), 111's
+ * reasons carried a figure that <b>no parameter supports</b> - 102's Basic-ATK share (12% vs param 0.1), 111's
  * energy (8 vs param 3), 310's threshold (50% vs param 0.3) and 313's per-stack CRIT DMG (which is why 313 is
- * still not authored) — so every number below is asserted against the file that was written, not against prose.
+ * still not authored) - so every number below is asserted against the file that was written, not against prose.
  *
- * <p>313 (无主荒星茨冈尼亚) stayed registered, and its reason was rewritten: 「当敌方目标被消灭时」 needs "the one
- * who died is an ENEMY", and {@code KILL} fires for any death with the victim as {@code target} — the condition
+ * <p>313 (无主荒星茨冈尼亚) stayed registered, and its reason was rewritten: "当敌方目标被消灭时" needs "the one
+ * who died is an ENEMY", and {@code KILL} fires for any death with the victim as {@code target} - the condition
  * DSL has no camp variable (F-5). A wrong number and a missing spelling in one entry.
  */
 public class RelicAbilityBatchTest {
     private static final double EPS = 1e-6;
 
-    /** 姬子 — carries no rule file of her own, so only the set's rules are in play. */
+    /** 姬子 - carries no rule file of her own, so only the set's rules are in play. */
     private static final int WEARER = 1003;
     /**
      * The "someone else" in the cases that need a second character. Deliberately the SAME rule-less character as
      * {@link #WEARER} rather than a colourful one: 桂乃芬 (1210) was the first draft and her own trace is
-     * 「对陷入灼烧状态的敌方目标造成的伤害提高20%」 -- which is exactly the debuff the Pioneer case applies, so she
+     * "对陷入灼烧状态的敌方目标造成的伤害提高20%" -- which is exactly the debuff the Pioneer case applies, so she
      * boosted her own hit by 20% and the case measured her rule instead of the set's.
      */
     private static final int ALLY = WEARER;
@@ -71,7 +71,7 @@ public class RelicAbilityBatchTest {
     private static final int POET = 124;
     private static final int SERENE_DEMESNE = 319;
     private static final int RAPT_BROODING = 320;
-    /** 「对己方角色施放」 family, authored 2026-09-27 with the `is_ally` condition. */
+    /** "对己方角色施放" family, authored 2026-09-2with the `is_ally` condition. */
     private static final int MESSENGER = 114;
     private static final int WATCHMAKER = 118;
     private static final int SACERDOS = 121;
@@ -87,7 +87,7 @@ public class RelicAbilityBatchTest {
     private static final int REVELRY = 322;
 
     // ==================================================================
-    // 102 — 普攻伤害 +10%
+    // 102 - 普攻伤害 +10%
     // ==================================================================
 
     /** The Basic ATK half is a rule; the SPD half is the data path's `properties` stat (and is not repeated). */
@@ -103,7 +103,7 @@ public class RelicAbilityBatchTest {
     }
 
     // ==================================================================
-    // 111 — 击破弱点后回能
+    // 111 - 击破弱点后回能
     // ==================================================================
 
     /** Only the wearer's own break pays, and the amount is the parameter's 3. */
@@ -125,7 +125,7 @@ public class RelicAbilityBatchTest {
     }
 
     // ==================================================================
-    // 117 — 对受负面状态影响的敌人增伤
+    // 11- 对受负面状态影响的敌人增伤
     // ==================================================================
 
     /**
@@ -154,7 +154,7 @@ public class RelicAbilityBatchTest {
         Assertions.assertEquals(0.12, onDebuffed / onClean - 1, 1e-6,
                 "param #1 is 0.12 and it applies to the instance being settled");
 
-        // 「装备者造成的伤害」: the wearer's rule must not boost a teammate's hit on the same enemy.
+        // "装备者造成的伤害": the wearer's rule must not boost a teammate's hit on the same enemy.
         double allyOnDebuffed = hit(battle, ally, debuffed);
         double allyOnClean = hit(battle, ally, clean);
         Assertions.assertEquals(allyOnClean, allyOnDebuffed, EPS,
@@ -162,14 +162,14 @@ public class RelicAbilityBatchTest {
     }
 
     // ==================================================================
-    // 122 — 战技/终结技增伤，终结技后下一次战技额外 +25%
+    // 122 - 战技/终结技增伤，终结技后下一次战技额外 +25%
     // ==================================================================
 
     /**
      * The two scoped boosts are permanent, and the extra 25% <b>adds</b> to the 20% rather than replacing it.
      *
-     * <p>This is the case that would have shipped a silent 10-point error: 「额外提高」 means on top, while the
-     * default stack cap is 1 and two modifiers on one attribute then replace each other — so the file states
+     * <p>This is the case that would have shipped a silent 10-point error: "额外提高" means on top, while the
+     * default stack cap is 1 and two modifiers on one attribute then replace each other - so the file states
      * {@code max_stacks: 2}.
      */
     @Test
@@ -188,7 +188,7 @@ public class RelicAbilityBatchTest {
     }
 
     // ==================================================================
-    // 310 — 效果抵抗 ≥ 30% 时我方全体暴击伤害 +10%
+    // 310 - 效果抵抗 >= 30% 时我方全体暴击伤害 +10%
     // ==================================================================
 
     /** The threshold is 30%, it is a fraction, and it reaches the whole side. */
@@ -203,7 +203,7 @@ public class RelicAbilityBatchTest {
     }
 
     // ==================================================================
-    // 107, 120, 311, 127 -- the second pass over the backlog
+    // 10, 120, 311, 12-- the second pass over the backlog
     // ==================================================================
 
     /** The Skill boost is permanent, and the fire boost is consumed by the next attack. */
@@ -255,7 +255,7 @@ public class RelicAbilityBatchTest {
      * Three effects on one trigger, and the summon condition is what keeps the third reachable.
      *
      * <p>Without the memosprite the rule must do <b>nothing</b>, not throw: the effect that names
-     * {@code target: "summon"} fails loudly when nothing is out, so 「若装备者的忆灵在场」 is load-bearing.
+     * {@code target: "summon"} fails loudly when nothing is out, so "若装备者的忆灵在场" is load-bearing.
      */
     @Test
     public void theShatteredWorldNeedsItsMemospriteAndThenBoostsBoth() {
@@ -302,7 +302,7 @@ public class RelicAbilityBatchTest {
     }
 
     // ==================================================================
-    // 124 / 319 / 320 -- 「装备者及其忆灵」 reaches a LATE arrival (M-39)
+    // 124 / 319 / 320 -- "装备者及其忆灵" reaches a LATE arrival (M-39)
     // ==================================================================
 
     /**
@@ -311,7 +311,7 @@ public class RelicAbilityBatchTest {
      * <p>This is the decision M-39 needed: `target: "summon"` cannot be filed at BATTLE_START (nothing may be
      * out, and the selector fails loudly rather than silently missing), so each tier carries a second rule on
      * SUMMONED. Both halves are asserted: the wearer gets hers at the start, the memosprite gets hers when it
-     * appears — including for a wearer whose kit summons it mid-fight, which is the case the single BATTLE_START
+     * appears - including for a wearer whose kit summons it mid-fight, which is the case the single BATTLE_START
      * rule could not serve at all.
      */
     @Test
@@ -395,14 +395,14 @@ public class RelicAbilityBatchTest {
     }
 
     // ==================================================================
-    // 114 / 118 / 121 — 「对己方角色施放」 (`target is_ally`, 2026-09-27)
+    // 114 / 118 / 121 - "对己方角色施放" (`target is_ally`, 2026-09-2)
     // ==================================================================
 
     /**
-     * 114 骇域漫游的信使: the wearer's Ultimate <b>on an ally</b> speeds the whole side up — and aimed at an enemy it
+     * 114 骇域漫游的信使: the wearer's Ultimate <b>on an ally</b> speeds the whole side up - and aimed at an enemy it
      * does nothing at all.
      *
-     * <p>⚠ Both halves in one case on purpose: the contrast is the whole reason the condition exists (`actor == self`
+     * <p>Note: Both halves in one case on purpose: the contrast is the whole reason the condition exists (`actor == self`
      * alone would fire for a damaging ultimate too), and a test that only checked the ally half would pass for a rule
      * that never looks at the target.
      */
@@ -466,14 +466,14 @@ public class RelicAbilityBatchTest {
     }
 
     // ==================================================================
-    // 328 — a derived value read off MAX ENERGY, with a cap
+    // 328 - a derived value read off MAX ENERGY, with a cap
     // ==================================================================
 
     /**
-     * 328 生命的翁法罗斯: 「能量上限 ≥ 200 点，每超过 1 点使造成的伤害提高 0.2%，最多提高 32%」.
+     * 328 生命的翁法罗斯: "能量上限 >= 200 点，每超过 1 点使造成的伤害提高 0.2%，最多提高 32%".
      *
      * <p>Three points on the curve, which is what the sentence actually says: below the threshold <b>nothing</b>,
-     * 40 points over it <b>0.08</b>, and past 360 the <b>32% cap</b>. ⚠ The value is read off the modifier the rule
+     * 40 points over it <b>0.08</b>, and past 360 the <b>32% cap</b>. Note: The value is read off the modifier the rule
      * grants rather than off the resolved attribute: the wearer is built <b>with</b> a relic suit, so its random
      * sub-stats may already carry a damage boost of their own (the trap that made an earlier case read 0.444 instead
      * of 0.12).
@@ -505,13 +505,13 @@ public class RelicAbilityBatchTest {
     }
 
     // ==================================================================
-    // 314 — the party-composition condition
+    // 314 - the party-composition condition
     // ==================================================================
 
     /**
      * 314 出云显世与高天神国: the CRIT Rate arrives only when a teammate walks the wearer's Path.
      *
-     * <p>⚠ The value is read off the <b>modifier the rule granted</b>, not off the resolved attribute: the wearer is
+     * <p>Note: The value is read off the <b>modifier the rule granted</b>, not off the resolved attribute: the wearer is
      * built with a relic suit, whose random sub-stats may carry CRIT Rate of their own (relic sub-stats become
      * attributes at build time, so a `StatModifierBuff` on that attribute can only have come from a rule).
      */
@@ -540,13 +540,13 @@ public class RelicAbilityBatchTest {
     }
 
     // ==================================================================
-    // 316 — a weakness-gated buff
+    // 316 - a weakness-gated buff
     // ==================================================================
 
     /**
      * 316 盗贼公国塔利亚: hitting a <b>fire-weak</b> enemy raises the wearer's Break Effect; anyone else does not.
      *
-     * <p>⚠ Both sides in one case: the condition is the whole rule, and a rule that ignored the weakness would pass a
+     * <p>Note: Both sides in one case: the condition is the whole rule, and a rule that ignored the weakness would pass a
      * test that only checked the fire-weak enemy.
      */
     @Test
@@ -576,13 +576,13 @@ public class RelicAbilityBatchTest {
     }
 
     // ==================================================================
-    // 322 — a damage-CATEGORY boost (DoT only)
+    // 322 - a damage-CATEGORY boost (DoT only)
     // ==================================================================
 
     /**
      * 322 逐火者的航迹: the DoT-only boost appears once ATK passes 2400, again at 3600, and not below.
      *
-     * <p>⚠ This case reads the granted <b>modifier</b>; that the attribute actually reaches a DoT instance's damage is
+     * <p>Note: This case reads the granted <b>modifier</b>; that the attribute actually reaches a DoT instance's damage is
      * the branch in {@code Battle}'s assembly, and it is pinned separately by
      * {@link #theDotBoostReachesTheDamageInstance()} -- an attribute nothing reads would look exactly like a working
      * rule, so both halves are checked.
@@ -598,7 +598,7 @@ public class RelicAbilityBatchTest {
     /**
      * …and the attribute really reaches the tick: the <b>same</b> DoT hits harder once the wearer holds the boost.
      *
-     * <p>⚠ This is the half that would silently not work. `DOT_DAMAGE_BOOST` is read by a branch in {@code Battle}'s
+     * <p>Note: This is the half that would silently not work. `DOT_DAMAGE_BOOST` is read by a branch in {@code Battle}'s
      * boost assembly, and an attribute that nothing reads looks exactly like a working rule from the outside -- so the
      * pair of cases is the point, not either one.
      *

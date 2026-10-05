@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 「每消耗1点战技点…造成的伤害提高 6%」 (1306:159, 2026-10-02): `scale: "event_amount"` on a MODIFIER.
+ * "每消耗1点战技点…造成的伤害提高 6%" (1306:159, 2026-10-02): `scale: "event_amount"` on a MODIFIER.
  *
  * <p>File-driven character, one hand-built rule on the existing `SKILL_POINT_SPENT` event, and the amount spent is the
  * magnitude -- so 3 points is 3x one point, and no spend is no change at all.
@@ -24,7 +24,7 @@ public class EventAmountModifierTest {
     private static final int OWNER = 1306;
     private static final int MONSTER = 1002011;
 
-    /** ⭐ Three points spent raise the modifier three times as far as one. */
+    /** Three points spent raise the modifier three times as far as one. */
     @Test
     public void theModifierFollowsTheEvent() {
         double one = boostAfterSpending(1);

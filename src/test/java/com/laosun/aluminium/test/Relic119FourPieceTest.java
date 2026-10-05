@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Relic 119's four-piece: 「击破特攻 ≥150% 时，造成的击破伤害无视其 10% 防御力；≥250% 时，超击破伤害额外无视 15%」.
+ * Relic 119's four-piece: "击破特攻 >=150% 时，造成的击破伤害无视其 10% 防御力；>=250% 时，超击破伤害额外无视 15%".
  *
  * <p>New vocabulary: a damage-type scope on the instance route of MODIFY_ATTR. The wearer must WEAR the set (a relic rule is not loaded by CharacterFactory
  * alone), and the two readings isolate the two variables: same suit, same type, only the threshold differs; then same wearer, only the type differs.
@@ -71,19 +71,19 @@ public class Relic119FourPieceTest {
         Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
         Battle battle = new Battle(List.of(above, below), List.of(enemy), new Random(0));
         battle.startBattle();
-        // ⚠ fixedCrit: four settlements in a row draw from the same Random, so crit luck would differ between the readings
+        // Note: fixedCrit: four settlements in a row draw from the same Random, so crit luck would differ between the readings
         // and swamp the 5% the defence-ignore is worth (measured: a 1.5x swing).
         double breakAbove = battle.applyDamage(enemy, new Damage(above, enemy, DamageElement.PHYSICAL, DamageType.BREAK, 1000)
                 .fixedCrit(true, 1.5));
-        // ⚠ fixedCrit: four settlements in a row draw from the same Random, so crit luck would differ between the readings
+        // Note: fixedCrit: four settlements in a row draw from the same Random, so crit luck would differ between the readings
         // and swamp the 5% the defence-ignore is worth (measured: a 1.5x swing).
         double breakBelow = battle.applyDamage(enemy, new Damage(below, enemy, DamageElement.PHYSICAL, DamageType.BREAK, 1000)
                 .fixedCrit(true, 1.5));
-        // ⚠ fixedCrit: four settlements in a row draw from the same Random, so crit luck would differ between the readings
+        // Note: fixedCrit: four settlements in a row draw from the same Random, so crit luck would differ between the readings
         // and swamp the 5% the defence-ignore is worth (measured: a 1.5x swing).
         double normalAbove = battle.applyDamage(enemy, new Damage(above, enemy, DamageElement.PHYSICAL, DamageType.NORMAL, 1000)
                 .fixedCrit(true, 1.5));
-        // ⚠ fixedCrit: four settlements in a row draw from the same Random, so crit luck would differ between the readings
+        // Note: fixedCrit: four settlements in a row draw from the same Random, so crit luck would differ between the readings
         // and swamp the 5% the defence-ignore is worth (measured: a 1.5x swing).
         double normalBelow = battle.applyDamage(enemy, new Damage(below, enemy, DamageElement.PHYSICAL, DamageType.NORMAL, 1000)
                 .fixedCrit(true, 1.5));

@@ -20,15 +20,15 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 「天赋的反击效果每回合可触发的次数<b>增加1次</b>」 / 「冻结敌方目标的<b>基础概率</b>提高15%」 — a rule that raises a number on
+ * "天赋的反击效果每回合可触发的次数<b>增加1次</b>" / "冻结敌方目标的<b>基础概率</b>提高15%" - a rule that raises a number on
  * <b>another rule</b>.
  *
  * <p><b>Why the vocabulary needed it.</b> The two shapes that look like they work are both wrong, and both are wrong by
  * a number nobody would see: writing a <i>second</i> rule with the raised value <b>adds</b> (a {@code per_turn: 3} rule
  * next to the {@code per_turn: 2} one fires five times a turn rather than raising the cap to three), and a second chance
- * rule <b>rolls twice</b> (1 − 0.5 × 0.35 = 82.5% instead of 65%). So the target rule is named ({@code "id"}) and the
- * raise is a fact about the combatant in this battle ({@code MODIFY_RULE} → {@code CanHit}), never an edit of the rule
- * itself — a table is compiled once per cid and a relic's rules are shared by every wearer.
+ * rule <b>rolls twice</b> (1 − 0.5  x  0.35 = 82.5% instead of 65%). So the target rule is named ({@code "id"}) and the
+ * raise is a fact about the combatant in this battle ({@code MODIFY_RULE} to {@code CanHit}), never an edit of the rule
+ * itself - a table is compiled once per cid and a relic's rules are shared by every wearer.
  *
  * <p><b>What this file pins.</b> That the raise really reaches the two consumers (the per-turn cap and the roll), that
  * it is the <b>stated</b> number plus the raise rather than a replacement, that all the ambiguous or meaningless shapes
@@ -45,7 +45,7 @@ public class RuleAmendmentTest {
     /**
      * The per-turn raise, measured where it is observable: a counter that may fire twice now fires three times.
      *
-     * <p>Three separate hits in the same turn, so the difference is exactly the raised cap — and the third firing is
+     * <p>Three separate hits in the same turn, so the difference is exactly the raised cap - and the third firing is
      * the thing a second rule could not have produced (a second {@code per_turn} rule counts on its <b>own</b> key, so
      * it fires three more times, i.e. six).
      */
@@ -59,12 +59,12 @@ public class RuleAmendmentTest {
     }
 
     /**
-     * The base-chance raise, measured on the boundary: 0.5 raised by 0.15 is 0.65, so a roll of 0.6 lands and 0.7 does
+     * The base-chance raise, measured on the boundary: 0.5 raised by 0.15 is 0.65, so a roll of 0.6 lands and 0.does
      * not.
      *
-     * <p>⚠ This is the assertion a "write a second rule with 0.65" implementation cannot satisfy in the right
+     * <p>Note: This is the assertion a "write a second rule with 0.65" implementation cannot satisfy in the right
      * direction: it would land on 0.6 as well, but it would also land on <b>0.4</b> when the first rule's 0.5 already
-     * admitted it — the two rolls compound, so the pair's behaviour is 82.5%, not 65%. The generator is pinned, so the
+     * admitted it - the two rolls compound, so the pair's behaviour is 82.5%, not 65%. The generator is pinned, so the
      * boundary is an assertion instead of a coin flip.
      */
     @Test
@@ -75,7 +75,7 @@ public class RuleAmendmentTest {
         Assertions.assertTrue(freezeLands(0.0, 0.4), "…and it does reach 0.4 (the control case)");
     }
 
-    /** ⚠ An unnamed target is refused: a reference that points at nothing must not load. */
+    /** Note: An unnamed target is refused: a reference that points at nothing must not load. */
     @Test
     public void anUnknownRuleIdIsRefusedAtLoad() {
         IllegalArgumentException refused = Assertions.assertThrows(IllegalArgumentException.class,
@@ -98,7 +98,7 @@ public class RuleAmendmentTest {
         Assertions.assertTrue(refused.getMessage().contains("share the id"), refused.getMessage());
     }
 
-    /** ⚠ Raising a limit the target does not state is refused: 0 + 1 would silently impose a cap of one. */
+    /** Note: Raising a limit the target does not state is refused: 0 + 1 would silently impose a cap of one. */
     @Test
     public void raisingAPerTurnLimitThatDoesNotExistIsRefused() {
         IllegalArgumentException refused = Assertions.assertThrows(IllegalArgumentException.class,
@@ -109,7 +109,7 @@ public class RuleAmendmentTest {
         Assertions.assertTrue(refused.getMessage().contains("per_turn"), refused.getMessage());
     }
 
-    /** ⚠ Raising the chance of a rule that states none is refused: an unstated chance is 100%, with no number to raise. */
+    /** Note: Raising the chance of a rule that states none is refused: an unstated chance is 100%, with no number to raise. */
     @Test
     public void raisingAChanceThatIsNotStatedIsRefused() {
         IllegalArgumentException refused = Assertions.assertThrows(IllegalArgumentException.class,
@@ -144,7 +144,7 @@ public class RuleAmendmentTest {
         Assertions.assertTrue(tooBig.getMessage().contains("fraction of 1"), tooBig.getMessage());
     }
 
-    /** ⚠ A raise that is not made at battle start is refused: nothing would ever take it back. */
+    /** Note: A raise that is not made at battle start is refused: nothing would ever take it back. */
     @Test
     public void anAmendmentOutsideBattleStartIsRefused() {
         IllegalArgumentException refused = Assertions.assertThrows(IllegalArgumentException.class,
@@ -166,7 +166,7 @@ public class RuleAmendmentTest {
     }
 
     // ==================================================================
-    // The shipped content: 1001 星魂 4 and 行迹「冰咒」
+    // The shipped content: 1001 星魂 4 and 行迹"冰咒"
     // ==================================================================
 
     /** Her file ships both raises: the counter's cap and the ultimate's chance. */
@@ -222,7 +222,7 @@ public class RuleAmendmentTest {
     /**
      * Whether her shipped ultimate freezes an enemy, with the generator pinned at {@code roll}.
      *
-     * <p>Her file states {@code base_chance: 0.5} and 行迹「冰咒」 raises it by 0.15, so the boundary is 0.65.
+     * <p>Her file states {@code base_chance: 0.5} and 行迹"冰咒" raises it by 0.15, so the boundary is 0.65.
      */
     private static boolean freezeLandsWithHerFile(double roll) {
         Character hero = CharacterFactory.create(MARCH_7TH, LEVEL);
@@ -276,12 +276,12 @@ public class RuleAmendmentTest {
         return spec;
     }
 
-    /** {@code {"op":"MODIFY_RULE","rule":"…","amount":1}} — one more firing per turn. */
+    /** {@code {"op":"MODIFY_RULE","rule":"…","amount":1}} - one more firing per turn. */
     private static TriggerSpec amendPerTurn(String rule) {
         return TriggerSpecs.rule("BATTLE_START", null, amend(rule, 1.0, null));
     }
 
-    /** {@code {"op":"MODIFY_RULE","rule":"…","percent":0.15}} — a higher base chance. */
+    /** {@code {"op":"MODIFY_RULE","rule":"…","percent":0.15}} - a higher base chance. */
     private static TriggerSpec amendChance(String rule, double percent) {
         return TriggerSpecs.rule("BATTLE_START", null, amend(rule, null, percent));
     }

@@ -37,7 +37,7 @@ else:
     io.open(WORK + '/' + ENG, 'w', encoding='utf-8', newline='').write(t.replace(anchor, new, 1))
     print('TriggerInterpreter: scale + ceiling wired')
 BATTLE = 'src/main/java/com/laosun/aluminium/Battle.java'
-saved = io.open(WORK + '/' + BATTLE, encoding='utf-8').read()   # ⚠ 那行在 Battle 里，不是 ENG
+saved = io.open(WORK + '/' + BATTLE, encoding='utf-8').read()   # Note: 那行在 Battle 里，不是 ENG
 
 
 def run_focused():

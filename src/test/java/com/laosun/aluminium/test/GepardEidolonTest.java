@@ -16,13 +16,13 @@ import java.util.Random;
  *
  * <p><b>How the source settled it.</b> `TriggerInterpreter.modifyRule` dispatches on which field the effect carries: `amount` is a
  * per-turn count, `effect_turns` is a duration, `effect_max_stacks` is a stack cap, `effect_percent` is the rule's effect
- * percentage, and — the branch that matters here — <b>a plain `percent` is the base-chance amendment</b>
+ * percentage, and - the branch that matters here - <b>a plain `percent` is the base-chance amendment</b>
  * (`owner.addRuleBaseChanceBonus(target, percent)`). The control's roll reads it back as
  * `baseChance += ctx.owner().ruleBaseChanceBonus(ctx.ruleId())`, so the amendment is keyed by the id of the rule that applies
  * the control.
  *
- * <p>That gives a deterministic assertion for 「冻结的基础概率提高35%」 that does not touch the dice at all: ask the combatant what
- * it has filed. The freeze itself stays unverified — even at E1 it did not land under the fixture, which is now narrowed to
+ * <p>That gives a deterministic assertion for "冻结的基础概率提高35%" that does not touch the dice at all: ask the combatant what
+ * it has filed. The freeze itself stays unverified - even at E1 it did not land under the fixture, which is now narrowed to
  * either the roll or the state's name/resistance rather than to this op.
  */
 public class GepardEidolonTest {
@@ -30,7 +30,7 @@ public class GepardEidolonTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** ⚠ E1 files a +0.35 base-chance amendment under the id of the rule that applies the freeze. */
+    /** Note: E1 files a +0.35 base-chance amendment under the id of the rule that applies the freeze. */
     @Test
     public void eidolonOneFilesTheBaseChanceAmendment() {
         Character atE0 = gepardAt(0);

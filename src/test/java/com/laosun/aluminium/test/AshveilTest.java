@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1504 Ashveil, from her own file (2026-09-29, round 200): the Bait reaction (8 energy + a 200%-ATK follow-up) and the 【婪酣】 cap, whose numbers the document states.
+ * 1504 Ashveil, from her own file (2026-09-29, round 200): the Bait reaction (8 energy + a 200%-ATK follow-up) and the [婪酣] cap, whose numbers the document states.
  *
  * <p>Both guards are load-bearing and tested: `actor is_other_ally` (her own attack must not trigger it) and `target has_state 饲饵`. The cap is tested by EXCEEDING it.
  */
@@ -23,7 +23,7 @@ public class AshveilTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** ⚠ The reaction fires for a teammate's attack on the Bait, and not for her own. */
+    /** Note: The reaction fires for a teammate's attack on the Bait, and not for her own. */
     @Test
     public void theBaitReactionNeedsATeammate() {
         double fromAlly = energyGain(true);
@@ -35,7 +35,7 @@ public class AshveilTest {
                 "「我方**其他**目标攻击后」 -- her own attack must not trigger it");
     }
 
-    /** ⚠ One layer per firing, and a LOUD refusal once the two declared charges are spent (measured, not assumed). */
+    /** Note: One layer per firing, and a LOUD refusal once the two declared charges are spent (measured, not assumed). */
     @Test
     public void eachReactionAddsALayerAndNeedsACharge() {
         Character ashveil = CharacterFactory.create(ASHVEIL, LEVEL);
@@ -46,7 +46,7 @@ public class AshveilTest {
         // Make the enemy the Bait first: without it neither guard passes.
         battle.castImmediate(ashveil.getSkills().get(com.laosun.aluminium.enums.SkillType.SKILL), ashveil, List.of(enemy));
 
-        // Her declaration gives 2 charges. One firing is one layer (ADD_STACK's `amount` is not a layer count, round 172).
+        // Her declaration gives 2 charges. One firing is one layer (ADD_STACK's `amount` is not a layer count, round 12).
         battle.fireTriggers(TriggerEvent.ALLY_ATTACK, ally, enemy, 0, 0);
         battle.fireTriggers(TriggerEvent.ALLY_ATTACK, ally, enemy, 0, 0);
         Assertions.assertEquals(2, ashveil.getBuffManager().stacksOf("婪酣"),
@@ -57,7 +57,7 @@ public class AshveilTest {
                 "the engine refuses to spend a charge she does not have");
     }
 
-    /** ⚠ The technique's opening: the AoE and one Charge, whose declaration makes the gain real. */
+    /** Note: The technique's opening: the AoE and one Charge, whose declaration makes the gain real. */
     @Test
     public void theTechniqueHitsAndGrantsCharge() {
         Character ashveil = CharacterFactory.create(ASHVEIL, LEVEL);

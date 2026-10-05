@@ -20,8 +20,8 @@ import java.util.Random;
  * {@code toValue()} honours by skipping the zones) but no op reached it: a rule stating the type got an instance that
  * was <i>labelled</i> TRUE while defence still multiplied it.
  *
- * <p>⚠ <b>The fixture needs a REAL cast.</b> A hand-fired event carries no instance, so `damage_is_attack` — the guard
- * that keeps a rider from re-triggering itself — is false and the rule never fires; without the guard it recurses
+ * <p>Note: <b>The fixture needs a REAL cast.</b> A hand-fired event carries no instance, so `damage_is_attack` - the guard
+ * that keeps a rider from re-triggering itself - is false and the rule never fires; without the guard it recurses
  * ("Trigger recursion exceeded 8 levels", both measured). So each side is a real cast plus a rider, and the claim is
  * about the <b>difference</b> the rider makes, with the victim's defence as the variable.
  */
@@ -29,7 +29,7 @@ public class TrueDamageJudgeTest {
     private static final int OWNER = 1003;
     private static final int LEVEL = 80;
 
-    /** ⭐ The rider's damage does not move with the victim's defence, while an ordinary instance's does. */
+    /** The rider's damage does not move with the victim's defence, while an ordinary instance's does. */
     @Test
     public void trueDamageIgnoresDefence() {
         double soft = riderShare(0, "TRUE");

@@ -32,7 +32,7 @@ rules.append({
         "attribute": "CRIT_ATTACK",
         "percent_from_cast_param": 0,
         "permanent": True,
-        "target": "all_allies",              # ⚠ NO target_when in this run -- that is the one variable
+        "target": "all_allies",              # Note: NO target_when in this run -- that is the one variable
     }],
     "source": ("1415 昔涟 忆灵技能 17 「献予「律法」之诗」（数据槽位 23，SkillID 1141523）："
                "「整场生效，对刻律德菈施放后，**持有【" + MARK + "】的角色暴击伤害提高 #1%**。」"),

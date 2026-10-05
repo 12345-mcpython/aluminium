@@ -13,7 +13,7 @@ import java.util.List;
  * prerequisites, a type string, and an optional attribute bonus. The tree structure is assembled in
  * {@link SkillTrace#init(int)}.
  *
- * <p><b>Naming.</b> This used to be {@code SkillPoint} — the same name as the <b>battle</b> resource
+ * <p><b>Naming.</b> This used to be {@code SkillPoint} - the same name as the <b>battle</b> resource
  * (战技点, {@code models.skillpoint.SkillPointPolicy}), which is a different concept entirely. The trace
  * side is now consistently {@code SkillTrace*} on all three sides: this bean, {@code Constant.SKILL_TRACES},
  * and the generator's {@code trace_id} / {@code prev_trace} / {@code trace_type} export. The JSON keys had

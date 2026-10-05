@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1317 Rappa, trace 1317103: 「敌方目标的弱点被击破时，受到的击破伤害提高2%；若当前攻击力高于2400，每超过100点额外提高1%，最多额外提高8%」.
+ * 131Rappa, trace 131103: "敌方目标的弱点被击破时，受到的击破伤害提高2%；若当前攻击力高于2400，每超过100点额外提高1%，最多额外提高8%".
  *
  * <p>Two assertions that a magnitude mutation cannot survive: the base branch's own share (read from the compiled rule) and the measured ratio between break and normal
  * damage. The branch is selected by its condition, because the tiers are mutually exclusive step functions of ATTACK.

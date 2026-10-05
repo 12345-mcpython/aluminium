@@ -18,7 +18,7 @@ import java.util.Random;
 /**
  * 1013 Herta, from her own file (2026-09-29, round 158): a per-target threshold bonus, a control-class resistance, and the frozen bonus.
  *
- * <p>The skill case uses two enemies on ONE battlefield — one at full HP and one already below half — so the claim 「对该目标」 is measured
+ * <p>The skill case uses two enemies on ONE battlefield - one at full HP and one already below half - so the claim "对该目标" is measured
  * rather than assumed: the same cast must hurt the healthy one proportionally more.
  */
 public class HertaTest {
@@ -26,7 +26,7 @@ public class HertaTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** ⚠ 「抵抗控制类负面状态的概率提高35%」: the engine keeps a per-class resistance, and it must be up. */
+    /** Note: "抵抗控制类负面状态的概率提高35%": the engine keeps a per-class resistance, and it must be up. */
     @Test
     public void herPuppetTraceRaisesControlResistance() {
         Fixture f = new Fixture();
@@ -34,7 +34,7 @@ public class HertaTest {
                 "「抵抗控制类负面状态的概率提高35%」");
     }
 
-    /** ⚠ 「若敌方目标当前生命值百分比大于等于50%」: the bonus is per TARGET, so a low-HP enemy must not get it. */
+    /** Note: "若敌方目标当前生命值百分比大于等于50%": the bonus is per TARGET, so a low-HP enemy must not get it. */
     @Test
     public void theSkillBonusAppliesOnlyToHealthyTargets() {
         Character herta = CharacterFactory.create(HERTA, LEVEL);

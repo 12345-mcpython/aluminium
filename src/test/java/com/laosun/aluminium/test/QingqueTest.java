@@ -23,7 +23,7 @@ public class QingqueTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** ⚠ The count: one per TEAMMATE's turn start, two from the technique, and the document's cap of four enforced by exceeding it. */
+    /** Note: The count: one per TEAMMATE's turn start, two from the technique, and the document's cap of four enforced by exceeding it. */
     @Test
     public void theTileCountFollowsTheDocumentAndStopsAtFour() {
         Character qingque = CharacterFactory.create(QINGQUE, LEVEL);
@@ -46,7 +46,7 @@ public class QingqueTest {
                 "「最多持有4张琼玉牌」 -- eight draws must still read four");
     }
 
-    /** ⚠ The technique's two tiles, only when the technique was declared. */
+    /** Note: The technique's two tiles, only when the technique was declared. */
     @Test
     public void theTechniqueDrawsTwoTiles() {
         Character qingque = CharacterFactory.create(QINGQUE, LEVEL);
@@ -59,7 +59,7 @@ public class QingqueTest {
         Assertions.assertEquals(2, tilesOf(qingque), "「进入战斗时青雀会抽取2张琼玉牌」");
     }
 
-    /** ⚠ The Skill's self damage boost, capped at the document's four stacks. */
+    /** Note: The Skill's self damage boost, capped at the document's four stacks. */
     @Test
     public void theSkillRaisesHerOwnDamageUpToFourStacks() {
         Character qingque = CharacterFactory.create(QINGQUE, LEVEL);

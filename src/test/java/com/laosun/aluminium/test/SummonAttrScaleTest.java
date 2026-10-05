@@ -21,16 +21,16 @@ import java.util.Random;
 /**
  * `summon_attr:<ATTRIBUTE>`: a magnitude that is a share of the RULE OWNER'S MEMOSPRITE (2026-10-02).
  *
- * <p>Reader: 1415's memosprite skill 10 「献予「创世」之诗」 -- 「使开拓者•记忆的攻击力提高，提高数值等同于<b>德谬歌生命上限</b>的 #1%，同时使其暴击率
- * 提高，提高数值等同于<b>德谬歌暴击率</b>的 #2%」. The existing family names the owner's own attributes (`self_attr:`), so a share of the
+ * <p>Reader: 1415's memosprite skill 10 "献予'创世'之诗" -- "使开拓者-记忆的攻击力提高，提高数值等同于<b>德谬歌生命上限</b>的 #1%，同时使其暴击率
+ * 提高，提高数值等同于<b>德谬歌暴击率</b>的 #2%". The existing family names the owner's own attributes (`self_attr:`), so a share of the
  * MEMOSPRITE's had no spelling.
  *
- * <p>⭐ The reading is a comparison of two numbers, both readable: the modifier's value and `0.1 × the memosprite's Max HP`. A mutant that
+ * <p>The reading is a comparison of two numbers, both readable: the modifier's value and `0.1 x the memosprite's Max HP`. A mutant that
  * reads the OWNER's Max HP instead gives a different number, which is what makes this discriminating.
  */
 public class SummonAttrScaleTest {
     private static final int LEVEL = 80;
-    /** 1402 Aglaea: the panel of her memosprite is HEALTH 0.66 + flat 720, so its Max HP DIFFERS from hers. */
+    /** 1402 Aglaea: the panel of her memosprite is HEALTH 0.66 + flat 20, so its Max HP DIFFERS from hers. */
     private static final int CYRENE = 1402;
     private static final int ALLY = 1002;
     private static final int MONSTER = 1002011;

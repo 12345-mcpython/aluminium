@@ -12,14 +12,14 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
- * The dead dragon (2026-10-02): its panel states speed 165 flat and health = 100% of the 【新蕊】 cap, its ATTACK slot
+ * The dead dragon (2026-10-02): its panel states speed 165 flat and health = 100% of the [新蕊] cap, its ATTACK slot
  * carries the SUMMONER's Max HP, and 忆灵技能 1 deals 40% of that.
  *
  * <p>The first reader of the resource-based panel AND of the `attr:` spelling (a share of another of the master's
  * attributes, which the plain branch cannot express because it reads the SAME attribute the entry names).
  */
 public class DragonPanelTest {
-    /** ⭐ The panel is a share of a battle-level RESOURCE, and the flat speed rides beside it. */
+    /** The panel is a share of a battle-level RESOURCE, and the flat speed rides beside it. */
     @Test
     public void theDragonPanelFollowsNewbud() {
         MemospriteSpec spec = Memosprites.of(1407);
@@ -37,7 +37,7 @@ public class DragonPanelTest {
                 "the document states 165 speed, flat");
     }
 
-    /** ⭐ 忆灵技能 1 as the document states it, and the panel slot it scales off. */
+    /** 忆灵技能 1 as the document states it, and the panel slot it scales off. */
     @Test
     public void theDragonSkillIsWhatTheDocumentSays() {
         MemospriteSpec spec = Memosprites.of(1407);

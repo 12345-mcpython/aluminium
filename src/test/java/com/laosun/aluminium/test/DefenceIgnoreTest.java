@@ -21,29 +21,29 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 「无视目标 X% 的防御力」 as data — {@code DEFENCE_IGNORE} reached from a rule for the first time.
+ * "无视目标 X% 的防御力" as data - {@code DEFENCE_IGNORE} reached from a rule for the first time.
  *
  * <p><b>What already existed, and what did not.</b> The attribute has been read by
  * {@code Battle.assemble}'s defence zone since P1-6, and {@code Damage.DefenceArea} clamps it to
- * {@code [0,1]} while shrinking {@code effectiveDefence} — both covered by {@code DamagePipelineTest} and
+ * {@code [0,1]} while shrinking {@code effectiveDefence} - both covered by {@code DamagePipelineTest} and
  * {@code DamageZoneTest}. What had <b>never</b> run is the path in the middle: <b>no shipped rule file
  * granted it</b>, so "a rule can raise this attribute and the hit really gets bigger" was an untested
  * belief. That is the gap this class closes; 翡翠's Eidolon 4 is the first user.
  *
  * <p><b>Why the attribute is the right route here, and where it stops.</b> The text says
- * 「使翡翠造成的伤害无视敌方目标 12% 的防御力，持续 3 回合」 — a property of the wearer's damage <em>for a
- * while</em>, which is exactly an attribute buff. That covers most of the game's 「无视防御」 family
- * (波提欧 / 星期日 / 阮·梅 / 翡翠 all phrase it as a lasting effect on a unit), and it is worth recording
+ * "使翡翠造成的伤害无视敌方目标 12% 的防御力，持续 3 回合" - a property of the wearer's damage <em>for a
+ * while</em>, which is exactly an attribute buff. That covers most of the game's "无视防御" family
+ * (波提欧 / 星期日 / 阮-梅 / 翡翠 all phrase it as a lasting effect on a unit), and it is worth recording
  * because the roadmap had listed "a DEF-ignore op" as the missing capability. It does <b>not</b> cover the
- * minority that scopes the ignore to <em>one attack</em> — 银枝's 「施放终结技时…」, 云璃's
- * 「发动反击造成伤害时…」, relic set 119's break damage — because a turn-based buff would leak onto whatever
+ * minority that scopes the ignore to <em>one attack</em> - 银枝's "施放终结技时…", 云璃's
+ * "发动反击造成伤害时…", relic set 119's break damage - because a turn-based buff would leak onto whatever
  * else that unit does in the same window. Those stay registered and need the instance-scoped form plus a way
  * to ask what kind of damage the pending instance is.
  */
 public class DefenceIgnoreTest {
     private static final double EPS = 1e-6;
 
-    /** 翡翠 — no other test uses this id, so a rule file for her cannot invalidate anyone's premise. */
+    /** 翡翠 - no other test uses this id, so a rule file for her cannot invalidate anyone's premise. */
     private static final int JADE = 1314;
     /** 姬子, a plain attacker with no rule file of her own. */
     private static final int ATTACKER = 1003;
@@ -59,7 +59,7 @@ public class DefenceIgnoreTest {
     /**
      * A rule granting {@code DEFENCE_IGNORE} really raises the damage a later hit settles.
      *
-     * <p>Same character, same target, same base damage — the only difference is whether the rule fired. If
+     * <p>Same character, same target, same base damage - the only difference is whether the rule fired. If
      * {@code assemble} stopped reading the attribute, or {@code MODIFY_ATTR} silently failed to land on a
      * ratio attribute, this is where it shows.
      */
@@ -81,12 +81,12 @@ public class DefenceIgnoreTest {
      * Two grants of the same attribute <b>replace</b> each other unless the rule asks for stacks, and the
      * defence zone clamps at "ignore everything".
      *
-     * <p>⚠ <b>The replacement half surprised me and is worth pinning</b>: authoring 波提欧's 16% and
-     * 阮·梅's 20% as two plain rules gives <b>20%</b>, not 36% — {@code MODIFY_ATTR} defaults to
+     * <p>Note: <b>The replacement half surprised me and is worth pinning</b>: authoring 波提欧's 16% and
+     * 阮-梅's 20% as two plain rules gives <b>20%</b>, not 36% - {@code MODIFY_ATTR} defaults to
      * {@code max_stacks: 1}, i.e. "re-application replaces" (the engine's long-standing convention, stated in
      * {@code TriggerInterpreter}'s op table and pinned for other attributes by
      * {@code StatModifierStackingTest}). A content author who wants sources to add says so with
-     * {@code max_stacks}, which the second half here measures — otherwise the symptom is a character who is
+     * {@code max_stacks}, which the second half here measures - otherwise the symptom is a character who is
      * quietly weaker than the game with nothing to see.
      */
     @Test
@@ -112,7 +112,7 @@ public class DefenceIgnoreTest {
      * It is a <b>timed</b> buff: once its turns run out the bonus is gone.
      *
      * <p>Worth pinning because "ignore DEF" is exactly the kind of effect one is tempted to model as
-     * {@code permanent} — 翡翠's text gives a turn count, and a permanent grant would be a silently stronger
+     * {@code permanent} - 翡翠's text gives a turn count, and a permanent grant would be a silently stronger
      * character with nothing to show for it.
      */
     @Test
@@ -165,7 +165,7 @@ public class DefenceIgnoreTest {
                 "the effect is about the damage SHE deals, so it is a buff on herself (absent means self)");
     }
 
-    /** At rank four the Ultimate grants it — through the event, not by reaching into the attribute. */
+    /** At rank four the Ultimate grants it - through the event, not by reaching into the attribute. */
     @Test
     public void atRankFourTheUltimateGrantsIt() {
         Character jade = jadeAt(4);
@@ -220,7 +220,7 @@ public class DefenceIgnoreTest {
      * The damage one identical hit settles for a character whose battle-start rule grants
      * {@code DEFENCE_IGNORE percent}, or for one whose rule never fires when {@code percent} is null.
      *
-     * <p>⚠ A <b>fresh</b> attacker every call, never a reused one: {@code startBattle()} re-fires the
+     * <p>Note: A <b>fresh</b> attacker every call, never a reused one: {@code startBattle()} re-fires the
      * battle-start rules, so measuring twice with the same character would stack the grant and compare a
      * number against itself plus one more stack.
      */
@@ -268,7 +268,7 @@ public class DefenceIgnoreTest {
      * {@code BATTLE_START} -> grant {@code DEFENCE_IGNORE}.
      *
      * <p>A null turn count means "for the rest of the battle": the loader requires exactly one of
-     * {@code turns} / {@code permanent}, and there is no default — a rule that said neither would be a
+     * {@code turns} / {@code permanent}, and there is no default - a rule that said neither would be a
      * permanent buff by accident, which is the sort of silent-forever effect the validation exists to stop.
      */
     private static TriggerSpec defenceIgnoreRule(double percent, Integer turns) {

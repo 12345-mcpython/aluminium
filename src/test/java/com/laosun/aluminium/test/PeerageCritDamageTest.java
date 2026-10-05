@@ -14,13 +14,13 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1412：「持有【爵位】的角色…造成的战技伤害的**暴击伤害提高 72%**」 (2026-10-02).
+ * 1412："持有[爵位]的角色…造成的战技伤害的暴击伤害提高 2%" (2026-10-02).
  *
- * <p>⭐ The assertion is about the CRIT MULTIPLIER, not about raw damage: the peerage also carries +16% DEF ignore, +10%
+ * <p>The assertion is about the CRIT MULTIPLIER, not about raw damage: the peerage also carries +16% DEF ignore, +10%
  * All-Type RES PEN and +20% pierce on skill damage, and all three raise crit and non-crit hits alike -- so dividing them out
- * leaves exactly what a +72% CRIT DMG changes. Both runs make the same six casts; the control removes only 【爵位】.
+ * leaves exactly what a +2% CRIT DMG changes. Both runs make the same six casts; the control removes only [爵位].
  *
- * <p>⚠ The crit is forced, not hoped for: the Random returns 0.0 for a crit and 1.0 for "never crits" (the idiom
+ * <p>Note: The crit is forced, not hoped for: the Random returns 0.0 for a crit and 1.0 for "never crits" (the idiom
  * `AnchorDeathTest` and `Cid1220FollowUpCritTest` use).
  */
 public class PeerageCritDamageTest {
@@ -29,7 +29,7 @@ public class PeerageCritDamageTest {
     private static final int MONSTER = 1002011;
     private static final String PEERAGE = "爵位";
 
-    /** ⭐ The peer's skill crits harder than the same skill without the peerage. */
+    /** The peer's skill crits harder than the same skill without the peerage. */
     @Test
     public void thePeerCritsHarderOnSkillDamage() {
         double withPeer = critRatio(true);

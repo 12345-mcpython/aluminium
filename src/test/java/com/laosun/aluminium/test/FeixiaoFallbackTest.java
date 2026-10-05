@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1220 Feixiao: 「若不存在可攻击的主目标，则攻击敌方随机单体」 -- her follow-up fallback.
+ * 1220 Feixiao: "若不存在可攻击的主目标，则攻击敌方随机单体" -- her follow-up fallback.
  *
  * <p>Two enemies, because with one the fallback and the preference pick the same unit. A is defeated first
  * with CanHit.perish(), which fires no events and leaves it in Battle.enemies.

@@ -13,9 +13,9 @@ import java.util.Random;
 /**
  * 1415's memosprite skill 24, first sentence -- BOTH halves (2026-10-02).
  *
- * The capture half: `#1` is captured into a resource on her as the ode is cast. The boost half: when HER memosprite's data slot 7 deals damage, that share raises its damage.
+ * The capture half: `#1` is captured into a resource on her as the ode is cast. The boost half: when HER memosprite's data slot deals damage, that share raises its damage.
  *
- * ⭐ Two-sided: with the ode the memosprite's boost is the ode's own #1; without it, nothing was captured and nothing is boosted.
+ * Two-sided: with the ode the memosprite's boost is the ode's own #1; without it, nothing was captured and nothing is boosted.
  */
 public class TimeOdeBoostTest {
     private static final int LEVEL = 80;

@@ -26,7 +26,7 @@ public class ArlanTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** ⚠ 「320%…and 160% to enemies adjacent to it」: the neighbour takes HALF of what the centre takes. */
+    /** Note: "320%…and 160% to enemies adjacent to it": the neighbour takes HALF of what the centre takes. */
     @Test
     public void hisUltimateHitsNeighboursForHalf() {
         Character arlan = CharacterFactory.create(ARLAN, LEVEL);
@@ -49,7 +49,7 @@ public class ArlanTest {
                         + centreLoss + " vs neighbours " + neighbourLoss);
     }
 
-    /** ⚠ 「消灭敌方目标时，若当前生命值百分比小于等于30%，则立即回复等同于自身生命上限20%的生命值」. */
+    /** Note: "消灭敌方目标时，若当前生命值百分比小于等于30%，则立即回复等同于自身生命上限20%的生命值". */
     @Test
     public void hisSurvivalTraceHealsOnAKillBelowThirtyPercent() {
         Character arlan = CharacterFactory.create(ARLAN, LEVEL);
@@ -73,7 +73,7 @@ public class ArlanTest {
                 "「立即回复等同于自身生命上限20%的生命值」: " + before + " -> " + arlan.getCurrentHp());
     }
 
-    /** ⚠ 「抵抗持续伤害类负面状态的概率提高50%」: the per-class resistance, and only that class. */
+    /** Note: "抵抗持续伤害类负面状态的概率提高50%": the per-class resistance, and only that class. */
     @Test
     public void hisEnduranceTraceResistsDotOnly() {
         Character arlan = CharacterFactory.create(ARLAN, LEVEL);
@@ -92,8 +92,8 @@ public class ArlanTest {
     public void hisFileCarriesTheClauses() {
         var table = TriggerTables.of(ARLAN);
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.KILL), "the survival heal");
-        // ⭐ 2026-10-02: three BATTLE_START rules now, not two -- the eidolon-four trace is applied there (its sentence starts
-        // with 「进入战斗后」), and that trace is what the lethal blow is gated on.
+        // 2026-10-02: three BATTLE_START rules now, not two -- the eidolon-four trace is applied there (its sentence starts
+        // with "进入战斗后"), and that trace is what the lethal blow is gated on.
         Assertions.assertEquals(3, table.ruleCount(TriggerEvent.BATTLE_START),
                 "the DoT resistance, the level convention, and the eidolon-four trace");
     }

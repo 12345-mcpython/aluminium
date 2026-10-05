@@ -27,7 +27,7 @@ import java.util.Random;
  * the field for "who a commanded cast is aimed at" -- it reads through `resolveSelector`, the single-target switch, and reorders the victims
  * so the aim goes first. A set cannot go there.
  *
- * <p>Reader: 1415's memosprite skill 8, 「若施放前目标被消灭则对**新入场**的敌方目标施放」 -- the half of it that says WHERE the commanded
+ * <p>Reader: 1415's memosprite skill 8, "若施放前目标被消灭则对新入场的敌方目标施放" -- the half of it that says WHERE the commanded
  * strike should go.
  */
 public class WaveMonsterAimTest {
@@ -59,7 +59,7 @@ public class WaveMonsterAimTest {
         new WaveManager(battle, stage);
         Assertions.assertTrue(battle.getWaveManager().nextWave(), "310030 has a wave to enter");
 
-        // ⚠ The reading is the SPEED DELTA, not "was it touched at all": every enemy has a positive base speed, so the first version of
+        // Note: The reading is the SPEED DELTA, not "was it touched at all": every enemy has a positive base speed, so the first version of
         // this judge counted all four. Exactly one enemy carries +100, and the other three are equal to each other.
         List<CanHit> boosted = new ArrayList<>();
         List<Double> speeds = new ArrayList<>();

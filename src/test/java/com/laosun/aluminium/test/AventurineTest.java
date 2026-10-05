@@ -16,9 +16,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1304 Aventurine, from his own file (2026-09-29, round 175): the opening shield his trace grants, and the ultimate's state.
+ * 1304 Aventurine, from his own file (2026-09-29, round 15): the opening shield his trace grants, and the ultimate's state.
  *
- * <p>The shield's magnitude is the DOCUMENT'S arithmetic — 24.00% of his DEF plus 320 — so the case asserts the number itself, and the mutation that
+ * <p>The shield's magnitude is the DOCUMENT'S arithmetic - 24.00% of his DEF plus 320 - so the case asserts the number itself, and the mutation that
  * drops the flat addend makes it red.
  */
 public class AventurineTest {
@@ -27,7 +27,7 @@ public class AventurineTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** ⚠ 「为我方全体提供…等同于砂金24.00%防御力+320伤害的护盾【坚垣筹码】，持续3回合」. */
+    /** Note: "为我方全体提供…等同于砂金24.00%防御力+320伤害的护盾[坚垣筹码]，持续3回合". */
     @Test
     public void hisOpeningShieldUsesHisDefencePlusTheFlatAddend() {
         Character aventurine = CharacterFactory.create(AVENTURINE, LEVEL);
@@ -43,7 +43,7 @@ public class AventurineTest {
                 "「等同于砂金24.00%防御力+320的护盾」: expected " + expected + ", shield " + aventurine.getShield());
     }
 
-    /** ⚠ 「使指定敌方单体陷入【惊惶】状态，持续3回合」. */
+    /** Note: "使指定敌方单体陷入[惊惶]状态，持续3回合". */
     @Test
     public void hisUltimateUnnervesTheTarget() {
         Character aventurine = CharacterFactory.create(AVENTURINE, LEVEL);
@@ -58,7 +58,7 @@ public class AventurineTest {
                 "「使指定敌方单体陷入【惊惶】状态，持续3回合」");
     }
 
-    /** Census: the shield, the state and the level convention — and the skill's own shield is the DATA TABLE's job. */
+    /** Census: the shield, the state and the level convention - and the skill's own shield is the DATA TABLE's job. */
     @Test
     public void hisFileCarriesTheClauses() {
         var table = TriggerTables.of(AVENTURINE);

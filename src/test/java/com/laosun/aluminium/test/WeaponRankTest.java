@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
  * saying so. Weapon 20003 is the fixture because its rows carry real differing properties: `defence_percent` is 0.16 at rank
  * 1 and 0.32 at rank 5.
  *
- * <p>⚠ The row's effect is read through `Weapon`'s own `@ToString`, not through `WeaponAttribute`'s accessors: this test does
+ * <p>Note: The row's effect is read through `Weapon`'s own `@ToString`, not through `WeaponAttribute`'s accessors: this test does
  * not know that type's shape, and the printer carries the numbers all the same. Coarse on purpose, and stated rather than
  * pretended.
  */

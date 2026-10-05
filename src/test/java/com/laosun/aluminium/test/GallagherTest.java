@@ -16,10 +16,10 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 加拉赫 (1301), from his own file (2026-09-28): 【酩酊】 twice over, 行迹 天然酵母's advance, 星魂 1, and the talent's heal.
+ * 加拉赫 (1301), from his own file (2026-09-28): [酩酊] twice over, 行迹 天然酵母's advance, 星魂 1, and the talent's heal.
  *
- * <p><b>What it needed.</b> Nothing new — and one wrong assumption corrected: `attacker` is a legal target selector
- * (`TriggerInterpreter.TARGET_SELECTORS`), so 「回复**攻击者** 640 点生命值」 is expressible. The file's earlier claim that no
+ * <p><b>What it needed.</b> Nothing new - and one wrong assumption corrected: `attacker` is a legal target selector
+ * (`TriggerInterpreter.TARGET_SELECTORS`), so "回复攻击者 640 点生命值" is expressible. The file's earlier claim that no
  * spelling names the attacker came from reading `TargetSelector.java`, which is a different class.
  */
 public class GallagherTest {
@@ -28,7 +28,7 @@ public class GallagherTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** The 秘技's in-battle half puts 【酩酊】 on the whole enemy side at battle start. */
+    /** The 秘技's in-battle half puts [酩酊] on the whole enemy side at battle start. */
     @Test
     public void theStateComesFromBattleStartToo() {
         Fixture f = new Fixture();
@@ -45,7 +45,7 @@ public class GallagherTest {
                 "the talent's 「每次受到我方角色攻击后」 heal");
     }
 
-    /** ⚠ The heal's target is the ATTACKER: an ally's attack heals the ally, not Gallagher. */
+    /** Note: The heal's target is the ATTACKER: an ally's attack heals the ally, not Gallagher. */
     @Test
     public void hisFirstEidolonIsGated() {
         Fixture atE0 = new Fixture(0);
@@ -60,7 +60,7 @@ public class GallagherTest {
     // Helpers
     // ==================================================================
 
-    /** ⚠ End to end: the swapped slot-8 skill loads REAL data, so the enhanced attack actually lands. */
+    /** Note: End to end: the swapped slot-8 skill loads REAL data, so the enhanced attack actually lands. */
     @Test
     public void theShippedSwapDealsDamage() {
         Fixture f = new Fixture();

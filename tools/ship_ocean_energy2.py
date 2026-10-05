@@ -83,7 +83,7 @@ import java.util.Random;
 /**
  * 1415's memosprite skill 22 「献予「海洋」之诗」: the mark, and the energy it pays (2026-10-02).
  *
- * <p>「对海瑟音施放时，使海瑟音获得【暖流】。海瑟音施放攻击后消耗【暖流】为自身恢复 #4 点能量。」
+ * <p>「对海瑟音施放时，使海瑟音获得【暖流】。海瑟音施放攻击后消耗【暖流】为自身恢复 #4 点能量。"
  *
  * <p>⭐ Two readings: the mark lands when the ode is cast at her, and ONE attack spends it for exactly #4 = 60 energy -- the mark must be gone afterwards, so a rule
  * that paid without spending (or spent without paying) cannot pass.

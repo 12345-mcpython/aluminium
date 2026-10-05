@@ -16,8 +16,8 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Relic set 125 「烈阳惊雷的女武神」 4-piece: 「当装备者及其忆灵为装备者及其忆灵以外的我方目标提供治疗后，使装备者获得【甘霖】，
- * 每回合最多触发1次，持续2回合。装备者持有【甘霖】时，速度提高6%，我方全体暴击伤害提高15%，该效果无法叠加。」 (param [0.06, 0.15, 2])
+ * Relic set 125 "烈阳惊雷的女武神" 4-piece: "当装备者及其忆灵为装备者及其忆灵以外的我方目标提供治疗后，使装备者获得[甘霖]，
+ * 每回合最多触发1次，持续2回合。装备者持有[甘霖]时，速度提高6%，我方全体暴击伤害提高15%，该效果无法叠加。" (param [0.06, 0.15, 2])
  *
  * <p>Every expectation is a DIFFERENCE between two otherwise-identical battles -- one with the heal, one without -- because the wearer's SPD moves
  * for reasons of its own between construction and reading (the set's own 2-piece `SpeedAddedRatio`, and traits that fire at BATTLE_START). A share
@@ -37,7 +37,7 @@ public class GentleRainTest {
         Result without = run(false, false, false);
         Assertions.assertEquals(0.06 * with.baseSpeed, with.speed - without.speed, EPSILON,
                 "6% of the base SPD (" + with.baseSpeed + "): " + without.speed + " -> " + with.speed);
-        // ⚠ CRIT DMG is a RATIO attribute: `percent: 0.15` lands as an absolute addend (fifteen points), unlike SPD where the share scales
+        // Note: CRIT DMG is a RATIO attribute: `percent: 0.15` lands as an absolute addend (fifteen points), unlike SPD where the share scales
         // the base. Measured both ways this round; the ally's `baseValue()` for CRIT DMG reads 0.0, so a base-relative expectation is meaningless.
         Assertions.assertEquals(0.15, with.allyCrit - without.allyCrit, EPSILON,
                 "fifteen points of CRIT DMG: " + without.allyCrit + " -> " + with.allyCrit);

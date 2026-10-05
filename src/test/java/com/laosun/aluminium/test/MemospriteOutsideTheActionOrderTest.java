@@ -14,13 +14,13 @@ import java.util.Random;
 /**
  * A memosprite whose speed the game keeps at zero is in the battle but not in the action order (2026-10-02).
  *
- * <p>⭐ The game's own words, from 小伊卡's own skill row (1140903, whose SkillEffect is `Restore`, which is why this was
- * mis-registered as a heal): 「小伊卡的速度<b>保持为0</b>，免疫负面效果，并且<b>不会出现在行动序列上</b>」. 德谬歌 (1415's memosprite) carries the
+ * <p>The game's own words, from 小伊卡's own skill row (1140903, whose SkillEffect is `Restore`, which is why this was
+ * mis-registered as a heal): "小伊卡的速度<b>保持为0</b>，免疫负面效果，并且<b>不会出现在行动序列上</b>". 德谬歌 (1415's memosprite) carries the
  * same panel row -- `{"attribute": "SPEED", "flat": 0, "by_ability": true}` -- so the data was right and the queue was wrong: `Signal`'s
  * guard refused any speed at or below zero, which turned the whole battle into an exception the moment such a memosprite was summoned,
  * and made every clause needing one on the field unjudgeable.
  *
- * <p>⭐ The rule is arithmetic as much as it is the game's: an action value is `10000 / speed`, so a unit at zero has none and there is
+ * <p>The rule is arithmetic as much as it is the game's: an action value is `10000 / speed`, so a unit at zero has none and there is
  * nothing to schedule. It is skipped rather than refused.
  *
  * <p>The third assertion is a control: a normal ally IS in the order, so "not in the order" cannot pass vacuously.
@@ -50,7 +50,7 @@ public class MemospriteOutsideTheActionOrderTest {
         battle.processRequests();
 
         Summon servant = battle.summonServant(summoner);
-        // ⚠ This is the line that used to throw "Speed must be greater than 0."
+        // Note: This is the line that used to throw "Speed must be greater than 0."
         battle.processRequests();
 
         boolean inOrder = battle.getQueueSnapshot().stream().anyMatch(s -> s.getCanHit() == servant);

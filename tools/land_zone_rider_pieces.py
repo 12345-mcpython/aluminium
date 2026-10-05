@@ -25,7 +25,7 @@ FIELD_NEW = '''    /**
      * The share itself, read from one of the RULE OWNER's OWN skills as {@code "<SKILLTYPE>:<index>"} (2026-10-02).
      *
      * <p>The sibling of {@link #percentFromCastParam}: that one reads the skill that produced the event, this one reads a slot the rule names -- which is
-     * what 「造成 1 次等同于缇宝 #3% 生命上限的…附加伤害」 needs, since #3 belongs to his ULTIMATE while the rider hangs on somebody else's attack.
+     * what 「造成 1 次等同于缇宝 #3% 生命上限的…附加伤害" needs, since #3 belongs to his ULTIMATE while the rider hangs on somebody else's attack.
      */
     @SerializedName("percent_from_skill_param")
     private String percentFromSkillParam;

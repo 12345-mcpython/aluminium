@@ -17,14 +17,14 @@ import java.util.Random;
  * The Remembrance Trailblazer pair (2026-09-29, round 184): the first summon shipped since 1402/1413, because the document states its SPEED.
  *
  * <p>Round 163 measured that a memosprite file MUST state SPEED ("the action bar cannot schedule a unit with 0 speed"), which is why 1409's memosprite is
- * still unwritten. Here both numbers are in the text — 130 SPD and 80% of the Trailblazer's Max HP plus 640 — so the panel can be stated and asserted.
+ * still unwritten. Here both numbers are in the text - 130 SPD and 80% of the Trailblazer's Max HP plus 640 - so the panel can be stated and asserted.
  */
 public class RemembranceTrailblazerTest {
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** ⚠ The memorisprite arrives with the document's own panel, for both ids. */
+    /** Note: The memorisprite arrives with the document's own panel, for both ids. */
     @Test
     public void theSummonArrivesWithTheDocumentedPanel() {
         for (int cid : new int[]{8007, 8008}) {
@@ -45,7 +45,7 @@ public class RemembranceTrailblazerTest {
         }
     }
 
-    /** ⚠ Casting again does not create a second memosprite — the first is still the one on the field. */
+    /** Note: Casting again does not create a second memosprite - the first is still the one on the field. */
     @Test
     public void castingAgainKeepsTheSameMemosprite() {
         Character tb = CharacterFactory.create(8007, LEVEL);

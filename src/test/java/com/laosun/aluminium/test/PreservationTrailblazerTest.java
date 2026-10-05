@@ -17,7 +17,7 @@ import java.util.Random;
 /**
  * The Preservation Trailblazer pair (2026-09-29, round 183): 8003 and 8004, one kit under two ids.
  *
- * <p>Three claims, each from the document: one stack of 【灼热意志】 per hit up to eight; the cast-triggered party shield at 6% DEF + 80; and the technique's
+ * <p>Three claims, each from the document: one stack of [灼热意志] per hit up to eight; the cast-triggered party shield at 6% DEF + 80; and the technique's
  * self-shield at 30% DEF + 384, which only exists when the technique was declared.
  */
 public class PreservationTrailblazerTest {
@@ -27,7 +27,7 @@ public class PreservationTrailblazerTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** ⚠ 「每受到1次攻击，叠加1层【灼热意志】，最多可叠加8层」. */
+    /** Note: "每受到1次攻击，叠加1层[灼热意志]，最多可叠加8层". */
     @Test
     public void hisTalentStacksMagmaWillUpToEight() {
         Character tb = CharacterFactory.create(TB3, LEVEL);
@@ -45,7 +45,7 @@ public class PreservationTrailblazerTest {
         Assertions.assertEquals(8, tb.getBuffManager().stacksOf("灼热意志"), "the ninth hit must not pass the cap");
     }
 
-    /** ⚠ 「施放普攻、战技、终结技后，为我方全体提供…等同于6.00%防御力+80的护盾，持续2回合」 -- all three casts, both ids. */
+    /** Note: "施放普攻、战技、终结技后，为我方全体提供…等同于6.00%防御力+80的护盾，持续2回合" -- all three casts, both ids. */
     @Test
     public void everyCastShieldsThePartyForBothIds() {
         for (int cid : new int[]{TB3, TB4}) {
@@ -62,7 +62,7 @@ public class PreservationTrailblazerTest {
         }
     }
 
-    /** ⚠ The technique's self-shield, gated on the marker; and the control. */
+    /** Note: The technique's self-shield, gated on the marker; and the control. */
     @Test
     public void theTechniqueShieldsHimOnlyWhenDeclared() {
         Character withTechnique = CharacterFactory.create(TB3, LEVEL);

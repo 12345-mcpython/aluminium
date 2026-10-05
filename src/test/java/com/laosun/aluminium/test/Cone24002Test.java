@@ -19,7 +19,7 @@ import java.util.Random;
  * Light cone 24002, its first sentence: after taking a hit, an UNSHIELDED wearer gains a shield worth 16% of its max HP for
  * 2 turns, at most once every 3 turns.
  *
- * <p>⭐ 「未持有护盾」 is written {@code !self has_shield}: the {@code !} prefix negates any party condition, and
+ * <p>"未持有护盾" is written {@code !self has_shield}: the {@code !} prefix negates any party condition, and
  * {@code has_shield} is one. The cooldown is the rule-level turn counter, so the second hit must change nothing.
  */
 public class Cone24002Test {
@@ -83,7 +83,7 @@ public class Cone24002Test {
     }
 
     /**
-     * ★ The cooldown as a NUMBER, not just as "a second hit is blocked": with {@code cooldown: 3} the grant must stay
+     * The cooldown as a NUMBER, not just as "a second hit is blocked": with {@code cooldown: 3} the grant must stay
      * blocked through three of the wearer's turns and return after them. A fixture that only fires two hits in one turn
      * cannot tell {@code cooldown: 1} from {@code cooldown: 3} (measured: that mutation was 0 red).
      */
@@ -103,7 +103,7 @@ public class Cone24002Test {
         }
         System.out.println("[24002] granted per turn inside the cooldown: " + java.util.Arrays.toString(perTurn)
                 + " (cooldown " + COOLDOWN + ")");
-        // ⚠ Only what this fixture can show: the cooldown is a per-OWNER-turn counter, and these hand-fired turn events
+        // Note: Only what this fixture can show: the cooldown is a per-OWNER-turn counter, and these hand-fired turn events
         // do not tick it past its window, so "it grants again afterwards" is NOT asserted here -- the reading that tells
         // cooldown 1 from cooldown 3 is the per-turn array itself (measured: the 3 -> 1 mutation is red on it).
         for (int turn = 1; turn <= COOLDOWN; turn++) {
@@ -115,7 +115,7 @@ public class Cone24002Test {
     public void theSpecPinsTheShareTheDurationAndTheCooldown() {
         Battle battle = battle(true);
         int pinned = 0;
-        // ⚠ The gate is `target == self` (the one HIT is the target), so the context must name the wearer as the target.
+        // Note: The gate is `target == self` (the one HIT is the target), so the context must name the wearer as the target.
         for (var rule : wearer.getTriggerTable().matching(TriggerEvent.TAKING_HIT,
                 new TriggerTable.TriggerContext(wearer, enemy, wearer, 0, 0, null, battle, null))) {
             if (!rule.id().startsWith("cone24002_")) {

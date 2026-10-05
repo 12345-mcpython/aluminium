@@ -17,8 +17,8 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1223 Moze's follow-up clauses: 「【猎物】受到的追加攻击伤害提高 25%」 (trace 1223103) and
- * 「施放天赋的追加攻击后，恢复 1 个战技点，该效果在 1 回合后可再次触发」 (trace 1223101).
+ * 1223 Moze's follow-up clauses: "[猎物]受到的追加攻击伤害提高 25%" (trace 1223103) and
+ * "施放天赋的追加攻击后，恢复 1 个战技点，该效果在 1 回合后可再次触发" (trace 1223101).
  *
  * <p>Both are judged against the engine's own follow-up path, so the two readings differ in exactly one variable each.
  */

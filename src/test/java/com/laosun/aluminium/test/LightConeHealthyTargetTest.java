@@ -14,10 +14,10 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 「乐圮 / Shattered Home」: the boost applies only against a target whose HP share is above the threshold, and its size is
+ * "乐圮 / Shattered Home": the boost applies only against a target whose HP share is above the threshold, and its size is
  * per rank.
  *
- * <p>⚠ Two ranks of the SAME light cone, because that is what makes the comparison clean: rank does not change the weapon's
+ * <p>Note: Two ranks of the SAME light cone, because that is what makes the comparison clean: rank does not change the weapon's
  * stats, so the only difference is the boost the content states (0.20 versus 0.40). A ratio of 1.4/1.2 is the clause firing
  * with the right numbers; 1.0 would mean it never fires -- which is also how the ambiguous UNIT of `target_hp_percent` gets
  * settled, by measurement rather than by the validator accepting the spelling.
@@ -37,8 +37,8 @@ public class LightConeHealthyTargetTest {
         double rankFive = damage(5);
         Assertions.assertTrue(rankOne > 0, "precondition: the attack lands: " + rankOne);
         double ratio = rankFive / rankOne;
-        // ⚠ Measured, not derived: the observable ratio is 1.1404494, because BOOST_DAMAGE adds into a zone that already
-        // holds other contributions, so the naive 1.4/1.2 = 1.1667 compresses. The band is tight enough that a wrong boost
+        // Note: Measured, not derived: the observable ratio is 1.1404494, because BOOST_DAMAGE adds into a zone that already
+        // holds other contributions, so the naive 1.4/1.2 = 1.166compresses. The band is tight enough that a wrong boost
         // falls outside it (making both ranks equal gives 1.0).
         Assertions.assertTrue(ratio > 1.13 && ratio < 1.15,
                 "rank 5 boosts 40% against rank 1's 20%, which is observable as ~1.1404: " + rankOne + " vs " + rankFive
@@ -67,12 +67,12 @@ public class LightConeHealthyTargetTest {
     /**
      * The clause's negative half: below the threshold, the rank must not matter at all.
      *
-     * <p>⚠ The fixture finds a monster it can WOUND without KILLING, by walking candidate ids and checking after each ally
+     * <p>Note: The fixture finds a monster it can WOUND without KILLING, by walking candidate ids and checking after each ally
      * attack that the target is still alive and now under half health. Without that self-check the test could pass by
      * measuring a corpse, or by never satisfying the condition it is about.
      */
     @Test
-    // ⚠ This case PASSES but is NOT mutation-sensitive: changing the threshold from `> 0.5` to `> 0.0`
+    // Note: This case PASSES but is NOT mutation-sensitive: changing the threshold from `> 0.5` to `> 0.0`
     // leaves it green, so it currently shows only that the two ranks agree on a wounded target -- which would
     // also hold if the condition never evaluated to true. See round 53 in GAPS.md; the probe that settles it is
     // named there (print `ctx.target()` and `hpPercent` inside TriggerTable's `target_hp_percent` case).
@@ -88,7 +88,7 @@ public class LightConeHealthyTargetTest {
     /**
      * The wearer's skill damage against a target brought below the threshold -- and NOT killed by it.
      *
-     * <p>⚠ The precondition is the point: an earlier version picked a target small enough to overkill, so the "damage" it
+     * <p>Note: The precondition is the point: an earlier version picked a target small enough to overkill, so the "damage" it
      * measured was the target's remaining HP and both ranks agreed no matter what the boost said (the round-34/39 fault).
      * Here the wearer's hit must leave the target alive with at least 60% of its pre-hit HP intact, or the case refuses to
      * judge at all.

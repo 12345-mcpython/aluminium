@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * The technique gate's first harvest (2026-09-29, round 179): Dan Heng's opening ATK, declared only when the technique was used.
+ * The technique gate's first harvest (2026-09-29, round 19): Dan Heng's opening ATK, declared only when the technique was used.
  *
  * <p>A pair again: declaring the technique raises his ATK at battle start, and not declaring it leaves his ATK at its plain value.
  */
@@ -22,7 +22,7 @@ public class TechniqueHarvestTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** ⚠ 「使用秘技后，下一次战斗开始时丹恒攻击力提高40%」. */
+    /** Note: "使用秘技后，下一次战斗开始时丹恒攻击力提高40%". */
     @Test
     public void aDeclaredTechniqueRaisesHisAttackAtBattleStart() {
         Character plain = CharacterFactory.create(DANHENG, LEVEL);
@@ -38,8 +38,8 @@ public class TechniqueHarvestTest {
         Assertions.assertTrue(boosted > untouched,
                 "「使用秘技后，下一次战斗开始时丹恒攻击力提高40%」: "
                         + untouched + " -> " + boosted);
-        // Measured: the gain is 40% of the BASE attack (the engine's `add_percent` convention), not of the current total — 645.2712 -> 864.0072
-        // is a gain of 218.736 = 0.4 x 546.84. `baseValue()` reads the base, so the claim is stated in the engine's own terms.
+        // Measured: the gain is 40% of the BASE attack (the engine's `add_percent` convention), not of the current total - 645.212 -> 864.002
+        // is a gain of 218.36 = 0.4 x 546.84. `baseValue()` reads the base, so the claim is stated in the engine's own terms.
         double base = withTechnique.getAttribute(AttributeType.ATTACK).baseValue();
         double expectedGain = base * 0.4;
         Assertions.assertEquals(expectedGain, boosted - untouched, expectedGain * 0.02,
@@ -47,7 +47,7 @@ public class TechniqueHarvestTest {
                         + ", actual gain " + (boosted - untouched));
     }
 
-    /** ⚠ The control: without the marker his ATK is untouched at battle start. */
+    /** Note: The control: without the marker his ATK is untouched at battle start. */
     @Test
     public void withoutTheTechniqueHisAttackIsUntouched() {
         Character plain = CharacterFactory.create(DANHENG, LEVEL);

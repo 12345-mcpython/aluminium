@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1112 Topaz, the skill's 【负债证明】: 「使其受到的追加攻击伤害提高 50%」.
+ * 1112 Topaz, the skill's [负债证明]: "使其受到的追加攻击伤害提高 50%".
  *
  * <p>The engine's own follow-up path is {@code Battle.applyAdditionalDamage} (its comment calls DamageType.ADDITIONAL "the engine's one and only notion of a
  * follow-up attack"), so the two readings differ in exactly one thing: the damage type. Everything else in the fixture is identical.

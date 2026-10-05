@@ -119,7 +119,7 @@ rules.append({
         "times_from": "event_amount",
         "element": "Quantum",
         "target": "random_enemy",
-        # ⚠ 真名是 `crit_rate` / `crit_damage` (EffectSpec)，而 `crit_rate` 是**固定暴击**的意思
+        # Note: 真名是 `crit_rate` / `crit_damage` (EffectSpec)，而 `crit_rate` 是固定暴击的意思
         # (`Damage.fixedCrit`)，不是概率暴击 -- 所以不写它们。
     }],
     "source": ("1513 砂金•戏浪 强化欢愉技 下半句（`:283`）: "

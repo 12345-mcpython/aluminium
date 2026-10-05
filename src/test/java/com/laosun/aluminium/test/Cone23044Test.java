@@ -19,10 +19,10 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Light cone 23044: damage always ignores 18% of the target's defence, and while 【烈阳】 is up (granted by an Ultimate,
+ * Light cone 23044: damage always ignores 18% of the target's defence, and while [烈阳] is up (granted by an Ultimate,
  * removed at the wearer's turn start) the wearer deals 60% more.
  *
- * <p>⭐ Four states are measured on the same settlement: no cone, the cone alone (ignore only), after an Ultimate (ignore +
+ * <p>Four states are measured on the same settlement: no cone, the cone alone (ignore only), after an Ultimate (ignore +
  * the sun), and after a turn start (the sun is gone again, so back to ignore only).
  */
 public class Cone23044Test {
@@ -70,7 +70,7 @@ public class Cone23044Test {
                 + " (x" + (afterTurnStart / plain) + ")");
         Assertions.assertTrue(withCone > plain, "the defence ignore alone already raises the damage");
         Assertions.assertTrue(sun, "an Ultimate grants the sun");
-        // ★ The sun's own factor, as an EQUALITY against the clause's number (discipline 200): "> " cannot tell 60% from
+        // The sun's own factor, as an EQUALITY against the clause's number (discipline 200): "> " cannot tell 60% from
         // 30%, and the `60 -> 30 percent` mutation was 0 red until this line existed. Both are multipliers on the same
         // instance, so the ratio is exactly 1 + the boost.
         Assertions.assertEquals(1.6, withSun / withCone, 0.02, "the sun is exactly +60% on top of the ignore");

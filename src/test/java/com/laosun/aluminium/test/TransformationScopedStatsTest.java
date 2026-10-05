@@ -15,10 +15,10 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1408：「卡厄斯兰那的物理属性**抗性穿透提高 20%**」与「**变身期间**攻击力提高 80%，生命上限提高 270%」
+ * 1408："卡厄斯兰那的物理属性抗性穿透提高 20%"与"变身期间攻击力提高 80%，生命上限提高 20%"
  * (2026-10-02).
  *
- * <p>⭐ THE POINT IS THE THIRD ASSERTION: the block must live exactly as long as the state. Removing 【变身】 and watching ATK
+ * <p>THE POINT IS THE THIRD ASSERTION: the block must live exactly as long as the state. Removing [变身] and watching ATK
  * come back down is what tells "during the transformation" apart from "for the rest of the battle" -- and item 34 shipped
  * without that link, so this judge would have caught it.
  */
@@ -28,7 +28,7 @@ public class TransformationScopedStatsTest {
     private static final int MONSTER = 1002011;
     private static final String STATE = "变身";
 
-    /** ⭐ Transformed: +80% ATK, +270% Max HP, +20% RES PEN. Un-transformed: none of them. */
+    /** Transformed: +80% ATK, +20% Max HP, +20% RES PEN. Un-transformed: none of them. */
     @Test
     public void theBlockIsWorthWhatTheSentencesSay() {
         Character owner = CharacterFactory.create(OWNER, 80, false, null, null, 0);
@@ -54,7 +54,7 @@ public class TransformationScopedStatsTest {
                 "「物理属性抗性穿透提高 20%」");
     }
 
-    /** ⭐⭐ "During the transformation" means the block dies with the state. */
+    /** "During the transformation" means the block dies with the state. */
     @Test
     public void theBlockDiesWithTheState() {
         Character owner = CharacterFactory.create(OWNER, 80, false, null, null, 0);
@@ -74,7 +74,7 @@ public class TransformationScopedStatsTest {
         owner.getBuffManager().removeState(STATE);
         battle.processRequests();
         Assertions.assertFalse(owner.getBuffManager().hasState(STATE), "the transformation is off");
-        // ⚠ Updated 2026-10-02: the trace fires AGAIN when the transformation ends (「或变身结束时」), so what is left
+        // Note: Updated 2026-10-02: the trace fires AGAIN when the transformation ends ("或变身结束时"), so what is left
         // is the battle-start 50% plus the end 50%. What this reading is about is unchanged: the TRANSFORMATION's own
         // block is gone.
         Assertions.assertEquals(atk0 * (2.0 / 1.5), owner.getAttribute(AttributeType.ATTACK).get(), atk0 * 0.001,

@@ -15,7 +15,7 @@ import java.util.Random;
 /**
  * The technique gate's second harvest (2026-09-29, round 180): Gepard's opening shield, declared only when the technique was used.
  *
- * <p>Pair test again, and the declared side asserts the DOCUMENT'S arithmetic — 24% of his DEF plus 150.
+ * <p>Pair test again, and the declared side asserts the DOCUMENT'S arithmetic - 24% of his DEF plus 150.
  */
 public class TechniqueShieldTest {
     private static final int GEPARD = 1104;
@@ -23,7 +23,7 @@ public class TechniqueShieldTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** ⚠ 「为我方全体提供…等同于杰帕德24%防御力+150伤害的护盾，持续2回合」. */
+    /** Note: "为我方全体提供…等同于杰帕德24%防御力+150伤害的护盾，持续2回合". */
     @Test
     public void aDeclaredTechniqueShieldsTheParty() {
         Character gepard = CharacterFactory.create(GEPARD, LEVEL);
@@ -40,7 +40,7 @@ public class TechniqueShieldTest {
                 "「等同于杰帕德24%防御力+150的护盾」: expected " + expected + ", shield " + ally.getShield());
     }
 
-    /** ⚠ The control: no technique declared, no shield. */
+    /** Note: The control: no technique declared, no shield. */
     @Test
     public void withoutTheTechniqueNobodyIsShielded() {
         Character gepard = CharacterFactory.create(GEPARD, LEVEL);

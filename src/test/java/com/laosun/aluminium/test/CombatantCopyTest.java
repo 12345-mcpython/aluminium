@@ -10,14 +10,14 @@ import org.junit.jupiter.api.Test;
  * H-6: copying a combatant must not leave the copy <b>sharing its attribute sheet</b> with the original.
  *
  * <p>The bug this pins: {@code CanHit(CanHit)} did {@code this.attributes = other.attributes.clone()},
- * which clones the <b>array</b> and nothing else — every {@code DoubleValue} inside stayed the same
+ * which clones the <b>array</b> and nothing else - every {@code DoubleValue} inside stayed the same
  * object. Buffs mutate those objects in place ({@code BoostDamageBuff.applyEffect} calls
  * {@code addModifier} on the target's value), so buffing one combatant changed the other's panel, and
  * {@code removeModifiersFrom} would strip the other's modifiers as well.
  *
  * <p>Nothing called the copy constructor when this was written, which is exactly why it is worth a test:
- * "no caller" is not "no bug", it is a landmine waiting for the first caller (P7-4's waves are the
- * obvious one — "spawn the same monster again").
+ * "no caller" is not "no bug", it is a landmine waiting for the first caller (P-4's waves are the
+ * obvious one - "spawn the same monster again").
  *
  * <p>The second test is the other half of the contract, and it is deliberately <b>not</b> a bug report:
  * a copy starts with a <b>fresh battle state</b> (full HP, no energy, no stacks, alive, vulnerable).
@@ -45,11 +45,11 @@ public class CombatantCopyTest {
      * The mechanism, asserted directly: the copy's attribute objects are <b>different objects</b>.
      *
      * <p>Kept alongside the behavioural test rather than instead of it, because the two fail for
-     * different reasons: the behavioural one says "a buff leaked", this one says "the sheet is shared" —
+     * different reasons: the behavioural one says "a buff leaked", this one says "the sheet is shared" - 
      * and a fix that made buffs not leak for some other reason while still sharing the objects would
      * leave the next mutation bug (any in-place change) in place.
      *
-     * <p>⚠ An earlier version of this test cleared the copy's buffs and asserted the original kept its
+     * <p>Note: An earlier version of this test cleared the copy's buffs and asserted the original kept its
      * own. That could never fail: a copy's {@code BuffManager} starts empty, so {@code clearAll()} has
      * nothing to remove and never touches the shared object.
      */

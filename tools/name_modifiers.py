@@ -23,7 +23,7 @@ CID = sys.argv[1]
 NAMES = sys.argv[2:]
 PATH = '%s/src/main/resources/characters/%s.json' % (WORK, CID)
 
-# ⚠ 任何"挂在场上、按名字可摘"的修饰器。DAMAGE/GAIN_RESOURCE 这类是**瞬时**的，不属于这里。
+# Note: 任何"挂在场上、按名字可摘"的修饰器。DAMAGE/GAIN_RESOURCE 这类是瞬时的，不属于这里。
 MODIFIER_OPS = {'MODIFY_ATTR', 'MODIFY_DAMAGE_TAKEN', 'MODIFY_DAMAGE_DEALT', 'MODIFY_RULE'}
 
 NOTE = (
@@ -49,8 +49,8 @@ for r in rules:
         continue
     name = str(applied[0].get('buff'))
     for e in (r.get('do') or []):
-        # ⚠ 口径要完整：任何**留在场上**的修饰器都按名字摘，不只是 MODIFY_ATTR。
-        # 实测 1112 的规则里有 MODIFY_DAMAGE_TAKEN，而这一行原先只找 MODIFY_ATTR ⇒ 它误报"没事可做"。
+        # Note: 口径要完整：任何留在场上的修饰器都按名字摘，不只是 MODIFY_ATTR。
+        # 实测 1112 的规则里有 MODIFY_DAMAGE_TAKEN，而这一行原先只找 MODIFY_ATTR so 它误报"没事可做"。
         if e.get('op') in MODIFIER_OPS and not e.get('buff'):
             e['buff'] = name
             changed.append('%s.%s <- %s' % (r.get('id'), e.get('attribute') or e.get('op'), name))

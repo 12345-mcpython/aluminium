@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * Light cone 24004 (2026-09-30): two of its three clauses.
  *
- * <p>ATK +8..12%; after an attack that hits three or more enemies, SPD +8..16% for 1 turn. The 「for each enemy hit」
+ * <p>ATK +8..12%; after an attack that hits three or more enemies, SPD +8..16% for 1 turn. The "for each enemy hit"
  * clause is REGISTERED, not approximated: its multiplier is the number of enemies hit, and per_stack reads only the
  * target's debuff count, DoT count or a counter (measured).
  */

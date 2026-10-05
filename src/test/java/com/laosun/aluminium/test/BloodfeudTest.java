@@ -15,9 +15,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1404：【血仇】——进入它，以及结束它的致命一击 (2026-10-02).
+ * 1404：[血仇] -  - 进入它，以及结束它的致命一击 (2026-10-02).
  *
- * <p>⭐ ONE VARIABLE: whether 【血仇】 is on when the lethal blow lands. His ultimate grants 20 charge, so five of them reach the
+ * <p>ONE VARIABLE: whether [血仇] is on when the lethal blow lands. His ultimate grants 20 charge, so five of them reach the
  * hundred the entry clause needs -- no test-only shortcut into his resource.
  */
 public class BloodfeudTest {
@@ -26,7 +26,7 @@ public class BloodfeudTest {
     private static final String STATE = "血仇";
     private static final String CHARGE = "天赋充能";
 
-    /** ⭐ A hundred charge enters 【血仇】, and a lethal blow then leaves it -- at half his Max HP. */
+    /** A hundred charge enters [血仇], and a lethal blow then leaves it -- at half his Max HP. */
     @Test
     public void aLethalBlowEndsItAndHeSurvives() {
         Character him = CharacterFactory.create(MYDEI, 80, false, null, null, 0);
@@ -49,7 +49,7 @@ public class BloodfeudTest {
         Assertions.assertEquals(0.0, him.getResources().value(CHARGE), 1e-9, "「清空充能」");
     }
 
-    /** ⚠ Without 【血仇】 the same blow kills him -- the clause is the state's, not his. */
+    /** Note: Without [血仇] the same blow kills him -- the clause is the state's, not his. */
     @Test
     public void withoutBloodfeudTheBlowKills() {
         Character him = CharacterFactory.create(MYDEI, 80, false, null, null, 0);

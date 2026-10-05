@@ -23,7 +23,7 @@ import java.util.Random;
 import java.util.Set;
 
 /**
- * P3-2 acceptance: energy gain is really wired into battle — skill casts / taking hits / kills gain
+ * P3-2 acceptance: energy gain is really wired into battle - skill casts / taking hits / kills gain
  * energy automatically, and the ultimate needs full energy, then clears to zero before regaining 5.
  *
  * <p>Anchors (ROADMAP P3-0 convention 2): basic attack 20 / skill 30 / ultimate 5 / taking a hit 10 / kill 5.
@@ -71,17 +71,17 @@ public class EnergyBattleTest {
     }
 
     /**
-     * H-5: the clear to zero must happen **before the ultimate body is settled**.
+     * H-5: the clear to zero must happen before the ultimate body is settled.
      *
      * <p>Otherwise the kill energy gain given by the enemy the ultimate kills (credited to
      * {@code damage.getAttacker()}, i.e. the one casting the ultimate) would be wiped out by the
-     * subsequent {@code setCurrentEnergy(0)} — it should be 5 (kill) + 5 (ultimate) = 10, but only 5
+     * subsequent {@code setCurrentEnergy(0)} - it should be 5 (kill) + 5 (ultimate) = 10, but only 5
      * would remain.
      */
     @Test
     public void ultraKeepsTheKillEnergyItEarned() {
         Character hero = character("hero", 120);
-        hero.setSkill(SkillType.ULTRA, new DefaultSkill(1001, 3, 1));   // AoE, multiplier 0.9 → 100 × 0.9 = 90
+        hero.setSkill(SkillType.ULTRA, new DefaultSkill(1001, 3, 1));   // AoE, multiplier 0.9 to 100  x  0.9 = 90
         Enemy victim = dummy(50);
         Battle battle = newBattle(hero, victim);
         hero.setCurrentEnergy(120);
@@ -140,9 +140,9 @@ public class EnergyBattleTest {
     }
 
     /**
-     * **Kill energy gain is independent of damage type** (2026-09-19 convention): any damage
+     * Kill energy gain is independent of damage type (2026-09-19 convention): any damage
      * attributed to a character, as long as it kills a monster, settles kill energy gain for the
-     * attacker — including additional damage and true damage, which are "not treated as one attack".
+     * attacker - including additional damage and true damage, which are "not treated as one attack".
      *
      * <p>Difference from the previous test: there the target did not die, so the target gained no
      * energy and the attacker gained none either; here the target is killed, so the attacker gets
@@ -188,9 +188,9 @@ public class EnergyBattleTest {
     }
 
     /**
-     * **One attack action grants the target only one energy gain** (2026-09-19 convention): when one
+     * One attack action grants the target only one energy gain (2026-09-19 convention): when one
      * hit breaks an enemy, the skill segment grants the target energy, and the derived break segment /
-     * super break segment **no longer** grants energy (they already have
+     * super break segment no longer grants energy (they already have
      * {@code notCountsAsAttack()} set).
      *
      * <p>Anchor: the dummy has a 120 energy cap (so the taking-a-hit energy baseline is 10). Himeko's
@@ -215,8 +215,8 @@ public class EnergyBattleTest {
     }
 
     /**
-     * Same as above, plus a super break segment: one attack contains three damage types — skill +
-     * break + super break — and the target **still gains energy only once**.
+     * Same as above, plus a super break segment: one attack contains three damage types - skill +
+     * break + super break - and the target still gains energy only once.
      */
     @Test
     public void superBreakSegmentAlsoDoesNotGrantExtraHitEnergy() {
@@ -257,7 +257,7 @@ public class EnergyBattleTest {
 
     @Test
     public void entityWithoutEnergyBarNeverGainsAndCannotCastUltra() {
-        Character hero = character("hero", 0);                     // no energy bar (the 1407 Castorice kind)
+        Character hero = character("hero", 0);                     // no energy bar (the 140Castorice kind)
         hero.setSkill(SkillType.ULTRA, new DefaultSkill(1001, 3, 1));
         Enemy dummy = dummy(1_000_000);
         dummy.setMaxEnergy(0);

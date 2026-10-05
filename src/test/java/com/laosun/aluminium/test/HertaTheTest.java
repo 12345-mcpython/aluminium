@@ -18,14 +18,14 @@ import java.util.Random;
  * 1401 The Herta, from her own file (2026-09-29, round 192): the technique's opening ATK and the ultimate's three effects.
  *
  * <p>The technique's 60% is measured as 60% of the BASE attack (the engine's `add_percent` convention), and the pair (declared / undeclared) is what makes it a
- * measurement rather than a claim — the same trap round 179 hit with Dan Heng.
+ * measurement rather than a claim - the same trap round 19 hit with Dan Heng.
  */
 public class HertaTheTest {
     private static final int HERTA = 1401;
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** ⚠ 「使用秘技后，下一次战斗开始时大黑塔攻击力提高60%，持续2回合」, and the control. */
+    /** Note: "使用秘技后，下一次战斗开始时大黑塔攻击力提高60%，持续2回合", and the control. */
     @Test
     public void theTechniqueRaisesHerAttackAndNothingWithoutIt() {
         Character plain = CharacterFactory.create(HERTA, LEVEL);
@@ -46,7 +46,7 @@ public class HertaTheTest {
                 "「攻击力提高60%」 of the BASE: base " + base + ", gain " + (boosted - untouched));
     }
 
-    /** ⚠ The ultimate's own effects: +80% ATK, a full advance, and one Inspiration stack. */
+    /** Note: The ultimate's own effects: +80% ATK, a full advance, and one Inspiration stack. */
     @Test
     public void herUltimateRaisesAttackAdvancesAndGrantsInspiration() {
         Character herta = CharacterFactory.create(HERTA, LEVEL);
@@ -63,7 +63,7 @@ public class HertaTheTest {
         Assertions.assertEquals(1, herta.getBuffManager().stacksOf("灵感"),
                 "「获得1层【灵感】」");
 
-        // ⚠ The document's cap: five more ultimates must stop at 4, not keep counting (this is what makes the cap testable at all).
+        // Note: The document's cap: five more ultimates must stop at 4, not keep counting (this is what makes the cap testable at all).
         for (int i = 0; i < 5; i++) {
             battle.fireTriggers(TriggerEvent.ULT_CAST, herta, herta, 0, 0);
         }

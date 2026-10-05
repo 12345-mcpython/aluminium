@@ -4,14 +4,14 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.models.CanHit;
 
 /**
- * Heal event (P8-6): fired once after someone's HP is **actually restored**.
+ * Heal event (P8-6): fired once after someone's HP is actually restored.
  *
- * <p>{@code actuallyHealed} is the **amount actually restored**, not the base healing amount passed in —
- * being healed at full HP is 0, and then it **does not fire** ("received healing" and "got HP back" are two
+ * <p>{@code actuallyHealed} is the amount actually restored, not the base healing amount passed in - 
+ * being healed at full HP is 0, and then it does not fire ("received healing" and "got HP back" are two
  * different things, and healing-type trigger sources care about the latter).
  *
  * <p>Emission point: {@code Battle.heal(healer, target, base)}.
- * ⚠ {@code CanHit.heal(double)} (the raw HP addition) **does not fire** — it is the low-level opening shared by
+ * Note: {@code CanHit.heal(double)} (the raw HP addition) does not fire - it is the low-level opening shared by
  * {@code Battle.heal} and "directly set the HP", and emitting on it would treat "directly setting HP" as healing
  * too.
  *

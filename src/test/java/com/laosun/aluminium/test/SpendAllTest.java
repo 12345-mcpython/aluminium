@@ -14,28 +14,28 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Random;
 
-/** Which route fails for 「每消耗1点【热意】额外 1 次 21%」 (2026-10-02). */
+/** Which route fails for "每消耗1点[热意]额外 1 次 21%" (2026-10-02). */
 public class SpendAllTest {
     private static final int OWNER = 1513;
     private static final int ALLY = 1404;
     private static final int MONSTER = 1002011;
     private static final String RES = "热意";
 
-    /** ⭐ The cast spends everything. */
+    /** The cast spends everything. */
     @Test
     public void theCastSpendsAllFervor() {
         Assertions.assertTrue(lossByCast(1) > 0, "precondition: the cast lands");
         Assertions.assertTrue(lossByCast(7) > 0, "and for seven points too");
     }
 
-    /** ⭐ The hand-fired route: the rule DOES scale with the amount (exact multiple still open). */
+    /** The hand-fired route: the rule DOES scale with the amount (exact multiple still open). */
     @Test
     public void theRuleScalesWithTheAmount() {
         double one = lossByHand(1);
         double seven = lossByHand(7);
         Assertions.assertTrue(one > 0, "precondition: the hand-fired instance lands (" + one + ")");
-        // ⚠ Asserted as a DIRECTION, not a multiple: measured 38.808 for one point and 329.868 for seven -- scaling
-        // with the amount (which is what `times_from` buys), but not a clean 7x, and the reason is not yet known. The
+        // Note: Asserted as a DIRECTION, not a multiple: measured 38.808 for one point and 329.868 for seven -- scaling
+        // with the amount (which is what `times_from` buys), but not a clean x, and the reason is not yet known. The
         // exact multiple is registered rather than asserted, so this judge never claims more than it measured.
         Assertions.assertTrue(seven > 5 * one,
                 "seven points must add far more than one (" + one + " -> " + seven + ")");
@@ -74,7 +74,7 @@ public class SpendAllTest {
         Battle battle = primed(start);
         Character owner = (Character) battle.allies.get(0);
         Enemy enemy = (Enemy) battle.enemies.get(0);
-        // ⚠ The priming itself fires RESOURCE_CHANGED once per point GAINED, and the rule answers those too -- so the
+        // Note: The priming itself fires RESOURCE_CHANGED once per point GAINED, and the rule answers those too -- so the
         // baseline is taken AFTER priming and only the hand-fired change is measured.
         battle.processRequests();
         double baseline = enemy.getCurrentHp();

@@ -5,7 +5,7 @@ import lombok.Getter;
 import java.util.Map;
 
 /**
- * Path (命途) (P5-1). The Path determines the **base aggro value**, and thereby the
+ * Path (命途) (P5-1). The Path determines the base aggro value, and thereby the
  * probability that a single-target / blast enemy attack selects that character.
  *
  * <p>Aggro is "an absolute weight", not a percentage: hit probability =
@@ -17,12 +17,12 @@ import java.util.Map;
  *   protection（存护）  150
  *   destruction（毁灭） 125
  *   all other Paths     100
- *   single（巡猎）/ all（智识） 75   ← lower than the standard tier, do not treat it as 100
+ *   single（巡猎）/ all（智识） 5 from lower than the standard tier, do not treat it as 100
  * </pre>
  *
  * <p>{@code mt} is the raw string from {@code character_data.json}; it has only 9 possible
  * values: {@code all / debuff / destruction / elation / healing / help / memory / protection / single}.
- * Any unlisted value falls through to {@link #OTHER} (= 100) with no fail fast — when the data
+ * Any unlisted value falls through to {@link #OTHER} (= 100) with no fail fast - when the data
  * gains a new Path it should degrade rather than blow up.
  */
 @Getter
@@ -36,11 +36,11 @@ public enum Path {
      */
     DESTRUCTION("destruction", 125),
     /**
-     * Hunt: aggro 75 (lower than the standard tier).
+     * Hunt: aggro 5 (lower than the standard tier).
      */
     HUNT("single", 75),
     /**
-     * Erudition: aggro 75.
+     * Erudition: aggro 5.
      */
     ERUDITION("all", 75),
     /**
@@ -80,7 +80,7 @@ public enum Path {
             Map.entry("memory", REMEMBRANCE));
 
     /**
-     * The nine Paths by their <b>Chinese</b> name — the spelling a rule file writes
+     * The nine Paths by their <b>Chinese</b> name - the spelling a rule file writes
      * ({@code target has_path 同谐}).
      *
      * <p>Kept here rather than in the condition DSL for the same reason {@link #BY_MT} is: "a Path name means
@@ -115,7 +115,7 @@ public enum Path {
      * Look up a Path by the data side's {@code mt} (case sensitive; values are in the class
      * comment).
      *
-     * @param mt the Path string; {@code null} or unlisted → {@link #OTHER}
+     * @param mt the Path string; {@code null} or unlisted to {@link #OTHER}
      * @return the Path (never {@code null})
      */
     public static Path fromMt(String mt) {
@@ -125,7 +125,7 @@ public enum Path {
     /**
      * Look up a Path by its Chinese name (for manual input such as "存护/毁灭").
      *
-     * @param name the Chinese Path name; unlisted → {@link #OTHER}
+     * @param name the Chinese Path name; unlisted to {@link #OTHER}
      * @return the Path (never {@code null})
      */
     public static Path fromName(String name) {
@@ -139,7 +139,7 @@ public enum Path {
      * <p>Both answers are needed and they are not interchangeable. {@link #fromName} is for data that may
      * legitimately carry a Path this build does not know (it must degrade to the 100 aggro tier rather than
      * blow up). A <b>rule file</b> is different: {@code target has_path 同谐} with a typo would otherwise
-     * become "the target is on some other Path", i.e. a condition that quietly means something else — so the
+     * become "the target is on some other Path", i.e. a condition that quietly means something else - so the
      * condition DSL refuses it at load time, and it needs a lookup that can say "not a Path".
      *
      * @param name the Chinese Path name

@@ -112,7 +112,7 @@ public class BuffManagerTest {
     }
 
     // ==================================================================
-    // H-7: the buff query point (the prerequisite for P4-6 super break / P8-7 triggers / P10-2 the control state machine)
+    // H-: the buff query point (the prerequisite for P4-6 super break / P8-triggers / P10-2 the control state machine)
     // ==================================================================
 
     @Test
@@ -153,7 +153,7 @@ public class BuffManagerTest {
      *
      * <p>{@code blocked} is set when a control buff expires on the turn it was blocking (see
      * {@code stunExpiryStillBlocksTheCurrentTurn}). If clearing every buff leaves that flag standing, the
-     * unit stays unable to act even though nothing is on it any more — a stuck unit that no amount of
+     * unit stays unable to act even though nothing is on it any more - a stuck unit that no amount of
      * dispelling can free. {@code clearAllRemovesEverything} did not catch it because its stun is never
      * ticked, so {@code blocked} is never set.
      */
@@ -177,8 +177,8 @@ public class BuffManagerTest {
      *
      * <p>{@code onDamage} walked the live {@code buffs} list, and attaching a buff is exactly what a damage
      * reaction does (additional damage applying vulnerability, a counter attaching a marker, …). That is a
-     * {@code ConcurrentModificationException} raised from inside damage settlement — the hardest place to
-     * diagnose — or, where the list happens to tolerate it, a silently skipped buff.
+     * {@code ConcurrentModificationException} raised from inside damage settlement - the hardest place to
+     * diagnose - or, where the list happens to tolerate it, a silently skipped buff.
      *
      * <p>The pattern is not hypothetical: {@code ExtraTrueDamageTest.DamageReactor} and
      * {@code DamageHookTest}'s anonymous subclasses are already written this way.
@@ -201,7 +201,7 @@ public class BuffManagerTest {
                 "and the buff it attached must really be there, not skipped by the iteration");
     }
 
-    /** A damage reaction that attaches a second buff — the shape M-12 is about. */
+    /** A damage reaction that attaches a second buff - the shape M-12 is about. */
     private static final class BoostsItselfWhenHit extends AbstractBuff implements DamageEvent {
         private BoostsItselfWhenHit() {
             super(5, false);
@@ -233,7 +233,7 @@ public class BuffManagerTest {
 
     /**
      * The same hole on the <b>tick</b> path: {@code processBuffTick} used {@code removeIf}, whose predicate
-     * calls {@code tickEffect} — buff code again, so a buff that attaches another while ticking blew up the
+     * calls {@code tickEffect} - buff code again, so a buff that attaches another while ticking blew up the
      * same way. Both paths are fixed by the same snapshot rule, and both need their own test, because a
      * regression in one would not show up in the other.
      */

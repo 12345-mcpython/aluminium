@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 开拓者(毁灭)'s 行迹 坚韧: 「天赋的效果每层同时使开拓者的防御力提高10%」 -- the counter scale again, on a counter the
+ * 开拓者(毁灭)'s 行迹 坚韧: "天赋的效果每层同时使开拓者的防御力提高10%" -- the counter scale again, on a counter the
  * character's own talent marks.
  *
  * <p>Both the counter's name and the tally come from the data: the name is copied out of the JSON by the script that wrote
@@ -31,7 +31,7 @@ public class TrailblazerDefencePerStackTest {
     /**
      * The added DEFENCE is exactly `percent x base` per layer.
      *
-     * <p>⚠ Judged as an absolute delta, not as a ratio over the base: the unit already carries about +2.5% DEFENCE from a
+     * <p>Note: Judged as an absolute delta, not as a ratio over the base: the unit already carries about +2.5% DEFENCE from a
      * pre-existing modifier, so `value / baseValue` measured 1.1252 where the clause owns only 0.10 of the base. The delta
      * removes everything this clause does not own.
      */

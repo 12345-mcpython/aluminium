@@ -27,7 +27,7 @@ public class DrRatioTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** ⚠ The reaction needs the MARK: without it a teammate's attack does nothing. */
+    /** Note: The reaction needs the MARK: without it a teammate's attack does nothing. */
     @Test
     public void theReactionNeedsTheMark() {
         double beforeMark = reactionLoss(false);
@@ -39,7 +39,7 @@ public class DrRatioTest {
                 "「理真医生对该目标发动1次天赋的追加攻击」: " + afterMark);
     }
 
-    /** ⚠ The technique's 15% slow, against a hand-built -30% reference in the same pipeline. */
+    /** Note: The technique's 15% slow, against a hand-built -30% reference in the same pipeline. */
     @Test
     public void theTechniqueSlowsTheEnemiesByFifteenPercent() {
         double content = techniqueSlow(0);

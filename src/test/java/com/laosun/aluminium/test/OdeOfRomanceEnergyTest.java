@@ -16,9 +16,9 @@ import java.util.Random;
 /**
  * 1415 memosprite skill 12 (the ode of romance), the clause with no duration attached (2026-10-02).
  *
- * <p>Why the gain is measured TWICE. The first version read the energy across ONE attack and got 90, not 70: casting a skill earns energy on its
- * own, so the clause 70 and the cast own gain are merged in one number. The difference between an attack with the ode on her and the same attack
- * without it isolates the clause -- the only reading that can tell 70 from "70 plus whatever the cast paid".
+ * <p>Why the gain is measured TWICE. The first version read the energy across ONE attack and got 90, not 0: casting a skill earns energy on its
+ * own, so the clause 0 and the cast own gain are merged in one number. The difference between an attack with the ode on her and the same attack
+ * without it isolates the clause -- the only reading that can tell 0 from "0 plus whatever the cast paid".
  */
 public class OdeOfRomanceEnergyTest {
     private static final int LEVEL = 80;

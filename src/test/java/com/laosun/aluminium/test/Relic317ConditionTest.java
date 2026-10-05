@@ -14,9 +14,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Relic 317's CONDITION half (2026-09-30): 「若装备者不是队伍第一名」.
+ * Relic 31's CONDITION half (2026-09-30): "若装备者不是队伍第一名".
  *
- * <p>⚠ The sibling judge (Relic317PartyFirstTest) applies the rule with TriggerInterpreter.apply, which executes the
+ * <p>Note: The sibling judge (Relic31PartyFirstTest) applies the rule with TriggerInterpreter.apply, which executes the
  * effects but does NOT evaluate the conditions -- so it is blind to this half, and its engine mutation went red only
  * because the effect's TARGET (`party_first`) is resolved inside apply. matching() evaluates the conditions, and both
  * directions are asserted here: not first =&gt; the rule matches, first =&gt; it must not.

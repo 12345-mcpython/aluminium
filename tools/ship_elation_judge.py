@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 欢愉技的行首列是**次数**：「造成 **#1** 次伤害，每次对敌方随机单体造成 **#2%**…。**最后**造成 **#3%**…
+ * 欢愉技的行首列是**次数**：「造成 **#1 次伤害，每次对敌方随机单体造成 #2%…。最后造成 #3%…
  * 由**敌方全体均分**」 (2026-10-02; readers 8009/8010 slot 20, data row `[8, 0.25, 0.75]` at L15).
  *
  * <p>⭐ THE INSTRUMENT COUNTS INSTANCES, not damage: the sentence is about a NUMBER of hits, and damage would drag in the crit

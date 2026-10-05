@@ -5,13 +5,13 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
- * The two demos in {@link Main} are deliverables — a demo that throws is a broken deliverable, and nothing
+ * The two demos in {@link Main} are deliverables - a demo that throws is a broken deliverable, and nothing
  * else in the suite touches them.
  *
  * <p><b>What this pins, and what it deliberately does not.</b> Only "it still runs": the engine changes
  * that would break a demo (a removed method, a changed signature, a state machine that now refuses) surface
  * here instead of the first time somebody runs {@code gradlew run}. It does <b>not</b> pin any number the
- * demos print — those are the unit tests' job ({@code ControlTest}, {@code DotTest},
+ * demos print - those are the unit tests' job ({@code ControlTest}, {@code DotTest},
  * {@code EnemyCampSummonTest}, {@code MemospriteAttackTest}, …), and re-asserting them by scraping stdout
  * would be a second, weaker copy of the same claims.
  *

@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Light cone 23015: a basic attack grants one 【龙吟】 layer (two turns, at most two), and each layer raises ATTACK and
+ * Light cone 23015: a basic attack grants one [龙吟] layer (two turns, at most two), and each layer raises ATTACK and
  * ENERGY REGENERATION RATE. The stack is added first in the same rule, so `per_stack` reads the CURRENT count.
  */
 public class Cone23015Test {

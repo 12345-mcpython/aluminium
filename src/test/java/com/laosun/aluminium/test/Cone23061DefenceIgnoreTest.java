@@ -21,7 +21,7 @@ import java.util.Random;
 /**
  * Light cone 23061's second clause, first half: while the crown is up, the WHOLE PARTY ignores 20% of the target's defence.
  *
- * <p>⭐ The expectation is derived from the engine's own defence zone (discipline 192), and the judge reads the WEARER and the
+ * <p>The expectation is derived from the engine's own defence zone (discipline 192), and the judge reads the WEARER and the
  * ALLY separately -- the zone reads the ATTACKER's own attribute, so a modifier aimed at one unit would show up here.
  */
 public class Cone23061DefenceIgnoreTest {

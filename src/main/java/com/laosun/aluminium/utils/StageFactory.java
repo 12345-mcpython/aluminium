@@ -17,7 +17,7 @@ import java.util.Map;
 import java.util.Random;
 
 /**
- * Stage factory (P7-5): given a {@code stage_id}, assemble a {@link Battle} that is **ready to fight**.
+ * Stage factory (P-5): given a {@code stage_id}, assemble a {@link Battle} that is ready to fight.
  *
  * <pre>{@code
  * Battle battle = StageFactory.load(103201);
@@ -40,10 +40,10 @@ import java.util.Random;
  * not equally strong in different stages" is decided by the data and the caller does not need to
  * pass any multiplier.
  *
- * <p>⚠ <b>The team is real since P8-5</b>: {@link #load(int)} builds the 4-character team with
+ * <p>Note: <b>The team is real since P8-5</b>: {@link #load(int)} builds the 4-character team with
  * {@link #realTeam()}, which goes through {@code CharacterFactory} (real stat sheet, path, element,
  * energy cap, real skill slots), equips each character with a light cone of its own path from
- * {@code weapons.json}, and — since P10-3 — with a real relic suit whose 4-piece and 2-piece set bonuses
+ * {@code weapons.json}, and - since P10-3 - with a real relic suit whose 4-piece and 2-piece set bonuses
  * are applied ({@link #referenceRelics()}). Before P8-5 this method used a placeholder team built from
  * {@code Character.fromAttributes}.
  */
@@ -77,8 +77,8 @@ public final class StageFactory {
     /**
      * The cavern set the reference team wears: 102, <b>Musketeer of Wild Wheat</b>.
      *
-     * <p>Chosen because both its tiers are plain stats in the data — 2 pieces grant +12% ATK, 4 pieces
-     * another +6% SPD — so the team exercises a real 4-piece bonus end to end instead of a bonus that is
+     * <p>Chosen because both its tiers are plain stats in the data - 2 pieces grant +12% ATK, 4 pieces
+     * another +6% SPD - so the team exercises a real 4-piece bonus end to end instead of a bonus that is
      * only a named ability the engine cannot run yet (most 4-piece bonuses are exactly that; see
      * {@code RelicSet.Effect#hasAbility()}).
      */
@@ -99,22 +99,22 @@ public final class StageFactory {
      * <p>Chosen to cover four different paths (Erudition / Hunt / Destruction / Abundance) and four
      * different roles, so that a stage battle exercises more than one damage shape.
      *
-     * <p>A fixed roster is deliberate **for now**: assembling a team from an arbitrary pool needs
+     * <p>A fixed roster is deliberate for now: assembling a team from an arbitrary pool needs
      * team-building rules the project does not have, and the point of this task is "the stage uses
      * real characters", not "the game picks a team".
      */
     private static final int[] TEAM = {
-            1204,   // Jing Yuan — Erudition, thunder, 130 energy
-            1102,   // Seele — Hunt, quantum, 120
-            1107,   // Clara — Destruction, physical, 110
-            1105,   // Natasha — Abundance, physical, 90
+            1204,   // Jing Yuan - Erudition, thunder, 130 energy
+            1102,   // Seele - Hunt, quantum, 120
+            1107,   // Clara - Destruction, physical, 110
+            1105,   // Natasha - Abundance, physical, 90
     };
 
     private StageFactory() {
     }
 
     /**
-     * Assemble a **battle already under way** from a stage id: the real team is in place, wave 1 has
+     * Assemble a battle already under way from a stage id: the real team is in place, wave 1 has
      * entered and been ordered onto the action bar.
      *
      * <p>Callers who want a fixed seed should use {@link #load(int, List, Random)}.
@@ -179,25 +179,25 @@ public final class StageFactory {
     }
 
     /**
-     * The **real** 4-character reference team (P8-5), each with a light cone of its own path and a real
+     * The real 4-character reference team (P8-5), each with a light cone of its own path and a real
      * relic suit.
      *
      * <p>Every member comes from {@link CharacterFactory#create(int, int)}, so it carries a real stat
-     * sheet (level scaling, traces), path, element, aggro, energy cap, real skill slots and — since
-     * P8-7/P8-8 — its data-driven trigger table and stack resources.
+     * sheet (level scaling, traces), path, element, aggro, energy cap, real skill slots and - since
+     * P8-/P8-8 - its data-driven trigger table and stack resources.
      *
      * <p><b>On the light cones</b>: the cone is picked by path (the same key
      * {@code Path.fromMt} uses for characters), and the <b>smallest matching id</b> wins. That rule is
      * arbitrary but deterministic, which matters more here than "which cone is best": a
-     * non-deterministic pick would make every stage battle irreproducible. ⚠ Only the cone's
-     * <b>panel</b> is applied — its passive is not (a weapon passive needs the buff system, P10-3).
+     * non-deterministic pick would make every stage battle irreproducible. Note: Only the cone's
+     * <b>panel</b> is applied - its passive is not (a weapon passive needs the buff system, P10-3).
      *
-     * <p><b>On the relics (P10-3)</b>: every member wears the same {@link #referenceRelics()} build — four
-     * pieces of Musketeer of Wild Wheat (set 102) plus two pieces of Space Sealing Station (set 301) — so
+     * <p><b>On the relics (P10-3)</b>: every member wears the same {@link #referenceRelics()} build - four
+     * pieces of Musketeer of Wild Wheat (set 102) plus two pieces of Space Sealing Station (set 301) - so
      * both a 4-piece and a 2-piece set bonus are live on every sheet. The build is a pure function of the
      * data ({@link RelicFactory}), with no rolled main attributes and no rolled sub-stats, because a
      * non-deterministic build would make every stage battle irreproducible in exactly the way the cone
-     * choice above is designed to avoid. ⚠ An <b>ability</b>-type set bonus is still not applied: the
+     * choice above is designed to avoid. Note: An <b>ability</b>-type set bonus is still not applied: the
      * engine has no ability interpreter (see the class docs of {@code RelicSuit}).
      *
      * @return a fresh team; each call builds new characters and new relics, so two calls never share state
@@ -205,7 +205,7 @@ public final class StageFactory {
     public static List<Character> realTeam() {
         List<Character> team = new ArrayList<>();
         for (int cid : TEAM) {
-            // The cone is chosen **before** the character is built: the stat-sheet pipeline consumes
+            // The cone is chosen before the character is built: the stat-sheet pipeline consumes
             // the weapon during build(), so assigning it afterwards would set the field but never
             // reach the sheet (see CharacterFactory.create's weapon overload).
             //
@@ -232,19 +232,19 @@ public final class StageFactory {
     }
 
     /**
-     * The light cone used for a path: the **highest rarity**, ties broken by the smallest weapon id.
+     * The light cone used for a path: the highest rarity, ties broken by the smallest weapon id.
      *
      * <p>Rarity first because a level-80 team holding a 3-star starter cone would be a strange
      * reference team; the id tie-break then makes the choice deterministic, which matters more here
-     * than "which cone is best" — a non-deterministic pick would make every stage battle
+     * than "which cone is best" - a non-deterministic pick would make every stage battle
      * irreproducible.
      *
-     * <p>⚠ Only the cone's <b>panel</b> is applied. Its passive is not: a weapon passive needs the
+     * <p>Note: Only the cone's <b>panel</b> is applied. Its passive is not: a weapon passive needs the
      * buff system (P10-3).
      *
      * @param path the character's path
      * @return the cone, or {@code null} when no weapon of that path exists (the caller then leaves the
-     * character unequipped rather than failing — a weapon is not required to fight)
+     * character unequipped rather than failing - a weapon is not required to fight)
      */
     static Weapon samePathWeapon(Path path) {
         if (path == null || path == Path.OTHER) {

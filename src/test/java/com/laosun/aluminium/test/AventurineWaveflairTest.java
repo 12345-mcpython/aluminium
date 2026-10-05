@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1513 Aventurine • Waveflair, from his own file (2026-09-29, round 218): 【热意】, the one resource in this kit the document caps.
+ * 1513 Aventurine - Waveflair, from his own file (2026-09-29, round 218): [热意], the one resource in this kit the document caps.
  */
 public class AventurineWaveflairTest {
     private static final int AVENTURINE = 1513;
@@ -22,7 +22,7 @@ public class AventurineWaveflairTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** ⚠ One Fervor per TEAMMATE's attack, and the document's cap of 30 enforced by exceeding it. */
+    /** Note: One Fervor per TEAMMATE's attack, and the document's cap of 30 enforced by exceeding it. */
     @Test
     public void teammateAttacksFeedFervorUpToThirty() {
         Character aventurine = CharacterFactory.create(AVENTURINE, LEVEL);
@@ -47,7 +47,7 @@ public class AventurineWaveflairTest {
                 "「【热意】上限为30点」 -- forty-one firings must still read thirty");
     }
 
-    /** ⚠ The Ultimate: 8 Fervor and 30% more SPEED for the document's four turns. */
+    /** Note: The Ultimate: 8 Fervor and 30% more SPEED for the document's four turns. */
     @Test
     public void theUltimateAddsFervorAndSpeed() {
         Character aventurine = CharacterFactory.create(AVENTURINE, LEVEL);

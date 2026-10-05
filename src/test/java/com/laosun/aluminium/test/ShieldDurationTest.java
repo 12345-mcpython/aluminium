@@ -22,19 +22,19 @@ import java.util.Random;
  * How long a <b>shield</b> lasts, and the {@code has_shield} condition that asks whether one is still up.
  *
  * <p><b>The hole this closes.</b> A shield used to be a bare number on the combatant
- * ({@code Battle.grantShield}) that <b>nothing ever took off</b>: 三月七's Skill said 「持续3回合」, the rule carried
- * {@code "turns": 3}, and the field was read, validated and then silently dropped — the shield stayed for the rest
- * of the battle. That is not a cosmetic difference, because 「持有护盾的…」 is a <b>condition</b>: 三月七's 天赋
- * counter fires 「当持有护盾的我方目标受到敌方目标攻击后」, so a shield that never expires would have kept that
- * counter alive for the whole fight instead of for three turns. Both halves are pinned here — the lifetime, and
+ * ({@code Battle.grantShield}) that <b>nothing ever took off</b>: 三月七's Skill said "持续3回合", the rule carried
+ * {@code "turns": 3}, and the field was read, validated and then silently dropped - the shield stayed for the rest
+ * of the battle. That is not a cosmetic difference, because "持有护盾的…" is a <b>condition</b>: 三月七's 天赋
+ * counter fires "当持有护盾的我方目标受到敌方目标攻击后", so a shield that never expires would have kept that
+ * counter alive for the whole fight instead of for three turns. Both halves are pinned here - the lifetime, and
  * what the condition answers while it runs out.
  *
  * <p><b>Where the lifetime lives.</b> In a {@link ShieldBuff} attached to the <b>shielded unit</b>: it installs
  * the value when it lands and takes it off when it expires, so the number and its duration are one fact. The
- * carrier's own turns count it down (the engine's default clock), which is what 「持续3回合」 means — the shield is
+ * carrier's own turns count it down (the engine's default clock), which is what "持续3回合" means - the shield is
  * on <i>them</i>, so it lasts three of <i>their</i> turns.
  *
- * <p>⚠ The shield <b>value</b> is still read the ordinary way ({@code CanHit.getShield()}), which is what the
+ * <p>Note: The shield <b>value</b> is still read the ordinary way ({@code CanHit.getShield()}), which is what the
  * damage path drains: {@code HealShieldTest} keeps pinning that half.
  */
 public class ShieldDurationTest {
@@ -48,8 +48,8 @@ public class ShieldDurationTest {
     /**
      * The speeds the fixture states outright.
      *
-     * <p>⚠ Not decoration: 「持续N回合」 is counted in the <b>carrier's</b> turns, so a test that takes "the caster's
-     * turn" has to be sure the ally's turn did not slip in first — and two real characters' speeds are a fact
+     * <p>Note: Not decoration: "持续N回合" is counted in the <b>carrier's</b> turns, so a test that takes "the caster's
+     * turn" has to be sure the ally's turn did not slip in first - and two real characters' speeds are a fact
      * about the data that changes whenever a panel is corrected (停云 is already faster than 姬子). The fixture
      * therefore puts the caster far ahead and the ally far behind, which makes the order a property of the test.
      */
@@ -60,7 +60,7 @@ public class ShieldDurationTest {
     // 1. The lifetime
     // ==================================================================
 
-    /** 「持续2回合」: the shield is up, survives one of its carrier's turns, and is gone after the second. */
+    /** "持续2回合": the shield is up, survives one of its carrier's turns, and is gone after the second. */
     @Test
     public void aTimedShieldIsUpUntilItsCarriersTurnsAreSpent() {
         Fixture f = new Fixture(shieldRule(500, 2, "target"));
@@ -75,7 +75,7 @@ public class ShieldDurationTest {
         Assertions.assertEquals(0, f.ally.getShield(), EPS, "the second turn is the last one");
     }
 
-    /** Whose turns: the carrier's, not the caster's — 「为指定我方单体提供…持续3回合的护盾」. */
+    /** Whose turns: the carrier's, not the caster's - "为指定我方单体提供…持续3回合的护盾". */
     @Test
     public void theCastersTurnsDoNotSpendTheShieldsDuration() {
         Fixture f = new Fixture(shieldRule(500, 1, "target"));
@@ -104,7 +104,7 @@ public class ShieldDurationTest {
         Assertions.assertEquals(0, f.ally.getShield(), EPS, "being used up does");
     }
 
-    /** A shield that has been partly drained still expires on schedule — its duration is not "until used up". */
+    /** A shield that has been partly drained still expires on schedule - its duration is not "until used up". */
     @Test
     public void aPartlyUsedTimedShieldStillExpires() {
         Fixture f = new Fixture(shieldRule(500, 1, "target"));
@@ -118,7 +118,7 @@ public class ShieldDurationTest {
     }
 
     /**
-     * ⚠ A <b>raw</b> shield granted after a timed one is not taken off by that one's expiry.
+     * Note: A <b>raw</b> shield granted after a timed one is not taken off by that one's expiry.
      *
      * <p>This is what the ownership record is for: the value alone cannot say whose shield is standing there, and
      * {@code Battle.grantShield} (a permanent grant) is a different promise from a timed one.
@@ -150,13 +150,13 @@ public class ShieldDurationTest {
     }
 
     // ==================================================================
-    // 2. The condition: 「持有护盾的…」
+    // 2. The condition: "持有护盾的…"
     // ==================================================================
 
     /** {@code target has_shield} is true while a shield is up and false once it is gone. */
     @Test
     public void theConditionAsksWhetherTheShieldIsStillUp() {
-        // ⚠ The shield is granted by hand rather than by a second rule in the same table: rules fire in order
+        // Note: The shield is granted by hand rather than by a second rule in the same table: rules fire in order
         // within one event, so a shield rule would have made the first firing below carry a shield already --
         // and the test would have been measuring the ordering instead of the condition.
         Fixture f = new Fixture(conditionRule("target has_shield"));
@@ -182,7 +182,7 @@ public class ShieldDurationTest {
         Assertions.assertEquals(0, fireCondition(f), "and stops holding once one is up");
     }
 
-    /** ⚠ The subject decides whose shield is asked about: {@code self} is the rule's owner, not the event's target. */
+    /** Note: The subject decides whose shield is asked about: {@code self} is the rule's owner, not the event's target. */
     @Test
     public void theConditionReadsTheSubjectItNames() {
         Fixture f = new Fixture(conditionRule("self has_shield"));
@@ -231,7 +231,7 @@ public class ShieldDurationTest {
      * And it cannot be asked on {@code BATTLE_START}, which carries neither an actor nor a target.
      *
      * <p>The generic carried-party guard, the same one {@code has_state} / {@code is_ally} already obey: a rule
-     * gated on 「目标持有护盾」 there could never be true, and silence is not an acceptable answer for that.
+     * gated on "目标持有护盾" there could never be true, and silence is not an acceptable answer for that.
      */
     @Test
     public void hasShieldOnBattleStartIsRejected() {

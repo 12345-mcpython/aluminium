@@ -4,25 +4,25 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * A skill's **data-side** {@code attack_type} (the raw value in {@code skills.json}).
+ * A skill's data-side {@code attack_type} (the raw value in {@code skills.json}).
  *
- * <p>⚠ <b>Naming</b>: this enum is **deliberately not called** {@code SkillAttackType} — that name is already
- * taken by {@link SkillAttackType} (target shape: single target / blast / AoE), which is **another axis**.
+ * <p>Note: <b>Naming</b>: this enum is deliberately not called {@code SkillAttackType} - that name is already
+ * taken by {@link SkillAttackType} (target shape: single target / blast / AoE), which is another axis.
  * This enum answers "what class of skill is this", and it is orthogonal to {@link SkillEffectType} (what the skill
  * actually does) as well.
  *
  * <p><b>Why this enum is needed</b>: the data stores {@code attack_type} as a bare string, and the engine has two
  * places that branch on it (skill point settlement, skill energy gain). The problem with a string {@code switch} is
- * that **a spelling change or a new type on the data side fails silently** — it falls into the {@code default}
+ * that a spelling change or a new type on the data side fails silently - it falls into the {@code default}
  * branch and is swallowed, with neither compile-time protection nor a runtime error. Once it is centralised into
- * this enum, "data value → engine semantics" is defined in exactly one place, and adding a new type forces the
+ * this enum, "data value to engine semantics" is defined in exactly one place, and adding a new type forces the
  * compiler to make every {@code switch} take a stand.
  *
- * <p>⚠ <b>This is not the same thing as {@link SkillType}</b>, do not substitute one for the other:
+ * <p>Note: <b>This is not the same thing as {@link SkillType}</b>, do not substitute one for the other:
  * <ul>
- *   <li>{@code SkillType} is a **slot category** (which slot is equipped on the character), and contains the two
+ *   <li>{@code SkillType} is a slot category (which slot is equipped on the character), and contains the two
  *       values {@code SUMMON_SKILL} / {@code SUMMON_TALENT} that do not exist in the data;</li>
- *   <li>this enum is the **attack type in the data**, and contains the two values {@code ASSIST} /
+ *   <li>this enum is the attack type in the data, and contains the two values {@code ASSIST} /
  *       {@code ELATION_DAMAGE} that {@code SkillType} does not have.</li>
  * </ul>
  * The only overlap between the two is those five values {@code Normal / BPSkill / Ultra / Maze / MazeNormal}.
@@ -46,7 +46,7 @@ public enum SkillCategory {
      */
     ULTRA("Ultra"),
     /**
-     * Map basic attack (data {@code "MazeNormal"}): the hit used **outside battle**.
+     * Map basic attack (data {@code "MazeNormal"}): the hit used outside battle.
      */
     MAZE_NORMAL("MazeNormal"),
     /**
@@ -62,25 +62,25 @@ public enum SkillCategory {
      */
     ELATION_DAMAGE("ElationDamage"),
     /**
-     * {@code attack_type} is empty in the data — 94 measured, all of them **talents and follow-up attacks**
+     * {@code attack_type} is empty in the data - 94 measured, all of them talents and follow-up attacks
      * (they are not an "active cast", so they have no attack type).
      */
     UNSPECIFIED(""),
     /**
      * A value this project does not yet recognise showed up in the data.
      *
-     * <p>Deliberately **does not throw**: the data is an external artefact, and blowing up the engine over one new
+     * <p>Deliberately does not throw: the data is an external artefact, and blowing up the engine over one new
      * type is a stability problem. Here we choose "degrade safely + stay observable", and {@link #isKnownValue()}
      * lets the caller decide whether to make noise.
      */
     UNKNOWN("");
 
     /**
-     * **All** data values this enum recognises (including mixed-case ones like {@code "ElationDamage"}).
+     * All data values this enum recognises (including mixed-case ones like {@code "ElationDamage"}).
      *
      * <p>The single source of truth: {@link #fromString} looks it up, and {@link #isKnownValue()} looks it up too.
      *
-     * <p>The keys are always normalised through {@link #normalize} — otherwise "case-insensitive" would just be an
+     * <p>The keys are always normalised through {@link #normalize} - otherwise "case-insensitive" would just be an
      * empty phrase in the javadoc (that is exactly how the first version got it wrong: the keys were stored as-is
      * while lookups used lower case, so they could never be found).
      */
@@ -95,7 +95,7 @@ public enum SkillCategory {
     }
 
     /**
-     * Value normalisation: trim whitespace + lower case. Building the table and looking up in it **must** go
+     * Value normalisation: trim whitespace + lower case. Building the table and looking up in it must go
      * through the same function.
      */
     private static String normalize(String raw) {
@@ -122,15 +122,15 @@ public enum SkillCategory {
      * {@code attack_type} ({@code Normal} / {@code BPSkill} / {@code Ultra} / empty for talents and follow-ups) and
      * that is what rides along on a {@code Damage} instance; content names a slot the way the engine's own
      * {@code "skill"} field does ({@code COMMON} / {@code SKILL} / {@code ULTRA} / {@code TALENT}). A sentence like
-     * 「**施放战技**对敌方目标造成弱点击破时」 compares the two, so the translation lives here, once — a second copy
+     * "施放战技对敌方目标造成弱点击破时" compares the two, so the translation lives here, once - a second copy
      * at the call site would be free to disagree with this one.
      *
-     * <p>⚠ {@code TALENT} maps to {@link #UNSPECIFIED}, and that is the point rather than a gap: a talent or a
+     * <p>Note: {@code TALENT} maps to {@link #UNSPECIFIED}, and that is the point rather than a gap: a talent or a
      * follow-up attack carries no attack type in the data because it is <b>not an active cast</b>, so
-     * 「施放战技…造成弱点击破」 must <b>not</b> match a break caused by 姬子's own follow-up.
+     * "施放战技…造成弱点击破" must <b>not</b> match a break caused by 姬子's own follow-up.
      *
      * @param slot the slot a rule named, or {@code null}
-     * @return the category a damage instance from that slot carries ({@code null} in → {@code null} out)
+     * @return the category a damage instance from that slot carries ({@code null} in to {@code null} out)
      */
     public static SkillCategory of(SkillType slot) {
         if (slot == null) {
@@ -149,7 +149,7 @@ public enum SkillCategory {
     }
 
     /**
-     * Whether this value is a stand-in for {@code null} — i.e. the data **simply has no** attack type.
+     * Whether this value is a stand-in for {@code null} - i.e. the data simply has no attack type.
      *
      * <p>Used for branches like "talents/follow-up attacks": they are a legitimate empty, not a data error.
      */
@@ -158,7 +158,7 @@ public enum SkillCategory {
     }
 
     /**
-     * Whether this value is a legitimate value that **really exists** in the data.
+     * Whether this value is a legitimate value that really exists in the data.
      *
      * <p>{@code false} means one of two things: {@link #UNSPECIFIED} (legitimate empty) or
      * {@link #UNKNOWN} (data the engine does not recognise). Used for data validation/diagnostics.
@@ -168,12 +168,12 @@ public enum SkillCategory {
     }
 
     /**
-     * Whether this type counts as **one active cast inside battle**.
+     * Whether this type counts as one active cast inside battle.
      *
      * <p>{@code true}: basic attack / skill / ultimate. {@code false}: map basic attack, technique
      * (both outside battle), assist skill, elation damage, talents and follow-up attacks (empty in the data).
      *
-     * <p>Note: do **not** use this as the test for "should skill points be settled" — the skill point rule is
+     * <p>Note: do not use this as the test for "should skill points be settled" - the skill point rule is
      * "basic attack +1 / skill -1 / everything else neutral", expressed by
      * {@link com.laosun.aluminium.models.skillpoint.SkillPointPolicy}.
      */
@@ -185,10 +185,10 @@ public enum SkillCategory {
      * The <b>scoped damage-boost</b> attribute this kind of cast feeds, or {@code null} when the category is
      * not an in-battle cast.
      *
-     * <p>This is the mapping behind 「普攻/战技/终结技造成的伤害提高 X%」: the damage instance carries the
+     * <p>This is the mapping behind "普攻/战技/终结技造成的伤害提高 X%": the damage instance carries the
      * category of the cast that produced it, and {@code Battle.assemble} asks here which attribute to add to
      * the DMG-boost zone. It lives in this enum because this is already the single place that turns a data
-     * {@code attack_type} into engine semantics — and because the {@code switch} forces a new category to
+     * {@code attack_type} into engine semantics - and because the {@code switch} forces a new category to
      * take a stand instead of silently falling through.
      *
      * <p>{@code null} for everything else, deliberately: a technique or map attack happens outside battle, a
@@ -209,13 +209,13 @@ public enum SkillCategory {
     }
 
     /**
-     * Parses a string from the data into the enum, **case-insensitively** and trimming whitespace.
+     * Parses a string from the data into the enum, case-insensitively and trimming whitespace.
      *
      * <p>Parsing rules:
      * <ul>
-     *   <li>{@code null} or the empty string → {@link #UNSPECIFIED} (a legitimate empty in the data);</li>
-     *   <li>a recognised value → the matching enum constant;</li>
-     *   <li>an unrecognised value → {@link #UNKNOWN} (**does not throw**, see the note on that constant).</li>
+     *   <li>{@code null} or the empty string to {@link #UNSPECIFIED} (a legitimate empty in the data);</li>
+     *   <li>a recognised value to the matching enum constant;</li>
+     *   <li>an unrecognised value to {@link #UNKNOWN} (does not throw, see the note on that constant).</li>
      * </ul>
      *
      * @param raw the {@code attack_type} from the data

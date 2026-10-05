@@ -11,14 +11,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Tie-breaking on equal action values in the action bar (P7 fix E4).
+ * Tie-breaking on equal action values in the action bar (Pfix E4).
  *
  * <p>Before the fix {@code Signal.compareTo} only compared {@code nextActionTime}, so when they were
- * equal the {@code PriorityQueue} order was **undefined** — "which of two units with the same speed
+ * equal the {@code PriorityQueue} order was undefined - "which of two units with the same speed
  * acts first" became a matter of luck, and {@code snapshot()} sorted the heap array stably, so the
- * **displayed order could disagree with the actual turn order**.
+ * displayed order could disagree with the actual turn order.
  *
- * <p>The fix: {@code Signal} records a globally increasing **schedule sequence number**, and
+ * <p>The fix: {@code Signal} records a globally increasing schedule sequence number, and
  * {@code compareTo} compares it when the action values are equal (the one scheduled earlier acts
  * first).
  */
@@ -26,7 +26,7 @@ public class QueueTieBreakTest {
     private static final double EPS = 1e-9;
 
     /**
-     * The turn order of same-speed units must be the **entry order**, and must be reproducible —
+     * The turn order of same-speed units must be the entry order, and must be reproducible - 
      * running the same battle repeatedly gives the same result.
      *
      * <p>Two things are asserted: {@code peekNext()} returns the first one to enter; and the order
@@ -66,7 +66,7 @@ public class QueueTieBreakTest {
     }
 
     /**
-     * The order of {@code snapshot()} must **equal** the actual turn order (E4's second symptom).
+     * The order of {@code snapshot()} must equal the actual turn order (E4's second symptom).
      */
     @Test
     public void snapshotOrderMatchesActualTurnOrder() {
@@ -85,11 +85,11 @@ public class QueueTieBreakTest {
     }
 
     /**
-     * Action bar manipulation does **not** re-take a sequence number: pulling a unit to the same
+     * Action bar manipulation does not re-take a sequence number: pulling a unit to the same
      * action value as someone ahead of it still leaves it behind them.
      *
      * <p>This is a deliberately chosen semantics. If advancing also changed the sequence number, it
-     * would be "whoever gets advanced goes first", which would make the ordering of P7-2 extra turns
+     * would be "whoever gets advanced goes first", which would make the ordering of P-2 extra turns
      * / P10-4 action advance counter-intuitive and hard to predict.
      */
     @Test
@@ -103,9 +103,9 @@ public class QueueTieBreakTest {
         Assertions.assertTrue(seqA < seqB, "A entered first → smaller sequence number");
         Assertions.assertEquals(a, q.peekNext(), "same action value 150 → A, scheduled earlier, acts first");
 
-        // Both acted once at action value 150 and were both rescheduled to 250 (speed 100 → period 100).
-        // ⚠ advanceAction(…, 1e9) MUST NOT be used to "pull someone to the very front" and create the
-        // alignment: the clamp would pin them to elapsed, and move() would then drag the clock there —
+        // Both acted once at action value 150 and were both rescheduled to 250 (speed 100 to period 100).
+        // Note: advanceAction(…, 1e9) MUST NOT be used to "pull someone to the very front" and create the
+        // alignment: the clamp would pin them to elapsed, and move() would then drag the clock there - 
         // they would act twice in a row.
         Assertions.assertEquals(a, nextActor(q));
         Assertions.assertEquals(b, nextActor(q));
@@ -115,7 +115,7 @@ public class QueueTieBreakTest {
 
         // Now delay A to 280, then delay B to 280 as well: both have the same value.
         // delayAction is used rather than advanceAction, to avoid scheduling either one onto elapsed.
-        // Note the sequence numbers asserted must be the ones **after acting**: both were just
+        // Note the sequence numbers asserted must be the ones after acting: both were just
         // rescheduled, so their sequence numbers have been renewed.
         long seqAAfterActing = signalOf(q, a).getSequence();
         long seqBAfterActing = signalOf(q, b).getSequence();
@@ -136,7 +136,7 @@ public class QueueTieBreakTest {
     }
 
     /**
-     * After an actor is rescheduled it gets a **new** sequence number, so it cannot use its old
+     * After an actor is rescheduled it gets a new sequence number, so it cannot use its old
      * sequence number to cut in ahead of its tier: the actor goes to the back of the queue and the
      * next one in the same tier takes over.
      */
@@ -177,15 +177,15 @@ public class QueueTieBreakTest {
      * When speeds differ (action values differ), the tie-break sequence number must not steal the
      * show: the smaller action value still acts first.
      *
-     * <p>⚠ Here only "who acts first" is asserted, **not** which of two signals with the same value
-     * comes first — that depends on the two sequence numbers, and after acting the fast one is
+     * <p>Note: Here only "who acts first" is asserted, not which of two signals with the same value
+     * comes first - that depends on the two sequence numbers, and after acting the fast one is
      * rescheduled (see {@link #actorGoesToTheBackOfItsTierAfterActing}).
      * What this test proves is: {@code compareTo} always uses the action value as the primary key.
      */
     @Test
     public void sequenceNeverOverridesTheActionValue() {
         Character slow = character("slow", 100);      // first round 150
-        Character fast = character("fast", 200);      // first round 75
+        Character fast = character("fast", 200);      // first round 5
         Queue q = new Queue(List.of(slow, fast));
 
         Assertions.assertNotEquals(signalOf(q, slow).getSequence(), signalOf(q, fast).getSequence(),

@@ -26,7 +26,7 @@ import java.util.Random;
  *
  * <p><b>Additional damage (附加伤害)</b> official definition: "makes the hit target take 1 extra
  * instance of damage; this damage is not considered to have dealt 1 attack"
- * → it goes through the full zones (its base is a panel value: ATK / MaxHP × multiplier) and is
+ *  to it goes through the full zones (its base is a panel value: ATK / MaxHP  x  multiplier) and is
  * flagged {@code notCountsAsAttack()}.
  *
  * <p><b>True damage (真伤)</b> (Tribbie E1): the base is derived from this attack's total damage
@@ -59,11 +59,11 @@ public class ExtraTrueDamageTest {
     }
 
     private static Skill singleAttack() {
-        return new DefaultSkill(1001, 1, 1);       // real data: SingleAttack ×0.5
+        return new DefaultSkill(1001, 1, 1);       // real data: SingleAttack  x 0.5
     }
 
     private static Skill aoeAttack() {
-        return new DefaultSkill(1001, 3, 1);       // real data: AoEAttack ×0.9
+        return new DefaultSkill(1001, 3, 1);       // real data: AoEAttack  x 0.9
     }
 
     @Test
@@ -80,7 +80,7 @@ public class ExtraTrueDamageTest {
         battle.castImmediate(aoeAttack(), mainC, List.of(main));    // main target = e2
 
         // mainC's AOE: 90 per enemy; additional damage triggers only 1 time and lands only on the main target
-        // 120 (120% × Robin's ATK 100) × fixed crit 2.5 (100% crit rate / 150% crit DMG) = 300
+        // 120 (120%  x  Robin's ATK 100)  x  fixed crit 2.5 (100% crit rate / 150% crit DMG) = 300
         Assertions.assertEquals(90, damageTaken(first), EPS);
         Assertions.assertEquals(90 + 300, damageTaken(main), EPS);
         Assertions.assertEquals(90, damageTaken(third), EPS);
@@ -112,7 +112,7 @@ public class ExtraTrueDamageTest {
 
         battle.castImmediate(singleAttack(), mainC, List.of(boss));
 
-        // the additional damage instance "is not considered to have dealt 1 attack" → no recursive trigger
+        // the additional damage instance "is not considered to have dealt 1 attack" to no recursive trigger
         Assertions.assertEquals(1, concerto.triggerCount);
         Assertions.assertEquals(50 + 300, damageTaken(boss), EPS);
     }
@@ -129,8 +129,8 @@ public class ExtraTrueDamageTest {
 
         battle.castImmediate(aoeAttack(), mainC, List.of(mid));
 
-        // AOE ×0.9 → 90 each; the zone fires "for each target that is attacked" → 3 times × (12% × MaxHP 1000 = 120)
-        // each time it picks the "highest current HP among the hit targets" → all of them land on e1
+        // AOE  x 0.9 to 90 each; the zone fires "for each target that is attacked" to 3 times  x  (12%  x  MaxHP 1000 = 120)
+        // each time it picks the "highest current HP among the hit targets" to all of them land on e1
         Assertions.assertEquals(90 + 360, damageTaken(high), EPS);
         Assertions.assertEquals(90, damageTaken(mid), EPS);
         Assertions.assertEquals(90, damageTaken(low), EPS);
@@ -145,12 +145,12 @@ public class ExtraTrueDamageTest {
         Battle battle = battle(List.of(tribbie, mainC), List.of(boss));
         tribbie.getBuffManager().addBuff(new TribbieE1Buff(2, tribbie));
 
-        // mainC's basic attack (ice, ×0.5): 100 × 0.5 = 50 → defence zone 1000 / (10000 + 1000)
+        // mainC's basic attack (ice,  x 0.5): 100  x  0.5 = 50 to defence zone 1000 / (10000 + 1000)
         double mainDamage = 50.0 * 1000.0 / 11_000.0;
 
         battle.castImmediate(singleAttack(), mainC, List.of(boss));
 
-        // true damage = this attack's total damage × 24% (D2 undecided: no overflow occurs here, so both readings agree)
+        // true damage = this attack's total damage  x  24% (D2 undecided: no overflow occurs here, so both readings agree)
         Assertions.assertEquals(mainDamage * 1.24, damageTaken(boss), 1e-9);
     }
 
@@ -158,14 +158,14 @@ public class ExtraTrueDamageTest {
     public void additionalDamageStopsWhenTheMainDamageAlreadyKilledTheTarget() {
         Character robin = character();
         Character mainC = character();
-        Enemy fragile = enemy("boss", 50, 0);        // mainC's basic attack is exactly 50 → killed on the spot
+        Enemy fragile = enemy("boss", 50, 0);        // mainC's basic attack is exactly 50 to killed on the spot
         Battle battle = battle(List.of(robin, mainC), List.of(fragile));
         ConcertoBuff concerto = new ConcertoBuff(2, robin);
         robin.getBuffManager().addBuff(concerto);
 
         battle.castImmediate(singleAttack(), mainC, List.of(fragile));
 
-        // the event fires as usual (an attack did happen), but the main target is already dead → no more additional damage
+        // the event fires as usual (an attack did happen), but the main target is already dead to no more additional damage
         Assertions.assertEquals(1, concerto.triggerCount);
         Assertions.assertEquals(50, damageTaken(fragile), EPS);
     }
@@ -182,7 +182,7 @@ public class ExtraTrueDamageTest {
 
         battle.castImmediate(aoeAttack(), mainC, List.of(survivor));
 
-        // AOE 90 per enemy: e1 is killed → all 3 additional damage instances land on e2, the "currently alive + highest HP" one
+        // AOE 90 per enemy: e1 is killed to all 3 additional damage instances land on e2, the "currently alive + highest HP" one
         Assertions.assertEquals(50, damageTaken(fragile), EPS);          // a corpse takes no more damage
         Assertions.assertEquals(90 + 360, damageTaken(survivor), EPS);
         Assertions.assertEquals(90, damageTaken(low), EPS);
@@ -198,7 +198,7 @@ public class ExtraTrueDamageTest {
 
         battle.castImmediate(aoeAttack(), mainC, List.of(fragile));
 
-        // every hit target dies → none of the 3 additional damage instances is produced (no retargeting to targets that were not attacked)
+        // every hit target dies to none of the 3 additional damage instances is produced (no retargeting to targets that were not attacked)
         Assertions.assertEquals(50, damageTaken(fragile), EPS);
     }
 
@@ -211,7 +211,7 @@ public class ExtraTrueDamageTest {
         double additional = battle.applyAdditionalDamage(attacker, armoured, DamageElement.PHYSICAL, 1000);
         double trueDamage = battle.applyTrueDamage(attacker, armoured, DamageElement.PHYSICAL, 1000);
 
-        // additional damage's base is a panel value → goes through the defence zone; true damage → as-is
+        // additional damage's base is a panel value to goes through the defence zone; true damage to as-is
         Assertions.assertEquals(1000.0 * 1000.0 / 2150.0, additional, EPS);
         Assertions.assertEquals(1000, trueDamage, EPS);
     }
@@ -264,9 +264,9 @@ public class ExtraTrueDamageTest {
     }
 
     /**
-     * 1309 Robin 【协奏】: after an ally target casts an attack, deal 1 instance of physical
+     * 1309 Robin [协奏]: after an ally target casts an attack, deal 1 instance of physical
      * additional damage equal to 120% of her own ATK, with a fixed 100% crit rate / 150% crit DMG.
-     * The target is the **main target** (D1(i)); if the main target is already dead, this instance is
+     * The target is the main target (D1(i)); if the main target is already dead, this instance is
      * skipped.
      */
     private static class ConcertoBuff extends DamageReactor implements AttackEvent {
@@ -281,7 +281,7 @@ public class ExtraTrueDamageTest {
                                 List<? extends CanHit> hitTargets, double totalDamage) {
             triggerCount++;
             if (mainTarget == null || mainTarget.isDeath()) {
-                return;                                   // D1(i): main target already dead → no damage this instance
+                return;                                   // D1(i): main target already dead to no damage this instance
             }
             double base = owner.getAttribute(AttributeType.ATTACK).get() * 1.2;
             Damage extra = new Damage(owner, mainTarget, DamageElement.PHYSICAL, DamageType.ADDITIONAL, base);
@@ -307,7 +307,7 @@ public class ExtraTrueDamageTest {
             for (int i = 0; i < hitTargets.size(); i++) {
                 CanHit target = highestHpAlive(hitTargets);
                 if (target == null) {
-                    return;                               // all dead → the remaining instances are void
+                    return;                               // all dead to the remaining instances are void
                 }
                 battle.applyAdditionalDamage(owner, target, DamageElement.QUANTUM, base);
             }

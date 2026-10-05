@@ -9,13 +9,13 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 /**
- * Every character rule’s conditions, written out LITERALLY (2026-09-30).
+ * Every character rule's conditions, written out LITERALLY (2026-09-30).
  *
- * <p>⚠ Why literal: a judge that compares the file against the compiled table stays green when a mutation changes
- * both sides together (measured). To catch 「the content itself was changed」 the expectation must live here. The
- * literals are the parser’s spelling: attribute names lowered, integral thresholds given a decimal point.
+ * <p>Note: Why literal: a judge that compares the file against the compiled table stays green when a mutation changes
+ * both sides together (measured). To catch "the content itself was changed" the expectation must live here. The
+ * literals are the parser's spelling: attribute names lowered, integral thresholds given a decimal point.
  *
- * <p>⭐ Generated from the shipped files; regenerate after any condition change (see GAPS.md).
+ * <p>Generated from the shipped files; regenerate after any condition change (see GAPS.md).
  */
 public class CharacterConditionLiteralsTest {
     private static final int LEVEL = 80;

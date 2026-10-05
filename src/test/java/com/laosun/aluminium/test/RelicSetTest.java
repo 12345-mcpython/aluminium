@@ -38,16 +38,16 @@ import java.util.Set;
  */
 public class RelicSetTest {
 
-    /** "Musketeer of Wild Wheat" — a cavern set: HEAD / HAND / BODY / BOOT. */
+    /** "Musketeer of Wild Wheat" - a cavern set: HEAD / HAND / BODY / BOOT. */
     private static final int CAVERN_SET = 102;
-    /** "Space Sealing Station" — a planar ornament set: NECK (sphere) / OBJECT (rope). */
+    /** "Space Sealing Station" - a planar ornament set: NECK (sphere) / OBJECT (rope). */
     private static final int PLANAR_SET = 301;
     /** The reference star rating and level: 5-star, level 15. */
     private static final int STAR = 5;
     private static final int LEVEL = 15;
     /**
      * Set 102's 2-piece bonus as {@code relic_sets.json} spells it ({@code AttackAddedRatio: 0.12}), i.e.
-     * +12% <b>attack percent</b> — not flat attack. Pinned here so the expectations below are traceable to
+     * +12% <b>attack percent</b> - not flat attack. Pinned here so the expectations below are traceable to
      * the shipped file rather than to this test's arithmetic.
      */
     private static final double MUSKETEER_2PC_ATTACK_PERCENT = 0.12;
@@ -69,7 +69,7 @@ public class RelicSetTest {
 
     /**
      * {@code relic_sets.json} is loaded, and its rows really bind (a misspelled {@code @SerializedName}
-     * leaves a field at 0/false/empty — the silent-Gson failure this project keeps hitting).
+     * leaves a field at 0/false/empty - the silent-Gson failure this project keeps hitting).
      */
     @Test
     public void relicSetsAreLoadedFromTheGeneratedTable() {
@@ -118,7 +118,7 @@ public class RelicSetTest {
      * {@link AttributeType}; an unmappable name throws with the offending string instead of being dropped.
      *
      * <p>This is the failure mode worth a test of its own: a dropped property does not break anything
-     * visibly — the character is simply a few percent weaker than the game, forever, with nothing in the log.
+     * visibly - the character is simply a few percent weaker than the game, forever, with nothing in the log.
      */
     @Test
     public void everyPropertyNameInTheShippedFileResolvesToAnAttributeType() {
@@ -140,8 +140,8 @@ public class RelicSetTest {
                 "the shipped file uses 19 distinct property names; a new one must be mapped in "
                         + "AttributeType.BY_GAME_PROPERTY before this test can pass: " + names);
 
-        // The mapping is the generator's own inner_outer_mapping — the same dictionary that turns the
-        // affix tables into attack_percent / crit_chance — so these pairings are the semantics, not
+        // The mapping is the generator's own inner_outer_mapping - the same dictionary that turns the
+        // affix tables into attack_percent / crit_chance - so these pairings are the semantics, not
         // spelling: "AddedRatio" means a percentage, "Base" means the ratio attribute itself.
         Assertions.assertEquals(AttributeType.ATTACK_PERCENT,
                 AttributeType.fromGameProperty("AttackAddedRatio"), "AttackAddedRatio is attack percent");
@@ -171,7 +171,7 @@ public class RelicSetTest {
                 AttributeType.fromGameProperty("ElationDamageAddedRatioBase"), "ElationDamageAddedRatioBase");
     }
 
-    /** An unknown property name is an error, not a skip — that is what makes the guard above worth having. */
+    /** An unknown property name is an error, not a skip - that is what makes the guard above worth having. */
     @Test
     public void anUnmappablePropertyNameThrowsInsteadOfBeingSkipped() {
         IllegalArgumentException unknown = Assertions.assertThrows(IllegalArgumentException.class,
@@ -189,7 +189,7 @@ public class RelicSetTest {
      * from a test).
      *
      * <p>The {@code set_id} check is the one that matters: if that field stops binding, every row would say
-     * {@code 0} while the engine kept looking sets up by map key — nothing would visibly break, and every
+     * {@code 0} while the engine kept looking sets up by map key - nothing would visibly break, and every
      * set bonus in the game would quietly become zero.
      */
     @Test
@@ -219,10 +219,10 @@ public class RelicSetTest {
 
     /**
      * Exactly two pieces of the same set apply the 2-piece bonus, and nothing else:
-     * {@code ATTACK = 1000 × 1.12 = 1120}.
+     * {@code ATTACK = 1000  x  1.12 = 1120}.
      *
      * <p>The control suit wears the <b>same two pieces with their set id cleared</b>, so the only difference
-     * between the two computed values is the set bonus itself — not the affixes, which are identical.
+     * between the two computed values is the set bonus itself - not the affixes, which are identical.
      */
     @Test
     public void twoPieceBonusAppliesAtTwoPieces() {
@@ -242,8 +242,8 @@ public class RelicSetTest {
     }
 
     /**
-     * Four pieces additionally apply the 4-piece bonus: {@code ATTACK = 1000 × 1.12 + flat},
-     * {@code SPEED = 100 × 1.06 + flat}, and both tiers are attributable.
+     * Four pieces additionally apply the 4-piece bonus: {@code ATTACK = 1000  x  1.12 + flat},
+     * {@code SPEED = 100  x  1.06 + flat}, and both tiers are attributable.
      *
      * <p>Ten flat points of attack (the hand piece) and the boots' flat speed are deliberately in the
      * expectation: a percentage multiplies only the base, so a test that ignored the flat parts would be
@@ -279,7 +279,7 @@ public class RelicSetTest {
     }
 
     /**
-     * Taking pieces off takes the bonuses with them: 4 → 3 loses the 4-piece bonus (the 2-piece stays),
+     * Taking pieces off takes the bonuses with them: 4 to 3 loses the 4-piece bonus (the 2-piece stays),
      * 2 pieces keep only the 2-piece bonus, and 1 piece gets nothing at all.
      */
     @Test
@@ -316,7 +316,7 @@ public class RelicSetTest {
      * The bonus is not merely a modifier on a scratch builder: it moves a real character's computed panel.
      *
      * <p>Same character, same pieces, the only difference being whether the pieces carry their set id, so
-     * everything else — traces, level scaling, base stats — cancels out of the difference.
+     * everything else - traces, level scaling, base stats - cancels out of the difference.
      */
     @Test
     public void setBonusReachesTheCharacterSheet() {
@@ -401,10 +401,10 @@ public class RelicSetTest {
 
     /**
      * <b>No effect is silently empty.</b> Every bonus in the file either carries stats the engine applies or
-     * names an ability it cannot execute yet — nothing is both stat-less and ability-less, which would be a
+     * names an ability it cannot execute yet - nothing is both stat-less and ability-less, which would be a
      * bonus that quietly does nothing.
      *
-     * <p>The counts are pinned because they <em>are</em> the registered gap: 57 stat bonuses are applied,
+     * <p>The counts are pinned because they <em>are</em> the registered gap: 5stat bonuses are applied,
      * 35 ability-only bonuses (most 4-piece effects) are selected but not executed, and if regeneration
      * changes either number, this line is where somebody finds out.
      */
@@ -560,7 +560,7 @@ public class RelicSetTest {
                 - attribute(musketeerWithoutSetBonuses(firstSlots(pieces)), AttributeType.SPEED, BASE_SPEED);
     }
 
-    /** The first {@code pieces} cavern slots, in head → hand → body → boot order. */
+    /** The first {@code pieces} cavern slots, in head to hand to body to boot order. */
     private static RelicType[] firstSlots(int pieces) {
         RelicType[] order = {RelicType.HEAD, RelicType.HAND, RelicType.BODY, RelicType.BOOT};
         RelicType[] selected = new RelicType[Math.max(pieces, 0)];

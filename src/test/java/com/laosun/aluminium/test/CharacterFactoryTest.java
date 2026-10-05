@@ -20,12 +20,12 @@ import java.util.Set;
 /**
  * P8-1 acceptance: {@code CharacterFactory} + completion of the character identity fields.
  *
- * <p>This item **does not do skill assembly** (that is P8-2), so what is asserted here is:
- * element / path / aggro / energy cap / level / panel scaling — that is, "a character's identity
+ * <p>This item does not do skill assembly (that is P8-2), so what is asserted here is:
+ * element / path / aggro / energy cap / level / panel scaling - that is, "a character's identity
  * and numbers", without mechanics.
  *
  * <p>Character selection principle: the 5 are the P8-5 target team + Preservation, covering 5 of
- * the 8 elements, 5 paths, 4 aggro tiers, 4 energy tiers; plus 3 **data boundary** characters
+ * the 8 elements, 5 paths, 4 aggro tiers, 4 energy tiers; plus 3 data boundary characters
  * (null / 12 / 9 energy) that only get energy assertions.
  */
 public class CharacterFactoryTest {
@@ -51,11 +51,11 @@ public class CharacterFactoryTest {
      *
      * <p>{@code rarity} is obtained by the generator from the last digit of
      * {@code AvatarConfig.Rarity} (of the form {@code CombatPowerAvatarRarityType5}); in the data it
-     * is **23 four-stars + 70 five-stars** (consistent with the docs' index table).
+     * is 23 four-stars + 0 five-stars (consistent with the docs' index table).
      *
-     * <p>Why pin it down now: **in P8-2 the skill level cap differs by star rating** (it must be
+     * <p>Why pin it down now: in P8-2 the skill level cap differs by star rating (it must be
      * readable before skill assembly), and if the {@code CharacterData} record is missing a field,
-     * Gson silently gives 0 — no error, just everything wrong.
+     * Gson silently gives 0 - no error, just everything wrong.
      */
     @Test
     public void everyCharacterHasAStarRating() {
@@ -73,21 +73,21 @@ public class CharacterFactoryTest {
     }
 
     /**
-     * Panel scaling check: {@code final panel = data base value × calcCharacterRate(80, true)},
-     * **then plus the trace bonuses from {@code skill_traces.json}** (the latter applied unconditionally in
+     * Panel scaling check: {@code final panel = data base value  x  calcCharacterRate(80, true)},
+     * then plus the trace bonuses from {@code skill_traces.json} (the latter applied unconditionally in
      * {@code build()}).
      *
      * <pre>
-     *   Jing Yuan's traces: attack 4+4+6+6+8 = 28%, defence 5+7.5 = 12.5%, no HP trace
-     *   attack  95.04  × 7.35 × 1.28   = 894.13632
-     *   defence 66     × 7.35 × 1.125  = 545.7375
-     *   HP      158.4  × 7.35          = 1164.24
+     *   Jing Yuan's traces: attack 4+4+6+6+8 = 28%, defence 5+.5 = 12.5%, no HP trace
+     *   attack 95.04 x .35 x 1.28 = 894.13632
+     *   defence 66 x .35 x 1.125 = 545.35
+     *   HP 158.4 x .35 = 1164.24
      * </pre>
      *
-     * <p>⚠ My first version asserted attack / defence directly as {@code data × multiplier} and
-     * **missed the traces**; the failure values 894.136 / 545.7375 looked like "attribute array
+     * <p>Note: My first version asserted attack / defence directly as {@code data  x  multiplier} and
+     * missed the traces; the failure values 894.136 / 545.35 looked like "attribute array
      * index misalignment", which sent me down a wrong diagnosis for one round.
-     * Here it was changed to explicitly include the traces via {@code SkillTrace.sumAttributes} —
+     * Here it was changed to explicitly include the traces via {@code SkillTrace.sumAttributes} - 
      * the test explains that 28% / 12.5% by itself.
      */
     @Test
@@ -117,19 +117,19 @@ public class CharacterFactoryTest {
     }
 
     /**
-     * The ascension multiplier only guarantees **the two anchors Lv1 and Lv80**; the intermediate
-     * tiers are a **linear approximation**, not game values.
+     * The ascension multiplier only guarantees the two anchors Lv1 and Lv80; the intermediate
+     * tiers are a linear approximation, not game values.
      *
-     * <p>Measured {@code calcCharacterRate}: Lv20 → 2.35, Lv40 → 4.15, Lv70 → **6.85**;
+     * <p>Measured {@code calcCharacterRate}: Lv20 to 2.35, Lv40 to 4.15, Lv0 to 6.85;
      * whereas in the docs' "panel growth" table, ascension 2/40 is
-     * {@code 285.12 / 158.4 = 1.80} and ascension 5/70 is {@code 475.2 / 158.4 = 3.00}
-     * (that is, 1 + level tier × 0.4).
-     * So **do not** use the intermediate tiers to cross-check against the game panel — the formula
+     * {@code 285.12 / 158.4 = 1.80} and ascension 5/0 is {@code 45.2 / 158.4 = 3.00}
+     * (that is, 1 + level tier  x  0.4).
+     * So do not use the intermediate tiers to cross-check against the game panel - the formula
      * only lines up at the two ends (this is consistent with the "simulator multiplier formula"
      * recorded in ROADMAP P1-4: it was an approximation to begin with).
      *
      * <p>This one writes "which anchors are trustworthy" into the test, so that next time nobody
-     * (including me) asserts 475.2 at Lv70 again.
+     * (including me) asserts 45.2 at Lv0 again.
      */
     @Test
     public void onlyTheLevel1AndLevel80AnchorsMatchTheGameTable() {
@@ -138,14 +138,14 @@ public class CharacterFactoryTest {
         Assertions.assertEquals(158.4,
                 158.4 * LevelPromotionCalc.calcCharacterRate(1, false), 1e-9);
 
-        // Trustworthy anchor 2: Lv80 ascended = ×7.35 (Jing Yuan max level 1164.24 / March 7th 1058.4)
+        // Trustworthy anchor 2: Lv80 ascended = x .35 (Jing Yuan max level 1164.24 / March th 1058.4)
         Assertions.assertEquals(7.35, LevelPromotionCalc.calcCharacterRate(80, true), 1e-9);
         Assertions.assertEquals(1164.24,
                 158.4 * LevelPromotionCalc.calcCharacterRate(80, true), 1e-3);
         Assertions.assertEquals(1058.4,
                 144.0 * LevelPromotionCalc.calcCharacterRate(80, true), 1e-3);
 
-        // Intermediate tiers: record the current formula value, **and explicitly record its difference from the game table**
+        // Intermediate tiers: record the current formula value, and explicitly record its difference from the game table
         Assertions.assertEquals(6.85, LevelPromotionCalc.calcCharacterRate(70, true), 1e-9);
         Assertions.assertNotEquals(475.2 / 158.4,
                 LevelPromotionCalc.calcCharacterRate(70, true), 1e-6,
@@ -154,12 +154,12 @@ public class CharacterFactoryTest {
 
     /**
      * A latent bug fixed in P8-1: a low level combined with "ascended" once produced a
-     * **negative ascension**.
+     * negative ascension.
      *
      * <p>Originally Lv1 + {@code promotion=true} gave {@code promoteCount = 1/10 - 1 = -1}, a
-     * multiplier of 0.6 — so "ascended" actually pushed the level-1 panel down to 60% (Jing Yuan's
-     * HP 158.4 → 95.04).
-     * And 95.04 happens to be his **attack** value, so this bug looked like "attribute array index
+     * multiplier of 0.6 - so "ascended" actually pushed the level-1 panel down to 60% (Jing Yuan's
+     * HP 158.4 to 95.04).
+     * And 95.04 happens to be his attack value, so this bug looked like "attribute array index
      * misalignment" and was extremely easy to misdiagnose (I misdiagnosed it at first myself).
      *
      * <p>A level-1 character cannot have a negative ascension, so the lower bound is 0, and the Lv1
@@ -179,7 +179,7 @@ public class CharacterFactoryTest {
     }
 
     /**
-     * The unascended panel is **never higher than** the ascended one (at Lv70 it really is lower —
+     * The unascended panel is never higher than the ascended one (at Lv0 it really is lower - 
      * at Lv80 the two are the same, see the test above).
      */
     @Test
@@ -206,7 +206,7 @@ public class CharacterFactoryTest {
      * Full-table check of the identity fields of 5 real characters (values taken directly from
      * {@code character_data.json}).
      *
-     * <p>The element, path, aggro and energy of these 5 are deliberately made **pairwise different**,
+     * <p>The element, path, aggro and energy of these 5 are deliberately made pairwise different,
      * so one test covers several tiers.
      */
     @Test
@@ -219,12 +219,12 @@ public class CharacterFactoryTest {
     }
 
     /**
-     * Element parsing must be **case-insensitive**: {@code character_data.attribute} is all
+     * Element parsing must be case-insensitive: {@code character_data.attribute} is all
      * lowercase ({@code "thunder"}), whereas the {@code element} of {@code skills.json} is
      * capitalized ({@code "Thunder"}). Both spellings exist in the same data set.
      *
      * <p>Before the fix {@code fromString} was an exact match, so all-lowercase input
-     * **silently returned null** — the element field became null instead of raising an error.
+     * silently returned null - the element field became null instead of raising an error.
      */
     @Test
     public void elementParsingIsCaseInsensitive() {
@@ -236,7 +236,7 @@ public class CharacterFactoryTest {
         Assertions.assertEquals(DamageElement.QUANTUM, DamageElement.fromString("Quantum"));
         Assertions.assertEquals(DamageElement.QUANTUM, DamageElement.fromString("quantum"));
 
-        // Non-damaging skills are written "Unknown" in the data → must still be null, not become some element
+        // Non-damaging skills are written "Unknown" in the data to must still be null, not become some element
         Assertions.assertNull(DamageElement.fromString("Unknown"));
         Assertions.assertNull(DamageElement.fromString("unknown"));
         Assertions.assertNull(DamageElement.fromString(""));
@@ -245,7 +245,7 @@ public class CharacterFactoryTest {
 
     @Test
     public void identityFieldsAreCaseInsensitivelyParsedForEveryCharacter() {
-        // All 93 characters' attribute should parse to an element (only 7 elements exist in the data, all present)
+        // All 93 characters' attribute should parse to an element (only elements exist in the data, all present)
         com.laosun.aluminium.Constant.CHARACTERS.forEach((cid, data) -> {
             DamageElement element = DamageElement.fromString(data.attribute());
             Assertions.assertNotNull(element,
@@ -260,10 +260,10 @@ public class CharacterFactoryTest {
     /**
      * The three data boundaries of the energy cap:
      * <ul>
-     *   <li>1407 遐蝶 — the only {@code null} in the whole data set. **Must stay 0 (no energy bar)**;
+     *   <li>140遐蝶 - the only {@code null} in the whole data set. Must stay 0 (no energy bar);
      *       falling back to 100 would conjure an energy bar for her out of nothing;</li>
-     *   <li>1220 Feixiao — 12 (the ultimate only costs 6);</li>
-     *   <li>1308 Acheron — 9 (actually uses "stacks in place of an energy bar", see P8-8).</li>
+     *   <li>1220 Feixiao - 12 (the ultimate only costs 6);</li>
+     *   <li>1308 Acheron - 9 (actually uses "stacks in place of an energy bar", see P8-8).</li>
      * </ul>
      */
     @Test
@@ -295,7 +295,7 @@ public class CharacterFactoryTest {
     // ==================================================================
 
     /**
-     * Different level → different panel (level 1 and level 80).
+     * Different level to different panel (level 1 and level 80).
      */
     @Test
     public void levelChangesThePanel() {
@@ -311,7 +311,7 @@ public class CharacterFactoryTest {
     }
 
     /**
-     * The legacy placeholder entry point still works, but has **no** element (faithfully reflecting
+     * The legacy placeholder entry point still works, but has no element (faithfully reflecting
      * "this is not a character").
      *
      * <p>This also explains why new code after P8 should not use it any more.
@@ -327,7 +327,7 @@ public class CharacterFactoryTest {
     }
 
     /**
-     * Unknown cid → a self-explanatory exception; {@code exists} can be asked in advance.
+     * Unknown cid to a self-explanatory exception; {@code exists} can be asked in advance.
      */
     @Test
     public void unknownCharacterIsRejected() {
@@ -354,7 +354,7 @@ public class CharacterFactoryTest {
 
         Assertions.assertEquals(3, battle.queue.size(), "2 characters + 1 monster");
         Assertions.assertEquals(com.laosun.aluminium.Battle.Status.RUNNING, battle.getStatus());
-        // aggro comes from the data (Jing Yuan 75 / Seele 75), so the chance of being hit is even
+        // aggro comes from the data (Jing Yuan 5 / Seele 5), so the chance of being hit is even
         Assertions.assertEquals(75, battle.aggroOf(jingYuan));
         Assertions.assertEquals(75, battle.aggroOf(seele));
     }

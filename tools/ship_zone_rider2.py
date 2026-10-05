@@ -36,10 +36,10 @@ rules.append({
     "when": ["self has_state " + ZONE],
     "do": [{
         "op": "DAMAGE",
-        "scale": "owner_max_hp",                             # ⚠ the spelling the DAMAGE op reads (self_attr:HEALTH settled 1.0, measured)
-        "percent_from_skill_param": "ULTRA:2",               # × #3 of HIS OWN ultimate, at its own level
+        "scale": "owner_max_hp",                             # Note: the spelling the DAMAGE op reads (self_attr:HEALTH settled 1.0, measured)
+        "percent_from_skill_param": "ULTRA:2",               #  x  #3 of HIS OWN ultimate, at its own level
         "element": "Quantum",
-        "target": "highest_hp_attack_hit",                   # 「被攻击目标中当前生命值最高的目标」
+        "target": "highest_hp_attack_hit",                   # "被攻击目标中当前生命值最高的目标"
     }],
     "source": ("1403 缇宝 终结技 (140303)：「受到我方目标攻击后，**每有 1 名目标受到攻击**，"
                "会对**被攻击目标中当前生命值最高的目标**造成 1 次**等同于缇宝 #3% 生命上限**的"
@@ -79,7 +79,7 @@ import java.util.Random;
 /**
  * 1403 缇宝's zone deals its own additional damage (2026-10-02).
  *
- * <p>「受到我方目标攻击后，每有1名目标受到攻击，会对被攻击目标中当前生命值最高的目标造成 1 次等同于缇宝 #3% 生命上限的量子属性附加伤害。」
+ * <p>「受到我方目标攻击后，每有1名目标受到攻击，会对被攻击目标中当前生命值最高的目标造成 1 次等同于缇宝 #3% 生命上限的量子属性附加伤害。"
  *
  * <p>⭐ The two scenes differ by EXACTLY one thing: whether the rider's rule is on his table. The zone is open in both. An earlier version compared "zone closed" with
  * "zone open" and measured two effects at once -- the zone's 30% vulnerability lands on the ALLY's attack and does not follow 缇宝's level, so both deltas came out
@@ -111,7 +111,7 @@ public class ZoneAdditionalDamageTest {
         Assertions.assertTrue(rawAt80 > rawAtLow, "#3 x Max HP runs with level, which is what percent_from_skill_param reads");
     }
 
-    /** `#3 \\u00d7 Max HP` at a level, read the way the engine reads it. */
+    /** `#3 \\u00dMax HP` at a level, read the way the engine reads it. */
     private static double rawShare(int level) {
         Character tribbie = CharacterFactory.create(TRIBBIE, level);
         Skill ultra = tribbie.getSkills().get(SkillType.ULTRA);

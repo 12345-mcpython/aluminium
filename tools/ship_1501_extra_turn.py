@@ -44,7 +44,7 @@ rules.append({
 if isinstance(doc, dict):
     doc["rules"] = rules
 else:
-    doc = rules            # ⚠ 1501.json is a bare list (measured)
+    doc = rules            # Note: 1501.json is a bare list (measured)
 json.dump(doc, io.open(DATA, "w", encoding="utf-8", newline="\n"), ensure_ascii=False, indent=2)
 print("ok   1501.json: the Aha ending grants an extra turn")
 

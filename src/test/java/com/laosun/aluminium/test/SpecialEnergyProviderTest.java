@@ -20,21 +20,21 @@ import java.util.Random;
 import java.util.Set;
 
 /**
- * Special energy-provider characters use an **independent {@link EnergyProvider}**
+ * Special energy-provider characters use an independent {@link EnergyProvider}
  * ({@link NoConventionalEnergyProvider}).
  *
- * <p>Background: Feixiao 1220 / Acheron 1308 / Castorice 1407 / Phainon 1408 / Cyrene 1415 /
+ * <p>Background: Feixiao 1220 / Acheron 1308 / Castorice 140/ Phainon 1408 / Cyrene 1415 /
  * Silver Wolf LV.999 1506 accumulate, in the game, not energy but stacks / resources such as
- * 【新蕊】/【火种】/【追忆】.
+ * [新蕊]/[火种]/[追忆].
  *
  * <p>Why all 5 hooks MUST be blocked: {@code castUltra}'s threshold is
- * {@code currentEnergy >= maxEnergy}, and these characters' caps are very low (Acheron **9**,
- * Feixiao/Phainon **12**). If only the two skill hooks were plugged, they would fill up after taking
- * one or two hits and **cast an ultimate that should not exist** (slot 3 really is {@code Ultra}).
+ * {@code currentEnergy >= maxEnergy}, and these characters' caps are very low (Acheron 9,
+ * Feixiao/Phainon 12). If only the two skill hooks were plugged, they would fill up after taking
+ * one or two hits and cast an ultimate that should not exist (slot 3 really is {@code Ultra}).
  * This class is that guardrail.
  *
- * <p>Why the empty check does not live in {@link StandardEnergyProvider}: that is a **design
- * classification** rather than a single data fact, so per P8-0's three-way split it belongs to the
+ * <p>Why the empty check does not live in {@link StandardEnergyProvider}: that is a design
+ * classification rather than a single data fact, so per P8-0's three-way split it belongs to the
  * provider / assembly point (which is also the only place {@code cid} is allowed to appear).
  */
 public class SpecialEnergyProviderTest {
@@ -50,7 +50,7 @@ public class SpecialEnergyProviderTest {
     // 1. The provider itself
     // ==================================================================
 
-    /** All 5 hooks credit nothing — this is the complete expression of "no source should grant energy". */
+    /** All 5 hooks credit nothing - this is the complete expression of "no source should grant energy". */
     @Test
     public void specialProviderGrantsNothingFromAnySource() {
         Character any = CharacterFactory.create(1308, 80);      // Acheron
@@ -88,7 +88,7 @@ public class SpecialEnergyProviderTest {
         Assertions.assertEquals(5, standard.onBreak(regular, regular).amount(), EPS);
     }
 
-    /** The standard provider still uses the constants (20/30/5), matching ROADMAP P3-0's standard tier — it does not depend on skill data. */
+    /** The standard provider still uses the constants (20/30/5), matching ROADMAP P3-0's standard tier - it does not depend on skill data. */
     @Test
     public void standardProviderUsesTheConventionalConstants() {
         Character yaoGuang = CharacterFactory.create(1502, 80);   // Yao Guang: the basic-attack data says 30 (off-tier)
@@ -128,7 +128,7 @@ public class SpecialEnergyProviderTest {
     // ==================================================================
 
     /**
-     * The core: Acheron gains **not a single point of energy** from being hit.
+     * The core: Acheron gains not a single point of energy from being hit.
      *
      * <p>Her cap is only 9; before the fix one hit (+10) filled it and she could cast an ultimate
      * straight away.
@@ -192,7 +192,7 @@ public class SpecialEnergyProviderTest {
     }
 
     /**
-     * The 6 special characters have **energy constantly at 0** in a real battle (exhaustive, to avoid
+     * The 6 special characters have energy constantly at 0 in a real battle (exhaustive, to avoid
      * protecting only one of them).
      */
     @Test

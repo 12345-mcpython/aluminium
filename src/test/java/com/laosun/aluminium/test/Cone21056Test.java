@@ -17,7 +17,7 @@ import java.util.Random;
 /**
  * Light cone 21056: at battle start the WHOLE party deals 16% more BREAK damage.
  *
- * <p>★ Read through the real break path: {@code Battle.reduceToughness} returns the break damage it settled, so the judge
+ * <p>Read through the real break path: {@code Battle.reduceToughness} returns the break damage it settled, so the judge
  * compares a battle WITH the cone against one without -- the number a player would see, not an attribute value.
  */
 public class Cone21056Test {

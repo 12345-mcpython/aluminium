@@ -21,7 +21,7 @@ import java.util.Random;
 /**
  * `damage_is_attack`: "the instance being settled counts as an attack".
  *
- * <p>⭐ Its implementation was inverted (measured 2026-09-30 while shipping cone 23008): it returned the negation, so a
+ * <p>Its implementation was inverted (measured 2026-09-30 while shipping cone 23008): it returned the negation, so a
  * rule guarded by it fired on ADDITIONAL damage and never on a real attack. This test states the contract directly, both
  * ways, so the next inversion is caught by the condition's own judge rather than by a reader two steps away.
  */

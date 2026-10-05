@@ -17,15 +17,15 @@ import java.util.Random;
 /**
  * {@code HEAL} / {@code SHIELD} scaled by a Max HP, instead of a flat amount.
  *
- * <p><b>Why.</b> The game states most heals and shields as a share of somebody's Max HP — relic set 106's
- * 4-piece is 「恢复等同于生命上限 8% 的生命值」, and the skill-side loader has carried the same idea in
+ * <p><b>Why.</b> The game states most heals and shields as a share of somebody's Max HP - relic set 106's
+ * 4-piece is "恢复等同于生命上限 8% 的生命值", and the skill-side loader has carried the same idea in
  * {@code skill_effects.json}'s {@code scale} field since P10-3. The trigger table had only {@code amount}, so an
  * ability written that way could not be authored at all: the number is different for every character and every
  * level, which is exactly why writing one in the file would be wrong.
  *
  * <p>Two spellings, and the difference matters: {@code target_max_hp} is the <b>recipient's</b> bar (the relic's
  * case), {@code owner_max_hp} is the <b>healer's</b> (what the skill data calls {@code healer_max_hp}). The
- * per-recipient one is why the amount is computed inside the target loop rather than once — a party-wide heal
+ * per-recipient one is why the amount is computed inside the target loop rather than once - a party-wide heal
  * that restores 8% of <i>each ally's own</i> Max HP is not one number.
  */
 public class TriggerScaledHealTest {
@@ -112,8 +112,8 @@ public class TriggerScaledHealTest {
     /**
      * {@code scale} + {@code amount} is NOT a conflict: the amount is the flat addend.
      *
-     * <p>⚠ This case used to assert the opposite ("either a flat number or a share, not both"), and 1001 三月七's
-     * Skill is why it changed: 「抵消等同于三月七 57% 防御力 + 760 伤害的护盾」 is a share <b>plus</b> a constant, which
+     * <p>Note: This case used to assert the opposite ("either a flat number or a share, not both"), and 1001 三月七's
+     * Skill is why it changed: "抵消等同于三月七 5% 防御力 + 60 伤害的护盾" is a share <b>plus</b> a constant, which
      * the loader refused outright. Nothing shipped stated both (the refusal made that impossible), so allowing it
      * moved no existing content. What IS still refused is a {@code scale} with an {@code amount} and no
      * {@code percent} -- the scale names what the share is OF, so a missing share is a missing number.
@@ -153,7 +153,7 @@ public class TriggerScaledHealTest {
      *
      * <p>The unknown spelling used here is {@code healer_max_hp} on purpose: that is what
      * {@code skill_effects.json} calls the same idea, and the two vocabularies are deliberately not the same
-     * string — a trigger rule's owner may be shielding rather than healing, so the trigger table says
+     * string - a trigger rule's owner may be shielding rather than healing, so the trigger table says
      * {@code owner_max_hp} and the loader says {@code healer_max_hp}. A rule that copies the loader's spelling
      * gets told so instead of silently attaching nothing.
      */

@@ -28,7 +28,7 @@ RULE = "peerage_skill_extra_pierce"
 doc = json.load(io.open(DATA, encoding="utf-8"))
 rules = doc["rules"] if isinstance(doc, dict) else doc
 
-# ⭐ 2026-10-02, measured: the charge grant on the merit rule had NO `target`, so it fell to the cast's own target --
+# 2026-10-02, measured: the charge grant on the merit rule had NO `target`, so it fell to the cast's own target --
 # the ALLY -- while the document says "使刻律德菈获得 1 点充能" (SHE gains it). Five engine-side
 # hypotheses were eliminated before this one; the dead giveaway was a judge that read 1 no matter how often she cast.
 fixed = 0
@@ -46,7 +46,7 @@ for rule in rules:
                         "**并使刻律德菈获得 1 点充能**」✓ —— 充能应加**她** ✓。")
 if fixed > 1:
     raise SystemExit("expected at most one untargeted charge grant, fixed " + str(fixed))
-# ⚠ `fixed == 0` is the NORMAL case now: the untargeted charge grant was corrected in an earlier round, so this step is
+# Note: `fixed == 0` is the NORMAL case now: the untargeted charge grant was corrected in an earlier round, so this step is
 # idempotent and the guard must not demand a fix every time (it silently did nothing for a whole probe run).
 
 rules = [r for r in rules if not (isinstance(r, dict) and r.get("id") == RULE)]

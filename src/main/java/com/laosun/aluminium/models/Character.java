@@ -61,8 +61,8 @@ public class Character extends CanHit {
      * Character id (the key of {@code character_data.json}).
      *
      * <p>Why it exists: skill data is looked up by {@code cid} ({@code Constant.SKILLS.get(cid)}),
-     * and the overworld basic attack / technique are **attached only at battle start**
-     * (see {@code Battle#startBattle}) — by that moment the assembly point (装配点) is long gone,
+     * and the overworld basic attack / technique are attached only at battle start
+     * (see {@code Battle#startBattle}) - by that moment the assembly point (装配点) is long gone,
      * so the character has to remember its own id.
      */
     private int cid;
@@ -70,14 +70,14 @@ public class Character extends CanHit {
     /**
      * This character's own data id (its file name under {@code resources/characters/}) (2026-10-02).
      *
-     * <p>Reader: the {@code ally_cid:<cid>} selector -- 「德谬歌施放忆灵技时，使<b>风堇</b>获得2层…」 names a character, and nothing in the selector set could.
+     * <p>Reader: the {@code ally_cid:<cid>} selector -- "德谬歌施放忆灵技时，使<b>风堇</b>获得2层…" names a character, and nothing in the selector set could.
      */
     public int getCid() {
         return cid;
     }
 
     /**
-     * This character's mechanics, as data (P8-7).
+     * This character's mechanics, as data (P8-).
      *
      * <p>Never {@code null}: an unregistered character holds {@link TriggerTable#EMPTY}. That way
      * the interpreter treats "no mechanics" as a no-op instead of every call site null-checking, and
@@ -92,10 +92,10 @@ public class Character extends CanHit {
     /**
      * The weapon (light cone) equipped on this character.
      *
-     * <p>⚠ <b>Set this through the builder, not through {@code setWeapon}.</b> The stat-sheet
+     * <p>Note: <b>Set this through the builder, not through {@code setWeapon}.</b> The stat-sheet
      * pipeline consumes the weapon while {@code Builder#build()} runs (the calculator takes it as an
      * input), so assigning it to an <b>already-built</b> character changes this field but leaves the
-     * sheet stale — the cone would appear equipped while contributing nothing. Use
+     * sheet stale - the cone would appear equipped while contributing nothing. Use
      * {@code Character.builder().weapon(...)} or
      * {@link com.laosun.aluminium.utils.CharacterFactory#create(int, int, boolean, Weapon)}.
      *
@@ -118,7 +118,7 @@ public class Character extends CanHit {
      * This character's own aggro value ({@code aggro} in {@code character_data.json}).
      *
      * <p>It is the game multiplier itself (Preservation 150 / Destruction 125 / others 100 /
-     * Hunt · Erudition 75), so {@code Battle.aggroOf} prefers it and {@code path} only serves as the
+     * Hunt - Erudition 5), so {@code Battle.aggroOf} prefers it and {@code path} only serves as the
      * fallback when that data is absent. {@code 0} = no data.
      */
     private int aggro;
@@ -126,23 +126,23 @@ public class Character extends CanHit {
     /**
      * Attack element (P8-1): comes from {@code attribute} in {@code character_data.json}.
      *
-     * <p>⚠ That field is **all lowercase** ({@code "thunder"}), while {@code element} in
-     * {@code skills.json} is capitalized ({@code "Thunder"}) — so parsing goes through
+     * <p>Note: That field is all lowercase ({@code "thunder"}), while {@code element} in
+     * {@code skills.json} is capitalized ({@code "Thunder"}) - so parsing goes through
      * {@link DamageElement#fromString} (case-insensitive).
      *
      * <p>{@code null} = no data (this is the case for the placeholder characters made by
-     * {@code fromAttributes}). A placeholder having no element is a **faithful reflection** of the data;
+     * {@code fromAttributes}). A placeholder having no element is a faithful reflection of the data;
      * do not give it a fake element as a fallback.
      */
     private DamageElement element;
 
     /**
-     * How many Eidolon ranks (星魂) are active on this character: {@code 0}–{@code Constant.EIDOLON_MAX_RANK}.
+     * How many Eidolon ranks (星魂) are active on this character: {@code 0}-{@code Constant.EIDOLON_MAX_RANK}.
      *
      * <p><b>It is a construction-time property, like the relic suit.</b> The assembly point decides which ranks
      * are active and hands the number over; a trigger rule that belongs to an Eidolon says so with
      * {@code min_eidolon}, and the interpreter compares the two. So the engine never looks an Eidolon up by cid
-     * — the mechanics stay in {@code resources/characters/<cid>.json}, the same as talents and traces.
+     *  - the mechanics stay in {@code resources/characters/<cid>.json}, the same as talents and traces.
      *
      * <p>Which is also why {@code eidolons.json} is <b>reference material</b> rather than a loaded table: its
      * names, descriptions and parameters are what a rule's {@code source} and {@code note} cite, exactly like the
@@ -176,9 +176,9 @@ public class Character extends CanHit {
     /**
      * Creates a character directly from pre-computed attributes.
      *
-     * <p>⚠ <b>For tests / placeholders only; new code after P8 MUST NOT use it</b> (P8-1).
+     * <p>Note: <b>For tests / placeholders only; new code after P8 MUST NOT use it</b> (P8-1).
      * The characters it makes have no element, no path differences, an energy cap of 0, and skills that are
-     * all {@link DefaultSkill} placeholders — for a real character use
+     * all {@link DefaultSkill} placeholders - for a real character use
      * {@link com.laosun.aluminium.utils.CharacterFactory#create(int, int)}.
      */
     public static Character fromAttributes(Translate name, DoubleValue[] attributes) {
@@ -191,7 +191,7 @@ public class Character extends CanHit {
     /**
      * Build a placeholder character straight from attribute values (tests only).
      *
-     * <p>⚠ <b>New code after P8 MUST NOT use it</b>: the character it makes has no element, no path
+     * <p>Note: <b>New code after P8 MUST NOT use it</b>: the character it makes has no element, no path
      * differences, an energy cap of 0 (cannot cast an ultimate), and skills that are all
      * {@link DefaultSkill} placeholders.
      * For a real character use {@link com.laosun.aluminium.utils.CharacterFactory#create(int, int)}.
@@ -256,7 +256,7 @@ public class Character extends CanHit {
         private Path path;
 
         /**
-         * The character's trigger table (P8-7); defaults to the empty table, which means
+         * The character's trigger table (P8-); defaults to the empty table, which means
          * "no mechanics registered" -- an ordinary state, not an error.
          */
         private TriggerTable triggerTable = TriggerTable.EMPTY;
@@ -350,7 +350,7 @@ public class Character extends CanHit {
         }
 
         /**
-         * Attaches the character's trigger table (P8-7).
+         * Attaches the character's trigger table (P8-).
          *
          * <p>This is the assembly point for character mechanics: whoever builds the character (the
          * factories, or a test) decides which table it gets. The engine never looks a table up by
@@ -364,11 +364,11 @@ public class Character extends CanHit {
         }
 
         /**
-         * How many Eidolon ranks are active, {@code 0}–{@code Constant.EIDOLON_MAX_RANK}.
+         * How many Eidolon ranks are active, {@code 0}-{@code Constant.EIDOLON_MAX_RANK}.
          *
          * <p>Not validated here: {@code CharacterFactory.create} is the assembly point and refuses a rank
          * outside the range, so a hand-built character through this builder is the only way to set a nonsense
-         * value — and that is a test's business rather than the engine's.
+         * value - and that is a test's business rather than the engine's.
          */
         public Builder eidolonRank(int rank) {
             this.eidolonRank = rank;
@@ -393,9 +393,9 @@ public class Character extends CanHit {
             for (Map.Entry<SkillType, Integer> entry : skillLevel.entrySet()) {
                 SkillType type = entry.getKey();
                 int level = entry.getValue();
-                // P8-2: every slot resolves **its own** skill_id (previously it was always 1, so all six
+                // P8-2: every slot resolves its own skill_id (previously it was always 1, so all six
                 // slots had the basic attack's data).
-                // Only equip the "always-on character" slots: the overworld basic attack (6) / technique (7)
+                // Only equip the "always-on character" slots: the overworld basic attack (6) / technique ()
                 // are overworld skills attached by Battle.startBattle(); the summon slot belongs to memosprites
                 // (P9-4), so neither is equipped here.
                 if (!type.isIntrinsic()) {
@@ -418,11 +418,11 @@ public class Character extends CanHit {
             // P8-1: the element likewise comes from the character data (attribute is all lowercase; for the
             // parsing convention see DamageElement#fromString)
             character.setElement(DamageElement.fromString(characterData.attribute()));
-            // P8-1: the energy cap follows the data. **A null MUST stay 0 (= no energy bar); it must NOT fall
-            // back to 100** — 1407 遐蝶 is the only null in the whole data set, and a fallback would conjure
+            // P8-1: the energy cap follows the data. A null MUST stay 0 (= no energy bar); it must NOT fall
+            // back to 100 - 140遐蝶 is the only null in the whole data set, and a fallback would conjure
             // an energy bar for her out of thin air (P3-0 table A).
             character.setMaxEnergy(characterData.maxEnergy() != null ? characterData.maxEnergy() : 0);
-            // P8-7: the character's mechanics as data. Always non-null -- an unregistered character
+            // P8-: the character's mechanics as data. Always non-null -- an unregistered character
             // has the empty table, which is normal (the trigger interpreter treats it as a no-op and
             // Battle never has to null-check).
             character.setTriggerTable(triggerTable);

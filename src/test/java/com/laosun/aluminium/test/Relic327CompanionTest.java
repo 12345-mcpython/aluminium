@@ -17,10 +17,10 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Relic 327 (2026-09-30): 「进入战斗时，若装备者与另一名队友均为开拓同行角色，暴击伤害 +32%」.
+ * Relic 32(2026-09-30): "进入战斗时，若装备者与另一名队友均为开拓同行角色，暴击伤害 +32%".
  *
  * <p>The companion group is TWENTY ids (开拓者 has ten forms, 三月七 two), matched by character id -- never by name,
- * because 姬子 is a prefix of 姬子•启行. Membership has no data marker, so the set is transcribed from the docs; the
+ * because 姬子 is a prefix of 姬子-启行. Membership has no data marker, so the set is transcribed from the docs; the
  * mutation below removes one member and this test must notice.
  */
 public class Relic327CompanionTest {
@@ -51,7 +51,7 @@ public class Relic327CompanionTest {
         battle.startBattle();
         TriggerTable.TriggerContext ctx = new TriggerTable.TriggerContext(wearer, wearer, wearer, 0, 0, null,
                 battle, SkillCategory.UNSPECIFIED);
-        // ⚠ matching() EVALUATES the conditions; apply() does not. The first version of this test used apply() and
+        // Note: matching() EVALUATES the conditions; apply() does not. The first version of this test used apply() and
         // was therefore blind to a change in the companion set -- measured, not assumed.
         Assertions.assertEquals(1, RelicTriggerTables.of(327).at(2).matching(TriggerEvent.BATTLE_START, ctx).size(),
                 "two companions must match");

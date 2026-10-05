@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1208 Fu Xuan, from her own file (2026-09-29, round 214): the team-wide damage reduction of 【避厄】 and the two numbers 【鉴知】 hands out.
+ * 1208 Fu Xuan, from her own file (2026-09-29, round 214): the team-wide damage reduction of [避厄] and the two numbers [鉴知] hands out.
  */
 public class FuXuanTest {
     private static final int FUXUAN = 1208;
@@ -26,7 +26,7 @@ public class FuXuanTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** ⚠ 【避厄】's 18% reduction, in the measured convention: damage x (1 - 0.18), compared with a hand-built -36% rule. */
+    /** Note: [避厄]'s 18% reduction, in the measured convention: damage x (1 - 0.18), compared with a hand-built -36% rule. */
     @Test
     public void misfortuneAvoidanceCutsTheDamageTheTeamTakes() {
         double plain = hitLoss(false);
@@ -40,7 +40,7 @@ public class FuXuanTest {
                 "18% against a hand-built 36% must be half the reduction");
     }
 
-    /** ⚠ 【鉴知】: 6% of HER max HP as extra max HP, and +12% crit rate, on an ally. */
+    /** Note: [鉴知]: 6% of HER max HP as extra max HP, and +12% crit rate, on an ally. */
     @Test
     public void knowledgeRaisesMaxHpByHerShareAndCritRate() {
         Character fuxuan = CharacterFactory.create(FUXUAN, LEVEL);

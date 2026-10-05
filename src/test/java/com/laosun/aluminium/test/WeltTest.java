@@ -16,11 +16,11 @@ import java.util.Random;
 /**
  * 1004 Welt, from his own file (2026-09-28, round 143): the ultimate's Imprison and the level convention.
  *
- * <p>⚠ The target is hand-made with no resistances on purpose: the project's fixture monster is immune to controls
+ * <p>Note: The target is hand-made with no resistances on purpose: the project's fixture monster is immune to controls
  * (round 131 measured `STAT_CTRL_Frozen` at 1.0, which clamps the chance to 0). A 100% BASE chance still rolls, so an
  * unresisting target is what makes this deterministic.
  *
- * <p>Registered in his file: the bounce (an engine bug today), the speed-down roll, 【失重】, the 减速-gated talent, his
+ * <p>Registered in his file: the bounce (an engine bug today), the speed-down roll, [失重], the 减速-gated talent, his
  * traces and eidolons.
  */
 public class WeltTest {
@@ -60,7 +60,7 @@ public class WeltTest {
         }
     }
 
-    /** ⚠ Bounce: his skill's own damage must land at all (it computed zero hits before the round-170 fix). */
+    /** Note: Bounce: his skill's own damage must land at all (it computed zero hits before the round-10 fix). */
     @Test
     public void hisSkillActuallyDealsDamage() {
         Fixture f = new Fixture();

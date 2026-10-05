@@ -18,7 +18,7 @@ import java.util.Random;
 /**
  * Light cone 23025: break damage collapses the target -- it then takes 24% more break damage from the wearer and is 20% slower.
  *
- * <p>⭐ Read with {@code stacksOf}, NOT {@code hasState}: this debuff is a stack, and the engine answers &quot;is that state on you&quot;
+ * <p>Read with {@code stacksOf}, NOT {@code hasState}: this debuff is a stack, and the engine answers &quot;is that state on you&quot;
  * only for the state kind -- measured on one firing, {@code stacksOf=1} while {@code hasState=false}.
  */
 public class Cone23025Test {
@@ -57,7 +57,7 @@ public class Cone23025Test {
         System.out.println("[23025] collapse stacks=" + collapse + " (hasState="
                 + enemy.getBuffManager().hasState(COLLAPSE) + ") ; speed " + speedBefore + " -> " + speedAfter);
         Assertions.assertEquals(1, collapse, "造成击破伤容时 collapses the target");
-        // ★ The AMOUNT, not just the direction (discipline 200): the enemy carries no other speed modifier, so the slow
+        // The AMOUNT, not just the direction (discipline 200): the enemy carries no other speed modifier, so the slow
         // is exactly a fifth of it. `speedAfter < speedBefore` survives a `20 -> 10 percent` mutation -- measured, 0 red.
         Assertions.assertEquals(0.8, speedAfter / speedBefore, 1e-9, "20% slower, as a share of its own speed");
     }

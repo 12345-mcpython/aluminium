@@ -18,7 +18,7 @@ SE = "src/main/resources/data/skill_effects.json"
 SKILLS = "src/main/resources/data/skills.json"
 SLOT = 23
 
-# ⭐ the mark's own name, taken from the file that APPLIES it -- no second spelling
+# the mark's own name, taken from the file that APPLIES it -- no second spelling
 doc = json.load(io.open(CERYDRA, encoding="utf-8"))
 rules = doc if isinstance(doc, list) else doc.get("rules", [])
 marks = []
@@ -28,7 +28,7 @@ for r in rules:
             marks.append(e["buff"])
 if not marks:
     sys.exit("REFUSING: 1412 applies no named mark to read")
-# ⭐ The sentence names its mark: 「持有【军功】的角色」 -- so the mark is looked up BY THAT NAME rather than guessed from a list.
+# The sentence names its mark: "持有[军功]的角色" -- so the mark is looked up BY THAT NAME rather than guessed from a list.
 WANTED = "军功"
 print("1412's named marks: %d ; the sentence's own:「%s」" % (len(set(marks)), WANTED))
 if WANTED not in marks:

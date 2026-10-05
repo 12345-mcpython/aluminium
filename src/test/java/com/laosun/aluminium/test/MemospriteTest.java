@@ -28,19 +28,19 @@ import java.util.Random;
  * 忆灵 (memosprite) panels: a summon whose stat block is <b>derived from its summoner</b> (P9-4).
  *
  * <p><b>Why the panel is data, and why it is stated as an inheritance.</b> Every memosprite in the documents
- * is described that way — 「等同于阿格莱雅 35% 速度的速度以及等同于阿格莱雅 66% 生命上限 + 720 的生命上限」,
- * 「初始拥有 160 点速度，生命上限为长夜月的 50%」 — and the ratios differ per character. Absolute numbers here
+ * is described that way - "等同于阿格莱雅 35% 速度的速度以及等同于阿格莱雅 66% 生命上限 + 20 的生命上限",
+ * "初始拥有 160 点速度，生命上限为长夜月的 50%" - and the ratios differ per character. Absolute numbers here
  * would be wrong at every level and would go stale the moment the summoner changed a light cone or a relic,
  * so the spec says <em>how to derive</em> each attribute and the engine reads the summoner's resolved sheet.
  *
  * <p><b>What these cases are guarding.</b>
  * <ol>
  *   <li>the share is taken from the summoner's <b>current</b> sheet, not from a snapshot or from monster
- *       data — the case changes her speed and HP and expects the memosprite to follow;</li>
- *   <li>the flat term is added after the share (阿格莱雅's 720), and a flat-only entry is
+ *       data - the case changes her speed and HP and expects the memosprite to follow;</li>
+ *   <li>the flat term is added after the share (阿格莱雅's 20), and a flat-only entry is
  *       <b>not</b> a share of anything (长夜月's fixed 160 speed);</li>
  *   <li>a panel entry <b>replaces</b> an attribute rather than adding to it, so a spec that forgets HEALTH
- *       or SPEED describes a unit that cannot exist — rejected at load, not at battle time;</li>
+ *       or SPEED describes a unit that cannot exist - rejected at load, not at battle time;</li>
  *   <li>the memosprite is our side's, so it lands in {@code allies} and never in {@code characters}
  *       (the camp split its placement depends on).</li>
  * </ol>
@@ -48,11 +48,11 @@ import java.util.Random;
 public class MemospriteTest {
     private static final double EPS = 1e-6;
 
-    /** 阿格莱雅 — 衣匠's panel is two shares; her id is used by no other test. */
+    /** 阿格莱雅 - 衣匠's panel is two shares; her id is used by no other test. */
     private static final int AGLAEA = 1402;
-    /** 长夜月 — 「长夜」's panel is one share and one flat value. */
+    /** 长夜月 - "长夜"'s panel is one share and one flat value. */
     private static final int CASTORICE_LIKE = 1413;
-    /** 姬子 — a character with no memosprite, used for the "absent is an ordinary state" cases. */
+    /** 姬子 - a character with no memosprite, used for the "absent is an ordinary state" cases. */
     private static final int NO_MEMOSPRITE = 1003;
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
@@ -62,7 +62,7 @@ public class MemospriteTest {
     // ==================================================================
 
     /**
-     * 衣匠's panel is 阿格莱雅's, per her own text: 35% of her speed, 66% of her Max HP plus 720.
+     * 衣匠's panel is 阿格莱雅's, per her own text: 35% of her speed, 66% of her Max HP plus 20.
      *
      * <p>The flat term is the point of the second assertion: a share alone would be a different number at
      * every level, and the game's own figure has a constant in it.
@@ -83,7 +83,7 @@ public class MemospriteTest {
     }
 
     /**
-     * It follows the summoner's <b>current</b> sheet — equipment included.
+     * It follows the summoner's <b>current</b> sheet - equipment included.
      *
      * <p>Two readings of the same character with different stats must give two different memsprites. This is
      * what makes "derive it" different from "write the numbers down", and it is the reason the spec holds
@@ -169,7 +169,7 @@ public class MemospriteTest {
     /**
      * Summoning twice keeps <b>one</b> memosprite, and a dead one can be replaced.
      *
-     * <p>Two copies of the same memosprite would be a wrong state with nothing to see — two units where the
+     * <p>Two copies of the same memosprite would be a wrong state with nothing to see - two units where the
      * player sees one. The documents say "if it is already present, restore it to full HP"; that refresh is
      * <em>not</em> modelled, and doing nothing is the honest stand-in until it is.
      */
@@ -193,7 +193,7 @@ public class MemospriteTest {
         Assertions.assertEquals(3, battle.allies.size(), "and the dead one stays in the roster, as corpses do");
     }
 
-    /** The summoner falling takes it along — the same lifecycle the monster-side summons have. */
+    /** The summoner falling takes it along - the same lifecycle the monster-side summons have. */
     @Test
     public void theSummonersDeathTakesTheMemospriteAlong() {
         Character aglaea = CharacterFactory.create(AGLAEA, LEVEL);
@@ -216,7 +216,7 @@ public class MemospriteTest {
     /**
      * A memosprite is 25% more attractive to the enemy than an ordinary unit, because the document says so.
      *
-     * <p>「ServantID 11413 · 仇恨: 125」 is a line the servant block states for itself; without it every summon sat at
+     * <p>"ServantID 11413 - 仇恨: 125" is a line the servant block states for itself; without it every summon sat at
      * {@code Battle.aggroOf}''s 100 fallback, i.e. an enemy picked its target as if the memosprite were just
      * another character. Asserted against a unit that states nothing, so the two numbers mean something.
      */
@@ -258,19 +258,19 @@ public class MemospriteTest {
     }
 
     // ==================================================================
-    // 2c. 忆灵技能 2: 「长夜」免疫控制类负面状态
+    // 2c. 忆灵技能 2: "长夜"免疫控制类负面状态
     // ==================================================================
 
     /**
-     * 「「长夜」免疫控制类负面状态」 — the <b>summon</b> is immune, and the summoner is not.
+     * "'长夜'免疫控制类负面状态" - the <b>summon</b> is immune, and the summoner is not.
      *
      * <p><b>Why the pair of assertions.</b> "The control did not land" is also what a broken pipeline looks like, so
      * the same call is made against 长夜月 herself: it lands there. The difference is the only thing that can be the
      * immunity, and the immunity is a buff on the unit the document names.
      *
-     * <p>⚠ Note which unit carries it. The rule is written on 长夜月's table (the engine's tables live on characters)
-     * but its effect targets {@code summon}, because 「长夜」 is the one the sentence protects — a control aimed at her
-     * while 「长夜」 stands beside her is unaffected.
+     * <p>Note: Note which unit carries it. The rule is written on 长夜月's table (the engine's tables live on characters)
+     * but its effect targets {@code summon}, because "长夜" is the one the sentence protects - a control aimed at her
+     * while "长夜" stands beside her is unaffected.
      */
     @Test
     public void theMemospriteIsImmuneToControlsAndItsSummonerIsNot() {
@@ -295,7 +295,7 @@ public class MemospriteTest {
                         + "control path that quietly stopped working");
     }
 
-    /** The class is 控制类: 「长夜」's immunity must not make it immune to a burn (持续伤害类). */
+    /** The class is 控制类: "长夜"'s immunity must not make it immune to a burn (持续伤害类). */
     @Test
     public void theMemospriteIsStillBurnable() {
         Character evernight = CharacterFactory.create(CASTORICE_LIKE, LEVEL);
@@ -463,7 +463,7 @@ public class MemospriteTest {
         };
     }
 
-    /** 冻结 from the game's own control table — the state 「长夜」 is immune to. */
+    /** 冻结 from the game's own control table - the state "长夜" is immune to. */
     private static ControlBuff frozen() {
         return new ControlBuff(Constant.CONTROL_EFFECTS.get("FROZEN"), 2);
     }

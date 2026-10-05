@@ -26,7 +26,7 @@ public class PerStackLiveTest {
     private static final int MONSTER = 1002011;
     private static final String COUNTER = "probeCharge";
 
-    /** One stack, then five: the same attached aura yields 14% and then 70%. */
+    /** One stack, then five: the same attached aura yields 14% and then 0%. */
     @Test
     public void theAuraFollowsTheCounter() {
         Character owner = CharacterFactory.create(OWNER, LEVEL, false, null, null, 0);
@@ -56,7 +56,7 @@ public class PerStackLiveTest {
         double oneShare = (oneStack - base) / base;
         double fiveShare = (fiveStacks - base) / base;
         System.out.println("[per_stack_live] five stacks -> " + fiveStacks + " share=" + fiveShare);
-        // ⚠ The absolute share carries an unrelated offset from this unit's own modifiers (measured 0.18), so the reading
+        // Note: The absolute share carries an unrelated offset from this unit's own modifiers (measured 0.18), so the reading
         // is the DELTA: four more stacks have to be four more 14% shares, with nothing re-attached in between.
         Assertions.assertEquals(0.14 * 4, fiveShare - oneShare, 1e-6,
                 "the aura has to follow the count, with nothing re-attached");

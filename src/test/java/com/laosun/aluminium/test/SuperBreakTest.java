@@ -17,11 +17,11 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * The pair the biggest remaining family needs (2026-09-28): the <b>「弱点击破状态」</b> condition and the
- * <b>toughness→super-break conversion</b> ({@code SUPER_BREAK}).
+ * The pair the biggest remaining family needs (2026-09-28): the <b>"弱点击破状态"</b> condition and the
+ * <b>toughness to super-break conversion</b> ({@code SUPER_BREAK}).
  *
- * <p>「对处于<b>弱点击破状态</b>的敌方目标造成伤害后，会将本次伤害的<b>削韧值</b>转化为 1 次 X% 的超击破伤害」 (1321's clauses, and the
- * half of 8006's ultimate that was registered) — neither half has a reader without the other, which is why they landed
+ * <p>"对处于<b>弱点击破状态</b>的敌方目标造成伤害后，会将本次伤害的<b>削韧值</b>转化为 1 次 X% 的超击破伤害" (1321's clauses, and the
+ * half of 8006's ultimate that was registered) - neither half has a reader without the other, which is why they landed
  * together.
  *
  * <p><b>What is pinned here.</b> That breaking really flips the state on and off, that the conversion lands exactly on
@@ -46,7 +46,7 @@ public class SuperBreakTest {
                 "…and a character is never in it");
     }
 
-    /** ⚠ The conversion lands on a broken target and nowhere else. */
+    /** Note: The conversion lands on a broken target and nowhere else. */
     @Test
     public void theConversionLandsOnlyOnBrokenTargets() {
         double plain = damageWith(false, rule(2.0));
@@ -60,7 +60,7 @@ public class SuperBreakTest {
                 "against a broken target the same attack is followed by the converted super-break instance");
     }
 
-    /** ⚠ The magnitude is the instance's toughness reduction, not its damage: doubling the percentage doubles the extra. */
+    /** Note: The magnitude is the instance's toughness reduction, not its damage: doubling the percentage doubles the extra. */
     @Test
     public void theConversionScalesWithTheStanceValue() {
         double once = damageWith(true, rule(1.0));
@@ -72,7 +72,7 @@ public class SuperBreakTest {
                         + "in both runs)");
     }
 
-    /** ⚠ The op is refused anywhere but DEALING_DAMAGE: it reads the instance being settled. */
+    /** Note: The op is refused anywhere but DEALING_DAMAGE: it reads the instance being settled. */
     @Test
     public void theOpIsRefusedOnOtherEvents() {
         EffectSpec effect = new EffectSpec();
@@ -116,8 +116,8 @@ public class SuperBreakTest {
     private static Char strongEnemy() {
         Character hero = CharacterFactory.create(CID, LEVEL);
         DamageElement element = hero.getSkills().get(SkillType.COMMON).getData().getElement();
-        // ⚠ The candidate is BROKEN by this fixture, so it has to survive its own break damage: an earlier version
-        // took the first element-weak id and happened to survive by a narrow margin (break base 31037 against 16498
+        // Note: The candidate is BROKEN by this fixture, so it has to survive its own break damage: an earlier version
+        // took the first element-weak id and happened to survive by a narrow margin (break base 3103against 16498
         // Max HP), which made the test fail the moment anything raised that damage -- e.g. a 20% resistance reduction,
         // measured 2026-09-29 (the fixture's hero is 1321, whose aura reduces enemies' resistance). Picking the
         // element-weak candidate with the LARGEST Max HP is what makes the fixture say what it means.

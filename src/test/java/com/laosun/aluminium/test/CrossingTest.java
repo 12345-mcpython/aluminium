@@ -16,10 +16,10 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * The threshold CROSSING (2026-09-29, round 181): 「生命值百分比降到50%或以下时」 fires once, not on every later hit.
+ * The threshold CROSSING (2026-09-29, round 181): "生命值百分比降到50%或以下时" fires once, not on every later hit.
  *
  * <p>The pair is the measurement: damage that takes the ally from above half to below it heals him, while damage to an ally who is ALREADY below half
- * does not — the second case is what `target_hp_percent_before` exists for.
+ * does not - the second case is what `target_hp_percent_before` exists for.
  */
 public class CrossingTest {
     private static final int LUOCHA = 1203;
@@ -27,7 +27,7 @@ public class CrossingTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** ⚠ Crossing from above half to below it triggers the heal. */
+    /** Note: Crossing from above half to below it triggers the heal. */
     @Test
     public void aCrossingTriggersTheHeal() {
         Character luocha = CharacterFactory.create(LUOCHA, LEVEL);
@@ -46,7 +46,7 @@ public class CrossingTest {
                 "「当我方任意单体当前生命值百分比降到50%或以下时，罗刹会立即对其触发一次等同于战技的效果」 -- after the crossing he must be back above half: " + (ally.getCurrentHp() / ally.getMaxHp()));
     }
 
-    /** ⚠ The control: hitting someone who is ALREADY below half is not a crossing. */
+    /** Note: The control: hitting someone who is ALREADY below half is not a crossing. */
     @Test
     public void damageBelowTheThresholdIsNotACrossing() {
         Character luocha = CharacterFactory.create(LUOCHA, LEVEL);
@@ -60,7 +60,7 @@ public class CrossingTest {
         }
         Assertions.assertFalse(ally.isDeath(), "the fixture must be alive");
         double below = ally.getCurrentHp();
-        // ⚠ Honest scope: by now the crossing has already fired (that is asserted above) and `cooldown: 2` blocks the rule, so what this case
+        // Note: Honest scope: by now the crossing has already fired (that is asserted above) and `cooldown: 2` blocks the rule, so what this case
         // measures is the COOLDOWN, not the `target_hp_percent_before` half of the condition. The crossing case is what verifies the trigger itself.
         Assertions.assertTrue(below / ally.getMaxHp() < 0.5 || below > 0,
                 "the fixture must be below half or already healed by the crossing: " + (below / ally.getMaxHp()));

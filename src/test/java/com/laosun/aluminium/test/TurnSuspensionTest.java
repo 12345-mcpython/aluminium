@@ -19,15 +19,15 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 「【协奏】状态结束前<b>不会进入自己的回合</b>且无法行动」: a state that makes the unit's turns <b>pass without it</b> (2026-09-28).
+ * "[协奏]状态结束前<b>不会进入自己的回合</b>且无法行动": a state that makes the unit's turns <b>pass without it</b> (2026-09-28).
  *
  * <p><b>Why it is not a control.</b> {@code ControlBuff} stops a unit from <i>acting</i> but still lets the turn
- * arrive — its DOTs tick and its turn-based buffs count down. 「不会进入自己的回合」 is a different sentence: the turn
+ * arrive - its DOTs tick and its turn-based buffs count down. "不会进入自己的回合" is a different sentence: the turn
  * itself does not happen, which is exactly what lets 知更鸟's countdown act <b>in her place</b>. Modelling one as the
- * other would silently change every 「被冻结仍会掉血」 reading in the corpus.
+ * other would silently change every "被冻结仍会掉血" reading in the corpus.
  *
  * <p><b>What is pinned here.</b> That a suspended unit takes no turn (no {@code TURN_START}, no DOT settlement), that
- * the flag rides on the state it belongs to (removing the state gives the turns back — no second switch to forget),
+ * the flag rides on the state it belongs to (removing the state gives the turns back - no second switch to forget),
  * and that everybody else is unaffected.
  */
 public class TurnSuspensionTest {
@@ -52,7 +52,7 @@ public class TurnSuspensionTest {
                 "…and the burn on her did not tick either");
     }
 
-    /** ⚠ Everyone else is untouched: the flag is about the carrier, not about the battle. */
+    /** Note: Everyone else is untouched: the flag is about the carrier, not about the battle. */
     @Test
     public void everybodyElseStillActs() {
         Fixture f = new Fixture();
@@ -64,7 +64,7 @@ public class TurnSuspensionTest {
         Assertions.assertTrue(f.attack(f.ally) > attackBefore, "the ally's own turn is normal");
     }
 
-    /** ⚠ The flag rides on the state: removing the state gives the turns back, with no second switch to forget. */
+    /** Note: The flag rides on the state: removing the state gives the turns back, with no second switch to forget. */
     @Test
     public void removingTheStateGivesTheTurnsBack() {
         Fixture f = new Fixture();
@@ -134,7 +134,7 @@ public class TurnSuspensionTest {
         return TriggerSpecs.rule(TriggerEvent.TURN_START.value(), null, effect);
     }
 
-    /** 「【协奏】状态结束前不会进入自己的回合」 as the data spells it. */
+    /** "[协奏]状态结束前不会进入自己的回合" as the data spells it. */
     private static TriggerSpec suspendingState() {
         EffectSpec effect = new EffectSpec();
         TriggerSpecs.set(effect, "op", "APPLY_BUFF");

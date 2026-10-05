@@ -13,8 +13,8 @@ import com.laosun.aluminium.models.event.HpLossEvent;
  * the reaction fired far too often when both sides wore one, based on a measurement showing an enemy lose
  * 5902 where one attack explained 260. <b>There was no defect: that measurement was taken after an extra
  * attack</b>, so it quietly included a second exchange. Re-measured with a trace, both sides wearing a
- * counter and exactly one attack produce one bounded exchange — the enemy takes the attack (260.24), the
- * hero takes the counter (237.23), and the answering counter is refused.
+ * counter and exactly one attack produce one bounded exchange - the enemy takes the attack (260.24), the
+ * hero takes the counter (23.23), and the answering counter is refused.
  *
  * <p>The lesson outlives the retraction: the test that "failed to verify the guard" watched the
  * <b>hero's</b> HP, which is identical whether or not the chain is bounded, so it could not see the
@@ -22,14 +22,14 @@ import com.laosun.aluminium.models.event.HpLossEvent;
  * suspect the choice of observable before concluding the engine is wrong.
  *
  * <p><b>Which hook, and why it is not the obvious one.</b> {@code DamageEvent.onDamage} runs
- * <i>before</i> a hit is settled and exists to inject damage zones into that hit — a counter needs the
+ * <i>before</i> a hit is settled and exists to inject damage zones into that hit - a counter needs the
  * moment <i>after</i> the hit landed, which is {@link HpLossEvent#onHpLoss}. That hook also hands over
  * {@code source}, the one who caused the instance, which is exactly the counter's target ("the entity
  * that cast the skill", not necessarily the character itself).
  *
  * <p><b>Generic on purpose.</b> Nothing here is enemy-specific: it is introduced for boss mechanics
  * (P9-5) but a character could carry it too, and it deliberately does not duplicate the follow-up shape
- * that {@code TriggerInterpreter}'s {@code DAMAGE} op already expresses — both end up in
+ * that {@code TriggerInterpreter}'s {@code DAMAGE} op already expresses - both end up in
  * {@link Battle#applyAdditionalDamage}, so a counter is {@code ADDITIONAL} damage that
  * <b>does not count as an attack</b> (the victim gains no energy, no toughness is reduced).
  *
@@ -37,7 +37,7 @@ import com.laosun.aluminium.models.event.HpLossEvent;
  * {@code removeBuff} are empty because the buff only reacts. It does need to be attached, which is how
  * {@code BuffManager.onHpLoss} reaches it.
  *
- * <p>⚠ <b>Recursion</b> is handled by {@link Battle#runCounter}: two units wearing a counter would
+ * <p>Note: <b>Recursion</b> is handled by {@link Battle#runCounter}: two units wearing a counter would
  * otherwise hit each other forever, and this path is not covered by
  * {@code Battle}'s trigger-depth guard. See that method for why.
  */
@@ -54,7 +54,7 @@ public class CounterMechanic extends AbstractBuff implements HpLossEvent {
      * @param duration turns the counter stays attached
      * @param element  damage element of the counter; {@code null} = physical (a counter with no element
      *                 would silently skip the element boost zone)
-     * @param ratio    counter damage = wearer's ATK × this
+     * @param ratio    counter damage = wearer's ATK  x  this
      */
     public CounterMechanic(int duration, DamageElement element, double ratio) {
         super(duration, false);
@@ -95,7 +95,7 @@ public class CounterMechanic extends AbstractBuff implements HpLossEvent {
      * Hits the attacker back when the wearer really loses HP.
      *
      * <p>Not fired when there is nobody to counter ({@code source == null}, e.g. a DOT whose applier has
-     * died), when the wearer hit themselves, or once either side is down — a corpse does not counter, and
+     * died), when the wearer hit themselves, or once either side is down - a corpse does not counter, and
      * hitting a corpse is pointless.
      *
      * <p>{@code target} is the wearer (this is its own buff), so it is read from the parameter rather than
@@ -104,7 +104,7 @@ public class CounterMechanic extends AbstractBuff implements HpLossEvent {
     @Override
     public void onHpLoss(Battle battle, CanHit target, double before, double after,
                          CanHit source, double amount) {
-        // ⚠ Only react to MY OWN loss. Battle.broadcastHpLoss dispatches to both parties' buffs, so
+        // Note: Only react to MY OWN loss. Battle.broadcastHpLoss dispatches to both parties' buffs, so
         // without this check a counter attached to A would also fire when B loses HP -- and it would
         // counter on A's behalf using the wrong attacker/defender pair. Caught by
         // BossMechanicTest.aMutualPairOfCountersDoesNotEscalate, which saw more than one counter's worth

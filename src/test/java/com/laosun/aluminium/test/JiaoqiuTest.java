@@ -13,17 +13,17 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1218 Jiaoqiu, from his own file (2026-09-29, round 201): 【烬煨】's capped stacks and the Burn equivalence, both of whose numbers the document states.
+ * 1218 Jiaoqiu, from his own file (2026-09-29, round 201): [烬煨]'s capped stacks and the Burn equivalence, both of whose numbers the document states.
  *
  * <p>The cap is tested by EXCEEDING it (round 192's lesson): seven applications must still read five. And `hasState` resolves the engine's DOT states, so the Burn the
- * talent's second sentence creates is askable — which is why it is asserted rather than assumed.
+ * talent's second sentence creates is askable - which is why it is asserted rather than assumed.
  */
 public class JiaoqiuTest {
     private static final int JIAOQIU = 1218;
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** ⚠ Seven applications, five layers (the document's cap), and the Burn state alongside it. */
+    /** Note: Seven applications, five layers (the document's cap), and the Burn state alongside it. */
     @Test
     public void theStacksStopAtFiveAndTheBurnIsReal() {
         Character jiaoqiu = CharacterFactory.create(JIAOQIU, LEVEL);
@@ -42,7 +42,7 @@ public class JiaoqiuTest {
         // and this rule applies a Fire DoT. Registered as an open question rather than asserted falsely or deleted silently.
     }
 
-    /** ⚠ The technique's opening: the AoE and a stack, only when the technique was declared. */
+    /** Note: The technique's opening: the AoE and a stack, only when the technique was declared. */
     @Test
     public void theTechniqueHitsAndStacksOnlyWhenDeclared() {
         Character jiaoqiu = CharacterFactory.create(JIAOQIU, LEVEL);

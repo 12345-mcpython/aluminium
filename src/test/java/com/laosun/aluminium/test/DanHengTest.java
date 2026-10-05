@@ -20,7 +20,7 @@ import java.util.Random;
  *
  * <p>Everything it needs already existed: `SKILL_CAST` carries the aim (so `target == self` means "I was the one aimed at"),
  * `actor is_ally` says who cast it, `DAMAGE_PENETRATION` is the engine's name for 抗性穿透, `until: next_attack` is the duration the
- * sentence asks for, and `cooldown` is the rule-level field for 「2回合后可再次触发」.
+ * sentence asks for, and `cooldown` is the rule-level field for "2回合后可再次触发".
  */
 public class DanHengTest {
     private static final int DANHENG = 1002;
@@ -28,7 +28,7 @@ public class DanHengTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** ⚠ An ally's skill aimed at him raises his penetration; a skill aimed elsewhere does not. */
+    /** Note: An ally's skill aimed at him raises his penetration; a skill aimed elsewhere does not. */
     @Test
     public void anAllysSkillAimedAtHimRaisesHisPenetration() {
         Fixture f = new Fixture();
@@ -41,7 +41,7 @@ public class DanHengTest {
                         + before + " -> " + f.danheng.getAttribute(AttributeType.DAMAGE_PENETRATION).get());
     }
 
-    /** ⚠ The control: an ally's skill aimed at someone ELSE must leave his penetration alone. */
+    /** Note: The control: an ally's skill aimed at someone ELSE must leave his penetration alone. */
     @Test
     public void anAllysSkillAimedElsewhereLeavesItAlone() {
         Fixture f = new Fixture();

@@ -19,10 +19,10 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Scoped DMG boosts (P10-4): 「普攻 / 战技 / 终结技 造成的伤害提高 X%」.
+ * Scoped DMG boosts (P10-4): "普攻 / 战技 / 终结技 造成的伤害提高 X%".
  *
  * <p><b>Why this needed engine work at all.</b> A basic attack and a skill are both
- * {@code DamageType.NORMAL}, so the damage <i>type</i> cannot say which one produced an instance — which is
+ * {@code DamageType.NORMAL}, so the damage <i>type</i> cannot say which one produced an instance - which is
  * why relic set 131's "the DMG dealt by their Skill and Ultimate increases by 18%" was registered as
  * unmodelled for exactly this reason. The fact is now carried explicitly: {@code SkillExecutor} puts the
  * cast's {@link SkillCategory} onto the instance and {@code Battle.assemble} asks
@@ -30,7 +30,7 @@ import java.util.Random;
  *
  * <p><b>The property under test is "scoped", not "bigger".</b> Each case therefore checks both halves: the
  * matching cast is raised by exactly the stated percentage, <b>and</b> the other casts are untouched. A
- * wiring that boosted everything would satisfy the first half alone — and would be the silent
+ * wiring that boosted everything would satisfy the first half alone - and would be the silent
  * over-application this project treats as the worst failure mode.
  *
  * <p>Crit is forced to 0 in the harness so the ratio is exact and comparable; the dummy has enough HP that
@@ -193,7 +193,7 @@ public class DamageScopeBoostTest {
      *
      * <p><b>Why the typed boosts are zeroed: the boost zone is <i>additive</i>.</b> Himeko's own traces give
      * her +22.4% fire DMG, so granting a +40% scoped boost raises her damage by a factor of
-     * {@code (1.224 + 0.4) / 1.224 = 1.327}, not 1.4 — the first version of this test asserted 1.4 and failed
+     * {@code (1.224 + 0.4) / 1.224 = 1.32}, not 1.4 - the first version of this test asserted 1.4 and failed
      * with exactly that number, which is how the additive behaviour got confirmed rather than assumed. The
      * test is about the <b>scope</b>, so the harness removes the unrelated baseline instead of encoding it.
      * (The additivity itself is real and intended: a scoped boost stacks with an element boost the same way

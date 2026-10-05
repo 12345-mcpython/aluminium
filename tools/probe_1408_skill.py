@@ -37,7 +37,7 @@ for name in pages:
     for match in list(re.finditer("弑神登神", flat))[:4]:
         out.append("   [%s] ...%s..." % (name, flat[max(0, match.start() - 220):match.start() + 260]))
 
-# (d) how many pages state 「自动施放」 at all -- the reader count for such a family
+# (d) how many pages state "自动施放" at all -- the reader count for such a family
 auto = []
 for name in sorted(os.listdir(corpus)):
     if not name.endswith(".md"):

@@ -27,7 +27,7 @@ MARKER = re.compile(r"\bitem ships\b")
 
 
 def git(*args, check=True):
-    # ⚠ encoding="utf-8" explicitly: the platform default here is GBK, and a commit subject containing Chinese kills the
+    # Note: encoding="utf-8" explicitly: the platform default here is GBK, and a commit subject containing Chinese kills the
     # decode with UnicodeDecodeError (measured -- it is what stopped this driver's first run).
     out = subprocess.run(["git"] + list(args), capture_output=True, text=True,
                          encoding="utf-8", errors="replace")
@@ -104,7 +104,7 @@ def main():
     print("backup %s -> %s" % (BACKUP, head[:8]))
 
     for round_number in range(1, ROUNDS + 1):
-        # ⚠ The marker chain ENDS (here: at the nineteenth item), so a segment may have fewer than K whole items left. Take
+        # Note: The marker chain ENDS (here: at the nineteenth item), so a segment may have fewer than K whole items left. Take
         # what is left rather than stopping: the base stays a marker either way, which is what keeps every group a whole item.
         remaining = len(marker_list) - 1 - frontier_index
         if remaining < 1:

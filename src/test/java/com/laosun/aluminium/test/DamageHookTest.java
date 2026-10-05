@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * P1-7 acceptance: buffs inject zones through {@code DamageEvent} during settlement.
+ * P1-acceptance: buffs inject zones through {@code DamageEvent} during settlement.
  *
  * <p>Every defender here has DEFENCE = 0 and the attacker has no boost / crit attributes,
  * so a base of 1000 isolates the hooked zone.
@@ -71,7 +71,7 @@ public class DamageHookTest {
         Assertions.assertEquals(1500, settle(attacker(), enemy), EPS);
 
         enemy.getBuffManager().afterMove();
-        enemy.getBuffManager().afterMove();      // duration 2 → 0; on expiry the modifier is removed
+        enemy.getBuffManager().afterMove();      // duration 2 to 0; on expiry the modifier is removed
 
         Assertions.assertEquals(1000, settle(attacker(), enemy), EPS);
     }
@@ -98,13 +98,13 @@ public class DamageHookTest {
         Enemy enemy = enemy();
         enemy.getBuffManager().addBuff(new VulnerabilityBuff(2, 0.5));
 
-        // break gets no DMG boost / crit stats (blocked by BoostArea / CritArea's applies()), but it does get vulnerability — P4 reuses this
+        // break gets no DMG boost / crit stats (blocked by BoostArea / CritArea's applies()), but it does get vulnerability - P4 reuses this
         Assertions.assertEquals(1500, settle(attacker(), enemy, DamageType.BREAK), EPS);
     }
 
     @Test
     public void attackerSideWeaknessFeedsTheWeaknessZone() {
-        // weakness is an "attacker-side debuff" (HSR.md §2.2) → the hook must iterate the attacker side too
+        // weakness is an "attacker-side debuff" (HSR.md §2.2) to the hook must iterate the attacker side too
         Character attacker = attacker();
         attacker.getBuffManager().addBuff(new WeaknessBuff(2, 0.4));
 
@@ -124,7 +124,7 @@ public class DamageHookTest {
         Character attacker = attacker();
         attacker.getBuffManager().addBuff(new VulnerabilityBuff(2, 0.5));
 
-        // the defending side has no vulnerability → this hit is a clean 1000 (vulnerability only counts for "the hit I take")
+        // the defending side has no vulnerability to this hit is a clean 1000 (vulnerability only counts for "the hit I take")
         Assertions.assertEquals(1000, settle(attacker, enemy()), EPS);
     }
 

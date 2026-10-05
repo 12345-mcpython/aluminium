@@ -16,9 +16,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1414 Dan Heng • Permansor Terrae, from his own file (2026-09-29, round 176): ATK-scaled shields and the Bondmate designation.
+ * 1414 Dan Heng - Permansor Terrae, from his own file (2026-09-29, round 16): ATK-scaled shields and the Bondmate designation.
  *
- * <p>The shield case asserts the DOCUMENT'S arithmetic — 20.00% of his ATK plus 400 — which needs the new `owner_attack` scale; the mutation that drops the
+ * <p>The shield case asserts the DOCUMENT'S arithmetic - 20.00% of his ATK plus 400 - which needs the new `owner_attack` scale; the mutation that drops the
  * flat addend makes it red.
  */
 public class PermansorTerraeTest {
@@ -27,7 +27,7 @@ public class PermansorTerraeTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** ⚠ 「抵消等同于丹恒•腾荒20.00%攻击力+400伤害的护盾，持续3回合」. */
+    /** Note: "抵消等同于丹恒-腾荒20.00%攻击力+400伤害的护盾，持续3回合". */
     @Test
     public void hisSkillShieldsThePartyForAShareOfHisAttackPlusAFlatNumber() {
         Character dhpt = CharacterFactory.create(DHPT, LEVEL);
@@ -45,7 +45,7 @@ public class PermansorTerraeTest {
         Assertions.assertTrue(ally.getBuffManager().hasState("同袍"), "「使指定我方单体角色成为【同袍】」");
     }
 
-    /** ⚠ The ultimate states the same shield, so the party is covered even without the Skill. */
+    /** Note: The ultimate states the same shield, so the party is covered even without the Skill. */
     @Test
     public void hisUltimateAlsoShieldsTheParty() {
         Character dhpt = CharacterFactory.create(DHPT, LEVEL);

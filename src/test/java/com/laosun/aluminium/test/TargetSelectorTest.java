@@ -111,7 +111,7 @@ public class TargetSelectorTest {
         taunter.getBuffManager().addBuff(new TauntBuff(2));
         Battle battle = new Battle(List.of(tank, taunter), List.of(dummy()), new Random(5));
 
-        // the taunter is dead and the caller's candidate set already filtered it out → fall back
+        // the taunter is dead and the caller's candidate set already filtered it out to fall back
         // to aggro weighting, selecting the only one left, the tank
         taunter.takeDamage(999_999);
         List<CanHit> aliveCandidates = new ArrayList<>(List.of(tank, taunter));
@@ -149,7 +149,7 @@ public class TargetSelectorTest {
         Assertions.assertTrue(battle.performAction(iceEdge.getSkills().get(SkillType.COMMON), List.of(target)));
         battle.processRequests();
 
-        // expected value derived from the attacker's stat sheet: ATK × multiplier 1.0 × defence zone (attacker Lv90, victim DEF 1000)
+        // expected value derived from the attacker's stat sheet: ATK  x  multiplier 1.0  x  defence zone (attacker Lv90, victim DEF 1000)
         double levelTerm = Constant.DEFENCE_CONST + Constant.DEFENCE_PER_LEVEL * iceEdge.getLevel();
         double expected = iceEdge.getAttribute(AttributeType.ATTACK).get() * levelTerm / (1000 + levelTerm);
         Assertions.assertEquals(expected, hpBefore - victim.getCurrentHp(), 0.1,

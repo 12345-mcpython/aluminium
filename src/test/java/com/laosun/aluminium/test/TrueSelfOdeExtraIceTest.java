@@ -26,7 +26,7 @@ public class TrueSelfOdeExtraIceTest {
         Battle battle = new Battle(List.of(cyrene), List.of(EnemyFactory.create(1002011, 100, 1)), new Random(0));
         battle.startBattle();
         battle.processRequests();
-        // ⭐ `summonMemosprite` builds through `memospriteWith`, which does NOT install the spec's `skills` (measured: the map is empty);
+        // `summonMemosprite` builds through `memospriteWith`, which does NOT install the spec's `skills` (measured: the map is empty);
         // `summonServant` does, and both make the same unit (measured in an earlier round).
         var dragon = battle.summonServant(battle.characters.get(0));
         battle.processRequests();

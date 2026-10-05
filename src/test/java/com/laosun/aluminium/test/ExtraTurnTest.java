@@ -14,24 +14,24 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * P7-2 acceptance: extra turns ({@code Battle.grantExtraTurn}).
+ * P-2 acceptance: extra turns ({@code Battle.grantExtraTurn}).
  *
  * <pre>
  * An extra turn = one action handed out for free: the next stepForward() has him act,
- *                 **the clock does not move** ⇒ no action value is consumed, the round does not change,
+ *                 the clock does not move so no action value is consumed, the round does not change,
  *                 and his normal turn schedule is left completely untouched
  * </pre>
  *
  * <p>The difference from "action advance" (拉条), which is very easy to
  * confuse, and is also the most central assertion of this case:
- * action advance pulls his **normal** turn earlier (consuming it); an extra turn is an additional one,
+ * action advance pulls his normal turn earlier (consuming it); an extra turn is an additional one,
  * and his normal turn is still waiting for him in its original position.
  */
 public class ExtraTurnTest {
     private static final double EPS = 1e-9;
 
     /**
-     * An extra turn makes the target act immediately, and the clock does not move → the round does not change.
+     * An extra turn makes the target act immediately, and the clock does not move to the round does not change.
      */
     @Test
     public void extraTurnActsImmediatelyWithoutAdvancingTheClock() {
@@ -39,7 +39,7 @@ public class ExtraTurnTest {
         Queue q = new Queue(List.of(hero));
 
         q.move();                                        // hero's first round 150
-        q.setTopZero();                                  // hero → 250，elapsed = 150
+        q.setTopZero();                                  // hero to 250，elapsed = 150
         Assertions.assertEquals(250, signalOf(q, hero).getNextActionTime(), EPS);
         int roundBefore = q.getRound();
 
@@ -54,7 +54,7 @@ public class ExtraTurnTest {
     }
 
     /**
-     * The core assertion: an extra turn does **not consume** the target's normal turn schedule — after he has
+     * The core assertion: an extra turn does not consume the target's normal turn schedule - after he has
      * acted, his next action point is still the original 250.
      *
      * <p>If it were implemented as "action advance to elapsed" (the wrong way), this would yield a value other
@@ -70,7 +70,7 @@ public class ExtraTurnTest {
         battle.afterMove();
         battle.stepForward();                            // hero's first round 150
         Assertions.assertEquals(hero, battle.currentMove.getCanHit());
-        battle.afterMove();                              // hero → 250
+        battle.afterMove();                              // hero to 250
 
         Assertions.assertEquals(250, signalOf(q, hero).getNextActionTime(), EPS);
 
@@ -86,27 +86,27 @@ public class ExtraTurnTest {
 
     /**
      * Core assertion (separating "the correct implementation" from "the extra turn conveniently consumes the
-     * normal turn too"): after the extra turn, **his normal turn is still in its original position** and must
+     * normal turn too"): after the extra turn, his normal turn is still in its original position and must
      * not be displaced by this extra turn.
      *
-     * <p>Setup: actor has speed 140 (first round {@code 10000/140 × 1.5 ≈ 107.14}),
-     * fast has speed 200 (first round 75). When the extra turn is granted elapsed = 0, so his original
-     * schedule is 107.14.
+     * <p>Setup: actor has speed 140 (first round {@code 10000/140 x 1.5 ~= 10.14}),
+     * fast has speed 200 (first round 5). When the extra turn is granted elapsed = 0, so his original
+     * schedule is 10.14.
      *
      * <pre>
      *   t=0     actor takes the extra turn and acts immediately (the clock does not move)
-     *   correct: actor's normal schedule is still 107.14 → fast(75) → actor(107.14)
-     *   wrong (no restore): setTopZero schedules him at 0 + 71.43 = 71.43 → he would cut in ahead of fast
+     *   correct: actor's normal schedule is still 10.14 to fast(5) to actor(10.14)
+     *   wrong (no restore): setTopZero schedules him at 0 + 1.43 = 1.43 to he would cut in ahead of fast
      * </pre>
      *
      * <p>Why this case is mandatory: in a single-character scenario "restore to the original value" and
-     * "reschedule to elapsed + period" happen to be equal, so the difference cannot be observed — there must
+     * "reschedule to elapsed + period" happen to be equal, so the difference cannot be observed - there must
      * be another unit whose "normal turn is earlier" to separate the two.
      */
     @Test
     public void extraTurnKeepsTheNormalTurnInItsOriginalPlace() {
-        Character actor = character("actor", 140);       // first round 107.14, period 71.43
-        Character fast = character("fast", 200);         // first round 75
+        Character actor = character("actor", 140);       // first round 10.14, period 1.43
+        Character fast = character("fast", 200);         // first round 5
         Queue q = new Queue(List.of(actor, fast));
 
         double originalSchedule = 10000.0 / 140 * 1.5;
@@ -115,9 +115,9 @@ public class ExtraTurnTest {
         Assertions.assertTrue(q.grantExtraTurn(actor));
         Assertions.assertEquals(0, q.move(), EPS, "the extra turn happens immediately at t=0");
         Assertions.assertEquals(actor, q.getCurrentActor().getCanHit());
-        q.setTopZero();                                  // the period is rescheduled to 0 + 71.43
+        q.setTopZero();                                  // the period is rescheduled to 0 + 1.43
 
-        // His original schedule (107.14) is only restored at the beginning of the next move() —
+        // His original schedule (10.14) is only restored at the beginning of the next move() - 
         // that is what makes it an "extra turn" rather than "his normal turn pulled earlier"
         Assertions.assertEquals(fast, nextActor(q), "fast's normal turn is at 75 and he must not be jumped by actor");
         Assertions.assertEquals(75, q.getElapsed(), EPS);
@@ -147,18 +147,18 @@ public class ExtraTurnTest {
     }
 
     /**
-     * An extra turn can let someone who is "still a long way off" act first — this is exactly the
+     * An extra turn can let someone who is "still a long way off" act first - this is exactly the
      * queue-jumping semantics.
      */
     @Test
     public void extraTurnJumpsAheadOfTheQueue() {
-        Character soon = character("soon", 200);         // first round 75, acts first
+        Character soon = character("soon", 200);         // first round 5, acts first
         Character late = character("late", 100);         // first round 150
         Queue q = new Queue(List.of(soon, late));
 
-        Assertions.assertEquals(soon, nextActor(q));      // soon acts at 75
+        Assertions.assertEquals(soon, nextActor(q));      // soon acts at 5
 
-        // soon's next is at 125; late's first round is at 150. Give late an extra turn → he cuts in before 125
+        // soon's next is at 125; late's first round is at 150. Give late an extra turn to he cuts in before 125
         Assertions.assertTrue(q.grantExtraTurn(late));
         Assertions.assertEquals(late, nextActor(q), "late jumps the queue and acts first");
         Assertions.assertEquals(75, q.getElapsed(), EPS, "the clock is still parked at 75");
@@ -177,7 +177,7 @@ public class ExtraTurnTest {
         Queue q = new Queue(List.of(hero));
 
         q.move();
-        q.setTopZero();                                  // hero → 250
+        q.setTopZero();                                  // hero to 250
 
         Assertions.assertTrue(q.grantExtraTurn(hero));
         Assertions.assertTrue(q.grantExtraTurn(hero), "granting it twice still returns true (he is a legal target)");
@@ -238,7 +238,7 @@ public class ExtraTurnTest {
     }
 
     /**
-     * Inserting **someone else's** ultimate during an extra turn is forbidden; but the one whose extra turn it
+     * Inserting someone else's ultimate during an extra turn is forbidden; but the one whose extra turn it
      * is may cast theirs.
      */
     @Test

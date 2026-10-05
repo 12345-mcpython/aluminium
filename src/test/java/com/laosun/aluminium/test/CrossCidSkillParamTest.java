@@ -23,7 +23,7 @@ import java.util.Random;
  * either the CAST skill or the OWNER's own skill, so {@code skill_param_cid} now says whose row to read -- a FIELD, because putting the cid in the slot spelling is refused
  * (measured: {@code scales off skill slot "1415|SKILL", which is not a SkillType}).
  *
- * <p>⭐ The reading is discriminating by construction: the SAME rule runs twice, once with the field and once without, and the two rows hold different numbers -- so the gain over
+ * <p>The reading is discriminating by construction: the SAME rule runs twice, once with the field and once without, and the two rows hold different numbers -- so the gain over
  * the attribute's own base must equal each row's value.
  */
 public class CrossCidSkillParamTest {
@@ -39,11 +39,11 @@ public class CrossCidSkillParamTest {
         System.out.println("[cross_cid] the owner's own row value " + own[1] + " gave a boost of " + own[0]
                 + " ; naming cid " + OTHER + " (row value " + cross[1] + ") gave " + cross[0]);
 
-        // ⭐ the own-row run pins the reader exactly: the gain IS the row value
+        // the own-row run pins the reader exactly: the gain IS the row value
         Assertions.assertEquals(own[1], own[0], 1e-9, "without the field the owner's own row is read, exactly");
-        // ⭐ and the cross run's claim is the capability's own: naming a cid reads a DIFFERENT row
-        // ⚠ its size is not compared to the raw row value: the battle fires its own TURN_START as well, so the two runs apply the rule a different number of times
-        // (measured: 0.7 = the owner's row exactly, while the cross run read 0.24 = the other row's #0 * its #1). A reader that ignored the field would give 0.7 twice.
+        // and the cross run's claim is the capability's own: naming a cid reads a DIFFERENT row
+        // Note: its size is not compared to the raw row value: the battle fires its own TURN_START as well, so the two runs apply the rule a different number of times
+        // (measured: 0.= the owner's row exactly, while the cross run read 0.24 = the other row's #0 * its #1). A reader that ignored the field would give 0.twice.
         Assertions.assertNotEquals(own[0], cross[0], 1e-9,
                 "with the field a different character's row is read -- ignoring the field would give the owner's value again");
         Assertions.assertNotEquals(own[1], cross[1], 1e-9, "precondition: the two rows differ, so the reading discriminates");
@@ -59,7 +59,7 @@ public class CrossCidSkillParamTest {
         var otherSkill = other.getSkills().get(slot);
         var ownRow = ownSkill.getData().getSkills().get(owner.skillLevel(ownSkill) - 1);
         var otherRow = otherSkill.getData().getSkills().get(other.skillLevel(otherSkill) - 1);
-        // ⭐ find an index whose two values DIFFER, so the reading can only be right one way
+        // find an index whose two values DIFFER, so the reading can only be right one way
         int index = -1;
         for (int i = 0; i < Math.min(ownRow.size(), otherRow.size()); i++) {
             if (!ownRow.get(i).equals(otherRow.get(i))) {
@@ -92,11 +92,11 @@ public class CrossCidSkillParamTest {
         battle.processRequests();
         Character subject = battle.characters.get(0);
         double before = subject.getAttribute(AttributeType.ATTACK).get();
-        // ⚠ fire it for the RULE OWNER only: the no-argument form fires for every unit, which made the two runs accumulate a different number of times
+        // Note: fire it for the RULE OWNER only: the no-argument form fires for every unit, which made the two runs accumulate a different number of times
         battle.fireTriggers(TriggerEvent.TURN_START, subject, null, 0, 0);
         battle.processRequests();
         double after = subject.getAttribute(AttributeType.ATTACK).get();
-        // ⚠ the ABSOLUTE delta is the share: MODIFY_ATTR adds `scale * percent` to the attribute, so `after - before` is the row value itself
+        // Note: the ABSOLUTE delta is the share: MODIFY_ATTR adds `scale * percent` to the attribute, so `after - before` is the row value itself
         return new double[]{after - before, expected};
     }
 }

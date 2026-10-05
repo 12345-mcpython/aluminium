@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Random;
 
-/** 「展开战技的结界并使其没有持续时间」 (2026-10-02). */
+/** "展开战技的结界并使其没有持续时间" (2026-10-02). */
 public class RippleEndlessWardTest {
     private static final String WARD = "结界";
 

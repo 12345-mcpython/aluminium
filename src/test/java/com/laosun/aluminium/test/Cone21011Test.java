@@ -16,9 +16,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Light cone 21011: damage of the WEARER’S OWN element, dealt by anyone on our side, is 12% stronger.
+ * Light cone 21011: damage of the WEARER'S OWN element, dealt by anyone on our side, is 12% stronger.
  *
- * <p>⭐ Read on the two sides of the new keyword: the same element as the wearer’s own, and a different one. The wearer’s element
+ * <p>Read on the two sides of the new keyword: the same element as the wearer's own, and a different one. The wearer's element
  * is read from the unit itself rather than assumed, so the test does not depend on which element character 1205 happens to be.
  */
 public class Cone21011Test {
@@ -69,10 +69,10 @@ public class Cone21011Test {
                 + " ; same element " + plainSame + " -> " + boostedSame + " (x" + (boostedSame / plainSame) + ")"
                 + " ; another element " + plainOther + " -> " + boostedOther + " (x" + (boostedOther / plainOther) + ")");
         Assertions.assertNotNull(mine, "the wearer has an element of its own");
-        // ★ The ally’s side is read as a DIRECTION with its number printed: the two measurements come from two
-        // battles, and the same-element ally hit measured x1.0980392156862728 (= 1.12 / 1.02) where the wearer’s own
+        // The ally's side is read as a DIRECTION with its number printed: the two measurements come from two
+        // battles, and the same-element ally hit measured x1.098039215686228 (= 1.12 / 1.02) where the wearer's own
         // hit of that element measured exactly x1.12. The 2% baseline difference between the two battles is an open
-        // question, recorded rather than hidden -- the exact claim is pinned on the wearer’s own hit below.
+        // question, recorded rather than hidden -- the exact claim is pinned on the wearer's own hit below.
         Assertions.assertTrue(boostedSame > plainSame, "an ally’s hit of MY element is boosted");
         Assertions.assertEquals(1.0, boostedOther / plainOther, 0.01, "and another element is not (false case)");
     }

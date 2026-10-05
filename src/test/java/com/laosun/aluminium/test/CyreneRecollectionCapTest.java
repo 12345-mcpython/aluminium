@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Random;
 
-/** 「【追忆】达到 24 点时可激活终结技并解除自身所有负面效果」与「最多溢出至 27 点」 (2026-10-02). */
+/** "[追忆]达到 24 点时可激活终结技并解除自身所有负面效果"与"最多溢出至 2点" (2026-10-02). */
 public class CyreneRecollectionCapTest {
     private static final int LEVEL = 80;
     private static final int CYRENE = 1415;

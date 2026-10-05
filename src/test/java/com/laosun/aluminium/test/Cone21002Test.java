@@ -19,8 +19,8 @@ import java.util.Random;
 /**
  * Light cone 21002: with it equipped, the WHOLE party carries +8% all-type resistance, so an incoming hit lands for less.
  *
- * <p>⭐ Read on the damage an ally actually takes from the same attack with and without the cone -- the resistance zone is the
- * victim’s side, so the number that moves is the one the ally receives, and the enemy’s own panel is checked to be untouched.
+ * <p>Read on the damage an ally actually takes from the same attack with and without the cone -- the resistance zone is the
+ * victim's side, so the number that moves is the one the ally receives, and the enemy's own panel is checked to be untouched.
  */
 public class Cone21002Test {
     private static final int CONE = 21002;

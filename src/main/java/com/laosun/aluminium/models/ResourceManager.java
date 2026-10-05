@@ -15,12 +15,12 @@ import java.util.function.Consumer;
  * manager, its data declares which resources exist, and the trigger table adds to or spends them.
  *
  * <h2>Scope is enforced here, not on the resource</h2>
- * {@link ResourceScope#PARTY} resources are deliberately **rejected** by {@link #register}. A party
+ * {@link ResourceScope#PARTY} resources are deliberately rejected by {@link #register}. A party
  * resource needs one owner that outlives any single character; hanging it on each member would give
- * the team four independent counters where the game has one shared pool — and nothing would report
+ * the team four independent counters where the game has one shared pool - and nothing would report
  * the mistake. Rejecting loudly is the honest option until a per-battle registry exists.
  *
- * <p>⚠ The scope check reads {@link Resource#getScope()}. A {@code PARTY} resource cannot be
+ * <p>Note: The scope check reads {@link Resource#getScope()}. A {@code PARTY} resource cannot be
  * registered at all, so "registered" today implies {@code SELF}.
  */
 public class ResourceManager {
@@ -81,10 +81,10 @@ public class ResourceManager {
     }
 
     /**
-     * The same, for a declaration that also states an <b>overflow</b> (2026-09-30; reader: 1506’s 【隐藏分】).
+     * The same, for a declaration that also states an <b>overflow</b> (2026-09-30; reader: 1506's [隐藏分]).
      *
-     * <p>★ `Resource` has had both tiers all along; a DECLARATION could not state the second one, so
-     * 「达到上限后还可溢出 240 点」 could only be written as one flat cap -- a different rule.
+     * <p>`Resource` has had both tiers all along; a DECLARATION could not state the second one, so
+     * "达到上限后还可溢出 240 点" could only be written as one flat cap -- a different rule.
      */
     public Resource register(String id, int max, int initial, int overflow) {
         Resource resource = register(new Resource(id, ResourceScope.SELF, max, initial));

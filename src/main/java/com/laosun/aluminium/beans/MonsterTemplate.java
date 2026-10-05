@@ -9,9 +9,9 @@ import com.laosun.aluminium.enums.DamageElement;
  * {@code HPBase} / {@code AttackBase} / {@code DefenceBase} / …).
  *
  * <p>These are the raw values only. The final panel is
- * {@code base value × level-group coefficient × instance's own adjustment × Π elite-group coefficients} (see {@code EnemyScaler}).
+ * {@code base value  x  level-group coefficient  x  instance's own adjustment  x  Π elite-group coefficients} (see {@code EnemyScaler}).
  *
- * <p>⚠ Naming: {@code health} in this data is tbgd's <b>HP</b> (health, {@code HPBase});
+ * <p>Note: Naming: {@code health} in this data is tbgd's <b>HP</b> (health, {@code HPBase});
  * the corresponding field on the instance side is called {@code health_modify_ratio}
  * (see {@link MonsterConfig}).
  */

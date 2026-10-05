@@ -15,13 +15,13 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * A rule-driven ORDINARY damage instance (2026-09-30), reader 1505 绯英’s technique:
- * 「进入战斗后，对敌方全体造成等同于绯英 100% 攻击力的物理属性伤容」.
+ * A rule-driven ORDINARY damage instance (2026-09-30), reader 1505 绯英's technique:
+ * "进入战斗后，对敌方全体造成等同于绯英 100% 攻击力的物理属性伤容".
  *
- * <p>⭐ ⚠ The first version of this test believed an ordinary instance credits the VICTIM ENERGY inside `applyDamage` and measured
+ * <p>Note: The first version of this test believed an ordinary instance credits the VICTIM ENERGY inside `applyDamage` and measured
  * 0 -> 0: the crediting lives in the attack pipeline, not there, so that reading cannot tell the two paths apart. The real
  * discriminator is {@code countsAsAttack}: additional damage sets `notCountsAsAttack` (which is why a `damage_is_attack` rule must
- * not see it), while an ordinary instance does. A probe rule on the ALLY’s own table measures exactly that -- and it is planted on
+ * not see it), while an ordinary instance does. A probe rule on the ALLY's own table measures exactly that -- and it is planted on
  * the ally on purpose, because replacing the table of the character under test would delete the very rule being judged.
  */
 public class OrdinaryDamageTest {
@@ -60,7 +60,7 @@ public class OrdinaryDamageTest {
                 "an ORDINARY instance counts as an attack, so the probe saw it -- additional damage would not");
     }
 
-    /** ★ The shipped rule, read off the compiled table (discipline 232). */
+    /** The shipped rule, read off the compiled table (discipline 232). */
     @Test
     public void theShippedRuleSaysOrdinary() {
         Character elation = CharacterFactory.create(WEARER, LEVEL);

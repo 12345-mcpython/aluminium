@@ -19,7 +19,7 @@ SLOT = 22
 MARK = "暖流"
 
 doc = json.load(io.open(HY, encoding="utf-8"))
-# ⚠ measured: 1410.json is a LIST, not an object like 1406/1414 -- handle both shapes
+# Note: measured: 1410.json is a LIST, not an object like 1406/1414 -- handle both shapes
 rules = doc if isinstance(doc, list) else doc.get("rules", [])
 RULE_ID = "memosprite_ode_of_ocean_raises_her_damage"
 if any(r.get("id") == RULE_ID for r in rules):

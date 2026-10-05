@@ -21,31 +21,31 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * The cast events carry the unit they were <b>aimed at</b> — 「指定我方单体」 (M-35).
+ * The cast events carry the unit they were <b>aimed at</b> - "指定我方单体" (M-35).
  *
- * <p><b>What was missing.</b> 布洛妮娅's skill is 「解除<b>指定我方单体</b>的 1 个负面效果，并使<b>该目标</b>立即行动…当对自身
- * 施放该技能时，无法触发立即行动效果」. The trigger events carried the caster (`actor`) and, for attacks, how many
- * targets were hit (`hit_count`) — but not <em>who</em> was chosen, so "the ally I aimed at" was unwritable. The
+ * <p><b>What was missing.</b> 布洛妮娅's skill is "解除<b>指定我方单体</b>的 1 个负面效果，并使<b>该目标</b>立即行动…当对自身
+ * 施放该技能时，无法触发立即行动效果". The trigger events carried the caster (`actor`) and, for attacks, how many
+ * targets were hit (`hit_count`) - but not <em>who</em> was chosen, so "the ally I aimed at" was unwritable. The
  * buff-side {@code SkillCastEvent} has carried {@code targets} all along; the data side did not.
  *
  * <p><b>The semantic decision, written down rather than assumed.</b> {@code TriggerContext.target} already means
- * "the event's subject, defined per event" — {@code TAKING_HIT}'s is the one who took the hit, {@code HP_LOST}'s
+ * "the event's subject, defined per event" - {@code TAKING_HIT}'s is the one who took the hit, {@code HP_LOST}'s
  * the one who lost HP. A cast's subject is therefore <b>the unit the caller aimed at</b> (the main target), and
  * explicitly <b>not</b> "everything the effect reached": an AOE reaches several units and only the first is named,
  * so coverage is still {@code hit_count}'s question. That distinction is pinned below, because it is the one a
  * reader would get wrong.
  *
- * <p>⚠ Checked before the change: no shipped rule pairs a cast event with a {@code target} condition, so filling
- * the field in changes no existing rule's behaviour — which the whole suite confirms.
+ * <p>Note: Checked before the change: no shipped rule pairs a cast event with a {@code target} condition, so filling
+ * the field in changes no existing rule's behaviour - which the whole suite confirms.
  */
 public class CastTargetTest {
     private static final double EPS = 1e-6;
 
-    /** 布洛妮娅 — her skill is the first user of "the ally this cast was aimed at". */
+    /** 布洛妮娅 - her skill is the first user of "the ally this cast was aimed at". */
     private static final int BRONYA = 1101;
-    /** 桂乃芬 — a plain teammate to aim at. */
+    /** 桂乃芬 - a plain teammate to aim at. */
     private static final int ALLY = 1210;
-    /** 停云 — a second plain teammate, so "aimed at" can be told apart from "also hit". */
+    /** 停云 - a second plain teammate, so "aimed at" can be told apart from "also hit". */
     private static final int OTHER = 1202;
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
@@ -54,7 +54,7 @@ public class CastTargetTest {
     // 1. The aimed unit is the event's subject
     // ==================================================================
 
-    /** Aimed at one teammate, the rule on that teammate fires — and it does not fire for the other one. */
+    /** Aimed at one teammate, the rule on that teammate fires - and it does not fire for the other one. */
     @Test
     public void theCastCarriesTheUnitItWasAimedAt() {
         Battle battle = party();
@@ -121,7 +121,7 @@ public class CastTargetTest {
     /**
      * Aimed at herself: the damage boost still lands, the immediate action does not.
      *
-     * <p>「当对自身施放该技能时，无法触发立即行动效果」 — the whole reason her skill is two rules rather than one, and
+     * <p>"当对自身施放该技能时，无法触发立即行动效果" - the whole reason her skill is two rules rather than one, and
      * both halves are asserted here so the gate cannot be satisfied by dropping the rule altogether.
      */
     @Test
@@ -236,7 +236,7 @@ public class CastTargetTest {
         return unit.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
     }
 
-    /** How much action value the unit still has — zero means "acts now". */
+    /** How much action value the unit still has - zero means "acts now". */
     private static double timeRemaining(Battle battle, CanHit target) {
         for (Signal signal : battle.queue.snapshot()) {
             if (signal.getCanHit() == target) {

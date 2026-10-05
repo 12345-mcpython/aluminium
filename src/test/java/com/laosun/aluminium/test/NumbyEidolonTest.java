@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1107's 星魂 2: 「施放终结技后攻击力提高#1%，持续2回合」.
+ * 110's 星魂 2: "施放终结技后攻击力提高#1%，持续2回合".
  *
  * <p>ATTACK is a FLAT attribute, so the share scales `baseValue()`, read after the battle starts (rounds 125 and 133).
  */

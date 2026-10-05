@@ -27,7 +27,7 @@ public class TingyunTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** ⚠ 「使其攻击力提高50%，最高不超过停云当前攻击力的25%」: the gain must respect the ceiling. */
+    /** Note: "使其攻击力提高50%，最高不超过停云当前攻击力的25%": the gain must respect the ceiling. */
     @Test
     public void herSkillBlessesWithACappedGain() {
         Fixture f = new Fixture();
@@ -43,7 +43,7 @@ public class TingyunTest {
                 "「最高不超过停云当前攻击力的25%」 -- gain " + (after - before) + " vs ceiling " + ceiling);
     }
 
-    /** ⚠ The ultimate grants energy AND a two-turn damage boost to the chosen ally. */
+    /** Note: The ultimate grants energy AND a two-turn damage boost to the chosen ally. */
     @Test
     public void herUltimateGrantsEnergyAndABoost() {
         Fixture f = new Fixture();

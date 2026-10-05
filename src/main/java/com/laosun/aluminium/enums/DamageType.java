@@ -11,10 +11,10 @@ import java.util.Map;
  * <p>Two game rules live on the type itself as data, so callers never have to
  * remember them:
  * <ul>
- *   <li>{@link #isCrittable()} — break / super break / DOT / true damage never crit
+ *   <li>{@link #isCrittable()} - break / super break / DOT / true damage never crit
  *   (break, super break, DOT and true damage get no crit stats); elation damage does get crit stats
  *   (HSR.md §6.4).</li>
- *   <li>{@link #isBoostable()} — break / super break / true damage are not boosted by
+ *   <li>{@link #isBoostable()} - break / super break / true damage are not boosted by
  *   the damage-bonus zone (break and true damage get no DMG boost), and elation damage is likewise
  *   unaffected by damage-increasing effects
  *   (HSR.md §6.5 / GLOSSARY).</li>
@@ -23,29 +23,29 @@ import java.util.Map;
  * <p>{@link com.laosun.aluminium.models.Damage.Area#applies(DamageType)} consumes
  * both flags, so a zone removes itself instead of relying on callers not to add it.
  *
- * <h2>Which values are actually used ⚠</h2>
+ * <h2>Which values are actually used Note:</h2>
  *
- * <p>These enum values are **laid out to spec**, but the engine currently only uses some of them.
+ * <p>These enum values are laid out to spec, but the engine currently only uses some of them.
  * Do not assume that being declared means being wired up:
  *
  * <table>
  *   <tr><th>Type</th><th>Status</th></tr>
- *   <tr><td>{@link #NORMAL}</td><td>✅ The **only** actual outlet of character skills — the data has
+ *   <tr><td>{@link #NORMAL}</td><td>The only actual outlet of character skills - the data has
  *       no {@code damage_type} field (see the keys of {@code skills.json}), so skills/ultimates are
  *       recorded as {@code NORMAL} too.
- *       ⚠ There is currently **no behavioral difference**: the crittable and boostable flags of
+ *       Note: There is currently no behavioral difference: the crittable and boostable flags of
  *       {@code NORMAL}/{@code SKILL}/{@code ULTRA} are identical, so for now it does not affect the
  *       numbers</td></tr>
- *   <tr><td>{@link #ADDITIONAL} / {@link #TRUE}</td><td>✅ Additional damage / true damage (P1-9)</td></tr>
- *   <tr><td>{@link #BREAK} / {@link #SUPER_BREAK} / {@link #DOT}</td><td>✅ Break / super break / DOT (P4)</td></tr>
- *   <tr><td>{@link #SKILL} / {@link #ULTRA}</td><td>❌ **0 references** — cannot be distinguished
+ *   <tr><td>{@link #ADDITIONAL} / {@link #TRUE}</td><td>Additional damage / true damage (P1-9)</td></tr>
+ *   <tr><td>{@link #BREAK} / {@link #SUPER_BREAK} / {@link #DOT}</td><td>Break / super break / DOT (P4)</td></tr>
+ *   <tr><td>{@link #SKILL} / {@link #ULTRA}</td><td>0 references - cannot be distinguished
  *       until the skill data gains a {@code damage_type} (everything is {@code NORMAL} for now)</td></tr>
- *   <tr><td>{@link #EXTRA}</td><td>❌ **0 references** — the "extra damage" in the spec, with no source</td></tr>
- *   <tr><td>{@link #TECHNIQUE}</td><td>❌ **0 references** — technique damage; the technique itself is
+ *   <tr><td>{@link #EXTRA}</td><td>0 references - the "extra damage" in the spec, with no source</td></tr>
+ *   <tr><td>{@link #TECHNIQUE}</td><td>0 references - technique damage; the technique itself is
  *       currently only attached in {@code Battle.startBattle()} (P8-2) and its effect is not
  *       implemented (P8-6)</td></tr>
- *   <tr><td>{@link #MEMORY}</td><td>❌ **0 references** — memosprite damage, waiting on P9-4 summons</td></tr>
- *   <tr><td>{@link #ELATION}</td><td>❌ **0 references** — the elation system (P10); not even
+ *   <tr><td>{@link #MEMORY}</td><td>0 references - memosprite damage, waiting on P9-4 summons</td></tr>
+ *   <tr><td>{@link #ELATION}</td><td>0 references - the elation system (P10); not even
  *       {@code elation_basic_level_damage.json} has been loaded yet</td></tr>
  * </table>
  */

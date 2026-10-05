@@ -10,18 +10,18 @@ import java.util.concurrent.ConcurrentMap;
 
 
 /**
- * The **generic** implementation that resolves a skill from the data by
+ * The generic implementation that resolves a skill from the data by
  * {@code (cid, slot, level)}.
  *
- * <p>⚠ There used to be a `// TODO: DELETE IT BECAUSE OF EVERY CHARACTERS HAS EVERY SKILLS` here —
- * that comment is **misleading** and has been deleted. What it probably meant to say was "a skill should
- * not be a Java class each", but that is **the other direction** (the P8-0 three-way split (三分法):
+ * <p>Note: There used to be a `// TODO: DELETE IT BECAUSE OF EVERY CHARACTERS HAS EVERY SKILLS` here - 
+ * that comment is misleading and has been deleted. What it probably meant to say was "a skill should
+ * not be a Java class each", but that is the other direction (the P8-0 three-way split (三分法):
  * mechanics go through data/triggers, only escape-hatch (逃生舱) cases get a class), which in fact shows
- * that this class is right: a skill is **data**, locatable with the three keys {@code (cid, slot, level)},
- * with no need for 93 characters × 6 skills = 558 classes.
+ * that this class is right: a skill is data, locatable with the three keys {@code (cid, slot, level)},
+ * with no need for 93 characters  x  6 skills = 558 classes.
  *
  * <p>The claim "every character has every skill" does not hold either: a character only equips the
- * **always-on** slots in {@link com.laosun.aluminium.Constant#SKILL_SLOT}
+ * always-on slots in {@link com.laosun.aluminium.Constant#SKILL_SLOT}
  * (the overworld basic attack / technique are attached by {@code Battle.startBattle()}, and the summon slot
  * belongs to P9-4).
  */
@@ -49,7 +49,7 @@ public class DefaultSkill extends Skill {
     }
 
     /**
-     * ⚠ Despite the field name, {@code skillId} here is the <b>slot</b> — see the constructor call.
+     * Note: Despite the field name, {@code skillId} here is the <b>slot</b> - see the constructor call.
      */
     @Override
     public int getSkillSlot() {

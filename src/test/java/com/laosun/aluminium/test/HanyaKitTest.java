@@ -21,12 +21,12 @@ import java.util.Random;
  * 寒鸦 (1215), from her own file (2026-09-28): the ultimate, 星魂 1/2/3/5.
  *
  * <p><b>What her kit needed from the engine.</b> The SPD share is a <b>derived</b> magnitude read off her own panel
- * (`scale: self_attr:SPEED`), the ATK boost and the level raises are ordinary content, and 星魂 1's 「持有<b>终结技效果</b>
- * 的我方目标消灭敌方目标时」 is readable only because the ultimate also plants a marker <b>state</b> — a named modifier
+ * (`scale: self_attr:SPEED`), the ATK boost and the level raises are ordinary content, and 星魂 1's "持有<b>终结技效果</b>
+ * 的我方目标消灭敌方目标时" is readable only because the ultimate also plants a marker <b>state</b> - a named modifier
  * is invisible to `has_state`.
  *
- * <p><b>What is registered instead of approximated</b> (see the file's own note): the whole 【承负】 family — it needs a
- * state counter with a threshold (「每 2 次…恢复1个战技点」/「触发 2 次后自动解除」) — plus 星魂 4 and 6, which need a way to
+ * <p><b>What is registered instead of approximated</b> (see the file's own note): the whole [承负] family - it needs a
+ * state counter with a threshold ("每 2 次…恢复1个战技点"/"触发 2 次后自动解除") - plus 星魂 4 and 6, which need a way to
  * raise another rule's effect value or duration.
  */
 public class HanyaKitTest {
@@ -56,7 +56,7 @@ public class HanyaKitTest {
                 "「指定我方单体」: a self-cast is not a target (target != self)");
     }
 
-    /** 星魂 1: the ally who carries her ultimate gets a kill → she advances; once per turn. */
+    /** 星魂 1: the ally who carries her ultimate gets a kill to she advances; once per turn. */
     @Test
     public void herFirstEidolonAdvancesHerWhenTheCarrierGetsAKill() {
         Fixture f = new Fixture(1);
@@ -76,9 +76,9 @@ public class HanyaKitTest {
     }
 
     /**
-     * ⚠ The other half of 星魂 1: a kill by somebody <b>without</b> her ultimate's effect does not advance her.
+     * Note: The other half of 星魂 1: a kill by somebody <b>without</b> her ultimate's effect does not advance her.
      *
-     * <p>This case exists because the gate `actor has_state 敕令` was <b>not covered</b> by the positive test alone —
+     * <p>This case exists because the gate `actor has_state 敕令` was <b>not covered</b> by the positive test alone - 
      * removing the condition left every assertion green (measured mutation m1, 0 red), which is exactly the
      * "a test that cannot fail" shape this project keeps hunting.
      */

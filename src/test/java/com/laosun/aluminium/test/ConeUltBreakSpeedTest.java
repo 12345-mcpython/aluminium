@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Three cones a real battle drives: 20020 (attack on the ultimate), 20017 (heal on breaking a weakness) and 20019 (party speed at battle start, in POINTS).
+ * Three cones a real battle drives: 20020 (attack on the ultimate), 2001(heal on breaking a weakness) and 20019 (party speed at battle start, in POINTS).
  *
  * <p>Events are fired inside a driven turn and with a target, both established in round 129; the heal and the attack are measured as deltas across the
  * trigger, and the flat ones (SPEED, ATTACK) are related to the attribute's base value.

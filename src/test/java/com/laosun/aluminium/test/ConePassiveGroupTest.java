@@ -18,7 +18,7 @@ import java.util.Random;
 
 /**
  * Three cones whose effects come from passive boosts: 21003 (attack, plus crit ONLY against two or fewer enemies), 21008 (effect hit rate and damage over
- * time) and 21007 (outgoing healing, plus party energy whenever the wearer casts a skill).
+ * time) and 2100(outgoing healing, plus party energy whenever the wearer casts a skill).
  *
  * <p>The enemy-count gate is a battle-start fact (unlike current health, which is why the 20003/20016 shape was withdrawn), so it can be driven: the same
  * fixture is built with one enemy and with three, and the crit clause is asserted to fire in the first and not in the second.

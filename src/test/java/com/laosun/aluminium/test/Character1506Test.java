@@ -12,11 +12,11 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1506 银狼LV.999 (2026-09-30): the two clauses its own text states completely -- 「行动提前 100%」 and the declared
- * two-tier 【隐藏分】 (「达到 60 点后可激活终结技，达到上限后还可溢出 240 点」).
+ * 1506 银狼LV.999 (2026-09-30): the two clauses its own text states completely -- "行动提前 100%" and the declared
+ * two-tier [隐藏分] ("达到 60 点后可激活终结技，达到上限后还可溢出 240 点").
  *
- * <p>⭐ The two tiers are read on the resource itself: {@code gain} may run into the declared overflow, {@code gainClamped} stops at the
- * normal cap. ⚠ Until this round a declaration could only state ONE number, so the sentence above had no spelling even though the
+ * <p>The two tiers are read on the resource itself: {@code gain} may run into the declared overflow, {@code gainClamped} stops at the
+ * normal cap. Note: Until this round a declaration could only state ONE number, so the sentence above had no spelling even though the
  * engine underneath already had both tiers.
  */
 public class Character1506Test {
@@ -50,7 +50,7 @@ public class Character1506Test {
         Assertions.assertEquals(60, afterClamped, "but a clamped gain stops exactly at it");
     }
 
-    /** ★ The shipped declarations, read off the compiled character (discipline 232). */
+    /** The shipped declarations, read off the compiled character (discipline 232). */
     @Test
     public void theShippedDeclarationsCarryTheirNumbers() {
         build();

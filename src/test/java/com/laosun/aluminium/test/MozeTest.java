@@ -24,7 +24,7 @@ public class MozeTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** ⚠ The additional damage needs the Prey mark, and its 30% is compared with a hand-built 60% reference in the same pipeline. */
+    /** Note: The additional damage needs the Prey mark, and its 30% is compared with a hand-built 60% reference in the same pipeline. */
     @Test
     public void theAdditionalDamageNeedsPrey() {
         double unmarked = additionalLoss(true, false);
@@ -38,7 +38,7 @@ public class MozeTest {
                 "30% against a hand-built 60% reference: " + marked + " vs " + reference);
     }
 
-    /** ⚠ The Ultimate fires the talent's follow-up, and the number is the talent's own 160%. */
+    /** Note: The Ultimate fires the talent's follow-up, and the number is the talent's own 160%. */
     @Test
     public void theUltimateFiresTheTalentsFollowUp() {
         double fired = ultFollowUp();
@@ -68,7 +68,7 @@ public class MozeTest {
         Battle battle = new Battle(List.of(moze, ally), List.of(enemy), fixed());
         battle.startBattle();
         if (mark) {
-            // Applied directly in BOTH paths, so the only difference between them is the percentage (round 207's lesson).
+            // Applied directly in BOTH paths, so the only difference between them is the percentage (round 20's lesson).
             enemy.getBuffManager().addBuff(new com.laosun.aluminium.models.buff.StateBuff("猎物", 1, true));
         }
         double before = enemy.getCurrentHp();

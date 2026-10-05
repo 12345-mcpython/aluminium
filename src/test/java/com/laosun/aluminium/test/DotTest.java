@@ -26,12 +26,12 @@ import java.util.Set;
  * through the zones but cannot crit).
  *
  * <p>Anchor: a target with 100 defence, an Lv80 attacker (defence zone = 1000/1100), no resistance
- * and no DMG boost → one DOT with base=500 settles 500 × 1000/1100 ≈ 454.55.
+ * and no DMG boost to one DOT with base=500 settles 500  x  1000/1100 ~= 454.55.
  *
  * <p>Since the DOT became an ordinary buff, settling and counting down are <b>two</b> steps in two
  * different objects: {@code Battle.tickDots} deals the damage, {@code BuffManager.beforeMove()} burns
  * the turn off. Tests that assert expiry therefore drive both, in the order
- * {@code Battle.beforeMove()} drives them — the split is the point of the design, so it is visible in
+ * {@code Battle.beforeMove()} drives them - the split is the point of the design, so it is visible in
  * the tests rather than hidden behind a helper that would hide a wrong order too.
  */
 public class DotTest {
@@ -114,7 +114,7 @@ public class DotTest {
         Battle battle = new Battle(List.of(himeko), List.of(iceEdge), new Random(0));
 
         battle.castImmediate(new DefaultSkill(1003, 1, 1), himeko, List.of(iceEdge));
-        battle.castImmediate(new DefaultSkill(1003, 1, 1), himeko, List.of(iceEdge));   // drains it empty → break
+        battle.castImmediate(new DefaultSkill(1003, 1, 1), himeko, List.of(iceEdge));   // drains it empty to break
 
         Assertions.assertTrue(iceEdge.isBroken());
         Assertions.assertEquals(1, iceEdge.getBuffManager().countBuffs(DotBuff.class));
@@ -143,8 +143,8 @@ public class DotTest {
 
     @Test
     public void dotTicksThroughBattleWhenTheEnemyTurnStarts() {
-        Character hero = character("hero", 0.0);                        // speed 100 → period 100
-        Enemy fast = dummy(100_000, 100, 200);                          // speed 200 → period 50, acts first
+        Character hero = character("hero", 0.0);                        // speed 100 to period 100
+        Enemy fast = dummy(100_000, 100, 200);                          // speed 200 to period 50, acts first
         Battle battle = new Battle(List.of(hero), List.of(fast), new Random(0));
         fast.getBuffManager().addBuff(new DotBuff(hero, DamageElement.FIRE, 500, 2));
 
@@ -157,18 +157,18 @@ public class DotTest {
     }
 
     /**
-     * A one-turn DOT must still <b>settle once</b> — and this is the test that pins the <b>order</b> of
+     * A one-turn DOT must still <b>settle once</b> - and this is the test that pins the <b>order</b> of
      * the two lines in {@code Battle.beforeMove()}.
      *
      * <p>Settlement runs first, the buff countdown second. Swap them and a 1-turn DOT is counted down
      * to zero and removed <i>before</i> it ever deals damage: it silently burns for nothing. No other
-     * test can see that, because for a DOT with 2+ turns one settlement survives either way — only the
+     * test can see that, because for a DOT with 2+ turns one settlement survives either way - only the
      * boundary case distinguishes the two orders.
      */
     @Test
     public void aOneTurnDotStillSettlesBeforeItExpires() {
         Character hero = character("hero", 0.0);
-        Enemy fast = dummy(100_000, 100, 200);                 // speed 200 → acts first
+        Enemy fast = dummy(100_000, 100, 200);                 // speed 200 to acts first
         Battle battle = new Battle(List.of(hero), List.of(fast), new Random(0));
         fast.getBuffManager().addBuff(new DotBuff(hero, DamageElement.FIRE, 500, 1));
 
@@ -182,7 +182,7 @@ public class DotTest {
     }
 
     /**
-     * A DOT can land on <b>us</b>, and the engine settles it — this is the capability the migration
+     * A DOT can land on <b>us</b>, and the engine settles it - this is the capability the migration
      * bought, and it was <b>impossible</b> before it: {@code tickDots} took an {@code Enemy} and the
      * list of DOTs lived on {@code Enemy}, so "the boss burns us" could not be expressed at all.
      *
@@ -193,7 +193,7 @@ public class DotTest {
      */
     @Test
     public void aCharacterCanCarryADot() {
-        Enemy boss = dummy(100_000, 100, 50);                  // speed 50 → the hero (100) acts first
+        Enemy boss = dummy(100_000, 100, 50);                  // speed 50 to the hero (100) acts first
         Character hero = character("hero", 0.0);
         Battle battle = new Battle(List.of(hero), List.of(boss), new Random(0));
         hero.getBuffManager().addBuff(new DotBuff(boss, DamageElement.FIRE, 500, 2));
@@ -212,11 +212,11 @@ public class DotTest {
     // ==================================================================
 
     /**
-     * 「使目标陷入灼烧状态，每回合造成 500 点伤害」: the rule attaches a real DOT, and the {@code has_state}
-     * name follows from the element (Fire → 灼烧) with no second field.
+     * "使目标陷入灼烧状态，每回合造成 500 点伤害": the rule attaches a real DOT, and the {@code has_state}
+     * name follows from the element (Fire to 灼烧) with no second field.
      *
      * <p>Before this op only a weakness break could attach a DOT ({@code attachBreakDot}), so the whole
-     * 「使目标陷入灼烧/触电/裂伤/风化状态」 family — 11 of the 97 documents — had no spelling.
+     * "使目标陷入灼烧/触电/裂伤/风化状态" family - 11 of the 9documents - had no spelling.
      */
     @Test
     public void aRuleCanAttachABurn() {
@@ -232,10 +232,10 @@ public class DotTest {
     }
 
     /**
-     * 「每回合造成等同于三月七60%攻击力的冰属性伤害」: the magnitude is a share of the <b>rule owner's</b>
+     * "每回合造成等同于三月七60%攻击力的冰属性伤害": the magnitude is a share of the <b>rule owner's</b>
      * attribute, read once when the DOT lands and frozen into it.
      *
-     * <p>⚠ Frozen, not live: raising her attack afterwards must not change damage that is already burning. That is
+     * <p>Note: Frozen, not live: raising her attack afterwards must not change damage that is already burning. That is
      * the same snapshot rule the other derived values follow, and it is asserted here because the alternative
      * (holding a reference to her panel) would look identical in a one-turn test.
      */
@@ -254,7 +254,7 @@ public class DotTest {
                 "and frozen: a later change to her panel cannot change a DOT that is already burning");
     }
 
-    /** A flat constant may sit on top of the derived share — 「等同于 60% 攻击力 + 50」. */
+    /** A flat constant may sit on top of the derived share - "等同于 60% 攻击力 + 50". */
     @Test
     public void aDerivedMagnitudeMayCarryAConstant() {
         Fixture f = new Fixture(TriggerSpecs.dot("Ice", 50.0, "self_attr:ATTACK", 0.6, 2, null));
@@ -268,9 +268,9 @@ public class DotTest {
     /**
      * A DOT may state a <b>base chance</b>, and it is the same per-target pipeline a control uses.
      *
-     * <p>「有一定基础概率使目标陷入灼烧状态」 is common in the documents, so the field is read here too —
+     * <p>"有一定基础概率使目标陷入灼烧状态" is common in the documents, so the field is read here too - 
      * and when the roll fails, nothing is attached (not a DOT with 0 turns, which would still settle nothing but
-     * would show up in 「有几个负面效果」).
+     * would show up in "有几个负面效果").
      */
     @Test
     public void aDotWithABaseChanceIsRolledThroughTheEffectHitPipeline() {

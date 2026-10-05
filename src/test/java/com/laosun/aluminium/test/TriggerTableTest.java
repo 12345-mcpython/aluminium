@@ -23,15 +23,15 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Trigger tables (P8-7): character mechanics expressed as data.
+ * Trigger tables (P8-): character mechanics expressed as data.
  *
  * <p>The acceptance criterion from the roadmap is that <b>two real characters work with no Java
  * character class at all</b> -- their mechanics exist only as JSON under
  * {@code resources/characters/}:
  * <ul>
- *   <li><b>Tribbie 1403</b> — trace 1403103: 30 energy at battle start, and 1.50 energy
+ *   <li><b>Tribbie 1403</b> - trace 1403103: 30 energy at battle start, and 1.50 energy
  *       <b>per target hit</b> when another ally attacks;</li>
- *   <li><b>Robin 1309</b> — talent: a <b>flat 2</b> energy whenever an ally attacks.</li>
+ *   <li><b>Robin 1309</b> - talent: a <b>flat 2</b> energy whenever an ally attacks.</li>
  * </ul>
  * Those two are deliberately paired because they differ in the one way that is easy to get wrong:
  * Tribbie scales with the number of targets, Robin does not.
@@ -44,20 +44,20 @@ public class TriggerTableTest {
     /**
      * An ordinary character with <b>no trigger file</b>, used as the "unregistered" control.
      *
-     * <p>⚠ Looked up rather than named since 2026-09-27: this was 姬子 (1003) until her own kit was authored, and
+     * <p>Note: Looked up rather than named since 2026-09-2: this was 姬子 (1003) until her own kit was authored, and
      * the control having acquired rules broke three of the claims below. See {@link TestCharacters}.
      */
-    // ✅ 2026-09-30: split in two. The "there is no file" facts (`TriggerTables.exists` is false, a lookup is a cache miss)
+    // 2026-09-30: split in two. The "there is no file" facts (`TriggerTables.exists` is false, a lookup is a cache miss)
     // use a SYNTHETIC id that is never built; every use as a BODY builds 1002 instead, because those claims are about the table
-    // the test installs or about the body’s own data, not about the body having no rules.
+    // the test installs or about the body's own data, not about the body having no rules.
     private static final int NO_TRIGGERS = 999999;
 
     /**
-     * An ally whose ultimate connects with <b>every</b> enemy — the driver for the 「per target hit」 pair.
+     * An ally whose ultimate connects with <b>every</b> enemy - the driver for the "per target hit" pair.
      *
      * <p>Named rather than looked up, because the property being asked for is a fact about one character's
-     * <b>skill data</b> (1003's ultimate is 全体攻击, 60 toughness, Fire), not about the engine. ⚠ She has a rule
-     * file of her own since 2026-09-27, and that is deliberately acceptable here: the number each test measures is
+     * <b>skill data</b> (1003's ultimate is 全体攻击, 60 toughness, Fire), not about the engine. Note: She has a rule
+     * file of her own since 2026-09-2, and that is deliberately acceptable here: the number each test measures is
      * <em>Tribbie's</em> or <em>Robin's</em> energy, which only their own tables can credit, and none of her rules
      * grants energy to anybody ({@code resources/characters/1003.json}).
      */
@@ -181,10 +181,10 @@ public class TriggerTableTest {
      */
     @Test
     public void unregisteredCharacterHasAnEmptyTableAndTheBattleStillRuns() {
-        // ✅ 2026-09-30: this test asserts what an EMPTY TABLE does, so it builds the empty table itself instead of borrowing
-        // the shared "unregistered character" control. Measured: that control’s data matters here -- the assertion below is
+        // 2026-09-30: this test asserts what an EMPTY TABLE does, so it builds the empty table itself instead of borrowing
+        // the shared "unregistered character" control. Measured: that control's data matters here -- the assertion below is
         // about the character recovering energy from its own basic attack, and the last file-less id (1506) has max energy 0,
-        // so it read 0.0. Replacing a table is usually a trap (it deletes the rule under test, hit in round 70), but here the
+        // so it read 0.0. Replacing a table is usually a trap (it deletes the rule under test, hit in round 0), but here the
         // empty table IS the subject, which is exactly why it is the right construction.
         Character plain = CharacterFactory.create(1002, 80);
         plain.setTriggerTable(new com.laosun.aluminium.models.TriggerTable(1002, java.util.List.of()));
@@ -226,10 +226,10 @@ public class TriggerTableTest {
     /**
      * The trigger fires on the event that happened rather than on "the battle exists".
      *
-     * <p>⚠ The expected numbers moved on 2026-09-27: this test used to assert that Robin had <b>no</b>
+     * <p>Note: The expected numbers moved on 2026-09-2: this test used to assert that Robin had <b>no</b>
      * battle-start rule, because her file held only her talent. Her two 行迹 traces now live in the
-     * same file (华彩花腔 → {@code BATTLE_START}, 模进乐段 → {@code SKILL_CAST}), so the counts are
-     * per-event again — which is the actual claim being pinned: an event fires the rules that named
+     * same file (华彩花腔 to {@code BATTLE_START}, 模进乐段 to {@code SKILL_CAST}), so the counts are
+     * per-event again - which is the actual claim being pinned: an event fires the rules that named
      * <i>that</i> event and no others.
      */
     @Test
@@ -269,7 +269,7 @@ public class TriggerTableTest {
      * <p>The example used to be {@code ULT_CAST}, then {@code TURN_START} / {@code TAKING_HIT}; all
      * three now have emitters, so the event is taken from the enum instead of being hard-coded. The
      * companion assertion {@link #everyDeclaredTriggerEventIsEmitted()} is what keeps the vocabulary
-     * honest — without it the day every event is wired this test would silently stop covering the
+     * honest - without it the day every event is wired this test would silently stop covering the
      * rejection path.
      */
     @Test
@@ -325,12 +325,12 @@ public class TriggerTableTest {
     }
 
     /**
-     * Numeric equality parses — {@code hit_count == 2} has been in the DSL's documentation since its first
-     * version and was rejected as "compares two variables" until 2026-09-27.
+     * Numeric equality parses - {@code hit_count == 2} has been in the DSL's documentation since its first
+     * version and was rejected as "compares two variables" until 2026-09-2.
      *
      * <p>Found by writing a condition that needed {@code == 0}: {@code ==} and {@code !=} went straight to the
      * <b>identity</b> branch (which is about {@code actor == self}), so anything without {@code self} on one
-     * side was refused — including the examples in the comment above the parser. The two readings are now kept
+     * side was refused - including the examples in the comment above the parser. The two readings are now kept
      * apart by whether either side <em>is</em> {@code self}, and this case pins both.
      */
     @Test
@@ -377,8 +377,8 @@ public class TriggerTableTest {
      * An op whose prerequisite phase has not landed is rejected <b>with the phase named</b>, so the
      * author learns what to wait for instead of debugging a rule that can never work.
      *
-     * <p>⚠ The example moved on 2026-09-27: it used to be {@code APPLY_BUFF}, which is now wired (it puts
-     * the target into a named state — see {@code TriggerStateTest}). {@code REDUCE_TOUGHNESS} is the one
+     * <p>Note: The example moved on 2026-09-2: it used to be {@code APPLY_BUFF}, which is now wired (it puts
+     * the target into a named state - see {@code TriggerStateTest}). {@code REDUCE_TOUGHNESS} is the one
      * left, and it is spelled out here rather than derived from the interpreter's private set, because this
      * test is about the <i>message</i>.
      */
@@ -425,7 +425,7 @@ public class TriggerTableTest {
      * itself, because that is the only reading under which the rule does anything at all.
      *
      * <p>Those attributes are written by the builder through {@code addPercentPoint}, i.e. as a flat
-     * modifier on a base of <b>0</b> — so an additive percentage would multiply zero: the op would
+     * modifier on a base of <b>0</b> - so an additive percentage would multiply zero: the op would
      * fire, install a modifier, and change nothing, which is exactly the kind of silent no-op this
      * project's guard rails exist to prevent. This is the reading {@code RelicSuit.appendTo} already
      * uses for the same attributes ("any other {@code isPercent} attribute is a percentage-point
@@ -480,7 +480,7 @@ public class TriggerTableTest {
     }
 
     /**
-     * {@code all_allies} is what makes a party-wide buff expressible — and party-wide is the majority
+     * {@code all_allies} is what makes a party-wide buff expressible - and party-wide is the majority
      * of buff talents in the real data, so this selector decides whether the op is actually useful.
      */
     @Test
@@ -549,7 +549,7 @@ public class TriggerTableTest {
     /**
      * {@code AttributeType.fromString} documents itself as case-insensitive; that used to be false
      * (the lookup table is lower-cased but the input was not), which only surfaced once data started
-     * naming attributes — every other test here passes {@code ATTACK} and would simply have failed
+     * naming attributes - every other test here passes {@code ATTACK} and would simply have failed
      * to load. Mixed case is used here so the normalisation itself is what is under test.
      */
     @Test
@@ -563,7 +563,7 @@ public class TriggerTableTest {
 
     /**
      * A misspelled {@code target} used to fall back to "the owner", so {@code "atacker"} behaved
-     * exactly like {@code "self"} — the rule fired and nothing was reported. Now it is a closed set
+     * exactly like {@code "self"} - the rule fired and nothing was reported. Now it is a closed set
      * like the condition variables.
      */
     @Test
@@ -696,7 +696,7 @@ public class TriggerTableTest {
 
     // ---- MODIFY_ATTR helpers (P10-3) ----
 
-    /** hp 1000 / def 200 / atk 300 / speed 100 — all different, so a mix-up shows up as a number. */
+    /** hp 1000 / def 200 / atk 300 / speed 100 - all different, so a mix-up shows up as a number. */
     private static Character character(String name) {
         return Character.fromAttributes(name, 1000, 200, 300, 100);
     }
@@ -732,7 +732,7 @@ public class TriggerTableTest {
      * Runs one {@code MODIFY_ATTR} rule.
      *
      * <p>{@code battle} may be {@code null} for the single-target selectors: {@code MODIFY_ATTR} only
-     * touches the resolved target's buff manager. {@code all_allies} does need it, and says so — that
+     * touches the resolved target's buff manager. {@code all_allies} does need it, and says so - that
      * is {@link #allAlliesWithoutABattleFailsLoudly}.
      */
     private static void fireAttr(Battle battle, Character owner, Character subject, EffectSpec effect) {

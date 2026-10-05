@@ -21,21 +21,21 @@ import java.util.Set;
  * The pre-cast hook ({@code TriggerEvent.CAST_SETUP}) and {@code DELEGATE_DAMAGE} (P11-1, M-40).
  *
  * <p><b>What this pair is for.</b> A document can say that a skill's damage is somebody else's: 长夜月's ultimate
- * 「使忆灵「长夜」对敌方全体造成等同于「长夜」#1[i]%生命上限的冰属性伤害」 is the memosprite's swing, and the rule that
- * delivers it as such runs on {@code ULT_CAST} — i.e. <b>after</b> the damage has already been expanded. So the
+ * "使忆灵'长夜'对敌方全体造成等同于'长夜'#1[i]%生命上限的冰属性伤害" is the memosprite's swing, and the rule that
+ * delivers it as such runs on {@code ULT_CAST} - i.e. <b>after</b> the damage has already been expanded. So the
  * engine's own damage path swings 141303's rows first (with <b>her</b> attack as the base) and the commanded hit
  * lands on top: two instances where the document describes one, the first scaled off the wrong attribute
- * (measured 2026-09-27: 8818.5 of hers + the commanded share, on 1002011). {@code DELEGATE_DAMAGE} is the content
+ * (measured 2026-09-2: 8818.5 of hers + the commanded share, on 1002011). {@code DELEGATE_DAMAGE} is the content
  * saying "not mine", and it has to be on the pre-cast event because that is the only moment at which the swing can
  * still be stopped.
  *
  * <p><b>Why the cases below are shaped the way they are.</b>
  * <ol>
- *   <li>every "deals nothing" case is measured <b>against a control with the same cast but no delegation</b> — a
+ *   <li>every "deals nothing" case is measured <b>against a control with the same cast but no delegation</b> - a
  *       test that only asserted {@code 0} would also pass if the skill dealt no damage at all (or if the damage
  *       path broke), which is the opposite of what this op promises;</li>
  *   <li>the toughness is asserted next to the damage, because a delegated cast expands no damage and therefore
- *       removes no toughness either — the two travel together, and the op that <b>does</b> deliver the swing
+ *       removes no toughness either - the two travel together, and the op that <b>does</b> deliver the swing
  *       (here {@code COMMAND_SUMMON}) has to carry both;</li>
  *   <li>the same slot-matching is checked from both sides: the same slot is delegated successfully, a different
  *       slot is refused loudly. The condition DSL has no variable for "which slot is being cast", so that
@@ -45,9 +45,9 @@ import java.util.Set;
 public class CastSetupTest {
     private static final double EPS = 1e-6;
 
-    /** 长夜月 — the character whose ultimate is the first user of the op. */
+    /** 长夜月 - the character whose ultimate is the first user of the op. */
     private static final int OWNER = 1413;
-    /** 姬子 — a plain ally, whose casts must not be affected by 长夜月's rule. */
+    /** 姬子 - a plain ally, whose casts must not be affected by 长夜月's rule. */
     private static final int ALLY = 1003;
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
@@ -63,7 +63,7 @@ public class CastSetupTest {
     // ==================================================================
 
     /**
-     * A delegated cast deals <b>nothing</b> — no damage and no toughness — while the control (same cast, no
+     * A delegated cast deals <b>nothing</b> - no damage and no toughness - while the control (same cast, no
      * delegation) still deals a real amount.
      */
     @Test
@@ -90,7 +90,7 @@ public class CastSetupTest {
     @Test
     public void delegatingAnotherSlotWorksTheSameWay() {
         // 姬子's Skill rather than 长夜月's: the point is that the gate is the slot the rule names, and 长夜月's own
-        // slot 2 turns out not to be a damaging skill at all — the control is 0 for her, which is exactly what the
+        // slot 2 turns out not to be a damaging skill at all - the control is 0 for her, which is exactly what the
         // control in the case above exists to catch (a "delegated nothing" and a "nothing to delegate" read alike).
         double control = hitPointsLost(ALLY, TriggerTable.EMPTY, SKILL_SLOT);
         Assertions.assertTrue(control > 0, "control: 姬子's Skill deals damage of its own (" + control + ")");
@@ -103,7 +103,7 @@ public class CastSetupTest {
     }
 
     // ==================================================================
-    // 2. Refusals — at load time
+    // 2. Refusals - at load time
     // ==================================================================
 
     /** The op changes the cast being set up, so only the event that hands one over may carry it. */
@@ -128,13 +128,13 @@ public class CastSetupTest {
     }
 
     // ==================================================================
-    // 3. Refusals — when it fires
+    // 3. Refusals - when it fires
     // ==================================================================
 
     /**
      * Naming a different slot than the one being cast is refused rather than ignored.
      *
-     * <p>Ignoring it would be a rule that loads, fires, and does nothing — and the author would have no way to
+     * <p>Ignoring it would be a rule that loads, fires, and does nothing - and the author would have no way to
      * tell it apart from one that works.
      */
     @Test
@@ -156,7 +156,7 @@ public class CastSetupTest {
      * A rule that fires on a teammate's cast is refused, and the message names the fix.
      *
      * <p>{@code CAST_SETUP} reaches <b>every</b> character's table (the same broadcast the other cast events use),
-     * so a rule without {@code actor == self} would hand away somebody else's damage — an over-trigger that no
+     * so a rule without {@code actor == self} would hand away somebody else's damage - an over-trigger that no
      * later observation could tell from the intended one, which is why the op checks it instead of trusting the
      * condition.
      */

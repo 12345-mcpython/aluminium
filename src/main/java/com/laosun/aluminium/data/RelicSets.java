@@ -14,11 +14,11 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Loads {@code data/relic_sets.json} — the relic-set table (60 sets / 92 bonuses) that says what wearing
+ * Loads {@code data/relic_sets.json} - the relic-set table (60 sets / 92 bonuses) that says what wearing
  * two or four pieces of a set actually does.
  *
  * <p>Shaped like {@link SkillEffects} and {@link TriggerTables}: read once, lazily, from the classpath, and
- * a <b>missing file is an empty table rather than an error</b> — the file is generator output (see the
+ * a <b>missing file is an empty table rather than an error</b> - the file is generator output (see the
  * README's generator section), and the engine must still be able to run without it; it simply cannot apply
  * set bonuses, which is exactly the state before this table existed.
  *
@@ -32,7 +32,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  *   <li>a row whose {@code set_id} disagrees with its own map key is rejected. This is the guard against
  *       the failure mode this project keeps hitting: a misspelled {@code @SerializedName} makes Gson bind
  *       {@code setId} to {@code 0} for every row, and because the id is then never used as a lookup key
- *       nothing would visibly break — the set bonuses would just quietly stop matching. Comparing the two
+ *       nothing would visibly break - the set bonuses would just quietly stop matching. Comparing the two
  *       turns that into an exception at startup;</li>
  *   <li>absent {@code parts} / {@code effects} / {@code properties} become empty lists, so no caller has to
  *       null-check (the same normalisation {@code Constant} does for monster rows).</li>
@@ -61,7 +61,7 @@ public final class RelicSets {
      * <p>Shaped like {@link com.laosun.aluminium.Constant#stages()}: the first caller pays for the read,
      * everybody else gets the same immutable map. {@code Constant.RELIC_SETS} is the usual way in.
      *
-     * @return set id → set; empty when the data file was not generated
+     * @return set id to set; empty when the data file was not generated
      */
     public static Map<Integer, RelicSet> table() {
         Map<Integer, RelicSet> local = table;
@@ -98,7 +98,7 @@ public final class RelicSets {
     }
 
     /**
-     * How many times the resource was actually read — lets a test assert "read once".
+     * How many times the resource was actually read - lets a test assert "read once".
      */
     public static int loadCount() {
         return LOAD_COUNT.get();
@@ -119,15 +119,15 @@ public final class RelicSets {
     }
 
     /**
-     * Turns the file's {@code "set id" → set} map into the engine's {@code int id → set} table.
+     * Turns the file's {@code "set id" to set} map into the engine's {@code int id to set} table.
      *
      * <p>Everything the table is allowed to contain is decided here: the key must be a number, and a row
-     * whose own {@code set_id} disagrees with the key it is filed under is rejected — that disagreement is
+     * whose own {@code set_id} disagrees with the key it is filed under is rejected - that disagreement is
      * what a failed {@code set_id} binding looks like (every row would say {@code 0}), and it is silent
      * otherwise, because the engine looks sets up by the map key and never re-reads the field.
      *
      * <p>Public rather than private so that both rejections can be tested with a hand-made map instead of a
-     * doctored copy of a generated data file — the same reason {@code TriggerTable}'s constructor is where
+     * doctored copy of a generated data file - the same reason {@code TriggerTable}'s constructor is where
      * trigger specs are validated.
      *
      * @param parsed the parsed file, possibly {@code null} (an empty file)
@@ -165,7 +165,7 @@ public final class RelicSets {
     /**
      * Makes the lists non-null so that no caller has to care whether the generator emitted an empty array
      * or left the field out. Anything the engine cannot express is <b>left in place</b> (a property with an
-     * unknown name is not dropped here — it throws when it is applied).
+     * unknown name is not dropped here - it throws when it is applied).
      */
     private static RelicSet normalize(RelicSet set) {
         List<RelicSet.Part> parts = set.parts() == null ? List.of() : List.copyOf(set.parts());

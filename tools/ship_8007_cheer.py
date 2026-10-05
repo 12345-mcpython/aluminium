@@ -34,8 +34,8 @@ if len(targets) != 1:
     raise SystemExit("expected exactly one SKILL_CAST rule, found " + str(len(targets)))
 
 rule = targets[0]
-# ⚠ Idempotence by OP, not by an invented key: `EffectKeyDisciplineTest` reddened the first draft with "these effect keys
-# are not fields of EffectSpec, so Gson drops them silently: {mark=[8007.json]}" -- an invented key is not a marker, it is a
+# Note: Idempotence by OP, not by an invented key: `EffectKeyDisciplineTest` reddened the first draft with "these effect keys
+# are not fields of EffectSpec, so Gson drops them silently: {mark=[800.json]}" -- an invented key is not a marker, it is a
 # silent no-op. Drop any previous copy of these two ops, then append the real ones.
 do = [e for e in (rule.get("do") or []) if not (isinstance(e, dict) and (
     e.get("op") == "ADVANCE" or (e.get("op") == "APPLY_BUFF" and e.get("buff") == CHEER)))]

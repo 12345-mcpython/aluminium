@@ -19,9 +19,9 @@ import java.util.Random;
 /**
  * <b>Per-target conditions</b> (2026-09-28, {@code M-53}): an effect's {@code target_when}.
  *
- * <p><b>The sentences that needed it.</b> 「对所有<b>触电状态下的</b>敌方目标造成…附加伤害」(1103's talent), 「使<b>非触电状态下的</b>
- * 敌方目标陷入触电」(her 星魂 4) and 「对<b>生命百分比 ≤ 30% 的</b>我方目标附加持续治疗」(1105's 星魂 2). A rule's own conditions
- * filter the <b>rule</b>, so 「all shocked enemies」 could previously only be spelled as "the enemy I hit was shocked" —
+ * <p><b>The sentences that needed it.</b> "对所有<b>触电状态下的</b>敌方目标造成…附加伤害"(1103's talent), "使<b>非触电状态下的</b>
+ * 敌方目标陷入触电"(her 星魂 4) and "对<b>生命百分比 <= 30% 的</b>我方目标附加持续治疗"(1105's 星魂 2). A rule's own conditions
+ * filter the <b>rule</b>, so "all shocked enemies" could previously only be spelled as "the enemy I hit was shocked" - 
  * which then also hit the unshocked ones. The selector says which units; this filter says which of them qualify.
  *
  * <p><b>What is pinned here.</b> That the filter is applied <b>per candidate</b> (the subject really is the candidate,
@@ -71,8 +71,8 @@ public class TargetFilterTest {
                 "…and the healthy one did not: the condition tested the CANDIDATE, not the event's target");
     }
 
-    /** ⚠ A misspelled condition inside a filter is refused when the file loads, not ignored. */
-    /** ⚠ A misspelled condition inside a filter is refused when the file loads, not ignored. */
+    /** Note: A misspelled condition inside a filter is refused when the file loads, not ignored. */
+    /** Note: A misspelled condition inside a filter is refused when the file loads, not ignored. */
     @Test
     public void aBadFilterIsRefusedAtLoad() {
         IllegalArgumentException refused = Assertions.assertThrows(IllegalArgumentException.class,
@@ -130,7 +130,7 @@ public class TargetFilterTest {
     /**
      * One rule that marks <b>every</b> enemy, filtered per candidate.
      *
-     * <p>⚠ A marker state rather than damage: the filter is what is under test, and {@code APPLY_BUFF} observes it in one
+     * <p>Note: A marker state rather than damage: the filter is what is under test, and {@code APPLY_BUFF} observes it in one
      * line (`hasState`) without dragging in the DAMAGE op's own requirements (a skill slot and a parameter index).
      */
     private static TriggerSpec rule(List<String> filter) {

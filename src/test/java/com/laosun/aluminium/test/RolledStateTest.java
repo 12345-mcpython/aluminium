@@ -18,14 +18,14 @@ import java.util.Random;
 /**
  * A <b>state that is rolled</b> (2026-09-28): {@code APPLY_BUFF} with {@code base_chance}.
  *
- * <p>「**有 100% 的基础概率**使敌方每个单体目标陷入【通解】状态」 (1106 佩拉) needed it, and so does a family of 69 sentences across 24
- * files (six of them already-shipped characters). ⚠ The point is <b>not</b> "100% always works": the state goes through the same
- * {@code tryApplyDebuff} path a DOT or a control uses, so <b>effect resistance still applies</b> — 「基础概率」 is the chance
+ * <p>"有 100% 的基础概率使敌方每个单体目标陷入[通解]状态" (1106 佩拉) needed it, and so does a family of 69 sentences across 24
+ * files (six of them already-shipped characters). Note: The point is <b>not</b> "100% always works": the state goes through the same
+ * {@code tryApplyDebuff} path a DOT or a control uses, so <b>effect resistance still applies</b> - "基础概率" is the chance
  * <i>before</i> resistance, and applying the state unconditionally would be a different mechanic rather than a bigger number.
  *
  * <p><b>What is pinned here.</b> That a stated chance is really <b>rolled</b> (a tiny chance with a 0.5 roll leaves nothing
  * behind, while the same rule with no chance stated always lands), and that a plain state still meets no <i>class</i>
- * resistance — it reports no {@code debuffClass}, which is the honest limit of this spelling.
+ * resistance - it reports no {@code debuffClass}, which is the honest limit of this spelling.
  */
 public class RolledStateTest {
     private static final int CID = 1106;
@@ -45,10 +45,10 @@ public class RolledStateTest {
     }
 
     /**
-     * ⚠ And the round's actual claim, pinned: <b>a 100% base chance can still be resisted.</b>
+     * Note: And the round's actual claim, pinned: <b>a 100% base chance can still be resisted.</b>
      *
-     * <p>A 0.999999 draw against 1.0 must fail, because the chance is the number <i>before</i> effect resistance — if this
-     * ever lands, the state is being applied unconditionally and 「基础概率」 has silently become "always". (The first
+     * <p>A 0.999999 draw against 1.0 must fail, because the chance is the number <i>before</i> effect resistance - if this
+     * ever lands, the state is being applied unconditionally and "基础概率" has silently become "always". (The first
      * version of this case asserted the opposite, which is how the difference got measured rather than assumed.)
      */
     @Test

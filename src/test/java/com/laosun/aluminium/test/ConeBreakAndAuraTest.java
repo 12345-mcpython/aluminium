@@ -48,7 +48,7 @@ public class ConeBreakAndAuraTest {
         withCone.getAttribute(AttributeType.EFFECT_HIT_RATE)
                 .addModifier(DoubleValue.Modifier.pure(2.0, DoubleValue.Modifier.ModifierSource.BUFF, 230350));
         battle.fireTriggers(TriggerEvent.BREAK, withCone, target, 0, 0);
-        // ⚠ ADD_STACK builds a COUNTER, not a state hasState() reports (measured: hasState was false while the
+        // Note: ADD_STACK builds a COUNTER, not a state hasState() reports (measured: hasState was false while the
         // damage ratio below did move). So the stacking is asserted where it is observable: the ratio and the spec.
         int spec = 0;
         for (var rule : withCone.getTriggerTable().matching(TriggerEvent.BREAK,
@@ -87,7 +87,7 @@ public class ConeBreakAndAuraTest {
         Character wearer = CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(23038, LEVEL, false, 1));
         Character ally = CharacterFactory.create(ALLY, LEVEL);
         Battle battle = battle(wearer, ally);
-        // ⚠ No "before" reading in THIS battle: BATTLE_START already applied the aura (measured: 0.98 = 0.5 + 0.48),
+        // Note: No "before" reading in THIS battle: BATTLE_START already applied the aura (measured: 0.98 = 0.5 + 0.48),
         // so the baseline has to come from a battle with no cone at all (discipline 141).
         Character reference = CharacterFactory.create(ALLY, LEVEL);
         Character plainWearer = CharacterFactory.create(WEARER, LEVEL);
@@ -98,8 +98,8 @@ public class ConeBreakAndAuraTest {
         System.out.println("[23038] ally crit damage baseline(no cone)=" + baseline + " with cone=" + afterFollowUp
                 + " ; state on the wearer=" + wearer.getBuffManager().hasState("谕示"));
         Assertions.assertEquals(baseline + 0.48, afterFollowUp, 1e-9, "the aura gives the party 48 points of crit damage");
-        // ⚠ The duration has to be PINNED: every reading here happens in the same turn, so shortening the aura is
-        // invisible to them (measured: 2 -> 1 turn gave reds 0). Discipline 147.
+        // Note: The duration has to be PINNED: every reading here happens in the same turn, so shortening the aura is
+        // invisible to them (measured: 2 -> 1 turn gave reds 0). Discipline 14.
         int pinnedTurns = 0;
         for (var rule : wearer.getTriggerTable().matching(TriggerEvent.FOLLOW_UP,
                 new com.laosun.aluminium.models.TriggerTable.TriggerContext(wearer, wearer, wearer, 0, 0))) {

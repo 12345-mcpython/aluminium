@@ -23,16 +23,16 @@ import java.util.Random;
  * the engine stops assuming "enemy camp == monsters". Four things could each have quietly kept the old
  * assumption, and each is asserted here:
  * <ol>
- *   <li>the camp holds it ({@code enemies}) while the monster view ({@code enemyUnits()}) does not —
+ *   <li>the camp holds it ({@code enemies}) while the monster view ({@code enemyUnits()}) does not - 
  *       the two questions "who is on that side" and "which of them are monsters" are now separate;</li>
  *   <li>our side can reach it: the engine's own target expansion ({@code targetableEnemies}) includes it,
  *       which is what an AOE skill iterates;</li>
- *   <li><b>the outcome waits for it</b>: killing every monster while a summon lives must not be a win —
+ *   <li><b>the outcome waits for it</b>: killing every monster while a summon lives must not be a win - 
  *       the failure mode this guards against is a summon that is simply ignored by the victory check;</li>
  *   <li>it takes a turn: it is on the action bar like anything else.</li>
  * </ol>
  *
- * <p>A {@code Summon} is used rather than a fake subclass on purpose — it is the real type P9-4 needs, and
+ * <p>A {@code Summon} is used rather than a fake subclass on purpose - it is the real type P9-4 needs, and
  * it is the type that could not be placed at all before this change.
  */
 public class EnemyCampSummonTest {

@@ -20,11 +20,11 @@ import java.util.Random;
  * P9-2: an enemy skill reaches whoever its <b>shape</b> says, not always the main target.
  *
  * <p>Before this, {@code EnemySkill.execute} hit the first target {@link #SEGMENTS} times and nothing
- * else, so a multi-target enemy skill in the data had no way to reach a second character — an AoE would
+ * else, so a multi-target enemy skill in the data had no way to reach a second character - an AoE would
  * silently under-hit and the only way to notice was to read the numbers. The dispatch now mirrors
  * {@code SkillExecutor}'s character-skill shapes.
  *
- * <p>⚠ {@code hits} in {@code enemy_skills.json} means <b>segments</b>, not targets (8013010
+ * <p>Note: {@code hits} in {@code enemy_skills.json} means <b>segments</b>, not targets (8013010
  * "Trampling Stomp" is two segments on one target). {@code ROADMAP}'s P9-1 plan uses the same field name
  * for a target count, so these tests pin the meaning from the shipped side: if the field is ever
  * re-pointed, {@link #singleTargetIsTheDefaultAndHitsOnlyTheMainTarget} and
@@ -42,7 +42,7 @@ public class EnemySkillFullTest {
     // ==================================================================
 
     /**
-     * The default shape reaches one character — the behaviour every shipped entry relies on.
+     * The default shape reaches one character - the behaviour every shipped entry relies on.
      *
      * <p>{@code null} effect is the default on purpose: the five entries in {@code enemy_skills.json} were
      * written before shapes existed, and adding the field must not move them.
@@ -93,7 +93,7 @@ public class EnemySkillFullTest {
     }
 
     /**
-     * Blast on the leftmost character has only one neighbour — the range is clipped, not wrapped.
+     * Blast on the leftmost character has only one neighbour - the range is clipped, not wrapped.
      *
      * <p>Worth pinning separately: a naive index arithmetic would either throw or wrap around and hit a
      * character on the far side.
@@ -145,7 +145,7 @@ public class EnemySkillFullTest {
      * A character who is already down takes no damage, and the living ones still do.
      *
      * <p>The guard that decides this lives in the segment loop ({@code strike} breaks once the victim is
-     * dead), not in the target selection — an earlier version had both, and mutation testing showed the
+     * dead), not in the target selection - an earlier version had both, and mutation testing showed the
      * selection-side filter changed no observable outcome, so it was removed rather than left as an
      * untestable second guard.
      */

@@ -15,9 +15,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1415's memosprite skill 21, the fire-seed CRIT clause (2026-10-02): 「变身时若【火种】大于 #5 点，每超出 1 点，卡厄斯兰那的暴击伤害提高 #6%，最多可提高 #7%」.
+ * 1415's memosprite skill 21, the fire-seed CRIT clause (2026-10-02): "变身时若[火种]大于 #5 点，每超出 1 点，卡厄斯兰那的暴击伤害提高 #6%，最多可提高 #%".
  *
- * ⭐ The cap is the step count (`#7 / #6 = 6`), so the six gates are the sentence. This judge sets 【火种】 to a chosen value and reads the CRIT DMG the transformation grants.
+ * The cap is the step count (`#/ #6 = 6`), so the six gates are the sentence. This judge sets [火种] to a chosen value and reads the CRIT DMG the transformation grants.
  */
 public class WorldOdeFireSeedCritTest {
     private static final int LEVEL = 80;
@@ -33,8 +33,8 @@ public class WorldOdeFireSeedCritTest {
         double[] fifteen = run(15);
         System.out.println("[fire_crit] his own transformation grants +" + baseline[0] + " ; with seeds the total is +" + twelve[0]
                 + " (12), +" + thirteen[0] + " (13), +" + fifteen[0] + " (15)");
-        // ⭐ Differences cancel whatever his OWN transformation grants, so each difference is purely the sentence's steps.
-        // ⭐ ANCHORED to `baseline` rather than compared with each other (2026-10-02): a difference is blind to a uniform shift, which is exactly what a missing step looks
+        // Differences cancel whatever his OWN transformation grants, so each difference is purely the sentence's steps.
+        // ANCHORED to `baseline` rather than compared with each other (2026-10-02): a difference is blind to a uniform shift, which is exactly what a missing step looks
         // like -- measured, the mutation that disabled step 1 moved all three readings together and the difference-only version of this judge still passed.
         Assertions.assertEquals(steps(twelve[1]) * 0.06, twelve[0] - baseline[0], 1e-6, "at the threshold, nothing is over it");
         Assertions.assertEquals(steps(thirteen[1]) * 0.06, thirteen[0] - baseline[0], 1e-6, "one seed past the threshold is one step");
@@ -54,11 +54,11 @@ public class WorldOdeFireSeedCritTest {
         battle.startBattle();
         battle.processRequests();
         him = battle.characters.getFirst();
-        // ⭐ Give him the seeds DIRECTLY (2026-10-02). A hand-built table REPLACES his loaded one -- the trap this project has hit six times -- and that would delete
+        // Give him the seeds DIRECTLY (2026-10-02). A hand-built table REPLACES his loaded one -- the trap this project has hit six times -- and that would delete
         // the very rules under test, along with his own transformation.
         him.getResources().gain(FIRE_SEED, seeds);
         battle.processRequests();
-        // ⭐ His own kit already grants a seed at battle start (`trace_worlds_end_one_seed_at_battle_start`), so the judge reads the TOTAL and derives the step count from
+        // His own kit already grants a seed at battle start (`trace_worlds_end_one_seed_at_battle_start`), so the judge reads the TOTAL and derives the step count from
         // it -- the engine's own number, never a hard-coded expectation.
         int total = him.getResources().value(FIRE_SEED);
         Assertions.assertTrue(total >= seeds, "precondition: at least the seeds under test are in place, got " + total);

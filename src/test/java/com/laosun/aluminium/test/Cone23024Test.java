@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Light cone 23024: hitting a target puts 【泡影】 on it for one turn (once per attack per target), damage against such targets is 24%
+ * Light cone 23024: hitting a target puts [泡影] on it for one turn (once per attack per target), damage against such targets is 24%
  * higher, and Ultimates get another 24% on top.
  */
 public class Cone23024Test {
@@ -70,8 +70,8 @@ public class Cone23024Test {
                     Assertions.assertEquals(BUBBLE, effect.getBuff(), "the bubble");
                     Assertions.assertEquals(1, effect.getTurns(), "for one turn");
                     Assertions.assertEquals("target", effect.getTarget(), "on the target");
-                    // ⚠ `CompiledRule` exposes no once-per-attack accessor (measured), so the flag itself is not readable
-                    // from a test: the loader validates it at rule level (TriggerTable line 730 reads spec.getOncePerAttack()),
+                    // Note: `CompiledRule` exposes no once-per-attack accessor (measured), so the flag itself is not readable
+                    // from a test: the loader validates it at rule level (TriggerTable line 30 reads spec.getOncePerAttack()),
                     // and this judge pins the effect's shape. Registered as a small reading gap rather than faked here.
                     Assertions.assertEquals(1, effect.getTurns(), "one turn is exactly what the limit rides on");
                 } else {

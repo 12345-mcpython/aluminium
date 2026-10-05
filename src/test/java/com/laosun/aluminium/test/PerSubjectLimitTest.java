@@ -16,10 +16,10 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 「该效果每个角色最多触发 1 次」 (1403) -- a firing count that belongs to the TRIGGERER, not the owner.
+ * "该效果每个角色最多触发 1 次" (1403) -- a firing count that belongs to the TRIGGERER, not the owner.
  *
  * <p>The probe stack must be allowed past one (addStack caps at 1 by default), otherwise the reading
- * saturates and a working scope looks like a frozen failure -- the six rounds lost in 734-747.
+ * saturates and a working scope looks like a frozen failure -- the six rounds lost in 34-4.
  */
 public class PerSubjectLimitTest {
     private static final int OWNER = 1001;

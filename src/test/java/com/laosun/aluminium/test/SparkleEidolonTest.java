@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1306 花火's 星魂 2 (强化前): 「天赋每层效果额外使我方目标造成伤害时无视目标8%的防御力」.
+ * 1306 花火's 星魂 2 (强化前): "天赋每层效果额外使我方目标造成伤害时无视目标8%的防御力".
  *
  * <p>The layers are the talent's own, which is why that modifier had to be named first; the value is read with the counter
  * scale, and DEFENCE_IGNORE is a ratio attribute, so that is the right shape. Three ways: rank 2 states 8% per layer, the

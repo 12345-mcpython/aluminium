@@ -12,9 +12,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 「触发行迹…的获得好活当赏效果时，额外获得等同于本次的 50%」 — 1505 星魂 (2026-10-02).
+ * "触发行迹…的获得好活当赏效果时，额外获得等同于本次的 50%" - 1505 星魂 (2026-10-02).
  *
- * <p>⭐ FILE-DRIVEN and TWO-WAY on the EIDOLON RANK itself: at rank 1 the trace's capped credit gains its 50% on top; at
+ * <p>FILE-DRIVEN and TWO-WAY on the EIDOLON RANK itself: at rank 1 the trace's capped credit gains its 50% on top; at
  * rank 0 the same gain credits exactly the capped amount, which is what the older guards already assert.
  */
 public class ElationRewardBoostTest {
@@ -22,21 +22,21 @@ public class ElationRewardBoostTest {
     private static final int MONSTER = 1002011;
     private static final String REWARD = "好活当赏";
 
-    /** ⭐ With the Eidolon: 150 energy -> 20 + 100 (capped) + 50. */
+    /** With the Eidolon: 150 energy -> 20 + 100 (capped) + 50. */
     @Test
     public void theEidolonAddsHalfOfTheCappedCredit() {
         Assertions.assertEquals(170, rewardAfterGain(1, 150),
                 "rank 1: 20 (technique) + 100 (capped) + 50 (the eidolon's half)");
     }
 
-    /** ⚠ Without it: the base trace only, exactly as the older guards expect. */
+    /** Note: Without it: the base trace only, exactly as the older guards expect. */
     @Test
     public void theBaseIsUntouchedWithoutTheEidolon() {
         Assertions.assertEquals(120, rewardAfterGain(0, 150),
                 "rank 0: 20 (technique) + 100 (capped), no eidolon share");
     }
 
-    /** ⚠ The technique is not a trace, so its own 20 must not be boosted at any rank. */
+    /** Note: The technique is not a trace, so its own 20 must not be boosted at any rank. */
     @Test
     public void theTechniqueGainIsNotBoosted() {
         Assertions.assertEquals(20, rewardAfterGain(1, 0),

@@ -21,14 +21,14 @@ import java.util.Random;
 /**
  * {@code REPLACE_SKILL} (2026-09-28): a rule can swap one of its owner's skill slots for a data row.
  *
- * <p>Reader: 1301 Gallagher's ultimate 「并将下一次普攻强化为【酒花奔涌】」 — the enhanced attack is row <b>130108</b>, and
+ * <p>Reader: 1301 Gallagher's ultimate "并将下一次普攻强化为[酒花奔涌]" - the enhanced attack is row <b>130108</b>, and
  * {@code SkillData.init} resolves rows <b>by id</b> ({@code Constant.SKILLS.get(cid).get(skillID)}), which is why the engine
  * could always load it: round 98's note claiming otherwise came from {@code DefaultSkill}'s own stale javadoc rather than from
  * the code.
  *
- * <p>⚠ The observation is the <b>slot's own skill object identity</b>: swapping puts a different object in the slot and ending
- * the swap puts the original back. That is deliberately accessor-free — an earlier version read
- * {@code getData().getParamList()}, which is not what that class calls it — and identity is exactly the question being asked
+ * <p>Note: The observation is the <b>slot's own skill object identity</b>: swapping puts a different object in the slot and ending
+ * the swap puts the original back. That is deliberately accessor-free - an earlier version read
+ * {@code getData().getParamList()}, which is not what that class calls it - and identity is exactly the question being asked
  * ("is the slot's skill still the one it was?").
  */
 public class SkillSwapTest {
@@ -38,7 +38,7 @@ public class SkillSwapTest {
     private static final int MONSTER = 1002011;
     private static final int ENHANCED_ROW = 130108;
 
-    /** ⚠ The swap installs a different skill into the slot, and it is that row (the buff says which). */
+    /** Note: The swap installs a different skill into the slot, and it is that row (the buff says which). */
     @Test
     public void theSwapInstallsTheNamedRow() {
         Fixture f = new Fixture();
@@ -51,7 +51,7 @@ public class SkillSwapTest {
                 "…and it is the row the rule named (130108 for 加拉赫's enhanced attack)");
     }
 
-    /** ⚠ It is a swap, not a permanent replacement: the buff captured the original and puts it back. */
+    /** Note: It is a swap, not a permanent replacement: the buff captured the original and puts it back. */
     @Test
     public void endingTheSwapRestoresTheOriginal() {
         Fixture f = new Fixture();
@@ -63,7 +63,7 @@ public class SkillSwapTest {
         Assertions.assertSame(before, f.slot(), "the original skill is back in the slot");
     }
 
-    /** ⚠ A swap needs a row id: without one the rule is refused instead of silently doing nothing. */
+    /** Note: A swap needs a row id: without one the rule is refused instead of silently doing nothing. */
     @Test
     public void aMissingRowIdIsRefused() {
         EffectSpec effect = new EffectSpec();

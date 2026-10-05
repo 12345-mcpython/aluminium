@@ -64,7 +64,7 @@ public class ConeStateAndDebuffTest {
             }
         }
         Assertions.assertEquals(1, pinned, "the defence-drop effect exists");
-        // ⚠ The guard itself is only observable with a CONTRAST: a clean enemy must expose the "apply the state"
+        // Note: The guard itself is only observable with a CONTRAST: a clean enemy must expose the "apply the state"
         // rule and NOT the defence-drop one; an enemy that carries the state must expose exactly the opposite
         // (measured before this: dropping the guard changed no reading at all).
         int cleanApply = 0;
@@ -104,7 +104,7 @@ public class ConeStateAndDebuffTest {
 
     /** A real debuff, attached through the engine's own roll path, so `target_debuff_count` is genuinely >= 1. */
     private void giveTheEnemyADebuff(Character unit, Enemy enemy, Battle battle) {
-        // ⚠ A 1.0 base chance STILL rolls against the target's effect RES (discipline 145): without this the
+        // Note: A 1.0 base chance STILL rolls against the target's effect RES (discipline 145): without this the
         // helper silently attached nothing and the spec query saw 0 debuffs.
         unit.getAttribute(AttributeType.EFFECT_HIT_RATE)
                 .addModifier(DoubleValue.Modifier.pure(5.0, DoubleValue.Modifier.ModifierSource.BUFF, 230208));
@@ -124,7 +124,7 @@ public class ConeStateAndDebuffTest {
         Character unit = wearer(23020);
         Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
         Battle battle = battleWith(unit, enemy);
-        // ⚠ The spec query EVALUATES conditions, so the enemy must really carry a debuff before asking
+        // Note: The spec query EVALUATES conditions, so the enemy must really carry a debuff before asking
         // (discipline from round 254: a count on a false condition is 0 by construction).
         giveTheEnemyADebuff(unit, enemy, battle);
         System.out.println("[23020] enemy debuffs=" + enemy.getBuffManager().countBuffs(com.laosun.aluminium.models.buff.DotBuff.class));
@@ -149,11 +149,11 @@ public class ConeStateAndDebuffTest {
         Enemy clean = EnemyFactory.create(MONSTER, 90, 1);
         Battle plainBattle = battleWith(plain, clean);
         double withoutDebuff = critHit(plain, clean, plainBattle);
-        // ⚠ Derive the expectation from the wearer's OWN crit-damage attribute, not from a hard-coded 1.5: this cone
-        // also grants a 0.2 constant, so the base multiplier here is 1.7 (measured 1.0470588235 = 1.78/1.7).
-        // ⚠ Two corrections in one place: (a) the expectation must come from the wearer's OWN attribute (this cone
+        // Note: Derive the expectation from the wearer's OWN crit-damage attribute, not from a hard-coded 1.5: this cone
+        // also grants a 0.2 constant, so the base multiplier here is 1.(measured 1.040588235 = 1.8/1.).
+        // Note: Two corrections in one place: (a) the expectation must come from the wearer's OWN attribute (this cone
         // grants a 0.2 constant, so 0.5 alone would be wrong), and (b) the ATTRIBUTE and the damage ZONE differ by one --
-        // the zone is 1 + CRIT_ATTACK, which is why 0.7 reads as a 1.7 multiplier.
+        // the zone is 1 + CRIT_ATTACK, which is why 0.reads as a 1.multiplier.
         double critAttribute = unit.getAttribute(AttributeType.CRIT_ATTACK).get();
         double zone = 1.0 + critAttribute;
         System.out.println("[23020] crit " + withDebuff + " vs clean " + withoutDebuff
@@ -162,7 +162,7 @@ public class ConeStateAndDebuffTest {
         Assertions.assertEquals((zone + 0.08) / zone, withDebuff / withoutDebuff, 1e-6,
                 "8 points of instance crit damage inside the wearer's own crit zone");
 
-        // ⚠ The two readings must differ ONLY in the debate state: same enemy, same debuffs, same crit setup.
+        // Note: The two readings must differ ONLY in the debate state: same enemy, same debuffs, same crit setup.
         // Comparing two different enemies conflated the per-debuff crit rule (measured 1.424 instead of 1.0).
         double additionalBefore = battle.applyAdditionalDamage(unit, enemy, DamageElement.FIRE, 1000, 0.0, 1.5);
         double ordinaryBefore = battle.applyDamage(enemy, new Damage(unit, enemy, DamageElement.FIRE, DamageType.NORMAL, 1000));
@@ -178,7 +178,7 @@ public class ConeStateAndDebuffTest {
                 + " ratio=" + (additionalAfter / additionalBefore)
                 + " ; ordinary " + ordinaryBefore + " -> " + ordinaryAfter
                 + " ratio=" + (ordinaryAfter / ordinaryBefore));
-        // ⚠ The state itself boosts EVERY hit by the authored 36%, so the ordinary ratio is 1.36, not 1.0 (my first
+        // Note: The state itself boosts EVERY hit by the authored 36%, so the ordinary ratio is 1.36, not 1.0 (my first
         // wording was simply wrong). What proves the SCOPE is that the follow-up lands strictly higher: 1.5556 against
         // 1.36 -- the extra factor is the defence ignore, and it exists only on ADDITIONAL instances.
         Assertions.assertEquals(1.0 + 0.36, ordinaryAfter / ordinaryBefore, 1e-6,

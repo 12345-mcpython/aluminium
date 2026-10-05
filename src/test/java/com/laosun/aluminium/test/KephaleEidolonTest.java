@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1412's 星魂 星魂 1: 「持有【军功】的角色造成伤害时无视目标16%的防御力」.
+ * 1412's 星魂 星魂 1: "持有[军功]的角色造成伤害时无视目标16%的防御力".
  *
  * <p>The clause mirrors its own gate: same event, same target, same length. Two ways -- with the gating skill cast the
  * marked unit ignores the stated share, and without it nothing is stated.

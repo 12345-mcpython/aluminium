@@ -19,13 +19,13 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Light cone 20022: on the MEMOSPRITE's turn start the wearer and the memosprite each gain one stack of 【缅怀】 (max 4), and the
+ * Light cone 20022: on the MEMOSPRITE's turn start the wearer and the memosprite each gain one stack of [缅怀] (max 4), and the
  * wearer's stacks are removed when the memosprite disappears -- which, on a path where anyone is left to clean, means the
  * memosprite itself was killed.
  *
- * <p>⭐ Every word is existing vocabulary. 「忆灵的回合」 is {@code TURN_START} + {@code actor == summon} (the selector the
- * engine's own SUMMON_ATTACK note names), 「分别获得」 is two stack effects (target self / target summon), and
- * 「忆灵消失时移除」 is {@code KILL} with the memosprite as the victim. The path where the MASTER falls was measured
+ * <p>Every word is existing vocabulary. "忆灵的回合" is {@code TURN_START} + {@code actor == summon} (the selector the
+ * engine's own SUMMON_ATTACK note names), "分别获得" is two stack effects (target self / target summon), and
+ * "忆灵消失时移除" is {@code KILL} with the memosprite as the victim. The path where the MASTER falls was measured
  * and withdrawn: both holders are gone by then, so there is nothing to clean.
  */
 public class Cone20022Test {

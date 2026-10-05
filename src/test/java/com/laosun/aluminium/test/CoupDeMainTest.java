@@ -14,13 +14,13 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1412：「奇袭：复制一次即将施放的技能并提前施放，随后施放原技能。**奇袭不会再次触发奇袭**」＋
- * 「奇袭结束后，消耗 6 点充能使【爵位】变回【军功】」 (2026-10-02).
+ * 1412："奇袭：复制一次即将施放的技能并提前施放，随后施放原技能。奇袭不会再次触发奇袭"＋
+ * "奇袭结束后，消耗 6 点充能使[爵位]变回[军功]" (2026-10-02).
  *
- * <p>⭐ SAME SCENE, ONE VARIABLE: six casts promote the ally either way; the control merely removes 【爵位】 before the
+ * <p>SAME SCENE, ONE VARIABLE: six casts promote the ally either way; the control merely removes [爵位] before the
  * peer's own skill, so the only difference is whether the copy happens.
  *
- * <p>⚠ The upper bound is the anti-recursion proof: two casts, not an unbounded chain.
+ * <p>Note: The upper bound is the anti-recursion proof: two casts, not an unbounded chain.
  */
 public class CoupDeMainTest {
     private static final int OWNER = 1412;
@@ -30,7 +30,7 @@ public class CoupDeMainTest {
     private static final String MERIT = "军功";
     private static final String CHARGE = "充能";
 
-    /** ⭐ The peer's skill is cast twice -- the copy first, then the original -- and not forever. */
+    /** The peer's skill is cast twice -- the copy first, then the original -- and not forever. */
     @Test
     public void thePeerCastsItsSkillTwice() {
         double withCoup = damageDealt(true);
@@ -42,7 +42,7 @@ public class CoupDeMainTest {
                 "「奇袭不会再次触发奇袭」 -- two casts, not a chain (with=" + withCoup + ", without=" + without + ")");
     }
 
-    /** ⭐ After the coup, she pays six Charge and the peerage reverts to the merit. */
+    /** After the coup, she pays six Charge and the peerage reverts to the merit. */
     @Test
     public void theCoupEndsBySpendingSixCharge() {
         Character owner = CharacterFactory.create(OWNER, 80);

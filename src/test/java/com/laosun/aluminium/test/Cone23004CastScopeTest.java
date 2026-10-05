@@ -14,9 +14,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 光锥 23004 以世界之名：「当装备者施放战技时，装备者此次攻击的效果命中提高 #2%，攻击力提高 #3%」 (2026-10-02).
+ * 光锥 23004 以世界之名："当装备者施放战技时，装备者此次攻击的效果命中提高 #2%，攻击力提高 #3%" (2026-10-02).
  *
- * <p>⭐ THE SCOPE IS `until: cast_end`, and that is what these readings pin:
+ * <p>THE SCOPE IS `until: cast_end`, and that is what these readings pin:
  * <ul>
  *   <li>the boost is <b>gone the moment the cast is over</b> -- if the lifetime were longer (a turn, or permanent) the
  *       attributes would stay lifted, which is the mutation this guards;</li>
@@ -24,7 +24,7 @@ import java.util.Random;
  *       content itself (the same file-reading guard the cone census tests use).</li>
  * </ul>
  *
- * <p>⚠ What this judge does NOT measure: the boost's effect <i>during</i> the cast. The spelling it rides on is not new --
+ * <p>Note: What this judge does NOT measure: the boost's effect <i>during</i> the cast. The spelling it rides on is not new --
  * light cone 20001 ships four `"until": "cast_end"` rules today -- so the during-the-cast half is inherited, and this test
  * pins the half that is this cone's own (the numbers and the expiry).
  */
@@ -36,7 +36,7 @@ public class Cone23004CastScopeTest {
     private static final int RANK = 5;
     private static final String RULE = "cone23004_cast_scope_stats";
 
-    /** ⭐ No residue: both attributes are back to where they started once the cast is over. */
+    /** No residue: both attributes are back to where they started once the cast is over. */
     @Test
     public void theBoostDoesNotOutliveTheCast() {
         Character unit = CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(CONE, LEVEL, false, RANK));
@@ -62,7 +62,7 @@ public class Cone23004CastScopeTest {
                 "攻击力也一样：`until: cast_end` 到此为止");
     }
 
-    /** ⭐ The content guard: every rank carries the rule, with that rank's own two numbers and the cast-end lifetime. */
+    /** The content guard: every rank carries the rule, with that rank's own two numbers and the cast-end lifetime. */
     @Test
     public void everyRankCarriesTheCastScopedRule() throws java.io.IOException {
         String raw = java.nio.file.Files.readString(
@@ -71,7 +71,7 @@ public class Cone23004CastScopeTest {
         Assertions.assertTrue(raw.contains(RULE), "the shipped file must carry " + RULE);
         Assertions.assertEquals(5, count(raw, "\"id\": \"" + RULE + "\""),
                 "one rule per superimposition rank");
-        // ⚠ TEN, not five: each rank carries TWO effects (effect hit and attack) and both state the lifetime.
+        // Note: TEN, not five: each rank carries TWO effects (effect hit and attack) and both state the lifetime.
         Assertions.assertEquals(10, count(raw, "\"until\": \"cast_end\""),
                 "both effects of every rank are scoped to the cast");
         Assertions.assertEquals(5, count(raw, "\"attribute\": \"EFFECT_HIT_RATE\""), "the effect-hit half");

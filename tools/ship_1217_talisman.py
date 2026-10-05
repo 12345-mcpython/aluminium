@@ -22,7 +22,7 @@ RULE = "e2_saves_an_ally_with_the_talisman"
 STATE = "禳命"
 
 doc = json.load(io.open(DATA, encoding="utf-8"))
-# ⚠ 1217.json is a BARE LIST (like 1104 / 1209 / 1211); the file's own shape is preserved on the way out.
+# Note: 121.json is a BARE LIST (like 1104 / 1209 / 1211); the file's own shape is preserved on the way out.
 isObject = isinstance(doc, dict)
 rules = doc["rules"] if isObject else doc
 rules = [r for r in rules if not (isinstance(r, dict) and r.get("id") == RULE)]

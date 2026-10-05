@@ -24,7 +24,7 @@ public class FeixiaoTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** ⚠ The follow-up needs a TEAMMATE, and `per_turn: 1` caps it: the second firing in a turn does nothing. */
+    /** Note: The follow-up needs a TEAMMATE, and `per_turn: 1` caps it: the second firing in a turn does nothing. */
     @Test
     public void theFollowUpNeedsATeammateAndFiresOncePerTurn() {
         double first = followUpLoss(true, 1);
@@ -38,7 +38,7 @@ public class FeixiaoTest {
                 "「当飞霄的队友对敌方目标施放攻击后」 -- her OWN attack must not draw it");
     }
 
-    /** ⚠ The boost the same trigger grants her: 60% for two turns. */
+    /** Note: The boost the same trigger grants her: 60% for two turns. */
     @Test
     public void theTriggerAlsoBoostsHerself() {
         Character feixiao = CharacterFactory.create(FEIXIAO, LEVEL);

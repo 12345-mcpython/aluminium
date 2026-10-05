@@ -18,21 +18,21 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * {@code SHIELD_GRANTED} — "a shield was granted" as an event (M-43), and 大丽花's trace that needs it.
+ * {@code SHIELD_GRANTED} - "a shield was granted" as an event (M-43), and 大丽花's trace that needs it.
  *
  * <p><b>Why the engine needed it.</b> Shields were only an <i>op</i> ({@code SHIELD}): the engine could make one but
- * nothing was announced, so 「受到队友提供的治疗效果<b>或护盾</b>时」 (大丽花's trace, 1321101) could be written only
- * as its healing half — an effect that is too weak exactly when a shield arrives, with nothing to report. The event
- * follows {@code HEALED}'s convention ({@code actor} = who provided it, {@code target} = who received it), so 「队友
- * 提供的」 needs no new vocabulary: {@code target == self} + {@code actor is_ally} + {@code actor != self}.
+ * nothing was announced, so "受到队友提供的治疗效果<b>或护盾</b>时" (大丽花's trace, 1321101) could be written only
+ * as its healing half - an effect that is too weak exactly when a shield arrives, with nothing to report. The event
+ * follows {@code HEALED}'s convention ({@code actor} = who provided it, {@code target} = who received it), so "队友
+ * 提供的" needs no new vocabulary: {@code target == self} + {@code actor is_ally} + {@code actor != self}.
  *
  * <p><b>Two paths, one fact.</b> A shield reaches the field as a raw grant ({@code Battle.grantShield}) or through a
  * timed {@code ShieldBuff} (the interpreter's {@code SHIELD} arm, which has no {@code Battle} handle of its own). Both
  * are covered here, because a fix that only announced one of them would leave half the game's shields invisible.
  *
- * <p><b>⚠ And the reading that shrank this round's plan.</b> 「再次触发<b>该效果</b>」 was checked against the trace's
- * own text before anything was built: 该效果 is the sentence above's effect (「使其他角色的击破特攻提高，提高数值等同于
- * 24% 大丽花的击破特攻 + 0.5」), so re-triggering it is that <b>same buff granted again with a longer duration</b> —
+ * <p><b>Note: And the reading that shrank this round's plan.</b> "再次触发<b>该效果</b>" was checked against the trace's
+ * own text before anything was built: 该效果 is the sentence above's effect ("使其他角色的击破特攻提高，提高数值等同于
+ * 24% 大丽花的击破特攻 + 0.5"), so re-triggering it is that <b>same buff granted again with a longer duration</b> - 
  * which the existing {@code MODIFY_ATTR} already says. A planned {@code RETRIGGER_RULE} op would have had no reader.
  */
 public class ShieldGrantedEventTest {
@@ -55,7 +55,7 @@ public class ShieldGrantedEventTest {
         Assertions.assertEquals(HEAL, f.healed(), EPS, "「受到队友提供的…护盾时」");
     }
 
-    /** ⚠ The timed path goes through a buff, not through {@code grantShield}: it has to be announced separately. */
+    /** Note: The timed path goes through a buff, not through {@code grantShield}: it has to be announced separately. */
     @Test
     public void aTimedShieldFiresItToo() {
         Fixture f = new Fixture();
@@ -70,7 +70,7 @@ public class ShieldGrantedEventTest {
                         + "announces it, and a rule that answered only the raw path would miss every timed shield");
     }
 
-    /** ⚠ 「队友提供的」: a shield she gives herself is not one. */
+    /** Note: "队友提供的": a shield she gives herself is not one. */
     @Test
     public void aShieldSheGaveHerselfDoesNotFire() {
         Fixture f = new Fixture();
@@ -82,7 +82,7 @@ public class ShieldGrantedEventTest {
                 "`actor is_ally` alone would accept this (she IS on our side) -- `actor != self` is the other half");
     }
 
-    /** ⚠ A raw grant names no provider, so a question about who provided it must answer no. */
+    /** Note: A raw grant names no provider, so a question about who provided it must answer no. */
     @Test
     public void aShieldNobodyIsCreditedWithDoesNotFire() {
         Fixture f = new Fixture();
@@ -93,7 +93,7 @@ public class ShieldGrantedEventTest {
         Assertions.assertEquals(0, f.healed(), EPS, "no provider stated = no one to be a teammate");
     }
 
-    /** ⚠ A grant of 0 is how this API says "clear the shield": it is not a grant. */
+    /** Note: A grant of 0 is how this API says "clear the shield": it is not a grant. */
     @Test
     public void clearingAShieldIsNotGrantingOne() {
         Fixture f = new Fixture();
@@ -105,7 +105,7 @@ public class ShieldGrantedEventTest {
                 "the same convention as HEALED, which only fires when HP was really restored");
     }
 
-    /** 「单个回合内不可重复触发」 is `per_turn: 1` (the engine counts the owner's turns). */
+    /** "单个回合内不可重复触发" is `per_turn: 1` (the engine counts the owner's turns). */
     @Test
     public void itFiresOncePerTurn() {
         Fixture f = new Fixture();
@@ -125,7 +125,7 @@ public class ShieldGrantedEventTest {
         f.hurt();
         double baseline = f.dahlia.getCurrentHp();
 
-        // ⚠ The heal under test IS the heal the rule hangs on, so the direct amount lands in the same delta: a
+        // Note: The heal under test IS the heal the rule hangs on, so the direct amount lands in the same delta: a
         // self-heal of 100 moves her HP by 100 and must NOT add the rule's 100; a teammate's moves it by 200.
         f.battle.heal(f.dahlia, f.dahlia, 100);
         Assertions.assertEquals(100, f.dahlia.getCurrentHp() - baseline, EPS,
@@ -140,14 +140,14 @@ public class ShieldGrantedEventTest {
     /**
      * The shipped trace states both halves, each as the trace's own effect with the trace's own durations.
      *
-     * <p>⚠ Structural pin on purpose: her file's numbers are the document's ({@code [0.24, 1, 0.5, 3]} → 24% of her own
+     * <p>Note: Structural pin on purpose: her file's numbers are the document's ({@code [0.24, 1, 0.5, 3]} to 24% of her own
      * Break Effect + 0.5, for 1 turn at battle start and for <b>3</b> turns when it is re-triggered).
      */
     @Test
     public void herFileStatesBothHalves() {
         Character dahlia = CharacterFactory.create(DAHLIA, LEVEL);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
-        // ⚠ A real battle is required: `actor is_ally` asks the field who is on our side, so a context without one
+        // Note: A real battle is required: `actor is_ally` asks the field who is on our side, so a context without one
         // cannot answer it (measured: with battle = null `matching` returned 0 rules and the assertion below was
         // the thing that caught it).
         Battle battle = new Battle(List.of(dahlia, ally), List.of(enemy()), fixed());

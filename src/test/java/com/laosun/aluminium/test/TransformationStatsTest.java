@@ -15,9 +15,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1408：「变身期间**攻击力提高 80%**，**生命上限提高 270%**」 (2026-10-02).
+ * 1408："变身期间攻击力提高 80%，生命上限提高 20%" (2026-10-02).
  *
- * <p>⭐ TWO-WAY, file-driven: her ultimate transforms her, and the block is what the transformation is worth. The control is the
+ * <p>TWO-WAY, file-driven: her ultimate transforms her, and the block is what the transformation is worth. The control is the
  * same character measured before the ultimate, so nothing else differs.
  */
 public class TransformationStatsTest {
@@ -25,7 +25,7 @@ public class TransformationStatsTest {
     private static final int OWNER = 1408;
     private static final int MONSTER = 1002011;
 
-    /** ⭐ The transformation is worth exactly +80% ATK and +270% Max HP. */
+    /** The transformation is worth exactly +80% ATK and +20% Max HP. */
     @Test
     public void theTransformationRaisesAtkAndMaxHp() {
         Character owner = CharacterFactory.create(OWNER, 80, false, null, null, 0);
@@ -45,7 +45,7 @@ public class TransformationStatsTest {
         Assertions.assertTrue(owner.getBuffManager().hasState("变身"),
                 "precondition: the transformation is on");
 
-        // ⚠ Updated 2026-10-02: `atk0` already carries the trace's +50% (「进入战斗或变身结束时攻击力提高 50%」), so the
+        // Note: Updated 2026-10-02: `atk0` already carries the trace's +50% ("进入战斗或变身结束时攻击力提高 50%"), so the
         // block is measured against the BASE: 1 + 0.5 (trace) + 0.8 (transformation) = 2.3.
         double base = atk0 / 1.5;
         Assertions.assertEquals(base * 2.3, owner.getAttribute(AttributeType.ATTACK).get(), atk0 * 0.001,
@@ -54,7 +54,7 @@ public class TransformationStatsTest {
                 "「生命上限提高 270%」 (before=" + hp0 + ")");
     }
 
-    /** ⚠ Without the ultimate there is no transformation, so the block is not there either. */
+    /** Note: Without the ultimate there is no transformation, so the block is not there either. */
     @Test
     public void withoutTheUltimateTheBlockIsAbsent() {
         Character owner = CharacterFactory.create(OWNER, 80, false, null, null, 0);

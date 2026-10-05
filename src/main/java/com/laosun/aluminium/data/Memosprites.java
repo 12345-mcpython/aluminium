@@ -21,7 +21,7 @@ import java.util.Set;
  *
  * <p>Same contract as {@link TriggerTables}, and for the same reasons: it is <b>hand-written</b> content
  * rather than generated data (so it does not belong in {@code Constant}), it lives outside the gitignored
- * {@code data/}, it is <b>optional per character</b> — most characters have no memosprite — and therefore a
+ * {@code data/}, it is <b>optional per character</b> - most characters have no memosprite - and therefore a
  * <b>missing file is an ordinary state</b> while a file that exists and is wrong throws.
  *
  * <p><b>Keyed by the owner, not by the memosprite.</b> The file is named after the character who summons it
@@ -37,7 +37,7 @@ public final class Memosprites {
     public static final String DIR = "memosprites";
 
     /**
-     * The directory a general SERVANT's panel lives in (「侍从」, not 「忆灵」): the same panel vocabulary -- shares and flats of the
+     * The directory a general SERVANT's panel lives in ("侍从", not "忆灵"): the same panel vocabulary -- shares and flats of the
      * OWNER's sheet -- as a different category, and (slice 2) a different damage type.
      */
     public static final String SERVANT_DIR = "servants";
@@ -50,7 +50,7 @@ public final class Memosprites {
     private static final Gson GSON = new Gson();
 
     /**
-     * How many times a file has actually been read (not merely asked for) — so a test can assert the lazy
+     * How many times a file has actually been read (not merely asked for) - so a test can assert the lazy
      * and cached properties without reflection, the same way {@code TriggerTables.loadCount} does.
      */
     private static int loadCount;
@@ -63,8 +63,8 @@ public final class Memosprites {
      *
      * <p>{@code null} is the honest answer to "does this character summon a memosprite", and it is the same
      * shape {@code Constant.MONSTER_CONFIGS.get(...)} uses for "no such monster": the lookup answers
-     * absence, and the <b>caller</b> decides whether absence is acceptable. Here it is not — a rule or a
-     * call that expects a memosprite is wrong if there is none — so
+     * absence, and the <b>caller</b> decides whether absence is acceptable. Here it is not - a rule or a
+     * call that expects a memosprite is wrong if there is none - so
      * {@code SummonFactory.memosprite} turns it into a loud failure that names the file to write.
      *
      * @param ownerCid the summoning character's id
@@ -82,7 +82,7 @@ public final class Memosprites {
         }
     }
 
-    /** The same lookup against a named directory (「侍从」 vs 「忆灵」). */
+    /** The same lookup against a named directory ("侍从" vs "忆灵"). */
     public static MemospriteSpec of(int ownerCid, String dir) {
         synchronized (CACHE) {
             if (CACHE.containsKey(ownerCid)) {
@@ -130,7 +130,7 @@ public final class Memosprites {
      * dies to a tick or that the action bar refuses to schedule. The optional {@code attack} block is
      * checked separately by {@link #validateAttack}, which is where the "invisible zero" lives.
      *
-     * @param spec   the parsed spec (may be {@code null}, which is not an error — it means "no file")
+     * @param spec   the parsed spec (may be {@code null}, which is not an error - it means "no file")
      * @param source a label for error messages (normally the resource path)
      * @return the same spec, for chaining
      * @throws IllegalArgumentException when the spec cannot describe a real unit
@@ -169,12 +169,12 @@ public final class Memosprites {
      * otherwise only show up as a number in a battle log:
      *
      * <ul>
-     *   <li>an unknown element — a typo would silently fall back to physical damage;</li>
-     *   <li>a {@code base} the panel does not state — the value is 0 (a panel entry <b>replaces</b> the
+     *   <li>an unknown element - a typo would silently fall back to physical damage;</li>
+     *   <li>a {@code base} the panel does not state - the value is 0 (a panel entry <b>replaces</b> the
      *       attribute, nothing is inherited), so the memosprite would hit for exactly 0. This is the one
      *       that is invisible: the attack fires, the log line prints, and the number is zero;</li>
-     *   <li>a {@code base} that is a builder-only {@code *_PERCENT} key — the runtime slot is null;</li>
-     *   <li>a {@code shape} that does not deal damage — "an attack that heals" is a different feature, and
+     *   <li>a {@code base} that is a builder-only {@code *_PERCENT} key - the runtime slot is null;</li>
+     *   <li>a {@code shape} that does not deal damage - "an attack that heals" is a different feature, and
      *       {@code EnemySkill} would happily run it as a single-target hit.</li>
      * </ul>
      */
@@ -298,7 +298,7 @@ public final class Memosprites {
                             + entry.flat() + ", but a flat addition must be finite and not negative "
                             + "(" + source + ")");
         }
-        // ⚠ A zero the DATA states is not the same as a value nobody stated (2026-10-02). Measured: the game's own
+        // Note: A zero the DATA states is not the same as a value nobody stated (2026-10-02). Measured: the game's own
         // `AvatarServantConfig.json` gives 小伊卡 and 德谬歌 `SpeedBase "0"` and `SpeedInherit "0"`, and their servant configs
         // keep Speed OUT of the summoner sync -- an ability moves it. `by_ability` is how a file says that, so a zero can be
         // written down instead of being silently accepted (`positive` alone would hide it).
@@ -366,7 +366,7 @@ public final class Memosprites {
         }
     }
 
-    /** The same load against a named directory (「侍从」 vs 「忆灵」). */
+    /** The same load against a named directory ("侍从" vs "忆灵"). */
     private static MemospriteSpec load(int ownerCid, String dir) {
         String path = resourceFor(ownerCid, dir);
         if (path == null) {

@@ -20,7 +20,7 @@ import java.util.Random;
 /**
  * 1005's shock and the trace that lengthens it by one turn.
  *
- * <p>⚠ The monster is chosen to SURVIVE the whole window, and that is the instrument's real requirement: with a 3777-HP
+ * <p>Note: The monster is chosen to SURVIVE the whole window, and that is the instrument's real requirement: with a 3-HP
  * monster two DOTs kill it on turn three whatever their durations are, so a real one-turn extension cannot move the count --
  * which is what made this clause look unverifiable for several rounds. The highest-HP monster in the probe range has ~990k.
  *

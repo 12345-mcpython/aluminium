@@ -12,10 +12,10 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 「单次通过此方式计算的【好活当赏】不超过 100 点」 (2026-09-30): a single conversion of 150 energy mirrors only
+ * "单次通过此方式计算的[好活当赏]不超过 100 点" (2026-09-30): a single conversion of 150 energy mirrors only
  * 100, while 60 mirrors all 60.
  *
- * <p>⭐ The energy is delivered as the EVENT’s own magnitude through `fireTriggers`, which is exactly the quantity the mirror rule reads --
+ * <p>The energy is delivered as the EVENT's own magnitude through `fireTriggers`, which is exactly the quantity the mirror rule reads --
  * the real crediting path was already exercised by Character1505EnergySyncTest, and this test is about the ceiling.
  */
 public class ElationAmountCapTest {
@@ -44,7 +44,7 @@ public class ElationAmountCapTest {
         Assertions.assertEquals(60, small, "a conversion below the ceiling is untouched (false case)");
     }
 
-    /** ★ The shipped ceiling, read off the compiled rule (discipline 232). */
+    /** The shipped ceiling, read off the compiled rule (discipline 232). */
     @Test
     public void theShippedRuleCarriesTheCeiling() {
         Character elation = CharacterFactory.create(WEARER, LEVEL);

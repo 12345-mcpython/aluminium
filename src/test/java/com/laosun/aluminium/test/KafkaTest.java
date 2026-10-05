@@ -17,7 +17,7 @@ import java.util.Random;
 /**
  * 1005 Kafka, from her own file (2026-09-28, round 145): the ultimate's Shock, and the immediate tick that follows it.
  *
- * <p>Both halves are capabilities the engine already had — `APPLY_DOT` (with the per-turn magnitude) and `TICK_DOT` (round 105) —
+ * <p>Both halves are capabilities the engine already had - `APPLY_DOT` (with the per-turn magnitude) and `TICK_DOT` (round 105) - 
  * so this file is also a check that they compose in one rule. The target is hand-made and unresisting, because a 100% BASE
  * chance still rolls (round 131).
  */
@@ -25,7 +25,7 @@ public class KafkaTest {
     private static final int KAFKA = 1005;
     private static final int LEVEL = 80;
 
-    /** ⚠ The Shock lands with its own per-turn damage, and the same sentence makes it settle once more. */
+    /** Note: The Shock lands with its own per-turn damage, and the same sentence makes it settle once more. */
     @Test
     public void herUltimateAppliesShockAndMakesItSettleOnce() {
         Fixture f = new Fixture();
@@ -51,7 +51,7 @@ public class KafkaTest {
                 "the talent follow-up (moved to the once-per-cast event, which now carries the aim)");
     }
 
-    /** ⚠ An ALLY's basic attack makes Kafka strike again; her own must not. */
+    /** Note: An ALLY's basic attack makes Kafka strike again; her own must not. */
     @Test
     public void anAllysBasicAttackTriggersHerFollowUp() {
         Character kafka = CharacterFactory.create(KAFKA, LEVEL);
@@ -74,7 +74,7 @@ public class KafkaTest {
                 "「并有100%的基础概率使受到攻击的敌方目标陷入与终结技相同的触电状态」 — the follow-up really fired");
     }
 
-    /** ⚠ Her OWN basic attack must not grant the follow-up: observable is the Shock it would apply. */
+    /** Note: Her OWN basic attack must not grant the follow-up: observable is the Shock it would apply. */
     @Test
     public void herOwnBasicAttackDoesNotTriggerTheFollowUp() {
         Fixture f = new Fixture();

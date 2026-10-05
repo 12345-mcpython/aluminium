@@ -18,7 +18,7 @@ import java.util.Random;
 /**
  * A magnitude may read a battle-level PARTY counter (2026-10-02).
  *
- * <p>The reader is 1513's reward: it must hand 【好活当赏】 the number of 【笑点】 the Aha moment spent, and 【笑点】 is declared
+ * <p>The reader is 1513's reward: it must hand [好活当赏] the number of [笑点] the Aha moment spent, and [笑点] is declared
  * `scope: PARTY` -- the battle owns it, so `self_stacks:` (which reads a unit) cannot reach it.
  */
 public class PartyResourceScaleTest {
@@ -27,7 +27,7 @@ public class PartyResourceScaleTest {
     private static final int MONSTER = 1002011;
     private static final String COUNTER = "probeParty";
 
-    /** Seven on the counter, and 0.01 x 7 = 0.07 added when the rule fires. */
+    /** Seven on the counter, and 0.01 x = 0.0added when the rule fires. */
     @Test
     public void theMagnitudeComesFromThePartyCounter() {
         Character owner = CharacterFactory.create(OWNER, LEVEL, false, null, null, 0);

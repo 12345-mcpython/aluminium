@@ -14,9 +14,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 8007：「持有【迷迷的声援】的目标每造成 1 次伤害，都会再额外造成 1 次**等同于原伤害 28%**的真实伤害」 (2026-10-02).
+ * 800："持有[迷迷的声援]的目标每造成 1 次伤害，都会再额外造成 1 次等同于原伤害 28%的真实伤害" (2026-10-02).
  *
- * <p>⭐ TWO-WAY, and driven by REAL content: his skill lays the cheer on the ally, the ally then attacks. The control battle is
+ * <p>TWO-WAY, and driven by REAL content: his skill lays the cheer on the ally, the ally then attacks. The control battle is
  * the same fight without the cheer, so the EXCESS the enemy loses must be exactly 28% of what it lost in the control --
  * that is the sentence, and nothing else changes between the two runs (`level_convention` stays in place: no table is rebuilt).
  */
@@ -27,7 +27,7 @@ public class CheerTrueDamageRiderTest {
     private static final int MONSTER = 1002011;
     private static final String CHEER = "迷迷的声援";
 
-    /** ⭐ The holder's damage is raised by exactly the 28% the sentence states. */
+    /** The holder's damage is raised by exactly the 28% the sentence states. */
     @Test
     public void theHolderDealsTwentyEightPercentMore() {
         double with = damageDealt(true);
@@ -45,7 +45,7 @@ public class CheerTrueDamageRiderTest {
         battle.startBattle();
         battle.processRequests();
 
-        // ⭐ BOTH branches summon: his skill summons 迷迷, and the first draft only cast it in the "with" branch -- so the
+        // BOTH branches summon: his skill summons 迷迷, and the first draft only cast it in the "with" branch -- so the
         // excess contained the memosprite's own damage too. Same scene, one variable: the control removes the cheer instead.
         Skill his = owner.getSkills().get(SkillType.SKILL);
         Assertions.assertNotNull(his, "precondition: he has a skill");

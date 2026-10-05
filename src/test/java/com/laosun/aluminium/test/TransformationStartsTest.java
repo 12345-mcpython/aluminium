@@ -14,9 +14,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1408 白厄：「**变身为卡厄斯兰那**，变身期间展开境界【时墟铁墓】」 (2026-10-02).
+ * 1408 白厄："变身为卡厄斯兰那，变身期间展开境界[时墟铁墓]" (2026-10-02).
  *
- * <p>⭐ FILE-DRIVEN, and only the half the document states with no number in it: her ultimate puts the transformation STATE
+ * <p>FILE-DRIVEN, and only the half the document states with no number in it: her ultimate puts the transformation STATE
  * on. It is permanent because its end is the last countdown turn (文档 :120) -- an explicit removal, which this arc made
  * announce `STATE_ENDED`, so an end-reader now has something to hang on.
  */
@@ -25,7 +25,7 @@ public class TransformationStartsTest {
     private static final int MONSTER = 1002011;
     private static final String STATE = "变身";
 
-    /** ⭐ The ultimate starts the transformation. */
+    /** The ultimate starts the transformation. */
     @Test
     public void theUltimateStartsTheTransformation() {
         Character owner = CharacterFactory.create(OWNER, 80, false, null, null, 0);

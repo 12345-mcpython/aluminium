@@ -12,14 +12,14 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1407：「我方全体每损失 1 点生命值遐蝶获得 1 点【新蕊】」 (2026-10-02).
+ * 140："我方全体每损失 1 点生命值遐蝶获得 1 点[新蕊]" (2026-10-02).
  *
- * <p>⭐ MEASURED, and it took a probe to see it: the enemy never touched her -- "hp 1629.936 -> 1629.936 (max 1629.936)
+ * <p>MEASURED, and it took a probe to see it: the enemy never touched her -- "hp 1629.936 -> 1629.936 (max 1629.936)
  * after 40 steps" -- so every earlier draft failed because NO HP LOSS EVER HAPPENED. Damage now goes through the battle's own
  * entry point ({@code Battle.applyTrueDamage}); a bare {@code CanHit.takeDamage} does not reach the battle's HP-loss dispatch.
  *
- * <p>⭐ The scale is asserted EXACTLY: 50 HP lost -> 50 buds. The reader is {@code talent_newbud_per_hp_lost}, which uses
- * {@code amountFromEvent: true} -- "give what the event gave". ⚠ The mutation for this judge must change THAT rule (an
+ * <p>The scale is asserted EXACTLY: 50 HP lost -> 50 buds. The reader is {@code talent_newbud_per_hp_lost}, which uses
+ * {@code amountFromEvent: true} -- "give what the event gave". Note: The mutation for this judge must change THAT rule (an
  * earlier attempt mutated a duplicate I had added, and the suite stayed green because the real reader was doing the work).
  */
 public class NewBudOnHpLossTest {
@@ -28,7 +28,7 @@ public class NewBudOnHpLossTest {
     private static final int MONSTER = 1002011;
     private static final String RES = "新蕊";
 
-    /** ⭐ One bud per point of HP she loses. */
+    /** One bud per point of HP she loses. */
     @Test
     public void losingHpGivesOneBudPerPoint() {
         Character owner = CharacterFactory.create(OWNER, 80);

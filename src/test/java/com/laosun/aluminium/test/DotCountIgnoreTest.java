@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Random;
 
-/** Relic 116, 4 pieces: 「每承受 1 个持续伤害效果…无视其 6% 防御力，最多计入 3 个」 -- instance-scoped, counted per DoT. */
+/** Relic 116, 4 pieces: "每承受 1 个持续伤害效果…无视其 6% 防御力，最多计入 3 个" -- instance-scoped, counted per DoT. */
 public class DotCountIgnoreTest {
     private static final int WEARER = 1001;
     private static final int LEVEL = 80;

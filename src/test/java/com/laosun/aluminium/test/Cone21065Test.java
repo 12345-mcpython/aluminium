@@ -19,8 +19,8 @@ import java.util.Random;
 /**
  * Light cone 21065: casting an ELATION skill raises elation damage by 12%, up to 2 layers, with NO duration.
  *
- * <p>⭐ The duration came from upstream, by absence: {@code MEquip_21065_Sub} states {@code ReplaceByCaster} and a layer cap
- * but no {@code Duration} / {@code LifeTime}, so the layers persist. ⚠ The config says 5 layers while the text and its param say
+ * <p>The duration came from upstream, by absence: {@code MEquip_21065_Sub} states {@code ReplaceByCaster} and a layer cap
+ * but no {@code Duration} / {@code LifeTime}, so the layers persist. Note: The config says 5 layers while the text and its param say
  * 2 -- the document wins, as it does everywhere else in this project.
  */
 public class Cone21065Test {

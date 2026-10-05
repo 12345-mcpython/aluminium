@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Light cone 23017: when any ally casts an ultimate, the wearer heals the ally with the LOWEST HP percentage for 10% of
+ * Light cone 2301: when any ally casts an ultimate, the wearer heals the ally with the LOWEST HP percentage for 10% of
  * that ally's own maximum HP.
  */
 public class Cone23017Test {

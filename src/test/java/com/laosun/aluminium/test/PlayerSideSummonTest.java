@@ -32,14 +32,14 @@ import java.util.Random;
  *
  * <p><b>Why this is not the enemy-side change, done twice.</b> On the enemy side the roster's <em>type</em>
  * was wrong ({@code List<Enemy>}), so widening it made a summon placeable and the compiler found every site
- * that had assumed "enemy camp == monsters". Here the type was never the problem — the roster simply did not
+ * that had assumed "enemy camp == monsters". Here the type was never the problem - the roster simply did not
  * exist: our side had one list, {@code characters}, and it means "our characters". The chosen shape is
  * therefore {@code allies} = the camp and {@code characters} = our characters, which is
  * {@code enemies}/{@code enemyUnits()} with the names swapped round, because {@code characters} is read in
- * <b>179 places</b> and nearly all of them mean the characters.
+ * <b>19 places</b> and nearly all of them mean the characters.
  *
- * <p>⚠ <b>The cost of that choice, and how it is paid here.</b> A camp-level call site left reading
- * {@code characters} will not fail to compile — it will silently ignore friendly summons: an enemy AOE would
+ * <p>Note: <b>The cost of that choice, and how it is paid here.</b> A camp-level call site left reading
+ * {@code characters} will not fail to compile - it will silently ignore friendly summons: an enemy AOE would
  * miss one, a party-wide buff would skip it, and the victory check could ignore it. So each camp-level site
  * gets its own case below, with a summon on the field, and that set of cases <em>is</em> the type safety the
  * compiler is not providing. If a new camp-level site is added later, this class is where it should be
@@ -51,7 +51,7 @@ public class PlayerSideSummonTest {
     /** Our hero, and the master of the summon. */
     private static final int HERO = 1003;
     private static final int LEVEL = 80;
-    /** 银鬃近卫 — a monster id used as the friendly summon's data. */
+    /** 银鬃近卫 - a monster id used as the friendly summon's data. */
     private static final int MINION = 1002040;
     private static final int GROUP = 1;
 
@@ -140,7 +140,7 @@ public class PlayerSideSummonTest {
 
         Assertions.assertTrue(f.hero.getAttribute(AttributeType.ATTACK).get() > heroAttackBefore,
                 "precondition: the hero's own rule fired and buffed itself");
-        // ⚠ The summon's expectation is exact and the hero's is not, and the reason is worth stating: an
+        // Note: The summon's expectation is exact and the hero's is not, and the reason is worth stating: an
         // `add_percent` modifier multiplies the BASE attack, so a character whose traces already contribute
         // percentages (姬子 does) does not move by exactly 10% of its resolved value -- only the increase is
         // 10% of base. A summon built from monster data has no traces, so its resolved attack IS its base.
@@ -153,12 +153,12 @@ public class PlayerSideSummonTest {
     /**
      * The event fan-out walks the camp: a summon on our side hears about our side's events.
      *
-     * <p>Uses a recording {@code Summon} because the default {@code CanHit} hooks are no-ops — with a plain
+     * <p>Uses a recording {@code Summon} because the default {@code CanHit} hooks are no-ops - with a plain
      * summon this case could not tell the two implementations apart. Both halves are covered: the hero is the
      * <b>subject</b> of the HP loss, so that notification can only arrive through the "and our entire side"
      * part of the broadcast policy, and the hero is the <b>caster</b> of the skill, which is
      * {@code SkillExecutor}'s own fan-out. Both changed with the camp split, and each is a separate line of
-     * code — the mutation run caught the first and walked straight through the second until this case was
+     * code - the mutation run caught the first and walked straight through the second until this case was
      * added.
      */
     @Test
@@ -184,7 +184,7 @@ public class PlayerSideSummonTest {
     // 3. Lifecycle and outcome
     // ==================================================================
 
-    /** The master falling takes the friendly summon with it — the orphan sweep must cover our camp too. */
+    /** The master falling takes the friendly summon with it - the orphan sweep must cover our camp too. */
     @Test
     public void theMasterFallingTakesTheFriendlySummonAlong() {
         Fixture f = fixture();
@@ -216,9 +216,9 @@ public class PlayerSideSummonTest {
     /**
      * {@code checkResult} judges our <b>camp</b>: a survivor that is not a character keeps us in the fight.
      *
-     * <p>⚠ This is the only case that can tell the two readings apart, and it needs a <b>masterless</b>
+     * <p>Note: This is the only case that can tell the two readings apart, and it needs a <b>masterless</b>
      * summon to do it. With a summon that follows its master (the ordinary kind), "all characters are down"
-     * and "the whole camp is down" are the same state, because the master's death took the summon with it —
+     * and "the whole camp is down" are the same state, because the master's death took the summon with it - 
      * so a case built on one would pass under either reading and prove nothing. A hand-built summon with no
      * master (which {@code Summon} allows: the link is optional by design) survives the wipe, and then the
      * question "is this battle lost" has two answers depending on which list the check reads.
@@ -247,7 +247,7 @@ public class PlayerSideSummonTest {
     /**
      * And it is not an enemy for the victory check: killing the monsters wins while the summon still stands.
      *
-     * <p>The mirror of {@code EnemyCampSummonTest.killingAllTheMonstersIsNotAWinWhileASummonStands} — there
+     * <p>The mirror of {@code EnemyCampSummonTest.killingAllTheMonstersIsNotAWinWhileASummonStands} - there
      * the summon was theirs, here it is ours, and the two must not be confused.
      */
     @Test
@@ -308,7 +308,7 @@ public class PlayerSideSummonTest {
         return new Fixture(battle, hero, monster, summon);
     }
 
-    /** {@code BATTLE_START} -> +10% ATK for 「我方全体」. */
+    /** {@code BATTLE_START} -> +10% ATK for "我方全体". */
     private static TriggerSpec partyAttackRule() {
         EffectSpec effect = new EffectSpec();
         TriggerSpecs.set(effect, "op", "MODIFY_ATTR");

@@ -22,7 +22,7 @@ import java.util.Random;
  * at Speed 0 is skipped by `Queue.addCombatant` (a fix shipped earlier this session). The op dropped that answer, so a rule granting 德谬歌 an
  * extra turn looked like it had worked -- the judge read `extra turn actor = none` and nothing anywhere said why.
  *
- * <p>⭐ Two cases on purpose: the refusal must be loud, AND an ordinary character that CAN take an extra turn must still get one. A guard that
+ * <p>Two cases on purpose: the refusal must be loud, AND an ordinary character that CAN take an extra turn must still get one. A guard that
  * fires on everything is no better than one that fires on nothing.
  */
 public class ExtraTurnLoudnessTest {

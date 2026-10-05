@@ -21,21 +21,21 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * {@code RAISE_SKILL_LEVEL} and the one level resolver behind it (M-32): 「战技等级+1」「终结技等级+1」.
+ * {@code RAISE_SKILL_LEVEL} and the one level resolver behind it (M-32): "战技等级+1""终结技等级+1".
  *
  * <p><b>The gap.</b> Every skill in this engine is read at level 1 unless a rule pins the row with
- * {@code damage_level}, because a character had no skill levels at all. So 「战技等级+1」 had nowhere to land: writing
+ * {@code damage_level}, because a character had no skill levels at all. So "战技等级+1" had nowhere to land: writing
  * the rule again at another level would double the cast instead of raising it.
  *
  * <p><b>The model.</b> A level is <b>base + this battle's raises</b>, resolved in exactly one place
  * ({@code CanHit.skillLevel}) and used by every site that indexes a parameter table: a skill's own execution
  * ({@code SkillExecutor}, both the damaging path and the generated effect tables) and a rule-driven {@code DAMAGE}
- * ({@code TriggerInterpreter.multiplierOf}). A {@code damage_level} on a rule still wins — it is the author stating
+ * ({@code TriggerInterpreter.multiplierOf}). A {@code damage_level} on a rule still wins - it is the author stating
  * "the document quotes this row", a different statement from "my skill is level N".
  *
- * <p>⚠ The cases below <b>find</b> a slot whose parameter rows really differ between level 1 and level 10 instead of
+ * <p>Note: The cases below <b>find</b> a slot whose parameter rows really differ between level 1 and level 10 instead of
  * naming one: the first version of this file asserted a raise on 姬子's ultimate and measured <b>the same number
- * twice</b> (her ultimate's own rows are level-independent) — a test that looks like it checks the wiring and does not.
+ * twice</b> (her ultimate's own rows are level-independent) - a test that looks like it checks the wiring and does not.
  */
 public class SkillLevelTest {
     private static final int HIMEKO = 1003;
@@ -68,12 +68,12 @@ public class SkillLevelTest {
     }
 
     /**
-     * ⚠ The rule-driven {@code DAMAGE} reads the raised row — pinned against the <b>data's own ratio</b>, not against
+     * Note: The rule-driven {@code DAMAGE} reads the raised row - pinned against the <b>data's own ratio</b>, not against
      * the cast's total.
      *
      * <p>Why not "the cast grew by the same factor": a skill's row has several parameters and only one of them is the
      * multiplier this rule reads, so the cast's <i>total</i> does not scale linearly with it (measured on 姬子's SKILL:
-     * the cast went 11545 → 12325 (1.068) while its parameter 0 went 1.0 → 2.0). Comparing those two ratios would have
+     * the cast went 11545 to 12325 (1.068) while its parameter 0 went 1.0 to 2.0). Comparing those two ratios would have
      * been an assertion about the skill's other parameters wearing the label "the resolver agrees with itself".
      */
     @Test
@@ -102,7 +102,7 @@ public class SkillLevelTest {
                 slot + ": a rule stating `damage_level: 1` reads row 1 whether or not the battle raised the slot");
     }
 
-    /** ⚠ Per battle, not per character: the raise is cleared and re-earned, never stacked by reuse. */
+    /** Note: Per battle, not per character: the raise is cleared and re-earned, never stacked by reuse. */
     @Test
     public void theRaiseDoesNotSurviveIntoTheNextBattle() {
         Character hero = CharacterFactory.create(HIMEKO, LEVEL);
@@ -121,11 +121,11 @@ public class SkillLevelTest {
     }
 
     /**
-     * ⚠ <b>The third read site</b>: a skill whose amount comes from the <b>generated effect table</b>
+     * Note: <b>The third read site</b>: a skill whose amount comes from the <b>generated effect table</b>
      * ({@code skill_effects.json} + {@code SkillExecutor.effectAmount}), not from its damaging path.
      *
      * <p>Mutation m3 (that call site going back to the raw level) was the one mutation this file did not catch: every
-     * other case measures damage. 1105 is the clean subject — it has a {@code healer_max_hp}-scaled heal in its
+     * other case measures damage. 1105 is the clean subject - it has a {@code healer_max_hp}-scaled heal in its
      * generated table and <b>no character file</b>, so no rule of its own can overwrite what is being measured.
      */
     @Test
@@ -173,7 +173,7 @@ public class SkillLevelTest {
     /**
      * A slot of 姬子's whose parameter row really changes between level 1 and level 10.
      *
-     * <p>⚠ Found, not assumed: her ultimate's rows are level-independent, so a hand-picked slot gave
+     * <p>Note: Found, not assumed: her ultimate's rows are level-independent, so a hand-picked slot gave
      * "11841.82 vs 11841.82" and an assertion that could never fail.
      */
     private static SkillType aSlotWhoseRowsDiffer() {
@@ -207,7 +207,7 @@ public class SkillLevelTest {
         Fixture f = new Fixture(raiseBy, slot);
         List<TriggerSpec> rules = new ArrayList<>();
         if (raiseBy > 0) {
-            // ⚠ Only when it is a raise at all: an `amount: 0` RULE is refused at load (correctly), so adding it
+            // Note: Only when it is a raise at all: an `amount: 0` RULE is refused at load (correctly), so adding it
             // unconditionally made the "no raise" control case fail before it could measure anything.
             rules.add(raise(slot, raiseBy));
         }
@@ -220,8 +220,8 @@ public class SkillLevelTest {
 
     private static final class Fixture {
         /**
-         * ⚠ The combatant <b>inside the battle</b>, not the object handed to the constructor: the engine may copy a
-         * participant into the battle, and a raise filed on the copy is invisible from the original — the first
+         * Note: The combatant <b>inside the battle</b>, not the object handed to the constructor: the engine may copy a
+         * participant into the battle, and a raise filed on the copy is invisible from the original - the first
          * version of this file asserted on the original and read 0 (and cast with it, so the swing did not move
          * either: two failing cases with one cause).
          */

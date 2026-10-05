@@ -18,7 +18,7 @@ import java.util.Random;
 /**
  * Light cone 23003: an Ultimate aimed at an ALLY restores one skill point -- but only every second such Ultimate.
  *
- * <p>⭐ A two-step counter, and the threshold is 2 rather than 1 on purpose: the rules of one event are evaluated IN ORDER and
+ * <p>A two-step counter, and the threshold is 2 rather than 1 on purpose: the rules of one event are evaluated IN ORDER and
  * see each other's effects, so a threshold of 1 paid on EVERY cast (measured: points 1/2/3 after the first three). With the
  * threshold at 2 the first cast's increment is invisible to the payout, and the same-pass evaluation is harmless.
  */

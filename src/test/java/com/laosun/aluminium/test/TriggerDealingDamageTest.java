@@ -23,16 +23,16 @@ import java.util.Random;
 
 /**
  * Damage-instance conditions: the {@code DEALING_DAMAGE} event, the {@code BOOST_DAMAGE} op, and the DoT
- * state names that make them useful together — i.e. 「对处于灼烧状态的目标造成的伤害提高 20%」.
+ * state names that make them useful together - i.e. "对处于灼烧状态的目标造成的伤害提高 20%".
  *
  * <p><b>Why a new event was needed.</b> {@code ALLY_ATTACK} fires <i>after</i> an attack is fully settled, so
  * at that point the number is already final. A bonus that depends on the <b>target's state at the moment of
  * the hit</b> therefore could not be expressed at all: it is not a timed buff either (it applies to the hits
  * that happen to match, and to nothing else). The engine now hands the pending instance over before the zones
- * are read, and {@code BOOST_DAMAGE} changes <b>that instance</b> — the instance is the state, so there is no
+ * are read, and {@code BOOST_DAMAGE} changes <b>that instance</b> - the instance is the state, so there is no
  * buff to attach, nothing to remove, and nothing that can leak into the next hit.
  *
- * <p><b>The other half is the state name.</b> 「灼烧」 is not a {@code StateBuff}; it is a {@code DotBuff} of
+ * <p><b>The other half is the state name.</b> "灼烧" is not a {@code StateBuff}; it is a {@code DotBuff} of
  * element Fire, and the engine has modelled it that way since P10-0. {@code has_state} now resolves those four
  * names, which is what lets a rule ask about them without inventing a second fact for "this unit is burning".
  */
@@ -103,7 +103,7 @@ public class TriggerDealingDamageTest {
     }
 
     /**
-     * The event fires for every instance the engine settles, DOT ticks included — those are damage too, and a
+     * The event fires for every instance the engine settles, DOT ticks included - those are damage too, and a
      * rule that means "attacks only" can say so with its own conditions.
      *
      * <p>The comparison is between two battles, because a DOT tick only exists while the target is burning,
@@ -214,7 +214,7 @@ public class TriggerDealingDamageTest {
         return effect;
     }
 
-    /** Puts a Fire DoT on {@code target} — what 「陷入灼烧状态」 leaves behind. */
+    /** Puts a Fire DoT on {@code target} - what "陷入灼烧状态" leaves behind. */
     private static void burn(Enemy target, Character source) {
         target.getBuffManager().addBuff(new DotBuff(source, DamageElement.FIRE, 500, 3));
     }

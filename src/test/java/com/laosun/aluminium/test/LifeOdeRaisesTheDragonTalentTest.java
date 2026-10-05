@@ -9,12 +9,12 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1141517 complete (2026-10-02): the whole sentence, both halves.
+ * 114151complete (2026-10-02): the whole sentence, both halves.
  *
- * 「召唤死龙时会消耗所有溢出【新蕊】，每消耗 1% 溢出值，使本次召唤的死龙触发天赋【灼掠幽墟的晦翼】的技能效果时，造成的伤害倍率提高 #2%(0.0012)；
- *   召唤时若场上敌方目标小于等于 #6(2) 名，伤害倍率额外提高 #5%(0.0024)。」
+ * "召唤死龙时会消耗所有溢出[新蕊]，每消耗 1% 溢出值，使本次召唤的死龙触发天赋[灼掠幽墟的晦翼]的技能效果时，造成的伤害倍率提高 #2%(0.0012)；
+ *   召唤时若场上敌方目标小于等于 #6(2) 名，伤害倍率额外提高 #5%(0.0024)。"
  *
- * ⭐ Both halves are ratios the sentence states itself: with the ode and one enemy the six hits are `#1 + spent x #2 + #5` of her max HP; against three enemies the `#5` half is off,
+ * Both halves are ratios the sentence states itself: with the ode and one enemy the six hits are `#1 + spent x #2 + #5` of her max HP; against three enemies the `#5` half is off,
  * so the reading drops by exactly `#5 / (#1 + spent x #2)`.
  */
 public class LifeOdeRaisesTheDragonTalentTest {
@@ -33,7 +33,7 @@ public class LifeOdeRaisesTheDragonTalentTest {
     public void theSpentOverflowRaisesTheDragonDamage() {
         double with = hits(true, 1);
         double without = hits(false, 1);
-        // ⭐ BOTH readings carry the small-pack extra (one enemy on each side), and only the ode's amendment differs ⇒ the denominator is `#1 + #5`, not `#1`.
+        // BOTH readings carry the small-pack extra (one enemy on each side), and only the ode's amendment differs so the denominator is `#1 + #5`, not `#1`.
         double expected = (0.56 + OVERFLOW * PER_POINT + SMALL_PACK) / (0.56 + SMALL_PACK);
         System.out.println("[life_ratio] with the ode " + with + " ; without it " + without
                 + " ; ratio " + (with / without) + " (the sentence says " + expected + ")");

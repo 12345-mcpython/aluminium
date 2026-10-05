@@ -17,9 +17,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * The `ally_count` condition variable: 「我方目标数量」, the mirror of `enemy_count` and the blocker set 321 names.
+ * The `ally_count` condition variable: "我方目标数量", the mirror of `enemy_count` and the blocker set 321 names.
  *
- * <p>Both directions through a synthetic rule, on TURN_START: round 67 measured that BATTLE_START carries no battlefield, where a
+ * <p>Both directions through a synthetic rule, on TURN_START: round 6measured that BATTLE_START carries no battlefield, where a
  * count reads NaN and a negative case would pass without the condition ever being evaluated.
  */
 public class AllyCountConditionTest {
@@ -27,7 +27,7 @@ public class AllyCountConditionTest {
     private static final int TEAMMATE = 1002;
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
-    /** ⚠ Measured: a battle opens with 3 skill points. */
+    /** Note: Measured: a battle opens with 3 skill points. */
     private static final int OPENING = 3;
 
     @Test

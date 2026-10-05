@@ -49,7 +49,7 @@ public class LightConeBoostTest {
     public void thePropertyHalvesAreNotAuthoredTwice() {
         // 21062's crit damage is an ability_property (0.24 at rank 1), so the content must not add it again: authored twice
         // it would read 0.48, which is exactly the doubling round 46 measured for a defence property.
-        // ⚠ CRIT_ATTACK has a 0.5 base, so the judgement is a DIFFERENCE (discipline 48): the data path adds 0.24 once.
+        // Note: CRIT_ATTACK has a 0.5 base, so the judgement is a DIFFERENCE (discipline 48): the data path adds 0.24 once.
         double base = 0.5;
         Assertions.assertEquals(base + 0.24, raw(21062, AttributeType.CRIT_ATTACK, 1), 1e-9,
                 "crit damage comes from the data path once, not twice");
@@ -62,7 +62,7 @@ public class LightConeBoostTest {
     private static double raw(int weaponId, AttributeType attribute, int rank) {
         Character wearer = CharacterFactory.create(WEARER, LEVEL, true,
                 Weapon.build(weaponId, LEVEL, false, rank));
-        // ⚠ A battle has to START: the rules hang on BATTLE_START, and without it the attribute reads 0.0 while the
+        // Note: A battle has to START: the rules hang on BATTLE_START, and without it the attribute reads 0.0 while the
         // table visibly carries the rules -- measured by a probe before this line existed (rules=2, value 0.28).
         Enemy enemy = EnemyFactory.create(1002011, 90, 1);
         Battle battle = new Battle(List.of(wearer), List.of(enemy), new Random(0));

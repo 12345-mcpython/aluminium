@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1218 Jiaoqiu's ultimate: 「处于结界中时，敌方目标受到的终结技伤害提高 15.00%…结界持续 3 回合」.
+ * 1218 Jiaoqiu's ultimate: "处于结界中时，敌方目标受到的终结技伤害提高 15.00%…结界持续 3 回合".
  *
  * <p>Judged twice and both bind the number: the compiled rule (scope, share, turns) and the measured ratio between ultimate and normal damage.
  */
@@ -70,7 +70,7 @@ public class JiaoqiuUltTakenTest {
         Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
         Battle battle = new Battle(List.of(unit), List.of(enemy), new Random(0));
         battle.startBattle();
-        // ⚠ `matching` EVALUATES the rule's conditions, so the counter must really be stacked: the character's own ADD_STACK rule
+        // Note: `matching` EVALUATES the rule's conditions, so the counter must really be stacked: the character's own ADD_STACK rule
         // (on ALLY_ATTACK) is what creates it -- a hand-made state does not register (round 219/240).
         battle.fireTriggers(TriggerEvent.ALLY_ATTACK, unit, enemy, 0, 0);
         System.out.println("[1218] layers=" + enemy.getBuffManager().stacksOf("烬煨"));

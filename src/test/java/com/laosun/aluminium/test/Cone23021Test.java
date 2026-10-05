@@ -15,10 +15,10 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Light cone 23021: 【假面】 at battle start; every skill point RESTORED adds that many 【彩焰】 layers; four layers pay out a fresh
- * 【假面】.
+ * Light cone 23021: [假面] at battle start; every skill point RESTORED adds that many [彩焰] layers; four layers pay out a fresh
+ * [假面].
  *
- * <p>⭐ The discriminating reading is the +2 restore: `Battle.gainSkillPoint(2)` fires ONE event carrying 2, so 「每恢复 1 个」
+ * <p>The discriminating reading is the +2 restore: `Battle.gainSkillPoint(2)` fires ONE event carrying 2, so "每恢复 1 个"
  * must add TWO layers. A judge that only ever restores one point at a time cannot tell `scale: event_amount` from a plain `amount: 1`.
  */
 public class Cone23021Test {
@@ -56,8 +56,8 @@ public class Cone23021Test {
 
     @Test
     public void theMaskArrivesAtBattleStartAndCoversTheAllyOnly() {
-        // ★ Deltas, not absolutes (discipline 169): character 1002 carries its own 0.05 crit rate / 0.50 crit damage, so an
-        // absolute assertion would report the character's own baseline as if the cone had produced it (measured: 0.15 / 0.78).
+        // Deltas, not absolutes (discipline 169): character 1002 carries its own 0.05 crit rate / 0.50 crit damage, so an
+        // absolute assertion would report the character's own baseline as if the cone had produced it (measured: 0.15 / 0.8).
         Battle baseline = battle(false);
         double baseCritRate = ally.getAttribute(AttributeType.CRIT_CHANCE).get();
         double baseCritDamage = ally.getAttribute(AttributeType.CRIT_ATTACK).get();
@@ -96,7 +96,7 @@ public class Cone23021Test {
     }
 
     /**
-     * ★ The sentence says 「恢复时溢出的战技点也会被计算在内」, and that is exactly what a rule listening only to
+     * The sentence says "恢复时溢出的战技点也会被计算在内", and that is exactly what a rule listening only to
      * SKILL_POINT_GAINED gets wrong: a restore at the cap credits NOTHING, so no event fires at all -- measured before the
      * overflow event existed.
      */

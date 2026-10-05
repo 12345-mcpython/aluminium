@@ -19,11 +19,11 @@ import java.util.Random;
 /**
  * A DOT whose magnitude is a share of the <b>victim's</b> Max HP, with a <b>derived ceiling</b> (2026-09-28).
  *
- * <p>Reader: 1111 Luka's Skill — 「裂伤状态下…受到等同于<b>自身 24.00% 生命上限</b>的物理属性持续伤害，<b>最多不超过卢卡攻击力的
- * 338%</b>」. That is a {@code min_of_two}: the engine takes the smaller of the two derived values, which is why a low-HP victim keeps
+ * <p>Reader: 1111 Luka's Skill - "裂伤状态下…受到等同于<b>自身 24.00% 生命上限</b>的物理属性持续伤害，<b>最多不超过卢卡攻击力的
+ * 338%</b>". That is a {@code min_of_two}: the engine takes the smaller of the two derived values, which is why a low-HP victim keeps
  * its small share and only an excessive one is brought down to the ceiling.
  *
- * <p>⚠ The observation is the buff's own <b>base damage</b> ({@code DotBuff.getBaseDamage()}), not the settled damage: settlement runs
+ * <p>Note: The observation is the buff's own <b>base damage</b> ({@code DotBuff.getBaseDamage()}), not the settled damage: settlement runs
  * the defence/resistance zones, so a settled number would mix the question being asked with the defender's stats.
  */
 public class DotCeilingTest {
@@ -32,7 +32,7 @@ public class DotCeilingTest {
     private static final int LEVEL = 80;
     private static final double EPS = 1e-6;
 
-    /** ⚠ A high-HP victim is capped by the owner's attack, not by its own enormous bar. */
+    /** Note: A high-HP victim is capped by the owner's attack, not by its own enormous bar. */
     @Test
     public void aBigVictimIsCappedByTheOwnerSideValue() {
         Character owner = CharacterFactory.create(OWNER, LEVEL);
@@ -44,7 +44,7 @@ public class DotCeilingTest {
                 "「最多不超过卢卡攻击力的 338%」 -- the ceiling wins for a victim whose 24% share would be larger");
     }
 
-    /** ⚠ A small victim keeps its own small share: the ceiling is a ceiling, not a replacement. */
+    /** Note: A small victim keeps its own small share: the ceiling is a ceiling, not a replacement. */
     @Test
     public void aSmallVictimKeepsItsOwnShare() {
         Character owner = CharacterFactory.create(OWNER, LEVEL);
@@ -57,7 +57,7 @@ public class DotCeilingTest {
                         + "would have paid the ceiling here)");
     }
 
-    /** ⚠ Only the DOT reads a ceiling today; every other op refuses it instead of ignoring it. */
+    /** Note: Only the DOT reads a ceiling today; every other op refuses it instead of ignoring it. */
     @Test
     public void otherOpsRefuseACeiling() {
         EffectSpec effect = new EffectSpec();

@@ -15,9 +15,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1510 Himeko • Nova, from her own file (2026-09-29, round 219): the one clause of her kit that needs nothing the engine lacks.
+ * 1510 Himeko - Nova, from her own file (2026-09-29, round 219): the one clause of her kit that needs nothing the engine lacks.
  *
- * <p>Her Territory and Assist-Skill mechanics are registered, so the shipped rule is the marker itself — and the test also records that the marker does NOT carry the
+ * <p>Her Territory and Assist-Skill mechanics are registered, so the shipped rule is the marker itself - and the test also records that the marker does NOT carry the
  * party-wide 20%, because that clause is state-conditioned on HER and would otherwise outlive its own state.
  */
 public class HimekoNovaTest {
@@ -26,7 +26,7 @@ public class HimekoNovaTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** ⚠ The Skill puts 【领航旗语】 on HER for the document's three turns, and hands the party no damage boost (that clause is registered). */
+    /** Note: The Skill puts [领航旗语] on HER for the document's three turns, and hands the party no damage boost (that clause is registered). */
     @Test
     public void theSkillPutsSemaphoreOnHerselfAndNothingElse() {
         Character himeko = CharacterFactory.create(HIMEKO, LEVEL);

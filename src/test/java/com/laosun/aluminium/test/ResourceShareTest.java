@@ -36,7 +36,7 @@ public class ResourceShareTest {
         double before = cerydra.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
         battle.fireTriggers(TriggerEvent.TURN_START, cerydra, null, 0, 0);
         battle.processRequests();
-        // ⚠ Her own kit already carries a boost (0.2), and a same-attribute modifier REPLACES it -- so the reading with an EMPTY charge is the share of an
+        // Note: Her own kit already carries a boost (0.2), and a same-attribute modifier REPLACES it -- so the reading with an EMPTY charge is the share of an
         // empty resource, which is 0. That is the reader working, not a bug: measured, expected <0.2> but was <0.0> told us exactly this.
         Assertions.assertEquals(0.0, cerydra.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get(), 1e-9,
                 "with an empty charge the reader applies a zero share");

@@ -21,7 +21,7 @@ import java.util.Random;
  * Light cone 21006: a flat follow-up boost (+24%) plus an extra +24% against a target at or below half HP.
  *
  * <p>Rank 1 states 0.24 / 0.5 / 0.24, so a follow-up against a healthy target is 1.24x a cone-less one, against a low
- * target 1.48x. ⚠ The extra rule MUST be scoped to ADDITIONAL damage: on DEALING_DAMAGE it would otherwise raise the
+ * target 1.48x. Note: The extra rule MUST be scoped to ADDITIONAL damage: on DEALING_DAMAGE it would otherwise raise the
  * wearer's ORDINARY damage whenever the target is low, which the text never says. That is the third reading below.
  */
 public class Cone21006Test {

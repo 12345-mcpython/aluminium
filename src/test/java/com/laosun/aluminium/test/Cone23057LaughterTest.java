@@ -16,10 +16,10 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Light cone 23057, its laughter clause: 「对自身单体施放终结技时，获得 20 点【笑点】。
- * 该效果最多触发 1 次，施放 3 次普攻后重置可触发次数」.
+ * Light cone 2305, its laughter clause: "对自身单体施放终结技时，获得 20 点[笑点]。
+ * 该效果最多触发 1 次，施放 3 次普攻后重置可触发次数".
  *
- * <p>⭐ Three rules, and two of them are mutually exclusive on the same event ({@code self_stacks:普攻计数 < 2} and
+ * <p>Three rules, and two of them are mutually exclusive on the same event ({@code self_stacks:普攻计数 < 2} and
  * {@code >= 2}), so the third normal attack can only take the RESET branch -- there is no "clear then add" ordering to get
  * wrong.
  */
@@ -115,7 +115,7 @@ public class Cone23057LaughterTest {
     @Test
     public void theSpecPinsTheThreeRules() {
         Battle battle = battle(true);
-        // ★ matching() EVALUATES conditions (discipline 182): the grant and the count are reachable from a fresh battle,
+        // matching() EVALUATES conditions (discipline 182): the grant and the count are reachable from a fresh battle,
         // while the RESET branch only holds in a transient state (its gate is "the counter is already full", and the very
         // same event clears it again). That branch is covered BEHAVIOURALLY by theCounterRunsZeroOneTwoThenZero instead of
         // being faked here -- an assertion that has to manufacture an unreachable state would prove nothing about the game.

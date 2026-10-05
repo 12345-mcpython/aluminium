@@ -20,10 +20,10 @@ import java.util.Random;
 /**
  * `skill_param:<SKILLTYPE>:<index>`: a parameter of one of the RULE OWNER's own skills (2026-10-02).
  *
- * <p>Reader: 1403 缇宝's ultimate, whose zone rider deals 「等同于缇宝 #3% 生命上限」 damage on somebody else's attack. `cast_skill_param:` reads the skill that
+ * <p>Reader: 1403 缇宝's ultimate, whose zone rider deals "等同于缇宝 #3% 生命上限" damage on somebody else's attack. `cast_skill_param:` reads the skill that
  * PRODUCED the event -- the attack -- which is the wrong one, and a literal `percent` would freeze one level of a value that runs 0.06 -> 0.126.
  *
- * <p>⭐ The expected number is read the way the engine reads it: `skill.getData().getSkills()` at `attacker.skillLevel(skill)`, never row 1 by hand. And
+ * <p>The expected number is read the way the engine reads it: `skill.getData().getSkills()` at `attacker.skillLevel(skill)`, never row 1 by hand. And
  * the second assertion pins the INDEX: a neighbouring member of the same row is a different number, so a wrong index cannot pass.
  */
 public class SkillParamTest {

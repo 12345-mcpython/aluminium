@@ -17,9 +17,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Light cone 23064: casting an ELATION skill grants 【风口】, which raises SPEED by 24%.
+ * Light cone 23064: casting an ELATION skill grants [风口], which raises SPEED by 24%.
  *
- * <p>⭐ The state has no duration upstream ({@code Equip45.json} states {@code OnStack} and {@code ReplaceByCaster} for
+ * <p>The state has no duration upstream ({@code Equip45.json} states {@code OnStack} and {@code ReplaceByCaster} for
  * {@code MEquip_23064_Buff_1} and no {@code Duration} / {@code LifeTime} anywhere), the same signature as 21065's layers -- so
  * the state persists and the modifier is permanent with it (there is no counter here, so nothing can come apart).
  */

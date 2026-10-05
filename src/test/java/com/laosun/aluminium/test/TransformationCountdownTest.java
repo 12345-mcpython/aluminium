@@ -14,9 +14,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1408：「拥有 8 个卡厄斯兰那的额外回合，速度固定为基础速度的 60%」 (2026-10-02).
+ * 1408："拥有 8 个卡厄斯兰那的额外回合，速度固定为基础速度的 60%" (2026-10-02).
  *
- * <p>⭐ FILE-DRIVEN: her ultimate starts the transformation, and the countdown that spends the eight extra turns rides the
+ * <p>FILE-DRIVEN: her ultimate starts the transformation, and the countdown that spends the eight extra turns rides the
  * same rule -- so the two are born together.
  */
 public class TransformationCountdownTest {
@@ -24,7 +24,7 @@ public class TransformationCountdownTest {
     private static final int MONSTER = 1002011;
     private static final String COUNTDOWN = "卡厄斯兰那的额外回合";
 
-    /** ⭐ The ultimate starts the countdown as well as the transformation. */
+    /** The ultimate starts the countdown as well as the transformation. */
     @Test
     public void theUltimateStartsTheCountdown() {
         Character owner = CharacterFactory.create(OWNER, 80, false, null, null, 0);

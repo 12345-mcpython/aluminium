@@ -24,32 +24,32 @@ import java.util.Set;
  * damaging ones still do exactly what they did before.
  *
  * <p><b>What "control" means here was decided by the data, not by the plan.</b> The plan said "冻结期受伤害
- * +30%"; the encyclopedia text says something else, the same way in six independent entries —
- * {@code "冻结状态下，敌方目标不能行动同时每回合开始时受到…冰属性伤害"} — and for the other two,
+ * +30%"; the encyclopedia text says something else, the same way in six independent entries - 
+ * {@code "冻结状态下，敌方目标不能行动同时每回合开始时受到…冰属性伤害"} - and for the other two,
  * {@code "禁锢状态下，敌方目标行动延后#2%，速度降低#4%"} (瓦尔特) and
- * {@code "「纠缠」会使敌人行动延后，并在敌人下次行动时对其造成额外的量子属性伤害"}. So:
+ * {@code ""纠缠"会使敌人行动延后，并在敌人下次行动时对其造成额外的量子属性伤害"}. So:
  *
  * <table border="1">
  *   <caption>the three states, as the text describes them</caption>
  *   <tr><th>element</th><th>cannot act?</th><th>slows?</th><th>extra delay?</th></tr>
- *   <tr><td>Ice → 冻结</td><td><b>yes</b></td><td>no</td><td>yes</td></tr>
- *   <tr><td>Quantum → 纠缠</td><td>no</td><td>yes</td><td>yes</td></tr>
- *   <tr><td>Imaginary → 禁锢</td><td>no</td><td>yes</td><td>yes</td></tr>
+ *   <tr><td>Ice to 冻结</td><td><b>yes</b></td><td>no</td><td>yes</td></tr>
+ *   <tr><td>Quantum to 纠缠</td><td>no</td><td>yes</td><td>yes</td></tr>
+ *   <tr><td>Imaginary to 禁锢</td><td>no</td><td>yes</td><td>yes</td></tr>
  * </table>
  *
  * <p>The damage component of 冻结 (每回合冰伤) and 纠缠 (下次行动时量子伤) is <b>real but not built here</b>:
  * it is a DOT, {@code BreakEffect.dotRatio} is its field, and no source states the break-applied ratio. It
- * stays a recorded TODO instead of an invented number — and {@code BreakEffectTableTest} fails if someone
+ * stays a recorded TODO instead of an invented number - and {@code BreakEffectTableTest} fails if someone
  * fills one in without deciding.
  *
  * <p>These tests drive {@link Battle#reduceToughness} directly rather than casting a skill: it is the single
  * toughness-reduction entry point and it takes the break element explicitly, so the element under test is
- * the element that breaks — no character of that element needs to exist for Ice/Quantum/Imaginary to be
+ * the element that breaks - no character of that element needs to exist for Ice/Quantum/Imaginary to be
  * testable.
  *
  * <p><b>Why the push is asserted to the digit for 冻结 and not at all for 纠缠/禁锢.</b> A speed change
  * <i>reschedules</i> the pending action ({@code Signal.refreshSpeed} recomputes {@code nextActionTime} from
- * the progress the unit has already made), and the reschedule is larger the bigger the slow is — so for the
+ * the progress the unit has already made), and the reschedule is larger the bigger the slow is - so for the
  * two states that slow, the movement of the action bar mixes two effects and no threshold can separate them.
  * On this fixture, measured (after the L-26 fix; the numbers were smaller before it, which is what exposed
  * that fix):
@@ -57,19 +57,19 @@ import java.util.Set;
  * <table border="1">
  *   <caption>action-value movement of the same break, by how much it slows</caption>
  *   <tr><th>case</th><th>movement</th><th>assertable?</th></tr>
- *   <tr><td>plain break, no slow, no extra delay</td><td>18.94 (exactly 25%)</td><td>yes — this test's regression case pins it</td></tr>
- *   <tr><td>冻结, no slow, +50% delay</td><td>56.82</td><td><b>yes, to the digit</b> — nothing recomputes</td></tr>
- *   <tr><td>禁锢, 10% slow, without the extra delay</td><td>33.67</td><td>no — already above 18.94</td></tr>
- *   <tr><td>禁锢, 10% slow, with the +20% delay</td><td>50.51</td><td>no — indistinguishable in kind</td></tr>
- *   <tr><td>纠缠, 20% slow, without the extra delay</td><td>52.08</td><td>no — already above 18.94</td></tr>
- *   <tr><td>纠缠, 20% slow, with the +20% delay</td><td>71.02</td><td>no — indistinguishable in kind</td></tr>
+ *   <tr><td>plain break, no slow, no extra delay</td><td>18.94 (exactly 25%)</td><td>yes - this test's regression case pins it</td></tr>
+ *   <tr><td>冻结, no slow, +50% delay</td><td>56.82</td><td><b>yes, to the digit</b> - nothing recomputes</td></tr>
+ *   <tr><td>禁锢, 10% slow, without the extra delay</td><td>33.6</td><td>no - already above 18.94</td></tr>
+ *   <tr><td>禁锢, 10% slow, with the +20% delay</td><td>50.51</td><td>no - indistinguishable in kind</td></tr>
+ *   <tr><td>纠缠, 20% slow, without the extra delay</td><td>52.08</td><td>no - already above 18.94</td></tr>
+ *   <tr><td>纠缠, 20% slow, with the +20% delay</td><td>1.02</td><td>no - indistinguishable in kind</td></tr>
  * </table>
  *
  * <p>So an action-bar delay assertion for 纠缠/禁锢 could not fail, and both were removed rather than kept
  * as decoration. Nothing is left unpinned by that, because the three links are covered where they can be
  * isolated: the <b>table</b> by {@code BreakEffectTableTest} ({@code delayPercent > 0} for every control
- * element), the <b>one call site</b> that reads it by 冻结 below (exact), and the <b>mechanism</b> — a push
- * surviving a speed change — by {@code QueueActionManipulationTest.aDelaySurvivesASpeedChange}, which is
+ * element), the <b>one call site</b> that reads it by 冻结 below (exact), and the <b>mechanism</b> - a push
+ * surviving a speed change - by {@code QueueActionManipulationTest.aDelaySurvivesASpeedChange}, which is
  * where it can be observed alone.
  */
 public class ControlTest {
@@ -106,7 +106,7 @@ public class ControlTest {
                 "纠缠 acts, just later and slower -- it must NOT be an act lock");
         Assertions.assertEquals(speedBefore * (1 - Constant.CONTROL_EFFECTS.get("ENTANGLED").slowPercent()),
                 f.speed(), EPS, "纠缠 = 速度降低");
-        // ⚠ The push is NOT asserted here, deliberately -- see the class javadoc's measured table. A 20%
+        // Note: The push is NOT asserted here, deliberately -- see the class javadoc's measured table. A 20%
         // slow reschedules the action by more than the push, so with or without the element's extra delay
         // the movement clears every threshold this test could name: an assertion that cannot fail. The push
         // being read out of the table is pinned by 冻结's exact figure, and the mechanism by
@@ -124,7 +124,7 @@ public class ControlTest {
         Assertions.assertEquals(speedBefore * (1 - Constant.CONTROL_EFFECTS.get("IMPRISONED").slowPercent()),
                 f.speed(), EPS, "禁锢 = 速度降低");
         // Same as 纠缠 above: no push assertion, and for the same measured reason -- at a 10% slow the
-        // reschedule alone already moves the bar 33.67 against a plain break's 18.94. (Before the L-26 fix
+        // reschedule alone already moves the bar 33.6against a plain break's 18.94. (Before the L-26 fix
         // it was 12.63, *below* the baseline, so this case used to be assertable; the fix removed that
         // accidental discrimination by no longer truncating the reschedule.)
     }
@@ -180,8 +180,8 @@ public class ControlTest {
     // ==================================================================
 
     /**
-     * 「有 50% 基础概率使敌方目标陷入冻结状态，持续1回合」: the state lands, the victim cannot act, and the name is
-     * readable — which is what makes 「冻结状态」 askable at all.
+     * "有 50% 基础概率使敌方目标陷入冻结状态，持续1回合": the state lands, the victim cannot act, and the name is
+     * readable - which is what makes "冻结状态" askable at all.
      */
     @Test
     public void aSkillAppliedFreezeStopsTheVictimActingAndCarriesItsName() {
@@ -220,8 +220,8 @@ public class ControlTest {
     /**
      * A monster's own resistance to <b>this</b> state ({@code STAT_CTRL_Frozen}) is part of the same roll.
      *
-     * <p>⚠ The fixture for this case is 冰锋 (1002011), whose data really does carry
-     * {@code STAT_CTRL_Frozen = 1.0} — it cannot be frozen by a skill at all. That is why every other case above
+     * <p>Note: The fixture for this case is 冰锋 (1002011), whose data really does carry
+     * {@code STAT_CTRL_Frozen = 1.0} - it cannot be frozen by a skill at all. That is why every other case above
      * uses 1003010 (no specific resistances): a "the state lands" assertion on a monster that is immune to it would
      * have been a test of the data, not of the pipeline.
      */
@@ -240,11 +240,11 @@ public class ControlTest {
     }
 
     /**
-     * ⚠ <b>A break-frozen unit and a skill-frozen unit are the same state.</b>
+     * Note: <b>A break-frozen unit and a skill-frozen unit are the same state.</b>
      *
      * <p>This is the property that made the migration worth doing: before {@code ControlBuff}, a break produced an
-     * unnamed {@code StunBuff}, so 「冻结状态」 answered <b>false</b> for a unit that was, to the game and to the
-     * player, frozen — a condition that would have silently missed half the cases it exists for.
+     * unnamed {@code StunBuff}, so "冻结状态" answered <b>false</b> for a unit that was, to the game and to the
+     * player, frozen - a condition that would have silently missed half the cases it exists for.
      */
     @Test
     public void aBreakFreezeAndASkillFreezeAreTheSameState() {
@@ -264,10 +264,10 @@ public class ControlTest {
     /**
      * A gated rule can therefore ask the question: {@code target has_state 冻结}.
      *
-     * <p>⚠ The gate is on a <b>later event</b>, and that is not a stylistic choice: {@code TriggerInterpreter.fire}
+     * <p>Note: The gate is on a <b>later event</b>, and that is not a stylistic choice: {@code TriggerInterpreter.fire}
      * matches <b>every</b> rule of one event against the context <i>before</i> any of them runs ({@code matching}
      * is a pure predicate), so a rule cannot see a state an earlier rule of the same event applied. Content that
-     * wants both writes two rules on two events — which is what the game's sentences do too (the freeze is on the
+     * wants both writes two rules on two events - which is what the game's sentences do too (the freeze is on the
      * cast, the bonus is on the damage).
      */
     @Test
@@ -304,7 +304,7 @@ public class ControlTest {
                 "and the slow it attached goes with it -- one buff, so the parts cannot come apart");
     }
 
-    /** A control is a negative effect, so 「解除 N 个负面效果」 reaches it. */
+    /** A control is a negative effect, so "解除 N 个负面效果" reaches it. */
     @Test
     public void aControlIsADebuffAndCanBeDispelled() {
         Applied f = new Applied(control(1.0));
@@ -321,8 +321,8 @@ public class ControlTest {
     // ==================================================================
 
     /**
-     * 「冻结状态下…每回合开始时受到等同于三月七60%攻击力的冰属性附加伤害」: the payload is attached with the
-     * state, and it is <b>frozen with it</b> — a resisted freeze deals no ice damage either, which is why this is
+     * "冻结状态下…每回合开始时受到等同于三月七60%攻击力的冰属性附加伤害": the payload is attached with the
+     * state, and it is <b>frozen with it</b> - a resisted freeze deals no ice damage either, which is why this is
      * one effect and not two.
      */
     @Test
@@ -345,7 +345,7 @@ public class ControlTest {
                 "a resisted freeze attaches no damage: the payload is part of the state, not a second effect");
     }
 
-    /** Taking the state off takes its damage with it — otherwise the ice would keep burning after 「解除冻结」. */
+    /** Taking the state off takes its damage with it - otherwise the ice would keep burning after "解除冻结". */
     @Test
     public void theStatesDamageComesOffWithIt() {
         Applied f = new Applied(controlWithDamage(1.0));
@@ -366,7 +366,7 @@ public class ControlTest {
     /**
      * The load-time rejections, driven through {@code new TriggerTable(...)}.
      *
-     * <p>⚠ {@code TriggerSpecs.rule(...)} only builds the bean — validation happens when a table compiles the rule,
+     * <p>Note: {@code TriggerSpecs.rule(...)} only builds the bean - validation happens when a table compiles the rule,
      * which is why these cases must go through the table. A test that asserted on the bean alone would pass no
      * matter what the loader did.
      */
@@ -418,7 +418,7 @@ public class ControlTest {
      * One battle for the skill-applied cases: a hero with the rules under test and one enemy.
      *
      * <p>The hero is a placeholder character (no data file), so nothing but the rules built here is in play, and
-     * the enemy is 冰锋 — the same fixture the break cases use, so the two paths are compared on one enemy.
+     * the enemy is 冰锋 - the same fixture the break cases use, so the two paths are compared on one enemy.
      */
     private static final class Applied {
         private final Character hero;
@@ -432,7 +432,7 @@ public class ControlTest {
         private Applied(Enemy enemy, com.laosun.aluminium.beans.TriggerSpec... rules) {
             this.hero = Character.fromAttributes("caster", 10_000, 100, 100, 100);
             this.enemy = enemy;
-            // ⚠ The fixture STATES the two sides of the probability pipeline instead of inheriting them: every
+            // Note: The fixture STATES the two sides of the probability pipeline instead of inheriting them: every
             // monster carries some 效果抵抗 (1003010 has 30%), so "a base chance of 1 lands" is only true once
             // this is zero. The cases that want the resistance to bite set it back (see the two resistance
             // tests); the ones that want a certain landing rely on this line.
@@ -466,7 +466,7 @@ public class ControlTest {
     /**
      * 三月七's shape: the freeze plus its own per-turn ice damage (60% of the applier's ATTACK).
      *
-     * <p>⚠ The payload is stated on the <b>same</b> effect, which is what makes it land only when the freeze does
+     * <p>Note: The payload is stated on the <b>same</b> effect, which is what makes it land only when the freeze does
      * (see {@link #theStateCarriesItsOwnPerTurnDamage}).
      */
     private static com.laosun.aluminium.beans.TriggerSpec controlWithDamage(Double baseChance) {
@@ -503,7 +503,7 @@ public class ControlTest {
         return new Fixture(new Battle(List.of(hero), List.of(enemy), new Random(0)), hero, enemy);
     }
 
-    /** Action value left before the target acts — the observable the delay really moves. */
+    /** Action value left before the target acts - the observable the delay really moves. */
     private static double timeRemaining(Battle battle, Enemy target) {
         for (Signal signal : battle.queue.snapshot()) {
             if (signal.getCanHit() == target) {

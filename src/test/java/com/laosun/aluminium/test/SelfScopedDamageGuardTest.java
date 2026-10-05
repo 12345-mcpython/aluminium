@@ -85,7 +85,7 @@ public class SelfScopedDamageGuardTest {
     }
 
     /**
-     * ⚠ The case that makes 1220's `actor == self` observable: her rule ALSO requires `from_skill ULTRA`, so a teammate's
+     * Note: The case that makes 1220's `actor == self` observable: her rule ALSO requires `from_skill ULTRA`, so a teammate's
      * ordinary swing never reaches it -- only a teammate's ULTRA-category instance does. Measured: without this test, removing
      * her self-guard turned nothing red.
      */

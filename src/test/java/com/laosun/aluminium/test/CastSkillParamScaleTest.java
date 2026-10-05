@@ -21,13 +21,13 @@ import java.util.Random;
 /**
  * `cast_skill_param:<index>`: a magnitude that is a parameter of the skill that produced the event, at its CURRENT level (2026-10-02).
  *
- * <p>Reader: 1415's memosprite skill 10 「献予「创世」之诗」 -- 「使开拓者•记忆的攻击力提高，提高数值等同于德谬歌生命上限的 #1%」, where #1 runs
+ * <p>Reader: 1415's memosprite skill 10 "献予'创世'之诗" -- "使开拓者-记忆的攻击力提高，提高数值等同于德谬歌生命上限的 #1%", where #1 runs
  * with the skill level. A literal `percent` would have frozen one level.
  *
- * <p>⚠⚠ <b>The lesson this judge cost, and why it now reads the level it reads.</b> The first version expected ROW 1 (`0.36`) while the
+ * <p>Note:Note: <b>The lesson this judge cost, and why it now reads the level it reads.</b> The first version expected ROW 1 (`0.36`) while the
  * engine reads the row for the caster's CURRENT level -- and this memosprite's skill sits at level 10 (`rows = 10`). The mismatch surfaced as
- * the number `1.008`, which I first recorded as a mysterious downstream factor of 2.8 (`0.36 × 2.8`, and `0.18 × 2.8` in the mutant run).
- * There was never a factor: `70` -- the index-0 reading -- <b>is the same in every row</b>, which is exactly why the first case looked right
+ * the number `1.008`, which I first recorded as a mysterious downstream factor of 2.8 (`0.36  x  2.8`, and `0.18  x  2.8` in the mutant run).
+ * There was never a factor: `0` -- the index-0 reading -- <b>is the same in every row</b>, which is exactly why the first case looked right
  * while the second did not. Both cases now assert against the row the ENGINE uses, read through the same accessor `multiplierOf` uses.
  */
 public class CastSkillParamScaleTest {

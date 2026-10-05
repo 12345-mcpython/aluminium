@@ -14,10 +14,10 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 「敌方对我方施加了**控制类**负面状态」可以被问了 (2026-10-02).
+ * "敌方对我方施加了控制类负面状态"可以被问了 (2026-10-02).
  *
  * <p>One landed control, two watchers; both readings are deltas across startBattle. The landing is copied from the green
- * `ControlImmunityTest` — including its measured warning that `all_enemies` aims at the MONSTER — so that a failure here is about the
+ * `ControlImmunityTest` - including its measured warning that `all_enemies` aims at the MONSTER - so that a failure here is about the
  * filter and not about the scene.
  */
 public class DebuffClassConditionTest {
@@ -45,7 +45,7 @@ public class DebuffClassConditionTest {
         TriggerSpecs.set(land, "op", "APPLY_CONTROL");
         TriggerSpecs.set(land, "control", FREEZE);
         TriggerSpecs.set(land, "turns", 3);
-        // ⚠ Verbatim from the green judge: from the applier's side the "enemies" are the monster, and a judge about the rule owner
+        // Note: Verbatim from the green judge: from the applier's side the "enemies" are the monster, and a judge about the rule owner
         // wants the control ON the owner's own camp.
         TriggerSpecs.set(land, "target", "other_allies");
 

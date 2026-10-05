@@ -13,15 +13,15 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 三月七's 星魂 3 / 星魂 5 and the level her own document is quoted at (M-32) — content, on top of the engine's
+ * 三月七's 星魂 3 / 星魂 5 and the level her own document is quoted at (M-32) - content, on top of the engine's
  * {@code RAISE_SKILL_LEVEL}.
  *
- * <p><b>What the documents say.</b> 星魂 3 = 「<b>终结技</b>等级+2，最多不超过15级；<b>普攻</b>等级+1，最多不超过10级」 (data row
- * {@code {'100103': 2, '100101': 1}}), 星魂 5 = 「<b>战技</b>等级+2，最多不超过15级；<b>天赋</b>等级+2，最多不超过15级」 (row
+ * <p><b>What the documents say.</b> 星魂 3 = "<b>终结技</b>等级+2，最多不超过15级；<b>普攻</b>等级+1，最多不超过10级" (data row
+ * {@code {'100103': 2, '100101': 1}}), 星魂 5 = "<b>战技</b>等级+2，最多不超过15级；<b>天赋</b>等级+2，最多不超过15级" (row
  * {@code {'100102': 2, '100104': 2}}). Her talent is quoted at Lv10 in the prose, which used to be pinned per-effect with
  * {@code damage_level: 10} and is now the <b>base level</b> the file states, so the 星魂 raises compose with it.
  *
- * <p>⚠ The last case is why that composition matters: at 星魂 5 her counter reads a row that no fixed
+ * <p>Note: The last case is why that composition matters: at 星魂 5 her counter reads a row that no fixed
  * {@code damage_level} could ever have expressed.
  */
 public class March7thLevelTest {
@@ -44,7 +44,7 @@ public class March7thLevelTest {
                 "…so every effect that reads her talent indexes row 10");
     }
 
-    /** 星魂 3 raises the ultimate and the basic attack — and nothing else. */
+    /** 星魂 3 raises the ultimate and the basic attack - and nothing else. */
     @Test
     public void starRailThreeRaisesTheUltimateAndTheBasicAttack() {
         Character march = CharacterFactory.create(MARCH, LEVEL, true, null, null, 2);
@@ -71,12 +71,12 @@ public class March7thLevelTest {
     }
 
     /**
-     * ⚠ The composition lands on a row whose number is <b>different</b>: level 12 is not level 10.
+     * Note: The composition lands on a row whose number is <b>different</b>: level 12 is not level 10.
      *
      * <p>Pinned at the data + resolver level on purpose. The behavioural case ("the counter hits harder at 星魂 5") was
-     * written first and measured <b>71.13 at both ranks</b> — a fixture that was not reading the counter's row at all
+     * written first and measured <b>1.13 at both ranks</b> - a fixture that was not reading the counter's row at all
      * (the rows are {@code [1.0, 2.0]} and {@code [1.1, 2.0]}, so a real read cannot be equal). Her own suite pins the
-     * counter's Lv10 behaviour at 星魂 0 ({@code March7thKitTest}), and this case pins the half that suite cannot see.
+     * counter's Lv10 behaviour at 星魂 0 ({@code MarchthKitTest}), and this case pins the half that suite cannot see.
      */
     @Test
     public void theRaisedRowIsADifferentNumber() {

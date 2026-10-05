@@ -13,7 +13,7 @@ import sys
 PATH = "EXPRESSION.md"
 lines = io.open(PATH, encoding="utf-8").read().split("\n")
 
-# 1) the 1217 row leaves section 3 (shipped)
+# 1) the 121row leaves section 3 (shipped)
 P1217 = "| **「缩短【穹命】的持续**时长**」**"
 hits = [i for i, l in enumerate(lines) if l.startswith(P1217)]
 if len(hits) != 1:

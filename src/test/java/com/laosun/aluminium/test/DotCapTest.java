@@ -16,14 +16,14 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * A DOT's <b>layer ceiling</b> (2026-09-28): 「风化状态最多叠加 5 层」 (1108 Sampo's talent).
+ * A DOT's <b>layer ceiling</b> (2026-09-28): "风化状态最多叠加 5 层" (1108 Sampo's talent).
  *
- * <p><b>What is implemented is exactly what the sentence asserts</b> — at most N layers of a state <i>deal damage</i>;
+ * <p><b>What is implemented is exactly what the sentence asserts</b> - at most N layers of a state <i>deal damage</i>;
  * applications past the ceiling are inert (they are not removed: `DotBuff.isSameKind` answers `false`, so a DOT is never
  * evicted, and the extra layers simply sit there).
  *
- * <p>⚠ <b>What is NOT implemented</b>: 1307 Black Swan's extra sentence 「层数达到上限后可继续叠加，<b>产生伤害后移除超出上限的
- * 层数</b>」 — the excess layers are removed after the damage. It is stated for ONE state, so applying it to every capped DOT
+ * <p>Note: <b>What is NOT implemented</b>: 130Black Swan's extra sentence "层数达到上限后可继续叠加，<b>产生伤害后移除超出上限的
+ * 层数</b>" - the excess layers are removed after the damage. It is stated for ONE state, so applying it to every capped DOT
  * would be an inference rather than a reading; it stays registered. Likewise no refresh policy is invented: the corpus has
  * <b>zero</b> sentences describing what a re-application does to a duration.
  *
@@ -36,7 +36,7 @@ public class DotCapTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** ⚠ Without a ceiling every application pays, which is what the engine has always done. */
+    /** Note: Without a ceiling every application pays, which is what the engine has always done. */
     @Test
     public void withoutACeilingEveryLayerPays() {
         double one = tickAfter(1, null);
@@ -47,7 +47,7 @@ public class DotCapTest {
                 "three applications of the same state deal three times one layer (DOTs are never evicted)");
     }
 
-    /** ⚠ With a ceiling, only the first N layers pay — the extra applications add nothing. */
+    /** Note: With a ceiling, only the first N layers pay - the extra applications add nothing. */
     @Test
     public void pastTheCeilingExtraLayersPayNothing() {
         double one = tickAfter(1, 2);
@@ -59,7 +59,7 @@ public class DotCapTest {
                 "⚠ 「最多叠加 N 层」: five applications still deal exactly two layers' damage (the rest are inert)");
     }
 
-    /** ⚠ A ceiling has to be a real count; zero or negative is refused when the rule is compiled. */
+    /** Note: A ceiling has to be a real count; zero or negative is refused when the rule is compiled. */
     @Test
     public void aNonsenseCeilingIsRefused() {
         IllegalArgumentException refused = Assertions.assertThrows(IllegalArgumentException.class,

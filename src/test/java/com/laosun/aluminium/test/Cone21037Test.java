@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Light cone 21037: a critical hit grants one layer of 【好运】 (up to four), each worth 8 points of crit damage, and the
+ * Light cone 2103: a critical hit grants one layer of [好运] (up to four), each worth 8 points of crit damage, and the
  * layers are removed when the wearer's turn ends. This cone is why {@code CRIT_DEALT} exists.
  */
 public class Cone21037Test {
@@ -66,7 +66,7 @@ public class Cone21037Test {
     }
 
     /**
-     * ⚠ The owner gate needs a SECOND ally: with only the wearer in the party, `actor == self` and `actor is_ally`
+     * Note: The owner gate needs a SECOND ally: with only the wearer in the party, `actor == self` and `actor is_ally`
      * behave identically, so swapping them changed nothing (measured: 0 red). A teammate's crit is the case that tells
      * them apart -- it must not stack the wearer's layers.
      */

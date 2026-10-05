@@ -32,8 +32,8 @@ public enum RelicType {
      * <p>The generator emits the client's own six part names, which do not all match {@link RelicType}'s
      * names: {@code FOOT} is the boots slot, and the two planar-ornament parts are called {@code NECK}
      * (the sphere) and {@code OBJECT} (the rope). The generator establishes that pairing by crossing the
-     * part groups with the main-affix tables — group 55 (damage / ATK / HP / DEF mains) is {@code NECK} and
-     * group 56 (break / energy / effect-hit mains) is {@code OBJECT} — so it is data, not a guess about
+     * part groups with the main-affix tables - group 55 (damage / ATK / HP / DEF mains) is {@code NECK} and
+     * group 56 (break / energy / effect-hit mains) is {@code OBJECT} - so it is data, not a guess about
      * which English word sounds right.
      */
     private static final Map<String, RelicType> SET_PART = Map.of(

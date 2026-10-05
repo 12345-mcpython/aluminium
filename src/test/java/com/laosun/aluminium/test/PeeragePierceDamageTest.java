@@ -14,10 +14,10 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1412：「若已升为【爵位】…该角色造成战技伤害时**额外无视 20%** 防御」 (2026-10-02).
+ * 1412："若已升为[爵位]…该角色造成战技伤害时额外无视 20% 防御" (2026-10-02).
  *
- * <p>⭐ SAME SCENE, ONE VARIABLE: both runs reach six Charge (so the merit holder is a peer), cast the same skill at the same
- * enemy; the control then removes 【爵位】. What is compared is the DAMAGE -- because `self_attr:` reads the sheet, and a
+ * <p>SAME SCENE, ONE VARIABLE: both runs reach six Charge (so the merit holder is a peer), cast the same skill at the same
+ * enemy; the control then removes [爵位]. What is compared is the DAMAGE -- because `self_attr:` reads the sheet, and a
  * sentence about "when dealing Skill DMG" lives in one settled instance.
  */
 public class PeeragePierceDamageTest {
@@ -26,7 +26,7 @@ public class PeeragePierceDamageTest {
     private static final int MONSTER = 1002011;
     private static final String PEERAGE = "爵位";
 
-    /** ⭐ A peer's skill hits harder than the same skill without the peerage. */
+    /** A peer's skill hits harder than the same skill without the peerage. */
     @Test
     public void thePeerPiercesMoreOnSkillDamage() {
         double withPeer = damageDealt(true);

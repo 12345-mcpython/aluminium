@@ -20,7 +20,7 @@ import java.util.Random;
  * Light cone 21040: after an attack, if TWO OR MORE of the targets it connected with share its element's weakness, the
  * wearer's crit damage rises 20% for 2 turns.
  *
- * <p>⭐ The event is {@code ALLY_ATTACK} because both the hit count and the weakness count are CAST-LEVEL facts: measured,
+ * <p>The event is {@code ALLY_ATTACK} because both the hit count and the weakness count are CAST-LEVEL facts: measured,
  * they are 0 on the per-target damage event. The plumbing is proven from REAL casts -- the caster is 1003 (slot 2 is Fire +
  * Blast) and the targets are 1002011 (whose data lists Fire), and two probes make the count itself readable.
  */
@@ -48,7 +48,7 @@ public class Cone21040Test {
     }
 
     private boolean matches(int weakHitCount) {
-        // ★ A compact constructor + the copy helper: the record's canonical constructor grew a component, and
+        // A compact constructor + the copy helper: the record's canonical constructor grew a component, and
         // naming all twelve arguments by hand is what the helper exists to avoid.
         var context = new TriggerTable.TriggerContext(wearer, wearer, enemy, 1, 0, null, battle, null)
                 .withWeakHitCount(weakHitCount);
@@ -96,7 +96,7 @@ public class Cone21040Test {
     }
 
     /**
-     * ★ The PLUMBING, from REAL casts: two probes make the engine's own count readable (one fires at ">= 1", one at
+     * The PLUMBING, from REAL casts: two probes make the engine's own count readable (one fires at ">= 1", one at
      * ">= 2"), so which probes fired says what it counted. A negative-only reading would pass even if the count were
      * hard-wired to 0 -- which is exactly the trap this replaces.
      */

@@ -14,9 +14,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * The {@code random_enemy} selector (2026-09-30), reader 1505 绯英’s ultimate: 「对终结技<b>随机</b>造成伤容的敌方目标造成 14%…」.
+ * The {@code random_enemy} selector (2026-09-30), reader 1505 绯英's ultimate: "对终结技<b>随机</b>造成伤容的敌方目标造成 14%…".
  *
- * <p>⭐ Three readings, all on real battles: the pick is always one of the opponents; the SAME seed picks the same unit twice (so the
+ * <p>Three readings, all on real battles: the pick is always one of the opponents; the SAME seed picks the same unit twice (so the
  * engine is reproducible); and across many seeds the pick is not always the same one (so it really is a roll, not a constant).
  */
 public class RandomEnemySelectorTest {
@@ -25,7 +25,7 @@ public class RandomEnemySelectorTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** Sums the health a fixed-seed ultimate takes off the enemies, and reports which one lost more (the rider’s pick). */
+    /** Sums the health a fixed-seed ultimate takes off the enemies, and reports which one lost more (the rider's pick). */
     private List<Double> losses(long seed) {
         Character elation = CharacterFactory.create(WEARER, LEVEL);
         Enemy first = EnemyFactory.create(MONSTER, 90, 1);
@@ -63,7 +63,7 @@ public class RandomEnemySelectorTest {
                 "the roll really varies (it favoured the first enemy " + firstBigger + " times out of 12)");
     }
 
-    /** ★ The shipped rule, read off the compiled table (discipline 232). */
+    /** The shipped rule, read off the compiled table (discipline 232). */
     @Test
     public void theShippedRuleNamesTheRandomSelector() {
         Character elation = CharacterFactory.create(WEARER, LEVEL);

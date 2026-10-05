@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1504's 行迹「头狼」(1504103): 「不死途在场时，我方目标造成的暴击伤害提高 40%，我方目标追加攻击造成的暴击伤害额外提高 80%」.
+ * 1504's 行迹"头狼"(1504103): "不死途在场时，我方目标造成的暴击伤害提高 40%，我方目标追加攻击造成的暴击伤害额外提高 80%".
  *
  * <p>Both halves are party-wide, and the fixture proves it with an ALLY: the ally's crit damage rises (first half) and its follow-up rises further (second half). The
  * control battle is the same ally without 1504 in the party.
@@ -71,7 +71,7 @@ public class Cid1504AuraTest {
                 }
             }
         }
-        // ⚠ Only the `actor == self` half is asked here. Party predicates (`actor is_ally` / `is_other_ally`) are resolved by the
+        // Note: Only the `actor == self` half is asked here. Party predicates (`actor is_ally` / `is_other_ally`) are resolved by the
         // Battle, so a hand-built TriggerContext cannot see those rules -- measured: `is_ally` and `is_other_ally` both return
         // nothing while the very same rule fires in a real battle. That half is therefore covered behaviourally, in the test below.
         Assertions.assertEquals(1, seen, "the self half is visible to a hand-built context");
@@ -98,7 +98,7 @@ public class Cid1504AuraTest {
         System.out.println("[1504] without owner: normal=" + without[0] + " followUp=" + without[1]
                 + " ratio=" + (without[1] / without[0]));
         // MEASURED first, then pinned. The two factors are independent and both predictable from the crit multiplier:
-        // the aura turns 1.5 into 1.9 (ratio 1.9/1.5) and the follow-up half adds another 0.8 (ratio 2.7/1.9).
+        // the aura turns 1.5 into 1.9 (ratio 1.9/1.5) and the follow-up half adds another 0.8 (ratio 2./1.9).
         Assertions.assertEquals(1.0, without[1] / without[0], 1e-6, "without 1504 a follow-up is not special");
         Assertions.assertEquals(1.2666666667, with[0] / without[0], 1e-6,
                 "the first half raises the ally's crit damage by exactly 40 points");

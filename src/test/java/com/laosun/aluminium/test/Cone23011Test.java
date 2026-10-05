@@ -20,9 +20,9 @@ import java.util.Random;
 /**
  * Light cone 23011: at the start of EVERY WAVE, each ally heals a share of its OWN lost HP.
  *
- * <p>⭐ The event is new this round (`WAVE_START`, fired by {@code WaveManager.nextWave} right after the wave's monsters are
+ * <p>The event is new this round (`WAVE_START`, fired by {@code WaveManager.nextWave} right after the wave's monsters are
  * spawned, with neither actor nor subject like BATTLE_START); the heal itself reuses the `target_lost_hp` scale built in
- * round 5, which is exactly what 「各自已损失生命值」 needs.
+ * round 5, which is exactly what "各自已损失生命值" needs.
  */
 public class Cone23011Test {
     private static final int CONE = 23011;
@@ -85,11 +85,11 @@ public class Cone23011Test {
     }
 
     /**
-     * ★ The WIRING test, closing the debt round 21 registered: this one enters a wave for real, through
+     * The WIRING test, closing the debt round 21 registered: this one enters a wave for real, through
      * {@code WaveManager.nextWave}, so the line that fires {@code WAVE_START} is covered -- every other case fires the event
      * by hand and therefore judges only the content.
      *
-     * <p>⚠ Stage-dependent: {@code stage.json} is generator output, so the test skips when the table is empty, the same
+     * <p>Note: Stage-dependent: {@code stage.json} is generator output, so the test skips when the table is empty, the same
      * convention {@code WaveManagerTest} uses.
      */
     @Test
@@ -98,7 +98,7 @@ public class Cone23011Test {
                 "stage.json has not been generated");
         var stage = com.laosun.aluminium.Constant.stages().get(310030);
         Assertions.assertNotNull(stage, "310030 is a multi-wave stage");
-        // ⚠ Its own party: the fixture fields belong to the other cases, and a unit must not be in two battles.
+        // Note: Its own party: the fixture fields belong to the other cases, and a unit must not be in two battles.
         Character waveWearer = CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(CONE, LEVEL, false, 1));
         Character waveAlly = CharacterFactory.create(ALLY, LEVEL);
         Battle battle = new Battle(List.of(waveWearer, waveAlly), new java.util.ArrayList<>(), new Random(0));

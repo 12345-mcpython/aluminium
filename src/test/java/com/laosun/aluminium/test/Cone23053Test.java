@@ -20,7 +20,7 @@ import java.util.Random;
 /**
  * Light cone 23053: every skill point the wearer SPENDS makes its elation damage ignore 5% more defence, up to 4 layers.
  *
- * <p>⭐ `SKILL_POINT_SPENT` is already a trigger event (fired by the policy's own listener, so a spend at the cap -- which
+ * <p>`SKILL_POINT_SPENT` is already a trigger event (fired by the policy's own listener, so a spend at the cap -- which
  * credits nothing -- does not fire it), and the instance route already supports DEFENCE_IGNORE with per_stack. The judge
  * therefore spends for real and re-reads the settled damage, and it also checks that a NON-elation hit is untouched.
  */
@@ -52,7 +52,7 @@ public class Cone23053Test {
     }
 
     /**
-     * ★ Spend through a REAL Skill cast: the camp check lives in the policy ({@code Battle.applySkillPointCost}'s doc says
+     * Spend through a REAL Skill cast: the camp check lives in the policy ({@code Battle.applySkillPointCost}'s doc says
      * so), and a bare {@code spendSkillPoint()} therefore refuses when no actor is set up -- measured.
      */
     private void spend(Battle battle, int times) {
@@ -80,7 +80,7 @@ public class Cone23053Test {
         System.out.println("[23053] none=" + none + " one=" + one + " four=" + four + " after six=" + capped
                 + " layers=" + wearer.getBuffManager().stacksOf("消耗层数"));
         Assertions.assertTrue(one > none, "one spent point must raise the settled elation damage");
-        // ★ The VALUE, not just the direction (discipline 189): the settled damage is `base / (effDef + 200 + 10L)`, and
+        // The VALUE, not just the direction (discipline 189): the settled damage is `base / (effDef + 200 + 10L)`, and
         // the ignore multiplies effDef. Everything here comes from the engine's own numbers, so a wrong `percent` has to
         // move this line -- a monotonicity-only judge let `5% -> 2.5%` pass (measured, 0 red).
         double defence = enemy.getAttribute(AttributeType.DEFENCE).get();

@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Light cone 21026: 「攻击力提高#1%，对处于灼烧或裂伤状态的敌方目标造成的伤害提高#2%」 at rank 5.
+ * Light cone 21026: "攻击力提高#1%，对处于灼烧或裂伤状态的敌方目标造成的伤害提高#2%" at rank 5.
  *
  * <p>ATTACK is flat, so its share scales the post-start base; the disjunction is two rules, the second excluding the first state.
  */

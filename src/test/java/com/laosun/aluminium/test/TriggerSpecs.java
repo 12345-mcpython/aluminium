@@ -12,7 +12,7 @@ import java.util.List;
  * <p><b>Why reflective.</b> {@code TriggerSpec} and {@code EffectSpec} are Lombok
  * {@code @Getter}-only value objects: their fields are written by Gson from the JSON files, never by
  * engine code. The project's convention is therefore to set them reflectively in tests instead of
- * widening the production API with setters nobody else would call — the same choice
+ * widening the production API with setters nobody else would call - the same choice
  * {@code RelicTriggerTableTest} makes for its own two beans.
  *
  * <p>Kept in one place (rather than copied per test class) because two of the new test classes and
@@ -157,7 +157,7 @@ final class TriggerSpecs {
      *
      * @param state     the state's name as the documents spell it (协奏)
      * @param turns     how many turns it lasts, or {@code null} for a permanent one
-     * @param permanent {@code true} for 「整场战斗」, or {@code null}
+     * @param permanent {@code true} for "整场战斗", or {@code null}
      */
     static EffectSpec applyBuff(String state, Integer turns, Boolean permanent) {
         EffectSpec effect = new EffectSpec();
@@ -179,7 +179,7 @@ final class TriggerSpecs {
     }
 
     /**
-     * An {@code EXTEND_BUFF} effect: 「…的持续时间增加 N 回合」.
+     * An {@code EXTEND_BUFF} effect: "…的持续时间增加 N 回合".
      *
      * @param buff      the state's name (or 护盾) the rule lengthens, or {@code null} when filtering by attribute
      * @param attribute the attribute a modifier sits on, or {@code null} when filtering by name
@@ -196,9 +196,9 @@ final class TriggerSpecs {
     }
 
     /**
-     * An {@code APPLY_DOT} effect: 「使目标陷入…状态，每回合造成…伤害，持续 N 回合」.
+     * An {@code APPLY_DOT} effect: "使目标陷入…状态，每回合造成…伤害，持续 N 回合".
      *
-     * @param element  the {@code DamageElement} spelling ({@code "Fire"} → 灼烧), or {@code null} to leave it out
+     * @param element  the {@code DamageElement} spelling ({@code "Fire"} to 灼烧), or {@code null} to leave it out
      * @param amount   a flat per-turn amount, or the constant term of a derived one, or {@code null}
      * @param scale    {@code "self_attr:<ATTRIBUTE>"} for a value derived from the rule owner, or {@code null}
      * @param percent  the share of that attribute, or {@code null}
@@ -222,11 +222,11 @@ final class TriggerSpecs {
     }
 
     /**
-     * An {@code APPLY_CONTROL} effect: 「有 X% 基础概率使目标陷入…状态，持续 N 回合」.
+     * An {@code APPLY_CONTROL} effect: "有 X% 基础概率使目标陷入…状态，持续 N 回合".
      *
      * @param control the state's name as the documents spell it (冻结 / 纠缠 / 禁锢)
      * @param turns   how many of the victim's turns it lasts, or {@code null} to leave the field out (which the
-     *                loader refuses — a control with no duration would never end)
+     *                loader refuses - a control with no duration would never end)
      * @param chance  the base chance (基础概率), or {@code null} for a state that always lands
      * @param target  the optional target selector, or {@code null}
      */
@@ -261,7 +261,7 @@ final class TriggerSpecs {
     /**
      * Sets a private field on one of the trigger beans.
      *
-     * @throws IllegalStateException when the field does not exist — a renamed field must fail here,
+     * @throws IllegalStateException when the field does not exist - a renamed field must fail here,
      *                               loudly, rather than leave a test silently asserting nothing
      */
     static void set(Object target, String field, Object value) {

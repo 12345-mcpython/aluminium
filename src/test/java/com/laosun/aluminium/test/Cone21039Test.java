@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Light cone 21039: 「效果抵抗提高#1%。装备者每有#2 点防御力，使造成的伤害提高#3%，最多使造成的伤害提高#4%」.
+ * Light cone 21039: "效果抵抗提高#1%。装备者每有#2 点防御力，使造成的伤害提高#3%，最多使造成的伤害提高#4%".
  *
  * <p>Two regimes, both measured: the product (DEFENCE x share) and the CONSTANT ceiling (`cap_amount`). The ceiling is reached by raising DEFENCE with the call shape
  * `BoostDamageBuff` uses.

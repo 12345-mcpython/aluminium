@@ -23,22 +23,22 @@ import java.util.Set;
 /**
  * Named states: the {@code APPLY_BUFF} op and the {@code has_state} condition.
  *
- * <p><b>Why this vocabulary exists.</b> The rule text of this game says 「处于【协奏】状态时」 /
- * 「【转魄】状态下」 / 「触电状态下的敌方目标」 constantly, and before this the trigger table could not ask
+ * <p><b>Why this vocabulary exists.</b> The rule text of this game says "处于[协奏]状态时" /
+ * "[转魄]状态下" / "触电状态下的敌方目标" constantly, and before this the trigger table could not ask
  * about a state at all: a mechanic that is otherwise pure data needed a Java class per character. A state is
- * not a new kind of thing in this engine — it is <b>an ordinary buff that carries a name</b> (the lesson the
+ * not a new kind of thing in this engine - it is <b>an ordinary buff that carries a name</b> (the lesson the
  * DOT migration already taught), so it inherits duration, refresh, and {@code clearAll} removal for free.
  *
  * <p><b>What is pinned here, and why each case is worth its own test.</b>
  * <ul>
  *   <li>the op puts a state on a unit, and the condition reads it back;</li>
- *   <li>{@code target has_state X} reads the <b>event's subject</b>, not the owner — the classic
+ *   <li>{@code target has_state X} reads the <b>event's subject</b>, not the owner - the classic
  *       actor/target confusion of this DSL, and the reason Kafka's "an enemy in 触电 state" is expressible;</li>
- *   <li>two <b>different</b> states coexist ({@code StateBuff.isSameKind} compares names, not classes — the
- *       class-based default would make 【协奏】 silently evict 【转魄】, the L-14 trap);</li>
+ *   <li>two <b>different</b> states coexist ({@code StateBuff.isSameKind} compares names, not classes - the
+ *       class-based default would make [协奏] silently evict [转魄], the L-14 trap);</li>
  *   <li>the <b>same</b> state refreshes instead of stacking;</li>
  *   <li>a state expires after its turns, and a {@code permanent} one does not;</li>
- *   <li>{@code target has_skill <SLOT>} reads the named party's <b>kit</b> — the guard 8009/8010's ultimate needs
+ *   <li>{@code target has_skill <SLOT>} reads the named party's <b>kit</b> - the guard 8009/8010's ultimate needs
  *       before it may command that ally to cast (and the reason both its branches are expressible);</li>
  *   <li>every argument is validated at <b>load</b> time, and a missing party fails the condition rather than
  *       passing it.</li>
@@ -82,7 +82,7 @@ public class TriggerStateTest {
     }
 
     /**
-     * {@code target has_state X} asks about the event's subject — not about the rule's owner.
+     * {@code target has_state X} asks about the event's subject - not about the rule's owner.
      */
     @Test
     public void hasStateOnTheTargetReadsTheEventSubject() {
@@ -211,7 +211,7 @@ public class TriggerStateTest {
     }
 
     // ==================================================================
-    // 3b. `REMOVE_STATE` — the other half of the state pair (M-42 ②)
+    // 3b. `REMOVE_STATE` - the other half of the state pair (M-42 ②)
     // ==================================================================
 
     /**
@@ -236,7 +236,7 @@ public class TriggerStateTest {
     /**
      * Only the named state goes: other states on the same unit are untouched.
      *
-     * <p>Pinned because the cheap implementation — "remove the first buff that is a StateBuff" — would pass the case
+     * <p>Pinned because the cheap implementation - "remove the first buff that is a StateBuff" - would pass the case
      * above and take somebody else's state off, which is a wrong state with nothing to report (the L-14 family).
      */
     @Test
@@ -257,7 +257,7 @@ public class TriggerStateTest {
     /**
      * The four DoT spellings resolve the same way here as they do in {@code has_state}.
      *
-     * <p>「触电」 is not a {@code StateBuff} — the engine has represented the four damage-over-time states as an
+     * <p>"触电" is not a {@code StateBuff} - the engine has represented the four damage-over-time states as an
      * ordinary {@code DotBuff(element)} since P10-0, and {@code BuffManager} is the one place that knows the two
      * spellings are the same fact. Removing is the side where forgetting that would be invisible: the state would
      * simply stay on, and the rule would look like it ran.
@@ -312,14 +312,14 @@ public class TriggerStateTest {
     }
 
     // ==================================================================
-    // 3c. `is_ally` — which SIDE the unit the event names is on
+    // 3c. `is_ally` - which SIDE the unit the event names is on
     // ==================================================================
 
     /**
      * {@code target is_ally} is true for one of ours and false for an enemy.
      *
-     * <p>The condition exists for 「对<b>己方角色</b>施放终结技时」 (relic sets 114/118/121): a cast event carries the
-     * unit it AIMED at, and a damaging cast aimed at an enemy carries one too — so without the side test the rule
+     * <p>The condition exists for "对<b>己方角色</b>施放终结技时" (relic sets 114/118/121): a cast event carries the
+     * unit it AIMED at, and a damaging cast aimed at an enemy carries one too - so without the side test the rule
      * would fire on every cast of that slot.
      */
     @Test
@@ -336,7 +336,7 @@ public class TriggerStateTest {
                 "…and an enemy target is not: the rule must not fire on a cast aimed at the other side");
     }
 
-    /** {@code !target is_ally} is the opposite, and — like every negated party condition — fails with no target. */
+    /** {@code !target is_ally} is the opposite, and - like every negated party condition - fails with no target. */
     @Test
     public void isAllyNegatedIsTheOtherSide() {
         Battle battle = withAlly(TriggerSpecs.rule("ALLY_ATTACK", List.of("!target is_ally"), gain(1)));
@@ -362,13 +362,13 @@ public class TriggerStateTest {
     }
 
     // ==================================================================
-    // 3d. `has_same_path_ally` — a question about the PARTY
+    // 3d. `has_same_path_ally` - a question about the PARTY
     // ==================================================================
 
     /**
      * {@code self has_same_path_ally} is true when another <b>living</b> ally walks the wearer's Path.
      *
-     * <p>Its first user is 遗器 314's 「若至少存在一名与装备者命途相同的队友」 — the rule cannot name a Path, because
+     * <p>Its first user is 遗器 314's "若至少存在一名与装备者命途相同的队友" - the rule cannot name a Path, because
      * the relic can be worn by anybody, so it has to compare the wearer against the rest of the side. That makes it the
      * first condition whose answer depends on the <b>party</b> rather than on the owner or the event.
      */
@@ -391,7 +391,7 @@ public class TriggerStateTest {
                 "nobody else on the field is not 「至少存在一名队友」");
     }
 
-    /** A <b>dead</b> teammate is not somebody on the field — the same reading `summonsOf` uses. */
+    /** A <b>dead</b> teammate is not somebody on the field - the same reading `summonsOf` uses. */
     @Test
     public void aDeadSamePathAllyDoesNotCount() {
         Battle battle = withAllyOf(1013, pathRule(gain(1)));
@@ -433,13 +433,13 @@ public class TriggerStateTest {
     }
 
     // ==================================================================
-    // 3e. `has_weakness` — a property only an ENEMY has
+    // 3e. `has_weakness` - a property only an ENEMY has
     // ==================================================================
 
     /**
-     * {@code target has_weakness Fire} reads the enemy's weakness bar — the condition 遗器 316 needed.
+     * {@code target has_weakness Fire} reads the enemy's weakness bar - the condition 遗器 316 needed.
      *
-     * <p>⚠ A character has no weakness bar, so the condition is <b>false</b> for one rather than "not weak to Fire":
+     * <p>Note: A character has no weakness bar, so the condition is <b>false</b> for one rather than "not weak to Fire":
      * the family's rule is "cannot read it, therefore it fails".
      */
     @Test
@@ -471,18 +471,18 @@ public class TriggerStateTest {
     }
 
     // ==================================================================
-    // 3f. `has_skill` — "that party carries this slot at all" (8009/8010)
+    // 3f. `has_skill` - "that party carries this slot at all" (8009/8010)
     // ==================================================================
 
     /**
      * {@code target has_skill ELATION_SKILL} reads the <b>named party's kit</b>, not the owner's.
      *
-     * <p>⭐ The discrimination is one slot asked about two units: 8010 carries the Elation skill (data slot 20) and
+     * <p>The discrimination is one slot asked about two units: 8010 carries the Elation skill (data slot 20) and
      * 姬子 does not, while <b>both</b> carry {@code COMMON}. So a wrong implementation that read the owner's kit, or
      * that answered "yes" for any slot, or "no" for every slot, fails at least one of the three counts below.
      *
-     * <p>Why the condition exists at all: the sentence it comes from branches on it — 「若目标拥有欢愉技…**并使其立即
-     * 施放1次**…欢愉技…若目标不拥有欢愉技，使其**行动提前50%**」 — so the two polarities are two different rules, and
+     * <p>Why the condition exists at all: the sentence it comes from branches on it - "若目标拥有欢愉技…并使其立即
+     * 施放1次…欢愉技…若目标不拥有欢愉技，使其行动提前50%" - so the two polarities are two different rules, and
      * this is also the <b>guard</b> {@code CAST_SKILL} needs (that op throws when the unit has no such slot).
      */
     @Test
@@ -519,7 +519,7 @@ public class TriggerStateTest {
      *
      * <p>Both directions in one case, because "it fires for the unit without the skill" and "it does not fire for the
      * unit with it" are two claims, and a wrong implementation satisfies either alone. The {@code !} prefix is
-     * available because {@code HasSkill} reads a party — the same rule {@code has_path} follows.
+     * available because {@code HasSkill} reads a party - the same rule {@code has_path} follows.
      */
     @Test
     public void hasSkillNegationIsTheOtherBranch() {
@@ -536,10 +536,10 @@ public class TriggerStateTest {
     }
 
     /**
-     * ⚠ A slot that is not a {@link SkillType} is refused where the file is read.
+     * Note: A slot that is not a {@link SkillType} is refused where the file is read.
      *
      * <p>The wrong spelling in this case is not hypothetical: {@code ELATION} is a {@code DamageType} constant, and
-     * writing it here reads perfectly — 「欢愉」 — while naming nothing the kit can carry. The message has to name
+     * writing it here reads perfectly - "欢愉" - while naming nothing the kit can carry. The message has to name
      * both the bad spelling and the right one, or the author is left with "unknown skill".
      */
     @Test
@@ -557,11 +557,11 @@ public class TriggerStateTest {
     // ==================================================================
 
     /**
-     * {@code has_path} reads the Path off the named party — 姬子 is 智识 (Erudition) and 停云 is 同谐 (Harmony).
+     * {@code has_path} reads the Path off the named party - 姬子 is 智识 (Erudition) and 停云 is 同谐 (Harmony).
      *
      * <p>Same shape as {@code has_state}: the left side names a party, so "the target is on this Path" and
      * "I am on this Path" are the same mechanism. The Path itself is engine knowledge already
-     * ({@code Character.getPath()} — the aggro tier), so nothing about it is new data.
+     * ({@code Character.getPath()} - the aggro tier), so nothing about it is new data.
      */
     @Test
     public void hasPathReadsTheNamedPartysPath() {
@@ -589,7 +589,7 @@ public class TriggerStateTest {
     }
 
     /**
-     * {@code !} inverts the condition — the exception 星期日's Skill is written as.
+     * {@code !} inverts the condition - the exception 星期日's Skill is written as.
      *
      * <p>Both directions in one case, because "it fires for the other Path" and "it does not fire for 同谐" are
      * two different claims and a wrong implementation can satisfy either alone.
@@ -609,7 +609,7 @@ public class TriggerStateTest {
     }
 
     /**
-     * ⚠ A negated condition still <b>fails</b> when its party does not exist.
+     * Note: A negated condition still <b>fails</b> when its party does not exist.
      *
      * <p>This is the trap the prefix could have walked into: the positive spelling guarantees "a missing party is
      * never the accidental reason a rule matched" (a missing party reads as {@code false}), and a naive
@@ -628,7 +628,7 @@ public class TriggerStateTest {
     }
 
     /**
-     * ⚠ Only a party-reading condition may be negated, and the message says what to write instead.
+     * Note: Only a party-reading condition may be negated, and the message says what to write instead.
      *
      * <p>For a number, "cannot read it" and "is zero" are different facts ({@code NaN} comparisons are all false,
      * so {@code !(NaN > 0)} is <b>true</b>), and the DSL already has the honest spelling for the second one.
@@ -687,7 +687,7 @@ public class TriggerStateTest {
         return battle;
     }
 
-    /** The same, but with a chosen ally — the Path comparison needs control over who is beside the owner. */
+    /** The same, but with a chosen ally - the Path comparison needs control over who is beside the owner. */
     private static Battle withAllyOf(int allyCid, TriggerSpec... specs) {
         Battle battle = new Battle(List.of(ownerWith(specs), CharacterFactory.create(allyCid, LEVEL)),
                 List.of(dummy()), new Random(0));
@@ -725,8 +725,8 @@ public class TriggerStateTest {
     /**
      * Runs turns until {@code who} is the actor, settles that turn's start, and finishes the turn.
      *
-     * <p>A turn has to be finished for the next one to begin ({@code afterMove} → {@code setTopZero}), and
-     * it is the finish that counts a late buff's duration down — which is what these duration tests read.
+     * <p>A turn has to be finished for the next one to begin ({@code afterMove} to {@code setTopZero}), and
+     * it is the finish that counts a late buff's duration down - which is what these duration tests read.
      */
     private static void takeTurn(Battle battle, Character who) {
         for (int guard = 0; guard < 40; guard++) {

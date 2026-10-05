@@ -17,9 +17,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1224 Hunt March 7th, from her own file (2026-09-29, round 203): the 师父 marker, the charge it enables, and the speed share.
+ * 1224 Hunt March th, from her own file (2026-09-29, round 203): the 师父 marker, the charge it enables, and the speed share.
  *
- * <p>The speed is asserted against a hand-built 20% reference in the SAME pipeline (ratio 0.5), because round 197 showed a share of a zero base compares nothing and a
+ * <p>The speed is asserted against a hand-built 20% reference in the SAME pipeline (ratio 0.5), because round 19showed a share of a zero base compares nothing and a
  * bare "greater than before" lets any percentage pass.
  */
 public class March7thHuntTest {
@@ -28,7 +28,7 @@ public class March7thHuntTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** ⚠ The Skill marks the ally AND speeds them by 10%, measured against a hand-built 20% reference. */
+    /** Note: The Skill marks the ally AND speeds them by 10%, measured against a hand-built 20% reference. */
     @Test
     public void theSkillMarksTheShifuAndSpeedsThem() {
         double content = skillSpeedGain(0);
@@ -39,7 +39,7 @@ public class March7thHuntTest {
                 "content " + content + " vs reference " + reference);
     }
 
-    /** ⚠ The charge is granted by HER basic attack and by the SHIFU's attack, and by nobody else. */
+    /** Note: The charge is granted by HER basic attack and by the SHIFU's attack, and by nobody else. */
     @Test
     public void theChargeComesFromHerBasicAndFromTheShifu() {
         Character march = CharacterFactory.create(MARCH, LEVEL);

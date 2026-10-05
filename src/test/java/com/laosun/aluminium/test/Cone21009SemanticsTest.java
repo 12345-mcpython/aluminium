@@ -36,7 +36,7 @@ public class Cone21009SemanticsTest {
                 + " reduction=" + reduction + " ratioAttr=" + withCone[2]);
         Assertions.assertEquals(2.0, multiplier, 1e-6,
                 "percent 1 means twice the weight (base 150 -> 300), which is the game's slot value 2: " + multiplier);
-        // ⚠ The reduction is REPORTED, not asserted: it measures 0.4015 against the tier's 0.24 (the 0.24 + 0.16 shape) even with the
+        // Note: The reduction is REPORTED, not asserted: it measures 0.4015 against the tier's 0.24 (the 0.24 + 0.16 shape) even with the
         // shipped content, so something in the damage-taken path adds more than the stated share. Registered in GAPS rather than
         // asserted here, because asserting "whatever it happens to be" would hide the discrepancy instead of recording it.
         Assertions.assertTrue(reduction > 0, "the cone does reduce damage taken: " + reduction);

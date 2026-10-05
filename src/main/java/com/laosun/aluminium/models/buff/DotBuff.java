@@ -23,7 +23,7 @@ import lombok.Getter;
  * </table>
  *
  * <p>The migration is not cosmetic. The old shape was <b>type-impossible to put a DOT on a
- * character</b> — {@code tickDots} took an {@code Enemy} and the list lived on {@code Enemy}, so
+ * character</b> - {@code tickDots} took an {@code Enemy} and the list lived on {@code Enemy}, so
  * "the boss burns us" (which HSR does constantly) could not be expressed at all. It also lost
  * dispel, {@code hasBuff} queries, the shared refresh / stacking rules, and visibility to any
  * buff-driven mechanic. Now a DOT on a {@code Character} is the same code path as a DOT on an
@@ -41,19 +41,19 @@ import lombok.Getter;
  * </ul>
  * The two halves are kept in step by <b>where</b> they are called, not by shared state:
  * {@code Battle.beforeMove()} settles first and then lets the buff manager tick, so a DOT created
- * with N turns settles exactly N times — the same count the old {@code Dot.tick()} produced.
+ * with N turns settles exactly N times - the same count the old {@code Dot.tick()} produced.
  *
  * <h2>Why it is an early buff</h2>
  * {@code isEarlyBuff = true} means the countdown happens in {@code BuffManager.beforeMove()}, i.e. at
- * the start of its owner's turn — which is what "damage over time" means. A late buff would settle on
+ * the start of its owner's turn - which is what "damage over time" means. A late buff would settle on
  * the turn <i>after</i> the one it was meant to burn, off by one turn at both ends.
  *
  * <h2>Stacking: instances, not a kind</h2>
  * {@link #isSameKind} always returns {@code false}, so {@code addBuff} never evicts an existing DOT.
  * The default buff rule is "casting the same buff again refreshes it", and applying that here would
  * make a second break <b>replace</b> the first burn and silently drop its remaining settlements. The
- * engine's DOT rule has always been the opposite — "first applied, first settled", the same element
- * stacking as separate copies — so a DOT's identity is <b>the instance</b>. If content ever wants
+ * engine's DOT rule has always been the opposite - "first applied, first settled", the same element
+ * stacking as separate copies - so a DOT's identity is <b>the instance</b>. If content ever wants
  * "re-breaking refreshes the burn instead", this one method is the only place to change.
  */
 @Getter
@@ -69,11 +69,11 @@ public class DotBuff extends AbstractBuff {
     private final DamageElement element;
 
     /**
-     * Base damage per settlement (break base × {@code BreakEffect.dotRatio()}, which the four DOT
+     * Base damage per settlement (break base  x  {@code BreakEffect.dotRatio()}, which the four DOT
      * elements of {@code Constant.BREAK_EFFECTS} currently all fill with {@code Constant.DOT_RATIO}).
      *
      * <p>"Base" is literal: it has not been through the zones yet. It takes DMG boost and the
-     * DEF / RES / vulnerability zones when settled, and it can never crit — expressed by
+     * DEF / RES / vulnerability zones when settled, and it can never crit - expressed by
      * {@link com.laosun.aluminium.enums.DamageType#DOT}'s own {@code (crittable=false,
      * boostable=true)}, not by anything in this class.
      */
@@ -100,8 +100,8 @@ public class DotBuff extends AbstractBuff {
     /**
      * The layer ceiling this application was authored with, or {@code 0} for "no ceiling" (2026-09-28).
      *
-     * <p>「风化状态<b>最多叠加 5 层</b>」: applications may exceed it (a DOT is never evicted -- {@link #isSameKind} says
-     * so), but at most this many of them may <b>deal damage</b>. ⚠ {@code Battle.tickDots} applies it per element, i.e.
+     * <p>"风化状态<b>最多叠加 5 层</b>": applications may exceed it (a DOT is never evicted -- {@link #isSameKind} says
+     * so), but at most this many of them may <b>deal damage</b>. Note: {@code Battle.tickDots} applies it per element, i.e.
      * per DOCUMENT STATE (two 风化 applications are the same state; 风化 and 灼烧 are not).
      */
     private final int maxStacks;
@@ -111,11 +111,11 @@ public class DotBuff extends AbstractBuff {
     }
 
     /**
-     * A DOT with the <b>document's own name</b> for it (2026-09-30, cone 23006's 【游丝】).
+     * A DOT with the <b>document's own name</b> for it (2026-09-30, cone 23006's [游丝]).
      *
-     * <p>★ Why a name and not just an element: the corpus has states that ARE damage over time and are asked about by
-     * name (「如果该目标不处于【游丝】状态」), while the element alone only answers 灼烧/触电/裂伤/风化.
-     * Naming one is also how 「【游丝】也会被视为陷入了触电状态」 comes out right for free: a named THUNDER
+     * <p>Why a name and not just an element: the corpus has states that ARE damage over time and are asked about by
+     * name ("如果该目标不处于[游丝]状态"), while the element alone only answers 灼烧/触电/裂伤/风化.
+     * Naming one is also how "[游丝]也会被视为陷入了触电状态" comes out right for free: a named THUNDER
      * DOT still answers 触电 through the element table.
      */
     public DotBuff(CanHit source, DamageElement element, double baseDamage, int turns, int maxStacks, String name) {
@@ -162,7 +162,7 @@ public class DotBuff extends AbstractBuff {
     }
 
     /**
-     * A DOT is a 持续伤害类负面状态 — a negative effect that 「解除 1 个负面效果」 may remove.
+     * A DOT is a 持续伤害类负面状态 - a negative effect that "解除 1 个负面效果" may remove.
      */
     @Override
     public boolean isDebuff() {
@@ -170,7 +170,7 @@ public class DotBuff extends AbstractBuff {
     }
 
     /**
-     * 持续伤害类: 「抵抗持续伤害类负面状态的概率提高50%」 (1008 坚韧) is an answer about this family — and because it is
+     * 持续伤害类: "抵抗持续伤害类负面状态的概率提高50%" (1008 坚韧) is an answer about this family - and because it is
      * the <b>element</b> that makes a DOT a DOT, a fifth element would be covered the day it exists.
      */
     @Override
@@ -196,7 +196,7 @@ public class DotBuff extends AbstractBuff {
      * The whole of this buff's own behaviour: burn one turn off.
      *
      * <p>The countdown lives here rather than in the manager because {@code processBuffTick} only
-     * asks "is it over yet" ({@code duration() <= 0}) after calling this — so a buff decides its own
+     * asks "is it over yet" ({@code duration() <= 0}) after calling this - so a buff decides its own
      * duration semantics. {@code Battle.tickDots} has already settled the damage by this point.
      */
     @Override

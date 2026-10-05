@@ -17,8 +17,8 @@ import java.util.Random;
 /**
  * Relic set 312 (2-piece): other allies with the SAME Type as the wearer deal 10% more damage.
  *
- * <p>⭐ The elements are read from the units rather than assumed, and the allies are chosen by searching a handful of characters
- * for one that shares the wearer’s element and one that does not -- so the test states the RULE ("same element, not me") and not a
+ * <p>The elements are read from the units rather than assumed, and the allies are chosen by searching a handful of characters
+ * for one that shares the wearer's element and one that does not -- so the test states the RULE ("same element, not me") and not a
  * fact about which character happens to be which element.
  */
 public class Relic312Test {

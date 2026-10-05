@@ -14,9 +14,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Light cone 21014: 「效果抵抗提高#1%，并使治疗量提高，提高数值等同于效果抵抗的#2%，最多使治疗量提高#3%」.
+ * Light cone 21014: "效果抵抗提高#1%，并使治疗量提高，提高数值等同于效果抵抗的#2%，最多使治疗量提高#3%".
  *
- * <p>⚠ EFFECT_RESISTANCE is a RATIO attribute, so the share is ABSOLUTE POINTS: the clause is judged by the GAIN, not by the resulting total (the wearer starts with
+ * <p>Note: EFFECT_RESISTANCE is a RATIO attribute, so the share is ABSOLUTE POINTS: the clause is judged by the GAIN, not by the resulting total (the wearer starts with
  * some resistance of her own). The healing clause derives from the BOOSTED resistance and is capped, so its expectation is the smaller of the product and the ceiling.
  */
 public class Cone21014Test {

@@ -16,23 +16,23 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * {@code BOOST_TOUGHNESS} (2026-09-28): 「使本次攻击的<b>削韧值</b>提高 100%」.
+ * {@code BOOST_TOUGHNESS} (2026-09-28): "使本次攻击的<b>削韧值</b>提高 100%".
  *
- * <p><b>Where it is read.</b> Not inside {@code Battle.reduceToughness} — that receives "the nominal reduction of this
+ * <p><b>Where it is read.</b> Not inside {@code Battle.reduceToughness} - that receives "the nominal reduction of this
  * instance" and is also called by enemy skills and by the demo script. The one place that turns a nominal reduction into a
  * settled one is {@code SkillExecutor.applyStanceDamage}, which runs <b>after</b> the damage ({@code DEALING_DAMAGE} fires
- * inside {@code applyDamage}) and <b>before</b> the bar moves — so a rule on {@code DEALING_DAMAGE} can grant the boost in
+ * inside {@code applyDamage}) and <b>before</b> the bar moves - so a rule on {@code DEALING_DAMAGE} can grant the boost in
  * time.
  *
  * <p><b>Why two harness details matter here</b> (both learned the hard way): the attack must be a <b>real skill object</b>
  * that carries a toughness value (a hand-built {@code DefaultSkill} carries none, so an earlier version measured 0), and the
- * enemy must be one the engine itself says is <b>weak to the element</b> — an attack reduces nothing against a non-weakness.
+ * enemy must be one the engine itself says is <b>weak to the element</b> - an attack reduces nothing against a non-weakness.
  */
 public class ToughnessBoostTest {
     private static final int CID = 1207;
     private static final int LEVEL = 80;
 
-    /** The same attack reduces twice as much toughness with 「提高 100%」 up. */
+    /** The same attack reduces twice as much toughness with "提高 100%" up. */
     @Test
     public void theBoostMultipliesTheReduction() {
         double plain = stanceAfterAttack(-1);
@@ -43,7 +43,7 @@ public class ToughnessBoostTest {
                 "「削韧值提高100%」: the reduction doubles (the attack's own value is the 100% baseline)");
     }
 
-    /** Half of it, for the 「提高 50%」 half of the family. */
+    /** Half of it, for the "提高 50%" half of the family. */
     @Test
     public void aPartialBoostIsProportional() {
         double plain = stanceAfterAttack(-1);
@@ -78,9 +78,9 @@ public class ToughnessBoostTest {
     }
 
     /**
-     * ⚠ The enemy is chosen by <b>asking it</b> what it is weak to, not by trusting a hard-coded id: an attack reduces
+     * Note: The enemy is chosen by <b>asking it</b> what it is weak to, not by trusting a hard-coded id: an attack reduces
      * toughness only against a weakness ({@code Battle.reduceToughness} returns {@code NONE} otherwise).
-     * {@code getStanceWeak()} is the same API the mechanics demo prints 「Weakness [...]」 from.
+     * {@code getStanceWeak()} is the same API the mechanics demo prints "Weakness [...]" from.
      */
     private static Enemy enemyWeakToImaginary() {
         for (int id = 1002010; id < 1002060; id++) {

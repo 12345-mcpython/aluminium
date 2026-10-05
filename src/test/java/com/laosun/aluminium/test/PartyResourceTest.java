@@ -13,10 +13,10 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * A PARTY-scoped resource (2026-09-30): the shared 笑点 counter, reader 1505 绯英’s skill 「…并额外获得 10 点笑点」.
+ * A PARTY-scoped resource (2026-09-30): the shared 笑点 counter, reader 1505 绯英's skill "…并额外获得 10 点笑点".
  *
- * <p>⭐ `ResourceManager` refuses an unwired scope with the reason this capability answers: 「一个 party-level resource needs a per-battle
- * owner」. The battle is that owner now, and the judge reads the counter from the BATTLE (not from the caster), which is what makes
+ * <p>`ResourceManager` refuses an unwired scope with the reason this capability answers: "一个 party-level resource needs a per-battle
+ * owner". The battle is that owner now, and the judge reads the counter from the BATTLE (not from the caster), which is what makes
  * it shared rather than a copy per character.
  */
 public class PartyResourceTest {
@@ -50,7 +50,7 @@ public class PartyResourceTest {
                 "and the counter does not live on the caster (that is what makes it party-level)");
     }
 
-    /** ★ The shipped declaration and rule, read off the compiled character (discipline 232). */
+    /** The shipped declaration and rule, read off the compiled character (discipline 232). */
     @Test
     public void theShippedDeclarationSaysParty() {
         build();

@@ -20,26 +20,26 @@ import java.util.Random;
 import java.util.function.Supplier;
 
 /**
- * **Purpose verification** for the refactor: can the engine really be extended by character mechanics
+ * Purpose verification for the refactor: can the engine really be extended by character mechanics
  * while itself "knowing nothing about character mechanics"?
  *
  * <p><b>F-8</b> in {@code DOC_VS_CODE.md} §F says "the skill point policy must be pulled out of
- * {@code Battle}", and this class is the acceptance test for that sentence — **without changing a single
- * line of the engine**, it only swaps {@link Battle#skillPointPolicy} and sees whether the engine follows
+ * {@code Battle}", and this class is the acceptance test for that sentence - without changing a single
+ * line of the engine, it only swaps {@link Battle#skillPointPolicy} and sees whether the engine follows
  * the new rules.
  *
  * <p>The three assertions correspond to three kinds of real-world needs in the future:
  * <ol>
- *   <li>{@link #customPolicyChangesTheBasicAttackGain()} — character-level point provision
+ *   <li>{@link #customPolicyChangesTheBasicAttackGain()} - character-level point provision
  *       (Sparkle "every 3 basic attacks +1 extra", Sushang "+1 when hitting a broken target");</li>
- *   <li>{@link #customPolicyRaisesTheCap()} — cap-type modifications
+ *   <li>{@link #customPolicyRaisesTheCap()} - cap-type modifications
  *       (Sparkle's talent +2, the Elation light cone +1 per Elation character, corresponding to F-1 in §F);</li>
- *   <li>{@link #customPolicyCanChangeTheStartingValue()} — start-of-battle modifications
+ *   <li>{@link #customPolicyCanChangeTheStartingValue()} - start-of-battle modifications
  *       (the 4-piece Passerby set "at the start of battle +1", corresponding to F-2 in §F).</li>
  * </ol>
  *
- * <p>⚠ These subclasses are **test doubles**, not character implementations to be delivered — when
- * characters are really implemented they should be driven by the P8-7 trigger table ({@code cid} only
+ * <p>Note: These subclasses are test doubles, not character implementations to be delivered - when
+ * characters are really implemented they should be driven by the P8-trigger table ({@code cid} only
  * appears at an assembly point (装配点) or in an effect table, the P8-0 three-way split (三分法)).
  * What this class proves is "the hooks on the engine side are sufficient", not "the characters are
  * already done".
@@ -48,11 +48,11 @@ public class SkillPointPolicyExtensibilityTest {
     private static final double EPS = 1e-9;
 
     // ==================================================================
-    // 1. Character-level point provision: swap the policy → the engine follows the new rules
+    // 1. Character-level point provision: swap the policy to the engine follows the new rules
     // ==================================================================
 
     /**
-     * Custom policy: a basic attack restores **2** points (instead of 1).
+     * Custom policy: a basic attack restores 2 points (instead of 1).
      *
      * <p>Simulates effects like "Sparkle is on the team, basic attacks give +1 extra".
      */
@@ -68,11 +68,11 @@ public class SkillPointPolicyExtensibilityTest {
         Battle battle = newBattle(List.of(CharacterFactory.create(1003, 80)));
         Character hero = battle.characters.getFirst();
 
-        // Swap the policy — this is the only "wiring" action, and not one line of Battle was changed
+        // Swap the policy - this is the only "wiring" action, and not one line of Battle was changed
         battle.skillPointPolicy = new DoubleGainPolicy();
         Assertions.assertEquals(3, battle.getSkillPoints(), "the start is still 3 (the policy's initial value)");
 
-        // ⚠ The policy starts at 3 and one basic attack gives +2 → 4 (capped at 5), so assert
+        // Note: The policy starts at 3 and one basic attack gives +2 to 4 (capped at 5), so assert
         // "it grew by at least 2 rather than 1"
         Assertions.assertTrue(actWithRealTurn(battle, hero, () -> skill(hero, 1),
                 () -> List.of(firstEnemy(battle))));
@@ -85,7 +85,7 @@ public class SkillPointPolicyExtensibilityTest {
     // ==================================================================
 
     /**
-     * Custom policy: cap **7**, start 3 (the effect of Sparkle's talent +2).
+     * Custom policy: cap , start 3 (the effect of Sparkle's talent +2).
      *
      * <p>Corresponds to <b>F-1</b> in {@code DOC_VS_CODE.md} §F: the engine used to hard-code the cap in
      * {@code Constant.SKILL_POINT_MAX}, so it could not be raised by team configuration.
@@ -107,7 +107,7 @@ public class SkillPointPolicyExtensibilityTest {
     // ==================================================================
 
     /**
-     * Custom policy: start **4**, cap 5 (the effect of the 4-piece Passerby set "at the start of battle +1").
+     * Custom policy: start 4, cap 5 (the effect of the 4-piece Passerby set "at the start of battle +1").
      *
      * <p>Corresponds to <b>F-2</b> in {@code DOC_VS_CODE.md} §F.
      */
@@ -125,8 +125,8 @@ public class SkillPointPolicyExtensibilityTest {
     // ==================================================================
 
     /**
-     * Under the default policy, {@code Battle}'s read/write accessors and the policy are **always
-     * consistent** — there is no "second, unmanaged copy of the skill point state inside the engine".
+     * Under the default policy, {@code Battle}'s read/write accessors and the policy are always
+     * consistent - there is no "second, unmanaged copy of the skill point state inside the engine".
      */
     @Test
     public void battleFacadeNeverDivergesFromThePolicy() {
@@ -150,7 +150,7 @@ public class SkillPointPolicyExtensibilityTest {
     }
 
     /**
-     * The default policy is exactly the base game rule, not one word changed — a refactor must not change
+     * The default policy is exactly the base game rule, not one word changed - a refactor must not change
      * behaviour.
      */
     @Test
@@ -173,11 +173,11 @@ public class SkillPointPolicyExtensibilityTest {
     // ==================================================================
 
     /**
-     * The custom policy **itself** decides whether to check the camp — the engine no longer judges on its
+     * The custom policy itself decides whether to check the camp - the engine no longer judges on its
      * behalf.
      *
      * <p>This pins down the boundary of responsibility: whether an enemy action counts towards skill points
-     * is the **policy's** business ({@code StandardSkillPointPolicy} checks {@code Camp.PLAYER}), not
+     * is the policy's business ({@code StandardSkillPointPolicy} checks {@code Camp.PLAYER}), not
      * {@code Battle}'s. When "friendly summons" (P9-4) are added later and this rule has to be adjusted,
      * what changes is the policy, not the engine.
      */

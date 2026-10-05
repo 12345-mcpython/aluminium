@@ -20,8 +20,8 @@ import java.util.Random;
  * P4-3 acceptance: the break damage formula.
  *
  * <p>Anchor (ROADMAP P4-3): attacker Lv80, break effect 300%, toughness reduction 112.5 points,
- * enemy DEF 1150, no resistance and no reduction →
- * 376.75535 * 4.0 * 112.5 * 1000/2150 ≈ 78855.8.
+ * enemy DEF 1150, no resistance and no reduction to 
+ * 36.5535 * 4.0 * 112.5 * 1000/2150 ~= 8855.8.
  */
 public class BreakDamageTest {
     private static final double DEFENCE = 1150;
@@ -43,7 +43,7 @@ public class BreakDamageTest {
         double settled = battle.applyDamage(dummy, breakDamage);
 
         double expectedBase = 376.75535 * (1 + 3.0) * STANCE_DAMAGE;          // 169539.9
-        double expected = expectedBase * (1000.0 / (DEFENCE + 1000.0));        // defence zone (Lv80 → 1000)
+        double expected = expectedBase * (1000.0 / (DEFENCE + 1000.0));        // defence zone (Lv80 to 1000)
         Assertions.assertEquals(expected, settled, 1.0);
         Assertions.assertEquals(78_855.8, settled, 1.0);
         Assertions.assertEquals(dummy.getMaxHp() - settled, dummy.getCurrentHp(), 1.0);

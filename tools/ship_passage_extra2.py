@@ -45,8 +45,8 @@ rules.append({
     "when": ["actor == self", "damage_is_follow_up", "self has_state " + ODE],
     "do": [{
         "op": "DAMAGE",
-        "times": 1,                                       # 「额外造成 #1 次」-- #1 is 1 at EVERY level
-        "scale": "original_damage",                       # ⭐ ONE MORE INSTANCE OF THAT SAME DAMAGE (the engine's own spelling for it)
+        "times": 1,                                       # "额外造成 #1 次"-- #1 is 1 at EVERY level
+        "scale": "original_damage",                       # ONE MORE INSTANCE OF THAT SAME DAMAGE (the engine's own spelling for it)
         "percent": 1.0,
         "element": "Quantum",
         "target": "target",
@@ -88,7 +88,7 @@ import java.util.Random;
  * <p>⭐ Two scenes that differ by exactly one thing: whether the ode has been cast at him. Nothing is ever replaced -- his own table stays loaded (the `level_convention`
  * trap is recorded in `literalBase`'s comment, sprung three times by judges).
  *
- * <p>⭐ The reading is the SIZE of the extra instance, not merely that something happened: 「额外造成 #1 次附加伤害」 is one more instance of THAT damage, so the delta must
+ * <p>⭐ The reading is the SIZE of the extra instance, not merely that something happened: 「额外造成 #1 次附加伤害" is one more instance of THAT damage, so the delta must
  * be of the zone rider's own order (~#3 x Max HP), not a token amount. ⚠ The first version of this clause measured 1.2479250335691177 and was rolled back for it.
  */
 public class PassageExtraInstanceTest {

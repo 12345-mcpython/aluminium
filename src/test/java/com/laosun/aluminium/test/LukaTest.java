@@ -16,16 +16,16 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 卢卡 (1111), from his own file (2026-09-28): 【斗志】 layers, the ultimate's rolled vulnerability, and 动能过载.
+ * 卢卡 (1111), from his own file (2026-09-28): [斗志] layers, the ultimate's rolled vulnerability, and 动能过载.
  *
  * <p><b>What it needed.</b> Three capabilities that landed in the days before: a capped stack counter (`ADD_STACK` +
  * `max_stacks`), a rolled taken-side zone (`MODIFY_DAMAGE_TAKEN` + `base_chance`), and `REMOVE_BUFF` (the mirror of
  * `DISPEL`). The 330% ultimate damage and the Skill's damage are the engine's own skill rows.
  *
- * <p>⚠ <b>A measured correction, since closed (2026-09-29).</b> This class used to record that `ADD_STACK`'s `amount`
- * did <b>not</b> mean "this many layers at once" — one firing added exactly <b>one</b> layer whatever `amount` said — so
- * 「获得2层【斗志】」 could not be said and his file registered it rather than pretending. `ADD_STACK` now attaches
- * `amount` layers (stopping at `max_stacks`), which is what the 「获得 N 层」 family states: his own file already says
+ * <p>Note: <b>A measured correction, since closed (2026-09-29).</b> This class used to record that `ADD_STACK`'s `amount`
+ * did <b>not</b> mean "this many layers at once" - one firing added exactly <b>one</b> layer whatever `amount` said - so
+ * "获得2层[斗志]" could not be said and his file registered it rather than pretending. `ADD_STACK` now attaches
+ * `amount` layers (stopping at `max_stacks`), which is what the "获得 N 层" family states: his own file already says
  * `amount: 2` on the ultimate, and 1314 翡翠 states 5, 15, 1 and 3. So one ultimate is +2 layers, and the cap is still
  * real and is what the six-cast case below measures.
  */
@@ -35,7 +35,7 @@ public class LukaTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** 「战斗开始时，卢卡持有1层【斗志】」, and each ultimate adds the two his document states. */
+    /** "战斗开始时，卢卡持有1层[斗志]", and each ultimate adds the two his document states. */
     @Test
     public void theLayersStartAtOneAndGrow() {
         Fixture f = new Fixture();
@@ -47,7 +47,7 @@ public class LukaTest {
                 "「施放终结技时获得2层【斗志】」 -- one from the battle start plus two from the ultimate");
     }
 
-    /** ⚠ 「最多可持有 4 层」 holds no matter how often it is applied. */
+    /** Note: "最多可持有 4 层" holds no matter how often it is applied. */
     @Test
     public void theCapHolds() {
         Fixture f = new Fixture();
@@ -59,7 +59,7 @@ public class LukaTest {
                 "⚠ the cap is what makes 「最多可持有4层【斗志】」 true rather than decorative");
     }
 
-    /** ⚠ The vulnerability is rolled, and an easy draw lands it. */
+    /** Note: The vulnerability is rolled, and an easy draw lands it. */
     @Test
     public void theUltimatesVulnerabilityIsRolled() {
         Fixture f = new Fixture();
@@ -69,7 +69,7 @@ public class LukaTest {
                 "「有100%的基础概率使指定敌方单体受到的伤害提高20.00%」 -- the zone is up (an easy draw)");
     }
 
-    /** ⚠ One layer per relevant cast, and `from_skill` is what keeps the ultimate off the 普攻/战技 rules. */
+    /** Note: One layer per relevant cast, and `from_skill` is what keeps the ultimate off the 普攻/战技 rules. */
     @Test
     public void eachCastCategoryAddsExactlyOneLayer() {
         Fixture f = new Fixture();
@@ -88,7 +88,7 @@ public class LukaTest {
                         + "because all three are 「attack」 events");
     }
 
-    /** ⚠ Content-level: the SHIPPED Skill's ceiling must really be there — an unmapped key is silently ignored. */
+    /** Note: Content-level: the SHIPPED Skill's ceiling must really be there - an unmapped key is silently ignored. */
     @Test
     public void theShippedSkillCarriesItsCeiling() {
         Fixture f = new Fixture();
@@ -104,7 +104,7 @@ public class LukaTest {
                         + "reflective unit test can see, which is why this case goes through the FILE.");
     }
 
-    /** ⚠ End to end: two layers swap in a skill that loads, and that attack lands. */
+    /** Note: End to end: two layers swap in a skill that loads, and that attack lands. */
     @Test
     public void theSwappedSkillDealsDamage() {
         Fixture f = new Fixture();
@@ -124,7 +124,7 @@ public class LukaTest {
     }
 
     /**
-     * ⚠ Precondition FIRST and DEEP: the swap is installed by the attack that reaches the threshold, the swapped skill must
+     * Note: Precondition FIRST and DEEP: the swap is installed by the attack that reaches the threshold, the swapped skill must
      * LOAD real data, and only then is the 2-layer cost expected.
      */
     @Test
@@ -189,7 +189,7 @@ public class LukaTest {
         return new Random() {
             @Override
             public double nextDouble() {
-                return 0.0;                       // an easy draw: 「100%的基础概率」 lands
+                return 0.0;                       // an easy draw: "100%的基础概率" lands
             }
         };
     }

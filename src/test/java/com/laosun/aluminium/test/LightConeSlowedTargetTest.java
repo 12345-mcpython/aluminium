@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 「渊环 / Loop」: 「使装备者对减速状态下的敌方目标造成的伤害提高24/30/36/42/48%」, judged both ways.
+ * "渊环 / Loop": "使装备者对减速状态下的敌方目标造成的伤害提高24/30/36/42/48%", judged both ways.
  *
  * <p>Preconditions, per disciplines 54-56: the victim is a high-HP monster (1002064, ~990k) so neither hit can kill it, and the
  * fixture asserts the hit is a real measurement rather than the whole remaining bar. The generator is pinned at no-crit.

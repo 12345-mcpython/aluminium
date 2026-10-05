@@ -20,9 +20,9 @@ import java.util.Set;
 
 /**
  * P2-4 acceptance: the stat sheet, weaknesses and resistances of the enemies the factory produces are
- * all correct, and **the resistance really does enter the damage pipeline**.
+ * all correct, and the resistance really does enter the damage pipeline.
  *
- * <p>Anchor: Ice Edge 1002011 at group 1 · Lv90 → HP≈16498.296, DEF≈1100, speed 132, weak to
+ * <p>Anchor: Ice Edge 1002011 at group 1 - Lv90 to HP~=16498.296, DEF~=1100, speed 132, weak to
  * fire/lightning, ice RES 0.2, toughness 60.
  */
 public class EnemyFactoryTest {
@@ -48,7 +48,7 @@ public class EnemyFactoryTest {
         Assertions.assertTrue(enemy.isWeakTo(DamageElement.FIRE));
         Assertions.assertFalse(enemy.isWeakTo(DamageElement.ICE));
         Assertions.assertFalse(enemy.isWeakTo(null));
-        Assertions.assertEquals(60, enemy.getMaxStance(), EPS);      // template stance 60 × group 1·Lv90's 1
+        Assertions.assertEquals(60, enemy.getMaxStance(), EPS);      // template stance 60  x  group 1-Lv90's 1
         Assertions.assertEquals(60, enemy.getStance(), EPS);
         Assertions.assertEquals(1, enemy.getStanceCount());
         Assertions.assertEquals(DamageElement.ICE, enemy.getStanceType());
@@ -71,7 +71,7 @@ public class EnemyFactoryTest {
 
     @Test
     public void patchedAttackRatioReachesThePanel() {
-        // 100201506's attack adjustment is 0.33333302 in tbgd; this project's data lacks that column → merged from a patch file
+        // 100201506's attack adjustment is 0.33333302 in tbgd; this project's data lacks that column to merged from a patch file
         EnemyConfigAndTemplate pair = configOf(100201506);
         Enemy enemy = EnemyFactory.create(100201506, 90, 1);
 

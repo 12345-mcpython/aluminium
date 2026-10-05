@@ -17,14 +17,14 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 藿藿 (1217), from her own file (2026-09-28): 战技's cleanse, the ultimate's per-recipient energy, and 【禳命】.
+ * 藿藿 (121), from her own file (2026-09-28): 战技's cleanse, the ultimate's per-recipient energy, and [禳命].
  *
  * <p><b>What it needed.</b> Nothing new: `DISPEL`, `other_allies`, `GAIN_ENERGY` with a per-target share of max energy, a
- * [`owner_max_hp` + constant] heal, `ticks_on: "self"`, and `target_when` with `target_hp_percent` for 「每个当前生命值
- * 百分比 ≤ 50% 的我方目标**各**产生 1 次」.
+ * [`owner_max_hp` + constant] heal, `ticks_on: "self"`, and `target_when` with `target_hp_percent` for "每个当前生命值
+ * 百分比 <= 50% 的我方目标各产生 1 次".
  *
- * <p><b>What is registered</b> (the file's notes): 战技's 「相邻目标」 heal (no position axis), the talent's 「强化后」 variant
- * (a talent upgrade no gate can select) and its 「或施放终结技时」 trigger (no selector names a cast's caster for a heal).
+ * <p><b>What is registered</b> (the file's notes): 战技's "相邻目标" heal (no position axis), the talent's "强化后" variant
+ * (a talent upgrade no gate can select) and its "或施放终结技时" trigger (no selector names a cast's caster for a heal).
  */
 public class HuohuoTest {
     private static final int HUOHUO = 1217;
@@ -32,7 +32,7 @@ public class HuohuoTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** ⚡ The state she applies to herself, on her own clock. */
+    /** The state she applies to herself, on her own clock. */
     @Test
     public void herSkillGrantsTheStateToHerself() {
         Fixture f = new Fixture();
@@ -44,7 +44,7 @@ public class HuohuoTest {
         Assertions.assertFalse(f.ally.getBuffManager().hasState("禳命"), "…and it is hers (「藿藿获得」), not the party's");
     }
 
-    /** ⚠ 「除自身以外的队友」: the ultimate boosts every OTHER ally's attack (the energy half is registered). */
+    /** Note: "除自身以外的队友": the ultimate boosts every OTHER ally's attack (the energy half is registered). */
     @Test
     public void herUltimatePaysTheOthersNotHerself() {
         Fixture f = new Fixture();

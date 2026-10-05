@@ -20,10 +20,10 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Light cone 23036: the wearer AND its memosprite weave a stack of 【织锦】 with every attack, each layer lifts crit damage, and
+ * Light cone 23036: the wearer AND its memosprite weave a stack of [织锦] with every attack, each layer lifts crit damage, and
  * once the stack is full every layer also lifts basic-attack damage.
  *
- * <p>⭐ Three readings: the stack from a wearer attack, the stack from a MEMOSPRITE attack, and the crit number at one layer versus
+ * <p>Three readings: the stack from a wearer attack, the stack from a MEMOSPRITE attack, and the crit number at one layer versus
  * at the cap -- anchored to the crit base the engine reports, so a change in the share cannot hide.
  */
 public class Cone23036Test {
@@ -56,7 +56,7 @@ public class Cone23036Test {
     }
 
     private double critHit() {
-        // ★ A NORMAL cast category, because clause ④ is scoped by rom_category Normal: measured, the engine refuses an
+        // A NORMAL cast category, because clause ④ is scoped by rom_category Normal: measured, the engine refuses an
         // instance slot for BASIC_ATTACK_DAMAGE_BOOST, so the content limits the BOOST to a basic-attack instance instead.
         return battle.applyDamage(enemy, new Damage(wearer, enemy, DamageElement.FIRE, DamageType.NORMAL, 1000,
                 com.laosun.aluminium.enums.SkillCategory.NORMAL));
@@ -99,9 +99,9 @@ public class Cone23036Test {
         double atCap = critHit();
         double base = wearer.getAttribute(AttributeType.CRIT_ATTACK).get();
         double perLayer = (atOne - untamed) / untamed * (1 + base);
-        // ★ The cap, as the arithmetic both clauses imply: clause ③ adds to the crit MULTIPLIER, clause ④ multiplies the
+        // The cap, as the arithmetic both clauses imply: clause ③ adds to the crit MULTIPLIER, clause ④ multiplies the
         // damage zone (it is scoped to basic attacks, and this hit is one), so the cap is
-        //   raw × (1 + base + 0.54) × (1 + 0.54),  where raw = untamed / (1 + base).
+        //   raw  x  (1 + base + 0.54)  x  (1 + 0.54),  where raw = untamed / (1 + base).
         double theCap = untamed / (1 + base) * (1 + base + 0.09 * CAP) * (1 + 0.09 * CAP);
         System.out.println("[23036] crit untamed=" + untamed + " one layer=" + atOne + " at cap=" + atCap
                 + " ; per layer=" + perLayer + " ; the cap by arithmetic=" + theCap);

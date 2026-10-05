@@ -18,14 +18,14 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * `ADD_ELEMENTAL_WEAKNESS` 的两个**具名元素来源**（`cacb8b8`）：
- * `party_first`（角色 1006：「场上我方目标持有属性的弱点」，其技能说明指明**编队第一位**）
- * 与 `random_absent`（角色 1405：「添加 1 个随机属性弱点，优先添加目标尚未拥有的弱点」）。
+ * `ADD_ELEMENTAL_WEAKNESS` 的两个具名元素来源（`cacb8b8`）：
+ * `party_first`（角色 1006："场上我方目标持有属性的弱点"，其技能说明指明编队第一位）
+ * 与 `random_absent`（角色 1405："添加 1 个随机属性弱点，优先添加目标尚未拥有的弱点"）。
  *
- * <p>⚠ 这两个值**在装载期是闭集**的一部分：既不合法元素、也不在 `SPECIAL_ELEMENTS` 里的名字**装载期就抛**，
+ * <p>Note: 这两个值在装载期是闭集的一部分：既不合法元素、也不在 `SPECIAL_ELEMENTS` 里的名字装载期就抛，
  * 所以"拼错仍然响亮"这条防线没被这次改动打开。
  *
- * <p>⚠ 判据不装光锥、也不换表 —— 那条规则就挂在被测角色自己的表上（`setTriggerTable` 只会顶掉**别的**表，
+ * <p>Note: 判据不装光锥、也不换表 -  - 那条规则就挂在被测角色自己的表上（`setTriggerTable` 只会顶掉别的表，
  * 而这里没有别的表）。
  */
 public class WeaknessElementSourceTest {
@@ -44,7 +44,7 @@ public class WeaknessElementSourceTest {
         TriggerSpecs.set(rule, "id", "probe_element_source");
         TriggerSpecs.set(rule, "when", List.of("actor == self"));
         wearer.setTriggerTable(new TriggerTable(WEARER, List.of(rule)));
-        // ⚠ 第二位队友的属性与装备者**不同**：否则 `characters.getFirst()` 与 `getLast()` 是同一个，
+        // Note: 第二位队友的属性与装备者不同：否则 `characters.getFirst()` 与 `getLast()` 是同一个，
         // `party_first` 的变异就看不见了（判据的形状决定了变异能不能必红）。
         Character other = CharacterFactory.create(1002, LEVEL);
         Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
@@ -53,7 +53,7 @@ public class WeaknessElementSourceTest {
         return new Object[]{battle, wearer, enemy};
     }
 
-    /** 这个敌人**原本**就有的弱点。 */
+    /** 这个敌人原本就有的弱点。 */
     private static List<DamageElement> before(Enemy enemy) {
         List<DamageElement> had = new ArrayList<>();
         for (DamageElement e : DamageElement.values()) {

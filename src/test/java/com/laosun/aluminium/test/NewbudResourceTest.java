@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 【新蕊】 (2026-10-02): 「我方全体每损失 1 点生命值逍蝶获得 1 点【新蕊】」, the carrier's own half.
+ * [新蕊] (2026-10-02): "我方全体每损失 1 点生命值逍蝶获得 1 点[新蕊]", the carrier's own half.
  *
  * <p>Three facts bound the number: the battle knows the resource (a PARTY scope is what puts it in the registry), the hit
  * really lands through `Battle.applyDamage`, and the gain equals the loss.
@@ -24,7 +24,7 @@ public class NewbudResourceTest {
     private static final int CASTORICE = 1407;
     private static final int MONSTER = 1002011;
 
-    /** ⭐ One point of health lost is one point of Newbud. */
+    /** One point of health lost is one point of Newbud. */
     @Test
     public void aPointLostIsAPointOfNewbud() {
         Character castorice = CharacterFactory.create(CASTORICE, 80, false, null, null, 0);

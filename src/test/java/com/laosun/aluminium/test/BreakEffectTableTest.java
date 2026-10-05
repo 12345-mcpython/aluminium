@@ -11,7 +11,7 @@ import java.util.Arrays;
  * P10-1 / P10-2's break-effect tables: the structure exists, every element is accounted for, and nothing
  * can fall out of the tables unnoticed.
  *
- * <p>⚠ <b>The numbers are still placeholders and this class does not pretend otherwise.</b> The four
+ * <p>Note: <b>The numbers are still placeholders and this class does not pretend otherwise.</b> The four
  * damaging elements reuse the old {@code DOT_RATIO} / {@code DOT_TURNS}; the three control elements carry
  * a delay and a control state whose numbers are example values, and carry <b>no</b> DOT because the damage
  * component of 冻结/纠缠 is a ratio the data does not contain (see the TODO in ROADMAP P10-2). What is
@@ -35,7 +35,7 @@ public class BreakEffectTableTest {
 
     /**
      * The four damaging elements are exactly "a DOT and nothing else": no control state, and no extra delay
-     * — which is what makes the table reproduce their pre-table behaviour bit for bit.
+     *  - which is what makes the table reproduce their pre-table behaviour bit for bit.
      */
     @Test
     public void damagingElementsCarryADotAndNoControl() {
@@ -53,8 +53,8 @@ public class BreakEffectTableTest {
      * The three control elements name a control state and an extra delay, and still carry no DOT.
      *
      * <p>The "no DOT" half is not tidiness, it is an open question recorded as one: the encyclopedia text
-     * says a 冻结 victim takes ice damage every turn and that 纠缠 hits on its next action — both of which
-     * are DOTs — but it gives no break-applied ratio, and {@code BreakEffect.dotRatio} is exactly that
+     * says a 冻结 victim takes ice damage every turn and that 纠缠 hits on its next action - both of which
+     * are DOTs - but it gives no break-applied ratio, and {@code BreakEffect.dotRatio} is exactly that
      * field. This assertion makes "we have not decided that number yet" a red test if someone fills in a
      * made-up ratio, instead of a value that quietly looks like data.
      */
@@ -77,7 +77,7 @@ public class BreakEffectTableTest {
      *
      * <p>Two separate guards: an unresolvable key is a typo that must throw rather than degrade into "no
      * control at all" ({@code controlEffect()} does that loudly), and the three states must not collapse
-     * into one — 冻结 is the one that stops the victim acting, the other two only slow it down.
+     * into one - 冻结 is the one that stops the victim acting, the other two only slow it down.
      */
     @Test
     public void everyControlKeyResolvesAndFreezeIsTheOnlyActLock() {

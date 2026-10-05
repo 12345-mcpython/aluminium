@@ -15,7 +15,7 @@ import org.junit.jupiter.api.Test;
  * {@code Constant.SKILL_SLOT} AND to {@code SkillType#isIntrinsic()} the kit builder skipped them -- measured on 1501, whose kit
  * held "0 Elation skill(s) and 4 ordinary".
  *
- * <p>⭐ Read on a SHIPPED character: its own loaded kit, its own skills, and the type the engine would give each of them.
+ * <p>Read on a SHIPPED character: its own loaded kit, its own skills, and the type the engine would give each of them.
  */
 public class ElationSlotsTest {
     private static final int WEARER = 1501;

@@ -17,7 +17,7 @@ POINTER = ("> 逐轮日志（每一次读数、失败与回滚，原文未改）
 if hits:
     lines[hits[0]] = POINTER
 else:
-    # ⚠ the old pointer was itself a `> ` block, so the log split carried it away -- a fresh one goes right after the title
+    # Note: the old pointer was itself a `> ` block, so the log split carried it away -- a fresh one goes right after the title
     lines = lines[:1] + ["", POINTER] + lines[1:]
     print("no pointer left -- a fresh one was inserted after the title")
 

@@ -21,14 +21,14 @@ import java.util.function.Supplier;
  * Skill points (战技点, SP) (P8-4): start 3, cap 5, our basic attack +1, skill -1, ultimate and follow-up attacks
  * neutral.
  *
- * <p><b>Data fact</b>: {@code skills.json} has **no** skill point field — among the 638 skills, the
+ * <p><b>Data fact</b>: {@code skills.json} has no skill point field - among the 638 skills, the
  * {@code sp_need} of all 122 basic attacks and 109 skills is {@code null} (the 99 entries that do have a value are
  * all ultimates, and that is the ultimate energy threshold, see {@code engine.md} §9.4). So skill points can only
  * come from the game rules, and they live in {@link Constant}.
  *
- * <p>This test deliberately does **not** use {@code castImmediate} (that is a test/demo entry point that bypasses
+ * <p>This test deliberately does not use {@code castImmediate} (that is a test/demo entry point that bypasses
  * the queue and by design does not touch skill points); everything goes through the real chain
- * {@code stepForward → beforeMove → performAction → afterMove}, otherwise what is tested is "a world without skill
+ * {@code stepForward to beforeMove to performAction to afterMove}, otherwise what is tested is "a world without skill
  * points".
  */
 public class SkillPointTest {
@@ -87,7 +87,7 @@ public class SkillPointTest {
     // 2. The real chain: performAction really does change skill points
     // ==================================================================
 
-    /** One basic attack through the real chain → +1. */
+    /** One basic attack through the real chain to +1. */
     @Test
     public void basicAttackInRealActionFlowGainsOnePoint() {
         Battle battle = newBattle();
@@ -99,7 +99,7 @@ public class SkillPointTest {
         Assertions.assertEquals(4, battle.getSkillPoints(), "basic attack +1");
     }
 
-    /** One skill cast through the real chain → -1. */
+    /** One skill cast through the real chain to -1. */
     @Test
     public void skillInRealActionFlowSpendsOnePoint() {
         Battle battle = newBattle();
@@ -110,7 +110,7 @@ public class SkillPointTest {
         Assertions.assertEquals(2, battle.getSkillPoints(), "skill -1");
     }
 
-    /** Basic attacks in a row up to the cap: 3 → 4 → 5 → 5. */
+    /** Basic attacks in a row up to the cap: 3 to 4 to 5 to 5. */
     @Test
     public void repeatedBasicAttacksCapAtFive() {
         Battle battle = newBattle();
@@ -127,15 +127,15 @@ public class SkillPointTest {
     }
 
     // ==================================================================
-    // 3. At 0 points the skill cannot be cast, and deals **no damage**
+    // 3. At 0 points the skill cannot be cast, and deals no damage
     // ==================================================================
 
     /**
-     * The core case: casting the skill at 0 skill points → {@code performAction} returns false, and the target
+     * The core case: casting the skill at 0 skill points to {@code performAction} returns false, and the target
      * loses not a single point of HP.
      *
-     * <p>The "no damage" part must be asserted together: {@code performAction} only **queues**, the actual
-     * settlement happens in {@code afterMove → processRequests}. If the cost had failed but the request was
+     * <p>The "no damage" part must be asserted together: {@code performAction} only queues, the actual
+     * settlement happens in {@code afterMove to processRequests}. If the cost had failed but the request was
      * already queued, we would get "it was never paid for yet the hit came out".
      */
     @Test
@@ -177,7 +177,7 @@ public class SkillPointTest {
      * Follow-up attacks / talents: their {@code attack_type} is {@code null} in the data, so they must take the
      * neutral branch.
      *
-     * <p>⚠ This one guards against writing the {@code switch} as "if it is not a basic attack then it is a skill"
+     * <p>Note: This one guards against writing the {@code switch} as "if it is not a basic attack then it is a skill"
      * ({@code default -> spend}): that way talents and follow-up attacks would quietly eat skill points, and the
      * moment P8-3 adds follow-up attacks it would be hit immediately.
      */
@@ -211,14 +211,14 @@ public class SkillPointTest {
     /**
      * An enemy action must not change our skill points.
      *
-     * <p>⚠ <b>The trap in this test (already fixed)</b>: the enemy's default skill {@code EnemySkill} has a
-     * {@code getData()} that is **always null** (it does not go through the character multiplier table, see that
-     * class's javadoc), so it returns early at the null guard in {@code applySkillPointCost} —
-     * testing "the enemy does not affect skill points" with the default skill **passes whether or not the camp
-     * check exists**. That is exactly how I wrote it the first time, and only mutation testing exposed it (it
+     * <p>Note: <b>The trap in this test (already fixed)</b>: the enemy's default skill {@code EnemySkill} has a
+     * {@code getData()} that is always null (it does not go through the character multiplier table, see that
+     * class's javadoc), so it returns early at the null guard in {@code applySkillPointCost} - 
+     * testing "the enemy does not affect skill points" with the default skill passes whether or not the camp
+     * check exists. That is exactly how I wrote it the first time, and only mutation testing exposed it (it
      * stayed green after the camp check was removed).
      *
-     * <p>So here we **hand the enemy a real character basic attack** ({@code attack_type = "Normal"}):
+     * <p>So here we hand the enemy a real character basic attack ({@code attack_type = "Normal"}):
      * only that way does it actually reach the branch, making the "camp check" the only thing that can stop it.
      */
     @Test
@@ -231,7 +231,7 @@ public class SkillPointTest {
         Assertions.assertNull(enemySkill(enemy).getData(),
                 "precondition: EnemySkill has no character multiplier data, testing it directly is a no-op");
 
-        // swap in "a real character's basic attack" (Normal) — the data is non-null, so it really reaches the skill point branch
+        // swap in "a real character's basic attack" (Normal) - the data is non-null, so it really reaches the skill point branch
         enemy.setSkill(SkillType.COMMON, new DefaultSkill(1003, 1, 1));
         int before = battle.getSkillPoints();
         Assertions.assertTrue(actWithRealTurn(battle, enemy, () -> enemy.getSkills().get(SkillType.COMMON),
@@ -242,7 +242,7 @@ public class SkillPointTest {
     }
 
     // ==================================================================
-    // 6. applySkillPointCost is **atomic**
+    // 6. applySkillPointCost is atomic
     // ==================================================================
 
     /** Trying to cast the skill at 0 points: returns false and the count is unchanged (it must not deduct to -1 and then check). */
@@ -295,7 +295,7 @@ public class SkillPointTest {
     }
 
     /**
-     * Has {@code actor} take one action through the real flow, **and finishes it** ({@code afterMove}).
+     * Has {@code actor} take one action through the real flow, and finishes it ({@code afterMove}).
      *
      * <p>The one whose action value arrives first may be the enemy (冰锋 has speed 132 > Himeko's 96), so we have to
      * skip ahead to the actor's turn.
@@ -307,7 +307,7 @@ public class SkillPointTest {
         return result;
     }
 
-    /** As above, but does **not** finish it — left to the caller to assert before settlement (the "no damage" case needs this). */
+    /** As above, but does not finish it - left to the caller to assert before settlement (the "no damage" case needs this). */
     private static boolean actWithoutAfterMove(Battle battle, CanHit actor, Supplier<Skill> skill,
                                                List<? extends CanHit> targets) {
         for (int i = 0; i < 30; i++) {

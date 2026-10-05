@@ -23,7 +23,7 @@ import java.util.Map;
 import java.util.Random;
 
 /**
- * 「受到攻击的概率大幅提高」 — the SOFT aggro weight, and why it is an attribute rather than {@code TAUNT}.
+ * "受到攻击的概率大幅提高" - the SOFT aggro weight, and why it is an attribute rather than {@code TAUNT}.
  *
  * <p>三月七's Skill states no magnitude, which is why this clause sat registered for a long time. The magnitude is her
  * Skill's fifth parameter (the one her prose never references) and the property the game writes is
@@ -38,7 +38,7 @@ public class SoftAggroWeightTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** ⚠ The ratio multiplies the unit's OWN weight: 100 x (1 + 5) = 600, so two equal allies become 6:1. */
+    /** Note: The ratio multiplies the unit's OWN weight: 100 x (1 + 5) = 600, so two equal allies become 6:1. */
     @Test
     public void theRatioMultipliesTheUnitsOwnAggroWeight() {
         Character marked = withAggro(100);
@@ -57,7 +57,7 @@ public class SoftAggroWeightTest {
         Assertions.assertEquals(100.0 / 700, table.get(plain), EPS, "and the other ally is still a candidate");
     }
 
-    /** ⚠ The guard: a stated change that would zero the weight keeps the weight instead of deleting the unit. */
+    /** Note: The guard: a stated change that would zero the weight keeps the weight instead of deleting the unit. */
     @Test
     public void aStatedChangeThatWouldZeroTheWeightDoesNotDeleteTheUnit() {
         Character doomed = withAggro(100);
@@ -72,7 +72,7 @@ public class SoftAggroWeightTest {
         Assertions.assertEquals(1.0, battle.getAggroTable(List.of(doomed)).get(doomed), EPS, "still a legal candidate");
     }
 
-    /** ⚠ Her Skill's gate, both branches: at or above 30% HP it lands, below it her Skill raises nothing. */
+    /** Note: Her Skill's gate, both branches: at or above 30% HP it lands, below it her Skill raises nothing. */
     @Test
     public void herSkillRaisesAggroOnlyWhileTheAimedAllyIsAtThirtyPercentOrMore() {
         Assertions.assertEquals(6.0, aimedAllyWeightRatio(false), 1e-6,
@@ -81,7 +81,7 @@ public class SoftAggroWeightTest {
                 "below 30% the game pins MDF_AggroUp to 0, so the weight must be untouched");
     }
 
-    /** ⚠ Only the aimed ally is affected, and 星魂 2's battle-start shield carries no aggro at all. */
+    /** Note: Only the aimed ally is affected, and 星魂 2's battle-start shield carries no aggro at all. */
     @Test
     public void onlyTheAimedAllyIsAffectedAndTheEidolonShieldIsNot() {
         Character march = CharacterFactory.create(MARCH, LEVEL);
@@ -106,7 +106,7 @@ public class SoftAggroWeightTest {
         second.startBattle();
 
         // The shield itself answers `hasBuff(ShieldBuff.class)` -- a shield is not a named state. Which of the two it
-        // lands on is the engine's pick (「当前生命值百分比最低的我方目标」 is ambiguous at full HP), so the
+        // lands on is the engine's pick ("当前生命值百分比最低的我方目标" is ambiguous at full HP), so the
         // precondition is "one of them", while the claim below covers BOTH.
         boolean shieldedSomebody = withEidolon.getBuffManager().hasBuff(ShieldBuff.class)
                 || shielded.getBuffManager().hasBuff(ShieldBuff.class);

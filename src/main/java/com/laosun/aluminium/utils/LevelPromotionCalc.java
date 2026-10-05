@@ -16,15 +16,15 @@ public final class LevelPromotionCalc {
     /**
      * Calculates the character stat multiplier for the given level and promotion status.
      *
-     * <p>Formula: {@code 1 + (level-1)×0.05 + promotion count×0.4}. The promotion count is derived
-     * from the level bracket (one bracket per 10 levels, 0.4 per bracket), i.e. the 7 rows of the
+     * <p>Formula: {@code 1 + (level-1) x 0.05 + promotion count x 0.4}. The promotion count is derived
+     * from the level bracket (one bracket per 10 levels, 0.4 per bracket), i.e. the rows of the
      * game's {@code AvatarPromotionConfig}:
-     * ascension 0 (≤20) / 1 (≤30) / 2 (≤40) / 3 (≤50) / 4 (≤60) / 5 (≤70) / 6 (≤80).
+     * ascension 0 (<=20) / 1 (<=30) / 2 (<=40) / 3 (<=50) / 4 (<=60) / 5 (<=0) / 6 (<=80).
      *
-     * <p>⚠ <b>The promotion count MUST be clamped to ≥ 0</b> (fixed in P8-1): previously a low level
-     * combined with {@code promotion=true} produced a **negative** value (Lv1 → {@code 1/10 - 1 = -1}),
-     * so "already promoted" actually squeezed the Lv1 stat sheet down to 0.6× (Jing Yuan's (景元) base
-     * HP 158.4 → 95.04, which happens to equal his **attack** 95.04 — misreading the two is very easy
+     * <p>Note: <b>The promotion count MUST be clamped to >= 0</b> (fixed in P8-1): previously a low level
+     * combined with {@code promotion=true} produced a negative value (Lv1 to {@code 1/10 - 1 = -1}),
+     * so "already promoted" actually squeezed the Lv1 stat sheet down to 0.6 x  (Jing Yuan's (景元) base
+     * HP 158.4 to 95.04, which happens to equal his attack 95.04 - misreading the two is very easy
      * and looks like an index shift). A level-1 character cannot have a "negative promotion", so the
      * lower bound must be 0.
      *

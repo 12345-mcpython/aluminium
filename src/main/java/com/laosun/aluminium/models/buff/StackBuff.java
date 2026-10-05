@@ -3,19 +3,19 @@ package com.laosun.aluminium.models.buff;
 /**
  * A <b>named counter</b>: a buff that carries no modifier at all and exists only to be <b>counted</b> (2026-09-28).
  *
- * <p><b>The sentence that needs it.</b> 寒鸦's 战技: 「每当我方目标对【承负】状态下的敌方目标施放 <b>2</b> 次普攻、战技、终结技后，立即
- * 为我方恢复 1 个战技点；【承负】…会在触发 <b>2</b> 次战技点恢复效果后自动解除」 — two thresholds over two different things, and
+ * <p><b>The sentence that needs it.</b> 寒鸦's 战技: "每当我方目标对[承负]状态下的敌方目标施放 <b>2</b> 次普攻、战技、终结技后，立即
+ * 为我方恢复 1 个战技点；[承负]…会在触发 <b>2</b> 次战技点恢复效果后自动解除" - two thresholds over two different things, and
  * neither is a turn count or a probability: they are "how many times has this happened so far".
  *
  * <p><b>Why a buff and not a new kind of state.</b> The engine's existing stacking already means "several instances that
  * accumulate and can be removed one at a time" ({@code StatModifierBuff} with {@code maxStacks}, pinned by
  * {@code BuffManagerTest}), and it already gives every instance a lifetime. All that was missing was (a) a carrier with
- * <b>no</b> stat attached — a counter must not change the panel — and (b) a way to <b>read</b> the count, which is the
+ * <b>no</b> stat attached - a counter must not change the panel - and (b) a way to <b>read</b> the count, which is the
  * {@code self_stacks:<name>} / {@code target_stacks:<name>} condition.
  *
- * <p>⚠ Its display name is the key both of those use, so it is set by the {@code ADD_STACK} op
+ * <p>Note: Its display name is the key both of those use, so it is set by the {@code ADD_STACK} op
  * ({@code AbstractBuff.buffName}); {@code REMOVE_STATE <name>} clears the whole counter, and {@code REMOVE_STACK} takes
- * one off — the two directions the documents ask for (「触发 2 次后自动解除」 vs 「消耗 1 层」).
+ * one off - the two directions the documents ask for ("触发 2 次后自动解除" vs "消耗 1 层").
  */
 public class StackBuff extends AbstractBuff {
 
@@ -35,7 +35,7 @@ public class StackBuff extends AbstractBuff {
         this.maxStacks = Math.max(1, maxStacks);
     }
 
-    /** How many marks this counter accepts ({@code 1} = a plain flag) — read by {@code BuffManager.addStackable}. */
+    /** How many marks this counter accepts ({@code 1} = a plain flag) - read by {@code BuffManager.addStackable}. */
     private final int maxStacks;
 
     @Override
@@ -54,9 +54,9 @@ public class StackBuff extends AbstractBuff {
     }
 
     /**
-     * ⚠ <b>Stackable by construction, and that is the whole point.</b> The engine's rule is "the same kind refreshes
+     * Note: <b>Stackable by construction, and that is the whole point.</b> The engine's rule is "the same kind refreshes
      * instead of stacking; stacking is opt-in" ({@code BuffManagerTest.sameKindBuffRefreshesInsteadOfStacking}), so a
-     * counter whose instances were not stackable would silently stay at <b>1</b> however often it was marked — measured:
+     * counter whose instances were not stackable would silently stay at <b>1</b> however often it was marked - measured:
      * the first version of this class did exactly that, and the test that caught it is
      * {@code StackCounterTest.bothRemovalDirectionsWork}.
      */
@@ -77,19 +77,19 @@ public class StackBuff extends AbstractBuff {
         return true;
     }
 
-    /** ⚠ Nothing happens on its owner's turn: a counter is only ever read (and removed) by the content that made it. */
+    /** Note: Nothing happens on its owner's turn: a counter is only ever read (and removed) by the content that made it. */
     @Override
     public void tickEffect(com.laosun.aluminium.models.CanHit owner) {
         // deliberately nothing
     }
 
-    /** ⚠ Applying it does nothing either: the buff itself IS the count (see the class comment). */
+    /** Note: Applying it does nothing either: the buff itself IS the count (see the class comment). */
     @Override
     public void applyEffect(com.laosun.aluminium.models.CanHit owner) {
         // deliberately nothing
     }
 
-    /** ⚠ And nothing happens when it comes off: the count is the buffs, so removing one is the whole effect. */
+    /** Note: And nothing happens when it comes off: the count is the buffs, so removing one is the whole effect. */
     @Override
     public void removeBuff(com.laosun.aluminium.models.CanHit owner) {
         // deliberately nothing

@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1309's 行迹「即兴装饰」(1309102): 「处于【协奏】状态时，我方全体发动追加攻击造成的暴击伤害提高 25%」.
+ * 1309's 行迹"即兴装饰"(1309102): "处于[协奏]状态时，我方全体发动追加攻击造成的暴击伤害提高 25%".
  *
  * <p>The aura is owned by 1309 but must react to an ALLY's follow-up -- which the engine already supports, because fireTriggers walks the whole party. The judge makes
  * the ALLY deal the damage, so a self-only implementation would fail it.

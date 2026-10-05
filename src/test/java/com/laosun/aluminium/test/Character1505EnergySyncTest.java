@@ -13,11 +13,11 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1505 绯英’s energy sync (2026-09-30): 「绯英获得能量时，将同步获得等值的【好活当赏】」.
+ * 1505 绯英's energy sync (2026-09-30): "绯英获得能量时，将同步获得等值的[好活当赏]".
  *
- * <p>⭐ The energy comes from the ENGINE’s own credit (casting a basic attack), not from a hand-written rule, and the old table is
+ * <p>The energy comes from the ENGINE's own credit (casting a basic attack), not from a hand-written rule, and the old table is
  * never replaced -- an earlier version of this test did that and silently removed the very rule under test (measured: it read 20,
- * the technique’s gift alone). The expectation is the MEASURED energy delta, so the judge states the rule rather than a number
+ * the technique's gift alone). The expectation is the MEASURED energy delta, so the judge states the rule rather than a number
  * borrowed from somewhere else.
  */
 public class Character1505EnergySyncTest {

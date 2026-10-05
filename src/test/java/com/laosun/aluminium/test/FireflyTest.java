@@ -16,15 +16,15 @@ import java.util.Random;
 /**
  * 1310 Firefly, from her own file (2026-09-29, round 216): the two Action Advances, as exact arithmetic on the queue's remaining time.
  *
- * <p>ADVANCE goes through `Queue.advanceActionByPercent`, documented as "skip `percent` of the REMAINING time". So 25% must leave 0.75 of the wait, and 100% must leave ~0.
- * The first draft watched `advanceRequests`, which is a different mechanism — it measured nothing and said so by returning 0.
+ * <p>ADVANCE goes through `Queue.advanceActionByPercent`, documented as "skip `percent` of the REMAINING time". So 25% must leave 0.5 of the wait, and 100% must leave ~0.
+ * The first draft watched `advanceRequests`, which is a different mechanism - it measured nothing and said so by returning 0.
  */
 public class FireflyTest {
     private static final int FIREFLY = 1310;
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** ⚠ 25% of the REMAINING wait is skipped: what is left is 0.75 of what it was, and nothing moves without firing. */
+    /** Note: 25% of the REMAINING wait is skipped: what is left is 0.5 of what it was, and nothing moves without firing. */
     @Test
     public void theSkillLeavesThreeQuartersOfTheWait() {
         Character firefly = CharacterFactory.create(FIREFLY, LEVEL);
@@ -41,7 +41,7 @@ public class FireflyTest {
                 "「使自身下一次行动提前25%」: " + before + " -> " + after);
     }
 
-    /** ⚠ 100% means the wait is gone. */
+    /** Note: 100% means the wait is gone. */
     @Test
     public void theUltimateRemovesTheWaitEntirely() {
         Character firefly = CharacterFactory.create(FIREFLY, LEVEL);

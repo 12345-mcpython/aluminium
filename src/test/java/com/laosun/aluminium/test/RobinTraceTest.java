@@ -18,22 +18,22 @@ import java.util.Random;
  * test of "one character, several mechanics" (her talent was already authored in the same file).
  *
  * <p><b>Why this class is the extensibility evidence, not just a character test.</b> Both rules
- * added for her use events and ops that already existed — {@code BATTLE_START}, {@code SKILL_CAST},
- * {@code ADVANCE}, {@code GAIN_ENERGY} — and a condition the DSL already had ({@code actor == self}).
+ * added for her use events and ops that already existed - {@code BATTLE_START}, {@code SKILL_CAST},
+ * {@code ADVANCE}, {@code GAIN_ENERGY} - and a condition the DSL already had ({@code actor == self}).
  * So what is being pinned is not "the engine learned Robin" but "content can change a battle without
  * engine code", which is the claim the whole trigger-table design rests on. If a rule needs an op the
  * engine lacks, it is rejected at <b>load</b> time, so the failure mode is never a silent no-op.
  *
  * <p><b>How the assertions are made mutation-proof.</b> Every measurement is taken twice: once with
  * her real table, once with the <b>same character</b> (same cid, level, seed, roster) whose table has
- * been emptied. A number that only holds because a rule exists then cannot pass by accident — delete
+ * been emptied. A number that only holds because a rule exists then cannot pass by accident - delete
  * the rule and the two sides become equal. The one absolute assertion is 0 (an ally's skill must not
  * pay her), which is the guardrail for {@code actor == self}.
  */
 public class RobinTraceTest {
     private static final int ROBIN = 1309;
     /**
-     * 1202 Tingyun (停云): the same path (harmony) and level, but no rule file of her own — so she is a
+     * 1202 Tingyun (停云): the same path (harmony) and level, but no rule file of her own - so she is a
      * real character acting as the control, not a mock. Her skill and basic attack both deal no damage
      * beyond the basic attack itself, which is what makes the absolute assertions below safe.
      */
@@ -42,7 +42,7 @@ public class RobinTraceTest {
     private static final double EPS = 1e-9;
 
     /**
-     * 「战斗开始时，自身行动提前25%」 — 25% of the wait still ahead, not 25% of the round.
+     * "战斗开始时，自身行动提前25%" - 25% of the wait still ahead, not 25% of the round.
      */
     @Test
     public void battleStartAdvancesHerByAQuarterOfTheRemainingWait() {
@@ -56,13 +56,13 @@ public class RobinTraceTest {
     }
 
     /**
-     * 「施放战技时额外恢复5点能量」 — her own skill, and only her own.
+     * "施放战技时额外恢复5点能量" - her own skill, and only her own.
      *
      * <p>The absolute numbers are not 0/5: the skill <b>action</b> itself already credits the caster
      * 30 energy irrespective of any trigger rule (it is credited to whoever cast, which is why the
-     * ally case below leaves her at 0). That 30 is therefore not asserted here — it belongs to the
+     * ally case below leaves her at 0). That 30 is therefore not asserted here - it belongs to the
      * energy model, not to this trace. What is asserted is the difference the rule makes, which is
-     * exactly the word 「额外」 in the text.
+     * exactly the word "额外" in the text.
      */
     @Test
     public void castingHerOwnSkillGrantsTheExtraFiveEnergy() {
@@ -84,12 +84,12 @@ public class RobinTraceTest {
     }
 
     /**
-     * 「施放战技时」 must not fire on a <b>basic attack</b>.
+     * "施放战技时" must not fire on a <b>basic attack</b>.
      *
      * <p>This is the test that found the bug rather than pinning a known behaviour: {@code SKILL_CAST}
      * used to mean "any cast that is not an ultimate" (the emitter only split ultimate from everything
-     * else), so her own basic attacks were paying her the extra 5 as well. Her relic-109 sibling —
-     * 「施放战技时攻击力提高20%」 — had the same over-trigger, shipped, with a note claiming the
+     * else), so her own basic attacks were paying her the extra 5 as well. Her relic-109 sibling - 
+     * "施放战技时攻击力提高20%" - had the same over-trigger, shipped, with a note claiming the
      * emitter's split already handled it.
      */
     @Test
@@ -101,7 +101,7 @@ public class RobinTraceTest {
     }
 
     /**
-     * Composition: her talent (authored earlier, {@code ALLY_ATTACK} → +2) still works next to the
+     * Composition: her talent (authored earlier, {@code ALLY_ATTACK} to +2) still works next to the
      * new rules, and a basic attack is <b>not</b> a skill cast, so the +5 must not leak into it.
      */
     @Test

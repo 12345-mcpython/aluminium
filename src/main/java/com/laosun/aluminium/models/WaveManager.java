@@ -10,7 +10,7 @@ import lombok.Getter;
 import java.util.List;
 
 /**
- * Stage wave management (P7-4): spawns monsters in order, one entry of
+ * Stage wave management (P-4): spawns monsters in order, one entry of
  * {@link StageBean#monster()} (= one wave) at a time.
  *
  * <pre>{@code
@@ -24,14 +24,14 @@ import java.util.List;
  * }
  * }</pre>
  *
- * <p><b>How victory/defeat relates to waves</b> (the P7-3 × P7-4 seam, the easiest place to
+ * <p><b>How victory/defeat relates to waves</b> (the P-3 x P-4 seam, the easiest place to
  * trip over): {@code Battle.checkResult()} treats "one side is wiped out" as the battle
- * ending, whereas in wave mode "the enemy team is empty" only means **this wave has not
- * spawned yet**. So {@link Battle} asks this class
+ * ending, whereas in wave mode "the enemy team is empty" only means this wave has not
+ * spawned yet. So {@link Battle} asks this class
  * ({@link #hasPendingWaves()}): as long as waves remain, no victory is declared.
  *
- * <p>⚠ The data has **no** "between-wave cleanup" config item. So this class likewise does
- * not presume to clear buffs / reset the action bar — on a wave change it does only one
+ * <p>Note: The data has no "between-wave cleanup" config item. So this class likewise does
+ * not presume to clear buffs / reset the action bar - on a wave change it does only one
  * thing: spawn the monsters. If between-wave config ever appears, the extension point is
  * inside {@link #nextWave()}.
  */
@@ -64,11 +64,11 @@ public class WaveManager {
 
     /**
      * Enter the next wave: create this wave's monsters, add them to {@code battle.enemies},
-     * and **queue them for entry**.
+     * and queue them for entry.
      *
      * <p>Entry goes through {@code Battle.addRequestItems} ({@code processAddRequests} of
      * {@code processRequests()} pushes it into the action bar), so the monsters start running
-     * from the **current action value** and do not go back to 0 to restart a round — which is
+     * from the current action value and do not go back to 0 to restart a round - which is
      * exactly how waves should behave.
      *
      * @return {@code true} = a wave was entered; {@code false} if there is no next wave
@@ -81,11 +81,11 @@ public class WaveManager {
         // Before the spawn, not at `beginWave()`: that runs AFTER it and would erase the wave that just arrived.
         battle.forgetWaveMonsters();
         spawnWave(waveIndex);
-        // ★ The wave is on the field: tell the tables (cones 23011 / 23064 grant per-wave effects). Fired with no actor
+        // The wave is on the field: tell the tables (cones 23011 / 23064 grant per-wave effects). Fired with no actor
         // and no subject, exactly like BATTLE_START -- a wave is a fact about the battle, not about one unit. Before
         // checkResult on purpose: the wave's own rules must see a battle that is still running.
         battle.beginWave();        battle.fireTriggers(TriggerEvent.WAVE_START);
-        // A new wave came in → judge again (the checkResult before spawning may have
+        // A new wave came in to judge again (the checkResult before spawning may have
         // decided nothing)
         battle.checkResult();
         return true;
@@ -99,7 +99,7 @@ public class WaveManager {
     }
 
     /**
-     * Whether any wave is still **un-entered** — this is what {@link Battle} asks when
+     * Whether any wave is still un-entered - this is what {@link Battle} asks when
      * judging victory/defeat.
      *
      * <p>The name stresses pending: {@link #hasNextWave()} means "can still enter the next
@@ -120,7 +120,7 @@ public class WaveManager {
     /**
      * Whether every enemy of the current wave (that is, the last wave entered) has died.
      *
-     * <p>⚠ When not even one wave has been entered the enemy team is empty and this returns
+     * <p>Note: When not even one wave has been entered the enemy team is empty and this returns
      * {@code true} (the empty set is fully wiped out). Before using it as the "time to change
      * wave" test, first confirm {@link #getWaveIndex()} {@code >= 0}.
      *
@@ -131,7 +131,7 @@ public class WaveManager {
     }
 
     /**
-     * The current wave's units that are still alive — the enemy camp's, so a summon fighting
+     * The current wave's units that are still alive - the enemy camp's, so a summon fighting
      * alongside the monsters counts as "not cleared" too (L-8).
      */
     public List<CanHit> aliveEnemies() {

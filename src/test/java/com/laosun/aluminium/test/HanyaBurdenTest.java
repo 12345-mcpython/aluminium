@@ -15,11 +15,11 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 寒鸦's 【承负】 family, from her own file (2026-09-28): the state, the two-mark refund and the traces that hang off it.
+ * 寒鸦's [承负] family, from her own file (2026-09-28): the state, the two-mark refund and the traces that hang off it.
  *
- * <p><b>What it needed.</b> A counter with a threshold ({@code ADD_STACK} + {@code target_stacks:<name>} — 「每 2 次…后」 and
- * 「触发 2 次后自动解除」 are both of that shape), and <b>the cast category on {@code ALLY_ATTACK}</b>: 「施放 2 次普攻、战技、
- * 终结技」 must count <i>casts</i>, which only that event knows — counting on {@code DEALING_DAMAGE} would count hits and
+ * <p><b>What it needed.</b> A counter with a threshold ({@code ADD_STACK} + {@code target_stacks:<name>} - "每 2 次…后" and
+ * "触发 2 次后自动解除" are both of that shape), and <b>the cast category on {@code ALLY_ATTACK}</b>: "施放 2 次普攻、战技、
+ * 终结技" must count <i>casts</i>, which only that event knows - counting on {@code DEALING_DAMAGE} would count hits and
  * pay out early on a multi-hit skill, with nothing to report.
  */
 public class HanyaBurdenTest {
@@ -28,7 +28,7 @@ public class HanyaBurdenTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** 「【承负】仅对最新被施加的目标生效」: the second cast takes it off the first enemy. */
+    /** "[承负]仅对最新被施加的目标生效": the second cast takes it off the first enemy. */
     @Test
     public void theSkillMovesBurdenToTheLatestTarget() {
         Fixture f = new Fixture();
@@ -42,7 +42,7 @@ public class HanyaBurdenTest {
         Assertions.assertTrue(f.second.getBuffManager().hasState("承负"));
     }
 
-    /** Two qualifying attacks reach the threshold, and that clears the state (「触发 2 次…后自动解除」). */
+    /** Two qualifying attacks reach the threshold, and that clears the state ("触发 2 次…后自动解除"). */
     @Test
     public void twoAlliedAttacksReachTheRefundThreshold() {
         Fixture f = new Fixture();
@@ -57,7 +57,7 @@ public class HanyaBurdenTest {
                 "the second qualifying cast reached the threshold, the party got a skill point and 【承负】 came off");
     }
 
-    /** ⚠ The counter counts <b>casts</b>, not hits: a multi-hit skill marks once. */
+    /** Note: The counter counts <b>casts</b>, not hits: a multi-hit skill marks once. */
     @Test
     public void aMultiHitCastCountsOnce() {
         Fixture f = new Fixture();
@@ -88,7 +88,7 @@ public class HanyaBurdenTest {
 
     private static final class Fixture {
         private final Character hanya = CharacterFactory.create(HANYA, LEVEL, true, null, null, 0);
-        /** The 「队友」 the marks are about: an ally OTHER than the carrier, hence a field of its own. */
+        /** The "队友" the marks are about: an ally OTHER than the carrier, hence a field of its own. */
         private final Character ally = CharacterFactory.create(ALLY, LEVEL);
         private final Enemy first = EnemyFactory.create(MONSTER, 90, 1);
         private final Enemy second = EnemyFactory.create(MONSTER, 90, 1);
@@ -108,7 +108,7 @@ public class HanyaBurdenTest {
             allyAttacks(target, category, 1);
         }
 
-        /** One attack by 寒鸦 herself (「我方目标」 includes her), stating the cast category the event now carries. */
+        /** One attack by 寒鸦 herself ("我方目标" includes her), stating the cast category the event now carries. */
         private void allyAttacks(Enemy target, com.laosun.aluminium.enums.SkillCategory category, int hits) {
             battle.fireTriggers(TriggerEvent.ALLY_ATTACK, ally, target, hits, 0, category);
         }

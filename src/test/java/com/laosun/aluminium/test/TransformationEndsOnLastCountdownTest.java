@@ -15,9 +15,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1408：「最后 1 个倒计时回合…结束变身」 (2026-10-02).
+ * 1408："最后 1 个倒计时回合…结束变身" (2026-10-02).
  *
- * <p>⭐ TWO-WAY, and the countdown's turns are driven by the SHIPPED pattern (`CountdownTest`): point `currentMove` at the clock's
+ * <p>TWO-WAY, and the countdown's turns are driven by the SHIPPED pattern (`CountdownTest`): point `currentMove` at the clock's
  * `Signal` on the action bar and call `beforeMove()`. `stepForward()` does not execute a turn at all -- the tree says so in
  * `ContentWeaknessClausesTest` and this judge does not rely on it.
  */
@@ -27,14 +27,14 @@ public class TransformationEndsOnLastCountdownTest {
     private static final String STATE = "变身";
     private static final int TURNS = 8;
 
-    /** ⭐ After the eighth countdown turn the transformation is gone. */
+    /** After the eighth countdown turn the transformation is gone. */
     @Test
     public void theEighthCountdownTurnEndsIt() {
         Assertions.assertFalse(transformedAfterCountdownTurns(TURNS),
                 "「最后 1 个倒计时回合…结束变身」");
     }
 
-    /** ⚠ One turn earlier the transformation must still be on. */
+    /** Note: One turn earlier the transformation must still be on. */
     @Test
     public void oneTurnEarlierItIsStillOn() {
         Assertions.assertTrue(transformedAfterCountdownTurns(TURNS - 1),

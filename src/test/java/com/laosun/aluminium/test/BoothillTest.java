@@ -20,7 +20,7 @@ public class BoothillTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** ⚠ The state lands on the enemy AND on him, and both stack rules read their own event. */
+    /** Note: The state lands on the enemy AND on him, and both stack rules read their own event. */
     @Test
     public void theStandoffLandsOnBothAndBothEndsFeedTheStack() {
         Character boothill = CharacterFactory.create(BOOTHILL, LEVEL);

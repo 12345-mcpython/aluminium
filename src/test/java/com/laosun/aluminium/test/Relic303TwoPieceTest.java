@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
- * Relic 303's two-piece: 「使装备者的效果命中提高 10%。同时提高装备者等同于当前效果命中 25% 的攻击力，最多提高 25%」.
+ * Relic 303's two-piece: "使装备者的效果命中提高 10%。同时提高装备者等同于当前效果命中 25% 的攻击力，最多提高 25%".
  *
  * <p>An amount that SCALES off the wearer's own attribute and is CAPPED -- both pieces of vocabulary already existed, which is why this registry entry had gone stale.
  */

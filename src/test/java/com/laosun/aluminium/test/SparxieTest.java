@@ -20,7 +20,7 @@ public class SparxieTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** ⚠ The technique hits and restores exactly two Skill Points, and only when declared. */
+    /** Note: The technique hits and restores exactly two Skill Points, and only when declared. */
     @Test
     public void theTechniqueHitsAndRestoresSkillPoints() {
         Character sparxie = CharacterFactory.create(SPARXIE, LEVEL);
@@ -43,7 +43,7 @@ public class SparxieTest {
                 "「使用秘技后」 -- undeclared, so nothing");
     }
 
-    /** ⚠ Exactly two Skill Points: spend two first so the pool's cap cannot clamp the grant, then observe it in isolation. */
+    /** Note: Exactly two Skill Points: spend two first so the pool's cap cannot clamp the grant, then observe it in isolation. */
     @Test
     public void theTechniqueGrantsExactlyTwoSkillPoints() {
         Character sparxie = CharacterFactory.create(SPARXIE, LEVEL);

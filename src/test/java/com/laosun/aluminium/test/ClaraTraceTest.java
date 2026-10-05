@@ -17,11 +17,11 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1107 克拉拉 (Clara): her 家人 trace, the first shipped rule that combines a <b>probability</b> with a
+ * 110克拉拉 (Clara): her 家人 trace, the first shipped rule that combines a <b>probability</b> with a
  * <b>dispel</b>.
  *
- * <p>「受到攻击时有 35% 的固定概率解除自身 1 个负面效果」 is three things at once — an event that fires on every hit
- * she takes, a probability, and the removal of one negative effect — and all three had to exist before the rule
+ * <p>"受到攻击时有 35% 的固定概率解除自身 1 个负面效果" is three things at once - an event that fires on every hit
+ * she takes, a probability, and the removal of one negative effect - and all three had to exist before the rule
  * could be written. Her file already held her counter talent, so this also keeps pinning "one character, several
  * mechanics, one table".
  *
@@ -75,11 +75,11 @@ public class ClaraTraceTest {
     }
 
     /**
-     * Her 守护 trace: 「抵抗控制类负面状态的概率提高35%」 — a resistance to a whole <b>class</b>, from the real file.
+     * Her 守护 trace: "抵抗控制类负面状态的概率提高35%" - a resistance to a whole <b>class</b>, from the real file.
      *
      * <p>The number is read back off the character the loader built, which is the point: the op installs a permanent
      * 35% control resistance at BATTLE_START, and nothing else in the file changed. Asserting it here rather than
-     * only in {@code DebuffResistTest} is what keeps the <b>content</b> honest — the engine op can be perfect and the
+     * only in {@code DebuffResistTest} is what keeps the <b>content</b> honest - the engine op can be perfect and the
      * file still say the wrong percentage or the wrong class.
      */
     @Test

@@ -26,7 +26,7 @@ public class AnaxaTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** ⚠ The ratio, and the control that a basic attack does nothing. */
+    /** Note: The ratio, and the control that a basic attack does nothing. */
     @Test
     public void hisSkillLowersTheTargetsDefenceFromEidolonOne() {
         double content = defenceDrop(0);

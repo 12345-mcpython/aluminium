@@ -15,10 +15,10 @@ import org.junit.jupiter.api.Test;
  *
  * <p>The design point worth pinning is that <b>nothing has to be scheduled</b>: {@code activeSkill()} reads
  * the current HP each time it is asked, so there is no transition flag and no "hold the bar at 1 HP"
- * trick — which is the approach the roadmap forbids, because {@code takeDamage} marks the enemy dead the
+ * trick - which is the approach the roadmap forbids, because {@code takeDamage} marks the enemy dead the
  * moment HP reaches 0, so a locked bar either skips the phase or lets a corpse be hit.
  *
- * <p>⚠ This covers <b>threshold switching only</b>. A multi-HP-bar boss additionally needs its bar locked
+ * <p>Note: This covers <b>threshold switching only</b>. A multi-HP-bar boss additionally needs its bar locked
  * and explicitly reset ({@code setInvulnerable(true)} then set HP), which is a separate item.
  */
 public class EnemyPhaseTest {
@@ -58,7 +58,7 @@ public class EnemyPhaseTest {
 
         Assertions.assertNull(enemy.activeSkill(), "at full HP the phase has not started");
 
-        enemy.takeDamage(MAX_HP * 0.3);                       // down to 70%
+        enemy.takeDamage(MAX_HP * 0.3);                       // down to 0%
         Assertions.assertNull(enemy.activeSkill(), "at 70% HP the phase has still not started");
 
         enemy.takeDamage(MAX_HP * 0.3);                       // down to 40%
@@ -69,7 +69,7 @@ public class EnemyPhaseTest {
     }
 
     /**
-     * With several phases, the <b>tightest</b> one wins — a boss at 20% must use its 20% skill, not the one
+     * With several phases, the <b>tightest</b> one wins - a boss at 20% must use its 20% skill, not the one
      * it unlocked at 80%.
      *
      * <p>This is the assertion that pins the ascending sort and the first-match loop; getting the direction
@@ -92,7 +92,7 @@ public class EnemyPhaseTest {
                 "at 20% the tighter phase must win, not the one unlocked earlier");
     }
 
-    /** Exactly at the threshold counts as "at or below" — an off-by-one here would delay a phase. */
+    /** Exactly at the threshold counts as "at or below" - an off-by-one here would delay a phase. */
     @Test
     public void theThresholdItselfCounts() {
         Enemy enemy = enemy();

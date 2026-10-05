@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1303 阮•梅's 星魂 6: 「终结技展开的结界持续时间延长1回合」 -- judged over WHOLE turns.
+ * 1303 阮-梅's 星魂 6: "终结技展开的结界持续时间延长1回合" -- judged over WHOLE turns.
  *
  * <p>The countdown is split into an early pass (`beforeMove`) and a late one (`afterMove`), and a stat modifier is a LATE
  * buff, so a whole turn is both calls. `turns: 2` expires after two of them; with the extension the zone must still stand.

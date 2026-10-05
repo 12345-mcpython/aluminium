@@ -21,7 +21,7 @@ public class SilverWolfTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** ⚠ Exactly 45% of the enemy's own defence, and nothing at all until the Ultimate is cast. */
+    /** Note: Exactly 45% of the enemy's own defence, and nothing at all until the Ultimate is cast. */
     @Test
     public void theUltimateShredsFortyFivePercentOfTheDefence() {
         Character silverWolf = CharacterFactory.create(SILVER_WOLF, LEVEL);

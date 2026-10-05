@@ -14,14 +14,14 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1412 刻律德菈's 战技, second half: 「当充能达到 6 点时，自动使角色的【军功】升级为【爵位】」 (2026-10-02).
+ * 1412 刻律德菈's 战技, second half: "当充能达到 6 点时，自动使角色的[军功]升级为[爵位]" (2026-10-02).
  *
  * <p>Nothing new was needed for this: {@code RESOURCE_CHANGED} + {@code self_resource:充能 >= 6} + {@code holder_of:军功}
- * all ship already. Her skill grants 1 charge per cast, so six casts cross the threshold — and five must not, which is
+ * all ship already. Her skill grants 1 charge per cast, so six casts cross the threshold - and five must not, which is
  * the whole point of the case.
  *
- * <p>⚠ 「持有【爵位】的角色被视为同时持有【军功】」 is why the rule ADDS 爵位 and does not remove 军功: the sentence's
- * "counts as holding both" then holds by construction. ⚠ The same sentence's 「并解除其控制类负面状态」 is registered,
+ * <p>Note: "持有[爵位]的角色被视为同时持有[军功]" is why the rule ADDS 爵位 and does not remove 军功: the sentence's
+ * "counts as holding both" then holds by construction. Note: The same sentence's "并解除其控制类负面状态" is registered,
  * not written: the engine has no "clear a class of debuffs" capability today.
  */
 public class PeerageUpgradeTest {
@@ -32,7 +32,7 @@ public class PeerageUpgradeTest {
     private static final String MERIT = "军功";
     private static final String PEERAGE = "爵位";
 
-    /** ⭐ Five charges is not six: the state appears exactly on the cast that crosses the threshold. */
+    /** Five charges is not six: the state appears exactly on the cast that crosses the threshold. */
     @Test
     public void theUpgradeHappensAtSixChargeAndNotBefore() {
         Character cerydra = CharacterFactory.create(CERYDRA, LEVEL, false, null, null, 0);

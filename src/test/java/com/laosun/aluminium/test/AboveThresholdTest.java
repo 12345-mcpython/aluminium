@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 「速度大于等于 120 时…之后每超过 1 点速度使自身欢概度提高 1%」 (1502:269, 2026-10-02).
+ * "速度大于等于 120 时…之后每超过 1 点速度使自身欢概度提高 1%" (1502:269, 2026-10-02).
  *
  * <p>The reading is the EXCESS over the threshold, not the attribute -- which is exactly what separates this spelling
  * from `self_attr:`. A threshold above the character's own speed must therefore give nothing at all.
@@ -24,12 +24,12 @@ public class AboveThresholdTest {
     private static final int OWNER = 1502;
     private static final int MONSTER = 1002011;
 
-    /** ⭐ The magnitude is a share of the EXCESS, and a threshold above the attribute gives nothing. */
+    /** The magnitude is a share of the EXCESS, and a threshold above the attribute gives nothing. */
     @Test
     public void theMagnitudeIsTheExcessOverTheThreshold() {
         Character owner = CharacterFactory.create(OWNER, 80, false, null, null, 0);
         double speed = owner.getAttribute(AttributeType.SPEED).get();
-        // ⚠ Her own speed at Lv80 is 110 (measured), so the threshold here is 100: below 120 on purpose, because the
+        // Note: Her own speed at Lv80 is 110 (measured), so the threshold here is 100: below 120 on purpose, because the
         // spelling is what is under test, not her ability to reach the document's number without buffs.
         Assertions.assertTrue(speed > 100, "precondition: this character is faster than 100 (" + speed + ")");
 

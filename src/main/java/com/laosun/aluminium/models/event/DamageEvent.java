@@ -5,7 +5,7 @@ import com.laosun.aluminium.models.Damage;
 
 /**
  * Damage-settlement event, fired by {@code Battle.assemble} for both sides of a hit
- * before the zones are multiplied — the attacker first, then the defender.
+ * before the zones are multiplied - the attacker first, then the defender.
  *
  * <p>{@link com.laosun.aluminium.models.CanHit CanHit} implements it and relays to its
  * {@code BuffManager}, so buffs (vulnerability (易伤) / reduction (减伤) / weakness (虚弱)) inject

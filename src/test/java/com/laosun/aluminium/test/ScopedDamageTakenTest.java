@@ -23,14 +23,14 @@ import java.util.Random;
  * A <b>scoped, rolled</b> taken-side modifier (2026-09-28): {@code MODIFY_DAMAGE_TAKEN} with {@code damage_type} and
  * {@code base_chance}.
  *
- * <p>Readers: shipped 1301 Gallagher's talent 「受到的**击破伤害**提高 12%」, and 1108 Sampo's ultimate 「有 **100% 的基础概率**使
- * 被攻击的敌方目标**受到的持续伤害**提高 30%」. ⚠ `Battle.tickDots` settles DOT ticks as {@link DamageType#DOT}, which is what
- * makes the second one expressible — and the trap on the other side of those words is {@code DOT_DAMAGE_BOOST} ("how hard
+ * <p>Readers: shipped 1301 Gallagher's talent "受到的击破伤害提高 12%", and 1108 Sampo's ultimate "有 100% 的基础概率使
+ * 被攻击的敌方目标受到的持续伤害提高 30%". Note: `Battle.tickDots` settles DOT ticks as {@link DamageType#DOT}, which is what
+ * makes the second one expressible - and the trap on the other side of those words is {@code DOT_DAMAGE_BOOST} ("how hard
  * <b>my</b> DOTs hit") versus this ("how hard DOTs hurt <b>me</b>").
  *
- * <p>⚠ <b>Every assertion is a ratio</b>: the attacker's own DMG boosts ride along, so absolute numbers would read 1836
+ * <p>Note: <b>Every assertion is a ratio</b>: the attacker's own DMG boosts ride along, so absolute numbers would read 1836
  * where 1000 was expected (the first version of this file did exactly that). The zones are multiplicative, so
- * "×1.5 / ×1.3 on the scoped kind, ×1.0 on everything else" is what is pinned.
+ * " x 1.5 /  x 1.3 on the scoped kind,  x 1.0 on everything else" is what is pinned.
  */
 public class ScopedDamageTakenTest {
     /** Himeko: no shipped rule file, so the table under test is the only one. */
@@ -40,7 +40,7 @@ public class ScopedDamageTakenTest {
     private static final double BASE = 1000;
     private static final double EPS = 1e-6;
 
-    /** ⚠ A break-scoped vulnerability raises break damage and leaves every other kind alone. */
+    /** Note: A break-scoped vulnerability raises break damage and leaves every other kind alone. */
     @Test
     public void aScopedVulnerabilityOnlyTouchesItsOwnType() {
         double plainBreak = settle(DamageType.BREAK);
@@ -55,7 +55,7 @@ public class ScopedDamageTakenTest {
                 "⚠ …and an ordinary hit is untouched: that is the whole point of the scope");
     }
 
-    /** ⚠ 1108's clause is the DOT kind, and DOT ticks are their own {@link DamageType}. */
+    /** Note: 1108's clause is the DOT kind, and DOT ticks are their own {@link DamageType}. */
     @Test
     public void theDotScopedVulnerabilityMatchesSampoClause() {
         double plainDot = settle(DamageType.DOT);
@@ -70,7 +70,7 @@ public class ScopedDamageTakenTest {
                 "⚠ …and ordinary damage is not: the mirror-image mistake is DOT_DAMAGE_BOOST, which is the dealer's side");
     }
 
-    /** ⚠ No scope stated still means every type, which is what every earlier file relies on. */
+    /** Note: No scope stated still means every type, which is what every earlier file relies on. */
     @Test
     public void anUnscopedVulnerabilityStillRaisesEveryType() {
         double plainBreak = settle(DamageType.BREAK);
@@ -83,7 +83,7 @@ public class ScopedDamageTakenTest {
         Assertions.assertEquals(plainBreak * 1.5, settle(enemy, DamageType.BREAK), EPS, "…including break");
     }
 
-    /** ⚠ A misspelled type is refused when the rule is compiled rather than silently meaning "all kinds". */
+    /** Note: A misspelled type is refused when the rule is compiled rather than silently meaning "all kinds". */
     @Test
     public void aMisspelledTypeIsRefused() {
         EffectSpec effect = new EffectSpec();
@@ -99,7 +99,7 @@ public class ScopedDamageTakenTest {
         Assertions.assertTrue(refused.getMessage().contains("BREK"), refused.getMessage());
     }
 
-    /** ⚠ Sampo's file carries the clause — and the fact that it LOADED is itself the spelling check. */
+    /** Note: Sampo's file carries the clause - and the fact that it LOADED is itself the spelling check. */
     @Test
     public void hisFileCarriesTheRolledDotVulnerability() {
         Assertions.assertEquals(1, TriggerTables.of(SAMPO).ruleCount(TriggerEvent.ULT_CAST),
@@ -107,7 +107,7 @@ public class ScopedDamageTakenTest {
                         + "`damage_type` or `base_chance` would have thrown before this line ran");
     }
 
-    /** ⚠ A stated chance is really ROLLED: a tiny one against a 0.5 draw leaves the victim with no zone at all. */
+    /** Note: A stated chance is really ROLLED: a tiny one against a 0.5 draw leaves the victim with no zone at all. */
     @Test
     public void aStatedChanceOnAZoneIsRolled() {
         double plain = settle(DamageType.DOT);
@@ -125,7 +125,7 @@ public class ScopedDamageTakenTest {
 
     /**
      * Settles a DOT-typed hit against a defender whose zone came from a <b>rule</b> carrying {@code base_chance}, with a
-     * fixed draw — the only way to observe that the roll happens at all.
+     * fixed draw - the only way to observe that the roll happens at all.
      */
     private static double withZoneRolled(double baseChance, double roll) {
         Character owner = CharacterFactory.create(OWNER, LEVEL);

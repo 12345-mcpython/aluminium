@@ -37,6 +37,6 @@ for old, label in ((CHECK, "the share check"), (SIGNATURE, "the signature")):
 txt = txt.replace(CHECK, CHECK_NEW)
 i = txt.index(SIGNATURE)
 after = txt.index("\n", i) + 1
-txt = txt[:after] + EARLY + txt[after:]          # ⚠ INSIDE the method, after its signature line
+txt = txt[:after] + EARLY + txt[after:]          # Note: INSIDE the method, after its signature line
 io.open(T, "w", encoding="utf-8", newline="\n").write(txt)
 print("ok   both pieces are in, and the early branch sits inside the method")

@@ -20,8 +20,8 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Light cone 23052: where the wearer's MEMOSPRITE aims its skill decides what the party gets -- at an ally it marks 【空白】 and
- * everything the enemies take goes up 10%; at an enemy it marks 【诗行】 and the whole party crits 16% harder.
+ * Light cone 23052: where the wearer's MEMOSPRITE aims its skill decides what the party gets -- at an ally it marks [空白] and
+ * everything the enemies take goes up 10%; at an enemy it marks [诗行] and the whole party crits 16% harder.
  */
 public class Cone23052Test {
     private static final int CONE = 23052;

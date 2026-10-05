@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1312 Misha: 「我方全体每消耗 1 个战技点…米沙恢复 2.00 点能量」 -- 2 PER POINT.
+ * 1312 Misha: "我方全体每消耗 1 个战技点…米沙恢复 2.00 点能量" -- 2 PER POINT.
  *
  * <p>MishaTest fires the event with one point; this one hands the rule a context whose amount is 2 and
  * expects 4, which is the difference a per-action reading cannot show.

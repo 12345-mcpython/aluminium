@@ -19,10 +19,10 @@ import static com.laosun.aluminium.Constant.PERCENT_TO_BASE;
  *
  * <p>Supported operations:
  * <ul>
- *   <li>{@link #init(int)} — builds (or returns cached) the trace tree for a character</li>
- *   <li>{@link #sumAttributes(List)} — DFS-sums all attribute bonuses in the tree</li>
- *   <li>{@link #appendTo(List, AttributeBuilder)} — applies summed bonuses as modifiers</li>
- *   <li>{@link #printTree(List)} — prints the tree structure for debugging</li>
+ *   <li>{@link #init(int)} - builds (or returns cached) the trace tree for a character</li>
+ *   <li>{@link #sumAttributes(List)} - DFS-sums all attribute bonuses in the tree</li>
+ *   <li>{@link #appendTo(List, AttributeBuilder)} - applies summed bonuses as modifiers</li>
+ *   <li>{@link #printTree(List)} - prints the tree structure for debugging</li>
  * </ul>
  */
 public final class SkillTrace {

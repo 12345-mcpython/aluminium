@@ -14,31 +14,31 @@ import java.util.List;
  * Every memosprite in the documents is described that way, and the ratios differ per character:
  *
  * <pre>
- * 1402 阿格莱雅 · 衣匠   「等同于阿格莱雅#1[i]%速度的速度以及等同于阿格莱雅#2[i]%生命上限+#3[i]的生命上限」
- * 1413 长夜月   · 「长夜」 「初始拥有#1[i]点速度，生命上限为长夜月的#2[i]%」
- * 1512 知更鸟·晴歌 · 晴空乐手 「等同于…#1[i]%生命上限的生命上限和等同于…#2[i]%速度的速度」
- * 8007/8 开拓者  · 迷迷   「初始拥有#1[i]点速度和等同于开拓者#2[i]%生命上限+#3[i]的生命上限」
+ * 1402 阿格莱雅 - 衣匠   "等同于阿格莱雅#1[i]%速度的速度以及等同于阿格莱雅#2[i]%生命上限+#3[i]的生命上限"
+ * 1413 长夜月   - "长夜" "初始拥有#1[i]点速度，生命上限为长夜月的#2[i]%"
+ * 1512 知更鸟-晴歌 - 晴空乐手 "等同于…#1[i]%生命上限的生命上限和等同于…#2[i]%速度的速度"
+ * 800/8 开拓者 - 迷迷 "初始拥有#1[i]点速度和等同于开拓者#2[i]%生命上限+#3[i]的生命上限"
  * </pre>
  *
- * <p>So a memosprite's panel is <b>not</b> a stat block of its own — it is a function of the summoner's
+ * <p>So a memosprite's panel is <b>not</b> a stat block of its own - it is a function of the summoner's
  * current sheet. Writing absolute numbers would be wrong for every level, every light cone and every relic
  * the summoner wears, and it would go stale the moment any of them changed.
  *
- * <p>⚠ A panel entry <b>replaces</b> the attribute: nothing this file does not mention is inherited. An
- * attribute left out stays at {@code AttributeBuilder}'s default of 0 — which is why {@code HEALTH} and
+ * <p>Note: A panel entry <b>replaces</b> the attribute: nothing this file does not mention is inherited. An
+ * attribute left out stays at {@code AttributeBuilder}'s default of 0 - which is why {@code HEALTH} and
  * {@code SPEED} are required (see {@code Memosprites.validate}): 0 max HP is a unit that dies to a tick, and
  * 0 speed is a unit the action bar cannot schedule. The other columns (ATTACK, DEFENCE, the resistances)
  * have no number in any document and no memosprite stat table in this data set, so they are deliberately
  * left at 0 and registered as a gap rather than guessed at.
  *
  * @param name   the memosprite's name as the text writes it (e.g. 衣匠)
- * @param source where the panel numbers come from — the document and rule, with the placeholders and the
+ * @param source where the panel numbers come from - the document and rule, with the placeholders and the
  *               parameter list, so a number can be traced back
  * @param note   free-form note for the next reader (may be absent)
  * @param panel  one entry per attribute this memosprite takes from its summoner
  * @param attack the memosprite's own attack, or {@code null} when no document states one (P9-4 忆灵)
  * @param aggro  the servant's 仇恨 weight, or {@code null} to leave the engine's regular tier (100). Every
- *               document that describes a servant states one (「ServantID 11413 · 仇恨: 125」), so {@code null}
+ *               document that describes a servant states one ("ServantID 11413 - 仇恨: 125"), so {@code null}
  *               means "no document says", not "it is an ordinary unit"
  */
 public record MemospriteSpec(@SerializedName("name") String name,
@@ -50,7 +50,7 @@ public record MemospriteSpec(@SerializedName("name") String name,
                              @SerializedName("servant_id") Integer servantId,
                              @SerializedName("skills") List<SkillRow> skills,
                              /**
-                              * ⭐ Resources this summon DECLARES (2026-10-02; reader: 1141526’s 【故事】, which the sentence puts on the memosprite).
+                              * Resources this summon DECLARES (2026-10-02; reader: 1141526's [故事], which the sentence puts on the memosprite).
                               *
                               * <p>Before this a summon had no declaration site, so a `GAIN_RESOURCE` aimed at one was accepted by the loader and then silently granted nothing -- measured.
                               */
@@ -59,24 +59,24 @@ public record MemospriteSpec(@SerializedName("name") String name,
     /**
      * One 忆灵技能 of this memosprite, as the game states it: a SLOT and the level its row is read at.
      *
-     * <p>⚠ Why these two numbers are enough: the engine addresses a skill by `(cid, slot)`, and a memosprite's cid IS its
-     * `ServantID` (「ServantID 11415」). Both facts were measured -- `SkillEffects.forSkill` keys on
+     * <p>Note: Why these two numbers are enough: the engine addresses a skill by `(cid, slot)`, and a memosprite's cid IS its
+     * `ServantID` ("ServantID 11415"). Both facts were measured -- `SkillEffects.forSkill` keys on
      * `skill.getCid()` and `skill.getSkillSlot()`, and `DefaultSkill(cid, slot, level)` is the one implementation.
-     * ⚠ `skills.json` need not carry a row for it: {@code SkillData} hands back a placeholder for an id the data lacks, which is
+     * Note: `skills.json` need not carry a row for it: {@code SkillData} hands back a placeholder for an id the data lacks, which is
      * why a skill whose work is done by the rule table (`"effect": "Rules"`) can exist without parameters.
      */
     public record SkillRow(@SerializedName("slot") Integer slot, @SerializedName("level") Integer level) {
     }
 
     /**
-     * A spec with a panel and <b>no attack</b> — the ordinary case, since a document states an attack for
+     * A spec with a panel and <b>no attack</b> - the ordinary case, since a document states an attack for
      * only some memosprites.
      */
     public MemospriteSpec(String name, String source, String note, List<Panel> panel) {
         this(name, source, note, panel, null, null, null, null, null);
     }
 
-    /** The same, with an attack and no aggro — the shape most specs have. */
+    /** The same, with an attack and no aggro - the shape most specs have. */
     public MemospriteSpec(String name, String source, String note, List<Panel> panel, Attack attack) {
         this(name, source, note, panel, attack, null, null, null, null);
     }
@@ -86,11 +86,11 @@ public record MemospriteSpec(@SerializedName("name") String name,
     }
 
     /**
-     * One attribute of the panel, expressed against the summoner: {@code value = percent × summoner + flat}.
+     * One attribute of the panel, expressed against the summoner: {@code value = percent  x  summoner + flat}.
      *
      * <p>Either term may be absent, which is what lets the same entry shape cover "35% of the summoner's
      * speed" ({@code percent} only), "160 speed" ({@code flat} only) and "66% of the summoner's Max HP plus
-     * 720" ({@code percent} and {@code flat}).
+     * 20" ({@code percent} and {@code flat}).
      *
      * @param attribute the {@link com.laosun.aluminium.enums.AttributeType} name, spelled the way the rule
      *                  files spell it (e.g. {@code HEALTH}, {@code SPEED})
@@ -119,18 +119,18 @@ public record MemospriteSpec(@SerializedName("name") String name,
     }
 
     /**
-     * What the memosprite does when it gets a turn: {@code base × percent}, {@code hits} times, in
+     * What the memosprite does when it gets a turn: {@code base  x  percent}, {@code hits} times, in
      * {@code shape}.
      *
-     * <p><b>Why this lives here and not in a rule file.</b> A memosprite's attack is not a trigger — nothing
-     * in the battle fires it, a turn does — so it is not a {@code TriggerSpec}. It also cannot live on the
-     * summoning character, because the numbers are stated against the <em>memosprite</em>: 长夜月's 「长夜」
-     * hits for 「等同于「长夜」200%生命上限」, which is the memosprite's own Max HP, not the summoner's.
-     * Reading it off the summoner would produce a number 2× too large (the panel gives 长夜 half of 长夜月's
-     * HP) — a wrong number that looks plausible, which is the worst kind.
+     * <p><b>Why this lives here and not in a rule file.</b> A memosprite's attack is not a trigger - nothing
+     * in the battle fires it, a turn does - so it is not a {@code TriggerSpec}. It also cannot live on the
+     * summoning character, because the numbers are stated against the <em>memosprite</em>: 长夜月's "长夜"
+     * hits for "等同于'长夜'200%生命上限", which is the memosprite's own Max HP, not the summoner's.
+     * Reading it off the summoner would produce a number 2 x  too large (the panel gives 长夜 half of 长夜月's
+     * HP) - a wrong number that looks plausible, which is the worst kind.
      *
-     * <p>⚠ {@code base} names an attribute of the <b>memosprite</b>. Where a document instead scales off the
-     * <em>summoner</em> (景元's 「神君」 hits for 「等同于景元攻击力66%」), the panel carries the share and the
+     * <p>Note: {@code base} names an attribute of the <b>memosprite</b>. Where a document instead scales off the
+     * <em>summoner</em> (景元's "神君" hits for "等同于景元攻击力66%"), the panel carries the share and the
      * attack then scales off the memosprite's own ATTACK: the same number, stated the same way every other
      * inherited attribute is, and consistent with the panel's snapshot semantics.
      *

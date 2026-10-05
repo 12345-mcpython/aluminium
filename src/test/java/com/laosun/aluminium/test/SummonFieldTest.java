@@ -27,33 +27,33 @@ import java.util.Random;
  * Questions about summons <b>on the field</b>: {@code self_summon_count}, and the {@code "summon"} target
  * selector (P9-4's 忆灵 family).
  *
- * <p><b>Why these two exist and why they need the battle.</b> 「忆灵在场时」 and 「装备者及其忆灵」 are not facts
- * about the event — nothing just happened, or one of the two units named did not act. They are facts about the
+ * <p><b>Why these two exist and why they need the battle.</b> "忆灵在场时" and "装备者及其忆灵" are not facts
+ * about the event - nothing just happened, or one of the two units named did not act. They are facts about the
  * battlefield, so {@code TriggerContext} now carries the {@link Battle} for exactly these questions (see its
  * javadoc), and a context built without one makes them <b>fail</b> rather than guess.
  *
  * <p><b>Why the condition is spelled {@code self_summon_count}.</b> It counts the owner's own summons, and
  * {@code hp_percent} shows that the owner is normally the unmarked subject. Here the mark stays on, because a
- * bare {@code summon_count} reads like "how many summons are on the battlefield" — a different question with a
+ * bare {@code summon_count} reads like "how many summons are on the battlefield" - a different question with a
  * different answer that nobody has asked for yet.
  *
  * <p><b>The acceptance content is relic set 318</b> (奇想蕉乐园): its 2-piece grants the wearer an extra 32%
- * CRIT DMG 「当存在装备者召唤的目标时」. Its file is authored with the "while" technique — re-evaluated at each
- * of the wearer's turn starts for one turn — because a {@code permanent} buff would outlive the summon.
+ * CRIT DMG "当存在装备者召唤的目标时". Its file is authored with the "while" technique - re-evaluated at each
+ * of the wearer's turn starts for one turn - because a {@code permanent} buff would outlive the summon.
  */
 public class SummonFieldTest {
     private static final double EPS = 1e-6;
 
-    /** 阿格莱雅 — has a memosprite spec (1402), and no other test uses her id. */
+    /** 阿格莱雅 - has a memosprite spec (1402), and no other test uses her id. */
     private static final int AGLAEA = 1402;
-    /** 姬子 — our plain character, no memosprite. */
+    /** 姬子 - our plain character, no memosprite. */
     private static final int PLAIN = 1003;
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
     /** 银鬃近卫, the monster id used for an enemy-side summon. */
     private static final int MINION = 1002040;
 
-    /** 奇想蕉乐园 — the set whose 2-piece is authored with {@code self_summon_count}. */
+    /** 奇想蕉乐园 - the set whose 2-piece is authored with {@code self_summon_count}. */
     private static final int BANANA_PARADISE = 318;
 
     // ==================================================================
@@ -88,7 +88,7 @@ public class SummonFieldTest {
         Assertions.assertNull(f.battle.summonOf(f.owner));
     }
 
-    /** It counts all of them, not just the first — 知更鸟·晴歌's 晴空乐手 is a trio. */
+    /** It counts all of them, not just the first - 知更鸟-晴歌's 晴空乐手 is a trio. */
     @Test
     public void severalSummonsAreAllCounted() {
         Fixture f = fixture();
@@ -131,9 +131,9 @@ public class SummonFieldTest {
      *
      * <p>The distinction is the whole point, and it needs a <b>negative</b> question to be visible: for
      * {@code >= 1} the two readings agree by accident (0 is not >= 1 either), so a "cannot tell" that
-     * degraded to 0 would pass that gate silently. Asking {@code == 0} is what tells them apart — it must not
+     * degraded to 0 would pass that gate silently. Asking {@code == 0} is what tells them apart - it must not
      * match either, because the honest answer to "how many summons do I have" without a battlefield is
-     * "unknown", and a rule gated on 「忆灵在场时」 that read unknown as "none out" would be silently disabled.
+     * "unknown", and a rule gated on "忆灵在场时" that read unknown as "none out" would be silently disabled.
      */
     @Test
     public void aContextWithoutABattleFailsTheCondition() {
@@ -180,7 +180,7 @@ public class SummonFieldTest {
     /**
      * Naming a summon that is not there is a <b>loud</b> failure that says how to fix the rule.
      *
-     * <p>An author who writes 「装备者及其忆灵」 without a {@code self_summon_count >= 1} gate has a rule that fires
+     * <p>An author who writes "装备者及其忆灵" without a {@code self_summon_count >= 1} gate has a rule that fires
      * exactly when the unit it names is absent. Silence would leave a wrong state; the message names the
      * condition to add.
      */
@@ -208,9 +208,9 @@ public class SummonFieldTest {
      * <p>End-to-end through the relic loader and the real turn boundary: the wearer's own turn start is what
      * re-evaluates the condition, so the buff is up for the turn in which her own attacks land.
      *
-     * <p>⚠ Measured as a <b>delta against the same character without the set</b>, never as an absolute: her
+     * <p>Note: Measured as a <b>delta against the same character without the set</b>, never as an absolute: her
      * sheet already carries a CRIT DMG of its own, and asserting {@code 0.48} would be asserting that base to
-     * be zero. The two deltas are the two clauses — 0.16 from the set's {@code properties} plus 0.32 from the
+     * be zero. The two deltas are the two clauses - 0.16 from the set's {@code properties} plus 0.32 from the
      * rule when a summon is out, and 0.16 alone when it is not.
      */
     @Test
@@ -278,7 +278,7 @@ public class SummonFieldTest {
         return battle.fireTriggers(TriggerEvent.BATTLE_START, owner, null, 0, 0);
     }
 
-    /** A rule that buffs 「我的忆灵」 — the {@code target: "summon"} selector. */
+    /** A rule that buffs "我的忆灵" - the {@code target: "summon"} selector. */
     private static TriggerSpec summonAttackRule() {
         EffectSpec effect = TriggerSpecs.modifyAttr("ATTACK", 0.5, 2);
         TriggerSpecs.set(effect, "target", "summon");
@@ -291,7 +291,7 @@ public class SummonFieldTest {
      * <p>Turn start is where the authored rule re-evaluates, so the case drives the real path rather than
      * firing the event by hand: {@code stepForward()} opens the turn and {@code beforeMove()} is what emits
      * {@code TURN_START} (and it does nothing at all when no turn is in progress, which is why both are
-     * needed). {@code withSet} false measures the same character bare — the baseline the deltas are taken
+     * needed). {@code withSet} false measures the same character bare - the baseline the deltas are taken
      * against.
      */
     private static double critDamageAtOwnTurnStart(boolean withSet, boolean withSummon) {

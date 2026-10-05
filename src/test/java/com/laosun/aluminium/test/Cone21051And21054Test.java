@@ -17,9 +17,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Cones 21051 and 21054 -- both grant their bonus to 「装备者与忆灵」, i.e. to the wearer AND its memosprite and to nobody else.
+ * Cones 21051 and 21054 -- both grant their bonus to "装备者与忆灵", i.e. to the wearer AND its memosprite and to nobody else.
  *
- * <p>⭐ The third unit in the party is what makes the reading attributable: `all_allies` would raise it too, and the engine's
+ * <p>The third unit in the party is what makes the reading attributable: `all_allies` would raise it too, and the engine's
  * own note says a panel inherits only the attributes a memosprite's spec NAMES, so the wearer's copy is invisible on the
  * memosprite -- hence two effects, `self` and `summon`.
  */
@@ -95,7 +95,7 @@ public class Cone21051And21054Test {
     }
 
     /**
-     * ⭐ The spec half. Without it the judge only read the deltas, and a wrong DURATION went unnoticed (measured: the
+     * The spec half. Without it the judge only read the deltas, and a wrong DURATION went unnoticed (measured: the
      * `turns` mutation was 0 red) -- the project's own rule is that a duration must be pinned, not just observed.
      */
     @Test
@@ -117,11 +117,11 @@ public class Cone21051And21054Test {
         boolean selfSeen = false;
         boolean summonSeen = false;
         for (var rule : wearer.getTriggerTable().matching(event,
-                // ⚠ The battle must be in the context: `actor == summon` resolves the owner's memosprite THROUGH it, so a
+                // Note: The battle must be in the context: `actor == summon` resolves the owner's memosprite THROUGH it, so a
                 // hand-built context without one matches nothing (measured: 0 effects, and the spec half could not tell
                 // "wrong number" from "no rule at all").
                 new TriggerTable.TriggerContext(wearer, actor, enemy, 0, 0, null, battle, null))) {
-            // ⚠ `matching` returns every rule the wearer owns for that event -- the character's own rules included. The
+            // Note: `matching` returns every rule the wearer owns for that event -- the character's own rules included. The
             // spec half is about THIS cone, so it filters by the rule's id (measured: without this the duration read 1,
             // a number from another source entirely).
             if (!ruleId.equals(rule.id())) {

@@ -16,9 +16,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Light cone 21047: 「击破特攻提高#1%。进入战斗时或造成击破伤害后，速度提高#2%，持续#3回合，该效果每回合只可触发1次」.
+ * Light cone 2104: "击破特攻提高#1%。进入战斗时或造成击破伤害后，速度提高#2%，持续#3回合，该效果每回合只可触发1次".
  *
- * <p>`on_any` carries the break path, and `per_turn: 1` is counted per rule and shared across events (round 137). So the test asserts both directions: a break on
+ * <p>`on_any` carries the break path, and `per_turn: 1` is counted per rule and shared across events (round 13). So the test asserts both directions: a break on
  * its own grants (the positive check that a negative-only assertion cannot give), and a break in the same turn as the battle-start grant does not.
  */
 public class Cone21047Test {

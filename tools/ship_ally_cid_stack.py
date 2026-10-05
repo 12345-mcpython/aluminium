@@ -90,7 +90,7 @@ for body, old, label in ((interp, SPELL_ANCHOR, "the spelling check"),
     if n != 1:
         sys.exit("REFUSING: %s occurs %d times -- nothing written" % (label, n))
 
-# ⚠ `private int cid;` appears TWICE in Character (the field and the Builder's own) -- only the FIRST is the field
+# Note: `private int cid;` appears TWICE in Character (the field and the Builder's own) -- only the FIRST is the field
 n = char.count(CID_ANCHOR)
 print("anchor %-20s : %d (replacing the first only)" % ("the cid field", n))
 if n < 1:

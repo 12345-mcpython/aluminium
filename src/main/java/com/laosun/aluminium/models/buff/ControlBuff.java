@@ -6,8 +6,8 @@ import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.models.CanHit;
 
 /**
- * A <b>control state</b> (控制状态) as one buff: 冻结 / 纠缠 / 禁锢 — 「不能行动」, 「速度降低」 and, for 冻结,
- * 「每回合开始时受到冰属性附加伤害」.
+ * A <b>control state</b> (控制状态) as one buff: 冻结 / 纠缠 / 禁锢 - "不能行动", "速度降低" and, for 冻结,
+ * "每回合开始时受到冰属性附加伤害".
  *
  * <p><b>Why one class instead of "a StunBuff plus maybe a slow".</b> P10-2 composed a control inline out of
  * existing primitives, which was right about the <i>parts</i> and wrong about the <i>identity</i>: the composition
@@ -15,31 +15,31 @@ import com.laosun.aluminium.models.CanHit;
  * ("is this unit frozen?"), and no way for a <b>skill</b> to apply one at all. Two things follow from giving it a
  * class:
  * <ul>
- *   <li>its parts are attached and removed <b>together</b> — a control that is dispelled, removed by name or
+ *   <li>its parts are attached and removed <b>together</b> - a control that is dispelled, removed by name or
  *       expires takes its slow (and its per-turn damage) with it, instead of leaving half a state behind;</li>
- *   <li>it carries {@link #getName()} — the spelling the documents use ({@code 冻结}), which is what
+ *   <li>it carries {@link #getName()} - the spelling the documents use ({@code 冻结}), which is what
  *       {@code has_state 冻结} reads ({@code BuffManager.hasState}) and what a rule's {@code "control"} argument
  *       names.</li>
  * </ul>
  *
  * <p><b>Three parts, each optional except the name:</b>
  * <ul>
- *   <li>{@code blocksAct} → {@link #canAct()} answers {@code false}, which is what {@code Battle} consults before
+ *   <li>{@code blocksAct} to {@link #canAct()} answers {@code false}, which is what {@code Battle} consults before
  *       letting a unit act (冻结);</li>
- *   <li>{@code slowPercent} → a {@code StatModifierBuff.percentDebuff(SPEED, …)} this buff attaches and removes
+ *   <li>{@code slowPercent} to a {@code StatModifierBuff.percentDebuff(SPEED, …)} this buff attaches and removes
  *       itself, so the slow cannot outlive the state (纠缠 −20%, 禁锢 −10%);</li>
- *   <li>a <b>per-turn damage</b> ({@link #getDotElement()} / {@link #getDotDamage()}) → a {@code DotBuff} the same
- *       way, which is 冻结's 「每回合开始时受到…冰属性附加伤害」. It is <b>stated by the rule</b> rather than
+ *   <li>a <b>per-turn damage</b> ({@link #getDotElement()} / {@link #getDotDamage()}) to a {@code DotBuff} the same
+ *       way, which is 冻结's "每回合开始时受到…冰属性附加伤害". It is <b>stated by the rule</b> rather than
  *       looked up from {@link Constant#CONTROL_EFFECTS}, because the number is the applier's (三月七's ultimate
- *       deals 「等同于三月七60%攻击力」, her 秘技 50%) — the state says what it does, the ability says how much.</li>
+ *       deals "等同于三月七60%攻击力", her 秘技 50%) - the state says what it does, the ability says how much.</li>
  * </ul>
  *
- * <p>⚠ The <b>delay</b> is deliberately not part of this buff: 禁锢/纠缠's 「行动延后」 is a one-off push of the
+ * <p>Note: The <b>delay</b> is deliberately not part of this buff: 禁锢/纠缠's "行动延后" is a one-off push of the
  * action bar, and a state that expires after one turn leaving a push behind is the data's own behaviour (the
  * existing {@code attachBreakControl} documents the same split).
  *
  * <p>{@code isSameKind} is overridden to compare the <b>control name</b>, so re-applying the same control refreshes
- * it (the engine's ordinary "same buff again replaces the old one" rule) while two different controls can coexist —
+ * it (the engine's ordinary "same buff again replaces the old one" rule) while two different controls can coexist - 
  * being both frozen and imprisoned is not the same thing as being frozen twice.
  */
 public class ControlBuff extends AbstractBuff {
@@ -118,7 +118,7 @@ public class ControlBuff extends AbstractBuff {
     }
 
     /**
-     * A control is a <b>negative</b> effect on its bearer: 「解除…负面效果」 removes it, and DISPEL's count sees it.
+     * A control is a <b>negative</b> effect on its bearer: "解除…负面效果" removes it, and DISPEL's count sees it.
      */
     @Override
     public boolean isDebuff() {
@@ -126,7 +126,7 @@ public class ControlBuff extends AbstractBuff {
     }
 
     /**
-     * 控制类: 「抵抗控制类负面状态的概率提高35%」 and 「免疫控制类负面状态」 are answers about <b>this</b> family, so a
+     * 控制类: "抵抗控制类负面状态的概率提高35%" and "免疫控制类负面状态" are answers about <b>this</b> family, so a
      * control state written later is covered by them without anyone updating a list of keys.
      */
     @Override
@@ -145,7 +145,7 @@ public class ControlBuff extends AbstractBuff {
         }
         if (dotElement != null) {
             // The source is whoever applied the state, so the damage is credited to them (kill credit, energy,
-            // and 「造成的伤害」 attribution all follow the DotBuff's source).
+            // and "造成的伤害" attribution all follow the DotBuff's source).
             dot = new DotBuff(source, dotElement, dotDamage, remainingDuration);
             target.getBuffManager().addBuff(dot);
         }

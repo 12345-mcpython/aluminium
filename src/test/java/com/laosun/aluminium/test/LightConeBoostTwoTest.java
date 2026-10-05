@@ -16,7 +16,7 @@ import java.util.Random;
 /**
  * Two more light cones whose non-property halves land on scoped boosts, judged per rank.
  *
- * <p>⚠ A battle has to START before the value means anything: these rules hang on BATTLE_START, and round 49 measured a
+ * <p>Note: A battle has to START before the value means anything: these rules hang on BATTLE_START, and round 49 measured a
  * fixture that skipped `startBattle()` reading 0.0 while the table visibly carried the rules.
  */
 public class LightConeBoostTwoTest {

@@ -18,7 +18,7 @@ import java.util.Random;
  * Three light cones authored in one batch from `weapons.json`: 20000 (crit rate at battle start), 20003 (defence, plus a low-health extra) and 20014
  * (speed after a kill).
  *
- * <p>Expectations follow the attribute's kind (round 97): a RATIO attribute (CRIT_CHANCE) takes the share as points, while FLAT attributes (DEFENCE, SPEED)
+ * <p>Expectations follow the attribute's kind (round 9): a RATIO attribute (CRIT_CHANCE) takes the share as points, while FLAT attributes (DEFENCE, SPEED)
  * scale their base value. Each cone is asserted at two ranks, because a per-rank file whose ranks all held one value would otherwise pass unnoticed.
  */
 public class ConeBatchTest {

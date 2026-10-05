@@ -16,12 +16,12 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 佩拉 (1106), from her own file (2026-09-28): the two 「处于负面效果」 clauses and the party's effect hit rate.
+ * 佩拉 (1106), from her own file (2026-09-28): the two "处于负面效果" clauses and the party's effect hit rate.
  *
- * <p><b>What it needed.</b> Nothing new — {@code target_debuff_count} is the numerical variable that reads how many
+ * <p><b>What it needed.</b> Nothing new - {@code target_debuff_count} is the numerical variable that reads how many
  * negative buffs the event's target carries, and this file is its first shipped reader (both the talent's energy and 行迹
- * 痛击's damage bonus are gated on it). What is <b>registered</b> is 战技's 「解除敌方增益」 (the engine's `DISPEL` cleanses
- * our own side's debuffs; removing an <i>enemy's</i> buff is the opposite direction) and the ultimate's 【通解】, which is a
+ * 痛击's damage bonus are gated on it). What is <b>registered</b> is 战技's "解除敌方增益" (the engine's `DISPEL` cleanses
+ * our own side's debuffs; removing an <i>enemy's</i> buff is the opposite direction) and the ultimate's [通解], which is a
  * state with a 100% <b>base chance</b> (a roll the `APPLY_BUFF` path does not have).
  */
 public class PelaDebuffTest {
@@ -30,14 +30,14 @@ public class PelaDebuffTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** ⚠ Both 「处于负面效果」 clauses are gated on the target's debuff count. */
+    /** Note: Both "处于负面效果" clauses are gated on the target's debuff count. */
     @Test
     public void theDebuffConditionsAreOnTheRules() {
         TriggerTable table = TriggerTables.of(PELA);
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.ALLY_ATTACK), "the talent's energy trace");
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.DEALING_DAMAGE), "行迹 痛击");
 
-        // ⚠ Two separate fixtures: adding a DOT is not undone, so reusing one enemy would leave the "no debuff" check
+        // Note: Two separate fixtures: adding a DOT is not undone, so reusing one enemy would leave the "no debuff" check
         // looking at a debuffed target (an earlier version of this case did exactly that).
         Fixture debuffed = new Fixture();
         Assertions.assertFalse(table.matching(TriggerEvent.DEALING_DAMAGE, debuffed.ctx(true)).isEmpty(),
@@ -60,7 +60,7 @@ public class PelaDebuffTest {
     }
 
     /**
-     * ⚠ The direction is the whole point: her Skill strips an enemy's <b>benefit</b> (a timed shield) and leaves the
+     * Note: The direction is the whole point: her Skill strips an enemy's <b>benefit</b> (a timed shield) and leaves the
      * <b>negative</b> effects it carries alone.
      */
     @Test
