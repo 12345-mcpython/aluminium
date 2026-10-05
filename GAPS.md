@@ -36887,3 +36887,23 @@
 > * ⚠⚠ **教训（⭐ 本轮最值的一条 ✓）**：⭐ 我原以为"⭐ `isNamed` 支持属性 ⇒ ⭐ `removeState` 也支持" ✗ ⇒ ⭐ **脚本的断言当场证明没有** ✓
 >   ⇒ ⭐⭐ **一个函数支持某种匹配 ≠ 它对外有那个入口** ✓ —— ⭐ 差一层包装就是一整个能力 ✓。
 > * **实测（本轮）**：⭐ 全量 **0**（--rerun-tasks，**2284** 例 ✓）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓（⭐ 脚本拒绝后一个字没写 ✓）。
+
+> **2026-10-02 更新（新目标第 19 轮：⚠ **本轮没有出货** ✗ —— ⭐ 但"持续到某状态结束"这条路被证明**可能纯数据** ✓，⭐ 并撞出两个**具体的坑** ✓）**）**：
+>
+> * ⭐⭐⭐ **最重要的发现**：⭐ `MODIFY_ATTR` **确实收 `buff`** ✓ —— ⭐ 我把 `"buff": "<名字>"` 写在两个效果上 ✓，⭐ `mechanics` **接受了** ✓（⭐ rc 0 ✓）
+>   ⇒ ⭐⭐ 而 ⭐ `AbstractBuff.buffName` ✓ ＋ ⭐ `BuffManager.removeState(String)` ✓ 会移除 ⭐ **带该名字的 buff** ✓（⭐ L815 ✓）
+>   ⇒ ⭐⭐ **所以「持续到某状态结束」不需要新的时长** ✓：⭐ 效果带名字 ✓ ＋ ⭐ 一条 ⭐ `on: STATE_ENDED` ＋ ⭐ `self state_ended <至高之姿>` ✓ 的伴随规则 ⭐ `REMOVE_STATE{buff: <那个名字>}` ✓ 就成 ✓
+>   （⭐ 名字用的是**游戏自己的**修饰名 ✓：⭐ `GlobalModifiers` 里的 ⭐ `MServant_CyreneServant_00_AmazingBuff_Aglaea` ✓，⭐ 不是我起的 ✓。
+>    ⭐ 而 `至高之姿` ✓ 已经是 `1402.json` 里的状态 ✓。）
+> * ⚠⚠ **坑一（⭐ 承重的假设，⭐ 差点改坏别的东西 ✓）**：⭐ `derived = (scale != null && !scale.isBlank()) || percent == null` ✓
+>   —— ⭐ 它**不是**"有没有 scale" ✗，⭐ 而是"**有没有 percent**" ✗ ⇒ ⭐ `derivedMagnitude` **也负责只有 `amount` 的平增量** ✓。
+>   ⭐ 我一度把它改成"只看 scale" ✗ ⇒ ⭐ 立刻红了 **3 个既有判据** ✗：⭐ `AstaTest`（⭐ `50` → `5500` ✗）、⭐ `Cone23008Test`（⭐ `12` → `1164` ✗）、⭐ `ConeUltBreakSpeedTest`（⭐ `12` → `1212` ✗）
+>   ⇒ ⭐⭐ **教训：⭐ 一个布尔量的**名字**（derived）⭐ 不等于它的**含义** ✗；⭐ 改它之前要先看谁在用 ✓。**
+> * ⚠⚠ **坑二**：⭐ `percent_from_cast_param` 在**没有 `scale`** 时 ✗ 会踩两处旧假设 ✓：
+>   ⭐ ① ⭐ "恰好一个 `percent` 或 `amount`" 的检查 ✗（⭐ 我补了 ✓ —— 它把 ⭐ cast 参数也算成 share ✓）；
+>   ⭐ ② ⭐ `derived` 会**误判为 true** ✗ ⇒ ⭐ `derivedMagnitude` 去碰空 scale ⇒ NPE ✓（⭐ 这一处的正确修法**还没找到** ✗ ——
+>     ⭐ 简单改 `derived` 会踩坑一 ✓ ⇒ ⭐⭐ **正确方向大概是：⭐ 在 `derivedMagnitude` 内部给"没有 scale 但有 cast 参数"加一个早分支 ✓**，⭐ 而不是动 `derived`）。
+> * ⚠ **坑三**：⭐ 新规则里 ⭐ `target: "summon"` 的效果 ✗ 需要 ⭐ 衣匠**在场** ✓ —— ⭐ 引擎自己报出了修法 ✓
+>   （⭐ *"gate the rule with `self_summon_count >= 1`"* ✓）⇒ ⭐ 判据场景也要把她的忆灵召出来 ✓。
+> * ⭐ 按 ⑤ **全部回滚** ✓（⭐ `TriggerInterpreter` ＋ ⭐ `1402.json` ✓）⇒ ⭐ 树回到 HEAD ✓、⭐ 全量 **0** ✓、⭐ `mechanics` **rc 0** ✓。
+> * **实测（本轮）**：⭐ 全量 **0**（--rerun-tasks，**2282** 例 ✓）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓（⭐ 回滚后 ✓）。
