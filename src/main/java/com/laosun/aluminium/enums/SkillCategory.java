@@ -62,6 +62,13 @@ public enum SkillCategory {
      */
     ELATION_DAMAGE("ElationDamage"),
     /**
+     * ⭐ 「追加攻击」 (2026-10-02). The engine’s own notion of one is {@code Battle.applyAdditionalDamage} -- the method that fires
+     * {@code TriggerEvent.FOLLOW_UP} -- but an instance could not SAY it was one, so a rule reading an instance could not ask. Reader: 1415's ode of passage,
+     * 「缇宝施放**追加攻击**触发缇宝的结界的附加伤害时…」, where the follow-up half is load-bearing: an ordinary attack must
+     * NOT satisfy it.
+     */
+    FOLLOW_UP("FollowUp"),
+    /**
      * {@code attack_type} is empty in the data — 94 measured, all of them **talents and follow-up attacks**
      * (they are not an "active cast", so they have no attack type).
      */

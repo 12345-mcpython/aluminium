@@ -1168,6 +1168,14 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
      * guard it was written to pass (2026-09-30).
      */
     static final String DAMAGE_IS_ADDITIONAL = "damage_is_additional";
+
+    /**
+     * The bare keyword {@code damage_is_follow_up}: "the instance being settled came from a 「追加攻击」" (2026-10-02).
+     *
+     * <p>⭐ The third of the family, and the one that had no spelling at all: `SkillCategory` did not even have a FOLLOW_UP value, so a rule could not ask the
+     * question the ode of passage asks -- 「缇宝施放**追加攻击**触发…时」 -- and an ordinary attack had no way to be excluded.
+     */
+    static final String DAMAGE_IS_FOLLOW_UP = "damage_is_follow_up";
     /**
      * \u2705 The bare keyword \u300c\u9020\u6210**\u4e0e\u88c5\u5907\u8005\u76f8\u540c\u5c5e\u6027**\u7684\u4f24\u5bb9\u300d (2026-09-30; readers: light cone 21011 and
      * relic set 312). No subject and no value, like {@link #DAMAGE_IS_ATTACK}: the second party is the RULE\u2019S OWNER, so
@@ -1448,6 +1456,18 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
                                 + "(source: " + spec.getSource() + ")");
             }
             return new DamageIsAdditional(raw);
+        }
+
+        // ⭐ The third of the family (2026-10-02).
+        if (text.trim().equalsIgnoreCase(DAMAGE_IS_FOLLOW_UP)) {
+            TriggerEvent event = TriggerEvent.fromString(spec.getOn());
+            if (event == null || !DAMAGE_CARRYING_EVENTS.contains(event)) {
+                throw new IllegalArgumentException(
+                        "Condition '" + raw + "' asks whether the instance is a follow-up attack, but " + spec.getOn()
+                                + " carries no damage instance; it belongs on an event that settles one "
+                                + "(source: " + spec.getSource() + ")");
+            }
+            return new DamageIsFollowUp(raw);
         }
 
         // `damage_element_is_self`: the bare-keyword sibling of `damage_is_attack`, one clause further in --
@@ -2840,6 +2860,26 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
     }
 
     /** \u2605 The element half of {@link #DAMAGE_IS_ATTACK}: the instance\u2019s element against the rule owner\u2019s own. */
+    /** ⭐ "The instance came from a 「追加攻击」" (2026-10-02): the instance’s own category, stamped where the rule states one. */
+    private static final class DamageIsFollowUp implements Condition {
+        private final String raw;
+
+        DamageIsFollowUp(String raw) {
+            this.raw = raw;
+        }
+
+        @Override
+        public boolean test(TriggerContext ctx) {
+            return ctx.damage() != null
+                    && ctx.damage().getCastCategory() == com.laosun.aluminium.enums.SkillCategory.FOLLOW_UP;
+        }
+
+        @Override
+        public String source() {
+            return raw;
+        }
+    }
+
     /** ⭐ The complement of {@link #DAMAGE_IS_ATTACK}: the instance is additional damage, not an ordinary attack. */
     private static final class DamageIsAdditional implements Condition {
         private final String raw;
