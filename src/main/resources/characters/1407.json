@@ -6,6 +6,11 @@
       "scope": "PARTY",
       "source": "1407 逍蝶 天赋 掌心溡过的荒芜 (140704) 与「机制备注」：依据 tbgd `Avatar_Castorice_00_Ability.json` 的 `Castorice_Passive_MaxCount` 表达式 `5.3125 × 队伍最高等级²`（结果 ≤ 2000 时钳为 2000）",
       "note": "⭐ `\"scope\": \"PARTY\"` **是必需的** ✓：`Battle.registerPartyResources`（`:701`）会**跳过**所有 `scope` 不是 `PARTY` 的声明 ✓（`:707`）⇒ 没有它就进不了战斗的资源表 ✗，`partyResource(名)` 会返回 **null** ✗ —— 这一行解释了前面全部的 +0 ✓。⚠ 上限 **34,000** = 文档公式在**满级 Lv80** 的值 ✓（文档表：均衡 0 ⇒ 2,125 … 满级 ⇒ 34,000 ✓）；⚠ 资源只能声明**一个** `max` ✗ 而真实上限随等级变 ✗⇒ 取满级值并在此说明 ✓。"
+    },
+    {
+      "id": "生死之诗的溢出消耗",
+      "max": 2147483647,
+      "source": "⚠ **不是数据里的名字** —— 「召唤死龙时消耗的溢出量」的存放处（基点，`amount_percent: 12`）。"
     }
   ],
   "rules": [
@@ -138,7 +143,7 @@
       "note": "⭐ 2% 的对象是**声明的上限**：【新蕊】在本文件里是 `max: 34000`（出处是 `Castorice_Passive_MaxCount` 的公式）⇒ 2% = **680** ⇒ 本条把**溢出容量**抬高 680（**不动正常上限**）。⭐ 而这只是本技能的**第一句**；后两句（消耗溢出、消耗量→死龙天赋倍率）仍登记。"
     },
     {
-      "id": "life_ode_summon_spends_the_overflow",
+      "id": "life_ode_summon_spends_captures_and_raises",
       "on": "SUMMONED",
       "when": [
         "actor == summon"
@@ -147,12 +152,24 @@
         {
           "op": "SPEND_RESOURCE",
           "resource": "新蕊",
-          "target": "self",
-          "overflow_only": true
+          "overflow_only": true,
+          "target": "self"
+        },
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "生死之诗的溢出消耗",
+          "amountFromPrevious": true,
+          "amountPercent": 12.0,
+          "target": "self"
+        },
+        {
+          "op": "MODIFY_RULE",
+          "rule": "dragon_hollow_wing_damage",
+          "effect_percent_from_resource": "生死之诗的溢出消耗"
         }
       ],
-      "source": "1415 昔浯 忆灵技能 17：「**召唤死龙时会消耗所有溢出【新蕊】**，每消耗 1% 溢出值，使本次召唤的死龙触发天赋【灼掠幽墟的晦翼】…」",
-      "note": "⭐ **本条实现的是“消耗**所有溢出**”**：新拼法 `overflow_only`（只花**上限以上**那一段）。⚠ **而触发本身仍登记**：“召唤**死龙**时”—— 我们的 `1407.json` 里**并没有死龙**，所以本条挂在通用的 `SUMMONED` 上，精度已如实记下。⭐ 后半句（消耗量 → 天赋伤害倍率）仍登记。  ⭐ **2026-10-02 实测**：内容里的键是 **JSON 拼法 `overflow_only`**（它的 `@SerializedName` 就是这个），而不是 Java 字段名；写错会被**加载器当场拒绝**（“unknown key … known: […]”）。"
+      "source": "1415 昔涟 忆灵技能 17：「召唤死龙时会消耗所有溢出【新蕊】，**每消耗 1% 溢出值**，使本次召唤的死龙触发天赋【灼掠幽墟的晦翼】的技能效果时，造成的伤害倍率提高 #2%」（#2 = 0.0012）。",
+      "note": "⭐ **三个效果必须同一条规则**：`previousCredited` 是**每条规则独立**的（第 108/111 轮）。⭐ 而且**不能再有第二条规则抢先消耗**（第 111 轮实测：那样本条的消耗就移不动任何东西，捕获读 0）。⭐ 而本条必须在**伤害那一条之前**（同一事件按文件顺序）。⚠ 而“每次**到达**都会触发”仍是待办 5（遐蝶同时有忆灵与仆从）。"
     },
     {
       "id": "dragon_hollow_wing_damage",

@@ -1016,9 +1016,10 @@ public final class TriggerInterpreter {
                 String resourceId = effect.getResource();
                 // ⭐ Through `resourceAmount`, which knows BOTH stores (2026-10-02; measured: 【新蕊】 is `scope: PARTY`, so reading the holder's own store gave 0 on
                 // both sides of the move and the capture of a spend read 0 even though the spend itself worked).
-                int creditedBefore = resourceAmount(battle, holder, resourceId);
+                // ⭐ EITHER store, never both (2026-10-02; measured: `resourceAmount` ADDS the holder's store to the party's, so a SELF resource was counted twice and a capture of 4 read 8).
+                int creditedBefore = measureForTheDelta(effectCtx, holder, resourceId);
                 applyOne(battle, effect, effectCtx, previousCredited);
-                int creditedAfter = resourceAmount(battle, holder, resourceId);
+                int creditedAfter = measureForTheDelta(effectCtx, holder, resourceId);
                 // ⭐ The MAGNITUDE of what the previous effect moved (2026-10-02; reader: 1141517 「每消耗 1% 溢出值…」). A gain arrives positive and a spend
             // NEGATIVE, and `amount_from_previous` is asked for a size, not a direction -- measured: this is the only place `previousCredited` is set, and `gainResource` is its
             // only reader, so the sign carried no information anyone used.
@@ -3505,6 +3506,17 @@ public final class TriggerInterpreter {
      */
     /** \u2705 Tells the holder that a resource moved, WITH its name and delta (2026-09-30). */
     /** \u2705 How much of a resource exists right now: the unit\u2019s own copy plus the party counter (2026-09-30). */
+    /**
+     * ⭐ What the DELTA between two moments must be measured with (2026-10-02): the holder's own store when it has the resource, otherwise the party's. ⚠ Not `resourceAmount`, which
+     * ADDS the two -- right for a total, wrong for a difference (measured: a SELF resource read as if it were twice as large, and a capture of 4 came out 8).
+     */
+    private static int measureForTheDelta(TriggerContext ctx, CanHit holder, String id) {
+        if (holder != null && holder.getResources().has(id)) {
+            return holder.getResources().value(id);
+        }
+        return ctx.battle() == null ? 0 : ctx.battle().partyResourceValue(id);
+    }
+
     private static int resourceAmount(Battle battle, CanHit owner, String id) {
         int total = (owner == null || !owner.getResources().has(id)) ? 0 : owner.getResources().value(id);
         return battle == null ? total : total + battle.partyResourceValue(id);
