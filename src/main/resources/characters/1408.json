@@ -364,6 +364,132 @@
       ],
       "source": "1415 昔涟 忆灵技能 21 「献予「负世」之诗」（数据槽位 21，SkillID 1141521）：「整场生效，对白厄施放后，**使白厄获得 #8 点【火种】**…」（#8 = 6）。",
       "note": "⭐ 形态同第 89 轮的【亿质】那条：资源存在**被矄准者**身上，在他被施放那一刻入账（实测：忆灵的施放只送到被矄e者的表）。⭐ 数值 6 来自数据行 21 的 `#8`，写成字面是因为它不随等级变（ParamList 里是常量 6）。"
+    },
+    {
+      "id": "world_ode_fire_seed_crit_step_1",
+      "on": "ULT_CAST",
+      "when": [
+        "actor == self",
+        "self_resource:火种 >= 13"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.06,
+          "permanent": true,
+          "target": "self",
+          "coexist": true,
+          "max_stacks": 6
+        }
+      ],
+      "source": "1415 昔涟 忆灵技能 21：「…变身时若【火种】**大于 #5 点，每超出 1 点，卡厄斯兰那的暴击伤害提高 #6%**，最多可提高 #7%」（#5 = 12、#6 = 0.06、#7 = 0.36）—— 这是第 1 级台阶。",
+      "note": "⭐ **为何是六条**：`#7 / #6 = 0.36 / 0.06 = 6`，所以“超出 12 点、每点 0.06、上限 0.36”**恰好是六步** ⇒ 六条各自由 `self_resource:火种 >= 13` 把门，上限天然成立。⭐ 门用**条件**拼法 `self_resource:`（已出货），因为 `stackScale` 读的是 **buff 层数**、不是资源。  ⭐ `coexist: true`（2026-10-02）：同属性修饰符**默认叠代**，而这六步必须**同时存在**。"
+    },
+    {
+      "id": "world_ode_fire_seed_crit_step_2",
+      "on": "ULT_CAST",
+      "when": [
+        "actor == self",
+        "self_resource:火种 >= 14"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.06,
+          "permanent": true,
+          "target": "self",
+          "coexist": true,
+          "max_stacks": 6
+        }
+      ],
+      "source": "1415 昔涟 忆灵技能 21：「…变身时若【火种】**大于 #5 点，每超出 1 点，卡厄斯兰那的暴击伤害提高 #6%**，最多可提高 #7%」（#5 = 12、#6 = 0.06、#7 = 0.36）—— 这是第 2 级台阶。",
+      "note": "⭐ **为何是六条**：`#7 / #6 = 0.36 / 0.06 = 6`，所以“超出 12 点、每点 0.06、上限 0.36”**恰好是六步** ⇒ 六条各自由 `self_resource:火种 >= 14` 把门，上限天然成立。⭐ 门用**条件**拼法 `self_resource:`（已出货），因为 `stackScale` 读的是 **buff 层数**、不是资源。  ⭐ `coexist: true`（2026-10-02）：同属性修饰符**默认叠代**，而这六步必须**同时存在**。"
+    },
+    {
+      "id": "world_ode_fire_seed_crit_step_3",
+      "on": "ULT_CAST",
+      "when": [
+        "actor == self",
+        "self_resource:火种 >= 15"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.06,
+          "permanent": true,
+          "target": "self",
+          "coexist": true,
+          "max_stacks": 6
+        }
+      ],
+      "source": "1415 昔涟 忆灵技能 21：「…变身时若【火种】**大于 #5 点，每超出 1 点，卡厄斯兰那的暴击伤害提高 #6%**，最多可提高 #7%」（#5 = 12、#6 = 0.06、#7 = 0.36）—— 这是第 3 级台阶。",
+      "note": "⭐ **为何是六条**：`#7 / #6 = 0.36 / 0.06 = 6`，所以“超出 12 点、每点 0.06、上限 0.36”**恰好是六步** ⇒ 六条各自由 `self_resource:火种 >= 15` 把门，上限天然成立。⭐ 门用**条件**拼法 `self_resource:`（已出货），因为 `stackScale` 读的是 **buff 层数**、不是资源。  ⭐ `coexist: true`（2026-10-02）：同属性修饰符**默认叠代**，而这六步必须**同时存在**。"
+    },
+    {
+      "id": "world_ode_fire_seed_crit_step_4",
+      "on": "ULT_CAST",
+      "when": [
+        "actor == self",
+        "self_resource:火种 >= 16"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.06,
+          "permanent": true,
+          "target": "self",
+          "coexist": true,
+          "max_stacks": 6
+        }
+      ],
+      "source": "1415 昔涟 忆灵技能 21：「…变身时若【火种】**大于 #5 点，每超出 1 点，卡厄斯兰那的暴击伤害提高 #6%**，最多可提高 #7%」（#5 = 12、#6 = 0.06、#7 = 0.36）—— 这是第 4 级台阶。",
+      "note": "⭐ **为何是六条**：`#7 / #6 = 0.36 / 0.06 = 6`，所以“超出 12 点、每点 0.06、上限 0.36”**恰好是六步** ⇒ 六条各自由 `self_resource:火种 >= 16` 把门，上限天然成立。⭐ 门用**条件**拼法 `self_resource:`（已出货），因为 `stackScale` 读的是 **buff 层数**、不是资源。  ⭐ `coexist: true`（2026-10-02）：同属性修饰符**默认叠代**，而这六步必须**同时存在**。"
+    },
+    {
+      "id": "world_ode_fire_seed_crit_step_5",
+      "on": "ULT_CAST",
+      "when": [
+        "actor == self",
+        "self_resource:火种 >= 17"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.06,
+          "permanent": true,
+          "target": "self",
+          "coexist": true,
+          "max_stacks": 6
+        }
+      ],
+      "source": "1415 昔涟 忆灵技能 21：「…变身时若【火种】**大于 #5 点，每超出 1 点，卡厄斯兰那的暴击伤害提高 #6%**，最多可提高 #7%」（#5 = 12、#6 = 0.06、#7 = 0.36）—— 这是第 5 级台阶。",
+      "note": "⭐ **为何是六条**：`#7 / #6 = 0.36 / 0.06 = 6`，所以“超出 12 点、每点 0.06、上限 0.36”**恰好是六步** ⇒ 六条各自由 `self_resource:火种 >= 17` 把门，上限天然成立。⭐ 门用**条件**拼法 `self_resource:`（已出货），因为 `stackScale` 读的是 **buff 层数**、不是资源。  ⭐ `coexist: true`（2026-10-02）：同属性修饰符**默认叠代**，而这六步必须**同时存在**。"
+    },
+    {
+      "id": "world_ode_fire_seed_crit_step_6",
+      "on": "ULT_CAST",
+      "when": [
+        "actor == self",
+        "self_resource:火种 >= 18"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.06,
+          "permanent": true,
+          "target": "self",
+          "coexist": true,
+          "max_stacks": 6
+        }
+      ],
+      "source": "1415 昔涟 忆灵技能 21：「…变身时若【火种】**大于 #5 点，每超出 1 点，卡厄斯兰那的暴击伤害提高 #6%**，最多可提高 #7%」（#5 = 12、#6 = 0.06、#7 = 0.36）—— 这是第 6 级台阶。",
+      "note": "⭐ **为何是六条**：`#7 / #6 = 0.36 / 0.06 = 6`，所以“超出 12 点、每点 0.06、上限 0.36”**恰好是六步** ⇒ 六条各自由 `self_resource:火种 >= 18` 把门，上限天然成立。⭐ 门用**条件**拼法 `self_resource:`（已出货），因为 `stackScale` 读的是 **buff 层数**、不是资源。  ⭐ `coexist: true`（2026-10-02）：同属性修饰符**默认叠代**，而这六步必须**同时存在**。"
     }
   ]
 }
