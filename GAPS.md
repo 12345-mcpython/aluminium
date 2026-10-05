@@ -601,3 +601,16 @@
   5. ⭐ **结界那一下的 `skillKey` 是 0** ⇒ 我当初的守卫 `damage_skill_key == 3` **恰好把要看的那一下排除了**。
 - ⚠ **一条诚实的说明**：对本条而言 `damage_is_additional` 在 `damage_has_no_cast` 之下是**冗余的**
   （实测：去掉它读数不动）。它保留是因为**原话就是"附加伤害时"**，但**能咬的变异是本轮新增的那件**。
+
+
+## 附：四件"缺词汇"的收官账（2026-10-02，新目标）
+
+| # | 能力 | 结论 | 证据 |
+|---|---|---|---|
+| ① | **命途选择器** | ✅ **出货** | `allies_of_path:<命途>`（常量 ＋ 解析支 ＋ `pathNamed` 助手 ＋ 校验支 ＋ `Path` 的 import）<br>判据 `ReasonOdeEruditionAttackTest`：`那刻夏 0.84 ; 景元 0.84 ; 缇宝 0.0 ; 昔涟 0.0`<br>变异（「智识」→「同谐」）⇒ `缇宝 0.84 ; 两位智识 0.0` ⇒ **RED**<br>提交 `47118061` |
+| ② | **持续地抬高某一类伤害** | ✅ **出货**，且**不需要新词汇** | 正确的形状是「状态承载存续 ＋ `from_skill SKILL` 限定实例 ＋ `BOOST_DAMAGE`」，⭐ 引擎只改了**一行**（`boostDamage` 改走 `shareOf`）<br>判据 `TrueKnowledgeSkillDamageTest`：战技比值 **1.3948**、普攻比值 **1.00111**<br>变异（去掉 `from_skill SKILL`）⇒ 普攻 **575.36 → 801.63** ⇒ **RED**<br>提交 `03f27600` |
+| ③ | **"这次攻击是追加攻击"** | ✅ **出货** | ⭐ 那件词汇**本来就有**（`damage_is_additional`，而 `Battle` 自述 ADDITIONAL 就是引擎对追加攻击的唯一表示）；⭐ 真正缺的是 **`damage_has_no_cast`**（"这一下没有指名任何施放" = 引擎自己产生的），三处：常量 ＋ 解析支 ＋ 条件类<br>判据 `PassageOdeExtraZoneHitTest`（**同一场战斗内**撤掉门径状态作对照）：`475.06583639547534` vs `388.6902297781162` ⇒ 差 **86.3756 ≈ 一个 ADDITIONAL 实例**<br>变异（去掉 `damage_has_no_cast`）⇒ **RED**（*Trigger recursion exceeded 8 levels*）<br>提交 `34779c68` |
+| ④ | **"这个召唤物是哪一个"** | ✅ **已消除**（**从来不需要**） | ⭐ 实测：`actor == summon` **本来就表示"规则主人自己的召唤物"** —— 把五条规则全部换回旧拼法，"别人的召唤物到达"那一侧**仍是精确 0.0**<br>⭐ 同时量到：`SummonFactory.servant(master, spec)` 与 `memosprite(master, spec)` 对同一 spec 造出**同一个单位**（同名、`memospriteOf` 都指向它）<br>提交 `fc9c47ce` |
+
+⭐ **四点共同的方法论**：四件里**只有一件**真的需要新词汇（①），② 是**形状用错**、③ 是**词汇已在但判别器缺失**、④ 是**从一开始就不需要**
+⇒ 而每一次的结论都来自**运行时探针**（`fireTriggers`／`apply`／`DAMAGE` 份额／条件字段），不是推断。
