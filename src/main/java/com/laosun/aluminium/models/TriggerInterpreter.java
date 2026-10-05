@@ -1903,10 +1903,18 @@ public final class TriggerInterpreter {
         CanHit actor = require(resolveTarget(effect, ctx), "target", ctx);
         SkillType slot = SkillType.valueOf(effect.getSkill().trim().toUpperCase(Locale.ROOT));
         Skill skill = actor.getSkills().get(slot);
+        // ⭐ A MEMOSPRITE keeps its skills by DATA SLOT, not by SkillType (2026-10-02): its table is `Summon.skillsByDataSlot`, and
+        // 「自动施放【花与箭的舞曲】」 is its slot 1. Commanding that cast used to fail with "has no SKILL skill" because only
+        // the character table was consulted. The slot is named with `skill_id`, the same field `REPLACE_SKILL` uses for a data row.
+        if (skill == null && effect.getSkillId() != null && actor instanceof Summon from) {
+            skill = from.skillAt(effect.getSkillId());
+        }
         if (skill == null || skill.getData() == null || !skill.getData().isLoaded()) {
             throw new IllegalStateException(
-                    actor.getName() + " has no " + slot + " skill, so a CAST_SKILL effect has nothing to "
-                            + "read: the rule names the skill whose numbers the commanded cast uses");
+                    actor.getName() + " has no " + slot + " skill"
+                            + (effect.getSkillId() == null ? "" : " and no own skill at data slot " + effect.getSkillId())
+                            + ", so a CAST_SKILL effect has nothing to read: the rule names the skill whose numbers the "
+                            + "commanded cast uses");
         }
         // ⭐ What the engine can DELIVER, not "is it a swing" (2026-10-02): a cast may be a shield or a heal as well,
         // and those go through `SkillExecutor.dispatchNonDamaging`, which reads `skill_effects.json`. A skill the

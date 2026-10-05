@@ -36821,3 +36821,29 @@
 > * ⚠⚠ **我自己的坑（记 ✓）**：⭐ `\u2a0` 那个**残缺转义这一轮又犯了一次** ✗（⭐ 累计三次 ✗）⇒ ⭐ 我已决定 ⭐ **不再把 ⭐／⚠ 这类符号写成转义** ✓，
 >   ⭐ 需要时用 ⭐ 中文或 ASCII ✓。
 > * **实测（本轮）**：⭐ 全量 **0**（--rerun-tasks，**2280** 例 ✓）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓（⭐ 回滚后 ✓）。
+
+> **2026-10-02 更新（新目标第 16 轮：🎉🎉🎉 **第 103 件出货 ＝ `1141513` 献予「创世」之诗 **整句成句** ✓✓**）**）**：
+>
+> * ✅ **这一句的两半现在都在内容里** ✓（⭐ `characters/8007.json`，⭐ 开拓者•记忆 ✓）：
+>   ⭐ 第一半（⭐ 第 100 件 ✓）：⭐ 攻击力 ＋ 暴击率，⭐ 占比取自**技能参数**、⭐ 所乘的属性取自**动作方**德谬歌 ✓，⭐ 并有一条 ⭐ `target: "summon"` 的同胞规则覆盖「对迷迷也生效」✓；
+>   ⭐ 第二半（⭐ 本轮 ✓）：⭐ 印记（⭐ 挂在那条规则上 ✓）＋ ⭐ 一条规则 ⭐ `on: CAST_SETUP`
+>     ＋ ⭐ `when: [self has_state <那句诗>, actor == self, from_skill_id == 4]`
+>     ⇒ ⭐ `do: [INSERT_ACTION{target: attacker}, REPLACE_SKILL{SKILL, 1, target: attacker}, CAST_SKILL{SKILL, skill_id: 1, target: attacker}]` ✓。
+> * ✅ **引擎（一处 ✓）**：⭐ `castSkill` 的技能查找**回退到忆灵自己的槽位表** ✓ —— ⭐ 忆灵按**数据槽位**存技能 ✓（⭐ `Summon.skillAt/setSkillAt` ✓），
+>   ⭐ 而原来只查 ⭐ `actor.getSkills().get(SkillType.SKILL)` ✗（⭐ 那是**角色**的表 ✓）⇒ ⭐ 所以"命令忆灵施放"以前永远报 ⭐ *"has no SKILL skill"* ✓。
+> * ⭐⭐⭐ **`from_skill_id` 比的是槽位** ✓（⭐ 由代码确认，⭐ 不再猜 ✓）：⭐ `SkillExecutor:99-100` ⭐
+>   `battle.fireTriggers(CAST_SETUP, user, aimed, 0, 0, category, skill == null ? 0 : skill.getSkillSlot())` ✓ ——
+>   ⭐ 注释里还留着当时的实测：⭐ *"a rule plus `from_skill_id == 16` fired while `== 1141516` did not"* ✓。
+> * ⭐⭐⭐ **又是"主体"那个坑（⭐ 这一趟第三次 ✓，⭐ 而这次量到了硬证据 ✓）**：⭐ 那条规则的效果原先写 ⭐ `target: "summon"` ✗ ⇒
+>   ⭐ 那是 ⭐ **规则持有者**的忆灵 ✗ —— ⭐ 对 8007 而言是 ⭐ **迷迷** ✗，⭐ 而原句说的是 ⭐ **动作方**德谬歌 ✓ ⇒ ⭐ 改用 ⭐ `attacker` ✓。
+>   ⭐ **量到的证据**：⭐ 用 `summon` 时 ⭐ 插入的行动**给了迷迷** ✗（⭐ `the step forward gives 迷迷` ✓）、⭐ 伤害 ⭐ 16432 ✓；
+>   ⭐ 改用 `attacker` 后 ⭐ 伤害 ⭐ **15881** ✓（⭐ 德谬歌的槽位 1 打得更重 ✓）✓。
+>   ⇒ ⭐⭐ **三个主体，一族拼法，⭐ 已经踩过三次** ✗：⭐ `self_attr:` ＝ 持有者 ✓；⭐ `summon_attr:`／⭐ `target: "summon"` ＝ **持有者的忆灵** ✓；⭐ `actor_attr:`／⭐ `target: "attacker"` ＝ **动作方** ✓。
+> * ⭐⭐ **一个关于顺序的实测（⭐ 值得记 ✓）**：⭐ 那一击是"**立即施放**" ✓ ⇒ ⭐ 它在**规则内部**就推进了战斗 ✗ ⇒ ⭐ 插入的行动**当场被消费** ✓
+>   ⇒ ⭐ 所以"下一步是谁"**不属于这一句** ✗（⭐ 我一度把它写进判据 ⇒ 读到的是 ⭐ Trailblazer ✗）⇒ ⭐ 插入行动的能力由 ⭐ `InsertedActionTest` **单独守着** ✓。
+> * ✅ **判据 ＋ 实测变异** ✓：⭐ `MemospriteSlotCastTest` ⇒ ⭐
+>   `[slotted] the enemy HP 16498.2960225 -> 15881.580383368293 ; the memosprite slot 1 exists = true with slot 1` ✓✓；
+>   ⭐ **变异** ✓：⭐ 把门改成 ⭐ `from_skill_id == 1` ✗ ⇒ ⭐ `the enemy HP 16498.296 → 16498.296` ⇒ 红 ✓。
+> * ⭐ **教训（⭐ 本轮最有用的一条 ✓）**：⭐ 上一轮我断定"⭐ 规则没触发、⭐ 病在门控" ✗ —— ⭐ 病因其实是 ⭐ **判据没有召出 8007 自己的忆灵** ✗
+>   ⇒ ⭐ `self_summon_count >= 1` 为假 ✓ ⇒ ⭐⭐ **当一条规则的读数全静默时，⭐ 先检查它的**每一个** `when` ✗，⭐ 再怀疑引擎 ✓**。
+> * **实测（本轮）**：⭐ 全量 **0**（--rerun-tasks，**2282** 例 ✓）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
