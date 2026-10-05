@@ -33,19 +33,19 @@ public class TriggerDataBindingTest {
 
         TriggerTable robin = TriggerTables.of(ROBIN);
         Assertions.assertFalse(robin.isEmpty(), "1309's table must not be empty");
-        // Robin is the first character whose 行迹 extra abilities are data too, so her table now holds
+        // Robin is the first character whose 行迹 (trace) extra abilities are data too, so her table now holds
         // three rules: the talent (ALLY_ATTACK) and two traces (BATTLE_START, SKILL_CAST). The counts
         // are asserted per event rather than as a total, so a rule that lands on the wrong event is
         // still caught.
         Assertions.assertEquals(1, robin.ruleCount(TriggerEvent.BATTLE_START),
-                "华彩花腔: 战斗开始时自身行动提前25%");
+                "华彩花腔 (Radiant Refrain): 战斗开始时自身行动提前25% (advances herself 25% at battle start)");
         Assertions.assertEquals(1, robin.ruleCount(TriggerEvent.SKILL_CAST),
-                "模进乐段: 施放战技时额外恢复5点能量");
-        // Note: 2 since 2026-09-28: the talent's "额外为自身恢复2点能量" and [协奏]'s additional-damage rider
+                "模进乐段 (Sequence): 施放战技时额外恢复5点能量 (restores 5 extra energy when casting the Skill)");
+        // Note: 2 since 2026-09-28: the talent's "额外为自身恢复2点能量" (restores 2 extra energy for herself) and [协奏] (Concerto)'s additional-damage rider
         // ("我方目标每次施放攻击后…额外造成1次"), which is gated on `self has_state 协奏`.
         Assertions.assertEquals(2, robin.ruleCount(TriggerEvent.ALLY_ATTACK));
         Assertions.assertEquals(0, robin.ruleCount(TriggerEvent.BASIC_ATTACK),
-                "nothing in her file listens to 普攻 -- 施放战技时 is the Skill slot");
+                "nothing in her file listens to 普攻 (basic attack) -- 施放战技时 (casting the Skill) is the Skill slot");
     }
 
     /**

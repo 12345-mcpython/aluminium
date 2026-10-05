@@ -28,7 +28,7 @@ import java.util.Random;
  * ({@code hit_count}), about me ({@code hp_percent}) and about the event's subject
  * ({@code target_debuff_count}), but not about "how much of X do I have" - and that is the most common
  * conditional shape in the game's equipment: 13 of the planar-ornament 2-pieces read
- * "当装备者的速度/暴击率/击破特攻/生命上限…大于等于 N 时". The old names were a closed set of three; this one is
+ * "when the wearer's SPD / CRIT Rate / Break Effect / Max HP ... is greater than or equal to N". The old names were a closed set of three; this one is
  * <b>parameterised</b> over {@link AttributeType}, which is already a validated closed set - so new content
  * needs a new attribute <em>name</em>, not a new engine change. That is the extensibility this exists for.
  *
@@ -56,19 +56,19 @@ public class SelfAttributeConditionTest {
     private static final int LEVEL = 80;
 
     // The planar 2-pieces authored with this vocabulary. None of them had a rule file before.
-    /** 太空封印站: 攻击力 +12%; SPD >= 120 -> 攻击力额外 +12%. */
+    /** 太空封印站: ATK +12%; SPD >= 120 -> ATK additionally +12%. */
     private static final int SPACE_SEALING_STATION = 301;
-    /** 不老者的仙舟: 生命上限 +12%; SPD >= 120 -> 我方全体攻击力 +8%. */
+    /** 不老者的仙舟: Max HP +12%; SPD >= 120 -> all of our ATK +8%. */
     private static final int FLEET_OF_THE_AGELESS = 302;
-    /** 筑城者的贝洛伯格: 防御力 +15%; 效果命中 >= 50% -> 防御力额外 +15%. */
+    /** 筑城者的贝洛伯格: DEF +15%; Effect Hit Rate >= 50% -> DEF additionally +15%. */
     private static final int BELOBOG = 304;
-    /** 停转的萨尔索图: 暴击率 +8%; 当前暴击率 >= 50% -> 终结技与追加攻击伤害 +15%. */
+    /** 停转的萨尔索图: CRIT Rate +8%; current CRIT Rate >= 50% -> Ultimate and follow-up attack damage +15%. */
     private static final int INERT_SALSOTTO = 306;
-    /** 盗贼公国塔利亚: 击破特攻 +16%; SPD >= 145 -> 击破特攻额外 +20%. */
+    /** 盗贼公国塔利亚: Break Effect +16%; SPD >= 145 -> Break Effect additionally +20%. */
     private static final int TALIA = 307;
-    /** 生命的翁瓦克: 能量恢复效率 +5%; SPD >= 120 -> 进入战斗时行动提前 40%. */
+    /** 生命的翁瓦克: Energy Regeneration Rate +5%; SPD >= 120 -> action advances 40% on entering battle. */
     private static final int SPRIGHTLY_VONWACQ = 308;
-    /** 繁星竞技场: 暴击率 +8%; 当前暴击率 >= 0% -> 普攻与战技伤害 +20%. */
+    /** 繁星竞技场: CRIT Rate +8%; current CRIT Rate >= 0% -> basic attack and Skill damage +20%. */
     private static final int CELESTIAL_DIFFERENTIATOR = 309;
 
     /** All seven, for the cases that make a claim about the whole authored batch. */
@@ -84,7 +84,7 @@ public class SelfAttributeConditionTest {
     @Test
     public void theThresholdDecidesWhetherTheRuleFires() {
         Assertions.assertEquals(0, fireAtSpeed(144.9), "just short of 145");
-        Assertions.assertEquals(1, fireAtSpeed(145), "exactly at it -- the text says 大于等于");
+        Assertions.assertEquals(1, fireAtSpeed(145), "exactly at it -- the text says greater than or equal to");
         Assertions.assertEquals(1, fireAtSpeed(200), "and above it");
     }
 
@@ -256,7 +256,7 @@ public class SelfAttributeConditionTest {
         EffectSpec effect = soleEffect(FLEET_OF_THE_AGELESS, AttributeType.SPEED, 200);
 
         Assertions.assertEquals("all_allies", effect.getTarget(),
-                "the text says 我方全体, so the selector has to say so too");
+                "the text says all of our side, so the selector has to say so too");
         Assertions.assertEquals("ATTACK", effect.getAttribute());
         Assertions.assertEquals(0.08, effect.getPercent(), EPS, "param #3 is 0.08");
     }
@@ -273,7 +273,7 @@ public class SelfAttributeConditionTest {
 
         EffectSpec talia = soleEffect(TALIA, AttributeType.SPEED, 200);
         Assertions.assertEquals("BREAKING_EFFECT", talia.getAttribute(),
-                "击破特攻 is AttributeType.BREAKING_EFFECT (its data property is BreakDamageAddedRatioBase)");
+                "Break Effect is AttributeType.BREAKING_EFFECT (its data property is BreakDamageAddedRatioBase)");
         Assertions.assertEquals(0.2, talia.getPercent(), EPS, "param #3 is 0.2");
     }
 

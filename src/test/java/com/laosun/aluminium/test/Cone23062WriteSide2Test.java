@@ -16,17 +16,17 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 写入端：`Battle.castUltra` 把"本次消耗"送到结算时的伤害实例上 -  - Note: 走真实施放，不手工设值。
+ * The write side: `Battle.castUltra` hands "what this cast spent" to the damage instance at settlement -- Note: it goes through a real cast, not a hand-set value.
  *
- * <p>Note: 为什么必须自己造规则：读取端的判据是手工设 `castEnergySpent` 的，它根本不经过 `Battle`；而实测过，
- * 把写入那行注释掉，全量套件照样绿（845 轮）。
+ * <p>Note: why a rule has to be built here at all: the read-side case hand-sets `castEnergySpent`, so it never goes through `Battle`; and it was measured that
+ * commenting the write line out still leaves the full suite green (845 rounds).
  *
- * <p>Note: 而"造一条探针"也不自由：能读自定义 `scale` 的 op 是闭集 -  - `MODIFY_ATTR` 带
- * `cast_energy_spent` 在装载期就抛（856 轮实测），`ADD_STACK` 则静默不读（854 轮实测：
- * 探针恒为 2 层，写入被注释掉也照样 2 层）。实际上只有 `BOOST_DAMAGE` 认它。
+ * <p>Note: and "build a probe" is not free either: the ops that can read a custom `scale` are a closed set -- `MODIFY_ATTR` with
+ * `cast_energy_spent` throws at load time (measured over 856 rounds), `ADD_STACK` silently does not read it (measured over 854 rounds:
+ * the probe is always 2 layers, and stays 2 layers even with the write commented out). In fact only `BOOST_DAMAGE` honours it.
  *
- * <p>所以对照是同一条规则、只换 scale：一次带 `scale: cast_energy_spent`（percent 0.02），
- * 一次不带（percent 0.001）。写入发生时前者远高；写入被注释掉时前者读 0，于是低于后者。
+ * <p>So the control is the same rule with the scale swapped: one with `scale: cast_energy_spent` (percent 0.02),
+ * one without (percent 0.001). When the write happens the former is far higher; when the write is commented out the former reads 0, and so falls below the latter.
  */
 public class Cone23062WriteSide2Test {
     private static final int LEVEL = 80;
@@ -35,7 +35,7 @@ public class Cone23062WriteSide2Test {
     private static final double PER_POINT = 0.02;
     private static final double FLAT = 0.001;
 
-    /** 满能量放一次终结技；用一条自造的 BOOST_DAMAGE 规则读实例上的消耗。 */
+    /** Casts one ultimate at full energy; a hand-built BOOST_DAMAGE rule reads what the instance spent. */
     private static double ultimateDamage(boolean scaled) {
         Character wearer = CharacterFactory.create(WEARER, LEVEL);
         Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);

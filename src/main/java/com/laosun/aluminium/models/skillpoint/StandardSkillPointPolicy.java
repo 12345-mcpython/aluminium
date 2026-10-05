@@ -27,7 +27,7 @@ import com.laosun.aluminium.models.skill.Skill;
  * should also supply points, and this behaviour is pinned by {@code SkillPointGameParityTest}.
  *
  * <p>Note: <b>Known deviation</b> (<b>F-3</b> in §F of {@code DOC_VS_CODE.md}): here {@code NORMAL} is
- * uniformly +1, whereas in the game enhanced basic attacks have exceptions - Boothill's (波提欧)
+ * uniformly +1, whereas in the game enhanced basic attacks have exceptions - Boothill (波提欧)
  * enhanced basic attack "cannot restore skill points", while Qingque's (青雀) enhanced basic attack
  * "restores 1 skill point". In the data both are {@code "Normal"} (there is no separate type), so this
  * implementation is correct for Qingque and wrong for Boothill.
@@ -35,7 +35,7 @@ import com.laosun.aluminium.models.skill.Skill;
  * right fix is a per-skill skill-point delta field (a data completion). This class leaves
  * {@link #gainForCast} as the override point.
  *
- * <p>Note: <b>Character-level modifiers are not wired up</b> (F-4 in the same §F): Bronya's (布洛妮娅)
+ * <p>Note: <b>Character-level modifiers are not wired up</b> (F-4 in the same §F): Bronya (布洛妮娅)
  * "50% chance to +1 on skill", Sushang's (素裳) "+1 on a skill that hits a broken target", Sparkle's
  * (花火) "cap +2" and so on all have to wait for the P8-trigger table. This class deliberately knows
  * no character - when adding these, extend and override {@link #gainForCast} (or drive it from the
@@ -97,7 +97,8 @@ public class StandardSkillPointPolicy implements SkillPointPolicy {
          * Actually spent {@code amount} points ({@code > 0}).
          */
         /**
-         * A spend, WITH the unit that spent (2026-09-30; reader: cone 23061's "我方任意角色在自身同一回合内累计消耗 >= 4 点战技点").
+         * A spend, WITH the unit that spent (2026-09-30; reader: cone 23061's "我方任意角色在自身同一回合内累计消耗 >= 4 点战技点",
+         * "any character on our side accumulates >= 4 skill points spent within its own turn").
          *
          * <p>The spender was always known one frame up -- {@code onSkillCast(CanHit user, Skill skill)} is where the
          * policy decides -- and dropping it here is why a trigger rule could not tell who spent. It stays {@code null} for

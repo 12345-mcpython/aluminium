@@ -19,12 +19,12 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 银枝 (1302), from her own file (2026-09-28): [升格], the talent's per-hit energy, 行迹 勇气 and 星魂 1/4.
+ * 银枝 (1302), from her own file (2026-09-28): [升格], the talent's per-hit energy, trace 勇气 and Eidolon 1/4.
  *
- * <p><b>What it needed.</b> Nothing new - which is the point of writing it now: the talent's "每击中 1 个敌方目标…恢复 3 点能量"
+ * <p><b>What it needed.</b> Nothing new - which is the point of writing it now: the talent's "for each 1 enemy target hit ... restore 3 energy"
  * is {@code per_target} on {@code GAIN_ENERGY}, [升格] is a <b>stackable named modifier</b> (`max_stacks: 10` + `buff: 升格`),
- * and 勇气's "当前生命值百分比 <= 50% 的敌方目标" is the existing {@code target_hp_percent} condition. The two rules that
- * read like new vocabulary (星魂 4's cap raise, 星魂 6's defence ignore) are registered instead of approximated.
+ * and 勇气's "enemy targets whose current HP percentage <= 50%" is the existing {@code target_hp_percent} condition. The two rules that
+ * read like new vocabulary (Eidolon 4's cap raise, Eidolon 6's defence ignore) are registered instead of approximated.
  */
 public class ArgentiStacksTest {
     private static final int ARGENTI = 1302;
@@ -33,9 +33,9 @@ public class ArgentiStacksTest {
     private static final int MONSTER = 1002011;
 
     /**
-     * All three cast slots feed the talent: "施放普攻、战技、终结技时…获得 1 层[升格]".
+     * All three cast slots feed the talent: "when casting a basic attack, Skill or Ultimate ... gain 1 stack of [升格]".
      *
-     * <p>Note: The energy half of the same sentence ("每击中 1 个敌方目标…恢复 3 点能量") is {@code per_target}, and its
+     * <p>Note: The energy half of the same sentence ("for each 1 enemy target hit ... restore 3 energy") is {@code per_target}, and its
      * arithmetic already has its own pin in {@code CastAppliedCountTest} - the engine exposes no public "current energy"
      * reader, and inventing one for a test would be a worse trade than pointing at the case that exists. What is pinned
      * here is what this file adds: <b>three rules</b>, one per cast event, each marking exactly once.
@@ -68,10 +68,10 @@ public class ArgentiStacksTest {
         Assertions.assertEquals(base + 10 * 0.025, f.argenti.getAttribute(AttributeType.CRIT_CHANCE).get(), 1e-6,
                 "「该效果最多叠加10层」: twelve hits give ten stacks, not twelve");
         Assertions.assertEquals(10, f.argenti.getBuffManager().stacksOf("升格"),
-                "…and the count is readable by name, which is what 星魂 4 and any removal would use");
+                "…and the count is readable by name, which is what Eidolon 4 and any removal would use");
     }
 
-    /** 行迹 虔诚 grants a stack on her own turn start. */
+    /** trace 虔诚 grants a stack on her own turn start. */
     @Test
     public void herTraceGrantsAStackOnHerTurn() {
         Fixture f = new Fixture();
@@ -83,7 +83,7 @@ public class ArgentiStacksTest {
                 "「回合开始时，立即获得1层【升格】」");
     }
 
-    /** 行迹 勇气 boosts the instance that lands on a hurt enemy, and only that one. */
+    /** trace 勇气 boosts the instance that lands on a hurt enemy, and only that one. */
     @Test
     public void herTraceBoostsDamageOnHurtEnemies() {
         Fixture f = new Fixture();
@@ -93,18 +93,18 @@ public class ArgentiStacksTest {
                 "census: her file has the turn-start trace");
         Assertions.assertEquals(2, TriggerTables.of(ARGENTI).ruleCount(TriggerEvent.DEALING_DAMAGE),
                 "勇气 (the target's HP percentage -- no per-target vocabulary needed, because the condition's subject "
-                        + "is already the unit being hit) and 星魂 6's defence ignore");
+                        + "is already the unit being hit) and Eidolon 6's defence ignore");
     }
 
     /**
-     * 星魂 4's second half: "使天赋的效果<b>可叠加上限提高 2 层</b>" - the cap really does move.
+     * Eidolon 4's second half: "make the talent's effect <b>max stack count raise by 2</b>" - the cap really does move.
      *
-     * <p>Note: Measured on the ATTRIBUTE, and the arithmetic has a trap worth stating: 星魂 4 grants two layers at battle
+     * <p>Note: Measured on the ATTRIBUTE, and the arithmetic has a trap worth stating: Eidolon 4 grants two layers at battle
      * start and they share the talent's stack group, so a cap of 12 is reached by 2 + 10 - twelve more hits still only
      * add ten. The probe that settled it (round 66) printed, at E0 vs E4: 10 stacks / crit 0.30 against 12 stacks in the
      * group / crit 0.35 - the raise is real, and an expectation of "base + 12  x  0.025" double-counts those two layers.
      * Note: `stacksOf("升格")` is <b>not</b> usable here either: three modifier groups carry that name (the talent's crit
-     * rate, 星魂 1's crit damage, 星魂 4's battle-start pair), and a name count adds them up.
+     * rate, Eidolon 1's crit damage, Eidolon 4's battle-start pair), and a name count adds them up.
      */
     @Test
     public void theFourthEidolonRaisesTheStackCap() {

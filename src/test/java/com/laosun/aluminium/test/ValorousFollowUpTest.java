@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Relic set 315 (2 pieces): an ally's follow-up grants a stack of 功勋 (capped), each stack raises follow-up damage, and a FULL stack adds crit damage.
+ * Relic set 315 (2 pieces): an ally's follow-up grants a stack of 功勋 (merit) (capped), each stack raises follow-up damage, and a FULL stack adds crit damage.
  *
  * <p>The ally is played by a second character, and the event is fired with that ally as the actor, so the `actor is_other_ally` filter is exercised: firing it from
  * the wearer must grant nothing.

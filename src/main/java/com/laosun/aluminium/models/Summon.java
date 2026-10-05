@@ -39,7 +39,7 @@ public class Summon extends CanHit {
      * This memosprite's own skills, keyed by their <b>data slot</b> -- the number `SkillEffects` and `DefaultSkill` use.
      *
      * <p>Note: Not {@code CanHit.skills}: that map is keyed by {@link com.laosun.aluminium.enums.SkillType}, which has exactly two
-     * summon entries (亿灵技能 / 亿灵天赋), and a memosprite's own skill list runs to eighteen.
+     * summon entries (亿灵技能 / 亿灵天赋; memosprite skill / memosprite talent), and a memosprite's own skill list runs to eighteen.
      */
     private final java.util.Map<Integer, com.laosun.aluminium.models.skill.Skill> skillsByDataSlot =
             new java.util.LinkedHashMap<>();

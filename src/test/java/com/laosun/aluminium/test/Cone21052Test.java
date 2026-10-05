@@ -87,7 +87,7 @@ public class Cone21052Test {
     @Test
     public void theSpecPinsBothRules() {
         build(true);
-        // The rule is gated on 忆灵在场, and matching evaluates conditions (discipline 182): without a memosprite
+        // The rule is gated on 忆灵在场 (while the memosprite is out), and matching evaluates conditions (discipline 182): without a memosprite
         // on the field the rule does not exist at all -- measured, a fresh state found zero rules where one was expected.
         battle.summonMemosprite(wearer);
         int pinned = 0;

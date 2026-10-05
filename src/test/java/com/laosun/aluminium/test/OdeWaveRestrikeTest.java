@@ -19,11 +19,11 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1415's memosprite skill 8, the fifth clause: "若施放前目标被消灭则对<b>新入场</b>的敌方目标施放" (2026-10-02).
+ * 1415's memosprite skill 8, the fifth clause: "if the target is defeated before the cast, then cast it on a <b>newly entered</b> enemy target" (2026-10-02).
  *
  * <p>What tbgd says the clause IS, read out of `GlobalModifiers` in `Servant_CyreneServant_00_Ability.json`:
  * `MServant_CyreneServant_00_AmazingBuff_Mydeimos_OnWaveMonster` listens for <b>`OnWaveMonster`</b> and answers with
- * `TurnInsertAction{TargetType: ModifierOwnerEntity, AutoCast: true}` -- when a wave monster enters, <b>万敌 himself acts again</b>. The
+ * `TurnInsertAction{TargetType: ModifierOwnerEntity, AutoCast: true}` -- when a wave monster enters, <b>Mydei (万敌) himself acts again</b>. The
  * victims are the skill's own business, which is exactly what our `CAST_SKILL` already does.
  *
  * <p>So the clause is two facts, and both are content now: a durable mark the ode puts on him, and the restrike when a wave arrives.
@@ -60,7 +60,7 @@ public class OdeWaveRestrikeTest {
         SkillExecutor.execute(battle, ode, demiurge, List.of(mydei));
         battle.processRequests();
         Assertions.assertTrue(mydei.getBuffManager().hasState(MARK),
-                "「对万敌施放时」-- the ode leaves its mark on him");
+                "「when cast on Mydei」-- the ode leaves its mark on him");
 
         int before = mydei.getSkills().get(SkillType.SKILL).getSkillSlot();
         boolean entered = battle.getWaveManager().nextWave();
@@ -69,7 +69,7 @@ public class OdeWaveRestrikeTest {
         System.out.println("[ode] wave monsters = " + battle.waveMonsters().size() + " ; his SKILL slot " + before + " -> " + after);
 
         Assertions.assertEquals(GODSLAYER, after,
-                "「对**新入场**的敌方目标施放」-- a wave monster entering makes him restrike");
+                "「cast on a **newly entered** enemy target」-- a wave monster entering makes him restrike");
     }
 
     /** Without the ode's mark, a wave changes nothing -- the gate is the mark, not the wave. */
@@ -89,6 +89,6 @@ public class OdeWaveRestrikeTest {
         System.out.println("[ode] without the mark: his SKILL slot " + before + " -> " + after);
 
         Assertions.assertEquals(before, after,
-                "「对万敌施放时」-- the clause is about the ode reaching him, not about any wave");
+                "「when cast on Mydei」-- the clause is about the ode reaching him, not about any wave");
     }
 }

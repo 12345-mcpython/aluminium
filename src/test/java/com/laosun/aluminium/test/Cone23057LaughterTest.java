@@ -16,8 +16,8 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Light cone 2305, its laughter clause: "对自身单体施放终结技时，获得 20 点[笑点]。
- * 该效果最多触发 1 次，施放 3 次普攻后重置可触发次数".
+ * Light cone 2305, its laughter clause: "when casting the Ultimate on oneself, gain 20 [笑点].
+ * This effect triggers at most 1 time, and the number of triggers is reset after casting 3 basic attacks".
  *
  * <p>Three rules, and two of them are mutually exclusive on the same event ({@code self_stacks:普攻计数 < 2} and
  * {@code >= 2}), so the third normal attack can only take the RESET branch -- there is no "clear then add" ordering to get
@@ -74,7 +74,7 @@ public class Cone23057LaughterTest {
         System.out.println("[23057] first=" + first + " second=" + second + " after " + CYCLE
                 + " normals=" + afterReset);
         Assertions.assertEquals(GRANT, first, 1e-9, "a self-targeted Ultimate grants 20");
-        Assertions.assertEquals(GRANT, second, 1e-9, "and a second one does NOT -- 最多触发 1 次");
+        Assertions.assertEquals(GRANT, second, 1e-9, "and a second one does NOT -- at most 1 trigger");
         Assertions.assertEquals(2 * GRANT, afterReset, 1e-9,
                 "after three normal attacks the count is reset, so the next one grants again");
     }
@@ -100,7 +100,7 @@ public class Cone23057LaughterTest {
         Battle battle = battle(true);
         battle.fireTriggers(TriggerEvent.ULT_CAST, wearer, enemy, 1, 0);
         System.out.println("[23057] ult on an enemy: laughter=" + laughter());
-        Assertions.assertEquals(0, laughter(), "对自身 is the clause (false case)");
+        Assertions.assertEquals(0, laughter(), "on oneself is the clause (false case)");
     }
 
     @Test
@@ -109,7 +109,7 @@ public class Cone23057LaughterTest {
         battle.fireTriggers(TriggerEvent.ALLY_ATTACK, wearer, enemy, 1, 0, SkillCategory.BPSKILL);
         System.out.println("[23057] a Skill used as an attack: 普攻计数="
                 + wearer.getBuffManager().stacksOf(COUNT));
-        Assertions.assertEquals(0, wearer.getBuffManager().stacksOf(COUNT), "only 普攻 counts");
+        Assertions.assertEquals(0, wearer.getBuffManager().stacksOf(COUNT), "only basic attacks count");
     }
 
     @Test

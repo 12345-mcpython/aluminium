@@ -62,7 +62,7 @@ public class Character extends CanHit {
      *
      * <p>Why it exists: skill data is looked up by {@code cid} ({@code Constant.SKILLS.get(cid)}),
      * and the overworld basic attack / technique are attached only at battle start
-     * (see {@code Battle#startBattle}) - by that moment the assembly point (装配点) is long gone,
+     * (see {@code Battle#startBattle}) - by that moment the assembly point is long gone,
      * so the character has to remember its own id.
      */
     private int cid;
@@ -70,7 +70,7 @@ public class Character extends CanHit {
     /**
      * This character's own data id (its file name under {@code resources/characters/}) (2026-10-02).
      *
-     * <p>Reader: the {@code ally_cid:<cid>} selector -- "德谬歌施放忆灵技时，使<b>风堇</b>获得2层…" names a character, and nothing in the selector set could.
+     * <p>Reader: the {@code ally_cid:<cid>} selector -- "when the Demiurge (德谬歌) casts a memosprite skill, make <b>Hyacine (风堇)</b> gain 2 layers ..." names a character, and nothing in the selector set could.
      */
     public int getCid() {
         return cid;
@@ -419,7 +419,7 @@ public class Character extends CanHit {
             // parsing convention see DamageElement#fromString)
             character.setElement(DamageElement.fromString(characterData.attribute()));
             // P8-1: the energy cap follows the data. A null MUST stay 0 (= no energy bar); it must NOT fall
-            // back to 100 - 140遐蝶 is the only null in the whole data set, and a fallback would conjure
+            // back to 100 - 140 Castorice (遐蝶) is the only null in the whole data set, and a fallback would conjure
             // an energy bar for her out of thin air (P3-0 table A).
             character.setMaxEnergy(characterData.maxEnergy() != null ? characterData.maxEnergy() : 0);
             // P8-: the character's mechanics as data. Always non-null -- an unregistered character

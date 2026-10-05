@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1309 知更鸟 (Robin): the first character whose <b>行迹 extra abilities</b> are wired, and the first
+ * 1309 Robin (知更鸟): the first character whose <b>trace extra abilities</b> are wired, and the first
  * test of "one character, several mechanics" (her talent was already authored in the same file).
  *
  * <p><b>Why this class is the extensibility evidence, not just a character test.</b> Both rules
@@ -42,7 +42,7 @@ public class RobinTraceTest {
     private static final double EPS = 1e-9;
 
     /**
-     * "战斗开始时，自身行动提前25%" - 25% of the wait still ahead, not 25% of the round.
+     * "at the start of the battle, advance its own action by 25%" - 25% of the wait still ahead, not 25% of the round.
      */
     @Test
     public void battleStartAdvancesHerByAQuarterOfTheRemainingWait() {
@@ -56,13 +56,13 @@ public class RobinTraceTest {
     }
 
     /**
-     * "施放战技时额外恢复5点能量" - her own skill, and only her own.
+     * "when casting the Skill, additionally restore 5 points of energy" - her own skill, and only her own.
      *
      * <p>The absolute numbers are not 0/5: the skill <b>action</b> itself already credits the caster
      * 30 energy irrespective of any trigger rule (it is credited to whoever cast, which is why the
      * ally case below leaves her at 0). That 30 is therefore not asserted here - it belongs to the
      * energy model, not to this trace. What is asserted is the difference the rule makes, which is
-     * exactly the word "额外" in the text.
+     * exactly the word "additional" in the text.
      */
     @Test
     public void castingHerOwnSkillGrantsTheExtraFiveEnergy() {
@@ -80,16 +80,16 @@ public class RobinTraceTest {
     @Test
     public void anAllysSkillDoesNotFeedHer() {
         Assertions.assertEquals(0.0, robinEnergyAfterSkillCast(true, 1), EPS,
-                "「施放战技时」 means HER skill -- drop `actor == self` and this becomes 5");
+                "「when casting the Skill」 means HER skill -- drop `actor == self` and this becomes 5");
     }
 
     /**
-     * "施放战技时" must not fire on a <b>basic attack</b>.
+     * "when casting the Skill" must not fire on a <b>basic attack</b>.
      *
      * <p>This is the test that found the bug rather than pinning a known behaviour: {@code SKILL_CAST}
      * used to mean "any cast that is not an ultimate" (the emitter only split ultimate from everything
      * else), so her own basic attacks were paying her the extra 5 as well. Her relic-109 sibling - 
-     * "施放战技时攻击力提高20%" - had the same over-trigger, shipped, with a note claiming the
+     * "when casting the Skill, ATK is increased by 20%" - had the same over-trigger, shipped, with a note claiming the
      * emitter's split already handled it.
      */
     @Test
@@ -97,7 +97,7 @@ public class RobinTraceTest {
         double withTrace = robinEnergyAfterSkillCast(true, 0, SkillType.COMMON);
         double withoutTrace = robinEnergyAfterSkillCast(false, 0, SkillType.COMMON);
         Assertions.assertEquals(0.0, withTrace - withoutTrace, EPS,
-                "「施放战技时」 is the Skill slot, not 普攻: a basic attack must not feed her the extra 5");
+                "「when casting the Skill」 is the Skill slot, not a basic attack: a basic attack must not feed her the extra 5");
     }
 
     /**
@@ -107,7 +107,7 @@ public class RobinTraceTest {
     @Test
     public void herEarlierTalentStillFiresAndABasicAttackIsNotASkillCast() {
         Assertions.assertEquals(2.0, robinEnergyAfterSkillCast(true, 1, SkillType.COMMON), EPS,
-                "talent: 我方目标攻击敌方目标后 → +2 energy (flat per attack, not per target)");
+                "talent: after one of our targets attacks an enemy target -> +2 energy (flat per attack, not per target)");
     }
 
     // ==================================================================

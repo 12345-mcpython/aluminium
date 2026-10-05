@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1412's 星魂 星魂 1: "持有[军功]的角色造成伤害时无视目标16%的防御力".
+ * 1412's eidolon 1: "a character holding [军功] ignores 16% of the target's defence when dealing damage".
  *
  * <p>The clause mirrors its own gate: same event, same target, same length. Two ways -- with the gating skill cast the
  * marked unit ignores the stated share, and without it nothing is stated.
@@ -29,7 +29,7 @@ public class KephaleEidolonTest {
 
     @Test
     public void theMarkedUnitIgnoresItsShareOfDefence() {
-        Assertions.assertEquals(0.16, marked(true), EPS, "持有【军功】的角色造成伤害时无视目标16%的防御力");
+        Assertions.assertEquals(0.16, marked(true), EPS, "a character holding [军功] ignores 16% of the target's defence when dealing damage");
         Assertions.assertEquals(0.0, marked(false), EPS, "without the gate nothing is stated");
     }
 

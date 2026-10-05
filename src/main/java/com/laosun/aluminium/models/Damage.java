@@ -136,7 +136,7 @@ public class Damage {
      * The <b>toughness reduction this instance intends</b>, recorded by {@code SkillExecutor} before the instance is
      * settled (2026-09-28).
      *
-     * <p>"对处于弱点击破状态的敌方目标造成伤害后，会将本次伤害的<b>削韧值</b>转化为 1 次超击破伤害"（1321 大丽花）needs a number
+     * <p>"对处于弱点击破状态的敌方目标造成伤害后，会将本次伤害的<b>削韧值</b>转化为 1 次超击破伤害"(1321 Dahlia (大丽花)) needs a number
      * no rule could otherwise reach: the reduction is computed beside the damage and only {@code applyStanceDamage} ever
      * sees it. It travels on the instance for the same reason {@code addFlat} and {@code fixedCrit} do - the instance is
      * what a {@code DEALING_DAMAGE} rule is handed, and the settlement is still in progress.
@@ -344,7 +344,7 @@ public class Damage {
      *
      * <p><b>Where it enters.</b> The <b>base layer</b>: {@code Battle.assemble} adds it before the first zone, so the
      * addition takes crit / DMG boost / defence / resistance exactly like the skill multiplier does. That is the
-     * documented decision (ROADMAP M-55, {@code engine.md} 乘区表) rather than an accident: "伤害<b>值</b>提高" names a
+     * documented decision (ROADMAP M-55, {@code engine.md} the zone table (乘区表)) rather than an accident: "伤害<b>值</b>提高" names a
      * value, and a value that did not crit would be a different mechanic from the one the text describes.
      *
      * @param value the amount to add (may be negative, and the assembled total is still floored at 1)

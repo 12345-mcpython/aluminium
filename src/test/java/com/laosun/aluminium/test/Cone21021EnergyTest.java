@@ -14,11 +14,11 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 光锥 21021 等价交换，技能 酣适：`当装备者的回合开始时，随机为 1 个当前能量百分比小于 50% 的我方其他目标
- * 恢复 8 点能量`（原文：`for a randomly chosen ally (excluding the wearer) whose current Energy is lower than 50%`）。
+ * Light cone 21021 Equivalent Exchange (光锥 21021 等价交换), skill 酣适: `当装备者的回合开始时，随机为 1 个当前能量百分比小于 50% 的我方其他目标
+ * 恢复 8 点能量` (the original: `for a randomly chosen ally (excluding the wearer) whose current Energy is lower than 50%`).
  *
- * <p>Note: 三个对照一次说清三件事：装备者自己不被选（`excluding the wearer`）；满能量的队友不被选（阈值）；
- * 只有那个 30% 的队友被恢复，且恢复的是 8 点（阶 1）。
+ * <p>Note: three controls settle three things at once: the wearer itself is not picked (`excluding the wearer`); a teammate at full energy is not picked (the threshold);
+ * and only that 30% teammate is restored, by 8 points (superimposition 1).
  */
 public class Cone21021EnergyTest {
     private static final int WEARER = 1003;
@@ -28,7 +28,7 @@ public class Cone21021EnergyTest {
     private static final int LEVEL = 80;
     private static final double AMOUNT = 8;
 
-    /** 装 21021（阶 1）、放一个 TURN_START，返回 {装备者, 30% 的队友, 满的队友} 各自的能量增量。 */
+    /** Wears 21021 (superimposition 1), fires one TURN_START, and returns the energy gain of the {wearer, 30% teammate, full teammate}. */
     private static double[] gainsAtTurnStart() {
         Character wearer = CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(21021, LEVEL, false, 1));
         Character low = CharacterFactory.create(ALLY_LOW, LEVEL);
@@ -37,9 +37,9 @@ public class Cone21021EnergyTest {
         Battle battle = new Battle(List.of(wearer, low, full), List.of(enemy), new Random(0));
         battle.startBattle();
 
-        wearer.setCurrentEnergy(wearer.getMaxEnergy());          // Note: 装备者满能量：若被选中，会看得很清楚
-        low.setCurrentEnergy(low.getMaxEnergy() * 0.3);          // Note: 低于 50%
-        full.setCurrentEnergy(full.getMaxEnergy());               // Note: 不低于 50%
+        wearer.setCurrentEnergy(wearer.getMaxEnergy());          // Note: the wearer at full energy: if it were picked, that would be plainly visible
+        low.setCurrentEnergy(low.getMaxEnergy() * 0.3);          // Note: below 50%
+        full.setCurrentEnergy(full.getMaxEnergy());               // Note: not below 50%
 
         double w0 = wearer.getCurrentEnergy();
         double l0 = low.getCurrentEnergy();
@@ -61,18 +61,18 @@ public class Cone21021EnergyTest {
                 "the wearer is excluded by the text itself: a randomly chosen ally (excluding the wearer)");
     }
 
-    // 这里原本还有一个"只有装备者低于 50%"的场景（以及一个"不装光锥"的对照）。它们被撤掉了，因为那一次
-    // 暴露了一个真实的引擎缺口，而不是判据写错：
+    // There used to be another scene here, "only the wearer is below 50%" (plus a "no light cone" control). They were withdrawn, because that one
+    // exposed a real engine gap, not a case written wrong:
     //
-    //   require(…) 在 resolveTarget 返回 null 时抛
+    //   require(...) throws when resolveTarget returns null
     //   "Effect targets "random_ally_below_half_energy" but this event has no such party"
     //
-    // Note: 而"随机选一个"可以合法地没有候选（装备者是唯一低能量的 so 被排除 so 合格集为空）。正确语义是
-    // "什么都不做"，而 require 把它当成了错误。Note: 那句话是泛型消息（一个共用的助手对所有选择器说同一句），
-    // 所以它把诊断引向了"事件类型不对" -  - 实测证明那不对（'不装光锥' 的对照得到 0，说明那 8 点确实来自本从句）。
+    // Note: while "pick one at random" may legitimately have no candidate (the wearer is the only one low on energy, so it is excluded, so the qualifying set is empty). The correct semantics is
+    // "do nothing", and require treated that as an error. Note: that message is generic (one shared helper says the same sentence to every selector),
+    // so it pointed the diagnosis at "the event type is wrong" -- measured, that was wrong (the 'no light cone' control got 0, which says those 8 points really do come from this clause).
     //
-    // 缺口已补（`8c2ba29`：`resolveTargets` 对这一个名字返回空列表，照 `lowest_hp_ally` 的先例），
-    // 所以这个场景回来了 -  - 而它是唯一能让变异必红的那一个，见下面的注释。
+    // The gap has been closed (`8c2ba29`: `resolveTargets` returns an empty list for this one name, following the `lowest_hp_ally` precedent),
+    // so that scene is back -- and it is the one that makes the mutation necessarily red, see the note below.
     @Test
     public void aLoneLowWearerIsStillExcluded() {
         Character wearer = CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(21021, LEVEL, false, 1));
@@ -82,7 +82,7 @@ public class Cone21021EnergyTest {
         Battle battle = new Battle(List.of(wearer, a, b), List.of(enemy), new Random(0));
         battle.startBattle();
 
-        wearer.setCurrentEnergy(wearer.getMaxEnergy() * 0.3);   // Note: 唯一低于 50% 的
+        wearer.setCurrentEnergy(wearer.getMaxEnergy() * 0.3);   // Note: the only one below 50%
         a.setCurrentEnergy(a.getMaxEnergy());
         b.setCurrentEnergy(b.getMaxEnergy());
 
@@ -94,8 +94,8 @@ public class Cone21021EnergyTest {
         double x = a.getCurrentEnergy() - a0;
         double y = b.getCurrentEnergy() - b0;
         System.out.println("[21021] lone-low wearer=" + w + " allyA=" + x + " allyB=" + y);
-        // Note: 这个场景是变异探测用的：合格集里只有装备者一个候选（队友都满），于是"排除装备者"与
-        // "低于 50%"这两条无论哪一条被拆掉，候选都会变成那一个 -  - 随机在这里退化成确定，增量不再是 0。
+        // Note: this scene is for mutation probing: the qualifying set has the wearer as its only candidate (the teammates are all full), so whether "exclude the wearer" or
+        // "below 50%" is torn out, the candidate becomes that one -- here the random degenerates into certainty, and the gain is no longer 0.
         Assertions.assertEquals(0.0, w, 1e-9, "the wearer is never a candidate, low or not");
         Assertions.assertEquals(0.0, x, 1e-9, "an ally at full energy is above the threshold");
         Assertions.assertEquals(0.0, y, 1e-9, "and so is the other one");

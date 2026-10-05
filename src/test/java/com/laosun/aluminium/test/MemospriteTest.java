@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 忆灵 (memosprite) panels: a summon whose stat block is <b>derived from its summoner</b> (P9-4).
+ * memosprite (忆灵) panels: a summon whose stat block is <b>derived from its summoner</b> (P9-4).
  *
  * <p><b>Why the panel is data, and why it is stated as an inheritance.</b> Every memosprite in the documents
  * is described that way - "等同于阿格莱雅 35% 速度的速度以及等同于阿格莱雅 66% 生命上限 + 20 的生命上限",
@@ -37,8 +37,8 @@ import java.util.Random;
  * <ol>
  *   <li>the share is taken from the summoner's <b>current</b> sheet, not from a snapshot or from monster
  *       data - the case changes her speed and HP and expects the memosprite to follow;</li>
- *   <li>the flat term is added after the share (阿格莱雅's 20), and a flat-only entry is
- *       <b>not</b> a share of anything (长夜月's fixed 160 speed);</li>
+ *   <li>the flat term is added after the share (Aglaea's 20), and a flat-only entry is
+ *       <b>not</b> a share of anything (Evernight's fixed 160 speed);</li>
  *   <li>a panel entry <b>replaces</b> an attribute rather than adding to it, so a spec that forgets HEALTH
  *       or SPEED describes a unit that cannot exist - rejected at load, not at battle time;</li>
  *   <li>the memosprite is our side's, so it lands in {@code allies} and never in {@code characters}
@@ -48,11 +48,11 @@ import java.util.Random;
 public class MemospriteTest {
     private static final double EPS = 1e-6;
 
-    /** 阿格莱雅 - 衣匠's panel is two shares; her id is used by no other test. */
+    /** Aglaea - the 衣匠's panel is two shares; her id is used by no other test. */
     private static final int AGLAEA = 1402;
-    /** 长夜月 - "长夜"'s panel is one share and one flat value. */
+    /** Evernight - "长夜"'s panel is one share and one flat value. */
     private static final int CASTORICE_LIKE = 1413;
-    /** 姬子 - a character with no memosprite, used for the "absent is an ordinary state" cases. */
+    /** Himeko - a character with no memosprite, used for the "absent is an ordinary state" cases. */
     private static final int NO_MEMOSPRITE = 1003;
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
@@ -62,7 +62,7 @@ public class MemospriteTest {
     // ==================================================================
 
     /**
-     * 衣匠's panel is 阿格莱雅's, per her own text: 35% of her speed, 66% of her Max HP plus 20.
+     * The 衣匠's panel is Aglaea's, per her own text: 35% of her speed, 66% of her Max HP plus 20.
      *
      * <p>The flat term is the point of the second assertion: a share alone would be a different number at
      * every level, and the game's own figure has a constant in it.
@@ -92,7 +92,7 @@ public class MemospriteTest {
     @Test
     public void thePanelFollowsWhateverTheSummonerIsWearing() {
         Character bare = CharacterFactory.create(AGLAEA, LEVEL);
-        // Set 302 (不老者的仙舟) is the one whose 2-piece grants HPAddedRatio; 301's grants ATK.
+        // Set 302 (the 不老者的仙舟 set) is the one whose 2-piece grants HPAddedRatio; 301's grants ATK.
         Character equipped = CharacterFactory.create(AGLAEA, LEVEL, true, null,
                 RelicFactory.suit(302, 5, 15));
         // Also differ in speed, which relics alone might not move.
@@ -109,7 +109,7 @@ public class MemospriteTest {
                 "so the memosprite's panel moved with her: " + equippedHp + " vs " + bareHp);
     }
 
-    /** 长夜月: a flat speed is <b>not</b> a share of hers, while her HP share is. */
+    /** Evernight: a flat speed is <b>not</b> a share of hers, while her HP share is. */
     @Test
     public void aFlatEntryIsNotAShareOfAnything() {
         Character castorice = CharacterFactory.create(CASTORICE_LIKE, LEVEL);
@@ -210,7 +210,7 @@ public class MemospriteTest {
     }
 
     // ==================================================================
-    // 2b. Aggro: the servant''s own 仇恨 line
+    // 2b. Aggro: the servant''s own 仇恨 (aggro) line
     // ==================================================================
 
     /**
@@ -258,17 +258,17 @@ public class MemospriteTest {
     }
 
     // ==================================================================
-    // 2c. 忆灵技能 2: "长夜"免疫控制类负面状态
+    // 2c. 忆灵技能 (memosprite skill) 2: "长夜" is immune to control-class negative states
     // ==================================================================
 
     /**
      * "'长夜'免疫控制类负面状态" - the <b>summon</b> is immune, and the summoner is not.
      *
      * <p><b>Why the pair of assertions.</b> "The control did not land" is also what a broken pipeline looks like, so
-     * the same call is made against 长夜月 herself: it lands there. The difference is the only thing that can be the
+     * the same call is made against Evernight herself: it lands there. The difference is the only thing that can be the
      * immunity, and the immunity is a buff on the unit the document names.
      *
-     * <p>Note: Note which unit carries it. The rule is written on 长夜月's table (the engine's tables live on characters)
+     * <p>Note: Note which unit carries it. The rule is written on Evernight's table (the engine's tables live on characters)
      * but its effect targets {@code summon}, because "长夜" is the one the sentence protects - a control aimed at her
      * while "长夜" stands beside her is unaffected.
      */
@@ -278,7 +278,7 @@ public class MemospriteTest {
         Battle battle = new Battle(List.of(evernight), List.of(monster()), fixed(0.0));
         battle.startBattle();
         Summon evey = battle.memospriteOf(evernight);
-        Assertions.assertNotNull(evey, "precondition: her 天赋 summons 「长夜」 at BATTLE_START");
+        Assertions.assertNotNull(evey, "precondition: her 天赋 (talent) summons 「长夜」 at BATTLE_START");
         // The immunity is what is being measured, so the ordinary resistance is zeroed out on both sides.
         evey.setAttribute(AttributeType.EFFECT_RESISTANCE, new DoubleValue(0));
         evernight.setAttribute(AttributeType.EFFECT_RESISTANCE, new DoubleValue(0));
@@ -295,7 +295,7 @@ public class MemospriteTest {
                         + "control path that quietly stopped working");
     }
 
-    /** The class is 控制类: "长夜"'s immunity must not make it immune to a burn (持续伤害类). */
+    /** The class is 控制类 (control class): "长夜"'s immunity must not make it immune to a burn (持续伤害类, DOT class). */
     @Test
     public void theMemospriteIsStillBurnable() {
         Character evernight = CharacterFactory.create(CASTORICE_LIKE, LEVEL);
@@ -463,7 +463,7 @@ public class MemospriteTest {
         };
     }
 
-    /** 冻结 from the game's own control table - the state "长夜" is immune to. */
+    /** A freeze from the game's own control table - the state "长夜" is immune to. */
     private static ControlBuff frozen() {
         return new ControlBuff(Constant.CONTROL_EFFECTS.get("FROZEN"), 2);
     }

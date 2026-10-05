@@ -20,7 +20,7 @@ import java.util.Random;
  * (round 131 measured `STAT_CTRL_Frozen` at 1.0, which clamps the chance to 0). A 100% BASE chance still rolls, so an
  * unresisting target is what makes this deterministic.
  *
- * <p>Registered in his file: the bounce (an engine bug today), the speed-down roll, [失重], the 减速-gated talent, his
+ * <p>Registered in his file: the bounce (an engine bug today), the speed-down roll, [失重], the slow-gated (减速) talent, his
  * traces and eidolons.
  */
 public class WeltTest {

@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Resource-change forwarding (2026-09-30): 1506 银狼LV.999's "获得笑点时，获得等量[隐藏分]".
+ * Resource-change forwarding (2026-09-30): 1506 Silver Wolf LV.999 (银狼LV.999)'s "when gaining a laugh, gains an equal amount of [隐藏分]".
  *
  * <p>The source is 1505's skill, which grants ten SHARED laughs: the battle's laugh counter moves, the change carries that
  * resource's name and its delta, and 1506 turns it into the same number of [隐藏分]. The false case is the same cast with

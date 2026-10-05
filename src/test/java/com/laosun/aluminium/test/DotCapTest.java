@@ -22,8 +22,7 @@ import java.util.Random;
  * applications past the ceiling are inert (they are not removed: `DotBuff.isSameKind` answers `false`, so a DOT is never
  * evicted, and the extra layers simply sit there).
  *
- * <p>Note: <b>What is NOT implemented</b>: 130Black Swan's extra sentence "层数达到上限后可继续叠加，<b>产生伤害后移除超出上限的
- * 层数</b>" - the excess layers are removed after the damage. It is stated for ONE state, so applying it to every capped DOT
+ * <p>Note: <b>What is NOT implemented</b>: 130 Black Swan's extra sentence "after the layer count reaches its cap it can keep stacking, and <b>the layers beyond the cap are removed after the damage is dealt</b>" - the excess layers are removed after the damage. It is stated for ONE state, so applying it to every capped DOT
  * would be an inference rather than a reading; it stays registered. Likewise no refresh policy is invented: the corpus has
  * <b>zero</b> sentences describing what a re-application does to a duration.
  *

@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 开拓者(毁灭)'s 行迹 坚韧: "天赋的效果每层同时使开拓者的防御力提高10%" -- the counter scale again, on a counter the
+ * 开拓者(毁灭)'s trace 坚韧: "each layer of the talent's effect also raises the Trailblazer's DEF by 10%" -- the counter scale again, on a counter the
  * character's own talent marks.
  *
  * <p>Both the counter's name and the tally come from the data: the name is copied out of the JSON by the script that wrote
@@ -56,7 +56,7 @@ public class TrailblazerDefencePerStackTest {
                 "precondition: the talent marked exactly " + layers + " layer(s)");
         double after = trailblazer.getAttribute(AttributeType.DEFENCE).get();
         Assertions.assertEquals(shareOfBase * base, after - before, EPS,
-                "「天赋的效果每层同时使开拓者的"
-                        + "防御力提高10%」 with " + layers + " layer(s)");
+                "\"each layer of the talent's effect also raises the Trailblazer's "
+                        + "DEF by 10%\" with " + layers + " layer(s)");
     }
 }

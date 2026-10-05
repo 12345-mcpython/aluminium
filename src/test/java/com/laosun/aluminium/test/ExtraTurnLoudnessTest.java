@@ -19,7 +19,7 @@ import java.util.Random;
  * An {@code EXTRA_TURN} that cannot be granted must SAY SO (2026-10-02).
  *
  * <p>Found while writing 1415's ode of genesis: `Queue.grantExtraTurn` returns false for a unit that is not in the action order, and a memosprite
- * at Speed 0 is skipped by `Queue.addCombatant` (a fix shipped earlier this session). The op dropped that answer, so a rule granting 德谬歌 an
+ * at Speed 0 is skipped by `Queue.addCombatant` (a fix shipped earlier this session). The op dropped that answer, so a rule granting Demiurge (德谬歌) an
  * extra turn looked like it had worked -- the judge read `extra turn actor = none` and nothing anywhere said why.
  *
  * <p>Two cases on purpose: the refusal must be loud, AND an ordinary character that CAN take an extra turn must still get one. A guard that

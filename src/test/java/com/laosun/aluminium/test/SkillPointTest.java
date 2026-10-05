@@ -297,7 +297,7 @@ public class SkillPointTest {
     /**
      * Has {@code actor} take one action through the real flow, and finishes it ({@code afterMove}).
      *
-     * <p>The one whose action value arrives first may be the enemy (冰锋 has speed 132 > Himeko's 96), so we have to
+     * <p>The one whose action value arrives first may be the enemy (Ice Edge (冰锋) has speed 132 > Himeko's 96), so we have to
      * skip ahead to the actor's turn.
      */
     private static boolean actWithRealTurn(Battle battle, CanHit actor, Supplier<Skill> skill,

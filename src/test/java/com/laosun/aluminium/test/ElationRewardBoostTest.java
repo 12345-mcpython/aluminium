@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * "触发行迹…的获得好活当赏效果时，额外获得等同于本次的 50%" - 1505 星魂 (2026-10-02).
+ * "触发行迹…的获得好活当赏效果时，额外获得等同于本次的 50%" - 1505 Eidolon (星魂) (2026-10-02).
  *
  * <p>FILE-DRIVEN and TWO-WAY on the EIDOLON RANK itself: at rank 1 the trace's capped credit gains its 50% on top; at
  * rank 0 the same gain credits exactly the capped amount, which is what the older guards already assert.

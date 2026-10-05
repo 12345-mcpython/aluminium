@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1306 花火's 星魂 2 (强化前): "天赋每层效果额外使我方目标造成伤害时无视目标8%的防御力".
+ * 1306 Sparkle (花火)'s eidolon 2 (before enhancement): "each layer of the talent additionally makes our targets ignore 8% of the target's defence when dealing damage".
  *
  * <p>The layers are the talent's own, which is why that modifier had to be named first; the value is read with the counter
  * scale, and DEFENCE_IGNORE is a ratio attribute, so that is the right shape. Three ways: rank 2 states 8% per layer, the
@@ -32,7 +32,7 @@ public class SparkleEidolonTest {
     public void rankTwoTurnsEachTalentLayerIntoEightPercentDefenceIgnore() {
         Assertions.assertEquals(0.08, ignoreAfter(2, 1), EPS, "one layer is 8%");
         Assertions.assertEquals(0.24, ignoreAfter(2, 3), EPS, "three layers, the talent's cap, are 24%");
-        Assertions.assertEquals(0.0, ignoreAfter(0, 3), EPS, "星魂2 is the gate: without it nothing is stated");
+        Assertions.assertEquals(0.0, ignoreAfter(0, 3), EPS, "eidolon 2 is the gate: without it nothing is stated");
     }
 
     private static double ignoreAfter(int rank, int layers) {

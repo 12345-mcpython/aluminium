@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * "在一次行动中受到致命攻击的<b>全体</b>" -- one set, not one save per blow (2026-10-02).
+ * "all <b>of those</b> lethally hit in one action" -- one set, not one save per blow (2026-10-02).
  *
  * <p>Reader: 140月茇之庇. Its first half was already in the engine (`BuffManager.defersDeath()`: a state may hold the death instead of
  * committing it), and what was missing was this: the SAME action can land a lethal blow on several allies and the effect has to reach all
@@ -73,7 +73,7 @@ public class LethalSetTest {
         System.out.println("[lethal] second blow, same action: first +" + (speed(first) - firstBase)
                 + " second +" + (speed(second) - secondBase));
         Assertions.assertTrue(speed(second) > secondBase, "the second victim joins the set");
-        Assertions.assertTrue(speed(first) > firstBase, "「全体」-- the first is still reached by the effect");
+        Assertions.assertTrue(speed(first) > firstBase, "\"all\" -- the first is still reached by the effect");
 
         battle.afterMove();
         battle.processRequests();
@@ -83,7 +83,7 @@ public class LethalSetTest {
                 + " third +" + (speed(third) - thirdBase));
         Assertions.assertTrue(speed(third) > thirdBase, "the new action's victim is in the set");
         Assertions.assertEquals(secondAfterBoundary, speed(second), 1e-6,
-                "「在**一次行动**中」-- a blow from the previous action is not");
+                "\"in **one action**\" -- a blow from the previous action is not");
     }
 
     private static void blow(Battle battle, Character victim) {

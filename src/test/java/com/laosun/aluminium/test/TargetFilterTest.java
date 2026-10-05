@@ -19,8 +19,8 @@ import java.util.Random;
 /**
  * <b>Per-target conditions</b> (2026-09-28, {@code M-53}): an effect's {@code target_when}.
  *
- * <p><b>The sentences that needed it.</b> "对所有<b>触电状态下的</b>敌方目标造成…附加伤害"(1103's talent), "使<b>非触电状态下的</b>
- * 敌方目标陷入触电"(her 星魂 4) and "对<b>生命百分比 <= 30% 的</b>我方目标附加持续治疗"(1105's 星魂 2). A rule's own conditions
+ * <p><b>The sentences that needed it.</b> "deals additional damage to all enemies <b>in the shocked state</b>" (1103's talent), "makes enemies <b>not in the shocked state</b>
+ * fall into shock" (her 星魂 (Eidolon) 4) and "attaches continuous healing to our targets <b>whose HP percentage is <= 30%</b>" (1105's 星魂 (Eidolon) 2). A rule's own conditions
  * filter the <b>rule</b>, so "all shocked enemies" could previously only be spelled as "the enemy I hit was shocked" - 
  * which then also hit the unshocked ones. The selector says which units; this filter says which of them qualify.
  *

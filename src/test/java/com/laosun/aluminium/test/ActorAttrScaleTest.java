@@ -20,8 +20,8 @@ import java.util.Random;
 /**
  * `actor_attr:<ATTRIBUTE>`: a magnitude that is a share of the ACTOR's own attribute (2026-10-02).
  *
- * <p>Reader: 1415's memosprite skill 10 "献予'创世'之诗" -- "<b>对开拓者-记忆施放时</b>，使开拓者-记忆的攻击力提高，提高数值等同于<b>德谬歌生命上限</b>的
- * #1%". Read that carefully: the rule belongs to 开拓者-记忆, but the share is of <b>德谬歌</b> -- the unit doing the casting. Neither
+ * <p>Reader: 1415's memosprite skill 10 "献予'创世'之诗" -- "<b>when cast on 开拓者-记忆</b>, raise 开拓者-记忆's ATK, the raise being equal to
+ * #1% of <b>德谬歌's Max HP</b>". Read that carefully: the rule belongs to 开拓者-记忆, but the share is of <b>德谬歌</b> -- the unit doing the casting. Neither
  * `self_attr:` (the owner) nor `summon_attr:` (the owner's memosprite, which for 800is 迷迷) names that unit; the actor does.
  *
  * <p>So this judge is deliberately THREE-way: the gain must equal the actor's share, and must not equal the owner's -- which is the exact
@@ -71,7 +71,7 @@ public class ActorAttrScaleTest {
                 + " ; 10% of the actor = " + fromActor + " ; 10% of the owner = " + fromOwner);
 
         Assertions.assertEquals(fromActor, gained, Math.abs(fromActor) * 1e-6,
-                "「提高数值等同于**德谬歌**生命上限的 #1%」-- the ACTOR is the unit the share is of");
+                "the raise is equal to #1% of **德谬歌**'s Max HP\" -- the ACTOR is the unit the share is of");
         Assertions.assertNotEquals(fromOwner, gained, Math.abs(fromActor) * 1e-6,
                 "and the rule owner is a different unit here, so the two readings are distinguishable");
     }

@@ -14,10 +14,10 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1506 银狼LV.999 仓库技"999安全卫士": "若敌方目标对我方施加了控制类负面状态，则使我方全体获得[防火墙]…该效果每个波次最多触发 1 次".
+ * 1506 Silver Wolf LV.999's warehouse technique "999安全卫士" (999 Security Guard): "若敌方目标对我方施加了控制类负面状态，则使我方全体获得[防火墙]…该效果每个波次最多触发 1 次" (if an enemy applies a control-class negative state to our side, all of our side gains [防火墙], and this effect triggers at most once per wave).
  *
  * <p>This is what three shipped pieces were for: the warehouse LOAD POINT (she is owned but not deployed), the CONTROL-CLASS FILTER
- * ("控制类负面状态"), and the PER-WAVE CAP ("每个波次最多触发 1 次"). The rule itself is read from the real content file
+ * ("控制类负面状态", control-class negative states), and the PER-WAVE CAP ("每个波次最多触发 1 次", at most once per wave). The rule itself is read from the real content file
  * `resources/warehouse/1506.json` -- so the readings below are about the file, not about a scene built in this test.
  *
  * <p>Timing is the document's own: the control that TRIGGERS the clause still lands; [防火墙] is what immunises the ones after it.

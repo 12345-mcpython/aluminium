@@ -46,11 +46,11 @@ import java.util.Random;
 public class BuffLifetimeTest {
     private static final double EPS = 1e-6;
 
-    /** 姬子 - the plain character, and the one whose attacks this class drives. */
+    /** Himeko (姬子) - the plain character, and the one whose attacks this class drives. */
     private static final int OWNER = 1003;
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
-    /** 星体差分机 / Celestial Differentiator - "持续到施放首次攻击后结束". */
+    /** 星体差分机 (Celestial Differentiator) - "lasts until the first attack is cast, then ends". */
     private static final int STELLAR_DIFFERENTIATOR = 305;
 
     // ==================================================================

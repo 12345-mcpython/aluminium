@@ -25,7 +25,7 @@ import java.util.Random;
  *
  * <p><b>Where this sits in the chain.</b> {@code resources/memosprites/<cid>.json} says how a memosprite's
  * panel derives from its summoner, {@code Battle.summonMemosprite} puts one on the field, and this op is what
- * lets <b>content</b> ask for it: "进入战斗时召唤忆灵'长夜'" (1413) and "召唤忆灵衣匠" (1402) are now rule files
+ * lets <b>content</b> ask for it: "summon the memosprite '长夜' on entering battle" (1413) and "summon the memosprite 衣匠" (1402) are now rule files
  * rather than prose.
  *
  * <p><b>Three design choices, each pinned below.</b>
@@ -34,7 +34,7 @@ import java.util.Random;
  *       at - and a stray {@code target} is <b>refused</b> rather than quietly ignored (a stray argument is a
  *       rule that does something other than what the file says);</li>
  *   <li>idempotent per summoner: firing again keeps the memosprite already out, because two copies of it
- *       would be a wrong state the player cannot see. The documents' "若已在场，则使其生命值回复至上限" is the
+ *       would be a wrong state the player cannot see. The documents' "if already on the field, its HP is restored to its maximum" is the
  *       refresh, and that is <b>not</b> modelled - a no-op is the honest stand-in;</li>
  *   <li>a character whose rules use this op but has no memosprite spec is refused <b>when the character is
  *       built</b>, not mid-battle: only the assembly point knows both the cid and the merged rules, since a
@@ -44,9 +44,9 @@ import java.util.Random;
 public class SummonOpTest {
     private static final double EPS = 1e-6;
 
-    /** 长夜月 - "进入战斗时召唤忆灵'长夜'", authored in characters/1413.json. */
+    /** 长夜月 - "summon the memosprite '长夜' on entering battle", authored in characters/1413.json. */
     private static final int CASTORICE_LIKE = 1413;
-    /** 阿格莱雅 - "召唤忆灵衣匠" on her Ultimate, authored in characters/1402.json. */
+    /** 阿格莱雅 - "summon the memosprite 衣匠" on her Ultimate, authored in characters/1402.json. */
     private static final int AGLAEA = 1402;
     /** 姬子 - a character with no memosprite spec, for the refusal cases. */
     private static final int NO_MEMOSPRITE = 1003;

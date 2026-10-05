@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * "天赋的反击效果每回合可触发的次数<b>增加1次</b>" / "冻结敌方目标的<b>基础概率</b>提高15%" - a rule that raises a number on
+ * "raise the number of times the talent's counter effect can trigger per turn by <b>1</b>" / "raise the <b>base chance</b> to freeze the enemy target by 15%" - a rule that raises a number on
  * <b>another rule</b>.
  *
  * <p><b>Why the vocabulary needed it.</b> The two shapes that look like they work are both wrong, and both are wrong by
@@ -54,8 +54,8 @@ public class RuleAmendmentTest {
         int withoutAmendment = counterFirings(false);
         int withAmendment = counterFirings(true);
 
-        Assertions.assertEquals(2, withoutAmendment, "「每回合可触发2次」 is the rule's own number");
-        Assertions.assertEquals(3, withAmendment, "…and 「增加1次」 raises it to three, not to five");
+        Assertions.assertEquals(2, withoutAmendment, "\"can trigger 2 times per turn\" is the rule's own number");
+        Assertions.assertEquals(3, withAmendment, "…and \"raise by 1\" raises it to three, not to five");
     }
 
     /**
@@ -166,18 +166,18 @@ public class RuleAmendmentTest {
     }
 
     // ==================================================================
-    // The shipped content: 1001 星魂 4 and 行迹"冰咒"
+    // The shipped content: 1001 Eidolon 4 and trace "冰咒"
     // ==================================================================
 
     /** Her file ships both raises: the counter's cap and the ultimate's chance. */
     @Test
     public void theShippedFileCarriesBothRaises() {
         Assertions.assertEquals(3, counterFiringsWithHerFile(4),
-                "星魂 4's 「每回合可触发的次数增加1次」 raises the talent's 2 to 3");
+                "Eidolon 4's \"raise the number of times it can trigger per turn by 1\" raises the talent's 2 to 3");
         Assertions.assertEquals(2, counterFiringsWithHerFile(3),
-                "…and below 星魂 4 the talent still fires twice");
+                "…and below Eidolon 4 the talent still fires twice");
         Assertions.assertTrue(freezeLandsWithHerFile(0.6),
-                "行迹「冰咒」 raises the ultimate's 0.5 to 0.65, so a 0.6 roll freezes");
+                "trace \"冰咒\" raises the ultimate's 0.5 to 0.65, so a 0.6 roll freezes");
         Assertions.assertFalse(freezeLandsWithHerFile(0.7), "…and 0.7 does not");
     }
 
@@ -222,7 +222,7 @@ public class RuleAmendmentTest {
     /**
      * Whether her shipped ultimate freezes an enemy, with the generator pinned at {@code roll}.
      *
-     * <p>Her file states {@code base_chance: 0.5} and 行迹"冰咒" raises it by 0.15, so the boundary is 0.65.
+     * <p>Her file states {@code base_chance: 0.5} and trace "冰咒" raises it by 0.15, so the boundary is 0.65.
      */
     private static boolean freezeLandsWithHerFile(double roll) {
         Character hero = CharacterFactory.create(MARCH_7TH, LEVEL);

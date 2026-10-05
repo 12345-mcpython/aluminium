@@ -22,7 +22,7 @@ import java.util.Random;
  * Light cone 23006: a hit inflicts [游丝] -- a NAMED thunder damage-over-time -- and a target in [游丝]
  * "也会被视为陷入了触电状态".
  *
- * <p>The alias is not a second stored fact: a NAMED thunder DOT answers its own name AND the element table's 触电. The
+ * <p>The alias is not a second stored fact: a NAMED thunder DOT answers its own name AND the element table's 触电 (shock). The
  * readings below make that attributable -- including the mirror case of a plain, unnamed thunder DOT.
  */
 public class Cone23006Test {

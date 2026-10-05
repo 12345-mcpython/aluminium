@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Light cone 21022: "对处于触电或风化状态的敌方目标造成的伤害提高#2%" at rank 5.
+ * Light cone 21022: "raise the damage dealt to enemy targets in the shock or wind shear state by #2%" at rank 5.
  *
  * <p>The disjunction is two rules, the second requiring the ABSENCE of the first state, so a target carrying both is boosted once.
  */
@@ -33,12 +33,12 @@ public class Cone21022Test {
         double winded = settled(2);
         double both = settled(3);
         System.out.println("[21022] clean=" + clean + " shocked=" + shocked + " winded=" + winded + " both=" + both);
-        Assertions.assertEquals(1.32, shocked / clean, 2e-2, "触电 (rank 5 says #2 = 0.32)");
-        Assertions.assertEquals(1.32, winded / clean, 2e-2, "风化");
+        Assertions.assertEquals(1.32, shocked / clean, 2e-2, "shock (rank 5 says #2 = 0.32)");
+        Assertions.assertEquals(1.32, winded / clean, 2e-2, "wind shear");
         Assertions.assertEquals(1.32, both / clean, 2e-2, "both states must not double the boost");
     }
 
-    /** 0 = clean, 1 = 触电, 2 = 风化, 3 = both. */
+    /** 0 = clean, 1 = shock, 2 = wind shear, 3 = both. */
     private static double settled(int which) {
         Character unit = CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(21022, LEVEL, false, 5));
         Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);

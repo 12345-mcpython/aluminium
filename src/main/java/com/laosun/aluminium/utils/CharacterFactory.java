@@ -190,13 +190,13 @@ public final class CharacterFactory {
         }
         builder = builder.triggerTable(table);
         Character character = builder.build();
-        // P8-8: the resources this character declares ("充能，上限3点"). Registered after the build
+        // P8-8: the resources this character declares ("charge, cap 3 points"). Registered after the build
         // because the manager belongs to the combatant, and from the declaration rather than from the JSON
         // directly, so the cap a rule is gated on is the same number that was registered -- there is one
         // reader of the declaration (`requireReadableResources`), not two.
         for (ResourceSpec spec : table.resources()) {
                 // A PARTY-scoped declaration is NOT registered per character (2026-09-30): `ResourceManager.register` itself
-                // refuses an unwired scope because "一个 party-level resource needs a PER-BATTLE owner", and `Battle` is that owner
+                // refuses an unwired scope because "a party-level resource needs a PER-BATTLE owner", and `Battle` is that owner
                 // (it registers these from the party's declarations at the start of the battle). Registering a copy here as well would
                 // quietly give the declaring character a private counter and the shared one would read 0 -- measured, before this.
                 if ("PARTY".equalsIgnoreCase(spec.scope() == null ? "" : spec.scope().trim())) {
@@ -259,7 +259,7 @@ public final class CharacterFactory {
      *
      * <p><b>The failure being prevented.</b> An undeclared resource is not an error at any layer below:
      * {@code ResourceManager.gain} answers {@code 0} ("nothing credited") and {@code value} answers {@code 0}
-     * ("empty"). So a rule that grants "充能" would fire and grant nothing, and a rule gated on
+     * ("empty"). So a rule that grants "charge" would fire and grant nothing, and a rule gated on
      * {@code self_resource:充能 >= 3} would compile, load, and never fire - the wrong answer with no symptom that
      * this project refuses. Checked at build time so the message arrives while the character is being created,
      * naming the resource and the file to declare it in, rather than never arriving at all.
@@ -293,7 +293,7 @@ public final class CharacterFactory {
     /**
      * Refuses a merged table whose {@code SUMMON} rules this character could never satisfy (P9-4).
      *
-     * <p><b>Why the check lives here.</b> "进入战斗时召唤忆灵" is only meaningful for a character with a
+     * <p><b>Why the check lives here.</b> "summon a memosprite on entering battle" is only meaningful for a character with a
      * memosprite spec ({@code resources/memosprites/<cid>.json}), and a rule file cannot know its own cid:
      * {@link TriggerTable} is compiled from the file alone, and a <b>relic</b> rule is shared by every wearer.
      * The assembly point is the first place that knows both the character and the full set of rules it ends up

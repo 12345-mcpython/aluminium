@@ -41,17 +41,17 @@ import java.util.Random;
 public class CastSkillTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
-    /** 姬子: damage whose number we do not care about, used as the rule owner wherever the owner must not matter. */
+    /** Himeko (姬子): damage whose number we do not care about, used as the rule owner wherever the owner must not matter. */
     private static final int OWNER = 1003;
-    /** 丹恒: the unit being commanded. His ULTRA is a damaging single-target skill. */
+    /** Dan Heng (丹恒): the unit being commanded. His ULTRA is a damaging single-target skill. */
     private static final int CASTER = 1002;
-    /** 万敌: his SKILL is a BLAST, i.e. the one shape whose two columns differ. */
+    /** Mydei (万敌): his SKILL is a BLAST, i.e. the one shape whose two columns differ. */
     private static final int BLAST_CASTER = 1404;
-    /** 火花: her ELATION_SKILL is the only kind of skill that settles as a non-NORMAL damage type. */
+    /** Sparkle (火花): her ELATION_SKILL is the only kind of skill that settles as a non-NORMAL damage type. */
     private static final int ELATION_CASTER = 1501;
-    /** 丹恒-腾荒: the commanded cast of a NON-damaging skill (his skill is a {@code Defence} shield). */
+    /** Dan Heng - Permansor Terrae (丹恒-腾荒): the commanded cast of a NON-damaging skill (his skill is a {@code Defence} shield). */
     private static final int DHPT = 1414;
-    /** 阮-梅: her skill is a {@code Support} buff with no {@code skill_effects.json} entry -- undeliverable. */
+    /** Ruan Mei (阮-梅): her skill is a {@code Support} buff with no {@code skill_effects.json} entry -- undeliverable. */
     private static final int UNDELIVERABLE = 1303;
 
     // ==================================================================
@@ -62,7 +62,7 @@ public class CastSkillTest {
      * The commanded cast deals exactly what that unit's own cast would: same actor, same skill, same victims.
      *
      * <p>The two battles are built identically (same seed, same units) and differ only in <b>who is asked</b> - a rule
-     * commands 停云 to cast her ultimate, versus 停云 casting it herself through the engine's own entry point. The
+     * commands Tingyun (停云) to cast her ultimate, versus Tingyun casting it herself through the engine's own entry point. The
      * control matters: a comparison of two no-ops also reads as "identical", so the damage must be positive.
      */
     @Test
@@ -78,7 +78,7 @@ public class CastSkillTest {
     /**
      * Fires one ULT_CAST and answers the enemy's HP loss.
      *
-     * @param commanded {@code true} = 姬子's rule commands 停云 to cast; {@code false} = 停云 casts it herself
+     * @param commanded {@code true} = Himeko's rule commands Tingyun to cast; {@code false} = Tingyun casts it herself
      */
     private static double enemyDamage(boolean commanded) {
         Character owner = CharacterFactory.create(OWNER, LEVEL);
@@ -169,7 +169,7 @@ public class CastSkillTest {
     }
 
     /**
-     * Commands 火花's Elation skill and answers the enemies' total HP loss.
+     * Commands Sparkle's Elation skill and answers the enemies' total HP loss.
      *
      * @param elationVulnerability also apply "受到的欢愉伤害提高 100%" to the enemies first
      */
@@ -201,7 +201,7 @@ public class CastSkillTest {
     // 3. Shipped content, no scaffold
     // ==================================================================
 
-    /** 1404 万敌 "自身回合开始时自动施放[弑王成王]" - the rule fires and the skill really lands. */
+    /** 1404 Mydei "自身回合开始时自动施放[弑王成王]" - the rule fires and the skill really lands. */
     @Test
     public void hisTurnStartAutoCastDealsDamage() {
         Character him = CharacterFactory.create(BLAST_CASTER, LEVEL);
@@ -221,7 +221,7 @@ public class CastSkillTest {
                 "the commanded cast moved the enemy's HP (" + before + " -> " + enemy.getCurrentHp() + ")");
     }
 
-    /** 1504 不死途 "随后立即对[饲饵]发动 1 次获得强化的天赋追加攻击" - the commanded TALENT lands. */
+    /** 1504 Cipher "随后立即对[饲饵]发动 1 次获得强化的天赋追加攻击" - the commanded TALENT lands. */
     @Test
     public void hisUltimateCommandsHisTalentRightNow() {
         Character him = CharacterFactory.create(1504, LEVEL);
@@ -262,7 +262,7 @@ public class CastSkillTest {
         Assertions.assertTrue(refused.getMessage().contains("damage_param"), refused.getMessage());
     }
 
-    /** 1414 丹恒-腾荒 秘技 "下一次战斗开始时自动对持有[同袍]的角色施放1次战技，此次战技不消耗战技点". */
+    /** 1414 Dan Heng - Permansor Terrae technique "下一次战斗开始时自动对持有[同袍]的角色施放1次战技，此次战技不消耗战技点". */
     @Test
     public void aCommandedSupportCastShieldsOurSide() {
         // Note: The Bondmate is 1414 HIMSELF (his technique grants it to him), and he is deliberately NOT first in the
@@ -271,7 +271,7 @@ public class CastSkillTest {
         Character ally = CharacterFactory.create(CASTER, LEVEL);
         Character him = CharacterFactory.create(DHPT, LEVEL);
         // Note: Read BEFORE the battle starts: the shield is computed inside the cast, i.e. BEFORE the post-cast
-        // SKILL_CAST event that raises his ATK by the 神秀 trace -- so the number to compare against is this one.
+        // SKILL_CAST event that raises his ATK by the Shenxiu (神秀) trace -- so the number to compare against is this one.
         double attackBefore = him.getAttribute(com.laosun.aluminium.enums.AttributeType.ATTACK).get();
         Battle battle = new Battle(List.of(ally, him), List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
         battle.markTechniqueUsed(him);
@@ -308,7 +308,7 @@ public class CastSkillTest {
     /**
      * Note: A skill the engine has no definition for is refused <b>loudly</b> rather than cast into nothing.
      *
-     * <p>1303 阮-梅's skill is a {@code Support} buff and {@code skill_effects.json} has no entry for her, so there is
+     * <p>1303 Ruan Mei's skill is a {@code Support} buff and {@code skill_effects.json} has no entry for her, so there is
      * nothing to deliver: the commanded cast would fire, announce itself, and change nothing at all - the exact
      * silence this engine refuses. (1414's own skill IS deliverable: it is a {@code Defence} shield.)
      */

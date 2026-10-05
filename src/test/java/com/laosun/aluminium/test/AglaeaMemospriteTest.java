@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 阿格莱雅 1402's memosprite kit - "衣匠", as data.
+ * Aglaea (阿格莱雅) 1402's memosprite kit - "衣匠", as data.
  *
  * <p><b>Why this character.</b> Her two abilities are the densest test of everything the last few changes added,
  * and none of it needed a new engine piece: the panel is inherited from her ({@code memosprites/1402.json}), the
@@ -27,20 +27,20 @@ import java.util.Random;
  * own place in the turn order is moved with {@code ADVANCE}.
  *
  * <pre>
- * 战技: "为衣匠回复等同于其#1[i]%生命上限的生命值。若衣匠不在场，则召唤忆灵衣匠，并使自身立即行动。"
- * 终结技: "召唤忆灵衣匠，若衣匠已在场，则使其生命值回复至上限。阿格莱雅进入[至高之姿]状态并使自身立即行动。"
+ * Skill (战技): "为衣匠回复等同于其#1[i]%生命上限的生命值。若衣匠不在场，则召唤忆灵衣匠，并使自身立即行动。"
+ * Ultimate (终结技): "召唤忆灵衣匠，若衣匠已在场，则使其生命值回复至上限。阿格莱雅进入[至高之姿]状态并使自身立即行动。"
  * </pre>
  *
  * <p><b>The two halves are two rules, and the split is the interesting part.</b> "并使自身立即行动" hangs off the
- * "若衣匠不在场" branch (the 并 continues the summoning clause), so the skill's two sentences become two rules
+ * "若衣匠不在场" branch (the 并, "and", continues the summoning clause), so the skill's two sentences become two rules
  * gated by {@code self_summon_count >= 1} and {@code == 0} - mutually exclusive by construction, rather than by
  * asking whether the summon "really happened" (which {@code SUMMON}'s idempotence makes unobservable afterwards).
  * Her ultimate, in contrast, needs no branch at all: the "若已在场则回复至上限" clause is covered by summoning
  * first and then healing, because a fresh memosprite is at full HP.
  *
- * <p>Note: What is deliberately <b>not</b> authored, and why it is not an oversight: 衣匠's own attack. Its 忆灵技能1 is
- * a Blast for "110% 攻击力" of 雷 damage, but no document gives 衣匠 an ATK - the panel states HP and SPD only - 
- * and scaling it off 阿格莱雅's ATK would be a guess. The loader would refuse it anyway: an attack whose base the
+ * <p>Note: What is deliberately <b>not</b> authored, and why it is not an oversight: the Garmentmaker's own attack. Its Memosprite Skill 1 is
+ * a Blast for "110% 攻击力" of Lightning damage, but no document gives the Garmentmaker an ATK - the panel states HP and SPD only - 
+ * and scaling it off Aglaea's ATK would be a guess. The loader would refuse it anyway: an attack whose base the
  * panel never states is exactly the "every hit deals zero" case {@code Memosprites.validateAttack} exists for.
  */
 public class AglaeaMemospriteTest {
@@ -213,13 +213,13 @@ public class AglaeaMemospriteTest {
      * <b>lifecycle</b>, through the anchor ({@code ticks_on: "summon"}).
      *
      * <p><b>Why the anchor rather than a turn count.</b> The document gives the stance no duration: it ends when the
-     * 衣匠 is gone ("行动序列上出现倒计时…回合开始时使衣匠自毁。衣匠消失时阿格莱雅解除[至高之姿]状态"). The
+     * the Garmentmaker is gone ("行动序列上出现倒计时…回合开始时使衣匠自毁。衣匠消失时阿格莱雅解除[至高之姿]状态"). The
      * engine's anchor <i>is</i> the tick owner - {@code BuffManager.removeBuffsAnchoredTo} asks
      * {@code buff.ticksOn(dead)} - so one field says both things, and this case measures both ends of it:
      * <ul>
      *   <li>the stance is on her right after the ultimate, and a turn of hers does <b>not</b> spend it (it is
      *       permanent, so nothing counts it down - the control for "no turn count was invented");</li>
-     *   <li>and when the 衣匠 dies, it is gone - the half a turn-count spelling could never deliver.</li>
+     *   <li>and when the Garmentmaker dies, it is gone - the half a turn-count spelling could never deliver.</li>
      * </ul>
      */
     @Test

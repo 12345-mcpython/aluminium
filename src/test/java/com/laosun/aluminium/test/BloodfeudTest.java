@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1404：[血仇] -  - 进入它，以及结束它的致命一击 (2026-10-02).
+ * 1404: [血仇] - - entering it, and the lethal blow that ends it (2026-10-02).
  *
  * <p>ONE VARIABLE: whether [血仇] is on when the lethal blow lands. His ultimate grants 20 charge, so five of them reach the
  * hundred the entry clause needs -- no test-only shortcut into his resource.
@@ -37,16 +37,16 @@ public class BloodfeudTest {
 
         chargeToAHundred(battle, him);
         Assertions.assertTrue(him.getBuffManager().hasState(STATE),
-                "「充能达到 100 时消耗 100 点充能进入【血仇】状态」");
+                "\"when charge reaches 100, consume 100 points of charge to enter the [血仇] state\"");
 
         battle.applyTrueDamage(battle.enemies.getFirst(), him, DamageElement.ICE, him.getCurrentHp() * 2.0);
         battle.processRequests();
 
-        Assertions.assertFalse(him.isDeath(), "「不会陷入无法战斗状态」");
+        Assertions.assertFalse(him.isDeath(), "\"will not enter the unable-to-fight state\"");
         Assertions.assertEquals(him.getMaxHp() * 0.50, him.getCurrentHp(), him.getMaxHp() * 0.01,
-                "「回复等同于自身 50% 生命上限的生命值」");
-        Assertions.assertFalse(him.getBuffManager().hasState(STATE), "「退出【血仇】状态」");
-        Assertions.assertEquals(0.0, him.getResources().value(CHARGE), 1e-9, "「清空充能」");
+                "\"restore HP equal to 50% of one's own Max HP\"");
+        Assertions.assertFalse(him.getBuffManager().hasState(STATE), "\"leave the [血仇] state\"");
+        Assertions.assertEquals(0.0, him.getResources().value(CHARGE), 1e-9, "\"clear the charge\"");
     }
 
     /** Note: Without [血仇] the same blow kills him -- the clause is the state's, not his. */
@@ -57,11 +57,11 @@ public class BloodfeudTest {
                 List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
         battle.startBattle();
         battle.processRequests();
-        Assertions.assertFalse(him.getBuffManager().hasState(STATE), "precondition: no 【血仇】 yet");
+        Assertions.assertFalse(him.getBuffManager().hasState(STATE), "precondition: no [血仇] yet");
 
         battle.applyTrueDamage(battle.enemies.getFirst(), him, DamageElement.ICE, him.getCurrentHp() * 2.0);
         battle.processRequests();
-        Assertions.assertTrue(him.isDeath(), "【血仇】状态期间才有这一条");
+        Assertions.assertTrue(him.isDeath(), "only while in the [血仇] state does this clause exist");
     }
 
     // ==================================================================

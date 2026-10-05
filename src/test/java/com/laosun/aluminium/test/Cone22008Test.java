@@ -19,7 +19,7 @@ import java.util.Random;
  * Light cone 22008: after a FOLLOW-UP attack the wearer gains 3% crit damage for 2 turns, stacking up to 10.
  *
  * <p>Plain readings on the attribute itself: one follow-up adds 3%, ten of them reach 30%, and an eleventh adds nothing --
- * which is what 最多叠加 10 层 means.
+ * which is what stacking up to 10 layers (最多叠加 10 层) means.
  */
 public class Cone22008Test {
     private static final int CONE = 22008;

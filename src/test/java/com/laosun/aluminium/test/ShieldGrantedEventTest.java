@@ -18,21 +18,21 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * {@code SHIELD_GRANTED} - "a shield was granted" as an event (M-43), and 大丽花's trace that needs it.
+ * {@code SHIELD_GRANTED} - "a shield was granted" as an event (M-43), and Dahlia (大丽花)'s trace that needs it.
  *
  * <p><b>Why the engine needed it.</b> Shields were only an <i>op</i> ({@code SHIELD}): the engine could make one but
- * nothing was announced, so "受到队友提供的治疗效果<b>或护盾</b>时" (大丽花's trace, 1321101) could be written only
+ * nothing was announced, so "when receiving healing <b>or a shield</b> provided by a teammate" (Dahlia (大丽花)'s trace, 1321101) could be written only
  * as its healing half - an effect that is too weak exactly when a shield arrives, with nothing to report. The event
- * follows {@code HEALED}'s convention ({@code actor} = who provided it, {@code target} = who received it), so "队友
- * 提供的" needs no new vocabulary: {@code target == self} + {@code actor is_ally} + {@code actor != self}.
+ * follows {@code HEALED}'s convention ({@code actor} = who provided it, {@code target} = who received it), so "provided
+ * by a teammate" needs no new vocabulary: {@code target == self} + {@code actor is_ally} + {@code actor != self}.
  *
  * <p><b>Two paths, one fact.</b> A shield reaches the field as a raw grant ({@code Battle.grantShield}) or through a
  * timed {@code ShieldBuff} (the interpreter's {@code SHIELD} arm, which has no {@code Battle} handle of its own). Both
  * are covered here, because a fix that only announced one of them would leave half the game's shields invisible.
  *
- * <p><b>Note: And the reading that shrank this round's plan.</b> "再次触发<b>该效果</b>" was checked against the trace's
- * own text before anything was built: 该效果 is the sentence above's effect ("使其他角色的击破特攻提高，提高数值等同于
- * 24% 大丽花的击破特攻 + 0.5"), so re-triggering it is that <b>same buff granted again with a longer duration</b> - 
+ * <p><b>Note: And the reading that shrank this round's plan.</b> "triggers <b>this effect</b> again" was checked against the trace's
+ * own text before anything was built: 该效果 is the sentence above's effect ("raises other characters' Break Effect by a value equal to
+ * 24% of Dahlia (大丽花)'s Break Effect + 0.5"), so re-triggering it is that <b>same buff granted again with a longer duration</b> - 
  * which the existing {@code MODIFY_ATTR} already says. A planned {@code RETRIGGER_RULE} op would have had no reader.
  */
 public class ShieldGrantedEventTest {
@@ -183,7 +183,7 @@ public class ShieldGrantedEventTest {
     // Helpers
     // ==================================================================
 
-    /** 大丽花 with a hand-built copy of her trace's two rules, one ally to shield her, and one enemy. */
+    /** Dahlia (大丽花) with a hand-built copy of her trace's two rules, one ally to shield her, and one enemy. */
     private static final class Fixture {
         private final Character dahlia = CharacterFactory.create(DAHLIA, LEVEL);
         private final Character ally = CharacterFactory.create(ALLY, LEVEL);

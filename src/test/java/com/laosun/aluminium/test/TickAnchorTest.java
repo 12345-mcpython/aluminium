@@ -21,7 +21,7 @@ import java.util.Random;
  * {@code "ticks_on": "self"} - a buff whose duration is spent by <b>the rule owner's</b> turns (M-42 ④), and the
  * cleanup when that owner dies (③).
  *
- * <p><b>Why the clock is not always the carrier.</b> 星期日's [蒙福者]: "并使目标及其召唤物成为[蒙福者]…星期日自身
+ * <p><b>Why the clock is not always the carrier.</b> Sunday's [蒙福者]: "并使目标及其召唤物成为[蒙福者]…星期日自身
  * 每回合开始时[蒙福者]状态持续回合减1，共持续#3[i]回合。…当星期日陷入无法战斗状态时，[蒙福者]效果也会被解除。"
  * The state sits on the <b>ally</b> and is spent by <b>his</b> turns. Counting it down on the carrier's turns - what
  * a timed buff does by default - would end it after a different number of turns in every fight, with nothing to see.
@@ -102,7 +102,7 @@ public class TickAnchorTest {
     /**
      * When the unit whose turns spend the buff dies, the buff goes with it.
      *
-     * <p>Note: The generic reason is stronger than 星期日's sentence: an anchored buff whose clock will never come again
+     * <p>Note: The generic reason is stronger than Sunday's sentence: an anchored buff whose clock will never come again
      * is a <b>leak</b>, not a long duration. And it cannot be written as a rule on the dying unit - {@code
      * fireTriggers} skips dead units, so its own table never gets the chance.
      */
@@ -145,7 +145,7 @@ public class TickAnchorTest {
      * boundaries spend a duration, so on a {@code permanent} buff - never counted down - it was refused as "ignored".
      * The same field is now also the <b>anchor</b> ({@code removeBuffsAnchoredTo} asks {@code buff.ticksOn(dead)}),
      * and "permanent, but it ends when THAT unit disappears" is a sentence two documents write (1402's [至高之姿],
-     * and the 死龙 family's "随死龙消失而解除"). So the combination is legal; that it <b>loads</b> is pinned here,
+     * and the 死龙 (the dead dragon) family's "随死龙消失而解除"). So the combination is legal; that it <b>loads</b> is pinned here,
      * and what it buys is pinned in {@code AglaeaMemospriteTest}.
      */
     @Test
@@ -175,7 +175,7 @@ public class TickAnchorTest {
     // Fixture
     // ==================================================================
 
-    /** A rule that grants the ally a 提升 lasting {@code turns}, anchored to the owner's turns when asked. */
+    /** A rule that grants the ally a boost (提升) lasting {@code turns}, anchored to the owner's turns when asked. */
     private static TriggerSpec grantToAlly(boolean anchoredToOwner, int turns) {
         EffectSpec effect = boost("BREAKING_EFFECT", 0.5, turns);
         TriggerSpecs.set(effect, "target", "target");
@@ -196,7 +196,7 @@ public class TickAnchorTest {
 
     private static Battle battleWith(TriggerSpec rule, Random rng) {
         Character owner = CharacterFactory.create(OWNER, LEVEL);
-        // Note: The speeds are left alone on purpose: 停云 is faster, so HER turn comes first. That matters because
+        // Note: The speeds are left alone on purpose: Tingyun (停云) is faster, so HER turn comes first. That matters because
         // `takeTurn` runs the queue up to the requested unit, and any other unit's turn inside that window is a
         // turn too - the first draft asked for the caster's turn first, got a window that also contained hers, and
         // read the two ticks as one ("the carrier spends it" - the opposite of what was happening).

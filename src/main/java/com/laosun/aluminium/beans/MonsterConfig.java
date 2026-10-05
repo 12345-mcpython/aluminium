@@ -28,10 +28,10 @@ import java.util.Map;
  *
  * <p><b>The summon roster</b> ({@code summon_id} to {@link #summonIds()}): the ids of the monsters this one
  * may bring onto the field, in the order the data lists them. It is a <b>roster, not a trigger</b>: it says
- * "this monster's summons are 银鬃近卫  x 2" and deliberately says nothing about <em>when</em> they appear.
+ * "this monster's summons are Silvermane Guard (银鬃近卫)  x 2" and deliberately says nothing about <em>when</em> they appear.
  * When stays a decision for the caller ({@code Battle.summon}), the same way {@link #hpRatio} and the phase
  * table keep "how strong" separate from "which skill". 692 of the 2649 monsters have a non-empty roster
- * (1450 references to 556 distinct monsters); 银鬃尉官 1003010 to 1002040  x 2 is a typical one.
+ * (1450 references to 556 distinct monsters); Silvermane Lieutenant (银鬃尉官) 1003010 to 1002040  x 2 is a typical one.
  *
  * <p>Note: <b>A {@code 0} entry means "no summon", and it is really in the data</b> - one monster (405301004)
  * carries exactly {@code [0]}. Feeding that id to the factory would look up monster 0 and fail loudly, which

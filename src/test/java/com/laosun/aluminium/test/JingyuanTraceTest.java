@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1204 景元's trace "遣将": "施放战技后，暴击率提升10.0%，持续2回合".
+ * 1204 Jing Yuan's (景元) trace "遣将": "施放战技后，暴击率提升10.0%，持续2回合".
  *
  * <p>Judged as the difference in CRIT_CHANCE across a skill cast, and then again after the two turns its duration states have passed --
  * a duration that is not judged is a duration that can be wrong while the test stays green.

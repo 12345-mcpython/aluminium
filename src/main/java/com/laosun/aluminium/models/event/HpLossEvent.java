@@ -10,7 +10,7 @@ import com.laosun.aluminium.models.CanHit;
  * <ul>
  *   <li>What the shield absorbed does not count (when the shield does not break {@code amount == 0},
  *       and then it is not fired) - because "losing HP" and "taking damage" are two different things,
- *       and 遐蝶[新蕊]/ 万敌[血仇]/ 刃[充能] convert by amount of HP lost, so the amount blocked by
+ *       and Castorice (遐蝶)'s [新蕊] (New Bud) / Mydei (万敌)'s [血仇] (Bloodfeud) / Blade (刃)'s [充能] (Charge) convert by amount of HP lost, so the amount blocked by
  *       the shield must not be included;</li>
  *   <li>Overkill damage does not count ({@code before} is already the current value).</li>
  * </ul>

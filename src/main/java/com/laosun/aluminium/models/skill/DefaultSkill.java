@@ -15,8 +15,8 @@ import java.util.concurrent.ConcurrentMap;
  *
  * <p>Note: There used to be a `// TODO: DELETE IT BECAUSE OF EVERY CHARACTERS HAS EVERY SKILLS` here - 
  * that comment is misleading and has been deleted. What it probably meant to say was "a skill should
- * not be a Java class each", but that is the other direction (the P8-0 three-way split (三分法):
- * mechanics go through data/triggers, only escape-hatch (逃生舱) cases get a class), which in fact shows
+ * not be a Java class each", but that is the other direction (the P8-0 three-way split (三分法, the three-way split):
+ * mechanics go through data/triggers, only escape-hatch (逃生舱, the escape hatch) cases get a class), which in fact shows
  * that this class is right: a skill is data, locatable with the three keys {@code (cid, slot, level)},
  * with no need for 93 characters  x  6 skills = 558 classes.
  *

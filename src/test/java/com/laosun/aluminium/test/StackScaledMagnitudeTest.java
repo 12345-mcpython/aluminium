@@ -20,7 +20,7 @@ import java.util.Random;
  *
  * <p>The counter's name is a literal copied from the data file by the script that wrote this test. It is deliberately NOT
  * an escape: a hand-typed escape once named a different character and read as "the engine loses the counter" for three
- * rounds (the document's name is 烬煨, and the mistyped one differed in its second character).
+ * rounds (the document's name is 烬煨 (Ashen Roast), and the mistyped one differed in its second character).
  */
 public class StackScaledMagnitudeTest {
     private static final int JIAOQIU = 1218;

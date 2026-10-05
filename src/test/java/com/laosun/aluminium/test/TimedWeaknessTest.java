@@ -17,14 +17,14 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 会过期的弱点（`65f143b`）：`ADD_ELEMENTAL_WEAKNESS` 带 `turns` 时走 {@code Enemy.addWeakness(element, turns)}，
- * 而计时表在目标自己的回合结束时递减（`Battle:1203` 的 `TURN_END` 旁）。
+ * A weakness that expires (`65f143b`): `ADD_ELEMENTAL_WEAKNESS` with `turns` goes through {@code Enemy.addWeakness(element, turns)},
+ * and the timer counts down at the end of the target's own turn (beside `TURN_END` at `Battle:1203`).
  *
- * <p>Note: 这个判据必须驱动真实的回合金流程（`battle.stepForward()`）。若只调 `enemy.tickTimedWeaknesses()`，
- * `Enemy` 那一半会被覆盖，而 `Battle:1203` 的接线写错了也不会红 -  - 本段见过太多次"判据只覆盖一半"。
+ * <p>Note: This judge must drive the real turn loop (`battle.stepForward()`). If it only called `enemy.tickTimedWeaknesses()`,
+ * the `Enemy` half would be covered, while a mistake in the wiring at `Battle:1203` would not go red - - this section has seen "the judge covers only half" far too many times.
  *
- * <p>Note: 两句断言缺一不可："最终失效"证明递减会发生；"不是第一步就掉"证明计数对（否则把 `turns: 2`
- * 写成 `turns: 0` 也会让第一句变绿）。
+ * <p>Note: Both assertions are indispensable: "gone in the end" proves the countdown happens; "not gone on the first step" proves the count is right (otherwise writing
+ * `turns: 2` as `turns: 0` would also make the first one green).
  */
 public class TimedWeaknessTest {
     private static final int WEARER = 1006;
@@ -36,8 +36,8 @@ public class TimedWeaknessTest {
     public void anInsertedWeaknessExpiresInItsOwnTurns() {
         Character wearer = CharacterFactory.create(WEARER, LEVEL);
         Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
-        // Note: 不写死属性：挑一个这个敌人没有的。写死会让判据依赖它的属性表
-        // （实测：1002011 本来就有 Fire，第一次运行就是被这条前置挡住的）。
+        // Note: Do not hard-code the element: pick one this enemy does not have. Hard-coding it would make the judge depend on its attribute table
+        // (measured: 1002011 already has Fire, and the first run was stopped by exactly this precondition).
         DamageElement chosen = null;
         for (DamageElement each : DamageElement.values()) {
             if (!enemy.isWeakTo(each)) {
@@ -65,8 +65,8 @@ public class TimedWeaknessTest {
 
         int steps = 0;
         while (enemy.isWeakTo(chosen) && !battle.isOver() && steps < 60) {
-            battle.stepForward();      // Note: 只把 currentMove 设成下一个行动者（实测：它不执行回合）
-            battle.afterMove();        // 结束那次行动 - - 计时弱点的递减就在 afterMove 里面
+            battle.stepForward();      // Note: It only sets currentMove to the next actor (measured: it does not execute the turn)
+            battle.afterMove();        // Ends that action - - the timed weakness counts down inside afterMove
             steps++;
         }
         System.out.println("[timed] " + chosen + " weakness gone after " + steps + " steps (declared turns=" + TURNS
@@ -78,10 +78,10 @@ public class TimedWeaknessTest {
     }
 
     /**
-     * Note: 把两半切开：直接调 `Enemy.tickTimedWeaknesses()`（它是 `public`）。
+     * Note: Split the two halves apart: call `Enemy.tickTimedWeaknesses()` directly (it is `public`).
      *
-     * <p>上面那条走的是真实回合金流程，Note: 而它 60 步都没失效 so 两种可能：`Enemy` 的递减本身坏了，
-     * 或者那条流程根本没走到敌人的回合。这一条只问前半 -  - Note: 若它绿，问题一定在接线上。
+     * <p>The one above walks the real turn loop, and it did not expire in 60 steps, so there are two possibilities: `Enemy`'s countdown itself is broken,
+     * or that loop never reached the enemy's turn at all. This one asks only about the first half - - Note: if it is green, the problem must be in the wiring.
      */
     @Test
     public void theEnemySideRunsDownOnItsOwn() {

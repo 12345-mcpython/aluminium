@@ -72,7 +72,7 @@ public class StateBuff extends AbstractBuff {
     /**
      * A state never stops its owner acting - otherwise a state wearing off would freeze its owner for a turn.
      *
-     * <p>Control states (眩晕/冻结/纠缠…) are <b>not</b> states in this sense: they are their own buffs that
+     * <p>Control states (眩晕/冻结/纠缠…; stun/freeze/entangle) are <b>not</b> states in this sense: they are their own buffs that
      * return {@code false} here, and they are applied by their own mechanics, not by {@code APPLY_BUFF}.
      */
     @Override

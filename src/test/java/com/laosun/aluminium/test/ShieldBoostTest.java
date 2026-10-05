@@ -20,12 +20,12 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * "使装备者<b>提供的</b>护盾量提高 X%" - 遗器 103 (20%) / 128 (10% + 12%) 与一件光锥，四个读者。
+ * "increases the shield amount provided by <b>the wearer</b> by X%" - relic 103 (20%) / 128 (10% + 12%) and one light cone, four readers.
  *
  * <p><b>Why the vocabulary needed it.</b> {@code Battle.grantShield} used to install exactly the number the rule
  * computed, and the class register had carried these three abilities for days with the same sentence: <i>"Needs an op
  * that scales every shield the wearer creates"</i>. That is not an op - it is a <b>stat</b>, and the game states it as
- * one: "装备者<b>提供的</b>护盾量" names the <b>giver</b>, so the number belongs to whoever creates the shield and
+ * one: "the shield amount provided by <b>the wearer</b>" names the <b>giver</b>, so the number belongs to whoever creates the shield and
  * travels with it. Hence {@link AttributeType#SHIELD_BOOST}, read at grant time from the provider.
  *
  * <p><b>The three claims this file pins.</b>
@@ -44,7 +44,7 @@ public class ShieldBoostTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** The register's own example: 遗器 103's 4-piece, "使装备者提供的护盾量提高20%". */
+    /** The register's own example: relic 103's 4-piece, "increases the shield amount provided by the wearer by 20%". */
     @Test
     public void theProvidersBoostMultipliesTheShield() {
         Battle battle = fixture();
@@ -60,7 +60,7 @@ public class ShieldBoostTest {
     /**
      * Note: The boost belongs to the <b>giver</b>, not to the one being shielded.
      *
-     * <p>This is the case that separates "提供的护盾量" from every damage/healing modifier in the engine: a
+     * <p>This is the case that separates "the shield amount provided" from every damage/healing modifier in the engine: a
      * strengthened <i>receiver</i> must change nothing at all, or the same 20% would quietly apply to shields handed
      * out by teammates and by light cones nobody is wearing.
      */
@@ -91,8 +91,8 @@ public class ShieldBoostTest {
     /**
      * Two statements about one stat <b>add</b>, because both are contributions to one quantity.
      *
-     * <p>遗器 103's 20% and 128's 10% cannot be worn together (one relic per slot), but a light cone's "提供的护盾量提高
-     * 12%" can sit next to a set bonus, so the arithmetic has to be addition rather than "the strongest wins".
+     * <p>relic 103's 20% and 128's 10% cannot be worn together (one relic per slot), but a light cone's "the shield amount provided is increased
+     * by 12%" can sit next to a set bonus, so the arithmetic has to be addition rather than "the strongest wins".
      *
      * <p>Note: The modifiers are <b>pure</b> ones, which is not a detail of the fixture: SHIELD_BOOST is a ratio
      * attribute, and the engine's own {@code MODIFY_ATTR} gives a ratio attribute a flat modifier rather than an
@@ -128,7 +128,7 @@ public class ShieldBoostTest {
     /**
      * Note: <b>Both paths, one number.</b> The {@code SHIELD} op reaches the field in two shapes - a raw grant when the
      * rule states no {@code turns}, and a timed {@link ShieldBuff} when it does - and a boost that only applied to
-     * one of them would make 三月七's "持续3回合" shield 120 for three turns and 100 forever after.
+     * one of them would make March 7th (三月七)'s "lasting 3 turns" shield 120 for three turns and 100 forever after.
      */
     @Test
     public void theTimedShieldInstallsTheSameBoostedNumber() {
@@ -164,11 +164,11 @@ public class ShieldBoostTest {
     }
 
     /**
-     * The shipped content, read back through the loader: 遗器 103's 4-piece is 20% on its <b>wearer</b>.
+     * The shipped content, read back through the loader: relic 103's 4-piece is 20% on its <b>wearer</b>.
      *
      * <p>Note: This is the assertion the register could not make before: the ability was registered for days as
      * "not expressible", and a file that loads is not the same claim as a file whose number is right. It also pins
-     * the <b>side</b>: the rule must land on the wearer (自身), because "装备者提供的" shields are the wearer's own.
+     * the <b>side</b>: the rule must land on the wearer (self), because "provided by the wearer" shields are the wearer's own.
      *
      * <p>Note: The number is read <b>after</b> {@code startBattle()}, and that is not a detail of the fixture: the bonus is
      * an ability rule, not a {@code properties} stat, so it is applied by the {@code BATTLE_START} rule it was written
@@ -180,7 +180,7 @@ public class ShieldBoostTest {
         Battle battle = battleWith(List.of(wearer));
 
         Assertions.assertEquals(0.2, wearer.getAttribute(AttributeType.SHIELD_BOOST).get(), EPS,
-                "「使装备者提供的护盾量提高20%」");
+                "「increases the shield amount provided by the wearer by 20%」");
         Assertions.assertEquals(120, battle.grantShield(wearer, wearer, 100), EPS,
                 "…and a shield that wearer grants really is a fifth larger");
     }
@@ -201,7 +201,7 @@ public class ShieldBoostTest {
     /**
      * Note: A set the wearer's shield does not come from changes nothing.
      *
-     * <p>遗器 103's bonus is about <b>the wearer's own</b> shields only, so a teammate wearing 103 who shields
+     * <p>relic 103's bonus is about <b>the wearer's own</b> shields only, so a teammate wearing 103 who shields
      * somebody else must be the one who gets the boost - and a wearer who shields nobody must not have the attribute
      * leak into shields granted by their teammates.
      */
@@ -219,17 +219,17 @@ public class ShieldBoostTest {
 
     /**
      * Note: <b>The other shield path.</b> A shield can also be installed by the <b>skill data</b> rather than by a rule:
-     * {@code SkillExecutor}'s non-damaging arm reads a {@code Defence} effect's parameters (三月七's 100102 is one:
-     * "38% 防御力 + 190") and grants it directly. That arm must name its caster as the provider too, or a data-driven
-     * Shield skill would be the one shield in the fight that "提供的护盾量提高" does not reach.
+     * {@code SkillExecutor}'s non-damaging arm reads a {@code Defence} effect's parameters (March 7th's 100102 is one:
+     * "38% defence + 190") and grants it directly. That arm must name its caster as the provider too, or a data-driven
+     * Shield skill would be the one shield in the fight that "the shield amount provided is increased" does not reach.
      *
      * <p>The claim is stated as a <b>ratio</b> rather than an absolute number: what is being pinned is that the same
-     * skill installs 1.22 x  as much for a wearer of 遗器 128, which stays true whatever the skill's own formula is (that
-     * formula is 三月七's, and {@code SkillExecutorTest} owns it). Note: The caster is 1002 (a character with no rules of
-     * its own) casting 三月七's skill <b>data</b>, so nothing but the data path can install the shield.
+     * skill installs 1.22 x  as much for a wearer of relic 128, which stays true whatever the skill's own formula is (that
+     * formula is March 7th's, and {@code SkillExecutorTest} owns it). Note: The caster is 1002 (a character with no rules of
+     * its own) casting March 7th's skill <b>data</b>, so nothing but the data path can install the shield.
      *
-     * <p>Note: <b>Set 128, not 103</b>, and the reason is a measurement: 103's 2-piece is a <i>stat</i> (防御力 +15%), and
-     * this skill's amount is "38% 防御力 + 190" - so a 103 wearer's shield is larger for <b>two</b> reasons at once and
+     * <p>Note: <b>Set 128, not 103</b>, and the reason is a measurement: 103's 2-piece is a <i>stat</i> (defence +15%), and
+     * this skill's amount is "38% defence + 190" - so a 103 wearer's shield is larger for <b>two</b> reasons at once and
      * the ratio came out 1.255 instead of 1.2 (measured). 128's tiers are ability-only, so it moves exactly one number.
      */
     @Test
@@ -239,14 +239,14 @@ public class ShieldBoostTest {
 
         Assertions.assertTrue(plain > 0, "precondition: the Defence skill really installs a shield (" + plain + ")");
         Assertions.assertEquals(1.22 * plain, boosted, EPS,
-                "the skill-data path names the caster as the provider, so 「提供的护盾量提高」 reaches it");
+                "the skill-data path names the caster as the provider, so 「the shield amount provided is increased」 reaches it");
     }
 
     // ==================================================================
     // Helpers
     // ==================================================================
 
-    /** What 三月七's Skill data installs on its caster, with or without 遗器 128's two ability-only tiers. */
+    /** What March 7th's Skill data installs on its caster, with or without relic 128's two ability-only tiers. */
     private static double skillShield(boolean withRelic) {
         Character caster = withRelic
                 ? CharacterFactory.create(WEARER, LEVEL, true, null, RelicFactory.suit(RELIC_SET_128, STAR, RELIC_LEVEL))
@@ -260,7 +260,7 @@ public class ShieldBoostTest {
     private static final int RELIC_SET_128 = 128;
     private static final int STAR = 5;
     private static final int RELIC_LEVEL = 15;
-    /** 三月七's data row, read while the caster is somebody else (see {@link #theSkillPanelShieldIsBoostedToo}). */
+    /** March 7th's data row, read while the caster is somebody else (see {@link #theSkillPanelShieldIsBoostedToo}). */
     private static final int CASTERS_SKILL_CID = 1001;
     private static final int SKILL_SLOT = 2;
 
@@ -310,7 +310,7 @@ public class ShieldBoostTest {
         return effect;
     }
 
-    /** The same with "持续N回合", which is the path that goes through {@code ShieldBuff}. */
+    /** The same with "lasting N turns", which is the path that goes through {@code ShieldBuff}. */
     private static EffectSpec shieldWithTurns(double amount, int turns) {
         EffectSpec effect = shield(amount);
         TriggerSpecs.set(effect, "turns", turns);

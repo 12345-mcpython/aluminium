@@ -15,8 +15,8 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1408："当白厄成为其他任意目标的技能目标时，获得 1 点[火种]。若施放者为白厄的队友，还会使白厄的
- * 暴击伤害提高 30%，持续 3 回合" (2026-10-02).
+ * 1408: "when Phainon (白厄) becomes the skill target of any other target, he gains 1 point of [火种] (Coreflame). If the caster is a teammate of Phainon, it also increases Phainon's
+ * crit damage by 30%, lasting 3 turns" (2026-10-02).
  *
  * <p>SAME SCENE, ONE VARIABLE: 1414 -- whose skill is a shield aimed at a teammate -- casts it either AT 1408 or AT THE ENEMY. The
  * only difference is who was aimed at, which is exactly what the sentence is about.
@@ -32,15 +32,15 @@ public class SkillTargetCoreflameTest {
     @Test
     public void beingTargetedGrantsCoreflameAndCritDamage() {
         double[] aimedAtHer = scene(true);
-        Assertions.assertEquals(1.0, aimedAtHer[0], EPS, "「获得 1 点【火种】」");
-        Assertions.assertEquals(0.30, aimedAtHer[1], EPS, "「暴击伤害提高 30%」");
+        Assertions.assertEquals(1.0, aimedAtHer[0], EPS, "「gains 1 point of [火种]」");
+        Assertions.assertEquals(0.30, aimedAtHer[1], EPS, "「crit damage increased by 30%」");
     }
 
     /** Note: Aimed at an enemy instead: the sentence has not started. */
     @Test
     public void aimingElsewhereChangesNothing() {
         double[] aimedAway = scene(false);
-        Assertions.assertEquals(0.0, aimedAway[0], EPS, "「成为…技能目标时」 -- she was not the target");
+        Assertions.assertEquals(0.0, aimedAway[0], EPS, "「when becoming ... a skill target」 -- she was not the target");
         Assertions.assertEquals(0.0, aimedAway[1], EPS, "…so there is no crit damage either");
     }
 
@@ -60,7 +60,7 @@ public class SkillTargetCoreflameTest {
 
         Skill skill = support.getSkills().get(SkillType.SKILL);
         Assertions.assertNotNull(skill, "precondition: the teammate has a skill");
-        // Note: 两条分支，而不是一个三元表达式：一个是 `Character`、一个是 `CanHit`，没有共同类型可声明。
+        // Note: Two branches, not a ternary expression: one is a `Character` and the other a `CanHit`, and there is no common type to declare.
         if (aimAtHer) {
             SkillExecutor.execute(battle, skill, support, List.of(owner));
         } else {

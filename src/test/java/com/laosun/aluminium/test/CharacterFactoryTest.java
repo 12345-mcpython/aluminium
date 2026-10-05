@@ -260,7 +260,7 @@ public class CharacterFactoryTest {
     /**
      * The three data boundaries of the energy cap:
      * <ul>
-     *   <li>140遐蝶 - the only {@code null} in the whole data set. Must stay 0 (no energy bar);
+     *   <li>140 Castorice (遐蝶) - the only {@code null} in the whole data set. Must stay 0 (no energy bar);
      *       falling back to 100 would conjure an energy bar for her out of nothing;</li>
      *   <li>1220 Feixiao - 12 (the ultimate only costs 6);</li>
      *   <li>1308 Acheron - 9 (actually uses "stacks in place of an energy bar", see P8-8).</li>

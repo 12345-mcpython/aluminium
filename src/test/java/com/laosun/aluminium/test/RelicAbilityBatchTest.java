@@ -38,18 +38,18 @@ import java.util.Random;
  * energy (8 vs param 3), 310's threshold (50% vs param 0.3) and 313's per-stack CRIT DMG (which is why 313 is
  * still not authored) - so every number below is asserted against the file that was written, not against prose.
  *
- * <p>313 (无主荒星茨冈尼亚) stayed registered, and its reason was rewritten: "当敌方目标被消灭时" needs "the one
+ * <p>313 (无主荒星茨冈尼亚, Masterless Desolate Star Tsigonia) stayed registered, and its reason was rewritten: "when an enemy target is killed" needs "the one
  * who died is an ENEMY", and {@code KILL} fires for any death with the victim as {@code target} - the condition
  * DSL has no camp variable (F-5). A wrong number and a missing spelling in one entry.
  */
 public class RelicAbilityBatchTest {
     private static final double EPS = 1e-6;
 
-    /** 姬子 - carries no rule file of her own, so only the set's rules are in play. */
+    /** Himeko (姬子) - carries no rule file of her own, so only the set's rules are in play. */
     private static final int WEARER = 1003;
     /**
      * The "someone else" in the cases that need a second character. Deliberately the SAME rule-less character as
-     * {@link #WEARER} rather than a colourful one: 桂乃芬 (1210) was the first draft and her own trace is
+     * {@link #WEARER} rather than a colourful one: Guinaifen (桂乃芬, 1210) was the first draft and her own trace is
      * "对陷入灼烧状态的敌方目标造成的伤害提高20%" -- which is exactly the debuff the Pioneer case applies, so she
      * boosted her own hit by 20% and the case measured her rule instead of the set's.
      */
@@ -77,17 +77,17 @@ public class RelicAbilityBatchTest {
     private static final int SACERDOS = 121;
     private static final int SKILL_SLOT = 2;
     private static final int ULT_SLOT = 3;
-    /** 生命的翁法罗斯: the derived-value set (its bonus is a function of Max Energy). */
+    /** 生命的翁法罗斯 (Amphoreus, the Eternal Land): the derived-value set (its bonus is a function of Max Energy). */
     private static final int AMPHOREUS = 328;
-    /** 出云显世与高天神国: the party-composition set (its CRIT Rate needs a teammate on the same Path). */
+    /** 出云显世与高天神国 (Izumo Gensei and Takama Divine Realm): the party-composition set (its CRIT Rate needs a teammate on the same Path). */
     private static final int IZUMO = 314;
-    /** 盗贼公国塔利亚: the weakness-gated set (its Break Effect needs a fire-weak enemy). */
+    /** 盗贼公国塔利亚 (Talia, Kingdom of Banditry): the weakness-gated set (its Break Effect needs a fire-weak enemy). */
     private static final int BANDITRY = 316;
-    /** 逐火者的航迹: the damage-category set (its boost touches DoT only). */
+    /** 逐火者的航迹 (Revelry by the Sea): the damage-category set (its boost touches DoT only). */
     private static final int REVELRY = 322;
 
     // ==================================================================
-    // 102 - 普攻伤害 +10%
+    // 102 - basic attack damage +10%
     // ==================================================================
 
     /** The Basic ATK half is a rule; the SPD half is the data path's `properties` stat (and is not repeated). */
@@ -103,7 +103,7 @@ public class RelicAbilityBatchTest {
     }
 
     // ==================================================================
-    // 111 - 击破弱点后回能
+    // 111 - energy back after breaking a weakness
     // ==================================================================
 
     /** Only the wearer's own break pays, and the amount is the parameter's 3. */
@@ -125,7 +125,7 @@ public class RelicAbilityBatchTest {
     }
 
     // ==================================================================
-    // 11- 对受负面状态影响的敌人增伤
+    // 11- increased damage against an enemy affected by a negative state
     // ==================================================================
 
     /**
@@ -162,7 +162,7 @@ public class RelicAbilityBatchTest {
     }
 
     // ==================================================================
-    // 122 - 战技/终结技增伤，终结技后下一次战技额外 +25%
+    // 122 - Skill/Ultimate damage increased, and after the Ultimate the next Skill gets an extra +25%
     // ==================================================================
 
     /**
@@ -188,7 +188,7 @@ public class RelicAbilityBatchTest {
     }
 
     // ==================================================================
-    // 310 - 效果抵抗 >= 30% 时我方全体暴击伤害 +10%
+    // 310 - when effect RES >= 30%, the whole party's CRIT DMG +10%
     // ==================================================================
 
     /** The threshold is 30%, it is a fraction, and it reaches the whole side. */
@@ -316,7 +316,7 @@ public class RelicAbilityBatchTest {
      */
     @Test
     public void aPreBattleMemospriteEffectLandsOnArrival() {
-        Character wearer = wearing(SERENE_DEMESNE);               // 谧宁拾骨地: HP >= 5000 -> CRIT DMG +28%
+        Character wearer = wearing(SERENE_DEMESNE);               // 谧宁拾骨地 (Bone Collection's Serene Demesne): HP >= 5000 -> CRIT DMG +28%
         wearer.setAttribute(AttributeType.HEALTH, new DoubleValue(6_000));
         Battle battle = new Battle(List.of(wearer), List.of(dummy()), new Random(0));
         battle.startBattle();
@@ -356,7 +356,7 @@ public class RelicAbilityBatchTest {
     /** The nested tiers hold on both halves: 90 speed grants 32%, not 20% + 32%. */
     @Test
     public void thePoetsNestedTiersHoldOnBothHalves() {
-        Character wearer = wearing(POET);                        // 哀歌覆国的诗人: SPD < 110 / < 95
+        Character wearer = wearing(POET);                        // 哀歌覆国的诗人 (Poet of Mourning Collapse): SPD < 110 / < 95
         wearer.setAttribute(AttributeType.SPEED, new DoubleValue(90));
         Battle battle = new Battle(List.of(wearer), List.of(dummy()), new Random(0));
         battle.startBattle();
@@ -378,7 +378,7 @@ public class RelicAbilityBatchTest {
     /** The healing tiers reach the memosprite too, through OUTGOING_HEALING_BOOST. */
     @Test
     public void theGiantTreesHealingTiersReachTheMemosprite() {
-        Character wearer = wearing(RAPT_BROODING);               // 渊思寂虑的巨树: SPD >= 135 / >= 180
+        Character wearer = wearing(RAPT_BROODING);               // 渊思寂虑的巨树 (Giant Tree of Rapt Brooding): SPD >= 135 / >= 180
         wearer.setAttribute(AttributeType.SPEED, new DoubleValue(190));
         Battle battle = new Battle(List.of(wearer), List.of(dummy()), new Random(0));
         battle.startBattle();
@@ -395,11 +395,11 @@ public class RelicAbilityBatchTest {
     }
 
     // ==================================================================
-    // 114 / 118 / 121 - "对己方角色施放" (`target is_ally`, 2026-09-2)
+    // 114 / 118 / 121 - "cast on an allied character" (`target is_ally`, 2026-09-2)
     // ==================================================================
 
     /**
-     * 114 骇域漫游的信使: the wearer's Ultimate <b>on an ally</b> speeds the whole side up - and aimed at an enemy it
+     * 114 骇域漫游的信使 (Messenger Traversing Hackerspace): the wearer's Ultimate <b>on an ally</b> speeds the whole side up - and aimed at an enemy it
      * does nothing at all.
      *
      * <p>Note: Both halves in one case on purpose: the contrast is the whole reason the condition exists (`actor == self`
@@ -432,7 +432,7 @@ public class RelicAbilityBatchTest {
                 "aimed at an ENEMY: 「对己方角色」 does not hold, so nothing is granted");
     }
 
-    /** 118 梦游者钟表匠: the same trigger, a ratio attribute (+30% Break Effect, 2 turns). */
+    /** 118 梦游者钟表匠 (Watchmaker, Master of Dream Machinations): the same trigger, a ratio attribute (+30% Break Effect, 2 turns). */
     @Test
     public void theWatchmakerUltimateRaisesThePartysBreakEffect() {
         Character wearer = wearing(WATCHMAKER);
@@ -447,7 +447,7 @@ public class RelicAbilityBatchTest {
                 "「击破特攻提高#1[i]%」 -- a ratio attribute, so 0.3 is an absolute +30%");
     }
 
-    /** 121 祭司的旧日祭礼: the Skill on an ally raises THAT ally's CRIT DMG, and it stacks to the cap it states. */
+    /** 121 祭司的旧日祭礼 (Sacerdos' Relived Ordeal): the Skill on an ally raises THAT ally's CRIT DMG, and it stacks to the cap it states. */
     @Test
     public void theSacerdosSkillBuffsTheAimedAllyAndStacksTwice() {
         Character wearer = wearing(SACERDOS);
@@ -470,7 +470,7 @@ public class RelicAbilityBatchTest {
     // ==================================================================
 
     /**
-     * 328 生命的翁法罗斯: "能量上限 >= 200 点，每超过 1 点使造成的伤害提高 0.2%，最多提高 32%".
+     * 328 生命的翁法罗斯 (Amphoreus, the Eternal Land): "Max Energy >= 200 points, and for every 1 point above it the damage dealt is increased by 0.2%, up to 32%".
      *
      * <p>Three points on the curve, which is what the sentence actually says: below the threshold <b>nothing</b>,
      * 40 points over it <b>0.08</b>, and past 360 the <b>32% cap</b>. Note: The value is read off the modifier the rule
@@ -488,7 +488,7 @@ public class RelicAbilityBatchTest {
                 "below the threshold nothing is granted at all (and 0.002 x 150 - 0.4 would have been negative)");
     }
 
-    /** The modifier the rule granted on 全部伤害提高, or 0 when it granted none. */
+    /** The modifier the rule granted on all-damage boost, or 0 when it granted none. */
     private static double grantedDamageBoost(double maxEnergy) {
         Character wearer = wearing(AMPHOREUS);
         wearer.setMaxEnergy(maxEnergy);
@@ -509,7 +509,7 @@ public class RelicAbilityBatchTest {
     // ==================================================================
 
     /**
-     * 314 出云显世与高天神国: the CRIT Rate arrives only when a teammate walks the wearer's Path.
+     * 314 出云显世与高天神国 (Izumo Gensei and Takama Divine Realm): the CRIT Rate arrives only when a teammate walks the wearer's Path.
      *
      * <p>Note: The value is read off the <b>modifier the rule granted</b>, not off the resolved attribute: the wearer is
      * built with a relic suit, whose random sub-stats may carry CRIT Rate of their own (relic sub-stats become
@@ -544,7 +544,7 @@ public class RelicAbilityBatchTest {
     // ==================================================================
 
     /**
-     * 316 盗贼公国塔利亚: hitting a <b>fire-weak</b> enemy raises the wearer's Break Effect; anyone else does not.
+     * 316 盗贼公国塔利亚 (Talia - Kingdom of Banditry): hitting a <b>fire-weak</b> enemy raises the wearer's Break Effect; anyone else does not.
      *
      * <p>Note: Both sides in one case: the condition is the whole rule, and a rule that ignored the weakness would pass a
      * test that only checked the fire-weak enemy.
@@ -580,7 +580,7 @@ public class RelicAbilityBatchTest {
     // ==================================================================
 
     /**
-     * 322 逐火者的航迹: the DoT-only boost appears once ATK passes 2400, again at 3600, and not below.
+     * 322 逐火者的航迹 (Revelry by the Sea): the DoT-only boost appears once ATK passes 2400, again at 3600, and not below.
      *
      * <p>Note: This case reads the granted <b>modifier</b>; that the attribute actually reaches a DoT instance's damage is
      * the branch in {@code Battle}'s assembly, and it is pinned separately by

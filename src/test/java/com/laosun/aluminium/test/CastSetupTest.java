@@ -21,7 +21,7 @@ import java.util.Set;
  * The pre-cast hook ({@code TriggerEvent.CAST_SETUP}) and {@code DELEGATE_DAMAGE} (P11-1, M-40).
  *
  * <p><b>What this pair is for.</b> A document can say that a skill's damage is somebody else's: 长夜月's ultimate
- * "使忆灵'长夜'对敌方全体造成等同于'长夜'#1[i]%生命上限的冰属性伤害" is the memosprite's swing, and the rule that
+ * "make the memosprite '长夜' deal Ice damage equal to '长夜''s #1[i]% Max HP to all enemies" is the memosprite's swing, and the rule that
  * delivers it as such runs on {@code ULT_CAST} - i.e. <b>after</b> the damage has already been expanded. So the
  * engine's own damage path swings 141303's rows first (with <b>her</b> attack as the base) and the commanded hit
  * lands on top: two instances where the document describes one, the first scaled off the wrong attribute
@@ -81,7 +81,7 @@ public class CastSetupTest {
         battle.castImmediate(new DefaultSkill(OWNER, ULTRA_SLOT, 1), owner, List.of(enemy));
 
         Assertions.assertEquals(0, hpBefore - enemy.getCurrentHp(), EPS,
-                "「使忆灵「长夜」…造成伤害」: the damage is the memosprite's, so her cast swings nothing of its own");
+                "\"make the memosprite '长夜' ... deal damage\": the damage is the memosprite's, so her cast swings nothing of its own");
         Assertions.assertEquals(BAR, enemy.getStance(), EPS,
                 "…and the toughness of that swing goes with it, to whoever delivers it");
     }

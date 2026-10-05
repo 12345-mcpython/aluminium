@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Op {@code ADD_DAMAGE}: "使反击造成的伤害值提高，提高数值等同于三月七防御力的 30%" (ROADMAP M-55).
+ * Op {@code ADD_DAMAGE}: "raise the damage value the counter deals, the raise being equal to 30% of 三月七's DEF" (ROADMAP M-55).
  *
  * <p>It is the absolute sibling of {@code BOOST_DAMAGE}: that one adds a percentage of the instance, this one adds a
  * <b>value</b> derived from the rule owner's own attribute, into the instance's <b>base layer</b>
@@ -50,7 +50,7 @@ public class AddDamageOpTest {
         // Note: Compared as a RATIO: the addend goes through the same zones the base does, so the settled ratio is what
         // proves where it entered (an absolute growth would depend on the zone factors of this particular fight).
         Assertions.assertEquals((BASE + addend) / BASE, withOp / plain, 0.02,
-                "the settled damage equals a base of 「100 + 30% 防御力」 run through the same zones");
+                "the settled damage equals a base of \"100 + 30% DEF\" run through the same zones");
     }
 
     /** Note: The trap: a percentage of the instance and a value equal to 30% DEF are different numbers unless they coincide. */
@@ -64,7 +64,7 @@ public class AddDamageOpTest {
         double addend = 0.30 * f.owner.getAttribute(AttributeType.DEFENCE).get();
         Assertions.assertEquals(plain * (BASE + addend) / BASE, asValue, Math.max(0.5, plain * 0.02));
         Assertions.assertNotEquals(plain * 1.30, asValue,
-                "「提高数值等同于 30% 防御力」 is not 「造成的伤害提高 30%」 -- a base of " + BASE + " against a settled " + plain
+                "\"the raise is equal to 30% of DEF\" is not \"the damage dealt is raised by 30%\" -- a base of " + BASE + " against a settled " + plain
                         + " against an addend of " + addend);
     }
 
@@ -81,7 +81,7 @@ public class AddDamageOpTest {
                 () -> table(TriggerSpecs.rule("DEALING_DAMAGE", null, noScale)), "a derived value needs its scale");
     }
 
-    /** The shipped sentence: her 星魂 4 states the addend on the counter's own damage instance. */
+    /** The shipped sentence: her Eidolon 4 states the addend on the counter's own damage instance. */
     @Test
     public void theShippedEidolonStatesTheAddend() {
         Character owner = CharacterFactory.create(OWNER, LEVEL, true, null, null, 4);
@@ -92,7 +92,7 @@ public class AddDamageOpTest {
                 .stream()
                 .filter(rule -> rule.minEidolon() == 4)
                 .toList();
-        Assertions.assertEquals(1, rules.size(), "星魂 4's damage sentence is gone from characters/1001.json");
+        Assertions.assertEquals(1, rules.size(), "Eidolon 4's damage sentence is gone from characters/1001.json");
         Assertions.assertEquals(List.of("actor == self", "from_skill TALENT"),
                 rules.getFirst().conditions().stream().map(TriggerTable.Condition::source).toList());
         var effect = rules.getFirst().effects().getFirst();

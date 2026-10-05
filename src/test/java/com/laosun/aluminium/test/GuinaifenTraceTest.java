@@ -18,13 +18,13 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1210 桂乃芬 (Guinaifen): the first character whose file is <b>content</b> for the damage-instance vocabulary.
+ * 1210 Guinaifen (桂乃芬): the first character whose file is <b>content</b> for the damage-instance vocabulary.
  *
- * <p>Her 逾锋 is "对陷入灼烧状态的敌方目标造成的伤害提高20%" - a bonus that depends on the <i>target's state
+ * <p>Her 逾锋 is "increases the damage dealt to an enemy target in the burning state by 20%" - a bonus that depends on the <i>target's state
  * at the moment of the hit</i>, which is neither a timed buff nor something {@code ALLY_ATTACK} could drive
  * (that event fires after the attack is settled). It is the first shipped rule that uses
  * {@code DEALING_DAMAGE} + {@code BOOST_DAMAGE}, and the first that reads a state name resolving to a DoT
- * ({@code 灼烧} = a Fire {@code DotBuff}) rather than to a {@code StateBuff}.
+ * ({@code 灼烧} (Burn) = a Fire {@code DotBuff}) rather than to a {@code StateBuff}.
  *
  * <p>Her 投狭 (advance 25% at battle start) is in the same file, so this also keeps pinning "one character,
  * several mechanics, one table" - the property Robin's file established.
@@ -43,7 +43,7 @@ public class GuinaifenTraceTest {
     private static final double EPS = 1e-9;
 
     // ==================================================================
-    // 1210103 逾锋: "对陷入灼烧状态的敌方目标造成的伤害提高20%"
+    // 1210103 逾锋: "increases the damage dealt to an enemy target in the burning state by 20%"
     // ==================================================================
 
     @Test
@@ -88,11 +88,11 @@ public class GuinaifenTraceTest {
         double allyAfter = hit(battle, ally, target);
 
         Assertions.assertEquals(allyPlain, allyAfter, EPS,
-                "「桂乃芬对…造成的伤害提高」 is her own damage -- 'actor == self' is what keeps it that way");
+                "「Guinaifen's damage dealt to ... is increased」 is her own damage -- 'actor == self' is what keeps it that way");
     }
 
     // ==================================================================
-    // 1210102 投狭: "战斗开始时，桂乃芬的行动提前25%"
+    // 1210102 投狭: "at the start of the battle, advance Guinaifen's action by 25%"
     // ==================================================================
 
     @Test
@@ -102,7 +102,7 @@ public class GuinaifenTraceTest {
 
         Assertions.assertTrue(withoutTrace > 0, "precondition: she has a wait to shorten");
         Assertions.assertEquals(0.75 * withoutTrace, withTrace, 1e-6,
-                "the same 25%-of-remaining-wait arithmetic as Robin's 华彩花腔");
+                "the same 25%-of-remaining-wait arithmetic as Robin's 华彩花腔 (Coloratura)");
     }
 
     // ==================================================================

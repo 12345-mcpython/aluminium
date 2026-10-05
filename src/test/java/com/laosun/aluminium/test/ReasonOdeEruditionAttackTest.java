@@ -10,9 +10,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * `allies_of_path:智识` and the clause it unlocks (2026-10-02): "所有'智识'命途角色攻击力提高 #3(30)%".
+ * `allies_of_path:智识` and the clause it unlocks (2026-10-02): "所有'智识'命途角色攻击力提高 #3(30)%" (all characters on the Erudition path gain #3(30)% ATK).
  *
- * The party is chosen so the selector's REACH is what the reading shows: 那刻夏 (1405) and 景元 (1204) are Erudition, 缇宝 (1403) is Harmony, 昔涟 (1415) is Remembrance. A raise
+ * The party is chosen so the selector's REACH is what the reading shows: Anaxa (1405) and Jing Yuan (1204) are Erudition, Tribbie (1403) is Harmony, Cyrene (1415) is Remembrance. A raise
  * aimed at the path must move exactly the first two.
  */
 public class ReasonOdeEruditionAttackTest {
@@ -28,10 +28,10 @@ public class ReasonOdeEruditionAttackTest {
     public void theRaiseReachesTheEruditionAllyOnly() {
         double[] with = run(true);
         double[] without = run(false);
-        // ROSTER order: [0] 昔涟 (Remembrance), [1] 那刻夏 (Erudition), [2] 景元 (Erudition), [3] 缇宝 (Harmony).
-        System.out.println("[erudition_attack] gains: 那刻夏 " + (with[1] - without[1])
-                + " ; 景元 " + (with[2] - without[2])
-                + " ; 缇宝 " + (with[3] - without[3]) + " ; 昔涟 " + (with[0] - without[0]));
+        // ROSTER order: [0] Cyrene (Remembrance), [1] Anaxa (Erudition), [2] Jing Yuan (Erudition), [3] Tribbie (Harmony).
+        System.out.println("[erudition_attack] gains: Anaxa " + (with[1] - without[1])
+                + " ; Jing Yuan " + (with[2] - without[2])
+                + " ; Tribbie " + (with[3] - without[3]) + " ; Cyrene " + (with[0] - without[0]));
         System.out.println("[erudition_attack]   absolute with: " + java.util.Arrays.toString(with)
                 + " ; without: " + java.util.Arrays.toString(without));
         // What the selector must do: reach BOTH Erudition allies by the same amount, and neither of the others at all.
@@ -43,7 +43,7 @@ public class ReasonOdeEruditionAttackTest {
         Assertions.assertEquals(0.0, with[0] - without[0], 1e-9, "and so does the Remembrance caster");
     }
 
-    /** [那刻夏, 景元, 缇宝, 昔涟] attack values. */
+    /** [Anaxa, Jing Yuan, Tribbie, Cyrene] attack values. */
     private static double[] run(boolean castTheOde) {
         Character cyrene = CharacterFactory.create(CYRENE, LEVEL);
         Character anaxa = CharacterFactory.create(ANAXA, LEVEL);

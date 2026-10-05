@@ -16,12 +16,12 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 驭空 (120), from her own file (2026-09-28): [鸣弦号令], and the pair of capabilities it needed.
+ * Yukong (驭空) (120), from her own file (2026-09-28): [鸣弦号令] (Bowstring Command), and the pair of capabilities it needed.
  *
- * <p><b>What it needed.</b> {@code TURN_END} ("每次我方目标回合结束时" - the next unit's start is a different fact, and a
- * buff's duration tick is not an event) and {@code REMOVE_STACK} by name ("移除驭空 1 层[鸣弦号令]": the attribute
+ * <p><b>What it needed.</b> {@code TURN_END} ("at the end of each of our targets' turns" - the next unit's start is a different fact, and a
+ * buff's duration tick is not an event) and {@code REMOVE_STACK} by name ("remove 1 stack of [鸣弦号令] from Yukong": the attribute
  * form cannot address a named stack, and `REMOVE_STATE` takes all of them off). The ordering inside one event is what
- * makes "持有…时"与"层数归零" both expressible: conditions are evaluated when a rule is reached, so the trace sees the
+ * makes "while holding ..." and "the layer count reaches zero" both expressible: conditions are evaluated when a rule is reached, so the trace sees the
  * pre-removal count and the cleanup sees the post-removal one.
  */
 public class YukongCommandTest {
@@ -38,9 +38,9 @@ public class YukongCommandTest {
 
         f.castSkill();
 
-        Assertions.assertEquals(2, f.yukong.getBuffManager().stacksOf("鸣弦号令"), "「获得2层【鸣弦号令】」");
+        Assertions.assertEquals(2, f.yukong.getBuffManager().stacksOf("鸣弦号令"), "「gains 2 layers of [鸣弦号令]」");
         Assertions.assertTrue(f.ally.getAttribute(AttributeType.ATTACK).get() > allyAttack,
-                "「我方全体攻击力提高80%」 -- the boost lands on the whole side, not just on her");
+                "「increases the ATK of all of our side by 80%」 -- the boost lands on the whole side, not just on her");
     }
 
     /** Note: An ally's turn end removes exactly ONE layer; her own does not. */
@@ -51,11 +51,11 @@ public class YukongCommandTest {
 
         f.turnEndOf(f.yukong);
         Assertions.assertEquals(2, f.yukong.getBuffManager().stacksOf("鸣弦号令"),
-                "「驭空施放战技获得【鸣弦号令】的回合，不会移除】");
+                "「on the turn Yukong casts the Skill and gains [鸣弦号令], it is not removed」");
 
         f.turnEndOf(f.ally);
         Assertions.assertEquals(1, f.yukong.getBuffManager().stacksOf("鸣弦号令"),
-                "「每次我方目标回合结束时，移除驭空1层】");
+                "「at the end of each of our targets' turns, remove 1 layer from Yukong」");
     }
 
     /** When the last layer goes, the party boost goes with it - one removal, everyone. */
@@ -72,7 +72,7 @@ public class YukongCommandTest {
         Assertions.assertEquals(0, f.yukong.getBuffManager().stacksOf("鸣弦号令"), "two ally turn ends, two layers");
         Assertions.assertTrue(boosted > before, "precondition: the boost was up");
         Assertions.assertEquals(before, f.ally.getAttribute(AttributeType.ATTACK).get(), 1e-6,
-                "「当驭空持有【鸣弦号令】时」 -- with no layers left the boost is off, for every ally");
+                "「while Yukong holds [鸣弦号令]」 -- with no layers left the boost is off, for every ally");
     }
 
     /** The ultimate's crit buffs only appear while she holds a layer. */
@@ -82,7 +82,7 @@ public class YukongCommandTest {
         double base = without.ally.getAttribute(AttributeType.CRIT_CHANCE).get();
         without.castUltimate();
         Assertions.assertEquals(base, without.ally.getAttribute(AttributeType.CRIT_CHANCE).get(), 1e-6,
-                "「若驭空持有【鸣弦号令】」 is false, so nothing is granted");
+                "「if Yukong holds [鸣弦号令]」 is false, so nothing is granted");
 
         Fixture with = new Fixture();
         with.castSkill();
@@ -99,7 +99,7 @@ public class YukongCommandTest {
                 "census: three TURN_END rules (the energy trace, the one-layer removal, and the cleanup)");
         Assertions.assertEquals(1, TriggerTables.of(YUKONG).ruleCount(TriggerEvent.SKILL_CAST));
         Assertions.assertEquals(1, TriggerTables.of(YUKONG).ruleCount(TriggerEvent.BASIC_ATTACK),
-                "the talent's additional damage (its 「削韧值提高100%」 half is registered)");
+                "the talent's additional damage (its 「toughness reduction increased by 100%」 half is registered)");
     }
 
     // ==================================================================

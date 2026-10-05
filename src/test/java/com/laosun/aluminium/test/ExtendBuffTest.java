@@ -26,19 +26,19 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * {@code EXTEND_BUFF}: "…的持续时间增加 1 回合".
+ * {@code EXTEND_BUFF}: "... increases the duration by 1 turn".
  *
  * <p><b>Why the vocabulary needed it.</b> Ten of the 9documents lengthen a buff that is <b>already up</b> rather
- * than creating a new one - 三月七's 加护 ("战技提供的护盾持续时间增加1回合"), 布洛妮娅's 星魂 6, 桑博's 风化, 姬子's
- * 灼烧, 白露's 生息, 藿藿's 禳命, 加拉赫's 酩酊 … Before this op the only way to write one was to <b>fold the +1 into the
+ * than creating a new one - March 7th (三月七)'s 加护 ("increases the duration of the shield provided by the Skill by 1 turn"), Bronya (布洛妮娅)'s eidolon 6, Sampo (桑博)'s 风化,
+ * Himeko (姬子)'s 灼烧, Bailu (白露)'s 生息, Huohuo (藿藿)'s 禳命, Gallagher (加拉赫)'s 酩酊 ... Before this op the only way to write one was to <b>fold the +1 into the
  * ability it lengthens</b>, which erases the trace's own line from the data and makes the base ability state a
  * duration that is not its own.
  *
  * <p><b>The two filters, and why neither is optional.</b> Every sentence identifies the buff by its <b>origin</b>
- * ("战技提供的") and then by <b>what it is</b>: a state's name (灼烧 / 生息 / 冻结 / 护盾), or - when the text names an
- * effect rather than a state ("伤害提高效果") - the <b>attribute</b> the modifier sits on. "Everything I have on that
+ * ("provided by the Skill") and then by <b>what it is</b>: a state's name (Burning / 生息 / Frozen / shield), or - when the text names an
+ * effect rather than a state ("damage increase effect") - the <b>attribute</b> the modifier sits on. "Everything I have on that
  * unit" is deliberately not a spelling, and {@link #itDoesNotLengthenTheOwnersOtherBuffs} is the case that shows why:
- * 布洛妮娅's DEFENCE trace buff from {@code BATTLE_START} can still be ticking when she casts her Skill.
+ * Bronya's DEFENCE trace buff from {@code BATTLE_START} can still be ticking when she casts her Skill.
  */
 public class ExtendBuffTest {
     private static final double EPS = 1e-6;
@@ -48,7 +48,7 @@ public class ExtendBuffTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** The 加护 shape: the same rule applies the shield and then lengthens it. */
+    /** The 加护 (Ward) shape: the same rule applies the shield and then lengthens it. */
     @Test
     public void itLengthensTheBuffTheSameRuleJustApplied() {
         Fixture f = new Fixture(
@@ -75,7 +75,7 @@ public class ExtendBuffTest {
                 TriggerSpecs.extendBuff("灼烧", null, 1));
         dot.fire();
         Assertions.assertEquals(3, dot.buff(DotBuff.class).duration(),
-                "the DOT's name is its element's (Fire → 灼烧), translated in one place");
+                "the DOT's name is its element's (Fire -> Burning), translated in one place");
     }
 
     /** When the sentence names an <i>effect</i> rather than a state, the attribute a modifier sits on names it. */
@@ -90,7 +90,7 @@ public class ExtendBuffTest {
         Assertions.assertEquals(2, f.buff(StatModifierBuff.class).duration(), "1 + 1");
     }
 
-    /** Note: Only the owner's own buffs: "战技提供的"/"天赋使敌方目标陷入的" are all about who applied it. */
+    /** Note: Only the owner's own buffs: "provided by the Skill" / "inflicted on the enemy target by the talent" are all about who applied it. */
     @Test
     public void itDoesNotLengthenAnotherUnitsBuff() {
         Fixture f = new Fixture(TriggerSpecs.extendBuff(BuffManager.SHIELD_STATE, null, 1));
@@ -100,7 +100,7 @@ public class ExtendBuffTest {
         f.fire();
 
         Assertions.assertEquals(2, f.buff(ShieldBuff.class).duration(),
-                "a shield somebody else applied is not 「战技提供的护盾」");
+                "a shield somebody else applied is not 「the shield provided by the Skill」");
     }
 
     /**
@@ -136,7 +136,7 @@ public class ExtendBuffTest {
                 TriggerSpecs.rule("BASIC_ATTACK", null, TriggerSpecs.extendBuff("协奏", null, 5)));
         f.fire();
         StateBuff state = f.buff(StateBuff.class);
-        Assertions.assertTrue(state.isPermanent(), "precondition: the state is 「整场战斗」");
+        Assertions.assertTrue(state.isPermanent(), "precondition: the state is 「the whole battle」");
         int duration = state.duration();
 
         Assertions.assertDoesNotThrow(() -> f.fire(TriggerEvent.BASIC_ATTACK));
@@ -150,7 +150,7 @@ public class ExtendBuffTest {
      *
      * <p>This is what the origin filter rests on, and it used to be true only where a constructor demanded it
      * ({@code DotBuff} needs it for kill credit) - a {@code StateBuff} or a stat modifier could be anonymous, and an
-     * anonymous buff would make "战技提供的护盾" silently extend nothing at all. The audit is pinned here so that a
+     * anonymous buff would make "the shield provided by the Skill" silently extend nothing at all. The audit is pinned here so that a
      * new buff-creating op has to keep its half of the deal.
      */
     @Test

@@ -3,7 +3,7 @@ package com.laosun.aluminium.enums;
 import java.util.Locale;
 
 /**
- * The <b>class</b> of a negative state (负面状态类), as the documents group them:
+ * The <b>class</b> of a negative state (negative state class, 负面状态类), as the documents group them:
  * "抵抗<b>控制类</b>负面状态的概率提高35%" and "抵抗<b>持续伤害类</b>负面状态的概率提高50%".
  *
  * <p><b>Why a class and not just the specific resistance key.</b> The engine already has a per-state resistance
@@ -21,12 +21,12 @@ import java.util.Locale;
 public enum DebuffClass {
 
     /**
-     * 控制类: a state that takes the victim's turn away - 冻结 / 纠缠 / 禁锢, and the engine's plain act lock.
+     * Control class (控制类): a state that takes the victim's turn away - 冻结 (frozen) / 纠缠 (entangled) / 禁锢 (imprisoned), and the engine's plain act lock.
      */
     CONTROL("control"),
 
     /**
-     * 持续伤害类: the four damage-over-time states (灼烧 / 触电 / 裂伤 / 风化).
+     * Damage-over-time class (持续伤害类): the four damage-over-time states (灼烧 (burn) / 触电 (shock) / 裂伤 (bleed) / 风化 (windshear)).
      */
     DOT("dot");
 

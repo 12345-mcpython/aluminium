@@ -11,7 +11,7 @@ import com.laosun.aluminium.models.CanHit;
  * {@code "turns"} was <b>accepted and silently ignored</b>: 三月七's shield said "持续3回合" and stayed for the
  * rest of the battle. That is the failure mode this project refuses (a wrong number with nothing to report), and
  * it is worse than it looks, because a shield that never comes off keeps every "持有护盾的…" clause true - the
- * 天赋 counter this class was written for would have counted attacks for the whole fight instead of for three
+ * the 天赋 (talent) counter this class was written for would have counted attacks for the whole fight instead of for three
  * turns.
  *
  * <p><b>What it does.</b> It <b>installs</b> the shield when it is attached and <b>takes it off</b> when it
@@ -21,7 +21,7 @@ import com.laosun.aluminium.models.CanHit;
  *
  * <p><b>Whose turns count it down.</b> The carrier's (the shielded ally's), which is the engine's default anchor
  * and what "持续3回合" means in the texts: the shield is on <i>them</i>, and it lasts three of <i>their</i> turns.
- * 星期日's [蒙福者] is the one documented case where the clock is somebody else's, and it says so explicitly
+ * Sunday's [蒙福者] is the one documented case where the clock is somebody else's, and it says so explicitly
  * ({@code ticks_on}); a shield does not.
  *
  * <p><b>Note: Ownership, and why the value alone is not enough.</b> A new shield <b>overwrites</b> the old one
@@ -30,7 +30,7 @@ import com.laosun.aluminium.models.CanHit;
  * yet, and it must take off <b>its own</b> shield, not "whatever is there". Comparing values would be a guess
  * (two shields of the same size are indistinguishable); the shield therefore remembers
  * <b>which buff installed it</b> ({@code CanHit.installShield} / {@code removeShieldFrom}), and a buff only ever
- * clears the shield it put up. The same field is what the registered "这面盾<b>是不是我的</b>" gap will read when
+ * clears the shield it put up. The same field is what the registered "这面盾<b>是不是我的</b>" (is this shield mine) gap will read when
  * that content arrives - as {@link #getSource()}, the caster.
  */
 public class ShieldBuff extends AbstractBuff {
@@ -43,15 +43,15 @@ public class ShieldBuff extends AbstractBuff {
 
     /**
      * @param source the unit whose effect granted the shield ({@code null} = unknown), which is who
-     *               "装备者提供的护盾" would name - see {@link #getSource()}
-     * @param amount the shield value <b>before</b> the provider's "提供的护盾量提高" (already scaled and resolved by
+     *               "装备者提供的护盾" (the shield the equipper provides) would name - see {@link #getSource()}
+     * @param amount the shield value <b>before</b> the provider's "提供的护盾量提高" (raising the shield amount provided; already scaled and resolved by
      *               the caller); the boost is applied here, once, so that this buff's {@link #getAmount()} is the same
      *               number {@code Battle.grantShield} would install on the untimed path
      * @param turns  how many of the <b>carrier's</b> turns it lasts; must be positive
      */
     public ShieldBuff(CanHit source, double amount, int turns) {
         // Not an early buff: the engine's turn boundary order for a plain timed buff -- the same slot every
-        // StatModifierBuff uses, so "3 turns" means the same thing here as it does for "攻击力提高，持续3回合".
+        // StatModifierBuff uses, so "3 turns" means the same thing here as it does for "攻击力提高，持续3回合" (ATK raised for 3 turns).
         super(turns, false);
         setSource(source);
         // Note: The boost is read HERE rather than inside applyEffect: applyEffect only receives the carrier, and the
@@ -62,7 +62,7 @@ public class ShieldBuff extends AbstractBuff {
     /**
      * The shield value this buff installed, <b>after</b> the provider's boost.
      *
-     * <p>Note: Read it as "what the carrier's shield is worth", not as "what the rule asked for": 遗器 103 的 20% makes a
+     * <p>Note: Read it as "what the carrier's shield is worth", not as "what the rule asked for": the relic (遗器) 103's 20% makes a
      * "5% 防御力 + 60" shield worth 1.2 x that, and a test that compared this to the rule's own arithmetic would be
      * measuring the wrong thing (the rule's numbers are pinned by the shield's own tests).
      */

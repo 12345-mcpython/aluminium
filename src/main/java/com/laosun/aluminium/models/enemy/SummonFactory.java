@@ -47,7 +47,7 @@ public final class SummonFactory {
      * Builds a summon from "monster id + level + level group".
      *
      * @param monsterId      a key of {@code monster_config.json} - the <b>summon's</b> own id, not its
-     *                       master's (e.g. 1002040 银鬃近卫 for 银鬃尉官 1003010)
+     *                       master's (e.g. 1002040 Silvermane Guard (银鬃近卫) for Silvermane Lieutenant (银鬃尉官) 1003010)
      * @param level          the stage level (the same one the rest of the battle uses)
      * @param hardLevelGroup the stage's hard level group; explicit, because a monster's own
      *                       {@code hard_level_group} is almost always 1 and the stage is what decides
@@ -132,7 +132,7 @@ public final class SummonFactory {
      * Builds a character's <b>memosprite</b> (忆灵) with a panel derived from its summoner (P9-4).
      *
      * <pre>
-     * SummonFactory.memosprite(阿格莱雅 at level 80)
+     * SummonFactory.memosprite(Aglaea (阿格莱雅) at level 80)
      *    to memosprites/1402.json HEALTH = 0.66 x her Max HP + 20, SPEED = 0.35 x her SPD
      *    to Summon (Camp.PLAYER)
      * </pre>
@@ -144,7 +144,7 @@ public final class SummonFactory {
      * camp and panel were decided somewhere nobody looks.
      *
      * <p>Note: <b>The panel is read from the summoner's <em>resolved</em> sheet</b> ({@code getAttribute(...)}),
-     * which is what the documents mean by "等同于阿格莱雅生命上限": the number her relics, light cone, traces
+     * which is what the documents mean by "equal to Aglaea (阿格莱雅)'s Max HP": the number her relics, light cone, traces
      * and buffs have already produced. A memosprite therefore follows its summoner's equipment without any of
      * it being repeated here.
      *
@@ -231,9 +231,9 @@ public final class SummonFactory {
             double flat = entry.flat() == null ? 0 : entry.flat();
             double value;
             if (entry.source() != null && entry.source().startsWith("attr:")) {
-                // "等同于召唤者生命上限的 X%" (2026-10-02): a share of ANOTHER of the
+                // "equal to X% of the summoner's Max HP" (2026-10-02): a share of ANOTHER of the
                 // master's attributes. The plain branch below reads `master.getAttribute(attribute)` -- the
-                // SAME attribute the entry names -- which is why the 景元-style trick ("神君" = 66% of his
+                // SAME attribute the entry names -- which is why the Jing Yuan (景元)-style trick ("神君" = 66% of his
                 // ATTACK, carried in the ATTACK slot) works but "40% of the summoner's Max HP" did not.
                 String other = entry.source().substring("attr:".length()).trim();
                 value = share * master.getAttribute(AttributeType.fromString(other)).get() + flat;
@@ -298,7 +298,7 @@ public final class SummonFactory {
         summon.setLevel(master.getLevel());
         declareResources(summon, spec);
         if (spec.aggro() != null) {
-            // The servant's own 仇恨 ("ServantID 11413 - 仇恨: 125"). Only stated when a document states it:
+            // The servant's own 仇恨 (aggro) ("ServantID 11413 - 仇恨: 125"). Only stated when a document states it:
             // Battle.aggroOf answers its regular tier for anything left at 0, which is a different claim from
             // "the document says 100".
             summon.setAggro((int) Math.round(spec.aggro()));
@@ -335,7 +335,7 @@ public final class SummonFactory {
         summon.setLevel(master.getLevel());
         declareResources(summon, spec);
         if (spec.aggro() != null) {
-            // The servant's own 仇恨 ("ServantID 11413 - 仇恨: 125"). Only stated when a document states it:
+            // The servant's own 仇恨 (aggro) ("ServantID 11413 - 仇恨: 125"). Only stated when a document states it:
             // Battle.aggroOf answers its regular tier for anything left at 0, which is a different claim from
             // "the document says 100".
             summon.setAggro((int) Math.round(spec.aggro()));
@@ -343,7 +343,7 @@ public final class SummonFactory {
         if (spec.attack() != null) {
             summon.setSkill(SkillType.COMMON, attackOf(spec, DamageType.NORMAL));
         }
-        // 亿灵技本来就该是 `Skill` (2026-10-02): each stated row becomes a real skill, addressed by (ServantID, slot) exactly
+        // A memosprite skill was always meant to be a `Skill` (2026-10-02): each stated row becomes a real skill, addressed by (ServantID, slot) exactly
         // like a character's -- so `SkillEffects.forSkill`, `SkillExecutor.canDeliver` and every op that takes a skill work
         // on a memosprite's skill with no special case.
         installSpecSkills(summon, spec, master);
@@ -351,7 +351,7 @@ public final class SummonFactory {
     }
 
     /**
-     * Compiles the spec's {@code attack} block into the skill the memosprite acts with (P9-4 忆灵).
+     * Compiles the spec's {@code attack} block into the skill the memosprite acts with (P9-4 memosprite).
      *
      * <p>Note: The spec was validated immediately above, so an unknown element / base / shape cannot reach this
      * point; the lookups are the plain {@code fromString} ones rather than a second set of checks, because
@@ -375,7 +375,7 @@ public final class SummonFactory {
                 DamageElement.fromString(attack.element()),
                 attack.percent(),
                 attack.hits() == null ? 1 : attack.hits(),
-                // Note: `type` is 忆灵伤害 (GLOSSARY.md), and a memosprite's own skill is exactly that -- not NORMAL.
+                // Note: `type` is memosprite damage (忆灵伤害, GLOSSARY.md), and a memosprite's own skill is exactly that -- not NORMAL.
                 // The type has been declared since the table was written (its javadoc notes only some constants are in use);
                 // labelling it here is what lets a rule scope a bonus to memosprite damage, and it is the game's own word.
                 type,

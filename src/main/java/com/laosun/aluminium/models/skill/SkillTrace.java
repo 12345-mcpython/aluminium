@@ -10,7 +10,7 @@ import java.util.*;
 import static com.laosun.aluminium.Constant.PERCENT_TO_BASE;
 
 /**
- * A node in a character's skill trace tree (行迹点).
+ * A node in a character's skill trace tree (a trace node).
  *
  * <p>Each trace node may grant an attribute bonus. The tree is built from raw
  * {@link com.laosun.aluminium.beans.SkillTraceData} beans with parent-child relationships

@@ -16,10 +16,10 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * "处于[协奏]状态时，知更鸟免疫控制类负面状态" - the immunity, asserted BOTH ways.
+ * "while in the [协奏] state, Robin (知更鸟) is immune to control-class negative states" - the immunity, asserted BOTH ways.
  *
- * <p>The clause has been shipped since 2026-09-28, together with ③'s party ATK boost, in one ULT_CAST rule that carries
- * the name 协奏; this class pins what nothing else did: the same control that lands after the countdown cannot land while
+ * <p>The clause has been shipped since 2026-09-28, together with clause 3's party ATK boost, in one ULT_CAST rule that carries
+ * the name 协奏 (concerto); this class pins what nothing else did: the same control that lands after the countdown cannot land while
  * the state lasts, because the immunity ends with the state rather than with a turn count. It also records that ULT_CAST
  * arrives at the tables exactly once per cast.
  *

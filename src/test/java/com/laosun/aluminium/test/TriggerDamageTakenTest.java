@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * The {@code MODIFY_DAMAGE_TAKEN} op: "受到的伤害提高 X%"（易伤）and "受到的伤害降低 X%"（减伤）as data.
+ * The {@code MODIFY_DAMAGE_TAKEN} op: "受到的伤害提高 X%"（易伤, vulnerability）and "受到的伤害降低 X%"（减伤, reduction）as data.
  *
  * <p><b>Why a separate op was needed.</b> Both are damage <i>zones</i>, not attributes: the engine has had
  * {@link VulnerabilityBuff} / {@link ReductionBuff} since P1, and they work by injecting into the settlement
@@ -61,7 +61,7 @@ public class TriggerDamageTakenTest {
 
         fireOnDummy(battle);
         Assertions.assertTrue(dummy(battle).getBuffManager().hasBuff(VulnerabilityBuff.class),
-                "positive = 受到的伤害提高 = vulnerability, a DEBUFF on the defender");
+                "positive = 受到的伤害提高 (damage taken raised) = vulnerability, a DEBUFF on the defender");
         Assertions.assertEquals(plain * 1.12, dummyDamageTaken(battle), EPS);
     }
 
@@ -72,14 +72,14 @@ public class TriggerDamageTakenTest {
 
         fireOnDummy(battle);
         Assertions.assertTrue(dummy(battle).getBuffManager().hasBuff(ReductionBuff.class),
-                "negative = 受到的伤害降低 = reduction, a BUFF on the defender");
+                "negative = 受到的伤害降低 (damage taken lowered) = reduction, a BUFF on the defender");
         Assertions.assertEquals(plain * 0.92, dummyDamageTaken(battle), EPS);
     }
 
     /**
      * The C-1 boundary: a vulnerability on the defender must not boost the damage that defender <b>deals</b>.
      *
-     * <p>This is the trap both buffs guard with {@code damage.isOnDefenderSide(owner)} - without it a 易伤
+     * <p>This is the trap both buffs guard with {@code damage.isOnDefenderSide(owner)} - without it a 易伤 (vulnerability)
      * sitting on the enemy would also be an output bonus for the enemy. Pinned at the content level, because
      * this op is the first way for <b>data</b> to attach one.
      */

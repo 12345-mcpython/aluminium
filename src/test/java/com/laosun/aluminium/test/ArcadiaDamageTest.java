@@ -19,13 +19,13 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Relic set 321 "妖精织梦的乐园" 2-piece: "每少1名我方目标，使装备者及其忆灵造成的伤害提高12%，最多叠3层".
+ * Relic set 321 "妖精织梦的乐园" 2-piece: "for each 1 fewer of our targets, raise the damage dealt by the wearer and their memosprite by 12%, up to 3 stacks".
  *
  * <p>Every read happens after a DRIVEN TURN: the memosprite's half hangs on SUMMONED, which is fired from a settle, and rounds 8-9 recorded
  * it as an engine defect only because their probes read before any settle existed. Measured: `no-settle -> 0.0`, `settle -> 0.12`.
  *
- * <p>The fixture is built in TARGETS, not characters: `ally_count` counts a memosprite as an ally target (two characters plus the 忆灵 is
- * three targets, one missing, +12%), which is the game's own reading of "我方目标数量".
+ * <p>The fixture is built in TARGETS, not characters: `ally_count` counts a memosprite as an ally target (two characters plus the memosprite is
+ * three targets, one missing, +12%), which is the game's own reading of "our target count".
  */
 public class ArcadiaDamageTest {
     private static final int WEARER = 1001;
@@ -43,14 +43,14 @@ public class ArcadiaDamageTest {
 
     @Test
     public void theMemoSpriteIsBoostedToo() {
-        // Note: In targets: three characters plus the 忆灵 would be four (nothing missing), so the boosted case is two characters.
+        // Note: In targets: three characters plus the memosprite would be four (nothing missing), so the boosted case is two characters.
         double fourTargets = memospriteDamage(3);
         double threeTargets = memospriteDamage(2);
         double ratio = threeTargets / fourTargets;
         // Note: Measured 1.08, not 1.12: the memosprite also carries 1413's own enemy-count talent in another zone, which compresses the
         // ratio -- the same effect round 65 measured when a 1.48 zone ratio read 1.1404 on a skill hit. The attribute assertion inside
         // `memospriteDamage` is the exact one; this proves the boost reaches real damage.
-        Assertions.assertTrue(fourTargets > 0, "precondition: the 忆灵 landed both hits");
+        Assertions.assertTrue(fourTargets > 0, "precondition: the memosprite landed both hits");
         Assertions.assertTrue(ratio > 1.05 && ratio <= 1.12,
                 "the memosprite's own boost reached its damage: " + fourTargets + " vs " + threeTargets
                         + " (ratio " + ratio + ")");
@@ -64,7 +64,7 @@ public class ArcadiaDamageTest {
         return wearer.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
     }
 
-    /** Note: Takes the number of CHARACTERS: the 忆灵 adds one more target. */
+    /** Note: Takes the number of CHARACTERS: the memosprite adds one more target. */
     private static double memospriteDamage(int allies) {
         Character master = CharacterFactory.create(MEMOSPRITE_OWNER, LEVEL, true, null,
                 RelicFactory.suit(321, 5, RELIC_LEVEL));
@@ -80,7 +80,7 @@ public class ArcadiaDamageTest {
         Battle battle = new Battle(party(master, allies), List.of(victim), noCrit);
         battle.startBattle();
         Summon memosprite = battle.summonMemosprite(master);
-        Assertions.assertNotNull(memosprite, "precondition: the 忆灵 is out");
+        Assertions.assertNotNull(memosprite, "precondition: the memosprite is out");
         driveTurn(battle, master);
         Assertions.assertEquals(allies == 2 ? 0.12 : 0.0,
                 memosprite.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get(), 1e-9,

@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * "等同于<b>原伤害</b> X%" - the rider settles to the share the text states (2026-10-02).
+ * "equal to <b>the original damage</b> X%" - the rider settles to the share the text states (2026-10-02).
  *
  * <p>A {@code DAMAGE} effect's value is a <b>base</b>: settlement multiplies it by the instance's zones again, so a
  * scale that reads an already-settled amount has to divide by the triggering instance's own factor
@@ -43,14 +43,14 @@ public class OriginalDamageRiderTest {
         Assertions.assertEquals(baseline, full - baseline, baseline * 1e-6,
                 "a 100% rider settles what the original settled: " + baseline + " -> " + full);
         Assertions.assertEquals(baseline * 0.4, forty - baseline, baseline * 1e-6,
-                "and 姬子's 星魂 6 share (40%) lands as 40%, not as 40% x the zone factor");
+                "and 姬子's Eidolon 6 share (40%) lands as 40%, not as 40% x the zone factor");
     }
 
     /**
-     * 姬子's shipped 星魂 6, through her own file.
+     * 姬子's shipped Eidolon 6, through her own file.
      *
      * <p>Note: <b>The baseline is NOT "her total damage at E0".</b> In the same battle another of her file's rules lands a
-     * 1064.438828 instance, so the E0 total (11482.69) is mostly damage this clause must <b>not</b> scale: "原伤害" is
+     * 1064.438828 instance, so the E0 total (11482.69) is mostly damage this clause must <b>not</b> scale: "the original damage" is
      * the damage of <b>that cast</b> -- the ultimate's own 18.25531 -- and the two guards ({@code damage_is_attack}
      * and {@code from_skill ULTRA}) are what keep the clause off everything else. Reading the comparison the other way
      * round cost two rounds: the expectation was 0.8 x the total instead of 0.8 x what the ultimate itself settled.
@@ -62,7 +62,7 @@ public class OriginalDamageRiderTest {
         double ultimateOwnInstance = 718.255731;      // measured: her ultimate's own settled damage in this fixture
 
         Assertions.assertEquals(2 * 0.4 * ultimateOwnInstance, e6 - e0, 1e-6,
-                "「额外造成2次伤害…等同于原伤害40%」 = 2 x 40% x the ULTIMATE's own instance, and NOT of the "
+                "\"additionally deal 2 instances of damage ... equal to 40% of the original damage\" = 2 x 40% x the ULTIMATE's own instance, and NOT of the "
                         + "10764.438828 another rule contributes in the same battle: " + e0 + " -> " + e6);
     }
 

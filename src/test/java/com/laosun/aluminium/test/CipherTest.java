@@ -32,13 +32,13 @@ public class CipherTest {
         double reference = reactionLoss(false, true);
 
         Assertions.assertEquals(0.0, unmarked, 1e-9,
-                "「【老主顾】受到我方其他目标攻击后」 -- without the mark, nothing");
+                "「after 【老主顾】 (Patron) is attacked by another of our targets」 -- without the mark, nothing");
         Assertions.assertTrue(marked > 0, "with the mark, the follow-up lands");
         Assertions.assertEquals(0.5, marked / reference, 0.05,
                 "150% against a hand-built 300% reference: " + marked + " vs " + reference);
     }
 
-    /** Note: "使赛飞儿的攻击力提高30%" -- a share of her own BASE attack. */
+    /** Note: "increases Cipher's ATK by 30%" -- a share of her own BASE attack. */
     @Test
     public void theSkillRaisesHerOwnAttack() {
         Character cipher = CharacterFactory.create(CIPHER, LEVEL);
@@ -52,7 +52,7 @@ public class CipherTest {
         battle.castImmediate(cipher.getSkills().get(com.laosun.aluminium.enums.SkillType.SKILL), cipher, List.of(enemy));
 
         Assertions.assertEquals(base * 0.3, cipher.getAttribute(AttributeType.ATTACK).get() - before, base * 0.3 * 0.02,
-                "「使赛飞儿的攻击力提高30%」 of the BASE: base " + base);
+                "「increases Cipher's ATK by 30%」 of the BASE: base " + base);
     }
 
     /** Fires a teammate's attack at the enemy; optionally marks it first, optionally uses a hand-built 300% reference rule. */
@@ -71,7 +71,7 @@ public class CipherTest {
             TriggerSpecs.set(markEffect, "buff", "老主顾");
             TriggerSpecs.set(markEffect, "permanent", true);
             TriggerSpecs.set(markEffect, "target", "target");
-            // Note: The reference must carry her presence aura too. Round 1040 shipped "赛飞儿在场时，敌方全体受到的伤害提高
+            // Note: The reference must carry her presence aura too. Round 1040 shipped "while Cipher is on the field, the damage taken by all enemies is increased by
             // 40%", and this path REPLACES her whole trigger table -- so without this line the aura lands on the shipped
             // side only and the ratio drifts 0.5 -> 0.. Same shape as the crit clause recorded below (round 242).
             EffectSpec aura = new EffectSpec();
@@ -100,7 +100,7 @@ public class CipherTest {
 
     /**
      * Note: Returns 1.0, i.e. NEVER crits (2026-09-29, round 242). It used to return 0.0, which forced every hit to crit -- and that silently
-     * coupled this test to 1406's 追加攻击 crit-damage clause: the shipped path carries it, the hand-built reference (which REPLACES her
+     * coupled this test to 1406's follow-up attack crit-damage clause: the shipped path carries it, the hand-built reference (which REPLACES her
      * trigger table) does not, so the 150%/300% comparison drifted from 0.5 to 0.833 the moment that clause shipped. The test's subject is
      * the BASE SHARE, so measuring it without crits is both the minimal fix and the more honest reading.
      */

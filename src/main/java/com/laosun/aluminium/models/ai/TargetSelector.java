@@ -18,7 +18,7 @@ import java.util.Random;
  *       already hits everyone, so nothing needs choosing; bounces are random per hit and are not
  *       constrained.</li>
  *   <li><b>Aggro-weighted random</b>: draw one with probability
- *       {@code that unit's aggro / total candidate aggro}. Preservation (存护) 150 is more likely to
+ *       {@code that unit's aggro / total candidate aggro}. Preservation 150 is more likely to
  *       be hit than the usual 100.</li>
  * </ol>
  *

@@ -14,8 +14,8 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1505 绯英, the two clauses her own text states completely (2026-09-30):
- * "绯英获得等同于暴击伤容 50% 的欢愉度" and the technique's 20 [好活当赏].
+ * 1505 Evanescia (绯英), the two clauses her own text states completely (2026-09-30):
+ * "绯英获得等同于暴击伤容 50% 的欢愉度" (Evanescia gains Elation equal to 50% of her CRIT DMG) and the technique's 20 [好活当赏].
  */
 public class Character1505Test {
     private static final int WEARER = 1505;
@@ -51,8 +51,8 @@ public class Character1505Test {
         battle.startBattle();
         int elationValue = elation.getResources().value("欢愉度");
         int gifts = elation.getResources().value("好活当赏");
-        System.out.println("[1505] crit damage=" + critDamage + " -> 欢愉度=" + elationValue
-                + " (half is " + Math.round(critDamage * 0.5) + ") ; 好活当赏=" + gifts);
+        System.out.println("[1505] crit damage=" + critDamage + " -> 欢愉度 (Elation)=" + elationValue
+                + " (half is " + Math.round(critDamage * 0.5) + ") ; 好活当赏 (gifts)=" + gifts);
         Assertions.assertEquals((int) Math.round(critDamage * 0.5), elationValue,
                 "the talent sets the Elation value to half the crit-damage panel");
         Assertions.assertEquals(20, gifts, "and the technique grants 20 gifts at battle start");
@@ -69,7 +69,7 @@ public class Character1505Test {
         battle.startBattle();
         double critDamage = elation.getAttribute(AttributeType.CRIT_ATTACK).get();
         int elationValue = elation.getResources().value("欢愉度");
-        System.out.println("[1505] with a raised panel: crit damage=" + critDamage + " -> 欢愉度="
+        System.out.println("[1505] with a raised panel: crit damage=" + critDamage + " -> 欢愉度 (Elation)="
                 + elationValue + " (half is " + Math.round(critDamage * 0.5) + ")");
         Assertions.assertTrue(critDamage >= 1.4, "the panel really moved (it reads " + critDamage + ")");
         Assertions.assertEquals((int) Math.round(critDamage * 0.5), elationValue,
@@ -100,9 +100,9 @@ public class Character1505Test {
                             "the talent derives the value from the crit-damage panel");
                     Assertions.assertEquals(0.5, effect.getAmountPercent(), 1e-9, "and takes half of it");
                 } else if (Boolean.TRUE.equals(effect.getAmountFromEvent())) {
-                    // the third source (2026-09-30): "获得能量时同步获得等值[好活当赏]" -- the amount is the event's own
+                    // the third source (2026-09-30): "获得能量时同步获得等值[好活当赏]" (gaining energy also gains an equal amount of [好活当赏]) -- the amount is the event's own
                     Assertions.assertEquals("好活当赏", effect.getResource(),
-                            "the mirrored resource is 【好活当赏】");
+                            "the mirrored resource is 【好活当赏】 (gifts)");
                 } else if ("DAMAGE".equals(effect.getOp())) {
                     // the technique's own damage (2026-09-30): a rule-driven ORDINARY instance, so it has no `amount` at all
                     Assertions.assertEquals(1.0, effect.getPercent(), 1e-9, "100% of her attack");
@@ -114,7 +114,7 @@ public class Character1505Test {
         }
         Assertions.assertEquals(3, seen, "BATTLE_START carries the derive, the technique’s twenty and its damage");
 
-        // The third clause lives on a DIFFERENT event (2026-09-30): "获得能量时同步获得等值的[好活当赏]"
+        // The third clause lives on a DIFFERENT event (2026-09-30): "获得能量时同步获得等值的[好活当赏]" (gaining energy also gains an equal amount of [好活当赏])
         // is triggered by ENERGY_GAINED, so it is pinned by reading that event's rules -- the first version of this test counted
         // BATTLE_START only and read 2, which is exactly what made it obvious.
         var theSyncRule = elation.getTriggerTable().rulesFor(

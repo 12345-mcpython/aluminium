@@ -19,7 +19,7 @@ import java.util.Random;
 
 /**
  * Light cone 2305: the wearer's ELATION damage ignores 20% of the target's defence (its speed clause is the row's, and
- * its 笑点 clause is registered).
+ * its 笑点 (laugh points) clause is registered).
  *
  * <p>The instance route is what makes "permanently, but only for elation" expressible: it mutates the instance being
  * settled and is filtered by `damage_type`, so nothing can leak into ordinary damage. The expectation is derived from

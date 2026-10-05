@@ -49,7 +49,7 @@ public class SkillData {
      * {@code DefaultSkill}, and a slot whose character has no such row still ends up <b>present in the map</b> - 
      * holding this placeholder. So "the slot is there" and "the character has that skill" are different facts, and
      * the difference is invisible to a null check: {@code getData()} answers non-null either way. Measured
-     * (2026-10-02): 姬子 carries a {@code ELATION_SKILL} key whose row is this placeholder, while 8010's is a real
+     * (2026-10-02): Himeko carries a {@code ELATION_SKILL} key whose row is this placeholder, while 8010's is a real
      * one - the first version of the {@code has_skill} condition asked about the key and answered "yes" for every
      * character in the game.
      *
@@ -92,7 +92,7 @@ public class SkillData {
      *
      * <p>It is exactly tbgd's {@code AvatarSkillConfig.SPNeed}. Note: It is NOT equal to the energy
      * cap: of the 93 characters, 5 have a 2:1 ratio between the two (Yunli 240/120, Argenti
-     * 180/90, 绯英 480/240, Feixiao 12/6, Cyrene (昔涟) 24/12).
+     * 180/90, Evanescia 480/240, Feixiao 12/6, Cyrene (昔涟) 24/12).
      * See also {@link #spBase}.
      */
     private final Double spNeed;
@@ -185,7 +185,7 @@ public class SkillData {
      * would look broken.
      *
      * <p>The description <b>says</b> which index it is: the placeholder that directly precedes the
-     * words 基础概率 / 固定概率. Five measured anchors:
+     * words 基础概率 (base chance) / 固定概率 (fixed chance). Five measured anchors:
      *
      * <table border="1">
      *   <caption>skill, the text, and where the number really lives</caption>
@@ -198,19 +198,19 @@ public class SkillData {
      * </table>
      *
      * <p>So the rule is textual, and the two wordings are <b>not</b> interchangeable in game terms:
-     * 基础概率 is scaled by the caster's effect hit rate and reduced by the target's resistance
-     * (what {@link com.laosun.aluminium.Battle#hitChance} computes), while 固定概率 is applied as-is. Both are returned
-     * here, because both are "the chance this skill states"; a caller that feeds a 固定概率 through
+     * 基础概率 (base chance) is scaled by the caster's effect hit rate and reduced by the target's resistance
+     * (what {@link com.laosun.aluminium.Battle#hitChance} computes), while 固定概率 (fixed chance) is applied as-is. Both are returned
+     * here, because both are "the chance this skill states"; a caller that feeds a 固定概率 (fixed chance) through
      * {@code hitChance} will over-apply it. Distinguishing them is left to whoever builds the
      * Impair dispatch - the data needed to know <i>which</i> debuff is applied is still missing
      * (see ROADMAP P10-6), so an API for it here would have no caller.
      *
      * <p>Matching stops at the first hit, which is what the data needs: when a description names the
-     * chance twice (黑天鹅 130/4) both spellings point at the same placeholder.
+     * chance twice (130/4 Black Swan) both spellings point at the same placeholder.
      *
      * @return the chance ({@code param_list} of level 1), or {@code null} when the description states
      * no chance at all - which is a real answer, not a failure: 14 of the 28 {@code Impair}
-     * skills (e.g. 1315/2 波提欧's [绝命对峙]) apply their effect unconditionally
+     * skills (e.g. 1315/2 Boothill's [绝命对峙]) apply their effect unconditionally
      */
     public Double debuffChance() {
         if (description == null || skills.isEmpty()) {
@@ -286,7 +286,7 @@ public class SkillData {
     /**
      * A Bounce skill's damage share, taken from the description (2026-09-29).
      *
-     * <p>Bounce rows do not agree on layout: 1009 is `[0.25]` (its "额外造成4次" is prose only), 1108 is `[4, 0.28]` (count first) and 1004 is
+     * <p>Bounce rows do not agree on layout: 1009 is `[0.25]` (its "额外造成4次", "4 extra hits", is prose only), 1108 is `[4, 0.28]` (count first) and 1004 is
      * `[0.36, 0.65, 0.1, 2]` (count last). The only reliable map is the description: the share is the parameter a `#N[i]` placeholder
      * references immediately before a `%`, read the same way {@link #debuffChance()} reads its own.
      *
@@ -333,7 +333,7 @@ public class SkillData {
     /**
      * Which of the caster's attributes a damage clause scales off (2026-09-29).
      *
-     * <p>The description names it: "等同于砂金100%防御力" is DEF, "等同于风堇50%生命上限" is Max HP, and everything else is ATK. 18 documents scale a damage
+     * <p>The description names it: "等同于砂金100%防御力" (equal to 100% of Aventurine's DEF) is DEF, "等同于风堇50%生命上限" (equal to 50% of Hyacine's Max HP) is Max HP, and everything else is ATK. 18 documents scale a damage
      * clause off Max HP and 3 off DEF, while the executor used to multiply {@code ATTACK} unconditionally - so those skills dealt the wrong damage.
      */
     public com.laosun.aluminium.enums.AttributeType damageBaseAttribute() {

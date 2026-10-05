@@ -18,9 +18,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1415 昔涟's memosprite 德谬歌, 忆灵技能 8 "献予'纷争'之诗": "对万敌施放时解除万敌陷入的所有<b>控制类</b>负面状态" (2026-10-02).
+ * 1415 Cyrene (昔涟)'s memosprite the Demiurge (德谬歌), memosprite skill 8 "献予'纷争'之诗": "when cast on Mydei, dispel all <b>control-class</b> negative states Mydei is in" (2026-10-02).
  *
- * <p>Why this needed an engine piece: `DISPEL` removed the newest N debuffs and nothing else, so it could not say "控制类". A class is a
+ * <p>Why this needed an engine piece: `DISPEL` removed the newest N debuffs and nothing else, so it could not say "control class". A class is a
  * property of the state itself (`AbstractBuff.debuffClass()`, also what class resistance reads), and the vocabulary already existed as a
  * CONDITION (`debuff_class:control`) and as `RESIST_DEBUFF`'s `"kind"`; this gives the op the same word.
  *
@@ -60,8 +60,8 @@ public class DispelByClassTest {
         int dots = mydei.getBuffManager().countBuffs(DotBuff.class);
         System.out.println("[dispel] after the ode: debuffs = " + left + " ; dots = " + dots);
 
-        Assertions.assertEquals(1, left, "「解除万敌陷入的所有**控制类**负面状态」-- one of the two was not that class");
-        Assertions.assertEquals(1, dots, "the damage-over-time is NOT 控制类, so it stays");
+        Assertions.assertEquals(1, left, "「dispel all **control-class** negative states Mydei is in」-- one of the two was not that class");
+        Assertions.assertEquals(1, dots, "the damage-over-time is NOT control class, so it stays");
         // 2 - 1 = 1 and the survivor is the DOT, so the one that went was the control
 
     }

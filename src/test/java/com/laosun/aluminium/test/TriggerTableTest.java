@@ -44,7 +44,7 @@ public class TriggerTableTest {
     /**
      * An ordinary character with <b>no trigger file</b>, used as the "unregistered" control.
      *
-     * <p>Note: Looked up rather than named since 2026-09-2: this was 姬子 (1003) until her own kit was authored, and
+     * <p>Note: Looked up rather than named since 2026-09-2: this was Himeko (姬子) (1003) until her own kit was authored, and
      * the control having acquired rules broke three of the claims below. See {@link TestCharacters}.
      */
     // 2026-09-30: split in two. The "there is no file" facts (`TriggerTables.exists` is false, a lookup is a cache miss)
@@ -56,7 +56,7 @@ public class TriggerTableTest {
      * An ally whose ultimate connects with <b>every</b> enemy - the driver for the "per target hit" pair.
      *
      * <p>Named rather than looked up, because the property being asked for is a fact about one character's
-     * <b>skill data</b> (1003's ultimate is 全体攻击, 60 toughness, Fire), not about the engine. Note: She has a rule
+     * <b>skill data</b> (1003's ultimate is 全体攻击, all-target attack, 60 toughness, Fire), not about the engine. Note: She has a rule
      * file of her own since 2026-09-2, and that is deliberately acceptable here: the number each test measures is
      * <em>Tribbie's</em> or <em>Robin's</em> energy, which only their own tables can credit, and none of her rules
      * grants energy to anybody ({@code resources/characters/1003.json}).
@@ -133,7 +133,7 @@ public class TriggerTableTest {
     }
 
     /**
-     * "我方目标" excludes Robin herself: her own attack must not feed her talent.
+     * "我方目标" (our targets) excludes Robin herself: her own attack must not feed her talent.
      *
      * <p>This is what the {@code actor != self} condition is for, and it is exactly the kind of rule
      * that a table without conditions would get wrong.
@@ -227,7 +227,7 @@ public class TriggerTableTest {
      * The trigger fires on the event that happened rather than on "the battle exists".
      *
      * <p>Note: The expected numbers moved on 2026-09-2: this test used to assert that Robin had <b>no</b>
-     * battle-start rule, because her file held only her talent. Her two 行迹 traces now live in the
+     * battle-start rule, because her file held only her talent. Her two 行迹 (trace) abilities now live in the
      * same file (华彩花腔 to {@code BATTLE_START}, 模进乐段 to {@code SKILL_CAST}), so the counts are
      * per-event again - which is the actual claim being pinned: an event fires the rules that named
      * <i>that</i> event and no others.
@@ -239,10 +239,10 @@ public class TriggerTableTest {
         Battle battle = newBattle(List.of(robin, himeko), 1);
 
         Assertions.assertEquals(1, battle.fireTriggers(TriggerEvent.BATTLE_START),
-                "only her 华彩花腔 trace listens to BATTLE_START");
+                "only her 华彩花腔 (Radiant Refrain) trace listens to BATTLE_START");
 
         Assertions.assertEquals(0, battle.fireTriggers(TriggerEvent.BASIC_ATTACK, robin, null, 1, 0),
-                "nothing in her file listens to BASIC_ATTACK: 普攻 is not 战技");
+                "nothing in her file listens to BASIC_ATTACK: 普攻 (basic attack) is not 战技 (Skill)");
 
         int fired = battle.fireTriggers(TriggerEvent.ALLY_ATTACK, himeko, null, 1, 0);
         Assertions.assertEquals(1, fired, "only Robin's table has an ALLY_ATTACK rule");

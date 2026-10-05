@@ -100,9 +100,9 @@ public class DotBuff extends AbstractBuff {
     /**
      * The layer ceiling this application was authored with, or {@code 0} for "no ceiling" (2026-09-28).
      *
-     * <p>"风化状态<b>最多叠加 5 层</b>": applications may exceed it (a DOT is never evicted -- {@link #isSameKind} says
+     * <p>"the windshear state <b>stacks at most 5 layers</b>": applications may exceed it (a DOT is never evicted -- {@link #isSameKind} says
      * so), but at most this many of them may <b>deal damage</b>. Note: {@code Battle.tickDots} applies it per element, i.e.
-     * per DOCUMENT STATE (two 风化 applications are the same state; 风化 and 灼烧 are not).
+     * per DOCUMENT STATE (two 风化 (windshear) applications are the same state; 风化 and 灼烧 (burn) are not).
      */
     private final int maxStacks;
 
@@ -114,9 +114,9 @@ public class DotBuff extends AbstractBuff {
      * A DOT with the <b>document's own name</b> for it (2026-09-30, cone 23006's [游丝]).
      *
      * <p>Why a name and not just an element: the corpus has states that ARE damage over time and are asked about by
-     * name ("如果该目标不处于[游丝]状态"), while the element alone only answers 灼烧/触电/裂伤/风化.
-     * Naming one is also how "[游丝]也会被视为陷入了触电状态" comes out right for free: a named THUNDER
-     * DOT still answers 触电 through the element table.
+     * name ("if that target is not in the [游丝] state"), while the element alone only answers 灼烧 (burn) / 触电 (shock) / 裂伤 (bleed) / 风化 (windshear).
+     * Naming one is also how "[游丝] is also considered to be in the shocked state" comes out right for free: a named THUNDER
+     * DOT still answers 触电 (shock) through the element table.
      */
     public DotBuff(CanHit source, DamageElement element, double baseDamage, int turns, int maxStacks, String name) {
         this(source, element, baseDamage, turns, maxStacks);
@@ -162,7 +162,7 @@ public class DotBuff extends AbstractBuff {
     }
 
     /**
-     * A DOT is a 持续伤害类负面状态 - a negative effect that "解除 1 个负面效果" may remove.
+     * A DOT is a damage-over-time class negative state (持续伤害类负面状态) - a negative effect that "dispel 1 negative effect" may remove.
      */
     @Override
     public boolean isDebuff() {
@@ -170,7 +170,7 @@ public class DotBuff extends AbstractBuff {
     }
 
     /**
-     * 持续伤害类: "抵抗持续伤害类负面状态的概率提高50%" (1008 坚韧) is an answer about this family - and because it is
+     * Damage-over-time class (持续伤害类): "resistance to damage-over-time class negative states increased by 50%" (1008 坚韧) is an answer about this family - and because it is
      * the <b>element</b> that makes a DOT a DOT, a fifth element would be covered the day it exists.
      */
     @Override

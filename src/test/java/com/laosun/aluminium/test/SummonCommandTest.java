@@ -27,11 +27,11 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * {@code COMMAND_SUMMON} - "使忆灵对敌方全体造成等同于忆灵 X% 生命上限的伤害".
+ * {@code COMMAND_SUMMON} - "make the memosprite deal damage equal to X% of the memosprite's Max HP to all enemies".
  *
  * <p><b>What the op is.</b> The rule's owner orders its summon to attack <b>now</b>, with the numbers of a skill
- * the rule names. 长夜月's ultimate is the first user: "召唤忆灵'长夜'，随后使忆灵'长夜'对敌方全体造成等同于
- * "长夜"#1[i]%生命上限的冰属性伤害".
+ * the rule names. 长夜月's ultimate is the first user: "summon the memosprite '长夜', then make the memosprite '长夜' deal Ice damage equal to
+ * '长夜''s #1[i]% Max HP to all enemies".
  *
  * <p><b>Where each number comes from, because that is the whole design.</b>
  * <ul>
@@ -42,7 +42,7 @@ import java.util.Random;
  *       level 1 in this engine while the document quotes the Lv10 row. Reading "the skill's level" would deal
  *       half the damage with nothing to report - the case below pins the row by measuring the ratio between
  *       three levels of the same skill;</li>
- *   <li>the <b>base attribute</b> is the one thing the skill's row does not say: "等同于<b>忆灵</b>的生命上限",
+ *   <li>the <b>base attribute</b> is the one thing the skill's row does not say: "equal to the <b>memosprite</b>'s Max HP",
  *       not 长夜月's attack - so the rule states it, and the case that doubles the summon's Max HP (and then the
  *       owner's) is what tells the two apart;</li>
  *   <li>the <b>toughness</b> (90) is the same kind of fact and is therefore <b>not</b> a field of this op either:
@@ -153,7 +153,7 @@ public class SummonCommandTest {
     /**
      * The command does not spend the summon's turn, and does not touch its own skill.
      *
-     * <p>"使忆灵…造成伤害" is the owner's action: the memosprite attacks without acting. Its place in the action
+     * <p>"make the memosprite ... deal damage" is the owner's action: the memosprite attacks without acting. Its place in the action
      * bar and its own skill (50% of its Max HP, single target) are both still there afterwards.
      */
     @Test
@@ -315,7 +315,7 @@ public class SummonCommandTest {
                 "column 0 is `#1[i]`, the Max HP share (the placeholders are 1-based, the column is not)");
         Assertions.assertNull(command.getDamageLevel(),
                 "⚠ no `damage_level` any more (M-32): the row is not pinned per effect but stated as the skill's own "
-                        + "level, so a 星魂's 「终结技等级+2」 composes with it instead of being ignored");
+                        + "level, so an Eidolon's \"Ultimate Lv. +2\" composes with it instead of being ignored");
         // …and the file really does state that level, as a BATTLE_START raise of the ULTRA slot (10 - 1).
         TriggerTable table = TriggerTables.of(OWNER);
         Assertions.assertTrue(table.matching(TriggerEvent.BATTLE_START,
@@ -324,7 +324,7 @@ public class SummonCommandTest {
                         .anyMatch(effect -> "RAISE_SKILL_LEVEL".equals(effect.getOp())
                                 && "ULTRA".equals(effect.getSkill())
                                 && effect.getAmount() != null && effect.getAmount() == 9.0),
-                "her file states 「quoted at Lv10」 as a ULTRA +9 battle-start raise");
+                "her file states \"quoted at Lv10\" as a ULTRA +9 battle-start raise");
         Assertions.assertEquals("HEALTH", command.getAttribute());
         Assertions.assertNull(command.getPercent(), "the multiplier is the skill's, not a second copy here");
         Assertions.assertNull(command.getTarget(), "the victims come from the skill's shape");
@@ -483,7 +483,7 @@ public class SummonCommandTest {
         battle.castImmediate(new DefaultSkill(OWNER, 3, 1), owner, List.of(enemy));
 
         Assertions.assertEquals(210, enemy.getStance(), EPS,
-                "「使忆灵「长夜」对敌方全体造成…冰属性伤害」-- exactly the 90 of 141303's own stance_list, once");
+                "\"make the memosprite '长夜' deal ... Ice damage to all enemies\" -- exactly the 90 of 141303's own stance_list, once");
     }
 
     private static Enemy otherDummy() {

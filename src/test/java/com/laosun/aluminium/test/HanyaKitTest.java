@@ -18,15 +18,15 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 寒鸦 (1215), from her own file (2026-09-28): the ultimate, 星魂 1/2/3/5.
+ * Hanya (1215), from her own file (2026-09-28): the ultimate, Eidolons 1/2/3/5.
  *
  * <p><b>What her kit needed from the engine.</b> The SPD share is a <b>derived</b> magnitude read off her own panel
- * (`scale: self_attr:SPEED`), the ATK boost and the level raises are ordinary content, and 星魂 1's "持有<b>终结技效果</b>
+ * (`scale: self_attr:SPEED`), the ATK boost and the level raises are ordinary content, and Eidolon 1's "持有<b>终结技效果</b>
  * 的我方目标消灭敌方目标时" is readable only because the ultimate also plants a marker <b>state</b> - a named modifier
  * is invisible to `has_state`.
  *
  * <p><b>What is registered instead of approximated</b> (see the file's own note): the whole [承负] family - it needs a
- * state counter with a threshold ("每 2 次…恢复1个战技点"/"触发 2 次后自动解除") - plus 星魂 4 and 6, which need a way to
+ * state counter with a threshold ("每 2 次…恢复1个战技点"/"触发 2 次后自动解除") - plus Eidolons 4 and 6, which need a way to
  * raise another rule's effect value or duration.
  */
 public class HanyaKitTest {
@@ -51,12 +51,12 @@ public class HanyaKitTest {
                 "「提高数值等同于寒鸦速度的20%」: a derived share of HER panel, not a percentage of the ally's speed");
         Assertions.assertTrue(f.ally.getAttribute(AttributeType.ATTACK).get() > allyAttackBefore, "…plus a flat 60% ATK");
         Assertions.assertTrue(f.ally.getBuffManager().hasState("敕令"),
-                "and the effect is also a STATE, which is the only way 星魂 1's 「持有终结技效果的我方目标」 is readable");
+                "and the effect is also a STATE, which is the only way Eidolon 1's 「持有终结技效果的我方目标」 is readable");
         Assertions.assertEquals(herAttackBefore, f.hanya.getAttribute(AttributeType.ATTACK).get(), EPS,
                 "「指定我方单体」: a self-cast is not a target (target != self)");
     }
 
-    /** 星魂 1: the ally who carries her ultimate gets a kill to she advances; once per turn. */
+    /** Eidolon 1: the ally who carries her ultimate gets a kill to she advances; once per turn. */
     @Test
     public void herFirstEidolonAdvancesHerWhenTheCarrierGetsAKill() {
         Fixture f = new Fixture(1);
@@ -76,9 +76,9 @@ public class HanyaKitTest {
     }
 
     /**
-     * Note: The other half of 星魂 1: a kill by somebody <b>without</b> her ultimate's effect does not advance her.
+     * Note: The other half of Eidolon 1: a kill by somebody <b>without</b> her ultimate's effect does not advance her.
      *
-     * <p>This case exists because the gate `actor has_state 敕令` was <b>not covered</b> by the positive test alone - 
+     * <p>This case exists because the gate `actor has_state 敕令` (the decree state) was <b>not covered</b> by the positive test alone - 
      * removing the condition left every assertion green (measured mutation m1, 0 red), which is exactly the
      * "a test that cannot fail" shape this project keeps hunting.
      */
@@ -90,10 +90,10 @@ public class HanyaKitTest {
         f.allyKills();
 
         Assertions.assertEquals(before, remainingWait(f, f.hanya), 1.0,
-                "the ally never received 敕令, so 「持有终结技效果的我方目标消灭敌方目标时」 does not apply");
+                "the ally never received 敕令 (the decree state), so 「持有终结技效果的我方目标消灭敌方目标时」 does not apply");
     }
 
-    /** 星魂 2: her own Skill raises her speed for a turn. */
+    /** Eidolon 2: her own Skill raises her speed for a turn. */
     @Test
     public void herSecondEidolonSpeedsHerUpAfterASkill() {
         Fixture f = new Fixture(2);
@@ -105,15 +105,15 @@ public class HanyaKitTest {
                 "「施放战技后，速度提高20%，持续1回合」");
     }
 
-    /** 星魂 3 / 5: the level raises, and the talent's base level composes with them (M-32). */
+    /** Eidolon 3 / 5: the level raises, and the talent's base level composes with them (M-32). */
     @Test
     public void herEidolonLevelRaisesAreStated() {
         Fixture atThree = new Fixture(3);
-        Assertions.assertEquals(2, atThree.hanya.skillLevelBonus(SkillType.SKILL), "星魂 3「战技等级+2」");
+        Assertions.assertEquals(2, atThree.hanya.skillLevelBonus(SkillType.SKILL), "Eidolon 3 「战技等级+2」");
         Assertions.assertEquals(1, atThree.hanya.skillLevelBonus(SkillType.COMMON), "…「普攻等级+1」");
 
         Fixture atFive = new Fixture(5);
-        Assertions.assertEquals(2, atFive.hanya.skillLevelBonus(SkillType.ULTRA), "星魂 5「终结技等级+2」");
+        Assertions.assertEquals(2, atFive.hanya.skillLevelBonus(SkillType.ULTRA), "Eidolon 5 「终结技等级+2」");
         Assertions.assertEquals(11, atFive.hanya.skillLevelBonus(SkillType.TALENT),
                 "…「天赋等级+2」 on top of the +9 base level the file states (10 + 2)");
     }

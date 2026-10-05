@@ -15,8 +15,8 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 121："当藿藿拥有[禳命]时，若我方目标受到致命攻击…立即回复等同于其自身生命上限 50% 的生命值。
- * 该效果单场战斗中可以触发 2 次" (2026-10-02).
+ * 121: "while 藿藿 holds [禳命], if one of our targets takes a lethal blow ... immediately restore HP equal to 50% of its own Max HP.
+ * This effect can trigger 2 times per battle" (2026-10-02).
  *
  * <p>ONE VARIABLE per test: the eidolon rank, or the NUMBER OF LETHAL BLOWS. Same party, same skill (which is what puts
  * [禳命] on her), same blow.
@@ -31,19 +31,19 @@ public class TalismanSavesAnAllyTest {
     @Test
     public void atEidolonTwoTheAllySurvives() {
         double[] result = afterLethalBlows(2, 1);
-        Assertions.assertTrue(result[0] > 0, "「不会陷入无法战斗状态」 (hp " + result[0] + ")");
+        Assertions.assertTrue(result[0] > 0, "\"will not enter the unable-to-fight state\" (hp " + result[0] + ")");
         Assertions.assertEquals(result[1] * 0.50, result[0], result[1] * 0.01,
-                "「回复等同于**其自身**生命上限 50%」-- the VICTIM’s own, not the healer’s");
+                "\"restore equal to 50% of **its own** Max HP\" -- the VICTIM's own, not the healer's");
     }
 
     /** Note: Below E2 the ally falls. */
     @Test
     public void belowEidolonTwoTheAllyFalls() {
-        Assertions.assertTrue(afterLethalBlows(0, 1)[0] <= 0, "星魂 2 才有这一条");
+        Assertions.assertTrue(afterLethalBlows(0, 1)[0] <= 0, "only Eidolon 2 has this clause");
     }
 
     /**
-     * "该效果单场战斗中可以触发 2 次": the first two blows are answered, the third is not.
+     * "this effect can trigger 2 times per battle": the first two blows are answered, the third is not.
      *
      * <p>The count is a shipped spelling, not a new capability: a counter is `ADD_STACK` plus a `self_stacks:` condition
      * (sample: 1111's [斗志]). Note: The two answered blows each leave her ALLY at half of ITS OWN Max HP, so the third
@@ -54,10 +54,10 @@ public class TalismanSavesAnAllyTest {
         double[] one = afterLethalBlows(2, 1);
         double[] two = afterLethalBlows(2, 2);
         double[] three = afterLethalBlows(2, 3);
-        Assertions.assertTrue(one[0] > 0, "第一次被救");
-        Assertions.assertTrue(two[0] > 0, "第二次仍被救（「可以触发 2 次」）");
+        Assertions.assertTrue(one[0] > 0, "the first blow is answered");
+        Assertions.assertTrue(two[0] > 0, "the second blow is still answered (\"can trigger 2 times\")");
         Assertions.assertTrue(three[0] <= 0,
-                "第三次**不再**被救（「可以触发 2 次」的上限）");
+                "the third is **no longer** answered (the cap of \"can trigger 2 times\")");
     }
 
     // ==================================================================
@@ -76,7 +76,7 @@ public class TalismanSavesAnAllyTest {
         Assertions.assertNotNull(skill, "precondition: she has a skill");
         SkillExecutor.execute(battle, skill, her, List.of(battle.enemies.getFirst()));
         battle.processRequests();
-        Assertions.assertTrue(her.getBuffManager().hasState(STATE), "precondition: 【禳命】 is on her");
+        Assertions.assertTrue(her.getBuffManager().hasState(STATE), "precondition: [禳命] is on her");
 
         for (int blow = 0; blow < blows; blow++) {
             if (ally.isDeath()) {

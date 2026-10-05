@@ -22,7 +22,7 @@ import java.util.Random;
  *                 and his normal turn schedule is left completely untouched
  * </pre>
  *
- * <p>The difference from "action advance" (拉条), which is very easy to
+ * <p>The difference from "action advance" (拉条, action advance), which is very easy to
  * confuse, and is also the most central assertion of this case:
  * action advance pulls his normal turn earlier (consuming it); an extra turn is an additional one,
  * and his normal turn is still waiting for him in its original position.

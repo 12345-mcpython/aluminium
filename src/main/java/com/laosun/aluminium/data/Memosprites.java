@@ -17,7 +17,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Loads memosprite panels from {@code resources/memosprites/<ownerCid>.json} (P9-4, the 忆灵 half).
+ * Loads memosprite panels from {@code resources/memosprites/<ownerCid>.json} (P9-4, the memosprite half).
  *
  * <p>Same contract as {@link TriggerTables}, and for the same reasons: it is <b>hand-written</b> content
  * rather than generated data (so it does not belong in {@code Constant}), it lives outside the gitignored
@@ -37,7 +37,7 @@ public final class Memosprites {
     public static final String DIR = "memosprites";
 
     /**
-     * The directory a general SERVANT's panel lives in ("侍从", not "忆灵"): the same panel vocabulary -- shares and flats of the
+     * The directory a general SERVANT's panel lives in (the servant directory, not the memosprite one): the same panel vocabulary -- shares and flats of the
      * OWNER's sheet -- as a different category, and (slice 2) a different damage type.
      */
     public static final String SERVANT_DIR = "servants";
@@ -82,7 +82,7 @@ public final class Memosprites {
         }
     }
 
-    /** The same lookup against a named directory ("侍从" vs "忆灵"). */
+    /** The same lookup against a named directory (the servant directory vs the memosprite one). */
     public static MemospriteSpec of(int ownerCid, String dir) {
         synchronized (CACHE) {
             if (CACHE.containsKey(ownerCid)) {
@@ -165,7 +165,7 @@ public final class Memosprites {
     }
 
     /**
-     * Checks the optional {@code attack} block (P9-4 忆灵). Every rejection is a wrong attack that would
+     * Checks the optional {@code attack} block (P9-4, the memosprite half). Every rejection is a wrong attack that would
      * otherwise only show up as a number in a battle log:
      *
      * <ul>
@@ -366,7 +366,7 @@ public final class Memosprites {
         }
     }
 
-    /** The same load against a named directory ("侍从" vs "忆灵"). */
+    /** The same load against a named directory (the servant directory vs the memosprite one). */
     private static MemospriteSpec load(int ownerCid, String dir) {
         String path = resourceFor(ownerCid, dir);
         if (path == null) {

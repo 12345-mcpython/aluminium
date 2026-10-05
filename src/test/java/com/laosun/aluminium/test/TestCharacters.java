@@ -8,7 +8,7 @@ import com.laosun.aluminium.utils.CharacterFactory;
  * A real character with <b>no trigger file of their own</b> - the "unregistered" control that the trigger-table
  * suites are built on.
  *
- * <p><b>Why it is looked up rather than named.</b> It used to be 姬子 (1003), spelled as a constant in
+ * <p><b>Why it is looked up rather than named.</b> It used to be Himeko (姬子) (1003), spelled as a constant in
  * {@code TriggerTableTest} and {@code RelicTriggerTableTest}, until her kit was authored on 2026-09-2- which
  * turned four unrelated assertions into failures: "no file to empty table", "a character without relics behaves as
  * before", and a {@code BATTLE_START} count that went from 1 to 2 because the control itself had acquired a rule.
@@ -39,10 +39,10 @@ final class TestCharacters {
         // file" -- a MOVING TARGET: shipping 1112 (round 20/240) handed every caller a DIFFERENT character, and
         // a suite measuring HP numbers went red far from the change. The id below is a key of
         // data/character_data.json with no content file; if it ever gains one, the guard fails loudly.
-        int cid = 1506;   // 2026-09-30: the pin moved because 1502 爻光 was SHIPPED. 1506 (银狼LV.999) is now
+        int cid = 1506;   // 2026-09-30: the pin moved because 1502 Yao Guang was SHIPPED. 1506 (Silver Wolf LV.999 (银狼LV.999)) is now
         // the last key of character_data.json without a content file. Note: Its max energy is 0, which is why the suite that
         // asserted "an empty table still recovers energy" no longer uses this control -- it builds an empty table itself. // 2026-09-30: the pin moved because 1505 绯英 was SHIPPED -- the guard failed loudly
-        // exactly as designed. 1502 爻光 is still a key of character_data.json with no content file. Note: Note what the
+        // exactly as designed. 1502 Yao Guang is still a key of character_data.json with no content file. Note: Note what the
         // failure taught: this control is used as a PARTY MEMBER in some suites, so its data (element, speed, whether slot 1
         // is single-target) can move their numbers. `HimekoChargeTest` now names its own single-target ally for that reason.
         if (TriggerTables.exists(cid)) {

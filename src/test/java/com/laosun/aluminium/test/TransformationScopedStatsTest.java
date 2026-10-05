@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1408："卡厄斯兰那的物理属性抗性穿透提高 20%"与"变身期间攻击力提高 80%，生命上限提高 20%"
+ * 1408: "卡厄斯兰那的物理属性抗性穿透提高 20%" and "变身期间攻击力提高 80%，生命上限提高 20%"
  * (2026-10-02).
  *
  * <p>THE POINT IS THE THIRD ASSERTION: the block must live exactly as long as the state. Removing [变身] and watching ATK

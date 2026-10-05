@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1512 知更鸟-晴歌's memosprite panel (2026-10-02).
+ * 1512 Robin - Summer Songbird's memosprite panel (2026-10-02).
  *
  * <p>Document, verbatim (1512_知更鸟-晴歌.html:81): "忆灵'晴空乐手'<b>初始拥有等同于知更鸟-晴歌 0% 生命上限的生命上限</b>和
  * <b>等同于知更鸟-晴歌 180% 速度的速度</b>。"
@@ -41,9 +41,9 @@ public class SummerSongbirdPanelTest {
         Assertions.assertNotNull(bird, "her memosprite must be summonable");
 
         Assertions.assertEquals(robin.getMaxHp() * 0.7, bird.getMaxHp(), EPS,
-                "「初始拥有等同于知更鸟•晴歌 70% 生命上限的生命上限」");
+                "「初始拥有等同于知更鸟•晴歌 70% 生命上限的生命上限」 (starts with Max HP equal to 70% of Robin - Summer Songbird's Max HP)");
         Assertions.assertEquals(robin.getAttribute(AttributeType.SPEED).get() * 1.8,
                 bird.getAttribute(AttributeType.SPEED).get(), EPS,
-                "「等同于知更鸟•晴歌 180% 速度的速度」");
+                "「等同于知更鸟•晴歌 180% 速度的速度」 (speed equal to 180% of Robin - Summer Songbird's speed)");
     }
 }

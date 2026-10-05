@@ -15,13 +15,13 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 开拓者-同谐 (8006), from her own file (2026-09-28): [伴舞], the break trace and 星魂 1/4.
+ * 开拓者-同谐 (8006), from her own file (2026-09-28): [伴舞], the break trace and Eidolon 1/4.
  *
- * <p><b>What it needed.</b> Nothing new: {@code ticks_on: "self"} carries "开拓者每回合开始时持续回合数减1" (the caster's
- * clock, the same field 星期日's [蒙福者] uses), `BREAK` is "有敌方目标的弱点被击破时", `once_per_battle` is "首次", and
- * 星魂 4's "等同于开拓者 15% 的击破特攻" is the ordinary derived scale read off the rule owner.
+ * <p><b>What it needed.</b> Nothing new: {@code ticks_on: "self"} carries "the Trailblazer's duration is reduced by 1 at the start of each of her turns" (the caster's
+ * clock, the same field 星期日's [蒙福者] uses), `BREAK` is "when an enemy target's weakness is broken", `once_per_battle` is "the first time", and
+ * Eidolon 4's "equal to 15% of the Trailblazer's Break Effect" is the ordinary derived scale read off the rule owner.
  *
- * <p><b>What is registered</b> (the file's notes): the super-break conversion (no super-break damage type), 行迹 随波逐流
+ * <p><b>What is registered</b> (the file's notes): the super-break conversion (no super-break damage type), trace 随波逐流
  * (a timed boost would hit every bounce hit, not only the first) and 剧院之帽 (no action-delay op).
  */
 public class TrailblazerHarmonyTest {
@@ -47,7 +47,7 @@ public class TrailblazerHarmonyTest {
     /**
      * Note: The duration runs on HER clock: her turn shortens it, an ally's does not.
      *
-     * <p>"为我方全体附上[伴舞]效果，持续3回合，开拓者每回合开始时持续回合数减1" - the state sits on every ally
+     * <p>"apply the [伴舞] effect to all of our side, lasting 3 turns, the Trailblazer's duration reduced by 1 at the start of each of her turns" - the state sits on every ally
      * while the clock belongs to the caster, which is what {@code "ticks_on": "self"} states (the same field 星期日's
      * [蒙福者] uses). The harness detail that made this case fail twice is in {@link Fixture#fullTurnOf}.
      */
@@ -58,7 +58,7 @@ public class TrailblazerHarmonyTest {
 
         f.fullTurnOf(f.ally);
         Assertions.assertTrue(f.ally.getBuffManager().hasState("伴舞"),
-                "an ally's turn does not shorten it: 「**开拓者**每回合开始时」");
+                "an ally's turn does not shorten it: \"**the Trailblazer**'s turn start\"");
 
         f.fullTurnOf(f.harmony);
         f.fullTurnOf(f.harmony);
@@ -67,7 +67,7 @@ public class TrailblazerHarmonyTest {
                 "three of HER turns run the 3-turn state out, even on the allies carrying copies");
     }
 
-    /** The talent pays energy on any break, and 星魂 4 passes her break effect to the others. */
+    /** The talent pays energy on any break, and Eidolon 4 passes her break effect to the others. */
     @Test
     public void herTalentAndFourthEidolonAreAsStated() {
         Fixture f = new Fixture();
@@ -77,10 +77,10 @@ public class TrailblazerHarmonyTest {
         Fixture atFour = new Fixture(4);
         Assertions.assertTrue(atFour.ally.getAttribute(AttributeType.BREAKING_EFFECT).get()
                         > f.ally.getAttribute(AttributeType.BREAKING_EFFECT).get(),
-                "星魂 4: 「使除自身以外的队友击破特攻提高，提高数值等同于开拓者15%的击破特攻」");
+                "Eidolon 4: \"raise the Break Effect of the teammates other than oneself, the raise being equal to 15% of the Trailblazer's Break Effect\"");
         Assertions.assertEquals(f.harmony.getAttribute(AttributeType.BREAKING_EFFECT).get(),
                 atFour.harmony.getAttribute(AttributeType.BREAKING_EFFECT).get(), 1e-6,
-                "…and 「除自身以外」 means she is not boosted by it");
+                "…and \"other than oneself\" means she is not boosted by it");
     }
 
     /** The registered clauses stay registered. */
@@ -88,7 +88,7 @@ public class TrailblazerHarmonyTest {
     public void herFileCarriesWhatItSays() {
         Assertions.assertEquals(1, TriggerTables.of(HARMONY).ruleCount(TriggerEvent.ULT_CAST));
         Assertions.assertEquals(1, TriggerTables.of(HARMONY).ruleCount(TriggerEvent.SKILL_CAST),
-                "星魂 1 (the registered super-break clauses are absent on purpose)");
+                "Eidolon 1 (the registered super-break clauses are absent on purpose)");
     }
 
     // ==================================================================
@@ -121,7 +121,7 @@ public class TrailblazerHarmonyTest {
          *
          * <p>Note: Both halves are needed, and that is the whole lesson of this case: a `TURN_START` fired by hand does not run
          * the foreign-buff tick at all, and driving only `beforeMove()` does not run it for a <b>late</b> buff either - 
-         * `APPLY_BUFF` creates a late one, and "开拓者每回合开始时持续回合数减1" is delivered by
+         * `APPLY_BUFF` creates a late one, and "the Trailblazer's duration is reduced by 1 at the start of each of her turns" is delivered by
          * `tickForeignBuffs(actor, false)` inside `afterMove`. Two earlier versions of this case failed on exactly that.
          */
         private void fullTurnOf(Character unit) {

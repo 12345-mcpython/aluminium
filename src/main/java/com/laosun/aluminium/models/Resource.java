@@ -8,7 +8,7 @@ import lombok.Getter;
  * maximum overflow allowance.
  *
  * <p><b>Why this class has to exist</b>: skill points (SP) (P8-4) and P8-8's stack resources
- * (Acheron's [残梦], Feixiao's [飞黄], Phainon's [火种], Cyrene's [追忆], Castorice's [新蕊]…)
+ * (Acheron's [残梦], Feixiao's [飞黄], Phainon's [火种], Cyrene's [追忆], Castorice's [新蕊] ...)
  * are essentially the same thing - a counter that some event adds to or subtracts from, that has a
  * capacity cap, and that fires a signal when full. Without extracting it, every character would need
  * a "because of some character" branch inside the engine (violating P8-0's three-way split).

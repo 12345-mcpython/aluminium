@@ -28,7 +28,7 @@ import java.util.Random;
  * </ol>
  *
  * <p>Warning: the gate that made the previous attempt look like a broken engine -- the rule carries `self_summon_count >= 1`, so this test must
- * field the RECIPIENT's own memosprite (迷迷) as well. The first version did not, the rule never fired, and every reading below was silent.
+ * field the RECIPIENT's own memosprite (Mem (迷迷)) as well. The first version did not, the rule never fired, and every reading below was silent.
  */
 public class MemospriteSlotCastTest {
     private static final int LEVEL = 80;

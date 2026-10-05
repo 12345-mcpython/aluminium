@@ -31,7 +31,7 @@ import java.util.Set;
  * <p>Each hit goes through {@link Battle#applyDamage} independently: each hit rolls crit and
  * settles on its own (consistent with character skills).
  *
- * <p>P9-4 忆灵: the class also serves memosprites. Their damage is written in the documents the same way
+ * <p>P9-4 忆灵 (memosprite): the class also serves memosprites. Their damage is written in the documents the same way
  * an enemy's is (one number times one of the caster's attributes) - "对敌方单体造成等同于'长夜'50%生命上限的
  * 冰属性伤害" - so the only thing that had to change was naming the attribute ({@link #getBaseAttribute()})
  * and taking the target side from the caster's camp rather than assuming "the enemy is casting".
@@ -155,7 +155,7 @@ public class EnemySkill extends Skill {
         for (CanHit struck : struckBy(victim, user, battle)) {
             total += strike(battle, user, struck, hitTargets);
         }
-        // P9-4 忆灵 / M-30: a summon's attack is an attack, so our side hears about it exactly once, after
+        // P9-4 忆灵 (memosprite) / M-30: a summon's attack is an attack, so our side hears about it exactly once, after
         // every segment has been settled -- the same notification a character's skill raises. Before this, a
         // memosprite's attack told nobody, so a buff on the memosprite itself
         // ({@code "target": "summon"} + {@code "until": "next_attack"}) was never consumed and simply stayed.

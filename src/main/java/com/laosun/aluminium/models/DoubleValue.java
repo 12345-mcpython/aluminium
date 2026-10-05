@@ -127,7 +127,7 @@ public final class DoubleValue implements Cloneable {
     public double get() {
         // A live modifier has to be re-resolved here, because compute() otherwise runs only when modifiers are attached
         // or removed. Scanning costs nothing for the attributes that have none -- which is every attribute until a rule
-        // asks for "每拥有 1 层…".
+        // asks for "每拥有 1 层…" (for each stack held).
         if (hasLiveModifier()) {
             compute();
         }
@@ -157,7 +157,7 @@ public final class DoubleValue implements Cloneable {
     /**
      * The value a percentage share scales off (2026-09-29).
      *
-     * <p>Added for the capped-modifier path: "提高50%，最高不超过X的25%" is a share against a ceiling in absolute units, so the
+     * <p>Added for the capped-modifier path: "提高50%，最高不超过X的25%" (raised by 50%, never above 25% of X) is a share against a ceiling in absolute units, so the
      * ceiling has to be divided by THIS number and not by {@link #get()} - the total includes modifiers, and dividing by the
      * total would tighten the cap whenever the target is already buffed.
      */
@@ -351,7 +351,7 @@ public final class DoubleValue implements Cloneable {
         /**
          * A modifier whose magnitude is resolved when it is READ, not when it was attached (2026-10-02).
          *
-         * <p>The reader family is the "每拥有 1 层…提高 X%" auras (fourteen documents): their number has to follow the stack
+         * <p>The reader family is the "每拥有 1 层…提高 X%" (raise X% for each stack held) auras (fourteen documents): their number has to follow the stack
          * count, and a stored number can only be right at the instant it was stored.
          */
         private java.util.function.DoubleSupplier live;
@@ -376,7 +376,7 @@ public final class DoubleValue implements Cloneable {
         /**
          * The same, for a modifier whose magnitude is an ABSOLUTE number in the attribute's own units.
          *
-         * <p>The derived form "每层[当品]使暴击伤害提高 2.40%" is absolute, and a ratio attribute takes it as
+         * <p>The derived form "每层[当品]使暴击伤害提高 2.40%" (each stack of [当品] raises CRIT DMG by 2.40%) is absolute, and a ratio attribute takes it as
          * a pure value -- so the live kind needs a pure factory as well as a percentage one.
          */
         public static Modifier livePure(java.util.function.DoubleSupplier value,

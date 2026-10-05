@@ -40,7 +40,7 @@ public abstract class AbstractBuff implements Buff, AttackEvent, SkillCastEvent 
      * Whose <b>turn boundaries</b> count this buff's duration down; {@code null} = the unit that carries it
      * (M-42 ④).
      *
-     * <p><b>Why the clock is not always the carrier.</b> 星期日's [蒙福者] says "星期日自身每回合开始时
+     * <p><b>Why the clock is not always the carrier.</b> Sunday's [蒙福者] says "星期日自身每回合开始时
      * [蒙福者]状态持续回合减1" - the state sits on the ally, but its duration is spent by <b>his</b> turns.
      * Modelling that as an ordinary timed buff on the ally would count it down on the <i>ally's</i> turns: a
      * different number of turns in every real fight, with nothing to see. So the anchor is stated, and
@@ -170,7 +170,7 @@ public abstract class AbstractBuff implements Buff, AttackEvent, SkillCastEvent 
      * <p><b>Why a set.</b> The game states durations as disjunctions - "持续至装备者下次施放普攻<b>或</b>战技后"
      * (relic set 12) - and the buff ends at the <b>first</b> of the named events: a duration is one fact, however
      * many events can end it. The alternative shapes are both wrong, and both look like they work: naming one of
-     * the two events makes a 战技 silently not end a buff that its text says it ends, and creating two buffs (one
+     * the two events makes a Skill silently not end a buff that its text says it ends, and creating two buffs (one
      * per event) makes them <b>replace each other</b> on the same kind + target, so only the later one is ever up.
      */
     @Getter
@@ -250,8 +250,8 @@ public abstract class AbstractBuff implements Buff, AttackEvent, SkillCastEvent 
     /**
      * Which <b>rule</b> created this buff, by its {@code id}, or {@code ""} when the rule states none.
      *
-     * <p><b>Why the source is not enough.</b> "战技提供的护盾" (1001 三月七 星魂 6) names the <i>ability</i>, not just
-     * the person: 三月七 has two shields of her own (her Skill's and 星魂 2's at battle start), so "a shield from
+     * <p><b>Why the source is not enough.</b> "战技提供的护盾" (1001 March 7th (三月七) Eidolon 6) names the <i>ability</i>, not just
+     * the person: March 7th has two shields of her own (her Skill's and Eidolon 2's at battle start), so "a shield from
      * 三月七" would heal an ally the star level does not mean to heal - a wrong number with nothing to report. The rule
      * id is the one handle that tells them apart, and it is stamped where every buff already gets its source
      * ({@code TriggerInterpreter.withSource}).
@@ -298,7 +298,7 @@ public abstract class AbstractBuff implements Buff, AttackEvent, SkillCastEvent 
     /**
      * Whether carrying this buff means <b>the unit does not take its own turns</b> (2026-09-28).
      *
-     * <p>知更鸟's [协奏]: "[协奏]状态结束前<b>不会进入自己的回合</b>且无法行动" - while the state lasts she is not in the
+     * <p>Robin's (知更鸟) [协奏]: "[协奏]状态结束前<b>不会进入自己的回合</b>且无法行动" - while the state lasts she is not in the
      * order at all, and the countdown acts in her place. That is <b>not</b> what a control does: {@code ControlBuff}
      * stops a unit from <i>acting</i> but still lets its turn arrive (and its DOTs tick), while this flag makes the
      * turn itself pass without the unit. Conflating the two would silently change every "被冻结仍会掉血" reading.
@@ -316,7 +316,7 @@ public abstract class AbstractBuff implements Buff, AttackEvent, SkillCastEvent 
     public abstract boolean canAct();
 
     /**
-     * Whether this buff is a <b>negative effect</b> (负面效果) - the thing "解除 N 个负面效果" removes and
+     * Whether this buff is a <b>negative effect</b> (negative effect) - the thing "解除 N 个负面效果" removes and
      * "目标身上有几个负面" counts.
      *
      * <p><b>Where the classification lives, and why not abstract.</b> The default is {@code false}, and the
@@ -340,7 +340,7 @@ public abstract class AbstractBuff implements Buff, AttackEvent, SkillCastEvent 
      * Which <b>class</b> of negative state this buff is, or {@code null} when it belongs to none.
      *
      * <p>It exists for the two sentences that protect against a whole family - "抵抗<b>控制类</b>负面状态的概率提高35%"
-     * (克拉拉 守护) and "免疫<b>控制类</b>负面状态" (长夜月's 忆灵"长夜") - and the point is that a <b>new</b> state of
+     * (Clara (克拉拉) 守护) and "免疫<b>控制类</b>负面状态" (Cyrene's (长夜月) memosprite "长夜") - and the point is that a <b>new</b> state of
      * that family is covered the day it is written, instead of falling outside a hand-kept list of resistance keys.
      * Like {@link #isDebuff()}, the answer comes from the buff class itself, which is the only place that knows.
      *

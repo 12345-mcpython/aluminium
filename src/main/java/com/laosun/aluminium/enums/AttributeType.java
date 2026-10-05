@@ -97,7 +97,7 @@ public enum AttributeType {
      * {@link #FOLLOW_UP_DAMAGE_BOOST} and {@link #BASIC_ATTACK_DAMAGE_BOOST}, for "装备者忆灵造成的暴击伤害额外提高 X%".
      *
      * <p>Note: Gated in {@code Battle.assemble} on `attacker == memospriteOf(summon.getMaster())`, NOT on {@code instanceof Summon}:
-     * the documents distinguish 忆灵 from ordinary 召唤物, and the loose test would raise a summon's damage under a sentence that
+     * the documents distinguish a memosprite from an ordinary summon, and the loose test would raise a summon's damage under a sentence that
      * never mentions it.
      */
     @SerializedName("memosprite_damage_boost") MEMOSPRITE_DAMAGE_BOOST("memosprite_damage_boost"),
@@ -132,7 +132,7 @@ public enum AttributeType {
      */
     @SerializedName("ultimate_damage_boost") ULTIMATE_DAMAGE_BOOST("ultimate_damage_boost"),
     /**
-     * Damage-over-time only (322 逐火者的航迹, "使装备者造成的持续伤害额外提高 X%").
+     * Damage-over-time only (322 Revelry by the Sea (逐火者的航迹), "使装备者造成的持续伤害额外提高 X%").
      *
      * <p>Note: <b>Appended, never inserted</b>: {@link #ordinal()} is part of the persisted attribute order (see the
      * warning above {@link #BASIC_ATTACK_DAMAGE_BOOST}), so a new scope goes at the end.
@@ -156,7 +156,7 @@ public enum AttributeType {
      * other attribute that means "how much shield I make": {@code OUTGOING_HEALING_BOOST} is its healing twin, and
      * folding the two together would make "提供的护盾量提高" silently also strengthen heals.
      *
-     * <p>Readers: 遗器 103 净庭教宗的圣骑士 4 件套 (20%), 遗器 128 自匿星芒的隐士 2 件套 (10%) 与 4 件套 (12%), and a
+     * <p>Readers: relic 103 Knight of Purity Palace (净庭教宗的圣骑士) 4-piece (20%), relic 128 Self-Enshrouded Recluse (自匿星芒的隐士) 2-piece (10%) and 4-piece (12%), and a
      * light cone (12/15/18/21/24%). All four say "提供的护盾量" - the provider's side, never the receiver's; the
      * receiver-side spelling ("shield gained") has no reader in the corpus and is deliberately not modelled.
      *
@@ -171,7 +171,7 @@ public enum AttributeType {
      * <p><b>Why it is not {@code TauntBuff}.</b> A taunt is a hard constraint: while it is up, a single-target attack
      * can only pick the taunter. This is the other kind of thing - the same weighted draw, with this unit's weight
      * raised. Writing a taunt for "概率大幅提高" would replace a soft weight with a hard lock, i.e. a different
-     * mechanic rather than a different number, which is why 三月七's Skill's third sentence stayed registered for so
+     * mechanic rather than a different number, which is why March 7th's Skill's third sentence stayed registered for so
      * long instead of being approximated.
      *
      * <p><b>Where the magnitude comes from - it is in the data, not invented.</b> The sentence states no number, but
@@ -202,7 +202,7 @@ public enum AttributeType {
      *
      * <p><b>Readers - measured, not assumed (2026-09-29).</b> Nineteen corpus documents say
      * "全属性抗性降低"; the engine-side ones are 1004, 1006, 1203, 1218, 1304, 1308, 1321, 1405, 140, 1410,
-     * 1504 and 150(plus 1222/1505, which have no engine file, and the 光锥/词条 documents). Before this constant
+     * 1504 and 150 (plus 1222/1505, which have no engine file, and the light cone / stat entry documents). Before this constant
      * existed, <b>no</b> shipped file mentioned any resistance-reduction spelling at all.
      *
      * <p>Note: <b>Appended, never inserted</b>: {@link #ordinal()} indexes every unit's attribute array.

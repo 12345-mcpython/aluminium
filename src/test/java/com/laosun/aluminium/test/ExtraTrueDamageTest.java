@@ -21,7 +21,7 @@ import java.util.Random;
 
 /**
  * P1-9 acceptance: additional damage (附加伤害) and true damage (真实伤害), reproduced from the
- * real kits of 1309 Robin and 1403 Tribbie (see {@code E:\code\blog\hsr\1309_知更鸟.md} /
+ * real kits of 1309 Robin (知更鸟) and 1403 Tribbie (缇宝) (see {@code E:\code\blog\hsr\1309_知更鸟.md} /
  * {@code 1403_缇宝.md}).
  *
  * <p><b>Additional damage (附加伤害)</b> official definition: "makes the hit target take 1 extra
@@ -29,7 +29,7 @@ import java.util.Random;
  *  to it goes through the full zones (its base is a panel value: ATK / MaxHP  x  multiplier) and is
  * flagged {@code notCountsAsAttack()}.
  *
- * <p><b>True damage (真伤)</b> (Tribbie E1): the base is derived from this attack's total damage
+ * <p><b>True damage (真伤, true damage)</b> (Tribbie E1): the base is derived from this attack's total damage
  * value, so it skips every zone.
  *
  * <p>Attackers are plain Lv80 characters with ATK 100 / MaxHP 1000 and no boost or crit panel
@@ -291,7 +291,7 @@ public class ExtraTrueDamageTest {
     }
 
     /**
-     * 1403 Tribbie zone (结界): after an ally attacks, "for each target that is attacked", deal
+     * 1403 Tribbie zone (结界, zone): after an ally attacks, "for each target that is attacked", deal
      * 1 instance of quantum additional damage equal to 12% of Tribbie's MaxHP to the hit target with
      * the highest current HP.
      */

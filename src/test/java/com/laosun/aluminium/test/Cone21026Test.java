@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Light cone 21026: "攻击力提高#1%，对处于灼烧或裂伤状态的敌方目标造成的伤害提高#2%" at rank 5.
+ * Light cone 21026: "攻击力提高#1%，对处于灼烧或裂伤状态的敌方目标造成的伤害提高#2%" (ATK raised by #1%, damage to a burning or wounded enemy raised by #2%) at rank 5.
  *
  * <p>ATTACK is flat, so its share scales the post-start base; the disjunction is two rules, the second excluding the first state.
  */
@@ -37,8 +37,8 @@ public class Cone21026Test {
         System.out.println("[21026] clean=" + clean + " burning=" + burning + " wounded=" + wounded + " both=" + both
                 + " attackRatio=" + attackGain);
         Assertions.assertEquals(0.2, attackGain, 1e-6, "rank 5 raises attack by 20% of base");
-        Assertions.assertEquals(1.32, burning / clean, 2e-2, "灼烧");
-        Assertions.assertEquals(1.32, wounded / clean, 2e-2, "裂伤");
+        Assertions.assertEquals(1.32, burning / clean, 2e-2, "灼烧 (burning)");
+        Assertions.assertEquals(1.32, wounded / clean, 2e-2, "裂伤 (wounded)");
         Assertions.assertEquals(1.32, both / clean, 2e-2, "both states must not double the boost");
     }
 
@@ -52,7 +52,7 @@ public class Cone21026Test {
         return gain / unit.getAttribute(AttributeType.ATTACK).baseValue();
     }
 
-    /** 0 = clean, 1 = 灼烧, 2 = 裂伤, 3 = both. */
+    /** 0 = clean, 1 = 灼烧 (burning), 2 = 裂伤 (wounded), 3 = both. */
     private static double settled(int which) {
         Character unit = CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(21026, LEVEL, false, 5));
         Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);

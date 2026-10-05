@@ -14,8 +14,8 @@ import java.util.Random;
 /**
  * A memosprite whose speed the game keeps at zero is in the battle but not in the action order (2026-10-02).
  *
- * <p>The game's own words, from 小伊卡's own skill row (1140903, whose SkillEffect is `Restore`, which is why this was
- * mis-registered as a heal): "小伊卡的速度<b>保持为0</b>，免疫负面效果，并且<b>不会出现在行动序列上</b>". 德谬歌 (1415's memosprite) carries the
+ * <p>The game's own words, from 小伊卡 (Little Ica)'s own skill row (1140903, whose SkillEffect is `Restore`, which is why this was
+ * mis-registered as a heal): "小伊卡的速度<b>保持为0</b>，免疫负面效果，并且<b>不会出现在行动序列上</b>" (Little Ica's speed stays at 0, it is immune to negative effects, and it does not appear in the action order). 德谬歌 (Demogogue, 1415's memosprite) carries the
  * same panel row -- `{"attribute": "SPEED", "flat": 0, "by_ability": true}` -- so the data was right and the queue was wrong: `Signal`'s
  * guard refused any speed at or below zero, which turned the whole battle into an exception the moment such a memosprite was summoned,
  * and made every clause needing one on the field unjudgeable.
@@ -29,13 +29,13 @@ public class MemospriteOutsideTheActionOrderTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** 德谬歌: summoned, in the battle, out of the order. */
+    /** 德谬歌 (Demogogue): summoned, in the battle, out of the order. */
     @Test
     public void theZeroSpeedMemospriteIsInTheBattleButNotInTheOrder() {
         assertOutsideTheOrder(1415, 1404);
     }
 
-    /** 小伊卡: the other memosprite whose panel says the same thing. */
+    /** 小伊卡 (Little Ica): the other memosprite whose panel says the same thing. */
     @Test
     public void littleIcaIsInTheBattleButNotInTheOrder() {
         assertOutsideTheOrder(1409, 1217);

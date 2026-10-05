@@ -6,7 +6,7 @@ import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.skill.Skill;
 
 /**
- * A skill-slot swap carried by a buff (2026-09-28): "将下一次普攻强化为[酒花奔涌]" (1301 加拉赫).
+ * A skill-slot swap carried by a buff (2026-09-28): "将下一次普攻强化为[酒花奔涌]" (turns the next basic attack into [酒花奔涌]) (1301 Gallagher).
  *
  * <p><b>Why a buff.</b> The swap needs a <i>lifetime</i>, and this engine already has exactly the lifetimes the documents
  * use - `turns`, `permanent`, and `until` ("下一次普攻" is `until: next_attack`). Riding on {@link AbstractBuff} means the
@@ -17,7 +17,7 @@ import com.laosun.aluminium.models.skill.Skill;
  * from ({@code Character.getSkills()}) - and restores <b>whatever was there</b> when it leaves, which is what makes two
  * overlapping swaps safe: the second one captures the first one's replacement as its "original".
  *
- * <p>Note: It is a buff on our own unit, not a debuff: {@code isDebuff()} stays {@code false}, so "解除负面效果" can never take
+ * <p>Note: It is a buff on our own unit, not a debuff: {@code isDebuff()} stays {@code false}, so "解除负面效果" (dispel negative effects) can never take
  * an enhanced attack away.
  */
 public class SkillSwapBuff extends AbstractBuff {

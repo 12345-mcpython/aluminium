@@ -21,15 +21,15 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * {@code target: "other_allies"} - "除自身以外的队友", and the group {@code ADVANCE} it exists for.
+ * {@code target: "other_allies"} - "the teammates other than yourself", and the group {@code ADVANCE} it exists for.
  *
- * <p><b>Why a new word was needed.</b> 知更鸟's ultimate says "使<b>除自身以外的队友</b>立即行动". The op and the
- * fraction were already there (`ADVANCE percent: 1.0` = skip all of a unit's remaining wait = 立即行动), but the
+ * <p><b>Why a new word was needed.</b> Robin (知更鸟)'s ultimate says "makes <b>the teammates other than yourself</b> act immediately". The op and the
+ * fraction were already there (`ADVANCE percent: 1.0` = skip all of a unit's remaining wait = act immediately), but the
  * <em>group</em> could not be named:
  *
  * <ul>
  *   <li>{@code all_allies} / {@code party} is "our whole side" <b>including</b> the rule's owner - that is pinned
- *       by 302 不老者的仙舟's "我方全体攻击力提高", which must buff the wearer - so it cannot mean "everyone but
+ *       by 302 不老者的仙舟 (the Xianzhou of the Undying)'s "raises the ATK of all of us", which must buff the wearer - so it cannot mean "everyone but
  *       me";</li>
  *   <li>a condition cannot say it either: conditions filter <b>rules</b> (is this event mine?), not the units an
  *       effect reaches (all of them but one). Those are different questions, and the second one is the effect's
@@ -39,7 +39,7 @@ import java.util.Random;
  * <p><b>What is really being tested.</b> That the two group selectors differ in exactly one unit, that
  * {@code ADVANCE} reaches every unit in the group (it used to resolve a single target, so "our side" silently
  * advanced only one of them), that the group is the <b>camp</b> (a player-side summon is one of us), that our
- * enemies are untouched, and that 知更鸟's authored rule does what her sentence says.
+ * enemies are untouched, and that Robin (知更鸟)'s authored rule does what her sentence says.
  */
 public class OtherAlliesTargetTest {
     private static final double EPS = 1e-6;
@@ -47,11 +47,11 @@ public class OtherAlliesTargetTest {
     /** The pair selector this class also covers; spelled once so a rename cannot half-apply. */
     private static final String TARGET_AND_SUMMON = "target_and_summon";
 
-    /** 姬子 - no shipped rule file, so the table under test is the only one in play. */
+    /** Himeko (姬子) - no shipped rule file, so the table under test is the only one in play. */
     private static final int OWNER = 1003;
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
-    /** 知更鸟 - her ultimate's first sentence is the first user of this selector. */
+    /** Robin (知更鸟) - her ultimate's first sentence is the first user of this selector. */
     private static final int ROBIN = 1309;
 
     // ==================================================================
@@ -148,7 +148,7 @@ public class OtherAlliesTargetTest {
                 "her own turn is untouched by this clause (【协奏】 is what does something else to her)");
     }
 
-    /** …and the rule is filed as her ultimate's first sentence, with the fraction that means 立即行动. */
+    /** ...and the rule is filed as her ultimate's first sentence, with the fraction that means act immediately. */
     @Test
     public void theAuthoredRobinRuleStatesItsShape() {
         Character robin = CharacterFactory.create(ROBIN, LEVEL);

@@ -19,8 +19,8 @@ import java.util.Random;
  * A modifier (or a resistance) that carries <b>the name the data gave it</b>, so a state's own effect can be removed
  * with the state (2026-09-28).
  *
- * <p><b>The sentence that needs it.</b> 知更鸟's [协奏] grants the party an ATK boost and a crowd-control immunity
- * that last "处于[协奏]状态时" - <b>as long as the state does</b>, and that state ends when a countdown's turn
+ * <p><b>The sentence that needs it.</b> Robin (知更鸟)'s [协奏] grants the party an ATK boost and a crowd-control immunity
+ * that last "while in the [协奏] state" - <b>as long as the state does</b>, and that state ends when a countdown's turn
  * arrives, which is not a turn count at all. Removal by name existed only for <b>states</b>, so those two effects could
  * only be written as {@code permanent}: a buff that never comes off, i.e. a wrong number with no symptom.
  *
@@ -61,7 +61,7 @@ public class NamedBuffTest {
         f.fire(List.of(removeState("协奏")));
 
         Assertions.assertEquals(before, f.attack(), 1e-6,
-                "an unnamed modifier survives 「移除协奏」 -- only what states a name can be removed by one");
+                "an unnamed modifier survives 「remove 协奏」 -- only what states a name can be removed by one");
     }
 
     // ==================================================================

@@ -22,11 +22,11 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 三月七 (1001) - a kit whose clauses each needed a different engine capability, and what that looks like in the data.
+ * March 7th (1001) - a kit whose clauses each needed a different engine capability, and what that looks like in the data.
  *
  * <p><b>Why her.</b> Her document is a wall of shields: a DEF-scaled shield, a taunt, a freeze, and a counter that
  * needs a shielded ally. Three clauses are complete and pinned here - the shield (a DEF share plus a constant, and
- * a <b>duration</b>), the cleanse (行迹"纯洁") and, since 2026-09-2, the 天赋 counter, which is what the
+ * a <b>duration</b>), the cleanse (the 行迹"纯洁") and, since 2026-09-2, the 天赋 counter, which is what the
  * {@code has_shield} condition and the {@code per_turn} limit were added for. The rest is <b>registered rather than
  * approximated</b>: every one of those clauses would be a wrong number or a wrong trigger if it were guessed at, and
  * a census of what is missing is worth more than a file that looks finished.
@@ -36,18 +36,18 @@ import java.util.Random;
 public class March7thKitTest {
     private static final double EPS = 1e-6;
 
-    /** 三月七 herself. */
+    /** March 7th herself. */
     private static final int MARCH = 1001;
-    /** 桂乃芬 - a plain ally to be shielded and cleansed; her own rules never touch the numbers below. */
+    /** Guinaifen - a plain ally to be shielded and cleansed; her own rules never touch the numbers below. */
     private static final int ALLY = 1210;
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
-    /** An ordinary monster with no specific resistances (1002011 is immune to 冻结 - see the freeze cases). */
+    /** An ordinary monster with no specific resistances (1002011 is immune to freeze - see the freeze cases). */
     private static final int ORDINARY_MONSTER = 1003010;
     private static final int SKILL_SLOT = 2;
 
     /**
-     * 行迹"纯洁": "施放战技时，解除指定我方单体的1个负面效果".
+     * The 行迹"纯洁": "施放战技时，解除指定我方单体的1个负面效果".
      *
      * <p>Driven through a real cast: her Skill is a `Defence` skill, so what makes this rule reach the right unit is
      * the cast event carrying the ally it was AIMED at (M-35).
@@ -68,7 +68,7 @@ public class March7thKitTest {
     }
 
     /**
-     * 战技: the shield absorbs "等同于三月七 <b>5% 防御力 + 60</b>" - a share of HER DEFENCE plus a constant.
+     * The 战技: the shield absorbs "等同于三月七 <b>5% 防御力 + 60</b>" - a share of HER DEFENCE plus a constant.
      *
      * <p>Note: Asserted exactly, off her own DEFENCE as the engine resolves it: that is the whole point of
      * {@code scale: "owner_def"} -- a literal would be wrong for every build and every skill level.
@@ -89,7 +89,7 @@ public class March7thKitTest {
     }
 
     /**
-     * 天赋"少女的特权": "当持有护盾的我方目标受到敌方目标攻击后，三月七立即向攻击者发起反击…每回合可触发2次".
+     * The 天赋"少女的特权": "当持有护盾的我方目标受到敌方目标攻击后，三月七立即向攻击者发起反击…每回合可触发2次".
      *
      * <p>Note: The hit is deliberately one the <b>shield absorbs entirely</b> (HP never moves). That is the case the
      * event choice exists for: "受到攻击后" is about being attacked, not about losing HP, so gating this on
@@ -143,14 +143,14 @@ public class March7thKitTest {
     }
 
     /**
-     * 终结技"冰刻箭雨之时": "受到攻击的敌方目标有50%基础概率陷入冻结状态，持续1回合".
+     * The 终结技"冰刻箭雨之时": "受到攻击的敌方目标有50%基础概率陷入冻结状态，持续1回合".
      *
      * <p>Note: The ultimate's <b>damage</b> needs no rule (the engine's ordinary AoE path reads 100103's own row), so
      * what is asserted here is the state: the victim cannot act, and "冻结状态" is readable by the condition DSL.
      *
-     * <p>Note: The fixture is 1003010, not the 冰锋 the other cases use: 冰锋's data carries
+     * <p>Note: The fixture is 1003010, not the Ice Edge the other cases use: Ice Edge's data carries
      * {@code STAT_CTRL_Frozen = 1.0} - it cannot be frozen by a skill at all (which the next test pins). Both
-     * sides of the probability pipeline are stated here (her 效果命中, the victim's 效果抵抗) so that "50% base"
+     * sides of the probability pipeline are stated here (her effect hit, the victim's effect resistance) so that "50% base"
      * is not a coin flip in a test.
      */
     @Test
@@ -166,7 +166,7 @@ public class March7thKitTest {
                 List.of(enemy));
 
         Assertions.assertTrue(enemy.getBuffManager().hasState("冻结"),
-                "「有50%基础概率陷入冻结状态」 -- with 效果命中 +100% and no resistance, this is the certain case");
+                "「有50%基础概率陷入冻结状态」 -- with effect hit +100% and no resistance, this is the certain case");
         Assertions.assertFalse(enemy.getBuffManager().canAct(), "「冻结状态下，敌方目标不能行动」");
         Assertions.assertTrue(enemy.getCurrentHp() < enemy.getMaxHp(),
                 "and the first sentence of the ultimate is the engine's own AoE path, not a rule");
@@ -182,7 +182,7 @@ public class March7thKitTest {
     }
 
     /**
-     * The other side of the same roll, and a fact about the <b>data</b> rather than about the fixture: 冰锋
+     * The other side of the same roll, and a fact about the <b>data</b> rather than about the fixture: Ice Edge
      * (1002011) is immune to freeze ({@code STAT_CTRL_Frozen = 1.0}), so even a certain base chance cannot land.
      */
     @Test
@@ -204,7 +204,7 @@ public class March7thKitTest {
     }
 
     /**
-     * 星魂 2"记忆中的它": "进入战斗时，为当前生命值百分比最低的我方目标提供等同于三月七24%防御力+320的护盾，
+     * The 星魂 2"记忆中的它": "进入战斗时，为当前生命值百分比最低的我方目标提供等同于三月七24%防御力+320的护盾，
      * 持续3回合".
      *
      * <p>Note: What this needed was the <b>selector</b> (`lowest_hp_ally`), not a new op: the shield's numbers are the
@@ -225,7 +225,7 @@ public class March7thKitTest {
         double expected = 0.24 * march.getAttribute(AttributeType.DEFENCE).get() + 320;
         Assertions.assertEquals(expected, march.getShield(), EPS,
                 "the first unit in the party order takes it, because everybody is at 100% at battle start");
-        Assertions.assertEquals(0, ally.getShield(), EPS, "and only one unit is 「最低的」");
+        Assertions.assertEquals(0, ally.getShield(), EPS, "and only one unit is the lowest");
         Assertions.assertEquals(MARCH, ((Character) battle.allies.getFirst()).getCid(),
                 "precondition: she is first in the party order");
     }
@@ -238,11 +238,11 @@ public class March7thKitTest {
 
         battle.startBattle();
 
-        Assertions.assertEquals(0, march.getShield(), EPS, "星魂 1 does not grant it");
+        Assertions.assertEquals(0, march.getShield(), EPS, "Eidolon 1 does not grant it");
     }
 
     /**
-     * 行迹"加护": "战技提供的护盾持续时间增加1回合".
+     * The 行迹"加护": "战技提供的护盾持续时间增加1回合".
      *
      * <p>Note: The +1 is a <b>separate rule</b> from the Skill's shield, and it has to run after it in the same event - 
      * which it does, because effects of one event run in order (only *conditions* are all evaluated up front). The
@@ -257,7 +257,7 @@ public class March7thKitTest {
                 f.ally.getBuffManager().findBuff(com.laosun.aluminium.models.buff.ShieldBuff.class);
 
         Assertions.assertEquals(4, shield.duration(),
-                "3 turns from the Skill + 1 from 加护 -- 「战技提供的护盾持续时间增加1回合」");
+                "3 turns from the Skill + 1 from the 加护 trace -- 「战技提供的护盾持续时间增加1回合」");
     }
 
     /**
@@ -265,7 +265,7 @@ public class March7thKitTest {
      *
      * <p><b>Twelve</b> clauses exist and each is pinned above; the counts here are what says nothing else was written.
      *
-     * <p>Note: <b>Her 战技's soft taunt is no longer on the registered list</b> (2026-09-29): it was never a missing number.
+     * <p>Note: <b>Her Skill's soft taunt is no longer on the registered list</b> (2026-09-29): it was never a missing number.
      * The sentence states no magnitude, but the skill's {@code param_list} has five slots per level and the prose
      * references four, so the fifth (a constant 5) is the ratio; the game's own ability config attaches its shield
      * modifier with the property {@code AggroAddedRatio} and gates it on the HP% the prose does name, pinning that
@@ -273,38 +273,38 @@ public class March7thKitTest {
      * {@code TAUNT}, which is the hard "can only be selected" and would be a different mechanic rather than a
      * different number. See {@code SoftAggroWeightTest} and the rule's note in {@code characters/1001.json}.
      *
-     * <p>Note: Three clauses came off that list and each is worth a line: 星魂 1 (2026-09-28) needed a per-cast count of the
-     * victims a state actually landed on ({@code "scale": "cast_applied:冻结"}); 星魂 4's first sentence plus
-     * 行迹"冰咒" (same day) needed a way to raise another rule's own number ({@code MODIFY_RULE}); 星魂 4's second
-     * sentence needed an absolute damage addend derived from an attribute ({@code ADD_DAMAGE}); and 星魂 6 needed a
-     * shield whose <i>origin</i> can be asked ({@code has_shield from_rule}). 星魂 3/5 came off with {@code M-32}: a
+     * <p>Note: Three clauses came off that list and each is worth a line: Eidolon 1 (2026-09-28) needed a per-cast count of the
+     * victims a state actually landed on ({@code "scale": "cast_applied:冻结"}); Eidolon 4's first sentence plus
+     * the 行迹"冰咒" (same day) needed a way to raise another rule's own number ({@code MODIFY_RULE}); Eidolon 4's second
+     * sentence needed an absolute damage addend derived from an attribute ({@code ADD_DAMAGE}); and Eidolon 6 needed a
+     * shield whose <i>origin</i> can be asked ({@code has_shield from_rule}). Eidolons 3/5 came off with {@code M-32}: a
      * skill level is now content data (a {@code RAISE_SKILL_LEVEL} rule) rather than a fixed {@code damage_level}.
      */
     @Test
     public void theRestOfHerKitIsNotAuthored() {
         Assertions.assertEquals(4, TriggerTables.of(MARCH).ruleCount(TriggerEvent.SKILL_CAST),
-                "the shield, the soft aggro weight (AGGRO_ADDED_RATIO, added 2026-09-29), the cleanse trace and 加护 "
+                "the shield, the soft aggro weight (AGGRO_ADDED_RATIO, added 2026-09-29), the cleanse trace and the Grace trace "
                         + "(the shield's +1 turn) -- and nothing else on her Skill");
         Assertions.assertEquals(1, TriggerTables.of(MARCH).ruleCount(TriggerEvent.TAKING_HIT),
                 "the Talent's counter");
         Assertions.assertEquals(2, TriggerTables.of(MARCH).ruleCount(TriggerEvent.ULT_CAST),
-                "the ultimate's freeze (its damage is the engine's own path, so there is no damage rule) and 星魂 1's "
+                "the ultimate's freeze (its damage is the engine's own path, so there is no damage rule) and Eidolon 1's "
                         + "energy per landed freeze");
         Assertions.assertEquals(6, TriggerTables.of(MARCH).ruleCount(TriggerEvent.BATTLE_START),
-                "星魂 2's battle-start shield; the two amendments (星魂 4 raising the talent's per-turn cap, 行迹「冰咒」 "
-                        + "raising the ultimate's base chance); and 星魂 3's and 星魂 5's skill levels plus the talent's "
+                "Eidolon 2's battle-start shield; the two amendments (Eidolon 4 raising the talent's per-turn cap, the 行迹「冰咒」 "
+                        + "raising the ultimate's base chance); and Eidolon 3's and Eidolon 5's skill levels plus the talent's "
                         + "base level (three rules, M-32)");
         Assertions.assertEquals(0, TriggerTables.of(MARCH).ruleCount(TriggerEvent.KILL),
                 "and nothing of hers reacts to kills");
         Assertions.assertEquals(1, TriggerTables.of(MARCH).ruleCount(TriggerEvent.TURN_START),
-                "星魂 6's heal, which fires once per shielded ally's own turn start");
+                "Eidolon 6's heal, which fires once per shielded ally's own turn start");
     }
 
     // ==================================================================
     // helpers
     // ==================================================================
 
-    /** 三月七, one plain ally and one enemy: the shape every case above needs. */
+    /** March 7th, one plain ally and one enemy: the shape every case above needs. */
     private static final class Fixture {
         private final Character march;
         private final Character ally;

@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 光锥 23004 以世界之名："当装备者施放战技时，装备者此次攻击的效果命中提高 #2%，攻击力提高 #3%" (2026-10-02).
+ * Light cone 23004 以世界之名 (In the Name of the World): "when the wearer casts the Skill, the effect hit rate of the wearer's attack this time is increased by #2%, and ATK by #3%" (2026-10-02).
  *
  * <p>THE SCOPE IS `until: cast_end`, and that is what these readings pin:
  * <ul>
@@ -57,9 +57,9 @@ public class Cone23004CastScopeTest {
         System.out.println(printed + " ; after the cast: effectHit=" + hitAfter + " atk=" + atkAfter);
 
         Assertions.assertEquals(hitBefore, hitAfter, 1e-9,
-                "「此次攻击」的效果命中不能活过这一次施放");
+                "「this attack」's effect hit rate must not outlive this one cast");
         Assertions.assertEquals(atkBefore, atkAfter, 1e-9,
-                "攻击力也一样：`until: cast_end` 到此为止");
+                "ATK is the same: `until: cast_end` stops right there");
     }
 
     /** The content guard: every rank carries the rule, with that rank's own two numbers and the cast-end lifetime. */

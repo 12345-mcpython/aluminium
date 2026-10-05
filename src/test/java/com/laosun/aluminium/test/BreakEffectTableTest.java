@@ -14,7 +14,7 @@ import java.util.Arrays;
  * <p>Note: <b>The numbers are still placeholders and this class does not pretend otherwise.</b> The four
  * damaging elements reuse the old {@code DOT_RATIO} / {@code DOT_TURNS}; the three control elements carry
  * a delay and a control state whose numbers are example values, and carry <b>no</b> DOT because the damage
- * component of 冻结/纠缠 is a ratio the data does not contain (see the TODO in ROADMAP P10-2). What is
+ * component of Frozen/Entanglement is a ratio the data does not contain (see the TODO in ROADMAP P10-2). What is
  * pinned here is the <b>structure</b>: every element is accounted for, the DOT set is derived from the
  * table rather than listed a second time, and every control key resolves.
  */
@@ -53,7 +53,7 @@ public class BreakEffectTableTest {
      * The three control elements name a control state and an extra delay, and still carry no DOT.
      *
      * <p>The "no DOT" half is not tidiness, it is an open question recorded as one: the encyclopedia text
-     * says a 冻结 victim takes ice damage every turn and that 纠缠 hits on its next action - both of which
+     * says a Frozen victim takes ice damage every turn and that Entanglement hits on its next action - both of which
      * are DOTs - but it gives no break-applied ratio, and {@code BreakEffect.dotRatio} is exactly that
      * field. This assertion makes "we have not decided that number yet" a red test if someone fills in a
      * made-up ratio, instead of a value that quietly looks like data.
@@ -68,7 +68,7 @@ public class BreakEffectTableTest {
             Assertions.assertTrue(effect.hasControl(),
                     element + " must name its control effect, so 'unimplemented' is visible");
             Assertions.assertTrue(effect.delayPercent() > 0,
-                    element + " is documented as 行动延后, so it must carry an extra delay");
+                    element + " is documented as an action delay, so it must carry an extra delay");
         }
     }
 
@@ -77,7 +77,7 @@ public class BreakEffectTableTest {
      *
      * <p>Two separate guards: an unresolvable key is a typo that must throw rather than degrade into "no
      * control at all" ({@code controlEffect()} does that loudly), and the three states must not collapse
-     * into one - 冻结 is the one that stops the victim acting, the other two only slow it down.
+     * into one - Frozen is the one that stops the victim acting, the other two only slow it down.
      */
     @Test
     public void everyControlKeyResolvesAndFreezeIsTheOnlyActLock() {
@@ -88,7 +88,7 @@ public class BreakEffectTableTest {
             Constant.ControlEffect control = effect.controlEffect();
             Assertions.assertNotNull(control, effect.control() + " does not resolve");
             Assertions.assertEquals(control.blocksAct(), "FROZEN".equals(effect.control()),
-                    effect.control() + ": only 冻结 keeps the victim from acting -- 禁锢/纠缠 act, "
+                    effect.control() + ": only Frozen keeps the victim from acting -- Imprisonment/Entanglement act, "
                             + "just later and slower");
             Assertions.assertNotNull(control.resistKey(),
                     effect.control() + " needs a resist key for the skill-applied path");

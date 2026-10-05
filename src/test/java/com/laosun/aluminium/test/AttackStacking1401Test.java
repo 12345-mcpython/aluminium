@@ -16,7 +16,7 @@ import java.util.Random;
  * Her technique's +60% and her ult's +80% ATTACK must both count (1401, 2026-10-02).
  *
  * <p>FILE-DRIVEN, three readings, and the two ratios are the claim: 1.6 with the technique alone, 2.4 with both.
- * `Note: `秘技` comes from `battle.markTechniqueUsed(owner)` BEFORE `startBattle()` -- the engine's own entry point, which is what the
+ * `Note: `秘技` (technique) comes from `battle.markTechniqueUsed(owner)` BEFORE `startBattle()` -- the engine's own entry point, which is what the
  * earlier attempt got wrong when it invented an `APPLY_BUFF` rule that never fired.
  */
 public class AttackStacking1401Test {

@@ -17,7 +17,7 @@ import java.util.List;
  * OUR WHOLE SIDE's damage up 24..40%, both for 1 turn.
  *
  * <p>Note: The two state names come from codepoints on the generator side, because round 30lost a round to a
- * hand-typed escape that named a different character: measured, the engine said {@code 歌咏} while the judge
+ * hand-typed escape that named a different character: measured, the engine said the state {@code 歌咏} while the judge
  * expected something else. The engine was right.
  */
 public class Cone23026Test {

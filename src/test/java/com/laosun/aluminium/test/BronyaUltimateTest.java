@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Random;
 
-/** 1101 布洛妮娅's ultimate: an all-allies ATK share and a DERIVED CRIT DMG amount, both judged on a teammate. */
+/** 1101 Bronya (布洛妮娅)'s ultimate: an all-allies ATK share and a DERIVED CRIT DMG amount, both judged on a teammate. */
 public class BronyaUltimateTest {
     private static final int BRONYA = 1101;
     private static final int ALLY = 1001;

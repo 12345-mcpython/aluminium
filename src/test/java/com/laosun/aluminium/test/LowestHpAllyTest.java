@@ -19,8 +19,8 @@ import java.util.Random;
  *
  * <p><b>Why the vocabulary needed it.</b> "The most hurt ally" is a place an effect <b>reaches</b>, and before this
  * selector the only tool was a <b>condition</b> - which filters <i>rules</i> ("is this event mine?"), not the units
- * an effect lands on. So 三月七's 星魂 2 ("进入战斗时，为当前生命值百分比最低的我方目标提供…护盾") and 藿藿's
- * [禎命] / 灵砂's [浮元] (heal that unit) had no spelling at all.
+ * an effect lands on. So March 7th's Eidolon 2 ("进入战斗时，为当前生命值百分比最低的我方目标提供…护盾") and Huohuo's (藿藿)
+ * [禎命] / Lingsha's (灵砂) [浮元] (heal that unit) had no spelling at all.
  *
  * <p>Note: <b>The one thing this suite exists to pin: percentage, not points.</b> With allies at 100/1000 and 900/10000
  * the answer differs - 10% versus 9% - so a selector that quietly compared absolute HP would look right in every
@@ -52,7 +52,7 @@ public class LowestHpAllyTest {
     /**
      * Ties go to the earliest unit in the party order.
      *
-     * <p>Not a corner case: at {@code BATTLE_START} everybody is at 100%, so every 星魂-2-style rule fires on a tie
+     * <p>Not a corner case: at {@code BATTLE_START} everybody is at 100%, so every Eidolon-2-style rule fires on a tie
      * and the choice has to be stated rather than left to whatever order a map happened to iterate in.
      */
     @Test

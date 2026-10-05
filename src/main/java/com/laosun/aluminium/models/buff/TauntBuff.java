@@ -41,7 +41,7 @@ public class TauntBuff extends AbstractBuff {
     }
 
     /**
-     * 嘲讽 is a negative effect <b>on its bearer</b>: it forces that unit's targeting, which is why it is applied
+     * 嘲讽 (taunt) is a negative effect <b>on its bearer</b>: it forces that unit's targeting, which is why it is applied
      * to enemies and counts as a debuff rather than as a buff the wearer gives itself.
      */
     @Override

@@ -14,7 +14,7 @@ import java.util.Map;
  * P2-1 acceptance: the three monster data files load with the right shapes and values.
  *
  * <p>Anchor data (matching `E:\code\blog\hsr\HSR.md` §1.2 / the measurements taken in the session):
- * 冰锋 1002011 template `18 / 210 / 69.5 / 100 / 60`, weak to fire+lightning, resistance to
+ * Ice Edge (冰锋) 1002011 template `18 / 210 / 69.5 / 100 / 60`, weak to fire+lightning, resistance to
  * physical/ice/wind/quantum/imaginary 0.2;
  * level group 1-Lv90 = `36.821384 / 5.238095 / 236.5341 / 1.32 / 1 / 0.32 / 0.1`.
  */
@@ -69,7 +69,7 @@ public class MonsterDataTest {
 
     @Test
     public void hpRatioUsesHealthModifyRatioAndNotTheGhostField() {
-        // 802501003 is a 绝境 instance measured in the session: the real HP ratio is 1.9916;
+        // 802501003 is a Despair (绝境) instance measured in the session: the real HP ratio is 1.9916;
         // the hp_modify_ratio in the same entry is a ghost field (always 1), using it would double the HP.
         Assertions.assertEquals(1.979167, Constant.MONSTER_CONFIGS.get(802501003).hpRatio(), EPS);
         // 100201101 is even more extreme: the real value is 0.26666, the ghost field says 1
@@ -101,7 +101,7 @@ public class MonsterDataTest {
     public void highLevelGroupRatiosLoad() {
         HardLevelGroup level120 = Constant.HARD_LEVEL_GROUPS.get(3).get(120);
 
-        // a 绝境 level group verified in the session (group 3-Lv120): HP ratio 1938.634
+        // a Despair (绝境) level group verified in the session (group 3-Lv120): HP ratio 1938.634
         Assertions.assertEquals(1938.7634, level120.health(), EPS);
         Assertions.assertEquals(49.879406, level120.attack(), EPS);
         Assertions.assertEquals(5.714286, level120.defence(), EPS);

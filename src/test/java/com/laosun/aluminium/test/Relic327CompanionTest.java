@@ -17,9 +17,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Relic 32(2026-09-30): "进入战斗时，若装备者与另一名队友均为开拓同行角色，暴击伤害 +32%".
+ * Relic 32(2026-09-30): "when entering battle, if the wearer and another teammate are both Trailblaze Companion characters, CRIT DMG +32%".
  *
- * <p>The companion group is TWENTY ids (开拓者 has ten forms, 三月七 two), matched by character id -- never by name,
+ * <p>The companion group is TWENTY ids (the Trailblazer (开拓者) has ten forms, March 7th (三月七) two), matched by character id -- never by name,
  * because 姬子 is a prefix of 姬子-启行. Membership has no data marker, so the set is transcribed from the docs; the
  * mutation below removes one member and this test must notice.
  */
@@ -43,7 +43,7 @@ public class Relic327CompanionTest {
 
     @Test
     public void membershipDecidesIt() {
-        // 1001 三月七 and 1002 丹恒 are both companions; 1210 (桂乃芬) is not.
+        // 1001 三月七 (March 7th) and 1002 丹恒 (Dan Heng) are both companions; 1210 (桂乃芬, Guinaifen) is not.
         Character wearer = CharacterFactory.create(1001, LEVEL);
         Character ally = CharacterFactory.create(1002, LEVEL);
         Battle battle = new Battle(List.of(wearer, ally), List.of(EnemyFactory.create(1002011, 90, 1)),

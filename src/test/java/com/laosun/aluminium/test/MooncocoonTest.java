@@ -13,8 +13,8 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 140："若我方角色受到致命攻击，则…获得[月茧]状态。[月茧]状态下的角色会暂时延后陷入无法战斗状态，
- * 且可以正常行动。若行动后、下一次回合开始前当前生命值提高或获得护盾，则解除[月茧]状态，否则将立即陷入无法战斗状态" (2026-10-02).
+ * 140: "if one of our characters takes a lethal blow, then... gains the [月茧] state. A character in the [月茧] state temporarily defers falling into the cannot-fight state,
+ * and can act normally. If, after acting and before the next turn begins, its current HP is raised or it gains a shield, the [月茧] state is dispelled; otherwise it will immediately fall into the cannot-fight state" (2026-10-02).
  *
  * <p>ONE SENTENCE, THREE READINGS: it does not fall; it falls once its own turn is over; a heal before that saves it.
  *

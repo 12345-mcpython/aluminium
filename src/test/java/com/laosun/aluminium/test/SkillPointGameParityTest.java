@@ -170,7 +170,7 @@ public class SkillPointGameParityTest {
      * gain.
      *
      * <p>Note: This test used to be called {@code characterAndGearSkillPointModifiersAreNotImplemented} and listed six
-     * characters as evidence. <b>One of them is implemented now</b>: 布洛妮娅's Eidolon 1 ("施放战技时，有 50% 的固定概率
+     * characters as evidence. <b>One of them is implemented now</b>: Bronya's (布洛妮娅) Eidolon 1 ("施放战技时，有 50% 的固定概率
      * 恢复 1 个战技点，该效果有 1 回合的触发冷却") is authored in {@code characters/1101.json} as
      * {@code chance} + {@code cooldown} + {@code min_eidolon}, and pinned by {@code BronyaEidolonTest}. The other
      * five still have no data, but they now have a <b>shape</b> - a rule on the trigger table that grants a point
@@ -200,7 +200,7 @@ public class SkillPointGameParityTest {
      * {@code attack_type == "Normal"}, but in the game there are exceptions where an enhanced
      * basic attack does not restore a skill point.
      *
-     * <p>Evidence: {@code 1315_波提欧.md} "an enhanced basic attack cannot restore a skill
+     * <p>Evidence: {@code 1315_波提欧.md}, "an enhanced basic attack cannot restore a skill
      * point, and can only target an enemy in [绝命对峙]". The enhanced basic attack of
      * {@code 1213_丹恒-饮月.md}, on the other hand, does not spend a skill point ("casting this
      * skill does not consume a skill point and is not treated as using a skill").

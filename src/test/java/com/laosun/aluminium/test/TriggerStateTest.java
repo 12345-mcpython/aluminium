@@ -23,8 +23,8 @@ import java.util.Set;
 /**
  * Named states: the {@code APPLY_BUFF} op and the {@code has_state} condition.
  *
- * <p><b>Why this vocabulary exists.</b> The rule text of this game says "处于[协奏]状态时" /
- * "[转魄]状态下" / "触电状态下的敌方目标" constantly, and before this the trigger table could not ask
+ * <p><b>Why this vocabulary exists.</b> The rule text of this game says "while in the [协奏] state" /
+ * "while in the [转魄] state" / "an enemy target in the shocked state" constantly, and before this the trigger table could not ask
  * about a state at all: a mechanic that is otherwise pure data needed a Java class per character. A state is
  * not a new kind of thing in this engine - it is <b>an ordinary buff that carries a name</b> (the lesson the
  * DOT migration already taught), so it inherits duration, refresh, and {@code clearAll} removal for free.
@@ -33,7 +33,7 @@ import java.util.Set;
  * <ul>
  *   <li>the op puts a state on a unit, and the condition reads it back;</li>
  *   <li>{@code target has_state X} reads the <b>event's subject</b>, not the owner - the classic
- *       actor/target confusion of this DSL, and the reason Kafka's "an enemy in 触电 state" is expressible;</li>
+ *       actor/target confusion of this DSL, and the reason Kafka's "an enemy in the shocked state" is expressible;</li>
  *   <li>two <b>different</b> states coexist ({@code StateBuff.isSameKind} compares names, not classes - the
  *       class-based default would make [协奏] silently evict [转魄], the L-14 trap);</li>
  *   <li>the <b>same</b> state refreshes instead of stacking;</li>
@@ -93,9 +93,9 @@ public class TriggerStateTest {
         drainSkillPoints(battle);
 
         Assertions.assertEquals(1, battle.fireTriggers(TriggerEvent.ALLY_ATTACK, owner, ally, 1, 0),
-                "the subject of the event is in 触电");
+                "the subject of the event is in the shocked state");
         Assertions.assertEquals(0, battle.fireTriggers(TriggerEvent.ALLY_ATTACK, owner, owner, 1, 0),
-                "the owner is NOT in 触电, so the rule must not fire -- reading the owner here would make "
+                "the owner is NOT in the shocked state, so the rule must not fire -- reading the owner here would make "
                         + "every 'the target is in state X' rule fire on the wrong unit");
         Assertions.assertEquals(0, battle.fireTriggers(TriggerEvent.ALLY_ATTACK, owner, null, 1, 0),
                 "an event with no subject fails the condition instead of accidentally passing it");
@@ -149,7 +149,7 @@ public class TriggerStateTest {
         Assertions.assertTrue(owner.getBuffManager().hasState("协奏"));
 
         takeTurn(battle, owner);
-        Assertions.assertFalse(owner.getBuffManager().hasState("协奏"), "「持续1回合」 is over after that turn");
+        Assertions.assertFalse(owner.getBuffManager().hasState("协奏"), "「lasts 1 turn」 is over after that turn");
     }
 
     @Test
@@ -230,7 +230,7 @@ public class TriggerStateTest {
         Assertions.assertEquals(1, fire(battle, owner), "the state was applied");
         Assertions.assertTrue(owner.getBuffManager().hasState("蒙福者"), "precondition: it is on");
         Assertions.assertEquals(1, fire(battle, owner, TriggerEvent.SKILL_CAST), "and then removed");
-        Assertions.assertFalse(owner.getBuffManager().hasState("蒙福者"), "「解除…状态」");
+        Assertions.assertFalse(owner.getBuffManager().hasState("蒙福者"), "「removes ... the state」");
     }
 
     /**
@@ -257,7 +257,7 @@ public class TriggerStateTest {
     /**
      * The four DoT spellings resolve the same way here as they do in {@code has_state}.
      *
-     * <p>"触电" is not a {@code StateBuff} - the engine has represented the four damage-over-time states as an
+     * <p>"shocked" is not a {@code StateBuff} - the engine has represented the four damage-over-time states as an
      * ordinary {@code DotBuff(element)} since P10-0, and {@code BuffManager} is the one place that knows the two
      * spellings are the same fact. Removing is the side where forgetting that would be invisible: the state would
      * simply stay on, and the rule would look like it ran.
@@ -272,7 +272,7 @@ public class TriggerStateTest {
         fire(battle, owner);
 
         Assertions.assertFalse(owner.getBuffManager().hasState("触电"),
-                "「解除…状态」 works on the DoT names too -- one name, one meaning");
+                "「removes ... the state」 works on the DoT names too -- one name, one meaning");
     }
 
     /** Removing a state that is not there is nothing to do, not a failure. */
@@ -318,7 +318,7 @@ public class TriggerStateTest {
     /**
      * {@code target is_ally} is true for one of ours and false for an enemy.
      *
-     * <p>The condition exists for "对<b>己方角色</b>施放终结技时" (relic sets 114/118/121): a cast event carries the
+     * <p>The condition exists for "when casting the ultimate on <b>one of our own characters</b>" (relic sets 114/118/121): a cast event carries the
      * unit it AIMED at, and a damaging cast aimed at an enemy carries one too - so without the side test the rule
      * would fire on every cast of that slot.
      */
@@ -368,7 +368,7 @@ public class TriggerStateTest {
     /**
      * {@code self has_same_path_ally} is true when another <b>living</b> ally walks the wearer's Path.
      *
-     * <p>Its first user is 遗器 314's "若至少存在一名与装备者命途相同的队友" - the rule cannot name a Path, because
+     * <p>Its first user is relic 314's "if there is at least one teammate on the same Path as the wearer" - the rule cannot name a Path, because
      * the relic can be worn by anybody, so it has to compare the wearer against the rest of the side. That makes it the
      * first condition whose answer depends on the <b>party</b> rather than on the owner or the event.
      */
@@ -377,18 +377,18 @@ public class TriggerStateTest {
         Battle same = withAllyOf(1013, pathRule(gain(1)));
         drainSkillPoints(same);
         Assertions.assertEquals(1, same.fireTriggers(TriggerEvent.ALLY_ATTACK, same.characters.getFirst(), null, 1, 0),
-                "黑塔 is 智识, like 姬子");
+                "Herta (黑塔) is Erudition, like Himeko (姬子)");
 
         Battle other = withAllyOf(1210, pathRule(gain(1)));
         drainSkillPoints(other);
         Assertions.assertEquals(0,
                 other.fireTriggers(TriggerEvent.ALLY_ATTACK, other.characters.getFirst(), null, 1, 0),
-                "桂乃芬 is 虚无: 「命途相同」 does not hold");
+                "Guinaifen (桂乃芬) is Nihility: 「same Path」 does not hold");
 
         Battle alone = battleWith(pathRule(gain(1)));
         drainSkillPoints(alone);
         Assertions.assertEquals(0, alone.fireTriggers(TriggerEvent.ALLY_ATTACK, alone.characters.getFirst(), null, 1, 0),
-                "nobody else on the field is not 「至少存在一名队友」");
+                "nobody else on the field is not 「at least one teammate exists」");
     }
 
     /** A <b>dead</b> teammate is not somebody on the field - the same reading `summonsOf` uses. */
@@ -402,7 +402,7 @@ public class TriggerStateTest {
         battle.processRequests();
 
         Assertions.assertEquals(0, battle.fireTriggers(TriggerEvent.ALLY_ATTACK, owner, null, 1, 0),
-                "a corpse is not 「与装备者命途相同的队友」");
+                "a corpse is not 「a teammate on the same Path as the wearer」");
     }
 
     /** {@code !self has_same_path_ally} is the opposite (and still needs a party to look at). */
@@ -437,7 +437,7 @@ public class TriggerStateTest {
     // ==================================================================
 
     /**
-     * {@code target has_weakness Fire} reads the enemy's weakness bar - the condition 遗器 316 needed.
+     * {@code target has_weakness Fire} reads the enemy's weakness bar - the condition relic 316 needed.
      *
      * <p>Note: A character has no weakness bar, so the condition is <b>false</b> for one rather than "not weak to Fire":
      * the family's rule is "cannot read it, therefore it fails".
@@ -478,11 +478,11 @@ public class TriggerStateTest {
      * {@code target has_skill ELATION_SKILL} reads the <b>named party's kit</b>, not the owner's.
      *
      * <p>The discrimination is one slot asked about two units: 8010 carries the Elation skill (data slot 20) and
-     * 姬子 does not, while <b>both</b> carry {@code COMMON}. So a wrong implementation that read the owner's kit, or
+     * Himeko (姬子) does not, while <b>both</b> carry {@code COMMON}. So a wrong implementation that read the owner's kit, or
      * that answered "yes" for any slot, or "no" for every slot, fails at least one of the three counts below.
      *
-     * <p>Why the condition exists at all: the sentence it comes from branches on it - "若目标拥有欢愉技…并使其立即
-     * 施放1次…欢愉技…若目标不拥有欢愉技，使其行动提前50%" - so the two polarities are two different rules, and
+     * <p>Why the condition exists at all: the sentence it comes from branches on it - "if the target has an elation skill ... and make it immediately
+     * cast 1 ... elation skill ... if the target does not have an elation skill, advance its action by 50%" - so the two polarities are two different rules, and
      * this is also the <b>guard</b> {@code CAST_SKILL} needs (that op throws when the unit has no such slot).
      */
     @Test
@@ -497,7 +497,7 @@ public class TriggerStateTest {
         Assertions.assertTrue(elation.getSkills().get(SkillType.ELATION_SKILL).getData().isLoaded(),
                 "precondition: 8010's slot 20 is a REAL row, which is what the condition asks about");
         Assertions.assertFalse(owner.getSkills().get(SkillType.ELATION_SKILL).getData().isLoaded(),
-                "precondition: 姬子 CARRIES the key too (the builder fills every intrinsic slot) -- its row is the "
+                "precondition: Himeko (姬子) CARRIES the key too (the builder fills every intrinsic slot) -- its row is the "
                         + "loader's not-found placeholder, so 'the slot is there' and 'she has the skill' differ, "
                         + "and only the second is the question");
         Assertions.assertTrue(owner.getSkills().get(SkillType.COMMON).getData().isLoaded(),
@@ -509,7 +509,7 @@ public class TriggerStateTest {
 
         drainSkillPoints(battle);
         Assertions.assertEquals(1, battle.fireTriggers(TriggerEvent.ALLY_ATTACK, owner, owner, 1, 0),
-                "姬子 has COMMON but no Elation skill: only the second rule runs");
+                "Himeko (姬子) has COMMON but no Elation skill: only the second rule runs");
         Assertions.assertEquals(2, battle.getSkillPoints(),
                 "and only ITS amount lands (2, measured from a drained bar so no cap can hide the difference)");
     }
@@ -530,7 +530,7 @@ public class TriggerStateTest {
         drainSkillPoints(battle);
 
         Assertions.assertEquals(1, battle.fireTriggers(TriggerEvent.ALLY_ATTACK, owner, owner, 1, 0),
-                "姬子 has no Elation skill, so the negated condition holds");
+                "Himeko (姬子) has no Elation skill, so the negated condition holds");
         Assertions.assertEquals(0, battle.fireTriggers(TriggerEvent.ALLY_ATTACK, owner, elation, 1, 0),
                 "8010 HAS one, so it must not");
     }
@@ -539,7 +539,7 @@ public class TriggerStateTest {
      * Note: A slot that is not a {@link SkillType} is refused where the file is read.
      *
      * <p>The wrong spelling in this case is not hypothetical: {@code ELATION} is a {@code DamageType} constant, and
-     * writing it here reads perfectly - "欢愉" - while naming nothing the kit can carry. The message has to name
+     * writing it here reads perfectly - "elation" - while naming nothing the kit can carry. The message has to name
      * both the bad spelling and the right one, or the author is left with "unknown skill".
      */
     @Test
@@ -557,7 +557,7 @@ public class TriggerStateTest {
     // ==================================================================
 
     /**
-     * {@code has_path} reads the Path off the named party - 姬子 is 智识 (Erudition) and 停云 is 同谐 (Harmony).
+     * {@code has_path} reads the Path off the named party - Himeko (姬子) is Erudition and Tingyun (停云) is Harmony.
      *
      * <p>Same shape as {@code has_state}: the left side names a party, so "the target is on this Path" and
      * "I am on this Path" are the same mechanism. The Path itself is engine knowledge already
@@ -573,7 +573,7 @@ public class TriggerStateTest {
         drainSkillPoints(battle);
 
         Assertions.assertEquals(1, battle.fireTriggers(TriggerEvent.ALLY_ATTACK, owner, harmony, 1, 0),
-                "停云 is 同谐: only the first rule matches");
+                "Tingyun (停云) is Harmony: only the first rule matches");
         Assertions.assertEquals(1, battle.getSkillPoints(), "and it is the one that granted a point");
     }
 
@@ -589,9 +589,9 @@ public class TriggerStateTest {
     }
 
     /**
-     * {@code !} inverts the condition - the exception 星期日's Skill is written as.
+     * {@code !} inverts the condition - the exception Sunday (星期日)'s Skill is written as.
      *
-     * <p>Both directions in one case, because "it fires for the other Path" and "it does not fire for 同谐" are
+     * <p>Both directions in one case, because "it fires for the other Path" and "it does not fire for Harmony" are
      * two different claims and a wrong implementation can satisfy either alone.
      */
     @Test
@@ -603,9 +603,9 @@ public class TriggerStateTest {
         drainSkillPoints(battle);
 
         Assertions.assertEquals(0, battle.fireTriggers(TriggerEvent.ALLY_ATTACK, owner, harmony, 1, 0),
-                "the target IS 同谐, so the negated condition fails");
+                "the target IS Harmony, so the negated condition fails");
         Assertions.assertEquals(1, battle.fireTriggers(TriggerEvent.ALLY_ATTACK, owner, owner, 1, 0),
-                "姬子 is 智识, so it holds");
+                "Himeko (姬子) is Erudition, so it holds");
     }
 
     /**

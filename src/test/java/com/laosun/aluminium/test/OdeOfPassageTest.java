@@ -15,12 +15,12 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1415's memosprite skill 14 "献予'门径'之诗", the sentence about defence (2026-10-02).
+ * 1415's memosprite skill 14 "献予'门径'之诗" (Ode to the Passage), the sentence about defence (2026-10-02).
  *
- * <p>"整场生效，<b>对缇宝施放时，使缇宝造成的伤害无视敌方目标 #2[i]% 的防御力。</b>…"
+ * <p>"takes effect for the whole battle; <b>when cast on Tribbie, makes the damage dealt by Tribbie ignore #2[i]% of the enemy target's defence.</b> ..."
  *
  * <p>Two readings: the piercing lands with the value the engine actually reads (this skill's row at the caster's level -- `#2` runs 0.06 -> 0.168),
- * and it lands on 缇宝 ONLY, because the rule lives on his table and is gated on `target == self`.
+ * and it lands on Tribbie ONLY, because the rule lives on his table and is gated on `target == self`.
  */
 public class OdeOfPassageTest {
     private static final int LEVEL = 80;
@@ -57,7 +57,7 @@ public class OdeOfPassageTest {
                 + " (=" + expected + ")");
 
         Assertions.assertEquals(expected, tribbieGain, Math.abs(expected) * 1e-6,
-                "「使缇宝造成的伤害无视敌方目标 #2% 的防御力」-- #2 runs with the level");
+                "「makes the damage dealt by Tribbie ignore #2% of the enemy target's defence」-- #2 runs with the level");
 
         // and the same ode aimed at somebody else does nothing for him
         SkillExecutor.execute(battle, ode, demiurge, List.of(bystander));
@@ -66,6 +66,6 @@ public class OdeOfPassageTest {
         System.out.println("[passage] aimed at a bystander instead: the bystander gained " + bystanderGain
                 + " ; Tribbie is now at " + tribbie.getAttribute(AttributeType.DEFENCE_IGNORE).get());
         Assertions.assertEquals(0.0, bystanderGain, 1e-9,
-                "「**对缇宝**施放时」-- the sentence names him, so nobody else is touched");
+                "「**when cast on Tribbie**」-- the sentence names him, so nobody else is touched");
     }
 }

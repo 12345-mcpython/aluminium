@@ -18,10 +18,10 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Light cone 21023: at battle start, damage taken is reduced for 5 turns AND "同时立即为我方全体回复等同于
- * 各自已损失生命值 30% 的生命值".
+ * Light cone 21023: at battle start, damage taken is reduced for 5 turns AND "at the same time immediately restore to all of our side
+ * HP equal to 30% of each one's own lost HP".
  *
- * <p>"各自" is the whole point of the new `target_lost_hp` scale: the share is read per RECIPIENT, so a
+ * <p>"each one's own" is the whole point of the new `target_lost_hp` scale: the share is read per RECIPIENT, so a
  * full-HP ally heals nothing while a hurt one heals 30% of its own gap. Measuring both in one battle is what makes this
  * reading attributable.
  */
@@ -69,7 +69,7 @@ public class Cone21023Test {
                 + " expected=" + (allyLost * SHARE) + " wearerHealed=" + wearerHealed);
         Assertions.assertEquals(allyLost * SHARE, allyHealed, 1e-6, "30% of the ALLY's own lost HP");
         Assertions.assertEquals(0.0, wearerHealed, 1e-9,
-                "and an ally at full HP heals nothing -- 「各自」, not a share of one pool");
+                "and an ally at full HP heals nothing -- \"each one's own\", not a share of one pool");
     }
 
     @Test

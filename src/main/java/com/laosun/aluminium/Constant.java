@@ -28,7 +28,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  *   <li>{@link #RELIC_SETS} - relic set definitions (the 2-piece / 4-piece bonus table)</li>
  *   <li>{@link #WEAPONS} - weapon (light cone) data by ID</li>
  *   <li>{@link #CHARACTERS} - character base stats by ID</li>
- *   <li>{@link #SKILL_TRACES} - trace tree data (行迹) by character ID</li>
+ *   <li>{@link #SKILL_TRACES} - trace tree data (traces, 行迹) by character ID</li>
  * </ul>
  *
  * <p>{@link #PERCENT_TO_BASE} maps percentage-type attributes to their corresponding
@@ -333,7 +333,7 @@ public final class Constant {
     public static final int SKILL_POINT_GAIN_BASIC = 1;
 
     /**
-     * How many Eidolon ranks (星魂) a character can have. {@code 0} means "none active"; the data carries
+     * How many Eidolon ranks (eidolons, 星魂) a character can have. {@code 0} means "none active"; the data carries
      * exactly the ranks {@code 1}…{@code 6} for every character in {@code character_data.json}.
      *
      * <p>It is a constant here because it is the bound the <b>assembly point</b> validates against
@@ -472,12 +472,12 @@ public final class Constant {
      * {@code ControlBuff}, which also carries {@link #name} - the spelling the documents and `has_state` use.
      *
      * @param key         the English key {@link BreakEffect#control} uses ({@code "FROZEN"})
-     * @param name        the state's NAME as the documents spell it (冻结) - what a rule's {@code control}
+     * @param name        the state's NAME as the documents spell it (冻结, frozen) - what a rule's {@code control}
      *                    argument and the {@code has_state} condition use
      * @param resistKey   the data's specific-resistance key for this state (what a <i>skill</i> must beat)
      * @param turns       how many of the victim's turns it lasts
      * @param blocksAct   {@code true} = the victim cannot act at all; {@code false} = it acts, just slower
-     *                    or later (this is the difference between 冻结 and 禁锢/纠缠)
+     *                    or later (this is the difference between 冻结 (frozen) and 禁锢 (imprisoned) / 纠缠 (entangled))
      * @param slowPercent SPEED reduction as a decimal (0.2 = −20%), 0 = no slow
      */
     public record ControlEffect(String key, String name, String resistKey, int turns, boolean blocksAct,
@@ -494,9 +494,9 @@ public final class Constant {
      * not the numbers. What the text <i>did</i> settle is the mechanics, and two of them contradicted the
      * plan (recorded in {@code ROADMAP.md} P10-2):
      * <ul>
-     *   <li>冻结 = <b>不能行动</b>（+ 每回合冰属性伤害） -  - the plan said "冻结期受伤害 +30%",
+     *   <li>冻结 (frozen) = <b>cannot act</b> (+ ice damage every turn) - the plan said "while frozen, damage taken +30%",
      *       which nothing in the data supports;</li>
-     *   <li>禁锢 / 纠缠 = <b>行动延后 + 速度降低</b>, and the victim still acts.</li>
+     *   <li>禁锢 (imprisoned) / 纠缠 (entangled) = <b>action delayed + speed lowered</b>, and the victim still acts.</li>
      * </ul>
      *
      * <p>{@code turns} is 1 for all three because none of the sources states a break-applied duration, and
@@ -505,10 +505,10 @@ public final class Constant {
      *
      * <p><b>One number did turn out to be traceable after all</b> (P10-6, reading the descriptions):
      * 瓦尔特's 画地为牢 (1004/) writes {@code 禁锢状态下，敌方目标行动延后#2%，速度降低#3%} with
-     * {@code param_list = [1, 0.2, 0.1, 15, 0.5]} - i.e. 行动延后 20%, 速度降低 10%. The delay matches
+     * {@code param_list = [1, 0.2, 0.1, 15, 0.5]} - i.e. action delayed 20%, speed lowered 10%. The delay matches
      * {@link #IMPRISON_EXTRA_DELAY} by coincidence (it was a guess), and {@code slowPercent} for
      * {@code IMPRISONED} was guessed as 0.2 and is <b>corrected to 0.1</b> from that text. The same
-     * caveat as 冻结 applies: that is a <i>technique</i>-applied 禁锢, not a break-applied one, and no
+     * caveat as 冻结 (frozen) applies: that is a <i>technique</i>-applied 禁锢 (imprisonment), not a break-applied one, and no
      * source gives the latter - so this is the closest available evidence, not a verified break value.
      * {@code ENTANGLED}'s 0.2 has no source at all and stays a plain guess.
      */
@@ -532,7 +532,7 @@ public final class Constant {
 
     /**
      * Extra action delay of a Freeze break, on top of {@link #BREAK_DELAY_RATIO} (example value,
-     * TODO data). The encyclopedia text says a 冻结 "行动延后" but gives no break-applied number.
+     * TODO data). The encyclopedia text says a 冻结 (frozen) "action delayed" but gives no break-applied number.
      */
     public static final double FREEZE_EXTRA_DELAY = 0.5;
 

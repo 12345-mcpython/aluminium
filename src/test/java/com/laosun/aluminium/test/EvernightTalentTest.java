@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1413 长夜月's talent: "场上敌方目标数量等于4或以上/3/2/1名时，我方忆灵造成的伤害为原伤害的120%/125%/130%/150%".
+ * 1413 Evernight (长夜月)'s talent: "场上敌方目标数量等于4或以上/3/2/1名时，我方忆灵造成的伤害为原伤害的120%/125%/130%/150%" (when the number of enemy targets on the field is 4 or more/3/2/1, the damage our memosprites deal is 120%/125%/130%/150% of the original damage).
  *
  * <p>The whole memosprite chain is exercised here: the damage TYPE (`DamageType.MEMORY`), the scoped boost granted to the MASTER
  * (its table is consulted when its memosprite strikes -- measured), and the `enemy_count` condition.
@@ -35,7 +35,7 @@ public class EvernightTalentTest {
     public void fewerEnemiesMeansMoreMemospriteDamage() {
         double four = memospriteDamage(4);
         double one = memospriteDamage(1);
-        Assertions.assertTrue(four > 0 && one > 0, "precondition: the 忆灵 landed both hits");
+        Assertions.assertTrue(four > 0 && one > 0, "precondition: the 忆灵 (memosprite) landed both hits");
         Assertions.assertEquals(1.50 / 1.20, one / four, 1e-9,
                 "120% at four enemies and 150% at one: " + four + " vs " + one);
     }
@@ -63,7 +63,7 @@ public class EvernightTalentTest {
         Battle battle = new Battle(List.of(master), foes, noCrit);
         battle.startBattle();
         Summon memosprite = battle.summonMemosprite(master);
-        Assertions.assertNotNull(memosprite, "precondition: the 忆灵 is out");
+        Assertions.assertNotNull(memosprite, "precondition: the 忆灵 (memosprite) is out");
         double before = victim.getCurrentHp();
         // Note: COMMON, not SKILL: a memosprite's stated attack is installed in its COMMON slot.
         battle.castImmediate(memosprite.getSkills().get(SkillType.COMMON), memosprite, List.of(victim));

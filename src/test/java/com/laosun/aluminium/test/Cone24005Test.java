@@ -18,7 +18,7 @@ import java.util.Random;
 /**
  * Light cone 24005: after the wearer casts a Skill, the WHOLE party deals 8% more damage for 3 turns.
  *
- * <p>The ally is the attributable reading: the wearer is 1205 (whose own kit moves too), and the sentence says 我方全体.
+ * <p>The ally is the attributable reading: the wearer is 1205 (whose own kit moves too), and the sentence says all of us (我方全体).
  */
 public class Cone24005Test {
     private static final int CONE = 24005;

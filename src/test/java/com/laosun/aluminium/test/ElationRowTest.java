@@ -15,8 +15,8 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 欢愉技的行首列是次数："造成 #1 次伤害，每次对敌方随机单体造成 #2%…。最后造成 #3%…
- * 由敌方全体均分" (2026-10-02; readers 8009/8010 slot 20, data row `[8, 0.25, 0.5]` at L15).
+ * An Elation skill's row leads with a COUNT: "deal #1 instances of damage, each dealing #2% to a random single enemy ... The last deals #3% ...
+ * divided evenly among all enemies" (2026-10-02; readers 8009/8010 slot 20, data row `[8, 0.25, 0.5]` at L15).
  *
  * <p>THE INSTRUMENT COUNTS INSTANCES, not damage: the sentence is about a NUMBER of hits, and damage would drag in the crit
  * zone and the Elation boost. A test-only rule on the caster adds one counter stack per damage instance it deals.
@@ -31,14 +31,14 @@ public class ElationRowTest {
     @Test
     public void theRowSettlesEightHitsAndTheSplit() {
         Assertions.assertEquals(9, instancesFromTheElationRow(), 0,
-                "8 次伤害 + 最后一次均分");
+                "8 damage instances + one final split");
     }
 
     /** Note: And the same reading must NOT be a single 8x instance, which is what the AOE path did before the branch. */
     @Test
     public void itIsNotOneInstanceOfEightTimesTheShare() {
         Assertions.assertNotEquals(1, instancesFromTheElationRow(),
-                "行首列是次数，不是倍率");
+                "the leading column is a count, not a multiplier");
     }
 
     // ==================================================================

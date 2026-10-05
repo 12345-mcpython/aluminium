@@ -72,7 +72,7 @@ public class SkillExecutorDiagnosticTest {
     public void diagnosticIsOffByDefault() {
         Character natasha = CharacterFactory.create(1105, 80);
         // Note: This case measures the ENGINE's skill execution against the parameter row, so the loadout is
-        // isolated: 1105 has a file now, and its 行迹 医者 raises outgoing healing by 10%, which would otherwise
+        // isolated: 1105 has a file now, and its trace 医者 raises outgoing healing by 10%, which would otherwise
         // fold a content effect into an engine number.
         natasha.setTriggerTable(new com.laosun.aluminium.models.TriggerTable(1105, java.util.List.of()));
         Battle battle = newBattle(natasha);
@@ -151,7 +151,7 @@ public class SkillExecutorDiagnosticTest {
     public void healingSkillsHealForTheDocumentedAmount() {
         Character natasha = CharacterFactory.create(1105, 80);
         // Note: This case measures the ENGINE's skill execution against the parameter row, so the loadout is
-        // isolated: 1105 has a file now, and its 行迹 医者 raises outgoing healing by 10%, which would otherwise
+        // isolated: 1105 has a file now, and its trace 医者 raises outgoing healing by 10%, which would otherwise
         // fold a content effect into an engine number.
         natasha.setTriggerTable(new com.laosun.aluminium.models.TriggerTable(1105, java.util.List.of()));
         Battle battle = newBattle(natasha);
@@ -183,7 +183,7 @@ public class SkillExecutorDiagnosticTest {
     public void mixedHealRowsApplyOnlyTheImmediatePart() {
         Character natasha = CharacterFactory.create(1105, 80);
         // Note: This case measures the ENGINE's skill execution against the parameter row, so the loadout is
-        // isolated: 1105 has a file now, and its 行迹 医者 raises outgoing healing by 10%, which would otherwise
+        // isolated: 1105 has a file now, and its trace 医者 raises outgoing healing by 10%, which would otherwise
         // fold a content effect into an engine number.
         natasha.setTriggerTable(new com.laosun.aluminium.models.TriggerTable(1105, java.util.List.of()));
         Battle battle = newBattle(natasha);

@@ -18,7 +18,7 @@ import java.util.Random;
 /**
  * A resource gain whose amount is a SHARE of an attribute (2026-09-30).
  *
- * <p>Reader: 1505 绯英's talent, verbatim "绯英获得等同于暴击伤容 50% 的欢愉度". A `GAIN_RESOURCE` effect could
+ * <p>Reader: 1505 Evanescia (绯英)'s talent, verbatim "Evanescia gains elation equal to 50% of her crit damage". A `GAIN_RESOURCE` effect could
  * only add a literal before this, so that sentence had no spelling at all.
  */
 public class AttributeShareResourceTest {

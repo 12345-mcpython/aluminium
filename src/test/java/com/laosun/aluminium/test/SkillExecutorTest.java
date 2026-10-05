@@ -64,7 +64,7 @@ public class SkillExecutorTest {
     /** Fabricated data (this character has no Blast / Bounce). */
     private static Skill fakeSkill(SkillEffectType effect, List<Double> params) {
         // ? The Bounce path reads its numbers from the DESCRIPTION (round 10): the share is the `%`-referenced parameter
-        // and the hit count is the ADDITIONAL count ("额外造成 N 次"), so the fixture states both. params[1] is therefore the
+        // and the hit count is the ADDITIONAL count ("additionally deals N instances"), so the fixture states both. params[1] is therefore the
         // additional count, not the total - the call sites below say 2 to mean three hits.
         String description = params.size() > 1
                 ? "Deals DMG equal to #1[i]% of ATK to one enemy and additionally deals #2[i] instances of DMG."
@@ -264,7 +264,7 @@ public class SkillExecutorTest {
     public void invulnerableTargetTakesNoDamageWhileOthersStillDo() {
         Character attacker = attacker();
         Enemy transitioning = enemy("boss");
-        transitioning.setInvulnerable(true);      // phase-transition invulnerability / HP-lock scripted sequence (转阶段无敌、锁血演出)
+        transitioning.setInvulnerable(true);      // phase-transition invulnerability / HP-lock scripted sequence
         Enemy other = enemy("e2");
         Battle battle = battle(attacker, List.of(transitioning, other));
 
