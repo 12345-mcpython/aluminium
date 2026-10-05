@@ -281,6 +281,23 @@
       ],
       "source": "1413 长夜月 战技「白昼悄然离去」（SkillID 141302）：「…并**使我方全体忆灵的暴击伤害提高，提高数值等同于长夜月暴击伤害的 #1%**，持续 #2 回合…」。",
       "note": "⭐ 数值不落字面：`percent_from_skill_param: SKILL:0` 读她自己战技的 `#1`（实测：0.12 → 0.264）；⭐ 份额的底是**她自己的暴伤**（`self_attr:crit_attack`，引擎里叫 `CRIT_ATTACK`）；⭐ 目标是新选择器 `all_summons`（本轮新增）。"
+    },
+    {
+      "id": "time_ode_raises_her_skill_crit",
+      "on": "CAST_SETUP",
+      "when": [
+        "target == self",
+        "from_skill_id == 24"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_RULE",
+          "rule": "her_skill_raises_our_memosprites_crit_damage",
+          "effect_percent": 0.06
+        }
+      ],
+      "source": "1415 昔涟 忆灵技能 24：「**长夜月战技的暴击伤害提高效果额外提高，提高数值等同于长夜月暴击伤害的 #3%」（#3 = 0.06）。",
+      "note": "⭐ 增量加在**拼法解出的份额**上（本轮引擎改动）：`(0.12 + 0.06) × 暴伤`。"
     }
   ],
   "resources": [
