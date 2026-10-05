@@ -1,0 +1,3 @@
+StatusConfig rows: 2457
+columns: ['ModifierName', 'ReadParamList', 'StatusDesc', 'StatusEffect', 'StatusID', 'StatusIconPath', 'StatusIconPathHighSize', 'StatusName', 'StatusType', 'TagList']
+rows matching the state name: 0
