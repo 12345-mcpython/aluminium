@@ -201,7 +201,8 @@
       "id": "memosprite_ode_of_sky_stacks_hyacine_when_it_casts",
       "on": "CAST_SETUP",
       "when": [
-        "actor is_summon"
+        "actor is_summon",
+        "from_skill_id == 19"
       ],
       "do": [
         {
@@ -214,7 +215,7 @@
         }
       ],
       "source": "1415 昔涟 忆灵技能 19 「献予「天空」之诗」（数据槽位 19，SkillID 1141519）：「**德谬歌施放忆灵技时，使风堇获得2层【献予「天空」之诗】**。」",
-      "note": "⭐ 能力数据自己就是这么写的（**实测**）：`AddModifier` **`MServant_CyreneServant_00_AmazingBuff_Hyacine`** + `LayerAddWhenStack: 2`，而前置是 **`ByCompareCharacterID` = 1409** —— 游戏就是“按 cid 点名”，与 `ally_cid:` 是同一件事。⭐ **上限写 99999 是游戏自己的惯例**，不是我编的：提到该修饰的四个文件里，它旁边**没有** `MaxLayer`（`AvatarStatusConfig` 的行甚至没有计数列），而同一个能力文件里“不限”写的就是 `MaxLayer: 99999`（两处）⇒ 缺省就是“不限”。⚠ 不写它的话，引擎的 `StackBuff`（`Math.max(1, maxStacks)`）会只给 **1** 层。"
+      "note": "⭐ 能力数据自己就是这么写的（**实测**）：`AddModifier` **`MServant_CyreneServant_00_AmazingBuff_Hyacine`** + `LayerAddWhenStack: 2`，而前置是 **`ByCompareCharacterID` = 1409** —— 游戏就是“按 cid 点名”，与 `ally_cid:` 是同一件事。⭐ **上限写 99999 是游戏自己的惯例**，不是我编的：提到该修饰的四个文件里，它旁边**没有** `MaxLayer`（`AvatarStatusConfig` 的行甚至没有计数列），而同一个能力文件里“不限”写的就是 `MaxLayer: 99999`（两处）⇒ 缺省就是“不限”。⚠ 不写它的话，引擎的 `StackBuff`（`Math.max(1, maxStacks)`）会只给 **1** 层。⚠ 补上 `from_skill_id == 19`（2026-10-02，回归修正）：没有它时，**任何**忆灵的施放都会触发本条，而队伍里没有风堇时 `ally_cid:1409` 会**抛异常**（实测：全量 22 例红）。数据也支持这道门：该修饰就写在 19 号技能的 `TaskList` 里。"
     }
   ]
 }
