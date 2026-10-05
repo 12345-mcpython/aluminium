@@ -364,3 +364,28 @@
   1. ⭐ 槽位 18 的规则**每次施放只触发一次**（用计数资源量过，不是推的）；
   2. ⭐ **`ADVANCE{percent: 1.0}` 就是“立即行动”**：实测 `154.63917525773195 -> 0.0`，**恰好归零**。
 - ⭐ 而开工前应该先列一下**已有的忆灵技能判据清单**，看看哪些从句已经被判据盖住了。
+
+- ⭐⭐⭐ **第 116 轮：真实覆盖图（从已有判据反推，而不是从“待办”正推）**：
+  上一轮的教训落实了——把 `1415` 忆灵技能的**已有判据**列了一遍，得到真正的账：
+  | 槽位 | 判据（已绿灯） |
+  |---|---|
+  | 13 创世 | `OdeOfGenesisTest`、`ActorAttrScaleTest`、`CastSkillParamScaleTest`、`PercentFromCastParamScaleTest`、`SummonAttrScaleTest` |
+  | 14 浪漫 | `OdeOfRomanceTest`、`OdeOfRomanceEnergyTest`、`OdeOfRomanceStanceTest2` |
+  | 15 门径 | `OdeOfPassageTest` |
+  | 16 战争 | `OdeToStrifeBloodfeudTest`、`OdeToStrifeAdvanceTest`、`OdeToStrifeCritTest`、`OdeWaveRestrikeTest`、`DispelByClassTest` |
+  | 17 生死 | `LifeOdeNewBudOverflowTest`、`LifeOdeRaisesTheDragonTalentTest`、`DragonHollowWingTest`、`OverflowOnlySpendTest`、`SpentAmountIsPositiveTest`、`AmendmentFromResourceTest` |
+  | 18 理性 | `ReasonOdePointAndActionTest` |
+  | 19 天空 | `SkyOdeStackTest`、`SkyOdeSpendTest`、`SkyOdeEnergyTest`、`SkyOdeHealingTotalTest` |
+  | 20 诡计 | **`TrickeryOdeDamageTest`**（首句已出货！） |
+  | 21 负世 | `WorldOdeFireSeedTest`、`WorldOdeFireSeedCritTest`、`WorldOdeEverburningTest`、`WorldOdeAddedFireHitsTest`、`WorldOdeExtraTurnsRefreshTest`、`WorldOdeExtraTurnCostsHpTest` |
+  | 22 海洋 | `OceanOdeDamageTest`、`OceanOdeEnergyTest`、`OceanOdeTickDotTest` |
+  | 23 律法 | `OdeToLawChargeTest`、`LawOdeCritDamageTest` |
+  | 24 岁月 | `TimeOdeBoostTest`、`TimeOdeMemoryTest`、`TimeOdeRaisesHerCritTest`、`EvernightCritForSummonsTest` |
+  - ⭐ 而**这就解释了第 114 轮的“变异不咬”**：`TrickeryOdeDamageTest` **已经在那里**，读数是它驱动的。
+- ⭐⭐⭐ **而“对某角色”的正确惯用法也找到了**：`OdeOfPassageTest` 的头注说得明白——
+  **规则写在那个角色自己的文件里**（带宝 = `1403.json`，赛飞儿 = `1406.json`，都是**规则数组**），并且 `when` 用 `target == self`。
+  ⭐ 效果：第 114 轮我把规则写在 `1415.json` 里、用 `target: "ally_cid:1406"` 指名—— **那不是已出货的惯例**。
+- ⭐⭐ **而“防御力”的词汇也在**（`AttributeType`）：`DEFENCE_PERCENT`（`defence_percent`）、`DEFENCE`（落自 `DefenceDelta`）、
+  `DEFENCE_IGNORE`（`defence_ignore`）、`RESISTANCE_REDUCTION` ⇒ **槽位 20 的后两句“防御力降低 10%/6%”是表达得出来的**
+  （`MODIFY_ATTR{attribute: DEFENCE_PERCENT, percent: 负值}`）；而否定条件（`!target has_state 老主顾`）也早已出货。
+  ⭐ **下一步**：在 `1406.json` 里写两条（老主顾 −10%、其余 −6%），并用敌人的 `DEFENCE_PERCENT` 做判据。
