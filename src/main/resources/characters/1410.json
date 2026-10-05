@@ -110,5 +110,25 @@
     ],
     "source": "1415 昔涟 忆灵技能 16 「献予「海洋」之诗」（数据槽位 22）：「**海瑟音施放攻击后消耗【暖流】为自身恢复 #4 点能量**。」",
     "note": "⭐ 形状照 1402 的 `memosprite_ode_of_romance_spends_itself_for_energy`。⭐ `#4` 在 1141522 的**十行里全是 60**（**实测**）。"
+  },
+  {
+    "id": "memosprite_ode_of_ocean_raises_her_damage",
+    "on": "CAST_SETUP",
+    "when": [
+      "target == self",
+      "actor is_summon",
+      "from_skill_id == 22"
+    ],
+    "do": [
+      {
+        "op": "MODIFY_ATTR",
+        "attribute": "ALL_DAMAGE_TYPE_BOOST",
+        "percent_from_cast_param": 0,
+        "permanent": true,
+        "target": "self"
+      }
+    ],
+    "source": "1415 昔涟 忆灵技能 22 「献予「海洋」之诗」（数据槽位 22，SkillID 1141522）：「单次生效，对海瑟音施放时，使海瑟音获得【暖流】。…**本场战斗中，海瑟音造成的伤害提高 #1%**…」",
+    "note": "⭐ 形状照 1414 的浪漫之诗与 1406 的诡计之诗（**同一属性、同一目标、永久**）。⭐ **实测**：`#1` 随等级变（0.6 → 0.72）⇒ `percent_from_cast_param: 0`（施放技能就是本条诗）。⛔ 同句最后一句（使目标身上的**持续伤害立即产生**相当于原伤害 `#2%`/`#3%` 的伤害）**仍登记**，★ 形状已有先例：`characters/1111.json` 的 「使其当前承受的裂伤状态**立即产生 1 次**相当于原伤害 85% 的伤害」。"
   }
 ]
