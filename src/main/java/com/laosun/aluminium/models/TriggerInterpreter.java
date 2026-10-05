@@ -1006,16 +1006,19 @@ public final class TriggerInterpreter {
             // ⭐ BOTH resource-moving ops (2026-10-02): the first version measured only a GAIN, so a SPEND went down the `else` and never set
             // `previousCredited` at all -- measured: 「每消耗 1% 溢出值…」 read 0 instead of the amount spent.
             String movingOp = normalizeOp(effect, null);
-            if ("GAIN_RESOURCE".equals(movingOp) || "SPEND_RESOURCE".equals(movingOp)) {
+            // ⭐ Match the RAW op too (2026-10-02): `normalizeOp` derives its name and a spend spelled `overflow_only` did not reach this branch, so the capture of a spend read 0.
+            String rawOp = effect.getOp() == null ? "" : effect.getOp().trim().toUpperCase(java.util.Locale.ROOT);
+            if ("GAIN_RESOURCE".equals(movingOp) || "SPEND_RESOURCE".equals(movingOp)
+                    || "GAIN_RESOURCE".equals(rawOp) || "SPEND_RESOURCE".equals(rawOp)) {
                 // ⭐ 2026-10-02: the amount this effect ACTUALLY credits (after the cap) is what the next effect may
                 // take a share of. Measured from the holder itself, so the cap is included by construction.
                 CanHit holder = resolveTarget(effect, effectCtx);
                 String resourceId = effect.getResource();
-                int creditedBefore = holder.getResources().has(resourceId)
-                        ? holder.getResources().value(resourceId) : 0;
+                // ⭐ Through `resourceAmount`, which knows BOTH stores (2026-10-02; measured: 【新蕊】 is `scope: PARTY`, so reading the holder's own store gave 0 on
+                // both sides of the move and the capture of a spend read 0 even though the spend itself worked).
+                int creditedBefore = resourceAmount(battle, holder, resourceId);
                 applyOne(battle, effect, effectCtx, previousCredited);
-                int creditedAfter = holder.getResources().has(resourceId)
-                        ? holder.getResources().value(resourceId) : 0;
+                int creditedAfter = resourceAmount(battle, holder, resourceId);
                 // ⭐ The MAGNITUDE of what the previous effect moved (2026-10-02; reader: 1141517 「每消耗 1% 溢出值…」). A gain arrives positive and a spend
             // NEGATIVE, and `amount_from_previous` is asked for a size, not a direction -- measured: this is the only place `previousCredited` is set, and `gainResource` is its
             // only reader, so the sign carried no information anyone used.
