@@ -92,5 +92,64 @@
     ],
     "source": "8007 开拓者 战技（文档 `:143`）：「持有【迷迷的声援】的目标每造成 1 次伤害，都会再额外造成 1 次**等同于原伤害 28%**的真实伤害」",
     "note": "⭐ 2026-10-02：写法逐字照拄 **`1415.json` 的 `zone_true_damage_rider`** ✓（`DAMAGE_SETTLED` ✓／`scale: \"original_damage\"` ✓／`damage_type: \"TRUE\"` ✓）；`percent: 0.28` ✓ 与 `element: \"Ice\"` ✓ 均出自数据（他的 `attribute` 是 `ice` ✓）。⚠ 无属性在引擎里是“**跳过全部伤害区**”实现的 ✓，`element` 只是随行标签 ✓。"
+  },
+  {
+    "id": "memosprite_ode_of_genesis_raises_his_attack_and_crit",
+    "on": "CAST_SETUP",
+    "when": [
+      "target == self",
+      "actor is_summon",
+      "from_skill_id == 13"
+    ],
+    "do": [
+      {
+        "op": "MODIFY_ATTR",
+        "attribute": "ATTACK",
+        "scale": "actor_attr:HEALTH",
+        "percent_from_cast_param": 0,
+        "permanent": true,
+        "target": "self"
+      },
+      {
+        "op": "MODIFY_ATTR",
+        "attribute": "CRIT_CHANCE",
+        "scale": "actor_attr:CRIT_CHANCE",
+        "percent_from_cast_param": 1,
+        "permanent": true,
+        "target": "self"
+      }
+    ],
+    "source": "1415 昔涟 忆灵技能 10 「献予「创世」之诗」（数据槽位 13，SkillID 1141513）：「**对开拓者•记忆施放时，使开拓者•记忆的攻击力提高，提高数值等同于**德谬歌生命上限**的 #1%，同时使其暴击率提高，提高数值等同于**德谬歌暴击率**的 #2%。**该效果对迷迷也生效。**」",
+    "note": "⭐ 两个主体各自取自哪里，都是**量过**的：占比 #1/#2 来自**施放技能的参数**（`percent_from_cast_param`，按施放者的**当前等级**取行）；而它们所**乘**的属性来自**动作方**（`actor_attr:`，即德谬歌自己）——`self_attr:` 读的是持有者、`summon_attr:` 读的是持有者的忆灵（对 8007 而言是迷迷），两者都不是德谬歌。"
+  },
+  {
+    "id": "memosprite_ode_of_genesis_also_reaches_his_memosprite",
+    "on": "CAST_SETUP",
+    "when": [
+      "target == self",
+      "actor is_summon",
+      "from_skill_id == 13",
+      "self_summon_count >= 1"
+    ],
+    "do": [
+      {
+        "op": "MODIFY_ATTR",
+        "attribute": "ATTACK",
+        "scale": "actor_attr:HEALTH",
+        "percent_from_cast_param": 0,
+        "permanent": true,
+        "target": "summon"
+      },
+      {
+        "op": "MODIFY_ATTR",
+        "attribute": "CRIT_CHANCE",
+        "scale": "actor_attr:CRIT_CHANCE",
+        "percent_from_cast_param": 1,
+        "permanent": true,
+        "target": "summon"
+      }
+    ],
+    "source": "1415 昔涟 忆灵技能 10 「献予「创世」之诗」（数据槽位 13，SkillID 1141513）：「**对开拓者•记忆施放时，使开拓者•记忆的攻击力提高，提高数值等同于**德谬歌生命上限**的 #1%，同时使其暴击率提高，提高数值等同于**德谬歌暴击率**的 #2%。**该效果对迷迷也生效。**」",
+    "note": "「**该效果对迷迷也生效。**」—— ⭐ 它是**独立一句**，所以也是**独立一条规则**：「对迷迷」只在**持有者身边确实有忆灵**时才成立，而检查它的就是 `self_summon_count >= 1`（引擎在目标落空时**自己报出这个门控的名字**）。"
   }
 ]

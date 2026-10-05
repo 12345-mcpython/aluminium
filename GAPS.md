@@ -36661,3 +36661,27 @@
 >   ⭐ `TriggerSpecs.set` 的键是 ⭐ **字段名（驼峰）** ✓ 不是 JSON 拼法 ✗；⭐ 变异前 ⭐ 先删 `build/resources` 的拷贝 ✓。
 > * ⭐⭐ **`1141513` 的两件前置现在都齐了** ✓（⭐ `actor_attr:` 第 98 件 ✓、⭐ 本轮 ✓）⇒ ⭐ **下一轮就可以把第一半写成句** ✓。
 > * **实测（本轮）**：⭐ 全量 **0**（--rerun-tasks，**2275** 例 ✓）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
+
+> **2026-10-02 更新（新目标第 9 轮：🎉🎉🎉 **第 100 件出货 ＝ `1141513` 献予「创世」之诗的第一半** ✓✓ —— ⭐ 两件前置（`actor_attr:` ＋ `percent_from_cast_param`）合起来把这一句写成了 ✓）**）**：
+>
+> * ✅ **出货内容** ✓：⭐ `characters/8007.json`（开拓者•记忆 ✓）**两条规则** ——
+>   ⭐ `memosprite_ode_of_genesis_raises_his_attack_and_crit` ✓（⭐ `on: CAST_SETUP` ＋ ⭐ `target == self`／`actor is_summon`／`from_skill_id == 13` ⇒
+>   ⭐ `MODIFY_ATTR{ATTACK, scale: "actor_attr:HEALTH", percent_from_cast_param: 0, permanent: true}` ＋ ⭐ `MODIFY_ATTR{CRIT_CHANCE, scale: "actor_attr:CRIT_CHANCE", percent_from_cast_param: 1, …}` ✓）；
+>   ⭐ `memosprite_ode_of_genesis_also_reaches_his_memosprite` ✓（⭐ 同样两个效果但 ⭐ `target: "summon"` ✓，⭐ 并加 ⭐ `self_summon_count >= 1` ✓）；
+>   ⭐ `skill_effects.json` 新增 ⭐ `11415/13 = Rules` ✓（⭐ 否则整条技能永远无法施放 ✓）。
+> * ⭐⭐ **拆成两条规则是引擎"教我"的** ✓：⭐ 场景里只召出德谬歌时 ✗，⭐ 引擎报 ⭐
+>   *"Effect targets `summon` but Trailblazer has no summon on the field; gate the rule with `self_summon_count >= 1`…"* ✓
+>   ⇒ ⭐ **那条错误信息自己给出了修法** ✓✓ ⇒ ⭐ 而拆开也**更贴原句** ✓（⭐ "该效果对迷迷也生效"本来就是独立一句 ✓）。
+> * ✅ **判据 ＋ 实测变异** ✓：⭐ `OdeOfGenesisTest` ⇒ ⭐
+>   `[genesis] the row used = [0.224, 1.008, 1.0] ; demiurge Max HP = 1536.7968` ✓ ＋ ⭐ `迷迷 attack gain = 344.2424832 ; expected 344.2424832` ✓✓
+>   ⇒ ⭐ 攻击力增量 ⭐ **正是第 10 行的 `#1` × 德谬歌生命上限** ✓（⭐ `0.224 × 1536.7968` ✓，⭐ 而 `0.224` 正是该行第一列 ✓）；
+>   ⭐ **变异** ✓：⭐ 把攻击力那两个效果改用**参数 1** ✗ ⇒ ⭐ **两个用例都红** ✓（⭐ `expected: <344.2424832> but was: <1549.0911744>` ✗）。
+> * ⚠ **判据里一处弱断言（诚实记下 ✓）**：⭐ 暴击率那条 ⭐ `expected = 1.008 × 德谬歌的 CRIT_CHANCE` ✗，⭐ 而 ⭐ 德谬歌的暴击率恰好是 **0** ✗
+>   ⇒ ⭐ `0 == 0` ✓ ⭐ **不具判别力** ✗（⭐ 行为是对的 ✓，⭐ 但那条断言本身证明不了什么 ✓）。⭐ 真正判别的是 ⭐ 攻击力那条 ✓ 与 ⭐ 迷迷那条 ✓。
+> * ⚠⚠ **两处我自己的坑（同一个根因：⭐ 我改了兄弟分支却漏了另一个 ✓）**：
+>   ⭐ ① ⭐ **`actor_attr:` 分支漏了 `shareOf`** ✗ —— ⭐ 它写于 `shareOf` 存在**之前** ✓，⭐ 所以上一轮我修 `summon_attr:` 时 ⭐ 漏了它 ✓
+>     ⇒ ⭐ 栈帧 ⭐ `derivedMagnitude:2428` ⭐ **直接点名** ✓（⭐ 又一次证明：⭐ 先看栈，⭐ 别猜 ✓）⇒ 已修 ✓；
+>   ⭐ ② ⭐ **残缺转义 `\u2a0`** ✗（⭐ 只有 3 位十六进制 ✓，⭐ 不是合法转义 ✓）⭐ **这一轮犯了两次** ✗ ⇒ ⭐ 脚本解析期就死 ✓、⭐ 内容一个字没变 ✓。
+> * ⭐ **`1141513` 尚未写的那半（登记 ✓）**：⭐ 「本场战斗中，开拓者•记忆**施放强化普攻后**，德谬歌立即获得 1 个**额外回合**并自动施放【花与箭的舞曲】，
+>   若施放前目标被消灭则对新入场的敌方目标施放」✗ —— ⭐ 需要 ⭐ 一个"强化普攻"事件 ✗ ＋ ⭐ 额外回合 ✗（⭐ 其后半句"对新入场"用已出货的 `wave_monsters` ✓ 可写 ✓）。
+> * **实测（本轮）**：⭐ 全量 **0**（--rerun-tasks，**2277** 例 ✓）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
