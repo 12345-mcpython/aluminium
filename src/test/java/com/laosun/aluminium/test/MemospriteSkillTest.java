@@ -126,6 +126,11 @@ public class MemospriteSkillTest {
                 {"1413", "1", "ICE"},
                 {"1413", "7", "ICE"},
                 {"1415", "1", "ICE"},
+                // the second pass, done again from each skill OWN ability subtree instead of a byte window
+                {"1407", "10", "QUANTUM"},
+                {"1407", "11", "QUANTUM"},
+                {"1407", "12", "QUANTUM"},
+                {"1409", "1", "WIND"},
         };
         StringBuilder report = new StringBuilder("[elements] ");
         for (String[] w : want) {
