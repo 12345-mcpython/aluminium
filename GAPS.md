@@ -36596,3 +36596,24 @@
 >   ⭐ **索引 0 仍通过**（⭐ `70` 每行都有 ✓）⭐ 而 ⭐ **索引 1 抓到**（⭐ `expected: <1.008> but was: <0.36>` ✓）⇒ 红 ✓✓
 >   —— ⭐ 这条变异同时证明了 ⭐ **"按等级读行"这件事本身是被判据守住的** ✓。
 > * **实测（本轮）**：⭐ 全量 **0**（--rerun-tasks，**2273** 例 ✓）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓。
+
+> **2026-10-02 更新（新目标第 6 轮：⚠ **本轮没有出货** ✗ —— `percent_from_cast_param` 实现后**回滚** ✓，⭐ 但量出了写 `1141513` 的**真前置** ✓）**）**：
+>
+> * ⛔ **回滚了什么** ✗：⭐ 我实现并（部分）判据通过了一个新字段 ⭐ **`percent_from_cast_param`** ✓ —— ⭐ 让"占比"由**技能参数**给出 ✓，
+>   这样 ⭐ "技能参数 × 忆灵属性" 才能相乘 ✓（⭐ 那句的 `#1% × 德谬歌生命上限` ✓）。⭐ 落点：⭐ `EffectSpec` 新字段 ✓ ＋ ⭐ `requirePercent` 接受它 ✓
+>   ＋ ⭐ 两个 helper（⭐ `castParamValue` ✓ 从已有分支提出 ✓、⭐ `shareOf` ✓）＋ ⭐ `summon_attr:` 分支改用占比 ✓。
+> * ✅ **它有一半是真的通的** ✓：⭐ **装载期拒绝**两种占比同时给出 ✓ —— ⭐ 判据当场通过 ✓：
+>   `Op MODIFY_ATTR states BOTH "percent" and "percent_from_cast_param"; the share comes from one of them` ✓。
+> * ⛔ **运行期撞墙** ✗：⭐ `NullPointerException: Cannot invoke "java.lang.Double.doubleValue()" because … EffectSpec.getAmount() is null` ✗
+>   ⇒ ⭐ derived 修量词那条路上 ⭐ 有一个**无保护的 `getAmount()` 拆箱** ✗。
+>   ⚠ 我**猜的那一处**（⭐ `MODIFY_RULE` 里的 L807 ✓）⭐ **已经有** `!= null` 保护 ✗ ⇒ ⭐ 真正那处**本轮没定位到** ✓
+>   —— ⚠ 因为我读 XML 时 ⭐ **只过滤了 `error`** ✗，⭐ 而 JUnit 把 NPE 放在 ⭐ `failure` 里 ✓ ⇒ ⭐⭐ **教训：读 XML 时 `failure` 与 `error` 都要看** ✓。
+>   ⭐ 按 ⑤ ⭐ 未判据通过的能力**不能留在树上** ✗ ⇒ ⭐ `git checkout` 两个文件 ＋ ⭐ 删掉判据 ⇒ ⭐ 树回到全绿 ✓。
+> * ⭐⭐⭐ **本轮真正的收获：写 `1141513` 的「真前置」被量出来了** ✓（⭐ 比那个 NPE 重要 ✓）：
+>   ⭐ 那句的占比是 ⭐ **德谬歌**（⭐ 即**施放者自己的**忆灵 ✓）的生命上限 ✓，⭐ 而 ⭐ 已出货的 ⭐ `summon_attr:` ⭐ 读的是 ⭐ **规则持有者的**忆灵 ✗。
+>   ⭐ 对 ⭐ **开拓者•记忆（8007）** 来说 ⭐ 它的忆灵是 ⭐ **迷迷** ✗ ⇒ ⭐ 拿 `summon_attr:` 去写这句 ⭐ **读错主体** ✗ ✗。
+>   ⇒ ⭐⭐ **需要的是"施放者（动作方）自己的属性"** ✗ —— ⭐ 即 ⭐ **`actor_attr:<ATTRIBUTE>`** ✓，⭐ 与 ⭐ `self_attr:` 同族、⭐ 只差主体是**动作方** ✓。
+>   ⭐ 而 ⭐ 那句的 ⭐ 动作方正是 ⭐ 德谬歌 本身 ✓（⭐ `CAST_SETUP` 的 actor ✓）⇒ ⭐ 用 `actor_attr:HEALTH` 就**正好**是德谬歌的生命上限 ✓✓。
+> * ⭐ **顺带量到的（可用 ✓）**：⭐ 暴击率属性名 ＝ ⭐ **`CRIT_CHANCE`** ✓（⭐ `crit_chance` ✓，⭐ 0..1 的比率 ✓）；⭐ 忆灵侧的目标选择器 ＝ ⭐ **`"target": "summon"`** ✓（⭐ 1402／1413 已在用 ✓）；
+>   ⭐ `characters/8007.json` **存在** ✓ ⇒ ⭐ 那句的接收者表已就位 ✓。
+> * **实测（本轮）**：⭐ 全量 **0**（--rerun-tasks，**2273** 例 ✓）、`mechanics` **rc 0** ✓、树干净 ✓ 已推送 ✓（⭐ 回滚后 ✓）。
