@@ -810,6 +810,21 @@ public class Battle {
      * unit first, exactly as before, and fall back here -- so nothing changes for a resource a character owns itself.
      */
     /** The party counter's current value, or 0 when this battle has no such counter. */
+    /**
+     * The laugh-point factor of Elation damage: {@code 1 + 笑点×5/(笑点+240)}.
+     *
+     * <p>From the spec at {@code ROADMAP.md:1262}
+     * ({@code 基础值 × 欢愉倍率 × (1+欢愉度) × (1+增笑) × (1+笑点×5/(笑点+240))}, attack power banned). The
+     * laugh points are the PARTY resource this class already hosts; the curve lives here so the two settlement
+     * sites cannot drift apart, the same reason {@code ELATION_DAMAGE_BOOST} is folded in one step.
+     *
+     * <p>With no laugh points the factor is exactly 1, so content that never creates any is unaffected.
+     */
+    public double elationLaughMultiplier() {
+        double laughs = partyResourceValue("\u7b11\u70b9");
+        return 1 + laughs * 5.0 / (laughs + 240);
+    }
+
     public int partyResourceValue(String id) {
         com.laosun.aluminium.models.Resource resource = partyResources.get(id);
         return resource == null ? 0 : resource.value();
