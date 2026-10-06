@@ -2121,3 +2121,29 @@ has been loaded yet”，第 60 行定义 `ELATION("elation", true, false)`（**
 拿去和什么比：`SkillCategory` 枚举本身、它的 `name` 字段、还是技能数据的
 `attack_type`），并用一个**已知能匹配**的类别（如 `BPSkill` → `BPSKILL`）做对照实验。
 那一步能同时判定：这四条规则、四张光锥、以及 1513 那条，到底是不是死的。
+
+### ⭐ 收窄（2026-10-02）：为什么 `allies_with_path:欢愉` 在 CAST_SETUP 上为假，在 TURN_START 上为真
+
+⭐ **决定性实验**：把真珠四条欢榆技档位规则的 `allies_with_path:欢愉 >= N`
+**临时删掉**（其余不动），再用
+`fireTriggers(CAST_SETUP, pearl, pearl, 0, 0, SkillCategory.ELATION_DAMAGE)` 发一次，
+读数是 **`carriers=3`** —— 全队都拿到了载体，规则全部触发。
+（实验后已用 `git checkout` 恢复，三道门都在，全量绿。）
+
+⇒ ⭐ 所以失败的只有路径门。而且已排除的有：
+
+| 假设 | 结果 |
+|---|---|
+| 寿命（`until` / `turns` / `permanent`） | ❌ 不是原因（三种写法都空） |
+| `target_when` 防重复 | ❌ 不是 |
+| 目标选择器（`all_allies` / `self`） | ❌ 不是 |
+| 施放路径（真实 `castImmediate`） | ❌ 不是 |
+| `ctx.battle()` 为空 | ❌ **推翻**：`Battle:2535/2551` 造上下文时传了 `this` |
+
+⭐ 而 `AlliesWithPathTest`（绿色）证明同一个变量在 `TURN_START` 上能算对。
+⇒ ⭐ 下一步只差一个诊断：在 `FromCategory`/`pathCount` 那一步打印
+`ctx.battle()`、`ctx.actor()`、`ctx.owner()`、以及 `ctx.battle().allies` 的命途列表，
+看 `CAST_SETUP` 与 `TURN_START` 两者差在哪一个。⭐ 一行输出就能定案。
+
+⭐ 影响面：真珠的四条欢榆技档位（现在全部不触发）；其它把
+`allies_with_path` 放在 `CAST_SETUP` 上的内容会有同样问题（目前只有真珠）。
