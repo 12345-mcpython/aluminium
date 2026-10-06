@@ -35219,7 +35219,8 @@
       },
       "element": "Ice",
       "sp_need": null,
-      "sp_base": null
+      "sp_base": null,
+      "bp_add": 0
     },
     "2": {
       "attack_type": "BPSkill",
