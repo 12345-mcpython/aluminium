@@ -2219,3 +2219,21 @@ has been loaded yet”，第 60 行定义 `ELATION("elation", true, false)`（**
 `skill == null ? DamageElement.fromString(…) : elementOf(…)`，所以**不带技能行的规则**
 （正是真珠这类）走的是内联那支，看不到保留字；现在三处全部收敛到 `elementOf`，
 并且 `elementOf` 对 `skill == null` 安全。
+
+### ⛔ 兼现端被两个封闭词表挡住（2026-10-02）
+
+⭐ 把真珠欢榆技的兼现端写成 `DEALING_DAMAGE` 上的四条 `DAMAGE` 规则后，
+引擎连续拒绝两种写法，两次都是它自己的校验器说的话：
+
+1. ⭐ **递归守卫抓住了它**：
+   `Trigger recursion exceeded 8 levels while firing DEALING_DAMAGE; a trigger table is probably reacting to its own effect`
+   —— 兼现的 `DAMAGE` 自己又发一次 `DEALING_DAMAGE`，所以规则对**自己的产物**再次触发。
+2. ⭐ **`ADD_DAMAGE` 读不到类型**：
+   `Op ADD_DAMAGE states "damage_type", but only [DAMAGE, MODIFY_ATTR, MODIFY_DAMAGE_TAKEN, BOOST_DAMAGE] read it`
+   —— 所以它无法承载“这一笔是欢榆伤害”，三个欢榆乘区也就折不进去。
+
+⇒ ⭐ 要么给伤害类 op 一个“**这不是我自己那笔**”的门（例如按来源规则排除自己），
+要么让 `ADD_DAMAGE` 读 `damage_type`（并把欢榆三因子折进它的 base）。两者都是新词汇。
+
+⭐ **已撤回**：四条兼现规则与它们的判据（树保持绿）。成果保留在引擎侧：
+`element: "attacker"`、`scale: "elation_base"`、笑点乘区、`ELATION_DAMAGE_AMP` 全部已落地且有判据。
