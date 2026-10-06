@@ -156,5 +156,16 @@
     ],
     "source": "1306 花火 天赋: 「每层【幻相】使敌方全体受到的伤害提高 4.00%，该效果持续 2 回合，最多可叠加 3 层」",
     "note": "⭐⭐ **完全用既有词汇** ✓：`MODIFY_DAMAGE_TAKEN` 的**派生量** ✓ 配 **`scale: \"self_stacks:幻相\"`** ✓ —— 层数在**花火自己**身上 ✓（`stackScale` 的两个前缀之一 ✓），所以用 `self_stacks:` ✓ 而不是 `target_stacks:` ✓。⚠ 无 `amount` ⇒ 基线为 **0** ✓（0 层 ⇒ 0% ✓，原文未给\"1 层时\"的固定值 ✓）；上限 **`cap_amount 0.12`** ✓（= 3 层 × 4% ✓，对应\"最多可叠加 3 层\" ✓）。"
+  },
+  {
+    "id": "talent_raises_skill_point_cap",
+    "on": "BATTLE_START",
+    "do": [
+      {
+        "op": "RAISE_SKILL_POINT_CAP",
+        "amount": 2
+      }
+    ],
+    "source": "talent 130604: while Sparkle is on the field the skill point cap is raised by 2 (tbgd ParamList #3 = 2 at every level). The other half of the same talent, the party damage on spending a point, is talent_party_damage_on_spend."
   }
 ]

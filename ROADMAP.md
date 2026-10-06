@@ -259,7 +259,7 @@ demo 跑通一场三对三战斗
 | 项 | 现状 | 归属 |
 |---|---|---|
 | 技能回能数据化 | `sp_base` 已落库但**不驱动回能**（多段技能是"每段值"，需聚合 `SPHitRatio`） | P3-4 剩余 |
-| 战技点**上限**可变（F-1） | **接口已就位**（换策略构造参数），**没有接线** | 见 §12.5 的 F-1 |
+| 战技点**上限**可变（F-1） | ✅ **已接线**：`RAISE_SKILL_POINT_CAP` + 花火天赋（实测 **5 → 7**） | — |
 | 开局战技点可变（F-2） | ✅ **已接线**：过客 4 件套开局 **3 → 4**（套装 ability 走触发器表，有用例钉住） | — |
 | 强化普攻的战技点 | 一刀切 +1：对青雀对、**对波提欧错** | F-3，数据补全 |
 | 敌人技能不发事件 | `EnemySkill` 不走 `SkillExecutor`，故不发 `SkillCastEvent` | P9-2 对齐 |
@@ -1421,9 +1421,9 @@ chance = base × (1 + 效果命中) × (1 - 效果抵抗) × (1 - 具体 debuff 
 
 | # | 缺口 | 说明 |
 |---|---|---|
-| F-1 | **战技点上限不是恒定值，且引擎没有"改队伍级资源上限"的口子** | 接口已就位（换策略构造参数），**没有接线**；受影响的套装效果落在 `_unmodelled.json` 里 |
+| F-1 | ✅ **已解决（2026-10-02）**：上限可由内容上调 | 新 op **`RAISE_SKILL_POINT_CAP`**（`amount` 可负，取回加成）直接走策略；`Resource` 把上限改成 **基础值 + 加成**（`getMax()`），并修正了四处仍读裸 `max` 的地方（`missingToMax` / `isFull` / `gainClamped` / `cap`）。花火天赋已落库（`1306.json`，`amount: 2`，tbgd `130604` 参数 #3 = 2），判据 `SparkleTest.herTalentRaisesTheTeamCap` 双向钉住（有她 7 / 无她 5）、删句变异打红。**F-4 的通道因此就位**，剩下的是逐个角色/光锥/遗器的内容活 |
 | F-3 | ✅ **已解决（2026-10-02）**：+1 改由数据给出 | 引擎改读每个技能自己的 **`bp_add`**（`skills.json`，取自 tbgd `AvatarSkillConfig.BPAdd`）；波提欧的强化普攻已建模（`REPLACE_SKILL`）并记 `bp_add: 0`，判据 `BoothillEnhancedBasicTest` 双向钉住、变异打红。⭐ **另一半也已收口**：能实际施放强化普攻的角色只有四个 —— 卢卡 `1111`（`111108`，数据 `BPAdd 1`）、加拉赫 `1301`（`130108`，同）、波提欧 `1315`（`131508`，散文说“无法恢复”）、昔涟 `1415`（`141508`，同）—— 四个都已钉住（`BoothillEnhancedBasicTest` 与 `RippleReinforcedBasicTest`，双向且变异打红）。⚠ 仍约束：tbgd 的 `BPAdd = null` **不等于 0**，所以“哪个角色的强化普攻给点”不能本机械地批量填；而未建模强化普攻的角色**尚无可填之处**（计算不出错）|
-| F-4 | 角色 / 光锥 / 遗器级的**供点机制全部未接** | 与 F-1 同族 |
+| F-4 | 角色 / 光锥 / 遗器级的**供点机制** | ⚠ **通道已就位**（触发器表 + `RAISE_SKILL_POINT_CAP` / `GAIN_SKILL_POINT`，见 F-1）；**剩下的是内容**：逐个角色与光锥的供点句子还没写 |
 | F-5 | `EnemySkill.getData()` 恒为 `null` | 敌方行动绕过 `SkillExecutor`，不发 `SkillCastEvent`。⚠ 另外：条件 DSL **没有"阵营"变量**，所以"敌人施放技能"目前**无法表达**（这是设计口子，不是补一行）。⚠ **忆灵的攻击走的是同一条路**（§24.8 复用它）：`SkillCastEvent` 同样不发（对忆灵也不该发 —— 它不是"施放技能"）；**攻击级事件则是发的**（2026-09-28 起 `Battle.fireAfterAttack` 一个出口，见 M-30），规则侧另有一个专门的 `SUMMON_ATTACK`，所以「忆灵攻击后」**已经能写**（`SUMMON_ATTACK` + `actor == summon`，首个用户遗器 123，见 `engine.md` §24.9） |
 | F-7 | `hasSkillPoint()` 语义过窄 | 只看"够不够这一次" |
 | F-9 | 技能效果参数表 | ✅ 表已存在（`skill_effects.json`，40 条 / 26 条可用）；**仍缺**：14 条 `params` 为空、`BUFF`/`CONTROL`/`SUMMON` 技能没有"施加什么"的表、`IMPAIR` 分支缺"哪个 debuff" |

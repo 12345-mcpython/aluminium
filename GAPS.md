@@ -1251,3 +1251,32 @@
 ⭐ 改成**两侧都先施战技（3 → 2 ✓）** ⇒ ⭐ 唯一差别就是普攻自己的 +1 ✓：
 `[reinforced_sp] after her Skill and then an ordinary basic = 3 ; after her Skill, her ultimate and the reinforced basic = 2` ✓
 ⭐ **变异**（⭐ `141508` ✗ 的 `bp_add` ✗ 改回 1 ✓）⇒ ⭐ 右侧变 3 ✗ ⇒ **RED** ✓✓。
+
+## F-1 已解决：战技点上限可以由内容上调（2026-10-02）
+
+⭐ **登记原文**：⭐「⭐ **战技点上限不是恒定值，且引擎没有"⭐ 改队伍级资源上限 ✗"⭐ 的口子** ✗：⭐ 接口已就位（⭐ 换策略构造参数 ✓），⭐ **没有接线** ✓」。
+
+### ⭐ 先看引擎里已有什么（⭐ 差点误判 ✓）
+
+⭐ 引擎**已经有** `RAISE_RESOURCE_CAP` ✗ ✓ —— ⭐ 但它放宽的是**声明式资源的溢出上限** ✗（`Resource.setMaxOverflow` ✗ ✓），⭐ 与战技点池的 **cap** ✗ 是**两个数** ✓ ⇒ ⭐ 不能复用 ✓，⭐ 需要新 op ✗ ✓。
+
+### ⭐ tbgd 的权威
+
+⭐ 花火（⭐ `AvatarID 1306` ✗ ✓）⭐ 天赋 `130604` ✗ 原文：⭐「⭐ **花火在场时，战技点上限额外增加 `#3[i]` 点** ✗」✓，⭐ 而 `ParamList` ✗ 的 `#3` ✗ **每级都是 2** ✗ ✓ ⇒ ⭐ **+2** ✓（⭐ 与登记旧注一致 ✓）。
+
+### ⭐ 落法
+
+1. ⭐ **`Resource`** ✗：⭐ 上限改成 **基础值 + 加成** ✗ ✓（`max` ✗ 仍是 `final` ✓，⭐ 新增 `maxBonus` ✗ ＋ `getMax()` ✗ ＋ `raiseMax(int)` ✗ ✓，⭐ 加成下限 0 ✓）；
+2. ⭐ **`SkillPointPolicy` / `StandardSkillPointPolicy`** ✗：⭐ 新增 `raiseMax(int)` ✗ ✓（⭐ 池子的主人是策略 ✓，⭐ 所以必须经它 ✓）；
+3. ⭐ **op `RAISE_SKILL_POINT_CAP`** ✗：⭐ 校验（⭐ `amount` ✗ 非零、⭐ 可为负 ✓）＋ ⭐ 分派（⭐ 直接走到策略 ✓）＋ ⭐ 文档表 ＋ ⭐ `WIRED` ✗ ✓；
+4. ⭐ **内容**：⭐ `characters/1306.json` ✗ 加 `talent_raises_skill_point_cap` ✗（`BATTLE_START` ✗，⭐ `amount: 2` ✗ ✓）—— ⭐ 她天赋的**另一半**（⭐ 消耗战技点加伤害 ✓）⭐ 早就在文件里了 ✓。
+
+### ⚠ 一条我自己写错、⭐ 被判据当场抓到的断言（⭐ 值得记 ✓）
+
+⭐ 我第一版在 `Resource.getMax()` ✗ 的 javadoc ✗ 里写"⭐ **每处**"⭐ 是否满／⭐ 还能装多少的问题都读它 ✗" ✗ —— ⭐ **当次运行就被 `SparkleTest` ✗ 推翻** ✗：⭐ 她的终结技 +4 ✗ 被夹在**基础 5** ✗、⭐ 而上限报的是 **7** ✗ ⇒ ⭐ 因为**四处仍读裸 `max`** ✗（`missingToMax` ✗／`isFull` ✗／`gainClamped` ✗／`cap` ✗ ✓）。
+⭐ 改掉那四处之后，⭐ 那句话才成立 ✓ —— ⭐ **先写断言、⭐ 后补证据 ✗**⭐ 是顺序错了 ✓。
+
+### ⭐ 判据与变异
+
+⭐ `SparkleTest.herTalentRaisesTheTeamCap` ✗：`[sparkle_cap] the team cap with her = 7 ; without her = 5` ✗ ✓
+⭐ **变异**（⭐ 删掉她那条规则 ✓）⇒ ⭐ 上限回落 5 ✗ ⇒ **RED** ✓。

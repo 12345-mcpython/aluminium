@@ -65,6 +65,18 @@ public interface SkillPointPolicy {
     int getMax();
 
     /**
+     * Grants a bonus on top of the conventional cap; a negative {@code delta} takes one away.
+     *
+     * <p>The cap itself is not a constant: Sparkle's talent raises the team's skill point cap while she is
+     * on the field. A policy owns the value, so the change has to travel through the policy rather than
+     * through {@code Battle}, the same way spending and gaining do.
+     *
+     * @param delta the change to the cap (may be negative)
+     * @return the effective cap after the change
+     */
+    int raiseMax(int delta);
+
+    /**
      * Adds a value directly (capped at the regular maximum) and returns the amount actually credited.
      *
      * <p>For explicit sources other than "basic attack +1" (techniques, relics, character mechanics).

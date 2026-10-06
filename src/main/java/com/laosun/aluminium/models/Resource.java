@@ -53,8 +53,39 @@ public class Resource {
     /**
      * The normal cap. {@link #getValue()} only exceeds it while in an overflow state.
      */
-    @Getter
     private final int max;
+
+    /**
+     * A bonus granted on top of {@link #max} while the battle is running, from content such as a talent
+     * that raises the team's skill point cap.
+     *
+     * <p>It is deliberately separate from {@code max}: the base cap belongs to the resource, whereas the
+     * bonus belongs to the current state of the battle and can be granted and taken away again, which a
+     * {@code final} base cap could not express.
+     */
+    private int maxBonus;
+
+    /**
+     * The effective cap: the base cap plus whatever bonus the content has granted.
+     *
+     * <p>Every "is it full" / "how much fits" question reads this, not {@link #max}, so granting a bonus
+     * takes effect everywhere at once.
+     */
+    public int getMax() {
+        return max + maxBonus;
+    }
+
+    /**
+     * Grants a bonus on top of the base cap; a negative {@code delta} takes one away.
+     *
+     * <p>The bonus never goes below zero, so the effective cap can never fall under the base cap.
+     *
+     * @return the effective cap after the change
+     */
+    public int raiseMax(int delta) {
+        maxBonus = Math.max(0, maxBonus + delta);
+        return getMax();
+    }
 
     @Getter
     private int value;
@@ -117,14 +148,14 @@ public class Resource {
      * How far the current value is from the normal cap (0 when full or overflowing).
      */
     public int missingToMax() {
-        return Math.max(0, max - value);
+        return Math.max(0, getMax() - value);
     }
 
     /**
      * Whether the normal cap has been reached (also true while overflowing).
      */
     public boolean isFull() {
-        return value >= max;
+        return value >= getMax();
     }
 
     /**
@@ -154,7 +185,7 @@ public class Resource {
         }
         boolean wasFull = isFull();
         int before = value;
-        value = Math.min(max, value + delta);
+        value = Math.min(getMax(), value + delta);
         int gained = value - before;
         fireIfJustBecameFull(wasFull, gained);
         return gained;
@@ -273,7 +304,7 @@ public class Resource {
         // would make clamp() throw (Math.clamp requires min <= max) instead of clamping, turning a
         // nonsensical configuration into an exception from an unrelated call. Saturating keeps clamp()
         // total, which is what the "value ∈ [0, max + maxOverflow] always holds" invariant needs.
-        return (int) Math.min(Integer.MAX_VALUE, (long) max + maxOverflow);
+        return (int) Math.min(Integer.MAX_VALUE, (long) getMax() + maxOverflow);
     }
 
     /**
@@ -309,6 +340,6 @@ public class Resource {
 
     @Override
     public String toString() {
-        return id + "=" + value + "/" + max + (maxOverflow > 0 ? "(+" + maxOverflow + ")" : "");
+        return id + "=" + value + "/" + getMax() + (maxOverflow > 0 ? "(+" + maxOverflow + ")" : "");
     }
 }
