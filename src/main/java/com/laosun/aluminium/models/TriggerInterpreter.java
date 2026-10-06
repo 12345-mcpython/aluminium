@@ -5042,7 +5042,7 @@ public final class TriggerInterpreter {
                   ? null
                   : DamageType.fromString(effect.getDamageType().trim());
           double settledBase = damageType == DamageType.ELATION
-                  ? base * (1 + attacker.getAttribute(com.laosun.aluminium.enums.AttributeType.ELATION_DAMAGE_BOOST).get()) * (ctx.battle() == null ? 1 : ctx.battle().elationLaughMultiplier())
+                  ? base * (1 + attacker.getAttribute(com.laosun.aluminium.enums.AttributeType.ELATION_DAMAGE_BOOST).get()) * (1 + attacker.getAttribute(com.laosun.aluminium.enums.AttributeType.ELATION_DAMAGE_AMP).get()) * (ctx.battle() == null ? 1 : ctx.battle().elationLaughMultiplier())
                   : base;
           // `damage_type: "TRUE"` is true damage: it SKIPS every zone. Without this branch the op stamps the
         // TYPE and still went through `applyAdditionalDamage`, so the instance was labelled TRUE while defence and
