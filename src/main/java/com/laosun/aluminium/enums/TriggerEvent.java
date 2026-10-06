@@ -318,6 +318,21 @@ public enum TriggerEvent {
      * <p>An attack that connected with nothing does not fire it, and neither does a summon with no
      * attack of its own: this is "an attack happened", not "a unit was on the field".
      */
+    /**
+     * An <b>enemy</b> finished an attack: fired by {@code EnemySkill.execute}, the sibling of
+     * {@link #SUMMON_ATTACK}.
+     *
+     * <p><b>Why it was needed.</b> Enemy actions run their own path -- an {@code EnemySkill} carries its own
+     * multipliers because it does not go through {@code SkillData}, which is why its {@code getData()} answers
+     * null and {@code SkillExecutor} must not be reused for it. So an enemy attack told nobody, and a clause of
+     * the form "when an enemy attacks" had no event to hang off. That is the lead half of F-5.
+     *
+     * <p>Fired only when the user is an {@link com.laosun.aluminium.models.enemy.Enemy} -- a memosprite
+     * attacking through the same class raises {@link #SUMMON_ATTACK} instead -- and only when something was
+     * really hit. Its subject is the attacker and its target is the VICTIM, so "an enemy attacked me" is
+     * expressible as {@code target == self}.
+     */
+    ENEMY_ATTACK("ENEMY_ATTACK", true),
     SUMMON_ATTACK("SUMMON_ATTACK", true),
     /**
      * A <b>summon entered the field</b> ( memosprites): fired by {@code Battle.processRequests} for
