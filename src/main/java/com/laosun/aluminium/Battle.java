@@ -864,6 +864,12 @@ public class Battle {
         // reads its own state (e.g. "restore 30 energy at the start of battle").
         fireTriggers(TriggerEvent.BATTLE_START);
         processRequests();
+        // Note: the second phase. Some clauses read a fact that another BATTLE_START rule produces -- the team's
+        // skill point cap, for instance, which a talent raises -- and BATTLE_START rules run in team order, so
+        // such a clause would answer differently depending on where its raiser stood. Let the first phase settle,
+        // then give those clauses their moment.
+        fireTriggers(TriggerEvent.BATTLE_READY);
+        processRequests();
         checkResult();
     }
 

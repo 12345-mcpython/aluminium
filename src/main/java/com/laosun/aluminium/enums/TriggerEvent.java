@@ -74,6 +74,20 @@ public enum TriggerEvent {
      * once, and the loader now refuses the spelling). "My own battle start" needs no condition because the
      * table being fired <b>is</b> the owner's.
      */
+    /**
+     * Fired once, after every {@link #BATTLE_START} rule has run and settled: the moment a clause may read a
+     * fact that ANOTHER battle-start rule produced.
+     *
+     * <p><b>Why a second moment is needed.</b> {@code BATTLE_START} rules run in team order, so a clause like
+     * light cone 23046's "when entering combat, if the allies' Skill Points limit is 6 or higher" would see the
+     * cap before the rule that raises it whenever the raiser stands later in the team -- measured: the bonus
+     * appears with the raiser first and silently does nothing with the raiser second, which is a wrong answer
+     * with no symptom. Everything the game calls "when entering combat" is settled by this point.
+     *
+     * <p>It is a separate event rather than a second firing of {@link #BATTLE_START} so that no existing rule
+     * runs twice.
+     */
+    BATTLE_READY("BATTLE_READY", true),
     BATTLE_START("BATTLE_START", true),
     /**
      * An ally finished an attack. Carries the hit-target count.
