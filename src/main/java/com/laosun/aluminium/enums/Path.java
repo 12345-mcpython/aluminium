@@ -36,11 +36,11 @@ public enum Path {
      */
     DESTRUCTION("destruction", 125),
     /**
-     * Hunt: aggro 5 (lower than the standard tier).
+     * Hunt: aggro 75 (lower than the standard tier).
      */
     HUNT("single", 75),
     /**
-     * Erudition: aggro 5.
+     * Erudition: aggro 75.
      */
     ERUDITION("all", 75),
     /**
