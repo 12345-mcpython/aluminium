@@ -2273,3 +2273,22 @@ has been loaded yet”，第 60 行定义 `ELATION("elation", true, false)`（**
 
 ⭐ 一条可复用的方法：当被测量要穿过一系列乘区时，直接断言绝对值会把区间也算进去；
 **改测两个只差一个倍数的情形的比值**，区间就自动相消。
+
+### ⛔ 形态 A 的 20% 被两件事挡住（2026-10-02）
+
+⭐ 已知的写法都对（`ADD_DAMAGE` + `damage_type: "ELATION"` + `scale: "elation_base"`），
+门也对（`from_skill_id == 8` 加 `self_resource:好活当赏 >= 1`），但判据跑不通：
+
+1. ⭐ **`ADD_DAMAGE` 不接受手发事件**：
+   `Op ADD_DAMAGE needs the damage instance being settled, but this context carries none`
+   —— 它需要**真实的一笔结算**，所以判据必须驱动一次真实攻击。
+2. ⭐ **换上的技能拿不到**：终结技已把 COMMON 换成槽 8，但
+   `castImmediate(pearl.getSkills().get(SkillType.COMMON), …)` 打出的伤害**加持与不加持完全相同**
+   （396.30858086449007 两次），说明施放的不是槽 8 那个形态，于是门不可能命中。
+
+⇒ ⭐ 下一步：查“**换上去的技能该怎么施放**”（`SkillSwapBuff` 把替换装进槽位，
+那么取技能的时机、或是 `castImmediate` 是否走槽位查找）。⭐ 本条规则与判据**已撤回**，树保持绿。
+
+⭐ 另一件已量定的事：`holder_of:<state>` 是**目标选择器**（`1412` / `1414` 在用），
+**不能出现在 `scale` 里** —— 所以“读【美学底本】的面板值”（语料 106 行的 60%、
+星魂 6 的 240%）还需要一个不存在的 scale 拼法。
