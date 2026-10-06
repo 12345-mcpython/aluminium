@@ -674,7 +674,7 @@ public class Battle {
     public static final String ULTIMATE_ACTIVATED_STATE = "终结技已激活";
 
     /**
-     * Whether this unit can cast its ultimate right now follow-up): reaching the "ult threshold" is
+     * Whether this unit can cast its ultimate right now: reaching the "ult threshold" is
      * enough, it does not have to be filled to the maximum.
      *
      * <p>The threshold comes from the skill data's {@code spNeed} (tbgd {@code AvatarSkillConfig.SPNeed},
@@ -940,7 +940,7 @@ public class Battle {
 
     /**
      * Give {@code actor} an extra turn: the next {@link #stepForward()} is taken by it,
-     * and it costs no action value (the clock does not move to the round does not change, see {@link #getRound()}).
+     * and it costs no action value (the clock does not move, so the round does not change, see {@link #getRound()}).
      *
      * <p>The typical use is a kill-type talent (Seele (希儿) and the like): call it inside
      * {@code afterMove()} -- that is, after {@code queue.setTopZero()} -- so that its normal turn schedule
@@ -1780,8 +1780,8 @@ public class Battle {
      * The stated aggro weight, before any {@link AttributeType#AGGRO_ADDED_RATIO} is applied.
      *
      * <p>Priority: the {@code aggro} in the character data (it is the game multiplier itself: Preservation
-     * 150 / Destruction 125 / others 100 / Hunt-Erudition 5) to when there is no data, fall back to the path's
-     * default tier to non-characters (enemies/summons) get 100.
+     * 150 / Destruction 125 / others 100 / Hunt-Erudition 75); when there is no data, fall back to the path's
+     * default tier; non-characters (enemies/summons) get 100.
      *
      * <p>Taunt is not here: taunt is the hard constraint of "can only be selected", handled by
      * {@link TargetSelector}. Squeezing it into the aggro value by multiplication can only raise the
