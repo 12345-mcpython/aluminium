@@ -167,6 +167,13 @@ public class EnemySkill extends Skill {
         // existed".
         if (!hitTargets.isEmpty()) {
             battle.fireTriggers(TriggerEvent.SUMMON_ATTACK, user, null, hitTargets.size(), 0);
+            // ...and the enemy's own half of the same fact. An enemy action runs its own path, so before this a
+            // clause of the form "when an enemy attacks" had no event at all. The victim is passed as the target
+            // (unlike the summon event, which passes null), because "an enemy attacked ME" is the clause that gets
+            // written; a memosprite attacking through this same class raises SUMMON_ATTACK only.
+            if (user instanceof com.laosun.aluminium.models.enemy.Enemy) {
+                battle.fireTriggers(TriggerEvent.ENEMY_ATTACK, user, victim, hitTargets.size(), 0);
+            }
         }
     }
 
