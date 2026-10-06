@@ -266,7 +266,7 @@
         }
       ],
       "source": "1503 真珠 行迹 艺术壁垒 (1503103) 的兑现端: 「使其下一次施放终结技时，为真珠固定恢复 90 点能量」。",
-      "note": "⭐ 90 是数据里的值（状态 `10015033` 的 `#1`）。⭐ 回能量的目标是 `self`（真珠）—— 原文说“为**真珠**恢复”。⚠ ⭐ 原文的“使其**下一次**施放终结技时”那个“下一次”**本文件未能表达**：“用完就移除”需要 `REMOVE_STATE` 能指向“引发事件的那个队友”，而它的选择器表不收 `actor`，也不收 `attacker`（两个都实测过，加载器直接拒绝）。⇒ 当前行为：该队友**每一次**终结技都会为真珠回 90 点（原文只说下一次）。这一点已登记，不当成完成。"
+      "note": "⭐ 90 是数据里的值（状态 `10015033` 的 `#1`）。⭐ 回能量的目标是 `self`（真珠）—— 原文说“为**真珠**恢复”。⚠ ⭐ 原文的“使其**下一次**施放终结技时”那个“下一次”**本文件未能表达**：“用完就移除”需要 `REMOVE_STATE` 能指向“引发事件的那个队友”，而它的选择器表不收 `actor`，也不收 `attacker`（两个都实测过，加载器直接拒绝）。⇒ 当前行为：该队友**每一次**终结技都会为真珠回 90 点（原文只说下一次）。这一点已登记，不当成完成。  NOTE 2026-10-02: the corpus page states the same clause with 90 as the fixed amount, matching status 10015033's first parameter."
     },
     {
       "on": "HP_LOST",
@@ -357,8 +357,8 @@
           "target": "self"
         }
       ],
-      "source": "1503 真珠 行迹行为：状态 `10015037`（`Skill03_Caster_BuffA`）：「造成伤害时，额外造成#1[i]%冰属性欢榆伤害，该次欢榆伤害使用【美学底本】的属性值来计算。普攻【行笔，临摹断水】强化为【行笔，幻造星月】」。",
-      "note": "⭐ **分支的一侧** ✓：【美学底本】为欢榆命途 ⇒ 强化为槽 **8**（行笔，幻造星月），且带额外冰欢榆伤害（参数在 `150308` 的第五项：级 1 = 0.1，满级 = 0.2）。⚠ “额外伤害”本身**未写**：它要算在另一次实例上，且“用【美学底本】的属性值计算”是另一种取值口径。  NOTE 2026-10-02, from the in-game Ultimate text: deep study carries THREE charges and each enhanced basic spends one, ending the state after acting with none left. So the lifetime is 3 uses, not the 2 the technique's own parameter names (that 2 is the technique's own charge grant, row 150307 = [2, 20]). Charges are not modelled as a counter yet; `turns: 3` is the closest existing lifetime and is now text-backed."
+      "source": "1503 真珠 行迹行为：状态 `10015037`（`Skill03_Caster_BuffA`）：「造成伤害时，额外造成#1[i]%冰属性欢榆伤害，该次欢榆伤害使用【美学底本】的属性值来计算。普攻【行笔，临摹断水】强化为【行笔，幻造星月】」。  原文（Lv10）：「且攻击后，额外造成 60% 的冰属性欢榆伤害，该次欢榆伤害使用【美学底本】的属性值计算」。",
+      "note": "⭐ **分支的一侧** ✓：【美学底本】为欢榆命途 ⇒ 强化为槽 **8**（行笔，幻造星月），且带额外冰欢榆伤害（参数在 `150308` 的第五项：级 1 = 0.1，满级 = 0.2）。⚠ “额外伤害”本身**未写**：它要算在另一次实例上，且“用【美学底本】的属性值计算”是另一种取值口径。  NOTE 2026-10-02, from the in-game Ultimate text: deep study carries THREE charges and each enhanced basic spends one, ending the state after acting with none left. So the lifetime is 3 uses, not the 2 the technique's own parameter names (that 2 is the technique's own charge grant, row 150307 = [2, 20]). Charges are not modelled as a counter yet; `turns: 3` is the closest existing lifetime and is now text-backed.  NOTE 2026-10-02, from the corpus page (line 106, level 10) and the in-game panel (level 1): the extra Ice Elation damage is 60% at level 10 and 30% at level 1, and it is computed from the AESTHETIC ARCHETYPE's stats. The corpus also states its own convention: quoted values are level 10. The damage itself is still unmodelled -- it needs a scale read off another unit."
     },
     {
       "on": "ULT_CAST",
