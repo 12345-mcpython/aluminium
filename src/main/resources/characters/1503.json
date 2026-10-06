@@ -88,7 +88,7 @@
         }
       ],
       "source": "1503 真珠 星魂 1 珍珠，藏在海的留白处: 「若我方目标受到致命伤害，不会陷入无法战斗状态，并立即回复等同于其生命上限 50% 的生命值。该效果单场战斗中可以触发 2 次」。",
-      "note": "⭐ **逐字镜像** `1217.json` 的 `e2_saves_an_ally_with_the_talisman` ✓（同一形状：`LETHAL_DAMAGE` + `actor is_ally` + `target_max_hp` 回复 50% + 计数器限次）。⭐ 除此之外的**欢榆度**加成段（「队伍中欢榆命途角色数量等于 2/3/4 或以上时，使我方全体欢榆度提高 10%/20%/60%」）**未写**：条件 DSL 没有“队伍中某命途的人数”这个变量。"
+      "note": "⭐ **逐字镜像** `1217.json` 的 `e2_saves_an_ally_with_the_talisman` ✓（同一形状：`LETHAL_DAMAGE` + `actor is_ally` + `target_max_hp` 回复 50% + 计数器限次）。⭐ 除此之外的**欢愉度**加成段（「队伍中欢愉命途角色数量等于 2/3/4 或以上时，使我方全体欢愉度提高 10%/20%/60%」）**未写**：条件 DSL 没有“队伍中某命途的人数”这个变量。"
     },
     {
       "on": "TURN_START",
@@ -105,6 +105,73 @@
       ],
       "source": "1503 真珠 行迹 感知容差 (1503102): 「我方目标回合开始时，真珠获得 5 点【好活当赏】，最多获得 50 点【好活当赏】，真珠回合开始时重置可获得【好活当赏】数量」。",
       "note": "⭐ **照现成样板** ✓：`1201.json` 的 `talent_draw_on_ally_turn` 是同一形状（`TURN_START` + 一个阵营条件 + `GAIN_RESOURCE`）。⭐ 用 `actor is_ally` 而不是 `is_other_ally`：原文说的是“我方目标”，而 `is_ally` 的文档明记“**counts the owner herself**”。⭐ 上限（“最多获得 50 点”）由声明里的 `max: 50` 兑现，不重复写。⚠ 同句的另一半（“持有【好活当赏】时，我方全体目标的**效果抵抗提高 50%**”）**本文件未写**：`AttributeType` 里**没有任何名字命名效果抵抗**（实测扫过）。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "ult_advances_the_target_at_1_elation_allies",
+      "when": [
+        "actor == self",
+        "allies_with_path:欢愉 >= 1"
+      ],
+      "do": [
+        {
+          "op": "ADVANCE",
+          "percent": 0.1,
+          "target": "target"
+        }
+      ],
+      "source": "1503 真珠 终结技 鉴映灵魂的底色 (150303): 「队伍中「欢愉」命途角色数量等于 1 或以上时，使【美学底本】行动提前 10%」。",
+      "note": "⭐ 三档写成**三条规则**（阈值递增），而不是一条加分档变量：条件 DSL 只能比较数字，而三条各自的门槛正好是原文的三个档。⭐ 作用对象是 `target`（终结技选中的那个队友，即【美学底本】）。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "ult_advances_the_target_at_2_elation_allies",
+      "when": [
+        "actor == self",
+        "allies_with_path:欢愉 >= 2"
+      ],
+      "do": [
+        {
+          "op": "ADVANCE",
+          "percent": 0.15,
+          "target": "target"
+        }
+      ],
+      "source": "1503 真珠 终结技 鉴映灵魂的底色 (150303): 「队伍中「欢愉」命途角色数量等于 2 或以上时，使【美学底本】行动提前 15%」。",
+      "note": "⭐ 三档写成**三条规则**（阈值递增），而不是一条加分档变量：条件 DSL 只能比较数字，而三条各自的门槛正好是原文的三个档。⭐ 作用对象是 `target`（终结技选中的那个队友，即【美学底本】）。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "ult_advances_the_target_at_3_elation_allies",
+      "when": [
+        "actor == self",
+        "allies_with_path:欢愉 >= 3"
+      ],
+      "do": [
+        {
+          "op": "ADVANCE",
+          "percent": 0.3,
+          "target": "target"
+        }
+      ],
+      "source": "1503 真珠 终结技 鉴映灵魂的底色 (150303): 「队伍中「欢愉」命途角色数量等于 3 或以上时，使【美学底本】行动提前 30%」。",
+      "note": "⭐ 三档写成**三条规则**（阈值递增），而不是一条加分档变量：条件 DSL 只能比较数字，而三条各自的门槛正好是原文的三个档。⭐ 作用对象是 `target`（终结技选中的那个队友，即【美学底本】）。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "ult_grants_an_extra_turn_at_four_elation_allies",
+      "when": [
+        "actor == self",
+        "allies_with_path:欢愉 >= 4"
+      ],
+      "do": [
+        {
+          "op": "EXTRA_TURN",
+          "target": "target"
+        }
+      ],
+      "source": "1503 真珠 终结技: 「队伍中「欢愉」命途角色数量等于 4 或以上时，使【美学底本】获得 1 个额外回合」。",
+      "note": "⭐ `EXTRA_TURN` 已有用例（1102 无参数、1309/1404/1501 写 `target: self`）。⚠ 同句后半“该额外回合开始时，【美学底本】获得 30 点【好活当赏】，并获得 60 点笑点，额外回合结束时移除”**本文件未写**：它需要一个“这个额外回合”的标记与结束时机，而【深度学习】与【美学底本】两个状态尚未建模。"
     }
   ]
 }
