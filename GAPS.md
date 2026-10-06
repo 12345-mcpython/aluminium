@@ -2021,3 +2021,23 @@ checkResult();
 
 ⭐ 真珠欢榆技的**兼现端**只能登记。⭐ 同一句话在**其它欢榆角色**里也会出现（参耍编号这一族特征），
 所以这不是真珠专属的小事。
+
+### ⭐ 实测的落点清单（2026-10-02，供下一轮直接执行）
+
+| # | 位置 | 要做什么 |
+|---|---|---|
+| 1 | `TriggerInterpreter:5265 requireElement` | 它用 `DamageElement.fromString` 校验，所以保留词会**在加载期被拒**。需要一个只在**伤害类 op**上生效的许可（不能放宽 `APPLY_DOT` / `APPLY_CONTROL`，它们也调它） |
+| 2 | `TriggerInterpreter:5079 elementOf(effect, skill)` | 签名加 `CanHit attacker`，并在**规则自己的 `element`**之前先识别保留词 |
+| 3 | `elementOf` 的 **3 个调用点**：`5032` / `5042` / `5048` | 传入 attacker（它们所在的方法里 `attacker` 就在作用域内） |
+| 4 | `5031` / `5041` / `5047` 的**内联**取值 | 这三处直接写了 `DamageElement.fromString(effect.getElement().trim())`，与 `elementOf` 重复；一并改成调 `elementOf` |
+| 5 | 单位取属性的 API | 已有先例：`battle.characters.getFirst().getElement()`（1208 行）—— `Character.getElement()` 存在 |
+
+⭐ 预期语法：`{"op": "DAMAGE", "scale": "self_attr:ATTACK", "percent": 0.1,`
+`"element": "attacker", "damage_type": "ELATION", "target": "target"}`。
+
+⭐ 为什么值得做：真珠欢榆技的兼现端（四档 10/15/20/40%）就卡在这里；
+而“对应属性欢榆伤害”是**欢榆命途一族**的常见句式，所以它不是真珠专属。
+⭐ 与它**同族但不同向**的还有一个：真珠形态 A 的 60% 与星魂 6 的 240% 要“使用
+**【美学底本】的属性值**来计算”——那是“取**另一个单位**的属性值”，
+与本缺口是同一个设计问题的两个方向（一个取元素、一个取面板值），
+值得一起设计一个“**取谁的属性**”的词。
