@@ -1645,3 +1645,54 @@ checkResult();
 
 ⚠ 因此本轮**删掉了那条判据**（它在面板就位前不可能通过），只保留规则文件✓ ——
 它已由全量用例验证“加载合法”✓，但**规则本身尚无判据**，这一点写在这里不模糊。
+
+### ⭐⭐ 做角色的完整配方（ 2026-10-02 量测）：**四份文件 + 一处计数**
+
+⭐ 我给 `1503` 写完规则后逐步补，三个守卫判据把清单逐条说了出来：
+
+| 缺的 | 守卫的报错（原文） |
+|---|---|
+| ⭐ 面板数据 | `CharacterException$CharacterNotFoundException: Character '1503' not found`（`Character$Builder.validateAndGet`） |
+| ⭐ `data/skills.json` 的技能行 | `cid=1503's COMMON parameter table is empty (data not fetched?)` 与 `cid=1503's MAZE parameter table is empty` |
+| ⭐ 名册计数（5★） | `number of 5★ ==> expected: <70> but was: <71>` |
+
+⇒ ⭐ 一个角色：① `characters/<cid>.json`（规则）、② `data/character_data.json`（面板）、
+③ `data/character_id_mappings.json`（cid → 双语名）、④ `data/skills.json`（每槽的技能行），
+加上⑤守卫里的名册计数（`CharacterFactoryTest`）。
+
+#### ⭐ 面板字段（照 `1502` 逐字比过）
+
+`id` / `attribute`（小写元素）/ `short_name` / `max_energy` / `name{chinese,english}` / `mt`（命途）/
+`rarity` / `health` / `attack` / `defence` / `speed` / `aggro` / `crit_chance` / `crit_attack`。
+⭐ 真珠的值已从语料量好（并与 `AvatarConfig` 交叉验过 `Elation`+`Ice`+`SPNeed 180`）：
+`ice` / `pearl` / 180 / 真珠 / Pearl / `elation` / 5 / **163.68** / **63.36** / **99** / **99** / **100** / 0.05 / 0.5。
+
+#### ⭐ 技能行的字段集（照 `1502` 量的，共 12 个）
+
+`attack_type` / `element` / `max_level` / `name{chinese,english}` / `param_list`（**全等级**）/ `skill_effect` /
+`skill_id` / `skill_introduction{chinese,english}` / `sp_base` / `sp_need` / `stance_list{single,all,spread}`，
+基础攻击另带 `bp_add`。
+
+#### ⭐ 槽位映射（已从 tbgd 量出真珠的每一行）
+
+| 槽 | tbgd 的 `SkillTriggerKey` | 技能 ID | 形态 |
+|---|---|---|---|
+| 1 | `Skill01` | 150301 | `Normal` / `SingleAttack` / 10 级 |
+| 2 | `Skill02` | 150302 | `BPSkill` / `Defence` / 15 级 |
+| 3 | `Skill03` | 150303 | `Ultra` / `Support` / 15 级 |
+| 4 | （天赋，待确认键） | 150304 | 天赋 |
+| 6 | （空键） | 150306 | `MazeNormal` / `MazeAttack` / 1 级 |
+| 7 | `SkillMaze` | 150307 | `Maze` 秘技 |
+| 8 | `Skill11` | 150308 | `Normal` / `AoEAttack` / 强化普攻一 |
+| （另一强化普攻） | （待确认） | （「行笔，绘制末浪」） | 强化普攻二 |
+| 20 | `Skill04` | 150320 | `ElationDamage` / `Support` / 15 级 |
+
+⭐ 每行的 `AttackType` / `SkillEffect` / `MaxLevel` / `ShowStanceList` / `StanceDamageType` / `ParamList`（全等级）/
+`SkillName` / `SkillDesc` 在 `AvatarSkillConfig` 里**完整**，且另外 93 个角色就是这么生成的，
+所以这一步是**机械活**。
+
+⚠ 本轮为什么回滚：⭐ 我已有三份文件中的**两份**（面板与映射）写对了、
+第三份（技能行）尚未生成，而三个守卫因此红着。⭐ 在一个已经很长的会话尾部，
+“留一棵红树 + 半成品”比“回滚 + 完整配方”差得多，所以选后者。
+⭐ `characters/1503.json`（规则）**保留**：它由全量用例验证“加载合法”✓，
+但**规则本身仍无判据**（判据在面板就位后才能跑）—— 这一点不模糊。
