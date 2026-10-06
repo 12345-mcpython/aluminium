@@ -472,7 +472,7 @@
         }
       ],
       "source": "1503 真珠 技能表的等级口径: 语料页引用的是 **Lv10** 行（战技明写“效果量（Lv10）: 12% × 防御力 + 240”；终结技的“额外 60% 冰属性欢榆伤害”也是 Lv10 文本）。",
-      "note": "⭐ 同 `1310.json` 的 `level_convention` 同法（同一组四个槽位、同一个 `amount: 9`）。⭐ **为什么必须有它**：本文件其它规则里的数字（战技的 12%+240）取自语料的 **Lv10** 行；若技能停在 Lv1，那些数字就描述了一个单位不在的等级。⭐ 这条让口径自洽：文档引 Lv10 ⇒ 技能在 Lv10。  MEASURED 2026-10-02: a judge that read `Skill.getLevel()` saw 1 for E0, E3 and E5 alike, so `RAISE_SKILL_LEVEL` does NOT surface in that reading -- it presumably feeds the parameter lookup instead. The rule itself mirrors 1310's shipped `level_convention`, but it is UNPROVEN until an observable is found."
+      "note": "⭐ 同 `1310.json` 的 `level_convention` 同法（同一组四个槽位、同一个 `amount: 9`）。⭐ **为什么必须有它**：本文件其它规则里的数字（战技的 12%+240）取自语料的 **Lv10** 行；若技能停在 Lv1，那些数字就描述了一个单位不在的等级。⭐ 这条让口径自洽：文档引 Lv10 ⇒ 技能在 Lv10。  PROVEN 2026-10-02 by `PearlSkillLevelsTest` plus its mutant. The observable is `CanHit.skillLevel(Skill)` -- the EFFECTIVE level -- because `RAISE_SKILL_LEVEL` writes into `CanHit.skillLevelBonus` and `CanHit.skillLevel(...)` is where the base level and the raises are added together (its own comment says so). My first judge read `Skill.getLevel()`, which is the BASE level and excludes raises by design, so it saw a flat 1 and the rule looked dead. Measured: E0 -> ULTRA 10 / COMMON 10; E3 -> ULTRA 12 / COMMON 11; E5 -> SKILL 12 / TALENT 12."
     },
     {
       "on": "BATTLE_START",
@@ -501,7 +501,7 @@
         }
       ],
       "source": "1503 真珠 星魂 3 速写，惊涛悬停的刹那: 「终结技等级+2；普攻等级+1；欢榆技等级+1」（参数 `{'150303': 2, '150301': 1, '150320': 1, '150308': 1, '150310': 1}`）。",
-      "note": "⭐ 语料参数里的五个技能 ID 映到四个槽位：150303 → ULTRA、150301 → COMMON、150320 → ELATION_SKILL（槽 20）、而 **150308 与 150310 同属 `ELATION_EXTRA`**（强化普攻，实测自 `SkillType` 枚举）—— 所以它们共用一条 `+1`。  MEASURED 2026-10-02: a judge that read `Skill.getLevel()` saw 1 for E0, E3 and E5 alike, so `RAISE_SKILL_LEVEL` does NOT surface in that reading -- it presumably feeds the parameter lookup instead. The rule itself mirrors 1310's shipped `level_convention`, but it is UNPROVEN until an observable is found."
+      "note": "⭐ 语料参数里的五个技能 ID 映到四个槽位：150303 → ULTRA、150301 → COMMON、150320 → ELATION_SKILL（槽 20）、而 **150308 与 150310 同属 `ELATION_EXTRA`**（强化普攻，实测自 `SkillType` 枚举）—— 所以它们共用一条 `+1`。  PROVEN 2026-10-02 by `PearlSkillLevelsTest` plus its mutant. The observable is `CanHit.skillLevel(Skill)` -- the EFFECTIVE level -- because `RAISE_SKILL_LEVEL` writes into `CanHit.skillLevelBonus` and `CanHit.skillLevel(...)` is where the base level and the raises are added together (its own comment says so). My first judge read `Skill.getLevel()`, which is the BASE level and excludes raises by design, so it saw a flat 1 and the rule looked dead. Measured: E0 -> ULTRA 10 / COMMON 10; E3 -> ULTRA 12 / COMMON 11; E5 -> SKILL 12 / TALENT 12."
     },
     {
       "on": "BATTLE_START",
@@ -525,7 +525,7 @@
         }
       ],
       "source": "1503 真珠 星魂 5 透视，笔端星夜的肌理: 「战技等级+2；天赋等级+2；欢榆技等级+1」（参数 `{'150302': 2, '150304': 2, '150320': 1}`）。",
-      "note": "⭐ 三个参数直接对应 SKILL / TALENT / ELATION_SKILL，无歧义。  MEASURED 2026-10-02: a judge that read `Skill.getLevel()` saw 1 for E0, E3 and E5 alike, so `RAISE_SKILL_LEVEL` does NOT surface in that reading -- it presumably feeds the parameter lookup instead. The rule itself mirrors 1310's shipped `level_convention`, but it is UNPROVEN until an observable is found."
+      "note": "⭐ 三个参数直接对应 SKILL / TALENT / ELATION_SKILL，无歧义。  PROVEN 2026-10-02 by `PearlSkillLevelsTest` plus its mutant. The observable is `CanHit.skillLevel(Skill)` -- the EFFECTIVE level -- because `RAISE_SKILL_LEVEL` writes into `CanHit.skillLevelBonus` and `CanHit.skillLevel(...)` is where the base level and the raises are added together (its own comment says so). My first judge read `Skill.getLevel()`, which is the BASE level and excludes raises by design, so it saw a flat 1 and the rule looked dead. Measured: E0 -> ULTRA 10 / COMMON 10; E3 -> ULTRA 12 / COMMON 11; E5 -> SKILL 12 / TALENT 12."
     }
   ]
 }
