@@ -17,22 +17,15 @@ TARGET = pathlib.Path("src/main/resources/characters/1503.json")
 BACKUP = TARGET.with_suffix(".json.bak")
 
 EDITS = {
-    # 洞察万物: the threshold itself.
     "insight_threshold": (710, '"self_attr:DEFENCE >= 2400"', '"self_attr:DEFENCE >= 3400"'),
-    # 洞察万物: the per-100-points growth rate.
     "insight_per_point": (716, '"percent": 0.0003,', '"percent": 0.0006,'),
-    # 洞察万物: the flat 32% half (an `amount` on the excess scale).
     "insight_base": (720, '"amount": 0.32,', '"amount": 0.42,'),
-    # 洞察万物: the ceiling -- `cap_amount` is last in its object, so the anchor carries no comma.
     "insight_cap": (721, '"cap_amount": 0.68', '"cap_amount": 0.98'),
-    # 洞察万物: the healing link (20% of her Elation).
     "insight_healing": (735, '"percent": 0.2,', '"percent": 0.3,'),
-    # 感知容差: the effect-resistance amount (the 0.5 at line 753; line 83 is another rule's).
-    "tolerance_percent": (753, '"percent": 0.5,', '"percent": 0.4,'),
-    # 星魂 6: the penetration amount.
-    "eidolon6_percent": (775, '"percent": 0.2,', '"percent": 0.3,'),
-    # 星魂 6: its gate (which is also the sentence's "while deep-studying").
-    "eidolon6_gate": (779, '"self has_state 深度学习"', '"self has_state 美学底本"'),
+    "tolerance_gate": (748, '"self_resource:好活当赏 >= 1"', '"self_resource:好活当赏 >= 999"'),
+    "tolerance_percent": (754, '"percent": 0.5,', '"percent": 0.4,'),
+    "eidolon6_percent": (773, '"percent": 0.2,', '"percent": 0.3,'),
+    "eidolon6_gate": (777, '"self has_state 深度学习"', '"self has_state 美学底本"'),
 }
 
 

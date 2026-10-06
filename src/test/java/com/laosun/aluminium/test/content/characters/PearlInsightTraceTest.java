@@ -90,9 +90,17 @@ public class PearlInsightTraceTest {
                 "the healing bonus is 20% of the Elation she has once the trace has paid out");
     }
 
-    /** 感知容差's other half: while deep-studying, the whole party's effect resistance is up by 50%. */
+    /**
+     * 感知容差's other half: "while holding 【好活当赏】", the whole party's effect resistance is up by 50%.
+     *
+     * <p>Note: The gate is the <b>resource</b>, not a state - `self_resource:好活当赏 >= 1`, the spelling 1505 ships
+     * three times. The first version of this rule used {@code self has_state 深度学习} and claimed the documented
+     * gate "cannot be written today"; that claim was wrong, and this case is what pins the real one: the counter is
+     * granted by the Ultimate, so the aura arrives on the cast that grants it (and the pre-cast reading is the
+     * control that a wrong gate would break).
+     */
     @Test
-    public void theToleranceTraceRaisesThePartysEffectResistanceWhileDeepStudying() {
+    public void theToleranceTraceRaisesThePartysEffectResistanceWhileHoldingTheCounter() {
         Character pearl = pearlWith(1200, 0);
         Character ally = CharacterFactory.create(HUNTER, 80);
         Battle battle = new Battle(List.of(pearl, ally), List.of(EnemyFactory.create(MONSTER, 90, 1)),
@@ -102,16 +110,20 @@ public class PearlInsightTraceTest {
 
         double pearlBefore = pearl.getAttribute(AttributeType.EFFECT_RESISTANCE).get();
         double allyBefore = ally.getAttribute(AttributeType.EFFECT_RESISTANCE).get();
-        battle.fireTriggers(TriggerEvent.ULT_CAST, pearl, ally, 0, 0);
+        Assertions.assertEquals(0, pearl.getResources().value(COUNTER), EPS,
+                "precondition: she holds none of the counter yet, so the aura is not up");
+        Assertions.assertEquals(0.0, pearlBefore, EPS, "precondition: no effect resistance before the Ultimate");
+
+        Character aim = battle.characters.get(1);
+        battle.fireTriggers(TriggerEvent.ULT_CAST, pearl, aim, 0, 0);
         battle.processRequests();
         double pearlGain = pearl.getAttribute(AttributeType.EFFECT_RESISTANCE).get() - pearlBefore;
         double allyGain = ally.getAttribute(AttributeType.EFFECT_RESISTANCE).get() - allyBefore;
         System.out.println("[pearl_insight] effect RES after the Ultimate: Pearl +" + pearlGain
-                + " ; the ally +" + allyGain + " ; she is deep-studying = "
-                + pearl.getBuffManager().hasState(DEEP));
+                + " ; the ally +" + allyGain + " ; the counter reads " + pearl.getResources().value(COUNTER));
 
-        Assertions.assertTrue(pearl.getBuffManager().hasState(DEEP),
-                "precondition: the Ultimate put her into " + DEEP);
+        Assertions.assertTrue(pearl.getResources().value(COUNTER) >= 1,
+                "precondition: the Ultimate granted 【好活当赏】, which is what the text's gate asks about");
         Assertions.assertEquals(0.5, pearlGain, EPS, "the party-wide clause includes Pearl herself");
         Assertions.assertEquals(0.5, allyGain, EPS, "and it is party-wide, not self-only");
     }
@@ -150,6 +162,7 @@ public class PearlInsightTraceTest {
     // ==================================================================
 
     private static final String DEEP = "深度学习";
+    private static final String COUNTER = "好活当赏";
 
     /** Pearl at the given Defence and Eidolon rank, with every {@code BATTLE_START} rule settled. */
     private static Character pearlWith(double defence, int eidolon) {

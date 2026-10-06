@@ -742,9 +742,10 @@
     },
     {
       "on": "ULT_CAST",
-      "id": "trace_tolerance_raises_effect_resistance_while_deep",
+      "id": "trace_tolerance_raises_effect_resistance_while_holding",
       "when": [
-        "actor == self"
+        "actor == self",
+        "self_resource:好活当赏 >= 1"
       ],
       "do": [
         {
@@ -752,14 +753,11 @@
           "attribute": "EFFECT_RESISTANCE",
           "percent": 0.5,
           "permanent": true,
-          "target": "all_allies",
-          "target_when": [
-            "self has_state 深度学习"
-          ]
+          "target": "all_allies"
         }
       ],
       "source": "1503 真珠 行迹 感知容差 (1503102): 「持有【好活当赏】时，我方全体目标的**效果抵抗**提高 50%」。",
-      "note": "⚠⚠ **这一条是本轮唯一带读数近似的**，写清楚以免被当成完成：原文的门是「**持有【好活当赏】时**」，而【好活当赏】在本引擎里是**数值资源**（`resources[0]`），不是可 `has_state` 的状态 —— 所以「持有它」这个条件**今天写不出来**（资源经过 0 点时无法用条件表达“此刻持有”）。⭐ 本轮**借用了最接近的可判定事实**：`self has_state 深度学习`（同一套机制的另一半：深度学习由终结技/秘技装上、强化普攻消耗）。⚠ 差别在于**它不在所有该在的时候成立**（只要终结技转过就来，与是否持有好活当赏无关）。已登记为缺口，**不当作完成**；解锁条件是把【好活当赏】做成一个长度为 1 的具名状态（或给条件 DSL 一个“资源 > 0”的拼法）。⭐ 效果抵抗的属性名**早就存在** —— 本文件原文那句“`AttributeType` 里没有任何名字命名效果抵抗（实测扫过）”是**错的**：`EFFECT_RESISTANCE`（`AttributeType:44`，由游戏属性 `StatusResistanceBase` 映射，见 `:289`）。这与“我断言欢愉伤害属性不存在、而 `ELATION_DAMAGE_BOOST` 一直都在”是同一个错法，已作为纪律记下。"
+      "note": "⭐⭐ **门改对了**（本轮）：原文的门是「**持有【好活当赏】时**」✓，而它**有现成写法** —— `self_resource:好活当赏 >= 1` ✓。⚠ 我上一版写成 `self has_state 深度学习`、并把门放在 `target_when`，还断言「持有它这个条件今天写不出来」 ✗ —— **那句话是错的** ✓，而且仓库里就有反例：`1505.json` **三条已出货规则**用的正是这个条件拼写（`self_resource:好活当赏 >= 1` ✓，`1201`/`1003` 同族 ✓）。⇒ 近似已撤下 ✓。⭐ 三条口径：① **`>= 1` 就是「持有」** ✓（数值资源没有「状态」可问，而「有没有」就是 `>= 1` ✓）；② **门属于 `when`，不属于 `target_when`** ✓ —— 「她持有它」说的是**规则的主语**，不是「哪些候选合格」；写在 `target_when` 里虽然也能跑（`self` 在那里仍绑规则主人 ✓），但说的是另一件事 ✓；③ **条件单调**（只会从假变真 ⇒ 第一次满足时挂上、之后一直成立 ✓），所以 `permanent: true` 的光环语义与这句话一致 ✓。⚠ 未表达的是同句**没有**的那部分：原文只要求「持有」，没说什么时候撤下 —— 而【好活当赏】在她的声明里是**持续时间无限** ✓（`resources[0]` 的 source 原话 ✓）⇒ 不撤下是对的 ✓。⭐ 另：效果抵抗的属性名**早就存在** —— 本文件此前那句「`AttributeType` 里没有任何名字命名效果抵抗（实测扫过）」是**错的**：`EFFECT_RESISTANCE`（`AttributeType:44`，由游戏属性 `StatusResistanceBase` 映射，见 `:289`）。这与「我断言欢愉伤害属性不存在、而 `ELATION_DAMAGE_BOOST` 一直都在」是同一个错法，已作为纪律记下。"
     },
     {
       "on": "ULT_CAST",
