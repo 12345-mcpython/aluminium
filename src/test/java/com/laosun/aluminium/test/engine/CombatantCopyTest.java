@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
- * H-6: copying a combatant must not leave the copy <b>sharing its attribute sheet</b> with the original.
+ * Copying a combatant must not leave the copy <b>sharing its attribute sheet</b> with the original.
  *
  * <p>The bug this pins: {@code CanHit(CanHit)} did {@code this.attributes = other.attributes.clone()},
  * which clones the <b>array</b> and nothing else - every {@code DoubleValue} inside stayed the same
@@ -16,7 +16,7 @@ import org.junit.jupiter.api.Test;
  * {@code removeModifiersFrom} would strip the other's modifiers as well.
  *
  * <p>Nothing called the copy constructor when this was written, which is exactly why it is worth a test:
- * "no caller" is not "no bug", it is a landmine waiting for the first caller (P-4's waves are the
+ * "no caller" is not "no bug", it is a landmine waiting for the first caller (the waves are the
  * obvious one - "spawn the same monster again").
  *
  * <p>The second test is the other half of the contract, and it is deliberately <b>not</b> a bug report:

@@ -18,7 +18,7 @@ import java.util.Objects;
 
 /**
  * One damage instance - always a single hit on a single target (it has carried its own
- * damage-zone system since P1-3).
+ * damage-zone system since the first version).
  *
  * <p>A skill that produces N hits builds N {@code Damage} objects; an instance is only
  * built when something actually has to be settled.
@@ -95,7 +95,7 @@ public class Damage {
     private boolean trueDamage;
     /**
      * Whether this hit counts as an attack: additional / true damage segments are
-     * {@code false} (P3 energy gain and P4 toughness only look at this).
+     * {@code false} (energy gain and toughness reduction only look at this).
      */
     private boolean countsAsAttack = true;
     /**

@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * "提高数值等同于&lt;某属性&gt;的 Y%" rides the <b>base layer</b>, not the boost zone (ROADMAP M-55).
+ * "提高数值等同于&lt;某属性&gt;的 Y%" rides the <b>base layer</b>, not the boost zone.
  *
  * <p>The primitive: {@code Damage.addFlat(value)}. The decision it encodes - an absolute addend is added to the skill
  * multiplier <b>before</b> the zones, so it crits and is boosted exactly like the multiplier - is what these cases pin.
@@ -53,7 +53,7 @@ public class DamageFlatAddendTest {
         Assertions.assertEquals(130, asAddend.toValue(), EPS);
         Assertions.assertEquals(130, asBoost.toValue(), EPS, "…equal only because the base is 100 (the trap)");
 
-        // Any other base separates them: that is exactly why M-55 needed its own spelling.
+        // Any other base separates them: that is exactly why the addend needed its own spelling.
         Damage otherBase = damage(1000);
         otherBase.addFlat(30);
         Assertions.assertEquals(1030, otherBase.toValue(), EPS, "+30 is +30 whatever the base is");

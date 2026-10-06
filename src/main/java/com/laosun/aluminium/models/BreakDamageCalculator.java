@@ -25,7 +25,7 @@ import com.laosun.aluminium.models.enemy.Enemy;
  * {@code breaking_rate.json / 10 = 36.5535}, so the {@code stanceDamage} passed in
  * MUST be on the "point" scale (e.g. 30-point basic attack  x  2.5 break bonus = 112.5).
  * If it ever switches to 36, the toughness reduction value must be divided by 10 in step,
- * otherwise it is off by 10 x ; P4-6 super break uses the same scale.
+ * otherwise it is off by 10 x ; super break uses the same scale.
  */
 public final class BreakDamageCalculator {
 

@@ -216,7 +216,7 @@ public class TriggerEventWiringTest {
     /**
      * The trigger only fires for our own side, matching {@code HP_LOST}'s broadcast policy.
      *
-     * <p>An enemy being hit is not our content (P9 owns monsters), and - more importantly for the
+     * <p>An enemy being hit is not our content (monsters are their own subsystem), and - more importantly for the
      * rule's arithmetic - a relic rule must not accumulate stacks when the wearer is the one
      * attacking. {@code fireTriggersForAlly} is the camp check, and this test is what keeps it in
      * place.

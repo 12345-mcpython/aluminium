@@ -26,7 +26,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Relic-set trigger rules (P10-3 follow-up): the loader, the assembly point, and the registry of
+ * Relic-set trigger rules: the loader, the assembly point, and the registry of
  * abilities the op vocabulary cannot express yet.
  *
  * <p>Relic set bonuses that are not plain stats are "when &lt;event&gt;, do &lt;something the engine
@@ -264,7 +264,7 @@ public class RelicTriggerTableTest {
      * {@code MODIFY_DAMAGE_TAKEN} existed), then to <b>25</b> when the same set's 4-piece became
      * authorable - and then to <b>4</b> when the MIXED effects joined the partition (see
      * {@link #MIXED_STAT_AND_ABILITY}); those 22 mixed entries are not a regression, they are the half of
-     * the data this test could not see before (ROADMAP M-25). It went to <b>44</b> on 2026-09-28, when set 123
+     * the data this test could not see before. It went to <b>44</b> on 2026-09-28, when set 123
      * was authored (see {@link #HERO_OF_TRIUMPHANT_SONG}), and to <b>22</b> on 2026-09-28 when the shield-amount
      * family became authorable (sets 103 and 128, three entries - see {@link #KNIGHT_OF_PURITY}).
      */
@@ -276,7 +276,7 @@ public class RelicTriggerTableTest {
     /**
      * Stat + ability bonuses: an unconditional {@code properties} stat <b>plus</b> an ability.
      *
-     * <p>Note: <b>This half was invisible until 2026-09-2</b> (ROADMAP M-25). The partition below used to skip
+     * <p>Note: <b>This half was invisible until 2026-09-2</b>. The partition below used to skip
      * every effect with a non-empty {@code properties}, so the common planar-ornament shape
      * ("攻击力提高 12%。当速度 >= 120 时，攻击力额外提高 12%") had its first clause applied by
      * {@code RelicSuit} and its second clause <b>silently dropped</b>, with no registry entry to say so - 
@@ -340,7 +340,7 @@ public class RelicTriggerTableTest {
     /**
      * Every authored number survives the JSON round trip.
      *
-     * <p>This is the project's recurring failure mode (see {@code ROADMAP} §4.2): a misspelled field
+     * <p>This is the project's recurring failure mode: a misspelled field
      * leaves a value at {@code null}/0, the file still loads, and the rule quietly does the wrong
      * thing. Here that would mean a buff with no duration (rejected at load) or a modifier of 0 (a
      * silent no-op), so the values are pinned per ability rather than derived.
@@ -536,7 +536,7 @@ public class RelicTriggerTableTest {
      * <p>Note: <b>Both kinds are walked, and that is the point of the 2026-09-2revision.</b> The loop used to
      * {@code continue} on any effect with a non-empty {@code properties}, which silently excluded 29
      * "stat + ability" effects - the majority shape for planar ornaments, whose conditional half was being
-     * dropped without a registry entry (ROADMAP M-25). The classification is now explicit and both
+     * dropped without a registry entry. The classification is now explicit and both
      * denominators are asserted, so an effect cannot escape the partition by acquiring a stat.
      */
     @Test
@@ -657,7 +657,7 @@ public class RelicTriggerTableTest {
      * hiding a gap.
      *
      * <p>Note: Walks <b>every</b> ability-bearing effect, not just the pure ones - otherwise the 22 registered
-     * mixed entries would all look stale, which is how this case failed the first time the M-25 entries
+     * mixed entries would all look stale, which is how this case failed the first time those entries
      * landed (it had the same {@code properties().isEmpty()} filter the partition test used to have).
      */
     @Test

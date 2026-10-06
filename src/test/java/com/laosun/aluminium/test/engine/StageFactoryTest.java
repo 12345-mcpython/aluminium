@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * P-5 acceptance: {@code StageFactory.load(stageId)} assembles, from a stage, a battle that can be
+ * Acceptance: {@code StageFactory.load(stageId)} assembles, from a stage, a battle that can be
  * fought immediately.
  *
  * <p>Covers:
@@ -56,7 +56,7 @@ public class StageFactoryTest {
      * Difficulty comes from the stage: the same monster has different stat sheets in stages of
      * different level.
      *
-     * <p>This is the core of P-5 - "hard" is decided by the data, not by multipliers the caller
+     * <p>This is the core requirement - "hard" is decided by the data, not by multipliers the caller
      * passes in.
      */
     @Test
@@ -162,7 +162,7 @@ public class StageFactoryTest {
      * The reference team: 4 real characters, each with an identity, an energy bar and a light
      * cone of its own path.
      *
-     * <p>Replaces the old P-5 assertion, which checked 3 placeholders with deliberately distinct
+     * <p>Replaces the old assertion, which checked 3 placeholders with deliberately distinct
      * speeds. The real roster happens to have distinct speeds too, so the action bar stays meaningful.
      */
     @Test
@@ -186,7 +186,7 @@ public class StageFactoryTest {
     }
 
     /**
-     * The caller can supply their own team (P8-5 swapping in the real team goes this way).
+     * The caller can supply their own team (this is how the real team is swapped in).
      */
     @Test
     public void callersCanSupplyTheirOwnTeam() {

@@ -17,7 +17,7 @@ import java.util.Map;
 import java.util.Random;
 
 /**
- * Stage factory (P-5): given a {@code stage_id}, assemble a {@link Battle} that is ready to fight.
+ * Stage factory: given a {@code stage_id}, assemble a {@link Battle} that is ready to fight.
  *
  * <pre>{@code
  * Battle battle = StageFactory.load(103201);
@@ -40,11 +40,11 @@ import java.util.Random;
  * not equally strong in different stages" is decided by the data and the caller does not need to
  * pass any multiplier.
  *
- * <p>Note: <b>The team is real since P8-5</b>: {@link #load(int)} builds the 4-character team with
+ * <p>Note: <b>The team is real</b>: {@link #load(int)} builds the 4-character team with
  * {@link #realTeam()}, which goes through {@code CharacterFactory} (real stat sheet, path, element,
  * energy cap, real skill slots), equips each character with a light cone of its own path from
- * {@code weapons.json}, and - since P10-3 - with a real relic suit whose 4-piece and 2-piece set bonuses
- * are applied ({@link #referenceRelics()}). Before P8-5 this method used a placeholder team built from
+ * {@code weapons.json}, and - with a real relic suit - its 4-piece and 2-piece set bonuses
+ * are applied ({@link #referenceRelics()}). Earlier this method used a placeholder team built from
  * {@code Character.fromAttributes}.
  */
 public final class StageFactory {
@@ -52,7 +52,7 @@ public final class StageFactory {
     /**
      * The level the assembled team is built at.
      *
-     * <p>80 is the current cap, so the team is a "fully levelled" reference team: the point of P8-5 is
+     * <p>80 is the current cap, so the team is a "fully levelled" reference team: the point is
      * to fight with real sheets, and a mid-level team would make any disagreement with the data harder
      * to spot.
      */
@@ -94,7 +94,7 @@ public final class StageFactory {
     private static final int PLANAR_SET = 301;
 
     /**
-     * The P8-5 reference team: Jing Yuan / Seele / Clara / Natasha.
+     * The reference team: Jing Yuan / Seele / Clara / Natasha.
      *
      * <p>Chosen to cover four different paths (Erudition / Hunt / Destruction / Abundance) and four
      * different roles, so that a stage battle exercises more than one damage shape.
@@ -183,14 +183,14 @@ public final class StageFactory {
      * relic suit.
      *
      * <p>Every member comes from {@link CharacterFactory#create(int, int)}, so it carries a real stat
-     * sheet (level scaling, traces), path, element, aggro, energy cap, real skill slots and - since
-     * -/P8-8 - its data-driven trigger table and stack resources.
+     * sheet (level scaling, traces), path, element, aggro, energy cap, real skill slots and
+     * its data-driven trigger table and stack resources.
      *
      * <p><b>On the light cones</b>: the cone is picked by path (the same key
      * {@code Path.fromMt} uses for characters), and the <b>smallest matching id</b> wins. That rule is
      * arbitrary but deterministic, which matters more here than "which cone is best": a
      * non-deterministic pick would make every stage battle irreproducible. Note: Only the cone's
-     * <b>panel</b> is applied - its passive is not (a weapon passive needs the buff system, P10-3).
+     * <b>panel</b> is applied - its passive is not (a weapon passive needs the buff system).
      *
      * <p><b>On the relics</b>: every member wears the same {@link #referenceRelics()} build - four
      * pieces of Musketeer of Wild Wheat (set 102) plus two pieces of Space Sealing Station (set 301) - so

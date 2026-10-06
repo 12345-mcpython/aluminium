@@ -12,8 +12,8 @@ package com.laosun.aluminium.models.enemy;
  * @param attack           final ATK
  * @param defence          final DEF
  * @param speed            final SPD
- * @param stance           toughness value (P4 toughness reduction consumes it)
- * @param effectHitRate    effect hit rate (additive-value convention, used by P6-1)
+ * @param stance           toughness value (the toughness-reduction step consumes it)
+ * @param effectHitRate    effect hit rate (additive-value convention, used when an effect is applied)
  * @param effectResistance effect resistance (additive convention: template value +
  *                         level-group value)
  */

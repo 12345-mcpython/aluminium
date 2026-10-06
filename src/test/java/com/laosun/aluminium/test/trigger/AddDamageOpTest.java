@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Op {@code ADD_DAMAGE}: "raise the damage value the counter deals, the raise being equal to 30% of 三月七's DEF" (ROADMAP M-55).
+ * Op {@code ADD_DAMAGE}: "raise the damage value the counter deals, the raise being equal to 30% of 三月七's DEF".
  *
  * <p>It is the absolute sibling of {@code BOOST_DAMAGE}: that one adds a percentage of the instance, this one adds a
  * <b>value</b> derived from the rule owner's own attribute, into the instance's <b>base layer</b>

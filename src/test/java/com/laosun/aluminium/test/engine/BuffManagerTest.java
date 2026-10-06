@@ -114,7 +114,7 @@ public class BuffManagerTest {
     }
 
     // ==================================================================
-    // H-: the buff query point (the prerequisite for P4-6 super break / P8-triggers / P10-2 the control state machine)
+    // the buff query point (the prerequisite for super break, triggers and the control state machine)
     // ==================================================================
 
     @Test
@@ -147,7 +147,7 @@ public class BuffManagerTest {
     }
 
     // ==================================================================
-    // §12 M-5 / M-12: two stability holes in the manager itself
+    // two stability holes in the manager itself
     // ==================================================================
 
     /**
@@ -203,7 +203,7 @@ public class BuffManagerTest {
                 "and the buff it attached must really be there, not skipped by the iteration");
     }
 
-    /** A damage reaction that attaches a second buff - the shape M-12 is about. */
+    /** A damage reaction that attaches a second buff - the shape described above. */
     private static final class BoostsItselfWhenHit extends AbstractBuff implements DamageEvent {
         private BoostsItselfWhenHit() {
             super(5, false);

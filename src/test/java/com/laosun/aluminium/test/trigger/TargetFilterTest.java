@@ -74,7 +74,6 @@ public class TargetFilterTest {
     }
 
     /** Note: A misspelled condition inside a filter is refused when the file loads, not ignored. */
-    /** Note: A misspelled condition inside a filter is refused when the file loads, not ignored. */
     @Test
     public void aBadFilterIsRefusedAtLoad() {
         IllegalArgumentException refused = Assertions.assertThrows(IllegalArgumentException.class,

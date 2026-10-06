@@ -12,7 +12,7 @@ import java.util.List;
  * applying level scaling.
  *
  * <p>{@code rarity} (3/4/5 stars) is carried because it is needed to choose a cone sensibly.
- * {@code weapons.json} does contain the field, but the bean did not declare it until P8-5 - and a
+ * {@code weapons.json} does contain the field, but the bean did not declare it for a long time - and a
  * record whose component names do not match the JSON keys is exactly how Gson turns a real value
  * into a silent 0 (see {@code ROADMAP} §4.2).
  */

@@ -30,7 +30,7 @@ import java.util.Set;
  * declare one, and the condition DSL cannot read one: {@code gain} answers {@code 0} for an unknown id and
  * {@code value} answers {@code 0} too, so a rule about "充能" (charge) is a no-op that reports nothing. 41 of the 9
  * character documents in the corpus gate something on a count, which is the largest single gap the scan found
- * (ROADMAP §13.) - and a whole family of kits (Acheron's [残梦] (Dreamscape), Feixiao's [飞黄] (Flying Yellow), Cyrene's [追忆] (Recollection)) is built on
+ * ({@code ROADMAP.md}) - and a whole family of kits (Acheron's [残梦] (Dreamscape), Feixiao's [飞黄] (Flying Yellow), Cyrene's [追忆] (Recollection)) is built on
  * it.
  *
  * <p><b>Three things are pinned here</b>, each of which would otherwise be a rule that loads and quietly does the

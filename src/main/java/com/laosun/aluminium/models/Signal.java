@@ -68,7 +68,7 @@ public final class Signal implements Comparable<Signal>, Cloneable {
      * How much action value is left until the next action point (Pfix E2).
      *
      * <p>Why it has to be tracked separately, and must be a "distance" rather than a "percentage":
-     * the first round (P-1) stretches the cycle to 1.5 x , so the denominator of the "current cycle" differs
+     * the first round stretches the cycle to 1.5 x , so the denominator of the "current cycle" differs
      * between the first round and the rounds after it (150 vs 100). Once progress is recorded as a percentage it
      * can no longer be converted when the speed changes - a percentage times the new cycle would change two things
      * at once. A <b>distance, however, is speed-independent</b>: "how many squares are left" on the action bar does
@@ -85,7 +85,7 @@ public final class Signal implements Comparable<Signal>, Cloneable {
      */
     private double remaining = 0;
     /**
-     * Whether this signal has not yet finished its first-round scheduling (P-1): the first-round booking is
+     * Whether this signal has not yet finished its first-round scheduling: the first-round booking is
      * multiplied by  x 1.5.
      */
     private boolean firstRound = false;
@@ -156,8 +156,8 @@ public final class Signal implements Comparable<Signal>, Cloneable {
      *       <b>the booking length is not discounted</b>: a speed boost does not let someone "skip ahead out of
      *       thin air", it only shortens the wait proportionally;</li>
      *   <li>speed change halfway through to the remaining wait is scaled in proportion to the old and new cycles;</li>
-     *   <li><b>pushed back beyond one booking (progress &gt; 1)</b> to the excess is preserved rather than capped
-     *       (L-26). Deliberately <b>not</b> clamped from above: a delayed unit really is more than a round away,
+     *   <li><b>pushed back beyond one booking (progress &gt; 1)</b> to the excess is preserved rather than capped.
+     *       Deliberately <b>not</b> clamped from above: a delayed unit really is more than a round away,
      *       and clamping truncated every push to one full round.</li>
      * </ul>
      *
@@ -170,7 +170,7 @@ public final class Signal implements Comparable<Signal>, Cloneable {
      */
     public void refreshSpeed(double elapsed) {
         double oldLength = nextCycleLength();
-        // Note: No UPPER clamp (L-26). A unit that has been pushed back by an action delay is legitimately
+        // Note: No UPPER clamp. A unit that has been pushed back by an action delay is legitimately
         // MORE than one booking away, i.e. `remaining > oldLength`; capping the progress at 1 then
         // rewrote it to exactly one full booking, silently truncating the push. That is why a slowed,
         // delayed unit used to be indistinguishable from a merely slowed one.
@@ -206,7 +206,7 @@ public final class Signal implements Comparable<Signal>, Cloneable {
     }
 
     /**
-     * Marks this signal as being in its "first round" (P-1): this booking is multiplied by x 1.5.
+     * Marks this signal as being in its "first round": this booking is multiplied by x 1.5.
      *
      * <p>The length of the first booking is exactly {@code 1.5  x  cycleTime()}, so the distance starts from there.
      */
@@ -224,7 +224,7 @@ public final class Signal implements Comparable<Signal>, Cloneable {
 
     /**
      * Directly sets "how much action value is left until the action point" and synchronises
-     * {@link #nextActionTime} (P-2).
+     * {@link #nextActionTime}.
      *
      * <p>{@code remaining} and {@code nextActionTime} are two ledgers of the same state
      * (see {@code engine.md} §5.6), so changing one of them means the other must be synchronised - 

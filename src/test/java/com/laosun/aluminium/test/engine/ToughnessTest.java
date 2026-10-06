@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
  *
  * <p>Anchor: Ice Edge 1002011 @ group 1 - Lv90 to toughness 60 (template 60  x  level group 1).
  * This task only builds the state machine, and reaching zero does not break automatically
- * (the break judgement is in P4-2); the broken duration / turn skipping is in P4-4.
+ * (the break judgement itself is not here); the broken duration / turn skipping are separate concerns.
  */
 public class ToughnessTest {
     private static final double EPS = 1e-6;
@@ -38,7 +38,7 @@ public class ToughnessTest {
 
         iceEdge.reduceStance(30);
         Assertions.assertEquals(0, iceEdge.getStance(), EPS);
-        Assertions.assertFalse(iceEdge.isBroken(), "toughness reaching zero is not the same as a break: that judgement is in P4-2");
+        Assertions.assertFalse(iceEdge.isBroken(), "toughness reaching zero is not the same as a break: that judgement is in");
 
         iceEdge.reduceStance(10);
         Assertions.assertEquals(0, iceEdge.getStance(), EPS, "already 0, it will not go negative");

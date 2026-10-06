@@ -30,7 +30,7 @@ public interface EnergyProvider {
      * Whether this unit's ultimate is available right now.
      *
      * <p>This is the <b>gate</b> for casting, and it exists because "energy is full" is not the only
-     * way to earn an ultimate. Characters who build stacks instead of energy (P8-8: Acheron's
+     * way to earn an ultimate. Characters who build stacks instead of energy (Acheron's
      * [残梦], Feixiao's [飞黄], Cyrene's [追忆]…) become ready when their resource is full, so
      * gating on {@code currentEnergy >= maxEnergy} would lock them out forever - their energy stays
      * at 0 by design.

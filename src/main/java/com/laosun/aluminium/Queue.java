@@ -70,7 +70,7 @@ public final class Queue {
      */
     private Signal currentActor;
     /**
-     * Pending extra turn actor (P-2): the next {@link #move()} is performed by them,
+     * Pending extra turn actor: the next {@link #move()} is performed by them,
      * and it does not advance the clock (so it consumes no action value and does not
      * change the round either).
      *
@@ -113,7 +113,7 @@ public final class Queue {
         return false;
     }
     /**
-     * When the extra turn was granted, that actor's original {@code nextActionTime} (P-2).
+     * When the extra turn was granted, that actor's original {@code nextActionTime}.
      *
      * <p>The extra turn is implemented by temporarily pinning their action time to {@code elapsed}
      * (see {@link #grantExtraTurn}); it MUST be handed back afterwards, otherwise one of their
@@ -123,7 +123,7 @@ public final class Queue {
      */
     private double extraTurnOriginalTime;
     /**
-     * The schedule to restore on the next {@link #move()} after the extra turn actor has acted (P-2).
+     * The schedule to restore on the next {@link #move()} after the extra turn actor has acted.
      *
      * <p>Why not restore it right inside the extra turn: after restoring, the top of the heap is
      * them again, and the next {@code move()} would directly advance their normal turn - the
@@ -211,8 +211,8 @@ public final class Queue {
      * Adds a single combatant, scheduled one full cycle from the current global time.
      * Duplicates are ignored.
      *
-     * <p>Note: The first-round x 1.5 multiplier is NOT applied here (P-1 only affects
-     * {@link #initialize()}): units that join mid-battle (summons, P9-4) are queued at their
+     * <p>Note: The first-round x 1.5 multiplier is NOT applied here (it only affects
+     * {@link #initialize()}): units that join mid-battle (summons) are queued at their
      * normal cycle. If the "first round" should later cover mid-battle entries too, change this
      * and update {@code QueueRoundTest} accordingly.
      *
@@ -268,7 +268,7 @@ public final class Queue {
 
     /**
      * Resets the simulation: all combatants' action cycles start from time zero,
-     * with the first round stretched to 150 action value (P-1).
+     * with the first round stretched to 150 action value.
      */
     public void initialize() {
         elapsed = 0;
@@ -277,7 +277,7 @@ public final class Queue {
         heap.clear();
         for (Signal s : snapshot) {
             s.refreshSpeed();
-            // P-1: first round 150, every later round 100 to the first cycle is x 1.5
+            // First round 150, every later round 100 to the first cycle is x 1.5
             //
             // E4: the scheduling sequence number is deliberately not re-drawn here. The number
             // was already issued by entry order when addCombatant() created the Signal, and what is
@@ -292,7 +292,7 @@ public final class Queue {
     }
 
     /**
-     * Which round it currently is (P-1): derived from accumulated action value, {@code first round = 1}.
+     * Which round it currently is: derived from accumulated action value, {@code first round = 1}.
      *
      * <p>The intervals are closed on the right:
      * <pre>
@@ -306,7 +306,7 @@ public final class Queue {
      * The implementation uses {@code -EPS} to attribute boundary values to the previous round.
      *
      * <p>Good enough for demos/logging; the real round driving (win/loss determination, stage turn
-     * limits) is in P-3.
+     * limits) happens elsewhere.
      *
      * @return the round, starting from 1
      */
@@ -348,12 +348,12 @@ public final class Queue {
             insertedSignal = null;
             return 0;
         }
-        // P-2: first handle "the pending restore left over from the previous extra turn",
+        // First handle "the pending restore left over from the previous extra turn",
         // then do the normal advance.
         if (pendingRestore != null) {
             applyPendingRestore();
         }
-        // P-2: the extra turn cuts the line. The clock does not move, so no action value is
+        // The extra turn cuts the line. The clock does not move, so no action value is
         // consumed and the round does not change either.
         if (extraTurnActor != null) {
             return moveExtraTurn();
@@ -374,7 +374,7 @@ public final class Queue {
     }
 
     /**
-     * Consumes one extra turn (P-2): makes {@link #extraTurnActor} act immediately, with the clock
+     * Consumes one extra turn: makes {@link #extraTurnActor} act immediately, with the clock
      * not moving.
      *
      * <p><b>Why their {@code nextActionTime} must be temporarily pinned to {@code elapsed}</b>:
@@ -426,14 +426,14 @@ public final class Queue {
     }
 
     /**
-     * The "pending schedule restore" left behind by consuming an extra turn (P-2).
+     * The "pending schedule restore" left behind by consuming an extra turn.
      */
     private record ExtraTurnRestore(CanHit actor, double originalActionTime) {
     }
 
     /**
      * Restores the extra-turn actor's schedule to "the value it had when the extra turn was
-     * granted" (P-2).
+     * granted".
      *
      * <p>This happens after "the extra turn has been acted out and their cycle has already been
      * rescheduled at normal speed by {@link #setTopZero()}", so this step simply erases that
@@ -453,7 +453,7 @@ public final class Queue {
     }
 
     /**
-     * Gives {@code actor} an extra turn (P-2): the next {@link #move()} is performed by them,
+     * Gives {@code actor} an extra turn: the next {@link #move()} is performed by them,
      * and it consumes no action value (the clock does not move to the round does not change either).
      *
      * <p>Semantic points:
@@ -469,7 +469,7 @@ public final class Queue {
      *       replaces the previous holder.</li>
      * </ul>
      *
-     * <p>Typical usage (P5's on-kill talents, e.g. Seele): call it inside {@code afterMove()} - 
+     * <p>Typical usage (on-kill talents, e.g. Seele): call it inside {@code afterMove()} - 
      * that is, after {@code setTopZero()} - so that the stored "original schedule" is the one from
      * after they acted and got pushed back.
      *
@@ -618,7 +618,7 @@ public final class Queue {
         for (Signal s : heap) {
             if (s.getCanHit() == target) {
                 s.setNextActionTime(Math.max(elapsed, s.getNextActionTime() - advance));
-                // Same ledger sync as delayAction (L-26): the pull must survive a later speed change too.
+                // Same ledger sync as delayAction: the pull must survive a later speed change too.
                 s.setRemaining(elapsed, s.getNextActionTime() - elapsed);
                 rebuildHeap();
                 return true;

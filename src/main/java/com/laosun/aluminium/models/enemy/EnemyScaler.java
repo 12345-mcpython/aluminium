@@ -29,7 +29,7 @@ public final class EnemyScaler {
 
     /**
      * No elite group bonus (all multipliers 1) - this data directory has no elite_group.json yet;
-     * wiring the table up is left to P-4 / P9.
+     * wiring the table up is left to the stage-wiring work.
      */
     public static final EliteGroup NO_ELITE_BONUS = new EliteGroup(1, 1, 1, 1, 1);
 

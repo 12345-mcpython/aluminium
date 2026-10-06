@@ -21,7 +21,7 @@ import java.util.Random;
  *
  * <p><b>Why.</b> The game states most heals and shields as a share of somebody's Max HP - relic set 106's
  * 4-piece is "restores health equal to 8% of Max HP", and the skill-side loader has carried the same idea in
- * {@code skill_effects.json}'s {@code scale} field since P10-3. The trigger table had only {@code amount}, so an
+ * {@code skill_effects.json}'s {@code scale} field for some time. The trigger table had only {@code amount}, so an
  * ability written that way could not be authored at all: the number is different for every character and every
  * level, which is exactly why writing one in the file would be wrong.
  *

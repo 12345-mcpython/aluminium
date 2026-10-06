@@ -19,7 +19,7 @@ import java.util.Set;
  * {@link StandardEnergyProvider}</b>:
  * <ul>
  *   <li>This is a design classification ("this character does not use the conventional
- *       energy system"), not a single data fact. The P8-0 three-way split assigns judgements
+ *       energy system"), not a single data fact. The three-way split used here assigns judgements
  *       like this to the provider / assembly point, which is also the only place allowed to
  *       mention {@code cid}.</li>
  *   <li>The conventional provider has 5 hooks. Blocking only the two skill ones
@@ -33,7 +33,7 @@ import java.util.Set;
  *
  * <p>Once this is wired up, these characters behave as "energy is always 0, an ultimate can
  * never be cast" - an explicit and testable state, rather than relying on a data
- * coincidence to block one path and miss three. When the P8-8 {@code Resource} abstraction
+ * coincidence to block one path and miss three. When the {@code Resource} abstraction
  * lands, simply swap this provider for a real resource implementation (the wiring point is
  * already in place).
  *

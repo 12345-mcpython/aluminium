@@ -179,7 +179,7 @@ public class SkillPointTest {
      *
      * <p>Note: This one guards against writing the {@code switch} as "if it is not a basic attack then it is a skill"
      * ({@code default -> spend}): that way talents and follow-up attacks would quietly eat skill points, and the
-     * moment P8-3 adds follow-up attacks it would be hit immediately.
+     * moment follow-up attacks are added it would be hit immediately.
      */
     @Test
     public void nullAttackTypeIsNeutral() {
@@ -289,7 +289,7 @@ public class SkillPointTest {
         return battle;
     }
 
-    /** The enemy's basic attack (the skill P5-3 equips on enemies). */
+    /** The enemy's basic attack (the skill enemies are equipped with). */
     private static Skill enemySkill(Enemy enemy) {
         return enemy.getSkills().values().iterator().next();
     }

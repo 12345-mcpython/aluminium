@@ -47,7 +47,7 @@ public enum SkillType {
      *
      * <p>For most characters the technique's effect is "takes effect when the next battle starts"
      * (for example Jing Yuan (景元) +3 stacks of [神君] (Lightning-Lord)), so its trigger timing
-     * is the start of battle - see the event completion work in ROADMAP P8-6.
+     * is the start of battle - see the planned event completion work.
      */
     TECHNIQUE,
     /**

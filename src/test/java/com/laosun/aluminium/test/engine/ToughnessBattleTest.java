@@ -115,7 +115,7 @@ public class ToughnessBattleTest {
     }
 
     /**
-     * H-3: for a bouncing skill, {@code stance_list.single} is the total toughness reduction of the whole
+     * For a bouncing skill, {@code stance_list.single} is the total toughness reduction of the whole
      * skill and must be spread evenly across the hits.
      *
      * <p>Anchor (real data): cid 1321 Dahlia slot 4 = Bounce Fire, {@code hits = 5}, {@code single = 9}
@@ -135,7 +135,7 @@ public class ToughnessBattleTest {
     }
 
     /**
-     * H-4: weakness break damage is computed from "the value this instance actually reduced", not from
+     * Weakness break damage is computed from "the value this instance actually reduced", not from
      * the skill's nominal toughness reduction value.
      *
      * <p>Ice Edge has toughness 60 and a basic attack reduces 30 to 30 left; the second basic attack is

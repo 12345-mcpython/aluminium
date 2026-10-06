@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * The <b>friendly half of L-8</b>: our side's camp holds any {@code CanHit}, and {@code characters} is the
+ * The <b>friendly half of the camp widening</b>: our side's camp holds any {@code CanHit}, and {@code characters} is the
  * subset view.
  *
  * <p><b>Why this is not the enemy-side change, done twice.</b> On the enemy side the roster's <em>type</em>
@@ -225,7 +225,7 @@ public class PlayerSideSummonTest {
      * master (which {@code Summon} allows: the link is optional by design) survives the wipe, and then the
      * question "is this battle lost" has two answers depending on which list the check reads.
      *
-     * <p>The answer taken here is the one L-8 established for the enemy side: a side is wiped out when its
+     * <p>The answer taken here is the one the enemy side already follows: a side is wiped out when its
      * <b>camp</b> is, so victory/defeat cannot be declared while something on that side is still standing.
      * It is not a claim that masterless allies are a thing content should create.
      */

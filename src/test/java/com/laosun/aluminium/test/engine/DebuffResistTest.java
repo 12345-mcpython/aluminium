@@ -208,7 +208,7 @@ public class DebuffResistTest {
      * <b>not</b> one of them, so leaving {@code TauntBuff} outside the control class matches the game's own list
      * rather than dodging a decision. Note: The other side of that measurement is a registered gap: of those twelve
      * states the engine implements three (Frozen / Entanglement / Imprisonment, the break trio), so a "immune to the control class" clause protects
-     * against everything the engine can currently apply and nothing more - see ROADMAP's register.
+     * against everything the engine can currently apply and nothing more - see the register of known gaps.
      */
     @Test
     public void aClassImmunityDoesNotCoverAStateInNoClass() {
@@ -218,7 +218,7 @@ public class DebuffResistTest {
 
         Assertions.assertEquals(1, f.enemy.getBuffManager().countBuffs(TauntBuff.class),
                 "Taunt is in no class, so 「immune to the control class」 leaves it alone — the documents' 12-name list does not "
-                        + "include it (ROADMAP register)");
+                        + "include it");
     }
 
     // ==================================================================

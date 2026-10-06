@@ -36,7 +36,7 @@ import java.util.Set;
  *   <li>{@code target has_state X} reads the <b>event's subject</b>, not the owner - the classic
  *       actor/target confusion of this DSL, and the reason Kafka's "an enemy in the shocked state" is expressible;</li>
  *   <li>two <b>different</b> states coexist ({@code StateBuff.isSameKind} compares names, not classes - the
- *       class-based default would make [协奏] silently evict [转魄], the L-14 trap);</li>
+ *       class-based default would make [协奏] silently evict [转魄], a collision that must not happen under name matching);</li>
  *   <li>the <b>same</b> state refreshes instead of stacking;</li>
  *   <li>a state expires after its turns, and a {@code permanent} one does not;</li>
  *   <li>{@code target has_skill <SLOT>} reads the named party's <b>kit</b> - the guard 8009/8010's ultimate needs
@@ -119,7 +119,7 @@ public class TriggerStateTest {
         Assertions.assertTrue(owner.getBuffManager().hasState("协奏"));
         Assertions.assertTrue(owner.getBuffManager().hasState("转魄"),
                 "applying a second state must not evict the first: StateBuff.isSameKind compares names, "
-                        + "not classes (the class-based default is the L-14 trap)");
+                        + "not classes (matching by class would silently evict the first state)");
         Assertions.assertEquals(2, owner.getBuffManager().countBuffs(StateBuff.class));
     }
 
@@ -212,7 +212,7 @@ public class TriggerStateTest {
     }
 
     // ==================================================================
-    // 3b. `REMOVE_STATE` - the other half of the state pair (M-42 ②)
+    // 3b. `REMOVE_STATE` - the other half of the state pair
     // ==================================================================
 
     /**
@@ -238,7 +238,8 @@ public class TriggerStateTest {
      * Only the named state goes: other states on the same unit are untouched.
      *
      * <p>Pinned because the cheap implementation - "remove the first buff that is a StateBuff" - would pass the case
-     * above and take somebody else's state off, which is a wrong state with nothing to report (the L-14 family).
+     * above and take somebody else's state off, which is a wrong state with nothing to report (a defect this project
+     * refuses to carry).
      */
     @Test
     public void removeStateLeavesOtherStatesAlone() {
@@ -259,7 +260,7 @@ public class TriggerStateTest {
      * The four DoT spellings resolve the same way here as they do in {@code has_state}.
      *
      * <p>"shocked" is not a {@code StateBuff} - the engine has represented the four damage-over-time states as an
-     * ordinary {@code DotBuff(element)} since P10-0, and {@code BuffManager} is the one place that knows the two
+     * ordinary {@code DotBuff(element)} from the start, and {@code BuffManager} is the one place that knows the two
      * spellings are the same fact. Removing is the side where forgetting that would be invisible: the state would
      * simply stay on, and the rule would look like it ran.
      */

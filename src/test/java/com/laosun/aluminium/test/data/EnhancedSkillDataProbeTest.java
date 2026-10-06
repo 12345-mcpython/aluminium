@@ -31,7 +31,7 @@ public class EnhancedSkillDataProbeTest {
     public void gallaghersEnhancedRowLoadsRealData() {
         Skill enhanced = new DefaultSkill(GALLAGHER, GALLAGHER_ENHANCED_ROW, LEVEL);
         Assertions.assertEquals(SkillCategory.UNSPECIFIED, enhanced.getData().getCategory(),
-                "⚠ THIS IS THE MEASURED FACT (2026-09-28): a DATA ROW id is not what the loader wants, so this reads "
+                "⚠ THIS IS THE MEASURED FACT: a DATA ROW id is not what the loader wants, so this reads"
                         + "UNSPECIFIED — the swapped skill carries no data and produces no hits. Round 98's javadoc said the "
                         + "parameter is a slot; round 107 called that stale; the measurement says round 98 was right. "
                         + "⚠ It is why the two REPLACE_SKILL clauses were withdrawn: they installed a no-op.");

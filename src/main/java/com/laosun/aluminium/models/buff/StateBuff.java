@@ -23,7 +23,7 @@ import lombok.Getter;
  *
  * <p><b>Identity is the name, not the class.</b> {@link #isSameKind} compares state names. The default
  * "same class = same buff" behavior would make applying [协奏] evict [转魄] -
- * two unrelated states of the same character, one of them silently gone (the same trap registered as L-14).
+ * two unrelated states of the same character, one of them silently gone (the same trap seen elsewhere in the buff system).
  * Re-applying the <b>same</b> state refreshes its duration, which is what the engine's ordinary rule means by
  * "refreshes" and what the game text means by it too.
  *
@@ -59,7 +59,7 @@ public class StateBuff extends AbstractBuff {
         if (state == null || state.isBlank()) {
             throw new IllegalArgumentException("StateBuff needs a state name");
         }
-        // The same guard DotBuff learned the hard way (L-12): a non-positive duration is not a zero-length
+        // The same guard DotBuff learned the hard way: a non-positive duration is not a zero-length
         // state, it is a state that exists for the whole turn it was applied in and disappears at its end.
         if (!permanent && turns < 1) {
             throw new IllegalArgumentException(

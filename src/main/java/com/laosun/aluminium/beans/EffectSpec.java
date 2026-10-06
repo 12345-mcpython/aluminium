@@ -15,13 +15,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * One effect inside a trigger (P8-): "do this".
+ * One effect inside a trigger: "do this".
  *
  * <p>Every effect is a {@code (op, ...args)} pair. The {@code op} vocabulary is deliberately
  * restricted to <b>capabilities the engine already has</b> -- the trigger table is an interpreter
  * over existing engine operations, not a second engine. See
- * {@link com.laosun.aluminium.models.TriggerInterpreter} for the implemented ops and
- * {@code ROADMAP.md} P8-for the planned ones.
+ * {@link com.laosun.aluminium.models.TriggerInterpreter} for the implemented ops - the rest are
+ * still only planned.
  *
  * <p>Which fields an op reads depends on the op (for example {@code GAIN_ENERGY} uses
  * {@link #amount} while {@code APPLY_BUFF} uses {@link #buff}); unused fields stay

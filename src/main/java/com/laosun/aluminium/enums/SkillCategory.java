@@ -58,7 +58,7 @@ public enum SkillCategory {
      */
     ASSIST("Assist"),
     /**
-     * Elation damage skill (data {@code "ElationDamage"}, 9 measured, P10 Elation system).
+     * Elation damage skill (data {@code "ElationDamage"}, 9 measured, part of the Elation system).
      */
     ELATION_DAMAGE("ElationDamage"),
     /**

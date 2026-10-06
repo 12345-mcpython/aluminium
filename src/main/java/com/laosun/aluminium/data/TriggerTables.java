@@ -20,9 +20,9 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Loads character trigger tables from {@code resources/characters/<cid>.json} (P8-).
+ * Loads character trigger tables from {@code resources/characters/<cid>.json}.
  *
- * <p>This is the "character content is data" side of the P8-0 three-way split: a character's
+ * <p>This is the "character content is data" side of the three-way split: a character's
  * mechanics live in a JSON file next to the code, and the engine only interprets them.
  *
  * <h2>Why this is not in {@code Constant}</h2>

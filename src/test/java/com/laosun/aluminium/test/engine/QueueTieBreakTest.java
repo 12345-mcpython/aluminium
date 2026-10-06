@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Tie-breaking on equal action values in the action bar (Pfix E4).
+ * Tie-breaking on equal action values in the action bar.
  *
  * <p>Before the fix {@code Signal.compareTo} only compared {@code nextActionTime}, so when they were
  * equal the {@code PriorityQueue} order was undefined - "which of two units with the same speed
@@ -89,8 +89,8 @@ public class QueueTieBreakTest {
      * action value as someone ahead of it still leaves it behind them.
      *
      * <p>This is a deliberately chosen semantics. If advancing also changed the sequence number, it
-     * would be "whoever gets advanced goes first", which would make the ordering of P-2 extra turns
-     * / P10-4 action advance counter-intuitive and hard to predict.
+     * would be "whoever gets advanced goes first", which would make the ordering of extra turns
+     * / action advance counter-intuitive and hard to predict.
      */
     @Test
     public void advancingToTheSameActionValueDoesNotJumpAhead() {
@@ -197,7 +197,7 @@ public class QueueTieBreakTest {
     }
 
     /**
-     * A latecomer entering mid-battle (a summon / P9-4) gets a new sequence number, and compared
+     * A latecomer entering mid-battle (a summon) gets a new sequence number, and compared
      * with an old unit at the same instant it is placed behind.
      */
     @Test

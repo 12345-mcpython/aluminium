@@ -34,7 +34,7 @@ import java.util.Set;
  * This class is that guardrail.
  *
  * <p>Why the empty check does not live in {@link StandardEnergyProvider}: that is a design
- * classification rather than a single data fact, so per P8-0's three-way split it belongs to the
+ * classification rather than a single data fact, so as a matter of the three-way split it belongs to the
  * provider / assembly point (which is also the only place {@code cid} is allowed to appear).
  */
 public class SpecialEnergyProviderTest {
@@ -88,13 +88,13 @@ public class SpecialEnergyProviderTest {
         Assertions.assertEquals(5, standard.onBreak(regular, regular).amount(), EPS);
     }
 
-    /** The standard provider still uses the constants (20/30/5), matching ROADMAP P3-0's standard tier - it does not depend on skill data. */
+    /** The standard provider still uses the constants (20/30/5), matching the standard tier - it does not depend on skill data. */
     @Test
     public void standardProviderUsesTheConventionalConstants() {
         Character yaoGuang = CharacterFactory.create(1502, 80);   // Yao Guang: the basic-attack data says 30 (off-tier)
         Assertions.assertEquals(20, standard.onSkillCast(yaoGuang,
                         realSkill(1502, SkillType.COMMON), Set.of()).amount(), EPS,
-                "the standard provider grants the constant 20 (fidelity to the off-tier value is left to P3-4's datafication)");
+                "the standard provider grants the constant 20 (fidelity to the off-tier value is left to datafication)");
     }
 
     // ==================================================================
@@ -234,7 +234,7 @@ public class SpecialEnergyProviderTest {
         return new DefaultSkill(cid, slot, 1);
     }
 
-    /** The enemy's basic attack (the skill P5-3 attaches to enemies). */
+    /** The enemy's basic attack (the skill attached to enemies at assembly). */
     private static Skill enemySkill(Enemy enemy) {
         return enemy.getSkills().values().iterator().next();
     }

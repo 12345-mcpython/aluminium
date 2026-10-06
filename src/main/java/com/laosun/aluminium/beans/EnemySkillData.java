@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName;
 import com.laosun.aluminium.enums.DamageElement;
 
 /**
- * A single enemy skill (the values of {@code enemy_skills.json}) - home-made in P5-3.
+ * A single enemy skill (the values of {@code enemy_skills.json}) - home-made, as explained below.
  *
  * <p><b>Why home-made</b>: the game data of this project has no enemy skill table. {@code skills.json}
  * contains only character skills, and tbgd's delivered data has no monster skill multipliers either.
@@ -13,7 +13,7 @@ import com.laosun.aluminium.enums.DamageElement;
  * source data is found, only the data file and the loading in {@code Constant} get
  * replaced - the engine side needs no change.
  *
- * @param id         skill id (unique; kept as the key for wiring up the real skill table in P9)
+ * @param id         skill id (unique; kept as the key for wiring up the real skill table later)
  * @param name       display name
  * @param element    damage element; {@code null} = use the monster's own {@code stance_type} (the
  *                   template's toughness attribute)
@@ -25,8 +25,8 @@ import com.laosun.aluminium.enums.DamageElement;
  *                   {@code SkillEffectType.fromString}); {@code null} = single target
  * @param guessed    whether the multiplier is a guessed value
  *
- *                   <p>Note: <b>{@code hits} means segments here, not targets.</b> {@code ROADMAP}'s P9-1 plan describes a
- *                   future enemy skill table whose {@code hits} field means "how many targets, 0 = all". The two must
+ *                   <p>Note: <b>{@code hits} means segments here, not targets.</b> The plan for a future
+ *                   enemy skill table gives its {@code hits} field the meaning "how many targets, 0 = all". The two must
  *                   not be merged silently: the shipped entries were written as segments (8013010 "Trampling Stomp" has
  *                   {@code hits: 2} and means two segments on one target), so reusing the name for a target count when
  *                   the real table lands would change every existing enemy's behaviour without a single test failing.

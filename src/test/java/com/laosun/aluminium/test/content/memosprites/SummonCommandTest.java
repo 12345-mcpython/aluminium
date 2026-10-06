@@ -316,7 +316,7 @@ public class SummonCommandTest {
         Assertions.assertEquals(0, command.getDamageParam(),
                 "column 0 is `#1[i]`, the Max HP share (the placeholders are 1-based, the column is not)");
         Assertions.assertNull(command.getDamageLevel(),
-                "⚠ no `damage_level` any more (M-32): the row is not pinned per effect but stated as the skill's own "
+                "⚠ no `damage_level` any more: the row is not pinned per effect but stated as the skill's own"
                         + "level, so an Eidolon's \"Ultimate Lv. +2\" composes with it instead of being ignored");
         // ...and the file really does state that level, as a BATTLE_START raise of the ULTRA slot (10 - 1).
         TriggerTable table = TriggerTables.of(OWNER);
@@ -454,7 +454,7 @@ public class SummonCommandTest {
     }
 
     /**
-     * Casting the ultimate removes the toughness <b>its own skill states</b> - and after M-40 it is the
+     * Casting the ultimate removes the toughness <b>its own skill states</b> - and it is the
      * <b>commanded</b> attack that removes it.
      *
      * <p>141303's {@code stance_list} is {@code single 0 / all 90}, so one real cast takes a 90-point bar to 0; the

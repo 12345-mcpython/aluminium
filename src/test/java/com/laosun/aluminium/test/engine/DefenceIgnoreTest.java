@@ -26,7 +26,7 @@ import java.util.Random;
  * "ignores X% of the target's defence" as data - {@code DEFENCE_IGNORE} reached from a rule for the first time.
  *
  * <p><b>What already existed, and what did not.</b> The attribute has been read by
- * {@code Battle.assemble}'s defence zone since P1-6, and {@code Damage.DefenceArea} clamps it to
+ * {@code Battle.assemble}'s defence zone for a long time, and {@code Damage.DefenceArea} clamps it to
  * {@code [0,1]} while shrinking {@code effectiveDefence} - both covered by {@code DamagePipelineTest} and
  * {@code DamageZoneTest}. What had <b>never</b> run is the path in the middle: <b>no shipped rule file
  * granted it</b>, so "a rule can raise this attribute and the hit really gets bigger" was an untested

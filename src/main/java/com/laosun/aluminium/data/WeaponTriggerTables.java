@@ -61,7 +61,7 @@ public final class WeaponTriggerTables {
     /**
      * The resource declarations of a light cone's file ({@code { "resources": [...], "1": [...], ... }}).
      *
-     * <p>P8-8's shape, reused: {@code TriggerTable.plus} already carries declarations across a merge, and
+     * <p>The resource shape, reused: {@code TriggerTable.plus} already carries declarations across a merge, and
      * {@code CharacterFactory} already registers whatever the merged table declares -- so the only missing piece was a
      * loader that reads them.
      *

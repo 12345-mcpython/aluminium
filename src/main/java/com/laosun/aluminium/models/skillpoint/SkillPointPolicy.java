@@ -7,13 +7,13 @@ import com.laosun.aluminium.models.skill.Skill;
  * The policy for skill points (SP): it pulls "should it be spent, how much, and how does it grow" out of
  * {@code Battle}.
  *
- * <p><b>Why this interface exists</b> (an architecture decision added after the P8-4 review, see <b>F-8</b> of
- * {@code DOC_VS_CODE.md} §F): skill points are a team-level resource, but their rules keep growing - 
+ * <p><b>Why this interface exists</b> (an architecture decision added after a design review, see <b>F-8</b> of
+ * {@code ROADMAP.md} §12.5): skill points are a team-level resource, but their rules keep growing - 
  * Bronya's (布洛妮娅) "50% chance to restore 1 point when casting the skill", Sushang's (素裳) "restore 1 point
  * after casting the skill on a broken target", Sparkle's (花火) "max +2", the 4-piece Passerby set "restore 1 point
  * at the start of battle" ...
  * If all of these were added as branches inside {@code Battle.useSkill}, {@code Battle} would fill up with
- * "because some character" checks, which is exactly what the P8-0 three-way split forbids.
+ * "because some character" checks, which is exactly what the three-way split forbids.
  *
  * <p>After extracting it into a policy:
  * <ul>
@@ -21,7 +21,7 @@ import com.laosun.aluminium.models.skill.Skill;
  *       and knows no character at all;</li>
  *   <li>character-level corrections will be injected in future by another implementation (or by this one
  *       reading an externally registered effect table); the injection point is the assembly point
- *       ({@code CharacterFactory}, the only place P8-0 allows a {@code cid} to appear) or the P8-trigger table;</li>
+ *       ({@code CharacterFactory}, the only place a {@code cid} may appear) or the trigger table;</li>
  *   <li>the engine side gains no new dependency on "some character" - that is the entire reason this abstraction
  *       exists.</li>
  * </ul>
@@ -35,8 +35,8 @@ import com.laosun.aluminium.models.skill.Skill;
  * <p>Note: This interface does not promise to express event-driven character mechanics such as "whenever a
  * skill point is spent ..." (Misha's (米沙) "every 1 skill point our side spends to +1 hit on the next ultimate",
  * Sparkle's (花火) "when our side spends a skill point, gain 1 extra energy"). Those need to listen to the event
- * "a skill point was spent", which belongs to the P8-trigger table (it needs a new event
- * {@code SkillPointSpentEvent}) - see F-4 of {@code DOC_VS_CODE.md} §F.
+ * "a skill point was spent", which belongs to the trigger table (it needs a new event
+ * {@code SkillPointSpentEvent}) - see F-4 of {@code ROADMAP.md} §12.5.
  */
 public interface SkillPointPolicy {
 

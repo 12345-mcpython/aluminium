@@ -32,7 +32,7 @@ import java.util.Random;
  * a monster's summon roster becomes a combatant that can actually be put on the field.
  *
  * <p><b>What was missing before this.</b> Two halves of "summons exist" had each been paid for and neither
- * was usable alone: {@code Battle.enemies} was widened to {@code List<CanHit>} (L-8), so the camp
+ * was usable alone: {@code Battle.enemies} was widened to {@code List<CanHit>}, so the camp
  * <em>could</em> hold one; and {@code models/Summon} was declared, so the type existed. But production code
  * never called {@code new Summon(...)} anywhere, and {@code monster_config.json}'s {@code summon_id} column
  *  - non-empty for <b>692 of 2649 monsters</b> - was not parsed at all. This is the piece that connects them:
@@ -193,7 +193,7 @@ public class SummonTest {
         Assertions.assertEquals(queueBefore + 1, battle.queue.size());
         Assertions.assertTrue(battle.enemies.contains(summon), "the camp holds it");
         Assertions.assertEquals(1, battle.enemyUnits().size(),
-                "enemyUnits() is still the monsters only -- that split is the whole point of L-8");
+                "enemyUnits() is still the monsters only -- that split is the whole point of");
         Assertions.assertEquals(roundBefore, battle.getRound(),
                 "entering costs no action value: it starts from the current clock, it does not restart a round");
         Assertions.assertTrue(battle.queue.snapshot().stream().anyMatch(s -> s.getCanHit() == summon),
@@ -358,7 +358,7 @@ public class SummonTest {
      * {@code allies}.
      *
      * <p>Note: This case replaces one that asserted a player-side master was <b>refused</b>. That was true until
-     * the friendly half of L-8 landed; the refusal existed because our only roster was
+     * the friendly half of that change landed; the refusal existed because our only roster was
      * {@code List<Character>} and a {@link Summon} had nowhere to go. Now there is {@code allies}, so the
      * contract is the routing rather than the refusal, and the friendly path itself (targeting, party buffs,
      * outcome, lifecycle) is pinned in {@code PlayerSideSummonTest}.

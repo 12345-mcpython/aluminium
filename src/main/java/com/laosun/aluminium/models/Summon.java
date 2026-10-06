@@ -21,11 +21,11 @@ import lombok.ToString;
  * <p><b>What a summon is not (yet).</b> It is a {@code CanHit}, not an {@code Enemy}, so it has a stat
  * sheet, a level, a skill and buffs, but <b>none of the monster-only mechanics</b>: no toughness bar
  * (nothing to break), no weakness list, no per-element damage resistance, no specific debuff resistance
- * and no phase table. That split is the L-8 one - the enemy camp holds any {@code CanHit} while
+ * and no phase table. That split is the camp split - the enemy camp holds any {@code CanHit} while
  * {@code Battle.enemyUnits()} is "the monsters in it" - and it is why those mechanics say
  * {@code instanceof Enemy} at their call sites instead of assuming every enemy-camp unit has them.
  *
- * <p><b>Still open</b> (the P9-4 remainder, all of it content or mechanism rather than placement):
+ * <p><b>Still open</b> (all of it content or mechanism rather than placement):
  * memosprites (忆灵) as they are actually described - a stat <b>snapshot</b> of the summoner and joint
  * attacks - and whatever decides <em>when</em> a roster entry is used, since an enemy skill's {@code SUMMON}
  * effect needs a "what to summon" column this data does not have (see {@code SkillEffectType.SUMMON}).

@@ -25,7 +25,7 @@ import java.util.Random;
  * {@code SkillExecutor}'s character-skill shapes.
  *
  * <p>Note: {@code hits} in {@code enemy_skills.json} means <b>segments</b>, not targets (8013010
- * "Trampling Stomp" is two segments on one target). {@code ROADMAP}'s P9-1 plan uses the same field name
+ * "Trampling Stomp" is two segments on one target). The plan for a future enemy skill table uses the same field name
  * for a target count, so these tests pin the meaning from the shipped side: if the field is ever
  * re-pointed, {@link #singleTargetIsTheDefaultAndHitsOnlyTheMainTarget} and
  * {@link #everySegmentLandsOnEveryTargetReached} change meaning with it.

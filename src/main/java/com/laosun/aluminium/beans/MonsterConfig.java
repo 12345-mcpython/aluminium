@@ -22,7 +22,7 @@ import java.util.Map;
  * patch file {@code monster_attack_modify_ratio.json}; all the multipliers are filled in uniformly in
  * {@code Constant}, so a loaded instance is never {@code null}.
  *
- * <p>Mechanic fields: {@code debuff_resistance} is wired up in P6-1 (example: Ice Edge (冰锋)
+ * <p>Mechanic fields: {@code debuff_resistance} is wired up (example: Ice Edge (冰锋)
  * {@code {"STAT_CTRL_Frozen": 1}} = fully immune to Frozen). {@code summon_id} is the monster's
  * <b>summon roster</b> - see the note below.
  *

@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * The ultimate's cast threshold (P3-4 follow-up): once {@code sp_need} is reached the ultimate can be cast; the
+ * The ultimate's cast threshold: once {@code sp_need} is reached the ultimate can be cast; the
  * {@code maxEnergy} bar does not have to be full.
  *
  * <p>5 of the 93 characters have a threshold below their cap (the data agrees with the character docs):

@@ -25,9 +25,9 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Trigger tables (P8-): character mechanics expressed as data.
+ * Trigger tables: character mechanics expressed as data.
  *
- * <p>The acceptance criterion from the roadmap is that <b>two real characters work with no Java
+ * <p>The acceptance criterion is that <b>two real characters work with no Java
  * character class at all</b> -- their mechanics exist only as JSON under
  * {@code resources/characters/}:
  * <ul>

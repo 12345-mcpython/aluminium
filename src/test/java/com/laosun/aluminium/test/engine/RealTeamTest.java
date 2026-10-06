@@ -18,7 +18,7 @@ import java.util.Random;
 /**
  * The real team assembly.
  *
- * <p>Until P8-5, {@code StageFactory.load} fought with a placeholder team built from
+ * <p>Formerly, {@code StageFactory.load} fought with a placeholder team built from
  * {@code Character.fromAttributes}: no element, no path, no real skills, and stat magnitudes chosen by
  * hand. This class pins what replaced it - a 4-character team from {@link CharacterFactory}, each
  * carrying a light cone of its own path.
@@ -104,7 +104,7 @@ public class RealTeamTest {
     }
 
     /**
-     * Note: {@code WeaponData.rarity} really binds. It was missing from the bean until P8-5 even though
+     * Note: {@code WeaponData.rarity} really binds. It was missing from the bean until recently even though
      * {@code weapons.json} has the field, which is the classic silent-Gson failure this project keeps
      * hitting: the pick would then always see {@code rarity == 0} and quietly fall back to sorting by
      * id alone (i.e. 3-star starter cones).
@@ -189,7 +189,7 @@ public class RealTeamTest {
         Assertions.assertTrue(battle.queue.getElapsed() > 0);
     }
 
-    /** The no-argument {@code load} uses the real team too (that is the whole point of P8-5). */
+    /** The no-argument {@code load} uses the real team too (that is the whole point of the real team). */
     @Test
     public void defaultLoadUsesTheRealTeam() {
         assumeStageData();

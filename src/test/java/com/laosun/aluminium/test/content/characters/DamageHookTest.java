@@ -98,7 +98,7 @@ public class DamageHookTest {
         Enemy enemy = enemy();
         enemy.getBuffManager().addBuff(new VulnerabilityBuff(2, 0.5));
 
-        // break gets no DMG boost / crit stats (blocked by BoostArea / CritArea's applies()), but it does get vulnerability - P4 reuses this
+        // break gets no DMG boost / crit stats (blocked by BoostArea / CritArea's applies()), but it does get vulnerability - the toughness-reduction step reuses this
         Assertions.assertEquals(1500, settle(attacker(), enemy, DamageType.BREAK), EPS);
     }
 
@@ -158,7 +158,7 @@ public class DamageHookTest {
     /**
      * An attacker-side debuff buff embedded in the test: proving that {@code DamageEvent} is also
      * triggered on the attacker side.
-     * (The production WeaknessBuff is left to P10-3 to do uniformly.)
+     * (The production WeaknessBuff is left to do the same thing uniformly.)
      */
     private static class WeaknessBuff extends AbstractBuff implements DamageEvent {
         private final double ratio;

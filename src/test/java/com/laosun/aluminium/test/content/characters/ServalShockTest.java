@@ -62,7 +62,6 @@ public class ServalShockTest {
     }
 
     /** The shock settles on the enemy's own turns. */
-    /** The shock settles on the enemy's own turns. */
     @Test
     public void theShockTicksOnTheEnemysTurn() {
         Fixture f = new Fixture(0.0);
@@ -113,8 +112,6 @@ public class ServalShockTest {
 
     /** The whole file is present, and the registered clauses are absent on purpose. */
     /** The whole file is present, and the registered clauses are absent on purpose. */
-    /** The whole file is present, and the registered clauses are absent on purpose. */
-    @Test
     public void herFileCarriesWhatItSays() {
         Assertions.assertEquals(1, TriggerTables.of(SERVAL).ruleCount(TriggerEvent.SKILL_CAST),
                 "the shock (the blast's damage is the engine's own path)");

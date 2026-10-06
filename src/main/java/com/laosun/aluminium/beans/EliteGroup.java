@@ -9,9 +9,9 @@ package com.laosun.aluminium.beans;
  * Beetle is HPRatio 6.2 / AttackRatio 1.1 and the Eye of Daybreak is 5.0; <b>using the wrong
  * table puts HP off by several times</b>.
  *
- * <p>This data directory does not have those two tables yet, so P2 only exposes the
+ * <p>This data directory does not have those two tables yet, so this class only exposes the
  * multipliers as parameters (see {@code EnemyScaler}), leaving "which table to read from and
- * how it follows the stage" to P-4 / P9.
+ * how it follows the stage" to the stage-wiring work.
  *
  * <p>Note: When wiring up the tables, first verify the JSON key names: in tbgd they are
  * {@code HPRatio} / {@code AttackRatio} / {@code DefenceRatio} / {@code SpeedRatio}, whereas

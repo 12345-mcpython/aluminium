@@ -11,7 +11,7 @@ import com.laosun.aluminium.models.CanHit;
  * <p>The trigger point is unique: the one place in {@code Battle.reduceToughness} that drains the
  * toughness and sets {@code broken} - so "an enemy already in the broken state keeps being hit"
  * (the super break computation path) does not fire it again.
- * Himeko's "break weakness +1[充能]", as well as P4-4's action bar push / DoT attachment, all
+ * Himeko's "break weakness +1[充能]", as well as the action bar push / DoT attachment, all
  * happen around this same moment.
  *
  * <p>Note: Difference from {@link KillEvent}: a break does not necessarily kill, and a death does not

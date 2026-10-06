@@ -24,10 +24,10 @@ import java.util.Random;
 /**
  * Talents and follow-up attacks, as pure data.
  *
- * <p>The engine capability landed in P8-6/P8-/P8-8 (events, trigger tables, resources) plus the
+ * <p>The engine capability needed here (events, trigger tables, resources) has landed, plus the
  * {@code DAMAGE} op and the {@code target} condition variable added here. What remains is content,
  * and content is JSON - this class asserts that two real characters work with <b>no Java character
- * class</b>, which is the whole point of the P8-0 three-way split.
+ * class</b>, which is the whole point of the three-way split.
  *
  * <h2>Where a follow-up attack comes from</h2>
  * The talent slot (4) is the source. That slot's {@code attack_type} is empty, and that is

@@ -217,7 +217,7 @@ public class ExtraTrueDamageTest {
     }
 
     // ==================================================================
-    // "Character effects" embedded in the test: the real implementation is left to P8-3;
+    // "Character effects" embedded in the test: the real implementation is not wired up yet;
     // here they are reproduced with the documented values
     // ==================================================================
 
@@ -318,7 +318,7 @@ public class ExtraTrueDamageTest {
      * 1403 Tribbie E1: to the target (of the additional damage) deal extra true damage equal to 24%
      * of this attack's total damage value.
      * Here the main target is used as an approximation of "the target the additional damage was
-     * dealt to" (TODO P8-3: wire it up through E1's full chain).
+     * dealt to" (TODO: wire it up through E1's full chain).
      */
     private static class TribbieE1Buff extends DamageReactor implements AttackEvent {
         private TribbieE1Buff(int duration, CanHit owner) {

@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * L-8: the enemy camp accepts any {@code CanHit}, so a {@link Summon} can fight alongside the monsters.
+ * The enemy camp accepts any {@code CanHit}, so a {@link Summon} can fight alongside the monsters.
  *
  * <p><b>What this is really testing.</b> Widening the roster's type is only worth anything if the rest of
  * the engine stops assuming "enemy camp == monsters". Four things could each have quietly kept the old

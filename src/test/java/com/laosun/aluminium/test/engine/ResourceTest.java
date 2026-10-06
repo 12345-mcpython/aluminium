@@ -31,7 +31,7 @@ import java.util.Random;
  * Stack resources: the abstraction that lets "stack instead of an energy bar" characters work
  * without a class of their own.
  *
- * <p>The abstraction itself is {@link Resource} (extracted during P8-4, where skill points became its
+ * <p>The abstraction itself is {@link Resource} (skill points became its
  * first user); this task adds the parts that make it usable by characters: a
  * {@link ResourceManager} each combatant owns, the "became full" signal, the two trigger ops
  * ({@code GAIN_RESOURCE} / {@code SPEND_RESOURCE}), and - the piece that actually unlocks the
@@ -195,7 +195,7 @@ public class ResourceTest {
     /**
      * A stack character can cast once the <b>resource</b> is full, and cannot before.
      *
-     * <p>This is the acceptance criterion from the roadmap. The test uses a stand-in provider because
+     * <p>This is the acceptance criterion. The test uses a stand-in provider because
      * the engine's job is the hook; wiring a specific character's numbers belongs with that
      * character's data.
      */
