@@ -389,7 +389,7 @@
       "id": "enhanced_basic_heals_on_slot_8",
       "when": [
         "actor == self",
-        "from_skill_id == 150308"
+        "from_skill_id == 8"
       ],
       "do": [
         {
@@ -413,14 +413,14 @@
         }
       ],
       "source": "1503 真珠 强化普攻 【行笔，幻造星月】 (150308): 「对敌方全体造成等同于真珠 100% 防御力的冰属性伤害，为我方全体目标回复等同于真珠 8.00% 防御力 + 160 的生命值，**额外**为**当前生命值百分比最低的**我方目标回复同样量」。",
-      "note": "⭐ 伤害不写在这里：它在 `skills.json` 的技能行里（`AoEAttack` 加倍率），引擎自己结算；本条只补那两段治疗（与她战技同一写法）。⭐ 触发靠 `BASIC_ATTACK` + `from_skill_id == <技能 ID>`：**该变量是数值变量**，必须带 `==`（写成 `from_skill_id 150308` 会报 “not a known shorthand”，实测）。  NOTE 2026-10-02: this rule also carries trait 1503102's dispel half -- \"on casting an enhanced basic or the Skill, dispel 1 debuff from every ally\" (corpus line 301), via DISPEL{amount: 1, target: all_allies}, the shape 1110 ships."
+      "note": "⭐ 伤害不写在这里：它在 `skills.json` 的技能行里（`AoEAttack` 加倍率），引擎自己结算；本条只补那两段治疗（与她战技同一写法）。⭐ 触发靠 `BASIC_ATTACK` + `from_skill_id == <技能 ID>`：**该变量是数值变量**，必须带 `==`（写成 `from_skill_id 150308` 会报 “not a known shorthand”，实测）。  NOTE 2026-10-02: this rule also carries trait 1503102's dispel half -- \"on casting an enhanced basic or the Skill, dispel 1 debuff from every ally\" (corpus line 301), via DISPEL{amount: 1, target: all_allies}, the shape 1110 ships.  FIXED 2026-10-02: the gate was `from_skill_id == 150308`, the DATA skill id, but `from_skill_id` carries the SLOT -- TriggerTable says so twice (\"carries the SLOT\", and the note about a rule ungated on it). So this rule could never fire. It is now `from_skill_id == 8`, the slot these two enhanced basics occupy."
     },
     {
       "on": "BASIC_ATTACK",
       "id": "enhanced_basic_heals_on_slot_9",
       "when": [
         "actor == self",
-        "from_skill_id == 150310"
+        "from_skill_id == 9"
       ],
       "do": [
         {
@@ -444,7 +444,7 @@
         }
       ],
       "source": "1503 真珠 强化普攻 【行笔，绘制末浪】 (150310): 「对敌方全体造成等同于真珠 100% 防御力的冰属性伤害，为我方全体目标回复等同于真珠 8.00% 防御力 + 160 的生命值，**额外**为**当前生命值百分比最低的**我方目标回复同样量」。",
-      "note": "⭐ 伤害不写在这里：它在 `skills.json` 的技能行里（`AoEAttack` 加倍率），引擎自己结算；本条只补那两段治疗（与她战技同一写法）。⭐ 触发靠 `BASIC_ATTACK` + `from_skill_id == <技能 ID>`：**该变量是数值变量**，必须带 `==`（写成 `from_skill_id 150308` 会报 “not a known shorthand”，实测）。  NOTE 2026-10-02: this rule also carries trait 1503102's dispel half -- \"on casting an enhanced basic or the Skill, dispel 1 debuff from every ally\" (corpus line 301), via DISPEL{amount: 1, target: all_allies}, the shape 1110 ships."
+      "note": "⭐ 伤害不写在这里：它在 `skills.json` 的技能行里（`AoEAttack` 加倍率），引擎自己结算；本条只补那两段治疗（与她战技同一写法）。⭐ 触发靠 `BASIC_ATTACK` + `from_skill_id == <技能 ID>`：**该变量是数值变量**，必须带 `==`（写成 `from_skill_id 150308` 会报 “not a known shorthand”，实测）。  NOTE 2026-10-02: this rule also carries trait 1503102's dispel half -- \"on casting an enhanced basic or the Skill, dispel 1 debuff from every ally\" (corpus line 301), via DISPEL{amount: 1, target: all_allies}, the shape 1110 ships.  FIXED 2026-10-02: the gate was `from_skill_id == 150310`, the DATA skill id, but `from_skill_id` carries the SLOT -- TriggerTable says so twice (\"carries the SLOT\", and the note about a rule ungated on it). So this rule could never fire. It is now `from_skill_id == 9`, the slot these two enhanced basics occupy."
     },
     {
       "on": "BATTLE_START",
