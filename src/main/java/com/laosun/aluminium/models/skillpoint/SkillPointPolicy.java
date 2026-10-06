@@ -89,6 +89,19 @@ public interface SkillPointPolicy {
     boolean canAfford();
 
     /**
+     * Whether the pool holds at least {@code points} skill points right now.
+     *
+     * <p>{@link #canAfford()} only ever answers "can the next action be paid for", which is one point for a
+     * skill. A clause that asks a different question -- light cone 23046 gates on the CAP, and the count
+     * itself is what other content reads -- needs the count, so the narrower question is kept and this one
+     * sits beside it rather than replacing it.
+     *
+     * @param points the number of points to check for
+     * @return whether the pool holds that many (a non-positive argument is trivially true)
+     */
+    boolean hasAtLeast(int points);
+
+    /**
      * Spends one charge.
      *
      * @return whether it succeeded; {@code false} means not enough (the value is unchanged)
