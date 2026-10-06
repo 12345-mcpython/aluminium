@@ -926,9 +926,33 @@ public class Battle {
         if (isOver()) {
             return;                                  // terminal state: the action bar does not advance
         }
+        // EXTRA_TURN_STARTED, and why the QUEUE is asked rather than tracked here.
+        // `Queue.moveExtraTurn()` consumes the pending flag as it hands the turn over, so from the turn's own
+        // TURN_START onward nothing outside the queue can tell an extra turn from an ordinary one. The queue holds
+        // that fact at exactly one moment - just before this move - so it is read here.
+        // Firing BEFORE `move()` is deliberate: "at the start of this extra turn" has to be in place before the unit
+        // acts (1503 grants a resource the archetype is about to spend), and after `move()` it is too late.
+        // The unit is remembered in `extraTurnBeingTaken` because the END cannot be announced here - the turn has not
+        // been acted out yet. See `afterMove()`.
+        // A grant that never becomes a turn (the holder dies or leaves the queue) never reaches this branch, so it
+        // announces neither boundary: the honest reading is that no extra turn happened.
+        boolean startingExtraTurn = queue.hasPendingExtraTurn();
         queue.move();
         currentMove = queue.getCurrentActor();
+        if (startingExtraTurn && currentMove != null) {
+            extraTurnBeingTaken = currentMove.getCanHit();
+            fireTriggersWithSubject(TriggerEvent.EXTRA_TURN_STARTED, extraTurnBeingTaken, extraTurnBeingTaken, 0);
+        }
     }
+
+    /**
+     * The unit whose extra turn is being acted out, or {@code null}.
+     *
+     * <p>Kept for one reason, and it is not derivable: between the start and the end of an extra turn the queue has
+     * already consumed everything that identifies it, and {@code currentMove} names whoever acts NEXT. It is set when
+     * the start is announced and cleared when the end is, so it cannot survive into an ordinary turn.
+     */
+    private CanHit extraTurnBeingTaken;
 
     /**
      * Whether the battle is already over (won or lost).
@@ -1360,6 +1384,16 @@ public class Battle {
         if (actor.getCurrentHp() <= 0 && actor.getBuffManager().defersDeath()) {
             actor.perish();
         }
+        }
+        // EXTRA_TURN_ENDED, and why it belongs HERE rather than beside the start.
+        // "At the end of this extra turn" is exactly this boundary: the unit has acted, its own hook has run
+        // (`afterMove`) and the late tick is done, so what the start granted has been spent. Announcing it at the move
+        // that STARTED the turn - which the first version of this change did - would make "at the start" and "at the
+        // end" the same instant, and a pair of events that cannot be told apart is not a pair.
+        // Note: Fired before `processRequests()` for the same reason TURN_END is: the rules may still produce effects.
+        if (extraTurnBeingTaken != null && extraTurnBeingTaken == actor) {
+            extraTurnBeingTaken = null;
+            fireTriggersWithSubject(TriggerEvent.EXTRA_TURN_ENDED, actor, actor, 0);
         }
         processRequests();
     }

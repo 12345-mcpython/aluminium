@@ -434,7 +434,32 @@ public enum TriggerEvent {
      * restore 1 skill point"). Note: Three readers: 23050, 1405's talent, 1006's Skill.
      * Note: Fired in {@code ADD_ELEMENTAL_WEAKNESS}'s success branch, so it only fires when one was really added.
      */
-    WEAKNESS_ADDED("WEAKNESS_ADDED", true);
+    WEAKNESS_ADDED("WEAKNESS_ADDED", true),
+
+    /**
+     * An <b>extra turn</b> (额外回合) is about to be taken: {@code actor} is the unit that was handed it, and the next
+     * {@link com.laosun.aluminium.Queue#move()} will be theirs.
+     *
+     * <p><b>Why this needed an event and could not be derived.</b> The engine forgets the extra turn the moment it
+     * starts: {@code Queue.moveExtraTurn} consumes {@code extraTurnActor} and moves it into {@code currentActor}, so
+     * from the turn's own {@code TURN_START} onward there is nothing on the battlefield saying "this turn is an extra
+     * one". A rule about such a turn therefore had no moment to hang on. This pair supplies it.
+     *
+     * <p><b>How the two differ, and why that is not a detail.</b> {@code EXTRA_TURN_STARTED} is fired <i>before</i>
+     * {@code queue.move()}, i.e. while the turn is still only SCHEDULED - which is the true reading of "at the start
+     * of this extra turn" for anything that must be in place before the unit acts (a resource it is about to spend).
+     * {@code EXTRA_TURN_ENDED} is fired after the turn has been acted out, alongside {@code setTopZero()}.
+     *
+     * <p>Note: Both fire once per extra turn, not once per grant: {@code Queue.grantExtraTurn} is idempotent and a
+     * second grant replaces the holder, so the pair is emitted at the boundaries of the turn that really happens.
+     */
+    EXTRA_TURN_STARTED("EXTRA_TURN_STARTED", true),
+
+    /**
+     * An extra turn has been acted out - the counterpart of {@link #EXTRA_TURN_STARTED}: {@code actor} is the unit
+     * that just took it. Reader: 1503 Pearl (真珠)'s "【美学底本】获得 30 点【好活当赏】…额外回合结束时移除".
+     */
+    EXTRA_TURN_ENDED("EXTRA_TURN_ENDED", true);
 
     private static final Map<String, TriggerEvent> BY_NAME = new HashMap<>();
 
