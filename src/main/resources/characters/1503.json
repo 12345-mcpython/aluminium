@@ -172,6 +172,63 @@
       ],
       "source": "1503 真珠 终结技: 「队伍中「欢愉」命途角色数量等于 4 或以上时，使【美学底本】获得 1 个额外回合」。",
       "note": "⭐ `EXTRA_TURN` 已有用例（1102 无参数、1309/1404/1501 写 `target: self`）。⚠ 同句后半“该额外回合开始时，【美学底本】获得 30 点【好活当赏】，并获得 60 点笑点，额外回合结束时移除”**本文件未写**：它需要一个“这个额外回合”的标记与结束时机，而【深度学习】与【美学底本】两个状态尚未建模。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon1_raises_elation_at_2_elation_allies",
+      "min_eidolon": 1,
+      "when": [
+        "allies_with_path:欢愉 >= 2"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ELATION_DAMAGE_BOOST",
+          "percent": 0.1,
+          "permanent": true,
+          "target": "all_allies"
+        }
+      ],
+      "source": "1503 真珠 星魂 1 珍珠，藏在海的留白处: 「队伍中「欢榆」命途角色数量等于 2 或以上时，使我方全体欢榆度提高 10%」。",
+      "note": "⭐ **属性本就存在** ✓：`ELATION_DAMAGE_BOOST` 定义在 `AttributeType:105`，并由数据列 `ElationDamageAddedRatioBase` 映射（`:288`），应用在 `TriggerInterpreter:5022` 与 `SkillExecutor:642` 两处 —— 所以这条只是内容。⭐ 三档写成三条递增阈值（同终结技的写法），作用对象 `all_allies`。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon1_raises_elation_at_3_elation_allies",
+      "min_eidolon": 1,
+      "when": [
+        "allies_with_path:欢愉 >= 3"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ELATION_DAMAGE_BOOST",
+          "percent": 0.2,
+          "permanent": true,
+          "target": "all_allies"
+        }
+      ],
+      "source": "1503 真珠 星魂 1 珍珠，藏在海的留白处: 「队伍中「欢榆」命途角色数量等于 3 或以上时，使我方全体欢榆度提高 20%」。",
+      "note": "⭐ **属性本就存在** ✓：`ELATION_DAMAGE_BOOST` 定义在 `AttributeType:105`，并由数据列 `ElationDamageAddedRatioBase` 映射（`:288`），应用在 `TriggerInterpreter:5022` 与 `SkillExecutor:642` 两处 —— 所以这条只是内容。⭐ 三档写成三条递增阈值（同终结技的写法），作用对象 `all_allies`。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon1_raises_elation_at_4_elation_allies",
+      "min_eidolon": 1,
+      "when": [
+        "allies_with_path:欢愉 >= 4"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ELATION_DAMAGE_BOOST",
+          "percent": 0.6,
+          "permanent": true,
+          "target": "all_allies"
+        }
+      ],
+      "source": "1503 真珠 星魂 1 珍珠，藏在海的留白处: 「队伍中「欢榆」命途角色数量等于 4 或以上时，使我方全体欢榆度提高 60%」。",
+      "note": "⭐ **属性本就存在** ✓：`ELATION_DAMAGE_BOOST` 定义在 `AttributeType:105`，并由数据列 `ElationDamageAddedRatioBase` 映射（`:288`），应用在 `TriggerInterpreter:5022` 与 `SkillExecutor:642` 两处 —— 所以这条只是内容。⭐ 三档写成三条递增阈值（同终结技的写法），作用对象 `all_allies`。"
     }
   ]
 }
