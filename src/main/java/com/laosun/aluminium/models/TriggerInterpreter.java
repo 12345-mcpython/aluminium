@@ -2921,7 +2921,10 @@ public final class TriggerInterpreter {
         // `party_resource:<name>` joins this list: like EVENT_AMOUNT it is a magnitude the op can read
         // but not an AttributeType, so the question "which attribute does this scale name" has no answer for it.
         if (SELF_MAX_ENERGY.equals(raw) || EVENT_AMOUNT.equals(raw) || raw.startsWith(ABOVE_PREFIX)
-                || raw.startsWith("party_resource:")) {
+                || raw.startsWith("party_resource:") || "elation_base".equals(raw)) {
+            // `elation_base` joins them: it is the Elation damage base from Constant's loaded level table
+            // (ROADMAP:1262's `基础值 × 欢愉倍率`), a magnitude `literalBase` resolves for the DAMAGE path --
+            // not one of the rule owner's attributes, so "which attribute does it name" has no answer.
             return null;                      // handled by derivedMagnitude; not an AttributeType
         }
         if (!raw.startsWith(TriggerTable.SELF_ATTR_PREFIX)) {
@@ -3284,7 +3287,8 @@ public final class TriggerInterpreter {
             "target_debuff_count", "target_dot_count", "target_weakness_count", "shielded_count");
 
     private static final Set<String> SCALES =
-        Set.of("target_max_hp", "target_lost_hp", "owner_max_hp", "actor_max_hp", "owner_def", "owner_attack");
+        Set.of("target_max_hp", "target_lost_hp", "owner_max_hp", "actor_max_hp", "owner_def", "owner_attack",
+            "elation_base");
 
     /**
      * The one scale {@code GAIN_ENERGY} accepts: a share of the <b>receiving</b> unit's maximum energy.
@@ -4959,6 +4963,25 @@ public final class TriggerInterpreter {
                             "a literal-ratio DAMAGE scaled by actor_max_hp has no actor to read it from");
                 }
                 return ctx.actor().getMaxHp() * share + flat;
+            }
+            case "elation_base" -> {
+                // The Elation damage base (ROADMAP:1262's `基础值 × 欢愉倍率`): the 101-row level table loaded as
+            // Constant.ELATION_BASIC_LEVEL_DAMAGE, read at the owner's Elation-skill level. Attack power plays
+            // no part in Elation damage, so this is the honest scale for such an instance; a rule that names
+            // `self_attr:ATTACK` instead is stating its own approximation.
+            if (ctx == null || ctx.owner() == null) {
+                throw new IllegalStateException(
+                        "a literal-ratio DAMAGE scaled by elation_base has no rule owner to read a level from");
+            }
+            Skill elationSkill = ctx.owner().getSkills().get(SkillType.ELATION_SKILL);
+            int level = elationSkill == null ? 1 : ctx.owner().skillLevel(elationSkill);
+            Double base = com.laosun.aluminium.Constant.ELATION_BASIC_LEVEL_DAMAGE.get(level);
+            if (base == null) {
+                throw new IllegalStateException(
+                        "elation_base has no table row for Elation-skill level " + level + "; the loaded table has "
+                                + com.laosun.aluminium.Constant.ELATION_BASIC_LEVEL_DAMAGE.size() + " rows");
+            }
+                return base * share + flat;
             }
             case "target_max_hp" -> {
                 if (victim == null) {
