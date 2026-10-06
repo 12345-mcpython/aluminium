@@ -49,6 +49,7 @@ import java.util.Set;
  *   <tr><th>op</th><th>arguments</th><th>status</th></tr>
  *   <tr><td>{@code GAIN_ENERGY}</td><td>{@code amount}</td><td>wired</td></tr>
  *   <tr><td>{@code GAIN_SKILL_POINT}</td><td>{@code amount}</td><td>wired</td></tr>
+ *   <tr><td>{@code RAISE_SKILL_POINT_CAP}</td><td>{@code amount} (negative takes the bonus away)</td><td>wired</td></tr>
  *   <tr><td>{@code HEAL}</td><td>{@code amount}, optional {@code target} - <b>or</b> {@code scale} +
  *       {@code percent} (a share of a Max HP)</td><td>wired</td></tr>
  *   <tr><td>{@code SHIELD}</td><td>{@code amount}, optional {@code target} - <b>or</b> {@code scale} +
@@ -126,6 +127,10 @@ public final class TriggerInterpreter {
             // "add an X attribute weakness to a designated single enemy" (readers 1315, 1310).
             "ADD_ELEMENTAL_WEAKNESS",
             "GAIN_ENERGY", "GAIN_SKILL_POINT", "HEAL", "SHIELD", "EXTRA_TURN", "ADVANCE",
+            // "while [character] is on the field the skill point cap is raised by #3" (reader: 1306,
+            // Sparkle): the cap is not a constant, so content needs a way to move it. Distinct from
+            // RAISE_RESOURCE_CAP, which widens a declared resource's OVERFLOW, not its cap.
+            "RAISE_SKILL_POINT_CAP",
             "GAIN_RESOURCE", "SPEND_RESOURCE", "DAMAGE", "MODIFY_ATTR", "APPLY_BUFF", "REMOVE_STACK", "RAISE_SKILL_HITS",
             // "[新蕊] can overflow to #3%" (reader: 114151, Castorice (遐蝶)): a declaration states a resource's overflow,
             // and `Resource` has had both tiers all along -- this widens the second one in battle.
@@ -386,6 +391,18 @@ public final class TriggerInterpreter {
             }
             case "GAIN_SKILL_POINT" -> {
                 requireAmount(effect, op, spec);
+                requireNoStackArguments(effect, op, spec);
+            }
+            case "RAISE_SKILL_POINT_CAP" -> {
+                // Unlike GAIN_SKILL_POINT, a negative amount is meaningful here: it takes a granted bonus
+                // back. Zero is not, because it would silently do nothing.
+                if (effect.getAmount() == null || effect.getAmount() == 0) {
+                    throw new IllegalArgumentException(
+                            "Op " + op + " changes the skill point cap, so \"amount\" is a non-zero number of points"
+                                    + " (negative takes a bonus away): got "
+                                    + (effect.getAmount() == null ? "nothing" : effect.getAmount())
+                                    + " (source: " + spec.getSource() + ")");
+                }
                 requireNoStackArguments(effect, op, spec);
             }
             case "HEAL", "SHIELD" -> {
@@ -1287,6 +1304,11 @@ public final class TriggerInterpreter {
                 }
             }
             case "RAISE_RESOURCE_CAP" -> raiseResourceCap(effect, ctx);
+            case "RAISE_SKILL_POINT_CAP" -> {
+                // The pool is team-level and its owner is the policy, so this is the one op that goes
+                // straight to the policy rather than through a unit's resources.
+                battle.skillPointPolicy.raiseMax((int) Math.round(effect.getAmount()));
+            }
             case "GAIN_RESOURCE" -> {
                 CanHit mover = ctx.owner();
                 String movedId = effect.getResource();

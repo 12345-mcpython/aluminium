@@ -212,6 +212,11 @@ public class StandardSkillPointPolicy implements SkillPointPolicy {
     }
 
     @Override
+    public int raiseMax(int delta) {
+        return resource.raiseMax(delta);
+    }
+
+    @Override
     public int gain(int delta) {
         return resource.gainClamped(delta);
     }

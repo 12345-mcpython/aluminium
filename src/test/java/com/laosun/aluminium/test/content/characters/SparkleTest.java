@@ -90,4 +90,20 @@ public class SparkleTest {
             }
         };
     }
+
+    /** Note: Her talent: "while Sparkle is on the field the skill point cap is raised by 2" (tbgd 130604). */
+    @Test
+    public void herTalentRaisesTheTeamCap() {
+        int withHer = capWith(List.of(CharacterFactory.create(SPARKLE, LEVEL), CharacterFactory.create(ALLY, LEVEL)));
+        int withoutHer = capWith(List.of(CharacterFactory.create(ALLY, LEVEL)));
+        System.out.println("[sparkle_cap] the team cap with her = " + withHer + " ; without her = " + withoutHer);
+        Assertions.assertEquals(5, withoutHer, "the conventional cap, with nobody raising it");
+        Assertions.assertEquals(7, withHer, "her talent raises the team's cap by 2 (tbgd 130604 param #3)");
+    }
+
+    private static int capWith(List<Character> team) {
+        Battle battle = new Battle(team, List.of(EnemyFactory.create(MONSTER, 90, 1)), fixed());
+        battle.startBattle();
+        return battle.getSkillPointMax();
+    }
 }
