@@ -2147,3 +2147,19 @@ has been loaded yet”，第 60 行定义 `ELATION("elation", true, false)`（**
 
 ⭐ 影响面：真珠的四条欢榆技档位（现在全部不触发）；其它把
 `allies_with_path` 放在 `CAST_SETUP` 上的内容会有同样问题（目前只有真珠）。
+
+### ✅ 撤回（2026-10-02）：`from_category` 没有问题，是我的实验污染了读数
+
+⭐ 前面两节登记的“从哪来的 `carriers=0`”与“怀疑 `from_category ElationDamage` 不匹配”
+**都是假警报**：那些读数是在**我自己的实验还没恢复**的文件上取的。
+
+⭐ 恢复后的同一轮读数：`[same] gate-probe delta=1.0 carriers=2`；
+而正式判据 `PearlElationSkillCarrierTest` 立刻通过：
+
+> `[pearl_carrier] armed by the Elation skill: [1503, 1502, 1204] ; armed by BPSKILL: []`
+
+⇒ ⭐ 四条欢榆技档位规则**一直是工作的**；变异（摘掉 `from_category`）打红。
+
+⭐ **教训（本会话第五条方法论）**：做实验性修改时，
+**必须在同一次调用里备份并恢复**，而不是依赖后续手动 `git checkout`——
+我因为忘了恢复，在改过的文件上读了四次，并两次把错误结论写进台账。
