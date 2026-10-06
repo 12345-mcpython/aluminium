@@ -1534,3 +1534,19 @@ checkResult();
 
 1. ⭐ **`is_enemy`** ✗ —— ⭐ 阵营词只有 `is_ally` ✗／`is_other_ally` ✗ ✓；⭐ 落点四处已量（⭐ 模式／⭐ 解析分支／⭐ 条件类照 `IsAlly` ✗／⭐ `requireCarriedParty` ✗ 链 ✓）✓
 2. ⭐ **"⭐ 敌人施放技能 ✗" ✗** 本身不存在 ✓ —— ⭐ 敌人的动作是一次**攻击** ✓ ⇒ ⭐ 该从句应读作"⭐ 敌人出手 ✗" ✓
+
+### F-5 收口（2026-10-02 同日，第三次尝试）：⭐ `is_enemy` ✗ 补齐，⭐ 阵营词两侧齐全 ✓
+
+⭐ 上一轮出货了**敌方出手的事件** ✓，⭐ 这一轮补**阵营词** ✓。⭐ 做法照旧：⭐ **先把要镜像的代码读全** ✓（⭐ `IsAlly` ✗ 的 `partyOf` ✗／`test` ✗／`source` ✗ 三方法 ✓ ＋ ⭐ 它依赖的 `requireCarriedParty` ✗／`requireStateSubject` ✗ ✓）⇒ ⭐ 一次编译过 ✓。
+
+| 处 | 内容 |
+|---|---|
+| ⭐ 模式 | ⭐ `IS_ENEMY` ✗（⭐ 照 `IS_ALLY` ✗ ✓），⭐ javadoc ✗ 记"⭐ 阵营词原本是单边的 ✗" |
+| ⭐ 解析分支 | ⭐ 照 `is_ally` ✗ 那段 ✓（⭐ 同样的"⭐ 后面不许再写东西 ✗"⭐ 校验 ✓，⭐ 提示语给 `actor is_enemy` ✗／⭐ `!actor is_enemy` ✗ ✓） |
+| ⭐ 条件类 | ⭐ `IsEnemy implements Condition, PartyCondition` ✗ ✓，⭐ `partyOf` ✗ 与 `IsAlly` ✗ 逐字相同 ✓，⭐ `test` ✗ 答 **`ctx.battle().enemies.contains(who)`** ✗ ✓ |
+
+⭐ **判据**（⭐ 用刚出货的 `ENEMY_ATTACK` ✗，⭐ 两条规则靠**不同属性**区分 ✓）：
+`[is_enemy] ATTACK 894.13632 -> 1243.40832 ; CRIT_ATTACK 0.5 -> 0.5` ✓
+⭐ **变异**（⭐ `enemies.contains` ✗ ⇒ `allies.contains` ✗）⇒ ⭐ **RED** ✗（⭐ 两侧都不命中 ✓）✓。
+
+⭐ ⚠ 两次变异都做了 ✓：⭐ 事件那侧删宣告 ⇒ RED ✓；⭐ 阵营这侧换边 ⇒ RED ✓ ⇒ ⭐ **两半各自承重** ✓。

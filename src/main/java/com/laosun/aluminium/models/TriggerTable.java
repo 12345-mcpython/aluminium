@@ -1027,6 +1027,17 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
             Pattern.compile("(?<![\\w])is_ally(?![\\w])", Pattern.CASE_INSENSITIVE);
 
     /**
+     * The {@code is_enemy} keyword: "&lt;who&gt; is on the OTHER side" - the mirror of {@link #IS_ALLY}.
+     *
+     * <p><b>Why it was needed.</b> The camp vocabulary was one-sided: a rule could say "a teammate attacked"
+     * ({@code actor is_ally}) but not "an enemy did", so every clause about the other camp had to be written some
+     * other way or not at all. That is the second half of F-5, and it became writable once an enemy's attack had
+     * an event of its own ({@code TriggerEvent.ENEMY_ATTACK}).
+     */
+    private static final Pattern IS_ENEMY =
+            Pattern.compile("(?<![\\w])is_enemy(?![\\w])", Pattern.CASE_INSENSITIVE);
+
+    /**
      * The {@code is_summon} keyword: "&lt;who&gt; is a memosprite" -- the fourth predicate.
      *
      * <p>Note: Why it was needed: "对万敌施放时…" is 1415's memosprite skill 8, and the only spelling that names a SKILL is
@@ -1398,6 +1409,19 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
                                 + "(write \"actor is_other_ally\") (source: " + spec.getSource() + ")");
             }
             return new IsOtherAlly(requireCarriedParty(requireStateSubject(subject, raw, spec), raw, spec), raw);
+        }
+
+        Matcher isEnemy = IS_ENEMY.matcher(text);
+        if (isEnemy.find()) {
+            String subject = normalize(text.substring(0, isEnemy.start()));
+            String trailing = text.substring(isEnemy.end()).trim();
+            if (!trailing.isEmpty()) {
+                throw new IllegalArgumentException(
+                        "Condition '" + raw + "' writes something after \"is_enemy\": it takes no argument "
+                                + "(write \"actor is_enemy\", or \"!actor is_enemy\" for the opposite) "
+                                + "(source: " + spec.getSource() + ")");
+            }
+            return new IsEnemy(requireCarriedParty(requireStateSubject(subject, raw, spec), raw, spec), raw, spec);
         }
 
         Matcher isAlly = IS_ALLY.matcher(text);
@@ -2654,6 +2678,39 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
         public boolean test(TriggerContext ctx) {
             CanHit who = partyOf(ctx);
             return who != null && ctx.battle() != null && ctx.battle().allies.contains(who);
+        }
+
+        @Override
+        public String source() {
+            return raw;
+        }
+    }
+
+    /** Side test: {@code actor is_enemy} - "the unit that caused this event is on the other side". */
+    private static final class IsEnemy implements Condition, PartyCondition {
+
+        private final String subject;
+        private final String raw;
+
+        IsEnemy(String subject, String raw, TriggerSpec spec) {
+            this.subject = subject;
+            this.raw = raw;
+        }
+
+        @Override
+        public CanHit partyOf(TriggerContext ctx) {
+            return switch (subject) {
+                case "self" -> ctx.owner();
+                case "actor" -> ctx.actor();
+                case "target" -> ctx.target();
+                default -> null;
+            };
+        }
+
+        @Override
+        public boolean test(TriggerContext ctx) {
+            CanHit who = partyOf(ctx);
+            return who != null && ctx.battle() != null && ctx.battle().enemies.contains(who);
         }
 
         @Override
