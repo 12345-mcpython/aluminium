@@ -2237,3 +2237,20 @@ has been loaded yet”，第 60 行定义 `ELATION("elation", true, false)`（**
 
 ⭐ **已撤回**：四条兼现规则与它们的判据（树保持绿）。成果保留在引擎侧：
 `element: "attacker"`、`scale: "elation_base"`、笑点乘区、`ELATION_DAMAGE_AMP` 全部已落地且有判据。
+
+### ✅ 已落地：`ADD_DAMAGE` 现在读 `damage_type`（2026-10-02）
+
+⭐ 两处改动：校验的 `DAMAGE_TYPE_READERS` 名单收入 `ADD_DAMAGE`；
+处理器在类型为 `ELATION` 时，把**欢榆度、增笑与笑点三个因子**乘到追加量上
+（从 **攻击者**读，不是规则拥有者）。⭐ 全量绿。
+
+### ⛔ 仍差一步：`ADD_DAMAGE` 的量读不到表背的 scale
+
+⭐ 把兼现写成 `ADD_DAMAGE{scale: "elation_base", percent: P, damage_type: "ELATION"}` 后，
+它的量走 `derivedMagnitude`，而那个读取器解析的是**属性**；`elation_base` 不是属性，
+于是返回 null，结算在 `AttributeType.ordinal()` 上 NPE。实测原文：
+`Cannot invoke "AttributeType.ordinal()" because "attributeType" is null`。
+
+⇒ ⭐ 下一步很确定：把 `literalBase` 里那段查表抽成一个**共用 helper**（`DAMAGE` 与 `ADD_DAMAGE` 各调一次），
+而不是在 `addDamageFlat` 里再写一份。我试过一版，写坏在锚点缩进上（脚本在写盘前退出，文件未动）。
+⇒ 兼现端的四条规则与判据**已撤回**，树保持绿。
