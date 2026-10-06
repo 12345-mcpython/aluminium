@@ -83,7 +83,7 @@ public class CastSetupTest {
         battle.castImmediate(new DefaultSkill(OWNER, ULTRA_SLOT, 1), owner, List.of(enemy));
 
         Assertions.assertEquals(0, hpBefore - enemy.getCurrentHp(), EPS,
-                "\"make the memosprite '长夜' ... deal damage\": the damage is the memosprite's, so her cast swings nothing of its own");
+                "\"make the memosprite Evey (长夜) ... deal damage\": the damage is the memosprite's, so her cast swings nothing of its own");
         Assertions.assertEquals(BAR, enemy.getStance(), EPS,
                 "...and the toughness of that swing goes with it, to whoever delivers it");
     }

@@ -62,7 +62,7 @@ public class SkillAttributionTest {
         f.breakWith(new DefaultSkill(HIMEKO, SKILL_SLOT, 1));
 
         Assertions.assertEquals(2, f.charge(),
-                "the talent pays for anybody's break, and 星魂 4 pays a second one for a break caused by her 战技");
+                "the talent pays for anybody's break, and Eidolon (星魂) 4 pays a second one for a break caused by her Skill (战技)");
     }
 
     /**
@@ -79,7 +79,7 @@ public class SkillAttributionTest {
         f.breakWith(new DefaultSkill(HIMEKO, BASIC_SLOT, 1));
 
         Assertions.assertEquals(1, f.charge(),
-                "a 普攻 break is the talent's, not 星魂 4's -- and `actor == self` alone cannot tell them apart");
+                "a Basic ATK (普攻) break is the talent's, not Eidolon (星魂) 4's -- and `actor == self` alone cannot tell them apart");
     }
 
     /**
@@ -96,7 +96,7 @@ public class SkillAttributionTest {
 
         f.breakWith(new DefaultSkill(HIMEKO, ULTIMATE_SLOT, 1));
 
-        Assertions.assertEquals(1, f.charge(), "「施放战技」 is not 「施放终结技」");
+        Assertions.assertEquals(1, f.charge(), "「施放战技」 (casting a Skill) is not 「施放终结技」 (casting an Ultimate)");
     }
 
     /** The actor gate still matters: a break caused by an ally's Skill (战技) pays the talent but not her Eidolon. */
@@ -107,7 +107,7 @@ public class SkillAttributionTest {
 
         f.battle.reduceToughness(ally, f.enemy, DamageElement.FIRE, 60, SkillCategory.BPSKILL);
 
-        Assertions.assertEquals(1, f.charge(), "an ally's skill break is not 「姬子施放战技」");
+        Assertions.assertEquals(1, f.charge(), "an ally's skill break is not 「姬子施放战技」 (Himeko casts a Skill)");
     }
 
     /** Note: A break with no causing instance answers false: the event happened, but nothing can say which slot caused it. */
@@ -195,7 +195,7 @@ public class SkillAttributionTest {
                 .stream()
                 .filter(candidate -> candidate.minEidolon() == 4)
                 .findFirst()
-                .orElseThrow(() -> new AssertionError("星魂 4's rule is gone from characters/1003.json"));
+                .orElseThrow(() -> new AssertionError("Eidolon (星魂) 4's rule is gone from characters/1003.json"));
 
         Assertions.assertEquals(List.of("actor == self", "from_skill SKILL"),
                 rule.conditions().stream().map(TriggerTable.Condition::source).toList());

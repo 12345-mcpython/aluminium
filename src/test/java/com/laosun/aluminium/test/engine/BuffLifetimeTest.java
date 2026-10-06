@@ -184,7 +184,7 @@ public class BuffLifetimeTest {
 
         attack(byAttack, attacker, 1);
         Assertions.assertEquals(0, critRateBonus(attacker), EPS,
-                "「普攻或战技」: either one is enough");
+                "「普攻或战技」 (a Basic ATK or a Skill): either one is enough");
     }
 
     /**
@@ -286,7 +286,7 @@ public class BuffLifetimeTest {
         attack(battle, wearer, 1);
 
         Assertions.assertEquals(bare, critRateOf(wearer), EPS,
-                "「持续到施放首次攻击后结束」 -- and the first attack has happened");
+                "「持续到施放首次攻击后结束」 (lasts until the first attack is cast, then ends) -- and the first attack has happened");
     }
 
     /** Below the threshold nothing is granted at all. */

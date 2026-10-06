@@ -45,10 +45,10 @@ public class EvanesciaUltRiderTest {
     public void theUltimateRiderNeedsTheGifts() {
         double withGifts = ultimateDamage(true);
         double without = ultimateDamage(false);
-        System.out.println("[1505-ult] the ultimate took " + withGifts + " in total while holding [好活当赏] and "
+        System.out.println("[1505-ult] the ultimate took " + withGifts + " in total while holding [好活当赏] (Certified Banger) and "
                 + without + " after spending it (difference " + (withGifts - without) + ")");
         Assertions.assertTrue(without > 0, "the ultimate itself deals damage");
-        Assertions.assertTrue(withGifts > without, "holding [好活当赏] adds the all-enemy Elation rider");
+        Assertions.assertTrue(withGifts > without, "holding [好活当赏] (Certified Banger) adds the all-enemy Elation rider");
     }
 
     /** The shipped rule, read off the compiled table (discipline 232): the number, the scope and the type. */

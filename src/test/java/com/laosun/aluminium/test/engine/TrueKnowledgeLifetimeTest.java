@@ -44,8 +44,8 @@ public class TrueKnowledgeLifetimeTest {
                 List.of(battle.enemies.getFirst()));
         battle.processRequests();
         boolean still = battle.characters.get(1).getBuffManager().hasState(KNOWLEDGE);
-        System.out.println("[knowledge_lifetime] after the cast that grants it, 【真知】 is "
+        System.out.println("[knowledge_lifetime] after the cast that grants it, 【真知】 (True Knowledge) is "
                 + (still ? "still on him" : "gone"));
-        Assertions.assertTrue(still, "the cast that grants 【真知】 must not also consume it");
+        Assertions.assertTrue(still, "the cast that grants 【真知】 (True Knowledge) must not also consume it");
     }
 }

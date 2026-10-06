@@ -66,7 +66,7 @@ public class ElationBrimmingWithBlessingsTest {
         battle.fireTriggers(TriggerEvent.ULT_CAST, wearer, ally, 1, 0);
         double afterAlly = ally.getAttribute(AttributeType.ELATION_DAMAGE_BOOST).get() - allyBase;
         System.out.println("[24006] ult on enemy: +" + afterEnemy + " ; ult on ally: +" + afterAlly);
-        Assertions.assertEquals(0.0, afterEnemy, 1e-9, "an enemy is not 我方单体角色 (false case)");
+        Assertions.assertEquals(0.0, afterEnemy, 1e-9, "an enemy is not a single ally (我方单体角色) -- the false case");
         Assertions.assertEquals(0.12, afterAlly, 1e-9, "an ally is, and the Ultimate counts too");
     }
 

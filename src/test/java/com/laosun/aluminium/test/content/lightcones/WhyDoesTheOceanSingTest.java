@@ -43,7 +43,7 @@ public class WhyDoesTheOceanSingTest {
 
             var ensnare = table.rulesFor(TriggerEvent.DEBUFF_APPLIED).stream()
                     .filter(r -> r.id().equals("cone23047_ensnare")).toList();
-            Assertions.assertEquals(1, ensnare.size(), "rank " + rank + ": the 魂迷 rule");
+            Assertions.assertEquals(1, ensnare.size(), "rank " + rank + ": the Enthrallment (魂迷) rule");
             Assertions.assertEquals(List.of("actor == self"),
                     ensnare.getFirst().conditions().stream().map(c -> c.source()).toList(),
                     "rank " + rank + ": only a debuff the WEARER applied (the event's actor is the applier)");

@@ -27,7 +27,7 @@ public class TrueSelfOdeGivesStoryTest {
     public void aRuleCanPutAResourceOnTheMemosprite() {
         double with = story(true);
         double without = story(false);
-        System.out.println("[true_self] the memosprite's 【故事】 reads " + with + " with the ode and " + without
+        System.out.println("[true_self] the memosprite's 【故事】 (Story) reads " + with + " with the ode and " + without
                 + " without it");
         Assertions.assertEquals(1.0, with, 1e-9, "her ultimate gives the memosprite one point");
         Assertions.assertEquals(0.0, without, 1e-9, "and without the ode there is no counter at all");

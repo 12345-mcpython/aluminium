@@ -59,7 +59,7 @@ public class SiblingElationTest {
             battle.fireTriggers(TriggerEvent.ALLY_ATTACK, tb, enemy, 0, 0);
 
             Assertions.assertEquals(10.0, tb.getCurrentEnergy() - before, 1e-6,
-                    "cid " + cid + ": 「施放攻击后，固定恢复10点能量」");
+                    "cid " + cid + ": \"after casting an attack, restores a fixed 10 Energy\" (「施放攻击后，固定恢复10点能量」)");
         }
     }
 
@@ -72,8 +72,8 @@ public class SiblingElationTest {
             // engine's reading of an Elation skill's row ("8 次随机单体 + 最后一次均分", whose leading column is a HIT
             // COUNT): before that, a commanded Elation cast settled as ONE 800% instance. See `ElationRowTest`.
             Assertions.assertEquals(4, table.ruleCount(TriggerEvent.ULT_CAST),
-                    "cid " + cid + ": 终结技现在是四条 —— 暴伤 buff、无欢愉技时的行动提前、"
-                            + "获得 5 个笑点、以及「若目标拥有欢愉技…使其立即施放 1 次欢愉技」");
+                    "cid " + cid + ": the Ultimate now has four clauses -- the CRIT DMG buff, the action advance when there is no Elation Skill, "
+                            + "gains 5 Punchline, and \"if the target has an Elation Skill ... makes it immediately cast 1 Elation Skill\" (「若目标拥有欢愉技…使其立即施放 1 次欢愉技」)");
             Assertions.assertEquals(1, table.ruleCount(TriggerEvent.ALLY_ATTACK), "cid " + cid);
             Assertions.assertEquals(1, table.ruleCount(TriggerEvent.BATTLE_START), "cid " + cid);
         }
@@ -106,7 +106,7 @@ public class SiblingElationTest {
 
         Assertions.assertTrue(plain[0] > 0, "precondition: the ally still had action value to give away");
         Assertions.assertEquals(plain[0] / 2, plain[1], 1e-9,
-                "「使其行动提前50%」: " + plain[0] + " -> " + plain[1] + " (half of the REMAINING wait)");
+                "\"advances its action by 50%\" (「使其行动提前50%」): " + plain[0] + " -> " + plain[1] + " (half of the REMAINING wait)");
         Assertions.assertEquals(elation[0], elation[1], 1e-9,
                 "and an ally who HAS an Elation skill is the document's other branch: nothing may be advanced ("
                         + elation[0] + " -> " + elation[1] + ")");

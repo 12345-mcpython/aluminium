@@ -37,7 +37,7 @@ public class HuohuoTalismanDurationTest {
 
         SkillExecutor.execute(battle, her.getSkills().get(SkillType.SKILL), her, List.of(her));
         battle.processRequests();
-        Assertions.assertTrue(her.getBuffManager().hasState(STATE), "precondition: her skill grants 【禳命】");
+        Assertions.assertTrue(her.getBuffManager().hasState(STATE), "precondition: her skill grants 【禳命】 (Divine Provision)");
 
         spendTurnOf(battle, ally);
         boolean afterAllyTurn = her.getBuffManager().hasState(STATE);
@@ -49,9 +49,9 @@ public class HuohuoTalismanDurationTest {
                 + " ; after her 1st=" + afterHerFirstTurn + " ; after her 2nd=" + afterHerSecondTurn);
 
         Assertions.assertTrue(afterAllyTurn,
-                "「藿藿每回合开始时」-- the clock is HERS, so a teammate's turn costs it nothing");
-        Assertions.assertTrue(afterHerFirstTurn, "「持续 2 回合」-- one of her turns is not two");
-        Assertions.assertFalse(afterHerSecondTurn, "「持续回合数减 1」-- two of her turns spend it");
+                "「藿藿每回合开始时」 (at the start of each of Huohuo's turns)-- the clock is HERS, so a teammate's turn costs it nothing");
+        Assertions.assertTrue(afterHerFirstTurn, "「持续 2 回合」 (lasts 2 turns)-- one of her turns is not two");
+        Assertions.assertFalse(afterHerSecondTurn, "「持续回合数减 1」 (the remaining turns are reduced by 1)-- two of her turns spend it");
     }
 
     /** Note: Half a turn is `beforeMove()` alone; a full one is both halves, and expiry lands on the late half. */

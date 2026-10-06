@@ -70,7 +70,7 @@ public class OdeToStrifeAdvanceTest {
         System.out.println("[advance] in bloodfeud: " + before + " -> " + after
                 + " (his SKILL slot = " + mydei.getSkills().get(com.laosun.aluminium.enums.SkillType.SKILL).getSkillSlot() + ")");
         Assertions.assertEquals(before, after, EPS,
-                "「if Mydei is in [血仇]」-- that branch commands him instead of advancing him");
+                "「if Mydei is in [血仇] (Vendetta)」-- that branch commands him instead of advancing him");
     }
 
     // ==================================================================

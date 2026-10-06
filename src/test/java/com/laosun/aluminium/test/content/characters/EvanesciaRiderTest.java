@@ -43,11 +43,11 @@ public class EvanesciaRiderTest {
     public void theRiderNeedsTheGifts() {
         double withGifts = skillDamage(true);
         double without = skillDamage(false);
-        System.out.println("[1505-rider] the skill took " + withGifts + " while holding [好活当赏] and "
+        System.out.println("[1505-rider] the skill took " + withGifts + " while holding [好活当赏] (Certified Banger) and "
                 + without + " after spending it (difference " + (withGifts - without) + ")");
         Assertions.assertTrue(without > 0, "the skill itself deals damage");
         Assertions.assertTrue(withGifts > without,
-                "and holding [好活当赏] adds the 8% Elation rider on top");
+                "and holding [好活当赏] (Certified Banger) adds the 8% Elation rider on top");
     }
 
     /**

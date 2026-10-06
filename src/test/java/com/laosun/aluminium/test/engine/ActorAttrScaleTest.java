@@ -68,12 +68,12 @@ public class ActorAttrScaleTest {
 
         double fromActor = SHARE * demiurge.getMaxHp();
         double fromOwner = SHARE * recipient.getMaxHp();
-        System.out.println("[actor_attr] the actor 德谬歌 Max HP = " + demiurge.getMaxHp()
+        System.out.println("[actor_attr] the actor Demiurge (德谬歌) Max HP = " + demiurge.getMaxHp()
                 + " ; the owner Max HP = " + recipient.getMaxHp() + " ; the gain = " + gained
                 + " ; 10% of the actor = " + fromActor + " ; 10% of the owner = " + fromOwner);
 
         Assertions.assertEquals(fromActor, gained, Math.abs(fromActor) * 1e-6,
-                "the raise is equal to #1% of **德谬歌**'s Max HP\" -- the ACTOR is the unit the share is of");
+                "the raise is equal to #1% of **Demiurge (德谬歌)**'s Max HP\" -- the ACTOR is the unit the share is of");
         Assertions.assertNotEquals(fromOwner, gained, Math.abs(fromActor) * 1e-6,
                 "and the rule owner is a different unit here, so the two readings are distinguishable");
     }

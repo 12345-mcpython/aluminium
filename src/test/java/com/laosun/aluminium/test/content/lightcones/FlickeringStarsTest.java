@@ -72,7 +72,7 @@ public class FlickeringStarsTest {
         spendAs(battle, wearer, THRESHOLD);
         System.out.println("[23061] after the WEARER's own four spends: crown="
                 + wearer.getBuffManager().hasState(CROWN));
-        Assertions.assertTrue(wearer.getBuffManager().hasState(CROWN), "我方任意角色 includes the wearer");
+        Assertions.assertTrue(wearer.getBuffManager().hasState(CROWN), "any ally (我方任意角色) includes the wearer");
     }
 
     @Test

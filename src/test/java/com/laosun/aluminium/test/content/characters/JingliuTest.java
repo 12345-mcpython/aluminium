@@ -33,13 +33,13 @@ public class JingliuTest {
 
         battle.fireTriggers(TriggerEvent.SKILL_CAST, jingliu, enemy, 0, 0);
         Assertions.assertEquals(1, jingliu.getBuffManager().stacksOf("朔望"),
-                "「并获得1层【朔望】」");
+                "「并获得1层【朔望】」 (and gains 1 stack of [朔望])");
 
         for (int i = 0; i < 4; i++) {
             battle.fireTriggers(TriggerEvent.SKILL_CAST, jingliu, enemy, 0, 0);
         }
         Assertions.assertEquals(3, jingliu.getBuffManager().stacksOf("朔望"),
-                "「【朔望】最多可累计3层」 -- five casts must still read three");
+                "「【朔望】最多可累计3层」 ([朔望] accumulates at most 3 stacks) -- five casts must still read three");
     }
 
     /** Note: The threshold: the SECOND cast reaches two stacks and must Advance; the first must not. */
@@ -53,7 +53,7 @@ public class JingliuTest {
         Assertions.assertEquals(1.0, afterOne / untouched, 1e-6,
                 "with ONE stack the Advance must not fire: " + untouched + " -> " + afterOne);
         Assertions.assertEquals(0.0, afterTwo, 1e-6,
-                "「当拥有2层【朔望】时…使行动提前100%」: " + untouched + " -> " + afterTwo);
+                "「当拥有2层【朔望】时…使行动提前100%」 (at 2 stacks of [朔望] ... advances her action by 100%): " + untouched + " -> " + afterTwo);
     }
 
     /** Casts the Skill `casts` times (the RULES build the stacks) and returns her remaining wait. */

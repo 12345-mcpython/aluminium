@@ -48,7 +48,7 @@ public class ElationAccumulatorTest {
         int first = elation.getResources().value(ACC);
         System.out.println("[acc] a 300-energy gain added " + big + " ; a 100 one added " + small
                 + " ; the counter now reads " + first + " (240 + 100)");
-        Assertions.assertEquals(240, big, "单次获得能量时最多获得 240 点累计值 (a single energy gain adds at most 240 accumulated)");
+        Assertions.assertEquals(240, big, "\"a single energy gain adds at most 240 accumulated points\" (单次获得能量时最多获得 240 点累计值)");
         Assertions.assertEquals(100, small, "below the ceiling a gain is taken whole");
         Assertions.assertEquals(340, first, "and the counter accumulates rather than resetting");
     }

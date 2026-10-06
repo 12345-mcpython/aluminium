@@ -70,7 +70,7 @@ public class DazzledByAFloweryWorldPushTest {
         double allyDelta = ally.getAttribute(AttributeType.ELATION_DAMAGE_BOOST).get() - allyBase;
         System.out.println("[23053push] after four spends in one turn: push=" + wearer.getBuffManager().hasState(PUSH)
                 + " party elation +" + allyDelta + " counter=" + wearer.getBuffManager().stacksOf(SPENT));
-        Assertions.assertTrue(wearer.getBuffManager().hasState(PUSH), "four spends in one turn grant 【推流】");
+        Assertions.assertTrue(wearer.getBuffManager().hasState(PUSH), "four spends in one turn grant 【推流】 (Stream Promo)");
         Assertions.assertEquals(BURST, allyDelta, 1e-9, "and the whole party gains 20% elation damage");
         Assertions.assertEquals(0, wearer.getBuffManager().stacksOf(SPENT), "the counter is cleared by the payout");
     }
@@ -84,7 +84,7 @@ public class DazzledByAFloweryWorldPushTest {
         spend(battle, 1);
         System.out.println("[23053push] three, then a turn boundary (counter=" + afterBoundary + "), then one: push="
                 + wearer.getBuffManager().hasState(PUSH));
-        Assertions.assertEquals(0, afterBoundary, "the turn boundary clears the counter -- 同一回合内");
+        Assertions.assertEquals(0, afterBoundary, "the turn boundary clears the counter -- within the same turn (同一回合内)");
         Assertions.assertFalse(wearer.getBuffManager().hasState(PUSH),
                 "so the fourth spend in ANOTHER turn must not pay out (false case)");
     }

@@ -49,9 +49,9 @@ public class EnhancedSkillDataProbeTest {
     @Test
     public void theEnhancedAttackLoadsUnderItsSlot() {
         Assertions.assertEquals(SkillCategory.NORMAL, new DefaultSkill(GALLAGHER, 8, LEVEL).getData().getCategory(),
-                "「强化普攻」是槽位 8（`data/skills.json` 的内层键是 1,2,3,4,6,7,8）——数据行的末位就是槽位：130108 / 111108");
+                "\"Enhanced Basic ATK\" (「强化普攻」) is slot 8 (the inner keys of `data/skills.json` are 1,2,3,4,6,7,8) -- the last digit of the data row is the slot: 130108 / 111108");
         Assertions.assertEquals(SkillCategory.NORMAL, new DefaultSkill(LUKA, 8, LEVEL).getData().getCategory(),
-                "the same slot for 1111's 【直冲碎天拳】");
+                "the same slot for 1111's 【直冲碎天拳】 (Sky-Shatter Fist)");
     }
 
     /** Control: an ordinary slot row loads real data, so the probe can tell the two apart. */

@@ -35,7 +35,7 @@ public class TimeOdeBoostTest {
                 + " ; without the ode captured " + without[1] + " boost " + without[0]);
         Assertions.assertEquals(Math.round(with[2] * 10000), with[1], "the captured value is #1 in basis points");
         Assertions.assertEquals(with[2], with[0], Math.abs(with[2]) * 1e-6,
-                "「「长夜」施放忆灵技【迷梦，流失，如露】时造成的伤害提高 #1%」-- the captured share");
+                "\"when Evey (「长夜」) casts the memosprite skill [迷梦，流失，如露], the DMG it deals is raised by #1%\" (「「长夜」施放忆灵技【迷梦，流失，如露】时造成的伤害提高 #1%」) -- the captured share");
         Assertions.assertEquals(0, without[1], EPS, "without the ode nothing is captured");
         Assertions.assertEquals(0.0, without[0], EPS, "and nothing is boosted");
     }

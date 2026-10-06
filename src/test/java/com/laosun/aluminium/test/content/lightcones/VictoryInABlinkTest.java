@@ -73,7 +73,7 @@ public class VictoryInABlinkTest {
         double before = partyBoost();
         battle.castImmediate(new DefaultSkill(WEARER, 2, LEVEL), wearer, List.of(ally));
         System.out.println("[21050] after the CHARACTER's own Skill: +" + (partyBoost() - before));
-        Assertions.assertEquals(0.0, partyBoost() - before, 1e-9, "装备者的忆灵, not the wearer (false case)");
+        Assertions.assertEquals(0.0, partyBoost() - before, 1e-9, "the wearer's memosprite (装备者的忆灵), not the wearer -- the false case");
     }
 
     @Test
@@ -85,7 +85,7 @@ public class VictoryInABlinkTest {
         var sprite = battle.summonMemosprite(wearer);
         battle.castImmediate(new DefaultSkill(WEARER, 2, LEVEL), sprite, List.of(enemy));
         System.out.println("[21050] memosprite aiming at an ENEMY: +" + (partyBoost() - before));
-        Assertions.assertEquals(0.0, partyBoost() - before, 1e-9, "对我方目标 (false case)");
+        Assertions.assertEquals(0.0, partyBoost() - before, 1e-9, "our target (对我方目标), the false case");
     }
 
     @Test

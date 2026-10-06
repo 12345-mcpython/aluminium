@@ -33,14 +33,14 @@ public class ExtendAllBuffsTest {
     @Test
     public void kindAllLengthensAnotherUnitsBuff() {
         Assertions.assertTrue(survivesTheTicks(ExtendKind.ALL),
-                "「使自身**所有**增益效果延长 1 回合」-- the buff came from 甲, and it must still be lengthened");
+                "\"extends **all** of her own buffs by 1 turn\" (「使自身**所有**增益效果延长 1 回合」) -- the buff came from unit A (甲), and it must still be lengthened");
     }
 
     /** Note: Naming the buff keeps the shipped origin filter: B (乙) did not apply it, A (甲) did. */
     @Test
     public void namingTheBuffKeepsTheOriginFilter() {
         Assertions.assertFalse(survivesTheTicks(ExtendKind.BY_NAME),
-                "⚠ the origin filter is the old behaviour: 乙’s rule may only lengthen 乙’s own buffs");
+                "⚠ the origin filter is the old behaviour: unit B's (乙’s) rule may only lengthen unit B's own buffs");
     }
 
     private enum ExtendKind { ALL, BY_NAME }
@@ -62,13 +62,13 @@ public class ExtendAllBuffsTest {
         battle.processRequests();
 
         Skill theirs = first.getSkills().get(SkillType.SKILL);
-        Assertions.assertNotNull(theirs, "precondition: 甲 has a skill");
+        Assertions.assertNotNull(theirs, "precondition: unit A (甲) has a skill");
         SkillExecutor.execute(battle, theirs, first, List.of(battle.enemies.getFirst()));
         battle.processRequests();
-        Assertions.assertTrue(second.getBuffManager().hasState(MARK), "precondition: 乙 carries 甲’s buff");
+        Assertions.assertTrue(second.getBuffManager().hasState(MARK), "precondition: unit B (乙) carries unit A's (甲’s) buff");
 
         Skill hers = second.getSkills().get(SkillType.SKILL);
-        Assertions.assertNotNull(hers, "precondition: 乙 has a skill");
+        Assertions.assertNotNull(hers, "precondition: unit B (乙) has a skill");
         SkillExecutor.execute(battle, hers, second, List.of(battle.enemies.getFirst()));
         battle.processRequests();
 

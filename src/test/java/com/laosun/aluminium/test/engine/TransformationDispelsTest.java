@@ -36,14 +36,14 @@ public class TransformationDispelsTest {
     @Test
     public void theTransformedFormStripsItsDebuffs() {
         Assertions.assertFalse(debuffedAfterCast(true),
-                "「解除自身所有负面效果」");
+                "\"removes all of her own debuffs\" (「解除自身所有负面效果」)");
     }
 
     /** Note: Untransformed: the same cast leaves it there. */
     @Test
     public void withoutTheTransformationNothingIsStripped() {
         Assertions.assertTrue(debuffedAfterCast(false),
-                "「卡厄斯兰那…解除」-- the dispel belongs to the transformation");
+                "「卡厄斯兰那…解除」 (Khaslana ... remove)-- the dispel belongs to the transformation");
     }
 
     // ==================================================================

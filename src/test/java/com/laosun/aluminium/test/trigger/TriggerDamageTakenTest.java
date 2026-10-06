@@ -63,7 +63,7 @@ public class TriggerDamageTakenTest {
 
         fireOnDummy(battle);
         Assertions.assertTrue(dummy(battle).getBuffManager().hasBuff(VulnerabilityBuff.class),
-                "positive = 受到的伤害提高 (damage taken raised) = vulnerability, a DEBUFF on the defender");
+                "positive = DMG taken increased (受到的伤害提高) = vulnerability, a DEBUFF on the defender");
         Assertions.assertEquals(plain * 1.12, dummyDamageTaken(battle), EPS);
     }
 
@@ -74,7 +74,7 @@ public class TriggerDamageTakenTest {
 
         fireOnDummy(battle);
         Assertions.assertTrue(dummy(battle).getBuffManager().hasBuff(ReductionBuff.class),
-                "negative = 受到的伤害降低 (damage taken lowered) = reduction, a BUFF on the defender");
+                "negative = DMG taken reduced (受到的伤害降低) = reduction, a BUFF on the defender");
         Assertions.assertEquals(plain * 0.92, dummyDamageTaken(battle), EPS);
     }
 

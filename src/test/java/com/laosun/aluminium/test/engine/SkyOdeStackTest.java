@@ -52,7 +52,7 @@ public class SkyOdeStackTest {
         System.out.println("[sky_stacks] the named character has " + named + " ; the other ally has " + bystander);
 
         Assertions.assertEquals(2, named,
-                "「使风堇获得 2 层」-- the data states LayerAddWhenStack: 2, and the sentence agrees");
+                "「使风堇获得 2 层」 (grants Hyacine 2 stacks)-- the data states LayerAddWhenStack: 2, and the sentence agrees");
         Assertions.assertEquals(0, bystander, "and nobody else -- the game names the cid, and so does `ally_cid:`");
     }
 
@@ -82,7 +82,7 @@ public class SkyOdeStackTest {
                     SkillExecutor.execute(battle, ode, demiurge, List.of(battle.enemies.getFirst()));
                     battle.processRequests();
                 },
-                "名点的角色不在场时，这条应该什么也不做");
+                "when the character the sentence names is not on the field, this clause should do nothing");
         Assertions.assertEquals(0, other.getBuffManager().stacksOf(MARK),
                 "and it lands on nobody -- not on a bystander");
         System.out.println("[sky_stacks] with the named character absent: no throw, and the bystander has "

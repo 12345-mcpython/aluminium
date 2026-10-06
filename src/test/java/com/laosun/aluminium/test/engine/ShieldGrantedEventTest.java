@@ -54,7 +54,7 @@ public class ShieldGrantedEventTest {
 
         f.battle.grantShield(f.ally, f.dahlia, 500);
 
-        Assertions.assertEquals(HEAL, f.healed(), EPS, "「受到队友提供的…护盾时」");
+        Assertions.assertEquals(HEAL, f.healed(), EPS, "\"when receiving ... a shield provided by an ally\" (「受到队友提供的…护盾时」)");
     }
 
     /** Note: The timed path goes through a buff, not through {@code grantShield}: it has to be announced separately. */
@@ -156,7 +156,7 @@ public class ShieldGrantedEventTest {
         TriggerTable table = TriggerTables.of(DAHLIA);
 
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.HEALED),
-                "大丽花's trace needs BOTH halves: 「治疗效果**或**护盾」 -- one alone is a trace that stays silent "
+                "The Dahlia (大丽花)'s trace needs BOTH halves: \"healing **or** a shield\" (「治疗效果**或**护盾」) -- one alone is a trace that stays silent "
                         + "half the time");
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.SHIELD_GRANTED), "…the shield half is the other one");
 
@@ -165,19 +165,19 @@ public class ShieldGrantedEventTest {
             TriggerTable.TriggerContext ctx = new TriggerTable.TriggerContext(dahlia, ally, dahlia, 0, 0, null, battle,
                     com.laosun.aluminium.enums.SkillCategory.UNSPECIFIED);
             List<TriggerTable.CompiledRule> rules = table.matching(event, ctx);
-            Assertions.assertEquals(1, rules.size(), event + ": the trace's rule must match 「大丽花受到队友提供的…」");
+            Assertions.assertEquals(1, rules.size(), event + ": the trace's rule must match 「大丽花受到队友提供的…」 (The Dahlia receives ... from an ally)");
             TriggerTable.CompiledRule rule = rules.getFirst();
             Assertions.assertEquals(List.of("target == self", "actor is_ally", "actor != self"),
                     rule.conditions().stream().map(TriggerTable.Condition::source).toList(),
                     event + ": all three conditions are load-bearing");
-            Assertions.assertEquals(1, rule.perTurn(), event + ": 「单个回合内不可重复触发」");
+            Assertions.assertEquals(1, rule.perTurn(), event + ": \"cannot be triggered more than once in a single turn\" (「单个回合内不可重复触发」)");
             EffectSpec effect = rule.effects().getFirst();
             Assertions.assertEquals("MODIFY_ATTR", effect.getOp());
             Assertions.assertEquals("BREAKING_EFFECT", effect.getAttribute());
             Assertions.assertEquals("self_attr:BREAKING_EFFECT", effect.getScale());
             Assertions.assertEquals(0.24, effect.getPercent(), EPS);
             Assertions.assertEquals(0.5, effect.getAmount(), EPS);
-            Assertions.assertEquals(3, effect.getTurns(), event + ": 「持续#4[i]回合」 = 3");
+            Assertions.assertEquals(3, effect.getTurns(), event + ": \"lasts #4[i] turns\" (「持续#4[i]回合」) = 3");
         }
     }
 

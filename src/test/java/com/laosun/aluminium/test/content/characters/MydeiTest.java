@@ -39,8 +39,8 @@ public class MydeiTest {
         double declared = openingLoss(true);
         double undeclared = openingLoss(false);
 
-        Assertions.assertTrue(declared > 0, "「使用秘技后…对敌方全体造成等同于万敌80%生命上限的虚数属性伤害」: " + declared);
-        Assertions.assertEquals(0.0, undeclared, 1e-9, "「使用秘技后」 -- undeclared, so nothing");
+        Assertions.assertTrue(declared > 0, "\"after using the Technique ... deals Imaginary damage to all enemies equal to 80% of Mydei (万敌)'s Max HP\" (「使用秘技后…对敌方全体造成等同于万敌80%生命上限的虚数属性伤害」): " + declared);
+        Assertions.assertEquals(0.0, undeclared, 1e-9, "「使用秘技后」 (after using the Technique) -- undeclared, so nothing");
     }
 
     /** Note: The number: 80% of his Max HP must be 1.6 of a hand-built 50% in the same pipeline. */
@@ -64,7 +64,7 @@ public class MydeiTest {
             Assertions.assertNotNull(resources, "the file must declare its resource");
             Assertions.assertEquals("天赋充能", resources.get(0).getAsJsonObject().get("id").getAsString());
             Assertions.assertEquals(200, resources.get(0).getAsJsonObject().get("max").getAsInt(),
-                    "「最多积攒200点」");
+                    "\"accumulates at most 200 points\" (「最多积攒200点」)");
         } catch (java.io.IOException failure) {
             throw new IllegalStateException(failure);
         }

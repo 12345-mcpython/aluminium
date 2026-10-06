@@ -78,7 +78,7 @@ public class SoftAggroWeightTest {
     @Test
     public void herSkillRaisesAggroOnlyWhileTheAimedAllyIsAtThirtyPercentOrMore() {
         Assertions.assertEquals(6.0, aimedAllyWeightRatio(false), 1e-6,
-                "「若该目标当前生命值百分比大于等于30%」 -- x6 above the gate");
+                "「若该目标当前生命值百分比大于等于30%」 (if that target's current HP percentage is at least 30%) -- x6 above the gate");
         Assertions.assertEquals(1.0, aimedAllyWeightRatio(true), 1e-6,
                 "below 30% the game pins MDF_AggroUp to 0, so the weight must be untouched");
     }
@@ -96,7 +96,7 @@ public class SoftAggroWeightTest {
         battle.castImmediate(march.getSkills().get(SkillType.SKILL), march, List.of(aimed));
 
         Assertions.assertEquals(bystanderBefore, battle.aggroOf(bystander), EPS,
-                "「指定我方单体」 -- only the aimed ally, never the bystander");
+                "「指定我方单体」 (a designated single ally) -- only the aimed ally, never the bystander");
 
         // Eidolon (星魂) 2 grants a shield at battle start from a DIFFERENT modifier, which has no MDF_AggroUp in the game data.
         Character withEidolon = CharacterFactory.create(MARCH, LEVEL, true, null, null, 2);
@@ -112,7 +112,7 @@ public class SoftAggroWeightTest {
         // precondition is "one of them", while the claim below covers BOTH.
         boolean shieldedSomebody = withEidolon.getBuffManager().hasBuff(ShieldBuff.class)
                 || shielded.getBuffManager().hasBuff(ShieldBuff.class);
-        Assertions.assertTrue(shieldedSomebody, "precondition: 星魂 2's battle-start shield landed");
+        Assertions.assertTrue(shieldedSomebody, "precondition: Eidolon (星魂) 2's battle-start shield landed");
         Assertions.assertEquals(marchBefore, second.aggroOf(withEidolon), EPS,
                 "MAvatar_March7th_00_Rank02_Shield has no MDF_AggroUp, so that shield must not raise aggro");
         Assertions.assertEquals(allyBefore, second.aggroOf(shielded), EPS,

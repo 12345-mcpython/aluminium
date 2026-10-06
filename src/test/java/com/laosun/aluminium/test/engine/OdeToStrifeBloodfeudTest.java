@@ -53,7 +53,7 @@ public class OdeToStrifeBloodfeudTest {
         int slot = mydei.getSkills().get(SkillType.SKILL).getSkillSlot();
         System.out.println("[ode] his SKILL slot " + before + " -> " + slot + " (want " + GODSLAYER + ")");
         Assertions.assertEquals(GODSLAYER, slot,
-                "「使其自动施放 1 次【弑神登神】」-- the swap his own rule performs");
+                "「使其自动施放 1 次【弑神登神】」 (makes it automatically cast Godslayer Be God once)-- the swap his own rule performs");
     }
 
     /** Outside [血仇] the same cast leaves him alone -- the other half of "若 ...处于 ...则 ...". */
@@ -68,7 +68,7 @@ public class OdeToStrifeBloodfeudTest {
 
         int slot = mydei.getSkills().get(SkillType.SKILL).getSkillSlot();
         System.out.println("[ode] outside bloodfeud his SKILL slot " + before + " -> " + slot + " (want it unchanged)");
-        Assertions.assertEquals(before, slot, "「若万敌处于【血仇】」-- this branch needs it");
+        Assertions.assertEquals(before, slot, "「若万敌处于【血仇】」 (if Mydei is in the Vendetta state)-- this branch needs it");
     }
 
     // ==================================================================

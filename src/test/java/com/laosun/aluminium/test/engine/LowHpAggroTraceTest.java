@@ -47,7 +47,7 @@ public class LowHpAggroTraceTest {
 
             dropBelowHalf(battle, owner, enemy);
             Assertions.assertEquals(full * 0.5, battle.aggroOf(owner), EPS,
-                    "「则被敌方目标攻击的概率降低」: "
+                    "\"then it is less likely to be attacked by enemy targets\" (「则被敌方目标攻击的概率降低」): "
                             + "1 + (-0.5) => x0.5 (cid " + cid + ")");
 
             // A second loss while already below the gate must not stack a second modifier.

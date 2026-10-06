@@ -42,7 +42,7 @@ public class ZoneAdditionalDamageTest {
                 + " ; the rider's own instance = " + delta + " (raw #3 x Max HP = " + rawAt80 + ")");
 
         Assertions.assertTrue(withoutRider > 0, "precondition: the ally attack lands");
-        Assertions.assertTrue(delta > 0, "「造成 1 次…附加伤害」-- the zone's own instance");
+        Assertions.assertTrue(delta > 0, "「造成 1 次…附加伤害」 (deals 1 instance of ... additional DMG)-- the zone's own instance");
         Assertions.assertTrue(delta < rawAt80,
                 "it is a real damage instance, so the target's zones scale it: " + delta + " < " + rawAt80);
         Assertions.assertTrue(delta > rawAt80 / 4,

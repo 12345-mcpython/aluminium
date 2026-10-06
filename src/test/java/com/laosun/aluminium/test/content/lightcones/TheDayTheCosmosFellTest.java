@@ -63,7 +63,7 @@ public class TheDayTheCosmosFellTest {
         System.out.println("[21040] weak targets 0/1/2/3 -> "
                 + matches(0) + "/" + matches(1) + "/" + matches(2) + "/" + matches(3));
         Assertions.assertFalse(matches(0), "no weak target: nothing");
-        Assertions.assertFalse(matches(1), "one is not 不少于２个");
+        Assertions.assertFalse(matches(1), "one is not \"no fewer than 2\" (不少于２个)");
         Assertions.assertTrue(matches(2), "two is");
         Assertions.assertTrue(matches(3), "and three still is");
     }

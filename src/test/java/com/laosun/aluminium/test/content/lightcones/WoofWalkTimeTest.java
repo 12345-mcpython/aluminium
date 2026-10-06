@@ -37,8 +37,8 @@ public class WoofWalkTimeTest {
         System.out.println("[21026] clean=" + clean + " burning=" + burning + " wounded=" + wounded + " both=" + both
                 + " attackRatio=" + attackGain);
         Assertions.assertEquals(0.2, attackGain, 1e-6, "rank 5 raises attack by 20% of base");
-        Assertions.assertEquals(1.32, burning / clean, 2e-2, "灼烧 (burning)");
-        Assertions.assertEquals(1.32, wounded / clean, 2e-2, "裂伤 (wounded)");
+        Assertions.assertEquals(1.32, burning / clean, 2e-2, "Burn (灼烧)");
+        Assertions.assertEquals(1.32, wounded / clean, 2e-2, "Bleed (裂伤)");
         Assertions.assertEquals(1.32, both / clean, 2e-2, "both states must not double the boost");
     }
 

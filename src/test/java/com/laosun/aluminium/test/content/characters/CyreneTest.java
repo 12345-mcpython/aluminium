@@ -32,15 +32,15 @@ public class CyreneTest {
 
         Assertions.assertEquals(0, recollectionOf(cyrene), "the document states no initial value, so it starts at 0");
         battle.fireTriggers(TriggerEvent.BASIC_ATTACK, cyrene, enemy, 0, 0);
-        Assertions.assertEquals(1, recollectionOf(cyrene), "「获得1点【追忆】」");
+        Assertions.assertEquals(1, recollectionOf(cyrene), "「获得1点【追忆】」 (gains 1 point of Recollection (【追忆】))");
         battle.fireTriggers(TriggerEvent.SKILL_CAST, cyrene, enemy, 0, 0);
-        Assertions.assertEquals(4, recollectionOf(cyrene), "「获得3点【追忆】」 -- the other writer");
+        Assertions.assertEquals(4, recollectionOf(cyrene), "「获得3点【追忆】」 (gains 3 points of Recollection) -- the other writer");
 
         for (int i = 0; i < 8; i++) {
             battle.fireTriggers(TriggerEvent.SKILL_CAST, cyrene, enemy, 0, 0);
         }
         Assertions.assertEquals(27, recollectionOf(cyrene),
-                "「【追忆】达到24点时可激活终结技」 -- thirty-two casts must still read twenty-four");
+                "「【追忆】达到24点时可激活终结技」 (at 24 points of Recollection the Ultimate can be activated) -- thirty-two casts must still read twenty-four");
     }
 
     /** Note: The party boost, which the document conditions on nothing at all: an ally gains it, an enemy does not. */
@@ -56,7 +56,7 @@ public class CyreneTest {
         battle.startBattle();
 
         Assertions.assertEquals(0.2, ally.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get() - allyBefore, 1e-9,
-                "「昔涟在场时，我方全体目标造成的伤害提高20.00%」");
+                "「昔涟在场时，我方全体目标造成的伤害提高20.00%」 (while Cyrene is on the field, all allies deal 20.00% more DMG)");
         Assertions.assertEquals(0.0, enemy.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get() - enemyBefore, 1e-9,
                 "the selector is `all_allies`: the enemy side must be untouched");
     }

@@ -858,7 +858,7 @@ public class Battle {
 
     /**
      * Attach the map skills at the start of a battle: map basic attack (slot 6) and
-     * technique.
+     * technique (slot 7).
      *
      * <p>Why here and not in {@code CharacterFactory}: these two slots are things on the map,
      * not a character's permanent skills -- they only make sense at the moment of "entering battle".

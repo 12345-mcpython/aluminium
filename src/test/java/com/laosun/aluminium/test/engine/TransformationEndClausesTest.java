@@ -56,9 +56,9 @@ public class TransformationEndClausesTest {
                 + " ; ally " + allyBefore + " -> " + allyAfter + " (base " + allyBase + ")");
 
         Assertions.assertEquals(ownerBase * 0.15, ownerAfter - ownerBefore, ownerBase * 1e-6,
-                "「变身结束时…速度提高 15%」-- on her");
+                "「变身结束时…速度提高 15%」 (when the transformation ends ... SPD is raised by 15%)-- on her");
         Assertions.assertEquals(allyBase * 0.15, allyAfter - allyBefore, allyBase * 1e-6,
-                "「我方全体」-- and on the ally, which is what 全体 means");
+                "all allies (「我方全体」) -- and on the ally, which is what \"all\" (全体) means");
     }
 
     /** "变身结束时，获得 3 点[火种]". */
@@ -72,7 +72,7 @@ public class TransformationEndClausesTest {
 
         int before = owner.getResources().value(SEEDS);
         // "战斗开始时，获得 1 点[火种]" -- the other half of the same trace line (1408101).
-        Assertions.assertEquals(1, before, "「战斗开始时，获得 1 点【火种】」");
+        Assertions.assertEquals(1, before, "\"at the start of battle, gains 1 point of Kindling (【火种】)\" (「战斗开始时，获得 1 点【火种】」)");
         Skill ult = owner.getSkills().get(SkillType.ULTRA);
         SkillExecutor.execute(battle, ult, owner, List.of(owner));
         battle.processRequests();
@@ -85,7 +85,7 @@ public class TransformationEndClausesTest {
         System.out.println("[end-clauses] seeds " + before + " -> " + duringTransformation + " -> " + after);
 
         Assertions.assertEquals(duringTransformation + 3, after,
-                "「变身结束时，获得 3 点【火种】」");
+                "\"when the transformation ends, gains 3 points of Kindling (【火种】)\" (「变身结束时，获得 3 点【火种】」)");
     }
 
     /**
@@ -120,6 +120,6 @@ public class TransformationEndClausesTest {
         Assertions.assertEquals(seedsAfterOneEnd + 3, seedsAfterTwoEnds,
                 "the second end really fired -- the seed clause has no cap");
         Assertions.assertEquals(0.0, atkAfterTwoEnds - atkAfterOneEnd, 1e-9,
-                "「最多叠加 2 层」: with the battle-start layer that is already two, so the third is dropped");
+                "「最多叠加 2 层」 (stacks at most 2 times): with the battle-start layer that is already two, so the third is dropped");
     }
 }

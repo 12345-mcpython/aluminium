@@ -31,7 +31,7 @@ public class LightConeMomentTest {
         double without = aggro(false);
         double with = aggro(true);
         Assertions.assertEquals(2.0, with / without, 1e-9,
-                "同时使自身受到攻击的概率提高 -- the data says the factor is 2");
+                "\"and makes itself more likely to be attacked\" (同时使自身受到攻击的概率提高) -- the data says the factor is 2");
     }
 
     @Test

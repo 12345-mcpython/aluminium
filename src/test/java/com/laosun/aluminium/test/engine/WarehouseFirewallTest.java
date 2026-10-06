@@ -59,8 +59,8 @@ public class WarehouseFirewallTest {
                 + " ; controls on her=" + fighter.getBuffManager().countBuffs(ControlBuff.class));
 
         Assertions.assertTrue(firewallOn,
-                "「则使我方全体获得【防火墙】」-- the warehouse clause fired from a character who is not on the field");
+                "「则使我方全体获得【防火墙】」 (then grants all allies Firewall)-- the warehouse clause fired from a character who is not on the field");
         Assertions.assertFalse(landedAfter,
-                "「【防火墙】状态下，我方目标免疫敌方目标施加的控制类负面状态」-- the next control is refused");
+                "「【防火墙】状态下，我方目标免疫敌方目标施加的控制类负面状态」 (while in the Firewall state, our targets are immune to Crowd Control debuffs applied by enemy targets)-- the next control is refused");
     }
 }

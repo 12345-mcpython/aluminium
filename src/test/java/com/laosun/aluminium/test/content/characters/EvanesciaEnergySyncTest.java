@@ -44,7 +44,7 @@ public class EvanesciaEnergySyncTest {
                 + giftsBefore + " -> " + giftsAfter + " (expected " + (giftsBefore + mirrored) + ")");
         Assertions.assertTrue(mirrored > 0, "the cast really credited energy (it credited " + mirrored + ")");
         Assertions.assertEquals(giftsBefore + mirrored, giftsAfter,
-                "every point of energy is mirrored one-for-one into [好活当赏]");
+                "every point of energy is mirrored one-for-one into [好活当赏] (Certified Banger)");
     }
 
     @Test

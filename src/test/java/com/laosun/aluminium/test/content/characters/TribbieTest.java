@@ -33,9 +33,9 @@ public class TribbieTest {
         double fromAlly = lossWhenTheEventComesFrom(true);
         double fromSelf = lossWhenTheEventComesFrom(false);
 
-        Assertions.assertTrue(fromAlly > 0, "「我方其他角色施放终结技后」 -- a teammate's ultimate must trigger it: " + fromAlly);
+        Assertions.assertTrue(fromAlly > 0, "「我方其他角色施放终结技后」 (after another one of our characters casts an Ultimate) -- a teammate's ultimate must trigger it: " + fromAlly);
         Assertions.assertEquals(0.0, fromSelf, 1e-9,
-                "「我方**其他**角色」 -- her own ultimate is excluded, and firing the event by hand means no ultimate damage is mixed in: " + fromSelf);
+                "「我方**其他**角色」 (**another** one of our characters) -- her own ultimate is excluded, and firing the event by hand means no ultimate damage is mixed in: " + fromSelf);
     }
 
     /** Note: "进入战斗时获得[神启]，持续3回合", and the trace's own battle-start energy. */
@@ -49,7 +49,7 @@ public class TribbieTest {
         battle.startBattle();
 
         Assertions.assertTrue(tribbie.getBuffManager().hasState("神启"),
-                "「使用秘技后，进入战斗时获得【神启】」");
+                "「使用秘技后，进入战斗时获得【神启】」 (after using the Technique, gains Numinosity (【神启】) on entering battle)");
     }
 
     /** Census: the ultimate, the skill, the technique, two traces and the convention all live on BATTLE_START/other events as stated. */
@@ -59,7 +59,7 @@ public class TribbieTest {
         // 4 since: `ult_zone_state` joins the three -- "结界持续期间" had no state to name,
         // and 1415's ode of passage needs one ("缇宝的结界的附加伤害").
         Assertions.assertEquals(4, table.ruleCount(TriggerEvent.ULT_CAST),
-                "the follow-up trigger, and (2026-09-29) the zone's 「敌方目标受到的伤害提高30%」" + " with `ticks_on: self` for the zone's own clock");
+                "the follow-up trigger, and (2026-09-29) the zone's 「敌方目标受到的伤害提高30%」 (enemy targets take 30% more DMG)" + " with `ticks_on: self` for the zone's own clock");
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.SKILL_CAST), "Numinosity");
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.FOLLOW_UP), "the damage boost");
         Assertions.assertEquals(3, table.ruleCount(TriggerEvent.BATTLE_START),

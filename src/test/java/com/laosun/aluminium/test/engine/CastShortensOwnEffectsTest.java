@@ -73,7 +73,7 @@ public class CastShortensOwnEffectsTest {
                 + " ; the memosprite still has it = " + spriteStill);
 
         Assertions.assertFalse(masterStill,
-                "「德谬歌施放技能后使自身所有持续效果持续回合数减 1」-- 2 became 1, so one tick ends it");
+                "「德谬歌施放技能后使自身所有持续效果持续回合数减 1」 (after Demiurge casts a skill, all of its own lasting effects lose 1 turn)-- 2 became 1, so one tick ends it");
         Assertions.assertTrue(spriteStill,
                 "and the MEMOSPRITE's own mark is untouched -- `self` in this file is the master");
     }

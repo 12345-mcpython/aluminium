@@ -59,9 +59,9 @@ public class PatienceIsAllYouNeedTest {
         attack(battle);
         boolean thread = enemy.getBuffManager().hasState("游丝");
         boolean shock = enemy.getBuffManager().hasState("触电");
-        System.out.println("[23006] after one hit: has 游丝=" + thread + " has 触电=" + shock);
+        System.out.println("[23006] after one hit: has Erode (游丝)=" + thread + " has Shock (触电)=" + shock);
         Assertions.assertTrue(thread, "the named DOT answers to its own name");
-        Assertions.assertTrue(shock, "and to 触电 through the element table -- the alias costs nothing");
+        Assertions.assertTrue(shock, "and to Shock (触电) through the element table -- the alias costs nothing");
     }
 
     @Test
@@ -74,16 +74,16 @@ public class PatienceIsAllYouNeedTest {
                 wearer, DamageElement.THUNDER, 20, 2));
         boolean thread = enemy.getBuffManager().hasState("游丝");
         boolean shock = enemy.getBuffManager().hasState("触电");
-        System.out.println("[23006] unnamed thunder DOT: has 游丝=" + thread + " has 触电=" + shock);
-        Assertions.assertTrue(shock, "an unnamed thunder DOT is still 触电 -- the element path is untouched");
-        Assertions.assertFalse(thread, "but it is NOT 游丝: the name is what distinguishes them");
+        System.out.println("[23006] unnamed thunder DOT: has Erode (游丝)=" + thread + " has Shock (触电)=" + shock);
+        Assertions.assertTrue(shock, "an unnamed thunder DOT is still Shock (触电) -- the element path is untouched");
+        Assertions.assertFalse(thread, "but it is NOT Erode (游丝): the name is what distinguishes them");
     }
 
     @Test
     public void withoutTheConeTheEnemyIsNotInflicted() {
         Battle battle = battle(false);
         attack(battle);
-        System.out.println("[23006] without the cone: has 游丝=" + enemy.getBuffManager().hasState("游丝"));
+        System.out.println("[23006] without the cone: has Erode (游丝)=" + enemy.getBuffManager().hasState("游丝"));
         Assertions.assertFalse(enemy.getBuffManager().hasState("游丝"), "no cone, no state (false case)");
     }
 
@@ -99,7 +99,7 @@ public class PatienceIsAllYouNeedTest {
                     pinned++;
                     System.out.println("[23006] spec element=" + effect.getElement() + " name=" + effect.getBuff()
                             + " percent=" + effect.getPercent() + " turns=" + effect.getTurns());
-                    Assertions.assertEquals("Thunder", effect.getElement(), "thunder is what makes 触电 true");
+                    Assertions.assertEquals("Thunder", effect.getElement(), "thunder is what makes Shock (触电) true");
                     Assertions.assertEquals("游丝", effect.getBuff(), "the document's name for the state");
                     Assertions.assertEquals(1, effect.getTurns(), "one turn at rank 1");
                 }

@@ -32,7 +32,7 @@ public class SkillTargetCoreflameTest {
     @Test
     public void beingTargetedGrantsCoreflameAndCritDamage() {
         double[] aimedAtHer = scene(true);
-        Assertions.assertEquals(1.0, aimedAtHer[0], EPS, "「gains 1 point of [火种]」");
+        Assertions.assertEquals(1.0, aimedAtHer[0], EPS, "「gains 1 point of [火种] (Kindling)」");
         Assertions.assertEquals(0.30, aimedAtHer[1], EPS, "「crit damage increased by 30%」");
     }
 

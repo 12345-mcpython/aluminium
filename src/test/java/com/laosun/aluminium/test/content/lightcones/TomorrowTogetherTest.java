@@ -53,7 +53,7 @@ public class TomorrowTogetherTest {
         double wearerDelta = wearer.getAttribute(AttributeType.ELATION_DAMAGE_BOOST).get() - wearerBase;
         double allyDelta = ally.getAttribute(AttributeType.ELATION_DAMAGE_BOOST).get() - allyBase;
         System.out.println("[22007] after the Ultimate: wearer +" + wearerDelta + " ally +" + allyDelta);
-        Assertions.assertEquals(SHARE, wearerDelta, 1e-9, "the wearer is part of 我方全体");
+        Assertions.assertEquals(SHARE, wearerDelta, 1e-9, "the wearer is part of all allies (我方全体)");
         Assertions.assertEquals(SHARE, allyDelta, 1e-9, "and so is the ally");
     }
 

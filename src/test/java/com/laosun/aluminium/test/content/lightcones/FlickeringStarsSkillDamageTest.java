@@ -151,7 +151,7 @@ public class FlickeringStarsSkillDamageTest {
         double basicRatio = basic / plainBasic;
         System.out.println("[23061skill] skill x" + skillRatio + " basic x" + basicRatio
                 + " ratio-of-ratios=" + (skillRatio / basicRatio));
-        Assertions.assertEquals(1.0, basicRatio, 1e-9, "the basic attack is NOT a 战技 -- nothing for it");
+        Assertions.assertEquals(1.0, basicRatio, 1e-9, "the basic attack is NOT a Skill (战技) -- nothing for it");
 
         // The exact multiplier is NOT 1 + percent here: measured, 0.2 moved the Skill cast by x1.588, so the boost lands on a
         // base this judge has not pinned. What it CAN pin, and what a wrong `percent` must break, is SCALE: the same fixture

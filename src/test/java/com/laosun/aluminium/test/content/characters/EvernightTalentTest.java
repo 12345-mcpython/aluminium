@@ -35,7 +35,7 @@ public class EvernightTalentTest {
     public void fewerEnemiesMeansMoreMemospriteDamage() {
         double four = memospriteDamage(4);
         double one = memospriteDamage(1);
-        Assertions.assertTrue(four > 0 && one > 0, "precondition: the 忆灵 (memosprite) landed both hits");
+        Assertions.assertTrue(four > 0 && one > 0, "precondition: the memosprite (忆灵) landed both hits");
         Assertions.assertEquals(1.50 / 1.20, one / four, 1e-9,
                 "120% at four enemies and 150% at one: " + four + " vs " + one);
     }
@@ -63,7 +63,7 @@ public class EvernightTalentTest {
         Battle battle = new Battle(List.of(master), foes, noCrit);
         battle.startBattle();
         Summon memosprite = battle.summonMemosprite(master);
-        Assertions.assertNotNull(memosprite, "precondition: the 忆灵 (memosprite) is out");
+        Assertions.assertNotNull(memosprite, "precondition: the memosprite (忆灵) is out");
         double before = victim.getCurrentHp();
         // Note: COMMON, not SKILL: a memosprite's stated attack is installed in its COMMON slot.
         battle.castImmediate(memosprite.getSkills().get(SkillType.COMMON), memosprite, List.of(victim));

@@ -74,7 +74,7 @@ public class OtherAlliesTargetTest {
         Assertions.assertEquals(0, timeRemaining(battle, battle.characters.get(1)), EPS, "teammate 1 acts now");
         Assertions.assertEquals(0, timeRemaining(battle, battle.characters.get(2)), EPS, "teammate 2 acts now");
         Assertions.assertEquals(ownerBefore, timeRemaining(battle, owner), EPS,
-                "…and the owner keeps their place: that is what 「除自身以外」 means");
+                "…and the owner keeps their place: that is what 「除自身以外」 (other than herself) means");
         Assertions.assertTrue(timeRemaining(battle, battle.enemyUnits().getFirst()) > 0,
                 "the enemies are not ours to advance");
     }
@@ -93,7 +93,7 @@ public class OtherAlliesTargetTest {
 
         battle.fireTriggers(TriggerEvent.ULT_CAST, owner, null, 0, 0);
 
-        Assertions.assertEquals(0, timeRemaining(battle, owner), EPS, "「我方全体」 includes the wearer");
+        Assertions.assertEquals(0, timeRemaining(battle, owner), EPS, "「我方全体」 (all allies) includes the wearer");
         Assertions.assertEquals(0, timeRemaining(battle, battle.characters.get(1)), EPS);
         Assertions.assertEquals(0, timeRemaining(battle, battle.characters.get(2)), EPS);
     }
@@ -110,7 +110,7 @@ public class OtherAlliesTargetTest {
         battle.fireTriggers(TriggerEvent.ULT_CAST, owner, null, 0, 0);
 
         Assertions.assertEquals(0, timeRemaining(battle, minion), EPS,
-                "「我方」 is the side, not the character list -- the same reading all_allies has");
+                "「我方」 (our side) is the side, not the character list -- the same reading all_allies has");
     }
 
     // ==================================================================
@@ -144,10 +144,10 @@ public class OtherAlliesTargetTest {
 
         battle.fireTriggers(TriggerEvent.ULT_CAST, robin, null, 0, 0);
 
-        Assertions.assertEquals(0, timeRemaining(battle, first), EPS, "「使除自身以外的队友立即行动」");
+        Assertions.assertEquals(0, timeRemaining(battle, first), EPS, "\"makes allies other than herself act immediately\" (「使除自身以外的队友立即行动」)");
         Assertions.assertEquals(0, timeRemaining(battle, second), EPS);
         Assertions.assertEquals(robinBefore, timeRemaining(battle, robin), EPS,
-                "her own turn is untouched by this clause (【协奏】 is what does something else to her)");
+                "her own turn is untouched by this clause (【协奏】 (Concerto) is what does something else to her)");
     }
 
     /** ...and the rule is filed as her ultimate's first sentence, with the fraction that means act immediately. */
@@ -195,8 +195,8 @@ public class OtherAlliesTargetTest {
         // The ULT_CAST event carries the unit the cast was AIMED AT, which is what "指定" means.
         battle.fireTriggers(TriggerEvent.ULT_CAST, owner, chosen, 0, 0);
 
-        Assertions.assertEquals(0, timeRemaining(battle, chosen), EPS, "「指定我方单体」acts now");
-        Assertions.assertEquals(0, timeRemaining(battle, chosenSummon), EPS, "「及其召唤物」 acts with it");
+        Assertions.assertEquals(0, timeRemaining(battle, chosen), EPS, "「指定我方单体」 (a designated single ally)acts now");
+        Assertions.assertEquals(0, timeRemaining(battle, chosenSummon), EPS, "「及其召唤物」 (and its summons) acts with it");
         Assertions.assertTrue(timeRemaining(battle, ownersSummon) > 0,
                 "…but the RULE OWNER's summon is untouched: that would be the `summon` selector, a different unit");
         Assertions.assertEquals(ownerBefore, timeRemaining(battle, owner), EPS,
@@ -237,7 +237,7 @@ public class OtherAlliesTargetTest {
         battle.fireTriggers(TriggerEvent.ULT_CAST, owner, chosen, 0, 0);
 
         Assertions.assertEquals(0, timeRemaining(battle, chosen), EPS,
-                "「及其召唤物」 means the one that is on the field -- a corpse is not advanced");
+                "「及其召唤物」 (and its summons) means the one that is on the field -- a corpse is not advanced");
     }
 
     /**

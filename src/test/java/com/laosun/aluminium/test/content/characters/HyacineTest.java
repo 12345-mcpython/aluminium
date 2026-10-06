@@ -41,9 +41,9 @@ public class HyacineTest {
         battle.castImmediate(hyacine.getSkills().get(SkillType.ULTRA), hyacine, List.of(ally));
 
         Assertions.assertTrue(hyacine.getBuffManager().hasState("雨过天晴"),
-                "「风堇进入【雨过天晴】状态」");
-        Assertions.assertTrue(ally.getMaxHp() > allyMaxBefore, "「我方全体目标生命上限提高30.00%」 -- ally");
-        Assertions.assertTrue(hyacine.getMaxHp() > herMaxBefore, "「我方全体」 includes Hyacine herself");
+                "「风堇进入【雨过天晴】状态」 (Hyacine enters the After Rain (【雨过天晴】) state)");
+        Assertions.assertTrue(ally.getMaxHp() > allyMaxBefore, "「我方全体目标生命上限提高30.00%」 (all allies' Max HP is raised by 30.00%) -- ally");
+        Assertions.assertTrue(hyacine.getMaxHp() > herMaxBefore, "「我方全体」 (all allies) includes Hyacine herself");
     }
 
     /** Census: the ultimate's rule and the level convention; the heals belong to the skill data, not to rules. */

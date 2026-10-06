@@ -77,7 +77,7 @@ public class PenaconyLandOfTheDreamsTest {
                     "and another element gets nothing (false case)");
         }
         System.out.println("[312] the wearer itself: boost=" + mineBoost);
-        Assertions.assertEquals(0.0, mineBoost, 1e-9, "其他我方角色 excludes the wearer (false case)");
+        Assertions.assertEquals(0.0, mineBoost, 1e-9, "other allies (其他我方角色) excludes the wearer -- the false case");
     }
 
     @Test

@@ -117,7 +117,7 @@ public class MemospriteTest {
 
         Assertions.assertEquals("长夜", nightfall.getName());
         Assertions.assertEquals(160, nightfall.getAttribute(AttributeType.SPEED).get(), EPS,
-                "「初始拥有 160 点速度」 is a flat number, and her own speed is not part of it");
+                "「初始拥有 160 点速度」 (starts with 160 SPD) is a flat number, and her own speed is not part of it");
         Assertions.assertNotEquals(castorice.getAttribute(AttributeType.SPEED).get(), 160,
                 "…and the two really are different numbers, so the assertion above is not vacuous");
         Assertions.assertEquals(0.5 * castorice.getMaxHp(), nightfall.getMaxHp(), EPS, "50% of her Max HP");
@@ -226,7 +226,7 @@ public class MemospriteTest {
         Battle battle = new Battle(List.of(aglaea), List.of(monster()), new Random(0));
         Summon tailor = battle.summonMemosprite(aglaea);
 
-        Assertions.assertEquals(125, battle.aggroOf(tailor), EPS, "「仇恨: 125」");
+        Assertions.assertEquals(125, battle.aggroOf(tailor), EPS, "\"aggro: 125\" (「仇恨: 125」)");
         Assertions.assertEquals(100, battle.aggroOf(battle.enemies.getFirst()), EPS,
                 "and a unit that states nothing still gets the regular tier");
     }
@@ -278,7 +278,7 @@ public class MemospriteTest {
         Battle battle = new Battle(List.of(evernight), List.of(monster()), fixed(0.0));
         battle.startBattle();
         Summon evey = battle.memospriteOf(evernight);
-        Assertions.assertNotNull(evey, "precondition: her 天赋 (talent) summons 「长夜」 at BATTLE_START");
+        Assertions.assertNotNull(evey, "precondition: her Talent (天赋) summons Evey (「长夜」) at BATTLE_START");
         // The immunity is what is being measured, so the ordinary resistance is zeroed out on both sides.
         evey.setAttribute(AttributeType.EFFECT_RESISTANCE, new DoubleValue(0));
         evernight.setAttribute(AttributeType.EFFECT_RESISTANCE, new DoubleValue(0));
@@ -287,7 +287,7 @@ public class MemospriteTest {
         boolean landedOnEvey = battle.tryApplyDebuff(caster, evey, frozen(), 1.0, null);
         boolean landedOnEvernight = battle.tryApplyDebuff(caster, evernight, frozen(), 1.0, null);
 
-        Assertions.assertFalse(landedOnEvey, "「长夜」免疫控制类负面状态");
+        Assertions.assertFalse(landedOnEvey, "Evey (「长夜」) is immune to Crowd Control debuffs (「长夜」免疫控制类负面状态)");
         Assertions.assertFalse(evey.getBuffManager().hasState("冻结"));
         Assertions.assertTrue(evey.getBuffManager().canAct(), "and it keeps its turns");
         Assertions.assertTrue(landedOnEvernight,
@@ -307,10 +307,10 @@ public class MemospriteTest {
         boolean landed = battle.tryApplyDebuff(battle.enemies.getFirst(), evey,
                 new DotBuff(evey, com.laosun.aluminium.enums.DamageElement.FIRE, 100, 2), 1.0, null);
 
-        Assertions.assertTrue(landed, "免疫控制类 says nothing about 持续伤害类");
+        Assertions.assertTrue(landed, "immunity to Crowd Control (免疫控制类) says nothing about DoT Debuffs (持续伤害类)");
         Assertions.assertEquals(1, evey.getBuffManager().countBuffs(DotBuff.class));
         Assertions.assertEquals(0, evey.getBuffManager().debuffResistOf(DebuffClass.DOT), EPS,
-                "…and the resistance it carries is a 控制类 one, read back off the unit this time");
+                "…and the resistance it carries is a Crowd Control (控制类) one, read back off the unit this time");
     }
 
     // ==================================================================

@@ -59,7 +59,7 @@ public class WaveLimitCapTest {
         System.out.println("[wave-cap] two casts in wave 1 -> " + firstWave + " ; one more in wave 2 -> " + secondWave);
 
         Assertions.assertEquals(1.0, firstWave, EPS,
-                "「每个波次最多触发 1 次」-- the second cast in the same wave changes nothing");
+                "「每个波次最多触发 1 次」 (triggers at most once per wave)-- the second cast in the same wave changes nothing");
         Assertions.assertEquals(1.0, secondWave, EPS,
                 "and the NEXT wave fires again, which is what tells a wave cap apart from a battle-long one");
     }

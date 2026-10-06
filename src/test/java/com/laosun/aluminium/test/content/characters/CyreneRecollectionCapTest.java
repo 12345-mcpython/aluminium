@@ -47,6 +47,6 @@ public class CyreneRecollectionCapTest {
         battle.processRequests();
         int left = battle.characters.getFirst().getBuffManager().debuffCount();
         System.out.println("[recollection] after reaching 24, her debuffs read " + left);
-        Assertions.assertEquals(0, left, "a full [追忆] cleanses her");
+        Assertions.assertEquals(0, left, "a full [追忆] (Recollection) cleanses her");
     }
 }

@@ -154,7 +154,7 @@ public class DebuffResistTest {
         Assertions.assertEquals(1.0, f.enemy.getBuffManager().debuffResistOf(DebuffClass.CONTROL), EPS);
         TestTurns.take(f.battle, f.enemy);
         Assertions.assertEquals(0.0, f.enemy.getBuffManager().debuffResistOf(DebuffClass.CONTROL), EPS,
-                "「while in the [防火墙] state ... immune」 lasts a turn — a buff covers both that and a permanent trace");
+                "「while in the [防火墙] (Firewall) state ... immune」 lasts a turn — a buff covers both that and a permanent trace");
     }
 
     /** A permanent one is never ticked, so it holds for the whole fight. */

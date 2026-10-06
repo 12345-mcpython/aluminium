@@ -38,7 +38,7 @@ public class TrueDamageJudgeTest {
         double hard = riderShare(2000, "TRUE");
         Assertions.assertTrue(soft > 0, "precondition: the rider deals damage (" + soft + ")");
         Assertions.assertEquals(soft, hard, 1e-6,
-                "真实伤害 (true damage) skips the defence zone: " + soft + " on a 0-defence target vs " + hard + " on a 2000 one");
+                "True DMG (真实伤害) skips the defence zone: " + soft + " on a 0-defence target vs " + hard + " on a 2000 one");
 
         double ordinarySoft = riderShare(0, null);
         double ordinaryHard = riderShare(2000, null);

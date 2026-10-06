@@ -71,9 +71,9 @@ public class ReforgedRemembranceTest {
         int allFour = wearer.getBuffManager().stacksOf(SEER);
         System.out.println("[23022] seer: burn=" + afterBurn + " burnAgain=" + burnAgain
                 + " +shock=" + afterShock + " +wind+physical=" + allFour);
-        Assertions.assertEquals(1, afterBurn, "灼烧 gives one layer");
+        Assertions.assertEquals(1, afterBurn, "Burn (灼烧) gives one layer");
         Assertions.assertEquals(1, burnAgain, "and repeating it gives nothing (once per type)");
-        Assertions.assertEquals(2, afterShock, "触电 adds a second");
+        Assertions.assertEquals(2, afterShock, "Shock (触电) adds a second");
         Assertions.assertEquals(4, allFour, "and all four types reach the cap of four");
     }
 

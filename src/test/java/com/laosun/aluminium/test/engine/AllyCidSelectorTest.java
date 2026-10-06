@@ -60,7 +60,7 @@ public class AllyCidSelectorTest {
         int otherHas = other.getBuffManager().stacksOf(MARK);
         System.out.println("[ally_cid] the NAMED character has " + namedHas + " ; a different ally has " + otherHas);
 
-        Assertions.assertEquals(2, namedHas, "「使**风堇**获得 2 层」-- the named cid, and the count the rule states");
+        Assertions.assertEquals(2, namedHas, "「使**风堇**获得 2 层」 (grants **Hyacine** 2 stacks)-- the named cid, and the count the rule states");
         Assertions.assertEquals(0, otherHas,
                 "and a different ally gets nothing -- a fallback to \"the owner\" (or to everybody) would pass one half and fail this one");
     }

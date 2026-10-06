@@ -36,9 +36,9 @@ public class JiaoqiuTest {
         }
 
         Assertions.assertEquals(5, jiaoqiu.getBuffManager() == null ? enemy.getBuffManager().stacksOf("烬煨") : enemy.getBuffManager().stacksOf("烬煨"),
-                "「【烬煨】最多叠加5层」 -- seven applications must still read five");
+                "「【烬煨】最多叠加5层」 (Ashen Roast stacks at most 5 times) -- seven applications must still read five");
         Assertions.assertTrue(enemy.getBuffManager().hasState("灼烧"),
-                "「也会被视为同时陷入了灼烧状态」 -- a Fire DotBuff IS 灼烧 by the engine's own translation");
+                "\"is also considered to be in the Burn state at the same time\" (「也会被视为同时陷入了灼烧状态」) -- a Fire DotBuff IS Burn (灼烧) by the engine's own translation");
         // and this rule applies a Fire DoT. Registered as an open question rather than asserted falsely or deleted silently.
     }
 
@@ -54,15 +54,15 @@ public class JiaoqiuTest {
         battle.startBattle();
 
         Assertions.assertTrue(before - enemy.getCurrentHp() > 0,
-                "「对敌方全体造成等同于椒丘100%攻击力的火属性伤害」");
-        Assertions.assertEquals(1, enemy.getBuffManager().stacksOf("烬煨"), "并施加1层【烬煨】");
+                "「对敌方全体造成等同于椒丘100%攻击力的火属性伤害」 (Fire damage to all enemies equal to 100% of Jiaoqiu (椒丘)'s ATK)");
+        Assertions.assertEquals(1, enemy.getBuffManager().stacksOf("烬煨"), "and applies 1 stack of Ashen Roast (【烬煨】)");
 
         Character plain = CharacterFactory.create(JIAOQIU, LEVEL);
         Enemy enemy2 = EnemyFactory.create(MONSTER, 90, 1);
         Battle plainBattle = new Battle(List.of(plain), List.of(enemy2), fixed());
         double untouched = enemy2.getCurrentHp();
         plainBattle.startBattle();
-        Assertions.assertEquals(untouched, enemy2.getCurrentHp(), 1e-9, "「使用秘技后」 -- undeclared, so nothing");
+        Assertions.assertEquals(untouched, enemy2.getCurrentHp(), 1e-9, "「使用秘技后」 (after using the Technique) -- undeclared, so nothing");
     }
 
     private static Random fixed() {

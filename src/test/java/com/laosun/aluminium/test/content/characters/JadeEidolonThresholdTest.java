@@ -32,7 +32,7 @@ public class JadeEidolonThresholdTest {
         // Note: A difference, not an absolute: the unit carries the game's inherent +0.05 crit chance, so `get() - baseValue()`
         // mixes the two (measured: 0.23 where the clause owns 0.18).
         Assertions.assertEquals(0.18, withTechnique - without, EPS,
-                "【当品】叠加至15层时，暴击率提高18%");
+                "at 15 stacks of Pawned Asset (【当品】), CRIT Rate is raised by 18%");
         // The absence of the clause still reads the game's inherent 5% crit chance, so the control is 0.05.
         Assertions.assertEquals(0.05, without, EPS, "one layer is below the threshold, so only the inherent remains");
     }

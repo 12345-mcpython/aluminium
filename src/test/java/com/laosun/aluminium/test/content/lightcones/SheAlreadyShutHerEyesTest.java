@@ -62,7 +62,7 @@ public class SheAlreadyShutHerEyesTest {
         System.out.println("[23011] lost=" + lost + " alliedHealed=" + healed + " expected=" + (lost * SHARE)
                 + " wearerHealed=" + wearerHealed);
         Assertions.assertEquals(lost * SHARE, healed, 1e-6, "the share is of the ALLY's own gap (rank 1 param says 0.8)");
-        Assertions.assertEquals(0.0, wearerHealed, 1e-9, "and a full-HP ally heals nothing -- 「各自」");
+        Assertions.assertEquals(0.0, wearerHealed, 1e-9, "and a full-HP ally heals nothing -- 「各自」 (each one's own)");
     }
 
     @Test

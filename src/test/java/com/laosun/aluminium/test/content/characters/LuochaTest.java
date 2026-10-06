@@ -36,7 +36,7 @@ public class LuochaTest {
         f.battle.castImmediate(f.luocha.getSkills().get(SkillType.SKILL), f.luocha, List.of(f.ally));
 
         Assertions.assertEquals(1, f.luocha.getBuffManager().stacksOf("白花之刻"),
-                "「并使罗刹获得1层【白花之刻】」");
+                "「并使罗刹获得1层【白花之刻】」 (and Luocha (罗刹) gains 1 stack of Abyss Flower (【白花之刻】))");
     }
 
     /** Census: the counter, the low-HP retrigger and the level convention are where the notes say. */

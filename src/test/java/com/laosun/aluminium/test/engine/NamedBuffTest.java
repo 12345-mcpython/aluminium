@@ -63,7 +63,7 @@ public class NamedBuffTest {
         f.fire(List.of(removeState("协奏")));
 
         Assertions.assertEquals(before, f.attack(), 1e-6,
-                "an unnamed modifier survives 「remove 协奏」 -- only what states a name can be removed by one");
+                "an unnamed modifier survives 「remove 协奏 (Concerto)」 -- only what states a name can be removed by one");
     }
 
     // ==================================================================

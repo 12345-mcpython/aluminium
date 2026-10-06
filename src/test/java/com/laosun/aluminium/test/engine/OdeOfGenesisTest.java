@@ -64,9 +64,9 @@ public class OdeOfGenesisTest {
                 + "\n           crit:   expected " + expectedCrit + " got " + critGain);
 
         Assertions.assertEquals(expectedAttack, attackGain, Math.abs(expectedAttack) * 1e-6,
-                "「攻击力提高，数值等同于德谬歌生命上限的 #1%」");
+                "\"ATK raised by an amount equal to #1% of Demiurge (德谬歌)'s Max HP\" (「攻击力提高，数值等同于德谬歌生命上限的 #1%」)");
         Assertions.assertEquals(expectedCrit, critGain, Math.abs(expectedCrit) * 1e-6,
-                "「暴击率提高，数值等同于德谬歌暴击率的 #2%」");
+                "\"CRIT Rate raised by an amount equal to #2% of Demiurge (德谬歌)'s CRIT Rate\" (「暴击率提高，数值等同于德谬歌暴击率的 #2%」)");
     }
 
     /** "该效果对迷迷也生效" -- the same two effects reach the recipient's own memosprite. */
@@ -91,9 +91,9 @@ public class OdeOfGenesisTest {
         double gain = mimi.getAttribute(AttributeType.ATTACK).get() - before;
         double expected = used.get(0) * demiurge.getMaxHp();
 
-        System.out.println("[genesis] 迷迷 (" + mimi.getName() + ") attack gain = " + gain
+        System.out.println("[genesis] Mem (迷迷) (" + mimi.getName() + ") attack gain = " + gain
                 + " ; expected " + expected);
         Assertions.assertEquals(expected, gain, Math.abs(expected) * 1e-6,
-                "「该效果对迷迷也生效」-- aimed at `summon`, the spelling 1402 and 1413 already use");
+                "「该效果对迷迷也生效」 (this effect also applies to Mem)-- aimed at `summon`, the spelling 1402 and 1413 already use");
     }
 }

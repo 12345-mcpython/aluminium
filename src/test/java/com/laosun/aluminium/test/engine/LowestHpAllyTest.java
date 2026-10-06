@@ -48,7 +48,7 @@ public class LowestHpAllyTest {
         Assertions.assertEquals(500, hero.getCurrentHp(), 1.0,
                 "an absolute-HP reading would pick the 500-point ally -- it must not");
         Assertions.assertEquals(1000, ally.getCurrentHp(), 1.0,
-                "「生命值百分比最低的」 is the 9% one, so the heal lands there");
+                "「生命值百分比最低的」 (the one with the lowest HP percentage) is the 9% one, so the heal lands there");
     }
 
     /**
@@ -86,7 +86,7 @@ public class LowestHpAllyTest {
         f.fire();
 
         Assertions.assertEquals(600, hero.getCurrentHp(), 1.0,
-                "the living ally is the lowest -- 「我方目标」 does not mean 「包括倒下的」");
+                "the living ally is the lowest -- 「我方目标」 (our target) does not mean 「包括倒下的」 (including the fallen)");
     }
 
     /** A camp with nobody alive is <b>no target</b>, not an error: the same reading the group selectors have. */
@@ -96,7 +96,7 @@ public class LowestHpAllyTest {
         Fixture f = new Fixture(hero, List.of(hero), TriggerSpecs.heal(100, "lowest_hp_ally"));
         hero.takeDamage(hero.getMaxHp());
 
-        Assertions.assertDoesNotThrow(f::fire, "an empty answer is a no-op, like 「我方全体」 with nobody standing");
+        Assertions.assertDoesNotThrow(f::fire, "an empty answer is a no-op, like 「我方全体」 (all allies) with nobody standing");
         Assertions.assertEquals(0, hero.getCurrentHp(), 1.0, "and nothing happened to it");
     }
 

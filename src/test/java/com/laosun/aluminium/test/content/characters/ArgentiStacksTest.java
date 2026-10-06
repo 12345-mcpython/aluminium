@@ -51,7 +51,7 @@ public class ArgentiStacksTest {
             int before = f.argenti.getBuffManager().stacksOf("升格");
             f.fireAttack(cast, 1);
             int after = f.argenti.getBuffManager().stacksOf("升格");
-            Assertions.assertEquals(1, after - before, cast + " marks 【升格】 exactly once");
+            Assertions.assertEquals(1, after - before, cast + " marks 【升格】 (Apotheosis) exactly once");
             marks++;
         }
         Assertions.assertEquals(3, marks);
@@ -69,7 +69,7 @@ public class ArgentiStacksTest {
         }
 
         Assertions.assertEquals(base + 10 * 0.025, f.argenti.getAttribute(AttributeType.CRIT_CHANCE).get(), 1e-6,
-                "「该效果最多叠加10层」: twelve hits give ten stacks, not twelve");
+                "「该效果最多叠加10层」 (this effect stacks at most 10 times): twelve hits give ten stacks, not twelve");
         Assertions.assertEquals(10, f.argenti.getBuffManager().stacksOf("升格"),
                 "…and the count is readable by name, which is what Eidolon 4 and any removal would use");
     }
@@ -83,7 +83,7 @@ public class ArgentiStacksTest {
         f.argentiTurn();
 
         Assertions.assertEquals(base + 0.025, f.argenti.getAttribute(AttributeType.CRIT_CHANCE).get(), 1e-6,
-                "「回合开始时，立即获得1层【升格】」");
+                "「回合开始时，立即获得1层【升格】」 (at the start of the turn, immediately gains 1 stack of Apotheosis (【升格】))");
     }
 
     /** trace Courage (勇气) boosts the instance that lands on a hurt enemy, and only that one. */
@@ -95,7 +95,7 @@ public class ArgentiStacksTest {
         Assertions.assertEquals(2, TriggerTables.of(ARGENTI).ruleCount(TriggerEvent.TURN_START) + 1,
                 "census: her file has the turn-start trace");
         Assertions.assertEquals(2, TriggerTables.of(ARGENTI).ruleCount(TriggerEvent.DEALING_DAMAGE),
-                "勇气 (the target's HP percentage -- no per-target vocabulary needed, because the condition's subject "
+                "the trace Courage (勇气): the target's HP percentage -- no per-target vocabulary needed, because the condition's subject "
                         + "is already the unit being hit) and Eidolon 6's defence ignore");
     }
 

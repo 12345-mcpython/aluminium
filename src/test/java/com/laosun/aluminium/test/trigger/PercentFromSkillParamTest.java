@@ -71,7 +71,7 @@ public class PercentFromSkillParamTest {
                 + " (neighbour " + neighbour + ") ; gained " + gained);
 
         Assertions.assertEquals(expected, gained, Math.abs(expected) * 1e-6,
-                "「等同于缇宝 #3% 生命上限」-- #3 of HIS ultimate, times Max HP");
+                "「等同于缇宝 #3% 生命上限」 (equal to #3% of Tribbie's Max HP)-- #3 of HIS ultimate, times Max HP");
         Assertions.assertNotEquals(neighbour, gained, Math.abs(expected) * 1e-6, "and the index is load-bearing");
     }
 }

@@ -38,7 +38,7 @@ public class PeerageCritDamageTest {
         double without = critRatio(false);
         Assertions.assertTrue(without > 1.0, "precondition: a crit really is bigger than a non-crit (" + without + ")");
         Assertions.assertTrue(withPeer > without,
-                "「战技伤害的暴击伤害提高 72%」 (crit/non-crit: with=" + withPeer + ", without=" + without + ")");
+                "「战技伤害的暴击伤害提高 72%」 (Skill DMG's CRIT DMG is raised by 72%) (crit/non-crit: with=" + withPeer + ", without=" + without + ")");
     }
 
     /** forced-crit damage divided by never-crit damage, same scene, same six casts. */

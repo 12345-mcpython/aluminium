@@ -47,7 +47,7 @@ public class ShieldOriginConditionTest {
     @Test
     public void onlyTheNamedRulesShieldCounts() {
         Assertions.assertTrue(healFires(true, "skill_shield"),
-                "「战技提供的护盾」 is the shield that rule created");
+                "「战技提供的护盾」 (the shield the Skill provides) is the shield that rule created");
         Assertions.assertFalse(healFires(true, "eidolon_shield"),
                 "…and a different rule of hers is a different shield, even though the giver is the same");
     }
@@ -121,9 +121,9 @@ public class ShieldOriginConditionTest {
         double throughTheSkill = shippedTurnStartHeal(true);
         double throughTheBattleStart = shippedTurnStartHeal(false);
 
-        Assertions.assertTrue(throughTheSkill > 0, "「每回合开始时回复等同于各自4%生命上限+106」");
+        Assertions.assertTrue(throughTheSkill > 0, "\"at the start of every turn, restores HP equal to 4% of each one's Max HP + 106\" (「每回合开始时回复等同于各自4%生命上限+106」)");
         Assertions.assertEquals(0, throughTheBattleStart, EPS,
-                "only 「战技提供的护盾」 qualifies -- the 星魂 2 shield is hers too, and must not");
+                "only \"the shield the Skill provides\" (「战技提供的护盾」) qualifies -- the Eidolon (星魂) 2 shield is hers too, and must not");
     }
 
     // ==================================================================

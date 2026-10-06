@@ -51,7 +51,7 @@ public class ClassResistBuff extends AbstractBuff {
         if (!(percent > 0) || percent > 1) {
             throw new IllegalArgumentException(
                     "ClassResistBuff percent must be in (0, 1], got " + percent
-                            + " (1.0 = immunity (免疫), 0.35 = 「抵抗…的概率提高35%」)");
+                            + " (1.0 = immunity (免疫), 0.35 = 「抵抗…的概率提高35%」 (raises the RES to ... by 35%))");
         }
         if (turns < 1) {
             throw new IllegalArgumentException("ClassResistBuff turns must be >= 1, got " + turns);

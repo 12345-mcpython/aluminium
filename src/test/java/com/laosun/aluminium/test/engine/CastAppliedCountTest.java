@@ -186,7 +186,7 @@ public class CastAppliedCountTest {
         double withoutEidolon = shippedUltimateEnergy(0);
 
         Assertions.assertEquals(18, withEidolon - withoutEidolon, EPS,
-                "「终结技每冻结1个目标，为三月七恢复6点能量」 × the 3 enemies her ultimate froze");
+                "「终结技每冻结1个目标，为三月七恢复6点能量」 (for every target the Ultimate freezes, March 7th restores 6 Energy) × the 3 enemies her ultimate froze");
     }
 
     /** ...and her file really states the count, rather than the aim count that would pay the same 18 here. */
@@ -200,7 +200,7 @@ public class CastAppliedCountTest {
                 .stream()
                 .filter(rule -> rule.minEidolon() == 1)
                 .findFirst()
-                .orElseThrow(() -> new AssertionError("星魂 1's rule is gone from characters/1001.json"))
+                .orElseThrow(() -> new AssertionError("Eidolon (星魂) 1's rule is gone from characters/1001.json"))
                 .effects().getFirst();
 
         Assertions.assertEquals("GAIN_ENERGY", effect.getOp());

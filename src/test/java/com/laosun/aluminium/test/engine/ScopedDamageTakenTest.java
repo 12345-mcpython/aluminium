@@ -52,7 +52,7 @@ public class ScopedDamageTakenTest {
         enemy.getBuffManager().addBuff(new VulnerabilityBuff(2, 0.5, false, DamageType.BREAK));
 
         Assertions.assertEquals(plainBreak * 1.5, settle(enemy, DamageType.BREAK), EPS,
-                "「使目标受到的**击破伤害**提高 50%」 -- the scoped kind is raised by the ratio");
+                "「使目标受到的**击破伤害**提高 50%」 (raises the **Break DMG** the target takes by 50%) -- the scoped kind is raised by the ratio");
         Assertions.assertEquals(plainNormal, settle(enemy, DamageType.NORMAL), EPS,
                 "⚠ …and an ordinary hit is untouched: that is the whole point of the scope");
     }
@@ -67,7 +67,7 @@ public class ScopedDamageTakenTest {
         enemy.getBuffManager().addBuff(new VulnerabilityBuff(2, 0.3, false, DamageType.DOT));
 
         Assertions.assertEquals(plainDot * 1.3, settle(enemy, DamageType.DOT), EPS,
-                "「使目标**受到的持续伤害**提高 30%」 -- the DOT kind is raised by the ratio");
+                "「使目标**受到的持续伤害**提高 30%」 (raises the **DoT** the target takes by 30%) -- the DOT kind is raised by the ratio");
         Assertions.assertEquals(plainNormal, settle(enemy, DamageType.NORMAL), EPS,
                 "⚠ …and ordinary damage is not: the mirror-image mistake is DOT_DAMAGE_BOOST, which is the dealer's side");
     }
@@ -113,7 +113,7 @@ public class ScopedDamageTakenTest {
     @Test
     public void aStatedChanceOnAZoneIsRolled() {
         double plain = settle(DamageType.DOT);
-        Assertions.assertEquals(plain, withZoneRolled(0.0001, 0.5), EPS, "「有 X% 的基础概率」 is a roll, not a label");
+        Assertions.assertEquals(plain, withZoneRolled(0.0001, 0.5), EPS, "「有 X% 的基础概率」 (an X% base chance) is a roll, not a label");
         Assertions.assertEquals(plain * 1.3, withZoneRolled(1.0, 0.0), EPS, "…and an easy draw lands it");
     }
 

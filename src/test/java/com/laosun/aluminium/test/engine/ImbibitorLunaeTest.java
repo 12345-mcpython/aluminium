@@ -42,9 +42,9 @@ public class ImbibitorLunaeTest {
             battle.castImmediate(dhil.getSkills().get(SkillType.COMMON), dhil, List.of(enemy));
         }
         Assertions.assertEquals(6, dhil.getBuffManager().stacksOf(OUTROAR),
-                "「施放每段攻击后获得1层【亢心】…该效果可以叠加6层」");
+                "\"gains 1 stack of Righteous Heart (【亢心】) after each attack segment ... this effect can stack 6 times\" (「施放每段攻击后获得1层【亢心】…该效果可以叠加6层」)");
         Assertions.assertTrue(dhil.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get() > boostBefore,
-                "「使自身造成的伤害提高10.00%」 per stack");
+                "「使自身造成的伤害提高10.00%」 (raises its own DMG dealt by 10.00%) per stack");
 
         battle.castImmediate(dhil.getSkills().get(SkillType.COMMON), dhil, List.of(enemy));
         Assertions.assertEquals(6, dhil.getBuffManager().stacksOf(OUTROAR),

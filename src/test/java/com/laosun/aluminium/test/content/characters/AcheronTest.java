@@ -30,13 +30,13 @@ public class AcheronTest {
 
         Assertions.assertEquals(0, dreamOf(acheron), "the document states no initial value, so it starts at 0");
         battle.fireTriggers(TriggerEvent.SKILL_CAST, acheron, enemy, 0, 0);
-        Assertions.assertEquals(1, dreamOf(acheron), "「获得1点【残梦】」");
+        Assertions.assertEquals(1, dreamOf(acheron), "「获得1点【残梦】」 (gains 1 point of [残梦])");
 
         for (int i = 0; i < 11; i++) {
             battle.fireTriggers(TriggerEvent.SKILL_CAST, acheron, enemy, 0, 0);
         }
         Assertions.assertEquals(9, dreamOf(acheron),
-                "「【残梦】达到9点时可激活终结技」 -- twelve casts must still read nine");
+                "「【残梦】达到9点时可激活终结技」 (at 9 points of [残梦] the Ultimate can be activated) -- twelve casts must still read nine");
     }
 
 

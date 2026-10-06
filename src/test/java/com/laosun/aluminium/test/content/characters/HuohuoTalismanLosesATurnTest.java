@@ -51,7 +51,7 @@ public class HuohuoTalismanLosesATurnTest {
         Assertions.assertNotNull(skill, "precondition: she has a skill");
         SkillExecutor.execute(battle, skill, her, List.of(battle.enemies.getFirst()));
         battle.processRequests();
-        Assertions.assertTrue(her.getBuffManager().hasState(STATE), "precondition: 【禳命】 is on her");
+        Assertions.assertTrue(her.getBuffManager().hasState(STATE), "precondition: 【禳命】 (Divine Provision) is on her");
         int before = her.getBuffManager().findBuff(StateBuff.class).duration();
 
         battle.applyTrueDamage(battle.enemies.getFirst(), ally, DamageElement.ICE, ally.getCurrentHp() * 2.0);
@@ -62,8 +62,8 @@ public class HuohuoTalismanLosesATurnTest {
                 + " ; the saved ally survives = " + !ally.isDeath());
 
         Assertions.assertEquals(1, after,
-                "「使【禳命】的持续回合数减 1」-- her skill granted 2, so the save leaves 1");
+                "「使【禳命】的持续回合数减 1」 (reduces the remaining turns of Divine Provision by 1)-- her skill granted 2, so the save leaves 1");
         Assertions.assertTrue(!ally.isDeath(),
-                "「不会陷入无法战斗状态」-- answering the lethal event is what cancels the death");
+                "「不会陷入无法战斗状态」 (does not fall into the unable-to-fight state)-- answering the lethal event is what cancels the death");
     }
 }

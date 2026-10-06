@@ -39,7 +39,7 @@ public class YunliTest {
         battle.fireTriggers(TriggerEvent.SKILL_CAST, yunli, enemy, 0, 0);
 
         Assertions.assertEquals(expected, yunli.getCurrentHp() - before, expected * 0.02,
-                "「恢复等同于云璃30.00%攻击力+200的生命值」: expected " + expected);
+                "「恢复等同于云璃30.00%攻击力+200的生命值」 (restores HP equal to 30.00% of Yunli's ATK + 200): expected " + expected);
     }
 
     /** Note: The counter reaches the ATTACKER and nobody else, and its 120% is pinned against a hand-built 240% reference. */
@@ -59,7 +59,7 @@ public class YunliTest {
         battle.fireTriggers(TriggerEvent.TAKING_HIT, attacker, yunli, 0, 100);
 
         Assertions.assertEquals(15.0, yunli.getCurrentEnergy() - energyBefore, 1e-6,
-                "「额外恢复15点能量」");
+                "「额外恢复15点能量」 (restores 15 extra Energy)");
         Assertions.assertEquals(bystanderBefore, bystander.getCurrentHp(), 1e-9,
                 "and a bystander does not: `target: attacker` is what makes this exact");
         Assertions.assertTrue(reference > 0, "the reference must land at all");

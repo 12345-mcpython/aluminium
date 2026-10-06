@@ -74,7 +74,7 @@ public class HighestHpAmongHitsTest {
         }
         System.out.println("[highest_hit] after a real cast, units of the hit set whose speed rose = " + raised);
         Assertions.assertEquals(1, raised,
-                "「被攻击目标中当前生命值最高的目标」-- ONE of the units the attack hit");
+                "「被攻击目标中当前生命值最高的目标」 (the target with the highest current HP among those hit)-- ONE of the units the attack hit");
     }
 
     /** With no instance at all there is no hit set, and the selector says so rather than aiming at nobody. */

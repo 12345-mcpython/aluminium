@@ -75,6 +75,6 @@ public class RandomEnemySelectorTest {
                 + " target=" + effect.getTarget() + " damage_type=" + effect.getDamageType());
         Assertions.assertEquals(0.14, effect.getPercent(), 1e-9, "14% of her attack");
         Assertions.assertEquals("random_enemy", effect.getTarget(), "aimed by the roll");
-        Assertions.assertEquals("ELATION", effect.getDamageType(), "as 欢愉伤容");
+        Assertions.assertEquals("ELATION", effect.getDamageType(), "as Elation DMG (欢愉伤容)");
     }
 }

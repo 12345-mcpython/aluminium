@@ -65,7 +65,7 @@ public class TextureOfMemoriesTest {
         double before = wearer.getShield();
         takeHit(battle);
         System.out.println("[24002] already shielded: " + before + " -> " + wearer.getShield());
-        Assertions.assertEquals(before, wearer.getShield(), 1e-9, "未持有护盾 is the gate (false case)");
+        Assertions.assertEquals(before, wearer.getShield(), 1e-9, "not holding a shield (未持有护盾) is the gate -- the false case");
     }
 
     @Test

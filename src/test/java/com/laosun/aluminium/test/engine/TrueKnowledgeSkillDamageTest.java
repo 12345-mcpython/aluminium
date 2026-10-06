@@ -33,13 +33,13 @@ public class TrueKnowledgeSkillDamageTest {
         double[] skillElsewhere = hit(false, SkillType.SKILL);
         double[] basicAtHim = hit(true, SkillType.COMMON);
         double[] basicElsewhere = hit(false, SkillType.COMMON);
-        System.out.println("[true_knowledge_dmg] SKILL: " + skillAtHim[0] + " with [真知] on him, "
+        System.out.println("[true_knowledge_dmg] SKILL: " + skillAtHim[0] + " with [真知] (True Knowledge) on him, "
                 + skillElsewhere[0] + " without it (captured " + skillAtHim[1] + " bp)");
         System.out.println("[true_knowledge_dmg] COMMON: " + basicAtHim[0] + " with it, " + basicElsewhere[0]
                 + " without it");
         double skillRatio = skillAtHim[0] / skillElsewhere[0];
         double basicRatio = basicAtHim[0] / basicElsewhere[0];
-        Assertions.assertTrue(skillRatio > 1.05, "his SKILL hits much harder with [真知] up: " + skillRatio);
+        Assertions.assertTrue(skillRatio > 1.05, "his SKILL hits much harder with [真知] (True Knowledge) up: " + skillRatio);
         // The BASIC's move is the OTHER clause of the same sentence (the +30% attack for Erudition, which is +0.84 on ~5= +0.111%), NOT a gate leak. A boost that lost its
         // `from_skill SKILL` gate would move this ratio to the skill's own ~1.39 and fail here.
         Assertions.assertTrue(basicRatio < 1.01,

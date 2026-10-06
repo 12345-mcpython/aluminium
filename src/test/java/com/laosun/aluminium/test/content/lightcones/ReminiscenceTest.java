@@ -58,7 +58,7 @@ public class ReminiscenceTest {
         int onWearer = wearer.getBuffManager().stacksOf(MEMORIAL);
         int onSprite = sprite.getBuffManager().stacksOf(MEMORIAL);
         System.out.println("[20022] after one memosprite turn: wearer=" + onWearer + " sprite=" + onSprite);
-        Assertions.assertEquals(1, onWearer, "分别获得 1 层: the wearer");
+        Assertions.assertEquals(1, onWearer, "1 stack each (分别获得 1 层): the wearer");
         Assertions.assertEquals(1, onSprite, "and the memosprite");
     }
 
@@ -68,7 +68,7 @@ public class ReminiscenceTest {
         battle.summonMemosprite(wearer);
         battle.fireTriggers(TriggerEvent.TURN_START, wearer, null, 0, 0);
         System.out.println("[20022] after the WEARER's turn start: " + wearer.getBuffManager().stacksOf(MEMORIAL));
-        Assertions.assertEquals(0, wearer.getBuffManager().stacksOf(MEMORIAL), "忆灵的回合 (false case)");
+        Assertions.assertEquals(0, wearer.getBuffManager().stacksOf(MEMORIAL), "the memosprite's turn (忆灵的回合) -- the false case");
     }
 
     @Test
@@ -83,7 +83,7 @@ public class ReminiscenceTest {
                 + " ; sprite dead=" + sprite.isDeath());
         Assertions.assertEquals(1, before, "one stack first");
         Assertions.assertTrue(sprite.isDeath(), "the memosprite really died");
-        Assertions.assertEquals(0, after, "忆灵消失时移除");
+        Assertions.assertEquals(0, after, "removed when the memosprite disappears (忆灵消失时移除)");
     }
 
     @Test
@@ -103,7 +103,7 @@ public class ReminiscenceTest {
                         + " amount=" + effect.getAmount() + " max=" + effect.getMaxStacks()
                         + " target=" + effect.getTarget());
                 Assertions.assertEquals("ADD_STACK", effect.getOp(), "the turn start gains");
-                Assertions.assertEquals(4, effect.getMaxStacks(), "最多叠加 4 层");
+                Assertions.assertEquals(4, effect.getMaxStacks(), "at most 4 stacks (最多叠加 4 层)");
                 if ("summon".equals(effect.getTarget())) {
                     targets++;
                 }

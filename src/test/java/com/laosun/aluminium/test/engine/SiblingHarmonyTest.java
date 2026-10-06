@@ -35,11 +35,11 @@ public class SiblingHarmonyTest {
         battle.castImmediate(tb.getSkills().get(SkillType.ULTRA), tb, List.of(enemy));
 
         Assertions.assertTrue(ally.getBuffManager().hasState("伴舞"),
-                "「为我方全体附上【伴舞】效果」");
+                "\"applies the Backup Dancer (【伴舞】) effect to all allies\" (「为我方全体附上【伴舞】效果」)");
         // Measured: BREAKING_EFFECT is a FRACTION attribute whose base is 0, and the engine lands this modifier as an absolute 0.3 - i.e. exactly the
         // document's 30%. Asserting a share of the base (the first attempt) expected 0 and compared nothing.
         Assertions.assertEquals(0.3, ally.getAttribute(AttributeType.BREAKING_EFFECT).get() - before, 1e-9,
-                "「击破特攻提高30%」: gain " + (ally.getAttribute(AttributeType.BREAKING_EFFECT).get() - before));
+                "「击破特攻提高30%」 (Break Effect is raised by 30%): gain " + (ally.getAttribute(AttributeType.BREAKING_EFFECT).get() - before));
     }
 
     /** Note: The technique's own +30% for two turns, gated on the marker, with the control. */
@@ -55,7 +55,7 @@ public class SiblingHarmonyTest {
         battle.startBattle();
 
         Assertions.assertTrue(ally.getAttribute(AttributeType.BREAKING_EFFECT).get() > before,
-                "「使我方全体的击破特攻提高30%，持续2回合」");
+                "\"raises all allies' Break Effect by 30% for 2 turns\" (「使我方全体的击破特攻提高30%，持续2回合」)");
 
         Character plain = CharacterFactory.create(TB, LEVEL);
         Character ally2 = CharacterFactory.create(ALLY, LEVEL);
@@ -64,7 +64,7 @@ public class SiblingHarmonyTest {
         double untouched = ally2.getAttribute(AttributeType.BREAKING_EFFECT).get();
         plainBattle.startBattle();
         Assertions.assertEquals(untouched, ally2.getAttribute(AttributeType.BREAKING_EFFECT).get(), 1e-9,
-                "「使用秘技后」 -- undeclared, so nothing");
+                "「使用秘技后」 (after using the Technique) -- undeclared, so nothing");
     }
 
     /** Census: the ultimate, the super-break rule, the talent, the technique and the convention. */

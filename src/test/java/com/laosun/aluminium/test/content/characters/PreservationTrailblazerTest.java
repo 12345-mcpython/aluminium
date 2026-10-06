@@ -39,7 +39,7 @@ public class PreservationTrailblazerTest {
             battle.fireTriggers(TriggerEvent.TAKING_HIT, enemy, tb, 0, 0);
         }
         Assertions.assertEquals(8, tb.getBuffManager().stacksOf("灼热意志"),
-                "「每受到1次攻击，叠加1层【灼热意志】，最多可叠加8层」");
+                "「每受到1次攻击，叠加1层【灼热意志】，最多可叠加8层」 (every time it is attacked once, gains 1 stack of Magma Will (【灼热意志】), up to 8 stacks)");
 
         battle.fireTriggers(TriggerEvent.TAKING_HIT, enemy, tb, 0, 0);
         Assertions.assertEquals(8, tb.getBuffManager().stacksOf("灼热意志"), "the ninth hit must not pass the cap");
@@ -58,7 +58,7 @@ public class PreservationTrailblazerTest {
             battle.castImmediate(tb.getSkills().get(com.laosun.aluminium.enums.SkillType.SKILL), tb, List.of(enemy));
 
             Assertions.assertEquals(expected, ally.getShield(), expected * 0.02,
-                    "cid " + cid + ": 「施放战技后，为我方全体提供…6.00%防御力+80的护盾」");
+                    "cid " + cid + ": \"after casting the Skill, provides all allies with a shield of ... 6.00% DEF + 80\" (「施放战技后，为我方全体提供…6.00%防御力+80的护盾」)");
         }
     }
 
@@ -72,14 +72,14 @@ public class PreservationTrailblazerTest {
         battle.startBattle();
         double expected = withTechnique.getAttribute(AttributeType.DEFENCE).get() * 0.3 + 384;
         Assertions.assertEquals(expected, withTechnique.getShield(), expected * 0.02,
-                "「给自身提供…等同于30%防御力+384的护盾，持续1回合」");
+                "「给自身提供…等同于30%防御力+384的护盾，持续1回合」 (provides itself with a shield equal to 30% DEF + 384 for 1 turn)");
 
         Character without = CharacterFactory.create(TB3, LEVEL);
         Enemy enemy2 = EnemyFactory.create(MONSTER, 90, 1);
         Battle plain = new Battle(List.of(without), List.of(enemy2), fixed());
         plain.startBattle();
         Assertions.assertEquals(0.0, without.getShield(), 1e-9,
-                "「使用秘技后」 -- undeclared, so no shield");
+                "「使用秘技后」 (after using the Technique) -- undeclared, so no shield");
     }
 
     /** Census: the stacks, the three shields, the skill's two effects, the technique and the convention. */

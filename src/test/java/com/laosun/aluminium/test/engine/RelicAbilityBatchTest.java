@@ -99,7 +99,7 @@ public class RelicAbilityBatchTest {
         Assertions.assertEquals(0.1, boostOf(wearer, AttributeType.BASIC_ATTACK_DAMAGE_BOOST), EPS,
                 "param #2 is 0.1 -- the registered reason's 12% came from the English sentence");
         Assertions.assertEquals(0, boostOf(wearer, AttributeType.SKILL_DAMAGE_BOOST), EPS,
-                "「普攻造成的伤害」 is one scope, not every cast");
+                "「普攻造成的伤害」 (DMG dealt by Basic ATKs) is one scope, not every cast");
     }
 
     // ==================================================================
@@ -117,7 +117,7 @@ public class RelicAbilityBatchTest {
 
         battle.fireTriggers(TriggerEvent.BREAK, ally, dummy(), 0, 0);
         Assertions.assertEquals(before, wearer.getCurrentEnergy(), EPS,
-                "「装备者击破」: a teammate's break is not hers");
+                "「装备者击破」 (a break by the wearer): a teammate's break is not hers");
 
         battle.fireTriggers(TriggerEvent.BREAK, wearer, dummy(), 0, 0);
         Assertions.assertEquals(before + 3, wearer.getCurrentEnergy(), EPS,
@@ -184,7 +184,7 @@ public class RelicAbilityBatchTest {
         battle.fireTriggers(TriggerEvent.ULT_CAST, wearer, null, 0, 0);
 
         Assertions.assertEquals(0.45, boostOf(wearer, AttributeType.SKILL_DAMAGE_BOOST), EPS,
-                "0.20 + 0.25: 「额外提高」 adds, which is what max_stacks: 2 is for");
+                "0.20 + 0.25: 「额外提高」 (raised by an extra amount) adds, which is what max_stacks: 2 is for");
     }
 
     // ==================================================================
@@ -222,7 +222,7 @@ public class RelicAbilityBatchTest {
 
         battle.castImmediate(new DefaultSkill(WEARER, 1, 1), wearer, List.of(battle.enemyUnits().getFirst()));
         Assertions.assertEquals(before, boostOf(wearer, AttributeType.FIRE_DAMAGE_BOOST), EPS,
-                "「下一次攻击」: the attack has happened, so the boost is gone");
+                "「下一次攻击」 (the next attack): the attack has happened, so the boost is gone");
     }
 
     /** Only the wearer's own follow-up grants it, and the share is the parameter's 36%. */
@@ -235,7 +235,7 @@ public class RelicAbilityBatchTest {
 
         battle.fireTriggers(TriggerEvent.FOLLOW_UP, ally, dummy(), 0, 0);
         Assertions.assertEquals(0, boostOf(wearer, AttributeType.ULTIMATE_DAMAGE_BOOST), EPS,
-                "「装备者施放追加攻击时」: a teammate's follow-up is not hers");
+                "「装备者施放追加攻击时」 (when the wearer casts a follow-up attack): a teammate's follow-up is not hers");
 
         battle.fireTriggers(TriggerEvent.FOLLOW_UP, wearer, dummy(), 0, 0);
         Assertions.assertEquals(0.36, boostOf(wearer, AttributeType.ULTIMATE_DAMAGE_BOOST), EPS,
@@ -281,13 +281,13 @@ public class RelicAbilityBatchTest {
 
         double bareHp = CharacterFactory.create(WEARER, LEVEL).getMaxHp();
         Assertions.assertEquals(0.24 * bareHp, wearer.getMaxHp() - wearerHp, 0.5,
-                "「装备者…生命上限提高 24%」 -- asserted as the DELTA, because a percentage modifier on a base "
+                "「装备者…生命上限提高 24%」 (the wearer's ... Max HP is raised by 24%) -- asserted as the DELTA, because a percentage modifier on a base "
                         + "attribute adds 24% of the character's base Max HP while the relic's own sub-stats "
                         + "already carry their own HP%");
         Assertions.assertTrue(evey.getBuffManager().countBuffs(StatModifierBuff.class) > 0,
-                "「及其忆灵」: the memosprite carries its own copy of the Max HP buff");
+                "「及其忆灵」 (and its memosprite): the memosprite carries its own copy of the Max HP buff");
         Assertions.assertEquals(allyBoost + 0.15, boostOf(ally, AttributeType.ALL_DAMAGE_TYPE_BOOST), EPS,
-                "「我方全体造成的伤害提高 15%」 reaches a teammate too");
+                "「我方全体造成的伤害提高 15%」 (all allies deal 15% more DMG) reaches a teammate too");
 
         // the file states the sentence's disjunction as ONE duration with two ends. Asserted on the shipped
         // 4-piece rather than on a hand-made rule, because the shape of the JSON is half of what this guarantees.
@@ -297,7 +297,7 @@ public class RelicAbilityBatchTest {
         Assertions.assertEquals(1, rules.size());
         for (EffectSpec effect : rules.getFirst().effects()) {
             Assertions.assertEquals(List.of("next_attack", "next_skill"), effect.getUntil(),
-                    "「持续至装备者下次施放普攻或战技后」 -- a list, so a support Skill ends it too");
+                    "「持续至装备者下次施放普攻或战技后」 (lasts until the wearer next casts a Basic ATK or Skill) -- a list, so a support Skill ends it too");
         }
     }
 
@@ -350,7 +350,7 @@ public class RelicAbilityBatchTest {
         battle.processRequests();                                // where SUMMONED is fired, by design
 
         Assertions.assertEquals(0, boostOf(evey, AttributeType.CRIT_ATTACK), EPS,
-                "4000 is below 「大于等于 5000 点」 -- and HEALTH is a base attribute, so the literal is absolute");
+                "4000 is below 「大于等于 5000 点」 (at least 5000 points) -- and HEALTH is a base attribute, so the literal is absolute");
     }
 
     /** The nested tiers hold on both halves: 90 speed grants 32%, not 20% + 32%. */
@@ -370,7 +370,7 @@ public class RelicAbilityBatchTest {
         // (0.32). The wearer's own value is unusable as an absolute -- the relic's random sub-stats carry
         // CRIT Rate of their own, which is how the first draft read 0.69394.
         Assertions.assertEquals(0.32, boostOf(evey, AttributeType.CRIT_CHANCE), 1e-6,
-                "「小于 95」 alone: without the upper tier's exclusion this would be 0.52");
+                "「小于 95」 (below 95) alone: without the upper tier's exclusion this would be 0.52");
         Assertions.assertTrue(boostOf(wearer, AttributeType.CRIT_CHANCE) > bareCritRate(),
                 "and the wearer was granted hers at the start");
     }
@@ -417,7 +417,7 @@ public class RelicAbilityBatchTest {
         battle.castImmediate(new DefaultSkill(WEARER, ULT_SLOT, 1), wearer, List.of(ally));
 
         Assertions.assertEquals(speedBefore * 0.12, boostOf(ally, AttributeType.SPEED) - speedBefore, 1e-6,
-                "「我方全体速度提高#1[i]%」 -- #1 = 0.12, a share of the target's base speed");
+                "「我方全体速度提高#1[i]%」 (all allies' SPD is raised by #1[i]%) -- #1 = 0.12, a share of the target's base speed");
 
         Battle aimedAtEnemy = new Battle(List.of(wearing(MESSENGER), CharacterFactory.create(1210, LEVEL)),
                 List.of(dummy()), new Random(0));
@@ -429,7 +429,7 @@ public class RelicAbilityBatchTest {
                 List.of(aimedAtEnemy.enemyUnits().getFirst()));
 
         Assertions.assertEquals(secondBefore, boostOf(second, AttributeType.SPEED), 1e-6,
-                "aimed at an ENEMY: 「对己方角色」 does not hold, so nothing is granted");
+                "aimed at an ENEMY: 「对己方角色」 (on one of our own characters) does not hold, so nothing is granted");
     }
 
     /** 118 Watchmaker, Master of Dream Machinations (梦游者钟表匠): the same trigger, a ratio attribute (+30% Break Effect, 2 turns). */
@@ -444,7 +444,7 @@ public class RelicAbilityBatchTest {
         battle.castImmediate(new DefaultSkill(WEARER, ULT_SLOT, 1), wearer, List.of(ally));
 
         Assertions.assertEquals(0.3, boostOf(ally, AttributeType.BREAKING_EFFECT) - before, 1e-6,
-                "「击破特攻提高#1[i]%」 -- a ratio attribute, so 0.3 is an absolute +30%");
+                "「击破特攻提高#1[i]%」 (Break Effect is raised by #1[i]%) -- a ratio attribute, so 0.3 is an absolute +30%");
     }
 
     /** 121 Sacerdos' Relived Ordeal (祭司的旧日祭礼): the Skill on an ally raises THAT ally's CRIT DMG, and it stacks to the cap it states. */
@@ -458,7 +458,7 @@ public class RelicAbilityBatchTest {
 
         battle.castImmediate(new DefaultSkill(WEARER, SKILL_SLOT, 1), wearer, List.of(ally));
         Assertions.assertEquals(0.18, boostOf(ally, AttributeType.CRIT_ATTACK) - before, 1e-6,
-                "「使该目标暴击伤害提高#1[i]%」 -- #1 = 0.18, on the unit the cast was AIMED at");
+                "「使该目标暴击伤害提高#1[i]%」 (raises that target's CRIT DMG by #1[i]%) -- #1 = 0.18, on the unit the cast was AIMED at");
 
         battle.castImmediate(new DefaultSkill(WEARER, SKILL_SLOT, 1), wearer, List.of(ally));
         Assertions.assertEquals(0.36, boostOf(ally, AttributeType.CRIT_ATTACK) - before, 1e-6,
@@ -483,7 +483,7 @@ public class RelicAbilityBatchTest {
         Assertions.assertEquals(0.002 * (240 - 200), grantedDamageBoost(240), 1e-6,
                 "240 energy is 40 points over the threshold: 0.2% x 40 = 8%");
         Assertions.assertEquals(0.32, grantedDamageBoost(400), 1e-6,
-                "「最多提高#3[i]%」 -- past 360 the cap holds, and the lower tier is excluded by its own upper bound");
+                "「最多提高#3[i]%」 (raises it by at most #3[i]%) -- past 360 the cap holds, and the lower tier is excluded by its own upper bound");
         Assertions.assertEquals(0, grantedDamageBoost(150), 1e-6,
                 "below the threshold nothing is granted at all (and 0.002 x 150 - 0.4 would have been negative)");
     }
@@ -518,9 +518,9 @@ public class RelicAbilityBatchTest {
     @Test
     public void theIzumoCritRateNeedsATeammateOnTheSamePath() {
         Assertions.assertEquals(0.12, grantedCritRateWith(1013), 1e-6,
-                "黑塔 is 智识, like the wearer: 「若至少存在一名与装备者命途相同的队友」");
+                "Herta (黑塔) is Erudition (智识), like the wearer: \"if there is at least one ally on the same Path as the wearer\" (「若至少存在一名与装备者命途相同的队友」)");
         Assertions.assertEquals(0, grantedCritRateWith(1210), 1e-6,
-                "桂乃芬 is 虚无: the condition does not hold, so nothing is granted");
+                "Guinaifen (桂乃芬) is Nihility (虚无): the condition does not hold, so nothing is granted");
     }
 
     /** The CRIT Rate modifier the suit granted, or 0 when it granted none. */
@@ -552,7 +552,7 @@ public class RelicAbilityBatchTest {
     @Test
     public void theBanditryBreakEffectNeedsAFireWeakEnemy() {
         Assertions.assertEquals(0.2, breakEffectAfterHit(true), 1e-6,
-                "「命中具有火属性弱点的敌方目标时」 -- +20% for 2 turns");
+                "「命中具有火属性弱点的敌方目标时」 (when hitting an enemy target with a Fire Weakness) -- +20% for 2 turns");
         Assertions.assertEquals(0, breakEffectAfterHit(false), 1e-6,
                 "the same hit on an enemy without that weakness grants nothing");
     }
@@ -589,9 +589,9 @@ public class RelicAbilityBatchTest {
      */
     @Test
     public void theRevelryDotBoostAppearsAtItsThresholds() {
-        Assertions.assertEquals(0.12, dotBoostAtAttack(2500), 1e-6, "「大于等于 2400 时…提高 12%」");
+        Assertions.assertEquals(0.12, dotBoostAtAttack(2500), 1e-6, "\"when it is greater than or equal to 2400 ... raise it by 12%\" (「大于等于 2400 时…提高 12%」)");
         Assertions.assertEquals(0.24, dotBoostAtAttack(4000), 1e-6,
-                "「大于等于 3600 时…提高 24%」 -- the lower tier is excluded by its own upper bound");
+                "「大于等于 3600 时…提高 24%」 (at 3600 or above ... raises it by 24%) -- the lower tier is excluded by its own upper bound");
         Assertions.assertEquals(0, dotBoostAtAttack(2000), 1e-6, "below 2400 nothing is granted");
     }
 
@@ -612,7 +612,7 @@ public class RelicAbilityBatchTest {
 
         Assertions.assertTrue(plain > 0, "precondition: the DoT tick dealt damage (" + plain + ")");
         Assertions.assertTrue(boosted > plain,
-                "「使装备者造成的持续伤害额外提高 12%」 must reach the tick (" + boosted + " vs " + plain + ")");
+                "「使装备者造成的持续伤害额外提高 12%」 (raises the DoT the wearer deals by an extra 12%) must reach the tick (" + boosted + " vs " + plain + ")");
     }
 
     /** How much HP one DoT tick takes off the enemy, with the wearer at this ATK. */

@@ -30,25 +30,25 @@ public class LethalHitTest {
     @Test
     public void theTransformedFormSurvivesALethalBlow() {
         Character her = survivor(PHAINON, true);
-        Assertions.assertFalse(her.isDeath(), "「卡厄斯兰那受到致命攻击时不会陷入无法战斗状态」");
+        Assertions.assertFalse(her.isDeath(), "\"when Khaslana (卡厄斯兰那) takes a lethal hit, she does not fall into the unable-to-fight state\" (「卡厄斯兰那受到致命攻击时不会陷入无法战斗状态」)");
         Assertions.assertEquals(her.getMaxHp() * 0.20, her.getCurrentHp(), her.getMaxHp() * 0.01,
-                "「而是回复等同于自身生命上限 20% 的生命值」");
+                "\"instead restores HP equal to 20% of her own Max HP\" (「而是回复等同于自身生命上限 20% 的生命值」)");
     }
 
     /** Note: 1408 untransformed: the same blow kills her. */
     @Test
     public void withoutTheTransformationTheBlowKills() {
         Assertions.assertTrue(survivor(PHAINON, false).isDeath(),
-                "「变身期间」-- outside it the clause does not apply");
+                "「变身期间」 (during the transformation)-- outside it the clause does not apply");
     }
 
     /** 1104: her trace saves her once -- at half of Max HP -- and the SECOND lethal blow kills her. */
     @Test
     public void jingliuSurvivesOnce() {
         Character her = survivor(JINGLIU, false);
-        Assertions.assertFalse(her.isDeath(), "1104 的行迹救了她一次");
+        Assertions.assertFalse(her.isDeath(), "the 1104 Traces (行迹) saved her once");
         Assertions.assertEquals(her.getMaxHp() * 0.50, her.getCurrentHp(), her.getMaxHp() * 0.01,
-                "「回复等同于自身生命上限 50% 的生命值」");
+                "\"restores HP equal to 50% of her own Max HP\" (「回复等同于自身生命上限 50% 的生命值」)");
     }
 
     /** Note: "该效果单场战斗中只能触发 1 次": the second lethal blow kills her. */
@@ -67,7 +67,7 @@ public class LethalHitTest {
         battle.applyTrueDamage(battle.enemies.getFirst(), her, DamageElement.ICE, her.getCurrentHp() * 2.0);
         battle.processRequests();
         Assertions.assertTrue(her.isDeath(),
-                "「该效果单场战斗中只能触发 1 次」-- the second one is not saved");
+                "「该效果单场战斗中只能触发 1 次」 (this effect can only trigger once per battle)-- the second one is not saved");
     }
 
     // ==================================================================

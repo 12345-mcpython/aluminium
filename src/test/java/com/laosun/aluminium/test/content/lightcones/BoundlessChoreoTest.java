@@ -60,8 +60,8 @@ public class BoundlessChoreoTest {
         System.out.println("[21044] rules matching -- plain=" + plain + " defence lowered=" + lowered
                 + " defence+speed lowered=" + both);
         Assertions.assertEquals(0, plain, "a plain target has no rule");
-        Assertions.assertEquals(1, lowered, "防御降低 is one of them");
-        Assertions.assertEquals(2, both, "或 减速 is the other");
+        Assertions.assertEquals(1, lowered, "DEF Reduction (防御降低) is one of them");
+        Assertions.assertEquals(2, both, "or Slow (减速) is the other");
     }
 
     @Test

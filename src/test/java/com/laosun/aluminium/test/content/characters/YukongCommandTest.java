@@ -38,7 +38,7 @@ public class YukongCommandTest {
 
         f.castSkill();
 
-        Assertions.assertEquals(2, f.yukong.getBuffManager().stacksOf("鸣弦号令"), "「gains 2 layers of [鸣弦号令]」");
+        Assertions.assertEquals(2, f.yukong.getBuffManager().stacksOf("鸣弦号令"), "「gains 2 layers of [鸣弦号令] (Roaring Bowstrings)」");
         Assertions.assertTrue(f.ally.getAttribute(AttributeType.ATTACK).get() > allyAttack,
                 "「increases the ATK of all of our side by 80%」 -- the boost lands on the whole side, not just on her");
     }
@@ -51,7 +51,7 @@ public class YukongCommandTest {
 
         f.turnEndOf(f.yukong);
         Assertions.assertEquals(2, f.yukong.getBuffManager().stacksOf("鸣弦号令"),
-                "「on the turn Yukong casts the Skill and gains [鸣弦号令], it is not removed」");
+                "「on the turn Yukong casts the Skill and gains [鸣弦号令] (Roaring Bowstrings), it is not removed」");
 
         f.turnEndOf(f.ally);
         Assertions.assertEquals(1, f.yukong.getBuffManager().stacksOf("鸣弦号令"),
@@ -72,7 +72,7 @@ public class YukongCommandTest {
         Assertions.assertEquals(0, f.yukong.getBuffManager().stacksOf("鸣弦号令"), "two ally turn ends, two layers");
         Assertions.assertTrue(boosted > before, "precondition: the boost was up");
         Assertions.assertEquals(before, f.ally.getAttribute(AttributeType.ATTACK).get(), 1e-6,
-                "「while Yukong holds [鸣弦号令]」 -- with no layers left the boost is off, for every ally");
+                "「while Yukong holds [鸣弦号令] (Roaring Bowstrings)」 -- with no layers left the boost is off, for every ally");
     }
 
     /** The ultimate's crit buffs only appear while she holds a layer. */
@@ -82,7 +82,7 @@ public class YukongCommandTest {
         double base = without.ally.getAttribute(AttributeType.CRIT_CHANCE).get();
         without.castUltimate();
         Assertions.assertEquals(base, without.ally.getAttribute(AttributeType.CRIT_CHANCE).get(), 1e-6,
-                "「if Yukong holds [鸣弦号令]」 is false, so nothing is granted");
+                "「if Yukong holds [鸣弦号令] (Roaring Bowstrings)」 is false, so nothing is granted");
 
         Fixture with = new Fixture();
         with.castSkill();

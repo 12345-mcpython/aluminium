@@ -35,13 +35,13 @@ public class PelaDebuffTest {
     public void theDebuffConditionsAreOnTheRules() {
         TriggerTable table = TriggerTables.of(PELA);
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.ALLY_ATTACK), "the talent's energy trace");
-        Assertions.assertEquals(1, table.ruleCount(TriggerEvent.DEALING_DAMAGE), "trace 痛击");
+        Assertions.assertEquals(1, table.ruleCount(TriggerEvent.DEALING_DAMAGE), "trace Bash (痛击)");
 
         // Note: Two separate fixtures: adding a DOT is not undone, so reusing one enemy would leave the "no debuff" check
         // looking at a debuffed target.
         Fixture debuffed = new Fixture();
         Assertions.assertFalse(table.matching(TriggerEvent.DEALING_DAMAGE, debuffed.ctx(true)).isEmpty(),
-                "with a debuff on the target, 痛击 matches");
+                "with a debuff on the target, Bash (痛击) matches");
         Fixture clean = new Fixture();
         Assertions.assertTrue(table.matching(TriggerEvent.DEALING_DAMAGE, clean.ctx(false)).isEmpty(),
                 "Note: with none it does not: 「to an enemy target in a **negative effect**」");
@@ -54,7 +54,7 @@ public class PelaDebuffTest {
         Assertions.assertTrue(f.ally.getAttribute(AttributeType.EFFECT_HIT_RATE).get() > 0,
                 "「while Pela is on the field, the effect hit rate of all of our side is increased by 10%」");
         Assertions.assertEquals(2, TriggerTables.of(PELA).ruleCount(TriggerEvent.BATTLE_START) - 1,
-                "census: the 秘策 rule, the level-convention rule, and (2026-09-29) the technique's "
+                "census: the Secret Strategy (秘策) rule, the level-convention rule, and (2026-09-29) the technique's "
                         + "「defence reduced by 20%」 which rolls a base chance");
     }
 

@@ -63,6 +63,6 @@ public class SilverWolfLV999Test {
                 .filter(rule -> rule.id().startsWith("p1506_")).toList();
         Assertions.assertEquals(1, rules.size(), "the ultimate’s advance is one rule");
         var effect = rules.getFirst().effects().getFirst();
-        Assertions.assertEquals(1.0, effect.getPercent(), 1e-9, "行动提前 100%");
+        Assertions.assertEquals(1.0, effect.getPercent(), 1e-9, "action advance 100% (行动提前 100%)");
     }
 }

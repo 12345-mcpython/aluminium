@@ -48,9 +48,9 @@ public class NatashaHealTest {
         f.castSkillOn(f.ally);
 
         Assertions.assertEquals(Math.min(f.ally.getMaxHp(), before + expected), f.ally.getCurrentHp(), 1.0,
-                "「立即为指定我方单体回复等同于娜塔莎10.50%生命上限+280的生命值」");
+                "「立即为指定我方单体回复等同于娜塔莎10.50%生命上限+280的生命值」 (immediately restores HP to a designated single ally equal to 10.50% of Natasha (娜塔莎)'s Max HP + 280)");
         Assertions.assertEquals(herBefore, f.natasha.getCurrentHp(), 1.0,
-                "「指定我方单体」 is the ally, not her -- ⚠ the first version compared the ALLY's HP with hers");
+                "「指定我方单体」 (a designated single ally) is the ally, not her -- ⚠ the first version compared the ALLY's HP with hers");
     }
 
     /** Her ultimate heals the whole side. */
@@ -79,7 +79,7 @@ public class NatashaHealTest {
         Fixture f = new Fixture();
         double boost = f.natasha.getAttribute(com.laosun.aluminium.enums.AttributeType.OUTGOING_HEALING_BOOST).get();
         Assertions.assertEquals(0.1, boost, 1e-6,
-                "「娜塔莎提供的治疗量提高10%」 -- the first shipped content to grant this attribute");
+                "「娜塔莎提供的治疗量提高10%」 (the healing Natasha provides is raised by 10%) -- the first shipped content to grant this attribute");
     }
 
     /**
@@ -100,7 +100,7 @@ public class NatashaHealTest {
 
         f.allyTurn();
         Assertions.assertEquals(Math.min(f.ally.getMaxHp(), afterCast + perTick), f.ally.getCurrentHp(), 1.0,
-                "first turn start: 「目标每回合开始时为其回复…」");
+                "first turn start: 「目标每回合开始时为其回复…」 (restores ... to the target at the start of every turn)");
 
         double afterFirst = f.ally.getCurrentHp();
         f.allyTurn();
@@ -111,7 +111,7 @@ public class NatashaHealTest {
         double afterThird = f.ally.getCurrentHp();
         f.allyTurn();
         Assertions.assertEquals(Math.min(f.ally.getMaxHp(), afterThird + perTick), f.ally.getCurrentHp(), 1.0,
-                "…and a third time, because the 行迹 调理 trace lengthens it by one turn");
+                "…and a third time, because the Traces (行迹) Recuperation (调理) trace lengthens it by one turn");
         double afterFourth = f.ally.getCurrentHp();
         f.allyTurn();
         Assertions.assertEquals(afterFourth, f.ally.getCurrentHp(), 1.0, "…and then it is over");

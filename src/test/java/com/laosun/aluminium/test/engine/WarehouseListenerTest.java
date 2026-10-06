@@ -58,10 +58,10 @@ public class WarehouseListenerTest {
                 + " listener in queue=" + ownedInQueue);
 
         Assertions.assertTrue(ownedGain > 0,
-                "「获得该角色即生效」-- the listener's own rule ran although it is not on the field");
+                "「获得该角色即生效」 (takes effect as soon as the character is obtained)-- the listener's own rule ran although it is not on the field");
         Assertions.assertEquals(0.0, fighterGain, 1e-9,
                 "and the mark landed on the LISTENER's panel, whose 「self」 is the character that owns the clause");
         Assertions.assertFalse(ownedInQueue,
-                "「无需上场」-- it must not take a turn, which is why it cannot ride in `characters`");
+                "「无需上场」 (does not need to be on the field)-- it must not take a turn, which is why it cannot ride in `characters`");
     }
 }

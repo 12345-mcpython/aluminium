@@ -37,7 +37,7 @@ public class BladeTest {
         battle.castImmediate(blade.getSkills().get(com.laosun.aluminium.enums.SkillType.SKILL), blade, List.of(enemy));
 
         Assertions.assertTrue(blade.getBuffManager().hasState("地狱变"),
-                "「进入【地狱变】状态」");
+                "「进入【地狱变】状态」 (enters the Hellscape (【地狱变】) state)");
     }
 
     /** Note: The technique's 40% of his Max HP, measured against a hand-built 50% in the same pipeline, and the control. */
@@ -47,7 +47,7 @@ public class BladeTest {
         double reference = referenceLoss();
         double undeclared = openingLoss(false);
 
-        Assertions.assertEquals(0.0, undeclared, 1e-9, "「使用秘技后」 -- undeclared, so nothing");
+        Assertions.assertEquals(0.0, undeclared, 1e-9, "「使用秘技后」 (after using the Technique) -- undeclared, so nothing");
         Assertions.assertTrue(reference > 0, "the reference must deal damage");
         Assertions.assertEquals(0.4 / 0.5, content / reference, 0.05,
                 "content " + content + " vs reference " + reference + " (expected " + (0.4 / 0.5) + ")");
@@ -66,7 +66,7 @@ public class BladeTest {
         }
 
         Assertions.assertEquals(5, blade.getBuffManager().stacksOf("充能"),
-                "「最多叠加5层」 -- six hits must still read five");
+                "「最多叠加5层」 (stacks at most 5 times) -- six hits must still read five");
     }
 
     /** Runs the opening with or without the technique marker. */

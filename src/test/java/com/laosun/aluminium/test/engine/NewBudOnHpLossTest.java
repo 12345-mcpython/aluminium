@@ -47,6 +47,6 @@ public class NewBudOnHpLossTest {
         Assertions.assertEquals(50.0, dealt, "precondition: the battle really took 50 HP off her");
 
         Assertions.assertEquals(before + 50, battle.partyResource(RES).value(),
-                "「每损失 1 点生命值遐蝶获得 1 点【新蕊】」 (before=" + before + ")");
+                "「每损失 1 点生命值遐蝶获得 1 点【新蕊】」 (for every 1 point of HP lost, Castorice gains 1 point of Newbud) (before=" + before + ")");
     }
 }

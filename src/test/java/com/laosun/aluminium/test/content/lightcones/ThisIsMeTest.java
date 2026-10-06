@@ -78,7 +78,7 @@ public class ThisIsMeTest {
                                 SkillCategory.NORMAL))
                 .stream().filter(rule -> rule.id().startsWith("cone21030_")).count();
         System.out.println("[21030] rules matching a plain attack = " + pinned);
-        Assertions.assertEquals(0, pinned, "终结技 only (false case)");
+        Assertions.assertEquals(0, pinned, "Ultimate (终结技) only -- the false case");
     }
 
     /**

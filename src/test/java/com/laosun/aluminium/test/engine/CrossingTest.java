@@ -43,7 +43,7 @@ public class CrossingTest {
         battle.applyDamage(ally, new Damage(enemy, ally, DamageElement.PHYSICAL, DamageType.NORMAL, ally.getMaxHp() * 0.1));
 
         Assertions.assertTrue(ally.getCurrentHp() / ally.getMaxHp() > 0.5,
-                "「当我方任意单体当前生命值百分比降到50%或以下时，罗刹会立即对其触发一次等同于战技的效果」 -- after the crossing he must be back above half: " + (ally.getCurrentHp() / ally.getMaxHp()));
+                "「当我方任意单体当前生命值百分比降到50%或以下时，罗刹会立即对其触发一次等同于战技的效果」 (when any one of our units' current HP percentage drops to 50% or below, Luocha immediately triggers a Skill-equivalent effect on them) -- after the crossing he must be back above half: " + (ally.getCurrentHp() / ally.getMaxHp()));
     }
 
     /** Note: The control: hitting someone who is ALREADY below half is not a crossing. */

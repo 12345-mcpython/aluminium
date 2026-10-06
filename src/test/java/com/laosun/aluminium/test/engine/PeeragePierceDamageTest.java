@@ -33,7 +33,7 @@ public class PeeragePierceDamageTest {
         double without = damageDealt(false);
         Assertions.assertTrue(without > 0, "precondition: the control deals damage (" + without + ")");
         Assertions.assertTrue(withPeer > without,
-                "「额外无视 20% 防御」 (with=" + withPeer + ", without=" + without + ")");
+                "「额外无视 20% 防御」 (ignores an extra 20% DEF) (with=" + withPeer + ", without=" + without + ")");
     }
 
     private static double damageDealt(boolean keepPeerage) {

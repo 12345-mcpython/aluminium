@@ -41,13 +41,13 @@ public class RobinSummerettoTest {
         battle.castImmediate(robin.getSkills().get(SkillType.SKILL), robin, List.of(enemy));
 
         var mem = battle.memospriteOf(robin);
-        Assertions.assertNotNull(mem, "「召唤忆灵「晴空乐手」贝茜」");
+        Assertions.assertNotNull(mem, "「召唤忆灵「晴空乐手」贝茜」 (summons the memosprite 贝茜 of the Summer Songbirds (「晴空乐手」))");
         double expectedHp = robin.getMaxHp() * 0.7;
         Assertions.assertEquals(expectedHp, mem.getMaxHp(), expectedHp * 0.02,
-                "「70%生命上限」: expected " + expectedHp + ", got " + mem.getMaxHp());
+                "「70%生命上限」 (70% of Max HP): expected " + expectedHp + ", got " + mem.getMaxHp());
         double expectedSpeed = robin.getAttribute(AttributeType.SPEED).get() * 1.8;
         Assertions.assertEquals(expectedSpeed, mem.getAttribute(AttributeType.SPEED).get(), expectedSpeed * 0.02,
-                "「180%速度」: expected " + expectedSpeed + ", got " + mem.getAttribute(AttributeType.SPEED).get());
+                "「180%速度」 (180% of SPD): expected " + expectedSpeed + ", got " + mem.getAttribute(AttributeType.SPEED).get());
     }
 
     /** Note: The control: without the Skill nothing is summoned. */
@@ -66,8 +66,8 @@ public class RobinSummerettoTest {
     public void theFilesDeclareTheResourceAndThePanel() {
         JsonObject character = read("/characters/1512.json");
         JsonArray resources = character.getAsJsonArray("resources");
-        Assertions.assertNotNull(resources, "the character file must declare 气氛值");
-        Assertions.assertEquals(50, resources.get(0).getAsJsonObject().get("max").getAsInt(), "「上限50点」");
+        Assertions.assertNotNull(resources, "the character file must declare the atmosphere resource (气氛值)");
+        Assertions.assertEquals(50, resources.get(0).getAsJsonObject().get("max").getAsInt(), "\"the ceiling is 50 points\" (「上限50点」)");
 
         JsonObject memo = read("/memosprites/1512.json");
         JsonArray panel = memo.getAsJsonArray("panel");

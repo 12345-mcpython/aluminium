@@ -42,7 +42,7 @@ public class PartyResourceTest {
         int before = battle.partyResourceValue(LAUGH);
         battle.castImmediate(elation.getSkills().get(SkillType.SKILL), elation, List.of());
         int after = battle.partyResourceValue(LAUGH);
-        System.out.println("[party] 笑点 on the battle: " + before + " -> " + after
+        System.out.println("[party] Punchline (笑点) on the battle: " + before + " -> " + after
                 + " ; the caster holds it herself? " + elation.getResources().has(LAUGH));
         Assertions.assertEquals(0, before, "the battle starts with none");
         Assertions.assertEquals(10, after, "her skill adds ten to the SHARED counter");

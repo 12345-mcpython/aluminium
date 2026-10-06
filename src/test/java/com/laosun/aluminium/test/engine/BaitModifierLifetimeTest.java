@@ -92,7 +92,7 @@ public class BaitModifierLifetimeTest {
         Assertions.assertEquals(1.4, onBait / none, 0.06,
                 "while a bait exists, the cut raises the damage the first enemy takes");
         Assertions.assertEquals(1.4, moved / none, 0.06,
-                "Note: and it STAYS up after the bait moves: the sentence is 「while [饲饵] exists, all enemies ...」, and the cut is "
+                "Note: and it STAYS up after the bait moves: the sentence is 「while [饲饵] (Bait) exists, all enemies ...」, and the cut is "
                         + "re-laid over the whole camp on every cast -- what the state's own name buys is that the OLD "
                         + "cut goes off first, so they never stack");
     }

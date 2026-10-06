@@ -29,7 +29,7 @@ public class KephaleEidolonTest {
 
     @Test
     public void theMarkedUnitIgnoresItsShareOfDefence() {
-        Assertions.assertEquals(0.16, marked(true), EPS, "a character holding [军功] ignores 16% of the target's defence when dealing damage");
+        Assertions.assertEquals(0.16, marked(true), EPS, "a character holding [军功] (Military Merit) ignores 16% of the target's defence when dealing damage");
         Assertions.assertEquals(0.0, marked(false), EPS, "without the gate nothing is stated");
     }
 

@@ -33,16 +33,16 @@ public class GallagherTest {
     public void theStateComesFromBattleStartToo() {
         Fixture f = new Fixture();
         Assertions.assertTrue(f.enemy.getBuffManager().hasState("酩酊"),
-                "「进入战斗后使敌方全体陷入【酩酊】状态，持续2回合」");
+                "「进入战斗后使敌方全体陷入【酩酊】状态，持续2回合」 (after entering battle, puts all enemies into the Besotted (【酩酊】) state for 2 turns)");
     }
 
     /** Census: his file carries the two ULT_CAST rules, the talent's heal and the trace. */
     @Test
     public void hisFileCarriesTheClauses() {
         Assertions.assertEquals(2, TriggerTables.of(GALLAGHER).ruleCount(TriggerEvent.ULT_CAST),
-                "「使敌方全体陷入【酩酊】状态」 and the 行迹 天然酵母 (Natural Yeast) trace's 「行动提前100%」");
+                "\"puts all enemies into the Besotted state\" (「使敌方全体陷入【酩酊】状态」) and the Traces (行迹) Natural Yeast (天然酵母) trace's \"advances the action by 100%\" (「行动提前100%」)");
         Assertions.assertEquals(1, TriggerTables.of(GALLAGHER).ruleCount(TriggerEvent.ALLY_ATTACK),
-                "the talent's 「每次受到我方角色攻击后」 heal");
+                "the talent's 「每次受到我方角色攻击后」 (after every time it is attacked by one of our characters) heal");
     }
 
     /** Note: The heal's target is the ATTACKER: an ally's attack heals the ally, not Gallagher. */
@@ -76,7 +76,7 @@ public class GallagherTest {
         f.battle.fireAfterAttack(f.gallagher, f.enemy, List.of(f.enemy), 1.0);
 
         Assertions.assertTrue(f.enemy.getCurrentHp() < before,
-                "「将下一次普攻强化为【酒花奔涌】」 — the enhanced basic attack is a real attack");
+                "「将下一次普攻强化为【酒花奔涌】」 (strengthens the next Basic ATK into [酒花奔涌]) — the enhanced basic attack is a real attack");
     }
 
     private static final class Fixture {

@@ -226,7 +226,7 @@ public class DotTest {
 
         Assertions.assertEquals(1, f.fire(), "the rule fires");
         Assertions.assertTrue(f.enemy.getBuffManager().hasState("灼烧"),
-                "Fire + DotBuff IS 灼烧: the engine's one translation is BuffManager.DOT_STATES");
+                "Fire + DotBuff IS Burn (灼烧): the engine's one translation is BuffManager.DOT_STATES");
         Assertions.assertEquals(500, f.dot().getBaseDamage(), EPS, "the flat amount the rule stated");
 
         double expected = 500 * 1000.0 / (100 + 1000.0);
@@ -280,7 +280,7 @@ public class DotTest {
         resisted.enemy.setAttribute(AttributeType.EFFECT_RESISTANCE, new DoubleValue(1.0));
         resisted.fire();
         Assertions.assertEquals(0, resisted.enemy.getBuffManager().countBuffs(DotBuff.class),
-                "100% effect resistance: 「陷入灼烧状态」 did not happen, so there is no DOT at all");
+                "100% effect resistance: 「陷入灼烧状态」 (falls into the Burn state) did not happen, so there is no DOT at all");
 
         Fixture lands = new Fixture(TriggerSpecs.dot("Fire", 500.0, null, null, 2, 1.0));
         lands.enemy.setAttribute(AttributeType.EFFECT_RESISTANCE, new DoubleValue(0));

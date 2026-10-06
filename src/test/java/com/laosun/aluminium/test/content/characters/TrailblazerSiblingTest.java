@@ -42,9 +42,9 @@ public class TrailblazerSiblingTest {
         battle.fireTriggers(TriggerEvent.BREAK, tb, enemy, 0, 0);
         double afterThree = tb.getAttribute(AttributeType.ATTACK).get();
 
-        Assertions.assertTrue(afterOne > before, "「每次击破敌方目标的弱点后，攻击力提高20%」: " + before + " -> " + afterOne);
+        Assertions.assertTrue(afterOne > before, "\"after each time an enemy target's Weakness is Broken, ATK is raised by 20%\" (「每次击破敌方目标的弱点后，攻击力提高20%」): " + before + " -> " + afterOne);
         Assertions.assertTrue(afterTwo > afterOne, "the second layer must add again");
-        Assertions.assertEquals(afterTwo, afterThree, 1e-9, "最多叠加2层");
+        Assertions.assertEquals(afterTwo, afterThree, 1e-9, "stacks at most 2 times (最多叠加2层)");
     }
 
     /** Note: The technique heal, gated on the round-18 marker. */
@@ -64,7 +64,7 @@ public class TrailblazerSiblingTest {
 
         double expected = ally.getMaxHp() * 0.15;
         Assertions.assertEquals(expected, ally.getCurrentHp() - hurt, expected * 0.05,
-                "「回复等同于各自生命上限15%的生命值」");
+                "「回复等同于各自生命上限15%的生命值」 (restores HP equal to 15% of each one's Max HP)");
     }
 
 
@@ -83,7 +83,7 @@ public class TrailblazerSiblingTest {
         battle.startBattle();
 
         Assertions.assertEquals(hurt, ally.getCurrentHp(), 1e-9,
-                "「使用秘技后」 -- undeclared, so no heal");
+                "「使用秘技后」 (after using the Technique) -- undeclared, so no heal");
     }
 
     /** Census: the talent, the technique heal and the level convention. */
@@ -91,7 +91,7 @@ public class TrailblazerSiblingTest {
     public void hisFileCarriesTheClauses() {
         var table = TriggerTables.of(TB2);
         Assertions.assertEquals(2, table.ruleCount(TriggerEvent.BREAK),
-                "the talent's ATK stack and (2026-09-29) the 坚韧 trace's per-layer DEFENCE, both on BREAK");
+                "the talent's ATK stack and (2026-09-29) the Tenacity (坚韧) trace's per-layer DEFENCE, both on BREAK");
         Assertions.assertEquals(2, table.ruleCount(TriggerEvent.BATTLE_START), "the technique heal and the level convention");
     }
 

@@ -47,7 +47,7 @@ public class RuleEffectAmendmentTest {
         double expectedDelta = 0.1 * CharacterFactory.create(CID, LEVEL).getAttribute(AttributeType.ATTACK).get();
 
         Assertions.assertEquals(expectedDelta, withAmendment - base, 1.0,
-                "「…额外提高10%」: the named rule's 30% is raised to 40%, i.e. a tenth of the base attack more than "
+                "「…额外提高10%」 (... is raised by an extra 10%): the named rule's 30% is raised to 40%, i.e. a tenth of the base attack more than "
                         + "the unamended rule gives");
     }
 
@@ -65,7 +65,7 @@ public class RuleEffectAmendmentTest {
         Assertions.assertFalse(afterOneFullTurn(2, false),
                 "precondition: an unamended 2-turn state is gone after its two turns");
         Assertions.assertTrue(afterOneFullTurn(2, true),
-                "「…持续时间额外增加1回合」: it is still standing on the turn it used to expire on");
+                "「…持续时间额外增加1回合」 (... the duration is extended by an extra turn): it is still standing on the turn it used to expire on");
         Assertions.assertFalse(afterOneFullTurn(3, true), "…and it does end, one turn later than before");
     }
 
@@ -74,7 +74,7 @@ public class RuleEffectAmendmentTest {
     public void theDurationAmendmentIsFiledAgainstTheNamedRule() {
         Character hero = hero(new TriggerTable(CID, List.of(turnsAmendment(), boostRule())));
         Assertions.assertEquals(1, hero.ruleEffectTurnsBonus("boost"),
-                "「终结技的持续时间额外增加1回合」 is filed against the named rule");
+                "「终结技的持续时间额外增加1回合」 (the Ultimate's duration is extended by an extra turn) is filed against the named rule");
         Assertions.assertNull(hero.ruleEffectPercentBonus("boost"), "and the other kind is untouched");
     }
 

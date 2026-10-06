@@ -43,7 +43,7 @@ public class SuperBreakTest {
         enemy.breakIt();
 
         Assertions.assertTrue(enemy.enemy.getBuffManager().hasState("弱点击破"),
-                "「韧性被削减至 0」 is what the state means -- it is a fact about the field, not a buff anyone applied");
+                "「韧性被削减至 0」 (toughness is reduced to 0) is what the state means -- it is a fact about the field, not a buff anyone applied");
         Assertions.assertFalse(CharacterFactory.create(ALLY, LEVEL).getBuffManager().hasState("弱点击破"),
                 "…and a character is never in it");
     }
@@ -57,7 +57,7 @@ public class SuperBreakTest {
 
         Assertions.assertTrue(brokenWithoutRule > 0, "precondition: the attack lands");
         Assertions.assertEquals(brokenWithoutRule, plain, 1e-6,
-                "the same rule against a HEALTHY target adds nothing: the condition is 「处于弱点击破状态」");
+                "the same rule against a HEALTHY target adds nothing: the condition is 「处于弱点击破状态」 (in the Weakness Break state)");
         Assertions.assertTrue(converted > brokenWithoutRule,
                 "against a broken target the same attack is followed by the converted super-break instance");
     }
@@ -70,7 +70,7 @@ public class SuperBreakTest {
         double none = damageWith(true, null);
 
         Assertions.assertEquals(2 * (once - none), twice - none, 1.0,
-                "「转化为 1 次 X% 的超击破伤害」: the extra damage is proportional to X (and to the 削韧值, which is the same "
+                "\"converted into 1 instance of X% Super Break DMG\" (「转化为 1 次 X% 的超击破伤害」): the extra damage is proportional to X (and to the Toughness Reduction (削韧值), which is the same "
                         + "in both runs)");
     }
 

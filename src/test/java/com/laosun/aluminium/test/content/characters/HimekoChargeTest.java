@@ -71,7 +71,7 @@ public class HimekoChargeTest {
         Battle battle = new Battle(List.of(himeko), List.of(dummy()), new Random(0));
         battle.startBattle();
 
-        Assertions.assertEquals(1, himeko.getResources().value(CHARGE), "「战斗开始时获得1点充能」");
+        Assertions.assertEquals(1, himeko.getResources().value(CHARGE), "「战斗开始时获得1点充能」 (gains 1 point of Charge at the start of battle)");
     }
 
     /**
@@ -94,7 +94,7 @@ public class HimekoChargeTest {
         battle.castImmediate(new DefaultSkill(HIMEKO, 1, 1), himeko, List.of(iceEdge));
         Assertions.assertTrue(iceEdge.isBroken(), "the second one breaks it");
         Assertions.assertEquals(2, himeko.getResources().value(CHARGE),
-                "BATTLE_START's 1 plus the break's 1 -- 「当有敌方目标的弱点被击破时，姬子获得充能」");
+                "BATTLE_START's 1 plus the break's 1 -- 「当有敌方目标的弱点被击破时，姬子获得充能」 (when an enemy target's Weakness is Broken, Himeko gains Charge)");
 
         // Two more breaks: the third point lands, the fourth is swallowed by the cap (overflow is 0 by default,
         // so "上限3点" is enforced by the declaration rather than by arithmetic in the rule).
@@ -130,9 +130,9 @@ public class HimekoChargeTest {
 
         Assertions.assertTrue(first.getCurrentHp() < firstBefore, "the first enemy was hit");
         Assertions.assertTrue(second.getCurrentHp() < secondBefore,
-                "「对敌方全体目标」 -- and so was the one the ally never aimed at");
+                "「对敌方全体目标」 (to all enemies) -- and so was the one the ally never aimed at");
         Assertions.assertEquals(ourSideBefore, ourSideHp(battle), EPS, "on the enemies, not on our side");
-        Assertions.assertEquals(0, himeko.getResources().value(CHARGE), "「并消耗全部充能」");
+        Assertions.assertEquals(0, himeko.getResources().value(CHARGE), "「并消耗全部充能」 (and consumes all of the Charge)");
     }
 
     /** Below the cap nothing happens - the same attack, one point short. */
@@ -151,7 +151,7 @@ public class HimekoChargeTest {
         double secondBefore = second.getCurrentHp();
         battle.castImmediate(new DefaultSkill(ALLY, 1, 1), ally, List.of(first));
 
-        Assertions.assertEquals(secondBefore, second.getCurrentHp(), EPS, "「若…达到上限」 is not met");
+        Assertions.assertEquals(secondBefore, second.getCurrentHp(), EPS, "「若…达到上限」 (if ... reaches the ceiling) is not met");
         Assertions.assertEquals(2, himeko.getResources().value(CHARGE), "and nothing was spent");
     }
 
@@ -168,7 +168,7 @@ public class HimekoChargeTest {
     public void theFollowUpDealsTheTalentRowsLv10Damage() {
         double row = talentRow(HIMEKO, LEVEL_ROW, 0);
         Assertions.assertEquals(1.4, row, EPS,
-                "the number the document quotes: 「等同于姬子140%攻击力」 is 100304's Lv10, column 0");
+                "the number the document quotes: 「等同于姬子140%攻击力」 (equal to 140% of Himeko's ATK) is 100304's Lv10, column 0");
 
         Character himeko = CharacterFactory.create(HIMEKO, LEVEL);
         // Crit off: the pipeline only draws for a crit when the rate is above 0, so every number below is exact.
@@ -235,16 +235,16 @@ public class HimekoChargeTest {
         // quoted at ("quoted at Lv10" as a TALENT +9 raise) - before that the level lived in a `damage_level` field
         // on the follow-up's damage effect.
         Assertions.assertEquals(2, table.ruleCount(TriggerEvent.BATTLE_START),
-                "「战斗开始时获得1点充能」 and the talent's level statement");
+                "「战斗开始时获得1点充能」 (gains 1 point of Charge at the start of battle) and the talent's level statement");
         Assertions.assertEquals(2, table.ruleCount(TriggerEvent.BREAK),
-                "「当有敌方目标的弱点被击破时」 (anybody's break) and 星魂 4's 「施放战技…造成弱点击破时」");
-        Assertions.assertEquals(1, table.ruleCount(TriggerEvent.ALLY_ATTACK), "「当我方目标施放攻击后」");
+                "\"when an enemy target's Weakness is Broken\" (「当有敌方目标的弱点被击破时」) (anybody's break) and Eidolon (星魂) 4's \"when casting the Skill ... causing a Weakness Break\" (「施放战技…造成弱点击破时」)");
+        Assertions.assertEquals(1, table.ruleCount(TriggerEvent.ALLY_ATTACK), "\"after one of our targets casts an attack\" (「当我方目标施放攻击后」)");
         Assertions.assertEquals(0, table.ruleCount(TriggerEvent.ULT_CAST), "her ultimate is the engine's ordinary path");
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.KILL),
-                "「每消灭1个敌方目标额外恢复姬子5点能量」 -- shipped on 2026-09-28 once 「额外」 was read against the "
+                "「每消灭1个敌方目标额外恢复姬子5点能量」 (every time an enemy target is killed, Himeko restores 5 extra Energy) -- shipped on 2026-09-28 once 「额外」 (extra) was read against the "
                         + "engine's general kill credit (HimekoKillEnergyTest)");
         Assertions.assertEquals(0, table.ruleCount(TriggerEvent.SKILL_CAST),
-                "星魂 4's charge rides on BREAK with `from_skill SKILL`, not on a cast event of its own");
+                "Eidolon (星魂) 4's charge rides on BREAK with `from_skill SKILL`, not on a cast event of its own");
         Assertions.assertEquals(1, table.resources().size(), "and she declares exactly one resource");
         Assertions.assertEquals(CHARGE, table.referencedResources().iterator().next(),
                 "every resource a rule names is the one she declares -- checked when she is built");

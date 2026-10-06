@@ -42,7 +42,7 @@ public class ElationAmountCapTest {
         int big = mirrored(150);
         int small = mirrored(60);
         System.out.println("[cap] a 150-energy conversion mirrored " + big + " and a 60-energy one mirrored " + small);
-        Assertions.assertEquals(100, big, "单次不超过 100 点");
+        Assertions.assertEquals(100, big, "at most 100 points in a single gain (单次不超过 100 点)");
         Assertions.assertEquals(60, small, "a conversion below the ceiling is untouched (false case)");
     }
 

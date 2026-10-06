@@ -38,7 +38,7 @@ public class KlaraTechniqueAggroTest {
         withoutTechnique.startBattle();
 
         Assertions.assertEquals(plainBefore, withoutTechnique.aggroOf(plain), EPS,
-                "no technique was used, so 「进入战斗后…概率提高」 must not fire");
+                "no technique was used, so 「进入战斗后…概率提高」 (after entering battle ... the chance is raised) must not fire");
 
         Character clara = CharacterFactory.create(KLARA, LEVEL);
         Battle withTechnique = new Battle(List.of(clara), List.of(dummy()), new Random(0));
@@ -48,7 +48,7 @@ public class KlaraTechniqueAggroTest {
         withTechnique.startBattle();
 
         Assertions.assertEquals(base * 6.0, withTechnique.aggroOf(clara), EPS,
-                "「克拉拉受到敌方攻击的概率提高」 "
+                "\"Clara (克拉拉) is more likely to be attacked by enemies\" (「克拉拉受到敌方攻击的概率提高」) "
                         + "-- the unclaimed parameter 5 reads as weight x (1 + 5)");
     }
 

@@ -48,7 +48,7 @@ public class OdeOfRomanceTest {
         Skill ode = demiurge.skillAt(ODE_OF_ROMANCE);
         Assertions.assertNotNull(ode, "precondition: the memosprite carries its own skill 14");
         Assertions.assertTrue(SkillExecutor.canDeliver(ode),
-                "「单次生效」-- the Rules entry is what makes this skill deliverable at all");
+                "「单次生效」 (takes effect once)-- the Rules entry is what makes this skill deliverable at all");
 
         SkillExecutor.execute(battle, ode, demiurge, List.of(aglaea));
         battle.processRequests();
@@ -56,7 +56,7 @@ public class OdeOfRomanceTest {
         boolean marked = aglaea.getBuffManager().hasState(STATE);
         System.out.println("[romance] canDeliver = true ; Aglaea carries " + STATE + " = " + marked);
         Assertions.assertTrue(marked,
-                "「对阿格莱雅施放时，使阿格莱雅获得【" + STATE + "】」");
+                "「对阿格莱雅施放时，使阿格莱雅获得【" + STATE + "】」 (when cast on Aglaea, makes Aglaea gain that state)");
     }
 
     /** And the other ally is untouched -- the ode is aimed at ONE unit. */
@@ -77,6 +77,6 @@ public class OdeOfRomanceTest {
 
         System.out.println("[romance] bystander carries it = " + bystander.getBuffManager().hasState(STATE));
         Assertions.assertFalse(bystander.getBuffManager().hasState(STATE),
-                "「对阿格莱雅施放时」-- one aim, not the whole party");
+                "「对阿格莱雅施放时」 (when cast on Aglaea)-- one aim, not the whole party");
     }
 }

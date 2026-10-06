@@ -25,7 +25,7 @@ public class LightConeBoostTest {
     @Test
     public void theUltimateBoostFollowsTheRank() {
         Assertions.assertEquals(0.28, boost(20006, AttributeType.ULTIMATE_DAMAGE_BOOST, 1), 1e-9,
-                "终结技 damage is 28% at rank 1");
+                "Ultimate (终结技) damage is 28% at rank 1");
         Assertions.assertEquals(0.56, boost(20006, AttributeType.ULTIMATE_DAMAGE_BOOST, 5), 1e-9,
                 "and 56% at rank 5");
     }

@@ -37,10 +37,10 @@ public class AventurineTest {
         battle.startBattle();
 
         double expected = aventurine.getAttribute(AttributeType.DEFENCE).get() * 0.24 + 320;
-        Assertions.assertTrue(aventurine.getShield() > 0, "「我方全体提供护盾【坚垣筹码】」 -- himself");
-        Assertions.assertTrue(ally.getShield() > 0, "「我方全体」 -- and his ally");
+        Assertions.assertTrue(aventurine.getShield() > 0, "「我方全体提供护盾【坚垣筹码】」 (provides all allies with a shield, [坚垣筹码]) -- himself");
+        Assertions.assertTrue(ally.getShield() > 0, "「我方全体」 (all allies) -- and his ally");
         Assertions.assertEquals(expected, aventurine.getShield(), expected * 0.02,
-                "「等同于砂金24.00%防御力+320的护盾」: expected " + expected + ", shield " + aventurine.getShield());
+                "「等同于砂金24.00%防御力+320的护盾」 (a shield equal to 24.00% of Aventurine's DEF + 320): expected " + expected + ", shield " + aventurine.getShield());
     }
 
     /** Note: "使指定敌方单体陷入[惊惶]状态，持续3回合". */
@@ -55,7 +55,7 @@ public class AventurineTest {
         battle.castImmediate(aventurine.getSkills().get(SkillType.ULTRA), aventurine, List.of(enemy));
 
         Assertions.assertTrue(enemy.getBuffManager().hasState("惊惶"),
-                "「使指定敌方单体陷入【惊惶】状态，持续3回合」");
+                "「使指定敌方单体陷入【惊惶】状态，持续3回合」 (puts a designated single enemy into the Unnerved (【惊惶】) state for 3 turns)");
     }
 
     /** Census: the shield, the state and the level convention - and the skill's own shield is the DATA TABLE's job. */

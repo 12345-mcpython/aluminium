@@ -42,7 +42,7 @@ public class UltCritDamageTraceTest {
         battle.processRequests();
 
         Assertions.assertEquals(before + 0.50, owner.getAttribute(AttributeType.CRIT_ATTACK).get(), EPS,
-                "「施放终结技时，暴击伤害提高 50%」 (before=" + before + ")");
+                "「施放终结技时，暴击伤害提高 50%」 (when casting the Ultimate, CRIT DMG is raised by 50%) (before=" + before + ")");
     }
 
     /** Note: Before the ultimate the trace has not started, so the panel is untouched. */

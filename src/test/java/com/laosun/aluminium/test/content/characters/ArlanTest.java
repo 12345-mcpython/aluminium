@@ -43,9 +43,9 @@ public class ArlanTest {
 
         double centreLoss = centreBefore - centre.getCurrentHp();
         double neighbourLoss = ((leftBefore - left.getCurrentHp()) + (rightBefore - right.getCurrentHp())) / 2;
-        Assertions.assertTrue(centreLoss > 0, "「对指定敌方单体造成…雷属性伤害」");
+        Assertions.assertTrue(centreLoss > 0, "「对指定敌方单体造成…雷属性伤害」 (deals ... Lightning damage to a designated single enemy)");
         Assertions.assertEquals(0.5, neighbourLoss / centreLoss, 0.02,
-                "「同时对其相邻目标造成等同于阿兰 160% 攻击力的雷属性伤害」 — the data says 320%/160%: centre "
+                "「同时对其相邻目标造成等同于阿兰 160% 攻击力的雷属性伤害」 (at the same time deals Lightning damage to its adjacent targets equal to 160% of Arlan's ATK) — the data says 320%/160%: centre "
                         + centreLoss + " vs neighbours " + neighbourLoss);
     }
 
@@ -70,7 +70,7 @@ public class ArlanTest {
         battle.fireTriggers(TriggerEvent.KILL, arlan, enemy, 0, 0);
 
         Assertions.assertTrue(arlan.getCurrentHp() > before,
-                "「立即回复等同于自身生命上限20%的生命值」: " + before + " -> " + arlan.getCurrentHp());
+                "「立即回复等同于自身生命上限20%的生命值」 (immediately restores HP equal to 20% of his own Max HP): " + before + " -> " + arlan.getCurrentHp());
     }
 
     /** Note: "抵抗持续伤害类负面状态的概率提高50%": the per-class resistance, and only that class. */
@@ -82,7 +82,7 @@ public class ArlanTest {
         battle.startBattle();
 
         Assertions.assertTrue(arlan.getBuffManager().debuffResistOf(DebuffClass.DOT) > 0,
-                "「抵抗持续伤害类负面状态的概率提高50%」");
+                "「抵抗持续伤害类负面状态的概率提高50%」 (raises RES to DoT Debuffs by 50%)");
         Assertions.assertEquals(0.0, arlan.getBuffManager().debuffResistOf(DebuffClass.CONTROL), 1e-9,
                 "it must not become a general resistance to every debuff class");
     }

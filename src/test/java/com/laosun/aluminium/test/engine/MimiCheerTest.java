@@ -41,6 +41,6 @@ public class MimiCheerTest {
         battle.processRequests();
 
         Assertions.assertTrue(ally.getBuffManager().hasState(CHEER),
-                "「附上【迷迷的声援】」");
+                "\"applies Mem's Support (【迷迷的声援】)\" (「附上【迷迷的声援】」)");
     }
 }

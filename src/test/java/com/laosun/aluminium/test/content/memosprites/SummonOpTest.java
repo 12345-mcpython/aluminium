@@ -100,7 +100,7 @@ public class SummonOpTest {
         Assertions.assertNull(battle.memospriteOf(aglaea), "her file has no battle-start rule");
 
         battle.fireTriggers(TriggerEvent.ULT_CAST, ally, null, 0, 0);
-        Assertions.assertNull(battle.memospriteOf(aglaea), "「阿格莱雅」 -- an ally's Ultimate is not hers");
+        Assertions.assertNull(battle.memospriteOf(aglaea), "「阿格莱雅」 (Aglaea) -- an ally's Ultimate is not hers");
 
         battle.fireTriggers(TriggerEvent.ULT_CAST, aglaea, null, 0, 0);
         Assertions.assertNotNull(battle.memospriteOf(aglaea), "and hers is");

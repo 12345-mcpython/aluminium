@@ -38,10 +38,10 @@ public class TrailblazerHarmonyTest {
 
         f.castUltimate();
 
-        Assertions.assertTrue(f.ally.getBuffManager().hasState("伴舞"), "「为我方全体附上【伴舞】效果」");
-        Assertions.assertTrue(f.harmony.getBuffManager().hasState("伴舞"), "…including the caster (「我方全体」)");
+        Assertions.assertTrue(f.ally.getBuffManager().hasState("伴舞"), "「为我方全体附上【伴舞】效果」 (applies the Backup Dancer (【伴舞】) effect to all allies)");
+        Assertions.assertTrue(f.harmony.getBuffManager().hasState("伴舞"), "…including the caster (「我方全体」 (all allies))");
         Assertions.assertTrue(f.ally.getAttribute(AttributeType.BREAKING_EFFECT).get() > before,
-                "「持有【伴舞】的我方目标击破特攻提高30%」");
+                "「持有【伴舞】的我方目标击破特攻提高30%」 (an ally holding Backup Dancer (【伴舞】) gets 30% more Break Effect)");
     }
 
     /**
@@ -72,7 +72,7 @@ public class TrailblazerHarmonyTest {
     public void herTalentAndFourthEidolonAreAsStated() {
         Fixture f = new Fixture();
         Assertions.assertEquals(1, TriggerTables.of(HARMONY).ruleCount(TriggerEvent.BREAK),
-                "「当有敌方目标的弱点被击破时，开拓者立即恢复10点能量」");
+                "「当有敌方目标的弱点被击破时，开拓者立即恢复10点能量」 (when an enemy target's Weakness is Broken, the Trailblazer immediately restores 10 Energy)");
 
         Fixture atFour = new Fixture(4);
         Assertions.assertTrue(atFour.ally.getAttribute(AttributeType.BREAKING_EFFECT).get()

@@ -49,7 +49,7 @@ public class ToughnessBoostTest {
     @Test
     public void aPartialBoostIsProportional() {
         double plain = stanceAfterAttack(-1);
-        Assertions.assertEquals(plain * 1.5, stanceAfterAttack(0.5), 1e-6, "「提高50%」 is half of the doubling");
+        Assertions.assertEquals(plain * 1.5, stanceAfterAttack(0.5), 1e-6, "「提高50%」 (raised by 50%) is half of the doubling");
     }
 
     // ==================================================================

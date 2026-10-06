@@ -53,17 +53,17 @@ public class DebuffTest {
     @Test
     public void theClassificationIsDecidedPerBuffClass() {
         Assertions.assertTrue(new DotBuff(attacker(), DamageElement.FIRE, 100, 2).isDebuff(),
-                "灼烧/触电/… are 持续伤害类负面状态");
+                "Burn (灼烧) / Shock (触电) / ... are DoT Debuffs (持续伤害类负面状态)");
         Assertions.assertTrue(new StunBuff(1).isDebuff(), "a control state is negative on its bearer");
         Assertions.assertTrue(new TauntBuff(1).isDebuff(),
-                "嘲讽 forces the bearer's targeting -- negative on the one carrying it");
-        Assertions.assertTrue(new VulnerabilityBuff(1, 0.5).isDebuff(), "易伤 is the defender-side debuff");
+                "Taunt (嘲讽) forces the bearer's targeting -- negative on the one carrying it");
+        Assertions.assertTrue(new VulnerabilityBuff(1, 0.5).isDebuff(), "Vulnerability (易伤) is the defender-side debuff");
 
         Assertions.assertFalse(new ReductionBuff(1, 0.5).isDebuff(),
-                "减伤 sits on the defender too, but it is a POSITIVE effect -- where a buff sits does not "
+                "DMG Reduction (减伤) sits on the defender too, but it is a POSITIVE effect -- where a buff sits does not "
                         + "decide its side, the text does");
         Assertions.assertFalse(new StateBuff("协奏", 2).isDebuff(),
-                "a named state's side belongs to the rule that applied it (【协奏】 vs 【失重】), so the safe "
+                "a named state's side belongs to the rule that applied it (【协奏】 (Concerto) vs 【失重】), so the safe "
                         + "default is 'not a debuff' and APPLY_BUFF gains the side when content needs it");
     }
 
@@ -82,7 +82,7 @@ public class DebuffTest {
         Assertions.assertEquals(2, modifiers.size(), "precondition: one debuff and one buff");
         long debuffs = modifiers.stream().filter(AbstractBuff::isDebuff).count();
         Assertions.assertEquals(1, debuffs,
-                "「攻击力 -30%」 is a debuff and 「攻击力 +50%」 is not, both decided by the sign the rule wrote");
+                "「攻击力 -30%」 (ATK -30%) is a debuff and 「攻击力 +50%」 (ATK +50%) is not, both decided by the sign the rule wrote");
     }
 
     // ==================================================================
@@ -119,7 +119,7 @@ public class DebuffTest {
         Assertions.assertTrue(owner.getBuffManager().hasBuff(DotBuff.class),
                 "the older debuff is still there -- one dispel removes one");
         Assertions.assertTrue(owner.getBuffManager().hasBuff(StateBuff.class),
-                "and the buff is untouched: 协奏 is not a negative effect");
+                "and the buff is untouched: Concerto (协奏) is not a negative effect");
     }
 
     @Test

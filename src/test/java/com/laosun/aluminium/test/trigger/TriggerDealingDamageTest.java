@@ -143,14 +143,14 @@ public class TriggerDealingDamageTest {
         Assertions.assertFalse(target.getBuffManager().hasState("灼烧"), "nothing attached yet");
 
         burn(target, owner);
-        Assertions.assertTrue(target.getBuffManager().hasState("灼烧"), "a Fire DOT is 灼烧");
-        Assertions.assertFalse(target.getBuffManager().hasState("触电"), "and it is not 触电");
+        Assertions.assertTrue(target.getBuffManager().hasState("灼烧"), "a Fire DOT is Burn (灼烧)");
+        Assertions.assertFalse(target.getBuffManager().hasState("触电"), "and it is not Shock (触电)");
         Assertions.assertFalse(target.getBuffManager().hasState("冻结"),
                 "control states are deliberately not resolved yet: models them as a buff plus a delay,"
                         + "so 'is it frozen' needs its own definition rather than a guess");
 
         target.getBuffManager().addBuff(new DotBuff(owner, DamageElement.THUNDER, 300, 2));
-        Assertions.assertTrue(target.getBuffManager().hasState("触电"), "a Thunder DOT is 触电");
+        Assertions.assertTrue(target.getBuffManager().hasState("触电"), "a Thunder DOT is Shock (触电)");
         Assertions.assertTrue(target.getBuffManager().hasState("灼烧"), "and the first one is still there");
     }
 

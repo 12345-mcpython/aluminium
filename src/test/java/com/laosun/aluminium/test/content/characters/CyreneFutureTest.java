@@ -28,8 +28,8 @@ public class CyreneFutureTest {
         battle.processRequests();
         boolean ally = battle.characters.get(1).getBuffManager().hasState(FUTURE);
         boolean her = battle.characters.get(0).getBuffManager().hasState(FUTURE);
-        System.out.println("[future] at battle start: the ally has it = " + ally + " ; 昔涟 herself = " + her);
-        Assertions.assertTrue(ally, "another ally gains 【未来】");
-        Assertions.assertFalse(her, "and 昔涟 does not, because the text says 其他");
+        System.out.println("[future] at battle start: the ally has it = " + ally + " ; Cyrene (昔涟) herself = " + her);
+        Assertions.assertTrue(ally, "another ally gains 【未来】 (the Future)");
+        Assertions.assertFalse(her, "and Cyrene (昔涟) does not, because the text says other allies (其他)");
     }
 }

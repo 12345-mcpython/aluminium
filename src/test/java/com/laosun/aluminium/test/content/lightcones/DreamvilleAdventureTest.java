@@ -77,7 +77,7 @@ public class DreamvilleAdventureTest {
         build(false);
         cast(SkillCategory.BPSKILL);
         System.out.println("[21036] without the cone: " + boosts());
-        Assertions.assertEquals("basic=0.0 skill=0.0 ult=0.0", boosts(), "no cone, no 童心 (false case)");
+        Assertions.assertEquals("basic=0.0 skill=0.0 ult=0.0", boosts(), "no cone, no Childlike Heart (童心) -- the false case");
     }
 
     @Test

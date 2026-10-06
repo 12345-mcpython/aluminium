@@ -23,7 +23,7 @@ public class EarthOdeMarksDanHengTest {
 
     @Test
     public void theEarthOdeMarksTheOneItIsCastAt() {
-        Assertions.assertEquals(1.0, state(true), 1e-9, "cast at him, he gains 献予「大地」之诗");
+        Assertions.assertEquals(1.0, state(true), 1e-9, "cast at him, he gains the poem offered to Earth (献予「大地」之诗)");
         Assertions.assertEquals(0.0, state(false), 1e-9, "cast at someone else, he does not");
     }
 

@@ -36,9 +36,9 @@ public class DrRatioTest {
         double afterMark = reactionLoss(true);
 
         Assertions.assertEquals(0.0, beforeMark, 1e-9,
-                "「持有【智者的短见】的目标」 -- no mark, no reaction");
+                "「持有【智者的短见】的目标」 (a target holding [智者的短见]) -- no mark, no reaction");
         Assertions.assertTrue(afterMark > 0,
-                "「理真医生对该目标发动1次天赋的追加攻击」: " + afterMark);
+                "「理真医生对该目标发动1次天赋的追加攻击」 (Dr. Ratio launches 1 follow-up attack from his Talent at that target): " + afterMark);
     }
 
     /** Note: The technique's 15% slow, against a hand-built -30% reference in the same pipeline. */

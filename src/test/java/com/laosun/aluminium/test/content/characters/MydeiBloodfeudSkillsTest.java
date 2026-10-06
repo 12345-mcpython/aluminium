@@ -59,7 +59,7 @@ public class MydeiBloodfeudSkillsTest {
                 + ") ; enemy " + enemyBefore + " -> " + enemyAfter);
 
         Assertions.assertEquals(hpBefore * 0.65, hpAfter, hpBefore * 1e-6,
-                "「消耗等同于万敌当前生命值 35% 的生命值」-- the CURRENT value");
+                "「消耗等同于万敌当前生命值 35% 的生命值」 (consumes HP equal to 35% of Mydei's current HP)-- the CURRENT value");
         Assertions.assertTrue(hpAfter > hpBefore - 0.35 * maxHp,
                 "and NOT a share of the maximum: that would leave " + (hpBefore - 0.35 * maxHp) + ", and he has " + hpAfter);
         Assertions.assertTrue(enemyAfter < enemyBefore, "and the attack lands");
@@ -89,7 +89,7 @@ public class MydeiBloodfeudSkillsTest {
         int slot = him.getSkills().get(SkillType.SKILL).getSkillSlot();
         System.out.println("[mydei-skills] SKILL slot after the swap = " + slot
                 + " ; category = " + him.getSkills().get(SkillType.SKILL).getData().getCategory());
-        Assertions.assertEquals(9, slot, "换入的是**槽 9** 的行（【弑王成王】破韧 60/30 ✓），而原来是槽 2");
+        Assertions.assertEquals(9, slot, "the row swapped in is **slot 9** (Kingslayer Be King (【弑王成王】) toughness 60/30 ✓), where it used to be slot 2");
     }
 
     /** Note: Half a turn is `beforeMove()` alone; a full one is both halves (see `ArlanEidolonFourTest`). */
@@ -139,7 +139,7 @@ public class MydeiBloodfeudSkillsTest {
         System.out.println("[mydei-skills] commanded=" + commanded + " ; slot-9 by hand=" + manual);
 
         Assertions.assertEquals(manual, commanded, manual * 1e-9,
-                "「自动施放【弑王成王】」-- the commanded cast runs the row the swap installed, not the slot's original one");
+                "「自动施放【弑王成王】」 (automatically casts Kingslayer Be King)-- the commanded cast runs the row the swap installed, not the slot's original one");
     }
 
     /** The gate: a charge that arrives WHILE [血仇] is already on must not be drained again. */
@@ -161,7 +161,7 @@ public class MydeiBloodfeudSkillsTest {
         System.out.println("[mydei-skills] charge after entering bloodfeud with 100 = " + charge);
 
         Assertions.assertEquals(100, charge,
-                "「充能达到 100 时消耗 100 点充能进入【血仇】状态」-- already in it, so nothing is drained again; "
+                "「充能达到 100 时消耗 100 点充能进入【血仇】状态」 (when Charge reaches 100, consumes 100 points of Charge to enter the Vendetta state)-- already in it, so nothing is drained again; "
                         + "without this the charge can never reach 150 and the next sentence is unreachable");
     }
 
@@ -186,9 +186,9 @@ public class MydeiBloodfeudSkillsTest {
         System.out.println("[mydei-skills] 150: charge " + charge + " ; enemy " + enemyBefore + " -> " + enemyAfter
                 + " ; SKILL slot now=" + him.getSkills().get(SkillType.SKILL).getSkillSlot());
 
-        Assertions.assertEquals(0, charge, "「消耗 150 点充能」");
-        Assertions.assertTrue(enemyAfter < enemyBefore, "【弑神登神】 was cast");
+        Assertions.assertEquals(0, charge, "\"consumes 150 points of Charge\" (「消耗 150 点充能」)");
+        Assertions.assertTrue(enemyAfter < enemyBefore, "【弑神登神】 (Godslayer Be God) was cast");
         Assertions.assertEquals(11, him.getSkills().get(SkillType.SKILL).getSkillSlot(),
-                "the cast ran 槽 11, which is the row the sentence names");
+                "the cast ran slot 11 (槽 11), which is the row the sentence names");
     }
 }

@@ -39,7 +39,7 @@ public class HysilensTest {
         Assertions.assertTrue(before > 0, "the fixture must deal damage");
         // Measured: a "20% increased damage taken" makes the instance cost damage x 1.2 - the natural reading, and NOT the 1.5 I first assumed.
         Assertions.assertEquals(1.2, after / before, 0.02,
-                "「受到的伤害提高20%」: before " + before + ", after " + after);
+                "「受到的伤害提高20%」 (DMG taken is raised by 20%): before " + before + ", after " + after);
         // And the claim is the LINEAR share, with the 1.4 coming from a hand-built 40% rule in the same pipeline.
         Assertions.assertEquals(0.5, (after / before - 1.0) / (doubled / before - 1.0), 0.05,
                 "20% against a 40% reference must be half the increase: " + (after / before - 1.0) + " vs " + (doubled / before - 1.0));

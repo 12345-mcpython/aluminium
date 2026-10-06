@@ -37,10 +37,10 @@ public class LynxTest {
 
         f.skill();
 
-        Assertions.assertTrue(f.ally.getBuffManager().hasState("求生反应"), "「附上【求生反应】」");
-        Assertions.assertTrue(f.ally.getMaxHp() > before, "「提高等同于玲可7.50%生命上限+200的生命上限」");
+        Assertions.assertTrue(f.ally.getBuffManager().hasState("求生反应"), "「附上【求生反应】」 (applies Survival Response (【求生反应】))");
+        Assertions.assertTrue(f.ally.getMaxHp() > before, "「提高等同于玲可7.50%生命上限+200的生命上限」 (raises Max HP by an amount equal to 7.50% of Lynx (玲可)'s Max HP + 200)");
         Assertions.assertFalse(f.lynx.getBuffManager().hasState("求生反应"),
-                "⚠ 「指定我方**单体**」: not party-wide");
+                "⚠ 「指定我方**单体**」 (a designated single **ally**): not party-wide");
     }
 
     /** Her ultimate cleanses the whole side. */
@@ -53,7 +53,7 @@ public class LynxTest {
         f.ultimate();
 
         Assertions.assertFalse(f.ally.getBuffManager().hasState("灼烧"),
-                "「解除我方全体的1个负面效果」 -- the cleanse reaches every ally, not just the aimed one");
+                "「解除我方全体的1个负面效果」 (dispels 1 debuff from all allies) -- the cleanse reaches every ally, not just the aimed one");
     }
 
     /** Census: the clauses are where the notes say they are. */

@@ -81,8 +81,8 @@ public class SundaySkillTest {
 
         cast(battle, sunday, ally);
 
-        Assertions.assertEquals(0, timeRemaining(battle, ally), EPS, "「指定我方单体角色…立即行动」");
-        Assertions.assertEquals(0, timeRemaining(battle, evey), EPS, "「及其召唤物」 -- the pair moves together");
+        Assertions.assertEquals(0, timeRemaining(battle, ally), EPS, "「指定我方单体角色…立即行动」 (a designated single ally ... acts immediately)");
+        Assertions.assertEquals(0, timeRemaining(battle, evey), EPS, "「及其召唤物」 (and its summons) -- the pair moves together");
         Assertions.assertEquals(sundayBefore, timeRemaining(battle, sunday), EPS,
                 "the caster is not part of the pair");
     }
@@ -104,7 +104,7 @@ public class SundaySkillTest {
         cast(battle, sunday, harmony);
 
         Assertions.assertEquals(harmonyBefore, timeRemaining(battle, harmony), EPS,
-                "「当星期日对「同谐」命途的角色施放该技能时，无法触发立即行动效果」");
+                "「当星期日对「同谐」命途的角色施放该技能时，无法触发立即行动效果」 (when Sunday casts this Skill on a character of the Harmony (「同谐」) Path, the immediate-action effect cannot be triggered)");
     }
 
     /** ...but the damage share is a different clause, and it is granted to a Harmony (同谐) target all the same. */
@@ -118,7 +118,7 @@ public class SundaySkillTest {
         cast(battle, sunday, harmony);
 
         Assertions.assertEquals(0.15, damageBoostOf(harmony), EPS,
-                "only 立即行动 is blocked by the sentence, not 「使其造成的伤害提高」");
+                "only the immediate action (立即行动) is blocked by the sentence, not the DMG boost (「使其造成的伤害提高」)");
     }
 
     // ==================================================================
@@ -129,9 +129,9 @@ public class SundaySkillTest {
     @Test
     public void theShareIsFifteenPercentWithoutASummonAndFortyWith() {
         Assertions.assertEquals(0.15, boostAfterCastAt(ERUDITION_ALLY, false), EPS,
-                "「并使其造成的伤害提高#2[i]%」 -- #2 = 0.15 at Lv1");
+                "「并使其造成的伤害提高#2[i]%」 (and raises its DMG dealt by #2[i]%) -- #2 = 0.15 at Lv1");
         Assertions.assertEquals(0.40, boostAfterCastAt(MEMOSPRITE_ALLY, true), EPS,
-                "「若目标拥有召唤物，则…额外提高#4[i]%」 -- 0.15 + 0.25, the sum the target ends up with");
+                "「若目标拥有召唤物，则…额外提高#4[i]%」 (if the target has a summon, ... raises it by an extra #4[i]%) -- 0.15 + 0.25, the sum the target ends up with");
     }
 
     /**  ...and it lasts the 2 turns the row says (#3), not a number this file invented. */
@@ -146,7 +146,7 @@ public class SundaySkillTest {
 
         List<StatModifierBuff> buffs = ally.getBuffManager().allBuffsOf(StatModifierBuff.class);
         Assertions.assertEquals(1, buffs.size(), "one modifier, not two: the two clauses are disjoint rules");
-        Assertions.assertEquals(2, buffs.getFirst().duration(), "「持续#3[i]回合」 -- #3 = 2");
+        Assertions.assertEquals(2, buffs.getFirst().duration(), "\"lasts #3[i] turns\" (「持续#3[i]回合」) -- #3 = 2");
     }
 
     // ==================================================================
@@ -160,9 +160,9 @@ public class SundaySkillTest {
         Character sunday = battle.characters.getFirst();
         Character first = battle.characters.get(1);
 
-        Assertions.assertTrue(first.getBuffManager().hasState("蒙福者"), "「使目标及其召唤物成为【蒙福者】」");
+        Assertions.assertTrue(first.getBuffManager().hasState("蒙福者"), "「使目标及其召唤物成为【蒙福者】」 (makes the target and its summons The Beatified (【蒙福者】))");
         Assertions.assertEquals(0.12 * critDamageOf(sunday) + 0.08, critDamageOf(first) - HARMONY_BARE_CRIT_DMG, EPS,
-                "「提高数值等同于星期日#2%暴击伤害+#4%」 -- his own number, not the target's");
+                "「提高数值等同于星期日#2%暴击伤害+#4%」 (raises by an amount equal to #2% of Sunday's CRIT DMG + #4%) -- his own number, not the target's");
 
         //  ...and casting it on somebody new takes it off the previous holder: "仅对 ...最新的施放目标生效".
         Character second = CharacterFactory.create(ERUDITION_ALLY, LEVEL);
@@ -176,7 +176,7 @@ public class SundaySkillTest {
         castUltimate(next, sunday, second);
 
         Assertions.assertFalse(first.getBuffManager().hasState("蒙福者"),
-                "「仅对…最新的施放目标生效」 -- the removal is what says that, there is no holder flag");
+                "「仅对…最新的施放目标生效」 (applies only to ... the most recent cast target) -- the removal is what says that, there is no holder flag");
         Assertions.assertTrue(second.getBuffManager().hasState("蒙福者"));
     }
 
@@ -246,7 +246,7 @@ public class SundaySkillTest {
         cast(battle, sunday, ally);
 
         Assertions.assertEquals(1, battle.getSkillPoints(),
-                "「对【蒙福者】施放战技后恢复1个战技点」 -- the point the skill cost came back");
+                "「对【蒙福者】施放战技后恢复1个战技点」 (restores 1 Skill Point after casting the Skill on The Beatified) -- the point the skill cost came back");
     }
 
     // ==================================================================
@@ -265,9 +265,9 @@ public class SundaySkillTest {
         Character sunday = CharacterFactory.create(SUNDAY, LEVEL);
 
         Assertions.assertEquals(4, TriggerTables.of(SUNDAY).ruleCount(TriggerEvent.SKILL_CAST),
-                "advance (unless Harmony) + share without a summon + share with one + the 【蒙福者】 refund");
+                "advance (unless Harmony) + share without a summon + share with one + the 【蒙福者】 (The Beatified) refund");
         Assertions.assertEquals(1, TriggerTables.of(SUNDAY).ruleCount(TriggerEvent.ULT_CAST),
-                "the 【蒙福者】 clause; the energy restore is registered separately");
+                "the 【蒙福者】 (The Beatified) clause; the energy restore is registered separately");
     }
 
     // ==================================================================

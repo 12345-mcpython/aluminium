@@ -39,11 +39,11 @@ public class CerydraTest {
         battle.castImmediate(cerydra.getSkills().get(com.laosun.aluminium.enums.SkillType.SKILL), cerydra, List.of(ally));
 
         Assertions.assertTrue(ally.getBuffManager().hasState("军功"),
-                "「使指定我方单体角色获得【军功】」");
+                "「使指定我方单体角色获得【军功】」 (grants a designated single ally Military Merit (【军功】))");
         Assertions.assertEquals(expected, ally.getAttribute(AttributeType.ATTACK).get() - allyAttackBefore, expected * 0.02,
-                "「提高数值等同于刻律德菈攻击力的24.00%」: expected " + expected);
+                "「提高数值等同于刻律德菈攻击力的24.00%」 (raises by an amount equal to 24.00% of Cerydra's ATK): expected " + expected);
         Assertions.assertEquals(chargeBefore + 1, cerydra.getResources().get("充能").getValue(),
-                "「并使刻律德菈获得1点充能」");
+                "「并使刻律德菈获得1点充能」 (and Cerydra (刻律德菈) gains 1 point of Charge)");
     }
 
     /** Note: The mark's reaction: a marked ally's attack grants Charge AND draws her 60% additional damage; an unmarked one does neither. */
@@ -53,7 +53,7 @@ public class CerydraTest {
         double marked = markedAttackLoss(true);
 
         Assertions.assertEquals(0.0, unmarked, 1e-9,
-                "「持有【军功】的角色施放攻击后」 -- without the mark, nothing");
+                "「持有【军功】的角色施放攻击后」 (after a character holding Military Merit casts an attack) -- without the mark, nothing");
         Assertions.assertTrue(marked > 0, "with the mark, the additional damage lands: " + marked);
     }
 

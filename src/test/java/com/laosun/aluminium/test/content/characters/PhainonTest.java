@@ -36,10 +36,10 @@ public class PhainonTest {
         // Note: Updated: the document DOES state one -- her trace 1408101 "战斗开始时，获得 1 点[火种]", which is
         // now written, so the pool opens at one. The reading is unchanged in kind: it starts where the sentences say.
         Assertions.assertEquals(1, coreflameOf(phainon),
-                "「战斗开始时，获得 1 点【火种】」");
+                "「战斗开始时，获得 1 点【火种】」 (at the start of battle, gains 1 point of Kindling (【火种】))");
         battle.fireTriggers(TriggerEvent.SKILL_CAST, phainon, enemy, 0, 0);
         Assertions.assertEquals(3, coreflameOf(phainon),
-                "「获得2点【火种】」 -- one from the battle start, two from the cast");
+                "「获得2点【火种】」 (gains 2 points of Kindling) -- one from the battle start, two from the cast");
 
         for (int i = 0; i < 9; i++) {
             battle.fireTriggers(TriggerEvent.SKILL_CAST, phainon, enemy, 0, 0);
@@ -70,7 +70,7 @@ public class PhainonTest {
         battle.fireTriggers(TriggerEvent.BATTLE_START, phainon, ally, 0, 0);
 
         Assertions.assertEquals(25.0, ally.getCurrentEnergy() - allyBefore, 1e-6,
-                "「为我方队友恢复25点能量」");
+                "「为我方队友恢复25点能量」 (restores 25 Energy to allied teammates)");
         Assertions.assertEquals(0.0, phainon.getCurrentEnergy() - herBefore, 1e-6,
                 "the target is `other_allies`: the energy goes to the TEAM, not to her");
         Assertions.assertEquals(Math.min(points + 1, battle.getSkillPointMax()), battle.getSkillPoints(),

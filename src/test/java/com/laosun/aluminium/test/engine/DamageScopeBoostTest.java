@@ -59,7 +59,7 @@ public class DamageScopeBoostTest {
     public void basicAttackBoostLeavesASkillAlone() {
         Assertions.assertEquals(settledDamage(SkillType.SKILL, null, 0),
                 settledDamage(SkillType.SKILL, AttributeType.BASIC_ATTACK_DAMAGE_BOOST, 0.4), EPS,
-                "「普攻造成的伤害提高」 must not reach a skill: that is what \"scoped\" means here");
+                "「普攻造成的伤害提高」 (DMG dealt by Basic ATKs is raised) must not reach a skill: that is what \"scoped\" means here");
     }
 
     @Test
@@ -129,7 +129,7 @@ public class DamageScopeBoostTest {
         Assertions.assertEquals(plain * 1.2, withFollowUpBoost, EPS, "set 115's 2-piece, in one line");
 
         Assertions.assertEquals(plain, additionalDamage(AttributeType.BASIC_ATTACK_DAMAGE_BOOST, 0.4), EPS,
-                "追加攻击 damage is not 普攻 damage, even when the follow-up came from one");
+                "follow-up attack (追加攻击) damage is not Basic ATK (普攻) damage, even when the follow-up came from one");
     }
 
     /**

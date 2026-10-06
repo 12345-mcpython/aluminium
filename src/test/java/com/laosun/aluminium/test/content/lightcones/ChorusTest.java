@@ -57,7 +57,7 @@ public class ChorusTest {
         double allyDelta = ally.getAttribute(AttributeType.ATTACK).get() - allyBase;
         System.out.println("[20005] wearer +" + wearerDelta + " ally +" + allyDelta
                 + " (ally baseline " + allyBase + ")");
-        Assertions.assertTrue(wearerDelta > 0, "我方全体 includes the wearer");
+        Assertions.assertTrue(wearerDelta > 0, "all allies (我方全体) includes the wearer");
         // What this judge CAN attribute: the wearer is 1205, whose own kit raises ATTACK at battle start too (measured
         // +386, far more than 8%), and the buff itself is a share of the unit's PRE-BONUS base -- measured: the ally's +43.5
         // is 8% of 546.9, while its post-bonus ATTACK is 645.2. Reading that base is not something this judge can do yet

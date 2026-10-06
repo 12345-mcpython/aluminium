@@ -56,7 +56,7 @@ public class YaoGuangTest {
         int before = battle.partyResourceValue(LAUGH);
         battle.castImmediate(yaoguang.getSkills().get(SkillType.ULTRA), yaoguang, List.of());
         int after = battle.partyResourceValue(LAUGH);
-        System.out.println("[1502] 笑点 on the battle: " + before + " -> " + after
+        System.out.println("[1502] Punchline (笑点) on the battle: " + before + " -> " + after
                 + " ; the caster holds it herself? " + yaoguang.getResources().has(LAUGH)
                 + " ; the ally? " + ally.getResources().has(LAUGH));
         Assertions.assertEquals(0, before, "the battle starts with none");

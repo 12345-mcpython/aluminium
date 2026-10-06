@@ -28,13 +28,13 @@ public class EidolonSixExtendsSoulsteelTest {
     /** At E6 the kill lengthens it by a turn, so it outlives the tick that would have ended it. */
     @Test
     public void atEidolonSixTheKillLengthensIt() {
-        Assertions.assertTrue(survivesTheTick(6), "「使这些增益效果的持续时间全部延长 1 回合」");
+        Assertions.assertTrue(survivesTheTick(6), "\"extends the duration of all these buffs by 1 turn\" (「使这些增益效果的持续时间全部延长 1 回合」)");
     }
 
     /** Note: Below E6 the rule is off, so one tick ends it. */
     @Test
     public void belowEidolonSixItEnds() {
-        Assertions.assertFalse(survivesTheTick(0), "星魂 6 才有这一条");
+        Assertions.assertFalse(survivesTheTick(0), "only Eidolon (星魂) 6 has this clause");
     }
 
     // ==================================================================

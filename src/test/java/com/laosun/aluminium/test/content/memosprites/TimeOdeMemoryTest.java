@@ -27,7 +27,7 @@ public class TimeOdeMemoryTest {
     public void herSkillGrantsTheCapturedMemory() {
         int with = memoryAfterSkill(true);
         int without = memoryAfterSkill(false);
-        System.out.println("[time_memory] after her skill [忆质] is " + with + " with the ode ; " + without + " without it");
+        System.out.println("[time_memory] after her skill [忆质] (Memoria) is " + with + " with the ode ; " + without + " without it");
         Assertions.assertEquals(1, with, "the ode's #2 is 1 at this level, captured and handed over");
         Assertions.assertEquals(0, without, "without the ode nothing was captured, so nothing is granted");
     }

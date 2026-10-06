@@ -41,8 +41,8 @@ public class PermansorTerraeTest {
 
         Assertions.assertTrue(ally.getShield() > 0, "「为我方全体提供…护盾」 (a shield for all of our side) -- the designated ally");
         Assertions.assertEquals(expected, ally.getShield(), expected * 0.02,
-                "「抵消等同于丹恒•腾荒20.00%攻击力+400伤害的护盾」: expected " + expected + ", shield " + ally.getShield());
-        Assertions.assertTrue(ally.getBuffManager().hasState("同袍"), "「使指定我方单体角色成为【同袍】」");
+                "「抵消等同于丹恒•腾荒20.00%攻击力+400伤害的护盾」 (a shield that absorbs damage equal to 20.00% of Dan Heng - Permansor Terrae's ATK + 400): expected " + expected + ", shield " + ally.getShield());
+        Assertions.assertTrue(ally.getBuffManager().hasState("同袍"), "\"makes a designated single ally the Bondmate (【同袍】)\" (「使指定我方单体角色成为【同袍】」)");
     }
 
     /** Note: The ultimate states the same shield, so the party is covered even without the Skill. */
@@ -64,17 +64,17 @@ public class PermansorTerraeTest {
     public void hisFileCarriesTheClauses() {
         var table = TriggerTables.of(DHPT);
         Assertions.assertEquals(2, table.ruleCount(TriggerEvent.SKILL_CAST),
-                "the Bondmate/shield rule AND (since 2026-10-02) the 神秀 (Divine Excellence) trace that buffs whoever holds 【同袍】 (the Bondmate) -- "
+                "the Bondmate/shield rule AND (since 2026-10-02) the Empyreanity (神秀) trace that buffs whoever holds the Bondmate (【同袍】) -- "
                         + "which is why the two are in this order in the file: the first designates, the second reads "
                         + "`holder_of:同袍`");
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.ULT_CAST), "the party shield");
         Assertions.assertEquals(4, table.ruleCount(TriggerEvent.BATTLE_START),
-                "the level convention, the technique's 【同袍】 (「使用秘技后获得【同袍】」, gaining the Bondmate after using the technique), 葳蕤's 「行动提前40%」 and "
-                        + "-- since 2026-10-02 -- the technique's auto-cast (「下一次战斗开始时自动对持有【同袍】的"
+                "the level convention, the technique's Bondmate (【同袍】) (\"gaining the Bondmate after using the Technique\" (「使用秘技后获得【同袍】」)), Sylvanity (葳蕤)'s \"action advance 40%\" (「行动提前40%」) and "
+                        + "-- since 2026-10-02 -- the technique's auto-cast, i.e. \"at the start of the next battle it automatically casts 1 Skill on the holder of the Bondmate (【同袍】)\" (「下一次战斗开始时自动对持有【同袍】的"
                         + "角色施放1次战技」), which CAST_SKILL can now deliver because it casts the skill through the "
                         + "engine's own path: his skill is a DEFENCE shield, not a swing");
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.ALLY_ATTACK),
-                "葳蕤's second half: 「【同袍】施放攻击时，丹恒•腾荒恢复6点能量」 (when the Bondmate attacks, Dan Heng - Permansor Terrae restores 6 energy)");
+                "Sylvanity (葳蕤)'s second half: \"when the Bondmate (【同袍】) casts an attack, Dan Heng - Permansor Terrae restores 6 Energy\" (「【同袍】施放攻击时，丹恒•腾荒恢复6点能量」)");
     }
 
     private static Random fixed() {
