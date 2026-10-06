@@ -702,6 +702,86 @@
       ],
       "source": "1503 真珠 欢榆技 渲染理性，解构欢榆 (150320): 「队伍中「欢榆」命途角色数量等于 4 或以上时，使我方全体目标**下一次攻击后**，对攻击目标额外造成 40% 的**对应属性**欢榆伤害」。",
       "note": "⭐ 用 `ADD_DAMAGE` 而不是 `DAMAGE`：它把量加到**正在结算的那一笔**，不产生新实例，也就不会再次触发 `DEALING_DAMAGE`（第一版用 `DAMAGE` 时，引擎的递归守卫拦下了它）。⭐ 三个欢榆因子由 `damage_type: \"ELATION\"` 带入（本轮为 `ADD_DAMAGE` 加的能力）；量的来源 `elation_base` 由共用 helper 解析（它不是属性，属性读取器对它无答案）。⭐ **元素不用写**：这笔加入攻击者自己的实例，元素本就是他的。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "trace_insight_raises_elation_at_2400_defence",
+      "when": [
+        "self_attr:DEFENCE >= 2400"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ELATION_DAMAGE_BOOST",
+          "percent": 0.0003,
+          "permanent": true,
+          "target": "self",
+          "scale": "self_attr_above:DEFENCE:2400",
+          "amount": 0.32,
+          "cap_amount": 0.68
+        }
+      ],
+      "source": "1503 真珠 行迹 洞察万物 (1503101): 「真珠的防御力大于等于 2400 时，使自身欢愉度提高 32%，之后每超过 100 点防御力使自身欢愉度提高 3%，最多计入 3600 点超出的防御力」。",
+      "note": "⭐⭐ **一条规则，不是两条** —— 第一版写成两条（平的 0.32 与 `self_attr_above:DEFENCE:2400` + `amount: -0.04`），而**实测在 DEF = 2400 处读到 0.28 而不是 0.32** ✗：两条同属性、同类的修饰**互相替换**（`max_stacks` 默认 1，这是引擎的既有口径），后一条在超出量为 0 时给出 `0 − 0.04`，把前一条顶掉了 ✓。⭐ 合并**不是绕道** ✓：`self_attr_above:DEFENCE:2400` 本身就取 `max(0, DEF − 2400)` ✓，所以一条规则读 `0.32 + 0.0003 × 超出量` ✓，而 `cap_amount: 0.68` 正好写出文档的上限 —— 「最多计入 3600 点超出的防御力」⇒ `0.32 + 0.0003 × (3600 − 2400) = 0.68` ✓。⇒ 上限这次是**按输出端**表达的，而它与文档的读法在**任何** DEF 上都相等 ✓（写 `amount` 那种输出端偏移才会分岔 ✓）。⭐ 判据 `PearlInsightTraceTest` 量四点：2300 给 0 ✓、2400 给 0.32 ✓、2500 给 0.35 ✓、4000 与 5000 **读数相同**（封顶 0.68 ✓）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "trace_insight_links_healing_to_elation",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "OUTGOING_HEALING_BOOST",
+          "scale": "self_attr:ELATION_DAMAGE_BOOST",
+          "percent": 0.2,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "1503 真珠 行迹 洞察万物 (1503101) 第二句: 「真珠获得等同于自身欢愉度 20% 的治疗量加成」。",
+      "note": "⭐ `OUTGOING_HEALING_BOOST` 是**治疗者侧**的属性（`Battle.heal` 从施放者身上读），首个出货读者是 `1105.json` 的行迹 调理 —— 所以这里同样只是内容。⭐ 量的来源是**欢愉度**（`ELATION_DAMAGE_BOOST`），这是个**比率属性**，所以 `percent × 该值` 得到的就是「欢愉度的 20%」这件事本身的单位（比率），不需要再换算。⚠ 顺序：`BATTLE_START` 上三条规则按**文件顺序**执行 —— 上面两条先抬高欢愉度，这一条随后按**抬完的**值取 20%（这是「等同于自身欢愉度」的自然读法，也是判据里能观测到的一处差别）。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "trace_tolerance_raises_effect_resistance_while_deep",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "EFFECT_RESISTANCE",
+          "percent": 0.5,
+          "permanent": true,
+          "target": "all_allies",
+          "target_when": [
+            "self has_state 深度学习"
+          ]
+        }
+      ],
+      "source": "1503 真珠 行迹 感知容差 (1503102): 「持有【好活当赏】时，我方全体目标的**效果抵抗**提高 50%」。",
+      "note": "⚠⚠ **这一条是本轮唯一带读数近似的**，写清楚以免被当成完成：原文的门是「**持有【好活当赏】时**」，而【好活当赏】在本引擎里是**数值资源**（`resources[0]`），不是可 `has_state` 的状态 —— 所以「持有它」这个条件**今天写不出来**（资源经过 0 点时无法用条件表达“此刻持有”）。⭐ 本轮**借用了最接近的可判定事实**：`self has_state 深度学习`（同一套机制的另一半：深度学习由终结技/秘技装上、强化普攻消耗）。⚠ 差别在于**它不在所有该在的时候成立**（只要终结技转过就来，与是否持有好活当赏无关）。已登记为缺口，**不当作完成**；解锁条件是把【好活当赏】做成一个长度为 1 的具名状态（或给条件 DSL 一个“资源 > 0”的拼法）。⭐ 效果抵抗的属性名**早就存在** —— 本文件原文那句“`AttributeType` 里没有任何名字命名效果抵抗（实测扫过）”是**错的**：`EFFECT_RESISTANCE`（`AttributeType:44`，由游戏属性 `StatusResistanceBase` 映射，见 `:289`）。这与“我断言欢愉伤害属性不存在、而 `ELATION_DAMAGE_BOOST` 一直都在”是同一个错法，已作为纪律记下。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "eidolon6_raises_all_type_resistance_penetration",
+      "min_eidolon": 6,
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DAMAGE_PENETRATION",
+          "percent": 0.2,
+          "permanent": true,
+          "target": "all_allies",
+          "target_when": [
+            "self has_state 深度学习"
+          ]
+        }
+      ],
+      "source": "1503 真珠 星魂 6 用一副躯壳，演算生命: 「【深度学习】时，我方全体目标的全属性**抗性穿透**提高 20%」（参数 `[0.2, 2.4]` 的第二项是 240% 的欢愉伤害，仍未写）。",
+      "note": "⭐⭐ **本轮推翻了一处流传很久的笔记**：`1403.json` 写着「“全属性抗性穿透”没有写法 ✗（引擎只有 1207 那条 `DAMAGE_PENETRATION`，绑定单一元素 ✓）」—— **后半句是错的** ✓。实测读源码：`Battle:3065` 是 `damage.resist(rawResist, attacker.getAttribute(DAMAGE_PENETRATION).get())`，而 `rawResist = enemy.getDamageResist().getOrDefault(damage.getElement(), 0.0)` 已经取过元素 ✓ ⇒ **穿透是攻击者的一个值，与元素无关** ✓，它减的是**任何**元素的那一发抗性 ✓。已经有三份出货内容按这个读法用它（`1408:123` ✓、`1412:177` ✓、`1502` ✓），所以那个笔记与仓库里的三处出货**互相矛盾** ✓，本轮以源码为准 ✓（并把它记进 GAPS，免得第四次重犯 ✓）。⭐ `min_eidolon: 6` 让“这句属于星魂”写在机制旁边（引擎依旧不认识星魂，照 `1211` 的既有写法）。⭐ 门写 `self has_state 深度学习` —— 这一条**恰好准确**：原文的门就是【深度学习】本身。⚠ 星魂 6 的另一半（强化普攻额外 240% 冰属性欢愉伤害、用【美学底本】的属性值计算）**未写**：引擎侧的 `holder_attr:` 已经就位，缺的是**哪条属性**（正文没说、能力脚本不在数据里）—— 见 `GAPS.md`（2026-10-06）。"
     }
   ]
 }
