@@ -7,3 +7,6 @@ src/main/resources/data/
 logs/
 # Python bytecode from the tools/ scripts
 __pycache__/
+
+# Scratch output and local working notes from tools/ (the scripts themselves are tracked)
+tools/_*

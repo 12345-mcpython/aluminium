@@ -920,6 +920,25 @@ static final String ACTOR_ATTR_PREFIX = "actor_attr:";
 static final String SUMMON_ATTR_PREFIX = "summon_attr:";
 
 /**
+ * {@code holder_attr:<STATE>:<ATTRIBUTE>} -- the own attribute of the unit <b>holding a state</b>, as a magnitude.
+ *
+ * <p>The fourth subject in this family, and the one the three above cannot name: "该次欢愉伤害使用【美学底本】的属性值计算"
+ * (1503 Pearl (真珠)'s enhanced basic and her Eidolon 6) states that the instance's magnitude is read off the ally her
+ * ultimate marked as the Aesthetic Archetype (美学底本) -- a unit chosen in combat, not a slot in the roster, so neither
+ * {@link #SELF_ATTR_PREFIX} (the owner), {@link #SUMMON_ATTR_PREFIX} (the owner's memosprite) nor {@link #ACTOR_ATTR_PREFIX}
+ * (whoever the event is about) can reach it.
+ *
+ * <p>It is the magnitude-keeping counterpart of the {@code holder_of:<STATE>} <b>target</b> selector
+ * ({@link TriggerInterpreter}), resolved through the same lookup - so "who holds it" has one answer in the engine
+ * whether the sentence is about where an effect lands or about which number it reads.
+ *
+ * <p>The state name can contain a colon, so the split is on the LAST colon. Note: the attribute is mandatory here
+ * (unlike the target selector, where the holder itself is the whole answer): "use [美学底本]'s stats" does not say
+ * which stat, and defaulting to one would silently invent the game's own choice.
+ */
+static final String HOLDER_ATTR_PREFIX = "holder_attr:";
+
+/**
  * {@code cast_skill_param:<index>} -- a parameter of the skill that produced the event, at its CURRENT level: "等同于德谬歌生命上限的 #1%"
  * (1415 memosprite skill 10). The damage path reads the same row through {@code multiplierOf}.
  */
