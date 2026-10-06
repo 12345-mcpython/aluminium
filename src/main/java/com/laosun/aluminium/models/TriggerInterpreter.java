@@ -316,7 +316,7 @@ public final class TriggerInterpreter {
 
     /** The ops that actually read {@code damage_type} (see the guard in {@link #validate}). */
     private static final java.util.Set<String> DAMAGE_TYPE_READERS =
-            java.util.Set.of("BOOST_DAMAGE", "DAMAGE", "MODIFY_ATTR", "MODIFY_DAMAGE_TAKEN");
+            java.util.Set.of("BOOST_DAMAGE", "DAMAGE", "MODIFY_ATTR", "MODIFY_DAMAGE_TAKEN", "ADD_DAMAGE");
 
     public static void validate(EffectSpec effect, TriggerSpec spec) {
         // Note: A ceiling is only READ by APPLY_DOT today, so every other op refuses it: silently ignoring a field is exactly the
@@ -3249,7 +3249,27 @@ public final class TriggerInterpreter {
             throw new IllegalStateException(
                     "Op ADD_DAMAGE needs the damage instance being settled, but this context carries none");
         }
-        damage.addFlat(derivedMagnitude(effect, ctx));
+        // An addition labelled ELATION belongs to an Elation instance, so it carries that instance's three
+        // factors (ROADMAP:1262: an Elation base is `... x (1+欢愉度) x (1+增笑) x (1+笑点x5/(笑点+240))`).
+        // They are read off the ATTACKER -- the unit whose instance this is -- not the rule owner.
+        double magnitude = derivedMagnitude(effect, ctx);
+        com.laosun.aluminium.enums.DamageType only = parseDamageType(effect, "ADD_DAMAGE", null);
+        if (only == com.laosun.aluminium.enums.DamageType.ELATION) {
+            CanHit attacker = damage.getAttacker();
+            if (attacker == null) {
+                throw new IllegalStateException(
+                        "Op ADD_DAMAGE states damage_type ELATION, but the instance being settled has no attacker"
+                                + " to read 欢愉度 and 增笑 from");
+            }
+            magnitude *= 1 + attacker.getAttribute(
+                    com.laosun.aluminium.enums.AttributeType.ELATION_DAMAGE_BOOST).get();
+            magnitude *= 1 + attacker.getAttribute(
+                    com.laosun.aluminium.enums.AttributeType.ELATION_DAMAGE_AMP).get();
+            if (ctx.battle() != null) {
+                magnitude *= ctx.battle().elationLaughMultiplier();
+            }
+        }
+        damage.addFlat(magnitude);
     }
 
     private static void boostDamage(EffectSpec effect, TriggerContext ctx) {
