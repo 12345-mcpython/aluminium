@@ -1567,7 +1567,7 @@ TriggerInterpreter 的 SHIELD 分支（有 turns → ShieldBuff）  ← ⚠ 第�
 > `everyAbilityBearingBonusIsEitherAuthoredOrRegistered` 想守住、但因为 `properties().isEmpty()`
 > 这个过滤条件而没守到的地方。
 >
-> **现在的账本是两半都算**：`35 纯 + 29 混合 = 17 已写 + 47 已登记`，两个分母**各自钉住**
+> **现在的账本是两半都算**：`35 纯 + 29 混合 = **63 已写 + 1 已登记**`（当前，2026-10-02 重校；下面那些分类细节是 2026-09-27 的历史记录，以 `RelicTriggerTableTest` 的 pin 为准），两个分母**各自钉住**
 > （这样"某个效果靠长出一个 `properties` 逃出分区"会立刻变红）。29 条混合里
 > **7 条已写**（301 / 302 / 304 / 306 / 307 / 308 / 309，全靠 `self_attr` 与 `ADVANCE`），
 > 其余 22 条逐条登记了缺哪种能力；其中 **7 条**的能力其实已经有了、只是还没写文件，
