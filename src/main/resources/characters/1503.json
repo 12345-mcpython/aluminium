@@ -229,6 +229,83 @@
       ],
       "source": "1503 真珠 星魂 1 珍珠，藏在海的留白处: 「队伍中「欢榆」命途角色数量等于 4 或以上时，使我方全体欢榆度提高 60%」。",
       "note": "⭐ **属性本就存在** ✓：`ELATION_DAMAGE_BOOST` 定义在 `AttributeType:105`，并由数据列 `ElationDamageAddedRatioBase` 映射（`:288`），应用在 `TriggerInterpreter:5022` 与 `SkillExecutor:642` 两处 —— 所以这条只是内容。⭐ 三档写成三条递增阈值（同终结技的写法），作用对象 `all_allies`。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "art_barrier_on_an_elation_archetype",
+      "when": [
+        "actor == self",
+        "target has_path 欢愉"
+      ],
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "艺术壁垒",
+          "permanent": true,
+          "target": "target",
+          "target_when": [
+            "!target has_state 艺术壁垒"
+          ]
+        }
+      ],
+      "source": "1503 真珠 行迹 艺术壁垒 (1503103): 「进入战斗和施放终结技后，若【美学底本】为「欢榆」命途角色，使其下一次施放终结技时，为真珠固定恢复 90 点能量。该效果无法叠加」。",
+      "note": "⭐ 不需要先建【美学底本】状态 ✓：终结技选中的 `target` **就是**【美学底本】，所以“若【美学底本】为欢榆命途”就是 `target has_path 欢愉`。⭐ “无法叠加”用 `target_when: [\"!target has_state 艺术壁垒\"]` 表达（现成写法，见 `1211`）。⚠ 同句的“进入战斗后”那一半（秘技版）**本文件未写**：它依赖秘技版的【美学底本】转移语义。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "art_barrier_refunds_ninety_energy_once",
+      "when": [
+        "actor is_ally",
+        "actor has_state 艺术壁垒"
+      ],
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 90,
+          "target": "self"
+        }
+      ],
+      "source": "1503 真珠 行迹 艺术壁垒 (1503103) 的兑现端: 「使其下一次施放终结技时，为真珠固定恢复 90 点能量」。",
+      "note": "⭐ 90 是数据里的值（状态 `10015033` 的 `#1`）。⭐ 回能量的目标是 `self`（真珠）—— 原文说“为**真珠**恢复”。⚠ ⭐ 原文的“使其**下一次**施放终结技时”那个“下一次”**本文件未能表达**：“用完就移除”需要 `REMOVE_STATE` 能指向“引发事件的那个队友”，而它的选择器表不收 `actor`，也不收 `attacker`（两个都实测过，加载器直接拒绝）。⇒ 当前行为：该队友**每一次**终结技都会为真珠回 90 点（原文只说下一次）。这一点已登记，不当成完成。"
+    },
+    {
+      "on": "HP_LOST",
+      "id": "talent_reduces_damage_taken_below_half_hp",
+      "when": [
+        "target is_ally",
+        "target_hp_percent <= 0.5"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "percent": -0.15,
+          "permanent": true,
+          "buff": "吞纳沙砾",
+          "target": "target",
+          "target_when": [
+            "!target has_state 吞纳沙砾"
+          ]
+        }
+      ],
+      "source": "1503 真珠 天赋 吞纳沙砾，重塑生机 (150304): 「我方目标当前生命值百分比小于等于 50% 时，受到的伤害降低 15%」。",
+      "note": "⭐ **照现成形状** ✓：`1002` 的行迹就是“`HP_LOST` + 阈值判定 ⇒ 加减伤”，并在 `HEALED` 那侧移除（见下一条）。⭐ 减伤用**负值** `percent`（库里已有 `-0.5/-0.18/-0.1`）。⭐ 防重复施加用 `target_when`（见 `1211`）。⚠ 满级是 37.5%（`#4 = 0.375`），本文件取**级 1 = 15%** —— 取值口径统一问题登记在下面。"
+    },
+    {
+      "on": "HEALED",
+      "id": "talent_drops_the_reduction_above_half_hp",
+      "when": [
+        "target is_ally",
+        "target_hp_percent > 0.5"
+      ],
+      "do": [
+        {
+          "op": "REMOVE_STATE",
+          "buff": "吞纳沙砾",
+          "target": "target"
+        }
+      ],
+      "source": "1503 真珠 天赋 (150304) 的取消端: 「我方目标当前生命值百分比小于等于 50% 时」—— 回到 50% 以上就不再满足。",
+      "note": "⭐ 与 `1002` 的 `HEALED` 清理端同形状。"
     }
   ]
 }
