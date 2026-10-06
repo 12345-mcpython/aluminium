@@ -2176,3 +2176,27 @@ has been loaded yet”，第 60 行定义 `ELATION("elation", true, false)`（**
 “加载器坏了”与“文件不在”读数一模一样（都是 0 条，都绿）。
 ⭐ 而且它与项目不一致：其它每一张表都走 `JSONReader`，均为严格。
 ⇒ 改为严格，判据立刻可以失败。
+
+### ✅ 四乘区齐备（2026-10-02）：欢榆伤害公式已完整可用
+
+⭐ `ROADMAP.md:1262` 的公式 `基础值 × 欢榆倍率 × (1+欢榆度) × (1+增笑) × (1+笑点×5/(笑点+240))`，
+现在**四个因子全部存在且各自有判据**：
+
+| 因子 | 怎么来 | 判据 |
+|---|---|---|
+| `基础值 × 欢榆倍率` | `Constant.ELATION_BASIC_LEVEL_DAMAGE`（101 行表，已加载）与 `"scale": "elation_base"` | `ElationBaseTableTest`、`ElationBaseScaleTest` |
+| `(1+欢榆度)` | `ELATION_DAMAGE_BOOST`（既有） | 既有判据 |
+| `(1+增笑)` | **新** `ELATION_DAMAGE_AMP`（无数据列，仅由规则给出） | `ElationAmpTest` |
+| `(1+笑点×5/(笑点+240))` | **新** `Battle.elationLaughMultiplier()`（读 PARTY 资源笑点） | `ElationLaughMultiplierTest` |
+
+⭐ 两个新因子都只作用于 `DamageType.ELATION`，且都折在同一处（`TriggerInterpreter` 与
+`SkillExecutor` 的 base）—— 与 `ELATION_DAMAGE_BOOST` 原来的位置一致，所以三个因子不会各自漂移。
+
+⭐ 关键性质已被判据钉住：
+- 欢榆伤害**禁攻击力**（`ElationBaseScaleTest`：加 200% 攻击后伤害不变）；
+- 增笑与欢榆度**相乘而非相加**（`ElationAmpTest`：各 +100% ⇒ 恰好 ×4）；
+- 笑点因子**只影响欢榆伤害**（240 笑点 ⇒ 比值 3.5，而 NORMAL 不变）。
+
+⇒ ⭐ 真珠的**欢榆技兼现端、形态 A 的 60%、星魂 6 的 240%、星魂 2 的 15% 增笑**
+现在都有了数值依据，只剩两个**取值口径**：“用【美学底本】的属性值计算”
+与“元素随攻击者”。
