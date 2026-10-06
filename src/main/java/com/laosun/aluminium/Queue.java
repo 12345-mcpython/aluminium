@@ -453,6 +453,19 @@ public final class Queue {
     }
 
     /**
+     * Whether an extra turn is going to be taken by the next {@link #move()}.
+     *
+     * <p>True only while one is <b>pending</b>, and that is the one moment at which the queue can still tell an extra
+     * turn from an ordinary one: {@link #move()} hands the turn over and consumes the flag in the same step, so from
+     * the turn's own first boundary onward nothing outside the queue knows. Reader: {@code Battle.stepForward}, which
+     * announces {@code EXTRA_TURN_STARTED} off it, before the move - "at the start of this extra turn" has to be in
+     * place before the unit acts.
+     */
+    public boolean hasPendingExtraTurn() {
+        return extraTurnActor != null;
+    }
+
+    /**
      * Gives {@code actor} an extra turn: the next {@link #move()} is performed by them,
      * and it consumes no action value (the clock does not move to the round does not change either).
      *
