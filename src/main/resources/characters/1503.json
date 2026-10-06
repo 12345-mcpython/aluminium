@@ -630,6 +630,78 @@
       ],
       "source": "1503 真珠 星魂 2 截取，顷刻破晓的光斑: 「我方全体目标的欢榆伤害增笑 15%」（参数 `[0.15, 1]`）。",
       "note": "⭐ **只写了三分之一** ✓：这一半只是一个属性。同句的“使**除真珠和【美学底本】外**的其他欢榆命途角色也触发行动提前”需要知道谁是底本、并排除它和真珠；“额外回合开始时获得的【好活当赏】和笑点提高 100%”则等待那两项奖励本身先被写出来。⭐ 用 `ELATION_DAMAGE_AMP` 而**不是** `ELATION_DAMAGE_BOOST`：规格（`ROADMAP.md:1262`）把它们写成两个**相乘**的因子，实测判据也钉住了这一点。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "elation_skill_pays_out_at_1_elation_allies",
+      "when": [
+        "actor has_state 渲染理性，解构欢榆",
+        "allies_with_path:欢愉 >= 1"
+      ],
+      "do": [
+        {
+          "op": "ADD_DAMAGE",
+          "scale": "elation_base",
+          "percent": 0.1,
+          "damage_type": "ELATION"
+        }
+      ],
+      "source": "1503 真珠 欢榆技 渲染理性，解构欢榆 (150320): 「队伍中「欢榆」命途角色数量等于 1 或以上时，使我方全体目标**下一次攻击后**，对攻击目标额外造成 10% 的**对应属性**欢榆伤害」。",
+      "note": "⭐ 用 `ADD_DAMAGE` 而不是 `DAMAGE`：它把量加到**正在结算的那一笔**，不产生新实例，也就不会再次触发 `DEALING_DAMAGE`（第一版用 `DAMAGE` 时，引擎的递归守卫拦下了它）。⭐ 三个欢榆因子由 `damage_type: \"ELATION\"` 带入（本轮为 `ADD_DAMAGE` 加的能力）；量的来源 `elation_base` 由共用 helper 解析（它不是属性，属性读取器对它无答案）。⭐ **元素不用写**：这笔加入攻击者自己的实例，元素本就是他的。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "elation_skill_pays_out_at_2_elation_allies",
+      "when": [
+        "actor has_state 渲染理性，解构欢榆",
+        "allies_with_path:欢愉 >= 2"
+      ],
+      "do": [
+        {
+          "op": "ADD_DAMAGE",
+          "scale": "elation_base",
+          "percent": 0.15,
+          "damage_type": "ELATION"
+        }
+      ],
+      "source": "1503 真珠 欢榆技 渲染理性，解构欢榆 (150320): 「队伍中「欢榆」命途角色数量等于 2 或以上时，使我方全体目标**下一次攻击后**，对攻击目标额外造成 15% 的**对应属性**欢榆伤害」。",
+      "note": "⭐ 用 `ADD_DAMAGE` 而不是 `DAMAGE`：它把量加到**正在结算的那一笔**，不产生新实例，也就不会再次触发 `DEALING_DAMAGE`（第一版用 `DAMAGE` 时，引擎的递归守卫拦下了它）。⭐ 三个欢榆因子由 `damage_type: \"ELATION\"` 带入（本轮为 `ADD_DAMAGE` 加的能力）；量的来源 `elation_base` 由共用 helper 解析（它不是属性，属性读取器对它无答案）。⭐ **元素不用写**：这笔加入攻击者自己的实例，元素本就是他的。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "elation_skill_pays_out_at_3_elation_allies",
+      "when": [
+        "actor has_state 渲染理性，解构欢榆",
+        "allies_with_path:欢愉 >= 3"
+      ],
+      "do": [
+        {
+          "op": "ADD_DAMAGE",
+          "scale": "elation_base",
+          "percent": 0.2,
+          "damage_type": "ELATION"
+        }
+      ],
+      "source": "1503 真珠 欢榆技 渲染理性，解构欢榆 (150320): 「队伍中「欢榆」命途角色数量等于 3 或以上时，使我方全体目标**下一次攻击后**，对攻击目标额外造成 20% 的**对应属性**欢榆伤害」。",
+      "note": "⭐ 用 `ADD_DAMAGE` 而不是 `DAMAGE`：它把量加到**正在结算的那一笔**，不产生新实例，也就不会再次触发 `DEALING_DAMAGE`（第一版用 `DAMAGE` 时，引擎的递归守卫拦下了它）。⭐ 三个欢榆因子由 `damage_type: \"ELATION\"` 带入（本轮为 `ADD_DAMAGE` 加的能力）；量的来源 `elation_base` 由共用 helper 解析（它不是属性，属性读取器对它无答案）。⭐ **元素不用写**：这笔加入攻击者自己的实例，元素本就是他的。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "elation_skill_pays_out_at_4_elation_allies",
+      "when": [
+        "actor has_state 渲染理性，解构欢榆",
+        "allies_with_path:欢愉 >= 4"
+      ],
+      "do": [
+        {
+          "op": "ADD_DAMAGE",
+          "scale": "elation_base",
+          "percent": 0.4,
+          "damage_type": "ELATION"
+        }
+      ],
+      "source": "1503 真珠 欢榆技 渲染理性，解构欢榆 (150320): 「队伍中「欢榆」命途角色数量等于 4 或以上时，使我方全体目标**下一次攻击后**，对攻击目标额外造成 40% 的**对应属性**欢榆伤害」。",
+      "note": "⭐ 用 `ADD_DAMAGE` 而不是 `DAMAGE`：它把量加到**正在结算的那一笔**，不产生新实例，也就不会再次触发 `DEALING_DAMAGE`（第一版用 `DAMAGE` 时，引擎的递归守卫拦下了它）。⭐ 三个欢榆因子由 `damage_type: \"ELATION\"` 带入（本轮为 `ADD_DAMAGE` 加的能力）；量的来源 `elation_base` 由共用 helper 解析（它不是属性，属性读取器对它无答案）。⭐ **元素不用写**：这笔加入攻击者自己的实例，元素本就是他的。"
     }
   ]
 }

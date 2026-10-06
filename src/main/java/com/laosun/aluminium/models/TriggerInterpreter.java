@@ -3252,7 +3252,11 @@ public final class TriggerInterpreter {
         // An addition labelled ELATION belongs to an Elation instance, so it carries that instance's three
         // factors (ROADMAP:1262: an Elation base is `... x (1+欢愉度) x (1+增笑) x (1+笑点x5/(笑点+240))`).
         // They are read off the ATTACKER -- the unit whose instance this is -- not the rule owner.
-        double magnitude = derivedMagnitude(effect, ctx);
+        // `elation_base` is a table lookup, not an attribute, so it is resolved here rather than by
+        // `derivedMagnitude` -- measured: that reader returned null and the settlement NPE'd.
+        double magnitude = "elation_base".equals(effect.getScale() == null ? "" : effect.getScale().trim())
+                ? elationBase(ctx) * (effect.getPercent() == null ? 1 : effect.getPercent())
+                : derivedMagnitude(effect, ctx);
         com.laosun.aluminium.enums.DamageType only = parseDamageType(effect, "ADD_DAMAGE", null);
         if (only == com.laosun.aluminium.enums.DamageType.ELATION) {
             CanHit attacker = damage.getAttacker();
@@ -4928,6 +4932,32 @@ public final class TriggerInterpreter {
      * on the base) and the WRONG one for damage. Measured: a row-based instance at her Lv10 COMMON row dealt 64.365 while a literal 0.8 dealt 385.35 = 0.8 x
      * 481.- the base ATK rather than the settled one. A damage instance uses the settled value, so this path reads it directly.
      */
+    /**
+     * The Elation damage base for the rule owner's Elation-skill level: {@code Constant.ELATION_BASIC_LEVEL_DAMAGE}
+     * (101 rows, loaded from the gitignored data file) -- the base-times-ratio factor of the spec at
+     * {@code ROADMAP.md:1262}.
+     *
+     * <p>Shared by the two ops that can name it: {@code DAMAGE} through {@code literalBase}, and
+     * {@code ADD_DAMAGE}, whose magnitude otherwise goes through the ATTRIBUTE reader -- which has no answer
+     * for a table lookup (measured: it returned null and the settlement NPE'd on {@code AttributeType.ordinal()}).
+     * One copy, so the two cannot drift.
+     */
+    private static double elationBase(TriggerContext ctx) {
+        if (ctx == null || ctx.owner() == null) {
+            throw new IllegalStateException(
+                    "a scale of elation_base has no rule owner to read an Elation-skill level from");
+        }
+        Skill elationSkill = ctx.owner().getSkills().get(SkillType.ELATION_SKILL);
+        int level = elationSkill == null ? 1 : ctx.owner().skillLevel(elationSkill);
+        Double base = com.laosun.aluminium.Constant.ELATION_BASIC_LEVEL_DAMAGE.get(level);
+        if (base == null) {
+            throw new IllegalStateException("elation_base has no table row for Elation-skill level " + level
+                    + "; the loaded table has " + com.laosun.aluminium.Constant.ELATION_BASIC_LEVEL_DAMAGE.size()
+                    + " rows");
+        }
+        return base;
+    }
+
     private static double literalBase(CanHit attacker, CanHit victim, EffectSpec effect, TriggerContext ctx) {
         String scale = effect.getScale() == null ? "" : effect.getScale().trim();
         // Note: `shareOf`, not the raw field: a share may also come from one of the owner's own skills (`percent_from_skill_param`),
@@ -4985,24 +5015,11 @@ public final class TriggerInterpreter {
                 return ctx.actor().getMaxHp() * share + flat;
             }
             case "elation_base" -> {
-                // The Elation damage base (ROADMAP:1262's `基础值 × 欢愉倍率`): the 101-row level table loaded as
+            // The Elation damage base (ROADMAP:1262's base x Elation ratio): the 101-row level table loaded as
             // Constant.ELATION_BASIC_LEVEL_DAMAGE, read at the owner's Elation-skill level. Attack power plays
-            // no part in Elation damage, so this is the honest scale for such an instance; a rule that names
-            // `self_attr:ATTACK` instead is stating its own approximation.
-            if (ctx == null || ctx.owner() == null) {
-                throw new IllegalStateException(
-                        "a literal-ratio DAMAGE scaled by elation_base has no rule owner to read a level from");
-            }
-            Skill elationSkill = ctx.owner().getSkills().get(SkillType.ELATION_SKILL);
-            int level = elationSkill == null ? 1 : ctx.owner().skillLevel(elationSkill);
-            Double base = com.laosun.aluminium.Constant.ELATION_BASIC_LEVEL_DAMAGE.get(level);
-            if (base == null) {
-                throw new IllegalStateException(
-                        "elation_base has no table row for Elation-skill level " + level + "; the loaded table has "
-                                + com.laosun.aluminium.Constant.ELATION_BASIC_LEVEL_DAMAGE.size() + " rows");
-            }
-                return base * share + flat;
-            }
+            // no part in Elation damage, so this is the honest scale for such an instance.
+            return elationBase(ctx) * share + flat;
+        }
             case "target_max_hp" -> {
                 if (victim == null) {
                     throw new IllegalStateException("a literal-ratio DAMAGE scaled by target_max_hp has no victim to read it from");
