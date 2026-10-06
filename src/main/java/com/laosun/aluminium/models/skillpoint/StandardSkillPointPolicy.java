@@ -222,6 +222,11 @@ public class StandardSkillPointPolicy implements SkillPointPolicy {
     }
 
     @Override
+    public boolean hasAtLeast(int points) {
+        return points <= 0 || resource.getValue() >= points;
+    }
+
+    @Override
     public boolean canAfford() {
         return resource.getValue() > 0;
     }

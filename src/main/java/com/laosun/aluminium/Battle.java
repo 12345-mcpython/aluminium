@@ -408,6 +408,17 @@ public class Battle {
     }
 
     /**
+     * Whether the pool holds at least {@code points} skill points.
+     *
+     * <p>Beside {@link #hasSkillPoint()}, which only ever asks "is one action affordable": a clause that
+     * reads the count or the cap asks a different question, and the register's F-7 is that the narrower
+     * one used to be the only one on offer.
+     */
+    public boolean hasSkillPoint(int points) {
+        return skillPointPolicy.hasAtLeast(points);
+    }
+
+    /**
      * Whether there are enough skill points to cast one skill.
      */
     public boolean hasSkillPoint() {
