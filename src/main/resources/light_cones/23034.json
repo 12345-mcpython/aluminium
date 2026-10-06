@@ -65,6 +65,90 @@
       "source": "光锥 23034: 「当装备者对我方单体角色施放战技或终结技后，装备者恢复#1[f1]点能量，同时使技能目标获得1层【圣咏】，持续#4[i]回合，最多叠加#3[i]层，每层【圣咏】使持有者造成的伤害提高#2[i]%」",
       "note": "⭐ 用 **`on_any`** ✓ 同时接两个施放事件 ✓（库内已有先例 ✓），并用 **`target is_ally`** ✓ 表达「对**我方单体角色**施放」✓。⭐ 叠层用 **`ADD_STACK`** ✓（本轮刚学到：`APPLY_BUFF` **不会累积** ✗）并作用于 **技能目标** ✓；每层加成用 `per_stack` ✓。⚠ **第三句已登记** ✗：「每对我方单体角色施放#5[i]**次**后恢复 1 个战技点」需要**阈值计数器** ✗（引擎的计数器只能被读取，不能在\"达到 N\"时触发 ✗）。 ⭐ ⚠ **`on_any` 不是规则级字段** ✗（实测：`Unknown trigger event 'null'` ✗）⇒ 两个事件各写**一条规则** ✓。",
       "on": "ULT_CAST"
+    },
+    {
+      "on": "SKILL_CAST",
+      "id": "cone23034_skill_point_count_skill",
+      "when": [
+        "actor == self",
+        "target is_ally",
+        "self_stacks:施放计数 < 2"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "施放计数",
+          "amount": 1,
+          "max_stacks": 2,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23034 回到大地的飞行: 「装备者每对我方单体角色施放#5[i]次战技或终结技后，恢复1个战技点」(tbgd Ability23034, ParamList #5 = 2 at rank 1)。"
+    },
+    {
+      "on": "SKILL_CAST",
+      "id": "cone23034_skill_point_pay_skill",
+      "when": [
+        "actor == self",
+        "target is_ally",
+        "self_stacks:施放计数 >= 2"
+      ],
+      "do": [
+        {
+          "op": "GAIN_SKILL_POINT",
+          "amount": 1
+        },
+        {
+          "op": "REMOVE_STACK",
+          "buff": "施放计数",
+          "amount": 2,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23034: the payout half of the same clause, counted with self_stacks like cone 23003 and 23064."
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "cone23034_skill_point_count_ult",
+      "when": [
+        "actor == self",
+        "target is_ally",
+        "self_stacks:施放计数 < 2"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "施放计数",
+          "amount": 1,
+          "max_stacks": 2,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23034 回到大地的飞行: 「装备者每对我方单体角色施放#5[i]次战技或终结技后，恢复1个战技点」(tbgd Ability23034, ParamList #5 = 2 at rank 1)。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "cone23034_skill_point_pay_ult",
+      "when": [
+        "actor == self",
+        "target is_ally",
+        "self_stacks:施放计数 >= 2"
+      ],
+      "do": [
+        {
+          "op": "GAIN_SKILL_POINT",
+          "amount": 1
+        },
+        {
+          "op": "REMOVE_STACK",
+          "buff": "施放计数",
+          "amount": 2,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23034: the payout half of the same clause, counted with self_stacks like cone 23003 and 23064."
     }
   ],
   "2": [
@@ -133,6 +217,90 @@
       "source": "光锥 23034: 「当装备者对我方单体角色施放战技或终结技后，装备者恢复#1[f1]点能量，同时使技能目标获得1层【圣咏】，持续#4[i]回合，最多叠加#3[i]层，每层【圣咏】使持有者造成的伤害提高#2[i]%」",
       "note": "⭐ 用 **`on_any`** ✓ 同时接两个施放事件 ✓（库内已有先例 ✓），并用 **`target is_ally`** ✓ 表达「对**我方单体角色**施放」✓。⭐ 叠层用 **`ADD_STACK`** ✓（本轮刚学到：`APPLY_BUFF` **不会累积** ✗）并作用于 **技能目标** ✓；每层加成用 `per_stack` ✓。⚠ **第三句已登记** ✗：「每对我方单体角色施放#5[i]**次**后恢复 1 个战技点」需要**阈值计数器** ✗（引擎的计数器只能被读取，不能在\"达到 N\"时触发 ✗）。 ⭐ ⚠ **`on_any` 不是规则级字段** ✗（实测：`Unknown trigger event 'null'` ✗）⇒ 两个事件各写**一条规则** ✓。",
       "on": "ULT_CAST"
+    },
+    {
+      "on": "SKILL_CAST",
+      "id": "cone23034_skill_point_count_skill",
+      "when": [
+        "actor == self",
+        "target is_ally",
+        "self_stacks:施放计数 < 2"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "施放计数",
+          "amount": 1,
+          "max_stacks": 2,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23034 回到大地的飞行: 「装备者每对我方单体角色施放#5[i]次战技或终结技后，恢复1个战技点」(tbgd Ability23034, ParamList #5 = 2 at rank 2)。"
+    },
+    {
+      "on": "SKILL_CAST",
+      "id": "cone23034_skill_point_pay_skill",
+      "when": [
+        "actor == self",
+        "target is_ally",
+        "self_stacks:施放计数 >= 2"
+      ],
+      "do": [
+        {
+          "op": "GAIN_SKILL_POINT",
+          "amount": 1
+        },
+        {
+          "op": "REMOVE_STACK",
+          "buff": "施放计数",
+          "amount": 2,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23034: the payout half of the same clause, counted with self_stacks like cone 23003 and 23064."
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "cone23034_skill_point_count_ult",
+      "when": [
+        "actor == self",
+        "target is_ally",
+        "self_stacks:施放计数 < 2"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "施放计数",
+          "amount": 1,
+          "max_stacks": 2,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23034 回到大地的飞行: 「装备者每对我方单体角色施放#5[i]次战技或终结技后，恢复1个战技点」(tbgd Ability23034, ParamList #5 = 2 at rank 2)。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "cone23034_skill_point_pay_ult",
+      "when": [
+        "actor == self",
+        "target is_ally",
+        "self_stacks:施放计数 >= 2"
+      ],
+      "do": [
+        {
+          "op": "GAIN_SKILL_POINT",
+          "amount": 1
+        },
+        {
+          "op": "REMOVE_STACK",
+          "buff": "施放计数",
+          "amount": 2,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23034: the payout half of the same clause, counted with self_stacks like cone 23003 and 23064."
     }
   ],
   "3": [
@@ -201,6 +369,90 @@
       "source": "光锥 23034: 「当装备者对我方单体角色施放战技或终结技后，装备者恢复#1[f1]点能量，同时使技能目标获得1层【圣咏】，持续#4[i]回合，最多叠加#3[i]层，每层【圣咏】使持有者造成的伤害提高#2[i]%」",
       "note": "⭐ 用 **`on_any`** ✓ 同时接两个施放事件 ✓（库内已有先例 ✓），并用 **`target is_ally`** ✓ 表达「对**我方单体角色**施放」✓。⭐ 叠层用 **`ADD_STACK`** ✓（本轮刚学到：`APPLY_BUFF` **不会累积** ✗）并作用于 **技能目标** ✓；每层加成用 `per_stack` ✓。⚠ **第三句已登记** ✗：「每对我方单体角色施放#5[i]**次**后恢复 1 个战技点」需要**阈值计数器** ✗（引擎的计数器只能被读取，不能在\"达到 N\"时触发 ✗）。 ⭐ ⚠ **`on_any` 不是规则级字段** ✗（实测：`Unknown trigger event 'null'` ✗）⇒ 两个事件各写**一条规则** ✓。",
       "on": "ULT_CAST"
+    },
+    {
+      "on": "SKILL_CAST",
+      "id": "cone23034_skill_point_count_skill",
+      "when": [
+        "actor == self",
+        "target is_ally",
+        "self_stacks:施放计数 < 2"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "施放计数",
+          "amount": 1,
+          "max_stacks": 2,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23034 回到大地的飞行: 「装备者每对我方单体角色施放#5[i]次战技或终结技后，恢复1个战技点」(tbgd Ability23034, ParamList #5 = 2 at rank 3)。"
+    },
+    {
+      "on": "SKILL_CAST",
+      "id": "cone23034_skill_point_pay_skill",
+      "when": [
+        "actor == self",
+        "target is_ally",
+        "self_stacks:施放计数 >= 2"
+      ],
+      "do": [
+        {
+          "op": "GAIN_SKILL_POINT",
+          "amount": 1
+        },
+        {
+          "op": "REMOVE_STACK",
+          "buff": "施放计数",
+          "amount": 2,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23034: the payout half of the same clause, counted with self_stacks like cone 23003 and 23064."
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "cone23034_skill_point_count_ult",
+      "when": [
+        "actor == self",
+        "target is_ally",
+        "self_stacks:施放计数 < 2"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "施放计数",
+          "amount": 1,
+          "max_stacks": 2,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23034 回到大地的飞行: 「装备者每对我方单体角色施放#5[i]次战技或终结技后，恢复1个战技点」(tbgd Ability23034, ParamList #5 = 2 at rank 3)。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "cone23034_skill_point_pay_ult",
+      "when": [
+        "actor == self",
+        "target is_ally",
+        "self_stacks:施放计数 >= 2"
+      ],
+      "do": [
+        {
+          "op": "GAIN_SKILL_POINT",
+          "amount": 1
+        },
+        {
+          "op": "REMOVE_STACK",
+          "buff": "施放计数",
+          "amount": 2,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23034: the payout half of the same clause, counted with self_stacks like cone 23003 and 23064."
     }
   ],
   "4": [
@@ -269,6 +521,90 @@
       "source": "光锥 23034: 「当装备者对我方单体角色施放战技或终结技后，装备者恢复#1[f1]点能量，同时使技能目标获得1层【圣咏】，持续#4[i]回合，最多叠加#3[i]层，每层【圣咏】使持有者造成的伤害提高#2[i]%」",
       "note": "⭐ 用 **`on_any`** ✓ 同时接两个施放事件 ✓（库内已有先例 ✓），并用 **`target is_ally`** ✓ 表达「对**我方单体角色**施放」✓。⭐ 叠层用 **`ADD_STACK`** ✓（本轮刚学到：`APPLY_BUFF` **不会累积** ✗）并作用于 **技能目标** ✓；每层加成用 `per_stack` ✓。⚠ **第三句已登记** ✗：「每对我方单体角色施放#5[i]**次**后恢复 1 个战技点」需要**阈值计数器** ✗（引擎的计数器只能被读取，不能在\"达到 N\"时触发 ✗）。 ⭐ ⚠ **`on_any` 不是规则级字段** ✗（实测：`Unknown trigger event 'null'` ✗）⇒ 两个事件各写**一条规则** ✓。",
       "on": "ULT_CAST"
+    },
+    {
+      "on": "SKILL_CAST",
+      "id": "cone23034_skill_point_count_skill",
+      "when": [
+        "actor == self",
+        "target is_ally",
+        "self_stacks:施放计数 < 2"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "施放计数",
+          "amount": 1,
+          "max_stacks": 2,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23034 回到大地的飞行: 「装备者每对我方单体角色施放#5[i]次战技或终结技后，恢复1个战技点」(tbgd Ability23034, ParamList #5 = 2 at rank 4)。"
+    },
+    {
+      "on": "SKILL_CAST",
+      "id": "cone23034_skill_point_pay_skill",
+      "when": [
+        "actor == self",
+        "target is_ally",
+        "self_stacks:施放计数 >= 2"
+      ],
+      "do": [
+        {
+          "op": "GAIN_SKILL_POINT",
+          "amount": 1
+        },
+        {
+          "op": "REMOVE_STACK",
+          "buff": "施放计数",
+          "amount": 2,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23034: the payout half of the same clause, counted with self_stacks like cone 23003 and 23064."
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "cone23034_skill_point_count_ult",
+      "when": [
+        "actor == self",
+        "target is_ally",
+        "self_stacks:施放计数 < 2"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "施放计数",
+          "amount": 1,
+          "max_stacks": 2,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23034 回到大地的飞行: 「装备者每对我方单体角色施放#5[i]次战技或终结技后，恢复1个战技点」(tbgd Ability23034, ParamList #5 = 2 at rank 4)。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "cone23034_skill_point_pay_ult",
+      "when": [
+        "actor == self",
+        "target is_ally",
+        "self_stacks:施放计数 >= 2"
+      ],
+      "do": [
+        {
+          "op": "GAIN_SKILL_POINT",
+          "amount": 1
+        },
+        {
+          "op": "REMOVE_STACK",
+          "buff": "施放计数",
+          "amount": 2,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23034: the payout half of the same clause, counted with self_stacks like cone 23003 and 23064."
     }
   ],
   "5": [
@@ -337,6 +673,90 @@
       "source": "光锥 23034: 「当装备者对我方单体角色施放战技或终结技后，装备者恢复#1[f1]点能量，同时使技能目标获得1层【圣咏】，持续#4[i]回合，最多叠加#3[i]层，每层【圣咏】使持有者造成的伤害提高#2[i]%」",
       "note": "⭐ 用 **`on_any`** ✓ 同时接两个施放事件 ✓（库内已有先例 ✓），并用 **`target is_ally`** ✓ 表达「对**我方单体角色**施放」✓。⭐ 叠层用 **`ADD_STACK`** ✓（本轮刚学到：`APPLY_BUFF` **不会累积** ✗）并作用于 **技能目标** ✓；每层加成用 `per_stack` ✓。⚠ **第三句已登记** ✗：「每对我方单体角色施放#5[i]**次**后恢复 1 个战技点」需要**阈值计数器** ✗（引擎的计数器只能被读取，不能在\"达到 N\"时触发 ✗）。 ⭐ ⚠ **`on_any` 不是规则级字段** ✗（实测：`Unknown trigger event 'null'` ✗）⇒ 两个事件各写**一条规则** ✓。",
       "on": "ULT_CAST"
+    },
+    {
+      "on": "SKILL_CAST",
+      "id": "cone23034_skill_point_count_skill",
+      "when": [
+        "actor == self",
+        "target is_ally",
+        "self_stacks:施放计数 < 2"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "施放计数",
+          "amount": 1,
+          "max_stacks": 2,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23034 回到大地的飞行: 「装备者每对我方单体角色施放#5[i]次战技或终结技后，恢复1个战技点」(tbgd Ability23034, ParamList #5 = 2 at rank 5)。"
+    },
+    {
+      "on": "SKILL_CAST",
+      "id": "cone23034_skill_point_pay_skill",
+      "when": [
+        "actor == self",
+        "target is_ally",
+        "self_stacks:施放计数 >= 2"
+      ],
+      "do": [
+        {
+          "op": "GAIN_SKILL_POINT",
+          "amount": 1
+        },
+        {
+          "op": "REMOVE_STACK",
+          "buff": "施放计数",
+          "amount": 2,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23034: the payout half of the same clause, counted with self_stacks like cone 23003 and 23064."
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "cone23034_skill_point_count_ult",
+      "when": [
+        "actor == self",
+        "target is_ally",
+        "self_stacks:施放计数 < 2"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "施放计数",
+          "amount": 1,
+          "max_stacks": 2,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23034 回到大地的飞行: 「装备者每对我方单体角色施放#5[i]次战技或终结技后，恢复1个战技点」(tbgd Ability23034, ParamList #5 = 2 at rank 5)。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "cone23034_skill_point_pay_ult",
+      "when": [
+        "actor == self",
+        "target is_ally",
+        "self_stacks:施放计数 >= 2"
+      ],
+      "do": [
+        {
+          "op": "GAIN_SKILL_POINT",
+          "amount": 1
+        },
+        {
+          "op": "REMOVE_STACK",
+          "buff": "施放计数",
+          "amount": 2,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 23034: the payout half of the same clause, counted with self_stacks like cone 23003 and 23064."
     }
   ]
 }
