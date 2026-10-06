@@ -228,7 +228,7 @@ public class Main {
      * Scene 1: one enemy broken three ways, printing what each element actually does.
      */
     private static void breakControlScene() {
-        System.out.println("[1] Break control states — 冰 锁行动 / 量子·虚数 减速 + 推条");
+        System.out.println("[1] Break control states — Ice (冰) locks the action / Quantum (量子)·Imaginary (虚数) slow + push the bar");
         Character hero = Character.fromAttributes("hero", 10_000, 100, 100, 100);
         Enemy enemy = EnemyFactory.create(8002040, 90, 1);          // Warp Trotter (次元扑满)
         // Demo affordance #1: make one target weak to all three control elements so each can be shown.
@@ -259,7 +259,7 @@ public class Main {
                     + " + element's own " + pct(effect.delayPercent()) + ")"
                     + "  attached: " + describeControl(enemy));
         }
-        System.out.println("    → only 冰 stopped the victim acting; all three pushed the bar further than the"
+        System.out.println("    → only Ice (冰) stopped the victim acting; all three pushed the bar further than the"
                 + " fixed quarter alone, which is the element's own delay from Constant.BREAK_EFFECTS");
         System.out.println();
     }
@@ -436,7 +436,7 @@ public class Main {
         MemospriteSpec.Attack attack = spec.attack();
         System.out.println("    attack: " + attack.shape() + " " + attack.element() + " = "
                 + pct(attack.percent()) + " of its own " + attack.base()
-                + " — no ATK anywhere, because the text gives 「长夜」 no ATK to use");
+                + " — no ATK anywhere, because the text gives 「长夜」 (Evey) no ATK to use");
 
         // Who acts first is the action bar's answer, not an assumption: step until the next actor is the
         // memosprite, then let it take that turn. (Bounded, so a scene can never hang the demo.)

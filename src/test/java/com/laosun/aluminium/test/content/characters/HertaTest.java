@@ -31,7 +31,7 @@ public class HertaTest {
     public void herPuppetTraceRaisesControlResistance() {
         Fixture f = new Fixture();
         Assertions.assertTrue(f.herta.getBuffManager().debuffResistOf(DebuffClass.CONTROL) > 0,
-                "「抵抗控制类负面状态的概率提高35%」");
+                "「抵抗控制类负面状态的概率提高35%」 (raises RES to Crowd Control debuffs by 35%)");
     }
 
     /** Note: "若敌方目标当前生命值百分比大于等于50%": the bonus is per TARGET, so a low-HP enemy must not get it. */
@@ -61,7 +61,7 @@ public class HertaTest {
         // Same defence on both sides, so an equal instance would cost each the same ABSOLUTE HP, and the document's 20% has to show up
         // as at least a 10% larger loss. (Shares would differ by construction; a strict `>` is satisfied by float noise.)
         Assertions.assertTrue(healthyLoss > hurtLoss * 1.1,
-                "「若敌方目标当前生命值百分比大于等于50%，则对该目标造成的伤害提高20%」 -- absolute losses: "
+                "「若敌方目标当前生命值百分比大于等于50%，则对该目标造成的伤害提高20%」 (if the enemy target's current HP percentage is at least 50%, DMG dealt to that target is raised by 20%) -- absolute losses: "
                         + healthyLoss + " (healthy) vs " + hurtLoss + " (hurt)");
     }
 

@@ -56,7 +56,7 @@ public class WhereaboutsShouldDreamsRestTest {
         double speedAfter = enemy.getAttribute(AttributeType.SPEED).get();
         System.out.println("[23025] collapse stacks=" + collapse + " (hasState="
                 + enemy.getBuffManager().hasState(COLLAPSE) + ") ; speed " + speedBefore + " -> " + speedAfter);
-        Assertions.assertEquals(1, collapse, "造成击破伤容时 collapses the target");
+        Assertions.assertEquals(1, collapse, "Break DMG (造成击破伤容) collapses the target");
         // The AMOUNT, not just the direction (discipline 200): the enemy carries no other speed modifier, so the slow
         // is exactly a fifth of it. `speedAfter < speedBefore` survives a `20 -> 10 percent` mutation -- measured, 0 red.
         Assertions.assertEquals(0.8, speedAfter / speedBefore, 1e-9, "20% slower, as a share of its own speed");

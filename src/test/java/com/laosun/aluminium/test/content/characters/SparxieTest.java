@@ -32,7 +32,7 @@ public class SparxieTest {
         battle.startBattle();
 
         Assertions.assertTrue(before - enemy.getCurrentHp() > 0,
-                "「对敌方全体造成等同于火花50%攻击力的火属性伤害」");
+                "「对敌方全体造成等同于火花50%攻击力的火属性伤害」 (Fire damage to all enemies equal to 50% of Sparxie (火花)'s ATK)");
 
         Character plain = CharacterFactory.create(SPARXIE, LEVEL);
         Enemy enemy2 = EnemyFactory.create(MONSTER, 90, 1);
@@ -40,7 +40,7 @@ public class SparxieTest {
         double untouched = enemy2.getCurrentHp();
         plainBattle.startBattle();
         Assertions.assertEquals(untouched, enemy2.getCurrentHp(), 1e-9,
-                "「使用秘技后」 -- undeclared, so nothing");
+                "「使用秘技后」 (after using the Technique) -- undeclared, so nothing");
     }
 
     /** Note: Exactly two Skill Points: spend two first so the pool's cap cannot clamp the grant, then observe it in isolation. */
@@ -61,7 +61,7 @@ public class SparxieTest {
         battle.fireTriggers(TriggerEvent.BATTLE_START, sparxie, sparxie, 0, 0);
 
         Assertions.assertEquals(before + 2, battle.getSkillPoints(),
-                "「并为我方恢复2个战技点」: " + before + " -> " + battle.getSkillPoints());
+                "\"and restores 2 Skill Points to our side\" (「并为我方恢复2个战技点」): " + before + " -> " + battle.getSkillPoints());
     }
 
     private static Random fixed() {

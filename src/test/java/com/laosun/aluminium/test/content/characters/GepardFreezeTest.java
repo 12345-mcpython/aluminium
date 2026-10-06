@@ -38,7 +38,7 @@ public class GepardFreezeTest {
         f.battle.castImmediate(f.gepard.getSkills().get(SkillType.SKILL), f.gepard, List.of(f.enemy));
 
         Assertions.assertTrue(f.enemy.getBuffManager().hasState("冻结"),
-                "「有65%的基础概率使受到攻击的敌方目标陷入冻结状态」 + 星魂 1 的 +35% ⇒ 100% base chance");
+                "\"a 65% base chance to put the attacked enemy target into the Frozen state\" (「有65%的基础概率使受到攻击的敌方目标陷入冻结状态」) + the +35% from Eidolon (星魂) 1 ⇒ 100% base chance");
     }
 
     /** Note: The control carries its own per-turn payload: "冻结状态下...每回合开始时受到...冰属性附加伤害". */
@@ -52,7 +52,7 @@ public class GepardFreezeTest {
         f.battle.tickDots(f.enemy);
 
         Assertions.assertTrue(f.enemy.getCurrentHp() < before,
-                "「冻结状态下，敌方目标不能行动同时每回合开始时受到等同于杰帕德60%攻击力的冰属性附加伤害」");
+                "「冻结状态下，敌方目标不能行动同时每回合开始时受到等同于杰帕德60%攻击力的冰属性附加伤害」 (while Frozen, the enemy target cannot act and takes additional Ice DMG equal to 60% of Gepard (杰帕德)'s ATK at the start of every turn)");
     }
 
     /** At E0 the chance is the document's 65%, so a roll of 0.0 still lands - the amendment is not what makes it pass. */

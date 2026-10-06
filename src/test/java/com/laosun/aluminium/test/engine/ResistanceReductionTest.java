@@ -56,7 +56,7 @@ public class ResistanceReductionTest {
         // a 20% reduction against a victim whose physical resistance is 20% (0.8 -> 1.0 = 1/0.8). It is also the
         // evidence for the zone's shape: damage is multiplied by (1 - resistance).
         Assertions.assertEquals(1.25, after / before, EPS,
-                "全属性抗性降低 20%: " + before + " -> " + after);
+                "All-Type RES Reduction 20% (全属性抗性降低 20%): " + before + " -> " + after);
     }
 
     /** 1321's shipped aura: "大丽花在场时，敌方全体全属性抗性降低20%" - a stated 0.2 on every enemy. */
@@ -99,7 +99,7 @@ public class ResistanceReductionTest {
         firstBattle.castImmediate(fuxuan.getSkills().get(SkillType.ULTRA), fuxuan, List.of(first));
 
         Assertions.assertEquals(0.2, first.getAttribute(AttributeType.RESISTANCE_REDUCTION).get(), EPS,
-                "「施放终结技时…敌方全体全属性抗性降低20%」");
+                "\"when casting the Ultimate ... all enemies get 20% All-Type RES Reduction\" (「施放终结技时…敌方全体全属性抗性降低20%」)");
 
         Character nihility = CharacterFactory.create(1304, LEVEL);
         Enemy second = EnemyFactory.create(MONSTER, 90, 1);
@@ -109,6 +109,6 @@ public class ResistanceReductionTest {
         secondBattle.castImmediate(nihility.getSkills().get(SkillType.COMMON), nihility, List.of(second));
 
         Assertions.assertEquals(0.12, second.getAttribute(AttributeType.RESISTANCE_REDUCTION).get(), EPS,
-                "「施放普攻时使目标的全属性抗性降低12%」");
+                "\"casting a Basic ATK lowers the target's All-Type RES by 12%\" (「施放普攻时使目标的全属性抗性降低12%」)");
     }
 }

@@ -37,7 +37,7 @@ public class DanHengTest {
         f.battle.castImmediate(f.ally.getSkills().get(SkillType.SKILL), f.ally, List.of(f.danheng));
 
         Assertions.assertTrue(f.danheng.getAttribute(AttributeType.DAMAGE_PENETRATION).get() > before,
-                "「当丹恒成为我方技能的施放目标时，下一次攻击的风属性抗性穿透提高36%」: "
+                "「当丹恒成为我方技能的施放目标时，下一次攻击的风属性抗性穿透提高36%」 (when Dan Heng becomes the target of one of our Skills, his next attack has 36% more Wind RES PEN): "
                         + before + " -> " + f.danheng.getAttribute(AttributeType.DAMAGE_PENETRATION).get());
     }
 
@@ -50,7 +50,7 @@ public class DanHengTest {
         f.battle.castImmediate(f.ally.getSkills().get(SkillType.SKILL), f.ally, List.of(f.ally));
 
         Assertions.assertEquals(before, f.danheng.getAttribute(AttributeType.DAMAGE_PENETRATION).get(), 1e-9,
-                "「成为我方技能的施放目标」 -- being on the field is not enough");
+                "「成为我方技能的施放目标」 (becomes the target of one of our Skills) -- being on the field is not enough");
     }
 
     /** Census: the talent and the level convention are where the notes say. */

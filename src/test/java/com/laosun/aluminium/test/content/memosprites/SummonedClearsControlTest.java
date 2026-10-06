@@ -71,8 +71,8 @@ public class SummonedClearsControlTest {
         System.out.println("[summoned_clears] control -> " + controlAfter + " ; dot -> " + dotAfter);
 
         Assertions.assertFalse(controlAfter,
-                "「德谬歌被召唤时，解除我方全体**控制类**负面状态」-- the control is gone");
+                "「德谬歌被召唤时，解除我方全体**控制类**负面状态」 (when Demiurge is summoned, dispels **Crowd Control** debuffs from all allies)-- the control is gone");
         Assertions.assertTrue(dotAfter,
-                "and the DOT is NOT -- 「控制类」 names one class, not every debuff");
+                "and the DOT is NOT -- 「控制类」 (Crowd Control) names one class, not every debuff");
     }
 }

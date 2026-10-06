@@ -28,7 +28,7 @@ public class DragonPanelTest {
 
         Summon small = SummonFactory.memosprite(master, spec, name -> 1000);
         Assertions.assertEquals(1000, small.getAttribute(AttributeType.HEALTH).get(), 1e-6,
-                "100% of a 1000-point 【新蕊】");
+                "100% of a 1000-point 【新蕊】 (Newbud)");
 
         Summon large = SummonFactory.memosprite(master, spec, name -> 34000);
         Assertions.assertEquals(34000, large.getAttribute(AttributeType.HEALTH).get(), 1e-6,
@@ -42,11 +42,11 @@ public class DragonPanelTest {
     public void theDragonSkillIsWhatTheDocumentSays() {
         MemospriteSpec spec = Memosprites.of(1407);
         Assertions.assertNotNull(spec.attack(), "the skill must be stated (忆灵技能 1)");
-        Assertions.assertEquals("Quantum", spec.attack().element(), "document: 量子属性伤害");
+        Assertions.assertEquals("Quantum", spec.attack().element(), "document: Quantum DMG (量子属性伤害)");
         Assertions.assertEquals("ATTACK", spec.attack().base(), "scales off this memosprite's ATTACK slot");
         Assertions.assertEquals(0.4, spec.attack().percent(), 1e-9, "40.00%, the level the prose quotes");
-        Assertions.assertEquals("AoEAttack", spec.attack().shape(), "document: 全体攻击");
-        Assertions.assertEquals(30, spec.attack().stance(), 1e-9, "document: 全体 30");
+        Assertions.assertEquals("AoEAttack", spec.attack().shape(), "document: AoE attack (全体攻击)");
+        Assertions.assertEquals(30, spec.attack().stance(), 1e-9, "document: AoE (全体) 30");
 
         Character master = CharacterFactory.create(1407, 80, false, null, null, 0);
         Summon dragon = SummonFactory.memosprite(master, spec, name -> 34000);

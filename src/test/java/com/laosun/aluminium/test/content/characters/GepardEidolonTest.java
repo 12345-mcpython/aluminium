@@ -42,7 +42,7 @@ public class GepardEidolonTest {
         Assertions.assertEquals(0.0, none, 1e-9,
                 "at E0 nothing is filed for that rule");
         Assertions.assertEquals(0.35, raised, 1e-9,
-                "「施放战技时，使受到攻击的敌方目标陷入冻结状态的基础概率提高35%」 — filed as a BASE CHANCE amendment, "
+                "「施放战技时，使受到攻击的敌方目标陷入冻结状态的基础概率提高35%」 (when casting the Skill, raises the base chance of putting the attacked enemy target into the Frozen state by 35%) — filed as a BASE CHANCE amendment, "
                         + "which is what a plain `percent` on MODIFY_RULE means");
     }
 

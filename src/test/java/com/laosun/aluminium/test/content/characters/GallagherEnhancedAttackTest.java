@@ -44,7 +44,7 @@ public class GallagherEnhancedAttackTest {
         f.battle.fireAfterAttack(f.gallagher, f.enemy, List.of(f.enemy), 1.0);
 
         Assertions.assertTrue(f.enemy.getAttribute(AttributeType.ATTACK).get() < before,
-                "「并使目标攻击力降低 15.00%，持续 2 回合」 — an ordinary basic attack would not have done this");
+                "「并使目标攻击力降低 15.00%，持续 2 回合」 (and lowers the target's ATK by 15.00% for 2 turns) — an ordinary basic attack would not have done this");
     }
 
     /** Note: The negative control: the ordinary basic attack must NOT lower anything. */

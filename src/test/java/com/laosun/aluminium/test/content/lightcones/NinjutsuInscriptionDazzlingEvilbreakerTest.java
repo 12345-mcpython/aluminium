@@ -141,7 +141,7 @@ public class NinjutsuInscriptionDazzlingEvilbreakerTest {
         battle.fireTriggers(TriggerEvent.ALLY_ATTACK, wearer, enemy, 1, 100, SkillCategory.BPSKILL);
         System.out.println("[23033] after a Skill used as an attack: count="
                 + wearer.getBuffManager().stacksOf(COUNT));
-        Assertions.assertEquals(0, wearer.getBuffManager().stacksOf(COUNT), "普攻 only");
+        Assertions.assertEquals(0, wearer.getBuffManager().stacksOf(COUNT), "Basic ATK (普攻) only");
     }
 
     @Test

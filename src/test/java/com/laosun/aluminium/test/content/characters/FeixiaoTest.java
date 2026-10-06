@@ -33,9 +33,9 @@ public class FeixiaoTest {
 
         Assertions.assertTrue(first > 0, "a teammate's attack must draw it");
         Assertions.assertEquals(first, twice, 1e-6,
-                "「该效果每回合最多触发1次」 -- two firings in the same turn must deal ONE instance");
+                "「该效果每回合最多触发1次」 (this effect triggers at most once per turn) -- two firings in the same turn must deal ONE instance");
         Assertions.assertEquals(0.0, hers, 1e-9,
-                "「当飞霄的队友对敌方目标施放攻击后」 -- her OWN attack must not draw it");
+                "「当飞霄的队友对敌方目标施放攻击后」 (after Feixiao's ally casts an attack on an enemy target) -- her OWN attack must not draw it");
     }
 
     /** Note: The boost the same trigger grants her: 60% for two turns. */
@@ -51,7 +51,7 @@ public class FeixiaoTest {
         battle.fireTriggers(TriggerEvent.ALLY_ATTACK, ally, enemy, 0, 0);
 
         Assertions.assertEquals(0.6, feixiao.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get() - before, 1e-9,
-                "「发动此攻击时使自身造成的伤害提高60%」");
+                "「发动此攻击时使自身造成的伤害提高60%」 (this attack raises her own DMG dealt by 60%)");
     }
 
     /** Fires `times` teammate attacks and returns the total damage they drew; `byTeammate` false means Feixiao herself attacks. */

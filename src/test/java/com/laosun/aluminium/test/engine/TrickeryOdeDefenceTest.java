@@ -27,7 +27,7 @@ public class TrickeryOdeDefenceTest {
     public void theMarkLosesMoreThanTheRest() {
         double[] r = run();
         System.out.println("[trick_def] the marked one's defence fell " + r[0] + " ; the unmarked one's " + r[1]);
-        Assertions.assertEquals(0.10, r[0], 1e-6, "【老主顾】 takes #2");
+        Assertions.assertEquals(0.10, r[0], 1e-6, "【老主顾】 (Patron) takes #2");
         Assertions.assertEquals(0.06, r[1], 1e-6, "everyone else takes #3");
     }
 

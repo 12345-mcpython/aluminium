@@ -31,7 +31,7 @@ public class RuanMeiZoneTest {
     @Test
     public void theZoneGivesEveryAllyResistancePenetration() {
         Assertions.assertEquals(0.25, afterUlt(0, AttributeType.DAMAGE_PENETRATION), EPS,
-                "处于结界中时我方全体全属性抗性穿透提高25.00%");
+                "\"while inside the zone, all allies gain 25.00% All-Type RES PEN\" (处于结界中时我方全体全属性抗性穿透提高25.00%)");
         Assertions.assertEquals(0.0, beforeUlt(0, AttributeType.DAMAGE_PENETRATION), EPS,
                 "without the Ultimate nothing is stated");
     }
@@ -39,7 +39,7 @@ public class RuanMeiZoneTest {
     @Test
     public void theFirstEidolonIgnoresDefenceOnTheZonesClock() {
         Assertions.assertEquals(0.2, afterUlt(1, AttributeType.DEFENCE_IGNORE), EPS,
-                "结界期间，我方全体造成伤害时无视目标的20%的防御力");
+                "\"while the zone lasts, all allies ignore 20% of the target's DEF when dealing damage\" (结界期间，我方全体造成伤害时无视目标的20%的防御力)");
         Assertions.assertEquals(0.0, afterUlt(0, AttributeType.DEFENCE_IGNORE), EPS, "rank 0 states nothing");
     }
 
@@ -54,7 +54,7 @@ public class RuanMeiZoneTest {
     public void theZoneExpiresOnHerSecondWholeTurn() {
         Assertions.assertEquals(0.25, penetrationAfterHerTurns(1), EPS, "still up after one turn of hers");
         Assertions.assertEquals(0.0, penetrationAfterHerTurns(2), EPS,
-                "自身每回合开始时结界持续回合数减1 -- so two turns end it");
+                "\"at the start of each of her own turns, the zone's remaining turns are reduced by 1\" (自身每回合开始时结界持续回合数减1) -- so two turns end it");
     }
 
     private static double penetrationAfterHerTurns(int turns) {

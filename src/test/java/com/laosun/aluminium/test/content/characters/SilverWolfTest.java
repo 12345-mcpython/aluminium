@@ -40,7 +40,7 @@ public class SilverWolfTest {
         double after = enemy.getAttribute(AttributeType.DEFENCE).get();
 
         Assertions.assertEquals(0.45, (before - after) / before, 1e-6,
-                "「使指定敌方单体防御力降低45.00%」 of its own defence: " + before + " -> " + after);
+                "「使指定敌方单体防御力降低45.00%」 (lowers a designated single enemy's DEF by 45.00%) of its own defence: " + before + " -> " + after);
     }
 
     private static Random fixed() {

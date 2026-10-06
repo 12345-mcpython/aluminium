@@ -72,7 +72,7 @@ public class IShallBeMyOwnSwordTest {
                 + " then two more hits=" + capped);
         Assertions.assertEquals(1, one, "a teammate being hit gives one layer");
         Assertions.assertEquals(2, two, "and a teammate paying health gives another");
-        Assertions.assertEquals(CAP, capped, "最多叠加 3 层");
+        Assertions.assertEquals(CAP, capped, "at most 3 stacks (最多叠加 3 层)");
     }
 
     @Test
@@ -101,7 +101,7 @@ public class IShallBeMyOwnSwordTest {
         battle.fireTriggers(TriggerEvent.ALLY_ATTACK, wearer, enemy, 1, 0);
         int after = wearer.getBuffManager().stacksOf(MOON);
         System.out.println("[23014] stacks after the wearer attacks=" + after);
-        Assertions.assertEquals(0, after, "施放攻击后解除");
+        Assertions.assertEquals(0, after, "removed after casting an attack (施放攻击后解除)");
     }
 
     @Test

@@ -69,9 +69,9 @@ public class OdeToStrifeCritTest {
         System.out.println("[crit] always-crit strike = " + strike + " ; his base CRIT_ATTACK = "
                 + mydei.getAttribute(com.laosun.aluminium.enums.AttributeType.CRIT_ATTACK).get());
 
-        Assertions.assertTrue(strike > 0, "precondition: the commanded 【弑神登神】 lands");
+        Assertions.assertTrue(strike > 0, "precondition: the commanded 【弑神登神】 (Godslayer Be God) lands");
         Assertions.assertEquals(EXPECTED, strike, EXPECTED * 1e-9,
-                "「本次攻击中万敌的暴击伤害提高 #1[i]%」-- on a crit, the boost is what this number is");
+                "「本次攻击中万敌的暴击伤害提高 #1[i]%」 (in this attack Mydei's CRIT DMG is raised by #1[i]%)-- on a crit, the boost is what this number is");
     }
 
     /** Measured with the clause in place. */

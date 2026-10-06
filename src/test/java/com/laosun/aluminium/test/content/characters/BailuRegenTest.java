@@ -35,7 +35,7 @@ public class BailuRegenTest {
 
         f.castUltimate();
 
-        Assertions.assertTrue(f.ally.getBuffManager().hasState("生息"), "「for our targets that do not have [生息] ... apply [生息]」");
+        Assertions.assertTrue(f.ally.getBuffManager().hasState("生息"), "「for our targets that do not have [生息] (Invigoration) ... apply [生息] (Invigoration)」");
         Assertions.assertTrue(f.bailu.getBuffManager().hasState("生息"), "...and 「all of our side」 includes her");
     }
 
@@ -69,7 +69,7 @@ public class BailuRegenTest {
 
         Assertions.assertTrue(f.ally.getBuffManager().allBuffsOf(
                         com.laosun.aluminium.models.buff.ReductionBuff.class).size() > before,
-                "「characters that have [生息] take 10% less damage」 -- the reduction goes up with the state");
+                "「characters that have [生息] (Invigoration) take 10% less damage」 -- the reduction goes up with the state");
     }
 
     // ==================================================================

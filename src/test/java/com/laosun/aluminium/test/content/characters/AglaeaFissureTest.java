@@ -38,7 +38,7 @@ public class AglaeaFissureTest {
         double plain = skillDamage(false);
         Assertions.assertTrue(plain > 0, "precondition: the skill lands: " + plain);
         Assertions.assertTrue(threaded > plain,
-                "the additional damage must land on a 【间隙织线】 target: " + plain + " -> " + threaded);
+                "the additional damage must land on a 【间隙织线】 (Seam Stitch) target: " + plain + " -> " + threaded);
         double extra = threaded - plain;
         double attack = attackOf();
         // Note: The arithmetic of a flat addend is pinned by `AddDamageOpTest` (it lands in the BASE layer, so defence and the

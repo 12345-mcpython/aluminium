@@ -49,13 +49,13 @@ public class March7thLevelTest {
     public void starRailThreeRaisesTheUltimateAndTheBasicAttack() {
         Character march = CharacterFactory.create(MARCH, LEVEL, true, null, null, 2);
         new Battle(List.of(march), List.of(enemy()), fixed()).startBattle();
-        Assertions.assertEquals(0, march.skillLevelBonus(SkillType.ULTRA), "星魂 2 is not 星魂 3");
+        Assertions.assertEquals(0, march.skillLevelBonus(SkillType.ULTRA), "Eidolon (星魂) 2 is not Eidolon 3");
 
         Character atThree = CharacterFactory.create(MARCH, LEVEL, true, null, null, 3);
         new Battle(List.of(atThree), List.of(enemy()), fixed()).startBattle();
-        Assertions.assertEquals(2, atThree.skillLevelBonus(SkillType.ULTRA), "「终结技等级+2」");
-        Assertions.assertEquals(1, atThree.skillLevelBonus(SkillType.COMMON), "「普攻等级+1」");
-        Assertions.assertEquals(0, atThree.skillLevelBonus(SkillType.SKILL), "…and 星魂 5 has not landed yet");
+        Assertions.assertEquals(2, atThree.skillLevelBonus(SkillType.ULTRA), "\"Ultimate Lv. +2\" (「终结技等级+2」)");
+        Assertions.assertEquals(1, atThree.skillLevelBonus(SkillType.COMMON), "\"Basic ATK Lv. +1\" (「普攻等级+1」)");
+        Assertions.assertEquals(0, atThree.skillLevelBonus(SkillType.SKILL), "…and Eidolon (星魂) 5 has not landed yet");
     }
 
     /** Eidolon 5 raises the skill and the talent; the talent's raise sits <b>on top of</b> the base level. */
@@ -64,8 +64,8 @@ public class March7thLevelTest {
         Character march = CharacterFactory.create(MARCH, LEVEL, true, null, null, 5);
         new Battle(List.of(march), List.of(enemy()), fixed()).startBattle();
 
-        Assertions.assertEquals(2, march.skillLevelBonus(SkillType.SKILL), "「战技等级+2」");
-        Assertions.assertEquals(11, march.skillLevelBonus(SkillType.TALENT), "+9 base and +2 from this 星魂");
+        Assertions.assertEquals(2, march.skillLevelBonus(SkillType.SKILL), "\"Skill Lv. +2\" (「战技等级+2」)");
+        Assertions.assertEquals(11, march.skillLevelBonus(SkillType.TALENT), "+9 base and +2 from this Eidolon (星魂)");
         Assertions.assertEquals(12, march.skillLevel(march.getSkills().get(SkillType.TALENT)),
                 "so her talent is read at level 12 — its table has 15 rows, and this is the number the game means");
     }
@@ -90,7 +90,7 @@ public class March7thLevelTest {
         double raisedRow = rows.get(atFive.skillLevel(atFive.getSkills().get(SkillType.TALENT)) - 1).getFirst();
 
         Assertions.assertEquals(1.0, baseRow, EPS, "her talent's row 10 (「100%攻击力」)");
-        Assertions.assertEquals(1.1, raisedRow, EPS, "…and row 12, which is what 星魂 5's 「天赋等级+2」 buys");
+        Assertions.assertEquals(1.1, raisedRow, EPS, "…and row 12, which is what Eidolon (星魂) 5's \"Talent Lv. +2\" (「天赋等级+2」) buys");
     }
 
     // ==================================================================

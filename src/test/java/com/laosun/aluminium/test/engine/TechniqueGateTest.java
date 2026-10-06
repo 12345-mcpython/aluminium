@@ -45,7 +45,7 @@ public class TechniqueGateTest {
         double healed = ally.getCurrentHp() - hurt;
         double expected = ally.getMaxHp() * 0.15;
         Assertions.assertEquals(expected, healed, expected * 0.05,
-                "「使用秘技后立即为我方全体回复等同于各自生命上限15%的生命值」: expected " + expected + ", healed " + healed);
+                "「使用秘技后立即为我方全体回复等同于各自生命上限15%的生命值」 (after using the Technique, immediately restores HP to all allies equal to 15% of each one's Max HP): expected " + expected + ", healed " + healed);
     }
 
     /** Note: The control: with NO technique declared, the same battle heals nobody. */
@@ -71,7 +71,7 @@ public class TechniqueGateTest {
         battle.startBattle();
 
         Assertions.assertTrue(tb.getBuffManager().hasState("秘技"),
-                "「使用秘技后」 -- the declared technique must be visible as a state");
+                "「使用秘技后」 (after using the Technique) -- the declared technique must be visible as a state");
     }
 
     /** Census: the technique rule and the level convention. */

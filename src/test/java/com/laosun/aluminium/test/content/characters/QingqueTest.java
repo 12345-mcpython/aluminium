@@ -34,7 +34,7 @@ public class QingqueTest {
 
         Assertions.assertEquals(0, tilesOf(qingque), "the document states no initial value, so it starts at 0");
         battle.fireTriggers(TriggerEvent.TURN_START, ally, enemy, 0, 0);
-        Assertions.assertEquals(1, tilesOf(qingque), "「我方目标回合开始时…随机抽取1张」");
+        Assertions.assertEquals(1, tilesOf(qingque), "「我方目标回合开始时…随机抽取1张」 (at the start of one of our targets' turns ... draws 1 tile at random)");
         battle.fireTriggers(TriggerEvent.TURN_START, qingque, enemy, 0, 0);
         Assertions.assertEquals(1, tilesOf(qingque),
                 "the gate is `actor is_other_ally`: her OWN turn start adds nothing (the document's wording is ambiguous and the rule says so)");
@@ -43,7 +43,7 @@ public class QingqueTest {
             battle.fireTriggers(TriggerEvent.TURN_START, ally, enemy, 0, 0);
         }
         Assertions.assertEquals(4, tilesOf(qingque),
-                "「最多持有4张琼玉牌」 -- eight draws must still read four");
+                "「最多持有4张琼玉牌」 (holds at most 4 jade tiles) -- eight draws must still read four");
     }
 
     /** Note: The technique's two tiles, only when the technique was declared. */
@@ -56,7 +56,7 @@ public class QingqueTest {
 
         battle.startBattle();
 
-        Assertions.assertEquals(2, tilesOf(qingque), "「进入战斗时青雀会抽取2张琼玉牌」");
+        Assertions.assertEquals(2, tilesOf(qingque), "「进入战斗时青雀会抽取2张琼玉牌」 (when entering battle, Qingque draws 2 jade tiles)");
     }
 
     /** Note: The Skill's self damage boost, capped at the document's four stacks. */
@@ -74,7 +74,7 @@ public class QingqueTest {
         }
 
         Assertions.assertEquals(0.28 * 4, qingque.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get() - before, 1e-6,
-                "「增伤 28%」叠到「最多 4 层」 -- five casts must still read four");
+                "\"DMG +28%\" (「增伤 28%」) stacking to \"at most 4 stacks\" (「最多 4 层」) -- five casts must still read four");
     }
 
     /** The declared resource's value, read through the combatant's own manager. */

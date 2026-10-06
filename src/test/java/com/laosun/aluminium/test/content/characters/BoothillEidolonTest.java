@@ -27,7 +27,7 @@ public class BoothillEidolonTest {
     @Test
     public void hisFirstEidolonIgnoresSixteenPercentDefence() {
         Assertions.assertEquals(0.16, defenceIgnore(1), EPS,
-                "when 波提欧 deals damage, ignore the enemy target's "
+                "when Boothill (波提欧) deals damage, ignore the enemy target's "
                         + "16% DEF");
         Assertions.assertEquals(0.0, defenceIgnore(0), EPS, "rank 0 states nothing");
     }

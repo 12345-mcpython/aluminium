@@ -71,7 +71,7 @@ public class DebuffOnConditionTest {
         enemy.getAttribute(AttributeType.DEFENCE)
                 .addModifier(DoubleValue.Modifier.addPercent(0.3, DoubleValue.Modifier.ModifierSource.BUFF, MODIFIER_ID));
         System.out.println("[debuff] after RAISING the enemy's defence: matches=" + matches());
-        Assertions.assertFalse(matches(), "防御力被降低 is not 防御力被提高 (false case)");
+        Assertions.assertFalse(matches(), "DEF Reduction (防御力被降低) is not DEF Boost (防御力被提高) -- the false case");
     }
 
     @Test

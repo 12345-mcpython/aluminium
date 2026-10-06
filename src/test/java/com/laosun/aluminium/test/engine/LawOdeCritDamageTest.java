@@ -67,8 +67,8 @@ public class LawOdeCritDamageTest {
                 + " ; unmarked gain = " + plainGain);
 
         Assertions.assertEquals(row.get(0), markedGain, Math.abs(row.get(0)) * 1e-6,
-                "「持有【军功】的角色暴击伤害提高 #1%」-- and #1 runs with level");
+                "「持有【军功】的角色暴击伤害提高 #1%」 (a character holding Military Merit gets #1% more CRIT DMG)-- and #1 runs with level");
         Assertions.assertEquals(0.0, plainGain, 1e-9,
-                "and an ally WITHOUT it gains nothing -- 「持有【军功】的角色」 names a subset");
+                "and an ally WITHOUT it gains nothing -- 「持有【军功】的角色」 (a character holding Military Merit) names a subset");
     }
 }

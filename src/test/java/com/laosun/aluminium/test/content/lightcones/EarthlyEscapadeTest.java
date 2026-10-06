@@ -70,9 +70,9 @@ public class EarthlyEscapadeTest {
         System.out.println("[23021] at battle start: masked=" + masked + " ally critRate=" + allyCritRate
                 + " ally critDamage=" + allyCritDamage + " wearer critRate=" + wearerCritRate);
         Assertions.assertTrue(masked, "the wearer holds the mask");
-        Assertions.assertEquals(0.10, allyCritRate, 1e-9, "队友 crit rate +10%");
-        Assertions.assertEquals(0.28, allyCritDamage, 1e-9, "队友 crit damage +28%");
-        Assertions.assertEquals(0.0, wearerCritRate, 1e-9, "the wearer is NOT its own 队友 (false case)");
+        Assertions.assertEquals(0.10, allyCritRate, 1e-9, "ally (队友) crit rate +10%");
+        Assertions.assertEquals(0.28, allyCritDamage, 1e-9, "ally (队友) crit damage +28%");
+        Assertions.assertEquals(0.0, wearerCritRate, 1e-9, "the wearer is NOT its own ally (队友) -- the false case");
     }
 
     @Test
@@ -90,7 +90,7 @@ public class EarthlyEscapadeTest {
         System.out.println("[23021] flame after +1=" + one + " after +2 more=" + three + " after the fourth=" + after
                 + " mask=" + wearer.getBuffManager().hasState(MASK));
         Assertions.assertEquals(1, one, "one restored point is one layer");
-        Assertions.assertEquals(3, three, "a SINGLE restore of 2 points is TWO more layers -- 每恢复 1 个");
+        Assertions.assertEquals(3, three, "a SINGLE restore of 2 points is TWO more layers -- one per point restored (每恢复 1 个)");
         Assertions.assertEquals(0, after, "the fourth layer pays out and clears the counter");
         Assertions.assertTrue(wearer.getBuffManager().hasState(MASK), "and it grants the mask");
     }

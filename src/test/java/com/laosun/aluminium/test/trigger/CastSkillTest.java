@@ -72,7 +72,7 @@ public class CastSkillTest {
         double commanded = enemyDamage(true);
         double own = enemyDamage(false);
 
-        Assertions.assertTrue(own > 0, "precondition: 停云's ULTRA deals damage at all (" + own + ")");
+        Assertions.assertTrue(own > 0, "precondition: Tingyun (停云)'s ULTRA deals damage at all (" + own + ")");
         Assertions.assertEquals(own, commanded, own * 1e-9,
                 "the commanded cast (" + commanded + ") must be the same cast as her own (" + own + ")");
     }
@@ -120,7 +120,7 @@ public class CastSkillTest {
         Character caster = CharacterFactory.create(BLAST_CASTER, LEVEL);
         var data = caster.getSkills().get(SkillType.SKILL).getData();
         Assertions.assertEquals(com.laosun.aluminium.enums.SkillEffectType.BLAST, data.getEffect(),
-                "precondition: 万敌's SKILL is the blast this case is about");
+                "precondition: Mydei (万敌)'s SKILL is the blast this case is about");
 
         Enemy left = EnemyFactory.create(MONSTER, 90, 1);
         Enemy centre = EnemyFactory.create(MONSTER, 90, 1);
@@ -166,7 +166,7 @@ public class CastSkillTest {
 
         Assertions.assertTrue(plain > 0, "precondition: the Elation skill deals damage (" + plain + ")");
         Assertions.assertEquals(2.0, boosted / plain, 1e-6,
-                "「受到的欢愉伤害提高 100%」 applies only if the instance really is ELATION: "
+                "「受到的欢愉伤害提高 100%」 (Elation DMG taken is raised by 100%) applies only if the instance really is ELATION: "
                         + plain + " -> " + boosted);
     }
 
@@ -281,7 +281,7 @@ public class CastSkillTest {
         battle.startBattle();
 
         Assertions.assertTrue(him.getBuffManager().hasState("同袍"),
-                "precondition: the technique put 【同袍】 on him (the aim's true side)");
+                "precondition: the technique put 【同袍】 (Bondmate) on him (the aim's true side)");
         Assertions.assertFalse(ally.getBuffManager().hasState("同袍"),
                 "and the commanded cast must NOT have moved it onto the first ally");
 
@@ -289,16 +289,16 @@ public class CastSkillTest {
         Assertions.assertEquals(expected, him.getShield(), 1e-6,
                 "the shield is the skill's OWN Lv10 row -- which also pins that `level_convention` ran BEFORE the "
                         + "commanded cast (at Lv1 the row would be 0.14 x ATK + 100)");
-        Assertions.assertEquals(expected, ally.getShield(), 1e-6, "「为我方全体提供…护盾」: the ally too");
+        Assertions.assertEquals(expected, ally.getShield(), 1e-6, "「为我方全体提供…护盾」 (provides a shield to all allies): the ally too");
         // Note: THE discriminating assertion for the op's side choice: a non-damaging cast reaches OUR camp. The ally's
         // shield above cannot show it (his own SKILL_CAST rule grants one to all_allies anyway), but a shield on the
         // ENEMY can only come from the commanded cast.
         Assertions.assertEquals(0.0, battle.enemies.getFirst().getShield(), 1e-9,
-                "「为我方全体提供…护盾」 -- the commanded cast must never shield the other side");
+                "「为我方全体提供…护盾」 (provides a shield to all allies) -- the commanded cast must never shield the other side");
         Assertions.assertEquals(pointsBefore, battle.getSkillPoints(),
                 "「此次战技不消耗战技点」 -- a commanded cast never spends one (that is the caller's act)");
         Assertions.assertEquals(attackBefore * 1.15, Attack(him), 1e-6,
-                "and the cast's own SKILL_CAST event ran 神秀 in the same breath: +15% of his ATK, on the holder "
+                "and the cast's own SKILL_CAST event ran Empyreanity (神秀) in the same breath: +15% of his ATK, on the holder "
                         + "(one commanded cast, both halves of the clause)");
     }
 

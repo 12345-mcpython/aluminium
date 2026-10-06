@@ -48,7 +48,7 @@ public class KafkaShockDurationTest {
     @Test
     public void herOwnUltimateBurnsOneLongerThanAnUnlengthenedDot() {
         Assertions.assertEquals(syntheticBurningTurns(HER_DOT_TURNS, 1), herBurningTurns(),
-                "触电状态的持续时间增加1回合 -- two turns plus the trace's one");
+                "the Shock (触电) state lasts 1 turn longer -- two turns plus the trace's one");
     }
 
     private static int herBurningTurns() {

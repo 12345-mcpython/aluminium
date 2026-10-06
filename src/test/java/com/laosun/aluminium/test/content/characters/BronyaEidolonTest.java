@@ -62,7 +62,7 @@ public class BronyaEidolonTest {
             battle.afterMove();
         }
 
-        Assertions.assertEquals(0, defenceBuffsOn(bronya).size(), "「持续2回合」, counted on her own turns");
+        Assertions.assertEquals(0, defenceBuffsOn(bronya).size(), "「持续2回合」 (lasts 2 turns), counted on her own turns");
     }
 
     // ==================================================================
@@ -95,7 +95,7 @@ public class BronyaEidolonTest {
 
         castSkill(battle, bronya);
         Assertions.assertEquals(1, battle.getSkillPoints(),
-                "「该效果有 1 回合的触发冷却」: a second cast in the same turn changes nothing");
+                "「该效果有 1 回合的触发冷却」 (this effect has a 1-turn trigger cooldown): a second cast in the same turn changes nothing");
     }
 
     // ==================================================================

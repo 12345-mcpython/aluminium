@@ -43,7 +43,7 @@ public class ServalShockTest {
         Fixture f = new Fixture(0.9);
         f.castSkill();
         Assertions.assertTrue(f.enemy.getBuffManager().hasState("触电"),
-                "「…基础概率提高20%」 turns the 80% roll into a certain one, and a 0.9 roll sits inside that difference");
+                "「…基础概率提高20%」 (the base chance of ... is raised by 20%) turns the 80% roll into a certain one, and a 0.9 roll sits inside that difference");
     }
 
     /**
@@ -57,7 +57,7 @@ public class ServalShockTest {
     public void herTraceFilesTheChanceAmendment() {
         Fixture f = new Fixture(0.0);
         Assertions.assertEquals(0.2, f.serval.ruleBaseChanceBonus("skill_shock"), 1e-9,
-                "「施放战技时…陷入触电状态的基础概率提高20%」 is an amendment to the named rule, not a second rule "
+                "「施放战技时…陷入触电状态的基础概率提高20%」 (when casting the Skill, the base chance of falling into the Shock state is raised by 20%) is an amendment to the named rule, not a second rule "
                         + "(two rules would roll twice: 96%, not 100%)");
     }
 
@@ -72,7 +72,7 @@ public class ServalShockTest {
         f.enemyTurn();
 
         Assertions.assertTrue(f.enemy.getCurrentHp() < before,
-                "「触电状态下，敌方目标每回合开始时受到等同于希露瓦104%攻击力的雷属性持续伤害」");
+                "「触电状态下，敌方目标每回合开始时受到等同于希露瓦104%攻击力的雷属性持续伤害」 (while Shocked, the enemy target takes Lightning DoT equal to 104% of Serval (希露瓦)'s ATK at the start of every turn)");
     }
 
     /**
@@ -88,7 +88,7 @@ public class ServalShockTest {
         int without = settlements(false);
         int with = settlements(true);
         Assertions.assertEquals(2, with - without,
-                "「延长2回合的触电状态」: the extension adds exactly two settlements (" + without + " -> " + with + ")");
+                "「延长2回合的触电状态」 (extends the Shock state by 2 turns): the extension adds exactly two settlements (" + without + " -> " + with + ")");
         Assertions.assertTrue(without >= 2, "precondition: the Skill's own shock settles at least twice");
     }
 
@@ -118,7 +118,7 @@ public class ServalShockTest {
         Assertions.assertEquals(1, TriggerTables.of(SERVAL).ruleCount(TriggerEvent.DEALING_DAMAGE),
                 "Eidolon 6's conditional boost");
         Assertions.assertEquals(1, TriggerTables.of(SERVAL).ruleCount(TriggerEvent.ALLY_ATTACK),
-                "her talent's rider -- written since 2026-09-28 because target_when can finally say 「对所有触电状态下的敌方目标」");
+                "her talent's rider -- written since 2026-09-28 because target_when can finally say 「对所有触电状态下的敌方目标」 (all enemy targets in the Shock state)");
         Assertions.assertEquals(2, TriggerTables.of(SERVAL).ruleCount(TriggerEvent.ULT_CAST),
                 "the shock extension and Eidolon 4's spread to the unshocked ones");
     }

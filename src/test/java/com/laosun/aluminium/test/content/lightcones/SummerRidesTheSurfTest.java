@@ -57,7 +57,7 @@ public class SummerRidesTheSurfTest {
         cast(battle, SkillCategory.ELATION_DAMAGE);
         double delta = wearer.getAttribute(AttributeType.SPEED).get() - base;
         boolean state = wearer.getBuffManager().hasState("风口");
-        System.out.println("[23064] after an elation cast: speed +" + delta + " (base " + base + ") has 风口=" + state);
+        System.out.println("[23064] after an elation cast: speed +" + delta + " (base " + base + ") has Updraft (风口)=" + state);
         Assertions.assertTrue(state, "the state itself is granted");
         Assertions.assertEquals(base * 0.24, delta, 1e-6, "and it is +24% SPEED (a share of the base)");
     }

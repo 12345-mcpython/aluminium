@@ -70,7 +70,7 @@ public class UntilTheFlowersBloomAgainTest {
         System.out.println("[23058] ordinary instance before=" + before + " after=" + after
                 + " ratio=" + (after / before));
         Assertions.assertEquals(1 + SHARE, after / before, 1e-6,
-                "the sentence says 受到的伤害 -- 15% on EVERY damage type, not elation only");
+                "the sentence says DMG taken (受到的伤害) -- 15% on EVERY damage type, not elation only");
     }
 
     @Test
@@ -98,7 +98,7 @@ public class UntilTheFlowersBloomAgainTest {
                 System.out.println("[23058] spec percent=" + effect.getPercent() + " damageType=" + effect.getDamageType()
                         + " turns=" + effect.getTurns() + " target=" + effect.getTarget());
                 Assertions.assertEquals(0.15, effect.getPercent(), 1e-9, "15% at rank 1");
-                Assertions.assertNull(effect.getDamageType(), "no damage type -- the sentence says 受到的伤害");
+                Assertions.assertNull(effect.getDamageType(), "no damage type -- the sentence says DMG taken (受到的伤害)");
                 Assertions.assertEquals(2, effect.getTurns(), "for 2 turns");
                 Assertions.assertEquals("all_enemies", effect.getTarget(), "on every enemy");
             }

@@ -70,7 +70,7 @@ public class WaveMonstersTest {
         System.out.println("[wave] after wave 1: enemies=" + battle.enemies.size() + " in the set=" + first.size()
                 + " speeds=" + first.stream().map(e -> e.getAttribute(AttributeType.SPEED).get()).toList());
 
-        Assertions.assertFalse(first.isEmpty(), "「新入场的敌方目标」-- the wave brought enemies");
+        Assertions.assertFalse(first.isEmpty(), "「新入场的敌方目标」 (newly entered enemy target)-- the wave brought enemies");
         for (CanHit enemy : first) {
             Assertions.assertTrue(enemy.getAttribute(AttributeType.SPEED).get() > 0, "the rule reached it");
         }
@@ -82,7 +82,7 @@ public class WaveMonstersTest {
             System.out.println("[wave] after wave 2: in the set=" + second.size()
                     + " ; any of the first wave still in it = " + second.stream().anyMatch(first::contains));
             Assertions.assertFalse(second.stream().anyMatch(first::contains),
-                    "「新入场」-- last wave's monsters are not this wave's");
+                    "「新入场」 (newly entered)-- last wave's monsters are not this wave's");
         }
     }
 }

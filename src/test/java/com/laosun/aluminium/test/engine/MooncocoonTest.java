@@ -34,9 +34,9 @@ public class MooncocoonTest {
     public void theBlowIsHeld() {
         Scene scene = alone();
         strike(scene);
-        Assertions.assertFalse(scene.victim.isDeath(), "「不会陷入无法战斗状态」");
-        Assertions.assertEquals(0.0, scene.victim.getCurrentHp(), 1e-9, "它真的停在 0 血 —— 那就是「延后」");
-        Assertions.assertTrue(scene.victim.getBuffManager().hasState(STATE), "「获得【月茧】状态」");
+        Assertions.assertFalse(scene.victim.isDeath(), "\"does not fall into the unable-to-fight state\" (「不会陷入无法战斗状态」)");
+        Assertions.assertEquals(0.0, scene.victim.getCurrentHp(), 1e-9, "it really stops at 0 HP —— that is the \"delay\" (「延后」)");
+        Assertions.assertTrue(scene.victim.getBuffManager().hasState(STATE), "\"gains the Mooncocoon (【月茧】) state\" (「获得【月茧】状态」)");
     }
 
     /** "行动后…否则将立即陷入无法战斗状态": nothing saved it, so its own turn's END commits the death. */
@@ -47,7 +47,7 @@ public class MooncocoonTest {
         Assertions.assertFalse(scene.victim.isDeath(), "precondition: the blow was held");
         takeItsTurn(scene);
         Assertions.assertTrue(scene.victim.isDeath(),
-                "没有人救它 ⇒ 它自己的回合结束时候倒下（且它确实行动过 ✓）");
+                "nobody saves it ⇒ it falls at the end of its own turn (and it did act ✓)");
     }
 
     /**
@@ -63,9 +63,9 @@ public class MooncocoonTest {
         strike(scene);
         Assertions.assertTrue(scene.victim.getCurrentHp() > 0, "precondition: the teammate's heal really restored HP");
         Assertions.assertFalse(scene.victim.getBuffManager().hasState(STATE),
-                "生命值提高 ⇒ 【月茧】解除");
+                "HP raised ⇒ the Mooncocoon (【月茧】) is removed");
         takeItsTurn(scene);
-        Assertions.assertFalse(scene.victim.isDeath(), "【月茧】已解除 ⇒ 它不再倒下");
+        Assertions.assertFalse(scene.victim.isDeath(), "the Mooncocoon (【月茧】) is removed ⇒ it no longer falls");
     }
 
     // ==================================================================

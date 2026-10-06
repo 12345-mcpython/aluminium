@@ -52,7 +52,7 @@ public class LiteralDamageTest {
         battle.startBattle();
 
         Assertions.assertEquals(before, enemy.getCurrentHp(), 1e-9,
-                "「使用秘技后」 -- undeclared, so no damage");
+                "「使用秘技后」 (after using the Technique) -- undeclared, so no damage");
     }
 
     /** Fires one literal-ratio DAMAGE at the given percent and returns what it cost the enemy. */

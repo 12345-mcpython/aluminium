@@ -64,7 +64,7 @@ public class MakeFarewellsMoreBeautifulTest {
         System.out.println("[23040] defence ignore: before=" + before + " the memosprite's loss=" + afterSprite
                 + " wearer loss=" + afterWearer + " second loss=" + afterAgain);
         Assertions.assertEquals(0.0, before, 1e-9, "nothing before a loss");
-        Assertions.assertEquals(0.3, afterSprite, 1e-9, "the MEMOSPRITE’s loss alone grants 冥花 (actor == summon)");
+        Assertions.assertEquals(0.3, afterSprite, 1e-9, "the MEMOSPRITE’s loss alone grants Death Flower (冥花) (actor == summon)");
         Assertions.assertEquals(0.3, afterWearer, 1e-9, "the wearer’s loss leaves the same state alone");
         Assertions.assertEquals(0.3, afterAgain, 1e-9, "and it is a state: a second loss adds nothing");
     }

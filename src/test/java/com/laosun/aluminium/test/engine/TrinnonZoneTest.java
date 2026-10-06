@@ -35,7 +35,7 @@ public class TrinnonZoneTest {
 
         Assertions.assertTrue(without > 0, "the control must land, or the ratio below means nothing");
         Assertions.assertEquals(1.3, with / without, EPS,
-                "「结界持续期间，敌方目标受到的伤害提高30.00%」 -- "
+                "\"while the zone lasts, enemy targets take 30.00% more DMG\" (「结界持续期间，敌方目标受到的伤害提高30.00%」) -- "
                         + "with " + with + " vs without " + without);
     }
 

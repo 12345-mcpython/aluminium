@@ -35,13 +35,13 @@ public class ControlImmunityTest {
     /** Transformed: the control does not land. */
     @Test
     public void theTransformedFormShrugsOffControl() {
-        Assertions.assertFalse(controlledAfter(true), "「卡厄斯兰那免疫控制类负面状态」");
+        Assertions.assertFalse(controlledAfter(true), "\"Khaslana (卡厄斯兰那) is immune to Crowd Control debuffs\" (「卡厄斯兰那免疫控制类负面状态」)");
     }
 
     /** Note: Untransformed: the same control lands, so the immunity really is the transformation's. */
     @Test
     public void withoutTheTransformationTheControlLands() {
-        Assertions.assertTrue(controlledAfter(false), "「变身期间」-- outside it she is controlable");
+        Assertions.assertTrue(controlledAfter(false), "「变身期间」 (during the transformation)-- outside it she is controlable");
     }
 
     // ==================================================================

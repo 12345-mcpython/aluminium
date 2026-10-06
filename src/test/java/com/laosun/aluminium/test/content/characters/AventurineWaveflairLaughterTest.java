@@ -30,7 +30,7 @@ public class AventurineWaveflairLaughterTest {
         Scene scene = fight();
         Assertions.assertEquals(0, scene.battle.partyResourceValue(LAUGH), "the battle starts with none");
         scene.battle.castImmediate(scene.her.getSkills().get(SkillType.SKILL), scene.her, List.of());
-        Assertions.assertEquals(4, scene.battle.partyResourceValue(LAUGH), "\"gain 4 笑点\"");
+        Assertions.assertEquals(4, scene.battle.partyResourceValue(LAUGH), "\"gain 4 笑点\" (gain 4 Punchline)");
     }
 
     /** "Ultimate ... gain 6 笑点" */
@@ -38,7 +38,7 @@ public class AventurineWaveflairLaughterTest {
     public void herUltimateGivesSix() {
         Scene scene = fight();
         scene.battle.castImmediate(scene.her.getSkills().get(SkillType.ULTRA), scene.her, List.of());
-        Assertions.assertEquals(6, scene.battle.partyResourceValue(LAUGH), "\"gain 6 笑点\"");
+        Assertions.assertEquals(6, scene.battle.partyResourceValue(LAUGH), "\"gain 6 笑点\" (gain 6 Punchline)");
     }
 
     /** "after a teammate casts an attack ... and 1 笑点" -- a REAL teammate attack, not a hand-fired event. */
@@ -47,7 +47,7 @@ public class AventurineWaveflairLaughterTest {
         Scene scene = fight();
         scene.battle.castImmediate(scene.mate.getSkills().get(SkillType.COMMON), scene.mate,
                 List.of(scene.battle.enemies.getFirst()));
-        Assertions.assertEquals(1, scene.battle.partyResourceValue(LAUGH), "\"and 1 笑点\"");
+        Assertions.assertEquals(1, scene.battle.partyResourceValue(LAUGH), "\"and 1 笑点\" (and 1 more Punchline)");
     }
 
     /** THE SHARED COUNTER: all three in one battle sum, because Punchline (笑点) is party-scoped. */

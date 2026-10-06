@@ -40,9 +40,9 @@ public class RuanMeiTest {
         battle.startBattle();
 
         Assertions.assertEquals(allyBase * 0.1, ally.getAttribute(AttributeType.SPEED).get() - before, allyBase * 0.02,
-                "「使除自身以外的队友速度提高10.00%」: ally base " + allyBase);
+                "「使除自身以外的队友速度提高10.00%」 (raises the SPD of allies other than herself by 10.00%): ally base " + allyBase);
         Assertions.assertEquals(0.0, ruanmei.getAttribute(AttributeType.SPEED).get() - herBefore, 1e-9,
-                "「除自身以外」 -- she is excluded, so her own speed must not move (base " + herBase + ")");
+                "「除自身以外」 (other than herself) -- she is excluded, so her own speed must not move (base " + herBase + ")");
         Assertions.assertTrue(battle.getSkillPoints() >= 0, "the battle ran");
     }
 
@@ -58,7 +58,7 @@ public class RuanMeiTest {
         battle.castImmediate(ruanmei.getSkills().get(SkillType.SKILL), ruanmei, List.of(ally));
 
         Assertions.assertTrue(ruanmei.getBuffManager().hasState("弦外音"),
-                "「施放战技后阮•梅获得【弦外音】」");
+                "「施放战技后阮•梅获得【弦外音】」 (after casting the Skill, Ruan Mei gains Overtone (【弦外音】))");
         Assertions.assertFalse(ally.getBuffManager().hasState("弦外音"),
                 "the state is on HER, not on the ally she aimed at");
     }

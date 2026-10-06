@@ -239,10 +239,10 @@ public class TriggerTableTest {
         Battle battle = newBattle(List.of(robin, himeko), 1);
 
         Assertions.assertEquals(1, battle.fireTriggers(TriggerEvent.BATTLE_START),
-                "only her 华彩花腔 (Radiant Refrain) trace listens to BATTLE_START");
+                "only her Coloratura Cadenza (华彩花腔) trace listens to BATTLE_START");
 
         Assertions.assertEquals(0, battle.fireTriggers(TriggerEvent.BASIC_ATTACK, robin, null, 1, 0),
-                "nothing in her file listens to BASIC_ATTACK: 普攻 (basic attack) is not 战技 (Skill)");
+                "nothing in her file listens to BASIC_ATTACK: Basic ATK (普攻) is not Skill (战技)");
 
         int fired = battle.fireTriggers(TriggerEvent.ALLY_ATTACK, himeko, null, 1, 0);
         Assertions.assertEquals(1, fired, "only Robin's table has an ALLY_ATTACK rule");

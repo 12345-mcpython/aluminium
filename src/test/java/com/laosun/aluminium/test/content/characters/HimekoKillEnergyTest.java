@@ -51,7 +51,7 @@ public class HimekoKillEnergyTest {
         // Battle.grantHitAndKillEnergy), so "额外" really is an extra credit rather than a relabelling of the
         // standard one. That is the reading this case exists to pin.
         Assertions.assertEquals(5, killed - survived, 1.0,
-                "「每消灭1个敌方目标额外恢复姬子5点能量」 adds exactly 5 on top of the cast's own energy ("
+                "「每消灭1个敌方目标额外恢复姬子5点能量」 (every time an enemy target is killed, Himeko restores 5 extra Energy) adds exactly 5 on top of the cast's own energy ("
                         + killed + " vs " + survived + ")");
     }
 
@@ -75,7 +75,7 @@ public class HimekoKillEnergyTest {
 
         Assertions.assertTrue(enemy.isDeath(), "precondition: the ally's hit killed it");
         Assertions.assertEquals(0, hero.getCurrentEnergy() - before, EPS,
-                "姬子 gains nothing from a kill she did not cause -- the general credit goes to the killer");
+                "Himeko (姬子) gains nothing from a kill she did not cause -- the general credit goes to the killer");
     }
 
     // ==================================================================

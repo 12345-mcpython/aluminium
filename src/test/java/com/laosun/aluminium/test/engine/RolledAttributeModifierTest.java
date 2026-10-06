@@ -43,7 +43,7 @@ public class RolledAttributeModifierTest {
         battle.castImmediate(wolf.getSkills().get(SkillType.SKILL), wolf, List.of(enemy));
 
         Assertions.assertEquals(0.1, enemy.getAttribute(AttributeType.RESISTANCE_REDUCTION).get(), EPS,
-                "「有100%的基础概率使该目标的全属性抗性降低10.00%」");
+                "\"a 100% base chance to lower that target's All-Type RES by 10.00%\" (「有100%的基础概率使该目标的全属性抗性降低10.00%」)");
     }
 
     /**
@@ -90,9 +90,9 @@ public class RolledAttributeModifierTest {
     @Test
     public void twoTechniquesLowerAnEnemyAttributeThroughTheRoll() {
         Assertions.assertEquals(0.8, appliedRatio(1106, AttributeType.DEFENCE, false), 1e-6,
-                "「有100%的基础概率使敌方每个单体目标防御力降低20%」");
+                "\"a 100% base chance to lower each single enemy target's DEF by 20%\" (「有100%的基础概率使敌方每个单体目标防御力降低20%」)");
         Assertions.assertEquals(0.75, appliedRatio(1217, AttributeType.ATTACK, false), 1e-6,
-                "「有100%的基础概率使敌方每个单体目标攻击力降低25%」");
+                "\"a 100% base chance to lower each single enemy target's ATK by 25%\" (「有100%的基础概率使敌方每个单体目标攻击力降低25%」)");
     }
 
     /**
@@ -143,6 +143,6 @@ public class RolledAttributeModifierTest {
     @Test
     public void weltsSkillSlowsTheTargetThroughItsBaseChance() {
         Assertions.assertEquals(0.9, appliedRatio(1004, AttributeType.SPEED, true), 1e-6,
-                "「攻击命中时有75%的基础概率使受到攻击的敌方目标速度降低10%」");
+                "\"when an attack hits, a 75% base chance to lower the attacked enemy target's SPD by 10%\" (「攻击命中时有75%的基础概率使受到攻击的敌方目标速度降低10%」)");
     }
 }

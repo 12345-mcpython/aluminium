@@ -38,7 +38,7 @@ public class FireflyTest {
         double after = remaining(battle, firefly);
 
         Assertions.assertEquals(0.75, after / before, 1e-6,
-                "「使自身下一次行动提前25%」: " + before + " -> " + after);
+                "「使自身下一次行动提前25%」 (advances her own next action by 25%): " + before + " -> " + after);
     }
 
     /** Note: 100% means the wait is gone. */
@@ -54,7 +54,7 @@ public class FireflyTest {
         battle.fireTriggers(TriggerEvent.ULT_CAST, firefly, enemy, 0, 0);
 
         Assertions.assertEquals(0.0, remaining(battle, firefly), 1e-6,
-                "「自身行动提前100%」: " + before + " -> 0");
+                "「自身行动提前100%」 (advances her own action by 100%): " + before + " -> 0");
     }
 
     /** The owner's remaining wait, read off the queue's public snapshot. */

@@ -34,11 +34,11 @@ public class YanqingTest {
         battle.fireTriggers(TriggerEvent.SKILL_CAST, yanqing, enemy, 0, 0);
 
         Assertions.assertTrue(yanqing.getBuffManager().hasState("智剑连心"),
-                "「并为彦卿附加【智剑连心】」");
+                "「并为彦卿附加【智剑连心】」 (and applies Soulsteel Sync (【智剑连心】) to Yanqing)");
         Assertions.assertEquals(0.2, yanqing.getAttribute(AttributeType.CRIT_CHANCE).get() - critBefore, 1e-9,
-                "「为自身提高20.00%暴击率」");
+                "「为自身提高20.00%暴击率」 (raises his own CRIT Rate by 20.00%)");
         Assertions.assertEquals(0.3, yanqing.getAttribute(AttributeType.CRIT_ATTACK).get() - dmgBefore, 1e-9,
-                "「和30%暴击伤害」");
+                "「和30%暴击伤害」 (and 30% CRIT DMG)");
     }
 
     /** Note: The Ultimate's conditional half: +50% CRIT DMG ONLY while the state is up. */
@@ -48,7 +48,7 @@ public class YanqingTest {
         double unsynced = ultCritDamageGain(false);
 
         Assertions.assertEquals(0.5, synced, 1e-9,
-                "「若彦卿处于【智剑连心】效果，则使其暴击伤害额外提高50%」");
+                "「若彦卿处于【智剑连心】效果，则使其暴击伤害额外提高50%」 (if Yanqing has the Soulsteel Sync (【智剑连心】) effect, his CRIT DMG is raised by an extra 50%)");
         Assertions.assertEquals(0.0, unsynced, 1e-9,
                 "without the state the extra 50% must not be granted");
     }
@@ -60,7 +60,7 @@ public class YanqingTest {
         double never = followUpLoss(1.0);
 
         Assertions.assertTrue(always > 0,
-                "「有60%的固定概率发动追加攻击」: a 0.0 roll is below 0.6, so it MUST fire");
+                "「有60%的固定概率发动追加攻击」 (a 60% fixed chance to launch a follow-up attack): a 0.0 roll is below 0.6, so it MUST fire");
         Assertions.assertEquals(0.0, never, 1e-9,
                 "a 1.0 roll is not below 0.6, so it must not fire -- which is what makes this a test of the CHANCE and not of the damage");
     }

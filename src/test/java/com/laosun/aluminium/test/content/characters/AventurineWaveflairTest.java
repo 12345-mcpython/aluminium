@@ -34,7 +34,7 @@ public class AventurineWaveflairTest {
         Assertions.assertEquals(0, fervorOf(aventurine), "no initial value is stated, so it starts at 0");
         battle.fireTriggers(TriggerEvent.ALLY_ATTACK, ally, enemy, 0, 0);
         Assertions.assertEquals(1, fervorOf(aventurine),
-                "「队友施放攻击后，砂金•戏浪获得1点【热意】」");
+                "「队友施放攻击后，砂金•戏浪获得1点【热意】」 (after an ally casts an attack, Aventurine Waveflair gains 1 point of [热意])");
 
         battle.fireTriggers(TriggerEvent.ALLY_ATTACK, aventurine, enemy, 0, 0);
         Assertions.assertEquals(1, fervorOf(aventurine),
@@ -44,7 +44,7 @@ public class AventurineWaveflairTest {
             battle.fireTriggers(TriggerEvent.ALLY_ATTACK, ally, enemy, 0, 0);
         }
         Assertions.assertEquals(30, fervorOf(aventurine),
-                "「【热意】上限为30点」 -- forty-one firings must still read thirty");
+                "「【热意】上限为30点」 (the ceiling of [热意] is 30 points) -- forty-one firings must still read thirty");
     }
 
     /** Note: The Ultimate: 8 Fervor and 30% more SPEED for the document's four turns. */
@@ -61,9 +61,9 @@ public class AventurineWaveflairTest {
 
         battle.fireTriggers(TriggerEvent.ULT_CAST, aventurine, enemy, 0, 0);
 
-        Assertions.assertEquals(fervor + 8, fervorOf(aventurine), "「获得8点【热意】」");
+        Assertions.assertEquals(fervor + 8, fervorOf(aventurine), "「获得8点【热意】」 (gains 8 points of [热意])");
         Assertions.assertEquals(base * 0.3, aventurine.getAttribute(AttributeType.SPEED).get() - before, base * 0.02,
-                "「使自身速度提高30%，持续4回合」 of the BASE speed: base " + base);
+                "「使自身速度提高30%，持续4回合」 (raises its own SPD by 30% for 4 turns) of the BASE speed: base " + base);
     }
 
     /** The declared resource's value, read through the combatant's own manager. */

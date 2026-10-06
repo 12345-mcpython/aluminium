@@ -34,14 +34,14 @@ public class CoreflameOverflowTest {
     @Test
     public void thePoolGoesPastItsMaximum() {
         Assertions.assertEquals(13.0, afterCasts(6), 1e-9,
-                "「达到上限后还可溢出」-- 1 + 12 = 13 is above the declared max of 12");
+                "「达到上限后还可溢出」 (can overflow past the ceiling)-- 1 + 12 = 13 is above the declared max of 12");
     }
 
     /** The allowance is exactly three: ten casts stop at fifteen. */
     @Test
     public void theAllowanceIsExactlyThree() {
         Assertions.assertEquals(15.0, afterCasts(10), 1e-9,
-                "「最多溢出 3 点」-- 12 + 3 is the ceiling");
+                "「最多溢出 3 点」 (overflows at most 3 points)-- 12 + 3 is the ceiling");
     }
 
     private static double afterCasts(int casts) {

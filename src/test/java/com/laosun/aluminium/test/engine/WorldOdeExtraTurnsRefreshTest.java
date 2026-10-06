@@ -29,11 +29,11 @@ public class WorldOdeExtraTurnsRefreshTest {
     public void theLastExtraTurnRefreshesWhileEverBurning() {
         double[] with = run(true);
         double[] without = run(false);
-        System.out.println("[refresh] with the state: 变身 " + with[0] + ", counter " + with[1] + ", 【毁伤】 " + with[2]
-                + " ; without it: 变身 " + without[0] + ", counter " + without[1] + ", 【毁伤】 " + without[2]);
+        System.out.println("[refresh] with the state: transformation (变身) " + with[0] + ", counter " + with[1] + ", Scourge (【毁伤】) " + with[2]
+                + " ; without it: transformation (变身) " + without[0] + ", counter " + without[1] + ", Scourge (【毁伤】) " + without[2]);
         Assertions.assertTrue(with[0] > 0, "the transformation survives the exhausted turn while ever-burning");
         Assertions.assertEquals(0.0, with[1], 1e-9, "and every extra turn is refreshed, so the counter is empty again");
-        Assertions.assertEquals(4.0, with[2], 1e-9, "and 【毁伤】 gains #9 = 4");
+        Assertions.assertEquals(4.0, with[2], 1e-9, "and 【毁伤】 (Scourge) gains #9 = 4");
         Assertions.assertEquals(0.0, without[0], 1e-9, "while without the state the same turn ends the transformation");
         Assertions.assertEquals(0.0, without[2], 1e-9, "and nothing is gained");
     }

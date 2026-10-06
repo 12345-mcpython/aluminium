@@ -40,14 +40,14 @@ public class TriggerDataBindingTest {
         // are asserted per event rather than as a total, so a rule that lands on the wrong event is
         // still caught.
         Assertions.assertEquals(1, robin.ruleCount(TriggerEvent.BATTLE_START),
-                "华彩花腔 (Radiant Refrain): 战斗开始时自身行动提前25% (advances herself 25% at battle start)");
+                "Coloratura Cadenza (华彩花腔): \"advances her own action by 25% at battle start\" (战斗开始时自身行动提前25%)");
         Assertions.assertEquals(1, robin.ruleCount(TriggerEvent.SKILL_CAST),
-                "模进乐段 (Sequence): 施放战技时额外恢复5点能量 (restores 5 extra energy when casting the Skill)");
+                "Sequential Passage (模进乐段): \"restores 5 extra Energy when casting the Skill\" (施放战技时额外恢复5点能量)");
         // Note: two of them: the talent's "额外为自身恢复2点能量" (restores 2 extra energy for herself) and Concerto (协奏)'s additional-damage rider
         // ("我方目标每次施放攻击后...额外造成1次"), which is gated on `self has_state 协奏`.
         Assertions.assertEquals(2, robin.ruleCount(TriggerEvent.ALLY_ATTACK));
         Assertions.assertEquals(0, robin.ruleCount(TriggerEvent.BASIC_ATTACK),
-                "nothing in her file listens to 普攻 (basic attack) -- 施放战技时 (casting the Skill) is the Skill slot");
+                "nothing in her file listens to Basic ATK (普攻) -- \"when casting the Skill\" (施放战技时) is the Skill slot");
     }
 
     /**

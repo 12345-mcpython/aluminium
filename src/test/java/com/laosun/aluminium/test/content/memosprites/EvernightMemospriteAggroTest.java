@@ -39,9 +39,9 @@ public class EvernightMemospriteAggroTest {
         battle.startBattle();
 
         Summon evey = battle.memospriteOf(her);
-        Assertions.assertNotNull(evey, "precondition: 长夜月's talent summons 长夜 at battle start");
+        Assertions.assertNotNull(evey, "precondition: Evernight (长夜月)'s talent summons Evey (长夜) at battle start");
         Assertions.assertEquals(125 * 4.0, battle.aggroOf(evey), EPS,
-                "「「长夜」被攻击的概率提高」 "
+                "\"Evey (「长夜」) is more likely to be attacked\" (「「长夜」被攻击的概率提高」) "
                         + "-- the spec's aggro 125 x (1 + 3)");
     }
 

@@ -34,7 +34,7 @@ public class WorldOdeAddedFireHitsTest {
         // (measured: the five hits read 1123.6 where 5 x 5% x ATK x mitigation says 103.95). Registered rather than approximated; the `times` mutation still moves the reading
         // (1599.9 -> 1394.25), which is why a count-aware isolation is the next step.
         Assertions.assertTrue(with > without + 1e-6,
-                "the five added hits must land while he holds 【永续的燃烧】");
+                "the five added hits must land while he holds 【永续的燃烧】 (Eternal Ignition)");
     }
 
     /** His ATTACK, read once in the transformed state so the expectation uses the engine's own number. */

@@ -58,9 +58,9 @@ public class SparkleTest {
         double afterFive = ally.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
 
         Assertions.assertEquals(0.06, afterOne - before, 1e-6,
-                "「每消耗 1 点战技点…伤害提高 6.00%」");
+                "「每消耗 1 点战技点…伤害提高 6.00%」 (for every 1 Skill Point consumed ... DMG is raised by 6.00%)");
         Assertions.assertEquals(0.18, afterFive - before, 1e-6,
-                "「最多可叠加 3 层」 -- five firings must still read three stacks of 6%");
+                "「最多可叠加 3 层」 (stacks at most 3 times) -- five firings must still read three stacks of 6%");
     }
 
     /** Note: The Ultimate: four Skill Points and the [谜诡] state on every ally. */
@@ -79,7 +79,7 @@ public class SparkleTest {
         Assertions.assertEquals(Math.min(before + 4, battle.getSkillPointMax()), battle.getSkillPoints(),
                 "「为我方恢复 4 个战技点」 (clamped by the pool's ceiling)");
         Assertions.assertTrue(ally.getBuffManager().hasState("谜诡"),
-                "「并使我方全体获得【谜诡】」");
+                "「并使我方全体获得【谜诡】」 (and grants all allies Cipher (【谜诡】))");
     }
 
     private static Random fixed() {

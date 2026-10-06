@@ -44,7 +44,7 @@ public class OceanOdeEnergyTest {
         SkillExecutor.execute(battle, ode, demiurge, List.of(hysilens));
         battle.processRequests();
         Assertions.assertTrue(hysilens.getBuffManager().hasState(MARK),
-                "「使海瑟音获得【暖流】」-- the mark is on her");
+                "「使海瑟音获得【暖流】」 (grants Hysilens Flowing Warmth)-- the mark is on her");
 
         hysilens.setCurrentEnergy(20);
         double before = hysilens.getCurrentEnergy();
@@ -55,7 +55,7 @@ public class OceanOdeEnergyTest {
         System.out.println("[ocean] energy " + before + " -> " + after + " ; the mark is still on her = " + stillMarked);
 
         Assertions.assertEquals(before + 60, after, 1e-6,
-                "「消耗【暖流】为自身恢复 #4 点能量」-- #4 is 60 at every level");
-        Assertions.assertFalse(stillMarked, "and the mark is consumed -- 消耗 means spent, not merely read");
+                "「消耗【暖流】为自身恢复 #4 点能量」 (consumes Flowing Warmth to restore #4 Energy to itself)-- #4 is 60 at every level");
+        Assertions.assertFalse(stillMarked, "and the mark is consumed -- consume (消耗) means spent, not merely read");
     }
 }

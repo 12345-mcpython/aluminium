@@ -67,7 +67,7 @@ public class March7thKitTest {
 
         battle.castImmediate(new DefaultSkill(MARCH, SKILL_SLOT, 1), march, List.of(ally));
 
-        Assertions.assertEquals(0, ally.getBuffManager().debuffCount(), "「解除指定我方单体的1个负面效果」");
+        Assertions.assertEquals(0, ally.getBuffManager().debuffCount(), "「解除指定我方单体的1个负面效果」 (dispels 1 debuff from a designated single ally)");
     }
 
     /**
@@ -87,8 +87,8 @@ public class March7thKitTest {
         battle.castImmediate(new DefaultSkill(MARCH, SKILL_SLOT, 1), march, List.of(ally));
 
         Assertions.assertEquals(expected, ally.getShield(), EPS,
-                "「抵消等同于三月七 57% 防御力 + 760 伤害的护盾」 -- the ally's shield, scaled off HER Defence");
-        Assertions.assertEquals(0, march.getShield(), EPS, "and not on herself: 「指定我方单体」 is the ally");
+                "「抵消等同于三月七 57% 防御力 + 760 伤害的护盾」 (a shield that absorbs damage equal to 57% of March 7th's DEF + 760) -- the ally's shield, scaled off HER Defence");
+        Assertions.assertEquals(0, march.getShield(), EPS, "and not on herself: 「指定我方单体」 (a designated single ally) is the ally");
     }
 
     /**
@@ -110,7 +110,7 @@ public class March7thKitTest {
         Assertions.assertEquals(f.ally.getMaxHp(), f.ally.getCurrentHp(), EPS,
                 "precondition: the shield ate the whole hit");
         Assertions.assertTrue(f.enemy.getCurrentHp() < enemyBefore,
-                "「立即向攻击者发起反击」 -- the ATTACKER takes it, and the trigger is being attacked, not losing HP");
+                "「立即向攻击者发起反击」 (immediately counterattacks the attacker) -- the ATTACKER takes it, and the trigger is being attacked, not losing HP");
     }
 
     /** "该效果每回合可触发2次": the third hit of the same turn is not answered, and her own turn refreshes it. */
@@ -169,8 +169,8 @@ public class March7thKitTest {
                 List.of(enemy));
 
         Assertions.assertTrue(enemy.getBuffManager().hasState("冻结"),
-                "「有50%基础概率陷入冻结状态」 -- with effect hit +100% and no resistance, this is the certain case");
-        Assertions.assertFalse(enemy.getBuffManager().canAct(), "「冻结状态下，敌方目标不能行动」");
+                "「有50%基础概率陷入冻结状态」 (a 50% base chance to fall into the Frozen state) -- with effect hit +100% and no resistance, this is the certain case");
+        Assertions.assertFalse(enemy.getBuffManager().canAct(), "「冻结状态下，敌方目标不能行动」 (while Frozen, the enemy target cannot act)");
         Assertions.assertTrue(enemy.getCurrentHp() < enemy.getMaxHp(),
                 "and the first sentence of the ultimate is the engine's own AoE path, not a rule");
 
@@ -202,7 +202,7 @@ public class March7thKitTest {
         Assertions.assertEquals(java.util.Map.of("STAT_CTRL_Frozen", 1.0), immune.getDebuffResist(),
                 "precondition: this monster's data is what makes it unfreezable");
         Assertions.assertFalse(immune.getBuffManager().hasState("冻结"),
-                "no amount of 效果命中 beats a specific immunity -- which is why the case above needs a "
+                "no amount of Effect Hit Rate (效果命中) beats a specific immunity -- which is why the case above needs a "
                         + "different enemy rather than a bigger number");
     }
 
@@ -260,7 +260,7 @@ public class March7thKitTest {
                 f.ally.getBuffManager().findBuff(com.laosun.aluminium.models.buff.ShieldBuff.class);
 
         Assertions.assertEquals(4, shield.duration(),
-                "3 turns from the Skill + 1 from the 加护 trace -- 「战技提供的护盾持续时间增加1回合」");
+                "3 turns from the Skill + 1 from the Reinforce (加护) trace -- \"the shield the Skill provides lasts 1 turn longer\" (「战技提供的护盾持续时间增加1回合」)");
     }
 
     /**
@@ -294,7 +294,7 @@ public class March7thKitTest {
                 "the ultimate's freeze (its damage is the engine's own path, so there is no damage rule) and Eidolon 1's "
                         + "energy per landed freeze");
         Assertions.assertEquals(6, TriggerTables.of(MARCH).ruleCount(TriggerEvent.BATTLE_START),
-                "Eidolon 2's battle-start shield; the two amendments (Eidolon 4 raising the talent's per-turn cap, the 行迹「冰咒」 "
+                "Eidolon 2's battle-start shield; the two amendments (Eidolon 4 raising the talent's per-turn cap, the Traces (行迹) \"Ice Spell\" (「冰咒」) "
                         + "raising the ultimate's base chance); and Eidolon 3's and Eidolon 5's skill levels plus the talent's "
                         + "base level (three rules, )");
         Assertions.assertEquals(0, TriggerTables.of(MARCH).ruleCount(TriggerEvent.KILL),
@@ -325,7 +325,7 @@ public class March7thKitTest {
         /** Casts her Skill on the ally, which is what puts a shield on them. */
         private void shieldTheAlly() {
             battle.castImmediate(new DefaultSkill(MARCH, SKILL_SLOT, 1), march, List.of(ally));
-            Assertions.assertTrue(ally.getShield() > 0, "precondition: 「为指定我方单体提供…护盾」");
+            Assertions.assertTrue(ally.getShield() > 0, "precondition: 「为指定我方单体提供…护盾」 (provides a shield to a designated single ally)");
         }
 
         /** One enemy hit on the ally, through the engine's own damage path (which emits {@code TAKING_HIT}). */

@@ -86,7 +86,7 @@ public class SkillPointPolicyExtensibilityTest {
     // ==================================================================
 
     /**
-     * Custom policy: cap, start 3 (the effect of Sparkle's talent +2).
+     * Custom policy: cap 7, start 3 (the effect of Sparkle's talent +2).
      *
      * <p>The cap finding in the ledger is that the engine used to hard-code the cap in
      * {@code Constant.SKILL_POINT_MAX}, so it could not be raised by team configuration.

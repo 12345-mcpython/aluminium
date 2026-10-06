@@ -57,11 +57,11 @@ public class FuXuanTest {
         battle.castImmediate(fuxuan.getSkills().get(SkillType.SKILL), fuxuan, List.of(ally));
 
         Assertions.assertTrue(ally.getBuffManager().hasState("鉴知"),
-                "「处于【穷观阵】的我方全体获得【鉴知】」");
+                "「处于【穷观阵】的我方全体获得【鉴知】」 (all allies inside the Matrix of Prescience (【穷观阵】) gain Knowledge (【鉴知】))");
         Assertions.assertEquals(expected, ally.getAttribute(AttributeType.HEALTH).get() - hpBefore, expected * 0.02,
                 "6% of HER max HP: expected " + expected);
         Assertions.assertEquals(0.12, ally.getAttribute(AttributeType.CRIT_CHANCE).get() - critBefore, 1e-6,
-                "「暴击率提高12.00%」");
+                "「暴击率提高12.00%」 (CRIT Rate is raised by 12.00%)");
     }
 
     /** One fixed hit against an ally, with her talent active or not. */

@@ -51,9 +51,9 @@ public class ReasonOdePointAndActionTest {
                 + " ; his action value " + avBefore + " -> " + avAfter);
 
         Assertions.assertEquals(pointsBefore + 1, pointsAfter,
-                "「为我方恢复 #4 个战技点」-- and #4 is 1 at every level");
+                "「为我方恢复 #4 个战技点」 (restores #4 Skill Points to our side)-- and #4 is 1 at every level");
         Assertions.assertTrue(avAfter < avBefore,
-                "「使那刻夏立即行动」-- his action value must come DOWN (" + avBefore + " -> " + avAfter + ")");
+                "「使那刻夏立即行动」 (makes Anaxa act immediately)-- his action value must come DOWN (" + avBefore + " -> " + avAfter + ")");
     }
 
     /** How much action value the unit still has -- zero means "acts now" (mirrors AglaeaMemospriteTest). */

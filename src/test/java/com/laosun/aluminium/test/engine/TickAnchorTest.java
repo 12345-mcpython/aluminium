@@ -121,7 +121,7 @@ public class TickAnchorTest {
 
         Assertions.assertTrue(owner.isDeath(), "precondition: the caster is down");
         Assertions.assertEquals(-1, durationOf(ally),
-                "「当星期日陷入无法战斗状态时，【蒙福者】效果也会被解除」 -- and generally: no clock, no buff");
+                "「当星期日陷入无法战斗状态时，【蒙福者】效果也会被解除」 (when Sunday falls into the unable-to-fight state, The Beatified effect is also removed) -- and generally: no clock, no buff");
     }
 
     // ==================================================================

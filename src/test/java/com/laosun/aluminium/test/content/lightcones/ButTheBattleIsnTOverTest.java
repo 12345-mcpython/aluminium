@@ -97,7 +97,7 @@ public class ButTheBattleIsnTOverTest {
         int counted = wearer.getBuffManager().stacksOf(COUNT);
         System.out.println("[23003] after an ultimate aimed at an ENEMY: counter=" + counted
                 + " points=" + battle.getSkillPoints());
-        Assertions.assertEquals(0, counted, "对我方目标 (false case)");
+        Assertions.assertEquals(0, counted, "our target (对我方目标), the false case");
         Assertions.assertEquals(0, battle.getSkillPoints(), "and nothing is paid");
     }
 

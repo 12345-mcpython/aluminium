@@ -45,7 +45,7 @@ public class OriginalDamageRiderTest {
         Assertions.assertEquals(baseline, full - baseline, baseline * 1e-6,
                 "a 100% rider settles what the original settled: " + baseline + " -> " + full);
         Assertions.assertEquals(baseline * 0.4, forty - baseline, baseline * 1e-6,
-                "and 姬子's Eidolon 6 share (40%) lands as 40%, not as 40% x the zone factor");
+                "and Himeko (姬子)'s Eidolon 6 share (40%) lands as 40%, not as 40% x the zone factor");
     }
 
     /**

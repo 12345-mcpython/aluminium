@@ -54,7 +54,7 @@ public class HanyaBurdenTest {
 
         f.allyAttacks(f.first, com.laosun.aluminium.enums.SkillCategory.BPSKILL);
         Assertions.assertFalse(f.first.getBuffManager().hasState("承负"),
-                "the second qualifying cast reached the threshold, the party got a skill point and 【承负】 came off");
+                "the second qualifying cast reached the threshold, the party got a skill point and 【承负】 (Burden) came off");
     }
 
     /** Note: The counter counts <b>casts</b>, not hits: a multi-hit skill marks once. */
@@ -77,9 +77,9 @@ public class HanyaBurdenTest {
         Assertions.assertEquals(3, TriggerTables.of(HANYA).ruleCount(TriggerEvent.DEALING_DAMAGE),
                 "the talent's boost, one rule per slot");
         Assertions.assertEquals(2, TriggerTables.of(HANYA).ruleCount(TriggerEvent.KILL),
-                "Eidolon 1 (the carrier\'s kill advances her) and the 行迹 幽府 (Netherworld) trace (a kill on a 【承负】 target refunds one more)");
+                "Eidolon 1 (the carrier\'s kill advances her) and the Traces (行迹) Netherworld (幽府) trace (a kill on a Burden (【承负】) target refunds one more)");
         Assertions.assertEquals(2, TriggerTables.of(HANYA).ruleCount(TriggerEvent.SKILL_CAST),
-                "the 承负 (Burden) application and Eidolon 2's speed boost");
+                "the Burden (承负) application and Eidolon 2's speed boost");
     }
 
     // ==================================================================

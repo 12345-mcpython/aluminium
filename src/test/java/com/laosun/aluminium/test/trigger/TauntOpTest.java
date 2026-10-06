@@ -49,7 +49,7 @@ public class TauntOpTest {
 
         List<TauntBuff> buffs = enemy.getBuffManager().allBuffsOf(TauntBuff.class);
         Assertions.assertEquals(1, buffs.size(), "the enemy is taunted");
-        Assertions.assertEquals(2, buffs.getFirst().duration(), "「持续#N回合」");
+        Assertions.assertEquals(2, buffs.getFirst().duration(), "\"lasts #N turns\" (「持续#N回合」)");
     }
 
     /** Nothing to taunt is not a silent success: the marker is on the unit the rule resolved. */

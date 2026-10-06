@@ -125,7 +125,7 @@ public class BondmateHolderTest {
         battle.startBattle();
 
         Assertions.assertTrue(him.getBuffManager().hasState(BONDMATE),
-                "「使用秘技后获得【同袍】」: the technique's own marker (秘技) is what the rule is gated on");
+                "「使用秘技后获得【同袍】」 (gains Bondmate after using the Technique): the technique's own marker (秘技) is what the rule is gated on");
     }
 
     /**
@@ -169,7 +169,7 @@ public class BondmateHolderTest {
         double untouched = timeRemaining(baseline, plain);
         Assertions.assertTrue(untouched > 0, "precondition: there was a wait to shorten (" + untouched + ")");
         Assertions.assertEquals(untouched * 0.6, timeRemaining(battle, him), 1e-9,
-                "「行动提前40%」: " + untouched + " -> " + timeRemaining(battle, him));
+                "\"action advance 40%\" (「行动提前40%」): " + untouched + " -> " + timeRemaining(battle, him));
     }
 
     /** trace (行迹) Weirui (葳蕤)'s second half "[同袍]施放攻击时，丹恒-腾荒恢复6点能量" - gated on the ATTACKER holding it. */

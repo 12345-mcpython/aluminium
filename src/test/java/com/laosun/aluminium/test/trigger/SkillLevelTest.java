@@ -52,7 +52,7 @@ public class SkillLevelTest {
         Skill ultimate = f.hero.getSkills().get(SkillType.ULTRA);
 
         Assertions.assertEquals(ultimate.getLevel() + RAISE, f.hero.skillLevel(ultimate),
-                "「终结技等级+9」 raises what the engine reads");
+                "「终结技等级+9」 (Ultimate Lv. +9) raises what the engine reads");
         Assertions.assertEquals(RAISE, f.hero.skillLevelBonus(SkillType.ULTRA), "…filed for this battle");
         Assertions.assertEquals(0, f.hero.skillLevelBonus(SkillType.SKILL), "…and only that slot");
     }

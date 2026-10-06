@@ -77,7 +77,7 @@ public class SummerRidesTheSurfSkillPointTest {
         Battle battle = battle(true);
         cast(battle, SkillCategory.ULTRA);
         cast(battle, SkillCategory.BPSKILL);
-        System.out.println("[23064] after two non-elation casts: 欢愉技计数="
+        System.out.println("[23064] after two non-elation casts: Elation Skill (欢愉技) counter = "
                 + wearer.getBuffManager().stacksOf(COUNT));
         Assertions.assertEquals(0, wearer.getBuffManager().stacksOf(COUNT),
                 "the clause counts ELATION casts only (false case)");

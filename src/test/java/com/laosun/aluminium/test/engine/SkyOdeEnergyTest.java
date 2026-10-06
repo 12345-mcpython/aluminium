@@ -45,7 +45,7 @@ public class SkyOdeEnergyTest {
 
         Assertions.assertEquals(0.0, withoutOde, 1e-9, "precondition: the ode is what moves it");
         Assertions.assertEquals(expected, withOde, Math.abs(expected) * 1e-6,
-                "「为风堇恢复 #2 点能量」-- and #2 runs with level");
+                "「为风堇恢复 #2 点能量」 (restores #2 Energy to Hyacine)-- and #2 runs with level");
     }
 
     private static double energyAfter(boolean castTheOde) {

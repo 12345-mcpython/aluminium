@@ -31,7 +31,7 @@ public class TransformationEndsOnLastCountdownTest {
     @Test
     public void theEighthCountdownTurnEndsIt() {
         Assertions.assertFalse(transformedAfterCountdownTurns(TURNS),
-                "「最后 1 个倒计时回合…结束变身」");
+                "\"the last countdown turn ... ends the transformation\" (「最后 1 个倒计时回合…结束变身」)");
     }
 
     /** Note: One turn earlier the transformation must still be on. */

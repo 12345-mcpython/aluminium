@@ -43,7 +43,7 @@ public class DotCeilingTest {
         double base = baseDamageOn(owner, boss);
 
         Assertions.assertEquals(owner.getAttribute(AttributeType.ATTACK).get() * 3.38, base, 1e-3,
-                "「最多不超过卢卡攻击力的 338%」 -- the ceiling wins for a victim whose 24% share would be larger");
+                "「最多不超过卢卡攻击力的 338%」 (at most 338% of Luka's ATK) -- the ceiling wins for a victim whose 24% share would be larger");
     }
 
     /** Note: A small victim keeps its own small share: the ceiling is a ceiling, not a replacement. */

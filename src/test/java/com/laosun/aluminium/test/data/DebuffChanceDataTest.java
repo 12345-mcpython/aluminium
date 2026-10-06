@@ -32,19 +32,19 @@ public class DebuffChanceDataTest {
     public void theChanceIsThePlaceholderNextToTheProbabilityWording() {
         // the wording that states a base chance: "有<unbreak>#1[i]%</unbreak>的<u>基础概率</u>" -> param[0] = 1
         Assertions.assertEquals(1.0, SkillData.init(1003, 7).debuffChance(), 1e-9,
-                "Himeko 不完全燃烧: #1 → param_list[0]");
+                "Himeko Incomplete Combustion (不完全燃烧): #1 → param_list[0]");
         // the same wording: "有<unbreak>#1[i]%</unbreak>的<u>基础概率</u>" -> param[0] = 1
         Assertions.assertEquals(1.0, SkillData.init(1004, 7).debuffChance(), 1e-9,
-                "Welt 画地为牢: #1 → param_list[0]");
+                "Welt Gravitational Imprisonment (画地为牢): #1 → param_list[0]");
         // the fixed-chance wording: "有<unbreak>#2[i]%</unbreak><u>固定概率</u>" -> param[1] = 1 (no possessive marker, and NOT index 0)
         Assertions.assertEquals(1.0, SkillData.init(1108, 7).debuffChance(), 1e-9,
-                "Sampo 你最闪亮: #2 → param_list[1]; this is what proves the slot is read from the text");
+                "Sampo Shining Bright (你最闪亮): #2 → param_list[1]; this is what proves the slot is read from the text");
         // the coloured form: "有<color=#f29e38ff><unbreak>#4[i]%</unbreak></color>的<u>基础概率</u>" -> param[3] = 0.6
         Assertions.assertEquals(0.6, SkillData.init(1006, 4).debuffChance(), 1e-9,
-                "Silver Wolf 等待程序响应: #4 → param_list[3] = 0.6");
+                "Silver Wolf Waiting for Program Response (等待程序响应): #4 → param_list[3] = 0.6");
         // the coloured form again: "有<color=#f29e38ff><unbreak>#2[i]%</unbreak></color>的<u>基础概率</u>" -> param[1] = 0.5
         Assertions.assertEquals(0.5, SkillData.init(1307, 4).debuffChance(), 1e-9,
-                "Black Swan 无端命运的机杼: #2 → param_list[1] = 0.5 (the text names it twice, both #2)");
+                "Black Swan Loom of Fate's Caprice (无端命运的机杼): #2 → param_list[1] = 0.5 (the text names it twice, both #2)");
     }
 
     /**
@@ -73,7 +73,7 @@ public class DebuffChanceDataTest {
     @Test
     public void aSkillWhoseTextStatesNoChanceReportsNoChance() {
         Assertions.assertNull(SkillData.init(1315, 2).debuffChance(),
-                "Boothill 绝命对峙: the description states no probability, so there is nothing to read");
+                "Boothill Standoff (绝命对峙): the description states no probability, so there is nothing to read");
     }
 
     /**

@@ -44,16 +44,16 @@ public class SuperBreakContentTest {
         battle.startBattle();
         battle.castImmediate(harmony.getSkills().get(SkillType.ULTRA), harmony, List.of(ally, harmony));
         breakIt(battle, harmony, enemy);
-        Assertions.assertTrue(ally.getBuffManager().hasState("伴舞"), "precondition: the ally carries 【伴舞】");
+        Assertions.assertTrue(ally.getBuffManager().hasState("伴舞"), "precondition: the ally carries 【伴舞】 (Backup Dancer)");
         Assertions.assertTrue(enemy.getBuffManager().hasState("弱点击破"), "precondition: the target is broken");
 
         TriggerTable table = TriggerTables.of(HARMONY);
         Assertions.assertFalse(table.matching(TriggerEvent.DEALING_DAMAGE, ctx(harmony, ally, enemy, battle)).isEmpty(),
-                "「持有【伴舞】的我方目标…攻击处于弱点击破状态下的敌方目标后」 -- a carrier attacking a broken target matches");
+                "「持有【伴舞】的我方目标…攻击处于弱点击破状态下的敌方目标后」 (after an ally holding Backup Dancer ... attacks an enemy target in the Weakness Break state) -- a carrier attacking a broken target matches");
 
         Character plain = CharacterFactory.create(ALLY, LEVEL);
         Assertions.assertTrue(table.matching(TriggerEvent.DEALING_DAMAGE, ctx(harmony, plain, enemy, battle)).isEmpty(),
-                "⚠ 「**持有【伴舞】的**我方目标」: an attacker without the state does not match");
+                "⚠ 「**持有【伴舞】的**我方目标」 (an ally **holding Backup Dancer**): an attacker without the state does not match");
     }
 
     /** Her file carries the clause now (and the tally says so). */
@@ -76,8 +76,8 @@ public class SuperBreakContentTest {
         battle.castImmediate(bloom.getSkills().get(SkillType.SKILL), bloom, List.of(enemy));
 
         Assertions.assertEquals(0.5, ally.getBuffManager().toughnessBoost(), 1e-9,
-                "「我方全体的弱点击破效率提高50%」 -- the boost reaches an ally, not just her");
-        Assertions.assertEquals(0.5, bloom.getBuffManager().toughnessBoost(), 1e-9, "…and her (「我方全体」 includes her)");
+                "「我方全体的弱点击破效率提高50%」 (all allies' Weakness Break Efficiency is raised by 50%) -- the boost reaches an ally, not just her");
+        Assertions.assertEquals(0.5, bloom.getBuffManager().toughnessBoost(), 1e-9, "…and her (「我方全体」 (all allies) includes her)");
     }
 
     // ==================================================================

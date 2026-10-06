@@ -192,7 +192,7 @@ public class ControlTest {
 
         Assertions.assertTrue(f.enemy.getBuffManager().hasState("冻结"),
                 "the applied state answers has_state under the name the documents use");
-        Assertions.assertFalse(f.enemy.getBuffManager().canAct(), "冻结 = 不能行动");
+        Assertions.assertFalse(f.enemy.getBuffManager().canAct(), "Frozen (冻结) = cannot act (不能行动)");
         Assertions.assertEquals("冻结", f.enemy.getBuffManager().findBuff(ControlBuff.class).getName());
     }
 
@@ -358,7 +358,7 @@ public class ControlTest {
         f.enemy.getBuffManager().removeState("冻结");
 
         Assertions.assertEquals(0, f.enemy.getBuffManager().countBuffs(DotBuff.class),
-                "one buff owns the state and its payload, so 「解除」 cannot leave half of it behind");
+                "one buff owns the state and its payload, so 「解除」 (remove) cannot leave half of it behind");
     }
 
     // ==================================================================

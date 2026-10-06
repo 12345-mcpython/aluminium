@@ -28,7 +28,7 @@ public class DamageBaseTest {
     public void aMaxHpSentenceNamesMaxHp() {
         Character lynx = CharacterFactory.create(LYNX, LEVEL);
         Assertions.assertEquals(AttributeType.HEALTH, lynx.getSkills().get(SkillType.COMMON).getData().damageBaseAttribute(),
-                "「等同于…生命上限的伤害」");
+                "\"damage equal to ... Max HP\" (「等同于…生命上限的伤害」)");
     }
 
     /** Note: "等同于砂金100%防御力的伤害" -> DEFENCE. */
@@ -36,7 +36,7 @@ public class DamageBaseTest {
     public void aDefenceSentenceNamesDefence() {
         Character aventurine = CharacterFactory.create(AVENTURINE, LEVEL);
         Assertions.assertEquals(AttributeType.DEFENCE, aventurine.getSkills().get(SkillType.COMMON).getData().damageBaseAttribute(),
-                "「等同于砂金100%防御力的伤害」");
+                "\"damage equal to 100% of Aventurine (砂金)'s DEF\" (「等同于砂金100%防御力的伤害」)");
     }
 
     /** Note: The ordinary case stays ATK: "等同于丹恒100%攻击力". */
@@ -44,6 +44,6 @@ public class DamageBaseTest {
     public void anAttackSentenceStaysAttack() {
         Character danheng = CharacterFactory.create(DANHENG, LEVEL);
         Assertions.assertEquals(AttributeType.ATTACK, danheng.getSkills().get(SkillType.COMMON).getData().damageBaseAttribute(),
-                "「等同于丹恒100%攻击力」");
+                "\"equal to 100% of Dan Heng (丹恒)'s ATK\" (「等同于丹恒100%攻击力」)");
     }
 }

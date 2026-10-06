@@ -34,7 +34,7 @@ public class NatashaHealingBoostTest {
 
         Assertions.assertTrue(plain > 0, "the control must compute something, or the ratio below means nothing");
         Assertions.assertEquals(1.1, boosted / plain, 1e-6,
-                "「娜塔莎提供的治疗量提高10%」 -- "
+                "\"the healing Natasha (娜塔莎) provides is raised by 10%\" (「娜塔莎提供的治疗量提高10%」) -- "
                         + "boosted " + boosted + " vs plain " + plain);
     }
 

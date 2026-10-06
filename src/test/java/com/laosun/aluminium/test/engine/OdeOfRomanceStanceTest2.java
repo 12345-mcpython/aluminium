@@ -65,9 +65,9 @@ public class OdeOfRomanceStanceTest2 {
                 + " pierce +" + servantPierceGain + " (=" + expectedPierce + ")");
 
         Assertions.assertEquals(expectedPierce, pierceGain, Math.abs(expectedPierce) * 1e-6,
-                "「并无视目标 #3% 的防御」-- hers");
+                "「并无视目标 #3% 的防御」 (and ignores #3% of the target's DEF)-- hers");
         Assertions.assertEquals(expectedBoost, servantBoostGain, Math.abs(expectedBoost) * 1e-6,
-                "「阿格莱雅**与衣匠**造成的伤害提高 #2%」-- the Garmentmaker is named too");
+                "「阿格莱雅**与衣匠**造成的伤害提高 #2%」 (Aglaea **and the Garmentmaker** deal #2% more DMG)-- the Garmentmaker is named too");
         Assertions.assertEquals(expectedPierce, servantPierceGain, Math.abs(expectedPierce) * 1e-6,
                 "and it gets the pierce as well");
 
@@ -80,7 +80,7 @@ public class OdeOfRomanceStanceTest2 {
                 + " ; hers pierce = " + aglaea.getAttribute(AttributeType.DEFENCE_IGNORE).get());
 
         Assertions.assertEquals(servantBoostBefore, garmentmaker.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get(), 1e-6,
-                "「持续至阿格莱雅退出【" + STANCE + "】状态」-- the Garmentmaker is back where it started");
+                "「持续至阿格莱雅退出【" + STANCE + "】状态」 (it lasts until Aglaea exits that state) -- the Garmentmaker is back where it started");
         Assertions.assertEquals(servantPierceBefore, garmentmaker.getAttribute(AttributeType.DEFENCE_IGNORE).get(), 1e-6,
                 "and its pierce is gone");
         Assertions.assertTrue(aglaea.getAttribute(AttributeType.DEFENCE_IGNORE).get() < pierceBefore + expectedPierce,

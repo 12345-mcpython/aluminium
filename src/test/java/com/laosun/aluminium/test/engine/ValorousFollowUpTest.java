@@ -41,7 +41,7 @@ public class ValorousFollowUpTest {
         double baseline = wearer.getAttribute(AttributeType.FOLLOW_UP_DAMAGE_BOOST).get();
         battle.fireTriggers(TriggerEvent.FOLLOW_UP, wearer, enemy, 0, 0);
         Assertions.assertEquals(baseline, wearer.getAttribute(AttributeType.FOLLOW_UP_DAMAGE_BOOST).get(), 1e-6,
-                "the wearer's own follow-up must not mark 功勋");
+                "the wearer's own follow-up must not mark Merit (功勋)");
         battle.fireTriggers(TriggerEvent.FOLLOW_UP, ally, enemy, 0, 0);
         Assertions.assertTrue(wearer.getAttribute(AttributeType.FOLLOW_UP_DAMAGE_BOOST).get() > baseline,
                 "an ally's follow-up does: " + baseline + " -> " + wearer.getAttribute(AttributeType.FOLLOW_UP_DAMAGE_BOOST).get());

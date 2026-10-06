@@ -80,7 +80,7 @@ public class ExpressionChecklistTest {
             Assertions.assertEquals(4, cells.size(), "§3 rows have four columns: " + row);
             for (int column = 1; column <= 3; column++) {
                 Assertions.assertFalse(cells.get(column).isBlank(),
-                        "§3 column " + column + " is empty -- 「缺什么／读者是谁／前置是什么」 must all be stated: " + row);
+                        "§3 column " + column + " is empty -- 「缺什么／读者是谁／前置是什么」 (what is missing / who the reader is / what the prerequisite is) must all be stated: " + row);
             }
             Assertions.assertTrue(cells.get(2).matches(".*\\d.*"),
                     "§3 must count its readers (a named family with a number): " + row);

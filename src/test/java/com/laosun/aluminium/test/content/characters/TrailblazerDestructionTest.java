@@ -40,10 +40,10 @@ public class TrailblazerDestructionTest {
         battle.fireTriggers(TriggerEvent.BREAK, tb, enemy, 0, 0);
         double afterThree = tb.getAttribute(AttributeType.ATTACK).get();
 
-        Assertions.assertTrue(afterOne > before, "「每次击破敌方目标的弱点后，攻击力提高20%」: " + before + " -> " + afterOne);
+        Assertions.assertTrue(afterOne > before, "\"after each time an enemy target's Weakness is Broken, ATK is raised by 20%\" (「每次击破敌方目标的弱点后，攻击力提高20%」): " + before + " -> " + afterOne);
         Assertions.assertTrue(afterTwo > afterOne, "the second layer must add again");
         Assertions.assertEquals(afterTwo, afterThree, 1e-9,
-                "「该效果最多叠加2层」 -- a third break must not add a third layer");
+                "「该效果最多叠加2层」 (this effect stacks at most 2 times) -- a third break must not add a third layer");
     }
 
     /** Census: the talent and the level convention. */
@@ -51,7 +51,7 @@ public class TrailblazerDestructionTest {
     public void hisFileCarriesTheClauses() {
         var table = TriggerTables.of(TB);
         Assertions.assertEquals(2, table.ruleCount(TriggerEvent.BREAK),
-                "the talent's ATK stack and (2026-09-29) the 坚韧 trace's per-layer DEFENCE, both on BREAK");
+                "the talent's ATK stack and (2026-09-29) the Tenacity (坚韧) trace's per-layer DEFENCE, both on BREAK");
         Assertions.assertEquals(2, table.ruleCount(TriggerEvent.BATTLE_START),
                 "the technique heal (round 178) and the level convention");
     }

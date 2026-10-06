@@ -35,9 +35,9 @@ public class TechniqueShieldTest {
         battle.startBattle();
 
         double expected = gepard.getAttribute(AttributeType.DEFENCE).get() * 0.24 + 150;
-        Assertions.assertTrue(gepard.getShield() > 0, "「为我方全体提供…护盾」 -- himself");
+        Assertions.assertTrue(gepard.getShield() > 0, "「为我方全体提供…护盾」 (provides a shield to all allies) -- himself");
         Assertions.assertEquals(expected, ally.getShield(), expected * 0.02,
-                "「等同于杰帕德24%防御力+150的护盾」: expected " + expected + ", shield " + ally.getShield());
+                "「等同于杰帕德24%防御力+150的护盾」 (a shield equal to 24% of Gepard's DEF + 150): expected " + expected + ", shield " + ally.getShield());
     }
 
     /** Note: The control: no technique declared, no shield. */
@@ -51,7 +51,7 @@ public class TechniqueShieldTest {
         battle.startBattle();
 
         Assertions.assertEquals(0.0, ally.getShield(), 1e-9,
-                "「使用秘技后」 -- the shield is the technique's, so without it there is none");
+                "「使用秘技后」 (after using the Technique) -- the shield is the technique's, so without it there is none");
     }
 
     private static Random fixed() {

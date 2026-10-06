@@ -47,9 +47,9 @@ public class WarehouseAutoListenerTest {
 
         Assertions.assertTrue(firstLanded, "precondition: the triggering control really landed");
         Assertions.assertTrue(firewallOn,
-                "「获得该角色后，或该角色在队伍中时」-- nobody registered her by hand, so the battle must have found her warehouse file");
+                "「获得该角色后，或该角色在队伍中时」 (after obtaining that character, or while that character is in the team)-- nobody registered her by hand, so the battle must have found her warehouse file");
         Assertions.assertFalse(secondLanded,
-                "「【防火墙】状态下，我方目标免疫敌方目标施加的控制类负面状态」-- the next control is refused");
+                "「【防火墙】状态下，我方目标免疫敌方目标施加的控制类负面状态」 (while in the Firewall state, our targets are immune to Crowd Control debuffs applied by enemy targets)-- the next control is refused");
         Assertions.assertTrue(wolfInQueue,
                 "and she keeps her own battle table: she is still a combatant, which a table swap would have taken away");
     }

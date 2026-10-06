@@ -37,7 +37,7 @@ public class TrickeryOdeDamageTest {
         Assertions.assertNotEquals(withoutOde.gain, withOde.gain, 1e-9,
                 "casting the ode CHANGES her boost -- and the change is the cast row’s own #1");
         Assertions.assertEquals(withOde.expected, withOde.gain, Math.abs(withOde.expected) * 1e-6,
-                "「使赛飞儿造成的伤害提高 #1%」-- and #1 runs with level");
+                "「使赛飞儿造成的伤害提高 #1%」 (raises the DMG Cipher deals by #1%)-- and #1 runs with level");
     }
 
     private record Boost(double gain, double expected) {

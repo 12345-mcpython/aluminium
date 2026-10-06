@@ -47,7 +47,7 @@ public class ClaraTraceTest {
         hit(battle, clara);
 
         Assertions.assertFalse(clara.getBuffManager().hasBuff(DotBuff.class),
-                "the burn is a negative effect, so 解除 (dispelling) takes it");
+                "the burn is a negative effect, so dispelling (解除) takes it");
         Assertions.assertTrue(clara.getBuffManager().hasBuff(StateBuff.class),
                 "and the named state stays: it is not classified as negative");
     }
@@ -75,7 +75,7 @@ public class ClaraTraceTest {
         hit(battle, clara);
 
         Assertions.assertTrue(enemy.getCurrentHp() < before,
-                "「受到攻击后反击」 is a different rule in the same file, and it must survive the addition");
+                "「受到攻击后反击」 (counterattacks after being attacked) is a different rule in the same file, and it must survive the addition");
     }
 
     /**
@@ -92,7 +92,7 @@ public class ClaraTraceTest {
         Character clara = battle.characters.getFirst();
 
         Assertions.assertEquals(0.35, clara.getBuffManager().debuffResistOf(DebuffClass.CONTROL), 1e-9,
-                "「抵抗控制类负面状态的概率提高35%」");
+                "「抵抗控制类负面状态的概率提高35%」 (raises RES to Crowd Control debuffs by 35%)");
         Assertions.assertEquals(1, clara.getBuffManager().countBuffs(ClassResistBuff.class), "one contribution");
         Assertions.assertEquals(0, clara.getBuffManager().debuffResistOf(DebuffClass.DOT),
                 "Guardian (守护) says control class (控制类) and nothing about the DOT class (持续伤害类)");

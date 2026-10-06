@@ -36,12 +36,12 @@ public class RemembranceTrailblazerTest {
             battle.castImmediate(tb.getSkills().get(SkillType.SKILL), tb, List.of(enemy));
 
             var mem = battle.memospriteOf(tb);
-            Assertions.assertNotNull(mem, "cid " + cid + ": 「召唤忆灵迷迷」");
+            Assertions.assertNotNull(mem, "cid " + cid + ": \"summons the memosprite Mem\" (「召唤忆灵迷迷」)");
             Assertions.assertEquals(130, mem.getAttribute(AttributeType.SPEED).get(), 1e-9,
-                    "cid " + cid + ": 「忆灵迷迷初始拥有130点速度」");
+                    "cid " + cid + ": \"the memosprite Mem starts with 130 SPD\" (「忆灵迷迷初始拥有130点速度」)");
             double expected = tb.getMaxHp() * 0.8 + 640;
             Assertions.assertEquals(expected, mem.getMaxHp(), expected * 0.02,
-                    "cid " + cid + ": 「等同于开拓者80%生命上限+640的生命上限」: expected " + expected + ", got " + mem.getMaxHp());
+                    "cid " + cid + ": 「等同于开拓者80%生命上限+640的生命上限」 (Max HP equal to 80% of the Trailblazer's Max HP + 640): expected " + expected + ", got " + mem.getMaxHp());
         }
     }
 
@@ -58,7 +58,7 @@ public class RemembranceTrailblazerTest {
         battle.castImmediate(tb.getSkills().get(SkillType.SKILL), tb, List.of(enemy));
         var second = battle.memospriteOf(tb);
 
-        Assertions.assertSame(first, second, "「若迷迷已在场」 -- the same memosprite, not a second one");
+        Assertions.assertSame(first, second, "「若迷迷已在场」 (if Mem is already on the field) -- the same memosprite, not a second one");
     }
 
     /** Census: the summon (Skill), the summon (Ultimate) and the level convention. */

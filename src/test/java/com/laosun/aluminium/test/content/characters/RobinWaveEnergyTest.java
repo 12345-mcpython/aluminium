@@ -31,9 +31,9 @@ public class RobinWaveEnergyTest {
         System.out.println("[robin-wave] with field=" + withField + " without=" + withoutField);
 
         Assertions.assertEquals(5.0, withField, EPS,
-                "「每个波次开始时知更鸟恢复 5 点能量」-- and the field is what makes it hers");
+                "「每个波次开始时知更鸟恢复 5 点能量」 (at the start of every wave Robin restores 5 Energy)-- and the field is what makes it hers");
         Assertions.assertEquals(0.0, withoutField, EPS,
-                "「领域展开期间进入战斗后」-- no field, no energy: this half is what makes the reading about the clause");
+                "「领域展开期间进入战斗后」 (after entering battle while the field is open)-- no field, no energy: this half is what makes the reading about the clause");
     }
 
     /** Her energy gain when a wave starts, with or without the technique's field. */

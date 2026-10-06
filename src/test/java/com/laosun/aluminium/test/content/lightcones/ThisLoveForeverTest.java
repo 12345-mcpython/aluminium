@@ -64,7 +64,7 @@ public class ThisLoveForeverTest {
         double after = wearableHit();
         System.out.println("[23052] blank=" + blank + " ; damage on the enemy " + before + " -> " + after
                 + " (x" + (after / before) + ")");
-        Assertions.assertEquals(1, blank, "对我方单体 gives 空白");
+        Assertions.assertEquals(1, blank, "a single ally (对我方单体) gives Blank (空白)");
         Assertions.assertEquals(1.1, after / before, 0.02, "and every enemy takes 10% more");
     }
 
@@ -78,7 +78,7 @@ public class ThisLoveForeverTest {
         double after = wearer.getAttribute(AttributeType.CRIT_ATTACK).get();
         System.out.println("[23052] poem=" + poem + " ; party crit damage " + before + " -> " + after
                 + " (allies: " + ally.getAttribute(AttributeType.CRIT_ATTACK).get() + ")");
-        Assertions.assertEquals(1, poem, "对敌方 gives 诗行");
+        Assertions.assertEquals(1, poem, "an enemy (对敌方) gives Verse (诗行)");
         Assertions.assertEquals(before + 0.16, after, 1e-9, "and the party crits 16% harder");
         Assertions.assertEquals(after, ally.getAttribute(AttributeType.CRIT_ATTACK).get(), 1e-9, "the ALLY too");
     }

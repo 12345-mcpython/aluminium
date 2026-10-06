@@ -41,7 +41,7 @@ public class MilitaryMeritDefenceIgnoreTest {
         battle.processRequests();
 
         Assertions.assertEquals(0.16, ally.getAttribute(AttributeType.DEFENCE_IGNORE).get(), 1e-9,
-                "持有【军功】的角色无视 16% 防御");
+                "\"a character holding Military Merit (【军功】) ignores 16% DEF\" (持有【军功】的角色无视 16% 防御)");
         Assertions.assertEquals(0.0, owner.getAttribute(AttributeType.DEFENCE_IGNORE).get(), 1e-9,
                 "and the caster keeps none of it (the false side)");
     }

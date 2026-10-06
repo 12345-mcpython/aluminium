@@ -66,9 +66,9 @@ public class SkyOdeSpendTest {
         System.out.println("[sky_spend] layers after basic = " + afterBasic + " ; after skill = " + afterSkill
                 + " ; after ultimate = " + afterUlt);
 
-        Assertions.assertEquals(3, afterBasic, "「战技/终结技」-- a BASIC is neither, so it must not spend");
-        Assertions.assertEquals(2, afterSkill, "战技 (slot 2) spends one");
-        Assertions.assertEquals(1, afterUlt, "终结技 (slot 3) spends another");
+        Assertions.assertEquals(3, afterBasic, "「战技/终结技」 (Skill/Ultimate)-- a BASIC is neither, so it must not spend");
+        Assertions.assertEquals(2, afterSkill, "Skill (战技) (slot 2) spends one");
+        Assertions.assertEquals(1, afterUlt, "Ultimate (终结技) (slot 3) spends another");
     }
 
     private static int cast(Battle battle, Character who, int slot) {

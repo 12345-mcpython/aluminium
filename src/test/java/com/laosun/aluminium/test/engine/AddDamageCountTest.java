@@ -58,6 +58,6 @@ public class AddDamageCountTest {
 
         Character owner = CharacterFactory.create(WEARER, 80);
         Assertions.assertDoesNotThrow(() -> owner.setTriggerTable(new TriggerTable(WEARER, List.of(rule))),
-                "「使反击造成的伤害值提高…」(1001) is exactly this shape and must keep working");
+                "「使反击造成的伤害值提高…」 (raises the damage a counterattack deals ...) (1001) is exactly this shape and must keep working");
     }
 }

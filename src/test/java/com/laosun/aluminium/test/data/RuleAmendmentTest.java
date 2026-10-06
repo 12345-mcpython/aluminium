@@ -179,7 +179,7 @@ public class RuleAmendmentTest {
         Assertions.assertEquals(2, counterFiringsWithHerFile(3),
                 "…and below Eidolon 4 the talent still fires twice");
         Assertions.assertTrue(freezeLandsWithHerFile(0.6),
-                "trace \"冰咒\" raises the ultimate's 0.5 to 0.65, so a 0.6 roll freezes");
+                "the \"Ice Spell\" (「冰咒」) trace raises the ultimate's 0.5 to 0.65, so a 0.6 roll freezes");
         Assertions.assertFalse(freezeLandsWithHerFile(0.7), "…and 0.7 does not");
     }
 

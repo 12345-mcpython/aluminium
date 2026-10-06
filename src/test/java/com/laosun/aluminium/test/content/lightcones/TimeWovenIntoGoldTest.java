@@ -84,7 +84,7 @@ public class TimeWovenIntoGoldTest {
         }
         int stacks = wearer.getBuffManager().stacksOf(BROCADE);
         System.out.println("[23036] brocade after nine attacks=" + stacks);
-        Assertions.assertEquals(CAP, stacks, "最多叠加 6 层");
+        Assertions.assertEquals(CAP, stacks, "at most 6 stacks (最多叠加 6 层)");
     }
 
     @Test

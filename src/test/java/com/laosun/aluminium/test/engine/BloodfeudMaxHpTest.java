@@ -47,15 +47,15 @@ public class BloodfeudMaxHpTest {
         double base = him.getMaxHp();
         SkillExecutor.execute(battle, ult, him, List.of(battle.enemies.getFirst()));
         battle.processRequests();
-        Assertions.assertTrue(him.getBuffManager().hasState(STATE), "precondition: 【血仇】 is on");
+        Assertions.assertTrue(him.getBuffManager().hasState(STATE), "precondition: 【血仇】 (Vendetta) is on");
         Assertions.assertEquals(base * 1.5, him.getMaxHp(), base * 0.01,
-                "「【血仇】状态下生命上限提高，数值等同于当前生命上限的 50%」");
+                "「【血仇】状态下生命上限提高，数值等同于当前生命上限的 50%」 (while in the Vendetta (【血仇】) state, Max HP is raised by an amount equal to 50% of the current Max HP)");
 
         // The paragraph's ONLY exit: the lethal blow. The raise must go with the state.
         battle.applyTrueDamage(battle.enemies.getFirst(), him, DamageElement.ICE, him.getCurrentHp() * 2.0);
         battle.processRequests();
         Assertions.assertFalse(him.getBuffManager().hasState(STATE), "precondition: the lethal blow ended it");
         Assertions.assertEquals(base, him.getMaxHp(), base * 0.01,
-                "「退出【血仇】状态」-- the extra Max HP leaves with it");
+                "「退出【血仇】状态」 (leaves the Vendetta state)-- the extra Max HP leaves with it");
     }
 }

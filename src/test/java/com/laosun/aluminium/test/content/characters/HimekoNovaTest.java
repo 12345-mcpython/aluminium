@@ -39,11 +39,11 @@ public class HimekoNovaTest {
         battle.fireTriggers(TriggerEvent.SKILL_CAST, himeko, enemy, 0, 0);
 
         Assertions.assertTrue(himeko.getBuffManager().hasState("领航旗语"),
-                "「姬子•启行获得【领航旗语】」");
+                "「姬子•启行获得【领航旗语】」 (Himeko - Nova gains Navigator's Semaphore (【领航旗语】))");
         Assertions.assertFalse(ally.getBuffManager().hasState("领航旗语"),
                 "the state is on HER, not on the party");
         Assertions.assertEquals(0.0, ally.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get() - allyBoostBefore, 1e-9,
-                "⚠ 「当姬子•启行拥有【领航旗语】时，我方全体造成的伤害提高20%」 is REGISTERED, not written: a permanent modifier would outlive the state");
+                "⚠ 「当姬子•启行拥有【领航旗语】时，我方全体造成的伤害提高20%」 (while Himeko - Nova has Navigator's Semaphore, all allies deal 20% more DMG) is REGISTERED, not written: a permanent modifier would outlive the state");
     }
 
     private static Random fixed() {

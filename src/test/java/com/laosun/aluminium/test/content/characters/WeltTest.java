@@ -35,7 +35,7 @@ public class WeltTest {
         f.battle.castImmediate(f.welt.getSkills().get(SkillType.ULTRA), f.welt, List.of(f.enemy));
 
         Assertions.assertTrue(f.enemy.getBuffManager().hasState("禁锢"),
-                "「有100%的基础概率使受到攻击的敌方目标陷入禁锢状态，持续1回合」");
+                "「有100%的基础概率使受到攻击的敌方目标陷入禁锢状态，持续1回合」 (a 100% base chance to put the attacked enemy target into the Imprisonment (禁锢) state for 1 turn)");
     }
 
     @Test
@@ -70,6 +70,6 @@ public class WeltTest {
 
         double loss = before - f.enemy.getCurrentHp();
         Assertions.assertTrue(loss > 0,
-                "「对指定敌方单体造成等同于维尔特#1[i]%攻击力的虚数伤害，并额外造成 2 次伤害」 — the skill must land: loss " + loss);
+                "「对指定敌方单体造成等同于维尔特#1[i]%攻击力的虚数伤害，并额外造成 2 次伤害」 (deals Imaginary damage to a designated single enemy equal to #1[i]% of Welt's ATK, and deals 2 extra instances of damage) — the skill must land: loss " + loss);
     }
 }

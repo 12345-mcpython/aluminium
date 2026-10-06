@@ -26,7 +26,7 @@ public class WorldOdeFireSeedTest {
     public void theOdeGivesHimSixFireSeed() {
         int with = seedAfterOde(true);
         int without = seedAfterOde(false);
-        System.out.println("[fire_seed] after the ode 【火种】 is " + with + " with the ode ; " + without + " without it");
+        System.out.println("[fire_seed] after the ode 【火种】 (Kindling) is " + with + " with the ode ; " + without + " without it");
         Assertions.assertEquals(6, with, "the data row's #8 is 6, granted when the ode is cast at him");
         Assertions.assertEquals(0, without, "without the ode nothing is granted");
     }

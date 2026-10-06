@@ -50,7 +50,7 @@ public class AlongThePassingShoreTest {
         boolean after = enemy.getBuffManager().hasState(BUBBLE);
         System.out.println("[23024] bubble before=" + before + " after a hit=" + after);
         Assertions.assertFalse(before, "nothing yet");
-        Assertions.assertTrue(after, "击中敌方目标时使敌方陷入【泡影】");
+        Assertions.assertTrue(after, "on hitting an enemy target, puts the enemy into Mirage Fizzle (【泡影】)");
     }
 
     @Test

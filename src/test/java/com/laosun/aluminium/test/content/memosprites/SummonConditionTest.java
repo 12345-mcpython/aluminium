@@ -332,7 +332,7 @@ public class SummonConditionTest {
         Battle battle = new Battle(List.of(wearer), List.of(dummy()), new Random(0));
         battle.startBattle();
         Summon evey = battle.memospriteOf(wearer);
-        Assertions.assertNotNull(evey, "precondition: 长夜月's own rule brought 「长夜」 out");
+        Assertions.assertNotNull(evey, "precondition: Evernight (长夜月)'s own rule brought Evey (「长夜」) out");
 
         TriggerTable table = RelicTriggerTables.of(HERO_OF_TRIUMPHANT_SONG).at(4);
         List<TriggerTable.CompiledRule> speedRules = table.matching(TriggerEvent.TURN_START,
@@ -342,7 +342,7 @@ public class SummonConditionTest {
         Assertions.assertEquals("SPEED", speed.getAttribute());
         Assertions.assertEquals(0.06, speed.getPercent(), EPS, "param #1");
         Assertions.assertEquals(1, speed.getTurns(),
-                "「在场时」 is a WHILE clause re-evaluated each turn, not `permanent`");
+                "「在场时」 (while on the field) is a WHILE clause re-evaluated each turn, not `permanent`");
 
         List<TriggerTable.CompiledRule> attackRules = table.matching(TriggerEvent.SUMMON_ATTACK,
                 new TriggerTable.TriggerContext(wearer, evey, null, 1, 0, null, battle));
@@ -355,8 +355,8 @@ public class SummonConditionTest {
         Assertions.assertEquals(0.3, onWearer.getPercent(), EPS, "param #2");
         Assertions.assertEquals(2, onWearer.getTurns(),
                 "param #3 is 2 — the registered reason said '3 turn(s)', read off the English sentence");
-        Assertions.assertNull(onWearer.getTarget(), "「装备者」 is the rule's owner: no target selector");
-        Assertions.assertEquals("summon", onSummon.getTarget(), "「忆灵」 is the second effect");
+        Assertions.assertNull(onWearer.getTarget(), "「装备者」 (the wearer) is the rule's owner: no target selector");
+        Assertions.assertEquals("summon", onSummon.getTarget(), "「忆灵」 (the memosprite) is the second effect");
     }
 
     /** Both units gain the CRIT DMG from a real attack, measured as a delta. */
@@ -366,7 +366,7 @@ public class SummonConditionTest {
         Battle battle = new Battle(List.of(wearer), List.of(dummy()), new Random(0));
         battle.startBattle();
         Summon evey = battle.memospriteOf(wearer);
-        Assertions.assertNotNull(evey, "precondition: 「长夜」 is out");
+        Assertions.assertNotNull(evey, "precondition: 「长夜」 (Evey) is out");
 
         double wearerBefore = critDamageOf(wearer);
         double summonBefore = critDamageOf(evey);
@@ -374,7 +374,7 @@ public class SummonConditionTest {
         letItAttack(battle, evey, List.of(battle.enemyUnits().getFirst()));
 
         Assertions.assertEquals(wearerBefore + 0.3, critDamageOf(wearer), EPS,
-                "「装备者和忆灵的暴击伤害提高 30%」 — the wearer's half");
+                "「装备者和忆灵的暴击伤害提高 30%」 (the wearer's and the memosprite's CRIT DMG is raised by 30%) — the wearer's half");
         Assertions.assertEquals(summonBefore + 0.3, critDamageOf(evey), EPS,
                 "…and the memosprite's half");
     }

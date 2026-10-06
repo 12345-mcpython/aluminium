@@ -51,7 +51,7 @@ public class TribbieZoneStateTest {
         System.out.println("[zone_state] right after the ultimate = " + afterUlt
                 + " ; after two of his turns = " + afterTwoTurns);
 
-        Assertions.assertTrue(afterUlt, "「开启【" + ZONE + "】」-- the state says the zone is open");
-        Assertions.assertFalse(afterTwoTurns, "「【" + ZONE + "】持续 #4 回合」-- #4 is 2 at every level, so it must end");
+        Assertions.assertTrue(afterUlt, "「开启【" + ZONE + "】」 (opens the zone) -- the state says the zone is open");
+        Assertions.assertFalse(afterTwoTurns, "「【" + ZONE + "】持续 #4 回合」 (lasts #4 turns) -- #4 is 2 at every level, so it must end");
     }
 }

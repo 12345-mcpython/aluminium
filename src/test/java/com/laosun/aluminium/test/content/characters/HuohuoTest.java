@@ -40,7 +40,7 @@ public class HuohuoTest {
 
         f.skill();
 
-        Assertions.assertTrue(f.huohuo.getBuffManager().hasState("禳命"), "「施放战技后藿藿获得【禳命】」");
+        Assertions.assertTrue(f.huohuo.getBuffManager().hasState("禳命"), "「施放战技后藿藿获得【禳命】」 (after casting the Skill, Huohuo gains Divine Provision (【禳命】))");
         Assertions.assertFalse(f.ally.getBuffManager().hasState("禳命"), "…and it is hers (「藿藿获得」), not the party's");
     }
 
@@ -56,13 +56,13 @@ public class HuohuoTest {
         f.ultimate();
 
         Assertions.assertTrue(f.ally.getAttribute(AttributeType.ATTACK).get() > allyBefore,
-                "「使其攻击力提高40.00%」 -- an ally is boosted");
+                "「使其攻击力提高40.00%」 (raises its ATK by 40.00%) -- an ally is boosted");
         Assertions.assertEquals(herBefore, f.huohuo.getAttribute(AttributeType.ATTACK).get(), 1e-6,
                 "⚠ 「**除自身以外**的队友」: she is not (boosting everyone would be the plausible-looking wrong reading)");
         Assertions.assertTrue(f.ally.getCurrentEnergy() > allyEnergyBefore,
-                "「为除自身以外的队友恢复等同于**各自**20.00%能量上限的能量」 -- a share of the ALLY's own maximum");
+                "「为除自身以外的队友恢复等同于**各自**20.00%能量上限的能量」 (restores Energy to allies other than herself equal to **each one's** 20.00% of their Energy ceiling) -- a share of the ALLY's own maximum");
         Assertions.assertEquals(herEnergyBefore, f.huohuo.getCurrentEnergy(), 1e-6,
-                "⚠ …and her own bar is untouched: 「除自身以外」 governs both halves");
+                "⚠ …and her own bar is untouched: 「除自身以外」 (other than herself) governs both halves");
     }
 
     /** The talent's trigger is gated on HER state, and both of its halves are on the rule. */
@@ -72,11 +72,11 @@ public class HuohuoTest {
         TriggerTable table = TriggerTables.of(HUOHUO);
 
         Assertions.assertTrue(table.matching(TriggerEvent.TURN_START, ctx(f, false)).isEmpty(),
-                "no 【禳命】 on her, no trigger");
+                "no 【禳命】 (Divine Provision) on her, no trigger");
 
         f.skill();
         Assertions.assertFalse(table.matching(TriggerEvent.TURN_START, ctx(f, true)).isEmpty(),
-                "with 【禳命】 up, a turn start matches");
+                "with 【禳命】 (Divine Provision) up, a turn start matches");
     }
 
     /** Census: the clauses are where the notes say they are. */

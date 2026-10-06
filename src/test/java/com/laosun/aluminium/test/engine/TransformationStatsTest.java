@@ -49,9 +49,9 @@ public class TransformationStatsTest {
         // block is measured against the BASE: 1 + 0.5 (trace) + 0.8 (transformation) = 2.3.
         double base = atk0 / 1.5;
         Assertions.assertEquals(base * 2.3, owner.getAttribute(AttributeType.ATTACK).get(), atk0 * 0.001,
-                "「变身期间攻击力提高 80%」 beside the trace's 50% (before=" + atk0 + ")");
+                "「变身期间攻击力提高 80%」 (during the transformation, ATK is raised by 80%) beside the trace's 50% (before=" + atk0 + ")");
         Assertions.assertEquals(hp0 * 3.7, owner.getAttribute(AttributeType.HEALTH).get(), hp0 * 0.001,
-                "「生命上限提高 270%」 (before=" + hp0 + ")");
+                "「生命上限提高 270%」 (Max HP raised by 270%) (before=" + hp0 + ")");
     }
 
     /** Note: Without the ultimate there is no transformation, so the block is not there either. */

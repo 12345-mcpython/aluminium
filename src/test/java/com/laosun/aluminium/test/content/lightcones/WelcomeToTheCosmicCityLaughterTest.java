@@ -87,7 +87,7 @@ public class WelcomeToTheCosmicCityLaughterTest {
         for (int i = 1; i <= CYCLE; i++) {
             normalAttack(battle);
             seen[i] = wearer.getBuffManager().stacksOf(COUNT);
-            System.out.println("[23057] normal attack " + i + " -> 普攻计数=" + seen[i]);
+            System.out.println("[23057] normal attack " + i + " -> Basic ATK (普攻) counter = " + seen[i]);
         }
         Assertions.assertEquals(0, seen[0], "nothing yet");
         Assertions.assertEquals(1, seen[1], "first normal attack counts");
@@ -107,7 +107,7 @@ public class WelcomeToTheCosmicCityLaughterTest {
     public void aNonNormalAttackDoesNotCount() {
         Battle battle = battle(true);
         battle.fireTriggers(TriggerEvent.ALLY_ATTACK, wearer, enemy, 1, 0, SkillCategory.BPSKILL);
-        System.out.println("[23057] a Skill used as an attack: 普攻计数="
+        System.out.println("[23057] a Skill used as an attack: Basic ATK (普攻) counter = "
                 + wearer.getBuffManager().stacksOf(COUNT));
         Assertions.assertEquals(0, wearer.getBuffManager().stacksOf(COUNT), "only basic attacks count");
     }

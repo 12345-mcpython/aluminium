@@ -70,7 +70,7 @@ public class AglaeaMemospriteTest {
         battle.fireTriggers(TriggerEvent.SKILL_CAST, aglaea, null, 0, 0);
 
         Assertions.assertEquals(before + tailor.getMaxHp() * 0.5, tailor.getCurrentHp(), EPS,
-                "「回复等同于其 50% 生命上限的生命值」");
+                "「回复等同于其 50% 生命上限的生命值」 (restores HP equal to 50% of its Max HP)");
         Assertions.assertEquals(1, battle.summonCountOf(aglaea), "…and no second one appeared");
     }
 
@@ -86,8 +86,8 @@ public class AglaeaMemospriteTest {
         battle.processRequests();
 
         Summon tailor = battle.memospriteOf(aglaea);
-        Assertions.assertNotNull(tailor, "「若衣匠不在场，则召唤忆灵衣匠」");
-        Assertions.assertEquals(0, timeRemaining(battle, aglaea), EPS, "「并使自身立即行动」");
+        Assertions.assertNotNull(tailor, "「若衣匠不在场，则召唤忆灵衣匠」 (if the Garmentmaker is not on the field, summons the memosprite Garmentmaker (忆灵衣匠))");
+        Assertions.assertEquals(0, timeRemaining(battle, aglaea), EPS, "「并使自身立即行动」 (and makes herself act immediately)");
         Assertions.assertTrue(timeRemaining(battle, tailor) > 0,
                 "the advance is HERS: the memosprite's own turn is untouched (it is not memosprite skill 3 (忆灵技能3))");
     }
@@ -125,8 +125,8 @@ public class AglaeaMemospriteTest {
         battle.fireTriggers(TriggerEvent.ULT_CAST, aglaea, null, 0, 0);
         battle.processRequests();
 
-        Assertions.assertEquals(1, battle.summonCountOf(aglaea), "「召唤忆灵衣匠」");
-        Assertions.assertEquals(0, timeRemaining(battle, aglaea), EPS, "「并使自身立即行动」");
+        Assertions.assertEquals(1, battle.summonCountOf(aglaea), "「召唤忆灵衣匠」 (summons the memosprite Garmentmaker (忆灵衣匠))");
+        Assertions.assertEquals(0, timeRemaining(battle, aglaea), EPS, "「并使自身立即行动」 (and makes herself act immediately)");
     }
 
     /**
@@ -150,7 +150,7 @@ public class AglaeaMemospriteTest {
 
         Assertions.assertEquals(1, battle.summonCountOf(aglaea), "no second memosprite");
         Assertions.assertSame(tailor, battle.memospriteOf(aglaea), "the same one");
-        Assertions.assertEquals(tailor.getMaxHp(), tailor.getCurrentHp(), EPS, "「回复至上限」");
+        Assertions.assertEquals(tailor.getMaxHp(), tailor.getCurrentHp(), EPS, "「回复至上限」 (restores HP to the maximum)");
         Assertions.assertEquals(0, timeRemaining(battle, aglaea), EPS, "…and she still acts immediately");
     }
 
@@ -191,7 +191,7 @@ public class AglaeaMemospriteTest {
         Assertions.assertEquals(List.of("SUMMON", "ADVANCE"), absent.getFirst().effects().stream()
                 .map(EffectSpec::getOp).toList());
         Assertions.assertEquals(1.0, absent.getFirst().effects().get(1).getPercent(), EPS);
-        Assertions.assertEquals("self", absent.getFirst().effects().get(1).getTarget(), "「使自身」");
+        Assertions.assertEquals("self", absent.getFirst().effects().get(1).getTarget(), "\"makes herself\" (「使自身」)");
 
         List<TriggerTable.CompiledRule> ultimate = TriggerTables.of(AGLAEA).matching(TriggerEvent.ULT_CAST,
                 new TriggerTable.TriggerContext(aglaea, aglaea, null, 0, 0, null, battle));
@@ -199,9 +199,9 @@ public class AglaeaMemospriteTest {
         Assertions.assertEquals(List.of("SUMMON", "HEAL", "APPLY_BUFF", "ADVANCE"),
                 ultimate.getFirst().effects().stream().map(EffectSpec::getOp).toList(),
                 "the order the sentence writes them -- SUMMON must come first (the other three aim at the summon, "
-                        + "and the stance is ANCHORED to it, which needs it to exist), and the stance 「阿格莱雅进入"
-                        + "【至高之姿】状态」 precedes 「并使自身立即行动」");
-        Assertions.assertEquals(1.0, ultimate.getFirst().effects().get(1).getPercent(), EPS, "回复至上限");
+                        + "and the stance is ANCHORED to it, which needs it to exist), and the stance \"Aglaea enters that stance\" (「阿格莱雅进入"
+                        + "【至高之姿】 (Supreme Stance)状态」) precedes \"and makes herself act immediately\" (「并使自身立即行动」)");
+        Assertions.assertEquals(1.0, ultimate.getFirst().effects().get(1).getPercent(), EPS, "restores HP to the maximum (回复至上限)");
     }
 
     // ==================================================================
@@ -233,7 +233,7 @@ public class AglaeaMemospriteTest {
 
         battle.fireTriggers(TriggerEvent.ULT_CAST, aglaea, null, 0, 0);
         battle.processRequests();
-        Assertions.assertTrue(aglaea.getBuffManager().hasState(STANCE), "「阿格莱雅进入【至高之姿】状态」");
+        Assertions.assertTrue(aglaea.getBuffManager().hasState(STANCE), "「阿格莱雅进入【至高之姿】状态」 (Aglaea enters the Supreme Stance (【至高之姿】) state)");
 
         battle.beforeMove();
         battle.afterMove();
@@ -245,7 +245,7 @@ public class AglaeaMemospriteTest {
         battle.processRequests();
         Assertions.assertTrue(tailor.isDeath(), "precondition: the memosprite is gone");
         Assertions.assertFalse(aglaea.getBuffManager().hasState(STANCE),
-                "「衣匠消失时阿格莱雅解除【至高之姿】状态」 -- the anchor's death takes it off");
+                "「衣匠消失时阿格莱雅解除【至高之姿】状态」 (Aglaea leaves the Supreme Stance state when the Garmentmaker disappears) -- the anchor's death takes it off");
     }
 
     // ==================================================================

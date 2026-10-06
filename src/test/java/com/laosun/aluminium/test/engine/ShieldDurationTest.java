@@ -164,14 +164,14 @@ public class ShieldDurationTest {
         // and the test would have been measuring the ordering instead of the condition.
         Fixture f = new Fixture(conditionRule("target has_shield"));
 
-        Assertions.assertEquals(0, fireCondition(f), "no shield yet: 「持有护盾的」 is false");
+        Assertions.assertEquals(0, fireCondition(f), "no shield yet: 「持有护盾的」 (one that holds a shield) is false");
 
         f.battle.grantShield(f.ally, 500);
         Assertions.assertEquals(1, fireCondition(f), "with a shield, the condition holds");
 
         f.ally.takeDamage(5000);
         Assertions.assertEquals(0, fireCondition(f),
-                "a shield that has been used up is gone -- otherwise 「持有护盾的」 would stay true forever");
+                "a shield that has been used up is gone -- otherwise 「持有护盾的」 (one that holds a shield) would stay true forever");
     }
 
     /** Its negation is the other half of the same question, and is read the same way. */
@@ -179,7 +179,7 @@ public class ShieldDurationTest {
     public void theNegatedConditionAsksTheOpposite() {
         Fixture f = new Fixture(conditionRule("!target has_shield"));
 
-        Assertions.assertEquals(1, fireCondition(f), "no shield: 「没有护盾的」 holds");
+        Assertions.assertEquals(1, fireCondition(f), "no shield: 「没有护盾的」 (one that has no shield) holds");
 
         f.battle.grantShield(f.ally, 500);
         Assertions.assertEquals(0, fireCondition(f), "and stops holding once one is up");

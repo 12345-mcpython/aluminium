@@ -47,11 +47,11 @@ public class TransformationScopedStatsTest {
         Assertions.assertTrue(owner.getBuffManager().hasState(STATE), "precondition: the transformation is on");
 
         Assertions.assertEquals(atk0 / 1.5 * 2.3, owner.getAttribute(AttributeType.ATTACK).get(), atk0 * 1e-9,
-                "「攻击力提高 80%」");
+                "\"ATK raised by 80%\" (「攻击力提高 80%」)");
         Assertions.assertEquals(hp0 * 3.7, owner.getAttribute(AttributeType.HEALTH).get(), hp0 * 1e-9,
-                "「生命上限提高 270%」");
+                "\"Max HP raised by 270%\" (「生命上限提高 270%」)");
         Assertions.assertEquals(pen0 + 0.20, owner.getAttribute(AttributeType.DAMAGE_PENETRATION).get(), EPS,
-                "「物理属性抗性穿透提高 20%」");
+                "\"Physical RES PEN raised by 20%\" (「物理属性抗性穿透提高 20%」)");
     }
 
     /** "During the transformation" means the block dies with the state. */
@@ -78,7 +78,7 @@ public class TransformationScopedStatsTest {
         // is the battle-start 50% plus the end 50%. What this reading is about is unchanged: the TRANSFORMATION's own
         // block is gone.
         Assertions.assertEquals(atk0 * (2.0 / 1.5), owner.getAttribute(AttributeType.ATTACK).get(), atk0 * 0.001,
-                "「变身期间」-- the transformation's block must be gone with the state");
+                "「变身期间」 (during the transformation)-- the transformation's block must be gone with the state");
         Assertions.assertEquals(pen0, owner.getAttribute(AttributeType.DAMAGE_PENETRATION).get(), EPS,
                 "and the RES PEN too");
     }

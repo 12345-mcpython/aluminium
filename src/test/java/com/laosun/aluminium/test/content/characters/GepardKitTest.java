@@ -51,7 +51,7 @@ public class GepardKitTest {
         f.battle.castImmediate(f.gepard.getSkills().get(SkillType.ULTRA), f.gepard, List.of(f.ally));
 
         Assertions.assertTrue(f.gepard.getShield() > 0,
-                "「为我方全体提供能够抵消…伤害的护盾」 — the caster is shielded too");
+                "「为我方全体提供能够抵消…伤害的护盾」 (provides all allies with a shield that absorbs ... damage) — the caster is shielded too");
         Assertions.assertTrue(f.ally.getShield() > 0,
                 "…and the aimed ally, so the rule is not written for `target` alone");
     }
@@ -65,7 +65,7 @@ public class GepardKitTest {
         f.battle.fireTriggers(TriggerEvent.TURN_START, f.gepard, f.gepard, 0, 0);
 
         Assertions.assertTrue(f.gepard.getAttribute(AttributeType.ATTACK).get() > before,
-                "「提高等同于自身当前防御力35%的攻击力，每回合开始时刷新」");
+                "「提高等同于自身当前防御力35%的攻击力，每回合开始时刷新」 (raises ATK by an amount equal to 35% of his current DEF, refreshed at the start of every turn)");
     }
 
     /** Census: the clauses are where the notes say they are. */
@@ -77,7 +77,7 @@ public class GepardKitTest {
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.TURN_START), "the trace, refreshed each turn");
         Assertions.assertEquals(7, table.ruleCount(TriggerEvent.BATTLE_START),
                 "the level convention, the four eidolon rules (E1/E3/E4/E5), the technique shield (round 180) and "
-                        + "the 刚正 trace's aggro ratio (2026-09-29)");
+                        + "the Integrity (刚正) trace's aggro ratio (2026-09-29)");
     }
 
     /**
@@ -99,7 +99,7 @@ public class GepardKitTest {
         battle.startBattle();
 
         Assertions.assertEquals(4.0, battle.aggroOf(gepard) / before, 1e-9,
-                "「傑帕德被敌方攻击的概率提高」 "
+                "\"Gepard is more likely to be attacked by enemies\" (「傑帕德被敌方攻击的概率提高」) "
                         + "-- ParamList [3] reads as weight x (1 + 3)");
         Assertions.assertTrue(battle.aggroOf(gepard) > battle.aggroOf(ally),
                 "and he now outweighs a plain ally, which is the whole point of the trace");

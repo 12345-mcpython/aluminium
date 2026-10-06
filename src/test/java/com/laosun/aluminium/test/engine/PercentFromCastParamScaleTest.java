@@ -79,7 +79,7 @@ public class PercentFromCastParamScaleTest {
                 + " ; expected = " + expected + " ; the gain = " + gained);
 
         Assertions.assertEquals(expected, gained, Math.abs(expected) * 1e-6,
-                "「提高数值等同于德谬歌生命上限的 #1%」-- the param TIMES the attribute");
+                "「提高数值等同于德谬歌生命上限的 #1%」 (raises by an amount equal to #1% of Demiurge's Max HP)-- the param TIMES the attribute");
     }
 
     /** Stating both shares is refused at load time rather than letting one silently win. */

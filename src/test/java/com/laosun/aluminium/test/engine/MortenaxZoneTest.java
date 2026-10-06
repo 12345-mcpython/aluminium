@@ -42,16 +42,16 @@ public class MortenaxZoneTest {
         battle.castImmediate(mortenax.getSkills().get(SkillType.ULTRA), mortenax, List.of(enemy));
 
         Assertions.assertEquals(baseWeight * 11.0, battle.aggroOf(mortenax), EPS,
-                "「被敌方攻击的概率提高」 -- the unclaimed 10 reads as x (1 + 10)");
+                "「被敌方攻击的概率提高」 (is more likely to be attacked by enemies) -- the unclaimed 10 reads as x (1 + 10)");
         Assertions.assertEquals(1, mortenax.getBuffManager().countBuffs(ReductionBuff.class),
-                "「自身受到的伤害降低50%」");
+                "\"DMG taken is reduced by 50%\" (「自身受到的伤害降低50%」)");
         Assertions.assertEquals(baseHeal * 1.5, battle.calculateHeal(ally, mortenax, 1000), EPS,
-                "「受到的治疗量提高50%」");
+                "\"healing received is raised by 50%\" (「受到的治疗量提高50%」)");
 
         battle.fireTriggers(TriggerEvent.COUNTDOWN_TURN, battle.countdownsOf(mortenax).getFirst(), mortenax, 0, 0);
 
         Assertions.assertEquals(baseWeight, battle.aggroOf(mortenax), EPS,
-                "「倒计时回合开始时结界解除」 -- the weight goes back");
+                "「倒计时回合开始时结界解除」 (the zone is removed when the countdown's turn starts) -- the weight goes back");
         Assertions.assertEquals(0, mortenax.getBuffManager().countBuffs(ReductionBuff.class),
                 "and the reduction comes off with it");
         Assertions.assertEquals(baseHeal, battle.calculateHeal(ally, mortenax, 1000), EPS,
@@ -73,12 +73,12 @@ public class MortenaxZoneTest {
         battle.castImmediate(withEidolon.getSkills().get(SkillType.ULTRA), withEidolon, List.of(enemy));
 
         Assertions.assertEquals(0.2, enemy.getAttribute(AttributeType.RESISTANCE_REDUCTION).get(), EPS,
-                "「结界持续期间，使敌方全体全属性抗性降低20%」");
+                "\"while the zone lasts, all enemies get 20% All-Type RES Reduction\" (「结界持续期间，使敌方全体全属性抗性降低20%」)");
 
         battle.fireTriggers(TriggerEvent.COUNTDOWN_TURN, battle.countdownsOf(withEidolon).getFirst(), withEidolon, 0, 0);
 
         Assertions.assertEquals(0.0, enemy.getAttribute(AttributeType.RESISTANCE_REDUCTION).get(), EPS,
-                "「倒计时回合开始时结界解除」 -- the reduction goes with the zone");
+                "「倒计时回合开始时结界解除」 (the zone is removed when the countdown's turn starts) -- the reduction goes with the zone");
 
         Character withoutEidolon = CharacterFactory.create(MORTENAX, LEVEL);
         Enemy plain = EnemyFactory.create(MONSTER, 90, 1);
@@ -88,6 +88,6 @@ public class MortenaxZoneTest {
         second.castImmediate(withoutEidolon.getSkills().get(SkillType.ULTRA), withoutEidolon, List.of(plain));
 
         Assertions.assertEquals(0.0, plain.getAttribute(AttributeType.RESISTANCE_REDUCTION).get(), EPS,
-                "星魂1 is the gate: without it the clause must not fire");
+                "Eidolon (星魂) 1 is the gate: without it the clause must not fire");
     }
 }

@@ -34,7 +34,7 @@ public class MozeTest {
         double reference = additionalLoss(false, true);
 
         Assertions.assertEquals(0.0, unmarked, 1e-9,
-                "「我方目标攻击【猎物】后」 -- without the mark, nothing");
+                "「我方目标攻击【猎物】后」 (after one of our targets attacks [猎物]) -- without the mark, nothing");
         Assertions.assertTrue(marked > 0, "with the mark, the additional damage lands");
         Assertions.assertEquals(0.5, marked / reference, 0.05,
                 "30% against a hand-built 60% reference: " + marked + " vs " + reference);

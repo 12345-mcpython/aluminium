@@ -33,13 +33,13 @@ public class RappaTest {
         Assertions.assertEquals(0, chargeOf(rappa), "the document states no initial value, so it starts at 0");
         battle.fireTriggers(TriggerEvent.BREAK, rappa, enemy, 0, 0);
         Assertions.assertEquals(1, chargeOf(rappa),
-                "「每当敌方目标的弱点被击破时，乱破获得1点充能」");
+                "「每当敌方目标的弱点被击破时，乱破获得1点充能」 (every time an enemy target's Weakness is Broken, Rappa gains 1 point of Charge)");
 
         for (int i = 0; i < 11; i++) {
             battle.fireTriggers(TriggerEvent.BREAK, rappa, enemy, 0, 0);
         }
         Assertions.assertEquals(10, chargeOf(rappa),
-                "「最多拥有10点充能」 -- twelve breaks must still read ten");
+                "「最多拥有10点充能」 (holds at most 10 points of Charge) -- twelve breaks must still read ten");
     }
 
     /** The declared resource's value, read through the combatant's own manager. */

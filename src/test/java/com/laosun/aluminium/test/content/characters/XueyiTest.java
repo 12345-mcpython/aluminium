@@ -33,7 +33,7 @@ public class XueyiTest {
         double reference = openingLoss(1);
         double undeclared = openingLoss(2);
 
-        Assertions.assertEquals(0.0, undeclared, 1e-9, "「使用秘技后」 -- undeclared, so nothing");
+        Assertions.assertEquals(0.0, undeclared, 1e-9, "「使用秘技后」 (after using the Technique) -- undeclared, so nothing");
         Assertions.assertTrue(reference > 0, "the reference must deal damage");
         Assertions.assertEquals(0.8 / 0.5, content / reference, 0.05,
                 "content " + content + " vs reference " + reference + " (expected " + (0.8 / 0.5) + ")");

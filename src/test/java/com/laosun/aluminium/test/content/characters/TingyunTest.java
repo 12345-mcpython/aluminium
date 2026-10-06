@@ -36,11 +36,11 @@ public class TingyunTest {
         f.battle.castImmediate(f.tingyun.getSkills().get(SkillType.SKILL), f.tingyun, List.of(f.ally));
 
         double after = f.ally.getAttribute(AttributeType.ATTACK).get();
-        Assertions.assertTrue(f.ally.getBuffManager().hasState("赐福"), "「为指定我方单体提供【赐福】」");
-        Assertions.assertTrue(after > before, "「使其攻击力提高50%」: " + before + " -> " + after);
+        Assertions.assertTrue(f.ally.getBuffManager().hasState("赐福"), "「为指定我方单体提供【赐福】」 (provides a designated single ally with [赐福])");
+        Assertions.assertTrue(after > before, "\"raises its ATK by 50%\" (「使其攻击力提高50%」): " + before + " -> " + after);
         double ceiling = f.tingyun.getAttribute(AttributeType.ATTACK).get() * 0.25;
         Assertions.assertTrue(after - before <= ceiling + 1e-6,
-                "「最高不超过停云当前攻击力的25%」 -- gain " + (after - before) + " vs ceiling " + ceiling);
+                "「最高不超过停云当前攻击力的25%」 (at most 25% of Tingyun's current ATK) -- gain " + (after - before) + " vs ceiling " + ceiling);
     }
 
     /** Note: The ultimate grants energy AND a two-turn damage boost to the chosen ally. */
@@ -53,9 +53,9 @@ public class TingyunTest {
         f.battle.castImmediate(f.tingyun.getSkills().get(SkillType.ULTRA), f.tingyun, List.of(f.ally));
 
         Assertions.assertTrue(f.ally.getCurrentEnergy() > energyBefore,
-                "「为指定我方单体恢复50点能量」: " + energyBefore + " -> " + f.ally.getCurrentEnergy());
+                "\"restores 50 Energy to a designated single ally\" (「为指定我方单体恢复50点能量」): " + energyBefore + " -> " + f.ally.getCurrentEnergy());
         Assertions.assertTrue(f.ally.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get() > boostBefore,
-                "「同时使目标造成的伤害提高50%，持续2回合」");
+                "「同时使目标造成的伤害提高50%，持续2回合」 (and raises the target's DMG dealt by 50% for 2 turns)");
     }
 
     /** Census: five rules of hers plus the level convention. */

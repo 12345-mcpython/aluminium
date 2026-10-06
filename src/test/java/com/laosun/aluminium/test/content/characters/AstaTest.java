@@ -37,7 +37,7 @@ public class AstaTest {
         battle.castImmediate(asta.getSkills().get(SkillType.ULTRA), asta, List.of(ally));
 
         Assertions.assertEquals(50.0, ally.getAttribute(AttributeType.SPEED).get() - before, 1e-6,
-                "「使我方全体速度提高50点」: before " + before + ", after " + ally.getAttribute(AttributeType.SPEED).get());
+                "「使我方全体速度提高50点」 (raises all allies' SPD by 50): before " + before + ", after " + ally.getAttribute(AttributeType.SPEED).get());
     }
 
     /** Note: The technique's 50%-ATK opening, and its control. */
@@ -50,14 +50,14 @@ public class AstaTest {
         double before = enemy.getCurrentHp();
         battle.startBattle();
         Assertions.assertTrue(before - enemy.getCurrentHp() > 0,
-                "「对敌方全体目标造成等同于艾丝妲50%攻击力的火属性伤害」");
+                "「对敌方全体目标造成等同于艾丝妲50%攻击力的火属性伤害」 (Fire damage to all enemies equal to 50% of Asta (艾丝妲)'s ATK)");
 
         Character plain = CharacterFactory.create(ASTA, LEVEL);
         Enemy enemy2 = EnemyFactory.create(MONSTER, 90, 1);
         Battle plainBattle = new Battle(List.of(plain), List.of(enemy2), fixed());
         double untouched = enemy2.getCurrentHp();
         plainBattle.startBattle();
-        Assertions.assertEquals(untouched, enemy2.getCurrentHp(), 1e-9, "「使用秘技后」 -- undeclared, so nothing");
+        Assertions.assertEquals(untouched, enemy2.getCurrentHp(), 1e-9, "「使用秘技后」 (after using the Technique) -- undeclared, so nothing");
     }
 
     private static Random fixed() {

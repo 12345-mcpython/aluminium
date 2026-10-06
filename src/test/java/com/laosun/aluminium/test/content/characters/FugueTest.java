@@ -37,11 +37,11 @@ public class FugueTest {
         battle.castImmediate(fugue.getSkills().get(SkillType.SKILL), fugue, List.of(ally));
 
         Assertions.assertTrue(ally.getBuffManager().hasState("狐祈"),
-                "「使指定我方单体获得【狐祈】」");
+                "「使指定我方单体获得【狐祈】」 (grants a designated single ally [狐祈])");
         Assertions.assertTrue(fugue.getBuffManager().hasState("炽灼"),
-                "「并使自身进入【炽灼】状态」 -- on HERSELF");
+                "「并使自身进入【炽灼】状态」 (and puts herself into the Torrid Scorch state) -- on HERSELF");
         Assertions.assertEquals(0.3, ally.getAttribute(AttributeType.BREAKING_EFFECT).get() - before, 1e-6,
-                "「持有【狐祈】的我方目标，击破特攻提高30%」");
+                "「持有【狐祈】的我方目标，击破特攻提高30%」 (an ally holding [狐祈] gets 30% more Break Effect)");
     }
 
     /** Note: The reaction: the mark is on the ATTACKER, and the shredded enemy is the one attacked. */
@@ -51,9 +51,9 @@ public class FugueTest {
         double marked = defenceLoss(true);
 
         Assertions.assertEquals(0.0, unmarked, 1e-9,
-                "「持有【狐祈】的我方目标每次施放攻击时」 -- unmarked, nothing");
+                "「持有【狐祈】的我方目标每次施放攻击时」 (every time an ally holding [狐祈] casts an attack) -- unmarked, nothing");
         Assertions.assertEquals(0.18, marked, 1e-6,
-                "「使受到攻击的敌方目标防御力降低18%」 of the enemy's own defence");
+                "「使受到攻击的敌方目标防御力降低18%」 (lowers the attacked enemy target's DEF by 18%) of the enemy's own defence");
     }
 
     /** Note: The technique advances her by 40%: round 216's recipe says the remaining wait becomes 0.6 of what it was. */
@@ -75,7 +75,7 @@ public class FugueTest {
         double untouched = remaining(plainBattle, plain);
 
         Assertions.assertEquals(0.6, after / untouched, 0.02,
-                "「进入战斗后忘归人行动提前40%」: " + untouched + " -> " + after);
+                "「进入战斗后忘归人行动提前40%」 (after entering battle, Fugue (忘归人) advances her action by 40%): " + untouched + " -> " + after);
     }
 
     /** The enemy's defence drop after one attack by an ally, marked or not. */

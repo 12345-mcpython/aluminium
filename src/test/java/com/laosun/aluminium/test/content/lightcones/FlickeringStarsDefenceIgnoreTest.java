@@ -86,6 +86,6 @@ public class FlickeringStarsDefenceIgnoreTest {
         Assertions.assertEquals(expected, wearerAfter, Math.abs(expected) * 1e-6,
                 "the wearer's own hits ignore 20% -- the zone reads the ATTACKER's attribute");
         Assertions.assertEquals(wearerNone * (zoneIgnore / zoneNone), allyAfter, Math.abs(wearerAfter) * 1e-6,
-                "and so do the ally's -- the panel covers 我方全体");
+                "and so do the ally's -- the panel covers all allies (我方全体)");
     }
 }

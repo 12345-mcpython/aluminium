@@ -79,7 +79,7 @@ public class SwordplayTest {
         }
         int stacks = first.getBuffManager().stacksOf(MARK);
         System.out.println("[21010] after eight hits: stacks=" + stacks);
-        Assertions.assertEquals(5, stacks, "最多叠加 5 层");
+        Assertions.assertEquals(5, stacks, "at most 5 stacks (最多叠加 5 层)");
     }
 
     @Test

@@ -37,7 +37,7 @@ public class BloodfeudTest {
 
         chargeToAHundred(battle, him);
         Assertions.assertTrue(him.getBuffManager().hasState(STATE),
-                "\"when charge reaches 100, consume 100 points of charge to enter the [血仇] state\"");
+                "\"when charge reaches 100, consume 100 points of charge to enter the [血仇] (Vendetta) state\"");
 
         battle.applyTrueDamage(battle.enemies.getFirst(), him, DamageElement.ICE, him.getCurrentHp() * 2.0);
         battle.processRequests();
@@ -45,7 +45,7 @@ public class BloodfeudTest {
         Assertions.assertFalse(him.isDeath(), "\"will not enter the unable-to-fight state\"");
         Assertions.assertEquals(him.getMaxHp() * 0.50, him.getCurrentHp(), him.getMaxHp() * 0.01,
                 "\"restore HP equal to 50% of one's own Max HP\"");
-        Assertions.assertFalse(him.getBuffManager().hasState(STATE), "\"leave the [血仇] state\"");
+        Assertions.assertFalse(him.getBuffManager().hasState(STATE), "\"leave the [血仇] (Vendetta) state\"");
         Assertions.assertEquals(0.0, him.getResources().value(CHARGE), 1e-9, "\"clear the charge\"");
     }
 
@@ -57,11 +57,11 @@ public class BloodfeudTest {
                 List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
         battle.startBattle();
         battle.processRequests();
-        Assertions.assertFalse(him.getBuffManager().hasState(STATE), "precondition: no [血仇] yet");
+        Assertions.assertFalse(him.getBuffManager().hasState(STATE), "precondition: no [血仇] (Vendetta) yet");
 
         battle.applyTrueDamage(battle.enemies.getFirst(), him, DamageElement.ICE, him.getCurrentHp() * 2.0);
         battle.processRequests();
-        Assertions.assertTrue(him.isDeath(), "only while in the [血仇] state does this clause exist");
+        Assertions.assertTrue(him.isDeath(), "only while in the [血仇] (Vendetta) state does this clause exist");
     }
 
     // ==================================================================

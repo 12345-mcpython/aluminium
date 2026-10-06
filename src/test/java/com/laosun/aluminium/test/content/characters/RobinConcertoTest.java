@@ -57,7 +57,7 @@ public class RobinConcertoTest {
                 "ULT_CAST arrives at the tables once per cast (an event count -- it does NOT count the rules that match)");
         battle.fireTriggers(TriggerEvent.TURN_START, injector, robin, 0, 0);
         Assertions.assertFalse(robin.getBuffManager().hasState("冻结"),
-                "「处于【协奏】状态时，知更鸟免疫控制类负面状态」");
+                "「处于【协奏】状态时，知更鸟免疫控制类负面状态」 (while in the Concerto (【协奏】) state, Robin is immune to Crowd Control debuffs)");
 
         battle.fireTriggers(TriggerEvent.COUNTDOWN_TURN, battle.countdownsOf(robin).getFirst(), robin, 0, 0);
 

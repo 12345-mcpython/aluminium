@@ -53,8 +53,8 @@ public class EvanesciaTest {
         battle.startBattle();
         int elationValue = elation.getResources().value("欢愉度");
         int gifts = elation.getResources().value("好活当赏");
-        System.out.println("[1505] crit damage=" + critDamage + " -> 欢愉度 (Elation)=" + elationValue
-                + " (half is " + Math.round(critDamage * 0.5) + ") ; 好活当赏 (gifts)=" + gifts);
+        System.out.println("[1505] crit damage=" + critDamage + " -> Elation (欢愉度)=" + elationValue
+                + " (half is " + Math.round(critDamage * 0.5) + ") ; Certified Banger gifts (好活当赏)=" + gifts);
         Assertions.assertEquals((int) Math.round(critDamage * 0.5), elationValue,
                 "the talent sets the Elation value to half the crit-damage panel");
         Assertions.assertEquals(20, gifts, "and the technique grants 20 gifts at battle start");
@@ -71,7 +71,7 @@ public class EvanesciaTest {
         battle.startBattle();
         double critDamage = elation.getAttribute(AttributeType.CRIT_ATTACK).get();
         int elationValue = elation.getResources().value("欢愉度");
-        System.out.println("[1505] with a raised panel: crit damage=" + critDamage + " -> 欢愉度 (Elation)="
+        System.out.println("[1505] with a raised panel: crit damage=" + critDamage + " -> Elation (欢愉度)="
                 + elationValue + " (half is " + Math.round(critDamage * 0.5) + ")");
         Assertions.assertTrue(critDamage >= 1.4, "the panel really moved (it reads " + critDamage + ")");
         Assertions.assertEquals((int) Math.round(critDamage * 0.5), elationValue,

@@ -36,8 +36,8 @@ public class CyreneFutureSpendTest {
         boolean still = battle.characters.get(1).getBuffManager().hasState(FUTURE);
         double after = battle.characters.get(0).getResources().has(MEMORY)
                 ? battle.characters.get(0).getResources().value(MEMORY) : 0;
-        System.out.println("[future_spend] after the ally acts: 【未来】 still on it = " + still
-                + " ; 昔涟's 【追忆】 " + before + " -> " + after);
+        System.out.println("[future_spend] after the ally acts: 【未来】 (the Future) still on it = " + still
+                + " ; Cyrene (昔涟)'s Recollection (【追忆】) " + before + " -> " + after);
         Assertions.assertFalse(still, "acting consumes it");
         Assertions.assertEquals(before + 1, after, 1e-9, "and she is credited one point");
     }

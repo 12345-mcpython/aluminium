@@ -86,7 +86,7 @@ public class PlanetaryRendezvousTest {
         build(true);
         double boosted = dealtBy(wearer, mine);
         System.out.println("[21011] the wearer’s own hit: " + plain + " -> " + boosted + " (x" + (boosted / plain) + ")");
-        Assertions.assertEquals(1.12, boosted / plain, 0.01, "我方目标 includes the wearer");
+        Assertions.assertEquals(1.12, boosted / plain, 0.01, "our target (我方目标) includes the wearer");
     }
 
     @Test

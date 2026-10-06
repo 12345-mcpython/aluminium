@@ -37,9 +37,9 @@ public class CoupDeMainTest {
         double without = damageDealt(false);
         Assertions.assertTrue(without > 0, "precondition: the control deals damage (" + without + ")");
         Assertions.assertTrue(withCoup > without * 1.5,
-                "「复制一次…提前施放，随后施放原技能」 (with=" + withCoup + ", without=" + without + ")");
+                "「复制一次…提前施放，随后施放原技能」 (copies it once ... casts it in advance, then casts the original Skill) (with=" + withCoup + ", without=" + without + ")");
         Assertions.assertTrue(withCoup < without * 2.5,
-                "「奇袭不会再次触发奇袭」 -- two casts, not a chain (with=" + withCoup + ", without=" + without + ")");
+                "「奇袭不会再次触发奇袭」 (a Coup de Main does not trigger another Coup de Main) -- two casts, not a chain (with=" + withCoup + ", without=" + without + ")");
     }
 
     /** After the coup, she pays six Charge and the peerage reverts to the merit. */
@@ -66,13 +66,13 @@ public class CoupDeMainTest {
         battle.processRequests();
 
         Assertions.assertEquals(charge - 6 + 2, owner.getResources().value(CHARGE), 1e-9,
-                "「消耗 6 点充能」—— ❗ 而两次施放（复制 + 原技能）"
-                        + "各给她 +1 点（【军功】那条：「施放普攻或战技时使刻律德菈获得 1 点充能」）"
-                        + "，所以净变化是 -4 ✓ (before=" + charge + ")");
+                "\"consumes 6 points of Charge\" (「消耗 6 点充能」)—— ❗ and two casts (the copy + the original Skill)"
+                        + "+1 point each (the Military Merit (【军功】) clause: \"when casting a Basic ATK or Skill, Cerydra gains 1 point of Charge\" (「施放普攻或战技时使刻律德菈获得 1 点充能」))"
+                        + ", so the net change is -4 ✓ (before=" + charge + ")");
         Assertions.assertFalse(ally.getBuffManager().hasState(PEERAGE),
-                "「使【爵位】变回【军功】」");
+                "\"turns Peerage (【爵位】) back into Military Merit (【军功】)\" (「使【爵位】变回【军功】」)");
         Assertions.assertTrue(ally.getBuffManager().hasState(MERIT),
-                "“变回【军功】” -- the merit is still there");
+                "\"turns back into Military Merit (【军功】)\" (「变回【军功】」) -- the merit is still there");
     }
 
     private static double damageDealt(boolean keepPeerage) {

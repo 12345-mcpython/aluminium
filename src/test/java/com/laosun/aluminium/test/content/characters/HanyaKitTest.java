@@ -48,12 +48,12 @@ public class HanyaKitTest {
         f.castUltimateOn(f.ally);
 
         Assertions.assertEquals(allySpeedBefore + 0.2 * herSpeed, f.ally.getAttribute(AttributeType.SPEED).get(), 1.0,
-                "「提高数值等同于寒鸦速度的20%」: a derived share of HER panel, not a percentage of the ally's speed");
+                "「提高数值等同于寒鸦速度的20%」 (raises by an amount equal to 20% of Hanya's SPD): a derived share of HER panel, not a percentage of the ally's speed");
         Assertions.assertTrue(f.ally.getAttribute(AttributeType.ATTACK).get() > allyAttackBefore, "…plus a flat 60% ATK");
         Assertions.assertTrue(f.ally.getBuffManager().hasState("敕令"),
-                "and the effect is also a STATE, which is the only way Eidolon 1's 「持有终结技效果的我方目标」 is readable");
+                "and the effect is also a STATE, which is the only way Eidolon 1's 「持有终结技效果的我方目标」 (an ally holding the Ultimate's effect) is readable");
         Assertions.assertEquals(herAttackBefore, f.hanya.getAttribute(AttributeType.ATTACK).get(), EPS,
-                "「指定我方单体」: a self-cast is not a target (target != self)");
+                "「指定我方单体」 (a designated single ally): a self-cast is not a target (target != self)");
     }
 
     /** Eidolon 1: the ally who carries her ultimate gets a kill to she advances; once per turn. */
@@ -67,12 +67,12 @@ public class HanyaKitTest {
 
         double after = remainingWait(f, f.hanya);
         Assertions.assertTrue(after < before,
-                "「持有终结技效果的我方目标消灭敌方目标时，寒鸦行动提前15%」 (" + before + " -> " + after + ")");
+                "\"when an ally holding the Ultimate's effect kills an enemy target, Hanya advances her action by 15%\" (「持有终结技效果的我方目标消灭敌方目标时，寒鸦行动提前15%」) (" + before + " -> " + after + ")");
 
         double afterFirst = after;
         f.allyKills();
         Assertions.assertEquals(afterFirst, remainingWait(f, f.hanya), 1.0,
-                "「该效果每回合只能触发1次」: per_turn: 1");
+                "「该效果每回合只能触发1次」 (this effect can only trigger once per turn): per_turn: 1");
     }
 
     /**
@@ -90,7 +90,7 @@ public class HanyaKitTest {
         f.allyKills();
 
         Assertions.assertEquals(before, remainingWait(f, f.hanya), 1.0,
-                "the ally never received the decree state (敕令), so 「持有终结技效果的我方目标消灭敌方目标时」 does not apply");
+                "the ally never received the decree state (敕令), so 「持有终结技效果的我方目标消灭敌方目标时」 (when an ally holding the Ultimate's effect kills an enemy target) does not apply");
     }
 
     /** Eidolon 2: her own Skill raises her speed for a turn. */
@@ -102,20 +102,20 @@ public class HanyaKitTest {
         f.castSkill();
 
         Assertions.assertTrue(f.hanya.getAttribute(AttributeType.SPEED).get() > before,
-                "「施放战技后，速度提高20%，持续1回合」");
+                "「施放战技后，速度提高20%，持续1回合」 (after casting the Skill, SPD is raised by 20% for 1 turn)");
     }
 
     /** Eidolon 3 / 5: the level raises, and the talent's base level composes with them. */
     @Test
     public void herEidolonLevelRaisesAreStated() {
         Fixture atThree = new Fixture(3);
-        Assertions.assertEquals(2, atThree.hanya.skillLevelBonus(SkillType.SKILL), "Eidolon 3 「战技等级+2」");
-        Assertions.assertEquals(1, atThree.hanya.skillLevelBonus(SkillType.COMMON), "…「普攻等级+1」");
+        Assertions.assertEquals(2, atThree.hanya.skillLevelBonus(SkillType.SKILL), "Eidolon 3 「战技等级+2」 (Skill Lv. +2)");
+        Assertions.assertEquals(1, atThree.hanya.skillLevelBonus(SkillType.COMMON), "…\"Basic ATK Lv. +1\" (「普攻等级+1」)");
 
         Fixture atFive = new Fixture(5);
-        Assertions.assertEquals(2, atFive.hanya.skillLevelBonus(SkillType.ULTRA), "Eidolon 5 「终结技等级+2」");
+        Assertions.assertEquals(2, atFive.hanya.skillLevelBonus(SkillType.ULTRA), "Eidolon 5 「终结技等级+2」 (Ultimate Lv. +2)");
         Assertions.assertEquals(11, atFive.hanya.skillLevelBonus(SkillType.TALENT),
-                "…「天赋等级+2」 on top of the +9 base level the file states (10 + 2)");
+                "…「天赋等级+2」 (Talent Lv. +2) on top of the +9 base level the file states (10 + 2)");
     }
 
     // ==================================================================

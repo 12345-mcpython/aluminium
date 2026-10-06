@@ -76,7 +76,7 @@ public class WaveMonsterAimTest {
                 + " of them (speeds " + speeds + ")");
 
         Assertions.assertEquals(1, boosted.size(),
-                "「对新入场的敌方目标施放」-- a commanded cast names ONE aim, so exactly one enemy carries the boost");
+                "「对新入场的敌方目标施放」 (cast on a newly entered enemy target)-- a commanded cast names ONE aim, so exactly one enemy carries the boost");
         Assertions.assertSame(battle.waveMonsters().getFirst(), boosted.getFirst(),
                 "and it is the wave's own first arrival, not some other enemy");
     }

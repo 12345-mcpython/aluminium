@@ -43,7 +43,7 @@ public class HertaTheTest {
         double boosted = herta.getAttribute(AttributeType.ATTACK).get();
         double base = herta.getAttribute(AttributeType.ATTACK).baseValue();
         Assertions.assertEquals(base * 0.6, boosted - untouched, base * 0.6 * 0.02,
-                "「攻击力提高60%」 of the BASE: base " + base + ", gain " + (boosted - untouched));
+                "「攻击力提高60%」 (ATK raised by 60%) of the BASE: base " + base + ", gain " + (boosted - untouched));
     }
 
     /** Note: The ultimate's own effects: +80% ATK, a full advance, and one Inspiration stack. */
@@ -58,17 +58,17 @@ public class HertaTheTest {
         battle.castImmediate(herta.getSkills().get(com.laosun.aluminium.enums.SkillType.ULTRA), herta, List.of(enemy));
 
         Assertions.assertTrue(herta.getAttribute(AttributeType.ATTACK).get() > before,
-                "「使大黑塔攻击力提高80%，持续3回合」");
+                "「使大黑塔攻击力提高80%，持续3回合」 (raises The Herta's ATK by 80% for 3 turns)");
         // ADD_STACK makes a stack, not a named state: it is read with stacksOf, the same API 8003's Magma Will uses.
         Assertions.assertEquals(1, herta.getBuffManager().stacksOf("灵感"),
-                "「获得1层【灵感】」");
+                "「获得1层【灵感】」 (gains 1 stack of [灵感])");
 
         // Note: The document's cap: five more ultimates must stop at 4, not keep counting (this is what makes the cap testable at all).
         for (int i = 0; i < 5; i++) {
             battle.fireTriggers(TriggerEvent.ULT_CAST, herta, herta, 0, 0);
         }
         Assertions.assertEquals(4, herta.getBuffManager().stacksOf("灵感"),
-                "「【灵感】最多持有4层」");
+                "「【灵感】最多持有4层」 ([灵感] can be held up to 4 stacks)");
     }
 
     /** Census: the technique, the ultimate and the convention. */

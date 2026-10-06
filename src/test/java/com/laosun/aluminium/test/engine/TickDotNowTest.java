@@ -44,7 +44,7 @@ public class TickDotNowTest {
 
         Assertions.assertTrue(full > 0, "precondition: the DOT deals damage");
         Assertions.assertEquals(full * 0.85, extra, 1e-6,
-                "「立即产生 1 次相当于原伤害 85% 的伤害」 -- a share of the state's own damage, through the same settlement");
+                "「立即产生 1 次相当于原伤害 85% 的伤害」 (immediately deals 1 instance of damage equal to 85% of the original damage) -- a share of the state's own damage, through the same settlement");
     }
 
     /** Note: It is damage, not ageing: the state keeps its remaining turns. */

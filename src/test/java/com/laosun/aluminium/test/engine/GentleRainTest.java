@@ -48,7 +48,7 @@ public class GentleRainTest {
         Result with = run(true, true, false);
         Result without = run(false, true, false);
         Assertions.assertEquals(0.06 * with.baseSpeed, with.speed - without.speed, EPSILON,
-                "one rule covers both healers, because `actor is_ally` includes the 忆灵 (memosprite): "
+                "one rule covers both healers, because `actor is_ally` includes the memosprite (忆灵): "
                         + without.speed + " -> " + with.speed);
     }
 

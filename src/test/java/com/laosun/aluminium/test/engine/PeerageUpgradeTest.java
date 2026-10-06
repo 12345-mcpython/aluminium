@@ -46,16 +46,16 @@ public class PeerageUpgradeTest {
             cerydra.getSkills().get(SkillType.SKILL).execute(battle, cerydra, List.of(ally));
             battle.processRequests();
         }
-        Assertions.assertTrue(ally.getBuffManager().hasState(MERIT), "precondition: the ally carries [军功]");
+        Assertions.assertTrue(ally.getBuffManager().hasState(MERIT), "precondition: the ally carries [军功] (Military Merit)");
         Assertions.assertFalse(ally.getBuffManager().hasState(PEERAGE),
-                "five charges is below the threshold, so no [爵位] yet");
+                "five charges is below the threshold, so no [爵位] (Peerage) yet");
 
         cerydra.getSkills().get(SkillType.SKILL).execute(battle, cerydra, List.of(ally));
         battle.processRequests();
 
         Assertions.assertTrue(ally.getBuffManager().hasState(PEERAGE),
-                "the sixth charge upgrades [军功] to [爵位]");
+                "the sixth charge upgrades [军功] (Military Merit) to [爵位] (Peerage)");
         Assertions.assertTrue(ally.getBuffManager().hasState(MERIT),
-                "and [爵位] COUNTS AS [军功], so both are on (the rule adds, it does not replace)");
+                "and [爵位] (Peerage) COUNTS AS [军功] (Military Merit), so both are on (the rule adds, it does not replace)");
     }
 }

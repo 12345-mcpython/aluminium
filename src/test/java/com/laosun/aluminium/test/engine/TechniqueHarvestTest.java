@@ -36,14 +36,14 @@ public class TechniqueHarvestTest {
 
         double boosted = withTechnique.getAttribute(AttributeType.ATTACK).get();
         Assertions.assertTrue(boosted > untouched,
-                "「使用秘技后，下一次战斗开始时丹恒攻击力提高40%」: "
+                "\"after using the Technique, Dan Heng's ATK is raised by 40% at the start of the next battle\" (「使用秘技后，下一次战斗开始时丹恒攻击力提高40%」): "
                         + untouched + " -> " + boosted);
         // Measured: the gain is 40% of the BASE attack (the engine's `add_percent` convention), not of the current total - 645.212 -> 864.002
         // is a gain of 218.36 = 0.4 x 546.84. `baseValue()` reads the base, so the claim is stated in the engine's own terms.
         double base = withTechnique.getAttribute(AttributeType.ATTACK).baseValue();
         double expectedGain = base * 0.4;
         Assertions.assertEquals(expectedGain, boosted - untouched, expectedGain * 0.02,
-                "「攻击力提高40%」 of the BASE: base " + base + " -> expected gain " + expectedGain
+                "「攻击力提高40%」 (ATK raised by 40%) of the BASE: base " + base + " -> expected gain " + expectedGain
                         + ", actual gain " + (boosted - untouched));
     }
 
@@ -57,7 +57,7 @@ public class TechniqueHarvestTest {
         battle.startBattle();
 
         Assertions.assertEquals(before, plain.getAttribute(AttributeType.ATTACK).get(), 1e-9,
-                "「使用秘技后」 -- without the technique nothing happens");
+                "「使用秘技后」 (after using the Technique) -- without the technique nothing happens");
     }
 
     private static Random fixed() {

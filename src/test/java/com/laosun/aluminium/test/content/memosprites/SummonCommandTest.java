@@ -288,7 +288,7 @@ public class SummonCommandTest {
 
         battle.fireTriggers(TriggerEvent.ULT_CAST, owner, null, 0, 0);
 
-        Assertions.assertEquals(1, battle.summonCountOf(owner), "「召唤忆灵「长夜」」 came first");
+        Assertions.assertEquals(1, battle.summonCountOf(owner), "「召唤忆灵「长夜」」 (summons the memosprite Evey) came first");
         Assertions.assertTrue(first.getCurrentHp() < firstBefore, "…and then the command hit the enemies");
         Assertions.assertTrue(second.getCurrentHp() < secondBefore, "every one of them");
     }
@@ -485,7 +485,7 @@ public class SummonCommandTest {
         battle.castImmediate(new DefaultSkill(OWNER, 3, 1), owner, List.of(enemy));
 
         Assertions.assertEquals(210, enemy.getStance(), EPS,
-                "\"make the memosprite '长夜' deal ... Ice damage to all enemies\" -- exactly the 90 of 141303's own stance_list, once");
+                "\"make the memosprite Evey (长夜) deal ... Ice damage to all enemies\" -- exactly the 90 of 141303's own stance_list, once");
     }
 
     private static Enemy otherDummy() {
