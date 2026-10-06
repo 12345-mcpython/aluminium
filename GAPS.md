@@ -2092,3 +2092,32 @@ has been loaded yet”，第 60 行定义 `ELATION("elation", true, false)`（**
 ⇒ ⭐ 这就是真正的任务清单；做完一次解开真珠的**欢榆技兼现端、形态 A 的 60%、星魂 6 的 240%**，
 以及**其它欢榆角色**。与它不同的是本襯先前登记的“取不到攻击者元素”——
 那一条仍然成立，但是**最后一步**而不是第一步。
+
+### ❓ 疑问（2026-10-02，五个实验为证）：`from_category ElationDamage` 到底匹配什么
+
+⭐ 真珠的四条欢榆技档位规则写着
+`["actor == self", "from_category ElationDamage", "allies_with_path:欢愉 >= N"]`，动作是
+`APPLY_BUFF{渲染理性，解构欢榆, 目标全体}`。⭐ 五个实验全部读到**零个承载者**：
+
+| 实验 | 做法 | 读数 |
+|---|---|---|
+| 1 | 直接 `fireTriggers(CAST_SETUP, pearl, pearl, 0, 0, SkillCategory.ELATION_DAMAGE)` | 空 |
+| 2 | 寿命 `until: "next_attack"` → `turns: 2` | 空 |
+| 3 | 去掉 `target_when` | 空 |
+| 4 | 目标由 `all_allies` → `self` | 空 |
+| 5 | **真实施放**：`castImmediate(getSkills().get(SkillType.ELATION_SKILL), ...)` | 空 |
+| （附） | 寿命 `permanent: true` | 空 |
+
+⭐ 排除掉的：寿命写法、`target_when`、目标选择器、施放路径。
+⭐ 已单独证实可用的条件：`actor == self`（多处绿色判据）与
+`allies_with_path:欢愉 >= N`（`AlliesWithPathTest` 绿色，且建议队伍下会触发）。
+⇒ ⭐ **唯一没被证实能匹配的条件就是 `from_category ElationDamage`**。
+
+⚠ 但这只是**怀疑**，不是证据：我没找到任何**确实匹配成功**的例子。
+⭐ 而同一个词还装在：四张出货光锥（21064 / 21066 / 23058 / 23064）与 `1513` 的
+`elation_spend_all_fervor` 上 —— 若它不匹配，那些也一律不会触发。
+
+⭐ 最小的下一步：读 `from_category` 的**解析与比较代码**（它把 DSL 的 `ElationDamage`
+拿去和什么比：`SkillCategory` 枚举本身、它的 `name` 字段、还是技能数据的
+`attack_type`），并用一个**已知能匹配**的类别（如 `BPSkill` → `BPSKILL`）做对照实验。
+那一步能同时判定：这四条规则、四张光锥、以及 1513 那条，到底是不是死的。
