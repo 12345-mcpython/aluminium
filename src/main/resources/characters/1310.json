@@ -92,5 +92,17 @@
     ],
     "source": "1310 流萤 秘技: 「每个波次开始时为敌方全体添加火属性弱点，持续 2 回合。」",
     "note": "⭐ 弱点植入的**波次那半已出货** ✓（2026-09-30 ✓）：⚠ 原登记写 **弱点植入 ✗ ＋ 按波次 ✗** ✓ ⇒ ⚠ 现在两者都有 ✓ —— ⚠ `WAVE_START` ✓（⚠ `23059` 的注记用过它 ✓）＋ ⚠ `ADD_ELEMENTAL_WEAKNESS` ＋ ⚠ `element: Fire` ＋ ⚠ `target: all_enemies` ✗。⛔ **仍登记的是时长** ✗：⚠ 文档写 **持续 2 回合** ✗，⚠ 而 `Enemy.stanceWeak` 是**无寿命的集合** ✓ ⇒ ⚠ 加上的弱点不会自己消失 ✓（⚠ 差异已写明 ✓）。⚠ 本条**只写秘技那一句** ✓；⚠ 强化普攻与强化战技里的**火弱点** ⚠ 各自要自己的事件与目标 ✗ ⇒ ⚠ 仍登记 ✓。⚠ 引擎与判据：⚠ `Enemy.addWeakness` ✓／`ADD_ELEMENTAL_WEAKNESS` ✓／`WeaknessOpTest` ✓。\n\n⭐ 2026-09-30 更新：「持续 2 回合」现在可写了 ✓ —— 弱点可以过期（95ff510，按**目标自己的回合**递减）。"
+  },
+  {
+    "id": "talent_energy_floor_at_battle_start",
+    "on": "BATTLE_START",
+    "do": [
+      {
+        "op": "RAISE_ENERGY_TO",
+        "percent": 0.5,
+        "target": "self"
+      }
+    ],
+    "source": "talent 131004: \"at the start of battle, if energy is below #2, restore it to #2\" (tbgd ParamList #2 = 0.5 at every level). The same talent's third clause, the dispel at full energy, is talent_dispel_when_energy_full."
   }
 ]
