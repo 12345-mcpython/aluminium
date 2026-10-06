@@ -1836,3 +1836,30 @@ checkResult();
 ⭐ 修正：**11 处**（四个条件 加 引文）一次改完，全量立刷绿。
 ⭐ 教训：目前的命途名是**中文**（`丰饶 / 同谐 / 存护 / 巡猎 / 智识 / 欢愉 / 毁灭 / 虚无 / 记忆`），
 而我的脚本里写码位时没核对字形 —— 下次宁可从报文里直接拷贝那九个名字。
+
+## 欢榆度属性（2026-10-02）：⭐⭐ **它早就存在** —— 我先前的结论是错的
+
+### ⭐ 实测：全链路都在
+
+| 位置 | 内容 |
+|---|---|
+| `AttributeType:105` | `@SerializedName("elation_damage_boost") ELATION_DAMAGE_BOOST("elation_damage_boost")` |
+| `AttributeType:288` | 数据列映射：`Map.entry("ElationDamageAddedRatioBase", ELATION_DAMAGE_BOOST)` |
+| `TriggerInterpreter:5022` | `base * (1 + attacker.getAttribute(ELATION_DAMAGE_BOOST).get())` |
+| `SkillExecutor:642` | 同一个应用点，且注释里**带实测**（“with `ELATION_DAMAGE_BOOST` at 0.8 …”） |
+
+### ⚠ 我为什么误判了它缺失
+
+⭐ 我扫 `AttributeType` 时用的正则是 `^\s*([A-Z][A-Z0-9_]*)\(`，而该枚举的条目**以 `@SerializedName(…)`开头**，
+类名在行尾——所以整个枚举扫出 `count=0`。⭐ 我当时**注意到了这个不合理的 0**，却只回头查了一半，
+并把“没有 ELATION 属性”当成结论告诉了用户。⭐ 教训：**扫描结果为 0 时，先质疑扫描本身**。
+
+### ✅ 因此落地的只是内容：真珠星魂 1 的三档
+
+⭐ 三条递增阈值（同结算技的写法）：
+`allies_with_path:欢愉 >= 2/3/4` → `MODIFY_ATTR{ELATION_DAMAGE_BOOST}` 0.10/0.20/0.60，`target: all_allies`，`permanent: true`，`min_eidolon: 1`。
+
+### ⚠ 仍缺一个判据（本轮撤回了草稿）
+
+⭐ 草稿用 `pearl.setEidolon(1)`，而真名是 **`Character.Builder.eidolonRank(int)`**（`Character:373`），
+且测试里已有 `EidolonGateTest` 的辅助可借用。⭐ 下一步：照 `EidolonGateTest` 的写法把判据补上（“1 个欢榆时为 0、2 个时 0.10、4 个时 0.60”是现成的双向断言）。
