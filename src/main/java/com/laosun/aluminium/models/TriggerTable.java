@@ -935,6 +935,21 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
     static final String SELF_ATTR_PREFIX = "self_attr:";
 
     /**
+     * The prefix of a parameterised numeric variable counting OUR side: {@code allies_with_path:<PATH>} -
+     * "how many characters of that Path are on my team".
+     *
+     * <p><b>Why it was needed.</b> The Elation characters scale their own kits by how many Elation characters
+     * stand with them: 1503 Pearl's Ultimate advances its target by 10%/15%/30% at 1/2/3 such allies and grants
+     * an extra turn at 4, her Eidolon 1 raises the team's Elation by 10%/20%/60% at 2/3/4, and her Elation skill
+     * adds 10%/15%/20%/40% damage at 1/2/3/4. The DSL could ask whether ONE unit has a Path ({@code has_path})
+     * but not how many do, so none of those tiers could be written.
+     *
+     * <p>The Path name is validated with the same {@code requirePath} the {@code has_path} keyword uses, so a
+     * typo is refused at load time rather than counting zero.
+     */
+    static final String ALLIES_WITH_PATH_PREFIX = "allies_with_path:";
+
+    /**
      * The effect-side spelling for "how many targets <b>this cast really applied</b> that state to"
      * ("终结技每冻结1个目标，为三月七恢复6点能量") - {@code "scale": "cast_applied:冻结"}.
      *
@@ -1696,7 +1711,7 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
                     left.startsWith(ACTOR_STACKS_PREFIX), operator, 0, false, right,
                     selfAttributeOf(right, raw, spec), selfResourceOf(right, raw, spec),
                     stacksNameOf(right, raw, spec), right.startsWith(TARGET_STACKS_PREFIX),
-                    right.startsWith(ACTOR_STACKS_PREFIX));
+                    right.startsWith(ACTOR_STACKS_PREFIX), pathOf(left, raw, spec), pathOf(right, raw, spec));
         } else {
             throw new IllegalArgumentException(
                     "Condition '" + raw + "' has no numeric literal on either side (source: "
@@ -1705,7 +1720,8 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
         if (!NUMERIC_VARIABLES.contains(variable) && !variable.startsWith(SELF_ATTR_PREFIX)
                 && !variable.startsWith(SELF_RESOURCE_PREFIX) && !variable.startsWith(SELF_STACKS_PREFIX)
                 && !variable.startsWith(TARGET_STACKS_PREFIX) && !variable.startsWith(ACTOR_STACKS_PREFIX)
-                && !variable.startsWith(SUMMON_RESOURCE_PREFIX)) {
+                && !variable.startsWith(SUMMON_RESOURCE_PREFIX)
+                && !variable.startsWith(ALLIES_WITH_PATH_PREFIX)) {
             throw new IllegalArgumentException(
                     "Condition '" + raw + "' compares unknown variable '" + variable
                             + "'; known numeric variables: " + String.join(", ", knownNumericVariables())
@@ -1721,7 +1737,8 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
                 selfResourceOf(variable, raw, spec),
                 onActor ? variable.substring(ACTOR_STACKS_PREFIX.length()).trim()
                         : stacksNameOf(variable, raw, spec),
-                variable.startsWith(TARGET_STACKS_PREFIX), onActor, operator, literal, literalOnLeft);
+                variable.startsWith(TARGET_STACKS_PREFIX), onActor, operator, literal, literalOnLeft, null, null,
+                null, null, false, false, pathOf(variable, raw, spec), null);
     }
 
     /**
@@ -1743,6 +1760,26 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
      * @param spec     the owning rule, for the source
      * @return the attribute, or {@code null} when the variable is a plain numeric name
      */
+    /**
+     * The Path an {@code allies_with_path:<PATH>} variable names, or {@code null} for every other variable.
+     *
+     * <p>The name is checked by the same {@code requirePath} that {@code has_path} uses, so an unknown Path is a
+     * load-time error rather than a silent count of zero.
+     */
+    private static String pathOf(String variable, String raw, TriggerSpec spec) {
+        if (!variable.startsWith(ALLIES_WITH_PATH_PREFIX)) {
+            return null;
+        }
+        String name = variable.substring(ALLIES_WITH_PATH_PREFIX.length()).trim();
+        if (name.isEmpty()) {
+            throw new IllegalArgumentException(
+                    "Condition '" + raw + "' writes \"" + ALLIES_WITH_PATH_PREFIX + "\" with no Path after it; "
+                            + "give one, e.g. \"allies_with_path:elation >= 2\" (source: " + spec.getSource() + ")");
+        }
+        requirePath(name, raw, spec);
+        return name;
+    }
+
     private static AttributeType selfAttributeOf(String variable, String raw, TriggerSpec spec) {
         if (!variable.startsWith(SELF_ATTR_PREFIX)) {
             return null;
@@ -2045,7 +2082,8 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
         String name = token == null ? "" : token.trim();
         return NUMERIC_VARIABLES.contains(name) || name.startsWith(SELF_ATTR_PREFIX)
                 || name.startsWith(SELF_RESOURCE_PREFIX) || name.startsWith(SELF_STACKS_PREFIX)
-                || name.startsWith(TARGET_STACKS_PREFIX) || name.startsWith(ACTOR_STACKS_PREFIX);
+                || name.startsWith(TARGET_STACKS_PREFIX) || name.startsWith(ACTOR_STACKS_PREFIX)
+                || name.startsWith(ALLIES_WITH_PATH_PREFIX);
     }
 
     private static boolean isNumeric(String token) {
@@ -3501,6 +3539,10 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
         private final String otherVariable;
         private final AttributeType otherAttribute;
         private final String otherResource;
+        /** The Path an {@code allies_with_path:<PATH>} variable counts, or {@code null}. */
+        private final String path;
+        /** The same for the right-hand variable of a two-variable comparison. */
+        private final String otherPath;
         private final String otherStacksName;
         private final boolean otherStacksOnTarget;
         private final boolean otherStacksOnActor;
@@ -3508,13 +3550,13 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
         Numeric(String variable, AttributeType attribute, String resource, String stacksName, boolean stacksOnTarget,
                 boolean stacksOnActor, String operator, double literal, boolean literalOnLeft) {
             this(variable, attribute, resource, stacksName, stacksOnTarget, stacksOnActor, operator, literal,
-                    literalOnLeft, null, null, null, null, false, false);
+                    literalOnLeft, null, null, null, null, false, false, null, null);
         }
 
         Numeric(String variable, AttributeType attribute, String resource, String stacksName, boolean stacksOnTarget,
                 boolean stacksOnActor, String operator, double literal, boolean literalOnLeft, String otherVariable,
                 AttributeType otherAttribute, String otherResource, String otherStacksName, boolean otherStacksOnTarget,
-                boolean otherStacksOnActor) {
+                boolean otherStacksOnActor, String path, String otherPath) {
             this.variable = variable;
             this.attribute = attribute;
             this.resource = resource;
@@ -3530,6 +3572,8 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
             this.otherStacksName = otherStacksName;
             this.otherStacksOnTarget = otherStacksOnTarget;
             this.otherStacksOnActor = otherStacksOnActor;
+            this.path = path;
+            this.otherPath = otherPath;
         }
 
         @Override
@@ -3538,8 +3582,10 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
             double left;
             double right;
             if (otherVariable != null) {
-                double other = value(ctx, otherVariable, otherAttribute, otherResource, otherStacksName,
-                        otherStacksOnTarget, otherStacksOnActor);
+                double other = otherPath != null
+                        ? pathCount(ctx, otherPath)
+                        : value(ctx, otherVariable, otherAttribute, otherResource, otherStacksName,
+                                otherStacksOnTarget, otherStacksOnActor);
                 left = literalOnLeft ? other : value;
                 right = literalOnLeft ? value : other;
             } else {
@@ -3569,7 +3615,26 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
          * {@code *_PERCENT} keys but must not become an NPE inside a battle if it ever does.
          */
         private double numericValue(TriggerContext ctx) {
-            return value(ctx, variable, attribute, resource, stacksName, stacksOnTarget, stacksOnActor);
+            return path != null
+                    ? pathCount(ctx, path)
+                    : value(ctx, variable, attribute, resource, stacksName, stacksOnTarget, stacksOnActor);
+        }
+
+        /**
+         * How many characters on OUR side have the named Path.
+         *
+         * <p>{@code NaN} when there is no battlefield to read, the same convention every other variable follows:
+         * a comparison against NaN is false, so the condition fails rather than counting zero and passing.
+         */
+        private static double pathCount(TriggerContext ctx, String pathName) {
+            if (ctx.battle() == null || pathName == null) {
+                return Double.NaN;
+            }
+            com.laosun.aluminium.enums.Path want = com.laosun.aluminium.enums.Path.fromName(pathName);
+            return ctx.battle().allies.stream()
+                    .filter(unit -> unit instanceof com.laosun.aluminium.models.Character character
+                            && character.getPath() == want)
+                    .count();
         }
 
         /** One reader for every numeric variable, so a comparison can read two of them. */
