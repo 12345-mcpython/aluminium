@@ -511,7 +511,7 @@ public final class TriggerInterpreter {
                     if ("original_damage".equals(literalScale)) {
                         requireEvent(spec, op, TriggerEvent.DAMAGE_SETTLED);
                         requirePercent(effect, op, spec);
-                        requireElement(effect, op, spec);
+                        requireElement(effect, op, spec, true);
                     } else {
                         boolean maxHpShare = "owner_max_hp".equals(literalScale) || "target_max_hp".equals(literalScale)
                 || "actor_max_hp".equals(literalScale);
@@ -520,7 +520,7 @@ public final class TriggerInterpreter {
                         } else {
                             requireDerivedScale(effect, op, spec, false);
                         }
-                        requireElement(effect, op, spec);
+                        requireElement(effect, op, spec, true);
                     }
                 } else {
                     requireSkill(effect, op, spec);
@@ -666,7 +666,7 @@ public final class TriggerInterpreter {
             }
             case "TICK_DOT" -> {
                 // "make its currently suffered bleed state immediately produce 1 instance of damage equal to 85% of the original damage": which state, and what share of it.
-                requireElement(effect, op, spec);
+                requireElement(effect, op, spec, false);
                 requirePercent(effect, op, spec);
                 requireNonZeroPercent(effect, op, spec);
                 requireNoStackArguments(effect, op, spec);
@@ -763,7 +763,7 @@ public final class TriggerInterpreter {
                 // "make the target enter the burn state, dealing damage equal to ... each turn": a damage-over-time attached by a rule. The
                 // element is the engine's own spelling (Fire to burn), the magnitude is either flat or derived
                 // from the RULE OWNER's attribute, and it is frozen into the buff when it lands.
-                requireElement(effect, op, spec);
+                requireElement(effect, op, spec, false);
                 requireDotMagnitude(effect, op, spec);
         // "at most no more than 338% of Luka (卢卡)'s ATK": a derived ceiling -- the magnitude is the SMALLER of the two values.
         if (effect.getCapScale() != null || effect.getCapPercent() != null) {
@@ -5050,9 +5050,7 @@ public final class TriggerInterpreter {
         // engine's one true-damage entry: it sets `.trueDamage()`, which `toValue()` honours by skipping the zones.
         // Readers (2): 800 Trailblazer (开拓者)'s [迷迷的声援] (28%) and 1415 Cyrene (昔涟)'s zone (24%), both "true damage equal to X% of the original damage".
         if (damageType == DamageType.TRUE) {
-            battle.applyTrueDamage(attacker, victim, skill == null
-                            ? DamageElement.fromString(effect.getElement().trim())
-                            : elementOf(effect, skill),
+            battle.applyTrueDamage(attacker, victim, elementOf(effect, skill, attacker),
                     settledBase);
             return;
         }
@@ -5060,15 +5058,11 @@ public final class TriggerInterpreter {
               // An ORDINARY instance: the public `applyDamage` settles it as the main instance of a hit, so the
               // victim is credited energy and the instance is an attack -- exactly what "deal Physical damage equal to ..." means, and what the
               // additional-damage path (KILL_ONLY, not-an-attack) could not express.
-              battle.applyDamage(victim, new Damage(attacker, victim, skill == null
-                              ? DamageElement.fromString(effect.getElement().trim())
-                              : elementOf(effect, skill),
+              battle.applyDamage(victim, new Damage(attacker, victim, elementOf(effect, skill, attacker),
                       damageType == null ? DamageType.NORMAL : damageType, settledBase));
               return;
           }
-                      battle.applyAdditionalDamage(attacker, victim, skill == null
-                            ? DamageElement.fromString(effect.getElement().trim())
-                            : elementOf(effect, skill), settledBase,
+                      battle.applyAdditionalDamage(attacker, victim, elementOf(effect, skill, attacker), settledBase,
                     effect.getCritRate(), effect.getCritDamage(), damageType,
                     // The rule may state that this instance is a "follow-up attack": `applyAdditionalDamage` fires FOLLOW_UP without a
                     // category, so the instance has to carry it for a listener to be able to ask.
@@ -5099,11 +5093,30 @@ public final class TriggerInterpreter {
      * the skill's element there would have produced an element-less instance - and one that silently takes no element
      * bonus or resistance.
      */
-    private static DamageElement elementOf(EffectSpec effect, Skill skill) {
+    /**
+     * The reserved word the damage ops accept in their {@code element} slot: "the element of the unit that
+     * PRODUCED this instance", rather than a fixed word.
+     *
+     * <p>It exists for Pearl (1503): her Elation skill arms every ally to deal "Elation DMG of their own Type"
+     * on their next attack, so one rule has to name an element that differs per attacker. A rider that belongs
+     * to a single unit (1505, 1513) can simply name its element, which is why this is new.
+     *
+     * <p>Only the damage ops accept it. {@code APPLY_DOT} / {@code APPLY_CONTROL} share {@code requireElement}
+     * and refuse it: "the attacker's element" has no meaning for a DOT a rule applies on its own behalf.
+     */
+    static final String ATTACKER_ELEMENT = "attacker";
+
+    private static DamageElement elementOf(EffectSpec effect, Skill skill, CanHit attacker) {
         if (effect.getElement() != null && !effect.getElement().isBlank()) {
-            return DamageElement.fromString(effect.getElement().trim());
+            String named = effect.getElement().trim();
+            if (ATTACKER_ELEMENT.equalsIgnoreCase(named)) {
+                // `getElement()` lives on Character, not on CanHit: a summon's element comes from its
+                // master, and the loose test would have to guess it, so a non-character answers null.
+                return attacker instanceof Character character ? character.getElement() : null;
+            }
+            return DamageElement.fromString(named);
         }
-        return skill.getData().getElement();
+        return skill == null ? null : skill.getData().getElement();
     }
 
     private static double multiplierOf(Skill skill, EffectSpec effect, CanHit attacker) {
@@ -5275,7 +5288,7 @@ public final class TriggerInterpreter {
             }
             return;
         }
-        requireElement(effect, op, spec);
+        requireElement(effect, op, spec, false);
         requireDotMagnitude(effect, op, spec);
     }
 
@@ -5285,7 +5298,19 @@ public final class TriggerInterpreter {
      * <p>An unknown name would otherwise become a DOT that applies to nothing - {@code DamageElement.fromString}
      * answers {@code null} for "Unknown" and for typos alike, so the check has to be here.
      */
-    private static void requireElement(EffectSpec effect, String op, TriggerSpec spec) {
+    /**
+     * Validates an {@code element} slot against {@link DamageElement}.
+     *
+     * <p>{@link #ATTACKER_ELEMENT} is accepted only when the caller says so: the damage ops pass
+     * {@code true} because they always have an attacker to read, while {@code APPLY_DOT} /
+     * {@code APPLY_CONTROL} pass {@code false} -- their instance is the rule's own, so "the attacker's element"
+     * is a sentence with no subject.
+     */
+    private static void requireElement(EffectSpec effect, String op, TriggerSpec spec, boolean allowAttackerElement) {
+        if (allowAttackerElement && effect.getElement() != null
+                && ATTACKER_ELEMENT.equalsIgnoreCase(effect.getElement().trim())) {
+            return;
+        }
         if (effect.getElement() == null || effect.getElement().isBlank()) {
             throw new IllegalArgumentException(
                     "Op " + op + " requires \"element\" (which damage element the per-turn damage deals, e.g. "
