@@ -2360,6 +2360,37 @@ public final class TriggerInterpreter {
     }
 
 
+    /**
+     * The state named by a {@code holder_attr:<STATE>:<ATTRIBUTE>} scale.
+     *
+     * <p>The split is on the <b>last</b> colon, not the first: a state name may itself contain one
+     * ({@code holder_attr:渲染理性，解构欢愉:DEFENCE} is a real state name of 1503's), so splitting on the first
+     * colon would read the attribute out of the middle of the state and the state as a truncated prefix.
+     *
+     * @param effect the effect whose scale is being read
+     * @return the state name (never blank; the loader refuses a blank one)
+     */
+    private static String holderAttrState(EffectSpec effect) {
+        String raw = effect.getScale() == null ? "" : effect.getScale().trim();
+        String rest = raw.substring(TriggerTable.HOLDER_ATTR_PREFIX.length());
+        int lastColon = rest.lastIndexOf(':');
+        if (lastColon < 0) {
+            throw new IllegalStateException(
+                    "the scale \"" + raw + "\" must state <STATE>:<ATTRIBUTE>, e.g. holder_attr:同袍:DEFENCE; the "
+                            + "state name alone does not say which of the holder's stats to read");
+        }
+        return rest.substring(0, lastColon).trim();
+    }
+
+    /** The attribute named by a {@code holder_attr:<STATE>:<ATTRIBUTE>} scale (the part after the last colon). */
+    private static AttributeType holderAttrAttribute(EffectSpec effect) {
+        String raw = effect.getScale() == null ? "" : effect.getScale().trim();
+        String rest = raw.substring(TriggerTable.HOLDER_ATTR_PREFIX.length());
+        int lastColon = rest.lastIndexOf(':');
+        String name = (lastColon < 0 ? rest : rest.substring(lastColon + 1)).trim();
+        return AttributeType.fromString(name);
+    }
+
     private static List<CanHit> holderOf(Battle battle, String rawSelector, TriggerContext ctx) {
         String raw = rawSelector.trim();
         String state = raw.substring(HOLDER_OF_PREFIX.length()).trim();
@@ -2368,12 +2399,34 @@ public final class TriggerInterpreter {
                     "Effect targets \"" + raw + "\" but this rule was evaluated without a battlefield, so the "
                             + "units that could hold 【" + state + "】 cannot be listed");
         }
-        for (CanHit ally : battle.getSideOf(ctx.owner())) {
+        CanHit holder = holderOfOrNull(battle, state, ctx.owner());
+        return holder == null ? List.of() : List.of(holder);
+    }
+
+    /**
+     * The single unit on {@code querier}'s side carrying the state, or {@code null} when nobody does.
+     *
+     * <p>The one place "who holds it" is answered, shared by the {@code holder_of:<STATE>} target selector (where
+     * "nobody" is a legal state of the world and the caller turns it into an empty list or a loud miss) and by the
+     * {@code holder_attr:<STATE>:<ATTRIBUTE>} scale (where "nobody" cannot be turned into a number at all, so the
+     * caller throws). The DEAD are skipped - a corpse holding a marker is not the unit the sentence is about.
+     * First match wins, in the side's own order, so the answer is stable.
+     *
+     * @param battle  the battlefield, or {@code null} (then nobody can be found)
+     * @param state   the state name
+     * @param querier the unit whose SIDE is searched
+     * @return the holder, or {@code null}
+     */
+    private static CanHit holderOfOrNull(Battle battle, String state, CanHit querier) {
+        if (battle == null || querier == null || state == null) {
+            return null;
+        }
+        for (CanHit ally : battle.getSideOf(querier)) {
             if (ally != null && !ally.isDeath() && ally.getBuffManager().hasState(state)) {
-                return List.of(ally);
+                return ally;
             }
         }
-        return List.of();
+        return null;
     }
 
     private static String normalizeOp(EffectSpec effect, TriggerSpec spec) {
@@ -2850,6 +2903,21 @@ public final class TriggerInterpreter {
         if (effect.getScale().trim().startsWith(TriggerTable.SKILL_PARAM_PREFIX)) {
             return shareOf(effect, ctx) * ownerSkillParamValue(effect, ctx) + (effect.getAmount() == null ? 0 : effect.getAmount());
         }
+        if (effect.getScale().trim().startsWith(TriggerTable.HOLDER_ATTR_PREFIX)) {
+            // The state-holder's own attribute (1503: "该次欢愉伤害使用【美学底本】的属性值计算"). Resolved through
+            // `holderOfOrNull`, the SAME lookup the `holder_of:<STATE>` target selector uses, so "who holds it" has
+            // one answer whichever side of the sentence asks. Like the memosprite branch below, a subject that is not
+            // on the field is an ERROR rather than a zero: a share of a unit that is not there is not a number.
+            CanHit holder = holderOfOrNull(ctx.battle(), holderAttrState(effect), owner);
+            if (holder == null) {
+                throw new IllegalStateException("the scale \"" + effect.getScale()
+                        + "\" reads the attribute of the unit holding 【" + holderAttrState(effect) + "】, but nobody on "
+                        + owner.getName() + "'s side holds it, so there is no unit to read "
+                        + holderAttrAttribute(effect) + " from");
+            }
+            return shareOf(effect, ctx) * holder.getAttribute(holderAttrAttribute(effect)).get()
+                    + (effect.getAmount() == null ? 0 : effect.getAmount());
+        }
         if (effect.getScale().trim().startsWith(TriggerTable.SUMMON_ATTR_PREFIX)) {
             // The owner's MEMOSPRITE (1415 memosprite skill 10). Resolved through `Battle.summonOf`, the same accessor the `summon`
             // target selector reads, and before the attribute branch because the subject here is not the owner.
@@ -2921,7 +2989,12 @@ public final class TriggerInterpreter {
         // `party_resource:<name>` joins this list: like EVENT_AMOUNT it is a magnitude the op can read
         // but not an AttributeType, so the question "which attribute does this scale name" has no answer for it.
         if (SELF_MAX_ENERGY.equals(raw) || EVENT_AMOUNT.equals(raw) || raw.startsWith(ABOVE_PREFIX)
-                || raw.startsWith("party_resource:") || "elation_base".equals(raw)) {
+                || raw.startsWith("party_resource:") || raw.startsWith(TriggerTable.HOLDER_ATTR_PREFIX)
+                || "elation_base".equals(raw)) {
+            // `holder_attr:` joins them for the same reason `summon_attr:`/`actor_attr:` are not here: it names a
+            // SUBJECT, and the magnitude is read from that subject's attribute by its own branch of
+            // `derivedMagnitude`/`literalBase`. (Those two leave this method through the early return below as
+            // well, by never reaching it.)
             // `elation_base` joins them: it is the Elation damage base from Constant's loaded level table
             // (ROADMAP:1262's `基础值 × 欢愉倍率`), a magnitude `literalBase` resolves for the DAMAGE path --
             // not one of the rule owner's attributes, so "which attribute does it name" has no answer.
@@ -4457,6 +4530,23 @@ public final class TriggerInterpreter {
             requirePercent(effect, op, spec);
             return;
         }
+        // The STATE-HOLDER's own attribute (`holder_attr:<STATE>:<ATTRIBUTE>`). Accepted/checked here for the reason the
+        // actor branch above gives, plus one of its own: unlike `holder_of:` in `target` (where naming the state IS the
+        // whole answer), a scale must also say WHICH stat, because "use [美学底本]'s stats" (1503) does not say it and
+        // defaulting to one would silently invent the game's choice. The split is on the LAST colon: state names
+        // themselves contain colons in this project's content (1503's 渲染理性，解构欢愉 is checked below).
+        if (scale.startsWith(TriggerTable.HOLDER_ATTR_PREFIX)) {
+            String rest = scale.substring(TriggerTable.HOLDER_ATTR_PREFIX.length());
+            int lastColon = rest.lastIndexOf(':');
+            if (lastColon < 0 || rest.substring(0, lastColon).isBlank() || rest.substring(lastColon + 1).isBlank()) {
+                throw new IllegalArgumentException(
+                        "Op " + op + " scales off the holder of a state but does not name it as <STATE>:<ATTRIBUTE>: \""
+                                + scale + "\"; e.g. \"holder_attr:同袍:DEFENCE\" (source: " + spec.getSource() + ")");
+            }
+            AttributeType.fromString(rest.substring(lastColon + 1).trim());
+            requirePercent(effect, op, spec);
+            return;
+        }
         if (scale.startsWith(TriggerTable.SELF_STACKS_PREFIX)
                 || scale.startsWith(TriggerTable.TARGET_STACKS_PREFIX)) {
             String name = scale.substring(scale.indexOf(':') + 1).trim();
@@ -4999,6 +5089,13 @@ public final class TriggerInterpreter {
                     ? 1.0
                     : ctx.damage().toValue() / ctx.damage().getSkillBaseValue();
             return ctx.amount() / factor * share + flat;
+        }
+        // ? The state-holder's own attribute (`holder_attr:<STATE>:<ATTRIBUTE>`, 1503's "该次欢愉伤害使用【美学底本】的属性值计算").
+        // Routed to `derivedMagnitude` rather than copied here: that reader is where the share/flat arithmetic for a
+        // subject attribute already lives (`actor_attr:`/`summon_attr:` reach `literalBase` the same way), and a second
+        // copy is where the two would drift. `DAMAGE` and `ADD_DAMAGE` therefore agree about this scale by construction.
+        if (scale.startsWith(TriggerTable.HOLDER_ATTR_PREFIX)) {
+            return derivedMagnitude(effect, ctx);
         }
         // ? A Max HP share: "deal damage equal to X% of Max HP" -- 16 documents state it. `owner_max_hp` is the attacker's own, `target_max_hp` the
         // victim's, which is why the victim is passed in. These are not `self_attr:` names, so they are handled before the attribute reader.
