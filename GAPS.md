@@ -2200,3 +2200,22 @@ has been loaded yet”，第 60 行定义 `ELATION("elation", true, false)`（**
 ⇒ ⭐ 真珠的**欢榆技兼现端、形态 A 的 60%、星魂 6 的 240%、星魂 2 的 15% 增笑**
 现在都有了数值依据，只剩两个**取值口径**：“用【美学底本】的属性值计算”
 与“元素随攻击者”。
+
+### ✅ 已解决（2026-10-02）：`element: "attacker"` —— 一笔规则产生的伤害现在可以取攻击者的元素
+
+⭐ 新保留字：`TriggerInterpreter.ATTACKER_ELEMENT = "attacker"`。`elementOf(effect, skill, attacker)`
+现在接收它，并从 `Character.getElement()` 取值（`CanHit` 上没有这个读口，
+所以非 `Character` 的单位答 null）。
+
+⭐ **作用域是刻意的**：只有 **伤害类 op** 接受它（`DAMAGE` 的两个校验点传 `true`），
+`TICK_DOT` / `APPLY_DOT` / 状态伤害传 `false`，因为“攻击者的元素”对一个**规则自己施加**的 DOT
+是一句没有主语的话。
+
+⭐ 判据 `AttackerElementTest` 两侧：
+- 真珠（冰）的规则用 `element: "attacker"` 能结算且命中（`dealt 41.14`）；
+- `APPLY_DOT` 同样写法被**拒绝**，报文指名 `element` 槽。
+
+⭐ 顺手修掉一处重复：三个调用点原来都写着
+`skill == null ? DamageElement.fromString(…) : elementOf(…)`，所以**不带技能行的规则**
+（正是真珠这类）走的是内联那支，看不到保留字；现在三处全部收敛到 `elementOf`，
+并且 `elementOf` 对 `skill == null` 安全。
