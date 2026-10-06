@@ -66,7 +66,7 @@ public class CharacterFactoryTest {
         Assertions.assertEquals(Set.of(4, 5), distribution.keySet(),
                 "the star rating should only be 4 and 5, actually " + distribution);
         Assertions.assertEquals(23L, distribution.get(4), "number of 4★");
-        Assertions.assertEquals(70L, distribution.get(5), "number of 5★");
+        Assertions.assertEquals(71L, distribution.get(5), "number of 5★");
 
         Assertions.assertEquals(5, CharacterFactory.data(1204).rarity(), "Jing Yuan is 5★");
         Assertions.assertEquals(4, CharacterFactory.data(1001).rarity(), "March 7th is 4★");
