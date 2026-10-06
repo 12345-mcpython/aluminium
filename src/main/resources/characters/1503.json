@@ -339,7 +339,7 @@
         }
       ],
       "source": "1503 真珠 终结技 鉴映灵魂的底色 (150303): 「获得 20 点【好活当赏】。【深度学习】除自身以外的指定我方单体角色，使目标成为【美学底本】」。",
-      "note": "⭐ 两个状态都是**调查过的**：`AvatarStatusConfig` 里 `10015032`（`Skill03_Target`，`Other`）是【美学底本】，`10015037`/`10015035`（`Skill03_Caster_BuffA/B`）是【深度学习】的两个分支。⭐ 用 `target_when` 防重复施加（照 `1211`）。⚠ **持续时间未知**：数据里没有（已扫 2253 个表 + 整棵 `Config/`），状态说明也不提。本文件用 `permanent` 先**把状态建立起来**，边界待定。"
+      "note": "⭐ 两个状态都是**调查过的**：`AvatarStatusConfig` 里 `10015032`（`Skill03_Target`，`Other`）是【美学底本】，`10015037`/`10015035`（`Skill03_Caster_BuffA/B`）是【深度学习】的两个分支。⭐ 用 `target_when` 防重复施加（照 `1211`）。⚠ **持续时间未知**：数据里没有（已扫 2253 个表 + 整棵 `Config/`），状态说明也不提。本文件用 `permanent` 先**把状态建立起来**，边界待定。  NOTE 2026-10-02, from the in-game text: deep study is granted with charges, and the text gives no round-based lifetime at all -- it is spent by casts. The state is applied `permanent` here because the engine has no charge counter for it yet; the enhanced-basic swap carries the 3-use limit instead."
     },
     {
       "on": "ULT_CAST",
@@ -353,12 +353,12 @@
           "op": "REPLACE_SKILL",
           "skill": "COMMON",
           "skill_id": 8,
-          "turns": 2,
+          "turns": 3,
           "target": "self"
         }
       ],
       "source": "1503 真珠 行迹行为：状态 `10015037`（`Skill03_Caster_BuffA`）：「造成伤害时，额外造成#1[i]%冰属性欢榆伤害，该次欢榆伤害使用【美学底本】的属性值来计算。普攻【行笔，临摹断水】强化为【行笔，幻造星月】」。",
-      "note": "⭐ **分支的一侧** ✓：【美学底本】为欢榆命途 ⇒ 强化为槽 **8**（行笔，幻造星月），且带额外冰欢榆伤害（参数在 `150308` 的第五项：级 1 = 0.1，满级 = 0.2）。⚠ “额外伤害”本身**未写**：它要算在另一次实例上，且“用【美学底本】的属性值计算”是另一种取值口径。"
+      "note": "⭐ **分支的一侧** ✓：【美学底本】为欢榆命途 ⇒ 强化为槽 **8**（行笔，幻造星月），且带额外冰欢榆伤害（参数在 `150308` 的第五项：级 1 = 0.1，满级 = 0.2）。⚠ “额外伤害”本身**未写**：它要算在另一次实例上，且“用【美学底本】的属性值计算”是另一种取值口径。  NOTE 2026-10-02, from the in-game Ultimate text: deep study carries THREE charges and each enhanced basic spends one, ending the state after acting with none left. So the lifetime is 3 uses, not the 2 the technique's own parameter names (that 2 is the technique's own charge grant, row 150307 = [2, 20]). Charges are not modelled as a counter yet; `turns: 3` is the closest existing lifetime and is now text-backed."
     },
     {
       "on": "ULT_CAST",
@@ -372,12 +372,12 @@
           "op": "REPLACE_SKILL",
           "skill": "COMMON",
           "skill_id": 9,
-          "turns": 2,
+          "turns": 3,
           "target": "self"
         }
       ],
       "source": "1503 真珠 状态 `10015035`（`Skill03_Caster_BuffB`）：「普攻【行笔，临摹断水】强化为【行笔，绘制末浪】」。",
-      "note": "⭐ **分支的另一侧** ✓：底本不是欢榆命途 ⇒ 槽 **9**（行笔，绘制末浪），且它的参数表只有四项（`150310` = `[0.5, 0.04, 1, 80]`）—— **没有第五项**，这正是它不带额外欢榆伤害的数据佐证。"
+      "note": "⭐ **分支的另一侧** ✓：底本不是欢榆命途 ⇒ 槽 **9**（行笔，绘制末浪），且它的参数表只有四项（`150310` = `[0.5, 0.04, 1, 80]`）—— **没有第五项**，这正是它不带额外欢榆伤害的数据佐证。  NOTE 2026-10-02, from the in-game Ultimate text: deep study carries THREE charges and each enhanced basic spends one, ending the state after acting with none left. So the lifetime is 3 uses, not the 2 the technique's own parameter names (that 2 is the technique's own charge grant, row 150307 = [2, 20]). Charges are not modelled as a counter yet; `turns: 3` is the closest existing lifetime and is now text-backed."
     },
     {
       "on": "BASIC_ATTACK",
