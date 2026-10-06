@@ -306,6 +306,130 @@
       ],
       "source": "1503 真珠 天赋 (150304) 的取消端: 「我方目标当前生命值百分比小于等于 50% 时」—— 回到 50% 以上就不再满足。",
       "note": "⭐ 与 `1002` 的 `HEALED` 清理端同形状。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "ult_marks_the_archetype_and_deep_study",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "好活当赏",
+          "amount": 20
+        },
+        {
+          "op": "APPLY_BUFF",
+          "buff": "美学底本",
+          "permanent": true,
+          "target": "target",
+          "target_when": [
+            "!target has_state 美学底本"
+          ]
+        },
+        {
+          "op": "APPLY_BUFF",
+          "buff": "深度学习",
+          "permanent": true,
+          "target": "self",
+          "target_when": [
+            "!self has_state 深度学习"
+          ]
+        }
+      ],
+      "source": "1503 真珠 终结技 鉴映灵魂的底色 (150303): 「获得 20 点【好活当赏】。【深度学习】除自身以外的指定我方单体角色，使目标成为【美学底本】」。",
+      "note": "⭐ 两个状态都是**调查过的**：`AvatarStatusConfig` 里 `10015032`（`Skill03_Target`，`Other`）是【美学底本】，`10015037`/`10015035`（`Skill03_Caster_BuffA/B`）是【深度学习】的两个分支。⭐ 用 `target_when` 防重复施加（照 `1211`）。⚠ **持续时间未知**：数据里没有（已扫 2253 个表 + 整棵 `Config/`），状态说明也不提。本文件用 `permanent` 先**把状态建立起来**，边界待定。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "enhanced_basic_is_form_a_for_an_elation_archetype",
+      "when": [
+        "actor == self",
+        "target has_path 欢愉"
+      ],
+      "do": [
+        {
+          "op": "REPLACE_SKILL",
+          "skill": "COMMON",
+          "skill_id": 8,
+          "turns": 2,
+          "target": "self"
+        }
+      ],
+      "source": "1503 真珠 行迹行为：状态 `10015037`（`Skill03_Caster_BuffA`）：「造成伤害时，额外造成#1[i]%冰属性欢榆伤害，该次欢榆伤害使用【美学底本】的属性值来计算。普攻【行笔，临摹断水】强化为【行笔，幻造星月】」。",
+      "note": "⭐ **分支的一侧** ✓：【美学底本】为欢榆命途 ⇒ 强化为槽 **8**（行笔，幻造星月），且带额外冰欢榆伤害（参数在 `150308` 的第五项：级 1 = 0.1，满级 = 0.2）。⚠ “额外伤害”本身**未写**：它要算在另一次实例上，且“用【美学底本】的属性值计算”是另一种取值口径。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "enhanced_basic_is_form_b_otherwise",
+      "when": [
+        "actor == self",
+        "!target has_path 欢愉"
+      ],
+      "do": [
+        {
+          "op": "REPLACE_SKILL",
+          "skill": "COMMON",
+          "skill_id": 9,
+          "turns": 2,
+          "target": "self"
+        }
+      ],
+      "source": "1503 真珠 状态 `10015035`（`Skill03_Caster_BuffB`）：「普攻【行笔，临摹断水】强化为【行笔，绘制末浪】」。",
+      "note": "⭐ **分支的另一侧** ✓：底本不是欢榆命途 ⇒ 槽 **9**（行笔，绘制末浪），且它的参数表只有四项（`150310` = `[0.5, 0.04, 1, 80]`）—— **没有第五项**，这正是它不带额外欢榆伤害的数据佐证。"
+    },
+    {
+      "on": "BASIC_ATTACK",
+      "id": "enhanced_basic_heals_on_slot_8",
+      "when": [
+        "actor == self",
+        "from_skill_id == 150308"
+      ],
+      "do": [
+        {
+          "op": "HEAL",
+          "scale": "owner_def",
+          "percent": 0.08,
+          "amount": 160,
+          "target": "all_allies"
+        },
+        {
+          "op": "HEAL",
+          "scale": "owner_def",
+          "percent": 0.08,
+          "amount": 160,
+          "target": "lowest_hp_ally"
+        }
+      ],
+      "source": "1503 真珠 强化普攻 【行笔，幻造星月】 (150308): 「对敌方全体造成等同于真珠 100% 防御力的冰属性伤害，为我方全体目标回复等同于真珠 8.00% 防御力 + 160 的生命值，**额外**为**当前生命值百分比最低的**我方目标回复同样量」。",
+      "note": "⭐ 伤害不写在这里：它在 `skills.json` 的技能行里（`AoEAttack` 加倍率），引擎自己结算；本条只补那两段治疗（与她战技同一写法）。⭐ 触发靠 `BASIC_ATTACK` + `from_skill_id == <技能 ID>`：**该变量是数值变量**，必须带 `==`（写成 `from_skill_id 150308` 会报 “not a known shorthand”，实测）。"
+    },
+    {
+      "on": "BASIC_ATTACK",
+      "id": "enhanced_basic_heals_on_slot_9",
+      "when": [
+        "actor == self",
+        "from_skill_id == 150310"
+      ],
+      "do": [
+        {
+          "op": "HEAL",
+          "scale": "owner_def",
+          "percent": 0.08,
+          "amount": 160,
+          "target": "all_allies"
+        },
+        {
+          "op": "HEAL",
+          "scale": "owner_def",
+          "percent": 0.08,
+          "amount": 160,
+          "target": "lowest_hp_ally"
+        }
+      ],
+      "source": "1503 真珠 强化普攻 【行笔，绘制末浪】 (150310): 「对敌方全体造成等同于真珠 100% 防御力的冰属性伤害，为我方全体目标回复等同于真珠 8.00% 防御力 + 160 的生命值，**额外**为**当前生命值百分比最低的**我方目标回复同样量」。",
+      "note": "⭐ 伤害不写在这里：它在 `skills.json` 的技能行里（`AoEAttack` 加倍率），引擎自己结算；本条只补那两段治疗（与她战技同一写法）。⭐ 触发靠 `BASIC_ATTACK` + `from_skill_id == <技能 ID>`：**该变量是数值变量**，必须带 `==`（写成 `from_skill_id 150308` 会报 “not a known shorthand”，实测）。"
     }
   ]
 }
