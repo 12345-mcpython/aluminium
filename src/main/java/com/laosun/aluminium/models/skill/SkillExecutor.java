@@ -639,7 +639,7 @@ public final class SkillExecutor {
         // x1.0. Super break folds `SUPER_BREAK_BOOST` into its base the same way, for the same reason.
         DamageType damageType = damageTypeOf(data);
         double settledBase = damageType == DamageType.ELATION
-                ? base * (1 + user.getAttribute(com.laosun.aluminium.enums.AttributeType.ELATION_DAMAGE_BOOST).get())
+                ? base * (1 + user.getAttribute(com.laosun.aluminium.enums.AttributeType.ELATION_DAMAGE_BOOST).get()) * battle.elationLaughMultiplier()
                 : base;
         Damage damage = new Damage(user, target, element, damageType, settledBase,
                 data == null ? SkillCategory.UNSPECIFIED : data.getCategory());
