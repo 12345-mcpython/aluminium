@@ -44,7 +44,7 @@ import java.util.Map;
  *   <tr><td>{@link #TECHNIQUE}</td><td>0 references - technique damage; the technique itself is
  *       currently only attached in {@code Battle.startBattle()} and its effect is not
  *       implemented</td></tr>
- *   <tr><td>{@link #MEMORY}</td><td>0 references - memosprite damage, waiting on P9-4 summons</td></tr>
+ *   <tr><td>{@link #MEMORY}</td><td>0 references - memosprite damage, waiting on summon support</td></tr>
  *   <tr><td>{@link #ELATION}</td><td>0 references - the elation system; not even
  *       {@code elation_basic_level_damage.json} has been loaded yet</td></tr>
  * </table>

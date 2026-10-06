@@ -7,11 +7,11 @@ import lombok.Getter;
  * A team-level numeric resource: it has a current value, a maximum capacity, and an optional
  * maximum overflow allowance.
  *
- * <p><b>Why this class has to exist</b>: skill points (SP) and P8-8's stack resources
+ * <p><b>Why this class has to exist</b>: skill points (SP) and stack resources
  * (Acheron's [残梦], Feixiao's [飞黄], Phainon's [火种], Cyrene's [追忆], Castorice's [新蕊] ...)
  * are essentially the same thing - a counter that some event adds to or subtracts from, that has a
  * capacity cap, and that fires a signal when full. Without extracting it, every character would need
- * a "because of some character" branch inside the engine (violating P8-0's three-way split).
+ * a "because of some character" branch inside the engine (violating the three-way split).
  *
  * <p><b>Three boundaries (all measured in practice, not written off the cuff)</b>:
  * <ol>

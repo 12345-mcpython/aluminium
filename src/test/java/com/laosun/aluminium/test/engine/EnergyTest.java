@@ -21,9 +21,9 @@ import java.util.Set;
  * acceptance: the energy field + the single credit entry point {@code gainEnergy} + the
  * standard provider's numeric mapping.
  *
- * <p>For the numbers see ROADMAP's P3-0: basic attack 20 / skill 30 / ultimate 5 / taking a hit 10 /
+ * <p>For the numbers see the standard tier in {@code ROADMAP.md}: basic attack 20 / skill 30 / ultimate 5 / taking a hit 10 /
  * kill 5 / break 5;
- * the ultimate clears to zero first and then regains 5 (the clear is done in P3-2's {@code castUltra}).
+ * the ultimate clears to zero first and then regains 5 (the clear is done in {@code castUltra}).
  */
 public class EnergyTest {
     private static final double EPS = 1e-6;
@@ -95,7 +95,7 @@ public class EnergyTest {
         Assertions.assertEquals(20, normal.amount(), EPS);
         Assertions.assertEquals(30, skill.amount(), EPS);
         Assertions.assertNull(ultra, "the ultimate is not settled in onSkillCast (clear first, then regain 5, see onUltCast)");
-        Assertions.assertNull(followUp, "follow-up attacks grant no energy at this stage (the per-hit value must land in the data first, P3-4/P8-3)");
+        Assertions.assertNull(followUp, "follow-up attacks grant no energy at this stage (the per-hit value must land in the data first)");
         Assertions.assertEquals(5, provider.onUltCast(user, new DefaultSkill(1001, 3, 1)).amount(), EPS);
     }
 

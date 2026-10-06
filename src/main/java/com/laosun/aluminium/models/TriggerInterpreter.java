@@ -37,7 +37,7 @@ import java.util.Locale;
 import java.util.Set;
 
 /**
- * Runs the effects of a {@link TriggerTable} (P8-). The only place in the trigger system that
+ * Runs the effects of a {@link TriggerTable}. The only place in the trigger system that
  * touches engine state.
  *
  * <p><b>The op vocabulary is restricted on purpose</b> to capabilities the engine already has --
@@ -345,7 +345,7 @@ public final class TriggerInterpreter {
         if (PLANNED.contains(op)) {
             throw new IllegalArgumentException(
                     "Trigger op '" + op + "' is declared in the roadmap but not wired yet "
-                            + "(see ROADMAP P8-7 / TriggerInterpreter); rule source: " + spec.getSource());
+                            + "(see ROADMAP / TriggerInterpreter); rule source:" + spec.getSource());
         }
         if (!WIRED.contains(op)) {
             throw new IllegalArgumentException(

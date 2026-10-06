@@ -101,7 +101,7 @@ public final class EnemyFactory {
         enemy.setLevel(level);                                  // level enters the defence zone
         enemy.setDamageResist(config.damageResistance());       // the resistance zone takes effect directly
         enemy.setDebuffResist(config.debuffResistance());        // specific debuff resistance
-        enemy.setStanceWeak(Set.copyOf(config.stanceWeak()));   // weaknesses (used by P4's toughness-reduction check)
+        enemy.setStanceWeak(Set.copyOf(config.stanceWeak()));   // weaknesses (used by the toughness-reduction check)
         enemy.setStance(resolved.stats().stance());
         enemy.setMaxStance(resolved.stats().stance());
         enemy.setStanceCount(template.stanceCount());

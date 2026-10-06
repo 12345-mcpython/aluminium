@@ -55,7 +55,7 @@ public class Enemy extends CanHit {
      * default = no weakness (102 entries in the data lack this item).
      *
      * <p>This is data: hitting a weakness element allows toughness reduction; the
-     * judgement and the toughness-reduction mechanic are implemented in P4-2.
+     * judgement and the toughness-reduction mechanic live in the damage-settlement code.
      */
     private Set<DamageElement> stanceWeak = Set.of();
 
@@ -68,7 +68,7 @@ public class Enemy extends CanHit {
     private final java.util.Map<DamageElement, Integer> timedWeak = new java.util.LinkedHashMap<>();
 
     /**
-     * Current toughness (P4 toughness reduction decreases it; the value is given by
+     * Current toughness (toughness reduction decreases it; the value is given by
      * {@code EnemyScaler}: template  x  level group  x  instance multiplier).
      */
     private double stance;
@@ -100,18 +100,18 @@ public class Enemy extends CanHit {
     private List<Integer> summonIds = List.of();
 
     /**
-     * Whether it is in the broken state (judged in P4-2, recovered in P4-4).
+     * Whether it is in the broken state (set on break, cleared on recovery).
      */
     private boolean broken;
 
     /**
-     * The element of this break (used by P4-3 break damage / P4-5 DOT type).
+     * The element of this break (used by break damage and the DOT type).
      */
     private DamageElement brokenElement;
 
     /**
-     * Remaining turns of the broken state (turn skipping / action delay is maintained by
-     * ; P4-1 only keeps the field).
+     * Remaining turns of the broken state (turn skipping / action delay is maintained by the
+     * break handling; this class only keeps the field).
      */
     private int brokenRemainTurns;
 
@@ -121,8 +121,8 @@ public class Enemy extends CanHit {
      *
      * <p>{@link #activeSkill()} reads the current HP every time it is asked, so a phase change needs no
      * bookkeeping at all - no flag to flip, no transition to schedule. That is deliberate: the alternative
-     * ("hold the HP bar at 1 and advance the phase when it would have died") is the approach the roadmap
-     * warns about, because {@code CanHit.takeDamage} sets {@code death = true} the moment HP reaches 0, so
+     * ("hold the HP bar at 1 and advance the phase when it would have died") is the approach this project
+     * deliberately avoids, because {@code CanHit.takeDamage} sets {@code death = true} the moment HP reaches 0, so
      * a locked bar either skips the phase or lets the enemy be hit after it is already down. A
      * <b>multi-HP-bar</b> boss does need locking, and the safe way is {@code setInvulnerable(true)}
      * followed by an explicit HP reset - that is not implemented here and stays registered as its own item.
@@ -196,7 +196,7 @@ public class Enemy extends CanHit {
     /**
      * Whether the given element is one of this enemy's weaknesses.
      *
-     * <p>P4-2 uses this as the single judgement point for "weakness toughness reduction" - 
+     * <p>This is the single judgement point for "weakness toughness reduction" - 
      * do not reach for {@link #stanceWeak} directly any more, or a future change to the
      * judgement rule will miss the call sites.
      *
@@ -262,8 +262,8 @@ public class Enemy extends CanHit {
     /**
      * Whether it has a toughness bar ({@code maxStance > 0}).
      *
-     * <p>P4-2's toughness-reduction / break judgement goes through here uniformly - do not
-     * each reach for {@link #maxStance}: the data really does contain monsters with 0 toughness.
+     * <p>The toughness-reduction / break judgement goes through here uniformly - do not
+     * reach for {@link #maxStance} directly: the data really does contain monsters with 0 toughness.
      *
      * @return {@code true} if this enemy can be broken at all
      */
@@ -272,14 +272,14 @@ public class Enemy extends CanHit {
     }
 
     /**
-     * Toughness reduction (P4-2 calls this once per damage segment).
+     * Toughness reduction (called once per damage segment).
      *
      * <p><b>Reaching zero does not break automatically</b> - the break judgement has to
-     * distinguish weakness break from non-weakness toughness reduction (the P4-2 stance), so
+     * distinguish weakness break from non-weakness toughness reduction, so
      * this method is only responsible for deducting and clamping at 0. A target that is
      * already broken is no longer reduced before it recovers (the toughness bar is empty).
      *
-     * <p><b>Returns the amount actually consumed (H-4)</b>: break damage must be settled on
+     * <p><b>Returns the amount actually consumed</b>: break damage must be settled on
      * "how much did this segment really shave off", not on the skill's nominal toughness
      * reduction - 10 points of toughness left taking a 30-point skill means only 10 counts.
      * Callers must also note: super break uses the excess {@code amount - consumed},
@@ -306,7 +306,7 @@ public class Enemy extends CanHit {
     }
 
     /**
-     * Enter the broken state (P4-2 calls this when toughness reaches zero).
+     * Enter the broken state (called when toughness reaches zero).
      *
      * @param element the element that caused the break ({@code null} = unknown, not asserted)
      */
@@ -317,11 +317,11 @@ public class Enemy extends CanHit {
     }
 
     /**
-     * Leave the broken state and refill the toughness bar (P4-4: called when the broken
+     * Leave the broken state and refill the toughness bar (called when the broken
      * duration in turns ends).
      *
      * <p>Bar-by-bar consumption for multi-bar toughness ({@link #stanceCount} {@code > 1})
-     * is left to P4-4; this task only restores the value to full.
+     * is left to the break handling; this method only restores the value to full.
      */
     public void recoverFromBroken() {
         broken = false;

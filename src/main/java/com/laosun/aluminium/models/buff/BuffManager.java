@@ -142,7 +142,7 @@ public class BuffManager {
      * How many instances of a buff of the given class are currently attached.
      *
      * <p>Exists because "at how many stacks am I?" is a legitimate question for content and tests,
-     * and the alternative - handing the buff list out - is the P1-decision this class deliberately
+     * and the alternative - handing the buff list out - is the decision this class deliberately
      * keeps (see {@link #hasBuff(Class)}). Matching is by exact class, the same convention as
      * {@code hasBuff}.
      *
@@ -434,8 +434,8 @@ public class BuffManager {
      * <p>Used to validate {@code "scale": "cast_applied:<状态名>"} at load time: the closed set is the control states
      * (frozen (冻结) / entangled (纠缠) / imprisoned (禁锢)) and the four DOT states (burn (灼烧) / shock (触电) / bleed (裂伤) / windshear (风化)) - the states that reach the field
      * through {@code Battle.tryApplyDebuff}, which is what the counter counts. Note: taunt (嘲讽) is deliberately absent: no
-     * document counts taunts, and whether the marker belongs to the control class is still an open decision (see
-     * ROADMAP).
+     * document counts taunts, and whether the marker belongs to the control class is still an open
+     * question.
      *
      * @param stateName the name to check (a document spelling)
      * @return {@code true} when it names a state this engine rolls for

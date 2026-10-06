@@ -26,7 +26,7 @@ import java.util.Set;
  * acceptance: energy gain is really wired into battle - skill casts / taking hits / kills gain
  * energy automatically, and the ultimate needs full energy, then clears to zero before regaining 5.
  *
- * <p>Anchors (ROADMAP P3-0 convention 2): basic attack 20 / skill 30 / ultimate 5 / taking a hit 10 / kill 5.
+ * <p>Anchors (this project's energy convention): basic attack 20 / skill 30 / ultimate 5 / taking a hit 10 / kill 5.
  */
 public class EnergyBattleTest {
     private static final double EPS = 1e-6;
@@ -71,7 +71,7 @@ public class EnergyBattleTest {
     }
 
     /**
-     * H-5: the clear to zero must happen before the ultimate body is settled.
+     * The clear to zero must happen before the ultimate body is settled.
      *
      * <p>Otherwise the kill energy gain given by the enemy the ultimate kills (credited to
      * {@code damage.getAttacker()}, i.e. the one casting the ultimate) would be wiped out by the
@@ -92,7 +92,7 @@ public class EnergyBattleTest {
     }
 
     /**
-     * H-5's break branch: the break energy gain given when the ultimate drains the toughness must
+     * The break branch of that rule: the break energy gain given when the ultimate drains the toughness must
      * likewise not be wiped out by the clear to zero.
      */
     @Test
@@ -304,7 +304,7 @@ public class EnergyBattleTest {
         Battle battle = newBattle(hero, dummy);
 
         Assertions.assertEquals(5, battle.gainBreakEnergy(hero, dummy), EPS);
-        Assertions.assertEquals(5, hero.getCurrentEnergy(), EPS, "break energy gain baseline 5 (P4-4 calls this opening on break)");
+        Assertions.assertEquals(5, hero.getCurrentEnergy(), EPS, "break energy gain baseline 5 (crediting it opens on break)");
         Assertions.assertEquals(0, battle.gainBreakEnergy(null, dummy), EPS, "no breaker → 0, does not blow up");
     }
 

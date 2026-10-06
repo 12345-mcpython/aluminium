@@ -36,7 +36,7 @@ import static com.laosun.aluminium.Constant.PERCENT_TO_BASE;
  * ({@code resources/relic_sets/<setId>.json}, loaded by
  * {@link com.laosun.aluminium.data.RelicTriggerTables} and attached at the assembly point), not here - 
  * see that class. An ability whose text the current op vocabulary cannot express is registered as an
- * explicit gap ({@code relic_sets/_unmodelled.json}, reported as {@code F-10} in {@code DOC_VS_CODE.md})
+ * explicit gap ({@code relic_sets/_unmodelled.json}, reported as {@code F-10} in {@code ROADMAP.md})
  * rather than being silently forgotten; {@link RelicSet.Effect#hasAbility()} and
  * {@code RelicSetTest}'s "every effect is either stats or a named ability" invariant keep the split
  * visible.

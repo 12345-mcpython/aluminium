@@ -77,7 +77,7 @@ public class Character extends CanHit {
     }
 
     /**
-     * This character's mechanics, as data (P8-).
+     * This character's mechanics, as data.
      *
      * <p>Never {@code null}: an unregistered character holds {@link TriggerTable#EMPTY}. That way
      * the interpreter treats "no mechanics" as a no-op instead of every call site null-checking, and
@@ -176,7 +176,7 @@ public class Character extends CanHit {
     /**
      * Creates a character directly from pre-computed attributes.
      *
-     * <p>Note: <b>For tests / placeholders only; new code after P8 MUST NOT use it</b>.
+     * <p>Note: <b>For tests / placeholders only; new code MUST NOT use it</b>.
      * The characters it makes have no element, no path differences, an energy cap of 0, and skills that are
      * all {@link DefaultSkill} placeholders - for a real character use
      * {@link com.laosun.aluminium.utils.CharacterFactory#create(int, int)}.
@@ -191,7 +191,7 @@ public class Character extends CanHit {
     /**
      * Build a placeholder character straight from attribute values (tests only).
      *
-     * <p>Note: <b>New code after P8 MUST NOT use it</b>: the character it makes has no element, no path
+     * <p>Note: <b>New code MUST NOT use it</b>: the character it makes has no element, no path
      * differences, an energy cap of 0 (cannot cast an ultimate), and skills that are all
      * {@link DefaultSkill} placeholders.
      * For a real character use {@link com.laosun.aluminium.utils.CharacterFactory#create(int, int)}.
@@ -256,7 +256,7 @@ public class Character extends CanHit {
         private Path path;
 
         /**
-         * The character's trigger table (P8-); defaults to the empty table, which means
+         * The character's trigger table; defaults to the empty table, which means
          * "no mechanics registered" -- an ordinary state, not an error.
          */
         private TriggerTable triggerTable = TriggerTable.EMPTY;
@@ -350,7 +350,7 @@ public class Character extends CanHit {
         }
 
         /**
-         * Attaches the character's trigger table (P8-).
+         * Attaches the character's trigger table.
          *
          * <p>This is the assembly point for character mechanics: whoever builds the character (the
          * factories, or a test) decides which table it gets. The engine never looks a table up by
@@ -395,9 +395,9 @@ public class Character extends CanHit {
                 int level = entry.getValue();
                 // every slot resolves its own skill_id (previously it was always 1, so all six
                 // slots had the basic attack's data).
-                // Only equip the "always-on character" slots: the overworld basic attack (6) / technique ()
-                // are overworld skills attached by Battle.startBattle(); the summon slot belongs to memosprites
-                // , so neither is equipped here.
+                // Only equip the "always-on character" slots: the overworld basic attack (6) / technique
+                // are overworld skills attached by Battle.startBattle(); the summon slot belongs to memosprites,
+                // so neither is equipped here.
                 if (!type.isIntrinsic()) {
                     continue;
                 }
@@ -420,9 +420,9 @@ public class Character extends CanHit {
             character.setElement(DamageElement.fromString(characterData.attribute()));
             // the energy cap follows the data. A null MUST stay 0 (= no energy bar); it must NOT fall
             // back to 100 - 140 Castorice (遐蝶) is the only null in the whole data set, and a fallback would conjure
-            // an energy bar for her out of thin air (P3-0 table A).
+            // an energy bar for her out of thin air.
             character.setMaxEnergy(characterData.maxEnergy() != null ? characterData.maxEnergy() : 0);
-            // -: the character's mechanics as data. Always non-null -- an unregistered character
+            // the character's mechanics as data. Always non-null -- an unregistered character
             // has the empty table, which is normal (the trigger interpreter treats it as a no-op and
             // Battle never has to null-check).
             character.setTriggerTable(triggerTable);

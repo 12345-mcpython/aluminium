@@ -27,7 +27,7 @@ import java.util.Random;
  * <p><b>Why her.</b> Her document is the corpus's most common shape that had no spelling: "gains charge, cap 3 points",
  * "if the charge reaches its cap then...", "consumes all charge". The ops to write such a resource existed, but nothing could
  * <em>read</em> one back, and nothing could declare one at all - 41 of the 9character documents gate something on
- * a count, which is the largest single hole the corpus scan found (ROADMAP §13.). Her three rules are the reader
+ * a count, which is the largest single hole the corpus scan found. Her three rules are the reader
  * that pays for both capabilities: {@code self_resource:<NAME>} in the condition DSL, and the {@code resources}
  * block that says what the cap is.
  *

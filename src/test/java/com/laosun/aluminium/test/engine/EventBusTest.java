@@ -314,7 +314,7 @@ public class EventBusTest {
      * only affects the energy-gain category, not the fact of "death").
      *
      * <p>So here we assert the measured behaviour, and this correction is recorded in
-     * `engine.md` §4.2 and `ROADMAP` P8-6.
+     * `engine.md` §4.2.
      */
     @Test
     public void dotKillAlsoFiresKillEvent() {

@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * The generic primitives the relic abilities needed (P10-3 follow-up): a <b>stackable</b> stat
+ * The generic primitives the relic abilities needed (a follow-up to the relic work): a <b>stackable</b> stat
  * modifier, an <b>unbounded</b> duration, and the two trigger-table arguments that expose them
  * ({@code max_stacks} / {@code permanent}).
  *

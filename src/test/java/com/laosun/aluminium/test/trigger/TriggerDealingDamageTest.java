@@ -35,7 +35,7 @@ import java.util.Random;
  * buff to attach, nothing to remove, and nothing that can leak into the next hit.
  *
  * <p><b>The other half is the state name.</b> "灼烧" is not a {@code StateBuff}; it is a {@code DotBuff} of
- * element Fire, and the engine has modelled it that way since P10-0. {@code has_state} now resolves those four
+ * element Fire, and the engine has modelled it that way all along. {@code has_state} now resolves those four
  * names, which is what lets a rule ask about them without inventing a second fact for "this unit is burning".
  */
 public class TriggerDealingDamageTest {
@@ -146,7 +146,7 @@ public class TriggerDealingDamageTest {
         Assertions.assertTrue(target.getBuffManager().hasState("灼烧"), "a Fire DOT is 灼烧");
         Assertions.assertFalse(target.getBuffManager().hasState("触电"), "and it is not 触电");
         Assertions.assertFalse(target.getBuffManager().hasState("冻结"),
-                "control states are deliberately not resolved yet: P10-2 models them as a buff plus a delay, "
+                "control states are deliberately not resolved yet: models them as a buff plus a delay,"
                         + "so 'is it frozen' needs its own definition rather than a guess");
 
         target.getBuffManager().addBuff(new DotBuff(owner, DamageElement.THUNDER, 300, 2));

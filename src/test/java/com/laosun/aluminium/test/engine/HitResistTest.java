@@ -23,7 +23,7 @@ import java.util.Random;
  * chance to land = base chance  x  (1 + caster's hit rate)  x  (1 - target's resistance)  x  (1 - specific debuff resistance), clamp [0,1]
  * </pre>
  *
- * <p>All three factors are multiplied (it is not "hit rate minus resistance"). Anchors (ROADMAP):
+ * <p>All three factors are multiplied (it is not "hit rate minus resistance"). Anchors (real data):
  * base 1.0 + hit 0 + resist 0.3 to 0.; with hit 0.5 to 1.0 (clamp);
  * base 0.8 + hit 0.25 + resist 0.2 to 0.8.
  */
@@ -100,7 +100,7 @@ public class HitResistTest {
     /**
      * An enemy's effect hit rate must make it onto the stat sheet: {@code EnemyScaler} computed 0.32
      * (group 1-Lv90), but early on {@code EnemyFactory} forgot to write it to the sheet, so the enemy's hit rate was
-     * always 0 (review report M-5).
+     * always 0 (found in review).
      */
     @Test
     public void enemyEffectHitRateReachesThePanel() {
@@ -109,7 +109,7 @@ public class HitResistTest {
         Assertions.assertEquals(0.32, iceEdge.getAttribute(AttributeType.EFFECT_HIT_RATE).get(), 1e-9,
                 "group 1·Lv90 effect hit rate = 0.32");
         Assertions.assertEquals(0.3, iceEdge.getAttribute(AttributeType.EFFECT_RESISTANCE).get(), 1e-9,
-                "effect resistance is additive: template 0.2 + level group 0.1 (P2-3)");
+                "effect resistance is additive: template 0.2 + level group 0.1");
         // when the enemy is the caster, the 0.32 hit rate really does raise the chance
         Character victim = Character.fromAttributes("victim", 10_000, 100, 100, 100);
         Assertions.assertEquals(1.0, newBattle(iceEdge, victim).hitChance(iceEdge, victim, 1.0, null), EPS);

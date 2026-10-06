@@ -44,7 +44,7 @@ import java.util.Random;
  *   <li><b>the units.</b> Flat attributes are absolute and ratio attributes are fractions, so
  *       {@code self_attr:SPEED >= 145} and {@code self_attr:CRIT_CHANCE >= 0.} are the same shape on two
  *       different scales. Getting that wrong is a factor of 100 that fails <b>silently</b> - the trap
- *       ROADMAP L-9 already records once.</li>
+ *       already recorded once.</li>
  * </ol>
  *
  * <p>The shipped content that uses it is at the bottom, checked through the real loader and assembly point

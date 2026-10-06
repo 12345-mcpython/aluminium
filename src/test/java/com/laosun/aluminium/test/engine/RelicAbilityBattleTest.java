@@ -37,7 +37,7 @@ import java.util.Random;
  *
  * <h2>The F-2 case</h2>
  * {@link #openingSkillPointsIncludeThePasserbyFourPiece()} is the end-to-end claim registered as
- * {@code F-2} in {@code DOC_VS_CODE.md}: a team wearing the Passerby of Wandering Cloud 4-piece starts
+ * {@code F-2} in {@code ROADMAP.md}: a team wearing the Passerby of Wandering Cloud 4-piece starts
  * with <b>4</b> skill points instead of 3. It also pins the <b>ordering</b> the claim depends on - 
  * the opening value is assigned when the {@link Battle} is constructed, and {@code BATTLE_START} is
  * fired later by {@code startBattle()}, which is what makes the +1 observable.

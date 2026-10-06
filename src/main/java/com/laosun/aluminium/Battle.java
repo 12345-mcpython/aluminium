@@ -41,7 +41,7 @@ import java.util.function.Consumer;
 
 public class Battle {
     /**
-     * Battle state machine (P-3).
+     * Battle state machine.
      *
      * <pre>
      *  NOT_STARTED --startBattle--RUNNING --one side wiped out--WIN / LOSE
@@ -64,7 +64,7 @@ public class Battle {
      * characters plus any friendly {@link Summon} (a memosprite, Jing Yuan (景元)'s [神君], ...).
      *
      * <p><b>Why this exists next to {@link #characters} rather than replacing it</b> (the friendly half of
-     * L-8). The enemy side already has this split - {@link #enemies} is the camp and {@link #enemyUnits()}
+     * the camp split). The enemy side already has this split - {@link #enemies} is the camp and {@link #enemyUnits()}
      * is the monsters in it - so that things which genuinely only work on monsters say so. Our side had no
      * such split, and the consequence was harder than a missing convenience: <b>a player-side summon could
      * not be placed anywhere at all</b>, because the only roster we had was typed {@code List<Character>}.
@@ -95,7 +95,7 @@ public class Battle {
     /**
      * The <b>enemy camp's roster</b> - every combatant fighting against us, in battlefield order.
      *
-     * <p>Note: <b>Deliberately {@code CanHit}, not {@code Enemy}</b> (L-8). Typing it as
+     * <p>Note: <b>Deliberately {@code CanHit}, not {@code Enemy}</b>. Typing it as
      * {@code List<Enemy>} would make an enemy-side {@link com.laosun.aluminium.models.Summon}
      * <b>structurally impossible to place</b>: the action bar accepts any {@code CanHit}
      * ({@code Queue.addCombatants} takes {@code List<? extends CanHit>}), and camp-agnostic code
@@ -155,14 +155,14 @@ public class Battle {
     public Signal currentMove;
 
     /**
-     * The current battle status (P-3). It starts as {@link Status#NOT_STARTED}, and {@link #startBattle()}
+     * The current battle status. It starts as {@link Status#NOT_STARTED}, and {@link #startBattle()}
      * turns it into {@link Status#RUNNING}.
      */
     @Getter
     private Status status = Status.NOT_STARTED;
 
     /**
-     * Wave management (P-4); {@code null} for a non-wave battle.
+     * Wave management; {@code null} for a non-wave battle.
      *
      * <p>Its only reason to exist is to let {@link #checkResult()} know whether "the enemy team is empty"
      * means won or this wave has not entered yet.
@@ -384,7 +384,7 @@ public class Battle {
      * "skill has a 50% chance of +1", Sushang (素裳) "skill on a weakness-broken target +1",
      * Sparkle (花火) "max +2", ...). If all of those branches were added here,
      * {@code Battle} would fill up with "because of some character" conditionals, violating the three-way split.
-     * See <b>F-8</b> in §F of {@code DOC_VS_CODE.md}.
+     * See <b>F-8</b> in §12.5 of {@code ROADMAP.md}.
      *
      * <p>The default is {@link StandardSkillPointPolicy} (start 3 / max 5 / our basic attack +1 / skill -1 /
      * everything else neutral). To swap in another rule set for the team (e.g. Sparkle (花火) raising the max),
@@ -503,7 +503,7 @@ public class Battle {
      *
      * <p>Two documents start with "takes effect as soon as the character is obtained, no deployment needed" (140's Moon Cocoon's Ward (月茇之庇), 1506's 999 Safety Guard (999安全卫士)), and the data files them under
      * {@code AvatarGlobalBuffConfig} as global support skills. Note: Their tables cannot ride in `characters`: that list is the
-     * roster the QUEUE is built from (L520), so a listener put there would take turns of its own. They are asked by a second
+     * roster the QUEUE is built from, so a listener put there would take turns of its own. They are asked by a second
      * loop instead, and because they are in neither `allies` nor the queue they are never targeted and never act.
      */
     private final java.util.LinkedHashMap<Character, TriggerTable> warehouseListeners =
@@ -562,8 +562,8 @@ public class Battle {
     /**
      * @param characterQueue our side (characters; a player-side summon is added to the action bar directly)
      * @param enemyQueue     the enemy camp - monsters, and any summon fighting alongside them. Taken as
-     *                       {@code ? extends CanHit} so that a caller's {@code List<Enemy>} still fits
-     *                       (L-8). Copied, so the battle owns its roster and a later
+     *                       {@code ? extends CanHit} so that a caller's {@code List<Enemy>} still fits.
+     *                       Copied, so the battle owns its roster and a later
      *                       {@code WaveManager} append does not write through to the caller's list.
      */
     public Battle(List<Character> characterQueue, List<? extends CanHit> enemyQueue, Random rng) {
@@ -731,7 +731,7 @@ public class Battle {
         if (user == null || user.isDeath() || !isUltraReady(user)) {
             return false;                       // not enough accumulated, cannot cast (characters without an energy bar can never cast)
         }
-        // P-2: during an extra turn, inserting someone else's ultimate is forbidden.
+        // During an extra turn, inserting someone else's ultimate is forbidden.
         // Rule in HSR.md §3.1; without this block, an "extra turn" could be extended forever by ultimates.
         CanHit extraTurnActor = queue.getExtraTurnActor();
         if (extraTurnActor != null && extraTurnActor != user) {
@@ -744,7 +744,7 @@ public class Battle {
         if (!requestSkill(ultra, user, targets)) {
             return false;
         }
-        // H-5: zero it first (the order in ROADMAP), then let the ultimate body settle.
+        // Zero it first (the order is deliberate), then let the ultimate body settle.
         // Reversing the order eats the energy the ultimate itself earns: the kill energy / break energy
         // inside processRequests are both credited to damage.getAttacker (= the one casting the ultimate),
         // so settling first and zeroing afterwards wipes those entries out.
@@ -764,7 +764,7 @@ public class Battle {
      * The energy the ultimate now settling consumed, for {@code ULT_CAST}'s amount.
      *
      * <p>Note: It cannot be read one layer down: Battle zeroes the energy BEFORE the ultimate body settles
-     * (see the H-5 comment above), so by the time the event fires the unit already reads 0.
+     * (see the comment above), so by the time the event fires the unit already reads 0.
      */
     private double lastUltEnergySpent;
 
@@ -906,7 +906,7 @@ public class Battle {
     }
 
     /**
-     * Decide the outcome and set the status (P-3). Idempotent: once terminal it does nothing
+     * Decide the outcome and set the status. Idempotent: once terminal it does nothing
      * (terminal states never roll back).
      *
      * <p>The rules:
@@ -925,10 +925,10 @@ public class Battle {
         if (status != Status.RUNNING) {
             return status;
         }
-        // P-4: there are waves not yet entered to an empty enemy team only means "this wave has not entered", so no win.
+        // An empty enemy team with waves not yet entered only means "this wave has not entered", so no win.
         boolean pendingWaves = waveManager != null && waveManager.hasPendingWaves();
-        // Both sides are judged by their CAMP, not by their "real units" list (L-8 on the enemy side, its
-        // friendly half here). Today the two readings coincide for our side anyway: a summon perishes with
+        // Both sides are judged by their CAMP, not by their "real units" list (the camp split on the enemy
+        // side, its friendly half here). Today the two readings coincide for our side anyway: a summon perishes with
         // its master, so "every character is down" and "the whole camp is down" are the same state.
         if (allies.stream().allMatch(CanHit::isDeath)) {
             status = Status.LOSE;                    // our side being wiped out is a real loss, with or without pending waves
@@ -939,10 +939,10 @@ public class Battle {
     }
 
     /**
-     * Give {@code actor} an extra turn (P-2): the next {@link #stepForward()} is taken by it,
+     * Give {@code actor} an extra turn: the next {@link #stepForward()} is taken by it,
      * and it costs no action value (the clock does not move to the round does not change, see {@link #getRound()}).
      *
-     * <p>The typical use is a kill-type talent (Seele (希儿) and the like, ROADMAP): call it inside
+     * <p>The typical use is a kill-type talent (Seele (希儿) and the like): call it inside
      * {@code afterMove()} -- that is, after {@code queue.setTopZero()} -- so that its normal turn schedule
      * stays untouched and the extra turn is a free one.
      *
@@ -965,17 +965,17 @@ public class Battle {
     }
 
     /**
-     * The currently scheduled extra-turn actor (P-2); {@code null} if there is none.
+     * The currently scheduled extra-turn actor; {@code null} if there is none.
      */
     public CanHit getExtraTurnActor() {
         return queue.getExtraTurnActor();
     }
 
     /**
-     * The current round (P-1): derived from the action bar's accumulated action value; the first round = 1.
+     * The current round: derived from the action bar's accumulated action value; the first round = 1.
      *
      * <p>One round = 100 action value, the first round = 150 (see {@code Queue.initialize()}).
-     * This is only a query point; the real round driving (outcome decision, stage round limit) is in P-3.
+     * This is only a query point; the real round driving (outcome decision, stage round limit) happens elsewhere.
      *
      * @return the round, starting from 1
      */
@@ -1286,7 +1286,7 @@ public class Battle {
             return false;
         }
         // Skill points ): all the rules are in skillPointPolicy (including the our-side/enemy-side camp
-        // check); Battle only asks once "does this action hold up" -- it knows no character, see F-8 in §F.
+        // check); Battle only asks once "does this action hold up" -- it knows no character, see F-8 in §12.5.
         if (!skillPointPolicy.onSkillCast(user, skill)) {
             return false;
         }
@@ -1561,7 +1561,7 @@ public class Battle {
     }
 
     /**
-     * Toughness reduction + weakness break trigger ): the only toughness reduction entry point in
+     * Toughness reduction + weakness break trigger: the only toughness reduction entry point in
      * battle, called by {@link SkillExecutor} after each damage instance settles.
      *
      * <p>The rules (HSR.md §3.2 / §.1):
@@ -1651,7 +1651,7 @@ public class Battle {
         if (!enemy.isWeakTo(element)) {
             return StanceResult.NONE;        // while not broken: a non-weakness reduces nothing at all, so there is no excess part
         }
-        // H-4: break damage is computed from the value this instance actually reduced, not the skill's nominal toughness reduction
+        // Break damage is computed from the value this instance actually reduced, not the skill's nominal toughness reduction
         double consumed = enemy.reduceStance(stanceDamage);
         double overkill = stanceDamage - consumed;                 // the excess part = the input to super break
         if (enemy.getStance() > 0) {
@@ -2875,10 +2875,10 @@ public class Battle {
      * The enemy camp's units that may be selected as attack targets (= alive), in battlefield order.
      *
      * <p>Single source of truth for "who can be hit": {@link SkillExecutor} uses it today,
-     * the target selector ) and wave handling (P-4) must use the same judgement so
+     * the target selector and wave handling must use the same judgement so
      * that no caller ever picks a corpse (that is where corpse-hitting comes from).
      *
-     * <p>Returns {@code CanHit}, not {@code Enemy} (L-8): an enemy-side summon is a legitimate
+     * <p>Returns {@code CanHit}, not {@code Enemy}: an enemy-side summon is a legitimate
      * target, and narrowing here would have made the roster widening pointless - the target list is
      * where the widening has to be visible.
      *
@@ -2967,7 +2967,7 @@ public class Battle {
             damage.addBoost(attacker.getAttribute(scopeBoost).get());
         }
 
-        // Damage-instance conditions (ROADMAP §3 "damage-instance conditions"): "increases the damage dealt to a target in state X by Y%". Fired *before* the zones
+        // Damage-instance conditions: "increases the damage dealt to a target in state X by Y%". Fired *before* the zones
         // are read, because afterwards the number is final and all a rule could do is describe it. `target` is
         // the one about to take the damage; a rule that changes this instance uses BOOST_DAMAGE, which mutates
         // the instance itself -- the instance is the state, so there is no buff to attach, nothing to clean up,
@@ -3121,7 +3121,7 @@ public class Battle {
             }
         }
         releaseBuffsAnchoredToTheDead();             // (3): a buff spent by MY turns has no clock left
-        checkResult();                               // P-3: decide the outcome right after clearing the corpses
+        checkResult();                               // decide the outcome right after clearing the corpses
     }
 
     /**
@@ -3180,7 +3180,7 @@ public class Battle {
      * the signal, because it is the one thing every removal path in the engine sets.
      *
      * <p>Note: <b>Both camps are swept.</b> A summon can now be ours as well as theirs (the friendly half of
-     * L-8), and a sweep that only walked {@code enemies} would leave a player-side minion standing after its
+     * the camp split), and a sweep that only walked {@code enemies} would leave a player-side minion standing after its
      * master fell - still acting, still targetable, and still counted as a survivor by {@link #checkResult}.
      */
     private void perishOrphanedSummons() {
@@ -3200,7 +3200,7 @@ public class Battle {
     }
 
     /**
-     * Brings a summon onto the field ).
+     * Brings a summon onto the field.
      *
      * <p>The summon comes from real monster data ({@code SummonFactory}, keyed by {@code monster_config.json}
      *  - so {@code monster_config.json}'s {@code summon_id} roster on the master tells you the candidates and
@@ -3210,10 +3210,10 @@ public class Battle {
      * <p><b>What is deliberately explicit.</b> The level group is a parameter, not something inferred: a
      * monster's own {@code hard_level_group} is almost always 1 and the <em>stage</em> is what decides
      * difficulty, so there is nothing here to guess it from. Guessing is how the project once got a
-     * silently-empty skill point policy (see ROADMAP §5 lesson 3) - a wrong answer with nothing to see is
+     * silently-empty skill point policy - a wrong answer with nothing to see is
      * worse than a required argument.
      *
-     * <p><b>Both camps can summon</b> (the friendly half of L-8 landed on). The summon joins the
+     * <p><b>Both camps can summon</b> (the friendly half of the camp split). The summon joins the
      * master's own camp: an enemy's minion goes into {@link #enemies}, ours into {@link #allies}, so our side
      * is targetable by the enemy as a whole and our own summon is <b>not</b> a legal target for our attacks
      * (our attacks look at {@code enemies}). The camp is taken from the master rather than passed in - a

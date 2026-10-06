@@ -23,9 +23,10 @@ import java.util.function.Supplier;
  * Purpose verification for the refactor: can the engine really be extended by character mechanics
  * while itself "knowing nothing about character mechanics"?
  *
- * <p><b>F-8</b> in {@code DOC_VS_CODE.md} §F says "the skill point policy must be pulled out of
- * {@code Battle}", and this class is the acceptance test for that sentence - without changing a single
- * line of the engine, it only swaps {@link Battle#skillPointPolicy} and sees whether the engine follows
+ * <p>The requirement is that "the skill point policy must be pulled out of
+ * {@code Battle} (see the finding ledger in {@code ROADMAP.md})", and this class is the acceptance test
+ * for that sentence - without changing a single line of the engine, it only swaps
+ * {@link Battle#skillPointPolicy} and sees whether the engine follows
  * the new rules.
  *
  * <p>The three assertions correspond to three kinds of real-world needs in the future:
@@ -33,14 +34,14 @@ import java.util.function.Supplier;
  *   <li>{@link #customPolicyChangesTheBasicAttackGain()} - character-level point provision
  *       (Sparkle "every 3 basic attacks +1 extra", Sushang "+1 when hitting a broken target");</li>
  *   <li>{@link #customPolicyRaisesTheCap()} - cap-type modifications
- *       (Sparkle's talent +2, the Elation light cone +1 per Elation character, corresponding to F-1 in §F);</li>
+ *       (Sparkle's talent +2, the Elation light cone +1 per Elation character, the cap finding in the ledger);</li>
  *   <li>{@link #customPolicyCanChangeTheStartingValue()} - start-of-battle modifications
- *       (the 4-piece Passerby set "at the start of battle +1", corresponding to F-2 in §F).</li>
+ *       (the 4-piece Passerby set "at the start of battle +1", the start-value finding in the ledger).</li>
  * </ol>
  *
  * <p>Note: These subclasses are test doubles, not character implementations to be delivered - when
- * characters are really implemented they should be driven by the P8-trigger table ({@code cid} only
- * appears at an assembly point (装配点) or in an effect table, the P8-0 three-way split (三分法)).
+ * characters are really implemented they should be driven by the trigger table ({@code cid} only
+ * appears at an assembly point (装配点) or in an effect table, the three-way split (三分法)).
  * What this class proves is "the hooks on the engine side are sufficient", not "the characters are
  * already done".
  */
@@ -87,7 +88,7 @@ public class SkillPointPolicyExtensibilityTest {
     /**
      * Custom policy: cap , start 3 (the effect of Sparkle's talent +2).
      *
-     * <p>Corresponds to <b>F-1</b> in {@code DOC_VS_CODE.md} §F: the engine used to hard-code the cap in
+     * <p>The cap finding in the ledger is that the engine used to hard-code the cap in
      * {@code Constant.SKILL_POINT_MAX}, so it could not be raised by team configuration.
      */
     @Test
@@ -107,9 +108,8 @@ public class SkillPointPolicyExtensibilityTest {
     // ==================================================================
 
     /**
-     * Custom policy: start 4, cap 5 (the effect of the 4-piece Passerby set "at the start of battle +1").
-     *
-     * <p>Corresponds to <b>F-2</b> in {@code DOC_VS_CODE.md} §F.
+     * Custom policy: start 4, cap 5 (the effect of the 4-piece Passerby set "at the start of battle +1";
+     * the ledger's finding that the start value must be configurable).
      */
     @Test
     public void customPolicyCanChangeTheStartingValue() {

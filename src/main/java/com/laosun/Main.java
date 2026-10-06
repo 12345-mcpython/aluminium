@@ -268,7 +268,7 @@ public class Main {
      * Scene 2: a DOT on our own character, settled by the engine at the start of its turn.
      */
     private static void dotOnOurCharacterScene() {
-        System.out.println("[2] A DOT on OUR character — the burn a boss puts on us (P10-0)");
+        System.out.println("[2] A DOT on OUR character — the burn a boss puts on us");
         Character hero = Character.fromAttributes("hero", 10_000, 100, 100, 200);   // fast: acts first
         Enemy boss = EnemyFactory.create(1002011, 90, 1);
         Battle battle = new Battle(List.of(hero), List.of(boss), new Random(7));
@@ -308,7 +308,7 @@ public class Main {
      * Scene 3: the enemy camp holds a summon - targetable, and counted for the outcome.
      */
     private static void enemyCampSummonScene() {
-        System.out.println("[3] A summon on the ENEMY side — the camp no longer only accepts monsters (L-8)");
+        System.out.println("[3] A summon on the ENEMY side — the camp no longer only accepts monsters");
         Character hero = Character.fromAttributes("hero", 10_000, 100, 100, 100);
         Enemy monster = EnemyFactory.create(1002011, 90, 1);
         Summon minion = new Summon("冰锋的随从", com.laosun.aluminium.enums.Camp.ENEMY,
@@ -404,7 +404,7 @@ public class Main {
      * value) because "the panel is a function of the summoner" is the whole mechanic.
      */
     private static void memospriteScene() {
-        System.out.println("[4] A memosprite of OUR side — its panel is a function of its summoner (P9-4)");
+        System.out.println("[4] A memosprite of OUR side — its panel is a function of its summoner");
         Character summoner = CharacterFactory.create(1413, 80);
         Enemy monster = EnemyFactory.create(1002011, 90, 1);
         Battle battle = new Battle(List.of(summoner), List.of(monster), new Random(7));
@@ -680,7 +680,7 @@ public class Main {
      * action bar schedules it like any other unit and {@code Battle.performAction} casts whatever skill it
      * was given. This is the demo's policy, written down in one place - attack the opposing camp with the
      * {@code COMMON} skill, main target picked by the same aggro-weighted selector the enemies use. A real
-     * client would pick differently (memosprite skill 1 says "优先攻击长夜月上次攻击的敌方目标" - see ROADMAP §12.5);
+     * client would pick differently (memosprite skill 1 says "优先攻击长夜月上次攻击的敌方目标" - see {@code ROADMAP.md});
      * the point here is that a summon <b>acts</b>, and that its damage is not a character's.
      *
      * <p>Which side it hits comes from {@code battle.getOpponents(summon)}, never from a hard-coded camp: an

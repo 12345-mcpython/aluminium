@@ -18,7 +18,7 @@ public abstract class Skill {
      *
      * <p>Together with {@link #getSkillSlot()} this is the key into the data tables that are indexed
      * by character rather than embedded in {@code skills.json} - today {@code skill_effects.json}
-     * (P10-3: how to read a non-damaging skill's parameters).
+     * (how to read a non-damaging skill's parameters).
      *
      * <p>The default is deliberately {@code 0} rather than abstract: hand-built test skills and the
      * {@code Character.fromAttributes} placeholder simply have no character, and forcing every one of

@@ -23,7 +23,7 @@ import java.util.Map;
 import java.util.Random;
 
 /**
- * Skill slot mapping (the core of P8-2): {@code SkillType} to the slot number in {@code skills.json}.
+ * Skill slot mapping (the core of skill assembly): {@code SkillType} to the slot number in {@code skills.json}.
  *
  * <p>Before the fix, {@code Character.Builder.build()} wrote every slot as
  * {@code new DefaultSkill(cid, 1, level)} - so basic attack / skill / ultimate / talent all
@@ -145,7 +145,7 @@ public class SkillSlotMappingTest {
     }
 
     /**
-     * Field-by-field alignment with the raw data in {@code Constant.SKILLS} (P8-2's acceptance test).
+     * Field-by-field alignment with the raw data in {@code Constant.SKILLS} (the acceptance test for this mapping).
      */
     @Test
     public void builderDataMatchesTheRawSkillData() {
@@ -310,7 +310,7 @@ public class SkillSlotMappingTest {
      * {@code skillLevel} initial value is 1; to level up, call {@code skillLevel(type)} (+1) or
      * {@code setSkillLevel(type, level)}.
      *
-     * <p>This is not a defect: skill level belongs to P8's progression system (traces/eidolons add
+     * <p>This is not a defect: skill level belongs to the progression system (traces/eidolons add
      * levels); this item is only responsible for "the slot is right, the data is right, the level
      * takes effect".
      */

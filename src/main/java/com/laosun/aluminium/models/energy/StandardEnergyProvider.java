@@ -11,7 +11,7 @@ import java.util.Set;
  * Conventional energy gain: basic attack 20 / skill 30 / ultimate 5 / taking a hit 10 /
  * kill 5 / break 5.
  *
- * <p>Data sources are in {@code ROADMAP.md} under P3-0: the conventional tiers for basic
+ * <p>Where the numbers come from: the conventional tiers for basic
  * attack / skill / ultimate come from tbgd's {@code AvatarSkillConfig.SPBase} (ultimate is
  * always 5; multi-hit skills convert per hit and still total 30), while the base values for
  * taking a hit / kill / break were reverse-engineered from the character documents (the
@@ -24,7 +24,7 @@ import java.util.Set;
  * while that multiplication depends on the ability config's {@code SPHitRatio} (not present
  * in this project's data) - taking the raw value directly makes those 6 characters come out
  * low. Constants give the correct total, so going back to constants is more accurate. The
- * proper data-driven route is ROADMAP P3-4 (aggregate {@code SPHitRatio} first, then wire it up).
+ * proper data-driven route is to aggregate {@code SPHitRatio} first and then wire it up.
  *
  * <p><b>Characters that do not use conventional energy are not judged here</b>: Feixiao /
  * Acheron / Castorice / Phainon / Cyrene / Silver Wolf LV.999 use stacks / special resources
@@ -45,7 +45,7 @@ public class StandardEnergyProvider implements EnergyProvider {
         // Note: Switch on the SkillCategory enum, never on a bare string: when the data side
         //    changes the spelling or adds a value, a string switch fails silently (it falls
         //    into default and is swallowed, with no compile-time protection).
-        //    See F-6 in DOC_VS_CODE.md §F.
+        //    See F-6 in ROADMAP.md §12.5.
         return switch (skill.getData().getCategory()) {
             case NORMAL -> EnergyGain.normal(Constant.ENERGY_GAIN_BASIC);
             case BPSKILL -> EnergyGain.normal(Constant.ENERGY_GAIN_SKILL);

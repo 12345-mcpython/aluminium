@@ -9,7 +9,7 @@ import com.laosun.aluminium.models.CanHit;
  * A <b>control state</b> as one buff: Frozen / Entanglement / Imprisonment - "cannot act", "speed reduced" and, for Frozen,
  * "takes additional ice damage at the start of every turn".
  *
- * <p><b>Why one class instead of "a StunBuff plus maybe a slow".</b> P10-2 composed a control inline out of
+ * <p><b>Why one class instead of "a StunBuff plus maybe a slow".</b> The earlier design composed a control inline out of
  * existing primitives, which was right about the <i>parts</i> and wrong about the <i>identity</i>: the composition
  * lived in {@code Battle.attachBreakControl}, so a control had no name, nothing the condition DSL could read
  * ("is this unit frozen?"), and no way for a <b>skill</b> to apply one at all. Two things follow from giving it a

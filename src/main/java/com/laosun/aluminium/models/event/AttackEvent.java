@@ -22,7 +22,7 @@ import java.util.List;
  * through {@code Battle.applyDamage} and are <em>part of</em> somebody else's attack - in the official
  * definition additional damage "does not count as having caused 1 attack", which also naturally avoids the
  * recursion "additional damage kills to triggers additional damage". A follow-up attack is therefore not
- * announced either, so it does not consume an {@code "until": "next_attack"} buff (registered as M-2).
+ * announced either, so it does not consume an {@code "until": "next_attack"} buff.
  *
  * <p>An attack that <b>hits nothing</b> is not announced: {@code Battle.fireAfterAttack} returns early when
  * no target was hit, so a swing at a battlefield with nothing alive does not count as an attack.

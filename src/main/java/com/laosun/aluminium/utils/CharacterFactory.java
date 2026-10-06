@@ -30,36 +30,36 @@ import java.util.Set;
  * }</pre>
  *
  * <p>It is essentially a thin wrapper around {@code Character.builder()} - the stat pipeline
- * (level scaling / light cone / relics / traces / extra bonuses) was already complete in P2; what
- * added is the character identity fields: element, path, aggro, max energy (see
+ * (level scaling / light cone / relics / traces / extra bonuses) was already complete; what this class
+ * adds is the character identity fields: element, path, aggro, max energy (see
  * {@code Character.Builder#build()}).
  *
  * <p>Division of labour with {@link Character#fromAttributes}: that one is the test/placeholder
  * entry point (no element, no path, max energy 0, all skills placeholders); this one is the real
- * character entry point. After P8 all new code uses this one.
+ * character entry point. All new code uses this one.
  *
- * <p><b>Skill assembly is wired up in P8-2</b>: a character built by {@code create()} carries
+ * <p><b>Skill assembly is wired up</b>: a character built by {@code create()} carries
  * {@code DefaultSkill} with the real slot mapping (basic attack 1 / skill 2 / ultimate 3 /
  * talent 4); there is only one mapping table ({@code Constant.SKILL_SLOT}) and the assembly point is
  * {@code Character.Builder#build()} - see {@code engine.md} §.2. Map basic attack (6) / technique ()
  * are not installed here; they are attached by {@code Battle.startBattle()}.
  *
  * <p>Note: This class only handles character identity and resources and does not touch skill
- * multipliers: follow-up attacks/summons are P8-3/P9-4.
+ * multipliers: follow-up attacks/summons are not handled yet.
  */
 public final class CharacterFactory {
     /**
      * Characters that go through stacks/special resources instead of conventional energy (the
-     * "capabilities the engine does not have yet" bucket of the P8-0 three-way split).
+     * "capabilities the engine does not have yet" bucket of the three-way split).
      *
      * <p>What they accumulate in the game is [追忆] (Reminiscence) / [新蕊] (New Bud) / [火种]
      * (Kindling) / points; conventional energy gain is meaningless for them. And {@code castUltra}
      * only looks at {@code currentEnergy >= maxEnergy}, so without blocking them they could fill the
      * bar by "getting hit" and fire an ultimate that should not exist (Acheron (黄泉) caps at 9).
      *
-     * <p>Putting the check at the assembly point is explicitly allowed by P8-0 (the provider registry /
-     * the assembly point are the only places where a cid may appear). Once P8-8's {@code Resource}
-     * lands, this table evolves into a "character to resource implementation" registry.
+     * <p>Putting the check at the assembly point is explicitly allowed (the provider registry /
+     * the assembly point are the only places where a cid may appear). Once the {@code Resource}
+     * abstraction lands, this table evolves into a "character to resource implementation" registry.
      */
     private static final Set<Integer> SPECIAL_RESOURCE_CHARACTERS = Set.of(
             1220,   // Feixiao (飞霄): stacks (ultimate threshold 6, cap 12)
@@ -326,8 +326,8 @@ public final class CharacterFactory {
     /**
      * Whether this character goes through stacks/special resources (rather than conventional energy).
      *
-     * <p>Gives the caller a "ask first, then wire up" hook, and also lets tests and the future P8-8
-     * registry reuse the same table.
+     * <p>Gives the caller a "ask first, then wire up" hook, and also lets tests and the future
+     * resource registry reuse the same table.
      */
     public static boolean usesSpecialResource(int cid) {
         return SPECIAL_RESOURCE_CHARACTERS.contains(cid);

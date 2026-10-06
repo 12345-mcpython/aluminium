@@ -27,7 +27,7 @@ import java.util.Random;
 
 /**
  * Questions about summons <b>on the field</b>: {@code self_summon_count}, and the {@code "summon"} target
- * selector (P9-4's memosprite family).
+ * selector (the memosprite family).
  *
  * <p><b>Why these two exist and why they need the battle.</b> "while a memosprite is on the field" and "the wearer and their memosprite" are not facts
  * about the event - nothing just happened, or one of the two units named did not act. They are facts about the

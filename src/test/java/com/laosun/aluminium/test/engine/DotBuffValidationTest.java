@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
- * L-12: every input of a {@code DotBuff} comes from data, so each one has to be rejected at
+ * Every input of a {@code DotBuff} comes from data, so each one has to be rejected at
  * <b>construction</b> time instead of producing a wrong answer later.
  *
  * <p>Why this is not "defensive programming for its own sake" - each parameter has a concrete wrong
@@ -21,7 +21,7 @@ import org.junit.jupiter.api.Test;
  *   {@code Battle.assemble}'s {@code Math.max(1, …)} floor, so the burn settles exactly <b>1 damage
  *   per turn</b> - a wrong number that nothing ever complains about. (The registry's original wording
  *   "silently no damage" was close but not exact.) NaN/infinity poisons the settlement the same way a
- *   NaN reaches the HP bar (see M-11).</li>
+ *   NaN reaches the HP bar (see the note on NaN handling).</li>
  *   <li>A {@code null} element is only caught much later by {@code Damage}'s
  *   {@code Objects.requireNonNull(element)} - at settlement time, in {@code tickDots}, far from the
  *   code that built the buff.</li>

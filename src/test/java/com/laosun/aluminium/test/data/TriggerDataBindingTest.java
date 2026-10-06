@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
- * Guards the JSON <-> bean binding of the trigger files (P8-).
+ * Guards the JSON <-> bean binding of the trigger files.
  *
  * <p>Why this is separate from {@link TriggerTableTest}: that class proves the trigger
  * <b>behaves</b> correctly, but a Gson field-name mismatch is the failure mode this project has hit

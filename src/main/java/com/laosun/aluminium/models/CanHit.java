@@ -105,7 +105,7 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
      *
      * <p>The real caps come from {@code max_energy} in {@code character_data.json} (of the 93 characters
      * only Castorice is null). Many are way off the common tier: Feixiao/Mydei 12, Acheron 9, Cyrene 24,
-     * Firefly/Yunli/Evernight 240, Argenti/Yao Guang 180, Aglaea 350, Evanescia 480 - see the P3-0 D table in ROADMAP.
+     * Firefly/Yunli/Evernight 240, Argenti/Yao Guang 180, Aglaea 350, Evanescia 480.
      */
     @Setter
     private double maxEnergy = 0;
@@ -143,7 +143,7 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
      *
      * <p>Deliberately without a getter: the maps are mutable, and they are reachable only through the
      * four methods below, so nothing can tick or clear somebody else's limits by accident - the same
-     * reasoning that made {@code Queue}'s exposed live heap a registered defect (L-5).
+     * reasoning that made {@code Queue}'s exposed live heap a registered defect.
      */
     @Getter(AccessLevel.NONE)
     private final Map<String, Integer> triggerCooldowns = new HashMap<>();
@@ -279,7 +279,7 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
         this.camp = other.camp;
         this.level = other.level;
         this.skills = new EnumMap<>(other.skills);
-        // Note: Deep-clone the attribute sheet (H-6). `other.attributes.clone()` clones the ARRAY and
+        // Note: Deep-clone the attribute sheet. `other.attributes.clone()` clones the ARRAY and
         // nothing else, so every DoubleValue inside stayed the same object as the original's -- and
         // buffs mutate those objects in place (BoostDamageBuff.applyEffect calls addModifier on the
         // target's value), so a buff on one combatant showed up on the other's panel. DoubleValue.clone()
@@ -648,7 +648,7 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
     }
 
     /**
-     * Credit one energy gain (the only entry point for energy growth in P3).
+     * Credit one energy gain (the only entry point for energy growth).
      *
      * <p>Formula (HSR.md §3.3): {@code final energy gained = base energy gained  x  (1 + energy regeneration
      * rate%)}; when {@link EnergyGain#affectedByEfficiency()} is {@code false} the efficiency bonus does
@@ -985,7 +985,7 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
     }
 
     /**
-     * Damage-settlement hook (P1-), fired for both sides before the zones are multiplied.
+     * Damage-settlement hook, fired for both sides before the zones are multiplied.
      *
      * <p>The default relays to {@link BuffManager#onDamage(Battle, Damage)}, so buffs can inject
      * vulnerability / reduction / weakness. Subclasses that override it (character

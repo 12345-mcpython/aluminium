@@ -8,11 +8,11 @@ import lombok.ToString;
 import java.util.List;
 
 /**
- * One trigger rule from {@code resources/characters/<cid>.json} (P8-):
+ * One trigger rule from {@code resources/characters/<cid>.json}:
  * "on &lt;event&gt;, when &lt;conditions&gt;, do &lt;effects&gt;".
  *
  * <p>This is the unit that replaces a `XxxTalent.java` class. The engine only interprets it --
- * it never learns which character it belongs to, which is the whole point of the P8-0 three-way
+ * it never learns which character it belongs to, which is the whole point of the three-way
  * split.
  *
  * <p>Note: Read the conditions as follows: the owning character is called <b>self</b> in

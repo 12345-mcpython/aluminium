@@ -10,7 +10,7 @@ import lombok.Getter;
 import java.util.List;
 
 /**
- * Stage wave management (P-4): spawns monsters in order, one entry of
+ * Stage wave management: spawns monsters in order, one entry of
  * {@link StageBean#monster()} (= one wave) at a time.
  *
  * <pre>{@code
@@ -24,7 +24,7 @@ import java.util.List;
  * }
  * }</pre>
  *
- * <p><b>How victory/defeat relates to waves</b> (the P-3 x P-4 seam, the easiest place to
+ * <p><b>How victory/defeat relates to waves</b> (the battle-status/wave seam, the easiest place to
  * trip over): {@code Battle.checkResult()} treats "one side is wiped out" as the battle
  * ending, whereas in wave mode "the enemy team is empty" only means this wave has not
  * spawned yet. So {@link Battle} asks this class
@@ -132,7 +132,7 @@ public class WaveManager {
 
     /**
      * The current wave's units that are still alive - the enemy camp's, so a summon fighting
-     * alongside the monsters counts as "not cleared" too (L-8).
+     * alongside the monsters counts as "not cleared" too.
      */
     public List<CanHit> aliveEnemies() {
         return battle.enemies.stream().filter(e -> !e.isDeath()).toList();

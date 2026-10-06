@@ -286,7 +286,7 @@ public class March7thKitTest {
     @Test
     public void theRestOfHerKitIsNotAuthored() {
         Assertions.assertEquals(4, TriggerTables.of(MARCH).ruleCount(TriggerEvent.SKILL_CAST),
-                "the shield, the soft aggro weight (AGGRO_ADDED_RATIO, added 2026-09-29), the cleanse trace and the Grace trace "
+                "the shield, the soft aggro weight (AGGRO_ADDED_RATIO), the cleanse trace and the Grace trace"
                         + "(the shield's +1 turn) -- and nothing else on her Skill");
         Assertions.assertEquals(1, TriggerTables.of(MARCH).ruleCount(TriggerEvent.TAKING_HIT),
                 "the Talent's counter");
@@ -296,7 +296,7 @@ public class March7thKitTest {
         Assertions.assertEquals(6, TriggerTables.of(MARCH).ruleCount(TriggerEvent.BATTLE_START),
                 "Eidolon 2's battle-start shield; the two amendments (Eidolon 4 raising the talent's per-turn cap, the 行迹「冰咒」 "
                         + "raising the ultimate's base chance); and Eidolon 3's and Eidolon 5's skill levels plus the talent's "
-                        + "base level (three rules, M-32)");
+                        + "base level (three rules, )");
         Assertions.assertEquals(0, TriggerTables.of(MARCH).ruleCount(TriggerEvent.KILL),
                 "and nothing of hers reacts to kills");
         Assertions.assertEquals(1, TriggerTables.of(MARCH).ruleCount(TriggerEvent.TURN_START),

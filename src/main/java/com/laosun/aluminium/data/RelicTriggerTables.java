@@ -32,7 +32,7 @@ import java.util.TreeMap;
  * {@code resources/characters/<cid>.json}. Relic sets therefore reuse all of it and add no new
  * interpreter, no new op and no per-set Java class. A set that needs a capability the vocabulary does
  * not have is <b>not approximated</b>: it is registered in {@code _unmodelled.json} and recorded as a
- * gap in {@code DOC_VS_CODE.md} §F.
+ * gap in {@code ROADMAP.md} §12.5.
  *
  * <h2>The file format</h2>
  * A set file is a JSON object keyed by the <b>worn piece count</b> the rules under it need, so that a

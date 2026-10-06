@@ -14,7 +14,7 @@ import java.util.Arrays;
  * <p>Note: <b>The numbers are still placeholders and this class does not pretend otherwise.</b> The four
  * damaging elements reuse the old {@code DOT_RATIO} / {@code DOT_TURNS}; the three control elements carry
  * a delay and a control state whose numbers are example values, and carry <b>no</b> DOT because the damage
- * component of Frozen/Entanglement is a ratio the data does not contain (see the TODO in ROADMAP P10-2). What is
+ * component of Frozen/Entanglement is a ratio the data does not contain (see the TODO in the plan). What is
  * pinned here is the <b>structure</b>: every element is accounted for, the DOT set is derived from the
  * table rather than listed a second time, and every control key resolves.
  */
@@ -64,7 +64,7 @@ public class BreakEffectTableTest {
                 DamageElement.QUANTUM, DamageElement.IMAGINARY)) {
             Constant.BreakEffect effect = Constant.BREAK_EFFECTS.get(element);
             Assertions.assertFalse(effect.hasDot(),
-                    element + " must not carry a DOT until the damage ratio is decided (ROADMAP P10-2)");
+                    element + "must not carry a DOT until the damage ratio is decided");
             Assertions.assertTrue(effect.hasControl(),
                     element + " must name its control effect, so 'unimplemented' is visible");
             Assertions.assertTrue(effect.delayPercent() > 0,

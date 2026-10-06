@@ -311,8 +311,7 @@ public final class Constant {
      *
      * <p>Note: <b>The cap is not always 5</b>: Sparkle's talent "cap +2" and a light cone's "for each character
      * on the Path of Elation +1", and some light cones even trigger on "cap >= 6". The engine currently has
-     * no hook for "changing a team-level resource cap" - registered as <b>F-1</b> in
-     * {@code DOC_VS_CODE.md} §F.
+     * no hook for "changing a team-level resource cap" - recorded in {@code ROADMAP.md}.
      */
     public static final int SKILL_POINT_MAX = 5;
 
@@ -323,7 +322,7 @@ public final class Constant {
      * "at the start of battle immediately recover 1 skill point for our side" to start at 4 (5 if two
      * characters wear it). That bonus is an <b>ability</b> rather than stats - {@link #RELIC_SETS} now
      * carries it as {@code Ability51011} with an empty property list - and the engine has no ability
-     * interpreter, so it is still not applied: registered as <b>F-2</b> in §F.
+     * interpreter, so it is still not applied: recorded in {@code ROADMAP.md}.
      */
     public static final int SKILL_POINT_START = 3;
 
@@ -493,9 +492,9 @@ public final class Constant {
      * <b>not</b> contain a break-control table: {@code breaking_rate.json} is level to break base value, and
      * the only descriptions of these states live in the encyclopedia text, which states the mechanics but
      * not the numbers. What the text settles is the mechanics, and two of them contradict the
-     * plan (recorded in {@code ROADMAP.md}):
+     * earlier design notes (recorded in {@code ROADMAP.md}):
      * <ul>
-     *   <li>frozen (冻结) = <b>cannot act</b> (+ ice damage every turn) - the plan said "while frozen, damage taken +30%",
+     *   <li>frozen (冻结) = <b>cannot act</b> (+ ice damage every turn) - the earlier notes said "while frozen, damage taken +30%",
      *       which nothing in the data supports;</li>
      *   <li>imprisoned (禁锢) / entangled (纠缠) = <b>action delayed + speed lowered</b>, and the victim still acts.</li>
      * </ul>

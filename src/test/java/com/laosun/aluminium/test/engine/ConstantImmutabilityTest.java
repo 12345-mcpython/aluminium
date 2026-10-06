@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * H-1: the tables loaded into {@link Constant} are <b>read-only shared engine data</b>.
+ * The tables loaded into {@link Constant} are <b>read-only shared engine data</b>.
  *
  * <p>{@code public static final} locks the reference, not the contents. Before this, every table was a
  * mutable {@code LinkedHashMap} straight out of Gson and the nesting was mutable too, so any caller - a
@@ -61,7 +61,7 @@ public class ConstantImmutabilityTest {
     }
 
     /**
-     * The nested containers are frozen as well - this is the half the concrete examples in H-1 were about
+     * The nested containers are frozen as well - this is the half the concrete examples above were about
      * ({@code SKILLS[1001]} was a mutable map, {@code SKILL_TRACES[1001]} a mutable list).
      */
     @Test

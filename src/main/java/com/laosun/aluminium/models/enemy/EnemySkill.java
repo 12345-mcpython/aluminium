@@ -179,7 +179,7 @@ public class EnemySkill extends Skill {
         // and that is the one guard a test can reach. An earlier version filtered here too, and mutation
         // testing showed the outer filter changed no observable outcome (removing it left every test green),
         // i.e. it was an untestable second guard for the same fact. One guard, exercised.
-        // Note: The OPPOSING CAMP of the user, not `battle.allies` (the friendly half of L-8). An enemy AOE
+        // Note: The OPPOSING CAMP of the user, not `battle.allies` (the friendly half). An enemy AOE
         // has to reach a player-side summon too, and a memosprite's AOE has to reach the enemy
         // camp. Hard-coding `allies` made every AOE one-sided: it read right while only enemies cast
         // this skill, and silently hit nothing the moment our own summon did.

@@ -23,10 +23,10 @@ import com.laosun.aluminium.models.skill.Skill;
  * <p><b>Why only our side is counted</b>: enemies also act through {@code Battle.performAction}, and
  * their skills are {@code Normal} as well - without a camp check, every enemy hit would give our side
  * +1 skill point. The test uses {@link com.laosun.aluminium.enums.Camp#PLAYER} ("a unit on our side")
- * rather than "is it player-controlled": when friendly summons (memosprite, P9-4) are added later they
+ * rather than "is it player-controlled": when friendly summons (memosprite) are added later they
  * should also supply points, and this behaviour is pinned by {@code SkillPointGameParityTest}.
  *
- * <p>Note: <b>Known deviation</b> (<b>F-3</b> in §F of {@code DOC_VS_CODE.md}): here {@code NORMAL} is
+ * <p>Note: <b>Known deviation</b> (the finding ledger in {@code ROADMAP.md}): here {@code NORMAL} is
  * uniformly +1, whereas in the game enhanced basic attacks have exceptions - Boothill (波提欧)
  * enhanced basic attack "cannot restore skill points", while Qingque's (青雀) enhanced basic attack
  * "restores 1 skill point". In the data both are {@code "Normal"} (there is no separate type), so this
@@ -35,17 +35,17 @@ import com.laosun.aluminium.models.skill.Skill;
  * right fix is a per-skill skill-point delta field (a data completion). This class leaves
  * {@link #gainForCast} as the override point.
  *
- * <p>Note: <b>Character-level modifiers are not wired up</b> (F-4 in the same §F): Bronya (布洛妮娅)
+ * <p>Note: <b>Character-level modifiers are not wired up</b> (the finding ledger in {@code ROADMAP.md}): Bronya (布洛妮娅)
  * "50% chance to +1 on skill", Sushang's (素裳) "+1 on a skill that hits a broken target", Sparkle's
- * (花火) "cap +2" and so on all have to wait for the P8-trigger table. This class deliberately knows
+ * (花火) "cap +2" and so on all have to wait for the trigger table. This class deliberately knows
  * no character - when adding these, extend and override {@link #gainForCast} (or drive it from the
- * -effect table), and do not write {@code cid} checks here.
+ * effect table), and do not write {@code cid} checks here.
  */
 public class StandardSkillPointPolicy implements SkillPointPolicy {
 
     /**
      * The skill point resource itself. {@link Resource} is used instead of a bare {@code int} so that
-     * it shares one bounded-semantics abstraction with P8-8's stack resources (see that class's
+     * it shares one bounded-semantics abstraction with the stack resources (see that class's
      * description).
      */
     private final Resource resource;
@@ -60,7 +60,7 @@ public class StandardSkillPointPolicy implements SkillPointPolicy {
 
     /**
      * Construct with the given cap/start value (for tests and for the future "cap raised by a light
-     * cone/character", see F-1 in §F).
+     * cone/character", see the cap note in {@code ROADMAP.md}).
      *
      * @param max     the conventional cap
      * @param initial the start value (clamped to {@code [0, max]})
@@ -85,7 +85,7 @@ public class StandardSkillPointPolicy implements SkillPointPolicy {
      * (for example, when already at cap after a basic attack the actual credited amount is 0, and no
      * event should be fired). {@code Battle} is only responsible for broadcasting the reported events
      * to the team - that way {@code Battle} still does not need to know the skill point rules
-     * (see F-8 in §F).
+     * (see {@code ROADMAP.md}).
      */
     public interface Listener {
         /**
@@ -168,7 +168,7 @@ public class StandardSkillPointPolicy implements SkillPointPolicy {
      *
      * <p>This is the class's primary override point: character-level modifiers such as "Sparkle
      * (花火) in the team gives +1" or "an enhanced basic attack restores no points" are produced by a
-     * subclass or the P8-effect table overriding it, and without changing {@code Battle}.
+     * subclass or the effect table overriding it, and without changing {@code Battle}.
      *
      * @param user     the acting unit
      * @param skill    the skill
@@ -183,8 +183,8 @@ public class StandardSkillPointPolicy implements SkillPointPolicy {
      * Resolves the skill category.
      *
      * <p>Note: Go through {@code SkillData.getCategory()} and not a bare-string {@code switch} - the
-     * latter silently mismatches when the data side changes a spelling or adds a new value (see
-     * F-6 in §F of {@code DOC_VS_CODE.md}).
+     * latter silently mismatches when the data side changes a spelling or adds a new value
+     * (see the finding ledger in {@code ROADMAP.md}).
      *
      * @return {@code null} means "there is no category to speak of" (the skill or its skill data is
      * empty); the caller treats it as neutral

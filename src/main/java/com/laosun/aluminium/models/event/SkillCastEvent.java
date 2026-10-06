@@ -29,7 +29,7 @@ import java.util.List;
  *
  * <p>Note: Currently it is only emitted from {@code SkillExecutor}. {@code castImmediate} goes through it too,
  * so it is fired; but enemy skills ({@code EnemySkill}'s own {@code execute}) currently do not emit it - 
- * to be aligned when P9-2 wires enemy skills into the unified executor.
+ * to be aligned when enemy skills are wired into the unified executor.
  *
  * @param battle     the running battle
  * @param user       the caster

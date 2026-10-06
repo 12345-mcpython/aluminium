@@ -20,11 +20,11 @@ import java.util.Set;
 /**
  * acceptance: {@code CharacterFactory} + completion of the character identity fields.
  *
- * <p>This item does not do skill assembly (that is P8-2), so what is asserted here is:
+ * <p>This item does not do skill assembly (that is a later step), so what is asserted here is:
  * element / path / aggro / energy cap / level / panel scaling - that is, "a character's identity
  * and numbers", without mechanics.
  *
- * <p>Character selection principle: the 5 are the P8-5 target team + Preservation, covering 5 of
+ * <p>Character selection principle: the 5 are the target team + Preservation, covering 5 of
  * the 8 elements, 5 paths, 4 aggro tiers, 4 energy tiers; plus 3 data boundary characters
  * (null / 12 / 9 energy) that only get energy assertions.
  */
@@ -47,13 +47,13 @@ public class CharacterFactoryTest {
     }
 
     /**
-     * Every character's star rating can be read, and the only values are 4 / 5 (a prerequisite of P8-2).
+     * Every character's star rating can be read, and the only values are 4 / 5 (a prerequisite of skill assembly).
      *
      * <p>{@code rarity} is obtained by the generator from the last digit of
      * {@code AvatarConfig.Rarity} (of the form {@code CombatPowerAvatarRarityType5}); in the data it
      * is 23 four-stars + 0 five-stars (consistent with the docs' index table).
      *
-     * <p>Why pin it down now: in P8-2 the skill level cap differs by star rating (it must be
+     * <p>Why pin it down now: in skill assembly the skill level cap differs by star rating (it must be
      * readable before skill assembly), and if the {@code CharacterData} record is missing a field,
      * Gson silently gives 0 - no error, just everything wrong.
      */
@@ -126,7 +126,7 @@ public class CharacterFactoryTest {
      * (that is, 1 + level tier  x  0.4).
      * So do not use the intermediate tiers to cross-check against the game panel - the formula
      * only lines up at the two ends (this is consistent with the "simulator multiplier formula"
-     * recorded in ROADMAP P1-4: it was an approximation to begin with).
+     * recorded in the design notes: it was an approximation to begin with).
      *
      * <p>This one writes "which anchors are trustworthy" into the test, so that next time nobody
      * (including me) asserts 45.2 at Lv0 again.
@@ -153,7 +153,7 @@ public class CharacterFactoryTest {
     }
 
     /**
-     * A latent bug fixed in P8-1: a low level combined with "ascended" once produced a
+     * A latent bug fixed early on: a low level combined with "ascended" once produced a
      * negative ascension.
      *
      * <p>Originally Lv1 + {@code promotion=true} gave {@code promoteCount = 1/10 - 1 = -1}, a
@@ -254,7 +254,7 @@ public class CharacterFactoryTest {
     }
 
     // ==================================================================
-    // Energy boundaries (the three named by the P3-0 A table)
+    // Energy boundaries (the three named by the energy table)
     // ==================================================================
 
     /**
@@ -263,7 +263,7 @@ public class CharacterFactoryTest {
      *   <li>140 Castorice (遐蝶) - the only {@code null} in the whole data set. Must stay 0 (no energy bar);
      *       falling back to 100 would conjure an energy bar for her out of nothing;</li>
      *   <li>1220 Feixiao - 12 (the ultimate only costs 6);</li>
-     *   <li>1308 Acheron - 9 (actually uses "stacks in place of an energy bar", see P8-8).</li>
+     *   <li>1308 Acheron - 9 (actually uses "stacks in place of an energy bar", see the note on stack resources).</li>
      * </ul>
      */
     @Test
@@ -314,7 +314,7 @@ public class CharacterFactoryTest {
      * The legacy placeholder entry point still works, but has no element (faithfully reflecting
      * "this is not a character").
      *
-     * <p>This also explains why new code after P8 should not use it any more.
+     * <p>This also explains why new code should not use it any more.
      */
     @Test
     public void placeholderEntryStillWorksButHasNoIdentity() {

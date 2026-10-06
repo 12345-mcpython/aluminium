@@ -12,7 +12,7 @@ import java.util.Map;
 import static com.laosun.aluminium.models.DoubleValue.Modifier.ModifierSource.BUFF;
 
 /**
- * acceptance (and the P1-2 constructor checks): every zone asserts its own
+ * acceptance (plus the constructor checks): every zone asserts its own
  * multiplier against a base of 1000, plus the invariants of the zone container.
  *
  * <p>Pure algebra: {@code attacker}/{@code defender} take no part in zone settlement,
