@@ -866,8 +866,10 @@ public class TriggerTable {
     // ==================================================================
 
     /**
-     * The numeric variables {@code hit_count}, {@code hp_percent}, {@code target_debuff_count} and
-     * {@code self_summon_count} are the complete, closed set of <b>plain</b> names.
+     * The numeric variables {@code hit_count}, {@code hp_percent}, {@code target_debuff_count},
+     * {@code self_summon_count} and their siblings are the complete, closed set of <b>plain</b> names (the
+     * authoritative list is {@link #NUMERIC_VARIABLES}, and a name must be added to all of that set, the value
+     * switch below, and {@code UnitDisciplineTest}'s pin).
      *
      * <p>Each reads from a different place, which is why the names say so: {@code hit_count} comes from the
      * event, {@code hp_percent} from the rule's owner (a fact about me), and {@code target_debuff_count} from
@@ -887,7 +889,11 @@ public class TriggerTable {
     private static final Set<String> NUMERIC_VARIABLES =
             Set.of("ally_count", "enemy_count", "hit_count", "weakness_hit_count", "target_weakness_count", "hp_percent", "target_hp_percent", "target_hp_percent_before", "target_debuff_count", "self_summon_count",
                     "target_summon_count", "self_max_energy", "self_energy_percent", "from_skill_id", "damage_skill_key", "target_dot_count",
-            "actor_hp_percent");
+            "actor_hp_percent",
+            // "when entering combat, if the allies' Skill Points limit is #2 or higher" (reader: light cone 23046):
+            // the cap is not a field of the unit -- it belongs to the battle's skill point policy -- so the value
+            // comes from the battle, and a context without one answers NaN like every other unreadable variable.
+            "skill_point_max");
 
     /**
      * The prefix of one parameterised numeric variable: {@code self_attr:SPEED}.
@@ -3586,6 +3592,11 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
                 case "self_energy_percent" -> ctx.owner() == null || ctx.owner().getMaxEnergy() <= 0
                         ? Double.NaN
                         : (double) ctx.owner().getCurrentEnergy() / ctx.owner().getMaxEnergy();
+                // "if the allies' Skill Points limit is #2 or higher" -- the cap of the TEAM's pool. It is not an
+                // attribute and not a field of the unit: the policy owns it (F-1 made it movable), so this reads the
+                // battle rather than the owner, and a context with no battle answers NaN -- "cannot read it, so the
+                // condition fails", the convention every other variable follows.
+                case "skill_point_max" -> ctx.battle() == null ? Double.NaN : ctx.battle().getSkillPointMax();
                 default -> Double.NaN;
             };
         }
