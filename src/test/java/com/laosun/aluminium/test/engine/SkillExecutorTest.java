@@ -70,7 +70,7 @@ public class SkillExecutorTest {
                 ? "Deals DMG equal to #1[i]% of ATK to one enemy and additionally deals #2[i] instances of DMG."
                 : "Deals DMG equal to #1[i]% of ATK to one enemy.";
         SkillData data = new SkillData(1, "Fake", List.of(params), new StanceList(0, 0, 0),
-                DamageElement.ICE, effect, null, 30.0, description);   // description is the 9th component (Lombok field order)
+                DamageElement.ICE, effect, null, 30.0, null, description);   // bp_add is null, so the policy keeps its default
         return new Skill() {
             @Override
             public int getLevel() {

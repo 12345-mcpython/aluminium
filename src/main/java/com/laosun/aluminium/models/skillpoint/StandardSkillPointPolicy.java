@@ -176,7 +176,12 @@ public class StandardSkillPointPolicy implements SkillPointPolicy {
      * @return the skill points to add ({@code <= 0} means add none)
      */
     protected int gainForCast(CanHit user, Skill skill, SkillCategory category) {
-        return Constant.SKILL_POINT_GAIN_BASIC;
+        // The data states the battle-point change per skill, and it is the only authority that separates a basic
+        // attack that restores a point from an ENHANCED one that does not: a normal basic carries BPAdd 1, an
+        // enhanced basic carries none (Boothill's Fanning the Hammer, Qingque's enhanced basic). Rows we have no
+        // data for keep the historical +1, so a skill outside the character tables behaves as before.
+        Double stated = skill == null || skill.getData() == null ? null : skill.getData().getBpAdd();
+        return stated == null ? Constant.SKILL_POINT_GAIN_BASIC : (int) Math.round(stated);
     }
 
     /**

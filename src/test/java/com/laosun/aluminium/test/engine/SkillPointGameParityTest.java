@@ -197,31 +197,29 @@ public class SkillPointGameParityTest {
     }
 
     /**
-     * Note: <b>Known deviation</b>: the engine hands out +1 with a blanket
-     * {@code attack_type == "Normal"}, but in the game there are exceptions where an enhanced
-     * basic attack does not restore a skill point.
+     * Note: <b>Resolved for the case the evidence settles</b> (2026-10-02, F-3). The engine no longer
+     * hands out +1 from a blanket {@code attack_type == "Normal"}: it reads the skill row's own
+     * {@code bp_add}, which {@code skills.json} carries from tbgd's {@code AvatarSkillConfig.BPAdd}.
      *
      * <p>Evidence: {@code 1315_波提欧.md}, "an enhanced basic attack cannot restore a skill
      * point, and can only target an enemy in [绝命对峙]". The enhanced basic attack of
      * {@code 1213_丹恒-饮月.md}, on the other hand, does not spend a skill point ("casting this
      * skill does not consume a skill point and is not treated as using a skill").
      *
-     * <p>Why it "happens to line up": in this project's data the enhanced basic attacks
-     * are also {@code "Normal"}, with no separate type (122 {@code Normal} entries measured =
-     * 93 characters  x  1 + the multi-tier enhanced basic attacks of Dan Heng - Imbibitor Lunae /
-     * Jingliu / Qingque / Boothill), so the engine gives them +1. That is correct for Qingque
-     * ({@code 1201_青雀.md} states explicitly "after casting an enhanced basic attack, restore
-     * 1 skill point") and wrong for Boothill.
+     * <p>What is recorded, and what is not: a row's {@code bp_add} holds the value <b>only where the
+     * evidence settles it</b> -- every ordinary basic attack (tbgd says {@code BPAdd 1}) and Boothill's
+     * enhanced basic (its own text says "the enhanced basic cannot restore skill points", and tbgd
+     * carries no {@code BPAdd} there). For every other row the field is absent on purpose, because
+     * tbgd's {@code null} does <b>not</b> mean zero: Qingque's enhanced basic also has no
+     * {@code BPAdd}, yet {@code 1201_青雀.md} states "after casting an enhanced basic attack, restore
+     * 1 skill point". So the field cannot be filled in mechanically -- each character's prose decides,
+     * which is why the register keeps that half open.
      *
-     * <p>Note: But it MUST NOT be changed to "enhanced basic attacks are always +0": that would
-     * break Qingque.
-     * The real fix is "each skill carries its own skill point gain field", which is a data
-     * completion task, not an engine logic problem.
-     * This probe writes down the fact of the blanket rule, so that later nobody reads only
-     * {@code engine.md} and assumes "who restores skill points" is already exact.
+     * <p>{@code BoothillEnhancedBasicTest} pins both sides of the resolved case, and flipping the row's
+     * {@code bp_add} back to 1 turns it red.
      */
     @Test
-    public void normalAttackIsBlanketPlusOneSoEnhancedNormalsAlsoGain() {
+    public void anOrdinaryBasicRestoresThePointItsRowStates() {
         Battle battle = newBattle(List.of(CharacterFactory.create(1315, 80)));   // Boothill
         Skill enhancedLikeBasic = new DefaultSkill(1315, 1, 1);
         Assertions.assertEquals("Normal", enhancedLikeBasic.getData().getSkillType(),
@@ -230,7 +228,7 @@ public class SkillPointGameParityTest {
         int before = battle.getSkillPoints();
         Assertions.assertTrue(battle.applySkillPointCost(enhancedLikeBasic, battle.characters.getFirst()));
         Assertions.assertEquals(before + 1, battle.getSkillPoints(),
-                "the engine's blanket +1 — correct for Qingque, a known deviation for Boothill (enhanced basic attack restores nothing)");
+                "the row states bp_add 1, so an ordinary basic attack restores one point");
     }
 
     /**

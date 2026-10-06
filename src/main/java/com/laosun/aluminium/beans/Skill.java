@@ -13,7 +13,8 @@ public record Skill(@SerializedName("attack_type") String attackType, @Serialize
                     @SerializedName("stance_list") StanceList stanceList,
                     DamageElement element,
                     @SerializedName("sp_need") Double spNeed,
-                    @SerializedName("sp_base") Double spBase) {
+                    @SerializedName("sp_base") Double spBase,
+                    @SerializedName("bp_add") Double bpAdd) {
     public record StanceList(int single, int all, int spread) {
     }
 }
