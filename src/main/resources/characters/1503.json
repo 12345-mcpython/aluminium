@@ -526,6 +526,94 @@
       ],
       "source": "1503 真珠 星魂 5 透视，笔端星夜的肌理: 「战技等级+2；天赋等级+2；欢榆技等级+1」（参数 `{'150302': 2, '150304': 2, '150320': 1}`）。",
       "note": "⭐ 三个参数直接对应 SKILL / TALENT / ELATION_SKILL，无歧义。  PROVEN 2026-10-02 by `PearlSkillLevelsTest` plus its mutant. The observable is `CanHit.skillLevel(Skill)` -- the EFFECTIVE level -- because `RAISE_SKILL_LEVEL` writes into `CanHit.skillLevelBonus` and `CanHit.skillLevel(...)` is where the base level and the raises are added together (its own comment says so). My first judge read `Skill.getLevel()`, which is the BASE level and excludes raises by design, so it saw a flat 1 and the rule looked dead. Measured: E0 -> ULTRA 10 / COMMON 10; E3 -> ULTRA 12 / COMMON 11; E5 -> SKILL 12 / TALENT 12."
+    },
+    {
+      "on": "CAST_SETUP",
+      "id": "elation_skill_arms_the_team_at_1_elation_allies",
+      "when": [
+        "actor == self",
+        "from_category ElationDamage",
+        "allies_with_path:欢愉 >= 1"
+      ],
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "渲染理性，解构欢榆",
+          "until": "next_attack",
+          "target": "all_allies",
+          "target_when": [
+            "!target has_state 渲染理性，解构欢榆"
+          ]
+        }
+      ],
+      "source": "1503 真珠 欢榆技 渲染理性，解构欢榆 (150320): 「队伍中「欢榆」命途角色数量等于 1 或以上时，使我方全体目标**下一次攻击后**，对攻击目标额外造成 10% 的对应属性欢榆伤害」。",
+      "note": "⭐ **触发写法是现成的** ✓：引擎没有 Elation 专用事件，“这次施放是欢榆技”靠 `from_category ElationDamage`（见 `1513` 的 `elation_spend_all_fervor`）；实测 `TriggerEvent` 里没有任何 Elation 专用事件。⭐ **“下一次攻击”的寿命** 用 `until: \"next_attack\"`，它在 `LIFETIMES` 封闭词表里（`TriggerInterpreter:4798`），且已有三处出货（1002 / 1301 / 8001）。⚠ **兼现端本文件未写**：原文说的是“**对应属性**”，即每个队友各自的属性；而一条规则的 `element` 是一个固定词，所以它无法给四个队友四个属性。`1505` 的 rider 也只写一个单位的属性。兼现形态已登记（参考形状：`DAMAGE{scale: self_attr:ATTACK, percent: X, element: <属性>, damage_type: \"ELATION\", target: target}` 在 `DEALING_DAMAGE` 上）。"
+    },
+    {
+      "on": "CAST_SETUP",
+      "id": "elation_skill_arms_the_team_at_2_elation_allies",
+      "when": [
+        "actor == self",
+        "from_category ElationDamage",
+        "allies_with_path:欢愉 >= 2"
+      ],
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "渲染理性，解构欢榆",
+          "until": "next_attack",
+          "target": "all_allies",
+          "target_when": [
+            "!target has_state 渲染理性，解构欢榆"
+          ]
+        }
+      ],
+      "source": "1503 真珠 欢榆技 渲染理性，解构欢榆 (150320): 「队伍中「欢榆」命途角色数量等于 2 或以上时，使我方全体目标**下一次攻击后**，对攻击目标额外造成 15% 的对应属性欢榆伤害」。",
+      "note": "⭐ **触发写法是现成的** ✓：引擎没有 Elation 专用事件，“这次施放是欢榆技”靠 `from_category ElationDamage`（见 `1513` 的 `elation_spend_all_fervor`）；实测 `TriggerEvent` 里没有任何 Elation 专用事件。⭐ **“下一次攻击”的寿命** 用 `until: \"next_attack\"`，它在 `LIFETIMES` 封闭词表里（`TriggerInterpreter:4798`），且已有三处出货（1002 / 1301 / 8001）。⚠ **兼现端本文件未写**：原文说的是“**对应属性**”，即每个队友各自的属性；而一条规则的 `element` 是一个固定词，所以它无法给四个队友四个属性。`1505` 的 rider 也只写一个单位的属性。兼现形态已登记（参考形状：`DAMAGE{scale: self_attr:ATTACK, percent: X, element: <属性>, damage_type: \"ELATION\", target: target}` 在 `DEALING_DAMAGE` 上）。"
+    },
+    {
+      "on": "CAST_SETUP",
+      "id": "elation_skill_arms_the_team_at_3_elation_allies",
+      "when": [
+        "actor == self",
+        "from_category ElationDamage",
+        "allies_with_path:欢愉 >= 3"
+      ],
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "渲染理性，解构欢榆",
+          "until": "next_attack",
+          "target": "all_allies",
+          "target_when": [
+            "!target has_state 渲染理性，解构欢榆"
+          ]
+        }
+      ],
+      "source": "1503 真珠 欢榆技 渲染理性，解构欢榆 (150320): 「队伍中「欢榆」命途角色数量等于 3 或以上时，使我方全体目标**下一次攻击后**，对攻击目标额外造成 20% 的对应属性欢榆伤害」。",
+      "note": "⭐ **触发写法是现成的** ✓：引擎没有 Elation 专用事件，“这次施放是欢榆技”靠 `from_category ElationDamage`（见 `1513` 的 `elation_spend_all_fervor`）；实测 `TriggerEvent` 里没有任何 Elation 专用事件。⭐ **“下一次攻击”的寿命** 用 `until: \"next_attack\"`，它在 `LIFETIMES` 封闭词表里（`TriggerInterpreter:4798`），且已有三处出货（1002 / 1301 / 8001）。⚠ **兼现端本文件未写**：原文说的是“**对应属性**”，即每个队友各自的属性；而一条规则的 `element` 是一个固定词，所以它无法给四个队友四个属性。`1505` 的 rider 也只写一个单位的属性。兼现形态已登记（参考形状：`DAMAGE{scale: self_attr:ATTACK, percent: X, element: <属性>, damage_type: \"ELATION\", target: target}` 在 `DEALING_DAMAGE` 上）。"
+    },
+    {
+      "on": "CAST_SETUP",
+      "id": "elation_skill_arms_the_team_at_4_elation_allies",
+      "when": [
+        "actor == self",
+        "from_category ElationDamage",
+        "allies_with_path:欢愉 >= 4"
+      ],
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "渲染理性，解构欢榆",
+          "until": "next_attack",
+          "target": "all_allies",
+          "target_when": [
+            "!target has_state 渲染理性，解构欢榆"
+          ]
+        }
+      ],
+      "source": "1503 真珠 欢榆技 渲染理性，解构欢榆 (150320): 「队伍中「欢榆」命途角色数量等于 4 或以上时，使我方全体目标**下一次攻击后**，对攻击目标额外造成 40% 的对应属性欢榆伤害」。",
+      "note": "⭐ **触发写法是现成的** ✓：引擎没有 Elation 专用事件，“这次施放是欢榆技”靠 `from_category ElationDamage`（见 `1513` 的 `elation_spend_all_fervor`）；实测 `TriggerEvent` 里没有任何 Elation 专用事件。⭐ **“下一次攻击”的寿命** 用 `until: \"next_attack\"`，它在 `LIFETIMES` 封闭词表里（`TriggerInterpreter:4798`），且已有三处出货（1002 / 1301 / 8001）。⚠ **兼现端本文件未写**：原文说的是“**对应属性**”，即每个队友各自的属性；而一条规则的 `element` 是一个固定词，所以它无法给四个队友四个属性。`1505` 的 rider 也只写一个单位的属性。兼现形态已登记（参考形状：`DAMAGE{scale: self_attr:ATTACK, percent: X, element: <属性>, damage_type: \"ELATION\", target: target}` 在 `DEALING_DAMAGE` 上）。"
     }
   ]
 }
