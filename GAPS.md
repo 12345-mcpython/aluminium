@@ -1696,3 +1696,21 @@ checkResult();
 “留一棵红树 + 半成品”比“回滚 + 完整配方”差得多，所以选后者。
 ⭐ `characters/1503.json`（规则）**保留**：它由全量用例验证“加载合法”✓，
 但**规则本身仍无判据**（判据在面板就位后才能跑）—— 这一点不模糊。
+
+### ✅ 修正：真珠已在同日**完整落地**，不是“已撤回”
+
+⭐ 上一节写的“回滚 + 配方”很快就被推翻了，因为四份文件里的技能行**是机械活**：
+⭐ 我从 tbgd 的 `AvatarSkillConfig` 直接生成了**八个槽**（1 / 2 / 3 / 4 / 6 / 7 / 8 / 20），
+字段集逐字照 `1502` 的样子（`attack_type` / `element` / `max_level` / `name` / `param_list`（全等级）/
+`skill_effect` / `skill_id` / `skill_introduction` / `sp_base` / `sp_need` / `stance_list`，基础攻击另带 `bp_add`）。
+
+⭐ **最终四件套**：① `characters/1503.json`（规则）、② `data/character_data.json`（面板）、
+③ `data/character_id_mappings.json`（双语名）、④ `data/skills.json`（技能行），
+加⑤ `CharacterFactoryTest` 的 5★ 计数 **70 → 71**。
+
+⭐ **判据**：`PearlSkillHealTest` ✓ 双向——
+`[pearl] pearl gained 327.318 ; the lowest ally gained 654.636 ; counter 0 -> 15`（最低者恰好**两倍**）；
+变异（删掉第二段治疗）⇒ **RED**（两者都是 327.318）。
+
+⭐ 经验：⭐ 守卫（槽位、名册）**强制四件套原子落地** —— ⭐ 只提交规则文件会立刻 3 红，
+这是个好守卫；⭐ 而“生成技能行”这一步虽然看着吓人，实际上全是查表。
