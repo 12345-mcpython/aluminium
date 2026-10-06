@@ -48,6 +48,7 @@ import java.util.Set;
  * <table border="1">
  *   <tr><th>op</th><th>arguments</th><th>status</th></tr>
  *   <tr><td>{@code GAIN_ENERGY}</td><td>{@code amount}</td><td>wired</td></tr>
+ *   <tr><td>{@code RAISE_ENERGY_TO}</td><td>{@code percent} (a floor; no-op when already above)</td><td>wired</td></tr>
  *   <tr><td>{@code GAIN_SKILL_POINT}</td><td>{@code amount}</td><td>wired</td></tr>
  *   <tr><td>{@code RAISE_SKILL_POINT_CAP}</td><td>{@code amount} (negative takes the bonus away)</td><td>wired</td></tr>
  *   <tr><td>{@code HEAL}</td><td>{@code amount}, optional {@code target} - <b>or</b> {@code scale} +
@@ -127,6 +128,9 @@ public final class TriggerInterpreter {
             // "add an X attribute weakness to a designated single enemy" (readers 1315, 1310).
             "ADD_ELEMENTAL_WEAKNESS",
             "GAIN_ENERGY", "GAIN_SKILL_POINT", "HEAL", "SHIELD", "EXTRA_TURN", "ADVANCE",
+            // "at the start of battle, if energy is below #2, restore it to #2" (reader: 1310, Firefly's talent):
+            // a FLOOR. GAIN_ENERGY adds an amount or a share of max, so from 40% it would add 50% and overshoot.
+            "RAISE_ENERGY_TO",
             // "while [character] is on the field the skill point cap is raised by #3" (reader: 1306,
             // Sparkle): the cap is not a constant, so content needs a way to move it. Distinct from
             // RAISE_RESOURCE_CAP, which widens a declared resource's OVERFLOW, not its cap.
@@ -388,6 +392,17 @@ public final class TriggerInterpreter {
                     requireAmountOrScale(effect, op, spec, ENERGY_SCALES, "max energy");
                     requireNoStackArguments(effect, op, spec);
                 }
+            }
+            case "RAISE_ENERGY_TO" -> {
+                // A plain share, because the handler reads it directly: accepting the
+                // percent_from_* spellings here would leave the share unresolved at run time.
+                requirePercent(effect, op, spec);
+                if (effect.getPercent() == null) {
+                    throw new IllegalArgumentException(
+                            "Op " + op + " names the level to raise energy TO, so it needs a plain \"percent\": got a share"
+                                    + " from a cast parameter or a resource instead (source: " + spec.getSource() + ")");
+                }
+                requireNoStackArguments(effect, op, spec);
             }
             case "GAIN_SKILL_POINT" -> {
                 requireAmount(effect, op, spec);
@@ -1240,6 +1255,16 @@ public final class TriggerInterpreter {
                 }
             }
             case "GAIN_ENERGY" -> gainEnergy(battle, effect, ctx);
+            case "RAISE_ENERGY_TO" -> {
+                // A FLOOR, not a gain: energy is raised to the stated share of the maximum and left alone
+                // when it is already at or above it. Adding a share instead would overshoot.
+                for (CanHit target : resolveTargets(battle, effect, ctx)) {
+                    double floor = target.getMaxEnergy() * effect.getPercent();
+                    if (target.getCurrentEnergy() < floor) {
+                        target.setCurrentEnergy(floor);
+                    }
+                }
+            }
             case "GAIN_SKILL_POINT" -> battle.gainSkillPoint((int) Math.round(scaledAmount(effect, ctx)));
             case "HEAL" -> {
                 for (CanHit target : resolveTargets(battle, effect, ctx)) {
