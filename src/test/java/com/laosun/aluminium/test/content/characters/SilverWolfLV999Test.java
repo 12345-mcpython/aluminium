@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1506 Silver Wolf LV.999 (银狼LV.999) (2026-09-30): the two clauses its own text states completely -- "行动提前 100%" and the declared
+ * 1506 Silver Wolf LV.999 (银狼LV.999): the two clauses its own text states completely -- "行动提前 100%" and the declared
  * two-tier [隐藏分] ("达到 60 点后可激活终结技，达到上限后还可溢出 240 点").
  *
  * <p>The two tiers are read on the resource itself: {@code gain} may run into the declared overflow, {@code gainClamped} stops at the

@@ -820,7 +820,7 @@ public class BuffManager {
         // a buff of its own. Resolving them here is what makes "对处于灼烧状态的目标造成的伤害提高" and
         // "冻结状态下的敌方目标" expressible without inventing a second fact for "this unit is burning/frozen".
         //
-        // Note: Controls joined this table on 2026-09-2, when ControlBuff gave them a name. Before that the comment
+        // Note: Controls joined this table when ControlBuff gave them a name. Before that the comment
         // here said they were "deliberately NOT in this table yet ... adding them later changes no JSON" -- and
         // that is exactly what happened: the break path and a skill-applied control now produce the SAME buff, so
         // "冻结" answers the same thing whichever one froze the unit (a break-frozen enemy carries no name
@@ -1190,7 +1190,7 @@ public class BuffManager {
      *
      * <p>That question is why this exists at all. {@code Battle.tickDots(CanHit)} has to settle every
      * DOT on a unit, and the engine's documented rule is <b>"first applied, first settled"</b>
-     * (HSR.md §) - so order is part of the contract, not an implementation detail, and it is the
+     * (HSR.md) - so order is part of the contract, not an implementation detail, and it is the
      * order {@code buffs} already keeps.
      *
      * <p>Matching is by exact class, the same convention as {@link #hasBuff(Class)} / {@link

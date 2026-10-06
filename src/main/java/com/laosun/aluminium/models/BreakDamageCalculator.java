@@ -19,7 +19,7 @@ import com.laosun.aluminium.models.enemy.Enemy;
  * {@link Damage}'s base; the DEF zone / RES zone are assembled centrally by {@link Battle#applyDamage},
  * and DMG boost and crit are blocked by {@link DamageType#BREAK}'s own {@code (crittable=false, boostable=false)}.
  *
- * <p><b>Units MUST come as a matched set (HSR.md §.1)</b>: the doc gives level 80 "base break base 36"
+ * <p><b>Units MUST come as a matched set (HSR.md §3.1)</b>: the doc gives level 80 "base break base 36"
  * (toughness reduction unit "conventional", basic attack = 1) and "super break 36."
  * (toughness reduction unit "point", basic attack = 10). This class uses
  * {@code breaking_rate.json / 10 = 36.5535}, so the {@code stanceDamage} passed in
@@ -72,7 +72,7 @@ public final class BreakDamageCalculator {
      */
     public static Damage build(CanHit attacker, Enemy enemy, DamageElement element, double stanceDamage) {
         double breakingEffect = attacker.getAttribute(AttributeType.BREAKING_EFFECT).get();
-        // A second, independent multiplier (2026-09-30; reader: cone 21056's "使我方全体造成的击破伤容提高 16%"):
+        // A second, independent multiplier:
         // the ordinary DMG boost zone cannot carry it, because DamageType.BREAK is deliberately not boostable. Read from
         // the ATTACKER, so a party-wide grant is expressed by giving every ally the modifier (see cone 24005's shape).
         double breakDamageBoost = attacker.getAttribute(AttributeType.BREAK_DAMAGE_BOOST).get();

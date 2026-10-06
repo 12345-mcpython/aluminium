@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 /**
- * The conditions of every shipped cone rule, asserted against the text (2026-09-30).
+ * The conditions of every shipped cone rule, asserted against the text.
  *
  * <p>A fourth mutation layer (rewriting a rule's "when") stayed green for seventeen of these, because the cone
  * judges asserted effects but never conditions. Conditions decide WHEN a rule is in force, so a wrong one makes a rule

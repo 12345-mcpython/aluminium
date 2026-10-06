@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Relic set 129, four pieces (2026-09-30): "装备者及其忆灵造成的欢愉伤容无视目标 10% 防御".
+ * Relic set 129, four pieces: "装备者及其忆灵造成的欢愉伤容无视目标 10% 防御".
  *
  * <p>Two-sided on the same wearer: an ELATION instance is bigger with the set on, an ordinary one is untouched -- the scope is
  * the whole point of the clause, and it is the capability that was measured when the Elation slice landed.

@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Arrays;
 
 /**
- * 's break-effect tables: the structure exists, every element is accounted for, and nothing
+ * The break-effect tables: the structure exists, every element is accounted for, and nothing
  * can fall out of the tables unnoticed.
  *
  * <p>Note: <b>The numbers are still placeholders and this class does not pretend otherwise.</b> The four

@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
- * A damage instance carries the hit set of the attack behind it (2026-09-30).
+ * A damage instance carries the hit set of the attack behind it.
  *
  * <p>The reader for "a random one of the enemies HIT by this attack": a {@code DEALING_DAMAGE} rule is handed the
  * damage instance, so the fact must live on the instance -- the pattern {@code setSkillKey} and {@code setStance} already

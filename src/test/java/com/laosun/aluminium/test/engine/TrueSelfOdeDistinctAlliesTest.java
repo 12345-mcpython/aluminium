@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Random;
 
-/** "每从 1 个除德谬歌以外不同的队友处获得[追忆]后" (2026-10-02). */
+/** "每从 1 个除德谬歌以外不同的队友处获得[追忆]后". */
 public class TrueSelfOdeDistinctAlliesTest {
     private static final String COUNTER = "忆灵技的额外一击";
 

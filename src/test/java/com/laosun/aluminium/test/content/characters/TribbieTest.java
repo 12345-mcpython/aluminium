@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1403 Tribbie, from her own file (2026-09-29, round 190): an 18%-Max-HP follow-up on a TEAMMATE's ultimate, and the Numinosity state.
+ * 1403 Tribbie, from her own file: an 18%-Max-HP follow-up on a TEAMMATE's ultimate, and the Numinosity state.
  *
  * <p>The follow-up needs two things that did not exist together before: `actor is_other_ally` (round 14) so her own ultimate does not trigger it, and the
  * Max HP scale (round 189) so 18% of HER Max HP can be stated at all.
@@ -56,7 +56,7 @@ public class TribbieTest {
     @Test
     public void herFileCarriesTheClauses() {
         var table = TriggerTables.of(TRIBBIE);
-        // 4 since 2026-10-02: `ult_zone_state` joins the three -- "结界持续期间" had no state to name,
+        // 4 since: `ult_zone_state` joins the three -- "结界持续期间" had no state to name,
         // and 1415's ode of passage needs one ("缇宝的结界的附加伤害").
         Assertions.assertEquals(4, table.ruleCount(TriggerEvent.ULT_CAST),
                 "the follow-up trigger, and (2026-09-29) the zone's 「敌方目标受到的伤害提高30%」" + " with `ticks_on: self` for the zone's own clock");

@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1415's memosprite skill 24, third sentence (2026-10-02): "长夜月战技的暴击伤害提高效果额外提高，提高数值等同于长夜月暴击伤害的 #3%".
+ * 1415's memosprite skill 24, third sentence: "长夜月战技的暴击伤害提高效果额外提高，提高数值等同于长夜月暴击伤害的 #3%".
  *
  * Her skill states its share as `percent_from_skill_param` (it varies with level: 0.12 -> 0.264), so the amendment must ADD to whatever that resolves to -- not write a `percent`,
  * which `shareOf` reads first and which would therefore erase her skill's own number. Both readings come from the engine: the gain a memosprite actually received, and her own CRIT DMG.

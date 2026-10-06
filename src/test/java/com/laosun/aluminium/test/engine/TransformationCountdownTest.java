@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1408："拥有 8 个卡厄斯兰那的额外回合，速度固定为基础速度的 60%" (2026-10-02).
+ * 1408："拥有 8 个卡厄斯兰那的额外回合，速度固定为基础速度的 60%".
  *
  * <p>FILE-DRIVEN: her ultimate starts the transformation, and the countdown that spends the eight extra turns rides the
  * same rule -- so the two are born together.

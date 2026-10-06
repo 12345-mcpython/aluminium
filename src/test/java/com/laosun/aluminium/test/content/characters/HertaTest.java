@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1013 Herta, from her own file (2026-09-29, round 158): a per-target threshold bonus, a control-class resistance, and the frozen bonus.
+ * 1013 Herta, from her own file: a per-target threshold bonus, a control-class resistance, and the frozen bonus.
  *
  * <p>The skill case uses two enemies on ONE battlefield - one at full HP and one already below half - so the claim "对该目标" is measured
  * rather than assumed: the same cast must hurt the healthy one proportionally more.

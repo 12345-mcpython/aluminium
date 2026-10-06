@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 8009/8010's ultimate, the branch that needs an Elation skill on the target (2026-10-02):
+ * 8009/8010's ultimate, the branch that needs an Elation skill on the target:
  * "Gains 5 Punchline point(s) ... if the target has an Elation skill, the target additionally gains 10 points of
  * Bondmate-of-Appreciation, and immediately uses one Elation skill".
  *

@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * "奇袭结束后，使刻律德菈获得 1 点充能" (2026-10-02).
+ * "奇袭结束后，使刻律德菈获得 1 点充能".
  *
  * <p>The sentence is 1415's memosprite skill 15. Everything it needs was measured before the rule was written: the moment
  * (INSERTED_CAST_END), the aimed unit (item 66 made the event carry it), and the resource declaration (the loader checks per

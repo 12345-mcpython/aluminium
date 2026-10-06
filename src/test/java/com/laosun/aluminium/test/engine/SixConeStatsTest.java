@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
- * Six cones shipped together (2026-09-30): clause 1 of each, one permanent attribute, table-driven.
+ * Six cones shipped together: clause 1 of each, one permanent attribute, table-driven.
  *
  * <p>23055 was shipped with them and then rolled back: `data/weapons.json` (169 rows) has no row for it, so
  * Weapon.build throws and the card cannot exist in this engine. 23050-23060 misses only that one id.

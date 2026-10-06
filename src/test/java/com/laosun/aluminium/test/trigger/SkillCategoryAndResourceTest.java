@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
- * Two generic abstractions introduced by the refactor (2026-09-23):
+ * Two generic abstractions introduced by the refactor:
  * {@link SkillCategory} (enumification of the data's {@code attack_type}) and
  * {@link Resource} (a bounded party-level resource).
  *

@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * `allies_of_path:智识` and the clause it unlocks (2026-10-02): "所有'智识'命途角色攻击力提高 #3(30)%" (all characters on the Erudition path gain #3(30)% ATK).
+ * `allies_of_path:智识` and the clause it unlocks: "所有'智识'命途角色攻击力提高 #3(30)%" (all characters on the Erudition path gain #3(30)% ATK).
  *
  * The party is chosen so the selector's REACH is what the reading shows: Anaxa (1405) and Jing Yuan (1204) are Erudition, Tribbie (1403) is Harmony, Cyrene (1415) is Remembrance. A raise
  * aimed at the path must move exactly the first two.

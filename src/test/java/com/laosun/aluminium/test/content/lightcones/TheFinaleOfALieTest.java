@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 /**
- * Light cone 23056 (2026-09-30): every clause, after the "every four follow-ups" half was reclaimed.
+ * Light cone 23056: every clause, after the "every four follow-ups" half was reclaimed.
  *
  * <p>Crit rate +18..30%; at battle start the shadow arrives for 3 turns and while it holds the wearer's ATK is up
  * 40..80% and every enemy takes 20..30% more damage; and every FOUR follow-up attacks grant the same shadow, expressed

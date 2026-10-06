@@ -34,7 +34,7 @@ public class ContentDuplicateGuardTest {
     private static final List<String> OPERANDS =
             List.of("attribute", "buff", "resource", "rule", "state", "scale", "target", "permanent", "turns",
                     "percent", "amount", "crit_rate", "crit_damage", "per_stack", "max_stacks",
-                    // `element` names WHAT is affected as much as `buff` does (2026-10-02): a Fire damage-over-time and an Ice one are different effects, and
+                    // `element` names WHAT is affected as much as `buff` does: a Fire damage-over-time and an Ice one are different effects, and
                     // 1415's ocean ode writes one tick rule per element (TICK_DOT has no wildcard spelling) -- without this the guard read those 14 rules as duplicates.
                     "element");
 

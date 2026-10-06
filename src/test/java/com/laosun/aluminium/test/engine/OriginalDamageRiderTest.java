@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * "equal to <b>the original damage</b> X%" - the rider settles to the share the text states (2026-10-02).
+ * "equal to <b>the original damage</b> X%" - the rider settles to the share the text states.
  *
  * <p>A {@code DAMAGE} effect's value is a <b>base</b>: settlement multiplies it by the instance's zones again, so a
  * scale that reads an already-settled amount has to divide by the triggering instance's own factor

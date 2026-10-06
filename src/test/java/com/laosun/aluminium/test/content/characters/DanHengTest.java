@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1002 Dan Heng, from his own file (2026-09-29, round 153): the talent that answers "an ally aimed a skill at me".
+ * 1002 Dan Heng, from his own file: the talent that answers "an ally aimed a skill at me".
  *
  * <p>Everything it needs already existed: `SKILL_CAST` carries the aim (so `target == self` means "I was the one aimed at"),
  * `actor is_ally` says who cast it, `DAMAGE_PENETRATION` is the engine's name for RES PEN (抗性穿透), `until: next_attack` is the duration the

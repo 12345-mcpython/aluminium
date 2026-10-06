@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Slot 15's narrowing (2026-10-02): "缇宝施放追加攻击触发缇宝的结界的附加伤害时，会额外造成 #1(1) 次附加伤害".
+ * Slot 15's narrowing: "缇宝施放追加攻击触发缇宝的结界的附加伤害时，会额外造成 #1(1) 次附加伤害".
  *
  * The control lives INSIDE one battle. The ode is cast at her in both readings, so its other clause (the passage ode's `DEFENCE_IGNORE`, measured to raise every instance she deals from
  * 82.20 to 90.13) applies identically; the only thing that differs is the extra rule's own gate, the state the ode grants. Note: Comparing "ode vs no ode" instead would measure two effects

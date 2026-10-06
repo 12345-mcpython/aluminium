@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 140："我方全体每损失 1 点生命值遐蝶获得 1 点[新蕊]" (2026-10-02).
+ * 140："我方全体每损失 1 点生命值遐蝶获得 1 点[新蕊]".
  *
  * <p>MEASURED, and it took a probe to see it: the enemy never touched her -- "hp 1629.936 -> 1629.936 (max 1629.936)
  * after 40 steps" -- so every earlier draft failed because NO HP LOSS EVER HAPPENED. Damage now goes through the battle's own

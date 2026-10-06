@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * `amount_from_previous` gives the MAGNITUDE of what the previous effect moved (2026-10-02; reader: 114151"每消耗 1% 溢出值…").
+ * `amount_from_previous` gives the MAGNITUDE of what the previous effect moved.
  *
  * The two effects run in one rule, in order: a SPEND of , then a GAIN whose size is `amount_from_previous`. A spend arrives as a negative resource delta, so before this the
  * gain would have been handed -. Two-sided: the same pair with a GAIN first must still read a positive .

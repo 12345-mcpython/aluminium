@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
- * Cones 23013 and 23039 (2026-09-30): the permanent attributes only -- and one refused trap.
+ * Cones 23013 and 23039: the permanent attributes only -- and one refused trap.
  *
  * <p>23013: max HP +18..30% AND healing done +12..20%. The healing attribute is OUTGOING_HEALING_BOOST, the name seven
  * shipped files already use, and it is the right one here because the sentence is about the healing the wearer GIVES.

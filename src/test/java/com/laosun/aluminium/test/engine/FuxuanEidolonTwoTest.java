@@ -16,7 +16,7 @@ import java.util.Random;
 
 /**
  * 1208: "when [穷观阵] is opened, if one of our targets takes lethal damage ... immediately restore HP equal to 0% of its own Max HP.
- * This effect can trigger 1 time per battle" (2026-10-02).
+ * This effect can trigger 1 time per battle".
  *
  * <p>TWO READINGS IN ONE SCENE: the first lethal blow is answered (the ally stands at 0% of its OWN Max HP), and the second is not --
  * which is exactly "can trigger 1 time per battle". The zone is opened by her own skill, so no test-only shortcut is used.

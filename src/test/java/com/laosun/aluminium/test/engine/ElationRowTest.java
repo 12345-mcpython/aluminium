@@ -17,7 +17,7 @@ import java.util.Random;
 
 /**
  * An Elation skill's row leads with a COUNT: "deal #1 instances of damage, each dealing #2% to a random single enemy ... The last deals #3% ...
- * divided evenly among all enemies" (2026-10-02; readers 8009/8010 slot 20, data row `[8, 0.25, 0.5]` at L15).
+ * divided evenly among all enemies".
  *
  * <p>THE INSTRUMENT COUNTS INSTANCES, not damage: the sentence is about a NUMBER of hits, and damage would drag in the crit
  * zone and the Elation boost. A test-only rule on the caster adds one counter stack per damage instance it deals.

@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1404："[血仇]状态下生命上限提高，数值等同于当前生命上限的 50%" (2026-10-02).
+ * 1404："[血仇]状态下生命上限提高，数值等同于当前生命上限的 50%".
  *
  * <p>ONE VARIABLE, in one scene: the state goes ON (a hundred charge, five ultimates) and then OFF (the lethal blow the paragraph
  * names as its only exit). Max HP must follow it both ways.

@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1212 Jingliu, from her own file (2026-09-29, round 225): the Syzygy stack, its cap, and the threshold that fires her Action Advance.
+ * 1212 Jingliu, from her own file: the Syzygy stack, its cap, and the threshold that fires her Action Advance.
  *
  * <p>The threshold is a `self_stacks:` condition - a form the engine already had - and the Advance is observed as round 216's recipe prescribes: the remaining wait must reach 0.
  */

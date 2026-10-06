@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1412："若已升为[爵位]…该角色造成战技伤害时额外无视 20% 防御" (2026-10-02).
+ * 1412："若已升为[爵位]…该角色造成战技伤害时额外无视 20% 防御".
  *
  * <p>SAME SCENE, ONE VARIABLE: both runs reach six Charge (so the merit holder is a peer), cast the same skill at the same
  * enemy; the control then removes [爵位]. What is compared is the DAMAGE -- because `self_attr:` reads the sheet, and a

@@ -15,7 +15,7 @@ import java.util.Random;
 
 /**
  * 1412："奇袭：复制一次即将施放的技能并提前施放，随后施放原技能。奇袭不会再次触发奇袭"＋
- * "奇袭结束后，消耗 6 点充能使[爵位]变回[军功]" (2026-10-02).
+ * "奇袭结束后，消耗 6 点充能使[爵位]变回[军功]".
  *
  * <p>SAME SCENE, ONE VARIABLE: six casts promote the ally either way; the control merely removes [爵位] before the
  * peer's own skill, so the only difference is whether the copy happens.

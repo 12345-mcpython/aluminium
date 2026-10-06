@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * GAIN_RESOURCE captures the CAST skill parameter (2026-10-02).
+ * GAIN_RESOURCE captures the CAST skill parameter.
  *
  * Why it matters: a memosprite skill row is unreachable by EVERY share -- Summon keys its skills by int data slot while shares read Character.getSkills(), keyed by SkillType --
  * but the cast moment CAN read it, because castParamValue goes through the event actor. So a number that belongs to an ode is captured into a resource as it is cast.

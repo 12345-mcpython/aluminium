@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1221 Yunli, from her own file (2026-09-29, round 22): the heal's derived-plus-flat amount, and the counter that reaches THE ATTACKER.
+ * 1221 Yunli, from her own file: the heal's derived-plus-flat amount, and the counter that reaches THE ATTACKER.
  */
 public class YunliTest {
     private static final int YUNLI = 1221;

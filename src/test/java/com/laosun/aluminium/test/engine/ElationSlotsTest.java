@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
- * Elation slice 1a (2026-09-30): the data files the Elation damage skills under slots 20/21, and until they were added to
+ * Elation slice 1a: the data files the Elation damage skills under slots 20/21, and until they were added to
  * {@code Constant.SKILL_SLOT} AND to {@code SkillType#isIntrinsic()} the kit builder skipped them -- measured on 1501, whose kit
  * held "0 Elation skill(s) and 4 ordinary".
  *

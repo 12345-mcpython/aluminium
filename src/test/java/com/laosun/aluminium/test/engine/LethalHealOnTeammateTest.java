@@ -13,7 +13,7 @@ import java.util.Random;
 
 /**
  * 1211: "when a teammate of Bailu (白露) takes a lethal attack ... Bailu immediately provides healing for it, restoring health equal to 18.00% of Bailu's Max HP + 480"
- * (2026-10-02).
+ *.
  *
  * <p>ONE VARIABLE: whether the blow would have killed the teammate. Nothing else differs -- same party, same heal amount, same scene.
  */

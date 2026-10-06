@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Tribbie's zone, as a state on him (2026-10-02).
+ * Tribbie's zone, as a state on him.
  *
  * <p>His ultimate (140303): "开启<b>结界</b>… <b>结界持续期间</b>，敌方目标受到的伤害提高 #2%… 结界持续 #4 回合，自身每回合开始时结界持续回合数减1。"
  *

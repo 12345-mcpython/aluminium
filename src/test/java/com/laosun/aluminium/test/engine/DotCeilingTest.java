@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * A DOT whose magnitude is a share of the <b>victim's</b> Max HP, with a <b>derived ceiling</b> (2026-09-28).
+ * A DOT whose magnitude is a share of the <b>victim's</b> Max HP, with a <b>derived ceiling</b>.
  *
  * <p>Reader: 1111 Luka's Skill - "while in the bleed (裂伤) state... takes physical damage over time equal to <b>24.00% of its own Max HP</b>, <b>capped at
  * 338% of Luka's ATK</b>". That is a {@code min_of_two}: the engine takes the smaller of the two derived values, which is why a low-HP victim keeps

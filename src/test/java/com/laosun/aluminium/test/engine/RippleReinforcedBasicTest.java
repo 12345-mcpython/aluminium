@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Random;
 
-/** "获得强化普攻" (2026-10-02). */
+/** "获得强化普攻". */
 public class RippleReinforcedBasicTest {
     @Test
     public void herUltimateReplacesHerBasic() {

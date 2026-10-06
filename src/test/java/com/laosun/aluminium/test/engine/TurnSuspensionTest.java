@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * "before the [协奏] state ends it <b>will not enter its own turn</b> and cannot act": a state that makes the unit's turns <b>pass without it</b> (2026-09-28).
+ * "before the [协奏] state ends it <b>will not enter its own turn</b> and cannot act": a state that makes the unit's turns <b>pass without it</b>.
  *
  * <p><b>Why it is not a control.</b> {@code ControlBuff} stops a unit from <i>acting</i> but still lets the turn
  * arrive - its DOTs tick and its turn-based buffs count down. "will not enter its own turn" is a different sentence: the turn

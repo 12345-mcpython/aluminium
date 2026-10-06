@@ -155,7 +155,7 @@ public final class DoubleValue implements Cloneable {
     }
 
     /**
-     * The value a percentage share scales off (2026-09-29).
+ * The value a percentage share scales off.
      *
      * <p>Added for the capped-modifier path: "提高50%，最高不超过X的25%" (raised by 50%, never above 25% of X) is a share against a ceiling in absolute units, so the
      * ceiling has to be divided by THIS number and not by {@link #get()} - the total includes modifiers, and dividing by the
@@ -324,7 +324,7 @@ public final class DoubleValue implements Cloneable {
 
         /**
          * The four fields every factory fills. Written out rather than generated: the class also carries the optional
-         * {@code live} supplier (2026-10-02), and a generated all-args constructor would silently require it too.
+ * {@code live} supplier, and a generated all-args constructor would silently require it too.
          */
         public Modifier(ModifierType modifierType, double value, ModifierSource source, int sourceRoleId) {
             this.modifierType = modifierType;
@@ -349,7 +349,7 @@ public final class DoubleValue implements Cloneable {
          */
         private int sourceRoleId;
         /**
-         * A modifier whose magnitude is resolved when it is READ, not when it was attached (2026-10-02).
+ * A modifier whose magnitude is resolved when it is READ, not when it was attached.
          *
          * <p>The reader family is the "每拥有 1 层…提高 X%" (raise X% for each stack held) auras (fourteen documents): their number has to follow the stack
          * count, and a stored number can only be right at the instant it was stored.
@@ -362,7 +362,7 @@ public final class DoubleValue implements Cloneable {
          * Creates an add-percent modifier from an integer percentage (e.g. 18 means 18%).
          */
         /**
-         * A modifier whose ADD_PERCENT share is asked for on every computation (2026-10-02).
+ * A modifier whose ADD_PERCENT share is asked for on every computation.
          *
          * @param share the supplier, read each time the owning attribute is computed
          */

@@ -60,7 +60,7 @@ public class Enemy extends CanHit {
     private Set<DamageElement> stanceWeak = Set.of();
 
     /**
-     * Weaknesses an EFFECT inserted, which EXPIRE: element so turns still to run (2026-09-30).
+ * Weaknesses an EFFECT inserted, which EXPIRE: element so turns still to run.
      * Note: A second table on purpose, not a replacement: {@link #stanceWeak} is DATA (from
      * {@code monster_config.json}) and never expires, so every existing reader keeps its meaning.
      * Note: Counted in the TARGET's own turns, matching {@code TURN_END} where it is ticked.
@@ -208,7 +208,7 @@ public class Enemy extends CanHit {
     }
 
     /**
-     * Adds an element to this enemy weaknesses ("为指定敌方单体添加 X 属性弱点", 2026-09-30; readers 1315, 1310).
+ * Adds an element to this enemy weaknesses ("为指定敌方单体添加 X 属性弱点",; readers 1315, 1310).
      * Goes through the setter, as the note above asks. Note: No LIFETIME: the documents say "持续 2 回合",
      * and a set has no expiry -- that half stays registered.
      */
@@ -248,7 +248,7 @@ public class Enemy extends CanHit {
     }
 
     /**
-     * How many elements this one is weak to (2026-09-30; reader: cone 22004's "敌方目标每拥有1个不同属性的弱点").
+ * How many elements this one is weak to.
      *
      * <p>The enemy's own data is the answer (its {@code stance_weak} list); no new state is tracked, and a unit with no
      * weakness bar (a character, a summon) is not this class at all, so asking one is a type question the caller answers.

@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1205 Blade, from his own file (2026-09-29, round 194): the [地狱变] state, the technique's Max-HP opening and the charge's cap.
+ * 1205 Blade, from his own file: the [地狱变] state, the technique's Max-HP opening and the charge's cap.
  *
  * <p>The cap is tested by EXCEEDING it (round 192's lesson): six hits must still read 5.
  */

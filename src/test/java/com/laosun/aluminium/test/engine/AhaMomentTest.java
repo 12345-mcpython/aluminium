@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * "Aha's moment lasts until the end of the last elation skill cast this time" so it grants [好活当赏] when it ends (1513, 2026-10-02).
+ * "Aha's moment lasts until the end of the last elation skill cast this time" so it grants [好活当赏] when it ends (1513,).
  *
  * <p>FILE-DRIVEN: a real elation cast applies the moment (that is what gives the event its category), and the clock is
  * advanced with `BuffManager.tickForeign` -- the same call the turn loop makes -- because the engine's announcement only

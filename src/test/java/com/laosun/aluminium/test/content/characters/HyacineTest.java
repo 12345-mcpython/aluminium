@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1409 Hyacine, from her own file (2026-09-29, rounds 163-166).
+ * 1409 Hyacine, from her own file.
  *
  * <p>The rules cover only what a skill's data does NOT do. Measured this round: the HEAL op is exact (`owner_max_hp` 10% + 100 healed
  * 219.52864 against a declared 219.52864000000002 when isolated on TURN_START), while a skill also heals from its own data - so a rule that
@@ -50,13 +50,13 @@ public class HyacineTest {
     @Test
     public void herFileCarriesTheClauses() {
         var table = TriggerTables.of(HYACINE);
-        // Two now: her own ultimate, and the sky ode spending a layer on a ULT_CAST (2026-10-02).
+        // Two now: her own ultimate, and the sky ode spending a layer on a ULT_CAST.
         Assertions.assertEquals(2, table.ruleCount(TriggerEvent.ULT_CAST), "state and Max HP");
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.BATTLE_START), "the level convention");
-        // Note: Narrowed 2026-10-02: the reason is about the HEAL, and the same skill also says "召唤忆灵 小伊卡".
+        // Note: Narrowed: the reason is about the HEAL, and the same skill also says "召唤忆灵 小伊卡".
         // Exactly one SKILL_CAST rule exists and it only summons -- the heal is still absent from the file, so nothing is
         // double-counted. What the pin protects is unchanged; what it counts is now what the document states.
-        // Two now as well: the summon, and the sky ode spending a layer on a SKILL_CAST (2026-10-02).
+        // Two now as well: the summon, and the sky ode spending a layer on a SKILL_CAST.
         Assertions.assertEquals(2, table.ruleCount(TriggerEvent.SKILL_CAST),
                 "the summon rule the document states -- the heal still comes from the skill data, so no rule states it");
     }

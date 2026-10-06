@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * An {@code EXTRA_TURN} that cannot be granted must SAY SO (2026-10-02).
+ * An {@code EXTRA_TURN} that cannot be granted must SAY SO.
  *
  * <p>Found while writing 1415's ode of genesis: `Queue.grantExtraTurn` returns false for a unit that is not in the action order, and a memosprite
  * at Speed 0 is skipped by `Queue.addCombatant` (a fix shipped earlier this session). The op dropped that answer, so a rule granting Demiurge (德谬歌) an

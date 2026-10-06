@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1513 Aventurine - Waveflair, from his own file (2026-09-29, round 218): [热意], the one resource in this kit the document caps.
+ * 1513 Aventurine - Waveflair, from his own file: [热意], the one resource in this kit the document caps.
  */
 public class AventurineWaveflairTest {
     private static final int AVENTURINE = 1513;

@@ -332,7 +332,7 @@ public final class TriggerInterpreter {
                             + "(source: " + spec.getSource() + ")");
         }
         // Note: A damage-type scope is only meaningful for the ops that actually READ it, and one of them accepts it
-        // while ignoring it (BOOST_DAMAGE, fixed 2026-09-29: "follow-up attacks only" silently raised every hit). The
+        // while ignoring it (BOOST_DAMAGE, fixed: "follow-up attacks only" silently raised every hit). The
         // closed set below is the fix's other half -- stating a scope an op cannot honour is refused at load time, never
         // silently dropped.
         if (effect.getDamageType() != null && !effect.getDamageType().isBlank()
@@ -467,7 +467,7 @@ public final class TriggerInterpreter {
                 // talent's follow-up or an eidolon has no row to name - 53 and 15 documents state such a ratio.
                 if (effect.getSkill() == null || effect.getSkill().isBlank()) {
                     // ? A literal ratio is scaled either by a derived attribute (`self_attr:ATTACK`) or by a Max HP share (`owner_max_hp` /
-                    // `target_max_hp`, added 2026-09-29 for "deal damage equal to X% of Max HP" -- 16 documents). `requireDerivedScale` stays strict because
+                    // `target_max_hp`, added for "deal damage equal to X% of Max HP" -- 16 documents). `requireDerivedScale` stays strict because
                     // MODIFY_ATTR shares it and a modifier must not name a Max HP.
                     String literalScale = effect.getScale() == null ? "" : effect.getScale().trim();
                     // A share of the SETTLED instance joins this branch: it states a `percent` and no
@@ -744,7 +744,7 @@ public final class TriggerInterpreter {
 
                 requirePositiveTurns(effect, op, spec);
                 requireBaseChance(effect, op, spec);
-                // Note: `max_stacks` IS allowed here ("at most N stacks", 2026-09-28): the general stack-family refusal would
+                // Note: `max_stacks` IS allowed here ("at most N stacks",): the general stack-family refusal would
                 // reject it, so the ceiling is validated on its own -- a positive count, nothing else from that family.
                 requireDotStackCap(effect, op, spec);
                 if (Boolean.TRUE.equals(effect.getPermanent()) || eventBound(effect)) {
@@ -993,7 +993,7 @@ public final class TriggerInterpreter {
             // battle, so adjusting it in place would leak the amendment (and, in the test suite, into other tests).
             // The fast path returns the same instance, so the 5places that read `percent`/`turns` stay untouched.
             if (effect.getMinEidolon() != null && eidolonRankOf(ctx.owner()) < effect.getMinEidolon()) {
-                // 2026-10-02: this EFFECT belongs to an Eidolon rank the unit does not have. The rule-level
+                //: this EFFECT belongs to an Eidolon rank the unit does not have. The rule-level
                 // `min_eidolon` cannot express this -- it would switch off the whole rule, base part included.
                 continue;
             }
@@ -1011,7 +1011,7 @@ public final class TriggerInterpreter {
             String rawOp = effect.getOp() == null ? "" : effect.getOp().trim().toUpperCase(java.util.Locale.ROOT);
             if ("GAIN_RESOURCE".equals(movingOp) || "SPEND_RESOURCE".equals(movingOp)
                     || "GAIN_RESOURCE".equals(rawOp) || "SPEND_RESOURCE".equals(rawOp)) {
-                // 2026-10-02: the amount this effect ACTUALLY credits (after the cap) is what the next effect may
+                //: the amount this effect ACTUALLY credits (after the cap) is what the next effect may
                 // take a share of. Measured from the holder itself, so the cap is included by construction.
                 CanHit holder = resolveTarget(effect, effectCtx);
                 String resourceId = effect.getResource();
@@ -1803,7 +1803,7 @@ public final class TriggerInterpreter {
 
     /**
      * The same resolution, for a selector that is not the effect's own {@code target}
-     * ({@code cast_target}, 2026-10-02) - one switch, so the two spellings cannot drift apart.
+ * ({@code cast_target},) - one switch, so the two spellings cannot drift apart.
      *
      * @param selector the selector token (already lower-cased and trimmed)
      */
@@ -2942,7 +2942,7 @@ public final class TriggerInterpreter {
      * <b>event</b> that ends a buff, this names <b>whose turn boundary</b> spends it. A rule may state either, and
      * the state names are the same ones the rest of the op vocabulary uses.
      *
-     * <p>Two spellings since 2026-10-02, and the second one is what "... removed when it disappears" is built on:
+ * <p>Two spellings since, and the second one is what "... removed when it disappears" is built on:
      * <ul>
      *   <li>{@code "self"} - the rule owner's turns (星期日's [蒙福者], 1321's domain, 缇宝's zone);</li>
      *   <li>{@code "summon"} - <b>the owner's memosprite</b> (1402's [至高之姿] "<b>when the Garmentmaker (衣匠) disappears</b>, Aglaea (阿格莱雅) removes
@@ -3148,11 +3148,11 @@ public final class TriggerInterpreter {
             AbstractBuff zone = withSource(withTickOwner(withLifetime(percent > 0
                     ? new VulnerabilityBuff(turns, percent, permanent, scope)
                     : new ReductionBuff(turns, -percent, permanent, scope), effect), effect, ctx), ctx);
-            // Note: `withTickOwner` joined this chain on 2026-09-30. It was missing, so `ticks_on` was a SILENT no-op on
+            // Note: `withTickOwner` joined this chain on. It was missing, so `ticks_on` was a SILENT no-op on
             // this op: 1218's zone carried `ticks_on: "self"` and its clock still belonged to the carrier, which meant
             // "the zone is removed when 椒丘 enters the unable-to-fight state" could never fire -- measured at exactly 1.40x before and after she fell
             // (AnchorDeathTest). The other four buff-creating ops had it; this one did not.
-            // A NAMED modifier is what REMOVE_STATE can take off (the same field MODIFY_ATTR has used since 2026-09-28;
+            // A NAMED modifier is what REMOVE_STATE can take off (the same field MODIFY_ATTR has used since;
             // BuffManager.removeState's last loop walks every buff that carries a name). Without it a zone-scoped
             // "damage taken is lowered" could only be spelled `permanent`, i.e. it would stay on for the rest of the battle --
             // which is why 150's Soul, Tempered ad Mortem (千锻魂) needs it: the reduction lasts as long as the zone's countdown, not forever.
@@ -3219,7 +3219,7 @@ public final class TriggerInterpreter {
         }
         // Both a stated `scale` and a stated ceiling must be read (reader: light cone 23062).
         // Note: This method ignores `damage_type` the same way -- see the comment above.
-        // Through `shareOf`, like every other op that reads a share (2026-10-02; measured: `percent_from_resource` passed validation -- `requirePercent` has admitted it since round
+        // Through `shareOf`, like every other op that reads a share (; measured: `percent_from_resource` passed validation -- `requirePercent` has admitted it since round
         // 83 -- and then died here with "getPercent() is null", so the op validated against a vocabulary it did not apply).
         double magnitude = effect.getScale() == null || effect.getScale().isBlank()
                 ? shareOf(effect, ctx)
@@ -3537,7 +3537,7 @@ public final class TriggerInterpreter {
     }
 
     /**
-     * Tells the holder that a resource moved ({@code RESOURCE_CHANGED}, 2026-09-30).
+ * Tells the holder that a resource moved ({@code RESOURCE_CHANGED},).
      *
      * <p>From the OP, not from {@code ResourceManager}: the manager owns no battle, so it cannot raise a trigger.
      */
@@ -4577,7 +4577,7 @@ public final class TriggerInterpreter {
      *
      * <p>Note: The same hole exists for the ops that credit the owner by definition ({@code GAIN_ENERGY},
      * {@code GAIN_SKILL_POINT}, {@code BOOST_DAMAGE}, ...): they ignore a stray {@code target} today. No shipped
-     * rule does that (checked 2026-09-2), so it is latent rather than live, and it is registered rather than
+     * rule does that (checked), so it is latent rather than live, and it is registered rather than
      * fixed here because widening the guard would change the accepted vocabulary of seven ops at once.
      */
     private static void requireNoTarget(EffectSpec effect, String op, TriggerSpec spec) {
@@ -4863,7 +4863,7 @@ public final class TriggerInterpreter {
         // and `derivedMagnitude` was fixed for exactly this one round earlier. Same family, same line.
         double share = shareOf(effect, ctx);
         double flat = effect.getAmount() == null ? 0.0 : effect.getAmount();
-        // Note:Note: A share of the TRIGGERING instance ("equal to X% of the original damage") was implemented here on 2026-10-02 and ROLLED
+        // Note:Note: A share of the TRIGGERING instance ("equal to X% of the original damage") was implemented here on and ROLLED
         // BACK the same round, because it read the wrong quantity: at `DEALING_DAMAGE` -- the only event that carries
         // the instance -- `damage.toValue()` is 4.2x the value the victim actually loses (measured: 1093.02 vs
         // 260.23584 on one Himeko (姬子) attack), since settlement happens AFTER that event by design. The scale itself was
@@ -4889,7 +4889,7 @@ public final class TriggerInterpreter {
             }
             // Note: The division corrects for the rider's OWN settlement, so a rider that skips the zones needs no
             // correction at all: true damage (`damage_type: "TRUE"`) settles at a factor of exactly 1, and dividing by
-            // the ORIGINAL's factor would multiply the share by 1/0.5829 (measured 2026-10-02: a 24% rider landed as
+            // the ORIGINAL's factor would multiply the share by 1/0.5829 (measured: a 24% rider landed as
             // 44% -- .43 where 42.01 was due). 1415 Cyrene (昔涟)'s zone rider is the reader.
             if (effect.getDamageType() != null && DamageType.TRUE == DamageType.fromString(effect.getDamageType().trim())) {
                 return ctx.amount() * share + flat;

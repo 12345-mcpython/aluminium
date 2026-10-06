@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * The pair the biggest remaining family needs (2026-09-28): the <b>"弱点击破状态"</b> condition and the
+ * The pair the biggest remaining family needs: the <b>"弱点击破状态"</b> condition and the
  * <b>toughness to super-break conversion</b> ({@code SUPER_BREAK}).
  *
  * <p>"对处于<b>弱点击破状态</b>的敌方目标造成伤害后，会将本次伤害的<b>削韧值</b>转化为 1 次 X% 的超击破伤害" (1321's clauses, and the
@@ -121,7 +121,7 @@ public class SuperBreakTest {
         // Note: The candidate is BROKEN by this fixture, so it has to survive its own break damage: an earlier version
         // took the first element-weak id and happened to survive by a narrow margin (break base 3103against 16498
         // Max HP), which made the test fail the moment anything raised that damage -- e.g. a 20% resistance reduction,
-        // measured 2026-09-29 (the fixture's hero is 1321, whose aura reduces enemies' resistance). Picking the
+        // measured (the fixture's hero is 1321, whose aura reduces enemies' resistance). Picking the
         // element-weak candidate with the LARGEST Max HP is what makes the fixture say what it means.
         Enemy enemy = null;
         for (int id = 1002010; id < 1002100; id++) {

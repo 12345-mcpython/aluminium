@@ -43,7 +43,7 @@ public class Countdown extends CanHit {
 
     /**
      * @param owner who placed it ({@code null} = a hand-built one) - the link {@code actor == countdown} reads, so a
-     *              rule can tell <b>its own</b> countdown from somebody else's (2026-09-28)
+ * rule can tell <b>its own</b> countdown from somebody else's
      */
     public Countdown(CanHit owner, String name, double speed) {
         super(name, Camp.PLAYER, blankSheet(speed));

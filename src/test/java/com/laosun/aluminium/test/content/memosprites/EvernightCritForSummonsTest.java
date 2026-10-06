@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1413's skill, the clause that raises every memosprite's CRIT DMG (2026-10-02): "使我方全体忆灵的暴击伤害提高，提高数值等同于长夜月暴击伤害的 #1%".
+ * 1413's skill, the clause that raises every memosprite's CRIT DMG: "使我方全体忆灵的暴击伤害提高，提高数值等同于长夜月暴击伤害的 #1%".
  *
  * It is also the effect that 1141524's third sentence later raises, so it has to exist before that can be written.
  *

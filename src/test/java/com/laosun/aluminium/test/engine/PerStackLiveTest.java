@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * A sustained aura can follow its counter (2026-10-02): "for every 1 stack the owner has, ...".
+ * A sustained aura can follow its counter: "for every 1 stack the owner has,...".
  *
  * <p>The reader family is the largest registered one in GAPS (fourteen documents). A snapshot is right only at the instant
  * it is taken, and re-attaching on every change would stack the buff itself -- so the share is re-read instead.

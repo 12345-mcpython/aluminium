@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 /**
- * Cone 23048 clause 3 (2026-09-30): the FIRST reader of the aimed unit that CAST_SETUP now carries.
+ * Cone 23048 clause 3: the FIRST reader of the aimed unit that CAST_SETUP now carries.
  *
  * <p>"After the wearer casts a skill on a single ally, the TARGET's skill damage rises" needs one event that (a)
  * carries the category, (b) fires BEFORE settlement, and (c) names the ally. No event had all three: SKILL_CAST names

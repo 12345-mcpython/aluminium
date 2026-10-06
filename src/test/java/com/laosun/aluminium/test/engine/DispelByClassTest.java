@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1415 Cyrene (昔涟)'s memosprite the Demiurge (德谬歌), memosprite skill 8 "献予'纷争'之诗": "when cast on Mydei, dispel all <b>control-class</b> negative states Mydei is in" (2026-10-02).
+ * 1415 Cyrene (昔涟)'s memosprite the Demiurge (德谬歌), memosprite skill 8 "献予'纷争'之诗": "when cast on Mydei, dispel all <b>control-class</b> negative states Mydei is in".
  *
  * <p>Why this needed an engine piece: `DISPEL` removed the newest N debuffs and nothing else, so it could not say "control class". A class is a
  * property of the state itself (`AbstractBuff.debuffClass()`, also what class resistance reads), and the vocabulary already existed as a

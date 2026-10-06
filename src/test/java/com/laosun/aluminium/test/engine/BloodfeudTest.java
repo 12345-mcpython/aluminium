@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1404: [血仇] - - entering it, and the lethal blow that ends it (2026-10-02).
+ * 1404: [血仇] - - entering it, and the lethal blow that ends it.
  *
  * <p>ONE VARIABLE: whether [血仇] is on when the lethal blow lands. His ultimate grants 20 charge, so five of them reach the
  * hundred the entry clause needs -- no test-only shortcut into his resource.

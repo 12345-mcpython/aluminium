@@ -6,7 +6,7 @@ import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.skill.Skill;
 
 /**
- * A skill-slot swap carried by a buff (2026-09-28): "将下一次普攻强化为[酒花奔涌]" (turns the next basic attack into [酒花奔涌]) (1301 Gallagher).
+ * A skill-slot swap carried by a buff: "将下一次普攻强化为[酒花奔涌]" (turns the next basic attack into [酒花奔涌]) (1301 Gallagher).
  *
  * <p><b>Why a buff.</b> The swap needs a <i>lifetime</i>, and this engine already has exactly the lifetimes the documents
  * use - `turns`, `permanent`, and `until` ("下一次普攻" is `until: next_attack`). Riding on {@link AbstractBuff} means the

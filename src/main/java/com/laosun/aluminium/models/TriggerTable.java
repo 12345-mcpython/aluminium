@@ -1637,7 +1637,7 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
             }
             // Neither side is "self", so this is not an identity comparison - it is a numeric one, and
             // `hit_count == 2` has been in this DSL's documentation since its first version while the parser
-            // reported it as "compares two variables" (found 2026-09-2by a test that needed `== 0`). Fall
+            // reported it as "compares two variables" (found by a test that needed `== 0`). Fall
             // through to the numeric path; a comparison between two *names* still gets the clearer message.
             if (!isNumeric(left) && !isNumeric(right)) {
                 throw new IllegalArgumentException(
@@ -3489,7 +3489,7 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
                 case "<" -> left < right;
                 case "<=" -> left <= right;
                 // Equality on numbers, which the DSL has always documented (`hit_count == 2`) and only
-                // started accepting on 2026-09-2-- see parseCondition. NaN compares false against
+                // started accepting -- see parseCondition. NaN compares false against
                 // everything, which is the "cannot read it, so the condition fails" rule.
                 case "==" -> left == right;
                 case "!=" -> left != right;

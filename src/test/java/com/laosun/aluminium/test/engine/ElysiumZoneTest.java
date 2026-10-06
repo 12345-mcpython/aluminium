@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1415 Cyrene (昔涟)'s zone (2026-10-02): "while the zone lasts, every time all of our targets deal 1 instance of damage, they additionally deal 1 instance of true damage equal to 24% of the original damage".
+ * 1415 Cyrene (昔涟)'s zone: "while the zone lasts, every time all of our targets deal 1 instance of damage, they additionally deal 1 instance of true damage equal to 24% of the original damage".
  *
  * <p>Her own file carries both halves: the skill marks the zone ({@code APPLY_BUFF} with {@code ticks_on: "self"}), and the
  * rider listens on {@code DAMAGE_SETTLED}. The claim is therefore "with the zone up, an ALLY's attack costs the enemy

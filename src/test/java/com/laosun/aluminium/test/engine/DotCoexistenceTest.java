@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * What a repeating DOT <b>already</b> does (2026-09-28), measured because the gap list needed the truth.
+ * What a repeating DOT <b>already</b> does, measured because the gap list needed the truth.
  *
  * <p>GAPS #1 says "DOT stacking is blocked". That is only half true, and the half that is false matters: `DotBuff`'s
  * {@code isSameKind} answers {@code false}, so a second application of the same state is <b>not</b> evicted - the DOTs

@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * The {@code random_enemy} selector (2026-09-30), reader 1505 Evanescia (绯英)'s ultimate: "deals 14%... to an enemy target chosen <b>at random</b> for the Ultimate".
+ * The {@code random_enemy} selector, reader 1505 Evanescia (绯英)'s ultimate: "deals 14%... to an enemy target chosen <b>at random</b> for the Ultimate".
  *
  * <p>Three readings, all on real battles: the pick is always one of the opponents; the SAME seed picks the same unit twice (so the
  * engine is reproducible); and across many seeds the pick is not always the same one (so it really is a roll, not a constant).

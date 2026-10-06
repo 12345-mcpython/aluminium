@@ -140,7 +140,7 @@ public class EnergyBattleTest {
     }
 
     /**
-     * Kill energy gain is independent of damage type (2026-09-19 convention): any damage
+ * Kill energy gain is independent of damage type: any damage
      * attributed to a character, as long as it kills a monster, settles kill energy gain for the
      * attacker - including additional damage and true damage, which are "not treated as one attack".
      *
@@ -188,7 +188,7 @@ public class EnergyBattleTest {
     }
 
     /**
-     * One attack action grants the target only one energy gain (2026-09-19 convention): when one
+ * One attack action grants the target only one energy gain: when one
      * hit breaks an enemy, the skill segment grants the target energy, and the derived break segment /
      * super break segment no longer grants energy (they already have
      * {@code notCountsAsAttack()} set).

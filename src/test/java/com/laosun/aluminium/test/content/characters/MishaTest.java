@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1312 Misha, from his own file (2026-09-29, round 233): the energy his talent returns on a Skill Point spent.
+ * 1312 Misha, from his own file: the energy his talent returns on a Skill Point spent.
  */
 public class MishaTest {
     private static final int MISHA = 1312;
@@ -36,7 +36,7 @@ public class MishaTest {
         Assertions.assertEquals(0.0, misha.getCurrentEnergy() - before, 1e-9,
                 "「我方全体每消耗 1 个战技点」 -- an attack is not a spend");
 
-        // 2026-09-30: the amount is the number of points spent -- 1, not 0. It used to be 0, which only passed
+        //: the amount is the number of points spent -- 1, not 0. It used to be 0, which only passed
         // while the literal `amount: 2` ignored the context entirely (measured rounds 680-682).
         battle.fireTriggers(TriggerEvent.SKILL_POINT_SPENT, ally, enemy, 0, 1);
         Assertions.assertEquals(2.0, misha.getCurrentEnergy() - before, 1e-6,

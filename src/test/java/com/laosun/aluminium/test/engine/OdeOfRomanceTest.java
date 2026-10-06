@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1415's memosprite skill 12 "献予'浪漫'之诗" (data slot 14, SkillID 1141514), the half that is expressible today (2026-10-02).
+ * 1415's memosprite skill 12 "献予'浪漫'之诗" (data slot 14, SkillID 1141514), the half that is expressible today.
  *
  * <p>"单次生效，对阿格莱雅施放时，<b>使阿格莱雅获得[浪漫]</b>并使衣匠忆灵天赋的速度提高效果层数立即叠加至上限。…"
  *

@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * CHARACTERISATION of the {@code target_weakness_count} variable (2026-09-30, step two of the cone-22004 diagnosis): a rule
+ * CHARACTERISATION of the {@code target_weakness_count} variable: a rule
  * guarded by "the target is weak to at least one element" must fire for a monster that has weaknesses and NOT for one that has
  * none.
  *

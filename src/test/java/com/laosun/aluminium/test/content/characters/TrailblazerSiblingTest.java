@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 8002, the sibling id of 8001 (2026-09-29, round 182): the same Trailblazer (Destruction) kit, verified number by number.
+ * 8002, the sibling id of 8001: the same Trailblazer (Destruction) kit, verified number by number.
  *
  * <p>Same three assertions as 8001's file: the break-triggered ATK stacking with its cap, the technique heal gated on the round-18 marker, and the
  * census. Shipping the sibling under the same document is the point - the two ids state the same numbers.

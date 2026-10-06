@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1209："消灭敌方目标时，如果当前持有[智剑连心]…则使这些增益效果的持续时间全部延长 1 回合" (2026-10-02).
+ * 1209："消灭敌方目标时，如果当前持有[智剑连心]…则使这些增益效果的持续时间全部延长 1 回合".
  *
  * <p>ONE VARIABLE: the eidolon rank. Everything else -- her skill (which applies [智剑连心] for one turn), the kill, the tick --
  * is identical, so the survival of the state after one tick is exactly what eidolon six buys.

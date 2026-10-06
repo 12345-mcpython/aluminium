@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * "获得该角色后，或该角色在队伍中时" -- the warehouse clause needs no manual registration (2026-10-02).
+ * "获得该角色后，或该角色在队伍中时" -- the warehouse clause needs no manual registration.
  *
  * <p>1506 sits in the party and nothing in this test registers her: `Battle.startBattle` finds her `warehouse/1506.json` and listens to
  * it. The third reading is the one that makes the shape right -- she is still IN THE QUEUE, i.e. her own battle table was left alone

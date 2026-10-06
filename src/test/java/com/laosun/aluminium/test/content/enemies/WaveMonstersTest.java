@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * "若施放前目标被消灭则对<b>新入场</b>的敌方目标施放" -- the selector `wave_monsters` (2026-10-02).
+ * "若施放前目标被消灭则对<b>新入场</b>的敌方目标施放" -- the selector `wave_monsters`.
  *
  * <p>The word came out of the game's own data, not out of my head: `MServant_CyreneServant_00_AmazingBuff_Mydeimos_OnWaveMonster` listens
  * for `"Event": "OnWaveMonster"` and answers with a `TurnInsertAction` -- an enemy that entered WITH A WAVE. The engine already had waves

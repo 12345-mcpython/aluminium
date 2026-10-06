@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 /**
- * Light cone 23026 (2026-09-30): both clauses -- and the first content to combine REMOVE_STATE with per_stack.
+ * Light cone 23026: both clauses -- and the first content to combine REMOVE_STATE with per_stack.
  *
  * <p>Every ally attack gives the wearer one layer of the counter; each layer lifts ENERGY_REGENERATION_RATE by 3..5%,
  * capped at 5 layers. The ultimate consumes the whole counter and grants the flourish: the wearer's ATK up 48..96% and

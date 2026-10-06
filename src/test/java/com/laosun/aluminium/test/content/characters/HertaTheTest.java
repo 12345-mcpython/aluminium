@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1401 The Herta, from her own file (2026-09-29, round 192): the technique's opening ATK and the ultimate's three effects.
+ * 1401 The Herta, from her own file: the technique's opening ATK and the ultimate's three effects.
  *
  * <p>The technique's 60% is measured as 60% of the BASE attack (the engine's `add_percent` convention), and the pair (declared / undeclared) is what makes it a
  * measurement rather than a claim - the same trap round 19 hit with Dan Heng.

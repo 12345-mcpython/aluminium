@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * An EXPLICIT removal ends a state, and the tables hear about it (2026-10-02).
+ * An EXPLICIT removal ends a state, and the tables hear about it.
  *
  * <p>Until today only a spent duration announced {@code STATE_ENDED}: 1513's own judge proves that path by letting the Aha
  * moment run out. A rule that took a state off by hand left its readers silent -- which is exactly what 1408's

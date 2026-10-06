@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Random;
 
-/** The extra Ice hits of slot 26's second clause (2026-10-02). */
+/** The extra Ice hits of slot 26's second clause. */
 public class TrueSelfOdeExtraIceTest {
     private static final String COUNTER = "忆灵技的额外一击";
 

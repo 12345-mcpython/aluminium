@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1220 Feixiao, from her own file (2026-09-29, round 232): the teammate-triggered follow-up with its per-turn limit, and the boost it carries.
+ * 1220 Feixiao, from her own file: the teammate-triggered follow-up with its per-turn limit, and the boost it carries.
  */
 public class FeixiaoTest {
     private static final int FEIXIAO = 1220;

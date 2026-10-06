@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 /**
- * Light cone 23023 (2026-09-30): all three clauses.
+ * Light cone 23023: all three clauses.
  *
  * <p>DEF +40..64%; when the wearer grants a shield to an ally, the wearer's CRIT DAMAGE rises 40..64% for 2 turns; when
  * a follow-up attack hits, the enemies that were hit take 10..16% more damage for 2 turns.

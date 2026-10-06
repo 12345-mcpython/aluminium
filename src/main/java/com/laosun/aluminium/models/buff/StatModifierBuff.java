@@ -62,7 +62,7 @@ public class StatModifierBuff extends AbstractBuff {
     private final int maxStacks;
     /**
      * When set, this modifier asks for its share on every read instead of holding the number it was built with
-     * (2026-10-02; reader: the fourteen "每拥有 1 层…提高 X%" auras). Only add-percent modifiers may be live -- a
+ *. Only add-percent modifiers may be live -- a
      * pure or multiply share has no spelling for "随层数变化" yet, and this refuses rather than guessing.
      */
     private java.util.function.DoubleSupplier liveShare;
@@ -303,7 +303,7 @@ public class StatModifierBuff extends AbstractBuff {
     }
 
     /**
-     * Makes this modifier LIVE: its share is asked for on every read (2026-10-02).
+ * Makes this modifier LIVE: its share is asked for on every read.
      *
      * @throws IllegalStateException when the modifier is not an add-percent one, because the live kind only exists for
      *                               that type -- silently keeping the stored number would be a wrong number with no symptom

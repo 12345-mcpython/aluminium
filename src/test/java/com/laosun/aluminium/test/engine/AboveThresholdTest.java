@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * "速度大于等于 120 时…之后每超过 1 点速度使自身欢概度提高 1%" (1502:269, 2026-10-02).
+ * "速度大于等于 120 时…之后每超过 1 点速度使自身欢概度提高 1%" (1502:269,).
  *
  * <p>The reading is the EXCESS over the threshold, not the attribute -- which is exactly what separates this spelling
  * from `self_attr:`. A threshold above the character's own speed must therefore give nothing at all.

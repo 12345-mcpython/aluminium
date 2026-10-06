@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 140Castorice, from her own file (2026-09-29, round 221): the talent's damage boost on HP loss - the HP_LOST event's first use here.
+ * 140Castorice, from her own file: the talent's damage boost on HP loss - the HP_LOST event's first use here.
  */
 public class CastoriceTest {
     private static final int CASTORICE = 1407;

@@ -19,7 +19,7 @@ import java.util.Random;
 
 /**
  * A modifier (or a resistance) that carries <b>the name the data gave it</b>, so a state's own effect can be removed
- * with the state (2026-09-28).
+ * with the state.
  *
  * <p><b>The sentence that needs it.</b> Robin (知更鸟)'s [协奏] grants the party an ATK boost and a crowd-control immunity
  * that last "while in the [协奏] state" - <b>as long as the state does</b>, and that state ends when a countdown's turn

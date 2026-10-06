@@ -48,7 +48,7 @@ public class SkillSlotMappingTest {
                         SkillType.TALENT, 4,
                         SkillType.MAZE, 6,
                         SkillType.TECHNIQUE, 7,
-                        // 2026-09-30: the Elation damage skills live in slots 20/21 in `skills.json`
+                        //: the Elation damage skills live in slots 20/21 in `skills.json`
                         SkillType.ELATION_SKILL, 20,
                         SkillType.ELATION_EXTRA, 21),
                 Constant.SKILL_SLOT);
@@ -75,7 +75,7 @@ public class SkillSlotMappingTest {
      * in {@code Battle.startBattle()}.
      *
      * <p>This is a deliberate layering: the map basic attack (slot 6, attack type {@code MazeNormal})
-     * and the technique (slot , {@code Maze}) are things on the map; the in-battle basic attack is
+     * and the technique (slot 7, {@code Maze}) are things on the map; the in-battle basic attack is
      * slot 1's {@code Normal}, and the two are not the same thing.
      */
     @Test
@@ -156,7 +156,7 @@ public class SkillSlotMappingTest {
         for (Map.Entry<SkillType, Integer> entry : Constant.SKILL_SLOT.entrySet()) {
             int slot = entry.getValue();
             var raw = Constant.SKILLS.get(cid).get(slot);
-            // 2026-09-30: the table lists SLOTS, not per-character rows -- only seven characters carry slots 20/21, so a
+            //: the table lists SLOTS, not per-character rows -- only seven characters carry slots 20/21, so a
             // character without a row for a slot is the normal case (a failure here would assert the opposite).
             if (raw == null) {
                 continue;

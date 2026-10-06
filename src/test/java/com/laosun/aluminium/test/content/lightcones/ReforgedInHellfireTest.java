@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 /**
- * Light cone 23059 (2026-09-30): three of five clauses -- and the judge that caught two real errors the suite could not.
+ * Light cone 23059: three of five clauses -- and the judge that caught two real errors the suite could not.
  *
  * <p>A rule that is never SELECTED is never validated, so a green suite said nothing: the HP rule named an attribute
  * the engine does not have (it is HEALTH), and the state rule hung a category test on SKILL_CAST, which carries none,

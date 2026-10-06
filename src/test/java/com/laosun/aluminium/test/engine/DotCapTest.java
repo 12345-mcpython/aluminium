@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * A DOT's <b>layer ceiling</b> (2026-09-28): "风化状态最多叠加 5 层" (1108 Sampo's talent).
+ * A DOT's <b>layer ceiling</b>: "风化状态最多叠加 5 层" (1108 Sampo's talent).
  *
  * <p><b>What is implemented is exactly what the sentence asserts</b> - at most N layers of a state <i>deal damage</i>;
  * applications past the ceiling are inert (they are not removed: `DotBuff.isSameKind` answers `false`, so a DOT is never

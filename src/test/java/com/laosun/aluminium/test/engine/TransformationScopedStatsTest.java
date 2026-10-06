@@ -16,7 +16,7 @@ import java.util.Random;
 
 /**
  * 1408: "卡厄斯兰那的物理属性抗性穿透提高 20%" and "变身期间攻击力提高 80%，生命上限提高 20%"
- * (2026-10-02).
+ *.
  *
  * <p>THE POINT IS THE THIRD ASSERTION: the block must live exactly as long as the state. Removing [变身] and watching ATK
  * come back down is what tells "during the transformation" apart from "for the rest of the battle" -- and item 34 shipped
@@ -74,7 +74,7 @@ public class TransformationScopedStatsTest {
         owner.getBuffManager().removeState(STATE);
         battle.processRequests();
         Assertions.assertFalse(owner.getBuffManager().hasState(STATE), "the transformation is off");
-        // Note: Updated 2026-10-02: the trace fires AGAIN when the transformation ends ("或变身结束时"), so what is left
+        // Note: Updated: the trace fires AGAIN when the transformation ends ("或变身结束时"), so what is left
         // is the battle-start 50% plus the end 50%. What this reading is about is unchanged: the TRANSFORMATION's own
         // block is gone.
         Assertions.assertEquals(atk0 * (2.0 / 1.5), owner.getAttribute(AttributeType.ATTACK).get(), atk0 * 0.001,

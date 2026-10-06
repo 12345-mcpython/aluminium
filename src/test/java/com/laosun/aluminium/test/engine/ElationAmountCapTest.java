@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * "单次通过此方式计算的[好活当赏]不超过 100 点" (2026-09-30): a single conversion of 150 energy mirrors only
+ * "单次通过此方式计算的[好活当赏]不超过 100 点": a single conversion of 150 energy mirrors only
  * 100, while 60 mirrors all 60.
  *
  * <p>The energy is delivered as the EVENT's own magnitude through `fireTriggers`, which is exactly the quantity the mirror rule reads --

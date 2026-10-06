@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * `REMOVE_STATE` with `"kind": "own"`: take off only what THIS rule owner applied (2026-10-02).
+ * `REMOVE_STATE` with `"kind": "own"`: take off only what THIS rule owner applied.
  *
  * <p>Reader: 1415 memosprite skill 12, whose lifetime is "持续至阿格莱雅退出[至高之姿]状态". Removing by NAME alone took a pre-existing
  * `ALL_DAMAGE_TYPE_BOOST` of hers as well, so the removal needed the origin filter `EXTEND_BUFF` has always used.

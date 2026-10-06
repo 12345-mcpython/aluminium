@@ -164,7 +164,7 @@ public class Damage {
 
     /** Records the intended toughness reduction (fluent, like the other instance mutators). */
     /**
-     * The targets hit by the attack that produced this instance (2026-09-30).
+ * The targets hit by the attack that produced this instance.
      *
      * <p>Note: The engine's pattern for "a cast-level fact a rule must be able to read": the caller holds it and
      * <b>the instance carries the answer</b> (see {@code setSkillKey} / {@code setStance}). An EMPTY set means
@@ -442,7 +442,7 @@ public class Damage {
     /** Extra DEF-ignore carried by THIS hit, added by a rule firing on {@code DEALING_DAMAGE}. */
     private double extraDefenceIgnore = 0;
 
-    /** Extra CRIT CHANCE carried by THIS hit, added by a rule on {@code DEALING_DAMAGE} (2026-09-29). */
+    /** Extra CRIT CHANCE carried by THIS hit, added by a rule on {@code DEALING_DAMAGE}. */
     private double extraCritChance = 0;
 
     /** Extra CRIT DAMAGE carried by THIS hit, same route. */

@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 8005, the sibling of 8006 (2026-09-29, round 19): [伴舞] and the +30% Break Effect, mirrored where the two documents agree.
+ * 8005, the sibling of 8006: [伴舞] and the +30% Break Effect, mirrored where the two documents agree.
  */
 public class SiblingHarmonyTest {
     private static final int TB = 8005;
@@ -72,7 +72,7 @@ public class SiblingHarmonyTest {
     public void hisFileCarriesTheClauses() {
         var table = com.laosun.aluminium.data.TriggerTables.of(TB);
         Assertions.assertEquals(1, table.ruleCount(com.laosun.aluminium.enums.TriggerEvent.ULT_CAST));
-        // 2026-09-30: 2 -- 8005 gained the skill clause "额外造成 4 次伤害，每次对随机敌方单体" (times).
+        //: 2 -- 8005 gained the skill clause "额外造成 4 次伤害，每次对随机敌方单体" (times).
         Assertions.assertEquals(2, table.ruleCount(com.laosun.aluminium.enums.TriggerEvent.DEALING_DAMAGE));
         Assertions.assertEquals(1, table.ruleCount(com.laosun.aluminium.enums.TriggerEvent.BREAK));
         Assertions.assertEquals(2, table.ruleCount(com.laosun.aluminium.enums.TriggerEvent.BATTLE_START),

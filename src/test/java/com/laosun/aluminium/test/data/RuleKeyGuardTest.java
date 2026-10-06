@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
- * A rule's key has to be a key Gson maps (2026-10-02).
+ * A rule's key has to be a key Gson maps.
  *
  * <p>Found the hard way twice: I wrote `on_any` in a rule that had no `on` and concluded the engine could not spell it -- when
  * the real story is that RULE OBJECTS had no key guard at all, so a mistyped key vanished and the rule arrived as "Unknown

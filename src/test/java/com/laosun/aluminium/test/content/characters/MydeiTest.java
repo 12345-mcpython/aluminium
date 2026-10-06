@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1404 Mydei, from his own file (2026-09-29, round 191): the technique's 80%-Max-HP opening, gated on the technique state.
+ * 1404 Mydei, from his own file: the technique's 80%-Max-HP opening, gated on the technique state.
  *
  * <p>His charge uses the resource vocabulary 1003 established, so the file declares it; the census reads that declaration back.
  */

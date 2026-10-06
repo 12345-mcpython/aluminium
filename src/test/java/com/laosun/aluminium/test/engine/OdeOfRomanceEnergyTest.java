@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1415 memosprite skill 12 (the ode of romance), the clause with no duration attached (2026-10-02).
+ * 1415 memosprite skill 12 (the ode of romance), the clause with no duration attached.
  *
  * <p>Why the gain is measured TWICE. The first version read the energy across ONE attack and got 90, not 0: casting a skill earns energy on its
  * own, so the clause 0 and the cast own gain are merged in one number. The difference between an attack with the ode on her and the same attack

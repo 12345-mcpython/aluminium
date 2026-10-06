@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1415's memosprite skill 24, second sentence (2026-10-02): "after 长夜月 casts a Skill/Ultimate, additionally gain #2 points of [忆质]".
+ * 1415's memosprite skill 24, second sentence: "after 长夜月 casts a Skill/Ultimate, additionally gain #2 points of [忆质]".
  *
  * Two-sided: with the ode cast at her, her skill grants the captured #2 (1 at this level); without it nothing was captured, so nothing is granted. The value never appears as
  * a literal in content: it is read from the ode's own row and handed over through a resource.

@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * The +30% Break Effect of the Ultimate and of the technique must both count (8005) (2026-10-02).
+ * The +30% Break Effect of the Ultimate and of the technique must both count (8005).
  *
  * <p>FILE-DRIVEN, four readings, and SUPERPOSITION is the claim: with both sources present the two differences must add.
  * Note: the technique comes from `battle.markTechniqueUsed(owner)` BEFORE `startBattle()` -- the engine's own entry point.

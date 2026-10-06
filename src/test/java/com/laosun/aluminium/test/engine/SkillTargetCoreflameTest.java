@@ -16,7 +16,7 @@ import java.util.Random;
 
 /**
  * 1408: "when Phainon (白厄) becomes the skill target of any other target, he gains 1 point of [火种] (Coreflame). If the caster is a teammate of Phainon, it also increases Phainon's
- * crit damage by 30%, lasting 3 turns" (2026-10-02).
+ * crit damage by 30%, lasting 3 turns".
  *
  * <p>SAME SCENE, ONE VARIABLE: 1414 -- whose skill is a shield aimed at a teammate -- casts it either AT 1408 or AT THE ENEMY. The
  * only difference is who was aimed at, which is exactly what the sentence is about.

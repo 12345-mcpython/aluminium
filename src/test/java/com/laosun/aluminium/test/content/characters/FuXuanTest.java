@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1208 Fu Xuan, from her own file (2026-09-29, round 214): the team-wide damage reduction of [避厄] and the two numbers [鉴知] hands out.
+ * 1208 Fu Xuan, from her own file: the team-wide damage reduction of [避厄] and the two numbers [鉴知] hands out.
  */
 public class FuXuanTest {
     private static final int FUXUAN = 1208;

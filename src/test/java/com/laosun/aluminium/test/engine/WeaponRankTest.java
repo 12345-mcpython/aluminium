@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
- * A light cone's superimposition rank selects its skill row (2026-09-29).
+ * A light cone's superimposition rank selects its skill row.
  *
  * <p>`weapons.json` carries five rows per light cone, and the engine used to read the first one -- modelling rank 1 without
  * saying so. Weapon 20003 is the fixture because its rows carry real differing properties: `defence_percent` is 0.16 at rank

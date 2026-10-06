@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1206 Sushang, from her own file (2026-09-29, round 155): the talent that answers a weakness break, and the Sword Stance pair.
+ * 1206 Sushang, from her own file: the talent that answers a weakness break, and the Sword Stance pair.
  *
  * <p>The talent is the interesting one: it hangs on the engine's `BREAK` event, which nothing had used yet. Its observable is her own
  * SPEED, so no damage comparison (and no level-convention confound) is involved.

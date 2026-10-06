@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * {@code TICK_DOT} (2026-09-28): "使其当前承受的裂伤状态<b>立即产生 1 次</b>相当于原伤害 85% 的伤害" (1111 Luka's talent).
+ * {@code TICK_DOT}: "使其当前承受的裂伤状态<b>立即产生 1 次</b>相当于原伤害 85% 的伤害" (1111 Luka's talent).
  *
  * <p>It mirrors {@code Battle.tickDots} - same source, element, {@code DamageType.DOT} and {@code EnergyGrant.KILL_ONLY} - so
  * it is "the state ticked once more", not a new kind of damage. Note: The duration is untouched (the sentence asks for an extra

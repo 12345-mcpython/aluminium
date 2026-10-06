@@ -66,19 +66,19 @@ public class RelicTriggerTableTest {
     /**
      * "星如我见的领航员" - 4-piece: a Skill/Ultimate DMG boost that stacks to 3 and loses one per turn.
      *
-     * <p>Authored on 2026-09-2, the day two engine changes made it expressible at all: three scoped
+     * <p>Authored once two engine changes made it expressible at all: three scoped
      * DMG-boost attributes (which scope the +18%) and the {@code REMOVE_STACK} op (the "removes 1 stack"
      * half). Before either, the ability could only have been modelled by dropping part of its text.
      */
     private static final int NAVIGATOR = 131;
     /**
      * "戍卫风雪的铁卫" - its 2-piece ("Reduces DMG taken by 8%") needed a damage-taken zone the data could
-     * not reach; authored on 2026-09-2once {@code MODIFY_DAMAGE_TAKEN} existed. Its 4-piece stays
+     * not reach; authored once {@code MODIFY_DAMAGE_TAKEN} existed. Its 4-piece stays
      * registered: it heals a <b>percentage of Max HP</b>, which {@code HEAL}'s fixed amount cannot express.
      */
     private static final int GUARD_OF_SNOW = 106;
 
-    // The seven MIXED (stat + ability) planar 2-pieces authored on 2026-09-2, when `self_attr` and
+    // The seven MIXED (stat + ability) planar 2-pieces authored when `self_attr` and
     // ADVANCE made their conditional sentence expressible. Before that they were not in this test's
     // world at all -- see MIXED_STAT_AND_ABILITY.
     /** Space Sealing Station (太空封印站): ATK +12%; SPD >= 120 -> ATK +12% more. */
@@ -132,7 +132,7 @@ public class RelicTriggerTableTest {
 
     /**
      * A set with a registered ability and <b>no</b> rule file - used by the "nothing to merge" case, which must
-     * therefore pick a set that is still unwritten (102 was that set until it was authored on 2026-09-28).
+ * therefore pick a set that is still unwritten (102 was that set until it was authored on).
      */
     private static final int NO_RULE_SET = 99002;
 
@@ -149,10 +149,10 @@ public class RelicTriggerTableTest {
      * An ordinary character with <b>no trigger rules of their own</b>, so every rule the tests below see comes
      * from the relic set: the merge must still yield the set's rules, and the counts must be the set's alone.
      *
-     * <p>Note: Looked up rather than named since 2026-09-2: it was Himeko (1003) until her kit was authored, which put
+     * <p>Note: Looked up rather than named: it was Himeko (1003) until her kit was authored, which put
      * a {@code BATTLE_START} rule of her own into the counts pinned below. See {@link TestCharacters}.
      */
-    // 2026-09-30: a REAL character whose own file carries NO BATTLE_START rule (this suite counts them), so the count it
+    //: a REAL character whose own file carries NO BATTLE_START rule (this suite counts them), so the count it
     // reads is the RELIC SET's alone. The old witness (a cid with no content file) no longer exists once every character ships.
     private static final int NO_RULES = 1402;
 
@@ -190,7 +190,7 @@ public class RelicTriggerTableTest {
             NAVIGATOR + "/" + FOUR_PIECE,
             GUARD_OF_SNOW + "/" + TWO_PIECE,
             GUARD_OF_SNOW + "/" + FOUR_PIECE,
-            // The mixed (stat + ability) effects authored on 2026-09-2with `self_attr` / `ADVANCE`:
+            // The mixed (stat + ability) effects authored with `self_attr` / `ADVANCE`:
             // seven planar 2-pieces whose conditional sentence had no spelling before.
             SPACE_SEALING_STATION + "/" + TWO_PIECE,
             FLEET_OF_THE_AGELESS + "/" + TWO_PIECE,
@@ -199,12 +199,12 @@ public class RelicTriggerTableTest {
             TALIA + "/" + TWO_PIECE,
             SPRIGHTLY_VONWACQ + "/" + TWO_PIECE,
             CELESTIAL_DIFFERENTIATOR + "/" + TWO_PIECE,
-            // Authored on 2026-09-2once a rule could ask "do I have a summon out?"
+            // Authored once a rule could ask "do I have a summon out?"
             // (`self_summon_count`, and `target: "summon"` to address it).
             BANANA_PARADISE + "/" + TWO_PIECE,
             // Authored once a buff could end on an EVENT instead of a turn boundary (`"until"`).
             STELLAR_DIFFERENTIATOR + "/" + TWO_PIECE,
-            // Authored on 2026-09-28 in the content pass over the `Writable now:` backlog: the five whose
+            // Authored on in the content pass over the `Writable now:` backlog: the five whose
             // every clause already had a spelling, with the numbers read from `param` (four of the registered
             // reasons carried a figure read off the English sentence instead - see each file's note).
             POET + "/" + FOUR_PIECE,
@@ -222,19 +222,19 @@ public class RelicTriggerTableTest {
             // Authored once "the attacker is MY summon" became expressible (`actor == summon`) and a summon's
             // attack became an event the data can subscribe to (`SUMMON_ATTACK`).
             HERO_OF_TRIUMPHANT_SONG + "/" + FOUR_PIECE,
-            // Authored on 2026-09-2once a cast event could say WHICH SIDE the unit it aimed at is on
+            // Authored once a cast event could say WHICH SIDE the unit it aimed at is on
             // (`target is_ally`): "对己方角色施放终结技/战技时" (sets 114, 118, 121) fired on every cast
             // without it, because a damaging ultimate aimed at an enemy carries a target too.
             "114/4",
             "118/4",
             "121/4",
-            // Authored on 2026-09-29 (round 95) once `ally_count` existed and it was measured
+            // Authored on (round 95) once `ally_count` existed and it was measured
             // that SUMMONED fires from a settle, so the memosprite half works.
             "321/2",
-            // Authored on 2026-09-29 (round 9): `actor is_ally` covers the wearer AND their
+            // Authored on (round 9): `actor is_ally` covers the wearer AND their
             // memosprite, and `per_turn` supplies "每回合最多触发1次".
             "125/4",
-            // Authored on 2026-09-2once a derived value could read MAX ENERGY
+            // Authored once a derived value could read MAX ENERGY
             // (`self_max_energy`, both as a condition and as a scale).
             "328/2",
             // Authored once a condition could ask about the PARTY, not just the owner
@@ -246,7 +246,7 @@ public class RelicTriggerTableTest {
             // Authored once a damage category could be named as an ATTRIBUTE
             // (`DOT_DAMAGE_BOOST`, the sibling of the follow-up one).
             "322/2",
-            // Authored on 2026-09-28, the day a shield could remember WHO created it: "提供的护盾量提高 X%" is the
+            // Authored on, the day a shield could remember WHO created it: "提供的护盾量提高 X%" is the
             // giver's own number (`AttributeType.SHIELD_BOOST`, read by `Battle.boostedShield` from the provider).
             // Note: Set 128's 4-piece ships one of its two sentences: the other one asks, per ally, whether the shield
             // that ally holds is the wearer's, and a whole-rule condition cannot say that.
@@ -259,13 +259,13 @@ public class RelicTriggerTableTest {
      * How many ability-only bonuses the shipped file still cannot express.
      *
      * <p>The invariant is {@code PURE + MIXED = AUTHORED.size() + STILL_REGISTERED}; the individual values
-     * are just where the line currently sits. It went 28 to <b>2</b> on 2026-09-2(set 131, once
+     * are just where the line currently sits. It went 28 to <b>2</b> (set 131, once
      * {@code REMOVE_STACK} existed), then to <b>26</b> (set 106's 2-piece, once
      * {@code MODIFY_DAMAGE_TAKEN} existed), then to <b>25</b> when the same set's 4-piece became
      * authorable - and then to <b>4</b> when the MIXED effects joined the partition (see
      * {@link #MIXED_STAT_AND_ABILITY}); those 22 mixed entries are not a regression, they are the half of
-     * the data this test could not see before. It went to <b>44</b> on 2026-09-28, when set 123
-     * was authored (see {@link #HERO_OF_TRIUMPHANT_SONG}), and to <b>22</b> on 2026-09-28 when the shield-amount
+ * the data this test could not see before. It went to <b>44</b> on, when set 123
+ * was authored (see {@link #HERO_OF_TRIUMPHANT_SONG}), and to <b>22</b> on when the shield-amount
      * family became authorable (sets 103 and 128, three entries - see {@link #KNIGHT_OF_PURITY}).
      */
     private static final int STILL_REGISTERED = 1;
@@ -276,7 +276,7 @@ public class RelicTriggerTableTest {
     /**
      * Stat + ability bonuses: an unconditional {@code properties} stat <b>plus</b> an ability.
      *
-     * <p>Note: <b>This half was invisible until 2026-09-2</b>. The partition below used to skip
+     * <p>Note: <b>This half was invisible</b>. The partition below used to skip
      * every effect with a non-empty {@code properties}, so the common planar-ornament shape
      * ("攻击力提高 12%。当速度 >= 120 时，攻击力额外提高 12%") had its first clause applied by
      * {@code RelicSuit} and its second clause <b>silently dropped</b>, with no registry entry to say so - 
@@ -533,7 +533,7 @@ public class RelicTriggerTableTest {
      * {@code AUTHORED.size()} expressible with today's op vocabulary,
      * {@link #STILL_REGISTERED} not. A change on either side must be deliberate.
      *
-     * <p>Note: <b>Both kinds are walked, and that is the point of the 2026-09-2revision.</b> The loop used to
+     * <p>Note: <b>Both kinds are walked, and that is the point of the revision.</b> The loop used to
      * {@code continue} on any effect with a non-empty {@code properties}, which silently excluded 29
      * "stat + ability" effects - the majority shape for planar ornaments, whose conditional half was being
      * dropped without a registry entry. The classification is now explicit and both
@@ -686,9 +686,9 @@ public class RelicTriggerTableTest {
      *
      * <p>Every planar ornament set's ability sits at the 2-piece tier, and that is where most of the mixed
      * (stat + ability) shape lives, so missing that tier would hide most of the gap. It was eight before 326
-     * (City of Converging Stars) and 115 (The Ashblazing Grand Duke) became authorable, <b>five</b> since
-     * 2026-09-2(set 106 joined them), and <b>22</b> once the 1mixed 2-piece abilities that no longer
-     * count as invisible were registered. It is <b>11</b> since 2026-09-28, when 128's 2-piece
+     * (City of Converging Stars) and 115 (The Ashblazing Grand Duke) became authorable, <b>five</b> once
+     * set 106 joined them, and <b>22</b> once the mixed 2-piece abilities that no longer
+ * count as invisible were registered. It is <b>11</b> since, when 128's 2-piece
      * ("提供的护盾量提高10%") became authorable with the shield-amount boost.
      */
     @Test

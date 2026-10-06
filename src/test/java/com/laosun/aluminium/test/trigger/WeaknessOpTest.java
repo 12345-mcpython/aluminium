@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * ADD_ELEMENTAL_WEAKNESS (2026-09-30; readers 1315 and 1310, both registered):
+ * ADD_ELEMENTAL_WEAKNESS:
  * "为指定敌方单体添加物理弱点".
  *
  * <p>isWeakTo is both the engine judgement point and a ready-made observable, so no two-enemy or hand-read

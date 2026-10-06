@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * {@code BOOST_TOUGHNESS} (2026-09-28): "使本次攻击的<b>削韧值</b>提高 100%".
+ * {@code BOOST_TOUGHNESS}: "使本次攻击的<b>削韧值</b>提高 100%".
  *
  * <p><b>Where it is read.</b> Not inside {@code Battle.reduceToughness} - that receives "the nominal reduction of this
  * instance" and is also called by enemy skills and by the demo script. The one place that turns a nominal reduction into a

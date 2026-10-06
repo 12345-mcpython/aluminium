@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * The Remembrance Trailblazer pair (2026-09-29, round 184): the first summon shipped since 1402/1413, because the document states its SPEED.
+ * The Remembrance Trailblazer pair: the first summon shipped since 1402/1413, because the document states its SPEED.
  *
  * <p>Round 163 measured that a memosprite file MUST state SPEED ("the action bar cannot schedule a unit with 0 speed"), which is why 1409's memosprite is
  * still unwritten. Here both numbers are in the text - 130 SPD and 80% of the Trailblazer's Max HP plus 640 - so the panel can be stated and asserted.

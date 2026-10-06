@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1310 Firefly, from her own file (2026-09-29, round 216): the two Action Advances, as exact arithmetic on the queue's remaining time.
+ * 1310 Firefly, from her own file: the two Action Advances, as exact arithmetic on the queue's remaining time.
  *
  * <p>ADVANCE goes through `Queue.advanceActionByPercent`, documented as "skip `percent` of the REMAINING time". So 25% must leave 0.5 of the wait, and 100% must leave ~0.
  * The first draft watched `advanceRequests`, which is a different mechanism - it measured nothing and said so by returning 0.

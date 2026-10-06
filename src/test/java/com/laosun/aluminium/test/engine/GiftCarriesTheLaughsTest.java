@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * The gift carries the [笑点] count, and 1505 takes half of it (2026-10-02) -- objective ①-a's whole chain.
+ * The gift carries the [笑点] count, and 1505 takes half of it -- objective ①-a's whole chain.
  *
  * <p>Content only: 1513's skill grants 4 [笑点], an [阿哈时刻] ends, her reward applies the gift with FOUR instances, and ending
  * it pays 1505 half of four. The cap is spelled `max_stacks`, which is the trap this reading was written around: the Java name

@@ -46,7 +46,7 @@ public class HimekoKillEnergyTest {
         double killed = ultimateEnergy(true);
         double survived = ultimateEnergy(false);
 
-        // Note: Measured: killed = 10, survived = 5 (2026-09-28). The difference is HER five and nothing else -- the
+        // Note: Measured: killed = 10, survived = 5. The difference is HER five and nothing else -- the
         // general kill credit is folded into the attack's own energy («one attack grants energy only once»,
         // Battle.grantHitAndKillEnergy), so "额外" really is an extra credit rather than a relabelling of the
         // standard one. That is the reading this case exists to pin.

@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Elation slice 1b (2026-09-30): {@code ELATION_DAMAGE_BOOST} is folded into the base of an Elation instance, because that damage
+ * Elation slice 1b: {@code ELATION_DAMAGE_BOOST} is folded into the base of an Elation instance, because that damage
  * type is deliberately not boostable (so `addBoost` would be silently ignored by the zone's own `applies(type)` gate).
  *
  * <p>Judged on a SHIPPED character's REAL Elation skill (1501, slot 20): the enemy's health is what moves, and the boost

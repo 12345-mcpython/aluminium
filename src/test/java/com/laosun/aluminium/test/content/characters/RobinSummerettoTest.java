@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1512 Robin - Summeretto, from her own file (2026-09-29, round 193): the summon whose panel the document states in full.
+ * 1512 Robin - Summeretto, from her own file: the summon whose panel the document states in full.
  *
  * <p>Two numbers are asserted, both from the document: the memosprite's Max HP is 0% of hers and its SPD is 180% of hers. The control shows nothing appears
  * without the Skill.

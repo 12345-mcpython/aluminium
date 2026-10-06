@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Both the ultimate's -40% and the technique's -20% defence reduction have to count (1106) (2026-10-02).
+ * Both the ultimate's -40% and the technique's -20% defence reduction have to count (1106).
  *
  * <p>FILE-DRIVEN, four readings, and SUPERPOSITION is the claim: with both sources present the two differences must add.
  * Note: The technique state comes from `battle.markTechniqueUsed(owner)` BEFORE `startBattle()` -- the engine's own entry point.

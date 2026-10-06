@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
- * Cones 23060 and 22006 (2026-09-30): clause 1 of each.
+ * Cones 23060 and 22006: clause 1 of each.
  *
  * <p>23060 is the instance-path spelling used CORRECTLY from the start: DEFENCE_IGNORE on DEALING_DAMAGE with
  * {@code instance: true}. Without that flag it would raise the WEARER's attribute, which is the defect 23031 shipped and

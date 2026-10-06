@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * `percent_from_skill_param: "<SKILLTYPE>:<index>"` (2026-10-02).
+ * `percent_from_skill_param: "<SKILLTYPE>:<index>"`.
  *
  * <p>Reader: 1403 Tribbie's ultimate, whose zone rider deals damage equal to "#3% of his Max HP" on somebody else's attack. #3 lives in HIS ultimate and runs
  * with level (0.06 -> 0.15), so neither `percent_from_cast_param` (the skill that produced the event) nor a literal can say it.

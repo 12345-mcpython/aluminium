@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1009 Asta, from her own file (2026-09-29, round 195): the FLAT speed boost, whose base is 1documents.
+ * 1009 Asta, from her own file: the FLAT speed boost, whose base is 1documents.
  *
  * <p>The assertion is absolute because the document is: speed rises by exactly 50 POINTS, not by a share.
  */

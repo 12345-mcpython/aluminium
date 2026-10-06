@@ -106,7 +106,7 @@ public class TriggerSpec {
 
     /**
      * Whose firings {@link #perTurn} and {@link #cooldown} count, when it is not the rule owner - the count-and-reset
-     * family (2026-09-30; readers 1305, 120, 1403) counts on the marked TARGET, on the TRIGGERER, or per UNIT.
+ * family counts on the marked TARGET, on the TRIGGERER, or per UNIT.
      * One of {@code self} / {@code target} / {@code actor}; absent means the owner, which is what every
      * shipped rule already does, so omitting it changes nothing.
      */
@@ -134,7 +134,7 @@ public class TriggerSpec {
      * the next one. Cumulative with the other caps (they are all upper bounds).
      */
     /**
-     * [WAVE-LIMITED] at most one firing per WAVE (2026-10-02; reader: 1506's warehouse skill).
+ * [WAVE-LIMITED] at most one firing per WAVE.
      *
      * <p><b>Why neither neighbour can say it.</b> {@code per_turn} counts one unit's turns and {@code once_per_battle} covers the
      * whole fight; a wave is neither. So it gets the treatment {@code once_per_attack} got: a SEQUENCE comparison, which needs no

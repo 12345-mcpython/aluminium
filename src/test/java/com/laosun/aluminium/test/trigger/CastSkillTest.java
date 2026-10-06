@@ -21,8 +21,8 @@ import java.util.Random;
 /**
  * {@code CAST_SKILL}: "使<那个单位>立即施放 1 次…" - the op that lets a rule command somebody else to cast.
  *
- * <p><b>Why this file exists now.</b> The op was added on 2026-09-30 by loosening {@code commandSummon}, and on
- * 2026-10-02 the <b>first attempt to make it fire</b> found that it could never have worked: it read the multiplier
+ * <p><b>Why this file exists now.</b> The op was added on by loosening {@code commandSummon}, and on
+ * the <b>first attempt to make it fire</b> found that it could never have worked: it read the multiplier
  * through {@code multiplierOf}, which requires {@code damage_param}, and <b>all nine</b> rules using it (none of which
  * states one) died with a {@code NullPointerException}; it also hard-coded {@code DamageType.NORMAL} and gave a blast's
  * neighbours the centre's number. Nothing caught any of it, because no test ever let the op run - a green suite is not

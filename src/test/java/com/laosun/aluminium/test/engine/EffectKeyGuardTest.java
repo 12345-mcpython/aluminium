@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 /**
- * The key a file writes has to be the key Gson maps (2026-10-02).
+ * The key a file writes has to be the key Gson maps.
  *
  * <p>Found the hard way: 1513's reward wrote `maxStacks` (the Java name), the loader accepted it, Gson dropped it, and the
  * stackable state's cap became 1 -- so the sentence behaved as "one instance" with nothing to report.

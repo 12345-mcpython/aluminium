@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1415's memosprite skill 20 "献予'诡计'之诗": "使赛飞儿造成的伤害提高 #1%" (2026-10-02).
+ * 1415's memosprite skill 20 "献予'诡计'之诗": "使赛飞儿造成的伤害提高 #1%".
  *
  * <p>Two scenes that differ by exactly one thing: whether the ode was cast at her. Note: Nothing is ever replaced -- the table trap has already deleted a rule under
  * test once in this project.

@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1408 Phainon, from his own file (2026-09-29, round 222): the [火种] resource his transformation kit still lets us declare.
+ * 1408 Phainon, from his own file: the [火种] resource his transformation kit still lets us declare.
  */
 public class PhainonTest {
     private static final int PHAINON = 1408;
@@ -33,7 +33,7 @@ public class PhainonTest {
         Battle battle = new Battle(List.of(phainon, ally), List.of(enemy), fixed());
         battle.startBattle();
 
-        // Note: Updated 2026-10-02: the document DOES state one -- her trace 1408101 "战斗开始时，获得 1 点[火种]", which is
+        // Note: Updated: the document DOES state one -- her trace 1408101 "战斗开始时，获得 1 点[火种]", which is
         // now written, so the pool opens at one. The reading is unchanged in kind: it starts where the sentences say.
         Assertions.assertEquals(1, coreflameOf(phainon),
                 "「战斗开始时，获得 1 点【火种】」");
@@ -44,7 +44,7 @@ public class PhainonTest {
         for (int i = 0; i < 9; i++) {
             battle.fireTriggers(TriggerEvent.SKILL_CAST, phainon, enemy, 0, 0);
         }
-        // Note: 12 -> 15 (2026-10-02, item 39). This expectation was written while the file declared only `max: 12`, and the
+        // Note: 12 -> 15. This expectation was written while the file declared only `max: 12`, and the
         // document's sentence does not stop there: "[火种]达到 12 点时可激活终结技，达到上限后还可最多溢出 3 点".
         // The test's INTENT is untouched -- the pool is capped, and ten casts cannot run past the ceiling -- but the ceiling now
         // quotes the whole sentence. The allowance itself is pinned from both sides by `CoreflameOverflowTest`.

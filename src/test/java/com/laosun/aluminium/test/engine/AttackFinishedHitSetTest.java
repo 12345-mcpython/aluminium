@@ -20,7 +20,7 @@ import java.util.Random;
 import java.util.Set;
 
 /**
- * \\u300ca random one of the enemies this attack HIT\\u300d reads the ATTACK-LEVEL set (2026-09-30).
+ * \\u300ca random one of the enemies this attack HIT\\u300d reads the ATTACK-LEVEL set.
  *
  * <p>\\u2b50 The reader for the capability behind cone 21029: {@code ATTACK_FINISHED} carries the attack's FROZEN hit set,
  * while a per-hit context only has its instance's snapshot. This judge drives real casts through the engine and looks at

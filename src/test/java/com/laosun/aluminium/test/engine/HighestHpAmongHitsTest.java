@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * `highest_hp_attack_hit`: "被攻击目标中当前生命值最高的目标" (2026-10-02).
+ * `highest_hp_attack_hit`: "被攻击目标中当前生命值最高的目标".
  *
  * <p>Reader: 1403 Tribbie's (缇宝) ultimate, whose zone rider picks that unit, and 1415's ode of passage, which names the rider. It is the sibling of
  * `random_hit_enemy`: the same hit pool, a different pick -- the highest current HP (当前生命值) instead of a roll.

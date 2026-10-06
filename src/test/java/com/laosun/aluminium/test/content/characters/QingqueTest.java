@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1201 Qingque, from her own file (2026-09-29, round 212): the tile COUNT (whose suits are flattened) and the Skill's self damage boost.
+ * 1201 Qingque, from her own file: the tile COUNT (whose suits are flattened) and the Skill's self damage boost.
  */
 public class QingqueTest {
     private static final int QINGQUE = 1201;

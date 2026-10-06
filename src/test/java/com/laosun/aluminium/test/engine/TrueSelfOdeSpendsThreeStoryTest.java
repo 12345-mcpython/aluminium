@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Slot 26 clause 4 (2026-10-02): "当[故事]达到3点时，德谬歌消耗全部[故事]…". Two-sided: at three the counter is spent, at two nothing happens.
+ * Slot 26 clause 4: "当[故事]达到3点时，德谬歌消耗全部[故事]…". Two-sided: at three the counter is spent, at two nothing happens.
  */
 public class TrueSelfOdeSpendsThreeStoryTest {
     private static final int LEVEL = 80;

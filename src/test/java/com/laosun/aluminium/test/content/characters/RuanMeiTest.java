@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1303 Ruan Mei, from her own file (2026-09-29, round 211): the SELECTOR clause (everyone but her) and the state she puts on herself.
+ * 1303 Ruan Mei, from her own file: the SELECTOR clause (everyone but her) and the state she puts on herself.
  */
 public class RuanMeiTest {
     private static final int RUANMEI = 1303;

@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.TreeSet;
 
 /**
- * <b>The light-cone registry guard</b> (2026-09-30). The mirror of the relic guard.
+ * <b>The light-cone registry guard</b>. The mirror of the relic guard.
  *
  * <p>Every light cone whose ability is not authored must be REGISTERED in {@code light_cones/_unmodelled.json} with
  * the capability it is missing. Before this existed, "5 cones are unwritten" lived only in prose -- and the count

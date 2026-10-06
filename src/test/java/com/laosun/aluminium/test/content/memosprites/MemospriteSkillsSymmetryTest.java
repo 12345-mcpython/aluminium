@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Random;
 
-/** Both summon paths install the spec's skills (2026-10-02). */
+/** Both summon paths install the spec's skills. */
 public class MemospriteSkillsSymmetryTest {
     @Test
     public void theMemoSpritePathInstallsTheSpecsSkillsToo() {

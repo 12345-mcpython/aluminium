@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1415's memosprite skill 14 "献予'门径'之诗" (Ode to the Passage), the sentence about defence (2026-10-02).
+ * 1415's memosprite skill 14 "献予'门径'之诗" (Ode to the Passage), the sentence about defence.
  *
  * <p>"takes effect for the whole battle; <b>when cast on Tribbie, makes the damage dealt by Tribbie ignore #2[i]% of the enemy target's defence.</b> ..."
  *

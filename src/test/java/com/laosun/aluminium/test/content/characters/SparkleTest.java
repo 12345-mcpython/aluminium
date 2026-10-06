@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1306 Sparkle, from her own file (2026-09-29, round 210): the CRIT DMG share the Skill hands over, and the party-wide boost her talent accrues on every Skill Point spent.
+ * 1306 Sparkle, from her own file: the CRIT DMG share the Skill hands over, and the party-wide boost her talent accrues on every Skill Point spent.
  */
 public class SparkleTest {
     private static final int SPARKLE = 1306;

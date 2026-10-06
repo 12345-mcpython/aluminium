@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1408："最后 1 个倒计时回合…结束变身" (2026-10-02).
+ * 1408："最后 1 个倒计时回合…结束变身".
  *
  * <p>TWO-WAY, and the countdown's turns are driven by the SHIPPED pattern (`CountdownTest`): point `currentMove` at the clock's
  * `Signal` on the action bar and call `beforeMove()`. `stepForward()` does not execute a turn at all -- the tree says so in

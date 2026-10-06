@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * RULE-level runtime judge for cone 23048 clause 3 (2026-09-30) -- and the name says what it does NOT cover.
+ * RULE-level runtime judge for cone 23048 clause 3 -- and the name says what it does NOT cover.
  *
  * <p>Measured: with the event's target set to an ally, the rule raises THAT ally's skill-damage boost (0.54 at rank 1)
  * and leaves the wearer at 0. So it proves the rule's target binding.

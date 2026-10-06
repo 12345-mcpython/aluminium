@@ -18,7 +18,7 @@ import java.util.Set;
  * documents only say "additionally restores N points"), so the numbers are centralised in
  * constants such as {@link Constant#ENERGY_GAIN_BASIC}.
  *
- * <p><b>Why we went back to constants</b> (2026-09-21): we briefly switched to reading
+ * <p><b>Why we went back to constants</b>: we briefly switched to reading
  * {@code SkillData.spBase}, but in the data the {@code spBase} of multi-hit / bouncy skills
  * is a per-hit value (Asta 6, Welt 10) and would have to be multiplied by the hit count,
  * while that multiplication depends on the ability config's {@code SPHitRatio} (not present

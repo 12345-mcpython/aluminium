@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1415's memosprite skill 19, last sentence (2026-10-02): "提高数值等同于本次治疗数值的 #1%", counted into Little Ica's (小伊卡) healing total.
+ * 1415's memosprite skill 19, last sentence: "提高数值等同于本次治疗数值的 #1%", counted into Little Ica's (小伊卡) healing total.
  *
  * Two-sided: the ode is cast at her (capturing #1 in basis points), then a 1000-heal runs while she wears the ode -- the total must gain exactly 1000 * #1. In the control the
  * ode is never cast, so nothing was captured and the same heal adds nothing.

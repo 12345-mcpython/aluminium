@@ -248,7 +248,7 @@ public class Resource {
      * <p>The clamping range is {@code [0, max + maxOverflow]}.
      */
     /**
-     * The current amount (2026-09-30). `ResourceManager.value(id)` was the only reader; the party-level store holds
+ * The current amount. `ResourceManager.value(id)` was the only reader; the party-level store holds
      * {@link Resource} objects directly, so the accessor belongs here next to {@code setValue}.
      */
     public int value() {

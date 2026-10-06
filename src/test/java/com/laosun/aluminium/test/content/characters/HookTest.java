@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Hook (虎克) (1109): his burn and the traces/eidolons that shipped with it (2026-09-28, round 134).
+ * Hook (虎克) (1109): his burn and the traces/eidolons that shipped with it.
  *
  * <p><b>Why a hand-made target.</b> The project's fixture monster resists controls outright (round 131), and the burn is rolled
  * too - `APPLY_DOT` runs `tryApplyDebuff` with the document's base chance - so an unresisting target is what makes the test

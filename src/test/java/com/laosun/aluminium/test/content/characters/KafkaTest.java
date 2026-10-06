@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1005 Kafka, from her own file (2026-09-28, round 145): the ultimate's Shock, and the immediate tick that follows it.
+ * 1005 Kafka, from her own file: the ultimate's Shock, and the immediate tick that follows it.
  *
  * <p>Both halves are capabilities the engine already had - `APPLY_DOT` (with the per-turn magnitude) and `TICK_DOT` (round 105) - 
  * so this file is also a check that they compose in one rule. The target is hand-made and unresisting, because a 100% BASE

@@ -41,7 +41,7 @@ import java.util.Set;
  * <p><b>Skill assembly is wired up</b>: a character built by {@code create()} carries
  * {@code DefaultSkill} with the real slot mapping (basic attack 1 / skill 2 / ultimate 3 /
  * talent 4); there is only one mapping table ({@code Constant.SKILL_SLOT}) and the assembly point is
- * {@code Character.Builder#build()} - see {@code engine.md} §.2. Map basic attack (6) / technique ()
+ * {@code Character.Builder#build()} - see {@code engine.md} §7.2. Map basic attack (6) / technique
  * are not installed here; they are attached by {@code Battle.startBattle()}.
  *
  * <p>Note: This class only handles character identity and resources and does not touch skill
@@ -195,14 +195,14 @@ public final class CharacterFactory {
         // directly, so the cap a rule is gated on is the same number that was registered -- there is one
         // reader of the declaration (`requireReadableResources`), not two.
         for (ResourceSpec spec : table.resources()) {
-                // A PARTY-scoped declaration is NOT registered per character (2026-09-30): `ResourceManager.register` itself
+                // A PARTY-scoped declaration is NOT registered per character: `ResourceManager.register` itself
                 // refuses an unwired scope because "a party-level resource needs a PER-BATTLE owner", and `Battle` is that owner
                 // (it registers these from the party's declarations at the start of the battle). Registering a copy here as well would
                 // quietly give the declaring character a private counter and the shared one would read 0 -- measured, before this.
                 if ("PARTY".equalsIgnoreCase(spec.scope() == null ? "" : spec.scope().trim())) {
                     continue;
                 }
-            // The declared overflow rides along (2026-09-30).
+            // The declared overflow rides along.
                 character.getResources().register(spec.id(), spec.max(), spec.initial(),
                         spec.overflow() == null ? 0 : spec.overflow());
         }

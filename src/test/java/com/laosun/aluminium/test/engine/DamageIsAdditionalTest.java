@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * `damage_is_additional`: the instance being settled IS additional damage (2026-10-02).
+ * `damage_is_additional`: the instance being settled IS additional damage.
  *
  * <p>The complement of `damage_is_attack`, and it has to be a keyword of its own: that one is stated positively on purpose (`!` is only for party
  * conditions), and `TriggerTable` records what happened when the negation lived inside it instead -- cone 23008 energy clause read +0.0, because

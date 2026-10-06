@@ -71,7 +71,7 @@ public class RelicAbilityBatchTest {
     private static final int POET = 124;
     private static final int SERENE_DEMESNE = 319;
     private static final int RAPT_BROODING = 320;
-    /** "对己方角色施放" family, authored 2026-09-2with the `is_ally` condition. */
+    /** "对己方角色施放" family, authored with the `is_ally` condition. */
     private static final int MESSENGER = 114;
     private static final int WATCHMAKER = 118;
     private static final int SACERDOS = 121;
@@ -395,7 +395,7 @@ public class RelicAbilityBatchTest {
     }
 
     // ==================================================================
-    // 114 / 118 / 121 - "cast on an allied character" (`target is_ally`, 2026-09-2)
+    // 114 / 118 / 121 - "cast on an allied character" (`target is_ally`)
     // ==================================================================
 
     /**

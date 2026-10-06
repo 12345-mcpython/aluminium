@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * `INSERT_ACTION`: a unit OUTSIDE the action order acts now (2026-10-02).
+ * `INSERT_ACTION`: a unit OUTSIDE the action order acts now.
  *
  * <p>Reader: 1415's memosprite skill 10 -- "开拓者-记忆施放强化普攻后，德谬歌<b>立即获得1个额外回合</b>并自动施放[花与箭的舞曲]". The game expresses this as
  * `TurnInsertAction`, and it has to, because the game pins a memosprite's speed to 0 with `SpeedOverride` (measured): a unit with no action value
