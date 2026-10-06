@@ -235,7 +235,8 @@
       },
       "element": "Ice",
       "sp_need": null,
-      "sp_base": 20
+      "sp_base": 20,
+      "bp_add": 1
     },
     "3": {
       "attack_type": "Ultra",
@@ -489,7 +490,8 @@
       },
       "element": "Wind",
       "sp_need": null,
-      "sp_base": 20
+      "sp_base": 20,
+      "bp_add": 1
     },
     "2": {
       "attack_type": "BPSkill",
@@ -880,7 +882,8 @@
       },
       "element": "Fire",
       "sp_need": null,
-      "sp_base": 20
+      "sp_base": 20,
+      "bp_add": 1
     },
     "2": {
       "attack_type": "BPSkill",
@@ -1243,7 +1246,8 @@
       },
       "element": "Imaginary",
       "sp_need": null,
-      "sp_base": 20
+      "sp_base": 20,
+      "bp_add": 1
     },
     "2": {
       "attack_type": "BPSkill",
@@ -1652,7 +1656,8 @@
       },
       "element": "Thunder",
       "sp_need": null,
-      "sp_base": 20
+      "sp_base": 20,
+      "bp_add": 1
     },
     "6": {
       "attack_type": "MazeNormal",
@@ -2089,7 +2094,8 @@
       },
       "element": "Thunder",
       "sp_need": null,
-      "sp_base": 20
+      "sp_base": 20,
+      "bp_add": 1
     },
     "2": {
       "attack_type": "BPSkill",
@@ -2434,7 +2440,8 @@
       },
       "element": "Fire",
       "sp_need": null,
-      "sp_base": 20
+      "sp_base": 20,
+      "bp_add": 1
     },
     "2": {
       "attack_type": "BPSkill",
@@ -2794,7 +2801,8 @@
       },
       "element": "Ice",
       "sp_need": null,
-      "sp_base": 20
+      "sp_base": 20,
+      "bp_add": 1
     },
     "2": {
       "attack_type": "BPSkill",
@@ -3155,7 +3163,8 @@
       },
       "element": "Wind",
       "sp_need": null,
-      "sp_base": 20
+      "sp_base": 20,
+      "bp_add": 1
     },
     "2": {
       "attack_type": "BPSkill",
@@ -3561,7 +3570,8 @@
       },
       "element": "Quantum",
       "sp_need": null,
-      "sp_base": 20
+      "sp_base": 20,
+      "bp_add": 1
     },
     "2": {
       "attack_type": "BPSkill",
@@ -3921,7 +3931,8 @@
       },
       "element": "Thunder",
       "sp_need": null,
-      "sp_base": 20
+      "sp_base": 20,
+      "bp_add": 1
     },
     "3": {
       "attack_type": "Ultra",
@@ -4314,7 +4325,8 @@
       },
       "element": "Ice",
       "sp_need": null,
-      "sp_base": 20
+      "sp_base": 20,
+      "bp_add": 1
     },
     "2": {
       "attack_type": "BPSkill",
@@ -4706,7 +4718,8 @@
       },
       "element": "Physical",
       "sp_need": null,
-      "sp_base": 20
+      "sp_base": 20,
+      "bp_add": 1
     },
     "4": {
       "attack_type": null,
@@ -5114,7 +5127,8 @@
       },
       "element": "Ice",
       "sp_need": null,
-      "sp_base": 20
+      "sp_base": 20,
+      "bp_add": 1
     },
     "2": {
       "attack_type": "BPSkill",
@@ -5492,7 +5506,8 @@
       },
       "element": "Physical",
       "sp_need": null,
-      "sp_base": 20
+      "sp_base": 20,
+      "bp_add": 1
     },
     "2": {
       "attack_type": "BPSkill",
@@ -5913,7 +5928,8 @@
       },
       "element": "Wind",
       "sp_need": null,
-      "sp_base": 20
+      "sp_base": 20,
+      "bp_add": 1
     },
     "2": {
       "attack_type": "BPSkill",
@@ -6335,7 +6351,8 @@
       },
       "element": "Fire",
       "sp_need": null,
-      "sp_base": 20
+      "sp_base": 20,
+      "bp_add": 1
     },
     "2": {
       "attack_type": "BPSkill",
@@ -6842,7 +6859,8 @@
       },
       "element": "Quantum",
       "sp_need": null,
-      "sp_base": 20
+      "sp_base": 20,
+      "bp_add": 1
     },
     "2": {
       "attack_type": "BPSkill",
@@ -7322,7 +7340,8 @@
       },
       "element": "Physical",
       "sp_need": null,
-      "sp_base": 20
+      "sp_base": 20,
+      "bp_add": 1
     },
     "8": {
       "attack_type": "Normal",
@@ -7386,7 +7405,8 @@
       },
       "element": "Physical",
       "sp_need": null,
-      "sp_base": 20
+      "sp_base": 20,
+      "bp_add": 1
     },
     "2": {
       "attack_type": "BPSkill",
@@ -7837,7 +7857,8 @@
       },
       "element": "Quantum",
       "sp_need": null,
-      "sp_base": 20
+      "sp_base": 20,
+      "bp_add": 1
     },
     "8": {
       "attack_type": "Normal",
@@ -8246,7 +8267,8 @@
       },
       "element": "Thunder",
       "sp_need": null,
-      "sp_base": 20
+      "sp_base": 20,
+      "bp_add": 1
     },
     "3": {
       "attack_type": "Ultra",
@@ -8636,7 +8658,8 @@
       },
       "element": "Imaginary",
       "sp_need": null,
-      "sp_base": 20
+      "sp_base": 20,
+      "bp_add": 1
     },
     "6": {
       "attack_type": "MazeNormal",
@@ -9054,7 +9077,8 @@
       },
       "element": "Wind",
       "sp_need": null,
-      "sp_base": 20
+      "sp_base": 20,
+      "bp_add": 1
     },
     "8": {
       "attack_type": "Normal",
@@ -9644,7 +9668,8 @@
       },
       "element": "Physical",
       "sp_need": null,
-      "sp_base": 20
+      "sp_base": 20,
+      "bp_add": 1
     },
     "2": {
       "attack_type": "BPSkill",
@@ -10049,7 +10074,8 @@
       },
       "element": "Imaginary",
       "sp_need": null,
-      "sp_base": 20
+      "sp_base": 20,
+      "bp_add": 1
     },
     "2": {
       "attack_type": "BPSkill",
@@ -10441,7 +10467,8 @@
       },
       "element": "Quantum",
       "sp_need": null,
-      "sp_base": 20
+      "sp_base": 20,
+      "bp_add": 1
     },
     "2": {
       "attack_type": "BPSkill",
@@ -10847,7 +10874,8 @@
       },
       "element": "Ice",
       "sp_need": null,
-      "sp_base": 20
+      "sp_base": 20,
+      "bp_add": 1
     },
     "2": {
       "attack_type": "BPSkill",
@@ -11269,7 +11297,8 @@
       },
       "element": "Fire",
       "sp_need": null,
-      "sp_base": 20
+      "sp_base": 20,
+      "bp_add": 1
     },
     "2": {
       "attack_type": "BPSkill",
@@ -11736,7 +11765,8 @@
       },
       "element": "Thunder",
       "sp_need": null,
-      "sp_base": 20
+      "sp_base": 20,
+      "bp_add": 1
     },
     "2": {
       "attack_type": "BPSkill",
@@ -12186,7 +12216,8 @@
       },
       "element": "Imaginary",
       "sp_need": null,
-      "sp_base": 20
+      "sp_base": 20,
+      "bp_add": 1
     },
     "8": {
       "attack_type": "Normal",
@@ -12785,7 +12816,8 @@
       },
       "element": "Quantum",
       "sp_need": null,
-      "sp_base": 20
+      "sp_base": 20,
+      "bp_add": 1
     },
     "2": {
       "attack_type": "BPSkill",
@@ -13175,7 +13207,8 @@
       },
       "element": "Physical",
       "sp_need": null,
-      "sp_base": 20
+      "sp_base": 20,
+      "bp_add": 1
     },
     "2": {
       "attack_type": "BPSkill",
@@ -13548,7 +13581,8 @@
       },
       "element": "Physical",
       "sp_need": null,
-      "sp_base": 20
+      "sp_base": 20,
+      "bp_add": 1
     },
     "2": {
       "attack_type": "BPSkill",
@@ -14061,7 +14095,8 @@
       },
       "element": "Fire",
       "sp_need": null,
-      "sp_base": 20
+      "sp_base": 20,
+      "bp_add": 1
     },
     "8": {
       "attack_type": "Normal",
@@ -14125,7 +14160,8 @@
       },
       "element": "Fire",
       "sp_need": null,
-      "sp_base": 30
+      "sp_base": 30,
+      "bp_add": 1
     },
     "2": {
       "attack_type": "BPSkill",
@@ -14532,7 +14568,8 @@
       },
       "element": "Quantum",
       "sp_need": null,
-      "sp_base": 20
+      "sp_base": 20,
+      "bp_add": 1
     },
     "2": {
       "attack_type": "BPSkill",
@@ -15042,7 +15079,8 @@
       },
       "element": "Thunder",
       "sp_need": null,
-      "sp_base": 20
+      "sp_base": 20,
+      "bp_add": 1
     },
     "6": {
       "attack_type": "MazeNormal",
@@ -15462,7 +15500,8 @@
       },
       "element": "Physical",
       "sp_need": null,
-      "sp_base": 20
+      "sp_base": 20,
+      "bp_add": 1
     },
     "2": {
       "attack_type": "BPSkill",
@@ -15938,7 +15977,8 @@
       },
       "element": "Ice",
       "sp_need": null,
-      "sp_base": 20
+      "sp_base": 20,
+      "bp_add": 1
     },
     "9": {
       "attack_type": "BPSkill",
@@ -16507,7 +16547,8 @@
       },
       "element": "Ice",
       "sp_need": null,
-      "sp_base": 20
+      "sp_base": 20,
+      "bp_add": 1
     },
     "2": {
       "attack_type": "BPSkill",
@@ -16930,7 +16971,8 @@
       },
       "element": "Fire",
       "sp_need": null,
-      "sp_base": 20
+      "sp_base": 20,
+      "bp_add": 1
     },
     "2": {
       "attack_type": "BPSkill",
@@ -17336,7 +17378,8 @@
       },
       "element": "Wind",
       "sp_need": null,
-      "sp_base": 20
+      "sp_base": 20,
+      "bp_add": 1
     },
     "2": {
       "attack_type": "BPSkill",
@@ -17834,7 +17877,8 @@
       },
       "element": "Imaginary",
       "sp_need": null,
-      "sp_base": 20
+      "sp_base": 20,
+      "bp_add": 1
     },
     "2": {
       "attack_type": "BPSkill",
@@ -18302,7 +18346,8 @@
       },
       "element": "Ice",
       "sp_need": null,
-      "sp_base": 20
+      "sp_base": 20,
+      "bp_add": 1
     },
     "2": {
       "attack_type": "BPSkill",
@@ -18723,7 +18768,8 @@
       },
       "element": "Fire",
       "sp_need": null,
-      "sp_base": 20
+      "sp_base": 20,
+      "bp_add": 1
     },
     "2": {
       "attack_type": "BPSkill",
@@ -19342,7 +19388,8 @@
       },
       "element": "Fire",
       "sp_need": null,
-      "sp_base": null
+      "sp_base": null,
+      "bp_add": 1
     }
   },
   "1301": {
@@ -19398,7 +19445,8 @@
       },
       "element": "Fire",
       "sp_need": null,
-      "sp_base": 20
+      "sp_base": 20,
+      "bp_add": 1
     },
     "8": {
       "attack_type": "Normal",
@@ -19472,7 +19520,8 @@
       },
       "element": "Fire",
       "sp_need": null,
-      "sp_base": 20
+      "sp_base": 20,
+      "bp_add": 1
     },
     "2": {
       "attack_type": "BPSkill",
@@ -19838,7 +19887,8 @@
       },
       "element": "Wind",
       "sp_need": null,
-      "sp_base": 20
+      "sp_base": 20,
+      "bp_add": 1
     },
     "2": {
       "attack_type": "BPSkill",
@@ -20364,7 +20414,8 @@
       },
       "element": "Imaginary",
       "sp_need": null,
-      "sp_base": 20
+      "sp_base": 20,
+      "bp_add": 1
     },
     "2": {
       "attack_type": "BPSkill",
@@ -20727,7 +20778,8 @@
       },
       "element": "Thunder",
       "sp_need": null,
-      "sp_base": null
+      "sp_base": null,
+      "bp_add": 1
     },
     "2": {
       "attack_type": "BPSkill",
@@ -21532,7 +21584,8 @@
       },
       "element": "Physical",
       "sp_need": null,
-      "sp_base": 20
+      "sp_base": 20,
+      "bp_add": 1
     },
     "8": {
       "attack_type": "Normal",
@@ -21586,7 +21639,8 @@
       },
       "element": "Physical",
       "sp_need": null,
-      "sp_base": 30
+      "sp_base": 30,
+      "bp_add": 0
     },
     "2": {
       "attack_type": "BPSkill",
@@ -22036,7 +22090,8 @@
       },
       "element": "Imaginary",
       "sp_need": null,
-      "sp_base": 20
+      "sp_base": 20,
+      "bp_add": 1
     },
     "2": {
       "attack_type": "BPSkill",
@@ -22397,7 +22452,8 @@
       },
       "element": "Physical",
       "sp_need": null,
-      "sp_base": 20
+      "sp_base": 20,
+      "bp_add": 1
     },
     "2": {
       "attack_type": "BPSkill",
@@ -22818,7 +22874,8 @@
       },
       "element": "Imaginary",
       "sp_need": null,
-      "sp_base": 20
+      "sp_base": 20,
+      "bp_add": 1
     },
     "2": {
       "attack_type": "BPSkill",
@@ -23189,7 +23246,8 @@
       },
       "element": "Quantum",
       "sp_need": null,
-      "sp_base": 20
+      "sp_base": 20,
+      "bp_add": 1
     },
     "2": {
       "attack_type": "BPSkill",
@@ -23641,7 +23699,8 @@
       },
       "element": "Quantum",
       "sp_need": null,
-      "sp_base": 20
+      "sp_base": 20,
+      "bp_add": 1
     },
     "2": {
       "attack_type": "BPSkill",
@@ -24092,7 +24151,8 @@
       },
       "element": "Fire",
       "sp_need": null,
-      "sp_base": 20
+      "sp_base": 20,
+      "bp_add": 1
     },
     "2": {
       "attack_type": "BPSkill",
@@ -24584,7 +24644,8 @@
       },
       "element": "Imaginary",
       "sp_need": null,
-      "sp_base": 20
+      "sp_base": 20,
+      "bp_add": 1
     },
     "8": {
       "attack_type": "Normal",
@@ -25074,7 +25135,8 @@
       },
       "element": "Physical",
       "sp_need": null,
-      "sp_base": 20
+      "sp_base": 20,
+      "bp_add": 1
     },
     "2": {
       "attack_type": "BPSkill",
@@ -25570,7 +25632,8 @@
       },
       "element": "Wind",
       "sp_need": null,
-      "sp_base": null
+      "sp_base": null,
+      "bp_add": 1
     },
     "2": {
       "attack_type": "BPSkill",
@@ -26289,7 +26352,8 @@
       },
       "element": "Imaginary",
       "sp_need": null,
-      "sp_base": 20
+      "sp_base": 20,
+      "bp_add": 1
     },
     "2": {
       "attack_type": "BPSkill",
@@ -27134,7 +27198,8 @@
       },
       "element": "Thunder",
       "sp_need": null,
-      "sp_base": 20
+      "sp_base": 20,
+      "bp_add": 1
     },
     "2": {
       "attack_type": "BPSkill",
@@ -27496,7 +27561,8 @@
       },
       "element": "Fire",
       "sp_need": null,
-      "sp_base": 20
+      "sp_base": 20,
+      "bp_add": 1
     },
     "2": {
       "attack_type": "BPSkill",
@@ -28036,7 +28102,8 @@
       },
       "element": "Imaginary",
       "sp_need": null,
-      "sp_base": 20
+      "sp_base": 20,
+      "bp_add": 1
     },
     "2": {
       "attack_type": "BPSkill",
@@ -28457,7 +28524,8 @@
       },
       "element": "Fire",
       "sp_need": null,
-      "sp_base": 20
+      "sp_base": 20,
+      "bp_add": 1
     },
     "8": {
       "attack_type": "Normal",
@@ -28521,7 +28589,8 @@
       },
       "element": "Fire",
       "sp_need": null,
-      "sp_base": 20
+      "sp_base": 20,
+      "bp_add": 1
     },
     "2": {
       "attack_type": "BPSkill",
@@ -28939,7 +29008,8 @@
       },
       "element": "Thunder",
       "sp_need": null,
-      "sp_base": 20
+      "sp_base": 20,
+      "bp_add": 1
     },
     "2": {
       "attack_type": "BPSkill",
@@ -29615,7 +29685,8 @@
       },
       "element": "Ice",
       "sp_need": null,
-      "sp_base": 20
+      "sp_base": 20,
+      "bp_add": 1
     },
     "2": {
       "attack_type": "BPSkill",
@@ -30209,7 +30280,8 @@
       },
       "element": "Quantum",
       "sp_need": null,
-      "sp_base": 20
+      "sp_base": 20,
+      "bp_add": 1
     },
     "2": {
       "attack_type": "BPSkill",
@@ -30584,7 +30656,8 @@
       },
       "element": "Imaginary",
       "sp_need": null,
-      "sp_base": 20
+      "sp_base": 20,
+      "bp_add": 1
     },
     "2": {
       "attack_type": "BPSkill",
@@ -31251,7 +31324,8 @@
       },
       "element": "Physical",
       "sp_need": null,
-      "sp_base": null
+      "sp_base": null,
+      "bp_add": 1
     },
     "2": {
       "attack_type": "BPSkill",
@@ -32180,7 +32254,8 @@
       },
       "element": "Quantum",
       "sp_need": null,
-      "sp_base": null
+      "sp_base": null,
+      "bp_add": 1
     },
     "2": {
       "attack_type": "BPSkill",
@@ -32732,7 +32807,8 @@
       },
       "element": "Wind",
       "sp_need": null,
-      "sp_base": 20
+      "sp_base": 20,
+      "bp_add": 1
     },
     "2": {
       "attack_type": "BPSkill",
@@ -33108,7 +33184,8 @@
       },
       "element": "Wind",
       "sp_need": null,
-      "sp_base": 20
+      "sp_base": 20,
+      "bp_add": 1
     },
     "2": {
       "attack_type": "BPSkill",
@@ -33621,7 +33698,8 @@
       },
       "element": "Wind",
       "sp_need": null,
-      "sp_base": 20
+      "sp_base": 20,
+      "bp_add": 1
     },
     "2": {
       "attack_type": "BPSkill",
@@ -34054,7 +34132,8 @@
       },
       "element": "Quantum",
       "sp_need": null,
-      "sp_base": 20
+      "sp_base": 20,
+      "bp_add": 1
     },
     "2": {
       "attack_type": "BPSkill",
@@ -34557,7 +34636,8 @@
       },
       "element": "Physical",
       "sp_need": null,
-      "sp_base": 20
+      "sp_base": 20,
+      "bp_add": 1
     },
     "2": {
       "attack_type": "BPSkill",
@@ -35064,7 +35144,8 @@
       },
       "element": "Ice",
       "sp_need": null,
-      "sp_base": null
+      "sp_base": null,
+      "bp_add": 1
     },
     "8": {
       "attack_type": "Normal",
@@ -35683,7 +35764,8 @@
       },
       "element": "Physical",
       "sp_need": null,
-      "sp_base": 20
+      "sp_base": 20,
+      "bp_add": 1
     },
     "2": {
       "attack_type": "BPSkill",
@@ -36223,7 +36305,8 @@
       },
       "element": "Ice",
       "sp_need": null,
-      "sp_base": 20
+      "sp_base": 20,
+      "bp_add": 1
     },
     "2": {
       "attack_type": "BPSkill",
@@ -36890,7 +36973,8 @@
       },
       "element": "Fire",
       "sp_need": null,
-      "sp_base": 20
+      "sp_base": 20,
+      "bp_add": 1
     },
     "2": {
       "attack_type": "BPSkill",
@@ -37326,7 +37410,8 @@
       },
       "element": "Ice",
       "sp_need": null,
-      "sp_base": 20
+      "sp_base": 20,
+      "bp_add": 1
     },
     "2": {
       "attack_type": "BPSkill",
@@ -37736,7 +37821,8 @@
       },
       "element": "Ice",
       "sp_need": null,
-      "sp_base": 30
+      "sp_base": 30,
+      "bp_add": 1
     },
     "9": {
       "attack_type": "BPSkill",
@@ -37828,7 +37914,8 @@
       },
       "element": "Ice",
       "sp_need": null,
-      "sp_base": 20
+      "sp_base": 20,
+      "bp_add": 1
     },
     "2": {
       "attack_type": "BPSkill",
@@ -38238,7 +38325,8 @@
       },
       "element": "Ice",
       "sp_need": null,
-      "sp_base": 30
+      "sp_base": 30,
+      "bp_add": 1
     },
     "9": {
       "attack_type": "BPSkill",
@@ -38330,7 +38418,8 @@
       },
       "element": "Fire",
       "sp_need": null,
-      "sp_base": 20
+      "sp_base": 20,
+      "bp_add": 1
     },
     "2": {
       "attack_type": "BPSkill",
@@ -39033,7 +39122,8 @@
       },
       "element": "Fire",
       "sp_need": null,
-      "sp_base": 40
+      "sp_base": 40,
+      "bp_add": 1
     },
     "10": {
       "attack_type": "Normal",
@@ -39094,7 +39184,8 @@
       },
       "element": "Fire",
       "sp_need": null,
-      "sp_base": 40
+      "sp_base": 40,
+      "bp_add": 1
     }
   },
   "1505": {
@@ -39150,7 +39241,8 @@
       },
       "element": "Physical",
       "sp_need": null,
-      "sp_base": 20
+      "sp_base": 20,
+      "bp_add": 1
     },
     "2": {
       "attack_type": "BPSkill",
@@ -39755,7 +39847,8 @@
       },
       "element": "Physical",
       "sp_need": null,
-      "sp_base": 30
+      "sp_base": 30,
+      "bp_add": 1
     },
     "2": {
       "attack_type": "BPSkill",
@@ -40304,7 +40397,8 @@
       },
       "element": "Thunder",
       "sp_need": null,
-      "sp_base": 20
+      "sp_base": 20,
+      "bp_add": 1
     },
     "2": {
       "attack_type": "BPSkill",
@@ -40816,7 +40910,8 @@
       },
       "element": "Physical",
       "sp_need": null,
-      "sp_base": 20
+      "sp_base": 20,
+      "bp_add": 1
     },
     "2": {
       "attack_type": "BPSkill",
@@ -41329,7 +41424,8 @@
       },
       "element": "Fire",
       "sp_need": null,
-      "sp_base": 20
+      "sp_base": 20,
+      "bp_add": 1
     },
     "8": {
       "attack_type": "Normal",
@@ -41393,7 +41489,8 @@
       },
       "element": "Fire",
       "sp_need": null,
-      "sp_base": 30
+      "sp_base": 30,
+      "bp_add": 1
     },
     "2": {
       "attack_type": "BPSkill",
@@ -41800,7 +41897,8 @@
       },
       "element": "Imaginary",
       "sp_need": null,
-      "sp_base": null
+      "sp_base": null,
+      "bp_add": 1
     },
     "2": {
       "attack_type": "BPSkill",
@@ -42665,7 +42763,8 @@
       },
       "element": "Thunder",
       "sp_need": null,
-      "sp_base": 20
+      "sp_base": 20,
+      "bp_add": 1
     },
     "2": {
       "attack_type": "BPSkill",
@@ -43203,7 +43302,8 @@
       },
       "element": "Thunder",
       "sp_need": null,
-      "sp_base": 20
+      "sp_base": 20,
+      "bp_add": 1
     },
     "2": {
       "attack_type": "BPSkill",
@@ -43741,7 +43841,8 @@
       },
       "element": "Fire",
       "sp_need": null,
-      "sp_base": 20
+      "sp_base": 20,
+      "bp_add": 1
     },
     "2": {
       "attack_type": "BPSkill",
@@ -44220,7 +44321,8 @@
       },
       "element": "Fire",
       "sp_need": null,
-      "sp_base": 20
+      "sp_base": 20,
+      "bp_add": 1
     },
     "14": {
       "attack_type": "Ultra",
@@ -44411,7 +44513,8 @@
       },
       "element": "Fire",
       "sp_need": null,
-      "sp_base": 20
+      "sp_base": 20,
+      "bp_add": 1
     },
     "2": {
       "attack_type": "BPSkill",
@@ -45767,7 +45870,8 @@
       },
       "element": "Wind",
       "sp_need": null,
-      "sp_base": 20
+      "sp_base": 20,
+      "bp_add": 1
     },
     "2": {
       "attack_type": "BPSkill",
@@ -46264,7 +46368,8 @@
       },
       "element": "Quantum",
       "sp_need": null,
-      "sp_base": 20
+      "sp_base": 20,
+      "bp_add": 1
     },
     "2": {
       "attack_type": "BPSkill",

@@ -40,7 +40,7 @@ public class SkillData {
      * in the loaded data set.
      */
     private static final SkillData EMPTY = new SkillData(0, "", EMPTY_PARAMS, EMPTY_STANCE,
-            DamageElement.PHYSICAL, SkillEffectType.ENHANCE, null, null, null);
+            DamageElement.PHYSICAL, SkillEffectType.ENHANCE, null, null, null, null);
 
     /**
      * Is this a real row, or the {@link #EMPTY} placeholder the loader hands back for an id the data does not have?
@@ -119,6 +119,14 @@ public class SkillData {
     private final Double spBase;
 
     /**
+     * Battle points this skill adds when it is cast, from the data's own {@code bp_add} column
+     * (tbgd {@code AvatarSkillConfig.BPAdd}). A normal basic attack states 1; an ENHANCED basic states none, which is
+     * how the data spells "the enhanced basic restores no skill points". {@code null} means the row states nothing and the
+     * policy keeps its historical default.
+     */
+    private final Double bpAdd;
+
+    /**
      * The skill's Chinese description ({@code skill_introduction.chinese}), tags and all - or
      * {@code null} when the data has none.
      *
@@ -170,7 +178,7 @@ public class SkillData {
                     "Unknown skill_effect: " + skill.skillEffect() + " (cid=" + cid + ", skillID=" + skillID + ")");
         }
         return new SkillData(skill.maxLevel(), skill.attackType(), skill.paramList(), skill.stanceList(),
-                skill.element(), effect, skill.spNeed(), skill.spBase(),
+                skill.element(), effect, skill.spNeed(), skill.spBase(), skill.bpAdd(),
                 skill.skillIntroduction() == null ? null : skill.skillIntroduction().chinese());
     }
 

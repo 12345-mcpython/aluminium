@@ -1186,3 +1186,48 @@
 
 ⛔ **未处理（⭐ 与本轮目标无关但顺带发现 ✓）**：⭐ `RaceToTheHorizonTest.java` ✗ L64 的断言消息文本是**中英混排**的（⭐ `and the eleventh changes nothing: … 10 …` ✓），
 ⭐ 不影响判据 ✓；⭐ 若你要统一判据消息的语言，⭐ 这是唯一一处 ✓。
+
+## F-3 已解决：战技点的 +1 改成由数据给出（2026-10-02）
+
+⭐ **登记原文**（`ROADMAP.md` §12.5）：⭐「⭐ **「普攻 +1」是一刀切，强化普攻有例外** ✗：⭐ 对青雀对、⭐ **对波提欧错** ✓ —— ⭐ 登记表里**唯一一条让引擎算错数**的项，⭐ 属**数据补全** ✓」。
+
+### ⭐ 先在 tbgd 里找权威
+
+⭐ `AvatarSkillConfig` ✗ 里**没有** `SPBase` ✗ 这种"⭐ 技能点增减 ✗"⭐ 列（⭐ `SPMultipleRatio` ✗ 对所有技能都是 0.5 ⇒ ⭐ 不是判别字段 ✓），⭐ **但有 `BPAdd` ✗** ✓：
+
+| 技能 | `BPAdd` ✗ |
+|---|---|
+| `131501` ✗ 波提欧 普攻 `蹄铁裂颅` ✗ | **1** ✓ |
+| `131508` ✗ 波提欧 **强化普攻** `击锤连弩` ✗ | **`null`** ✗ |
+| `120101` ✗ 青雀 普攻 `门前清` ✗ | **1** ✓ |
+| `120108` ✗ 青雀 **强化普攻** `杠上开花！` ✗ | **`null`** ✗ |
+
+⭐ 而波提欧强化普攻的**原文**自己写着：⭐「⭐ 强化普攻**无法恢复战技点** ✗，且仅能以处于【绝命对峙】的敌方目标为目标 ✓」。
+
+### ⚠ 一个我纠正过的过度推论（⭐ 值得记 ✓）
+
+⭐ 第一版我把 `BPAdd = null` ✗ 一律当 **0** ✗，⭐ 给全部 638 行都写了 `bp_add` ✗ —— ⭐ **过头了** ✗：⭐ 青雀的强化普攻也是 `null` ✗，⭐ 而我们自己的语料 `1201_青雀.md` ✗ 写着"⭐ 施放强化普攻后**恢复 1 点战技点** ✗" ✓
+⇒ ⭐ **`BPAdd = null` ✗ 不等于 0** ✓，⭐ 它只说明"⭐ 这列不表态 ✗" ✓。⭐ 收紧后：⭐ **105 行**（⭐ 全部普攻 ✓）记 1 ✓、⭐ **只有 1 行**记 0 ✓（⭐ 波提欧强化普攻 ✓，⭐ 散文＋数据双证 ✓）、⭐ 其余**不写** ⇒ ⭐ 策略退回历史默认 ✓。
+
+### ⭐ 落法（⭐ 四处，⭐ 每处都锚在唯一文本上 ✓）
+
+1. ⭐ **数据**：⭐ `skills.json` ✗ 的行加 `bp_add` ✗（⭐ 值取自 tbgd `AvatarSkillConfig.BPAdd` ✗ ✓）；
+2. ⭐ **bean**：⭐ `beans/Skill` ✗ 加 `@SerializedName("bp_add") Double bpAdd` ✗ ✓；
+3. ⭐ **`SkillData`** ✗ 加字段（⭐ Lombok `@Getter` ✗ 自动出 `getBpAdd()` ✗ ✓）＋ ⭐ 同步两个构造点（⭐ `EMPTY` ✗ 与 `init` ✗ ✓）；
+4. ⭐ **策略**：⭐ `StandardSkillPointPolicy.gainForCast` ✗ —— ⭐ 它自己的注释早就写着这里是"⭐ '⭐ 强化普攻不恢复点数 ✗'⭐ 该落的地方 ✗" ✓ ⇒ ⭐ 改成"⭐ 行里说了就用行里的 ✓，⭐ 没数据才用历史 +1 ✗" ✓。
+
+### ⭐ 内容侧：波提欧的强化普攻此前**根本没建模** ✗
+
+⭐ `characters/1315.json` ✗ 原来 6 条规则、⭐ **没有 `REPLACE_SKILL`** ✗ ⇒ ⭐ 那条一刀切 +1 **碰不到它** ✗ ✓。
+⭐ 现按他自己的原文补上：⭐ `skill_standoff_on_both` ✗（⭐ 施放战技进入【绝命对峙】✓）⭐ 同时 `REPLACE_SKILL{skill: COMMON, skill_id: 8, turns: 2}` ✗（⭐ slot 8 = `131508` ✗ ✓）。
+
+### ⭐ 判据与变异
+
+⭐ `BoothillEnhancedBasicTest` ✗（⭐ 走 `Battle.useSkill` ✗，⭐ 因为策略只在那条路径上被咨询 ✓）：
+`[boothill_sp] skill points after an ordinary basic = 4 ; after the enhanced basic inside Standoff = 2` ✓
+⭐ **变异**（⭐ 把 `131508` ✗ 的 `bp_add` ✗ 改回 1 ✓）⇒ **RED**（⭐ `= 3` ✗ ✓）。
+
+### ⛔ 仍登记（⭐ F-3 的另一半 ✓）
+
+⭐ tbgd 的 `BPAdd = null` ✗ **不等于 0** ✗ ⇒ ⭐ "⭐ 某个角色的强化普攻到底给不给点 ✗"⭐ 要**逐条按散文**补 ✓（⭐ 青雀就是一个反例 ✓）。
+⭐ 因此 `SkillPointGameParityTest` ✗ 的注解已改写为"⭐ **只记有证据的行** ✗"，⭐ 测试名也从 `normalAttackIsBlanketPlusOneSoEnhancedNormalsAlsoGain` ✗ 改为 `anOrdinaryBasicRestoresThePointItsRowStates` ✗ ✓。
