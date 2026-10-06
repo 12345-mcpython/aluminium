@@ -9,7 +9,7 @@ import com.laosun.aluminium.models.event.HpLossEvent;
 /**
  * Counter-attack: while this is attached, losing HP hits the one who caused it back.
  *
- * <p><b>Retraction (2026-09-24).</b> A previous revision of this Javadoc carried an "OPEN DEFECT" claiming
+ * <p><b>Retraction.</b> A previous revision of this Javadoc carried an "OPEN DEFECT" claiming
  * the reaction fired far too often when both sides wore one, based on a measurement showing an enemy lose
  * 5902 where one attack explained 260. <b>There was no defect: that measurement was taken after an extra
  * attack</b>, so it quietly included a second exchange. Re-measured with a trace, both sides wearing a

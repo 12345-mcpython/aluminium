@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1415's memosprite skill 19, first sentence: "德谬歌施放忆灵技时，使风堇获得2层[献予'天空'之诗]" (2026-10-02).
+ * 1415's memosprite skill 19, first sentence: "德谬歌施放忆灵技时，使风堇获得2层[献予'天空'之诗]".
  *
  * <p>TWO-SIDED in one battle: the character the game NAMES BY CID (1409, measured in the ability data) gets the 2 layers the data states, and a different ally present gets
  * none. Note: A cap had to be stated -- the data puts no `MaxLayer` beside this modifier, and our `StackBuff` clamps to 1 without one; 99999 is how this kit spells "no limit".

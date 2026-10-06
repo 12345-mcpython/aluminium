@@ -325,7 +325,7 @@ public class TriggerTableTest {
 
     /**
      * Numeric equality parses - {@code hit_count == 2} has been in the DSL's documentation since its first
-     * version and was rejected as "compares two variables" until 2026-09-2.
+     * version and was rejected as "compares two variables".
      *
      * <p>Found by writing a condition that needed {@code == 0}: {@code ==} and {@code !=} went straight to the
      * <b>identity</b> branch (which is about {@code actor == self}), so anything without {@code self} on one

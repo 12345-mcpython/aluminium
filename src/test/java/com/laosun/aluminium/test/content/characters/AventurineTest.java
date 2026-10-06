@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1304 Aventurine, from his own file (2026-09-29, round 15): the opening shield his trace grants, and the ultimate's state.
+ * 1304 Aventurine, from his own file: the opening shield his trace grants, and the ultimate's state.
  *
  * <p>The shield's magnitude is the DOCUMENT'S arithmetic - 24.00% of his DEF plus 320 - so the case asserts the number itself, and the mutation that
  * drops the flat addend makes it red.

@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * A stackable state can be applied N times in one effect (2026-10-02).
+ * A stackable state can be applied N times in one effect.
  *
  * <p>The reader is 1513's reward, whose state's instance count IS the [笑点] it spent -- and 1505's "开不败" reads that count
  * when the state ends.

@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * A share can be carried in a resource, in basis points (2026-10-02).
+ * A share can be carried in a resource, in basis points.
  *
  * The last structural piece for the two remaining sentences: a number captured while an ode is cast (a memosprite row is unreachable later) is a share BELOW 1, and a resource holds
  * an integer -- so the capture stores basis points and `percent_from_resource` reads them back.

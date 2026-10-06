@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * A <b>state that is rolled</b> (2026-09-28): {@code APPLY_BUFF} with {@code base_chance}.
+ * A <b>state that is rolled</b>: {@code APPLY_BUFF} with {@code base_chance}.
  *
  * <p>"有 100% 的基础概率使敌方每个单体目标陷入[通解]状态" (1106 Pela) needed it, and so does a family of 69 sentences across 24
  * files (six of them already-shipped characters). Note: The point is <b>not</b> "100% always works": the state goes through the same

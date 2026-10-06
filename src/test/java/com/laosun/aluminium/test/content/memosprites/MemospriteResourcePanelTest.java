@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 /**
- * A summon panel that derives from a RESOURCE (2026-10-02): "龙的生命 = [新蕊]上限的 100%".
+ * A summon panel that derives from a RESOURCE: "龙的生命 = [新蕊]上限的 100%".
  *
  * <p>Every shipped panel is a share of the master's ATTRIBUTE; this one is a share of a battle-level resource, so the
  * value is handed in and the derivation stays battle-free. The claims: the share follows the resource, the flat term is

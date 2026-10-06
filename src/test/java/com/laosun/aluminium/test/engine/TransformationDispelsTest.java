@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1408："解除自身所有负面效果，随后造成…" (2026-10-02).
+ * 1408："解除自身所有负面效果，随后造成…".
  *
  * <p>SAME SCENE, ONE VARIABLE, and the DOT is applied AFTER the transformation: item 41 made the transformed form immune to
  * CONTROLS, so a control could not be used here even though it is a debuff -- a Thunder DOT is used instead, and the immunity

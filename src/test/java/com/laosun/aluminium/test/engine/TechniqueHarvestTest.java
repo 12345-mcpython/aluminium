@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * The technique gate's first harvest (2026-09-29, round 19): Dan Heng's opening ATK, declared only when the technique was used.
+ * The technique gate's first harvest: Dan Heng's opening ATK, declared only when the technique was used.
  *
  * <p>A pair again: declaring the technique raises his ATK at battle start, and not declaring it leaves his ATK at its plain value.
  */

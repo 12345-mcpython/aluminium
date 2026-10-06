@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Her talent and her trace both write +20% to the party; both must be counted (1415, 2026-10-02).
+ * Her talent and her trace both write +20% to the party; both must be counted (1415,).
  *
  * <p>FILE-DRIVEN, and the TOTAL is the claim: 0.2 below the threshold (talent alone), 0.4 past it. The measured switch is
  * `max_stacks > 1` -- `StatModifierBuff.isStackable()` is exactly that, and `stackGroupKey()` is the attribute, the

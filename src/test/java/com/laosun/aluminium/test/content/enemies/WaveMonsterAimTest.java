@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * `wave_monster`: the SINGLE aim a commanded cast can name (2026-10-02).
+ * `wave_monster`: the SINGLE aim a commanded cast can name.
  *
  * <p>Why a single-target sibling of `wave_monsters` is needed at all, measured: `CAST_SKILL`'s `target` is the CASTER, and `cast_target` is
  * the field for "who a commanded cast is aimed at" -- it reads through `resolveSelector`, the single-target switch, and reorders the victims

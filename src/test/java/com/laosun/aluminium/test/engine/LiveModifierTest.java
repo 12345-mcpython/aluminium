@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
- * A modifier can resolve its share at READ time (2026-10-02).
+ * A modifier can resolve its share at READ time.
  *
  * <p>The reader family is the largest registered one in GAPS: fourteen documents say "for every 1 stack the owner has, ...",
  * in sustained auras, where the number has to follow the stacks. A snapshot can only be right at the instant it is taken,

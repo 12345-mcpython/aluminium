@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Cone 21025 (2026-09-30): shape, plus a runtime measurement that CAN tell the two readings apart.
+ * Cone 21025: shape, plus a runtime measurement that CAN tell the two readings apart.
  *
  * <p>The wearer must wear 21025, so its place in the queue is not freely chosen -- it is decided by SPEED. Variant A of
  * the capability is "the next to act", variant B is "the party's first ally"; with the wearer fastest they coincide and

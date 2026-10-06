@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Relic 31(2026-09-30): "若装备者不是队伍第一名，则使队伍第一名的攻击力提高 12%".
+ * Relic 31: "若装备者不是队伍第一名，则使队伍第一名的攻击力提高 12%".
  *
  * <p>The condition and the target are the two halves of ONE sentence, and both read battle.characters -- the character
  * roster in party order -- not battle.allies, which takes memosprites and servants as they are summoned. The runtime

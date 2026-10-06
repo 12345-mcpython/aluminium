@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Random;
 
-/** "激活全体队友的终结技" (2026-10-02). */
+/** "激活全体队友的终结技". */
 public class UltimateActivationTest {
     @Test
     public void herUltimateMakesTheOthersReady() {

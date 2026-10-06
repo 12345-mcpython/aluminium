@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1315 Boothill, from his own file (2026-09-29, round 226): the Standoff state on BOTH units, and the stack that both of its end conditions feed.
+ * 1315 Boothill, from his own file: the Standoff state on BOTH units, and the stack that both of its end conditions feed.
  */
 public class BoothillTest {
     private static final int BOOTHILL = 1315;

@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 
 
 /**
- * Light cone 23062 (2026-09-30): two of its three clauses.
+ * Light cone 23062: two of its three clauses.
  *
  * <p>ATK +18..30% and energy regeneration +10..20%, both permanent. Entering battle or casting the ultimate grants the
  * state for 3 turns, and while it holds EVERY ally's crit damage is up 24..48%. The per-energy clause is REGISTERED.

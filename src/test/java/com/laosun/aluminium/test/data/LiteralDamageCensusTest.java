@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * The literal-ratio conversions from round 188's audit (2026-09-29): the three rules that pointed at slot 1 (COMMON).
+ * The literal-ratio conversions from round 188's audit: the three rules that pointed at slot 1 (COMMON).
  *
  * <p>Why they were converted: `data/skills.json` puts 1.4 in the COMMON row's Lv10 parameter while every document says 100%, so a row reference deals a number
  * nobody stated. This census reads the shipped file, so an edit back to a row (or to another percent) fails here.

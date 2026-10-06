@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * "extends all of your own positive effects by 1 turn" (2026-10-02): `EXTEND_BUFF` with `kind: all`.
+ * "extends all of your own positive effects by 1 turn": `EXTEND_BUFF` with `kind: all`.
  *
  * <p>ONE VARIABLE: A (甲) puts a two-turn buff on B (乙) in both runs, and B's own extender differs only in HOW it says what to lengthen.
  */

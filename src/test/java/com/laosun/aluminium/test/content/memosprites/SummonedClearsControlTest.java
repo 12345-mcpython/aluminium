@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1415's memosprite skill 05 "你好，世界♪": "德谬歌被召唤时，解除我方全体控制类负面状态。" (2026-10-02).
+ * 1415's memosprite skill 05 "你好，世界♪": "德谬歌被召唤时，解除我方全体控制类负面状态。".
  *
  * <p>The reading is the CLASS, not "something was removed": a control on an ally is gone after the summon, and a DOT on him is still there. A sweep that took
  * everything off would pass the first half while being wrong about the second.

@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * The dragon's talent [灼掠幽墟的晦翼] (2026-10-02): "造成 #2 次伤害，每次伤害对敌方随机单体造成等同于遐蝶 #1% 生命上限的量子属性伤害…".
+ * The dragon's talent [灼掠幽墟的晦翼]: "造成 #2 次伤害，每次伤害对敌方随机单体造成等同于遐蝶 #1% 生命上限的量子属性伤害…".
  *
  * Two-sided: summoning the dragon deals its six hits and heals our side; and the rule that carries the damage ratio is there BY ID, because 114151raises it with `MODIFY_RULE`.
  */
@@ -24,8 +24,8 @@ public class DragonHollowWingTest {
         double[] r = run();
         System.out.println("[dragon] the enemy lost " + r[0] + " ; our side gained " + r[1]
                 + " HP (the dragon pays " + r[2] + " of its own master's max HP)");
-        // COUNTABLE (2026-10-02): six hits of #1 of her max HP, each settled on the enemy -- and `r[3]` is the mitigation the judge measured itself with one plain hit.
-        // PLUS the small-pack extra (2026-10-02): this battle has ONE enemy, so 114151's second half raises the ratio by `#5` as well.
+        // COUNTABLE: six hits of #1 of her max HP, each settled on the enemy -- and `r[3]` is the mitigation the judge measured itself with one plain hit.
+        // PLUS the small-pack extra: this battle has ONE enemy, so 114151's second half raises the ratio by `#5` as well.
         double expected = 6 * (0.56 + 0.0024) * r[4] * r[3];
         System.out.println("[dragon]   expected 6 x (56% + 0.24%) x her max HP " + r[4] + " x mitigation " + r[3]
                 + " = " + expected);

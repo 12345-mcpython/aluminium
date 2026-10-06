@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1415's memosprite skill 8, the fifth clause: "if the target is defeated before the cast, then cast it on a <b>newly entered</b> enemy target" (2026-10-02).
+ * 1415's memosprite skill 8, the fifth clause: "if the target is defeated before the cast, then cast it on a <b>newly entered</b> enemy target".
  *
  * <p>What tbgd says the clause IS, read out of `GlobalModifiers` in `Servant_CyreneServant_00_Ability.json`:
  * `MServant_CyreneServant_00_AmazingBuff_Mydeimos_OnWaveMonster` listens for <b>`OnWaveMonster`</b> and answers with

@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
- * Light cone 23050 (2026-09-30): clause 1 only -- the other two are registered, not approximated.
+ * Light cone 23050: clause 1 only -- the other two are registered, not approximated.
  *
  * <p>Break effect +60..120% permanently. The property name is the one shipped content already uses (BREAKING_EFFECT),
  * which is the same route that caught 23059's invented "HP".

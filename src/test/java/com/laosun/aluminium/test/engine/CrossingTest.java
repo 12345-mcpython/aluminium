@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * The threshold CROSSING (2026-09-29, round 181): "生命值百分比降到50%或以下时" fires once, not on every later hit.
+ * The threshold CROSSING: "生命值百分比降到50%或以下时" fires once, not on every later hit.
  *
  * <p>The pair is the measurement: damage that takes the ally from above half to below it heals him, while damage to an ally who is ALREADY below half
  * does not - the second case is what `target_hp_percent_before` exists for.

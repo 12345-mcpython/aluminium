@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Effect-level repetition (2026-09-30): the {@code times} field on an effect.
+ * Effect-level repetition: the {@code times} field on an effect.
  *
  * <p>The fixture set 99004 holds two rules differing in nothing but {@code times} (3 vs 1), so the observable is how
  * much damage ONE battle produces -- an absolute figure would drag defence and mitigation into the assertion.

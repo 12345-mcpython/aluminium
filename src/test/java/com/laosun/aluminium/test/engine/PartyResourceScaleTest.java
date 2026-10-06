@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * A magnitude may read a battle-level PARTY counter (2026-10-02).
+ * A magnitude may read a battle-level PARTY counter.
  *
  * <p>The reader is 1513's reward: it must hand [好活当赏] the number of [笑点] the Aha moment spent, and [笑点] is declared
  * `scope: PARTY` -- the battle owns it, so `self_stacks:` (which reads a unit) cannot reach it.

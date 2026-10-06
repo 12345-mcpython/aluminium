@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1505 Evanescia (绯英)'s energy accumulator (2026-09-30): "累计获得 240 点能量时…单次获得能量时最多获得 240 点累计值" (when 240 energy has been accumulated in total... a single energy gain adds at most 240 to the accumulated value).
+ * 1505 Evanescia (绯英)'s energy accumulator: "累计获得 240 点能量时…单次获得能量时最多获得 240 点累计值" (when 240 energy has been accumulated in total... a single energy gain adds at most 240 to the accumulated value).
  *
  * <p>Two-sided on the same resource: a 300-energy gain adds only 240 (the per-conversion ceiling), a 100-energy gain adds all 100,
  * and two gains in a row accumulate -- which is what "累计" (accumulate) means.

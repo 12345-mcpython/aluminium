@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 8009 and 8010, the Elation Trailblazer pair (2026-09-29, round 198): the chosen ally's +50% CRIT DMG, for both ids.
+ * 8009 and 8010, the Elation Trailblazer pair: the chosen ally's +50% CRIT DMG, for both ids.
  *
  * <p>The gain is asserted against a hand-built reference at percent 1.0 in the SAME pipeline, so the ratio 0.5 is the claim and the engine's own factors cancel - 
  * the round-19lesson, where asserting a share of a zero base compared nothing.
@@ -68,7 +68,7 @@ public class SiblingElationTest {
     public void theirFilesCarryTheClauses() {
         for (int cid : new int[]{8009, 8010}) {
             var table = com.laosun.aluminium.data.TriggerTables.of(cid);
-            // 2026-10-02: FOUR clauses now, not two -- the document's other branch finally shipped. It waited on the
+            //: FOUR clauses now, not two -- the document's other branch finally shipped. It waited on the
             // engine's reading of an Elation skill's row ("8 次随机单体 + 最后一次均分", whose leading column is a HIT
             // COUNT): before that, a commanded Elation cast settled as ONE 800% instance. See `ElationRowTest`.
             Assertions.assertEquals(4, table.ruleCount(TriggerEvent.ULT_CAST),

@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * "该效果每个波次最多触发 1 次" (2026-10-02).
+ * "该效果每个波次最多触发 1 次".
  *
  * <p>Reader: 1506's warehouse skill. Two-way on purpose: twice in one wave fires once, and the NEXT wave fires again -- which is what
  * tells a wave cap apart from a battle-long one.

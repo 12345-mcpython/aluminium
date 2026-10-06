@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * `summon_attr:<ATTRIBUTE>`: a magnitude that is a share of the RULE OWNER'S MEMOSPRITE (2026-10-02).
+ * `summon_attr:<ATTRIBUTE>`: a magnitude that is a share of the RULE OWNER'S MEMOSPRITE.
  *
  * <p>Reader: 1415's memosprite skill 10 "献予'创世'之诗" -- "increases the ATK of Trailblazer - Remembrance by an amount equal to #1% of <b>the Demiurge (德谬歌)'s Max HP</b>, and at the same time
  * increases its crit rate by an amount equal to #2% of <b>the Demiurge's crit rate</b>". The existing family names the owner's own attributes (`self_attr:`), so a share of the

@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 /**
- * Light cone 2300(2026-09-30): three of its four clauses.
+ * Light cone 2300: three of its four clauses.
  *
  * <p>Sentences: effect hit +24..40%; apply [以太编码] to a random HIT target not holding it (after a basic
  * attack / skill, and separately after an ultimate); the holder takes +12..20% damage for 1 turn. The ">=N debuffs"
@@ -78,7 +78,7 @@ public class IncessantRainTest {
      *
      * <p>Note: The bonus belongs to THIS hit, so it carries {@code instance: true} -- without it the op would raise the
      * WEARER's attribute for a while, a different sentence. Note: It also carries {@code permanent}, because the op's
-     * validation demands one of turn/permanent/until even on the instance path (measured 2026-09-30).
+ * validation demands one of turn/permanent/until even on the instance path (measured).
      * Note: The threshold reads {@code >= 3.0}: the parser writes an integral threshold with a decimal point.
      */
     @Test

@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * "获得该角色即生效，无需上场" -- the load point (2026-10-02).
+ * "获得该角色即生效，无需上场" -- the load point.
  *
  * <p>Two claims, and both matter: a registered listener IS asked (its rule moves its own panel), and it does NOT take a turn of its
  * own (the queue never contains it). The second is why the listener cannot simply be added to `characters`.

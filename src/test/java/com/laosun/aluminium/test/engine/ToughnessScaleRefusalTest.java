@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 /**
  * A rule that states `scale` on an op that does not read it must be refused, not silently ignored.
  *
- * <p>&#9888; This is the guard for {@code BOOST_TOUGHNESS} (2026-09-29): 1315's "每层[优势口袋]使强化普攻的削韧值提高 50%" needs a
+ * <p>&#9888; This is the guard for {@code BOOST_TOUGHNESS}: 1315's "每层[优势口袋]使强化普攻的削韧值提高 50%" needs a
  * stack-scaled magnitude, which the op does not implement yet.
  */
 public class ToughnessScaleRefusalTest {

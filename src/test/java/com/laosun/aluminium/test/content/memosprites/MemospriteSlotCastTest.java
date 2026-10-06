@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1415's memosprite skill 10 "献予'创世'之诗", the second half, end to end (2026-10-02).
+ * 1415's memosprite skill 10 "献予'创世'之诗", the second half, end to end.
  *
  * <p>"本场战斗中，<b>开拓者-记忆施放强化普攻后，德谬歌立即获得1个额外回合并自动施放[花与箭的舞曲]</b>，…"
  *

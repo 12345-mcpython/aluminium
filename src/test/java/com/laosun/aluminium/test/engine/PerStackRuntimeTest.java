@@ -28,7 +28,7 @@ import java.util.Random;
  * {@code instance}, and so on). This one asserts the NUMBER -- it arms a self counter, applies a
  * {@code MODIFY_ATTR ... per_stack: self_stacks:<that counter>} and requires the attribute to actually move.
  *
- * <p>Why it exists: until the merge of 2026-09-30, {@code modifyAttr} resolved {@code per_stack} itself and knew only
+ * <p>Why it exists: until the merge of, {@code modifyAttr} resolved {@code per_stack} itself and knew only
  * {@code target_debuff_count} plus a generic counter, so {@code self_stacks:...} fell through to
  * {@code stacksOf("self_stacks:...")} = 0 and the bonus vanished. Note: Red-proved: with the old formula in place this
  * test fails (after == before).

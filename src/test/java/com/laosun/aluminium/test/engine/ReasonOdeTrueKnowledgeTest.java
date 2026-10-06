@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Slot 18's [真知] half (2026-10-02): "那刻夏在下一次施放普攻、战技时获得[真知]：…造成的战技伤害提高 #2(20)%".
+ * Slot 18's [真知] half: "那刻夏在下一次施放普攻、战技时获得[真知]：…造成的战技伤害提高 #2(20)%".
  *
  * Two-sided: the ode is cast at HIM, so the state and the raise land on him; a second reading with the ode cast at somebody else must leave him untouched.
  */

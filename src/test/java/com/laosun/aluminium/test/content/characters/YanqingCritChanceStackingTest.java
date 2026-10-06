@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Her skill's +20% and her ult's +60% CRIT CHANCE must both count (1209, 2026-10-02).
+ * Her skill's +20% and her ult's +60% CRIT CHANCE must both count (1209,).
  *
  * <p>FILE-DRIVEN, and the numbers are the claim: 0.2 after the skill, 0.8 after the ult as well. A replaced modifier
  * gives 0.6 at the second reading, which is what the mutation has to produce.

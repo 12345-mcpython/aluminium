@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * "每消耗1点战技点…造成的伤害提高 6%" (1306:159, 2026-10-02): `scale: "event_amount"` on a MODIFIER.
+ * "每消耗1点战技点…造成的伤害提高 6%" (1306:159,): `scale: "event_amount"` on a MODIFIER.
  *
  * <p>File-driven character, one hand-built rule on the existing `SKILL_POINT_SPENT` event, and the amount spent is the
  * magnitude -- so 3 points is 3x one point, and no spend is no change at all.

@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * The `ally_cid:<cid>` selector: naming a character outright (2026-10-02).
+ * The `ally_cid:<cid>` selector: naming a character outright.
  *
  * <p>Reader: 1415's sky ode -- "德谬歌施放忆灵技时，使<b>风堇</b>获得2层…" -- a rule that lives in the memosprite's file, where `self` is the MASTER, so it has to reach another
  * character. The closed selector set had positions (`party_first`, `next_ally`) and predicates (`lowest_hp_ally`), but nothing that NAMES one.

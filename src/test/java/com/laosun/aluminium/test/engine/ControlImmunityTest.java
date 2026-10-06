@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1408："卡厄斯兰那免疫控制类负面状态" (2026-10-02).
+ * 1408："卡厄斯兰那免疫控制类负面状态".
  *
  * <p>SAME SCENE, ONE VARIABLE: a spare unit applies [冻结] (a control, from the document's own glossary) to her; the only
  * difference between the two runs is whether she is transformed. The applier carries a hand-built table so the judge can cast a

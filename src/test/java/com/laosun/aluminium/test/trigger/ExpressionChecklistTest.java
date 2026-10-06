@@ -15,7 +15,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Guards <b>EXPRESSION.md</b>, the "完全表达" checklist (objective ⑥, 2026-10-02).
+ * Guards <b>EXPRESSION.md</b>, the "完全表达" checklist (objective ⑥,).
  *
  * <p><b>Why a test and not just a document.</b> A checklist written from memory rots: it cites files that were renamed,
  * rules that were withdrawn, and families that shipped without anyone updating the row. This test makes the document

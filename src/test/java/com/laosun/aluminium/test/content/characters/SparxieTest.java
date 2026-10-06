@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1501 Sparxie, from her own file (2026-09-29, round 206): the technique's AoE and the two Skill Points it restores.
+ * 1501 Sparxie, from her own file: the technique's AoE and the two Skill Points it restores.
  */
 public class SparxieTest {
     private static final int SPARXIE = 1501;

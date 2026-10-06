@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * RESET_TRIGGER_LIMIT (2026-09-30; readers 1305, 120, 1403): "施放终结技后重置该效果触发次数".
+ * RESET_TRIGGER_LIMIT: "施放终结技后重置该效果触发次数".
  *
  * <p>One rule is capped at one firing per turn; a second rule on ULT_CAST clears exactly that rule limit, so
  * the capped rule fires again. Note: resetTriggerLimits() would clear EVERY rule of the unit instead.

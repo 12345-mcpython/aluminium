@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * `SPEND_RESOURCE{overflow_only: true}` spends only the tier above the cap (2026-10-02; reader: 114151"召唤死龙时会消耗所有溢出[新蕊]").
+ * `SPEND_RESOURCE{overflow_only: true}` spends only the tier above the cap.
  *
  * The judge tests the CAPABILITY, on a spare character whose hand-built table cannot disturb any loaded content, and with a resource it declares itself.
  */

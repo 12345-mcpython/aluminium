@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 /**
- * Relic set 324, 2-piece (2026-09-30): the same-turn skill-point threshold and the count that pays it out.
+ * Relic set 324, 2-piece: the same-turn skill-point threshold and the count that pays it out.
  *
  * <p>Note: Two measured lessons are baked in here. First, this reads the rules with {@code rulesFor(event)}, NOT with
  * {@code matching(event, ctx)}: matching EVALUATES the conditions, so a context with no stacks answers the payout rule's

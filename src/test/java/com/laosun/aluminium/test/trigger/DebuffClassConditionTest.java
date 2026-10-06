@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * "敌方对我方施加了控制类负面状态" (an enemy applied a control-class negative state to our side) can now be asked (2026-10-02).
+ * "敌方对我方施加了控制类负面状态" (an enemy applied a control-class negative state to our side) can now be asked.
  *
  * <p>One landed control, two watchers; both readings are deltas across startBattle. The landing is copied from the green
  * `ControlImmunityTest` - including its measured warning that `all_enemies` aims at the MONSTER - so that a failure here is about the

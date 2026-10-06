@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1415's memosprite skill 22 "献予'海洋'之诗": "本场战斗中，海瑟音造成的伤害提高 #1%" (2026-10-02).
+ * 1415's memosprite skill 22 "献予'海洋'之诗": "本场战斗中，海瑟音造成的伤害提高 #1%".
  *
  * <p>TWO-SIDED without a magic number: the ode takes her boost to exactly the CAST row's own #1 (which runs with level), and a scene without the ode reads a different value.
  * Note: Nothing is replaced -- her table holds the rule under test.

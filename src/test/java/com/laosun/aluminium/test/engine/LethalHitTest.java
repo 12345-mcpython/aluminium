@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * "受到致命攻击时不会陷入无法战斗状态，而是回复…" -- one capability, two readers (2026-10-02).
+ * "受到致命攻击时不会陷入无法战斗状态，而是回复…" -- one capability, two readers.
  *
  * <p>The hit is dealt through the battle's own settlement entry point with twice the unit's CURRENT HP, so it is lethal by
  * construction -- and the assertion is about survival, not about how much was healed.

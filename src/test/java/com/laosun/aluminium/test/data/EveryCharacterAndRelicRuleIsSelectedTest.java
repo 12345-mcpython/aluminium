@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * BREADTH for characters and relic sets (2026-09-30): select every rule so the engine validates it.
+ * BREADTH for characters and relic sets: select every rule so the engine validates it.
  *
  * <p>Companion of EveryConeRuleIsSelectedTest. A rule is validated only when it is SELECTED; cone 23059 shipped two
  * errors (an attribute the engine lacks, and a category test on an event that carries no category) while the full suite

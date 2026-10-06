@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * A rule-authored damage instance with a LITERAL ratio (2026-09-29, round 186): Sushang's technique deals 80% of her ATK.
+ * A rule-authored damage instance with a LITERAL ratio: Sushang's technique deals 80% of her ATK.
  *
  * <p>The capability's contract is that the stated `percent` is applied to the settled attribute, linearly and exactly once. That is what this test asserts: two
  * literal rules at 0.8 and 0.4 must differ by a factor of two.

@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 /**
- * The decisive probe for the enhanced-attack path (2026-09-28, round 113) - <b>no engine change</b>, only questions.
+ * The decisive probe for the enhanced-attack path - <b>no engine change</b>, only questions.
  *
  * <p>Round 112 established that the condition and the context path are fine (`from_skill_id` matches a hand-built context),
  * which left the live path. Reading {@code SkillExecutor} showed the row id IS passed, so the remaining explanation is that

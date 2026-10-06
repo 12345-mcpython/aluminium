@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 114151complete (2026-10-02): the whole sentence, both halves.
+ * 114151complete: the whole sentence, both halves.
  *
  * "when summoning the dead dragon, all overflow [新蕊] is consumed; for every 1% of overflow consumed, when the dead dragon summoned this time triggers the skill effect of the talent [灼掠幽墟的晦翼], the damage multiplier it deals is increased by #2%(0.0012);
  *   and if no more than #6(2) enemy targets are on the field at the time of summoning, the damage multiplier is additionally increased by #5%(0.0024)."

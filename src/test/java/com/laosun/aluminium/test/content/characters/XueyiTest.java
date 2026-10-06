@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1214 Xueyi, from her own file (2026-09-29, round 196): the technique's 80%-ATK opening.
+ * 1214 Xueyi, from her own file: the technique's 80%-ATK opening.
  *
  * <p>Same-pipeline reference again: the content's 0.8 against a hand-built 0.5 must be exactly 1.6.
  */

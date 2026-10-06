@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1209 Yanqing, from his own file (2026-09-29, round 224): the state that rides on himself, and the two fixtures that pin a 60% chance.
+ * 1209 Yanqing, from his own file: the state that rides on himself, and the two fixtures that pin a 60% chance.
  */
 public class YanqingTest {
     private static final int YANQING = 1209;

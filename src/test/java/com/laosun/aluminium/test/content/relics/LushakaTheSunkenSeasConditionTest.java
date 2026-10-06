@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Relic 31's CONDITION half (2026-09-30): "若装备者不是队伍第一名".
+ * Relic 31's CONDITION half: "若装备者不是队伍第一名".
  *
  * <p>Note: The sibling judge (Relic31PartyFirstTest) applies the rule with TriggerInterpreter.apply, which executes the
  * effects but does NOT evaluate the conditions -- so it is blind to this half, and its engine mutation went red only

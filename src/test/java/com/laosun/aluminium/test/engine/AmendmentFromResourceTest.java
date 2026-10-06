@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * `MODIFY_RULE{effect_percent_from_resource}` sizes an amendment from a resource (2026-10-02; reader: 114151"每消耗 1% 溢出值…").
+ * `MODIFY_RULE{effect_percent_from_resource}` sizes an amendment from a resource.
  */
 public class AmendmentFromResourceTest {
     private static final int LEVEL = 80;

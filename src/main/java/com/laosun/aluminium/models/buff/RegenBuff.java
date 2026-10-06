@@ -4,7 +4,7 @@ import com.laosun.aluminium.models.CanHit;
 import lombok.Getter;
 
 /**
- * A <b>heal over time</b>: "目标每回合开始时为其回复等同于娜塔莎 .20% 生命上限 + 192 的生命值，持续 2 回合" (2026-09-28).
+ * A <b>heal over time</b>: "目标每回合开始时为其回复等同于娜塔莎.20% 生命上限 + 192 的生命值，持续 2 回合".
  *
  * <p><b>Why it is the twin of {@link DotBuff}, down to the placement of the settle.</b> The engine already had the
  * damage half - a DOT is an ordinary early buff, and the <i>settlement</i> happens in

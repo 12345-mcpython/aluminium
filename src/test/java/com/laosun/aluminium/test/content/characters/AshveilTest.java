@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1504 Ashveil, from her own file (2026-09-29, round 200): the Bait reaction (8 energy + a 200%-ATK follow-up) and the [婪酣] cap, whose numbers the document states.
+ * 1504 Ashveil, from her own file: the Bait reaction (8 energy + a 200%-ATK follow-up) and the [婪酣] cap, whose numbers the document states.
  *
  * <p>Both guards are load-bearing and tested: `actor is_other_ally` (her own attack must not trigger it) and `target has_state 饲饵`. The cap is tested by EXCEEDING it.
  */

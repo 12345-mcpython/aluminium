@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1415's memosprite skill 1, first clause (2026-10-02): "对遐蝶施放时，[新蕊]可以溢出至 #3%" (#3 = 2).
+ * 1415's memosprite skill 1, first clause: "对遐蝶施放时，[新蕊]可以溢出至 #3%" (#3 = 2).
  *
  * Two-sided: after the ode lands on her, filling [新蕊] far past its cap stops at `max + 2% of max`; without the ode the same fill stops at `max`. Both numbers are the
  * engine's: the cap her file declares, and the overflow the sentence widens.

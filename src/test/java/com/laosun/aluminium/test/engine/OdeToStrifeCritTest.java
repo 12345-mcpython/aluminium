@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1415 Cyrene's memosprite Demiurge, memosprite skill 8 "献予'纷争'之诗", third clause (2026-10-02):
+ * 1415 Cyrene's memosprite Demiurge, memosprite skill 8 "献予'纷争'之诗", third clause:
  *
  * <p>"<b>本次攻击中</b>万敌的暴击伤害提高 <b>#1[i]%</b>" -- `#1` is 2 at level 10, i.e. +200%.
  *

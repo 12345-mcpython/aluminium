@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 
 
 /**
- * Light cone 23054 (2026-09-30): three of its four clauses -- and the FIRST content reader of WAVE_START.
+ * Light cone 23054: three of its four clauses -- and the FIRST content reader of WAVE_START.
  *
  * <p>SPD +18..30% permanently; entering battle grants the charm for 3 turns, and while it holds EVERY ally's crit rate
  * is up 10..14% and crit damage 30..60%, with the wearer's own energy regeneration up 12..20%; and at every wave start

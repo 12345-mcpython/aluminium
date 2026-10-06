@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Random;
 
-/** "[追忆] (Recollection) reaching 24 points activates the ultimate and removes all of her own negative effects" and "may overflow up to 2 points" (2026-10-02). */
+/** "[追忆] (Recollection) reaching 24 points activates the ultimate and removes all of her own negative effects" and "may overflow up to 2 points". */
 public class CyreneRecollectionCapTest {
     private static final int LEVEL = 80;
     private static final int CYRENE = 1415;

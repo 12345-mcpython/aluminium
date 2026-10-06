@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * The <b>state-holder</b> selector: {@code "target": "holder_of:同袍"} - "持有[同袍]的角色" (2026-10-02, 1414 Dan Heng - Permansor Terrae (丹恒-腾荒)).
+ * The <b>state-holder</b> selector: {@code "target": "holder_of:同袍"} - "持有[同袍]的角色").
  *
  * <p><b>Why the vocabulary had to exist.</b> 1414's kit is built on one marker: his skill designates one ally as
  * [同袍], and then two other clauses speak about <i>whoever holds it</i> - the Shenxiu (神秀) trace that raises that ally's ATK,

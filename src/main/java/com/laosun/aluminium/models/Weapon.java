@@ -28,13 +28,13 @@ public class Weapon implements Cloneable {
      * Display name (bilingual).
      */
     /**
-     * The light cone's id, which names its rule file under {@code resources/light_cones/} (2026-09-29).
+ * The light cone's id, which names its rule file under {@code resources/light_cones/}.
      * It was already in hand at construction and simply not kept.
      */
     private int wid;
 
     /**
-     * The light cone's <b>superimposition rank</b> (1..5), which selects the skill row whose values apply (2026-09-29).
+ * The light cone's <b>superimposition rank</b> (1..5), which selects the skill row whose values apply.
      *
      * <p>Note: Before this the engine always read the FIRST row - i.e. it modelled rank 1 without saying so. The default stays
      * 1, so every existing caller behaves exactly as before; a caller that knows the wearer's rank can now say it.
@@ -81,7 +81,7 @@ public class Weapon implements Cloneable {
         if (wp == null) {
             throw new RuntimeException("Weapon not found!");
         }
-        // Note: By RANK, not always the first row (2026-09-29): the rows are the five superimposition ranks, and taking
+        // Note: By RANK, not always the first row: the rows are the five superimposition ranks, and taking
         // `getFirst()` silently modelled rank 1 for every light cone in the game.
         WeaponData.SkillData row = wp.weaponSkillData().stream()
                 .filter(candidate -> candidate.level() == rank)

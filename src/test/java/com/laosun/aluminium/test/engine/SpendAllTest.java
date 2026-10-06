@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Random;
 
-/** Which route fails for "每消耗1点[热意]额外 1 次 21%" (2026-10-02). */
+/** Which route fails for "每消耗1点[热意]额外 1 次 21%". */
 public class SpendAllTest {
     private static final int OWNER = 1513;
     private static final int ALLY = 1404;

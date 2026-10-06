@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * END-TO-END judge for the capability behind cone 23048 clause 3 (2026-09-30): it really walks SkillExecutor.
+ * END-TO-END judge for the capability behind cone 23048 clause 3: it really walks SkillExecutor.
  *
  * <p>Measured facts it rests on: `DefaultSkill(id, slot, level)` derives the category from the SLOT (slot 2 = BPSKILL,
  * probed), and SkillExecutor takes its targets from the CALLER's list, so passing the ally makes the engine hand that

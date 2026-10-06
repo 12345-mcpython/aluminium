@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1415's memosprite skill 22 "献予'海洋'之诗": the mark, and the energy it pays (2026-10-02).
+ * 1415's memosprite skill 22 "献予'海洋'之诗": the mark, and the energy it pays.
  *
  * <p>"对海瑟音施放时，使海瑟音获得[暖流]。海瑟音施放攻击后消耗[暖流]为自身恢复 #4 点能量。"
  *

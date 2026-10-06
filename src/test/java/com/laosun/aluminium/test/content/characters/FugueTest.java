@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1225 Fugue, from her own file (2026-09-29, round 21): the Foxian Prayer mark and the four things it drives.
+ * 1225 Fugue, from her own file: the Foxian Prayer mark and the four things it drives.
  */
 public class FugueTest {
     private static final int FUGUE = 1225;

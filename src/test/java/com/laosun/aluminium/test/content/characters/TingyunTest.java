@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1202 Tingyun, from her own file (2026-09-29, round 156): Benediction with its cap, the ultimate's grant, and three traces.
+ * 1202 Tingyun, from her own file: Benediction with its cap, the ultimate's grant, and three traces.
  *
  * <p>Against her own listener-first logic: none of these needed a new engine ability. What is registered instead is the pair of
  * sentences where the BLESSED ALLY, not Tingyun, is the one dealing the extra damage.

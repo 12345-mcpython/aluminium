@@ -235,7 +235,7 @@ public final class TriggerTables {
                                 "the object form needs a \"rules\" array; only a bare array may omit it "
                                         + "(a character with nothing but rules uses the array form)");
                     }
-                    // The same guard, one level deeper (2026-10-02). The comment on the resource check describes this exact trap --
+                    // The same guard, one level deeper. The comment on the resource check describes this exact trap --
                     // "Gson drops a key it does not know" -- but only the resource declaration was walked, and an effect
                     // writing `maxStacks` (the Java name) was accepted and then dropped, leaving a stackable state with a cap
                     // of 1. The allowed sets come from `EffectSpec`'s and `TriggerSpec`'s own `@SerializedName` annotations,
@@ -305,7 +305,7 @@ public final class TriggerTables {
      * array may be empty, and anything else is not a shape this file understands.
      */
     /**
-     * The keys {@link EffectSpec} actually maps, read from its own annotations (2026-10-02).
+ * The keys {@link EffectSpec} actually maps, read from its own annotations.
      *
      * <p>Reflection rather than a hand-kept list: the failure this guards is exactly a key the loader "knows" and Gson does
      * not, so the two must be the same source of truth.
@@ -317,7 +317,7 @@ public final class TriggerTables {
         for (java.lang.reflect.Field field : com.laosun.aluminium.beans.EffectSpec.class.getDeclaredFields()) {
             com.google.gson.annotations.SerializedName name =
                     field.getAnnotation(com.google.gson.annotations.SerializedName.class);
-            // Gson's own rule (2026-10-02): an annotated field is keyed by the annotation, a plain one by the field's
+            // Gson's own rule: an annotated field is keyed by the annotation, a plain one by the field's
             // name. Collecting only the annotated ones rejected `amountFromEvent` and `amountFromAttr` -- keys the shipped
             // files use and Gson maps -- which the suite showed at once.
             keys.add(name != null ? name.value() : field.getName());
@@ -332,7 +332,7 @@ public final class TriggerTables {
     }
 
     /**
-     * The keys {@link com.laosun.aluminium.beans.TriggerSpec} actually maps, read from its own annotations (2026-10-02).
+ * The keys {@link com.laosun.aluminium.beans.TriggerSpec} actually maps, read from its own annotations.
      *
      * <p>The same reflection the effect guard uses, for the same reason: a key the loader "knows" and Gson does not is a value
      * that vanishes without a word.
@@ -353,7 +353,7 @@ public final class TriggerTables {
         return Set.copyOf(keys);
     }
 
-    /** Walks the rules themselves: known keys, and an event to listen to (2026-10-02). */
+    /** Walks the rules themselves: known keys, and an event to listen to. */
     private static void requireKnownRuleKeys(JsonElement rules) {
         if (rules == null || !rules.isJsonArray()) {
             return;

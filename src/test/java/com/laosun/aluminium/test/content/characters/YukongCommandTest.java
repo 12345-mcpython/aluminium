@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Yukong (驭空) (120), from her own file (2026-09-28): [鸣弦号令] (Bowstring Command), and the pair of capabilities it needed.
+ * Yukong (驭空) (120), from her own file: [鸣弦号令] (Bowstring Command), and the pair of capabilities it needed.
  *
  * <p><b>What it needed.</b> {@code TURN_END} ("at the end of each of our targets' turns" - the next unit's start is a different fact, and a
  * buff's duration tick is not an event) and {@code REMOVE_STACK} by name ("remove 1 stack of [鸣弦号令] from Yukong": the attribute

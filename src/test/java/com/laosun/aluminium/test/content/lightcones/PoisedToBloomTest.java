@@ -22,7 +22,7 @@ import java.util.Random;
  *
  * <p>The candidates' Paths are collected FIRST and chosen by COUNT (a Path with two members, and one with exactly one), not
  * concluded while iterating -- and every "not applied" claim is compared against that unit's OWN baseline, because a character's
- * starting crit damage is 0.5, not 0 (both mistakes were made and measured on 2026-09-30).
+ * starting crit damage is 0.5, not 0 (both mistakes were made and measured on).
  */
 public class PoisedToBloomTest {
     private static final int CONE = 21046;

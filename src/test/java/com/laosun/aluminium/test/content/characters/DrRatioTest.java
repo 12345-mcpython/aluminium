@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1305 Dr. Ratio, from his own file (2026-09-29, round 204): the Wiseman's Folly reaction and the technique's slow.
+ * 1305 Dr. Ratio, from his own file: the Wiseman's Folly reaction and the technique's slow.
  *
  * <p>The reaction is measured by FIRING the event (round 190's lesson: a real ally attack would mix its own damage into the reading). The slow is compared with a
  * hand-built -30% reference in the same pipeline, so the ratio 0.5 is the claim.

@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Loads a light cone's trigger rules from {@code resources/light_cones/<weaponId>.json} (2026-09-29).
+ * Loads a light cone's trigger rules from {@code resources/light_cones/<weaponId>.json}.
  *
  * <h2>Why a light cone reuses the trigger table</h2>
  * Its ability is the same kind of sentence as a relic set's or a character's -- "when &lt;event&gt;, do &lt;something the
@@ -50,7 +50,7 @@ public final class WeaponTriggerTables {
         if (cached != null) {
             return cached;
         }
-        // A light cone may DECLARE resources (2026-09-30): its file allows a top-level "resources" array next to the
+        // A light cone may DECLARE resources: its file allows a top-level "resources" array next to the
         // rank keys, the same declaration shape a character's file uses. Note: The merged table refuses two declaring
         // sides, so this is a cone-side declaration only while no character declares the same name.
         TriggerTable table = new TriggerTable(weaponId, read(weaponId, rank), readResources(weaponId));

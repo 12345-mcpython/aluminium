@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * The Preservation Trailblazer pair (2026-09-29, round 183): 8003 and 8004, one kit under two ids.
+ * The Preservation Trailblazer pair: 8003 and 8004, one kit under two ids.
  *
  * <p>Three claims, each from the document: one stack of [灼热意志] per hit up to eight; the cast-triggered party shield at 6% DEF + 80; and the technique's
  * self-shield at 30% DEF + 384, which only exists when the technique was declared.

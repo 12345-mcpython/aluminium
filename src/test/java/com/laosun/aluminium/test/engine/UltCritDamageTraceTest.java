@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1408："施放终结技时，暴击伤害提高 50%，持续 3 回合" (2026-10-02).
+ * 1408："施放终结技时，暴击伤害提高 50%，持续 3 回合".
  *
  * <p>TWO-WAY: the same character measured before and after her ultimate, so the only thing that differs is the cast.
  */

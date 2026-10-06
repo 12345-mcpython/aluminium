@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * {@code REPLACE_SKILL} (2026-09-28): a rule can swap one of its owner's skill slots for a data row.
+ * {@code REPLACE_SKILL}: a rule can swap one of its owner's skill slots for a data row.
  *
  * <p>Reader: 1301 Gallagher's ultimate "并将下一次普攻强化为[酒花奔涌]" - the enhanced attack is row <b>130108</b>, and
  * {@code SkillData.init} resolves rows <b>by id</b> ({@code Constant.SKILLS.get(cid).get(skillID)}), which is why the engine

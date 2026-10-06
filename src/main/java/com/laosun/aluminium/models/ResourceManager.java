@@ -81,7 +81,7 @@ public class ResourceManager {
     }
 
     /**
-     * The same, for a declaration that also states an <b>overflow</b> (2026-09-30; reader: 1506's [隐藏分]).
+ * The same, for a declaration that also states an <b>overflow</b>.
      *
      * <p>`Resource` has had both tiers all along; a DECLARATION could not state the second one, so
      * "达到上限后还可溢出 240 点" could only be written as one flat cap -- a different rule.

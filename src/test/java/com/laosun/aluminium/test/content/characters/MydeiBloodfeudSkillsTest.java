@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1404 Mydei (万敌): the automatic cast of [弑王成王] (Kingslayer Made King), and its cost (2026-10-02).
+ * 1404 Mydei (万敌): the automatic cast of [弑王成王] (Kingslayer Made King), and its cost.
  *
  * <p>Two readings, kept apart because the earlier attempt failed with two independent causes. One reads the COST, the other reads
  * the SWAP by the slot the skill reports. Note: And the cost reading wounds him first: at full HP "35% of CURRENT" and "35% of

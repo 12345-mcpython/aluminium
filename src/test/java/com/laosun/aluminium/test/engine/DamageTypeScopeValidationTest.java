@@ -14,7 +14,7 @@ import java.util.List;
  * Round 259: a damage_type scope is legal only on the ops that READ it.
  *
  * <p>The list is closed on purpose: the bug this closes is a scope the loader ACCEPTED and the runtime IGNORED
- * (BOOST_DAMAGE, fixed 2026-09-29 -- "follow-up attacks only" used to raise every hit). An op that cannot honour a scope
+ * (BOOST_DAMAGE, fixed -- "follow-up attacks only" used to raise every hit). An op that cannot honour a scope
  * must refuse it at load time rather than silently drop it.
  */
 public class DamageTypeScopeValidationTest {

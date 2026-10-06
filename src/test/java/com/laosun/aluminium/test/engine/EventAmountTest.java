@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * {@code times_from: "event_amount"} (2026-10-02): the REPEAT COUNT follows the triggering event.
+ * {@code times_from: "event_amount"}: the REPEAT COUNT follows the triggering event.
  *
  * <p>Note: The magnitude half was withdrawn the same day: {@code scale: "event_amount"} duplicated the spelling that already
  * exists -- {@link EffectSpec}'s {@code amount_from_event} (+ {@code amount_percent}), used by four shipped rules

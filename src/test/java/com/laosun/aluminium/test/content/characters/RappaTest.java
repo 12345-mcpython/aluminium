@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 131Rappa, from her own file (2026-09-29, round 209): the Charge that Weakness Break feeds, and the document's cap of 10.
+ * 131Rappa, from her own file: the Charge that Weakness Break feeds, and the document's cap of 10.
  *
  * <p>The cap is tested by EXCEEDING it (round 192's lesson): twelve breaks must still read ten.
  */

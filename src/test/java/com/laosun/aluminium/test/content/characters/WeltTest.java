@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1004 Welt, from his own file (2026-09-28, round 143): the ultimate's Imprison and the level convention.
+ * 1004 Welt, from his own file: the ultimate's Imprison and the level convention.
  *
  * <p>Note: The target is hand-made with no resistances on purpose: the project's fixture monster is immune to controls
  * (round 131 measured `STAT_CTRL_Frozen` at 1.0, which clamps the chance to 0). A 100% BASE chance still rolls, so an

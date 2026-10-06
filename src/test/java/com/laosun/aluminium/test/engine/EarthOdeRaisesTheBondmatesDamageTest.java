@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Random;
 
-/** "当他持有[献予'大地'之诗]时，[同袍]造成的伤害提高 0.12%" (2026-10-02). */
+/** "当他持有[献予'大地'之诗]时，[同袍]造成的伤害提高 0.12%". */
 public class EarthOdeRaisesTheBondmatesDamageTest {
     @Test
     public void theBondmateGainsTheSmallBoost() {

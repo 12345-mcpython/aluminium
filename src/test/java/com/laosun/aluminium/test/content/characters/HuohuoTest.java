@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Huohuo (藿藿) (121), from her own file (2026-09-28): the Skill (战技)'s cleanse, the ultimate's per-recipient energy, and [禳命].
+ * Huohuo (藿藿) (121), from her own file: the Skill (战技)'s cleanse, the ultimate's per-recipient energy, and [禳命].
  *
  * <p><b>What it needed.</b> Nothing new: `DISPEL`, `other_allies`, `GAIN_ENERGY` with a per-target share of max energy, a
  * [`owner_max_hp` + constant] heal, `ticks_on: "self"`, and `target_when` with `target_hp_percent` for "each of our targets whose current HP

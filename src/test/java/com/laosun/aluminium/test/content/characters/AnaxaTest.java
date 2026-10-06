@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1405 Anaxa's eidolon 1 (2026-09-29, round 199): the target's DEFENCE drops 16% when his SKILL lands.
+ * 1405 Anaxa's eidolon 1: the target's DEFENCE drops 16% when his SKILL lands.
  *
  * <p>Two guards are load-bearing and both are tested: `from_skill SKILL` (a basic attack must not do it) and `min_eidolon: 1`. The magnitude is compared with a
  * hand-built -32% reference in the same pipeline, so the ratio 0.5 is the claim rather than "some reduction".

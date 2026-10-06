@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 /**
- * The damage base an HP- or DEF-scaled skill must use (2026-09-29, round 14).
+ * The damage base an HP- or DEF-scaled skill must use.
  *
  * <p>Asserted on the MAPPING, not on a damage ratio: `loss / share` is the base times the settlement zones, so comparing it against a raw attribute
  * measures the zones rather than the base (the first version of this test did exactly that and failed for both characters). The behavioural claim is

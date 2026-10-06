@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 /**
- * Relic set 325, 2-piece (2026-09-30): the Elation thresholds, hung on every event that can raise it.
+ * Relic set 325, 2-piece: the Elation thresholds, hung on every event that can raise it.
  *
  * <p>Measured coverage: the four events below are ALL the writers of ELATION_DAMAGE_BOOST in the shipped content
  * (enumerated), and there is no character-side writer. The "first time" limit is a one-way marker: the rule only fires

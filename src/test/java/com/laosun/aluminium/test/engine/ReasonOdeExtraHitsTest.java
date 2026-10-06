@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * "使其战技的伤害次数增加 3 次" (2026-10-02).
+ * "使其战技的伤害次数增加 3 次".
  *
  * One variable: the same battle, the same seed, the same ode; the control takes the three segments back with the op's own negative amount. Nothing else differs, so what moves is the segments.
  */

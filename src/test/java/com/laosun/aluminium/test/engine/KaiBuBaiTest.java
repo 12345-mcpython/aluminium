@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * "开不败": half of a teammate's ended [好活当赏] (2026-10-02).
+ * "开不败": half of a teammate's ended [好活当赏].
  *
  * <p>Four instances end, so half of them is the whole number 2 and no rounding can hide behind the arithmetic. The state is
  * applied through the manager (a hand-built TABLE never receives STATE_ENDED -- measured), and the rule under test lives in

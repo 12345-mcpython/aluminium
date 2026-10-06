@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * `percent_from_cast_param`: a magnitude that is a skill parameter TIMES an attribute (2026-10-02).
+ * `percent_from_cast_param`: a magnitude that is a skill parameter TIMES an attribute.
  *
  * <p>Reader: 1415's memosprite skill 10 "献予'创世'之诗" -- "使开拓者-记忆的攻击力提高，提高数值等同于<b>德谬歌生命上限的 #1%</b>". The magnitude
  * is a product: `#1` comes from the casting skill and runs with its level; the max HP comes from the field. One `scale` names one factor, so

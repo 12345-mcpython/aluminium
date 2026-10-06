@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * A share may be read out of ANOTHER character's skill row (2026-10-02).
+ * A share may be read out of ANOTHER character's skill row.
  *
  * <p>The recurring structural gap: three sentences name a number that lives in one character's table while the event they modify belongs to another. Every share spelling read
  * either the CAST skill or the OWNER's own skill, so {@code skill_param_cid} now says whose row to read -- a FIELD, because putting the cid in the slot spelling is refused

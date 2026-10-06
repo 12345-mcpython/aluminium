@@ -80,7 +80,7 @@ public final class Queue {
     private CanHit extraTurnActor;
 
     /**
-     * A unit that will act BEFORE the heap is consulted (2026-10-02; an inserted action -- the game's {@code TurnInsertAction}).
+ * A unit that will act BEFORE the heap is consulted.
      *
      * <p>Why a separate slot rather than a heap entry: the heap is a schedule, and a unit with no action value cannot have one. This is
      * "who acts next regardless of the clock", which is what an inserted action is, and it is what `move()` hands out first.
@@ -228,7 +228,7 @@ public final class Queue {
             }
         }
         // A unit at zero speed has no action value at all (cycleTime = 10000 / speed), so there is nothing to schedule: it is
-        // skipped rather than refused (2026-10-02). The game states this for the two memosprites whose panel says so --
+        // skipped rather than refused. The game states this for the two memosprites whose panel says so --
         // "小伊卡的速度保持为0…并且不会出现在行动序列上" (1409's 1140903; 1415's Demiurge (德谬歌) has the same panel row). Such a unit stays in the battle --
         // targetable, castable at, commandable -- and simply never takes a turn.
         // Note: Before this, {@link Signal}'s guard turned the whole battle into an exception the moment one was summoned, which made
@@ -341,7 +341,7 @@ public final class Queue {
             currentActor = null;
             return 0;
         }
-        // An inserted action cuts in front of everything, and the clock does not move for it (2026-10-02) -- the same "the clock does not
+        // An inserted action cuts in front of everything, and the clock does not move for it -- the same "the clock does not
         // move" the extra turn states, but WITHOUT needing a place in the heap, which is what a zero-speed unit cannot have.
         if (insertedSignal != null) {
             currentActor = insertedSignal;

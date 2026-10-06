@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1501："阿哈时刻结束时使火花获得 1 个[额外回合]" (2026-10-02).
+ * 1501："阿哈时刻结束时使火花获得 1 个[额外回合]".
  *
  * <p>FILE-DRIVEN, with the applier on the ALLY: 1501 has no Aha-moment creator of her own, and rebuilding HER table would
  * destroy the very reader under test. The ally lays the state on the whole camp instead, and the judge then ends it by hand.

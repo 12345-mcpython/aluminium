@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1415's memosprite skill 19 "献予'天空'之诗": "对风堇施放时，为风堇恢复 #2 点能量" (2026-10-02).
+ * 1415's memosprite skill 19 "献予'天空'之诗": "对风堇施放时，为风堇恢复 #2 点能量".
  *
  * <p>Two scenes that differ by exactly one thing: whether the ode was cast at her. #2 runs with the level (12 -> 33.6), so the expected number comes out of the CAST
  * skill's row. Note: Her energy is zeroed BEFORE the cast -- reading an increment needs its baseline set before the action.

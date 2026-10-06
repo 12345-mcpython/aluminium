@@ -101,7 +101,7 @@ public class Battle {
      * ({@code Queue.addCombatants} takes {@code List<? extends CanHit>}), and camp-agnostic code
      * ({@code TargetSelector}, {@code opposingCamp}) was already written against {@code CanHit},
      * but the roster it had to be registered in only admitted monsters. Widening it here is what
-     * makes possible at all.
+     * makes that possible at all.
      *
      * <p>Code that needs <b>monster</b> mechanics (toughness, weakness, per-element debuff
      * resistance, phase tables) must ask for them explicitly through {@link #enemyUnits()} rather
@@ -376,7 +376,7 @@ public class Battle {
     }
 
     /**
-     * Skill points policy ): one pool shared by the whole team, not one track per character.
+     * Skill points policy: one pool shared by the whole team, not one track per character.
      *
      * <p>{@code Battle} itself does not know the skill point rules -- it only holds a
      * {@link SkillPointPolicy} and asks it once when "deciding to act" (see {@link #useSkill}).
@@ -394,28 +394,28 @@ public class Battle {
     public SkillPointPolicy skillPointPolicy = new StandardSkillPointPolicy();
 
     /**
-     * Current skill points ). Equivalent to {@code skillPointPolicy.getValue()}.
+     * Current skill points. Equivalent to {@code skillPointPolicy.getValue()}.
      */
     public int getSkillPoints() {
         return skillPointPolicy.getValue();
     }
 
     /**
-     * The regular skill point cap ). Equivalent to {@code skillPointPolicy.getMax()}.
+     * The regular skill point cap. Equivalent to {@code skillPointPolicy.getMax()}.
      */
     public int getSkillPointMax() {
         return skillPointPolicy.getMax();
     }
 
     /**
-     * Whether there are enough skill points to cast one skill ).
+     * Whether there are enough skill points to cast one skill.
      */
     public boolean hasSkillPoint() {
         return skillPointPolicy.canAfford();
     }
 
     /**
-     * Directly restore skill points ), capped at the regular maximum.
+     * Directly restore skill points, capped at the regular maximum.
      *
      * <p>For explicit sources other than "basic attack +1": techniques, relics (the 4-piece Passerby set),
      * character mechanics.
@@ -443,7 +443,7 @@ public class Battle {
     }
 
     /**
-     * Spend 1 skill point ).
+     * Spend 1 skill point.
      *
      * @return whether the spend succeeded; {@code false} means the count was already 0 (the caller should block this action)
      */
@@ -452,7 +452,7 @@ public class Battle {
     }
 
     /**
-     * Settle skill points for a skill ). The internal funnel point, shared by {@link #useSkill} and
+     * Settle skill points for a skill. The internal funnel point, shared by {@link #useSkill} and
      * the heal/shield branches in the demos -- the latter call {@code Battle.heal/grantShield} directly,
      * bypassing {@link #useSkill}, so this has to be called explicitly, otherwise "a healing skill costs no points".
      *
@@ -598,7 +598,7 @@ public class Battle {
     }
 
     /**
-     * Wire the skill point policy's change reports into event broadcasting ).
+     * Wire the skill point policy's change reports into event broadcasting.
      *
      * <p>The policy reports after it "really credited / really spent", and {@code Battle} only broadcasts --
      * that way {@code Battle} does not need to know the skill point rules (nor to guess what just happened
@@ -857,8 +857,8 @@ public class Battle {
     }
 
     /**
-     * Attach the map skills at the start of a battle ): map basic attack (slot 6) and
-     * technique (slot ).
+     * Attach the map skills at the start of a battle: map basic attack (slot 6) and
+     * technique.
      *
      * <p>Why here and not in {@code CharacterFactory}: these two slots are things on the map,
      * not a character's permanent skills -- they only make sense at the moment of "entering battle".
@@ -1175,7 +1175,7 @@ public class Battle {
     }
 
     /**
-     * Weakness break's attached damage over time ): only Fire/Lightning/Physical/Wind have it.
+     * Weakness break's attached damage over time: only Fire/Lightning/Physical/Wind have it.
      * Ice = Frozen, Quantum = Entanglement, Imaginary = Imprisonment - those three carry <b>no effect at
      * all</b> today, they are not merely "a different DOT".
      *
@@ -1204,7 +1204,7 @@ public class Battle {
     }
 
     /**
-     * The control part of a weakness break ): the element's own extra action delay, plus the control
+     * The control part of a weakness break: the element's own extra action delay, plus the control
      * state itself.
      *
      * <p><b>What the three non-damaging elements do, and how that was decided.</b> The plan said "during the frozen period, the damage taken
@@ -1222,7 +1222,7 @@ public class Battle {
      *       TODO.</li>
      * </ul>
      * So all three are <b>action delay</b>, and the difference is Frozen = cannot act versus Imprisonment/Entanglement = acts but slower
-     * (a {@code SPEED} debuff). Both are existing primitives, and sincethey are the two parts of
+     * (a {@code SPEED} debuff). Both are existing primitives, and since they are the two parts of
      * {@code ControlBuff} - which is what gives a control its <b>name</b>, so "the frozen state" can be asked about no
      * matter which path applied it.
      *
@@ -1285,7 +1285,7 @@ public class Battle {
         if (user.isDeath()) {
             return false;
         }
-        // Skill points ): all the rules are in skillPointPolicy (including the our-side/enemy-side camp
+        // Skill points: all the rules are in skillPointPolicy (including the our-side/enemy-side camp
         // check); Battle only asks once "does this action hold up" -- it knows no character, see F-8 in §12.5.
         if (!skillPointPolicy.onSkillCast(user, skill)) {
             return false;
@@ -1505,7 +1505,7 @@ public class Battle {
     }
 
     /**
-     * The only energy gain entry point inside battle ): the rules are decided by {@code target}'s own
+     * The only energy gain entry point inside battle: the rules are decided by {@code target}'s own
      * {@link com.laosun.aluminium.models.energy.EnergyProvider}; team charging (Tingyun (停云)/Huohuo (藿藿)/
      * Sunday (星期日)) will in the future also grant energy to other targets from here.
      *
@@ -1539,7 +1539,7 @@ public class Battle {
     }
 
     /**
-     * Skill energy gain hook point ): called by {@link SkillExecutor} where the skill is executed -- only
+     * Skill energy gain hook point: called by {@link SkillExecutor} where the skill is executed -- only
      * there does it know the actual hit set (AOE hits everyone, BLAST hits three slots, BOUNCE switches
      * target every instance).
      *
@@ -1564,7 +1564,7 @@ public class Battle {
      * Toughness reduction + weakness break trigger: the only toughness reduction entry point in
      * battle, called by {@link SkillExecutor} after each damage instance settles.
      *
-     * <p>The rules (HSR.md §3.2 / §.1):
+     * <p>The rules (HSR.md §3.2 / §3.1):
      * <ul>
      *   <li><b>Only hitting a weakness reduces toughness</b> -- a non-weakness element reduces none of it
      *       ("toughness reduction ignoring weakness" is a character trait of Rappa (乱破)/Himeko (姬子) - Nova
@@ -1580,10 +1580,10 @@ public class Battle {
      *       judgement itself)</li>
      * </ul>
      *
-     * <p>The order of the break chain (later tasks add things here): broken state to break damage ) to 
-     * action delay ) to attach DOT ) to break energy gain ).
+     * <p>The order of the break chain (later tasks add things here): broken state to break damage to 
+     * action delay to attach DOT to break energy gain.
      *
-     * <p><b>The return value also gives the "excess part" )</b>: let the skill's nominal toughness
+     * <p><b>The return value also gives the "excess part"</b>: let the skill's nominal toughness
      * reduction be {@code S} and the remaining toughness {@code T}; this one {@code S} is split between two
      * chains -- break damage uses {@code min(S,T)} ({@link StanceResult#consumed()}), super break damage uses
      * {@code max(0, S-T)} ({@link StanceResult#overkill()}), and the two always sum to {@code S}.
@@ -1637,7 +1637,7 @@ public class Battle {
         if (enemy.isBroken() || !enemy.hasToughnessBar()) {
             // The toughness bar is empty (already broken / an enemy with stance = 0 in the data) so the whole
             // nominal toughness reduction cannot enter the toughness bar, so all of it counts as "the excess
-            // part" -- that is the input to super break ).
+            // part" -- that is the input to super break.
             //
             // The weakness check is deliberately skipped here: the official wording is "after attacking an
             // enemy in the weakness-broken state, this attack's toughness reduction value is converted into 1
@@ -1679,7 +1679,7 @@ public class Battle {
     }
 
     /**
-     * The result of one toughness reduction ).
+     * The result of one toughness reduction.
      *
      * <p>The two toughness reduction numbers always sum to this instance's nominal toughness reduction,
      * with nothing double-counted and nothing dropped.
@@ -1712,7 +1712,7 @@ public class Battle {
     }
 
     /**
-     * Delay the action by a percentage of the target's action period ): {@code delay = period  x  percent},
+     * Delay the action by a percentage of the target's action period: {@code delay = period  x  percent},
      * period = {@code 10000 / speed} (consistent with {@code Queue}'s {@code ACTION_THRESHOLD}).
      *
      * @param target  the target being delayed
@@ -1731,7 +1731,7 @@ public class Battle {
     }
 
     /**
-     * Called when a broken enemy's turn comes up ): decrements the broken turn count, restores toughness
+     * Called when a broken enemy's turn comes up: decrements the broken turn count, restores toughness
      * at 0, and returns "this turn is skipped".
      *
      * <p>When the caller (today the {@code Main} demo, in the enemy turn execution) gets {@code true},
@@ -1752,7 +1752,7 @@ public class Battle {
     }
 
     /**
-     * A unit's current aggro value ): it decides the probability of the enemy selecting it.
+     * A unit's current aggro value: it decides the probability of the enemy selecting it.
      *
      * <p>This is the stated weight of {@link #baseAggroOf} with the unit's {@link AttributeType#AGGRO_ADDED_RATIO}
      * applied - "the probability of being attacked is greatly increased" is a <b>soft</b> modifier on the same weighted draw, which is why it is an
@@ -1807,7 +1807,7 @@ public class Battle {
     }
 
     /**
-     * The aggro table: {@code unit to hit probability} ). The probabilities sum to 1.
+     * The aggro table: {@code unit to hit probability}. The probabilities sum to 1.
      *
      * @param allies the candidate units (the caller is responsible for filtering out dead targets first)
      * @return an ordered unit to probability mapping; an empty list returns an empty table
@@ -1828,7 +1828,7 @@ public class Battle {
     }
 
     /**
-     * The application chance of a debuff ):
+     * The application chance of a debuff:
      *
      * <pre>
      * chance = base chance  x  (1 + caster's effect hit rate%)  x  (1 - victim's effect resistance%)  x  (1 - specific debuff resistance%)
@@ -1867,7 +1867,7 @@ public class Battle {
     }
 
     /**
-     * After the chance check, whether this debuff is actually applied ).
+     * After the chance check, whether this debuff is actually applied.
      *
      * <p>Rolls with the injected {@link #rng}: the same seed to the same battle is reproducible.
      *
@@ -1882,7 +1882,7 @@ public class Battle {
     }
 
     /**
-     * Apply a debuff: the hit check comes first, and only on a hit is {@code addBuff} called ).
+     * Apply a debuff: the hit check comes first, and only on a hit is {@code addBuff} called.
      *
      * <p>This is the unified entry point for "a skill applying a debuff" -- do not call {@code addBuff}
      * directly inside a skill, otherwise effect hit rate and resistance are bypassed.
@@ -1919,7 +1919,7 @@ public class Battle {
     }
 
     /**
-     * Healing amount ): it does not touch {@code Damage}; it is an independent set of damage zones.
+     * Healing amount: it does not touch {@code Damage}; it is an independent set of damage zones.
      *
      * <pre>
      * healing = base amount  x  (1 + outgoing healing boost)  x  (1 + healing taken boost)
@@ -1951,7 +1951,7 @@ public class Battle {
     }
 
     /**
-     * Perform one heal ): compute the healing amount first, then apply it to the target's HP
+     * Perform one heal: compute the healing amount first, then apply it to the target's HP
      * ({@code CanHit.heal} caps it itself and does nothing for the dead).
      *
      * @return the HP actually restored (after truncation by the cap; 0 when the target is dead or the
@@ -1977,7 +1977,7 @@ public class Battle {
     }
 
     /**
-     * Gain a shield ).
+     * Gain a shield.
      *
      * <p><b>No stacking</b>: it directly overwrites the current shield value (shields in this game normally do
      * not stack; a refresh from the same source is treated as an overwrite).
@@ -2113,7 +2113,7 @@ public class Battle {
     }
 
     /**
-     * The members of a unit's opposing camp ): our side to enemies; enemies to our side.
+     * The members of a unit's opposing camp: our side to enemies; enemies to our side.
      *
      * <p>It does not filter out the dead (the caller filters as needed): it only answers "whose camp is
      * this", not "who can be hit". If a third camp is introduced in the future
@@ -2148,7 +2148,7 @@ public class Battle {
     }
 
     /**
-     * Break energy gain ): calls this one funnel point at the moment of the break; the rules
+     * Break energy gain: calls this one funnel point at the moment of the break; the rules
      * still belong to the breaker's own provider (the standard implementation gives 5; Rappa (乱破) +10,
      * Harmony Trailblazer (同谐开拓者) +10, Fugue (忘归人) +3 and the like get their own implementations when the
      * characters are really built).
@@ -2206,42 +2206,42 @@ public class Battle {
     }
 
     /**
-     * Energy credited ).
+     * Energy credited.
      */
     private void broadcastEnergyGain(CanHit target, double added) {
         dispatch(t -> t.onEnergyGain(this, target, added), target);
     }
 
     /**
-     * HP loss ). {@code source} is this hit's attacker and may be {@code null}.
+     * HP loss. {@code source} is this hit's attacker and may be {@code null}.
      */
     private void broadcastHpLoss(CanHit target, double before, double after, CanHit source, double amount) {
         dispatch(t -> t.onHpLoss(this, target, before, after, source, amount), target, source);
     }
 
     /**
-     * Kill ).
+     * Kill.
      */
     private void broadcastKill(CanHit attacker, CanHit victim) {
         dispatch(t -> t.onKill(this, attacker, victim), victim, attacker);
     }
 
     /**
-     * Heal ).
+     * Heal.
      */
     private void broadcastHeal(CanHit healer, CanHit target, double healed) {
         dispatch(t -> t.onHeal(this, healer, target, healed), target, healer);
     }
 
     /**
-     * Weakness break ).
+     * Weakness break.
      */
     private void broadcastBreak(CanHit attacker, CanHit target, DamageElement element) {
         dispatch(t -> t.onBreak(this, attacker, target, element), target, attacker);
     }
 
     /**
-     * Skill points credited ). Only delivered to our side -- skill points are a resource of our team
+     * Skill points credited. Only delivered to our side -- skill points are a resource of our team
      * and the enemy has no share.
      *
      * <p>"Our team" is the camp ({@code allies}), but only a {@link Character} has anything to do with skill
@@ -2256,7 +2256,7 @@ public class Battle {
     }
 
     /**
-     * Skill points spent ). Only delivered to our side, same as {@link #broadcastSkillPointGained}.
+     * Skill points spent. Only delivered to our side, same as {@link #broadcastSkillPointGained}.
      */
     private void broadcastSkillPointSpent(int amount) {
         for (CanHit ally : allies) {
@@ -2653,7 +2653,7 @@ public class Battle {
     }
 
     /**
-     * Hit energy gain + kill energy gain ).
+     * Hit energy gain + kill energy gain.
      *
      * <p><b>The two rules differ, do not gate them with the same switch:</b>
      * <ul>
@@ -2952,7 +2952,7 @@ public class Battle {
             damage.addBoost(owner.getAttribute(AttributeType.MEMOSPRITE_DAMAGE_BOOST).get());
         }
 
-        // Scoped boosts ): "increases the damage dealt by basic attacks / Skills / ultimates by X%". These cannot be gated on the damage
+        // Scoped boosts: "increases the damage dealt by basic attacks / Skills / ultimates by X%". These cannot be gated on the damage
         // *type* the way the follow-up boost above is -- a basic attack and a skill are both
         // DamageType.NORMAL -- so they are gated on the category of the cast that produced this instance,
         // which SkillExecutor threads through (`Damage.getCastCategory`).

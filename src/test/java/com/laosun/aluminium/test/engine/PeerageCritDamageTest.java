@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1412："持有[爵位]的角色…造成的战技伤害的暴击伤害提高 2%" (2026-10-02).
+ * 1412："持有[爵位]的角色…造成的战技伤害的暴击伤害提高 2%".
  *
  * <p>The assertion is about the CRIT MULTIPLIER, not about raw damage: the peerage also carries +16% DEF ignore, +10%
  * All-Type RES PEN and +20% pierce on skill damage, and all three raise crit and non-crit hits alike -- so dividing them out

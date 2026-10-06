@@ -68,7 +68,7 @@ public class Character extends CanHit {
     private int cid;
 
     /**
-     * This character's own data id (its file name under {@code resources/characters/}) (2026-10-02).
+ * This character's own data id (its file name under {@code resources/characters/}).
      *
      * <p>Reader: the {@code ally_cid:<cid>} selector -- "when the Demiurge (德谬歌) casts a memosprite skill, make <b>Hyacine (风堇)</b> gain 2 layers ..." names a character, and nothing in the selector set could.
      */

@@ -14,7 +14,7 @@ import java.util.Random;
 
 /**
  * 140: "if one of our characters takes a lethal blow, then... gains the [月茧] state. A character in the [月茧] state temporarily defers falling into the cannot-fight state,
- * and can act normally. If, after acting and before the next turn begins, its current HP is raised or it gains a shield, the [月茧] state is dispelled; otherwise it will immediately fall into the cannot-fight state" (2026-10-02).
+ * and can act normally. If, after acting and before the next turn begins, its current HP is raised or it gains a shield, the [月茧] state is dispelled; otherwise it will immediately fall into the cannot-fight state".
  *
  * <p>ONE SENTENCE, THREE READINGS: it does not fall; it falls once its own turn is over; a heal before that saves it.
  *

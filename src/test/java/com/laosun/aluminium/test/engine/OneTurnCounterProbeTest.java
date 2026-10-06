@@ -74,7 +74,7 @@ public class OneTurnCounterProbeTest {
         // equality so that the day somebody gives counters a per-turn reset, this test FAILS and the gap for cones 23053
         // ([推流]) and 23061 ([闪耀王冠]) gets revisited instead of silently becoming shippable.
         Assertions.assertEquals(1, insideTurn, "the layer is there inside the turn (the default cap is one)");
-        // UPDATED 2026-09-30 (this test was WRITTEN to fail when the gap closed -- and it did): `until: turn_end` is the
+        // UPDATED (this test was WRITTEN to fail when the gap closed -- and it did): `until: turn_end` is the
         // spelling for "同一回合内", and `BuffManager.afterMove` sweeps it. A plain `turns: 1` counter still does NOT reset.
         Assertions.assertEquals(1, afterTickForeign, "a plain turns: 1 counter still survives the tick entries");
 
@@ -94,7 +94,7 @@ public class OneTurnCounterProbeTest {
         Assertions.assertTrue(second.applySkillPointCost(secondSkill, watcher));
         int withActorGate = watcher.getBuffManager().stacksOf(COUNT);
         System.out.println("[probe] a rule gated on `actor == self` saw the spend: stacks=" + withActorGate);
-        // UPDATED 2026-09-30, the same design as the assertion above: this half of the gap closed in the same session --
+        // UPDATED, the same design as the assertion above: this half of the gap closed in the same session --
         // the policy always knew the spender (`onSkillCast(user, skill)`) and now passes it on, so `actor == self` fires.
         Assertions.assertEquals(1, withActorGate,
                 "SKILL_POINT_SPENT names its spender now, so a rule gated on `actor == self` sees the spend");

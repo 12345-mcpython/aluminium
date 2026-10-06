@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1223 Moze, from his own file (2026-09-29, round 213): the Prey marker, the additional damage it draws, and the follow-up the Ultimate fires.
+ * 1223 Moze, from his own file: the Prey marker, the additional damage it draws, and the follow-up the Ultimate fires.
  */
 public class MozeTest {
     private static final int MOZE = 1223;

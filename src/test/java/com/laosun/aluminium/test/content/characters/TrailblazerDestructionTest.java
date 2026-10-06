@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 8001 Trailblazer (Destruction), from his own file (2026-09-29, round 1): ATK that stacks on weakness breaks.
+ * 8001 Trailblazer (Destruction), from his own file: ATK that stacks on weakness breaks.
  *
  * <p>The case asserts the cap: two breaks give the full +40%, and a third changes nothing. Dropping `max_stacks` makes it red.
  */

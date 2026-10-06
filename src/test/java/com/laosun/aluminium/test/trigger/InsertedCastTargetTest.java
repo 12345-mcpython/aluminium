@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * The commanded cast's own target is readable when it ends (2026-10-02).
+ * The commanded cast's own target is readable when it ends.
  *
  * <p>1415's memosprite skill says "对刻律德菈施放后…奇袭结束后，使刻律德菈获得 1 点充能" -- so the moment must be able to say WHO the
  * commanded skill was aimed at. It used to pass the caster in the target slot.

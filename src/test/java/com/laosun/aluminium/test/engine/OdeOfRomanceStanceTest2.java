@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1415's memosprite skill 12 "献予'浪漫'之诗" -- the two effects whose lifetime is another state (2026-10-02).
+ * 1415's memosprite skill 12 "献予'浪漫'之诗" -- the two effects whose lifetime is another state.
  *
  * <p>"阿格莱雅与衣匠造成的伤害提高 #2[i]% 并无视目标 #3[i]% 的防御，<b>持续至阿格莱雅退出[至高之姿]状态</b>。"
  *

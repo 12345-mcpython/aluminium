@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1410 Hysilens, from her own file (2026-09-29, round 208): the Skill's +20% damage taken, measured through actual damage.
+ * 1410 Hysilens, from her own file: the Skill's +20% damage taken, measured through actual damage.
  *
  * <p>Damage-taken is only observable as damage, so the case compares the loss a fixed hit causes BEFORE and AFTER the Skill: a hand-built 40% rule would double it, so the
  * content's 20% must land at 1.5x. That ratio is what makes the claim exact rather than "some increase".

@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Random;
 
-/** "处于[往昔的涟漪]状态时在[追忆]达到 12 点时可激活终结技" (2026-10-02). */
+/** "处于[往昔的涟漪]状态时在[追忆]达到 12 点时可激活终结技". */
 public class CyreneRippleTierTest {
     private static final String STATE = "往昔的涟漪";
     private static final String MEMORY = "追忆";

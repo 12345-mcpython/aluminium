@@ -42,7 +42,7 @@ public enum SkillType {
      */
     MAZE,
     /**
-     * Technique (秘技) (skill slot ): a buff actively cast on the map (attack type {@code Maze} in
+     * Technique (秘技) (skill slot 7): a buff actively cast on the map (attack type {@code Maze} in
      * the data).
      *
      * <p>For most characters the technique's effect is "takes effect when the next battle starts"
@@ -58,13 +58,13 @@ public enum SkillType {
      * Passive talent of a summoned entity.
      */
     /**
-     * The data's slot 20 (2026-09-30): the Elation skill "欢愉技", named by the game's own text
+ * The data's slot 20: the Elation skill "欢愉技", named by the game's own text
      * (relic set 130 says "首次使用欢愉技"). Nine skills in `skills.json` carry `attack_type: ElationDamage`
      * and every one of them was invisible to the loader until this constant existed.
      */
     ELATION_SKILL,
     /**
-     * Note: The data's slot 21 (2026-09-30): a second Elation-damage skill carried by 1506 and 1513 only. The game text
+ * Note: The data's slot 21: a second Elation-damage skill carried by 1506 and 1513 only. The game text
      * does not name it, so this name records the SLOT and nothing more.
      */
     ELATION_EXTRA,
@@ -81,7 +81,7 @@ public enum SkillType {
      * character's own skills.
      */
     public boolean isIntrinsic() {
-        // 2026-09-30: the Elation damage skills are part of the always-on kit. This method is the gate that kept
+        //: the Elation damage skills are part of the always-on kit. This method is the gate that kept
         // them invisible: `Character`'s kit builder skips every type it does not call intrinsic.
         return this == COMMON || this == SKILL || this == ULTRA || this == TALENT
                 || this == ELATION_SKILL || this == ELATION_EXTRA;

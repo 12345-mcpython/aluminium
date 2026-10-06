@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * A literal-ratio damage instance scaled by a Max HP (2026-09-29, round 189): Natasha's trace adds 40% of her own Max HP as physical damage.
+ * A literal-ratio damage instance scaled by a Max HP: Natasha's trace adds 40% of her own Max HP as physical damage.
  *
  * <p>Measured: 16 documents state damage this way. The assertion puts both instances in the SAME pipeline - the content's rule at 0.4 of her Max HP against a
  * hand-built rule at 0.5 of the same scale - so the engine's factors cancel and the ratio 0.8 is what is checked.

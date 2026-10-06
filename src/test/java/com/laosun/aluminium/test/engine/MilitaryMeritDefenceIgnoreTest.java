@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1412："持有[军功]的角色造成伤害时无视目标 16% 的防御力" (2026-10-02).
+ * 1412："持有[军功]的角色造成伤害时无视目标 16% 的防御力".
  *
  * <p>FILE-DRIVEN: her skill is what grants [军功], so after it the ALLY should carry the 16% defence ignore -- while she
  * herself should not, which is the "false side" this judge also asserts.

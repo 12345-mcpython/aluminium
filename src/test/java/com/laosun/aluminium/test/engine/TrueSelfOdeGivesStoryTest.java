@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * A summon can DECLARE a resource, so a rule can grant one to it (2026-10-02).
+ * A summon can DECLARE a resource, so a rule can grant one to it.
  *
  * Slot 26's "昔涟施放终结技后…使德谬歌获得1点[故事]" is the reader. Before this capability the loader accepted `GAIN_RESOURCE{target: "summon"}` and the runtime silently granted nothing,
  * because a resource has to be declared where the unit can see it and a summon had no declaration site (`MemospriteSpec` now carries `resources`; `SummonFactory` registers them).

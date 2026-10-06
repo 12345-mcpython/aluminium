@@ -1,7 +1,7 @@
 package com.laosun.aluminium.models.buff;
 
 /**
- * A named state that <b>stacks</b> -- the engine's spelling of "this state carries a COUNT" (2026-10-02).
+ * A named state that <b>stacks</b> -- the engine's spelling of "this state carries a COUNT".
  *
  * <p>It opts into the accumulate path that {@link StackBuff} already uses: {@code BuffManager.addBuff} sends every buff
  * whose {@link #isStackable()} is true to {@code addStackable}, grouped by {@link #stackGroupKey()} and capped by

@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1415 Cyrene, from her own file (2026-09-29, round 230): the [追忆] resource and the party boost that needs no condition.
+ * 1415 Cyrene, from her own file: the [追忆] resource and the party boost that needs no condition.
  */
 public class CyreneTest {
     private static final int CYRENE = 1415;

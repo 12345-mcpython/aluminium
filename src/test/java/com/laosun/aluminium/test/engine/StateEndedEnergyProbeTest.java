@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * "[生息]结束时若我方目标当前生命值等于其生命上限，则额外恢复目标 8 点能量" (1211, 2026-10-02).
+ * "[生息]结束时若我方目标当前生命值等于其生命上限，则额外恢复目标 8 点能量" (1211,).
  *
  * <p>FILE-DRIVEN and TWO-WAY: the clause has to be shown to matter, so full HP must pay and less-than-full HP must not.
  * The announcement is fired through the engine's own `Battle.fireStateEnded`, which is what sets the name the condition reads.

@@ -9,7 +9,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 /**
- * Every character rule's conditions, written out LITERALLY (2026-09-30).
+ * Every character rule's conditions, written out LITERALLY.
  *
  * <p>Note: Why literal: a judge that compares the file against the compiled table stays green when a mutation changes
  * both sides together (measured). To catch "the content itself was changed" the expectation must live here. The

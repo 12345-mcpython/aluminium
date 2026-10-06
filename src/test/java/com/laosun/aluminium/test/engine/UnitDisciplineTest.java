@@ -38,7 +38,7 @@ public class UnitDisciplineTest {
     private static final Set<String> KNOWN = Set.of(
             "hit_count", "hp_percent", "target_hp_percent", "target_debuff_count",
             "self_summon_count", "target_summon_count", "self_max_energy", "self_energy_percent", "from_skill_id",
-        // Added with the condition itself (2026-10-02): the skill that produced a SETTLED damage. The discipline test mirrors TriggerTable switch, so a new
+        // Added with the condition itself: the skill that produced a SETTLED damage. The discipline test mirrors TriggerTable switch, so a new
         // condition belongs in BOTH -- that is the fifth place a condition name lives (closed set, switch, this list, and the docs that describe them).
         "damage_skill_key",
             "target_hp_percent_before", "enemy_count", "ally_count");   // added with the crossing variable (round 181)

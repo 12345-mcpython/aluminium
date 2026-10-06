@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * The technique gate (2026-09-29, round 18): a technique happens outside the battle, so the caller declares it and the engine turns it into a state.
+ * The technique gate: a technique happens outside the battle, so the caller declares it and the engine turns it into a state.
  *
  * <p>The pair is the measurement: with the marker the party is healed by 15% of EACH ally's own Max HP, and without it nothing happens at all.
  */

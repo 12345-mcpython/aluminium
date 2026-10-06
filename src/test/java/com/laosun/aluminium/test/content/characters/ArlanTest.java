@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1008 Arlan, from his own file (2026-09-29, round 169): his traces, and the blast shape his ultimate exposed.
+ * 1008 Arlan, from his own file: his traces, and the blast shape his ultimate exposed.
  *
  * <p>The blast case asserts the DOCUMENT'S 2:1 RATIO between the centre and its neighbours. It is what found the engine bug: the branch
  * applied the centre's multiplier to the neighbours, and the skill data's second parameter (`[3.2, 1.6]`) was never read.
@@ -92,7 +92,7 @@ public class ArlanTest {
     public void hisFileCarriesTheClauses() {
         var table = TriggerTables.of(ARLAN);
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.KILL), "the survival heal");
-        // 2026-10-02: three BATTLE_START rules now, not two -- the eidolon-four trace is applied there (its sentence starts
+        //: three BATTLE_START rules now, not two -- the eidolon-four trace is applied there (its sentence starts
         // with "进入战斗后"), and that trace is what the lethal blow is gated on.
         Assertions.assertEquals(3, table.ruleCount(TriggerEvent.BATTLE_START),
                 "the DoT resistance, the level convention, and the eidolon-four trace");

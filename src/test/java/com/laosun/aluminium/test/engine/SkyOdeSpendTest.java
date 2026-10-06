@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1415's memosprite skill 19, THIRD sentence: "风堇施放战技/终结技后，消耗1层[献予'天空'之诗]" (2026-10-02).
+ * 1415's memosprite skill 19, THIRD sentence: "风堇施放战技/终结技后，消耗1层[献予'天空'之诗]".
  *
  * <p>The reading discriminates the SLOT gate three ways in one battle: casting her SKILL (slot 2) spends a layer, casting her ULTIMATE (slot 3) spends another, and casting
  * her BASIC (slot 1) spends none. A rule that fired on any cast -- or on a wrong slot -- cannot pass all three.

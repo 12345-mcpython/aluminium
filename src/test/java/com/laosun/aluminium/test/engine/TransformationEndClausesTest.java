@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1408: the reading of the two "when the transformation ends" sentences (2026-10-02).
+ * 1408: the reading of the two "when the transformation ends" sentences.
  *
  * <p>Both clauses hang off the same moment the reward does -- STATE_ENDED for [变身] -- so this reads them the way the shipped
  * sibling reads the transformation's block: transform, then remove the state and look.

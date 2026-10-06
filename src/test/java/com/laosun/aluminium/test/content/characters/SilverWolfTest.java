@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1006 Silver Wolf, from her own file (2026-09-29, round 223): the Ultimate's defence shred, measured as a fraction of the enemy's own defence.
+ * 1006 Silver Wolf, from her own file: the Ultimate's defence shred, measured as a fraction of the enemy's own defence.
  */
 public class SilverWolfTest {
     private static final int SILVER_WOLF = 1006;

@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1415 Cyrene (昔涟)'s memosprite the Demiurge (德谬歌), memosprite skill 8 "献予'纷争'之诗", the other half (2026-10-02):
+ * 1415 Cyrene (昔涟)'s memosprite the Demiurge (德谬歌), memosprite skill 8 "献予'纷争'之诗", the other half:
  *
  * <p>"if Mydei (万敌) is <b>not</b> in the [血仇] state, then <b>advance Mydei's action by 100%</b>" -- `#2` is 1 at every level, i.e. 100%.
  *

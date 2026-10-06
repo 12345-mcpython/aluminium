@@ -8,7 +8,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 /**
- * Every light cone rule condition PER SUPERIMPOSITION RANK (2026-09-30).
+ * Every light cone rule condition PER SUPERIMPOSITION RANK.
  *
  * <p>Entry points, both measured: {@code Weapon.build(id, second)} IGNORES its second argument and assembles the
  * lowest existing tier, while {@code WeaponTriggerTables.of(id, rank)} selects the EXACT rank. This judge uses the

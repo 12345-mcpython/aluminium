@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 121 Huohuo (藿藿): "after casting the Skill, Huohuo gains [禳命], lasting 2 turns, and the remaining turns decrease by 1 at the start of each of Huohuo's turns" (2026-10-02).
+ * 121 Huohuo (藿藿): "after casting the Skill, Huohuo gains [禳命], lasting 2 turns, and the remaining turns decrease by 1 at the start of each of Huohuo's turns".
  *
  * <p>The point is WHOSE clock spends it: the sentence names Huohuo (藿藿), not the party. Note: The drive is the one a green sibling uses
  * (`ArlanEidolonFourTest`): a timed buff ticks in two halves per turn, and expiry is announced on the late one.

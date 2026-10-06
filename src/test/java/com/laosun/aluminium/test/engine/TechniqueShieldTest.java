@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * The technique gate's second harvest (2026-09-29, round 180): Gepard's opening shield, declared only when the technique was used.
+ * The technique gate's second harvest: Gepard's opening shield, declared only when the technique was used.
  *
  * <p>Pair test again, and the declared side asserts the DOCUMENT'S arithmetic - 24% of his DEF plus 150.
  */

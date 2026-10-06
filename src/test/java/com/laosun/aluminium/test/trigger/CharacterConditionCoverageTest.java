@@ -16,7 +16,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Every rule of the characters shipped in this arc states the conditions its file states (2026-09-30).
+ * Every rule of the characters shipped in this arc states the conditions its file states.
  *
  * <p>A condition sweep (negating {@code actor == self}, swapping {@code from_category}, raising a
  * {@code self_resource} threshold) stayed green for eleven of these, so the character judges assert effects but not

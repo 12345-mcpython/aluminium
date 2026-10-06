@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * `DEALING_DAMAGE` carries the skill key (2026-09-28, round 121), verified through the shipped clause it was built for.
+ * `DEALING_DAMAGE` carries the skill key, verified through the shipped clause it was built for.
  *
  * <p>Gallagher's enhanced basic attack says "并使目标攻击力降低15.00%，持续2回合". That sentence cannot live on
  * `ALLY_ATTACK` - that event deliberately carries no aim - so it needed an event with <b>both</b> a target and the skill key.
