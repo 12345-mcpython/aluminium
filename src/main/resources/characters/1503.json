@@ -42,10 +42,15 @@
           "percent": 0.12,
           "amount": 240,
           "target": "lowest_hp_ally"
+        },
+        {
+          "op": "DISPEL",
+          "amount": 1,
+          "target": "all_allies"
         }
       ],
       "source": "1503 真珠 战技 补缀生命的柔光 (150302): 「获得 15 点【好活当赏】，为我方全体目标回复等同于真珠 12.00% 防御力 + 240 的生命值，**额外**为**当前生命值百分比最低的**我方目标回复等同于真珠 12.00% 防御力 + 240 的生命值」。",
-      "note": "⭐ **现成能力拼成** ✓：`GAIN_RESOURCE` ✓（声明过的计数）、`HEAL` 配 `scale: owner_def` ✓（「等同于真珠防御力的 12% + 240」）、以及 `lowest_hp_ally` 选择器 ✓（「当前生命值百分比最低的我方目标」，已有用例：`1001.json` 与光锥 `23017`）。⭐ 两段治疗写成**两条 op**（而不是一条 `all_allies`），因为原文说的是“**额外**为最低者再回一次”。"
+      "note": "⭐ **现成能力拼成** ✓：`GAIN_RESOURCE` ✓（声明过的计数）、`HEAL` 配 `scale: owner_def` ✓（「等同于真珠防御力的 12% + 240」）、以及 `lowest_hp_ally` 选择器 ✓（「当前生命值百分比最低的我方目标」，已有用例：`1001.json` 与光锥 `23017`）。⭐ 两段治疗写成**两条 op**（而不是一条 `all_allies`），因为原文说的是“**额外**为最低者再回一次”。  NOTE 2026-10-02: this rule also carries trait 1503102's dispel half -- \"on casting an enhanced basic or the Skill, dispel 1 debuff from every ally\" (corpus line 301), via DISPEL{amount: 1, target: all_allies}, the shape 1110 ships."
     },
     {
       "on": "BATTLE_START",
@@ -400,10 +405,15 @@
           "percent": 0.08,
           "amount": 160,
           "target": "lowest_hp_ally"
+        },
+        {
+          "op": "DISPEL",
+          "amount": 1,
+          "target": "all_allies"
         }
       ],
       "source": "1503 真珠 强化普攻 【行笔，幻造星月】 (150308): 「对敌方全体造成等同于真珠 100% 防御力的冰属性伤害，为我方全体目标回复等同于真珠 8.00% 防御力 + 160 的生命值，**额外**为**当前生命值百分比最低的**我方目标回复同样量」。",
-      "note": "⭐ 伤害不写在这里：它在 `skills.json` 的技能行里（`AoEAttack` 加倍率），引擎自己结算；本条只补那两段治疗（与她战技同一写法）。⭐ 触发靠 `BASIC_ATTACK` + `from_skill_id == <技能 ID>`：**该变量是数值变量**，必须带 `==`（写成 `from_skill_id 150308` 会报 “not a known shorthand”，实测）。"
+      "note": "⭐ 伤害不写在这里：它在 `skills.json` 的技能行里（`AoEAttack` 加倍率），引擎自己结算；本条只补那两段治疗（与她战技同一写法）。⭐ 触发靠 `BASIC_ATTACK` + `from_skill_id == <技能 ID>`：**该变量是数值变量**，必须带 `==`（写成 `from_skill_id 150308` 会报 “not a known shorthand”，实测）。  NOTE 2026-10-02: this rule also carries trait 1503102's dispel half -- \"on casting an enhanced basic or the Skill, dispel 1 debuff from every ally\" (corpus line 301), via DISPEL{amount: 1, target: all_allies}, the shape 1110 ships."
     },
     {
       "on": "BASIC_ATTACK",
@@ -426,10 +436,15 @@
           "percent": 0.08,
           "amount": 160,
           "target": "lowest_hp_ally"
+        },
+        {
+          "op": "DISPEL",
+          "amount": 1,
+          "target": "all_allies"
         }
       ],
       "source": "1503 真珠 强化普攻 【行笔，绘制末浪】 (150310): 「对敌方全体造成等同于真珠 100% 防御力的冰属性伤害，为我方全体目标回复等同于真珠 8.00% 防御力 + 160 的生命值，**额外**为**当前生命值百分比最低的**我方目标回复同样量」。",
-      "note": "⭐ 伤害不写在这里：它在 `skills.json` 的技能行里（`AoEAttack` 加倍率），引擎自己结算；本条只补那两段治疗（与她战技同一写法）。⭐ 触发靠 `BASIC_ATTACK` + `from_skill_id == <技能 ID>`：**该变量是数值变量**，必须带 `==`（写成 `from_skill_id 150308` 会报 “not a known shorthand”，实测）。"
+      "note": "⭐ 伤害不写在这里：它在 `skills.json` 的技能行里（`AoEAttack` 加倍率），引擎自己结算；本条只补那两段治疗（与她战技同一写法）。⭐ 触发靠 `BASIC_ATTACK` + `from_skill_id == <技能 ID>`：**该变量是数值变量**，必须带 `==`（写成 `from_skill_id 150308` 会报 “not a known shorthand”，实测）。  NOTE 2026-10-02: this rule also carries trait 1503102's dispel half -- \"on casting an enhanced basic or the Skill, dispel 1 debuff from every ally\" (corpus line 301), via DISPEL{amount: 1, target: all_allies}, the shape 1110 ships."
     }
   ]
 }
