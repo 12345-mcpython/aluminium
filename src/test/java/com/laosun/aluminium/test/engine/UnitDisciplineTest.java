@@ -41,7 +41,8 @@ public class UnitDisciplineTest {
         // Added with the condition itself: the skill that produced a SETTLED damage. The discipline test mirrors TriggerTable switch, so a new
         // condition belongs in BOTH -- that is the fifth place a condition name lives (closed set, switch, this list, and the docs that describe them).
         "damage_skill_key",
-            "target_hp_percent_before", "enemy_count", "ally_count");   // added with the crossing variable (round 181)
+            "target_hp_percent_before", "enemy_count", "ally_count",
+            "skill_point_max");   // the team pool's cap, for light cone 23046 (a count, not a fraction)
 
     /** Of those, the ones that resolve to 0..1 rather than a count. */
     // self_energy_percent is a RATIO (current/max), so it joins the fraction family: any literal above 1 is refused.
