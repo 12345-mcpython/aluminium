@@ -105,6 +105,20 @@ public enum AttributeType {
     @SerializedName("elation_damage_boost") ELATION_DAMAGE_BOOST("elation_damage_boost"),
 
     /**
+     * 增笑 -- Elation damage's OWN amplifier, distinct from {@link #ELATION_DAMAGE_BOOST} (欢榆度).
+     *
+     * <p>The spec at {@code ROADMAP.md:1262} keeps them apart on purpose:
+     * {@code 基础值 × 欢榆倍率 × (1+欢榆度) × (1+增笑) × (1+笑点×5/(笑点+240))} -- two separate factors, so a rule that
+     * grants one must not be written as the other. The corpus glossary says the same: 增笑 is
+     * "影响欢榆伤害的特殊效果，可额外提高造成的欢榆伤害".
+     *
+     * <p><b>No data column.</b> Measured: {@link #BY_GAME_PROPERTY}'s only Elation entry is
+     * {@code ElationDamageAddedRatioBase} (the one above), and no game property mentions this concept. So a
+     * character's own panel never carries it -- it arrives only from rules, like Pearl's Eidolon 2 (15%).
+     */
+    @SerializedName("elation_damage_amp") ELATION_DAMAGE_AMP("elation_damage_amp"),
+
+    /**
      * Damage dealt by <b>basic attacks</b> only ("普攻造成的伤害提高 X%") - the basic-attack sibling of
      * {@link #FOLLOW_UP_DAMAGE_BOOST}.
      *
