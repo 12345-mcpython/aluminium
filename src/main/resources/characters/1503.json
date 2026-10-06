@@ -614,6 +614,22 @@
       ],
       "source": "1503 真珠 欢榆技 渲染理性，解构欢榆 (150320): 「队伍中「欢榆」命途角色数量等于 4 或以上时，使我方全体目标**下一次攻击后**，对攻击目标额外造成 40% 的对应属性欢榆伤害」。",
       "note": "⭐ **触发写法是现成的** ✓：引擎没有 Elation 专用事件，“这次施放是欢榆技”靠 `from_category ElationDamage`（见 `1513` 的 `elation_spend_all_fervor`）；实测 `TriggerEvent` 里没有任何 Elation 专用事件。⭐ **“下一次攻击”的寿命** 用 `until: \"next_attack\"`，它在 `LIFETIMES` 封闭词表里（`TriggerInterpreter:4798`），且已有三处出货（1002 / 1301 / 8001）。⚠ **兼现端本文件未写**：原文说的是“**对应属性**”，即每个队友各自的属性；而一条规则的 `element` 是一个固定词，所以它无法给四个队友四个属性。`1505` 的 rider 也只写一个单位的属性。兼现形态已登记（参考形状：`DAMAGE{scale: self_attr:ATTACK, percent: X, element: <属性>, damage_type: \"ELATION\", target: target}` 在 `DEALING_DAMAGE` 上）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon2_raises_elation_amp_for_the_team",
+      "min_eidolon": 2,
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ELATION_DAMAGE_AMP",
+          "percent": 0.15,
+          "permanent": true,
+          "target": "all_allies"
+        }
+      ],
+      "source": "1503 真珠 星魂 2 截取，顷刻破晓的光斑: 「我方全体目标的欢榆伤害增笑 15%」（参数 `[0.15, 1]`）。",
+      "note": "⭐ **只写了三分之一** ✓：这一半只是一个属性。同句的“使**除真珠和【美学底本】外**的其他欢榆命途角色也触发行动提前”需要知道谁是底本、并排除它和真珠；“额外回合开始时获得的【好活当赏】和笑点提高 100%”则等待那两项奖励本身先被写出来。⭐ 用 `ELATION_DAMAGE_AMP` 而**不是** `ELATION_DAMAGE_BOOST`：规格（`ROADMAP.md:1262`）把它们写成两个**相乘**的因子，实测判据也钉住了这一点。"
     }
   ]
 }
