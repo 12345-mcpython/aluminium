@@ -814,14 +814,21 @@ public class Battle {
      * The laugh-point factor of Elation damage: {@code 1 + 笑点×5/(笑点+240)}.
      *
      * <p>From the spec at {@code ROADMAP.md:1262}
-     * ({@code 基础值 × 欢愉倍率 × (1+欢愉度) × (1+增笑) × (1+笑点×5/(笑点+240))}, attack power banned). The
-     * laugh points are the PARTY resource this class already hosts; the curve lives here so the two settlement
-     * sites cannot drift apart, the same reason {@code ELATION_DAMAGE_BOOST} is folded in one step.
+     * ({@code 基础值 × 欢愉倍率 × (1+欢愉度) × (1+增笑) × (1+笑点×5/(笑点+240))}, attack power banned). The curve lives
+     * here so the three settlement sites cannot drift apart, the same reason {@code ELATION_DAMAGE_BOOST} is folded in
+     * one step.
      *
-     * <p>With no laugh points the factor is exactly 1, so content that never creates any is unaffected.
+     * <p>⚠⚠ <b>Which laugh points</b>, and this is the correction the encyclopedia entry forced. It reads
+     * {@link #countedLaughPoints()} - the <b>merged snapshot</b> taken when each holder received 【好活当赏】 - and NOT
+     * the party's live pool, which is what it used to read. The entry says the state takes 「本次阿哈时刻的笑点」 and that
+     * 「技能效果和欢愉伤害以【好活当赏】计入的笑点数计算」, with several holders 「合并计算」.
+     *
+     * <p>Two consequences, both intended: damage is computed from the count that was frozen when the state arrived (so
+     * the pool growing afterwards does not move it), and with NO holder the factor is 1.0 - a battle that never had an
+     * Aha Moment has no laugh points folded into anything.
      */
     public double elationLaughMultiplier() {
-        double laughs = partyResourceValue("\u7b11\u70b9");
+        double laughs = countedLaughPoints();
         return 1 + laughs * 5.0 / (laughs + 240);
     }
 
