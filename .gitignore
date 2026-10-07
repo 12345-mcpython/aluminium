@@ -15,3 +15,6 @@ tools/_*
 # `git checkout HEAD -- <path>`, because a .bak goes stale and `checkout --` restores the INDEX rather than
 # HEAD - both of which have cost this project rounds. One was committed by accident once, so keep them out.
 *.bak
+
+# Parallel coverage-sweep worktrees and their logs
+tools/_sweep/
