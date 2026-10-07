@@ -3656,6 +3656,29 @@ public class Battle {
         }
     }
 
+    /**
+     * Records the unit that 【美学底本】 sat on when the battle began - the technique's own half.
+     *
+     * <p>Reader: 1503 Pearl (真珠)'s technique - 「使用秘技后获得【美学底本】，切换行动角色时【美学底本】转移至当前行动角色。下一次
+     * 战斗开始时，真珠获得 20 点【好活当赏】，并【深度学习】持有【美学底本】的角色」.
+     *
+     * <p>⚠ <b>Why the caller states it.</b> 「切换行动角色」 is something that happens on the MAP, between battles, and the
+     * engine cannot observe it - exactly like the technique itself, which is why {@link #markTechniqueUsed} exists. So the
+     * fact arrives the same way, and the engine's job is to let the rules READ it rather than to invent a map layer.
+     * Whatever the caller passes is the unit holding the mark, which is what the battle-start clause needs to know.
+     *
+     * <p>Call before {@link #startBattle()}. A unit passed here that used no technique still holds the mark, because the
+     * two facts are separate: the technique is Pearl's, the mark is whoever's it moved to.
+     */
+    public void markArchetypeHolder(CanHit unit) {
+        techniqueArchetype = unit;
+    }
+
+    /** The unit 【美学底本】 sat on when the battle began, or {@code null} when the caller told us of none. */
+    public CanHit archetypeHolder() {
+        return techniqueArchetype;
+    }
+
     /** Gives every unit whose technique was used a permanent "秘技" state, before anything reads BATTLE_START. */
     private void applyTechniqueStates() {
         for (CanHit unit : techniqueUsers) {
@@ -3664,6 +3687,20 @@ public class Battle {
             }
             unit.getBuffManager().addBuff(new com.laosun.aluminium.models.buff.StateBuff("秘技", 1, true));
         }
+        // The technique's own mark, on the unit the caller named - 「使用秘技后获得【美学底本】」. Applied HERE rather than
+        // by a rule because it exists BEFORE the battle does; the rules then read it (`self has_state 美学底本`) to find
+        // who to apply 深度学习 to.
+        // Note: Only when SOMEONE used a technique. The mark comes from 【秘技】, so a battle where nobody used one has no
+        // archetype to hold it - and a caller that names a holder anyway gets no mark rather than a state nothing
+        // granted. Measured: the first version marked unconditionally, and the judge's "no technique, no mark" control
+        // found it.
+        if (techniqueArchetype != null && !techniqueArchetype.isDeath() && !techniqueUsers.isEmpty()) {
+            techniqueArchetype.getBuffManager()
+                    .addBuff(new com.laosun.aluminium.models.buff.StateBuff("美学底本", 1, true));
+        }
     }
+
+    /** The unit 【美学底本】 sat on at the start of the battle; see {@link #markArchetypeHolder}. */
+    private CanHit techniqueArchetype;
 
 }
