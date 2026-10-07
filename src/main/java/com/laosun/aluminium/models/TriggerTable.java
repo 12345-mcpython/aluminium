@@ -928,7 +928,12 @@ public class TriggerTable {
             // to catch (measured: 1503's Eidolon 4 doubling was refused as "one sentence written twice"). Reading the
             // rank as a CONDITION puts the difference inside the clause, where the guard can see it and where a reader
             // can see it too.
-            "eidolon");
+            "eidolon",
+            // "施放欢愉技计入的笑点大于等于 20 个" (reader: 1506 Silver Wolf LV.999's trace 1506102). Distinct from
+            // `self_resource:笑点`: that reads a POOL's current value, while this reads the count Elation damage is
+            // actually computed from - the merged snapshots taken when 【好活当赏】 was granted. They differ whenever the
+            // pool has moved since the state arrived, which is exactly the case the state exists to describe.
+            "counted_laughs");
 
     /**
      * The prefix of one parameterised numeric variable: {@code self_attr:SPEED}.
@@ -3729,6 +3734,11 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
                 yield hit == null ? 0 : hit.getSkillKey();
             }
                 case "hp_percent" -> hpPercent(ctx.owner());
+                // "施放欢愉技计入的笑点大于等于 20 个" (reader: 1506 Silver Wolf LV.999's trace 1506102): the laugh points
+                // that Elation damage is computed from - the merged, frozen snapshots of 【好活当赏】, NOT the party's live
+                // pool, which is the same distinction the damage factor itself makes. A context with no battle answers
+                // NaN, like every other unreadable variable here.
+                case "counted_laughs" -> ctx.battle() == null ? Double.NaN : ctx.battle().countedLaughPoints();
                 case "target_weakness_count" -> ctx.target() instanceof com.laosun.aluminium.models.enemy.Enemy weak
                             ? weak.weaknessCount() : 0;
                     case "target_debuff_count", "target_dot_count" -> ctx.target() == null ? Double.NaN

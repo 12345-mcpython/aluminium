@@ -32,7 +32,10 @@ public class CharacterConditionCoverageTest {
      * text is normalised the same way before the comparison -- a different threshold still fails.
      */
     private static String normalise(String text) {
-        Matcher matcher = Pattern.compile("([<>]=?\\s*)(\\d+)$").matcher(text);
+        // Note: `(?:\\.0)?` - the engine emits an integer literal as `2.0`, and content may write either `2` or `2.0`.
+        // Both mean the same comparison, so both normalise to the same text; without the optional group, a file written
+        // as `2.0` normalised to `2.0.0` and failed against the engine's `2.0`.
+        Matcher matcher = Pattern.compile("([<>]=?\\s*)(\\d+)(?:\\.0)?$").matcher(text);
         return matcher.find() ? matcher.replaceFirst("$1$2.0") : text;
     }
 

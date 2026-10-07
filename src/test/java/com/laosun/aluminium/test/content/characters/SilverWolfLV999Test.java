@@ -59,9 +59,12 @@ public class SilverWolfLV999Test {
         System.out.println("[1506] declared " + HIDDEN + ": max=" + spec.max() + " overflow=" + spec.overflow());
         Assertions.assertEquals(60, spec.max(), "the activation threshold is the normal cap");
         Assertions.assertEquals(240, spec.overflow(), "and the text allows 240 more");
+        // Note: Located by ID rather than by "there is only one rule on this event". The count was 1 when her file held
+        // two rules; the Elation-skill and 【无敌玩家】 batches then put four more rules on the same event, and a
+        // breadth count is a snapshot that has to be rebuilt every time content is added. The ID does not move.
         var rules = wolf.getTriggerTable().rulesFor(TriggerEvent.CAST_SETUP).stream()
-                .filter(rule -> rule.id().startsWith("p1506_")).toList();
-        Assertions.assertEquals(1, rules.size(), "the ultimate’s advance is one rule");
+                .filter(rule -> rule.id().equals("p1506_ult_advance")).toList();
+        Assertions.assertEquals(1, rules.size(), "her Ultimate's advance is one rule, named p1506_ult_advance");
         var effect = rules.getFirst().effects().getFirst();
         Assertions.assertEquals(1.0, effect.getPercent(), 1e-9, "action advance 100% (行动提前 100%)");
     }

@@ -47,7 +47,12 @@ public class UnitDisciplineTest {
             // the rule-level `min_eidolon` field beside it uses the same unit. Added when 1503's Eidolon 4 doubling
             // needed the rank inside the clause's own conditions - a rule-level field alone left the two rules
             // byte-identical and the duplicate guard refused them.
-            "eidolon");
+            "eidolon",
+            // The laugh points Elation damage is computed from - the merged snapshots of 【好活当赏】, as a COUNT.
+            // Added with 1506 Silver Wolf LV.999's trace: 「施放欢愉技计入的笑点大于等于 20 个」. Distinct from
+            // `self_resource:笑点`, which reads a POOL's value: the pool and the count differ whenever the pool has moved
+            // since the state arrived, which is the case that state exists to describe.
+            "counted_laughs");
 
     /** Of those, the ones that resolve to 0..1 rather than a count. */
     // self_energy_percent is a RATIO (current/max), so it joins the fraction family: any literal above 1 is refused.
