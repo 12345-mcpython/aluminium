@@ -21,8 +21,17 @@ public class PearlArtBarrierAndTalentTest {
     private static final String BARRIER = "\u827a\u672f\u58c1\u5792";
     private static final String GRIT = "\u541e\u7eb3\u6c99\u783e";
 
+    /**
+     * The art barrier lands on an Elation archetype and on nobody else.
+     *
+     * <p>Note: This case used to assert the 90-energy refund as well. That rule has been WITHDRAWN: the corpus says
+     * "使其【下一次】施放终结技时" - the NEXT time - and the rule fired on every ultimate the holder cast, because
+     * "next" needs the engine to take a state off the unit that CAUSED the event. The author rejected the
+     * approximation, so the rule is gone rather than sitting in the tree looking finished. The barrier's own half is
+     * exact and stays.
+     */
     @Test
-    public void theBarrierLandsOnlyOnAnElationArchetypeAndRefundsNinety() {
+    public void theBarrierLandsOnlyOnAnElationArchetype() {
         Battle battle = newBattle();
         Character pearl = battle.characters.get(0);
         Character elation = battle.characters.get(1);
@@ -32,16 +41,10 @@ public class PearlArtBarrierAndTalentTest {
         battle.fireTriggers(TriggerEvent.ULT_CAST, pearl, hunter, 0, 0);
         boolean onElation = elation.getBuffManager().hasState(BARRIER);
         boolean onHunter = hunter.getBuffManager().hasState(BARRIER);
-
-        double pearlBefore = pearl.getCurrentEnergy();
-        battle.fireTriggers(TriggerEvent.ULT_CAST, elation, elation, 0, 0);
-        double refund = pearl.getCurrentEnergy() - pearlBefore;
-        System.out.println("[pearl_barrier] on the Elation ally = " + onElation + " ; on the Hunt ally = " + onHunter
-                + " ; refund when the holder casts = " + refund);
+        System.out.println("[pearl_barrier] on the Elation ally = " + onElation + " ; on the Hunt ally = " + onHunter);
 
         Assertions.assertTrue(onElation, "an Elation-Path archetype gets the barrier");
         Assertions.assertFalse(onHunter, "a Hunt ally must NOT get it (the rule gates on target has_path)");
-        Assertions.assertEquals(90.0, refund, 1e-9, "and its holder's ultimate refunds Pearl 90 energy");
     }
 
     @Test
@@ -63,16 +66,20 @@ public class PearlArtBarrierAndTalentTest {
     }
 
     /**
-     * The talent's NUMBER, not just its state: below half HP the ally takes 15% less.
+     * The talent's NUMBER, not just its state: below half HP the ally takes 30% less.
      *
      * <p>Note: Why this case exists. The state assertion above passes for a buff carrying the right NAME and any
      * number at all, and a mutation of the shipped `-0.15` to `-0.5` was measured to leave the whole class GREEN. So
      * the magnitude is pinned here, on the engine's own settlement entrance ({@code Battle.applyDamage}, the single
      * outlet - a hand-fired {@code HP_LOST} never reaches a rule), as a RATIO of two readings taken on the same ally
      * in one battle: before the talent is up, and after.
+     *
+     * <p>Note: The figure is 30%, not the corpus's headline 15% - that one is the Lv1 row, and the author settled the
+     * level question in favour of Lv10 (#4 is 0.15 at Lv1 and 0.375 at Lv15, so 0.30 at Lv10), which is the
+     * convention every other number in the file already uses.
      */
     @Test
-    public void theTalentsReductionIsFifteenPercent() {
+    public void theTalentsReductionIsThirtyPercent() {
         Battle battle = newBattle();
         Character ally = battle.characters.get(2);
         Enemy attacker = battle.enemyUnits().getFirst();
@@ -103,11 +110,13 @@ public class PearlArtBarrierAndTalentTest {
                 + " without it ; ratio = " + (withTalent / without));
 
         Assertions.assertTrue(without > 0, "the control hit must land (" + without + ")");
-        // Note: The ratio, not the absolute numbers: the same attacker, the same victim and the same instance value
-        // are used in both readings, so the damage zones cancel into the ratio. A reduction of -0.15 divides by
-        // 1 - 0.15; a wrong magnitude (measured: -0.5) lands at 0.5 and is caught here.
-        Assertions.assertEquals(1 / 1.15, withTalent / without, 0.02,
-                "「受到的伤害降低 15%」: the hit is divided by 1 - 0.15, not by anything else");
+        // Note: The zone is MULTIPLICATIVE, not a division - `ReductionArea.add(r)` calls `multiplyPercent(-r)`, so the
+        // hit is scaled by (1 - 0.30) = 0.70. Measured, and read off the source after the numbers disagreed with the
+        // first expectation twice: the earlier `-0.15` version asserted 1/1.15 = 0.8696 and passed only because the
+        // tolerance was 0.02 against a measured 0.85 (a 1.9% error, just inside it). This case now states the engine's
+        // own relationship, at a magnitude whose error cannot hide.
+        Assertions.assertEquals(1 - 0.30, withTalent / without, 1e-6,
+                "「受到的伤害降低 30%」（Lv10）: the hit is multiplied by 1 - 0.30");
     }
 
     /**
