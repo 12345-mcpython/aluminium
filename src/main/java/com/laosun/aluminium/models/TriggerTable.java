@@ -666,7 +666,8 @@ public class TriggerTable {
                 minEidolon, validateMaxEidolon(spec, minEidolon), validatePerTurn(spec), validatePerAttack(spec),
                 Boolean.TRUE.equals(spec.getOncePerWave()), List.copyOf(targetFilters),
                 validatePerSubject(spec), validateOneOf(spec, effects), validateChanceDecay(spec),
-                spec.getOneOfNoRepeat() == null ? "" : spec.getOneOfNoRepeat().trim()));
+                spec.getOneOfNoRepeat() == null ? "" : spec.getOneOfNoRepeat().trim(),
+                Boolean.TRUE.equals(spec.getDeferUntilWave())));
     }
 
     /**
@@ -2300,6 +2301,8 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
      *                      ({@code 0} = the probability does not decay; see {@link TriggerSpec#getChanceDecay()})
      * @param oneOfNoRepeat the memory this rule's pick is filed under ({@code ""} = no memory, a uniform pick; two rules
      *                      stating the same name share it - see {@link TriggerSpec#getOneOfNoRepeat()})
+     * @param deferUntilWave {@code true} = fired with every opponent down, this rule is held until a wave brings enemies
+     *                      in ({@link TriggerSpec#getDeferUntilWave()})
      */
     public record CompiledRule(TriggerEvent event, List<Condition> conditions,
                                List<EffectSpec> effects, String source, String key, String id,
@@ -2307,7 +2310,7 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
                                int maxEidolon,
                                int perTurn, int perAttack, boolean oncePerWave,
                                List<List<Condition>> effectTargetFilters, String perSubject,
-                               boolean oneOf, double chanceDecay, String oneOfNoRepeat) {
+                               boolean oneOf, double chanceDecay, String oneOfNoRepeat, boolean deferUntilWave) {
 
         /**
          * The per-target conditions of one effect ({@code target_when}), by that effect's index in {@link #effects}.
