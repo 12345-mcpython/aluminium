@@ -32,10 +32,10 @@ RULE = {
         {
             "op": "DAMAGE",
             "scale": "self_attr:ATTACK",
-            "percent": 0.2,
+            "percent": 5.0,
             "element": "Imaginary",
             "damage_type": "TRUE",
-            "target": "highest_hp_attack_hit"
+            "target": "highest_hp_enemy"
         },
         {
             "op": "GAIN_RESOURCE",

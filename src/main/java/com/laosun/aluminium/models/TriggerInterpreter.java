@@ -204,6 +204,9 @@ public final class TriggerInterpreter {
             // "the target with the highest current HP among the attacked targets" (reader: 1403 Tribbie (缇宝)'s ultimate, whose zone rider picks that unit, and 1415's
             // ode of passage, which names that rider). The sibling of `random_hit_enemy`: same pool, a different pick.
             "highest_hp_attack_hit",
+            // "the enemy target with the highest HP", over ALL opponents - the `random_enemy` half of the same pair, for a
+            // clause whose event carries no hit set. Reader: 1506's 【超超超大剑】.
+            "highest_hp_enemy",
             // "raise the CRIT DMG of all of our memosprites" (reader: 1413 Evernight (长夜月)'s skill "白昼悄然离去").
             // `summon` says only "the owner's OWN summon", so a clause that speaks of the whole side needs its own name.
             "all_summons");
@@ -1777,6 +1780,14 @@ public final class TriggerInterpreter {
                 return;
             }
         }
+        // The battle's SKILL POINTS: a counter the battle owns outright (`Battle.skillPointPolicy`), not a `Resource`, so
+        // `partyCounterOrNull` cannot answer with it and this is where a rule reaches it. Reader: 1506 Silver Wolf
+        // LV.999's 【头号补给盲盒】 - 「【爆爆爆炸蛋】：恢复 2 个战技点」 - which is one of the three effects that rule picks
+        // between. Measured: nothing anywhere gained or spent 战技点 before this, so the name had no readout at all.
+        if (SKILL_POINT.equals(effect.getResource()) && ctx.battle() != null) {
+            ctx.battle().skillPointPolicy.gain(amount);
+            return;
+        }
         // A PARTY-scoped counter has no home on the unit: the battle owns it, so any ally may add to it.
         if (party != null) {
             int credited = party.gain(amount);
@@ -2004,6 +2015,30 @@ public final class TriggerInterpreter {
             }
             if (highest == null || hit.getCurrentHp() > highest.getCurrentHp()) {
                 highest = hit;
+            }
+        }
+        return highest;
+    }
+
+    /**
+     * The enemy with the highest CURRENT HP, over <b>all</b> of the owner's opponents.
+     *
+     * <p>Reader: 1506 Silver Wolf LV.999's 【超超超大剑】 - 「对生命值最高的敌方目标额外造成等同于本次总伤害值 20% 的真实伤害」. Its
+     * trigger is a spent Skill Point, which carries no hit set, so {@link #highestHitTarget} - the ATTACK-HIT pool - cannot
+     * answer it; this is the same pair of pools `random_enemy` and `random_hit_enemy` already distinguish. Like those, it
+     * fails loudly when nothing qualifies rather than silently aiming at nobody.
+     */
+    private static CanHit highestHpEnemy(TriggerContext ctx) {
+        if (ctx.battle() == null) {
+            return null;
+        }
+        CanHit highest = null;
+        for (CanHit enemy : ctx.battle().getOpponents(ctx.owner())) {
+            if (enemy == null || enemy.isDeath() || !ctx.passesTargetFilter(enemy)) {
+                continue;
+            }
+            if (highest == null || enemy.getCurrentHp() > highest.getCurrentHp()) {
+                highest = enemy;
             }
         }
         return highest;
@@ -2270,6 +2305,11 @@ public final class TriggerInterpreter {
             }
             case TARGET_RANDOM_ENEMY -> require(ctx.battle() == null ? null : ctx.battle().randomOpponent(ctx.owner()),
                     TARGET_RANDOM_ENEMY, ctx);
+            // "the enemy target with the highest HP" - ALL of the opponents, not the ones this attack happened to hit.
+            // Reader: 1506 Silver Wolf LV.999's 【超超超大剑】 - 「对生命值最高的敌方目标额外造成…真实伤害」 - which fires from a
+            // Skill-Point event that carries no hit set at all, so `highest_hp_attack_hit` (same pool as
+            // `random_hit_enemy`) cannot answer it. The pair is exactly like `random_hit_enemy` / `random_enemy`.
+            case "highest_hp_enemy" -> require(highestHpEnemy(ctx), "highest_hp_enemy", ctx);
             // "the character holding [同袍]": the single-target path asks the same question the list path does, and a
             // single-target op has to name ONE unit -- so "nobody holds it" surfaces through `require`'s message
             // rather than silently applying to nobody (the list path's empty answer is documented on the prefix).
@@ -3802,6 +3842,16 @@ public final class TriggerInterpreter {
      * additive Elation rider, which is what "counts five times as many laughs" buys.
      */
     private static final String COUNTED_LAUGHS = "counted_laughs";
+
+    /**
+     * The battle's SKILL POINTS, under the name content spells: 「战技点」.
+     *
+     * <p>Not a {@code Resource}: the battle owns it ({@code Battle.skillPointPolicy}), and every other counter this DSL
+     * touches lives in a {@code ResourceManager}. So {@code GAIN_RESOURCE} reaches it through its own branch, which is
+     * also why the name appears nowhere in the declared-resource checks - a character does not declare it, the battle has
+     * it. Reader: 1506's 【爆爆爆炸蛋】.
+     */
+    private static final String SKILL_POINT = "战技点";
 
     /**
      * "when SPD is greater than or equal to X ... for each 1 point of SPD above that ...": {@code self_attr_above:<ATTRIBUTE>:<threshold>}.

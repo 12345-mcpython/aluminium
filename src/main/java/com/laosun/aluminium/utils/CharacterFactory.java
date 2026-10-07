@@ -273,8 +273,24 @@ public final class CharacterFactory {
      * @return the same table, for chaining
      * @throws CharacterException when a rule reads or writes a resource that is not declared
      */
+    /**
+     * Counters the BATTLE owns, which no character declares.
+     *
+     * <p>「战技点」 is the first: it lives in {@code Battle.skillPointPolicy}, so a character cannot declare it and a
+     * declaration would have to invent a cap the battle already knows. Content still spells it like any other counter, and
+     * {@code TriggerInterpreter} routes the write to the battle.
+     */
+    private static final java.util.Set<String> BATTLE_OWNED_COUNTERS = java.util.Set.of("战技点");
+
     public static TriggerTable requireReadableResources(int cid, TriggerTable table) {
         for (String referenced : table.referencedResources().stream().sorted().toList()) {
+            // The BATTLE's own counters are not declared by a character, because no character owns them: the skill points
+            // live in `Battle.skillPointPolicy`, and `TriggerInterpreter` reaches them through its own branch. Reader: 1506
+            // Silver Wolf LV.999's 【爆爆爆炸蛋】 - 「恢复 2 个战技点」. Measured: nothing had ever gained or spent them, so
+            // this exemption is where the name becomes reachable rather than a declaration nobody could honestly write.
+            if (BATTLE_OWNED_COUNTERS.contains(referenced)) {
+                continue;
+            }
             boolean declared = table.resources().stream().anyMatch(spec -> spec.id().equals(referenced));
             if (!declared) {
                 throw new CharacterException(

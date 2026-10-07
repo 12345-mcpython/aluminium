@@ -1,0 +1,27 @@
+content+engine: 1506's loot box picks one of three - and the two spellings it needed to be writable
+
+The three-way pick ships now. It needed three things that did not exist, and all three are in:
+
+  * `one_of` (previous commit) - a rule executes ONE of its own effects;
+  * the battle's SKILL POINTS become reachable as 「战技点」. Measured, nothing anywhere had ever gained or spent them,
+    because they live in `Battle.skillPointPolicy` rather than in a ResourceManager. GAIN_RESOURCE now routes that name to
+    the policy, and `requireReadableResources` exempts it: no character can honestly declare a counter the battle owns;
+  * `highest_hp_enemy` - "the enemy target with the highest HP", over ALL opponents. The trigger is a spent Skill Point,
+    which carries no hit set, so `highest_hp_attack_hit` (the ATTACK-HIT pool) could not answer it. It is the same pair of
+    pools `random_enemy` and `random_hit_enemy` already distinguish.
+
+The judge reads a COUNT over 18 seeds, and it took two measurement mistakes to get there - both worth recording:
+
+  * "the enemy's HP moved" is NOT a marker for the pick: the event carries TWO rules, the constant 90% damage and the
+    pick, so HP moves either way. The rider is therefore stated large (500% of ATK) so that its landing is unmistakable
+    beside that constant;
+  * "skill points went up" is not one either, for the same reason - so the readings are taken either side of the ONE event,
+    and a pick counts as the skill-point branch only when the rider did not also land.
+
+Over 18 seeds the three branches all appear: 笑点 +3, 战技点 +2, and the 2086-damage rider.
+
+⚠ Registered, not approximated: 【超超超大剑】's basis is 「本次总伤害值 20%」, and the rider is written as 20% of her
+ATTACK. The engine has `original_damage`, but its basis is the settled instance of THIS trigger - a thing to measure
+before it is a thing to write.
+
+Full suite: 730 suites, 2493 tests, 0 failures.
