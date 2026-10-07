@@ -825,6 +825,97 @@ public class Battle {
         return 1 + laughs * 5.0 / (laughs + 240);
     }
 
+    /**
+     * The laugh points a settlement of Elation damage will use, once the count is modelled as the document states it.
+     *
+     * <p><b>Not wired into the factor yet, on purpose.</b> The encyclopedia says the count is 「本次阿哈时刻的笑点」
+     * frozen when the state is granted, merged across holders, each timed on its own turns - and the elapsed part of
+     * that model is what this and {@link #noteElationGift} implement. The factor still reads the live party pool, so
+     * that building this changes no number anywhere; switching the factor over is the second step, and it will move
+     * every Elation expectation in the suite at once.
+     */
+    public int countedLaughPoints() {
+        int total = 0;
+        for (Snapshot snapshot : laughSnapshots.values()) {
+            if (!snapshot.hasExpired()) {
+                total += snapshot.points();
+            }
+        }
+        return total;
+    }
+
+    /**
+     * One holder's frozen laugh count and its own remaining turns.
+     *
+     * <p>「各个【好活当赏】的持续时间各自独立计算」: each instance runs down on its OWN holder's turns, so the holder is
+     * part of the record rather than the battle carrying one shared deadline.
+     */
+    private record Snapshot(int points, int turnsLeft) {
+        boolean hasExpired() {
+            return turnsLeft <= 0;
+        }
+    }
+
+    /** One record per holder, replaced when the state is granted again. */
+    private final java.util.Map<CanHit, Snapshot> laughSnapshots = new java.util.IdentityHashMap<>();
+
+    /**
+     * A unit received 【好活当赏】: freeze the party's 笑点 as ITS count, to run down over {@code turns} of its own turns.
+     *
+     * <p>Called wherever the state is granted, whatever spelling the rule used, so 「将本次阿哈时刻的笑点计入该状态」 has one
+     * implementation rather than one per rule.
+     *
+     * @param turns how many of the holder's turns it lasts (the document states 2)
+     */
+    public void noteElationGift(CanHit holder, int turns) {
+        if (holder == null || holder.isDeath()) {
+            return;
+        }
+        laughSnapshots.put(holder, new Snapshot(partyResourceValue("\u7b11\u70b9"), Math.max(1, turns)));
+    }
+
+    /** One holder's frozen count, 0 when it holds none. For judges, and for the demo's output. */
+    public int laughSnapshotOf(CanHit holder) {
+        Snapshot snapshot = laughSnapshots.get(holder);
+        return snapshot == null || snapshot.hasExpired() ? 0 : snapshot.points();
+    }
+
+    /** How many holders are counted right now - the "how many【好活当赏】" a judge can read. */
+    public int laughSnapshotHolders() {
+        return (int) laughSnapshots.values().stream().filter(s -> !s.hasExpired()).count();
+    }
+
+    /** Counts one of the unit's own turns against its snapshot, dropping it when the last one is gone. */
+    private void tickLaughSnapshots(CanHit holder) {
+        Snapshot snapshot = laughSnapshots.get(holder);
+        if (snapshot == null) {
+            return;
+        }
+        int left = snapshot.turnsLeft() - 1;
+        if (left <= 0) {
+            laughSnapshots.remove(holder);
+        } else {
+            laughSnapshots.put(holder, new Snapshot(snapshot.points(), left));
+        }
+    }
+
+    /**
+     * Ends {@code unit}'s turn: the document's own boundary for anything timed in a unit's turns.
+     *
+     * <p>Note: Exposed because a per-turn duration has to be drivable from a judge as ONE action. {@link #afterMove}
+     * is the engine's own path and it does more than this (the actor's hook, the buff tick, the extra-turn pairing), so
+     * a case that wants to say "two of its turns have passed" should not have to reproduce that sequence - the first
+     * version of the snapshot judge fired {@code TURN_END} directly, which is a different event from the boundary and
+     * left the snapshot unticked.
+     */
+    public void endTurnOf(CanHit unit) {
+        if (unit == null) {
+            return;
+        }
+        tickLaughSnapshots(unit);
+        fireTriggers(TriggerEvent.TURN_END, unit, unit, 0, 0);
+    }
+
     public int partyResourceValue(String id) {
         com.laosun.aluminium.models.Resource resource = partyResources.get(id);
         return resource == null ? 0 : resource.value();
@@ -1377,7 +1468,9 @@ public class Battle {
             if (actor instanceof com.laosun.aluminium.models.enemy.Enemy ticking) {
                 ticking.tickTimedWeaknesses();
             }
-            fireTriggers(TriggerEvent.TURN_END, actor, actor, 0, 0);
+            // 「各个【好活当赏】的持续时间各自独立计算」: a laugh snapshot is counted in ITS HOLDER's own turns, exactly like
+            // the timed weakness above is counted in the target's. Same boundary, same reason.
+            endTurnOf(actor);
         // "(if not restored) otherwise it will immediately fall into the unable-to-fight state" (140's Moon Cocoon's Ward (月茧之庇)): a death that a deferring state held
         // is committed HERE -- the carrier's turn is over (so it really did "act normally"), and the next turn has not begun
         // (so a heal or a shield up to this point still saves it). Nothing removed the state, so it falls now.

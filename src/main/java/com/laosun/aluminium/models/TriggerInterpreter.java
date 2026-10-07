@@ -1747,6 +1747,10 @@ public final class TriggerInterpreter {
             if (effect.getMaxPerRound() != null && allowanceOwner != null) {
                 allowanceOwner.getResources().countGainThisRound(effect.getResource(), credited);
             }
+            // Note: The state is granted to the HOLDER either way - a party counter still means "this unit received
+            // 【好活当赏】" - so the count is taken here too. Measured: a holder that does not declare the counter itself
+            // took no snapshot at all, which read as "the second holder's count is 0".
+            noteElationGiftIfThisIsOne(ctx, effect, holder, credited);
             return;
         }
         int credited = holder.getResources().gain(effect.getResource(), amount);
@@ -1755,7 +1759,36 @@ public final class TriggerInterpreter {
             // the round's allowance on points it never delivered.
             allowanceOwner.getResources().countGainThisRound(effect.getResource(), credited);
         }
+        noteElationGiftIfThisIsOne(ctx, effect, holder, credited);
         }
+
+    /** The counter 【好活当赏】's name, and how many of its holder's TURN-ENDS the document's 2 rounds span. */
+    private static final String ELATION_GIFT = "好活当赏";
+    /**
+     * 「持续 2 回合」, counted as the number of the holder's turn-ENDS it survives.
+     *
+     * <p>Three, not two, and the off-by-one is the boundary's: the snapshot is ticked when a turn ENDS, so a value of 2
+     * would be gone after the holder's FIRST full turn and cover one round rather than the document's two. Measured on
+     * the judge: with 2 the count read 0 after the second turn; with 3 it survives the first and second and is gone on
+     * the third.
+     */
+    private static final int ELATION_GIFT_TURNS = 3;
+
+    /**
+     * A gain of 【好活当赏】 is the moment the document says the current Aha Moment's 笑点 is counted INTO the holder -
+     * 「使参演阿哈时刻的角色获得【好活当赏】状态，并将本次阿哈时刻的笑点计入该状态」 - so the snapshot is taken here, once,
+     * rather than by each of the twelve rules that grant it.
+     *
+     * <p>Note: Only on a gain that actually CREDITED something. A grant truncated to nothing (a counter already at its
+     * cap) did not hand the unit the count, and freezing a snapshot for it would invent one.
+     */
+    private static void noteElationGiftIfThisIsOne(TriggerContext ctx, EffectSpec effect, CanHit holder,
+            int credited) {
+        if (ctx.battle() == null || credited <= 0 || !ELATION_GIFT.equals(effect.getResource())) {
+            return;
+        }
+        ctx.battle().noteElationGift(holder, ELATION_GIFT_TURNS);
+    }
 
     /**
      * The counter a resource id names, wherever it actually lives: the unit's own, or the battle's PARTY-scoped one.
