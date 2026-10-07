@@ -93,6 +93,38 @@ public class PearlDefenceValueTest {
                 "and it bought exactly 200 of cover, which is the #5 the talent states");
     }
 
+    /**
+     * The SHARE is what caps the block, and this case is the only one where that cap binds.
+     *
+     * <p>Note: Why it is needed, and why the other three cases could not stand in for it. A point buys 200 and the
+     * share is 60%, so the two caps only differ once the hit is large: at a hit of 66.84 the single point bought
+     * covers the whole 60% share, and even raising the share to 100% changes nothing - which was measured, not
+     * assumed: the {@code percent: 0.6 -> 1.0} mutation left every case here GREEN until this one existed. The
+     * instance is therefore stated large (3000 raw, ~2005 settled) so that 60% (~1203) needs 7 points while 100%
+     * (~2005) needs 11, and a case that reads the POINTS SPENT tells the two apart.
+     */
+    @Test
+    public void theSixtyPercentShareIsWhatCapsTheBlock() {
+        Battle battle = newBattle(30);
+        Character pearl = battle.characters.getFirst();
+        Character ally = battle.characters.get(1);
+        double cost = hit(battle, ally, 3000);
+        int spent = 30 - pearl.getResources().value(COUNTER);
+        double control = hit(newBattle(0), null, 3000);
+        System.out.println("[pearl_defence] large hit: cost " + cost + " (control " + control + ") ; points spent "
+                + spent);
+
+        Assertions.assertTrue(control > 0, "precondition: the large hit lands (" + control + ")");
+        // The share is 60% of the SETTLED amount, so the block is capped there even though 30 points (6000 of cover)
+        // are available. Measured: the block lands just under the cap because points are whole.
+        Assertions.assertTrue(control - cost < 0.6 * control + 200,
+                "the block does not exceed the 60% share plus a point's worth of rounding (" + (control - cost)
+                        + " vs " + (0.6 * control) + ")");
+        Assertions.assertEquals(7, spent,
+                "and the share is what decided the spend: 60% of the settled amount needs 7 points, where blocking"
+                        + " the whole hit would need 11");
+    }
+
     // ==================================================================
     // Helpers
     // ==================================================================
