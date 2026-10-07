@@ -66,6 +66,63 @@ public class OneOfEffectTest {
         Assertions.assertEquals(3, count, "a rule without `one_of` runs all of its effects, as it always did");
     }
 
+    /**
+     * An effect marked {@code always} runs EVERY firing while exactly one of the rest runs.
+     *
+     * <p>Reader: 1506's 【头号补给盲盒】, whose own 90% is 「造成…伤害，<b>并</b>随机触发 1 种效果」 - the box's damage is not one of
+     * the three that can be picked. It is the same rule and not a second one because the box's fixed chance is one roll.
+     */
+    @Test
+    public void anAlwaysEffectStaysOutOfThePick() {
+        boolean sawA = false;
+        boolean sawB = false;
+        int countA = 0;
+        int countB = 0;
+        for (int seed = 0; seed < 24; seed++) {
+            Character wolf = marksWithAnAlwaysEffect(seed);
+            boolean constant = wolf.getBuffManager().hasState(C);
+            boolean a = wolf.getBuffManager().hasState(A);
+            boolean b = wolf.getBuffManager().hasState(B);
+            int picked = (a ? 1 : 0) + (b ? 1 : 0);
+            System.out.println("[one_of] always seed " + seed + ": constant=" + constant + " A=" + a + " B=" + b);
+            Assertions.assertTrue(constant,
+                    "seed " + seed + ": the `always` effect must run every firing, picked or not");
+            Assertions.assertEquals(1, picked,
+                    "seed " + seed + ": exactly one of the two POOL effects runs - 0 means the always-effect "
+                            + "swallowed the pick, 2 means the roll went per effect");
+            countA += a ? 1 : 0;
+            countB += b ? 1 : 0;
+            sawA |= a;
+            sawB |= b;
+        }
+        System.out.println("[one_of] always over 24 seeds: A=" + countA + " B=" + countB);
+        Assertions.assertTrue(sawA && sawB, "and the pool is what the roll chooses from - both of its effects appear");
+    }
+
+    /** `always` on a rule with no `one_of` marks nothing: it reads like a forgotten field, so it is refused. */
+    @Test
+    public void alwaysWithoutOneOfIsRefused() {
+        EffectSpec constant = mark(A);
+        TriggerSpecs.set(constant, "always", true);
+        IllegalArgumentException error = Assertions.assertThrows(IllegalArgumentException.class,
+                () -> table(TriggerSpecs.rule("TURN_START", List.of(), constant, mark(B))));
+        System.out.println("[one_of] `always` without the field refused: " + error.getMessage());
+        Assertions.assertTrue(error.getMessage().contains("one_of"), "the message names the field it needs");
+    }
+
+    /** The POOL is what "at least two" counts: one constant plus one pick is "pick one of one". */
+    @Test
+    public void aPoolOfOneBesideAnAlwaysEffectIsRefused() {
+        EffectSpec constant = mark(C);
+        TriggerSpecs.set(constant, "always", true);
+        EffectSpec onlyPick = mark(A);
+        TriggerSpec spec = TriggerSpecs.rule("TURN_START", List.of(), onlyPick, constant);
+        TriggerSpecs.set(spec, "oneOf", true);
+        IllegalArgumentException error = Assertions.assertThrows(IllegalArgumentException.class, () -> table(spec));
+        System.out.println("[one_of] a pool of one refused: " + error.getMessage());
+        Assertions.assertTrue(error.getMessage().contains("one_of"), "the message names the field");
+    }
+
     /** "Pick one of one" states nothing, and reads exactly like a rule that forgot the field. */
     @Test
     public void aSingleEffectWithTheFieldIsRefused() {
@@ -94,6 +151,33 @@ public class OneOfEffectTest {
 
     private static Character marksAfterOneFiring(int seed) {
         return marksAfterOneFiring(seed, true);
+    }
+
+    /** The same firing, with a rule of three marks where the THIRD is {@code always}: A/B are the pool, C is constant. */
+    private static Character marksWithAnAlwaysEffect(int seed) {
+        Battle battle = new Battle(
+                List.of(CharacterFactory.create(WOLF, 80), CharacterFactory.create(ALLY, 80)),
+                List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(seed));
+        battle.startBattle();
+        battle.processRequests();
+        Character wolf = battle.characters.getFirst();
+        EffectSpec constant = mark(C);
+        TriggerSpecs.set(constant, "always", true);
+        TriggerSpec spec = TriggerSpecs.rule("TURN_START", List.of("actor == self"), mark(A), mark(B), constant);
+        TriggerSpecs.set(spec, "oneOf", true);
+        wolf.setTriggerTable(table(spec));
+        // ⚠ Burn four draws first, and the reason is measured rather than tidy: `nextInt(2)` takes the
+        // POWER-OF-TWO branch of `java.util.Random`, which reads the TOP bit of `next(31)` - and the FIRST draw of
+        // `new Random(seed)` has nearly the same top bits for small seeds. Measured: two effects and 24 seeds 0..23
+        // answered 1 every single time, so the pool looked like a constant. Three effects hid it, because `nextInt(3)`
+        // takes the other branch and reads the LOW bits. Nothing here is wrong with the engine - it is how this fixture
+        // must hand it a source, and a battle that draws once before its first pick would never see it.
+        for (int draw = 0; draw < 4; draw++) {
+            battle.getRng().nextInt();
+        }
+        battle.fireTriggers(TriggerEvent.TURN_START, wolf, wolf, 0, 0);
+        battle.processRequests();
+        return wolf;
     }
 
     /** Applies one firing of a three-effect rule and returns the unit, so the caller can read the markers. */

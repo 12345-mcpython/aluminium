@@ -211,6 +211,11 @@ public class TriggerSpec {
      * because it FILTERS (several effects may survive it); this one is exclusive, which is why the two cannot be combined
      * without a second reading - see the loader's check.
      *
+     * <p>⚠ <b>The pool is the effects not marked {@code always}</b> ({@link EffectSpec#getAlways()}), which is how one
+     * sentence that both deals damage and picks among three effects stays ONE rule: "造成 90% 的…伤害，并随机触发 1 种效果".
+     * The pool's size is what "at least two" is measured on; an {@code always} effect may even carry its own
+     * {@code min_eidolon}, since nothing picks it.
+     *
      * <p>The pick is made ONCE per firing, not once per effect: rolling for each would as easily execute none of them as
      * two of them, and neither is "one of".
      */

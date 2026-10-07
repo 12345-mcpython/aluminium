@@ -18,6 +18,9 @@ import java.util.Random;
  * <p>「…造成 90% 的虚数属性欢愉伤害，由敌方全体均分，并随机触发 1 种效果：【超超超大剑】：对生命值最高的敌方目标额外造成等同于本次总伤害值
  * 20% 的真实伤害；【爆爆爆炸蛋】：恢复 2 个战技点；【怪怪怪味豆】：获得 3 个笑点。」
  *
+ * <p>⚠ The box is ONE rule: its own 90% carries {@code always} (「造成…伤害，<b>并</b>随机触发 1 种效果」 - it is not one of the
+ * three), which is also what lets the box have a single fixed chance.
+ *
  * <p>⚠ <b>Two enemies, and the reason is the sword's base.</b> The box settles one instance per enemy, and the sword's
  * share is taken of their TOTAL - so with two enemies a rider that read only the instance on its own target would land
  * at 1.1x the box's damage instead of 1.2x. With one enemy the two readings are the same number, and the judge could
@@ -36,7 +39,7 @@ public class SilverWolfLV999LootPickTest {
     private static final int ALLY = 1204;
     private static final int MONSTER = 1002011;
     private static final String LAUGH = "笑点";
-    /** The effect indices of the box's three effects, in the order the file states them. */
+    /** What the scripted roll answers with: an index into the box's POOL, in the order the file states the three. */
     private static final int PICK_SWORD = 0;
     private static final int PICK_POINTS = 1;
     private static final int PICK_LAUGHS = 2;

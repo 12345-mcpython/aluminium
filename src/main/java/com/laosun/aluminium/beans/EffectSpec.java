@@ -55,6 +55,7 @@ public class EffectSpec {
         copy.amountFromEvent = amountFromEvent;
         copy.amountFromPrevious = amountFromPrevious;
         copy.minEidolon = minEidolon;
+        copy.always = always;
         copy.amountCap = amountCap;
         copy.ordinary = ordinary;
         copy.perStack = this.perStack;
@@ -229,6 +230,24 @@ return copy;
      */
     @com.google.gson.annotations.SerializedName("min_eidolon")
     private Integer minEidolon;
+
+    /**
+     * This effect is <b>not one of the rule's {@code one_of} picks</b>: it runs every time the rule triggers.
+     *
+     * <p>Reader: 1506 Silver Wolf LV.999's 【头号补给盲盒】 - 「造成 <b>90%</b> 的虚数属性欢愉伤害，由敌方全体均分，<b>并</b>随机触发 1 种效果：
+     * 【超超超大剑】…／【爆爆爆炸蛋】…／【怪怪怪味豆】…」 - where the box's own damage is not one of the three that can be picked.
+     *
+     * <p><b>Why the box is one rule and not two.</b> The sentence gives the box ONE <b>fixed chance</b> that decays after
+     * each successful trigger (「触发该效果的初始固定概率为 100%，成功触发后…降低至当前概率的 20%」). Split across two rules, the
+     * two halves would roll separately - the damage landing without the pick, or the pick without the damage - and each
+     * half would carry a decay of its own. One roll for the whole box needs one rule, and the damage needs a way to stay
+     * out of the pool.
+     *
+     * <p>Note: Stating it on a rule that does not state {@code one_of} says nothing and reads exactly like a forgotten
+     * field, so the loader refuses that pair - the same reason "pick one of one" is refused.
+     */
+    @com.google.gson.annotations.SerializedName("always")
+    private Boolean always;
 
     /**
      * Note: from 1505's Eidolon "额外获得等同于本次获得的[好活当赏]50%/100%":

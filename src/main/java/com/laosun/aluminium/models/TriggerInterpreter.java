@@ -1098,12 +1098,24 @@ public final class TriggerInterpreter {
         // `one_of`: ONE of the rule's effects runs, picked at random. Rolled HERE, once per firing, and not inside the
         // loop: a roll per effect would as easily run none of them as two of them, and neither is "one of". Reader:
         // 1506's 【头号补给盲盒】 and light cone 21032's 「随机生效 1 个效果」.
+        // Note: The roll is over the POOL - the effects NOT marked `always` - and it answers with the effect's own
+        // index. Reader for the marker: the same box's own 90%, which 「造成…伤害，并随机触发 1 种效果」 - it runs every
+        // time, and it is in this rule rather than a second one because the box's fixed chance is ONE roll (and, with
+        // `chance_decay`, one decaying number) for the whole box.
         int chosen = -1;
-        if (rule.oneOf() && battle != null && !rule.effects().isEmpty()) {
-            chosen = battle.getRng().nextInt(rule.effects().size());
+        if (rule.oneOf() && battle != null) {
+            java.util.List<Integer> pool = new java.util.ArrayList<>();
+            for (int index = 0; index < rule.effects().size(); index++) {
+                if (!Boolean.TRUE.equals(rule.effects().get(index).getAlways())) {
+                    pool.add(index);
+                }
+            }
+            if (!pool.isEmpty()) {
+                chosen = pool.get(battle.getRng().nextInt(pool.size()));
+            }
         }
         for (EffectSpec effect : rule.effects()) {
-            if (chosen >= 0 && effectIndex != chosen) {
+            if (chosen >= 0 && effectIndex != chosen && !Boolean.TRUE.equals(effect.getAlways())) {
                 effectIndex++;
                 continue;
             }

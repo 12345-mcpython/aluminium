@@ -638,27 +638,50 @@ public class TriggerTable {
     }
 
     /**
-     * Whether this rule picks ONE of its effects at random - and the two combinations that must be refused with it.
+     * Whether this rule picks ONE of its effects at random - and the combinations that must be refused with it.
      *
      * <p>Reader: 1506 Silver Wolf LV.999's 【头号补给盲盒】 - 「随机触发 1 种效果」 - and light cone 21032's 「随机生效 1 个效果」.
      *
-     * <p>Refused, both being the "two readings" shape this vocabulary will not carry:
+     * <p>⚠ The pool is the effects that are <b>not</b> marked {@code always} (reader: the same box's own 90%, which is
+     * 「造成…伤害，<b>并</b>随机触发 1 种效果」 - it runs every time and is not one of the three). So the count below is the
+     * POOL's, not the rule's: a box with one constant effect and two picks is a pick of two.
+     *
+     * <p>Refused, each being the "two readings" or "says nothing" shape this vocabulary will not carry:
      * <ul>
-     *   <li>fewer than two effects - "pick one of one" states nothing, and reads exactly like a rule that forgot the field;
-     *   <li>an effect carrying its own {@code min_eidolon} - the two filters then compose two ways (rank first, or pick
-     *       first and possibly land on an effect the rank excludes, i.e. a firing that does nothing).</li>
+     *   <li>{@code always} on an effect of a rule that states no {@code one_of} - it marks nothing, and reads like a
+     *       forgotten field;
+     *   <li>a pool of fewer than two effects - "pick one of one" states nothing, and reads exactly like a rule that
+     *       forgot the field;
+     *   <li>a POOL effect carrying its own {@code min_eidolon} - the two filters then compose two ways (rank first, or
+     *       pick first and possibly land on an effect the rank excludes, i.e. a firing that does nothing). An
+     *       {@code always} effect may carry one: nothing picks it, so there is only one reading.</li>
      * </ul>
      */
     private static boolean validateOneOf(TriggerSpec spec, List<EffectSpec> effects) {
         if (!Boolean.TRUE.equals(spec.getOneOf())) {
+            for (EffectSpec effect : effects) {
+                if (Boolean.TRUE.equals(effect.getAlways())) {
+                    throw new IllegalArgumentException(
+                            "An effect states \"always\" but its rule does not state \"one_of\": there is no pick for "
+                                    + "it to stay out of, so the field says nothing (source: " + spec.getSource() + ")");
+                }
+            }
             return false;
         }
-        if (effects.size() < 2) {
-            throw new IllegalArgumentException(
-                    "Trigger rule states \"one_of\" but has " + effects.size() + " effect(s); "
-                            + "\"pick one of one\" states nothing (source: " + spec.getSource() + ")");
-        }
+        List<EffectSpec> pool = new ArrayList<>();
         for (EffectSpec effect : effects) {
+            if (!Boolean.TRUE.equals(effect.getAlways())) {
+                pool.add(effect);
+            }
+        }
+        if (pool.size() < 2) {
+            throw new IllegalArgumentException(
+                    "Trigger rule states \"one_of\" but has " + pool.size() + " effect(s) to pick from"
+                            + (pool.size() == effects.size() ? "" : " (the other " + (effects.size() - pool.size())
+                            + " are marked \"always\")")
+                            + "; \"pick one of one\" states nothing (source: " + spec.getSource() + ")");
+        }
+        for (EffectSpec effect : pool) {
             if (effect.getMinEidolon() != null) {
                 throw new IllegalArgumentException(
                         "Trigger rule states \"one_of\" and an effect states its own \"min_eidolon\": the two compose "
