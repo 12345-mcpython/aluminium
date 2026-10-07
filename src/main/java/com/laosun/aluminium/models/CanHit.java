@@ -218,6 +218,21 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
     private final Map<String, Integer> ruleEffectMaxStacksBonus = new HashMap<>();
 
     /**
+     * Per-battle <b>current fixed probabilities</b> of rules that decay, keyed by that rule's {@code id}.
+     *
+     * <p>"触发该效果的初始固定概率为 100%，成功触发后下一次触发的固定概率降低至当前概率的 20%": the rule's own {@code chance} is the
+     * INITIAL value, and this map holds where it has decayed to. Reader: 1506 Silver Wolf LV.999's 【头号补给盲盒】.
+     *
+     * <p><b>Why the number lives here and not on the rule.</b> Exactly like the amendments above: a trigger table is
+     * compiled once and cached per cid, so writing a decayed probability onto the rule would leak it into every battle
+     * in the JVM and into every later firing of the cached table. The probability is a fact about <b>this combatant in
+     * this battle</b>, so it sits next to the firing counters and is cleared with them. An absent entry means "still at
+     * the initial value", which is why {@link #resetRuleChance} is a removal rather than a write.
+     */
+    @Getter(AccessLevel.NONE)
+    private final Map<String, Double> ruleCurrentChance = new HashMap<>();
+
+    /**
      * Per-battle <b>skill level raises</b>, keyed by slot: "战技等级+1""终结技等级+1" (1001 Eidolon (星魂) 3/5, and the
      * same sentence in most characters' kits).
      *
@@ -826,7 +841,54 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
         ruleEffectPercentBonus.clear();
         ruleEffectTurnsBonus.clear();
         ruleEffectMaxStacksBonus.clear();
+        ruleCurrentChance.clear();
         skillLevelBonus.clear();
+    }
+
+    /**
+     * The probability the rule named {@code ruleId} has <b>right now</b>: the rule's own initial chance, or what its
+     * decays have left it at (see {@link #ruleCurrentChance}).
+     *
+     * <p>Read on every firing instead of once, which is the whole point: a rule that never states
+     * {@code chance_decay} has no entry here and answers its initial {@code chance} forever - measured, adding this
+     * reader changed no shipped rule's behaviour.
+     *
+     * @param ruleId  the rule's {@code id}
+     * @param initial the rule's own {@code chance} ({@code 1.0} = always)
+     */
+    public double currentRuleChance(String ruleId, double initial) {
+        return ruleId == null || ruleId.isBlank() ? initial : ruleCurrentChance.getOrDefault(ruleId.trim(), initial);
+    }
+
+    /**
+     * Files the decay of a rule that has just triggered: its probability becomes {@code decay x} what it was.
+     *
+     * <p>Called by the interpreter <b>after</b> the rule has really run, which is what "成功触发后" means - a roll that
+     * failed, or a firing a limit or a condition turned away, leaves the probability where it was.
+     *
+     * @param ruleId  the rule's {@code id}
+     * @param initial the rule's own {@code chance} (the value the first decay starts from)
+     * @param decay   the factor stated by {@code chance_decay}
+     */
+    public void decayRuleChance(String ruleId, double initial, double decay) {
+        if (ruleId == null || ruleId.isBlank() || !(decay > 0)) {
+            return;
+        }
+        ruleCurrentChance.put(ruleId.trim(), currentRuleChance(ruleId, initial) * decay);
+    }
+
+    /**
+     * Puts a decaying probability back to the rule's initial value: "将触发…的固定概率重置为初始值".
+     *
+     * <p>Note: A removal, not a write of the initial number - an absent entry IS "the initial value", and storing it
+     * would make a rule whose {@code chance} is later amended disagree with itself.
+     *
+     * @param ruleId the rule's {@code id}
+     */
+    public void resetRuleChance(String ruleId) {
+        if (ruleId != null && !ruleId.isBlank()) {
+            ruleCurrentChance.remove(ruleId.trim());
+        }
     }
 
     /**

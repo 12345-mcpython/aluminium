@@ -39,11 +39,16 @@ public class SettledDamageTotalTest {
     @Test
     public void theShareIsTakenOfEveryInstanceTheFiringSettled() {
         double base = lossOfTheBoxAlone();
-        double withRider = lossOfTheBoxAndTheSword();
-        System.out.println("[settled-total] the box alone settled " + base + ", box + 20% rider = " + withRider);
+        double[] firings = lossesOfTheBoxAndTheSword(2);
+        System.out.println("[settled-total] the box alone settled " + base + ", box + 20% rider = " + firings[0]
+                + " then " + firings[1]);
         Assertions.assertTrue(base > 0, "the fixture must settle damage before the rider can take a share of it");
-        Assertions.assertEquals(1.2 * base, withRider, 1e-6,
+        Assertions.assertEquals(1.2 * base, firings[0], 1e-6,
                 "the rider is 20% of the TOTAL the firing settled: 1.1x would be one enemy's instance, 1.0x no rider");
+        // The total belongs to THIS firing. A second one must still be a fifth of ONE box, not of everything the battle
+        // has dealt so far - which is exactly what a missing per-firing reset reads (1.4x: base + 20% of two boxes).
+        Assertions.assertEquals(1.2 * base, firings[1], 1e-6,
+                "the running total is emptied at the start of each firing; otherwise this one reads two boxes");
     }
 
     /**
@@ -77,12 +82,12 @@ public class SettledDamageTotalTest {
 
     /** The box's own damage, with no rider in the table at all - the baseline the share is asserted against. */
     private static double lossOfTheBoxAlone() {
-        return lostAfterFiring(List.of(theBox()));
+        return lostAfterFiring(List.of(theBox()), 1)[0];
     }
 
     /** The same firing, with the 20% true-damage rider as a SECOND rule so it runs after the box has settled. */
-    private static double lossOfTheBoxAndTheSword() {
-        return lostAfterFiring(List.of(theBox(), swordRule()));
+    private static double[] lossesOfTheBoxAndTheSword(int firings) {
+        return lostAfterFiring(List.of(theBox(), swordRule()), firings);
     }
 
     private static void assertRefused(EffectSpec effect, String names) {
@@ -93,8 +98,8 @@ public class SettledDamageTotalTest {
                 "the message must name what is missing, and it says: " + error.getMessage());
     }
 
-    /** One firing of the given table, returning the total HP the whole enemy side lost to it. */
-    private static double lostAfterFiring(List<TriggerSpec> specs) {
+    /** One firing per entry, each returning the total HP the whole enemy side lost to it. */
+    private static double[] lostAfterFiring(List<TriggerSpec> specs, int firings) {
         Battle battle = new Battle(
                 List.of(CharacterFactory.create(WOLF, 80), CharacterFactory.create(ALLY, 80)),
                 List.of(EnemyFactory.create(MONSTER, 90, 1), EnemyFactory.create(MONSTER, 90, 1)),
@@ -104,10 +109,14 @@ public class SettledDamageTotalTest {
         Character wolf = battle.characters.getFirst();
         wolf.setTriggerTable(new TriggerTable(WOLF, specs));
         var enemies = battle.enemyUnits();
-        double before = enemies.stream().mapToDouble(e -> e.getCurrentHp()).sum();
-        battle.fireTriggers(TriggerEvent.SKILL_POINT_SPENT, wolf, wolf, 0, 1);
-        battle.processRequests();
-        return before - enemies.stream().mapToDouble(e -> e.getCurrentHp()).sum();
+        double[] losses = new double[firings];
+        for (int firing = 0; firing < firings; firing++) {
+            double before = enemies.stream().mapToDouble(e -> e.getCurrentHp()).sum();
+            battle.fireTriggers(TriggerEvent.SKILL_POINT_SPENT, wolf, wolf, 0, 1);
+            battle.processRequests();
+            losses[firing] = before - enemies.stream().mapToDouble(e -> e.getCurrentHp()).sum();
+        }
+        return losses;
     }
 
     private static TriggerSpec theBox() {

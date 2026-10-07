@@ -142,6 +142,9 @@ public final class TriggerInterpreter {
             // "真珠回合开始时重置可获得【好活当赏】数量" (reader: the same trace): starts a new round for the allowances that
             // `max_per_round` charges against, so a per-round limit can exist at all.
             "RESET_RESOURCE_CAP",
+            // "将触发【头号补给盲盒】的固定概率重置为初始值" (reader: 1506 Silver Wolf LV.999's 崩坏级伤害演示): the inverse of a
+            // decaying rule probability (`chance_decay`), and the only way a decayed rule becomes certain again.
+            "RESET_RULE_CHANCE",
             // "[新蕊] can overflow to #3%" (reader: 114151, Castorice (遐蝶)): a declaration states a resource's overflow,
             // and `Resource` has had both tiers all along -- this widens the second one in battle.
             "RAISE_RESOURCE_CAP",
@@ -519,6 +522,15 @@ public final class TriggerInterpreter {
                 // allowances" without saying which one is a rule whose subject is missing.
                 requireResource(effect, op, spec);
                 requireNoDuration(effect, op, spec);
+            }
+            case "RESET_RULE_CHANCE" -> {
+                // "将触发【头号补给盲盒】的固定概率重置为初始值" (1506's 崩坏级伤害演示): the decaying probability's own reset. It
+                // names the rule for the same reason MODIFY_RULE does - "reset the probability" without saying whose
+                // has no subject - and the shape check (the named rule really decays) lives in
+                // TriggerTable.validateAmendments, the only place that can see the whole file.
+                requireRuleReference(effect, op, spec);
+                requireNoDuration(effect, op, spec);
+                requireNoStackArguments(effect, op, spec);
             }
             case "DAMAGE" -> {
                 // Note: `times` says "settle N independent times"; `per_target` says "multiply this one settlement
@@ -1222,10 +1234,21 @@ public final class TriggerInterpreter {
             }
             // A rule-level probability ("there is a 35% fixed chance..."). A failed roll costs nothing: no cooldown is
             // started and no once-per-battle flag is set, because nothing happened.
-            if (rule.chance() < 1 && !battle.rollChance(rule.chance())) {
+            // Note: The number is read from the combatant, not from the rule, because a rule may DECAY: "触发该效果的初始固定
+            // 概率为 100%，成功触发后…降低至当前概率的 20%" (reader: 1506's 【头号补给盲盒】). `chance` is then the initial value
+            // and the owner holds where it has got to; a rule with no `chance_decay` has no entry and answers its own
+            // `chance` forever, which is why this read changed no shipped rule's behaviour.
+            double chance = owner == null ? rule.chance() : owner.currentRuleChance(rule.id(), rule.chance());
+            if (chance < 1 && !battle.rollChance(chance)) {
                 continue;
             }
             apply(battle, rule, ctx.withRule(rule.id()));
+            if (owner != null && rule.chanceDecay() > 0) {
+                // "成功触发后": the rule really ran, so the NEXT time it is asked for, its probability is this much
+                // smaller. A failed roll returned above, and a firing turned away by a condition or a limit never got
+                // here at all - neither is a successful trigger.
+                owner.decayRuleChance(rule.id(), rule.chance(), rule.chanceDecay());
+            }
             if (owner != null) {
                 // Note: The count recorded is the SAME number the check above used: recording the stated per_turn while
                 // checking the amended one would make an amended rule fire forever (its counter would never reach the
@@ -1496,6 +1519,14 @@ public final class TriggerInterpreter {
                 CanHit resetOwner = ctx.owner();
                 if (resetOwner != null) {
                     resetOwner.getResources().resetRoundAllowances();
+                }
+            }
+            // "将触发【头号补给盲盒】的固定概率重置为初始值" (1506's 崩坏级伤害演示): the decaying probability goes back to the
+            // rule's own `chance`, so the next firing rolls the initial number again.
+            case "RESET_RULE_CHANCE" -> {
+                CanHit chanceOwner = ctx.owner();
+                if (chanceOwner != null) {
+                    chanceOwner.resetRuleChance(effect.getRule().trim());
                 }
             }
             case "DAMAGE" -> {

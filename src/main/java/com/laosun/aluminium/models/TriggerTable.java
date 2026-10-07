@@ -209,11 +209,12 @@ public class TriggerTable {
         for (List<CompiledRule> rules : byEvent.values()) {
             for (CompiledRule rule : rules) {
                 for (EffectSpec effect : rule.effects()) {
-                    if (!"MODIFY_RULE".equalsIgnoreCase(
-                            effect.getOp() == null ? "" : effect.getOp().trim())) {
-                        continue;
+                    String op = effect.getOp() == null ? "" : effect.getOp().trim();
+                    if ("MODIFY_RULE".equalsIgnoreCase(op)) {
+                        requireAmendable(rule, effect, byId);
+                    } else if ("RESET_RULE_CHANCE".equalsIgnoreCase(op)) {
+                        requireDecayingRule(rule, effect, byId);
                     }
-                    requireAmendable(rule, effect, byId);
                 }
                 // `has_shield from_rule <id>`: same kind of reference, so the same pass resolves it. It must name a
                 // rule in this file AND that rule must actually create a shield - otherwise the condition can never
@@ -224,6 +225,36 @@ public class TriggerTable {
                     }
                 }
             }
+        }
+    }
+
+    /**
+     * One {@code RESET_RULE_CHANCE} effect against its target: the id resolves, and that rule really has a decaying
+     * probability to reset.
+     *
+     * <p><b>Why the shape check is not optional</b> (the same reason {@code requireAmendable} gives): a rule that does
+     * not decay answers the reset by not changing - a rule that reads as if it restarts something, with nothing to see.
+     * Reader: 1506 Silver Wolf LV.999's 【崩坏级伤害演示】 - 「将触发【头号补给盲盒】的固定概率重置为初始值」.
+     *
+     * @param holder the rule carrying the effect
+     * @param effect the {@code RESET_RULE_CHANCE} effect (its {@code rule} is the reference)
+     * @param byId   every named rule in this file
+     */
+    private static void requireDecayingRule(CompiledRule holder, EffectSpec effect, Map<String, CompiledRule> byId) {
+        String target = effect.getRule() == null ? "" : effect.getRule().trim();
+        CompiledRule named = byId.get(target);
+        if (named == null) {
+            throw new IllegalArgumentException(
+                    "RESET_RULE_CHANCE names the rule \"" + target + "\", which is not in this file; a reference only "
+                            + "resolves inside the same table (known ids: " + (byId.isEmpty()
+                            ? "none -- no rule here states an \"id\"" : String.join(", ", byId.keySet().stream().sorted().toList()))
+                            + ") (source: " + holder.source() + ")");
+        }
+        if (!(named.chanceDecay() > 0)) {
+            throw new IllegalArgumentException(
+                    "RESET_RULE_CHANCE names the rule \"" + target + "\", but that rule states no \"chance_decay\", so "
+                            + "it has no decaying probability to reset and the effect would change nothing "
+                            + "(source: " + holder.source() + ")");
         }
     }
 
@@ -634,7 +665,7 @@ public class TriggerTable {
                 Boolean.TRUE.equals(spec.getOncePerBattle()), validateChance(spec),
                 minEidolon, validateMaxEidolon(spec, minEidolon), validatePerTurn(spec), validatePerAttack(spec),
                 Boolean.TRUE.equals(spec.getOncePerWave()), List.copyOf(targetFilters),
-                validatePerSubject(spec), validateOneOf(spec, effects)));
+                validatePerSubject(spec), validateOneOf(spec, effects), validateChanceDecay(spec)));
     }
 
     /**
@@ -791,6 +822,32 @@ public class TriggerTable {
                             + "(source: " + spec.getSource() + ")");
         }
         return chance;
+    }
+
+    /**
+     * Validates a rule's decaying probability and returns the factor ({@code 0} = the rule does not decay).
+     *
+     * <p>The two refusals are the "says nothing" / "can never happen again" shapes this vocabulary keeps out:
+     * {@code chance_decay: 1} is not a decay at all, and a factor at or below 0 would leave a rule that can never
+     * trigger again after its first success. A decay on a rule that states no {@code chance} has nothing to decay.
+     */
+    private static double validateChanceDecay(TriggerSpec spec) {
+        Double decay = spec.getChanceDecay();
+        if (decay == null) {
+            return 0;
+        }
+        if (spec.getChance() == null) {
+            throw new IllegalArgumentException(
+                    "Trigger rule has \"chance_decay\": " + decay + " but no \"chance\": there is no initial "
+                            + "probability for it to decay from (source: " + spec.getSource() + ")");
+        }
+        if (!(decay > 0) || decay >= 1) {
+            throw new IllegalArgumentException(
+                    "Trigger rule has \"chance_decay\": " + decay + ", which is not a decay: it must be a fraction "
+                            + "strictly between 0 and 1 (0.2 = \"the next time it triggers, the chance is 20% of what "
+                            + "it was\") (source: " + spec.getSource() + ")");
+        }
+        return decay;
     }
 
     /**
@@ -2226,6 +2283,8 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
      * @param oncePerBattle {@code true} = at most one firing per battle
      * @param chance        the probability of firing at all, as a fraction of 1 ({@code 1.0} = always)
      * @param minEidolon    the Eidolon rank the owner needs ({@code 0} = ungated)
+     * @param chanceDecay   what the {@code chance} is multiplied by after a successful trigger
+     *                      ({@code 0} = the probability does not decay; see {@link TriggerSpec#getChanceDecay()})
      */
     public record CompiledRule(TriggerEvent event, List<Condition> conditions,
                                List<EffectSpec> effects, String source, String key, String id,
@@ -2233,7 +2292,7 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
                                int maxEidolon,
                                int perTurn, int perAttack, boolean oncePerWave,
                                List<List<Condition>> effectTargetFilters, String perSubject,
-                               boolean oneOf) {
+                               boolean oneOf, double chanceDecay) {
 
         /**
          * The per-target conditions of one effect ({@code target_when}), by that effect's index in {@link #effects}.
