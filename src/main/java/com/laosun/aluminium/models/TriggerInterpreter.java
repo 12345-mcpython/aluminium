@@ -502,6 +502,13 @@ public final class TriggerInterpreter {
                                     + ", which allows no gain at all; give a positive allowance or omit the field"
                                     + " (source: " + spec.getSource() + ")");
                 }
+                // `to_max` says "however much it is short", which is a claim about a GAIN - the other two ops move the
+                // counter the other way, where it would be a contradiction rather than a shortcut.
+                if (Boolean.TRUE.equals(effect.getToMax()) && !"GAIN_RESOURCE".equals(op)) {
+                    throw new IllegalArgumentException(
+                            "Op " + op + " states \"to_max\", which only means something for GAIN_RESOURCE "
+                                    + "(source: " + spec.getSource() + ")");
+                }
                 requireNoStackArguments(effect, op, spec);
             }
             case "RESET_RESOURCE_CAP" -> {
@@ -1727,6 +1734,24 @@ public final class TriggerInterpreter {
             amount = (int) Math.min(amount, Math.round(effect.getAmountCap()));
         }
         com.laosun.aluminium.models.Resource party = partyCounterOrNull(ctx, holder, effect.getResource());
+        // `to_max`: the counter is raised to its ceiling, so the amount becomes "however much it is short". Reader: 1503
+        // Pearl (真珠)'s 充能 - the counter IS 【深度学习】's duration, so re-entering the state restores the FULL three
+        // rather than adding three to the remainder. Note it is measured against the counter's MAXIMUM and not its
+        // overflow ceiling: a plain gain on a counter that HAS an overflow allowance pours the spare on top, and the
+        // state would then outlast the document by a use.
+        if (Boolean.TRUE.equals(effect.getToMax())) {
+            com.laosun.aluminium.models.Resource counter = party != null ? party
+                    : holder.getResources().get(effect.getResource());
+            if (counter == null) {
+                throw new IllegalStateException("GAIN_RESOURCE to_max names the resource '"
+                        + effect.getResource() + "', which neither " + holder.getName()
+                        + " declares nor the battle holds as a party counter");
+            }
+            amount = Math.min(amount, counter.missingToMax());
+            if (amount <= 0) {
+                return;
+            }
+        }
         // "5 points per ally turn, at most 50 in a round, reset when Pearl's own turn begins": a per-ROUND allowance
         // rather than a cap on the counter, so the amount is bounded by what the round has left before anything is
         // credited. Note: It is read from the RULE OWNER (`ctx.owner()`), not from the holder: the allowance belongs to
