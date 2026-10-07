@@ -547,6 +547,24 @@ public final class TriggerInterpreter {
                                     + "settlement and the other multiplies a single one, so the pair has two "
                                     + "readings (source: " + spec.getSource() + ")");
                 }
+                // "造成 90% 的虚数属性欢愉伤害，由敌方全体均分": the stated magnitude is the TOTAL, divided among the victims.
+                // Two combinations are refused, the same shapes the other fields refuse:
+                if (Boolean.TRUE.equals(effect.getSplit())) {
+                    if (Boolean.TRUE.equals(effect.getPerTarget())) {
+                        throw new IllegalArgumentException(
+                                "Op DAMAGE states both \"split\" and \"per_target\": one divides the stated total "
+                                        + "among the victims and the other multiplies it by how many were hit, so the "
+                                        + "pair has two readings (source: " + spec.getSource() + ")");
+                    }
+                    String splitTarget = normalizeTarget(effect);
+                    if (!TARGET_ALL_ENEMIES.equals(splitTarget)) {
+                        throw new IllegalArgumentException(
+                                "Op DAMAGE states \"split\" with target \"" + splitTarget + "\": the divisor IS how "
+                                        + "many units the effect reaches, so the field only says something for a "
+                                        + "selector that reaches several - write \"" + TARGET_ALL_ENEMIES
+                                        + "\" (source: " + spec.getSource() + ")");
+                    }
+                }
                 // ? Two ways to state the multiplier: a SKILL ROW (`skill` + `damage_param`) or a LITERAL ratio
                 // (`scale` + `percent`, plus `element` because no skill lends one). "deal damage equal to 80% of 素裳's ATK" in a technique, a
                 // talent's follow-up or an eidolon has no row to name - 53 and 15 documents state such a ratio.
@@ -1561,8 +1579,23 @@ public final class TriggerInterpreter {
                     }
                 }
                 for (int repeat = 0; repeat < times; repeat++) {
-                    for (CanHit victim : resolveTargets(battle, effect, ctx)) {
-                        damage(battle, effect, ctx, victim);
+                    List<CanHit> victims = resolveTargets(battle, effect, ctx);
+                    // "由敌方全体均分": the stated magnitude is the TOTAL, so each living victim takes an even share of it.
+                    // ⚠ The divisor counts only the victims that can really take it: a corpse is skipped by `damage`
+                    // below, and counting it would make part of the stated total vanish with nothing to see. An
+                    // INVULNERABLE victim IS counted - its share is simply not settled (see EffectSpec.getSplit).
+                    int divisor = 1;
+                    if (Boolean.TRUE.equals(effect.getSplit())) {
+                        divisor = 0;
+                        for (CanHit victim : victims) {
+                            if (victim != null && !victim.isDeath()) {
+                                divisor++;
+                            }
+                        }
+                        divisor = Math.max(1, divisor);
+                    }
+                    for (CanHit victim : victims) {
+                        damage(battle, effect, ctx, victim, divisor);
                     }
                 }
             }
@@ -5647,6 +5680,16 @@ public final class TriggerInterpreter {
     }
 
     private static void damage(Battle battle, EffectSpec effect, TriggerContext ctx, CanHit victim) {
+        damage(battle, effect, ctx, victim, 1);
+    }
+
+    /**
+     * The same, with the victim's share of the effect's TOTAL already worked out.
+     *
+     * @param divisor how many victims are sharing the stated magnitude ({@code 1} = the ordinary per-victim reading;
+     *                see {@link EffectSpec#getSplit()})
+     */
+    private static void damage(Battle battle, EffectSpec effect, TriggerContext ctx, CanHit victim, int divisor) {
         CanHit attacker = ctx.owner();
         if (victim == null || victim.isDeath()) {
             return;
@@ -5679,6 +5722,12 @@ public final class TriggerInterpreter {
           double base = skill == null
                   ? literalBase(attacker, victim, effect, ctx)   // ? a literal ratio: off the SETTLED attribute, a Max HP share, or the triggering instance's settled value
                   : attacker.getAttribute(AttributeType.ATTACK).get() * multiplierOf(skill, effect, attacker);
+          // "由敌方全体均分": this victim's share of the effect's stated TOTAL. Divided HERE, on the raw magnitude, so
+          // everything downstream (the Elation fold, the zones, critical hits) applies to the share the sentence gives
+          // each victim - and so the sum over the victims is the stated total, whatever N is.
+          if (divisor > 1) {
+              base /= divisor;
+          }
           // The instance's type is the rule's own when it states one (reader: 1505's Elation (欢愉) riders). And because
           // `DamageType.ELATION` is deliberately not boostable, its own boost is folded into the BASE here, exactly as the cast
           // path does it in `SkillExecutor.hit` -- a type that settles but ignores its own boost zone is the silent hole this
