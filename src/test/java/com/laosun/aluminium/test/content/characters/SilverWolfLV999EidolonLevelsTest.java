@@ -72,14 +72,42 @@ public class SilverWolfLV999EidolonLevelsTest {
                 "星魂 5 的 「终结技等级+2」 同理");
     }
 
-    /** The speed trace: at 160 Speed or more she gains 50% Elation on top of what she already has. */
+    /**
+     * The speed trace, BOTH halves: +50% at 160 Speed, then +2% for every point above it.
+     *
+     * <p>「速度大于等于 160 时，使自身欢愉度提高 50%，之后每超过 1 点速度使自身欢愉度提高 2%，最多计入 100 点超出的速度。」
+     */
     @Test
     public void theSpeedTraceNeedsOneSixty() {
-        double above = elationWithSpeedBuff(0.5);
         double none = elationWithSpeedBuff(0.0);
-        System.out.println("[1506] 欢愉度 with a +50% Speed buff: " + above + " ; with none: " + none);
-        Assertions.assertEquals(0.5, above - none, 1e-9,
-                "行迹 假结局速通攻略: 「速度大于等于 160 时，使自身欢愉度提高 50%」 (base 119 +50% = 178.5, past the gate)");
+        double buffed = elationWithSpeedBuff(0.5);
+        System.out.println("[1506] 欢愉度 with no Speed buff: " + none + " ; with +50% (Speed 174): " + buffed);
+        // The fixture's Speed is 119, so +50% is 178.5 -> 174 after the stat pipeline's rounding: 14 points over 160.
+        // And the base is NOT zero - she carries 0.1 of her own - so the expectation is stated against the measured base
+        // rather than against 0, which is the mistake the first version made.
+        Assertions.assertEquals(none + 0.5 + 14 * 0.02, buffed, 1e-6,
+                "「+50%」 plus 「每超过 1 点 +2%」 for the 14 points above 160, on top of her own 0.1");
+    }
+
+    /**
+     * And the CEILING on those points, which is the half that could not be written before.
+     *
+     * <p>「最多计入 100 点超出的速度」. The reading that matters is the one that would be wrong without the bound: at a
+     * Speed far above 160 the per-point term must stop growing, so the difference from a lower Speed is NOT proportional.
+     */
+    @Test
+    public void theSpeedTraceStopsCountingPointsAtOneHundred() {
+        double none = elationWithSpeedBuff(0.0);
+        double justOver = elationWithSpeedBuff(0.5);
+        double farOver = elationWithSpeedBuff(2.0);
+        double atCap = none + 0.5 + 100 * 0.02;
+        double unbounded = none + 0.5 + 179 * 0.02;
+        System.out.println("[1506] 欢愉度 at Speed 119: " + none + " ; at 174: " + justOver + " ; at 339: " + farOver
+                + " ; the ceiling is " + atCap + " and WITHOUT `max_points` 339 Speed would read " + unbounded);
+        Assertions.assertTrue(farOver > justOver, "more Speed still helps below the ceiling");
+        Assertions.assertEquals(atCap, farOver, 1e-6,
+                "and past 100 points over, the per-point term stops - without `max_points` this would read "
+                        + unbounded);
     }
 
     /** E6's 增笑 lands with the Ultimate and not before it. */

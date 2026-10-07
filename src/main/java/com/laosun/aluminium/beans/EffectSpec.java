@@ -73,6 +73,7 @@ public class EffectSpec {
         copy.stacks = this.stacks;
         copy.resource = this.resource;
         copy.unitAmount = this.unitAmount;
+        copy.maxPoints = this.maxPoints;
         copy.toMax = this.toMax;
         copy.maxPerRound = this.maxPerRound;
         copy.payer = this.payer;
@@ -470,6 +471,21 @@ return copy;
     @SerializedName("unit_amount")
     private Double unitAmount;
 
+    /**
+     * For a {@code self_attr_above:<ATTRIBUTE>:<threshold>} scale: the largest excess that may be counted.
+     *
+     * <p>Reader: 1506 Silver Wolf LV.999's trace - 「速度大于等于 160 时，使自身欢愉度提高 50%，之后每超过 1 点速度使自身欢愉度提高
+     * 2%，<b>最多计入 100 点</b>超出的速度」. The sentence has a BASE share (50%, a separate flat effect), a per-point
+     * share (2%) and a CEILING ON THE POINTS (100) - and the ceiling is the part no spelling could state, so the whole
+     * clause could not be written without either dropping the bound (a silent wrong number at high Speed, 280% instead of
+     * 200% at Speed 300) or approximating it.
+     *
+     * <p>Note: It bounds the POINTS, not the resulting share, and those are the same thing here because the share is the
+     * points times a positive constant. Stating it on the points is what the document states, so a reader can check the
+     * field against the sentence.
+     */
+    @SerializedName("max_points")
+    private Double maxPoints;
     /**
      * For {@code GAIN_RESOURCE}: raise the counter to its declared maximum, however much it is short.
      *

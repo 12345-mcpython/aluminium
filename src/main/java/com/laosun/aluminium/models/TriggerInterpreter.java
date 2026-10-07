@@ -3281,6 +3281,12 @@ public final class TriggerInterpreter {
             AttributeType over = AttributeType.fromString(parts[0].trim());
             double threshold = Double.parseDouble(parts[1].trim());
             double excess = Math.max(0, owner.getAttribute(over).get() - threshold);
+            // `max_points`: the document may bound the EXCESS itself - 「最多计入 100 点超出的速度」. Reader: 1506 Silver Wolf
+            // LV.999's trace. Without it the clause cannot be written honestly: dropping the bound gives 280% at Speed 300
+            // where the document says 200%, and that is a silent wrong number.
+            if (effect.getMaxPoints() != null) {
+                excess = Math.min(excess, effect.getMaxPoints());
+            }
             return effect.getPercent() * excess + (effect.getAmount() == null ? 0 : effect.getAmount());
         }
         // A battle-level PARTY counter (reader: 1513's reward): the counter lives on the battle, so it is
