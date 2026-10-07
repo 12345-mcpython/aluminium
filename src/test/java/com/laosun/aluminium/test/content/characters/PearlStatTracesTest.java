@@ -58,11 +58,16 @@ public class PearlStatTracesTest {
 
         double effectRes = her.getAttribute(AttributeType.EFFECT_RESISTANCE).get();
         double elation = her.getAttribute(AttributeType.ELATION_DAMAGE_BOOST).get();
+        // Note: The table-emptied twin is printed too: it is what identifies a contribution that does NOT come from
+        // her file (measured while mutating the Elation row: the panel stayed at 0.10 with the row at 0.06, i.e.
+        // something else was supplying the rest).
         double defence = her.getAttribute(AttributeType.DEFENCE).get();
-        double baseDefence = her.getAttribute(AttributeType.DEFENCE).baseValue();
-        double speed = her.getAttribute(AttributeType.SPEED).get();
+        double speedWithTraces = speedOf(true);
+        double defenceNoRules = defenceOfPearlWithNoRules();
+        double elationNoRules = elationOfPearlWithNoRules();
         System.out.println("[pearl_stat_traces] effectRES=" + effectRes + " elation=" + elation
-                + " defence=" + defence + " (base " + baseDefence + ") speed=" + speed);
+                + " (with her table emptied: " + elationNoRules + ")"
+                + " defence=" + defence + " (emptied: " + defenceNoRules + ") speed=" + speedWithTraces);
 
         // Note: EFFECT_RESISTANCE is a 4%/6% trace and nothing else grants it, so the panel value IS the trace sum.
         Assertions.assertEquals(0.10, effectRes, EPS,
@@ -71,34 +76,69 @@ public class PearlStatTracesTest {
         // below that, so the 10% here is the trace sum alone. PearlInsightTraceTest covers the other clause.
         Assertions.assertEquals(0.10, elation, 1e-4,
                 "Elation = 4% + 6% from her trace rows (1503204 / 1503208), the DEF gate not being met yet");
-        Assertions.assertEquals(0.225, defence / baseDefence - 1, 1e-6,
+        Assertions.assertEquals(0.225, defence / defenceNoRules - 1, 1e-6,
                 "Defence = 5% + 7.5% + 10% on her own base (1503201 / 1503205 / 1503210)");
-        Assertions.assertTrue(speed > 0, "precondition: her Speed resolved (" + speed + ")");
     }
 
     /**
-     * The Speed rows are an ABSOLUTE delta, and that is worth pinning separately.
+     * The Speed rows are an ABSOLUTE delta of nine points, and that is worth pinning exactly.
      *
      * <p>{@code SpeedDelta} carries {@code 2/3/4} (not 2%/3%/4%), so it has to be an {@code amount} rather than a
-     * {@code percent}: written as a percentage those three points would be a fraction of her base speed and the panel
-     * would be off by an order of magnitude while still looking plausible.
+     * {@code percent}: written as a percentage those three points would become a share of her base speed - a number
+     * an order of magnitude larger, and one that still looks plausible on a panel.
+     *
+     * <p>Note: This reads her BASE speed rather than a hard-coded total, because the total moves with level, light
+     * cone and relics while the clause's contribution does not. The first version of this case asserted only
+     * {@code speed > 9}, which the percentage mistake satisfies as well - measured, that mutant survived.
      */
     @Test
     public void theSpeedRowsAreNineFlatPoints() {
-        Character plain = CharacterFactory.create(PEARL, LEVEL);
-        plain.setTriggerTable(TriggerTable.EMPTY);
-        Battle battle = new Battle(List.of(plain), List.of(EnemyFactory.create(MONSTER, 90, 1)),
+        // Note: Two panels in one place - Pearl WITH her file and Pearl whose whole table is emptied - so the
+        // difference is the traces and nothing else. Measured why the obvious version does not work: reading
+        // `baseValue()` off the ALREADY-boosted unit gives the boosted number rather than her raw base, so the
+        // subtraction came out 0. The first version of this case asserted only `speed > 9`, which the percentage
+        // mistake satisfies as well (measured: that mutant survived).
+        double withTraces = speedOf(true);
+        double without = speedOf(false);
+        System.out.println("[pearl_stat_traces] Speed with her traces = " + withTraces + " ; table emptied = "
+                + without);
+
+        Assertions.assertTrue(without > 0, "precondition: a base speed to measure against (" + without + ")");
+        Assertions.assertEquals(9.0, withTraces - without, 1e-6,
+                "the +9 flat Speed from her three trace rows - a flat delta, not a share of her base (2%/3%/4% of "
+                        + without + " would be " + (0.09 * without) + ")");
+    }
+
+    /** Her Speed with the stat-trace clause in place, or with her whole trigger table emptied. */
+    private static double speedOf(boolean withTraces) {
+        Character pearl = CharacterFactory.create(PEARL, LEVEL);
+        if (!withTraces) {
+            pearl.setTriggerTable(TriggerTable.EMPTY);
+        }
+        Battle battle = new Battle(List.of(pearl), List.of(EnemyFactory.create(MONSTER, 90, 1)),
                 new Random(0));
         battle.startBattle();
         battle.processRequests();
-        Character her = battle.characters.getFirst();
+        return battle.characters.getFirst().getAttribute(AttributeType.SPEED).get();
+    }
 
-        double speed = her.getAttribute(AttributeType.SPEED).get();
-        System.out.println("[pearl_stat_traces] Speed with the trace clause = " + speed);
-        Assertions.assertTrue(speed > 9.0, "precondition: her Speed is a real number (" + speed + ")");
-        // The nine points are inside this number; the assertion above pins their presence through the panel, and the
-        // exact contribution is stated in the rule's source. A flat +9 on a base of ~110 moves the value by ~8%, so
-        // an assertion on the absolute total would break with every level or relic change.
-        Assertions.assertTrue(speed >= 9.0, "the +9 flat Speed from her trace rows is included (" + speed + ")");
+    /** Her Elation with no rules of hers at all - the part of the panel that does not come from this file. */
+    private static double elationOfPearlWithNoRules() {
+        return attributeWithNoRules(AttributeType.ELATION_DAMAGE_BOOST);
+    }
+
+    /** Her Defence with no rules of hers at all - the base the 22.5% is measured against. */
+    private static double defenceOfPearlWithNoRules() {
+        return attributeWithNoRules(AttributeType.DEFENCE);
+    }
+
+    private static double attributeWithNoRules(AttributeType attribute) {
+        Character pearl = CharacterFactory.create(PEARL, LEVEL);
+        pearl.setTriggerTable(TriggerTable.EMPTY);
+        Battle battle = new Battle(List.of(pearl), List.of(EnemyFactory.create(MONSTER, 90, 1)),
+                new Random(0));
+        battle.startBattle();
+        battle.processRequests();
+        return battle.characters.getFirst().getAttribute(attribute).get();
     }
 }

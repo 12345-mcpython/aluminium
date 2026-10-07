@@ -42,7 +42,7 @@ EDITS = {
 
 def restore():
     """Put the file back to what git has, NOT to a backup that may predate a fix."""
-    result = subprocess.run(["git", "checkout", "--", str(TARGET)],
+    result = subprocess.run(["git", "checkout", "HEAD", "--", str(TARGET)],
                             capture_output=True, text=True)
     if result.returncode == 0:
         print("restored", TARGET, "(git)")

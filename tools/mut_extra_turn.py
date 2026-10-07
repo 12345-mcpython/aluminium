@@ -30,7 +30,7 @@ EDITS = {
 
 
 def git_restore():
-    result = subprocess.run(["git", "checkout", "--", str(BATTLE), str(QUEUE)],
+    result = subprocess.run(["git", "checkout", "HEAD", "--", str(BATTLE), str(QUEUE)],
                             capture_output=True, text=True)
     if result.returncode == 0:
         print("restored the engine files (git)")
