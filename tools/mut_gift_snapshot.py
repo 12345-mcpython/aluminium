@@ -31,6 +31,11 @@ VARIANTS = {
     "one_tick": (INTERPRETER,
                  '    private static final int ELATION_GIFT_TURNS = 3;',
                  '    private static final int ELATION_GIFT_TURNS = 2;  // MUTANT'),
+    # The numeric half: the factor goes back to the live pool, which is what it read before the correction.
+    "factor_reads_pool": (BATTLE,
+                          "        double laughs = countedLaughPoints();\n        return 1 + laughs * 5.0 / (laughs + 240);",
+                          "        double laughs = partyResourceValue(\"\\u7b11\\u70b9\");  // MUTANT: the old behaviour\n"
+                          "        return 1 + laughs * 5.0 / (laughs + 240);"),
 }
 
 
