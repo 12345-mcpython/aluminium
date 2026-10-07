@@ -126,23 +126,11 @@
       ],
       "do": [
         {
-          "op": "SPEND_RESOURCE",
+          "op": "GAIN_RESOURCE",
           "resource": "隐藏分",
-          "spendAll": true,
+          "amount": 0,
           "target": "self"
-        }
-      ],
-      "source": "1506 银狼LV.999 天赋: 「退出【无敌玩家】状态时【隐藏分】会被清空」",
-      "note": "⭐ 用**状态结束事件** ✓（`STATE_ENDED` ＋ `actor state_ended <名>` ✓，本会话早先已出货 ✓）。⚠ 星魂 1 把这一句**改成保留 20%** ✓ ⇒ 那一条是**另一档**（`min_eidolon: 1` ✓），⚠ 且必须让**基础那条不再整份清空** ✓ —— 见 `p1506_e1_keeps_a_fifth_of_hidden` ✓。"
-    },
-    {
-      "on": "STATE_ENDED",
-      "id": "p1506_e1_keeps_a_fifth_of_hidden",
-      "min_eidolon": 1,
-      "when": [
-        "actor state_ended 无敌玩家"
-      ],
-      "do": [
+        },
         {
           "op": "SPEND_RESOURCE",
           "resource": "隐藏分",
@@ -152,13 +140,14 @@
         {
           "op": "GAIN_RESOURCE",
           "resource": "隐藏分",
+          "amountFromPrevious": true,
           "amountPercent": 0.2,
-          "target": "self",
-          "amountFromPrevious": true
+          "min_eidolon": 1,
+          "target": "self"
         }
       ],
-      "source": "1506 银狼LV.999 星魂 1 以太编辑：星魂+1: 「退出【无敌玩家】状态时不会清空【隐藏分】，改为保留 20% 的【隐藏分】」—— #2 = 0.2。",
-      "note": "⚠⚠ **两条规则都在 `STATE_ENDED` 上，而基础那条没有星魂门** ✓ ⇒ 有星魂 1 时**两条都会跑** ✓。⚠ 解决办法就是**利用文件顺序** ✓：那条（先）清空 ✓、本条（后）按**前一个效果实际入账的量**恢复 20% ✓。⚠⚠ **这里必须用 `amountFromPrevious` 而不是 `amountFromEvent`** ✓ —— **实测**：`STATE_ENDED` 的 amount 槽是「该状态被持有几层」✓（`fireStateEnded` 的注释写明了 ✓），**不是**刚被清掉的隐藏分 ✓ ⇒ 用 `amountFromEvent` 会**安静地**按 20% × 0 恢复 ✓（判据读到 0 而不是 12 ✓）。⭐ `amountFromPrevious` 的既有读者是 1505 的星魂 ✓：「额外获得本次获得量的 50%/100%」✓，读的正是**前一个效果截断后的入账量** ✓。⚠ 所以本条的**顺序是承重的** ✓ —— 它必须排在 `p1506_leaving_godmode_clears_hidden` **之后** ✓，而且它先清再补 ✓（否则会变成保留 120% ✓）。"
+      "source": "1506 银狼LV.999 天赋: 「退出【无敌玩家】状态时【隐藏分】会被清空」",
+      "note": "⚠⚠ **清空与「星魂 1 保留 20%」必须在同一条规则里** ✓ —— **实测**：`previousCredited` **是每条规则独立、从 0 开始** ✓（`TriggerInterpreter.apply` 里 `double previousCredited = 0;` ✓，它只遍历**一条规则**的效果 ✓）⇒ 拆成两条规则时，保留那条**看不到**清空那条花掉了多少 ✓ ⇒ 它按 **0.2 × 0** 恢复 ✓（判据读到 **0** 而非 **12** ✓）。⭐ 现在这一条**一次做完**：先按**资源当前值**取走，再按**前一个效果实际入账的量**恢复五分之一 ✓ —— `previousCredited` **在同一条规则内是通的** ✓。⚠ 星魂门**写在效果上**（`min_eidolon` 在效果层 ✓），**不是规则层** ✓ —— 规则层的门会让整条规则消失 ✓，而基础清空必须**始终**发生 ✓。"
     },
     {
       "on": "BASIC_ATTACK",

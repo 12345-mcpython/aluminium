@@ -1,0 +1,22 @@
+content: Eidolon 1's retained fifth - the two rules were one rule's worth of work
+
+「退出【无敌玩家】状态时不会清空【隐藏分】，改为保留 20% 的【隐藏分】。」
+
+This was recorded as OPEN with a measured 0 where a fifth of her 隐藏分 belongs, and the cause is not the spelling of the
+share: `previousCredited` - the quantity `amount_from_previous` reads - is per-RULE. `TriggerInterpreter.apply` starts it
+at 0 and walks ONE rule's effects, so a retention written as its OWN rule cannot see what the clearing rule took, and the
+share is 20% of nothing.
+
+Merged into one rule, with the Eidolon gate on the EFFECT rather than on the rule (a rule-level gate would remove the
+base clear, which must always happen):
+
+    SPEND_RESOURCE  spendAll                    - take everything
+    GAIN_RESOURCE   amountFromPrevious  0.2    - restore a fifth of what that actually took
+
+Measured: she holds 80 at the exit of 【无敌玩家】 (the Ultimate and its trace pay 20 before the fixture's own 60), and the
+rule now keeps 16. At E0 the base clear still leaves 0.
+
+The judge's own expectation was wrong first: it wanted a fifth of 60 and read the rule as broken. Corrected against the
+measured holding, and the case that used to be `_OPEN` is a real one again.
+
+Full suite: 727 suites, 2485 tests, 0 failures.

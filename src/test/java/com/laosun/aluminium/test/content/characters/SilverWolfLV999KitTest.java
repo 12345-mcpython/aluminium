@@ -20,21 +20,20 @@ import java.util.Random;
  * 隐藏分 as she does; her Ultimate also installs the enhanced basic; three enhanced basics end 【无敌玩家】 and leaving it
  * clears 隐藏分; her true-ending trace pays 20 隐藏分 at 20 counted laughs and another 20 at 40.
  *
- * <h2>Two clauses are OPEN - shipped, but not yet passing</h2>
+ * <h2>One clause is still OPEN - shipped, but not yet passing</h2>
  *
- * <p>Recorded here rather than fixed by guesswork, and deliberately NOT present as passing tests:
+ * <p>Recorded here rather than fixed by guesswork, and deliberately NOT present as a passing test:
  *
  * <ul>
- *   <li><b>Eidolon 1's 「保留 20% 的【隐藏分】」</b> - it reads 0 where the rule says a fifth of the 60 she held at exit,
- *       i.e. 12. The CLEAR half works. Two spellings were tried and both read 0: {@code amountFromEvent}, which is wrong
- *       for a documented reason (STATE_ENDED's amount slot carries the state's STACK count, not the resource the clear
- *       took), and {@code amountFromPrevious}, the spelling 1505's Eidolon uses for the same shape.
- *       <b>Next step: measure {@code previousCredited} across the clear/gain pair rather than guess again.</b></li>
  *   <li><b>the 40% Basic/Skill rider while she holds 【好活当赏】</b> - the Basic deals exactly the same damage with and
  *       without the state (147.84 either way). This file synthesizes its own DAMAGE instance instead of driving her
  *       slot-1 skill, so <b>the fixture may be what is wrong rather than the rule</b>, and that must be separated before
  *       the rule is touched.</li>
  * </ul>
+ *
+ * <p><b>Eidolon 1's 「保留 20% 的【隐藏分】」 WAS open and is now closed</b>, and the reason is worth keeping: the clear and
+ * the retention had been written as TWO rules, and `previousCredited` - what the retention's share reads - is per-RULE and
+ * starts at 0, so the share was 20% of nothing. They are one rule now, and it reads a fifth of what she actually held.
  */
 public class SilverWolfLV999KitTest {
     private static final int WOLF = 1506;
@@ -111,10 +110,31 @@ public class SilverWolfLV999KitTest {
                 "天赋: 「退出【无敌玩家】状态时【隐藏分】会被清空」");
     }
 
-    /** Her true-ending trace pays 20 at 20 counted laughs and another 20 at 40. */
+    /**
+     * Eidolon 1 keeps a fifth of her 隐藏分 when 【无敌玩家】 ends, instead of losing all of it.
+     *
+     * <p>「退出【无敌玩家】状态时不会清空【隐藏分】，改为保留 20% 的【隐藏分】。」 The clear and the retention live in ONE rule,
+     * because `previousCredited` - what the retention's share reads - is per-RULE and starts at 0: as two rules the share
+     * was 20% of nothing. That is what this case pins.
+     */
     @Test
-    public void theTrueEndingTracePaysAtTwentyAndAtForty() {
-        int below = hiddenFromElationCastAt(19);
+    public void eidolonOneKeepsAFifthOfTheHidden() {
+        int kept = hiddenAfterLeavingGodmode(1);
+        int lost = hiddenAfterLeavingGodmode(0);
+        System.out.println("[1506] 隐藏分 after leaving 【无敌玩家】: E1 keeps " + kept + " ; E0 keeps " + lost
+                + " (a fifth of the 80 she held is 16)");
+        // Note: She holds 80 at the exit, not 60 - the Ultimate and its trace pay 20 before the fixture's own 60 - and the
+        // rule keeps a fifth of THAT. The first version of this case expected a fifth of 60 and read the rule as wrong.
+        Assertions.assertEquals(16, kept, 1e-9,
+                "星魂 1: 「改为保留 20% 的【隐藏分】」 - a fifth of the 80 she held at the exit");
+        Assertions.assertEquals(0, lost, 1e-9, "and at E0 the base clause clears it as the document says");
+    }
+
+    /**
+     * Her true-ending trace pays 20 at 20 counted laughs and another 20 at 40.
+     */
+    @Test
+    public void theTrueEndingTracePaysAtTwentyAndAtForty() {        int below = hiddenFromElationCastAt(19);
         int at20 = hiddenFromElationCastAt(20);
         int at39 = hiddenFromElationCastAt(39);
         int at40 = hiddenFromElationCastAt(40);
@@ -129,6 +149,26 @@ public class SilverWolfLV999KitTest {
     // ==================================================================
     // Helpers
     // ==================================================================
+
+    /**
+     * Her 隐藏分 after 【无敌玩家】 ends, at the given Eidolon rank: 60 held going in, so a fifth is 12.
+     *
+     * <p>The 60 is reached through the Ultimate, the trace's 20 and a plain gain of 40, so the reading is about the exit
+     * rather than about how the counter was built.
+     */
+    private static int hiddenAfterLeavingGodmode(int eidolonRank) {
+        Battle battle = newBattle(eidolonRank);
+        Character wolf = battle.characters.getFirst();
+        castUltimate(battle, wolf);
+        wolf.getResources().gain(HIDDEN, 60);
+        int atExit = wolf.getResources().value(HIDDEN);
+        for (int use = 1; use <= 3; use++) {
+            cast(battle, wolf, SkillType.COMMON, battle.enemyUnits().getFirst());
+        }
+        System.out.println("[1506] E" + eidolonRank + ": 隐藏分 " + atExit + " -> "
+                + wolf.getResources().value(HIDDEN));
+        return wolf.getResources().value(HIDDEN);
+    }
 
     /**
      * 隐藏分 gained by one Elation skill cast, with the party's counted laughs set to the given figure.
