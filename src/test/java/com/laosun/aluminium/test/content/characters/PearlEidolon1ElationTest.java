@@ -16,17 +16,27 @@ public class PearlEidolon1ElationTest {
     private static final int ELATION = 1502;   // Yao Guang, Elation
     private static final int HUNTER = 1204;
 
+    /**
+     * Eidolon 1's tiers, read as the difference the EIDOLON makes rather than as her absolute panel.
+     *
+     * <p>Note: Pearl's panel is no longer zero-based - her ten stat traces (measured absent from
+     * {@code skill_traces.json}) put 10% Elation on her from the start - so an absolute assertion here would be
+     * asserting that other clause as much as this one. Each reading below is therefore the difference against the
+     * same team with the Eidolon condition left unmet.
+     */
     @Test
     public void theElationBoostNeedsBothTheEidolonAndTheSecondElationAlly() {
         double ranked = boost(1, 2);
         double alone = boost(1, 1);
         double unranked = boost(0, 2);
-        System.out.println("[pearl_e1] Elation boost -- eidolon 1 with 2 Elation allies = " + ranked
+        System.out.println("[pearl_e1] panel Elation -- eidolon 1 with 2 Elation allies = " + ranked
                 + " ; eidolon 1 with 1 = " + alone + " ; eidolon 0 with 2 = " + unranked);
 
-        Assertions.assertEquals(0.10, ranked, 1e-9, "at 2 Elation allies the team gains 10%");
-        Assertions.assertEquals(0.0, alone, 1e-9, "the first tier needs a second Elation ally");
-        Assertions.assertEquals(0.0, unranked, 1e-9, "and the rule carries min_eidolon: 1");
+        // Note: `alone` and `unranked` both sit at the stat-trace floor, and the tier adds 0.10 on top of it.
+        Assertions.assertEquals(0.10, ranked - unranked, 1e-9, "at 2 Elation allies the team gains 10%");
+        Assertions.assertEquals(0.0, alone - unranked, 1e-9,
+                "the first tier needs a second Elation ally, not just the Eidolon");
+        Assertions.assertTrue(unranked > 0, "precondition: her stat traces give the panel a floor (" + unranked + ")");
     }
 
     /** Builds a team with the given Eidolon rank and number of Elation characters. */

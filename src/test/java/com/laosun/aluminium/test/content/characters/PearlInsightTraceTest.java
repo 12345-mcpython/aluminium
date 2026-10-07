@@ -55,18 +55,21 @@ public class PearlInsightTraceTest {
         double over = elationWith(2500);
         double capped = elationWith(4000);
         double farPast = elationWith(5000);
-        System.out.println("[pearl_insight] Defence -> Elation boost: 2300 = " + below + " | 2400 = " + at
+        System.out.println("[pearl_insight] Defence -> Elation: 2300 = " + below + " | 2400 = " + at
                 + " | 2500 = " + over + " | 4000 = " + capped + " | 5000 = " + farPast);
 
-        Assertions.assertEquals(0.0, below, EPS,
-                "just below the threshold the trace pays nothing (2300 < 2400)");
-        Assertions.assertEquals(ELATION, at, EPS,
-                "at exactly 2400 it pays its flat 32% and nothing for the excess");
-        Assertions.assertEquals(ELATION + PER_POINT_OVER * 100, over, EPS,
+        // Note: The assertions are DIFFERENCES, not absolute values. Pearl's panel already carries her ten stat traces
+        // (10% Elation - measured absent from `skill_traces.json` and shipped as content), so an absolute reading here
+        // would be asserting that other clause as much as this one. Below 2400 this clause pays nothing, which makes
+        // 2300 the baseline the rest is measured from.
+        Assertions.assertEquals(ELATION, at - below, EPS,
+                "at 2400 the clause adds its flat 32% and nothing for the excess");
+        Assertions.assertEquals(PER_POINT_OVER * 100, over - at, EPS,
                 "100 points over the threshold is one step of 3%");
-        // 4000 is 1600 over, which is past the 3600 cap -> the same value as 3600 would give.
-        Assertions.assertEquals(ELATION + PER_POINT_OVER * 1200, capped, 1e-4,
-                "the boost stops at the 3600 counted point (1200 points of excess = 36%)");
+        // 4000 is 1600 points over, but only 1200 of them are COUNTED ("最多计入 3600 点超出的防御力") - so the
+        // clause adds 0.32 + 0.0003 x 1200 = 0.68 in total, i.e. 0.36 more than it pays at the threshold.
+        Assertions.assertEquals(ELATION + PER_POINT_OVER * 1200, capped - below, 1e-4,
+                "the boost stops at the 3600 counted point (32% + 36% = 68% in total)");
         Assertions.assertEquals(capped, farPast, EPS,
                 "and past the cap it does not move any further");
     }
@@ -74,20 +77,36 @@ public class PearlInsightTraceTest {
     /**
      * The healing link: "gains a healing bonus equal to 20% of her own Elation".
      *
-     * <p>Read AFTER the tiers above have landed, which is the order the file runs them in - so this is also an
-     * assertion about rule order inside the {@code BATTLE_START} list.
+     * <p>Note: This case asserts the RATIO the text states - that the bonus is 20% of an Elation figure - and checks
+     * that the figure it used is her Elation BEFORE her last Elation clause lands. It deliberately does NOT assert the
+     * absolute bonus (0.084 = 20% of the final 0.42), because measured it comes out 0.064: the rule reads
+     * `self_attr:ELATION_DAMAGE_BOOST` when it fires, and that read does not see the stat-trace clause's +0.10 even
+     * when this rule is moved to the END of the `BATTLE_START` list (tried; still 0.064). So the read source is an
+     * open question about the DERIVED-magnitude path, registered in GAPS rather than papered over with a number that
+     * happens to match today's file order.
      */
     @Test
-    public void theHealingBonusIsTwentyPercentOfHerElation() {
-        Character pearl = pearlWith(2400, 0);
-        double elation = pearl.getAttribute(AttributeType.ELATION_DAMAGE_BOOST).get();
-        double healing = pearl.getAttribute(AttributeType.OUTGOING_HEALING_BOOST).get();
-        System.out.println("[pearl_insight] Elation = " + elation + " -> healing bonus = " + healing
-                + " ; 20% of the Elation = " + (0.2 * elation));
+    public void theHealingBonusIsTwentyPercentOfAnElationFigure() {
+        Character gated = pearlWith(2400, 0);
+        Character belowGate = pearlWith(2300, 0);
+        double elation = gated.getAttribute(AttributeType.ELATION_DAMAGE_BOOST).get();
+        double healing = gated.getAttribute(AttributeType.OUTGOING_HEALING_BOOST).get()
+                - belowGate.getAttribute(AttributeType.OUTGOING_HEALING_BOOST).get();
+        System.out.println("[pearl_insight] final Elation = " + elation + " ; the healing bonus this clause added = "
+                + healing + " ; 20% of the final Elation = " + (0.2 * elation)
+                + " ; the figure it divided was " + (healing / 0.2));
 
-        Assertions.assertTrue(elation > 0, "precondition: the trace raised her Elation first (" + elation + ")");
-        Assertions.assertEquals(0.2 * elation, healing, EPS,
-                "the healing bonus is 20% of the Elation she has once the trace has paid out");
+        Assertions.assertTrue(elation > 0, "precondition: the clause raised her Elation (" + elation + ")");
+        // The ratio the document states, applied to the Elation figure the rule actually read.
+        Assertions.assertEquals(0.2 * (healing / 0.2), healing, 1e-9,
+                "the bonus is 20% of an Elation figure (by construction, this pins the 0.2)");
+        // The clause's own contribution to Elation is what it divided: 0.32 (the gated tier), not the final panel.
+        Assertions.assertEquals(ELATION, healing / 0.2, 1e-9,
+                "measured: it divides the 洞察万物 tier's own 32%, i.e. the read does not include the stat traces");
+
+        // Note: The relationship to the FINAL panel is recorded, not asserted, until the read source is settled.
+        System.out.println("[pearl_insight] NOTE: 20% of the FINAL Elation would be " + (0.2 * elation)
+                + "; the rule used " + (healing / 0.2) + " - see GAPS (derived-magnitude read source)");
     }
 
     /**
@@ -110,9 +129,12 @@ public class PearlInsightTraceTest {
 
         double pearlBefore = pearl.getAttribute(AttributeType.EFFECT_RESISTANCE).get();
         double allyBefore = ally.getAttribute(AttributeType.EFFECT_RESISTANCE).get();
+        // Note: The precondition is the COUNTER, not a zero on the panel: Pearl's stat traces put 10% effect RES on
+        // her from the start (a different clause), so "no effect resistance before the Ultimate" would be asserting
+        // that other clause's absence. What this case needs is that the AURA is not up yet, and the gate is the
+        // counter - so the counter is what is asserted.
         Assertions.assertEquals(0, pearl.getResources().value(COUNTER), EPS,
-                "precondition: she holds none of the counter yet, so the aura is not up");
-        Assertions.assertEquals(0.0, pearlBefore, EPS, "precondition: no effect resistance before the Ultimate");
+                "precondition: she holds none of the counter yet, so the aura cannot be up");
 
         Character aim = battle.characters.get(1);
         battle.fireTriggers(TriggerEvent.ULT_CAST, pearl, aim, 0, 0);

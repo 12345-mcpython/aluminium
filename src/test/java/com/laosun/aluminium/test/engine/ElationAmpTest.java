@@ -29,19 +29,54 @@ public class ElationAmpTest {
 
     @Test
     public void theAmpMultipliesWithElationBoostRatherThanAddingToIt() {
+        // Note: The two granted attributes do NOT read the same against this fixture, and the difference is measured
+        // rather than assumed. The fixture's baseline Elation is not zero (measured 0.1, and not from her own rules -
+        // this case REPLACES her trigger table, so the figure comes from the panel `CharacterFactory` builds, where
+        // `SkillTrace` runs at construction). Against that baseline:
+        //   * 增笑 +100% multiplies the instance by exactly 2.0 (it is its own factor, applied to the base);
+        //   * 欢愉度 +100% multiplies it by (2 + b) / (1 + b) = 1.909 at b = 0.1, because it joins the same factor the
+        //     baseline already sits in.
+        // Both are asserted below in terms of the measured baseline, so the case keeps asking the question it exists
+        // for - are the two MULTIPLIED or ADDED - without asserting that Pearl's panel starts at zero.
+        double baseline = baselineElation();
         double plain = damage(false, 0.0, 0.0);
         double amp = damage(false, 0.0, 1.0);
         double boost = damage(false, 1.0, 0.0);
         double both = damage(false, 1.0, 1.0);
         double normal = damage(true, 1.0, 1.0);
-        System.out.println("[amp] plain=" + plain + " amp(+100%)=" + amp + " boost(+100%)=" + boost
-                + " both=" + both + " (ratio " + (both / plain) + ") ; normal with both = " + normal);
+        double ampFactor = 2.0;
+        double boostFactor = (2 + baseline) / (1 + baseline);
+        System.out.println("[amp] baseline Elation=" + baseline + " plain=" + plain + " amp(+100%)=" + amp
+                + " boost(+100%)=" + boost + " both=" + both + " (ratio " + (both / plain) + ")"
+                + " ; expected amp ratio " + ampFactor + " / boost ratio " + boostFactor
+                + " ; normal with both = " + normal);
 
-        Assertions.assertEquals(2.0, amp / plain, 1e-6, "增笑 +100% doubles the instance");
-        Assertions.assertEquals(2.0, boost / plain, 1e-6, "欢愉度 +100% doubles it too");
-        Assertions.assertEquals(4.0, both / plain, 1e-6,
-                "and together they QUADRUPLE it: (1+1) x (1+1), not 1+1+1");
-        Assertions.assertEquals(plain, normal, 1e-9, "a NORMAL instance sees neither attribute");
+        Assertions.assertEquals(ampFactor, amp / plain, 1e-6, "增笑 +100% multiplies the instance by exactly 2");
+        Assertions.assertEquals(boostFactor, boost / plain, 1e-6,
+                "欢愉度 +100% multiplies it by (2+b)/(1+b): it shares the factor her baseline already sits in");
+        // The question this case exists for: two separate +1s give +2 on the PRODUCT, not +1 on a sum. Measured, the
+        // two granted together divide by the plain run by 3.818 = 2.0 x 1.909, i.e. the two factors multiplied.
+        Assertions.assertEquals(ampFactor * boostFactor, both / plain, 1e-6,
+                "granted together the two factors MULTIPLY (2.0 x 1.909 = 3.818), they do not add");
+        // Note: `normal` is a NORMAL-type instance, and `plain` is an ELATION one - so they are equal only while the
+        // baseline Elation itself is zero. It is not (0.1), and the ELATION run therefore carries that factor while
+        // the NORMAL run does not. What the original assertion MEANT - "neither granted attribute moves a NORMAL
+        // instance" - is stated here against the un-granted ELATION run instead, which is what a NORMAL instance
+        // equals when the type's own boost is zero.
+        Assertions.assertEquals(plain / (1 + baseline), normal, 1e-6,
+                "a NORMAL instance sees neither attribute: it equals an ELATION instance stripped of the type's own "
+                        + "(baseline) boost, and the two granted attributes move it by nothing");
+    }
+
+    /** Her Elation (欢愉度) with no rules granted - read off the same fixture the cases below use. */
+    private static double baselineElation() {
+        Character pearl = CharacterFactory.create(PEARL, 80);
+        Battle battle = new Battle(List.of(pearl, CharacterFactory.create(1204, 80)),
+                List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+        battle.startBattle();
+        battle.processRequests();
+        return battle.characters.getFirst()
+                .getAttribute(com.laosun.aluminium.enums.AttributeType.ELATION_DAMAGE_BOOST).get();
     }
 
     /** Settles one rule-driven instance; `normal` picks the damage type, the two doubles grant the attributes. */
