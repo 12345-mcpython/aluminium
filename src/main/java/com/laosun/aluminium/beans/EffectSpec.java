@@ -56,6 +56,7 @@ public class EffectSpec {
         copy.amountFromPrevious = amountFromPrevious;
         copy.minEidolon = minEidolon;
         copy.always = always;
+        copy.split = split;
         copy.amountCap = amountCap;
         copy.ordinary = ordinary;
         copy.perStack = this.perStack;
@@ -248,6 +249,26 @@ return copy;
      */
     @com.google.gson.annotations.SerializedName("always")
     private Boolean always;
+
+    /**
+     * The stated magnitude is the <b>TOTAL</b>, divided evenly among the units this effect resolves to: 「造成 90% 的虚数属性欢愉伤害，
+     * <b>由敌方全体均分</b>」.
+     *
+     * <p><b>Why it needs its own field.</b> Every other magnitude in this DSL is per victim ("deal X to all enemies" settles X on
+     * each). "由敌方全体均分" states one total and distributes it, so with N living victims each settles {@code magnitude /
+     * N} - and the total is the same whether the enemy side has one unit or five. Writing the per-victim reading instead
+     * multiplies the sentence by N, and N is exactly what a reader cannot see in the JSON.
+     *
+     * <p>The divisor is the number of <b>living</b> resolved victims (a corpse is not dealt to, so it must not absorb a
+     * share that then never lands). An INVULNERABLE victim is counted: its share is simply not settled, the same way a
+     * single-target attack on an invulnerable unit deals nothing - the total is not silently redistributed.
+     *
+     * <p>Reader: 1506 Silver Wolf LV.999's 【头号补给盲盒】, confirmed against the game's own wording rather than guessed;
+     * its 【超超超大剑】 then reads {@code scale: "settled_damage_this_event"} - the settled total, which is what "本次总伤害值"
+     * means and which the split is what makes equal to the stated 90%.
+     */
+    @com.google.gson.annotations.SerializedName("split")
+    private Boolean split;
 
     /**
      * Note: from 1505's Eidolon "额外获得等同于本次获得的[好活当赏]50%/100%":

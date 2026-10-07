@@ -21,11 +21,12 @@ import java.util.Random;
  * <p>⚠ The box is ONE rule: its own 90% carries {@code always} (「造成…伤害，<b>并</b>随机触发 1 种效果」 - it is not one of the
  * three), which is also what lets the box have a single fixed chance.
  *
- * <p>⚠ <b>One firing, two enemies, and both are load-bearing.</b> The box settles one instance per enemy and the rider is
- * a share of their TOTAL, so with two enemies a rider that read only the instance on its own target would land at half
- * the size. And the enemy the rider did NOT hit is the control: its loss IS one box's hit per enemy, measured inside the
- * same firing. Reading the same thing from a second firing would need the box's chance to pass twice (it decays to 20%
- * after the first success), so the per-firing question is the engine judge's, where the fixture states no chance at all.
+ * <p>⚠ <b>One firing, two enemies, and both are load-bearing.</b> The box's own 90% is a TOTAL split among the enemies
+ * (「由敌方全体均分」), so it settles one instance per enemy and the rider is a share of their SUM - with two enemies a
+ * rider that read only the instance on its own target would land at half the size. And the enemy the rider did NOT hit is
+ * the control: its loss IS one box's hit per enemy, measured inside the same firing. Reading the same thing from a second
+ * firing would need the box's chance to pass twice (it decays to 20% after the first success), so the per-firing question
+ * is the engine judge's, where the fixture states no chance at all.
  *
  * <p>⚠ The random source is pinned rather than seeded: {@code nextInt} says which effect runs, and {@code nextDouble}
  * never passes a crit - measured on this very fixture, a crit moves the box's damage by 50% (146.36 → 219.54) and the
@@ -64,6 +65,22 @@ public class SilverWolfLV999LootPickTest {
                         + "would be half of that, and no rider at all would leave the two losses equal");
     }
 
+    /**
+     * 「由敌方全体均分」: the box's own 90% is a TOTAL, so one enemy takes all of it and two take half each.
+     *
+     * <p>⚠ This is the reading the author confirmed, and it is the one the JSON cannot show by itself: the per-victim
+     * reading ("each enemy takes 90%") would make the same sentence deal 2x here, with the enemy count as the hidden
+     * factor. Read per enemy, the two fixtures differ by exactly the divisor.
+     */
+    @Test
+    public void theBoxsOwnDamageIsSplitAmongTheEnemies() {
+        double alone = boxsOwnDamagePerEnemy(1);
+        double eachOfTwo = boxsOwnDamagePerEnemy(2);
+        System.out.println("[1506] one enemy takes " + alone + ", two take " + eachOfTwo + " each");
+        Assertions.assertEquals(alone, 2 * eachOfTwo, 1e-6,
+                "the stated 90% is the total: with two enemies each takes half, so the TOTAL does not move with N");
+    }
+
     /** 【爆爆爆炸蛋】 restores 2 skill points and settles nothing else: the other end of the same pick. */
     @Test
     public void thePointsEffectDoesNotTouchTheEnemySide() {
@@ -87,6 +104,18 @@ public class SilverWolfLV999LootPickTest {
     // ==================================================================
     // Helpers
     // ==================================================================
+
+    /** One firing with {@code enemies} identical enemies, 【爆爆爆炸蛋】 picked, returning what each enemy lost. */
+    private static double boxsOwnDamagePerEnemy(int enemies) {
+        ScriptedRng rng = new ScriptedRng(PICK_POINTS);
+        Battle battle = battle(rng, enemies);
+        Reading reading = fire(battle, rng);
+        for (double lost : reading.hpLostEach) {
+            Assertions.assertEquals(reading.hpLostEach[0], lost, 1e-6,
+                    "identical enemies must take the same share, or the comparison below is meaningless");
+        }
+        return reading.hpLostEach[0];
+    }
 
     /** What one firing of the box moved: HP (in total and per enemy), skill points and laughs. */
     private record Reading(double hpLost, double[] hpLostEach, int skillPointsGained, int laughsGained) {
@@ -113,9 +142,17 @@ public class SilverWolfLV999LootPickTest {
 
     /** The wolf with her zone and 【无敌玩家】 up, and TWO identical enemies so "the total" is not one instance. */
     private static Battle battle(ScriptedRng rng) {
+        return battle(rng, 2);
+    }
+
+    /** The same, with however many identical enemies the case needs. */
+    private static Battle battle(ScriptedRng rng, int enemies) {
+        List<com.laosun.aluminium.models.enemy.Enemy> roster = new java.util.ArrayList<>();
+        for (int i = 0; i < enemies; i++) {
+            roster.add(EnemyFactory.create(MONSTER, 90, 1));
+        }
         Battle battle = new Battle(
-                List.of(CharacterFactory.create(WOLF, 80), CharacterFactory.create(ALLY, 80)),
-                List.of(EnemyFactory.create(MONSTER, 90, 1), EnemyFactory.create(MONSTER, 90, 1)), rng);
+                List.of(CharacterFactory.create(WOLF, 80), CharacterFactory.create(ALLY, 80)), roster, rng);
         battle.startBattle();
         battle.processRequests();
         Character wolf = battle.characters.getFirst();
