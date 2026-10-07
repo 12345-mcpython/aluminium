@@ -665,7 +665,8 @@ public class TriggerTable {
                 Boolean.TRUE.equals(spec.getOncePerBattle()), validateChance(spec),
                 minEidolon, validateMaxEidolon(spec, minEidolon), validatePerTurn(spec), validatePerAttack(spec),
                 Boolean.TRUE.equals(spec.getOncePerWave()), List.copyOf(targetFilters),
-                validatePerSubject(spec), validateOneOf(spec, effects), validateChanceDecay(spec)));
+                validatePerSubject(spec), validateOneOf(spec, effects), validateChanceDecay(spec),
+                spec.getOneOfNoRepeat() == null ? "" : spec.getOneOfNoRepeat().trim()));
     }
 
     /**
@@ -689,7 +690,13 @@ public class TriggerTable {
      * </ul>
      */
     private static boolean validateOneOf(TriggerSpec spec, List<EffectSpec> effects) {
+        String memory = spec.getOneOfNoRepeat() == null ? null : spec.getOneOfNoRepeat().trim();
         if (!Boolean.TRUE.equals(spec.getOneOf())) {
+            if (memory != null && !memory.isEmpty()) {
+                throw new IllegalArgumentException(
+                        "Trigger rule states \"one_of_no_repeat\" but not \"one_of\": there is no pick for a memory to "
+                                + "make a difference to (source: " + spec.getSource() + ")");
+            }
             for (EffectSpec effect : effects) {
                 if (Boolean.TRUE.equals(effect.getAlways())) {
                     throw new IllegalArgumentException(
@@ -698,6 +705,12 @@ public class TriggerTable {
                 }
             }
             return false;
+        }
+        if (memory != null && memory.isEmpty()) {
+            throw new IllegalArgumentException(
+                    "Trigger rule states \"one_of_no_repeat\" with a blank name, but the name IS the memory two rules "
+                            + "share - write the sentence's own name, or omit the field for a uniform pick "
+                            + "(source: " + spec.getSource() + ")");
         }
         List<EffectSpec> pool = new ArrayList<>();
         for (EffectSpec effect : effects) {
@@ -2285,6 +2298,8 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
      * @param minEidolon    the Eidolon rank the owner needs ({@code 0} = ungated)
      * @param chanceDecay   what the {@code chance} is multiplied by after a successful trigger
      *                      ({@code 0} = the probability does not decay; see {@link TriggerSpec#getChanceDecay()})
+     * @param oneOfNoRepeat the memory this rule's pick is filed under ({@code ""} = no memory, a uniform pick; two rules
+     *                      stating the same name share it - see {@link TriggerSpec#getOneOfNoRepeat()})
      */
     public record CompiledRule(TriggerEvent event, List<Condition> conditions,
                                List<EffectSpec> effects, String source, String key, String id,
@@ -2292,7 +2307,7 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
                                int maxEidolon,
                                int perTurn, int perAttack, boolean oncePerWave,
                                List<List<Condition>> effectTargetFilters, String perSubject,
-                               boolean oneOf, double chanceDecay) {
+                               boolean oneOf, double chanceDecay, String oneOfNoRepeat) {
 
         /**
          * The per-target conditions of one effect ({@code target_when}), by that effect's index in {@link #effects}.
