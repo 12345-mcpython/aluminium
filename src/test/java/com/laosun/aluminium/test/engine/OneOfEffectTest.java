@@ -110,6 +110,17 @@ public class OneOfEffectTest {
         Assertions.assertTrue(error.getMessage().contains("one_of"), "the message names the field it needs");
     }
 
+    /** And so is a WEIGHT on a rule with no `one_of`: there is no pick for it to be a share of. */
+    @Test
+    public void aWeightWithoutOneOfIsRefused() {
+        EffectSpec weighted = mark(A);
+        TriggerSpecs.set(weighted, "weight", 10.0);
+        IllegalArgumentException error = Assertions.assertThrows(IllegalArgumentException.class,
+                () -> table(TriggerSpecs.rule("TURN_START", List.of(), weighted, mark(B))));
+        System.out.println("[one_of] a weight without the field refused: " + error.getMessage());
+        Assertions.assertTrue(error.getMessage().contains("one_of"), "the message names the field it needs");
+    }
+
     /** The POOL is what "at least two" counts: one constant plus one pick is "pick one of one". */
     @Test
     public void aPoolOfOneBesideAnAlwaysEffectIsRefused() {
