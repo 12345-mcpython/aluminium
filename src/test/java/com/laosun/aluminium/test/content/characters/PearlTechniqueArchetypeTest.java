@@ -59,28 +59,53 @@ public class PearlTechniqueArchetypeTest {
         Assertions.assertEquals(20, pearl.getResources().value(COUNTER), "and she gets her 20 points");
     }
 
-    /** Without the technique nothing happens: the rule's own gate is the technique marker. */
+    /**
+     * Without the technique, the technique's own rule does nothing: no 深度学习 and no counter.
+     *
+     * <p>Note: The mark itself IS still there, because the caller named a holder and the map's answer is what the engine
+     * applies - see {@link #theCallersAnswerIsTheArchetype()}. This case is about the RULE's gate (the 秘技 marker), not
+     * about the mark, which is why it asserts the two things the rule produces and not the state the caller set.
+     */
     @Test
-    public void withoutTheTechniqueThereIsNoMarkAndNoStudy() {
+    public void withoutTheTechniqueTheRuleProducesNothing() {
         Battle battle = newBattle(false, true);
         Character pearl = battle.characters.get(0);
         Character archetype = battle.characters.get(1);
-        System.out.println("[pearl_technique] with no technique: mark="
-                + archetype.getBuffManager().hasState(MARK) + " deep="
+        System.out.println("[pearl_technique] with no technique: deep="
                 + archetype.getBuffManager().hasState(DEEP) + " counter="
                 + pearl.getResources().value(COUNTER));
-        Assertions.assertFalse(archetype.getBuffManager().hasState(MARK), "no technique, no mark");
-        Assertions.assertFalse(archetype.getBuffManager().hasState(DEEP), "and no 深度学习");
-        Assertions.assertEquals(0, pearl.getResources().value(COUNTER), "and no counter");
+        Assertions.assertFalse(archetype.getBuffManager().hasState(DEEP),
+                "「并【深度学习】持有【美学底本】的角色」 is gated on the 秘技 marker, which is not there");
+        Assertions.assertEquals(0, pearl.getResources().value(COUNTER), "and no counter either");
     }
 
-    /** The technique used with NOBODY designated is not an error, and marks nobody. */
+    /**
+     * The MAP decides who holds the mark, so naming a holder is enough - and the engine applies it.
+     *
+     * <p>Note: This case replaces one that asserted the opposite, and the change is the point of it. The first version
+     * required that a technique had been used as well, which was my own invention: 「切换行动角色」 is a map action and
+     * the map is pre-battle configuration, so by the time combat starts exactly one ally holds the mark and the caller
+     * has already accounted for the technique. An extra condition here could only ever DISAGREE with the caller.
+     */
     @Test
-    public void aTechniqueWithNoDesignatedArchetypeIsNotAnError() {
+    public void theCallersAnswerIsTheArchetype() {
+        Battle battle = newBattle(false, true);
+        Character archetype = battle.characters.get(1);
+        System.out.println("[pearl_technique] a named holder with no technique state: mark="
+                + archetype.getBuffManager().hasState(MARK) + " deep="
+                + archetype.getBuffManager().hasState(DEEP));
+        Assertions.assertTrue(archetype.getBuffManager().hasState(MARK),
+                "the unit the caller named holds 【美学底本】 - that IS the map's answer");
+        Assertions.assertFalse(archetype.getBuffManager().hasState(DEEP),
+                "while 深度学习 still needs the technique rule, whose gate is the 秘技 marker");
+    }
+
+    /** Nobody named means no archetype, and that is not an error. */
+    @Test
+    public void nobodyNamedMeansNoArchetype() {
         Battle battle = newBattle(true, false);
         Character pearl = battle.characters.get(0);
-        System.out.println("[pearl_technique] technique with no archetype named: counter="
-                + pearl.getResources().value(COUNTER));
+        System.out.println("[pearl_technique] no archetype named: counter=" + pearl.getResources().value(COUNTER));
         Assertions.assertEquals(20, pearl.getResources().value(COUNTER),
                 "the counter half is about Pearl and happens anyway");
         for (Character ally : battle.characters) {
