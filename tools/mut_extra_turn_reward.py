@@ -21,17 +21,21 @@ import sys
 CONTENT = pathlib.Path("src/main/resources/characters/1503.json")
 
 VARIANTS = {
-    "amount30": (CONTENT,
-                 '"op": "GAIN_RESOURCE", "resource": "好活当赏", "amount": 30',
-                 '"op": "GAIN_RESOURCE", "resource": "好活当赏", "amount": 1'),
-    "amount60": (CONTENT,
-                 '"op": "GAIN_RESOURCE", "resource": "笑点", "amount": 60',
-                 '"op": "GAIN_RESOURCE", "resource": "笑点", "amount": 1'),
-    # The strict reading: take exactly 30, erroring when it is not there. Expressed by raising the removal to 3000,
-    # which the clamped implementation absorbs (the counter caps at 50) while a strict one could not.
-    "strict": (CONTENT,
-               '"op": "REMOVE_RESOURCE", "resource": "好活当赏", "amount": 30',
-               '"op": "REMOVE_RESOURCE", "resource": "好活当赏", "amount": 3000'),
+    "grant30": (CONTENT,
+                '"op": "GAIN_RESOURCE",\n          "resource": "好活当赏",\n          "amount": 30',
+                '"op": "GAIN_RESOURCE",\n          "resource": "好活当赏",\n          "amount": 1'),
+    "grant60": (CONTENT,
+                '"op": "GAIN_RESOURCE",\n          "resource": "笑点",\n          "amount": 60',
+                '"op": "GAIN_RESOURCE",\n          "resource": "笑点",\n          "amount": 1'),
+    # The removal's own number. Note: an earlier variant here raised the removal to 3000 to stand for "a strict spend",
+    # and it SURVIVED - correctly, because with a clamping implementation removing 3000 and removing 30 are the same
+    # thing (both empty the counter). A mutation has to differ in what the judge READS, and this one does.
+    "take30": (CONTENT,
+               '"op": "REMOVE_RESOURCE",\n          "resource": "好活当赏",\n          "amount": 30',
+               '"op": "REMOVE_RESOURCE",\n          "resource": "好活当赏",\n          "amount": 1'),
+    "take60": (CONTENT,
+               '"op": "REMOVE_RESOURCE",\n          "resource": "笑点",\n          "amount": 60',
+               '"op": "REMOVE_RESOURCE",\n          "resource": "笑点",\n          "amount": 1'),
 }
 
 
