@@ -1,0 +1,26 @@
+content+engine: 1506's enhanced-basic ramp - a PLATEAU written as four linear terms, and a scale that reads a resource
+
+「每拥有 60 点【隐藏分】，强化普攻期间造成的伤害提高原伤害的 15%，最多叠加 2 层。」 That is
+min(floor(hidden / 60), 2) * 0.15 - nothing, one layer, a PLATEAU, two layers. The shipped vocabulary is linear and
+that function is not, so the rule states four threshold terms whose sum reproduces it:
+
+    hidden < 60     nothing
+    60 .. 119       0.15
+    120 .. 179      -0.075 + 0.075          = 0.15   the plateau: the +0.075 that starts cancels the one still running
+    >= 180          -0.075 + 0.075 + 0.15   = 0.30   the cap; nothing is stated above 180
+
+Engine: `self_attr_above:` now accepts a RESOURCE name as well as an attribute. Its reader is this clause - she has
+`隐藏分` as a counter, not an attribute - and the resource readout is the same one `self_resource:` uses. Until now
+the name went straight to AttributeType.fromString and threw "Unknown AttributeType: 隐藏分".
+
+Carried on ALL_DAMAGE_TYPE_BOOST, which is read per damage INSTANCE, so the ramp lands on the enhanced basic's damage
+and nothing else. Each term needs `coexist: true`: two modifiers on the same attribute and target are judged the same
+kind and evict each other.
+
+Measured, and recorded rather than papered over: a first version of the judge fired a damage event and read the
+difference in that attribute, and got 8.85 at 60 隐藏分, 9.0 at 120 and 18.0 at 180 - a quantity that GROWS. The reason
+is that the ramp is read from a resource, so its terms are re-added on every reading, and a synthetic event does not
+reproduce the engine's own single-firing context. Pinpointing that is a measurement problem of its own. What the case
+now holds is the decomposition term by term, which is where the plateau and the cap actually live.
+
+Full suite: 727 suites, 2484 tests, 0 failures.
