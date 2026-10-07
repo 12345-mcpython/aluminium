@@ -233,6 +233,20 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
     private final Map<String, Double> ruleCurrentChance = new HashMap<>();
 
     /**
+     * Per-battle <b>what each named pick last chose</b>, keyed by the memory name a rule states
+     * ({@code TriggerSpec.one_of_no_repeat}).
+     *
+     * <p>"随机生效 1 个效果…替换上次的效果且本次不会与上次重复" (light cone 21032): the value is the effect index the last pick
+     * landed on, and the next pick excludes it. It is keyed by a NAME rather than by the rule because the two rules that
+     * share it are one mechanism in the game - the cone's battle-start pick and its turn-start pick - and the document
+     * says the first turn-start pick must differ from the battle-start one.
+     *
+     * <p>Note: Per battle, cleared with the firing counters - "上次" is this fight's last effect.
+     */
+    @Getter(AccessLevel.NONE)
+    private final Map<String, Integer> rulePickMemory = new HashMap<>();
+
+    /**
      * Per-battle <b>skill level raises</b>, keyed by slot: "战技等级+1""终结技等级+1" (1001 Eidolon (星魂) 3/5, and the
      * same sentence in most characters' kits).
      *
@@ -842,7 +856,37 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
         ruleEffectTurnsBonus.clear();
         ruleEffectMaxStacksBonus.clear();
         ruleCurrentChance.clear();
+        rulePickMemory.clear();
         skillLevelBonus.clear();
+    }
+
+    /**
+     * The effect index the pick filed under {@code memory} landed on last time, or {@code -1} when nothing is filed yet
+     * (the first pick of the battle, which is uniform).
+     *
+     * @param memory the name the rule states in {@code one_of_no_repeat}
+     */
+    public int lastPick(String memory) {
+        if (memory == null || memory.isBlank()) {
+            return -1;
+        }
+        return rulePickMemory.getOrDefault(memory.trim(), -1);
+    }
+
+    /**
+     * Files this pick, so the next one under the same name cannot repeat it.
+     *
+     * <p>Called by the interpreter after the roll, and only for a rule that states a memory. Note: It is written even
+     * when the pick was <b>forced</b> (a pool of two after the exclusion), because the next firing must still differ
+     * from it.
+     *
+     * @param memory      the name the rule states in {@code one_of_no_repeat}
+     * @param effectIndex the effect this pick landed on
+     */
+    public void rememberPick(String memory, int effectIndex) {
+        if (memory != null && !memory.isBlank()) {
+            rulePickMemory.put(memory.trim(), effectIndex);
+        }
     }
 
     /**

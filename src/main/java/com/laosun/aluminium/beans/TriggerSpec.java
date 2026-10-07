@@ -247,6 +247,28 @@ public class TriggerSpec {
     }
 
     /**
+     * The <b>name</b> this rule's {@code one_of} pick is remembered under, so that the next pick cannot be the same one:
+     * 「随机生效 1 个效果。该效果生效时，替换上次的效果且**本次不会与上次重复**」.
+     *
+     * <p><b>Why a NAME and not a flag.</b> The memory belongs to the SENTENCE, not to the rule: light cone 21032's
+     * battle-start pick and its turn-start pick are one mechanism in the game - a single state modifier carries the
+     * current choice from one to the other (`MEquip_21032_Sub1/2/3`, read out of the ability data) - and the document
+     * says the first turn-start pick must differ from the battle-start one. Those two triggers cannot be one rule here,
+     * because {@code BATTLE_START} is fired with <b>no actor at all</b>, so a rule that names the wearer cannot also
+     * catch the battle's start. Two rules stating the same name therefore share one memory; a rule that states none has
+     * no memory, and its pick stays uniform.
+     *
+     * <p>⚠ It needs {@code one_of} - without a pick there is nothing to remember - and the memory is per <b>battle</b>:
+     * it is filed on the combatant next to the firing counters and cleared with them, which is what "替换上次" means
+     * (this fight's last effect, not a previous run's).
+     *
+     * <p>Reader: light cone 21032 「秘密」. Note what it is NOT: the pick stays <b>uniform</b> among the effects that are
+     * allowed - which is what the game's own script does, removing the current effect and rolling 50/50 over the other two.
+     */
+    @SerializedName("one_of_no_repeat")
+    private String oneOfNoRepeat;
+
+    /**
      * Where the rule came from (trace id, talent name, character-doc reference).
      *
      * <p>Not used by the engine at all: it exists so that anyone reading the JSON -- or a failing

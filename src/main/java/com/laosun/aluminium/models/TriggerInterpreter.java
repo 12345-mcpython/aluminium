@@ -1140,8 +1140,23 @@ public final class TriggerInterpreter {
                     pool.add(index);
                 }
             }
+            // "替换上次的效果且本次不会与上次重复": the memory is named by the rule, so two rules of one sentence (a battle start
+            // and a turn start) share it - see TriggerSpec.oneOfNoRepeat. ⚠ The remembered effect is excluded and the pick
+            // stays UNIFORM among the rest, which is what the game's own script does (remove the current, roll 50/50 over
+            // the other two). An unknown or already-excluded memory changes nothing, so the first pick is uniform.
+            String memory = rule.oneOfNoRepeat() == null ? "" : rule.oneOfNoRepeat().trim();
+            CanHit picker = ctx.owner();
+            if (!memory.isEmpty() && picker != null && pool.size() > 1) {
+                int last = picker.lastPick(memory);
+                if (last >= 0) {
+                    pool.removeIf(index -> index == last);
+                }
+            }
             if (!pool.isEmpty()) {
                 chosen = pool.get(battle.getRng().nextInt(pool.size()));
+                if (!memory.isEmpty() && picker != null) {
+                    picker.rememberPick(memory, chosen);
+                }
             }
         }
         for (EffectSpec effect : rule.effects()) {
