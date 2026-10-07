@@ -269,6 +269,24 @@ public class TriggerSpec {
     private String oneOfNoRepeat;
 
     /**
+     * If this rule triggers while every opponent is <b>down</b>, it is not delivered now: it is held and delivered when a
+     * wave brings enemies in - 「若触发前目标被消灭则对新入场的敌方目标触发」.
+     *
+     * <p>Reader: 1506 Silver Wolf LV.999's 【头号补给盲盒】, and the author's own reading of the sentence: the box waits for
+     * the new wave rather than being spent.
+     *
+     * <p>⚠ <b>What has already happened when it is held, and what has not.</b> The conditions and the ROLL are the
+     * firing's own - a held trigger consumed its fixed chance and decayed it (「成功触发后…」) - while the <b>effects</b>,
+     * including which one a {@code one_of} would pick, are decided at delivery. Asserted by the judge: after a held
+     * firing, the box's chance is 20%, so a later one needs a draw under 0.2.
+     *
+     * <p>Note: The delivery is part of the {@code WAVE_START} firing, so a rider reading "the total damage settled this
+     * firing" sees the held rule's own damage - they are one firing, not two.
+     */
+    @SerializedName("defer_until_wave")
+    private Boolean deferUntilWave;
+
+    /**
      * Where the rule came from (trace id, talent name, character-doc reference).
      *
      * <p>Not used by the engine at all: it exists so that anyone reading the JSON -- or a failing

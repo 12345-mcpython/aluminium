@@ -2796,10 +2796,44 @@ public class Battle {
                                 fromCast).withSkillId(skillId).withWeakHitCount(weakHitCount)
                                 .withAttackHitTargets(attackHitTargets));
             }
+            // Held triggers ("若触发前目标被消灭则对新入场的敌方目标触发"): the firing happened while nothing was on the field,
+            // so its effects were kept - and a wave has just brought enemies in. Delivered INSIDE this firing, so a rider
+            // reading "the damage settled this firing" sees the held rule's own damage: they are one firing, not two.
+            if (event == TriggerEvent.WAVE_START && !deferredTriggers.isEmpty()) {
+                List<DeferredTrigger> held = List.copyOf(deferredTriggers);
+                deferredTriggers.clear();
+                for (DeferredTrigger trigger : held) {
+                    TriggerInterpreter.apply(this, trigger.rule(), trigger.context());
+                    fired++;
+                }
+            }
             return fired;
         } finally {
             triggerDepth--;
         }
+    }
+
+    /**
+     * A rule whose trigger happened with nobody to deliver it to, kept until a wave brings enemies in.
+     *
+     * <p>Note: The CONTEXT is kept, not just the rule: "self" and the event's own actor are facts about the firing, and
+     * the delivery must not re-derive them from the wave (a wave event carries no actor at all). The conditions are
+     * deliberately <b>not</b> re-checked - the trigger already happened.
+     */
+    private record DeferredTrigger(TriggerTable.CompiledRule rule, TriggerTable.TriggerContext context) {
+    }
+
+    /** Triggers held until a wave arrives; see {@link TriggerSpec#getDeferUntilWave()}. */
+    private final List<DeferredTrigger> deferredTriggers = new ArrayList<>();
+
+    /**
+     * Holds a rule's effects until a wave brings enemies in; called by the interpreter in place of applying them.
+     *
+     * @param rule    the rule that triggered
+     * @param context the context it triggered with (its owner and actor are part of what is being held)
+     */
+    public void deferUntilWave(TriggerTable.CompiledRule rule, TriggerTable.TriggerContext context) {
+        deferredTriggers.add(new DeferredTrigger(rule, context));
     }
 
     /**

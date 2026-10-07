@@ -1116,6 +1116,24 @@ public final class TriggerInterpreter {
     }
 
     /**
+     * Whether the owner has any opponent left standing - the question {@code defer_until_wave} asks of the field.
+     *
+     * <p>Note: {@code getOpponents} does not filter the dead (the ops do, because only they know whether a dead unit is
+     * something they can act on), so the filter lives here: "no target" means no LIVING one.
+     */
+    private static boolean hasLivingOpponent(Battle battle, CanHit owner) {
+        if (battle == null || owner == null) {
+            return true;                          // nothing to judge the field with: deliver, as every rule did before
+        }
+        for (CanHit opponent : battle.getOpponents(owner)) {
+            if (opponent != null && !opponent.isDeath()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Runs every effect of a rule.
      *
      * @param battle the running battle
@@ -1275,7 +1293,14 @@ public final class TriggerInterpreter {
             if (chance < 1 && !battle.rollChance(chance)) {
                 continue;
             }
-            apply(battle, rule, ctx.withRule(rule.id()));
+            // "若触发前目标被消灭则对新入场的敌方目标触发": the trigger already HAPPENED (its conditions and its roll are
+            // spent), but there is nobody to deliver it to - so it is held and delivered when a wave brings enemies in.
+            // Note: The effects - including which one a `one_of` picks - are decided at delivery; only the gate is now.
+            if (rule.deferUntilWave() && !hasLivingOpponent(battle, owner)) {
+                battle.deferUntilWave(rule, ctx.withRule(rule.id()));
+            } else {
+                apply(battle, rule, ctx.withRule(rule.id()));
+            }
             if (owner != null && rule.chanceDecay() > 0) {
                 // "成功触发后": the rule really ran, so the NEXT time it is asked for, its probability is this much
                 // smaller. A failed roll returned above, and a firing turned away by a condition or a limit never got
