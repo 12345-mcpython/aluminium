@@ -1,0 +1,30 @@
+content: 1506's ZONE - the registration was wrong, and both halves were writable
+
+The note said the Zone needed "a ZONE (region) mechanism and 战技点 consumption events - neither exists". Both halves of
+that are false, and this ships what they were blocking.
+
+The Zone exists as a NAMED STATE marker, not a container: 1203's talent opens it with APPLY_BUFF buff 结界 and its next
+clause reads it with `target has_state 结界`; 1410's ult_zone_opens_and_lowers carries `buff: 结界` with `ticks_on: self`;
+1513 uses it too. And SKILL_POINT_SPENT is a real event.
+
+  * p1506_ult_deploys_the_zone - her Ultimate deploys 【结界】 on her, 「展开结界」;
+  * p1506_zone_loot_box_on_a_spent_point - inside it, a Skill Point an ally spends triggers one 【头号补给盲盒】 dealing 90%
+    Imaginary Elation damage to all enemies.
+
+The discipline this cost: before writing "this needs mechanism X", search how X ALREADY APPEARS in shipped content. I
+concluded from "there is no Zone class in the engine", while content expresses it by name and state - and the corpus had
+been doing so since 1203.
+
+Registered, and now narrower than the old entry:
+
+  * the decaying FIXED CHANCE - 「初始固定概率为 100%，成功触发后下一次触发的固定概率降低至当前概率的 20%」. The engine rolls a
+    rule-level `chance`, but has no amendment for it: MODIFY_RULE raises an effect's `base_chance`, which is the
+    debuff-application probability. A static 1.0 fires every time and a static 0.2 fires at the wrong moment, so neither
+    is an honest reading of a probability that decays;
+  * the three-way random EFFECT, which needs "pick one of N" - the same gap 21032's random-effect selection is registered
+    under.
+
+A reading choice is recorded rather than buried: the damage is settled per enemy ("每个目标各受 90%") because the engine
+has no "split a total evenly" primitive, and that differs from 「由敌方全体均分」 whenever there is more than one enemy.
+
+Full suite: 727 suites, 2485 tests, 0 failures.
