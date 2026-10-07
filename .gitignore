@@ -10,3 +10,8 @@ __pycache__/
 
 # Scratch output and local working notes from tools/ (the scripts themselves are tracked)
 tools/_*
+
+# Backups made by the tools/ mutation scripts. They are scratch: the scripts restore through
+# `git checkout HEAD -- <path>`, because a .bak goes stale and `checkout --` restores the INDEX rather than
+# HEAD - both of which have cost this project rounds. One was committed by accident once, so keep them out.
+*.bak
