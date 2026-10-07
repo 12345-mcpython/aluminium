@@ -1,0 +1,24 @@
+test: 1506's kit judge - five clauses pinned, two recorded as OPEN rather than guessed
+
+Covers the batch just shipped: the Skill's 5 笑点, the Elation skill's 15 隐藏分, the Ultimate entering
+【无敌玩家】 with the trace's 20 隐藏分 and the enhanced-basic allowance filled, three enhanced basics ending the
+state and clearing 隐藏分, and the true-ending trace paying 20 at 20 counted laughs and another 20 at 40.
+
+Two clauses are shipped but NOT passing, and they are written into the file's javadoc as open work instead of
+being disabled quietly:
+
+  * Eidolon 1's 「保留 20% 的【隐藏分】」 reads 0 where it should read 12 (a fifth of the 60 held at exit). The
+    CLEAR half works - the case beside it proves that - so the question is what the E1 rule's share reads. Two
+    spellings were tried and both read 0: amountFromEvent, which is wrong for a documented reason (STATE_ENDED's
+    amount slot carries the state's STACK count, not the resource the clear took), and amountFromPrevious, the
+    spelling 1505's Eidolon uses for this shape. The next step is to measure previousCredited across the pair;
+  * the 40% Basic/Skill rider while she holds 【好活当赏】: the Basic deals the same 147.84 either way. This judge
+    synthesizes its own DAMAGE instance instead of driving her slot-1 skill, so the FIXTURE may be at fault rather
+    than the rule, and that has to be separated first.
+
+Finding worth keeping: ATTACK_FINISHED does not carry a skill slot - Battle fires it with a null skillId - so the
+rule ending 【无敌玩家】 could not be gated on from_skill_id == 8. Its symptom was silent: the state simply stayed
+up while the counter ran down, and both rules looked right on their own. It is now gated on the state itself,
+which is what grants the enhanced basic in the first place.
+
+Full suite: 725 suites, 2477 tests, 0 failures.

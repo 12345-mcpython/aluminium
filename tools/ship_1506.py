@@ -92,7 +92,7 @@ RULES = [
         "when": ["actor state_ended 无敌玩家"],
         "do": [
             {"op": "SPEND_RESOURCE", "resource": HIDDEN, "spendAll": True, "target": "self"},
-            {"op": "GAIN_RESOURCE", "resource": HIDDEN, "amountFromEvent": True, "amountPercent": 0.2, "target": "self"},
+            {"op": "GAIN_RESOURCE", "resource": HIDDEN, "amountFromPrevious": True, "amountPercent": 0.2, "target": "self"},
         ],
         "source": "1506 银狼LV.999 星魂 1 以太编辑：星魂+1: 「退出【无敌玩家】状态时不会清空【隐藏分】，改为保留 20% 的【隐藏分】」"
                   "—— #2 = 0.2。",
@@ -100,6 +100,14 @@ RULES = [
                 "⚠ 解决办法就是**利用文件顺序** ✓：那条（先）清空 ✓、本条（后）按**事件携带的量**恢复 20% ✓。"
                 "⚠ 所以本条的**顺序是承重的** ✓ —— 它必须排在 `p1506_leaving_godmode_clears_hidden` **之后** ✓，"
                 "而且它先清再补 ✓（否则会变成保留 120% ✓）。⭐ 这一点由判据**同时读两条路径**钉住 ✓。",
+    },
+    {
+        "on": "ULT_CAST",
+        "id": "p1506_ult_installs_the_enhanced_basic",
+        "when": ["actor == self"],
+        "do": [{"op": "REPLACE_SKILL", "skill": "COMMON", "skill_id": 8, "turns": 3, "target": "self"}],
+        "source": "1506 银狼LV.999 天赋: 「【无敌玩家】状态下…拥有强化普攻和强化欢愉技」—— 强化普攻是槽位 8。",
+        "note": "⚠ 这一条是补的：没有它，【无敌玩家】装不上强化普攻，槽 8 的消耗与退出规则永远不会触发（症状是沉默的）。",
     },
     {
         "on": "BASIC_ATTACK",
@@ -113,7 +121,7 @@ RULES = [
     {
         "on": "ATTACK_FINISHED",
         "id": "p1506_three_enhanced_basics_end_godmode",
-        "when": ["actor == self", "from_skill_id == 8.0", "self_resource:强化普攻次数 <= 0", "self has_state 无敌玩家"],
+        "when": ["actor == self", "self_resource:强化普攻次数 <= 0", "self has_state 无敌玩家"],
         "do": [{"op": "REMOVE_STATE", "buff": GOD, "target": "self"}],
         "source": "1506 银狼LV.999 天赋: 「完整施放 3 次强化普攻后退出【无敌玩家】状态」",
         "note": "⭐ 「**施放完 3 次之后**」的落点是 `ATTACK_FINISHED` ✓（攻击结算完 ✓），"
