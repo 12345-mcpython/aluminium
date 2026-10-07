@@ -532,19 +532,31 @@
           "percent": 0.2,
           "element": "Imaginary",
           "damage_type": "TRUE",
-          "target": "highest_hp_enemy"
+          "target": "highest_hp_enemy",
+          "weight": 1
         },
         {
           "op": "GAIN_RESOURCE",
           "resource": "战技点",
           "amount": 2,
-          "target": "self"
+          "target": "self",
+          "weight": 1,
+          "weight_steps": [
+            "战技点:4:-0.9",
+            "战技点:5:-0.099"
+          ]
         },
         {
           "op": "GAIN_RESOURCE",
           "resource": "笑点",
           "amount": 3,
-          "target": "self"
+          "target": "self",
+          "weight": 10,
+          "weight_steps": [
+            "隐藏分:60:-9",
+            "隐藏分:120:-0.9",
+            "隐藏分:300:-0.099"
+          ]
         }
       ],
       "source": "1506 银狼LV.999 终结技 无敌玩家，启动！ (150603): 「结界内我方目标每消耗 1 个战技点，有概率触发 1 次【头号补给盲盒】：造成 90% 的虚数属性欢愉伤害，由敌方全体均分，并随机触发 1 种效果：【超超超大剑】：对生命值最高的敌方目标额外造成等同于本次总伤害值 20% 的真实伤害；【爆爆爆炸蛋】：恢复 2 个战技点；【怪怪怪味豆】：获得 3 个笑点。触发该效果的初始固定概率为 100%，成功触发后下一次触发的固定概率降低至当前概率的 20%。」—— #3 = 0.9、#5 = 0.2、#6 = 2、#7 = 3（初始 100% 与衰减 20% 是正文，不在参数行里）。",

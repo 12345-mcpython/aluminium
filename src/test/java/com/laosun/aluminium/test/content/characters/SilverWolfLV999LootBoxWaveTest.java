@@ -31,8 +31,13 @@ public class SilverWolfLV999LootBoxWaveTest {
     private static final int WOLF = 1506;
     private static final int ALLY = 1204;
     private static final int MONSTER = 1002011;
-    /** The pool index of 【爆爆爆炸蛋】: 2 skill points, and no damage of its own. */
-    private static final int PICK_POINTS = 1;
+    /**
+     * 【爆爆爆炸蛋】's WEIGHT bucket: 2 skill points, and no damage of its own.
+     *
+     * <p>⚠ The pick is WEIGHTED (the game's grades: 1 / 1 / 10 while 隐藏分 is under 60), so the roll is over the weight
+     * total and this is the bucket's lower edge, not a pool index.
+     */
+    private static final int PICK_POINTS = 1000;
 
     /** The box triggered with nobody on the field is held, and the wave delivers it to the enemy that just entered. */
     @Test
@@ -139,7 +144,9 @@ public class SilverWolfLV999LootBoxWaveTest {
 
         @Override
         public int nextInt(int bound) {
-            return pick;
+            // ⚠ Clamped: other draws share this source (a bounce picks its target with `nextInt(alive.size())`), and a
+            // weight bucket there would index out of bounds.
+            return Math.min(pick, bound - 1);
         }
 
         @Override

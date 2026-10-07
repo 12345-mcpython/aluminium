@@ -1116,8 +1116,66 @@ public final class TriggerInterpreter {
     }
 
     /**
-     * Whether the owner has any opponent left standing - the question {@code defer_until_wave} asks of the field.
+     * How much of a {@code one_of} pick an effect gets: its {@code weight}, plus every {@code weight_steps} entry whose
+     * counter is at or above its threshold. See {@link EffectSpec#getWeight()}.
      *
+     * <p>Note: An effect that states neither counts as {@code 1}, which is what keeps a partly-weighted pool meaningful.
+     */
+    private static double weightOf(EffectSpec effect, TriggerContext ctx) {
+        double weight = effect.getWeight() == null ? 1 : effect.getWeight();
+        if (effect.getWeightSteps() == null) {
+            return weight;
+        }
+        for (String raw : effect.getWeightSteps()) {
+            String[] parts = raw == null ? new String[0] : raw.trim().split(":", 3);
+            if (parts.length != 3) {
+                throw new IllegalStateException("a weight step is written \"<resource>:<threshold>:<delta>\", e.g. "
+                        + "\"战技点:4:-0.9\", and this one is \"" + raw + "\"");
+            }
+            String name = parts[0].trim();
+            double threshold;
+            double delta;
+            try {
+                threshold = Double.parseDouble(parts[1].trim());
+                delta = Double.parseDouble(parts[2].trim());
+            } catch (NumberFormatException notANumber) {
+                throw new IllegalStateException("a weight step's threshold and delta must be numbers, and \"" + raw
+                        + "\" is not");
+            }
+            if (counterValue(name, ctx) >= threshold) {
+                weight += delta;
+            }
+        }
+        return weight;
+    }
+
+    /**
+     * The quantity a weight step watches: an attribute of the rule owner, one of its own counters, or the BATTLE's
+     * skill points - the last one because 「战技点」 is a counter the battle owns, not a {@code Resource} (see
+     * {@link #SKILL_POINT}).
+     */
+    private static double counterValue(String name, TriggerContext ctx) {
+        CanHit owner = ctx == null ? null : ctx.owner();
+        if (SKILL_POINT.equals(name)) {
+            return ctx.battle() == null ? 0 : ctx.battle().getSkillPoints();
+        }
+        if (owner == null) {
+            return 0;
+        }
+        try {
+            return owner.getAttribute(AttributeType.fromString(name)).get();
+        } catch (IllegalArgumentException notAnAttribute) {
+            // falls through to the counter readout below, exactly like the `self_attr_above` scale does
+        }
+        if (owner.getResources() != null && owner.getResources().has(name)) {
+            return owner.getResources().value(name);
+        }
+        throw new IllegalStateException("a weight step reads \"" + name + "\", which is neither an attribute of "
+                + owner.getName() + ", one of its counters, nor the battle's skill points");
+    }
+
+    /**
+     * Whether the owner has any opponent left standing - the question {@code defer_until_wave} asks of the field.     *
      * <p>Note: {@code getOpponents} does not filter the dead (the ops do, because only they know whether a dead unit is
      * something they can act on), so the filter lives here: "no target" means no LIVING one.
      */
@@ -1171,8 +1229,48 @@ public final class TriggerInterpreter {
                 }
             }
             if (!pool.isEmpty()) {
-                chosen = pool.get(battle.getRng().nextInt(pool.size()));
-                if (!memory.isEmpty() && picker != null) {
+                // WEIGHTS: 「有概率触发 1 次…」 where the chance is graded per effect - 「战技点较少时，触发概率提高…较多时降低」.
+                // Scale is 1000, because the game's own smallest grade is 0.001 (measured: its ability script multiplies
+                // the graded chance by 10 / 0.1 / 0.001). A pool where nobody states a weight keeps the uniform roll.
+                boolean weighted = false;
+                int[] weights = new int[pool.size()];
+                for (int index = 0; index < pool.size(); index++) {
+                    EffectSpec candidate = rule.effects().get(pool.get(index));
+                    if (candidate.getWeight() != null || candidate.getWeightSteps() != null) {
+                        weighted = true;
+                    }
+                    weights[index] = (int) Math.round(weightOf(candidate, ctx) * 1000);
+                    if (weights[index] < 0) {
+                        throw new IllegalStateException("the pick weight of " + candidate.getOp() + " is negative ("
+                                + weights[index] / 1000.0 + "); a weight is a share of the pick, so it cannot be less "
+                                + "than zero (source: " + rule.source() + ")");
+                    }
+                }
+                if (!weighted) {
+                    chosen = pool.get(battle.getRng().nextInt(pool.size()));
+                } else {
+                    long total = 0;
+                    for (int weight : weights) {
+                        total += weight;
+                    }
+                    if (total <= 0) {
+                        throw new IllegalStateException("this rule's `one_of` is WEIGHTED but every weight adds up to "
+                                + "nothing, so there is no distribution to roll against (source: " + rule.source() + ")");
+                    }
+                    if (total > Integer.MAX_VALUE) {
+                        throw new IllegalStateException("this rule's `one_of` weights add up to " + total
+                                + ", which no single roll can cover (source: " + rule.source() + ")");
+                    }
+                    int roll = battle.getRng().nextInt((int) total);
+                    for (int index = 0; index < pool.size(); index++) {
+                        roll -= weights[index];
+                        if (roll < 0) {
+                            chosen = pool.get(index);
+                            break;
+                        }
+                    }
+                }
+                if (!memory.isEmpty() && picker != null && chosen >= 0) {
                     picker.rememberPick(memory, chosen);
                 }
             }

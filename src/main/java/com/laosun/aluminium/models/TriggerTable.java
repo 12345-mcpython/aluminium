@@ -484,6 +484,16 @@ public class TriggerTable {
             }
         }
         for (EffectSpec effect : rule.effects()) {
+            // `weight_steps` READS a counter ("<resource>:<threshold>:<delta>"), so an undeclared one must be refused
+            // here exactly like a condition that reads it - otherwise the step silently counts nothing.
+            if (effect.getWeightSteps() != null) {
+                for (String step : effect.getWeightSteps()) {
+                    String named = step == null ? "" : step.trim().split(":", 2)[0].trim();
+                    if (!named.isEmpty()) {
+                        referencedResources.add(named);
+                    }
+                }
+            }
             if (effect.getOp() == null || effect.getResource() == null) {
                 continue;
             }
@@ -703,6 +713,12 @@ public class TriggerTable {
                     throw new IllegalArgumentException(
                             "An effect states \"always\" but its rule does not state \"one_of\": there is no pick for "
                                     + "it to stay out of, so the field says nothing (source: " + spec.getSource() + ")");
+                }
+                if (effect.getWeight() != null || effect.getWeightSteps() != null) {
+                    throw new IllegalArgumentException(
+                            "An effect states a pick \"weight\" / \"weight_steps\" but its rule does not state "
+                                    + "\"one_of\": there is no pick for a weight to be a share of "
+                                    + "(source: " + spec.getSource() + ")");
                 }
             }
             return false;

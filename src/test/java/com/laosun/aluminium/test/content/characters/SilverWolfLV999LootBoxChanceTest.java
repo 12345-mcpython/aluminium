@@ -33,8 +33,13 @@ public class SilverWolfLV999LootBoxChanceTest {
     private static final int WOLF = 1506;
     private static final int ALLY = 1204;
     private static final int MONSTER = 1002011;
-    /** The pool index of 【爆爆爆炸蛋】: it restores skill points and settles no damage. */
-    private static final int PICK_POINTS = 1;
+    /**
+     * 【爆爆爆炸蛋】's WEIGHT bucket: it restores skill points and settles no damage.
+     *
+     * <p>⚠ The pick is WEIGHTED (the game's grades: 1 / 1 / 10 while 隐藏分 is under 60), so the roll is over the weight
+     * total and this is the bucket's lower edge, not a pool index.
+     */
+    private static final int PICK_POINTS = 1000;
 
     /** 100% → 20% → 4% → 【崩坏级伤害演示】 → 100%, each step read through the roll. */
     @Test
@@ -114,7 +119,9 @@ public class SilverWolfLV999LootBoxChanceTest {
 
         @Override
         public int nextInt(int bound) {
-            return pick;
+            // ⚠ Clamped: other draws share this source - her enhanced Elation skill's bounce picks a target with
+            // `nextInt(alive.size())`, and a weight bucket there would index out of bounds.
+            return Math.min(pick, bound - 1);
         }
 
         @Override
