@@ -718,27 +718,12 @@
           "target": "self",
           "scale": "self_attr_above:DEFENCE:2400",
           "amount": 0.32,
-          "cap_amount": 0.68
+          "cap_amount": 0.68,
+          "coexist": true
         }
       ],
       "source": "1503 真珠 行迹 洞察万物 (1503101): 「真珠的防御力大于等于 2400 时，使自身欢愉度提高 32%，之后每超过 100 点防御力使自身欢愉度提高 3%，最多计入 3600 点超出的防御力」。",
-      "note": "⭐⭐ **一条规则，不是两条** —— 第一版写成两条（平的 0.32 与 `self_attr_above:DEFENCE:2400` + `amount: -0.04`），而**实测在 DEF = 2400 处读到 0.28 而不是 0.32** ✗：两条同属性、同类的修饰**互相替换**（`max_stacks` 默认 1，这是引擎的既有口径），后一条在超出量为 0 时给出 `0 − 0.04`，把前一条顶掉了 ✓。⭐ 合并**不是绕道** ✓：`self_attr_above:DEFENCE:2400` 本身就取 `max(0, DEF − 2400)` ✓，所以一条规则读 `0.32 + 0.0003 × 超出量` ✓，而 `cap_amount: 0.68` 正好写出文档的上限 —— 「最多计入 3600 点超出的防御力」⇒ `0.32 + 0.0003 × (3600 − 2400) = 0.68` ✓。⇒ 上限这次是**按输出端**表达的，而它与文档的读法在**任何** DEF 上都相等 ✓（写 `amount` 那种输出端偏移才会分岔 ✓）。⭐ 判据 `PearlInsightTraceTest` 量四点：2300 给 0 ✓、2400 给 0.32 ✓、2500 给 0.35 ✓、4000 与 5000 **读数相同**（封顶 0.68 ✓）。"
-    },
-    {
-      "on": "BATTLE_START",
-      "id": "trace_insight_links_healing_to_elation",
-      "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "OUTGOING_HEALING_BOOST",
-          "scale": "self_attr:ELATION_DAMAGE_BOOST",
-          "percent": 0.2,
-          "permanent": true,
-          "target": "self"
-        }
-      ],
-      "source": "1503 真珠 行迹 洞察万物 (1503101) 第二句: 「真珠获得等同于自身欢愉度 20% 的治疗量加成」。",
-      "note": "⭐ `OUTGOING_HEALING_BOOST` 是**治疗者侧**的属性（`Battle.heal` 从施放者身上读），首个出货读者是 `1105.json` 的行迹 调理 —— 所以这里同样只是内容。⭐ 量的来源是**欢愉度**（`ELATION_DAMAGE_BOOST`），这是个**比率属性**，所以 `percent × 该值` 得到的就是「欢愉度的 20%」这件事本身的单位（比率），不需要再换算。⚠ 顺序：`BATTLE_START` 上三条规则按**文件顺序**执行 —— 上面两条先抬高欢愉度，这一条随后按**抬完的**值取 20%（这是「等同于自身欢愉度」的自然读法，也是判据里能观测到的一处差别）。"
+      "note": "⭐⭐ **一条规则，不是两条** —— 第一版写成两条（平的 0.32 与 `self_attr_above:DEFENCE:2400` + `amount: -0.04`），而**实测在 DEF = 2400 处读到 0.28 而不是 0.32** ✗：两条同属性、同类的修饰**互相替换**（`max_stacks` 默认 1，这是引擎的既有口径），后一条在超出量为 0 时给出 `0 − 0.04`，把前一条顶掉了 ✓。⭐ 合并**不是绕道** ✓：`self_attr_above:DEFENCE:2400` 本身就取 `max(0, DEF − 2400)` ✓，所以一条规则读 `0.32 + 0.0003 × 超出量` ✓，而 `cap_amount: 0.68` 正好写出文档的上限 —— 「最多计入 3600 点超出的防御力」⇒ `0.32 + 0.0003 × (3600 − 2400) = 0.68` ✓。⇒ 上限这次是**按输出端**表达的，而它与文档的读法在**任何** DEF 上都相等 ✓（写 `amount` 那种输出端偏移才会分岔 ✓）。⭐ 判据 `PearlInsightTraceTest` 量四点：2300 给 0 ✓、2400 给 0.32 ✓、2500 给 0.35 ✓、4000 与 5000 **读数相同**（封顶 0.68 ✓）。\n  ⚠⚠ **必须带 `coexist: true`** ✓：`StatModifierBuff.isSameKind` 的身份是 **(属性, modifierType, sourceRole)** ✓ —— **名字不参与** ✓ —— 所以同属性的两条 `MODIFY_ATTR` 会**互相替换** ✗。实测：行迹的 `ELATION_DAMAGE_BOOST +0.10` 把这一条算出来的值**顶掉**了（2400 防御处读数由 0.42 变 0.10 ✓）；行迹的 `EFFECT_RESISTANCE +0.10` 同样顶掉了感知容差的光环 ✓。⚠ **不能靠合并解决**：行迹是**无条件**的，而这一条**带门**（防御 ≥ 2400 / 持有【好活当赏】）⇒ 一条规则扛不了两句话 ✓。⇒ 用引擎既有的 `coexist` ✓（它的注释写的就是这个用途：「一个效果可以要求**不被顶掉**」✓，两个方向都保护 ✓）。"
     },
     {
       "on": "ULT_CAST",
@@ -753,11 +738,12 @@
           "attribute": "EFFECT_RESISTANCE",
           "percent": 0.5,
           "permanent": true,
-          "target": "all_allies"
+          "target": "all_allies",
+          "coexist": true
         }
       ],
       "source": "1503 真珠 行迹 感知容差 (1503102): 「持有【好活当赏】时，我方全体目标的**效果抵抗**提高 50%」。",
-      "note": "⭐⭐ **门改对了**（本轮）：原文的门是「**持有【好活当赏】时**」✓，而它**有现成写法** —— `self_resource:好活当赏 >= 1` ✓。⚠ 我上一版写成 `self has_state 深度学习`、并把门放在 `target_when`，还断言「持有它这个条件今天写不出来」 ✗ —— **那句话是错的** ✓，而且仓库里就有反例：`1505.json` **三条已出货规则**用的正是这个条件拼写（`self_resource:好活当赏 >= 1` ✓，`1201`/`1003` 同族 ✓）。⇒ 近似已撤下 ✓。⭐ 三条口径：① **`>= 1` 就是「持有」** ✓（数值资源没有「状态」可问，而「有没有」就是 `>= 1` ✓）；② **门属于 `when`，不属于 `target_when`** ✓ —— 「她持有它」说的是**规则的主语**，不是「哪些候选合格」；写在 `target_when` 里虽然也能跑（`self` 在那里仍绑规则主人 ✓），但说的是另一件事 ✓；③ **条件单调**（只会从假变真 ⇒ 第一次满足时挂上、之后一直成立 ✓），所以 `permanent: true` 的光环语义与这句话一致 ✓。⚠ 未表达的是同句**没有**的那部分：原文只要求「持有」，没说什么时候撤下 —— 而【好活当赏】在她的声明里是**持续时间无限** ✓（`resources[0]` 的 source 原话 ✓）⇒ 不撤下是对的 ✓。⭐ 另：效果抵抗的属性名**早就存在** —— 本文件此前那句「`AttributeType` 里没有任何名字命名效果抵抗（实测扫过）」是**错的**：`EFFECT_RESISTANCE`（`AttributeType:44`，由游戏属性 `StatusResistanceBase` 映射，见 `:289`）。这与「我断言欢愉伤害属性不存在、而 `ELATION_DAMAGE_BOOST` 一直都在」是同一个错法，已作为纪律记下。"
+      "note": "⭐⭐ **门改对了**（本轮）：原文的门是「**持有【好活当赏】时**」✓，而它**有现成写法** —— `self_resource:好活当赏 >= 1` ✓。⚠ 我上一版写成 `self has_state 深度学习`、并把门放在 `target_when`，还断言「持有它这个条件今天写不出来」 ✗ —— **那句话是错的** ✓，而且仓库里就有反例：`1505.json` **三条已出货规则**用的正是这个条件拼写（`self_resource:好活当赏 >= 1` ✓，`1201`/`1003` 同族 ✓）。⇒ 近似已撤下 ✓。⭐ 三条口径：① **`>= 1` 就是「持有」** ✓（数值资源没有「状态」可问，而「有没有」就是 `>= 1` ✓）；② **门属于 `when`，不属于 `target_when`** ✓ —— 「她持有它」说的是**规则的主语**，不是「哪些候选合格」；写在 `target_when` 里虽然也能跑（`self` 在那里仍绑规则主人 ✓），但说的是另一件事 ✓；③ **条件单调**（只会从假变真 ⇒ 第一次满足时挂上、之后一直成立 ✓），所以 `permanent: true` 的光环语义与这句话一致 ✓。⚠ 未表达的是同句**没有**的那部分：原文只要求「持有」，没说什么时候撤下 —— 而【好活当赏】在她的声明里是**持续时间无限** ✓（`resources[0]` 的 source 原话 ✓）⇒ 不撤下是对的 ✓。⭐ 另：效果抵抗的属性名**早就存在** —— 本文件此前那句「`AttributeType` 里没有任何名字命名效果抵抗（实测扫过）」是**错的**：`EFFECT_RESISTANCE`（`AttributeType:44`，由游戏属性 `StatusResistanceBase` 映射，见 `:289`）。这与「我断言欢愉伤害属性不存在、而 `ELATION_DAMAGE_BOOST` 一直都在」是同一个错法，已作为纪律记下。\n  ⚠⚠ **必须带 `coexist: true`** ✓：`StatModifierBuff.isSameKind` 的身份是 **(属性, modifierType, sourceRole)** ✓ —— **名字不参与** ✓ —— 所以同属性的两条 `MODIFY_ATTR` 会**互相替换** ✗。实测：行迹的 `ELATION_DAMAGE_BOOST +0.10` 把这一条算出来的值**顶掉**了（2400 防御处读数由 0.42 变 0.10 ✓）；行迹的 `EFFECT_RESISTANCE +0.10` 同样顶掉了感知容差的光环 ✓。⚠ **不能靠合并解决**：行迹是**无条件**的，而这一条**带门**（防御 ≥ 2400 / 持有【好活当赏】）⇒ 一条规则扛不了两句话 ✓。⇒ 用引擎既有的 `coexist` ✓（它的注释写的就是这个用途：「一个效果可以要求**不被顶掉**」✓，两个方向都保护 ✓）。"
     },
     {
       "on": "ULT_CAST",
@@ -780,6 +766,62 @@
       ],
       "source": "1503 真珠 星魂 6 用一副躯壳，演算生命: 「【深度学习】时，我方全体目标的全属性**抗性穿透**提高 20%」（参数 `[0.2, 2.4]` 的第二项是 240% 的欢愉伤害，仍未写）。",
       "note": "⭐⭐ **本轮推翻了一处流传很久的笔记**：`1403.json` 写着「“全属性抗性穿透”没有写法 ✗（引擎只有 1207 那条 `DAMAGE_PENETRATION`，绑定单一元素 ✓）」—— **后半句是错的** ✓。实测读源码：`Battle:3065` 是 `damage.resist(rawResist, attacker.getAttribute(DAMAGE_PENETRATION).get())`，而 `rawResist = enemy.getDamageResist().getOrDefault(damage.getElement(), 0.0)` 已经取过元素 ✓ ⇒ **穿透是攻击者的一个值，与元素无关** ✓，它减的是**任何**元素的那一发抗性 ✓。已经有三份出货内容按这个读法用它（`1408:123` ✓、`1412:177` ✓、`1502` ✓），所以那个笔记与仓库里的三处出货**互相矛盾** ✓，本轮以源码为准 ✓（并把它记进 GAPS，免得第四次重犯 ✓）。⭐ `min_eidolon: 6` 让“这句属于星魂”写在机制旁边（引擎依旧不认识星魂，照 `1211` 的既有写法）。⭐ 门写 `self has_state 深度学习` —— 这一条**恰好准确**：原文的门就是【深度学习】本身。⚠ 星魂 6 的另一半（强化普攻额外 240% 冰属性欢愉伤害、用【美学底本】的属性值计算）**未写**：引擎侧的 `holder_attr:` 已经就位，缺的是**哪条属性**（正文没说、能力脚本不在数据里）—— 见 `GAPS.md`（2026-10-06）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "stat_traces_the_ten_panel_rows",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE",
+          "percent": 0.225,
+          "permanent": true,
+          "target": "self",
+          "coexist": true
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SPEED",
+          "amount": 9.0,
+          "permanent": true,
+          "target": "self",
+          "coexist": true
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "EFFECT_RESISTANCE",
+          "percent": 0.1,
+          "permanent": true,
+          "target": "self",
+          "coexist": true
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ELATION_DAMAGE_BOOST",
+          "percent": 0.1,
+          "permanent": true,
+          "target": "self",
+          "coexist": true
+        }
+      ],
+      "source": "1503 真珠 行迹属性（`AvatarSkillTreeConfig` 的 `AvatarID=1503` 行，`StatusAddList` 十条）：防御力 +5.00%/+7.50%/+10.00%（1503201/1503205/1503210）、速度 +2/+3/+4（1503202/1503206/1503209）、效果抵抗 +4.00%/+6.00%（1503203/1503207）、欢愉度 +4.00%/+6.00%（1503204/1503208）。",
+      "note": "⭐⭐ **这一条补的是一个实测出来的空洞**：语料说这十条属性行迹『已由 `SkillTrace` 处理，不需要内容规则』✓ —— 那句话对**通路**是对的 ✓，对**数据**是错的 ✗。实测三件事：① `AvatarSkillTreeConfig` 里 `AvatarID=1503` **确实带着**这十条（`StatusAddList` 的 `PropertyType` 分别是 `DefenceAddedRatio`/`SpeedDelta`/`StatusResistanceBase`/`ElationDamageAddedRatioBase` ✓）；② 但引擎的行迹通路 `SkillTrace` 读的是**生成数据** `skill_traces.json` ✓，而那份文件有 **93** 个条目、`1502`/`1505`/`1001` **各 13 条**、**`1503` 是空表** ✗；③ 所以真珠的面板**少了这十条** ✓，而且**没有任何报错** ✓（面板只是偏低 ✓）。⇒ 这正是本项目反复抓到的那一型：**数据里有、生成文件里没有** ✓。⭐ 四条各写**一条效果**，数值是那十条的**和**（行迹是加算 ✓）：防御 `0.05+0.075+0.10 = 0.225` ✓、速度 `2+3+4 = 9`（`SpeedDelta` 是**绝对值** ⇒ 用 `amount` 而不是 `percent` ✓）、效果抵抗 `0.04+0.06 = 0.10` ✓、欢愉度 `0.04+0.06 = 0.10` ✓。⚠ 防御与欢愉度是**比率属性**（属性自己的单位是分数 ✓），所以 `percent: 0.225` 是『基准的 22.5%』，与数据行的 5%/7.5%/10% 同义 ✓。⚠ **修在内容侧的代价**：生成器补上这十条之后，这一条会与它**重复计算** ✓ —— 所以解锁条件是『`skill_traces.json` 里 1503 的行数不再是 0』✓，那时**删掉这一条** ✓。⭐ 判据 `PearlStatTracesTest` 量的是**与数据行相符的绝对增量** ✓（不是『比 0 大』✓）。\n  ⚠⚠ **必须带 `coexist: true`** ✓：`StatModifierBuff.isSameKind` 的身份是 **(属性, modifierType, sourceRole)** ✓ —— **名字不参与** ✓ —— 所以同属性的两条 `MODIFY_ATTR` 会**互相替换** ✗。实测：行迹的 `ELATION_DAMAGE_BOOST +0.10` 把这一条算出来的值**顶掉**了（2400 防御处读数由 0.42 变 0.10 ✓）；行迹的 `EFFECT_RESISTANCE +0.10` 同样顶掉了感知容差的光环 ✓。⚠ **不能靠合并解决**：行迹是**无条件**的，而这一条**带门**（防御 ≥ 2400 / 持有【好活当赏】）⇒ 一条规则扛不了两句话 ✓。⇒ 用引擎既有的 `coexist` ✓（它的注释写的就是这个用途：「一个效果可以要求**不被顶掉**」✓，两个方向都保护 ✓）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "trace_insight_links_healing_to_elation",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "OUTGOING_HEALING_BOOST",
+          "scale": "self_attr:ELATION_DAMAGE_BOOST",
+          "percent": 0.2,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "1503 真珠 行迹 洞察万物 (1503101) 第二句: 「真珠获得等同于自身欢愉度 20% 的治疗量加成」。",
+      "note": "⭐ `OUTGOING_HEALING_BOOST` 是**治疗者侧**的属性（`Battle.heal` 从施放者身上读），首个出货读者是 `1105.json` 的行迹 调理 —— 所以这里同样只是内容。⭐ 量的来源是**欢愉度**（`ELATION_DAMAGE_BOOST`），这是个**比率属性**，所以 `percent × 该值` 得到的就是「欢愉度的 20%」这件事本身的单位（比率），不需要再换算。⚠ 顺序：`BATTLE_START` 上三条规则按**文件顺序**执行 —— 上面两条先抬高欢愉度，这一条随后按**抬完的**值取 20%（这是「等同于自身欢愉度」的自然读法，也是判据里能观测到的一处差别）。"
     }
   ]
 }
