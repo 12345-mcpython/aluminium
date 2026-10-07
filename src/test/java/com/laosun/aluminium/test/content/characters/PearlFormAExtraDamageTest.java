@@ -56,7 +56,12 @@ public class PearlFormAExtraDamageTest {
         // instance plus the extra one, and the two sit in different factors (the skill's row times HER Defence, the
         // extra times the ARCHETYPE's Attack). A ratio assertion would therefore be asserting the enemy's defence and
         // her Defence at once; the direction and the control below are what this case can honestly pin.
-        Assertions.assertTrue(withStrongArchetype / withWeakArchetype > 1.5,
+        //
+        // ⚠ The threshold is DIRECTIONAL, not a value: measured 1.4189 after the Elation base was corrected to the
+        // character level (the 15% rider on her own instance grew, and a larger constant in both runs pushes the ratio
+        // toward 1). Pinning the measured number would be pinning an accident - the control below is what gives this
+        // case its teeth.
+        Assertions.assertTrue(withStrongArchetype / withWeakArchetype > 1.2,
                 "and it grows by much more than a rounding step (" + (withStrongArchetype / withWeakArchetype) + ")");
     }
 

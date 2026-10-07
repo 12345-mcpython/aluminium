@@ -518,7 +518,7 @@
       "do": [
         {
           "op": "DAMAGE",
-          "scale": "self_attr:ATTACK",
+          "scale": "elation_base",
           "percent": 0.9,
           "element": "Imaginary",
           "damage_type": "ELATION",

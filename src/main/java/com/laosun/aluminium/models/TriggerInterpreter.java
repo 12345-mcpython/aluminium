@@ -5693,25 +5693,27 @@ public final class TriggerInterpreter {
      * 481.- the base ATK rather than the settled one. A damage instance uses the settled value, so this path reads it directly.
      */
     /**
-     * The Elation damage base for the rule owner's Elation-skill level: {@code Constant.ELATION_BASIC_LEVEL_DAMAGE}
-     * (101 rows, loaded from the gitignored data file) -- the base-times-ratio factor of the spec at
-     * {@code ROADMAP.md:1262}.
+     * The Elation damage base: {@code Constant.ELATION_BASIC_LEVEL_DAMAGE}, indexed by the owner's <b>character level</b>
+     * - the {@code 欢愉基础值} of the formula
+     * {@code 欢愉伤害 = 欢愉基础值(等级) × (1+欢愉度) × (1+增笑) × (1 + 5×好活/(好活+240)) × zones × 倍率}.
      *
-     * <p>Shared by the two ops that can name it: {@code DAMAGE} through {@code literalBase}, and
-     * {@code ADD_DAMAGE}, whose magnitude otherwise goes through the ATTRIBUTE reader -- which has no answer
-     * for a table lookup (measured: it returned null and the settlement NPE'd on {@code AttributeType.ordinal()}).
-     * One copy, so the two cannot drift.
+     * <p>⚠⚠ <b>CORRECTED: it used to read the ELATION-SKILL level.</b> The table is a character-level table - measured
+     * against the game's own formula card, its row <b>80 is 7535.107</b>, exactly the {@code 7535.107} the card multiplies
+     * for a Lv80 character - and reading row 10 (a skill-level convention) gave ≈180, wrong by a factor of ~40 on every
+     * Elation number. The card also confirms the shape this engine already had: no attack power anywhere in the formula,
+     * the laugh factor {@code 1 + 5×好活/(好活+240)}, and 「增笑」 as its own multiplier.
+     *
+     * <p>Reader: 1503 Pearl (真珠)'s Elation riders and 1506 Silver Wolf LV.999's 【头号补给盲盒】.
      */
     private static double elationBase(TriggerContext ctx) {
         if (ctx == null || ctx.owner() == null) {
             throw new IllegalStateException(
-                    "a scale of elation_base has no rule owner to read an Elation-skill level from");
+                    "a scale of elation_base has no rule owner to read a character level from");
         }
-        Skill elationSkill = ctx.owner().getSkills().get(SkillType.ELATION_SKILL);
-        int level = elationSkill == null ? 1 : ctx.owner().skillLevel(elationSkill);
+        int level = ctx.owner().getLevel();
         Double base = com.laosun.aluminium.Constant.ELATION_BASIC_LEVEL_DAMAGE.get(level);
         if (base == null) {
-            throw new IllegalStateException("elation_base has no table row for Elation-skill level " + level
+            throw new IllegalStateException("elation_base has no table row for character level " + level
                     + "; the loaded table has " + com.laosun.aluminium.Constant.ELATION_BASIC_LEVEL_DAMAGE.size()
                     + " rows");
         }
