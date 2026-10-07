@@ -31,7 +31,11 @@ public class PearlSkillLevelsTest {
         Assertions.assertEquals(10, none[0], "the convention alone brings the Ultimate to 10");
         Assertions.assertEquals(10, none[1], "and the basic too");
         Assertions.assertEquals(12, three[0], "Eidolon 3 adds 2 to the Ultimate");
-        Assertions.assertEquals(11, three[1], "and 1 to the basic");
+        // Note: E3's "+1 to the basic" is filed but does NOT take effect, because the basic's table has 10 rows and the
+        // level is therefore already at its cap. That is the engine's bound (see CanHit.skillLevel), and it is what
+        // keeps the skill working: measured, without the clamp this level read 11, the damage path found no row 11 and
+        // returned silently, and Pearl's enhanced basic dealt a flat 0 at every Eidolon from 3 up - with no error.
+        Assertions.assertEquals(10, three[1], "and 1 to the basic, which is already at its table's 10-row cap");
         Assertions.assertEquals(12, five[2], "Eidolon 5 adds 2 to the Skill");
         Assertions.assertEquals(12, five[3], "and 2 to the talent");
     }

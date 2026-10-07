@@ -1,0 +1,848 @@
+{
+  "resources": [
+    {
+      "id": "好活当赏",
+      "max": 50,
+      "initial": 0,
+      "source": "1503 真珠 天赋 吞纳沙砾，重塑生机 (150304): 「真珠的【好活当赏】持续时间无限，且持有上限为 50 点」。",
+      "note": "⭐ 上限 **50** 与初始 **0** 都是**文档原话** ✓。⭐ 它是**真珠自己**的计数（战技「获得 15 点」、秘技「获得 20 点」、行迹「我方目标回合开始时真珠获得 5 点」），所以默认的 `SELF` 作用域对。⚠ 作为**抵御值**消耗的那一半（每点 = 200 抵御值、代代价抵挡 60% 伤害）**本文件未写**，登记在下面。"
+    },
+    {
+      "id": "笑点",
+      "max": 2147483647,
+      "initial": 0,
+      "scope": "PARTY",
+      "source": "1503 真珠 终结技 鉴映灵魂的底色 (150303): 「该额外回合开始时，【美学底本】获得 30 点【好活当赏】，并获得 60 点笑点」。",
+      "note": "⭐ 笑点 是**队伍级**计数（1502 也声明了同一个名字，两者共用）；数据里没有上限，所以 `max` 用 `Integer.MAX_VALUE`。⭐ 它在本文件里只有**一处获取**（终结技的额外回合）✓。"
+    }
+  ],
+  "rules": [
+    {
+      "on": "SKILL_CAST",
+      "id": "skill_heals_everyone_and_the_lowest_ally_again",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "好活当赏",
+          "amount": 15
+        },
+        {
+          "op": "HEAL",
+          "scale": "owner_def",
+          "percent": 0.12,
+          "amount": 240,
+          "target": "all_allies"
+        },
+        {
+          "op": "HEAL",
+          "scale": "owner_def",
+          "percent": 0.12,
+          "amount": 240,
+          "target": "lowest_hp_ally"
+        },
+        {
+          "op": "DISPEL",
+          "amount": 1,
+          "target": "all_allies"
+        }
+      ],
+      "source": "1503 真珠 战技 补缀生命的柔光 (150302): 「获得 15 点【好活当赏】，为我方全体目标回复等同于真珠 12.00% 防御力 + 240 的生命值，**额外**为**当前生命值百分比最低的**我方目标回复等同于真珠 12.00% 防御力 + 240 的生命值」。",
+      "note": "⭐ **现成能力拼成** ✓：`GAIN_RESOURCE` ✓（声明过的计数）、`HEAL` 配 `scale: owner_def` ✓（「等同于真珠防御力的 12% + 240」）、以及 `lowest_hp_ally` 选择器 ✓（「当前生命值百分比最低的我方目标」，已有用例：`1001.json` 与光锥 `23017`）。⭐ 两段治疗写成**两条 op**（而不是一条 `all_allies`），因为原文说的是“**额外**为最低者再回一次”。  NOTE 2026-10-02: this rule also carries trait 1503102's dispel half -- \"on casting an enhanced basic or the Skill, dispel 1 debuff from every ally\" (corpus line 301), via DISPEL{amount: 1, target: all_allies}, the shape 1110 ships."
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "technique_grants_the_opening_counter",
+      "when": [
+        "self has_state 秘技"
+      ],
+      "do": [
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "好活当赏",
+          "amount": 20
+        }
+      ],
+      "source": "1503 真珠 秘技 凝润珠光，复刻真迹 (150307): 「下一次战斗开始时，真珠获得 20 点【好活当赏】，并【深度学习】持有【美学底本】的角色」。",
+      "note": "⭐ 开局类规则的惯例拼法：`BATTLE_START` ✓ 加 `self has_state 秘技` ✓（秘技状态在每条 `BATTLE_START` 之前已经就位，见 `Battle.startBattle`）。⚠ 同句的【深度学习】与【美学底本】**本文件未写**，登记在下。"
+    },
+    {
+      "on": "LETHAL_DAMAGE",
+      "id": "eidolon1_saves_an_ally_twice",
+      "min_eidolon": 1,
+      "when": [
+        "actor is_ally",
+        "self_stacks:救主计数 < 2"
+      ],
+      "do": [
+        {
+          "op": "HEAL",
+          "scale": "target_max_hp",
+          "percent": 0.5,
+          "target": "target"
+        },
+        {
+          "op": "ADD_STACK",
+          "buff": "救主计数",
+          "amount": 1,
+          "max_stacks": 2,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "1503 真珠 星魂 1 珍珠，藏在海的留白处: 「若我方目标受到致命伤害，不会陷入无法战斗状态，并立即回复等同于其生命上限 50% 的生命值。该效果单场战斗中可以触发 2 次」。",
+      "note": "⭐ **逐字镜像** `1217.json` 的 `e2_saves_an_ally_with_the_talisman` ✓（同一形状：`LETHAL_DAMAGE` + `actor is_ally` + `target_max_hp` 回复 50% + 计数器限次）。⭐ 除此之外的**欢愉度**加成段（「队伍中欢愉命途角色数量等于 2/3/4 或以上时，使我方全体欢愉度提高 10%/20%/60%」）**未写**：条件 DSL 没有“队伍中某命途的人数”这个变量。"
+    },
+    {
+      "on": "TURN_START",
+      "id": "trace_gains_on_an_ally_turn_start",
+      "when": [
+        "actor is_ally"
+      ],
+      "do": [
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "好活当赏",
+          "amount": 5
+        }
+      ],
+      "source": "1503 真珠 行迹 感知容差 (1503102): 「我方目标回合开始时，真珠获得 5 点【好活当赏】，最多获得 50 点【好活当赏】，真珠回合开始时重置可获得【好活当赏】数量」。",
+      "note": "⭐ **照现成样板** ✓：`1201.json` 的 `talent_draw_on_ally_turn` 是同一形状（`TURN_START` + 一个阵营条件 + `GAIN_RESOURCE`）。⭐ 用 `actor is_ally` 而不是 `is_other_ally`：原文说的是“我方目标”，而 `is_ally` 的文档明记“**counts the owner herself**”。⭐ 上限（“最多获得 50 点”）由声明里的 `max: 50` 兑现，不重复写。⚠ 同句的另一半（“持有【好活当赏】时，我方全体目标的**效果抵抗提高 50%**”）**本文件未写**：`AttributeType` 里**没有任何名字命名效果抵抗**（实测扫过）。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "ult_advances_the_target_at_1_elation_allies",
+      "when": [
+        "actor == self",
+        "allies_with_path:欢愉 >= 1"
+      ],
+      "do": [
+        {
+          "op": "ADVANCE",
+          "percent": 0.1,
+          "target": "target"
+        }
+      ],
+      "source": "1503 真珠 终结技 鉴映灵魂的底色 (150303): 「队伍中「欢愉」命途角色数量等于 1 或以上时，使【美学底本】行动提前 10%」。",
+      "note": "⭐ 三档写成**三条规则**（阈值递增），而不是一条加分档变量：条件 DSL 只能比较数字，而三条各自的门槛正好是原文的三个档。⭐ 作用对象是 `target`（终结技选中的那个队友，即【美学底本】）。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "ult_advances_the_target_at_2_elation_allies",
+      "when": [
+        "actor == self",
+        "allies_with_path:欢愉 >= 2"
+      ],
+      "do": [
+        {
+          "op": "ADVANCE",
+          "percent": 0.15,
+          "target": "target"
+        }
+      ],
+      "source": "1503 真珠 终结技 鉴映灵魂的底色 (150303): 「队伍中「欢愉」命途角色数量等于 2 或以上时，使【美学底本】行动提前 15%」。",
+      "note": "⭐ 三档写成**三条规则**（阈值递增），而不是一条加分档变量：条件 DSL 只能比较数字，而三条各自的门槛正好是原文的三个档。⭐ 作用对象是 `target`（终结技选中的那个队友，即【美学底本】）。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "ult_advances_the_target_at_3_elation_allies",
+      "when": [
+        "actor == self",
+        "allies_with_path:欢愉 >= 3"
+      ],
+      "do": [
+        {
+          "op": "ADVANCE",
+          "percent": 0.3,
+          "target": "target"
+        }
+      ],
+      "source": "1503 真珠 终结技 鉴映灵魂的底色 (150303): 「队伍中「欢愉」命途角色数量等于 3 或以上时，使【美学底本】行动提前 30%」。",
+      "note": "⭐ 三档写成**三条规则**（阈值递增），而不是一条加分档变量：条件 DSL 只能比较数字，而三条各自的门槛正好是原文的三个档。⭐ 作用对象是 `target`（终结技选中的那个队友，即【美学底本】）。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "ult_grants_an_extra_turn_at_four_elation_allies",
+      "when": [
+        "actor == self",
+        "allies_with_path:欢愉 >= 4"
+      ],
+      "do": [
+        {
+          "op": "EXTRA_TURN",
+          "target": "target"
+        }
+      ],
+      "source": "1503 真珠 终结技: 「队伍中「欢愉」命途角色数量等于 4 或以上时，使【美学底本】获得 1 个额外回合」。",
+      "note": "⭐ `EXTRA_TURN` 已有用例（1102 无参数、1309/1404/1501 写 `target: self`）。⚠ 同句后半“该额外回合开始时，【美学底本】获得 30 点【好活当赏】，并获得 60 点笑点，额外回合结束时移除”**本文件未写**：它需要一个“这个额外回合”的标记与结束时机，而【深度学习】与【美学底本】两个状态尚未建模。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon1_raises_elation_at_2_elation_allies",
+      "min_eidolon": 1,
+      "when": [
+        "allies_with_path:欢愉 >= 2"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ELATION_DAMAGE_BOOST",
+          "percent": 0.1,
+          "permanent": true,
+          "target": "all_allies"
+        }
+      ],
+      "source": "1503 真珠 星魂 1 珍珠，藏在海的留白处: 「队伍中「欢榆」命途角色数量等于 2 或以上时，使我方全体欢榆度提高 10%」。",
+      "note": "⭐ **属性本就存在** ✓：`ELATION_DAMAGE_BOOST` 定义在 `AttributeType:105`，并由数据列 `ElationDamageAddedRatioBase` 映射（`:288`），应用在 `TriggerInterpreter:5022` 与 `SkillExecutor:642` 两处 —— 所以这条只是内容。⭐ 三档写成三条递增阈值（同终结技的写法），作用对象 `all_allies`。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon1_raises_elation_at_3_elation_allies",
+      "min_eidolon": 1,
+      "when": [
+        "allies_with_path:欢愉 >= 3"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ELATION_DAMAGE_BOOST",
+          "percent": 0.2,
+          "permanent": true,
+          "target": "all_allies"
+        }
+      ],
+      "source": "1503 真珠 星魂 1 珍珠，藏在海的留白处: 「队伍中「欢榆」命途角色数量等于 3 或以上时，使我方全体欢榆度提高 20%」。",
+      "note": "⭐ **属性本就存在** ✓：`ELATION_DAMAGE_BOOST` 定义在 `AttributeType:105`，并由数据列 `ElationDamageAddedRatioBase` 映射（`:288`），应用在 `TriggerInterpreter:5022` 与 `SkillExecutor:642` 两处 —— 所以这条只是内容。⭐ 三档写成三条递增阈值（同终结技的写法），作用对象 `all_allies`。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon1_raises_elation_at_4_elation_allies",
+      "min_eidolon": 1,
+      "when": [
+        "allies_with_path:欢愉 >= 4"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ELATION_DAMAGE_BOOST",
+          "percent": 0.6,
+          "permanent": true,
+          "target": "all_allies"
+        }
+      ],
+      "source": "1503 真珠 星魂 1 珍珠，藏在海的留白处: 「队伍中「欢榆」命途角色数量等于 4 或以上时，使我方全体欢榆度提高 60%」。",
+      "note": "⭐ **属性本就存在** ✓：`ELATION_DAMAGE_BOOST` 定义在 `AttributeType:105`，并由数据列 `ElationDamageAddedRatioBase` 映射（`:288`），应用在 `TriggerInterpreter:5022` 与 `SkillExecutor:642` 两处 —— 所以这条只是内容。⭐ 三档写成三条递增阈值（同终结技的写法），作用对象 `all_allies`。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "art_barrier_on_an_elation_archetype",
+      "when": [
+        "actor == self",
+        "target has_path 欢愉"
+      ],
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "艺术壁垒",
+          "permanent": true,
+          "target": "target",
+          "target_when": [
+            "!target has_state 艺术壁垒"
+          ]
+        }
+      ],
+      "source": "1503 真珠 行迹 艺术壁垒 (1503103): 「进入战斗和施放终结技后，若【美学底本】为「欢榆」命途角色，使其下一次施放终结技时，为真珠固定恢复 90 点能量。该效果无法叠加」。",
+      "note": "⭐ 不需要先建【美学底本】状态 ✓：终结技选中的 `target` **就是**【美学底本】，所以“若【美学底本】为欢榆命途”就是 `target has_path 欢愉`。⭐ “无法叠加”用 `target_when: [\"!target has_state 艺术壁垒\"]` 表达（现成写法，见 `1211`）。⚠ 同句的“进入战斗后”那一半（秘技版）**本文件未写**：它依赖秘技版的【美学底本】转移语义。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "art_barrier_refunds_ninety_energy_once",
+      "when": [
+        "actor is_ally",
+        "actor has_state 艺术壁垒"
+      ],
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 90,
+          "target": "self"
+        }
+      ],
+      "source": "1503 真珠 行迹 艺术壁垒 (1503103) 的兑现端: 「使其下一次施放终结技时，为真珠固定恢复 90 点能量」。",
+      "note": "⭐ 90 是数据里的值（状态 `10015033` 的 `#1`）。⭐ 回能量的目标是 `self`（真珠）—— 原文说“为**真珠**恢复”。⚠ ⭐ 原文的“使其**下一次**施放终结技时”那个“下一次”**本文件未能表达**：“用完就移除”需要 `REMOVE_STATE` 能指向“引发事件的那个队友”，而它的选择器表不收 `actor`，也不收 `attacker`（两个都实测过，加载器直接拒绝）。⇒ 当前行为：该队友**每一次**终结技都会为真珠回 90 点（原文只说下一次）。这一点已登记，不当成完成。  NOTE 2026-10-02: the corpus page states the same clause with 90 as the fixed amount, matching status 10015033's first parameter."
+    },
+    {
+      "on": "HP_LOST",
+      "id": "talent_reduces_damage_taken_below_half_hp",
+      "when": [
+        "target is_ally",
+        "target_hp_percent <= 0.5"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "percent": -0.15,
+          "permanent": true,
+          "buff": "吞纳沙砾",
+          "target": "target",
+          "target_when": [
+            "!target has_state 吞纳沙砾"
+          ]
+        }
+      ],
+      "source": "1503 真珠 天赋 吞纳沙砾，重塑生机 (150304): 「我方目标当前生命值百分比小于等于 50% 时，受到的伤害降低 15%」。",
+      "note": "⭐ **照现成形状** ✓：`1002` 的行迹就是“`HP_LOST` + 阈值判定 ⇒ 加减伤”，并在 `HEALED` 那侧移除（见下一条）。⭐ 减伤用**负值** `percent`（库里已有 `-0.5/-0.18/-0.1`）。⭐ 防重复施加用 `target_when`（见 `1211`）。⚠ 满级是 37.5%（`#4 = 0.375`），本文件取**级 1 = 15%** —— 取值口径统一问题登记在下面。"
+    },
+    {
+      "on": "HEALED",
+      "id": "talent_drops_the_reduction_above_half_hp",
+      "when": [
+        "target is_ally",
+        "target_hp_percent > 0.5"
+      ],
+      "do": [
+        {
+          "op": "REMOVE_STATE",
+          "buff": "吞纳沙砾",
+          "target": "target"
+        }
+      ],
+      "source": "1503 真珠 天赋 (150304) 的取消端: 「我方目标当前生命值百分比小于等于 50% 时」—— 回到 50% 以上就不再满足。",
+      "note": "⭐ 与 `1002` 的 `HEALED` 清理端同形状。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "ult_marks_the_archetype_and_deep_study",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "好活当赏",
+          "amount": 20
+        },
+        {
+          "op": "APPLY_BUFF",
+          "buff": "美学底本",
+          "permanent": true,
+          "target": "target",
+          "target_when": [
+            "!target has_state 美学底本"
+          ]
+        },
+        {
+          "op": "APPLY_BUFF",
+          "buff": "深度学习",
+          "permanent": true,
+          "target": "self",
+          "target_when": [
+            "!self has_state 深度学习"
+          ]
+        }
+      ],
+      "source": "1503 真珠 终结技 鉴映灵魂的底色 (150303): 「获得 20 点【好活当赏】。【深度学习】除自身以外的指定我方单体角色，使目标成为【美学底本】」。",
+      "note": "⭐ 两个状态都是**调查过的**：`AvatarStatusConfig` 里 `10015032`（`Skill03_Target`，`Other`）是【美学底本】，`10015037`/`10015035`（`Skill03_Caster_BuffA/B`）是【深度学习】的两个分支。⭐ 用 `target_when` 防重复施加（照 `1211`）。⚠ **持续时间未知**：数据里没有（已扫 2253 个表 + 整棵 `Config/`），状态说明也不提。本文件用 `permanent` 先**把状态建立起来**，边界待定。  NOTE 2026-10-02, from the in-game text: deep study is granted with charges, and the text gives no round-based lifetime at all -- it is spent by casts. The state is applied `permanent` here because the engine has no charge counter for it yet; the enhanced-basic swap carries the 3-use limit instead."
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "enhanced_basic_is_form_a_for_an_elation_archetype",
+      "when": [
+        "actor == self",
+        "target has_path 欢愉"
+      ],
+      "do": [
+        {
+          "op": "REPLACE_SKILL",
+          "skill": "COMMON",
+          "skill_id": 8,
+          "turns": 3,
+          "target": "self"
+        }
+      ],
+      "source": "1503 真珠 行迹行为：状态 `10015037`（`Skill03_Caster_BuffA`）：「造成伤害时，额外造成#1[i]%冰属性欢榆伤害，该次欢榆伤害使用【美学底本】的属性值来计算。普攻【行笔，临摹断水】强化为【行笔，幻造星月】」。  原文（Lv10）：「且攻击后，额外造成 60% 的冰属性欢榆伤害，该次欢榆伤害使用【美学底本】的属性值计算」。",
+      "note": "⭐ **分支的一侧** ✓：【美学底本】为欢榆命途 ⇒ 强化为槽 **8**（行笔，幻造星月），且带额外冰欢榆伤害（参数在 `150308` 的第五项：级 1 = 0.1，满级 = 0.2）。⚠ “额外伤害”本身**未写**：它要算在另一次实例上，且“用【美学底本】的属性值计算”是另一种取值口径。  NOTE 2026-10-02, from the in-game Ultimate text: deep study carries THREE charges and each enhanced basic spends one, ending the state after acting with none left. So the lifetime is 3 uses, not the 2 the technique's own parameter names (that 2 is the technique's own charge grant, row 150307 = [2, 20]). Charges are not modelled as a counter yet; `turns: 3` is the closest existing lifetime and is now text-backed.  NOTE 2026-10-02, from the corpus page (line 106, level 10) and the in-game panel (level 1): the extra Ice Elation damage is 60% at level 10 and 30% at level 1, and it is computed from the AESTHETIC ARCHETYPE's stats. The corpus also states its own convention: quoted values are level 10. The damage itself is still unmodelled -- it needs a scale read off another unit."
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "enhanced_basic_is_form_b_otherwise",
+      "when": [
+        "actor == self",
+        "!target has_path 欢愉"
+      ],
+      "do": [
+        {
+          "op": "REPLACE_SKILL",
+          "skill": "COMMON",
+          "skill_id": 9,
+          "turns": 3,
+          "target": "self"
+        }
+      ],
+      "source": "1503 真珠 状态 `10015035`（`Skill03_Caster_BuffB`）：「普攻【行笔，临摹断水】强化为【行笔，绘制末浪】」。",
+      "note": "⭐ **分支的另一侧** ✓：底本不是欢榆命途 ⇒ 槽 **9**（行笔，绘制末浪），且它的参数表只有四项（`150310` = `[0.5, 0.04, 1, 80]`）—— **没有第五项**，这正是它不带额外欢榆伤害的数据佐证。  NOTE 2026-10-02, from the in-game Ultimate text: deep study carries THREE charges and each enhanced basic spends one, ending the state after acting with none left. So the lifetime is 3 uses, not the 2 the technique's own parameter names (that 2 is the technique's own charge grant, row 150307 = [2, 20]). Charges are not modelled as a counter yet; `turns: 3` is the closest existing lifetime and is now text-backed."
+    },
+    {
+      "on": "BASIC_ATTACK",
+      "id": "enhanced_basic_heals_on_slot_8",
+      "when": [
+        "actor == self",
+        "from_skill_id == 8"
+      ],
+      "do": [
+        {
+          "op": "HEAL",
+          "scale": "owner_def",
+          "percent": 0.08,
+          "amount": 160,
+          "target": "all_allies"
+        },
+        {
+          "op": "HEAL",
+          "scale": "owner_def",
+          "percent": 0.08,
+          "amount": 160,
+          "target": "lowest_hp_ally"
+        },
+        {
+          "op": "DISPEL",
+          "amount": 1,
+          "target": "all_allies"
+        }
+      ],
+      "source": "1503 真珠 强化普攻 【行笔，幻造星月】 (150308): 「对敌方全体造成等同于真珠 100% 防御力的冰属性伤害，为我方全体目标回复等同于真珠 8.00% 防御力 + 160 的生命值，**额外**为**当前生命值百分比最低的**我方目标回复同样量」。",
+      "note": "⭐ 伤害不写在这里：它在 `skills.json` 的技能行里（`AoEAttack` 加倍率），引擎自己结算；本条只补那两段治疗（与她战技同一写法）。⭐ 触发靠 `BASIC_ATTACK` + `from_skill_id == <技能 ID>`：**该变量是数值变量**，必须带 `==`（写成 `from_skill_id 150308` 会报 “not a known shorthand”，实测）。  NOTE 2026-10-02: this rule also carries trait 1503102's dispel half -- \"on casting an enhanced basic or the Skill, dispel 1 debuff from every ally\" (corpus line 301), via DISPEL{amount: 1, target: all_allies}, the shape 1110 ships.  FIXED 2026-10-02: the gate was `from_skill_id == 150308`, the DATA skill id, but `from_skill_id` carries the SLOT -- TriggerTable says so twice (\"carries the SLOT\", and the note about a rule ungated on it). So this rule could never fire. It is now `from_skill_id == 8`, the slot these two enhanced basics occupy."
+    },
+    {
+      "on": "BASIC_ATTACK",
+      "id": "enhanced_basic_heals_on_slot_9",
+      "when": [
+        "actor == self",
+        "from_skill_id == 9"
+      ],
+      "do": [
+        {
+          "op": "HEAL",
+          "scale": "owner_def",
+          "percent": 0.08,
+          "amount": 160,
+          "target": "all_allies"
+        },
+        {
+          "op": "HEAL",
+          "scale": "owner_def",
+          "percent": 0.08,
+          "amount": 160,
+          "target": "lowest_hp_ally"
+        },
+        {
+          "op": "DISPEL",
+          "amount": 1,
+          "target": "all_allies"
+        }
+      ],
+      "source": "1503 真珠 强化普攻 【行笔，绘制末浪】 (150310): 「对敌方全体造成等同于真珠 100% 防御力的冰属性伤害，为我方全体目标回复等同于真珠 8.00% 防御力 + 160 的生命值，**额外**为**当前生命值百分比最低的**我方目标回复同样量」。",
+      "note": "⭐ 伤害不写在这里：它在 `skills.json` 的技能行里（`AoEAttack` 加倍率），引擎自己结算；本条只补那两段治疗（与她战技同一写法）。⭐ 触发靠 `BASIC_ATTACK` + `from_skill_id == <技能 ID>`：**该变量是数值变量**，必须带 `==`（写成 `from_skill_id 150308` 会报 “not a known shorthand”，实测）。  NOTE 2026-10-02: this rule also carries trait 1503102's dispel half -- \"on casting an enhanced basic or the Skill, dispel 1 debuff from every ally\" (corpus line 301), via DISPEL{amount: 1, target: all_allies}, the shape 1110 ships.  FIXED 2026-10-02: the gate was `from_skill_id == 150310`, the DATA skill id, but `from_skill_id` carries the SLOT -- TriggerTable says so twice (\"carries the SLOT\", and the note about a rule ungated on it). So this rule could never fire. It is now `from_skill_id == 9`, the slot these two enhanced basics occupy."
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "level_convention",
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "COMMON",
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "SKILL",
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ULTRA",
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "TALENT",
+          "amount": 9
+        }
+      ],
+      "source": "1503 真珠 技能表的等级口径: 语料页引用的是 **Lv10** 行（战技明写“效果量（Lv10）: 12% × 防御力 + 240”；终结技的“额外 60% 冰属性欢榆伤害”也是 Lv10 文本）。",
+      "note": "⭐ 同 `1310.json` 的 `level_convention` 同法（同一组四个槽位、同一个 `amount: 9`）。⭐ **为什么必须有它**：本文件其它规则里的数字（战技的 12%+240）取自语料的 **Lv10** 行；若技能停在 Lv1，那些数字就描述了一个单位不在的等级。⭐ 这条让口径自洽：文档引 Lv10 ⇒ 技能在 Lv10。  PROVEN 2026-10-02 by `PearlSkillLevelsTest` plus its mutant. The observable is `CanHit.skillLevel(Skill)` -- the EFFECTIVE level -- because `RAISE_SKILL_LEVEL` writes into `CanHit.skillLevelBonus` and `CanHit.skillLevel(...)` is where the base level and the raises are added together (its own comment says so). My first judge read `Skill.getLevel()`, which is the BASE level and excludes raises by design, so it saw a flat 1 and the rule looked dead. Measured: E0 -> ULTRA 10 / COMMON 10; E3 -> ULTRA 12 / COMMON 11; E5 -> SKILL 12 / TALENT 12."
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon3_raises_four_slots",
+      "min_eidolon": 3,
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ULTRA",
+          "amount": 2
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "COMMON",
+          "amount": 1
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ELATION_SKILL",
+          "amount": 1
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ELATION_EXTRA",
+          "amount": 1
+        }
+      ],
+      "source": "1503 真珠 星魂 3 速写，惊涛悬停的刹那: 「终结技等级+2；普攻等级+1；欢榆技等级+1」（参数 `{'150303': 2, '150301': 1, '150320': 1, '150308': 1, '150310': 1}`）。",
+      "note": "⭐ 语料参数里的五个技能 ID 映到四个槽位：150303 → ULTRA、150301 → COMMON、150320 → ELATION_SKILL（槽 20）、而 **150308 与 150310 同属 `ELATION_EXTRA`**（强化普攻，实测自 `SkillType` 枚举）—— 所以它们共用一条 `+1`。  PROVEN 2026-10-02 by `PearlSkillLevelsTest` plus its mutant. The observable is `CanHit.skillLevel(Skill)` -- the EFFECTIVE level -- because `RAISE_SKILL_LEVEL` writes into `CanHit.skillLevelBonus` and `CanHit.skillLevel(...)` is where the base level and the raises are added together (its own comment says so). My first judge read `Skill.getLevel()`, which is the BASE level and excludes raises by design, so it saw a flat 1 and the rule looked dead. Measured: E0 -> ULTRA 10 / COMMON 10; E3 -> ULTRA 12 / COMMON 11; E5 -> SKILL 12 / TALENT 12."
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon5_raises_three_slots",
+      "min_eidolon": 5,
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "SKILL",
+          "amount": 2
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "TALENT",
+          "amount": 2
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ELATION_SKILL",
+          "amount": 1
+        }
+      ],
+      "source": "1503 真珠 星魂 5 透视，笔端星夜的肌理: 「战技等级+2；天赋等级+2；欢榆技等级+1」（参数 `{'150302': 2, '150304': 2, '150320': 1}`）。",
+      "note": "⭐ 三个参数直接对应 SKILL / TALENT / ELATION_SKILL，无歧义。  PROVEN 2026-10-02 by `PearlSkillLevelsTest` plus its mutant. The observable is `CanHit.skillLevel(Skill)` -- the EFFECTIVE level -- because `RAISE_SKILL_LEVEL` writes into `CanHit.skillLevelBonus` and `CanHit.skillLevel(...)` is where the base level and the raises are added together (its own comment says so). My first judge read `Skill.getLevel()`, which is the BASE level and excludes raises by design, so it saw a flat 1 and the rule looked dead. Measured: E0 -> ULTRA 10 / COMMON 10; E3 -> ULTRA 12 / COMMON 11; E5 -> SKILL 12 / TALENT 12."
+    },
+    {
+      "on": "CAST_SETUP",
+      "id": "elation_skill_arms_the_team_at_1_elation_allies",
+      "when": [
+        "actor == self",
+        "from_category ElationDamage",
+        "allies_with_path:欢愉 >= 1"
+      ],
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "渲染理性，解构欢榆",
+          "until": "next_attack",
+          "target": "all_allies",
+          "target_when": [
+            "!target has_state 渲染理性，解构欢榆"
+          ]
+        }
+      ],
+      "source": "1503 真珠 欢榆技 渲染理性，解构欢榆 (150320): 「队伍中「欢榆」命途角色数量等于 1 或以上时，使我方全体目标**下一次攻击后**，对攻击目标额外造成 10% 的对应属性欢榆伤害」。",
+      "note": "⭐ **触发写法是现成的** ✓：引擎没有 Elation 专用事件，“这次施放是欢榆技”靠 `from_category ElationDamage`（见 `1513` 的 `elation_spend_all_fervor`）；实测 `TriggerEvent` 里没有任何 Elation 专用事件。⭐ **“下一次攻击”的寿命** 用 `until: \"next_attack\"`，它在 `LIFETIMES` 封闭词表里（`TriggerInterpreter:4798`），且已有三处出货（1002 / 1301 / 8001）。⚠ **兼现端本文件未写**：原文说的是“**对应属性**”，即每个队友各自的属性；而一条规则的 `element` 是一个固定词，所以它无法给四个队友四个属性。`1505` 的 rider 也只写一个单位的属性。兼现形态已登记（参考形状：`DAMAGE{scale: self_attr:ATTACK, percent: X, element: <属性>, damage_type: \"ELATION\", target: target}` 在 `DEALING_DAMAGE` 上）。"
+    },
+    {
+      "on": "CAST_SETUP",
+      "id": "elation_skill_arms_the_team_at_2_elation_allies",
+      "when": [
+        "actor == self",
+        "from_category ElationDamage",
+        "allies_with_path:欢愉 >= 2"
+      ],
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "渲染理性，解构欢榆",
+          "until": "next_attack",
+          "target": "all_allies",
+          "target_when": [
+            "!target has_state 渲染理性，解构欢榆"
+          ]
+        }
+      ],
+      "source": "1503 真珠 欢榆技 渲染理性，解构欢榆 (150320): 「队伍中「欢榆」命途角色数量等于 2 或以上时，使我方全体目标**下一次攻击后**，对攻击目标额外造成 15% 的对应属性欢榆伤害」。",
+      "note": "⭐ **触发写法是现成的** ✓：引擎没有 Elation 专用事件，“这次施放是欢榆技”靠 `from_category ElationDamage`（见 `1513` 的 `elation_spend_all_fervor`）；实测 `TriggerEvent` 里没有任何 Elation 专用事件。⭐ **“下一次攻击”的寿命** 用 `until: \"next_attack\"`，它在 `LIFETIMES` 封闭词表里（`TriggerInterpreter:4798`），且已有三处出货（1002 / 1301 / 8001）。⚠ **兼现端本文件未写**：原文说的是“**对应属性**”，即每个队友各自的属性；而一条规则的 `element` 是一个固定词，所以它无法给四个队友四个属性。`1505` 的 rider 也只写一个单位的属性。兼现形态已登记（参考形状：`DAMAGE{scale: self_attr:ATTACK, percent: X, element: <属性>, damage_type: \"ELATION\", target: target}` 在 `DEALING_DAMAGE` 上）。"
+    },
+    {
+      "on": "CAST_SETUP",
+      "id": "elation_skill_arms_the_team_at_3_elation_allies",
+      "when": [
+        "actor == self",
+        "from_category ElationDamage",
+        "allies_with_path:欢愉 >= 3"
+      ],
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "渲染理性，解构欢榆",
+          "until": "next_attack",
+          "target": "all_allies",
+          "target_when": [
+            "!target has_state 渲染理性，解构欢榆"
+          ]
+        }
+      ],
+      "source": "1503 真珠 欢榆技 渲染理性，解构欢榆 (150320): 「队伍中「欢榆」命途角色数量等于 3 或以上时，使我方全体目标**下一次攻击后**，对攻击目标额外造成 20% 的对应属性欢榆伤害」。",
+      "note": "⭐ **触发写法是现成的** ✓：引擎没有 Elation 专用事件，“这次施放是欢榆技”靠 `from_category ElationDamage`（见 `1513` 的 `elation_spend_all_fervor`）；实测 `TriggerEvent` 里没有任何 Elation 专用事件。⭐ **“下一次攻击”的寿命** 用 `until: \"next_attack\"`，它在 `LIFETIMES` 封闭词表里（`TriggerInterpreter:4798`），且已有三处出货（1002 / 1301 / 8001）。⚠ **兼现端本文件未写**：原文说的是“**对应属性**”，即每个队友各自的属性；而一条规则的 `element` 是一个固定词，所以它无法给四个队友四个属性。`1505` 的 rider 也只写一个单位的属性。兼现形态已登记（参考形状：`DAMAGE{scale: self_attr:ATTACK, percent: X, element: <属性>, damage_type: \"ELATION\", target: target}` 在 `DEALING_DAMAGE` 上）。"
+    },
+    {
+      "on": "CAST_SETUP",
+      "id": "elation_skill_arms_the_team_at_4_elation_allies",
+      "when": [
+        "actor == self",
+        "from_category ElationDamage",
+        "allies_with_path:欢愉 >= 4"
+      ],
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "渲染理性，解构欢榆",
+          "until": "next_attack",
+          "target": "all_allies",
+          "target_when": [
+            "!target has_state 渲染理性，解构欢榆"
+          ]
+        }
+      ],
+      "source": "1503 真珠 欢榆技 渲染理性，解构欢榆 (150320): 「队伍中「欢榆」命途角色数量等于 4 或以上时，使我方全体目标**下一次攻击后**，对攻击目标额外造成 40% 的对应属性欢榆伤害」。",
+      "note": "⭐ **触发写法是现成的** ✓：引擎没有 Elation 专用事件，“这次施放是欢榆技”靠 `from_category ElationDamage`（见 `1513` 的 `elation_spend_all_fervor`）；实测 `TriggerEvent` 里没有任何 Elation 专用事件。⭐ **“下一次攻击”的寿命** 用 `until: \"next_attack\"`，它在 `LIFETIMES` 封闭词表里（`TriggerInterpreter:4798`），且已有三处出货（1002 / 1301 / 8001）。⚠ **兼现端本文件未写**：原文说的是“**对应属性**”，即每个队友各自的属性；而一条规则的 `element` 是一个固定词，所以它无法给四个队友四个属性。`1505` 的 rider 也只写一个单位的属性。兼现形态已登记（参考形状：`DAMAGE{scale: self_attr:ATTACK, percent: X, element: <属性>, damage_type: \"ELATION\", target: target}` 在 `DEALING_DAMAGE` 上）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon2_raises_elation_amp_for_the_team",
+      "min_eidolon": 2,
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ELATION_DAMAGE_AMP",
+          "percent": 0.15,
+          "permanent": true,
+          "target": "all_allies"
+        }
+      ],
+      "source": "1503 真珠 星魂 2 截取，顷刻破晓的光斑: 「我方全体目标的欢榆伤害增笑 15%」（参数 `[0.15, 1]`）。",
+      "note": "⭐ **只写了三分之一** ✓：这一半只是一个属性。同句的“使**除真珠和【美学底本】外**的其他欢榆命途角色也触发行动提前”需要知道谁是底本、并排除它和真珠；“额外回合开始时获得的【好活当赏】和笑点提高 100%”则等待那两项奖励本身先被写出来。⭐ 用 `ELATION_DAMAGE_AMP` 而**不是** `ELATION_DAMAGE_BOOST`：规格（`ROADMAP.md:1262`）把它们写成两个**相乘**的因子，实测判据也钉住了这一点。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "elation_skill_pays_out_at_1_elation_allies",
+      "when": [
+        "actor has_state 渲染理性，解构欢榆",
+        "allies_with_path:欢愉 >= 1"
+      ],
+      "do": [
+        {
+          "op": "ADD_DAMAGE",
+          "scale": "elation_base",
+          "percent": 0.1,
+          "damage_type": "ELATION"
+        }
+      ],
+      "source": "1503 真珠 欢榆技 渲染理性，解构欢榆 (150320): 「队伍中「欢榆」命途角色数量等于 1 或以上时，使我方全体目标**下一次攻击后**，对攻击目标额外造成 10% 的**对应属性**欢榆伤害」。",
+      "note": "⭐ 用 `ADD_DAMAGE` 而不是 `DAMAGE`：它把量加到**正在结算的那一笔**，不产生新实例，也就不会再次触发 `DEALING_DAMAGE`（第一版用 `DAMAGE` 时，引擎的递归守卫拦下了它）。⭐ 三个欢榆因子由 `damage_type: \"ELATION\"` 带入（本轮为 `ADD_DAMAGE` 加的能力）；量的来源 `elation_base` 由共用 helper 解析（它不是属性，属性读取器对它无答案）。⭐ **元素不用写**：这笔加入攻击者自己的实例，元素本就是他的。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "elation_skill_pays_out_at_2_elation_allies",
+      "when": [
+        "actor has_state 渲染理性，解构欢榆",
+        "allies_with_path:欢愉 >= 2"
+      ],
+      "do": [
+        {
+          "op": "ADD_DAMAGE",
+          "scale": "elation_base",
+          "percent": 0.15,
+          "damage_type": "ELATION"
+        }
+      ],
+      "source": "1503 真珠 欢榆技 渲染理性，解构欢榆 (150320): 「队伍中「欢榆」命途角色数量等于 2 或以上时，使我方全体目标**下一次攻击后**，对攻击目标额外造成 15% 的**对应属性**欢榆伤害」。",
+      "note": "⭐ 用 `ADD_DAMAGE` 而不是 `DAMAGE`：它把量加到**正在结算的那一笔**，不产生新实例，也就不会再次触发 `DEALING_DAMAGE`（第一版用 `DAMAGE` 时，引擎的递归守卫拦下了它）。⭐ 三个欢榆因子由 `damage_type: \"ELATION\"` 带入（本轮为 `ADD_DAMAGE` 加的能力）；量的来源 `elation_base` 由共用 helper 解析（它不是属性，属性读取器对它无答案）。⭐ **元素不用写**：这笔加入攻击者自己的实例，元素本就是他的。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "elation_skill_pays_out_at_3_elation_allies",
+      "when": [
+        "actor has_state 渲染理性，解构欢榆",
+        "allies_with_path:欢愉 >= 3"
+      ],
+      "do": [
+        {
+          "op": "ADD_DAMAGE",
+          "scale": "elation_base",
+          "percent": 0.2,
+          "damage_type": "ELATION"
+        }
+      ],
+      "source": "1503 真珠 欢榆技 渲染理性，解构欢榆 (150320): 「队伍中「欢榆」命途角色数量等于 3 或以上时，使我方全体目标**下一次攻击后**，对攻击目标额外造成 20% 的**对应属性**欢榆伤害」。",
+      "note": "⭐ 用 `ADD_DAMAGE` 而不是 `DAMAGE`：它把量加到**正在结算的那一笔**，不产生新实例，也就不会再次触发 `DEALING_DAMAGE`（第一版用 `DAMAGE` 时，引擎的递归守卫拦下了它）。⭐ 三个欢榆因子由 `damage_type: \"ELATION\"` 带入（本轮为 `ADD_DAMAGE` 加的能力）；量的来源 `elation_base` 由共用 helper 解析（它不是属性，属性读取器对它无答案）。⭐ **元素不用写**：这笔加入攻击者自己的实例，元素本就是他的。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "elation_skill_pays_out_at_4_elation_allies",
+      "when": [
+        "actor has_state 渲染理性，解构欢榆",
+        "allies_with_path:欢愉 >= 4"
+      ],
+      "do": [
+        {
+          "op": "ADD_DAMAGE",
+          "scale": "elation_base",
+          "percent": 0.4,
+          "damage_type": "ELATION"
+        }
+      ],
+      "source": "1503 真珠 欢榆技 渲染理性，解构欢榆 (150320): 「队伍中「欢榆」命途角色数量等于 4 或以上时，使我方全体目标**下一次攻击后**，对攻击目标额外造成 40% 的**对应属性**欢榆伤害」。",
+      "note": "⭐ 用 `ADD_DAMAGE` 而不是 `DAMAGE`：它把量加到**正在结算的那一笔**，不产生新实例，也就不会再次触发 `DEALING_DAMAGE`（第一版用 `DAMAGE` 时，引擎的递归守卫拦下了它）。⭐ 三个欢榆因子由 `damage_type: \"ELATION\"` 带入（本轮为 `ADD_DAMAGE` 加的能力）；量的来源 `elation_base` 由共用 helper 解析（它不是属性，属性读取器对它无答案）。⭐ **元素不用写**：这笔加入攻击者自己的实例，元素本就是他的。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "trace_insight_raises_elation_at_2400_defence",
+      "when": [
+        "self_attr:DEFENCE >= 2400"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ELATION_DAMAGE_BOOST",
+          "percent": 0.0003,
+          "permanent": true,
+          "target": "self",
+          "scale": "self_attr_above:DEFENCE:2400",
+          "amount": 0.32,
+          "cap_amount": 0.68,
+          "coexist": true
+        }
+      ],
+      "source": "1503 真珠 行迹 洞察万物 (1503101): 「真珠的防御力大于等于 2400 时，使自身欢愉度提高 32%，之后每超过 100 点防御力使自身欢愉度提高 3%，最多计入 3600 点超出的防御力」。",
+      "note": "⭐⭐ **一条规则，不是两条** —— 第一版写成两条（平的 0.32 与 `self_attr_above:DEFENCE:2400` + `amount: -0.04`），而**实测在 DEF = 2400 处读到 0.28 而不是 0.32** ✗：两条同属性、同类的修饰**互相替换**（`max_stacks` 默认 1，这是引擎的既有口径），后一条在超出量为 0 时给出 `0 − 0.04`，把前一条顶掉了 ✓。⭐ 合并**不是绕道** ✓：`self_attr_above:DEFENCE:2400` 本身就取 `max(0, DEF − 2400)` ✓，所以一条规则读 `0.32 + 0.0003 × 超出量` ✓，而 `cap_amount: 0.68` 正好写出文档的上限 —— 「最多计入 3600 点超出的防御力」⇒ `0.32 + 0.0003 × (3600 − 2400) = 0.68` ✓。⇒ 上限这次是**按输出端**表达的，而它与文档的读法在**任何** DEF 上都相等 ✓（写 `amount` 那种输出端偏移才会分岔 ✓）。⭐ 判据 `PearlInsightTraceTest` 量四点：2300 给 0 ✓、2400 给 0.32 ✓、2500 给 0.35 ✓、4000 与 5000 **读数相同**（封顶 0.68 ✓）。\n  ⚠⚠ **必须带 `coexist: true`** ✓：`StatModifierBuff.isSameKind` 的身份是 **(属性, modifierType, sourceRole)** ✓ —— **名字不参与** ✓ —— 所以同属性的两条 `MODIFY_ATTR` 会**互相替换** ✗。实测：行迹的 `ELATION_DAMAGE_BOOST +0.10` 把这一条算出来的值**顶掉**了（2400 防御处读数由 0.42 变 0.10 ✓）；行迹的 `EFFECT_RESISTANCE +0.10` 同样顶掉了感知容差的光环 ✓。⚠ **不能靠合并解决**：行迹是**无条件**的，而这一条**带门**（防御 ≥ 2400 / 持有【好活当赏】）⇒ 一条规则扛不了两句话 ✓。⇒ 用引擎既有的 `coexist` ✓（它的注释写的就是这个用途：「一个效果可以要求**不被顶掉**」✓，两个方向都保护 ✓）。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "trace_tolerance_raises_effect_resistance_while_holding",
+      "when": [
+        "actor == self",
+        "self_resource:好活当赏 >= 1"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "EFFECT_RESISTANCE",
+          "percent": 0.5,
+          "permanent": true,
+          "target": "all_allies",
+          "coexist": true
+        }
+      ],
+      "source": "1503 真珠 行迹 感知容差 (1503102): 「持有【好活当赏】时，我方全体目标的**效果抵抗**提高 50%」。",
+      "note": "⭐⭐ **门改对了**（本轮）：原文的门是「**持有【好活当赏】时**」✓，而它**有现成写法** —— `self_resource:好活当赏 >= 1` ✓。⚠ 我上一版写成 `self has_state 深度学习`、并把门放在 `target_when`，还断言「持有它这个条件今天写不出来」 ✗ —— **那句话是错的** ✓，而且仓库里就有反例：`1505.json` **三条已出货规则**用的正是这个条件拼写（`self_resource:好活当赏 >= 1` ✓，`1201`/`1003` 同族 ✓）。⇒ 近似已撤下 ✓。⭐ 三条口径：① **`>= 1` 就是「持有」** ✓（数值资源没有「状态」可问，而「有没有」就是 `>= 1` ✓）；② **门属于 `when`，不属于 `target_when`** ✓ —— 「她持有它」说的是**规则的主语**，不是「哪些候选合格」；写在 `target_when` 里虽然也能跑（`self` 在那里仍绑规则主人 ✓），但说的是另一件事 ✓；③ **条件单调**（只会从假变真 ⇒ 第一次满足时挂上、之后一直成立 ✓），所以 `permanent: true` 的光环语义与这句话一致 ✓。⚠ 未表达的是同句**没有**的那部分：原文只要求「持有」，没说什么时候撤下 —— 而【好活当赏】在她的声明里是**持续时间无限** ✓（`resources[0]` 的 source 原话 ✓）⇒ 不撤下是对的 ✓。⭐ 另：效果抵抗的属性名**早就存在** —— 本文件此前那句「`AttributeType` 里没有任何名字命名效果抵抗（实测扫过）」是**错的**：`EFFECT_RESISTANCE`（`AttributeType:44`，由游戏属性 `StatusResistanceBase` 映射，见 `:289`）。这与「我断言欢愉伤害属性不存在、而 `ELATION_DAMAGE_BOOST` 一直都在」是同一个错法，已作为纪律记下。\n  ⚠⚠ **必须带 `coexist: true`** ✓：`StatModifierBuff.isSameKind` 的身份是 **(属性, modifierType, sourceRole)** ✓ —— **名字不参与** ✓ —— 所以同属性的两条 `MODIFY_ATTR` 会**互相替换** ✗。实测：行迹的 `ELATION_DAMAGE_BOOST +0.10` 把这一条算出来的值**顶掉**了（2400 防御处读数由 0.42 变 0.10 ✓）；行迹的 `EFFECT_RESISTANCE +0.10` 同样顶掉了感知容差的光环 ✓。⚠ **不能靠合并解决**：行迹是**无条件**的，而这一条**带门**（防御 ≥ 2400 / 持有【好活当赏】）⇒ 一条规则扛不了两句话 ✓。⇒ 用引擎既有的 `coexist` ✓（它的注释写的就是这个用途：「一个效果可以要求**不被顶掉**」✓，两个方向都保护 ✓）。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "eidolon6_raises_all_type_resistance_penetration",
+      "min_eidolon": 6,
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DAMAGE_PENETRATION",
+          "percent": 0.2,
+          "permanent": true,
+          "target": "all_allies",
+          "target_when": [
+            "self has_state 深度学习"
+          ]
+        }
+      ],
+      "source": "1503 真珠 星魂 6 用一副躯壳，演算生命: 「【深度学习】时，我方全体目标的全属性**抗性穿透**提高 20%」（参数 `[0.2, 2.4]` 的第二项是 240% 的欢愉伤害，仍未写）。",
+      "note": "⭐⭐ **本轮推翻了一处流传很久的笔记**：`1403.json` 写着「“全属性抗性穿透”没有写法 ✗（引擎只有 1207 那条 `DAMAGE_PENETRATION`，绑定单一元素 ✓）」—— **后半句是错的** ✓。实测读源码：`Battle:3065` 是 `damage.resist(rawResist, attacker.getAttribute(DAMAGE_PENETRATION).get())`，而 `rawResist = enemy.getDamageResist().getOrDefault(damage.getElement(), 0.0)` 已经取过元素 ✓ ⇒ **穿透是攻击者的一个值，与元素无关** ✓，它减的是**任何**元素的那一发抗性 ✓。已经有三份出货内容按这个读法用它（`1408:123` ✓、`1412:177` ✓、`1502` ✓），所以那个笔记与仓库里的三处出货**互相矛盾** ✓，本轮以源码为准 ✓（并把它记进 GAPS，免得第四次重犯 ✓）。⭐ `min_eidolon: 6` 让“这句属于星魂”写在机制旁边（引擎依旧不认识星魂，照 `1211` 的既有写法）。⭐ 门写 `self has_state 深度学习` —— 这一条**恰好准确**：原文的门就是【深度学习】本身。⚠ 星魂 6 的另一半（强化普攻额外 240% 冰属性欢愉伤害、用【美学底本】的属性值计算）**未写**：引擎侧的 `holder_attr:` 已经就位，缺的是**哪条属性**（正文没说、能力脚本不在数据里）—— 见 `GAPS.md`（2026-10-06）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "stat_traces_the_ten_panel_rows",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE",
+          "percent": 0.225,
+          "permanent": true,
+          "target": "self",
+          "coexist": true
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SPEED",
+          "amount": 9.0,
+          "permanent": true,
+          "target": "self",
+          "coexist": true
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "EFFECT_RESISTANCE",
+          "percent": 0.1,
+          "permanent": true,
+          "target": "self",
+          "coexist": true
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ELATION_DAMAGE_BOOST",
+          "percent": 0.1,
+          "permanent": true,
+          "target": "self",
+          "coexist": true
+        }
+      ],
+      "source": "1503 真珠 行迹属性（`AvatarSkillTreeConfig` 的 `AvatarID=1503` 行，`StatusAddList` 十条）：防御力 +5.00%/+7.50%/+10.00%（1503201/1503205/1503210）、速度 +2/+3/+4（1503202/1503206/1503209）、效果抵抗 +4.00%/+6.00%（1503203/1503207）、欢愉度 +4.00%/+6.00%（1503204/1503208）。",
+      "note": "⭐⭐ **这一条补的是一个实测出来的空洞**：语料说这十条属性行迹『已由 `SkillTrace` 处理，不需要内容规则』✓ —— 那句话对**通路**是对的 ✓，对**数据**是错的 ✗。实测三件事：① `AvatarSkillTreeConfig` 里 `AvatarID=1503` **确实带着**这十条（`StatusAddList` 的 `PropertyType` 分别是 `DefenceAddedRatio`/`SpeedDelta`/`StatusResistanceBase`/`ElationDamageAddedRatioBase` ✓）；② 但引擎的行迹通路 `SkillTrace` 读的是**生成数据** `skill_traces.json` ✓，而那份文件有 **93** 个条目、`1502`/`1505`/`1001` **各 13 条**、**`1503` 是空表** ✗；③ 所以真珠的面板**少了这十条** ✓，而且**没有任何报错** ✓（面板只是偏低 ✓）。⇒ 这正是本项目反复抓到的那一型：**数据里有、生成文件里没有** ✓。⭐ 四条各写**一条效果**，数值是那十条的**和**（行迹是加算 ✓）：防御 `0.05+0.075+0.10 = 0.225` ✓、速度 `2+3+4 = 9`（`SpeedDelta` 是**绝对值** ⇒ 用 `amount` 而不是 `percent` ✓）、效果抵抗 `0.04+0.06 = 0.10` ✓、欢愉度 `0.04+0.06 = 0.10` ✓。⚠ 防御与欢愉度是**比率属性**（属性自己的单位是分数 ✓），所以 `percent: 0.225` 是『基准的 22.5%』，与数据行的 5%/7.5%/10% 同义 ✓。⚠ **修在内容侧的代价**：生成器补上这十条之后，这一条会与它**重复计算** ✓ —— 所以解锁条件是『`skill_traces.json` 里 1503 的行数不再是 0』✓，那时**删掉这一条** ✓。⭐ 判据 `PearlStatTracesTest` 量的是**与数据行相符的绝对增量** ✓（不是『比 0 大』✓）。\n  ⚠⚠ **必须带 `coexist: true`** ✓：`StatModifierBuff.isSameKind` 的身份是 **(属性, modifierType, sourceRole)** ✓ —— **名字不参与** ✓ —— 所以同属性的两条 `MODIFY_ATTR` 会**互相替换** ✗。实测：行迹的 `ELATION_DAMAGE_BOOST +0.10` 把这一条算出来的值**顶掉**了（2400 防御处读数由 0.42 变 0.10 ✓）；行迹的 `EFFECT_RESISTANCE +0.10` 同样顶掉了感知容差的光环 ✓。⚠ **不能靠合并解决**：行迹是**无条件**的，而这一条**带门**（防御 ≥ 2400 / 持有【好活当赏】）⇒ 一条规则扛不了两句话 ✓。⇒ 用引擎既有的 `coexist` ✓（它的注释写的就是这个用途：「一个效果可以要求**不被顶掉**」✓，两个方向都保护 ✓）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "trace_insight_links_healing_to_elation",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "OUTGOING_HEALING_BOOST",
+          "scale": "self_attr:ELATION_DAMAGE_BOOST",
+          "percent": 0.2,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "1503 真珠 行迹 洞察万物 (1503101) 第二句: 「真珠获得等同于自身欢愉度 20% 的治疗量加成」。",
+      "note": "⭐ `OUTGOING_HEALING_BOOST` 是**治疗者侧**的属性（`Battle.heal` 从施放者身上读），首个出货读者是 `1105.json` 的行迹 调理 —— 所以这里同样只是内容。⭐ 量的来源是**欢愉度**（`ELATION_DAMAGE_BOOST`），这是个**比率属性**，所以 `percent × 该值` 得到的就是「欢愉度的 20%」这件事本身的单位（比率），不需要再换算。⚠ 顺序：`BATTLE_START` 上三条规则按**文件顺序**执行 —— 上面两条先抬高欢愉度，这一条随后按**抬完的**值取 20%（这是「等同于自身欢愉度」的自然读法，也是判据里能观测到的一处差别）。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "enhanced_basic_form_a_extra_elation_damage",
+      "when": [
+        "actor == self",
+        "actor has_state 深度学习",
+        "from_skill_id == 8"
+      ],
+      "do": [
+        {
+          "op": "DAMAGE",
+          "scale": "holder_attr:美学底本:ATTACK",
+          "percent": 0.6,
+          "element": "Ice",
+          "damage_type": "ELATION",
+          "target": "target"
+        }
+      ],
+      "source": "1503 真珠 终结技 鉴映灵魂的底色 (150303) 的强化普攻端: 「若【美学底本】为「欢愉」命途，则强化为【行笔，幻造星月】，且攻击后，额外造成 #2[i]% 的冰属性欢愉伤害，该次欢愉伤害使用【美学底本】的属性值计算」（#2：Lv1 = 0.3、Lv10 = 0.6、Lv15 = 0.75；本文件已有等级口径把四个槽位钉在 Lv10）。⭐ 「使用【美学底本】的属性值计算」= **【美学底本】的攻击力**（用户提供的裁决 ✓），写法是 `holder_attr:美学底本:ATTACK` ✓ —— 它读**状态持有者自己**的属性 ✓，与 `holder_of:` 选择器共用同一处查找 ✓。",
+      "note": "⭐⭐ **本条同时用上了本会话新增的两件引擎能力**：`holder_attr:<状态>:<属性>` ✓（读状态持有者的属性 ✓）与 `ADD_DAMAGE` 能带 `damage_type` ✓。⚠ 但它用的是 **`DAMAGE`** 而不是 `ADD_DAMAGE`：原文说「额外**造成**」= **一笔独立实例** ✓（`ADD_DAMAGE` 是「把量加进正在结算的那一笔」✓，语义不同 ✓）；代价是它自己也会发 `DEALING_DAMAGE` ✓ ⇒ **靠门把它自己挡在门外** ✓：`from_skill_id == 8` 在第二趟（这一笔自己产生的实例）不再成立 ✓（⚠ **待判据确认** ✓ —— 若引擎给规则驱动的实例也带上 8，递归守卫会喊出来 ✓）。\n  ⚠⚠ **门改对了**（实测）：原写 `actor has_state 美学底本` ✗ ⇒ **条文从不触发** ✓（强化普攻伤害与槽 9 完全相同：`475.398` ✓，把底本攻击力从 1000 改到 3000 也**纹丝不动** ✓）；把这一条门去掉后立刻触发（`1229.68` ✓）。⭐ 根因是**主语错位**：`actor` 是**造成伤害的真珠** ✓，而【美学底本】打在**被她指定的队友**身上 ✓ ⇒ 门要说**她自己满足的事实**（`深度学习` ✓），而**量**仍指向底本 ✓ —— 这正是 `holder_attr:美学底本:ATTACK` 的用途 ✓，也是为什么这一条**同时**需要一个关于她的条件与一个关于持有者的 scale ✓。"
+    }
+  ]
+}

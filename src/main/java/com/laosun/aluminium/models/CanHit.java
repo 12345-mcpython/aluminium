@@ -889,7 +889,28 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
                 }
             }
         }
-        return skill.getLevel() + (slot == null ? 0 : skillLevelBonus.getOrDefault(slot, 0));
+        int level = skill.getLevel() + (slot == null ? 0 : skillLevelBonus.getOrDefault(slot, 0));
+        return Math.min(level, tableRows(skill));
+    }
+
+    /**
+     * How many parameter rows this skill's data actually has - i.e. its <b>maximum level</b>.
+     *
+     * <p>Note: Why the resolver clamps. Raising a slot past its own table is not exotic: the data caps a basic attack at
+     * level 10 while an Eidolon grants "普攻等级+1", so a file whose level convention already sits the slot at 10 and
+     * then applies that Eidolon asks for row 11 of a 10-row table. Both readers used to answer that by <b>returning
+     * silently</b> - `SkillExecutor`'s damaging path and its generated-effect path - so the skill dealt no damage at
+     * all with no error anywhere (measured: 1503's enhanced basic is a flat 0 at Eidolon 6, and the same shape of
+     * raise ships on 1103 / 1104 / 1109 / 1207 and more). The table's row count IS the documented cap ("最多不超过
+     * 10级" is the row count, not a separate field), so the honest reading is "the level cannot exceed what the table
+     * has", and every caller then finds a row.
+     */
+    private static int tableRows(Skill skill) {
+        if (skill.getData() == null || skill.getData().getSkills() == null
+                || skill.getData().getSkills().isEmpty()) {
+            return Integer.MAX_VALUE;      // no table to clamp against (fixtures, enemies with bare skills)
+        }
+        return skill.getData().getSkills().size();
     }
 
     /**
