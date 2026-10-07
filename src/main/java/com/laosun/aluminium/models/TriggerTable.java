@@ -628,10 +628,11 @@ public class TriggerTable {
             }
             targetFilters.add(List.copyOf(filter));
         }
+        int minEidolon = validateMinEidolon(spec);
         return List.of(new CompiledRule(event, conditions, effects, spec.getSource(),
                 ruleKey(spec, index), validateId(spec), validateCooldown(spec),
                 Boolean.TRUE.equals(spec.getOncePerBattle()), validateChance(spec),
-                validateMinEidolon(spec), validatePerTurn(spec), validatePerAttack(spec),
+                minEidolon, validateMaxEidolon(spec, minEidolon), validatePerTurn(spec), validatePerAttack(spec),
                 Boolean.TRUE.equals(spec.getOncePerWave()), List.copyOf(targetFilters),
                 validatePerSubject(spec)));
     }
@@ -685,6 +686,32 @@ public class TriggerTable {
             throw new IllegalArgumentException(
                     "Trigger rule has \"min_eidolon\": " + rank + ", but Eidolon ranks are 1-"
                             + Constant.EIDOLON_MAX_RANK + "; omit the field entirely for a rule that needs none "
+                            + "(source: " + spec.getSource() + ")");
+        }
+        return rank;
+    }
+
+    /**
+     * Validates the OTHER end of the Eidolon gate and returns it ({@code 0} = no ceiling).
+     *
+     * <p>Validated here for the same reason as the floor: a ceiling below the floor would be a rule that can never
+     * fire, which is the "silently dead" shape this vocabulary refuses rather than ships.
+     */
+    private static int validateMaxEidolon(TriggerSpec spec, int minEidolon) {
+        Integer rank = spec.getMaxEidolon();
+        if (rank == null) {
+            return 0;
+        }
+        if (rank < 1 || rank > Constant.EIDOLON_MAX_RANK) {
+            throw new IllegalArgumentException(
+                    "Trigger rule has \"max_eidolon\": " + rank + ", but Eidolon ranks are 1-"
+                            + Constant.EIDOLON_MAX_RANK + "; omit the field for a rule with no ceiling "
+                            + "(source: " + spec.getSource() + ")");
+        }
+        if (minEidolon > 0 && rank < minEidolon) {
+            throw new IllegalArgumentException(
+                    "Trigger rule has \"min_eidolon\": " + minEidolon + " and \"max_eidolon\": " + rank
+                            + ", so it can never fire; the ceiling must be at or above the floor "
                             + "(source: " + spec.getSource() + ")");
         }
         return rank;
@@ -2143,6 +2170,7 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
     public record CompiledRule(TriggerEvent event, List<Condition> conditions,
                                List<EffectSpec> effects, String source, String key, String id,
                                int cooldownTurns, boolean oncePerBattle, double chance, int minEidolon,
+                               int maxEidolon,
                                int perTurn, int perAttack, boolean oncePerWave,
                                List<List<Condition>> effectTargetFilters, String perSubject) {
 

@@ -1173,6 +1173,11 @@ public final class TriggerInterpreter {
             }            if (rule.minEidolon() > 0 && eidolonRankOf(owner) < rule.minEidolon()) {
                 continue;
             }
+            // The other end of the band: "this clause replaces that one from rank N" needs the shipped rule to STOP
+            // applying, which a floor alone cannot say (see TriggerSpec.maxEidolon).
+            if (rule.maxEidolon() > 0 && eidolonRankOf(owner) > rule.maxEidolon()) {
+                continue;
+            }
             // A rule-level probability ("there is a 35% fixed chance..."). A failed roll costs nothing: no cooldown is
             // started and no once-per-battle flag is set, because nothing happened.
             if (rule.chance() < 1 && !battle.rollChance(rule.chance())) {
@@ -2043,11 +2048,83 @@ public final class TriggerInterpreter {
      */
     static final String ALLIES_OF_PATH_PREFIX = "allies_of_path:";
 
+    /**
+     * The same family with an <b>exclusion list</b>: {@code allies_of_path_except:<PATH>:<WHO>,<WHO>}.
+     *
+     * <p>Reader: 1503 Pearl (真珠)'s Eidolon 2 - 「使除真珠和【美学底本】外的其他我方「欢愉」命途角色也触发行动提前效果」 - "the
+     * allies of that Path OTHER THAN these two". The plain {@code allies_of_path:} cannot say it, and neither can a
+     * condition: the exclusion is about <b>which units the effect reaches</b>, which is what a target selector is for.
+     *
+     * <p>The names after the path are the same subjects the identity conditions use ({@code self} = the rule's owner,
+     * {@code target} = what the event happened to), so a clause that says "other than me and the one I aimed at" reads
+     * the same way as the conditions around it.
+     */
+    static final String ALLIES_OF_PATH_EXCEPT_PREFIX = "allies_of_path_except:";
+
+
     /** The party member whose cid is this one, or {@code null} when nobody matches. */
     /**
      * The path a selector names, or {@code null} if it names none. Both spellings are accepted because the selector arrives lowercased: the Chinese name through
      * {@link Path#fromNameOrNull}, the enum's own through {@code valueOf} on the upper-cased text.
      */
+    /**
+     * The allies of a Path, minus the units the selector excludes: {@code allies_of_path_except:欢愉:self,target}.
+     *
+     * <p>Shared by both resolution paths (one unit and a set), so a clause that names one of these cannot behave
+     * differently from the same clause used as a group target.
+     *
+     * @throws IllegalStateException when the path is unknown or the selector names nobody to exclude - both are
+     *                               SPELLING mistakes, and this vocabulary is closed on purpose (see
+     *                               {@link #requireSelectorSpelling})
+     */
+    private static List<CanHit> alliesOfPathExcept(String selector, TriggerContext ctx) {
+        String rest = selector.substring(ALLIES_OF_PATH_EXCEPT_PREFIX.length()).trim();
+        int split = rest.lastIndexOf(':');
+        if (split < 0) {
+            throw new IllegalStateException("Effect targets \"" + selector
+                    + "\" but no exclusion list follows the Path; write \""
+                    + ALLIES_OF_PATH_EXCEPT_PREFIX + "<path>:self,target\"");
+        }
+        Path wanted = pathNamed(rest.substring(0, split).trim());
+        if (wanted == null) {
+            throw new IllegalStateException("Effect targets \"" + selector + "\" but \""
+                    + rest.substring(0, split).trim() + "\" is not a path (write its Chinese name, or the enum's)");
+        }
+        List<CanHit> excluded = new ArrayList<>();
+        for (String who : rest.substring(split + 1).split(",")) {
+            String name = who.trim().toLowerCase(Locale.ROOT);
+            if (name.isEmpty()) {
+                continue;
+            }
+            CanHit unit = switch (name) {
+                case "self", "owner" -> ctx.owner();
+                case "target" -> ctx.target();
+                case "actor", "attacker" -> ctx.actor();
+                default -> throw new IllegalStateException("Effect targets \"" + selector
+                        + "\" but \"" + name + "\" is not a unit this vocabulary knows; use self / target / actor");
+            };
+            if (unit != null) {
+                excluded.add(unit);
+            }
+        }
+        if (excluded.isEmpty()) {
+            throw new IllegalStateException("Effect targets \"" + selector
+                    + "\" but its exclusion list names nobody that exists in this event; a selector that excludes"
+                    + " nothing is a different clause (use " + ALLIES_OF_PATH_PREFIX + " instead)");
+        }
+        if (ctx.battle() == null) {
+            throw new IllegalStateException(
+                    "Effect targets \"" + selector + "\" but no battle was supplied to take the party from");
+        }
+        List<CanHit> selected = new ArrayList<>();
+        for (CanHit ally : ctx.battle().allies) {
+            if (ally instanceof Character character && character.getPath() == wanted && !excluded.contains(ally)) {
+                selected.add(ally);
+            }
+        }
+        return selected;
+    }
+
     private static Path pathNamed(String text) {
         Path byName = Path.fromNameOrNull(text);
         if (byName != null) {
@@ -2174,6 +2251,11 @@ public final class TriggerInterpreter {
         if (selector.startsWith(HOLDER_OF_PREFIX)) {
             return holderOf(battle, effect.getTarget(), ctx);
         }
+        if (selector.startsWith(ALLIES_OF_PATH_EXCEPT_PREFIX)) {
+            // Note: Before the plain `allies_of_path:` branch below, which would otherwise read this spelling's path
+            // out of the middle of the exclusion list.
+            return alliesOfPathExcept(selector, ctx);
+        }
         if ("wave_monsters".equals(selector)) {
             if (battle == null) {
                 throw new IllegalStateException(
@@ -2218,6 +2300,11 @@ public final class TriggerInterpreter {
                 party.add(ally);
             }
             return List.copyOf(party);
+        }
+        if (selector.startsWith(ALLIES_OF_PATH_EXCEPT_PREFIX)) {
+            // Note: Checked BEFORE the plain `allies_of_path:` branch, which would otherwise match this spelling and
+            // read the rest of it as a path name.
+            return List.copyOf(alliesOfPathExcept(selector, ctx));
         }
         if (selector.startsWith(ALLIES_OF_PATH_PREFIX)) {
             // ALL of them, not the first (reader: 1141518 "raise the ATK of all 'Erudition' path characters..."): the sentence says "all", so the answer is the
@@ -4808,7 +4895,8 @@ public final class TriggerInterpreter {
      */
     private static void requireSelectorSpelling(String value, String field, String op, TriggerSpec spec) {
         String selector = value.trim().toLowerCase(Locale.ROOT);
-        if (!TARGET_SELECTORS.contains(selector) && !selector.startsWith(HOLDER_OF_PREFIX)) {
+        if (!TARGET_SELECTORS.contains(selector) && !selector.startsWith(HOLDER_OF_PREFIX)
+                && !selector.startsWith(ALLIES_OF_PATH_EXCEPT_PREFIX)) {
             throw new IllegalArgumentException(
                     "Op " + op + " names an unknown \"" + field + "\" selector '" + value
                             + "' (known: " + String.join(" / ", TARGET_SELECTORS.stream().sorted().toList())

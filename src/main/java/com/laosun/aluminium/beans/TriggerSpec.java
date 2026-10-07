@@ -186,6 +186,21 @@ public class TriggerSpec {
     private Integer minEidolon;
 
     /**
+     * The highest Eidolon rank this rule still applies at; absent = no ceiling.
+     *
+     * <p>Reader: 1503 Pearl (真珠)'s Eidolon 2 - 「使除真珠和【美学底本】外的其他我方「欢愉」命途角色也触发行动提前效果」. That
+     * clause does not ADD an advance, it WIDENS the one her base kit already performs: at Eidolon 0-1 the tier advances
+     * the archetype, from Eidolon 2 the same tier advances every Elation ally. So the shipped rule has to stop applying
+     * at rank 2, which {@link #minEidolon} alone cannot say - a floor with no ceiling leaves both rules firing and the
+     * archetype advancing twice (and {@code ADVANCE} is multiplicative: twice 10% is 19%, not 20%).
+     *
+     * <p>With {@link #minEidolon} this makes a closed rank BAND, which is what "this clause replaces that one from rank
+     * N" needs. Either end may be stated alone.
+     */
+    @SerializedName("max_eidolon")
+    private Integer maxEidolon;
+
+    /**
      * Where the rule came from (trace id, talent name, character-doc reference).
      *
      * <p>Not used by the engine at all: it exists so that anyone reading the JSON -- or a failing
