@@ -140,6 +140,9 @@ public final class TriggerInterpreter {
             // and `Resource` has had both tiers all along -- this widens the second one in battle.
             "RAISE_RESOURCE_CAP",
             "MODIFY_DAMAGE_TAKEN", "BOOST_DAMAGE", "DISPEL", "SUMMON", "SUMMON_SERVANT", "COMMAND_SUMMON", "CAST_SKILL", "DELEGATE_DAMAGE",
+            // "每点【好活当赏】等同于 200 点抵御值，我方目标受到伤害时，真珠可消耗抵御值为我方目标抵挡 60% 的伤害"
+            // (reader: 1503 Pearl (真珠)'s talent): a share of an incoming hit paid for out of ANOTHER unit's counter.
+            "ABSORB_DAMAGE",
             "REMOVE_STATE", "TAUNT", "APPLY_CONTROL", "APPLY_DOT", "EXTEND_BUFF", "RESIST_DEBUFF",
             "MODIFY_RULE", "ADD_DAMAGE", "RAISE_SKILL_LEVEL", "START_COUNTDOWN", "ADD_STACK", "APPLY_REGEN", "BOOST_TOUGHNESS", "SUPER_BREAK", "REMOVE_BUFF", "REPLACE_SKILL", "TICK_DOT", "CONSUME_HP");
 
@@ -155,7 +158,10 @@ public final class TriggerInterpreter {
      * ("for the rest of the battle"). See {@link #requireNoStackArguments}.
      */
     private static final Set<String> OPS_WITH_DURATION =
-            Set.of("MODIFY_ATTR", "APPLY_BUFF", "MODIFY_DAMAGE_TAKEN", "RESIST_DEBUFF", "REPLACE_SKILL");
+            Set.of("MODIFY_ATTR", "APPLY_BUFF", "MODIFY_DAMAGE_TAKEN", "RESIST_DEBUFF", "REPLACE_SKILL",
+                    // "真珠的【好活当赏】持续时间无限" shapes an absorber that lasts the battle; a `turns` one that runs
+                    // out is equally expressible, so it belongs in this set rather than being forced to `permanent`.
+                    "ABSORB_DAMAGE");
 
     /**
      * The selectors an effect's {@code target} may name.
@@ -623,6 +629,33 @@ public final class TriggerInterpreter {
                 requireBaseChance(effect, op, spec);
                 requirePercent(effect, op, spec);
                 requireNonZeroPercent(effect, op, spec);
+                requireDuration(effect, op, spec);
+                requireNoStackArguments(effect, op, spec);
+            }
+            case "ABSORB_DAMAGE" -> {
+                // "每点【好活当赏】等同于 200 点抵御值 ... 抵挡 60% 的伤害": three things have to be stated, and each one is
+                // a silent no-op if it is missing -- an absorber with no pool blocks nothing, one with no rate cannot
+                // turn points into damage, and one with no share would block the whole hit. So all three are required
+                // at LOAD time rather than discovered by a number that came out zero.
+                if (effect.getResource() == null || effect.getResource().isBlank()) {
+                    throw new IllegalArgumentException(
+                            "Op ABSORB_DAMAGE requires \"resource\" (which counter pays for the blocked damage)"
+                                    + " (source: " + spec.getSource() + ")");
+                }
+                requireResource(effect, op, spec);
+                if (effect.getUnitAmount() == null || effect.getUnitAmount() <= 0) {
+                    throw new IllegalArgumentException(
+                            "Op ABSORB_DAMAGE requires a positive \"unit_amount\" (how much damage one point of '"
+                                    + effect.getResource().trim() + "' is worth), but has "
+                                    + effect.getUnitAmount() + " (source: " + spec.getSource() + ")");
+                }
+                requirePercent(effect, op, spec);
+                if (effect.getPercent() > 1) {
+                    throw new IllegalArgumentException(
+                            "Op ABSORB_DAMAGE takes \"percent\" as the SHARE of the hit that may be blocked, in (0, 1]"
+                                    + " - not a number out of 100; got " + effect.getPercent()
+                                    + " (source: " + spec.getSource() + ")");
+                }
                 requireDuration(effect, op, spec);
                 requireNoStackArguments(effect, op, spec);
             }
@@ -1297,6 +1330,32 @@ public final class TriggerInterpreter {
                             battle.fireTriggersForAlly(TriggerEvent.SHIELD_GRANTED, ctx.owner(), target, amount);
                         }
                     }
+                }
+            }
+            case "ABSORB_DAMAGE" -> {
+                // "每点【好活当赏】等同于 200 点抵御值，我方目标受到伤害时，真珠可消耗抵御值抵挡 60% 的伤害" (1503 Pearl (真珠)'s
+                // talent). The grant rides on the PROTECTED unit - that is where the hit lands, so that is where the
+                // absorber has to be - while the counter belongs to whoever PAYS.
+                // Note: `resource`, `unit_amount` and `percent` are all validated at LOAD time (see `validate`), so by
+                // the time this runs they are known good; the casts here are reads, not checks.
+                String resource = effect.getResource().trim();
+                double unitAmount = effect.getUnitAmount();
+                double share = effect.getPercent();
+                // Who pays. Defaults to the rule's owner (Pearl), which is the documented shape: the counter is hers
+                // while the protected units are the party.
+                CanHit payer = effect.getPayer() == null || effect.getPayer().isBlank()
+                        ? ctx.owner()
+                        : require(resolveTarget(effect, ctx), "target", ctx);
+                boolean permanent = unticked(effect);
+                int turns = permanent ? UNBOUNDED_DURATION_PLACEHOLDER : effect.getTurns();
+                for (CanHit target : resolveTargets(battle, effect, ctx)) {
+                    if (target == null || target.isDeath()) {
+                        continue;
+                    }
+                    target.getBuffManager().addBuff(withSource(withLifetime(
+                            new com.laosun.aluminium.models.buff.AbsorbBuff(
+                                    turns, permanent, resource, unitAmount, share, payer),
+                            effect), ctx));
                 }
             }
             case "INSERT_ACTION" -> {

@@ -1501,6 +1501,12 @@ public class Battle {
             return 0;                  // corpse / phase-transition invulnerability: not settled (so no hitting a corpse either)
         }
         double settled = assemble(damage);                       // damage after the zones (this is "how much was dealt")
+        // "our target takes damage, and Pearl may spend 抵御值 to block 60% of it": absorption reads the SETTLED
+        // amount - that is what "受到伤害时" means - and lowers it before anything else looks at the hit. It sits
+        // here rather than in the DamageEvent hooks because those run inside the zone arithmetic, where the settled
+        // amount does not exist yet, and it must precede the lethal check below: absorbing a hit down to zero is
+        // exactly "this was not a lethal blow".
+        settled = absorbsInto(target, settled);
         double hpBefore = target.getCurrentHp();
         // Lethal blow: "when taking a lethal attack it will not fall into the unable-to-fight state, but instead restore health equal to 20%/50% of its own Max HP".
         // Note: THE ORDER IS THE WHOLE MECHANIC, and the first attempt got it wrong (measured): announcing BEFORE the damage leaves the
@@ -1568,6 +1574,61 @@ public class Battle {
         // Identity: settled == shieldAbsorbed + hpLoss (the shield is eaten first, HP is deducted only after it
         // runs out); computing them separately is just so that both parts stay observable.
         return shieldAbsorbed + hpLoss;
+    }
+
+    /**
+     * Lowers a settled hit by every absorber the victim carries, spending the payer's counter for each.
+     *
+     * <p>The mechanic (1503 Pearl (真珠)'s talent): 「每点【好活当赏】等同于 200 点抵御值，我方目标受到伤害时，真珠可消耗抵御值
+     * 为我方目标抵挡 60% 的伤害」 - the counter belongs to <b>Pearl</b> while the absorber sits on an <b>ally</b>, so
+     * the resource is read from the payer and not from the victim.
+     *
+     * <p>Order and arithmetic, all three of which the corpus's own words decide:
+     * <ol>
+     *   <li>the share is taken of the <b>settled</b> amount ("受到伤害时" - what the target was about to take);</li>
+     *   <li>a point pays for {@code unitAmount} of damage, so the points needed are {@code want / unitAmount},
+     *       rounded <b>up</b>: a point is a whole thing and a fraction of one cannot be spent;</li>
+     *   <li>whatever the counter can actually pay for is what gets blocked, so a victim with 1 point behind them
+     *       blocks 200 and keeps the hit's remainder - <b>partial absorption</b>, not an all-or-nothing save.</li>
+     * </ol>
+     *
+     * <p>⚠ The deduction is derived from the points actually spent rather than from the amount the share asked for.
+     * Rounding up means those differ: needing 1.5 points blocks the whole 300 those points buy, not just the 300 that
+     * were needed. That is deliberate and matches "抵御值" being a pool of whole points.
+     *
+     * @param victim  the unit the hit is landing on
+     * @param settled the amount after the zones
+     * @return the amount to deduct from HP instead
+     */
+    private double absorbsInto(CanHit victim, double settled) {
+        if (settled <= 0) {
+            return settled;
+        }
+        for (com.laosun.aluminium.models.buff.AbsorbBuff absorber : victim.getBuffManager().absorbers()) {
+            CanHit payer = absorber.getPayer();
+            if (payer == null || payer.isDeath()) {
+                continue;                                        // a fallen payer's counter blocks nothing
+            }
+            double share = settled * absorber.getPercent();      // what this absorber may block at most
+            if (share <= 0) {
+                continue;
+            }
+            int affordable = payer.getResources().value(absorber.getResource());
+            if (affordable <= 0) {
+                continue;
+            }
+            int needed = (int) Math.ceil(share / absorber.getUnitAmount());
+            int spent = payer.getResources().spend(absorber.getResource(), Math.min(needed, affordable));
+            if (spent <= 0) {
+                continue;
+            }
+            double blocked = Math.min(spent * absorber.getUnitAmount(), settled);
+            settled -= blocked;
+            if (settled <= 0) {
+                return 0;
+            }
+        }
+        return settled;
     }
 
     /**

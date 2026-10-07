@@ -72,6 +72,8 @@ public class EffectSpec {
         copy.instance = this.instance;
         copy.stacks = this.stacks;
         copy.resource = this.resource;
+        copy.unitAmount = this.unitAmount;
+        copy.payer = this.payer;
         copy.until = this.until;
         copy.buff = this.buff;
         copy.ticksOn = this.ticksOn;
@@ -450,10 +452,31 @@ return copy;
     private Boolean perStackLive;
 
     /**
-     * Resource id for {@code GAIN_RESOURCE} / {@code SPEND_RESOURCE} (e.g. {@code "tribbie_charge"}).
+     * Resource id for {@code GAIN_RESOURCE} / {@code SPEND_RESOURCE} / {@code ABSORB_DAMAGE} (e.g.
+     * {@code "tribbie_charge"}).
      */
     @SerializedName("resource")
     private String resource;
+
+    /**
+     * For {@code ABSORB_DAMAGE}: how much damage <b>one point</b> of {@link #resource} is worth.
+     *
+     * <p>1503 Pearl (真珠)'s talent is the reader: 「每点【好活当赏】等同于 #5 点抵御值」, #5 = 200. This is the exchange
+     * rate between a counter of whole points and a damage amount, and it is what makes the spend computable: the
+     * points a hit needs are {@code amount / unit_amount}.
+     */
+    @SerializedName("unit_amount")
+    private Double unitAmount;
+
+    /**
+     * For {@code ABSORB_DAMAGE}: <b>whose</b> counter pays for the blocked damage, as a target selector.
+     *
+     * <p>Defaults to the rule's owner, which is the documented shape - the counter belongs to Pearl while the units
+     * being protected are her allies (「真珠可消耗抵御值<b>为我方目标</b>抵挡」). Stated explicitly when the payer is
+     * somebody else.
+     */
+    @SerializedName("payer")
+    private String payer;
 
     /**
      * For {@code MODIFY_ATTR} / {@code APPLY_BUFF} / {@code MODIFY_DAMAGE_TAKEN}: the buff ends when its

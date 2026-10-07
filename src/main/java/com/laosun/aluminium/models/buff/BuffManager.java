@@ -531,6 +531,25 @@ public class BuffManager {
     }
 
     /**
+     * The absorbers attached to this unit - each one a share of a hit that some counter may pay for.
+     *
+     * <p>Note: Why this is a query rather than another {@code *Event} hook. Absorption has to run at a point the
+     * existing hooks do not reach: after the zones have settled the amount (so it blocks the number the unit really
+     * takes) but before the lethal check and before HP moves. {@link #onDamage} runs too early - inside
+     * {@code Damage.toValue()}'s own arithmetic, where the settled amount does not exist yet - so the caller asks for
+     * the absorbers and does the arithmetic itself.
+     */
+    public java.util.List<com.laosun.aluminium.models.buff.AbsorbBuff> absorbers() {
+        java.util.List<com.laosun.aluminium.models.buff.AbsorbBuff> found = new java.util.ArrayList<>();
+        for (AbstractBuff buff : buffs) {
+            if (buff instanceof com.laosun.aluminium.models.buff.AbsorbBuff absorber) {
+                found.add(absorber);
+            }
+        }
+        return found;
+    }
+
+    /**
      * Lets every buff react to a finished attack (Robin's [协奏] / Tribbie's zone's "after our side attacks").
      * Called by {@link CanHit#afterAttack(Battle, CanHit, CanHit, List, double)}.
      */
