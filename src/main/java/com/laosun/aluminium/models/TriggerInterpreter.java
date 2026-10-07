@@ -136,6 +136,9 @@ public final class TriggerInterpreter {
             // RAISE_RESOURCE_CAP, which widens a declared resource's OVERFLOW, not its cap.
             "RAISE_SKILL_POINT_CAP",
             "GAIN_RESOURCE", "SPEND_RESOURCE", "DAMAGE", "MODIFY_ATTR", "APPLY_BUFF", "REMOVE_STACK", "RAISE_SKILL_HITS",
+            // "该额外回合开始时【美学底本】获得 30 点…额外回合结束时移除" (reader: 1503 Pearl (真珠)): the inverse of a
+            // temporary grant, which clamps rather than erroring - unlike SPEND_RESOURCE, which is a strict cost.
+            "REMOVE_RESOURCE",
             // "[新蕊] can overflow to #3%" (reader: 114151, Castorice (遐蝶)): a declaration states a resource's overflow,
             // and `Resource` has had both tiers all along -- this widens the second one in battle.
             "RAISE_RESOURCE_CAP",
@@ -174,6 +177,10 @@ public final class TriggerInterpreter {
     private static final Set<String> TARGET_SELECTORS =
             Set.of("party_first", "next_ally", "self", "target", "attacker", "all_allies", "party", "other_allies", "summon",
                     "target_and_summon", "all_enemies", "lowest_hp_ally",
+                    // Note: `actor` is `attacker` under the name the condition language and the events use. Reader:
+                    // 1503's extra-turn reward - "该额外回合开始时，【美学底本】获得 30 点【好活当赏】" - where the unit to be
+                    // paid is the event's actor (the archetype whose extra turn just began), not the rule's owner.
+                    "actor",
             "random_enemy", "random_hit_enemy",
             // "all allies lethally hit in one action" (140月茉之庇): the allies a lethal blow has landed on since
             // this action began. A SET, not a unit -- hence the `all_` prefix, like `all_allies`.
@@ -459,7 +466,7 @@ public final class TriggerInterpreter {
                                     + " (source: " + spec.getSource() + ")");
                 }
             }
-            case "GAIN_RESOURCE", "SPEND_RESOURCE" -> {
+            case "GAIN_RESOURCE", "SPEND_RESOURCE", "REMOVE_RESOURCE" -> {
                 if (Boolean.TRUE.equals(effect.getSpendAll())) {
                     // "consume all [X]": a spend with no stated SIZE -- and stating one
                     // beside it is a contradiction, so it is refused rather than silently preferring one.
@@ -1407,6 +1414,16 @@ public final class TriggerInterpreter {
                 spendResource(effect, ctx);
                 fireResourceChanged(battle, ctx, movedId, resourceAmount(battle, mover, movedId) - before);
             }
+            // "该额外回合开始时，【美学底本】获得 30 点【好活当赏】…额外回合结束时移除" (1503 Pearl (真珠)'s ultimate): the
+            // inverse of a temporary grant. Deliberately NOT `SPEND_RESOURCE`, which is a strict cost that errors when
+            // the pool is short - a revocation has to clamp instead, because this pool is meant to be consumed.
+            case "REMOVE_RESOURCE" -> {
+                CanHit mover = ctx.owner();
+                String movedId = effect.getResource();
+                int before = resourceAmount(battle, mover, movedId);
+                removeResource(effect, ctx, "REMOVE_RESOURCE");
+                fireResourceChanged(battle, ctx, movedId, resourceAmount(battle, mover, movedId) - before);
+            }
             case "DAMAGE" -> {
                 // A list, like HEAL/SHIELD: "to all enemies" is one effect that reaches several units, and the
                 // engine settles one instance per victim (that is what a group attack is here).
@@ -1638,6 +1655,8 @@ public final class TriggerInterpreter {
         resource.setMaxOverflow(resource.getMaxOverflow() + raise);
     }
 
+
+
     private static void gainResource(EffectSpec effect, TriggerContext ctx,
             double previousCredited) {
         CanHit holder = resolveTarget(effect, ctx);
@@ -1675,9 +1694,7 @@ public final class TriggerInterpreter {
         if (effect.getAmountCap() != null) {
             amount = (int) Math.min(amount, Math.round(effect.getAmountCap()));
         }
-        com.laosun.aluminium.models.Resource party = holder.getResources().has(effect.getResource())
-                ? null
-                : (ctx.battle() == null ? null : ctx.battle().partyResource(effect.getResource()));
+        com.laosun.aluminium.models.Resource party = partyCounterOrNull(ctx, holder, effect.getResource());
         // A PARTY-scoped counter has no home on the unit: the battle owns it, so any ally may add to it.
         if (party != null) {
             party.gain(amount);
@@ -1685,6 +1702,62 @@ public final class TriggerInterpreter {
         }
         holder.getResources().gain(effect.getResource(), amount);
         }
+
+    /**
+     * The counter a resource id names, wherever it actually lives: the unit's own, or the battle's PARTY-scoped one.
+     *
+     * <p>Note: Extracted because three ops need the same answer for the same reason - 笑点 is declared
+     * {@code scope: PARTY}, so the holder's own {@code Resources} does not have it and the battle does. A version that
+     * looked only at the holder would silently do nothing for every party counter, which is the failure
+     * {@code spendResource} had to fix once already.
+     *
+     * @return the unit's own counter, or {@code null} when it is a PARTY one (see the second return value's role)
+     */
+    private static com.laosun.aluminium.models.Resource partyCounterOrNull(TriggerContext ctx, CanHit holder,
+            String id) {
+        if (id == null || holder == null || holder.getResources().has(id)) {
+            return null;
+        }
+        return ctx.battle() == null ? null : ctx.battle().partyResource(id);
+    }
+
+    /**
+     * Takes an amount back off a counter, keeping whatever is left when the counter cannot cover it.
+     *
+     * <p>This is the inverse of {@code GAIN_RESOURCE} for a grant that is explicitly temporary: 1503 Pearl (真珠)'s
+     * ultimate pays the archetype 30 好活当赏 and 60 笑点 for its extra turn and says 「额外回合结束时移除」.
+     *
+     * <p>⚠ <b>Why not {@code SPEND_RESOURCE}.</b> That op is deliberately strict - a spend the author believed would
+     * fit is an error when it does not - and it is the right reading for a COST. A revocation is not a cost: the pool
+     * may legitimately have less by then, because the whole point of this counter is that it gets CONSUMED (Pearl's own
+     * talent spends it as 抵御值). So this clamps: it removes what is there, up to the stated amount, and never fails.
+     *
+     * <p>⚠ <b>What this does NOT do, and why it does not matter here.</b> It removes from the CURRENT value, so a
+     * grant that was spent and then re-earned within the extra turn takes the re-earned points too. Making it
+     * exact would need the grant to be tracked as a separate lot, and the sentence's numbers are fixed and paired
+     * (30 and 60 granted, 30 and 60 removed at the end of the same turn), so there is nothing to track.
+     *
+     * @return how much was actually taken back (0 when there was nothing left)
+     */
+    private static int removeResource(EffectSpec effect, TriggerContext ctx, String op) {
+        CanHit holder = resolveTarget(effect, ctx);
+        String id = effect.getResource();
+        int asked = (int) Math.round(scaledAmount(effect, ctx));
+        if (asked <= 0) {
+            return 0;
+        }
+        com.laosun.aluminium.models.Resource party = partyCounterOrNull(ctx, holder, id);
+        if (party != null) {
+            return party.spend(asked);
+        }
+        if (!holder.getResources().has(id)) {
+            // Note: A granted-then-removed counter that the unit does not have at all would be a rule whose two halves
+            // disagree about WHERE the counter lives; that is worth saying rather than returning 0.
+            throw new IllegalStateException("Op " + op + " names '" + id + "', but " + holder.getName()
+                    + " has no such resource (nor does the party)");
+        }
+        return holder.getResources().spend(id, asked);
+    }
 
     /**
      * Spends from the target's resource.
@@ -1702,9 +1775,7 @@ public final class TriggerInterpreter {
         // A PARTY counter has no home on the unit (the same fact `gainResource` records), so a spend has to fall back to the
         // battle-level one -- measured: [笑点] is declared `scope: PARTY` ("Punchline (笑点) is shared by the whole team", glossary 1000002) and the holder's
         // own Resources does not have it, so "Aha consumes all 笑点 after acting" (10000026) could not be written at all.
-        com.laosun.aluminium.models.Resource partyCounter = holder.getResources().has(id)
-                ? null
-                : (ctx.battle() == null ? null : ctx.battle().partyResource(id));
+        com.laosun.aluminium.models.Resource partyCounter = partyCounterOrNull(ctx, holder, id);
         if (partyCounter != null) {
             // "consume all overflow" is the tier ABOVE the cap (reader: 114151) -- neither `spendAll` (everything) nor a stated amount says it.
             int spend = Boolean.TRUE.equals(effect.getOverflowOnly())
@@ -1961,6 +2032,12 @@ public final class TriggerInterpreter {
             case "self" -> ctx.owner();
             case "target" -> require(ctx.target(), "target", ctx);
             case "attacker" -> require(ctx.actor(), "attacker", ctx);
+            // Note: `actor` is the same unit as `attacker`, under the name the CONDITION language and the event
+            // vocabulary already use (`actor == self`, "the event's actor"). It was missing here, so an op could read
+            // the actor in its conditions but had no way to ADDRESS it - which is why 1503's extra-turn reward ("that
+            // extra turn begins: the ARCHETYPE gains 30") could not be written even though EXTRA_TURN_STARTED fires
+            // with exactly that unit as its actor.
+            case "actor" -> require(ctx.actor(), "actor", ctx);
             case "summon" -> requireSummon(ctx);
             // "randomly 1 enemy target": the roll is the battle's own seeded one, so the same seed picks the
             // same unit -- and the judge can therefore pin both determinism and genuine variation.
