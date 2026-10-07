@@ -36,7 +36,7 @@ public class AlliesOfPathExceptSelectorTest {
     private static final int MONSTER = 1002011;
     private static final String MARK = "测试标记";
 
-    /** The Path mate is reached; the owner (excluded as `self`), the aimed ally (as `target`) and the off-Path ally are not. */
+    /** The Path mate is reached; the owner (excluded as `self`), the aimed ally (as `target`) and the off-Path allies are not. */
     @Test
     public void itReachesThePathMateAndNeitherExclusionNorTheOffPathAlly() {
         Fixture f = new Fixture();
@@ -47,11 +47,16 @@ public class AlliesOfPathExceptSelectorTest {
         f.battle.processRequests();
 
         System.out.println("[path_except] mate " + f.stacks(f.mate) + " ; owner " + f.stacks(f.owner)
-                + " ; aimed " + f.stacks(f.aimed) + " ; off-path " + f.stacks(f.hunter));
+                + " ; aimed " + f.stacks(f.aimed) + " ; off-path " + f.stacks(f.offPath));
         Assertions.assertEquals(1, f.stacks(f.mate), "the Elation mate is reached");
         Assertions.assertEquals(0, f.stacks(f.owner), "the owner is excluded by `self`");
         Assertions.assertEquals(0, f.stacks(f.aimed), "the aimed ally is excluded by `target`");
-        Assertions.assertEquals(0, f.stacks(f.hunter), "and an ally OFF the Path is not reached");
+        // Note: This unit is the reason the fixture carries FOUR allies. With only three, the one off-Path ally was also
+        // the one excluded as `target`, so a mutation that dropped the Path restriction entirely still produced the same
+        // reading - measured, the `no_path` mutation SURVIVED the first version of this case. An ally that is neither on
+        // the Path nor excluded is what makes the Path half of the selector separately observable.
+        Assertions.assertEquals(0, f.stacks(f.offPath),
+                "and an ally that is OFF the Path and NOT excluded is not reached");
     }
 
     /**
@@ -117,24 +122,29 @@ public class AlliesOfPathExceptSelectorTest {
         return effect;
     }
 
-    /** Pearl, an Elation mate, a Hunt ally (the AIMED one, so the archetype is off-Path), and an enemy. */
+    /**
+     * Pearl, an Elation mate, a Hunt ally that gets AIMED (so the archetype is off-Path), and a SECOND Hunt ally that
+     * is neither on the Path nor excluded.
+     */
     private static final class Fixture {
         final Battle battle;
         final Character owner;
         final Character mate;
         final Character hunter;
+        final Character offPath;
         final Character aimed;
 
         Fixture() {
             battle = new Battle(
                     List.of(CharacterFactory.create(PEARL, LEVEL), CharacterFactory.create(ELATION_MATE, LEVEL),
-                            CharacterFactory.create(HUNTER, LEVEL)),
+                            CharacterFactory.create(HUNTER, LEVEL), CharacterFactory.create(1101, LEVEL)),
                     List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
             battle.startBattle();
             battle.processRequests();
             owner = battle.characters.get(0);
             mate = battle.characters.get(1);
             hunter = battle.characters.get(2);
+            offPath = battle.characters.get(3);
             aimed = hunter;
         }
 
