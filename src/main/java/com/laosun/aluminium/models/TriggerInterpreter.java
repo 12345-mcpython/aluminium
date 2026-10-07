@@ -549,7 +549,16 @@ public final class TriggerInterpreter {
                     // "original damage" is not one -- and it must hang on the ONE event whose `amount` is a settled damage.
                     // A share of the SETTLED instance: `percent` + `element` like a Max HP share, and it
                     // must hang on the one event whose `amount` is a settled damage (`DAMAGE_SETTLED`).
-                    if ("original_damage".equals(literalScale)) {
+                    if (SETTLED_DAMAGE_THIS_EVENT.equals(literalScale)) {
+                        // "equal to X% of the TOTAL damage value of this one": the share is taken of the SETTLED total,
+                        // which has already been through every zone. A rider settled through the zones again would
+                        // multiply them a second time, and - unlike `original_damage`, which can divide by the one
+                        // triggering instance's own factor - a SUM over several instances has no single factor to
+                        // divide by. So the only honest reader of this scale is true damage; see `requireTrueDamage`.
+                        requirePercent(effect, op, spec);
+                        requireElement(effect, op, spec, true);
+                        requireTrueDamage(effect, op, spec);
+                    } else if ("original_damage".equals(literalScale)) {
                         requireEvent(spec, op, TriggerEvent.DAMAGE_SETTLED);
                         requirePercent(effect, op, spec);
                         requireElement(effect, op, spec, true);
@@ -3844,6 +3853,20 @@ public final class TriggerInterpreter {
     private static final String COUNTED_LAUGHS = "counted_laughs";
 
     /**
+     * {@code settled_damage_this_event}: the damage the firing in progress has settled, summed over every instance
+     * (see {@code Battle.settledDamageThisEvent}).
+     *
+     * <p>The sibling of {@code original_damage}, which reads the ONE instance {@code DAMAGE_SETTLED} hands over. This
+     * one answers a different sentence - 「等同于本次总伤害值 20%」 - where "本次" is the whole action: a group action
+     * settles one instance per victim, so the sum exists only on the battle, and it is why the two spellings are not
+     * one spelling. Reader: 1506 Silver Wolf LV.999's 【超超超大剑】.
+     *
+     * <p>Note: It is refused on anything but true damage, because the value is already settled - see the DAMAGE
+     * validation.
+     */
+    private static final String SETTLED_DAMAGE_THIS_EVENT = "settled_damage_this_event";
+
+    /**
      * The battle's SKILL POINTS, under the name content spells: 「战技点」.
      *
      * <p>Not a {@code Resource}: the battle owns it ({@code Battle.skillPointPolicy}), and every other counter this DSL
@@ -5505,6 +5528,18 @@ public final class TriggerInterpreter {
         // hand-built one to control variables, which also dropped `level_convention`, so the cast ran at the Lv1 row
         // (0.5) while my rider used the full ATK (1.0) -- a clean factor 2 that I read as a zone discrepancy and rolled
         // a CORRECT implementation back three times (the trap the judge springs).
+        if (SETTLED_DAMAGE_THIS_EVENT.equals(scale)) {
+            // "equal to 20% of the total damage value of this one": the settled sum of the firing in progress, which
+            // only the battle holds - a group action settles one instance per victim, so no single event carries it.
+            // Note: NOT divided by any factor (there is no single instance to read one from), which is exactly why the
+            // validator refuses this scale on anything but true damage.
+            if (ctx == null || ctx.battle() == null) {
+                throw new IllegalStateException(
+                        "a DAMAGE scaled by \"" + SETTLED_DAMAGE_THIS_EVENT + "\" needs the battle whose firing it is "
+                                + "summing, and this rule was evaluated without one");
+            }
+            return ctx.battle().settledDamageThisEvent() * share + flat;
+        }
         if ("original_damage".equals(scale)) {
             if (ctx == null || ctx.damage() == null) {
                 throw new IllegalStateException(
@@ -5888,6 +5923,26 @@ public final class TriggerInterpreter {
                     "Op " + op + " names element '" + effect.getElement() + "', which is not a DamageElement "
                             + "spelling (e.g. Ice / Fire / Wind / Thunder / Physical / Quantum / Imaginary); an "
                             + "unknown element would attach nothing (source: " + spec.getSource() + ")");
+        }
+    }
+
+    /**
+     * Validates that the effect states <b>true damage</b>.
+     *
+     * <p>Required by the one scale that reads an <b>already settled</b> total
+     * ({@link #SETTLED_DAMAGE_THIS_EVENT}): that number has been through every zone once. A rider settled through the
+     * zones again would land at an unknown multiple of the share its text states, and - unlike {@code original_damage},
+     * which divides by the ONE triggering instance's own factor - a sum over several instances has no single factor to
+     * divide out. True damage settles at exactly 1, which is what makes a stated "20%" mean 20%.
+     */
+    private static void requireTrueDamage(EffectSpec effect, String op, TriggerSpec spec) {
+        String stated = effect.getDamageType() == null ? "" : effect.getDamageType().trim();
+        if (!"TRUE".equalsIgnoreCase(stated)) {
+            throw new IllegalArgumentException(
+                    "Op " + op + " scales by the SETTLED total damage of the firing, so it must state \"damage_type\": "
+                            + "\"TRUE\": the total has already been through every damage zone, and a rider that went "
+                            + "through them again would settle at an unknown multiple of the share it states (it says '"
+                            + (stated.isEmpty() ? "(none)" : stated) + "') (source: " + spec.getSource() + ")");
         }
     }
 

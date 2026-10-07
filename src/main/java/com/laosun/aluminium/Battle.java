@@ -1607,6 +1607,11 @@ public class Battle {
         // amount does not exist yet, and it must precede the lethal check below: absorbing a hit down to zero is
         // exactly "this was not a lethal blow".
         settled = absorbsInto(target, settled);
+        // The running total of the firing in progress ("X% of the total damage value of this one"). Placed AFTER
+        // absorption, so it is the same number DAMAGE_SETTLED announces to a rule - "the amount dealt", not what the
+        // victim's HP happened to lose. It is added for every instance, of every camp, so a group action's total is the
+        // sum its reader needs; the next outermost firing empties it again.
+        settledDamageThisEvent += settled;
         double hpBefore = target.getCurrentHp();
         // Lethal blow: "when taking a lethal attack it will not fall into the unable-to-fight state, but instead restore health equal to 20%/50% of its own Max HP".
         // Note: THE ORDER IS THE WHOLE MECHANIC, and the first attempt got it wrong (measured): announcing BEFORE the damage leaves the
@@ -2518,6 +2523,29 @@ public class Battle {
     }
 
     /**
+     * The damage settled so far <b>during the trigger firing in progress</b> - "the total damage value of this one".
+     *
+     * <p><b>Why it is not just a damage instance.</b> {@link TriggerEvent#DAMAGE_SETTLED} hands a rule ONE settled
+     * instance ({@code scale: "original_damage"}), which answers "X% of the damage I just dealt". A clause of the form
+     * "X% of the total damage of this one" asks about <b>every</b> instance of the action, which no single event has
+     * in hand: a group attack settles one instance per victim, so only the battle can hold their sum.
+     *
+     * <p><b>Where it is reset.</b> At the outermost firing only ({@code triggerDepth == 0}), so a nested event - a
+     * {@code DAMAGE_SETTLED} raised while the damage settles, a state that ends on the way - keeps adding to the same
+     * total instead of emptying it. The reader is 1506 Silver Wolf LV.999's 【头号补给盲盒】: the box settles its 90%
+     * on every enemy, and its 【超超超大剑】 then takes 20% of that whole.
+     */
+    private double settledDamageThisEvent;
+
+    /**
+     * The settled damage of the firing in progress; see the field. Zero outside a firing, and zero at the start of one
+     * until something settles.
+     */
+    public double settledDamageThisEvent() {
+        return settledDamageThisEvent;
+    }
+
+    /**
      * Nesting depth of buff-path reactions; see {@link #runCounter}. Per battle, never static.
      */
     private int counterDepth;
@@ -2729,6 +2757,12 @@ public class Battle {
             throw new IllegalStateException(
                     "Trigger recursion exceeded " + MAX_TRIGGER_DEPTH + " levels while firing "
                             + event.value() + "; a trigger table is probably reacting to its own effect");
+        }
+        // A firing is starting from the outside, so "the total damage of THIS one" begins empty. Only here, not on
+        // every nested event: a DAMAGE_SETTLED raised while the damage settles is part of the same action, and
+        // emptying the total at each nesting level would leave the reader with the last instance instead of the sum.
+        if (triggerDepth == 0) {
+            settledDamageThisEvent = 0;
         }
         triggerDepth++;
         try {
