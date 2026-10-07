@@ -73,6 +73,7 @@ public class EffectSpec {
         copy.stacks = this.stacks;
         copy.resource = this.resource;
         copy.unitAmount = this.unitAmount;
+        copy.maxPerRound = this.maxPerRound;
         copy.payer = this.payer;
         copy.until = this.until;
         copy.buff = this.buff;
@@ -467,6 +468,21 @@ return copy;
      */
     @SerializedName("unit_amount")
     private Double unitAmount;
+
+    /**
+     * For {@code GAIN_RESOURCE}: how much may be gained <b>within one round</b>, across every gain of this resource by
+     * this rule's owner.
+     *
+     * <p>1503 Pearl (真珠)'s trace is the reader: 「我方目标回合开始时，真珠获得 5 点【好活当赏】，最多获得 50 点
+     * 【好活当赏】，真珠回合开始时重置可获得【好活当赏】数量」 - a per-ROUND allowance, not a cap on the counter itself
+     * (the counter's own cap is 50 and lives in its declaration). The allowance is reset by
+     * {@code RESET_RESOURCE_CAP}, which the document pairs with the owner's own turn starting.
+     *
+     * <p>Note: Distinct from {@link #amountCap}, which bounds ONE conversion. A per-round allowance bounds the sum of
+     * many small conversions - five points per ally turn, up to fifty.
+     */
+    @SerializedName("max_per_round")
+    private Double maxPerRound;
 
     /**
      * For {@code ABSORB_DAMAGE}: <b>whose</b> counter pays for the blocked damage, as a target selector.
