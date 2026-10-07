@@ -174,6 +174,25 @@ public class TriggerSpec {
     private Double chance;
 
     /**
+     * What {@link #chance} is multiplied by <b>after this rule triggers</b>: "触发该效果的初始固定概率为 100%，成功触发后下一次触发的
+     * 固定概率降低至当前概率的 20%" ({@code 0.2} for that sentence).
+     *
+     * <p>So {@code chance} is the <b>initial</b> probability and this is the factor it decays by. The current value is
+     * per-battle state on the combatant ({@code CanHit.currentRuleChance}), filed under the rule's id and cleared with the
+     * other firing counters, so it cannot leak from one battle into the next. {@code RESET_RULE_CHANCE} puts it back to
+     * the initial one - "将触发…的固定概率重置为初始值".
+     *
+     * <p>Reader: 1506 Silver Wolf LV.999's 【头号补给盲盒】 - and it is the reason that box is ONE rule rather than two: its
+     * damage and its three-way pick share one probability, so they have to share one roll.
+     *
+     * <p>Note: A decay is only meaningful <b>between</b> 0 and 1. A multiplier of 1 never decays (it says nothing), and 0
+     * or less would leave a rule that can never trigger again - so the loader refuses both, and refuses a decay on a rule
+     * that states no {@code chance} at all.
+     */
+    @SerializedName("chance_decay")
+    private Double chanceDecay;
+
+    /**
      * The Eidolon rank (星魂, Eidolon) this rule needs: "unlocked at Eidolon N". Absent = the rule is not gated.
      *
      * <p>An Eidolon's <b>mechanic</b> is written like every other one - as a rule in

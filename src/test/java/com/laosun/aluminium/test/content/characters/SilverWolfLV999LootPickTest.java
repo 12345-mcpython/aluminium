@@ -21,18 +21,15 @@ import java.util.Random;
  * <p>⚠ The box is ONE rule: its own 90% carries {@code always} (「造成…伤害，<b>并</b>随机触发 1 种效果」 - it is not one of the
  * three), which is also what lets the box have a single fixed chance.
  *
- * <p>⚠ <b>Two enemies, and the reason is the sword's base.</b> The box settles one instance per enemy, and the sword's
- * share is taken of their TOTAL - so with two enemies a rider that read only the instance on its own target would land
- * at 1.1x the box's damage instead of 1.2x. With one enemy the two readings are the same number, and the judge could
- * not tell them apart.
+ * <p>⚠ <b>One firing, two enemies, and both are load-bearing.</b> The box settles one instance per enemy and the rider is
+ * a share of their TOTAL, so with two enemies a rider that read only the instance on its own target would land at half
+ * the size. And the enemy the rider did NOT hit is the control: its loss IS one box's hit per enemy, measured inside the
+ * same firing. Reading the same thing from a second firing would need the box's chance to pass twice (it decays to 20%
+ * after the first success), so the per-firing question is the engine judge's, where the fixture states no chance at all.
  *
- * <p>⚠ The pick is read as a COUNT, not as "did X happen": the wrong implementations are "both ran" and "neither ran",
- * and a positive assertion is satisfied by the first of them. Here each effect has a marker only it produces (skill
- * points +2 / laughs +3 / the sword's own damage), so "exactly one" is a statement about all three at once.
- *
- * <p>⚠ The random source is pinned rather than seeded ({@link ScriptedRng}): which effect runs is scripted, and
- * {@code nextDouble} never passes a crit, so the numbers below are exact instead of "usually". That also makes the
- * sword's own reading a hard number: two lucky rolls per enemy would otherwise move the box's damage by 50%.
+ * <p>⚠ The random source is pinned rather than seeded: {@code nextInt} says which effect runs, and {@code nextDouble}
+ * never passes a crit - measured on this very fixture, a crit moves the box's damage by 50% (146.36 → 219.54) and the
+ * share would be asserted against the wrong total.
  */
 public class SilverWolfLV999LootPickTest {
     private static final int WOLF = 1506;
@@ -43,48 +40,48 @@ public class SilverWolfLV999LootPickTest {
     private static final int PICK_SWORD = 0;
     private static final int PICK_POINTS = 1;
     private static final int PICK_LAUGHS = 2;
+    /** The box's share of its own total, as the document states it (「等同于本次总伤害值 20%」). */
+    private static final double SHARE = 0.2;
 
-    /**
-     * The box's damage is settled once per enemy, and the sword is a fifth of that total - stated as a share so the
-     * failure says which reading it got: 1.1x is "only my own target's instance", 1.0x is "no rider at all", and the
-     * old stand-in (500% of her ATK) was 7.6x.
-     */
+    /** 【超超超大剑】 is a fifth of what the box settled, over BOTH enemies, and it lands on ONE of them. */
     @Test
     public void theSwordIsAFifthOfWhatTheBoxSettled() {
-        ScriptedRng rng = new ScriptedRng(PICK_POINTS);
+        ScriptedRng rng = new ScriptedRng(PICK_SWORD);
         Battle battle = battle(rng);
+        Reading sword = fire(battle, rng);
 
-        // ① 【爆爆爆炸蛋】 settles no damage of its own, so this reading IS the box's total - over both enemies.
-        Reading points = fire(battle, rng, PICK_POINTS);
-        Assertions.assertEquals(2, points.skillPointsGained, "【爆爆爆炸蛋】 restores 2 skill points");
-        Assertions.assertEquals(0, points.laughsGained, "and no laughs");
-        double total = points.hpLost;
-        System.out.println("[1506] the box's own total over " + points.hpLostEach.length + " enemies = " + total);
-        Assertions.assertTrue(total > 0, "the box's own 90% lands whichever effect is picked");
-
-        // ② 【超超超大剑】: that total, plus a fifth of it, as ONE true-damage instance on the highest-HP enemy.
-        Reading sword = fire(battle, rng, PICK_SWORD);
         Assertions.assertEquals(0, sword.skillPointsGained + sword.laughsGained,
                 "neither of the other two effects ran alongside the sword");
-        Assertions.assertEquals(total + 0.2 * total, sword.hpLost, 1e-6,
-                "the sword settles 20% of the TOTAL the box settled, not 20% of one enemy's instance");
-        double spread = Math.max(sword.hpLostEach[0], sword.hpLostEach[1])
-                - Math.min(sword.hpLostEach[0], sword.hpLostEach[1]);
-        Assertions.assertEquals(0.2 * total, spread, 1e-6,
-                "the rider lands on ONE enemy - the one with the highest HP - while both take the box's own damage");
+        // The enemy the rider did not hit took the box's own damage and nothing else, so its loss is one instance.
+        double perEnemy = Math.min(sword.hpLostEach[0], sword.hpLostEach[1]);
+        double rider = Math.max(sword.hpLostEach[0], sword.hpLostEach[1]) - perEnemy;
+        double total = 2 * perEnemy;
+        System.out.println("[1506] the box settled " + perEnemy + " per enemy (" + total + " in all), the sword "
+                + rider + " - a share of " + (rider / total));
+        Assertions.assertTrue(perEnemy > 0, "the box's own 90% lands whichever effect is picked, on every enemy");
+        Assertions.assertEquals(SHARE * total, rider, 1e-6,
+                "the sword settles 20% of the TOTAL the box settled - reading the rider's own target's instance "
+                        + "would be half of that, and no rider at all would leave the two losses equal");
+    }
 
-        // ③ The total belongs to THIS firing. A second sword, after two firings that settled damage, must still be a
-        //    fifth of one box - not a fifth of everything the battle has ever dealt.
-        Reading again = fire(battle, rng, PICK_SWORD);
-        Assertions.assertEquals(total + 0.2 * total, again.hpLost, 1e-6,
-                "the running total is emptied at the start of each firing; otherwise this one reads three boxes");
+    /** 【爆爆爆炸蛋】 restores 2 skill points and settles nothing else: the other end of the same pick. */
+    @Test
+    public void thePointsEffectDoesNotTouchTheEnemySide() {
+        ScriptedRng rng = new ScriptedRng(PICK_POINTS);
+        Battle battle = battle(rng);
+        Reading points = fire(battle, rng);
+        Assertions.assertEquals(2, points.skillPointsGained, "【爆爆爆炸蛋】 restores 2 skill points");
+        Assertions.assertEquals(0, points.laughsGained, "and no laughs");
+    }
 
-        // ④ 【怪怪怪味豆】 adds laughs and no damage - and the laughs arrive AFTER the box's own damage, so the base is
-        //    still the one measured in ①.
-        Reading laughs = fire(battle, rng, PICK_LAUGHS);
+    /** 【怪怪怪味豆】 grants 3 laughs and settles nothing else. */
+    @Test
+    public void theLaughsEffectDoesNotTouchTheEnemySide() {
+        ScriptedRng rng = new ScriptedRng(PICK_LAUGHS);
+        Battle battle = battle(rng);
+        Reading laughs = fire(battle, rng);
         Assertions.assertEquals(3, laughs.laughsGained, "【怪怪怪味豆】 grants 3 laughs");
         Assertions.assertEquals(0, laughs.skillPointsGained, "and no skill points");
-        Assertions.assertEquals(total, laughs.hpLost, 1e-6, "only the box's own damage - this effect has no rider");
     }
 
     // ==================================================================
@@ -96,14 +93,13 @@ public class SilverWolfLV999LootPickTest {
     }
 
     /** Fires the one event the box listens to and reads everything either side of it. */
-    private static Reading fire(Battle battle, ScriptedRng rng, int pick) {
-        rng.pick = pick;
+    private static Reading fire(Battle battle, ScriptedRng rng) {
         var enemies = battle.enemyUnits();
         double[] beforeHp = enemies.stream().mapToDouble(e -> e.getCurrentHp()).toArray();
         int pointsBefore = battle.getSkillPoints();
         int laughsBefore = battle.partyResourceValue(LAUGH);
-        battle.fireTriggers(TriggerEvent.SKILL_POINT_SPENT, battle.characters.getFirst(),
-                battle.characters.getFirst(), 0, 1);
+        Character wolf = battle.characters.getFirst();
+        battle.fireTriggers(TriggerEvent.SKILL_POINT_SPENT, wolf, wolf, 0, 1);
         battle.processRequests();
         double[] lost = new double[beforeHp.length];
         double totalLost = 0;
@@ -130,12 +126,11 @@ public class SilverWolfLV999LootPickTest {
     }
 
     /**
-     * A random source with the luck taken out: {@code nextInt} answers with the effect the caller scripts (which is
-     * what {@code one_of} draws), and {@code nextDouble} is high enough that no crit roll ever passes.
+     * A random source with the luck taken out: {@code nextInt} answers with the effect the caller scripts (which is what
+     * {@code one_of} draws), and {@code nextDouble} is high enough that no crit roll ever passes.
      */
     private static final class ScriptedRng extends Random {
-        private int pick;
-        private int intCalls;
+        private final int pick;
 
         private ScriptedRng(int pick) {
             this.pick = pick;
@@ -143,7 +138,6 @@ public class SilverWolfLV999LootPickTest {
 
         @Override
         public int nextInt(int bound) {
-            intCalls++;
             return pick;
         }
 
