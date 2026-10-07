@@ -90,6 +90,17 @@ for position, key in enumerate(keys, start=1):
 
 def run(workers):
     SWEEP.mkdir(parents=True, exist_ok=True)
+    # A safety net, because the risk is real: each worker writes a rule OUT of a character file and restores it after the
+    # suite, and a worker killed inside that window leaves the file short a rule - with the suite still GREEN, because
+    # the rule that vanished is exactly one that nothing was guarding. Measured, not imagined: the first serial attempt
+    # was cancelled and left 1005.json with 17 lines fewer. So every file is copied first, and compared afterwards.
+    backup = SWEEP / "backup"
+    if backup.exists():
+        shutil.rmtree(backup)
+    backup.mkdir(parents=True)
+    for path in sorted(CHARS.glob("*.json")):
+        shutil.copyfile(path, backup / path.name)
+
     keys = pending_keys()
     print("pending rules: %d ; workers: %d" % (len(keys), workers))
     if not keys:
@@ -125,7 +136,29 @@ def run(workers):
         shutil.copyfile(tree / "tools/_part.json", ROOT / ("tools/_rule_coverage_part%d.json" % index))
         print("  worker %d finished" % index)
     print("all workers done in %.0fs" % (time.time() - started))
+    verify_restored(backup)
     return 0
+
+
+def verify_restored(backup):
+    """Restores any file a worker left short, and says so.
+
+    <p>Note: A file left short is INVISIBLE to the suite - the missing rule is one nothing guards, which is the whole
+    reason it was being swept - so this is the only check that would catch it.
+    """
+    restored = []
+    for path in sorted(CHARS.glob("*.json")):
+        saved = backup / path.name
+        if not saved.exists():
+            continue
+        if path.read_bytes() != saved.read_bytes():
+            shutil.copyfile(saved, path)
+            restored.append(path.name)
+    if restored:
+        print("RESTORED from the backup (a worker left these short): " + ", ".join(restored))
+    else:
+        print("every character file matches the backup: nothing was left short")
+    return restored
 
 
 def report():
