@@ -1083,7 +1083,18 @@ public final class TriggerInterpreter {
     public static void apply(Battle battle, CompiledRule rule, TriggerContext ctx) {
         int effectIndex = 0;
         double previousCredited = 0;
+        // `one_of`: ONE of the rule's effects runs, picked at random. Rolled HERE, once per firing, and not inside the
+        // loop: a roll per effect would as easily run none of them as two of them, and neither is "one of". Reader:
+        // 1506's 【头号补给盲盒】 and light cone 21032's 「随机生效 1 个效果」.
+        int chosen = -1;
+        if (rule.oneOf() && battle != null && !rule.effects().isEmpty()) {
+            chosen = battle.getRng().nextInt(rule.effects().size());
+        }
         for (EffectSpec effect : rule.effects()) {
+            if (chosen >= 0 && effectIndex != chosen) {
+                effectIndex++;
+                continue;
+            }
             final int thisEffect = effectIndex++;
             // "the Ultimate's duration is additionally increased by 1 turn"/"the talent's damage boost effect is additionally raised by 10%": an amendment to the
             // named rule's own effect values. Note: A COPY, not a mutation: the compiled EffectSpec is shared by every

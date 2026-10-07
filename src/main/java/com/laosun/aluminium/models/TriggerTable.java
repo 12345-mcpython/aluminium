@@ -634,7 +634,39 @@ public class TriggerTable {
                 Boolean.TRUE.equals(spec.getOncePerBattle()), validateChance(spec),
                 minEidolon, validateMaxEidolon(spec, minEidolon), validatePerTurn(spec), validatePerAttack(spec),
                 Boolean.TRUE.equals(spec.getOncePerWave()), List.copyOf(targetFilters),
-                validatePerSubject(spec)));
+                validatePerSubject(spec), validateOneOf(spec, effects)));
+    }
+
+    /**
+     * Whether this rule picks ONE of its effects at random - and the two combinations that must be refused with it.
+     *
+     * <p>Reader: 1506 Silver Wolf LV.999's 【头号补给盲盒】 - 「随机触发 1 种效果」 - and light cone 21032's 「随机生效 1 个效果」.
+     *
+     * <p>Refused, both being the "two readings" shape this vocabulary will not carry:
+     * <ul>
+     *   <li>fewer than two effects - "pick one of one" states nothing, and reads exactly like a rule that forgot the field;
+     *   <li>an effect carrying its own {@code min_eidolon} - the two filters then compose two ways (rank first, or pick
+     *       first and possibly land on an effect the rank excludes, i.e. a firing that does nothing).</li>
+     * </ul>
+     */
+    private static boolean validateOneOf(TriggerSpec spec, List<EffectSpec> effects) {
+        if (!Boolean.TRUE.equals(spec.getOneOf())) {
+            return false;
+        }
+        if (effects.size() < 2) {
+            throw new IllegalArgumentException(
+                    "Trigger rule states \"one_of\" but has " + effects.size() + " effect(s); "
+                            + "\"pick one of one\" states nothing (source: " + spec.getSource() + ")");
+        }
+        for (EffectSpec effect : effects) {
+            if (effect.getMinEidolon() != null) {
+                throw new IllegalArgumentException(
+                        "Trigger rule states \"one_of\" and an effect states its own \"min_eidolon\": the two compose "
+                                + "two ways - filter the ranks and then pick, or pick and possibly land on an excluded "
+                                + "effect, which is a firing that does nothing (source: " + spec.getSource() + ")");
+            }
+        }
+        return true;
     }
 
     /**
@@ -2177,7 +2209,8 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
                                int cooldownTurns, boolean oncePerBattle, double chance, int minEidolon,
                                int maxEidolon,
                                int perTurn, int perAttack, boolean oncePerWave,
-                               List<List<Condition>> effectTargetFilters, String perSubject) {
+                               List<List<Condition>> effectTargetFilters, String perSubject,
+                               boolean oneOf) {
 
         /**
          * The per-target conditions of one effect ({@code target_when}), by that effect's index in {@link #effects}.
