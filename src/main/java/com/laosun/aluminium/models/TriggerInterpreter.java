@@ -139,6 +139,9 @@ public final class TriggerInterpreter {
             // "该额外回合开始时【美学底本】获得 30 点…额外回合结束时移除" (reader: 1503 Pearl (真珠)): the inverse of a
             // temporary grant, which clamps rather than erroring - unlike SPEND_RESOURCE, which is a strict cost.
             "REMOVE_RESOURCE",
+            // "真珠回合开始时重置可获得【好活当赏】数量" (reader: the same trace): starts a new round for the allowances that
+            // `max_per_round` charges against, so a per-round limit can exist at all.
+            "RESET_RESOURCE_CAP",
             // "[新蕊] can overflow to #3%" (reader: 114151, Castorice (遐蝶)): a declaration states a resource's overflow,
             // and `Resource` has had both tiers all along -- this widens the second one in battle.
             "RAISE_RESOURCE_CAP",
@@ -490,7 +493,22 @@ public final class TriggerInterpreter {
                     }
                 }
                 requireResource(effect, op, spec);
+                // "最多获得 50 点" (1503 Pearl (真珠)'s trace): an allowance that is not positive would forbid every gain,
+                // which is a rule that does nothing rather than a strict one - so it is refused beside the other
+                // "silently no-op" shapes.
+                if (effect.getMaxPerRound() != null && effect.getMaxPerRound() <= 0) {
+                    throw new IllegalArgumentException(
+                            "Op " + op + " states \"max_per_round\" = " + effect.getMaxPerRound()
+                                    + ", which allows no gain at all; give a positive allowance or omit the field"
+                                    + " (source: " + spec.getSource() + ")");
+                }
                 requireNoStackArguments(effect, op, spec);
+            }
+            case "RESET_RESOURCE_CAP" -> {
+                // The other half of `max_per_round`, and it needs the counter named for the same reason: "reset my
+                // allowances" without saying which one is a rule whose subject is missing.
+                requireResource(effect, op, spec);
+                requireNoDuration(effect, op, spec);
             }
             case "DAMAGE" -> {
                 // Note: `times` says "settle N independent times"; `per_target` says "multiply this one settlement
@@ -1424,6 +1442,15 @@ public final class TriggerInterpreter {
                 removeResource(effect, ctx, "REMOVE_RESOURCE");
                 fireResourceChanged(battle, ctx, movedId, resourceAmount(battle, mover, movedId) - before);
             }
+            // "真珠回合开始时重置可获得【好活当赏】数量" (1503 Pearl (真珠)'s trace): starts a new round for the per-round
+            // allowances that `max_per_round` charges against. Nothing about the COUNTER changes - only what this round
+            // may still hand out.
+            case "RESET_RESOURCE_CAP" -> {
+                CanHit resetOwner = ctx.owner();
+                if (resetOwner != null) {
+                    resetOwner.getResources().resetRoundAllowances();
+                }
+            }
             case "DAMAGE" -> {
                 // A list, like HEAL/SHIELD: "to all enemies" is one effect that reaches several units, and the
                 // engine settles one instance per victim (that is what a group attack is here).
@@ -1695,12 +1722,34 @@ public final class TriggerInterpreter {
             amount = (int) Math.min(amount, Math.round(effect.getAmountCap()));
         }
         com.laosun.aluminium.models.Resource party = partyCounterOrNull(ctx, holder, effect.getResource());
+        // "5 points per ally turn, at most 50 in a round, reset when Pearl's own turn begins": a per-ROUND allowance
+        // rather than a cap on the counter, so the amount is bounded by what the round has left before anything is
+        // credited. Note: It is read from the RULE OWNER (`ctx.owner()`), not from the holder: the allowance belongs to
+        // whoever the rule is about, which is the same unit the counters are hers (measured: the trace's own wording
+        // makes the reset Pearl's turn, and the gaining rule fires on her allies' turns).
+        CanHit allowanceOwner = ctx.owner() == null ? holder : ctx.owner();
+        if (effect.getMaxPerRound() != null && allowanceOwner != null) {
+            int already = allowanceOwner.getResources().gainedThisRound(effect.getResource());
+            int allowance = (int) Math.round(effect.getMaxPerRound());
+            amount = Math.min(amount, Math.max(0, allowance - already));
+            if (amount <= 0) {
+                return;
+            }
+        }
         // A PARTY-scoped counter has no home on the unit: the battle owns it, so any ally may add to it.
         if (party != null) {
-            party.gain(amount);
+            int credited = party.gain(amount);
+            if (effect.getMaxPerRound() != null && allowanceOwner != null) {
+                allowanceOwner.getResources().countGainThisRound(effect.getResource(), credited);
+            }
             return;
         }
-        holder.getResources().gain(effect.getResource(), amount);
+        int credited = holder.getResources().gain(effect.getResource(), amount);
+        if (effect.getMaxPerRound() != null && allowanceOwner != null) {
+            // The CREDITED amount, not the amount asked for: a gain truncated by the counter's own cap must not spend
+            // the round's allowance on points it never delivered.
+            allowanceOwner.getResources().countGainThisRound(effect.getResource(), credited);
+        }
         }
 
     /**

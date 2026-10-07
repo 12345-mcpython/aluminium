@@ -36,6 +36,17 @@ public class ResourceManager {
     private final Map<String, Resource> resources = new LinkedHashMap<>();
 
     /**
+     * How much of each resource has been gained <b>within the current round</b>, for a per-round allowance.
+     *
+     * <p>Reader: 1503 Pearl (真珠)'s trace 「我方目标回合开始时，真珠获得 5 点【好活当赏】，最多获得 50 点【好活当赏】，
+     * 真珠回合开始时重置可获得【好活当赏】数量」. The tally belongs here rather than on {@link Resource} because it is a
+     * fact about the <b>round</b>, not about the counter: the counter's own cap (also 50, from its declaration) limits
+     * what it can HOLD, while this limits what a round may hand out - and the two can differ, which is exactly why the
+     * document states both.
+     */
+    private final Map<String, Integer> gainedThisRound = new LinkedHashMap<>();
+
+    /**
      * @param owner the combatant these resources belong to
      */
     public ResourceManager(CanHit owner) {
@@ -162,6 +173,39 @@ public class ResourceManager {
     public int value(String id) {
         Resource resource = resources.get(id);
         return resource == null ? 0 : resource.getValue();
+    }
+
+    /**
+     * How much of a resource this unit has gained since the per-round allowance was last reset.
+     *
+     * <p>See {@link #resetRoundAllowances()}. Zero for a resource that has none, which reads correctly: nothing has
+     * been counted against an allowance nobody set.
+     */
+    public int gainedThisRound(String id) {
+        return gainedThisRound.getOrDefault(id, 0);
+    }
+
+    /**
+     * Adds to a resource's per-round tally, called by the gain that actually landed.
+     *
+     * <p>Note: What is recorded is the amount <b>credited</b>, not the amount asked for - a gain truncated by the
+     * counter's own cap must not consume the round's allowance for points it never delivered.
+     */
+    public void countGainThisRound(String id, int credited) {
+        if (credited > 0) {
+            gainedThisRound.merge(id, credited, Integer::sum);
+        }
+    }
+
+    /**
+     * Starts a new round for the per-round allowances: every tally goes back to zero.
+     *
+     * <p>Reader: 「真珠回合开始时重置可获得【好活当赏】数量」 - the document pairs the reset with the owner's OWN turn
+     * beginning, which is a rule event ({@code TURN_START} with {@code actor == self}) rather than something the round
+     * boundary could imply, so nothing here decides when it happens.
+     */
+    public void resetRoundAllowances() {
+        gainedThisRound.clear();
     }
 
     /**
