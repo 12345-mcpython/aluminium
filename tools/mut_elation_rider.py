@@ -20,8 +20,12 @@ import sys
 CONTENT = pathlib.Path("src/main/resources/characters/1503.json")
 
 VARIANTS = {
-    "percent": ('"op": "ADD_DAMAGE",\n          "scale": "elation_base",\n          "percent": 0.15',
-                '"op": "ADD_DAMAGE",\n          "scale": "elation_base",\n          "percent": 0.01'),
+    # The anchor carries the rule's own gate: `scale: elation_base` alone appears in the Elation skill's four tier
+    # clauses as well, so a bare magnitude anchor is ambiguous and a mutation built on it silently never applies.
+    "percent": ('"from_skill_id == 8"\n      ],\n      "do": [\n        {\n          "op": "ADD_DAMAGE",\n'
+                '          "scale": "elation_base",\n          "percent": 0.15',
+                '"from_skill_id == 8"\n      ],\n      "do": [\n        {\n          "op": "ADD_DAMAGE",\n'
+                '          "scale": "elation_base",\n          "percent": 0.01'),
     "gate": ('        "self_resource:好活当赏 >= 1",\n', ''),
     "slot": ('"actor == self",\n        "self_resource:好活当赏 >= 1",\n        "from_skill_id == 8"',
              '"actor == self",\n        "self_resource:好活当赏 >= 1",\n        "from_skill_id == 9"'),
