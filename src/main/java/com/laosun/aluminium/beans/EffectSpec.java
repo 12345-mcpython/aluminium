@@ -73,6 +73,7 @@ public class EffectSpec {
         copy.stacks = this.stacks;
         copy.resource = this.resource;
         copy.unitAmount = this.unitAmount;
+        copy.toMax = this.toMax;
         copy.maxPerRound = this.maxPerRound;
         copy.payer = this.payer;
         copy.until = this.until;
@@ -468,6 +469,20 @@ return copy;
      */
     @SerializedName("unit_amount")
     private Double unitAmount;
+
+    /**
+     * For {@code GAIN_RESOURCE}: raise the counter to its declared maximum, however much it is short.
+     *
+     * <p>Reader: 1503 Pearl (真珠)'s 充能 - 「【深度学习】具有 3 点充能」. The counter IS the state's duration, so re-entering
+     * the state has to put it back to the FULL three, not add three to whatever is left: a unit that used one charge and
+     * then re-entered would otherwise be handed four, and the state would outlast the document by a turn.
+     *
+     * <p>Note: The sibling of {@code RAISE_ENERGY_TO}, which does the same for the energy bar. {@link #amount} still
+     * bounds how much may be credited in one go (it is the cap on what "full" reaches), so the two can be stated
+     * together when the ceiling is not the resource's own max.
+     */
+    @SerializedName("to_max")
+    private Boolean toMax;
 
     /**
      * For {@code GAIN_RESOURCE}: how much may be gained <b>within one round</b>, across every gain of this resource by
