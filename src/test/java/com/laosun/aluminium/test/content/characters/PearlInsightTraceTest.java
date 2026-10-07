@@ -77,36 +77,35 @@ public class PearlInsightTraceTest {
     /**
      * The healing link: "gains a healing bonus equal to 20% of her own Elation".
      *
-     * <p>Note: This case asserts the RATIO the text states - that the bonus is 20% of an Elation figure - and checks
-     * that the figure it used is her Elation BEFORE her last Elation clause lands. It deliberately does NOT assert the
-     * absolute bonus (0.084 = 20% of the final 0.42), because measured it comes out 0.064: the rule reads
-     * `self_attr:ELATION_DAMAGE_BOOST` when it fires, and that read does not see the stat-trace clause's +0.10 even
-     * when this rule is moved to the END of the `BATTLE_START` list (tried; still 0.064). So the read source is an
-     * open question about the DERIVED-magnitude path, registered in GAPS rather than papered over with a number that
-     * happens to match today's file order.
+     * <p>Note: The clause fires on BOTH fixtures - the difference between them is the Elation it reads - so the bonus
+     * has to be compared against the Elation each run actually had, not against a single panel reading. The first
+     * version of this case took the DIFFERENCE of the two runs' healing (0.084 - 0.020 = 0.064) and read it as "20% of
+     * 0.32", which manufactured an engine puzzle that did not exist: a probe on the modifier path shows the rule
+     * dividing exactly 20% of the value present when it fires (0.084 on the gated run, 0.020 on the below-gate one).
      */
     @Test
-    public void theHealingBonusIsTwentyPercentOfAnElationFigure() {
+    public void theHealingBonusIsTwentyPercentOfTheElationItReads() {
         Character gated = pearlWith(2400, 0);
         Character belowGate = pearlWith(2300, 0);
-        double elation = gated.getAttribute(AttributeType.ELATION_DAMAGE_BOOST).get();
-        double healing = gated.getAttribute(AttributeType.OUTGOING_HEALING_BOOST).get()
-                - belowGate.getAttribute(AttributeType.OUTGOING_HEALING_BOOST).get();
-        System.out.println("[pearl_insight] final Elation = " + elation + " ; the healing bonus this clause added = "
-                + healing + " ; 20% of the final Elation = " + (0.2 * elation)
-                + " ; the figure it divided was " + (healing / 0.2));
+        double elationGated = gated.getAttribute(AttributeType.ELATION_DAMAGE_BOOST).get();
+        double elationBelow = belowGate.getAttribute(AttributeType.ELATION_DAMAGE_BOOST).get();
+        double healingGated = gated.getAttribute(AttributeType.OUTGOING_HEALING_BOOST).get();
+        double healingBelow = belowGate.getAttribute(AttributeType.OUTGOING_HEALING_BOOST).get();
+        System.out.println("[pearl_insight] gated: Elation " + elationGated + " -> healing " + healingGated
+                + " ; below the gate: Elation " + elationBelow + " -> healing " + healingBelow
+                + " ; the difference in Elation is " + (elationGated - elationBelow) + " and in healing "
+                + (healingGated - healingBelow));
 
-        Assertions.assertTrue(elation > 0, "precondition: the clause raised her Elation (" + elation + ")");
-        // The ratio the document states, applied to the Elation figure the rule actually read.
-        Assertions.assertEquals(0.2 * (healing / 0.2), healing, 1e-9,
-                "the bonus is 20% of an Elation figure (by construction, this pins the 0.2)");
-        // The clause's own contribution to Elation is what it divided: 0.32 (the gated tier), not the final panel.
-        Assertions.assertEquals(ELATION, healing / 0.2, 1e-9,
-                "measured: it divides the 洞察万物 tier's own 32%, i.e. the read does not include the stat traces");
-
-        // Note: The relationship to the FINAL panel is recorded, not asserted, until the read source is settled.
-        System.out.println("[pearl_insight] NOTE: 20% of the FINAL Elation would be " + (0.2 * elation)
-                + "; the rule used " + (healing / 0.2) + " - see GAPS (derived-magnitude read source)");
+        Assertions.assertTrue(elationGated > elationBelow,
+                "precondition: the gated run has more Elation (" + elationGated + " vs " + elationBelow + ")");
+        Assertions.assertEquals(0.2 * elationGated, healingGated, EPS,
+                "the bonus is 20% of the Elation she has when the clause fires");
+        Assertions.assertEquals(0.2 * elationBelow, healingBelow, EPS,
+                "and the same on the run below the gate: 20% of THAT run's Elation");
+        // The two runs differ by exactly the gated tier, so their bonuses differ by 20% of it - which is the clause
+        // answering to the value it actually reads rather than to a fixed number.
+        Assertions.assertEquals(0.2 * (elationGated - elationBelow), healingGated - healingBelow, EPS,
+                "the bonus tracks the Elation of the run it is in");
     }
 
     /**
