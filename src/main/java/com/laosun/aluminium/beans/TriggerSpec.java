@@ -201,6 +201,28 @@ public class TriggerSpec {
     private Integer maxEidolon;
 
     /**
+     * This rule executes ONE of its effects, chosen at random, rather than all of them.
+     *
+     * <p>Reader: 1506 Silver Wolf LV.999's 【头号补给盲盒】 - 「随机触发 1 种效果：【超超超大剑】…／【爆爆爆炸蛋】…／【怪怪怪味豆】…」
+     * - and light cone 21032's 「战斗开始时以及当装备者回合开始时，随机生效 1 个效果」.
+     *
+     * <p>⚠ <b>Why it belongs on the RULE.</b> What is picked is one of the rule's whole EFFECTS, not a number inside one,
+     * so there is nothing on an {@code EffectSpec} for it to describe. The sibling {@code min_eidolon} IS per-effect
+     * because it FILTERS (several effects may survive it); this one is exclusive, which is why the two cannot be combined
+     * without a second reading - see the loader's check.
+     *
+     * <p>The pick is made ONCE per firing, not once per effect: rolling for each would as easily execute none of them as
+     * two of them, and neither is "one of".
+     */
+    @SerializedName("one_of")
+    private Boolean oneOf;
+
+    /** Whether this rule executes one of its effects at random; see the field. */
+    public Boolean getOneOf() {
+        return oneOf;
+    }
+
+    /**
      * Where the rule came from (trace id, talent name, character-doc reference).
      *
      * <p>Not used by the engine at all: it exists so that anyone reading the JSON -- or a failing
