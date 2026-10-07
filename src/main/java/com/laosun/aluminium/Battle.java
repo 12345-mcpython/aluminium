@@ -3662,19 +3662,21 @@ public class Battle {
      * <p>Reader: 1503 Pearl (真珠)'s technique - 「使用秘技后获得【美学底本】，切换行动角色时【美学底本】转移至当前行动角色。下一次
      * 战斗开始时，真珠获得 20 点【好活当赏】，并【深度学习】持有【美学底本】的角色」.
      *
-     * <p>⚠ <b>Why the caller states it.</b> 「切换行动角色」 is something that happens on the MAP, between battles, and the
-     * engine cannot observe it - exactly like the technique itself, which is why {@link #markTechniqueUsed} exists. So the
-     * fact arrives the same way, and the engine's job is to let the rules READ it rather than to invent a map layer.
-     * Whatever the caller passes is the unit holding the mark, which is what the battle-start clause needs to know.
+     * <p>⚠ <b>Where the transfer lives.</b> 「切换行动角色」 is a MAP action, and the map is a pre-battle CONFIGURATION
+     * layer: the player switches characters, the mark follows, and by the time combat starts exactly one ally holds it.
+     * So the battle does not need to observe the switching at all - it needs to be TOLD who holds the mark, which is
+     * what this method is for. A caller that models the map (or a judge standing in for one) calls it before
+     * {@link #startBattle()}; the engine's half is to apply the mark and let the rules read it.
      *
-     * <p>Call before {@link #startBattle()}. A unit passed here that used no technique still holds the mark, because the
-     * two facts are separate: the technique is Pearl's, the mark is whoever's it moved to.
+     * <p>There is always an archetype in the game ("the character who used the technique holds it, and it moves when the
+     * active character changes"), so "nobody" is spelled by not calling this at all - not by a flag. Whatever is passed
+     * is the unit holding the mark, and {@code null} leaves the battle with none.
      */
     public void markArchetypeHolder(CanHit unit) {
         techniqueArchetype = unit;
     }
 
-    /** The unit 【美学底本】 sat on when the battle began, or {@code null} when the caller told us of none. */
+    /** The unit 【美学底本】 sat on when the battle began, or {@code null} when the caller named none. */
     public CanHit archetypeHolder() {
         return techniqueArchetype;
     }
@@ -3690,11 +3692,12 @@ public class Battle {
         // The technique's own mark, on the unit the caller named - 「使用秘技后获得【美学底本】」. Applied HERE rather than
         // by a rule because it exists BEFORE the battle does; the rules then read it (`self has_state 美学底本`) to find
         // who to apply 深度学习 to.
-        // Note: Only when SOMEONE used a technique. The mark comes from 【秘技】, so a battle where nobody used one has no
-        // archetype to hold it - and a caller that names a holder anyway gets no mark rather than a state nothing
-        // granted. Measured: the first version marked unconditionally, and the judge's "no technique, no mark" control
-        // found it.
-        if (techniqueArchetype != null && !techniqueArchetype.isDeath() && !techniqueUsers.isEmpty()) {
+        // Note: No further condition. The MAP decides who holds the mark and the caller states it, so a named unit IS the
+        // answer - "nobody" is spelled by not naming one. The first version additionally required that someone had used a
+        // technique, which was my own invention: the map's answer already accounts for that (a holder is named only when
+        // Pearl's technique put the mark somewhere), and the judge's "no archetype named" case is what showed the extra
+        // condition was doing nothing but adding a way to disagree with the caller.
+        if (techniqueArchetype != null && !techniqueArchetype.isDeath()) {
             techniqueArchetype.getBuffManager()
                     .addBuff(new com.laosun.aluminium.models.buff.StateBuff("美学底本", 1, true));
         }
