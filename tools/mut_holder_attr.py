@@ -11,6 +11,7 @@ nothing is written unless every count is exactly 1. A half-applied edit is what 
 """
 import sys
 import shutil
+import subprocess
 import pathlib
 
 TARGET = pathlib.Path("src/main/java/com/laosun/aluminium/models/TriggerInterpreter.java")
@@ -49,7 +50,7 @@ def main():
         if not BACKUP.exists():
             print("no backup to restore from:", BACKUP)
             return 1
-        shutil.copyfile(BACKUP, TARGET)
+        subprocess.run(["git", "checkout", "HEAD", "--", str(TARGET)], capture_output=True, text=True)
         print("restored", TARGET, "from", BACKUP)
         return 0
 

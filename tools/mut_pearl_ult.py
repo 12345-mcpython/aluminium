@@ -17,6 +17,7 @@ Usage:
 """
 import pathlib
 import shutil
+import subprocess
 import sys
 
 TARGET = pathlib.Path("src/main/resources/characters/1503.json")
@@ -46,7 +47,7 @@ def main():
         if not BACKUP.exists():
             print("no backup at", BACKUP)
             return 1
-        shutil.copyfile(BACKUP, TARGET)
+        subprocess.run(["git", "checkout", "HEAD", "--", str(TARGET)], capture_output=True, text=True)
         print("restored", TARGET)
         return 0
 
@@ -72,7 +73,7 @@ def main():
     landed = TARGET.read_text(encoding="utf-8").splitlines()[line_no - 1].strip()
     if landed != replacement:
         print("EDIT DID NOT LAND: line", line_no, "reads", landed, "- restoring")
-        shutil.copyfile(BACKUP, TARGET)
+        subprocess.run(["git", "checkout", "HEAD", "--", str(TARGET)], capture_output=True, text=True)
         return 3
     print("applied", name, "at line", line_no, "->", landed)
     return 0
