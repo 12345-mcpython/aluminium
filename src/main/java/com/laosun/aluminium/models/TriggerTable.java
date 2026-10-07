@@ -893,7 +893,15 @@ public class TriggerTable {
             // "when entering combat, if the allies' Skill Points limit is #2 or higher" (reader: light cone 23046):
             // the cap is not a field of the unit -- it belongs to the battle's skill point policy -- so the value
             // comes from the battle, and a context without one answers NaN like every other unreadable variable.
-            "skill_point_max");
+            "skill_point_max",
+            // The owner's Eidolon rank, as a condition. Note: `min_eidolon` already gates a whole RULE on it, and that
+            // is enough when the clause IS the Eidolon's ("【深度学习】时 ... 抗性穿透提高 20%"). It is not enough when an
+            // Eidolon clause MODIFIES an effect the base kit also has at the same event: the two rules then carry
+            // identical content and differ only in a rule-level field, which is exactly what the duplicate guard exists
+            // to catch (measured: 1503's Eidolon 4 doubling was refused as "one sentence written twice"). Reading the
+            // rank as a CONDITION puts the difference inside the clause, where the guard can see it and where a reader
+            // can see it too.
+            "eidolon");
 
     /**
      * The prefix of one parameterised numeric variable: {@code self_attr:SPEED}.
@@ -3724,6 +3732,12 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
                 // "若装备者的能量上限大于等于…" -- not an attribute (`CanHit.getMaxEnergy()` is a field, and the
                 // attribute table has no slot for it), which is exactly why it needed a variable of its own.
                 case "self_max_energy" -> ctx.owner() == null ? Double.NaN : ctx.owner().getMaxEnergy();
+                // The owner's Eidolon rank. Note: A non-character owner (a summon, a hand-built context) has no
+                // Eidolons, and 0 is the answer that unlocks nothing - the same convention `eidolonRankOf` uses on the
+                // rule-level gate, spelled once here as a value.
+                case "eidolon" -> ctx.owner() instanceof com.laosun.aluminium.models.Character owner
+                        ? owner.getEidolonRank()
+                        : 0;
                 // "当前能量值等于其能量上限" / "当前能量百分比小于 50%" -- the same reasoning as the variable above,
                 // one step further: energy is a field rather than an attribute, so the RATIO needs its own name too.
                 // Five shipped readers are already on record as blocked on exactly this spelling: light cone 2101's

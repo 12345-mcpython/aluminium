@@ -42,7 +42,12 @@ public class UnitDisciplineTest {
         // condition belongs in BOTH -- that is the fifth place a condition name lives (closed set, switch, this list, and the docs that describe them).
         "damage_skill_key",
             "target_hp_percent_before", "enemy_count", "ally_count",
-            "skill_point_max");   // the team pool's cap, for light cone 23046 (a count, not a fraction)
+            "skill_point_max",   // the team pool's cap, for light cone 23046 (a count, not a fraction)
+            // The owner's Eidolon rank. A COUNT of ranks (1..6), never a fraction: "eidolon >= 4" means four ranks, and
+            // the rule-level `min_eidolon` field beside it uses the same unit. Added when 1503's Eidolon 4 doubling
+            // needed the rank inside the clause's own conditions - a rule-level field alone left the two rules
+            // byte-identical and the duplicate guard refused them.
+            "eidolon");
 
     /** Of those, the ones that resolve to 0..1 rather than a count. */
     // self_energy_percent is a RATIO (current/max), so it joins the fraction family: any literal above 1 is refused.
