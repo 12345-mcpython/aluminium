@@ -20,8 +20,12 @@ CONTENT = pathlib.Path("src/main/resources/characters/1503.json")
 WIDE = "allies_of_path_except:欢愉:self,target"
 
 VARIANTS = {
-    "ceiling": ('"id": "ult_advances_the_target_at_1_elation_allies",\n      "max_eidolon": 1',
-                '"id": "ult_advances_the_target_at_1_elation_allies",\n      "max_eidolon": 2'),
+    # Note: `max_eidolon` is written at the END of each rule (the ship script appends it), so the anchor is the field
+    # line plus the closing brace - a bare `"max_eidolon": 1` occurs in all three shipped tiers at once.
+    "ceiling": ('      "max_eidolon": 1\n    },\n    {\n      "on": "ULT_CAST",\n'
+                '      "id": "ult_advances_the_target_at_2_elation_allies"',
+                '      "max_eidolon": 2\n    },\n    {\n      "on": "ULT_CAST",\n'
+                '      "id": "ult_advances_the_target_at_2_elation_allies"'),
     "noexcept": (f'"target": "{WIDE}"', '"target": "all_allies"'),
     "paths": (f'"target": "{WIDE}"', '"target": "other_allies"'),
 }
