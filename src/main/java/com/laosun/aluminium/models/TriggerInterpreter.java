@@ -3278,9 +3278,28 @@ public final class TriggerInterpreter {
                 throw new IllegalStateException("the scale \"" + effect.getScale()
                         + "\" must state <ATTRIBUTE>:<threshold>, e.g. self_attr_above:SPEED:120");
             }
-            AttributeType over = AttributeType.fromString(parts[0].trim());
+            // The name may be an ATTRIBUTE or a RESOURCE. Reader: 1506 Silver Wolf LV.999's enhanced-basic ramp -
+            // 「每拥有 60 点【隐藏分】…」 - where the quantity is a counter she owns, not an attribute. A resource name is
+            // not an AttributeType, so it is resolved here; the attribute path is untouched and stays the first choice.
+            double over = 0;
+            String name = parts[0].trim();
+            AttributeType named = null;
+            try {
+                named = AttributeType.fromString(name);
+            } catch (IllegalArgumentException notAnAttribute) {
+                named = null;                  // falls through to the resource readout below
+            }
+            if (named != null) {
+                over = owner.getAttribute(named).get();
+            } else if (owner.getResources() != null && owner.getResources().has(name)) {
+                over = owner.getResources().value(name);
+            } else {
+                throw new IllegalStateException("the scale \"" + effect.getScale() + "\" reads \"" + name
+                        + "\", which is neither an attribute of " + owner.getName()
+                        + " nor one of its resources");
+            }
             double threshold = Double.parseDouble(parts[1].trim());
-            double excess = Math.max(0, owner.getAttribute(over).get() - threshold);
+            double excess = Math.max(0, over - threshold);
             // `max_points`: the document may bound the EXCESS itself - 「最多计入 100 点超出的速度」. Reader: 1506 Silver Wolf
             // LV.999's trace. Without it the clause cannot be written honestly: dropping the bound gives 280% at Speed 300
             // where the document says 200%, and that is a silent wrong number.
