@@ -3183,6 +3183,14 @@ public final class TriggerInterpreter {
                 && (effect.getPercentFromCastParam() != null || effect.getPercentFromResource() != null)) {
             return shareOf(effect, ctx) + (effect.getAmount() == null ? 0 : effect.getAmount());
         }
+        // `counted_laughs`: the laugh points Elation damage is computed from - the merged snapshots of 【好活当赏】, NOT
+        // the party's live pool (the same distinction the damage factor makes). Reader: 1506 Silver Wolf LV.999's Eidolon
+        // 4, 「【崩坏级伤害演示】造成的欢愉伤害额外计入 5 倍的【笑点】」. Before the owner requirement for the reason the
+        // cast-skill share gives: the count belongs to the battle, so a context without a rule owner can still read it.
+        if (COUNTED_LAUGHS.equals(effect.getScale().trim())) {
+            double points = ctx.battle() == null ? 0 : ctx.battle().countedLaughPoints();
+            return effect.getPercent() * points + (effect.getAmount() == null ? 0 : effect.getAmount());
+        }
         Character owner = requireCharacterOwner(effect, ctx);
         // Note:Note: `stackScale` takes a primitive, so handing it `effect.getPercent()` unboxes a null the moment a rule states
         // its share as `percent_from_cast_param` instead. The share is what the counter multiplies, so ask for it the one way.
@@ -3197,8 +3205,7 @@ public final class TriggerInterpreter {
             double spent = hit == null ? 0 : hit.getCastEnergySpent();
             return effect.getPercent() * spent + (effect.getAmount() == null ? 0 : effect.getAmount());
         }
-        if (EVENT_AMOUNT.equals(effect.getScale().trim())) {
-            // "raise X% for each 1 point spent ...": the triggering event's own magnitude, as a
+        if (EVENT_AMOUNT.equals(effect.getScale().trim())) {            // "raise X% for each 1 point spent ...": the triggering event's own magnitude, as a
             // modifier. Note: `event_amount` is NOT a new spelling: `ADD_STACK` already read it (1306's
             // `talent_phantasm_stack`, one [幻相] layer per point spent). What was missing is this ROUTE --
             // modifiers read their magnitude here and had no way to ask the event. (It was ALSO withdrawn once from
@@ -3320,7 +3327,7 @@ public final class TriggerInterpreter {
         // but not an AttributeType, so the question "which attribute does this scale name" has no answer for it.
         if (SELF_MAX_ENERGY.equals(raw) || EVENT_AMOUNT.equals(raw) || raw.startsWith(ABOVE_PREFIX)
                 || raw.startsWith("party_resource:") || raw.startsWith(TriggerTable.HOLDER_ATTR_PREFIX)
-                || "elation_base".equals(raw)) {
+                || COUNTED_LAUGHS.equals(raw) || "elation_base".equals(raw)) {
             // `holder_attr:` joins them for the same reason `summon_attr:`/`actor_attr:` are not here: it names a
             // SUBJECT, and the magnitude is read from that subject's attribute by its own branch of
             // `derivedMagnitude`/`literalBase`. (Those two leave this method through the early return below as
@@ -3750,6 +3757,15 @@ public final class TriggerInterpreter {
      * is deliberately not an {@code AttributeType}.
      */
     private static final String EVENT_AMOUNT = "event_amount";
+
+    /**
+     * {@code counted_laughs}: the laugh points Elation damage is computed from, as a SCALE.
+     *
+     * <p>Reader: 1506 Silver Wolf LV.999's Eidolon 4 - 「【崩坏级伤害演示】造成的欢愉伤害额外计入 5 倍的【笑点】」. The same
+     * quantity {@code TriggerTable}'s numeric variable of that name reads for conditions; here it is the base of an
+     * additive Elation rider, which is what "counts five times as many laughs" buys.
+     */
+    private static final String COUNTED_LAUGHS = "counted_laughs";
 
     /**
      * "when SPD is greater than or equal to X ... for each 1 point of SPD above that ...": {@code self_attr_above:<ATTRIBUTE>:<threshold>}.
