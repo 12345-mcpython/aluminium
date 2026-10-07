@@ -1,11 +1,18 @@
 """Mutations for Pearl's charge counter - the state duration that is a count of USES, not of turns.
 
-  to_max_adds        re-entering the state adds three instead of restoring to the ceiling (the bug `to_max` prevents)
+  to_max_adds        re-entering the state adds three instead of restoring to the ceiling
   no_spend           an enhanced basic does not spend a charge
   spend_two          an enhanced basic spends two, so the state ends a use early
   never_ends         the state is never removed when the counter empties
 
-Restore is `git checkout HEAD -- <path>`.
+⚠ `to_max_adds` is EXPECTED to survive Pearl's own judge, and that is a fact about her counter rather than a hole: its
+maximum is 3 and it carries no overflow allowance, so a plain "gain 3" is already clamped to 3 from anywhere - "restore
+to full" and "add three" cannot be told apart on it. The field is pinned by `GainResourceToMaxTest`, which builds a
+counter WITH an overflow allowance so the two spellings diverge: from 1, granting 3 lands on 3 with `to_max` and 4
+without it.
+
+Restore uses this script's own backup, never `git checkout HEAD` - that reverts to the last COMMIT and deletes
+uncommitted rule changes, which is exactly what it did once.
 
 Usage:
     python tools/mut_pearl_charge.py <variant>
