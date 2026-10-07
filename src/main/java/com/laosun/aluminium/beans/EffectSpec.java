@@ -57,6 +57,8 @@ public class EffectSpec {
         copy.minEidolon = minEidolon;
         copy.always = always;
         copy.split = split;
+        copy.weight = weight;
+        copy.weightSteps = weightSteps;
         copy.amountCap = amountCap;
         copy.ordinary = ordinary;
         copy.perStack = this.perStack;
@@ -269,6 +271,33 @@ return copy;
      */
     @com.google.gson.annotations.SerializedName("split")
     private Boolean split;
+
+    /**
+     * How much of the {@code one_of} pick this effect gets, when the rule states weights: 「有概率触发 1 次…」 where the
+     * chance is graded - 「【爆爆爆炸蛋】：恢复战技点（<b>战技点较少时，触发概率提高</b>…较多时降低）；【怪怪怪味豆】：获得笑点（【隐藏分】较少时…）」.
+     *
+     * <p>Reader: 1506 Silver Wolf LV.999's 【头号补给盲盒】, and the numbers are the game's own: its ability script rolls
+     * {@code RandomConfig} over {@code [Item1Chance, Item2Chance, Item3Chance]}, where item 1 is never graded (1), item 2
+     * is multiplied by 10 / 0.1 / 0.001 as 战技点 sits at 4 / at its cap, and item 3 by 10 / 0.1 / 0.001 as 隐藏分 sits below
+     * 60 / at 120 / at 300.
+     *
+     * <p>Note: An effect that states no weight counts as {@code 1}, and a rule where NO effect states one keeps the
+     * uniform pick it always had - so no shipped rule changes.
+     */
+    @com.google.gson.annotations.SerializedName("weight")
+    private Double weight;
+
+    /**
+     * Threshold additions to {@link #weight}: {@code "<resource>:<threshold>:<delta>"}, added when the resource is
+     * <b>at or above</b> the threshold.
+     *
+     * <p><b>Why a step, and not the existing {@code self_attr_above} scale.</b> That one is the EXCESS over a threshold
+     * ({@code percent x (value - threshold)}), i.e. a ramp. The grades here are steps - 10, then 1, then 0.1, then
+     * 0.001 - and two steps reproduce a tier: {@code ["战技点:4:-0.9", "战技点:5:-0.099"]} is 1 at 0-3, 0.1 at 4, and
+     * 0.001 from 5 up.
+     */
+    @com.google.gson.annotations.SerializedName("weight_steps")
+    private java.util.List<String> weightSteps;
 
     /**
      * Note: from 1505's Eidolon "额外获得等同于本次获得的[好活当赏]50%/100%":

@@ -37,10 +37,15 @@ public class SilverWolfLV999LootPickTest {
     private static final int ALLY = 1204;
     private static final int MONSTER = 1002011;
     private static final String LAUGH = "笑点";
-    /** What the scripted roll answers with: an index into the box's POOL, in the order the file states the three. */
+    /**
+     * What the scripted roll answers with: a value inside the effect's WEIGHT bucket.
+     *
+     * <p>⚠ The pick is WEIGHTED - the game's own grades are 1, 1 and 10 while 隐藏分 is under 60 - so the roll is over
+     * the weight total (12000 in this fixture's state) and these are the buckets' lower edges, not effect indices.
+     */
     private static final int PICK_SWORD = 0;
-    private static final int PICK_POINTS = 1;
-    private static final int PICK_LAUGHS = 2;
+    private static final int PICK_POINTS = 1000;
+    private static final int PICK_LAUGHS = 2000;
     /** The box's share of its own total, as the document states it (「等同于本次总伤害值 20%」). */
     private static final double SHARE = 0.2;
 
@@ -175,7 +180,9 @@ public class SilverWolfLV999LootPickTest {
 
         @Override
         public int nextInt(int bound) {
-            return pick;
+            // ⚠ Clamped: other draws share this source (a bounce picks its target with `nextInt(alive.size())`), and a
+            // weight bucket there would index out of bounds.
+            return Math.min(pick, bound - 1);
         }
 
         @Override
