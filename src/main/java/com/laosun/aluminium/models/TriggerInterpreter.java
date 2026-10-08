@@ -5772,6 +5772,35 @@ public final class TriggerInterpreter {
      * otherwise the battle's snapshot. One reader of the table, called from the two places that fold Elation damage, so the
      * two cannot drift apart.
      */
+    /**
+     * How many times one effect repeats: {@code per_steps: "<counter>:<step>"} is {@code floor(value / step)}, and an effect
+     * that states nothing runs exactly once.
+     *
+     * <p>Deliberately a COUNT and not a spend - that is why a second effect of the same rule reads the same number, and why
+     * spending has to be its own op. The value is read here, at dispatch time, so a counter moved by an earlier effect of the
+     * same rule is already visible.
+     */
+    private static int perStepsRepeat(EffectSpec effect, TriggerContext ctx) {
+        String spec = effect == null ? null : effect.getPerSteps();
+        if (spec == null || spec.isBlank()) {
+            return 1;
+        }
+        int colon = spec.indexOf(':');
+        if (colon <= 0 || colon == spec.length() - 1) {
+            throw new IllegalStateException("per_steps must be \"<counter>:<step>\", got \"" + spec + "\"");
+        }
+        double step;
+        try {
+            step = Double.parseDouble(spec.substring(colon + 1).trim());
+        } catch (NumberFormatException notANumber) {
+            throw new IllegalStateException("per_steps step is not a number: \"" + spec + "\"");
+        }
+        if (step <= 0) {
+            throw new IllegalStateException("per_steps step must be positive, got " + step + " (\"" + spec + "\")");
+        }
+        return (int) Math.floor(counterValue(spec.substring(0, colon).trim(), ctx) / step);
+    }
+
     private static double laughFactor(TriggerContext ctx, EffectSpec effect) {
         if (effect != null && effect.getCountedLaughs() != null) {
             double counted = effect.getCountedLaughs();
