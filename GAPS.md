@@ -643,6 +643,34 @@ Lv10 = 0.15 ✓、Lv15 = 0.2 ✓）。
 1. **规则/效果级**（她 ✓ ＋ 1513／8009／8010 的"施放一次固定计入 N"✓）—— 作用在**那一笔实例**上 ✓；
 2. **更广的一段**（1502 的"**额外回合**固定计入 20／40"✗）—— 那是**一整段时间**的计数覆写 ✓，得住进「回合级」的东西 ✓ ⇒ 先登记，不与第 1 段混做 ✗。
 
+#### ⭐⭐ 第 3 段勘察（终）：**分派就是 `applyOne(...)`** ⇒ 包法已定，可一次成型 ✓
+
+实测循环尾部（1318-1349 ✓）形状如下 ✓：
+```
+effect = amendedEffect(effect, ctx);
+TriggerContext effectCtx = ctx.withTargetFilter(rule.targetFilterAt(thisEffect));
+String movingOp = normalizeOp(effect, null);      // ＋ rawOp（1329 ✓）
+if (GAIN/SPEND_RESOURCE ...) {
+    ... int creditedBefore = measureForTheDelta(...);
+    applyOne(battle, effect, effectCtx, previousCredited);      // ← 1340 ✓
+    int creditedAfter = measureForTheDelta(...);
+    previousCredited = Math.abs(creditedAfter - creditedBefore);
+} else {
+    applyOne(battle, effect, effectCtx, previousCredited);      // ← 1347 ✓
+}
+```
+⇒ ⭐ **`per_steps` 的包法**：在上述 **`if/else` 之外**套一层 `for (int repeat = perStepsRepeat(effect, ctx); repeat > 0; repeat--) { … }` ✓
+（⚠ **不要**把 `effectIndex++`（1308 ✓）／`amendedEffect`（1318 ✓）／`effectCtx`（1321 ✓）圈进去 ✗ —— 只圈**这一个 if/else** ✓ ⇒ 簿记与上下文**各算一次** ✓，
+正是 1303 循环那条约束要求的 ✓）。
+
+⚠ **一处语义决定（要写进注释 ✓）**：`previousCredited`（1345 ✓）现在仍是"**上一个效果**的量" ✓ ⇒ 在重复里它会被**最后一次迭代覆盖** ✓。
+两种选择 ✓：(a) 保持 `=` ✓，并在 `per_steps` 的效果上**响亮拒绝** `amount_from_previous` ✗（不许静默丢 ✓）；(b) 让 `per_steps` 与 `amount_from_previous` **互斥校验** ✓。
+⭐ 推荐 **(b)**：装载期就拒绝这个组合 ✓（比运行期才反映"只算最后一次"要好 ✓）。
+
+⭐ **`SPEND_STEPS` 的两个注册点**（都要加 ✓，否则**运行期**才炸 ✓ —— 分派尾部 `default -> throw`（1809 ✓）✓）：
+- **装载期校验**：`ADD_STACK` 的 case 在 **982** ✓、`REMOVE_STACK` 在 **708** ✓、未知 op 落到 **1139 `default -> requireNoStackArguments(...)`** ✓ ⇒ `SPEND_STEPS` 要在这一带加自己的校验 ✓；
+- **运行期分派**：`1767-1787` 一带（`case "REMOVE_STACK" -> removeStacks(...)` ✓／`case "ADD_STACK" -> addStack(...)` ✓）✓ 加 `case "SPEND_STEPS" -> spendSteps(battle, effect, ctx);` ✓。
+
 #### ⭐ 第 3 段勘察（续）：`GAIN_RESOURCE` **接受 `scale`** ✓ ＋ 一个实现约束 ⚠
 
 - ⭐ **配额那半是"一个效果"就够** ✓：`gainResource`（1965 ✓）的分支里写着 ✓ —— `effect.getAmountFromAttr() == null` ⇒
