@@ -1,9 +1,11 @@
 package com.laosun.aluminium.test.content.characters;
 
 import com.laosun.aluminium.Battle;
+import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
+import com.laosun.aluminium.models.buff.StateBuff;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
@@ -20,16 +22,13 @@ import java.util.Random;
  * 隐藏分 as she does; her Ultimate also installs the enhanced basic; three enhanced basics end 【无敌玩家】 and leaving it
  * clears 隐藏分; her true-ending trace pays 20 隐藏分 at 20 counted laughs and another 20 at 40.
  *
- * <h2>One clause is still OPEN - shipped, but not yet passing</h2>
+ * <h2>The clause that WAS open, and what was actually wrong with it</h2>
  *
- * <p>Recorded here rather than fixed by guesswork, and deliberately NOT present as a passing test:
- *
- * <ul>
- *   <li><b>the 40% Basic/Skill rider while she holds 【好活当赏】</b> - the Basic deals exactly the same damage with and
- *       without the state (147.84 either way). This file synthesizes its own DAMAGE instance instead of driving her
- *       slot-1 skill, so <b>the fixture may be what is wrong rather than the rule</b>, and that must be separated before
- *       the rule is touched.</li>
- * </ul>
+ * <p><b>the 40% Basic/Skill rider while she holds 【好活当赏】</b> used to read the same damage with and without the state
+ * (147.84 either way), and the file recorded it rather than guessing. The rule was never the problem: the fixture
+ * <b>synthesized its own DAMAGE instance</b>, so the rule's {@code from_skill_id == 1.0} could not match anything. Driving
+ * her own slots through {@code requestSkill} closed it - and the case now reads BOTH slots, because the two rules state the
+ * same 40% and reading only one would let the other be deleted without a red.
  *
  * <p><b>Eidolon 1's 「保留 20% 的【隐藏分】」 WAS open and is now closed</b>, and the reason is worth keeping: the clear and
  * the retention had been written as TWO rules, and `previousCredited` - what the retention's share reads - is per-RULE and
@@ -43,6 +42,8 @@ public class SilverWolfLV999KitTest {
     private static final String HIDDEN = "隐藏分";
     private static final String CHARGES = "强化普攻次数";
     private static final String GOD = "无敌玩家";
+    /** 【好活当赏】 - a STATE here, because that is what her rider's gate asks about (`self has_state 好活当赏`). */
+    private static final String GIFT = "好活当赏";
 
     /** Her Skill gains the 5 笑点 her page states. */
     @Test
@@ -149,6 +150,73 @@ public class SilverWolfLV999KitTest {
     // ==================================================================
     // Helpers
     // ==================================================================
+
+    /**
+     * 「持有【好活当赏】时，施放普攻、战技对受到攻击的敌方目标造成 40% 的虚数属性欢愉伤害」 - read on BOTH slots.
+     *
+     * <p>⚠ This is the case the file once recorded as OPEN. Every earlier attempt synthesized a {@code DAMAGE} instance and
+     * fired {@code DEALING_DAMAGE} by hand, so the rule's {@code from_skill_id == 1.0} never matched and the reading came
+     * out identical with and without the state. Driving her own slot through {@code requestSkill} is what the fixture was
+     * missing; the rules themselves were never touched.
+     *
+     * <p>And both slots are read, because the two clauses state the same 40%: a case that reads only one of them cannot
+     * tell "the other rule is missing" from "the other rule is there".
+     */
+    @Test
+    public void theBangerRidersPayOnBothSlots() {
+        assertRider(SkillType.COMMON, "普攻");
+        assertRider(SkillType.SKILL, "战技");
+    }
+
+    /**
+     * One slot's 40% rider, against an expectation built from the engine's own factors.
+     *
+     * <p>⚠ Why the exact arithmetic rather than "it went up": a case that only compares the two runs leaves a mutation of
+     * the shipped 0.4 to 0.1 GREEN, because both readings move together. The identity used here has no free parameter -
+     * the rider is {@code 0.4 x ATTACK} folded with 欢愉度, 增笑 and the laugh snapshot, then settled through the SAME zones
+     * as the attack that carries it, so {@code delta / attackDamage} is {@code (0.4 / the row) x those factors} exactly.
+     * Measured: 0.43517, and the row it implies (1.4) is the slot-1 row the file pins at Lv10.
+     */
+    private static void assertRider(SkillType slot, String label) {
+        double without = attackDamage(newBattle(), false, slot);
+        Battle held = newBattle();
+        double with = attackDamage(held, true, slot);
+        Character wolf = held.characters.getFirst();
+        double boosts = (1 + wolf.getAttribute(AttributeType.ELATION_DAMAGE_BOOST).get())
+                * (1 + wolf.getAttribute(AttributeType.ELATION_DAMAGE_AMP).get());
+        double laughs = held.elationLaughMultiplier();
+        var skill = wolf.getSkills().get(slot);
+        double row = skill.getData().getSkills().get(wolf.skillLevel(skill) - 1).getFirst();
+        double expected = (0.4 / row) * without * boosts * laughs;
+        System.out.println("[1506] " + label + ": " + without + " -> " + with + " ; delta " + (with - without)
+                + " ; expected 40% of the same attack (row " + row + ", boosts " + boosts + ", laughs x" + laughs
+                + ") = " + expected);
+        Assertions.assertTrue(with > without, label + " pays the rider while she holds 【好活当赏】");
+        Assertions.assertEquals(expected, with - without, 1e-6,
+                label + " pays exactly 40% of her ATTACK folded by 欢愉度/增笑/计入的笑点, settled through the same zones");
+    }
+
+    /**
+     * The settled damage of one 普攻/战技 against the single enemy, with or without 【好活当赏】.
+     *
+     * <p>The state is granted as the STATE the rule's gate asks about (`has_state 好活当赏`), and the counted laughs are
+     * frozen the way the engine freezes them when the state arrives - without it the Elation factor would be 1 and the
+     * rider would be measured under the wrong multiplier.
+     */
+    private static double attackDamage(Battle battle, boolean holding, SkillType slot) {
+        Character wolf = battle.characters.getFirst();
+        if (holding) {
+            battle.partyResource(LAUGH).gain(20);
+            StateBuff gift = new StateBuff(GIFT, 2, false);
+            gift.setSource(wolf);
+            wolf.getBuffManager().addBuff(gift);
+            battle.noteElationGift(wolf, 2);
+        }
+        Enemy victim = battle.enemyUnits().getFirst();
+        double before = victim.getCurrentHp();
+        cast(battle, wolf, slot, victim);
+        return before - victim.getCurrentHp();
+    }
 
     /**
      * Her 隐藏分 after 【无敌玩家】 ends, at the given Eidolon rank: 60 held going in, so a fifth is 12.
