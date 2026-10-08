@@ -3,6 +3,7 @@ package com.laosun.aluminium.test.content.characters;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.TriggerEvent;
+import com.laosun.aluminium.models.CanHit;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
@@ -25,10 +26,10 @@ import java.util.Random;
  * arithmetic (250 in, two milestones, 30 left), the multiplicity (a single 280-point gain is TWO milestones, so two
  * charges come back) and the negative control (outside the state, the ledger does not move at all).
  *
- * <p>⚠ <b>The extra turn is NOT part of this file, and that is deliberate.</b> {@code Queue.grantExtraTurn} keeps ONE
- * pending extra turn - a second grant overwrites the first, which {@code ExtraTurnTest} pins - so a {@code per_steps}
- * repeat of it would pay one extra turn where the document counts two. Registered rather than approximated; the rule's
- * own {@code source} says where the effect goes when the queue can hold more than one.
+ * <p><b>The extra turn is part of it too.</b> That half had to wait: {@code Queue.grantExtraTurn} kept ONE pending
+ * extra turn, so a {@code per_steps} repeat would have paid one where the document counts two. The author ruled that
+ * the game accumulates them, the queue now counts them for the same unit ({@code ExtraTurnTest} pins the new
+ * semantics), and this case takes both of them through the engine's own turn boundaries.
  *
  * <p><b>The fixture moves her hidden score the way the documents do</b>: a second unit grants a lump of SHARED 笑点, and
  * her own talent (「获得笑点时，获得等量【隐藏分】」) forwards it one for one. ⚠ Deliberately NOT a direct
@@ -69,11 +70,12 @@ public class SilverWolfLV999MilestoneQuotaTest {
     }
 
     /**
-     * ⚠ The case the whole primitive exists for: ONE gain of 280 is two milestones, so two charges come back - a
-     * per-event "over 120, pay one" check would restore one.
+     * ⚠ The case the whole primitive exists for: ONE gain of 280 is two milestones, so BOTH effects are paid twice -
+     * two charges come back and two extra turns are owed, taken back to back. A per-event "over 120, pay one" check
+     * would pay one of each.
      */
     @Test
-    public void oneGainOfTwoHundredAndEightyRestoresTwoCharges() {
+    public void oneGainOfTwoHundredAndEightyPaysTwoMilestones() {
         build(2, 280);
         enterGodmode();
         Assertions.assertEquals(20, hidden(), "precondition: the Ultimate's own trace, and no milestone yet");
@@ -87,6 +89,14 @@ public class SilverWolfLV999MilestoneQuotaTest {
         Assertions.assertEquals(300, hidden(), "forwarded one for one, up to the counter's own ceiling (60 + 240)");
         Assertions.assertEquals(3, charges(), "1 + 2 milestones: a single 'over 120' check would leave 2");
         Assertions.assertEquals(60, quota(), "300 counted as two milestones, 60 left for the next one");
+
+        // ⭐ The same two milestones paid the extra turns too, and the engine takes them one after the other: the second
+        // is still owed after the first has been taken (Queue counts them; ExtraTurnTest has the queue-level case).
+        Assertions.assertEquals(wolf, battle.getExtraTurnActor(), "two milestones, so an extra turn is pending");
+        Assertions.assertEquals(wolf, takeOneTurn(), "the first extra turn is hers");
+        Assertions.assertEquals(wolf, battle.getExtraTurnActor(), "and the second is still owed, not overwritten");
+        Assertions.assertEquals(wolf, takeOneTurn(), "the second extra turn is hers");
+        Assertions.assertNull(battle.getExtraTurnActor(), "no more are owed");
     }
 
     /** The negative control: outside 【无敌玩家】 the ledger does not move, whatever her hidden score does. */
@@ -136,14 +146,17 @@ public class SilverWolfLV999MilestoneQuotaTest {
         Assertions.assertEquals(List.of("self has_state 无敌玩家", "resource_changed:隐藏分"),
                 rule.conditions().stream().map(condition -> condition.source()).toList(),
                 "the state is the scope, and the hidden score is what moved");
-        Assertions.assertEquals(3, effects.size(), "accumulate, restore, spend - in that order");
+        Assertions.assertEquals(4, effects.size(), "accumulate, extra turn, restore, spend - in that order");
         Assertions.assertEquals(Boolean.TRUE, effects.get(0).getAmountFromEvent(), "the ledger grows by the event's delta");
         Assertions.assertEquals(QUOTA, effects.get(0).getResource());
-        Assertions.assertEquals(CHARGES, effects.get(1).getResource());
+        Assertions.assertEquals("EXTRA_TURN", effects.get(1).getOp(), "「获得 1 个额外回合」 comes first in the sentence");
         Assertions.assertEquals(QUOTA + ":" + STEP, effects.get(1).getPerSteps(),
-                "one charge per milestone, counted - not spent");
-        Assertions.assertEquals("SPEND_STEPS", effects.get(2).getOp());
-        Assertions.assertEquals(QUOTA + ":" + STEP, effects.get(2).getSteps(),
+                "one per milestone, counted - not spent");
+        Assertions.assertEquals(CHARGES, effects.get(2).getResource());
+        Assertions.assertEquals(QUOTA + ":" + STEP, effects.get(2).getPerSteps(),
+                "one charge per milestone, off the same number");
+        Assertions.assertEquals("SPEND_STEPS", effects.get(3).getOp());
+        Assertions.assertEquals(QUOTA + ":" + STEP, effects.get(3).getSteps(),
                 "and the milestones are consumed once, after both readers");
     }
 
@@ -159,7 +172,10 @@ public class SilverWolfLV999MilestoneQuotaTest {
         TriggerSpecs.set(grant, "op", "GAIN_RESOURCE");
         TriggerSpecs.set(grant, "resource", LAUGH);
         TriggerSpecs.set(grant, "amount", (double) laughs);
-        feeder.setTriggerTable(new TriggerTable(1, List.of(TriggerSpecs.rule("TURN_START", List.of(), grant))));
+        // ⚠ DAMAGE_SETTLED, not TURN_START: driving the extra turns below goes through the engine's own turn boundaries,
+        // and TURN_START would fire this fixture's rule again - a second 280-point grant would move every reading here.
+        feeder.setTriggerTable(new TriggerTable(1, List.of(
+                TriggerSpecs.rule(TriggerEvent.DAMAGE_SETTLED.name(), List.of(), grant))));
         enemy = EnemyFactory.create(MONSTER, 90, 1);
         battle = new Battle(List.of(wolf, feeder), List.of(enemy), new Random(0));
         battle.startBattle();
@@ -174,8 +190,17 @@ public class SilverWolfLV999MilestoneQuotaTest {
 
     /** One party-scoped laugh gain, which 「获得笑点时，获得等量【隐藏分】」 turns into hidden points. */
     private void feederLaughs() {
-        battle.fireTriggers(TriggerEvent.TURN_START, feeder, feeder, 0, 0);
+        battle.fireTriggers(TriggerEvent.DAMAGE_SETTLED, feeder, feeder, 0, 0);
         battle.processRequests();
+    }
+
+    /** One complete turn through the engine's own boundaries, answering with whoever acted. */
+    private CanHit takeOneTurn() {
+        battle.stepForward();
+        CanHit actor = battle.currentMove.getCanHit();
+        battle.beforeMove();
+        battle.afterMove();
+        return actor;
     }
 
     private int hidden() {
