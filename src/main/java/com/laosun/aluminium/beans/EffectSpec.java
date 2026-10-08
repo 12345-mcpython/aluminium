@@ -59,6 +59,7 @@ public class EffectSpec {
         copy.split = split;
         copy.weight = weight;
         copy.weightSteps = weightSteps;
+        copy.elationFrom = elationFrom;
         copy.amountCap = amountCap;
         copy.ordinary = ordinary;
         copy.perStack = this.perStack;
@@ -298,6 +299,25 @@ return copy;
      */
     @com.google.gson.annotations.SerializedName("weight_steps")
     private java.util.List<String> weightSteps;
+
+    /**
+     * The state whose holder's values this Elation instance is computed from: 「该次欢愉伤害使用【美学底本】的属性值计算」.
+     *
+     * <p><b>What is borrowed, and what is not - the author's reading of the formula card.</b> The Elation formula is
+     * {@code 欢愉基础值(等级) × (1+欢愉度) × (1+增笑) × [1 + 5×好活/(好活+240)] × 暴击区 × 易伤区 × 减伤区 × 抗性区 × 防御区 × 倍率区}. The
+     * UNDERLINED terms - the laugh factor, the six zones and the multiplier - 「各自吃各自的」, i.e. the instance's own;
+     * the UN-UNDERLINED ones - the base (the level table's row), 欢愉度 and 增笑 - come from this state's holder. Notice what
+     * is NOT in that list: <b>attack power</b>, which the formula does not contain at all. This project first read the
+     * sentence as "【美学底本】's ATTACK" and wrote {@code holder_attr:美学底本:ATTACK} - wrong twice over, because the borrowed
+     * values are the two boosts and the LEVEL, not an attack.
+     *
+     * <p>Reader: 1503 Pearl (真珠)'s enhanced-basic rider (60%) and Eidolon 6's (240%), both 「使用【美学底本】的属性值计算」.
+     *
+     * <p>Note: It requires {@code damage_type: "ELATION"} and {@code scale: "elation_base"} - there is no Elation formula to
+     * redirect otherwise, and the base has to be the table's row for the holder's level.
+     */
+    @com.google.gson.annotations.SerializedName("elation_from")
+    private String elationFrom;
 
     /**
      * Note: from 1505's Eidolon "额外获得等同于本次获得的[好活当赏]50%/100%":
