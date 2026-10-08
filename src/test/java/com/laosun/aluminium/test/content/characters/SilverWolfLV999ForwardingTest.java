@@ -72,12 +72,19 @@ public class SilverWolfLV999ForwardingTest {
         build(1506);
         var rules = other.getTriggerTable().rulesFor(TriggerEvent.RESOURCE_CHANGED).stream()
                 .filter(rule -> rule.id().startsWith("p1506_")).toList();
-        // ⚠ Her table has TWO rules on this event, and both belong there: the forwarding clause, and her talent, which
-        // recomputes the CRIT conversion whenever 【隐藏分】 moves. Pinning the exact set keeps a third one from slipping in.
+        // ⚠ Her table has THREE rules on this event, and each one belongs there: the forwarding clause, her talent,
+        // which recomputes the CRIT conversion whenever 【隐藏分】 moves, and her Eidolon 2's milestone ledger, which
+        // counts what the hidden score did while 【无敌玩家】 is up. Pinning the exact set keeps a fourth from slipping in.
         Assertions.assertEquals(
-                java.util.Set.of("p1506_laughs_to_hidden", "p1506_talent_hidden_becomes_crit"),
+                java.util.Set.of("p1506_laughs_to_hidden", "p1506_talent_hidden_becomes_crit",
+                        "p1506_e2_milestones_while_in_godmode"),
                 rules.stream().map(rule -> rule.id()).collect(java.util.stream.Collectors.toSet()),
-                "the forwarding rule and the talent conversion, and nothing else");
+                "the forwarding rule, the talent conversion and the Eidolon 2 ledger, and nothing else");
+        // ⚠ ORDER is load-bearing too, and this is the cheapest place to notice it: the ledger's own first effect moves
+        // 里程碑配额, which overwrites the battle's `lastChangedResource`, so a rule placed AFTER it that reads
+        // `resource_changed:隐藏分` would never fire. The ledger therefore has to stay last on this event.
+        Assertions.assertEquals("p1506_e2_milestones_while_in_godmode",
+                rules.getLast().id(), "the ledger moves another counter, so it goes last on this event");
         var forwarding = rules.stream().filter(rule -> rule.id().equals("p1506_laughs_to_hidden")).findFirst()
                 .orElseThrow();
         var effect = forwarding.effects().getFirst();
