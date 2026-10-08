@@ -1327,9 +1327,7 @@ public final class TriggerInterpreter {
             String movingOp = normalizeOp(effect, null);
             // Match the RAW op too: `normalizeOp` derives its name and a spend spelled `overflow_only` did not reach this branch, so the capture of a spend read 0.
             String rawOp = effect.getOp() == null ? "" : effect.getOp().trim().toUpperCase(java.util.Locale.ROOT);
-            for (int repeat = perStepsRepeat(effect, effectCtx); repeat > 0; repeat--) {
-                if ("GAIN_RESOURCE".equals(movingOp) || "SPEND_RESOURCE".equals(movingOp)
-            }
+            if ("GAIN_RESOURCE".equals(movingOp) || "SPEND_RESOURCE".equals(movingOp)
                     || "GAIN_RESOURCE".equals(rawOp) || "SPEND_RESOURCE".equals(rawOp)) {
                 //: the amount this effect ACTUALLY credits (after the cap) is what the next effect may
                 // take a share of. Measured from the holder itself, so the cap is included by construction.
@@ -5774,34 +5772,6 @@ public final class TriggerInterpreter {
      * otherwise the battle's snapshot. One reader of the table, called from the two places that fold Elation damage, so the
      * two cannot drift apart.
      */
-    /**
-     * The number of times one effect repeats: {@code per_steps: "<counter>:<step>"} is {@code floor(value / step)}, and an
-     * effect that states nothing runs once.
-     *
-     * <p>Deliberately a COUNT and not a spend - the caller wraps a single dispatch, and a second effect of the same rule reads
-     * the same number because nothing moved.
-     */
-    private static int perStepsRepeat(EffectSpec effect, TriggerContext ctx) {
-        String spec = effect == null ? null : effect.getPerSteps();
-        if (spec == null || spec.isBlank()) {
-            return 1;
-        }
-        int colon = spec.indexOf(':');
-        if (colon <= 0 || colon == spec.length() - 1) {
-            throw new IllegalStateException("per_steps must be \"<counter>:<step>\", got \"" + spec + "\"");
-        }
-        double step;
-        try {
-            step = Double.parseDouble(spec.substring(colon + 1).trim());
-        } catch (NumberFormatException error) {
-            throw new IllegalStateException("per_steps step is not a number: \"" + spec + "\"");
-        }
-        if (step <= 0) {
-            throw new IllegalStateException("per_steps step must be positive, got " + step + " (\"" + spec + "\")");
-        }
-        return (int) Math.floor(counterValue(spec.substring(0, colon).trim(), ctx) / step);
-    }
-
     private static double laughFactor(TriggerContext ctx, EffectSpec effect) {
         if (effect != null && effect.getCountedLaughs() != null) {
             double counted = effect.getCountedLaughs();
