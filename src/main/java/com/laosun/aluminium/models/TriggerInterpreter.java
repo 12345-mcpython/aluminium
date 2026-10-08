@@ -1739,26 +1739,31 @@ public final class TriggerInterpreter {
             // straight to the policy rather than through a unit's resources.
             case "RAISE_SKILL_POINT_CAP" -> battle.skillPointPolicy.raiseMax((int) Math.round(effect.getAmount()));
             case "GAIN_RESOURCE" -> {
-                CanHit mover = ctx.owner();
+                // ⚠ The store that MOVED, not the rule owner's: an effect may grant to somebody else ("give that ally 2
+                // points"), and `resourceAmount(owner)` measured on a unit that does not carry the counter reads 0 on
+                // both sides - measured: a teammate granted her 280 hidden points, her store went 20 to 300, and the
+                // event announced nothing. One resolution, handed to the op, so a rolling selector rolls once.
+                CanHit mover = resolveTarget(effect, ctx);
                 String movedId = effect.getResource();
                 int before = resourceAmount(battle, mover, movedId);
-                gainResource(effect, ctx, previousCredited);
-                fireResourceChanged(battle, ctx, movedId, resourceAmount(battle, mover, movedId) - before);
+                gainResource(effect, ctx, previousCredited, mover);
+                fireResourceChanged(battle, ctx, mover, movedId, resourceAmount(battle, mover, movedId) - before);
             }
             case "SPEND_RESOURCE" -> {
-                CanHit mover = ctx.owner();
+                CanHit mover = resolveTarget(effect, ctx);
                 String movedId = effect.getResource();
                 int before = resourceAmount(battle, mover, movedId);
-                spendResource(effect, ctx);
-                fireResourceChanged(battle, ctx, movedId, resourceAmount(battle, mover, movedId) - before);
+                spendResource(effect, ctx, mover);
+                fireResourceChanged(battle, ctx, mover, movedId, resourceAmount(battle, mover, movedId) - before);
             }
             // "该额外回合开始时，【美学底本】获得 30 点【好活当赏】…额外回合结束时移除" (1503 Pearl (真珠)'s ultimate): the
             // inverse of a temporary grant. Deliberately NOT `SPEND_RESOURCE`, which is a strict cost that errors when
             // the pool is short - a revocation has to clamp instead, because this pool is meant to be consumed.
             case "REMOVE_RESOURCE" -> {
+                CanHit mover = resolveTarget(effect, ctx);
                 String movedId = effect.getResource();
-                int removed = removeResource(effect, ctx);
-                fireResourceChanged(battle, ctx, movedId, -removed);
+                int removed = removeResource(effect, ctx, mover);
+                fireResourceChanged(battle, ctx, mover, movedId, -removed);
             }
             // "真珠回合开始时重置可获得【好活当赏】数量" (1503 Pearl (真珠)'s trace): starts a new round for the per-round
             // allowances that `max_per_round` charges against. Nothing about the COUNTER changes - only what this round
@@ -2030,7 +2035,13 @@ public final class TriggerInterpreter {
 
     private static void gainResource(EffectSpec effect, TriggerContext ctx,
                                      double previousCredited) {
-        CanHit holder = resolveTarget(effect, ctx);
+        gainResource(effect, ctx, previousCredited, resolveTarget(effect, ctx));
+    }
+
+    /**
+     * The same, told which unit receives: the caller has already resolved it, and it announces on the same one.
+     */
+    private static void gainResource(EffectSpec effect, TriggerContext ctx, double previousCredited, CanHit holder) {
         // A gain whose amount is a SHARE of an attribute (reader: 1505's talent "gain an Elation degree equal to
         // 50% of CRIT DMG"). `scaledAmount` stays literal-only on purpose: this share is read off the HOLDER, which only
         // this method has resolved. Unknown attribute names are refused loudly rather than silently adding zero.
@@ -2194,7 +2205,13 @@ public final class TriggerInterpreter {
      * @return how much was actually taken back (0 when there was nothing left)
      */
     private static int removeResource(EffectSpec effect, TriggerContext ctx) {
-        CanHit holder = resolveTarget(effect, ctx);
+        return removeResource(effect, ctx, resolveTarget(effect, ctx));
+    }
+
+    /**
+     * The same, told which unit's store gives the points back: the caller has already resolved it.
+     */
+    private static int removeResource(EffectSpec effect, TriggerContext ctx, CanHit holder) {
         String id = effect.getResource();
         int asked = (int) Math.round(scaledAmount(effect, ctx));
         if (asked <= 0) {
@@ -2224,7 +2241,13 @@ public final class TriggerInterpreter {
      * @throws IllegalStateException when the resource is missing or does not hold enough
      */
     private static void spendResource(EffectSpec effect, TriggerContext ctx) {
-        CanHit holder = resolveTarget(effect, ctx);
+        spendResource(effect, ctx, resolveTarget(effect, ctx));
+    }
+
+    /**
+     * The same, told which unit's store pays: the caller has already resolved it (see the SPEND_RESOURCE arm).
+     */
+    private static void spendResource(EffectSpec effect, TriggerContext ctx, CanHit holder) {
         String id = effect.getResource();
         // A PARTY counter has no home on the unit (the same fact `gainResource` records), so a spend has to fall back to the
         // battle-level one -- measured: [笑点] is declared `scope: PARTY` ("Punchline (笑点) is shared by the whole team", glossary 1000002) and the holder's
@@ -2299,8 +2322,9 @@ public final class TriggerInterpreter {
                     + holder.getName() + " has only " + store.value());
         }
         // Announced like every other resource move: the GAIN/SPEND_RESOURCE arms measure around their own call for
-        // the same reason, and a rule forwarding off this counter has to see the consumption.
-        fireResourceChanged(ctx.battle(), ctx, counter.counter(), -amount);
+        // the same reason, and a rule forwarding off this counter has to see the consumption. The subject is the
+        // holder whose store was charged, exactly as those arms now name theirs.
+        fireResourceChanged(ctx.battle(), ctx, holder, counter.counter(), -amount);
     }
 
     /**
@@ -4570,13 +4594,25 @@ public final class TriggerInterpreter {
      *
      * <p>From the op, not from {@code ResourceManager}: the manager owns no battle, so it cannot raise a trigger.
      *
+     * <p>The SUBJECT is the holder - the unit whose store moved - because that is what the event is about; a
+     * cross-unit grant names the grantee, not the rule's owner (see the GAIN_RESOURCE arm).
+     *
      * @param battle   the running battle
      * @param ctx      the context
      * @param resource the resource whose value moved
      * @param delta    how much it moved (positive for a gain, negative for a spend)
      */
     private static void fireResourceChanged(Battle battle, TriggerContext ctx, String resource, int delta) {
-        CanHit holder = ctx.owner();
+        fireResourceChanged(battle, ctx, ctx.owner(), resource, delta);
+    }
+
+    /**
+     * The same, naming the unit whose store moved - for the ops that may move somebody ELSE's counter.
+     *
+     * @param holder the unit the moved store belongs to (its own counter, or its copy of a PARTY one)
+     */
+    private static void fireResourceChanged(Battle battle, TriggerContext ctx, CanHit holder, String resource,
+                                            int delta) {
         if (battle != null && holder != null) {
             battle.noteChangedResource(resource);
             battle.fireTriggers(TriggerEvent.RESOURCE_CHANGED, holder, holder, 0, delta);
