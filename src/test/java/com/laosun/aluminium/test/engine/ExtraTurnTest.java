@@ -169,10 +169,15 @@ public class ExtraTurnTest {
     }
 
     /**
-     * Granting extra turns to the same person repeatedly is equivalent to one (they do not accumulate).
+     * Two grants to the same unit are TWO extra turns: they accumulate.
+     *
+     * <p>This case said the opposite until 1506 Silver Wolf LV.999's Eidolon 2 was written: 「每使【隐藏分】提高 120 点…获得 1 个
+     * 额外回合」 counts one per milestone, and one move can cross two, so a second grant that overwrote the first would
+     * pay one where the document counts two. What must NOT change is the case's other half - both are FREE turns, and
+     * the normal turn is still waiting at 250.
      */
     @Test
-    public void repeatedGrantsStillOnlyGiveOneExtraTurn() {
+    public void repeatedGrantsToTheSameUnitAccumulate() {
         Character hero = character("hero", 100);
         Queue q = new Queue(List.of(hero));
 
@@ -182,11 +187,17 @@ public class ExtraTurnTest {
         Assertions.assertTrue(q.grantExtraTurn(hero));
         Assertions.assertTrue(q.grantExtraTurn(hero), "granting it twice still returns true (he is a legal target)");
 
-        Assertions.assertEquals(hero, nextActor(q));      // extra turn
-        Assertions.assertNull(q.getExtraTurnActor());
+        Assertions.assertEquals(hero, nextActor(q));      // the first extra turn
+        Assertions.assertEquals(hero, q.getExtraTurnActor(),
+                "the second is still owed - the second grant did not replace the first");
+        Assertions.assertEquals(150, q.getElapsed(), EPS, "and neither of them moved the clock");
+
+        Assertions.assertEquals(hero, nextActor(q));      // the second extra turn
+        Assertions.assertNull(q.getExtraTurnActor(), "now there is none left");
+        Assertions.assertEquals(150, q.getElapsed(), EPS, "still no clock movement");
 
         Assertions.assertEquals(250, signalOf(q, hero).getNextActionTime(), EPS,
-                "the normal turn is still at 250 and was not displaced by the extra turn");
+                "the normal turn is still at 250 and was not displaced by either extra turn");
         Assertions.assertEquals(100, q.move(), EPS, "back to normal advancement: 150 → 250");
     }
 

@@ -80,6 +80,19 @@ public final class Queue {
     private CanHit extraTurnActor;
 
     /**
+     * How many extra turns {@link #extraTurnActor} still owes: a second grant to the SAME unit while one is already
+     * pending is another extra turn, not a replacement.
+     *
+     * <p>Reader: 1506 Silver Wolf LV.999's Eidolon 2 - 「每使【隐藏分】提高 120 点…获得 1 个额外回合」 pays one per milestone, and a
+     * single move can cross two. Note: The schedule to restore is the snapshot taken at the FIRST grant
+     * ({@link #extraTurnOriginalTime}) - it is the value the normal turn has to come back to after all of them.
+     *
+     * <p>Note: Grants to DIFFERENT units in one firing still collapse into this one slot (the later replaces the
+     * earlier). That is a separate gap with no shipped reader today; it is registered in GAPS rather than guessed at.
+     */
+    private int extraTurnsOwed;
+
+    /**
  * A unit that will act BEFORE the heap is consulted.
      *
      * <p>Why a separate slot rather than a heap entry: the heap is a schedule, and a unit with no action value cannot have one. This is
@@ -392,7 +405,13 @@ public final class Queue {
      */
     private double moveExtraTurn() {
         CanHit actor = extraTurnActor;
-        extraTurnActor = null;
+        if (extraTurnsOwed > 1) {
+            // One of them is being taken now and the actor stays pending for the rest: the next move() cuts in again.
+            extraTurnsOwed--;
+        } else {
+            extraTurnActor = null;
+            extraTurnsOwed = 0;
+        }
 
         Signal signal = null;
         for (Signal s : heap) {
@@ -475,11 +494,12 @@ public final class Queue {
      *       normal turn earlier, whereas an extra turn is a freebie and their normal turn's
      *       schedule stays untouched - so here their action time is temporarily pinned to
      *       {@code elapsed} and restored after they act.</li>
-     *   <li>Each {@code grantExtraTurn} takes effect only once; calling it repeatedly on the same
-     *       target is equivalent to one call (extra turns do not accumulate).</li>
+     *   <li>Repeated grants to the SAME unit ACCUMULATE: each call owes one more extra turn, and they are taken
+     *       back to back (reader: 1506's Eidolon 2, one per 120 hidden points). The schedule restored afterwards is
+     *       still the one snapshotted at the first grant, so the normal turn survives all of them.</li>
      *   <li>Target already dead / not in the queue to returns {@code false}, no extra turn.</li>
      *   <li>Only one person can hold an extra turn at a time; granting it to someone else
-     *       replaces the previous holder.</li>
+     *       replaces the previous holder (registered gap: no shipped reader needs more than one holder yet).</li>
      * </ul>
      *
      * <p>Typical usage (on-kill talents, e.g. Seele): call it inside {@code afterMove()} - 
@@ -503,8 +523,15 @@ public final class Queue {
         if (signal == null) {
             return false;                            // not in the queue (not yet entered / removed)
         }
+        if (extraTurnActor == actor) {
+            // Another extra turn for the one already pending, not a replacement: they still owe the first. The snapshot
+            // stays the first one's - it is the schedule the normal turn returns to after all of them.
+            extraTurnsOwed++;
+            return true;
+        }
         extraTurnActor = actor;
         extraTurnOriginalTime = signal.getNextActionTime();
+        extraTurnsOwed = 1;
         return true;
     }
 
