@@ -50,8 +50,15 @@
       ],
       "do": [
         {
+          "op": "REMOVE_STATE",
+          "buff": "军功-攻击力",
+          "kind": "own",
+          "target": "target"
+        },
+        {
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
+          "buff": "军功-攻击力",
           "scale": "self_attr:ATTACK",
           "percent": 0.24,
           "permanent": true,
