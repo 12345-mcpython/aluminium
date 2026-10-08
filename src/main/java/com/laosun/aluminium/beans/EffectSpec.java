@@ -61,6 +61,7 @@ public class EffectSpec {
         copy.weightSteps = weightSteps;
         copy.elationFrom = elationFrom;
         copy.countedLaughs = countedLaughs;
+        copy.perSteps = perSteps;
         copy.amountCap = amountCap;
         copy.ordinary = ordinary;
         copy.perStack = this.perStack;
@@ -332,6 +333,17 @@ return copy;
      */
     @com.google.gson.annotations.SerializedName("counted_laughs")
     private Double countedLaughs;
+
+    /**
+     * How many times THIS effect repeats, as {@code "<counter>:<step>"} - 「每 120 隐藏分 1 个额外回合」 needs three extra
+     * turns when the counter moves 400 in one go, and a per-event "if over 120, pay one" check silently under-pays.
+     *
+     * <p>floor(value / step), counting the counter's value at the moment the effect runs, and <b>counting only</b>: spending is
+     * a separate op, because her sentence pays TWO effects per milestone (the extra turn and the charge) while the counter may
+     * only be consumed once. Absent means once, so every shipped effect is unchanged.
+     */
+    @com.google.gson.annotations.SerializedName("per_steps")
+    private String perSteps;
 
     /**
      * Note: from 1505's Eidolon "额外获得等同于本次获得的[好活当赏]50%/100%":
