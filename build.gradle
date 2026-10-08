@@ -2,6 +2,7 @@ plugins {
     id 'java'
     id 'application'
     id 'idea'
+    id 'info.solidsoft.pitest' version '1.19.0-rc.3'
 }
 
 application {
@@ -49,6 +50,26 @@ tasks.withType(JavaExec).configureEach {
 
 tasks.withType(Test).configureEach {
     jvmArgs '-Dfile.encoding=UTF-8', '-Dstdout.encoding=UTF-8', '-Dstderr.encoding=UTF-8'
+}
+
+pitest {
+    targetClasses = ['com.laosun.*']
+
+    targetTests = ['com.laosun.*Test']
+
+    mutators = ['DEFAULTS']
+
+    outputFormats = ['HTML', 'XML']
+
+    threads = 12
+
+    junit5PluginVersion = '1.2.0'
+
+    enableDefaultIncrementalAnalysis = true
+
+    excludedClasses = ['com.laosun.Main']
+
+    jvmArgs = ['-Dfile.encoding=UTF-8', '-Dstdout.encoding=UTF-8', '-Dstderr.encoding=UTF-8']
 }
 
 idea {
