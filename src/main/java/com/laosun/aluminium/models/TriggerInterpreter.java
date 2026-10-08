@@ -37,79 +37,79 @@ import java.util.Locale;
 import java.util.Set;
 
 /**
-* Runs the effects of a {@link TriggerTable}. The only place in the trigger system that
-* touches engine state.
-*
-* <p><b>The op vocabulary is restricted on purpose</b> to capabilities the engine already has --
-* the trigger table is an interpreter over existing operations, not a second engine. An op whose
-* prerequisite phase has not landed yet is <b>rejected at load time</b> with the phase named, so a
-* content author learns immediately instead of shipping a rule that silently never works.
-*
-* <table border="1">
-*   <tr><th>op</th><th>arguments</th><th>status</th></tr>
-*   <tr><td>{@code GAIN_ENERGY}</td><td>{@code amount}</td><td>wired</td></tr>
-*   <tr><td>{@code RAISE_ENERGY_TO}</td><td>{@code percent} (a floor; no-op when already above)</td><td>wired</td></tr>
-*   <tr><td>{@code GAIN_SKILL_POINT}</td><td>{@code amount}</td><td>wired</td></tr>
-*   <tr><td>{@code RAISE_SKILL_POINT_CAP}</td><td>{@code amount} (negative takes the bonus away)</td><td>wired</td></tr>
-*   <tr><td>{@code HEAL}</td><td>{@code amount}, optional {@code target} - <b>or</b> {@code scale} +
-*       {@code percent} (a share of a Max HP)</td><td>wired</td></tr>
-*   <tr><td>{@code SHIELD}</td><td>{@code amount}, optional {@code target} - <b>or</b> {@code scale} +
-*       {@code percent}</td><td>wired</td></tr>
-*   <tr><td>{@code EXTRA_TURN}</td><td>optional {@code target}</td><td>wired</td></tr>
-*   <tr><td>{@code ADVANCE}</td><td>{@code percent}, optional {@code target}</td><td>wired (0.0-1.0 = the fraction of the target's <b>remaining</b> time to act that gets skipped)</td></tr>
-*   <tr><td>{@code MODIFY_ATTR}</td><td>{@code attribute}, {@code percent}, <b>exactly one of</b>
-*       {@code turns} / {@code permanent} / {@code until}, optional {@code target}, {@code max_stacks} (alias
-*       {@code stacks})</td>
-*       <td>wired - a negative {@code percent} becomes a {@code DEBUFF}, so a buff and a
-*           debuff on the same attribute coexist; for a ratio attribute ({@code CRIT_ATTACK} and
-*           friends) {@code percent} is the value itself (0.25 = +25 percentage points), because an
-*           additive percentage would multiply their zero base and change nothing.
-*           <b>{@code permanent: true}</b> means "until the battle ends": the modifier is never
-*           ticked, so its duration is unbounded rather than merely long. <b>{@code until}</b> is the
-*           third duration and the one the texts keep asking for - the "ends after the first attack is cast" one is not a
-*           number of turns; it ends the buff when its <b>owner</b> attacks / casts a Skill / casts an
-*           Ultimate ({@code AbstractBuff.Lifetime}), and such a buff is likewise never ticked.
-*           <b>{@code max_stacks}</b>
-*           (&gt; 1) makes re-applications <b>accumulate</b> up to that cap instead of replacing the
-*           previous one; each stack is an ordinary buff instance with its own id, so it can be
-*           removed on its own. Absent {@code max_stacks} keeps the historical replace behaviour.</td></tr>
-*   <tr><td>{@code BOOST_DAMAGE}</td><td>{@code percent}</td>
-*       <td>wired - changes <b>the instance being settled</b> when the rule fires on
-*           {@code DEALING_DAMAGE} ("the damage dealt to a target in state X is raised by Y%"). No duration, no target and no
-*           buff: the instance is the state, so nothing persists and nothing can leak into the next hit</td></tr>
-*   <tr><td>{@code DISPEL}</td><td>{@code amount}, optional {@code target}</td>
-*       <td>wired - removes up to {@code amount} <b>negative effects</b> ("remove N negative effects"), newest
-*           first. What counts as negative is {@code AbstractBuff.isDebuff()}, decided per buff class</td></tr>
-*   <tr><td>{@code MODIFY_DAMAGE_TAKEN}</td><td>{@code percent}, <b>exactly one of</b> {@code turns} /
-*       {@code permanent} / {@code until}, optional {@code target}</td>
-*       <td>wired - the sign decides the zone: {@code percent > 0} is "damage taken is raised" (vulnerability,
-*           a debuff on the defender), {@code percent < 0} is "damage taken is lowered" (reduction, a buff on the
-*           defender). Neither is an attribute, which is why {@code MODIFY_ATTR} cannot express them</td></tr>
-*   <tr><td>{@code REMOVE_STACK}</td><td>{@code attribute}, {@code amount}, optional {@code target}</td>
-*       <td>wired - takes up to {@code amount} stacks of that attribute's modifier off the target
-*           ("remove 1 stack per turn"); removing nothing is not an error, because the rule fires every turn
-*           anyway</td></tr>
-*   <tr><td>{@code APPLY_BUFF}</td><td>{@code buff}, <b>exactly one of</b> {@code turns} /
-*       {@code permanent} / {@code until}, optional {@code target}</td>
-*       <td>wired - puts the target into a <b>named state</b> ({@code StateBuff}, e.g. [协奏]/[转魄]/
-*           [shock]). What the state <i>does</i> is separate effects conditioned on {@code has_state}, which
-*           keeps "what the state is" apart from "what it changes"; plain stat buffs stay {@code MODIFY_ATTR}</td></tr>
-*   <tr><td>{@code GAIN_RESOURCE} / {@code SPEND_RESOURCE}</td><td>{@code resource}, {@code amount}</td>
-*       <td>wired</td></tr>
-*   <tr><td>{@code REDUCE_TOUGHNESS}</td><td>{@code amount}</td><td>needs an element + enemy target</td></tr>
-*   <tr><td>{@code SUMMON}</td><td><b>no arguments</b></td>
-*       <td>wired - brings the <b>rule owner's own memosprite</b> onto the field
-*           ({@code Battle.summonMemosprite}). No {@code target}: a memosprite belongs to its summoner and
-*           fights for that camp, so there is nothing to point at. Idempotent - "if already on the field, its HP is
-*           restored to its maximum" is what the texts say and the refresh is <b>not</b> modelled, so a second firing
-*           keeps the one already out rather than making a second copy</td></tr>
-*   <tr><td>{@code DAMAGE}</td><td>{@code skill}, {@code damage_param}, optional {@code target}</td>
-*       <td>wired</td></tr>
-* </table>
-*
-* <p>Effects run in the order written. Every effect credits the <b>owner</b> (the character whose
-* table fired) unless it names a {@code target}; see {@link #resolveTarget}.
-*/
+ * Runs the effects of a {@link TriggerTable}. The only place in the trigger system that
+ * touches engine state.
+ *
+ * <p><b>The op vocabulary is restricted on purpose</b> to capabilities the engine already has --
+ * the trigger table is an interpreter over existing operations, not a second engine. An op whose
+ * prerequisite phase has not landed yet is <b>rejected at load time</b> with the phase named, so a
+ * content author learns immediately instead of shipping a rule that silently never works.
+ *
+ * <table border="1">
+ *   <tr><th>op</th><th>arguments</th><th>status</th></tr>
+ *   <tr><td>{@code GAIN_ENERGY}</td><td>{@code amount}</td><td>wired</td></tr>
+ *   <tr><td>{@code RAISE_ENERGY_TO}</td><td>{@code percent} (a floor; no-op when already above)</td><td>wired</td></tr>
+ *   <tr><td>{@code GAIN_SKILL_POINT}</td><td>{@code amount}</td><td>wired</td></tr>
+ *   <tr><td>{@code RAISE_SKILL_POINT_CAP}</td><td>{@code amount} (negative takes the bonus away)</td><td>wired</td></tr>
+ *   <tr><td>{@code HEAL}</td><td>{@code amount}, optional {@code target} - <b>or</b> {@code scale} +
+ *       {@code percent} (a share of a Max HP)</td><td>wired</td></tr>
+ *   <tr><td>{@code SHIELD}</td><td>{@code amount}, optional {@code target} - <b>or</b> {@code scale} +
+ *       {@code percent}</td><td>wired</td></tr>
+ *   <tr><td>{@code EXTRA_TURN}</td><td>optional {@code target}</td><td>wired</td></tr>
+ *   <tr><td>{@code ADVANCE}</td><td>{@code percent}, optional {@code target}</td><td>wired (0.0-1.0 = the fraction of the target's <b>remaining</b> time to act that gets skipped)</td></tr>
+ *   <tr><td>{@code MODIFY_ATTR}</td><td>{@code attribute}, {@code percent}, <b>exactly one of</b>
+ *       {@code turns} / {@code permanent} / {@code until}, optional {@code target}, {@code max_stacks} (alias
+ *       {@code stacks})</td>
+ *       <td>wired - a negative {@code percent} becomes a {@code DEBUFF}, so a buff and a
+ *           debuff on the same attribute coexist; for a ratio attribute ({@code CRIT_ATTACK} and
+ *           friends) {@code percent} is the value itself (0.25 = +25 percentage points), because an
+ *           additive percentage would multiply their zero base and change nothing.
+ *           <b>{@code permanent: true}</b> means "until the battle ends": the modifier is never
+ *           ticked, so its duration is unbounded rather than merely long. <b>{@code until}</b> is the
+ *           third duration and the one the texts keep asking for - the "ends after the first attack is cast" one is not a
+ *           number of turns; it ends the buff when its <b>owner</b> attacks / casts a Skill / casts an
+ *           Ultimate ({@code AbstractBuff.Lifetime}), and such a buff is likewise never ticked.
+ *           <b>{@code max_stacks}</b>
+ *           (&gt; 1) makes re-applications <b>accumulate</b> up to that cap instead of replacing the
+ *           previous one; each stack is an ordinary buff instance with its own id, so it can be
+ *           removed on its own. Absent {@code max_stacks} keeps the historical replace behaviour.</td></tr>
+ *   <tr><td>{@code BOOST_DAMAGE}</td><td>{@code percent}</td>
+ *       <td>wired - changes <b>the instance being settled</b> when the rule fires on
+ *           {@code DEALING_DAMAGE} ("the damage dealt to a target in state X is raised by Y%"). No duration, no target and no
+ *           buff: the instance is the state, so nothing persists and nothing can leak into the next hit</td></tr>
+ *   <tr><td>{@code DISPEL}</td><td>{@code amount}, optional {@code target}</td>
+ *       <td>wired - removes up to {@code amount} <b>negative effects</b> ("remove N negative effects"), newest
+ *           first. What counts as negative is {@code AbstractBuff.isDebuff()}, decided per buff class</td></tr>
+ *   <tr><td>{@code MODIFY_DAMAGE_TAKEN}</td><td>{@code percent}, <b>exactly one of</b> {@code turns} /
+ *       {@code permanent} / {@code until}, optional {@code target}</td>
+ *       <td>wired - the sign decides the zone: {@code percent > 0} is "damage taken is raised" (vulnerability,
+ *           a debuff on the defender), {@code percent < 0} is "damage taken is lowered" (reduction, a buff on the
+ *           defender). Neither is an attribute, which is why {@code MODIFY_ATTR} cannot express them</td></tr>
+ *   <tr><td>{@code REMOVE_STACK}</td><td>{@code attribute}, {@code amount}, optional {@code target}</td>
+ *       <td>wired - takes up to {@code amount} stacks of that attribute's modifier off the target
+ *           ("remove 1 stack per turn"); removing nothing is not an error, because the rule fires every turn
+ *           anyway</td></tr>
+ *   <tr><td>{@code APPLY_BUFF}</td><td>{@code buff}, <b>exactly one of</b> {@code turns} /
+ *       {@code permanent} / {@code until}, optional {@code target}</td>
+ *       <td>wired - puts the target into a <b>named state</b> ({@code StateBuff}, e.g. [协奏]/[转魄]/
+ *           [shock]). What the state <i>does</i> is separate effects conditioned on {@code has_state}, which
+ *           keeps "what the state is" apart from "what it changes"; plain stat buffs stay {@code MODIFY_ATTR}</td></tr>
+ *   <tr><td>{@code GAIN_RESOURCE} / {@code SPEND_RESOURCE}</td><td>{@code resource}, {@code amount}</td>
+ *       <td>wired</td></tr>
+ *   <tr><td>{@code REDUCE_TOUGHNESS}</td><td>{@code amount}</td><td>needs an element + enemy target</td></tr>
+ *   <tr><td>{@code SUMMON}</td><td><b>no arguments</b></td>
+ *       <td>wired - brings the <b>rule owner's own memosprite</b> onto the field
+ *           ({@code Battle.summonMemosprite}). No {@code target}: a memosprite belongs to its summoner and
+ *           fights for that camp, so there is nothing to point at. Idempotent - "if already on the field, its HP is
+ *           restored to its maximum" is what the texts say and the refresh is <b>not</b> modelled, so a second firing
+ *           keeps the one already out rather than making a second copy</td></tr>
+ *   <tr><td>{@code DAMAGE}</td><td>{@code skill}, {@code damage_param}, optional {@code target}</td>
+ *       <td>wired</td></tr>
+ * </table>
+ *
+ * <p>Effects run in the order written. Every effect credits the <b>owner</b> (the character whose
+ * table fired) unless it names a {@code target}; see {@link #resolveTarget}.
+ */
 public final class TriggerInterpreter {
 
     /**
@@ -2365,17 +2365,21 @@ public final class TriggerInterpreter {
     }
 
     /**
-    * The same resolution, for a selector that is not the effect's own {@code target}
-    * ({@code cast_target},) - one switch, so the two spellings cannot drift apart.
-    * @param selector the selector token (already lower-cased and trimmed)
-    * "to Hyacine (风堇)...": a selector that names a character by cid.
-    */
+     * The prefix of a selector that names an ally outright by cid:
+     * {@code "target": "ally_cid:1006"}.
+     *
+     * <p>Unlike the closed set of role selectors, this is a parameterised family: the part after the colon is the
+     * character's cid, read as written. A cid that is not in the party resolves to nobody — the plural path answers
+     * an empty list, while the single-target path reports it through {@code require}.
+     */
     static final String ALLY_CID_PREFIX = "ally_cid:";
 
     /**
-     * A second selector FAMILY, admitted by prefix (reader: 1141518 "raise the ATK of all 'Erudition' path characters"): every ALLY on the named path.
+     * A second selector FAMILY, admitted by prefix (reader: 1141518 "raise the ATK of all 'Erudition' path characters"):
+     * every ALLY on the named path.
      *
-     * <p>The name may be the path's Chinese name ("智识") or the enum's own ("ERUDITION"), because the selector is lowercased on the way in and neither spelling is the other's.
+     * <p>The name may be the path's Chinese name ("智识") or the enum's own ("ERUDITION"), because the selector is
+     * lowercased on the way in and neither spelling is the other's.
      */
     static final String ALLIES_OF_PATH_PREFIX = "allies_of_path:";
 
@@ -2394,19 +2398,19 @@ public final class TriggerInterpreter {
 
 
     /**
-    The party member whose cid is this one, or {@code null} when nobody matches. 
-    The party member whose cid is this one, or {@code null} when nobody matches. 
-    * The path a selector names, or {@code null} if it names none. Both spellings are accepted because the selector arrives lowercased: the Chinese name through
-    * {@link Path#fromNameOrNull}, the enum's own through {@code valueOf} on the upper-cased text.
-    * The allies of a Path, minus the units the selector excludes: {@code allies_of_path_except:欢愉:self,target}.
-    *
-    * <p>Shared by both resolution paths (one unit and a set), so a clause that names one of these cannot behave
-    * differently from the same clause used as a group target.
-    *
-    * @throws IllegalStateException when the path is unknown or the selector names nobody to exclude - both are
-    *                               SPELLING mistakes, and this vocabulary is closed on purpose (see
-    *                               {@link #requireSelectorSpelling})
-    */
+     * The party member whose cid is this one, or {@code null} when nobody matches.
+     * The party member whose cid is this one, or {@code null} when nobody matches.
+     * The path a selector names, or {@code null} if it names none. Both spellings are accepted because the selector arrives lowercased: the Chinese name through
+     * {@link Path#fromNameOrNull}, the enum's own through {@code valueOf} on the upper-cased text.
+     * The allies of a Path, minus the units the selector excludes: {@code allies_of_path_except:欢愉:self,target}.
+     *
+     * <p>Shared by both resolution paths (one unit and a set), so a clause that names one of these cannot behave
+     * differently from the same clause used as a group target.
+     *
+     * @throws IllegalStateException when the path is unknown or the selector names nobody to exclude - both are
+     *                               SPELLING mistakes, and this vocabulary is closed on purpose (see
+     *                               {@link #requireSelectorSpelling})
+     */
     private static List<CanHit> alliesOfPathExcept(String selector, TriggerContext ctx) {
         String rest = selector.substring(ALLIES_OF_PATH_EXCEPT_PREFIX.length()).trim();
         int split = rest.lastIndexOf(':');
@@ -2479,6 +2483,13 @@ public final class TriggerInterpreter {
         return null;
     }
 
+    /**
+     * The same resolution, for a selector that is not the effect's own {@code target}
+     * ({@code cast_target},) - one switch, so the two spellings cannot drift apart.
+     *
+     * @param selector the selector token (already lower-cased and trimmed)
+     *                 "to Hyacine (风堇)...": a selector that names a character by cid.
+     */
     private static CanHit resolveSelector(String selector, EffectSpec effect, TriggerContext ctx) {
         if (selector.startsWith(ALLY_CID_PREFIX)) {
             int cid = Integer.parseInt(selector.substring(ALLY_CID_PREFIX.length()).trim());
@@ -2666,60 +2677,66 @@ public final class TriggerInterpreter {
             CanHit named = allyWithCid(ctx, cid);
             return named == null ? List.of() : List.of(named);
         }
-        if (TARGET_LOWEST_HP_ALLY.equals(selector)) {
-            if (battle == null) {
-                throw new IllegalStateException(
-                        "Effect targets \"" + TARGET_LOWEST_HP_ALLY
-                                + "\" but no battle was supplied to read the party's health from");
-            }
-            CanHit lowest = null;
-            double lowestShare = Double.MAX_VALUE;
-            for (CanHit ally : battle.allies) {
-                if (ally == null || ally.isDeath() || !(ally.getMaxHp() > 0)) {
-                    continue;                       // a corpse, or a unit with no health bar, has no share
+        switch (selector) {
+            case TARGET_LOWEST_HP_ALLY -> {
+                if (battle == null) {
+                    throw new IllegalStateException(
+                            "Effect targets \"" + TARGET_LOWEST_HP_ALLY
+                                    + "\" but no battle was supplied to read the party's health from");
                 }
-                double share = ally.getCurrentHp() / ally.getMaxHp();
-                // Strictly less than: a tie keeps the EARLIER unit, so the answer is the party order's, not luck.
-                if (share < lowestShare) {
-                    lowestShare = share;
-                    lowest = ally;
+                CanHit lowest = null;
+                double lowestShare = Double.MAX_VALUE;
+                for (CanHit ally : battle.allies) {
+                    if (ally == null || ally.isDeath() || !(ally.getMaxHp() > 0)) {
+                        continue;                       // a corpse, or a unit with no health bar, has no share
+                    }
+                    double share = ally.getCurrentHp() / ally.getMaxHp();
+                    // Strictly less than: a tie keeps the EARLIER unit, so the answer is the party order's, not luck.
+                    if (share < lowestShare) {
+                        lowestShare = share;
+                        lowest = ally;
+                    }
                 }
+                return lowest == null ? List.of() : List.of(lowest);
             }
-            return lowest == null ? List.of() : List.of(lowest);
-        }
-        if (TARGET_ALL_ENEMIES.equals(selector)) {
-            if (battle == null) {
-                throw new IllegalStateException(
-                        "Effect targets \"" + TARGET_ALL_ENEMIES
-                                + "\" but no battle was supplied to take the opposing camp from");
+            case TARGET_ALL_ENEMIES -> {
+                if (battle == null) {
+                    throw new IllegalStateException(
+                            "Effect targets \"" + TARGET_ALL_ENEMIES
+                                    + "\" but no battle was supplied to take the opposing camp from");
+                }
+                // `getOpponents` is the one predicate for "the other side" (it also answers correctly for an enemy
+                // owner), and it does not filter the dead -- the op does, because only the op knows whether a dead
+                // unit is something it can act on.
+                return List.copyOf(battle.getOpponents(ctx.owner()));
+                // `getOpponents` is the one predicate for "the other side" (it also answers correctly for an enemy
+                // owner), and it does not filter the dead -- the op does, because only the op knows whether a dead
+                // unit is something it can act on.
             }
-            // `getOpponents` is the one predicate for "the other side" (it also answers correctly for an enemy
-            // owner), and it does not filter the dead -- the op does, because only the op knows whether a dead
-            // unit is something it can act on.
-            return List.copyOf(battle.getOpponents(ctx.owner()));
-        }
-        if (TARGET_AND_SUMMON.equals(selector)) {
-            if (battle == null) {
-                throw new IllegalStateException(
-                        "Effect targets \"" + TARGET_AND_SUMMON
-                                + "\" but no battle was supplied to look for that unit's summon");
+            case TARGET_AND_SUMMON -> {
+                if (battle == null) {
+                    throw new IllegalStateException(
+                            "Effect targets \"" + TARGET_AND_SUMMON
+                                    + "\" but no battle was supplied to look for that unit's summon");
+                }
+                CanHit chosen = require(ctx.target(), TARGET_AND_SUMMON, ctx);
+                List<CanHit> pair = new ArrayList<>();
+                pair.add(chosen);
+                // `summonsOf` is the one predicate for "the summons this unit owns" (it already drops the dead ones),
+                // so "and their summon" means the same thing here as it does for the `summon` selector.
+                pair.addAll(battle.summonsOf(chosen));
+                return List.copyOf(pair);
             }
-            CanHit chosen = require(ctx.target(), TARGET_AND_SUMMON, ctx);
-            List<CanHit> pair = new ArrayList<>();
-            pair.add(chosen);
-            // `summonsOf` is the one predicate for "the summons this unit owns" (it already drops the dead ones),
-            // so "and their summon" means the same thing here as it does for the `summon` selector.
-            pair.addAll(battle.summonsOf(chosen));
-            return List.copyOf(pair);
-        }
-        // "randomly 1 of ... our other targets whose current energy percentage is below 50%" (light cone 21021): this selector may
-        // legitimately have NO candidate (the wearer is excluded, and everyone else may be full), and then the
-        // clause does nothing. Note: Same shape as lowest_hp_ally just above -- empty list, not an error.
-        // Note: Only THIS name is allowed to be empty: every other selector still goes through require(), so a
-        // misspelling keeps failing loudly.
-        if ("random_ally_below_half_energy".equals(selector)) {
-            CanHit one = randomAllyBelowHalfEnergy(ctx);
-            return one == null ? List.of() : List.of(one);
+
+            // "randomly 1 of ... our other targets whose current energy percentage is below 50%" (light cone 21021): this selector may
+            // legitimately have NO candidate (the wearer is excluded, and everyone else may be full), and then the
+            // clause does nothing. Note: Same shape as lowest_hp_ally just above -- empty list, not an error.
+            // Note: Only THIS name is allowed to be empty: every other selector still goes through require(), so a
+            // misspelling keeps failing loudly.
+            case "random_ally_below_half_energy" -> {
+                CanHit one = randomAllyBelowHalfEnergy(ctx);
+                return one == null ? List.of() : List.of(one);
+            }
         }
         return List.of(resolveTarget(effect, ctx));
     }
@@ -2903,7 +2920,7 @@ public final class TriggerInterpreter {
         // The event carries the unit the commanded cast was AIMED at, not the caster (reader: 1415's
         // "after the surprise attack ends, grant Cerydra (刻律德菈) 1 point of charge"). The actor is still the actor; the target slot now answers "who was it cast on",
         // which is what that sentence needs -- and 1412's own subscriber states no target, so nothing shipped moves.
-        CanHit aimed = victims == null || victims.isEmpty() ? actor : victims.getFirst();
+        CanHit aimed = victims.isEmpty() ? actor : victims.getFirst();
         battle.fireTriggers(TriggerEvent.INSERTED_CAST_END, actor, aimed, 0, 0);
     }
 
@@ -3043,42 +3060,14 @@ public final class TriggerInterpreter {
     }
 
     /**
-    * Settles a {@code MODIFY_ATTR} effect: "the target's {@code attribute} changes by
-    * {@code percent} for {@code turns} turns" -- the generic stat buff / debuff.
-    * <p><b>Why this op matters more than its size suggests.</b> 2 of the 93 characters have a
-    * buff / enhance talent, and before this op the only way to express one was a new Java buff
-    * class per character. With it, "ATK +33% for 2 turns" is data, and the engine gained no
-    * character-specific knowledge at all: it forwards (attribute, value, turns) to
-    * {@link StatModifierBuff}.
-    * <p><b>The sign decides buff or debuff.</b> {@code percent >= 0} is applied as a
-    * {@code BUFF}, a negative one as a {@code DEBUFF}. The distinction is not cosmetic: it decides
-    * which half of the attribute the modifier lands in, so "ATK +50%" and "ATK -30%" can be on the
-    * same character at once and be removed independently instead of overwriting each other.
-    * <p>{@code percent} is a decimal ({@code 0.5} = +50%).
-    * <p><b>What the decimal means depends on the attribute kind</b>, and the difference is not
-    * cosmetic either:
-    * <ul>
-    *   <li>For a <b>base</b> attribute ({@code HEALTH / ATTACK / DEFENCE / SPEED}) it is an
-    *       {@code ADD_PERCENT} modifier, so it sums with the character's other add-percent bonuses
-    *       (traces, relics, light cones) rather than multiplying on top of them -- see
-    *       {@link DoubleValue} for the formula.</li>
-    *   <li>For a <b>ratio</b> attribute ({@code CRIT_CHANCE}, {@code CRIT_ATTACK}, the damage
-    *       boosts, {@code BREAKING_EFFECT}, {@code ENERGY_REGENERATION_RATE}, ...) it is the value
-    *       <b>itself</b>: {@code 0.25} on {@code CRIT_ATTACK} means +25 percentage points. This is
-    *       the engine's existing convention for those attributes (see {@code RelicSuit.appendTo}:
-    *       "any other {@code isPercent} attribute is a percentage-point value") and the reason is
-    *       that their whole value is a flat modifier -- the builder writes them with
-    *       {@code AttributeBuilder.addPercentPoint}, so their base is literally 0 and an
-    *       {@code ADD_PERCENT} modifier would multiply zero: the rule would fire, add a modifier and
-    *       change nothing. A silent no-op is the one outcome this op must not have.</li>
-    * </ul>
-    * @param effect the effect ({@code attribute} / {@code percent} / {@code turns} or
-    *               {@code permanent}, optional {@code max_stacks}, {@code target})
-    * @param ctx    the context
-    The multiplier `per_stack` names, read on the target: a debuff count, a DoT count, or a counter. 
-    The multiplier `per_stack` names, read on the target: a debuff count, a DoT count, or a counter. 
-    * Whether `per_stack` names something a supplier can read later, without an event context.
-    */
+     * Whether {@code per_stack} names something a supplier can read later, without an event context.
+     *
+     * <p>Some {@code per_stack} forms count something about the <b>current hit</b>
+     * ({@code target_debuff_count} / {@code target_dot_count} / {@code target_weakness_count} /
+     * {@code shielded_count}), so they can only be read while an event is being delivered. Everything
+     * else a {@code per_stack} may name (a bare counter name, or {@code self_stacks:<NAME>}) can be
+     * read from the carrier alone, and a live aura built on it needs no event.
+     */
     private static boolean ctxFreeCounter(EffectSpec effect) {
         return effect.getPerStack() != null && !effect.getPerStack().isBlank()
                 && !COUNT_FORMS.contains(effect.getPerStack().trim());
@@ -3122,6 +3111,46 @@ public final class TriggerInterpreter {
         };
     }
 
+    /**
+     * Settles a {@code MODIFY_ATTR} effect: "the target's {@code attribute} changes by
+     * {@code percent} for {@code turns} turns" -- the generic stat buff / debuff.
+     *
+     * <p><b>Why this op matters more than its size suggests.</b> 2 of the 93 characters have a
+     * buff / enhance talent, and before this op the only way to express one was a new Java buff
+     * class per character. With it, "ATK +33% for 2 turns" is data, and the engine gained no
+     * character-specific knowledge at all: it forwards (attribute, value, turns) to
+     * {@link StatModifierBuff}.
+     *
+     * <p><b>The sign decides buff or debuff.</b> {@code percent >= 0} is applied as a
+     * {@code BUFF}, a negative one as a {@code DEBUFF}. The distinction is not cosmetic: it decides
+     * which half of the attribute the modifier lands in, so "ATK +50%" and "ATK -30%" can be on the
+     * same character at once and be removed independently instead of overwriting each other.
+     *
+     * <p>{@code percent} is a decimal ({@code 0.5} = +50%).
+     *
+     * <p><b>What the decimal means depends on the attribute kind</b>, and the difference is not
+     * cosmetic either:
+     * <ul>
+     *   <li>For a <b>base</b> attribute ({@code HEALTH / ATTACK / DEFENCE / SPEED}) it is an
+     *       {@code ADD_PERCENT} modifier, so it sums with the character's other add-percent bonuses
+     *       (traces, relics, light cones) rather than multiplying on top of them -- see
+     *       {@link DoubleValue} for the formula.</li>
+     *   <li>For a <b>ratio</b> attribute ({@code CRIT_CHANCE}, {@code CRIT_ATTACK}, the damage
+     *       boosts, {@code BREAKING_EFFECT}, {@code ENERGY_REGENERATION_RATE}, ...) it is the value
+     *       <b>itself</b>: {@code 0.25} on {@code CRIT_ATTACK} means +25 percentage points. This is
+     *       the engine's existing convention for those attributes (see {@code RelicSuit.appendTo}:
+     *       "any other {@code isPercent} attribute is a percentage-point value") and the reason is
+     *       that their whole value is a flat modifier -- the builder writes them with
+     *       {@code AttributeBuilder.addPercentPoint}, so their base is literally 0 and an
+     *       {@code ADD_PERCENT} modifier would multiply zero: the rule would fire, add a modifier and
+     *       change nothing. A silent no-op is the one outcome this op must not have.</li>
+     * </ul>
+     *
+     * @param battle the running battle
+     * @param effect the effect ({@code attribute} / {@code percent} / {@code turns} or
+     *               {@code permanent}, optional {@code max_stacks}, {@code target})
+     * @param ctx    the context
+     */
     private static void modifyAttr(Battle battle, EffectSpec effect, TriggerContext ctx) {
         AttributeType attribute = AttributeType.fromString(effect.getAttribute());
         // A derived magnitude - "the raise is equal to X% + Y% of <somebody's attribute>". It is computed once,
@@ -3273,28 +3302,28 @@ public final class TriggerInterpreter {
     }
 
     /**
-    * The magnitude of a derived {@code MODIFY_ATTR}: {@code percent  x  <the rule owner's attribute> + amount}.
-    * <p>The first user is The Dahlia (大丽花)'s trace "又一场葬礼": "on entering battle, raise the other characters' Break Effect, the raise being equal to #1% of The Dahlia (大丽花)'s
-    * Break Effect + #3%" - a percentage of her own Break Effect plus a flat part, granted to the rest of the party.
-    * <p>Note: <b>Read at fire time, then frozen.</b> The value is taken from the owner's <b>resolved</b> attribute (so it
-    * includes whatever buffs are on them at that moment) and stored in an ordinary modifier, so a later change to
-    * the owner's attribute does not retroactively rewrite it. That is the engine's existing snapshot convention
-    * (§24.5: a memosprite's panel is derived once, at summon time) and it is also what "the raise is equal to" means in
-    * the documents - a number that was computed, then held for the duration.
-    * <p>Note: A missing attribute slot is a loud failure rather than {@code 0}: the alternative is a buff that grants
-    * nothing, which is a wrong number with no symptom.
-    * The magnitude of a counter-scaled modifier: {@code percent  x  how many layers this unit carries}.
-    *
-    * <p>Spelled with the condition DSL's own two prefixes -- {@code self_stacks:<NAME>} reads the rule owner's counter
-    * and {@code target_stacks:<NAME>} the event target's -- so "I have N layers" and "the number is N layers' worth"
-    * are the same vocabulary. Read <b>at fire time</b> and then held, like every other derived magnitude; a rule that
-    * wants the value to track a changing count must therefore be re-asserted when the count changes (the same-named
-    * modifier replaces, so the newest application wins).
-    *
-    * <p>Note: Returns {@code null} for any other scale, so the caller falls through to the attribute/HP families.
-    * Note: A name nothing ever marks reads 0, which is a real answer ("no layers") and not an error; the loader's own
-    * declared-counter check is what keeps a typo from looking like a zero.
-    */
+     * The magnitude of a derived {@code MODIFY_ATTR}: {@code percent  x  <the rule owner's attribute> + amount}.
+     * <p>The first user is The Dahlia (大丽花)'s trace "又一场葬礼": "on entering battle, raise the other characters' Break Effect, the raise being equal to #1% of The Dahlia (大丽花)'s
+     * Break Effect + #3%" - a percentage of her own Break Effect plus a flat part, granted to the rest of the party.
+     * <p>Note: <b>Read at fire time, then frozen.</b> The value is taken from the owner's <b>resolved</b> attribute (so it
+     * includes whatever buffs are on them at that moment) and stored in an ordinary modifier, so a later change to
+     * the owner's attribute does not retroactively rewrite it. That is the engine's existing snapshot convention
+     * (§24.5: a memosprite's panel is derived once, at summon time) and it is also what "the raise is equal to" means in
+     * the documents - a number that was computed, then held for the duration.
+     * <p>Note: A missing attribute slot is a loud failure rather than {@code 0}: the alternative is a buff that grants
+     * nothing, which is a wrong number with no symptom.
+     * The magnitude of a counter-scaled modifier: {@code percent  x  how many layers this unit carries}.
+     *
+     * <p>Spelled with the condition DSL's own two prefixes -- {@code self_stacks:<NAME>} reads the rule owner's counter
+     * and {@code target_stacks:<NAME>} the event target's -- so "I have N layers" and "the number is N layers' worth"
+     * are the same vocabulary. Read <b>at fire time</b> and then held, like every other derived magnitude; a rule that
+     * wants the value to track a changing count must therefore be re-asserted when the count changes (the same-named
+     * modifier replaces, so the newest application wins).
+     *
+     * <p>Note: Returns {@code null} for any other scale, so the caller falls through to the attribute/HP families.
+     * Note: A name nothing ever marks reads 0, which is a real answer ("no layers") and not an error; the loader's own
+     * declared-counter check is what keeps a typo from looking like a zero.
+     */
     private static Double stackScale(String key, double percent, TriggerContext ctx) {
         if (key == null) {
             return null;
@@ -3324,14 +3353,14 @@ public final class TriggerInterpreter {
 
 
     /**
-    * The value of one parameter of the skill that produced the event, at the caster's CURRENT level.
-    * <p>Note: Shared by the {@code cast_skill_param:<index>} scale and by {@code percent_from_cast_param}, so the two cannot drift: the damage
-    * path reads the same row the same way (`multiplierOf` -- `skill.getData().getSkills()`, `attacker.skillLevel(skill)`, `level - 1`).
-    * A parameter of one of the RULE OWNER's OWN skills, at that skill's current level.
-    *
-    * <p>The sibling of {@link #castParamValue}, and the only difference is which skill: that one reads the skill that PRODUCED the event, this one reads
-    * the slot the scale names. Same row lookup (`getData().getSkills()` at `skillLevel`, then the index), so the two cannot drift.
-    */
+     * The value of one parameter of the skill that produced the event, at the caster's CURRENT level.
+     * <p>Note: Shared by the {@code cast_skill_param:<index>} scale and by {@code percent_from_cast_param}, so the two cannot drift: the damage
+     * path reads the same row the same way (`multiplierOf` -- `skill.getData().getSkills()`, `attacker.skillLevel(skill)`, `level - 1`).
+     * A parameter of one of the RULE OWNER's OWN skills, at that skill's current level.
+     *
+     * <p>The sibling of {@link #castParamValue}, and the only difference is which skill: that one reads the skill that PRODUCED the event, this one reads
+     * the slot the scale names. Same row lookup (`getData().getSkills()` at `skillLevel`, then the index), so the two cannot drift.
+     */
     private static double ownerSkillParamValue(EffectSpec effect, TriggerContext ctx) {
         return ownerSkillParamValue(effect, ctx,
                 effect.getScale().trim().substring(TriggerTable.SKILL_PARAM_PREFIX.length()));
@@ -3404,12 +3433,12 @@ public final class TriggerInterpreter {
     }
 
     /**
-    The share a magnitude is multiplied by: the stated `percent`, or the cast skill's own parameter. 
-    The share a magnitude is multiplied by: the stated `percent`, or the cast skill's own parameter. 
-    * The amendment a `MODIFY_RULE{effect_percent}` filed for the rule that is firing.
-    *
-    * <p>It is added to a share the effect states by SPELLING -- a literal `percent` is raised by {@code amendedEffect} instead, so a rule is never raised twice.
-    */
+     * The share a magnitude is multiplied by: the stated `percent`, or the cast skill's own parameter.
+     * The share a magnitude is multiplied by: the stated `percent`, or the cast skill's own parameter.
+     * The amendment a `MODIFY_RULE{effect_percent}` filed for the rule that is firing.
+     *
+     * <p>It is added to a share the effect states by SPELLING -- a literal `percent` is raised by {@code amendedEffect} instead, so a rule is never raised twice.
+     */
     private static double amendmentDelta(EffectSpec effect, TriggerContext ctx) {
         if (effect.getPercent() != null) {
             return 0;
@@ -3456,7 +3485,7 @@ public final class TriggerInterpreter {
         // the party's live pool (the same distinction the damage factor makes). Reader: 1506 Silver Wolf LV.999's Eidolon
         // 4, 「【崩坏级伤害演示】造成的欢愉伤害额外计入 5 倍的【笑点】」. Before the owner requirement for the reason the
         // cast-skill share gives: the count belongs to the battle, so a context without a rule owner can still read it.
-        if (COUNTED_LAUGHS.equals(effect.getScale().trim())) {
+        if (effect.getScale() != null && COUNTED_LAUGHS.equals(effect.getScale().trim())) {
             double points = ctx.battle() == null ? 0 : ctx.battle().countedLaughPoints();
             return effect.getPercent() * points + (effect.getAmount() == null ? 0 : effect.getAmount());
         }
@@ -3631,6 +3660,9 @@ public final class TriggerInterpreter {
             return effect.getPercent() * owner.getMaxEnergy() + (effect.getAmount() == null ? 0 : effect.getAmount());
         }
         AttributeType source = scaleAttribute(effect, effect.getOp(), null);
+        if (source == null) {
+            throw new IllegalStateException("MODIFY_ATTR derives its value from null source");
+        }
         DoubleValue value = owner.getAttribute(source);
         if (value == null) {
             throw new IllegalStateException(
@@ -4314,32 +4346,32 @@ public final class TriggerInterpreter {
 
 
     /**
-    * {@code REMOVE_STATE}: takes the named state off every resolved target - the "only the newest one holds it"
-    * half of Sunday (星期日)'s [蒙福者].
-    * <p>Note: Removing a state that is not there is <b>not</b> an error: an "only the latest target" rule runs on every
-    * cast, and most of those casts find the state on somebody (or nobody) whose removal is simply nothing to do.
-    * The op that <i>applies</i> a state to a unit that does not exist is loud ({@code "target": "summon"}); this one
-    * has no such unit to miss.
-    * {@code TAUNT}: puts the engine's {@link TauntBuff} on every resolved target - "make the target enter the taunt state, lasting 1 turn".
-    * <p>The buff is a pure marker, and the constraint it carries is a <b>hard one</b> implemented at target
-    * selection (`TargetSelector`): as long as it is attached to a living unit, single-target attacks and the centre
-    * of a blast attack can only pick that unit. Note: That is the "taunt" the corpus asks for (Yunli (云璃)'s ultimate puts it
-    * on every enemy, Mortenax Blade (千冶-刃)'s skill on one) and it is deliberately NOT the same thing as "raise the chance of being attacked by the enemy"
-    * (March 7th (三月七) / Gepard (杰帕德) / Lynx (玲可)), which is a soft weight - that sentence carries <b>no number</b> in any document, so it is
-    * registered as a data gap rather than guessed at here.
-    * {@code APPLY_BUFF}'s roll, when the rule states one: "with a 100% base chance, make each single enemy target enter the [通解] state" (1106 佩拉).
-    *
-    * <p>It goes through the <b>same</b> entry point {@code APPLY_DOT} and {@code APPLY_CONTROL} use, so a rolled state meets
-    * effect resistance exactly as they do - Note: which is the reason this exists at all: applying the state unconditionally
-    * would drop "base chance", and that is a different mechanic rather than a smaller number (100% base chance is still
-    * resistible).
-    *
-    * <p>Note: A plain {@link com.laosun.aluminium.models.buff.StateBuff} reports {@code isDebuff() == false} and carries no
-    * {@code debuffClass}, so it meets <b>no class resistance</b> - correct for a state no document calls control or DOT,
-    * and the honest limit of what this spelling can say.
-    *
-    * @return {@code true} when the state was attached (or when the rule stated no chance at all)
-    */
+     * {@code REMOVE_STATE}: takes the named state off every resolved target - the "only the newest one holds it"
+     * half of Sunday (星期日)'s [蒙福者].
+     * <p>Note: Removing a state that is not there is <b>not</b> an error: an "only the latest target" rule runs on every
+     * cast, and most of those casts find the state on somebody (or nobody) whose removal is simply nothing to do.
+     * The op that <i>applies</i> a state to a unit that does not exist is loud ({@code "target": "summon"}); this one
+     * has no such unit to miss.
+     * {@code TAUNT}: puts the engine's {@link TauntBuff} on every resolved target - "make the target enter the taunt state, lasting 1 turn".
+     * <p>The buff is a pure marker, and the constraint it carries is a <b>hard one</b> implemented at target
+     * selection (`TargetSelector`): as long as it is attached to a living unit, single-target attacks and the centre
+     * of a blast attack can only pick that unit. Note: That is the "taunt" the corpus asks for (Yunli (云璃)'s ultimate puts it
+     * on every enemy, Mortenax Blade (千冶-刃)'s skill on one) and it is deliberately NOT the same thing as "raise the chance of being attacked by the enemy"
+     * (March 7th (三月七) / Gepard (杰帕德) / Lynx (玲可)), which is a soft weight - that sentence carries <b>no number</b> in any document, so it is
+     * registered as a data gap rather than guessed at here.
+     * {@code APPLY_BUFF}'s roll, when the rule states one: "with a 100% base chance, make each single enemy target enter the [通解] state" (1106 佩拉).
+     *
+     * <p>It goes through the <b>same</b> entry point {@code APPLY_DOT} and {@code APPLY_CONTROL} use, so a rolled state meets
+     * effect resistance exactly as they do - Note: which is the reason this exists at all: applying the state unconditionally
+     * would drop "base chance", and that is a different mechanic rather than a smaller number (100% base chance is still
+     * resistible).
+     *
+     * <p>Note: A plain {@link com.laosun.aluminium.models.buff.StateBuff} reports {@code isDebuff() == false} and carries no
+     * {@code debuffClass}, so it meets <b>no class resistance</b> - correct for a state no document calls control or DOT,
+     * and the honest limit of what this spelling can say.
+     *
+     * @return {@code true} when the state was attached (or when the rule stated no chance at all)
+     */
     private static boolean attachRolled(Battle battle, CanHit target, AbstractBuff buff, EffectSpec effect,
                                         TriggerContext ctx) {
         if (effect.getBaseChance() == null) {
@@ -4847,11 +4879,14 @@ public final class TriggerInterpreter {
                     break;                      // "2 times" is a threshold, not an invitation to keep counting
                 }
                 boolean permanent = unticked(effect);
-                AbstractBuff stack = new com.laosun.aluminium.models.buff.StackBuff(
-                        name, permanent ? 1 : effect.getTurns(), permanent, cap);
-                stack = withLifetime(stack, effect);
-                stack = withTickOwner(stack, effect, ctx);
-                stack = withSource(stack, ctx);
+                AbstractBuff stack = withSource(
+                        withTickOwner(
+                                withLifetime(
+                                        new com.laosun.aluminium.models.buff.StackBuff(
+                                                name, permanent ? 1 : effect.getTurns(), permanent, cap),
+                                        effect),
+                                effect, ctx),
+                        ctx);
                 target.getBuffManager().addBuff(stack);
             }
         }
@@ -4999,11 +5034,11 @@ public final class TriggerInterpreter {
             // "the Ultimate's duration is additionally increased by 1 turn": the rule's own effect durations, raised where they are read
             // (see amendedEffect). Note: Not an extra rule with a longer `turns`: the two modifiers of one skill are the
             // same kind, so a second one would REPLACE the first rather than stack.
-            owner.amendRuleEffectTurns(target, (int) Math.round(effect.getEffectTurns()));
+            owner.amendRuleEffectTurns(target, effect.getEffectTurns());
         } else if (effect.getEffectMaxStacks() != null) {
             // "raise the talent's effect max stack count by 2": a CAP, not a value -- and it must be in place before any stack is
             // attached, which it is: an amendment is filed at battle start and the stacks come from later firings.
-            owner.amendRuleEffectMaxStacks(target, (int) Math.round(effect.getEffectMaxStacks()));
+            owner.amendRuleEffectMaxStacks(target, effect.getEffectMaxStacks());
         } else if (effect.getEffectPercent() != null) {
             // "additionally raise the talent's damage boost effect by 10%": 30% -> 40%, the same rule, raised in place.
             owner.amendRuleEffectPercent(target, effect.getEffectPercent());
@@ -5991,34 +6026,36 @@ public final class TriggerInterpreter {
                         : com.laosun.aluminium.enums.SkillCategory.fromString(effect.getCastCategory().trim()));
     }
 
-    /**
-    * Reads the damage multiplier out of the skill's per-level parameter row.
-    * <p>The <b>row</b> is {@link EffectSpec#getDamageLevel()} when the rule states one, and the skill's own
-    * level otherwise; the <b>column</b> is {@link EffectSpec#getDamageParam()}. Both are stated by the author
-    * where the document's figure depends on them - see {@code damage_level}'s javadoc for why the engine's
-    * default (level 1) is not the same thing as "the number in the text".
-    * @param skill  the skill
-    * @param effect the effect naming the column (and optionally the row)
-    * @return the multiplier for that row
-    * @throws IllegalStateException when the row or the column falls outside the data
-    * The element of a rule-driven damage instance: the rule's own {@code element} when it states one, otherwise the
-    * skill's.
-    * <p>Note: The rule's own spelling had to exist for Robin (知更鸟)'s [协奏] rider: the number comes from her ultimate's row,
-    * but her ultimate is a Support skill with <b>no element</b>, while the text says the damage is Physical. Reading
-    * the skill's element there would have produced an element-less instance - and one that silently takes no element
-    * bonus or resistance.
-    * The reserved word the damage ops accept in their {@code element} slot: "the element of the unit that
-    * PRODUCED this instance", rather than a fixed word.
-    *
-    * <p>It exists for Pearl (1503): her Elation skill arms every ally to deal "Elation DMG of their own Type"
-    * on their next attack, so one rule has to name an element that differs per attacker. A rider that belongs
-    * to a single unit (1505, 1513) can simply name its element, which is why this is new.
-    *
-    * <p>Only the damage ops accept it. {@code APPLY_DOT} / {@code APPLY_CONTROL} share {@code requireElement}
-    * and refuse it: "the attacker's element" has no meaning for a DOT a rule applies on its own behalf.
-    */
     static final String ATTACKER_ELEMENT = "attacker";
 
+    /**
+     * Reads the damage multiplier out of the skill's per-level parameter row.
+     * <p>The <b>row</b> is {@link EffectSpec#getDamageLevel()} when the rule states one, and the skill's own
+     * level otherwise; the <b>column</b> is {@link EffectSpec#getDamageParam()}. Both are stated by the author
+     * where the document's figure depends on them - see {@code damage_level}'s javadoc for why the engine's
+     * default (level 1) is not the same thing as "the number in the text".
+     * <p>
+     * The element of a rule-driven damage instance: the rule's own {@code element} when it states one, otherwise the
+     * skill's.
+     * <p>Note: The rule's own spelling had to exist for Robin (知更鸟)'s [协奏] rider: the number comes from her ultimate's row,
+     * but her ultimate is a Support skill with <b>no element</b>, while the text says the damage is Physical. Reading
+     * the skill's element there would have produced an element-less instance - and one that silently takes no element
+     * bonus or resistance.
+     * The reserved word the damage ops accept in their {@code element} slot: "the element of the unit that
+     * PRODUCED this instance", rather than a fixed word.
+     *
+     * <p>It exists for Pearl (1503): her Elation skill arms every ally to deal "Elation DMG of their own Type"
+     * on their next attack, so one rule has to name an element that differs per attacker. A rider that belongs
+     * to a single unit (1505, 1513) can simply name its element, which is why this is new.
+     *
+     * <p>Only the damage ops accept it. {@code APPLY_DOT} / {@code APPLY_CONTROL} share {@code requireElement}
+     * and refuse it: "the attacker's element" has no meaning for a DOT a rule applies on its own behalf.
+     *
+     * @param skill  the skill
+     * @param effect the effect naming the column (and optionally the row)
+     * @return the multiplier for that row
+     * @throws IllegalStateException when the row or the column falls outside the data
+     */
     private static DamageElement elementOf(EffectSpec effect, Skill skill, CanHit attacker) {
         if (effect.getElement() != null && !effect.getElement().isBlank()) {
             String named = effect.getElement().trim();
@@ -6077,12 +6114,12 @@ public final class TriggerInterpreter {
     }
 
     /**
-    * Validates the duration of an {@code APPLY_CONTROL} (required and positive).
-    * <p>Required rather than defaulted: "enter the frozen state" with no turn count would be a <b>permanent</b> lock - 
-    * a wrong mechanic that reads like a working rule, which is the one thing this vocabulary refuses. The
-    * documents always state it ("lasting 1 turn").
-    * The delta of an EXTEND_BUFF: non-zero and signed (the game does `SetModifierValue{Add, LifeTime}` on a named modifier).
-    */
+     * Validates the duration of an {@code APPLY_CONTROL} (required and positive).
+     * <p>Required rather than defaulted: "enter the frozen state" with no turn count would be a <b>permanent</b> lock -
+     * a wrong mechanic that reads like a working rule, which is the one thing this vocabulary refuses. The
+     * documents always state it ("lasting 1 turn").
+     * The delta of an EXTEND_BUFF: non-zero and signed (the game does `SetModifierValue{Add, LifeTime}` on a named modifier).
+     */
     private static void requireSignedTurns(EffectSpec effect, String op, TriggerSpec spec) {
         Integer turns = effect.getTurns();
         if (turns == null || turns == 0) {
@@ -6128,20 +6165,20 @@ public final class TriggerInterpreter {
     }
 
     /**
-    * Refuses the magnitude family ({@code amount} / {@code scale} / {@code percent} / {@code attribute} /
-    * {@code buff}) on an op that has no use for any of them.
-    * <p>Same reasoning as {@code requireNoTarget} and {@code requireNoStackArguments}: a field the interpreter
-    * never reads is a rule that says one thing and does another. The message names the field, because
-    * "which of my six fields was ignored" is otherwise a guessing game.
-    * Refuses the fields that would be a <b>second reading</b> of a skill's row, on the ops that cast a named skill
-    * through the engine's own {@code SkillExecutor} path ({@code CAST_SKILL}).
-    *
-    * <p>Why this is a refusal rather than "just ignore it": the op reads the multiplier from the row's first column,
-    * the neighbouring column for a blast, the element, the base attribute and the damage type from the skill's own
-    * data. An author who writes {@code damage_param} is asking for a different reading -- and the honest answer is
-    * no, because a second reading is how this op came to be broken in three ways at once (see {@code castSkill}).
-    * A field the engine silently ignores is the failure mode this project ranks worst.
-    */
+     * Refuses the magnitude family ({@code amount} / {@code scale} / {@code percent} / {@code attribute} /
+     * {@code buff}) on an op that has no use for any of them.
+     * <p>Same reasoning as {@code requireNoTarget} and {@code requireNoStackArguments}: a field the interpreter
+     * never reads is a rule that says one thing and does another. The message names the field, because
+     * "which of my six fields was ignored" is otherwise a guessing game.
+     * Refuses the fields that would be a <b>second reading</b> of a skill's row, on the ops that cast a named skill
+     * through the engine's own {@code SkillExecutor} path ({@code CAST_SKILL}).
+     *
+     * <p>Why this is a refusal rather than "just ignore it": the op reads the multiplier from the row's first column,
+     * the neighbouring column for a blast, the element, the base attribute and the damage type from the skill's own
+     * data. An author who writes {@code damage_param} is asking for a different reading -- and the honest answer is
+     * no, because a second reading is how this op came to be broken in three ways at once (see {@code castSkill}).
+     * A field the engine silently ignores is the failure mode this project ranks worst.
+     */
     private static void requireNoRowArguments(EffectSpec effect, String op, TriggerSpec spec) {
         if (effect.getDamageParam() != null || effect.getDamageLevel() != null || effect.getAttribute() != null
                 || effect.getElement() != null || effect.getAmount() != null || effect.getScale() != null
@@ -6151,16 +6188,6 @@ public final class TriggerInterpreter {
                             + "\"damage_param\" / \"damage_level\" / \"attribute\" / \"element\" / \"amount\" / "
                             + "\"scale\" / \"percent\": those would be a second reading of numbers the engine "
                             + "already reads once, and the engine's own cast path would ignore them without a word "
-                            + "(source: " + spec.getSource() + ")");
-        }
-    }
-
-    private static void requireNoMagnitudeArguments(EffectSpec effect, String op, TriggerSpec spec) {
-        if (effect.getAmount() != null || effect.getScale() != null || effect.getPercent() != null
-                || effect.getAttribute() != null || effect.getBuff() != null) {
-            throw new IllegalArgumentException(
-                    "Op " + op + " takes a control state, its turns and an optional base chance; it has no "
-                            + "\"amount\" / \"scale\" / \"percent\" / \"attribute\" / \"buff\" "
                             + "(source: " + spec.getSource() + ")");
         }
     }
@@ -6202,16 +6229,16 @@ public final class TriggerInterpreter {
     }
 
     /**
-    * Validates the element of a per-turn damage: one of {@code DamageElement}'s spellings.
-    * <p>An unknown name would otherwise become a DOT that applies to nothing - {@code DamageElement.fromString}
-    * answers {@code null} for "Unknown" and for typos alike, so the check has to be here.
-    * Validates an {@code element} slot against {@link DamageElement}.
-    *
-    * <p>{@link #ATTACKER_ELEMENT} is accepted only when the caller says so: the damage ops pass
-    * {@code true} because they always have an attacker to read, while {@code APPLY_DOT} /
-    * {@code APPLY_CONTROL} pass {@code false} -- their instance is the rule's own, so "the attacker's element"
-    * is a sentence with no subject.
-    */
+     * Validates the element of a per-turn damage: one of {@code DamageElement}'s spellings.
+     * <p>An unknown name would otherwise become a DOT that applies to nothing - {@code DamageElement.fromString}
+     * answers {@code null} for "Unknown" and for typos alike, so the check has to be here.
+     * Validates an {@code element} slot against {@link DamageElement}.
+     *
+     * <p>{@link #ATTACKER_ELEMENT} is accepted only when the caller says so: the damage ops pass
+     * {@code true} because they always have an attacker to read, while {@code APPLY_DOT} /
+     * {@code APPLY_CONTROL} pass {@code false} -- their instance is the rule's own, so "the attacker's element"
+     * is a sentence with no subject.
+     */
     private static void requireElement(EffectSpec effect, String op, TriggerSpec spec, boolean allowAttackerElement) {
         if (allowAttackerElement && effect.getElement() != null
                 && ATTACKER_ELEMENT.equalsIgnoreCase(effect.getElement().trim())) {
