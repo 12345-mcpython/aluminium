@@ -60,6 +60,7 @@ public class EffectSpec {
         copy.weight = weight;
         copy.weightSteps = weightSteps;
         copy.elationFrom = elationFrom;
+        copy.countedLaughs = countedLaughs;
         copy.amountCap = amountCap;
         copy.ordinary = ordinary;
         copy.perStack = this.perStack;
@@ -318,6 +319,19 @@ return copy;
      */
     @com.google.gson.annotations.SerializedName("elation_from")
     private String elationFrom;
+
+    /**
+     * The laugh count THIS instance is folded with, when the text states one: 「固定计入 N 点【好活当赏】」.
+     *
+     * <p>⭐ Without it the Elation factor comes from the battle's snapshot of 【好活当赏】 (the party pool frozen when the
+     * state arrived). With it the instance ignores the pool entirely and uses this number — which is what the sentence says:
+     * 「本次造成的欢愉伤害**固定计入 99 点**【好活当赏】」.
+     *
+     * <p>Readers (12 hits across 10 files, scanned after stripping HTML — see GAPS): 1506's technique box (99), 1513's cast
+     * (20), 8009/8010's triggered Elation skill (20). 1502's turn-level variant is a different surface and not this field.
+     */
+    @com.google.gson.annotations.SerializedName("counted_laughs")
+    private Double countedLaughs;
 
     /**
      * Note: from 1505's Eidolon "额外获得等同于本次获得的[好活当赏]50%/100%":
