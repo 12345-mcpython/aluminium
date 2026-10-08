@@ -45,7 +45,9 @@ public class MozeTest {
     public void theUltimateFiresTheTalentsFollowUp() {
         double fired = ultFollowUp();
         Character moze = CharacterFactory.create(MOZE, LEVEL);
-        double expected = moze.getAttribute(AttributeType.ATTACK).get() * 1.6;
+        // ⚠ Times the toughness damage reduction: the target is unbroken, so 10% of the instance is removed on the way in.
+        double expected = moze.getAttribute(AttributeType.ATTACK).get() * 1.6
+                * (1 - com.laosun.aluminium.Constant.TOUGHNESS_DAMAGE_REDUCTION);
 
         Assertions.assertTrue(fired > 0, "the follow-up must land when the event is fired");
         Assertions.assertEquals(expected, fired, expected * 0.15,

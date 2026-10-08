@@ -243,6 +243,19 @@ public final class Constant {
      */
     public static final double WEAKNESS_MIN = 0.2;
     /**
+     * The toughness damage reduction: an enemy whose toughness bar is not empty takes 10% less damage.
+     *
+     * <p>The author's ruling (2026-10-07): 「敌对物种最常见的减伤是**韧性条不为0时10%的减伤**。而该减伤**当且仅当**敌人处于
+     * 弱点击破状态时被移除。注意**击破伤害一定会受该减伤影响**。」 It is a <b>member of the reduction zone</b>, not a zone
+     * of its own: 「减伤区是各乘区中唯一一个叠加乘算的，即 Π(1-减伤)，目前游戏中的减伤的叠加上限为 0.99」 - so it multiplies
+     * with every other reduction and shares the 0.01 floor.
+     *
+     * <p>⚠ This is that {@code HSR.md} §6.4 lists inside the Elation formula while §2.2's zone overview omits it: it applies
+     * to ALL damage. (The game itself never writes 「韧性减伤」 - the full TextMap has no such string - so the term is that
+     * document's own wording.) Before this constant, the engine was ~11% high on every hit against an unbroken enemy.
+     */
+    public static final double TOUGHNESS_DAMAGE_REDUCTION = 0.1;
+    /**
      * Lower bound of the raw resistance value (-100%).
      */
     public static final double RESIST_MIN = -1.0;

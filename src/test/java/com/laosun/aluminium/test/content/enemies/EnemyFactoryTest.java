@@ -66,7 +66,10 @@ public class EnemyFactoryTest {
         double settled = battle.applyDamage(iceEdge, iceHit);
 
         // defence zone = 1000 / (def + 1000) (attacker Lv80); resistance zone = 1 - 0.2 (Ice Edge's ice RES 0.2)
-        Assertions.assertEquals(1000.0 * 1000.0 / (defence + 1000.0) * 0.8, settled, EPS);
+        // ⚠ And the toughness damage reduction: Ice Edge HAS a toughness bar and is not broken, so 10% of every hit is
+        // removed inside the reduction zone (the author's ruling; see Constant.TOUGHNESS_DAMAGE_REDUCTION).
+        Assertions.assertEquals(1000.0 * 1000.0 / (defence + 1000.0) * 0.8
+                * (1 - com.laosun.aluminium.Constant.TOUGHNESS_DAMAGE_REDUCTION), settled, EPS);
     }
 
     @Test

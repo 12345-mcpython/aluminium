@@ -56,8 +56,12 @@ public class SuperBreakTest {
         double brokenWithoutRule = damageWith(true, null);
 
         Assertions.assertTrue(brokenWithoutRule > 0, "precondition: the attack lands");
-        Assertions.assertEquals(brokenWithoutRule, plain, 1e-6,
-                "the same rule against a HEALTHY target adds nothing: the condition is 「处于弱点击破状态」 (in the Weakness Break state)");
+        // ⚠ The healthy target takes the toughness damage reduction and the broken one does not, so the healthy reading is
+        // the broken one DISCOUNTED by it - the rule itself still adds nothing (the author's ruling; the conversion needs
+        // 「处于弱点击破状态」).
+        Assertions.assertEquals(brokenWithoutRule * (1 - com.laosun.aluminium.Constant.TOUGHNESS_DAMAGE_REDUCTION),
+                plain, 1e-6,
+                "the same rule against a HEALTHY target adds nothing beyond the toughness reduction that target takes: ");
         Assertions.assertTrue(converted > brokenWithoutRule,
                 "against a broken target the same attack is followed by the converted super-break instance");
     }

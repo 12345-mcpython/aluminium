@@ -99,7 +99,10 @@ public class ThisIsMeTest {
         double extra = after - before;
         // Measured, not assumed: the reduction uses the DEFENDER's level (the enemy is level 90 here), and the shape is
         // damage * (1 - def / (def + 200 + 10 * defenderLevel)) -- my first guess used the ATTACKER's level and was 1.5% off.
-        double expected = 0.6 * defence * (1 - defence / (defence + 200 + 10 * 90));
+        // ⚠ And the extra instance takes the toughness damage reduction too: the enemy is unbroken, so the reduction zone
+        // multiplies it by 0.9 as well (the author's ruling; the 2% band below still covers the level wobble above).
+        double expected = 0.6 * defence * (1 - defence / (defence + 200 + 10 * 90))
+                * (1 - com.laosun.aluminium.Constant.TOUGHNESS_DAMAGE_REDUCTION);
         System.out.println("[21030] defence=" + defence + " extra=" + extra + " expected=" + expected);
         Assertions.assertEquals(expected, extra, expected * 0.02,
                 "60% of the wearer's defence, through the defence zone");

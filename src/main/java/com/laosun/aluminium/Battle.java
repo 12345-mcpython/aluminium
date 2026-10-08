@@ -3308,6 +3308,21 @@ public class Battle {
                 defender.getAttribute(AttributeType.DEFENCE).get(),
                 attacker.getAttribute(AttributeType.DEFENCE_IGNORE).get());
 
+        // 3.5) Toughness damage reduction: an enemy whose toughness bar is not empty takes 10% less damage.
+        //      The author's ruling (2026-10-07): 「敌对物种最常见的减伤是韧性条不为0时10%的减伤。而该减伤当且仅当敌人处于弱点击破
+        //      状态时被移除。注意击破伤害一定会受该减伤影响。」 It is a MEMBER of the reduction zone - not a zone of its own -
+        //      so it multiplies with every other reduction and shares the 0.01 floor; that is also why `HSR.md` §6.4 lists
+        //      it inside the Elation formula while §2.2's overview omits it, and why the engine was ~11% high on every hit
+        //      against an unbroken enemy before this line.
+        //      ⚠ The BREAK instance is the one exception in TIME, not in kind: `reduceToughness` marks the enemy broken
+        //      BEFORE it settles the break damage, so asking "is it broken" there would drop the reduction the ruling says
+        //      break damage always takes. Super break is NOT excepted: it is settled against an already-broken enemy, where
+        //      the reduction is gone. And an enemy with no toughness bar at all never gets it ("韧性条不为0").
+        if (defender instanceof Enemy toughnessHolder && toughnessHolder.hasToughnessBar()
+                && (!toughnessHolder.isBroken() || damage.getType() == DamageType.BREAK)) {
+            damage.addReduction(Constant.TOUGHNESS_DAMAGE_REDUCTION);
+        }
+
         // 4) Resistance zone: victim resistance - attacker penetration, then clamp (HSR.md §2.5, negative
         //    resistance is fully effective)
         //    Note: weakness break does not change resistance (§2.5)
