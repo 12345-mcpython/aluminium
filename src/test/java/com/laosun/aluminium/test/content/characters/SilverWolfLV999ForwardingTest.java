@@ -80,11 +80,12 @@ public class SilverWolfLV999ForwardingTest {
                         "p1506_e2_milestones_while_in_godmode"),
                 rules.stream().map(rule -> rule.id()).collect(java.util.stream.Collectors.toSet()),
                 "the forwarding rule, the talent conversion and the Eidolon 2 ledger, and nothing else");
-        // ⚠ ORDER is load-bearing too, and this is the cheapest place to notice it: the ledger's own first effect moves
-        // 里程碑配额, which overwrites the battle's `lastChangedResource`, so a rule placed AFTER it that reads
-        // `resource_changed:隐藏分` would never fire. The ledger therefore has to stay last on this event.
+        // ⚠ The ORDER is pinned as a snapshot of this event's table, so a new rule arrives here first. Note: it is NOT
+        // a constraint any more - the ledger's first effect moves 里程碑配额, and that used to overwrite the battle's
+        // `lastChangedResource` for the rules after it (the ledger therefore had to be last). That is fixed:
+        // `TriggerInterpreter.fireResourceChanged` scopes the name to its own firing, pinned by ResourceChangeScopeTest.
         Assertions.assertEquals("p1506_e2_milestones_while_in_godmode",
-                rules.getLast().id(), "the ledger moves another counter, so it goes last on this event");
+                rules.getLast().id(), "the census reads this event's order; it is the last of the three today");
         var forwarding = rules.stream().filter(rule -> rule.id().equals("p1506_laughs_to_hidden")).findFirst()
                 .orElseThrow();
         var effect = forwarding.effects().getFirst();

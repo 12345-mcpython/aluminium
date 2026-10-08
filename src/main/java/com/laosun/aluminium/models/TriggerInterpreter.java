@@ -4613,9 +4613,20 @@ public final class TriggerInterpreter {
      */
     private static void fireResourceChanged(Battle battle, TriggerContext ctx, CanHit holder, String resource,
                                             int delta) {
-        if (battle != null && holder != null) {
-            battle.noteChangedResource(resource);
+        if (battle == null || holder == null) {
+            return;
+        }
+        // ⚠ The fact is scoped to THIS firing: save and restore, exactly as `Battle.fireStateEnded` does with
+        // `lastStateEndedName`. Without it, a rule delivered for this event that moves ANOTHER resource (ordinary -
+        // 1506's forwarding clause grants 隐藏分 for a 笑点 move) overwrites the name, and the rules that come AFTER it
+        // in the same firing read the wrong one: their `resource_changed:<this one>` condition is false and they
+        // silently do not fire. The outer event's rules are about the outer event's resource.
+        String previous = battle.lastChangedResource();
+        battle.noteChangedResource(resource);
+        try {
             battle.fireTriggers(TriggerEvent.RESOURCE_CHANGED, holder, holder, 0, delta);
+        } finally {
+            battle.noteChangedResource(previous);
         }
     }
 
