@@ -31,7 +31,7 @@ import java.util.Random;
  * boundary and survives a turn in which nothing was attacked; written as {@code permanent: true} it never
  * goes away. Both are wrong numbers with nothing to see, which is exactly what this project refuses - so the
  * rule names the <b>event</b> that ends it, and the vocabulary is closed
- * ({@code next_attack} / {@code next_skill} / {@code next_ultimate}).
+ * ({@code next_attack} / {@code next_skill} / {@code next_ultimate} / {@code next_elation_skill}).
  *
  * <p><b>What the cases guard.</b>
  * <ol>
@@ -41,7 +41,7 @@ import java.util.Random;
  *   <li>it is <b>not</b> ticked away: a lifetime is not a turn count, so any number of turn boundaries must
  *       leave it alone. (This is why an event-bound buff is created with the "never ticked" flag, which is
  *       what {@code permanent} means mechanically - see {@code TriggerInterpreter.unticked}.)</li>
- *   <li>the three spellings mean three different events;</li>
+ *   <li>the spellings mean different events, including the Elation skill's own category;</li>
  *   <li>the shipped user of it - relic set 305 - grants its 60% CRIT Rate and loses it to the first attack.</li>
  * </ol>
  */
@@ -152,6 +152,29 @@ public class BuffLifetimeTest {
         Assertions.assertEquals(0.5, critRateBonus(ultOwner), EPS, "a Skill is not an Ultimate");
         attack(ultBattle, ultOwner, 3);
         Assertions.assertEquals(0, critRateBonus(ultOwner), EPS, "the Ultimate is");
+    }
+
+    /**
+     * {@code next_elation_skill}: a Skill does not consume it, an <b>Elation</b> skill does.
+     *
+     * <p>Reader: 1513 (砂金•戏浪)'s talent - 「并在施放后使自身下一次在阿哈时刻中施放的欢愉技强化为【All in！敬炽烈一夏】」, a slot swap
+     * that has to survive until the next Elation cast and be consumed by it. {@code next_skill} cannot say it (it ends on
+     * a 战技) and {@code cast_end} is too early (it would end in the cast that granted it).
+     *
+     * <p>The category the lifetime reads is a fact about the SKILL's data ({@code ElationDamage}), so the cast is driven
+     * with that data ({@code DefaultSkill(1513, 20, 1)} - her Elation skill's row) while the caster stays this class's own
+     * unit: nothing in the lifetime reads who cast it.
+     */
+    @Test
+    public void anElationCastIsItsOwnLifetime() {
+        Battle battle = battleWithBuff("next_elation_skill");
+        Character owner = battle.characters.getFirst();
+
+        attack(battle, owner, 2);                                 // a Skill
+        Assertions.assertEquals(0.5, critRateBonus(owner), EPS, "a Skill is not an Elation skill");
+
+        battle.castImmediate(new DefaultSkill(1513, 20, 1), owner, List.of(monster()));
+        Assertions.assertEquals(0, critRateBonus(owner), EPS, "the Elation cast is");
     }
 
     // ==================================================================

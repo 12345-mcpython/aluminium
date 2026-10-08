@@ -3980,6 +3980,7 @@ public final class TriggerInterpreter {
                 case "next_attack" -> AbstractBuff.Lifetime.NEXT_ATTACK;
                 case "next_skill" -> AbstractBuff.Lifetime.NEXT_SKILL;
                 case "next_ultimate" -> AbstractBuff.Lifetime.NEXT_ULTIMATE;
+                case "next_elation_skill" -> AbstractBuff.Lifetime.NEXT_ELATION_SKILL;
                 // The cast being delivered right now: raised inside the cast window, dropped when its events are done.
                 case "cast_end" -> AbstractBuff.Lifetime.CAST_END;
                 case "turn_end" -> AbstractBuff.Lifetime.TURN_END;
@@ -5850,7 +5851,7 @@ public final class TriggerInterpreter {
      * quietly never expires.
      */
     private static final Set<String> LIFETIMES = Set.of("next_attack", "next_skill", "cast_end", "next_ultimate", "turn_end",
-            "next_turn_start");
+            "next_turn_start", "next_elation_skill");
 
     /**
      * Validates the optional stack cap of a {@code MODIFY_ATTR} effect <b>at load time</b>.

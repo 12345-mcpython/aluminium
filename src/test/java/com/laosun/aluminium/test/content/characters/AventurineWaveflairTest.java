@@ -22,7 +22,15 @@ public class AventurineWaveflairTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** Note: One Fervor per TEAMMATE's attack, and the document's cap of 30 enforced by exceeding it. */
+    /**
+     * Note: One Fervor per TEAMMATE's attack, and the document's cap of 30 enforced by exceeding it.
+     *
+     * <p>⚠ The cap is driven by ONE gain, and the reason is measured: 「【热意】达到10点时…立即施放…」 means each crossing casts
+     * and spends ALL of the counter, so forty-one single-point attacks never accumulate - they cycle (41 reads 1). While
+     * the milestone clause was still an approximation (it fired on TURN_START and spent nothing) this case could reach
+     * the cap by repetition; now the ceiling is what the DECLARATION does to one big gain, which is a different claim
+     * and is asserted as such. The cycling itself is pinned in {@code AventurineWaveflairMilestoneTest}.
+     */
     @Test
     public void teammateAttacksFeedFervorUpToThirty() {
         Character aventurine = CharacterFactory.create(AVENTURINE, LEVEL);
@@ -43,8 +51,12 @@ public class AventurineWaveflairTest {
         for (int i = 0; i < 40; i++) {
             battle.fireTriggers(TriggerEvent.ALLY_ATTACK, ally, enemy, 0, 0);
         }
+        Assertions.assertEquals(1, fervorOf(aventurine),
+                "forty-one single points cycle: every crossing at ten casts and spends ALL of it, leaving one");
+
+        aventurine.getResources().gain("热意", 41);
         Assertions.assertEquals(30, fervorOf(aventurine),
-                "「【热意】上限为30点」 (the ceiling of [热意] is 30 points) -- forty-one firings must still read thirty");
+                "「【热意】上限为30点」 is the DECLARATION's clamp on one gain");
     }
 
     /** Note: The Ultimate: 8 Fervor and 30% more SPEED for the document's four turns. */

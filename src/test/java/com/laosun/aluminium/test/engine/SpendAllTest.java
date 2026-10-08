@@ -14,7 +14,14 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Random;
 
-/** Which route fails for "每消耗1点[热意]额外 1 次 21%". */
+/**
+ * 「每消耗1点[热意]额外 1 次 21%」 - the points a cast is about to spend.
+ *
+ * <p>Note: This class used to ask WHICH ROUTE serves the clause, and the answer it recorded was the hand-fired
+ * {@code RESOURCE_CHANGED} one. That route is gone: the clause now lives on the cast itself (its own sentence is
+ * "施放时会消耗所有【热意】，每消耗1点…"), where the counter is read at dispatch time - the value that cast is about to
+ * spend. Both cases here therefore drive the real cast, at two amounts.
+ */
 public class SpendAllTest {
     private static final int OWNER = 1513;
     private static final int ALLY = 1404;
@@ -28,15 +35,16 @@ public class SpendAllTest {
         Assertions.assertTrue(lossByCast(7) > 0, "and for seven points too");
     }
 
-    /** The hand-fired route: the rule DOES scale with the amount (exact multiple still open). */
+    /** The cast route scales with the amount: seven points add far more than one. */
     @Test
     public void theRuleScalesWithTheAmount() {
-        double one = lossByHand(1);
-        double seven = lossByHand(7);
-        Assertions.assertTrue(one > 0, "precondition: the hand-fired instance lands (" + one + ")");
-        // Note: Asserted as a DIRECTION, not a multiple: measured 38.808 for one point and 329.868 for seven -- scaling
-        // with the amount (which is what `times_from` buys), but not a clean x, and the reason is not yet known. The
-        // exact multiple is registered rather than asserted, so this judge never claims more than it measured.
+        double one = lossByCast(1);
+        double seven = lossByCast(7);
+        // Note: Asserted as a DIRECTION, not a multiple: this judge once measured 38.808 for one point and 329.868 for
+        // seven through the hand-fired route, and the exact multiple is still not a clean x through this one either
+        // (the per-point instants settle through the same zones as the cast around them). Registered, not asserted.
+        System.out.println("[spendAll] one point " + one + " ; seven points " + seven);
+        Assertions.assertTrue(one > 0, "precondition: the cast with one point lands (" + one + ")");
         Assertions.assertTrue(seven > 5 * one,
                 "seven points must add far more than one (" + one + " -> " + seven + ")");
     }
@@ -70,17 +78,4 @@ public class SpendAllTest {
         return before - enemy.getCurrentHp();
     }
 
-    private static double lossByHand(int start) {
-        Battle battle = primed(start);
-        Character owner = (Character) battle.allies.get(0);
-        Enemy enemy = (Enemy) battle.enemies.get(0);
-        // Note: The priming itself fires RESOURCE_CHANGED once per point GAINED, and the rule answers those too -- so the
-        // baseline is taken AFTER priming and only the hand-fired change is measured.
-        battle.processRequests();
-        double baseline = enemy.getCurrentHp();
-        battle.noteChangedResource(RES);
-        battle.fireTriggers(TriggerEvent.RESOURCE_CHANGED, owner, enemy, 0, -start);
-        battle.processRequests();
-        return baseline - enemy.getCurrentHp();
-    }
 }
