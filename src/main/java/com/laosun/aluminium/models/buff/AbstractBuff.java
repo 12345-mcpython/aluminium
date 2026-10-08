@@ -134,6 +134,14 @@ public abstract class AbstractBuff implements Buff, AttackEvent, SkillCastEvent 
          */
         NEXT_ULTIMATE,
         /**
+         * Ends after its owner casts an <b>Elation skill</b> - the skill the Aha Moment's participants cast.
+         *
+         * <p>Reader: 1513's talent 「并在施放后使自身下一次在阿哈时刻中施放的欢愉技强化为【All in！敬炽烈一夏】」 - a slot swap that
+         * has to survive until the NEXT Elation cast and be consumed by it. {@code NEXT_SKILL} cannot say it (it ends on
+         * a 战技) and {@code CAST_END} is too early (it would end in the cast that granted it).
+         */
+        NEXT_ELATION_SKILL,
+        /**
          * Ends when the cast being delivered right now finishes (cones 20001 / 21000).
          *
          * <p>"施放战技和终结技时，治疗量提高 12%" is neither a turn nor permanent: upstream scopes it to the cast
@@ -218,7 +226,8 @@ public abstract class AbstractBuff implements Buff, AttackEvent, SkillCastEvent 
                 ? null
                 : skill.getData().getCategory();
         if ((lifetimes.contains(Lifetime.NEXT_SKILL) && category == SkillCategory.BPSKILL)
-                || (lifetimes.contains(Lifetime.NEXT_ULTIMATE) && category == SkillCategory.ULTRA)) {
+                || (lifetimes.contains(Lifetime.NEXT_ULTIMATE) && category == SkillCategory.ULTRA)
+                || (lifetimes.contains(Lifetime.NEXT_ELATION_SKILL) && category == SkillCategory.ELATION_DAMAGE)) {
             endNow();
         }
     }
