@@ -89,6 +89,10 @@ import java.util.Set;
  *       <td>wired - takes up to {@code amount} stacks of that attribute's modifier off the target
  *           ("remove 1 stack per turn"); removing nothing is not an error, because the rule fires every turn
  *           anyway</td></tr>
+ *   <tr><td>{@code SPEND_STEPS}</td><td>{@code steps} ({@code "<counter>:<step>"})</td>
+ *       <td>wired - consumes {@code floor(value / step) * step} of that counter: the other half of
+ *           {@code per_steps}, which counts the milestones an effect repeats without spending them. The two are
+ *           separate because one rule may pay TWO effects per milestone while the counter is charged once</td></tr>
  *   <tr><td>{@code APPLY_BUFF}</td><td>{@code buff}, <b>exactly one of</b> {@code turns} /
  *       {@code permanent} / {@code until}, optional {@code target}</td>
  *       <td>wired - puts the target into a <b>named state</b> ({@code StateBuff}, e.g. [协奏]/[转魄]/
@@ -153,7 +157,12 @@ public final class TriggerInterpreter {
             // (reader: 1503 Pearl (真珠)'s talent): a share of an incoming hit paid for out of ANOTHER unit's counter.
             "ABSORB_DAMAGE",
             "REMOVE_STATE", "TAUNT", "APPLY_CONTROL", "APPLY_DOT", "EXTEND_BUFF", "RESIST_DEBUFF",
-            "MODIFY_RULE", "ADD_DAMAGE", "RAISE_SKILL_LEVEL", "START_COUNTDOWN", "ADD_STACK", "APPLY_REGEN", "BOOST_TOUGHNESS", "SUPER_BREAK", "REMOVE_BUFF", "REPLACE_SKILL", "TICK_DOT", "CONSUME_HP");
+            "MODIFY_RULE", "ADD_DAMAGE", "RAISE_SKILL_LEVEL", "START_COUNTDOWN", "ADD_STACK", "APPLY_REGEN", "BOOST_TOUGHNESS", "SUPER_BREAK", "REMOVE_BUFF", "REPLACE_SKILL", "TICK_DOT", "CONSUME_HP",
+            // "每使【隐藏分】提高 120 点（含初始隐藏分），获得 1 个额外回合并恢复 1 次强化普攻的可施放次数" (reader: 1506
+            // Silver Wolf LV.999's Eidolon 2): the milestones a `per_steps` effect paid for, consumed ONCE. Counting and
+            // spending have to be two effects, because the sentence pays two effects per milestone while the counter may
+            // be charged only once.
+            "SPEND_STEPS");
 
     /**
      * Ops that are declared in the roadmap but whose prerequisite phase has not landed. Listing
@@ -374,6 +383,25 @@ public final class TriggerInterpreter {
                     "Op " + op + " states \"damage_type\", but only " + DAMAGE_TYPE_READERS
                             + " read it; an op that ignores it would silently apply to every damage type "
                             + "(source: " + spec.getSource() + ")");
+        }
+        // `per_steps` and `SPEND_STEPS` are the two halves of one primitive - "every N points of a counter" as a repeat
+        // COUNT and as a SPEND - so both spellings are checked here, at LOAD time, for every op that may state them.
+        if (effect.getPerSteps() != null && !effect.getPerSteps().isBlank()) {
+            requireCounterSteps(effect.getPerSteps().trim(), "per_steps", spec);
+            if (Boolean.TRUE.equals(effect.getAmountFromPrevious())) {
+                // `previousCredited` is what the PREVIOUS effect booked, and a repeat overwrites it once per iteration:
+                // this effect's own read would see the last repetition's number rather than the previous effect's.
+                throw new IllegalArgumentException(
+                        "Op " + op + " states both \"per_steps\" and \"amount_from_previous\": a repeat overwrites the "
+                                + "amount the previous effect booked once per iteration, so the share would be read off the "
+                                + "last repetition instead of off the previous effect (source: " + spec.getSource() + ")");
+            }
+        }
+        // `steps` is SPEND_STEPS's own spelling (it consumes milestones); on any other op it would be silently ignored.
+        if (effect.getSteps() != null && !effect.getSteps().isBlank() && !"SPEND_STEPS".equals(op)) {
+            throw new IllegalArgumentException(
+                    "Op " + op + " states \"steps\", which only SPEND_STEPS reads: it consumes the milestones a "
+                            + "\"per_steps\" effect counted (source: " + spec.getSource() + ")");
         }
         if (PLANNED.contains(op)) {
             throw new IllegalArgumentException(
@@ -984,6 +1012,25 @@ public final class TriggerInterpreter {
                 requireBuff(effect, op, spec);
                 requireDuration(effect, op, spec);
             }
+            case "SPEND_STEPS" -> {
+                // The other half of `per_steps`: the milestones a repeating effect just paid for, consumed ONCE out of a
+                // counter - her sentence pays two effects per milestone (an extra turn and a charge) and the counter may
+                // be charged only once. See spendSteps.
+                if (effect.getSteps() == null || effect.getSteps().isBlank()) {
+                    throw new IllegalArgumentException(
+                            "Op SPEND_STEPS requires \"steps\" (\"<counter>:<step>\"), which says which counter is "
+                                    + "consumed and how wide one milestone is (source: " + spec.getSource() + ")");
+                }
+                requireCounterSteps(effect.getSteps().trim(), "SPEND_STEPS steps", spec);
+                if (effect.getPerSteps() != null && !effect.getPerSteps().isBlank()) {
+                    // Note: SPEND_STEPS consumes, it does not repeat - a repeat count here would spend the same
+                    // milestones once per iteration. The counting half belongs on the effects that PAY per milestone.
+                    throw new IllegalArgumentException(
+                            "Op SPEND_STEPS states \"per_steps\" as well, but it consumes milestones rather than "
+                                    + "repeating an effect; its own spelling is \"steps\" (source: " + spec.getSource() + ")");
+                }
+                requireNoStackArguments(effect, op, spec);
+            }
             case "RAISE_SKILL_HITS" -> {
                 // The DATA SLOT, not a SkillType letter: the executor knows the slot number.
                 if (effect.getSkillId() == null || effect.getSkillId() <= 0) {
@@ -1327,24 +1374,26 @@ public final class TriggerInterpreter {
             String movingOp = normalizeOp(effect, null);
             // Match the RAW op too: `normalizeOp` derives its name and a spend spelled `overflow_only` did not reach this branch, so the capture of a spend read 0.
             String rawOp = effect.getOp() == null ? "" : effect.getOp().trim().toUpperCase(java.util.Locale.ROOT);
-            if ("GAIN_RESOURCE".equals(movingOp) || "SPEND_RESOURCE".equals(movingOp)
-                    || "GAIN_RESOURCE".equals(rawOp) || "SPEND_RESOURCE".equals(rawOp)) {
-                //: the amount this effect ACTUALLY credits (after the cap) is what the next effect may
-                // take a share of. Measured from the holder itself, so the cap is included by construction.
-                CanHit holder = resolveTarget(effect, effectCtx);
-                String resourceId = effect.getResource();
-                // Through `resourceAmount`, which knows BOTH stores (measured: [新蕊] is `scope: PARTY`, so reading the holder's own store gave 0 on
-                // both sides of the move and the capture of a spend read 0 even though the spend itself worked).
-                // EITHER store, never both (measured: `resourceAmount` ADDS the holder's store to the party's, so a SELF resource was counted twice and a capture of 4 read 8).
-                int creditedBefore = measureForTheDelta(effectCtx, holder, resourceId);
-                applyOne(battle, effect, effectCtx, previousCredited);
-                int creditedAfter = measureForTheDelta(effectCtx, holder, resourceId);
-                // The MAGNITUDE of what the previous effect moved (reader: 114151"for each 1% of overflow spent..."). A gain arrives positive and a spend
-                // NEGATIVE, and `amount_from_previous` is asked for a size, not a direction -- measured: this is the only place `previousCredited` is set, and `gainResource` is its
-                // only reader, so the sign carried no information anyone used.
-                previousCredited = Math.abs(creditedAfter - creditedBefore);
-            } else {
-                applyOne(battle, effect, effectCtx, previousCredited);
+            for (int repeat = perStepsRepeat(effect, effectCtx); repeat > 0; repeat--) {
+                if ("GAIN_RESOURCE".equals(movingOp) || "SPEND_RESOURCE".equals(movingOp)
+                        || "GAIN_RESOURCE".equals(rawOp) || "SPEND_RESOURCE".equals(rawOp)) {
+                    //: the amount this effect ACTUALLY credits (after the cap) is what the next effect may
+                    // take a share of. Measured from the holder itself, so the cap is included by construction.
+                    CanHit holder = resolveTarget(effect, effectCtx);
+                    String resourceId = effect.getResource();
+                    // Through `resourceAmount`, which knows BOTH stores (measured: [新蕊] is `scope: PARTY`, so reading the holder's own store gave 0 on
+                    // both sides of the move and the capture of a spend read 0 even though the spend itself worked).
+                    // EITHER store, never both (measured: `resourceAmount` ADDS the holder's store to the party's, so a SELF resource was counted twice and a capture of 4 read 8).
+                    int creditedBefore = measureForTheDelta(effectCtx, holder, resourceId);
+                    applyOne(battle, effect, effectCtx, previousCredited);
+                    int creditedAfter = measureForTheDelta(effectCtx, holder, resourceId);
+                    // The MAGNITUDE of what the previous effect moved (reader: 114151"for each 1% of overflow spent..."). A gain arrives positive and a spend
+                    // NEGATIVE, and `amount_from_previous` is asked for a size, not a direction -- measured: this is the only place `previousCredited` is set, and `gainResource` is its
+                    // only reader, so the sign carried no information anyone used.
+                    previousCredited = Math.abs(creditedAfter - creditedBefore);
+                } else {
+                    applyOne(battle, effect, effectCtx, previousCredited);
+                }
             }
         }
     }
@@ -1785,6 +1834,7 @@ public final class TriggerInterpreter {
             case "RAISE_SKILL_HITS" -> raiseSkillHits(effect, ctx);
             case "START_COUNTDOWN" -> startCountdown(battle, effect, ctx);
             case "ADD_STACK" -> addStack(battle, effect, ctx);
+            case "SPEND_STEPS" -> spendSteps(effect, ctx);
             case "CONSUME_HP" -> {
                 // Note: The share vocabulary is the HEAL/SHIELD one, not the modifier one: "consume HP equal to 30% of Blade (刃)'s Max HP"
                 // is `owner_max_hp`, which derivedMagnitude refuses (it names an ATTRIBUTE).
@@ -2196,6 +2246,45 @@ public final class TriggerInterpreter {
                     "SPEND_RESOURCE '" + id + "' needs " + amount + " but " + holder.getName()
                             + " has only " + holder.getResources().value(id));
         }
+    }
+
+    /**
+     * {@code SPEND_STEPS}: gives up {@code floor(value / step) * step} of a counter - the other half of {@code per_steps}.
+     *
+     * <p>Why it is its own op rather than something the repeat does: her sentence pays TWO effects per milestone
+     * ("gain 1 extra turn AND restore 1 use of the enhanced basic attack") while the counter may be charged only once, so
+     * the count has to be readable twice and spendable once. A repeat that consumed as it counted could not say that.
+     *
+     * <p>The counter must be a real STORE - one of the unit's own counters, or the party's. An attribute has nothing to
+     * spend from, and saying so beats silently keeping the milestones and paying them again on the next change. Nothing
+     * to spend (fewer than one whole step) is a no-op, because this rule fires on every change of the counter.
+     */
+    private static void spendSteps(EffectSpec effect, TriggerContext ctx) {
+        String written = effect.getSteps() == null ? "" : effect.getSteps().trim();
+        CounterSteps counter = parseCounterSteps(written, "SPEND_STEPS steps");
+        int milestones = counter.wholeSteps(ctx);
+        if (milestones <= 0) {
+            return;
+        }
+        int amount = (int) Math.round(milestones * counter.step());
+        CanHit holder = resolveTarget(effect, ctx);
+        // The STORE, wherever it lives: the unit's own counter, or the battle's PARTY-scoped one. An attribute is
+        // neither, and a spend that kept the milestones would pay them again on the next change.
+        com.laosun.aluminium.models.Resource party = partyCounterOrNull(ctx, holder, counter.counter());
+        com.laosun.aluminium.models.Resource store = party != null ? party
+                : holder.getResources().has(counter.counter()) ? holder.getResources().get(counter.counter())
+                : null;
+        if (store == null) {
+            throw new IllegalStateException("SPEND_STEPS names '" + counter.counter() + "', which is not a counter "
+                    + holder.getName() + " holds (nor a party one); an attribute has no store to spend from");
+        }
+        if (!store.spendExactly(amount)) {
+            throw new IllegalStateException("SPEND_STEPS '" + counter.counter() + "' needs " + amount + " but "
+                    + holder.getName() + " has only " + store.value());
+        }
+        // Announced like every other resource move: the GAIN/SPEND_RESOURCE arms measure around their own call for
+        // the same reason, and a rule forwarding off this counter has to see the consumption.
+        fireResourceChanged(ctx.battle(), ctx, counter.counter(), -amount);
     }
 
     /**
@@ -5752,6 +5841,94 @@ public final class TriggerInterpreter {
     }
 
     /**
+     * The laugh factor one instance is folded with: the declared {@code counted_laughs} when the effect states one, and
+     * otherwise the battle's snapshot. One reader of the table, called from the two places that fold Elation damage, so the
+     * two cannot drift apart.
+     */
+    private static double laughFactor(TriggerContext ctx, EffectSpec effect) {
+        if (effect != null && effect.getCountedLaughs() != null) {
+            double counted = effect.getCountedLaughs();
+            if (counted < 0) {
+                throw new IllegalStateException("counted_laughs is " + counted
+                        + "; a laugh count cannot be negative (source: " + ctx.ruleId() + ")");
+            }
+            return 1 + counted * 5.0 / (counted + 240);
+        }
+        return ctx == null || ctx.battle() == null ? 1 : ctx.battle().elationLaughMultiplier();
+    }
+
+    /**
+     * One parsed {@code "<counter>:<step>"} specification: which counter is read, and how wide one step is.
+     *
+     * <p>Three spellings share this shape and therefore this parser - the {@code steps:} scale ("every N points of a
+     * counter", as a magnitude), {@code per_steps} (the same count, as a repeat count) and {@code SPEND_STEPS}'s
+     * {@code steps} (the same count, consumed). One string, one meaning.
+     */
+    private record CounterSteps(String counter, double step) {
+
+        /**
+         * How many WHOLE steps the counter has reached: {@code floor(value / step)}, read through the resolution
+         * {@code weight_steps} uses - the rule owner's attribute, one of its own counters, or the battle's skill points.
+         */
+        int wholeSteps(TriggerContext ctx) {
+            return (int) Math.floor(counterValue(counter, ctx) / step);
+        }
+    }
+
+    /**
+     * Parses {@code "<counter>:<step>"}, refusing a malformed specification or a step that is not positive.
+     *
+     * <p>Loud on purpose, at whichever point it is called: a step of zero would be divided by, and a misspelled counter
+     * would read 0 forever - the "wrong number with no symptom" this interpreter refuses everywhere else.
+     */
+    private static CounterSteps parseCounterSteps(String written, String spelling) {
+        int colon = written.indexOf(':');
+        if (colon <= 0 || colon == written.length() - 1) {
+            throw new IllegalArgumentException(spelling + " must be \"<counter>:<step>\", e.g. \"隐藏分:120\", and this "
+                    + "one is \"" + written + "\"");
+        }
+        double step;
+        try {
+            step = Double.parseDouble(written.substring(colon + 1).trim());
+        } catch (NumberFormatException notANumber) {
+            throw new IllegalArgumentException(spelling + " has a step that is not a number: \"" + written + "\"");
+        }
+        if (!(step > 0)) {
+            throw new IllegalArgumentException(spelling + " divides by " + step
+                    + "; a step must be greater than zero (\"" + written + "\")");
+        }
+        return new CounterSteps(written.substring(0, colon).trim(), step);
+    }
+
+    /**
+     * The same parse, for the LOAD time callers: a message about a rule has to name the rule.
+     */
+    private static void requireCounterSteps(String written, String spelling, TriggerSpec spec) {
+        try {
+            parseCounterSteps(written, spelling);
+        } catch (IllegalArgumentException malformed) {
+            throw new IllegalArgumentException(malformed.getMessage() + " (source: " + spec.getSource() + ")");
+        }
+    }
+
+    /**
+     * How many times one effect repeats: {@code per_steps: "<counter>:<step>"} is {@code floor(value / step)}, and an
+     * effect that states nothing runs exactly once.
+     *
+     * <p>Deliberately a COUNT and not a spend: her sentence pays two effects per milestone (an extra turn and a charge)
+     * while the counter may be charged only once, so the spending is {@link #spendSteps} - and because reading is not
+     * spending, the second effect of the same rule reads the same number. Read HERE, at dispatch time, so a counter moved
+     * by an earlier effect of the same rule is already visible.
+     */
+    private static int perStepsRepeat(EffectSpec effect, TriggerContext ctx) {
+        String written = effect == null ? null : effect.getPerSteps();
+        if (written == null || written.isBlank()) {
+            return 1;
+        }
+        return parseCounterSteps(written.trim(), "per_steps").wholeSteps(ctx);
+    }
+
+    /**
      * The Elation damage base: {@code Constant.ELATION_BASIC_LEVEL_DAMAGE}, indexed by the owner's
      * <b>character level</b> - the {@code 欢愉基础值} of the formula
      * {@code 欢愉伤害 = 欢愉基础值(等级) × (1+欢愉度) × (1+增笑) × (1 + 5×好活/(好活+240)) × zones × 倍率}.
@@ -5767,52 +5944,6 @@ public final class TriggerInterpreter {
      *
      * <p>Reader: 1503 Pearl (真珠)'s Elation riders and 1506 Silver Wolf LV.999's 【头号补给盲盒】.
      */
-    /**
-     * The laugh factor one instance is folded with: the declared {@code counted_laughs} when the effect states one, and
-     * otherwise the battle's snapshot. One reader of the table, called from the two places that fold Elation damage, so the
-     * two cannot drift apart.
-     */
-    /**
-     * How many times one effect repeats: {@code per_steps: "<counter>:<step>"} is {@code floor(value / step)}, and an effect
-     * that states nothing runs exactly once.
-     *
-     * <p>Deliberately a COUNT and not a spend - that is why a second effect of the same rule reads the same number, and why
-     * spending has to be its own op. The value is read here, at dispatch time, so a counter moved by an earlier effect of the
-     * same rule is already visible.
-     */
-    private static int perStepsRepeat(EffectSpec effect, TriggerContext ctx) {
-        String spec = effect == null ? null : effect.getPerSteps();
-        if (spec == null || spec.isBlank()) {
-            return 1;
-        }
-        int colon = spec.indexOf(':');
-        if (colon <= 0 || colon == spec.length() - 1) {
-            throw new IllegalStateException("per_steps must be \"<counter>:<step>\", got \"" + spec + "\"");
-        }
-        double step;
-        try {
-            step = Double.parseDouble(spec.substring(colon + 1).trim());
-        } catch (NumberFormatException notANumber) {
-            throw new IllegalStateException("per_steps step is not a number: \"" + spec + "\"");
-        }
-        if (step <= 0) {
-            throw new IllegalStateException("per_steps step must be positive, got " + step + " (\"" + spec + "\")");
-        }
-        return (int) Math.floor(counterValue(spec.substring(0, colon).trim(), ctx) / step);
-    }
-
-    private static double laughFactor(TriggerContext ctx, EffectSpec effect) {
-        if (effect != null && effect.getCountedLaughs() != null) {
-            double counted = effect.getCountedLaughs();
-            if (counted < 0) {
-                throw new IllegalStateException("counted_laughs is " + counted
-                        + "; a laugh count cannot be negative (source: " + ctx.ruleId() + ")");
-            }
-            return 1 + counted * 5.0 / (counted + 240);
-        }
-        return ctx == null || ctx.battle() == null ? 1 : ctx.battle().elationLaughMultiplier();
-    }
-
     private static double elationBase(TriggerContext ctx) {
         if (ctx == null || ctx.owner() == null) {
             throw new IllegalStateException(
