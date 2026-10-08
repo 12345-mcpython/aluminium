@@ -270,7 +270,7 @@
         {
           "op": "APPLY_BUFF",
           "buff": "艺术壁垒",
-          "permanent": true,
+          "until": "next_ultimate",
           "target": "target",
           "target_when": [
             "!target has_state 艺术壁垒"
@@ -278,7 +278,24 @@
         }
       ],
       "source": "1503 真珠 行迹 艺术壁垒 (1503103): 「进入战斗和施放终结技后，若【美学底本】为「欢榆」命途角色，使其下一次施放终结技时，为真珠固定恢复 90 点能量。该效果无法叠加」。",
-      "note": "⭐ 不需要先建【美学底本】状态 ✓：终结技选中的 `target` **就是**【美学底本】，所以“若【美学底本】为欢榆命途”就是 `target has_path 欢愉`。⭐ “无法叠加”用 `target_when: [\"!target has_state 艺术壁垒\"]` 表达（现成写法，见 `1211`）。⚠ 同句的“进入战斗后”那一半（秘技版）**本文件未写**：它依赖秘技版的【美学底本】转移语义。"
+      "note": "⭐ 不需要先建【美学底本】状态 ✓：终结技选中的 `target` **就是**【美学底本】，所以“若【美学底本】为欢榆命途”就是 `target has_path 欢愉`。⭐ “无法叠加”用 `target_when: [\"!target has_state 艺术壁垒\"]` 表达（现成写法，见 `1211`）。⚠ 同句的“进入战斗后”那一半（秘技版）**本文件未写**：它依赖秘技版的【美学底本】转移语义 ✓。⭐ 同句的**效果**那一半（「下一次施放终结技时，为真珠固定恢复 90 点能量」✓）**已写在** `art_barrier_pays_pearl_on_the_holders_ultimate` ✓；⚠ 本条的时长**改过** ✓：从 `permanent: true` ✗ 改成 **`until: next_ultimate`** ✓ —— 正文说的是「**下一次**施放终结技时」✓（标记必须被那次终结技**消费掉** ✓）。"
+    },
+    {
+      "on": "CAST_SETUP",
+      "id": "art_barrier_pays_pearl_on_the_holders_ultimate",
+      "when": [
+        "from_category ULTRA",
+        "actor has_state 艺术壁垒"
+      ],
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 90,
+          "target": "self"
+        }
+      ],
+      "source": "1503 真珠 行迹 艺术壁垒 (1503103): 「进入战斗和施放终结技后，若【美学底本】为「欢愉」命途角色，使其下一次施放终结技时，为真珠固定恢复 90 点能量。该效果无法叠加」—— #1 = 90（行迹参数，全等级固定）。",
+      "note": "⭐⭐ **这句的「效果」那一半** ✓：`actor has_state 艺术壁垒` ✓ —— 施放终结技的**那个人**就是持有标记的那个人 ✓（施放事件会广播到我方每一张表 ✓，所以真珠的表收得到**他**的终结技 ✓）；「**为真珠**固定恢复」= 规则持有者自己 ✓ ⇒ `target: self` ✓（不是施放者 ✗ —— 那会把能量回给持有者 ✗）。⚠⚠ **触发为什么是 `CAST_SETUP` ＋ `from_category ULTRA`，而不是 `ULT_CAST`** ✓（**实测**：挂在 `ULT_CAST` 上时**从不触发** ✗）：`SkillExecutor.broadcastSkillCast` **先**调 `ally.onSkillCast(...)` ✓（寿命就在那里结束 ✓），**然后**才发 `ULT_CAST`／`SKILL_CAST` ✓ —— 那是**有意**的（「为这次施放授予的 buff 不该被这次施放结束」✓）⇒ 需要**看见** `next_ultimate` 标记的规则只能挂 `CAST_SETUP` ✓（它在施放的最前面 ✓，`from_category ULTRA` 指的就是槽位 ✓）；⚠ 这也正是原文「下次施放终结技**时**」的读法 ✓。⚠ 「**下一次**」由标记自己的寿命承担 ✓（`until: next_ultimate` ✓ —— 它是**持有者的**下一次终结技 ✓，因为 buff 的 owner 就是那个队友 ✓），标记在**同一次施放**稍后被消费掉 ✓ ⇒ 不需要手写清除 ✓；⚠ 旧写法是 `permanent: true` ✗ ⇒ 标记会**永远**留着 ✗ ⇒ 这里一并改成寿命 ✓。⚠ 「无法叠加」仍由标记那条的 `target_when` 表达 ✓ ⇒ **两次终结技只发一次钱** ✓。⚠ **仍未写**：同句的「**进入战斗**后」那一半 ✗（它要在战斗开始时判定【美学底本】**持有者的命途** ✗ —— 条件词汇只有 self/actor/target 三个主体 ✓，而那一刻的 `target` 不是他 ✓），已登记在那条标记规则的 note 里 ✓。"
     },
     {
       "on": "HP_LOST",
