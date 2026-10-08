@@ -4,7 +4,7 @@
   second_percent  2 -> 1 on the CRIT DMG half                                (content)
   second_scale    the CRIT DMG half reads from CRIT_CHANCE 0.0 instead of 1.0 (content)
   drop_second     the CRIT DMG half is deleted                               (content)
-  no_coexist      `coexist` dropped, so a re-fire piles on top               (content)
+  no_removal      the REMOVE_STATE pair dropped, so a re-fire piles on   (content)
   swap_order      the two effects swapped (the second reads the stale value)  (content)
 
 Usage:
@@ -51,8 +51,10 @@ def apply(variant):
         effects[1]['scale'] = 'self_attr_above:CRIT_CHANCE:0'
     elif variant == 'drop_second':
         rule['do'] = effects[:1]
-    elif variant == 'no_coexist':
-        effects[0].pop('coexist', None)
+    elif variant == 'no_removal':
+        # ⚠ This is the variant that matters: without the named removals the two modifiers are re-attached on every
+        # RESOURCE_CHANGED and PILE UP (measured on the first version: 20.44 for 100 points instead of 0.637).
+        rule['do'] = [e for e in effects if e.get('op') != 'REMOVE_STATE']
     elif variant == 'swap_order':
         rule['do'] = [effects[1], effects[0]]
     else:

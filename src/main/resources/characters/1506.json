@@ -447,8 +447,21 @@
       ],
       "do": [
         {
+          "op": "REMOVE_STATE",
+          "buff": "1506天赋-暴击率",
+          "kind": "own",
+          "target": "self"
+        },
+        {
+          "op": "REMOVE_STATE",
+          "buff": "1506天赋-暴击伤害",
+          "kind": "own",
+          "target": "self"
+        },
+        {
           "op": "MODIFY_ATTR",
           "attribute": "CRIT_CHANCE",
+          "buff": "1506天赋-暴击率",
           "scale": "self_attr_above:隐藏分:0",
           "percent": 0.004,
           "permanent": true,
@@ -458,6 +471,7 @@
         {
           "op": "MODIFY_ATTR",
           "attribute": "CRIT_ATTACK",
+          "buff": "1506天赋-暴击伤害",
           "scale": "self_attr_above:CRIT_CHANCE:1.0",
           "percent": 2,
           "permanent": true,
@@ -466,7 +480,7 @@
         }
       ],
       "source": "1506 银狼LV.999 天赋: 「每点【隐藏分】使暴击率提高 0.4%。暴击率达到 100% 后，其余每点【隐藏分】改为使暴击伤害提高 0.8%。」",
-      "note": "⭐⭐ **两半都不需要新引擎词汇** ✓ —— 第一半是 `self_attr_above:隐藏分:0` × `0.004` ✓（每点 +0.4% ✓，**不夹上界** ✓：暴击率超过 1.0 在引擎里就是「必定暴击」✓，而**上界正是第二半要读的量** ✓ ⇒ 夹住它反而会让第二半永远读到 0 ✗）。⭐ 第二半把它写成**暴击率的溢出** ✓：`self_attr_above:CRIT_CHANCE:1.0` × `2` ✓ —— ⚠ 换算：每点【隐藏分】给 0.004 暴击率 ✓，而「每**溢出 1%** 暴击率 ⇒ +2% 暴击伤害」✓ ⇒ 每点 = 0.008 暴击伤害 ✓ = 正文的 0.8% ✓✓（`percent: 2` × 0.004 = 0.008 ✓）。⚠ **两条必须按文件顺序** ✓：第二条读的 `CRIT_CHANCE` 是**第一条刚写进去的**那个值 ✓ ⇒ 顺序反了就永远读不到溢出 ✓（判据里两个读数分别钉住 ✓）。⚠ 事件用 `RESOURCE_CHANGED` ✓：每次【隐藏分】变化都要重算 ✓（与 `p1506_laughs_to_hidden` 同一事件 ✓），`coexist: true` 让规则**替换自己**上一次的贡献 ✓ 而不是叠加 ✓。"
+      "note": "⭐⭐ **两半都不需要新引擎词汇** ✓ —— 第一半是 `self_attr_above:隐藏分:0` × `0.004` ✓（每点 +0.4% ✓，**不夹上界** ✓：暴击率超过 1.0 在引擎里就是「必定暴击」✓，而**上界正是第二半要读的量** ✓ ⇒ 夹住它反而会让第二半永远读到 0 ✗）。⭐ 第二半把它写成**暴击率的溢出** ✓：`self_attr_above:CRIT_CHANCE:1.0` × `2` ✓ —— ⚠ 换算：每点【隐藏分】给 0.004 暴击率 ✓，而「每**溢出 1%** 暴击率 ⇒ +2% 暴击伤害」✓ ⇒ 每点 = 0.008 暴击伤害 ✓ = 正文的 0.8% ✓✓（`percent: 2` × 0.004 = 0.008 ✓）。⚠ **两条必须按文件顺序** ✓：第二条读的 `CRIT_CHANCE` 是**第一条刚写进去的**那个值 ✓ ⇒ 顺序反了就永远读不到溢出 ✓（判据里两个读数分别钉住 ✓）。⚠ 事件用 `RESOURCE_CHANGED` ✓：每次【隐藏分】变化都要重算 ✓（与 `p1506_laughs_to_hidden` 同一事件 ✓），⚠⚠ **重算必须靠「先移除自己」** ✓ —— **实测**：`coexist: true` 的语义是 `setKeepsSiblings` ✓（**与同属性的兄弟修饰器共存** ✗），**不是**「替换自己上一次的贡献」✗ ⇒ 少了那两条 `REMOVE_STATE`（按**名字** ✓、`kind: own` ✓）时，每次【隐藏分】变化都会**再叠一层** ✗（实测：夹具「每点触发一次」时 100 点读出 **20.44** ✓，正好是 `0.004 × (1+2+…+100)` ✓）。⚠ 而 `coexist: true` **仍要保留** ✓：移除的是**自己** ✓，保留它才能让**别的来源**（光锥／遗器／队友）挂在同一属性上的修饰器不被顶掉 ✓。"
     },
     {
       "on": "DEALING_DAMAGE",
@@ -477,8 +491,33 @@
       ],
       "do": [
         {
+          "op": "REMOVE_STATE",
+          "buff": "1506行迹-强化普攻隐藏分1",
+          "kind": "own",
+          "target": "self"
+        },
+        {
+          "op": "REMOVE_STATE",
+          "buff": "1506行迹-强化普攻隐藏分2",
+          "kind": "own",
+          "target": "self"
+        },
+        {
+          "op": "REMOVE_STATE",
+          "buff": "1506行迹-强化普攻隐藏分3",
+          "kind": "own",
+          "target": "self"
+        },
+        {
+          "op": "REMOVE_STATE",
+          "buff": "1506行迹-强化普攻隐藏分4",
+          "kind": "own",
+          "target": "self"
+        },
+        {
           "op": "MODIFY_ATTR",
           "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "buff": "1506行迹-强化普攻隐藏分1",
           "scale": "self_attr_above:隐藏分:60",
           "percent": 0.15,
           "permanent": true,
@@ -488,6 +527,7 @@
         {
           "op": "MODIFY_ATTR",
           "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "buff": "1506行迹-强化普攻隐藏分2",
           "scale": "self_attr_above:隐藏分:120",
           "percent": -0.075,
           "permanent": true,
@@ -497,6 +537,7 @@
         {
           "op": "MODIFY_ATTR",
           "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "buff": "1506行迹-强化普攻隐藏分3",
           "scale": "self_attr_above:隐藏分:120",
           "percent": 0.075,
           "permanent": true,
@@ -506,6 +547,7 @@
         {
           "op": "MODIFY_ATTR",
           "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "buff": "1506行迹-强化普攻隐藏分4",
           "scale": "self_attr_above:隐藏分:180",
           "percent": 0.15,
           "permanent": true,
