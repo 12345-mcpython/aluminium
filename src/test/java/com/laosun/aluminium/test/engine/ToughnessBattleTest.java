@@ -164,14 +164,19 @@ public class ToughnessBattleTest {
         double resistZone = 1 - iceEdge.getDamageResist().getOrDefault(DamageElement.FIRE, 0.0);
         double skillDamage = atk * 1.0;                      // Himeko's skill multiplier 1.0 (himeko ATK = 1000)
         double breakDamage = Constant.BREAKING_RATE.get(himeko.getLevel()) / 10.0 * 30;
-        double expected = (skillDamage + breakDamage) * defenceZone * resistZone;
+        // ⚠ BOTH instances take the toughness damage reduction: the skill lands while the bar still holds 30 points, and
+        // the break damage 「一定会受该减伤影响」 (the author's ruling) even though the bar empties first - which is exactly
+        // why `Battle.assemble` excepts the BREAK instance from its "is it broken" question.
+        double expected = (skillDamage + breakDamage) * defenceZone * resistZone
+                * (1 - com.laosun.aluminium.Constant.TOUGHNESS_DAMAGE_REDUCTION);
 
         Assertions.assertEquals(expected, hpBefore - iceEdge.getCurrentHp(), 1e-6,
                 "weakness break damage uses the 30 actually reduced, not the nominal 60");
 
         // Reverse assertion: if the nominal value 60 were used by mistake the settled value would be clearly
         // larger - ensuring this case really can fail
-        double wrong = (skillDamage + breakDamage * 2) * defenceZone * resistZone;
+        double wrong = (skillDamage + breakDamage * 2) * defenceZone * resistZone
+                * (1 - com.laosun.aluminium.Constant.TOUGHNESS_DAMAGE_REDUCTION);
         Assertions.assertNotEquals(wrong, hpBefore - iceEdge.getCurrentHp(), 1e-6,
                 "the result of the nominal value 60 must differ from this implementation, otherwise this test has no discriminating power");
     }

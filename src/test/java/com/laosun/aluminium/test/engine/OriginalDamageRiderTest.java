@@ -62,10 +62,20 @@ public class OriginalDamageRiderTest {
         double e6 = ultimateLoss(6);
         double e0 = ultimateLoss(0);
         double ultimateOwnInstance = 718.255731;      // measured: her ultimate's own settled damage in this fixture
+        // ⚠ The toughness damage reduction reaches this clause in a shape worth writing down, measured (ratio 1.0000000004):
+        // the rider is 2 x 40% of the ultimate's own instance and the two instances take the reduction ONCE between them.
+        // That is not an accident of arithmetic - "the original damage" is read when DEALING_DAMAGE fires, which is step 1
+        // of `Battle.assemble`, BEFORE the reduction zone joins at step 3.5 - and the rider's own instances then settle
+        // through the zones like any other. So the base is the pre-reduction value and the 0.9 lands once.
+        double reduction = 1 - com.laosun.aluminium.Constant.TOUGHNESS_DAMAGE_REDUCTION;
 
-        Assertions.assertEquals(2 * 0.4 * ultimateOwnInstance, e6 - e0, 1e-6,
-                "\"additionally deal 2 instances of damage ... equal to 40% of the original damage\" = 2 x 40% x the ULTIMATE's own instance, and NOT of the "
-                        + "10764.438828 another rule contributes in the same battle: " + e0 + " -> " + e6);
+        double expected = 2 * 0.4 * ultimateOwnInstance * reduction;
+        System.out.println("[e6_rider] e0=" + e0 + " e6=" + e6 + " delta=" + (e6 - e0)
+                + " ; 2 x 40% x the original, times the toughness reduction = " + expected
+                + " ; ratio = " + ((e6 - e0) / expected));
+        Assertions.assertEquals(expected, e6 - e0, Math.max(1e-6, expected * 1e-9),
+                "\"additionally deal 2 instances of damage ... equal to 40% of the original damage\" = 2 x 40% x the ULTIMATE's own instance, "
+                        + "and NOT of the damage another rule contributes in the same battle: " + e0 + " -> " + e6);
     }
 
     /** Her ultimate alone, at the given eidolon rank (her own table, so the level convention is in force). */

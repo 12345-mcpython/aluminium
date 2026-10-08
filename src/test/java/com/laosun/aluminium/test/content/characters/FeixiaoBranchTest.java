@@ -41,8 +41,12 @@ public class FeixiaoBranchTest {
         double broken = damage(true, true);
         Assertions.assertTrue(control > 0, "precondition: the ultimate landed");
         Assertions.assertTrue(unbroken > control, "the unbroken branch fired: " + control + " -> " + unbroken);
-        Assertions.assertEquals(unbroken, broken, Math.max(1.0, 0.02 * unbroken),
-                "either branch gives the same +30%: unbroken " + unbroken + " vs broken " + broken);
+        // ⚠ The two runs differ in one more way than the branch: the broken target has toughness 0, so it does NOT take
+        // the 10% toughness damage reduction and the unbroken one does. Normalizing by it is what leaves "the same +30%".
+        double normalized = unbroken / (1 - com.laosun.aluminium.Constant.TOUGHNESS_DAMAGE_REDUCTION);
+        Assertions.assertEquals(normalized, broken, Math.max(1.0, 0.02 * normalized),
+                "either branch gives the same +30% once the toughness reduction is normalized away: unbroken "
+                        + unbroken + " (÷0.9 = " + normalized + ") vs broken " + broken);
         Assertions.assertTrue(unbroken / control > 1.15 && unbroken / control < 1.6,
                 "the boost is in the +30% band (control " + control + ", unbroken " + unbroken + ", ratio "
                         + (unbroken / control) + ")");

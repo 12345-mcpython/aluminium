@@ -70,10 +70,13 @@ public class OdeToStrifeCritTest {
                 + mydei.getAttribute(com.laosun.aluminium.enums.AttributeType.CRIT_ATTACK).get());
 
         Assertions.assertTrue(strike > 0, "precondition: the commanded 【弑神登神】 (Godslayer Be God) lands");
-        Assertions.assertEquals(EXPECTED, strike, EXPECTED * 1e-9,
+        // ⚠ Times the toughness damage reduction: the enemy is unbroken, so 10% of the strike is removed on the way in
+        // (the author's ruling). The constant below stays the measurement WITHOUT it, so the two facts stay separable.
+        Assertions.assertEquals(EXPECTED_BEFORE_TOUGHNESS
+                        * (1 - com.laosun.aluminium.Constant.TOUGHNESS_DAMAGE_REDUCTION), strike, EXPECTED_BEFORE_TOUGHNESS * 1e-9,
                 "「本次攻击中万敌的暴击伤害提高 #1[i]%」 (in this attack Mydei's CRIT DMG is raised by #1[i]%)-- on a crit, the boost is what this number is");
     }
 
-    /** Measured with the clause in place. */
-    private static final double EXPECTED = 9080.729463951842;
+    /** Measured with the clause in place, and BEFORE the 10% toughness damage reduction an unbroken enemy takes. */
+    private static final double EXPECTED_BEFORE_TOUGHNESS = 9080.729463951842;
 }
