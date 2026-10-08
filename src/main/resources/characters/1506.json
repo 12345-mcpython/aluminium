@@ -19,6 +19,12 @@
       "max": 3,
       "initial": 0,
       "source": "1506 银狼LV.999 天赋: 「完整施放 3 次强化普攻后退出【无敌玩家】状态」—— 计数即时长。"
+    },
+    {
+      "id": "里程碑配额",
+      "max": 300,
+      "initial": 0,
+      "source": "1506 银狼LV.999 星魂 2 用这副躯壳，抵达真理的尽头: 「本次【无敌玩家】状态下每使【隐藏分】提高 120 点（含初始隐藏分），获得 1 个额外回合并恢复 1 次强化普攻的可施放次数」—— 这个计数器是【隐藏分】在本状态内的影子：进入时记入当时的【隐藏分】（含初始），此后每次提高按增量累加，每满 120 点由 SPEND_STEPS 花掉、余数留给下一次。上限 300 = 【隐藏分】自己的上限（60 + 溢出 240），所以它不会先于【隐藏分】封顶。"
     }
   ],
   "rules": [
@@ -123,6 +129,20 @@
           "target": "self"
         },
         {
+          "op": "SPEND_RESOURCE",
+          "resource": "里程碑配额",
+          "spendAll": true,
+          "min_eidolon": 2,
+          "target": "self"
+        },
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "里程碑配额",
+          "amount_from_resource": "隐藏分",
+          "min_eidolon": 2,
+          "target": "self"
+        },
+        {
           "op": "GAIN_RESOURCE",
           "resource": "强化普攻次数",
           "amount": 3,
@@ -162,6 +182,13 @@
           "amountFromPrevious": true,
           "amountPercent": 0.2,
           "min_eidolon": 1,
+          "target": "self"
+        },
+        {
+          "op": "SPEND_RESOURCE",
+          "resource": "里程碑配额",
+          "spendAll": true,
+          "min_eidolon": 2,
           "target": "self"
         }
       ],
@@ -722,6 +749,37 @@
       ],
       "source": "1506 银狼LV.999 欢愉技·强化 崩坏级伤害演示 (150621): 「造成 6 次伤害，每次对敌方随机单体造成 90% 的虚数属性欢愉伤害。将触发【头号补给盲盒】的固定概率重置为初始值。」",
       "note": "⭐⭐ **`RESET_RULE_CHANCE` 的唯一读者** ✓：「将触发【头号补给盲盒】的固定概率**重置为初始值**」✓ ⇒ 把盲盒那条规则的**当前概率**清掉 ✓（清空 = 回到它自己的 `chance` ✓ —— ⚠ **不是**写一个 1.0 进去 ✓：那样规则里的初始值一改，两处就会各说各话 ✓）。⚠ **它挂在 `CAST_SETUP` ＋ `from_skill_id == 21.0`** ✓ —— 21 是**欢愉技·强化**（`150621` ✓，`SkillSlotMappingTest` 钉住 `ELATION_EXTRA = 21` ✓），而 `CAST_SETUP` 带**槽位** ✓（`SkillExecutor` 传 `skill.getSkillSlot()` ✓）⇒ 每个「崩坏级伤害演示」**施放一次就重置一次** ✓（不是每段伤害重置一次 ✓）。⚠ 同一条从句里的「造成 6 次伤害…」那一半**不在这条规则里** ✓（它属于伤害行 ✓）。"
+     },
+    {
+      "on": "RESOURCE_CHANGED",
+      "id": "p1506_e2_milestones_while_in_godmode",
+      "min_eidolon": 2,
+      "when": [
+        "self has_state 无敌玩家",
+        "resource_changed:隐藏分"
+      ],
+      "do": [
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "里程碑配额",
+          "amountFromEvent": true,
+          "target": "self"
+        },
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "强化普攻次数",
+          "per_steps": "里程碑配额:120",
+          "amount": 1,
+          "target": "self"
+        },
+        {
+          "op": "SPEND_STEPS",
+          "steps": "里程碑配额:120",
+          "target": "self"
+        }
+      ],
+      "source": "1506 银狼LV.999 星魂 2 用这副躯壳，抵达真理的尽头: 「本次【无敌玩家】状态下每使【隐藏分】提高 120 点（含初始隐藏分），获得 1 个额外回合并恢复 1 次强化普攻的可施放次数」—— ⚠ 「获得 1 个额外回合」那一半**未写** ✓：`Queue.grantExtraTurn` 只留**一个**待执行额外回合 ✓（重复授予互相覆盖 ✓，`ExtraTurnTest.repeatedGrantsStillOnlyGiveOneExtraTurn` 钉住的正是这一点 ✓）⇒ 一次跨 2 档时它只会发 1 个 ✗，**不许近似** ✓ ⇒ 已登记 ✓；补齐时把它插在 `SPEND_STEPS` **之前** ✓（两个效果必须读**同一个数** ✓）。",
+      "note": "⭐⭐ **星魂 2 后半的记账那一半** ✓：`里程碑配额` 是【隐藏分】**在本状态内的影子** ✓ —— 进入【无敌玩家】时先清空、再以 `amount_from_resource: 隐藏分` 记入**当时的**【隐藏分】✓（原文「**含初始**隐藏分」✓），此后每次【隐藏分】变化以 `amountFromEvent` 按**增量**累加 ✓（事件自己的量 ✓；被【隐藏分】自己的上限截掉的部分**不会**记进来 ✓，因为发事件前量的是**实际入账** ✓）。⚠ **每满 120 点**由**同一个数**付账 ✓：`per_steps` **只数不花** ✓ ⇒ 这条与（将来的）额外回合那条读到**同一个数** ✓；最后由 `SPEND_STEPS` **一次**花掉 `floor(配额/120) × 120` ✓，余数留给下一次 ✓。⚠⚠ **为什么必须分两步** ✓（这正是这对原语的由来 ✓）：一次跨 2 档时「判 `>= 120` 就花 120」会**少付** ✗ —— 实测 `PerStepsTest`：400 跨 120 是 **3** 档 ✓。⚠⚠ **规则顺序是承重的** ✓：本规则的第一个效果会**改动 `里程碑配额`** ✓ ⇒ 战斗级 `lastChangedResource` 被改写成 `里程碑配额` ✓ ⇒ **排在本规则之后的**任何 `resource_changed:隐藏分` 规则都**不再命中** ✗ ⇒ **本规则必须留在这条事件的最后** ✓（`SilverWolfLV999ForwardingTest` 钉住了这条事件上的规则集合 ✓，下一个加规则的人会先看到它 ✓）。⚠⚠ **「获得 1 个额外回合」那一半未写** ✗（`source` 里已写明理由 ✓）：`Queue.grantExtraTurn` 只保留**一个**待执行额外回合 ✓（`ExtraTurnTest` 钉住 ✓）⇒ 一次跨 2 档只发 1 个额外回合 ✗ ⇒ **登记**而不是近似 ✓。⚠ 判据钉住的是**算术**：进入时 250 点 ⇒ 配额 30 = 270 − 2×120 ✓（**含初始** ✓；若不含，配额会是 20 ✓）；一次 +280 的实入账 ⇒ 2 档 ⇒ 强化普攻次数 **+2**（先花掉 2 次以使这次恢复看得见 ✓）、配额剩 60 ✓；不在【无敌玩家】状态下 ⇒ 配额**一点不动** ✓。"
     }
   ]
 }
