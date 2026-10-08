@@ -27,9 +27,10 @@ import java.util.Random;
  * move of all four states {@code target: self} or leaves it unstated - owner and holder are the same unit in all shipped
  * content, so this changes no number anywhere. What it changes is that a cross-unit grant becomes readable at all.
  *
- * <p>⚠ <b>One observation per firing, on purpose.</b> Each case below gives the receiver's table a SINGLE rule: a
- * resource-moving effect overwrites the battle's {@code lastChangedResource} for the rules that come after it in the
- * same firing, so three rules on one event would measure each other's counter (found while writing this case).
+ * <p>⚠ <b>One observation per firing - no longer because it has to be.</b> The first version of this case put three
+ * rules on one event and the second and third never fired: a resource-moving effect used to overwrite the battle's
+ * {@code lastChangedResource} for the rules that came after it in the same firing (which is why the cases were split).
+ * That is fixed now - {@code ResourceChangeScopeTest} is the case for it - so the split is only a habit.
  */
 public class ResourceChangeHolderTest {
     private static final int MONSTER = 1002011;
