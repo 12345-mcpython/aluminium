@@ -101,6 +101,31 @@ public class SilverWolfLV999TalentCritTest {
                 "past the switch each hidden point pays the page's 0.8% CRIT DMG");
     }
 
+    /**
+     * Gains must RECOMPUTE, not accumulate: two gains of 100 total what one gain of 200 does.
+     *
+     * <p>⚠⚠ This is the case that found the bug. Firing the grant once per point read {@code 20.436999998} instead of
+     * {@code 0.636999998} - the modifiers were piling up, {@code 0.004 x (1+2+...+100) = 20.2} to be exact - because
+     * {@code coexist: true} does NOT mean "replace my own previous contribution": its meaning in the engine is
+     * {@code setKeepsSiblings} (live beside OTHER sources' modifiers on the same attribute). What makes the rule
+     * recompute is the pair of named {@code REMOVE_STATE} effects in front of its two modifiers.
+     */
+    @Test
+    public void twoGainsRecomputeInsteadOfAccumulating() {
+        Reading oneGain = read(200);
+        Reading twice = read(new int[] {100, 100});
+        Reading threeTimes = read(new int[] {60, 80, 60});
+        System.out.println("[1506-talent] 200 at once = " + oneGain.crit() + " ; 100 then 100 = " + twice.crit()
+                + " ; 60+80+60 = " + threeTimes.crit() + " ; 隐藏分 " + threeTimes.hidden());
+        Assertions.assertEquals(200, twice.hidden(), "precondition: two gains of 100 are 200 points");
+        Assertions.assertEquals(oneGain.crit(), twice.crit(), 1e-9,
+                "each point counts once: base + 200 x 0.004, not base + 100 x 0.004 twice over");
+        Assertions.assertEquals(oneGain.crit(), threeTimes.crit(), 1e-9,
+                "and the same holds for three gains of different sizes");
+        Assertions.assertEquals(oneGain.critDamage(), twice.critDamage(), 1e-9,
+                "the crit-damage half recomputes too - it is the one that reads the crit rate the other half just set");
+    }
+
     // ==================================================================
     // Helpers
     // ==================================================================
@@ -109,32 +134,33 @@ public class SilverWolfLV999TalentCritTest {
     private record Reading(double crit, double critDamage, int hidden) {
     }
 
-    /**
-     * One reading. The 隐藏分 is moved through an OP, because that is the only route that raises the RESOURCE_CHANGED the
-     * talent listens for - `fireResourceChanged` is called from the op, not by the resource manager, so granting the
-     * counter by hand leaves the talent deaf (measured: 隐藏分 100 and CRIT_CHANCE unchanged at 0.236999998).
-     *
-     * <p>⚠⚠ <b>ONE firing per reading, deliberately.</b> A version of this helper fired the grant once per point and
-     * measured {@code 20.436999998} for 100 points instead of {@code 0.636999998}: the modifiers STACK across firings, so
-     * the total was {@code 0.004 x (1+2+...+100) = 20.2}. That is registered in GAPS as an open question rather than
-     * papered over here - it means {@code coexist: true} does NOT mean "replace my own previous contribution", and the
-     * shipped enhanced-basic ramp (which fires on every DEALING_DAMAGE) has the same shape and is very likely
-     * over-counting on every hit after the first.
-     */
     private static Reading read(int hiddenPoints) {
+        return read(new int[] {hiddenPoints});
+    }
+
+    /**
+     * {@link #read(int)} for several gains in a row, which is what tells "recomputes" from "accumulates".
+     *
+     * <p>The 隐藏分 is moved through an OP, because that is the only route that raises the RESOURCE_CHANGED the talent
+     * listens for - `fireResourceChanged` is called from the op, not by the resource manager, so granting the counter by
+     * hand leaves the talent deaf (measured: 隐藏分 100 and CRIT_CHANCE unchanged at 0.236999998).
+     */
+    private static Reading read(int[] gains) {
         Battle battle = new Battle(
                 List.of(CharacterFactory.create(WOLF, 80), CharacterFactory.create(ALLY, 80)),
                 List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
         battle.startBattle();
         battle.processRequests();
         Character wolf = battle.characters.getFirst();
-        if (hiddenPoints > 0) {
-            TriggerTable withGrant = wolf.getTriggerTable().plus(new TriggerTable(WOLF,
-                    List.of(TriggerSpecs.rule("TURN_START", List.of("actor == self"),
-                            TriggerSpecs.gainResource(HIDDEN, hiddenPoints)))));
-            wolf.setTriggerTable(withGrant);
-            battle.fireTriggers(TriggerEvent.TURN_START, wolf, wolf, 0, 0);
-            battle.processRequests();
+        TriggerTable withGrant = wolf.getTriggerTable().plus(new TriggerTable(WOLF,
+                List.of(TriggerSpecs.rule("TURN_START", List.of("actor == self"),
+                        TriggerSpecs.gainResource(HIDDEN, 1)))));
+        wolf.setTriggerTable(withGrant);
+        for (int gain : gains) {
+            for (int step = 0; step < gain; step++) {
+                battle.fireTriggers(TriggerEvent.TURN_START, wolf, wolf, 0, 0);
+                battle.processRequests();
+            }
         }
         return new Reading(wolf.getAttribute(AttributeType.CRIT_CHANCE).get(),
                 wolf.getAttribute(AttributeType.CRIT_ATTACK).get(), wolf.getResources().value(HIDDEN));

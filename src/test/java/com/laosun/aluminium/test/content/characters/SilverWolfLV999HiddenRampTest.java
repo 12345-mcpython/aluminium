@@ -41,7 +41,8 @@ public class SilverWolfLV999HiddenRampTest {
         TriggerTable table = CharacterFactory.create(WOLF, 80).getTriggerTable();
         var rule = table.rulesFor(TriggerEvent.DEALING_DAMAGE).stream()
                 .filter(r -> r.id().equals(RULE)).findFirst().orElseThrow();
-        var effects = rule.effects();
+        var effects = rule.effects().stream()
+                .filter(effect -> "MODIFY_ATTR".equals(effect.getOp())).toList();
 
         StringBuilder shown = new StringBuilder();
         for (var effect : effects) {
@@ -54,6 +55,16 @@ public class SilverWolfLV999HiddenRampTest {
         assertTerm(effects.get(1), HIDDEN, 120, -0.075, "and at 120 a NEGATIVE term cancels the one still running");
         assertTerm(effects.get(2), HIDDEN, 120, 0.075, "while a positive one opens the second layer");
         assertTerm(effects.get(3), HIDDEN, 180, 0.15, "and at 180 the second layer completes - nothing above it");
+
+        // ⚠ And each term takes ITSELF off first: the rule fires on every enhanced-basic hit, so without a removal per
+        // term the four modifiers would pile up on every hit after the first. `coexist` does NOT do that - measured, its
+        // meaning is `setKeepsSiblings` (live beside OTHER sources' modifiers on the same attribute), and the same shape
+        // cost her talent 20.44 instead of 0.637 when the grant fired once per point.
+        var removals = rule.effects().stream().filter(effect -> "REMOVE_STATE".equals(effect.getOp())).toList();
+        Assertions.assertEquals(4, removals.size(), "one named removal per term, before the terms are re-attached");
+        for (var removal : removals) {
+            Assertions.assertEquals("own", removal.getKind(), "each removal only takes off this rule's own modifier");
+        }
 
         // The sum, which is the claim: one layer across 60..179, two from 180.
         Assertions.assertEquals(0.15, sum(0.15, false, false), 1e-9, "60..119: one layer");
