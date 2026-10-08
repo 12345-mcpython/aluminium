@@ -72,9 +72,16 @@ public class SilverWolfLV999ForwardingTest {
         build(1506);
         var rules = other.getTriggerTable().rulesFor(TriggerEvent.RESOURCE_CHANGED).stream()
                 .filter(rule -> rule.id().startsWith("p1506_")).toList();
-        Assertions.assertEquals(1, rules.size(), "one forwarding rule");
-        var effect = rules.getFirst().effects().getFirst();
-        System.out.println("[forward] spec " + rules.getFirst().id() + " when=" + rules.getFirst().conditions()
+        // ⚠ Her table has TWO rules on this event, and both belong there: the forwarding clause, and her talent, which
+        // recomputes the CRIT conversion whenever 【隐藏分】 moves. Pinning the exact set keeps a third one from slipping in.
+        Assertions.assertEquals(
+                java.util.Set.of("p1506_laughs_to_hidden", "p1506_talent_hidden_becomes_crit"),
+                rules.stream().map(rule -> rule.id()).collect(java.util.stream.Collectors.toSet()),
+                "the forwarding rule and the talent conversion, and nothing else");
+        var forwarding = rules.stream().filter(rule -> rule.id().equals("p1506_laughs_to_hidden")).findFirst()
+                .orElseThrow();
+        var effect = forwarding.effects().getFirst();
+        System.out.println("[forward] spec " + forwarding.id() + " when=" + forwarding.conditions()
                 + " resource=" + effect.getResource() + " amountFromEvent=" + effect.getAmountFromEvent());
         Assertions.assertEquals(HIDDEN, effect.getResource(), "it grants the hidden points");
         Assertions.assertEquals(Boolean.TRUE, effect.getAmountFromEvent(), "by the event’s own amount");
