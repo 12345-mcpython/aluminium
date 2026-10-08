@@ -277,6 +277,37 @@ public class SilverWolfLV999KitTest {
         battle.processRequests();
     }
 
+    /**
+     * Eidolon 2's first half: 「进入【无敌玩家】状态后，使自身所有增益效果延长 1 回合」.
+     *
+     * <p>⚠ <b>Read structurally, and the reason is measured.</b> The behavioural version - put a ONE-turn buff on her, cast
+     * the Ultimate, then advance a turn and see whether it survived - does not work in this fixture: firing TURN_START (and
+     * TURN_END) by hand does NOT drive the buff clock, so the 1-turn buff was still there in the E0 CONTROL as well, i.e.
+     * nothing ticked. Advancing a real turn means running the queue, which is a different fixture; what this case can
+     * honestly pin instead is the shipped spelling, which is the whole clause: every buff, one turn, on herself, at E2, on
+     * the same gate as entering 【无敌玩家】.
+     */
+    @Test
+    public void eidolonTwoExtendsHerBuffsOnEnteringGodmode() {
+        var table = CharacterFactory.create(WOLF, 80, false, null, null, 2).getTriggerTable();
+        var rule = table.rulesFor(TriggerEvent.CAST_SETUP).stream()
+                .filter(r -> r.id().equals("p1506_e2_extends_her_buffs_on_entering_godmode"))
+                .findFirst().orElseThrow(() -> new AssertionError("E2's extension rule is not on her table"));
+        var conditions = rule.conditions().stream().map(c -> c.source()).toList();
+        var effect = rule.effects().getFirst();
+        System.out.println("[1506] E2 extension: when=" + conditions + " op=" + effect.getOp() + " kind="
+                + effect.getKind() + " turns=" + effect.getTurns() + " target=" + effect.getTarget());
+        Assertions.assertEquals("EXTEND_BUFF", effect.getOp(), "「使自身所有增益效果延长 1 回合」 is the shipped op");
+        Assertions.assertEquals("all", effect.getKind(), "「所有增益效果」 - not one named state");
+        Assertions.assertEquals(1, effect.getTurns(), "延长 1 回合");
+        Assertions.assertEquals("self", effect.getTarget(), "自身");
+        Assertions.assertTrue(conditions.contains("from_category ULTRA") && conditions.contains("actor == self"),
+                "and it hangs on the same entry as 【无敌玩家】 itself, which is the order 「进入…后」 needs");
+        // ⚠ The Eidolon gate is a FIELD on the compiled rule, not a loading filter: the same table serves every rank and the
+        // interpreter decides at firing time (measured - the first version looked the rule up at E0 and still found it).
+        Assertions.assertEquals(2, rule.minEidolon(), "「星魂 2」 gates the clause itself, not the base kit");
+    }
+
     private static Battle newBattle() {
         return newBattle(0);
     }

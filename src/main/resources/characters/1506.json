@@ -91,6 +91,25 @@
     },
     {
       "on": "CAST_SETUP",
+      "id": "p1506_e2_extends_her_buffs_on_entering_godmode",
+      "min_eidolon": 2,
+      "when": [
+        "actor == self",
+        "from_category ULTRA"
+      ],
+      "do": [
+        {
+          "op": "EXTEND_BUFF",
+          "kind": "all",
+          "turns": 1,
+          "target": "self"
+        }
+      ],
+      "source": "1506 银狼LV.999 星魂 2 用这副躯壳，抵达真理的尽头: 「进入【无敌玩家】状态后，使自身所有增益效果延长 1 回合。」（同句后半「本次【无敌玩家】状态下每使【隐藏分】提高 120 点（含初始隐藏分），获得 1 个额外回合并恢复 1 次强化普攻的可施放次数」**未写** ✓ —— 它要一个「每累计 N 点」的量 ✗，已登记，读者数已扫（6 处／5 文件 ✓）。）",
+      "note": "⭐ **星魂 2 的前半，用的是现成词汇** ✓：`EXTEND_BUFF` ＋ `kind: all` ＋ `turns: 1` ＋ `target: self` ✓ —— 「使自身**所有**增益效果延长 1 回合」✓（与 1415 那条 −1 的规则同形 ✓，符号相反 ✓）。⚠ **门与进状态那条完全相同** ✓（`CAST_SETUP` ＋ `actor == self` ＋ `from_category ULTRA` ✓）且**排在它之后** ✓ ⇒ 触发时【无敌玩家】已在身上 ✓，「进入后」的时序成立 ✓。⚠ `min_eidolon: 2` ✓ 是这句自己的门槛 ✓ —— 别加进进状态那条 ✗（那是本体技能 ✓）。"
+    },
+    {
+      "on": "CAST_SETUP",
       "id": "p1506_ult_enters_godmode",
       "when": [
         "actor == self",
