@@ -608,6 +608,29 @@ public final class TriggerInterpreter {
                 }
                 requireNoStackArguments(effect, op, spec);
                 requireFixedCrit(effect, op, spec);
+                // 「该次欢愉伤害使用【美学底本】的属性值计算」: there is no Elation formula to redirect unless this IS Elation
+                // damage, and the base it borrows is the table's row for the HOLDER's level - so the pair is required.
+                if (effect.getElationFrom() != null) {
+                    if (effect.getElationFrom().isBlank()) {
+                        throw new IllegalArgumentException(
+                                "Op " + op + " states a blank \"elation_from\": name the state whose holder the "
+                                        + "un-underlined terms come from (source: " + spec.getSource() + ")");
+                    }
+                    if (!"ELATION".equalsIgnoreCase(
+                            effect.getDamageType() == null ? "" : effect.getDamageType().trim())) {
+                        throw new IllegalArgumentException(
+                                "Op " + op + " states \"elation_from\" without \"damage_type\": \"ELATION\": the Elation "
+                                        + "formula is the only thing whose terms can be borrowed, so the field says "
+                                        + "nothing here (source: " + spec.getSource() + ")");
+                    }
+                    if (!"elation_base".equals(effect.getScale() == null ? "" : effect.getScale().trim())) {
+                        throw new IllegalArgumentException(
+                                "Op " + op + " states \"elation_from\" with scale \""
+                                        + (effect.getScale() == null ? "(none)" : effect.getScale())
+                                        + "\": the borrowed base IS the level table's row, so the scale must be "
+                                        + "\"elation_base\" (source: " + spec.getSource() + ")");
+                    }
+                }
             }
             case "MODIFY_ATTR" -> {
                 // Note: A damage-type scope is only read on the INSTANCE route. Stating it on an ordinary modifier would
@@ -5703,6 +5726,9 @@ public final class TriggerInterpreter {
      * Elation number. The card also confirms the shape this engine already had: no attack power anywhere in the formula,
      * the laugh factor {@code 1 + 5×好活/(好活+240)}, and 「增笑」 as its own multiplier.
      *
+     * <p>⚠ And it can be read off ANOTHER unit: 「该次欢愉伤害使用【美学底本】的属性值计算」 takes the base (this row, at the
+     * holder's level), 欢愉度 and 增笑 from the holder of a named state - see {@link EffectSpec#getElationFrom()}.
+     *
      * <p>Reader: 1503 Pearl (真珠)'s Elation riders and 1506 Silver Wolf LV.999's 【头号补给盲盒】.
      */
     private static double elationBase(TriggerContext ctx) {
@@ -5710,12 +5736,17 @@ public final class TriggerInterpreter {
             throw new IllegalStateException(
                     "a scale of elation_base has no rule owner to read a character level from");
         }
-        int level = ctx.owner().getLevel();
+        return elationBaseOf(ctx.owner(), "the rule owner");
+    }
+
+    /** The same row, for whichever unit the instance's un-underlined terms are borrowed from. */
+    private static double elationBaseOf(CanHit unit, String whose) {
+        int level = unit.getLevel();
         Double base = com.laosun.aluminium.Constant.ELATION_BASIC_LEVEL_DAMAGE.get(level);
         if (base == null) {
-            throw new IllegalStateException("elation_base has no table row for character level " + level
-                    + "; the loaded table has " + com.laosun.aluminium.Constant.ELATION_BASIC_LEVEL_DAMAGE.size()
-                    + " rows");
+            throw new IllegalStateException("elation_base has no table row for the character level " + level
+                    + " of " + whose + "; the loaded table has "
+                    + com.laosun.aluminium.Constant.ELATION_BASIC_LEVEL_DAMAGE.size() + " rows");
         }
         return base;
     }
@@ -5862,6 +5893,20 @@ public final class TriggerInterpreter {
           double base = skill == null
                   ? literalBase(attacker, victim, effect, ctx)   // ? a literal ratio: off the SETTLED attribute, a Max HP share, or the triggering instance's settled value
                   : attacker.getAttribute(AttributeType.ATTACK).get() * multiplierOf(skill, effect, attacker);
+          // 「该次欢愉伤害使用【美学底本】的属性值计算」: the formula's UN-UNDERLINED terms are borrowed from the holder of the
+          // named state - the base (this table's row, at the HOLDER's level), 欢愉度 and 增笑 - while the underlined ones
+          // (the laugh factor, the six zones and the multiplier) stay the instance's own. Note what is NOT borrowed:
+          // attack power, which the formula does not contain at all.
+          CanHit elationSource = attacker;
+          if (effect.getElationFrom() != null && !effect.getElationFrom().isBlank()) {
+              String state = effect.getElationFrom().trim();
+              elationSource = holderOfOrNull(battle, state, ctx.owner());
+              if (elationSource == null) {
+                  throw new IllegalStateException("this Elation rider computes itself from the holder of 【" + state
+                          + "】, and nobody on the field holds it");
+              }
+              base = elationBaseOf(elationSource, "the holder of 【" + state + "】") * shareOf(effect, ctx);
+          }
           // "由敌方全体均分": this victim's share of the effect's stated TOTAL. Divided HERE, on the raw magnitude, so
           // everything downstream (the Elation fold, the zones, critical hits) applies to the share the sentence gives
           // each victim - and so the sum over the victims is the stated total, whatever N is.
@@ -5876,7 +5921,7 @@ public final class TriggerInterpreter {
                   ? null
                   : DamageType.fromString(effect.getDamageType().trim());
           double settledBase = damageType == DamageType.ELATION
-                  ? base * (1 + attacker.getAttribute(com.laosun.aluminium.enums.AttributeType.ELATION_DAMAGE_BOOST).get()) * (1 + attacker.getAttribute(com.laosun.aluminium.enums.AttributeType.ELATION_DAMAGE_AMP).get()) * (ctx.battle() == null ? 1 : ctx.battle().elationLaughMultiplier())
+                  ? base * (1 + elationSource.getAttribute(com.laosun.aluminium.enums.AttributeType.ELATION_DAMAGE_BOOST).get()) * (1 + elationSource.getAttribute(com.laosun.aluminium.enums.AttributeType.ELATION_DAMAGE_AMP).get()) * (ctx.battle() == null ? 1 : ctx.battle().elationLaughMultiplier())
                   : base;
           // `damage_type: "TRUE"` is true damage: it SKIPS every zone. Without this branch the op stamps the
         // TYPE and still went through `applyAdditionalDamage`, so the instance was labelled TRUE while defence and
