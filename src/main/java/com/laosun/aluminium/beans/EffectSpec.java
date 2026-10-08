@@ -62,6 +62,7 @@ public class EffectSpec {
         copy.elationFrom = elationFrom;
         copy.countedLaughs = countedLaughs;
         copy.perSteps = perSteps;
+        copy.steps = steps;
         copy.amountCap = amountCap;
         copy.ordinary = ordinary;
         copy.perStack = this.perStack;
@@ -344,6 +345,18 @@ return copy;
      */
     @com.google.gson.annotations.SerializedName("per_steps")
     private String perSteps;
+
+    /**
+     * The milestones a {@code SPEND_STEPS} gives up, written {@code "<counter>:<step>"} - the spelling
+     * {@code per_steps} and the {@code steps:} scale already use, so one string means one thing wherever it appears.
+     *
+     * <p>floor(value / step) * step is taken out of the counter's own store in ONE go. It is a separate field rather than
+     * a second reading of {@code per_steps}, because the two answer different questions about the same counter: this op
+     * spends, and the counter it spends from is the counter it names - so there is no spelling that could count one
+     * counter and consume another.
+     */
+    @com.google.gson.annotations.SerializedName("steps")
+    private String steps;
 
     /**
      * Note: from 1505's Eidolon "额外获得等同于本次获得的[好活当赏]50%/100%":
