@@ -3566,6 +3566,47 @@ public final class TriggerInterpreter {
             return shareOf(effect, ctx) * fielded.getAttribute(from).get()
                     + (effect.getAmount() == null ? 0 : effect.getAmount());
         }
+        if (effect.getScale().trim().startsWith(STEPS_PREFIX)) {
+            // 「每累计 N 点…」 - how many WHOLE steps a counter has reached: floor(value / N), as a number.
+            // The shape's readers were counted before it was built (the house rule): 6 places across 5 files - both
+            // Trailblazer documents (每累计恢复 10 点能量), GLOSSARY_EXTRA (每累计损失 30% 生命值), RELICS (每累计获得 5 点笑点,
+            // which is Elation damage again) and two WEAPONS entries. ⚠ The quantity is a FLOOR, not a "did it cross" flag:
+            // a single +400 against N = 120 is THREE steps, which is exactly what a per-event `>= N` check would under-count.
+            String[] parts = effect.getScale().trim().substring(STEPS_PREFIX.length()).split(":", 2);
+            if (parts.length != 2) {
+                throw new IllegalStateException("the scale \"" + effect.getScale()
+                        + "\" must state <COUNTER>:<N>, e.g. steps:隐藏分:120");
+            }
+            String name = parts[0].trim();
+            double step;
+            try {
+                step = Double.parseDouble(parts[1].trim());
+            } catch (NumberFormatException notANumber) {
+                throw new IllegalStateException("the scale \"" + effect.getScale() + "\" has a step that is not a number");
+            }
+            if (!(step > 0)) {
+                throw new IllegalStateException("the scale \"" + effect.getScale()
+                        + "\" divides by " + step + "; a step must be greater than zero");
+            }
+            double value;
+            AttributeType named = null;
+            try {
+                named = AttributeType.fromString(name);
+            } catch (IllegalArgumentException notAnAttribute) {
+                named = null;                  // falls through to the resource readout, exactly like self_attr_above
+            }
+            if (named != null) {
+                value = owner.getAttribute(named).get();
+            } else if (owner.getResources() != null && owner.getResources().has(name)) {
+                value = owner.getResources().value(name);
+            } else {
+                throw new IllegalStateException("the scale \"" + effect.getScale() + "\" reads \"" + name
+                        + "\", which is neither an attribute of " + owner.getName() + ", one of its counters, nor the "
+                        + "battle's skill points");
+            }
+            return shareOf(effect, ctx) * Math.floor(value / step)
+                    + (effect.getAmount() == null ? 0 : effect.getAmount());
+        }
         if (effect.getScale().trim().startsWith(ABOVE_PREFIX)) {
             // "when SPD is greater than or equal to 120 ... for each 1 point of SPD above that ...": the EXCESS over a
             // stated threshold, as a magnitude. Note: `self_max_energy` below is the same shape with the threshold
@@ -3648,6 +3689,7 @@ public final class TriggerInterpreter {
         // `party_resource:<name>` joins this list: like EVENT_AMOUNT it is a magnitude the op can read
         // but not an AttributeType, so the question "which attribute does this scale name" has no answer for it.
         if (SELF_MAX_ENERGY.equals(raw) || EVENT_AMOUNT.equals(raw) || raw.startsWith(ABOVE_PREFIX)
+                || raw.startsWith(STEPS_PREFIX)
                 || raw.startsWith("party_resource:") || raw.startsWith(TriggerTable.HOLDER_ATTR_PREFIX)
                 || COUNTED_LAUGHS.equals(raw) || "elation_base".equals(raw)) {
             // `holder_attr:` joins them for the same reason `summon_attr:`/`actor_attr:` are not here: it names a
@@ -4120,6 +4162,17 @@ public final class TriggerInterpreter {
      * energy cap - and, like it, not an {@code AttributeType}.
      */
     private static final String ABOVE_PREFIX = "self_attr_above:";
+    /**
+     * {@code steps:<COUNTER>:<N>} - "every N points of a counter", as the number of WHOLE steps: {@code floor(value / N)}.
+     *
+     * <p>Reader evidence gathered before building it (the house rule is to count readers first): 6 places across 5 files -
+     * both Trailblazer documents 「每累计恢复 10 点能量」, GLOSSARY_EXTRA 「每累计损失 30% 生命值」, RELICS 「每累计获得 5 点笑点，造成的
+     * 欢愉伤害…」 and two WEAPONS entries.
+     *
+     * <p>⚠ Being a FLOOR is the whole point: 1506's Eidolon 2 pays 「每使【隐藏分】提高 120 点…获得 1 个额外回合」, and a single gain
+     * of 400 is THREE milestones - which a per-event ">= 120, then spend 120" check silently reports as one.
+     */
+    private static final String STEPS_PREFIX = "steps:";
 
 
     /**
