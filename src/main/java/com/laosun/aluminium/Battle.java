@@ -300,6 +300,29 @@ public class Battle {
     private final Map<String, Integer> castApplied = new HashMap<>();
 
     /**
+     * The laugh count the cast being resolved is settled with, or {@code null} when that cast stated none.
+     *
+     * <p>Reader of the content spelling: {@code CAST_SKILL} with {@code cast_counted_laughs} - 「使其立即施放 1 次固定计入
+     * 20 笑点的欢愉技」. Priority at the one fold site ({@link #elationLaughMultiplier()}): an effect's own
+     * {@code counted_laughs} first (that is one instance), then this (that is the whole cast), then the merged snapshot.
+     *
+     * <p>Note: It outlives the cast TOKEN on purpose, exactly like {@code castApplied}: {@code SkillExecutor} closes the
+     * window before it delivers the cast's own events, and that delivery is when a rider reads this.
+     */
+    private Integer castCountedLaughs;
+
+    /**
+     * A count a cast has claimed but not started yet: {@code CAST_SKILL} sets it and the cast it is about consumes it in
+     * {@link #beginCast}.
+     *
+     * <p>Two facts force the extra slot: the marker runs <b>before</b> {@code SkillExecutor.execute} (the only place the
+     * count can be stated), and that method's first act is {@code beginCast}, which clears the previous cast's record so
+     * a new cast never sees stale numbers. Consuming a claim at that begin keeps both properties - and nothing else can
+     * start a cast in between, so the claim cannot be taken by the wrong one.
+     */
+    private Integer nextCastCountedLaughs;
+
+    /**
      * Records one <b>landed</b> application of a named state during the current cast.
      *
      * <p>Called by the ops that roll for a state ({@code APPLY_CONTROL}, {@code APPLY_DOT}) and only when the roll
@@ -332,6 +355,8 @@ public class Battle {
      */
     public void endCastOutcome() {
         castApplied.clear();
+        // This cast's own laugh count goes with its outcome: a rule firing later must not fold its damage with it.
+        castCountedLaughs = null;
         // "when casting ..." ends here: every event of this cast has been delivered, so a modifier stating
         // `"until": "cast_end"` has covered every heal the cast performed and nothing after it. Swept on both sides,
         // because either camp may carry one.
@@ -351,8 +376,11 @@ public class Battle {
      * @return the token identifying this cast
      */
     public PendingCast beginCast(Skill skill, CanHit caster) {
-        // A new cast's outcome starts empty: see `castApplied`.
+        // A new cast's outcome starts empty: see `castApplied`, and the same for the laugh count a commanded cast
+        // claimed just before this call (see `nextCastCountedLaughs`).
         castApplied.clear();
+        castCountedLaughs = nextCastCountedLaughs;
+        nextCastCountedLaughs = null;
         pendingCast = new PendingCast(caster, skill == null ? 0 : skill.getSkillSlot(), pendingCast);
         return pendingCast;
     }
@@ -828,8 +856,32 @@ public class Battle {
      * Aha Moment has no laugh points folded into anything.
      */
     public double elationLaughMultiplier() {
-        double laughs = countedLaughPoints();
+        // The cast's own count wins while that cast is being resolved: 「固定计入 20 笑点」 is a fact about the CAST, and
+        // its damage is assembled from the skill's row, so nothing else could carry it. Otherwise the merged snapshot.
+        double laughs = castCountedLaughs != null ? castCountedLaughs : countedLaughPoints();
         return 1 + laughs * 5.0 / (laughs + 240);
+    }
+
+    /**
+     * Claims the laugh count for the NEXT cast to begin: 「使其立即施放 1 次固定计入 20 笑点的欢愉技」.
+     *
+     * <p>Called by {@code CAST_SKILL} right before it executes the cast it commands - see
+     * {@link #nextCastCountedLaughs} for why the claim and the cast cannot be the same moment.
+     *
+     * @param laughs the count that cast's Elation damage is folded with (0 is legal: "counting nothing")
+     */
+    public void markNextCastCountedLaughs(int laughs) {
+        nextCastCountedLaughs = laughs;
+    }
+
+    /**
+     * The laugh count the cast being resolved is settled with, or {@code null} when that cast stated none.
+     *
+     * <p>Read by the fold ({@link #elationLaughMultiplier()}) and by the judge that pins the window: a cast's count must
+     * not outlive its cast, and "the window is empty again" is the fact the behavioural readings are compared against.
+     */
+    public Integer castCountedLaughs() {
+        return castCountedLaughs;
     }
 
     /**

@@ -61,6 +61,7 @@ public class EffectSpec {
         copy.weightSteps = weightSteps;
         copy.elationFrom = elationFrom;
         copy.countedLaughs = countedLaughs;
+        copy.castCountedLaughs = castCountedLaughs;
         copy.perSteps = perSteps;
         copy.steps = steps;
         copy.amountCap = amountCap;
@@ -334,6 +335,21 @@ return copy;
      */
     @com.google.gson.annotations.SerializedName("counted_laughs")
     private Double countedLaughs;
+
+    /**
+     * The laugh count the CAST this effect performs is settled with, when the sentence fixes one:
+     * 「使其立即施放 1 次固定计入 20 笑点的欢愉技」.
+     *
+     * <p>Distinct from {@link #countedLaughs}, which is what ONE INSTANCE folds with ("this instance counts 99"): a
+     * commanded cast settles damage out of the <b>skill's own row</b>, so there is no effect of ours to carry the
+     * number, and the whole cast - its settlement and every rider firing on its own events - has to fold the same one.
+     *
+     * <p>Reader evidence before it was built (3 files): 8009's and 8010's ultimates, both 「固定计入 20 笑点」, and
+     * 1513's trace. Casts that settle anything but Elation damage REFUSE it at run time rather than fold a number
+     * nobody reads.
+     */
+    @com.google.gson.annotations.SerializedName("cast_counted_laughs")
+    private Integer castCountedLaughs;
 
     /**
      * How many times THIS effect repeats, written {@code "<counter>:<step>"} - 「每 120 隐藏分 1 个额外回合」 owes THREE extra

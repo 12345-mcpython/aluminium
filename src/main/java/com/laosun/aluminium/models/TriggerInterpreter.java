@@ -403,6 +403,22 @@ public final class TriggerInterpreter {
                     "Op " + op + " states \"steps\", which only SPEND_STEPS reads: it consumes the milestones a "
                             + "\"per_steps\" effect counted (source: " + spec.getSource() + ")");
         }
+        // `cast_counted_laughs` is a fact about a COMMANDED CAST ("make it cast, counting 20 laughs"), so only
+        // CAST_SKILL reads it - the same closed-set reasoning as `cast_target` above. A negative count is refused
+        // outright: it would fold a laugh factor below 1, which no sentence means.
+        if (effect.getCastCountedLaughs() != null) {
+            if (!"CAST_SKILL".equals(op)) {
+                throw new IllegalArgumentException(
+                        "Op " + op + " states \"cast_counted_laughs\" (" + effect.getCastCountedLaughs() + "), but only "
+                                + "CAST_SKILL reads it: it is the laugh count the cast IT PERFORMS is settled with, and "
+                                + "no other op performs one (source: " + spec.getSource() + ")");
+            }
+            if (effect.getCastCountedLaughs() < 0) {
+                throw new IllegalArgumentException(
+                        "Op " + op + " states a negative \"cast_counted_laughs\" (" + effect.getCastCountedLaughs()
+                                + "); a laugh count is a number of points (source: " + spec.getSource() + ")");
+            }
+        }
         if (PLANNED.contains(op)) {
             throw new IllegalArgumentException(
                     "Trigger op '" + op + "' is declared in the roadmap but not wired yet "
@@ -3001,6 +3017,20 @@ public final class TriggerInterpreter {
         // turn), not an authoring mistake.
         if (battle.currentCast() != null && battle.currentCast().outer() != null) {
             return;
+        }
+        if (effect.getCastCountedLaughs() != null) {
+            // ⚠ Loud when the cast cannot fold it: a fixed laugh count only reaches ELATION damage, and on any other
+            // cast it would be a number nobody reads - the silence this interpreter refuses everywhere else. The damage
+            // type is a fact about the skill's own row, so this can only be asked HERE (and it is the same reader the
+            // settlement uses, `SkillExecutor.damageTypeOf`).
+            if (SkillExecutor.damageTypeOf(skill.getData()) != com.laosun.aluminium.enums.DamageType.ELATION) {
+                throw new IllegalStateException("CAST_SKILL states cast_counted_laughs="
+                        + effect.getCastCountedLaughs() + ", but the commanded " + slot + " settles as "
+                        + SkillExecutor.damageTypeOf(skill.getData())
+                        + " damage: a laugh count is folded into Elation damage and nowhere else, so this number would "
+                        + "be read by nobody");
+            }
+            battle.markNextCastCountedLaughs(effect.getCastCountedLaughs());
         }
         skill.execute(battle, actor, victims);
         // The moment "after the surprise attack ends" names: the commanded cast has finished, the original continues afterwards. A
