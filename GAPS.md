@@ -643,6 +643,22 @@ Lv10 = 0.15 ✓、Lv15 = 0.2 ✓）。
 1. **规则/效果级**（她 ✓ ＋ 1513／8009／8010 的"施放一次固定计入 N"✓）—— 作用在**那一笔实例**上 ✓；
 2. **更广的一段**（1502 的"**额外回合**固定计入 20／40"✗）—— 那是**一整段时间**的计数覆写 ✓，得住进「回合级」的东西 ✓ ⇒ 先登记，不与第 1 段混做 ✗。
 
+#### ⚠ 第 1 段（实例级 `counted_laughs`）：**落点已实测，动手清单如下**（未落地 ✗）
+
+⭐ 已确认**只有两处**做欢愉折叠 ✓（实测 `grep elationLaughMultiplier` ✓）：
+1. `TriggerInterpreter.damage(...)` 里的 `settledBase = damageType == ELATION ? base * (1+BOOST) * (1+AMP) * laugh : base;` ✓
+   —— ⚠ 我这次为 `elation_from` 改的就是这一行 ✓（`laugh` 现写作 `ctx.battle() == null ? 1 : ctx.battle().elationLaughMultiplier()` ✓）；
+2. `TriggerInterpreter.addDamageFlat(...)` 附近的 `magnitude *= ctx.battle().elationLaughMultiplier();` ✓。
+
+**动手清单**（顺序固定，每步都要编译 ✓）：
+- ⓐ `EffectSpec` 加 `"counted_laughs"`（`Double` ✓）**并更新 `copy()`** ✓（⚠ 反射守卫测试要求 `copy()` 列出**每一个**字段 ✓，漏了会红 ✓）；
+- ⓑ 加一个**共用 helper** ✓：`laughFactor(ctx, effect)` ✓ = 声明了 `counted_laughs` ⇒ `1 + N*5/(N+240)` ✓，否则 `battle.elationLaughMultiplier()` ✓（⚠ 一处读表、两处调用 ✓，避免漂移 ✓）；⚠ N < 0 要**响亮拒绝** ✓（不许静默 ✓）；
+- ⓒ 把上面**两处**换成这个 helper ✓（只改这两处 ✓）；
+- ⓓ **判据**（`CountedLaughsTest` ✓）：声明 99 ⇒ 用 `1 + 99*5/(99+240)` ✓；**不声明** ⇒ 仍用池子快照 ✓（同场战斗里**两种并存** ✓ —— 这条最承重 ✓）；池子同时为 0 与为 300 时，**声明的那一笔不变** ✓（证明它**不看池子** ✓）；
+- ⓔ **变异**：helper 忽略 `counted_laughs` ⇒ 红 ✓；用池子值替代 N ⇒ 红 ✓；N 也乘进别的乘区 ⇒ 红 ✓。
+
+⚠ **1502 的"额外回合固定计入 20／40"不在这一段** ✗（那是**回合级**的计数覆写 ✓，另一种面 ✓）—— 已在上面单独登记 ✓。
+
 #### ⚠ 星魂 2 后半：**最后一块已定位，设计已定**（未落地 ✗）
 
 原文 ✓：「本次【无敌玩家】状态下每使【隐藏分】提高 **120** 点（**含初始**隐藏分），获得 **1 个额外回合**并**恢复 1 次强化普攻次数**」✓。
