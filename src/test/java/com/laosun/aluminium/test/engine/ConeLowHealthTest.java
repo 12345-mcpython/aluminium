@@ -5,14 +5,13 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Weapon;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.enums.TriggerEvent;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * The low-health family, and a kill-triggered one: 20003 (defence, plus an extra below half health), 20016 (crit rate below a health threshold) and
@@ -24,7 +23,6 @@ import java.util.Random;
 public class ConeLowHealthTest {
     private static final int WEARER = 1001;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
 
 
 
@@ -45,7 +43,7 @@ public class ConeLowHealthTest {
     }
 
     private static Battle battleWith(Character wearer) {
-        return new Battle(List.of(wearer), List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+        return BattleFixture.battle(List.of(wearer), List.of(BattleFixture.monster()));
     }
 
     private static double share(int cone, int rank, AttributeType attribute, boolean wounded, boolean secondFire) {

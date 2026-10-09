@@ -1,6 +1,7 @@
 package com.laosun.aluminium.test.engine;
 
 
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
@@ -288,7 +289,7 @@ public class ShieldBoostTest {
 
     /** One started battle around the given team, so every {@code BATTLE_START} rule has fired. */
     private static Battle battleWith(List<Character> team) {
-        Battle battle = new Battle(team, List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+        Battle battle = BattleFixture.battle(team, List.of(BattleFixture.monster()));
         battle.startBattle();
         return battle;
     }

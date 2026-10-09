@@ -10,14 +10,13 @@ import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Damage;
 import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * {@code ABSORB_DAMAGE}: a share of an incoming hit paid for out of <b>another unit's</b> counter.
@@ -37,7 +36,6 @@ import java.util.Random;
 public class AbsorbDamageTest {
     private static final int PEARL = 1503;
     private static final int ALLY = 1204;
-    private static final int MONSTER = 1002011;
     private static final String COUNTER = "抵御值计数";
 
     /** Enough points behind the target: the whole share is blocked, and the payer is charged for it. */
@@ -184,8 +182,8 @@ public class AbsorbDamageTest {
     }
 
     private static Battle newBattle() {
-        Battle battle = new Battle(List.of(CharacterFactory.create(PEARL, 80), CharacterFactory.create(ALLY, 80)),
-                List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+        Battle battle = BattleFixture.battle(List.of(CharacterFactory.create(PEARL, 80), CharacterFactory.create(ALLY, 80)),
+                List.of(BattleFixture.monster()));
         battle.startBattle();
         battle.processRequests();
         return battle;

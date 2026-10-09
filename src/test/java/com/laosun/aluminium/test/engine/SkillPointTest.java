@@ -9,12 +9,12 @@ import com.laosun.aluminium.models.skill.DefaultSkill;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.models.skill.Skill;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 import java.util.function.Supplier;
 
 /**
@@ -284,7 +284,7 @@ public class SkillPointTest {
 
     private static Battle newBattle(Character hero) {
         Enemy enemy = EnemyFactory.create(1002011, 90, 1);
-        Battle battle = new Battle(List.of(hero), List.of(enemy), new Random(0));
+        Battle battle = BattleFixture.battle(List.of(hero), List.of(enemy));
         battle.startBattle();
         return battle;
     }

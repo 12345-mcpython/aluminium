@@ -1,6 +1,7 @@
 package com.laosun.aluminium.test.engine;
 
 
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
@@ -240,7 +241,7 @@ public class DebuffTest {
     }
 
     private static Battle battleWith(TriggerSpec... specs) {
-        Battle battle = new Battle(List.of(ownerWith(specs)), List.of(dummy()), new Random(0));
+        Battle battle = BattleFixture.battle(List.of(ownerWith(specs)), List.of(dummy()));
         battle.startBattle();
         return battle;
     }

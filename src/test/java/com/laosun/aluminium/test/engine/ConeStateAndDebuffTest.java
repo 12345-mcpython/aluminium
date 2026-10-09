@@ -12,12 +12,12 @@ import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.Weapon;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /** Cones 21015 (a state and the defence drop it implies) and 23020 (debuff-fed crit damage, debate state). */
 public class ConeStateAndDebuffTest {
@@ -31,7 +31,7 @@ public class ConeStateAndDebuffTest {
     }
 
     private Battle battleWith(Character unit, Enemy enemy) {
-        Battle battle = new Battle(List.of(unit), List.of(enemy), new Random(0));
+        Battle battle = BattleFixture.battle(List.of(unit), List.of(enemy));
         battle.startBattle();
         return battle;
     }

@@ -9,12 +9,12 @@ import com.laosun.aluminium.models.DoubleValue;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.models.buff.CounterMechanic;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * counter-attack.
@@ -164,7 +164,7 @@ public class BossMechanicTest {
         Enemy enemy = EnemyFactory.create(ICE_EDGE, ENEMY_LEVEL, 1);
         enemy.setAttribute(AttributeType.HEALTH, new DoubleValue(1_000_000));
         enemy.heal(1_000_000);
-        Battle battle = new Battle(List.of(hero), List.of(enemy), new Random(0));
+        Battle battle = BattleFixture.battle(List.of(hero), List.of(enemy));
         battle.startBattle();
         // Deterministic damage: no crit rolls to compare around.
         hero.setAttribute(AttributeType.CRIT_CHANCE, new DoubleValue(0));

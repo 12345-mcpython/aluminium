@@ -1,6 +1,7 @@
 package com.laosun.aluminium.test.engine;
 
 
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.test.trigger.RelicTriggerTableTest;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.Constant;
@@ -23,7 +24,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Relic set abilities, end to end: a set whose bonus is an <em>ability</em> rather than stats now
@@ -748,7 +748,7 @@ public class RelicAbilityBattleTest {
         Enemy enemy = EnemyFactory.create(ICE_EDGE, ENEMY_LEVEL, 1);
         enemy.setAttribute(AttributeType.HEALTH, new DoubleValue(ENEMY_HP));
         enemy.heal(ENEMY_HP);
-        Battle battle = new Battle(team, List.of(enemy), new Random(0));
+        Battle battle = BattleFixture.battle(team, List.of(enemy));
         if (start) {
             battle.startBattle();
         }
