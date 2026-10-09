@@ -2,6 +2,7 @@ package com.laosun.aluminium.test.engine;
 
 
 import com.laosun.aluminium.test.data.BuffRuleTest;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.Constant;
@@ -21,7 +22,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * The generic primitives the relic abilities needed (a follow-up to the relic work): a <b>stackable</b> stat
@@ -473,7 +473,7 @@ public class StatModifierStackingTest {
         Enemy enemy = EnemyFactory.create(1002011, 90, 1);
         enemy.setAttribute(AttributeType.HEALTH, new DoubleValue(1_000_000));
         enemy.heal(1_000_000);
-        Battle battle = new Battle(List.of(hero), List.of(enemy), new Random(0));
+        Battle battle = BattleFixture.battle(List.of(hero), List.of(enemy));
         battle.startBattle();
         return battle;
     }

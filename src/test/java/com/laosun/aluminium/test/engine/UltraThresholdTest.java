@@ -5,12 +5,12 @@ import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * The ultimate's cast threshold: once {@code sp_need} is reached the ultimate can be cast; the
@@ -200,7 +200,7 @@ public class UltraThresholdTest {
 
     private static Battle newBattle(Character hero) {
         Enemy enemy = EnemyFactory.create(1002011, 90, 1);
-        Battle battle = new Battle(List.of(hero), List.of(enemy), new Random(0));
+        Battle battle = BattleFixture.battle(List.of(hero), List.of(enemy));
         battle.startBattle();
         return battle;
     }

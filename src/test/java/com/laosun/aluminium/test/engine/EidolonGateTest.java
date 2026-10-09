@@ -1,6 +1,7 @@
 package com.laosun.aluminium.test.engine;
 
 
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.Constant;
@@ -135,7 +136,7 @@ public class EidolonGateTest {
     }
 
     private static Battle battleWith(int rank, TriggerSpec... specs) {
-        Battle battle = new Battle(List.of(owner(OWNER, rank, specs)), List.of(dummy()), new Random(0));
+        Battle battle = BattleFixture.battle(List.of(owner(OWNER, rank, specs)), List.of(dummy()));
         battle.startBattle();
         return battle;
     }

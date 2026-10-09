@@ -5,14 +5,13 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Weapon;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.enums.TriggerEvent;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Three light cones authored in one batch from `weapons.json`: 20000 (crit rate at battle start), 20003 (defence, plus a low-health extra) and 20014
@@ -24,7 +23,6 @@ import java.util.Random;
 public class ConeBatchTest {
     private static final int WEARER = 1001;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
 
     @Test
     public void cone20000GivesCritRateAtBattleStart() {
@@ -45,8 +43,8 @@ public class ConeBatchTest {
     }
 
     private static Battle battleWith(Character wearer) {
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
-        Battle battle = new Battle(List.of(wearer), List.of(enemy), new Random(0));
+        Enemy enemy = BattleFixture.monster();
+        Battle battle = BattleFixture.battle(List.of(wearer), List.of(enemy));
         return battle;
     }
 

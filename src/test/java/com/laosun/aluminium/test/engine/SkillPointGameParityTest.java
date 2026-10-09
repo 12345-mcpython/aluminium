@@ -12,12 +12,12 @@ import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.models.skill.Skill;
 import com.laosun.aluminium.models.buff.StunBuff;
 import com.laosun.aluminium.models.energy.NoConventionalEnergyProvider;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 import java.util.function.Supplier;
 
 /**
@@ -320,7 +320,7 @@ public class SkillPointGameParityTest {
 
     private static Battle newBattle(List<Character> team) {
         Enemy enemy = EnemyFactory.create(1002011, 90, 1);
-        Battle battle = new Battle(team, List.of(enemy), new Random(0));
+        Battle battle = BattleFixture.battle(team, List.of(enemy));
         battle.startBattle();
         return battle;
     }

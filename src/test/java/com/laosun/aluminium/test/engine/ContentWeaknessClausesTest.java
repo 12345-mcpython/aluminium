@@ -7,6 +7,7 @@ import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Weapon;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -35,8 +36,8 @@ public class ContentWeaknessClausesTest {
 
     /** Whether light cone 23050 is equipped or nothing is, neither affects these four - they are the character's own rules. */
     private static Battle battleWith(Character wearer) {
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
-        Battle battle = new Battle(List.of(wearer), List.of(enemy), new Random(0));
+        Enemy enemy = BattleFixture.monster();
+        Battle battle = BattleFixture.battle(List.of(wearer), List.of(enemy));
         battle.startBattle();
         return battle;
     }

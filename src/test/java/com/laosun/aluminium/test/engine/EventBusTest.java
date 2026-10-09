@@ -14,13 +14,13 @@ import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.models.event.*;
 import com.laosun.aluminium.models.skill.DefaultSkill;
 import com.laosun.aluminium.models.skill.Skill;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 /**
  * Event completion: verifies that the new events are emitted at the right time, the
@@ -664,7 +664,7 @@ public class EventBusTest {
         Enemy enemy = EnemyFactory.create(1002011, 90, 1);
         enemy.setAttribute(AttributeType.HEALTH, new DoubleValue(1_000_000));   // so one hit does not kill it
         enemy.heal(1_000_000);
-        Battle battle = new Battle(List.of(hero), List.of(enemy), new Random(0));
+        Battle battle = BattleFixture.battle(List.of(hero), List.of(enemy));
         battle.startBattle();
         return battle;
     }

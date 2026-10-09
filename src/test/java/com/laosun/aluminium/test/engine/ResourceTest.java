@@ -19,13 +19,13 @@ import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.energy.EnergyGain;
 import com.laosun.aluminium.models.energy.EnergyProvider;
 import com.laosun.aluminium.models.skill.Skill;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 /**
  * Stack resources: the abstraction that lets "stack instead of an energy bar" characters work
@@ -483,7 +483,7 @@ public class ResourceTest {
         enemy.heal(1_000_000);
         List<Enemy> enemies = new ArrayList<>();
         enemies.add(enemy);
-        Battle battle = new Battle(team, enemies, new Random(0));
+        Battle battle = BattleFixture.battle(team, enemies);
         battle.startBattle();
         return battle;
     }

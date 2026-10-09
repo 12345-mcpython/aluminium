@@ -8,6 +8,7 @@ import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.skill.DefaultSkill;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -186,6 +187,6 @@ public class ToughnessBattleTest {
     }
 
     private static Battle newBattle(Character hero, Enemy enemy) {
-        return new Battle(List.of(hero), List.of(enemy), new Random(0));
+        return BattleFixture.battle(List.of(hero), List.of(enemy));
     }
 }

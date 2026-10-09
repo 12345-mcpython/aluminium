@@ -5,14 +5,13 @@ import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.models.skill.SkillExecutor;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * 「每消耗1点[热意]额外 1 次 21%」 - the points a cast is about to spend.
@@ -25,7 +24,6 @@ import java.util.Random;
 public class SpendAllTest {
     private static final int OWNER = 1513;
     private static final int ALLY = 1404;
-    private static final int MONSTER = 1002011;
     private static final String RES = "热意";
 
     /** The cast spends everything. */
@@ -54,8 +52,7 @@ public class SpendAllTest {
     private static Battle primed(int start) {
         Character owner = CharacterFactory.create(OWNER, 80, false, null, null, 0);
         Character ally = CharacterFactory.create(ALLY, 80, false, null, null, 0);
-        Battle battle = new Battle(List.of(owner, ally),
-                List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+        Battle battle = BattleFixture.battle(List.of(owner, ally), List.of(BattleFixture.monster()));
         battle.startBattle();
         for (int i = 0; i < start; i++) {
             battle.fireTriggers(TriggerEvent.ALLY_ATTACK, ally, ally, 0, 0);
