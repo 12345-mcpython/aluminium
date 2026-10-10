@@ -2,6 +2,7 @@ package com.laosun.aluminium.test.content.memosprites;
 
 
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
@@ -22,7 +23,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * {@code SUMMONED} - "when summoned", and the reason its timing is part of the contract.
@@ -64,7 +64,7 @@ public class SummonEntryTest {
         Character owner = characterWith(rule("SUMMONED", List.of("actor == summon"),
                 gainResource("charge")));
         owner.getResources().register("charge", 10, 0);
-        Battle battle = new Battle(List.of(owner), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(owner), List.of(dummy()), BattleFixture.seeded());
 
         battle.summonMemosprite(owner);
         battle.processRequests();
@@ -86,7 +86,7 @@ public class SummonEntryTest {
     @Test
     public void theSummonIsScheduledBeforeTheEventFires() {
         Character owner = characterWith(rule("SUMMONED", List.of("actor == summon"), advanceSummon()));
-        Battle battle = new Battle(List.of(owner), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(owner), List.of(dummy()), BattleFixture.seeded());
 
         Summon minion = battle.summon(owner, MONSTER, 1);
         minion.setAttribute(AttributeType.SPEED, new DoubleValue(1));   // would act last on its own
@@ -103,7 +103,7 @@ public class SummonEntryTest {
                 gainResource("charge")));
         owner.getResources().register("charge", 10, 0);
         Character teammate = CharacterFactory.create(TEAMMATE, LEVEL);
-        Battle battle = new Battle(List.of(owner, teammate), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(owner, teammate), List.of(dummy()), BattleFixture.seeded());
 
         battle.summonMemosprite(teammate);
         battle.processRequests();
@@ -118,7 +118,7 @@ public class SummonEntryTest {
         Character owner = characterWith(rule("SUMMONED", List.of("actor == summon"),
                 gainResource("charge")));
         owner.getResources().register("charge", 10, 0);
-        Battle battle = new Battle(List.of(owner), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(owner), List.of(dummy()), BattleFixture.seeded());
 
         battle.summonMemosprite(owner);
         battle.processRequests();
@@ -146,7 +146,7 @@ public class SummonEntryTest {
     @Test
     public void theAuthoredRuleStatesItsShape() {
         Character owner = CharacterFactory.create(OWNER, LEVEL);
-        Battle battle = new Battle(List.of(owner), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(owner), List.of(dummy()), BattleFixture.seeded());
 
         List<TriggerTable.CompiledRule> rules = TriggerTables.of(OWNER).matching(TriggerEvent.SUMMONED,
                 new TriggerTable.TriggerContext(owner, battle.summonMemosprite(owner), null, 0, 0, null, battle));
@@ -174,7 +174,7 @@ public class SummonEntryTest {
     @Test
     public void theAuthoredRuleMakesTheMemospriteActFirst() {
         Character owner = CharacterFactory.create(OWNER, LEVEL);
-        Battle battle = new Battle(List.of(owner), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(owner), List.of(dummy()), BattleFixture.seeded());
 
         battle.startBattle();
 

@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Two `on_any` readers: 21004 (break effect, plus energy after any attack, once per turn) and 20012 (energy after an attack or after being hit, once per turn).
@@ -28,7 +27,7 @@ public class ConeAttackEnergyTest {
         @Test
     public void cone21004GivesTheRankShareOfBreakEffect() {
         Character unit = CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(21004, LEVEL, false, 1));
-        Battle battle = new Battle(List.of(unit), List.of(BattleFixture.monster()), new Random(0));
+        Battle battle = new Battle(List.of(unit), List.of(BattleFixture.monster()), BattleFixture.seeded());
         double before = unit.getAttribute(AttributeType.BREAKING_EFFECT).get();
         battle.startBattle();
         Assertions.assertEquals(0.28, unit.getAttribute(AttributeType.BREAKING_EFFECT).get() - before, 1e-6,
@@ -56,7 +55,7 @@ public class ConeAttackEnergyTest {
     }
 
     private static Battle turnBattle(Character unit, Enemy enemy) {
-        Battle battle = new Battle(List.of(unit), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         battle.currentMove = new Signal(unit);
         battle.beforeMove();

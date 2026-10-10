@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * 1415's memosprite skill 19, first sentence: "德谬歌施放忆灵技时，使风堇获得2层[献予'天空'之诗]".
@@ -30,7 +29,7 @@ public class SkyOdeStackTest {
         Character hyacine = CharacterFactory.create(HYACINE, LEVEL);
         Character other = CharacterFactory.create(OTHER, LEVEL);
         Battle battle = new Battle(List.of(cyrene, hyacine, other),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         cyrene = battle.characters.get(0);
@@ -64,7 +63,7 @@ public class SkyOdeStackTest {
         Character cyrene = CharacterFactory.create(CYRENE, LEVEL);
         Character other = CharacterFactory.create(OTHER, LEVEL);
         Battle battle = new Battle(List.of(cyrene, other),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         cyrene = battle.characters.get(0);

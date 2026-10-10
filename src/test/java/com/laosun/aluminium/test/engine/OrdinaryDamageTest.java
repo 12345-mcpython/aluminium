@@ -2,6 +2,7 @@ package com.laosun.aluminium.test.engine;
 
 
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.TriggerEvent;
@@ -14,7 +15,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * A rule-driven ORDINARY damage instance, 1505 Evanescia (绯英)'s technique:
@@ -45,7 +45,7 @@ public class OrdinaryDamageTest {
         }
         Enemy first = EnemyFactory.create(MONSTER, 90, 1);
         Enemy second = EnemyFactory.create(MONSTER, 90, 2);
-        Battle battle = new Battle(List.of(elation, ally), List.of(first, second), new Random(0));
+        Battle battle = new Battle(List.of(elation, ally), List.of(first, second), BattleFixture.seeded());
         double before = first.getCurrentHp() + second.getCurrentHp();
         battle.startBattle();
         return before - (first.getCurrentHp() + second.getCurrentHp());

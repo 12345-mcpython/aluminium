@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * 1502 Yao Guang's (爻光) ultimate on both counts: "获得 5 个笑点…并使我方全体目标全属性抗性穿透提高 10%，持续 3 回合".
@@ -31,7 +30,7 @@ public class YaoGuangTest {
     private void build() {
         yaoguang = CharacterFactory.create(WEARER, LEVEL);
         ally = CharacterFactory.create(ALLY, LEVEL);
-        battle = new Battle(List.of(yaoguang, ally), List.of(BattleFixture.monster()), new Random(0));
+        battle = new Battle(List.of(yaoguang, ally), List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
     }
 

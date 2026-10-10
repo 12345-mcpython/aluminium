@@ -15,7 +15,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Light cone 20016: "装备者当前生命值百分比小于#1[i]%时，暴击率提高#2[i]%".
@@ -37,7 +36,7 @@ public class MutualDemiseTest {
     private static double gain(double fraction) {
         Character unit = CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(20016, LEVEL, false, 5));
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(unit), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         int guard = 0;
         while (fraction > 0 && unit.getCurrentHp() / unit.getMaxHp() >= fraction && guard++ < 80) {

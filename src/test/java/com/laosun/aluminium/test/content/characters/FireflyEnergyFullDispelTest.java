@@ -7,11 +7,11 @@ import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Firefly (流萤) (1310) TALENT: "when energy is restored to the maximum, remove all of its own negative effects".
@@ -26,7 +26,7 @@ public class FireflyEnergyFullDispelTest {
 
     private static Character wearer(Battle[] out) {
         Character c = CharacterFactory.create(CID, LEVEL);
-        Battle b = new Battle(List.of(c), List.of(EnemyFactory.create(1002011, 90, 1)), new Random(0));
+        Battle b = new Battle(List.of(c), List.of(EnemyFactory.create(1002011, 90, 1)), BattleFixture.seeded());
         b.startBattle();
         out[0] = b;
         return c;

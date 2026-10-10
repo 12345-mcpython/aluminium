@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Light cone 21022: "raise the damage dealt to enemy targets in the shock or wind shear state by #2%" at rank 5.
@@ -40,7 +39,7 @@ public class FermataTest {
     private static double settled(int which) {
         Character unit = CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(21022, LEVEL, false, 5));
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(unit), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         if (which == 1 || which == 3) {
             enemy.getBuffManager().addBuff(new DotBuff(unit, DamageElement.THUNDER, 100, 3));

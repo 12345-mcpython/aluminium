@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * 1415 Cyrene (昔涟)'s aura: "昔涟在场时，我方全体目标造成的伤害提高20.00%" (while Cyrene is on the field, all of our targets deal 20.00% more damage) -- carried by the rule the file ALREADY had,
@@ -42,7 +41,7 @@ public class CyreneAuraTest {
         List<Character> team = withCyrene
                 ? List.of(teammate, CharacterFactory.create(CYRENE, LEVEL))
                 : List.of(teammate);
-        Battle battle = new Battle(team, List.of(enemy), new Random(0));
+        Battle battle = new Battle(team, List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         return teammate.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
     }

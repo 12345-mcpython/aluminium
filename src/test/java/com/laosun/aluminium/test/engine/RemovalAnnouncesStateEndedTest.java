@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * An EXPLICIT removal ends a state, and the tables hear about it.
@@ -49,7 +48,7 @@ public class RemovalAnnouncesStateEndedTest {
     /** Casts her elation skill, which is what puts the Aha moment on. */
     private static Battle elation() {        Character owner = CharacterFactory.create(OWNER, 80, false, null, null, 0);
         Battle battle = new Battle(List.of(owner),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         Skill skill = owner.getSkills().get(SkillType.ELATION_SKILL);

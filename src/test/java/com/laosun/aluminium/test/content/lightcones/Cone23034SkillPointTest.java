@@ -6,10 +6,10 @@ import com.laosun.aluminium.models.Signal;
 import com.laosun.aluminium.models.Weapon;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import java.util.List;
-import java.util.Random;
 
 /** F-4: light cone 23034's skill-point clause, "every 2 Skills or Ultimates cast on one ally, restore 1". */
 public class Cone23034SkillPointTest {
@@ -31,7 +31,7 @@ public class Cone23034SkillPointTest {
     private static int pointsAfterAllyCasts(int casts) {
         Character wearer = CharacterFactory.create(WEARER, 80, true, Weapon.build(CONE, 80, false, 1));
         Character ally = CharacterFactory.create(ALLY, 80);
-        Battle battle = new Battle(List.of(wearer, ally), List.of(EnemyFactory.create(1002011, 100, 1)), new Random(0));
+        Battle battle = new Battle(List.of(wearer, ally), List.of(EnemyFactory.create(1002011, 100, 1)), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         wearer = battle.characters.getFirst();

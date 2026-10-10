@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * "制胜的瞬间 / Moment of Victory": the aggro doubling, and the two properties its data backs, per rank.
@@ -68,7 +67,7 @@ public class LightConeMomentTest {
         Character wearer = CharacterFactory.create(WEARER, LEVEL, true, weapon);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(wearer, ally), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(wearer, ally), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         return new Fixture(wearer, battle);
     }

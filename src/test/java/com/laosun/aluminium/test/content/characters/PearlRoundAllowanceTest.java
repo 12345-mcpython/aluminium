@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Character 1503 (Pearl): 感知容差 pays 5 per ally turn, at most 50 in a round, and the allowance resets on her turn.
@@ -105,7 +104,7 @@ public class PearlRoundAllowanceTest {
         Battle battle = new Battle(
                 List.of(CharacterFactory.create(PEARL, 80), CharacterFactory.create(ELATION_ALLY, 80),
                         CharacterFactory.create(HUNTER, 80)),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         return battle;

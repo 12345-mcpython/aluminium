@@ -17,7 +17,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * 1309's trace (行迹) "即兴装饰" (1309102): "处于[协奏]状态时，我方全体发动追加攻击造成的暴击伤害提高 25%".
@@ -55,7 +54,7 @@ public class RobinAuraTest {
         Character owner = CharacterFactory.create(OWNER, LEVEL);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(owner, ally), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(owner, ally), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         owner.getBuffManager().addBuff(new StateBuff("协奏", 3, true));
         ally.getAttribute(AttributeType.CRIT_CHANCE)
@@ -77,7 +76,7 @@ public class RobinAuraTest {
         Character owner = CharacterFactory.create(OWNER, LEVEL);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(owner, ally), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(owner, ally), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         ally.getAttribute(AttributeType.CRIT_CHANCE)
                 .addModifier(DoubleValue.Modifier.pure(2.0, DoubleValue.Modifier.ModifierSource.BUFF, 130902));

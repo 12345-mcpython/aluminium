@@ -3,6 +3,7 @@ package com.laosun.aluminium.test.engine;
 
 import com.laosun.aluminium.test.content.characters.HimekoChargeTest;
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
@@ -20,7 +21,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * {@code "target": "all_enemies"} - the first selector that reaches the <b>other</b> side as a group.
@@ -134,7 +134,7 @@ public class AllEnemiesTargetTest {
             this.owner = owner;
             this.first = EnemyFactory.create(ICE_EDGE, 90, 1);
             this.second = EnemyFactory.create(ICE_EDGE, 90, 1);
-            this.battle = new Battle(List.of(owner), List.of(first, second), new Random(0));
+            this.battle = new Battle(List.of(owner), List.of(first, second), BattleFixture.seeded());
             battle.startBattle();
         }
 

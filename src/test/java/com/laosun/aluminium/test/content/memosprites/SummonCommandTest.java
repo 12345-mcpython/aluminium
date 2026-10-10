@@ -2,6 +2,7 @@ package com.laosun.aluminium.test.content.memosprites;
 
 
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.MemospriteSpec;
@@ -26,7 +27,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * {@code COMMAND_SUMMON} - "make the memosprite deal damage equal to X% of the memosprite's Max HP to all enemies".
@@ -82,7 +82,7 @@ public class SummonCommandTest {
         Character owner = characterWith(
                 rule("ULT_CAST", command(0, 10)),
                 rule("SUMMON_ATTACK", List.of("actor == summon"), grantCritDamage(0.5)));
-        Battle battle = new Battle(List.of(owner), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(owner), List.of(dummy()), BattleFixture.seeded());
         battle.summonMemosprite(owner);
         double before = critDamageOf(owner);
 
@@ -121,7 +121,7 @@ public class SummonCommandTest {
         Character owner = characterWith(rule("ULT_CAST", command(0, 10)));
         Enemy first = dummy();
         Enemy second = otherDummy();
-        Battle battle = new Battle(List.of(owner), List.of(first, second), new Random(0));
+        Battle battle = new Battle(List.of(owner), List.of(first, second), BattleFixture.seeded());
         battle.summonMemosprite(owner);
         double firstBefore = first.getCurrentHp();
         double secondBefore = second.getCurrentHp();
@@ -161,7 +161,7 @@ public class SummonCommandTest {
     @Test
     public void theSummonsTurnIsNotSpent() {
         Character owner = characterWith(rule("ULT_CAST", command(0, 10)));
-        Battle battle = new Battle(List.of(owner), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(owner), List.of(dummy()), BattleFixture.seeded());
         Summon evey = battle.summonMemosprite(owner);
         battle.processRequests();
         double queueBefore = timeRemaining(battle, evey);
@@ -198,7 +198,7 @@ public class SummonCommandTest {
     @Test
     public void commandingASummonThatIsNotThereIsLoud() {
         Character owner = characterWith(rule("ULT_CAST", command(0, 10)));
-        Battle battle = new Battle(List.of(owner), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(owner), List.of(dummy()), BattleFixture.seeded());
 
         IllegalStateException refused = Assertions.assertThrows(IllegalStateException.class,
                 () -> battle.fireTriggers(TriggerEvent.ULT_CAST, owner, null, 0, 0));
@@ -211,7 +211,7 @@ public class SummonCommandTest {
     public void aNonDamagingSkillIsRefused() {
         Character owner = characterWith(rule("ULT_CAST",
                 withField(command(0, 10), "skill", "TALENT")));
-        Battle battle = new Battle(List.of(owner), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(owner), List.of(dummy()), BattleFixture.seeded());
         battle.summonMemosprite(owner);
 
         IllegalStateException refused = Assertions.assertThrows(IllegalStateException.class,
@@ -230,7 +230,7 @@ public class SummonCommandTest {
     @Test
     public void aLevelOutsideTheTableIsRefusedWhenItFires() {
         Character owner = characterWith(rule("ULT_CAST", command(0, 99)));
-        Battle battle = new Battle(List.of(owner), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(owner), List.of(dummy()), BattleFixture.seeded());
         battle.summonMemosprite(owner);
 
         IllegalStateException refused = Assertions.assertThrows(IllegalStateException.class,
@@ -252,7 +252,7 @@ public class SummonCommandTest {
         Character owner = characterWith(rule("ULT_CAST", command(0, 10)));
         Enemy first = dummy();
         Enemy second = otherDummy();
-        Battle battle = new Battle(List.of(owner), List.of(first, second), new Random(0));
+        Battle battle = new Battle(List.of(owner), List.of(first, second), BattleFixture.seeded());
         battle.summonMemosprite(owner);
         first.takeDamage(9_999_999);
         battle.processRequests();
@@ -281,7 +281,7 @@ public class SummonCommandTest {
         Character owner = CharacterFactory.create(OWNER, LEVEL);
         Enemy first = dummy();
         Enemy second = otherDummy();
-        Battle battle = new Battle(List.of(owner), List.of(first, second), new Random(0));
+        Battle battle = new Battle(List.of(owner), List.of(first, second), BattleFixture.seeded());
         Assertions.assertEquals(0, battle.summonCountOf(owner), "precondition: nothing is out yet");
         double firstBefore = first.getCurrentHp();
         double secondBefore = second.getCurrentHp();
@@ -297,7 +297,7 @@ public class SummonCommandTest {
     @Test
     public void theAuthoredRuleNamesItsSkillAndRow() {
         Character owner = CharacterFactory.create(OWNER, LEVEL);
-        Battle battle = new Battle(List.of(owner), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(owner), List.of(dummy()), BattleFixture.seeded());
         // A real battlefield is needed because `matching` evaluates the conditions, and this rule's condition
         // asks about the owner (`actor == self`) -- the same reason every condition test builds a battle.
         List<TriggerTable.CompiledRule> rules = TriggerTables.of(OWNER).matching(TriggerEvent.ULT_CAST,
@@ -399,7 +399,7 @@ public class SummonCommandTest {
                                           java.util.function.Consumer<Character> tweakOwner) {
         Character owner = characterWith(rule("ULT_CAST", command(0, 10)));
         Enemy target = dummy();
-        Battle battle = new Battle(List.of(owner), List.of(target), new Random(0));
+        Battle battle = new Battle(List.of(owner), List.of(target), BattleFixture.seeded());
         Summon evey = battle.summonMemosprite(owner);
         tweakSummon.accept(evey);
         tweakOwner.accept(owner);
@@ -414,7 +414,7 @@ public class SummonCommandTest {
     private static double commandedDamageWith(int level) {
         Character owner = characterWith(rule("ULT_CAST", command(0, level)));
         Enemy target = dummy();
-        Battle battle = new Battle(List.of(owner), List.of(target), new Random(0));
+        Battle battle = new Battle(List.of(owner), List.of(target), BattleFixture.seeded());
         battle.summonMemosprite(owner);
         double before = target.getCurrentHp();
 
@@ -480,7 +480,7 @@ public class SummonCommandTest {
         enemy.setMaxStance(300);
         enemy.setStance(300);
         Character owner = CharacterFactory.create(OWNER, LEVEL);
-        Battle battle = new Battle(List.of(owner), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(owner), List.of(enemy), BattleFixture.seeded());
 
         battle.castImmediate(new DefaultSkill(OWNER, 3, 1), owner, List.of(enemy));
 

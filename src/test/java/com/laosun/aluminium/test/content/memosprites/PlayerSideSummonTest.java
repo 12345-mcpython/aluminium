@@ -2,6 +2,7 @@ package com.laosun.aluminium.test.content.memosprites;
 
 
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
@@ -26,7 +27,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * The <b>friendly half of the camp widening</b>: our side's camp holds any {@code CanHit}, and {@code characters} is the
@@ -304,7 +304,7 @@ public class PlayerSideSummonTest {
     private static Fixture fixture() {
         Character hero = CharacterFactory.create(HERO, LEVEL);
         Enemy monster = EnemyFactory.create(1002011, 90, 1);
-        Battle battle = new Battle(List.of(hero), List.of(monster), new Random(0));
+        Battle battle = new Battle(List.of(hero), List.of(monster), BattleFixture.seeded());
         Summon summon = battle.summon(hero, MINION, GROUP);
         battle.processRequests();
         return new Fixture(battle, hero, monster, summon);

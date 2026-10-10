@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Relic set 125 "烈阳惊雷的女武神" (Warrior Goddess of Sun and Thunder) 4-piece: "当装备者及其忆灵为装备者及其忆灵以外的我方目标提供治疗后,使装备者获得[甘霖],
@@ -76,7 +75,7 @@ public class GentleRainTest {
         Character wearer = CharacterFactory.create(WEARER, LEVEL, true, null, RelicFactory.suit(125, 4, RELIC_LEVEL));
         Character ally = CharacterFactory.create(ALLY, LEVEL);
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(wearer, ally), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(wearer, ally), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         double baseSpeed = wearer.getAttribute(AttributeType.SPEED).baseValue();
         double baseCrit = ally.getAttribute(AttributeType.CRIT_ATTACK).baseValue();

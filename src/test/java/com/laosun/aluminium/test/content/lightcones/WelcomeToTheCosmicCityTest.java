@@ -15,7 +15,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Light cone 2305: the wearer's ELATION damage ignores 20% of the target's defence (its speed clause is the row's, and
@@ -40,7 +39,7 @@ public class WelcomeToTheCosmicCityTest {
         wearer.getAttribute(AttributeType.CRIT_CHANCE)
                 .addModifier(DoubleValue.Modifier.pure(-1.0, DoubleValue.Modifier.ModifierSource.BUFF, 230570));
         enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(wearer), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(wearer), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         return battle;
     }
@@ -79,7 +78,7 @@ public class WelcomeToTheCosmicCityTest {
                     .addModifier(DoubleValue.Modifier.pure(-1.0, DoubleValue.Modifier.ModifierSource.BUFF, 230571));
         }
         Enemy target = BattleFixture.monster();
-        Battle armed = new Battle(List.of(wearer, ally), List.of(target), new Random(0));
+        Battle armed = new Battle(List.of(wearer, ally), List.of(target), BattleFixture.seeded());
         armed.startBattle();
         double boosted = armed.applyDamage(target, new Damage(ally, target, DamageElement.FIRE, DamageType.ELATION, 1000));
 
@@ -88,7 +87,7 @@ public class WelcomeToTheCosmicCityTest {
         plainAlly.getAttribute(AttributeType.CRIT_CHANCE)
                 .addModifier(DoubleValue.Modifier.pure(-1.0, DoubleValue.Modifier.ModifierSource.BUFF, 230572));
         Enemy other = BattleFixture.monster();
-        Battle plain = new Battle(List.of(plainWearer, plainAlly), List.of(other), new Random(0));
+        Battle plain = new Battle(List.of(plainWearer, plainAlly), List.of(other), BattleFixture.seeded());
         plain.startBattle();
         double plainHit = plain.applyDamage(other, new Damage(plainAlly, other, DamageElement.FIRE, DamageType.ELATION, 1000));
         System.out.println("[23057] a teammate's elation hit: armed=" + boosted + " plain=" + plainHit);

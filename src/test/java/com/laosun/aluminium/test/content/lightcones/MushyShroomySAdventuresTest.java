@@ -16,7 +16,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Light cone 21064: while the wearer casts an ELATION skill, every enemy takes more elation damage.
@@ -42,7 +41,7 @@ public class MushyShroomySAdventuresTest {
         // the 1.5 crit multiplier), and a judge that compares two hits must compare the same arithmetic.
         wearer.getAttribute(com.laosun.aluminium.enums.AttributeType.CRIT_CHANCE)
                 .addModifier(DoubleValue.Modifier.pure(-1.0, DoubleValue.Modifier.ModifierSource.BUFF, 210640));
-        Battle battle = new Battle(List.of(wearer), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(wearer), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         return battle;
     }
@@ -96,7 +95,7 @@ public class MushyShroomySAdventuresTest {
         caster.getAttribute(com.laosun.aluminium.enums.AttributeType.CRIT_CHANCE)
                 .addModifier(DoubleValue.Modifier.pure(-1.0, DoubleValue.Modifier.ModifierSource.BUFF, 210641));
         Enemy target = BattleFixture.monster();
-        Battle arena = new Battle(List.of(caster), List.of(target), new Random(0));
+        Battle arena = new Battle(List.of(caster), List.of(target), BattleFixture.seeded());
         arena.startBattle();
         var elation = new com.laosun.aluminium.models.skill.DefaultSkill(1513, 20, LEVEL);
         Assertions.assertNotNull(elation.getData(), "1513 has a skill at slot 20");

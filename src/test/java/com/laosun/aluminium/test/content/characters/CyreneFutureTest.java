@@ -3,10 +3,10 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import java.util.List;
-import java.util.Random;
 
 /**
  * At battle start... other characters gain [未来]. Two-sided: the OTHER ally gets it, Cyrene (昔涟) herself does not (the text says 其他, "other").
@@ -23,7 +23,7 @@ public class CyreneFutureTest {
         Character cyrene = CharacterFactory.create(CYRENE, LEVEL);
         Character him = CharacterFactory.create(ANAXA, LEVEL);
         Battle battle = new Battle(List.of(cyrene, him),
-                List.of(EnemyFactory.create(MONSTER, 100, 1)), new Random(0));
+                List.of(EnemyFactory.create(MONSTER, 100, 1)), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         boolean ally = battle.characters.get(1).getBuffManager().hasState(FUTURE);

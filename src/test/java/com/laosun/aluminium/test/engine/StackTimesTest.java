@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * A stackable state can be applied N times in one effect.
@@ -55,7 +54,7 @@ public class StackTimesTest {
         Character owner = CharacterFactory.create(OWNER, LEVEL, false, null, null, 0);
         owner.setTriggerTable(scene(stackable));
         Battle battle = new Battle(List.of(owner),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         return owner;

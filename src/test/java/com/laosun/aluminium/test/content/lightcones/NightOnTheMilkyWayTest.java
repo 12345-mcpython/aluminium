@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /** Light cone 23000: a weakness break raises the wearer's damage for one turn (its per-enemy clause is registered). */
 public class NightOnTheMilkyWayTest {
@@ -30,7 +29,7 @@ public class NightOnTheMilkyWayTest {
     public void aBreakRaisesTheWearersDamageForOneTurn() {
         Character unit = wearer(true);
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(unit), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         double before = unit.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
         battle.fireTriggers(TriggerEvent.BREAK, unit, enemy, 0, 0);
@@ -55,7 +54,7 @@ public class NightOnTheMilkyWayTest {
     public void withoutTheConeNothingMoves() {
         Character unit = wearer(false);
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(unit), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         double before = unit.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
         battle.fireTriggers(TriggerEvent.BREAK, unit, enemy, 0, 0);

@@ -15,7 +15,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Cones 22002 (attack, then post-ultimate damage) and 24001 (crit, an INSTANCE crit against a low-HP target, post-kill attack).
@@ -30,7 +29,7 @@ public class ForTomorrowSJourneyAndCruisingInTheStellarSeasandTest {
     public void cone22002RaisesAttackAndThenDamageAfterTheUlt() {
         Character unit = CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(22002, LEVEL, false, 5));
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(unit), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         double boostBefore = unit.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
         battle.fireTriggers(TriggerEvent.ULT_CAST, unit, enemy, 0, 0);
@@ -52,7 +51,7 @@ public class ForTomorrowSJourneyAndCruisingInTheStellarSeasandTest {
     private static double instanceCrit(double fraction) {
         Character unit = CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(24001, LEVEL, false, 5));
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(unit), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         if (fraction > 0) {
             int guard = 0;

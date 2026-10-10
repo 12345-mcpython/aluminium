@@ -17,7 +17,6 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 /**
  * The milestone primitive's second half: {@code per_steps: "<counter>:<step>"} repeats ONE effect
@@ -203,7 +202,7 @@ public class PerStepsTest {
 
     private void fight() {
         battle = new Battle(List.of(unit, CharacterFactory.create(ALLY, 80)),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         battle.fireTriggers(TriggerEvent.TURN_START, unit, unit, 0, 0);

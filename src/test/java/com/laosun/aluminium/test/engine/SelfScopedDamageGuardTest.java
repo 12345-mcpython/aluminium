@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Three DEALING_DAMAGE rules must NOT reach a teammate's damage (round 245).
@@ -28,7 +27,7 @@ public class SelfScopedDamageGuardTest {
         Character ally = CharacterFactory.create(ALLY, LEVEL);
         Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(withOwner ? List.of(CharacterFactory.create(owner, LEVEL), ally) : List.of(ally),
-                List.of(enemy), new Random(0));
+                List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         // Drain the enemy below half HP first, so the "low HP" condition is satisfied for anybody's damage.
         while (enemy.getCurrentHp() / enemy.getMaxHp() > 0.4) {
@@ -59,7 +58,7 @@ public class SelfScopedDamageGuardTest {
     public void onlyAnUltimateCategoryInstanceGetsTheMultiplier() {
         Character owner = CharacterFactory.create(1220, LEVEL);
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(owner), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(owner), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         double ordinary = battle.applyDamage(enemy, new Damage(owner, enemy, DamageElement.WIND, DamageType.NORMAL, 1000));
         double ultimate = battle.applyDamage(enemy, new Damage(owner, enemy, DamageElement.WIND, DamageType.NORMAL, 1000,
@@ -76,7 +75,7 @@ public class SelfScopedDamageGuardTest {
         Character ally = CharacterFactory.create(ALLY, LEVEL);
         Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(withOwner ? List.of(CharacterFactory.create(owner, LEVEL), ally) : List.of(ally),
-                List.of(enemy), new Random(0));
+                List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         return battle.applyDamage(enemy, new Damage(ally, enemy, DamageElement.WIND, DamageType.NORMAL, 1000,
                 com.laosun.aluminium.enums.SkillCategory.ULTRA));

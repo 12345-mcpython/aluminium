@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Light cone 21014: "效果抵抗提高#1%，并使治疗量提高，提高数值等同于效果抵抗的#2%，最多使治疗量提高#3%".
@@ -26,7 +25,7 @@ public class PerfectTimingTest {
     public void theHealingClauseDerivesFromTheBoostedResistance() {
         Character unit = CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(21014, LEVEL, false, 5));
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(unit), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
         double resistBefore = unit.getAttribute(AttributeType.EFFECT_RESISTANCE).get();
         double healingBefore = unit.getAttribute(AttributeType.OUTGOING_HEALING_BOOST).get();
         battle.startBattle();

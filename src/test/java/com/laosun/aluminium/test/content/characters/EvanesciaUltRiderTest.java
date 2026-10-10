@@ -6,11 +6,11 @@ import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * 1505 Evanescia (绯英)'s ultimate rider: "while Evanescia (绯英) holds [好活当赏], casting the Ultimate deals 12% Physical Elation damage to all enemies".
@@ -31,7 +31,7 @@ public class EvanesciaUltRiderTest {
         Enemy first = EnemyFactory.create(MONSTER, 90, 1);
         Enemy second = EnemyFactory.create(MONSTER, 90, 2);
         Battle battle = new Battle(List.of(elation, CharacterFactory.create(ALLY, LEVEL)), List.of(first, second),
-                new Random(0));
+                BattleFixture.seeded());
         battle.startBattle();
         if (!keepTheGifts) {
             elation.getResources().spend(GIFTS, elation.getResources().value(GIFTS));

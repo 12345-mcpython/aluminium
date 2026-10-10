@@ -10,11 +10,11 @@ import com.laosun.aluminium.models.DoubleValue;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.models.enemy.EnemySkill;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * an enemy skill reaches whoever its <b>shape</b> says, not always the main target.
@@ -173,7 +173,7 @@ public class EnemySkillFullTest {
                 Character.fromAttributes("middle", HERO_HP, 100, 100, 100),
                 Character.fromAttributes("right", HERO_HP, 100, 100, 100));
         Enemy enemy = EnemyFactory.create(ICE_EDGE, ENEMY_LEVEL, 1);
-        Battle battle = new Battle(team, List.of(enemy), new Random(0));
+        Battle battle = new Battle(team, List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         enemy.setAttribute(AttributeType.CRIT_CHANCE, new DoubleValue(0));
         return battle;

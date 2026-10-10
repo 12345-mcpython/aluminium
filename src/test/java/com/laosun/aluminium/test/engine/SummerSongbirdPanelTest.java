@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * 1512 Robin - Summer Songbird's memosprite panel.
@@ -33,7 +32,7 @@ public class SummerSongbirdPanelTest {
     public void theMemospriteInheritsHerPanelAsRatios() {
         Character robin = CharacterFactory.create(ROBIN, 80);
         Battle battle = new Battle(List.of(robin),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
 

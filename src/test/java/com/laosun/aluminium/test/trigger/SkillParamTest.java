@@ -17,7 +17,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * `skill_param:<SKILLTYPE>:<index>`: a parameter of one of the RULE OWNER's own skills.
@@ -39,7 +38,7 @@ public class SkillParamTest {
         Character tribbie = CharacterFactory.create(TRIBBIE, LEVEL);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
         Battle battle = new Battle(List.of(tribbie, ally),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         tribbie = battle.characters.getFirst();

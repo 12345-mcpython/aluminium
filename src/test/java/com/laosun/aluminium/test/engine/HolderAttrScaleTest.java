@@ -16,7 +16,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * {@code holder_attr:<STATE>:<ATTRIBUTE>}: a magnitude that is a share of the attribute of the unit <b>holding a
@@ -57,7 +56,7 @@ public class HolderAttrScaleTest {
         owner.setTriggerTable(new TriggerTable(OWNER, List.of(
                 TriggerSpecs.rule("SKILL_CAST", List.of("actor == self"), holderDefenceShare()))));
         Battle battle = new Battle(List.of(owner, holder, bystander),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
 
         double ownerBefore = owner.getAttribute(AttributeType.DEFENCE).get();
@@ -103,7 +102,7 @@ public class HolderAttrScaleTest {
         owner.setTriggerTable(new TriggerTable(OWNER, List.of(
                 TriggerSpecs.rule("SKILL_CAST", List.of("actor == self"), holderDefenceShare()))));
         Battle battle = new Battle(List.of(owner, bystander),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         double ownerBefore = owner.getAttribute(AttributeType.DEFENCE).get();
 
@@ -193,7 +192,7 @@ public class HolderAttrScaleTest {
         owner.setTriggerTable(new TriggerTable(OWNER, List.of(
                 TriggerSpecs.rule("SKILL_CAST", List.of("actor == self"), defensiveRider()))));
         Battle battle = new Battle(List.of(owner, bystander),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
 
         IllegalStateException refused = Assertions.assertThrows(IllegalStateException.class,
@@ -217,7 +216,7 @@ public class HolderAttrScaleTest {
         owner.setTriggerTable(new TriggerTable(OWNER, List.of(
                 TriggerSpecs.rule("SKILL_CAST", List.of("actor == self"), riderOn(attribute)))));
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(owner, first, second), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(owner, first, second), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
 

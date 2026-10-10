@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * 1223 Moze's follow-up clauses: "[猎物]受到的追加攻击伤害提高 25%" (trace 1223103) and
@@ -49,7 +48,7 @@ public class MozeFollowUpTest {
     public void followUpDamageRisesByAQuarter() {
         Character unit = CharacterFactory.create(WEARER, LEVEL);
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(unit), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         battle.fireTriggers(TriggerEvent.SKILL_CAST, unit, enemy, 0, 0);
         double plain = battle.applyDamage(enemy, new Damage(unit, enemy, DamageElement.THUNDER, DamageType.NORMAL, 1000));
@@ -62,7 +61,7 @@ public class MozeFollowUpTest {
     public void aFollowUpRestoresOneSkillPointOncePerTurn() {
         Character unit = CharacterFactory.create(WEARER, LEVEL);
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(unit), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         int before = battle.getSkillPoints();
         battle.fireTriggers(TriggerEvent.FOLLOW_UP, unit, enemy, 500, 0);

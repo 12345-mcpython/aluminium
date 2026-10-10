@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * 1408: the reading of the two "when the transformation ends" sentences.
@@ -32,7 +31,7 @@ public class TransformationEndClausesTest {
         Character owner = CharacterFactory.create(OWNER, 80, false, null, null, 0);
         Character ally = CharacterFactory.create(ALLY, 80, false, null, null, 0);
         Battle battle = new Battle(List.of(owner, ally),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
 
@@ -65,7 +64,7 @@ public class TransformationEndClausesTest {
     public void theEndGrantsThreeSeeds() {
         Character owner = CharacterFactory.create(OWNER, 80, false, null, null, 0);
         Battle battle = new Battle(List.of(owner),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
 
@@ -98,7 +97,7 @@ public class TransformationEndClausesTest {
     public void theEndClauseCapsAtTwoLayers() {
         Character owner = CharacterFactory.create(OWNER, 80, false, null, null, 0);
         Battle battle = new Battle(List.of(owner),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
 

@@ -16,7 +16,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * 1412: "when charge reaches 6 points, automatically upgrade the character's [军功] to [爵位] and remove their control-class negative states".
@@ -54,7 +53,7 @@ public class PeerageDispelsControlTest {
         Character owner = CharacterFactory.create(OWNER, 80);
         Character ally = CharacterFactory.create(ALLY, 80);
         Battle battle = new Battle(List.of(owner, ally),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
 
         // Note: The ally's own table is replaced: this judge needs the ally to CARRY a control and a DOT, and no shipped file
         // gives it one. The state names are the document's (Frozen from the control list, Shocked as a non-control debuff).

@@ -3,10 +3,10 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import java.util.List;
-import java.util.Random;
 
 /**
  * Slot 25 "献予'大地'之诗" ("Ode to 'Earth'"): the audit found this whole skill missing, and these are the two clauses it can carry exactly.
@@ -31,7 +31,7 @@ public class EarthOdeMarksDanHengTest {
         Character cyrene = CharacterFactory.create(CYRENE, LEVEL);
         Character him = CharacterFactory.create(DAN_HENG, LEVEL);
         Battle battle = new Battle(List.of(cyrene, him),
-                List.of(EnemyFactory.create(MONSTER, 100, 1)), new Random(0));
+                List.of(EnemyFactory.create(MONSTER, 100, 1)), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         var sprite = battle.summonServant(battle.characters.get(0));

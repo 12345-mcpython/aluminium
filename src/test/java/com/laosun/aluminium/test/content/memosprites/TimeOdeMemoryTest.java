@@ -7,7 +7,6 @@ import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import java.util.List;
-import java.util.Random;
 
 /**
  * 1415's memosprite skill 24, second sentence: "after 长夜月 casts a Skill/Ultimate, additionally gain #2 points of [忆质]".
@@ -35,7 +34,7 @@ public class TimeOdeMemoryTest {
         Character cyrene = CharacterFactory.create(CYRENE, LEVEL);
         Character longnight = CharacterFactory.create(LONGNIGHT, LEVEL);
         Battle battle = new Battle(List.of(cyrene, longnight),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         cyrene = battle.characters.get(0);

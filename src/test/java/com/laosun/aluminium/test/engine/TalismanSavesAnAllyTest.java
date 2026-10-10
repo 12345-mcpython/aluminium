@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * 121: "while Huohuo (藿藿) holds [禳命], if one of our targets takes a lethal blow ... immediately restore HP equal to 50% of its own Max HP.
@@ -66,7 +65,7 @@ public class TalismanSavesAnAllyTest {
         Character her = CharacterFactory.create(HUOHUO, 80, false, null, null, eidolon);
         Character ally = CharacterFactory.create(ALLY, 80, false, null, null, 0);
         Battle battle = new Battle(List.of(her, ally),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
 

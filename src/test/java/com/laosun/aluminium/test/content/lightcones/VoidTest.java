@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Light cone 20004: "战斗开始时，使装备者的效果命中提高#1%，持续#2回合" -- the first cone authored from `weapons.json`'s per-rank table.
@@ -31,7 +30,7 @@ public class VoidTest {
     private static double gain(int rank) {
         Character wearer = CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(20004, LEVEL, false, rank));
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(wearer), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(wearer), List.of(enemy), BattleFixture.seeded());
         double before = wearer.getAttribute(AttributeType.EFFECT_HIT_RATE).get();
         battle.startBattle();
         return wearer.getAttribute(AttributeType.EFFECT_HIT_RATE).get() - before;

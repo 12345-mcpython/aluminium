@@ -5,17 +5,17 @@ import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Signal;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import java.util.List;
-import java.util.Random;
 
 /** "获得强化普攻". */
 public class RippleReinforcedBasicTest {
     @Test
     public void herUltimateReplacesHerBasic() {
         Character cyrene = CharacterFactory.create(1415, 80);
-        Battle battle = new Battle(List.of(cyrene), List.of(EnemyFactory.create(1002011, 100, 1)), new Random(0));
+        Battle battle = new Battle(List.of(cyrene), List.of(EnemyFactory.create(1002011, 100, 1)), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         cyrene = battle.characters.getFirst();
@@ -42,7 +42,7 @@ public class RippleReinforcedBasicTest {
     /** Spends a point on her Skill, then either casts her basic or the reinforced one the ripple installs. */
     private static int skillPoints(boolean insideTheRipple) {
         Character her = CharacterFactory.create(1415, 80);
-        Battle battle = new Battle(List.of(her), List.of(EnemyFactory.create(1002011, 100, 1)), new Random(0));
+        Battle battle = new Battle(List.of(her), List.of(EnemyFactory.create(1002011, 100, 1)), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         her = battle.characters.getFirst();

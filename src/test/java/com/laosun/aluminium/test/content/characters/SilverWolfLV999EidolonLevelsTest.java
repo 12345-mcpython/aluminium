@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Character 1506 (Silver Wolf LV.999), batch 2: her skill LEVELS, her speed trace, and Eidolon 6's 增笑.
@@ -156,7 +155,7 @@ public class SilverWolfLV999EidolonLevelsTest {
         Character wolf = CharacterFactory.create(WOLF, 80);
         Battle battle = new Battle(
                 List.of(wolf, CharacterFactory.create(ALLY, 80)),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         if (share != 0) {
             wolf.getBuffManager().addBuff(com.laosun.aluminium.models.buff.StatModifierBuff
                     .percentBuff(AttributeType.SPEED, share, 1));
@@ -172,7 +171,7 @@ public class SilverWolfLV999EidolonLevelsTest {
         Battle battle = new Battle(
                 List.of(CharacterFactory.create(WOLF, 80, false, null, null, eidolonRank),
                         CharacterFactory.create(ALLY, 80)),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         return battle;

@@ -10,11 +10,11 @@ import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.models.Signal;
 import com.laosun.aluminium.models.Summon;
 import com.laosun.aluminium.utils.AttributeBuilder;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * The enemy camp accepts any {@code CanHit}, so a {@link Summon} can fight alongside the monsters.
@@ -124,7 +124,7 @@ public class EnemyCampSummonTest {
                         .setBase(AttributeType.ATTACK, 100)
                         .setBase(AttributeType.SPEED, 100)
                         .build());
-        Battle battle = new Battle(List.of(hero), List.of(monster, summon), new Random(0));
+        Battle battle = new Battle(List.of(hero), List.of(monster, summon), BattleFixture.seeded());
         return new Fixture(battle, hero, monster, summon);
     }
 }

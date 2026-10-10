@@ -6,7 +6,6 @@ import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import java.util.List;
-import java.util.Random;
 
 /**
  * 114151complete: the whole sentence, both halves.
@@ -57,7 +56,7 @@ public class LifeOdeRaisesTheDragonTalentTest {
         for (int i = 0; i < enemies; i++) {
             pack.add(BattleFixture.monster());
         }
-        Battle battle = new Battle(List.of(her, cyrene), pack, new Random(0));
+        Battle battle = new Battle(List.of(her, cyrene), pack, BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         her = battle.characters.getFirst();

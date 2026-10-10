@@ -20,7 +20,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * The {@code SUMMON} op: a rule bringing its owner's <b>memosprite</b> (忆灵) onto the field.
@@ -61,7 +60,7 @@ public class SummonOpTest {
     @Test
     public void theBattleStartClauseBringsItOut() {
         Character castorice = CharacterFactory.create(CASTORICE_LIKE, LEVEL);
-        Battle battle = new Battle(List.of(castorice), List.of(monster()), new Random(0));
+        Battle battle = new Battle(List.of(castorice), List.of(monster()), BattleFixture.seeded());
 
         Assertions.assertNull(battle.memospriteOf(castorice), "nothing is out before the battle starts");
 
@@ -92,7 +91,7 @@ public class SummonOpTest {
     public void herUltimateSummonsItAndSomeoneElsesDoesNot() {
         Character aglaea = CharacterFactory.create(AGLAEA, LEVEL);
         Character ally = CharacterFactory.create(NO_MEMOSPRITE, LEVEL);
-        Battle battle = new Battle(List.of(aglaea, ally), List.of(monster()), new Random(0));
+        Battle battle = new Battle(List.of(aglaea, ally), List.of(monster()), BattleFixture.seeded());
         battle.startBattle();
 
         Assertions.assertNull(battle.memospriteOf(aglaea), "her file has no battle-start rule");
@@ -113,7 +112,7 @@ public class SummonOpTest {
     @Test
     public void summoningAgainKeepsTheSameOne() {
         Character aglaea = CharacterFactory.create(AGLAEA, LEVEL);
-        Battle battle = new Battle(List.of(aglaea), List.of(monster()), new Random(0));
+        Battle battle = new Battle(List.of(aglaea), List.of(monster()), BattleFixture.seeded());
         battle.startBattle();
 
         battle.fireTriggers(TriggerEvent.ULT_CAST, aglaea, null, 0, 0);
@@ -207,7 +206,7 @@ public class SummonOpTest {
     @Test
     public void firingItForACharacterWithNoSpecFailsLoudly() {
         Character himeko = CharacterFactory.create(NO_MEMOSPRITE, LEVEL);
-        Battle battle = new Battle(List.of(himeko), List.of(monster()), new Random(0));
+        Battle battle = new Battle(List.of(himeko), List.of(monster()), BattleFixture.seeded());
         battle.startBattle();
         himeko.setTriggerTable(new TriggerTable(NO_MEMOSPRITE, List.of(summonRule())));
 

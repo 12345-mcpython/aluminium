@@ -2,6 +2,7 @@ package com.laosun.aluminium.test.trigger;
 
 
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
@@ -15,7 +16,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * The {@code REMOVE_STACK} op: "…stacking up to 3 time(s); at the start of the wearer's turn, removes 1
@@ -196,14 +196,14 @@ public class TriggerRemoveStackTest {
     }
 
     private static Battle battleWith(TriggerSpec... specs) {
-        Battle battle = new Battle(List.of(ownerWith(specs)), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(ownerWith(specs)), List.of(dummy()), BattleFixture.seeded());
         battle.startBattle();
         return battle;
     }
 
     private static Battle withAlly(TriggerSpec... specs) {
         Battle battle = new Battle(List.of(ownerWith(specs), CharacterFactory.create(ALLY, LEVEL)),
-                List.of(dummy()), new Random(0));
+                List.of(dummy()), BattleFixture.seeded());
         battle.startBattle();
         return battle;
     }

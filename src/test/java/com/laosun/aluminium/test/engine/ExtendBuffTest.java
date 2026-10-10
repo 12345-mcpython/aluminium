@@ -25,7 +25,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * {@code EXTEND_BUFF}: "... increases the duration by 1 turn".
@@ -226,7 +225,7 @@ public class ExtendBuffTest {
             this.target = CharacterFactory.create(ALLY, LEVEL);
             this.owner.setTriggerTable(new TriggerTable(OWNER, List.of(rules)));
             this.target.setTriggerTable(new TriggerTable(ALLY, List.of()));
-            this.battle = new Battle(List.of(owner, target), List.of(dummy()), new Random(0));
+            this.battle = new Battle(List.of(owner, target), List.of(dummy()), BattleFixture.seeded());
             battle.startBattle();
         }
 

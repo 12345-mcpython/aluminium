@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /** 1101 Bronya (布洛妮娅)'s ultimate: an all-allies ATK share and a DERIVED CRIT DMG amount, both judged on a teammate. */
 public class BronyaUltimateTest {
@@ -23,7 +22,7 @@ public class BronyaUltimateTest {
         Character bronya = CharacterFactory.create(BRONYA, LEVEL);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(bronya, ally), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(bronya, ally), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         double attackBefore = ally.getAttribute(AttributeType.ATTACK).get();
         double critBefore = ally.getAttribute(AttributeType.CRIT_ATTACK).get();

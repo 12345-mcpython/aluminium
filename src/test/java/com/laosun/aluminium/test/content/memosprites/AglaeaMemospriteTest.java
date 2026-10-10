@@ -16,7 +16,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Aglaea (阿格莱雅) 1402's memosprite kit - "衣匠" ("Garmentmaker"), as data.
@@ -94,7 +93,7 @@ public class AglaeaMemospriteTest {
     @Test
     public void onlyOneHalfOfTheSkillAppliesAtATime() {
         Character aglaea = CharacterFactory.create(AGLAEA, LEVEL);
-        Battle battle = new Battle(List.of(aglaea), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(aglaea), List.of(dummy()), BattleFixture.seeded());
         battle.startBattle();
         Summon tailor = battle.summonMemosprite(aglaea);
         battle.processRequests();
@@ -160,7 +159,7 @@ public class AglaeaMemospriteTest {
     @Test
     public void theAuthoredRulesStateTheirShape() {
         Character aglaea = CharacterFactory.create(AGLAEA, LEVEL);
-        Battle battle = new Battle(List.of(aglaea), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(aglaea), List.of(dummy()), BattleFixture.seeded());
         battle.startBattle();
         Summon tailor = battle.summonMemosprite(aglaea);
         Assertions.assertNotNull(tailor);
@@ -223,7 +222,7 @@ public class AglaeaMemospriteTest {
     @Test
     public void herStanceEndsWhenTheGarmentmakerDoes() {
         Character aglaea = CharacterFactory.create(AGLAEA, LEVEL);
-        Battle battle = new Battle(List.of(aglaea), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(aglaea), List.of(dummy()), BattleFixture.seeded());
         battle.startBattle();
         Summon tailor = battle.summonMemosprite(aglaea);
         battle.processRequests();
@@ -251,7 +250,7 @@ public class AglaeaMemospriteTest {
     // ==================================================================
 
     private static Battle battle() {
-        return new Battle(List.of(CharacterFactory.create(AGLAEA, LEVEL)), List.of(dummy()), new Random(0));
+        return new Battle(List.of(CharacterFactory.create(AGLAEA, LEVEL)), List.of(dummy()), BattleFixture.seeded());
     }
 
     /** How much action value the unit still has - zero means "acts now". */

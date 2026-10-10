@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * 1404: [血仇] - - entering it, and the lethal blow that ends it.
@@ -30,7 +29,7 @@ public class BloodfeudTest {
     public void aLethalBlowEndsItAndHeSurvives() {
         Character him = CharacterFactory.create(MYDEI, 80, false, null, null, 0);
         Battle battle = new Battle(List.of(him),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
 
@@ -53,7 +52,7 @@ public class BloodfeudTest {
     public void withoutBloodfeudTheBlowKills() {
         Character him = CharacterFactory.create(MYDEI, 80, false, null, null, 0);
         Battle battle = new Battle(List.of(him),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         Assertions.assertFalse(him.getBuffManager().hasState(STATE), "precondition: no [血仇] (Vendetta) yet");

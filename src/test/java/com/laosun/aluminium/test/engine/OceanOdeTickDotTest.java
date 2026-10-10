@@ -12,7 +12,6 @@ import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import java.util.List;
-import java.util.Random;
 
 /**
  * 1415's memosprite skill 22, last sentence: "使受到攻击的敌方目标当前承受的所有持续伤害立即产生相当于原伤害 #2%/#3% 的伤害".
@@ -49,7 +48,7 @@ public class OceanOdeTickDotTest {
         Character cyrene = CharacterFactory.create(CYRENE, LEVEL);
         Character hysilens = CharacterFactory.create(HYSILENS, LEVEL);
         Battle battle = new Battle(List.of(cyrene, hysilens),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         cyrene = battle.characters.get(0);

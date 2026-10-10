@@ -13,7 +13,6 @@ import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import java.util.List;
-import java.util.Random;
 
 /**
  * The `elation_base` scale: an Elation damage instance's base comes from the loaded level table, and NOT from
@@ -42,7 +41,7 @@ public class ElationBaseScaleTest {
     private static double damageWithAttack(double attackBoost) {
         Character pearl = CharacterFactory.create(PEARL, 80);
         var enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(pearl, CharacterFactory.create(1204, 80)), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(pearl, CharacterFactory.create(1204, 80)), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         Character mine = battle.characters.getFirst();

@@ -4,10 +4,10 @@ import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import java.util.List;
-import java.util.Random;
 
 /** Character 1503 (Pearl): her Skill heals the party and the lowest-HP ally a SECOND time. */
 public class PearlSkillHealTest {
@@ -18,7 +18,7 @@ public class PearlSkillHealTest {
     @Test
     public void theSkillHealsThePartyAndTheLowestAllyAgain() {
         Battle battle = new Battle(List.of(CharacterFactory.create(PEARL, 80), CharacterFactory.create(ALLY, 80)),
-                List.of(EnemyFactory.create(1002011, 100, 1)), new Random(0));
+                List.of(EnemyFactory.create(1002011, 100, 1)), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         Character pearl = battle.characters.get(0);

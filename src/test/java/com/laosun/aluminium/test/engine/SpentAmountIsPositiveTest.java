@@ -12,7 +12,6 @@ import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import java.util.List;
-import java.util.Random;
 
 /**
  * `amount_from_previous` gives the MAGNITUDE of what the previous effect moved.
@@ -59,7 +58,7 @@ public class SpentAmountIsPositiveTest {
     private static int run(boolean spendFirst) {
         Character spare = CharacterFactory.create(SPARE, LEVEL);
         Battle battle = new Battle(List.of(spare),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         spare = battle.characters.getFirst();

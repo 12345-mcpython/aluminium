@@ -15,7 +15,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Light cone 21023: at battle start, damage taken is reduced for 5 turns AND "at the same time immediately restore to all of our side
@@ -43,7 +42,7 @@ public class WeAreWildfireTest {
                 : CharacterFactory.create(WEARER, LEVEL);
         ally = CharacterFactory.create(ALLY, LEVEL);
         enemy = BattleFixture.monster();
-        return new Battle(List.of(wearer, ally), List.of(enemy), new Random(0));
+        return new Battle(List.of(wearer, ally), List.of(enemy), BattleFixture.seeded());
     }
 
     private void hurt(Battle battle, Character victim, double amount) {

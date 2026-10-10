@@ -18,7 +18,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Cones 21016 (burn the attacker) and 21041 (a debuff-fed stack plus an EHR threshold). Both use events that already
@@ -38,7 +37,7 @@ public class ConeEventsTest {
         Character unit = wearer(21016);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(unit, ally), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(unit, ally), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         // Note: The wearer's OWN file already has TAKING_HIT rules, so counting rules would be wrong (measured: 2).
         // Count the op instead: only our cone applies a burn.
@@ -76,7 +75,7 @@ public class ConeEventsTest {
         Assertions.assertEquals(1, afterHit, "the burn landed");
         // ... and the FALSE case: hitting the ALLY must not burn anything.
         Enemy second = BattleFixture.monster();
-        Battle other = new Battle(List.of(unit, ally), List.of(second), new Random(0));
+        Battle other = new Battle(List.of(unit, ally), List.of(second), BattleFixture.seeded());
         other.startBattle();
         ally.getAttribute(AttributeType.EFFECT_HIT_RATE)
                 .addModifier(DoubleValue.Modifier.pure(2.0, DoubleValue.Modifier.ModifierSource.BUFF, 210161));
@@ -90,7 +89,7 @@ public class ConeEventsTest {
     public void aDebuffFedStackRaisesDamageUpToItsCap() {
         Character unit = wearer(21041);
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(unit), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         double before = unit.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
         for (int i = 0; i < 4; i++) {
@@ -106,7 +105,7 @@ public class ConeEventsTest {
         Character high = wearer(21041);
         Character low = wearer(21041);
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(high, low), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(high, low), List.of(enemy), BattleFixture.seeded());
         double lowBase = low.getAttribute(AttributeType.ATTACK).baseValue();
         high.getAttribute(AttributeType.EFFECT_HIT_RATE)
                 .addModifier(DoubleValue.Modifier.pure(0.8, DoubleValue.Modifier.ModifierSource.BUFF, 210401));

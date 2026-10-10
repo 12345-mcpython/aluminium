@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * 1303 Ruan Mei (阮•梅)'s zone: "我方全体全属性抗性穿透提高25.00%" for two of HER turns, plus Eidolon (星魂) 1's defence ignore on the same clock.
@@ -86,7 +85,7 @@ public class RuanMeiZoneTest {
         Character ruanMei = CharacterFactory.create(RUAN_MEI, LEVEL, true, null, null, rank);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(ruanMei, ally), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(ruanMei, ally), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         return new Fixture(ruanMei, ally, enemy, battle);
     }

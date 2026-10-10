@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * 1005 Kafka's talent: on a follow-up, the target takes 30% more DoT damage for two turns.
@@ -48,7 +47,7 @@ public class KafkaDotTakenTest {
     public void dotDamageIsAmplifiedByExactlyThirtyPercent() {
         Character unit = CharacterFactory.create(WEARER, LEVEL);
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(unit), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         double normal = battle.applyDamage(enemy, new Damage(unit, enemy, DamageElement.THUNDER, DamageType.NORMAL, 1000));
         battle.fireTriggers(TriggerEvent.FOLLOW_UP, unit, enemy, 0, 0);

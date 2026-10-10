@@ -16,7 +16,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.Random;
 
 /**
  * The undispatched diagnostic for non-damaging skills.
@@ -121,7 +120,7 @@ public class SkillExecutorDiagnosticTest {
     public void damagingSkillsDoNotTriggerTheDiagnostic() {
         Character jingYuan = CharacterFactory.create(1204, 80);
         Enemy enemy = EnemyFactory.create(1002011, 90, 1);
-        Battle battle = new Battle(List.of(jingYuan), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(jingYuan), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
 
         String out = capture(() -> {

@@ -16,7 +16,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Light cone 22003 (round 24, corrected in 248): the Max HP constant belongs to the engine's ability_property, not to us.
@@ -79,7 +78,7 @@ public class NinjaRecordSoundHuntTest {
         Character withCone = wearer(true);
         Character without = wearer(false);
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(withCone, without), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(withCone, without), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         double before = withCone.getAttribute(AttributeType.CRIT_ATTACK).get();
         battle.applyDamage(withCone, new Damage(enemy, withCone, DamageElement.PHYSICAL, DamageType.NORMAL, 20));
@@ -98,7 +97,7 @@ public class NinjaRecordSoundHuntTest {
         Character healer = CharacterFactory.create(WEARER, LEVEL);
         Character target = wearer(true);
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(healer, target), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(healer, target), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         // NOT via battle.heal on a damaged target: losing HP would already fire the OTHER half of the disjunction, and the two
         // write the same modifier (same value, so the second replaces the first and nothing moves). Emitting HEALED directly

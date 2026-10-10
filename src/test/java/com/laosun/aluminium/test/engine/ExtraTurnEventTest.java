@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * The extra-turn boundary events: {@code EXTRA_TURN_STARTED} and {@code EXTRA_TURN_ENDED}.
@@ -59,7 +58,7 @@ public class ExtraTurnEventTest {
         Character ally = CharacterFactory.create(ALLY, 80);
         installCounters(ally);
         Battle battle = new Battle(List.of(pearl, ally), List.of(BattleFixture.monster()),
-                new Random(0));
+                BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
 
@@ -100,7 +99,7 @@ public class ExtraTurnEventTest {
         Character ally = CharacterFactory.create(ALLY, 80);
         installCounters(ally);
         Battle battle = new Battle(List.of(pearl, ally), List.of(BattleFixture.monster()),
-                new Random(0));
+                BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
 
@@ -125,7 +124,7 @@ public class ExtraTurnEventTest {
         installCounters(ally);
         Character outsider = CharacterFactory.create(ALLY, 80);
         Battle battle = new Battle(List.of(pearl, ally), List.of(BattleFixture.monster()),
-                new Random(0));
+                BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
 

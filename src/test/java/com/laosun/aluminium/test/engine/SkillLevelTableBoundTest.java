@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * A raised skill level cannot exceed its own parameter table - and the reason is not tidiness.
@@ -34,7 +33,7 @@ public class SkillLevelTableBoundTest {
     public void aRaisePastTheTableStopsAtTheTableAndTheSkillStillWorks() {
         Character pearl = CharacterFactory.create(PEARL, 80, false, null, null, 3);
         Battle battle = new Battle(List.of(pearl, CharacterFactory.create(ALLY, 80)),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         Character her = battle.characters.getFirst();
@@ -67,7 +66,7 @@ public class SkillLevelTableBoundTest {
     public void theBasicStillDealsDamageWhenTheRaiseWouldOvershoot() {
         Character pearl = CharacterFactory.create(PEARL, 80, false, null, null, 3);
         Battle battle = new Battle(List.of(pearl, CharacterFactory.create(ALLY, 80)),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         Character her = battle.characters.getFirst();
@@ -87,7 +86,7 @@ public class SkillLevelTableBoundTest {
     public void theConventionsOwnLevelIsInsideTheTable() {
         Character pearl = CharacterFactory.create(PEARL, 80, false, null, null, 0);
         Battle battle = new Battle(List.of(pearl, CharacterFactory.create(ALLY, 80)),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         Character her = battle.characters.getFirst();

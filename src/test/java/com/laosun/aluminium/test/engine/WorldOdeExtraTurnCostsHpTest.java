@@ -9,7 +9,6 @@ import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import java.util.List;
-import java.util.Random;
 
 /**
  * 1415's memosprite skill 21, the last clause: "额外回合开始时，卡厄斯兰那消耗等同于当前生命值 #2% 的生命值".
@@ -37,7 +36,7 @@ public class WorldOdeExtraTurnCostsHpTest {
     private static double[] run(boolean everBurning) {
         Character him = CharacterFactory.create(PHAINON, LEVEL);
         Battle battle = new Battle(List.of(him),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         him = battle.characters.getFirst();

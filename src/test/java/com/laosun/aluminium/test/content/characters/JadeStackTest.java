@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * 1314 Jade (翡翠)'s [当品]: one layer at the enemy's battle entry, fifteen from her technique, and 2.40% critical damage each.
@@ -69,7 +68,7 @@ public class JadeStackTest {
     private static Fixture fixture(boolean technique) {
         Character jade = CharacterFactory.create(JADE, LEVEL);
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(jade), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(jade), List.of(enemy), BattleFixture.seeded());
         if (technique) {
             battle.markTechniqueUsed(jade);
         }

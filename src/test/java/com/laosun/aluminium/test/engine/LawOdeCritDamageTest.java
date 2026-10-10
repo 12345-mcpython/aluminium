@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * 1415's memosprite skill 23 "献予'律法'之诗": "持有[军功]的角色暴击伤害提高 #1%".
@@ -34,7 +33,7 @@ public class LawOdeCritDamageTest {
         Character cerydra = CharacterFactory.create(CERYDRA, LEVEL);
         Character plain = CharacterFactory.create(PLAIN, LEVEL);
         Battle battle = new Battle(List.of(cyrene, cerydra, plain),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         cyrene = battle.characters.get(0);

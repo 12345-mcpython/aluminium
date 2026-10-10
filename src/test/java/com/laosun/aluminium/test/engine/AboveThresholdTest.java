@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * "速度大于等于 120 时…之后每超过 1 点速度使自身欢概度提高 1%" (1502:269,).
@@ -54,7 +53,7 @@ public class AboveThresholdTest {
         owner.setTriggerTable(new TriggerTable(OWNER, List.of(TriggerSpecs.rule("BATTLE_START",
                 List.of(), effect))));
         Battle battle = new Battle(List.of(owner),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         return owner.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();

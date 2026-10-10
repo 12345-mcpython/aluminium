@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * 1204 Jing Yuan's (景元) trace "遣将": "施放战技后，暴击率提升10.0%，持续2回合".
@@ -27,7 +26,7 @@ public class JingyuanTraceTest {
     public void theSkillRaisesHisCritChanceForTwoTurns() {
         Character jingyuan = CharacterFactory.create(JINGYUAN, LEVEL);
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(jingyuan), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(jingyuan), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         double base = jingyuan.getAttribute(AttributeType.CRIT_CHANCE).get();
         battle.castImmediate(jingyuan.getSkills().get(SkillType.SKILL), jingyuan, List.of(enemy));

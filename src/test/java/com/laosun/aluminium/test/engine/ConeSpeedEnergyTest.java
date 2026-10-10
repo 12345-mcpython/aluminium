@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * 21045 (break effect, plus speed after the ultimate) and 21048 (speed, plus energy for hitting a weakness-broken target, at most N times a turn).
@@ -28,7 +27,7 @@ public class ConeSpeedEnergyTest {
     public void cone21045GivesBreakEffectAndSpeedAfterTheUltimate() {
         Character unit = CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(21045, LEVEL, false, 1));
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(unit), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
         double breakBefore = unit.getAttribute(AttributeType.BREAKING_EFFECT).get();
         battle.startBattle();
         Assertions.assertEquals(0.28, unit.getAttribute(AttributeType.BREAKING_EFFECT).get() - breakBefore, 1e-6,
@@ -47,7 +46,7 @@ public class ConeSpeedEnergyTest {
     public void cone21048GrantsEnergyOnlyAgainstABrokenTargetAndOnlySoOften() {
         Character unit = CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(21048, LEVEL, false, 1));
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(unit), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         battle.currentMove = new Signal(unit);
         battle.beforeMove();
@@ -70,7 +69,7 @@ public class ConeSpeedEnergyTest {
     public void cone21048AlsoGrantsThroughOnAny() {
         Character unit = CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(21048, LEVEL, false, 1));
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(unit), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         battle.currentMove = new Signal(unit);
         battle.beforeMove();

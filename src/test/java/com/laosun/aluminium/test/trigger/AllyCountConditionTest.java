@@ -16,7 +16,6 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 /**
  * The `ally_count` condition variable: "我方目标数量", the mirror of `enemy_count` and the blocker set 321 names.
@@ -60,7 +59,7 @@ public class AllyCountConditionTest {
             team.add(CharacterFactory.create(TEAMMATE, LEVEL));
         }
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(team, List.of(enemy), new Random(0));
+        Battle battle = new Battle(team, List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         battle.currentMove = new Signal(wearer);
         battle.beforeMove();

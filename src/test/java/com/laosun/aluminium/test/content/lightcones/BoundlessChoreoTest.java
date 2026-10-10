@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Light cone 21044: against a target whose DEFENCE was lowered OR whose SPEED was lowered, the wearer's crit damage is 24%
@@ -33,7 +32,7 @@ public class BoundlessChoreoTest {
     private void build() {
         wearer = CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(CONE, LEVEL, false, 1));
         enemy = BattleFixture.monster();
-        battle = new Battle(List.of(wearer), List.of(enemy), new Random(0));
+        battle = new Battle(List.of(wearer), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
     }
 

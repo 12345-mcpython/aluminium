@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * "该效果每个波次最多触发 1 次".
@@ -41,7 +40,7 @@ public class WaveLimitCapTest {
         owner.setTriggerTable(new TriggerTable(OWNER, List.of(rule), List.of()));
 
         Battle battle = new Battle(List.of(owner),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         battle.beginWave();

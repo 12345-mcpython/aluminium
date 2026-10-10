@@ -8,7 +8,6 @@ import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import java.util.List;
-import java.util.Random;
 
 /**
  * Slot 20's last two clauses: "[老主顾]的防御力降低 #2(10)%，[老主顾]以外的敌方目标的防御力降低 #3(6)%".
@@ -36,7 +35,7 @@ public class TrickeryOdeDefenceTest {
         Character cipher = CharacterFactory.create(CIPHER, LEVEL);
         Enemy marked = BattleFixture.monster();
         Enemy plain = BattleFixture.monster();
-        Battle battle = new Battle(List.of(cyrene, cipher), List.of(marked, plain), new Random(0));
+        Battle battle = new Battle(List.of(cyrene, cipher), List.of(marked, plain), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         // The mark is applied by Cipher (赛飞儿)'s OWN ultimate rule (`talent_patron_on_ult`, ULT_CAST -> APPLY_BUFF 老主顾), so the judge does not have to construct a buff by hand.

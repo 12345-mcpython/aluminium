@@ -16,7 +16,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * The Eidolon gate ({@code "min_eidolon"}) and the rank it is compared against.
@@ -75,7 +74,7 @@ public class EidolonGateTest {
     public void theGateReadsTheRulesOwnerNotATeammate() {
         Character unranked = owner(OWNER, 0, gatedRule(2));
         Battle battle = new Battle(List.of(unranked, CharacterFactory.create(ALLY, LEVEL, true, null, null, 2)),
-                List.of(dummy()), new Random(0));
+                List.of(dummy()), BattleFixture.seeded());
         battle.startBattle();
 
         Assertions.assertEquals(0, battle.fireTriggers(TriggerEvent.ALLY_ATTACK, unranked, null, 1, 0),

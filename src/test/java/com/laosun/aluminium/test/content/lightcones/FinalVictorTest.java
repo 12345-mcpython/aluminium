@@ -16,7 +16,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Light cone 2103: a critical hit grants one layer of [好运] (up to four), each worth 8 points of crit damage, and the
@@ -33,7 +32,7 @@ public class FinalVictorTest {
     }
 
     private Battle battleWith(Character unit, Enemy enemy) {
-        Battle battle = new Battle(List.of(unit), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         return battle;
     }
@@ -73,7 +72,7 @@ public class FinalVictorTest {
         Character wearer = wearer(true);
         Character ally = CharacterFactory.create(1002, LEVEL);
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(wearer, ally), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(wearer, ally), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         double before = wearer.getAttribute(AttributeType.CRIT_ATTACK).get();
         ally.getAttribute(AttributeType.CRIT_CHANCE)

@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * 1503 真珠's trace 艺术壁垒: 「进入战斗和施放终结技后，若【美学底本】为「欢愉」命途角色，使<b>其下一次</b>施放终结技时，<b>为真珠</b>固定恢复
@@ -107,7 +106,7 @@ public class PearlArtBarrierTest {
         pearl = CharacterFactory.create(PEARL, 80);
         ally = CharacterFactory.create(allyCid, 80);
         enemy = BattleFixture.monster();
-        battle = new Battle(List.of(pearl, ally), List.of(enemy), new Random(0));
+        battle = new Battle(List.of(pearl, ally), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
     }

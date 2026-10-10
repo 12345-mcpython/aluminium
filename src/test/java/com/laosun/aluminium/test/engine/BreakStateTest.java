@@ -8,11 +8,11 @@ import com.laosun.aluminium.models.skill.DefaultSkill;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.models.Signal;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * acceptance: break's delay/push-back (25% of the action bar), the skipped turn, and toughness
@@ -28,7 +28,7 @@ public class BreakStateTest {
     public void breakingDelaysTheEnemyByAQuarterOfItsCycle() {
         Character himeko = character("himeko");
         Enemy iceEdge = EnemyFactory.create(ICE_EDGE, 90, 1);
-        Battle battle = new Battle(List.of(himeko), List.of(iceEdge), new Random(0));
+        Battle battle = new Battle(List.of(himeko), List.of(iceEdge), BattleFixture.seeded());
         double cycle = 10000.0 / iceEdge.getAttribute(AttributeType.SPEED).get();
         double before = battle.queue.getTimeRemaining(signalOf(battle, iceEdge));
 
@@ -44,7 +44,7 @@ public class BreakStateTest {
     public void brokenEnemySkipsItsTurnsThenRecovers() {
         Character himeko = character("himeko");
         Enemy iceEdge = EnemyFactory.create(ICE_EDGE, 90, 1);
-        Battle battle = new Battle(List.of(himeko), List.of(iceEdge), new Random(0));
+        Battle battle = new Battle(List.of(himeko), List.of(iceEdge), BattleFixture.seeded());
         breakIt(battle, himeko, iceEdge);
 
         Assertions.assertTrue(battle.handleBrokenTurn(iceEdge), "turn 1: skipped");
@@ -64,7 +64,7 @@ public class BreakStateTest {
         Character himeko = character("himeko");
         himeko.setMaxEnergy(120);
         Enemy iceEdge = EnemyFactory.create(ICE_EDGE, 90, 1);
-        Battle battle = new Battle(List.of(himeko), List.of(iceEdge), new Random(0));
+        Battle battle = new Battle(List.of(himeko), List.of(iceEdge), BattleFixture.seeded());
 
         breakIt(battle, himeko, iceEdge);
         battle.handleBrokenTurn(iceEdge);
@@ -82,7 +82,7 @@ public class BreakStateTest {
     public void delayMovePercentRejectsBadInput() {
         Character himeko = character("himeko");
         Enemy iceEdge = EnemyFactory.create(ICE_EDGE, 90, 1);
-        Battle battle = new Battle(List.of(himeko), List.of(iceEdge), new Random(0));
+        Battle battle = new Battle(List.of(himeko), List.of(iceEdge), BattleFixture.seeded());
 
         Assertions.assertFalse(battle.delayMovePercent(null, 0.25));
         Assertions.assertFalse(battle.delayMovePercent(iceEdge, 0));

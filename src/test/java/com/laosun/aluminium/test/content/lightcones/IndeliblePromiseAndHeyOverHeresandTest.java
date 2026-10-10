@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /** Cones 21042 (break effect + post-ult crit) and 22001 (health + post-skill healing). */
 public class IndeliblePromiseAndHeyOverHeresandTest {
@@ -22,7 +21,7 @@ public class IndeliblePromiseAndHeyOverHeresandTest {
     public void cone21042RaisesBreakEffectThenCritAfterTheUlt() {
         Character unit = CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(21042, LEVEL, false, 5));
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(unit), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
         double breakBefore = unit.getAttribute(AttributeType.BREAKING_EFFECT).get();
         battle.startBattle();
         double breakEffect = unit.getAttribute(AttributeType.BREAKING_EFFECT).get() - breakBefore;
@@ -38,7 +37,7 @@ public class IndeliblePromiseAndHeyOverHeresandTest {
     public void cone22001RaisesHealthThenHealingAfterTheSkill() {
         Character unit = CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(22001, LEVEL, false, 5));
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(unit), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
         double healthBefore = unit.getAttribute(AttributeType.HEALTH).get();
         battle.startBattle();
         double health = unit.getAttribute(AttributeType.HEALTH).get() - healthBefore;

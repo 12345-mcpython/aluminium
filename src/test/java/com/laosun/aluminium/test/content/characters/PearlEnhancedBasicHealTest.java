@@ -5,10 +5,10 @@ import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import java.util.List;
-import java.util.Random;
 
 /** Character 1503 (Pearl): an enhanced basic heals the party and the lowest-HP ally a second time. */
 public class PearlEnhancedBasicHealTest {
@@ -32,7 +32,7 @@ public class PearlEnhancedBasicHealTest {
     /** Fires a basic attack at the given slot and returns Pearl's and the lowest ally's HP gains. */
     private static double[] gains(int slot) {
         Battle battle = new Battle(List.of(CharacterFactory.create(PEARL, 80), CharacterFactory.create(ALLY, 80)),
-                List.of(EnemyFactory.create(1002011, 100, 1)), new Random(0));
+                List.of(EnemyFactory.create(1002011, 100, 1)), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         Character pearl = battle.characters.get(0);

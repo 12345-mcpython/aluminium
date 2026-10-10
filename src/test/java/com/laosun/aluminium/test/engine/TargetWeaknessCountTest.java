@@ -2,6 +2,7 @@ package com.laosun.aluminium.test.engine;
 
 
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.DamageElement;
@@ -17,7 +18,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * CHARACTERISATION of the {@code target_weakness_count} variable: a rule
@@ -43,7 +43,7 @@ public class TargetWeaknessCountTest {
         TriggerSpecs.set(pay, "target", "self");
         unit.setTriggerTable(new TriggerTable(UNIT, List.of(TriggerSpecs.rule("DEALING_DAMAGE",
                 List.of("actor == self", "target_weakness_count >= 1"), pay))));
-        Battle battle = new Battle(List.of(unit, CharacterFactory.create(ALLY, LEVEL)), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(unit, CharacterFactory.create(ALLY, LEVEL)), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         double before = unit.getCurrentEnergy();
         battle.applyDamage(enemy, new Damage(unit, enemy, DamageElement.FIRE, DamageType.NORMAL, 10));

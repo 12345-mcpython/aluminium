@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * "立即攻击敌人，进入战斗后克拉拉受到敌方攻击的概率提高，持续 2 回合" - a technique clause, so the gate is the point.
@@ -31,7 +30,7 @@ public class KlaraTechniqueAggroTest {
     @Test
     public void theTechniqueRaisesHerWeightOnlyWhenItWasUsed() {
         Character plain = CharacterFactory.create(KLARA, LEVEL);
-        Battle withoutTechnique = new Battle(List.of(plain), List.of(dummy()), new Random(0));
+        Battle withoutTechnique = new Battle(List.of(plain), List.of(dummy()), BattleFixture.seeded());
         double plainBefore = withoutTechnique.aggroOf(plain);
 
         withoutTechnique.startBattle();
@@ -40,7 +39,7 @@ public class KlaraTechniqueAggroTest {
                 "no technique was used, so 「进入战斗后…概率提高」 (after entering battle ... the chance is raised) must not fire");
 
         Character clara = CharacterFactory.create(KLARA, LEVEL);
-        Battle withTechnique = new Battle(List.of(clara), List.of(dummy()), new Random(0));
+        Battle withTechnique = new Battle(List.of(clara), List.of(dummy()), BattleFixture.seeded());
         double base = withTechnique.aggroOf(clara);
         withTechnique.markTechniqueUsed(clara);
 

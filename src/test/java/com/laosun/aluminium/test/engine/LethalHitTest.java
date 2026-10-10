@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * "受到致命攻击时不会陷入无法战斗状态，而是回复…" -- one capability, two readers.
@@ -55,7 +54,7 @@ public class LethalHitTest {
     public void jingliuDiesToASecondLethalBlow() {
         Character her = CharacterFactory.create(JINGLIU, 80, false, null, null, 0);
         Battle battle = new Battle(List.of(her),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
 
@@ -75,7 +74,7 @@ public class LethalHitTest {
     private static Character survivor(int cid, boolean transform) {
         Character her = CharacterFactory.create(cid, 80, false, null, null, 0);
         Battle battle = new Battle(List.of(her),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
 

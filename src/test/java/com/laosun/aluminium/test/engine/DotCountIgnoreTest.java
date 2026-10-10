@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /** Relic 116, 4 pieces: "每承受 1 个持续伤害效果…无视其 6% 防御力，最多计入 3 个" -- instance-scoped, counted per DoT. */
 public class DotCountIgnoreTest {
@@ -39,7 +38,7 @@ public class DotCountIgnoreTest {
     private static double[] state(int dots) {
         Character unit = CharacterFactory.create(WEARER, LEVEL, true, null, RelicFactory.suit(116, 4, RELIC_LEVEL));
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(unit), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         DamageElement[] elements = {DamageElement.FIRE, DamageElement.THUNDER, DamageElement.ICE, DamageElement.WIND};
         for (int index = 0; index < dots; index++) {

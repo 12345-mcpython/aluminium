@@ -19,7 +19,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * 1404 Mydei (万敌): the automatic cast of [弑王成王] (Kingslayer Made King), and its cost.
@@ -38,7 +37,7 @@ public class MydeiBloodfeudSkillsTest {
     public void theTurnStartPaysTheSkillsCost() {
         Character him = CharacterFactory.create(MYDEI, 80, false, null, null, 0);
         Battle battle = new Battle(List.of(him),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         him.getBuffManager().addBuff(new StateBuff(BLOODFEUD, 9, true));
@@ -81,7 +80,7 @@ public class MydeiBloodfeudSkillsTest {
         him.setTriggerTable(new TriggerTable(MYDEI,
                 List.of(TriggerSpecs.rule("BATTLE_START", List.of(), swap)), List.of()));
         Battle battle = new Battle(List.of(him),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
 
@@ -113,7 +112,7 @@ public class MydeiBloodfeudSkillsTest {
     public void theSwapReachesTheCast() {
         Character him = CharacterFactory.create(MYDEI, 80, false, null, null, 0);
         Battle battle = new Battle(List.of(him),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         him.getBuffManager().addBuff(new StateBuff(BLOODFEUD, 9, true));
@@ -124,7 +123,7 @@ public class MydeiBloodfeudSkillsTest {
 
         Character byHand = CharacterFactory.create(MYDEI, 80, false, null, null, 0);
         Battle other = new Battle(List.of(byHand),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         other.startBattle();
         other.processRequests();
         // Note: AFTER startBattle, so the slot carries the level the convention gives it -- the trap the earlier attempt fell into.
@@ -146,7 +145,7 @@ public class MydeiBloodfeudSkillsTest {
     public void aChargeArrivingInBloodfeudIsNotDrainedAgain() {
         Character him = CharacterFactory.create(MYDEI, 80, false, null, null, 0);
         Battle battle = new Battle(List.of(him),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         him.getBuffManager().addBuff(new StateBuff(BLOODFEUD, 9, true));
@@ -169,7 +168,7 @@ public class MydeiBloodfeudSkillsTest {
     public void theHundredAndFiftyChargeCastsGodslayer() {
         Character him = CharacterFactory.create(MYDEI, 80, false, null, null, 0);
         Battle battle = new Battle(List.of(him),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         him.getBuffManager().addBuff(new StateBuff(BLOODFEUD, 9, true));

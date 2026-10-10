@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Character 1503 (Pearl): the extra turn her ultimate grants pays 30 好活当赏 and 60 笑点, and takes them back when that
@@ -138,7 +137,7 @@ public class PearlExtraTurnRewardTest {
         Battle battle = new Battle(
                 List.of(CharacterFactory.create(PEARL, 80), CharacterFactory.create(ELATION_ALLY, 80),
                         CharacterFactory.create(1204, 80)),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         // The archetype mark is normally applied by her ultimate; this case is about the reward, so it is set directly

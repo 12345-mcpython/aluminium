@@ -5,12 +5,12 @@ import com.laosun.aluminium.enums.Path;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 /**
  * acceptance: path aggro values, the aggro table, and "taunt does not change the numbers".
@@ -51,7 +51,7 @@ public class AggroTest {
     public void aggroTableSplitsProbabilityByWeight() {
         Character preservation = withAggro(150);
         Character other = withAggro(100);
-        Battle battle = new Battle(List.of(preservation, other), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(preservation, other), List.of(dummy()), BattleFixture.seeded());
 
         Map<com.laosun.aluminium.models.CanHit, Double> table = battle.getAggroTable(List.of(preservation, other));
 
@@ -61,7 +61,7 @@ public class AggroTest {
 
     @Test
     public void enemyHasTheNeutralAggroWeight() {
-        Battle battle = new Battle(List.of(withAggro(100)), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(withAggro(100)), List.of(dummy()), BattleFixture.seeded());
 
         Assertions.assertEquals(100, battle.aggroOf(battle.enemies.getFirst()), EPS,
                 "an enemy has no path, so it uses the conventional tier");

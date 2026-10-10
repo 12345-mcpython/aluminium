@@ -16,7 +16,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * {@code cast_counted_laughs}: the laugh count a COMMANDED CAST is settled with - 「使其立即施放 1 次固定计入 20 笑点的欢愉技」.
@@ -138,7 +137,7 @@ public class CastCountedLaughsTest {
         commander.setTriggerTable(new TriggerTable(1, List.of(
                 TriggerSpecs.rule(TriggerEvent.TURN_START.name(), List.of(), cast))));
         Battle battle = new Battle(List.of(caster, commander), List.of(BattleFixture.monster()),
-                new Random(0));
+                BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         return battle;

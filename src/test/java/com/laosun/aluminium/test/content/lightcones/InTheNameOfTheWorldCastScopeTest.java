@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Light cone 23004 In the Name of the World (以世界之名): "when the wearer casts the Skill, the effect hit rate of the wearer's attack this time is increased by #2%, and ATK by #3%".
@@ -40,7 +39,7 @@ public class InTheNameOfTheWorldCastScopeTest {
     public void theBoostDoesNotOutliveTheCast() {
         Character unit = CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(CONE, LEVEL, false, RANK));
         Battle battle = new Battle(List.of(unit),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
 

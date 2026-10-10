@@ -5,10 +5,10 @@ import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.buff.ControlBuff;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import java.util.List;
-import java.util.Random;
 
 /** "[追忆] (Recollection) reaching 24 points activates the ultimate and removes all of her own negative effects" and "may overflow up to 2 points". */
 public class CyreneRecollectionCapTest {
@@ -20,7 +20,7 @@ public class CyreneRecollectionCapTest {
     @Test
     public void thecapCanOverflowToTwentySeven() {
         Character her = CharacterFactory.create(CYRENE, LEVEL);
-        Battle battle = new Battle(List.of(her), List.of(EnemyFactory.create(MONSTER, 100, 1)), new Random(0));
+        Battle battle = new Battle(List.of(her), List.of(EnemyFactory.create(MONSTER, 100, 1)), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         her = battle.characters.getFirst();
@@ -33,7 +33,7 @@ public class CyreneRecollectionCapTest {
     @Test
     public void aFullRecollectionCleansesHer() {
         Character her = CharacterFactory.create(CYRENE, LEVEL);
-        Battle battle = new Battle(List.of(her), List.of(EnemyFactory.create(MONSTER, 100, 1)), new Random(0));
+        Battle battle = new Battle(List.of(her), List.of(EnemyFactory.create(MONSTER, 100, 1)), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         her = battle.characters.getFirst();

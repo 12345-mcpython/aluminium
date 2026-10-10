@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * 1306 Sparkle (花火)'s eidolon 2 (before enhancement): "each layer of the talent additionally makes our targets ignore 8% of the target's defence when dealing damage".
@@ -38,7 +37,7 @@ public class SparkleEidolonTest {
         Character sparkle = CharacterFactory.create(SPARKLE, LEVEL, true, null, null, rank);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(sparkle, ally), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(sparkle, ally), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         for (int i = 0; i < layers; i++) {
             battle.fireTriggers(TriggerEvent.SKILL_POINT_SPENT, sparkle, enemy, 1, 1);

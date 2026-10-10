@@ -12,11 +12,11 @@ import com.laosun.aluminium.models.DoubleValue;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.skill.Skill;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Scoped DMG boosts: "普攻 / 战技 / 终结技 造成的伤害提高 X%".
@@ -159,7 +159,7 @@ public class DamageScopeBoostTest {
     private static double settledDamage(SkillType slot, AttributeType boost, double value) {
         Character hero = boostedHero(boost, value);
         Enemy dummy = dummy();
-        Battle battle = new Battle(List.of(hero), List.of(dummy), new Random(0));
+        Battle battle = new Battle(List.of(hero), List.of(dummy), BattleFixture.seeded());
         battle.startBattle();
 
         Skill skill = hero.getSkills().get(slot);
@@ -173,7 +173,7 @@ public class DamageScopeBoostTest {
     private static double additionalDamage(AttributeType boost, double value) {
         Character hero = boostedHero(boost, value);
         Enemy dummy = dummy();
-        Battle battle = new Battle(List.of(hero), List.of(dummy), new Random(0));
+        Battle battle = new Battle(List.of(hero), List.of(dummy), BattleFixture.seeded());
         battle.startBattle();
         return battle.applyDamage(dummy, new Damage(hero, dummy, DamageElement.FIRE,
                 DamageType.ADDITIONAL, 1000));
@@ -182,7 +182,7 @@ public class DamageScopeBoostTest {
     private static double dotDamage(AttributeType boost, double value) {
         Character hero = boostedHero(boost, value);
         Enemy dummy = dummy();
-        Battle battle = new Battle(List.of(hero), List.of(dummy), new Random(0));
+        Battle battle = new Battle(List.of(hero), List.of(dummy), BattleFixture.seeded());
         battle.startBattle();
         return battle.applyDamage(dummy, new Damage(hero, dummy, DamageElement.FIRE,
                 DamageType.DOT, 1000));

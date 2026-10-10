@@ -9,11 +9,11 @@ import com.laosun.aluminium.models.Weapon;
 import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Light cone 21010: hitting the SAME enemy again lifts the damage by 8% a time, up to five layers -- and another enemy starts
@@ -43,7 +43,7 @@ public class SwordplayTest {
         first = EnemyFactory.create(FIRST, 90, 1);
         second = EnemyFactory.create(FIRST, 90, 2);
         battle = new Battle(List.of(wearer, CharacterFactory.create(ALLY, LEVEL)), List.of(first, second),
-                new Random(0));
+                BattleFixture.seeded());
         battle.startBattle();
     }
 

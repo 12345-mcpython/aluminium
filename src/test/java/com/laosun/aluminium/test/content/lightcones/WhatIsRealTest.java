@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Light cone 21035: "break effect up; after an attack, heal for a share of max HP plus a flat amount".
@@ -40,7 +39,7 @@ public class WhatIsRealTest {
     }
 
     private static Battle started(Character unit, Enemy enemy) {
-        Battle battle = new Battle(List.of(unit), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         battle.currentMove = new Signal(unit);
         battle.beforeMove();

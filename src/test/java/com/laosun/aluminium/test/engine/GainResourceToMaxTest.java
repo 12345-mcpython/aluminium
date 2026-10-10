@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * {@code GAIN_RESOURCE} with {@code to_max} raises a counter to its declared maximum, and does NOT spill into overflow.
@@ -72,7 +71,7 @@ public class GainResourceToMaxTest {
      */
     private static int grant(int from, int amount, boolean toMax, int overflow) {
         Character pearl = CharacterFactory.create(PEARL, 80);
-        Battle battle = new Battle(List.of(pearl), List.of(BattleFixture.monster()), new Random(0));
+        Battle battle = new Battle(List.of(pearl), List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         Character unit = battle.characters.getFirst();

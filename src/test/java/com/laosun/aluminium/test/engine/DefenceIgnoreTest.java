@@ -2,6 +2,7 @@ package com.laosun.aluminium.test.engine;
 
 
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
@@ -20,7 +21,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * "ignores X% of the target's defence" as data - {@code DEFENCE_IGNORE} reached from a rule for the first time.
@@ -121,7 +121,7 @@ public class DefenceIgnoreTest {
     public void theGrantExpiresWithItsTurnCount() {
         Character attacker = attackerWith(defenceIgnoreRule(0.5, 3));
         Enemy target = freshMonster();
-        Battle battle = new Battle(List.of(attacker), List.of(target), new Random(0));
+        Battle battle = new Battle(List.of(attacker), List.of(target), BattleFixture.seeded());
         battle.startBattle();
         double whileBuffed = hit(battle, attacker);
 
@@ -171,7 +171,7 @@ public class DefenceIgnoreTest {
     @Test
     public void atRankFourTheUltimateGrantsIt() {
         Character jade = jadeAt(4);
-        Battle battle = new Battle(List.of(jade), List.of(freshMonster()), new Random(0));
+        Battle battle = new Battle(List.of(jade), List.of(freshMonster()), BattleFixture.seeded());
         battle.startBattle();
 
         battle.fireTriggers(TriggerEvent.ULT_CAST, jade, null, 0, 0);
@@ -183,7 +183,7 @@ public class DefenceIgnoreTest {
     @Test
     public void belowRankFourNothingIsGranted() {
         Character jade = jadeAt(3);
-        Battle battle = new Battle(List.of(jade), List.of(freshMonster()), new Random(0));
+        Battle battle = new Battle(List.of(jade), List.of(freshMonster()), BattleFixture.seeded());
         battle.startBattle();
 
         battle.fireTriggers(TriggerEvent.ULT_CAST, jade, null, 0, 0);
@@ -197,7 +197,7 @@ public class DefenceIgnoreTest {
     public void anAllyUltimateDoesNotGrantIt() {
         Character jade = jadeAt(4);
         Character ally = CharacterFactory.create(ATTACKER, LEVEL);
-        Battle battle = new Battle(List.of(jade, ally), List.of(freshMonster()), new Random(0));
+        Battle battle = new Battle(List.of(jade, ally), List.of(freshMonster()), BattleFixture.seeded());
         battle.startBattle();
 
         battle.fireTriggers(TriggerEvent.ULT_CAST, ally, null, 0, 0);
@@ -238,7 +238,7 @@ public class DefenceIgnoreTest {
                         .map(p -> defenceIgnoreRule(p, null, maxStacks))
                         .toArray(TriggerSpec[]::new));
         Enemy target = freshMonster();
-        Battle battle = new Battle(List.of(attacker), List.of(target), new Random(0));
+        Battle battle = new Battle(List.of(attacker), List.of(target), BattleFixture.seeded());
         battle.startBattle();
         return hit(battle, attacker);
     }

@@ -12,7 +12,6 @@ import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import java.util.List;
-import java.util.Random;
 
 /**
  * 1415's memosprite skill 21, the fire-seed CRIT clause: "变身时若[火种]大于 #5 点，每超出 1 点，卡厄斯兰那的暴击伤害提高 #6%，最多可提高 #%".
@@ -49,7 +48,7 @@ public class WorldOdeFireSeedCritTest {
     private static double[] run(int seeds) {
         Character him = CharacterFactory.create(PHAINON, LEVEL);
         Battle battle = new Battle(List.of(him),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         him = battle.characters.getFirst();

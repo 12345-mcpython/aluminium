@@ -7,11 +7,11 @@ import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.models.Signal;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * P-2 acceptance: extra turns ({@code Battle.grantExtraTurn}).
@@ -63,7 +63,7 @@ public class ExtraTurnTest {
     @Test
     public void extraTurnDoesNotConsumeTheNormalTurn() {
         Character hero = character("hero", 100);
-        Battle battle = new Battle(List.of(hero), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(hero), List.of(dummy()), BattleFixture.seeded());
         Queue q = battle.queue;
 
         battle.stepForward();                            // the 132-speed enemy acts first (113.64)
@@ -259,7 +259,7 @@ public class ExtraTurnTest {
         hero.setMaxEnergy(100);                          // fromAttributes defaults maxEnergy to 0: no energy bar means no ultimate
         ally.setMaxEnergy(100);
         Enemy enemy = dummy();
-        Battle battle = new Battle(List.of(hero, ally), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(hero, ally), List.of(enemy), BattleFixture.seeded());
 
         battle.stepForward();
         battle.afterMove();

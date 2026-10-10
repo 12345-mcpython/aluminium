@@ -16,7 +16,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Light cone 23006: a hit inflicts [游丝] -- a NAMED thunder damage-over-time -- and a target in [游丝]
@@ -42,7 +41,7 @@ public class PatienceIsAllYouNeedTest {
         wearer.getAttribute(com.laosun.aluminium.enums.AttributeType.EFFECT_HIT_RATE)
                 .addModifier(com.laosun.aluminium.models.DoubleValue.Modifier.pure(
                         1.0, com.laosun.aluminium.models.DoubleValue.Modifier.ModifierSource.BUFF, 230600));
-        Battle battle = new Battle(List.of(wearer), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(wearer), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         return battle;
     }

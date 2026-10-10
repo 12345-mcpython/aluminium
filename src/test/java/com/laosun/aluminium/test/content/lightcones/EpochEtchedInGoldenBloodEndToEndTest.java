@@ -8,11 +8,11 @@ import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.models.skill.DefaultSkill;
 import com.laosun.aluminium.models.skill.Skill;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * END-TO-END judge for the capability behind cone 23048 clause 3: it really walks SkillExecutor.
@@ -30,7 +30,7 @@ public class EpochEtchedInGoldenBloodEndToEndTest {
         Character wearer = CharacterFactory.create(1210, LEVEL, true, Weapon.build(23048, LEVEL, false, 1));
         Character ally = CharacterFactory.create(1001, LEVEL);
         Battle battle = new Battle(List.of(wearer, ally), List.of(EnemyFactory.create(1002011, 90, 1)),
-                new Random(0));
+                BattleFixture.seeded());
         battle.startBattle();
 
         Assertions.assertEquals(0.0, ally.getAttribute(AttributeType.SKILL_DAMAGE_BOOST).get(), 1e-9,

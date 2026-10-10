@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * 1513: "gain 1/4/6 笑点" - the half each of the three sentences gives.
@@ -78,7 +77,7 @@ public class AventurineWaveflairLaughterTest {
         Character her = CharacterFactory.create(AVENTURINE, 80, false, null, null, 0);
         Character mate = CharacterFactory.create(ALLY, 80, false, null, null, 0);
         Battle battle = new Battle(List.of(her, mate),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         return new Scene(battle, her, mate);

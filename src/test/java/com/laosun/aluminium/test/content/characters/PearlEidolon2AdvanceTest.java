@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 /**
  * Character 1503 (Pearl): Eidolon 2 widens the Ultimate's action advance from the archetype to every Elation ally.
@@ -86,7 +85,7 @@ public class PearlEidolon2AdvanceTest {
     }
 
     private static Fraction fractions(int eidolonRank) {
-        Battle battle = new Battle(team(eidolonRank), List.of(BattleFixture.monster()), new Random(0));
+        Battle battle = new Battle(team(eidolonRank), List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         Character pearl = battle.characters.get(0);

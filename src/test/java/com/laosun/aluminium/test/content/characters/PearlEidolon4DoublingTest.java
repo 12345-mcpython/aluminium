@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 /**
  * Character 1503 (Pearl): Eidolon 4 doubles the Elation damage the Elation skill hands the team.
@@ -127,7 +126,7 @@ public class PearlEidolon4DoublingTest {
             team.add(CharacterFactory.create(ELATION, 80));
         }
         team.add(CharacterFactory.create(HUNTER, 80));
-        Battle battle = new Battle(team, List.of(BattleFixture.monster()), new Random(0));
+        Battle battle = new Battle(team, List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         Character pearl = battle.characters.get(0);

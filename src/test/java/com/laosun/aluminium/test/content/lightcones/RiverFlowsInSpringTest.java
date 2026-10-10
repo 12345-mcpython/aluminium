@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /** Light cone 21024's first sentence: speed and damage up for the wearer from the start of the battle. */
 public class RiverFlowsInSpringTest {
@@ -30,7 +29,7 @@ public class RiverFlowsInSpringTest {
                 : CharacterFactory.create(WEARER, LEVEL);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
         enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(wearer, ally), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(wearer, ally), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         return battle;
     }

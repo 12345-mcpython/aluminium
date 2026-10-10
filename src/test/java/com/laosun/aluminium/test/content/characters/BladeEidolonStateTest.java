@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /** 1205's eidolon 2: "刃处于[地狱变]状态时，暴击率提高 15%". */
 public class BladeEidolonStateTest {
@@ -32,7 +31,7 @@ public class BladeEidolonStateTest {
     private static double gain(boolean state) {
         Character unit = CharacterFactory.create(WEARER, LEVEL);
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(unit), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         if (state) {
             unit.getBuffManager().addBuff(new StateBuff(STATE, 3));

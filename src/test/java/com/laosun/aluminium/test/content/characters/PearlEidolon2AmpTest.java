@@ -5,10 +5,10 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import java.util.List;
-import java.util.Random;
 
 /** Character 1503 (Pearl): Eidolon 2 raises the whole team's 增笑 by 15%. */
 public class PearlEidolon2AmpTest {
@@ -31,7 +31,7 @@ public class PearlEidolon2AmpTest {
     private static double ampAt(int rank) {
         Battle battle = new Battle(List.of(CharacterFactory.create(PEARL, 80, true, null, null, rank),
                         CharacterFactory.create(ALLY, 80)),
-                List.of(EnemyFactory.create(1002011, 100, 1)), new Random(0));
+                List.of(EnemyFactory.create(1002011, 100, 1)), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         Character ally = battle.characters.get(1);

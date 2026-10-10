@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * 8009/8010's ultimate, the branch that needs an Elation skill on the target:
@@ -84,7 +83,7 @@ public class UltElationBranchTest {
         Character caster = CharacterFactory.create(CASTER, LEVEL, false, null, null, 0);
         Character target = CharacterFactory.create(TARGET, LEVEL, false, null, null, 0);
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(caster, target), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(caster, target), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         return new Scene(battle, caster, target, enemy);

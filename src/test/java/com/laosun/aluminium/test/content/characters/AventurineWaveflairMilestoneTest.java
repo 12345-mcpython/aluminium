@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * 1513 (砂金•戏浪)'s talent milestone: 「【热意】达到10点时，砂金•戏浪会立即施放1次<b>固定计入20笑点</b>的【举杯！敬炽烈一夏】，
@@ -154,7 +153,7 @@ public class AventurineWaveflairMilestoneTest {
                 new com.laosun.aluminium.models.DoubleValue(0));
         ally = CharacterFactory.create(ALLY, 80);
         enemy = BattleFixture.monster();
-        battle = new Battle(List.of(wolf, ally), List.of(enemy), new Random(0));
+        battle = new Battle(List.of(wolf, ally), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
     }

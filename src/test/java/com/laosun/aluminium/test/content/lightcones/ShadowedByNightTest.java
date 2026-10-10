@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Light cone 2104: "击破特攻提高#1%。进入战斗时或造成击破伤害后，速度提高#2%，持续#3回合，该效果每回合只可触发1次".
@@ -72,6 +71,6 @@ public class ShadowedByNightTest {
     }
 
     private static Battle battle(Character unit, Enemy enemy) {
-        return new Battle(List.of(unit), List.of(enemy), new Random(0));
+        return new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
     }
 }

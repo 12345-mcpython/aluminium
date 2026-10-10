@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Cones 21034 and 23018: a derived magnitude off the wearer's MAX ENERGY with a constant ceiling (`cap_amount`).
@@ -26,7 +25,7 @@ public class TodayIsAnotherPeacefulDayAndAnInstantBeforeAGazesandTest {
     public void cone21034BoostsDamageByMaxEnergyUpToTheCeiling() {
         Character unit = CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(21034, LEVEL, false, 5));
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(unit), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
         double before = unit.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
         double energy = unit.getMaxEnergy();
         battle.startBattle();
@@ -41,7 +40,7 @@ public class TodayIsAnotherPeacefulDayAndAnInstantBeforeAGazesandTest {
     public void cone23018RaisesCritDamageAndAnUltScopedBoost() {
         Character unit = CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(23018, LEVEL, false, 5));
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(unit), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
         double critBefore = unit.getAttribute(AttributeType.CRIT_ATTACK).get();
         double energy = unit.getMaxEnergy();
         battle.startBattle();

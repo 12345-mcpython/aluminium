@@ -15,7 +15,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * 121 Huohuo (藿藿) Eidolon (星魂) 2's third sentence: "...<b>decreases [禳命]'s remaining turns by 1</b>".
@@ -41,7 +40,7 @@ public class HuohuoTalismanLosesATurnTest {
         Character her = CharacterFactory.create(HUOHUO, 80, false, null, null, 2);
         Character ally = CharacterFactory.create(ALLY, 80, false, null, null, 0);
         Battle battle = new Battle(List.of(her, ally),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
 

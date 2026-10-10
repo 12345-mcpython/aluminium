@@ -19,7 +19,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * "使敌方全体全属性抗性降低 X%" - the victim's side of the resistance zone, pinned from both ends.
@@ -42,7 +41,7 @@ public class ResistanceReductionTest {
         applier.setTriggerTable(new TriggerTable(9996, List.of(TriggerSpecs.rule(
                 TriggerEvent.TURN_START.name(), List.of(), reduction(0.2)))));
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(caster, applier), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(caster, applier), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         double before = hit(battle, caster, enemy);
 
@@ -63,7 +62,7 @@ public class ResistanceReductionTest {
     public void herAuraStatesTwentyPercentOnEveryEnemy() {
         Character dahlia = CharacterFactory.create(1321, LEVEL);
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(dahlia), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(dahlia), List.of(enemy), BattleFixture.seeded());
 
         battle.startBattle();
 
@@ -92,7 +91,7 @@ public class ResistanceReductionTest {
     public void theTwoNewReadersStateTheirOwnPercentages() {
         Character fuxuan = CharacterFactory.create(1203, LEVEL);
         Enemy first = BattleFixture.monster();
-        Battle firstBattle = new Battle(List.of(fuxuan), List.of(first), new Random(0));
+        Battle firstBattle = new Battle(List.of(fuxuan), List.of(first), BattleFixture.seeded());
         firstBattle.startBattle();
 
         firstBattle.castImmediate(fuxuan.getSkills().get(SkillType.ULTRA), fuxuan, List.of(first));
@@ -102,7 +101,7 @@ public class ResistanceReductionTest {
 
         Character nihility = CharacterFactory.create(1304, LEVEL);
         Enemy second = BattleFixture.monster();
-        Battle secondBattle = new Battle(List.of(nihility), List.of(second), new Random(0));
+        Battle secondBattle = new Battle(List.of(nihility), List.of(second), BattleFixture.seeded());
         secondBattle.startBattle();
 
         secondBattle.castImmediate(nihility.getSkills().get(SkillType.COMMON), nihility, List.of(second));

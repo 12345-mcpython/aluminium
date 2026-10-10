@@ -7,10 +7,10 @@ import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.buff.SkillSwapBuff;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import java.util.List;
-import java.util.Random;
 
 /**
  * Character 1503 (Pearl): her Ultimate's enhanced basic branches on the archetype's Path.
@@ -44,7 +44,7 @@ public class PearlEnhancedBasicBranchTest {
     private static int swappedSlot(int archetype) {
         Battle battle = new Battle(List.of(CharacterFactory.create(PEARL, 80),
                         CharacterFactory.create(ELATION, 80), CharacterFactory.create(HUNTER, 80)),
-                List.of(EnemyFactory.create(1002011, 100, 1)), new Random(0));
+                List.of(EnemyFactory.create(1002011, 100, 1)), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         Character pearl = battle.characters.get(0);

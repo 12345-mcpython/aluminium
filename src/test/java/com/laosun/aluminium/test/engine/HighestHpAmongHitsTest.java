@@ -16,7 +16,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * `highest_hp_attack_hit`: "被攻击目标中当前生命值最高的目标".
@@ -48,7 +47,7 @@ public class HighestHpAmongHitsTest {
         Character owner = CharacterFactory.create(OWNER, LEVEL);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
         Battle battle = new Battle(List.of(owner, ally),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         owner = battle.characters.getFirst();
@@ -80,7 +79,7 @@ public class HighestHpAmongHitsTest {
     public void anEmptyHitSetIsRefusedLoudly() {
         Character owner = CharacterFactory.create(OWNER, LEVEL);
         Battle battle = new Battle(List.of(owner, CharacterFactory.create(ALLY, LEVEL)),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         owner = battle.characters.getFirst();

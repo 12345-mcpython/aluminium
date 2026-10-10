@@ -15,7 +15,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Light cone 21026: "攻击力提高#1%,对处于灼烧或裂伤状态的敌方目标造成的伤害提高#2%" (ATK raised by #1%, damage to a burning or wounded enemy raised by #2%) at rank 5.
@@ -43,7 +42,7 @@ public class WoofWalkTimeTest {
     private static double attackRatio() {
         Character unit = CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(21026, LEVEL, false, 5));
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(unit), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
         double before = unit.getAttribute(AttributeType.ATTACK).get();
         battle.startBattle();
         double gain = unit.getAttribute(AttributeType.ATTACK).get() - before;
@@ -54,7 +53,7 @@ public class WoofWalkTimeTest {
     private static double settled(int which) {
         Character unit = CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(21026, LEVEL, false, 5));
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(unit), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         if (which == 1 || which == 3) {
             enemy.getBuffManager().addBuff(new DotBuff(unit, DamageElement.FIRE, 100, 3));

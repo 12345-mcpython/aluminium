@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * When a rule reads {@code scale: self_attr:<X>}, does it read the CURRENT resolved value of {@code X}?
@@ -44,7 +43,7 @@ public class DerivedReadTimingTest {
     public void aDerivedReadSeesAnAttributeGrantedEarlierInTheSameEvent() {
         Character pearl = CharacterFactory.create(PEARL, 80);
         Battle battle = new Battle(List.of(pearl, CharacterFactory.create(HUNTER, 80)),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         Character her = battle.characters.getFirst();

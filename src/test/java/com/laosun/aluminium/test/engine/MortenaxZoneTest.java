@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * "结界持续期间..." - the zone's clock is a COUNTDOWN, so its effects last exactly as long as that unit is alive.
@@ -33,7 +32,7 @@ public class MortenaxZoneTest {
         Character mortenax = CharacterFactory.create(MORTENAX, LEVEL);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(mortenax, ally), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(mortenax, ally), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         double baseWeight = battle.aggroOf(mortenax);
         double baseHeal = battle.calculateHeal(ally, mortenax, 1000);
@@ -66,7 +65,7 @@ public class MortenaxZoneTest {
     public void herFirstEidolonLowersEnemyResistanceForTheZonesLifetime() {
         Character withEidolon = CharacterFactory.create(MORTENAX, LEVEL, true, null, null, 1);
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(withEidolon), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(withEidolon), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
 
         battle.castImmediate(withEidolon.getSkills().get(SkillType.ULTRA), withEidolon, List.of(enemy));
@@ -81,7 +80,7 @@ public class MortenaxZoneTest {
 
         Character withoutEidolon = CharacterFactory.create(MORTENAX, LEVEL);
         Enemy plain = BattleFixture.monster();
-        Battle second = new Battle(List.of(withoutEidolon), List.of(plain), new Random(0));
+        Battle second = new Battle(List.of(withoutEidolon), List.of(plain), BattleFixture.seeded());
         second.startBattle();
 
         second.castImmediate(withoutEidolon.getSkills().get(SkillType.ULTRA), withoutEidolon, List.of(plain));

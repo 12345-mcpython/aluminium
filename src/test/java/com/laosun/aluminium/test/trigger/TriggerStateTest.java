@@ -2,6 +2,7 @@ package com.laosun.aluminium.test.trigger;
 
 
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
@@ -18,7 +19,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 import java.util.Set;
 
 /**
@@ -684,7 +684,7 @@ public class TriggerStateTest {
     }
 
     private static Battle battleWith(TriggerSpec... specs) {
-        Battle battle = new Battle(List.of(ownerWith(specs)), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(ownerWith(specs)), List.of(dummy()), BattleFixture.seeded());
         battle.startBattle();
         return battle;
     }
@@ -692,7 +692,7 @@ public class TriggerStateTest {
     /** The same, but with a chosen ally - the Path comparison needs control over who is beside the owner. */
     private static Battle withAllyOf(int allyCid, TriggerSpec... specs) {
         Battle battle = new Battle(List.of(ownerWith(specs), CharacterFactory.create(allyCid, LEVEL)),
-                List.of(dummy()), new Random(0));
+                List.of(dummy()), BattleFixture.seeded());
         battle.startBattle();
         return battle;
     }
@@ -704,7 +704,7 @@ public class TriggerStateTest {
 
     private static Battle withAlly(TriggerSpec... specs) {
         Battle battle = new Battle(List.of(ownerWith(specs), CharacterFactory.create(ALLY, LEVEL)),
-                List.of(dummy()), new Random(0));
+                List.of(dummy()), BattleFixture.seeded());
         battle.startBattle();
         return battle;
     }

@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Both the ultimate's -40% and the technique's -20% defence reduction have to count (1106).
@@ -43,7 +42,7 @@ public class PelaDefenceStackingTest {
     private static double read(boolean usedTechnique, boolean castUlt) {
         Character owner = CharacterFactory.create(OWNER, 80, false, null, null, 0);
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(owner), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(owner), List.of(enemy), BattleFixture.seeded());
         if (usedTechnique) {
             battle.markTechniqueUsed(owner);
         }

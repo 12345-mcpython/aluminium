@@ -19,7 +19,6 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 /**
  * The RUN TIME number behind {@code per_stack}: a count that only the engine can resolve.
@@ -41,7 +40,7 @@ public class PerStackRuntimeTest {
     public void aSelfStackMultiplierActuallyScalesTheBonus() {
         Character wearer = CharacterFactory.create(WEARER, 80);
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(wearer), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(wearer), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
 
         EffectSpec add = new EffectSpec();

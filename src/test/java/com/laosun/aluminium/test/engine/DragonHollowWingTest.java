@@ -6,7 +6,6 @@ import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import java.util.List;
-import java.util.Random;
 
 /**
  * The dragon's talent [灼掠幽墟的晦翼]: "造成 #2 次伤害，每次伤害对敌方随机单体造成等同于遐蝶 #1% 生命上限的量子属性伤害…".
@@ -36,7 +35,7 @@ public class DragonHollowWingTest {
         Character her = CharacterFactory.create(CASTORICE, LEVEL);
         Character other = CharacterFactory.create(OTHER, LEVEL);
         Battle battle = new Battle(List.of(her, other),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         her = battle.characters.getFirst();

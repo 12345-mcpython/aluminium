@@ -25,7 +25,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Negative effects: what counts as one, how many are attached, and how "解除 N 个负面效果" removes them.
@@ -248,7 +247,7 @@ public class DebuffTest {
 
     private static Battle withAlly(TriggerSpec... specs) {
         Battle battle = new Battle(List.of(ownerWith(specs), CharacterFactory.create(ALLY, LEVEL)),
-                List.of(dummy()), new Random(0));
+                List.of(dummy()), BattleFixture.seeded());
         battle.startBattle();
         return battle;
     }

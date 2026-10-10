@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 /**
  * Light cone 21046: at battle start the units that share a Path with somebody else on our side gain 16% crit damage.
@@ -67,7 +66,7 @@ public class PoisedToBloomTest {
         Character wearerPlain = CharacterFactory.create(WEARER, LEVEL);
 
         battle = new Battle(List.of(wearerWithCone, twinA, twinB, loner), List.of(BattleFixture.monster()),
-                new Random(0));
+                BattleFixture.seeded());
         battle.startBattle();
         // baselines, read from a battle with no cone at all
         double twinABase = CharacterFactory.create(byPath.get(twinPath).get(0), LEVEL)
@@ -96,7 +95,7 @@ public class PoisedToBloomTest {
         Character a = CharacterFactory.create(1002, LEVEL);
         Character b = CharacterFactory.create(1002, LEVEL);
         Character c = CharacterFactory.create(1002, LEVEL);
-        battle = new Battle(List.of(a, b, c), List.of(BattleFixture.monster()), new Random(0));
+        battle = new Battle(List.of(a, b, c), List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         System.out.println("[21046] without the cone: " + a.getAttribute(AttributeType.CRIT_ATTACK).get());
         Assertions.assertEquals(0.5, a.getAttribute(AttributeType.CRIT_ATTACK).get(), 1e-9,

@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 /**
  * Three cones whose effects come from passive boosts: 21003 (attack, plus crit ONLY against two or fewer enemies), 21008 (effect hit rate and damage over
@@ -49,7 +48,7 @@ public class ConePassiveGroupTest {
         Character unit = wearer(21007, 1);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
         Enemy target = BattleFixture.monster();
-        Battle battle = new Battle(List.of(unit, ally), List.of(target), new Random(0));
+        Battle battle = new Battle(List.of(unit, ally), List.of(target), BattleFixture.seeded());
         double healBoost = unit.getAttribute(AttributeType.OUTGOING_HEALING_BOOST).get();
         double allyEnergy = ally.getCurrentEnergy();
         battle.startBattle();
@@ -76,7 +75,7 @@ public class ConePassiveGroupTest {
         for (int i = 0; i < enemies; i++) {
             list.add(BattleFixture.monster());
         }
-        Battle battle = new Battle(List.of(unit), list, new Random(0));
+        Battle battle = new Battle(List.of(unit), list, BattleFixture.seeded());
         double before = unit.getAttribute(attribute).get();
         battle.startBattle();
         return unit.getAttribute(attribute).get() - before;

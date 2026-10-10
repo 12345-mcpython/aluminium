@@ -16,7 +16,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * 1415's memosprite skill 19, THIRD sentence: "风堇施放战技/终结技后，消耗1层[献予'天空'之诗]".
@@ -35,7 +34,7 @@ public class SkyOdeSpendTest {
         Character hyacine = CharacterFactory.create(HYACINE, LEVEL);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
         Battle battle = new Battle(List.of(hyacine, ally),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         hyacine = battle.characters.get(0);

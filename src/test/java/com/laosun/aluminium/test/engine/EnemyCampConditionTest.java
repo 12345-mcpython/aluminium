@@ -9,11 +9,11 @@ import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.models.enemy.EnemySkill;
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import java.util.List;
-import java.util.Random;
 
 /** F-5: the camp vocabulary now has both sides -- `actor is_enemy` is the mirror of `actor is_ally`. */
 public class EnemyCampConditionTest {
@@ -22,7 +22,7 @@ public class EnemyCampConditionTest {
     @Test
     public void theEnemySideIsAskableAndTheAllySideIsNotIt() {
         Enemy enemy = EnemyFactory.create(1002011, 100, 1);
-        Battle battle = new Battle(List.of(CharacterFactory.create(HERO, 80)), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(CharacterFactory.create(HERO, 80)), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         Character hero = battle.characters.getFirst();

@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Character 1503 (Pearl): the Elation damage her ENHANCED basic carries on its own.
@@ -104,7 +103,7 @@ public class PearlEnhancedBasicElationRiderTest {
         Character pearl = CharacterFactory.create(PEARL, 80);
         Character archetype = CharacterFactory.create(ELATION_ALLY, 80);
         Battle battle = new Battle(List.of(pearl, archetype, CharacterFactory.create(HUNTER, 80)),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         Character her = battle.characters.getFirst();

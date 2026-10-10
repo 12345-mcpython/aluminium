@@ -2,6 +2,7 @@ package com.laosun.aluminium.test.trigger;
 
 
 import com.laosun.aluminium.test.support.TestCharacters;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
@@ -22,7 +23,6 @@ import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Random;
 
 /**
  * Trigger tables: character mechanics expressed as data.
@@ -641,7 +641,7 @@ public class TriggerTableTest {
             enemy.heal(1_000_000);
             enemies.add(enemy);
         }
-        Battle battle = new Battle(team, enemies, new Random(0));
+        Battle battle = new Battle(team, enemies, BattleFixture.seeded());
         battle.startBattle();
         return battle;
     }

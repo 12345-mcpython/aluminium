@@ -10,7 +10,6 @@ import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import java.util.List;
-import java.util.Random;
 
 /**
  * Character 1503 (Pearl): the Elation skill's payout -- an armed ally's attack carries an extra Elation amount.
@@ -47,7 +46,7 @@ public class PearlElationPayoutTest {
             team.add(CharacterFactory.create(ELATION, 80));
         }
         team.add(CharacterFactory.create(1204, 80));
-        Battle battle = new Battle(team, List.of(BattleFixture.monster()), new Random(0));
+        Battle battle = new Battle(team, List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         Character pearl = battle.characters.get(0);

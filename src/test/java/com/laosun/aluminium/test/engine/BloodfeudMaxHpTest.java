@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * 1404："[血仇]状态下生命上限提高，数值等同于当前生命上限的 50%".
@@ -30,7 +29,7 @@ public class BloodfeudMaxHpTest {
     public void theRaiseFollowsTheState() {
         Character him = CharacterFactory.create(MYDEI, 80, false, null, null, 0);
         Battle battle = new Battle(List.of(him),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         Skill ult = him.getSkills().get(SkillType.ULTRA);

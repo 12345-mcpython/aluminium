@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Character 1506 (Silver Wolf LV.999): the batch that took her from 2 rules to 15.
@@ -315,7 +314,7 @@ public class SilverWolfLV999KitTest {
         Battle battle = new Battle(
                 List.of(CharacterFactory.create(WOLF, 80, false, null, null, eidolonRank),
                         CharacterFactory.create(ALLY, 80)),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         return battle;

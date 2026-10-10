@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * 1205 Blade's skill: "消耗等同于刃生命上限 30% 的生命值，进入[地狱变]状态…若当前生命值不足…降低至 1 点".
@@ -27,7 +26,7 @@ public class ConsumeHpTest {
     public void theSkillSpendsThirtyPercentOfMaxHp() {
         Character unit = CharacterFactory.create(WEARER, LEVEL);
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(unit), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         double maxHp = unit.getMaxHp();
         double before = unit.getCurrentHp();
@@ -42,7 +41,7 @@ public class ConsumeHpTest {
     public void theSpendStopsAtOneHp() {
         Character unit = CharacterFactory.create(WEARER, LEVEL);
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(unit), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         int guard = 0;
         // Note: Small steps: `Damage`'s value is a SKILL BASE, not raw damage (round 193/240), so a big one-shot figure kills

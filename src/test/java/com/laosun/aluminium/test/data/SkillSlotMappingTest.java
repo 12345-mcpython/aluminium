@@ -4,6 +4,7 @@ package com.laosun.aluminium.test.data;
 import com.laosun.aluminium.test.engine.EnergyTest;
 import com.laosun.aluminium.test.engine.SkillExecutorTest;
 import com.laosun.aluminium.test.engine.SuperBreakTest;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.enums.AttributeType;
@@ -20,7 +21,6 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 /**
  * Skill slot mapping (the core of skill assembly): {@code SkillType} to the slot number in {@code skills.json}.
@@ -338,7 +338,7 @@ public class SkillSlotMappingTest {
         enemy.setAttribute(AttributeType.HEALTH, new DoubleValue(1_000_000));
         enemy.heal(1_000_000);
 
-        Battle battle = new Battle(List.of(hero), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(hero), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         battle.castImmediate(new DefaultSkill(1204, 1, level), hero, List.of(enemy));
         return 1_000_000 - enemy.getCurrentHp();
@@ -347,7 +347,7 @@ public class SkillSlotMappingTest {
     /** Starts a minimal battle (only to trigger {@code startBattle()}'s map-skill attachment). */
     private static Battle newBattle(Character hero) {
         Enemy enemy = EnemyFactory.create(1002011, 90, 1);
-        Battle battle = new Battle(List.of(hero), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(hero), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         return battle;
     }

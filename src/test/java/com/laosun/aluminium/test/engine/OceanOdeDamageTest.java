@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * 1415's memosprite skill 22 "献予'海洋'之诗": "本场战斗中，海瑟音造成的伤害提高 #1%".
@@ -38,7 +37,7 @@ public class OceanOdeDamageTest {
         Character cyrene = CharacterFactory.create(CYRENE, LEVEL);
         Character hysilens = CharacterFactory.create(HYSILENS, LEVEL);
         Battle battle = new Battle(List.of(cyrene, hysilens),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         cyrene = battle.characters.get(0);
@@ -59,7 +58,7 @@ public class OceanOdeDamageTest {
         Character cyrene = CharacterFactory.create(CYRENE, LEVEL);
         Character hysilens = CharacterFactory.create(HYSILENS, LEVEL);
         Battle battle = new Battle(List.of(cyrene, hysilens),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         battle.summonServant(battle.characters.get(0));

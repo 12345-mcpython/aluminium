@@ -4,11 +4,11 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 /** Character 1503 (Pearl): Eidolon 1 raises the team's Elation damage at 2/3/4 Elation allies. */
 public class PearlEidolon1ElationTest {
@@ -47,7 +47,7 @@ public class PearlEidolon1ElationTest {
             team.add(CharacterFactory.create(ELATION, 80));
         }
         team.add(CharacterFactory.create(HUNTER, 80));
-        Battle battle = new Battle(team, List.of(EnemyFactory.create(1002011, 100, 1)), new Random(0));
+        Battle battle = new Battle(team, List.of(EnemyFactory.create(1002011, 100, 1)), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         Character mine = battle.characters.stream().filter(c -> c.getCid() == PEARL).findFirst().orElseThrow();

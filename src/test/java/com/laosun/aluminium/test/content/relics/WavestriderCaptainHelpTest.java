@@ -8,11 +8,11 @@ import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Relic 126: "成为其他我方目标的技能目标时，获得 1 层[助力]，最多 2 层；施放终结技时若持有 2 层，
@@ -28,7 +28,7 @@ public class WavestriderCaptainHelpTest {
     private static final int ALLY = 1002;
 
     private static Battle battle(Character wearer, Character ally) {
-        Battle b = new Battle(List.of(wearer, ally), List.of(EnemyFactory.create(1002011, 90, 1)), new Random(0));
+        Battle b = new Battle(List.of(wearer, ally), List.of(EnemyFactory.create(1002011, 90, 1)), BattleFixture.seeded());
         b.startBattle();
         return b;
     }

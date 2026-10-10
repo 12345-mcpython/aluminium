@@ -8,7 +8,6 @@ import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import java.util.List;
-import java.util.Random;
 
 /**
  * 1415's memosprite skill 24, third sentence: "长夜月战技的暴击伤害提高效果额外提高，提高数值等同于长夜月暴击伤害的 #3%".
@@ -39,7 +38,7 @@ public class TimeOdeRaisesHerCritTest {
         Character cyrene = CharacterFactory.create(CYRENE, LEVEL);
         Character longnight = CharacterFactory.create(LONGNIGHT, LEVEL);
         Battle battle = new Battle(List.of(cyrene, longnight),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         cyrene = battle.characters.get(0);

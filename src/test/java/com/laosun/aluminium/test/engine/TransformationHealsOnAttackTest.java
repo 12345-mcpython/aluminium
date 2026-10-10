@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * 1408: "变身期间...施放攻击后回复等同于自身生命上限 20% 的生命值" (while transformed, casting an attack restores HP equal to 20% of her own Max HP).
@@ -45,7 +44,7 @@ public class TransformationHealsOnAttackTest {
     private static double healFromOneAttack(boolean transform) {
         Character owner = CharacterFactory.create(OWNER, 80, false, null, null, 0);
         Battle battle = new Battle(List.of(owner),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
 

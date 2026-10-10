@@ -7,12 +7,12 @@ import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * {@code counted_laughs}: 「本次造成的欢愉伤害**固定计入 99 点**【好活当赏】」 - ONE instance states the count it is folded with.
@@ -94,7 +94,7 @@ public class CountedLaughsTest {
     private static double damage(Double counted, int poolLaughs) {
         Character mine = CharacterFactory.create(MINE, 80);
         Enemy enemy = Enemy.fromAttributes("dummy", 1_000_000, 0, 100, 100);
-        Battle battle = new Battle(List.of(mine, CharacterFactory.create(ALLY, 80)), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(mine, CharacterFactory.create(ALLY, 80)), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         battle.partyResource(LAUGH).gain(poolLaughs);

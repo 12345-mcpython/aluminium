@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Light cone 21021 Quid Pro Quo (光锥 21021 等价交换), skill Enjoy With Rapture (酣适): `当装备者的回合开始时，随机为 1 个当前能量百分比小于 50% 的我方其他目标
@@ -33,7 +32,7 @@ public class QuidProQuoEnergyTest {
         Character low = CharacterFactory.create(ALLY_LOW, LEVEL);
         Character full = CharacterFactory.create(ALLY_FULL, LEVEL);
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(wearer, low, full), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(wearer, low, full), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
 
         wearer.setCurrentEnergy(wearer.getMaxEnergy());          // Note: the wearer at full energy: if it were picked, that would be plainly visible
@@ -77,7 +76,7 @@ public class QuidProQuoEnergyTest {
         Character a = CharacterFactory.create(ALLY_LOW, LEVEL);
         Character b = CharacterFactory.create(ALLY_FULL, LEVEL);
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(wearer, a, b), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(wearer, a, b), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
 
         wearer.setCurrentEnergy(wearer.getMaxEnergy() * 0.3);   // Note: the only one below 50%

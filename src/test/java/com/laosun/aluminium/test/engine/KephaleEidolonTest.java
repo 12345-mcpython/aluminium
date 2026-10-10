@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * 1412's eidolon 1: "a character holding [军功] ignores 16% of the target's defence when dealing damage".
@@ -37,7 +36,7 @@ public class KephaleEidolonTest {
         Character owner = CharacterFactory.create(OWNER, LEVEL, true, null, null, RANK);
         Character partner = CharacterFactory.create(ALLY, LEVEL);
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(owner, partner), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(owner, partner), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         Character candidate = false ? owner : partner;
         if (gated) {

@@ -8,10 +8,10 @@ import com.laosun.aluminium.models.Damage;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import java.util.List;
-import java.util.Random;
 
 /** Character 1503 (Pearl): the art barrier only lands on an Elation archetype, and the talent's reduction tracks the HP threshold. */
 public class PearlArtBarrierAndTalentTest {
@@ -134,7 +134,7 @@ public class PearlArtBarrierAndTalentTest {
 
     private static Battle newBattle() {
         Battle battle = new Battle(List.of(CharacterFactory.create(PEARL, 80), CharacterFactory.create(ELATION, 80),
-                CharacterFactory.create(HUNTER, 80)), List.of(EnemyFactory.create(1002011, 100, 1)), new Random(0));
+                CharacterFactory.create(HUNTER, 80)), List.of(EnemyFactory.create(1002011, 100, 1)), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         return battle;

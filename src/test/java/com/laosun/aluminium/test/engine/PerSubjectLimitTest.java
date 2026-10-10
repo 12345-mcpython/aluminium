@@ -2,6 +2,7 @@ package com.laosun.aluminium.test.engine;
 
 
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
@@ -15,7 +16,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * "该效果每个角色最多触发 1 次" (1403) -- a firing count that belongs to the TRIGGERER, not the owner.
@@ -34,7 +34,7 @@ public class PerSubjectLimitTest {
         Character a = CharacterFactory.create(ALLY_A, LEVEL);
         Character b = CharacterFactory.create(ALLY_B, LEVEL);
         Enemy enemy = EnemyFactory.create(1002011, 90, 1);
-        Battle battle = new Battle(List.of(owner, a, b), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(owner, a, b), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
 
         EffectSpec stack = new EffectSpec();

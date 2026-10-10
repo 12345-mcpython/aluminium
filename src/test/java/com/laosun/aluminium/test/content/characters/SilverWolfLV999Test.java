@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * 1506 Silver Wolf LV.999 (银狼LV.999): the two clauses its own text states completely -- "行动提前 100%" and the declared
@@ -31,7 +30,7 @@ public class SilverWolfLV999Test {
     private void build() {
         wolf = CharacterFactory.create(WEARER, LEVEL);
         battle = new Battle(List.of(wolf, CharacterFactory.create(ALLY, LEVEL)),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
     }
 

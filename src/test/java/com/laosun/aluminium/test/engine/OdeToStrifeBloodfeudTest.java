@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * 1415 Cyrene's memosprite Demiurge, memosprite skill 8 "献予'纷争'之诗 / Ode to Strife", the Bloodfeud branch.
@@ -80,7 +79,7 @@ public class OdeToStrifeBloodfeudTest {
         Character cyrene = CharacterFactory.create(CYRENE, LEVEL);
         Character mydei = CharacterFactory.create(MYDEI, LEVEL);
         battle = new Battle(List.of(cyrene, mydei),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         lastSummon = battle.summonServant(cyrene);

@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * 1112 Topaz &amp; Numby: the skill's [负债证明] state and its damage, plus the trace's fire-weakness clause.
@@ -29,7 +28,7 @@ public class TopazTest {
     public void theSkillMarksTheTargetAndDealsDamage() {
         Character unit = CharacterFactory.create(WEARER, LEVEL);
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(unit), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         battle.fireTriggers(TriggerEvent.SKILL_CAST, unit, enemy, 0, 0);
         boolean marked = enemy.getBuffManager().hasState("负债证明");

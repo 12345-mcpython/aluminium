@@ -16,7 +16,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Cones 23035 (a broken enemy takes more BREAK damage) and 23038 (a crit-damage aura carried by a state).
@@ -27,7 +26,7 @@ public class ConeBreakAndAuraTest {
     private static final int LEVEL = 80;
         private Battle battle(Character... units) {
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(units), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(units), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         return battle;
     }
@@ -69,7 +68,7 @@ public class ConeBreakAndAuraTest {
         double ordinary = battle.applyDamage(target, new Damage(withCone, target, DamageElement.FIRE, DamageType.NORMAL, 1000));
         // A second, clean enemy for the reference readings.
         Enemy reference = BattleFixture.monster();
-        Battle plain = new Battle(List.of(without), List.of(reference), new Random(0));
+        Battle plain = new Battle(List.of(without), List.of(reference), BattleFixture.seeded());
         plain.startBattle();
         double breakPlain = plain.applyDamage(reference, new Damage(without, reference, DamageElement.FIRE, DamageType.BREAK, 1000));
         double ordinaryPlain = plain.applyDamage(reference, new Damage(without, reference, DamageElement.FIRE, DamageType.NORMAL, 1000));

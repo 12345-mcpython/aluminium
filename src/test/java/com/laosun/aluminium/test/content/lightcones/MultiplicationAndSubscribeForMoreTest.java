@@ -16,7 +16,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Light cone 20015: "当装备者施放普攻后，使下一次行动提前#1[i]%" -- ADVANCE, the spelling shipped relics 110 and 308 already use.
@@ -29,7 +28,7 @@ public class MultiplicationAndSubscribeForMoreTest {
     public void theBasicAttackAdvancesTheWearersNextAction() {
         Character unit = CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(20015, LEVEL, false, 5));
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(unit), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         battle.currentMove = new Signal(unit);
         battle.beforeMove();
@@ -47,7 +46,7 @@ public class MultiplicationAndSubscribeForMoreTest {
     public void theConeRaisesBothBasicAndSkillDamage() {
         Character unit = CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(21017, LEVEL, false, 5));
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(unit), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
         double basicBefore = unit.getAttribute(AttributeType.BASIC_ATTACK_DAMAGE_BOOST).get();
         double skillBefore = unit.getAttribute(AttributeType.SKILL_DAMAGE_BOOST).get();
         battle.startBattle();

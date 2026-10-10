@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Tribbie's zone, as a state on him.
@@ -30,7 +29,7 @@ public class TribbieZoneStateTest {
     public void theZoneIsAStateThatEndsOnItsOwn() {
         Character tribbie = CharacterFactory.create(TRIBBIE, LEVEL);
         Battle battle = new Battle(List.of(tribbie, CharacterFactory.create(1002, LEVEL)),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         Assertions.assertFalse(tribbie.getBuffManager().hasState(ZONE),

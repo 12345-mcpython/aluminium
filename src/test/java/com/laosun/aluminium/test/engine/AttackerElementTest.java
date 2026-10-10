@@ -10,7 +10,6 @@ import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import java.util.List;
-import java.util.Random;
 
 /**
  * {@code element: "attacker"} -- the element of the unit that produced the instance.
@@ -26,7 +25,7 @@ public class AttackerElementTest {
     public void adamageRuleResolvesTheAttackersElement() {
         Character pearl = CharacterFactory.create(PEARL, 80);
         var enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(pearl, CharacterFactory.create(1204, 80)), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(pearl, CharacterFactory.create(1204, 80)), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         Character mine = battle.characters.getFirst();

@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /** Eidolon clauses "施放X后，<attr>提高N%，持续M回合", values verified against `eidolons.json`, expectations split by attribute kind. */
 public class EidolonBatchTest {
@@ -35,7 +34,7 @@ public class EidolonBatchTest {
     private static double gain(int cid, TriggerEvent event, AttributeType attribute, boolean flat) {
         Character unit = CharacterFactory.create(cid, LEVEL);
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(unit), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         battle.currentMove = new Signal(unit);
         battle.beforeMove();

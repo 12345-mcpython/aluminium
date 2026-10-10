@@ -10,11 +10,11 @@ import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * 1305 Dr. Ratio: "若追加攻击施放前目标被消灭则对敌方随机单体发动" -- the fallback selector.
@@ -32,7 +32,7 @@ public class DrRatioFallbackTest {
         Character ratio = CharacterFactory.create(RATIO, LEVEL);
         Enemy a = EnemyFactory.create(1002011, 90, 1);
         Enemy b = EnemyFactory.create(1002011, 90, 2);
-        Battle battle = new Battle(List.of(ratio), List.of(a, b), new Random(0));
+        Battle battle = new Battle(List.of(ratio), List.of(a, b), BattleFixture.seeded());
         battle.startBattle();
         a.perish();
         Assertions.assertTrue(a.isDeath(), "the fixture must leave A defeated");

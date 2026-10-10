@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * 1505 Evanescia (绯英), the two clauses her own text states completely:
@@ -46,7 +45,7 @@ public class EvanesciaTest {
     public void theTalentDerivesTheElationValueAndTheTechniqueGivesTwenty() {
         Character elation = CharacterFactory.create(WEARER, LEVEL);
         Battle battle = new Battle(List.of(elation, CharacterFactory.create(ALLY, LEVEL)),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         double critDamage = elation.getAttribute(AttributeType.CRIT_ATTACK).get();
         battle.startBattle();
         int elationValue = elation.getResources().value("欢愉度");
@@ -65,7 +64,7 @@ public class EvanesciaTest {
                 TriggerSpecs.rule("BATTLE_START", List.of(), raiseCritDamage()),
                 TriggerSpecs.rule("BATTLE_START", List.of(), derive()))));
         Battle battle = new Battle(List.of(elation, CharacterFactory.create(ALLY, LEVEL)),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         double critDamage = elation.getAttribute(AttributeType.CRIT_ATTACK).get();
         int elationValue = elation.getResources().value("欢愉度");

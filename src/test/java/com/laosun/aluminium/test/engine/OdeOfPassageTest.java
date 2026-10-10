@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * 1415's memosprite skill 14 "献予'门径'之诗" (Ode to the Passage), the sentence about defence.
@@ -35,7 +34,7 @@ public class OdeOfPassageTest {
         Character tribbie = CharacterFactory.create(TRIBBIE, LEVEL);
         Character bystander = CharacterFactory.create(BYSTANDER, LEVEL);
         Battle battle = new Battle(List.of(cyrene, tribbie, bystander),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         Summon demiurge = battle.summonServant(cyrene);

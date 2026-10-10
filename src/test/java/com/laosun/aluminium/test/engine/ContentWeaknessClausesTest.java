@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 /**
  * Content-layer judges for four pieces of content - that is, "is that clause really wired to an engine capability".
@@ -111,7 +110,7 @@ public class ContentWeaknessClausesTest {
         Enemy a = picked.get(0);
         Enemy b = picked.get(1);
         // Note: markTechniqueUsed must come before startBattle() - startBattle adds that state before any BATTLE_START rule
-        Battle battle = new Battle(List.of(firefly), List.of(a, b), new Random(0));
+        Battle battle = new Battle(List.of(firefly), List.of(a, b), BattleFixture.seeded());
         battle.markTechniqueUsed(firefly);
         battle.startBattle();
         // Note: WAVE_START is fired by WaveManager.nextWave() (it is not inside startBattle()).
@@ -137,7 +136,7 @@ public class ContentWeaknessClausesTest {
     public void theInsertedWeaknessFromContentActuallyExpires() {
         Character bto = CharacterFactory.create(1315, LEVEL);
         Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
-        Battle battle = new Battle(List.of(bto), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(bto), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         Assertions.assertFalse(enemy.isWeakTo(DamageElement.PHYSICAL), "1002011 must not already have Physical");
         bto.setCurrentEnergy(bto.getMaxEnergy());

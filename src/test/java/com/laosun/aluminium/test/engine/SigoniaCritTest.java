@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Relic set 313 (planar, 2 pieces): crit rate from battle start, and crit DMG per kill capped at the document's own stack count.
@@ -29,7 +28,7 @@ public class SigoniaCritTest {
     public void theSetGivesCritRateAtBattleStart() {
         Character unit = CharacterFactory.create(WEARER, LEVEL, true, null, RelicFactory.suit(313, 2, RELIC_LEVEL));
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(unit), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
         double before = unit.getAttribute(AttributeType.CRIT_CHANCE).get();
         battle.startBattle();
         Assertions.assertEquals(0.04, unit.getAttribute(AttributeType.CRIT_CHANCE).get() - before, 1e-6,
@@ -40,7 +39,7 @@ public class SigoniaCritTest {
     public void critDamageStacksOnlyUpToTheDocumentedCap() {
         Character unit = CharacterFactory.create(WEARER, LEVEL, true, null, RelicFactory.suit(313, 2, RELIC_LEVEL));
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(unit), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         battle.currentMove = new Signal(unit);
         battle.beforeMove();

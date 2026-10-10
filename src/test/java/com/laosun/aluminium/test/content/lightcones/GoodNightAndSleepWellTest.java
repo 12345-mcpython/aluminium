@@ -16,7 +16,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Light cone 21001: "敌方目标每承受 1 个负面效果，装备者对其造成的伤害提高 #1%，最多叠加 #2 层" at superimposition 5 (24% x 3).
@@ -53,7 +52,7 @@ public class GoodNightAndSleepWellTest {
     private static double[] settledWithCount(int debuffs) {
         Character unit = CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(21001, LEVEL, false, 5));
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(unit), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         if (debuffs >= 1) {
             enemy.getBuffManager().addBuff(new DotBuff(unit, DamageElement.FIRE, 100, 3));

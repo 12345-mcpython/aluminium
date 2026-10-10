@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * 1315 Boothill (波提欧)'s Eidolon 1: "when 波提欧 deals damage, ignore 16% of the enemy target's DEF".
@@ -34,7 +33,7 @@ public class BoothillEidolonTest {
     private static double defenceIgnore(int rank) {
         Character boothill = CharacterFactory.create(BOOTHILL, LEVEL, true, null, null, rank);
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(boothill), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(boothill), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         return boothill.getAttribute(AttributeType.DEFENCE_IGNORE).get()
                 - boothill.getAttribute(AttributeType.DEFENCE_IGNORE).baseValue();

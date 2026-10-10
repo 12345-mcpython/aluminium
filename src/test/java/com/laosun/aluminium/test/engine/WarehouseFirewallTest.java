@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * 1506 Silver Wolf LV.999's warehouse technique "999安全卫士" (999 Security Guard): "若敌方目标对我方施加了控制类负面状态，则使我方全体获得[防火墙]…该效果每个波次最多触发 1 次" (if an enemy applies a control-class negative state to our side, all of our side gains [防火墙], and this effect triggers at most once per wave).
@@ -30,7 +29,7 @@ public class WarehouseFirewallTest {
     public void theFirewallAnswersTheNextControl() {
         Character fighter = CharacterFactory.create(FIGHTER, 80, false, null, null, 0);
         Battle battle = new Battle(List.of(fighter),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
 
         // owned, not deployed: she is a LISTENER, and her table is the warehouse file rather than her battle kit
         Character wolf = CharacterFactory.create(WOLF, 80, false, null, null, 0);

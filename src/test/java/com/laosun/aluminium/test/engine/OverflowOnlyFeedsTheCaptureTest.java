@@ -12,7 +12,6 @@ import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import java.util.List;
-import java.util.Random;
 
 /** Does an `overflow_only` spend set the amount the next effect reads? */
 public class OverflowOnlyFeedsTheCaptureTest {
@@ -55,7 +54,7 @@ public class OverflowOnlyFeedsTheCaptureTest {
     private static int[] run(boolean overflowOnly) {
         Character spare = CharacterFactory.create(SPARE, LEVEL);
         Battle battle = new Battle(List.of(spare),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         spare = battle.characters.getFirst();

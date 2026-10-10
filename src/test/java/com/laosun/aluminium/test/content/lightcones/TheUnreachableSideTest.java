@@ -16,7 +16,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Light cone 23009: the constant halves (crit rate, Max HP) come from ability_property, so only the conditional half is ours --
@@ -61,7 +60,7 @@ public class TheUnreachableSideTest {
         Character withCone = wearer(true);
         Character without = wearer(false);
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(withCone, without), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(withCone, without), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         double before = withCone.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
         battle.applyDamage(withCone, new Damage(enemy, withCone, DamageElement.PHYSICAL, DamageType.NORMAL, 20));
@@ -82,7 +81,7 @@ public class TheUnreachableSideTest {
     public void payingAnHpPriceAlsoRaisesDamage() {
         Character withCone = wearer(true);
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(withCone), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(withCone), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         double before = withCone.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
         battle.fireTriggers(TriggerEvent.HP_CONSUMED, withCone, withCone, 100, 0);

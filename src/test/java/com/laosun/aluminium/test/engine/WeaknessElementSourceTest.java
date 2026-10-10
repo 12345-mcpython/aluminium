@@ -17,7 +17,6 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 /**
  * The two named element sources of `ADD_ELEMENTAL_WEAKNESS` (`cacb8b8`):
@@ -49,7 +48,7 @@ public class WeaknessElementSourceTest {
         // and the `party_first` mutation would be invisible (the shape of the case decides whether a mutation can be necessarily red).
         Character other = CharacterFactory.create(1002, LEVEL);
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(wearer, other), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(wearer, other), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         return new Object[]{battle, wearer, enemy};
     }

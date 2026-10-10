@@ -20,7 +20,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * The cast events carry the unit they were <b>aimed at</b> - "designate one of our characters".
@@ -80,7 +79,7 @@ public class CastTargetTest {
         Character bronya = CharacterFactory.create(BRONYA, LEVEL);
         Character ally = characterWith(rule("ULT_CAST", "target == self"));
         Character other = characterWith(rule("ULT_CAST", "target == self"));
-        Battle battle = new Battle(List.of(bronya, ally, other), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(bronya, ally, other), List.of(dummy()), BattleFixture.seeded());
 
         // Slot 3 is her ultimate, and 1001's slot 3 is an AOE attack: the caller aims it at `ally`, the effect
         // reaches the enemy camp, and the question here is which unit the EVENT names as its subject.
@@ -100,7 +99,7 @@ public class CastTargetTest {
     @Test
     public void herSkillAdvancesTheAllySheAimedAt() {
         Battle battle = new Battle(List.of(CharacterFactory.create(BRONYA, LEVEL),
-                CharacterFactory.create(ALLY, LEVEL)), List.of(dummy()), new Random(0));
+                CharacterFactory.create(ALLY, LEVEL)), List.of(dummy()), BattleFixture.seeded());
         battle.startBattle();
         Character bronya = battle.characters.getFirst();
         Character ally = battle.characters.get(1);
@@ -125,7 +124,7 @@ public class CastTargetTest {
      */
     @Test
     public void castingItOnHerselfSkipsOnlyTheImmediateAction() {
-        Battle battle = new Battle(List.of(CharacterFactory.create(BRONYA, LEVEL)), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(CharacterFactory.create(BRONYA, LEVEL)), List.of(dummy()), BattleFixture.seeded());
         Character bronya = battle.characters.getFirst();
         double before = timeRemaining(battle, bronya);
         double boostBefore = damageBoostOf(bronya);
@@ -147,7 +146,7 @@ public class CastTargetTest {
     public void theAuthoredRulesStateTheirShape() {
         Character bronya = CharacterFactory.create(BRONYA, LEVEL);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
-        Battle battle = new Battle(List.of(bronya, ally), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(bronya, ally), List.of(dummy()), BattleFixture.seeded());
         battle.startBattle();
         TriggerTable table = TriggerTables.of(BRONYA);
 
@@ -187,7 +186,7 @@ public class CastTargetTest {
         Character bronya = CharacterFactory.create(BRONYA, LEVEL);
         Character ally = characterWith(rule("SKILL_CAST", "target == self"));
         Character other = characterWith(rule("SKILL_CAST", "target == self"));
-        return new Battle(List.of(bronya, ally, other), List.of(dummy()), new Random(0));
+        return new Battle(List.of(bronya, ally, other), List.of(dummy()), BattleFixture.seeded());
     }
 
     /** Three characters, the first two carrying a rule that answers "a cast aimed at me". */

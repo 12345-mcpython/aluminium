@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * 1308 Acheron's talent: enemies enter battle with "受到的终结技伤害提高 8%", which DamageType.ULTRA scopes.
@@ -49,7 +48,7 @@ public class AcheronUltTakenTest {
     public void ultimateDamageIsAmplifiedAndNormalIsNot() {
         Character unit = CharacterFactory.create(WEARER, LEVEL);
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(unit), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         double normal = battle.applyDamage(enemy, new Damage(unit, enemy, DamageElement.THUNDER, DamageType.NORMAL, 1000));
         double ultra = battle.applyDamage(enemy, new Damage(unit, enemy, DamageElement.THUNDER, DamageType.ULTRA, 1000));

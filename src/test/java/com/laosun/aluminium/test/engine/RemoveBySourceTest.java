@@ -15,7 +15,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * `REMOVE_STATE` with `"kind": "own"`: take off only what THIS rule owner applied.
@@ -43,7 +42,7 @@ public class RemoveBySourceTest {
         Character owner = CharacterFactory.create(OWNER, LEVEL);
         Character other = CharacterFactory.create(OTHER, LEVEL);
         Battle battle = new Battle(List.of(owner, other),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
 

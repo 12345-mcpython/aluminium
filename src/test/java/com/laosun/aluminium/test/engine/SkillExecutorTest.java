@@ -12,11 +12,11 @@ import com.laosun.aluminium.models.skill.Skill;
 import com.laosun.aluminium.data.SkillData;
 import com.laosun.aluminium.models.skill.SkillExecutor;
 import com.laosun.aluminium.models.tests.TestSkillGroup1;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * acceptance: one skill activation expands into the right hits / targets.
@@ -46,7 +46,7 @@ public class SkillExecutorTest {
     }
 
     private static Battle battle(Character attacker, List<Enemy> enemies) {
-        return new Battle(List.of(attacker), enemies, new Random(0));
+        return new Battle(List.of(attacker), enemies, BattleFixture.seeded());
     }
 
     private static double damageTaken(Enemy enemy) {

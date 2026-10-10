@@ -2,6 +2,7 @@ package com.laosun.aluminium.test.engine;
 
 
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.SkillType;
@@ -13,7 +14,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * True DMG (真实伤害) through the {@code DAMAGE} op: {@code "damage_type": "TRUE"} must <b>skip every zone</b>.
@@ -60,7 +60,7 @@ public class TrueDamageJudgeTest {
         Character owner = CharacterFactory.create(OWNER, LEVEL, false, null, null, 0);
         owner.setTriggerTable(new TriggerTable(OWNER, withRider ? List.of(rider(damageType)) : List.of()));
         Enemy enemy = Enemy.fromAttributes("d" + defence, 1_000_000, defence, 100, 100);
-        Battle battle = new Battle(List.of(owner), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(owner), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         double before = enemy.getCurrentHp();
         owner.getSkills().get(SkillType.COMMON).execute(battle, owner, List.of(enemy));

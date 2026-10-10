@@ -15,7 +15,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Light cone 21053: "使装备者提供的护盾量提高 12%，我方目标持有护盾时，造成的伤害提高 12%".
@@ -35,7 +34,7 @@ public class JourneyForeverPeacefulTest {
 
     private double hit(Character unit, boolean shielded) {
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(unit), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         if (shielded) {
             battle.grantShield(unit, unit, 500);
@@ -62,7 +61,7 @@ public class JourneyForeverPeacefulTest {
         // (measured: boostedShield returned exactly 1000 until a battle was started).
         Character bare = ally(false);
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(unit, bare), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(unit, bare), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         double boostWith = Battle.boostedShield(unit, 1000);
         double boostWithout = Battle.boostedShield(bare, 1000);

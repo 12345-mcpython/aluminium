@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * The {@code eidolon} numeric condition: the owner's Eidolon rank, as a value a rule can compare.
@@ -76,7 +75,7 @@ public class EidolonConditionTest {
     private static int markerAt(int rank, String condition) {
         Character pearl = CharacterFactory.create(PEARL, 80, false, null, null, rank);
         Battle battle = new Battle(List.of(pearl, CharacterFactory.create(ALLY, 80)),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         Character her = battle.characters.getFirst();

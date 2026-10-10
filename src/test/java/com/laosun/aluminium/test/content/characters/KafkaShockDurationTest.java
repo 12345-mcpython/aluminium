@@ -2,6 +2,7 @@ package com.laosun.aluminium.test.content.characters;
 
 
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.SkillType;
@@ -17,7 +18,6 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 /**
  * 1005's shock and the trace that lengthens it by one turn.
@@ -55,7 +55,7 @@ public class KafkaShockDurationTest {
         Character kafka = CharacterFactory.create(KAFKA, LEVEL);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
         Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
-        Battle battle = new Battle(List.of(kafka, ally), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(kafka, ally), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         battle.castImmediate(kafka.getSkills().get(SkillType.ULTRA), kafka, List.of(enemy));
         return burningTurns(battle, enemy);
@@ -77,7 +77,7 @@ public class KafkaShockDurationTest {
         applier.setTriggerTable(new TriggerTable(9105, List.of(TriggerSpecs.rule(
                 TriggerEvent.ALLY_ATTACK.name(), List.of(), effects.toArray(new EffectSpec[0])))));
         Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
-        Battle battle = new Battle(List.of(applier), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(applier), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         // ALLY_ATTACK, not BATTLE_START: a battle start has no aimed party, so `target: target` is refused there.
         battle.fireTriggers(TriggerEvent.ALLY_ATTACK, applier, enemy, 1, 0);

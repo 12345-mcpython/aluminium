@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * 1408 Phainon (白厄): "transform into Khaslana (卡厄斯兰那), and during the transformation open the zone Ruinous Irontomb (时墟铁墓)".
@@ -29,7 +28,7 @@ public class TransformationStartsTest {
     public void theUltimateStartsTheTransformation() {
         Character owner = CharacterFactory.create(OWNER, 80, false, null, null, 0);
         Battle battle = new Battle(List.of(owner),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
 

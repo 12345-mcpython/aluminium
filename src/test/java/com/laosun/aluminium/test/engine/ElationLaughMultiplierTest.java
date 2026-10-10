@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * The laugh-point factor of Elation damage: {@code 1 + 笑点×5/(笑点+240)}, read off 【好活当赏】's frozen count.
@@ -80,7 +79,7 @@ public class ElationLaughMultiplierTest {
     private static double damageWithPoolThenGrowth(int atGrant, int after) {
         Character pearl = CharacterFactory.create(PEARL, 80);
         var enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(pearl, CharacterFactory.create(ALLY, 80)), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(pearl, CharacterFactory.create(ALLY, 80)), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         Character mine = battle.characters.getFirst();
@@ -121,7 +120,7 @@ public class ElationLaughMultiplierTest {
     private static double damage(boolean normal, int laughs, boolean counted) {
         Character pearl = CharacterFactory.create(PEARL, 80);
         var enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(pearl, CharacterFactory.create(ALLY, 80)), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(pearl, CharacterFactory.create(ALLY, 80)), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         Character mine = battle.characters.getFirst();

@@ -9,11 +9,11 @@ import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.StubEnemy;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * The stub enemy: a monster whose numbers and skills the caller states.
@@ -140,7 +140,7 @@ public class StubEnemyTest {
     public void itFightsInABattle() {
         Character pearl = CharacterFactory.create(PEARL, 80);
         Enemy stub = StubEnemy.named("陪练木桩").withHealth(100_000).withAttack(500).build();
-        Battle battle = new Battle(List.of(pearl), List.of(stub), new Random(0));
+        Battle battle = new Battle(List.of(pearl), List.of(stub), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         Assertions.assertEquals(1, battle.enemyUnits().size(), "the battle took the stub as its enemy");

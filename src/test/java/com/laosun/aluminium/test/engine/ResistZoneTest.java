@@ -8,12 +8,12 @@ import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Damage;
 import com.laosun.aluminium.models.DoubleValue;
 import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 /**
  * acceptance: the resistance zone reads the defender's per-element table
@@ -39,13 +39,13 @@ public class ResistZoneTest {
 
     private static double settle(Character attacker, Enemy defender, DamageElement element) {
         Damage damage = new Damage(attacker, defender, element, DamageType.NORMAL, BASE);
-        return new Battle(List.of(attacker), List.of(defender), new Random(0))
+        return new Battle(List.of(attacker), List.of(defender), BattleFixture.seeded())
                 .applyDamage(defender, damage);
     }
 
     private static double settle(Character attacker, Character defender, DamageElement element) {
         Damage damage = new Damage(attacker, defender, element, DamageType.NORMAL, BASE);
-        return new Battle(List.of(attacker, defender), List.of(), new Random(0))
+        return new Battle(List.of(attacker, defender), List.of(), BattleFixture.seeded())
                 .applyDamage(defender, damage);
     }
 

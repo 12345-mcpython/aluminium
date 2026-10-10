@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Relic set 115 (The Ashblazing Grand Duke), 4-piece: each FOLLOW-UP damage instance raises ATK by 6% for 3 turns, up
@@ -37,7 +36,7 @@ public class TheAshblazingGrandDukeFourPieceTest {
                 ? CharacterFactory.create(WEARER, LEVEL, true, null, RelicFactory.suit(115, 4, RELIC_LEVEL))
                 : CharacterFactory.create(WEARER, LEVEL);
         enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(wearer), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(wearer), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         return battle;
     }

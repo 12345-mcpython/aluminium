@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * 1506 Silver Wolf LV.999's Eidolon 2, second half: 「本次【无敌玩家】状态下每使【隐藏分】提高 120 点（含初始隐藏分），
@@ -176,7 +175,7 @@ public class SilverWolfLV999MilestoneQuotaTest {
         feeder.setTriggerTable(new TriggerTable(1, List.of(
                 TriggerSpecs.rule(TriggerEvent.DAMAGE_SETTLED.name(), List.of(), grant))));
         enemy = BattleFixture.monster();
-        battle = new Battle(List.of(wolf, feeder), List.of(enemy), new Random(0));
+        battle = new Battle(List.of(wolf, feeder), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
     }

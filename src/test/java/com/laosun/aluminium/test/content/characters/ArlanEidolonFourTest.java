@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * 1008: "after entering battle, when he takes a lethal attack Arlan (阿兰) will not enter the unable-to-fight state, and immediately restores to 25% of his own Max HP.
@@ -62,7 +61,7 @@ public class ArlanEidolonFourTest {
     private static double[] afterLethalBlows(int eidolon, int blows, int turns) {
         Character him = CharacterFactory.create(ARLAN, 80, false, null, null, eidolon);
         Battle battle = new Battle(List.of(him),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         if (eidolon >= 4) {

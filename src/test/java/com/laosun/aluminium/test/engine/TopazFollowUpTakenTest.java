@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * 1112 Topaz, the skill's [负债证明]: "使其受到的追加攻击伤害提高 50%".
@@ -50,7 +49,7 @@ public class TopazFollowUpTakenTest {
     public void followUpDamageIsAmplifiedAndPlainDamageIsNot() {
         Character unit = CharacterFactory.create(WEARER, LEVEL);
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(unit), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         battle.fireTriggers(TriggerEvent.SKILL_CAST, unit, enemy, 0, 0);
         double plain = battle.applyDamage(enemy, new Damage(unit, enemy, DamageElement.FIRE, DamageType.NORMAL, 1000));

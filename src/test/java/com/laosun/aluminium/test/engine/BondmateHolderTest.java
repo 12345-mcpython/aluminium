@@ -18,7 +18,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * The <b>state-holder</b> selector: {@code "target": "holder_of:同袍"} - "持有[同袍]的角色").
@@ -65,7 +64,7 @@ public class BondmateHolderTest {
                 TriggerSpecs.rule("SKILL_CAST", List.of("actor == self"), holderBuff()))));
         Character first = CharacterFactory.create(ALLY, LEVEL);
         Character second = CharacterFactory.create(OTHER_ALLY, LEVEL);
-        Battle battle = new Battle(List.of(him, first, second), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(him, first, second), List.of(dummy()), BattleFixture.seeded());
         battle.startBattle();
 
         double firstBefore = first.getAttribute(AttributeType.ATTACK).get();
@@ -113,13 +112,13 @@ public class BondmateHolderTest {
     @Test
     public void hisTechniqueGivesHimTheBondmate() {
         Character without = CharacterFactory.create(DHPT, LEVEL);
-        Battle plain = new Battle(List.of(without), List.of(dummy()), new Random(0));
+        Battle plain = new Battle(List.of(without), List.of(dummy()), BattleFixture.seeded());
         plain.startBattle();
         Assertions.assertFalse(without.getBuffManager().hasState(BONDMATE),
                 "no technique was used, so nothing may be granted");
 
         Character him = CharacterFactory.create(DHPT, LEVEL);
-        Battle battle = new Battle(List.of(him), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(him), List.of(dummy()), BattleFixture.seeded());
         battle.markTechniqueUsed(him);
         battle.startBattle();
 
@@ -138,7 +137,7 @@ public class BondmateHolderTest {
     public void hisTraceBuffsWhoeverJustBecameTheBondmate() {
         Character him = CharacterFactory.create(DHPT, LEVEL);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
-        Battle battle = new Battle(List.of(him, ally), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(him, ally), List.of(dummy()), BattleFixture.seeded());
         battle.startBattle();
         double himBefore = him.getAttribute(AttributeType.ATTACK).get();
         double allyBefore = ally.getAttribute(AttributeType.ATTACK).get();
@@ -158,11 +157,11 @@ public class BondmateHolderTest {
     public void hisTraceAdvancesHimAtBattleStart() {
         Character plain = CharacterFactory.create(DHPT, LEVEL);
         plain.setTriggerTable(TriggerTable.EMPTY);
-        Battle baseline = new Battle(List.of(plain), List.of(dummy()), new Random(0));
+        Battle baseline = new Battle(List.of(plain), List.of(dummy()), BattleFixture.seeded());
         baseline.startBattle();
 
         Character him = CharacterFactory.create(DHPT, LEVEL);
-        Battle battle = new Battle(List.of(him), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(him), List.of(dummy()), BattleFixture.seeded());
         battle.startBattle();
 
         double untouched = timeRemaining(baseline, plain);
@@ -177,7 +176,7 @@ public class BondmateHolderTest {
         Character him = CharacterFactory.create(DHPT, LEVEL);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(him, ally), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(him, ally), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
 
         double before = him.getCurrentEnergy();

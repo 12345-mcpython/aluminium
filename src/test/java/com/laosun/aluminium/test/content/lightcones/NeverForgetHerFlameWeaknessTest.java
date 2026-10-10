@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Light cone 23050 At Will (随心): "when the wearer adds a weakness to an enemy target, restores 1 skill point; this effect can trigger at most 1 time, and casting the Ultimate resets the number of triggerable times".
@@ -32,7 +31,7 @@ public class NeverForgetHerFlameWeaknessTest {
     private static Object[] scene() {
         Character wearer = CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(23050, LEVEL, false, 1));
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(wearer), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(wearer), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         return new Object[]{battle, wearer, enemy};
     }

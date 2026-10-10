@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /** Light cone 21013: energy on entering battle, and a permanent ultimate-damage boost. */
 public class MakeTheWorldClamorTest {
@@ -21,7 +20,7 @@ public class MakeTheWorldClamorTest {
     public void theConeGrantsEnergyAndRaisesUltimateDamage() {
         Character unit = CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(21013, LEVEL, false, 5));
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(unit), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
         double boostBefore = unit.getAttribute(AttributeType.ULTIMATE_DAMAGE_BOOST).get();
         double energyBefore = unit.getCurrentEnergy();
         battle.startBattle();

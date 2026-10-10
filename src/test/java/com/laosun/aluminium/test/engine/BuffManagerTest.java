@@ -2,6 +2,7 @@ package com.laosun.aluminium.test.engine;
 
 
 import com.laosun.aluminium.test.content.characters.DamageHookTest;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageElement;
@@ -20,7 +21,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 public class BuffManagerTest {
 
@@ -189,7 +189,7 @@ public class BuffManagerTest {
     public void aBuffMayAttachAnotherBuffWhileReactingToDamage() {
         Character hero = character();
         Enemy enemy = Enemy.fromAttributes("e", 100_000, 100, 100, 100);
-        Battle battle = new Battle(List.of(hero), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(hero), List.of(enemy), BattleFixture.seeded());
 
         // The hero answers every hit by giving itself a damage boost.
         hero.getBuffManager().addBuff(new BoostsItselfWhenHit());

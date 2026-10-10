@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Three cones a real battle drives: 20020 (attack on the ultimate), 2001(heal on breaking a weakness) and 20019 (party speed at battle start, in POINTS).
@@ -29,7 +28,7 @@ public class ConeUltBreakSpeedTest {
     public void cone20020GivesAttackOnTheUltimate() {
         Character unit = wearer(20020, 1);
         Enemy enemy = enemy();
-        Battle battle = new Battle(List.of(unit), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         battle.currentMove = new Signal(unit);
         battle.beforeMove();
@@ -45,7 +44,7 @@ public class ConeUltBreakSpeedTest {
     public void cone20017HealsOnBreakingAWeakness() {
         Character unit = wearer(20017, 1);
         Enemy enemy = enemy();
-        Battle battle = new Battle(List.of(unit), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         battle.currentMove = new Signal(unit);
         battle.beforeMove();
@@ -61,7 +60,7 @@ public class ConeUltBreakSpeedTest {
     public void cone20019GivesThePartySpeedInPoints() {
         Character unit = wearer(20019, 1);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
-        Battle battle = new Battle(List.of(unit, ally), List.of(enemy()), new Random(0));
+        Battle battle = new Battle(List.of(unit, ally), List.of(enemy()), BattleFixture.seeded());
         double wearerBefore = unit.getAttribute(AttributeType.SPEED).get();
         double allyBefore = ally.getAttribute(AttributeType.SPEED).get();
         battle.startBattle();

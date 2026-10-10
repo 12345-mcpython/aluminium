@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * 1415's memosprite skill 10 "献予'创世'之诗" (data slot 13, SkillID 1141513) -- the half the capabilities now support.
@@ -37,7 +36,7 @@ public class OdeOfGenesisTest {
         Character cyrene = CharacterFactory.create(CYRENE, LEVEL);
         Character recipient = CharacterFactory.create(TRAILBLAZER, LEVEL);
         Battle battle = new Battle(List.of(cyrene, recipient),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         Summon demiurge = battle.summonServant(cyrene);
@@ -74,7 +73,7 @@ public class OdeOfGenesisTest {
         Character cyrene = CharacterFactory.create(CYRENE, LEVEL);
         Character recipient = CharacterFactory.create(TRAILBLAZER, LEVEL);
         Battle battle = new Battle(List.of(cyrene, recipient),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         Summon demiurge = battle.summonServant(cyrene);

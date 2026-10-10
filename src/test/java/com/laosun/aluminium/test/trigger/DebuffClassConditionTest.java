@@ -3,6 +3,7 @@ package com.laosun.aluminium.test.trigger;
 
 import com.laosun.aluminium.test.engine.ControlImmunityTest;
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.AttributeType;
@@ -14,7 +15,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * "敌方对我方施加了控制类负面状态" (an enemy applied a control-class negative state to our side) can now be asked.
@@ -60,7 +60,7 @@ public class DebuffClassConditionTest {
 
         Character other = CharacterFactory.create(1003, 80, false, null, null, 0);
         Battle battle = new Battle(List.of(owner, other),
-                List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+                List.of(EnemyFactory.create(MONSTER, 90, 1)), BattleFixture.seeded());
         double attackBefore = owner.getAttribute(AttributeType.ATTACK).get();
         double defenceBefore = owner.getAttribute(AttributeType.DEFENCE).get();
         battle.startBattle();

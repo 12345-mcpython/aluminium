@@ -4,10 +4,10 @@ import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import java.util.List;
-import java.util.Random;
 
 /**
  * Slot 26 clause 4: "当[故事]达到3点时，德谬歌消耗全部[故事]…". Two-sided: at three the counter is spent, at two nothing happens.
@@ -32,7 +32,7 @@ public class TrueSelfOdeSpendsThreeStoryTest {
     private static double storyAfterUltimate(int seeded) {
         Character cyrene = CharacterFactory.create(CYRENE, LEVEL);
         Battle battle = new Battle(List.of(cyrene),
-                List.of(EnemyFactory.create(MONSTER, 100, 1)), new Random(0));
+                List.of(EnemyFactory.create(MONSTER, 100, 1)), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         cyrene = battle.characters.getFirst();

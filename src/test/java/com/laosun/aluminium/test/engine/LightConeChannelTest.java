@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * The light-cone rule channel, through its first content: "装备者施放普攻、战技或终结技攻击敌方目标后，分别获取一层[淘气值]".
@@ -52,7 +51,7 @@ public class LightConeChannelTest {
         Weapon weapon = equipped ? Weapon.build(WEAPON_ID, LEVEL) : null;
         Character character = CharacterFactory.create(WEARER, LEVEL, true, weapon);
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(character), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(character), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         return new Fixture(character, enemy, battle);
     }
@@ -78,7 +77,7 @@ public class LightConeChannelTest {
     private static double attackDelta(int rank) {
         Character character = CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(WEAPON_ID, LEVEL, false, rank));
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(character), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(character), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         battle.fireTriggers(TriggerEvent.BASIC_ATTACK, character, enemy, 1, 0);
         Assertions.assertEquals(1, character.getBuffManager().stacksOf(COUNTER), "precondition: one layer");

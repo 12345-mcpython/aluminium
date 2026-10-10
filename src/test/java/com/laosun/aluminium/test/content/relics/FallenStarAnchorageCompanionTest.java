@@ -10,11 +10,11 @@ import com.laosun.aluminium.models.TriggerInterpreter;
 import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Relic 32: "when entering battle, if the wearer and another teammate are both Trailblaze Companion characters, CRIT DMG +32%".
@@ -47,7 +47,7 @@ public class FallenStarAnchorageCompanionTest {
         Character wearer = CharacterFactory.create(1001, LEVEL);
         Character ally = CharacterFactory.create(1002, LEVEL);
         Battle battle = new Battle(List.of(wearer, ally), List.of(EnemyFactory.create(1002011, 90, 1)),
-                new Random(0));
+                BattleFixture.seeded());
         battle.startBattle();
         TriggerTable.TriggerContext ctx = new TriggerTable.TriggerContext(wearer, wearer, wearer, 0, 0, null,
                 battle, SkillCategory.UNSPECIFIED);
@@ -58,7 +58,7 @@ public class FallenStarAnchorageCompanionTest {
 
         Character lonely = CharacterFactory.create(1210, LEVEL);
         Battle other = new Battle(List.of(lonely, ally), List.of(EnemyFactory.create(1002011, 90, 1)),
-                new Random(0));
+                BattleFixture.seeded());
         other.startBattle();
         TriggerTable.TriggerContext ctx2 = new TriggerTable.TriggerContext(lonely, lonely, lonely, 0, 0, null,
                 other, SkillCategory.UNSPECIFIED);

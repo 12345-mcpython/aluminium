@@ -9,7 +9,6 @@ import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import java.util.List;
-import java.util.Random;
 
 /**
  * 1415's memosprite skill 21, the refresh clause: "在卡厄斯兰那的额外回合耗尽后不会结束变身、刷新全部额外回合并获得 #9 点[毁伤]".
@@ -41,7 +40,7 @@ public class WorldOdeExtraTurnsRefreshTest {
     private static double[] run(boolean everBurning) {
         Character him = CharacterFactory.create(PHAINON, LEVEL);
         Battle battle = new Battle(List.of(him),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         him = battle.characters.getFirst();

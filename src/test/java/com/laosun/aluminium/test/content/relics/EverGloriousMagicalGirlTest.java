@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Relic set 129, four pieces: "装备者及其忆灵造成的欢愉伤容无视目标 10% 防御".
@@ -38,7 +37,7 @@ public class EverGloriousMagicalGirlTest {
                 ? CharacterFactory.create(WEARER, LEVEL, true, null, RelicFactory.suit(129, 4, RELIC_LEVEL))
                 : CharacterFactory.create(WEARER, LEVEL);
         enemy = BattleFixture.monster();
-        battle = new Battle(List.of(wearer, CharacterFactory.create(ALLY, LEVEL)), List.of(enemy), new Random(0));
+        battle = new Battle(List.of(wearer, CharacterFactory.create(ALLY, LEVEL)), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
     }
 

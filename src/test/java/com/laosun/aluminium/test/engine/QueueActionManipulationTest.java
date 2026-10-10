@@ -10,11 +10,11 @@ import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.models.Signal;
 import com.laosun.aluminium.models.buff.SpeedBoostBuff;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Three fixes to the action bar (Pprerequisites):
@@ -111,7 +111,7 @@ public class QueueActionManipulationTest {
     @Test
     public void speedChangeReSchedulesTheSignalImmediately() {
         Character hero = character("hero", 100);
-        Battle battle = new Battle(List.of(hero), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(hero), List.of(dummy()), BattleFixture.seeded());
         Queue q = battle.queue;
 
         // enemy at 132 speed to first round 10000/132  x  1.5; earlier than hero's 150, so it acts first
@@ -144,7 +144,7 @@ public class QueueActionManipulationTest {
     @Test
     public void removingTheSpeedBuffReSchedulesBack() {
         Character hero = character("hero", 100);
-        Battle battle = new Battle(List.of(hero), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(hero), List.of(dummy()), BattleFixture.seeded());
         Queue q = battle.queue;
 
         SpeedBoostBuff buff = new SpeedBoostBuff(2, 1.0);
@@ -178,7 +178,7 @@ public class QueueActionManipulationTest {
     @Test
     public void settingTheSpeedAttributeDirectlyAlsoReSchedules() {
         Character hero = character("hero", 100);
-        Battle battle = new Battle(List.of(hero), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(hero), List.of(dummy()), BattleFixture.seeded());
         Queue q = battle.queue;
         Signal signal = signalOf(q, hero);
 

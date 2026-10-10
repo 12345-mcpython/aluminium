@@ -12,11 +12,11 @@ import com.laosun.aluminium.models.Weapon;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Light cone 23008: after the wearer attacks, each distinct target hit restores energy, up to 3 times per attack; and the
@@ -42,7 +42,7 @@ public class EchoesOfTheCoffinTest {
                 : CharacterFactory.create(WEARER, LEVEL);
         first = EnemyFactory.create(MONSTER, 90, 1);
         second = EnemyFactory.create(MONSTER, 90, 2);
-        Battle battle = new Battle(List.of(wearer), List.of(first, second), new Random(0));
+        Battle battle = new Battle(List.of(wearer), List.of(first, second), BattleFixture.seeded());
         battle.startBattle();
         return battle;
     }
@@ -82,7 +82,7 @@ public class EchoesOfTheCoffinTest {
         Character unit = CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(CONE, LEVEL, false, 1));
         Character ally = CharacterFactory.create(ALLY, LEVEL);
         Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
-        Battle battle = new Battle(List.of(unit, ally), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(unit, ally), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         double wearerBefore = unit.getAttribute(AttributeType.SPEED).get();
         double allyBefore = ally.getAttribute(AttributeType.SPEED).get();

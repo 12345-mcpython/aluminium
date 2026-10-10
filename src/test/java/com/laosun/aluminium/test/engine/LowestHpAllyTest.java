@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * {@code "target": "lowest_hp_ally"} - "当前<b>生命值百分比</b>最低的我方目标".
@@ -152,7 +151,7 @@ public class LowestHpAllyTest {
                     other.setTriggerTable(new TriggerTable(0, List.of()));
                 }
             }
-            Battle battle = new Battle(party, List.of(dummy()), new Random(0));
+            Battle battle = new Battle(party, List.of(dummy()), BattleFixture.seeded());
             battle.startBattle();
             return battle;
         }

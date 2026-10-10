@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * 140: "if one of our characters takes a lethal blow, then... gains the [月茧] state. A character in the [月茧] state temporarily defers falling into the cannot-fight state,
@@ -84,7 +83,7 @@ public class MooncocoonTest {
         Character owner = CharacterFactory.create(OWNER, 80, false, null, null, 0);
         Character victim = CharacterFactory.create(VICTIM, 80, false, null, null, 0);
         Battle battle = new Battle(List.of(owner, victim),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         return new Scene(battle, victim);
@@ -96,7 +95,7 @@ public class MooncocoonTest {
         Character healer = CharacterFactory.create(HEALER, 80, false, null, null, 0);
         Character victim = CharacterFactory.create(VICTIM, 80, false, null, null, 0);
         Battle battle = new Battle(List.of(owner, healer, victim),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         return new Scene(battle, victim);

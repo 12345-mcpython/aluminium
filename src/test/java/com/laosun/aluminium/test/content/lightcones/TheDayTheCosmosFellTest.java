@@ -2,6 +2,7 @@ package com.laosun.aluminium.test.content.lightcones;
 
 
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.SkillCategory;
 import com.laosun.aluminium.enums.TriggerEvent;
@@ -16,7 +17,6 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 /**
  * Light cone 21040: after an attack, if TWO OR MORE of the targets it connected with share its element's weakness, the
@@ -45,7 +45,7 @@ public class TheDayTheCosmosFellTest {
                 : CharacterFactory.create(WEARER, LEVEL);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
         enemy = EnemyFactory.create(MONSTER, 90, 1);
-        battle = new Battle(List.of(wearer, ally), List.of(enemy), new Random(0));
+        battle = new Battle(List.of(wearer, ally), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
     }
 
@@ -119,7 +119,7 @@ public class TheDayTheCosmosFellTest {
         for (int i = 0; i < targets; i++) {
             foes.add(EnemyFactory.create(WEAK_MONSTER, 90, 1));
         }
-        Battle fight = new Battle(List.of(caster, CharacterFactory.create(ALLY, LEVEL)), foes, new Random(0));
+        Battle fight = new Battle(List.of(caster, CharacterFactory.create(ALLY, LEVEL)), foes, BattleFixture.seeded());
         fight.startBattle();
         var skill = caster.getSkills().values().stream()
                 .filter(candidate -> candidate.getData() != null

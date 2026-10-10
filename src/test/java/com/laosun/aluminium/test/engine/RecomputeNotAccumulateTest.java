@@ -9,6 +9,7 @@ import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -17,7 +18,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -144,7 +144,7 @@ public class RecomputeNotAccumulateTest {
         unit.setTriggerTable(new TriggerTable(1, List.of(
                 TriggerSpecs.rule("TURN_START", List.of(), effects.toArray(new EffectSpec[0])))));
 
-        Battle battle = new Battle(List.of(unit), List.of(), new Random(0));
+        Battle battle = new Battle(List.of(unit), List.of(), BattleFixture.seeded());
         for (int firing = 0; firing < 2; firing++) {
             battle.fireTriggers(TriggerEvent.TURN_START, unit, unit, 0, 0);
             battle.processRequests();

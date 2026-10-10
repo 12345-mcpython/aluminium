@@ -16,7 +16,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Trailblazer (Destruction) (开拓者 (毁灭))'s Eidolon 4: "击中处于弱点击破状态的敌方目标时，暴击率提高25%" -- a state-gated boost for that hit.
@@ -57,7 +56,7 @@ public class TrailblazerEidolonTest {
             }
         }
         Assertions.assertNotNull(enemy, "no enemy weak to " + element + " in the probed range");
-        Battle battle = new Battle(List.of(trailblazer), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(trailblazer), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         if (broken) {
             battle.reduceToughness(trailblazer, enemy, element, 999);

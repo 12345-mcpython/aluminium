@@ -67,7 +67,7 @@ public class IronCavalryAgainstTheScourgeFourPieceTest {
         Character above = wearer(true);
         Character below = wearer(false);
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(above, below), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(above, below), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         // Note: fixedCrit: four settlements in a row draw from the same Random, so crit luck would differ between the readings
         // and swamp the 5% the defence-ignore is worth (measured: a 1.5x swing).

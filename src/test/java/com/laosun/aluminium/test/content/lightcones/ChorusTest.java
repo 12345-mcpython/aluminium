@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Light cone 20005: at battle start the WHOLE party's attack rises 8%.
@@ -39,7 +38,7 @@ public class ChorusTest {
         ally = CharacterFactory.create(ALLY, LEVEL);
         double allyBase = ally.getAttribute(AttributeType.ATTACK).get();
         enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(wearer, ally), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(wearer, ally), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         return battle;
     }

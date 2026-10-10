@@ -17,7 +17,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Cones 22005 and 2102(round 249): event-driven ATTACK stacks. Their constant halves are the engine's ability_property, so only
@@ -60,7 +59,7 @@ public class ConeStackingTest {
         Character unit = wearer(21027);
         Character control = wearer(0);
         Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
-        Battle battle = new Battle(List.of(unit, control), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(unit, control), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         double before = unit.getAttribute(AttributeType.ATTACK).get();
         // A non-kill event must not move it.

@@ -21,11 +21,11 @@ import com.laosun.aluminium.models.enemy.SummonFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.models.skill.DefaultSkill;
 import com.laosun.aluminium.utils.RelicFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * A content pass over the {@code Writable now:} backlog - five relic abilities whose every clause
@@ -94,7 +94,7 @@ public class RelicAbilityBatchTest {
     @Test
     public void theMusketeerBoostsBasicAttacksAndNotSkills() {
         Character wearer = wearing(MUSKETEER);
-        new Battle(List.of(wearer), List.of(dummy()), new Random(0)).startBattle();
+        new Battle(List.of(wearer), List.of(dummy()), BattleFixture.seeded()).startBattle();
 
         Assertions.assertEquals(0.1, boostOf(wearer, AttributeType.BASIC_ATTACK_DAMAGE_BOOST), EPS,
                 "param #2 is 0.1 -- the registered reason's 12% came from the English sentence");
@@ -111,7 +111,7 @@ public class RelicAbilityBatchTest {
     public void theThiefRegainsEnergyOnItsOwnBreak() {
         Character wearer = wearing(THIEF);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
-        Battle battle = new Battle(List.of(wearer, ally), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(wearer, ally), List.of(dummy()), BattleFixture.seeded());
         battle.startBattle();
         double before = wearer.getCurrentEnergy();
 
@@ -142,7 +142,7 @@ public class RelicAbilityBatchTest {
         ally.setAttribute(AttributeType.CRIT_CHANCE, new DoubleValue(0));
         Enemy debuffed = dummy();
         Enemy clean = dummy();
-        Battle battle = new Battle(List.of(wearer, ally), List.of(debuffed, clean), new Random(0));
+        Battle battle = new Battle(List.of(wearer, ally), List.of(debuffed, clean), BattleFixture.seeded());
         battle.startBattle();
         debuffed.getBuffManager().addBuff(new com.laosun.aluminium.models.buff.DotBuff(
                 wearer, DamageElement.FIRE, 1, 2));      // any debuff: the count is what the text asks for
@@ -175,7 +175,7 @@ public class RelicAbilityBatchTest {
     @Test
     public void theScholarAddsItsExtraSkillDamageOnTop() {
         Character wearer = wearing(SCHOLAR);
-        Battle battle = new Battle(List.of(wearer), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(wearer), List.of(dummy()), BattleFixture.seeded());
         battle.startBattle();
 
         Assertions.assertEquals(0.2, boostOf(wearer, AttributeType.SKILL_DAMAGE_BOOST), EPS, "param #1");
@@ -210,7 +210,7 @@ public class RelicAbilityBatchTest {
     @Test
     public void theFiresmithBoostsTheNextAttackAfterItsUltimate() {
         Character wearer = wearing(FIRESMITH);
-        Battle battle = new Battle(List.of(wearer), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(wearer), List.of(dummy()), BattleFixture.seeded());
         battle.startBattle();
         Assertions.assertEquals(0.12, boostOf(wearer, AttributeType.SKILL_DAMAGE_BOOST), EPS, "param #1");
 
@@ -230,7 +230,7 @@ public class RelicAbilityBatchTest {
     public void theValorousBoostsUltimateDamageAfterItsOwnFollowUp() {
         Character wearer = wearing(VALOROUS);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
-        Battle battle = new Battle(List.of(wearer, ally), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(wearer, ally), List.of(dummy()), BattleFixture.seeded());
         battle.startBattle();
 
         battle.fireTriggers(TriggerEvent.FOLLOW_UP, ally, dummy(), 0, 0);
@@ -261,7 +261,7 @@ public class RelicAbilityBatchTest {
     public void theShatteredWorldNeedsItsMemospriteAndThenBoostsBoth() {
         Character wearer = wearing(SHATTERED_WORLD);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
-        Battle battle = new Battle(List.of(wearer, ally), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(wearer, ally), List.of(dummy()), BattleFixture.seeded());
         battle.startBattle();
         double wearerHp = wearer.getMaxHp();
         double allyBoost = boostOf(ally, AttributeType.ALL_DAMAGE_TYPE_BOOST);
@@ -318,7 +318,7 @@ public class RelicAbilityBatchTest {
     public void aPreBattleMemospriteEffectLandsOnArrival() {
         Character wearer = wearing(SERENE_DEMESNE);               // 谧宁拾骨地 (Bone Collection's Serene Demesne): HP >= 5000 -> CRIT DMG +28%
         wearer.setAttribute(AttributeType.HEALTH, new DoubleValue(6_000));
-        Battle battle = new Battle(List.of(wearer), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(wearer), List.of(dummy()), BattleFixture.seeded());
         battle.startBattle();
         double wearerBoost = boostOf(wearer, AttributeType.CRIT_ATTACK);
 
@@ -340,7 +340,7 @@ public class RelicAbilityBatchTest {
     public void aPreBattleMemospriteEffectRespectsItsThreshold() {
         Character wearer = wearing(SERENE_DEMESNE);
         wearer.setAttribute(AttributeType.HEALTH, new DoubleValue(4_000));
-        Battle battle = new Battle(List.of(wearer), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(wearer), List.of(dummy()), BattleFixture.seeded());
         battle.startBattle();
 
         // The engine's real summon path, not a hand-placed fixture: SUMMONED is fired for what
@@ -358,7 +358,7 @@ public class RelicAbilityBatchTest {
     public void thePoetsNestedTiersHoldOnBothHalves() {
         Character wearer = wearing(POET);                        // 哀歌覆国的诗人 (Poet of Mourning Collapse): SPD < 110 / < 95
         wearer.setAttribute(AttributeType.SPEED, new DoubleValue(90));
-        Battle battle = new Battle(List.of(wearer), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(wearer), List.of(dummy()), BattleFixture.seeded());
         battle.startBattle();
         // The engine's real summon path, not a hand-placed fixture: SUMMONED is fired for what
         // Battle.summon* places (it is recorded in justSummoned), so a fixture added straight to the roster
@@ -380,7 +380,7 @@ public class RelicAbilityBatchTest {
     public void theGiantTreesHealingTiersReachTheMemosprite() {
         Character wearer = wearing(RAPT_BROODING);               // 渊思寂虑的巨树 (Giant Tree of Rapt Brooding): SPD >= 135 / >= 180
         wearer.setAttribute(AttributeType.SPEED, new DoubleValue(190));
-        Battle battle = new Battle(List.of(wearer), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(wearer), List.of(dummy()), BattleFixture.seeded());
         battle.startBattle();
         // The engine's real summon path, not a hand-placed fixture: SUMMONED is fired for what
         // Battle.summon* places (it is recorded in justSummoned), so a fixture added straight to the roster
@@ -410,7 +410,7 @@ public class RelicAbilityBatchTest {
     public void theMessengerUltimateHastesThePartyOnlyWhenItTargetsAnAlly() {
         Character wearer = wearing(MESSENGER);
         Character ally = CharacterFactory.create(1210, LEVEL);
-        Battle battle = new Battle(List.of(wearer, ally), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(wearer, ally), List.of(dummy()), BattleFixture.seeded());
         battle.startBattle();
         double speedBefore = boostOf(ally, AttributeType.SPEED);
 
@@ -420,7 +420,7 @@ public class RelicAbilityBatchTest {
                 "「我方全体速度提高#1[i]%」 (all allies' SPD is raised by #1[i]%) -- #1 = 0.12, a share of the target's base speed");
 
         Battle aimedAtEnemy = new Battle(List.of(wearing(MESSENGER), CharacterFactory.create(1210, LEVEL)),
-                List.of(dummy()), new Random(0));
+                List.of(dummy()), BattleFixture.seeded());
         aimedAtEnemy.startBattle();
         Character second = aimedAtEnemy.characters.get(1);
         double secondBefore = boostOf(second, AttributeType.SPEED);
@@ -437,7 +437,7 @@ public class RelicAbilityBatchTest {
     public void theWatchmakerUltimateRaisesThePartysBreakEffect() {
         Character wearer = wearing(WATCHMAKER);
         Character ally = CharacterFactory.create(1210, LEVEL);
-        Battle battle = new Battle(List.of(wearer, ally), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(wearer, ally), List.of(dummy()), BattleFixture.seeded());
         battle.startBattle();
         double before = boostOf(ally, AttributeType.BREAKING_EFFECT);
 
@@ -452,7 +452,7 @@ public class RelicAbilityBatchTest {
     public void theSacerdosSkillBuffsTheAimedAllyAndStacksTwice() {
         Character wearer = wearing(SACERDOS);
         Character ally = CharacterFactory.create(1210, LEVEL);
-        Battle battle = new Battle(List.of(wearer, ally), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(wearer, ally), List.of(dummy()), BattleFixture.seeded());
         battle.startBattle();
         double before = boostOf(ally, AttributeType.CRIT_ATTACK);
 
@@ -492,7 +492,7 @@ public class RelicAbilityBatchTest {
     private static double grantedDamageBoost(double maxEnergy) {
         Character wearer = wearing(AMPHOREUS);
         wearer.setMaxEnergy(maxEnergy);
-        Battle battle = new Battle(List.of(wearer), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(wearer), List.of(dummy()), BattleFixture.seeded());
         battle.startBattle();
 
         for (com.laosun.aluminium.models.buff.StatModifierBuff buff
@@ -527,7 +527,7 @@ public class RelicAbilityBatchTest {
     private static double grantedCritRateWith(int allyCid) {
         Character wearer = wearing(IZUMO);
         Character ally = CharacterFactory.create(allyCid, LEVEL);
-        Battle battle = new Battle(List.of(wearer, ally), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(wearer, ally), List.of(dummy()), BattleFixture.seeded());
         battle.startBattle();
 
         for (com.laosun.aluminium.models.buff.StatModifierBuff buff
@@ -566,7 +566,7 @@ public class RelicAbilityBatchTest {
         if (fireWeak) {
             target.setStanceWeak(java.util.Set.of(DamageElement.FIRE));
         }
-        Battle battle = new Battle(List.of(wearer), List.of(target), new Random(0));
+        Battle battle = new Battle(List.of(wearer), List.of(target), BattleFixture.seeded());
         battle.startBattle();
         double before = boostOf(wearer, AttributeType.BREAKING_EFFECT);
 
@@ -620,7 +620,7 @@ public class RelicAbilityBatchTest {
         Character wearer = wearing(REVELRY);
         wearer.setAttribute(AttributeType.ATTACK, new DoubleValue(attack));
         Enemy enemy = dummy();
-        Battle battle = new Battle(List.of(wearer), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(wearer), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         enemy.getBuffManager().addBuff(
                 new com.laosun.aluminium.models.buff.DotBuff(wearer, DamageElement.FIRE, 100, 3));
@@ -641,7 +641,7 @@ public class RelicAbilityBatchTest {
     private static double dotBoostAtAttack(double attack) {
         Character wearer = wearing(REVELRY);
         wearer.setAttribute(AttributeType.ATTACK, new DoubleValue(attack));
-        Battle battle = new Battle(List.of(wearer), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(wearer), List.of(dummy()), BattleFixture.seeded());
         battle.startBattle();
 
         for (com.laosun.aluminium.models.buff.StatModifierBuff buff
@@ -673,7 +673,7 @@ public class RelicAbilityBatchTest {
     private static double damageBoostAtSpeed(double speed) {
         Character wearer = wearing(GLAMOTH);
         wearer.setAttribute(AttributeType.SPEED, new DoubleValue(speed));
-        Battle battle = new Battle(List.of(wearer), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(wearer), List.of(dummy()), BattleFixture.seeded());
         battle.startBattle();
         return boostOf(wearer, AttributeType.ALL_DAMAGE_TYPE_BOOST);
     }
@@ -687,7 +687,7 @@ public class RelicAbilityBatchTest {
     private static double brokenKeelCritDamageAt(double effectRes) {
         Character wearer = wearing(BROKEN_KEEL);
         wearer.setAttribute(AttributeType.EFFECT_RESISTANCE, new DoubleValue(effectRes));
-        Battle battle = new Battle(List.of(wearer), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(wearer), List.of(dummy()), BattleFixture.seeded());
         battle.startBattle();
         return wearer.getAttribute(AttributeType.CRIT_ATTACK).get();
     }

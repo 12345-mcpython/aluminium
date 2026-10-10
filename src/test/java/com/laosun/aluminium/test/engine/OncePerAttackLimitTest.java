@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * `once_per_attack` -- the firing limit scoped to ONE attack.
@@ -35,7 +34,7 @@ public class OncePerAttackLimitTest {
         owner = CharacterFactory.create(OWNER, LEVEL);
         owner.setTriggerTable(new TriggerTable(OWNER, List.of(rule)));
         enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(owner), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(owner), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         return battle;
     }

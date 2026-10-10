@@ -24,7 +24,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Questions about summons <b>on the field</b>: {@code self_summon_count}, and the {@code "summon"} target
@@ -67,7 +66,7 @@ public class SummonFieldTest {
     public void theCountIsOfTheOwnersOwnSummons() {
         Character owner = CharacterFactory.create(AGLAEA, LEVEL);
         Character teammate = CharacterFactory.create(PLAIN, LEVEL);
-        Battle battle = new Battle(List.of(owner, teammate), List.of(monster()), new Random(0));
+        Battle battle = new Battle(List.of(owner, teammate), List.of(monster()), BattleFixture.seeded());
 
         Assertions.assertEquals(0, battle.summonCountOf(owner), "nothing is out yet");
         battle.summonMemosprite(owner);
@@ -108,7 +107,7 @@ public class SummonFieldTest {
     public void anEnemySummonCountsForTheEnemy() {
         Character hero = CharacterFactory.create(PLAIN, LEVEL);
         Enemy master = EnemyFactory.create(1003010, 90, 1);
-        Battle battle = new Battle(List.of(hero), List.of(master), new Random(0));
+        Battle battle = new Battle(List.of(hero), List.of(master), BattleFixture.seeded());
 
         Summon minion = battle.summon(master, MINION, 1);
 
@@ -189,7 +188,7 @@ public class SummonFieldTest {
     @Test
     public void theSummonSelectorFailsLoudlyWhenNothingIsOut() {
         Character owner = CharacterFactory.create(AGLAEA, LEVEL);
-        Battle battle = new Battle(List.of(owner), List.of(monster()), new Random(0));
+        Battle battle = new Battle(List.of(owner), List.of(monster()), BattleFixture.seeded());
         battle.startBattle();                       // start with the table empty, so nothing fires inside it
         owner.setTriggerTable(new TriggerTable(AGLAEA, List.of(summonAttackRule())));
 
@@ -261,7 +260,7 @@ public class SummonFieldTest {
     /** A battle with one memosprite already on the field (before the battle starts). */
     private static Fixture fixture() {
         Character owner = CharacterFactory.create(AGLAEA, LEVEL);
-        Battle battle = new Battle(List.of(owner), List.of(monster()), new Random(0));
+        Battle battle = new Battle(List.of(owner), List.of(monster()), BattleFixture.seeded());
         Summon memosprite = battle.summonMemosprite(owner);
         battle.processRequests();
         return new Fixture(battle, owner, memosprite);
@@ -270,7 +269,7 @@ public class SummonFieldTest {
     /** How many rules fire for an owner that does or does not have a memosprite out. */
     private static int fireWithSummon(boolean withSummon) {
         Character owner = CharacterFactory.create(AGLAEA, LEVEL);
-        Battle battle = new Battle(List.of(owner), List.of(monster()), new Random(0));
+        Battle battle = new Battle(List.of(owner), List.of(monster()), BattleFixture.seeded());
         if (withSummon) {
             battle.summonMemosprite(owner);
         }
@@ -303,7 +302,7 @@ public class SummonFieldTest {
                 : CharacterFactory.create(AGLAEA, LEVEL);
         // Make the wearer unambiguously first, so the turn this case opens is hers.
         wearer.setAttribute(AttributeType.SPEED, new DoubleValue(10_000));
-        Battle battle = new Battle(List.of(wearer), List.of(monster()), new Random(0));
+        Battle battle = new Battle(List.of(wearer), List.of(monster()), BattleFixture.seeded());
         if (withSummon) {
             battle.summonMemosprite(wearer);
         }

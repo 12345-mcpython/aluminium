@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * 1505 Evanescia (绯英)'s energy accumulator: "累计获得 240 点能量时…单次获得能量时最多获得 240 点累计值" (when 240 energy has been accumulated in total... a single energy gain adds at most 240 to the accumulated value).
@@ -29,7 +28,7 @@ public class ElationAccumulatorTest {
     private void build() {
         elation = CharacterFactory.create(WEARER, LEVEL);
         battle = new Battle(List.of(elation, CharacterFactory.create(ALLY, LEVEL)),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
     }
 

@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Relic 11, 4 pieces: crit damage against targets carrying 2/4 debuffs, doubled for one turn after the wearer applies a debuff.
@@ -42,7 +41,7 @@ public class DebuffAppliedTierTest {
     private static double critDamage(int debuffs, boolean empower) {
         Character unit = CharacterFactory.create(WEARER, LEVEL, true, null, RelicFactory.suit(117, 4, RELIC_LEVEL));
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(unit), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         for (int index = 0; index < debuffs; index++) {
             enemy.getBuffManager().addBuff(new DotBuff(unit, DamageElement.FIRE, 100, 3));

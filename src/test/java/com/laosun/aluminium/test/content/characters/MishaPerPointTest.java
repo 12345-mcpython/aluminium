@@ -10,11 +10,11 @@ import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * 1312 Misha: "我方全体每消耗 1 个战技点…米沙恢复 2.00 点能量" -- 2 PER POINT.
@@ -26,7 +26,7 @@ public class MishaPerPointTest {
     private static double energyAfter(int pts) {
         Character c = CharacterFactory.create(1312, 80, true, null, null);
         Enemy e = EnemyFactory.create(1002011, 90, 1);
-        Battle b = new Battle(List.of(c), List.of(e), new Random(0));
+        Battle b = new Battle(List.of(c), List.of(e), BattleFixture.seeded());
         b.startBattle();
         c.setCurrentEnergy(0);
         TriggerTable.TriggerContext ctx = new TriggerTable.TriggerContext(c, c, e, 1, pts, null, b, SkillCategory.UNSPECIFIED);

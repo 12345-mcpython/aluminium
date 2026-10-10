@@ -15,7 +15,6 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 /**
  * A memosprite's own skills are real skills.
@@ -59,7 +58,7 @@ public class MemospriteSkillTest {
             Assertions.assertNotNull(spec, "precondition: " + cid + " has a memosprite file");
             Character master = CharacterFactory.create(cid, 80, false, null, null, 0);
             Battle battle = new Battle(List.of(master),
-                    List.of(BattleFixture.monster()), new Random(0));
+                    List.of(BattleFixture.monster()), BattleFixture.seeded());
             battle.startBattle();
             battle.processRequests();
             // Note: `Battle.summonServant` is the seam that hands the panel its resource reader (140's derives from New Bud (新蕊))
@@ -90,7 +89,7 @@ public class MemospriteSkillTest {
             MemospriteSpec spec = Memosprites.of(cid);
             Character master = CharacterFactory.create(cid, 80, false, null, null, 0);
             Battle battle = new Battle(List.of(master),
-                    List.of(BattleFixture.monster()), new Random(0));
+                    List.of(BattleFixture.monster()), BattleFixture.seeded());
             battle.startBattle();
             battle.processRequests();
             Summon servant = battle.summonServant(master);
@@ -136,7 +135,7 @@ public class MemospriteSkillTest {
             int slot = Integer.parseInt(w[1]);
             Character master = CharacterFactory.create(cid, 80, false, null, null, 0);
             Battle battle = new Battle(List.of(master),
-                    List.of(BattleFixture.monster()), new Random(0));
+                    List.of(BattleFixture.monster()), BattleFixture.seeded());
             battle.startBattle();
             Summon servant = battle.summonServant(master);
             Skill skill = servant.skillAt(slot);
@@ -152,7 +151,7 @@ public class MemospriteSkillTest {
     private static Summon servantOf(int cid) {
         Character master = CharacterFactory.create(cid, 80, false, null, null, 0);
         Battle battle = new Battle(List.of(master),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         MemospriteSpec spec = Memosprites.of(cid);

@@ -4,10 +4,10 @@ import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import java.util.List;
-import java.util.Random;
 
 /** F-9: Firefly's talent raises energy TO 50% at battle start -- a floor, not a gain. */
 public class FireflyEnergyFloorTest {
@@ -15,7 +15,7 @@ public class FireflyEnergyFloorTest {
     @Test
     public void theFloorRaisesLowEnergyAndLeavesHighEnergyAlone() {
         Character firefly = CharacterFactory.create(1310, 80);
-        Battle battle = new Battle(List.of(firefly), List.of(EnemyFactory.create(1002011, 100, 1)), new Random(0));
+        Battle battle = new Battle(List.of(firefly), List.of(EnemyFactory.create(1002011, 100, 1)), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         firefly = battle.characters.getFirst();
