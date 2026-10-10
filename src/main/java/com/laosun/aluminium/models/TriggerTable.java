@@ -123,7 +123,7 @@ public class TriggerTable {
             TriggerEvent event = resolveEvent(spec);
             for (CompiledRule rule : compile(spec, event, index)) {
                 collectReferencedResources(rule);
-                byEvent.computeIfAbsent(event, k -> new ArrayList<>()).add(rule);
+                byEvent.computeIfAbsent(event, _ -> new ArrayList<>()).add(rule);
             }
             // "when casting the Skill and the Ultimate": the SAME compiled rules under extra events (one rule listening to several events).
             // Note: Compiled once, not per event: a second compilation would mint a second rule with the same id, which validateAmendments rightly
@@ -140,7 +140,7 @@ public class TriggerTable {
                                 "on_any repeats the primary event '" + extra + "' (source: " + spec.getSource()
                                         + "); it would double-fire in one trigger");
                     }
-                    byEvent.computeIfAbsent(other, k -> new ArrayList<>())
+                    byEvent.computeIfAbsent(other, _ -> new ArrayList<>())
                             .addAll(byEvent.getOrDefault(event, new ArrayList<>()));
                 }
             }
@@ -285,13 +285,7 @@ public class TriggerTable {
         }
     }
 
-    /**
-     * One {@code MODIFY_RULE} effect against its target: the id resolves, and the target states the number.
-     *
-     * @param amender the rule carrying the effect
-     * @param effect  the {@code MODIFY_RULE} effect (its fields were already validated by the interpreter)
-     * @param byId    every named rule in this file
-     */
+
     /**
      * Whether an op may <b>create the name</b> a {@code *_stacks:<name>} condition reads.
      *
@@ -308,6 +302,13 @@ public class TriggerTable {
         };
     }
 
+    /**
+     * One {@code MODIFY_RULE} effect against its target: the id resolves, and the target states the number.
+     *
+     * @param amender the rule carrying the effect
+     * @param effect  the {@code MODIFY_RULE} effect (its fields were already validated by the interpreter)
+     * @param byId    every named rule in this file
+     */
     private static void requireAmendable(CompiledRule amender, EffectSpec effect, Map<String, CompiledRule> byId) {
         String target = effect.getRule() == null ? "" : effect.getRule().trim();
         CompiledRule named = byId.get(target);
@@ -1037,7 +1038,7 @@ public class TriggerTable {
     /**
      * The numeric variables {@code hit_count}, {@code hp_percent}, {@code target_debuff_count},
      * {@code self_summon_count} and their siblings are the complete, closed set of <b>plain</b> names (the
-     * authoritative list is {@link #NUMERIC_VARIABLES}, and a name must be added to all of that set, the value
+     * authoritative list is this, and a name must be added to all of that set, the value
      * switch below, and {@code UnitDisciplineTest}'s pin).
      *
      * <p>Each reads from a different place, which is why the names say so: {@code hit_count} comes from the
@@ -1316,14 +1317,7 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
     private static final Pattern SAME_PATH_ALLY =
             Pattern.compile("(?<![\\w])has_same_path_ally(?![\\w])", Pattern.CASE_INSENSITIVE);
 
-    /**
-     * The {@code is_same_element_as_self} keyword: "<b>that unit carries the same element as me</b>".
-     *
-     * <p>It is the per-CANDIDATE sibling of {@code damage_element_is_self}: that one asks about the damage instance
-     * being settled, this one about a unit -- which is what a per-target filter ({@code target_when}) needs, because
-     * there the candidate sits in {@code target} and the rule's owner in {@code owner()}. Its reader is relic set 312's
-     * "与装备者相同属性的其他我方角色".
-     */
+
     /**
      * The {@code shares_path_with_an_ally} keyword: "<b>that unit walks the same Path as somebody else on our
      * side</b>". Its reader is light cone 21046's "if two or more of our characters share any one Path, make those characters...".
@@ -1335,6 +1329,14 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
     private static final Pattern SHARES_PATH_WITH_AN_ALLY =
             Pattern.compile("(?<![\\w])shares_path_with_an_ally(?![\\w])", Pattern.CASE_INSENSITIVE);
 
+    /**
+     * The {@code is_same_element_as_self} keyword: "<b>that unit carries the same element as me</b>".
+     *
+     * <p>It is the per-CANDIDATE sibling of {@code damage_element_is_self}: that one asks about the damage instance
+     * being settled, this one about a unit -- which is what a per-target filter ({@code target_when}) needs, because
+     * there the candidate sits in {@code target} and the rule's owner in {@code owner()}. Its reader is relic set 312's
+     * "与装备者相同属性的其他我方角色".
+     */
     private static final Pattern IS_SAME_ELEMENT =
             Pattern.compile("(?<![\\w])is_same_element_as_self(?![\\w])", Pattern.CASE_INSENSITIVE);
 
@@ -2764,7 +2766,7 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
         @Override
         public boolean test(TriggerContext ctx) {
             CanHit who = partyOf(ctx);
-            return who != null && isCompanion(who);
+            return isCompanion(who);
         }
 
         @Override
@@ -3685,7 +3687,7 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
                 return false;
             }
             if ("countdown".equals(otherToken)) {
-                boolean own = ctx.battle().countdownsOf(ctx.owner()).contains(subject);
+                boolean own = ctx.battle().countdownsOf(ctx.owner()).contains((Countdown) subject);
                 return negated != own;
             }
             // "…is one of my summons" is read off the FIELD, so a context with no battle cannot answer it and
@@ -3755,12 +3757,6 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
         private final String otherStacksName;
         private final boolean otherStacksOnTarget;
         private final boolean otherStacksOnActor;
-
-        Numeric(String variable, AttributeType attribute, String resource, String stacksName, boolean stacksOnTarget,
-                boolean stacksOnActor, String operator, double literal, boolean literalOnLeft) {
-            this(variable, attribute, resource, stacksName, stacksOnTarget, stacksOnActor, operator, literal,
-                    literalOnLeft, null, null, null, null, false, false, null, null);
-        }
 
         Numeric(String variable, AttributeType attribute, String resource, String stacksName, boolean stacksOnTarget,
                 boolean stacksOnActor, String operator, double literal, boolean literalOnLeft, String otherVariable,
@@ -3933,7 +3929,7 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
                 // every comparison against NaN is false, which is the convention `self_max_energy` already set.
                 case "self_energy_percent" -> ctx.owner() == null || ctx.owner().getMaxEnergy() <= 0
                         ? Double.NaN
-                        : (double) ctx.owner().getCurrentEnergy() / ctx.owner().getMaxEnergy();
+                        : ctx.owner().getCurrentEnergy() / ctx.owner().getMaxEnergy();
                 // "if the allies' Skill Points limit is #2 or higher" -- the cap of the TEAM's pool. It is not an
                 // attribute and not a field of the unit: the policy owns it (F-1 made it movable), so this reads the
                 // battle rather than the owner, and a context with no battle answers NaN -- "cannot read it, so the
