@@ -2,6 +2,7 @@ package com.laosun.aluminium.test.trigger;
 
 
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
@@ -21,7 +22,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Damage-instance conditions: the {@code DEALING_DAMAGE} event, the {@code BOOST_DAMAGE} op, and the DoT
@@ -243,7 +243,7 @@ public class TriggerDealingDamageTest {
             // No defence: the settled number is the base value times the zones, so a ratio is exact.
             enemies.add(Enemy.fromAttributes("dummy" + i, 1_000_000, 0, 100, 100));
         }
-        Battle battle = new Battle(team, enemies, new Random(0));
+        Battle battle = new Battle(team, enemies, BattleFixture.seeded());
         battle.startBattle();
         return battle;
     }

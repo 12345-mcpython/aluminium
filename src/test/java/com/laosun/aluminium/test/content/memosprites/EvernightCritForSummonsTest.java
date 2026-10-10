@@ -8,7 +8,6 @@ import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import java.util.List;
-import java.util.Random;
 
 /**
  * 1413's skill, the clause that raises every memosprite's CRIT DMG: "使我方全体忆灵的暴击伤害提高，提高数值等同于长夜月暴击伤害的 #1%".
@@ -37,7 +36,7 @@ public class EvernightCritForSummonsTest {
         Character cyrene = CharacterFactory.create(CYRENE, LEVEL);
         Character longnight = CharacterFactory.create(LONGNIGHT, LEVEL);
         Battle battle = new Battle(List.of(cyrene, longnight),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         cyrene = battle.characters.get(0);

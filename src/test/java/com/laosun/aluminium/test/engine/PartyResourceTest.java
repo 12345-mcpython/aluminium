@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * A PARTY-scoped resource: the shared 笑点 counter, reader 1505 Evanescia (绯英)'s skill "... and additionally gain 10 笑点".
@@ -31,7 +30,7 @@ public class PartyResourceTest {
     private void build() {
         elation = CharacterFactory.create(WEARER, LEVEL);
         battle = new Battle(List.of(elation, CharacterFactory.create(ALLY, LEVEL)),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
     }
 

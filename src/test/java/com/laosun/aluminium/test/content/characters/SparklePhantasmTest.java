@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * 1306 Sparkle's talent: "每层[幻相]使敌方全体受到的伤害提高 4.00%，持续 2 回合，最多叠加 3 层".
@@ -28,7 +27,7 @@ public class SparklePhantasmTest {
     public void theCounterIsStackedAndTheZoneScalesOffIt() {
         Character unit = CharacterFactory.create(WEARER, LEVEL);
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(unit), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         battle.fireTriggers(TriggerEvent.SKILL_POINT_SPENT, unit, enemy, 1, 0);
         int layers = unit.getBuffManager().stacksOf("幻相");
@@ -59,7 +58,7 @@ public class SparklePhantasmTest {
     public void moreLayersMeanMoreDamageTaken() {
         Character unit = CharacterFactory.create(WEARER, LEVEL);
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(unit), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         double none = battle.applyDamage(enemy, new Damage(unit, enemy, DamageElement.QUANTUM, DamageType.NORMAL, 1000));
         battle.fireTriggers(TriggerEvent.SKILL_POINT_SPENT, unit, enemy, 1, 0);

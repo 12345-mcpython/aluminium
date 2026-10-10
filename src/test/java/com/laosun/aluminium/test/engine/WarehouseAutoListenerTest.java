@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * "获得该角色后，或该角色在队伍中时" -- the warehouse clause needs no manual registration.
@@ -27,7 +26,7 @@ public class WarehouseAutoListenerTest {
         Character fighter = CharacterFactory.create(FIGHTER, 80, false, null, null, 0);
         Character wolf = CharacterFactory.create(WOLF, 80, false, null, null, 0);
         Battle battle = new Battle(List.of(fighter, wolf),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         battle.beginWave();

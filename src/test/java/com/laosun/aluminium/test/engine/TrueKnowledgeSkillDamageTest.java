@@ -7,7 +7,6 @@ import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import java.util.List;
-import java.util.Random;
 
 /**
  * Capability (2) and the clause it unlocks: "... raise the Skill damage dealt by #2(20)%".
@@ -50,7 +49,7 @@ public class TrueKnowledgeSkillDamageTest {
         Character cyrene = CharacterFactory.create(CYRENE, LEVEL);
         Character him = CharacterFactory.create(ANAXA, LEVEL);
         Battle battle = new Battle(List.of(cyrene, him),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         var sprite = battle.summonServant(battle.characters.get(0));

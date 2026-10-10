@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Light cone 21039: "效果抵抗提高#1%。装备者每有#2 点防御力，使造成的伤害提高#3%，最多使造成的伤害提高#4%".
@@ -42,7 +41,7 @@ public class DestinySThreadsForewovenTest {
     public void theEffectResistanceClauseApplies() {
         Character unit = CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(21039, LEVEL, false, 5));
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(unit), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
         double before = unit.getAttribute(AttributeType.EFFECT_RESISTANCE).get();
         battle.startBattle();
         double gain = unit.getAttribute(AttributeType.EFFECT_RESISTANCE).get() - before;
@@ -57,7 +56,7 @@ public class DestinySThreadsForewovenTest {
                     DoubleValue.Modifier.pure(extraDefence, DoubleValue.Modifier.ModifierSource.BUFF, 1));
         }
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(unit), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
         double before = unit.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
         battle.startBattle();
         return new double[] {unit.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get() - before,

@@ -10,11 +10,11 @@ import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Damage;
 import com.laosun.aluminium.models.DoubleValue;
 import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * acceptance: the break damage formula.
@@ -37,7 +37,7 @@ public class BreakDamageTest {
     public void breakDamageIsBaseTimesBreakingEffectTimesStanceThroughDefence() {
         Character breaker = breaker(3.0);
         Enemy dummy = dummy();
-        Battle battle = new Battle(List.of(breaker), List.of(dummy), new Random(0));
+        Battle battle = new Battle(List.of(breaker), List.of(dummy), BattleFixture.seeded());
 
         Damage breakDamage = BreakDamageCalculator.build(breaker, dummy, DamageElement.FIRE, STANCE_DAMAGE);
         double settled = battle.applyDamage(dummy, breakDamage);
@@ -54,7 +54,7 @@ public class BreakDamageTest {
         Character breaker = breaker(3.0);
         breaker.setAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST, new DoubleValue(5.0));   // DMG boost 500%
         Enemy dummy = dummy();
-        Battle battle = new Battle(List.of(breaker), List.of(dummy), new Random(0));
+        Battle battle = new Battle(List.of(breaker), List.of(dummy), BattleFixture.seeded());
 
         double settled = battle.applyDamage(dummy,
                 BreakDamageCalculator.build(breaker, dummy, DamageElement.FIRE, STANCE_DAMAGE));
@@ -68,7 +68,7 @@ public class BreakDamageTest {
     public void breakingEffectZeroGivesPlainBase() {
         Character breaker = breaker(0.0);
         Enemy dummy = dummy();
-        Battle battle = new Battle(List.of(breaker), List.of(dummy), new Random(0));
+        Battle battle = new Battle(List.of(breaker), List.of(dummy), BattleFixture.seeded());
 
         double settled = battle.applyDamage(dummy,
                 BreakDamageCalculator.build(breaker, dummy, DamageElement.FIRE, 30));

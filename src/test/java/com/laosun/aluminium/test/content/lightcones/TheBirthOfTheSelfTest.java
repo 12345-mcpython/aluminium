@@ -15,7 +15,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Light cone 21006: a flat follow-up boost (+24%) plus an extra +24% against a target at or below half HP.
@@ -34,7 +33,7 @@ public class TheBirthOfTheSelfTest {
                 ? CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(CONE, LEVEL, false, 1))
                 : CharacterFactory.create(WEARER, LEVEL);
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(unit), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         while (enemy.getCurrentHp() / enemy.getMaxHp() > enemyHpShare) {
             battle.applyDamage(enemy, new Damage(unit, enemy, DamageElement.PHYSICAL, DamageType.NORMAL,
@@ -49,7 +48,7 @@ public class TheBirthOfTheSelfTest {
                 ? CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(CONE, LEVEL, false, 1))
                 : CharacterFactory.create(WEARER, LEVEL);
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(unit), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         while (enemy.getCurrentHp() / enemy.getMaxHp() > enemyHpShare) {
             battle.applyDamage(enemy, new Damage(unit, enemy, DamageElement.PHYSICAL, DamageType.NORMAL,

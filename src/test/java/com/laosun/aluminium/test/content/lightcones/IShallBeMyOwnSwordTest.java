@@ -17,7 +17,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Light cone 23014: a teammate being hit or paying health gives the wearer a layer of [月蚀] (max 3); every layer lifts the
@@ -42,7 +41,7 @@ public class IShallBeMyOwnSwordTest {
                 : CharacterFactory.create(WEARER, LEVEL);
         ally = CharacterFactory.create(ALLY, LEVEL);
         enemy = BattleFixture.monster();
-        battle = new Battle(List.of(wearer, ally), List.of(enemy), new Random(0));
+        battle = new Battle(List.of(wearer, ally), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         wearer.getAttribute(AttributeType.CRIT_CHANCE)
                 .addModifier(DoubleValue.Modifier.pure(-1.0, DoubleValue.Modifier.ModifierSource.BUFF, 230141));

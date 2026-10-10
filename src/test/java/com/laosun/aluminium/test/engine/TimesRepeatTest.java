@@ -11,6 +11,7 @@ import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.utils.RelicFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -38,7 +39,7 @@ public class TimesRepeatTest {
     private static double lossWith(String ruleId, int applications) {
         Character c = CharacterFactory.create(WEARER, LEVEL, true, null, RelicFactory.suit(99004, 5, 15));
         Enemy e = EnemyFactory.create(1002011, 90, 1);
-        Battle b = new Battle(List.of(c), List.of(e), new Random(0));
+        Battle b = new Battle(List.of(c), List.of(e), BattleFixture.seeded());
         b.startBattle();
         TriggerTable.TriggerContext ctx = new TriggerTable.TriggerContext(c, c, e, 1, 0, null, b,
                 SkillCategory.UNSPECIFIED);

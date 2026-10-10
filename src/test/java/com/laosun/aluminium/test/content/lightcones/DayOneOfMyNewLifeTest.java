@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Light cone 21002: with it equipped, the WHOLE party carries +8% all-type resistance, so an incoming hit lands for less.
@@ -38,7 +37,7 @@ public class DayOneOfMyNewLifeTest {
                 : CharacterFactory.create(WEARER, LEVEL);
         ally = CharacterFactory.create(ALLY, LEVEL);
         enemy = BattleFixture.monster();
-        battle = new Battle(List.of(wearer, ally), List.of(enemy), new Random(0));
+        battle = new Battle(List.of(wearer, ally), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
     }
 

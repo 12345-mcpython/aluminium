@@ -14,11 +14,11 @@ import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.models.skill.Skill;
 import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * {@code ULT_CAST}: the event an ultimate's "after the wearer uses their Ultimate"
@@ -256,7 +256,7 @@ public class UltCastTriggerTest {
         Enemy enemy = EnemyFactory.create(ICE_EDGE, ENEMY_LEVEL, 1);
         enemy.setAttribute(AttributeType.HEALTH, new DoubleValue(ENEMY_HP));
         enemy.heal(ENEMY_HP);
-        Battle battle = new Battle(List.of(hero), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(hero), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         return battle;
     }

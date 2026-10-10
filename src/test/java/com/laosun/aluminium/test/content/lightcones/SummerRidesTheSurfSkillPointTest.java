@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Light cone 23064, its last sentence: "每个波次开始时或装备者每施放 3 次欢愉技后，
@@ -37,7 +36,7 @@ public class SummerRidesTheSurfSkillPointTest {
                 ? CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(CONE, LEVEL, false, 1))
                 : CharacterFactory.create(WEARER, LEVEL);
         enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(wearer), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(wearer), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         return battle;
     }

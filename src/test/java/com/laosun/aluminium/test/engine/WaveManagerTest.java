@@ -2,6 +2,7 @@ package com.laosun.aluminium.test.engine;
 
 
 import com.laosun.aluminium.test.data.StageLazyLoadTest;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.beans.StageBean;
@@ -17,7 +18,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 /**
  * P-4 acceptance: stage data ({@code stage.json}) + waves.
@@ -276,7 +276,7 @@ public class WaveManagerTest {
     @Test
     public void battlesWithoutWavesBehaveAsBefore() {
         Battle battle = new Battle(List.of(character()),
-                List.of(EnemyFactory.create(1002011, 90, 1)), new Random(0));
+                List.of(EnemyFactory.create(1002011, 90, 1)), BattleFixture.seeded());
 
         Assertions.assertNull(battle.getWaveManager());
         battle.startBattle();
@@ -318,7 +318,7 @@ public class WaveManagerTest {
     /** Builds a battle with "an empty enemy team + a wave manager" (P-4's standard usage). */
     private static Battle waveBattle(int stageId) {
         StageBean stage = stage(stageId);
-        Battle battle = new Battle(List.of(character()), new ArrayList<>(), new Random(0));
+        Battle battle = new Battle(List.of(character()), new ArrayList<>(), BattleFixture.seeded());
         new WaveManager(battle, stage);
         return battle;
     }

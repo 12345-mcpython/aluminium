@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * 1309 Robin (知更鸟): "after entering battle while the field is expanded, Robin restores 5 energy at the start of each wave".
@@ -39,7 +38,7 @@ public class RobinWaveEnergyTest {
     private static double gainAtWaveStart(boolean technique) {
         Character robin = CharacterFactory.create(ROBIN, 80, false, null, null, 0);
         Battle battle = new Battle(List.of(robin),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         if (technique) {
             battle.markTechniqueUsed(robin);
         }

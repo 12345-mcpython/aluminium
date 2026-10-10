@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * 1505 Evanescia (绯英)'s skill rider: "while 绯英 holds [好活当赏], casting the Skill deals 8% Physical Elation damage to the enemy targets that were attacked".
@@ -28,7 +27,7 @@ public class EvanesciaRiderTest {
         Character elation = CharacterFactory.create(WEARER, LEVEL);
         Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(elation, CharacterFactory.create(ALLY, LEVEL)), List.of(enemy),
-                new Random(0));
+                BattleFixture.seeded());
         battle.startBattle();
         if (!keepTheGifts) {
             elation.getResources().spend(GIFTS, elation.getResources().value(GIFTS));

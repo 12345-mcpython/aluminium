@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Character 1503 (Pearl): her 好活当赏 pays for the party's damage reduction - the talent's second half.
@@ -140,7 +139,7 @@ public class PearlDefenceValueTest {
     /** A fresh battle with Pearl holding {@code points} of 好活当赏. */
     private static Battle newBattle(int points) {
         Battle battle = new Battle(List.of(CharacterFactory.create(PEARL, 80), CharacterFactory.create(ALLY, 80)),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         if (points > 0) {

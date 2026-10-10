@@ -13,7 +13,6 @@ import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import java.util.List;
-import java.util.Random;
 
 /**
  * 1415's memosprite skill 19, last sentence: "提高数值等同于本次治疗数值的 #1%", counted into Little Ica's (小伊卡) healing total.
@@ -52,7 +51,7 @@ public class SkyOdeHealingTotalTest {
         Character hyacine = CharacterFactory.create(HYACINE, LEVEL);
         Character healer = CharacterFactory.create(HEALER, LEVEL);
         Battle battle = new Battle(List.of(cyrene, hyacine, healer),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         cyrene = battle.characters.get(0);

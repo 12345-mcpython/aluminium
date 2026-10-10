@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * "若当前生命值百分比小于等于50%，则被敌方目标攻击的概率降低" - one sentence, three characters.
@@ -36,7 +35,7 @@ public class LowHpAggroTraceTest {
             Character owner = CharacterFactory.create(cid, LEVEL);
             Character ally = CharacterFactory.create(ALLY, LEVEL);
             Enemy enemy = BattleFixture.monster();
-            Battle battle = new Battle(List.of(owner, ally), List.of(enemy), new Random(0));
+            Battle battle = new Battle(List.of(owner, ally), List.of(enemy), BattleFixture.seeded());
             battle.startBattle();
             double full = battle.aggroOf(owner);
 

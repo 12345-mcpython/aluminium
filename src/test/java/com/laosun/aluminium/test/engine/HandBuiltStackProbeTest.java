@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /** How many stacks survive when they come from one rule vs two? */
 public class HandBuiltStackProbeTest {
@@ -80,7 +79,7 @@ public class HandBuiltStackProbeTest {
             owner.setTriggerTable(new TriggerTable(OWNER, specs));
         }
         Battle battle = new Battle(List.of(owner),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         return owner.getBuffManager().stacksOf(STACK);

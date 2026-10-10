@@ -10,11 +10,11 @@ import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * 1220 Feixiao: "若不存在可攻击的主目标，则攻击敌方随机单体" -- her follow-up fallback.
@@ -32,7 +32,7 @@ public class FeixiaoFallbackTest {
         Character ally = CharacterFactory.create(ALLY, LEVEL);
         Enemy a = EnemyFactory.create(1002011, 90, 1);
         Enemy b = EnemyFactory.create(1002011, 90, 2);
-        Battle battle = new Battle(List.of(feixiao, ally), List.of(a, b), new Random(0));
+        Battle battle = new Battle(List.of(feixiao, ally), List.of(a, b), BattleFixture.seeded());
         battle.startBattle();
         a.perish();
         Assertions.assertTrue(a.isDeath() && battle.enemies.contains(a),

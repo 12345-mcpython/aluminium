@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Relic 323, 2 pieces: "装备者的忆灵在场时，我方全体速度提高#2%" -- the condition is the wearer's own summon count.
@@ -38,7 +37,7 @@ public class MemospriteSpeedTierTest {
         Character unit = CharacterFactory.create(WEARER, LEVEL, true, null, RelicFactory.suit(323, 2, RELIC_LEVEL));
         Character ally = CharacterFactory.create(ALLY, LEVEL);
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(unit, ally), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(unit, ally), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         double before = ally.getAttribute(AttributeType.SPEED).get();
         if (summon) {

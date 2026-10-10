@@ -14,12 +14,12 @@ import com.laosun.aluminium.models.Signal;
 import com.laosun.aluminium.models.skill.DefaultSkill;
 import com.laosun.aluminium.models.skill.Skill;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 /**
  * Talents and follow-up attacks, as pure data.
@@ -340,7 +340,7 @@ public class TalentTest {
         enemy.heal(1_000_000);
         List<Enemy> enemies = new ArrayList<>();
         enemies.add(enemy);
-        Battle battle = new Battle(team, enemies, new Random(0));
+        Battle battle = new Battle(team, enemies, BattleFixture.seeded());
         battle.startBattle();
         return battle;
     }

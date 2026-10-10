@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 /**
  * Character 1503 (Pearl): the three advance tiers her Ultimate lands on 【美学底本】, the extra turn at four Elation
@@ -109,7 +108,7 @@ public class PearlUltAdvanceTest {
     /** Who was handed the extra turn, or {@code null} when the Ultimate granted none. */
     private static Character extraTurnActorWith(int elationAllies) {
         Battle battle = new Battle(team(elationAllies), List.of(BattleFixture.monster()),
-                new Random(0));
+                BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         Character archetype = battle.characters.get(battle.characters.size() - 1);
@@ -123,7 +122,7 @@ public class PearlUltAdvanceTest {
     private static double counterAfterOpening(boolean techniqueUsed) {
         Character pearl = CharacterFactory.create(PEARL, 80);
         Battle battle = new Battle(List.of(pearl, CharacterFactory.create(HUNTER, 80)),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         if (techniqueUsed) {
             battle.markTechniqueUsed(pearl);
         }
@@ -156,7 +155,7 @@ public class PearlUltAdvanceTest {
         if (!fireTheUltimate) {
             fresh.getFirst().setTriggerTable(com.laosun.aluminium.models.TriggerTable.EMPTY);
         }
-        Battle battle = new Battle(fresh, List.of(BattleFixture.monster()), new Random(0));
+        Battle battle = new Battle(fresh, List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         Character archetype = battle.characters.get(battle.characters.size() - 1);

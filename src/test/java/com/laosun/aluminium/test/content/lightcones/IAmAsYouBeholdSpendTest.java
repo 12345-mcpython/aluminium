@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Light cone 23062 At Will (随心), sentence 4: `per 1 point of energy spent, increases the ultimate damage dealt this time by #3%, up to #6%`.
@@ -44,7 +43,7 @@ public class IAmAsYouBeholdSpendTest {
         Character wearer = CharacterFactory.create(WEARER, LEVEL, true,
                 Weapon.build(23062, LEVEL, false, RANK));
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(wearer), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(wearer), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         Damage hit = new Damage(enemy, wearer, DamageElement.FIRE, DamageType.NORMAL, 1000,
                 SkillCategory.ULTRA);

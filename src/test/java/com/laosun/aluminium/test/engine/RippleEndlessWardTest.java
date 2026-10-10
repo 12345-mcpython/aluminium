@@ -4,10 +4,10 @@ import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import java.util.List;
-import java.util.Random;
 
 /** "展开战技的结界并使其没有持续时间". */
 public class RippleEndlessWardTest {
@@ -26,7 +26,7 @@ public class RippleEndlessWardTest {
     /** How many of her buffs a one-turn lengthening finds -- the ward counts only while it is timed. */
     private static int lengthenable(boolean thenTheUltimate) {
         Character cyrene = CharacterFactory.create(1415, 80);
-        Battle battle = new Battle(List.of(cyrene), List.of(EnemyFactory.create(1002011, 100, 1)), new Random(0));
+        Battle battle = new Battle(List.of(cyrene), List.of(EnemyFactory.create(1002011, 100, 1)), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         cyrene = battle.characters.getFirst();

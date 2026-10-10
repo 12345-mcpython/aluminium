@@ -12,12 +12,12 @@ import com.laosun.aluminium.models.skill.DefaultSkill;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.skill.Skill;
 import com.laosun.aluminium.models.event.AttackEvent;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 /**
  * acceptance: additional damage (附加伤害) and true damage (真实伤害), reproduced from the
@@ -51,7 +51,7 @@ public class ExtraTrueDamageTest {
     }
 
     private static Battle battle(List<Character> allies, List<Enemy> enemies) {
-        return new Battle(allies, enemies, new Random(0));
+        return new Battle(allies, enemies, BattleFixture.seeded());
     }
 
     private static double damageTaken(Enemy enemy) {

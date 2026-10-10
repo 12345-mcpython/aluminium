@@ -18,7 +18,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Light cone 20018: after a Skill, the wearer's NEXT basic attack deals extra damage equal to 60% of its own attack.
@@ -42,7 +41,7 @@ public class HiddenShadowTest {
                 ? CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(CONE, LEVEL, false, 1))
                 : CharacterFactory.create(WEARER, LEVEL);
         enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(wearer), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(wearer), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         wearer.getAttribute(AttributeType.CRIT_CHANCE)
                 .addModifier(DoubleValue.Modifier.pure(-1.0, DoubleValue.Modifier.ModifierSource.BUFF, 200181));
@@ -52,7 +51,7 @@ public class HiddenShadowTest {
     private double extraDamageAtRank(int rank) {
         Character unit = CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(CONE, LEVEL, false, rank));
         Enemy target = BattleFixture.monster();
-        Battle battle = new Battle(List.of(unit), List.of(target), new Random(0));
+        Battle battle = new Battle(List.of(unit), List.of(target), BattleFixture.seeded());
         battle.startBattle();
         unit.getAttribute(AttributeType.CRIT_CHANCE)
                 .addModifier(DoubleValue.Modifier.pure(-1.0, DoubleValue.Modifier.ModifierSource.BUFF, 200183));

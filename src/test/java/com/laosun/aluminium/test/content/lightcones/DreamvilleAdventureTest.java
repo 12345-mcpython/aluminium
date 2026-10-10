@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Light cone 21036: whichever of basic / skill / ultimate the wearer cast LAST decides which category the whole party's damage
@@ -39,7 +38,7 @@ public class DreamvilleAdventureTest {
                 : CharacterFactory.create(WEARER, LEVEL);
         ally = CharacterFactory.create(ALLY, LEVEL);
         enemy = BattleFixture.monster();
-        battle = new Battle(List.of(wearer, ally), List.of(enemy), new Random(0));
+        battle = new Battle(List.of(wearer, ally), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
     }
 

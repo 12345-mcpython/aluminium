@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * 【好活当赏】 counts the Aha Moment's 笑点 INTO its holder, frozen, per holder, on that holder's own turns.
@@ -177,7 +176,7 @@ public class ElationGiftSnapshotTest {
             battle = new Battle(
                     List.of(CharacterFactory.create(PEARL, 80), CharacterFactory.create(ALLY, 80),
                             CharacterFactory.create(OTHER, 80)),
-                    List.of(BattleFixture.monster()), new Random(0));
+                    List.of(BattleFixture.monster()), BattleFixture.seeded());
             battle.startBattle();
             battle.processRequests();
             pearl = battle.characters.get(0);

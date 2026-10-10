@@ -16,7 +16,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Light cone 2105: the wearer's MEMOSPRITE deals 24% more CRIT damage (the crit damage in {@code props} is the wearer's own).
@@ -38,7 +37,7 @@ public class TheFlowerRemembersTest {
                 ? CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(CONE, LEVEL, false, 1))
                 : CharacterFactory.create(WEARER, LEVEL);
         enemy = BattleFixture.monster();
-        battle = new Battle(List.of(wearer, CharacterFactory.create(ALLY, LEVEL)), List.of(enemy), new Random(0));
+        battle = new Battle(List.of(wearer, CharacterFactory.create(ALLY, LEVEL)), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         // The crit chance belongs to the one that ATTACKS: measured, pinning the WEARER's chance left the memosprite's hit
         // uncritted (46.19 on both sides, while the wearer's own crit was 828.5), because the roll reads the attacker.

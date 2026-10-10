@@ -20,7 +20,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * "increases the shield amount provided by <b>the wearer</b> by X%" - relic 103 (20%) / 128 (10% + 12%) and one light cone, four readers.
@@ -299,7 +298,7 @@ public class ShieldBoostTest {
         Character giver = CharacterFactory.create(WEARER, LEVEL);
         Character shielded = CharacterFactory.create(WEARER, LEVEL);
         Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
-        Battle battle = new Battle(List.of(giver, shielded), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(giver, shielded), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         return battle;
     }

@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * P-3 acceptance: the win/loss state machine.
@@ -146,7 +145,7 @@ public class BattleResultTest {
     @Test
     public void anEmptySideCountsAsWipedOut() {
         Character hero = character("hero", 100);
-        Battle battle = new Battle(List.of(hero), List.of(), new Random(0));
+        Battle battle = new Battle(List.of(hero), List.of(), BattleFixture.seeded());
 
         battle.startBattle();
 

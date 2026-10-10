@@ -18,7 +18,6 @@ import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * `cast_skill_param:<index>`: a magnitude that is a parameter of the skill that produced the event, at its CURRENT level.
@@ -92,7 +91,7 @@ public class CastSkillParamScaleTest {
         Character cyrene = CharacterFactory.create(CYRENE, LEVEL);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
         Battle battle = new Battle(List.of(cyrene, ally),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         Summon demiurge = battle.summonServant(cyrene);

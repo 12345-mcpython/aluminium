@@ -3,10 +3,10 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import java.util.List;
-import java.util.Random;
 
 /**
  * A summon can DECLARE a resource, so a rule can grant one to it.
@@ -36,7 +36,7 @@ public class TrueSelfOdeGivesStoryTest {
     private static double story(boolean castTheOde) {
         Character cyrene = CharacterFactory.create(CYRENE, LEVEL);
         Battle battle = new Battle(List.of(cyrene),
-                List.of(EnemyFactory.create(MONSTER, 100, 1)), new Random(0));
+                List.of(EnemyFactory.create(MONSTER, 100, 1)), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         cyrene = battle.characters.getFirst();

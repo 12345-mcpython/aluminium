@@ -11,7 +11,6 @@ import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import java.util.List;
-import java.util.Random;
 
 /**
  * 1415's memosprite skill 21, the added-damage clause: "施放攻击后，造成 #3 次附加伤害，每次伤害对敌方随机单体造成等同于卡厄斯兰那 #4% 攻击力的火属性附加伤害".
@@ -42,7 +41,7 @@ public class WorldOdeAddedFireHitsTest {
     private static double damageOfOneAttack(boolean transform) {
         Character him = CharacterFactory.create(PHAINON, LEVEL);
         Battle battle = new Battle(List.of(him),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         him = battle.characters.getFirst();

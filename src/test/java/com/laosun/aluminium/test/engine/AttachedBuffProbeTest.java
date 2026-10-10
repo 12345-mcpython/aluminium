@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /** What is really on the unit after one stackable APPLY_BUFF? */
 public class AttachedBuffProbeTest {
@@ -36,7 +35,7 @@ public class AttachedBuffProbeTest {
         owner.setTriggerTable(new TriggerTable(OWNER,
                 List.of(TriggerSpecs.rule("BATTLE_START", List.of(), apply, apply, apply))));
         Battle battle = new Battle(List.of(owner),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
 

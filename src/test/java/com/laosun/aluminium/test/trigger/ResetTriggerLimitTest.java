@@ -2,6 +2,7 @@ package com.laosun.aluminium.test.trigger;
 
 
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
@@ -15,7 +16,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * RESET_TRIGGER_LIMIT: "施放终结技后重置该效果触发次数".
@@ -31,7 +31,7 @@ public class ResetTriggerLimitTest {
     private static int probeStacksAfterTwoFiresThenReset() {
         Character owner = CharacterFactory.create(OWNER, LEVEL);
         Enemy enemy = EnemyFactory.create(1002011, 90, 1);
-        Battle battle = new Battle(List.of(owner), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(owner), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
 
         EffectSpec stack = new EffectSpec();

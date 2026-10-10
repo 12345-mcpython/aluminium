@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Light cone 21011: damage of the WEARER'S OWN element, dealt by anyone on our side, is 12% stronger.
@@ -37,7 +36,7 @@ public class PlanetaryRendezvousTest {
                 : CharacterFactory.create(WEARER, LEVEL);
         ally = CharacterFactory.create(ALLY, LEVEL);
         enemy = BattleFixture.monster();
-        battle = new Battle(List.of(wearer, ally), List.of(enemy), new Random(0));
+        battle = new Battle(List.of(wearer, ally), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
     }
 

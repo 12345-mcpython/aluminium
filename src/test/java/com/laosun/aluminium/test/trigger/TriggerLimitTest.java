@@ -3,6 +3,7 @@ package com.laosun.aluminium.test.trigger;
 
 import com.laosun.aluminium.test.support.TestTurns;
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.google.gson.Gson;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
@@ -16,7 +17,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Firing limits on a trigger rule: {@code cooldown} (in the owner's own turns), {@code per_turn} (a count
@@ -358,7 +358,7 @@ public class TriggerLimitTest {
 
     private static Battle battleWith(TriggerSpec... specs) {
         Character owner = ownerWith(specs);
-        Battle battle = new Battle(List.of(owner), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(owner), List.of(dummy()), BattleFixture.seeded());
         battle.startBattle();
         drainSkillPoints(battle);
         return battle;
@@ -367,7 +367,7 @@ public class TriggerLimitTest {
     private static Battle withAlly(TriggerSpec... specs) {
         Character owner = ownerWith(specs);
         Battle battle = new Battle(List.of(owner, CharacterFactory.create(ALLY, LEVEL)),
-                List.of(dummy()), new Random(0));
+                List.of(dummy()), BattleFixture.seeded());
         battle.startBattle();
         drainSkillPoints(battle);
         return battle;

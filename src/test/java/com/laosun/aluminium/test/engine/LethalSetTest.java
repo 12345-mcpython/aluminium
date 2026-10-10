@@ -16,7 +16,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * "all <b>of those</b> lethally hit in one action" -- one set, not one save per blow.
@@ -56,7 +55,7 @@ public class LethalSetTest {
         owner.setTriggerTable(new TriggerTable(OWNER, List.of(rule)));
 
         Battle battle = new Battle(List.of(owner, first, second, third),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
 

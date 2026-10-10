@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Light cone 20021: the FIRST time the wearer summons a memosprite, one skill point and 12 energy come back.
@@ -33,7 +32,7 @@ public class ShadowburnTest {
                 ? CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(CONE, LEVEL, false, 1))
                 : CharacterFactory.create(WEARER, LEVEL);
         enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(wearer), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(wearer), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         return battle;
     }

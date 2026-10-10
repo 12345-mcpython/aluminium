@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Pins the shipped 21009: its aggro clause is `"percent": 1`, and `Battle.aggroOf` is base x (1 + ratio), so the wearer is hit twice as often --
@@ -45,7 +44,7 @@ public class LandauSChoiceSemanticsTest {
         Character unit = CharacterFactory.create(WEARER, LEVEL, true,
                 withCone ? Weapon.build(21009, LEVEL, false, 5) : null);
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(unit), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         double aggro = battle.aggroOf(unit);
         double ratio = unit.getAttribute(AttributeType.AGGRO_ADDED_RATIO).get();

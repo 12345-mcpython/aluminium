@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Light cone 24005: after the wearer casts a Skill, the WHOLE party deals 8% more damage for 3 turns.
@@ -37,7 +36,7 @@ public class MemorySCurtainNeverFallsTest {
                 : CharacterFactory.create(WEARER, LEVEL);
         ally = CharacterFactory.create(ALLY, LEVEL);
         enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(wearer, ally), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(wearer, ally), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         return battle;
     }

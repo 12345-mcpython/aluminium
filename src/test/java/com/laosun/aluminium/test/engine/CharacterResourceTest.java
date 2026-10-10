@@ -20,7 +20,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 import java.util.Set;
 
 /**
@@ -212,7 +211,7 @@ public class CharacterResourceTest {
         Character empty = characterWithCharge(0);
         charged.setTriggerTable(new TriggerTable(PLAIN, List.of(chargeThresholdRule())));
         empty.setTriggerTable(new TriggerTable(PLAIN, List.of()));
-        Battle battle = new Battle(List.of(charged, empty), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(charged, empty), List.of(dummy()), BattleFixture.seeded());
         battle.startBattle();
 
         Assertions.assertEquals(1, battle.fireTriggers(TriggerEvent.ALLY_ATTACK, empty, null, 1, 0),
@@ -222,7 +221,7 @@ public class CharacterResourceTest {
         Character fullActor = characterWithCharge(3);
         chargedAgain.setTriggerTable(new TriggerTable(PLAIN, List.of(chargeThresholdRule())));
         fullActor.setTriggerTable(new TriggerTable(PLAIN, List.of()));
-        Battle mirror = new Battle(List.of(chargedAgain, fullActor), List.of(dummy()), new Random(0));
+        Battle mirror = new Battle(List.of(chargedAgain, fullActor), List.of(dummy()), BattleFixture.seeded());
         mirror.startBattle();
 
         Assertions.assertEquals(0, mirror.fireTriggers(TriggerEvent.ALLY_ATTACK, fullActor, null, 1, 0),
@@ -244,7 +243,7 @@ public class CharacterResourceTest {
                 TriggerSpecs.modifyAttr("ATTACK", 0.12, 1));
         TriggerSpecs.set(spec, "when", List.of("self_resource:" + CHARGE + " >= 0"));
         owner.setTriggerTable(new TriggerTable(PLAIN, List.of(spec)));
-        Battle battle = new Battle(List.of(owner), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(owner), List.of(dummy()), BattleFixture.seeded());
         battle.startBattle();
 
         Assertions.assertEquals(0, battle.fireTriggers(TriggerEvent.ALLY_ATTACK, owner, null, 1, 0),
@@ -362,7 +361,7 @@ public class CharacterResourceTest {
     private static int fireAtCharge(int charge) {
         Character owner = characterWithCharge(charge);
         owner.setTriggerTable(new TriggerTable(PLAIN, List.of(chargeThresholdRule())));
-        Battle battle = new Battle(List.of(owner), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(owner), List.of(dummy()), BattleFixture.seeded());
         battle.startBattle();
         return battle.fireTriggers(TriggerEvent.ALLY_ATTACK, owner, null, 1, 0);
     }

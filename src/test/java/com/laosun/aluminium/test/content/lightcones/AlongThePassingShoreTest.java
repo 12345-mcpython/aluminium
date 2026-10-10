@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Light cone 23024: hitting a target puts [泡影] on it for one turn (once per attack per target), damage against such targets is 24%
@@ -33,7 +32,7 @@ public class AlongThePassingShoreTest {
                 ? CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(CONE, LEVEL, false, 1))
                 : CharacterFactory.create(WEARER, LEVEL);
         enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(wearer), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(wearer), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         return battle;
     }

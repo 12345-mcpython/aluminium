@@ -2,6 +2,7 @@ package com.laosun.aluminium.test.trigger;
 
 
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.DamageElement;
@@ -16,7 +17,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * ADD_ELEMENTAL_WEAKNESS:
@@ -32,7 +32,7 @@ public class WeaknessOpTest {
     private static boolean weakAfter(DamageElement element) {
         Character caster = CharacterFactory.create(CASTER, LEVEL);
         Enemy enemy = EnemyFactory.create(1002011, 90, 1);
-        Battle battle = new Battle(List.of(caster), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(caster), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         EffectSpec effect = new EffectSpec();
         TriggerSpecs.set(effect, "op", "ADD_ELEMENTAL_WEAKNESS");

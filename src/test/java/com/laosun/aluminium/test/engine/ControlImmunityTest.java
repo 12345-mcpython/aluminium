@@ -16,7 +16,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * 1408："卡厄斯兰那免疫控制类负面状态".
@@ -52,7 +51,7 @@ public class ControlImmunityTest {
                 TriggerSpecs.rule(TriggerEvent.SKILL_CAST.name(), List.of("actor == self"), control()))));
 
         Battle battle = new Battle(List.of(owner, applier),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
 

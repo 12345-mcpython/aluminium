@@ -3,6 +3,7 @@ package com.laosun.aluminium.test.trigger;
 
 import com.laosun.aluminium.test.engine.EventBusTest;
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.AttributeType;
@@ -21,7 +22,6 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 /**
  * The two trigger-table events that were declared but not emitted ({@code TURN_START},
@@ -388,7 +388,7 @@ public class TriggerEventWiringTest {
         Enemy enemy = EnemyFactory.create(1002011, 90, 1);
         enemy.setAttribute(AttributeType.HEALTH, new DoubleValue(ENEMY_HP));
         enemy.heal(ENEMY_HP);
-        Battle battle = new Battle(List.of(team), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(team), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         return battle;
     }

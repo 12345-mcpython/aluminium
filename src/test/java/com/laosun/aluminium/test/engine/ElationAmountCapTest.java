@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * "单次通过此方式计算的[好活当赏]不超过 100 点": a single conversion of 150 energy mirrors only
@@ -29,7 +28,7 @@ public class ElationAmountCapTest {
     private int mirrored(double energy) {
         Character elation = CharacterFactory.create(WEARER, LEVEL);
         Battle battle = new Battle(List.of(elation, CharacterFactory.create(ALLY, LEVEL)),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         int before = elation.getResources().value(GIFTS);
         battle.fireTriggers(TriggerEvent.ENERGY_GAINED, elation, elation, 1, energy);

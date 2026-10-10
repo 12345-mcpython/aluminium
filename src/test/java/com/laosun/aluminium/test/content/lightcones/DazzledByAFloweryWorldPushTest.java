@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Light cone 23053, its [推流] clause: spending 4 skill points WITHIN ONE TURN grants the state, and it lifts the whole party's
@@ -41,7 +40,7 @@ public class DazzledByAFloweryWorldPushTest {
                 : CharacterFactory.create(WEARER, LEVEL);
         ally = CharacterFactory.create(ALLY, LEVEL);
         enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(wearer, ally), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(wearer, ally), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         return battle;
     }

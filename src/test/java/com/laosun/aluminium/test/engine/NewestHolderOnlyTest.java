@@ -15,7 +15,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * The move of the "only the newest target it was applied to is affected" family: `REMOVE_STATE` first takes the name off everybody, then `APPLY_BUFF` gives it to the new target
@@ -64,7 +63,7 @@ public class NewestHolderOnlyTest {
         TriggerSpecs.set(rule, "when", List.of("actor == self"));
         wearer.setTriggerTable(new TriggerTable(WEARER, List.of(rule)));
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(wearer, a), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(wearer, a), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
 
         battle.fireTriggers(TriggerEvent.SKILL_CAST, wearer, a, 0, 0);      // Note: a gets the mark

@@ -4,10 +4,10 @@ import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import java.util.List;
-import java.util.Random;
 
 /**
  * Slot 15's narrowing: "缇宝施放追加攻击触发缇宝的结界的附加伤害时，会额外造成 #1(1) 次附加伤害".
@@ -39,7 +39,7 @@ public class PassageOdeExtraZoneHitTest {
         Character cyrene = CharacterFactory.create(CYRENE, LEVEL);
         Character tribbie = CharacterFactory.create(TRIBBIE, LEVEL);
         Battle battle = new Battle(List.of(cyrene, tribbie),
-                List.of(EnemyFactory.create(MONSTER, 100, 1)), new Random(0));
+                List.of(EnemyFactory.create(MONSTER, 100, 1)), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         tribbie = battle.characters.get(1);

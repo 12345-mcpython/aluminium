@@ -7,8 +7,8 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Weapon;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
-import java.util.Random;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
@@ -65,7 +65,7 @@ public class LightConeBoostTest {
         // Note: A battle has to START: the rules hang on BATTLE_START, and without it the attribute reads 0.0 while the
         // table visibly carries the rules -- measured by a probe before this line existed (rules=2, value 0.28).
         Enemy enemy = EnemyFactory.create(1002011, 90, 1);
-        Battle battle = new Battle(List.of(wearer), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(wearer), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         return wearer.getAttribute(attribute).get();
     }

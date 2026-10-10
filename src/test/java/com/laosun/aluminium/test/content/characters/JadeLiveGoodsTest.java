@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * "每层[当品]额外使翡翠的攻击力提高 0.50%" follows the layers.
@@ -29,7 +28,7 @@ public class JadeLiveGoodsTest {
     public void theAurasFollowTheLayers() {
         Character jade = CharacterFactory.create(JADE, LEVEL, false, null, null, 0);
         Battle battle = new Battle(List.of(jade),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
 

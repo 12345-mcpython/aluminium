@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * 1211: "when a teammate of Bailu (白露) takes a lethal attack ... Bailu immediately provides healing for it, restoring health equal to 18.00% of Bailu's Max HP + 480"
@@ -44,7 +43,7 @@ public class LethalHealOnTeammateTest {
         Character healer = CharacterFactory.create(BAILU, 80, false, null, null, 0);
         Character teammate = CharacterFactory.create(TEAMMATE, 80, false, null, null, 0);
         Battle battle = new Battle(List.of(healer, teammate),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
 

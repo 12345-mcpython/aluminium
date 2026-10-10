@@ -16,7 +16,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 import java.util.Set;
 
 /**
@@ -76,7 +75,7 @@ public class CastSetupTest {
         Enemy enemy = enemy();
         Character owner = CharacterFactory.create(OWNER, LEVEL);
         owner.setTriggerTable(new TriggerTable(OWNER, List.of(delegate("CAST_SETUP", "ULTRA", List.of("actor == self")))));
-        Battle battle = new Battle(List.of(owner), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(owner), List.of(enemy), BattleFixture.seeded());
         double hpBefore = enemy.getCurrentHp();
 
         battle.castImmediate(new DefaultSkill(OWNER, ULTRA_SLOT, 1), owner, List.of(enemy));
@@ -143,7 +142,7 @@ public class CastSetupTest {
         Character owner = CharacterFactory.create(OWNER, LEVEL);
         owner.setTriggerTable(new TriggerTable(OWNER, List.of(delegate("CAST_SETUP", "SKILL", null))));
         Enemy enemy = enemy();
-        Battle battle = new Battle(List.of(owner), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(owner), List.of(enemy), BattleFixture.seeded());
 
         IllegalStateException refused = Assertions.assertThrows(IllegalStateException.class,
                 () -> battle.castImmediate(new DefaultSkill(OWNER, ULTRA_SLOT, 1), owner, List.of(enemy)));
@@ -167,7 +166,7 @@ public class CastSetupTest {
         owner.setTriggerTable(new TriggerTable(OWNER, List.of(delegate("CAST_SETUP", "COMMON", null))));
         Character ally = CharacterFactory.create(ALLY, LEVEL);
         Enemy enemy = enemy();
-        Battle battle = new Battle(List.of(owner, ally), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(owner, ally), List.of(enemy), BattleFixture.seeded());
 
         IllegalStateException refused = Assertions.assertThrows(IllegalStateException.class,
                 () -> battle.castImmediate(new DefaultSkill(ALLY, 1, 1), ally, List.of(enemy)));
@@ -189,7 +188,7 @@ public class CastSetupTest {
         Character owner = CharacterFactory.create(cid, LEVEL);
         owner.setTriggerTable(table);
         Enemy enemy = enemy();
-        Battle battle = new Battle(List.of(owner), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(owner), List.of(enemy), BattleFixture.seeded());
         double before = enemy.getCurrentHp();
 
         battle.castImmediate(new DefaultSkill(cid, slot, 1), owner, List.of(enemy));

@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * "Aha's moment lasts until the end of the last elation skill cast this time" so it grants [好活当赏] when it ends (1513,).
@@ -30,7 +29,7 @@ public class AhaMomentTest {
     public void theMomentExpiresAndTheRewardLands() {
         Character owner = CharacterFactory.create(OWNER, 80, false, null, null, 0);
         Battle battle = new Battle(List.of(owner),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         Assertions.assertFalse(owner.getBuffManager().hasState(MOMENT), "precondition: not on yet");

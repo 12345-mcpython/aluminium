@@ -16,7 +16,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Light cone 23061's second clause, first half: while the crown is up, the WHOLE PARTY ignores 20% of the target's defence.
@@ -42,7 +41,7 @@ public class FlickeringStarsDefenceIgnoreTest {
                 : CharacterFactory.create(WEARER, LEVEL);
         ally = CharacterFactory.create(ALLY, LEVEL);
         enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(wearer, ally), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(wearer, ally), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         for (Character unit : List.of(wearer, ally)) {
             unit.getAttribute(AttributeType.CRIT_CHANCE)

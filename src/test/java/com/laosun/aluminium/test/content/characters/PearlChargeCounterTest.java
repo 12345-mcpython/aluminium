@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Character 1503 (Pearl): 充能 - a counter that IS a state's duration, not a number of turns.
@@ -146,7 +145,7 @@ public class PearlChargeCounterTest {
     private static Battle newBattle(int archetype) {
         Battle battle = new Battle(
                 List.of(CharacterFactory.create(PEARL, 80), CharacterFactory.create(archetype, 80)),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         return battle;

@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Her skill's +20% and her ult's +60% CRIT CHANCE must both count (1209,).
@@ -25,7 +24,7 @@ public class YanqingCritChanceStackingTest {
     public void bothCritChanceSourcesAreCounted() {
         Character owner = CharacterFactory.create(OWNER, 80, false, null, null, 0);
         Battle battle = new Battle(List.of(owner),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         double base = owner.getAttribute(AttributeType.CRIT_CHANCE).get();

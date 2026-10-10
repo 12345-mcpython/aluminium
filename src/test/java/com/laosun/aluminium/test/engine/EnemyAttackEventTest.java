@@ -9,11 +9,11 @@ import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.models.enemy.EnemySkill;
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import java.util.List;
-import java.util.Random;
 
 /** F-5: an enemy's attack raises ENEMY_ATTACK, and the event names the unit it hit. */
 public class EnemyAttackEventTest {
@@ -24,7 +24,7 @@ public class EnemyAttackEventTest {
     public void theEnemyAttackIsAnnouncedToTheUnitItHit() {
         Enemy enemy = EnemyFactory.create(1002011, 100, 1);
         Battle battle = new Battle(List.of(CharacterFactory.create(HIT, 80), CharacterFactory.create(SPARED, 80)),
-                List.of(enemy), new Random(0));
+                List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         Character hit = battle.characters.get(0);

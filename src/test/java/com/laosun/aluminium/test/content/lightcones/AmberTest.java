@@ -15,7 +15,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Light cone 20003: "防御力提高#1%。当装备者当前生命值百分比小于#2%时，其防御力额外提高#3%" at rank 5.
@@ -47,7 +46,7 @@ public class AmberTest {
     private static double[] defence(double fraction) {
         Character unit = CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(20003, LEVEL, false, 5));
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(unit), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         if (fraction > 0) {
             int guard = 0;

@@ -2,6 +2,7 @@ package com.laosun.aluminium.test.content.memosprites;
 
 
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.beans.EffectSpec;
@@ -26,7 +27,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * a monster's summon roster becomes a combatant that can actually be put on the field.
@@ -156,7 +156,7 @@ public class SummonTest {
     /** Two calls give two independent units - a roster entry is not a shared singleton. */
     @Test
     public void eachSummonIsItsOwnInstance() {
-        Battle battle = new Battle(List.of(hero()), List.of(master()), new Random(0));
+        Battle battle = new Battle(List.of(hero()), List.of(master()), BattleFixture.seeded());
 
         Summon first = battle.summon(battle.enemies.getFirst(), MINION, GROUP);
         Summon second = battle.summon(battle.enemies.getFirst(), MINION, GROUP);
@@ -315,7 +315,7 @@ public class SummonTest {
     @Test
     public void aSummonLeavingWithItsMasterIsNotAKill() {
         Character hero = heroWithKillReward();
-        Battle battle = new Battle(List.of(hero), List.of(master()), new Random(0));
+        Battle battle = new Battle(List.of(hero), List.of(master()), BattleFixture.seeded());
         battle.startBattle();
         Summon summon = battle.summon(battle.enemyUnits().getFirst(), MINION, GROUP);
         battle.processRequests();
@@ -336,7 +336,7 @@ public class SummonTest {
     @Test
     public void aSummonThatIsActuallyKilledDoesPayTheReward() {
         Character hero = heroWithKillReward();
-        Battle battle = new Battle(List.of(hero), List.of(master()), new Random(0));
+        Battle battle = new Battle(List.of(hero), List.of(master()), BattleFixture.seeded());
         battle.startBattle();
         Summon summon = battle.summon(battle.enemyUnits().getFirst(), MINION, GROUP);
         battle.processRequests();
@@ -366,7 +366,7 @@ public class SummonTest {
     @Test
     public void theCampComesFromTheMaster() {
         Character hero = hero();
-        Battle battle = new Battle(List.of(hero), List.of(master()), new Random(0));
+        Battle battle = new Battle(List.of(hero), List.of(master()), BattleFixture.seeded());
 
         Summon ours = battle.summon(hero, MINION, GROUP);
         Summon theirs = battle.summon(battle.enemyUnits().getFirst(), MINION, GROUP);
@@ -418,7 +418,7 @@ public class SummonTest {
 
     /** One hero that out-damages everything, and one real master. */
     private static Battle startedBattle() {
-        Battle battle = new Battle(List.of(hero()), List.of(master()), new Random(0));
+        Battle battle = new Battle(List.of(hero()), List.of(master()), BattleFixture.seeded());
         battle.startBattle();
         return battle;
     }

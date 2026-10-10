@@ -16,7 +16,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Elation slice 1b: {@code ELATION_DAMAGE_BOOST} is folded into the base of an Elation instance, because that damage
@@ -36,7 +35,7 @@ public class ElationBoostTest {
     private void build(double boost) {
         wearer = CharacterFactory.create(WEARER, LEVEL);
         enemy = BattleFixture.monster();
-        battle = new Battle(List.of(wearer, CharacterFactory.create(ALLY, LEVEL)), List.of(enemy), new Random(0));
+        battle = new Battle(List.of(wearer, CharacterFactory.create(ALLY, LEVEL)), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         if (boost != 0) {
             EffectSpec spec = new EffectSpec();

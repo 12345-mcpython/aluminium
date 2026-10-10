@@ -18,7 +18,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * {@code TAUNT} - "使目标陷入嘲讽状态，持续N回合" (make the target enter the taunted state for N turns).
@@ -40,7 +39,7 @@ public class TauntOpTest {
     public void tauntAttachesTheMarkerForTheStatedTurns() {
         Character owner = characterWith(tauntRule(2));
         Enemy enemy = dummy();
-        Battle battle = new Battle(List.of(owner), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(owner), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
 
         battle.fireTriggers(TriggerEvent.ALLY_ATTACK, owner, enemy, 1, 0);
@@ -55,7 +54,7 @@ public class TauntOpTest {
     public void tauntGoesOnTheResolvedTargetAndNowhereElse() {
         Character owner = characterWith(tauntRule(1));
         Enemy enemy = dummy();
-        Battle battle = new Battle(List.of(owner), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(owner), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
 
         battle.fireTriggers(TriggerEvent.ALLY_ATTACK, owner, enemy, 1, 0);

@@ -10,11 +10,11 @@ import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * 1306 Sparkle: "当我方目标每消耗 1 点战技点，花火获得 1 层[幻相]" -- PER POINT, not per spending action.
@@ -30,7 +30,7 @@ public class SparklePerPointTest {
     private static int phantasmAfter(int pointsSpent) {
         Character c = CharacterFactory.create(SPARKLE, LEVEL, true, null, null);
         Enemy e = EnemyFactory.create(1002011, 90, 1);
-        Battle b = new Battle(List.of(c), List.of(e), new Random(0));
+        Battle b = new Battle(List.of(c), List.of(e), BattleFixture.seeded());
         b.startBattle();
         TriggerTable.TriggerContext ctx = new TriggerTable.TriggerContext(c, c, e, 1, pointsSpent, null, b,
                 SkillCategory.UNSPECIFIED);

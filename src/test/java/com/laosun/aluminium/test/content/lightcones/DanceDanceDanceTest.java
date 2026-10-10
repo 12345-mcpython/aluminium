@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /** Light cone 21018: after the wearer's ultimate, the whole party's action is advanced. */
 public class DanceDanceDanceTest {
@@ -55,7 +54,7 @@ public class DanceDanceDanceTest {
         Character wearer = CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(CONE, LEVEL, false, 1));
         Character ally = CharacterFactory.create(ALLY, LEVEL);
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(wearer, ally), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(wearer, ally), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         double before = timeRemaining(battle, ally);
         battle.fireTriggers(TriggerEvent.ULT_CAST, wearer, enemy, 0, 0);
@@ -68,7 +67,7 @@ public class DanceDanceDanceTest {
         Character plainAlly = CharacterFactory.create(ALLY, LEVEL);
         Character plainWearer = CharacterFactory.create(WEARER, LEVEL);
         Enemy other = BattleFixture.monster();
-        Battle plain = new Battle(List.of(plainWearer, plainAlly), List.of(other), new Random(0));
+        Battle plain = new Battle(List.of(plainWearer, plainAlly), List.of(other), BattleFixture.seeded());
         plain.startBattle();
         double plainBefore = timeRemaining(plain, plainAlly);
         plain.fireTriggers(TriggerEvent.ULT_CAST, plainWearer, other, 0, 0);

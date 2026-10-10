@@ -7,11 +7,11 @@ import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.skill.Skill;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * 1309 Robin (知更鸟): the first character whose <b>trace extra abilities</b> are wired, and the first
@@ -124,7 +124,7 @@ public class RobinTraceTest {
         if (!keepRules) {
             robin.setTriggerTable(new TriggerTable(ROBIN, List.of()));
         }
-        Battle battle = new Battle(List.of(robin, control), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(robin, control), List.of(dummy()), BattleFixture.seeded());
         battle.startBattle();
         return battle;
     }

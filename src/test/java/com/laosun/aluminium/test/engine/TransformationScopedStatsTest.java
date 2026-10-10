@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * 1408: "卡厄斯兰那的物理属性抗性穿透提高 20%" and "变身期间攻击力提高 80%，生命上限提高 20%"
@@ -32,7 +31,7 @@ public class TransformationScopedStatsTest {
     public void theBlockIsWorthWhatTheSentencesSay() {
         Character owner = CharacterFactory.create(OWNER, 80, false, null, null, 0);
         Battle battle = new Battle(List.of(owner),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
 
@@ -58,7 +57,7 @@ public class TransformationScopedStatsTest {
     public void theBlockDiesWithTheState() {
         Character owner = CharacterFactory.create(OWNER, 80, false, null, null, 0);
         Battle battle = new Battle(List.of(owner),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
 

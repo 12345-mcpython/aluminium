@@ -13,7 +13,6 @@ import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import java.util.List;
-import java.util.Random;
 
 /**
  * `SPEND_RESOURCE{overflow_only: true}` spends only the tier above the cap.
@@ -50,7 +49,7 @@ public class OverflowOnlySpendTest {
     private static int[] run(int start) {
         Character spare = CharacterFactory.create(SPARE, LEVEL);
         Battle battle = new Battle(List.of(spare),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         spare = battle.characters.getFirst();

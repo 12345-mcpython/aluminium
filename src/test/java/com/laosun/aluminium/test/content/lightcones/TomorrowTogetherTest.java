@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Light cone 2200: after the wearer's Ultimate, the WHOLE party gains 8% elation damage for 1 turn.
@@ -38,7 +37,7 @@ public class TomorrowTogetherTest {
                 : CharacterFactory.create(WEARER, LEVEL);
         ally = CharacterFactory.create(ALLY, LEVEL);
         enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(wearer, ally), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(wearer, ally), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         return battle;
     }

@@ -11,11 +11,11 @@ import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.buff.DotBuff;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * 1210 Guinaifen (桂乃芬): the first character whose file is <b>content</b> for the damage-instance vocabulary.
@@ -117,7 +117,7 @@ public class GuinaifenTraceTest {
     /** Builds a battle from a roster, with crit and typed boosts neutralised on everybody. */
     private static Battle newBattle(List<Character> team) {
         team.forEach(GuinaifenTraceTest::neutralise);
-        Battle battle = new Battle(team, List.of(dummy()), new Random(0));
+        Battle battle = new Battle(team, List.of(dummy()), BattleFixture.seeded());
         battle.startBattle();
         return battle;
     }
@@ -128,7 +128,7 @@ public class GuinaifenTraceTest {
         if (!keepRules) {
             hero.setTriggerTable(new TriggerTable(GUINAIFEN, List.of()));
         }
-        Battle battle = new Battle(List.of(hero), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(hero), List.of(dummy()), BattleFixture.seeded());
         battle.startBattle();
         return battle.queue.snapshot().stream()
                 .filter(signal -> signal.getCanHit() == hero)

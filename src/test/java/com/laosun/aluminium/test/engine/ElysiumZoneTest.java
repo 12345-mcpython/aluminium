@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * 1415 Cyrene (昔涟)'s zone: "while the zone lasts, every time all of our targets deal 1 instance of damage, they additionally deal 1 instance of true damage equal to 24% of the original damage".
@@ -47,7 +46,7 @@ public class ElysiumZoneTest {
         Character ally = CharacterFactory.create(ALLY, LEVEL, false, null, null, 0);
         ally.setTriggerTable(new TriggerTable(ALLY, List.of()));   // the ally contributes nothing of its own
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(cyrene, ally), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(cyrene, ally), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         if (zone) {
             // Her skill is a support skill (no damage of its own), so announcing the cast is exactly what the marker rule needs.

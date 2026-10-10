@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Relic 108, 4 pieces: "无视其 10% 防御力，若目标拥有量子属性弱点则额外无视 10%" -- an INSTANCE-scoped modifier.
@@ -40,7 +39,7 @@ public class QuantumWeaknessIgnoreTest {
         enemy.setStanceWeak(forceWeakness
                 ? java.util.Set.of(DamageElement.QUANTUM)
                 : java.util.Set.of(DamageElement.FIRE));
-        Battle battle = new Battle(List.of(unit), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         Damage damage = new Damage(unit, enemy, DamageElement.QUANTUM, DamageType.NORMAL, 1000);
         battle.applyDamage(enemy, damage);

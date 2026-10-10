@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * 1415's memosprite skill 20 "献予'诡计'之诗": "使赛飞儿造成的伤害提高 #1%".
@@ -45,7 +44,7 @@ public class TrickeryOdeDamageTest {
         Character cyrene = CharacterFactory.create(CYRENE, LEVEL);
         Character cipher = CharacterFactory.create(CIPHER, LEVEL);
         Battle battle = new Battle(List.of(cyrene, cipher),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         cyrene = battle.characters.get(0);

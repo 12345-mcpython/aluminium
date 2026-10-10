@@ -18,7 +18,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * A {@code MODIFY_ATTR} whose value is <b>derived</b>: {@code scale: "self_attr:<ATTRIBUTE>"}.
@@ -157,7 +156,7 @@ public class DerivedModifierTest {
         ally.setAttribute(AttributeType.BREAKING_EFFECT, new DoubleValue(9.0));
         owner.setTriggerTable(new TriggerTable(OWNER, List.of(
                 rule("SKILL_CAST", derived("BREAKING_EFFECT", "BREAKING_EFFECT", 0.5, 0.0, "target")))));
-        Battle battle = new Battle(List.of(owner, ally), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(owner, ally), List.of(dummy()), BattleFixture.seeded());
         battle.startBattle();
         double allyBare = ally.getAttribute(AttributeType.BREAKING_EFFECT).get();
 
@@ -265,7 +264,7 @@ public class DerivedModifierTest {
         Character dahlia = CharacterFactory.create(DAHLIA, LEVEL);
         Character first = CharacterFactory.create(OWNER, LEVEL);
         Character second = CharacterFactory.create(ALLY, LEVEL);
-        Battle battle = new Battle(List.of(dahlia, first, second), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(dahlia, first, second), List.of(dummy()), BattleFixture.seeded());
         double herBreak = dahlia.getAttribute(AttributeType.BREAKING_EFFECT).get();
         double firstBare = first.getAttribute(AttributeType.BREAKING_EFFECT).get();
         double secondBare = second.getAttribute(AttributeType.BREAKING_EFFECT).get();
@@ -294,7 +293,7 @@ public class DerivedModifierTest {
         Character ally = CharacterFactory.create(ALLY, LEVEL);
         owner.setTriggerTable(new TriggerTable(OWNER, List.of(rule)));
         tweak.accept(owner);
-        Battle battle = new Battle(List.of(owner, ally), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(owner, ally), List.of(dummy()), BattleFixture.seeded());
         battle.startBattle();
         return battle;
     }

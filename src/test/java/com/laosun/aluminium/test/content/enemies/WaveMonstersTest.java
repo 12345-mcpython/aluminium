@@ -3,6 +3,7 @@ package com.laosun.aluminium.test.content.enemies;
 
 import com.laosun.aluminium.test.content.lightcones.SheAlreadyShutHerEyesTest;
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.beans.EffectSpec;
@@ -19,7 +20,6 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 /**
  * "若施放前目标被消灭则对<b>新入场</b>的敌方目标施放" -- the selector `wave_monsters`.
@@ -49,7 +49,7 @@ public class WaveMonstersTest {
 
         Character owner = CharacterFactory.create(OWNER, LEVEL);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
-        Battle battle = new Battle(List.of(owner, ally), new ArrayList<>(), new Random(0));
+        Battle battle = new Battle(List.of(owner, ally), new ArrayList<>(), BattleFixture.seeded());
 
         // the rule the selector is read through: every enemy that entered with this wave gains 100 speed
         EffectSpec effect = new EffectSpec();

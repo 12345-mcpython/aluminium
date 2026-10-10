@@ -18,7 +18,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Sunday's (1313) Skill "纸醉金迷" (131302) - the shipped content the two conditions here were built for.
@@ -72,7 +71,7 @@ public class SundaySkillTest {
     public void theChosenAllyAndItsSummonActImmediately() {
         Character sunday = CharacterFactory.create(SUNDAY, LEVEL);
         Character ally = CharacterFactory.create(MEMOSPRITE_ALLY, LEVEL);
-        Battle battle = new Battle(List.of(sunday, ally), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(sunday, ally), List.of(dummy()), BattleFixture.seeded());
         battle.startBattle();
         Summon evey = battle.summonMemosprite(ally);
         battle.processRequests();
@@ -96,7 +95,7 @@ public class SundaySkillTest {
     public void aHarmonyTargetIsNotAdvanced() {
         Character sunday = CharacterFactory.create(SUNDAY, LEVEL);
         Character harmony = CharacterFactory.create(HARMONY_ALLY, LEVEL);
-        Battle battle = new Battle(List.of(sunday, harmony), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(sunday, harmony), List.of(dummy()), BattleFixture.seeded());
         battle.startBattle();
         double harmonyBefore = timeRemaining(battle, harmony);
 
@@ -111,7 +110,7 @@ public class SundaySkillTest {
     public void theShareIsStillGrantedToAHarmonyTarget() {
         Character sunday = CharacterFactory.create(SUNDAY, LEVEL);
         Character harmony = CharacterFactory.create(HARMONY_ALLY, LEVEL);
-        Battle battle = new Battle(List.of(sunday, harmony), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(sunday, harmony), List.of(dummy()), BattleFixture.seeded());
         battle.startBattle();
 
         cast(battle, sunday, harmony);
@@ -138,7 +137,7 @@ public class SundaySkillTest {
     public void theShareLastsTheStatedTurns() {
         Character sunday = CharacterFactory.create(SUNDAY, LEVEL);
         Character ally = CharacterFactory.create(ERUDITION_ALLY, LEVEL);
-        Battle battle = new Battle(List.of(sunday, ally), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(sunday, ally), List.of(dummy()), BattleFixture.seeded());
         battle.startBattle();
 
         cast(battle, sunday, ally);
@@ -165,7 +164,7 @@ public class SundaySkillTest {
 
         //  ...and casting it on somebody new takes it off the previous holder: "仅对 ...最新的施放目标生效".
         Character second = CharacterFactory.create(ERUDITION_ALLY, LEVEL);
-        Battle next = new Battle(List.of(sunday, first, second), List.of(dummy()), new Random(0));
+        Battle next = new Battle(List.of(sunday, first, second), List.of(dummy()), BattleFixture.seeded());
         next.startBattle();
         next.stepForward();
         next.beforeMove();
@@ -190,7 +189,7 @@ public class SundaySkillTest {
     public void theUltimateRestoresAShareOfTheAllysMaxEnergy() {
         Character sunday = CharacterFactory.create(SUNDAY, LEVEL);
         Character ally = CharacterFactory.create(ERUDITION_ALLY, LEVEL);
-        Battle battle = new Battle(List.of(sunday, ally), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(sunday, ally), List.of(dummy()), BattleFixture.seeded());
         battle.startBattle();
         double before = ally.getCurrentEnergy();
         double max = ally.getMaxEnergy();
@@ -277,7 +276,7 @@ public class SundaySkillTest {
     private static double boostAfterCastAt(int allyCid, boolean withMemosprite) {
         Character sunday = CharacterFactory.create(SUNDAY, LEVEL);
         Character ally = CharacterFactory.create(allyCid, LEVEL);
-        Battle battle = new Battle(List.of(sunday, ally), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(sunday, ally), List.of(dummy()), BattleFixture.seeded());
         battle.startBattle();
         if (withMemosprite) {
             battle.summonMemosprite(ally);
@@ -319,7 +318,7 @@ public class SundaySkillTest {
         Character sunday = CharacterFactory.create(SUNDAY, LEVEL);
         Character ally = CharacterFactory.create(allyCid, LEVEL);
         ally.setAttribute(AttributeType.SPEED, new DoubleValue(150));
-        Battle battle = new Battle(List.of(sunday, ally), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(sunday, ally), List.of(dummy()), BattleFixture.seeded());
         battle.startBattle();
         castUltimate(battle, sunday, ally);
         return battle;

@@ -12,11 +12,11 @@ import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.buff.ReductionBuff;
 import com.laosun.aluminium.models.buff.VulnerabilityBuff;
 import com.laosun.aluminium.models.event.DamageEvent;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * -acceptance: buffs inject zones through {@code DamageEvent} during settlement.
@@ -42,7 +42,7 @@ public class DamageHookTest {
 
     private static double settle(Character attacker, Enemy defender, DamageType type) {
         Damage damage = new Damage(attacker, defender, DamageElement.FIRE, type, BASE);
-        return new Battle(List.of(attacker), List.of(defender), new Random(0))
+        return new Battle(List.of(attacker), List.of(defender), BattleFixture.seeded())
                 .applyDamage(defender, damage);
     }
 

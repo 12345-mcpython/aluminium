@@ -7,11 +7,11 @@ import com.laosun.aluminium.models.Weapon;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Two more light cones whose non-property halves land on scoped boosts, judged per rank.
@@ -50,7 +50,7 @@ public class LightConeBoostTwoTest {
         Character wearer = CharacterFactory.create(WEARER, LEVEL, true,
                 Weapon.build(weaponId, LEVEL, false, rank));
         Enemy enemy = EnemyFactory.create(1002011, 90, 1);
-        Battle battle = new Battle(List.of(wearer), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(wearer), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         return wearer.getAttribute(attribute).get();
     }

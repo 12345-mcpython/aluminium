@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * "奇袭结束后，使刻律德菈获得 1 点充能".
@@ -32,7 +31,7 @@ public class OdeToLawChargeTest {
         Character cerydra = CharacterFactory.create(CERYDRA, LEVEL, false, null, null, 0);
         Character cyrene = CharacterFactory.create(CYRENE, LEVEL, false, null, null, 0);
         Enemy victim = BattleFixture.monster();
-        Battle battle = new Battle(List.of(cerydra, cyrene), List.of(victim), new Random(0));
+        Battle battle = new Battle(List.of(cerydra, cyrene), List.of(victim), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
 

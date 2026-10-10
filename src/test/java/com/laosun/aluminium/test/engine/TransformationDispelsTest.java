@@ -16,7 +16,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * 1408："解除自身所有负面效果，随后造成…".
@@ -54,7 +53,7 @@ public class TransformationDispelsTest {
                 TriggerSpecs.rule(TriggerEvent.SKILL_CAST.name(), List.of("actor == self"), dot()))));
 
         Battle battle = new Battle(List.of(owner, applier),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
 

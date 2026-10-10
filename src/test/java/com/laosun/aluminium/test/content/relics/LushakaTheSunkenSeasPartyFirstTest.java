@@ -9,11 +9,11 @@ import com.laosun.aluminium.models.TriggerInterpreter;
 import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Relic 31: "若装备者不是队伍第一名，则使队伍第一名的攻击力提高 12%".
@@ -46,7 +46,7 @@ public class LushakaTheSunkenSeasPartyFirstTest {
         Character ally = CharacterFactory.create(1001, LEVEL);
         Character wearer = CharacterFactory.create(1210, LEVEL);
         Battle battle = new Battle(List.of(ally, wearer), List.of(EnemyFactory.create(1002011, 90, 1)),
-                new Random(0));
+                BattleFixture.seeded());
         battle.startBattle();
         Assertions.assertSame(ally, battle.characters.getFirst(),
                 "the party list order is what 'the first character' means");

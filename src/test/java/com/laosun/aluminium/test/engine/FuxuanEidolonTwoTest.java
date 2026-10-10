@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * 1208: "when [穷观阵] is opened, if one of our targets takes lethal damage ... immediately restore HP equal to 0% of its own Max HP.
@@ -32,7 +31,7 @@ public class FuxuanEidolonTwoTest {
         Character her = CharacterFactory.create(FUXUAN, 80, false, null, null, 2);
         Character ally = CharacterFactory.create(ALLY, 80, false, null, null, 0);
         Battle battle = new Battle(List.of(her, ally),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
 

@@ -3,6 +3,7 @@ package com.laosun.aluminium.test.content.characters;
 
 import com.laosun.aluminium.test.engine.SoftAggroWeightTest;
 import com.laosun.aluminium.test.support.TestTurns;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.data.TriggerTables;
 import com.laosun.aluminium.enums.AttributeType;
@@ -22,7 +23,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * March 7th (1001) - a kit whose clauses each needed a different engine capability, and what that looks like in the data.
@@ -59,7 +59,7 @@ public class March7thKitTest {
     public void herSkillCleansesOneDebuffFromTheAimedAlly() {
         Character march = CharacterFactory.create(MARCH, LEVEL);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
-        Battle battle = new Battle(List.of(march, ally), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(march, ally), List.of(dummy()), BattleFixture.seeded());
         battle.startBattle();
         ally.getBuffManager().addBuff(new DotBuff(march, DamageElement.WIND, 100, 3));
         Assertions.assertEquals(1, ally.getBuffManager().debuffCount(), "precondition: the ally carries one debuff");
@@ -80,7 +80,7 @@ public class March7thKitTest {
     public void herSkillShieldsTheAimedAllyFromHerOwnDefence() {
         Character march = CharacterFactory.create(MARCH, LEVEL);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
-        Battle battle = new Battle(List.of(march, ally), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(march, ally), List.of(dummy()), BattleFixture.seeded());
         battle.startBattle();
         double expected = 0.57 * march.getAttribute(com.laosun.aluminium.enums.AttributeType.DEFENCE).get() + 760;
 
@@ -162,7 +162,7 @@ public class March7thKitTest {
         march.setAttribute(AttributeType.EFFECT_HIT_RATE, new DoubleValue(1.0));
         Enemy enemy = EnemyFactory.create(ORDINARY_MONSTER, 90, 1);
         enemy.setAttribute(AttributeType.EFFECT_RESISTANCE, new DoubleValue(0));
-        Battle battle = new Battle(List.of(march), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(march), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
 
         battle.castImmediate(march.getSkills().get(com.laosun.aluminium.enums.SkillType.ULTRA), march,
@@ -193,7 +193,7 @@ public class March7thKitTest {
         Character march = CharacterFactory.create(MARCH, LEVEL);
         march.setAttribute(AttributeType.EFFECT_HIT_RATE, new DoubleValue(10.0));
         Enemy immune = dummy();
-        Battle battle = new Battle(List.of(march), List.of(immune), new Random(0));
+        Battle battle = new Battle(List.of(march), List.of(immune), BattleFixture.seeded());
         battle.startBattle();
 
         battle.castImmediate(march.getSkills().get(com.laosun.aluminium.enums.SkillType.ULTRA), march,
@@ -221,7 +221,7 @@ public class March7thKitTest {
     public void herSecondEidolonShieldsTheMostHurtAllyAtBattleStart() {
         Character march = CharacterFactory.create(MARCH, LEVEL, true, null, null, 2);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
-        Battle battle = new Battle(List.of(march, ally), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(march, ally), List.of(dummy()), BattleFixture.seeded());
 
         battle.startBattle();
 
@@ -237,7 +237,7 @@ public class March7thKitTest {
     @Test
     public void theSecondEidolonsShieldDoesNotExistBelowItsRank() {
         Character march = CharacterFactory.create(MARCH, LEVEL, true, null, null, 1);
-        Battle battle = new Battle(List.of(march), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(march), List.of(dummy()), BattleFixture.seeded());
 
         battle.startBattle();
 
@@ -318,7 +318,7 @@ public class March7thKitTest {
             this.march = CharacterFactory.create(MARCH, LEVEL);
             this.ally = CharacterFactory.create(ALLY, LEVEL);
             this.enemy = dummy();
-            this.battle = new Battle(List.of(march, ally), List.of(enemy), new Random(0));
+            this.battle = new Battle(List.of(march, ally), List.of(enemy), BattleFixture.seeded());
             battle.startBattle();
         }
 

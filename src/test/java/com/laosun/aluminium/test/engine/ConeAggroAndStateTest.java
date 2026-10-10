@@ -17,7 +17,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Cones 23030 (aggro, whose number only the upstream data states, plus a follow-up stack) and 23032 (a state plus a
@@ -35,7 +34,7 @@ public class ConeAggroAndStateTest {
     public void theAggroRatioComesFromTheUpstreamRow() {
         Character unit = wearer(23030);
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(unit), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         double aggro = unit.getAttribute(AttributeType.AGGRO_ADDED_RATIO).get();
         System.out.println("[23030] aggro added ratio=" + aggro);
@@ -49,7 +48,7 @@ public class ConeAggroAndStateTest {
     public void theFireDanceStacksRaiseFollowUpDamage() {
         Character unit = wearer(23030);
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(unit), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         // Deterministic instances: never crit, so the only variable is FOLLOW_UP_DAMAGE_BOOST.
         double noStack = battle.applyAdditionalDamage(unit, enemy, DamageElement.FIRE, 1000, 0.0, 1.5);
@@ -80,7 +79,7 @@ public class ConeAggroAndStateTest {
     private double hitWith(int cone, boolean applyState, double breakingEffectBonus) {
         Character unit = wearer(cone);
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(unit), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         if (breakingEffectBonus > 0) {
             unit.getAttribute(AttributeType.BREAKING_EFFECT)

@@ -17,7 +17,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Light cone 21066: while the wearer casts an ELATION skill, its damage ignores 8% of the target's defence.
@@ -43,7 +42,7 @@ public class ALittleGetawayTest {
         // Crit pinned to 0: two instances must differ only by the defence zone (a crit is x1.5, measured last round).
         wearer.getAttribute(AttributeType.CRIT_CHANCE)
                 .addModifier(DoubleValue.Modifier.pure(-1.0, DoubleValue.Modifier.ModifierSource.BUFF, 210660));
-        Battle battle = new Battle(List.of(wearer), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(wearer), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         return battle;
     }

@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Character 1506 (Silver Wolf LV.999): her ZONE (结界) - both halves, which the registration had called impossible.
@@ -90,7 +89,7 @@ public class SilverWolfLV999ZoneTest {
     private static Battle newBattle() {
         Battle battle = new Battle(
                 List.of(CharacterFactory.create(WOLF, 80), CharacterFactory.create(ALLY, 80)),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         return battle;

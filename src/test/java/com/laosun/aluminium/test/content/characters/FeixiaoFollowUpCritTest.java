@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * 1220's trace (行迹) "解形" (1220102): "the follow-up attack's CRIT DMG is increased by 36%".
@@ -49,7 +48,7 @@ public class FeixiaoFollowUpCritTest {
     public void followUpCritDamageRisesAndPlainDamageDoesNot() {
         Character unit = CharacterFactory.create(WEARER, LEVEL);
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(unit), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         // NOT fixedCrit: that path bypasses the crit zone, so an instance's extra crit damage stays invisible
         // (measured: the ratio stayed exactly 1.0). A guaranteed crit instead -- the zone runs and the roll cannot fail.

@@ -16,7 +16,6 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 /**
  * The `enemy_count` condition variable: "the number of enemy targets on the field", whose reader is 1413 Evernight (长夜月)'s talent.
@@ -61,7 +60,7 @@ public class EnemyCountConditionTest {
         for (int i = 0; i < enemies; i++) {
             foes.add(BattleFixture.monster());
         }
-        Battle battle = new Battle(List.of(wearer), foes, new Random(0));
+        Battle battle = new Battle(List.of(wearer), foes, BattleFixture.seeded());
         battle.startBattle();
         battle.currentMove = new Signal(wearer);
         battle.beforeMove();

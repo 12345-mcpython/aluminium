@@ -11,11 +11,11 @@ import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Damage;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 import java.util.Set;
 
 /**
@@ -58,7 +58,7 @@ public class EnemyFactoryTest {
     public void resistanceFlowsIntoTheDamagePipeline() {
         Character attacker = Character.fromAttributes("attacker", 1000, 100, 100, 100);  // ATK 100 / Lv80
         Enemy iceEdge = EnemyFactory.create(1002011, 90, 1);
-        Battle battle = new Battle(List.of(attacker), List.of(iceEdge), new Random(0));
+        Battle battle = new Battle(List.of(attacker), List.of(iceEdge), BattleFixture.seeded());
 
         double defence = iceEdge.getAttribute(AttributeType.DEFENCE).get();
         Damage iceHit = new Damage(attacker, iceEdge, DamageElement.ICE, DamageType.NORMAL, 1000);

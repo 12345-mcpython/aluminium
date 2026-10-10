@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * 1415 memosprite skill 12 (the ode of romance), the clause with no duration attached.
@@ -71,7 +70,7 @@ public class OdeOfRomanceEnergyTest {
         Character cyrene = CharacterFactory.create(CYRENE, LEVEL);
         Character aglaea = CharacterFactory.create(AGLAEA, LEVEL);
         Battle battle = new Battle(List.of(cyrene, aglaea),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         return battle;

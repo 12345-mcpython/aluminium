@@ -17,7 +17,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Light cone 23011: at the start of EVERY WAVE, each ally heals a share of its OWN lost HP.
@@ -43,7 +42,7 @@ public class SheAlreadyShutHerEyesTest {
                 : CharacterFactory.create(WEARER, LEVEL);
         ally = CharacterFactory.create(ALLY, LEVEL);
         enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(wearer, ally), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(wearer, ally), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         return battle;
     }
@@ -102,7 +101,7 @@ public class SheAlreadyShutHerEyesTest {
         // Note: Its own party: the fixture fields belong to the other cases, and a unit must not be in two battles.
         Character waveWearer = CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(CONE, LEVEL, false, 1));
         Character waveAlly = CharacterFactory.create(ALLY, LEVEL);
-        Battle battle = new Battle(List.of(waveWearer, waveAlly), new java.util.ArrayList<>(), new Random(0));
+        Battle battle = new Battle(List.of(waveWearer, waveAlly), new java.util.ArrayList<>(), BattleFixture.seeded());
         new com.laosun.aluminium.models.WaveManager(battle, stage);
         Enemy source = BattleFixture.monster();
         battle.applyDamage(waveAlly, new Damage(source, waveAlly, DamageElement.FIRE, DamageType.NORMAL, 400));

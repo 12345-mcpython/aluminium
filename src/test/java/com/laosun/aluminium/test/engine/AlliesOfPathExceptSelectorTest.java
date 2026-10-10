@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * The {@code allies_of_path_except:<PATH>:<WHO>,<WHO>} selector: the allies of a Path, minus named units.
@@ -137,7 +136,7 @@ public class AlliesOfPathExceptSelectorTest {
             battle = new Battle(
                     List.of(CharacterFactory.create(PEARL, LEVEL), CharacterFactory.create(ELATION_MATE, LEVEL),
                             CharacterFactory.create(HUNTER, LEVEL), CharacterFactory.create(1101, LEVEL)),
-                    List.of(BattleFixture.monster()), new Random(0));
+                    List.of(BattleFixture.monster()), BattleFixture.seeded());
             battle.startBattle();
             battle.processRequests();
             owner = battle.characters.get(0);

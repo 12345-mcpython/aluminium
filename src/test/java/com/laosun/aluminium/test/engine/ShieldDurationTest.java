@@ -19,7 +19,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * How long a <b>shield</b> lasts, and the {@code has_shield} condition that asks whether one is still up.
@@ -267,7 +266,7 @@ public class ShieldDurationTest {
             // rules built here and nothing else.
             caster.setTriggerTable(new TriggerTable(casterCid, List.of(specs)));
             ally.setTriggerTable(new TriggerTable(allyCid, List.of()));
-            this.battle = new Battle(List.of(caster, ally), List.of(dummy()), new Random(0));
+            this.battle = new Battle(List.of(caster, ally), List.of(dummy()), BattleFixture.seeded());
             battle.startBattle();
         }
 

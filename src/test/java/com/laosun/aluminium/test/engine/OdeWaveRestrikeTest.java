@@ -16,7 +16,6 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 /**
  * 1415's memosprite skill 8, the fifth clause: "if the target is defeated before the cast, then cast it on a <b>newly entered</b> enemy target".
@@ -48,7 +47,7 @@ public class OdeWaveRestrikeTest {
 
         Character cyrene = CharacterFactory.create(CYRENE, LEVEL);
         Character mydei = CharacterFactory.create(MYDEI, LEVEL);
-        Battle battle = new Battle(List.of(cyrene, mydei), new ArrayList<>(), new Random(0));
+        Battle battle = new Battle(List.of(cyrene, mydei), new ArrayList<>(), BattleFixture.seeded());
         new WaveManager(battle, stage);
 
         // the ode reaches him: the mark goes on
@@ -78,7 +77,7 @@ public class OdeWaveRestrikeTest {
         var stage = Constant.stages().get(MULTI_WAVE_STAGE);
 
         Character mydei = CharacterFactory.create(MYDEI, LEVEL);
-        Battle battle = new Battle(List.of(mydei, CharacterFactory.create(1002, LEVEL)), new ArrayList<>(), new Random(0));
+        Battle battle = new Battle(List.of(mydei, CharacterFactory.create(1002, LEVEL)), new ArrayList<>(), BattleFixture.seeded());
         new WaveManager(battle, stage);
         Assertions.assertFalse(mydei.getBuffManager().hasState(MARK), "precondition: no ode has reached him");
 

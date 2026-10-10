@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * "触发行迹…的获得好活当赏效果时，额外获得等同于本次的 50%" - 1505 Eidolon (星魂).
@@ -47,7 +46,7 @@ public class ElationRewardBoostTest {
     private static int rewardAfterGain(int eidolonRank, int energy) {
         Character owner = CharacterFactory.create(OWNER, 80, false, null, null, eidolonRank);
         Battle battle = new Battle(List.of(owner),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         if (energy > 0) {

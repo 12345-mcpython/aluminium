@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * 1403 Tribbie's (缇宝) zone deals its own additional damage.
@@ -61,7 +60,7 @@ public class ZoneAdditionalDamageTest {
         Character tribbie = CharacterFactory.create(TRIBBIE, LEVEL);
         Character attacker = CharacterFactory.create(ATTACKER, LEVEL);
         Battle battle = new Battle(List.of(tribbie, attacker),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         tribbie = battle.characters.getFirst();

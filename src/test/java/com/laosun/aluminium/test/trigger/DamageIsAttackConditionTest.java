@@ -18,7 +18,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * `damage_is_attack`: "the instance being settled counts as an attack".
@@ -40,7 +39,7 @@ public class DamageIsAttackConditionTest {
         TriggerSpec rule = TriggerSpecs.rule("DEALING_DAMAGE", List.of("damage_is_attack"),
                 TriggerSpecs.modifyAttr("ATTACK", 0.1, 1));
         wearer.setTriggerTable(new TriggerTable(WEARER, List.of(rule)));
-        Battle battle = new Battle(List.of(wearer), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(wearer), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         return battle;
     }

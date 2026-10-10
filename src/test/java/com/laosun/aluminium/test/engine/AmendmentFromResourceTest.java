@@ -13,7 +13,6 @@ import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import java.util.List;
-import java.util.Random;
 
 /**
  * `MODIFY_RULE{effect_percent_from_resource}` sizes an amendment from a resource.
@@ -59,7 +58,7 @@ public class AmendmentFromResourceTest {
     private static double gained(int basisPoints) {
         Character spare = CharacterFactory.create(SPARE, LEVEL);
         Battle battle = new Battle(List.of(spare),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         spare = battle.characters.getFirst();

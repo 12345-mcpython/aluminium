@@ -2,6 +2,7 @@ package com.laosun.aluminium.test.content.characters;
 
 
 import com.laosun.aluminium.test.support.TestCharacters;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.data.TriggerTables;
 import com.laosun.aluminium.enums.AttributeType;
@@ -19,7 +20,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Himeko (姬子) (1003) - the first character whose kit is built on a <b>declared resource</b>.
@@ -68,7 +68,7 @@ public class HimekoChargeTest {
         Assertions.assertEquals(0, himeko.getResources().value(CHARGE),
                 "precondition: the declaration alone starts her at 0 -- the sentence is a rule, not an initial value");
 
-        Battle battle = new Battle(List.of(himeko), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(himeko), List.of(dummy()), BattleFixture.seeded());
         battle.startBattle();
 
         Assertions.assertEquals(1, himeko.getResources().value(CHARGE), "「战斗开始时获得1点充能」 (gains 1 point of Charge at the start of battle)");
@@ -84,7 +84,7 @@ public class HimekoChargeTest {
     public void abreakChargesHerAndTheCapHolds() {
         Character himeko = CharacterFactory.create(HIMEKO, LEVEL);
         Enemy iceEdge = dummy();
-        Battle battle = new Battle(List.of(himeko), List.of(iceEdge), new Random(0));
+        Battle battle = new Battle(List.of(himeko), List.of(iceEdge), BattleFixture.seeded());
         battle.startBattle();
 
         battle.castImmediate(new DefaultSkill(HIMEKO, 1, 1), himeko, List.of(iceEdge));
@@ -117,7 +117,7 @@ public class HimekoChargeTest {
         Character ally = CharacterFactory.create(ALLY, LEVEL);
         Enemy first = dummy();
         Enemy second = dummy();
-        Battle battle = new Battle(List.of(himeko, ally), List.of(first, second), new Random(0));
+        Battle battle = new Battle(List.of(himeko, ally), List.of(first, second), BattleFixture.seeded());
         battle.startBattle();
         chargeTo(himeko, first, battle);
         Assertions.assertEquals(3, himeko.getResources().value(CHARGE), "precondition: she is at the cap");
@@ -142,7 +142,7 @@ public class HimekoChargeTest {
         Character ally = CharacterFactory.create(ALLY, LEVEL);
         Enemy first = dummy();
         Enemy second = dummy();
-        Battle battle = new Battle(List.of(himeko, ally), List.of(first, second), new Random(0));
+        Battle battle = new Battle(List.of(himeko, ally), List.of(first, second), BattleFixture.seeded());
         battle.startBattle();
         chargeTo(himeko, first, battle);
         himeko.getResources().spend(CHARGE, 1);
@@ -175,7 +175,7 @@ public class HimekoChargeTest {
         himeko.setAttribute(AttributeType.CRIT_CHANCE, new DoubleValue(0));
         Enemy first = dummy();
         Enemy second = dummy();
-        Battle battle = new Battle(List.of(himeko), List.of(first, second), new Random(0));
+        Battle battle = new Battle(List.of(himeko), List.of(first, second), BattleFixture.seeded());
         battle.startBattle();
         chargeTo(himeko, first, battle);
 
@@ -201,7 +201,7 @@ public class HimekoChargeTest {
         Character ally = CharacterFactory.create(ALLY, LEVEL);
         Enemy first = dummy();
         Enemy second = dummy();
-        Battle battle = new Battle(List.of(himeko, ally), List.of(first, second), new Random(0));
+        Battle battle = new Battle(List.of(himeko, ally), List.of(first, second), BattleFixture.seeded());
         battle.startBattle();
         chargeTo(himeko, first, battle);
 

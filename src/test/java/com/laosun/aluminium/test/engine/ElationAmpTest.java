@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 /**
  * 增笑 ({@code ELATION_DAMAGE_AMP}) is Elation damage's own amplifier, MULTIPLIED with 欢愉度, not added to it.
@@ -70,7 +69,7 @@ public class ElationAmpTest {
     private static double baselineElation() {
         Character pearl = CharacterFactory.create(PEARL, 80);
         Battle battle = new Battle(List.of(pearl, CharacterFactory.create(1204, 80)),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         return battle.characters.getFirst()
@@ -81,7 +80,7 @@ public class ElationAmpTest {
     private static double damage(boolean normal, double boost, double amp) {
         Character pearl = CharacterFactory.create(PEARL, 80);
         var enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(pearl, CharacterFactory.create(1204, 80)), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(pearl, CharacterFactory.create(1204, 80)), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         Character mine = battle.characters.getFirst();

@@ -15,7 +15,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /** Cones 23004 (boost against a debuffed target) and 23012 (a constant crit-damage clause). */
 public class InTheNameOfTheWorldAndSleepLikeTheDeadsandTest {
@@ -33,7 +32,7 @@ public class InTheNameOfTheWorldAndSleepLikeTheDeadsandTest {
     public void cone23012RaisesCritDamage() {
         Character unit = CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(23012, LEVEL, false, 5));
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(unit), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
         double before = unit.getAttribute(AttributeType.CRIT_ATTACK).get();
         battle.startBattle();
         double gain = unit.getAttribute(AttributeType.CRIT_ATTACK).get() - before;
@@ -44,7 +43,7 @@ public class InTheNameOfTheWorldAndSleepLikeTheDeadsandTest {
     private static double settled(boolean debuffed) {
         Character unit = CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(23004, LEVEL, false, 5));
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(unit), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         if (debuffed) {
             enemy.getBuffManager().addBuff(new DotBuff(unit, DamageElement.FIRE, 100, 3));

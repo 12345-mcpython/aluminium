@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * 1415's memosprite skill 05 "你好，世界♪": "德谬歌被召唤时，解除我方全体控制类负面状态。".
@@ -34,7 +33,7 @@ public class SummonedClearsControlTest {
         Character cyrene = CharacterFactory.create(CYRENE, LEVEL);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
         Battle battle = new Battle(List.of(cyrene, ally),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         cyrene = battle.characters.get(0);

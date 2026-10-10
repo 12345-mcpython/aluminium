@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * `INSERT_ACTION`: a unit OUTSIDE the action order acts now.
@@ -39,7 +38,7 @@ public class InsertedActionTest {
         Character cyrene = CharacterFactory.create(CYRENE, LEVEL);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
         Battle battle = new Battle(List.of(cyrene, ally),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         Summon demiurge = battle.summonServant(cyrene);

@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Her technique's +60% and her ult's +80% ATTACK must both count (1401).
@@ -42,7 +41,7 @@ public class TheHertaAttackStackingTest {
     private static double attack(boolean usedTechnique, boolean castUlt) {
         Character owner = CharacterFactory.create(OWNER, 80, false, null, null, 0);
         Battle battle = new Battle(List.of(owner),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         if (usedTechnique) {
             battle.markTechniqueUsed(owner);      // before startBattle: applyTechniqueStates runs before every BATTLE_START rule
         }

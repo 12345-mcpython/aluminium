@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Light cone 23033: energy at the start of the battle, and the [雷遁] state machine -- an Ultimate arms it, two basic attacks
@@ -38,7 +37,7 @@ public class NinjutsuInscriptionDazzlingEvilbreakerTest {
                 : CharacterFactory.create(WEARER, LEVEL);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
         enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(wearer, ally), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(wearer, ally), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         return battle;
     }
@@ -102,7 +101,7 @@ public class NinjutsuInscriptionDazzlingEvilbreakerTest {
         wearer = CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(CONE, LEVEL, false, rank));
         Character ally = CharacterFactory.create(ALLY, LEVEL);
         enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(wearer, ally), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(wearer, ally), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         battle.fireTriggers(TriggerEvent.ULT_CAST, wearer, enemy, 0, 0);
         basicAttack(battle);

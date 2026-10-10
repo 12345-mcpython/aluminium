@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * 1222 Lingsha (灵砂)'s Skill: "at the same time restore HP equal to 14.00% of Lingsha (灵砂)'s ATK + 420 to all of our side" -- the first clause of her file.
@@ -29,7 +28,7 @@ public class LingshaHealTest {
         Character lingsha = CharacterFactory.create(LINGSHA, LEVEL);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(lingsha, ally), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(lingsha, ally), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         // Wound the ally first: a heal on a full bar measures nothing.
         ally.takeDamage(ally.getCurrentHp() * 0.5);

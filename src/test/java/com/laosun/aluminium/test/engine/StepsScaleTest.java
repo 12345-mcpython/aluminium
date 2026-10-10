@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * {@code steps:<COUNTER>:<N>} - "every N points of a counter", as {@code floor(value / N)}.
@@ -119,7 +118,7 @@ public class StepsScaleTest {
         unit.setTriggerTable(new TriggerTable(1, List.of(
                 TriggerSpecs.rule("TURN_START", List.of(), effect))));
         Battle battle = new Battle(List.of(unit, CharacterFactory.create(ALLY, 80)),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         double before = unit.getAttribute(AttributeType.ATTACK).get();

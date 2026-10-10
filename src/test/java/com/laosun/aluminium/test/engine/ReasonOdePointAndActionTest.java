@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * 1415's memosprite skill 18 "献予'理性'之诗": "为我方恢复 #4 个战技点并使那刻夏立即行动".
@@ -28,7 +27,7 @@ public class ReasonOdePointAndActionTest {
         Character cyrene = CharacterFactory.create(CYRENE, LEVEL);
         Character anaxa = CharacterFactory.create(ANAXA, LEVEL);
         Battle battle = new Battle(List.of(cyrene, anaxa),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         cyrene = battle.characters.get(0);

@@ -51,7 +51,7 @@ public class TickAnchorTest {
      */
     @Test
     public void theCastersTurnsSpendItAndTheCarriersDoNot() {
-        Battle battle = battleWith(grantToAlly(true, 3), new Random(0));
+        Battle battle = battleWith(grantToAlly(true, 3), BattleFixture.seeded());
         Character owner = battle.characters.getFirst();
         Character ally = battle.characters.get(1);
         Assertions.assertEquals(3, durationOf(ally), "precondition: 3 turns");
@@ -66,7 +66,7 @@ public class TickAnchorTest {
     /** ...and it expires on his turns, not on hers. */
     @Test
     public void itExpiresOnTheCastersTurns() {
-        Battle battle = battleWith(grantToAlly(true, 2), new Random(0));
+        Battle battle = battleWith(grantToAlly(true, 2), BattleFixture.seeded());
         Character owner = battle.characters.getFirst();
         Character ally = battle.characters.get(1);
 
@@ -85,7 +85,7 @@ public class TickAnchorTest {
      */
     @Test
     public void anUnanchoredBuffStillTicksOnItsCarrier() {
-        Battle battle = battleWith(grantToAlly(false, 3), new Random(0));
+        Battle battle = battleWith(grantToAlly(false, 3), BattleFixture.seeded());
         Character owner = battle.characters.getFirst();
         Character ally = battle.characters.get(1);
 
@@ -109,7 +109,7 @@ public class TickAnchorTest {
      */
     @Test
     public void theAnchorsDeathTakesTheBuffOff() {
-        Battle battle = battleWith(grantToAlly(true, 5), new Random(0));
+        Battle battle = battleWith(grantToAlly(true, 5), BattleFixture.seeded());
         Character owner = battle.characters.getFirst();
         Character ally = battle.characters.get(1);
         Assertions.assertEquals(5, durationOf(ally), "precondition");

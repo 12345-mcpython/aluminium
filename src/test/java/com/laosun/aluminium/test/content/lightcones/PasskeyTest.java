@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Light cone 20013: "使装备者施放战技后额外恢复#1]点能量，该效果单个回合内不可重复触发".
@@ -28,7 +27,7 @@ public class PasskeyTest {
     public void oneSkillPerTurnGrantsEnergy() {
         Character unit = CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(20013, LEVEL, false, 1));
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(unit), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         double start = unit.getCurrentEnergy();
         battle.currentMove = new Signal(unit);

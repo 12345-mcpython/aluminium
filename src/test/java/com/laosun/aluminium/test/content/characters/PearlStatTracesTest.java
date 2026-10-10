@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Character 1503 (Pearl): the ten stat traces the dump carries for her reach her PANEL.
@@ -50,7 +49,7 @@ public class PearlStatTracesTest {
     public void theTenDataRowsReachThePanel() {
         Character pearl = CharacterFactory.create(PEARL, LEVEL);
         Battle battle = new Battle(List.of(pearl, CharacterFactory.create(ALLY, LEVEL)),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         Character her = battle.characters.getFirst();
@@ -115,7 +114,7 @@ public class PearlStatTracesTest {
             pearl.setTriggerTable(TriggerTable.EMPTY);
         }
         Battle battle = new Battle(List.of(pearl), List.of(BattleFixture.monster()),
-                new Random(0));
+                BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         return battle.characters.getFirst().getAttribute(AttributeType.SPEED).get();
@@ -135,7 +134,7 @@ public class PearlStatTracesTest {
         Character pearl = CharacterFactory.create(PEARL, LEVEL);
         pearl.setTriggerTable(TriggerTable.EMPTY);
         Battle battle = new Battle(List.of(pearl), List.of(BattleFixture.monster()),
-                new Random(0));
+                BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         return battle.characters.getFirst().getAttribute(attribute).get();

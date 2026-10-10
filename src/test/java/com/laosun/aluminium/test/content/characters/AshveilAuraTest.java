@@ -16,7 +16,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * 1504's "头狼" (Alpha Wolf) trace (1504103): "不死途在场时，我方目标造成的暴击伤害提高 40%，我方目标追加攻击造成的暴击伤害额外提高 80%" (while Ashveil (不死途) is on the field, our targets' CRIT DMG is raised by 40%, and our targets' follow-up attacks' CRIT DMG is raised by a further 80%).
@@ -35,7 +34,7 @@ public class AshveilAuraTest {
         List<Character> party = withOwner
                 ? List.of(CharacterFactory.create(OWNER, LEVEL), ally)
                 : List.of(ally);
-        Battle battle = new Battle(party, List.of(enemy), new Random(0));
+        Battle battle = new Battle(party, List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         ally.getAttribute(AttributeType.CRIT_CHANCE)
                 .addModifier(DoubleValue.Modifier.pure(2.0, DoubleValue.Modifier.ModifierSource.BUFF, 150401));
@@ -51,7 +50,7 @@ public class AshveilAuraTest {
         Character owner = CharacterFactory.create(OWNER, LEVEL);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(owner, ally), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(owner, ally), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         // The follow-up half is two mutually exclusive rules; both are asked in-battle, one per actor.
         int seen = 0;

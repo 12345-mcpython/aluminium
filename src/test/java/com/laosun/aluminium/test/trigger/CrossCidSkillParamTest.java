@@ -16,7 +16,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * A share may be read out of ANOTHER character's skill row.
@@ -87,7 +86,7 @@ public class CrossCidSkillParamTest {
                 TriggerSpecs.rule("TURN_START", List.of(), boost))));
 
         Battle battle = new Battle(List.of(owner, other),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         Character subject = battle.characters.get(0);

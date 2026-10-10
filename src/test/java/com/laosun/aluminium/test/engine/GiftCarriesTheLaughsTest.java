@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * The gift carries the [笑点] count, and 1505 takes half of it -- objective ①-a's whole chain.
@@ -35,7 +34,7 @@ public class GiftCarriesTheLaughsTest {
         Character sparkle = CharacterFactory.create(SPARKLE, LEVEL, false, null, null, 0);
         Character evanescia = CharacterFactory.create(EVANESCIA, LEVEL, false, null, null, 0);
         Enemy victim = BattleFixture.monster();
-        Battle battle = new Battle(List.of(sparkle, evanescia), List.of(victim), new Random(0));
+        Battle battle = new Battle(List.of(sparkle, evanescia), List.of(victim), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
 

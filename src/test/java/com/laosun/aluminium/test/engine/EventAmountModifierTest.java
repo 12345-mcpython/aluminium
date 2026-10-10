@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * "每消耗1点战技点…造成的伤害提高 6%" (1306:159,): `scale: "event_amount"` on a MODIFIER.
@@ -50,7 +49,7 @@ public class EventAmountModifierTest {
                 List.of("actor == self"), effect))));
 
         Battle battle = new Battle(List.of(owner),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         double before = owner.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
         battle.fireTriggers(TriggerEvent.SKILL_POINT_SPENT, owner, owner, 0, spent);

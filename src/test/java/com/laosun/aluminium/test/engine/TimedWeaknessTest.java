@@ -16,7 +16,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * A weakness that expires (`65f143b`): `ADD_ELEMENTAL_WEAKNESS` with `turns` goes through {@code Enemy.addWeakness(element, turns)},
@@ -57,7 +56,7 @@ public class TimedWeaknessTest {
         TriggerSpecs.set(rule, "when", List.of("actor == self"));
         wearer.setTriggerTable(new TriggerTable(WEARER, List.of(rule)));
 
-        Battle battle = new Battle(List.of(wearer), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(wearer), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         Assertions.assertFalse(enemy.isWeakTo(chosen), "the enemy must not already have it");
 

@@ -21,7 +21,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * {@code "until"} - a buff that ends when its <b>owner does something</b> instead of after N turns.
@@ -298,7 +297,7 @@ public class BuffLifetimeTest {
     @Test
     public void theAuthoredRuleGrantsItsCritRateUntilTheFirstAttack() {
         Character wearer = wearer(1.3);
-        Battle battle = new Battle(List.of(wearer), List.of(monster()), new Random(0));
+        Battle battle = new Battle(List.of(wearer), List.of(monster()), BattleFixture.seeded());
         double bare = CharacterFactory.create(OWNER, LEVEL).getAttribute(AttributeType.CRIT_CHANCE).get();
 
         battle.startBattle();
@@ -315,7 +314,7 @@ public class BuffLifetimeTest {
     @Test
     public void belowTheCritDamageThresholdNothingIsGranted() {
         Character wearer = wearer(1.0);            // 100% CRIT DMG, below the text's 120%
-        Battle battle = new Battle(List.of(wearer), List.of(monster()), new Random(0));
+        Battle battle = new Battle(List.of(wearer), List.of(monster()), BattleFixture.seeded());
         double bare = CharacterFactory.create(OWNER, LEVEL).getAttribute(AttributeType.CRIT_CHANCE).get();
 
         battle.startBattle();
@@ -328,7 +327,7 @@ public class BuffLifetimeTest {
     @Test
     public void theAuthoredRuleStatesItsOwnLifetime() {
         Character wearer = wearer(1.3);
-        Battle battle = new Battle(List.of(wearer), List.of(monster()), new Random(0));
+        Battle battle = new Battle(List.of(wearer), List.of(monster()), BattleFixture.seeded());
         battle.startBattle();
 
         List<TriggerTable.CompiledRule> rules = RelicTriggerTables.of(STELLAR_DIFFERENTIATOR).at(2)
@@ -370,7 +369,7 @@ public class BuffLifetimeTest {
         for (int i = 1; i < teamSize; i++) {
             team.add(CharacterFactory.create(1210, LEVEL));   // Guinaifen (桂乃芬): no rule file of its own
         }
-        Battle battle = new Battle(team, List.of(monster()), new Random(0));
+        Battle battle = new Battle(team, List.of(monster()), BattleFixture.seeded());
         battle.startBattle();
         return battle;
     }

@@ -5,10 +5,10 @@ import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.buff.ControlBuff;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import java.util.List;
-import java.util.Random;
 
 /** "处于[往昔的涟漪]状态时在[追忆]达到 12 点时可激活终结技". */
 public class CyreneRippleTierTest {
@@ -27,7 +27,7 @@ public class CyreneRippleTierTest {
 
     private static int debuffsLeft(boolean enterTheRipple) {
         Character her = CharacterFactory.create(1415, 80);
-        Battle battle = new Battle(List.of(her), List.of(EnemyFactory.create(1002011, 100, 1)), new Random(0));
+        Battle battle = new Battle(List.of(her), List.of(EnemyFactory.create(1002011, 100, 1)), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         her = battle.characters.getFirst();

@@ -22,7 +22,6 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 /**
  * "受到攻击的概率大幅提高" ("the chance of being attacked rises greatly") - the SOFT aggro weight, and why it is an attribute rather than {@code TAUNT}.
@@ -45,7 +44,7 @@ public class SoftAggroWeightTest {
         Character plain = withAggro(100);
         marked.setTriggerTable(new TriggerTable(MARCH, List.of(TriggerSpecs.rule(
                 TriggerEvent.BATTLE_START.name(), List.of(), aggroRatio(5.0)))));
-        Battle battle = new Battle(List.of(marked, plain), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(marked, plain), List.of(dummy()), BattleFixture.seeded());
 
         battle.startBattle();
 
@@ -63,7 +62,7 @@ public class SoftAggroWeightTest {
         Character doomed = withAggro(100);
         doomed.setTriggerTable(new TriggerTable(MARCH, List.of(TriggerSpecs.rule(
                 TriggerEvent.BATTLE_START.name(), List.of(), aggroRatio(-2.0)))));
-        Battle battle = new Battle(List.of(doomed), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(doomed), List.of(dummy()), BattleFixture.seeded());
 
         battle.startBattle();
 
@@ -87,7 +86,7 @@ public class SoftAggroWeightTest {
         Character march = CharacterFactory.create(MARCH, LEVEL);
         Character aimed = CharacterFactory.create(ALLY, LEVEL);
         Character bystander = CharacterFactory.create(BYSTANDER, LEVEL);
-        Battle battle = new Battle(List.of(march, aimed, bystander), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(march, aimed, bystander), List.of(dummy()), BattleFixture.seeded());
         battle.startBattle();
         double bystanderBefore = battle.aggroOf(bystander);
 
@@ -99,7 +98,7 @@ public class SoftAggroWeightTest {
         // Eidolon (星魂) 2 grants a shield at battle start from a DIFFERENT modifier, which has no MDF_AggroUp in the game data.
         Character withEidolon = CharacterFactory.create(MARCH, LEVEL, true, null, null, 2);
         Character shielded = CharacterFactory.create(ALLY, LEVEL);
-        Battle second = new Battle(List.of(withEidolon, shielded), List.of(dummy()), new Random(0));
+        Battle second = new Battle(List.of(withEidolon, shielded), List.of(dummy()), BattleFixture.seeded());
         double marchBefore = second.aggroOf(withEidolon);
         double allyBefore = second.aggroOf(shielded);
 
@@ -124,7 +123,7 @@ public class SoftAggroWeightTest {
         Character march = CharacterFactory.create(MARCH, LEVEL);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
         Enemy enemy = dummy();
-        Battle battle = new Battle(List.of(march, ally), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(march, ally), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         if (belowGate) {
             int guard = 0;

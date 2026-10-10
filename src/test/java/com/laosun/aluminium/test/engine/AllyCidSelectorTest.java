@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * The `ally_cid:<cid>` selector: naming a character outright.
@@ -37,7 +36,7 @@ public class AllyCidSelectorTest {
         Character named = CharacterFactory.create(NAMED, LEVEL);
         Character other = CharacterFactory.create(OTHER, LEVEL);
         Battle battle = new Battle(List.of(owner, named, other),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         owner = battle.characters.get(0);

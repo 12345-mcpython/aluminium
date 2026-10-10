@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * An Elation skill's row leads with a COUNT: "deal #1 instances of damage, each dealing #2% to a random single enemy ... The last deals #3% ...
@@ -55,7 +54,7 @@ public class ElationRowTest {
         him.setTriggerTable(new TriggerTable(AVENTURINE, List.of(
                 TriggerSpecs.rule("DEALING_DAMAGE", List.of("actor == self"), counter))));
 
-        Battle battle = new Battle(List.of(him), List.of(BattleFixture.monster()), new Random(0));
+        Battle battle = new Battle(List.of(him), List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         battle.castImmediate(him.getSkills().get(SkillType.ELATION_SKILL), him,

@@ -16,7 +16,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Cones 21023 (the party takes less damage) and 23011 (the party deals more when the wearer is hurt). Both are AURAS:
@@ -37,7 +36,7 @@ public class ConeAuraPartyTest {
         Character ally = CharacterFactory.create(ALLY, LEVEL);
         Enemy enemy = BattleFixture.monster();
         List<Character> party = withWearer ? List.of(wearer(cone), ally) : List.of(ally);
-        Battle battle = new Battle(party, List.of(enemy), new Random(0));
+        Battle battle = new Battle(party, List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         return battle.applyDamage(ally, new Damage(enemy, ally, DamageElement.PHYSICAL, DamageType.NORMAL, 1000));
     }
@@ -75,7 +74,7 @@ public class ConeAuraPartyTest {
         Character wearer = wearer(23011);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(wearer, ally), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(wearer, ally), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         double before = ally.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
         // The FALSE case first: the ALLY losing HP must not move the party bonus.

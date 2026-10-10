@@ -7,7 +7,6 @@ import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import java.util.List;
-import java.util.Random;
 
 /**
  * Slot 18's [真知] half: "那刻夏在下一次施放普攻、战技时获得[真知]：…造成的战技伤害提高 #2(20)%".
@@ -39,7 +38,7 @@ public class ReasonOdeTrueKnowledgeTest {
         Character him = CharacterFactory.create(ANAXA, LEVEL);
         Character other = CharacterFactory.create(OTHER, LEVEL);
         Battle battle = new Battle(List.of(cyrene, him, other),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         var sprite = battle.summonServant(battle.characters.get(0));

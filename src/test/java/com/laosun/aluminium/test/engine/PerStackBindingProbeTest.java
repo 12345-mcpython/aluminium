@@ -10,10 +10,10 @@ import com.laosun.aluminium.models.buff.DotBuff;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /** Reads the COMPILED rule with a real context (the earlier attempt had no target, so nothing matched). */
 public class PerStackBindingProbeTest {
@@ -21,7 +21,7 @@ public class PerStackBindingProbeTest {
     public void printTheCompiledSpec() {
         Character unit = CharacterFactory.create(1001, 80);
         Enemy enemy = EnemyFactory.create(1002011, 90, 1);
-        Battle battle = new Battle(List.of(unit), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         enemy.getBuffManager().addBuff(new DotBuff(unit, DamageElement.FIRE, 100, 3));
         enemy.getBuffManager().addBuff(new DotBuff(unit, DamageElement.ICE, 100, 3));

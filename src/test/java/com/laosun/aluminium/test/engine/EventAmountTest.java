@@ -15,7 +15,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * {@code times_from: "event_amount"}: the REPEAT COUNT follows the triggering event.
@@ -61,7 +60,7 @@ public class EventAmountTest {
                 List.of("actor == self", "resource_changed:充能"), effect)),
                 List.of(new ResourceSpec("充能", 8))));
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(owner), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(owner), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         double before = enemy.getCurrentHp();
         // Note: `resource_changed:<name>` reads what the battle was TOLD changed, and the SUBJECT must be the enemy: with

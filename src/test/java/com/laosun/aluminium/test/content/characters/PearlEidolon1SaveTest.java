@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Character 1503 (Pearl): Eidolon 1 keeps an ally from falling - twice per battle, at half its Max HP.
@@ -102,7 +101,7 @@ public class PearlEidolon1SaveTest {
         Battle battle = new Battle(
                 List.of(CharacterFactory.create(PEARL, 80, false, null, null, eidolonRank),
                         CharacterFactory.create(ALLY, 80)),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         return battle;

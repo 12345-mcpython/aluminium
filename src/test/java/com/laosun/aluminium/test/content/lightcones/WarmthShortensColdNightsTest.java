@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Light cone 21028: "生命上限提高#1%。施放普攻或战技后，为我方全体恢复等同于各自生命上限#2%的生命值" -- the first `on_any` reader.
@@ -37,7 +36,7 @@ public class WarmthShortensColdNightsTest {
         Character wearer = CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(21028, LEVEL, false, 1));
         Character ally = CharacterFactory.create(ALLY, LEVEL);
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(wearer, ally), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(wearer, ally), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         battle.currentMove = new Signal(wearer);
         battle.beforeMove();
@@ -59,7 +58,7 @@ public class WarmthShortensColdNightsTest {
     /** The wearer's HEALTH gain at this rank over the base taken AFTER the battle has started. */
     private static double share(int rank) {
         Character wearer = CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(21028, LEVEL, false, rank));
-        Battle battle = new Battle(List.of(wearer), List.of(BattleFixture.monster()), new Random(0));
+        Battle battle = new Battle(List.of(wearer), List.of(BattleFixture.monster()), BattleFixture.seeded());
         double before = wearer.getAttribute(AttributeType.HEALTH).get();
         battle.startBattle();
         double baseAfter = wearer.getAttribute(AttributeType.HEALTH).baseValue();

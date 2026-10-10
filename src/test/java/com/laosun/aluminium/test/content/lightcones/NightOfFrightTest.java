@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Light cone 2301: when any ally casts an ultimate, the wearer heals the ally with the LOWEST HP percentage for 10% of
@@ -31,7 +30,7 @@ public class NightOfFrightTest {
         Character hurt = CharacterFactory.create(HURT_ALLY, LEVEL);
         Character healthy = CharacterFactory.create(HEALTHY_ALLY, LEVEL);
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(wearer, hurt, healthy), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(wearer, hurt, healthy), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         battle.applyDamage(hurt, new com.laosun.aluminium.models.Damage(enemy, hurt,
                 com.laosun.aluminium.enums.DamageElement.PHYSICAL,

@@ -7,7 +7,6 @@ import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import java.util.List;
-import java.util.Random;
 
 /**
  * 1415's memosprite skill 1, first clause: "对遐蝶施放时，[新蕊]可以溢出至 #3%" (#3 = 2).
@@ -38,7 +37,7 @@ public class LifeOdeNewBudOverflowTest {
         Character cyrene = CharacterFactory.create(CYRENE, LEVEL);
         Character her = CharacterFactory.create(CASTORICE, LEVEL);
         Battle battle = new Battle(List.of(cyrene, her),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         cyrene = battle.characters.get(0);

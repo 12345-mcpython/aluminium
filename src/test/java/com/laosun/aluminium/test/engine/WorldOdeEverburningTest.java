@@ -8,7 +8,6 @@ import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import java.util.List;
-import java.util.Random;
 
 /**
  * 1415's memosprite skill 21, the ever-burning clause: "且在变身时获得[永续的燃烧]…持有[永续的燃烧]时，卡厄斯兰那的暴击率提高 #1%" (#1 = 0.08).
@@ -36,7 +35,7 @@ public class WorldOdeEverburningTest {
     private static double[] run(boolean castUlt) {
         Character him = CharacterFactory.create(PHAINON, LEVEL);
         Battle battle = new Battle(List.of(him),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         him = battle.characters.getFirst();

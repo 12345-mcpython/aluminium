@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Character 1503 (Pearl): her TECHNIQUE's half that nobody had written - 美学底本, and 深度学习 on its holder.
@@ -121,7 +120,7 @@ public class PearlTechniqueArchetypeTest {
         Character pearl = CharacterFactory.create(PEARL, 80);
         Character archetype = CharacterFactory.create(ARCHETYPE, 80);
         Battle battle = new Battle(List.of(pearl, archetype, CharacterFactory.create(OTHER, 80)),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         if (techniqueUsed) {
             battle.markTechniqueUsed(pearl);
         }

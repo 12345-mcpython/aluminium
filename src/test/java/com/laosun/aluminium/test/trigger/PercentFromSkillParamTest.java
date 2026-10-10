@@ -17,7 +17,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * `percent_from_skill_param: "<SKILLTYPE>:<index>"`.
@@ -39,7 +38,7 @@ public class PercentFromSkillParamTest {
     public void theShareComesFromHisOwnUltimateAtItsOwnLevel() {
         Character tribbie = CharacterFactory.create(TRIBBIE, LEVEL);
         Battle battle = new Battle(List.of(tribbie, CharacterFactory.create(ALLY, LEVEL)),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         tribbie = battle.characters.getFirst();

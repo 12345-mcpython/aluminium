@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Light cone 21030: the wearer's Ultimate carries extra damage equal to 60% of its own DEFENCE.
@@ -32,7 +31,7 @@ public class ThisIsMeTest {
     private Battle battle(int rank) {
         wearer = CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(CONE, LEVEL, false, rank));
         enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(wearer), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(wearer), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         wearer.getAttribute(AttributeType.CRIT_CHANCE)
                 .addModifier(com.laosun.aluminium.models.DoubleValue.Modifier.pure(-1.0,

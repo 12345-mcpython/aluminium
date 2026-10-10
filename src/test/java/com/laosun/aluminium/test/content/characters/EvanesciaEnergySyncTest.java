@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * 1505 Evanescia (绯英)'s energy sync: "when Evanescia gains energy, she gains an equal amount of [好活当赏] at the same time".
@@ -31,7 +30,7 @@ public class EvanesciaEnergySyncTest {
         Character elation = CharacterFactory.create(WEARER, LEVEL);
         Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(elation, CharacterFactory.create(ALLY, LEVEL)), List.of(enemy),
-                new Random(0));
+                BattleFixture.seeded());
         battle.startBattle();
         int giftsBefore = elation.getResources().value(GIFTS);
         double energyBefore = elation.getCurrentEnergy();
@@ -50,7 +49,7 @@ public class EvanesciaEnergySyncTest {
     public void withNoEnergyNothingIsMirrored() {
         Character elation = CharacterFactory.create(WEARER, LEVEL);
         Battle battle = new Battle(List.of(elation, CharacterFactory.create(ALLY, LEVEL)),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         int gifts = elation.getResources().value(GIFTS);
         System.out.println("[1505-sync] before any energy is credited the gifts read " + gifts);

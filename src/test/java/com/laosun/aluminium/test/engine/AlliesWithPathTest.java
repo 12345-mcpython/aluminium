@@ -6,12 +6,12 @@ import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 /** The parameterised variable `allies_with_path:<PATH>`: how many of my team share a Path. */
 public class AlliesWithPathTest {
@@ -38,7 +38,7 @@ public class AlliesWithPathTest {
             team.add(CharacterFactory.create(YAO_GUANG, 80));
         }
         team.add(CharacterFactory.create(HUNTER, 80));
-        Battle battle = new Battle(team, List.of(EnemyFactory.create(1002011, 100, 1)), new Random(0));
+        Battle battle = new Battle(team, List.of(EnemyFactory.create(1002011, 100, 1)), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         Character pearl = battle.characters.stream().filter(c -> c.getCid() == PEARL).findFirst().orElseThrow();

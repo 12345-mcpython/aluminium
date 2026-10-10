@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * "结界持续期间，敌方目标受到的伤害提高30.00%" - a ratio, not a presence check, so the number is what is pinned.
@@ -43,7 +42,7 @@ public class TrinnonZoneTest {
         Character trinnon = CharacterFactory.create(TRINNON, LEVEL);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(trinnon, ally), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(trinnon, ally), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         if (withZone) {
             battle.castImmediate(trinnon.getSkills().get(SkillType.ULTRA), trinnon, List.of(enemy));

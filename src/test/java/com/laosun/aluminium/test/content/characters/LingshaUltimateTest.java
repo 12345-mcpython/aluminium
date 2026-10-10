@@ -8,11 +8,11 @@ import com.laosun.aluminium.models.buff.VulnerabilityBuff;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * 1222 Lingsha (灵砂)'s Ultimate "幔亭缭霞" (Pavilion in Rosy Clouds): the [醇醉] break-damage mark on every enemy, and the second party heal.
@@ -37,7 +37,7 @@ public class LingshaUltimateTest {
         Character lingsha = CharacterFactory.create(LINGSHA, LEVEL);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
         Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
-        Battle battle = new Battle(List.of(lingsha, ally), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(lingsha, ally), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         ally.takeDamage(ally.getCurrentHp() * 0.5);
         double before = ally.getCurrentHp();
@@ -54,7 +54,7 @@ public class LingshaUltimateTest {
         Character lingsha = CharacterFactory.create(LINGSHA, LEVEL);
         Enemy first = EnemyFactory.create(MONSTER, 90, 1);
         Enemy second = EnemyFactory.create(OTHER_MONSTER, 90, 1);
-        Battle battle = new Battle(List.of(lingsha), List.of(first, second), new Random(0));
+        Battle battle = new Battle(List.of(lingsha), List.of(first, second), BattleFixture.seeded());
         battle.startBattle();
         battle.castImmediate(lingsha.getSkills().get(SkillType.ULTRA), lingsha, List.of(first));
         for (Enemy enemy : List.of(first, second)) {

@@ -2,6 +2,7 @@ package com.laosun.aluminium.test.content.memosprites;
 
 
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.MemospriteSpec;
@@ -26,7 +27,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * {@code actor == summon} / {@code target == summon} and the {@code SUMMON_ATTACK} event - "装备者的忆灵攻击时" (when the wearer's Memosprite attacks).
@@ -89,7 +89,7 @@ public class SummonConditionTest {
     public void onlyTheOwnersSummonCounts() {
         Character owner = characterWith(rule("SUMMON_ATTACK", List.of("actor == summon")));
         Character teammate = CharacterFactory.create(TEAMMATE, LEVEL);
-        Battle battle = new Battle(List.of(owner, teammate), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(owner, teammate), List.of(dummy()), BattleFixture.seeded());
 
         Summon theirs = battle.summonMemosprite(teammate);
         Summon mine = battle.summonMemosprite(owner);
@@ -105,7 +105,7 @@ public class SummonConditionTest {
     public void anEnemyMinionIsNotMySummon() {
         Character owner = characterWith(rule("SUMMON_ATTACK", List.of("actor == summon")));
         Enemy boss = dummy();
-        Battle battle = new Battle(List.of(owner), List.of(boss), new Random(0));
+        Battle battle = new Battle(List.of(owner), List.of(boss), BattleFixture.seeded());
         Summon minion = battle.summon(boss, OTHER_MONSTER, 1);
 
         Assertions.assertEquals(Camp.ENEMY, minion.getCamp(), "precondition: it really is a summon");
@@ -117,7 +117,7 @@ public class SummonConditionTest {
     @Test
     public void theSummonIsNotItsOwner() {
         Character owner = characterWith(rule("SUMMON_ATTACK", List.of("actor == self")));
-        Battle battle = new Battle(List.of(owner), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(owner), List.of(dummy()), BattleFixture.seeded());
         Summon mine = battle.summonMemosprite(owner);
 
         Assertions.assertEquals(0, battle.fireTriggers(TriggerEvent.SUMMON_ATTACK, mine, null, 1, 0));
@@ -129,7 +129,7 @@ public class SummonConditionTest {
     @Test
     public void theNegatedSpellingExcludesOnlyTheSummon() {
         Character owner = characterWith(rule("SUMMON_ATTACK", List.of("actor != summon")));
-        Battle battle = new Battle(List.of(owner), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(owner), List.of(dummy()), BattleFixture.seeded());
         Summon mine = battle.summonMemosprite(owner);
 
         Assertions.assertEquals(1, battle.fireTriggers(TriggerEvent.SUMMON_ATTACK, owner, null, 1, 0));
@@ -140,7 +140,7 @@ public class SummonConditionTest {
     @Test
     public void theMirrorSpellingMeansTheSameThing() {
         Character owner = characterWith(rule("SUMMON_ATTACK", List.of("summon == actor")));
-        Battle battle = new Battle(List.of(owner), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(owner), List.of(dummy()), BattleFixture.seeded());
         Summon mine = battle.summonMemosprite(owner);
 
         Assertions.assertEquals(1, battle.fireTriggers(TriggerEvent.SUMMON_ATTACK, mine, null, 1, 0));
@@ -157,7 +157,7 @@ public class SummonConditionTest {
     @Test
     public void anyOfMySummonsCountsNotJustTheFirst() {
         Character owner = characterWith(rule("SUMMON_ATTACK", List.of("actor == summon")));
-        Battle battle = new Battle(List.of(owner), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(owner), List.of(dummy()), BattleFixture.seeded());
         Summon first = place(battle, owner, aoeSpec());
         Summon second = place(battle, owner, aoeSpec());
 
@@ -171,7 +171,7 @@ public class SummonConditionTest {
     @Test
     public void theTargetSideAsksTheSameQuestionAboutTheSubject() {
         Character owner = characterWith(rule("TAKING_HIT", List.of("target == summon")));
-        Battle battle = new Battle(List.of(owner), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(owner), List.of(dummy()), BattleFixture.seeded());
         Summon mine = battle.summonMemosprite(owner);
 
         Assertions.assertEquals(1, battle.fireTriggers(TriggerEvent.TAKING_HIT, dummy(), mine, 1, 100),
@@ -191,7 +191,7 @@ public class SummonConditionTest {
     @Test
     public void aContextWithNoBattleFailsEitherWay() {
         Character owner = characterWith(rule("SUMMON_ATTACK", List.of("actor == summon")));
-        Battle battle = new Battle(List.of(owner), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(owner), List.of(dummy()), BattleFixture.seeded());
         Summon mine = battle.summonMemosprite(owner);
         TriggerTable.TriggerContext noBattle = new TriggerTable.TriggerContext(owner, owner, null, 1, 0);
 
@@ -219,7 +219,7 @@ public class SummonConditionTest {
                 rule("SUMMON_ATTACK", List.of("self_summon_count >= 1")),
                 rule("SUMMON_ATTACK", List.of("target_summon_count >= 1")));
         Character ally = CharacterFactory.create(PLAIN, LEVEL);
-        Battle battle = new Battle(List.of(owner, ally), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(owner, ally), List.of(dummy()), BattleFixture.seeded());
         battle.summonMemosprite(owner);
         battle.processRequests();
 
@@ -234,7 +234,7 @@ public class SummonConditionTest {
                 rule("SUMMON_ATTACK", List.of("self_summon_count >= 1")),
                 rule("SUMMON_ATTACK", List.of("target_summon_count >= 1")));
         Character ally = CharacterFactory.create(TEAMMATE, LEVEL);
-        Battle battle = new Battle(List.of(owner, ally), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(owner, ally), List.of(dummy()), BattleFixture.seeded());
         battle.summonMemosprite(ally);
         battle.processRequests();
 
@@ -256,7 +256,7 @@ public class SummonConditionTest {
                 rule("SUMMON_ATTACK", List.of("target_summon_count == 0")),
                 rule("SUMMON_ATTACK", List.of("target_summon_count >= 1")));
         Character ally = CharacterFactory.create(PLAIN, LEVEL);
-        Battle battle = new Battle(List.of(owner, ally), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(owner, ally), List.of(dummy()), BattleFixture.seeded());
         battle.summonMemosprite(owner);
         battle.processRequests();
 
@@ -295,7 +295,7 @@ public class SummonConditionTest {
         Character owner = characterWith(rule("SUMMON_ATTACK", List.of("actor == summon", "hit_count >= 2")));
         Enemy first = dummy();
         Enemy second = otherDummy();
-        Battle battle = new Battle(List.of(owner), List.of(first, second), new Random(0));
+        Battle battle = new Battle(List.of(owner), List.of(first, second), BattleFixture.seeded());
         battle.startBattle();
         Summon evey = place(battle, owner, aoeSpec());
         double before = critDamageOf(owner);
@@ -311,7 +311,7 @@ public class SummonConditionTest {
     @Test
     public void theHitCountIsTheNumberOfTargetsReached() {
         Character owner = characterWith(rule("SUMMON_ATTACK", List.of("actor == summon", "hit_count >= 2")));
-        Battle battle = new Battle(List.of(owner), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(owner), List.of(dummy()), BattleFixture.seeded());
         Summon evey = battle.summonMemosprite(owner);          // Memosprite skill 1 is a single-target attack
         battle.processRequests();
         double before = critDamageOf(owner);
@@ -329,7 +329,7 @@ public class SummonConditionTest {
     @Test
     public void theAuthoredRulesStateTheirOwnNumbers() {
         Character wearer = wearer();
-        Battle battle = new Battle(List.of(wearer), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(wearer), List.of(dummy()), BattleFixture.seeded());
         battle.startBattle();
         Summon evey = battle.memospriteOf(wearer);
         Assertions.assertNotNull(evey, "precondition: Evernight (长夜月)'s own rule brought Evey (「长夜」) out");
@@ -363,7 +363,7 @@ public class SummonConditionTest {
     @Test
     public void theAuthoredSetBuffsBothUnitsWhenTheMemospriteAttacks() {
         Character wearer = wearer();
-        Battle battle = new Battle(List.of(wearer), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(wearer), List.of(dummy()), BattleFixture.seeded());
         battle.startBattle();
         Summon evey = battle.memospriteOf(wearer);
         Assertions.assertNotNull(evey, "precondition: 「长夜」 (Evey) is out");
@@ -384,7 +384,7 @@ public class SummonConditionTest {
     public void theAuthoredSetIgnoresATeammatesMemosprite() {
         Character wearer = wearer();
         Character teammate = CharacterFactory.create(TEAMMATE, LEVEL);
-        Battle battle = new Battle(List.of(wearer, teammate), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(wearer, teammate), List.of(dummy()), BattleFixture.seeded());
         battle.startBattle();
         // A fixture summon for the teammate: Aglaea's own spec states a panel but no attack yet (her document
         // has not been read for one), and this case needs one that swings.
@@ -405,7 +405,7 @@ public class SummonConditionTest {
         Character wearer = CharacterFactory.create(TEAMMATE, LEVEL, true, null,
                 RelicFactory.suit(HERO_OF_TRIUMPHANT_SONG, 5, 15));
         wearer.setAttribute(AttributeType.SPEED, new DoubleValue(100));   // a clean base: +6% is +6
-        Battle battle = new Battle(List.of(wearer), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(wearer), List.of(dummy()), BattleFixture.seeded());
         battle.startBattle();
         Assertions.assertEquals(0, battle.summonCountOf(wearer), "precondition: nothing summoned yet");
 

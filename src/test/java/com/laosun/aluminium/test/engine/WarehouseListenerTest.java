@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * "获得该角色即生效，无需上场" -- the load point.
@@ -29,7 +28,7 @@ public class WarehouseListenerTest {
     public void theListenerIsHeardAndNeverActs() {
         Character fighter = CharacterFactory.create(FIGHTER, 80, false, null, null, 0);
         Battle battle = new Battle(List.of(fighter),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
 
         Character owned = CharacterFactory.create(OWNED, 80, false, null, null, 0);
         EffectSpec mark = new EffectSpec();

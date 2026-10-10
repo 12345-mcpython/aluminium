@@ -1,5 +1,6 @@
 package com.laosun.aluminium.test.content.characters;
 import com.laosun.aluminium.test.support.TestTurns;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.DebuffClass;
@@ -16,7 +17,6 @@ import com.laosun.aluminium.enums.TriggerEvent;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import java.util.List;
-import java.util.Random;
 
 /** Character 1503 (Pearl): her trait dispels a debuff on the Skill and on an enhanced basic. */
 public class PearlDispelTest {
@@ -58,7 +58,7 @@ public class PearlDispelTest {
 
     private static Battle battle() {
         Battle battle = new Battle(List.of(CharacterFactory.create(PEARL, 80), CharacterFactory.create(ALLY, 80)),
-                List.of(EnemyFactory.create(1002011, 100, 1)), new Random(0));
+                List.of(EnemyFactory.create(1002011, 100, 1)), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         return battle;

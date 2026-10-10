@@ -15,7 +15,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * The write side: `Battle.castUltra` hands "what this cast spent" to the damage instance at settlement -- Note: it goes through a real cast, not a hand-set value.
@@ -40,7 +39,7 @@ public class IAmAsYouBeholdWriteSide2Test {
     private static double ultimateDamage(boolean scaled) {
         Character wearer = CharacterFactory.create(WEARER, LEVEL);
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(wearer), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(wearer), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
 
         EffectSpec boost = new EffectSpec();

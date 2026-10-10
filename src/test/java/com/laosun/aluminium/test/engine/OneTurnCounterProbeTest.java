@@ -15,7 +15,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * A probe, kept as a test because its answer is a fact future content depends on: can a counter be scoped to ONE TURN?
@@ -45,7 +44,7 @@ public class OneTurnCounterProbeTest {
                 TriggerSpecs.rule("SKILL_POINT_SPENT", List.of("self_stacks:" + COUNT + " < 9"),
                         oneTurnCounter()))));
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(unit), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         var skill = unit.getSkills().values().stream()
                 .filter(candidate -> candidate.getData() != null
@@ -83,7 +82,7 @@ public class OneTurnCounterProbeTest {
         watcher.setTriggerTable(new TriggerTable(UNIT, List.of(
                 TriggerSpecs.rule("SKILL_POINT_SPENT", List.of("actor == self"), oneTurnCounter()))));
         Enemy target = BattleFixture.monster();
-        Battle second = new Battle(List.of(watcher), List.of(target), new Random(0));
+        Battle second = new Battle(List.of(watcher), List.of(target), BattleFixture.seeded());
         second.startBattle();
         var secondSkill = watcher.getSkills().values().stream()
                 .filter(candidate -> candidate.getData() != null

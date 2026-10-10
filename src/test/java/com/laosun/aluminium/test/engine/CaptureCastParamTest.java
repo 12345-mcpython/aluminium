@@ -4,10 +4,10 @@ import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.models.skill.SkillExecutor;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import java.util.List;
-import java.util.Random;
 
 /**
  * GAIN_RESOURCE captures the CAST skill parameter.
@@ -41,7 +41,7 @@ public class CaptureCastParamTest {
         Character cyrene = CharacterFactory.create(1415, LEVEL);
         Character cerydra = CharacterFactory.create(1412, LEVEL);
         Battle battle = new Battle(List.of(cyrene, cerydra),
-                List.of(EnemyFactory.create(1002011, 90, 1)), new Random(0));
+                List.of(EnemyFactory.create(1002011, 90, 1)), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         cyrene = battle.characters.get(0);

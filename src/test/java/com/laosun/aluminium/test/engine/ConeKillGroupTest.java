@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Three cones with a permanent attack boost and a kill-triggered second clause: 21019 (crit rate on a kill), 21020 (crit damage on a kill) and 21033 (heal a
@@ -80,6 +79,6 @@ public class ConeKillGroupTest {
     }
 
     private static Battle battle(Character unit, Enemy enemy) {
-        return new Battle(List.of(unit), List.of(enemy), new Random(0));
+        return new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
     }
 }

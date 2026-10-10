@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Relic set 315 (2 pieces): an ally's follow-up grants a stack of Merit (功勋) (capped), each stack raises follow-up damage, and a FULL stack adds crit damage.
@@ -33,7 +32,7 @@ public class ValorousFollowUpTest {
         Character wearer = wearer();
         Character ally = CharacterFactory.create(ALLY, LEVEL);
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(wearer, ally), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(wearer, ally), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         battle.currentMove = new Signal(wearer);
         battle.beforeMove();
@@ -51,7 +50,7 @@ public class ValorousFollowUpTest {
         Character wearer = wearer();
         Character ally = CharacterFactory.create(ALLY, LEVEL);
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(wearer, ally), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(wearer, ally), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         battle.currentMove = new Signal(wearer);
         battle.beforeMove();

@@ -4,10 +4,10 @@ import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Signal;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import java.util.List;
-import java.util.Random;
 
 /** "每从 1 个除德谬歌以外不同的队友处获得[追忆]后". */
 public class TrueSelfOdeDistinctAlliesTest {
@@ -19,7 +19,7 @@ public class TrueSelfOdeDistinctAlliesTest {
         Character one = CharacterFactory.create(1405, 80);
         Character two = CharacterFactory.create(1403, 80);
         Battle battle = new Battle(List.of(cyrene, one, two),
-                List.of(EnemyFactory.create(1002011, 100, 1)), new Random(0));
+                List.of(EnemyFactory.create(1002011, 100, 1)), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         var dragon = battle.summonMemosprite(battle.characters.get(0));

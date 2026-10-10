@@ -2,6 +2,7 @@ package com.laosun.aluminium.test.trigger;
 
 
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.beans.EffectSpec;
@@ -21,7 +22,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * {@code self_attr:<ATTRIBUTE>} - a numeric condition on <b>one of my own attribute values</b>.
@@ -102,7 +102,7 @@ public class SelfAttributeConditionTest {
         Character slow = ownerWithTrigger(speedThresholdRule(145), 100);
         Character fast = newOwner(200);
         fast.setTriggerTable(new TriggerTable(OWNER, List.of()));
-        Battle battle = new Battle(List.of(slow, fast), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(slow, fast), List.of(dummy()), BattleFixture.seeded());
         battle.startBattle();
 
         Assertions.assertEquals(0, battle.fireTriggers(TriggerEvent.ALLY_ATTACK, fast, null, 1, 0),
@@ -115,7 +115,7 @@ public class SelfAttributeConditionTest {
     @Test
     public void theSameRuleFiresForAFastOwner() {
         Character fast = ownerWithTrigger(speedThresholdRule(120), 130);
-        Battle battle = new Battle(List.of(fast), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(fast), List.of(dummy()), BattleFixture.seeded());
         battle.startBattle();
 
         Assertions.assertEquals(1, battle.fireTriggers(TriggerEvent.ALLY_ATTACK, fast, null, 1, 0));
@@ -426,7 +426,7 @@ public class SelfAttributeConditionTest {
         owner.setAttribute(AttributeType.CRIT_CHANCE, new DoubleValue(critChance));
         owner.setTriggerTable(new TriggerTable(OWNER, List.of(critThresholdRule(0.7))));
 
-        Battle battle = new Battle(List.of(owner), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(owner), List.of(dummy()), BattleFixture.seeded());
         battle.startBattle();
         return battle.fireTriggers(TriggerEvent.ALLY_ATTACK, owner, null, 1, 0);
     }
@@ -438,7 +438,7 @@ public class SelfAttributeConditionTest {
         TriggerSpecs.set(spec, "when", List.of(condition));
 
         Character owner = ownerWithTrigger(spec, speed);
-        Battle battle = new Battle(List.of(owner), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(owner), List.of(dummy()), BattleFixture.seeded());
         battle.startBattle();
         return battle.fireTriggers(TriggerEvent.ALLY_ATTACK, owner, null, 1, 0);
     }
@@ -449,7 +449,7 @@ public class SelfAttributeConditionTest {
                 RelicFactory.suit(setId, 5, 15));
         wearer.setAttribute(AttributeType.SPEED, new DoubleValue(speed));
 
-        Battle battle = new Battle(List.of(wearer), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(wearer), List.of(dummy()), BattleFixture.seeded());
         battle.startBattle();
         return wearer.getAttribute(AttributeType.ATTACK).get();
     }
@@ -487,7 +487,7 @@ public class SelfAttributeConditionTest {
 
     /** When the given unit's next turn comes, in the battle's action-value clock. */
     private static double nextActionTime(Character unit) {
-        Battle battle = new Battle(List.of(unit), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(unit), List.of(dummy()), BattleFixture.seeded());
         battle.startBattle();
         return battle.queue.snapshot().stream()
                 .filter(signal -> signal.getCanHit() == unit)

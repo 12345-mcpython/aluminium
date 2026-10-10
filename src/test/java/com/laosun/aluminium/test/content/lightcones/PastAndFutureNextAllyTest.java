@@ -9,12 +9,12 @@ import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Weapon;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 /**
  * Cone 21025: shape, plus a runtime measurement that CAN tell the two readings apart.
@@ -72,7 +72,7 @@ public class PastAndFutureNextAllyTest {
                     Character b = CharacterFactory.create(allies[i], LEVEL);
                     Character c = CharacterFactory.create(allies[j], LEVEL);
                     Battle cand = new Battle(List.of(a, b, c),
-                            List.of(EnemyFactory.create(1002011, 90, 1)), new Random(0));
+                            List.of(EnemyFactory.create(1002011, 90, 1)), BattleFixture.seeded());
                     cand.startBattle();
                     List<CanHit> ord = orderOf(cand);
                     if (ord.size() != 4 || !ord.contains(a)) {

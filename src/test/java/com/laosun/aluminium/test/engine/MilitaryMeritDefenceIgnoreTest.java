@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * 1412："持有[军功]的角色造成伤害时无视目标 16% 的防御力".
@@ -29,7 +28,7 @@ public class MilitaryMeritDefenceIgnoreTest {
         Character owner = CharacterFactory.create(OWNER, 80);
         Character ally = CharacterFactory.create(ALLY, 80);
         Battle battle = new Battle(List.of(owner, ally),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
 

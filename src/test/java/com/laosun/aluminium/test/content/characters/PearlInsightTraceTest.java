@@ -15,7 +15,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Character 1503 (Pearl): the two halves of her trace 洞察万物 (Insight Into All Things), the effect-resistance half
@@ -121,7 +120,7 @@ public class PearlInsightTraceTest {
         Character pearl = pearlWith(1200, 0);
         Character ally = CharacterFactory.create(HUNTER, 80);
         Battle battle = new Battle(List.of(pearl, ally), List.of(BattleFixture.monster()),
-                new Random(0));
+                BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
 
@@ -189,7 +188,7 @@ public class PearlInsightTraceTest {
         Character pearl = CharacterFactory.create(PEARL, 80, false, null, null, eidolon);
         pearl.setAttribute(AttributeType.DEFENCE, new com.laosun.aluminium.models.DoubleValue(defence));
         Battle battle = new Battle(List.of(pearl, CharacterFactory.create(HUNTER, 80)),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         return battle.characters.getFirst();
@@ -213,7 +212,7 @@ public class PearlInsightTraceTest {
         }
         Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(pearl, CharacterFactory.create(HUNTER, 80)), List.of(enemy),
-                new Random(0));
+                BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         Character her = battle.characters.getFirst();

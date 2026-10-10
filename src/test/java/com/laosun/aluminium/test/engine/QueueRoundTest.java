@@ -5,11 +5,11 @@ import com.laosun.aluminium.Queue;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * P-1 acceptance: round-based action value.
@@ -95,7 +95,7 @@ public class QueueRoundTest {
     public void battleExposesTheRound() {
         Character hero = Character.fromAttributes("hero", 10_000, 100, 100, 100);
         Enemy enemy = EnemyFactory.create(1002011, 90, 1);      // speed 132 > 100, so it acts first
-        Battle battle = new Battle(List.of(hero), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(hero), List.of(enemy), BattleFixture.seeded());
 
         Assertions.assertEquals(1, battle.getRound(), "it is round 1 at the start");
         battle.stepForward();

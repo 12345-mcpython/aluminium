@@ -18,7 +18,6 @@ import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * `percent_from_cast_param`: a magnitude that is a skill parameter TIMES an attribute.
@@ -47,7 +46,7 @@ public class PercentFromCastParamScaleTest {
         Character cyrene = CharacterFactory.create(CYRENE, LEVEL);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
         Battle battle = new Battle(List.of(cyrene, ally),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         Summon demiurge = battle.summonServant(cyrene);

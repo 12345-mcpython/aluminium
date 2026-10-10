@@ -16,7 +16,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * `damage_is_additional`: the instance being settled IS additional damage.
@@ -37,7 +36,7 @@ public class DamageIsAdditionalTest {
         Character owner = CharacterFactory.create(OWNER, LEVEL);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
         Battle battle = new Battle(List.of(owner, ally),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         owner = battle.characters.getFirst();

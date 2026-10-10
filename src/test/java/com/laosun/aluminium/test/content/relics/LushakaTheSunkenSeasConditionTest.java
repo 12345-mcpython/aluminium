@@ -7,11 +7,11 @@ import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Relic 31's CONDITION half: "若装备者不是队伍第一名".
@@ -35,7 +35,7 @@ public class LushakaTheSunkenSeasConditionTest {
         Character ally = CharacterFactory.create(1001, LEVEL);
         Character wearer = CharacterFactory.create(1210, LEVEL);
         Battle battle = new Battle(List.of(ally, wearer), List.of(EnemyFactory.create(1002011, 90, 1)),
-                new Random(0));
+                BattleFixture.seeded());
         battle.startBattle();
         Assertions.assertSame(ally, battle.characters.getFirst(), "the party list order is what matters");
         Assertions.assertEquals(1,
@@ -46,7 +46,7 @@ public class LushakaTheSunkenSeasConditionTest {
         Character first = CharacterFactory.create(1210, LEVEL);
         Character second = CharacterFactory.create(1001, LEVEL);
         Battle other = new Battle(List.of(first, second), List.of(EnemyFactory.create(1002011, 90, 1)),
-                new Random(0));
+                BattleFixture.seeded());
         other.startBattle();
         Assertions.assertSame(first, other.characters.getFirst(), "the wearer leads the party here");
         Assertions.assertEquals(0,

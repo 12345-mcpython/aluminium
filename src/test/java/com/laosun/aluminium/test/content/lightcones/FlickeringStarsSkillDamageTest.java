@@ -19,7 +19,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Light cone 23061's last half: while the crown is up, the wearer's SKILL damage is 2% higher.
@@ -40,7 +39,7 @@ public class FlickeringStarsSkillDamageTest {
         Character wearer = CharacterFactory.create(1205, LEVEL, true, Weapon.build(CONE, LEVEL, false, 1));
         Enemy enemy = BattleFixture.monster();
         Character ally = CharacterFactory.create(1001, LEVEL);
-        Battle battle = new Battle(List.of(wearer, ally), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(wearer, ally), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         // Crown FIRST: `matching` evaluates the conditions, so without the state this rule is filtered out (discipline 182).
         var skill = wearer.getSkills().values().stream()
@@ -97,7 +96,7 @@ public class FlickeringStarsSkillDamageTest {
             }
             candidate.setTriggerTable(TriggerTable.EMPTY);
             Enemy probeEnemy = BattleFixture.monster();
-            Battle probe = new Battle(List.of(candidate), List.of(probeEnemy), new Random(0));
+            Battle probe = new Battle(List.of(candidate), List.of(probeEnemy), BattleFixture.seeded());
             probe.startBattle();
             candidate.getAttribute(AttributeType.CRIT_CHANCE)
                     .addModifier(DoubleValue.Modifier.pure(-1.0, DoubleValue.Modifier.ModifierSource.BUFF, 230614));
@@ -118,7 +117,7 @@ public class FlickeringStarsSkillDamageTest {
         // two sides differed by far more than the one rule under test (measured: basic x0.35, i.e. nothing to do with 2%).
         plain.setTriggerTable(TriggerTable.EMPTY);
         Enemy plainEnemy = BattleFixture.monster();
-        Battle before = new Battle(List.of(plain), List.of(plainEnemy), new Random(0));
+        Battle before = new Battle(List.of(plain), List.of(plainEnemy), BattleFixture.seeded());
         before.startBattle();
         plain.getAttribute(AttributeType.CRIT_CHANCE)
                 .addModifier(DoubleValue.Modifier.pure(-1.0, DoubleValue.Modifier.ModifierSource.BUFF, 230613));
@@ -139,7 +138,7 @@ public class FlickeringStarsSkillDamageTest {
                 TriggerSpecs.rule("DEALING_DAMAGE",
                         List.of("actor == self", "from_category BPSKILL", "self has_state " + CROWN), boost))));
         Enemy boostedEnemy = BattleFixture.monster();
-        Battle after = new Battle(List.of(boosted), List.of(boostedEnemy), new Random(0));
+        Battle after = new Battle(List.of(boosted), List.of(boostedEnemy), BattleFixture.seeded());
         after.startBattle();
         boosted.getAttribute(AttributeType.CRIT_CHANCE)
                 .addModifier(DoubleValue.Modifier.pure(-1.0, DoubleValue.Modifier.ModifierSource.BUFF, 230613));
@@ -168,7 +167,7 @@ public class FlickeringStarsSkillDamageTest {
         Character plain = CharacterFactory.create(cid, LEVEL);
         plain.setTriggerTable(TriggerTable.EMPTY);
         Enemy plainEnemy = BattleFixture.monster();
-        Battle before = new Battle(List.of(plain), List.of(plainEnemy), new Random(0));
+        Battle before = new Battle(List.of(plain), List.of(plainEnemy), BattleFixture.seeded());
         before.startBattle();
         plain.getAttribute(AttributeType.CRIT_CHANCE)
                 .addModifier(DoubleValue.Modifier.pure(-1.0, DoubleValue.Modifier.ModifierSource.BUFF, 230615));
@@ -188,7 +187,7 @@ public class FlickeringStarsSkillDamageTest {
                 TriggerSpecs.rule("DEALING_DAMAGE",
                         List.of("actor == self", "from_category BPSKILL", "self has_state " + CROWN), small))));
         Enemy boostedEnemy = BattleFixture.monster();
-        Battle after = new Battle(List.of(boosted), List.of(boostedEnemy), new Random(0));
+        Battle after = new Battle(List.of(boosted), List.of(boostedEnemy), BattleFixture.seeded());
         after.startBattle();
         boosted.getAttribute(AttributeType.CRIT_CHANCE)
                 .addModifier(DoubleValue.Modifier.pure(-1.0, DoubleValue.Modifier.ModifierSource.BUFF, 230615));

@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * 1222 Lingsha (灵砂)'s Eidolon (星魂) 2: "施放终结技后,使我方全体击破特攻提高40%,持续3回合" (after casting the ultimate, all of our side's break effect is raised by 40% for 3 turns).
@@ -27,7 +26,7 @@ public class LingshaEidolonBreakEffectTest {
         Character lingsha = CharacterFactory.create(LINGSHA, LEVEL);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(lingsha, ally), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(lingsha, ally), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         double before = ally.getAttribute(AttributeType.BREAKING_EFFECT).get();
         battle.castImmediate(lingsha.getSkills().get(SkillType.ULTRA), lingsha, List.of(enemy));

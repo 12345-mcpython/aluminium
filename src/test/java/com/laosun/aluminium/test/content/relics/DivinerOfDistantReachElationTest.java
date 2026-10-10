@@ -8,11 +8,11 @@ import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Relic 130's SECOND sentence: "每场战斗第一次施放欢愉技时，我方全体欢愉度 +10%".
@@ -30,7 +30,7 @@ public class DivinerOfDistantReachElationTest {
 
     private static Battle battleWith(Character owner) {
         Battle battle = new Battle(List.of(owner, CharacterFactory.create(1001, LEVEL)),
-                List.of(EnemyFactory.create(1002011, 90, 1)), new Random(0));
+                List.of(EnemyFactory.create(1002011, 90, 1)), BattleFixture.seeded());
         battle.startBattle();
         return battle;
     }

@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * 1314 Jade (翡翠)'s 星魂 (Eidolon) 2: "when [当品] stacks to 15 layers, Jade's CRIT Rate is increased by 18%" -- a threshold on the counter she now ships.
@@ -39,7 +38,7 @@ public class JadeEidolonThresholdTest {
     private static double critChance(boolean technique) {
         Character jade = CharacterFactory.create(JADE, LEVEL, true, null, null, 2);
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(jade), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(jade), List.of(enemy), BattleFixture.seeded());
         if (technique) {
             battle.markTechniqueUsed(jade);
         }

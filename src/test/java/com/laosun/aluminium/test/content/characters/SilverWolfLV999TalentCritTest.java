@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Character 1506 (Silver Wolf LV.999): her talent's conversion - 「每点【隐藏分】使暴击率提高 <b>0.4%</b>。暴击率达到 <b>100%</b> 后，
@@ -147,7 +146,7 @@ public class SilverWolfLV999TalentCritTest {
     private static Reading read(int[] gains) {
         Battle battle = new Battle(
                 List.of(CharacterFactory.create(WOLF, 80), CharacterFactory.create(ALLY, 80)),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         Character wolf = battle.characters.getFirst();

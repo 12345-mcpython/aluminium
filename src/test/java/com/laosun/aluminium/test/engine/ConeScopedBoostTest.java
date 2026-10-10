@@ -16,7 +16,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /** Cones 2303(skill + ultimate damage after an ultimate) and 23034 (a stack for the skill's target). */
 public class ConeScopedBoostTest {
@@ -36,7 +35,7 @@ public class ConeScopedBoostTest {
     public void theUltimateRaisesBothScopedBoosts() {
         Character unit = wearer(23037);
         Enemy enemy = enemy();
-        Battle battle = new Battle(List.of(unit), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         double skillBefore = unit.getAttribute(AttributeType.SKILL_DAMAGE_BOOST).get();
         double ultBefore = unit.getAttribute(AttributeType.ULTIMATE_DAMAGE_BOOST).get();
@@ -69,7 +68,7 @@ public class ConeScopedBoostTest {
         Character unit = wearer(23034);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
         Enemy enemy = enemy();
-        Battle battle = new Battle(List.of(unit, ally), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(unit, ally), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         double allyBefore = ally.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
         double enemyBefore = enemy.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();

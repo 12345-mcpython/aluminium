@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * "equal to <b>the original damage</b> X%" - the rider settles to the share the text states.
@@ -80,7 +79,7 @@ public class OriginalDamageRiderTest {
     private static double ultimateLoss(int eidolon) {
         Character her = CharacterFactory.create(HIMEKO, LEVEL, false, null, null, eidolon);
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(her), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(her), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         double before = enemy.getCurrentHp();
         her.getSkills().get(SkillType.ULTRA).execute(battle, her, List.of(enemy));
@@ -96,7 +95,7 @@ public class OriginalDamageRiderTest {
         Character owner = CharacterFactory.create(HIMEKO, LEVEL, false, null, null, 0);
         owner.setTriggerTable(new TriggerTable(HIMEKO, share > 0 ? List.of(rider(share)) : List.of()));
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(owner), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(owner), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         double before = enemy.getCurrentHp();
         owner.getSkills().get(SkillType.COMMON).execute(battle, owner, List.of(enemy));

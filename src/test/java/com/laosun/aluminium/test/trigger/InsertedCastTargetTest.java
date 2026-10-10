@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * The commanded cast's own target is readable when it ends.
@@ -33,7 +32,7 @@ public class InsertedCastTargetTest {
         Character owner = CharacterFactory.create(OWNER, LEVEL, false, null, null, 0);
         owner.setTriggerTable(scene());
         Enemy victim = BattleFixture.monster();
-        Battle battle = new Battle(List.of(owner), List.of(victim), new Random(0));
+        Battle battle = new Battle(List.of(owner), List.of(victim), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
 

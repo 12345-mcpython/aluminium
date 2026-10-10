@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Three cones whose effects a real battle can drive, chosen by asking whether the state exists before the trigger: 20008 (party energy at battle start),
@@ -25,7 +24,7 @@ public class ConeEnergyHealTest {
     public void cone20008GivesTheWholePartyEnergyAtBattleStart() {
         Character wearer = wearer(20008, 1);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
-        Battle battle = new Battle(List.of(wearer, ally), List.of(enemy()), new Random(0));
+        Battle battle = new Battle(List.of(wearer, ally), List.of(enemy()), BattleFixture.seeded());
         double wearerBefore = wearer.getCurrentEnergy();
         double allyBefore = ally.getCurrentEnergy();
         battle.startBattle();
@@ -39,7 +38,7 @@ public class ConeEnergyHealTest {
     @Test
     public void cone20010HealsOnTheUltimateByMaxHpShare() {
         Character unit = wearer(20010, 1);
-        Battle battle = new Battle(List.of(unit), List.of(enemy()), new Random(0));
+        Battle battle = new Battle(List.of(unit), List.of(enemy()), BattleFixture.seeded());
         battle.startBattle();
         unit.takeDamage(unit.getMaxHp() * 0.5);
         double before = unit.getCurrentHp();

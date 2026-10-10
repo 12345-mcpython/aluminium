@@ -20,7 +20,6 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 /**
  * `wave_monster`: the SINGLE aim a commanded cast can name.
@@ -47,7 +46,7 @@ public class WaveMonsterAimTest {
 
         Character owner = CharacterFactory.create(OWNER, LEVEL);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
-        Battle battle = new Battle(List.of(owner, ally), new ArrayList<>(), new Random(0));
+        Battle battle = new Battle(List.of(owner, ally), new ArrayList<>(), BattleFixture.seeded());
 
         EffectSpec effect = new EffectSpec();
         TriggerSpecs.set(effect, "op", "MODIFY_ATTR");
@@ -86,7 +85,7 @@ public class WaveMonsterAimTest {
         Character owner = CharacterFactory.create(OWNER, LEVEL);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
         Battle battle = new Battle(List.of(owner, ally),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
 

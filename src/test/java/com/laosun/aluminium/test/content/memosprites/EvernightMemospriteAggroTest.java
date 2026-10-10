@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * "'长夜'被攻击的概率提高" - the memosprite's own aggro weight, which is a different unit from its master.
@@ -33,7 +32,7 @@ public class EvernightMemospriteAggroTest {
     public void herMemospriteCarriesTheAggroRatioItsProseNeverNames() {
         Character her = CharacterFactory.create(EVERNIGHT, LEVEL);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
-        Battle battle = new Battle(List.of(her, ally), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(her, ally), List.of(dummy()), BattleFixture.seeded());
 
         battle.startBattle();
 

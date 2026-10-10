@@ -2,6 +2,7 @@ package com.laosun.aluminium.test.engine;
 
 
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
@@ -20,7 +21,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * {@code target: "other_allies"} - "the teammates other than yourself", and the group {@code ADVANCE} it exists for.
@@ -63,7 +63,7 @@ public class OtherAlliesTargetTest {
     /** "除自身以外": the teammates act now, the owner does not. */
     @Test
     public void otherAlliesLeavesTheOwnerOut() {
-        Battle battle = new Battle(party(), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(party(), List.of(dummy()), BattleFixture.seeded());
         Character owner = battle.characters.getFirst();
         battle.startBattle();
         double ownerBefore = timeRemaining(battle, owner);
@@ -87,7 +87,7 @@ public class OtherAlliesTargetTest {
      */
     @Test
     public void allAlliesIncludesTheOwner() {
-        Battle battle = new Battle(party("all_allies"), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(party("all_allies"), List.of(dummy()), BattleFixture.seeded());
         Character owner = battle.characters.getFirst();
         battle.startBattle();
 
@@ -101,7 +101,7 @@ public class OtherAlliesTargetTest {
     /** The group is the <b>camp</b>: a player-side summon is one of us and is advanced with the rest. */
     @Test
     public void aSummonInOurCampIsOneOfUs() {
-        Battle battle = new Battle(party(), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(party(), List.of(dummy()), BattleFixture.seeded());
         Character owner = battle.characters.getFirst();
         battle.startBattle();
         Summon minion = battle.summon(owner, MONSTER, 1);
@@ -138,7 +138,7 @@ public class OtherAlliesTargetTest {
         Character robin = CharacterFactory.create(ROBIN, LEVEL);
         Character first = CharacterFactory.create(OWNER, LEVEL);
         Character second = CharacterFactory.create(1210, LEVEL);
-        Battle battle = new Battle(List.of(robin, first, second), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(robin, first, second), List.of(dummy()), BattleFixture.seeded());
         battle.startBattle();
         double robinBefore = timeRemaining(battle, robin);
 
@@ -154,7 +154,7 @@ public class OtherAlliesTargetTest {
     @Test
     public void theAuthoredRobinRuleStatesItsShape() {
         Character robin = CharacterFactory.create(ROBIN, LEVEL);
-        Battle battle = new Battle(List.of(robin), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(List.of(robin), List.of(dummy()), BattleFixture.seeded());
         battle.startBattle();
 
         List<TriggerTable.CompiledRule> rules = TriggerTables.of(ROBIN).matching(TriggerEvent.ULT_CAST,
@@ -183,7 +183,7 @@ public class OtherAlliesTargetTest {
      */
     @Test
     public void thePairIsTheChosenUnitAndItsOwnSummon() {
-        Battle battle = new Battle(party(TARGET_AND_SUMMON), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(party(TARGET_AND_SUMMON), List.of(dummy()), BattleFixture.seeded());
         Character owner = battle.characters.getFirst();
         Character chosen = battle.characters.get(1);
         battle.startBattle();
@@ -211,7 +211,7 @@ public class OtherAlliesTargetTest {
      */
     @Test
     public void aChosenUnitWithoutASummonIsJustTheUnit() {
-        Battle battle = new Battle(party(TARGET_AND_SUMMON), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(party(TARGET_AND_SUMMON), List.of(dummy()), BattleFixture.seeded());
         Character owner = battle.characters.getFirst();
         Character chosen = battle.characters.get(1);
         battle.startBattle();
@@ -225,7 +225,7 @@ public class OtherAlliesTargetTest {
     /** Only the summon <b>that is out</b> counts: a dead one is not part of the pair. */
     @Test
     public void aDeadSummonIsNotPartOfThePair() {
-        Battle battle = new Battle(party(TARGET_AND_SUMMON), List.of(dummy()), new Random(0));
+        Battle battle = new Battle(party(TARGET_AND_SUMMON), List.of(dummy()), BattleFixture.seeded());
         Character owner = battle.characters.getFirst();
         Character chosen = battle.characters.get(1);
         battle.startBattle();
@@ -254,7 +254,7 @@ public class OtherAlliesTargetTest {
         Character owner = CharacterFactory.create(OWNER, LEVEL);
         owner.setTriggerTable(new TriggerTable(OWNER, List.of(TriggerSpecs.rule("ULT_CAST", null, effect))));
         Battle battle = new Battle(List.of(owner, CharacterFactory.create(1210, LEVEL)), List.of(dummy()),
-                new Random(0));
+                BattleFixture.seeded());
         battle.startBattle();
 
         IllegalStateException refused = Assertions.assertThrows(IllegalStateException.class,

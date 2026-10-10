@@ -7,7 +7,6 @@ import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import java.util.List;
-import java.util.Random;
 
 /**
  * `allies_of_path:智识` and the clause it unlocks: "所有'智识'命途角色攻击力提高 #3(30)%" (all characters on the Erudition path gain #3(30)% ATK).
@@ -49,7 +48,7 @@ public class ReasonOdeEruditionAttackTest {
         Character jingYuan = CharacterFactory.create(JING_YUAN, LEVEL);
         Character tribbie = CharacterFactory.create(TRIBBIE, LEVEL);
         Battle battle = new Battle(List.of(cyrene, anaxa, jingYuan, tribbie),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         if (castTheOde) {

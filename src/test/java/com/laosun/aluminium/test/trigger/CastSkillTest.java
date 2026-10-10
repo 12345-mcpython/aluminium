@@ -16,7 +16,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * {@code CAST_SKILL}: "使<那个单位>立即施放 1 次…" - the op that lets a rule command somebody else to cast.
@@ -92,7 +91,7 @@ public class CastSkillTest {
             owner.setTriggerTable(TriggerTable.EMPTY);
         }
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(owner, caster), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(owner, caster), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         double before = enemy.getCurrentHp();
         if (commanded) {
@@ -124,7 +123,7 @@ public class CastSkillTest {
         Enemy left = BattleFixture.monster();
         Enemy centre = BattleFixture.monster();
         Enemy right = BattleFixture.monster();
-        Battle battle = new Battle(List.of(owner, caster), List.of(left, centre, right), new Random(0));
+        Battle battle = new Battle(List.of(owner, caster), List.of(left, centre, right), BattleFixture.seeded());
         battle.startBattle();
         double[] before = {left.getCurrentHp(), centre.getCurrentHp(), right.getCurrentHp()};
 
@@ -191,7 +190,7 @@ public class CastSkillTest {
 
         Character caster = CharacterFactory.create(ELATION_CASTER, LEVEL);
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(owner, caster), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(owner, caster), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         double before = enemy.getCurrentHp();
         battle.fireTriggers(TriggerEvent.ULT_CAST, owner, caster, 0, 0);
@@ -207,7 +206,7 @@ public class CastSkillTest {
     public void hisTurnStartAutoCastDealsDamage() {
         Character him = CharacterFactory.create(BLAST_CASTER, LEVEL);
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(him), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(him), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         // Note: "[血仇]状态期间…自身回合开始时自动施放[弑王成王]": the gate is part of the sentence, so the scene
         // enters the state. The rule used to fire unconditionally, which is the defect that gate corrects.
@@ -227,7 +226,7 @@ public class CastSkillTest {
     public void hisUltimateCommandsHisTalentRightNow() {
         Character him = CharacterFactory.create(1504, LEVEL);
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(him), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(him), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
 
         double before = enemy.getCurrentHp();
@@ -274,7 +273,7 @@ public class CastSkillTest {
         // Note: Read BEFORE the battle starts: the shield is computed inside the cast, i.e. BEFORE the post-cast
         // SKILL_CAST event that raises his ATK by the Shenxiu (神秀) trace -- so the number to compare against is this one.
         double attackBefore = him.getAttribute(com.laosun.aluminium.enums.AttributeType.ATTACK).get();
-        Battle battle = new Battle(List.of(ally, him), List.of(BattleFixture.monster()), new Random(0));
+        Battle battle = new Battle(List.of(ally, him), List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.markTechniqueUsed(him);
         double pointsBefore = battle.getSkillPoints();
         battle.startBattle();
@@ -319,7 +318,7 @@ public class CastSkillTest {
         owner.setTriggerTable(new TriggerTable(OWNER, List.of(command("SKILL"))));
         Character caster = CharacterFactory.create(UNDELIVERABLE, LEVEL);
         Battle battle = new Battle(List.of(owner, caster), List.of(BattleFixture.monster()),
-                new Random(0));
+                BattleFixture.seeded());
         battle.startBattle();
 
         IllegalStateException refused = Assertions.assertThrows(IllegalStateException.class,

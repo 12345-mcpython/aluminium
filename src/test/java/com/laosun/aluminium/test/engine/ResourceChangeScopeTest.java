@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 /**
  * {@code resource_changed:} is scoped to the firing that raised it - a nested resource move cannot silence the rest of
@@ -142,7 +141,7 @@ public class ResourceChangeScopeTest {
         Character giver = Character.fromAttributes("giver", 1000, 100, 100, 100);
         giver.setTriggerTable(new TriggerTable(1, List.of(giverRule)));
         Battle battle = new Battle(List.of(receiver, giver), List.of(BattleFixture.monster()),
-                new Random(0));
+                BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         return battle;

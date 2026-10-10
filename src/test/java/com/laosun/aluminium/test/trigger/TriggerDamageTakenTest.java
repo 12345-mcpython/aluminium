@@ -2,6 +2,7 @@ package com.laosun.aluminium.test.trigger;
 
 
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
@@ -22,7 +23,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * The {@code MODIFY_DAMAGE_TAKEN} op: "受到的伤害提高 X%" (vulnerability, 易伤) and "受到的伤害降低 X%" (reduction, 减伤) as data.
@@ -284,7 +284,7 @@ public class TriggerDamageTakenTest {
         for (int i = 0; i < enemyCount; i++) {
             enemies.add(Enemy.fromAttributes("dummy" + i, 1_000_000, 0, 100, 100));
         }
-        Battle battle = new Battle(team, enemies, new Random(0));
+        Battle battle = new Battle(team, enemies, BattleFixture.seeded());
         battle.startBattle();
         return battle;
     }

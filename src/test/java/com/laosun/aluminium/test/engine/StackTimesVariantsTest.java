@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /** Which field stops the repeat? */
 public class StackTimesVariantsTest {
@@ -47,7 +46,7 @@ public class StackTimesVariantsTest {
                 List.of(TriggerSpecs.rule("BATTLE_START", List.of(), grant, apply)),
                 List.of(new ResourceSpec(COUNTER, 2147483647, 0, null, "PARTY", "hand-built probe", null))));
         Battle battle = new Battle(List.of(owner),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         return owner.getBuffManager().stacksOf(STATE);

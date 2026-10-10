@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * 1412 Cerydra (刻律德菈)'s Skill, second half: "when charge reaches 6 points, automatically upgrade the character's [军功] to [爵位]".
@@ -38,7 +37,7 @@ public class PeerageUpgradeTest {
         Character ally = CharacterFactory.create(ALLY, LEVEL, false, null, null, 0);
         ally.setTriggerTable(new TriggerTable(ALLY, List.of()));
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(cerydra, ally), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(cerydra, ally), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
 
         for (int cast = 1; cast <= 5; cast++) {

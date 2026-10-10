@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * 1218 Jiaoqiu's ultimate: "处于结界中时，敌方目标受到的终结技伤害提高 15.00%…结界持续 3 回合".
@@ -53,7 +52,7 @@ public class JiaoqiuUltTakenTest {
     public void ultimateDamageIsAmplifiedAndNormalIsNot() {
         Character unit = CharacterFactory.create(WEARER, LEVEL);
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(unit), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         battle.fireTriggers(TriggerEvent.ULT_CAST, unit, enemy, 0, 0);
         double normal = battle.applyDamage(enemy, new Damage(unit, enemy, DamageElement.FIRE, DamageType.NORMAL, 1000));
@@ -66,7 +65,7 @@ public class JiaoqiuUltTakenTest {
     public void theTieredRuleStatesItsBaseSharePerLayerAndCeiling() {
         Character unit = CharacterFactory.create(WEARER, LEVEL);
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(unit), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         // Note: `matching` EVALUATES the rule's conditions, so the counter must really be stacked: the character's own ADD_STACK rule
         // (on ALLY_ATTACK) is what creates it -- a hand-made state does not register (round 219/240).

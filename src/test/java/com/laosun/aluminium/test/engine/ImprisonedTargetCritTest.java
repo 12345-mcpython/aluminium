@@ -17,7 +17,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Relic 112, 4 pieces: crit chance against a debuffed target, crit damage against an imprisoned one -- both INSTANCE-scoped.
@@ -46,7 +45,7 @@ public class ImprisonedTargetCritTest {
     private static Damage settle(boolean imprisoned, boolean debuffed) {
         Character unit = CharacterFactory.create(WEARER, LEVEL, true, null, RelicFactory.suit(112, 4, RELIC_LEVEL));
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(unit), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         if (imprisoned) {
             enemy.getBuffManager().addBuff(new StateBuff(IMPRISONED, 3));

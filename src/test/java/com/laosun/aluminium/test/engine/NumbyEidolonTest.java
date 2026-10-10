@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * 110's eidolon 2: "after casting the ultimate, ATK is increased by #1%, lasting 2 turns".
@@ -26,7 +25,7 @@ public class NumbyEidolonTest {
     public void theSecondEidolonRaisesAttackAfterTheUltimate() {
         Character unit = CharacterFactory.create(WEARER, LEVEL);
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(unit), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         battle.currentMove = new Signal(unit);
         battle.beforeMove();

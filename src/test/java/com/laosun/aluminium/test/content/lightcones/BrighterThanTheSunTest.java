@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Light cone 23015: a basic attack grants one [龙吟] layer (two turns, at most two), and each layer raises ATTACK and
@@ -31,7 +30,7 @@ public class BrighterThanTheSunTest {
 
     private Battle battleWith(Character unit) {
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(unit), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         return battle;
     }

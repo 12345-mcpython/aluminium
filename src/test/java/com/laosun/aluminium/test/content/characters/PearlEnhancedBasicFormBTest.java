@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Character 1503 (Pearl): the OTHER enhanced basic - the one for an archetype that is NOT on the Elation path.
@@ -115,7 +114,7 @@ public class PearlEnhancedBasicFormBTest {
         Battle battle = new Battle(
                 List.of(CharacterFactory.create(PEARL, 80), CharacterFactory.create(ELATION, 80),
                         CharacterFactory.create(HUNTER, 80), CharacterFactory.create(OTHER, 80)),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         return battle;

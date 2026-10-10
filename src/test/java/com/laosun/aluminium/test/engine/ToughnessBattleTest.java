@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * acceptance: each damage instance reduces toughness by the skill's {@code stance_list}, only a
@@ -90,7 +89,7 @@ public class ToughnessBattleTest {
         Enemy left = EnemyFactory.create(ICE_EDGE, 90, 1);
         Enemy right = EnemyFactory.create(ICE_EDGE, 90, 1);
         // Positional order = battle.enemies order; the main target must be in the middle to hit both neighbours
-        Battle battle = new Battle(List.of(himeko), List.of(left, centre, right), new Random(0));
+        Battle battle = new Battle(List.of(himeko), List.of(left, centre, right), BattleFixture.seeded());
 
         battle.castImmediate(new DefaultSkill(1003, 2, 1), himeko, List.of(centre));   // Blast Fire 60/30
 
@@ -105,7 +104,7 @@ public class ToughnessBattleTest {
         Character himeko = character("himeko");
         Enemy first = EnemyFactory.create(ICE_EDGE, 90, 1);
         Enemy second = EnemyFactory.create(ICE_EDGE, 90, 1);
-        Battle battle = new Battle(List.of(himeko), List.of(first, second), new Random(0));
+        Battle battle = new Battle(List.of(himeko), List.of(first, second), BattleFixture.seeded());
 
         battle.castImmediate(new DefaultSkill(1003, 3, 1), himeko, List.of(first));   // ultimate AoE Fire all=60
 

@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * 1415's memosprite skill 10 "献予'创世'之诗", the second half, end to end.
@@ -45,7 +44,7 @@ public class MemospriteSlotCastTest {
         Character cyrene = CharacterFactory.create(CYRENE, LEVEL);
         Character recipient = CharacterFactory.create(TRAILBLAZER, LEVEL);
         Battle battle = new Battle(List.of(cyrene, recipient),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         Summon demiurge = battle.summonServant(cyrene);

@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * 1501："阿哈时刻结束时使火花获得 1 个[额外回合]".
@@ -32,7 +31,7 @@ public class AhaEndExtraTurnTest {
         Character owner = CharacterFactory.create(OWNER, 80);
         Character ally = CharacterFactory.create(ALLY, 80);
         Battle battle = new Battle(List.of(owner, ally),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
 

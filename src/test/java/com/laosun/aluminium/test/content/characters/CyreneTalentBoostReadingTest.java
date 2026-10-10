@@ -4,10 +4,10 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import java.util.List;
-import java.util.Random;
 
 /**
  * What Cyrene (昔涟)'s talent actually leaves on a teammate: "at battle start ... raise the damage dealt by all of our targets".
@@ -26,7 +26,7 @@ public class CyreneTalentBoostReadingTest {
         Character cyrene = CharacterFactory.create(CYRENE, LEVEL);
         Character him = CharacterFactory.create(ANAXA, LEVEL);
         Battle battle = new Battle(List.of(cyrene, him),
-                List.of(EnemyFactory.create(MONSTER, 100, 1)), new Random(0));
+                List.of(EnemyFactory.create(MONSTER, 100, 1)), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         double boost = battle.characters.get(1).getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();

@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Light cone 21056: at battle start the WHOLE party deals 16% more BREAK damage.
@@ -37,7 +36,7 @@ public class InPursuitOfTheWindTest {
                 : CharacterFactory.create(WEARER, LEVEL);
         ally = CharacterFactory.create(ALLY, LEVEL);
         enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(wearer, ally), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(wearer, ally), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         return battle;
     }
@@ -72,7 +71,7 @@ public class InPursuitOfTheWindTest {
         int pinned = 0;
         for (var rule : wearer.getTriggerTable().matching(com.laosun.aluminium.enums.TriggerEvent.BATTLE_START,
                 new com.laosun.aluminium.models.TriggerTable.TriggerContext(wearer, null, null, 0, 0, null,
-                        new Battle(List.of(wearer), List.of(BattleFixture.monster()), new Random(0)), null))) {
+                        new Battle(List.of(wearer), List.of(BattleFixture.monster()), BattleFixture.seeded()), null))) {
             if (!rule.id().startsWith("cone21056_")) {
                 continue;
             }

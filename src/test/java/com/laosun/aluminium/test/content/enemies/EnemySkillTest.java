@@ -11,11 +11,11 @@ import com.laosun.aluminium.models.Damage;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.models.enemy.EnemySkill;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * acceptance: enemy skills (data-driven + fallback).
@@ -71,7 +71,7 @@ public class EnemySkillTest {
     public void attackSettlesAttackPowerTimesMultiplierThroughTheDefenceZone() {
         Enemy iceEdge = EnemyFactory.create(1002011, 90, 1);
         Character victim = victim();
-        Battle battle = new Battle(List.of(victim), List.of(iceEdge), new Random(0));
+        Battle battle = new Battle(List.of(victim), List.of(iceEdge), BattleFixture.seeded());
 
         double attack = iceEdge.getAttribute(AttributeType.ATTACK).get();
         double settled = battle.applyDamage(victim,
@@ -94,7 +94,7 @@ public class EnemySkillTest {
 
         Character victim = victim();
         victim.setMaxEnergy(120);
-        Battle battle = new Battle(List.of(victim), List.of(trampler), new Random(0));
+        Battle battle = new Battle(List.of(victim), List.of(trampler), BattleFixture.seeded());
 
         double attackPower = trampler.getAttribute(AttributeType.ATTACK).get();
         double hpBefore = victim.getCurrentHp();
@@ -110,7 +110,7 @@ public class EnemySkillTest {
         // Enemy crit chance is 0 to no crit; so the settled value = attack power  x  multiplier  x  defence zone  x  resistance zone (characters have no resistance table = 1)
         Enemy iceEdge = EnemyFactory.create(1002011, 90, 1);
         Character victim = victim();
-        Battle battle = new Battle(List.of(victim), List.of(iceEdge), new Random(0));
+        Battle battle = new Battle(List.of(victim), List.of(iceEdge), BattleFixture.seeded());
 
         Assertions.assertEquals(0, iceEdge.getAttribute(AttributeType.CRIT_CHANCE).get(), EPS);
         double settled = battle.applyDamage(victim,

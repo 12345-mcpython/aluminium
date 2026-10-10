@@ -15,7 +15,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * 8009/8010's ultimate clause: 「若目标拥有欢愉技，目标额外获得 10 点【好活当赏】，并使其立即施放 1 次<b>固定计入 20 笑点</b>的欢愉技，
@@ -116,7 +115,7 @@ public class ElationFixedLaughCastTest {
         ally.setTriggerTable(new TriggerTable(ally.getCid(), List.of(
                 TriggerSpecs.rule(TriggerEvent.KILL.name(), List.of(), TriggerSpecs.gainEnergy(1)))));
         Battle battle = new Battle(List.of(harmony, ally), List.of(BattleFixture.monster()),
-                new Random(0));
+                BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         return battle;

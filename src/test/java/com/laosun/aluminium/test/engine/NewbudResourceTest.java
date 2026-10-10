@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * [新蕊]: "我方全体每损失 1 点生命值逍蝶获得 1 点[新蕊]", the carrier's own half.
@@ -27,7 +26,7 @@ public class NewbudResourceTest {
     public void aPointLostIsAPointOfNewbud() {
         Character castorice = CharacterFactory.create(CASTORICE, 80, false, null, null, 0);
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(castorice), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(castorice), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         Assertions.assertNotNull(battle.partyResource("新蕊"),
                 "the battle must know 【新蕊】 (does the declaration say scope PARTY?)");

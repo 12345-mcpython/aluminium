@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * 1408: "when Phainon (白厄) becomes the skill target of any other target, he gains 1 point of [火种] (Coreflame). If the caster is a teammate of Phainon, it also increases Phainon's
@@ -50,7 +49,7 @@ public class SkillTargetCoreflameTest {
         Character owner = CharacterFactory.create(OWNER, 80, false, null, null, 0);
         Character support = CharacterFactory.create(SUPPORT, 80, false, null, null, 0);
         Battle battle = new Battle(List.of(owner, support),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
 

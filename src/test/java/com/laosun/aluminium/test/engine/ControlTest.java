@@ -3,6 +3,7 @@ package com.laosun.aluminium.test.engine;
 
 import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.test.trigger.BreakEffectTableTest;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.enums.AttributeType;
@@ -19,7 +20,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 import java.util.Set;
 
 /**
@@ -441,7 +441,7 @@ public class ControlTest {
             enemy.setAttribute(AttributeType.EFFECT_RESISTANCE, new DoubleValue(0));
             this.hero.setTriggerTable(new com.laosun.aluminium.models.TriggerTable(0,
                     java.util.List.of(rules)));
-            this.battle = new Battle(java.util.List.of(hero), java.util.List.of(enemy), new Random(0));
+            this.battle = new Battle(java.util.List.of(hero), java.util.List.of(enemy), BattleFixture.seeded());
             battle.startBattle();
         }
 
@@ -502,7 +502,7 @@ public class ControlTest {
         hero.setAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST, new DoubleValue(0));
         Enemy enemy = EnemyFactory.create(1002011, 90, 1);          // Ice Edge, toughness 60
         enemy.setStanceWeak(Set.of(weakness));                      // make exactly this element able to break it
-        return new Fixture(new Battle(List.of(hero), List.of(enemy), new Random(0)), hero, enemy);
+        return new Fixture(new Battle(List.of(hero), List.of(enemy), BattleFixture.seeded()), hero, enemy);
     }
 
     /** Action value left before the target acts - the observable the delay really moves. */

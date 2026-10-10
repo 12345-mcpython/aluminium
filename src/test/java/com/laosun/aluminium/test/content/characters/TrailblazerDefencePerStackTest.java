@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Trailblazer - Destruction (开拓者(毁灭))'s trace Tenacity (坚韧): "each layer of the talent's effect also raises the Trailblazer's DEF by 10%" -- the counter scale again, on a counter the
@@ -44,7 +43,7 @@ public class TrailblazerDefencePerStackTest {
     private static void assertDelta(int cid, String counter, int layers, double shareOfBase) {
         Character trailblazer = CharacterFactory.create(cid, LEVEL);
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(trailblazer), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(trailblazer), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         double base = trailblazer.getAttribute(AttributeType.DEFENCE).baseValue();
         double before = trailblazer.getAttribute(AttributeType.DEFENCE).get();

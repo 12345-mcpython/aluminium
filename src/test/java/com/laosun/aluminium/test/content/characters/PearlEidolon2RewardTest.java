@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Character 1503 (Pearl): Eidolon 2 raises the extra turn's reward by 100% - 30/60 becomes 60/120.
@@ -129,7 +128,7 @@ public class PearlEidolon2RewardTest {
         Battle battle = new Battle(
                 List.of(CharacterFactory.create(PEARL, 80, false, null, null, eidolonRank),
                         CharacterFactory.create(ELATION_ALLY, 80), CharacterFactory.create(1204, 80)),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         battle.characters.get(1).getBuffManager()

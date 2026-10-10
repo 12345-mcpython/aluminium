@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * 1303 Ruan Mei (阮-梅)'s eidolon 6: "the duration of the zone unfolded by the ultimate is extended by 1 turn" -- judged over WHOLE turns.
@@ -44,7 +43,7 @@ public class RuanMeiEidolonSixTest {
         Character ruanMei = CharacterFactory.create(RUAN_MEI, LEVEL, true, null, null, rank);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(ruanMei, ally), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(ruanMei, ally), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         battle.castImmediate(ruanMei.getSkills().get(SkillType.ULTRA), ruanMei, List.of(enemy));
         Assertions.assertEquals(0.25, penetrationOf(ally), EPS, "precondition: the zone is up after the cast");

@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /** 1209's trace Frost Favors the Brave (凌霜): "while in the [智剑连心] effect, effect resistance is increased by 20%". */
 public class YanqingTraceTest {
@@ -22,7 +21,7 @@ public class YanqingTraceTest {
     public void theTraceRaisesEffectResistanceForTheTurn() {
         Character unit = CharacterFactory.create(WEARER, LEVEL);
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(unit), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         battle.currentMove = new Signal(unit);
         battle.beforeMove();

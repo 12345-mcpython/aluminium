@@ -5,10 +5,10 @@ import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Weapon;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import java.util.List;
-import java.util.Random;
 
 /** F-7: light cone 23046 gates on the TEAM's skill point cap being 6 or higher. */
 public class Cone23046CapGateTest {
@@ -39,7 +39,7 @@ public class Cone23046CapGateTest {
         List<Character> team = withRaiser
                 ? List.of(wearer, CharacterFactory.create(RAISER, 80))
                 : List.of(wearer);
-        Battle battle = new Battle(team, List.of(EnemyFactory.create(1002011, 100, 1)), new Random(0));
+        Battle battle = new Battle(team, List.of(EnemyFactory.create(1002011, 100, 1)), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         Character mine = battle.characters.stream()

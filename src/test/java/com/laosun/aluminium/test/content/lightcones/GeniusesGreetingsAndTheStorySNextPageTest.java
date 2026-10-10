@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Cones 21051 and 21054 -- both grant their bonus to "装备者与忆灵", i.e. to the wearer AND its memosprite and to nobody else.
@@ -40,7 +39,7 @@ public class GeniusesGreetingsAndTheStorySNextPageTest {
                 : CharacterFactory.create(MASTER, LEVEL, true, Weapon.build(cone, LEVEL, false, 1));
         ally = CharacterFactory.create(ALLY, LEVEL);
         enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(wearer, ally), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(wearer, ally), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         memosprite = battle.summonMemosprite(wearer);
         return battle;

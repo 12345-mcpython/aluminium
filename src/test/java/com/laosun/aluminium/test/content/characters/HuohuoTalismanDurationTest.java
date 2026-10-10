@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * 121 Huohuo (藿藿): "after casting the Skill, Huohuo gains [禳命], lasting 2 turns, and the remaining turns decrease by 1 at the start of each of Huohuo's turns".
@@ -30,7 +29,7 @@ public class HuohuoTalismanDurationTest {
         Character her = CharacterFactory.create(HUOHUO, 80, false, null, null, 0);
         Character ally = CharacterFactory.create(ALLY, 80, false, null, null, 0);
         Battle battle = new Battle(List.of(her, ally),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
 

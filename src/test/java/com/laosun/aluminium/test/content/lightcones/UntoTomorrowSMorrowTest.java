@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Light cone 21055: while one of OUR units is at half health or more, the damage IT deals is 12% higher.
@@ -37,7 +36,7 @@ public class UntoTomorrowSMorrowTest {
                 : CharacterFactory.create(WEARER, LEVEL);
         attacker = CharacterFactory.create(ATTACKER, LEVEL);
         enemy = BattleFixture.monster();
-        battle = new Battle(List.of(wearer, attacker), List.of(enemy), new Random(0));
+        battle = new Battle(List.of(wearer, attacker), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
     }
 

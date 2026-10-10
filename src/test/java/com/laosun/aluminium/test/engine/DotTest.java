@@ -2,6 +2,7 @@ package com.laosun.aluminium.test.engine;
 
 
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.enums.AttributeType;
@@ -20,7 +21,6 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 import java.util.Set;
 
 /**
@@ -43,7 +43,7 @@ public class DotTest {
     public void dotTicksAtTurnStartAndExpiresAfterItsTurns() {
         Character source = character("source", 0.0);
         Enemy dummy = dummy(100_000, 100, 100);
-        Battle battle = new Battle(List.of(source), List.of(dummy), new Random(0));
+        Battle battle = new Battle(List.of(source), List.of(dummy), BattleFixture.seeded());
         dummy.getBuffManager().addBuff(new DotBuff(source, DamageElement.FIRE, 500, 2));
 
         double expected = 500 * 1000.0 / (100 + 1000.0);
@@ -70,7 +70,7 @@ public class DotTest {
         Character source = character("source", 0.0);
         List<DamageElement> seen = new ArrayList<>();
         Enemy recorder = recorder(100_000, 100, 100, seen);
-        Battle battle = new Battle(List.of(source), List.of(recorder), new Random(0));
+        Battle battle = new Battle(List.of(source), List.of(recorder), BattleFixture.seeded());
         recorder.getBuffManager().addBuff(new DotBuff(source, DamageElement.THUNDER, 100, 1));
         recorder.getBuffManager().addBuff(new DotBuff(source, DamageElement.FIRE, 100, 1));
 
@@ -83,7 +83,7 @@ public class DotTest {
     public void theSameElementStacksInsteadOfRefreshing() {
         Character source = character("source", 0.0);
         Enemy dummy = dummy(100_000, 100, 100);
-        Battle battle = new Battle(List.of(source), List.of(dummy), new Random(0));
+        Battle battle = new Battle(List.of(source), List.of(dummy), BattleFixture.seeded());
         dummy.getBuffManager().addBuff(new DotBuff(source, DamageElement.FIRE, 500, 3));
         dummy.getBuffManager().addBuff(new DotBuff(source, DamageElement.FIRE, 500, 3));
 
@@ -99,7 +99,7 @@ public class DotTest {
     public void dotIsBoostedButNeverCrits() {
         Character source = character("source", 1.0);          // DMG boost +100%
         Enemy dummy = dummy(100_000, 100, 100);
-        Battle battle = new Battle(List.of(source), List.of(dummy), new Random(0));
+        Battle battle = new Battle(List.of(source), List.of(dummy), BattleFixture.seeded());
         dummy.getBuffManager().addBuff(new DotBuff(source, DamageElement.FIRE, 500, 1));
 
         double settled = battle.tickDots(dummy);
@@ -113,7 +113,7 @@ public class DotTest {
     public void breakingWithFireAttachesABurn() {
         Character himeko = character("himeko", 0.0);
         Enemy iceEdge = EnemyFactory.create(1002011, 90, 1);   // weak to Fire, toughness 60
-        Battle battle = new Battle(List.of(himeko), List.of(iceEdge), new Random(0));
+        Battle battle = new Battle(List.of(himeko), List.of(iceEdge), BattleFixture.seeded());
 
         battle.castImmediate(new DefaultSkill(1003, 1, 1), himeko, List.of(iceEdge));
         battle.castImmediate(new DefaultSkill(1003, 1, 1), himeko, List.of(iceEdge));   // drains it empty to break
@@ -132,7 +132,7 @@ public class DotTest {
         Character mar7th = character("mar7th", 0.0);
         Enemy iceEdge = EnemyFactory.create(1002011, 90, 1);
         iceEdge.setStanceWeak(Set.of(DamageElement.ICE));      // temporarily made Ice-weak, so that the Ice element can break it
-        Battle battle = new Battle(List.of(mar7th), List.of(iceEdge), new Random(0));
+        Battle battle = new Battle(List.of(mar7th), List.of(iceEdge), BattleFixture.seeded());
 
         for (int i = 0; i < 2; i++) {
             battle.castImmediate(new DefaultSkill(1001, 1, 1), mar7th, List.of(iceEdge));
@@ -147,7 +147,7 @@ public class DotTest {
     public void dotTicksThroughBattleWhenTheEnemyTurnStarts() {
         Character hero = character("hero", 0.0);                        // speed 100 to period 100
         Enemy fast = dummy(100_000, 100, 200);                          // speed 200 to period 50, acts first
-        Battle battle = new Battle(List.of(hero), List.of(fast), new Random(0));
+        Battle battle = new Battle(List.of(hero), List.of(fast), BattleFixture.seeded());
         fast.getBuffManager().addBuff(new DotBuff(hero, DamageElement.FIRE, 500, 2));
 
         battle.stepForward();
@@ -171,7 +171,7 @@ public class DotTest {
     public void aOneTurnDotStillSettlesBeforeItExpires() {
         Character hero = character("hero", 0.0);
         Enemy fast = dummy(100_000, 100, 200);                 // speed 200 to acts first
-        Battle battle = new Battle(List.of(hero), List.of(fast), new Random(0));
+        Battle battle = new Battle(List.of(hero), List.of(fast), BattleFixture.seeded());
         fast.getBuffManager().addBuff(new DotBuff(hero, DamageElement.FIRE, 500, 1));
 
         battle.stepForward();
@@ -197,7 +197,7 @@ public class DotTest {
     public void aCharacterCanCarryADot() {
         Enemy boss = dummy(100_000, 100, 50);                  // speed 50 to the hero (100) acts first
         Character hero = character("hero", 0.0);
-        Battle battle = new Battle(List.of(hero), List.of(boss), new Random(0));
+        Battle battle = new Battle(List.of(hero), List.of(boss), BattleFixture.seeded());
         hero.getBuffManager().addBuff(new DotBuff(boss, DamageElement.FIRE, 500, 2));
 
         battle.stepForward();
@@ -334,7 +334,7 @@ public class DotTest {
             this.enemy = dummy(100_000, 100, 100);
             this.hero.setTriggerTable(new com.laosun.aluminium.models.TriggerTable(0,
                     List.of(TriggerSpecs.rule("ALLY_ATTACK", null, effect))));
-            this.battle = new Battle(List.of(hero), List.of(enemy), new Random(0));
+            this.battle = new Battle(List.of(hero), List.of(enemy), BattleFixture.seeded());
             battle.startBattle();
         }
 

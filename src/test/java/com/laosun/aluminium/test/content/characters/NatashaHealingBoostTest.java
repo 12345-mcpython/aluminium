@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * trace (行迹) "医者": "娜塔莎<b>提供的</b>治疗量提高10%" - the provider's side, read from the healer.
@@ -49,7 +48,7 @@ public class NatashaHealingBoostTest {
         Character healer = CharacterFactory.create(healerCid, LEVEL);
         Character target = CharacterFactory.create(TARGET_ALLY, LEVEL);
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(healer, target), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(healer, target), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         return battle.calculateHeal(healer, target, BASE_HEAL);
     }

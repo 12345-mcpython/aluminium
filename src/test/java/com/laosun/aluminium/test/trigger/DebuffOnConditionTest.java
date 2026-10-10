@@ -15,7 +15,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * The condition {@code <subject>_debuff:<ATTR>}: "that party carries a negative modifier on this attribute".
@@ -45,7 +44,7 @@ public class DebuffOnConditionTest {
         TriggerSpecs.set(pay, "target", "self");
         owner.setTriggerTable(new TriggerTable(UNIT, List.of(TriggerSpecs.rule("DEALING_DAMAGE",
                 List.of("actor == self", condition), pay))));
-        battle = new Battle(List.of(owner), List.of(enemy), new Random(0));
+        battle = new Battle(List.of(owner), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
     }
 

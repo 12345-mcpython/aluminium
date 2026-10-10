@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Light cone 23003: an Ultimate aimed at an ALLY restores one skill point -- but only every second such Ultimate.
@@ -38,7 +37,7 @@ public class ButTheBattleIsnTOverTest {
                 : CharacterFactory.create(WEARER, LEVEL);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
         enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(wearer, ally), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(wearer, ally), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         while (battle.spendSkillPoint()) {
             // drain, so every point granted is visible

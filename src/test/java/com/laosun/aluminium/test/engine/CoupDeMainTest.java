@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * 1412："奇袭：复制一次即将施放的技能并提前施放，随后施放原技能。奇袭不会再次触发奇袭"＋
@@ -47,7 +46,7 @@ public class CoupDeMainTest {
         Character owner = CharacterFactory.create(OWNER, 80);
         Character ally = CharacterFactory.create(ALLY, 80);
         Battle battle = new Battle(List.of(owner, ally),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
 
@@ -78,7 +77,7 @@ public class CoupDeMainTest {
         Character owner = CharacterFactory.create(OWNER, 80);
         Character ally = CharacterFactory.create(ALLY, 80);
         Battle battle = new Battle(List.of(owner, ally),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
 

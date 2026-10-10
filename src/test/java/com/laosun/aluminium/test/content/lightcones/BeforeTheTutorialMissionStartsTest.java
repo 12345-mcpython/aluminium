@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /** Light cone 22000: hit a target whose DEFENCE was lowered and 4 energy comes back. */
 public class BeforeTheTutorialMissionStartsTest {
@@ -30,7 +29,7 @@ public class BeforeTheTutorialMissionStartsTest {
                 ? CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(CONE, LEVEL, false, 1))
                 : CharacterFactory.create(WEARER, LEVEL);
         enemy = BattleFixture.monster();
-        battle = new Battle(List.of(wearer), List.of(enemy), new Random(0));
+        battle = new Battle(List.of(wearer), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
     }
 

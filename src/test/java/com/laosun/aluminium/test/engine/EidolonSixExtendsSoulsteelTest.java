@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * 1209："消灭敌方目标时，如果当前持有[智剑连心]…则使这些增益效果的持续时间全部延长 1 回合".
@@ -41,7 +40,7 @@ public class EidolonSixExtendsSoulsteelTest {
     private static boolean survivesTheTick(int eidolon) {
         Character her = CharacterFactory.create(YANQING, 80, false, null, null, eidolon);
         Battle battle = new Battle(List.of(her),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
 

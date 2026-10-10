@@ -10,7 +10,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Resource-change forwarding: 1506 Silver Wolf LV.999 (银狼LV.999)'s "when gaining a laugh, gains an equal amount of [隐藏分]".
@@ -32,7 +31,7 @@ public class SilverWolfLV999ForwardingTest {
     private void build(int ally) {
         source = CharacterFactory.create(SOURCE, LEVEL);
         other = CharacterFactory.create(ally, LEVEL);
-        battle = new Battle(List.of(source, other), List.of(BattleFixture.monster()), new Random(0));
+        battle = new Battle(List.of(source, other), List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
     }
 

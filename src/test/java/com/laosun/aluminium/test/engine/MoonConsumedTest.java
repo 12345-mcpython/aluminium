@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * 1212 Jingliu's [月色]: "我方目标受到伤害或消耗生命值时，镜流获得 1 层[月色]".
@@ -26,7 +25,7 @@ public class MoonConsumedTest {
     private static final int PAYER = 1205;
     private static final int LEVEL = 80;
         private Battle ready(Character observer, Character payer, Enemy enemy) {
-        Battle battle = new Battle(List.of(observer, payer), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(observer, payer), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         // Chain: 1 layer on SKILL_CAST, 1 on ULT_CAST -> 2 layers -> the entry rule grants [转魄].
         battle.fireTriggers(TriggerEvent.SKILL_CAST, observer, enemy, 0, 0);

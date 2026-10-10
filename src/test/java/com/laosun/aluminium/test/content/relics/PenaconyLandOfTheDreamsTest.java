@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 /**
  * Relic set 312 (2-piece): other allies with the SAME Type as the wearer deal 10% more damage.
@@ -58,7 +57,7 @@ public class PenaconyLandOfTheDreamsTest {
         Assertions.assertFalse(same.isEmpty(), "the search found an ally of the wearer’s own element");
         Assertions.assertFalse(different.isEmpty(), "and one of another element");
         Enemy enemy = BattleFixture.monster();
-        battle = new Battle(party, List.of(enemy), new Random(0));
+        battle = new Battle(party, List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         double mineBoost = wearer.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
         System.out.println("[312] the wearer’s element=" + mine + " ; same-element allies=" + same.size()
@@ -93,7 +92,7 @@ public class PenaconyLandOfTheDreamsTest {
         }
         Assertions.assertNotNull(ally, "the search found an ally of the wearer’s element");
         Enemy enemy = BattleFixture.monster();
-        battle = new Battle(List.of(wearer, ally), List.of(enemy), new Random(0));
+        battle = new Battle(List.of(wearer, ally), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         System.out.println("[312] without the set: " + ally.getName() + " boost="
                 + ally.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get());

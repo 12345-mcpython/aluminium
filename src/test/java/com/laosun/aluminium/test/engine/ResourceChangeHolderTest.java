@@ -12,7 +12,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * {@code RESOURCE_CHANGED} is about the store that MOVED - the holder, not the rule's owner.
@@ -68,7 +67,7 @@ public class ResourceChangeHolderTest {
                         record()))));
 
         Battle battle = new Battle(List.of(unit, Character.fromAttributes("other", 1000, 100, 100, 100)),
-                List.of(BattleFixture.monster()), new Random(0));
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         battle.fireTriggers(TriggerEvent.TURN_START, unit, unit, 0, 0);
@@ -122,7 +121,7 @@ public class ResourceChangeHolderTest {
                 List.of(), gain(COUNTER, 7, "party_first")))));
 
         Battle battle = new Battle(List.of(receiver, giver), List.of(BattleFixture.monster()),
-                new Random(0));
+                BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         battle.fireTriggers(TriggerEvent.TURN_START, giver, giver, 0, 0);
@@ -155,7 +154,7 @@ public class ResourceChangeHolderTest {
                 TriggerSpecs.rule(TriggerEvent.TURN_START.name(), List.of(), move))));
 
         Battle battle = new Battle(List.of(receiver, giver), List.of(BattleFixture.monster()),
-                new Random(0));
+                BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         battle.fireTriggers(TriggerEvent.TURN_START, giver, giver, 0, 0);

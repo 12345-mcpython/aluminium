@@ -16,7 +16,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Light cone 20024: "当拥有的笑点 >= 10 时，装备者的暴击伤害提高 20%".
@@ -43,7 +42,7 @@ public class LingeringTearTest {
                 ? CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(CONE, LEVEL, false, 1))
                 : CharacterFactory.create(WEARER, LEVEL);
         enemy = BattleFixture.monster();
-        Battle battle = new Battle(List.of(wearer), List.of(enemy), new Random(0));
+        Battle battle = new Battle(List.of(wearer), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         return battle;
     }
@@ -150,7 +149,7 @@ public class LingeringTearTest {
                 TriggerSpecs.modifyAttr("CRIT_ATTACK", BONUS, 3));
         unit.setTriggerTable(new TriggerTable(ALLY, List.of(pour, watch)));
         Enemy target = BattleFixture.monster();
-        Battle battle = new Battle(List.of(unit), List.of(target), new Random(0));
+        Battle battle = new Battle(List.of(unit), List.of(target), BattleFixture.seeded());
         battle.startBattle();
         double base = unit.getAttribute(AttributeType.CRIT_ATTACK).get();
         battle.fireTriggers(TriggerEvent.TURN_START, unit, unit, 0, 0);

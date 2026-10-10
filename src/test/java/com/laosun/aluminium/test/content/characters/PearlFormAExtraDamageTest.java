@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 /**
  * Character 1503 (Pearl): the enhanced basic's extra Elation damage, computed from 【美学底本】's values.
@@ -113,7 +112,7 @@ public class PearlFormAExtraDamageTest {
         archetype.setAttribute(AttributeType.ELATION_DAMAGE_BOOST, new DoubleValue(archetypeElationBoost));
         List<Character> team = new ArrayList<>(List.of(pearl, archetype, CharacterFactory.create(HUNTER, 80)));
         Enemy enemy = BattleFixture.monster();
-        Battle battle = new Battle(team, List.of(enemy), new Random(0));
+        Battle battle = new Battle(team, List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
         Character her = battle.characters.getFirst();
