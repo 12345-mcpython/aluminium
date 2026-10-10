@@ -29,14 +29,21 @@ from collections import Counter, defaultdict
 # uppercase/generic requirement, `if (x instanceof Y) {` parses as a method named
 # `if` and quietly becomes a node in the graph. Every misspelt node then reports as
 # "shared", which is the one answer that stops a split.
+#
+# The indent is ` {4}` and NOT `\s{4}`. `\s` also matches a newline, so with the
+# MULTILINE anchor `^` it backtracks one line and captures indent == "\n   " for any
+# declaration whose PRECEDING line ends in a non-space -- which is most of them. Those
+# declarations then fail the `indent == "    "` test in scan() and vanish from the graph,
+# which reads as "nothing calls this" rather than as a parse error. It hid the seven
+# package-private helpers the validator extraction introduced.
 DECL = re.compile(
-    r"^(?P<indent>\s{4})(?:public|private|protected)?\s*(?:static\s+)?"
+    r"^(?P<indent> {4})(?:public|private|protected)?\s*(?:static\s+)?"
     r"(?:final\s+)?(?P<type>(?:<[^>]+>\s*)?(?:[A-Z]\w*(?:<[^>]*>)?(?:\[\])?|void|int|long|double|boolean|char|byte|short|float))\s+"
     r"(?P<name>[a-z]\w*)\s*\((?P<args>[^)]*)\)\s*\{",
     re.DOTALL | re.MULTILINE,
 )
 FIELD = re.compile(
-    r"^\s{4}(?:private|public|protected)?\s*static\s+(?:final\s+)?"
+    r"^ {4}(?:private|public|protected)?\s*static\s+(?:final\s+)?"
     r"[\w.<>\[\], ?]+\s+(?P<name>\w+)\s*(?:=|;)"
 )
 CALL = re.compile(r"(?<![\w.])(?P<name>\w+)\s*\(")
