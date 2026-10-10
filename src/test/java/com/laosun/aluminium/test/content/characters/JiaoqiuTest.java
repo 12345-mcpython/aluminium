@@ -4,8 +4,8 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -21,13 +21,11 @@ import java.util.Random;
 public class JiaoqiuTest {
     private static final int JIAOQIU = 1218;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-
-    /** Note: Seven applications, five layers (the document's cap), and the Burn state alongside it. */
+        /** Note: Seven applications, five layers (the document's cap), and the Burn state alongside it. */
     @Test
     public void theStacksStopAtFiveAndTheBurnIsReal() {
         Character jiaoqiu = CharacterFactory.create(JIAOQIU, LEVEL);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(jiaoqiu), List.of(enemy), fixed());
         battle.startBattle();
 
@@ -46,7 +44,7 @@ public class JiaoqiuTest {
     @Test
     public void theTechniqueHitsAndStacksOnlyWhenDeclared() {
         Character jiaoqiu = CharacterFactory.create(JIAOQIU, LEVEL);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(jiaoqiu), List.of(enemy), fixed());
         battle.markTechniqueUsed(jiaoqiu);
         double before = enemy.getCurrentHp();
@@ -58,7 +56,7 @@ public class JiaoqiuTest {
         Assertions.assertEquals(1, enemy.getBuffManager().stacksOf("烬煨"), "and applies 1 stack of Ashen Roast (【烬煨】)");
 
         Character plain = CharacterFactory.create(JIAOQIU, LEVEL);
-        Enemy enemy2 = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy2 = BattleFixture.monster();
         Battle plainBattle = new Battle(List.of(plain), List.of(enemy2), fixed());
         double untouched = enemy2.getCurrentHp();
         plainBattle.startBattle();

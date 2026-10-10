@@ -10,8 +10,8 @@ import com.laosun.aluminium.models.Damage;
 import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.Weapon;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -27,9 +27,7 @@ public class ConeAuraPartyTest {
     private static final int ALLY = 1002;
     private static final int WEARER = 1205;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-
-    private Character wearer(int cone) {
+        private Character wearer(int cone) {
         return cone == 0 ? CharacterFactory.create(WEARER, LEVEL)
                 : CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(cone, LEVEL, false, 1));
     }
@@ -37,7 +35,7 @@ public class ConeAuraPartyTest {
     /** The ally's damage taken, with or without the cone wearer in the party. */
     private double damageTaken(int cone, boolean withWearer) {
         Character ally = CharacterFactory.create(ALLY, LEVEL);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         List<Character> party = withWearer ? List.of(wearer(cone), ally) : List.of(ally);
         Battle battle = new Battle(party, List.of(enemy), new Random(0));
         battle.startBattle();
@@ -76,7 +74,7 @@ public class ConeAuraPartyTest {
     public void thePartyDealsMoreOnlyWhenTheWearerLosesHp() {
         Character wearer = wearer(23011);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(wearer, ally), List.of(enemy), new Random(0));
         battle.startBattle();
         double before = ally.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();

@@ -4,8 +4,8 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.buff.StackBuff;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -22,15 +22,14 @@ import java.util.Random;
 public class JadeLiveGoodsTest {
     private static final int JADE = 1314;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-    private static final String GOODS = "当品";
+        private static final String GOODS = "当品";
 
     /** Four more layers mean four more 0.50% on ATTACK and four more 2.40% on CRIT DMG. */
     @Test
     public void theAurasFollowTheLayers() {
         Character jade = CharacterFactory.create(JADE, LEVEL, false, null, null, 0);
         Battle battle = new Battle(List.of(jade),
-                List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+                List.of(BattleFixture.monster()), new Random(0));
         battle.startBattle();
         battle.processRequests();
 

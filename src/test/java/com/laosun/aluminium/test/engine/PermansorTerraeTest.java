@@ -7,8 +7,8 @@ import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -25,14 +25,12 @@ public class PermansorTerraeTest {
     private static final int DHPT = 1414;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-
-    /** Note: "抵消等同于丹恒-腾荒20.00%攻击力+400伤害的护盾，持续3回合" (a shield absorbing damage equal to 20.00% of Dan Heng - Permansor Terrae's ATK + 400, for 3 turns). */
+        /** Note: "抵消等同于丹恒-腾荒20.00%攻击力+400伤害的护盾，持续3回合" (a shield absorbing damage equal to 20.00% of Dan Heng - Permansor Terrae's ATK + 400, for 3 turns). */
     @Test
     public void hisSkillShieldsThePartyForAShareOfHisAttackPlusAFlatNumber() {
         Character dhpt = CharacterFactory.create(DHPT, LEVEL);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(dhpt, ally), List.of(enemy), fixed());
         battle.startBattle();
         double expected = dhpt.getAttribute(AttributeType.ATTACK).get() * 0.2 + 400;
@@ -50,7 +48,7 @@ public class PermansorTerraeTest {
     public void hisUltimateAlsoShieldsTheParty() {
         Character dhpt = CharacterFactory.create(DHPT, LEVEL);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(dhpt, ally), List.of(enemy), fixed());
         battle.startBattle();
 

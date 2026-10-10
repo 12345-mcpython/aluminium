@@ -2,6 +2,7 @@ package com.laosun.aluminium.test.engine;
 
 
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.AttributeType;
@@ -12,7 +13,6 @@ import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Signal;
 import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -31,9 +31,7 @@ public class SiblingElationTest {
     /** The ally whose kit really carries an Elation skill (data slot 20) -- the auto-cast's true side. */
     private static final int ELATION_ALLY = 1501;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-
-    /** Note: The content's 0.5 against a reference 1.0, and the control, for BOTH ids. */
+        /** Note: The content's 0.5 against a reference 1.0, and the control, for BOTH ids. */
     @Test
     public void theUltimateRaisesTheChosenAllysCritDamage() {
         for (int cid : new int[]{8009, 8010}) {
@@ -51,7 +49,7 @@ public class SiblingElationTest {
     public void theTalentGivesTenEnergyPerAttack() {
         for (int cid : new int[]{8009, 8010}) {
             Character tb = CharacterFactory.create(cid, LEVEL);
-            Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+            Enemy enemy = BattleFixture.monster();
             Battle battle = new Battle(List.of(tb), List.of(enemy), fixed());
             battle.startBattle();
             double before = tb.getCurrentEnergy();
@@ -116,7 +114,7 @@ public class SiblingElationTest {
     private static double[] advanceAfterUltimate(int allyCid) {
         Character tb = CharacterFactory.create(8010, LEVEL);
         Character ally = CharacterFactory.create(allyCid, LEVEL);
-        Battle battle = new Battle(List.of(tb, ally), List.of(EnemyFactory.create(MONSTER, 90, 1)), fixed());
+        Battle battle = new Battle(List.of(tb, ally), List.of(BattleFixture.monster()), fixed());
         battle.startBattle();
         double before = timeRemaining(battle, ally);
         battle.fireTriggers(TriggerEvent.ULT_CAST, tb, ally, 0, 0);
@@ -147,7 +145,7 @@ public class SiblingElationTest {
             tb.setTriggerTable(new TriggerTable(cid, List.of(TriggerSpecs.rule(
                     TriggerEvent.ULT_CAST.name(), List.of("actor == self"), effect))));
         }
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(tb, ally), List.of(enemy), fixed());
         battle.startBattle();
         double before = ally.getAttribute(AttributeType.CRIT_ATTACK).get();

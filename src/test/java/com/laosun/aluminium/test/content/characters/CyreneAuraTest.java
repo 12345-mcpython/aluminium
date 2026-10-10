@@ -4,8 +4,8 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -27,9 +27,7 @@ public class CyreneAuraTest {
     private static final int CYRENE = 1415;
     private static final int TEAMMATE = 1001;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-
-    @Test
+        @Test
     public void theAuraReachesATeammate() {
         double withHer = boost(true);
         double withoutHer = boost(false);
@@ -40,7 +38,7 @@ public class CyreneAuraTest {
     /** A teammate's ALL_DAMAGE_TYPE_BOOST with Cyrene on the team or not. */
     private static double boost(boolean withCyrene) {
         Character teammate = CharacterFactory.create(TEAMMATE, LEVEL);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         List<Character> team = withCyrene
                 ? List.of(teammate, CharacterFactory.create(CYRENE, LEVEL))
                 : List.of(teammate);

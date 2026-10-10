@@ -3,8 +3,8 @@ package com.laosun.aluminium.test.content.characters;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -29,8 +29,7 @@ public class PearlTechniqueArchetypeTest {
     private static final int PEARL = 1503;
     private static final int ARCHETYPE = 1502;
     private static final int OTHER = 1204;
-    private static final int MONSTER = 1002011;
-    private static final String MARK = "美学底本";
+        private static final String MARK = "美学底本";
     private static final String DEEP = "深度学习";
     private static final String COUNTER = "好活当赏";
 
@@ -122,7 +121,7 @@ public class PearlTechniqueArchetypeTest {
         Character pearl = CharacterFactory.create(PEARL, 80);
         Character archetype = CharacterFactory.create(ARCHETYPE, 80);
         Battle battle = new Battle(List.of(pearl, archetype, CharacterFactory.create(OTHER, 80)),
-                List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+                List.of(BattleFixture.monster()), new Random(0));
         if (techniqueUsed) {
             battle.markTechniqueUsed(pearl);
         }

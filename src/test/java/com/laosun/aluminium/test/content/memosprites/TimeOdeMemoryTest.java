@@ -1,9 +1,9 @@
 package com.laosun.aluminium.test.content.memosprites;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.models.skill.SkillExecutor;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import java.util.List;
@@ -19,8 +19,7 @@ public class TimeOdeMemoryTest {
     private static final int LEVEL = 80;
     private static final int LONGNIGHT = 1413;
     private static final int CYRENE = 1415;
-    private static final int MONSTER = 1002011;
-    private static final int ODE_SLOT = 24;
+        private static final int ODE_SLOT = 24;
     private static final String MEM = "亿质";
 
     @Test
@@ -36,7 +35,7 @@ public class TimeOdeMemoryTest {
         Character cyrene = CharacterFactory.create(CYRENE, LEVEL);
         Character longnight = CharacterFactory.create(LONGNIGHT, LEVEL);
         Battle battle = new Battle(List.of(cyrene, longnight),
-                List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+                List.of(BattleFixture.monster()), new Random(0));
         battle.startBattle();
         battle.processRequests();
         cyrene = battle.characters.get(0);

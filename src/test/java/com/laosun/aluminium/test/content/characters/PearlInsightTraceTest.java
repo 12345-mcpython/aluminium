@@ -9,8 +9,8 @@ import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Damage;
 import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -36,8 +36,7 @@ import java.util.Random;
 public class PearlInsightTraceTest {
     private static final int PEARL = 1503;
     private static final int HUNTER = 1204;      // The Hunt (巡猎): not Elation, a plain bystander
-    private static final int MONSTER = 1002011;
-    private static final double ELATION = 0.32;
+        private static final double ELATION = 0.32;
     private static final double PER_POINT_OVER = 0.0003;   // 3% per 100 DEF
     private static final double EPS = 1e-6;
 
@@ -121,7 +120,7 @@ public class PearlInsightTraceTest {
     public void theToleranceTraceRaisesThePartysEffectResistanceWhileHoldingTheCounter() {
         Character pearl = pearlWith(1200, 0);
         Character ally = CharacterFactory.create(HUNTER, 80);
-        Battle battle = new Battle(List.of(pearl, ally), List.of(EnemyFactory.create(MONSTER, 90, 1)),
+        Battle battle = new Battle(List.of(pearl, ally), List.of(BattleFixture.monster()),
                 new Random(0));
         battle.startBattle();
         battle.processRequests();
@@ -190,7 +189,7 @@ public class PearlInsightTraceTest {
         Character pearl = CharacterFactory.create(PEARL, 80, false, null, null, eidolon);
         pearl.setAttribute(AttributeType.DEFENCE, new com.laosun.aluminium.models.DoubleValue(defence));
         Battle battle = new Battle(List.of(pearl, CharacterFactory.create(HUNTER, 80)),
-                List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+                List.of(BattleFixture.monster()), new Random(0));
         battle.startBattle();
         battle.processRequests();
         return battle.characters.getFirst();
@@ -212,7 +211,7 @@ public class PearlInsightTraceTest {
         if (!keepHerKit) {
             pearl.setTriggerTable(TriggerTable.EMPTY);      // her Eidolon rank stays; only the rules go
         }
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(pearl, CharacterFactory.create(HUNTER, 80)), List.of(enemy),
                 new Random(0));
         battle.startBattle();

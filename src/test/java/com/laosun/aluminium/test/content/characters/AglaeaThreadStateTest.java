@@ -6,8 +6,8 @@ import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.DoubleValue;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -23,8 +23,7 @@ import java.util.Random;
 public class AglaeaThreadStateTest {
     private static final int AGLAEA = 1402;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-    private static final String STATE = "间隙织线";
+        private static final String STATE = "间隙织线";
 
     @Test
     public void withTheMemoSpriteOutTheAttackThreadsTheTarget() {
@@ -40,7 +39,7 @@ public class AglaeaThreadStateTest {
     private static boolean attacked(boolean withMemoSprite) {
         Character aglaea = CharacterFactory.create(AGLAEA, LEVEL);
         Character ally = CharacterFactory.create(1001, LEVEL);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         enemy.setAttribute(AttributeType.HEALTH, new DoubleValue(900000));
         enemy.heal(900000);
         Random noCrit = new Random(0) {

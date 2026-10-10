@@ -4,10 +4,10 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.models.skill.Skill;
 import com.laosun.aluminium.models.skill.SkillExecutor;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -22,8 +22,7 @@ import java.util.Random;
  */
 public class BloodfeudTest {
     private static final int MYDEI = 1404;
-    private static final int MONSTER = 1002011;
-    private static final String STATE = "血仇";
+        private static final String STATE = "血仇";
     private static final String CHARGE = "天赋充能";
 
     /** A hundred charge enters [血仇], and a lethal blow then leaves it -- at half his Max HP. */
@@ -31,7 +30,7 @@ public class BloodfeudTest {
     public void aLethalBlowEndsItAndHeSurvives() {
         Character him = CharacterFactory.create(MYDEI, 80, false, null, null, 0);
         Battle battle = new Battle(List.of(him),
-                List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+                List.of(BattleFixture.monster()), new Random(0));
         battle.startBattle();
         battle.processRequests();
 
@@ -54,7 +53,7 @@ public class BloodfeudTest {
     public void withoutBloodfeudTheBlowKills() {
         Character him = CharacterFactory.create(MYDEI, 80, false, null, null, 0);
         Battle battle = new Battle(List.of(him),
-                List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+                List.of(BattleFixture.monster()), new Random(0));
         battle.startBattle();
         battle.processRequests();
         Assertions.assertFalse(him.getBuffManager().hasState(STATE), "precondition: no [血仇] (Vendetta) yet");

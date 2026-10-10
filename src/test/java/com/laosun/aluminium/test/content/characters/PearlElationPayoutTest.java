@@ -5,8 +5,8 @@ import com.laosun.aluminium.enums.SkillCategory;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import java.util.List;
@@ -21,9 +21,7 @@ import java.util.Random;
 public class PearlElationPayoutTest {
     private static final int PEARL = 1503;
     private static final int ELATION = 1502;
-    private static final int MONSTER = 1002011;
-
-    @Test
+        @Test
     public void thePayoutScalesWithHowManyTiersTheTeamQualifiesFor() {
         double two = payoutWith(2);
         double four = payoutWith(4);
@@ -49,7 +47,7 @@ public class PearlElationPayoutTest {
             team.add(CharacterFactory.create(ELATION, 80));
         }
         team.add(CharacterFactory.create(1204, 80));
-        Battle battle = new Battle(team, List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+        Battle battle = new Battle(team, List.of(BattleFixture.monster()), new Random(0));
         battle.startBattle();
         battle.processRequests();
         Character pearl = battle.characters.get(0);

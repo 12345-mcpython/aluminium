@@ -7,8 +7,8 @@ import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.Weapon;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -24,8 +24,7 @@ public class NinjutsuInscriptionDazzlingEvilbreakerTest {
     private static final int WEARER = 1205;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-    private static final String MINE = "雷遁";
+        private static final String MINE = "雷遁";
     private static final String COUNT = "普攻计数";
     private static final double RANK_ONE = 0.5;
     private static final double RANK_TWO = 0.55;
@@ -38,7 +37,7 @@ public class NinjutsuInscriptionDazzlingEvilbreakerTest {
                 ? CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(CONE, LEVEL, false, 1))
                 : CharacterFactory.create(WEARER, LEVEL);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
-        enemy = EnemyFactory.create(MONSTER, 90, 1);
+        enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(wearer, ally), List.of(enemy), new Random(0));
         battle.startBattle();
         return battle;
@@ -102,7 +101,7 @@ public class NinjutsuInscriptionDazzlingEvilbreakerTest {
     private double advanceDistance(int rank) {
         wearer = CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(CONE, LEVEL, false, rank));
         Character ally = CharacterFactory.create(ALLY, LEVEL);
-        enemy = EnemyFactory.create(MONSTER, 90, 1);
+        enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(wearer, ally), List.of(enemy), new Random(0));
         battle.startBattle();
         battle.fireTriggers(TriggerEvent.ULT_CAST, wearer, enemy, 0, 0);

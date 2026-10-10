@@ -4,8 +4,8 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -30,8 +30,7 @@ import java.util.Random;
 public class SilverWolfLV999LootBoxWaveTest {
     private static final int WOLF = 1506;
     private static final int ALLY = 1204;
-    private static final int MONSTER = 1002011;
-    /**
+        /**
      * 【爆爆爆炸蛋】's WEIGHT bucket: 2 skill points, and no damage of its own.
      *
      * <p>⚠ The pick is WEIGHTED (the game's grades: 1 / 1 / 10 while 隐藏分 is under 60), so the roll is over the weight
@@ -54,7 +53,7 @@ public class SilverWolfLV999LootBoxWaveTest {
         Assertions.assertEquals(pointsBefore, battle.getSkillPoints(),
                 "with nobody to hit, the box is HELD - a delivered one would have granted 2 skill points here");
 
-        Enemy fresh = EnemyFactory.create(MONSTER, 90, 1);      // the next wave walks in
+        Enemy fresh = BattleFixture.monster();      // the next wave walks in
         battle.enemies.add(fresh);
         double freshBefore = fresh.getCurrentHp();
         battle.fireTriggers(TriggerEvent.WAVE_START);
@@ -100,7 +99,7 @@ public class SilverWolfLV999LootBoxWaveTest {
         battle.processRequests();
         int pointsBefore = battle.getSkillPoints();
 
-        Enemy fresh = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy fresh = BattleFixture.monster();
         battle.enemies.add(fresh);
         rng.nextDoubleValue = 0.9;                 // would FAIL a 20% roll
         battle.fireTriggers(TriggerEvent.WAVE_START);
@@ -123,7 +122,7 @@ public class SilverWolfLV999LootBoxWaveTest {
     private static Battle battle(ScriptedRng rng) {
         Battle battle = new Battle(
                 List.of(CharacterFactory.create(WOLF, 80), CharacterFactory.create(ALLY, 80)),
-                List.of(EnemyFactory.create(MONSTER, 90, 1), EnemyFactory.create(MONSTER, 90, 1)), rng);
+                List.of(BattleFixture.monster(), BattleFixture.monster()), rng);
         battle.startBattle();
         battle.processRequests();
         Character wolf = battle.characters.getFirst();

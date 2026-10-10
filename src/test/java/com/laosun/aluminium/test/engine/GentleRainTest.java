@@ -6,9 +6,9 @@ import com.laosun.aluminium.models.CanHit;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Summon;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.utils.RelicFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -27,8 +27,7 @@ public class GentleRainTest {
     private static final int WEARER = 1413;
     private static final int ALLY = 1001;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-    private static final int RELIC_LEVEL = 15;
+        private static final int RELIC_LEVEL = 15;
     private static final double EPSILON = 1e-6;
 
     @Test
@@ -76,7 +75,7 @@ public class GentleRainTest {
     private static Result run(boolean heal, boolean byMemoSprite, boolean healTheWearer, boolean twice) {
         Character wearer = CharacterFactory.create(WEARER, LEVEL, true, null, RelicFactory.suit(125, 4, RELIC_LEVEL));
         Character ally = CharacterFactory.create(ALLY, LEVEL);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(wearer, ally), List.of(enemy), new Random(0));
         battle.startBattle();
         double baseSpeed = wearer.getAttribute(AttributeType.SPEED).baseValue();

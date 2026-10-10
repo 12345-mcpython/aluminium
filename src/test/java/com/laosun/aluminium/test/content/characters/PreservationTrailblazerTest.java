@@ -6,8 +6,8 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -25,13 +25,11 @@ public class PreservationTrailblazerTest {
     private static final int TB4 = 8004;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-
-    /** Note: "每受到1次攻击，叠加1层[灼热意志]，最多可叠加8层". */
+        /** Note: "每受到1次攻击，叠加1层[灼热意志]，最多可叠加8层". */
     @Test
     public void hisTalentStacksMagmaWillUpToEight() {
         Character tb = CharacterFactory.create(TB3, LEVEL);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(tb), List.of(enemy), fixed());
         battle.startBattle();
 
@@ -51,7 +49,7 @@ public class PreservationTrailblazerTest {
         for (int cid : new int[]{TB3, TB4}) {
             Character tb = CharacterFactory.create(cid, LEVEL);
             Character ally = CharacterFactory.create(ALLY, LEVEL);
-            Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+            Enemy enemy = BattleFixture.monster();
             Battle battle = new Battle(List.of(tb, ally), List.of(enemy), fixed());
             double expected = tb.getAttribute(AttributeType.DEFENCE).get() * 0.06 + 80;
 
@@ -66,7 +64,7 @@ public class PreservationTrailblazerTest {
     @Test
     public void theTechniqueShieldsHimOnlyWhenDeclared() {
         Character withTechnique = CharacterFactory.create(TB3, LEVEL);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(withTechnique), List.of(enemy), fixed());
         battle.markTechniqueUsed(withTechnique);
         battle.startBattle();
@@ -75,7 +73,7 @@ public class PreservationTrailblazerTest {
                 "「给自身提供…等同于30%防御力+384的护盾，持续1回合」 (provides itself with a shield equal to 30% DEF + 384 for 1 turn)");
 
         Character without = CharacterFactory.create(TB3, LEVEL);
-        Enemy enemy2 = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy2 = BattleFixture.monster();
         Battle plain = new Battle(List.of(without), List.of(enemy2), fixed());
         plain.startBattle();
         Assertions.assertEquals(0.0, without.getShield(), 1e-9,

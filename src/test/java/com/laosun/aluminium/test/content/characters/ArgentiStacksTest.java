@@ -3,6 +3,7 @@ package com.laosun.aluminium.test.content.characters;
 
 import com.laosun.aluminium.test.engine.CastAppliedCountTest;
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
@@ -13,7 +14,6 @@ import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -33,9 +33,7 @@ public class ArgentiStacksTest {
     private static final int ARGENTI = 1302;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-
-    /**
+        /**
      * All three cast slots feed the talent: "when casting a basic attack, Skill or Ultimate ... gain 1 stack of [升格]".
      *
      * <p>Note: The energy half of the same sentence ("for each 1 enemy target hit ... restore 3 energy") is {@code per_target}, and its
@@ -151,7 +149,7 @@ public class ArgentiStacksTest {
 
     private static final class Fixture {
         private final Character argenti;
-        private final Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        private final Enemy enemy = BattleFixture.monster();
         private final Battle battle;
 
         private Fixture() {

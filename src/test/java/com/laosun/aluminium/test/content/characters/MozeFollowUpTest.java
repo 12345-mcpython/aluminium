@@ -8,8 +8,8 @@ import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Damage;
 import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -25,12 +25,10 @@ import java.util.Random;
 public class MozeFollowUpTest {
     private static final int WEARER = 1223;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-
-    @Test
+        @Test
     public void theZoneIsScopedToAdditionalDamage() {
         Character unit = CharacterFactory.create(WEARER, LEVEL);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         String scope = null;
         double share = -1;
         for (var rule : unit.getTriggerTable().matching(TriggerEvent.SKILL_CAST,
@@ -50,7 +48,7 @@ public class MozeFollowUpTest {
     @Test
     public void followUpDamageRisesByAQuarter() {
         Character unit = CharacterFactory.create(WEARER, LEVEL);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(unit), List.of(enemy), new Random(0));
         battle.startBattle();
         battle.fireTriggers(TriggerEvent.SKILL_CAST, unit, enemy, 0, 0);
@@ -63,7 +61,7 @@ public class MozeFollowUpTest {
     @Test
     public void aFollowUpRestoresOneSkillPointOncePerTurn() {
         Character unit = CharacterFactory.create(WEARER, LEVEL);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(unit), List.of(enemy), new Random(0));
         battle.startBattle();
         int before = battle.getSkillPoints();

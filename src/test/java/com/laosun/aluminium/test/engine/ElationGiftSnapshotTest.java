@@ -6,8 +6,8 @@ import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.TriggerTable;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -40,8 +40,7 @@ public class ElationGiftSnapshotTest {
      */
     private static final int ALLY = 1505;
     private static final int OTHER = 1204;
-    private static final int MONSTER = 1002011;
-    private static final String GIFT = "好活当赏";
+        private static final String GIFT = "好活当赏";
     private static final String LAUGH = "笑点";
 
     /** The count is taken when the state is granted, and the pool growing afterwards does not change it. */
@@ -178,7 +177,7 @@ public class ElationGiftSnapshotTest {
             battle = new Battle(
                     List.of(CharacterFactory.create(PEARL, 80), CharacterFactory.create(ALLY, 80),
                             CharacterFactory.create(OTHER, 80)),
-                    List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+                    List.of(BattleFixture.monster()), new Random(0));
             battle.startBattle();
             battle.processRequests();
             pearl = battle.characters.get(0);

@@ -7,8 +7,8 @@ import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -24,9 +24,7 @@ import java.util.Random;
 public class HertaTest {
     private static final int HERTA = 1013;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-
-    /** Note: "抵抗控制类负面状态的概率提高35%": the engine keeps a per-class resistance, and it must be up. */
+        /** Note: "抵抗控制类负面状态的概率提高35%": the engine keeps a per-class resistance, and it must be up. */
     @Test
     public void herPuppetTraceRaisesControlResistance() {
         Fixture f = new Fixture();

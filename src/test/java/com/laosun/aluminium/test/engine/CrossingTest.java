@@ -7,8 +7,8 @@ import com.laosun.aluminium.enums.DamageType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Damage;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -25,14 +25,12 @@ public class CrossingTest {
     private static final int LUOCHA = 1203;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-
-    /** Note: Crossing from above half to below it triggers the heal. */
+        /** Note: Crossing from above half to below it triggers the heal. */
     @Test
     public void aCrossingTriggersTheHeal() {
         Character luocha = CharacterFactory.create(LUOCHA, LEVEL);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(luocha, ally), List.of(enemy), fixed());
         battle.startBattle();
         // Take him to just above half, then push him over the line.
@@ -51,7 +49,7 @@ public class CrossingTest {
     public void damageBelowTheThresholdIsNotACrossing() {
         Character luocha = CharacterFactory.create(LUOCHA, LEVEL);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(luocha, ally), List.of(enemy), fixed());
         battle.startBattle();
         // Bounded loop: the zones eat part of each instance, so one big hit is not guaranteed to cross the line.

@@ -2,6 +2,7 @@ package com.laosun.aluminium.test.content.characters;
 
 
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.TriggerEvent;
@@ -9,7 +10,6 @@ import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Damage;
 import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -27,9 +27,7 @@ public class HysilensTest {
     private static final int HYSILENS = 1410;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-
-    /** Note: The Skill raises the damage taken by 20%: a fixed hit costs 1.5x what it cost before (a 40% rule would give 2.0x). */
+        /** Note: The Skill raises the damage taken by 20%: a fixed hit costs 1.5x what it cost before (a 40% rule would give 2.0x). */
     @Test
     public void theSkillRaisesTheDamageTheEnemiesTake() {
         double before = fixedHitLoss(false);
@@ -49,7 +47,7 @@ public class HysilensTest {
     private static double fixedHitLoss(boolean afterSkill) {
         Character hysilens = CharacterFactory.create(HYSILENS, LEVEL);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(hysilens, ally), List.of(enemy), fixed());
         battle.startBattle();
         if (afterSkill) {
@@ -72,7 +70,7 @@ public class HysilensTest {
         hysilens.setTriggerTable(new TriggerTable(HYSILENS, List.of(TriggerSpecs.rule(
                 TriggerEvent.SKILL_CAST.name(), List.of("actor == self"), effect))));
         Character ally = CharacterFactory.create(ALLY, LEVEL);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(hysilens, ally), List.of(enemy), fixed());
         battle.startBattle();
         battle.castImmediate(hysilens.getSkills().get(com.laosun.aluminium.enums.SkillType.SKILL), hysilens, List.of(enemy));

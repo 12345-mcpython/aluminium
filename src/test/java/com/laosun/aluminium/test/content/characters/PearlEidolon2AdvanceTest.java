@@ -4,8 +4,8 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Signal;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -32,9 +32,7 @@ public class PearlEidolon2AdvanceTest {
     private static final int ELATION_A = 1502;  // Elation
     private static final int ELATION_B = 1505;  // Elation
     private static final int HUNTER = 1204;     // NOT Elation - the archetype in these teams
-    private static final int MONSTER = 1002011;
-
-    /**
+        /**
      * From Eidolon 2 the OTHER Elation allies are advanced where they were not before, and the non-Elation archetype
      * no longer is.
      *
@@ -88,7 +86,7 @@ public class PearlEidolon2AdvanceTest {
     }
 
     private static Fraction fractions(int eidolonRank) {
-        Battle battle = new Battle(team(eidolonRank), List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+        Battle battle = new Battle(team(eidolonRank), List.of(BattleFixture.monster()), new Random(0));
         battle.startBattle();
         battle.processRequests();
         Character pearl = battle.characters.get(0);

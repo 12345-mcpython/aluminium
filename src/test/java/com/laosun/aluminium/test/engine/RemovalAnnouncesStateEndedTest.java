@@ -3,10 +3,10 @@ package com.laosun.aluminium.test.engine;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.models.skill.Skill;
 import com.laosun.aluminium.models.skill.SkillExecutor;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -25,8 +25,7 @@ import java.util.Random;
  */
 public class RemovalAnnouncesStateEndedTest {
     private static final int OWNER = 1513;
-    private static final int MONSTER = 1002011;
-    private static final String MOMENT = "阿哈时刻";
+        private static final String MOMENT = "阿哈时刻";
     private static final String REWARD = "好活当赏";
 
     /** Taking the state off by hand is an end, so the reader pays. */
@@ -50,7 +49,7 @@ public class RemovalAnnouncesStateEndedTest {
     /** Casts her elation skill, which is what puts the Aha moment on. */
     private static Battle elation() {        Character owner = CharacterFactory.create(OWNER, 80, false, null, null, 0);
         Battle battle = new Battle(List.of(owner),
-                List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+                List.of(BattleFixture.monster()), new Random(0));
         battle.startBattle();
         battle.processRequests();
         Skill skill = owner.getSkills().get(SkillType.ELATION_SKILL);

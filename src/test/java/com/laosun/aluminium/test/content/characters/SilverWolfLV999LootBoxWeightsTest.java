@@ -3,8 +3,8 @@ package com.laosun.aluminium.test.content.characters;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -28,8 +28,7 @@ import java.util.Random;
 public class SilverWolfLV999LootBoxWeightsTest {
     private static final int WOLF = 1506;
     private static final int ALLY = 1204;
-    private static final int MONSTER = 1002011;
-    private static final String LAUGH = "笑点";
+        private static final String LAUGH = "笑点";
     private static final String HIDDEN = "隐藏分";
 
     /** 1 : 1 : 10 at the start of a battle - the hidden score is under 60, so 获得笑点 is ten times as likely. */
@@ -115,7 +114,7 @@ public class SilverWolfLV999LootBoxWeightsTest {
         ScriptedRng rng = new ScriptedRng(roll);
         Battle battle = new Battle(
                 List.of(CharacterFactory.create(WOLF, 80), CharacterFactory.create(ALLY, 80)),
-                List.of(EnemyFactory.create(MONSTER, 90, 1), EnemyFactory.create(MONSTER, 90, 1)), rng);
+                List.of(BattleFixture.monster(), BattleFixture.monster()), rng);
         battle.startBattle();
         battle.processRequests();
         // ⚠ The skill points are brought to the requested value BEFORE the box is armed: a battle opens with 3 of them, so

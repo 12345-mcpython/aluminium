@@ -2,13 +2,13 @@ package com.laosun.aluminium.test.content.characters;
 
 
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.TriggerTable;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -25,9 +25,7 @@ import java.util.Random;
  */
 public class CyreneSpeedThresholdTest {
     private static final int OWNER = 1415;
-    private static final int MONSTER = 1002011;
-
-    /** Talent alone below 180; talent plus trace past it. */
+        /** Talent alone below 180; talent plus trace past it. */
     @Test
     public void theTwoWritersAdd() {
         Assertions.assertEquals(0.2, total(0), 1e-6, "below the threshold, her talent alone");
@@ -49,7 +47,7 @@ public class CyreneSpeedThresholdTest {
                     .plus(new TriggerTable(OWNER, List.of(TriggerSpecs.rule("BATTLE_START", List.of(), raise)))));
         }
         Battle battle = new Battle(List.of(owner),
-                List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+                List.of(BattleFixture.monster()), new Random(0));
         battle.startBattle();
         battle.processRequests();
         battle.fireTriggers(TriggerEvent.TURN_START, owner, owner, 0, 0);

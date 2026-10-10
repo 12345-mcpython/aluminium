@@ -5,8 +5,8 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.TriggerTable;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -36,8 +36,7 @@ import java.util.Random;
 public class SilverWolfLV999TalentCritTest {
     private static final int WOLF = 1506;
     private static final int ALLY = 1204;
-    private static final int MONSTER = 1002011;
-    private static final String LAUGH = "笑点";
+        private static final String LAUGH = "笑点";
     private static final String HIDDEN = "隐藏分";
 
     /** Below full: +0.4% CRIT Rate per hidden point, and the crit-damage half stays out of it. */
@@ -148,7 +147,7 @@ public class SilverWolfLV999TalentCritTest {
     private static Reading read(int[] gains) {
         Battle battle = new Battle(
                 List.of(CharacterFactory.create(WOLF, 80), CharacterFactory.create(ALLY, 80)),
-                List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+                List.of(BattleFixture.monster()), new Random(0));
         battle.startBattle();
         battle.processRequests();
         Character wolf = battle.characters.getFirst();

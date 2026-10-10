@@ -14,10 +14,10 @@ import com.laosun.aluminium.models.Summon;
 import com.laosun.aluminium.models.buff.ControlBuff;
 import com.laosun.aluminium.models.buff.DotBuff;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.models.enemy.SummonFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.utils.RelicFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -55,9 +55,7 @@ public class MemospriteTest {
     /** Himeko - a character with no memosprite, used for the "absent is an ordinary state" cases. */
     private static final int NO_MEMOSPRITE = 1003;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-
-    // ==================================================================
+        // ==================================================================
     // 1. The panel is derived from the summoner's own sheet
     // ==================================================================
 
@@ -450,7 +448,7 @@ public class MemospriteTest {
     }
 
     private static Enemy monster() {
-        return EnemyFactory.create(MONSTER, 90, 1);
+        return BattleFixture.monster();
     }
 
     /** A generator that always answers the same value, so a probability becomes an assertion. */

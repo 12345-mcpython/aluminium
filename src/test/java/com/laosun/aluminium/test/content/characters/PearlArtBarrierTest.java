@@ -4,8 +4,8 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -29,8 +29,7 @@ public class PearlArtBarrierTest {
     private static final int PEARL = 1503;
     private static final int ELATION_ALLY = 1505;      // 「欢愉」命途: the barrier applies
     private static final int OTHER_ALLY = 1002;        // not that path: it must not
-    private static final int MONSTER = 1002011;
-    private static final String BARRIER = "艺术壁垒";
+        private static final String BARRIER = "艺术壁垒";
     private static final int ENERGY = 90;
 
     private Character pearl;
@@ -107,7 +106,7 @@ public class PearlArtBarrierTest {
     private void build(int allyCid) {
         pearl = CharacterFactory.create(PEARL, 80);
         ally = CharacterFactory.create(allyCid, 80);
-        enemy = EnemyFactory.create(MONSTER, 90, 1);
+        enemy = BattleFixture.monster();
         battle = new Battle(List.of(pearl, ally), List.of(enemy), new Random(0));
         battle.startBattle();
         battle.processRequests();

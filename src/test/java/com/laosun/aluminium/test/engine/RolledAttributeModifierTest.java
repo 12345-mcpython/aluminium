@@ -2,6 +2,7 @@ package com.laosun.aluminium.test.engine;
 
 
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.AttributeType;
@@ -29,14 +30,13 @@ public class RolledAttributeModifierTest {
     private static final int SILVER_WOLF = 1006;
     private static final int ALLY = 1210;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-    private static final double EPS = 1e-9;
+        private static final double EPS = 1e-9;
 
     /** The shipped clause states 0.1, through the roll, on the skill's target. */
     @Test
     public void herSkillStatesTenPercentOnItsTarget() {
         Character wolf = CharacterFactory.create(SILVER_WOLF, LEVEL);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(wolf, CharacterFactory.create(ALLY, LEVEL)), List.of(enemy), new Random(0));
         battle.startBattle();
 
@@ -62,7 +62,7 @@ public class RolledAttributeModifierTest {
         Character applier = Character.fromAttributes("applier", 10_000, 100, 100, 100);
         applier.setTriggerTable(new TriggerTable(9995, List.of(TriggerSpecs.rule(
                 TriggerEvent.TURN_START.name(), List.of(), reduction()))));
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(applier), List.of(enemy), new Random() {
             @Override
             public double nextDouble() {

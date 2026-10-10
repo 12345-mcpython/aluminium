@@ -8,9 +8,9 @@ import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Damage;
 import com.laosun.aluminium.models.Signal;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.models.skill.DefaultSkill;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -33,8 +33,7 @@ public class HanyaKitTest {
     private static final int HANYA = 1215;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-    private static final double EPS = 1e-6;
+        private static final double EPS = 1e-6;
 
     /** One cast: the ally's SPD grows by 20% of <b>her</b> SPD, the ATK by 60%, and the marker state lands. */
     @Test
@@ -131,7 +130,7 @@ public class HanyaKitTest {
         private Fixture(int eidolon) {
             hanya = CharacterFactory.create(HANYA, LEVEL, true, null, null, eidolon);
             ally = CharacterFactory.create(ALLY, LEVEL);
-            enemy = EnemyFactory.create(MONSTER, 90, 1);
+            enemy = BattleFixture.monster();
             battle = new Battle(List.of(hanya, ally), List.of(enemy), fixed());
             battle.startBattle();
         }

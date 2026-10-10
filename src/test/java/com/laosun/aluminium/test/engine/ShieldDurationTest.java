@@ -3,6 +3,7 @@ package com.laosun.aluminium.test.engine;
 
 import com.laosun.aluminium.test.support.TestTurns;
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
@@ -13,7 +14,6 @@ import com.laosun.aluminium.models.DoubleValue;
 import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.buff.ShieldBuff;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -46,9 +46,7 @@ public class ShieldDurationTest {
     /** The ally the shield lands on. Its table is emptied explicitly below, so no shipped content joins in. */
     private static final int ALLY = 1202;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-
-    /**
+        /**
      * The speeds the fixture states outright.
      *
      * <p>Note: Not decoration: "持续N回合" is counted in the <b>carrier's</b> turns, so a test that takes "the caster's
@@ -295,6 +293,6 @@ public class ShieldDurationTest {
     }
 
     private static Enemy dummy() {
-        return EnemyFactory.create(MONSTER, 90, 1);
+        return BattleFixture.monster();
     }
 }

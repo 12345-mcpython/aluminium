@@ -3,8 +3,8 @@ package com.laosun.aluminium.test.engine;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -21,8 +21,7 @@ public class ElationAccumulatorTest {
     private static final int WEARER = 1505;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-    private static final String ACC = "累计能量";
+        private static final String ACC = "累计能量";
 
     private Character elation;
     private Battle battle;
@@ -30,7 +29,7 @@ public class ElationAccumulatorTest {
     private void build() {
         elation = CharacterFactory.create(WEARER, LEVEL);
         battle = new Battle(List.of(elation, CharacterFactory.create(ALLY, LEVEL)),
-                List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+                List.of(BattleFixture.monster()), new Random(0));
         battle.startBattle();
     }
 

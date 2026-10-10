@@ -2,11 +2,11 @@ package com.laosun.aluminium.test.engine;
 
 
 import com.laosun.aluminium.test.content.memosprites.AglaeaMemospriteTest;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Summon;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -28,14 +28,12 @@ import java.util.Random;
 public class SummerSongbirdPanelTest {
     private static final double EPS = 1e-6;
     private static final int ROBIN = 1512;
-    private static final int MONSTER = 1002011;
-
-    /** The memosprite's sheet is 0% of her Max HP and 180% of her speed. */
+        /** The memosprite's sheet is 0% of her Max HP and 180% of her speed. */
     @Test
     public void theMemospriteInheritsHerPanelAsRatios() {
         Character robin = CharacterFactory.create(ROBIN, 80);
         Battle battle = new Battle(List.of(robin),
-                List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+                List.of(BattleFixture.monster()), new Random(0));
         battle.startBattle();
         battle.processRequests();
 

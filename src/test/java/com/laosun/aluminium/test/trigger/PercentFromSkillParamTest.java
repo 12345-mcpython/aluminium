@@ -2,6 +2,7 @@ package com.laosun.aluminium.test.trigger;
 
 
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
@@ -10,7 +11,6 @@ import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.TriggerTable;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.models.skill.Skill;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -35,13 +35,11 @@ public class PercentFromSkillParamTest {
     private static final int LEVEL = 80;
     private static final int TRIBBIE = 1403;
     private static final int ALLY = 1002;
-    private static final int MONSTER = 1002011;
-
-    @Test
+        @Test
     public void theShareComesFromHisOwnUltimateAtItsOwnLevel() {
         Character tribbie = CharacterFactory.create(TRIBBIE, LEVEL);
         Battle battle = new Battle(List.of(tribbie, CharacterFactory.create(ALLY, LEVEL)),
-                List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+                List.of(BattleFixture.monster()), new Random(0));
         battle.startBattle();
         battle.processRequests();
         tribbie = battle.characters.getFirst();

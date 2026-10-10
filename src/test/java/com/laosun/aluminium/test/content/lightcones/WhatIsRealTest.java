@@ -7,8 +7,8 @@ import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Signal;
 import com.laosun.aluminium.models.Weapon;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -23,9 +23,7 @@ import java.util.Random;
 public class WhatIsRealTest {
     private static final int WEARER = 1001;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-
-    @Test
+        @Test
     public void cone21035GivesBreakEffectAndBothHealTerms() {
         Assertions.assertEquals(0.24, breakEffect(1), 1e-6, "rank 1 break effect");
         Assertions.assertEquals(0.48, breakEffect(5), 1e-6, "rank 5 break effect");
@@ -52,13 +50,13 @@ public class WhatIsRealTest {
     private static double breakEffect(int rank) {
         Character unit = wearer(rank);
         double before = unit.getAttribute(AttributeType.BREAKING_EFFECT).get();
-        started(unit, EnemyFactory.create(MONSTER, 90, 1));
+        started(unit, BattleFixture.monster());
         return unit.getAttribute(AttributeType.BREAKING_EFFECT).get() - before;
     }
 
     private static double healed(int rank) {
         Character unit = wearer(rank);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = started(unit, enemy);
         unit.takeDamage(unit.getMaxHp() * 0.5);
         double before = unit.getCurrentHp();

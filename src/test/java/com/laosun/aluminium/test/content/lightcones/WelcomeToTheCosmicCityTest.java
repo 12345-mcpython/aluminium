@@ -9,8 +9,8 @@ import com.laosun.aluminium.models.Damage;
 import com.laosun.aluminium.models.DoubleValue;
 import com.laosun.aluminium.models.Weapon;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -29,8 +29,7 @@ public class WelcomeToTheCosmicCityTest {
     private static final int CONE = 23057;
     private static final int WEARER = 1205;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-    private static final double IGNORE = 0.2;
+        private static final double IGNORE = 0.2;
 
     private Enemy enemy;
 
@@ -40,7 +39,7 @@ public class WelcomeToTheCosmicCityTest {
                 : CharacterFactory.create(WEARER, LEVEL);
         wearer.getAttribute(AttributeType.CRIT_CHANCE)
                 .addModifier(DoubleValue.Modifier.pure(-1.0, DoubleValue.Modifier.ModifierSource.BUFF, 230570));
-        enemy = EnemyFactory.create(MONSTER, 90, 1);
+        enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(wearer), List.of(enemy), new Random(0));
         battle.startBattle();
         return battle;
@@ -79,7 +78,7 @@ public class WelcomeToTheCosmicCityTest {
             unit.getAttribute(AttributeType.CRIT_CHANCE)
                     .addModifier(DoubleValue.Modifier.pure(-1.0, DoubleValue.Modifier.ModifierSource.BUFF, 230571));
         }
-        Enemy target = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy target = BattleFixture.monster();
         Battle armed = new Battle(List.of(wearer, ally), List.of(target), new Random(0));
         armed.startBattle();
         double boosted = armed.applyDamage(target, new Damage(ally, target, DamageElement.FIRE, DamageType.ELATION, 1000));
@@ -88,7 +87,7 @@ public class WelcomeToTheCosmicCityTest {
         Character plainAlly = CharacterFactory.create(1002, LEVEL);
         plainAlly.getAttribute(AttributeType.CRIT_CHANCE)
                 .addModifier(DoubleValue.Modifier.pure(-1.0, DoubleValue.Modifier.ModifierSource.BUFF, 230572));
-        Enemy other = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy other = BattleFixture.monster();
         Battle plain = new Battle(List.of(plainWearer, plainAlly), List.of(other), new Random(0));
         plain.startBattle();
         double plainHit = plain.applyDamage(other, new Damage(plainAlly, other, DamageElement.FIRE, DamageType.ELATION, 1000));

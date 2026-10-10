@@ -6,8 +6,8 @@ import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Signal;
 import com.laosun.aluminium.models.buff.StateBuff;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -25,8 +25,7 @@ public class GiftCarriesTheLaughsTest {
     private static final int SPARKLE = 1513;
     private static final int EVANESCIA = 1505;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-    private static final String LAUGHS = "笑点";
+        private static final String LAUGHS = "笑点";
     private static final String GIFT = "好活当赏";
     private static final String MOMENT = "阿哈时刻";
 
@@ -35,7 +34,7 @@ public class GiftCarriesTheLaughsTest {
     public void theGiftCarriesTheLaughsAndSheTakesHalf() {
         Character sparkle = CharacterFactory.create(SPARKLE, LEVEL, false, null, null, 0);
         Character evanescia = CharacterFactory.create(EVANESCIA, LEVEL, false, null, null, 0);
-        Enemy victim = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy victim = BattleFixture.monster();
         Battle battle = new Battle(List.of(sparkle, evanescia), List.of(victim), new Random(0));
         battle.startBattle();
         battle.processRequests();

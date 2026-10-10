@@ -6,8 +6,8 @@ import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -24,14 +24,12 @@ public class HimekoNovaTest {
     private static final int HIMEKO = 1510;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-
-    /** Note: The Skill puts [领航旗语] on HER for the document's three turns, and hands the party no damage boost (that clause is registered). */
+        /** Note: The Skill puts [领航旗语] on HER for the document's three turns, and hands the party no damage boost (that clause is registered). */
     @Test
     public void theSkillPutsSemaphoreOnHerselfAndNothingElse() {
         Character himeko = CharacterFactory.create(HIMEKO, LEVEL);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(himeko, ally), List.of(enemy), fixed());
         battle.startBattle();
         double allyBoostBefore = ally.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();

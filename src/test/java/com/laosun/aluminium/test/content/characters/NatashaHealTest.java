@@ -5,8 +5,8 @@ import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -28,9 +28,7 @@ public class NatashaHealTest {
     private static final int NATASHA = 1105;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-
-    /** The heal really is a share of her max HP plus the constant, and it goes to the aimed ally. */
+        /** The heal really is a share of her max HP plus the constant, and it goes to the aimed ally. */
     @Test
     public void herSkillHealsTheAimedAlly() {
         Fixture f = new Fixture();
@@ -148,7 +146,7 @@ public class NatashaHealTest {
     private static final class Fixture {
         private final Character natasha = CharacterFactory.create(NATASHA, LEVEL);
         private final Character ally = CharacterFactory.create(ALLY, LEVEL);
-        private final Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        private final Enemy enemy = BattleFixture.monster();
         private final Battle battle = new Battle(List.of(natasha, ally), List.of(enemy), fixed());
 
         private Fixture() {

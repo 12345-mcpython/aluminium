@@ -6,8 +6,8 @@ import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.TriggerTable;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -33,8 +33,7 @@ import java.util.Random;
  * That is fixed now - {@code ResourceChangeScopeTest} is the case for it - so the split is only a habit.
  */
 public class ResourceChangeHolderTest {
-    private static final int MONSTER = 1002011;
-    private static final String COUNTER = "测试计数";
+        private static final String COUNTER = "测试计数";
     private static final String RECORDED = "测试记录";
     private static final String FROM_SELF = "测试主体是自己";
     private static final String FROM_OTHER = "测试主体是他人";
@@ -69,7 +68,7 @@ public class ResourceChangeHolderTest {
                         record()))));
 
         Battle battle = new Battle(List.of(unit, Character.fromAttributes("other", 1000, 100, 100, 100)),
-                List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+                List.of(BattleFixture.monster()), new Random(0));
         battle.startBattle();
         battle.processRequests();
         battle.fireTriggers(TriggerEvent.TURN_START, unit, unit, 0, 0);
@@ -122,7 +121,7 @@ public class ResourceChangeHolderTest {
         giver.setTriggerTable(new TriggerTable(1, List.of(TriggerSpecs.rule(TriggerEvent.TURN_START.name(),
                 List.of(), gain(COUNTER, 7, "party_first")))));
 
-        Battle battle = new Battle(List.of(receiver, giver), List.of(EnemyFactory.create(MONSTER, 90, 1)),
+        Battle battle = new Battle(List.of(receiver, giver), List.of(BattleFixture.monster()),
                 new Random(0));
         battle.startBattle();
         battle.processRequests();
@@ -155,7 +154,7 @@ public class ResourceChangeHolderTest {
         giver.setTriggerTable(new TriggerTable(1, List.of(
                 TriggerSpecs.rule(TriggerEvent.TURN_START.name(), List.of(), move))));
 
-        Battle battle = new Battle(List.of(receiver, giver), List.of(EnemyFactory.create(MONSTER, 90, 1)),
+        Battle battle = new Battle(List.of(receiver, giver), List.of(BattleFixture.monster()),
                 new Random(0));
         battle.startBattle();
         battle.processRequests();

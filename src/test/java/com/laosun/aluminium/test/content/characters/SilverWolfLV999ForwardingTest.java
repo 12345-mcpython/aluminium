@@ -4,8 +4,8 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -22,8 +22,7 @@ import java.util.Random;
 public class SilverWolfLV999ForwardingTest {
     private static final int SOURCE = 1505;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-    private static final String LAUGH = "笑点";
+        private static final String LAUGH = "笑点";
     private static final String HIDDEN = "隐藏分";
 
     private Character source;
@@ -33,7 +32,7 @@ public class SilverWolfLV999ForwardingTest {
     private void build(int ally) {
         source = CharacterFactory.create(SOURCE, LEVEL);
         other = CharacterFactory.create(ally, LEVEL);
-        battle = new Battle(List.of(source, other), List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+        battle = new Battle(List.of(source, other), List.of(BattleFixture.monster()), new Random(0));
         battle.startBattle();
     }
 

@@ -2,6 +2,7 @@ package com.laosun.aluminium.test.engine;
 
 
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.AttributeType;
@@ -13,7 +14,6 @@ import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Damage;
 import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -32,8 +32,7 @@ public class ResistanceReductionTest {
     private static final int ALLY = 1210;
     private static final int TRINNON = 1403;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-    private static final double EPS = 1e-6;
+        private static final double EPS = 1e-6;
 
     /** The engine reads the attribute: the same hit deals more once the reduction is on the victim. */
     @Test
@@ -42,7 +41,7 @@ public class ResistanceReductionTest {
         Character applier = Character.fromAttributes("applier", 10_000, 100, 100, 100);
         applier.setTriggerTable(new TriggerTable(9996, List.of(TriggerSpecs.rule(
                 TriggerEvent.TURN_START.name(), List.of(), reduction(0.2)))));
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(caster, applier), List.of(enemy), new Random(0));
         battle.startBattle();
         double before = hit(battle, caster, enemy);
@@ -63,7 +62,7 @@ public class ResistanceReductionTest {
     @Test
     public void herAuraStatesTwentyPercentOnEveryEnemy() {
         Character dahlia = CharacterFactory.create(1321, LEVEL);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(dahlia), List.of(enemy), new Random(0));
 
         battle.startBattle();
@@ -92,7 +91,7 @@ public class ResistanceReductionTest {
     @Test
     public void theTwoNewReadersStateTheirOwnPercentages() {
         Character fuxuan = CharacterFactory.create(1203, LEVEL);
-        Enemy first = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy first = BattleFixture.monster();
         Battle firstBattle = new Battle(List.of(fuxuan), List.of(first), new Random(0));
         firstBattle.startBattle();
 
@@ -102,7 +101,7 @@ public class ResistanceReductionTest {
                 "\"when casting the Ultimate ... all enemies get 20% All-Type RES Reduction\" (「施放终结技时…敌方全体全属性抗性降低20%」)");
 
         Character nihility = CharacterFactory.create(1304, LEVEL);
-        Enemy second = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy second = BattleFixture.monster();
         Battle secondBattle = new Battle(List.of(nihility), List.of(second), new Random(0));
         secondBattle.startBattle();
 

@@ -4,8 +4,8 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -32,8 +32,7 @@ import java.util.Random;
 public class SilverWolfLV999LootBoxChanceTest {
     private static final int WOLF = 1506;
     private static final int ALLY = 1204;
-    private static final int MONSTER = 1002011;
-    /**
+        /**
      * 【爆爆爆炸蛋】's WEIGHT bucket: it restores skill points and settles no damage.
      *
      * <p>⚠ The pick is WEIGHTED (the game's grades: 1 / 1 / 10 while 隐藏分 is under 60), so the roll is over the weight
@@ -98,7 +97,7 @@ public class SilverWolfLV999LootBoxChanceTest {
     private static Battle battle(ScriptedRng rng) {
         Battle battle = new Battle(
                 List.of(CharacterFactory.create(WOLF, 80), CharacterFactory.create(ALLY, 80)),
-                List.of(EnemyFactory.create(MONSTER, 90, 1), EnemyFactory.create(MONSTER, 90, 1)), rng);
+                List.of(BattleFixture.monster(), BattleFixture.monster()), rng);
         battle.startBattle();
         battle.processRequests();
         Character wolf = battle.characters.getFirst();

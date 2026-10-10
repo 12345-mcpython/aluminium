@@ -2,10 +2,10 @@ package com.laosun.aluminium.test.content.memosprites;
 
 
 import com.laosun.aluminium.test.engine.InsertedActionTest;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Summon;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.models.skill.Skill;
 import com.laosun.aluminium.models.skill.SkillExecutor;
 import com.laosun.aluminium.utils.CharacterFactory;
@@ -36,8 +36,7 @@ public class MemospriteSlotCastTest {
     private static final int LEVEL = 80;
     private static final int CYRENE = 1415;
     private static final int TRAILBLAZER = 8007;
-    private static final int MONSTER = 1002011;
-    private static final int ODE_OF_GENESIS = 13;
+        private static final int ODE_OF_GENESIS = 13;
     private static final int REINFORCED_BASIC_ATTACK = 4;
     private static final int MINUET = 1;
 
@@ -46,7 +45,7 @@ public class MemospriteSlotCastTest {
         Character cyrene = CharacterFactory.create(CYRENE, LEVEL);
         Character recipient = CharacterFactory.create(TRAILBLAZER, LEVEL);
         Battle battle = new Battle(List.of(cyrene, recipient),
-                List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+                List.of(BattleFixture.monster()), new Random(0));
         battle.startBattle();
         battle.processRequests();
         Summon demiurge = battle.summonServant(cyrene);

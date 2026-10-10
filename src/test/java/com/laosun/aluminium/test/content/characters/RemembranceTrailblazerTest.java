@@ -5,8 +5,8 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -22,14 +22,12 @@ import java.util.Random;
 public class RemembranceTrailblazerTest {
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-
-    /** Note: The memorisprite arrives with the document's own panel, for both ids. */
+        /** Note: The memorisprite arrives with the document's own panel, for both ids. */
     @Test
     public void theSummonArrivesWithTheDocumentedPanel() {
         for (int cid : new int[]{8007, 8008}) {
             Character tb = CharacterFactory.create(cid, LEVEL);
-            Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+            Enemy enemy = BattleFixture.monster();
             Battle battle = new Battle(List.of(tb), List.of(enemy), fixed());
             battle.startBattle();
 
@@ -49,7 +47,7 @@ public class RemembranceTrailblazerTest {
     @Test
     public void castingAgainKeepsTheSameMemosprite() {
         Character tb = CharacterFactory.create(8007, LEVEL);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(tb), List.of(enemy), fixed());
         battle.startBattle();
 

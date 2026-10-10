@@ -2,6 +2,7 @@ package com.laosun.aluminium.test.content.characters;
 
 
 import com.laosun.aluminium.test.engine.SuperBreakTest;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageElement;
@@ -25,8 +26,7 @@ import java.util.Random;
  */
 public class TrailblazerEidolonTest {
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-    private static final double EPS = 1e-9;
+        private static final double EPS = 1e-9;
 
     @Test
     public void theBoostIsStatedOnlyAgainstABrokenTarget() {

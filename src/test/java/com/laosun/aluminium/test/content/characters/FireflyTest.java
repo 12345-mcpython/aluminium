@@ -5,8 +5,8 @@ import com.laosun.aluminium.models.Signal;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -22,13 +22,11 @@ import java.util.Random;
 public class FireflyTest {
     private static final int FIREFLY = 1310;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-
-    /** Note: 25% of the REMAINING wait is skipped: what is left is 0.5 of what it was, and nothing moves without firing. */
+        /** Note: 25% of the REMAINING wait is skipped: what is left is 0.5 of what it was, and nothing moves without firing. */
     @Test
     public void theSkillLeavesThreeQuartersOfTheWait() {
         Character firefly = CharacterFactory.create(FIREFLY, LEVEL);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(firefly), List.of(enemy), fixed());
         battle.startBattle();
         double before = remaining(battle, firefly);
@@ -45,7 +43,7 @@ public class FireflyTest {
     @Test
     public void theUltimateRemovesTheWaitEntirely() {
         Character firefly = CharacterFactory.create(FIREFLY, LEVEL);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(firefly), List.of(enemy), fixed());
         battle.startBattle();
         double before = remaining(battle, firefly);

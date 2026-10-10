@@ -2,6 +2,7 @@ package com.laosun.aluminium.test.content.lightcones;
 
 
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.data.TriggerTables;
@@ -13,7 +14,6 @@ import com.laosun.aluminium.models.DoubleValue;
 import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.Weapon;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -32,14 +32,13 @@ import java.util.Random;
 public class FlickeringStarsSkillDamageTest {
     private static final int CONE = 23061;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-    private static final double BOOST = 0.72;
+        private static final double BOOST = 0.72;
     private static final String CROWN = "闪耀王冠";
 
     @Test
     public void theConePinsTheScopeAndTheShare() {
         Character wearer = CharacterFactory.create(1205, LEVEL, true, Weapon.build(CONE, LEVEL, false, 1));
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Character ally = CharacterFactory.create(1001, LEVEL);
         Battle battle = new Battle(List.of(wearer, ally), List.of(enemy), new Random(0));
         battle.startBattle();
@@ -97,7 +96,7 @@ public class FlickeringStarsSkillDamageTest {
                 continue;
             }
             candidate.setTriggerTable(TriggerTable.EMPTY);
-            Enemy probeEnemy = EnemyFactory.create(MONSTER, 90, 1);
+            Enemy probeEnemy = BattleFixture.monster();
             Battle probe = new Battle(List.of(candidate), List.of(probeEnemy), new Random(0));
             probe.startBattle();
             candidate.getAttribute(AttributeType.CRIT_CHANCE)
@@ -118,7 +117,7 @@ public class FlickeringStarsSkillDamageTest {
         // The SAME (empty) table on both sides: an earlier version left the character's own content in the baseline, so the
         // two sides differed by far more than the one rule under test (measured: basic x0.35, i.e. nothing to do with 2%).
         plain.setTriggerTable(TriggerTable.EMPTY);
-        Enemy plainEnemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy plainEnemy = BattleFixture.monster();
         Battle before = new Battle(List.of(plain), List.of(plainEnemy), new Random(0));
         before.startBattle();
         plain.getAttribute(AttributeType.CRIT_CHANCE)
@@ -139,7 +138,7 @@ public class FlickeringStarsSkillDamageTest {
                 TriggerSpecs.rule("BATTLE_START", null, crown),
                 TriggerSpecs.rule("DEALING_DAMAGE",
                         List.of("actor == self", "from_category BPSKILL", "self has_state " + CROWN), boost))));
-        Enemy boostedEnemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy boostedEnemy = BattleFixture.monster();
         Battle after = new Battle(List.of(boosted), List.of(boostedEnemy), new Random(0));
         after.startBattle();
         boosted.getAttribute(AttributeType.CRIT_CHANCE)
@@ -168,7 +167,7 @@ public class FlickeringStarsSkillDamageTest {
     private double measureSkillRatio(int cid, double percent) {
         Character plain = CharacterFactory.create(cid, LEVEL);
         plain.setTriggerTable(TriggerTable.EMPTY);
-        Enemy plainEnemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy plainEnemy = BattleFixture.monster();
         Battle before = new Battle(List.of(plain), List.of(plainEnemy), new Random(0));
         before.startBattle();
         plain.getAttribute(AttributeType.CRIT_CHANCE)
@@ -188,7 +187,7 @@ public class FlickeringStarsSkillDamageTest {
                 TriggerSpecs.rule("BATTLE_START", null, crown),
                 TriggerSpecs.rule("DEALING_DAMAGE",
                         List.of("actor == self", "from_category BPSKILL", "self has_state " + CROWN), small))));
-        Enemy boostedEnemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy boostedEnemy = BattleFixture.monster();
         Battle after = new Battle(List.of(boosted), List.of(boostedEnemy), new Random(0));
         after.startBattle();
         boosted.getAttribute(AttributeType.CRIT_CHANCE)

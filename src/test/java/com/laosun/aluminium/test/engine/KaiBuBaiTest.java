@@ -4,8 +4,8 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.buff.StackableStateBuff;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -23,15 +23,14 @@ public class KaiBuBaiTest {
     private static final int EVANESCIA = 1505;
     private static final int TEAMMATE = 1513;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-    private static final String GIFT = "好活当赏";
+        private static final String GIFT = "好活当赏";
 
     /** Four instances end, and she converts half of them. */
     @Test
     public void halfOfTheEndedGiftBecomesHers() {
         Character evanescia = CharacterFactory.create(EVANESCIA, LEVEL, false, null, null, 0);
         Character teammate = CharacterFactory.create(TEAMMATE, LEVEL, false, null, null, 0);
-        Enemy victim = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy victim = BattleFixture.monster();
         Battle battle = new Battle(List.of(evanescia, teammate), List.of(victim), new Random(0));
         battle.startBattle();
         battle.processRequests();

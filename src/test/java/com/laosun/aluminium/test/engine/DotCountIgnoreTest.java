@@ -7,9 +7,9 @@ import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Damage;
 import com.laosun.aluminium.models.buff.DotBuff;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.utils.RelicFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -20,8 +20,7 @@ import java.util.Random;
 public class DotCountIgnoreTest {
     private static final int WEARER = 1001;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-    private static final int RELIC_LEVEL = 15;
+        private static final int RELIC_LEVEL = 15;
     private static final double SHARE = 0.06;
     private static final int CAP = 3;
 
@@ -39,7 +38,7 @@ public class DotCountIgnoreTest {
 
     private static double[] state(int dots) {
         Character unit = CharacterFactory.create(WEARER, LEVEL, true, null, RelicFactory.suit(116, 4, RELIC_LEVEL));
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(unit), List.of(enemy), new Random(0));
         battle.startBattle();
         DamageElement[] elements = {DamageElement.FIRE, DamageElement.THUNDER, DamageElement.ICE, DamageElement.WIND};

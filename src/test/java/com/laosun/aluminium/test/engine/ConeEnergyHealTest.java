@@ -5,8 +5,8 @@ import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Weapon;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -21,9 +21,7 @@ public class ConeEnergyHealTest {
     private static final int WEARER = 1001;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-
-    @Test
+        @Test
     public void cone20008GivesTheWholePartyEnergyAtBattleStart() {
         Character wearer = wearer(20008, 1);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
@@ -57,6 +55,6 @@ public class ConeEnergyHealTest {
     }
 
     private static Enemy enemy() {
-        return EnemyFactory.create(MONSTER, 90, 1);
+        return BattleFixture.monster();
     }
 }

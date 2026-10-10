@@ -2,6 +2,7 @@ package com.laosun.aluminium.test.content.memosprites;
 
 
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.AttributeType;
@@ -12,7 +13,6 @@ import com.laosun.aluminium.models.DoubleValue;
 import com.laosun.aluminium.models.Summon;
 import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -37,8 +37,7 @@ import java.util.Random;
 public class MemospriteBoostTest {
     private static final int SUMMONER = 1413;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-    private static final double BOOST = 0.48;
+        private static final double BOOST = 0.48;
 
     @Test
     public void theMemospriteBoostRaisesItsDamage() {
@@ -56,7 +55,7 @@ public class MemospriteBoostTest {
     @Test
     public void theMemospriteIsTheOneThatQualifies() {
         Character master = CharacterFactory.create(SUMMONER, LEVEL);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(master), List.of(enemy), new Random(0));
         battle.startBattle();
         Summon memosprite = battle.summonMemosprite(master);
@@ -83,7 +82,7 @@ public class MemospriteBoostTest {
             master.setTriggerTable(new TriggerTable(9401, List.of(TriggerSpecs.rule(
                     TriggerEvent.BATTLE_START.name(), List.of(), grant))));
         }
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         enemy.setAttribute(AttributeType.HEALTH, new DoubleValue(900000));
         enemy.heal(900000);
         Random noCrit = new Random(0) {

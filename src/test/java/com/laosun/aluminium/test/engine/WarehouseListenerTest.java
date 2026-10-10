@@ -2,12 +2,12 @@ package com.laosun.aluminium.test.engine;
 
 
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.TriggerTable;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -24,14 +24,12 @@ import java.util.Random;
 public class WarehouseListenerTest {
     private static final int FIGHTER = 1002;
     private static final int OWNED = 1407;
-    private static final int MONSTER = 1002011;
-
-    /** The listener's rule fires; the fighter's panel is untouched; the listener never acts. */
+        /** The listener's rule fires; the fighter's panel is untouched; the listener never acts. */
     @Test
     public void theListenerIsHeardAndNeverActs() {
         Character fighter = CharacterFactory.create(FIGHTER, 80, false, null, null, 0);
         Battle battle = new Battle(List.of(fighter),
-                List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+                List.of(BattleFixture.monster()), new Random(0));
 
         Character owned = CharacterFactory.create(OWNED, 80, false, null, null, 0);
         EffectSpec mark = new EffectSpec();

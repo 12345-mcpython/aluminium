@@ -6,8 +6,8 @@ import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -34,8 +34,7 @@ public class PearlEnhancedBasicElationRiderTest {
     private static final int PEARL = 1503;
     private static final int ELATION_ALLY = 1502;
     private static final int HUNTER = 1204;
-    private static final int MONSTER = 1002011;
-    private static final String COUNTER = "好活当赏";
+        private static final String COUNTER = "好活当赏";
     /** The level her character is built at in this fixture; the Elation base table is indexed by THIS. */
     private static final int FIXTURE_LEVEL = 80;
 
@@ -105,7 +104,7 @@ public class PearlEnhancedBasicElationRiderTest {
         Character pearl = CharacterFactory.create(PEARL, 80);
         Character archetype = CharacterFactory.create(ELATION_ALLY, 80);
         Battle battle = new Battle(List.of(pearl, archetype, CharacterFactory.create(HUNTER, 80)),
-                List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+                List.of(BattleFixture.monster()), new Random(0));
         battle.startBattle();
         battle.processRequests();
         Character her = battle.characters.getFirst();

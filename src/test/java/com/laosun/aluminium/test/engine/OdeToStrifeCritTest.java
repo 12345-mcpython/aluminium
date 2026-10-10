@@ -5,10 +5,10 @@ import com.laosun.aluminium.models.CanHit;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Summon;
 import com.laosun.aluminium.models.buff.StateBuff;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.models.skill.Skill;
 import com.laosun.aluminium.models.skill.SkillExecutor;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -33,8 +33,7 @@ public class OdeToStrifeCritTest {
     private static final int LEVEL = 80;
     private static final int CYRENE = 1415;
     private static final int MYDEI = 1404;
-    private static final int MONSTER = 1002011;
-    private static final int ODE_TO_STRIFE = 16;
+        private static final int ODE_TO_STRIFE = 16;
     private static final String BLOODFEUD = "血仇";
 
     /** The strike the ode commands, with every roll a crit, carries the crit-damage clause. */
@@ -50,7 +49,7 @@ public class OdeToStrifeCritTest {
             }
         };
         Battle battle = new Battle(List.of(cyrene, mydei),
-                List.of(EnemyFactory.create(MONSTER, 90, 1)), alwaysCrit);
+                List.of(BattleFixture.monster()), alwaysCrit);
         battle.startBattle();
         battle.processRequests();
         Summon demiurge = battle.summonServant(cyrene);

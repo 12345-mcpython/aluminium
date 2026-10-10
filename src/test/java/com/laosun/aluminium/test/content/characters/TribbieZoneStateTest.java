@@ -2,8 +2,8 @@ package com.laosun.aluminium.test.content.characters;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -24,14 +24,13 @@ import java.util.Random;
 public class TribbieZoneStateTest {
     private static final int LEVEL = 80;
     private static final int TRIBBIE = 1403;
-    private static final int MONSTER = 1002011;
-    private static final String ZONE = "结界";
+        private static final String ZONE = "结界";
 
     @Test
     public void theZoneIsAStateThatEndsOnItsOwn() {
         Character tribbie = CharacterFactory.create(TRIBBIE, LEVEL);
         Battle battle = new Battle(List.of(tribbie, CharacterFactory.create(1002, LEVEL)),
-                List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+                List.of(BattleFixture.monster()), new Random(0));
         battle.startBattle();
         battle.processRequests();
         Assertions.assertFalse(tribbie.getBuffManager().hasState(ZONE),

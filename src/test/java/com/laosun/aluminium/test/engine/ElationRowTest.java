@@ -2,12 +2,12 @@ package com.laosun.aluminium.test.engine;
 
 
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.TriggerTable;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -25,8 +25,7 @@ import java.util.Random;
 public class ElationRowTest {
     private static final int AVENTURINE = 8009;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-    private static final String COUNTER = "命中次数";
+        private static final String COUNTER = "命中次数";
 
     /** Eight hits plus the final split instance, with a single enemy that every random draw must pick. */
     @Test
@@ -56,7 +55,7 @@ public class ElationRowTest {
         him.setTriggerTable(new TriggerTable(AVENTURINE, List.of(
                 TriggerSpecs.rule("DEALING_DAMAGE", List.of("actor == self"), counter))));
 
-        Battle battle = new Battle(List.of(him), List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+        Battle battle = new Battle(List.of(him), List.of(BattleFixture.monster()), new Random(0));
         battle.startBattle();
         battle.processRequests();
         battle.castImmediate(him.getSkills().get(SkillType.ELATION_SKILL), him,

@@ -2,6 +2,7 @@ package com.laosun.aluminium.test.engine;
 
 
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
@@ -11,7 +12,6 @@ import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.buff.SkillSwapBuff;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.models.skill.Skill;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -37,8 +37,7 @@ public class SkillSwapTest {
     private static final int GALLAGHER = 1301;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-    private static final int ENHANCED_ROW = 130108;
+        private static final int ENHANCED_ROW = 130108;
 
     /** Note: The swap installs a different skill into the slot, and it is that row (the buff says which). */
     @Test
@@ -87,7 +86,7 @@ public class SkillSwapTest {
     private static final class Fixture {
         private final Character gallagher = CharacterFactory.create(GALLAGHER, LEVEL);
         private final Character ally = CharacterFactory.create(ALLY, LEVEL);
-        private final Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        private final Enemy enemy = BattleFixture.monster();
         private final Battle battle = new Battle(List.of(gallagher, ally), List.of(enemy), fixed());
 
         private Fixture() {

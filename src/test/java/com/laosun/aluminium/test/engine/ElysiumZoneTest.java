@@ -6,8 +6,8 @@ import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -26,9 +26,7 @@ public class ElysiumZoneTest {
     private static final int CYRENE = 1415;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-
-    /** With the zone up, an ally's attack is followed by a true-damage rider of 24% of what it settled. */
+        /** With the zone up, an ally's attack is followed by a true-damage rider of 24% of what it settled. */
     @Test
     public void theZoneAddsAQuarterOfTheAllysDamage() {
         double with = enemyLoss(true);
@@ -48,7 +46,7 @@ public class ElysiumZoneTest {
         Character cyrene = CharacterFactory.create(CYRENE, LEVEL, false, null, null, 0);
         Character ally = CharacterFactory.create(ALLY, LEVEL, false, null, null, 0);
         ally.setTriggerTable(new TriggerTable(ALLY, List.of()));   // the ally contributes nothing of its own
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(cyrene, ally), List.of(enemy), new Random(0));
         battle.startBattle();
         if (zone) {

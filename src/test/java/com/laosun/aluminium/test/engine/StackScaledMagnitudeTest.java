@@ -6,8 +6,8 @@ import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -26,8 +26,7 @@ public class StackScaledMagnitudeTest {
     private static final int JIAOQIU = 1218;
     private static final int ATTACKER = 1210;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-    private static final double EPS = 1e-9;
+        private static final double EPS = 1e-9;
     private static final String COUNTER = "烬煨";
 
     @Test
@@ -83,7 +82,7 @@ public class StackScaledMagnitudeTest {
     private static Fixture fixture() {
         Character jiaoqiu = CharacterFactory.create(JIAOQIU, LEVEL);
         Character attacker = CharacterFactory.create(ATTACKER, LEVEL);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         // A generator that never crits (0.99 is above any crit chance) and never misses a base-chance roll: without it
         // the three measurements sit at different points in the shared stream, the crit flips, and the damage ratio
         // reflects the roll rather than the zone (measured: d1/d0 read 1.38 instead of ~1.19).

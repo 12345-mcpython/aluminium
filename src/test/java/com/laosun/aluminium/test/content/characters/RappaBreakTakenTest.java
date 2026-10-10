@@ -9,8 +9,8 @@ import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Damage;
 import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -26,12 +26,10 @@ import java.util.Random;
 public class RappaBreakTakenTest {
     private static final int WEARER = 1317;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-
-    @Test
+        @Test
     public void theBaseBranchStatesTwoPercentScopedToBreak() {
         Character unit = CharacterFactory.create(WEARER, LEVEL);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         double attack = unit.getAttribute(AttributeType.ATTACK).get();
         var rules = unit.getTriggerTable().matching(TriggerEvent.BREAK,
                 new TriggerTable.TriggerContext(unit, unit, enemy, 0, 0));
@@ -52,7 +50,7 @@ public class RappaBreakTakenTest {
     @Test
     public void breakDamageIsAmplifiedByExactlyTheAuthoredShare() {
         Character unit = CharacterFactory.create(WEARER, LEVEL);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(unit), List.of(enemy), new Random(0));
         battle.startBattle();
         double normal = battle.applyDamage(enemy, new Damage(unit, enemy, DamageElement.FIRE, DamageType.NORMAL, 1000));

@@ -5,11 +5,11 @@ import com.laosun.aluminium.beans.MemospriteSpec;
 import com.laosun.aluminium.data.Memosprites;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Summon;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.models.enemy.SummonFactory;
 import com.laosun.aluminium.models.skill.Skill;
 import com.laosun.aluminium.models.skill.SkillExecutor;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -33,9 +33,7 @@ public class MemospriteSkillTest {
     private static final int CYRENE = 1415;
     private static final int SERVANT_ID = 11415;
     private static final int ODE_TO_STRIFE = 16;
-    private static final int MONSTER = 1002011;
-
-    /** Demiurge (德谬歌) carries "Ode to Strife" (献予'纷争'之诗) as a Skill with the SERVANT's cid, and the engine can deliver it. */
+        /** Demiurge (德谬歌) carries "Ode to Strife" (献予'纷争'之诗) as a Skill with the SERVANT's cid, and the engine can deliver it. */
     @Test
     public void theMemospriteCarriesItsOwnSkill() {
         Summon demiurge = servantOf(CYRENE);
@@ -61,7 +59,7 @@ public class MemospriteSkillTest {
             Assertions.assertNotNull(spec, "precondition: " + cid + " has a memosprite file");
             Character master = CharacterFactory.create(cid, 80, false, null, null, 0);
             Battle battle = new Battle(List.of(master),
-                    List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+                    List.of(BattleFixture.monster()), new Random(0));
             battle.startBattle();
             battle.processRequests();
             // Note: `Battle.summonServant` is the seam that hands the panel its resource reader (140's derives from New Bud (新蕊))
@@ -92,7 +90,7 @@ public class MemospriteSkillTest {
             MemospriteSpec spec = Memosprites.of(cid);
             Character master = CharacterFactory.create(cid, 80, false, null, null, 0);
             Battle battle = new Battle(List.of(master),
-                    List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+                    List.of(BattleFixture.monster()), new Random(0));
             battle.startBattle();
             battle.processRequests();
             Summon servant = battle.summonServant(master);
@@ -138,7 +136,7 @@ public class MemospriteSkillTest {
             int slot = Integer.parseInt(w[1]);
             Character master = CharacterFactory.create(cid, 80, false, null, null, 0);
             Battle battle = new Battle(List.of(master),
-                    List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+                    List.of(BattleFixture.monster()), new Random(0));
             battle.startBattle();
             Summon servant = battle.summonServant(master);
             Skill skill = servant.skillAt(slot);
@@ -154,7 +152,7 @@ public class MemospriteSkillTest {
     private static Summon servantOf(int cid) {
         Character master = CharacterFactory.create(cid, 80, false, null, null, 0);
         Battle battle = new Battle(List.of(master),
-                List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+                List.of(BattleFixture.monster()), new Random(0));
         battle.startBattle();
         battle.processRequests();
         MemospriteSpec spec = Memosprites.of(cid);

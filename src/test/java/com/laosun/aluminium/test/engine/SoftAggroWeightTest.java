@@ -2,6 +2,7 @@ package com.laosun.aluminium.test.engine;
 
 
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.AttributeType;
@@ -15,7 +16,6 @@ import com.laosun.aluminium.models.Damage;
 import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.buff.ShieldBuff;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -38,9 +38,7 @@ public class SoftAggroWeightTest {
     private static final int ALLY = 1210;
     private static final int BYSTANDER = 1002;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-
-    /** Note: The ratio multiplies the unit's OWN weight: 100 x (1 + 5) = 600, so two equal allies become 6:1. */
+        /** Note: The ratio multiplies the unit's OWN weight: 100 x (1 + 5) = 600, so two equal allies become 6:1. */
     @Test
     public void theRatioMultipliesTheUnitsOwnAggroWeight() {
         Character marked = withAggro(100);
@@ -162,6 +160,6 @@ public class SoftAggroWeightTest {
     }
 
     private static Enemy dummy() {
-        return EnemyFactory.create(MONSTER, 90, 1);
+        return BattleFixture.monster();
     }
 }

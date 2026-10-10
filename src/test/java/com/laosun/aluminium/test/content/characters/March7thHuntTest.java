@@ -2,6 +2,7 @@ package com.laosun.aluminium.test.content.characters;
 
 
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.AttributeType;
@@ -10,7 +11,6 @@ import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -28,9 +28,7 @@ public class March7thHuntTest {
     private static final int MARCH = 1224;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-
-    /** Note: The Skill marks the ally AND speeds them by 10%, measured against a hand-built 20% reference. */
+        /** Note: The Skill marks the ally AND speeds them by 10%, measured against a hand-built 20% reference. */
     @Test
     public void theSkillMarksTheShifuAndSpeedsThem() {
         double content = skillSpeedGain(0);
@@ -46,7 +44,7 @@ public class March7thHuntTest {
     public void theChargeComesFromHerBasicAndFromTheShifu() {
         Character march = CharacterFactory.create(MARCH, LEVEL);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(march, ally), List.of(enemy), fixed());
         battle.startBattle();
 
@@ -90,7 +88,7 @@ public class March7thHuntTest {
             march.setTriggerTable(new TriggerTable(MARCH, List.of(TriggerSpecs.rule(
                     TriggerEvent.SKILL_CAST.name(), List.of("actor == self"), effect))));
         }
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(march, ally), List.of(enemy), fixed());
         battle.startBattle();
         double before = ally.getAttribute(AttributeType.SPEED).get();

@@ -4,8 +4,8 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.TriggerTable;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -36,8 +36,7 @@ import java.util.Random;
 public class PearlStatTracesTest {
     private static final int PEARL = 1503;
     private static final int ALLY = 1204;
-    private static final int MONSTER = 1002011;
-    private static final int LEVEL = 80;
+        private static final int LEVEL = 80;
     private static final double EPS = 1e-6;
 
     /**
@@ -51,7 +50,7 @@ public class PearlStatTracesTest {
     public void theTenDataRowsReachThePanel() {
         Character pearl = CharacterFactory.create(PEARL, LEVEL);
         Battle battle = new Battle(List.of(pearl, CharacterFactory.create(ALLY, LEVEL)),
-                List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+                List.of(BattleFixture.monster()), new Random(0));
         battle.startBattle();
         battle.processRequests();
         Character her = battle.characters.getFirst();
@@ -115,7 +114,7 @@ public class PearlStatTracesTest {
         if (!withTraces) {
             pearl.setTriggerTable(TriggerTable.EMPTY);
         }
-        Battle battle = new Battle(List.of(pearl), List.of(EnemyFactory.create(MONSTER, 90, 1)),
+        Battle battle = new Battle(List.of(pearl), List.of(BattleFixture.monster()),
                 new Random(0));
         battle.startBattle();
         battle.processRequests();
@@ -135,7 +134,7 @@ public class PearlStatTracesTest {
     private static double attributeWithNoRules(AttributeType attribute) {
         Character pearl = CharacterFactory.create(PEARL, LEVEL);
         pearl.setTriggerTable(TriggerTable.EMPTY);
-        Battle battle = new Battle(List.of(pearl), List.of(EnemyFactory.create(MONSTER, 90, 1)),
+        Battle battle = new Battle(List.of(pearl), List.of(BattleFixture.monster()),
                 new Random(0));
         battle.startBattle();
         battle.processRequests();

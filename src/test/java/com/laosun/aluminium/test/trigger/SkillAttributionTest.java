@@ -2,6 +2,7 @@ package com.laosun.aluminium.test.trigger;
 
 
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.ResourceSpec;
@@ -17,7 +18,6 @@ import com.laosun.aluminium.models.Damage;
 import com.laosun.aluminium.models.DoubleValue;
 import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.models.skill.DefaultSkill;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -47,8 +47,7 @@ public class SkillAttributionTest {
     private static final int HIMEKO = 1003;
     private static final int LEVEL = 80;
     /** Ice Edge (冰锋): toughness 60, weak to FIRE/THUNDER - one Skill (战技) (stance 60) breaks it. */
-    private static final int MONSTER = 1002011;
-    private static final int SKILL_SLOT = 2;
+        private static final int SKILL_SLOT = 2;
     private static final int BASIC_SLOT = 1;
     private static final int ULTIMATE_SLOT = 3;
     private static final String CHARGE = "充能";
@@ -266,7 +265,7 @@ public class SkillAttributionTest {
     }
 
     private static Enemy breakableEnemy() {
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         enemy.setStanceWeak(Set.of(DamageElement.FIRE));
         enemy.setAttribute(AttributeType.EFFECT_RESISTANCE, new DoubleValue(0));
         return enemy;

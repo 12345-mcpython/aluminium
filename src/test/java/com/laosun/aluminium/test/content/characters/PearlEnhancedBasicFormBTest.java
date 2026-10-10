@@ -5,8 +5,8 @@ import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -32,9 +32,7 @@ public class PearlEnhancedBasicFormBTest {
     private static final int ELATION = 1502;
     private static final int HUNTER = 1204;
     private static final int OTHER = 1101;
-    private static final int MONSTER = 1002011;
-
-    /** The slot-9 form heals the whole party, and the lowest-HP ally a second time. */
+        /** The slot-9 form heals the whole party, and the lowest-HP ally a second time. */
     @Test
     public void theSlotNineFormHealsThePartyAndTheLowestAllyAgain() {
         Battle battle = newBattle();
@@ -117,7 +115,7 @@ public class PearlEnhancedBasicFormBTest {
         Battle battle = new Battle(
                 List.of(CharacterFactory.create(PEARL, 80), CharacterFactory.create(ELATION, 80),
                         CharacterFactory.create(HUNTER, 80), CharacterFactory.create(OTHER, 80)),
-                List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+                List.of(BattleFixture.monster()), new Random(0));
         battle.startBattle();
         battle.processRequests();
         return battle;

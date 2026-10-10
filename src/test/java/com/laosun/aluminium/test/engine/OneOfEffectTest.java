@@ -6,8 +6,8 @@ import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.TriggerTable;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -29,8 +29,7 @@ import java.util.Random;
 public class OneOfEffectTest {
     private static final int WOLF = 1506;
     private static final int ALLY = 1204;
-    private static final int MONSTER = 1002011;
-    private static final String A = "标记A";
+        private static final String A = "标记A";
     private static final String B = "标记B";
     private static final String C = "标记C";
 
@@ -168,7 +167,7 @@ public class OneOfEffectTest {
     private static Character marksWithAnAlwaysEffect(int seed) {
         Battle battle = new Battle(
                 List.of(CharacterFactory.create(WOLF, 80), CharacterFactory.create(ALLY, 80)),
-                List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(seed));
+                List.of(BattleFixture.monster()), new Random(seed));
         battle.startBattle();
         battle.processRequests();
         Character wolf = battle.characters.getFirst();
@@ -195,7 +194,7 @@ public class OneOfEffectTest {
     private static Character marksAfterOneFiring(int seed, boolean oneOf) {
         Battle battle = new Battle(
                 List.of(CharacterFactory.create(WOLF, 80), CharacterFactory.create(ALLY, 80)),
-                List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(seed));
+                List.of(BattleFixture.monster()), new Random(seed));
         battle.startBattle();
         battle.processRequests();
         Character wolf = battle.characters.getFirst();

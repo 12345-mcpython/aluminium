@@ -4,8 +4,8 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -30,9 +30,7 @@ public class March7thLevelTest {
     private static final int MARCH = 1001;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-
-    /** The document's level for her talent, stated by the file instead of by a per-effect pin. */
+        /** The document's level for her talent, stated by the file instead of by a per-effect pin. */
     @Test
     public void herTalentIsReadAtTheDocumentsLevel() {
         Character march = CharacterFactory.create(MARCH, LEVEL, true, null, null, 0);
@@ -98,7 +96,7 @@ public class March7thLevelTest {
     // ==================================================================
 
     private static Enemy enemy() {
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         return enemy;
     }
 

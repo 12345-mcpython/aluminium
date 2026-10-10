@@ -2,6 +2,7 @@ package com.laosun.aluminium.test.engine;
 
 
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
@@ -9,7 +10,6 @@ import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -32,9 +32,7 @@ import java.util.Random;
 public class LowestHpAllyTest {
     private static final double EPS = 1e-9;
 
-    private static final int MONSTER = 1002011;
-
-    /** The most-hurt <b>share</b> wins, even when another ally has fewer HP points. */
+        /** The most-hurt <b>share</b> wins, even when another ally has fewer HP points. */
     @Test
     public void theLowestShareWinsRatherThanTheLowestNumberOfPoints() {
         Character hero = character("hero", 1000);
@@ -170,6 +168,6 @@ public class LowestHpAllyTest {
     }
 
     private static Enemy dummy() {
-        return EnemyFactory.create(MONSTER, 90, 1);
+        return BattleFixture.monster();
     }
 }

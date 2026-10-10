@@ -3,6 +3,7 @@ package com.laosun.aluminium.test.engine;
 
 import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.test.trigger.CastSkillTest;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
@@ -10,7 +11,6 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.TriggerTable;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -38,9 +38,7 @@ public class LethalSetTest {
     private static final int FIRST = 1002;
     private static final int SECOND = 1003;
     private static final int THIRD = 1004;
-    private static final int MONSTER = 1002011;
-
-    /** One blow reaches one ally; a second blow in the SAME action reaches both; a new action starts over. */
+        /** One blow reaches one ally; a second blow in the SAME action reaches both; a new action starts over. */
     @Test
     public void theSetGrowsWithinAnActionAndResetsAtItsBoundary() {
         Character owner = CharacterFactory.create(OWNER, LEVEL);
@@ -58,7 +56,7 @@ public class LethalSetTest {
         owner.setTriggerTable(new TriggerTable(OWNER, List.of(rule)));
 
         Battle battle = new Battle(List.of(owner, first, second, third),
-                List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+                List.of(BattleFixture.monster()), new Random(0));
         battle.startBattle();
         battle.processRequests();
 

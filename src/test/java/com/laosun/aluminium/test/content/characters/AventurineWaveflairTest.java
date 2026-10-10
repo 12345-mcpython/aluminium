@@ -5,8 +5,8 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -20,9 +20,7 @@ public class AventurineWaveflairTest {
     private static final int AVENTURINE = 1513;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-
-    /**
+        /**
      * Note: One Fervor per TEAMMATE's attack, and the document's cap of 30 enforced by exceeding it.
      *
      * <p>⚠ The cap is driven by ONE gain, and the reason is measured: 「【热意】达到10点时…立即施放…」 means each crossing casts
@@ -35,7 +33,7 @@ public class AventurineWaveflairTest {
     public void teammateAttacksFeedFervorUpToThirty() {
         Character aventurine = CharacterFactory.create(AVENTURINE, LEVEL);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(aventurine, ally), List.of(enemy), fixed());
         battle.startBattle();
 
@@ -64,7 +62,7 @@ public class AventurineWaveflairTest {
     public void theUltimateAddsFervorAndSpeed() {
         Character aventurine = CharacterFactory.create(AVENTURINE, LEVEL);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(aventurine, ally), List.of(enemy), fixed());
         battle.startBattle();
         double before = aventurine.getAttribute(AttributeType.SPEED).get();

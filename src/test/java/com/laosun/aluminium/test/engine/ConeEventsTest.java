@@ -12,8 +12,8 @@ import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.Weapon;
 import com.laosun.aluminium.models.buff.DotBuff;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -28,9 +28,7 @@ public class ConeEventsTest {
     private static final int WEARER = 1205;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-
-    private Character wearer(int cone) {
+        private Character wearer(int cone) {
         return cone == 0 ? CharacterFactory.create(WEARER, LEVEL)
                 : CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(cone, LEVEL, false, 1));
     }
@@ -39,7 +37,7 @@ public class ConeEventsTest {
     public void beingHitBurnsTheEnemyAndTheConditionIsTargeted() {
         Character unit = wearer(21016);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(unit, ally), List.of(enemy), new Random(0));
         battle.startBattle();
         // Note: The wearer's OWN file already has TAKING_HIT rules, so counting rules would be wrong (measured: 2).
@@ -77,7 +75,7 @@ public class ConeEventsTest {
         System.out.println("[21016] dots on the enemy after the wearer was hit=" + afterHit);
         Assertions.assertEquals(1, afterHit, "the burn landed");
         // ... and the FALSE case: hitting the ALLY must not burn anything.
-        Enemy second = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy second = BattleFixture.monster();
         Battle other = new Battle(List.of(unit, ally), List.of(second), new Random(0));
         other.startBattle();
         ally.getAttribute(AttributeType.EFFECT_HIT_RATE)
@@ -91,7 +89,7 @@ public class ConeEventsTest {
     @Test
     public void aDebuffFedStackRaisesDamageUpToItsCap() {
         Character unit = wearer(21041);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(unit), List.of(enemy), new Random(0));
         battle.startBattle();
         double before = unit.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
@@ -107,7 +105,7 @@ public class ConeEventsTest {
     public void theEhrThresholdGatesTheAttackBonus() {
         Character high = wearer(21041);
         Character low = wearer(21041);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(high, low), List.of(enemy), new Random(0));
         double lowBase = low.getAttribute(AttributeType.ATTACK).baseValue();
         high.getAttribute(AttributeType.EFFECT_HIT_RATE)

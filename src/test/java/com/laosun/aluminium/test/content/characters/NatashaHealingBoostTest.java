@@ -3,8 +3,8 @@ package com.laosun.aluminium.test.content.characters;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -24,8 +24,7 @@ public class NatashaHealingBoostTest {
     private static final int PLAIN = 1002;
     private static final int TARGET_ALLY = 1210;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-    private static final double BASE_HEAL = 500;
+        private static final double BASE_HEAL = 500;
 
     @Test
     public void herTraceRaisesTheHealingSheProvidesByTenPercent() {
@@ -49,7 +48,7 @@ public class NatashaHealingBoostTest {
     private static double computedHeal(int healerCid) {
         Character healer = CharacterFactory.create(healerCid, LEVEL);
         Character target = CharacterFactory.create(TARGET_ALLY, LEVEL);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(healer, target), List.of(enemy), new Random(0));
         battle.startBattle();
         return battle.calculateHeal(healer, target, BASE_HEAL);

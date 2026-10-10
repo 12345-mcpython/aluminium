@@ -3,8 +3,8 @@ package com.laosun.aluminium.test.engine;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.buff.ControlBuff;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -21,15 +21,13 @@ import java.util.Random;
 public class WarehouseAutoListenerTest {
     private static final int FIGHTER = 1002;
     private static final int WOLF = 1506;
-    private static final int MONSTER = 1002011;
-
-    /** The clause fires with no registration, and the owner keeps acting. */
+        /** The clause fires with no registration, and the owner keeps acting. */
     @Test
     public void aPartyMemberIsHeardWithoutGivingUpHerOwnTable() {
         Character fighter = CharacterFactory.create(FIGHTER, 80, false, null, null, 0);
         Character wolf = CharacterFactory.create(WOLF, 80, false, null, null, 0);
         Battle battle = new Battle(List.of(fighter, wolf),
-                List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+                List.of(BattleFixture.monster()), new Random(0));
         battle.startBattle();
         battle.processRequests();
         battle.beginWave();

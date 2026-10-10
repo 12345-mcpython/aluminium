@@ -2,6 +2,7 @@ package com.laosun.aluminium.test.content.characters;
 
 
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.AttributeType;
@@ -9,7 +10,6 @@ import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -24,9 +24,7 @@ public class MozeTest {
     private static final int MOZE = 1223;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-
-    /** Note: The additional damage needs the Prey mark, and its 30% is compared with a hand-built 60% reference in the same pipeline. */
+        /** Note: The additional damage needs the Prey mark, and its 30% is compared with a hand-built 60% reference in the same pipeline. */
     @Test
     public void theAdditionalDamageNeedsPrey() {
         double unmarked = additionalLoss(true, false);
@@ -68,7 +66,7 @@ public class MozeTest {
             moze.setTriggerTable(new TriggerTable(MOZE, List.of(TriggerSpecs.rule(
                     TriggerEvent.ALLY_ATTACK.name(), List.of("target has_state 猎物"), effect))));
         }
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(moze, ally), List.of(enemy), fixed());
         battle.startBattle();
         if (mark) {
@@ -84,7 +82,7 @@ public class MozeTest {
     private static double ultFollowUp() {
         Character moze = CharacterFactory.create(MOZE, LEVEL);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(moze, ally), List.of(enemy), fixed());
         battle.startBattle();
         double before = enemy.getCurrentHp();

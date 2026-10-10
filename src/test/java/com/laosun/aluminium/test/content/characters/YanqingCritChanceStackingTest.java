@@ -4,8 +4,8 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -20,14 +20,12 @@ import java.util.Random;
  */
 public class YanqingCritChanceStackingTest {
     private static final int OWNER = 1209;
-    private static final int MONSTER = 1002011;
-
-    /** Two sources, two shares, and the total. */
+        /** Two sources, two shares, and the total. */
     @Test
     public void bothCritChanceSourcesAreCounted() {
         Character owner = CharacterFactory.create(OWNER, 80, false, null, null, 0);
         Battle battle = new Battle(List.of(owner),
-                List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+                List.of(BattleFixture.monster()), new Random(0));
         battle.startBattle();
         battle.processRequests();
         double base = owner.getAttribute(AttributeType.CRIT_CHANCE).get();

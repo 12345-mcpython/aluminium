@@ -11,9 +11,9 @@ import com.laosun.aluminium.models.Signal;
 import com.laosun.aluminium.models.Summon;
 import com.laosun.aluminium.models.buff.StatModifierBuff;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.models.skill.DefaultSkill;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -55,8 +55,7 @@ public class SundaySkillTest {
     /** Aglaea - Remembrance (记忆) and a memosprite owner, so she is the "target has a summon" side. */
     private static final int MEMOSPRITE_ALLY = 1402;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-    /** His Skill's slot in {@code skills.json}. */
+        /** His Skill's slot in {@code skills.json}. */
     private static final int SKILL_SLOT = 2;
     /** His ultimate's slot. */
     private static final int ULTIMATE_SLOT = 3;
@@ -369,6 +368,6 @@ public class SundaySkillTest {
     }
 
     private static Enemy dummy() {
-        return EnemyFactory.create(MONSTER, 90, 1);
+        return BattleFixture.monster();
     }
 }

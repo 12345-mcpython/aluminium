@@ -2,13 +2,13 @@ package com.laosun.aluminium.test.engine;
 
 
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Signal;
 import com.laosun.aluminium.models.TriggerTable;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -25,8 +25,7 @@ import java.util.Random;
 public class PerStackLiveTest {
     private static final int OWNER = 1002;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-    private static final String COUNTER = "probeCharge";
+        private static final String COUNTER = "probeCharge";
 
     /** One stack, then five: the same attached aura yields 14% and then 0%. */
     @Test
@@ -34,7 +33,7 @@ public class PerStackLiveTest {
         Character owner = CharacterFactory.create(OWNER, LEVEL, false, null, null, 0);
         owner.setTriggerTable(scene());
         Battle battle = new Battle(List.of(owner),
-                List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+                List.of(BattleFixture.monster()), new Random(0));
         battle.startBattle();
         battle.processRequests();
 

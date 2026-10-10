@@ -2,6 +2,7 @@ package com.laosun.aluminium.test.engine;
 
 
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
@@ -9,7 +10,6 @@ import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -32,9 +32,7 @@ import java.util.Random;
 public class RolledStateTest {
     private static final int CID = 1106;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-
-    /** A stated chance is rolled: 0.0001 against a 0.5 roll attaches nothing. */
+        /** A stated chance is rolled: 0.0001 against a 0.5 roll attaches nothing. */
     @Test
     public void aStatedChanceIsRolled() {
         Assertions.assertFalse(lands(0.0001, 0.5), "「基础概率」 (base chance) is a real roll, not a label");
@@ -67,7 +65,7 @@ public class RolledStateTest {
 
     private static boolean lands(Double baseChance, double roll) {
         Character pela = CharacterFactory.create(CID, LEVEL);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
 
         EffectSpec state = new EffectSpec();
         TriggerSpecs.set(state, "op", "APPLY_BUFF");

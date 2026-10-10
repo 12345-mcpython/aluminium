@@ -7,8 +7,8 @@ import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -31,9 +31,7 @@ import java.util.Random;
 public class SplitDamageTest {
     private static final int WOLF = 1506;
     private static final int ALLY = 1204;
-    private static final int MONSTER = 1002011;
-
-    /** One enemy takes the stated share whole; two take half each; the total does not move with the enemy count. */
+        /** One enemy takes the stated share whole; two take half each; the total does not move with the enemy count. */
     @Test
     public void theStatedShareIsATotalSplitAmongTheVictims() {
         double alone = perEnemyLoss(1);
@@ -133,7 +131,7 @@ public class SplitDamageTest {
     private static Battle battle(int enemies, boolean split) {
         List<Enemy> roster = new ArrayList<>();
         for (int i = 0; i < enemies; i++) {
-            roster.add(EnemyFactory.create(MONSTER, 90, 1));
+            roster.add(BattleFixture.monster());
         }
         Battle battle = new Battle(
                 List.of(CharacterFactory.create(WOLF, 80), CharacterFactory.create(ALLY, 80)), roster, new NoCrit());

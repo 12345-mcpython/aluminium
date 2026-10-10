@@ -6,8 +6,8 @@ import com.laosun.aluminium.enums.DamageType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Damage;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -23,12 +23,10 @@ import java.util.Random;
 public class SelfScopedDamageGuardTest {
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-
-    /** The ally's damage against an enemy already below half HP, optionally with the owner in the party. */
+        /** The ally's damage against an enemy already below half HP, optionally with the owner in the party. */
     private double allyDamage(int owner, boolean withOwner) {
         Character ally = CharacterFactory.create(ALLY, LEVEL);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(withOwner ? List.of(CharacterFactory.create(owner, LEVEL), ally) : List.of(ally),
                 List.of(enemy), new Random(0));
         battle.startBattle();
@@ -60,7 +58,7 @@ public class SelfScopedDamageGuardTest {
     @Test
     public void onlyAnUltimateCategoryInstanceGetsTheMultiplier() {
         Character owner = CharacterFactory.create(1220, LEVEL);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(owner), List.of(enemy), new Random(0));
         battle.startBattle();
         double ordinary = battle.applyDamage(enemy, new Damage(owner, enemy, DamageElement.WIND, DamageType.NORMAL, 1000));
@@ -76,7 +74,7 @@ public class SelfScopedDamageGuardTest {
     /** An ALLY's own ULTRA-category instance, with and without the owner in the party. */
     private double allyUltimate(int owner, boolean withOwner) {
         Character ally = CharacterFactory.create(ALLY, LEVEL);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(withOwner ? List.of(CharacterFactory.create(owner, LEVEL), ally) : List.of(ally),
                 List.of(enemy), new Random(0));
         battle.startBattle();

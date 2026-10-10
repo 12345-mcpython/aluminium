@@ -5,8 +5,8 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -20,14 +20,12 @@ public class SiblingHarmonyTest {
     private static final int TB = 8005;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-
-    /** Note: "持有[伴舞]的我方目标击破特攻提高30%" -- the state and the modifier, for the party. */
+        /** Note: "持有[伴舞]的我方目标击破特攻提高30%" -- the state and the modifier, for the party. */
     @Test
     public void herUltimateGrantsTheDanceAndTheBreakEffect() {
         Character tb = CharacterFactory.create(TB, LEVEL);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(tb, ally), List.of(enemy), fixed());
         battle.startBattle();
         double before = ally.getAttribute(AttributeType.BREAKING_EFFECT).get();
@@ -47,7 +45,7 @@ public class SiblingHarmonyTest {
     public void theTechniqueRaisesThePartysBreakEffect() {
         Character tb = CharacterFactory.create(TB, LEVEL);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(tb, ally), List.of(enemy), fixed());
         battle.markTechniqueUsed(tb);
         double before = ally.getAttribute(AttributeType.BREAKING_EFFECT).get();
@@ -59,7 +57,7 @@ public class SiblingHarmonyTest {
 
         Character plain = CharacterFactory.create(TB, LEVEL);
         Character ally2 = CharacterFactory.create(ALLY, LEVEL);
-        Enemy enemy2 = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy2 = BattleFixture.monster();
         Battle plainBattle = new Battle(List.of(plain, ally2), List.of(enemy2), fixed());
         double untouched = ally2.getAttribute(AttributeType.BREAKING_EFFECT).get();
         plainBattle.startBattle();

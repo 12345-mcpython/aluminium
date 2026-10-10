@@ -9,8 +9,8 @@ import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.buff.DotBuff;
 import com.laosun.aluminium.models.buff.RegenBuff;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -27,9 +27,7 @@ public class LynxTest {
     private static final int LYNX = 1110;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-
-    /** Note: The state lands on the aimed ally, and it raises THEIR Max HP. */
+        /** Note: The state lands on the aimed ally, and it raises THEIR Max HP. */
     @Test
     public void herSkillGrantsTheStateAndRaisesMaxHp() {
         Fixture f = new Fixture();
@@ -72,7 +70,7 @@ public class LynxTest {
     private static final class Fixture {
         private final Character lynx = CharacterFactory.create(LYNX, LEVEL);
         private final Character ally = CharacterFactory.create(ALLY, LEVEL);
-        private final Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        private final Enemy enemy = BattleFixture.monster();
         private final Battle battle = new Battle(List.of(lynx, ally), List.of(enemy), fixed());
 
         private Fixture() {

@@ -2,6 +2,7 @@ package com.laosun.aluminium.test.engine;
 
 
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
@@ -10,7 +11,6 @@ import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -32,8 +32,7 @@ import java.util.Random;
  */
 public class WeaknessElementSourceTest {
     private static final int WEARER = 1006;
-    private static final int MONSTER = 1002011;
-    private static final int LEVEL = 80;
+        private static final int LEVEL = 80;
 
     /** Hangs one "on a Skill hit, add a weakness of some source to the target" rule on a character, and returns {battle, wearer, enemy}. */
     private static Object[] scene(String element) {
@@ -49,7 +48,7 @@ public class WeaknessElementSourceTest {
         // Note: the second teammate's element differs from the wearer's: otherwise `characters.getFirst()` and `getLast()` are the same unit,
         // and the `party_first` mutation would be invisible (the shape of the case decides whether a mutation can be necessarily red).
         Character other = CharacterFactory.create(1002, LEVEL);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(wearer, other), List.of(enemy), new Random(0));
         battle.startBattle();
         return new Object[]{battle, wearer, enemy};

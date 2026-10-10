@@ -5,8 +5,8 @@ import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -28,8 +28,7 @@ public class PeerageUpgradeTest {
     private static final int CERYDRA = 1412;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-    private static final String MERIT = "军功";
+        private static final String MERIT = "军功";
     private static final String PEERAGE = "爵位";
 
     /** Five charges is not six: the state appears exactly on the cast that crosses the threshold. */
@@ -38,7 +37,7 @@ public class PeerageUpgradeTest {
         Character cerydra = CharacterFactory.create(CERYDRA, LEVEL, false, null, null, 0);
         Character ally = CharacterFactory.create(ALLY, LEVEL, false, null, null, 0);
         ally.setTriggerTable(new TriggerTable(ALLY, List.of()));
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(cerydra, ally), List.of(enemy), new Random(0));
         battle.startBattle();
 

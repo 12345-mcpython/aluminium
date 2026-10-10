@@ -2,6 +2,7 @@ package com.laosun.aluminium.test.engine;
 
 
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
@@ -12,7 +13,6 @@ import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Countdown;
 import com.laosun.aluminium.models.Signal;
 import com.laosun.aluminium.models.TriggerTable;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -37,9 +37,7 @@ public class CountdownTest {
     private static final int MARCH = 1001;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-
-    /** Its own turn is announced to our rules, which is the whole point of the unit. */
+        /** Its own turn is announced to our rules, which is the whole point of the unit. */
     @Test
     public void itsTurnIsAnnouncedToOurRules() {
         Fixture f = new Fixture(markerOnCountdownTurn());
@@ -138,7 +136,7 @@ public class CountdownTest {
             hero = CharacterFactory.create(MARCH, LEVEL);
             hero.setTriggerTable(new TriggerTable(MARCH, rule == null ? List.of() : List.of(rule)));
             battle = new Battle(List.of(hero, CharacterFactory.create(ALLY, LEVEL)),
-                    List.of(EnemyFactory.create(MONSTER, 90, 1)), fixed());
+                    List.of(BattleFixture.monster()), fixed());
             battle.startBattle();
         }
     }

@@ -10,8 +10,8 @@ import com.laosun.aluminium.models.Damage;
 import com.laosun.aluminium.models.DoubleValue;
 import com.laosun.aluminium.models.Weapon;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -25,10 +25,8 @@ public class ConeBreakAndAuraTest {
     private static final int WEARER = 1205;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-
-    private Battle battle(Character... units) {
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        private Battle battle(Character... units) {
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(units), List.of(enemy), new Random(0));
         battle.startBattle();
         return battle;
@@ -70,7 +68,7 @@ public class ConeBreakAndAuraTest {
         double breakWith = battle.applyDamage(target, new Damage(withCone, target, DamageElement.FIRE, DamageType.BREAK, 1000));
         double ordinary = battle.applyDamage(target, new Damage(withCone, target, DamageElement.FIRE, DamageType.NORMAL, 1000));
         // A second, clean enemy for the reference readings.
-        Enemy reference = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy reference = BattleFixture.monster();
         Battle plain = new Battle(List.of(without), List.of(reference), new Random(0));
         plain.startBattle();
         double breakPlain = plain.applyDamage(reference, new Damage(without, reference, DamageElement.FIRE, DamageType.BREAK, 1000));

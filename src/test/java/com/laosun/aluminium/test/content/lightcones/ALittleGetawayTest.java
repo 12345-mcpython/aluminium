@@ -11,8 +11,8 @@ import com.laosun.aluminium.models.Damage;
 import com.laosun.aluminium.models.DoubleValue;
 import com.laosun.aluminium.models.Weapon;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -30,8 +30,7 @@ public class ALittleGetawayTest {
     private static final int CONE = 21066;
     private static final int WEARER = 1205;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-    private static final double IGNORE = 0.08;
+        private static final double IGNORE = 0.08;
 
     private Character wearer;
     private Enemy enemy;
@@ -40,7 +39,7 @@ public class ALittleGetawayTest {
         wearer = withCone
                 ? CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(CONE, LEVEL, false, 1))
                 : CharacterFactory.create(WEARER, LEVEL);
-        enemy = EnemyFactory.create(MONSTER, 90, 1);
+        enemy = BattleFixture.monster();
         // Crit pinned to 0: two instances must differ only by the defence zone (a crit is x1.5, measured last round).
         wearer.getAttribute(AttributeType.CRIT_CHANCE)
                 .addModifier(DoubleValue.Modifier.pure(-1.0, DoubleValue.Modifier.ModifierSource.BUFF, 210660));

@@ -7,8 +7,8 @@ import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -24,9 +24,7 @@ import java.util.Random;
 public class ArlanTest {
     private static final int ARLAN = 1008;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-
-    /** Note: "320%…and 160% to enemies adjacent to it": the neighbour takes HALF of what the centre takes. */
+        /** Note: "320%…and 160% to enemies adjacent to it": the neighbour takes HALF of what the centre takes. */
     @Test
     public void hisUltimateHitsNeighboursForHalf() {
         Character arlan = CharacterFactory.create(ARLAN, LEVEL);
@@ -53,7 +51,7 @@ public class ArlanTest {
     @Test
     public void hisSurvivalTraceHealsOnAKillBelowThirtyPercent() {
         Character arlan = CharacterFactory.create(ARLAN, LEVEL);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(arlan), List.of(enemy), fixed());
         battle.startBattle();
         // The zones eat part of each instance, so damage him until the fraction is where the document says (bounded loop).
@@ -77,7 +75,7 @@ public class ArlanTest {
     @Test
     public void hisEnduranceTraceResistsDotOnly() {
         Character arlan = CharacterFactory.create(ARLAN, LEVEL);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(arlan), List.of(enemy), fixed());
         battle.startBattle();
 

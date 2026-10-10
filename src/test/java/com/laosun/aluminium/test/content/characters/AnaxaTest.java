@@ -3,6 +3,7 @@ package com.laosun.aluminium.test.content.characters;
 
 import com.laosun.aluminium.test.engine.EidolonGateTest;
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.AttributeType;
@@ -10,7 +11,6 @@ import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -27,9 +27,7 @@ import java.util.Random;
 public class AnaxaTest {
     private static final int ANAXA = 1405;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-
-    /** Note: The ratio, and the control that a basic attack does nothing. */
+        /** Note: The ratio, and the control that a basic attack does nothing. */
     @Test
     public void hisSkillLowersTheTargetsDefenceFromEidolonOne() {
         double content = defenceDrop(0);
@@ -59,7 +57,7 @@ public class AnaxaTest {
             anaxa.setTriggerTable(new TriggerTable(ANAXA, List.of(TriggerSpecs.rule(
                     TriggerEvent.ALLY_ATTACK.name(), List.of("actor == self"), effect))));
         }
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(anaxa), List.of(enemy), fixed());
         battle.startBattle();
         double before = enemy.getAttribute(AttributeType.DEFENCE).get();
@@ -70,7 +68,7 @@ public class AnaxaTest {
     /** A basic attack with the shipped file: the guard must stop it. */
     private static double basicAttackDrop() {
         Character anaxa = CharacterFactory.create(ANAXA, LEVEL);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(anaxa), List.of(enemy), fixed());
         battle.startBattle();
         double before = enemy.getAttribute(AttributeType.DEFENCE).get();

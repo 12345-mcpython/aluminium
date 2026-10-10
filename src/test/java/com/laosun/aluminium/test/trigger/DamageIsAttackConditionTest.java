@@ -2,6 +2,7 @@ package com.laosun.aluminium.test.trigger;
 
 
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.AttributeType;
@@ -12,7 +13,6 @@ import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Damage;
 import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -30,15 +30,13 @@ import java.util.Random;
 public class DamageIsAttackConditionTest {
     private static final int WEARER = 1205;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-
-    private Character wearer;
+        private Character wearer;
     private Enemy enemy;
 
     /** A rule that only fires when the instance is an attack, observed through an ATTACK modifier. */
     private Battle battleWithGuardedRule() {
         wearer = CharacterFactory.create(WEARER, LEVEL);
-        enemy = EnemyFactory.create(MONSTER, 90, 1);
+        enemy = BattleFixture.monster();
         TriggerSpec rule = TriggerSpecs.rule("DEALING_DAMAGE", List.of("damage_is_attack"),
                 TriggerSpecs.modifyAttr("ATTACK", 0.1, 1));
         wearer.setTriggerTable(new TriggerTable(WEARER, List.of(rule)));

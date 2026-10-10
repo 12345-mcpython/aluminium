@@ -1,8 +1,8 @@
 package com.laosun.aluminium.test.trigger;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import java.util.List;
@@ -21,8 +21,7 @@ public class LifeOdeRaisesTheDragonTalentTest {
     private static final int LEVEL = 80;
     private static final int CASTORICE = 1407;
     private static final int CYRENE = 1415;
-    private static final int MONSTER = 1002011;
-    private static final int ODE_SLOT = 17;
+        private static final int ODE_SLOT = 17;
     private static final String BUD = "新蕊";
     private static final int CAP = 34000;
     private static final int OVERFLOW = 680;
@@ -56,7 +55,7 @@ public class LifeOdeRaisesTheDragonTalentTest {
         Character cyrene = CharacterFactory.create(CYRENE, LEVEL);
         List<com.laosun.aluminium.models.enemy.Enemy> pack = new java.util.ArrayList<>();
         for (int i = 0; i < enemies; i++) {
-            pack.add(EnemyFactory.create(MONSTER, 90, 1));
+            pack.add(BattleFixture.monster());
         }
         Battle battle = new Battle(List.of(her, cyrene), pack, new Random(0));
         battle.startBattle();

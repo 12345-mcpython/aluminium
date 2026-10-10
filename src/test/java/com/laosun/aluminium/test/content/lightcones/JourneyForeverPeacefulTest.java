@@ -9,8 +9,8 @@ import com.laosun.aluminium.models.Damage;
 import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.Weapon;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -27,16 +27,14 @@ public class JourneyForeverPeacefulTest {
     private static final int CONE = 21053;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-
-    private Character ally(boolean withCone) {
+        private Character ally(boolean withCone) {
         return withCone
                 ? CharacterFactory.create(ALLY, LEVEL, true, Weapon.build(CONE, LEVEL, false, 1))
                 : CharacterFactory.create(ALLY, LEVEL);
     }
 
     private double hit(Character unit, boolean shielded) {
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(unit), List.of(enemy), new Random(0));
         battle.startBattle();
         if (shielded) {
@@ -63,7 +61,7 @@ public class JourneyForeverPeacefulTest {
         // Note: BATTLE_START must actually FIRE before the attribute moves: reading the trigger table alone proves nothing
         // (measured: boostedShield returned exactly 1000 until a battle was started).
         Character bare = ally(false);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(unit, bare), List.of(enemy), new Random(0));
         battle.startBattle();
         double boostWith = Battle.boostedShield(unit, 1000);

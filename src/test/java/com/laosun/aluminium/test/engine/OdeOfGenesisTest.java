@@ -4,10 +4,10 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Summon;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.models.skill.Skill;
 import com.laosun.aluminium.models.skill.SkillExecutor;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
@@ -29,8 +29,7 @@ public class OdeOfGenesisTest {
     private static final int LEVEL = 80;
     private static final int CYRENE = 1415;
     private static final int TRAILBLAZER = 8007;   // Trailblazer - Remembrance (开拓者-记忆)
-    private static final int MONSTER = 1002011;
-    private static final int ODE_OF_GENESIS = 13;
+        private static final int ODE_OF_GENESIS = 13;
 
     /** Attack and crit both rise by the ACTOR's share, on the recipient. */
     @Test
@@ -38,7 +37,7 @@ public class OdeOfGenesisTest {
         Character cyrene = CharacterFactory.create(CYRENE, LEVEL);
         Character recipient = CharacterFactory.create(TRAILBLAZER, LEVEL);
         Battle battle = new Battle(List.of(cyrene, recipient),
-                List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+                List.of(BattleFixture.monster()), new Random(0));
         battle.startBattle();
         battle.processRequests();
         Summon demiurge = battle.summonServant(cyrene);
@@ -75,7 +74,7 @@ public class OdeOfGenesisTest {
         Character cyrene = CharacterFactory.create(CYRENE, LEVEL);
         Character recipient = CharacterFactory.create(TRAILBLAZER, LEVEL);
         Battle battle = new Battle(List.of(cyrene, recipient),
-                List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+                List.of(BattleFixture.monster()), new Random(0));
         battle.startBattle();
         battle.processRequests();
         Summon demiurge = battle.summonServant(cyrene);

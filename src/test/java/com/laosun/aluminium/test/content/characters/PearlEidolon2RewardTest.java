@@ -3,8 +3,8 @@ package com.laosun.aluminium.test.content.characters;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -26,8 +26,7 @@ import java.util.Random;
 public class PearlEidolon2RewardTest {
     private static final int PEARL = 1503;
     private static final int ELATION_ALLY = 1502;
-    private static final int MONSTER = 1002011;
-    private static final String COUNTER = "好活当赏";
+        private static final String COUNTER = "好活当赏";
     private static final String PUNCHLINE = "笑点";
 
     /**
@@ -130,7 +129,7 @@ public class PearlEidolon2RewardTest {
         Battle battle = new Battle(
                 List.of(CharacterFactory.create(PEARL, 80, false, null, null, eidolonRank),
                         CharacterFactory.create(ELATION_ALLY, 80), CharacterFactory.create(1204, 80)),
-                List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+                List.of(BattleFixture.monster()), new Random(0));
         battle.startBattle();
         battle.processRequests();
         battle.characters.get(1).getBuffManager()
