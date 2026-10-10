@@ -56,7 +56,7 @@ public class ShieldBuff extends AbstractBuff {
         setSource(source);
         // Note: The boost is read HERE rather than inside applyEffect: applyEffect only receives the carrier, and the
         // number has to be frozen at grant time anyway (see Battle.boostedShield).
-        this.amount = Battle.boostedShield(source, amount);
+        this.amount = com.laosun.aluminium.models.BattleDamage.boostedShield(source, amount);
     }
 
     /**
