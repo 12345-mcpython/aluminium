@@ -92,11 +92,6 @@ public class RobinConcertoTest {
 
     /** Rolls low enough that a control that is not resisted always lands. */
     private static Random fixed() {
-        return new Random() {
-            @Override
-            public double nextDouble() {
-                return 0.0;
-            }
-        };
+        return BattleFixture.alwaysRoll(0.0);
     }
 }

@@ -2,6 +2,7 @@ package com.laosun.aluminium.test.data;
 
 
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
@@ -310,11 +311,6 @@ public class RuleAmendmentTest {
 
     /** A generator that always answers the same value, so a probability becomes an assertion. */
     private static Random fixed(double value) {
-        return new Random() {
-            @Override
-            public double nextDouble() {
-                return value;
-            }
-        };
+        return BattleFixture.alwaysRoll(value);
     }
 }

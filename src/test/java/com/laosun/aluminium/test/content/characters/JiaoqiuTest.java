@@ -64,11 +64,6 @@ public class JiaoqiuTest {
     }
 
     private static Random fixed() {
-        return new Random() {
-            @Override
-            public double nextDouble() {
-                return 0.0;   // a debuff lands when nextDouble() < chance; 1.0 would RESIST every one (round 202)
-            }
-        };
+        return BattleFixture.alwaysRoll(0.0);
     }
 }

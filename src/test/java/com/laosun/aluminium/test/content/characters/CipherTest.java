@@ -105,11 +105,6 @@ public class CipherTest {
      * the BASE SHARE, so measuring it without crits is both the minimal fix and the more honest reading.
      */
     private static Random fixed() {
-        return new Random() {
-            @Override
-            public double nextDouble() {
-                return 1.0;
-            }
-        };
+        return BattleFixture.alwaysRoll(1.0);
     }
 }

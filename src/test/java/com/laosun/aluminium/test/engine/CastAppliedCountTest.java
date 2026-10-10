@@ -2,6 +2,7 @@ package com.laosun.aluminium.test.engine;
 
 
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
@@ -320,14 +321,8 @@ public class CastAppliedCountTest {
 
     /** A generator that always answers the same value, so "a 100% base chance" really is certain. */
     private static Random fixed(double value) {
-        return new Random() {
-            @Override
-            public double nextDouble() {
-                return value;
-            }
-        };
+        return BattleFixture.alwaysRoll(value);
     }
-
     /** Compiles one rule into a table, which is where load-time validation runs. */
     private static TriggerTable tableOf(TriggerSpec rule) {
         return new TriggerTable(MARCH_7TH, List.of(rule));

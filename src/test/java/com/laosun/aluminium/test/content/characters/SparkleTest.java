@@ -81,14 +81,8 @@ public class SparkleTest {
     }
 
     private static Random fixed() {
-        return new Random() {
-            @Override
-            public double nextDouble() {
-                return 0.0;
-            }
-        };
+        return BattleFixture.alwaysRoll(0.0);
     }
-
     /** Note: Her talent: "while Sparkle is on the field the skill point cap is raised by 2" (tbgd 130604). */
     @Test
     public void herTalentRaisesTheTeamCap() {

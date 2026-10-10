@@ -119,11 +119,6 @@ public class FixedCritTest {
 
     /** An RNG that never rolls a crit on its own -- so anything that crits did so because it was told to. */
     private static Random fixed() {
-        return new Random() {
-            @Override
-            public double nextDouble() {
-                return 0.999;
-            }
-        };
+        return BattleFixture.alwaysRoll(0.999);
     }
 }

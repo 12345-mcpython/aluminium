@@ -61,11 +61,6 @@ public class XueyiTest {
     }
 
     private static Random fixed() {
-        return new Random() {
-            @Override
-            public double nextDouble() {
-                return 1.0;
-            }
-        };
+        return BattleFixture.alwaysRoll(1.0);
     }
 }
