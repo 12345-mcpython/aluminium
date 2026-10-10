@@ -7,8 +7,8 @@ import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Signal;
 import com.laosun.aluminium.models.Weapon;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -25,12 +25,10 @@ import java.util.Random;
 public class ConeAttackEnergyTest {
     private static final int WEARER = 1001;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-
-    @Test
+        @Test
     public void cone21004GivesTheRankShareOfBreakEffect() {
         Character unit = CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(21004, LEVEL, false, 1));
-        Battle battle = new Battle(List.of(unit), List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+        Battle battle = new Battle(List.of(unit), List.of(BattleFixture.monster()), new Random(0));
         double before = unit.getAttribute(AttributeType.BREAKING_EFFECT).get();
         battle.startBattle();
         Assertions.assertEquals(0.28, unit.getAttribute(AttributeType.BREAKING_EFFECT).get() - before, 1e-6,
@@ -67,7 +65,7 @@ public class ConeAttackEnergyTest {
 
     private static double firstEventGain(int cone, TriggerEvent event) {
         Character unit = wearer(cone);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = turnBattle(unit, enemy);
         double before = unit.getCurrentEnergy();
         battle.fireTriggers(event, unit, enemy, 0, 0);
@@ -76,7 +74,7 @@ public class ConeAttackEnergyTest {
 
     private static double secondEventGain(int cone) {
         Character unit = wearer(cone);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = turnBattle(unit, enemy);
         battle.fireTriggers(TriggerEvent.BASIC_ATTACK, unit, enemy, 0, 0);
         double afterFirst = unit.getCurrentEnergy();

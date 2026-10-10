@@ -11,9 +11,9 @@ import com.laosun.aluminium.models.Damage;
 import com.laosun.aluminium.models.DoubleValue;
 import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.utils.RelicFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -30,9 +30,7 @@ public class IronCavalryAgainstTheScourgeFourPieceTest {
     private static final int SET = 119;
     private static final int WEARER = 1205;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-
-    private Character wearer(boolean aboveThreshold) {
+        private Character wearer(boolean aboveThreshold) {
         Character unit = CharacterFactory.create(WEARER, LEVEL, true, null, RelicFactory.suit(SET, 5, 15));
         if (aboveThreshold) {
             unit.getAttribute(AttributeType.BREAKING_EFFECT)
@@ -44,7 +42,7 @@ public class IronCavalryAgainstTheScourgeFourPieceTest {
     @Test
     public void theTwoRulesNameTheirDamageTypesAndShares() {
         Character unit = wearer(true);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Assertions.assertTrue(unit.getAttribute(AttributeType.BREAKING_EFFECT).get() >= 1.5,
                 "precondition: matching() evaluates conditions, so the wearer must meet the threshold");
         int seen = 0;
@@ -68,7 +66,7 @@ public class IronCavalryAgainstTheScourgeFourPieceTest {
     public void breakDamageIsBoostedAndPlainDamageIsNot() {
         Character above = wearer(true);
         Character below = wearer(false);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(above, below), List.of(enemy), new Random(0));
         battle.startBattle();
         // Note: fixedCrit: four settlements in a row draw from the same Random, so crit luck would differ between the readings

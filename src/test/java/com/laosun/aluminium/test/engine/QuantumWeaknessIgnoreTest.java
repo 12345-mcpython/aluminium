@@ -6,9 +6,9 @@ import com.laosun.aluminium.enums.DamageType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Damage;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.utils.RelicFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -24,8 +24,7 @@ import java.util.Random;
 public class QuantumWeaknessIgnoreTest {
     private static final int WEARER = 1001;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-    private static final int RELIC_LEVEL = 15;
+        private static final int RELIC_LEVEL = 15;
 
     @Test
     public void theFourthPieceIgnoresDefenceAndMoreAgainstAQuantumWeakTarget() {
@@ -37,7 +36,7 @@ public class QuantumWeaknessIgnoreTest {
 
     private static double ignoreAgainst(boolean forceWeakness) {
         Character unit = CharacterFactory.create(WEARER, LEVEL, true, null, RelicFactory.suit(108, 4, RELIC_LEVEL));
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         enemy.setStanceWeak(forceWeakness
                 ? java.util.Set.of(DamageElement.QUANTUM)
                 : java.util.Set.of(DamageElement.FIRE));

@@ -3,6 +3,7 @@ package com.laosun.aluminium.test.content.characters;
 
 import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.test.trigger.AddDamageOpTest;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.AttributeType;
@@ -12,7 +13,6 @@ import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.DoubleValue;
 import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -29,8 +29,7 @@ import java.util.Random;
 public class AglaeaFissureTest {
     private static final int AGLAEA = 1402;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-    private static final String STATE = "间隙织线";
+        private static final String STATE = "间隙织线";
 
     @Test
     public void theAdditionalDamageLandsOnlyOnAThreadedTarget() {
@@ -67,7 +66,7 @@ public class AglaeaFissureTest {
             ally.setTriggerTable(new TriggerTable(9701, List.of(TriggerSpecs.rule(
                     TriggerEvent.ALLY_ATTACK.name(), List.of(), state))));
         }
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         enemy.setAttribute(AttributeType.HEALTH, new DoubleValue(900000));
         enemy.heal(900000);
         Random noCrit = new Random(0) {

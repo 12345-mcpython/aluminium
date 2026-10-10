@@ -3,8 +3,8 @@ package com.laosun.aluminium.test.content.characters;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -23,8 +23,7 @@ public class SilverWolfLV999Test {
     private static final int WEARER = 1506;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-    private static final String HIDDEN = "隐藏分";
+        private static final String HIDDEN = "隐藏分";
 
     private Character wolf;
     private Battle battle;
@@ -32,7 +31,7 @@ public class SilverWolfLV999Test {
     private void build() {
         wolf = CharacterFactory.create(WEARER, LEVEL);
         battle = new Battle(List.of(wolf, CharacterFactory.create(ALLY, LEVEL)),
-                List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+                List.of(BattleFixture.monster()), new Random(0));
         battle.startBattle();
     }
 

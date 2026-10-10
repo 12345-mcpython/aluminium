@@ -7,8 +7,8 @@ import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Damage;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -25,9 +25,7 @@ public class MoonConsumedTest {
     private static final int OBSERVER = 1212;
     private static final int PAYER = 1205;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-
-    private Battle ready(Character observer, Character payer, Enemy enemy) {
+        private Battle ready(Character observer, Character payer, Enemy enemy) {
         Battle battle = new Battle(List.of(observer, payer), List.of(enemy), new Random(0));
         battle.startBattle();
         // Chain: 1 layer on SKILL_CAST, 1 on ULT_CAST -> 2 layers -> the entry rule grants [转魄].
@@ -47,7 +45,7 @@ public class MoonConsumedTest {
     public void aSpentPriceStacksOneLayer() {
         Character observer = CharacterFactory.create(OBSERVER, LEVEL);
         Character payer = CharacterFactory.create(PAYER, LEVEL);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = ready(observer, payer, enemy);
         battle.fireTriggers(TriggerEvent.SKILL_CAST, payer, enemy, 0, 0);
         int layers = observer.getBuffManager().stacksOf("月色");
@@ -59,7 +57,7 @@ public class MoonConsumedTest {
     public void aPlainHitDoesNotUseThePriceRule() {
         Character observer = CharacterFactory.create(OBSERVER, LEVEL);
         Character payer = CharacterFactory.create(PAYER, LEVEL);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = ready(observer, payer, enemy);
         battle.applyDamage(observer, new Damage(enemy, observer, DamageElement.PHYSICAL, DamageType.NORMAL, 40));
         int afterHit = observer.getBuffManager().stacksOf("月色");

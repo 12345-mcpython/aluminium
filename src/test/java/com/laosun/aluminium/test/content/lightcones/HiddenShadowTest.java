@@ -12,8 +12,8 @@ import com.laosun.aluminium.models.DoubleValue;
 import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.Weapon;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -31,8 +31,7 @@ public class HiddenShadowTest {
     private static final int CONE = 20018;
     private static final int WEARER = 1205;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-    private static final double RANK_ONE = 0.6;
+        private static final double RANK_ONE = 0.6;
     private static final double RANK_TWO = 0.75;
 
     private Character wearer;
@@ -42,7 +41,7 @@ public class HiddenShadowTest {
         wearer = withCone
                 ? CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(CONE, LEVEL, false, 1))
                 : CharacterFactory.create(WEARER, LEVEL);
-        enemy = EnemyFactory.create(MONSTER, 90, 1);
+        enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(wearer), List.of(enemy), new Random(0));
         battle.startBattle();
         wearer.getAttribute(AttributeType.CRIT_CHANCE)
@@ -52,7 +51,7 @@ public class HiddenShadowTest {
 
     private double extraDamageAtRank(int rank) {
         Character unit = CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(CONE, LEVEL, false, rank));
-        Enemy target = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy target = BattleFixture.monster();
         Battle battle = new Battle(List.of(unit), List.of(target), new Random(0));
         battle.startBattle();
         unit.getAttribute(AttributeType.CRIT_CHANCE)

@@ -8,8 +8,8 @@ import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.DoubleValue;
 import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -32,8 +32,7 @@ import java.util.Random;
 public class ElationFixedLaughCastTest {
     private static final List<Integer> TWINS = List.of(8009, 8010);
     private static final int ELATION_ALLY = 1505;
-    private static final int MONSTER = 1002011;
-    private static final String RULE = "ult_elation_gift_and_cast";
+        private static final String RULE = "ult_elation_gift_and_cast";
     private static final int FIXED = 20;
 
     /**
@@ -116,7 +115,7 @@ public class ElationFixedLaughCastTest {
         ally.setAttribute(AttributeType.CRIT_CHANCE, new DoubleValue(0));
         ally.setTriggerTable(new TriggerTable(ally.getCid(), List.of(
                 TriggerSpecs.rule(TriggerEvent.KILL.name(), List.of(), TriggerSpecs.gainEnergy(1)))));
-        Battle battle = new Battle(List.of(harmony, ally), List.of(EnemyFactory.create(MONSTER, 90, 1)),
+        Battle battle = new Battle(List.of(harmony, ally), List.of(BattleFixture.monster()),
                 new Random(0));
         battle.startBattle();
         battle.processRequests();

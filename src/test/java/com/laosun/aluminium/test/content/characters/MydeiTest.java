@@ -2,6 +2,7 @@ package com.laosun.aluminium.test.content.characters;
 
 
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -11,7 +12,6 @@ import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -31,9 +31,7 @@ public class MydeiTest {
     private static final int MYDEI = 1404;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-
-    /** Note: With the technique declared the enemies are hit; without it, nothing happens at all. */
+        /** Note: With the technique declared the enemies are hit; without it, nothing happens at all. */
     @Test
     public void theTechniqueHitsOnlyWhenDeclared() {
         double declared = openingLoss(true);
@@ -74,7 +72,7 @@ public class MydeiTest {
     private static double openingLoss(boolean declared) {
         Character mydei = CharacterFactory.create(MYDEI, LEVEL);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(mydei, ally), List.of(enemy), fixed());
         if (declared) {
             battle.markTechniqueUsed(mydei);
@@ -95,7 +93,7 @@ public class MydeiTest {
         TriggerSpecs.set(effect, "target", "all_enemies");
         mydei.setTriggerTable(new TriggerTable(MYDEI, List.of(TriggerSpecs.rule(
                 TriggerEvent.BATTLE_START.name(), List.of("self has_state 秘技"), effect))));
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(mydei), List.of(enemy), fixed());
         battle.markTechniqueUsed(mydei);
         double before = enemy.getCurrentHp();

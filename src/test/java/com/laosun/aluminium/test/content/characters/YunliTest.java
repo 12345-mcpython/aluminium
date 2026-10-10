@@ -2,12 +2,12 @@ package com.laosun.aluminium.test.content.characters;
 
 
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -21,13 +21,11 @@ import java.util.Random;
 public class YunliTest {
     private static final int YUNLI = 1221;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-
-    /** Note: The heal is 30% of her ATTACK plus a flat 200, and it heals HER. */
+        /** Note: The heal is 30% of her ATTACK plus a flat 200, and it heals HER. */
     @Test
     public void theSkillHealsHerByASharePlusAFlatAmount() {
         Character yunli = CharacterFactory.create(YUNLI, LEVEL);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(yunli), List.of(enemy), fixed());
         battle.startBattle();
         // Spend some HP first, so the heal has room to show.
@@ -49,8 +47,8 @@ public class YunliTest {
         double reference = counterLoss(false);
 
         Character yunli = CharacterFactory.create(YUNLI, LEVEL);
-        Enemy attacker = EnemyFactory.create(MONSTER, 90, 1);
-        Enemy bystander = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy attacker = BattleFixture.monster();
+        Enemy bystander = BattleFixture.monster();
         Battle battle = new Battle(List.of(yunli), List.of(attacker, bystander), fixed());
         battle.startBattle();
         double bystanderBefore = bystander.getCurrentHp();
@@ -81,8 +79,8 @@ public class YunliTest {
             yunli.setTriggerTable(new com.laosun.aluminium.models.TriggerTable(YUNLI, List.of(TriggerSpecs.rule(
                     TriggerEvent.TAKING_HIT.name(), List.of("target == self"), effect))));
         }
-        Enemy attacker = EnemyFactory.create(MONSTER, 90, 1);
-        Enemy bystander = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy attacker = BattleFixture.monster();
+        Enemy bystander = BattleFixture.monster();
         Battle battle = new Battle(List.of(yunli), List.of(attacker, bystander), fixed());
         battle.startBattle();
         double before = attacker.getCurrentHp();

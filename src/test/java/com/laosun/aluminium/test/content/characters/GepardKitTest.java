@@ -7,8 +7,8 @@ import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -40,9 +40,7 @@ public class GepardKitTest {
     private static final int GEPARD = 1104;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-
-    /** Note: "为我方全体提供…护盾": read as the engine reads it - a shield VALUE on each unit. */
+        /** Note: "为我方全体提供…护盾": read as the engine reads it - a shield VALUE on each unit. */
     @Test
     public void hisUltimateShieldsTheCasterAndTheParty() {
         Fixture f = new Fixture(0);
@@ -92,7 +90,7 @@ public class GepardKitTest {
     public void hisTraceRaisesHisOwnAggroWeight() {
         Character gepard = CharacterFactory.create(GEPARD, LEVEL);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
-        Battle battle = new Battle(List.of(gepard, ally), List.of(EnemyFactory.create(MONSTER, 90, 1)),
+        Battle battle = new Battle(List.of(gepard, ally), List.of(BattleFixture.monster()),
                 new Random(0));
         double before = battle.aggroOf(gepard);
 
@@ -112,7 +110,7 @@ public class GepardKitTest {
     private static final class Fixture {
         private final Character gepard;
         private final Character ally = CharacterFactory.create(ALLY, LEVEL);
-        private final Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        private final Enemy enemy = BattleFixture.monster();
         private final Battle battle;
 
         private Fixture(int eidolon) {

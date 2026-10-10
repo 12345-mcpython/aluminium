@@ -3,8 +3,8 @@ package com.laosun.aluminium.test.engine;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -20,9 +20,7 @@ import java.util.Random;
 public class LethalHealOnTeammateTest {
     private static final int BAILU = 1211;
     private static final int TEAMMATE = 1002;
-    private static final int MONSTER = 1002011;
-
-    /** A lethal blow: the teammate is saved, at Bailu (白露)'s 18% Max HP plus 480. */
+        /** A lethal blow: the teammate is saved, at Bailu (白露)'s 18% Max HP plus 480. */
     @Test
     public void aLethalBlowIsHealed() {
         double[] result = afterBlow(true);
@@ -46,7 +44,7 @@ public class LethalHealOnTeammateTest {
         Character healer = CharacterFactory.create(BAILU, 80, false, null, null, 0);
         Character teammate = CharacterFactory.create(TEAMMATE, 80, false, null, null, 0);
         Battle battle = new Battle(List.of(healer, teammate),
-                List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+                List.of(BattleFixture.monster()), new Random(0));
         battle.startBattle();
         battle.processRequests();
 

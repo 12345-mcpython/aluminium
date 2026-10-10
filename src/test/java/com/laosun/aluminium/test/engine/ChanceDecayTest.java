@@ -6,8 +6,8 @@ import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.TriggerTable;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -28,8 +28,7 @@ import java.util.Random;
 public class ChanceDecayTest {
     private static final int WOLF = 1506;
     private static final int ALLY = 1204;
-    private static final int MONSTER = 1002011;
-    /** A resource 1506's own file declares, so the fixture does not have to invent one. */
+        /** A resource 1506's own file declares, so the fixture does not have to invent one. */
     private static final String COUNTER = "隐藏分";
     private static final String BOX = "test_decaying_rule";
 
@@ -110,7 +109,7 @@ public class ChanceDecayTest {
     private static Battle battle(ScriptedRng rng, List<TriggerSpec> specs) {
         Battle battle = new Battle(
                 List.of(CharacterFactory.create(WOLF, 80), CharacterFactory.create(ALLY, 80)),
-                List.of(EnemyFactory.create(MONSTER, 90, 1)), rng);
+                List.of(BattleFixture.monster()), rng);
         battle.startBattle();
         battle.processRequests();
         battle.characters.getFirst().setTriggerTable(new TriggerTable(WOLF, specs));

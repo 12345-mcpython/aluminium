@@ -5,8 +5,8 @@ import com.laosun.aluminium.data.TriggerTables;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.buff.ControlBuff;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -25,14 +25,12 @@ import java.util.Random;
 public class WarehouseFirewallTest {
     private static final int FIGHTER = 1002;
     private static final int WOLF = 1506;
-    private static final int MONSTER = 1002011;
-
-    /** The trigger grants [防火墙], and the NEXT control is refused; the wave cap holds it to one grant. */
+        /** The trigger grants [防火墙], and the NEXT control is refused; the wave cap holds it to one grant. */
     @Test
     public void theFirewallAnswersTheNextControl() {
         Character fighter = CharacterFactory.create(FIGHTER, 80, false, null, null, 0);
         Battle battle = new Battle(List.of(fighter),
-                List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+                List.of(BattleFixture.monster()), new Random(0));
 
         // owned, not deployed: she is a LISTENER, and her table is the warehouse file rather than her battle kit
         Character wolf = CharacterFactory.create(WOLF, 80, false, null, null, 0);

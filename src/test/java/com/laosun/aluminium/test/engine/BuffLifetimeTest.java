@@ -2,6 +2,7 @@ package com.laosun.aluminium.test.engine;
 
 
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
@@ -13,7 +14,6 @@ import com.laosun.aluminium.models.CanHit;
 import com.laosun.aluminium.models.DoubleValue;
 import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.models.skill.DefaultSkill;
 import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.utils.RelicFactory;
@@ -51,8 +51,7 @@ public class BuffLifetimeTest {
     /** Himeko (姬子) - the plain character, and the one whose attacks this class drives. */
     private static final int OWNER = 1003;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-    /** Celestial Differentiator (星体差分机) - "lasts until the first attack is cast, then ends". */
+        /** Celestial Differentiator (星体差分机) - "lasts until the first attack is cast, then ends". */
     private static final int STELLAR_DIFFERENTIATOR = 305;
 
     // ==================================================================
@@ -433,6 +432,6 @@ public class BuffLifetimeTest {
     }
 
     private static Enemy monster() {
-        return EnemyFactory.create(MONSTER, 90, 1);
+        return BattleFixture.monster();
     }
 }

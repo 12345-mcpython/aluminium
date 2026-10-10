@@ -8,8 +8,8 @@ import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Damage;
 import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -24,12 +24,10 @@ import java.util.Random;
 public class JiaoqiuUltTakenTest {
     private static final int WEARER = 1218;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-
-    @Test
+        @Test
     public void theRuleStatesTheUltimateScopeShareAndDuration() {
         Character unit = CharacterFactory.create(WEARER, LEVEL);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         var rules = unit.getTriggerTable().matching(TriggerEvent.ULT_CAST,
                 new TriggerTable.TriggerContext(unit, unit, enemy, 0, 0));
         double share = -1;
@@ -54,7 +52,7 @@ public class JiaoqiuUltTakenTest {
     @Test
     public void ultimateDamageIsAmplifiedAndNormalIsNot() {
         Character unit = CharacterFactory.create(WEARER, LEVEL);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(unit), List.of(enemy), new Random(0));
         battle.startBattle();
         battle.fireTriggers(TriggerEvent.ULT_CAST, unit, enemy, 0, 0);
@@ -67,7 +65,7 @@ public class JiaoqiuUltTakenTest {
     @Test
     public void theTieredRuleStatesItsBaseSharePerLayerAndCeiling() {
         Character unit = CharacterFactory.create(WEARER, LEVEL);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(unit), List.of(enemy), new Random(0));
         battle.startBattle();
         // Note: `matching` EVALUATES the rule's conditions, so the counter must really be stacked: the character's own ADD_STACK rule

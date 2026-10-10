@@ -9,8 +9,8 @@ import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.DoubleValue;
 import com.laosun.aluminium.models.TriggerInterpreter;
 import com.laosun.aluminium.models.TriggerTable;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -34,8 +34,7 @@ import java.util.Random;
  */
 public class PerStepsTest {
     private static final int ALLY = 1204;
-    private static final int MONSTER = 1002011;
-    private static final String COUNTER = "测试配额";
+        private static final String COUNTER = "测试配额";
     private static final String TALLY = "测试结果";
     private static final String OTHER_TALLY = "测试结果二";
     private static final int MAX = 10000;
@@ -204,7 +203,7 @@ public class PerStepsTest {
 
     private void fight() {
         battle = new Battle(List.of(unit, CharacterFactory.create(ALLY, 80)),
-                List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+                List.of(BattleFixture.monster()), new Random(0));
         battle.startBattle();
         battle.processRequests();
         battle.fireTriggers(TriggerEvent.TURN_START, unit, unit, 0, 0);

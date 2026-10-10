@@ -5,8 +5,8 @@ import com.laosun.aluminium.data.TriggerTables;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -22,14 +22,12 @@ public class TechniqueGateTest {
     private static final int TB = 8001;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-
-    /** Note: With the technique declared, the party is healed for 15% of its own Max HP. */
+        /** Note: With the technique declared, the party is healed for 15% of its own Max HP. */
     @Test
     public void aDeclaredTechniqueHealsTheParty() {
         Character tb = CharacterFactory.create(TB, LEVEL);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(tb, ally), List.of(enemy), fixed());
         battle.markTechniqueUsed(tb);
         // BEFORE the battle: hurt the ally, so the opening technique heal has somewhere to go (at full HP it restores 0 and the
@@ -53,7 +51,7 @@ public class TechniqueGateTest {
     public void anUndeclaredTechniqueDoesNothing() {
         Character tb = CharacterFactory.create(TB, LEVEL);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(tb, ally), List.of(enemy), fixed());
         battle.startBattle();
 
@@ -65,7 +63,7 @@ public class TechniqueGateTest {
     @Test
     public void theMarkerCreatesTheState() {
         Character tb = CharacterFactory.create(TB, LEVEL);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(tb), List.of(enemy), fixed());
         battle.markTechniqueUsed(tb);
         battle.startBattle();

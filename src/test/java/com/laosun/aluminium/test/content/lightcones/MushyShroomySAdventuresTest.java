@@ -10,8 +10,8 @@ import com.laosun.aluminium.models.Damage;
 import com.laosun.aluminium.models.DoubleValue;
 import com.laosun.aluminium.models.Weapon;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -30,16 +30,14 @@ public class MushyShroomySAdventuresTest {
     private static final int CONE = 21064;
     private static final int WEARER = 1205;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-
-    private Character wearer;
+        private Character wearer;
     private Enemy enemy;
 
     private Battle battle(boolean withCone) {
         wearer = withCone
                 ? CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(CONE, LEVEL, false, 1))
                 : CharacterFactory.create(WEARER, LEVEL);
-        enemy = EnemyFactory.create(MONSTER, 90, 1);
+        enemy = BattleFixture.monster();
         // Note: Crit chance pinned to 0: two hits otherwise differ by the crit roll (measured: 46.19 -> 14.29, exactly
         // the 1.5 crit multiplier), and a judge that compares two hits must compare the same arithmetic.
         wearer.getAttribute(com.laosun.aluminium.enums.AttributeType.CRIT_CHANCE)
@@ -97,7 +95,7 @@ public class MushyShroomySAdventuresTest {
         Character caster = CharacterFactory.create(1513, LEVEL, true, Weapon.build(CONE, LEVEL, false, 1));
         caster.getAttribute(com.laosun.aluminium.enums.AttributeType.CRIT_CHANCE)
                 .addModifier(DoubleValue.Modifier.pure(-1.0, DoubleValue.Modifier.ModifierSource.BUFF, 210641));
-        Enemy target = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy target = BattleFixture.monster();
         Battle arena = new Battle(List.of(caster), List.of(target), new Random(0));
         arena.startBattle();
         var elation = new com.laosun.aluminium.models.skill.DefaultSkill(1513, 20, LEVEL);

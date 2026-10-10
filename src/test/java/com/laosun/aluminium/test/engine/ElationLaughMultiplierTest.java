@@ -6,8 +6,8 @@ import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.TriggerTable;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -36,8 +36,7 @@ import java.util.Random;
 public class ElationLaughMultiplierTest {
     private static final int PEARL = 1503;
     private static final int ALLY = 1505;       // declares 好活当赏, so a grant to her is not dropped
-    private static final int MONSTER = 1002011;
-    private static final int LAUGHS = 240;      // -> factor 1 + 240*5/(240+240) = 3.5
+        private static final int LAUGHS = 240;      // -> factor 1 + 240*5/(240+240) = 3.5
     private static final String GIFT = "好活当赏";
     private static final String LAUGH = "笑点";
 
@@ -80,7 +79,7 @@ public class ElationLaughMultiplierTest {
     /** Settles one Elation instance after granting at {@code atGrant} and then raising the pool to {@code after}. */
     private static double damageWithPoolThenGrowth(int atGrant, int after) {
         Character pearl = CharacterFactory.create(PEARL, 80);
-        var enemy = EnemyFactory.create(MONSTER, 90, 1);
+        var enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(pearl, CharacterFactory.create(ALLY, 80)), List.of(enemy), new Random(0));
         battle.startBattle();
         battle.processRequests();
@@ -121,7 +120,7 @@ public class ElationLaughMultiplierTest {
      */
     private static double damage(boolean normal, int laughs, boolean counted) {
         Character pearl = CharacterFactory.create(PEARL, 80);
-        var enemy = EnemyFactory.create(MONSTER, 90, 1);
+        var enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(pearl, CharacterFactory.create(ALLY, 80)), List.of(enemy), new Random(0));
         battle.startBattle();
         battle.processRequests();

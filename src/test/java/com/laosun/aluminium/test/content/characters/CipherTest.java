@@ -2,6 +2,7 @@ package com.laosun.aluminium.test.content.characters;
 
 
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.AttributeType;
@@ -9,7 +10,6 @@ import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -24,9 +24,7 @@ public class CipherTest {
     private static final int CIPHER = 1406;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-
-    /** Note: The reaction needs the Patron mark, and its 150% is compared with a hand-built 300% reference in the same pipeline. */
+        /** Note: The reaction needs the Patron mark, and its 150% is compared with a hand-built 300% reference in the same pipeline. */
     @Test
     public void theReactionNeedsThePatronAndDealsItsShare() {
         double unmarked = reactionLoss(true, false);
@@ -45,7 +43,7 @@ public class CipherTest {
     public void theSkillRaisesHerOwnAttack() {
         Character cipher = CharacterFactory.create(CIPHER, LEVEL);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(cipher, ally), List.of(enemy), fixed());
         battle.startBattle();
         double before = cipher.getAttribute(AttributeType.ATTACK).get();
@@ -87,7 +85,7 @@ public class CipherTest {
                     TriggerSpecs.rule(TriggerEvent.ALLY_ATTACK.name(),
                             List.of("actor is_other_ally", "target has_state 老主顾"), effect))));
         }
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(cipher, ally), List.of(enemy), fixed());
         battle.startBattle();
         if (mark) {

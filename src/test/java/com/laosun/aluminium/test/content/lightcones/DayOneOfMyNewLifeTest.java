@@ -9,7 +9,7 @@ import com.laosun.aluminium.models.Damage;
 import com.laosun.aluminium.models.Weapon;
 import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -27,9 +27,7 @@ public class DayOneOfMyNewLifeTest {
     private static final int WEARER = 1205;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-
-    private Character wearer;
+        private Character wearer;
     private Character ally;
     private Enemy enemy;
     private Battle battle;
@@ -39,7 +37,7 @@ public class DayOneOfMyNewLifeTest {
                 ? CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(CONE, LEVEL, false, 1))
                 : CharacterFactory.create(WEARER, LEVEL);
         ally = CharacterFactory.create(ALLY, LEVEL);
-        enemy = EnemyFactory.create(MONSTER, 90, 1);
+        enemy = BattleFixture.monster();
         battle = new Battle(List.of(wearer, ally), List.of(enemy), new Random(0));
         battle.startBattle();
     }

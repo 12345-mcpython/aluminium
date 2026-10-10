@@ -4,8 +4,8 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -32,9 +32,7 @@ import java.util.Random;
 public class SilverWolfLV999EidolonLevelsTest {
     private static final int WOLF = 1506;
     private static final int ALLY = 1204;
-    private static final int MONSTER = 1002011;
-
-    /** The convention puts each slot at the last row of its own table: 15 for the 15-row skills, 10 for the Basic. */
+        /** The convention puts each slot at the last row of its own table: 15 for the 15-row skills, 10 for the Basic. */
     @Test
     public void theLevelConventionPutsEverySlotAtItsTableMaximum() {
         Character wolf = battleAt(0).characters.getFirst();
@@ -158,7 +156,7 @@ public class SilverWolfLV999EidolonLevelsTest {
         Character wolf = CharacterFactory.create(WOLF, 80);
         Battle battle = new Battle(
                 List.of(wolf, CharacterFactory.create(ALLY, 80)),
-                List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+                List.of(BattleFixture.monster()), new Random(0));
         if (share != 0) {
             wolf.getBuffManager().addBuff(com.laosun.aluminium.models.buff.StatModifierBuff
                     .percentBuff(AttributeType.SPEED, share, 1));
@@ -174,7 +172,7 @@ public class SilverWolfLV999EidolonLevelsTest {
         Battle battle = new Battle(
                 List.of(CharacterFactory.create(WOLF, 80, false, null, null, eidolonRank),
                         CharacterFactory.create(ALLY, 80)),
-                List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+                List.of(BattleFixture.monster()), new Random(0));
         battle.startBattle();
         battle.processRequests();
         return battle;

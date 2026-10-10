@@ -2,6 +2,7 @@ package com.laosun.aluminium.test.content.memosprites;
 
 
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
@@ -13,7 +14,6 @@ import com.laosun.aluminium.models.RelicSuit;
 import com.laosun.aluminium.models.Summon;
 import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.utils.RelicFactory;
 import org.junit.jupiter.api.Assertions;
@@ -53,9 +53,7 @@ public class SummonOpTest {
     /** Himeko (姬子) - a character with no memosprite spec, for the refusal cases. */
     private static final int NO_MEMOSPRITE = 1003;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-
-    // ==================================================================
+        // ==================================================================
     // 1. The shipped content summons through the real event path
     // ==================================================================
 
@@ -247,6 +245,6 @@ public class SummonOpTest {
     }
 
     private static Enemy monster() {
-        return EnemyFactory.create(MONSTER, 90, 1);
+        return BattleFixture.monster();
     }
 }

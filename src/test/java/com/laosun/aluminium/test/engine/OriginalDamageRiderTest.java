@@ -2,13 +2,13 @@ package com.laosun.aluminium.test.engine;
 
 
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -32,9 +32,7 @@ import java.util.Random;
 public class OriginalDamageRiderTest {
     private static final int HIMEKO = 1003;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-
-    /** A share lands as that share of what the triggering instance settled. */
+        /** A share lands as that share of what the triggering instance settled. */
     @Test
     public void theRiderSettlesTheShareTheTextStates() {
         double baseline = loss(0.0);
@@ -81,7 +79,7 @@ public class OriginalDamageRiderTest {
     /** Her ultimate alone, at the given eidolon rank (her own table, so the level convention is in force). */
     private static double ultimateLoss(int eidolon) {
         Character her = CharacterFactory.create(HIMEKO, LEVEL, false, null, null, eidolon);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(her), List.of(enemy), new Random(0));
         battle.startBattle();
         double before = enemy.getCurrentHp();
@@ -97,7 +95,7 @@ public class OriginalDamageRiderTest {
     private static double loss(double share) {
         Character owner = CharacterFactory.create(HIMEKO, LEVEL, false, null, null, 0);
         owner.setTriggerTable(new TriggerTable(HIMEKO, share > 0 ? List.of(rider(share)) : List.of()));
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(owner), List.of(enemy), new Random(0));
         battle.startBattle();
         double before = enemy.getCurrentHp();

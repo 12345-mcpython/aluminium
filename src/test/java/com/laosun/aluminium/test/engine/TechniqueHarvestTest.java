@@ -4,8 +4,8 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -20,16 +20,14 @@ import java.util.Random;
 public class TechniqueHarvestTest {
     private static final int DANHENG = 1002;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-
-    /** Note: "使用秘技后，下一次战斗开始时丹恒攻击力提高40%". */
+        /** Note: "使用秘技后，下一次战斗开始时丹恒攻击力提高40%". */
     @Test
     public void aDeclaredTechniqueRaisesHisAttackAtBattleStart() {
         Character plain = CharacterFactory.create(DANHENG, LEVEL);
         double untouched = plain.getAttribute(AttributeType.ATTACK).get();
 
         Character withTechnique = CharacterFactory.create(DANHENG, LEVEL);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(withTechnique), List.of(enemy), fixed());
         battle.markTechniqueUsed(withTechnique);
         battle.startBattle();
@@ -52,7 +50,7 @@ public class TechniqueHarvestTest {
     public void withoutTheTechniqueHisAttackIsUntouched() {
         Character plain = CharacterFactory.create(DANHENG, LEVEL);
         double before = plain.getAttribute(AttributeType.ATTACK).get();
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(plain), List.of(enemy), fixed());
         battle.startBattle();
 

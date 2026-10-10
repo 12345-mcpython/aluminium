@@ -10,8 +10,8 @@ import com.laosun.aluminium.models.Damage;
 import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.Weapon;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -29,16 +29,14 @@ public class PatienceIsAllYouNeedTest {
     private static final int CONE = 23006;
     private static final int WEARER = 1205;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-
-    private Character wearer;
+        private Character wearer;
     private Enemy enemy;
 
     private Battle battle(boolean withCone) {
         wearer = withCone
                 ? CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(CONE, LEVEL, false, 1))
                 : CharacterFactory.create(WEARER, LEVEL);
-        enemy = EnemyFactory.create(MONSTER, 90, 1);
+        enemy = BattleFixture.monster();
         // Note: A base chance of 1.0 still ROLLS against the victim's effect RES (the project's own rule), so the applier
         // has to hold EFFECT_HIT_RATE or the DOT never lands and the reading is a silent zero (measured this round).
         wearer.getAttribute(com.laosun.aluminium.enums.AttributeType.EFFECT_HIT_RATE)
@@ -67,7 +65,7 @@ public class PatienceIsAllYouNeedTest {
     @Test
     public void aPlainThunderDotAnswersShockButNotThread() {
         wearer = CharacterFactory.create(WEARER, LEVEL);
-        enemy = EnemyFactory.create(MONSTER, 90, 1);
+        enemy = BattleFixture.monster();
         // The UNNAMED thunder DOT, built directly: the element alone, which is everything this engine could express
         // before today. (An event-driven fixture needs an event that carries a target, and BATTLE_START does not -- measured.)
         enemy.getBuffManager().addBuff(new com.laosun.aluminium.models.buff.DotBuff(

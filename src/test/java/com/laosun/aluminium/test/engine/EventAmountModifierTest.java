@@ -2,13 +2,13 @@ package com.laosun.aluminium.test.engine;
 
 
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.TriggerTable;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -24,9 +24,7 @@ import java.util.Random;
  */
 public class EventAmountModifierTest {
     private static final int OWNER = 1306;
-    private static final int MONSTER = 1002011;
-
-    /** Three points spent raise the modifier three times as far as one. */
+        /** Three points spent raise the modifier three times as far as one. */
     @Test
     public void theModifierFollowsTheEvent() {
         double one = boostAfterSpending(1);
@@ -52,7 +50,7 @@ public class EventAmountModifierTest {
                 List.of("actor == self"), effect))));
 
         Battle battle = new Battle(List.of(owner),
-                List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+                List.of(BattleFixture.monster()), new Random(0));
         battle.startBattle();
         double before = owner.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
         battle.fireTriggers(TriggerEvent.SKILL_POINT_SPENT, owner, owner, 0, spent);

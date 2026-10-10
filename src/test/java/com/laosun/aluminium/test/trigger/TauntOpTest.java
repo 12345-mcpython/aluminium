@@ -3,6 +3,7 @@ package com.laosun.aluminium.test.trigger;
 
 import com.laosun.aluminium.test.engine.DebuffResistTest;
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
@@ -12,7 +13,6 @@ import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.buff.TauntBuff;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -35,9 +35,7 @@ public class TauntOpTest {
     private static final double EPS = 1e-6;
     private static final int OWNER = 1003;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-
-    /** The op attaches the marker with the duration the rule states. */
+        /** The op attaches the marker with the duration the rule states. */
     @Test
     public void tauntAttachesTheMarkerForTheStatedTurns() {
         Character owner = characterWith(tauntRule(2));
@@ -108,7 +106,7 @@ public class TauntOpTest {
     }
 
     private static Enemy dummy() {
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         // Note: TAUNT goes through the resist pipeline (an unstated probability is a 100% BASE chance, not "bypasses
         // effect resistance (效果抵抗)), so the fixture states the other side of that roll: Ice Edge (冰锋)'s own 30% effect resistance would otherwise make
         // every case here a coin flip. The pipeline itself is pinned by DebuffResistTest.

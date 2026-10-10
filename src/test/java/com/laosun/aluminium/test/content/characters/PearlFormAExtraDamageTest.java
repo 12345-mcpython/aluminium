@@ -7,8 +7,8 @@ import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.DoubleValue;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -45,9 +45,7 @@ public class PearlFormAExtraDamageTest {
     private static final int PEARL = 1503;
     private static final int ELATION_ALLY = 1502;   // Elation path -> the archetype qualifies -> slot 8
     private static final int HUNTER = 1204;         // The Hunt -> slot 9, which carries no extra damage
-    private static final int MONSTER = 1002011;
-
-    /** The extra damage is real, and it is the ARCHETYPE's 欢愉度 that sizes it. */
+        /** The extra damage is real, and it is the ARCHETYPE's 欢愉度 that sizes it. */
     @Test
     public void theExtraInstanceFollowsTheArchetypesElationDegree() {
         double withBoost = damageOnSlot8(ELATION_ALLY, 1.0, 2000);
@@ -114,7 +112,7 @@ public class PearlFormAExtraDamageTest {
         archetype.setAttribute(AttributeType.ATTACK, new DoubleValue(archetypeAttack));
         archetype.setAttribute(AttributeType.ELATION_DAMAGE_BOOST, new DoubleValue(archetypeElationBoost));
         List<Character> team = new ArrayList<>(List.of(pearl, archetype, CharacterFactory.create(HUNTER, 80)));
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(team, List.of(enemy), new Random(0));
         battle.startBattle();
         battle.processRequests();

@@ -2,13 +2,13 @@ package com.laosun.aluminium.test.engine;
 
 
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.TriggerTable;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.models.skill.Skill;
 import com.laosun.aluminium.models.skill.SkillExecutor;
 import com.laosun.aluminium.utils.CharacterFactory;
@@ -32,9 +32,7 @@ public class HighestHpAmongHitsTest {
     private static final int LEVEL = 80;
     private static final int OWNER = 1402;
     private static final int ALLY = 1002;
-    private static final int MONSTER = 1002011;
-
-    private static EffectSpec speedBoost() {
+        private static EffectSpec speedBoost() {
         EffectSpec effect = new EffectSpec();
         TriggerSpecs.set(effect, "op", "MODIFY_ATTR");
         TriggerSpecs.set(effect, "attribute", "SPEED");
@@ -50,7 +48,7 @@ public class HighestHpAmongHitsTest {
         Character owner = CharacterFactory.create(OWNER, LEVEL);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
         Battle battle = new Battle(List.of(owner, ally),
-                List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+                List.of(BattleFixture.monster()), new Random(0));
         battle.startBattle();
         battle.processRequests();
         owner = battle.characters.getFirst();
@@ -82,7 +80,7 @@ public class HighestHpAmongHitsTest {
     public void anEmptyHitSetIsRefusedLoudly() {
         Character owner = CharacterFactory.create(OWNER, LEVEL);
         Battle battle = new Battle(List.of(owner, CharacterFactory.create(ALLY, LEVEL)),
-                List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+                List.of(BattleFixture.monster()), new Random(0));
         battle.startBattle();
         battle.processRequests();
         owner = battle.characters.getFirst();

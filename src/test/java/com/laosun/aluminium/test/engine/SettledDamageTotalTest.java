@@ -6,8 +6,8 @@ import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.TriggerTable;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -31,8 +31,7 @@ import java.util.Random;
 public class SettledDamageTotalTest {
     private static final int WOLF = 1506;
     private static final int ALLY = 1204;
-    private static final int MONSTER = 1002011;
-    /** Fixed so the two fixtures below draw the same numbers: only the extra rule differs between them. */
+        /** Fixed so the two fixtures below draw the same numbers: only the extra rule differs between them. */
     private static final int SEED = 7;
 
     /** The rider is exactly a fifth of everything the firing settled, and it lands on ONE enemy. */
@@ -102,7 +101,7 @@ public class SettledDamageTotalTest {
     private static double[] lostAfterFiring(List<TriggerSpec> specs, int firings) {
         Battle battle = new Battle(
                 List.of(CharacterFactory.create(WOLF, 80), CharacterFactory.create(ALLY, 80)),
-                List.of(EnemyFactory.create(MONSTER, 90, 1), EnemyFactory.create(MONSTER, 90, 1)),
+                List.of(BattleFixture.monster(), BattleFixture.monster()),
                 new Random(SEED));
         battle.startBattle();
         battle.processRequests();

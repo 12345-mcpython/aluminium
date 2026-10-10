@@ -6,8 +6,8 @@ import com.laosun.aluminium.enums.DamageType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Damage;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -32,8 +32,7 @@ import java.util.Random;
 public class PearlDefenceValueTest {
     private static final int PEARL = 1503;
     private static final int ALLY = 1204;
-    private static final int MONSTER = 1002011;
-    private static final String COUNTER = "好活当赏";
+        private static final String COUNTER = "好活当赏";
     private static final double INSTANCE = 100;
 
     /** A full counter blocks the share of an ally's hit, and the points come off HER pool. */
@@ -141,7 +140,7 @@ public class PearlDefenceValueTest {
     /** A fresh battle with Pearl holding {@code points} of 好活当赏. */
     private static Battle newBattle(int points) {
         Battle battle = new Battle(List.of(CharacterFactory.create(PEARL, 80), CharacterFactory.create(ALLY, 80)),
-                List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+                List.of(BattleFixture.monster()), new Random(0));
         battle.startBattle();
         battle.processRequests();
         if (points > 0) {

@@ -7,7 +7,7 @@ import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Weapon;
 import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -28,8 +28,7 @@ public class PoisedToBloomTest {
     private static final int CONE = 21046;
     private static final int WEARER = 1002;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-    private static final int[] CANDIDATES = {1003, 1004, 1006, 1008, 1009, 1013, 1101, 1102, 1103, 1104, 1105, 1106,
+        private static final int[] CANDIDATES = {1003, 1004, 1006, 1008, 1009, 1013, 1101, 1102, 1103, 1104, 1105, 1106,
             1107, 1108, 1109, 1110, 1111, 1112, 1201, 1202, 1203, 1204, 1205, 1206, 1207, 1208, 1209, 1210, 1211, 1212,
             1213, 1214, 1215, 1217, 1301, 1302, 1303, 1304, 1305, 1306, 1307, 1308, 1309, 1310, 1312, 1314, 1315};
 
@@ -67,7 +66,7 @@ public class PoisedToBloomTest {
         Character loner = CharacterFactory.create(byPath.get(lonerPath).get(0), LEVEL);
         Character wearerPlain = CharacterFactory.create(WEARER, LEVEL);
 
-        battle = new Battle(List.of(wearerWithCone, twinA, twinB, loner), List.of(EnemyFactory.create(MONSTER, 90, 1)),
+        battle = new Battle(List.of(wearerWithCone, twinA, twinB, loner), List.of(BattleFixture.monster()),
                 new Random(0));
         battle.startBattle();
         // baselines, read from a battle with no cone at all
@@ -97,7 +96,7 @@ public class PoisedToBloomTest {
         Character a = CharacterFactory.create(1002, LEVEL);
         Character b = CharacterFactory.create(1002, LEVEL);
         Character c = CharacterFactory.create(1002, LEVEL);
-        battle = new Battle(List.of(a, b, c), List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+        battle = new Battle(List.of(a, b, c), List.of(BattleFixture.monster()), new Random(0));
         battle.startBattle();
         System.out.println("[21046] without the cone: " + a.getAttribute(AttributeType.CRIT_ATTACK).get());
         Assertions.assertEquals(0.5, a.getAttribute(AttributeType.CRIT_ATTACK).get(), 1e-9,

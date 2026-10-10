@@ -2,13 +2,13 @@ package com.laosun.aluminium.test.engine;
 
 
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -32,8 +32,7 @@ import java.util.Random;
 public class BaitModifierLifetimeTest {
     private static final int BAIT = 1504;
     private static final int PROBE = 1002;
-    private static final int MONSTER = 1002011;
-    private static final int LEVEL = 80;
+        private static final int LEVEL = 80;
 
     /** The one rule: strip the state, lay the cut over the whole enemy camp, then mark the new bait. */
     private static void install(Character bait) {
@@ -59,8 +58,8 @@ public class BaitModifierLifetimeTest {
         Character bait = CharacterFactory.create(BAIT, LEVEL);
         install(bait);
         Character ally = CharacterFactory.create(PROBE, LEVEL);
-        Enemy first = EnemyFactory.create(MONSTER, 90, 1);
-        Enemy second = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy first = BattleFixture.monster();
+        Enemy second = BattleFixture.monster();
         Battle battle = new Battle(List.of(bait, ally), List.of(first, second), new Random() {
             @Override
             public double nextDouble() {

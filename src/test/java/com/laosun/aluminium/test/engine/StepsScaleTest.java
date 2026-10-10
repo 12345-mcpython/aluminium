@@ -6,8 +6,8 @@ import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.TriggerTable;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -34,8 +34,7 @@ import java.util.Random;
  */
 public class StepsScaleTest {
     private static final int ALLY = 1204;
-    private static final int MONSTER = 1002011;
-    private static final String COUNTER = "测试计数";
+        private static final String COUNTER = "测试计数";
 
     /** 119 / 120 / 239: the boundaries of one step. */
     @Test
@@ -120,7 +119,7 @@ public class StepsScaleTest {
         unit.setTriggerTable(new TriggerTable(1, List.of(
                 TriggerSpecs.rule("TURN_START", List.of(), effect))));
         Battle battle = new Battle(List.of(unit, CharacterFactory.create(ALLY, 80)),
-                List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+                List.of(BattleFixture.monster()), new Random(0));
         battle.startBattle();
         battle.processRequests();
         double before = unit.getAttribute(AttributeType.ATTACK).get();

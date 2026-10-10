@@ -9,8 +9,8 @@ import com.laosun.aluminium.models.Damage;
 import com.laosun.aluminium.models.DoubleValue;
 import com.laosun.aluminium.models.Weapon;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -28,8 +28,7 @@ public class DazzledByAFloweryWorldTest {
     private static final int CONE = 23053;
     private static final int WEARER = 1205;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-    private static final int CAP = 4;
+        private static final int CAP = 4;
     private static final double PER_POINT = 0.05;
 
     private Character wearer;
@@ -39,7 +38,7 @@ public class DazzledByAFloweryWorldTest {
         wearer = withCone
                 ? CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(CONE, LEVEL, false, 1))
                 : CharacterFactory.create(WEARER, LEVEL);
-        enemy = EnemyFactory.create(MONSTER, 90, 1);
+        enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(wearer), List.of(enemy), new Random(0));
         battle.startBattle();
         wearer.getAttribute(AttributeType.CRIT_CHANCE)

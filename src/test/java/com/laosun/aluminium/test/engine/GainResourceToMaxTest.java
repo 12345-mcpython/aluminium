@@ -6,8 +6,8 @@ import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.TriggerTable;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -32,8 +32,7 @@ import java.util.Random;
  */
 public class GainResourceToMaxTest {
     private static final int PEARL = 1503;
-    private static final int MONSTER = 1002011;
-    private static final String COUNTER = "溢出的计数";
+        private static final String COUNTER = "溢出的计数";
 
     /** With the field, the counter stops at its maximum however much is granted. */
     @Test
@@ -73,7 +72,7 @@ public class GainResourceToMaxTest {
      */
     private static int grant(int from, int amount, boolean toMax, int overflow) {
         Character pearl = CharacterFactory.create(PEARL, 80);
-        Battle battle = new Battle(List.of(pearl), List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+        Battle battle = new Battle(List.of(pearl), List.of(BattleFixture.monster()), new Random(0));
         battle.startBattle();
         battle.processRequests();
         Character unit = battle.characters.getFirst();

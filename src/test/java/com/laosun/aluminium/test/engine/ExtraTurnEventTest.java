@@ -5,8 +5,8 @@ import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.TriggerTable;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -43,8 +43,7 @@ import java.util.Random;
 public class ExtraTurnEventTest {
     private static final int PEARL = 1503;          // used as the fixture character, and for the counters' names
     private static final int ALLY = 1502;           // a second real unit, and a legal Elation ally
-    private static final int MONSTER = 1002011;
-    private static final String COUNTER = "好活当赏";
+        private static final String COUNTER = "好活当赏";
     private static final String LAUGH = "笑点";
     private static final double EPS = 1e-9;
 
@@ -59,7 +58,7 @@ public class ExtraTurnEventTest {
         Character pearl = CharacterFactory.create(PEARL, 80);
         Character ally = CharacterFactory.create(ALLY, 80);
         installCounters(ally);
-        Battle battle = new Battle(List.of(pearl, ally), List.of(EnemyFactory.create(MONSTER, 90, 1)),
+        Battle battle = new Battle(List.of(pearl, ally), List.of(BattleFixture.monster()),
                 new Random(0));
         battle.startBattle();
         battle.processRequests();
@@ -100,7 +99,7 @@ public class ExtraTurnEventTest {
         Character pearl = CharacterFactory.create(PEARL, 80);
         Character ally = CharacterFactory.create(ALLY, 80);
         installCounters(ally);
-        Battle battle = new Battle(List.of(pearl, ally), List.of(EnemyFactory.create(MONSTER, 90, 1)),
+        Battle battle = new Battle(List.of(pearl, ally), List.of(BattleFixture.monster()),
                 new Random(0));
         battle.startBattle();
         battle.processRequests();
@@ -125,7 +124,7 @@ public class ExtraTurnEventTest {
         Character ally = CharacterFactory.create(ALLY, 80);
         installCounters(ally);
         Character outsider = CharacterFactory.create(ALLY, 80);
-        Battle battle = new Battle(List.of(pearl, ally), List.of(EnemyFactory.create(MONSTER, 90, 1)),
+        Battle battle = new Battle(List.of(pearl, ally), List.of(BattleFixture.monster()),
                 new Random(0));
         battle.startBattle();
         battle.processRequests();

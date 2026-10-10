@@ -6,8 +6,8 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -23,19 +23,17 @@ import java.util.Random;
 public class HertaTheTest {
     private static final int HERTA = 1401;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-
-    /** Note: "使用秘技后，下一次战斗开始时大黑塔攻击力提高60%，持续2回合", and the control. */
+        /** Note: "使用秘技后，下一次战斗开始时大黑塔攻击力提高60%，持续2回合", and the control. */
     @Test
     public void theTechniqueRaisesHerAttackAndNothingWithoutIt() {
         Character plain = CharacterFactory.create(HERTA, LEVEL);
-        Enemy enemy1 = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy1 = BattleFixture.monster();
         Battle plainBattle = new Battle(List.of(plain), List.of(enemy1), fixed());
         plainBattle.startBattle();
         double untouched = plain.getAttribute(AttributeType.ATTACK).get();
 
         Character herta = CharacterFactory.create(HERTA, LEVEL);
-        Enemy enemy2 = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy2 = BattleFixture.monster();
         Battle battle = new Battle(List.of(herta), List.of(enemy2), fixed());
         battle.markTechniqueUsed(herta);
         battle.startBattle();
@@ -50,7 +48,7 @@ public class HertaTheTest {
     @Test
     public void herUltimateRaisesAttackAdvancesAndGrantsInspiration() {
         Character herta = CharacterFactory.create(HERTA, LEVEL);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(herta), List.of(enemy), fixed());
         battle.startBattle();
         double before = herta.getAttribute(AttributeType.ATTACK).get();

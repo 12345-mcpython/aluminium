@@ -2,6 +2,7 @@ package com.laosun.aluminium.test.trigger;
 
 
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
@@ -12,7 +13,6 @@ import com.laosun.aluminium.models.DoubleValue;
 import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.buff.ShieldBuff;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -41,9 +41,7 @@ public class ShieldOriginConditionTest {
     private static final int MARCH_7TH = 1001;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-
-    /** The Skill's shield satisfies the condition; the battle-start one (a different rule) does not. */
+        /** The Skill's shield satisfies the condition; the battle-start one (a different rule) does not. */
     @Test
     public void onlyTheNamedRulesShieldCounts() {
         Assertions.assertTrue(healFires(true, "skill_shield"),
@@ -271,7 +269,7 @@ public class ShieldOriginConditionTest {
     }
 
     private static Enemy monster() {
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         enemy.setAttribute(AttributeType.EFFECT_RESISTANCE, new DoubleValue(0));
         return enemy;
     }

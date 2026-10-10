@@ -7,8 +7,8 @@ import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.buff.ReductionBuff;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -26,14 +26,13 @@ public class MortenaxZoneTest {
     private static final int MORTENAX = 1507;
     private static final int ALLY = 1210;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-    private static final double EPS = 1e-6;
+        private static final double EPS = 1e-6;
 
     @Test
     public void theZoneGrantsThreeEffectsAndTheCountdownTakesThemAllOff() {
         Character mortenax = CharacterFactory.create(MORTENAX, LEVEL);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(mortenax, ally), List.of(enemy), new Random(0));
         battle.startBattle();
         double baseWeight = battle.aggroOf(mortenax);
@@ -66,7 +65,7 @@ public class MortenaxZoneTest {
     @Test
     public void herFirstEidolonLowersEnemyResistanceForTheZonesLifetime() {
         Character withEidolon = CharacterFactory.create(MORTENAX, LEVEL, true, null, null, 1);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(withEidolon), List.of(enemy), new Random(0));
         battle.startBattle();
 
@@ -81,7 +80,7 @@ public class MortenaxZoneTest {
                 "「倒计时回合开始时结界解除」 (the zone is removed when the countdown's turn starts) -- the reduction goes with the zone");
 
         Character withoutEidolon = CharacterFactory.create(MORTENAX, LEVEL);
-        Enemy plain = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy plain = BattleFixture.monster();
         Battle second = new Battle(List.of(withoutEidolon), List.of(plain), new Random(0));
         second.startBattle();
 

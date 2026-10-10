@@ -4,10 +4,10 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.models.skill.Skill;
 import com.laosun.aluminium.models.skill.SkillExecutor;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -27,8 +27,7 @@ public class ZoneAdditionalDamageTest {
     private static final int LEVEL = 80;
     private static final int TRIBBIE = 1403;
     private static final int ATTACKER = 1402;
-    private static final int MONSTER = 1002011;
-    private static final String ZONE = "结界";
+        private static final String ZONE = "结界";
 
     @Test
     public void theZoneAddsExactlyItsOwnInstance() {
@@ -62,7 +61,7 @@ public class ZoneAdditionalDamageTest {
         Character tribbie = CharacterFactory.create(TRIBBIE, LEVEL);
         Character attacker = CharacterFactory.create(ATTACKER, LEVEL);
         Battle battle = new Battle(List.of(tribbie, attacker),
-                List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+                List.of(BattleFixture.monster()), new Random(0));
         battle.startBattle();
         battle.processRequests();
         tribbie = battle.characters.getFirst();

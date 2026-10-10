@@ -2,13 +2,13 @@ package com.laosun.aluminium.test.engine;
 
 
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -26,9 +26,7 @@ import java.util.Random;
 public class OncePerAttackLimitTest {
     private static final int OWNER = 1205;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-
-    // Note: Kept as fields: Battle exposes no "give me my party" accessor (measured), and every reading here needs
+        // Note: Kept as fields: Battle exposes no "give me my party" accessor (measured), and every reading here needs
     // the same two units.
     private Character owner;
     private Enemy enemy;
@@ -36,7 +34,7 @@ public class OncePerAttackLimitTest {
     private Battle battleWith(TriggerSpec rule) {
         owner = CharacterFactory.create(OWNER, LEVEL);
         owner.setTriggerTable(new TriggerTable(OWNER, List.of(rule)));
-        enemy = EnemyFactory.create(MONSTER, 90, 1);
+        enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(owner), List.of(enemy), new Random(0));
         battle.startBattle();
         return battle;

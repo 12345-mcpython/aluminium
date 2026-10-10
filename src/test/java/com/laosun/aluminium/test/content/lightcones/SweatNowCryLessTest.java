@@ -11,7 +11,7 @@ import com.laosun.aluminium.models.Summon;
 import com.laosun.aluminium.models.Weapon;
 import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -30,9 +30,7 @@ public class SweatNowCryLessTest {
     private static final int WEARER = 1402;   // has resources/memosprites/1402.json
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-
-    private Character wearer;
+        private Character wearer;
     private Enemy enemy;
     private Battle battle;
 
@@ -40,7 +38,7 @@ public class SweatNowCryLessTest {
         wearer = withCone
                 ? CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(CONE, LEVEL, false, 1))
                 : CharacterFactory.create(WEARER, LEVEL);
-        enemy = EnemyFactory.create(MONSTER, 90, 1);
+        enemy = BattleFixture.monster();
         battle = new Battle(List.of(wearer, CharacterFactory.create(ALLY, LEVEL)), List.of(enemy), new Random(0));
         battle.startBattle();
         for (Character unit : List.of(wearer)) {

@@ -1,8 +1,8 @@
 package com.laosun.aluminium.test.engine;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import java.util.List;
@@ -17,9 +17,7 @@ public class DragonHollowWingTest {
     private static final int LEVEL = 80;
     private static final int CASTORICE = 1407;
     private static final int OTHER = 1002;
-    private static final int MONSTER = 1002011;
-
-    @Test
+        @Test
     public void theDragonTalentHitsAndHeals() {
         double[] r = run();
         System.out.println("[dragon] the enemy lost " + r[0] + " ; our side gained " + r[1]
@@ -38,7 +36,7 @@ public class DragonHollowWingTest {
         Character her = CharacterFactory.create(CASTORICE, LEVEL);
         Character other = CharacterFactory.create(OTHER, LEVEL);
         Battle battle = new Battle(List.of(her, other),
-                List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+                List.of(BattleFixture.monster()), new Random(0));
         battle.startBattle();
         battle.processRequests();
         her = battle.characters.getFirst();

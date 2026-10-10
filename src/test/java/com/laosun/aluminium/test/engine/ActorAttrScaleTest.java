@@ -2,6 +2,7 @@ package com.laosun.aluminium.test.engine;
 
 
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
@@ -9,7 +10,6 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Summon;
 import com.laosun.aluminium.models.TriggerTable;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.models.skill.Skill;
 import com.laosun.aluminium.models.skill.SkillExecutor;
 import com.laosun.aluminium.utils.CharacterFactory;
@@ -33,8 +33,7 @@ public class ActorAttrScaleTest {
     private static final int LEVEL = 80;
     private static final int CYRENE = 1415;
     private static final int RECIPIENT = 8007;   // Trailblazer - Remembrance (开拓者-记忆), whose own memosprite is Mem (迷迷), NOT Demiurge (德谬歌)
-    private static final int MONSTER = 1002011;
-    private static final int ODE_OF_ROMANCE = 14;
+        private static final int ODE_OF_ROMANCE = 14;
     private static final double SHARE = 0.1;
 
     /** The share is of the CASTER, not of the rule owner. */
@@ -43,7 +42,7 @@ public class ActorAttrScaleTest {
         Character cyrene = CharacterFactory.create(CYRENE, LEVEL);
         Character recipient = CharacterFactory.create(RECIPIENT, LEVEL);
         Battle battle = new Battle(List.of(cyrene, recipient),
-                List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+                List.of(BattleFixture.monster()), new Random(0));
         battle.startBattle();
         battle.processRequests();
         Summon demiurge = battle.summonServant(cyrene);

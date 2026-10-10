@@ -2,6 +2,7 @@ package com.laosun.aluminium.test.content.characters;
 
 
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.enums.TriggerEvent;
 
 import com.laosun.aluminium.Battle;
@@ -13,7 +14,6 @@ import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Signal;
 import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.buff.StateBuff;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -30,8 +30,7 @@ import java.util.Random;
  */
 public class MydeiBloodfeudSkillsTest {
     private static final int MYDEI = 1404;
-    private static final int MONSTER = 1002011;
-    private static final String BLOODFEUD = "血仇";
+        private static final String BLOODFEUD = "血仇";
     private static final String CHARGE = "天赋充能";
 
     /** "消耗等同于万敌当前生命值 35% 的生命值"-- the cost is paid, on the CURRENT value, at the start of his turn. */
@@ -39,7 +38,7 @@ public class MydeiBloodfeudSkillsTest {
     public void theTurnStartPaysTheSkillsCost() {
         Character him = CharacterFactory.create(MYDEI, 80, false, null, null, 0);
         Battle battle = new Battle(List.of(him),
-                List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+                List.of(BattleFixture.monster()), new Random(0));
         battle.startBattle();
         battle.processRequests();
         him.getBuffManager().addBuff(new StateBuff(BLOODFEUD, 9, true));
@@ -82,7 +81,7 @@ public class MydeiBloodfeudSkillsTest {
         him.setTriggerTable(new TriggerTable(MYDEI,
                 List.of(TriggerSpecs.rule("BATTLE_START", List.of(), swap)), List.of()));
         Battle battle = new Battle(List.of(him),
-                List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+                List.of(BattleFixture.monster()), new Random(0));
         battle.startBattle();
         battle.processRequests();
 
@@ -114,7 +113,7 @@ public class MydeiBloodfeudSkillsTest {
     public void theSwapReachesTheCast() {
         Character him = CharacterFactory.create(MYDEI, 80, false, null, null, 0);
         Battle battle = new Battle(List.of(him),
-                List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+                List.of(BattleFixture.monster()), new Random(0));
         battle.startBattle();
         battle.processRequests();
         him.getBuffManager().addBuff(new StateBuff(BLOODFEUD, 9, true));
@@ -125,7 +124,7 @@ public class MydeiBloodfeudSkillsTest {
 
         Character byHand = CharacterFactory.create(MYDEI, 80, false, null, null, 0);
         Battle other = new Battle(List.of(byHand),
-                List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+                List.of(BattleFixture.monster()), new Random(0));
         other.startBattle();
         other.processRequests();
         // Note: AFTER startBattle, so the slot carries the level the convention gives it -- the trap the earlier attempt fell into.
@@ -147,7 +146,7 @@ public class MydeiBloodfeudSkillsTest {
     public void aChargeArrivingInBloodfeudIsNotDrainedAgain() {
         Character him = CharacterFactory.create(MYDEI, 80, false, null, null, 0);
         Battle battle = new Battle(List.of(him),
-                List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+                List.of(BattleFixture.monster()), new Random(0));
         battle.startBattle();
         battle.processRequests();
         him.getBuffManager().addBuff(new StateBuff(BLOODFEUD, 9, true));
@@ -170,7 +169,7 @@ public class MydeiBloodfeudSkillsTest {
     public void theHundredAndFiftyChargeCastsGodslayer() {
         Character him = CharacterFactory.create(MYDEI, 80, false, null, null, 0);
         Battle battle = new Battle(List.of(him),
-                List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+                List.of(BattleFixture.monster()), new Random(0));
         battle.startBattle();
         battle.processRequests();
         him.getBuffManager().addBuff(new StateBuff(BLOODFEUD, 9, true));

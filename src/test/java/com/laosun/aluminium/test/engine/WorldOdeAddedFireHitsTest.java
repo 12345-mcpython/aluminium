@@ -5,9 +5,9 @@ import com.laosun.aluminium.enums.DamageType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Damage;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.models.skill.SkillExecutor;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import java.util.List;
@@ -22,9 +22,7 @@ import java.util.Random;
 public class WorldOdeAddedFireHitsTest {
     private static final int LEVEL = 80;
     private static final int PHAINON = 1408;
-    private static final int MONSTER = 1002011;
-
-    @Test
+        @Test
     public void theAttackIsFollowedByFiveFireHits() {
         double with = damageOfOneAttack(true);
         double without = damageOfOneAttack(false);
@@ -44,7 +42,7 @@ public class WorldOdeAddedFireHitsTest {
     private static double damageOfOneAttack(boolean transform) {
         Character him = CharacterFactory.create(PHAINON, LEVEL);
         Battle battle = new Battle(List.of(him),
-                List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+                List.of(BattleFixture.monster()), new Random(0));
         battle.startBattle();
         battle.processRequests();
         him = battle.characters.getFirst();

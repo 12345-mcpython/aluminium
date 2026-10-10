@@ -5,8 +5,8 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Weapon;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -24,9 +24,7 @@ public class LightConeMomentTest {
     private static final int WEARER = 1210;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-
-    @Test
+        @Test
     public void theAggroIsDoubled() {
         double without = aggro(false);
         double with = aggro(true);
@@ -69,7 +67,7 @@ public class LightConeMomentTest {
         Weapon weapon = equipped ? Weapon.build(WEAPON_ID, LEVEL, false, rank) : null;
         Character wearer = CharacterFactory.create(WEARER, LEVEL, true, weapon);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(wearer, ally), List.of(enemy), new Random(0));
         battle.startBattle();
         return new Fixture(wearer, battle);

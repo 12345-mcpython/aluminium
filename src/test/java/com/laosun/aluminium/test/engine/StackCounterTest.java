@@ -2,6 +2,7 @@ package com.laosun.aluminium.test.engine;
 
 
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
@@ -9,7 +10,6 @@ import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -33,9 +33,7 @@ public class StackCounterTest {
     private static final int HANYA = 1215;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-
-    /** The counter accumulates one mark per firing, and a threshold rule can read it. */
+        /** The counter accumulates one mark per firing, and a threshold rule can read it. */
     @Test
     public void theCountIsReadableAtTheThreshold() {
         Character hero = CharacterFactory.create(HANYA, LEVEL);
@@ -121,7 +119,7 @@ public class StackCounterTest {
     }
 
     private static Enemy enemy() {
-        return EnemyFactory.create(MONSTER, 90, 1);
+        return BattleFixture.monster();
     }
 
     private static Random fixed() {

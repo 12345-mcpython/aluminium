@@ -2,12 +2,12 @@ package com.laosun.aluminium.test.engine;
 
 
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.TriggerTable;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -29,8 +29,7 @@ public class AllyCidSelectorTest {
     private static final int OWNER = 1415;
     private static final int NAMED = 1409;
     private static final int OTHER = 1002;
-    private static final int MONSTER = 1002011;
-    private static final String MARK = "测试层数";
+        private static final String MARK = "测试层数";
 
     @Test
     public void theNamedCidGetsItAndADifferentAllyDoesNot() {
@@ -38,7 +37,7 @@ public class AllyCidSelectorTest {
         Character named = CharacterFactory.create(NAMED, LEVEL);
         Character other = CharacterFactory.create(OTHER, LEVEL);
         Battle battle = new Battle(List.of(owner, named, other),
-                List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+                List.of(BattleFixture.monster()), new Random(0));
         battle.startBattle();
         battle.processRequests();
         owner = battle.characters.get(0);

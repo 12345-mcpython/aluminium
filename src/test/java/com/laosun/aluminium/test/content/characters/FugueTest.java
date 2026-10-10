@@ -7,8 +7,8 @@ import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Signal;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -22,14 +22,12 @@ public class FugueTest {
     private static final int FUGUE = 1225;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-
-    /** Note: The Skill marks the ally, puts [炽灼] on HER, and hands the ally 30% Break Effect -- a share, so it is compared with her own base. */
+        /** Note: The Skill marks the ally, puts [炽灼] on HER, and hands the ally 30% Break Effect -- a share, so it is compared with her own base. */
     @Test
     public void theSkillMarksTheAllyAndHandsOverBreakEffect() {
         Character fugue = CharacterFactory.create(FUGUE, LEVEL);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(fugue, ally), List.of(enemy), fixed());
         battle.startBattle();
         double before = ally.getAttribute(AttributeType.BREAKING_EFFECT).get();
@@ -60,7 +58,7 @@ public class FugueTest {
     @Test
     public void theTechniqueLeavesSixtyPercentOfTheWait() {
         Character fugue = CharacterFactory.create(FUGUE, LEVEL);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(fugue), List.of(enemy), fixed());
         battle.markTechniqueUsed(fugue);
         battle.startBattle();
@@ -69,7 +67,7 @@ public class FugueTest {
         Assertions.assertTrue(after >= 0, "the queue must hold her: " + after);
 
         Character plain = CharacterFactory.create(FUGUE, LEVEL);
-        Enemy plainEnemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy plainEnemy = BattleFixture.monster();
         Battle plainBattle = new Battle(List.of(plain), List.of(plainEnemy), fixed());
         plainBattle.startBattle();
         double untouched = remaining(plainBattle, plain);
@@ -82,7 +80,7 @@ public class FugueTest {
     private static double defenceLoss(boolean mark) {
         Character fugue = CharacterFactory.create(FUGUE, LEVEL);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(fugue, ally), List.of(enemy), fixed());
         battle.startBattle();
         double before = enemy.getAttribute(AttributeType.DEFENCE).get();

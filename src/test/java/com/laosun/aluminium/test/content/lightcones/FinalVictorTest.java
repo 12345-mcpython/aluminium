@@ -10,8 +10,8 @@ import com.laosun.aluminium.models.Damage;
 import com.laosun.aluminium.models.DoubleValue;
 import com.laosun.aluminium.models.Weapon;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -26,9 +26,7 @@ public class FinalVictorTest {
     private static final int CONE = 21037;
     private static final int WEARER = 1205;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-
-    private Character wearer(boolean withCone) {
+        private Character wearer(boolean withCone) {
         return withCone
                 ? CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(CONE, LEVEL, false, 1))
                 : CharacterFactory.create(WEARER, LEVEL);
@@ -48,7 +46,7 @@ public class FinalVictorTest {
     @Test
     public void criticalHitsStackLuckAndANonCritDoesNot() {
         Character unit = wearer(true);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = battleWith(unit, enemy);
         double before = unit.getAttribute(AttributeType.CRIT_ATTACK).get();
         battle.applyDamage(enemy, new Damage(unit, enemy, DamageElement.FIRE, DamageType.NORMAL, 100));
@@ -74,7 +72,7 @@ public class FinalVictorTest {
     public void aTeammatesCritDoesNotGrantTheWearersLayers() {
         Character wearer = wearer(true);
         Character ally = CharacterFactory.create(1002, LEVEL);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(wearer, ally), List.of(enemy), new Random(0));
         battle.startBattle();
         double before = wearer.getAttribute(AttributeType.CRIT_ATTACK).get();
@@ -97,7 +95,7 @@ public class FinalVictorTest {
     @Test
     public void theLayersGoAwayWhenTheWearersTurnEnds() {
         Character unit = wearer(true);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = battleWith(unit, enemy);
         double before = unit.getAttribute(AttributeType.CRIT_ATTACK).get();
         forceCrit(unit);
@@ -110,7 +108,7 @@ public class FinalVictorTest {
         Assertions.assertEquals(before, cleared, 1e-9, "the wearer's turn end removes them");
 
         Character plain = wearer(false);
-        Enemy other = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy other = BattleFixture.monster();
         Battle plainBattle = battleWith(plain, other);
         double plainBefore = plain.getAttribute(AttributeType.CRIT_ATTACK).get();
         forceCrit(plain);

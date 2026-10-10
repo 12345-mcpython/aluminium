@@ -4,10 +4,10 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.models.skill.Skill;
 import com.laosun.aluminium.models.skill.SkillExecutor;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -23,8 +23,7 @@ import java.util.Random;
 public class LethalHitTest {
     private static final int PHAINON = 1408;
     private static final int JINGLIU = 1104;
-    private static final int MONSTER = 1002011;
-    private static final String STATE = "变身";
+        private static final String STATE = "变身";
 
     /** 1408: transformed, a lethal blow leaves her standing at a fifth of her (raised) Max HP. */
     @Test
@@ -56,7 +55,7 @@ public class LethalHitTest {
     public void jingliuDiesToASecondLethalBlow() {
         Character her = CharacterFactory.create(JINGLIU, 80, false, null, null, 0);
         Battle battle = new Battle(List.of(her),
-                List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+                List.of(BattleFixture.monster()), new Random(0));
         battle.startBattle();
         battle.processRequests();
 
@@ -76,7 +75,7 @@ public class LethalHitTest {
     private static Character survivor(int cid, boolean transform) {
         Character her = CharacterFactory.create(cid, 80, false, null, null, 0);
         Battle battle = new Battle(List.of(her),
-                List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+                List.of(BattleFixture.monster()), new Random(0));
         battle.startBattle();
         battle.processRequests();
 

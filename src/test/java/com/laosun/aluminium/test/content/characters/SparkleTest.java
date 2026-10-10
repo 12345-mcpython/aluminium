@@ -6,8 +6,8 @@ import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -21,14 +21,12 @@ public class SparkleTest {
     private static final int SPARKLE = 1306;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-
-    /** Note: "等同于花火24.00%暴击伤害+45.00%" -- a derived share PLUS a flat amount, both read from the engine. */
+        /** Note: "等同于花火24.00%暴击伤害+45.00%" -- a derived share PLUS a flat amount, both read from the engine. */
     @Test
     public void theSkillHandsOverHerCritDamageShare() {
         Character sparkle = CharacterFactory.create(SPARKLE, LEVEL);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(sparkle, ally), List.of(enemy), fixed());
         battle.startBattle();
         double before = ally.getAttribute(AttributeType.CRIT_ATTACK).get();
@@ -45,7 +43,7 @@ public class SparkleTest {
     public void everySpentSkillPointRaisesThePartysDamage() {
         Character sparkle = CharacterFactory.create(SPARKLE, LEVEL);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(sparkle, ally), List.of(enemy), fixed());
         battle.startBattle();
         double before = ally.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
@@ -68,7 +66,7 @@ public class SparkleTest {
     public void theUltimateGrantsSkillPointsAndCipher() {
         Character sparkle = CharacterFactory.create(SPARKLE, LEVEL);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(sparkle, ally), List.of(enemy), fixed());
         battle.startBattle();
         Assertions.assertTrue(battle.spendSkillPoint(), "the fixture must have a point to spend");
@@ -102,7 +100,7 @@ public class SparkleTest {
     }
 
     private static int capWith(List<Character> team) {
-        Battle battle = new Battle(team, List.of(EnemyFactory.create(MONSTER, 90, 1)), fixed());
+        Battle battle = new Battle(team, List.of(BattleFixture.monster()), fixed());
         battle.startBattle();
         return battle.getSkillPointMax();
     }

@@ -7,8 +7,8 @@ import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.buff.StateBuff;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -37,8 +37,7 @@ import java.util.Random;
 public class SilverWolfLV999KitTest {
     private static final int WOLF = 1506;
     private static final int ALLY = 1204;
-    private static final int MONSTER = 1002011;
-    private static final String LAUGH = "笑点";
+        private static final String LAUGH = "笑点";
     private static final String HIDDEN = "隐藏分";
     private static final String CHARGES = "强化普攻次数";
     private static final String GOD = "无敌玩家";
@@ -316,7 +315,7 @@ public class SilverWolfLV999KitTest {
         Battle battle = new Battle(
                 List.of(CharacterFactory.create(WOLF, 80, false, null, null, eidolonRank),
                         CharacterFactory.create(ALLY, 80)),
-                List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+                List.of(BattleFixture.monster()), new Random(0));
         battle.startBattle();
         battle.processRequests();
         return battle;

@@ -2,6 +2,7 @@ package com.laosun.aluminium.test.trigger;
 
 
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.TriggerEvent;
@@ -9,7 +10,6 @@ import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Damage;
 import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -26,9 +26,7 @@ import java.util.Random;
 public class ThresholdConditionTest {
     private static final int OWNER = 1224;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-
-    /** Note: `<=` is INCLUSIVE: the boundary value fires. */
+        /** Note: `<=` is INCLUSIVE: the boundary value fires. */
     @Test
     public void lessOrEqualFiresOnTheBoundary() {
         Assertions.assertEquals(1, fires("hit_count <= 0", 0), "at the boundary, `<=` must fire");
@@ -62,7 +60,7 @@ public class ThresholdConditionTest {
     /** Fires once at FULL HP, so "at or above half" and "at or above 50" can be told apart. */
     private static int firesAtFullHp(String condition) {
         Character owner = CharacterFactory.create(OWNER, LEVEL);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         owner.setTriggerTable(new TriggerTable(OWNER, List.of(TriggerSpecs.rule(
                 TriggerEvent.ALLY_ATTACK.name(), List.of(condition), energy()))));
         Battle battle = new Battle(List.of(owner), List.of(enemy), fixed());
@@ -73,7 +71,7 @@ public class ThresholdConditionTest {
     /** Fires an event with a chosen hit count and returns how many rules burned. */
     private static int fires(String condition, int hitCount) {
         Character owner = CharacterFactory.create(OWNER, LEVEL);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         owner.setTriggerTable(new TriggerTable(OWNER, List.of(TriggerSpecs.rule(
                 TriggerEvent.ALLY_ATTACK.name(), List.of(condition), energy()))));
         Battle battle = new Battle(List.of(owner), List.of(enemy), fixed());
@@ -84,7 +82,7 @@ public class ThresholdConditionTest {
     /** Fires once at full HP and once after heavy damage, returning the count for the damaged case. */
     private static int firesAfterDamage(String condition, boolean damageFirst) {
         Character owner = CharacterFactory.create(OWNER, LEVEL);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         owner.setTriggerTable(new TriggerTable(OWNER, List.of(TriggerSpecs.rule(
                 TriggerEvent.ALLY_ATTACK.name(), List.of(condition), energy()))));
         Battle battle = new Battle(List.of(owner), List.of(enemy), fixed());

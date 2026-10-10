@@ -9,8 +9,8 @@ import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.DoubleValue;
 import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -33,8 +33,7 @@ import java.util.Random;
  */
 public class CastCountedLaughsTest {
     private static final int CASTER = 1505;
-    private static final int MONSTER = 1002011;
-    private static final String ELATION = "ELATION_SKILL";
+        private static final String ELATION = "ELATION_SKILL";
     private static final String SKILL = "SKILL";
     private static final double FACTOR_20 = 1 + 20 * 5.0 / (20 + 240);
     private static final double FACTOR_NONE = 1.0;
@@ -138,7 +137,7 @@ public class CastCountedLaughsTest {
         // firing delivers is the fixture's commanded cast.
         commander.setTriggerTable(new TriggerTable(1, List.of(
                 TriggerSpecs.rule(TriggerEvent.TURN_START.name(), List.of(), cast))));
-        Battle battle = new Battle(List.of(caster, commander), List.of(EnemyFactory.create(MONSTER, 90, 1)),
+        Battle battle = new Battle(List.of(caster, commander), List.of(BattleFixture.monster()),
                 new Random(0));
         battle.startBattle();
         battle.processRequests();

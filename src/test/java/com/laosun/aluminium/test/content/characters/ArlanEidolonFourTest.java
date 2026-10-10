@@ -3,9 +3,9 @@ package com.laosun.aluminium.test.content.characters;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.models.Signal;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -21,8 +21,7 @@ import java.util.Random;
  */
 public class ArlanEidolonFourTest {
     private static final int ARLAN = 1008;
-    private static final int MONSTER = 1002011;
-    private static final String STATE = "绝处反击";
+        private static final String STATE = "绝处反击";
 
     /** At E4 the first lethal blow restores him to a quarter of his Max HP. */
     @Test
@@ -63,7 +62,7 @@ public class ArlanEidolonFourTest {
     private static double[] afterLethalBlows(int eidolon, int blows, int turns) {
         Character him = CharacterFactory.create(ARLAN, 80, false, null, null, eidolon);
         Battle battle = new Battle(List.of(him),
-                List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+                List.of(BattleFixture.monster()), new Random(0));
         battle.startBattle();
         battle.processRequests();
         if (eidolon >= 4) {

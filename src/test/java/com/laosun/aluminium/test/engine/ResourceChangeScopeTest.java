@@ -6,8 +6,8 @@ import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.TriggerTable;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -40,8 +40,7 @@ import java.util.Random;
  * 0 clobber risks, so this changes no shipped number - which the full suite confirms.
  */
 public class ResourceChangeScopeTest {
-    private static final int MONSTER = 1002011;
-    private static final String OUTER = "测试外层";
+        private static final String OUTER = "测试外层";
     private static final String INNER = "测试内层";
     private static final String INNER_SEEN = "内层看到了";
     private static final String OUTER_SEEN = "外层看到了";
@@ -142,7 +141,7 @@ public class ResourceChangeScopeTest {
     private static Battle battleWith(Character receiver, TriggerSpec giverRule) {
         Character giver = Character.fromAttributes("giver", 1000, 100, 100, 100);
         giver.setTriggerTable(new TriggerTable(1, List.of(giverRule)));
-        Battle battle = new Battle(List.of(receiver, giver), List.of(EnemyFactory.create(MONSTER, 90, 1)),
+        Battle battle = new Battle(List.of(receiver, giver), List.of(BattleFixture.monster()),
                 new Random(0));
         battle.startBattle();
         battle.processRequests();

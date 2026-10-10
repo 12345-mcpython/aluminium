@@ -2,6 +2,7 @@ package com.laosun.aluminium.test.content.characters;
 
 
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.data.TriggerTables;
 import com.laosun.aluminium.enums.AttributeType;
@@ -25,9 +26,7 @@ public class TribbieTest {
     private static final int TRIBBIE = 1403;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-
-    /** Note: A teammate's ultimate triggers it; her own does not. */
+        /** Note: A teammate's ultimate triggers it; her own does not. */
     @Test
     public void onlyATeammatesUltimateTriggersTheFollowUp() {
         double fromAlly = lossWhenTheEventComesFrom(true);
@@ -42,7 +41,7 @@ public class TribbieTest {
     @Test
     public void theTechniqueGrantsNuminosity() {
         Character tribbie = CharacterFactory.create(TRIBBIE, LEVEL);
-        Enemy enemy = com.laosun.aluminium.models.enemy.EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(tribbie), List.of(enemy), fixed());
         battle.markTechniqueUsed(tribbie);
 
@@ -75,7 +74,7 @@ public class TribbieTest {
     private static double lossWhenTheEventComesFrom(boolean teammate) {
         Character tribbie = CharacterFactory.create(TRIBBIE, LEVEL);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
-        Enemy enemy = com.laosun.aluminium.models.enemy.EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(tribbie, ally), List.of(enemy), fixed());
         battle.startBattle();
         double before = enemy.getCurrentHp();
@@ -109,7 +108,7 @@ public class TribbieTest {
                     List.of(TriggerSpecs.rule(TriggerEvent.ULT_CAST.name(), List.of("actor is_other_ally"), effect))));
         }
         Character ally = CharacterFactory.create(ALLY, LEVEL);
-        Enemy enemy = com.laosun.aluminium.models.enemy.EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(tribbie, ally), List.of(enemy), fixed());
         battle.startBattle();
         double before = enemy.getCurrentHp();

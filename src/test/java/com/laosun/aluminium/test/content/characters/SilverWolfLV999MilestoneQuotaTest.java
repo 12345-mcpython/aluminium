@@ -7,8 +7,8 @@ import com.laosun.aluminium.models.CanHit;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -40,8 +40,7 @@ import java.util.Random;
  */
 public class SilverWolfLV999MilestoneQuotaTest {
     private static final int WOLF = 1506;
-    private static final int MONSTER = 1002011;
-    private static final String HIDDEN = "隐藏分";
+        private static final String HIDDEN = "隐藏分";
     private static final String LAUGH = "笑点";
     private static final String CHARGES = "强化普攻次数";
     private static final String QUOTA = "里程碑配额";
@@ -176,7 +175,7 @@ public class SilverWolfLV999MilestoneQuotaTest {
         // and TURN_START would fire this fixture's rule again - a second 280-point grant would move every reading here.
         feeder.setTriggerTable(new TriggerTable(1, List.of(
                 TriggerSpecs.rule(TriggerEvent.DAMAGE_SETTLED.name(), List.of(), grant))));
-        enemy = EnemyFactory.create(MONSTER, 90, 1);
+        enemy = BattleFixture.monster();
         battle = new Battle(List.of(wolf, feeder), List.of(enemy), new Random(0));
         battle.startBattle();
         battle.processRequests();

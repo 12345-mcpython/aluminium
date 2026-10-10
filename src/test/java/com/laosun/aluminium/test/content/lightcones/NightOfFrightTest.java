@@ -5,8 +5,8 @@ import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Weapon;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -23,16 +23,14 @@ public class NightOfFrightTest {
     private static final int HURT_ALLY = 1002;
     private static final int HEALTHY_ALLY = 1204;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-
-    /** The lowest-HP ally's gain when an ally casts an ultimate, with or without the cone in the party. */
+        /** The lowest-HP ally's gain when an ally casts an ultimate, with or without the cone in the party. */
     private double healGain(boolean withCone) {
         Character wearer = withCone
                 ? CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(CONE, LEVEL, false, 1))
                 : CharacterFactory.create(WEARER, LEVEL);
         Character hurt = CharacterFactory.create(HURT_ALLY, LEVEL);
         Character healthy = CharacterFactory.create(HEALTHY_ALLY, LEVEL);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(wearer, hurt, healthy), List.of(enemy), new Random(0));
         battle.startBattle();
         battle.applyDamage(hurt, new com.laosun.aluminium.models.Damage(enemy, hurt,

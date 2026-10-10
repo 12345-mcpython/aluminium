@@ -2,6 +2,7 @@ package com.laosun.aluminium.test.engine;
 
 
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.AttributeType;
@@ -10,7 +11,6 @@ import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.buff.StateBuff;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -39,8 +39,7 @@ public class HolderAttrScaleTest {
     private static final int OWNER = 1503;      // Pearl (真珠) herself: the rule owner, who must NOT be read
     private static final int HOLDER = 1002;     // the ally the sentence is about
     private static final int BYSTANDER = 1202;  // the other ally: also not to be read
-    private static final int MONSTER = 1002011;
-    private static final String MARK = "美学底本";
+        private static final String MARK = "美学底本";
     private static final double SHARE = 0.6;
 
     /**
@@ -58,7 +57,7 @@ public class HolderAttrScaleTest {
         owner.setTriggerTable(new TriggerTable(OWNER, List.of(
                 TriggerSpecs.rule("SKILL_CAST", List.of("actor == self"), holderDefenceShare()))));
         Battle battle = new Battle(List.of(owner, holder, bystander),
-                List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+                List.of(BattleFixture.monster()), new Random(0));
         battle.startBattle();
 
         double ownerBefore = owner.getAttribute(AttributeType.DEFENCE).get();
@@ -104,7 +103,7 @@ public class HolderAttrScaleTest {
         owner.setTriggerTable(new TriggerTable(OWNER, List.of(
                 TriggerSpecs.rule("SKILL_CAST", List.of("actor == self"), holderDefenceShare()))));
         Battle battle = new Battle(List.of(owner, bystander),
-                List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+                List.of(BattleFixture.monster()), new Random(0));
         battle.startBattle();
         double ownerBefore = owner.getAttribute(AttributeType.DEFENCE).get();
 
@@ -194,7 +193,7 @@ public class HolderAttrScaleTest {
         owner.setTriggerTable(new TriggerTable(OWNER, List.of(
                 TriggerSpecs.rule("SKILL_CAST", List.of("actor == self"), defensiveRider()))));
         Battle battle = new Battle(List.of(owner, bystander),
-                List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+                List.of(BattleFixture.monster()), new Random(0));
         battle.startBattle();
 
         IllegalStateException refused = Assertions.assertThrows(IllegalStateException.class,
@@ -217,7 +216,7 @@ public class HolderAttrScaleTest {
 
         owner.setTriggerTable(new TriggerTable(OWNER, List.of(
                 TriggerSpecs.rule("SKILL_CAST", List.of("actor == self"), riderOn(attribute)))));
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(owner, first, second), List.of(enemy), new Random(0));
         battle.startBattle();
         battle.processRequests();

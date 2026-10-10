@@ -2,9 +2,9 @@ package com.laosun.aluminium.test.engine;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.models.skill.SkillExecutor;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -21,9 +21,7 @@ public class SkyOdeEnergyTest {
     private static final int LEVEL = 80;
     private static final int CYRENE = 1415;
     private static final int HYACINE = 1409;
-    private static final int MONSTER = 1002011;
-
-    @Test
+        @Test
     public void theOdeRestoresHerEnergy() {
         double withoutOde = energyAfter(false);
         double withOde = energyAfter(true);
@@ -31,7 +29,7 @@ public class SkyOdeEnergyTest {
         Character cyrene = CharacterFactory.create(CYRENE, LEVEL);
         Character hyacine = CharacterFactory.create(HYACINE, LEVEL);
         Battle probe = new Battle(List.of(cyrene, hyacine),
-                List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+                List.of(BattleFixture.monster()), new Random(0));
         probe.startBattle();
         probe.processRequests();
         var demiurge = probe.summonServant(probe.characters.get(0));
@@ -52,7 +50,7 @@ public class SkyOdeEnergyTest {
         Character cyrene = CharacterFactory.create(CYRENE, LEVEL);
         Character hyacine = CharacterFactory.create(HYACINE, LEVEL);
         Battle battle = new Battle(List.of(cyrene, hyacine),
-                List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+                List.of(BattleFixture.monster()), new Random(0));
         battle.startBattle();
         battle.processRequests();
         cyrene = battle.characters.get(0);

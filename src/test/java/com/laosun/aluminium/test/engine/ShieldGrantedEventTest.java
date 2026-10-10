@@ -2,6 +2,7 @@ package com.laosun.aluminium.test.engine;
 
 
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
@@ -11,7 +12,6 @@ import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -43,8 +43,7 @@ public class ShieldGrantedEventTest {
     private static final int DAHLIA = 1321;
     private static final int ALLY = 1001;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-    private static final double HEAL = 100;
+        private static final double HEAL = 100;
 
     /** An ally's shield on her fires it (the raw grant path). */
     @Test
@@ -236,7 +235,7 @@ public class ShieldGrantedEventTest {
     }
 
     private static Enemy enemy() {
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         enemy.setAttribute(AttributeType.EFFECT_RESISTANCE, new com.laosun.aluminium.models.DoubleValue(0));
         return enemy;
     }

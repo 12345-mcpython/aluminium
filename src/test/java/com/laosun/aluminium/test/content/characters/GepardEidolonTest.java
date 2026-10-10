@@ -3,8 +3,8 @@ package com.laosun.aluminium.test.content.characters;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -28,9 +28,7 @@ import java.util.Random;
 public class GepardEidolonTest {
     private static final int GEPARD = 1104;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-
-    /** Note: E1 files a +0.35 base-chance amendment under the id of the rule that applies the freeze. */
+        /** Note: E1 files a +0.35 base-chance amendment under the id of the rule that applies the freeze. */
     @Test
     public void eidolonOneFilesTheBaseChanceAmendment() {
         Character atE0 = gepardAt(0);
@@ -48,7 +46,7 @@ public class GepardEidolonTest {
 
     private static Character gepardAt(int eidolon) {
         Character gepard = CharacterFactory.create(GEPARD, LEVEL, true, null, null, eidolon);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(gepard), List.of(enemy), new Random() {
             @Override
             public double nextDouble() {

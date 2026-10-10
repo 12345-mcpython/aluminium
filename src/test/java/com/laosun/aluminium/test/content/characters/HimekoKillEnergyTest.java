@@ -8,9 +8,9 @@ import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Damage;
 import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.models.skill.DefaultSkill;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -37,8 +37,7 @@ public class HimekoKillEnergyTest {
 
     private static final int HIMEKO = 1003;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-    private static final int ULTIMATE_SLOT = 3;
+        private static final int ULTIMATE_SLOT = 3;
 
     /** A kill by her ultimate pays the general 5 AND her extra 5. */
     @Test
@@ -101,7 +100,7 @@ public class HimekoKillEnergyTest {
     }
 
     private static Enemy weakEnemy() {
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         enemy.setStanceWeak(Set.of(DamageElement.FIRE));
         return enemy;
     }

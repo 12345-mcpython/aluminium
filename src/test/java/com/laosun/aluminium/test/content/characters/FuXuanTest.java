@@ -2,6 +2,7 @@ package com.laosun.aluminium.test.content.characters;
 
 
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.AttributeType;
@@ -11,7 +12,6 @@ import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Damage;
 import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -26,9 +26,7 @@ public class FuXuanTest {
     private static final int FUXUAN = 1208;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-
-    /** Note: [避厄]'s 18% reduction, in the measured convention: damage x (1 - 0.18), compared with a hand-built -36% rule. */
+        /** Note: [避厄]'s 18% reduction, in the measured convention: damage x (1 - 0.18), compared with a hand-built -36% rule. */
     @Test
     public void misfortuneAvoidanceCutsTheDamageTheTeamTakes() {
         double plain = hitLoss(false);
@@ -47,7 +45,7 @@ public class FuXuanTest {
     public void knowledgeRaisesMaxHpByHerShareAndCritRate() {
         Character fuxuan = CharacterFactory.create(FUXUAN, LEVEL);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(fuxuan, ally), List.of(enemy), fixed());
         battle.startBattle();
         double hpBefore = ally.getAttribute(AttributeType.HEALTH).get();
@@ -68,7 +66,7 @@ public class FuXuanTest {
     private static double hitLoss(boolean talent) {
         Character fuxuan = CharacterFactory.create(FUXUAN, LEVEL);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(fuxuan, ally), List.of(enemy), fixed());
         if (talent) {
             battle.startBattle();
@@ -90,7 +88,7 @@ public class FuXuanTest {
         fuxuan.setTriggerTable(new TriggerTable(FUXUAN, List.of(TriggerSpecs.rule(
                 TriggerEvent.BATTLE_START.name(), List.of(), effect))));
         Character ally = CharacterFactory.create(ALLY, LEVEL);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(fuxuan, ally), List.of(enemy), fixed());
         battle.startBattle();
         double before = ally.getCurrentHp();

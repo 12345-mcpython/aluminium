@@ -4,6 +4,7 @@ package com.laosun.aluminium.test.engine;
 import com.laosun.aluminium.test.support.TestCharacters;
 import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.test.trigger.SelfAttributeConditionTest;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.google.gson.Gson;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.ResourceSpec;
@@ -14,7 +15,6 @@ import com.laosun.aluminium.exceptions.CharacterException;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -58,8 +58,7 @@ public class CharacterResourceTest {
     // every one of them installs its own rule table, so the character's own rules never enter the measurement.
     private static final int PLAIN = 1002;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-    private static final String CHARGE = "充能";
+        private static final String CHARGE = "充能";
 
     /** The fixture cids (see {@code src/test/resources/characters/}). */
     private static final int OBJECT_FORM = 9001;
@@ -396,6 +395,6 @@ public class CharacterResourceTest {
     }
 
     private static Enemy dummy() {
-        return EnemyFactory.create(MONSTER, 90, 1);
+        return BattleFixture.monster();
     }
 }

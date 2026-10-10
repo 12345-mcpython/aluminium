@@ -3,8 +3,8 @@ package com.laosun.aluminium.test.engine;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -25,9 +25,7 @@ import java.util.Random;
 public class SkillLevelTableBoundTest {
     private static final int PEARL = 1503;
     private static final int ALLY = 1204;
-    private static final int MONSTER = 1002011;
-
-    /**
+        /**
      * At an Eidolon whose raise would overshoot, the level is the table size and the skill still hits.
      *
      * <p>Eidolon 3 grants "普攻等级+1" and the file's convention already sits COMMON at 10, so the raise asks for 11.
@@ -36,7 +34,7 @@ public class SkillLevelTableBoundTest {
     public void aRaisePastTheTableStopsAtTheTableAndTheSkillStillWorks() {
         Character pearl = CharacterFactory.create(PEARL, 80, false, null, null, 3);
         Battle battle = new Battle(List.of(pearl, CharacterFactory.create(ALLY, 80)),
-                List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+                List.of(BattleFixture.monster()), new Random(0));
         battle.startBattle();
         battle.processRequests();
         Character her = battle.characters.getFirst();
@@ -69,7 +67,7 @@ public class SkillLevelTableBoundTest {
     public void theBasicStillDealsDamageWhenTheRaiseWouldOvershoot() {
         Character pearl = CharacterFactory.create(PEARL, 80, false, null, null, 3);
         Battle battle = new Battle(List.of(pearl, CharacterFactory.create(ALLY, 80)),
-                List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+                List.of(BattleFixture.monster()), new Random(0));
         battle.startBattle();
         battle.processRequests();
         Character her = battle.characters.getFirst();
@@ -89,7 +87,7 @@ public class SkillLevelTableBoundTest {
     public void theConventionsOwnLevelIsInsideTheTable() {
         Character pearl = CharacterFactory.create(PEARL, 80, false, null, null, 0);
         Battle battle = new Battle(List.of(pearl, CharacterFactory.create(ALLY, 80)),
-                List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+                List.of(BattleFixture.monster()), new Random(0));
         battle.startBattle();
         battle.processRequests();
         Character her = battle.characters.getFirst();

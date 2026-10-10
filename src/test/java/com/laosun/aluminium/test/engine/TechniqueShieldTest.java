@@ -4,8 +4,8 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -21,14 +21,12 @@ public class TechniqueShieldTest {
     private static final int GEPARD = 1104;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-
-    /** Note: "为我方全体提供…等同于杰帕德24%防御力+150伤害的护盾，持续2回合". */
+        /** Note: "为我方全体提供…等同于杰帕德24%防御力+150伤害的护盾，持续2回合". */
     @Test
     public void aDeclaredTechniqueShieldsTheParty() {
         Character gepard = CharacterFactory.create(GEPARD, LEVEL);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(gepard, ally), List.of(enemy), fixed());
         battle.markTechniqueUsed(gepard);
 
@@ -45,7 +43,7 @@ public class TechniqueShieldTest {
     public void withoutTheTechniqueNobodyIsShielded() {
         Character gepard = CharacterFactory.create(GEPARD, LEVEL);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(gepard, ally), List.of(enemy), fixed());
 
         battle.startBattle();

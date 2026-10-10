@@ -5,8 +5,8 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -19,13 +19,11 @@ import java.util.Random;
 public class BlackSwanTest {
     private static final int BLACK_SWAN = 1307;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-
-    /** Note: One Arcana per Skill, stopped at the document's fifty, and exactly 20.80% of the enemy's own defence. */
+        /** Note: One Arcana per Skill, stopped at the document's fifty, and exactly 20.80% of the enemy's own defence. */
     @Test
     public void theSkillStacksArcanaAndShredsDefence() {
         Character blackSwan = CharacterFactory.create(BLACK_SWAN, LEVEL);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(blackSwan), List.of(enemy), fixed());
         battle.startBattle();
         double defenceBefore = enemy.getAttribute(AttributeType.DEFENCE).get();

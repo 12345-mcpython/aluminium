@@ -3,8 +3,8 @@ package com.laosun.aluminium.test.content.characters;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -35,8 +35,7 @@ import java.util.Random;
 public class SilverWolfLV999LootPickTest {
     private static final int WOLF = 1506;
     private static final int ALLY = 1204;
-    private static final int MONSTER = 1002011;
-    private static final String LAUGH = "笑点";
+        private static final String LAUGH = "笑点";
     /**
      * What the scripted roll answers with: a value inside the effect's WEIGHT bucket.
      *
@@ -154,7 +153,7 @@ public class SilverWolfLV999LootPickTest {
     private static Battle battle(ScriptedRng rng, int enemies) {
         List<com.laosun.aluminium.models.enemy.Enemy> roster = new java.util.ArrayList<>();
         for (int i = 0; i < enemies; i++) {
-            roster.add(EnemyFactory.create(MONSTER, 90, 1));
+            roster.add(BattleFixture.monster());
         }
         Battle battle = new Battle(
                 List.of(CharacterFactory.create(WOLF, 80), CharacterFactory.create(ALLY, 80)), roster, rng);

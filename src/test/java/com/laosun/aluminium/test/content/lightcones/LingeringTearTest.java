@@ -2,6 +2,7 @@ package com.laosun.aluminium.test.content.lightcones;
 
 
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.AttributeType;
@@ -10,7 +11,6 @@ import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.Weapon;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -31,8 +31,7 @@ public class LingeringTearTest {
     private static final int WEARER = 1205;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-    private static final int THRESHOLD = 10;
+        private static final int THRESHOLD = 10;
     private static final double BONUS = 0.2;
     private static final String LAUGHTER = "笑点";
 
@@ -43,7 +42,7 @@ public class LingeringTearTest {
         wearer = withCone
                 ? CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(CONE, LEVEL, false, 1))
                 : CharacterFactory.create(WEARER, LEVEL);
-        enemy = EnemyFactory.create(MONSTER, 90, 1);
+        enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(wearer), List.of(enemy), new Random(0));
         battle.startBattle();
         return battle;
@@ -150,7 +149,7 @@ public class LingeringTearTest {
         var watch = TriggerSpecs.rule("RESOURCE_CHANGED", List.of("actor == self"),
                 TriggerSpecs.modifyAttr("CRIT_ATTACK", BONUS, 3));
         unit.setTriggerTable(new TriggerTable(ALLY, List.of(pour, watch)));
-        Enemy target = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy target = BattleFixture.monster();
         Battle battle = new Battle(List.of(unit), List.of(target), new Random(0));
         battle.startBattle();
         double base = unit.getAttribute(AttributeType.CRIT_ATTACK).get();

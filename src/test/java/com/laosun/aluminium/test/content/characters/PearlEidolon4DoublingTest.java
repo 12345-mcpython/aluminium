@@ -5,8 +5,8 @@ import com.laosun.aluminium.enums.SkillCategory;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -33,9 +33,7 @@ public class PearlEidolon4DoublingTest {
     private static final int PEARL = 1503;
     private static final int ELATION = 1502;
     private static final int HUNTER = 1204;
-    private static final int MONSTER = 1002011;
-
-    /**
+        /**
      * At E4 the arming pays twice what it pays at E3 - the two ranks whose Elation-skill level is the SAME.
      *
      * <p>Note: Why E3 is the control rather than E0, which is what the first version used. Eidolon 3 grants
@@ -129,7 +127,7 @@ public class PearlEidolon4DoublingTest {
             team.add(CharacterFactory.create(ELATION, 80));
         }
         team.add(CharacterFactory.create(HUNTER, 80));
-        Battle battle = new Battle(team, List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+        Battle battle = new Battle(team, List.of(BattleFixture.monster()), new Random(0));
         battle.startBattle();
         battle.processRequests();
         Character pearl = battle.characters.get(0);

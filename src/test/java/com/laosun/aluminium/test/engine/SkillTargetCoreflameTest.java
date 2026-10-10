@@ -4,10 +4,10 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.models.skill.Skill;
 import com.laosun.aluminium.models.skill.SkillExecutor;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -25,8 +25,7 @@ public class SkillTargetCoreflameTest {
     private static final double EPS = 1e-9;
     private static final int OWNER = 1408;
     private static final int SUPPORT = 1414;
-    private static final int MONSTER = 1002011;
-    private static final String COREFLAME = "火种";
+        private static final String COREFLAME = "火种";
 
     /** Aimed at: she gains a point of Coreflame and 30% crit damage. */
     @Test
@@ -51,7 +50,7 @@ public class SkillTargetCoreflameTest {
         Character owner = CharacterFactory.create(OWNER, 80, false, null, null, 0);
         Character support = CharacterFactory.create(SUPPORT, 80, false, null, null, 0);
         Battle battle = new Battle(List.of(owner, support),
-                List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+                List.of(BattleFixture.monster()), new Random(0));
         battle.startBattle();
         battle.processRequests();
 

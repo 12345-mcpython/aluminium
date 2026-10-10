@@ -7,8 +7,8 @@ import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Damage;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -30,14 +30,12 @@ public class LowHpAggroTraceTest {
     private static final int[] OWNERS = {1002, 1102, 1206};
     private static final int ALLY = 1210;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-
-    @Test
+        @Test
     public void theLowHpTraceHalvesTheWeightAndComesBackOnHealing() {
         for (int cid : OWNERS) {
             Character owner = CharacterFactory.create(cid, LEVEL);
             Character ally = CharacterFactory.create(ALLY, LEVEL);
-            Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+            Enemy enemy = BattleFixture.monster();
             Battle battle = new Battle(List.of(owner, ally), List.of(enemy), new Random(0));
             battle.startBattle();
             double full = battle.aggroOf(owner);

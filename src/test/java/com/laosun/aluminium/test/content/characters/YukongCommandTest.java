@@ -7,8 +7,8 @@ import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -28,9 +28,7 @@ public class YukongCommandTest {
     private static final int YUKONG = 1207;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-
-    /** The Skill grants two layers and the party boost; the layers are one buff each. */
+        /** The Skill grants two layers and the party boost; the layers are one buff each. */
     @Test
     public void herSkillGrantsTwoLayersAndThePartyBoost() {
         Fixture f = new Fixture();
@@ -109,7 +107,7 @@ public class YukongCommandTest {
     private static final class Fixture {
         private final Character yukong = CharacterFactory.create(YUKONG, LEVEL);
         private final Character ally = CharacterFactory.create(ALLY, LEVEL);
-        private final Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        private final Enemy enemy = BattleFixture.monster();
         private final Battle battle = new Battle(List.of(yukong, ally), List.of(enemy), fixed());
 
         private Fixture() {

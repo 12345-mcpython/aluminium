@@ -2,13 +2,13 @@ package com.laosun.aluminium.test.content.lightcones;
 
 
 import com.laosun.aluminium.test.engine.OncePerAttackLimitTest;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.Weapon;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -26,12 +26,10 @@ public class ReturnToDarknessTest {
     private static final int CONE = 21031;
     private static final int WEARER = 1205;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-
-    @Test
+        @Test
     public void theSpecCarriesTheOpTheChanceAndThePerAttackLimit() {
         Character unit = CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(CONE, LEVEL, false, 1));
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         int pinned = 0;
         for (var rule : unit.getTriggerTable().matching(TriggerEvent.CRIT_DEALT,
                 new TriggerTable.TriggerContext(unit, unit, enemy, 0, 0))) {

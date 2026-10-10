@@ -11,8 +11,8 @@ import com.laosun.aluminium.models.DoubleValue;
 import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.buff.StateBuff;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -29,12 +29,10 @@ public class RobinAuraTest {
     private static final int OWNER = 1309;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-
-    @Test
+        @Test
     public void theAuraNamesTheFollowUpScopeAndShare() {
         Character owner = CharacterFactory.create(OWNER, LEVEL);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         owner.getBuffManager().addBuff(new StateBuff("协奏", 3, true));
         int seen = 0;
         for (var rule : owner.getTriggerTable().matching(TriggerEvent.DEALING_DAMAGE,
@@ -56,7 +54,7 @@ public class RobinAuraTest {
     public void anAlliesFollowUpIsBoostedByTheOwnersAura() {
         Character owner = CharacterFactory.create(OWNER, LEVEL);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(owner, ally), List.of(enemy), new Random(0));
         battle.startBattle();
         owner.getBuffManager().addBuff(new StateBuff("协奏", 3, true));
@@ -78,7 +76,7 @@ public class RobinAuraTest {
     public void theAuraIsInertWithoutTheState() {
         Character owner = CharacterFactory.create(OWNER, LEVEL);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(owner, ally), List.of(enemy), new Random(0));
         battle.startBattle();
         ally.getAttribute(AttributeType.CRIT_CHANCE)

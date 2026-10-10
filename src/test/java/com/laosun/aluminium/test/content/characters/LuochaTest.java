@@ -6,8 +6,8 @@ import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -25,9 +25,7 @@ public class LuochaTest {
     private static final int LUOCHA = 1203;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-
-    /** Note: "并使罗刹获得1层[白花之刻]" (and gives Luocha 1 stack of [白花之刻], Abyss Flower): one stack per skill cast, on himself. */
+        /** Note: "并使罗刹获得1层[白花之刻]" (and gives Luocha 1 stack of [白花之刻], Abyss Flower): one stack per skill cast, on himself. */
     @Test
     public void hisSkillAddsOneAbyssFlowerStack() {
         Fixture f = new Fixture();
@@ -51,7 +49,7 @@ public class LuochaTest {
     private static final class Fixture {
         private final Character luocha = CharacterFactory.create(LUOCHA, LEVEL);
         private final Character ally = CharacterFactory.create(ALLY, LEVEL);
-        private final Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        private final Enemy enemy = BattleFixture.monster();
         private final Battle battle = new Battle(List.of(luocha, ally), List.of(enemy), new Random() {
             @Override
             public double nextDouble() {

@@ -2,12 +2,12 @@ package com.laosun.aluminium.test.content.characters;
 
 
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.TriggerTable;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -23,9 +23,7 @@ public class EvanesciaTest {
     private static final int WEARER = 1505;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-
-    private static EffectSpec derive() {
+        private static EffectSpec derive() {
         EffectSpec spec = new EffectSpec();
         TriggerSpecs.set(spec, "op", "GAIN_RESOURCE");
         TriggerSpecs.set(spec, "resource", "欢愉度");
@@ -48,7 +46,7 @@ public class EvanesciaTest {
     public void theTalentDerivesTheElationValueAndTheTechniqueGivesTwenty() {
         Character elation = CharacterFactory.create(WEARER, LEVEL);
         Battle battle = new Battle(List.of(elation, CharacterFactory.create(ALLY, LEVEL)),
-                List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+                List.of(BattleFixture.monster()), new Random(0));
         double critDamage = elation.getAttribute(AttributeType.CRIT_ATTACK).get();
         battle.startBattle();
         int elationValue = elation.getResources().value("欢愉度");
@@ -67,7 +65,7 @@ public class EvanesciaTest {
                 TriggerSpecs.rule("BATTLE_START", List.of(), raiseCritDamage()),
                 TriggerSpecs.rule("BATTLE_START", List.of(), derive()))));
         Battle battle = new Battle(List.of(elation, CharacterFactory.create(ALLY, LEVEL)),
-                List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+                List.of(BattleFixture.monster()), new Random(0));
         battle.startBattle();
         double critDamage = elation.getAttribute(AttributeType.CRIT_ATTACK).get();
         int elationValue = elation.getResources().value("欢愉度");

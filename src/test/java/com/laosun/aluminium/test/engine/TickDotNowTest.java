@@ -2,6 +2,7 @@ package com.laosun.aluminium.test.engine;
 
 
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
@@ -11,7 +12,6 @@ import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.buff.DotBuff;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -31,9 +31,7 @@ public class TickDotNowTest {
     /** Himeko: no shipped rule file, so the table under test is the only one. */
     private static final int OWNER = 1003;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-
-    /** Note: The extra instance is exactly {@code percent} of what the state was dealing. */
+        /** Note: The extra instance is exactly {@code percent} of what the state was dealing. */
     @Test
     public void theExtraInstanceIsAShareOfTheState() {
         Fixture f = new Fixture();
@@ -93,7 +91,7 @@ public class TickDotNowTest {
 
     private static final class Fixture {
         private final Character owner = CharacterFactory.create(OWNER, LEVEL);
-        private final Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        private final Enemy enemy = BattleFixture.monster();
         private final Battle battle = new Battle(List.of(owner), List.of(enemy), new Random() {
             @Override
             public double nextDouble() {

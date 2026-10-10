@@ -4,8 +4,8 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -27,8 +27,7 @@ public class UltElationBranchTest {
     private static final int CASTER = 8009;
     private static final int TARGET = 1505;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-    private static final String LAUGH = "笑点";
+        private static final String LAUGH = "笑点";
     private static final String GIFT = "好活当赏";
 
     /** "Gains 5 Punchline point(s)" -- onto the SHARED party counter. */
@@ -84,7 +83,7 @@ public class UltElationBranchTest {
     private static Scene fight() {
         Character caster = CharacterFactory.create(CASTER, LEVEL, false, null, null, 0);
         Character target = CharacterFactory.create(TARGET, LEVEL, false, null, null, 0);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(caster, target), List.of(enemy), new Random(0));
         battle.startBattle();
         battle.processRequests();

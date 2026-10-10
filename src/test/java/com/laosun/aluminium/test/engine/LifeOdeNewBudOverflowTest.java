@@ -1,9 +1,9 @@
 package com.laosun.aluminium.test.engine;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.models.skill.SkillExecutor;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import java.util.List;
@@ -19,8 +19,7 @@ public class LifeOdeNewBudOverflowTest {
     private static final int LEVEL = 80;
     private static final int CASTORICE = 1407;
     private static final int CYRENE = 1415;
-    private static final int MONSTER = 1002011;
-    private static final int ODE_SLOT = 17;
+        private static final int ODE_SLOT = 17;
     private static final String BUD = "新蕊";
     private static final int MAX = 34000;
     private static final int OVERFLOW = 680;
@@ -39,7 +38,7 @@ public class LifeOdeNewBudOverflowTest {
         Character cyrene = CharacterFactory.create(CYRENE, LEVEL);
         Character her = CharacterFactory.create(CASTORICE, LEVEL);
         Battle battle = new Battle(List.of(cyrene, her),
-                List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+                List.of(BattleFixture.monster()), new Random(0));
         battle.startBattle();
         battle.processRequests();
         cyrene = battle.characters.get(0);

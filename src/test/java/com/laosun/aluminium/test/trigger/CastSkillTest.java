@@ -2,6 +2,7 @@ package com.laosun.aluminium.test.trigger;
 
 
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.SkillType;
@@ -10,7 +11,6 @@ import com.laosun.aluminium.models.CanHit;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -42,8 +42,7 @@ import java.util.Random;
  */
 public class CastSkillTest {
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-    /** Himeko (姬子): damage whose number we do not care about, used as the rule owner wherever the owner must not matter. */
+        /** Himeko (姬子): damage whose number we do not care about, used as the rule owner wherever the owner must not matter. */
     private static final int OWNER = 1003;
     /** Dan Heng (丹恒): the unit being commanded. His ULTRA is a damaging single-target skill. */
     private static final int CASTER = 1002;
@@ -92,7 +91,7 @@ public class CastSkillTest {
         } else {
             owner.setTriggerTable(TriggerTable.EMPTY);
         }
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(owner, caster), List.of(enemy), new Random(0));
         battle.startBattle();
         double before = enemy.getCurrentHp();
@@ -122,9 +121,9 @@ public class CastSkillTest {
         Assertions.assertEquals(com.laosun.aluminium.enums.SkillEffectType.BLAST, data.getEffect(),
                 "precondition: Mydei (万敌)'s SKILL is the blast this case is about");
 
-        Enemy left = EnemyFactory.create(MONSTER, 90, 1);
-        Enemy centre = EnemyFactory.create(MONSTER, 90, 1);
-        Enemy right = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy left = BattleFixture.monster();
+        Enemy centre = BattleFixture.monster();
+        Enemy right = BattleFixture.monster();
         Battle battle = new Battle(List.of(owner, caster), List.of(left, centre, right), new Random(0));
         battle.startBattle();
         double[] before = {left.getCurrentHp(), centre.getCurrentHp(), right.getCurrentHp()};
@@ -191,7 +190,7 @@ public class CastSkillTest {
         owner.setTriggerTable(new TriggerTable(OWNER, rules));
 
         Character caster = CharacterFactory.create(ELATION_CASTER, LEVEL);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(owner, caster), List.of(enemy), new Random(0));
         battle.startBattle();
         double before = enemy.getCurrentHp();
@@ -207,7 +206,7 @@ public class CastSkillTest {
     @Test
     public void hisTurnStartAutoCastDealsDamage() {
         Character him = CharacterFactory.create(BLAST_CASTER, LEVEL);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(him), List.of(enemy), new Random(0));
         battle.startBattle();
         // Note: "[血仇]状态期间…自身回合开始时自动施放[弑王成王]": the gate is part of the sentence, so the scene
@@ -227,7 +226,7 @@ public class CastSkillTest {
     @Test
     public void hisUltimateCommandsHisTalentRightNow() {
         Character him = CharacterFactory.create(1504, LEVEL);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(him), List.of(enemy), new Random(0));
         battle.startBattle();
 
@@ -275,7 +274,7 @@ public class CastSkillTest {
         // Note: Read BEFORE the battle starts: the shield is computed inside the cast, i.e. BEFORE the post-cast
         // SKILL_CAST event that raises his ATK by the Shenxiu (神秀) trace -- so the number to compare against is this one.
         double attackBefore = him.getAttribute(com.laosun.aluminium.enums.AttributeType.ATTACK).get();
-        Battle battle = new Battle(List.of(ally, him), List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+        Battle battle = new Battle(List.of(ally, him), List.of(BattleFixture.monster()), new Random(0));
         battle.markTechniqueUsed(him);
         double pointsBefore = battle.getSkillPoints();
         battle.startBattle();
@@ -319,7 +318,7 @@ public class CastSkillTest {
         Character owner = CharacterFactory.create(OWNER, LEVEL);
         owner.setTriggerTable(new TriggerTable(OWNER, List.of(command("SKILL"))));
         Character caster = CharacterFactory.create(UNDELIVERABLE, LEVEL);
-        Battle battle = new Battle(List.of(owner, caster), List.of(EnemyFactory.create(MONSTER, 90, 1)),
+        Battle battle = new Battle(List.of(owner, caster), List.of(BattleFixture.monster()),
                 new Random(0));
         battle.startBattle();
 

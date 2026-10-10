@@ -4,8 +4,8 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Signal;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -26,8 +26,7 @@ public class MooncocoonTest {
     private static final int OWNER = 1407;
     private static final int HEALER = 1211;
     private static final int VICTIM = 1002;
-    private static final int MONSTER = 1002011;
-    private static final String STATE = "月茧";
+        private static final String STATE = "月茧";
 
     /** "暂时延后陷入无法战斗状态": the blow is HELD -- the victim is alive, at zero HP, carrying the trace. */
     @Test
@@ -85,7 +84,7 @@ public class MooncocoonTest {
         Character owner = CharacterFactory.create(OWNER, 80, false, null, null, 0);
         Character victim = CharacterFactory.create(VICTIM, 80, false, null, null, 0);
         Battle battle = new Battle(List.of(owner, victim),
-                List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+                List.of(BattleFixture.monster()), new Random(0));
         battle.startBattle();
         battle.processRequests();
         return new Scene(battle, victim);
@@ -97,7 +96,7 @@ public class MooncocoonTest {
         Character healer = CharacterFactory.create(HEALER, 80, false, null, null, 0);
         Character victim = CharacterFactory.create(VICTIM, 80, false, null, null, 0);
         Battle battle = new Battle(List.of(owner, healer, victim),
-                List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+                List.of(BattleFixture.monster()), new Random(0));
         battle.startBattle();
         battle.processRequests();
         return new Scene(battle, victim);

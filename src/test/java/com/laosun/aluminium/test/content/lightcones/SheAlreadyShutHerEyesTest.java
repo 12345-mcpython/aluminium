@@ -2,6 +2,7 @@ package com.laosun.aluminium.test.content.lightcones;
 
 
 import com.laosun.aluminium.test.engine.WaveManagerTest;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.DamageType;
@@ -11,7 +12,6 @@ import com.laosun.aluminium.models.Damage;
 import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.Weapon;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -31,8 +31,7 @@ public class SheAlreadyShutHerEyesTest {
     private static final int WEARER = 1205;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-    private static final double SHARE = 0.8;
+        private static final double SHARE = 0.8;
 
     private Character wearer;
     private Character ally;
@@ -43,7 +42,7 @@ public class SheAlreadyShutHerEyesTest {
                 ? CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(CONE, LEVEL, false, 1))
                 : CharacterFactory.create(WEARER, LEVEL);
         ally = CharacterFactory.create(ALLY, LEVEL);
-        enemy = EnemyFactory.create(MONSTER, 90, 1);
+        enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(wearer, ally), List.of(enemy), new Random(0));
         battle.startBattle();
         return battle;
@@ -105,7 +104,7 @@ public class SheAlreadyShutHerEyesTest {
         Character waveAlly = CharacterFactory.create(ALLY, LEVEL);
         Battle battle = new Battle(List.of(waveWearer, waveAlly), new java.util.ArrayList<>(), new Random(0));
         new com.laosun.aluminium.models.WaveManager(battle, stage);
-        Enemy source = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy source = BattleFixture.monster();
         battle.applyDamage(waveAlly, new Damage(source, waveAlly, DamageElement.FIRE, DamageType.NORMAL, 400));
         double lost = waveAlly.getMaxHp() - waveAlly.getCurrentHp();
         double before = waveAlly.getCurrentHp();

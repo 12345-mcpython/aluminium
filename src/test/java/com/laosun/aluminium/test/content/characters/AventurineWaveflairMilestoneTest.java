@@ -5,8 +5,8 @@ import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -31,8 +31,7 @@ import java.util.Random;
 public class AventurineWaveflairMilestoneTest {
     private static final int OWNER = 1513;
     private static final int ALLY = 1505;              // an Elation ally: their cast must not touch HER counter
-    private static final int MONSTER = 1002011;
-    private static final String FERVOR = "热意";
+        private static final String FERVOR = "热意";
     private static final int THRESHOLD = 10;
     private static final int FIXED_LAUGHS = 20;
 
@@ -154,7 +153,7 @@ public class AventurineWaveflairMilestoneTest {
         wolf.setAttribute(com.laosun.aluminium.enums.AttributeType.CRIT_CHANCE,
                 new com.laosun.aluminium.models.DoubleValue(0));
         ally = CharacterFactory.create(ALLY, 80);
-        enemy = EnemyFactory.create(MONSTER, 90, 1);
+        enemy = BattleFixture.monster();
         battle = new Battle(List.of(wolf, ally), List.of(enemy), new Random(0));
         battle.startBattle();
         battle.processRequests();

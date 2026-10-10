@@ -2,6 +2,7 @@ package com.laosun.aluminium.test.engine;
 
 
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
@@ -10,7 +11,6 @@ import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -30,14 +30,13 @@ import java.util.Random;
  */
 public class TimedWeaknessTest {
     private static final int WEARER = 1006;
-    private static final int MONSTER = 1002011;
-    private static final int LEVEL = 80;
+        private static final int LEVEL = 80;
     private static final int TURNS = 2;
 
     @Test
     public void anInsertedWeaknessExpiresInItsOwnTurns() {
         Character wearer = CharacterFactory.create(WEARER, LEVEL);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         // Note: Do not hard-code the element: pick one this enemy does not have. Hard-coding it would make the judge depend on its attribute table
         // (measured: 1002011 already has Fire, and the first run was stopped by exactly this precondition).
         DamageElement chosen = null;
@@ -87,7 +86,7 @@ public class TimedWeaknessTest {
      */
     @Test
     public void theEnemySideRunsDownOnItsOwn() {
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         DamageElement chosen = null;
         for (DamageElement each : DamageElement.values()) {
             if (!enemy.isWeakTo(each)) {

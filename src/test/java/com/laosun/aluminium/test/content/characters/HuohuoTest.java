@@ -8,8 +8,8 @@ import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -30,9 +30,7 @@ public class HuohuoTest {
     private static final int HUOHUO = 1217;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-
-    /** The state she applies to herself, on her own clock. */
+        /** The state she applies to herself, on her own clock. */
     @Test
     public void herSkillGrantsTheStateToHerself() {
         Fixture f = new Fixture();
@@ -99,7 +97,7 @@ public class HuohuoTest {
     private static final class Fixture {
         private final Character huohuo = CharacterFactory.create(HUOHUO, LEVEL);
         private final Character ally = CharacterFactory.create(ALLY, LEVEL);
-        private final Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        private final Enemy enemy = BattleFixture.monster();
         private final Battle battle = new Battle(List.of(huohuo, ally), List.of(enemy), fixed());
 
         private Fixture() {

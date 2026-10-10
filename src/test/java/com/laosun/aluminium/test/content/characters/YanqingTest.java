@@ -5,8 +5,8 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -19,13 +19,11 @@ import java.util.Random;
 public class YanqingTest {
     private static final int YANQING = 1209;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-
-    /** Note: The Skill applies the state AND its two modifiers, all on himself, all for the document's one turn. */
+        /** Note: The Skill applies the state AND its two modifiers, all on himself, all for the document's one turn. */
     @Test
     public void theSkillSyncsAndRaisesBothCritStats() {
         Character yanqing = CharacterFactory.create(YANQING, LEVEL);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(yanqing), List.of(enemy), fixed(0.0));
         battle.startBattle();
         double critBefore = yanqing.getAttribute(AttributeType.CRIT_CHANCE).get();
@@ -68,7 +66,7 @@ public class YanqingTest {
     /** The Ultimate's CRIT DMG gain, with the state applied first when asked. */
     private static double ultCritDamageGain(boolean synced) {
         Character yanqing = CharacterFactory.create(YANQING, LEVEL);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(yanqing), List.of(enemy), fixed(0.0));
         battle.startBattle();
         if (synced) {
@@ -83,7 +81,7 @@ public class YanqingTest {
     /** The damage the follow-up deals on one attack, under a chosen roll. */
     private static double followUpLoss(double roll) {
         Character yanqing = CharacterFactory.create(YANQING, LEVEL);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(yanqing), List.of(enemy), fixed(roll));
         battle.startBattle();
         double before = enemy.getCurrentHp();

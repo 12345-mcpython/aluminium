@@ -7,8 +7,8 @@ import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Signal;
 import com.laosun.aluminium.models.Weapon;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -27,9 +27,7 @@ public class ConePassiveGroupTest {
     private static final int WEARER = 1001;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-
-    @Test
+        @Test
     public void cone21003GivesAttackAlwaysAndCritOnlyAgainstTwoOrFewer() {
         double base = base(21003, 1, AttributeType.ATTACK);
         Assertions.assertEquals(0.16 * base, gain(21003, 1, AttributeType.ATTACK, 1), 1e-3,
@@ -50,7 +48,7 @@ public class ConePassiveGroupTest {
     public void cone21007GivesHealingAndPartyEnergyOnASkill() {
         Character unit = wearer(21007, 1);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
-        Enemy target = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy target = BattleFixture.monster();
         Battle battle = new Battle(List.of(unit, ally), List.of(target), new Random(0));
         double healBoost = unit.getAttribute(AttributeType.OUTGOING_HEALING_BOOST).get();
         double allyEnergy = ally.getCurrentEnergy();
@@ -76,7 +74,7 @@ public class ConePassiveGroupTest {
         Character unit = wearer(cone, rank);
         List<Enemy> list = new ArrayList<>();
         for (int i = 0; i < enemies; i++) {
-            list.add(EnemyFactory.create(MONSTER, 90, 1));
+            list.add(BattleFixture.monster());
         }
         Battle battle = new Battle(List.of(unit), list, new Random(0));
         double before = unit.getAttribute(attribute).get();

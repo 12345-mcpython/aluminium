@@ -7,8 +7,8 @@ import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Signal;
 import com.laosun.aluminium.models.Weapon;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -24,12 +24,10 @@ import java.util.Random;
 public class ShadowedByNightTest {
     private static final int WEARER = 1001;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-
-    @Test
+        @Test
     public void cone21047GivesBreakEffectAndSpeedAtBattleStart() {
         Character unit = wearer();
-        Battle battle = battle(unit, EnemyFactory.create(MONSTER, 90, 1));
+        Battle battle = battle(unit, BattleFixture.monster());
         double breakBefore = unit.getAttribute(AttributeType.BREAKING_EFFECT).get();
         double speedBefore = unit.getAttribute(AttributeType.SPEED).get();
         battle.startBattle();
@@ -43,7 +41,7 @@ public class ShadowedByNightTest {
     @Test
     public void cone21047GrantsSpeedOnABreakButOnlyOnceATurn() {
         Character unit = wearer();
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = battle(unit, enemy);
         battle.startBattle();
         battle.currentMove = new Signal(unit);
@@ -57,7 +55,7 @@ public class ShadowedByNightTest {
     @Test
     public void cone21047GrantsSpeedOnABreakInAFreshBattle() {
         Character unit = wearer();
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = battle(unit, enemy);
         battle.currentMove = new Signal(unit);
         battle.beforeMove();

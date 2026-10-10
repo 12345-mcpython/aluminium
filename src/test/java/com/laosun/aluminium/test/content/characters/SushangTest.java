@@ -6,8 +6,8 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -23,9 +23,7 @@ import java.util.Random;
 public class SushangTest {
     private static final int SUSHANG = 1206;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-
-    /** Note: "当场上有敌方目标的弱点被击破": the BREAK event, which fires with the broken unit as its target. */
+        /** Note: "当场上有敌方目标的弱点被击破": the BREAK event, which fires with the broken unit as its target. */
     @Test
     public void aWeaknessBreakRaisesHerSpeed() {
         Fixture f = new Fixture();
@@ -50,7 +48,7 @@ public class SushangTest {
 
     private static final class Fixture {
         private final Character sushang = CharacterFactory.create(SUSHANG, LEVEL);
-        private final Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        private final Enemy enemy = BattleFixture.monster();
         private final Battle battle = new Battle(List.of(sushang), List.of(enemy), new Random() {
             @Override
             public double nextDouble() {

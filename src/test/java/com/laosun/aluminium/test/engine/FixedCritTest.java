@@ -2,6 +2,7 @@ package com.laosun.aluminium.test.engine;
 
 
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
@@ -12,7 +13,6 @@ import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.DoubleValue;
 import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -36,9 +36,7 @@ public class FixedCritTest {
 
     private static final int MARCH = 1001;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-
-    /** With {@code crit_rate: 1} the instance crits even though the RNG never would. */
+        /** With {@code crit_rate: 1} the instance crits even though the RNG never would. */
     @Test
     public void theInstanceCritsAlthoughTheRollWouldNot() {
         double normal = damage(null, null);
@@ -94,7 +92,7 @@ public class FixedCritTest {
     private static double damage(Double critRate, Double critDamage) {
         Character hero = CharacterFactory.create(MARCH, LEVEL);
         hero.setTriggerTable(new TriggerTable(MARCH, List.of(rule(critRate, critDamage))));
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         enemy.setAttribute(AttributeType.EFFECT_RESISTANCE, new DoubleValue(0));
         Battle battle = new Battle(List.of(hero), List.of(enemy), fixed());
         battle.startBattle();

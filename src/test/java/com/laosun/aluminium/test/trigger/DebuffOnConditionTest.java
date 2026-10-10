@@ -2,6 +2,7 @@ package com.laosun.aluminium.test.trigger;
 
 
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
@@ -9,7 +10,6 @@ import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.DoubleValue;
 import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -28,8 +28,7 @@ public class DebuffOnConditionTest {
     private static final int UNIT = 1205;
     private static final int OTHER = 1002;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-    private static final int MODIFIER_ID = 990001;
+        private static final int MODIFIER_ID = 990001;
 
     private Character owner;
     private Enemy enemy;
@@ -37,7 +36,7 @@ public class DebuffOnConditionTest {
 
     private void build(String condition) {
         owner = CharacterFactory.create(UNIT, LEVEL);
-        enemy = EnemyFactory.create(MONSTER, 90, 1);
+        enemy = BattleFixture.monster();
         // The proven spelling: a bare EffectSpec filled through TriggerSpecs.set (TriggerSpecs.effect has no
         // (op, key, value) overload -- measured).
         var pay = new com.laosun.aluminium.beans.EffectSpec();

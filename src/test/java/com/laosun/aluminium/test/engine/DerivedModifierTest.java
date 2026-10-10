@@ -2,6 +2,7 @@ package com.laosun.aluminium.test.engine;
 
 
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
@@ -12,7 +13,6 @@ import com.laosun.aluminium.models.DoubleValue;
 import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.buff.StatModifierBuff;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -53,9 +53,7 @@ public class DerivedModifierTest {
     /** The Dahlia (大丽花) - her trace is the first content that needs this. */
     private static final int DAHLIA = 1321;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-
-    private static final double OWNER_BREAK = 2.0;
+        private static final double OWNER_BREAK = 2.0;
 
     // ==================================================================
     // 1. The arithmetic
@@ -345,6 +343,6 @@ public class DerivedModifierTest {
     }
 
     private static Enemy dummy() {
-        return EnemyFactory.create(MONSTER, 90, 1);
+        return BattleFixture.monster();
     }
 }

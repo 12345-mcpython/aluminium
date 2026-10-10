@@ -2,6 +2,7 @@ package com.laosun.aluminium.test.content.lightcones;
 
 
 import com.laosun.aluminium.test.trigger.CastTargetTest;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
@@ -10,7 +11,6 @@ import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Signal;
 import com.laosun.aluminium.models.Weapon;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -25,12 +25,10 @@ import java.util.Random;
 public class MultiplicationAndSubscribeForMoreTest {
     private static final int WEARER = 1001;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-
-    @Test
+        @Test
     public void theBasicAttackAdvancesTheWearersNextAction() {
         Character unit = CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(20015, LEVEL, false, 5));
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(unit), List.of(enemy), new Random(0));
         battle.startBattle();
         battle.currentMove = new Signal(unit);
@@ -48,7 +46,7 @@ public class MultiplicationAndSubscribeForMoreTest {
     @Test
     public void theConeRaisesBothBasicAndSkillDamage() {
         Character unit = CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(21017, LEVEL, false, 5));
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(unit), List.of(enemy), new Random(0));
         double basicBefore = unit.getAttribute(AttributeType.BASIC_ATTACK_DAMAGE_BOOST).get();
         double skillBefore = unit.getAttribute(AttributeType.SKILL_DAMAGE_BOOST).get();

@@ -8,8 +8,8 @@ import com.laosun.aluminium.models.Signal;
 import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.Weapon;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -22,9 +22,7 @@ public class DanceDanceDanceTest {
     private static final int WEARER = 1205;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-
-    /** Copied from the existing ADVANCE test: a unit's remaining time in the action queue. */
+        /** Copied from the existing ADVANCE test: a unit's remaining time in the action queue. */
     private static double timeRemaining(Battle battle, CanHit target) {
         for (Signal signal : battle.queue.snapshot()) {
             if (signal.getCanHit() == target) {
@@ -56,7 +54,7 @@ public class DanceDanceDanceTest {
     public void thePartyActsEarlierAndABattleWithoutTheConeDoesNot() {
         Character wearer = CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(CONE, LEVEL, false, 1));
         Character ally = CharacterFactory.create(ALLY, LEVEL);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(wearer, ally), List.of(enemy), new Random(0));
         battle.startBattle();
         double before = timeRemaining(battle, ally);
@@ -69,7 +67,7 @@ public class DanceDanceDanceTest {
 
         Character plainAlly = CharacterFactory.create(ALLY, LEVEL);
         Character plainWearer = CharacterFactory.create(WEARER, LEVEL);
-        Enemy other = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy other = BattleFixture.monster();
         Battle plain = new Battle(List.of(plainWearer, plainAlly), List.of(other), new Random(0));
         plain.startBattle();
         double plainBefore = timeRemaining(plain, plainAlly);

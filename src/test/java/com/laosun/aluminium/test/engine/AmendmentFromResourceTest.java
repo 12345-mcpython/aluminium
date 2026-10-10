@@ -1,6 +1,7 @@
 package com.laosun.aluminium.test.engine;
 
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
@@ -8,7 +9,6 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.TriggerTable;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -21,8 +21,7 @@ import java.util.Random;
 public class AmendmentFromResourceTest {
     private static final int LEVEL = 80;
     private static final int SPARE = 1002;
-    private static final int MONSTER = 1002011;
-    private static final String SIZED_BY = "定大小的资源";
+        private static final String SIZED_BY = "定大小的资源";
     private static final String TARGET = "a_rule_with_a_percent";
 
     private static TriggerTable table() {
@@ -60,7 +59,7 @@ public class AmendmentFromResourceTest {
     private static double gained(int basisPoints) {
         Character spare = CharacterFactory.create(SPARE, LEVEL);
         Battle battle = new Battle(List.of(spare),
-                List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+                List.of(BattleFixture.monster()), new Random(0));
         battle.startBattle();
         battle.processRequests();
         spare = battle.characters.getFirst();

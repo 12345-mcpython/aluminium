@@ -7,8 +7,8 @@ import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -25,15 +25,14 @@ import java.util.Random;
 public class ImbibitorLunaeTest {
     private static final int DHIL = 1213;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-    private static final String OUTROAR = "亢心";
+        private static final String OUTROAR = "亢心";
     private static final String SQUAMA = "逆鳞";
 
     /** Note: "施放每段攻击后获得1层[亢心]…可叠加6层": the count reaches the cap and stops there. */
     @Test
     public void hisTalentStacksPerHitUpToTheCap() {
         Character dhil = CharacterFactory.create(DHIL, LEVEL);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(dhil), List.of(enemy), fixed());
         battle.startBattle();
         double boostBefore = dhil.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();

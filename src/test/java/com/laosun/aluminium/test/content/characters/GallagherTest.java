@@ -7,8 +7,8 @@ import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -26,9 +26,7 @@ public class GallagherTest {
     private static final int GALLAGHER = 1301;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-
-    /** The "秘技" (technique)'s in-battle half puts [酩酊] on the whole enemy side at battle start. */
+        /** The "秘技" (technique)'s in-battle half puts [酩酊] on the whole enemy side at battle start. */
     @Test
     public void theStateComesFromBattleStartToo() {
         Fixture f = new Fixture();
@@ -82,7 +80,7 @@ public class GallagherTest {
     private static final class Fixture {
         private final Character gallagher;
         private final Character ally = CharacterFactory.create(ALLY, LEVEL);
-        private final Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        private final Enemy enemy = BattleFixture.monster();
         private final Battle battle;
 
         private Fixture() {

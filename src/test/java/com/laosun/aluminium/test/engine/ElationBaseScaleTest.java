@@ -7,8 +7,8 @@ import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.TriggerTable;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -26,9 +26,7 @@ import java.util.Random;
  */
 public class ElationBaseScaleTest {
     private static final int PEARL = 1503;
-    private static final int MONSTER = 1002011;
-
-    @Test
+        @Test
     public void theBaseComesFromTheTableAndNotFromAttack() {
         double low = damageWithAttack(0.0);
         double high = damageWithAttack(2.0);
@@ -43,7 +41,7 @@ public class ElationBaseScaleTest {
     /** Fires a rule-driven ELATION instance and returns the damage the enemy took. */
     private static double damageWithAttack(double attackBoost) {
         Character pearl = CharacterFactory.create(PEARL, 80);
-        var enemy = EnemyFactory.create(MONSTER, 90, 1);
+        var enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(pearl, CharacterFactory.create(1204, 80)), List.of(enemy), new Random(0));
         battle.startBattle();
         battle.processRequests();

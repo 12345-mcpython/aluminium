@@ -5,8 +5,8 @@ import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.TriggerTable;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -25,9 +25,7 @@ import java.util.Random;
  */
 public class ElationAmpTest {
     private static final int PEARL = 1503;
-    private static final int MONSTER = 1002011;
-
-    @Test
+        @Test
     public void theAmpMultipliesWithElationBoostRatherThanAddingToIt() {
         // Note: The two granted attributes do NOT read the same against this fixture, and the difference is measured
         // rather than assumed. The fixture's baseline Elation is not zero (measured 0.1, and not from her own rules -
@@ -72,7 +70,7 @@ public class ElationAmpTest {
     private static double baselineElation() {
         Character pearl = CharacterFactory.create(PEARL, 80);
         Battle battle = new Battle(List.of(pearl, CharacterFactory.create(1204, 80)),
-                List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+                List.of(BattleFixture.monster()), new Random(0));
         battle.startBattle();
         battle.processRequests();
         return battle.characters.getFirst()
@@ -82,7 +80,7 @@ public class ElationAmpTest {
     /** Settles one rule-driven instance; `normal` picks the damage type, the two doubles grant the attributes. */
     private static double damage(boolean normal, double boost, double amp) {
         Character pearl = CharacterFactory.create(PEARL, 80);
-        var enemy = EnemyFactory.create(MONSTER, 90, 1);
+        var enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(pearl, CharacterFactory.create(1204, 80)), List.of(enemy), new Random(0));
         battle.startBattle();
         battle.processRequests();

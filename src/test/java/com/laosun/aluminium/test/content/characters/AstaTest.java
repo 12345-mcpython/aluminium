@@ -5,8 +5,8 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -22,14 +22,12 @@ public class AstaTest {
     private static final int ASTA = 1009;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-
-    /** Note: "使我方全体速度提高50点，持续2回合" -- fifty points, for the party. */
+        /** Note: "使我方全体速度提高50点，持续2回合" -- fifty points, for the party. */
     @Test
     public void herUltimateRaisesEveryAllysSpeedByFiftyPoints() {
         Character asta = CharacterFactory.create(ASTA, LEVEL);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(asta, ally), List.of(enemy), fixed());
         battle.startBattle();
         double before = ally.getAttribute(AttributeType.SPEED).get();
@@ -44,7 +42,7 @@ public class AstaTest {
     @Test
     public void theTechniqueHitsOnlyWhenDeclared() {
         Character asta = CharacterFactory.create(ASTA, LEVEL);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(asta), List.of(enemy), fixed());
         battle.markTechniqueUsed(asta);
         double before = enemy.getCurrentHp();
@@ -53,7 +51,7 @@ public class AstaTest {
                 "「对敌方全体目标造成等同于艾丝妲50%攻击力的火属性伤害」 (Fire damage to all enemies equal to 50% of Asta (艾丝妲)'s ATK)");
 
         Character plain = CharacterFactory.create(ASTA, LEVEL);
-        Enemy enemy2 = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy2 = BattleFixture.monster();
         Battle plainBattle = new Battle(List.of(plain), List.of(enemy2), fixed());
         double untouched = enemy2.getCurrentHp();
         plainBattle.startBattle();

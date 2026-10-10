@@ -2,6 +2,7 @@ package com.laosun.aluminium.test.trigger;
 
 
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
@@ -10,7 +11,6 @@ import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Damage;
 import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -29,8 +29,7 @@ import java.util.Random;
 public class AddDamageOpTest {
     private static final int OWNER = 1001;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-    /**
+        /**
      * The instance base every case uses.
      *
      * <p>Note: Deliberately NOT 100: with a base of 100, "+X" and "+X%" are the same number, so the trap this op
@@ -115,7 +114,7 @@ public class AddDamageOpTest {
 
         private Fixture(double ignored) {
             this.owner = CharacterFactory.create(OWNER, LEVEL);
-            this.enemy = EnemyFactory.create(MONSTER, 90, 1);
+            this.enemy = BattleFixture.monster();
             this.battle = new Battle(List.of(owner), List.of(enemy), fixed());
             this.rule = null;
         }

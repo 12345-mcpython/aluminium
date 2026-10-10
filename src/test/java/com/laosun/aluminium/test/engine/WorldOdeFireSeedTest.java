@@ -1,9 +1,9 @@
 package com.laosun.aluminium.test.engine;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.models.skill.SkillExecutor;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import java.util.List;
@@ -18,8 +18,7 @@ public class WorldOdeFireSeedTest {
     private static final int LEVEL = 80;
     private static final int CYRENE = 1415;
     private static final int PHAINON = 1408;
-    private static final int MONSTER = 1002011;
-    private static final int ODE_SLOT = 21;
+        private static final int ODE_SLOT = 21;
     private static final String FIRE_SEED = "火种";
 
     @Test
@@ -35,7 +34,7 @@ public class WorldOdeFireSeedTest {
         Character cyrene = CharacterFactory.create(CYRENE, LEVEL);
         Character him = CharacterFactory.create(PHAINON, LEVEL);
         Battle battle = new Battle(List.of(cyrene, him),
-                List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+                List.of(BattleFixture.monster()), new Random(0));
         battle.startBattle();
         battle.processRequests();
         cyrene = battle.characters.get(0);

@@ -10,8 +10,8 @@ import com.laosun.aluminium.models.Signal;
 import com.laosun.aluminium.models.Summon;
 import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -50,9 +50,7 @@ public class AglaeaMemospriteTest {
     /** The stance her ultimate enters, and the state whose life is anchored to the memosprite. */
     private static final String STANCE = "至高之姿";
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-
-    // ==================================================================
+        // ==================================================================
     // 1. The skill: heal, or summon and advance
     // ==================================================================
 
@@ -267,6 +265,6 @@ public class AglaeaMemospriteTest {
     }
 
     private static Enemy dummy() {
-        return EnemyFactory.create(MONSTER, 90, 1);
+        return BattleFixture.monster();
     }
 }

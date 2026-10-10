@@ -2,6 +2,7 @@ package com.laosun.aluminium.test.trigger;
 
 
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
@@ -13,7 +14,6 @@ import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Signal;
 import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.models.skill.DefaultSkill;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -49,9 +49,7 @@ public class CastTargetTest {
     /** Tingyun (停云) - a second plain teammate, so "aimed at" can be told apart from "also hit". */
     private static final int OTHER = 1202;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-
-    // ==================================================================
+        // ==================================================================
     // 1. The aimed unit is the event's subject
     // ==================================================================
 
@@ -248,6 +246,6 @@ public class CastTargetTest {
     }
 
     private static Enemy dummy() {
-        return EnemyFactory.create(MONSTER, 90, 1);
+        return BattleFixture.monster();
     }
 }

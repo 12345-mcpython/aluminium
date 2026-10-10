@@ -2,6 +2,7 @@ package com.laosun.aluminium.test.content.memosprites;
 
 
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
@@ -51,8 +52,7 @@ public class SummonFieldTest {
     /** Himeko (姬子) - our plain character, no memosprite. */
     private static final int PLAIN = 1003;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-    /** Silvermane Guard (银鬃近卫), the monster id used for an enemy-side summon. */
+        /** Silvermane Guard (银鬃近卫), the monster id used for an enemy-side summon. */
     private static final int MINION = 1002040;
 
     /** Banana Paradise (奇想蕉乐园) - the set whose 2-piece is authored with {@code self_summon_count}. */
@@ -316,6 +316,6 @@ public class SummonFieldTest {
     }
 
     private static Enemy monster() {
-        return EnemyFactory.create(MONSTER, 90, 1);
+        return BattleFixture.monster();
     }
 }

@@ -6,8 +6,8 @@ import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -26,9 +26,7 @@ public class HanyaBurdenTest {
     private static final int HANYA = 1215;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-
-    /** "[承负] applies only to the most recently applied target" ([承负]仅对最新被施加的目标生效): the second cast takes it off the first enemy. */
+        /** "[承负] applies only to the most recently applied target" ([承负]仅对最新被施加的目标生效): the second cast takes it off the first enemy. */
     @Test
     public void theSkillMovesBurdenToTheLatestTarget() {
         Fixture f = new Fixture();
@@ -90,8 +88,8 @@ public class HanyaBurdenTest {
         private final Character hanya = CharacterFactory.create(HANYA, LEVEL, true, null, null, 0);
         /** The teammate (队友) the marks are about: an ally OTHER than the carrier, hence a field of its own. */
         private final Character ally = CharacterFactory.create(ALLY, LEVEL);
-        private final Enemy first = EnemyFactory.create(MONSTER, 90, 1);
-        private final Enemy second = EnemyFactory.create(MONSTER, 90, 1);
+        private final Enemy first = BattleFixture.monster();
+        private final Enemy second = BattleFixture.monster();
         private final Battle battle;
 
         private Fixture() {

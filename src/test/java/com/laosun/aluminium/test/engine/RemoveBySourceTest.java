@@ -2,6 +2,7 @@ package com.laosun.aluminium.test.engine;
 
 
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
@@ -9,7 +10,6 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.TriggerTable;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -33,9 +33,7 @@ public class RemoveBySourceTest {
     private static final int LEVEL = 80;
     private static final int OWNER = 1402;
     private static final int OTHER = 1002;
-    private static final int MONSTER = 1002011;
-
-    private static double attackOf(Character unit) {
+        private static double attackOf(Character unit) {
         return unit.getAttribute(AttributeType.ATTACK).get();
     }
 
@@ -45,7 +43,7 @@ public class RemoveBySourceTest {
         Character owner = CharacterFactory.create(OWNER, LEVEL);
         Character other = CharacterFactory.create(OTHER, LEVEL);
         Battle battle = new Battle(List.of(owner, other),
-                List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+                List.of(BattleFixture.monster()), new Random(0));
         battle.startBattle();
         battle.processRequests();
 

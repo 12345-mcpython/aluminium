@@ -3,8 +3,8 @@ package com.laosun.aluminium.test.engine;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.energy.EnergyGain;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -19,8 +19,7 @@ import java.util.Random;
  */
 public class ElationRewardBoostTest {
     private static final int OWNER = 1505;
-    private static final int MONSTER = 1002011;
-    private static final String REWARD = "好活当赏";
+        private static final String REWARD = "好活当赏";
 
     /** With the Eidolon: 150 energy -> 20 + 100 (capped) + 50. */
     @Test
@@ -48,7 +47,7 @@ public class ElationRewardBoostTest {
     private static int rewardAfterGain(int eidolonRank, int energy) {
         Character owner = CharacterFactory.create(OWNER, 80, false, null, null, eidolonRank);
         Battle battle = new Battle(List.of(owner),
-                List.of(EnemyFactory.create(MONSTER, 90, 1)), new Random(0));
+                List.of(BattleFixture.monster()), new Random(0));
         battle.startBattle();
         battle.processRequests();
         if (energy > 0) {

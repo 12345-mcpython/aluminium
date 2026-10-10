@@ -2,6 +2,7 @@ package com.laosun.aluminium.test.content.characters;
 
 
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
@@ -11,7 +12,6 @@ import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -35,9 +35,7 @@ public class ServalShockTest {
     private static final int SERVAL = 1103;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-
-    /** Her Rock 'n' Roll (摇滚) trace makes the 80% roll certain - and the same roll misses without an amendment (pinned below). */
+        /** Her Rock 'n' Roll (摇滚) trace makes the 80% roll certain - and the same roll misses without an amendment (pinned below). */
     @Test
     public void theShockIsCertainWithHerTrace() {
         Fixture f = new Fixture(0.9);
@@ -152,7 +150,7 @@ public class ServalShockTest {
         }
         serval.setTriggerTable(new TriggerTable(SERVAL, specs));
 
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(serval, CharacterFactory.create(ALLY, LEVEL)), List.of(enemy), roll(roll));
         battle.startBattle();
         battle.fireTriggers(TriggerEvent.KILL, serval, enemy, 0, 0);
@@ -161,7 +159,7 @@ public class ServalShockTest {
 
     private static final class Fixture {
         private final Character serval = CharacterFactory.create(SERVAL, LEVEL);
-        private final Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        private final Enemy enemy = BattleFixture.monster();
         private final Battle battle;
 
         private Fixture(double roll) {

@@ -4,8 +4,8 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -21,9 +21,7 @@ public class AshveilTest {
     private static final int ASHVEIL = 1504;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-
-    /** Note: The reaction fires for a teammate's attack on the Bait, and not for her own. */
+        /** Note: The reaction fires for a teammate's attack on the Bait, and not for her own. */
     @Test
     public void theBaitReactionNeedsATeammate() {
         double fromAlly = energyGain(true);
@@ -40,7 +38,7 @@ public class AshveilTest {
     public void eachReactionAddsALayerAndNeedsACharge() {
         Character ashveil = CharacterFactory.create(ASHVEIL, LEVEL);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(ashveil, ally), List.of(enemy), fixed());
         battle.startBattle();
         // Make the enemy the Bait first: without it neither guard passes.
@@ -61,7 +59,7 @@ public class AshveilTest {
     @Test
     public void theTechniqueHitsAndGrantsCharge() {
         Character ashveil = CharacterFactory.create(ASHVEIL, LEVEL);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(ashveil), List.of(enemy), fixed());
         battle.markTechniqueUsed(ashveil);
         double before = enemy.getCurrentHp();
@@ -76,7 +74,7 @@ public class AshveilTest {
     private static double energyGain(boolean teammate) {
         Character ashveil = CharacterFactory.create(ASHVEIL, LEVEL);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
-        Enemy enemy = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(ashveil, ally), List.of(enemy), fixed());
         battle.startBattle();
         battle.castImmediate(ashveil.getSkills().get(com.laosun.aluminium.enums.SkillType.SKILL), ashveil, List.of(enemy));

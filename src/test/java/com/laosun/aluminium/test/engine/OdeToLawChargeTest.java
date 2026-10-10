@@ -4,8 +4,8 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -23,8 +23,7 @@ public class OdeToLawChargeTest {
     private static final int CERYDRA = 1412;
     private static final int CYRENE = 1415;
     private static final int LEVEL = 80;
-    private static final int MONSTER = 1002011;
-    private static final String CHARGE = "充能";
+        private static final String CHARGE = "充能";
     private static final String PEERAGE = "爵位";
 
     /** After the coup: the charge she had, minus the six the coup costs, plus the one 1415 pays. */
@@ -32,7 +31,7 @@ public class OdeToLawChargeTest {
     public void theCoupPaysHerOneCharge() {
         Character cerydra = CharacterFactory.create(CERYDRA, LEVEL, false, null, null, 0);
         Character cyrene = CharacterFactory.create(CYRENE, LEVEL, false, null, null, 0);
-        Enemy victim = EnemyFactory.create(MONSTER, 90, 1);
+        Enemy victim = BattleFixture.monster();
         Battle battle = new Battle(List.of(cerydra, cyrene), List.of(victim), new Random(0));
         battle.startBattle();
         battle.processRequests();
