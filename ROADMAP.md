@@ -104,6 +104,16 @@ demo 跑通一场三对三战斗
 | `utils.StageFactory` | `load(stageId)` |
 | `Constant` | `CHARACTERS` / `WEAPONS` / `SKILLS` / `SKILL_TRACES` / `MONSTERS` / `SKILL_SLOT` / `stages()`（懒加载） |
 
+> **2026-10-08 拆分后新增的类**（原 `TriggerInterpreter` 6813 行 → 2310，`Battle` 3844 → 3621）：
+> 五个从解释器拆出的类 —— `TriggerVocabulary`（合法拼写的封闭集合）/ `TriggerValidator`
+> （装载期校验）/ `TriggerTargets`（选择器 → 打到谁）/ `TriggerMagnitudes`（scale → 多少）/
+> `TriggerEffects`（op → 做什么），以及从 `Battle` 拆出的 `BattleDamage`（伤害六乘区装配）。
+> ⚠ **`Battle` 的刀口被不变量钉住，拆之前先读 `REFACTOR.md` §一**：
+> `DEALING_DAMAGE` 公告**在装配中途**发射，`fireTriggers(…, Damage, …)` 与 `assemble`
+> **必须保持 private**（`DamagePipelineTest` 数"公共方法里收 `Damage` 的恰好 1 个"）。
+> 剩余刀口的实测（`TriggerTable` 的条件解析器 **19 声明 / 678 行 / 出向依赖 0**）与
+> 量刀口的工具都在 **`REFACTOR.md`**。
+
 ### 2.2 数据文件速查
 
 | 文件 | 内容 | 已确认锚点 |
