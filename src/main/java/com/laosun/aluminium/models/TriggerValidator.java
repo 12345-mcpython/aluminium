@@ -290,7 +290,7 @@ final class TriggerValidator {
                                         + "among the victims and the other multiplies it by how many were hit, so the "
                                         + "pair has two readings (source: " + spec.getSource() + ")");
                     }
-                    String splitTarget = TriggerInterpreter.normalizeTarget(effect);
+                    String splitTarget = TriggerTargets.normalizeTarget(effect);
                     if (!TriggerVocabulary.TARGET_ALL_ENEMIES.equals(splitTarget)) {
                         throw new IllegalArgumentException(
                                 "Op DAMAGE states \"split\" with target \"" + splitTarget + "\": the divisor IS how "
@@ -1226,24 +1226,24 @@ final class TriggerValidator {
         }
         // A selector FAMILY, admitted by prefix: `ally_cid:<cid>` names a character outright. The closed set below stays closed --
         // this is an explicit door, not a fallback, which is why it is checked BEFORE the membership test.
-        if (effect.getTarget().startsWith(TriggerInterpreter.ALLIES_OF_PATH_PREFIX)) {
+        if (effect.getTarget().startsWith(TriggerTargets.ALLIES_OF_PATH_PREFIX)) {
             // Same door, for paths: the name must be one the engine knows, so a typo is refused at load rather than silently targeting nobody.
-            String rest = effect.getTarget().substring(TriggerInterpreter.ALLIES_OF_PATH_PREFIX.length()).trim();
-            if (TriggerInterpreter.pathNamed(rest) == null) {
+            String rest = effect.getTarget().substring(TriggerTargets.ALLIES_OF_PATH_PREFIX.length()).trim();
+            if (TriggerTargets.pathNamed(rest) == null) {
                 throw new IllegalArgumentException(
                         "Op " + op + " names \"" + effect.getTarget() + "\", whose part after \""
-                                + TriggerInterpreter.ALLIES_OF_PATH_PREFIX + "\" must be a path -- its Chinese name or the enum's (source: "
+                                + TriggerTargets.ALLIES_OF_PATH_PREFIX + "\" must be a path -- its Chinese name or the enum's (source: "
                                 + spec.getSource() + ")");
             }
             return;
         }
-        if (effect.getTarget().startsWith(TriggerInterpreter.ALLY_CID_PREFIX)) {
-            String rest = effect.getTarget().substring(TriggerInterpreter.ALLY_CID_PREFIX.length()).trim();
+        if (effect.getTarget().startsWith(TriggerTargets.ALLY_CID_PREFIX)) {
+            String rest = effect.getTarget().substring(TriggerTargets.ALLY_CID_PREFIX.length()).trim();
             try {
                 Integer.parseInt(rest);
             } catch (NumberFormatException notANumber) {
                 throw new IllegalArgumentException(
-                        "Op " + op + " names \"" + effect.getTarget() + "\", whose part after \"" + TriggerInterpreter.ALLY_CID_PREFIX
+                        "Op " + op + " names \"" + effect.getTarget() + "\", whose part after \"" + TriggerTargets.ALLY_CID_PREFIX
                                 + "\" must be a cid (source: " + spec.getSource() + ")");
             }
             return;
@@ -1266,7 +1266,7 @@ final class TriggerValidator {
     static void requireSelectorSpelling(String value, String field, String op, TriggerSpec spec) {
         String selector = value.trim().toLowerCase(Locale.ROOT);
         if (!TriggerVocabulary.TARGET_SELECTORS.contains(selector) && !selector.startsWith(TriggerVocabulary.HOLDER_OF_PREFIX)
-                && !selector.startsWith(TriggerInterpreter.ALLIES_OF_PATH_EXCEPT_PREFIX)) {
+                && !selector.startsWith(TriggerTargets.ALLIES_OF_PATH_EXCEPT_PREFIX)) {
             throw new IllegalArgumentException(
                     "Op " + op + " names an unknown \"" + field + "\" selector '" + value
                             + "' (known: " + String.join(" / ", TriggerVocabulary.TARGET_SELECTORS.stream().sorted().toList())
