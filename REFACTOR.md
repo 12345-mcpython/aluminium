@@ -50,7 +50,50 @@ N 个文件之一里，归一化掉 `private` 与新增限定符）；**javadoc 
 `git worktree add build/_baseline_wt HEAD` ＋ 把 `src/main/resources/data/` 拷进去，
 在那个 worktree 里跑 demo 取基线，取完 `git worktree remove`。
 
-## 三、剩余：`TriggerTable` 的刀口已量到（未执行）
+## 三、剩余：`TriggerTable` 的刀口已量到，但**比看上去大**（本轮试抽后回退）
+
+⚠ **本轮实测订正**：条件 DSL 那一刀**不是"19 个方法"那么小**。我按"19 声明 / 678 行 / 出向依赖 0"
+抽了一次，编译失败 —— 失败**不是**常量或助手，而是：**`parseCondition` 会构造 28 个嵌套类型**，
+它们是这套 DSL 的真正实现：
+
+```
+AppliedDebuffClass  DamageElementIsSelf  DamageHasNoCast  DamageIsAdditional  DamageIsAttack
+Equality  FromCategory  FromSkill  HasCompanionAlly  HasDebuffOn  HasPath  HasSamePathAlly
+HasShield  HasSkill  HasState  HasWeakness  IsAlly  IsCompanion  IsEnemy  IsOtherAlly
+IsPartyFirst  IsSameElementAsSelf  IsSummon  Negated  Numeric  ResourceChanged
+SharesPathWithAnAlly  StateEnded
+```
+
+（`TriggerTable` 里 2582–3720，都实现公共的 `TriggerTable.Condition`。已整体回退，树干净、
+全量仍 751/2574/0。）
+
+⇒ **可搬移集合的正确边界是**：19 个方法 ＋ 34 个常量 ＋ **这 28 个嵌套类型**。
+动手前必须先定三件事，否则会像我这次一样抽到一半：
+
+1. **`Condition` 接口留在 `TriggerTable`** —— 它是**公开 API**（`CompiledRule` 的字段类型、
+   测试在用），不能跟着搬。
+2. **28 个实现类的引用方式**：留在 `TriggerTable` 就得写 `TriggerTable.HasState`（28 处）；
+   搬进新类就必须**先量**有没有测试/内容直接引用 `TriggerTable.HasState` 之类的名字。
+3. **`public` 收窄**：这些嵌套 record 现在是 public 的，搬进 package-private 新类会收窄公开面 ——
+   需先确认无外部引用。
+
+⭐ **量法（已验证可靠）**：不要用 `refactor_callmap.py` —— 它在这个文件上**给出错的 span**
+（把 `requireCarriedParty` 报成 2226-2255、`isNumericVariable` 报成 2226-2290，两者重叠，
+并集会把 65 行邻居一起带走）。用 `build/_refactor_baseline/_move_parser.py` 的做法：
+
+- 声明要**最短 span 胜出**（调用点也会匹配声明正则）；
+- 声明正则应**要求修饰符**（`private static` 等），否则 `    requireSkillSlot(x, y, z);` 这种
+  第 5 列开始的**调用**会被当成声明，而"最短胜出"会让它**赢过真正的 12 行方法**；
+- 常量的**结束位置要扫到 `;`**：`Pattern.compile(...)` 与 `Set.of(...)` 都跨多行，把它们当成
+  单行会让之后每个常量都**少切一行**（表现为"每个块都丢了开头那行 javadoc"）；
+- javadoc 的起点要**只向上跨注释行**：跳过空行会越过单行 javadoc（造成重叠），
+  多跨一行又会把上一段末尾的空行圈进来（虽然能编译，但块不再以 `/**` 或声明开头 ⇒ 无法校验）。
+
+⚠ **`gradlew clean` 会删掉 `build/`**，包括这些分析脚本与基线。基线要重建时用
+`git worktree add build/_baseline_wt HEAD` ＋ 把 `src/main/resources/data/` 拷进去，
+在那个 worktree 里跑 demo 取基线，取完 `git worktree remove`。
+
+## 三之二、原始测量（供参考，边界见上）
 
 `TriggerTable` 4049 行 / 51 方法。**条件 DSL 的解析器是一个可整体搬移的集合**，实测：
 
@@ -63,14 +106,20 @@ N 个文件之一里，归一化掉 `private` 与新增限定符）；**javadoc 
 - **接口只有 1 个**：`parseCondition` ← `compile`（唯一调用者）；
 - **出向依赖 0 个**：不调用任何留下的助手。
 
-⚠ **常量**：35 个是解析器独占的（`SELF_ATTR_PREFIX` / `ALLIES_WITH_PATH_PREFIX` /
-`SELF_RESOURCE_PREFIX` / `SUMMON_RESOURCE_PREFIX` / `HAS_STATE` / `IS_ALLY` … /
-`DAMAGE_CARRYING_EVENTS` / `CAST_CARRYING_EVENTS` / `IDENTITY_TERMS` 等，含
-`SELF_STACKS_PREFIX` / `ACTOR_STACKS_PREFIX` / `TARGET_STACKS_PREFIX`）⇒ **随解析器搬走**。
+⚠ **常量**（本轮实测订正为 **34 个解析器独占 ＋ 4 个共用**）：解析器独占的
+（`NUMERIC_VARIABLES` / `SELF_ATTR_PREFIX` / `STATE_ENDED_KEYWORD` / `HAS_STATE` / `DEBUFF_ON` /
+`HAS_PATH` / `IS_ALLY` … / `DAMAGE_CARRYING_EVENTS` / `CAST_CARRYING_EVENTS` /
+`SELF_STACKS_PREFIX` / `ACTOR_STACKS_PREFIX` / `TARGET_STACKS_PREFIX` / `IDENTITY_VARIABLES` /
+`IDENTITY_TERMS`）⇒ **随解析器搬走**（本轮的抽取已证明这一步是通的）。
 
-⚠⚠ **只有 `STATE_SUBJECTS` 是两个半边共用的**（`1220` 声明；解析器用 `2167/2170`，
-留在 `TriggerTable` 的 `3519/3522` 也用）⇒ **留下**、改 package-private，解析器引用
-`TriggerTable.STATE_SUBJECTS`。
+⚠⚠ **4 个是两个半边共用的** ⇒ **留下**、改 package-private，解析器引用 `TriggerTable.X`：
+`ALLIES_WITH_PATH_PREFIX`（`pathOf` 是**留下**的方法，在 1973/1976/1979 读它）、
+`SELF_RESOURCE_PREFIX`（`selfResourceOf` 同理，2079）、
+`SUMMON_RESOURCE_PREFIX`（2080 ＋ 3854）、
+`STATE_SUBJECTS`（3519/3522）。
+⚠ 这解释了一处容易误判的细节：**`pathOf` 与 `selfResourceOf` 的实际范围越过 `parseCondition`
+的结束行（1945）**，所以它们的助手 span 与解析器 span 是分开的两段 —— 本轮的
+`_move_parser.py` 已按此处理（19 个 span、0 重叠、逐块校验头部合法）。
 
 落法：新类 `TriggerConditionParser`（静态工具，照 `TriggerTargets` 的范式），
 `parseCondition` 改 package-private 供 `compile` 调用。
