@@ -347,12 +347,12 @@ final class TriggerMagnitudes {
         String trimmed = key.trim();
         boolean owner;
         String name;
-        if (trimmed.startsWith(TriggerTable.SELF_STACKS_PREFIX)) {
+        if (trimmed.startsWith(TriggerConditionParser.SELF_STACKS_PREFIX)) {
             owner = true;
-            name = trimmed.substring(TriggerTable.SELF_STACKS_PREFIX.length()).trim();
-        } else if (trimmed.startsWith(TriggerTable.TARGET_STACKS_PREFIX)) {
+            name = trimmed.substring(TriggerConditionParser.SELF_STACKS_PREFIX.length()).trim();
+        } else if (trimmed.startsWith(TriggerConditionParser.TARGET_STACKS_PREFIX)) {
             owner = false;
-            name = trimmed.substring(TriggerTable.TARGET_STACKS_PREFIX.length()).trim();
+            name = trimmed.substring(TriggerConditionParser.TARGET_STACKS_PREFIX.length()).trim();
         } else {
             return null;
         }
@@ -718,13 +718,13 @@ final class TriggerMagnitudes {
             // not one of the rule owner's attributes, so "which attribute does it name" has no answer.
             return null;                      // handled by derivedMagnitude; not an AttributeType
         }
-        if (!raw.startsWith(TriggerTable.SELF_ATTR_PREFIX)) {
+        if (!raw.startsWith(TriggerConditionParser.SELF_ATTR_PREFIX)) {
             throw new IllegalArgumentException(
                     "Op " + op + " has \"scale\": \"" + effect.getScale() + "\", which is not a spelling this op "
                             + "knows; a derived modifier names one of the RULE OWNER's attributes, e.g. "
-                            + "\"scale\": \"" + TriggerTable.SELF_ATTR_PREFIX + "BREAKING_EFFECT\"" + origin);
+                            + "\"scale\": \"" + TriggerConditionParser.SELF_ATTR_PREFIX + "BREAKING_EFFECT\"" + origin);
         }
-        String name = raw.substring(TriggerTable.SELF_ATTR_PREFIX.length()).trim();
+        String name = raw.substring(TriggerConditionParser.SELF_ATTR_PREFIX.length()).trim();
         AttributeType attribute;
         try {
             attribute = AttributeType.fromString(name);

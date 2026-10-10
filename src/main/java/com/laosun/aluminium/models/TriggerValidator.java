@@ -1095,7 +1095,7 @@ final class TriggerValidator {
                 throw new IllegalArgumentException(
                         "Op " + op + " states \"amount\" without a \"scale\": a plain modifier's magnitude is "
                                 + "\"percent\", so the amount would be ignored. Either say what it is a share of "
-                                + "(\"scale\": \"" + TriggerTable.SELF_ATTR_PREFIX + "BREAKING_EFFECT\" plus "
+                                + "(\"scale\": \"" + TriggerConditionParser.SELF_ATTR_PREFIX + "BREAKING_EFFECT\" plus "
                                 + "\"percent\") or write the number into \"percent\" "
                                 + "(source: " + spec.getSource() + ")");
             }
@@ -1189,8 +1189,8 @@ final class TriggerValidator {
             requirePercent(effect, op, spec);
             return;
         }
-        if (scale.startsWith(TriggerTable.SELF_STACKS_PREFIX)
-                || scale.startsWith(TriggerTable.TARGET_STACKS_PREFIX)) {
+        if (scale.startsWith(TriggerConditionParser.SELF_STACKS_PREFIX)
+                || scale.startsWith(TriggerConditionParser.TARGET_STACKS_PREFIX)) {
             String name = scale.substring(scale.indexOf(':') + 1).trim();
             if (name.isEmpty()) {
                 throw new IllegalArgumentException(
