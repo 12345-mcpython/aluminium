@@ -50,9 +50,12 @@ N 个文件之一里，归一化掉 `private` 与新增限定符）；**javadoc 
 `git worktree add build/_baseline_wt HEAD` ＋ 把 `src/main/resources/data/` 拷进去，
 在那个 worktree 里跑 demo 取基线，取完 `git worktree remove`。
 
-## 三、剩余：`TriggerTable` 的刀口已量到，但**比看上去大**（本轮试抽后回退）
+## 三、剩余：`TriggerTable` 的刀口（**两次试抽后**的最终测量）
 
-⚠ **本轮实测订正**：条件 DSL 那一刀**不是"19 个方法"那么小**。我按"19 声明 / 678 行 / 出向依赖 0"
+⚠ **两次试抽都回退了，但每次都把边界量得更准。结论在本文档最前面，动手前请先读完本节。**
+最终边界在 §三之三；§三之二的原始测量是第一次（不完整）的数，保留下来是为了看清"哪一步量漏了"。
+
+⚠ **第一次实测订正**：条件 DSL 那一刀**不是"19 个方法"那么小**。我按"19 声明 / 678 行 / 出向依赖 0"
 抽了一次，编译失败 —— 失败**不是**常量或助手，而是：**`parseCondition` 会构造 28 个嵌套类型**，
 它们是这套 DSL 的真正实现：
 
@@ -92,6 +95,48 @@ SharesPathWithAnAlly  StateEnded
 ⚠ **`gradlew clean` 会删掉 `build/`**，包括这些分析脚本与基线。基线要重建时用
 `git worktree add build/_baseline_wt HEAD` ＋ 把 `src/main/resources/data/` 拷进去，
 在那个 worktree 里跑 demo 取基线，取完 `git worktree remove`。
+
+## 三之三、⚠⚠ 第二次试抽的订正：**常量要"往外挂"，不能往里搬**（2026-10-08 第二轮实测）
+
+第二轮试抽（把 19 方法 ＋ 34 常量 ＋ **29 个私有嵌套类型**一起搬）**已经能编译到只剩收尾**，
+但暴露出一条上一轮没量到的、决定性的方向问题：
+
+> **那些"看起来只有解析器在用"的常量，其实被别的类用；所以它们不能搬进解析器，
+> 只能留在 `TriggerTable` 并把解析器改成引用 `TriggerTable.X`。**
+
+实测到的共享面（**跨 3 个类**，不是 2 个）：
+
+| 常量 | 谁在用 | 结果 |
+|---|---|---|
+| `SELF_ATTR_PREFIX` | 解析器 ＋ **`TriggerMagnitudes`** | 留 |
+| `SELF_STACKS_PREFIX` / `ACTOR_STACKS_PREFIX` / `TARGET_STACKS_PREFIX` | 解析器 ＋ **`TriggerMagnitudes`** | 留 |
+| `NUMERIC_VARIABLES` | 解析器 ＋ **`TriggerMagnitudes`** | 留 |
+| `ALLIES_WITH_PATH_PREFIX` / `SELF_RESOURCE_PREFIX` / `SUMMON_RESOURCE_PREFIX` / `STATE_SUBJECTS` | 解析器 ＋ `TriggerTable` 自己的效果侧 | 留 |
+
+⇒ **10 个常量留下、全部改 package-private**（本轮实测订正：不是 4 个）。
+`TriggerMagnitudes` 是第 3 个消费者 —— 它读 `self_attr:` / `self_stacks:` / `target_stacks:` /
+`actor_stacks:` 来解 scale，正是"同一套拼写、两个半边都要读"的又一处。
+
+⚠ **迁移脚本的红线（本轮踩到）**：给"共享常量"批量加 `Owner.` 前缀时，**声明行本身也被改写**了 ——
+`public static final String TriggerTable.SELF_STACKS_PREFIX = ...` 这种非法形式。
+⇒ **限定符脚本必须跳过声明行**（判据：行里含 `static final`），不能只看"是否注释行"。
+
+### 另一条订正：`PartyCondition`
+
+它是 `private interface`（**接口没有 `static` 关键字**），所以按 `private static` 找嵌套类型会**漏掉它**。
+第二轮里它因此没被搬走，而 28 个实现类却搬走了 ⇒ 编译失败。**正确做法：留在 `TriggerTable`、改
+package-private**（它 `extends Condition`，而 `Condition` 是公开 API）。
+
+### 还有两个类型不能搬
+
+- **`HasShield`**：`TriggerTable.requireShieldSource(...)` 的**形参类型**就是它 ⇒ 必须从新类可见
+  （package-private ＋ 两个被 `TriggerTable` 读的字段 `ruleId` / `raw` 也要放宽）；
+- **`Numeric`**：`TriggerTable` 有 `condition instanceof Numeric` 两处（`stacksName` / `resource` 判空）
+  ⇒ 同理，字段也要放宽。
+
+⇒ **最终正确的可搬移边界**：19 方法 ＋ **24 个**私有嵌套类型（29 减去 `PartyCondition`、
+`HasShield`、`Numeric` —— 这三个留）＋ **0 个常量**（10 个共享常量全部留 `TriggerTable`）。
+`compile` 调用改成 `TriggerConditionParser.parseCondition(...)`。
 
 ## 三之二、原始测量（供参考，边界见上）
 
