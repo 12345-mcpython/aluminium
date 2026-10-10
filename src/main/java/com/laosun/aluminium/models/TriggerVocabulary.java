@@ -1,5 +1,7 @@
 package com.laosun.aluminium.models;
 
+import com.laosun.aluminium.Battle;
+
 import java.util.Set;
 
 /**
@@ -64,7 +66,7 @@ final class TriggerVocabulary {
             "REDUCE_TOUGHNESS");
     /**
      * The ops that grant something with a duration, and therefore accept {@code permanent: true}
-     * ("for the rest of the battle"). See {@link #requireNoStackArguments}.
+     * ("for the rest of the battle"). See {@link TriggerValidator#requireNoStackArguments}.
      */
     static final Set<String> OPS_WITH_DURATION =
             Set.of("MODIFY_ATTR", "APPLY_BUFF", "MODIFY_DAMAGE_TAKEN", "RESIST_DEBUFF", "REPLACE_SKILL",
@@ -224,7 +226,8 @@ final class TriggerVocabulary {
      */
     static final String TARGET_LOWEST_HP_ALLY = "lowest_hp_ally";
     /**
-     * The ops that actually read {@code damage_type} (see the guard in {@link #validate}).
+     * The ops that actually read {@code damage_type} (see the guard in
+     * {@link TriggerValidator#validateOne}).
      */
     static final java.util.Set<String> DAMAGE_TYPE_READERS =
             java.util.Set.of("BOOST_DAMAGE", "DAMAGE", "MODIFY_ATTR", "MODIFY_DAMAGE_TAKEN", "ADD_DAMAGE");
