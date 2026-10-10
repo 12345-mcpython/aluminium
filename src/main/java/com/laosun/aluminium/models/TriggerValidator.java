@@ -828,7 +828,7 @@ final class TriggerValidator {
             }
             case "ADD_DAMAGE" -> {
                 requireEvent(spec, op, TriggerEvent.DEALING_DAMAGE);
-                TriggerInterpreter.scaleAttribute(effect, op, spec);
+                TriggerMagnitudes.scaleAttribute(effect, op, spec);
                 requirePercent(effect, op, spec);
                 requireNoStackArguments(effect, op, spec);
                 // Note: A COUNT is not an amount. "additionally deal #1 instances of additional damage" counts INSTANCES, and this op adds one amount to the
@@ -1202,7 +1202,7 @@ final class TriggerValidator {
         }
         // The spelling and (for the attribute family) the name; also re-checks `percent`, because a scale with no
         // magnitude is not a number ("some share of my Speed" says nothing about how much).
-        TriggerInterpreter.scaleAttribute(effect, op, spec);
+        TriggerMagnitudes.scaleAttribute(effect, op, spec);
         requirePercent(effect, op, spec);
     }
 
@@ -1843,7 +1843,7 @@ final class TriggerValidator {
             requirePercent(effect, op, spec);
             return;
         }
-        TriggerInterpreter.scaleAttribute(effect, op, spec);
+        TriggerMagnitudes.scaleAttribute(effect, op, spec);
         requirePercent(effect, op, spec);
     }
 
