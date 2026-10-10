@@ -1367,7 +1367,7 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
      * down the other path.
      *
      * <p>Note: It is also the guard {@code CAST_SKILL} needs: that op <b>throws</b> when the named unit has no such
-     * slot (see {@code TriggerInterpreter#castSkill}), so without this condition the auto-cast clause would explode
+     * slot (see {@code TriggerEffects#castSkill}), so without this condition the auto-cast clause would explode
      * on every ally who has no Elation skill.
      */
     private static final Pattern HAS_SKILL =
