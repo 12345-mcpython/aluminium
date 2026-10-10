@@ -2,6 +2,7 @@ package com.laosun.aluminium.test.content.characters;
 
 
 import com.laosun.aluminium.test.engine.SkillPointGameParityTest;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.SkillType;
@@ -194,14 +195,8 @@ public class BronyaEidolonTest {
 
     /** A generator that always answers the same value, so the 50% becomes an assertion. */
     private static Random fixed(double value) {
-        return new Random() {
-            @Override
-            public double nextDouble() {
-                return value;
-            }
-        };
+        return BattleFixture.alwaysRoll(value);
     }
-
     private static Enemy dummy() {
         return Enemy.fromAttributes("dummy", 1_000_000, 0, 100, 100);
     }

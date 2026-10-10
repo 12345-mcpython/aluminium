@@ -2,6 +2,7 @@ package com.laosun.aluminium.test.trigger;
 
 
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
@@ -104,14 +105,8 @@ public class TriggerChanceTest {
 
     /** A generator that always answers the same value, so a coin flip becomes an assertion. */
     static Random fixed(double value) {
-        return new Random() {
-            @Override
-            public double nextDouble() {
-                return value;
-            }
-        };
+        return BattleFixture.alwaysRoll(value);
     }
-
     /** A generator that answers the given values in order, then repeats the last one. */
     private static Random sequence(double first, double... rest) {
         return new Random() {

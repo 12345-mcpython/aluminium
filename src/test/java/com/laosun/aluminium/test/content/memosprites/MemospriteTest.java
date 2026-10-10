@@ -453,14 +453,8 @@ public class MemospriteTest {
 
     /** A generator that always answers the same value, so a probability becomes an assertion. */
     private static Random fixed(double value) {
-        return new Random() {
-            @Override
-            public double nextDouble() {
-                return value;
-            }
-        };
+        return BattleFixture.alwaysRoll(value);
     }
-
     /** A freeze from the game's own control table - the state Evey (长夜) is immune to. */
     private static ControlBuff frozen() {
         return new ControlBuff(Constant.CONTROL_EFFECTS.get("FROZEN"), 2);

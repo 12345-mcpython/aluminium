@@ -89,11 +89,6 @@ public class DrRatioTest {
     }
 
     private static Random fixed() {
-        return new Random() {
-            @Override
-            public double nextDouble() {
-                return 0.0;
-            }
-        };
+        return BattleFixture.alwaysRoll(0.0);
     }
 }

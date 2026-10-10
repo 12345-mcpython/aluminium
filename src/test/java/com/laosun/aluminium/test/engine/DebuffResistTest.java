@@ -3,6 +3,7 @@ package com.laosun.aluminium.test.engine;
 
 import com.laosun.aluminium.test.support.TestTurns;
 import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.AttributeType;
@@ -327,12 +328,7 @@ public class DebuffResistTest {
 
         /** A generator that always answers the same value, so a roll becomes an assertion. */
         private static Random fixed(double value) {
-            return new Random() {
-                @Override
-                public double nextDouble() {
-                    return value;
-                }
-            };
+            return BattleFixture.alwaysRoll(value);
         }
     }
 

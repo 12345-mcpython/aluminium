@@ -304,11 +304,6 @@ public class SkillAttributionTest {
     }
 
     private static Random fixed(double value) {
-        return new Random() {
-            @Override
-            public double nextDouble() {
-                return value;
-            }
-        };
+        return BattleFixture.alwaysRoll(value);
     }
 }

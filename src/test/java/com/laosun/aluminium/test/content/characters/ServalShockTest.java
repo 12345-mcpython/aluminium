@@ -186,11 +186,6 @@ public class ServalShockTest {
     }
 
     private static Random roll(double value) {
-        return new Random() {
-            @Override
-            public double nextDouble() {
-                return value;
-            }
-        };
+        return BattleFixture.alwaysRoll(value);
     }
 }

@@ -4,6 +4,7 @@ package com.laosun.aluminium.test.content.characters;
 import com.laosun.aluminium.test.engine.DebuffResistTest;
 import com.laosun.aluminium.test.support.TestTurns;
 import com.laosun.aluminium.test.trigger.TriggerChanceTest;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.DebuffClass;
@@ -131,14 +132,8 @@ public class ClaraTraceTest {
 
     /** A generator that always answers the same value (see {@code TriggerChanceTest.fixed}). */
     private static Random fixed(double value) {
-        return new Random() {
-            @Override
-            public double nextDouble() {
-                return value;
-            }
-        };
+        return BattleFixture.alwaysRoll(value);
     }
-
     private static Enemy dummy() {
         return Enemy.fromAttributes("dummy", 1_000_000, 0, 100, 100);
     }

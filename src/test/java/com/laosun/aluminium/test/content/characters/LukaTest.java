@@ -182,12 +182,6 @@ public class LukaTest {
     }
 
     private static Random fixed() {
-        return new Random() {
-            @Override
-            public double nextDouble() {
-                return 0.0;                       // an easy draw: "100%的基础概率" lands
-            }
-        };
+        return BattleFixture.alwaysRoll(0.0);
     }
-
 }
