@@ -104,15 +104,18 @@ demo 跑通一场三对三战斗
 | `utils.StageFactory` | `load(stageId)` |
 | `Constant` | `CHARACTERS` / `WEAPONS` / `SKILLS` / `SKILL_TRACES` / `MONSTERS` / `SKILL_SLOT` / `stages()`（懒加载） |
 
-> **2026-10-08 拆分后新增的类**（原 `TriggerInterpreter` 6813 行 → 2310，`Battle` 3844 → 3621）：
-> 五个从解释器拆出的类 —— `TriggerVocabulary`（合法拼写的封闭集合）/ `TriggerValidator`
+> **2026-10-08 拆分后新增的类**（`TriggerInterpreter` 6813 → 2310，`Battle` 3844 → 3621，
+> `TriggerTable` 4049 → 1844）：
+> 从解释器拆出五个 —— `TriggerVocabulary`（合法拼写的封闭集合）/ `TriggerValidator`
 > （装载期校验）/ `TriggerTargets`（选择器 → 打到谁）/ `TriggerMagnitudes`（scale → 多少）/
-> `TriggerEffects`（op → 做什么），以及从 `Battle` 拆出的 `BattleDamage`（伤害六乘区装配）。
+> `TriggerEffects`（op → 做什么）；从 `Battle` 拆出 `BattleDamage`（伤害六乘区装配）；
+> 从 `TriggerTable` 拆出 `TriggerConditionParser`（条件 DSL：19 方法 ＋ 26 个条件类 ＋ 38 常量）。
 > ⚠ **`Battle` 的刀口被不变量钉住，拆之前先读 `REFACTOR.md` §一**：
 > `DEALING_DAMAGE` 公告**在装配中途**发射，`fireTriggers(…, Damage, …)` 与 `assemble`
 > **必须保持 private**（`DamagePipelineTest` 数"公共方法里收 `Damage` 的恰好 1 个"）。
-> 剩余刀口的实测（`TriggerTable` 的条件解析器 **19 声明 / 678 行 / 出向依赖 0**）与
-> 量刀口的工具都在 **`REFACTOR.md`**。
+> ⚠ **`TriggerTable` 那一刀量了三次才成**（前两次都回退）：共享常量**跟着 DSL 走**、
+> 其他读者反过来指向新家；`PartyCondition`（接口没有 `static`）/ `HasShield` / `Numeric`
+> **必须留下**。三次的测量过程与工具都在 **`REFACTOR.md`**。
 
 ### 2.2 数据文件速查
 

@@ -17,6 +17,7 @@ javadoc 引用审计，**每批一个提交**。
 | | | `TriggerMagnitudes` | 795 | 这个效果**是多少**（触发期） |
 | | | `TriggerEffects` | 964 | 这个效果**做什么**（触发期） |
 | `Battle` 3844 | **3621** | `BattleDamage` | 307 | 伤害六乘区装配 ＋ 吸收 ＋ 击破两骑手 |
+| `TriggerTable` 4049 | **1844** | `TriggerConditionParser` | 2353 | 条件 DSL（`when` 的解释器：19 方法 ＋ 26 个条件类 ＋ 38 个常量） |
 
 ⚠ **`Battle` 的刀口是被一条不变量逼出来的，别拆错**：`DEALING_DAMAGE` 公告**在装配中途**发射
 （应答它的规则可以**改写这个实例** —— `BOOST_DAMAGE`，而其后每一乘区必须读到改写后的数）。
@@ -50,10 +51,36 @@ N 个文件之一里，归一化掉 `private` 与新增限定符）；**javadoc 
 `git worktree add build/_baseline_wt HEAD` ＋ 把 `src/main/resources/data/` 拷进去，
 在那个 worktree 里跑 demo 取基线，取完 `git worktree remove`。
 
-## 三、剩余：`TriggerTable` 的刀口（**两次试抽后**的最终测量）
+## 三、`TriggerTable` 的刀口（**已落地**；本节留作"为什么量了三次"的记录）
 
-⚠ **两次试抽都回退了，但每次都把边界量得更准。结论在本文档最前面，动手前请先读完本节。**
-最终边界在 §三之三；§三之二的原始测量是第一次（不完整）的数，保留下来是为了看清"哪一步量漏了"。
+✅ **第三次尝试成功并已提交**（`41de90fc`）：`TriggerTable` **4049 → 1844**，
+新类 `TriggerConditionParser` **2353**。全量 751/2574/0、三份 demo 一致、逐行零丢失。
+
+**最终边界（照这个做就一次成）**：
+
+| 搬走 | 留下 |
+|---|---|
+| 19 个方法（`parseCondition` ＋ 18 助手）＋ 后补的 `requirePath` / `isCompanion` | `CompiledRule` / `TriggerContext` / `Condition`（**公开 API**） |
+| 26 个私有条件类（改 package-private） | `PartyCondition`（**接口没有 `static`**，正则搜不到）、`HasShield`、`Numeric` |
+| **38 个常量**（含 `NUMERIC_VARIABLES` / `SELF_ATTR_PREFIX` / 三个 `*_STACKS_PREFIX` / 各关键字 Pattern） | — |
+
+⚠⚠ **关键方向**：常量**跟着 DSL 走**，而 `TriggerMagnitudes` / `TriggerValidator` **反过来指向新家**
+（`TriggerConditionParser.X`）。我第二轮搞反了这一条 —— 当时以为"共享 ⇒ 留在原地"，于是把解析器
+改成读 `TriggerTable.X`，结果 180 个错误。**共享不意味着留在原地，意味着其他读者要跟着走。**
+
+⚠ 留下的三个类型，解析器要**反过来限定**它们：`new TriggerTable.HasShield(...)`、
+`new TriggerTable.Numeric(...)`，且这两者与其被读的字段都放宽为 package-private。
+
+⚠ **动手前先量**：`refactor_callmap.py` 在这个文件上**给错 span**（把 `isNumericVariable` 报成
+2226-2290，与 `requireCarriedParty` 的 2226-2255 重叠 ⇒ 并集会把 **65 行邻居**带走）。
+可用的量法在 §三之三末（最短 span 胜出、声明要求修饰符、常量扫到 `;`、javadoc 只跨注释行）。
+
+⚠ **脚本红线**：给共享常量批量加限定符时**必须跳过声明行**（判据：行内含 `static final`），
+否则会把声明本身改成 `public static final String TriggerTable.X = ...` 这种非法形式。
+
+以下两节保留两次失败的过程与理由，供后来者看清"哪一步会量漏"。
+
+## 三之一、第一次试抽
 
 ⚠ **第一次实测订正**：条件 DSL 那一刀**不是"19 个方法"那么小**。我按"19 声明 / 678 行 / 出向依赖 0"
 抽了一次，编译失败 —— 失败**不是**常量或助手，而是：**`parseCondition` 会构造 28 个嵌套类型**，
@@ -96,7 +123,7 @@ SharesPathWithAnAlly  StateEnded
 `git worktree add build/_baseline_wt HEAD` ＋ 把 `src/main/resources/data/` 拷进去，
 在那个 worktree 里跑 demo 取基线，取完 `git worktree remove`。
 
-## 三之三、⚠⚠ 第二次试抽的订正：**常量要"往外挂"，不能往里搬**（2026-10-08 第二轮实测）
+## 三之二、⚠⚠ 第二次试抽的订正：**常量要"往外挂"，不能往里搬**（2026-10-08 第二轮实测）
 
 第二轮试抽（把 19 方法 ＋ 34 常量 ＋ **29 个私有嵌套类型**一起搬）**已经能编译到只剩收尾**，
 但暴露出一条上一轮没量到的、决定性的方向问题：
@@ -138,7 +165,7 @@ package-private**（它 `extends Condition`，而 `Condition` 是公开 API）�
 `HasShield`、`Numeric` —— 这三个留）＋ **0 个常量**（10 个共享常量全部留 `TriggerTable`）。
 `compile` 调用改成 `TriggerConditionParser.parseCondition(...)`。
 
-## 三之二、原始测量（供参考，边界见上）
+## 三之三、第一次的原始测量（不完整，保留以看清“哪一步量漏了”）
 
 `TriggerTable` 4049 行 / 51 方法。**条件 DSL 的解析器是一个可整体搬移的集合**，实测：
 
