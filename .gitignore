@@ -2,19 +2,12 @@
 build
 .gradle
 
+# The engine's generated data tables. They are produced by an out-of-repo generator
+# (E:\code\python\generate_data.py) and are not source.
 src/main/resources/data/
 
 logs/
-# Python bytecode from the tools/ scripts
-__pycache__/
 
-# Scratch output and local working notes from tools/ (the scripts themselves are tracked)
-tools/_*
-
-# Backups made by the tools/ mutation scripts. They are scratch: the scripts restore through
-# `git checkout HEAD -- <path>`, because a .bak goes stale and `checkout --` restores the INDEX rather than
+# Backups are scratch: a .bak goes stale, and `git checkout HEAD -- <path>` restores the INDEX rather than
 # HEAD - both of which have cost this project rounds. One was committed by accident once, so keep them out.
 *.bak
-
-# Parallel coverage-sweep worktrees and their logs
-tools/_sweep/
