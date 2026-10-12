@@ -34,12 +34,6 @@ import java.util.Set;
  *
  * <p>Note: For the origin of the multipliers see {@link EnemySkillData}: the data source has no enemy
  * skill table, so these values are guesses.
- *
- * @param element    damage element (already resolved at construction time from the data / the
- *                   monster's {@code stance_type}, never null)
- * @param multiplier multiplier (damage base = {@code baseAttribute} x multiplier)
- * @param hits       number of hits (at least 1)
- * @param type       damage type
  */
 public class EnemySkill extends Skill {
 
@@ -65,6 +59,13 @@ public class EnemySkill extends Skill {
     @Getter
     private final double stanceDamage;
 
+    /**
+     * @param element    damage element (already resolved at construction time from the data / the
+     *                   monster's {@code stance_type}, never null)
+     * @param multiplier multiplier (damage base = {@code baseAttribute} x multiplier)
+     * @param hits       number of hits (at least 1)
+     * @param type       damage type
+     */
     public EnemySkill(DamageElement element, double multiplier, int hits, DamageType type) {
         this(element, multiplier, hits, type, SkillEffectType.SINGLE_ATTACK);
     }

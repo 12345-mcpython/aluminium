@@ -90,7 +90,7 @@ tasks.named('javadoc') {
     source = fileTree("${buildDir}/delombok") { include '**/*.java' }
     classpath = files(configurations.compileClasspath, configurations.annotationProcessor)
     options.encoding = 'UTF-8'
-    options.addStringOption('Xdoclint:all', '-quiet')
+    options.addStringOption('Xdoclint:html,reference,accessibility,syntax', '-quiet')
     failOnError = false
 }
 
