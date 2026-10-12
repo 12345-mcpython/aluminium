@@ -961,33 +961,9 @@ final class TriggerConditionParser {
     }
 
     /**
-     * Side test: {@code target is_ally} - "the unit this cast was aimed at is on our side".
-     *
-     * <p><b>Why the DSL needs it.</b> Three shipped relic abilities say "对<b>己方角色</b>施放终结技/战技时" (sets 114,
-     * 118, 121). A cast event carries the unit it <b>aimed at</b> ({@code ctx.target()}), which is what
-     * "对…施放" names - but the event says nothing about that unit's <b>side</b>, and a damaging ultimate aimed at an
-     * enemy carries a target too. Without this predicate the rule would fire on every cast of that slot: an
-     * over-trigger with nothing to report.
-     *
-     * <p>The side is taken from the battlefield ({@code battle.allies}, the same roster {@code all_allies} reads), so
-     * a context with no battle answers "no" - the "cannot read it, therefore the condition fails" rule every
-     * field-reading condition follows. Note: It is a {@link PartyCondition}, so {@code !target is_ally} means the
-     * opposite <b>and</b> still fails when there is no target at all (a missing party must never become a match).
-     */
-    /**
-     * {@code <who> is_other_ally} ? the unit is on our side <b>and is not the rule's owner</b>.
-     *
-     * <p>The "other" half is the whole point: {@code is_ally} already answers "on our side", and the owner satisfies it. A rule
-     * that means "my ALLY did something" must exclude its own actions, or the follow-up it grants would trigger itself.
-     */
-    /**
-     * {@code <who> is_party_first} ? the unit is the FIRST CHARACTER of the party. Its reader is relic 31:
-     * "若装备者不是队伍第一名，则使队伍第一名的攻击力提高" -- one rule needs both halves, so this answers the condition
-     * half and {@code party_first} (a target selector) answers the other.
-     */
-    /**
      * {@code <who> is_companion} ? the unit is one of the Trailblaze Companions (relic 32).
      */
+
     static final class IsCompanion implements Condition, PartyCondition {
         private final String subject;
         private final String raw;
@@ -1053,6 +1029,12 @@ final class TriggerConditionParser {
         }
     }
 
+    /**
+     * {@code <who> is_party_first} ? the unit is the FIRST CHARACTER of the party. Its reader is relic 31:
+     * "若装备者不是队伍第一名，则使队伍第一名的攻击力提高" -- one rule needs both halves, so this answers the condition
+     * half and {@code party_first} (a target selector) answers the other.
+     */
+
     static final class IsPartyFirst implements Condition, PartyCondition {
         private final String subject;
         private final String raw;
@@ -1086,6 +1068,13 @@ final class TriggerConditionParser {
             return raw;
         }
     }
+
+    /**
+     * {@code <who> is_other_ally} ? the unit is on our side <b>and is not the rule's owner</b>.
+     *
+     * <p>The "other" half is the whole point: {@code is_ally} already answers "on our side", and the owner satisfies it. A rule
+     * that means "my ALLY did something" must exclude its own actions, or the follow-up it grants would trigger itself.
+     */
 
     static final class IsOtherAlly implements Condition, PartyCondition {
         private final String subject;
@@ -1150,6 +1139,21 @@ final class TriggerConditionParser {
             return raw;
         }
     }
+
+    /**
+     * Side test: {@code target is_ally} - "the unit this cast was aimed at is on our side".
+     *
+     * <p><b>Why the DSL needs it.</b> Three shipped relic abilities say "对<b>己方角色</b>施放终结技/战技时" (sets 114,
+     * 118, 121). A cast event carries the unit it <b>aimed at</b> ({@code ctx.target()}), which is what
+     * "对…施放" names - but the event says nothing about that unit's <b>side</b>, and a damaging ultimate aimed at an
+     * enemy carries a target too. Without this predicate the rule would fire on every cast of that slot: an
+     * over-trigger with nothing to report.
+     *
+     * <p>The side is taken from the battlefield ({@code battle.allies}, the same roster {@code all_allies} reads), so
+     * a context with no battle answers "no" - the "cannot read it, therefore the condition fails" rule every
+     * field-reading condition follows. Note: It is a {@link PartyCondition}, so {@code !target is_ally} means the
+     * opposite <b>and</b> still fails when there is no target at all (a missing party must never become a match).
+     */
 
     static final class IsAlly implements Condition, PartyCondition {
 
@@ -1243,10 +1247,6 @@ final class TriggerConditionParser {
      * "拥有任意相同命途的角色": whether the candidate has a Path twin on our side. A unit whose Path is
      * the placeholder ({@code Path.OTHER}) has no twin by definition -- the same refusal {@code has_same_path_ally} makes.
      */
-    /** "变化的是[NAME]": the guard that stops a forwarding rule from eating its own output. */
-    /**
-     * "施加的是[X]类负面状态": the family of the debuff that just landed (control / dot).
-     */
     static final class AppliedDebuffClass implements Condition {
         private final String raw;
         private final com.laosun.aluminium.enums.DebuffClass expected;
@@ -1272,6 +1272,10 @@ final class TriggerConditionParser {
         }
     }
 
+    /** "变化的是[NAME]": the guard that stops a forwarding rule from eating its own output. */
+    /**
+     * "施加的是[X]类负面状态": the family of the debuff that just landed (control / dot).
+     */
     static final class ResourceChanged implements Condition {
         private final String raw;
         private final String resource;
