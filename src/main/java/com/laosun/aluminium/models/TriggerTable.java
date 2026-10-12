@@ -52,7 +52,9 @@ public class TriggerTable {
      */
     private final Map<TriggerEvent, List<CompiledRule>> byEvent = new HashMap<>();
 
-    /** Who a per-turn or cooldown count may belong to when it is not the rule owner. */
+    /**
+     * Who a per-turn or cooldown count may belong to when it is not the rule owner.
+     */
     private static final java.util.Set<String> SUBJECTS = java.util.Set.of("self", "target", "actor");
 
     /**
@@ -1048,42 +1050,42 @@ public class TriggerTable {
      * an effect's {@code "scale"} ("raises the value by X% of <my own attribute>"): the condition's "read my attribute"
      * and the effect's "derive from my attribute" are one concept, and two literals would be able to drift.
      */
-/**
- * {@code summon_attr:<ATTRIBUTE>} -- the rule owner MEMOSPRITE's own attribute (Demiurge (德谬歌)), as a magnitude: "等同于德谬歌生命上限的 #1%"
- * (1415 memosprite skill 10, data slot 13). The sibling of {@link TriggerConditionParser#SELF_ATTR_PREFIX}, one subject further out.
- */
-/**
- * {@code actor_attr:<ATTRIBUTE>} -- the ACTOR's own attribute, as a magnitude: "提高数值等同于德谬歌生命上限的 #1%", where Demiurge (德谬歌) is the unit
- * casting (1415 memosprite skill 10). The sibling of {@link TriggerConditionParser#SELF_ATTR_PREFIX} (the owner) and {@link #SUMMON_ATTR_PREFIX} (the owner's
- * memosprite), one subject across: this one is whoever the event is about.
- */
-static final String ACTOR_ATTR_PREFIX = "actor_attr:";
-static final String SUMMON_ATTR_PREFIX = "summon_attr:";
+    /**
+     * {@code summon_attr:<ATTRIBUTE>} -- the rule owner MEMOSPRITE's own attribute (Demiurge (德谬歌)), as a magnitude: "等同于德谬歌生命上限的 #1%"
+     * (1415 memosprite skill 10, data slot 13). The sibling of {@link TriggerConditionParser#SELF_ATTR_PREFIX}, one subject further out.
+     */
+    /**
+     * {@code actor_attr:<ATTRIBUTE>} -- the ACTOR's own attribute, as a magnitude: "提高数值等同于德谬歌生命上限的 #1%", where Demiurge (德谬歌) is the unit
+     * casting (1415 memosprite skill 10). The sibling of {@link TriggerConditionParser#SELF_ATTR_PREFIX} (the owner) and {@link #SUMMON_ATTR_PREFIX} (the owner's
+     * memosprite), one subject across: this one is whoever the event is about.
+     */
+    static final String ACTOR_ATTR_PREFIX = "actor_attr:";
+    static final String SUMMON_ATTR_PREFIX = "summon_attr:";
 
-/**
- * {@code holder_attr:<STATE>:<ATTRIBUTE>} -- the own attribute of the unit <b>holding a state</b>, as a magnitude.
- *
- * <p>The fourth subject in this family, and the one the three above cannot name: "该次欢愉伤害使用【美学底本】的属性值计算"
- * (1503 Pearl (真珠)'s enhanced basic and her Eidolon 6) states that the instance's magnitude is read off the ally her
- * ultimate marked as the Aesthetic Archetype (美学底本) -- a unit chosen in combat, not a slot in the roster, so neither
- * {@link TriggerConditionParser#SELF_ATTR_PREFIX} (the owner), {@link #SUMMON_ATTR_PREFIX} (the owner's memosprite) nor {@link #ACTOR_ATTR_PREFIX}
- * (whoever the event is about) can reach it.
- *
- * <p>It is the magnitude-keeping counterpart of the {@code holder_of:<STATE>} <b>target</b> selector
- * ({@link TriggerInterpreter}), resolved through the same lookup - so "who holds it" has one answer in the engine
- * whether the sentence is about where an effect lands or about which number it reads.
- *
- * <p>The state name can contain a colon, so the split is on the LAST colon. Note: the attribute is mandatory here
- * (unlike the target selector, where the holder itself is the whole answer): "use [美学底本]'s stats" does not say
- * which stat, and defaulting to one would silently invent the game's own choice.
- */
-static final String HOLDER_ATTR_PREFIX = "holder_attr:";
+    /**
+     * {@code holder_attr:<STATE>:<ATTRIBUTE>} -- the own attribute of the unit <b>holding a state</b>, as a magnitude.
+     *
+     * <p>The fourth subject in this family, and the one the three above cannot name: "该次欢愉伤害使用【美学底本】的属性值计算"
+     * (1503 Pearl (真珠)'s enhanced basic and her Eidolon 6) states that the instance's magnitude is read off the ally her
+     * ultimate marked as the Aesthetic Archetype (美学底本) -- a unit chosen in combat, not a slot in the roster, so neither
+     * {@link TriggerConditionParser#SELF_ATTR_PREFIX} (the owner), {@link #SUMMON_ATTR_PREFIX} (the owner's memosprite) nor {@link #ACTOR_ATTR_PREFIX}
+     * (whoever the event is about) can reach it.
+     *
+     * <p>It is the magnitude-keeping counterpart of the {@code holder_of:<STATE>} <b>target</b> selector
+     * ({@link TriggerInterpreter}), resolved through the same lookup - so "who holds it" has one answer in the engine
+     * whether the sentence is about where an effect lands or about which number it reads.
+     *
+     * <p>The state name can contain a colon, so the split is on the LAST colon. Note: the attribute is mandatory here
+     * (unlike the target selector, where the holder itself is the whole answer): "use [美学底本]'s stats" does not say
+     * which stat, and defaulting to one would silently invent the game's own choice.
+     */
+    static final String HOLDER_ATTR_PREFIX = "holder_attr:";
 
-/**
- * {@code cast_skill_param:<index>} -- a parameter of the skill that produced the event, at its CURRENT level: "等同于德谬歌生命上限的 #1%"
- * (1415 memosprite skill 10). The damage path reads the same row through {@code multiplierOf}.
- */
-static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
+    /**
+     * {@code cast_skill_param:<index>} -- a parameter of the skill that produced the event, at its CURRENT level: "等同于德谬歌生命上限的 #1%"
+     * (1415 memosprite skill 10). The damage path reads the same row through {@code multiplierOf}.
+     */
+    static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
 
     /**
      * {@code skill_param:<SKILLTYPE>:<index>} -- a parameter of one of the RULE OWNER's OWN skills, at its current level.
@@ -1107,7 +1109,6 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
     static final String CAST_APPLIED_PREFIX = "cast_applied:";
 
 
-
     /**
      * The ops whose {@code "resource"} argument names a resource the character must declare.
      *
@@ -1117,76 +1118,26 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
     private static final Set<String> RESOURCE_OPS = Set.of("GAIN_RESOURCE", "SPEND_RESOURCE");
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     /**
      * A validated rule: the event it listens for, its conditions, its effects, and how often it may fire.
      *
-     * @param event         the subscribed event
-     * @param conditions    all must hold
-     * @param effects       run in order
-     * @param source        where the rule came from, propagated into error messages
-     * @param key           stable identity for the per-combatant firing limits (source + position)
-     * @param id            the rule's optional name ({@code ""} when it states none), the handle a
-     *                      {@code MODIFY_RULE} effect points at
-     * @param cooldownTurns the owner's turns between two firings ({@code 0} = unlimited)
-     * @param oncePerBattle {@code true} = at most one firing per battle
-     * @param chance        the probability of firing at all, as a fraction of 1 ({@code 1.0} = always)
-     * @param minEidolon    the Eidolon rank the owner needs ({@code 0} = ungated)
-     * @param chanceDecay   what the {@code chance} is multiplied by after a successful trigger
-     *                      ({@code 0} = the probability does not decay; see {@link TriggerSpec#getChanceDecay()})
-     * @param oneOfNoRepeat the memory this rule's pick is filed under ({@code ""} = no memory, a uniform pick; two rules
-     *                      stating the same name share it - see {@link TriggerSpec#getOneOfNoRepeat()})
+     * @param event          the subscribed event
+     * @param conditions     all must hold
+     * @param effects        run in order
+     * @param source         where the rule came from, propagated into error messages
+     * @param key            stable identity for the per-combatant firing limits (source + position)
+     * @param id             the rule's optional name ({@code ""} when it states none), the handle a
+     *                       {@code MODIFY_RULE} effect points at
+     * @param cooldownTurns  the owner's turns between two firings ({@code 0} = unlimited)
+     * @param oncePerBattle  {@code true} = at most one firing per battle
+     * @param chance         the probability of firing at all, as a fraction of 1 ({@code 1.0} = always)
+     * @param minEidolon     the Eidolon rank the owner needs ({@code 0} = ungated)
+     * @param chanceDecay    what the {@code chance} is multiplied by after a successful trigger
+     *                       ({@code 0} = the probability does not decay; see {@link TriggerSpec#getChanceDecay()})
+     * @param oneOfNoRepeat  the memory this rule's pick is filed under ({@code ""} = no memory, a uniform pick; two rules
+     *                       stating the same name share it - see {@link TriggerSpec#getOneOfNoRepeat()})
      * @param deferUntilWave {@code true} = fired with every opponent down, this rule is held until a wave brings enemies
-     *                      in ({@link TriggerSpec#getDeferUntilWave()})
+     *                       in ({@link TriggerSpec#getDeferUntilWave()})
      */
     public record CompiledRule(TriggerEvent event, List<Condition> conditions,
                                List<EffectSpec> effects, String source, String key, String id,
@@ -1285,7 +1236,7 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
          *
          * <p><b>Why a copy rather than a mutable field.</b> A rule can fire inside another rule's effect (a counter
          * that strikes back), so "the rule being applied" is a per-firing fact, exactly like the rest of the context
-         *  - a shared mutable field would report the inner rule to the outer one's remaining effects.
+         * - a shared mutable field would report the inner rule to the outer one's remaining effects.
          */
         public TriggerContext withRule(String id) {
             return new TriggerContext(owner, actor, target, hitCount, amount, damage, battle, fromCast,
@@ -1301,6 +1252,7 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
             return new TriggerContext(owner, actor, target, hitCount, amount, damage, battle, fromCast, ruleId,
                     targetFilter, skillId, weakHitCount, attackHitTargets, name);
         }
+
         /**
          * The same context, saying <b>which data row</b> of a skill produced this event.
          *
@@ -1378,7 +1330,9 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
                     List.of(), 0, weakHitCount, List.of(), stateName);
         }
 
-        /** Whether {@code candidate} passes the per-target conditions (an empty filter admits everything). */
+        /**
+         * Whether {@code candidate} passes the per-target conditions (an empty filter admits everything).
+         */
         public boolean passesTargetFilter(CanHit candidate) {
             for (Condition condition : targetFilter) {
                 if (!condition.test(withSubject(candidate))) {
@@ -1423,16 +1377,6 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
          */
         CanHit partyOf(TriggerContext ctx);
     }
-
-
-
-
-
-
-
-
-
-
 
 
     /**
@@ -1493,23 +1437,6 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
     }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     /**
      * Numeric comparison such as {@code hit_count > 0} or {@code self_attr:SPEED >= 145}.
      */
@@ -1528,11 +1455,17 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
          * {@link TriggerTable#referencedResources} for the assembly-point check.
          */
         final String resource;
-        /** The named counter a {@code *_stacks:<NAME>} variable reads, or {@code null}. */
+        /**
+         * The named counter a {@code *_stacks:<NAME>} variable reads, or {@code null}.
+         */
         final String stacksName;
-        /** Whether that counter is read off the event's <b>target</b> rather than the rule's owner. */
+        /**
+         * Whether that counter is read off the event's <b>target</b> rather than the rule's owner.
+         */
         private final boolean stacksOnTarget;
-        /** Whether it is read off the event's <b>actor</b> (the unit that caused it) instead. */
+        /**
+         * Whether it is read off the event's <b>actor</b> (the unit that caused it) instead.
+         */
         private final boolean stacksOnActor;
         private final String operator;
         private final double literal;
@@ -1546,9 +1479,13 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
         private final String otherVariable;
         private final AttributeType otherAttribute;
         private final String otherResource;
-        /** The Path an {@code allies_with_path:<PATH>} variable counts, or {@code null}. */
+        /**
+         * The Path an {@code allies_with_path:<PATH>} variable counts, or {@code null}.
+         */
         private final String path;
-        /** The same for the right-hand variable of a two-variable comparison. */
+        /**
+         * The same for the right-hand variable of a two-variable comparison.
+         */
         private final String otherPath;
         private final String otherStacksName;
         private final boolean otherStacksOnTarget;
@@ -1586,7 +1523,7 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
                 double other = otherPath != null
                         ? pathCount(ctx, otherPath)
                         : value(ctx, otherVariable, otherAttribute, otherResource, otherStacksName,
-                                otherStacksOnTarget, otherStacksOnActor);
+                        otherStacksOnTarget, otherStacksOnActor);
                 left = literalOnLeft ? other : value;
                 right = literalOnLeft ? value : other;
             } else {
@@ -1638,9 +1575,11 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
                     .count();
         }
 
-        /** One reader for every numeric variable, so a comparison can read two of them. */
+        /**
+         * One reader for every numeric variable, so a comparison can read two of them.
+         */
         private double value(TriggerContext ctx, String variable, AttributeType attribute, String resource,
-                String stacksName, boolean stacksOnTarget, boolean stacksOnActor) {
+                             String stacksName, boolean stacksOnTarget, boolean stacksOnActor) {
             if (attribute != null) {
                 return ownerAttribute(ctx.owner(), attribute);
             }
@@ -1663,17 +1602,17 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
             }
             return switch (variable) {
                 case "weakness_hit_count" -> ctx.weakHitCount();   // how many hit targets share the attack's weakness
-                    case "hit_count" -> ctx.hitCount();
+                case "hit_count" -> ctx.hitCount();
                 // "强化普攻命中…": the DATA ROW of the skill that produced this event (0 = the event named none, which
                 // makes the comparison false rather than accidentally true for the row 0 that no skill has).
                 case "from_skill_id" -> ctx.skillId();
-            // The skill that produced a SETTLED damage: `DAMAGE_SETTLED` hands over the `Damage` but goes through the overload WITHOUT a
-            // skillId, so `from_skill_id` reads 0 there -- measured, a rule that fires ungated stops firing the moment `from_skill_id == ` is added. The
-            // instance carries it (`Damage.getSkillKey()`, "the loader's slot"), so this reads it where the event provides nothing.
-            case "damage_skill_key" -> {
-                com.laosun.aluminium.models.Damage hit = ctx.damage();
-                yield hit == null ? 0 : hit.getSkillKey();
-            }
+                // The skill that produced a SETTLED damage: `DAMAGE_SETTLED` hands over the `Damage` but goes through the overload WITHOUT a
+                // skillId, so `from_skill_id` reads 0 there -- measured, a rule that fires ungated stops firing the moment `from_skill_id == ` is added. The
+                // instance carries it (`Damage.getSkillKey()`, "the loader's slot"), so this reads it where the event provides nothing.
+                case "damage_skill_key" -> {
+                    com.laosun.aluminium.models.Damage hit = ctx.damage();
+                    yield hit == null ? 0 : hit.getSkillKey();
+                }
                 case "hp_percent" -> hpPercent(ctx.owner());
                 // "施放欢愉技计入的笑点大于等于 20 个" (reader: 1506 Silver Wolf LV.999's trace 1506102): the laugh points
                 // that Elation damage is computed from - the merged, frozen snapshots of 【好活当赏】, NOT the party's live
@@ -1681,11 +1620,11 @@ static final String CAST_SKILL_PARAM_PREFIX = "cast_skill_param:";
                 // NaN, like every other unreadable variable here.
                 case "counted_laughs" -> ctx.battle() == null ? Double.NaN : ctx.battle().countedLaughPoints();
                 case "target_weakness_count" -> ctx.target() instanceof com.laosun.aluminium.models.enemy.Enemy weak
-                            ? weak.weaknessCount() : 0;
-                    case "target_debuff_count", "target_dot_count" -> ctx.target() == null ? Double.NaN
+                        ? weak.weaknessCount() : 0;
+                case "target_debuff_count", "target_dot_count" -> ctx.target() == null ? Double.NaN
                         : ("target_dot_count".equals(variable)
-                                ? ctx.target().getBuffManager().countBuffs(com.laosun.aluminium.models.buff.DotBuff.class)
-                                : ctx.target().getBuffManager().debuffCount());
+                        ? ctx.target().getBuffManager().countBuffs(com.laosun.aluminium.models.buff.DotBuff.class)
+                        : ctx.target().getBuffManager().debuffCount());
                 // "若该目标当前生命值百分比大于等于 30%" -- the OTHER unit's HP, which `hp_percent` cannot ask
                 // (that one reads the rule's owner). Unreadable with no subject, like every other variable here.
                 case "target_hp_percent" -> ctx.target() == null ? Double.NaN : hpPercent(ctx.target());

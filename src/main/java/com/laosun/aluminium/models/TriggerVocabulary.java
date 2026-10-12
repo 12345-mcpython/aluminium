@@ -22,48 +22,41 @@ final class TriggerVocabulary {
      * <p>`random_absent` -- "add 1 random attribute weakness, preferentially adding a weakness the target does not yet have" (character 1405).
      */
     static final Set<String> SPECIAL_ELEMENTS = Set.of("party_first", "random_absent");
-    static final Set<String> WIRED = Set.of(
-            "INSERT_ACTION", "RESET_TRIGGER_LIMIT",
-            // "add an X attribute weakness to a designated single enemy" (readers 1315, 1310).
-            "ADD_ELEMENTAL_WEAKNESS",
-            "GAIN_ENERGY", "GAIN_SKILL_POINT", "HEAL", "SHIELD", "EXTRA_TURN", "ADVANCE",
-            // "at the start of battle, if energy is below #2, restore it to #2" (reader: 1310, Firefly's talent):
-            // a FLOOR. GAIN_ENERGY adds an amount or a share of max, so from 40% it would add 50% and overshoot.
-            "RAISE_ENERGY_TO",
-            // "while [character] is on the field the skill point cap is raised by #3" (reader: 1306,
-            // Sparkle): the cap is not a constant, so content needs a way to move it. Distinct from
-            // RAISE_RESOURCE_CAP, which widens a declared resource's OVERFLOW, not its cap.
-            "RAISE_SKILL_POINT_CAP",
-            "GAIN_RESOURCE", "SPEND_RESOURCE", "DAMAGE", "MODIFY_ATTR", "APPLY_BUFF", "REMOVE_STACK", "RAISE_SKILL_HITS",
-            // "该额外回合开始时【美学底本】获得 30 点…额外回合结束时移除" (reader: 1503 Pearl (真珠)): the inverse of a
-            // temporary grant, which clamps rather than erroring - unlike SPEND_RESOURCE, which is a strict cost.
-            "REMOVE_RESOURCE",
-            // "真珠回合开始时重置可获得【好活当赏】数量" (reader: the same trace): starts a new round for the allowances that
-            // `max_per_round` charges against, so a per-round limit can exist at all.
-            "RESET_RESOURCE_CAP",
-            // "将触发【头号补给盲盒】的固定概率重置为初始值" (reader: 1506 Silver Wolf LV.999's 崩坏级伤害演示): the inverse of a
-            // decaying rule probability (`chance_decay`), and the only way a decayed rule becomes certain again.
-            "RESET_RULE_CHANCE",
-            // "[新蕊] can overflow to #3%" (reader: 114151, Castorice (遐蝶)): a declaration states a resource's overflow,
-            // and `Resource` has had both tiers all along -- this widens the second one in battle.
-            "RAISE_RESOURCE_CAP",
-            "MODIFY_DAMAGE_TAKEN", "BOOST_DAMAGE", "DISPEL", "SUMMON", "SUMMON_SERVANT", "COMMAND_SUMMON", "CAST_SKILL", "DELEGATE_DAMAGE",
-            // "每点【好活当赏】等同于 200 点抵御值，我方目标受到伤害时，真珠可消耗抵御值为我方目标抵挡 60% 的伤害"
-            // (reader: 1503 Pearl (真珠)'s talent): a share of an incoming hit paid for out of ANOTHER unit's counter.
-            "ABSORB_DAMAGE",
-            "REMOVE_STATE", "TAUNT", "APPLY_CONTROL", "APPLY_DOT", "EXTEND_BUFF", "RESIST_DEBUFF",
-            "MODIFY_RULE", "ADD_DAMAGE", "RAISE_SKILL_LEVEL", "START_COUNTDOWN", "ADD_STACK", "APPLY_REGEN", "BOOST_TOUGHNESS", "SUPER_BREAK", "REMOVE_BUFF", "REPLACE_SKILL", "TICK_DOT", "CONSUME_HP",
-            // "每使【隐藏分】提高 120 点（含初始隐藏分），获得 1 个额外回合并恢复 1 次强化普攻的可施放次数" (reader: 1506
-            // Silver Wolf LV.999's Eidolon 2): the milestones a `per_steps` effect paid for, consumed ONCE. Counting and
-            // spending have to be two effects, because the sentence pays two effects per milestone while the counter may
-            // be charged only once.
-            "SPEND_STEPS");
     /**
-     * Ops that are declared in the roadmap but whose prerequisite phase has not landed. Listing
-     * them here (rather than treating them as typos) lets the error message say <i>why</i>.
+     * Ops the engine can perform, derived from {@link TriggerOperator}.
+     *
+     * <p>Note: A view, not a second list. The constants in {@link TriggerOperator} are the
+     * vocabulary -- each carries its own {@code wired} flag and the long reasoning for why the op
+     * exists -- and these two sets are what the load-time check compares a character file's spelling
+     * against. Keeping them derived is the whole point: the vocabulary used to be written out as
+     * string literals here AND as constants there, and a second copy of one list always drifts.
+     *
+     * <p>Members worth knowing about, all of them here because the flag lives with the name:
+     * <ul>
+     *   <li>{@code ABSORB_DAMAGE} -- "每点【好活当赏】等同于 200 点抵御值，我方目标受到伤害时，
+     *       真珠可消耗抵御值为我方目标抵挡 60% 的伤害" (reader: 1503 Pearl (真珠)'s talent): a share of an
+     *       incoming hit paid for out of ANOTHER unit's counter.</li>
+     *   <li>{@code SPEND_STEPS} -- "每使【隐藏分】提高 120 点（含初始隐藏分），获得 1 个额外回合并恢复
+     *       1 次强化普攻的可施放次数" (reader: 1506 Silver Wolf LV.999's Eidolon 2): the milestones a
+     *       {@code per_steps} effect paid for, consumed ONCE. Counting and spending have to be two
+     *       effects, because the sentence pays two effects per milestone while the counter may be
+     *       charged only once.</li>
+     *   <li>{@code RAISE_RESOURCE_CAP} -- "[新蕊] can overflow to #3%" (reader: 114151, Castorice
+     *       (遐蝶)): a declaration states a resource's overflow, and {@code Resource} has had both
+     *       tiers all along, so this widens the second one in battle.</li>
+     *   <li>{@code RAISE_SKILL_POINT_CAP} -- "while [character] is on the field the skill point cap
+     *       is raised by #3" (reader: 1306, Sparkle): the cap is not a constant, so content needs a
+     *       way to move it. Distinct from {@code RAISE_RESOURCE_CAP}, which widens a declared
+     *       resource's OVERFLOW, not its cap.</li>
+     * </ul>
      */
-    static final Set<String> PLANNED = Set.of(
-            "REDUCE_TOUGHNESS");
+    static final Set<String> WIRED = TriggerOperator.wiredNames();
+
+    /**
+     * Ops declared in the roadmap whose prerequisite phase has not landed. Listing them (rather than
+     * treating them as typos) lets the error message say <i>why</i> -- see {@link TriggerOperator}.
+     */
+    static final Set<String> PLANNED = TriggerOperator.plannedNames();
     /**
      * The ops that grant something with a duration, and therefore accept {@code permanent: true}
      * ("for the rest of the battle"). See {@link TriggerValidator#requireNoStackArguments}.
