@@ -147,7 +147,7 @@ final class TriggerEffects {
         } else {
             magnitude = effect.getAmount();
         }
-        boolean permanent = TriggerInterpreter.unticked(effect);
+        boolean permanent = TriggerLifetimes.unticked(effect);
         int turns = permanent ? UNBOUNDED_DURATION_PLACEHOLDER : effect.getTurns();
         int maxStacks = effect.stackCap() == null ? 1 : effect.stackCap();
         for (CanHit target : TriggerTargets.resolveTargets(battle, effect, ctx)) {
@@ -181,8 +181,8 @@ final class TriggerEffects {
                     applied = Math.min(applied, ceiling / base);
                 }
             }
-            AbstractBuff buff = TriggerInterpreter.withSource(TriggerInterpreter.withTickOwner(
-                    TriggerInterpreter.withLifetime(TriggerInterpreter.statModifier(attribute, applied, turns, permanent, maxStacks, derived), effect),
+            AbstractBuff buff = TriggerInterpreter.withSource(TriggerLifetimes.withTickOwner(
+                    TriggerLifetimes.withLifetime(TriggerInterpreter.statModifier(attribute, applied, turns, permanent, maxStacks, derived), effect),
                     effect, ctx), ctx);
             // "while in the [协奏] state, raise the ATK of all of us ...": the boost lasts as long as the STATE, and the state ends
             // when a countdown's turn arrives -- a lifetime no `turns` can state. Naming the modifier is what lets
@@ -436,7 +436,7 @@ final class TriggerEffects {
      * @param ctx    the context
      */
     static void applyState(Battle battle, EffectSpec effect, TriggerContext ctx) {
-        boolean permanent = TriggerInterpreter.unticked(effect);
+        boolean permanent = TriggerLifetimes.unticked(effect);
         int turns = permanent ? UNBOUNDED_DURATION_PLACEHOLDER : effect.getTurns();
         String state = effect.getBuff().trim();
         // How many instances this application carries (reader: 1513's reward, whose state's INSTANCE COUNT is
@@ -453,8 +453,8 @@ final class TriggerEffects {
         }
         for (CanHit target : TriggerTargets.resolveTargets(battle, effect, ctx)) {
             for (int instance = 0; instance < times; instance++) {
-                AbstractBuff buff = TriggerInterpreter.withSource(TriggerInterpreter.withTickOwner(
-                        TriggerInterpreter.withLifetime(Boolean.TRUE.equals(effect.getStackable())
+                AbstractBuff buff = TriggerInterpreter.withSource(TriggerLifetimes.withTickOwner(
+                        TriggerLifetimes.withLifetime(Boolean.TRUE.equals(effect.getStackable())
                                 ? new StackableStateBuff(state, turns, permanent,
                                 effect.getMaxStacks() == null ? 1 : effect.getMaxStacks())
                                 : Boolean.TRUE.equals(effect.getDefersDeath())
@@ -549,10 +549,10 @@ final class TriggerEffects {
                 if (target.getBuffManager().stacksOf(name) >= cap) {
                     break;                      // "2 times" is a threshold, not an invitation to keep counting
                 }
-                boolean permanent = TriggerInterpreter.unticked(effect);
+                boolean permanent = TriggerLifetimes.unticked(effect);
                 AbstractBuff stack = TriggerInterpreter.withSource(
-                        TriggerInterpreter.withTickOwner(
-                                TriggerInterpreter.withLifetime(
+                        TriggerLifetimes.withTickOwner(
+                                TriggerLifetimes.withLifetime(
                                         new com.laosun.aluminium.models.buff.StackBuff(
                                                 name, permanent ? 1 : effect.getTurns(), permanent, cap),
                                         effect),
@@ -629,7 +629,7 @@ final class TriggerEffects {
             // heal/shield scale vocabulary and is worked out per carrier (a 	arget_max_hp regeneration is a different
             // number for each one). The value is derived once, here, and frozen in the buff.
             double amount = TriggerInterpreter.grantAmount(effect, target, ctx);
-            AbstractBuff regen = TriggerInterpreter.withSource(TriggerInterpreter.withLifetime(
+            AbstractBuff regen = TriggerInterpreter.withSource(TriggerLifetimes.withLifetime(
                     new com.laosun.aluminium.models.buff.RegenBuff(ctx.owner(), name, amount, effect.getTurns()),
                     effect), ctx);
             target.getBuffManager().addBuff(regen);
@@ -766,7 +766,7 @@ final class TriggerEffects {
         Skill replacement = new com.laosun.aluminium.models.skill.DefaultSkill(owner.getCid(), effect.getSkillId(), level);
         for (CanHit target : TriggerTargets.resolveTargets(battle, effect, ctx)) {
             if (target instanceof com.laosun.aluminium.models.Character character) {
-                character.getBuffManager().addBuff(TriggerInterpreter.withSource(TriggerInterpreter.withLifetime(
+                character.getBuffManager().addBuff(TriggerInterpreter.withSource(TriggerLifetimes.withLifetime(
                         new com.laosun.aluminium.models.buff.SkillSwapBuff(slot, replacement), effect), ctx));
             }
         }
@@ -863,7 +863,7 @@ final class TriggerEffects {
             if (target == null) {
                 continue;
             }
-            AbstractBuff boost = TriggerInterpreter.withSource(TriggerInterpreter.withLifetime(
+            AbstractBuff boost = TriggerInterpreter.withSource(TriggerLifetimes.withLifetime(
                     new com.laosun.aluminium.models.buff.ToughnessBoostBuff(effect.getPercent(), effect.getTurns()),
                     effect), ctx);
             target.getBuffManager().addBuff(boost);

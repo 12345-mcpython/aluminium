@@ -569,7 +569,7 @@ final class TriggerValidator {
                             "Op " + op + " requires a positive \"turns\" (how long the taunt lasts); the documents "
                                     + "write \"make the target enter the taunt state, lasting 1 turn\" (source: " + spec.getSource() + ")");
                 }
-                if (Boolean.TRUE.equals(effect.getPermanent()) || TriggerInterpreter.eventBound(effect)) {
+                if (Boolean.TRUE.equals(effect.getPermanent()) || TriggerLifetimes.eventBound(effect)) {
                     throw new IllegalArgumentException(
                             "Op " + op + " takes a turn count and nothing else; \"permanent\" / \"until\" would be "
                                     + "a taunt that never ends (source: " + spec.getSource() + ")");
@@ -611,7 +611,7 @@ final class TriggerValidator {
                 requirePositiveTurns(effect, op, spec);
                 requireBaseChance(effect, op, spec);
                 requireNoStackArguments(effect, op, spec);
-                if (Boolean.TRUE.equals(effect.getPermanent()) || TriggerInterpreter.eventBound(effect)) {
+                if (Boolean.TRUE.equals(effect.getPermanent()) || TriggerLifetimes.eventBound(effect)) {
                     throw new IllegalArgumentException(
                             "Op " + op + " states a number of turns and nothing else; \"permanent\" / \"until\" "
                                     + "would be a control that never ends (source: " + spec.getSource() + ")");
@@ -638,7 +638,7 @@ final class TriggerValidator {
                 // Note: `max_stacks` IS allowed here ("at most N stacks",): the general stack-family refusal would
                 // reject it, so the ceiling is validated on its own -- a positive count, nothing else from that family.
                 requireDotStackCap(effect, op, spec);
-                if (Boolean.TRUE.equals(effect.getPermanent()) || TriggerInterpreter.eventBound(effect)) {
+                if (Boolean.TRUE.equals(effect.getPermanent()) || TriggerLifetimes.eventBound(effect)) {
                     throw new IllegalArgumentException(
                             "Op " + op + " states a number of turns and nothing else; \"permanent\" / \"until\" "
                                     + "would be a damage-over-time that never ends (source: " + spec.getSource()
@@ -652,7 +652,7 @@ final class TriggerValidator {
                 // sits on ("damage boost effect"). Nothing else is stated.
                 requireSignedTurns(effect, op, spec);
                 requireNoStackArguments(effect, op, spec);
-                if (Boolean.TRUE.equals(effect.getPermanent()) || TriggerInterpreter.eventBound(effect)) {
+                if (Boolean.TRUE.equals(effect.getPermanent()) || TriggerLifetimes.eventBound(effect)) {
                     throw new IllegalArgumentException(
                             "Op " + op + " adds turns to a buff that already exists; \"permanent\" / \"until\" "
                                     + "describe how a NEW buff ends and are not read here "
@@ -1363,7 +1363,7 @@ final class TriggerValidator {
                     "Op " + op + " creates no buff, so \"permanent\" has nothing to keep alive; it acts on a "
                             + "single moment (source: " + spec.getSource() + ")");
         }
-        if (TriggerInterpreter.eventBound(effect)) {
+        if (TriggerLifetimes.eventBound(effect)) {
             throw new IllegalArgumentException(
                     "Op " + op + " creates no buff, so it has nothing an \"until\" could end; it states "
                             + "\"until\": " + spellUntil(effect) + " (source: " + spec.getSource() + ")");
@@ -1492,7 +1492,7 @@ final class TriggerValidator {
      */
     static void requireDuration(EffectSpec effect, String op, TriggerSpec spec) {
         boolean permanent = Boolean.TRUE.equals(effect.getPermanent());
-        boolean hasUntil = TriggerInterpreter.eventBound(effect);
+        boolean hasUntil = TriggerLifetimes.eventBound(effect);
         if (permanent && effect.getTurns() != null) {
             throw new IllegalArgumentException(
                     "Op " + op + " has both \"turns\" (" + effect.getTurns()
