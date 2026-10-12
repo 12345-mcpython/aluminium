@@ -278,7 +278,29 @@ public final class BattleDriver {
      * @return a driver using {@link AutoPolicy} for every unit
      */
     public static BattleDriver of(List<Character> characters, List<? extends CanHit> enemies, long seed) {
-        Battle battle = new Battle(characters, enemies, new Random(seed));
+        return of(characters, enemies, seed, null);
+    }
+
+    /**
+     * Builds a driver for a battle whose characters' technique releases are known up front.
+     *
+     * <p><b>Why the technique belongs here and not inside the driver's own logic.</b> A technique is cast on
+     * the map, before the battle exists, and only the caller can know whether it was: it spends a limited map
+     * resource, so "everyone uses their technique every battle" would be a different game. The driver's job is
+     * to carry that decision into the battle it builds, which is what this overload does.
+     *
+     * <p>Passing {@code null} is the same as {@link #of(List, List, long)}: nobody used a technique, so no
+     * {@code 秘技} state is applied and every technique rule's {@code self has_state 秘技} gate is false.
+     *
+     * @param characters the player's party
+     * @param enemies    the opposing units
+     * @param seed       the random seed, for reproducibility
+     * @param techniques which characters released their technique; {@code null} means none did
+     * @return a driver using {@link AutoPolicy} for every unit
+     */
+    public static BattleDriver of(List<Character> characters, List<? extends CanHit> enemies, long seed,
+                                  Battle.Techniques techniques) {
+        Battle battle = new Battle(characters, enemies, new Random(seed), techniques);
         return new BattleDriver(battle, new AutoPolicy());
     }
 }
