@@ -1947,6 +1947,18 @@ final class TriggerConditionParser {
             // pool has moved since the state arrived, which is exactly the case the state exists to describe.
             "counted_laughs");
 
+    /**
+     * The prefix of one parameterised numeric variable: {@code self_attr:SPEED}.
+     *
+     * <p>Why the subject is fixed at {@code self} and not a general {@code <subject>_attr:<TYPE>}: every
+     * attribute threshold in the shipped data is about the wearer ("the wearer's speed / crit rate / break effect / Max HP ..."),
+     * and an axis with one used value is an axis nobody has tested. Adding {@code target_attr:} later is a
+     * few lines in the same place once some content actually needs it.
+     *
+     * <p>Note: Package-private rather than private because {@code TriggerInterpreter} spells the <b>same</b> prefix for
+     * an effect's {@code "scale"} ("raises the value by X% of <my own attribute>"): the condition's "read my attribute"
+     * and the effect's "derive from my attribute" are one concept, and two literals would be able to drift.
+     */
     static final String SELF_ATTR_PREFIX = "self_attr:";
 
     /**
