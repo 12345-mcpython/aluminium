@@ -29,7 +29,8 @@
 | `build_glossary.py` | 从上游构建术语表 | 术语疑问时 ✓ |
 | `breadth_chars_relics.py`／`breadth_cones.py` | 广度普查（角色/遗器/光锥的覆盖）| 决定下一批做什么 ✓ |
 | `mutate.py`／`mut_*.py` | ⚠ **变异驱动**（历史断言靠它们）| ⚠ **已由 pitest 接替**（`build.gradle` 里 `info.solidsoft.pitest` ✓，增量分析已开 ✓）⇒ 新工作用 pitest ✓，这些退居**证据** ✓ |
-| `content_classes.tsv`／`content_names.tsv`／`gaps_section4.md` | 表格／文档片段 | 生成物，一般只读 ✓ |
+| `content_classes.tsv`／`content_names.tsv` | 表格 | 生成物，一般只读 ✓ |
+| `gaps_section4.md` | ⚠⚠ **已作废的 1415 受阻快照**（2026-10-05）—— 其中 4 条"受阻"结论**都已出货**；文件头已写清作废原因。**待办读 `GAPS.md`，不要读它** ✓ |
 
 ## 2. 历史证据（**别删、也别当工具用**）
 
