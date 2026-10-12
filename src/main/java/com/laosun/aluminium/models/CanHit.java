@@ -13,6 +13,7 @@ import com.laosun.aluminium.models.energy.EnergyProvider;
 import com.laosun.aluminium.models.energy.StandardEnergyProvider;
 import com.laosun.aluminium.models.event.*;
 import com.laosun.aluminium.models.skill.Skill;
+import com.laosun.aluminium.models.trigger.TriggerTable;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
@@ -223,6 +224,54 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
      * The cap half: "可叠加上限提高 N 层" - filed at battle start, so it is in place before any stack is attached.
      */
     private final Map<String, Integer> ruleEffectMaxStacksBonus = new HashMap<>();
+
+    /**
+     * Heal bonuses that are conditional on <b>who is being healed</b>, held by the healer.
+     *
+     * <p><b>Why this cannot be an attribute.</b> 「为当前生命值百分比小于等于 30% 的我方目标提供治疗时，
+     * 娜塔莎的治疗量提高 50%」 (1105's talent) is not a fact about the healer: a stat such as
+     * {@code OUTGOING_HEALING_BOOST} has no idea who the recipient is, so the same +50% would apply to a heal
+     * on a full-HP ally. It is also not expressible as a rule: there is no pre-heal event, so no rule can raise
+     * her outgoing healing just before the heal it is about. The one place with the healer and the recipient
+     * together is {@code Battle.calculateHeal}, and this is what it reads there.
+     *
+     * <p>A list rather than a running total, because each entry keeps its own condition and they are evaluated
+     * per heal -- the answer legitimately differs between recipients in the same turn.
+     *
+     * <p>Registered by {@code REGISTER_HEAL_BONUS} at {@code BATTLE_START}, so it is in place before any heal.
+     *
+     * @param condition the question asked about this heal, evaluated with the healer as {@code owner} and
+     *                  {@code actor} and the recipient as {@code target}
+     * @param percent   the bonus as a fraction: {@code 0.5} for 「提高 50%」
+     */
+    public record ConditionalHealBonus(TriggerTable.Condition condition, double percent) {
+    }
+
+    /**
+     * The conditional heal bonuses registered on this unit, in registration order.
+     */
+    private final List<ConditionalHealBonus> conditionalHealBonuses = new ArrayList<>();
+
+    /**
+     * Files a heal bonus whose applicability is decided per heal, not per unit.
+     *
+     * @param condition the question asked about each heal, or {@code null} to skip registering
+     * @param percent   the bonus as a fraction
+     */
+    public void addConditionalHealBonus(TriggerTable.Condition condition, double percent) {
+        if (condition != null) {
+            conditionalHealBonuses.add(new ConditionalHealBonus(condition, percent));
+        }
+    }
+
+    /**
+     * The conditional heal bonuses registered on this unit.
+     *
+     * @return the list, never {@code null}; empty when the unit has none
+     */
+    public List<ConditionalHealBonus> conditionalHealBonuses() {
+        return conditionalHealBonuses;
+    }
 
     /**
      * Per-battle <b>current fixed probabilities</b> of rules that decay, keyed by that rule's {@code id}.
