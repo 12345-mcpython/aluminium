@@ -553,27 +553,12 @@ public class TriggerTable {
     }
 
     /**
-     * All rules matching an event and a given context.
-     *
-     * @param event the fired event
-     * @param ctx   the context the conditions are evaluated against
-     * @return the matching rules, in table order; never {@code null}
-     */
-    /**
-     * The compiled rules of one event, <b>without</b> evaluating their conditions - the list
-     * {@link TriggerInterpreter#fire} walks when it wants to check each rule's conditions as it reaches it.
-     *
-     * <p>Note: Why the interpreter does not simply use {@link #matching}: conditions evaluated all at once cannot see what
-     * an <b>earlier rule of the same event</b> just did (a counter marked on this very attack, for instance), and
-     * "after every 2 times" is exactly that shape. `matching` stays the pure predicate it always was - the data-binding tests
-     * and {@code ruleCount} read it - and this accessor is what lets firing differ.
-     */
-    /**
      * The limiter key of the rule carrying this id, or {@code null} when this table has no such id.
      *
      * <p>Note: An id is optional and a key is not -- that is why both exist (see {@link CompiledRule}), and why
      * a caller holding an id cannot clear a limit without this lookup. Seven shipped rules have no id at all.
      */
+
     public String keyOf(String id) {
         if (id == null) {
             return null;
@@ -588,9 +573,27 @@ public class TriggerTable {
         return null;
     }
 
+    /**
+     * The compiled rules of one event, <b>without</b> evaluating their conditions - the list
+     * {@link TriggerInterpreter#fire} walks when it wants to check each rule's conditions as it reaches it.
+     *
+     * <p>Note: Why the interpreter does not simply use {@link #matching}: conditions evaluated all at once cannot see what
+     * an <b>earlier rule of the same event</b> just did (a counter marked on this very attack, for instance), and
+     * "after every 2 times" is exactly that shape. `matching` stays the pure predicate it always was - the data-binding tests
+     * and {@code ruleCount} read it - and this accessor is what lets firing differ.
+     */
+
     public List<CompiledRule> rulesFor(TriggerEvent event) {
         return byEvent.getOrDefault(event, List.of());
     }
+
+    /**
+     * All rules matching an event and a given context.
+     *
+     * @param event the fired event
+     * @param ctx   the context the conditions are evaluated against
+     * @return the matching rules, in table order; never {@code null}
+     */
 
     public List<CompiledRule> matching(TriggerEvent event, TriggerContext ctx) {
         List<CompiledRule> rules = byEvent.get(event);
@@ -757,13 +760,6 @@ public class TriggerTable {
     }
 
     /**
-     * A rule's optional <b>name</b>, trimmed, or {@code ""} when it states none.
-     *
-     * <p>Only a name that is present is meaningful: an unnamed rule can still be referred to by nothing, which is the
-     * ordinary case and the reason this is not an error. Note: The name is scoped to its file (uniqueness and
-     * resolvability are checked in {@link #validateAmendments()}).
-     */
-    /**
      * Validates {@code per_subject} and returns it ({@code ""} = the rule owner, the shipped default).
      *
      * <p>Validated at load time like the other limits: an unknown name would fall back to the owner and
@@ -783,6 +779,14 @@ public class TriggerTable {
         }
         return trimmed;
     }
+
+    /**
+     * A rule's optional <b>name</b>, trimmed, or {@code ""} when it states none.
+     *
+     * <p>Only a name that is present is meaningful: an unnamed rule can still be referred to by nothing, which is the
+     * ordinary case and the reason this is not an error. Note: The name is scoped to its file (uniqueness and
+     * resolvability are checked in {@link #validateAmendments()}).
+     */
 
     private static String validateId(TriggerSpec spec) {
         String id = spec.getId();
@@ -938,21 +942,6 @@ public class TriggerTable {
     }
 
     /**
-     * Validates a per-turn cap ("this effect can trigger N times per turn") and returns it ({@code 0} = no cap).
-     *
-     * <p>Two load-time rejections, both of them things that would otherwise read as a working rule:
-     * <ul>
-     *   <li>{@code per_turn: 0} (or negative) - it reads like "no per-turn limit", which is already spelled by
-     *       omitting the field, and a cap of 0 would be a rule that can never fire at all;</li>
-     *   <li>{@code per_turn} together with {@code cooldown} - "at most N per turn, and at least M turns apart"
-     *       has two readings that disagree once {@code N > 1} (does the cooldown start on the first firing or
-     *       the last?), and the engine would have to pick one silently. {@code cooldown: 1} is exactly the
-     *       {@code N = 1} case of this field, so the pair is never the only way to write something.</li>
-     * </ul>
-     * {@code once_per_battle} <b>may</b> be combined with it: the two are cumulative ("twice per turn, and only
-     * once in the whole battle"), which is a reading that cannot be misread.
-     */
-    /**
      * The per-ATTACK cap: {@code once_per_attack: true} means one, {@code per_attack: N} means N.
      *
      * <p>Note: Both at once is refused rather than resolved: they are two spellings of one dimension, and picking one
@@ -971,6 +960,22 @@ public class TriggerTable {
         }
         return once ? 1 : (stated == null ? 0 : stated);
     }
+
+    /**
+     * Validates a per-turn cap ("this effect can trigger N times per turn") and returns it ({@code 0} = no cap).
+     *
+     * <p>Two load-time rejections, both of them things that would otherwise read as a working rule:
+     * <ul>
+     *   <li>{@code per_turn: 0} (or negative) - it reads like "no per-turn limit", which is already spelled by
+     *       omitting the field, and a cap of 0 would be a rule that can never fire at all;</li>
+     *   <li>{@code per_turn} together with {@code cooldown} - "at most N per turn, and at least M turns apart"
+     *       has two readings that disagree once {@code N > 1} (does the cooldown start on the first firing or
+     *       the last?), and the engine would have to pick one silently. {@code cooldown: 1} is exactly the
+     *       {@code N = 1} case of this field, so the pair is never the only way to write something.</li>
+     * </ul>
+     * {@code once_per_battle} <b>may</b> be combined with it: the two are cumulative ("twice per turn, and only
+     * once in the whole battle"), which is a reading that cannot be misread.
+     */
 
     private static int validatePerTurn(TriggerSpec spec) {
         Integer perTurn = spec.getPerTurn();
@@ -1039,28 +1044,17 @@ public class TriggerTable {
 
 
     /**
-     * The prefix of one parameterised numeric variable: {@code self_attr:SPEED}.
-     *
-     * <p>Why the subject is fixed at {@code self} and not a general {@code <subject>_attr:<TYPE>}: every
-     * attribute threshold in the shipped data is about the wearer ("the wearer's speed / crit rate / break effect / Max HP ..."),
-     * and an axis with one used value is an axis nobody has tested. Adding {@code target_attr:} later is a
-     * few lines in the same place once some content actually needs it.
-     *
-     * <p>Note: Package-private rather than private because {@code TriggerInterpreter} spells the <b>same</b> prefix for
-     * an effect's {@code "scale"} ("raises the value by X% of <my own attribute>"): the condition's "read my attribute"
-     * and the effect's "derive from my attribute" are one concept, and two literals would be able to drift.
-     */
-    /**
      * {@code summon_attr:<ATTRIBUTE>} -- the rule owner MEMOSPRITE's own attribute (Demiurge (德谬歌)), as a magnitude: "等同于德谬歌生命上限的 #1%"
      * (1415 memosprite skill 10, data slot 13). The sibling of {@link TriggerConditionParser#SELF_ATTR_PREFIX}, one subject further out.
      */
+    static final String SUMMON_ATTR_PREFIX = "summon_attr:";
+
     /**
      * {@code actor_attr:<ATTRIBUTE>} -- the ACTOR's own attribute, as a magnitude: "提高数值等同于德谬歌生命上限的 #1%", where Demiurge (德谬歌) is the unit
      * casting (1415 memosprite skill 10). The sibling of {@link TriggerConditionParser#SELF_ATTR_PREFIX} (the owner) and {@link #SUMMON_ATTR_PREFIX} (the owner's
      * memosprite), one subject across: this one is whoever the event is about.
      */
     static final String ACTOR_ATTR_PREFIX = "actor_attr:";
-    static final String SUMMON_ATTR_PREFIX = "summon_attr:";
 
     /**
      * {@code holder_attr:<STATE>:<ATTRIBUTE>} -- the own attribute of the unit <b>holding a state</b>, as a magnitude.
