@@ -11,11 +11,12 @@ javadoc 引用审计，**每批一个提交**。
 
 | 原 | 现 | 拆出的类 | 行数 | 职责 |
 |---|---|---|---|---|
-| `TriggerInterpreter` 6813 | **2310** | `TriggerVocabulary` | 234 | 合法拼写的封闭集合（装载期） |
+| `TriggerInterpreter` 6813 | **2110** | `TriggerVocabulary` | 234 | 合法拼写的封闭集合（装载期） |
 | | | `TriggerValidator` | 2127 | 这条效果**凭什么存在**（装载期） |
 | | | `TriggerTargets` | 674 | 这条效果**打到谁**（触发期） |
 | | | `TriggerMagnitudes` | 795 | 这个效果**是多少**（触发期） |
 | | | `TriggerEffects` | 964 | 这个效果**做什么**（触发期） |
+| | | `TriggerLifetimes` | 125 | 一个 buff **什么时候结束**、**谁的回合花掉它**（§四之二） |
 | `Battle` 3844 | **3621** | `BattleDamage` | 307 | 伤害六乘区装配 ＋ 吸收 ＋ 击破两骑手 |
 | `TriggerTable` 4049 | **1844** | `TriggerConditionParser` | 2353 | 条件 DSL（`when` 的解释器：19 方法 ＋ 26 个条件类 ＋ 38 个常量） |
 
@@ -196,6 +197,53 @@ package-private**（它 `extends Condition`，而 `Condition` 是公开 API）�
 落法：新类 `TriggerConditionParser`（静态工具，照 `TriggerTargets` 的范式），
 `parseCondition` 改 package-private 供 `compile` 调用。
 
+## 三之四、`TriggerInterpreter` 的第二刀：`TriggerLifetimes`（**已落地**）
+
+✅ 提交 `e57d4363`：`TriggerInterpreter` **2205 → 2110**，新类 `TriggerLifetimes` **125 行**（5 个声明）。
+
+**为什么是这一组**：它**不是解释器的内部**，而是解释器与**消费者**之间的接缝 ——
+`TriggerEffects`（上一批拆出来的）调 `withLifetime` **6** 次、`unticked` **3** 次、
+`withTickOwner` **3** 次；`TriggerValidator` 调 `eventBound` **6** 次。
+
+| 声明 | 行 | 职责 |
+|---|---|---|
+| `unticked` / `eventBound` | 3 / 3 | 这个 buff **不许被 tick**（`permanent` 或事件结束） |
+| `withLifetime` | 4 | `until` 命名的**事件**（寿命挂在 buff 上） |
+| `withTickOwner` | 6 | `ticks_on` 命名的**谁的回合边界**花掉它 |
+| `lifetimesOf` | 22 | 把 `until` 的名字翻成 `AbstractBuff.Lifetime`（唯一私有成员） |
+
+**实测**（`refactor_movable.py --set`）：读 **0** 字段、**0** 阻塞调用、**0** 私有类型 ⇒ 干净可搬。
+块 **1325-1418 连续**（`refactor_spans.py`），一刀切下、没有夹带邻居。
+
+⚠ **两处代价**（都记下来）：
+1. **patch 脚本第一版锚点差一行**（两处都差）—— 是"先校验锚点再动笔"**当场抓住**的 ✗；
+2. **调用点数目我自己数错了**：我按 `grep` 行数报 **6**，工具按**出现次数**报 **8** ✓ ——
+   因为 `withSource(withTickOwner(withLifetime(` **一行里有三个** ✓。
+   ⇒ 教训与 §五 同族：**"数调用点"要数出现次数，不是数行数** ✓。
+
+⭐ **顺带修掉上一批留下的一处坏 javadoc**：`TriggerInterpreter` 里
+`{@link #applyControl}` **解析不到任何东西** ✓（`applyControl` 早在上一批就搬进
+`TriggerEffects` 了）⇒ 改成 `{@link TriggerEffects#applyControl}` ✓（本文件已有两处这个写法 ✓）。
+`refactor_docrefs.py` 现在报**整个 trigger 包全解析** ✓。
+
+### 这个文件剩下的刀口（修好仪器之后重量，2026-10-09）
+
+`TriggerInterpreter` 现在 **2110 行 / 47 个名字 / 53 个声明**，`refactor_clusters.py` 报
+**7 个直接边簇**，最大一个是 **41 方法 / 1302 行**。可动的连贯组按大小排：
+
+| 候选组 | 行 | 字段 | 阻塞调用 | 私有类型 | 读者 |
+|---|---|---|---|---|---|
+| 资源 op：`gainResource` / `spendResource` / `removeResource` / `raiseResourceCap` ＋ `isCastParamScale` / `scaledAmount` / `normalizeOp` / `eventShare` / `noteElationGiftIfThisIsOne` | **207** | 0 | 0 | 0 | ⚠ **只有本类** ✓ |
+| 量级/计数算术：`perStackFactor` / `grantAmount` / `measureForTheDelta` / `resourceAmount` / `statModifier` / `weightOf` / `counterValue` / `scaledAmount` | **134** | 0 | 0 | 0 | `TriggerEffects` 4 处 ✓ |
+| 计数与步进：`ctxFreeCounter` / `counterName` / `wholeSteps` / `parseCounterSteps` / `perStepsRepeat` / `spendSteps` / `counterValue` / `fireResourceChanged` | **104** | 0 | 0 | **1 (`CounterSteps` ✗ 一起搬走)** | `TriggerEffects` / `TriggerValidator` ✓ |
+
+⚠ 三组都**不连续**（8 / 7 / 7 处空隙）⇒ 每次都要**逐个切块**，成本高于 §三之四 那一刀 ✗。
+
+⚠⚠ **剩下的大头是三个派发器**，而它们**不可搬**：
+`validate` 3 ＋ `apply` 127 ＋ `fire` 90 ＋ **`applyOne` 312** ＝ **532 行 / 4 个方法** ✓ ——
+`applyOne` 就是那张 47 个 op 的 `switch` 本身 ✓。**它就是"解释器"的定义** ✓：
+把 `switch` 拆成映射表只是**换一种写法**，不是换一个刀口 ✓ ⇒ 按"能搬 ≠ 该搬"，**不动** ✓。
+
 ## 四、`Battle` 剩余部分：不要按名字猜子系统
 
 实测（`refactor_movable.py`）：`Battle` 140 方法 / **33 个实例字段**，140 个方法里
@@ -207,10 +255,10 @@ package-private**（它 `extends Condition`，而 `Condition` 是公开 API）�
 
 ⇒ 下一刀的选法：**先数候选集读几个私有字段**，再决定。
 
-## 四之一、⚠⚠ 仪器本身错了两次，`Battle` 的结论要重来（2026-10-09 实测）
+## 四之一、⚠⚠ 仪器本身错了三次，`Battle` 的结论要重来（2026-10-09 实测）
 
-**先用仪器，再信仪器。** 上面 §四 引的 `refactor_movable.py` 当时有两个盲点，
-**都朝"看起来可拆"的方向错**：
+**先用仪器，再信仪器。** 上面 §四 引的 `refactor_movable.py` 当时有**三个**盲点，
+**每一个都朝"看起来可拆"的方向错**：
 
 ### 盲点 1：**重载只算了第一个声明**（`scan` 按名字建表，`setdefault`）
 
@@ -242,6 +290,22 @@ DOT/回复那一组正是如此：读 0 字段、0 阻塞调用，却经
 真正的不变量写在测试里（`DamagePipelineTest` 数"收 `Damage` 的公开方法恰好 1 个"），
 **测量看得见访问权限，看不见语义** ⇒ 仪器是**筛子**，留下的候选仍要过成文不变量。
 
+### 盲点 3：**声明的行号取的是正则匹配起点**（找到 `TriggerInterpreter` 上）
+
+`DECL` 在 DOTALL 下把 `[A-Z]\w*` 当返回类型的备选、把 `[^)]*` 当参数表，`type` 后面还是 `\s+`
+（`\s` 吃换行）⇒ **匹配起点会漂** ✓：`TriggerInterpreter.isCastParamScale` **实际声明在 859**，
+仪器报 **852**（它的 `/**` 那一行）；`TriggerEffects.modifyAttr` 报 **43** 而非 **83** ✓。
+**src/main/java 全库 97 个声明的行号是错的** ✓ —— 而每个消费者都从这一行开始切正文 ✓
+⇒ 切出来的块**带着一段 javadoc** ✓（内容不丢失，但 span 与行数全错）。
+
+⇒ 修法：**行号锚在 `name` 分组上**（实测 1140 个声明里它一次都没漂 ✓）。
+⚠ 我为此先写了**两版补丁式守卫**（比较匹配起点与类型所在行）✗，两版都**误杀真实声明**
+（第二版丢了 **95 个方法名** ✓）⇒ 是**全库计数**（丢了什么、还剩什么）把误杀抓出来的 ✓，
+不是读代码看出来的 ✓。**根治位置错的毛病，不要在症状上加守卫** ✓。
+
+⚠ 订正：本节早先写的 "`Battle` 44.7% / `TriggerInterpreter` 56.7% 的声明行覆盖" 是**在
+守卫误杀期间量的** ⇒ **两个数都作废** ✓（那期间 `TriggerInterpreter` 只剩 38 个名字 ✓）。
+
 ### 修好之后重量的结果：**机械刀口基本用完了**
 
 | 候选组 | 行数 | 字段 | 阻塞调用 | 私有类型 |
@@ -259,15 +323,16 @@ DOT/回复那一组正是如此：读 0 字段、0 阻塞调用，却经
 
 ⇒ 结论按"能搬 ≠ 该搬"：**`Battle` 再切只能切出几十行，收益低于风险**。
 要真正再降一个量级，需要的**不是**找刀口，而是一次**新抽象**（把私有面本身重新划界）。
-按收益排序，下一刀更该落在**仍然藏着 276 行的 `TriggerInterpreter`**（读者更多、行为面更宽）。
 
-### 新增的三件仪器（都已纳入版本控制）
+### 新增的四件仪器（都已纳入版本控制）
 
 | 脚本 | 回答什么 |
 |---|---|
 | `refactor_overloads.py` | 这个文件因"第一个重载胜出"丢了哪些行、丢在哪 |
 | `refactor_spans.py` | 候选组多大、**是否连续**（不连续 = 中间的行要留下） |
 | `refactor_verify_spans.py` | span 是否真的对：花括号配平 / 首行是签名 / 无嵌套包含 |
+| `refactor_javadoc_starts.py` ＋ `refactor_check_spans.py` | **全库**有几处 span 起点落在注释行（盲点 3 的判据） |
+| `refactor_decls.py` | 一个类的**布局**：顺序 / 可见性 / 每个名字的行数 |
 
 
 ## 五、测试重复清理：**三批已落地**（2026-10-08）
