@@ -4,16 +4,25 @@ a game like HSR written by java
 
 ## docs
 
-| 文件 | 内容 |
+| 文件 | 放什么 |
 |---|---|
 | `engine.md` | **引擎机制说明**：从代码推导的当前行为（属性 / 伤害乘区 / 事件 / 行动条 / 回合流程 / 韧性击破 / 超击破 / 能量 / Buff / 面板构建 / 敌人 AI）。明确区分"已实现 / 未接线 / 占位 / 未实现" |
 | `ROADMAP.md` | **开发路线图**：设计原则（引擎不认角色 / 三分法）+ 待办任务（每个自带验收标准）+ 踩坑记录 + **§12 遗留缺陷登记** |
+| `HANDOFF.md` | **纪律手册 ＋ 当前实测状态** —— 动手前读它；历史不在这里 |
+| `REFACTOR.md` | **结构重构**：已完成的 god-class 拆分、量刀口的工具、剩余刀口在哪 |
+| `GAPS.md` | **未实现的登记**：每一条写着"缺什么 / 读者是谁 / 前置是什么" |
+| `GAPS_LOG.md` | **逐轮日志**（从 `GAPS.md` 拆出），查"当初为什么这么做" |
+| `EXPRESSION.md` | **「完全表达」判定清单** —— ⚠ 被 `ExpressionChecklistTest` 机器校验，不能凭印象改 |
+| `HSR.md` | 游戏机制的**权威公式**（正典副本在仓库外） |
 
 > 2026-09-26 删掉了 `CODE_REVIEW.md` 与 `DOC_VS_CODE.md`（一次性的审查/不一致分析快照，已多处腐烂），
 > 2026-09-27 又删掉了 v2 存档 `docs/archive/ROADMAP-v2-历史.md`（2446 行纯历史）。
 > 前两者的**未修条目**全部并进了 `ROADMAP.md` §12；已修条目不保留。
 > **三份文件的全文都在 git 历史里**（`git log --diff-filter=D --name-only`），需要查"当初为什么这么做"时去那里翻。
 > 旧文档里"`ROADMAP` 第 N 行指向 v2"的行号说法随之彻底作废 —— 现在只用任务编号（`P3-4` 等）引用。
+>
+> ⚠ **本仓库没有 `HISTORY.md`，也没有 `HISTORICAL.md`** —— 两者都从未存在过。
+> 需要历史时用 `GAPS_LOG.md` 与 `REFACTOR.md`。引用任何文件前先 `Test-Path` 一下。
 
 > 游戏机制的**权威公式**在 `HSR.md`（"崩坏：星穹铁道 战斗机制总结"）里，**正典位置在仓库外**（`E:\code\blog\hsr\HSR.md`）。
 > 遇到公式疑义时以它为准；`engine.md` 的 §18 记了它与本实现的差异。
@@ -47,9 +56,17 @@ none of those exist will it prompt for the path (and then store it next to the s
 
 The current script emits **28 files** — including `eidolons.json`, `relic_sets.json`, `growth.json`,
 `materials.json`, `recommend.json`, `enhanced_skills.json`, `global_buffs.json`,
-`skill_effects.json` and `property_names.json`. The Java engine reads 12 of the generated files
-(plus 2 hand-maintained ones); `engine.md` §14.1 registers which are loaded and which are
-generated-but-unused.
+`skill_effects.json` and `property_names.json`.
+
+The Java engine reads **17** of the files in `data/` — **14 generated**, the 2 hand-maintained ones
+(`enemy_skills.json`, `monster_attack_modify_ratio.json`), and `dump_data.json` (read only by
+`Benchmark`). `engine.md` §14.1 registers which are loaded and which are generated-but-unused; the
+live count is reproducible with `python tools/audit_data_reads.py`, which also lists the 13 files
+nothing reads.
+
+> ⚠️ **These counts drift.** Both sentences above were wrong before 2026-10-12: the engine was said
+> to read 12 (of 28) and only 2 files were said to be tracked. Re-measure with the commands named
+> here rather than trusting a number in this file.
 
 > ⚠️ The gist linked above is **behind the local copy**: the `skill_effects.json` export
 > (the per-skill scale/parameter table the engine reads through `SkillEffects`) exists only in the
@@ -57,10 +74,11 @@ generated-but-unused.
 > trace anywhere. Push it back to the gist before editing it.
 
 > **This step is required before anything can run.** Most game data is not committed:
-> `src/main/resources/data/` is listed in `.gitignore`, and only two files there are tracked —
-> the patch file `monster_attack_modify_ratio.json` and the hand-written `enemy_skills.json`.
-> A fresh `git clone` therefore has none of the **28 generated data files**
-> (`skills.json`, `monster_config.json`, `stage.json`, …), and **every test fails**.
+> `src/main/resources/data/` is listed in `.gitignore`, and only **four** files there are tracked —
+> the patch file `monster_attack_modify_ratio.json`, the hand-written `enemy_skills.json`, and
+> `skills.json` / `skill_effects.json`. A fresh `git clone` therefore has none of the
+> **28 generated data files** (`monster_config.json`, `stage.json`, …), and **every test fails**.
+> Check the current list with `git ls-files src/main/resources/data/`.
 
 ### What a missing data file looks like
 

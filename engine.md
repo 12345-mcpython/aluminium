@@ -2900,26 +2900,30 @@ B 组的 `enemy_skills.json` 与手写补丁也是静态块里读的（`ENEMY_SK
 
 ### 14.1 生成器产出 vs 引擎实际加载
 
-`generate_data.py` 现在产出 **28 个文件**（27 个 JSON + `text_ids.txt`），引擎用到其中 **12 个**
-（另外还读 2 个非 generator 产出的文件）。差额登记如下 —— 免得再出现
+`generate_data.py` 产出 **28 个文件**（27 个 JSON + `text_ids.txt`），引擎用到其中 **14 个**
+（另外还读 2 个手工维护的文件与 `dump_data.json`）。差额登记如下 —— 免得再出现
 "文档说没有、其实文件早就在"的偏差（本仓库此前那份 9/1 的快照就少了 11 个文件、
 `character_data.json` 也没有 `rarity`）。
 
-> ⚠ 计数在 2026-09-26 重新数过：`skill_effects.json`（P10-3 的技能效果参数表，引擎通过
-> `SkillEffects` 读取）是后来加的，所以"产出 27 / 引擎 11"这两个数字各 +1。
+> ⚠ 本节 2026-10-12 用 `python tools/audit_data_reads.py` **重新数过**。两处旧错已订正：
+> ① A 组曾列一个 **`point.json`，全库并不存在**（`point.json` 在源码里 0 命中）✗；
+> ② A 组**漏了 `skill_traces.json`**，而 `Constant` 确实加载它 ✓。
+> ⇒ 下面这三组数字都来自那个脚本，改数据装载后请重跑它，不要手改。
 
-**A. generator 产出且引擎已加载（12）**
+**A. generator 产出且引擎已加载（14）**
 
-`main_attribute` · `sub_attribute` · `weapons` · `character_data` · `point` · `skills` ·
-`skill_effects` · `monster_template_config` · `hard_level_group` · `monster_config` ·
-`breaking_rate` · `stage`
+`main_attribute` · `sub_attribute` · `weapons` · `character_data` · `skills` ·
+`skill_effects` · `skill_traces` · `relic_sets` · `monster_template_config` ·
+`hard_level_group` · `monster_config` · `breaking_rate` · `stage` ·
+`elation_basic_level_damage`
 
-**B. 非 generator 产出但引擎已加载（2）**
+**B. 非 generator 产出但引擎已加载（3）**
 
 | 文件 | 说明 |
 |---|---|
 | `monster_attack_modify_ratio` | 仓库内的补丁文件（人工维护），由 `normalizeMonsterConfigs` 合并 |
 | `enemy_skills` | 仓库内手写技能表（P5-3） |
+| `dump_data` | 预计算的遗器套装数据，**只被 `Benchmark` 读**，主战斗循环不用 |
 
 **C. generator 产出但引擎完全不读（16）** —— 都是"为后续阶段准备 / 喂给文档导出脚本"的：
 
@@ -3001,9 +3005,9 @@ B 组的 `enemy_skills.json` 与手写补丁也是静态块里读的（`ENEMY_SK
 | 技能槽位 | ✅ P8-2 已接（`Constant.SKILL_SLOT` 六槽，见 §7.2）；剩下的占位是 `Character.fromAttributes(...)` 这个测试入口（写死槽位 1） |
 | 击破 DOT 数值 | `DOT_RATIO=0.5`、`DOT_TURNS=3` 是示例值，base 不含击破特攻与削韧值 |
 | 神君/账账类追加攻击 | 未进入事件体系 |
-| 召唤物 | **两个阵营都能创建**（P9-4 + L-8 友方那一半，§24）：`summon_id` 名单 → `SummonFactory` → `Battle.summon`，主人倒下带走它；我方召唤物进 `allies`（阵营），`characters` 是它的子集视图。**忆灵已完整**：面板继承（§24.5）、在场可问可指（§24.6）、规则召上场（§24.7）、能打且伤害按自己的属性缩放（§24.8）。⚠ 仍缺：忆灵技 2~5、攻击削韧、连携攻击、"指令忆灵行动"、技能侧 `SkillEffectType.SUMMON` 分派（数据里没有"召谁"那一列） |
-| 控制 | 只有 `StunBuff` 一种 |
-| 治疗 | 只有 `heal()` 方法，无乘区、无调用者 |
+| 召唤物 | **两个阵营都能创建**（P9-4 + L-8 友方那一半，§24）：`summon_id` 名单 → `SummonFactory` → `Battle.summon`，主人倒下带走它；我方召唤物进 `allies`（阵营），`characters` 是它的子集视图。**忆灵已完整**：面板继承（§24.5）、在场可问可指（§24.6）、规则召上场（§24.7）、能打且伤害按自己的属性缩放（§24.8）、`COMMAND_SUMMON` 指令忆灵行动（§24.10）、`SUMMONED`（§24.11）。⚠ 仍缺：忆灵技 2~5、攻击削韧、**连携攻击**、技能侧 `SkillEffectType.SUMMON` 分派（数据里没有"召谁"那一列） |
+| 控制 | ✅ `ControlBuff` ＋ `Constant.CONTROL_EFFECTS` / `CONTROL_STATES`（冻结 / 纠缠 / 禁锢 / 禁锢-额外延后…），见 §8.6 |
+| 治疗 | ✅ `Battle.calculateHeal` ＋ `heal`，两个乘区 `OUTGOING_HEALING_BOOST`（给盾/治疗者侧）与 `HEAL_TAKEN_RATIO`（受治疗者侧），见 §20.2 |
 
 ### ❌ 未实现
 
@@ -3016,17 +3020,20 @@ B 组的 `enemy_skills.json` 与手写补丁也是静态块里读的（`ENEMY_SK
 | 护盾 | ✅ P6-3（先扣盾再扣血、不叠加、吸收量计入"造成伤害"） |
 | 终结技插入 | 无（`castUltra` 只是立即排队结算，不是插入行动轴）；额外回合期间禁止插入**别人**的终结技 ✅ P7-2 |
 | 速度操纵 | ✅ P7-1b / E2（速度变化立刻重排行动条） |
-| 忆灵 | ✅ P9-4（§24）：面板继承 / 在场可问可指 / 规则召上场 / 能打且伤害按自己的属性缩放。仍缺忆灵技 2~5、削韧、连携攻击、"指令忆灵行动" |
-| 欢愉 | 只有属性/类型占位，无机制（`DamageElement`/`DamageType` 里有名字，没有来源） |
-| 七系击破异常 | 只有 4 种 DOT，冻结/纠缠/禁锢未做 |
+| 忆灵 | ✅ P9-4（§24）：面板继承 / 在场可问可指 / 规则召上场 / 能打且伤害按自己的属性缩放 / `COMMAND_SUMMON` 指令忆灵行动（§24.10）。⚠ 仍缺：忆灵技 2~5、削韧、**连携攻击** |
+| 欢愉 | ✅ 属性与伤害类型**都已接线**：`ELATION_DAMAGE_BOOST`（欢愉度）／`ELATION_DAMAGE_AMP`（增笑）＋ `DamageType.ELATION`（吃双爆、不吃增伤），基数按**角色等级**查表（`elation_base`，§24.21）。⚠ 仍缺的是**欢愉度/笑点那套资源**与阶段机制，不是"没有机制" |
+| 七系击破异常 | ✅ 七系都在：4 种 DOT ＋ 冻结 / 纠缠 / 禁锢（`ControlBuff` ＋ `Constant.CONTROL_EFFECTS`，§8.6）。⚠ 仍缺：`ENTANGLED` 的 0.2 延后**无出处**（登记为猜测值） |
 | 多韧性条 | `stanceCount > 1` 未处理（恢复时直接回满） |
 | 转阶段 / 多血量阶段 | 只有 `invulnerable` 标志，无阶段切换 |
+| **连携攻击** | ❌ 全库无实现（`companionAttack` / 连携 零命中） |
 
 ---
 
 ## 16. 测试与可验证性
 
-- **53 个测试类 / 495 个用例**（截至 P10-3），全部通过（`.\gradlew.bat test`）。
+- **752 个 suite / 2578 个用例**（2026-10-12 实测），全部通过（`.\gradlew.bat test`）。
+  ⚠ 本行早先写"53 个测试类 / 495 个用例（截至 P10-3）"，是**很旧的快照** ✓ —— 用例数涨了 5 倍。
+  量法：数 `build/test-results/test/*.xml` 的 `tests` / `failures` 属性（跑前先删该目录，否则读到上一轮）。
 - 覆盖重心：伤害乘区（`DamageZoneTest` 24 条）、技能展开（`SkillExecutorTest` 13 条）、
   能量（`EnergyTest` 8 + `EnergyBattleTest` 16）、韧性击破（`ToughnessTest` 6 +
   `ToughnessBattleTest` 8 + `BreakDamageTest` 5 + `BreakStateTest` 4 + `DotTest` 6）、
@@ -3088,7 +3095,10 @@ B 组的 `enemy_skills.json` 与手写补丁也是静态块里读的（`ENEMY_SK
 5. **死者仍在 `characters`/`enemies` 列表里**，遍历时必须判 `isDeath()`；选目标走 `targetableEnemies()`。
 6. **所有战斗内随机走注入的 `Random`**（`battle.getRng()`）。
 7. **Gson 静默失败**是这个项目的历史重灾区：新增 bean 字段一律加 `@SerializedName` 并核对 JSON 键名。
-8. **`Constant` 的七张表是可变的**，不要往上面写，也不要假设别人不会写。
+8. **`Constant` 的表是只读的** —— 每张表都由 `frozen(...)` / `Map.copyOf` 包装（`Constant.java`），
+   往上面写会抛 `UnsupportedOperationException`。**读它、别改它。**
+   ⚠ 本行早先写"七张表是**可变的**，不要往上面写" ✓ —— 那个危险已在 2026-09-27 用 `frozen` 拆掉
+   （`ROADMAP.md` §12 H-1 记了这次修复）；留着旧措辞会让人去防一个**已经不存在**的坑。
 9. 引擎层**不准写 `cid` 判断**。
 
 ---
