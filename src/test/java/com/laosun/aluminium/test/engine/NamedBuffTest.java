@@ -1,15 +1,15 @@
 package com.laosun.aluminium.test.engine;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -33,7 +33,10 @@ import java.util.Random;
 public class NamedBuffTest {
     private static final int MARCH = 1001;
     private static final int LEVEL = 80;
-        /** "协奏" as a state, plus an ATTACK boost and an immunity that carry the same name. */
+
+    /**
+     * "协奏" as a state, plus an ATTACK boost and an immunity that carry the same name.
+     */
     @Test
     public void removingTheStateTakesItsNamedEffectsWithIt() {
         Fixture f = new Fixture();
@@ -51,7 +54,9 @@ public class NamedBuffTest {
                         + "only be `permanent` and would have stayed forever)");
     }
 
-    /** Note: An UNNAMED modifier is not touched by any name: the field must not change existing content's lifetime. */
+    /**
+     * Note: An UNNAMED modifier is not touched by any name: the field must not change existing content's lifetime.
+     */
     @Test
     public void anUnnamedModifierIsNotTouched() {
         Fixture f = new Fixture();
@@ -91,7 +96,9 @@ public class NamedBuffTest {
         }
     }
 
-    /** A state "协奏" plus an ATTACK boost and a control immunity, all naming {@code name} (null = unnamed). */
+    /**
+     * A state "协奏" plus an ATTACK boost and a control immunity, all naming {@code name} (null = unnamed).
+     */
     private static List<TriggerSpec> stateAndEffects(String name) {
         EffectSpec state = new EffectSpec();
         TriggerSpecs.set(state, "op", "APPLY_BUFF");

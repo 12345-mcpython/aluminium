@@ -9,8 +9,8 @@ import com.laosun.aluminium.models.Damage;
 import com.laosun.aluminium.models.Signal;
 import com.laosun.aluminium.models.Weapon;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -24,7 +24,8 @@ import java.util.List;
 public class AmberTest {
     private static final int WEARER = 1001;
     private static final int LEVEL = 80;
-        @Test
+
+    @Test
     public void theBaseBranchAppliesAndTheThresholdBranchStatesTheSum() {
         double[] healthy = defence(0.0);
         double[] middle = defence(0.7);
@@ -42,7 +43,9 @@ public class AmberTest {
                 "below 50% the exclusive branch states #1 + #3");
     }
 
-    /** gain, base value, and the final HP fraction. */
+    /**
+     * gain, base value, and the final HP fraction.
+     */
     private static double[] defence(double fraction) {
         Character unit = CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(20003, LEVEL, false, 5));
         Enemy enemy = BattleFixture.monster();
@@ -58,7 +61,7 @@ public class AmberTest {
         double before = unit.getAttribute(AttributeType.DEFENCE).get();
         battle.currentMove = new Signal(unit);
         battle.beforeMove();
-        return new double[] {unit.getAttribute(AttributeType.DEFENCE).get() - before,
+        return new double[]{unit.getAttribute(AttributeType.DEFENCE).get() - before,
                 unit.getAttribute(AttributeType.DEFENCE).baseValue(), unit.getCurrentHp() / unit.getMaxHp()};
     }
 }

@@ -4,8 +4,8 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -19,7 +19,10 @@ import java.util.List;
  */
 public class YanqingCritChanceStackingTest {
     private static final int OWNER = 1209;
-        /** Two sources, two shares, and the total. */
+
+    /**
+     * Two sources, two shares, and the total.
+     */
     @Test
     public void bothCritChanceSourcesAreCounted() {
         Character owner = CharacterFactory.create(OWNER, 80, false, null, null, 0);

@@ -1,13 +1,14 @@
 package com.laosun.aluminium.test.content.characters;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -21,7 +22,10 @@ import java.util.Random;
 public class YunliTest {
     private static final int YUNLI = 1221;
     private static final int LEVEL = 80;
-        /** Note: The heal is 30% of her ATTACK plus a flat 200, and it heals HER. */
+
+    /**
+     * Note: The heal is 30% of her ATTACK plus a flat 200, and it heals HER.
+     */
     @Test
     public void theSkillHealsHerByASharePlusAFlatAmount() {
         Character yunli = CharacterFactory.create(YUNLI, LEVEL);
@@ -40,7 +44,9 @@ public class YunliTest {
                 "「恢复等同于云璃30.00%攻击力+200的生命值」 (restores HP equal to 30.00% of Yunli's ATK + 200): expected " + expected);
     }
 
-    /** Note: The counter reaches the ATTACKER and nobody else, and its 120% is pinned against a hand-built 240% reference. */
+    /**
+     * Note: The counter reaches the ATTACKER and nobody else, and its 120% is pinned against a hand-built 240% reference.
+     */
     @Test
     public void theCounterHitsTheAttackerOnly() {
         double shipped = counterLoss(true);
@@ -66,7 +72,9 @@ public class YunliTest {
                         + " -- the ratio is what pins the MAGNITUDE (a surviving mutation proved a bare \"> 0\" did not)");
     }
 
-    /** The damage the counter deals to the attacker: the shipped file, or a hand-built 240% reference rule. */
+    /**
+     * The damage the counter deals to the attacker: the shipped file, or a hand-built 240% reference rule.
+     */
     private static double counterLoss(boolean shipped) {
         Character yunli = CharacterFactory.create(YUNLI, LEVEL);
         if (!shipped) {
@@ -76,7 +84,7 @@ public class YunliTest {
             TriggerSpecs.set(effect, "percent", 2.4);
             TriggerSpecs.set(effect, "element", "Physical");
             TriggerSpecs.set(effect, "target", "attacker");
-            yunli.setTriggerTable(new com.laosun.aluminium.models.TriggerTable(YUNLI, List.of(TriggerSpecs.rule(
+            yunli.setTriggerTable(new TriggerTable(YUNLI, List.of(TriggerSpecs.rule(
                     TriggerEvent.TAKING_HIT.name(), List.of("target == self"), effect))));
         }
         Enemy attacker = BattleFixture.monster();

@@ -5,12 +5,12 @@ import com.laosun.aluminium.data.TriggerTables;
 import com.laosun.aluminium.enums.SkillCategory;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerInterpreter;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
-import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.models.trigger.TriggerInterpreter;
+import com.laosun.aluminium.models.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -27,7 +27,9 @@ public class DrRatioFallbackTest {
     private static final int RATIO = 1305;
     private static final int LEVEL = 80;
 
-    /** Returns how much HP each enemy lost when the follow-up fires with A (dead) as its target. */
+    /**
+     * Returns how much HP each enemy lost when the follow-up fires with A (dead) as its target.
+     */
     private static double[] lossesWithDeadTarget() {
         Character ratio = CharacterFactory.create(RATIO, LEVEL);
         Enemy a = EnemyFactory.create(1002011, 90, 1);

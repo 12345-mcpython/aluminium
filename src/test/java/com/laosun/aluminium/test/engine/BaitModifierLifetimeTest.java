@@ -1,14 +1,14 @@
 package com.laosun.aluminium.test.engine;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -32,9 +32,11 @@ import java.util.Random;
 public class BaitModifierLifetimeTest {
     private static final int BAIT = 1504;
     private static final int PROBE = 1002;
-        private static final int LEVEL = 80;
+    private static final int LEVEL = 80;
 
-    /** The one rule: strip the state, lay the cut over the whole enemy camp, then mark the new bait. */
+    /**
+     * The one rule: strip the state, lay the cut over the whole enemy camp, then mark the new bait.
+     */
     private static void install(Character bait) {
         EffectSpec strip = new EffectSpec();
         TriggerSpecs.set(strip, "op", "REMOVE_STATE");
@@ -53,7 +55,9 @@ public class BaitModifierLifetimeTest {
                 TriggerSpecs.rule(TriggerEvent.SKILL_CAST.name(), List.of("actor == self"), strip, cut, mark))));
     }
 
-    /** @param baits 0 = no bait anywhere, 1 = the first enemy, 2 = then the second as well */
+    /**
+     * @param baits 0 = no bait anywhere, 1 = the first enemy, 2 = then the second as well
+     */
     private static double damageToFirstAfter(int baits) {
         Character bait = CharacterFactory.create(BAIT, LEVEL);
         install(bait);

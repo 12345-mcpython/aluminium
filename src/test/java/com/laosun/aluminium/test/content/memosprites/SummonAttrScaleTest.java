@@ -1,18 +1,17 @@
 package com.laosun.aluminium.test.content.memosprites;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
-import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Summon;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.skill.Skill;
 import com.laosun.aluminium.models.skill.SkillExecutor;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -31,12 +30,16 @@ import java.util.List;
  */
 public class SummonAttrScaleTest {
     private static final int LEVEL = 80;
-    /** 1402 Aglaea: the panel of her memosprite is HEALTH 0.66 + flat 20, so its Max HP DIFFERS from hers. */
+    /**
+     * 1402 Aglaea: the panel of her memosprite is HEALTH 0.66 + flat 20, so its Max HP DIFFERS from hers.
+     */
     private static final int CYRENE = 1402;
     private static final int ALLY = 1002;
-        private static final double SHARE = 0.1;
+    private static final double SHARE = 0.1;
 
-    /** The owner's ATK rises by a share of the MEMOSPRITE's Max HP -- not by a share of her own. */
+    /**
+     * The owner's ATK rises by a share of the MEMOSPRITE's Max HP -- not by a share of her own.
+     */
     @Test
     public void theMagnitudeIsAShareOfTheMemosprite() {
         Character cyrene = CharacterFactory.create(CYRENE, LEVEL);

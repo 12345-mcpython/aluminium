@@ -1,19 +1,18 @@
 package com.laosun.aluminium.test.content.lightcones;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
-import com.laosun.aluminium.data.TriggerTables;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.SkillCategory;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.DoubleValue;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.Weapon;
 import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -31,7 +30,7 @@ import java.util.List;
 public class FlickeringStarsSkillDamageTest {
     private static final int CONE = 23061;
     private static final int LEVEL = 80;
-        private static final double BOOST = 0.72;
+    private static final double BOOST = 0.72;
     private static final String CROWN = "闪耀王冠";
 
     @Test
@@ -162,7 +161,9 @@ public class FlickeringStarsSkillDamageTest {
                 "half the boost must move the Skill cast half as far -- the share is what `percent` sets");
     }
 
-    /** The same fixture at another boost size, so the SHARE can be judged without assuming a multiplier. */
+    /**
+     * The same fixture at another boost size, so the SHARE can be judged without assuming a multiplier.
+     */
     private double measureSkillRatio(int cid, double percent) {
         Character plain = CharacterFactory.create(cid, LEVEL);
         plain.setTriggerTable(TriggerTable.EMPTY);

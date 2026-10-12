@@ -1,6 +1,5 @@
 package com.laosun.aluminium.models.buff;
 
-import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.models.CanHit;
 
 /**

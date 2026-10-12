@@ -17,7 +17,7 @@ import java.util.Random;
 /**
  * 1005 Kafka, from her own file: the ultimate's Shock, and the immediate tick that follows it.
  *
- * <p>Both halves are capabilities the engine already had - `APPLY_DOT` (with the per-turn magnitude) and `TICK_DOT` (round 105) - 
+ * <p>Both halves are capabilities the engine already had - `APPLY_DOT` (with the per-turn magnitude) and `TICK_DOT` (round 105) -
  * so this file is also a check that they compose in one rule. The target is hand-made and unresisting, because a 100% BASE
  * chance still rolls (round 131).
  */
@@ -25,7 +25,9 @@ public class KafkaTest {
     private static final int KAFKA = 1005;
     private static final int LEVEL = 80;
 
-    /** Note: The Shock lands with its own per-turn damage, and the same sentence makes it settle once more. */
+    /**
+     * Note: The Shock lands with its own per-turn damage, and the same sentence makes it settle once more.
+     */
     @Test
     public void herUltimateAppliesShockAndMakesItSettleOnce() {
         Fixture f = new Fixture();
@@ -40,7 +42,9 @@ public class KafkaTest {
                 "the ultimate's own damage plus the extra instance 「立即产生相当于原伤害 100% 的伤害」 (immediately deals damage equal to 100% of the original damage)");
     }
 
-    /** Census: the composed ultimate and the level convention are where the notes say. */
+    /**
+     * Census: the composed ultimate and the level convention are where the notes say.
+     */
     @Test
     public void herFileCarriesTheClauses() {
         var table = TriggerTables.of(KAFKA);
@@ -51,7 +55,9 @@ public class KafkaTest {
                 "the talent follow-up (moved to the once-per-cast event, which now carries the aim)");
     }
 
-    /** Note: An ALLY's basic attack makes Kafka strike again; her own must not. */
+    /**
+     * Note: An ALLY's basic attack makes Kafka strike again; her own must not.
+     */
     @Test
     public void anAllysBasicAttackTriggersHerFollowUp() {
         Character kafka = CharacterFactory.create(KAFKA, LEVEL);
@@ -74,7 +80,9 @@ public class KafkaTest {
                 "「并有100%的基础概率使受到攻击的敌方目标陷入与终结技相同的触电状态」 (and a 100% base chance to put the attacked enemy target into the same Shock state as the Ultimate) — the follow-up really fired");
     }
 
-    /** Note: Her OWN basic attack must not grant the follow-up: observable is the Shock it would apply. */
+    /**
+     * Note: Her OWN basic attack must not grant the follow-up: observable is the Shock it would apply.
+     */
     @Test
     public void herOwnBasicAttackDoesNotTriggerTheFollowUp() {
         Fixture f = new Fixture();

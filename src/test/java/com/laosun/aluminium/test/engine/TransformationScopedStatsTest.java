@@ -6,8 +6,8 @@ import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.skill.Skill;
 import com.laosun.aluminium.models.skill.SkillExecutor;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -15,7 +15,7 @@ import java.util.List;
 
 /**
  * 1408: "卡厄斯兰那的物理属性抗性穿透提高 20%" and "变身期间攻击力提高 80%，生命上限提高 20%"
- *.
+ * .
  *
  * <p>THE POINT IS THE THIRD ASSERTION: the block must live exactly as long as the state. Removing [变身] and watching ATK
  * come back down is what tells "during the transformation" apart from "for the rest of the battle" -- and item 34 shipped
@@ -24,9 +24,11 @@ import java.util.List;
 public class TransformationScopedStatsTest {
     private static final double EPS = 1e-9;
     private static final int OWNER = 1408;
-        private static final String STATE = "变身";
+    private static final String STATE = "变身";
 
-    /** Transformed: +80% ATK, +20% Max HP, +20% RES PEN. Un-transformed: none of them. */
+    /**
+     * Transformed: +80% ATK, +20% Max HP, +20% RES PEN. Un-transformed: none of them.
+     */
     @Test
     public void theBlockIsWorthWhatTheSentencesSay() {
         Character owner = CharacterFactory.create(OWNER, 80, false, null, null, 0);
@@ -52,7 +54,9 @@ public class TransformationScopedStatsTest {
                 "\"Physical RES PEN raised by 20%\" (「物理属性抗性穿透提高 20%」)");
     }
 
-    /** "During the transformation" means the block dies with the state. */
+    /**
+     * "During the transformation" means the block dies with the state.
+     */
     @Test
     public void theBlockDiesWithTheState() {
         Character owner = CharacterFactory.create(OWNER, 80, false, null, null, 0);

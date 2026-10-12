@@ -1,13 +1,17 @@
 package com.laosun.aluminium.test.engine;
+
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
 import java.util.List;
 
-/** F-7: "at least N skill points" is a different question from "can the next action be paid for". */
+/**
+ * F-7: "at least N skill points" is a different question from "can the next action be paid for".
+ */
 public class SkillPointCountTest {
 
     @Test

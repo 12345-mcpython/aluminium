@@ -6,8 +6,8 @@ import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.skill.Skill;
 import com.laosun.aluminium.models.skill.SkillExecutor;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -21,9 +21,11 @@ import java.util.List;
  */
 public class TransformationHealsOnAttackTest {
     private static final int OWNER = 1408;
-        private static final String STATE = "变身";
+    private static final String STATE = "变身";
 
-    /** Transformed, an attack heals her for a fifth of her (raised) Max HP. */
+    /**
+     * Transformed, an attack heals her for a fifth of her (raised) Max HP.
+     */
     @Test
     public void anAttackHealsTheTransformedHer() {
         double healed = healFromOneAttack(true);
@@ -31,7 +33,9 @@ public class TransformationHealsOnAttackTest {
                 "「回复等同于自身生命上限 20% 的生命值」 (share of Max HP)");
     }
 
-    /** Note: Without the transformation the sentence has not started, so no attack heals her. */
+    /**
+     * Note: Without the transformation the sentence has not started, so no attack heals her.
+     */
     @Test
     public void withoutTheTransformationNothingIsHealed() {
         Assertions.assertEquals(0.0, healFromOneAttack(false), 1e-9,
@@ -40,7 +44,9 @@ public class TransformationHealsOnAttackTest {
 
     // ==================================================================
 
-    /** the heal as a SHARE of Max HP, so the size of the pool does not matter. */
+    /**
+     * the heal as a SHARE of Max HP, so the size of the pool does not matter.
+     */
     private static double healFromOneAttack(boolean transform) {
         Character owner = CharacterFactory.create(OWNER, 80, false, null, null, 0);
         Battle battle = new Battle(List.of(owner),

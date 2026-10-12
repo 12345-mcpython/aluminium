@@ -1,15 +1,15 @@
 package com.laosun.aluminium.test.engine;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
-import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.models.trigger.TriggerInterpreter;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -31,7 +31,9 @@ import java.util.List;
 public class LowestHpAllyTest {
     private static final double EPS = 1e-9;
 
-        /** The most-hurt <b>share</b> wins, even when another ally has fewer HP points. */
+    /**
+     * The most-hurt <b>share</b> wins, even when another ally has fewer HP points.
+     */
     @Test
     public void theLowestShareWinsRatherThanTheLowestNumberOfPoints() {
         Character hero = character("hero", 1000);
@@ -71,7 +73,9 @@ public class LowestHpAllyTest {
         Assertions.assertEquals(500, ally.getCurrentHp(), 1.0, "and the later one did not");
     }
 
-    /** A corpse is not "the most hurt ally" - and a heal would not land on it anyway. */
+    /**
+     * A corpse is not "the most hurt ally" - and a heal would not land on it anyway.
+     */
     @Test
     public void theDeadAreSkipped() {
         Character hero = character("hero", 1000);
@@ -86,7 +90,9 @@ public class LowestHpAllyTest {
                 "the living ally is the lowest -- 「我方目标」 (our target) does not mean 「包括倒下的」 (including the fallen)");
     }
 
-    /** A camp with nobody alive is <b>no target</b>, not an error: the same reading the group selectors have. */
+    /**
+     * A camp with nobody alive is <b>no target</b>, not an error: the same reading the group selectors have.
+     */
     @Test
     public void aCampWithNobodyAliveResolvesToNothingRatherThanFailing() {
         Character hero = character("hero", 1000);
@@ -97,7 +103,9 @@ public class LowestHpAllyTest {
         Assertions.assertEquals(0, hero.getCurrentHp(), 1.0, "and nothing happened to it");
     }
 
-    /** It needs a battlefield, and a hand-built context has none: that fails loudly rather than guessing. */
+    /**
+     * It needs a battlefield, and a hand-built context has none: that fails loudly rather than guessing.
+     */
     @Test
     public void withoutABattleItFailsLoudly() {
         Character owner = character("owner", 1000);
@@ -109,7 +117,7 @@ public class LowestHpAllyTest {
                 .matching(TriggerEvent.ALLY_ATTACK, ctx).getFirst();
 
         IllegalStateException rejected = Assertions.assertThrows(IllegalStateException.class,
-                () -> com.laosun.aluminium.models.TriggerInterpreter.apply(null, rule, ctx));
+                () -> TriggerInterpreter.apply(null, rule, ctx));
         Assertions.assertTrue(rejected.getMessage().contains("no battle"), rejected.getMessage());
     }
 
@@ -136,7 +144,9 @@ public class LowestHpAllyTest {
     // helpers
     // ==================================================================
 
-    /** The first character carries the rule under test; the rest are the party it chooses from. */
+    /**
+     * The first character carries the rule under test; the rest are the party it chooses from.
+     */
     private record Fixture(Character hero, Battle battle) {
 
         private Fixture(Character hero, List<Character> party, EffectSpec effect) {
@@ -161,7 +171,9 @@ public class LowestHpAllyTest {
         }
     }
 
-    /** A character with an explicit panel: the shares in these cases have to be stated, not inherited. */
+    /**
+     * A character with an explicit panel: the shares in these cases have to be stated, not inherited.
+     */
     private static Character character(String name, double maxHp) {
         return Character.fromAttributes(name, maxHp, 100, 100, 100);
     }

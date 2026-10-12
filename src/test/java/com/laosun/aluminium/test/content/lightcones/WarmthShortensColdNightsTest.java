@@ -7,8 +7,8 @@ import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Signal;
 import com.laosun.aluminium.models.Weapon;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -25,7 +25,8 @@ public class WarmthShortensColdNightsTest {
     private static final int WEARER = 1001;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-        @Test
+
+    @Test
     public void theConeRaisesMaxHpByTheRankShare() {
         Assertions.assertEquals(0.16, share(1), 1e-6, "rank 1 share of the post-start base");
         Assertions.assertEquals(0.32, share(5), 1e-6, "rank 5 share of the post-start base");
@@ -55,7 +56,9 @@ public class WarmthShortensColdNightsTest {
                 "and so does a skill, through on_any: " + before2 + " -> " + ally.getCurrentHp());
     }
 
-    /** The wearer's HEALTH gain at this rank over the base taken AFTER the battle has started. */
+    /**
+     * The wearer's HEALTH gain at this rank over the base taken AFTER the battle has started.
+     */
     private static double share(int rank) {
         Character wearer = CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(21028, LEVEL, false, rank));
         Battle battle = new Battle(List.of(wearer), List.of(BattleFixture.monster()), BattleFixture.seeded());

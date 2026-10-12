@@ -1,9 +1,9 @@
 package com.laosun.aluminium.test.data;
 
 import com.laosun.aluminium.enums.AttributeType;
-import com.laosun.aluminium.models.buff.BuffManager;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.DoubleValue;
+import com.laosun.aluminium.models.buff.BuffManager;
 import com.laosun.aluminium.models.buff.StatModifierBuff;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -26,7 +26,9 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class BuffRuleTest {
 
-    /** hp 1000 / def 200 / atk 300 / speed 100 - deliberately all different, so a mix-up shows. */
+    /**
+     * hp 1000 / def 200 / atk 300 / speed 100 - deliberately all different, so a mix-up shows.
+     */
     private static Character hero() {
         return Character.fromAttributes("hero", 1000, 200, 300, 100);
     }

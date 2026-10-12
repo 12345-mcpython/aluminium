@@ -22,7 +22,9 @@ import com.laosun.aluminium.models.event.DamageEvent;
  */
 public class ReductionBuff extends AbstractBuff implements DamageEvent {
 
-    /** The one damage type this reduction is about, or {@code null} for every type (see {@link VulnerabilityBuff}). */
+    /**
+     * The one damage type this reduction is about, or {@code null} for every type (see {@link VulnerabilityBuff}).
+     */
     private final com.laosun.aluminium.enums.DamageType scope;
 
     private final double ratio;

@@ -1,8 +1,6 @@
 package com.laosun.aluminium.test.engine;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
@@ -10,9 +8,11 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.DoubleValue;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.buff.StatModifierBuff;
 import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -45,20 +45,28 @@ import java.util.List;
 public class DerivedModifierTest {
     private static final double EPS = 1e-6;
 
-    /** Himeko (姬子) - a plain character with no rule file of its own; the derived value is put on it. */
+    /**
+     * Himeko (姬子) - a plain character with no rule file of its own; the derived value is put on it.
+     */
     private static final int OWNER = 1003;
-    /** Tingyun (停云) - "the other character" the party-wide grant reaches. */
+    /**
+     * Tingyun (停云) - "the other character" the party-wide grant reaches.
+     */
     private static final int ALLY = 1202;
-    /** The Dahlia (大丽花) - her trace is the first content that needs this. */
+    /**
+     * The Dahlia (大丽花) - her trace is the first content that needs this.
+     */
     private static final int DAHLIA = 1321;
     private static final int LEVEL = 80;
-        private static final double OWNER_BREAK = 2.0;
+    private static final double OWNER_BREAK = 2.0;
 
     // ==================================================================
     // 1. The arithmetic
     // ==================================================================
 
-    /** {@code percent  x  the owner's attribute + amount}, in the attribute's own units. */
+    /**
+     * {@code percent  x  the owner's attribute + amount}, in the attribute's own units.
+     */
     @Test
     public void theValueIsAShareOfTheOwnersAttributePlusAFlatPart() {
         Battle battle = battleWith(owner -> owner.setAttribute(AttributeType.BREAKING_EFFECT,
@@ -70,7 +78,9 @@ public class DerivedModifierTest {
                 "0.5 x 2.0 + 0.1 = 1.1 -- the document's own arithmetic (\"equal to X% ... + Y%\")");
     }
 
-    /** The part that has to be stated: {@code amount} is optional, the percentage is not. */
+    /**
+     * The part that has to be stated: {@code amount} is optional, the percentage is not.
+     */
     @Test
     public void theFlatPartIsOptional() {
         Battle battle = battleWith(owner -> owner.setAttribute(AttributeType.BREAKING_EFFECT,
@@ -171,7 +181,9 @@ public class DerivedModifierTest {
     // 3. Refusals, while the file is read
     // ==================================================================
 
-    /** A flat part with no scale has nothing to derive from, so it is refused rather than dropped silently. */
+    /**
+     * A flat part with no scale has nothing to derive from, so it is refused rather than dropped silently.
+     */
     @Test
     public void anAmountWithoutAScaleIsRefused() {
         EffectSpec effect = new EffectSpec();
@@ -186,7 +198,9 @@ public class DerivedModifierTest {
         Assertions.assertTrue(refused.getMessage().contains("scale"), refused.getMessage());
     }
 
-    /** A scale this op cannot read (the heal/shield family) is refused rather than silently ignored. */
+    /**
+     * A scale this op cannot read (the heal/shield family) is refused rather than silently ignored.
+     */
     @Test
     public void aHealScaleOnAnAttributeIsRefused() {
         EffectSpec effect = new EffectSpec();
@@ -199,19 +213,25 @@ public class DerivedModifierTest {
         assertRefused(effect, "target_max_hp");
     }
 
-    /** A builder-only input key is not a runtime attribute. */
+    /**
+     * A builder-only input key is not a runtime attribute.
+     */
     @Test
     public void aBuilderOnlyAttributeIsRefused() {
         assertRefused(derived("BREAKING_EFFECT", "ATTACK_PERCENT", 0.5, null, null), "ATTACK_PERCENT");
     }
 
-    /** A scale with no magnitude is not a number. */
+    /**
+     * A scale with no magnitude is not a number.
+     */
     @Test
     public void aScaleWithoutAPercentIsRefused() {
         assertRefused(derived("BREAKING_EFFECT", "BREAKING_EFFECT", null, null, null), "percent");
     }
 
-    /** A misspelled attribute is refused where the file is read, not when the rule fires. */
+    /**
+     * A misspelled attribute is refused where the file is read, not when the rule fires.
+     */
     @Test
     public void anUnknownAttributeInTheScaleIsRefused() {
         assertRefused(derived("BREAKING_EFFECT", "BREAK_EFFECT", 0.5, null, null), "BREAK_EFFECT");
@@ -226,7 +246,7 @@ public class DerivedModifierTest {
      * never fire.
      *
      * <p>Note: Written by hand first, in the trace just below, and the only reason it was noticed is that nothing was
-     * granted. The event is delivered to every character's own table, so "my own battle start" needs no condition - 
+     * granted. The event is delivered to every character's own table, so "my own battle start" needs no condition -
      * which is what the message says.
      */
     @Test
@@ -287,7 +307,9 @@ public class DerivedModifierTest {
     // Fixture
     // ==================================================================
 
-    /** A battle whose owner carries the given single rule, with the owner tweaked before it starts. */
+    /**
+     * A battle whose owner carries the given single rule, with the owner tweaked before it starts.
+     */
     private static Battle battleWith(java.util.function.Consumer<Character> tweak, TriggerSpec rule) {
         Character owner = CharacterFactory.create(OWNER, LEVEL);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
@@ -298,7 +320,9 @@ public class DerivedModifierTest {
         return battle;
     }
 
-    /** A {@code MODIFY_ATTR} with a derived magnitude. */
+    /**
+     * A {@code MODIFY_ATTR} with a derived magnitude.
+     */
     private static TriggerSpec rule(String event, EffectSpec effect) {
         return TriggerSpecs.rule(event, null, effect);
     }

@@ -1,24 +1,26 @@
 package com.laosun.aluminium.test.engine;
+
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
 import java.util.List;
 
 /**
  * Slot 20's last two clauses: "[老主顾]的防御力降低 #2(10)%，[老主顾]以外的敌方目标的防御力降低 #3(6)%".
- *
+ * <p>
  * Two-sided on the SAME enemy: the mark takes 10% and the unmarked one 6%, so a rule that ignored `target_when` would be caught either way.
  */
 public class TrickeryOdeDefenceTest {
     private static final int LEVEL = 80;
     private static final int CYRENE = 1415;
     private static final int CIPHER = 1406;
-        private static final int ODE_SLOT = 20;
+    private static final int ODE_SLOT = 20;
     private static final String PATRON = "老主顾";
 
     @Test
@@ -29,7 +31,9 @@ public class TrickeryOdeDefenceTest {
         Assertions.assertEquals(0.06, r[1], 1e-6, "everyone else takes #3");
     }
 
-    /** [what the marked enemy lost, what the unmarked enemy lost] */
+    /**
+     * [what the marked enemy lost, what the unmarked enemy lost]
+     */
     private static double[] run() {
         Character cyrene = CharacterFactory.create(CYRENE, LEVEL);
         Character cipher = CharacterFactory.create(CIPHER, LEVEL);

@@ -2,14 +2,14 @@ package com.laosun.aluminium.test.engine;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.Skill.StanceList;
+import com.laosun.aluminium.data.SkillData;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.SkillEffectType;
 import com.laosun.aluminium.models.CanHit;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.skill.DefaultSkill;
 import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.models.skill.DefaultSkill;
 import com.laosun.aluminium.models.skill.Skill;
-import com.laosun.aluminium.data.SkillData;
 import com.laosun.aluminium.models.skill.SkillExecutor;
 import com.laosun.aluminium.models.tests.TestSkillGroup1;
 import com.laosun.aluminium.test.support.BattleFixture;
@@ -61,7 +61,9 @@ public class SkillExecutorTest {
         return new DefaultSkill(1001, 3, 1);            // real data: multiplier 0.9
     }
 
-    /** Fabricated data (this character has no Blast / Bounce). */
+    /**
+     * Fabricated data (this character has no Blast / Bounce).
+     */
     private static Skill fakeSkill(SkillEffectType effect, List<Double> params) {
         // ? The Bounce path reads its numbers from the DESCRIPTION (round 10): the share is the `%`-referenced parameter
         // and the hit count is the ADDITIONAL count ("additionally deals N instances"), so the fixture states both. params[1] is therefore the

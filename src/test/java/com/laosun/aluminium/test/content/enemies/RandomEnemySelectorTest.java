@@ -25,7 +25,9 @@ public class RandomEnemySelectorTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** Sums the health a fixed-seed ultimate takes off the enemies, and reports which one lost more (the rider's pick). */
+    /**
+     * Sums the health a fixed-seed ultimate takes off the enemies, and reports which one lost more (the rider's pick).
+     */
     private List<Double> losses(long seed) {
         Character elation = CharacterFactory.create(WEARER, LEVEL);
         Enemy first = EnemyFactory.create(MONSTER, 90, 1);
@@ -63,7 +65,9 @@ public class RandomEnemySelectorTest {
                 "the roll really varies (it favoured the first enemy " + firstBigger + " times out of 12)");
     }
 
-    /** The shipped rule, read off the compiled table (discipline 232). */
+    /**
+     * The shipped rule, read off the compiled table (discipline 232).
+     */
     @Test
     public void theShippedRuleNamesTheRandomSelector() {
         Character elation = CharacterFactory.create(WEARER, LEVEL);

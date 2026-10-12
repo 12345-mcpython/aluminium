@@ -1,16 +1,16 @@
 package com.laosun.aluminium.test.trigger;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -30,7 +30,9 @@ import java.util.List;
  * not need a damage pipeline: they apply stacks with real rules and take them back with real rules.
  */
 public class TriggerRemoveStackTest {
-    /** Himeko: no shipped rule file, so the table under test is the only one in the battle. */
+    /**
+     * Himeko: no shipped rule file, so the table under test is the only one in the battle.
+     */
     private static final int OWNER = 1003;
     private static final int ALLY = 1202;
     private static final int LEVEL = 80;
@@ -106,7 +108,9 @@ public class TriggerRemoveStackTest {
                 "the 50% stack was added last, so it is the one that comes off");
     }
 
-    /** The op honours the {@code target} selector like every other effect. */
+    /**
+     * The op honours the {@code target} selector like every other effect.
+     */
     @Test
     public void stacksCanBeRemovedFromAnotherUnit() {
         Battle battle = withAlly(stackRule(0.18, 3), removeFromTargetRule(1));
@@ -159,12 +163,16 @@ public class TriggerRemoveStackTest {
     // Helpers
     // ==================================================================
 
-    /** A rule that adds one stack of {@code percent} on the boost attribute (cap 3), on any ally attack. */
+    /**
+     * A rule that adds one stack of {@code percent} on the boost attribute (cap 3), on any ally attack.
+     */
     private static TriggerSpec stackRule(double percent, int maxStacks) {
         return stackRuleOn("ALLY_ATTACK", percent, maxStacks);
     }
 
-    /** The same, on a named event - the stack cases need one firing to add exactly one stack. */
+    /**
+     * The same, on a named event - the stack cases need one firing to add exactly one stack.
+     */
     private static TriggerSpec stackRuleOn(String event, double percent, int maxStacks) {
         EffectSpec effect = new EffectSpec();
         TriggerSpecs.set(effect, "op", "MODIFY_ATTR");
@@ -175,12 +183,16 @@ public class TriggerRemoveStackTest {
         return TriggerSpecs.rule(event, null, effect);
     }
 
-    /** A rule on a skill cast that removes {@code amount} stacks of the boost attribute. */
+    /**
+     * A rule on a skill cast that removes {@code amount} stacks of the boost attribute.
+     */
     private static TriggerSpec removeRule(double amount) {
         return TriggerSpecs.rule("SKILL_CAST", null, removeOp(amount));
     }
 
-    /** The same, but asking for the event's subject instead of the rule's owner. */
+    /**
+     * The same, but asking for the event's subject instead of the rule's owner.
+     */
     private static TriggerSpec removeFromTargetRule(double amount) {
         EffectSpec effect = removeOp(amount);
         TriggerSpecs.set(effect, "target", "target");
@@ -222,7 +234,9 @@ public class TriggerRemoveStackTest {
         return battle.fireTriggers(TriggerEvent.SKILL_CAST, actor, null, 0, 0);
     }
 
-    /** The attribute's current value, i.e. what the stacks add up to. */
+    /**
+     * The attribute's current value, i.e. what the stacks add up to.
+     */
     private static double boostOf(Character who) {
         return who.getAttribute(BOOST).get();
     }

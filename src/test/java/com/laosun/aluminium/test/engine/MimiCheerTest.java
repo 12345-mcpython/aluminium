@@ -5,8 +5,8 @@ import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.skill.Skill;
 import com.laosun.aluminium.models.skill.SkillExecutor;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -20,9 +20,11 @@ import java.util.List;
 public class MimiCheerTest {
     private static final int OWNER = 8007;
     private static final int ALLY = 1002;
-        private static final String CHEER = "迷迷的声援";
+    private static final String CHEER = "迷迷的声援";
 
-    /** The skill lays the cheer on its target. */
+    /**
+     * The skill lays the cheer on its target.
+     */
     @Test
     public void theSkillLaysTheCheerOnItsTarget() {
         Character owner = CharacterFactory.create(OWNER, 80);

@@ -5,8 +5,8 @@ import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -30,7 +30,7 @@ import java.util.List;
 public class AventurineWaveflairMilestoneTest {
     private static final int OWNER = 1513;
     private static final int ALLY = 1505;              // an Elation ally: their cast must not touch HER counter
-        private static final String FERVOR = "热意";
+    private static final String FERVOR = "热意";
     private static final int THRESHOLD = 10;
     private static final int FIXED_LAUGHS = 20;
 
@@ -173,7 +173,9 @@ public class AventurineWaveflairMilestoneTest {
         return wolf.getResources().value(FERVOR);
     }
 
-    /** The laugh count the shipped rule states on its commanded cast, read off the compiled table. */
+    /**
+     * The laugh count the shipped rule states on its commanded cast, read off the compiled table.
+     */
     private static Integer fixedLaughsOf(Character unit) {
         return unit.getTriggerTable().rulesFor(TriggerEvent.RESOURCE_CHANGED).stream()
                 .filter(rule -> rule.id().equals("talent_autocasts_elation"))
@@ -183,7 +185,9 @@ public class AventurineWaveflairMilestoneTest {
                 .findFirst().orElse(null);
     }
 
-    /** The data row her Elation slot currently holds: 20 = 【举杯！敬炽烈一夏】, 21 = 【All in！敬炽烈一夏】. */
+    /**
+     * The data row her Elation slot currently holds: 20 = 【举杯！敬炽烈一夏】, 21 = 【All in！敬炽烈一夏】.
+     */
     private static int slotOf(Character unit) {
         return unit.getSkills().get(SkillType.ELATION_SKILL).getSkillSlot();
     }

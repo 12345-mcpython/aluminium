@@ -1,8 +1,6 @@
 package com.laosun.aluminium.test.content.characters;
 
 
-import com.laosun.aluminium.test.engine.SuperBreakTest;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageElement;
@@ -11,6 +9,7 @@ import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -25,11 +24,11 @@ import java.util.List;
  */
 public class TrailblazerEidolonTest {
     private static final int LEVEL = 80;
-        private static final double EPS = 1e-9;
+    private static final double EPS = 1e-9;
 
     @Test
     public void theBoostIsStatedOnlyAgainstABrokenTarget() {
-        for (int cid : new int[] {8001, 8002}) {
+        for (int cid : new int[]{8001, 8002}) {
             // Note: A difference, not an absolute: an intact unit still reads the game's inherent +0.05 crit chance
             // (measured: 0.30 where the clause owns 0.25).
             Assertions.assertEquals(0.25, critChance(cid, true) - critChance(cid, false), EPS,

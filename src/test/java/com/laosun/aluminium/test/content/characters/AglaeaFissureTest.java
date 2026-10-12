@@ -1,9 +1,6 @@
 package com.laosun.aluminium.test.content.characters;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.trigger.AddDamageOpTest;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.AttributeType;
@@ -11,8 +8,10 @@ import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.DoubleValue;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -29,7 +28,7 @@ import java.util.Random;
 public class AglaeaFissureTest {
     private static final int AGLAEA = 1402;
     private static final int LEVEL = 80;
-        private static final String STATE = "间隙织线";
+    private static final String STATE = "间隙织线";
 
     @Test
     public void theAdditionalDamageLandsOnlyOnAThreadedTarget() {
@@ -53,7 +52,9 @@ public class AglaeaFissureTest {
         return aglaea.getAttribute(AttributeType.ATTACK).get();
     }
 
-    /** Her skill's damage against a victim, with the state applied or not. */
+    /**
+     * Her skill's damage against a victim, with the state applied or not.
+     */
     private static double skillDamage(boolean threaded) {
         Character aglaea = CharacterFactory.create(AGLAEA, LEVEL);
         Character ally = CharacterFactory.create(1001, LEVEL);

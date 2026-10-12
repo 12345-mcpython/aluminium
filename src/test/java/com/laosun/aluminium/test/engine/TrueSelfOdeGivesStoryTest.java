@@ -1,19 +1,21 @@
 package com.laosun.aluminium.test.engine;
+
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
 import java.util.List;
 
 /**
  * A summon can DECLARE a resource, so a rule can grant one to it.
- *
+ * <p>
  * Slot 26's "昔涟施放终结技后…使德谬歌获得1点[故事]" is the reader. Before this capability the loader accepted `GAIN_RESOURCE{target: "summon"}` and the runtime silently granted nothing,
  * because a resource has to be declared where the unit can see it and a summon had no declaration site (`MemospriteSpec` now carries `resources`; `SummonFactory` registers them).
- *
+ * <p>
  * Note: The same sentence's other trigger, "…或德谬歌被召唤时", did NOT move the counter in this judge -- registered, not claimed.
  */
 public class TrueSelfOdeGivesStoryTest {

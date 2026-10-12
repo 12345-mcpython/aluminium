@@ -6,11 +6,11 @@ import com.laosun.aluminium.enums.DamageType;
 import com.laosun.aluminium.models.CanHit;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Damage;
-import com.laosun.aluminium.models.skill.DefaultSkill;
 import com.laosun.aluminium.models.DoubleValue;
 import com.laosun.aluminium.models.energy.EnergyGain;
 import com.laosun.aluminium.models.energy.EnergyProvider;
 import com.laosun.aluminium.models.energy.StandardEnergyProvider;
+import com.laosun.aluminium.models.skill.DefaultSkill;
 import com.laosun.aluminium.models.skill.Skill;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -126,7 +126,7 @@ public class EnergyTest {
         });
 
         Assertions.assertEquals(7, c.getEnergyProvider()
-                .onSkillCast(c, new DefaultSkill(1001, 1, 1), Set.of()).amount(), EPS,
+                        .onSkillCast(c, new DefaultSkill(1001, 1, 1), Set.of()).amount(), EPS,
                 "the credit entry point reads the entity's own provider, not a hardcoded constant");
     }
 

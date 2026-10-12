@@ -8,7 +8,6 @@ import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.utils.CharacterFactory;
-import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -24,7 +23,10 @@ import java.util.Random;
 public class HertaTest {
     private static final int HERTA = 1013;
     private static final int LEVEL = 80;
-        /** Note: "抵抗控制类负面状态的概率提高35%": the engine keeps a per-class resistance, and it must be up. */
+
+    /**
+     * Note: "抵抗控制类负面状态的概率提高35%": the engine keeps a per-class resistance, and it must be up.
+     */
     @Test
     public void herPuppetTraceRaisesControlResistance() {
         Fixture f = new Fixture();
@@ -32,7 +34,9 @@ public class HertaTest {
                 "「抵抗控制类负面状态的概率提高35%」 (raises RES to Crowd Control debuffs by 35%)");
     }
 
-    /** Note: "若敌方目标当前生命值百分比大于等于50%": the bonus is per TARGET, so a low-HP enemy must not get it. */
+    /**
+     * Note: "若敌方目标当前生命值百分比大于等于50%": the bonus is per TARGET, so a low-HP enemy must not get it.
+     */
     @Test
     public void theSkillBonusAppliesOnlyToHealthyTargets() {
         Character herta = CharacterFactory.create(HERTA, LEVEL);
@@ -63,7 +67,9 @@ public class HertaTest {
                         + healthyLoss + " (healthy) vs " + hurtLoss + " (hurt)");
     }
 
-    /** Census: the threshold bonus, the frozen bonus, the resistance and the level convention. */
+    /**
+     * Census: the threshold bonus, the frozen bonus, the resistance and the level convention.
+     */
     @Test
     public void herFileCarriesTheClauses() {
         var table = TriggerTables.of(HERTA);

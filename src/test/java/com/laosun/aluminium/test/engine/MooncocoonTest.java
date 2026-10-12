@@ -4,8 +4,8 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Signal;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -25,9 +25,11 @@ public class MooncocoonTest {
     private static final int OWNER = 1407;
     private static final int HEALER = 1211;
     private static final int VICTIM = 1002;
-        private static final String STATE = "月茧";
+    private static final String STATE = "月茧";
 
-    /** "暂时延后陷入无法战斗状态": the blow is HELD -- the victim is alive, at zero HP, carrying the trace. */
+    /**
+     * "暂时延后陷入无法战斗状态": the blow is HELD -- the victim is alive, at zero HP, carrying the trace.
+     */
     @Test
     public void theBlowIsHeld() {
         Scene scene = alone();
@@ -37,7 +39,9 @@ public class MooncocoonTest {
         Assertions.assertTrue(scene.victim.getBuffManager().hasState(STATE), "\"gains the Mooncocoon (【月茧】) state\" (「获得【月茧】状态」)");
     }
 
-    /** "行动后…否则将立即陷入无法战斗状态": nothing saved it, so its own turn's END commits the death. */
+    /**
+     * "行动后…否则将立即陷入无法战斗状态": nothing saved it, so its own turn's END commits the death.
+     */
     @Test
     public void itsOwnTurnEndsIt() {
         Scene scene = alone();
@@ -78,7 +82,9 @@ public class MooncocoonTest {
         }
     }
 
-    /** The unpolluted scene: nobody in it can heal, so the deferral is observable on its own. */
+    /**
+     * The unpolluted scene: nobody in it can heal, so the deferral is observable on its own.
+     */
     private static Scene alone() {
         Character owner = CharacterFactory.create(OWNER, 80, false, null, null, 0);
         Character victim = CharacterFactory.create(VICTIM, 80, false, null, null, 0);
@@ -89,7 +95,9 @@ public class MooncocoonTest {
         return new Scene(battle, victim);
     }
 
-    /** The same, plus a teammate whose own kit answers a lethal blow with a heal. */
+    /**
+     * The same, plus a teammate whose own kit answers a lethal blow with a heal.
+     */
     private static Scene withHealer() {
         Character owner = CharacterFactory.create(OWNER, 80, false, null, null, 0);
         Character healer = CharacterFactory.create(HEALER, 80, false, null, null, 0);
@@ -107,7 +115,9 @@ public class MooncocoonTest {
         scene.battle.processRequests();
     }
 
-    /** Note: A WHOLE turn: the early tick on `beforeMove`, the late tick and TURN_END on `afterMove`. */
+    /**
+     * Note: A WHOLE turn: the early tick on `beforeMove`, the late tick and TURN_END on `afterMove`.
+     */
     private static void takeItsTurn(Scene scene) {
         Signal signal = scene.battle.queue.snapshot().stream()
                 .filter(candidate -> candidate.getCanHit() == scene.victim).findFirst()

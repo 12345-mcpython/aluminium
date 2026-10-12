@@ -1,15 +1,15 @@
 package com.laosun.aluminium.test.engine;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -32,7 +32,9 @@ public class OrdinaryDamageTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** Runs the same battle, optionally with a probe on the ally that reacts only to damage which counts as an attack. */
+    /**
+     * Runs the same battle, optionally with a probe on the ally that reacts only to damage which counts as an attack.
+     */
     private double techniqueDamageFromTheFirstEnemy(boolean withProbe) {
         Character elation = CharacterFactory.create(WEARER, LEVEL);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
@@ -62,7 +64,9 @@ public class OrdinaryDamageTest {
                 "an ORDINARY instance counts as an attack, so the probe saw it -- additional damage would not");
     }
 
-    /** The shipped rule, read off the compiled table (discipline 232). */
+    /**
+     * The shipped rule, read off the compiled table (discipline 232).
+     */
     @Test
     public void theShippedRuleSaysOrdinary() {
         Character elation = CharacterFactory.create(WEARER, LEVEL);

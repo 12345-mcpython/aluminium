@@ -6,8 +6,8 @@ import com.laosun.aluminium.enums.DamageType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Damage;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -21,7 +21,10 @@ import java.util.List;
  */
 public class NewbudResourceTest {
     private static final int CASTORICE = 1407;
-        /** One point of health lost is one point of Newbud. */
+
+    /**
+     * One point of health lost is one point of Newbud.
+     */
     @Test
     public void aPointLostIsAPointOfNewbud() {
         Character castorice = CharacterFactory.create(CASTORICE, 80, false, null, null, 0);

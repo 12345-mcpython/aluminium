@@ -1,21 +1,20 @@
 package com.laosun.aluminium.test.engine;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.data.TriggerTables;
-import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.CanHit;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Signal;
 import com.laosun.aluminium.models.Summon;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -46,21 +45,29 @@ import java.util.List;
 public class OtherAlliesTargetTest {
     private static final double EPS = 1e-6;
 
-    /** The pair selector this class also covers; spelled once so a rename cannot half-apply. */
+    /**
+     * The pair selector this class also covers; spelled once so a rename cannot half-apply.
+     */
     private static final String TARGET_AND_SUMMON = "target_and_summon";
 
-    /** Himeko (姬子) - no shipped rule file, so the table under test is the only one in play. */
+    /**
+     * Himeko (姬子) - no shipped rule file, so the table under test is the only one in play.
+     */
     private static final int OWNER = 1003;
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
-    /** Robin (知更鸟) - her ultimate's first sentence is the first user of this selector. */
+    /**
+     * Robin (知更鸟) - her ultimate's first sentence is the first user of this selector.
+     */
     private static final int ROBIN = 1309;
 
     // ==================================================================
     // 1. The two group selectors differ in one unit
     // ==================================================================
 
-    /** "除自身以外": the teammates act now, the owner does not. */
+    /**
+     * "除自身以外": the teammates act now, the owner does not.
+     */
     @Test
     public void otherAlliesLeavesTheOwnerOut() {
         Battle battle = new Battle(party(), List.of(dummy()), BattleFixture.seeded());
@@ -98,7 +105,9 @@ public class OtherAlliesTargetTest {
         Assertions.assertEquals(0, timeRemaining(battle, battle.characters.get(2)), EPS);
     }
 
-    /** The group is the <b>camp</b>: a player-side summon is one of us and is advanced with the rest. */
+    /**
+     * The group is the <b>camp</b>: a player-side summon is one of us and is advanced with the rest.
+     */
     @Test
     public void aSummonInOurCampIsOneOfUs() {
         Battle battle = new Battle(party(), List.of(dummy()), BattleFixture.seeded());
@@ -117,7 +126,9 @@ public class OtherAlliesTargetTest {
     // 2. The spelling is closed
     // ==================================================================
 
-    /** A near miss is refused where the file is read, and the message names the vocabulary. */
+    /**
+     * A near miss is refused where the file is read, and the message names the vocabulary.
+     */
     @Test
     public void aMisspelledSelectorIsRefused() {
         TriggerSpec spec = TriggerSpecs.rule("ULT_CAST", null, advance("other_ally"));
@@ -132,7 +143,9 @@ public class OtherAlliesTargetTest {
     // 3. The shipped content: Robin's ultimate
     // ==================================================================
 
-    /** Her ultimate's first sentence, end to end: the two teammates act, Robin does not. */
+    /**
+     * Her ultimate's first sentence, end to end: the two teammates act, Robin does not.
+     */
     @Test
     public void theAuthoredRobinRuleAdvancesHerTeammatesOnly() {
         Character robin = CharacterFactory.create(ROBIN, LEVEL);
@@ -150,7 +163,9 @@ public class OtherAlliesTargetTest {
                 "her own turn is untouched by this clause (【协奏】 (Concerto) is what does something else to her)");
     }
 
-    /** ...and the rule is filed as her ultimate's first sentence, with the fraction that means act immediately. */
+    /**
+     * ...and the rule is filed as her ultimate's first sentence, with the fraction that means act immediately.
+     */
     @Test
     public void theAuthoredRobinRuleStatesItsShape() {
         Character robin = CharacterFactory.create(ROBIN, LEVEL);
@@ -222,7 +237,9 @@ public class OtherAlliesTargetTest {
         Assertions.assertEquals(0, timeRemaining(battle, chosen), EPS, "the chosen unit acts now");
     }
 
-    /** Only the summon <b>that is out</b> counts: a dead one is not part of the pair. */
+    /**
+     * Only the summon <b>that is out</b> counts: a dead one is not part of the pair.
+     */
     @Test
     public void aDeadSummonIsNotPartOfThePair() {
         Battle battle = new Battle(party(TARGET_AND_SUMMON), List.of(dummy()), BattleFixture.seeded());
@@ -267,7 +284,9 @@ public class OtherAlliesTargetTest {
     // Fixture
     // ==================================================================
 
-    /** Three characters; the first carries the rule under test, the others are plain. */
+    /**
+     * Three characters; the first carries the rule under test, the others are plain.
+     */
     private static List<Character> party() {
         return party("other_allies");
     }
@@ -279,7 +298,9 @@ public class OtherAlliesTargetTest {
         return List.of(owner, CharacterFactory.create(1210, LEVEL), CharacterFactory.create(1202, LEVEL));
     }
 
-    /** "立即行动": skip all of the target's remaining wait. */
+    /**
+     * "立即行动": skip all of the target's remaining wait.
+     */
     private static EffectSpec advance(String selector) {
         EffectSpec effect = new EffectSpec();
         TriggerSpecs.set(effect, "op", "ADVANCE");
@@ -288,7 +309,9 @@ public class OtherAlliesTargetTest {
         return effect;
     }
 
-    /** How much action value the unit still has - zero means "acts now". */
+    /**
+     * How much action value the unit still has - zero means "acts now".
+     */
     private static double timeRemaining(Battle battle, CanHit target) {
         for (Signal signal : battle.queue.snapshot()) {
             if (signal.getCanHit() == target) {

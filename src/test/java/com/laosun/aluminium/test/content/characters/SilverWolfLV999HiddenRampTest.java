@@ -1,8 +1,7 @@
 package com.laosun.aluminium.test.content.characters;
 
-import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.enums.TriggerEvent;
+import com.laosun.aluminium.models.trigger.TriggerTable;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -35,7 +34,9 @@ public class SilverWolfLV999HiddenRampTest {
     private static final String HIDDEN = "隐藏分";
     private static final String RULE = "p1506_enhanced_basic_hidden_ramp";
 
-    /** The four terms, in order: the two thresholds, the plateau, and the cap - and the ramp they sum to. */
+    /**
+     * The four terms, in order: the two thresholds, the plateau, and the cap - and the ramp they sum to.
+     */
     @Test
     public void theRampIsFourLinearTermsWhoseSumIsAPlateau() {
         TriggerTable table = CharacterFactory.create(WOLF, 80).getTriggerTable();
@@ -72,7 +73,9 @@ public class SilverWolfLV999HiddenRampTest {
         Assertions.assertEquals(0.30, sum(0.15, true, true), 1e-9, ">=180: two layers, and it stops there");
     }
 
-    /** The gate is her enhanced basic's own slot, and her ordinary Basic is left alone. */
+    /**
+     * The gate is her enhanced basic's own slot, and her ordinary Basic is left alone.
+     */
     @Test
     public void theRampIsGatedOnTheEnhancedBasic() {
         TriggerTable table = CharacterFactory.create(WOLF, 80).getTriggerTable();

@@ -1,16 +1,16 @@
 package com.laosun.aluminium.test.engine;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.skill.Skill;
 import com.laosun.aluminium.models.skill.SkillExecutor;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -27,17 +27,21 @@ import java.util.List;
 public class TransformationDispelsTest {
     private static final int OWNER = 1408;
     private static final int APPLIER = 1002;
-        private static final String STATE = "变身";
+    private static final String STATE = "变身";
     private static final String DOT = "触电";
 
-    /** Transformed: her own cast strips the debuff. */
+    /**
+     * Transformed: her own cast strips the debuff.
+     */
     @Test
     public void theTransformedFormStripsItsDebuffs() {
         Assertions.assertFalse(debuffedAfterCast(true),
                 "\"removes all of her own debuffs\" (「解除自身所有负面效果」)");
     }
 
-    /** Note: Untransformed: the same cast leaves it there. */
+    /**
+     * Note: Untransformed: the same cast leaves it there.
+     */
     @Test
     public void withoutTheTransformationNothingIsStripped() {
         Assertions.assertTrue(debuffedAfterCast(false),
@@ -82,7 +86,9 @@ public class TransformationDispelsTest {
         return owner.getBuffManager().hasState(DOT);
     }
 
-    /** A Thunder DOT on the other ally. */
+    /**
+     * A Thunder DOT on the other ally.
+     */
     private static EffectSpec dot() {
         EffectSpec e = new EffectSpec();
         TriggerSpecs.set(e, "op", "APPLY_DOT");

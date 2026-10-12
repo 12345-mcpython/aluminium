@@ -6,8 +6,8 @@ import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Summon;
 import com.laosun.aluminium.models.skill.Skill;
 import com.laosun.aluminium.models.skill.SkillExecutor;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
@@ -28,9 +28,11 @@ public class OdeOfGenesisTest {
     private static final int LEVEL = 80;
     private static final int CYRENE = 1415;
     private static final int TRAILBLAZER = 8007;   // Trailblazer - Remembrance (开拓者-记忆)
-        private static final int ODE_OF_GENESIS = 13;
+    private static final int ODE_OF_GENESIS = 13;
 
-    /** Attack and crit both rise by the ACTOR's share, on the recipient. */
+    /**
+     * Attack and crit both rise by the ACTOR's share, on the recipient.
+     */
     @Test
     public void theRecipientGainsBothBoosts() {
         Character cyrene = CharacterFactory.create(CYRENE, LEVEL);
@@ -67,7 +69,9 @@ public class OdeOfGenesisTest {
                 "\"CRIT Rate raised by an amount equal to #2% of Demiurge (德谬歌)'s CRIT Rate\" (「暴击率提高，数值等同于德谬歌暴击率的 #2%」)");
     }
 
-    /** "该效果对迷迷也生效" -- the same two effects reach the recipient's own memosprite. */
+    /**
+     * "该效果对迷迷也生效" -- the same two effects reach the recipient's own memosprite.
+     */
     @Test
     public void theRecipientsOwnMemospriteIsAlsoBoosted() {
         Character cyrene = CharacterFactory.create(CYRENE, LEVEL);

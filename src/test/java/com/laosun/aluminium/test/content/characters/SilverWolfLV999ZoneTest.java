@@ -1,11 +1,10 @@
 package com.laosun.aluminium.test.content.characters;
 
 import com.laosun.aluminium.Battle;
-import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -22,10 +21,12 @@ import java.util.List;
 public class SilverWolfLV999ZoneTest {
     private static final int WOLF = 1506;
     private static final int ALLY = 1204;
-        private static final String ZONE = "结界";
+    private static final String ZONE = "结界";
     private static final String GOD = "无敌玩家";
 
-    /** Her Ultimate deploys the Zone, and it lands on her rather than on the party. */
+    /**
+     * Her Ultimate deploys the Zone, and it lands on her rather than on the party.
+     */
     @Test
     public void theUltimateDeploysTheZoneOnHer() {
         Battle battle = newBattle();
@@ -41,7 +42,9 @@ public class SilverWolfLV999ZoneTest {
         Assertions.assertFalse(ally.getBuffManager().hasState(ZONE), "and it is HERS - the marker is on the caster");
     }
 
-    /** A Skill Point spent inside the Zone, with 【无敌玩家】 up, deals Elation damage to the enemies. */
+    /**
+     * A Skill Point spent inside the Zone, with 【无敌玩家】 up, deals Elation damage to the enemies.
+     */
     @Test
     public void aSpentSkillPointTriggersTheLootBox() {
         Battle battle = newBattle();
@@ -58,7 +61,9 @@ public class SilverWolfLV999ZoneTest {
                 "结界内每消耗 1 个战技点触发一次盲盒，造成 90% 虚数欢愉伤害");
     }
 
-    /** Without the state there is no Zone, so a spent Skill Point is just a spent Skill Point. */
+    /**
+     * Without the state there is no Zone, so a spent Skill Point is just a spent Skill Point.
+     */
     @Test
     public void withoutTheZoneASpentPointDoesNothing() {
         Battle battle = newBattle();

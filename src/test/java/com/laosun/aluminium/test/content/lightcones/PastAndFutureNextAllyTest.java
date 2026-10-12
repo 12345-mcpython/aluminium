@@ -8,8 +8,8 @@ import com.laosun.aluminium.models.CanHit;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Weapon;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -54,7 +54,9 @@ public class PastAndFutureNextAllyTest {
         }
     }
 
-    /** Finds a battle where the cone's wearer has an ally before and after it in the queue. */
+    /**
+     * Finds a battle where the cone's wearer has an ally before and after it in the queue.
+     */
     @Test
     public void theBoostLandsOnTheAllyWhoActsNext() {
         int[] wearers = {1210, 1204, 1209, 1211, 1112, 1101, 1102, 1103, 1104, 1001, 1002, 1004, 1006, 1008};

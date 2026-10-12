@@ -7,8 +7,8 @@ import com.laosun.aluminium.models.Summon;
 import com.laosun.aluminium.models.buff.StateBuff;
 import com.laosun.aluminium.models.skill.Skill;
 import com.laosun.aluminium.models.skill.SkillExecutor;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -33,11 +33,13 @@ public class OdeToStrifeBloodfeudTest {
     private static final int LEVEL = 80;
     private static final int CYRENE = 1415;
     private static final int MYDEI = 1404;
-        private static final int ODE_TO_STRIFE = 16;
+    private static final int ODE_TO_STRIFE = 16;
     private static final int GODSLAYER = 11;
     private static final String BLOODFEUD = "血仇";
 
-    /** In [血仇] the command lands: his SKILL slot becomes [弑神登神]. */
+    /**
+     * In [血仇] the command lands: his SKILL slot becomes [弑神登神].
+     */
     @Test
     public void inBloodfeudTheOdeCommandsTheGodslayer() {
         Character mydei = scene(true);
@@ -54,7 +56,9 @@ public class OdeToStrifeBloodfeudTest {
                 "「使其自动施放 1 次【弑神登神】」 (makes it automatically cast Godslayer Be God once)-- the swap his own rule performs");
     }
 
-    /** Outside [血仇] the same cast leaves him alone -- the other half of "若 ...处于 ...则 ...". */
+    /**
+     * Outside [血仇] the same cast leaves him alone -- the other half of "若 ...处于 ...则 ...".
+     */
     @Test
     public void outsideBloodfeudTheOdeDoesNothing() {
         Character mydei = scene(false);
@@ -74,7 +78,9 @@ public class OdeToStrifeBloodfeudTest {
     private Battle battle;
     private Summon lastSummon;
 
-    /** The scene every case shares: Cyrene, Mydei and her memosprite, with [血仇] stated or not. */
+    /**
+     * The scene every case shares: Cyrene, Mydei and her memosprite, with [血仇] stated or not.
+     */
     private Character scene(boolean inBloodfeud) {
         Character cyrene = CharacterFactory.create(CYRENE, LEVEL);
         Character mydei = CharacterFactory.create(MYDEI, LEVEL);

@@ -1,15 +1,15 @@
 package com.laosun.aluminium.test.content.characters;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -36,7 +36,8 @@ public class RobinConcertoTest {
     private static final int ROBIN = 1309;
     private static final int ALLY = 1210;
     private static final int LEVEL = 80;
-        @Test
+
+    @Test
     public void herConcertoMakesHerControlImmuneUntilTheCountdown() {
         Character robin = CharacterFactory.create(ROBIN, LEVEL);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
@@ -64,7 +65,9 @@ public class RobinConcertoTest {
                 "the immunity is named after the state, so the countdown takes it off -- the same control now lands");
     }
 
-    /** A 100% base chance control aimed at the event's target (the immunity under test is on the target). */
+    /**
+     * A 100% base chance control aimed at the event's target (the immunity under test is on the target).
+     */
     private static EffectSpec control() {
         EffectSpec effect = new EffectSpec();
         TriggerSpecs.set(effect, "op", "APPLY_CONTROL");
@@ -75,7 +78,9 @@ public class RobinConcertoTest {
         return effect;
     }
 
-    /** Counts how many times the event arrives. */
+    /**
+     * Counts how many times the event arrives.
+     */
     private static EffectSpec stack() {
         EffectSpec effect = new EffectSpec();
         TriggerSpecs.set(effect, "op", "ADD_STACK");
@@ -90,7 +95,9 @@ public class RobinConcertoTest {
         return BattleFixture.monster();
     }
 
-    /** Rolls low enough that a control that is not resisted always lands. */
+    /**
+     * Rolls low enough that a control that is not resisted always lands.
+     */
     private static Random fixed() {
         return BattleFixture.alwaysRoll(0.0);
     }

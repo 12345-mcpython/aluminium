@@ -2,10 +2,10 @@ package com.laosun.aluminium.test.engine;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
+import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Weapon;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -29,7 +29,6 @@ public class ConeBatchTest {
         Assertions.assertEquals(0.12, critGain(20000, 1), 1e-6, "rank 1");
         Assertions.assertEquals(0.24, critGain(20000, 5), 1e-6, "rank 5");
     }
-
 
 
     @Test
@@ -62,8 +61,6 @@ public class ConeBatchTest {
     }
 
 
-
-
     private static double speedGainAfterKill(int cone, int rank) {
         Character unit = wearer(cone, rank);
         Battle battle = battleWith(unit);
@@ -72,9 +69,6 @@ public class ConeBatchTest {
         battle.fireTriggers(TriggerEvent.KILL, unit, null, 0, 0);
         return unit.getAttribute(AttributeType.SPEED).get() - before;
     }
-
-
-
 
 
 }

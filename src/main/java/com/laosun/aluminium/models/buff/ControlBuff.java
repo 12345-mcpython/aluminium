@@ -39,7 +39,7 @@ import com.laosun.aluminium.models.CanHit;
  * existing {@code attachBreakControl} documents the same split).
  *
  * <p>{@code isSameKind} is overridden to compare the <b>control name</b>, so re-applying the same control refreshes
- * it (the engine's ordinary "same buff again replaces the old one" rule) while two different controls can coexist - 
+ * it (the engine's ordinary "same buff again replaces the old one" rule) while two different controls can coexist -
  * being both frozen and imprisoned is not the same thing as being frozen twice.
  */
 public class ControlBuff extends AbstractBuff {

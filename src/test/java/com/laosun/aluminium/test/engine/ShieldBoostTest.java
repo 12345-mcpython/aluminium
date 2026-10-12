@@ -1,19 +1,18 @@
 package com.laosun.aluminium.test.engine;
 
 
-import com.laosun.aluminium.test.support.BattleFixture;
-import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.AttributeType;
-import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.DoubleValue;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.buff.ShieldBuff;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.models.skill.DefaultSkill;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.utils.RelicFactory;
 import org.junit.jupiter.api.Assertions;
@@ -46,7 +45,9 @@ public class ShieldBoostTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
 
-    /** The register's own example: relic 103's 4-piece, "increases the shield amount provided by the wearer by 20%". */
+    /**
+     * The register's own example: relic 103's 4-piece, "increases the shield amount provided by the wearer by 20%".
+     */
     @Test
     public void theProvidersBoostMultipliesTheShield() {
         Battle battle = fixture();
@@ -79,7 +80,9 @@ public class ShieldBoostTest {
         Assertions.assertEquals(100, shielded.getShield(), EPS);
     }
 
-    /** No provider means no boost: the raw entry point the fixtures and demos use stays exactly as it was. */
+    /**
+     * No provider means no boost: the raw entry point the fixtures and demos use stays exactly as it was.
+     */
     @Test
     public void anUnknownProviderAppliesNoBoost() {
         Battle battle = fixture();
@@ -114,7 +117,9 @@ public class ShieldBoostTest {
         Assertions.assertEquals(122, battle.grantShield(giver, giver, 100), EPS);
     }
 
-    /** A boost cannot conjure a shield: 0 stays 0, and the "<= 0 clears it" reading is unchanged. */
+    /**
+     * A boost cannot conjure a shield: 0 stays 0, and the "<= 0 clears it" reading is unchanged.
+     */
     @Test
     public void aBoostDoesNotCreateOrUnclearAShield() {
         Battle battle = fixture();
@@ -148,7 +153,9 @@ public class ShieldBoostTest {
         Assertions.assertEquals(120, shielded.getShield(), EPS, "…and that is what it installed");
     }
 
-    /** …and the untimed shape of the same rule agrees, through the op's own call site rather than the API directly. */
+    /**
+     * …and the untimed shape of the same rule agrees, through the op's own call site rather than the API directly.
+     */
     @Test
     public void theRawGrantFromARuleIsBoostedToo() {
         Battle battle = fixture();
@@ -187,7 +194,9 @@ public class ShieldBoostTest {
                 "…and a shield that wearer grants really is a fifth larger");
     }
 
-    /** 128's two tiers end up at 22% for a full set (10% + 12%), and each piece count states its own number. */
+    /**
+     * 128's two tiers end up at 22% for a full set (10% + 12%), and each piece count states its own number.
+     */
     @Test
     public void theReclusesTwoTiersAddUp() {
         Character full = wearing(RELIC_SET_128);
@@ -248,7 +257,9 @@ public class ShieldBoostTest {
     // Helpers
     // ==================================================================
 
-    /** What March 7th's Skill data installs on its caster, with or without relic 128's two ability-only tiers. */
+    /**
+     * What March 7th's Skill data installs on its caster, with or without relic 128's two ability-only tiers.
+     */
     private static double skillShield(boolean withRelic) {
         Character caster = withRelic
                 ? CharacterFactory.create(WEARER, LEVEL, true, null, RelicFactory.suit(RELIC_SET_128, STAR, RELIC_LEVEL))
@@ -262,11 +273,15 @@ public class ShieldBoostTest {
     private static final int RELIC_SET_128 = 128;
     private static final int STAR = 5;
     private static final int RELIC_LEVEL = 15;
-    /** March 7th's data row, read while the caster is somebody else (see {@link #theSkillPanelShieldIsBoostedToo}). */
+    /**
+     * March 7th's data row, read while the caster is somebody else (see {@link #theSkillPanelShieldIsBoostedToo}).
+     */
     private static final int CASTERS_SKILL_CID = 1001;
     private static final int SKILL_SLOT = 2;
 
-    /** A character wearing the whole cavern set, already in a started battle (so its rules have run). */
+    /**
+     * A character wearing the whole cavern set, already in a started battle (so its rules have run).
+     */
     private static Character wearing(int setId) {
         Character character = CharacterFactory.create(WEARER, LEVEL, true, null,
                 RelicFactory.suit(setId, STAR, RELIC_LEVEL));
@@ -274,7 +289,9 @@ public class ShieldBoostTest {
         return character;
     }
 
-    /** The same with exactly the first two cavern pieces, which is what a 2-piece bonus needs. */
+    /**
+     * The same with exactly the first two cavern pieces, which is what a 2-piece bonus needs.
+     */
     private static Character wearingTwoPieces(int setId) {
         com.laosun.aluminium.models.RelicSuit suit = new com.laosun.aluminium.models.RelicSuit();
         for (com.laosun.aluminium.enums.RelicType slot : List.of(
@@ -286,14 +303,18 @@ public class ShieldBoostTest {
         return character;
     }
 
-    /** One started battle around the given team, so every {@code BATTLE_START} rule has fired. */
+    /**
+     * One started battle around the given team, so every {@code BATTLE_START} rule has fired.
+     */
     private static Battle battleWith(List<Character> team) {
         Battle battle = BattleFixture.battle(team, List.of(BattleFixture.monster()));
         battle.startBattle();
         return battle;
     }
 
-    /** A giver and somebody to shield, both with their own trigger table slot (the fixture's table is set per case). */
+    /**
+     * A giver and somebody to shield, both with their own trigger table slot (the fixture's table is set per case).
+     */
     private static Battle fixture() {
         Character giver = CharacterFactory.create(WEARER, LEVEL);
         Character shielded = CharacterFactory.create(WEARER, LEVEL);
@@ -303,7 +324,9 @@ public class ShieldBoostTest {
         return battle;
     }
 
-    /** One {@code SHIELD} effect with no duration (the raw grant). */
+    /**
+     * One {@code SHIELD} effect with no duration (the raw grant).
+     */
     private static EffectSpec shield(double amount) {
         EffectSpec effect = new EffectSpec();
         TriggerSpecs.set(effect, "op", "SHIELD");
@@ -312,7 +335,9 @@ public class ShieldBoostTest {
         return effect;
     }
 
-    /** The same with "lasting N turns", which is the path that goes through {@code ShieldBuff}. */
+    /**
+     * The same with "lasting N turns", which is the path that goes through {@code ShieldBuff}.
+     */
     private static EffectSpec shieldWithTurns(double amount, int turns) {
         EffectSpec effect = shield(amount);
         TriggerSpecs.set(effect, "turns", turns);

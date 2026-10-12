@@ -5,8 +5,8 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.skill.SkillExecutor;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -25,7 +25,7 @@ public class LawOdeCritDamageTest {
     private static final int CYRENE = 1415;
     private static final int CERYDRA = 1412;
     private static final int PLAIN = 1002;
-        private static final String MARK = "军功";
+    private static final String MARK = "军功";
 
     @Test
     public void onlyTheMarkedAllyGainsTheCritDamage() {

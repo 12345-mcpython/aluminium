@@ -1,13 +1,11 @@
 package com.laosun.aluminium.test.content.characters;
 
 
-import com.laosun.aluminium.test.engine.CoreflameOverflowTest;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
-import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -22,7 +20,10 @@ public class PhainonTest {
     private static final int PHAINON = 1408;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-        /** Note: Two Coreflame per Skill, and the document's cap of 12 enforced by exceeding it. */
+
+    /**
+     * Note: Two Coreflame per Skill, and the document's cap of 12 enforced by exceeding it.
+     */
     @Test
     public void theSkillFeedsCoreflameUpToTwelve() {
         Character phainon = CharacterFactory.create(PHAINON, LEVEL);
@@ -50,7 +51,9 @@ public class PhainonTest {
                 "「达到上限后还可最多溢出 3 点」 -- ten casts (20 points) stop at 12 + 3");
     }
 
-    /** Note: The technique restores the TEAM's energy (not hers) and grants one Skill Point. */
+    /**
+     * Note: The technique restores the TEAM's energy (not hers) and grants one Skill Point.
+     */
     @Test
     public void theTechniqueFeedsTheTeamButNotHerself() {
         Character phainon = CharacterFactory.create(PHAINON, LEVEL);
@@ -75,7 +78,9 @@ public class PhainonTest {
                 "「获得1个战技点」 (clamped by the pool's ceiling)");
     }
 
-    /** The declared resource's value, read through the combatant's own manager. */
+    /**
+     * The declared resource's value, read through the combatant's own manager.
+     */
     private static int coreflameOf(Character unit) {
         return unit.getResources().get("火种").getValue();
     }

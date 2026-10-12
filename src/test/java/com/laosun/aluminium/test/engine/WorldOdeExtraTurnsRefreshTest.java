@@ -1,25 +1,27 @@
 package com.laosun.aluminium.test.engine;
+
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Countdown;
-import com.laosun.aluminium.models.skill.SkillExecutor;
 import com.laosun.aluminium.models.Signal;
-import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.models.skill.SkillExecutor;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
 import java.util.List;
 
 /**
  * 1415's memosprite skill 21, the refresh clause: "在卡厄斯兰那的额外回合耗尽后不会结束变身、刷新全部额外回合并获得 #9 点[毁伤]".
- *
+ * <p>
  * The countdown's turn is driven THE SHIPPED WAY (`battle.currentMove = signal; battle.beforeMove();`, as CountdownTest does) -- a hand-fired COUNTDOWN_TURN never reaches his
  * table, because the engine announces it with the ally broadcaster inside beforeMove.
  */
 public class WorldOdeExtraTurnsRefreshTest {
     private static final int LEVEL = 80;
     private static final int PHAINON = 1408;
-        private static final String STATE = "永续的燃烧";
+    private static final String STATE = "永续的燃烧";
     private static final String COUNTER = "额外回合计数";
     private static final String MARK = "毁伤";
 
@@ -36,7 +38,9 @@ public class WorldOdeExtraTurnsRefreshTest {
         Assertions.assertEquals(0.0, without[2], 1e-9, "and nothing is gained");
     }
 
-    /** [变身 stacks, the counter, [毁伤]] after the exhausted extra turn, with or without the ever-burning state. */
+    /**
+     * [变身 stacks, the counter, [毁伤]] after the exhausted extra turn, with or without the ever-burning state.
+     */
     private static double[] run(boolean everBurning) {
         Character him = CharacterFactory.create(PHAINON, LEVEL);
         Battle battle = new Battle(List.of(him),

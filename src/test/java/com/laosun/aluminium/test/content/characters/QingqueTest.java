@@ -2,12 +2,11 @@ package com.laosun.aluminium.test.content.characters;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
-import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -21,7 +20,10 @@ public class QingqueTest {
     private static final int QINGQUE = 1201;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-        /** Note: The count: one per TEAMMATE's turn start, two from the technique, and the document's cap of four enforced by exceeding it. */
+
+    /**
+     * Note: The count: one per TEAMMATE's turn start, two from the technique, and the document's cap of four enforced by exceeding it.
+     */
     @Test
     public void theTileCountFollowsTheDocumentAndStopsAtFour() {
         Character qingque = CharacterFactory.create(QINGQUE, LEVEL);
@@ -44,7 +46,9 @@ public class QingqueTest {
                 "「最多持有4张琼玉牌」 (holds at most 4 jade tiles) -- eight draws must still read four");
     }
 
-    /** Note: The technique's two tiles, only when the technique was declared. */
+    /**
+     * Note: The technique's two tiles, only when the technique was declared.
+     */
     @Test
     public void theTechniqueDrawsTwoTiles() {
         Character qingque = CharacterFactory.create(QINGQUE, LEVEL);
@@ -57,7 +61,9 @@ public class QingqueTest {
         Assertions.assertEquals(2, tilesOf(qingque), "「进入战斗时青雀会抽取2张琼玉牌」 (when entering battle, Qingque draws 2 jade tiles)");
     }
 
-    /** Note: The Skill's self damage boost, capped at the document's four stacks. */
+    /**
+     * Note: The Skill's self damage boost, capped at the document's four stacks.
+     */
     @Test
     public void theSkillRaisesHerOwnDamageUpToFourStacks() {
         Character qingque = CharacterFactory.create(QINGQUE, LEVEL);
@@ -75,7 +81,9 @@ public class QingqueTest {
                 "\"DMG +28%\" (「增伤 28%」) stacking to \"at most 4 stacks\" (「最多 4 层」) -- five casts must still read four");
     }
 
-    /** The declared resource's value, read through the combatant's own manager. */
+    /**
+     * The declared resource's value, read through the combatant's own manager.
+     */
     private static int tilesOf(Character qingque) {
         return qingque.getResources().get("琼玉牌").getValue();
     }

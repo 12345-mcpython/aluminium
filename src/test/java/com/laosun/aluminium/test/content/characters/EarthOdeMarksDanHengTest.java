@@ -1,16 +1,18 @@
 package com.laosun.aluminium.test.content.characters;
+
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
 import java.util.List;
 
 /**
  * Slot 25 "献予'大地'之诗" ("Ode to 'Earth'"): the audit found this whole skill missing, and these are the two clauses it can carry exactly.
- *
+ * <p>
  * Two-sided: with the ode cast at Dan Heng - Permansor Terrae (丹恒-腾荒) he gains the state; with it cast at Cyrene (昔涟) he does not.
  */
 public class EarthOdeMarksDanHengTest {

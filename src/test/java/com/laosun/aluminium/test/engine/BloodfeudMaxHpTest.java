@@ -6,8 +6,8 @@ import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.skill.Skill;
 import com.laosun.aluminium.models.skill.SkillExecutor;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -21,10 +21,12 @@ import java.util.List;
  */
 public class BloodfeudMaxHpTest {
     private static final int MYDEI = 1404;
-        private static final String STATE = "血仇";
+    private static final String STATE = "血仇";
     private static final String CHARGE = "天赋充能";
 
-    /** +50% Max HP while [血仇] is on, and back to the base when it leaves. */
+    /**
+     * +50% Max HP while [血仇] is on, and back to the base when it leaves.
+     */
     @Test
     public void theRaiseFollowsTheState() {
         Character him = CharacterFactory.create(MYDEI, 80, false, null, null, 0);

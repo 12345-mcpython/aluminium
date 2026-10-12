@@ -3,8 +3,8 @@ package com.laosun.aluminium.test.content.characters;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -29,9 +29,11 @@ public class PearlRoundAllowanceTest {
     private static final int PEARL = 1503;
     private static final int ELATION_ALLY = 1502;
     private static final int HUNTER = 1204;
-        private static final String COUNTER = "好活当赏";
+    private static final String COUNTER = "好活当赏";
 
-    /** Each ally turn pays 5, and the round stops paying once it has handed out 50. */
+    /**
+     * Each ally turn pays 5, and the round stops paying once it has handed out 50.
+     */
     @Test
     public void theRoundPaysFivePerTurnAndStopsAtFifty() {
         Battle battle = newBattle();
@@ -52,7 +54,9 @@ public class PearlRoundAllowanceTest {
                 "「最多获得 50 点」: the round stops at fifty, however many turns it is given");
     }
 
-    /** Her own turn starts a new round: the allowance is available again. */
+    /**
+     * Her own turn starts a new round: the allowance is available again.
+     */
     @Test
     public void herOwnTurnStartsANewRound() {
         Battle battle = newBattle();

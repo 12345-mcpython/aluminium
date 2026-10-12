@@ -7,7 +7,9 @@ import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-/** Light cone 23041, read off the shipped file (discipline 232). */
+/**
+ * Light cone 23041, read off the shipped file (discipline 232).
+ */
 public class LifeShouldBeCastToFlamesTest {
     private static final int WEAPON_ID = 23041;
     private static final int WEARER = 1210;

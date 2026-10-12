@@ -4,9 +4,9 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.Queue;
 import com.laosun.aluminium.models.CanHit;
 import com.laosun.aluminium.models.Character;
+import com.laosun.aluminium.models.Signal;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
-import com.laosun.aluminium.models.Signal;
 import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -284,7 +284,9 @@ public class ExtraTurnTest {
 
     // ==================================================================
 
-    /** {@code move()} + {@code setTopZero()}: consume one round and return the actor. */
+    /**
+     * {@code move()} + {@code setTopZero()}: consume one round and return the actor.
+     */
     private static CanHit nextActor(Queue q) {
         q.move();
         CanHit actor = q.getCurrentActor().getCanHit();

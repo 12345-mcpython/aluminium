@@ -1,27 +1,30 @@
 package com.laosun.aluminium.test.engine;
+
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.models.skill.SkillExecutor;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
 import java.util.List;
 
 /**
  * A share can be carried in a resource, in basis points.
- *
+ * <p>
  * The last structural piece for the two remaining sentences: a number captured while an ode is cast (a memosprite row is unreachable later) is a share BELOW 1, and a resource holds
  * an integer -- so the capture stores basis points and `percent_from_resource` reads them back.
- *
+ * <p>
  * Two-sided: no charge means no boost, and once the charge exists the boost is exactly the charge over 10000.
  */
 public class ResourceShareTest {
     private static final int LEVEL = 80;
     private static final String CHARGE = "充能";
+
     @Test
     public void theBoostIsTheResourcesBasisPoints() {
         Character cyrene = CharacterFactory.create(1415, LEVEL);

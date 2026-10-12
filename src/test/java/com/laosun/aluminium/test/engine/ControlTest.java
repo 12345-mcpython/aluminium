@@ -1,21 +1,21 @@
 package com.laosun.aluminium.test.engine;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.trigger.BreakEffectTableTest;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.DoubleValue;
-import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.models.Signal;
 import com.laosun.aluminium.models.buff.ControlBuff;
 import com.laosun.aluminium.models.buff.DotBuff;
 import com.laosun.aluminium.models.buff.StatModifierBuff;
+import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.models.enemy.EnemyFactory;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -27,7 +27,7 @@ import java.util.Set;
  * damaging ones still do exactly what they did before.
  *
  * <p><b>What "control" means here is decided by the data, not by the plan.</b> The plan says "冻结期受伤害
- * +30%"; the encyclopedia text says something else, the same way in six independent entries - 
+ * +30%"; the encyclopedia text says something else, the same way in six independent entries -
  * {@code "冻结状态下，敌方目标不能行动同时每回合开始时受到…冰属性伤害"} - and for the other two,
  * {@code "禁锢状态下，敌方目标行动延后#2%，速度降低#4%"} (Welt) and
  * {@code ""纠缠"会使敌人行动延后，并在敌人下次行动时对其造成额外的量子属性伤害"}. So:
@@ -292,7 +292,9 @@ public class ControlTest {
                 "so the gated rule is refused -- the gate is the only thing that changed");
     }
 
-    /** The parts of a state come off together: entanglement's slow goes when the state is removed by name. */
+    /**
+     * The parts of a state come off together: entanglement's slow goes when the state is removed by name.
+     */
     @Test
     public void removingTheNamedStateTakesItsSlowWithIt() {
         Applied f = new Applied(control("纠缠", null));
@@ -306,7 +308,9 @@ public class ControlTest {
                 "and the slow it attached goes with it -- one buff, so the parts cannot come apart");
     }
 
-    /** A control is a negative effect, so a rule that dispels N negative effects reaches it. */
+    /**
+     * A control is a negative effect, so a rule that dispels N negative effects reaches it.
+     */
     @Test
     public void aControlIsADebuffAndCanBeDispelled() {
         Applied f = new Applied(control(1.0));
@@ -347,7 +351,9 @@ public class ControlTest {
                 "a resisted freeze attaches no damage: the payload is part of the state, not a second effect");
     }
 
-    /** Taking the state off takes its damage with it - otherwise the ice would keep burning after "解除冻结". */
+    /**
+     * Taking the state off takes its damage with it - otherwise the ice would keep burning after "解除冻结".
+     */
     @Test
     public void theStatesDamageComesOffWithIt() {
         Applied f = new Applied(controlWithDamage(1.0));
@@ -398,7 +404,9 @@ public class ControlTest {
                 "0 would read like 「never」, which is spelled by not writing the rule");
     }
 
-    /** An op that reads none of the magnitude fields refuses them rather than pretending. */
+    /**
+     * An op that reads none of the magnitude fields refuses them rather than pretending.
+     */
     @Test
     public void theMagnitudeFieldsAreRejectedOnAControl() {
         com.laosun.aluminium.beans.EffectSpec effect = TriggerSpecs.applyControl("冻结", 1, null, "target");
@@ -409,10 +417,12 @@ public class ControlTest {
         Assertions.assertTrue(rejected.getMessage().contains("amount"), rejected.getMessage());
     }
 
-    /** Compiles one {@code APPLY_CONTROL} effect into a table, which is where its validation runs. */
-    private static com.laosun.aluminium.models.TriggerTable tableOf(
+    /**
+     * Compiles one {@code APPLY_CONTROL} effect into a table, which is where its validation runs.
+     */
+    private static TriggerTable tableOf(
             com.laosun.aluminium.beans.EffectSpec effect) {
-        return new com.laosun.aluminium.models.TriggerTable(0,
+        return new TriggerTable(0,
                 java.util.List.of(TriggerSpecs.rule("ALLY_ATTACK", null, effect)));
     }
 
@@ -439,24 +449,30 @@ public class ControlTest {
             // this is zero. The cases that want the resistance to bite set it back (see the two resistance
             // tests); the ones that want a certain landing rely on this line.
             enemy.setAttribute(AttributeType.EFFECT_RESISTANCE, new DoubleValue(0));
-            this.hero.setTriggerTable(new com.laosun.aluminium.models.TriggerTable(0,
+            this.hero.setTriggerTable(new TriggerTable(0,
                     java.util.List.of(rules)));
             this.battle = new Battle(java.util.List.of(hero), java.util.List.of(enemy), BattleFixture.seeded());
             battle.startBattle();
         }
 
-        /** Fires the rule with this enemy as the event's subject; returns how many rules ran. */
+        /**
+         * Fires the rule with this enemy as the event's subject; returns how many rules ran.
+         */
         private int fire() {
             return fire(com.laosun.aluminium.enums.TriggerEvent.ALLY_ATTACK);
         }
 
-        /** The same for any event (some cases need a second event to observe what the first one applied). */
+        /**
+         * The same for any event (some cases need a second event to observe what the first one applied).
+         */
         private int fire(com.laosun.aluminium.enums.TriggerEvent event) {
             return battle.fireTriggers(event, hero, enemy, 1, 0);
         }
     }
 
-    /** A rule that freezes the event's subject with the given base chance ({@code null} = always). */
+    /**
+     * A rule that freezes the event's subject with the given base chance ({@code null} = always).
+     */
     private static com.laosun.aluminium.beans.TriggerSpec control(Double baseChance) {
         return control("冻结", baseChance);
     }
@@ -480,7 +496,9 @@ public class ControlTest {
         return TriggerSpecs.rule("ALLY_ATTACK", null, effect);
     }
 
-    /** One enemy made weak to exactly one element, in a battle with a hero who does the breaking. */
+    /**
+     * One enemy made weak to exactly one element, in a battle with a hero who does the breaking.
+     */
     private record Fixture(Battle battle, Character hero, Enemy enemy) {
 
         void breakWith(DamageElement element) {
@@ -491,7 +509,9 @@ public class ControlTest {
             return enemy.getAttribute(AttributeType.SPEED).get();
         }
 
-        /** One action period in action-value units: the same {@code 10000 / speed} the delay is computed from. */
+        /**
+         * One action period in action-value units: the same {@code 10000 / speed} the delay is computed from.
+         */
         double period() {
             return 10_000.0 / speed();
         }
@@ -505,7 +525,9 @@ public class ControlTest {
         return new Fixture(new Battle(List.of(hero), List.of(enemy), BattleFixture.seeded()), hero, enemy);
     }
 
-    /** Action value left before the target acts - the observable the delay really moves. */
+    /**
+     * Action value left before the target acts - the observable the delay really moves.
+     */
     private static double timeRemaining(Battle battle, Enemy target) {
         for (Signal signal : battle.queue.snapshot()) {
             if (signal.getCanHit() == target) {

@@ -5,10 +5,10 @@ import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.CanHit;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.models.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -39,7 +39,7 @@ import java.util.List;
  */
 public class SilverWolfLV999MilestoneQuotaTest {
     private static final int WOLF = 1506;
-        private static final String HIDDEN = "隐藏分";
+    private static final String HIDDEN = "隐藏分";
     private static final String LAUGH = "笑点";
     private static final String CHARGES = "强化普攻次数";
     private static final String QUOTA = "里程碑配额";
@@ -97,7 +97,9 @@ public class SilverWolfLV999MilestoneQuotaTest {
         Assertions.assertNull(battle.getExtraTurnActor(), "no more are owed");
     }
 
-    /** The negative control: outside 【无敌玩家】 the ledger does not move, whatever her hidden score does. */
+    /**
+     * The negative control: outside 【无敌玩家】 the ledger does not move, whatever her hidden score does.
+     */
     @Test
     public void nothingIsCountedWhileSheIsNotInGodmode() {
         build(2, 280);
@@ -109,7 +111,9 @@ public class SilverWolfLV999MilestoneQuotaTest {
         Assertions.assertEquals(0, charges(), "and nothing was restored");
     }
 
-    /** The ledger is per state: leaving 【无敌玩家】 ends the accounting with it. */
+    /**
+     * The ledger is per state: leaving 【无敌玩家】 ends the accounting with it.
+     */
     @Test
     public void theLedgerIsResetWhenTheStateEnds() {
         build(2, 0);
@@ -162,7 +166,9 @@ public class SilverWolfLV999MilestoneQuotaTest {
     // Helpers
     // ==================================================================
 
-    /** A party whose second unit can move the SHARED laugh pool, which her talent forwards into hidden points. */
+    /**
+     * A party whose second unit can move the SHARED laugh pool, which her talent forwards into hidden points.
+     */
     private void build(int eidolon, int laughs) {
         wolf = CharacterFactory.create(WOLF, 80, false, null, null, eidolon);
         feeder = Character.fromAttributes("feeder", 1000, 100, 100, 100);
@@ -186,13 +192,17 @@ public class SilverWolfLV999MilestoneQuotaTest {
         battle.processRequests();
     }
 
-    /** One party-scoped laugh gain, which 「获得笑点时，获得等量【隐藏分】」 turns into hidden points. */
+    /**
+     * One party-scoped laugh gain, which 「获得笑点时，获得等量【隐藏分】」 turns into hidden points.
+     */
     private void feederLaughs() {
         battle.fireTriggers(TriggerEvent.DAMAGE_SETTLED, feeder, feeder, 0, 0);
         battle.processRequests();
     }
 
-    /** One complete turn through the engine's own boundaries, answering with whoever acted. */
+    /**
+     * One complete turn through the engine's own boundaries, answering with whoever acted.
+     */
     private CanHit takeOneTurn() {
         battle.stepForward();
         CanHit actor = battle.currentMove.getCanHit();

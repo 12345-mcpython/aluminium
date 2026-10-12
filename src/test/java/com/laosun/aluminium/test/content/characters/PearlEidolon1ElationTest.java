@@ -1,16 +1,20 @@
 package com.laosun.aluminium.test.content.characters;
+
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
 import java.util.ArrayList;
 import java.util.List;
 
-/** Character 1503 (Pearl): Eidolon 1 raises the team's Elation damage at 2/3/4 Elation allies. */
+/**
+ * Character 1503 (Pearl): Eidolon 1 raises the team's Elation damage at 2/3/4 Elation allies.
+ */
 public class PearlEidolon1ElationTest {
     private static final int PEARL = 1503;
     private static final int ELATION = 1502;   // Yao Guang, Elation
@@ -39,7 +43,9 @@ public class PearlEidolon1ElationTest {
         Assertions.assertTrue(unranked > 0, "precondition: her stat traces give the panel a floor (" + unranked + ")");
     }
 
-    /** Builds a team with the given Eidolon rank and number of Elation characters. */
+    /**
+     * Builds a team with the given Eidolon rank and number of Elation characters.
+     */
     private static double boost(int eidolonRank, int elationAllies) {
         List<Character> team = new ArrayList<>();
         team.add(CharacterFactory.create(PEARL, 80, true, null, null, eidolonRank));

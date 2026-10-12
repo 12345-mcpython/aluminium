@@ -8,11 +8,11 @@ import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Damage;
 import com.laosun.aluminium.models.DoubleValue;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.buff.StateBuff;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.models.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -28,7 +28,8 @@ public class RobinAuraTest {
     private static final int OWNER = 1309;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-        @Test
+
+    @Test
     public void theAuraNamesTheFollowUpScopeAndShare() {
         Character owner = CharacterFactory.create(OWNER, LEVEL);
         Enemy enemy = BattleFixture.monster();

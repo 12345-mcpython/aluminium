@@ -5,8 +5,8 @@ import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Weapon;
 import com.laosun.aluminium.models.buff.ReductionBuff;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -25,7 +25,8 @@ public class LightConeAggroTest {
     private static final int WEARER = 1210;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-        @Test
+
+    @Test
     public void theAggroIsDoubled() {
         double without = aggro(false);
         double with = aggro(true);
@@ -80,7 +81,9 @@ public class LightConeAggroTest {
                 "rank 5 states 24% and rank 1 states 16%: " + rankFive + " vs " + rankOne);
     }
 
-    /** The wearer's HP loss from one enemy attack, at the given rank of the light cone. */
+    /**
+     * The wearer's HP loss from one enemy attack, at the given rank of the light cone.
+     */
     private static double damageTaken(int rank) {
         Character wearer = CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(WEAPON_ID, LEVEL, false, rank));
         Character ally = CharacterFactory.create(ALLY, LEVEL);

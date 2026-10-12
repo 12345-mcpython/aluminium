@@ -1,27 +1,20 @@
 package com.laosun.aluminium.test.content.memosprites;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
-import com.laosun.aluminium.enums.AttributeType;
-import com.laosun.aluminium.enums.Camp;
-import com.laosun.aluminium.enums.DamageElement;
-import com.laosun.aluminium.enums.DamageType;
-import com.laosun.aluminium.enums.SkillType;
-import com.laosun.aluminium.models.CanHit;
+import com.laosun.aluminium.enums.*;
+import com.laosun.aluminium.models.*;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.Damage;
-import com.laosun.aluminium.models.Signal;
-import com.laosun.aluminium.models.Summon;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.buff.SpeedBoostBuff;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.models.enemy.SummonFactory;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -35,7 +28,7 @@ import java.util.List;
  * was usable alone: {@code Battle.enemies} was widened to {@code List<CanHit>}, so the camp
  * <em>could</em> hold one; and {@code models/Summon} was declared, so the type existed. But production code
  * never called {@code new Summon(...)} anywhere, and {@code monster_config.json}'s {@code summon_id} column
- *  - non-empty for <b>692 of 2649 monsters</b> - was not parsed at all. This is the piece that connects them:
+ * - non-empty for <b>692 of 2649 monsters</b> - was not parsed at all. This is the piece that connects them:
  * the roster travels from the data onto the master, and a factory plus one {@code Battle} call turn an id
  * into a unit standing in the fight.
  *
@@ -64,17 +57,27 @@ import java.util.List;
 public class SummonTest {
     private static final double EPS = 1e-6;
 
-    /** Silvermane Lieutenant (银鬃尉官), whose data roster is Silvermane Guard (银鬃近卫)  x 2. */
+    /**
+     * Silvermane Lieutenant (银鬃尉官), whose data roster is Silvermane Guard (银鬃近卫)  x 2.
+     */
     private static final int MASTER = 1003010;
-    /** One Silvermane Guard (银鬃近卫) - the id the master's roster names. */
+    /**
+     * One Silvermane Guard (银鬃近卫) - the id the master's roster names.
+     */
     private static final int MINION = 1002040;
-    /** Ice Edge (冰锋), whose roster is empty (the common case: 195of 2649). */
+    /**
+     * Ice Edge (冰锋), whose roster is empty (the common case: 195of 2649).
+     */
     private static final int NO_ROSTER = 1002011;
-    /** The one monster whose roster is spelled {@code [0]}. */
+    /**
+     * The one monster whose roster is spelled {@code [0]}.
+     */
     private static final int ZERO_ROSTER = 405301004;
     private static final int LEVEL = 90;
     private static final int GROUP = 1;
-    /** What the stand-in "on kill" rule below hands out. */
+    /**
+     * What the stand-in "on kill" rule below hands out.
+     */
     private static final double KILL_REWARD = 5;
 
     // ==================================================================
@@ -95,7 +98,9 @@ public class SummonTest {
                 "the data's summon_id column, in order, duplicates kept");
     }
 
-    /** A monster with no summons has an empty roster, which is the ordinary case. */
+    /**
+     * A monster with no summons has an empty roster, which is the ordinary case.
+     */
     @Test
     public void aMonsterWithNoSummonsHasAnEmptyRoster() {
         Assertions.assertEquals(List.of(), EnemyFactory.create(NO_ROSTER, LEVEL, GROUP).getSummonIds(),
@@ -140,7 +145,9 @@ public class SummonTest {
         Assertions.assertEquals(LEVEL, summon.getLevel(), "the level enters the defence zone, like any unit's");
     }
 
-    /** It carries its own identity and its own skill - not its master's. */
+    /**
+     * It carries its own identity and its own skill - not its master's.
+     */
     @Test
     public void theSummonCarriesItsOwnNameAndSkill() {
         Summon summon = SummonFactory.create(MINION, LEVEL, GROUP, Camp.ENEMY);
@@ -153,7 +160,9 @@ public class SummonTest {
         Assertions.assertEquals(Camp.ENEMY, summon.getCamp(), "the camp is passed in, not assumed");
     }
 
-    /** Two calls give two independent units - a roster entry is not a shared singleton. */
+    /**
+     * Two calls give two independent units - a roster entry is not a shared singleton.
+     */
     @Test
     public void eachSummonIsItsOwnInstance() {
         Battle battle = new Battle(List.of(hero()), List.of(master()), BattleFixture.seeded());
@@ -200,7 +209,9 @@ public class SummonTest {
                 "it has a signal of its own, so it will be handed turns");
     }
 
-    /** Our side can reach it: the engine's own target list includes it, without the caller naming it. */
+    /**
+     * Our side can reach it: the engine's own target list includes it, without the caller naming it.
+     */
     @Test
     public void theEngineTargetListIncludesAFreshlySummonedUnit() {
         Battle battle = startedBattle();
@@ -242,7 +253,9 @@ public class SummonTest {
     // Lifecycle
     // ==================================================================
 
-    /** Killing it is an ordinary kill: it stops being a target and leaves the action bar. */
+    /**
+     * Killing it is an ordinary kill: it stops being a target and leaves the action bar.
+     */
     @Test
     public void killingASummonTakesItOutOfTheFight() {
         Battle battle = startedBattle();
@@ -286,7 +299,9 @@ public class SummonTest {
                 "nothing is left standing on that side, so this is a win rather than a stalemate");
     }
 
-    /** A summon that has not entered yet goes with its master just the same. */
+    /**
+     * A summon that has not entered yet goes with its master just the same.
+     */
     @Test
     public void aSummonStillWaitingToEnterDiesWithItsMasterToo() {
         Battle battle = startedBattle();
@@ -332,7 +347,9 @@ public class SummonTest {
         Assertions.assertTrue(summon.isDeath());
     }
 
-    /** The same rule <em>does</em> fire for a summon that is genuinely killed, so the case above is not vacuous. */
+    /**
+     * The same rule <em>does</em> fire for a summon that is genuinely killed, so the case above is not vacuous.
+     */
     @Test
     public void aSummonThatIsActuallyKilledDoesPayTheReward() {
         Character hero = heroWithKillReward();
@@ -378,7 +395,9 @@ public class SummonTest {
         Assertions.assertFalse(battle.allies.contains(theirs));
     }
 
-    /** A dead master cannot summon: the call could never do anything, so it says so instead. */
+    /**
+     * A dead master cannot summon: the call could never do anything, so it says so instead.
+     */
     @Test
     public void aDeadMasterIsRefused() {
         Battle battle = startedBattle();
@@ -392,7 +411,9 @@ public class SummonTest {
         Assertions.assertEquals(1, battle.enemies.size(), "no half-born summon was left in the roster");
     }
 
-    /** An id that names no monster fails loudly - a roster's job is to be right, not to be skippable. */
+    /**
+     * An id that names no monster fails loudly - a roster's job is to be right, not to be skippable.
+     */
     @Test
     public void anUnknownSummonIdFailsLoudly() {
         Battle battle = startedBattle();
@@ -404,7 +425,9 @@ public class SummonTest {
         Assertions.assertEquals(1, battle.enemies.size());
     }
 
-    /** A null master is a caller bug, not a unit with no owner. */
+    /**
+     * A null master is a caller bug, not a unit with no owner.
+     */
     @Test
     public void aNullMasterIsRefused() {
         Battle battle = startedBattle();
@@ -416,7 +439,9 @@ public class SummonTest {
     // Fixture
     // ==================================================================
 
-    /** One hero that out-damages everything, and one real master. */
+    /**
+     * One hero that out-damages everything, and one real master.
+     */
     private static Battle startedBattle() {
         Battle battle = new Battle(List.of(hero()), List.of(master()), BattleFixture.seeded());
         battle.startBattle();
@@ -427,7 +452,9 @@ public class SummonTest {
         return Character.fromAttributes("hero", 100_000, 100, 100, 100);
     }
 
-    /** Himeko's (姬子) id, but no shipped rule file, so the table built here is the only one in play. */
+    /**
+     * Himeko's (姬子) id, but no shipped rule file, so the table built here is the only one in play.
+     */
     private static Character heroWithKillReward() {
         Character hero = CharacterFactory.create(1003, 80);
         EffectSpec reward = TriggerSpecs.gainEnergy(KILL_REWARD);

@@ -15,9 +15,9 @@ import com.laosun.aluminium.models.buff.ControlBuff;
 import com.laosun.aluminium.models.buff.DotBuff;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.SummonFactory;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.utils.RelicFactory;
-import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -48,14 +48,20 @@ import java.util.Random;
 public class MemospriteTest {
     private static final double EPS = 1e-6;
 
-    /** Aglaea - the Garmentmaker (衣匠)'s panel is two shares; her id is used by no other test. */
+    /**
+     * Aglaea - the Garmentmaker (衣匠)'s panel is two shares; her id is used by no other test.
+     */
     private static final int AGLAEA = 1402;
-    /** Evernight - Evey (长夜)'s panel is one share and one flat value. */
+    /**
+     * Evernight - Evey (长夜)'s panel is one share and one flat value.
+     */
     private static final int CASTORICE_LIKE = 1413;
-    /** Himeko - a character with no memosprite, used for the "absent is an ordinary state" cases. */
+    /**
+     * Himeko - a character with no memosprite, used for the "absent is an ordinary state" cases.
+     */
     private static final int NO_MEMOSPRITE = 1003;
     private static final int LEVEL = 80;
-        // ==================================================================
+    // ==================================================================
     // 1. The panel is derived from the summoner's own sheet
     // ==================================================================
 
@@ -107,7 +113,9 @@ public class MemospriteTest {
                 "so the memosprite's panel moved with her: " + equippedHp + " vs " + bareHp);
     }
 
-    /** Evernight: a flat speed is <b>not</b> a share of hers, while her HP share is. */
+    /**
+     * Evernight: a flat speed is <b>not</b> a share of hers, while her HP share is.
+     */
     @Test
     public void aFlatEntryIsNotAShareOfAnything() {
         Character castorice = CharacterFactory.create(CASTORICE_LIKE, LEVEL);
@@ -126,7 +134,9 @@ public class MemospriteTest {
                 .getAttribute(AttributeType.SPEED).get(), EPS);
     }
 
-    /** A ratio attribute is derived with the builder's percentage-point convention, not as a base value. */
+    /**
+     * A ratio attribute is derived with the builder's percentage-point convention, not as a base value.
+     */
     @Test
     public void aRatioAttributeIsInheritedAsAPercentagePointValue() {
         Character aglaea = CharacterFactory.create(AGLAEA, LEVEL);
@@ -147,7 +157,9 @@ public class MemospriteTest {
     // 2. Getting it onto the field
     // ==================================================================
 
-    /** It joins our camp, not our characters, and it takes its turn. */
+    /**
+     * It joins our camp, not our characters, and it takes its turn.
+     */
     @Test
     public void theMemospriteJoinsOurCampAndTakesATurn() {
         Character aglaea = CharacterFactory.create(AGLAEA, LEVEL);
@@ -191,7 +203,9 @@ public class MemospriteTest {
         Assertions.assertEquals(3, battle.allies.size(), "and the dead one stays in the roster, as corpses do");
     }
 
-    /** The summoner falling takes it along - the same lifecycle the monster-side summons have. */
+    /**
+     * The summoner falling takes it along - the same lifecycle the monster-side summons have.
+     */
     @Test
     public void theSummonersDeathTakesTheMemospriteAlong() {
         Character aglaea = CharacterFactory.create(AGLAEA, LEVEL);
@@ -229,7 +243,9 @@ public class MemospriteTest {
                 "and a unit that states nothing still gets the regular tier");
     }
 
-    /** A spec that states no aggro leaves the engine''s fallback alone -- which is not the same claim as 100. */
+    /**
+     * A spec that states no aggro leaves the engine''s fallback alone -- which is not the same claim as 100.
+     */
     @Test
     public void aSpecWithoutAggroKeepsTheFallback() {
         Character aglaea = CharacterFactory.create(AGLAEA, LEVEL);
@@ -243,7 +259,9 @@ public class MemospriteTest {
         Assertions.assertEquals(100, battle.aggroOf(plain), EPS);
     }
 
-    /** A weight of zero or less is refused at load time: it would take the memosprite out of the aggro table. */
+    /**
+     * A weight of zero or less is refused at load time: it would take the memosprite out of the aggro table.
+     */
     @Test
     public void aNonPositiveAggroIsRejected() {
         IllegalArgumentException refused = Assertions.assertThrows(IllegalArgumentException.class,
@@ -293,7 +311,9 @@ public class MemospriteTest {
                         + "control path that quietly stopped working");
     }
 
-    /** The class is control class (控制类): Evey (长夜)'s immunity must not make it immune to a burn (DoT Debuff, 持续伤害类, DOT class). */
+    /**
+     * The class is control class (控制类): Evey (长夜)'s immunity must not make it immune to a burn (DoT Debuff, 持续伤害类, DOT class).
+     */
     @Test
     public void theMemospriteIsStillBurnable() {
         Character evernight = CharacterFactory.create(CASTORICE_LIKE, LEVEL);
@@ -314,7 +334,10 @@ public class MemospriteTest {
     // ==================================================================
     // 3. Refusals
     // ==================================================================
-    /** A character with no memosprite is refused <b>loudly</b>, naming the file to write. */
+
+    /**
+     * A character with no memosprite is refused <b>loudly</b>, naming the file to write.
+     */
     @Test
     public void aCharacterWithNoMemospriteIsRefusedWithThePathToWrite() {
         Character himeko = CharacterFactory.create(NO_MEMOSPRITE, LEVEL);
@@ -329,7 +352,9 @@ public class MemospriteTest {
                 "…and the loader's own answer for that character is simply 'none'");
     }
 
-    /** A dead summoner cannot summon: the memosprite would be orphaned in the same breath. */
+    /**
+     * A dead summoner cannot summon: the memosprite would be orphaned in the same breath.
+     */
     @Test
     public void aDeadSummonerIsRefused() {
         Character aglaea = CharacterFactory.create(AGLAEA, LEVEL);
@@ -370,7 +395,9 @@ public class MemospriteTest {
                 "not negative");
     }
 
-    /** The two attributes a memosprite cannot do without, each with its own reason in the message. */
+    /**
+     * The two attributes a memosprite cannot do without, each with its own reason in the message.
+     */
     @Test
     public void aPanelWithoutHealthOrSpeedIsRejectedWithTheConsequence() {
         IllegalArgumentException noHealth = Assertions.assertThrows(IllegalArgumentException.class,
@@ -384,7 +411,9 @@ public class MemospriteTest {
         Assertions.assertTrue(noSpeed.getMessage().contains("schedule"), noSpeed.getMessage());
     }
 
-    /** A share of zero with no flat term would give 0, which for these two attributes is not a unit. */
+    /**
+     * A share of zero with no flat term would give 0, which for these two attributes is not a unit.
+     */
     @Test
     public void aZeroValueForHealthOrSpeedIsRejected() {
         IllegalArgumentException zeroSpeed = Assertions.assertThrows(IllegalArgumentException.class,
@@ -397,7 +426,9 @@ public class MemospriteTest {
     // 5. The loader's contract: lazy, cached, absent is not an error
     // ==================================================================
 
-    /** Absent is an ordinary state; a file is read once and cached. */
+    /**
+     * Absent is an ordinary state; a file is read once and cached.
+     */
     @Test
     public void theLoaderIsLazyCachedAndTolerantOfAbsence() {
         Memosprites.clearCache();
@@ -414,7 +445,9 @@ public class MemospriteTest {
         Assertions.assertFalse(Memosprites.exists(NO_MEMOSPRITE));
     }
 
-    /** The shipped specs are valid and state what their documents state. */
+    /**
+     * The shipped specs are valid and state what their documents state.
+     */
     @Test
     public void theShippedSpecsAreValidAndGroundedInTheirDocuments() {
         MemospriteSpec aglaea = Memosprites.of(AGLAEA);
@@ -451,11 +484,16 @@ public class MemospriteTest {
         return BattleFixture.monster();
     }
 
-    /** A generator that always answers the same value, so a probability becomes an assertion. */
+    /**
+     * A generator that always answers the same value, so a probability becomes an assertion.
+     */
     private static Random fixed(double value) {
         return BattleFixture.alwaysRoll(value);
     }
-    /** A freeze from the game's own control table - the state Evey (长夜) is immune to. */
+
+    /**
+     * A freeze from the game's own control table - the state Evey (长夜) is immune to.
+     */
     private static ControlBuff frozen() {
         return new ControlBuff(Constant.CONTROL_EFFECTS.get("FROZEN"), 2);
     }

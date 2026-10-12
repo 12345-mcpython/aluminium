@@ -4,8 +4,8 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -26,10 +26,12 @@ public class UltElationBranchTest {
     private static final int CASTER = 8009;
     private static final int TARGET = 1505;
     private static final int LEVEL = 80;
-        private static final String LAUGH = "笑点";
+    private static final String LAUGH = "笑点";
     private static final String GIFT = "好活当赏";
 
-    /** "Gains 5 Punchline point(s)" -- onto the SHARED party counter. */
+    /**
+     * "Gains 5 Punchline point(s)" -- onto the SHARED party counter.
+     */
     @Test
     public void theUltimateGivesFiveLaughs() {
         Scene scene = fight();
@@ -39,7 +41,9 @@ public class UltElationBranchTest {
                 "the ultimate grants five laughs to the shared counter");
     }
 
-    /** "the target additionally gains 10 points" -- on the TARGET, not on the caster. */
+    /**
+     * "the target additionally gains 10 points" -- on the TARGET, not on the caster.
+     */
     @Test
     public void theTargetGainsTenGift() {
         Scene scene = fight();
@@ -52,7 +56,9 @@ public class UltElationBranchTest {
                 "and not the caster's own copy");
     }
 
-    /** "and immediately uses one Elation skill" -- the commanded cast really lands on the enemy. */
+    /**
+     * "and immediately uses one Elation skill" -- the commanded cast really lands on the enemy.
+     */
     @Test
     public void theCommandedElationCastLands() {
         Scene scene = fight();

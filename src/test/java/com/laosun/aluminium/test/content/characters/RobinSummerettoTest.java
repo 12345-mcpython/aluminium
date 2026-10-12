@@ -8,8 +8,8 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -28,7 +28,10 @@ import java.util.Random;
 public class RobinSummerettoTest {
     private static final int ROBIN = 1512;
     private static final int LEVEL = 80;
-        /** Note:"初始拥有等同于知更鸟-晴歌0%生命上限的生命上限和等同于知更鸟-晴歌180%速度的速度". */
+
+    /**
+     * Note:"初始拥有等同于知更鸟-晴歌0%生命上限的生命上限和等同于知更鸟-晴歌180%速度的速度".
+     */
     @Test
     public void theSummonArrivesWithTheDocumentedPanel() {
         Character robin = CharacterFactory.create(ROBIN, LEVEL);
@@ -48,7 +51,9 @@ public class RobinSummerettoTest {
                 "「180%速度」 (180% of SPD): expected " + expectedSpeed + ", got " + mem.getAttribute(AttributeType.SPEED).get());
     }
 
-    /** Note: The control: without the Skill nothing is summoned. */
+    /**
+     * Note: The control: without the Skill nothing is summoned.
+     */
     @Test
     public void nothingIsSummonedWithoutTheSkill() {
         Character robin = CharacterFactory.create(ROBIN, LEVEL);
@@ -59,7 +64,9 @@ public class RobinSummerettoTest {
         Assertions.assertNull(battle.memospriteOf(robin), "no Skill, no memosprite");
     }
 
-    /** Note: The file declares the Vibes resource with the document's cap, and the memosprite file states both numbers. */
+    /**
+     * Note: The file declares the Vibes resource with the document's cap, and the memosprite file states both numbers.
+     */
     @Test
     public void theFilesDeclareTheResourceAndThePanel() {
         JsonObject character = read("/characters/1512.json");

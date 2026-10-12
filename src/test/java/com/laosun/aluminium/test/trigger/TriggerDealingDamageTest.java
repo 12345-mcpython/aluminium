@@ -1,22 +1,21 @@
 package com.laosun.aluminium.test.trigger;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.DamageType;
-import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Damage;
 import com.laosun.aluminium.models.DoubleValue;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.buff.DotBuff;
 import com.laosun.aluminium.models.buff.StateBuff;
 import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -39,7 +38,9 @@ import java.util.List;
  * names, which is what lets a rule ask about them without inventing a second fact for "this unit is burning".
  */
 public class TriggerDealingDamageTest {
-    /** Himeko: no shipped rule file, so the table under test is the only one. */
+    /**
+     * Himeko: no shipped rule file, so the table under test is the only one.
+     */
     private static final int OWNER = 1003;
     private static final int ALLY = 1202;
     private static final int LEVEL = 80;
@@ -82,7 +83,9 @@ public class TriggerDealingDamageTest {
                         + "not a buff someone attached");
     }
 
-    /** {@code actor == self} scopes it to the rule owner's own damage, which is what a self-buff text means. */
+    /**
+     * {@code actor == self} scopes it to the rule owner's own damage, which is what a self-buff text means.
+     */
     @Test
     public void theActorConditionScopesItToTheOwnersOwnDamage() {
         Battle battle = withAlly(TriggerSpecs.rule("DEALING_DAMAGE",
@@ -122,7 +125,9 @@ public class TriggerDealingDamageTest {
                 "a DOT tick is a damage instance like any other, so the same target-state condition boosts it");
     }
 
-    /** Burns the dummy and returns what one DOT settlement deals to it. */
+    /**
+     * Burns the dummy and returns what one DOT settlement deals to it.
+     */
     private static double dotTickDamage(Battle battle) {
         Character owner = battle.characters.getFirst();
         Enemy target = dummy(battle);
@@ -198,7 +203,9 @@ public class TriggerDealingDamageTest {
     // Helpers
     // ==================================================================
 
-    /** The rule under test: while the target is burning, my damage against it is 20% higher. */
+    /**
+     * The rule under test: while the target is burning, my damage against it is 20% higher.
+     */
     private static TriggerSpec burnRule() {
         return TriggerSpecs.rule("DEALING_DAMAGE", List.of("target has_state 灼烧"), boostOp(BURN_RATIO));
     }
@@ -216,12 +223,16 @@ public class TriggerDealingDamageTest {
         return effect;
     }
 
-    /** Puts a Fire DoT on {@code target} - what "陷入灼烧状态" leaves behind. */
+    /**
+     * Puts a Fire DoT on {@code target} - what "陷入灼烧状态" leaves behind.
+     */
     private static void burn(Enemy target, Character source) {
         target.getBuffManager().addBuff(new DotBuff(source, DamageElement.FIRE, 500, 3));
     }
 
-    /** Settles one plain hit and returns the HP the target lost. */
+    /**
+     * Settles one plain hit and returns the HP the target lost.
+     */
     private static double hit(Battle battle, Character attacker, Enemy target) {
         double before = target.getCurrentHp();
         battle.applyDamage(target, new Damage(attacker, target, DamageElement.FIRE, DamageType.NORMAL, BASE));

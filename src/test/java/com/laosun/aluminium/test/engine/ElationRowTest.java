@@ -1,13 +1,13 @@
 package com.laosun.aluminium.test.engine;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -24,16 +24,20 @@ import java.util.List;
 public class ElationRowTest {
     private static final int AVENTURINE = 8009;
     private static final int LEVEL = 80;
-        private static final String COUNTER = "命中次数";
+    private static final String COUNTER = "命中次数";
 
-    /** Eight hits plus the final split instance, with a single enemy that every random draw must pick. */
+    /**
+     * Eight hits plus the final split instance, with a single enemy that every random draw must pick.
+     */
     @Test
     public void theRowSettlesEightHitsAndTheSplit() {
         Assertions.assertEquals(9, instancesFromTheElationRow(), 0,
                 "8 damage instances + one final split");
     }
 
-    /** Note: And the same reading must NOT be a single 8x instance, which is what the AOE path did before the branch. */
+    /**
+     * Note: And the same reading must NOT be a single 8x instance, which is what the AOE path did before the branch.
+     */
     @Test
     public void itIsNotOneInstanceOfEightTimesTheShare() {
         Assertions.assertNotEquals(1, instancesFromTheElationRow(),

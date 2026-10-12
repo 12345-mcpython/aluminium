@@ -1,10 +1,8 @@
 package com.laosun.aluminium.enums;
 
 import com.google.gson.annotations.SerializedName;
-import com.laosun.aluminium.beans.EliteGroup;
 import lombok.Getter;
 
-import java.lang.annotation.ElementType;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -13,7 +11,7 @@ import java.util.Map;
  *
  * <p>Attributes fall into two categories:
  * <ul>
- *   <li><b>Base attributes</b> ({@code isPercent = false}): HEALTH, ATTACK, DEFENCE, SPEED - 
+ *   <li><b>Base attributes</b> ({@code isPercent = false}): HEALTH, ATTACK, DEFENCE, SPEED -
  *   these have raw numeric values and can receive percentage-based bonuses via their
  *   corresponding PERCENT variants.</li>
  *   <li><b>Percent/rate attributes</b> ({@code isPercent = true}): all others - these
@@ -48,7 +46,7 @@ public enum AttributeType {
 
     @SerializedName("breaking_effect") BREAKING_EFFECT("breaking_effect"),
     /**
- * How much a BREAK hit is worth.
+     * How much a BREAK hit is worth.
      *
      * <p>A channel of its own because {@link DamageType#BREAK} is deliberately NOT boostable: the ordinary DMG
      * boost zone never touches break damage, so a sentence about break damage needs somewhere else to land. It
@@ -56,7 +54,7 @@ public enum AttributeType {
      */
     @SerializedName("break_damage_boost") BREAK_DAMAGE_BOOST("break_damage_boost"),
     /**
- * How much less damage this unit TAKES, across every element (
+     * How much less damage this unit TAKES, across every element (
      * "使我方全体的全属性抗性提高").
      *
      * <p>The victim-side twin of {@link #RESISTANCE_REDUCTION}: that one is stated on the ATTACKER and
@@ -214,7 +212,7 @@ public enum AttributeType {
      * i.e. 0.1 to 2.0). Folding the two together would make "抗性降低" stop at zero and hand every attacker
      * penetration instead.
      *
- * <p><b>Readers - measured, not assumed.</b> Nineteen corpus documents say
+     * <p><b>Readers - measured, not assumed.</b> Nineteen corpus documents say
      * "全属性抗性降低"; the engine-side ones are 1004, 1006, 1203, 1218, 1304, 1308, 1321, 1405, 140, 1410,
      * 1504 and 150 (plus 1222/1505, which have no engine file, and the light cone / stat entry documents). Before this constant
      * existed, <b>no</b> shipped file mentioned any resistance-reduction spelling at all.

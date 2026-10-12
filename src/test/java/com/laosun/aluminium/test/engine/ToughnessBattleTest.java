@@ -5,9 +5,9 @@ import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.skill.DefaultSkill;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
+import com.laosun.aluminium.models.skill.DefaultSkill;
 import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -119,7 +119,7 @@ public class ToughnessBattleTest {
      * skill and must be spread evenly across the hits.
      *
      * <p>Anchor (real data): cid 1321 Dahlia slot 4 = Bounce Fire, {@code hits = 5}, {@code single = 9}
-     *  to the five hits total 9 points, not 9 points per hit (45 in total).
+     * to the five hits total 9 points, not 9 points per hit (45 in total).
      * Before the fix this case would see 60 - 45 = 15; after the fix it is 60 - 9 = 51.
      */
     @Test

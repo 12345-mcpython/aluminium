@@ -5,8 +5,8 @@ import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.DamageType;
 import com.laosun.aluminium.models.DoubleValue;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemySkill;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
+import com.laosun.aluminium.models.enemy.EnemySkill;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -26,7 +26,9 @@ public class EnemyPhaseTest {
     private static final double MAX_HP = 10_000;
     private static final double EPS = 1e-9;
 
-    /** Ice Edge's real template, but with a small HP pool so a percentage is easy to set up. */
+    /**
+     * Ice Edge's real template, but with a small HP pool so a percentage is easy to set up.
+     */
     private static Enemy enemy() {
         Enemy enemy = EnemyFactory.create(1002011, 90, 1);
         enemy.setAttribute(AttributeType.HEALTH, new DoubleValue(MAX_HP));
@@ -39,7 +41,9 @@ public class EnemyPhaseTest {
         return new EnemySkill(DamageElement.FIRE, 1.0, 1, DamageType.NORMAL);
     }
 
-    /** With no phase registered, the enemy has no phase behaviour and the caller falls back. */
+    /**
+     * With no phase registered, the enemy has no phase behaviour and the caller falls back.
+     */
     @Test
     public void withoutAPhaseThereIsNothingToSwitchTo() {
         Enemy enemy = enemy();
@@ -49,7 +53,9 @@ public class EnemyPhaseTest {
                 "null means 'no phase applies'; the caller uses the ordinary skill");
     }
 
-    /** The phase takes over at its threshold and not before. */
+    /**
+     * The phase takes over at its threshold and not before.
+     */
     @Test
     public void aPhaseTakesOverAtItsThreshold() {
         Enemy enemy = enemy();
@@ -92,7 +98,9 @@ public class EnemyPhaseTest {
                 "at 20% the tighter phase must win, not the one unlocked earlier");
     }
 
-    /** Exactly at the threshold counts as "at or below" - an off-by-one here would delay a phase. */
+    /**
+     * Exactly at the threshold counts as "at or below" - an off-by-one here would delay a phase.
+     */
     @Test
     public void theThresholdItselfCounts() {
         Enemy enemy = enemy();
@@ -105,7 +113,9 @@ public class EnemyPhaseTest {
         Assertions.assertSame(enraged, enemy.activeSkill(), "50% is 'at or below 50%'");
     }
 
-    /** A null skill is ignored rather than stored as a phase that would select nothing. */
+    /**
+     * A null skill is ignored rather than stored as a phase that would select nothing.
+     */
     @Test
     public void aNullSkillIsNotRegistered() {
         Enemy enemy = enemy();

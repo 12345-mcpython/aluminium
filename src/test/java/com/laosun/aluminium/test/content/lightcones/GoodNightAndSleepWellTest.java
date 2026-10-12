@@ -10,8 +10,8 @@ import com.laosun.aluminium.models.Weapon;
 import com.laosun.aluminium.models.buff.ControlBuff;
 import com.laosun.aluminium.models.buff.DotBuff;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -26,7 +26,7 @@ import java.util.List;
 public class GoodNightAndSleepWellTest {
     private static final int WEARER = 1001;
     private static final int LEVEL = 80;
-        private static final double SHARE = 0.24;
+    private static final double SHARE = 0.24;
     private static final int CAP = 3;
 
     @Test
@@ -65,6 +65,6 @@ public class GoodNightAndSleepWellTest {
         }
         int count = enemy.getBuffManager().debuffCount();
         double settled = battle.applyDamage(enemy, new Damage(unit, enemy, DamageElement.QUANTUM, DamageType.NORMAL, 1000));
-        return new double[] {settled, count};
+        return new double[]{settled, count};
     }
 }

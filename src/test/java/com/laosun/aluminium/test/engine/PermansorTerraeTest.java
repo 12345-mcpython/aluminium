@@ -7,8 +7,8 @@ import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -25,7 +25,10 @@ public class PermansorTerraeTest {
     private static final int DHPT = 1414;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-        /** Note: "抵消等同于丹恒-腾荒20.00%攻击力+400伤害的护盾，持续3回合" (a shield absorbing damage equal to 20.00% of Dan Heng - Permansor Terrae's ATK + 400, for 3 turns). */
+
+    /**
+     * Note: "抵消等同于丹恒-腾荒20.00%攻击力+400伤害的护盾，持续3回合" (a shield absorbing damage equal to 20.00% of Dan Heng - Permansor Terrae's ATK + 400, for 3 turns).
+     */
     @Test
     public void hisSkillShieldsThePartyForAShareOfHisAttackPlusAFlatNumber() {
         Character dhpt = CharacterFactory.create(DHPT, LEVEL);
@@ -43,7 +46,9 @@ public class PermansorTerraeTest {
         Assertions.assertTrue(ally.getBuffManager().hasState("同袍"), "\"makes a designated single ally the Bondmate (【同袍】)\" (「使指定我方单体角色成为【同袍】」)");
     }
 
-    /** Note: The ultimate states the same shield, so the party is covered even without the Skill. */
+    /**
+     * Note: The ultimate states the same shield, so the party is covered even without the Skill.
+     */
     @Test
     public void hisUltimateAlsoShieldsTheParty() {
         Character dhpt = CharacterFactory.create(DHPT, LEVEL);
@@ -57,7 +62,9 @@ public class PermansorTerraeTest {
         Assertions.assertTrue(ally.getShield() > 0, "「为我方全体提供…护盾」 (a shield for all of our side)");
     }
 
-    /** Census: his skill and its trace, the ultimate, the technique, and the two halves of the Sylvanity (葳蕤) trace. */
+    /**
+     * Census: his skill and its trace, the ultimate, the technique, and the two halves of the Sylvanity (葳蕤) trace.
+     */
     @Test
     public void hisFileCarriesTheClauses() {
         var table = TriggerTables.of(DHPT);

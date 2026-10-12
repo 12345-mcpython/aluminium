@@ -1,4 +1,4 @@
-package com.laosun.aluminium.models;
+package com.laosun.aluminium.models.trigger;
 
 import com.laosun.aluminium.Battle;
 

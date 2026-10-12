@@ -6,9 +6,9 @@ import com.laosun.aluminium.enums.Camp;
 import com.laosun.aluminium.models.CanHit;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.DoubleValue;
+import com.laosun.aluminium.models.buff.StunBuff;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
-import com.laosun.aluminium.models.buff.StunBuff;
 import com.laosun.aluminium.utils.AttributeBuilder;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -59,7 +59,7 @@ public class HitResistTest {
 
     /**
      * Specific debuff resistance: Ice Edge (冰锋)'s {@code debuff_resistance = {"STAT_CTRL_Frozen": 1}}
-     *  to fully immune to freeze (chance 0), other effects are unaffected.
+     * to fully immune to freeze (chance 0), other effects are unaffected.
      */
     @Test
     public void specificResistanceCanNullifyTheChance() {
@@ -168,7 +168,9 @@ public class HitResistTest {
         return c;
     }
 
-    /** A hand-made enemy: only effect resistance and (optionally) specific resistance are set. */
+    /**
+     * A hand-made enemy: only effect resistance and (optionally) specific resistance are set.
+     */
     private static Enemy enemyWithResist(double resist, String specificKey) {
         AttributeBuilder builder = new AttributeBuilder();
         builder.setBase(AttributeType.HEALTH, 10_000)

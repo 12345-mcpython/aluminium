@@ -3,10 +3,10 @@ package com.laosun.aluminium.test.content.relics;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.utils.CharacterFactory;
-import com.laosun.aluminium.utils.RelicFactory;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.utils.RelicFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -25,7 +25,7 @@ public class PenaconyLandOfTheDreamsTest {
     private static final int WEARER = 1205;
     private static final int LEVEL = 80;
     private static final int RELIC_LEVEL = 15;
-        private static final int[] CANDIDATES = {1002, 1004, 1006, 1008, 1009, 1013, 1101, 1102, 1103, 1104, 1105, 1106,
+    private static final int[] CANDIDATES = {1002, 1004, 1006, 1008, 1009, 1013, 1101, 1102, 1103, 1104, 1105, 1106,
             1107, 1108, 1109, 1110, 1111, 1112, 1201, 1202, 1203, 1204, 1206, 1207, 1208, 1209, 1210, 1211};
 
     private Character wearer;

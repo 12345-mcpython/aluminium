@@ -1,19 +1,17 @@
 package com.laosun.aluminium.test.content.characters;
 
 
-import com.laosun.aluminium.test.engine.CastAppliedCountTest;
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.data.TriggerTables;
 import com.laosun.aluminium.enums.AttributeType;
-import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -33,7 +31,8 @@ public class ArgentiStacksTest {
     private static final int ARGENTI = 1302;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-        /**
+
+    /**
      * All three cast slots feed the talent: "when casting a basic attack, Skill or Ultimate ... gain 1 stack of [升格]".
      *
      * <p>Note: The energy half of the same sentence ("for each 1 enemy target hit ... restore 3 energy") is {@code per_target}, and its
@@ -56,7 +55,9 @@ public class ArgentiStacksTest {
     }
 
 
-    /** [升格] stacks up to its cap and each stack is a crit-rate step. */
+    /**
+     * [升格] stacks up to its cap and each stack is a crit-rate step.
+     */
     @Test
     public void theStacksCapAtTen() {
         Fixture f = new Fixture();
@@ -72,7 +73,9 @@ public class ArgentiStacksTest {
                 "…and the count is readable by name, which is what Eidolon 4 and any removal would use");
     }
 
-    /** trace Piety (虔诚) grants a stack on her own turn start. */
+    /**
+     * trace Piety (虔诚) grants a stack on her own turn start.
+     */
     @Test
     public void herTraceGrantsAStackOnHerTurn() {
         Fixture f = new Fixture();
@@ -84,7 +87,9 @@ public class ArgentiStacksTest {
                 "「回合开始时，立即获得1层【升格】」 (at the start of the turn, immediately gains 1 stack of Apotheosis (【升格】))");
     }
 
-    /** trace Courage (勇气) boosts the instance that lands on a hurt enemy, and only that one. */
+    /**
+     * trace Courage (勇气) boosts the instance that lands on a hurt enemy, and only that one.
+     */
     @Test
     public void herTraceBoostsDamageOnHurtEnemies() {
         Fixture f = new Fixture();
@@ -120,7 +125,9 @@ public class ArgentiStacksTest {
                 "…and the amendment is filed against the named rule — the mechanism, not a coincidence");
     }
 
-    /** Note: Raising the cap of a rule that states none is refused at load: there would be no cap to raise. */
+    /**
+     * Note: Raising the cap of a rule that states none is refused at load: there would be no cap to raise.
+     */
     @Test
     public void raisingACapThatDoesNotExistIsRefused() {
         EffectSpec state = new EffectSpec();

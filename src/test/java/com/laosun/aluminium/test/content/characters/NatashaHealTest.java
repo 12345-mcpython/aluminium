@@ -2,11 +2,10 @@ package com.laosun.aluminium.test.content.characters;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.SkillType;
-import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -16,7 +15,7 @@ import java.util.Random;
 /**
  * Natasha (1105), from her own file: the two heals, the cleanse and the outgoing-heal trace.
  *
- * <p><b>What it needed.</b> A derived magnitude read off the healer's <b>settled max HP</b> ({@code scale: self_max_hp}) - 
+ * <p><b>What it needed.</b> A derived magnitude read off the healer's <b>settled max HP</b> ({@code scale: self_max_hp}) -
  * "回复等同于娜塔莎生命上限的 10.50% + 280" (restores an amount equal to 10.50% of Natasha's Max HP + 280). Note: Not {@code self_attr:HEALTH}: that is the attribute table's HEALTH,
  * while "生命上限" (Max HP) is {@code getMaxHp()}, which every +HP% effect moves; the two agree until one does.
  *
@@ -28,7 +27,10 @@ public class NatashaHealTest {
     private static final int NATASHA = 1105;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-        /** The heal really is a share of her max HP plus the constant, and it goes to the aimed ally. */
+
+    /**
+     * The heal really is a share of her max HP plus the constant, and it goes to the aimed ally.
+     */
     @Test
     public void herSkillHealsTheAimedAlly() {
         Fixture f = new Fixture();
@@ -51,7 +53,9 @@ public class NatashaHealTest {
                 "「指定我方单体」 (a designated single ally) is the ally, not her -- ⚠ the first version compared the ALLY's HP with hers");
     }
 
-    /** Her ultimate heals the whole side. */
+    /**
+     * Her ultimate heals the whole side.
+     */
     @Test
     public void herUltimateHealsEveryAlly() {
         Fixture f = new Fixture();
@@ -71,7 +75,9 @@ public class NatashaHealTest {
                 "…and 「我方全体」 (all of our side) includes her");
     }
 
-    /** The Healer (医者) trace raises the outgoing healing, which is read from the healer while the amount is computed. */
+    /**
+     * The Healer (医者) trace raises the outgoing healing, which is read from the healer while the amount is computed.
+     */
     @Test
     public void herTraceRaisesHerOutgoingHealing() {
         Fixture f = new Fixture();
@@ -157,7 +163,9 @@ public class NatashaHealTest {
             battle.castImmediate(natasha.getSkills().get(SkillType.SKILL), natasha, List.of(target));
         }
 
-        /** One full turn of the ally: the moment "目标每回合开始时" would name. */
+        /**
+         * One full turn of the ally: the moment "目标每回合开始时" would name.
+         */
         private void allyTurn() {
             battle.currentMove = battle.queue.snapshot().stream()
                     .filter(signal -> signal.getCanHit() == ally)

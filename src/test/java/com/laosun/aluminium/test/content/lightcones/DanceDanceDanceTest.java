@@ -5,23 +5,28 @@ import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.CanHit;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Signal;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.Weapon;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.models.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-/** Light cone 21018: after the wearer's ultimate, the whole party's action is advanced. */
+/**
+ * Light cone 21018: after the wearer's ultimate, the whole party's action is advanced.
+ */
 public class DanceDanceDanceTest {
     private static final int CONE = 21018;
     private static final int WEARER = 1205;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-        /** Copied from the existing ADVANCE test: a unit's remaining time in the action queue. */
+
+    /**
+     * Copied from the existing ADVANCE test: a unit's remaining time in the action queue.
+     */
     private static double timeRemaining(Battle battle, CanHit target) {
         for (Signal signal : battle.queue.snapshot()) {
             if (signal.getCanHit() == target) {

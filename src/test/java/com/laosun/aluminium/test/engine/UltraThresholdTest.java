@@ -60,7 +60,9 @@ public class UltraThresholdTest {
         Assertions.assertEquals(jingYuan.getMaxEnergy(), battle.ultraEnergyCost(jingYuan), EPS);
     }
 
-    /** All 93 characters: the threshold must be <= the cap and > 0. */
+    /**
+     * All 93 characters: the threshold must be <= the cap and > 0.
+     */
     @Test
     public void thresholdNeverExceedsTheCap() {
         for (var entry : Constant.CHARACTERS.entrySet()) {
@@ -78,7 +80,9 @@ public class UltraThresholdTest {
         }
     }
 
-    /** Exactly 5 characters have a threshold below their cap - exhaustively registered, one more or one fewer must be changed explicitly. */
+    /**
+     * Exactly 5 characters have a threshold below their cap - exhaustively registered, one more or one fewer must be changed explicitly.
+     */
     @Test
     public void exactlyFiveCharactersHaveALowerThreshold() {
         int lower = 0;
@@ -170,8 +174,8 @@ public class UltraThresholdTest {
      * A special-resource character cannot cast even when force-fed to the cap - the provider gives her no energy,
      * but this verifies that the check itself does not let her through either
      * (her {@code sp_need} is 12 and her cap is 24, so feeding her to 20 would actually be "enough for the
-     *  threshold" - which is exactly why the real line of defence is {@code NoConventionalEnergyProvider} keeping
-     *  her from accumulating at all).
+     * threshold" - which is exactly why the real line of defence is {@code NoConventionalEnergyProvider} keeping
+     * her from accumulating at all).
      */
     @Test
     public void specialResourceCharacterCannotAccumulateInRealBattle() {

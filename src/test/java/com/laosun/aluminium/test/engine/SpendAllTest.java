@@ -26,14 +26,18 @@ public class SpendAllTest {
     private static final int ALLY = 1404;
     private static final String RES = "热意";
 
-    /** The cast spends everything. */
+    /**
+     * The cast spends everything.
+     */
     @Test
     public void theCastSpendsAllFervor() {
         Assertions.assertTrue(lossByCast(1) > 0, "precondition: the cast lands");
         Assertions.assertTrue(lossByCast(7) > 0, "and for seven points too");
     }
 
-    /** The cast route scales with the amount: seven points add far more than one. */
+    /**
+     * The cast route scales with the amount: seven points add far more than one.
+     */
     @Test
     public void theRuleScalesWithTheAmount() {
         double one = lossByCast(1);

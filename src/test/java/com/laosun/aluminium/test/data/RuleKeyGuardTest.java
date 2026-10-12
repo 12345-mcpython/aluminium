@@ -14,7 +14,9 @@ import org.junit.jupiter.api.Test;
  * trigger event 'null'". `on_any` itself is spelled and read (`1205.json` uses it).
  */
 public class RuleKeyGuardTest {
-    /** A key Gson does not know leaves the rule with no event at all -- the failure the guard refuses at load time. */
+    /**
+     * A key Gson does not know leaves the rule with no event at all -- the failure the guard refuses at load time.
+     */
     @Test
     public void aMistypedEventKeyLeavesNothing() {
         TriggerSpec mistyped = new Gson().fromJson("{\"onn\":\"BATTLE_START\",\"do\":[]}", TriggerSpec.class);
@@ -28,15 +30,19 @@ public class RuleKeyGuardTest {
         Assertions.assertEquals(1, spelled.getOnAny().size(), "and `on_any` ADDS events beside it");
     }
 
-    /** And the guard lets the corpus through, including the file that really writes `on_any`. */
+    /**
+     * And the guard lets the corpus through, including the file that really writes `on_any`.
+     */
     @Test
     public void everyShippedRuleSetLoads() {
-        for (int cid : new int[] {1205, 1408, 1412, 1513}) {
+        for (int cid : new int[]{1205, 1408, 1412, 1513}) {
             Assertions.assertNotNull(TriggerTables.of(cid), "cid " + cid + " loads through the rule guard");
         }
     }
 
-    /** And a rule that can never fire is refused AT LOAD, by name -- not left to fail later as 'Unknown trigger event'. */
+    /**
+     * And a rule that can never fire is refused AT LOAD, by name -- not left to fail later as 'Unknown trigger event'.
+     */
     @Test
     public void aRuleWithoutAnEventIsRefused() {
         IllegalStateException failure = Assertions.assertThrows(IllegalStateException.class,

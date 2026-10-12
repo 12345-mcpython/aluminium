@@ -1,18 +1,14 @@
 package com.laosun.aluminium.test.content.lightcones;
 
 import com.laosun.aluminium.Battle;
-import com.laosun.aluminium.enums.AttributeType;
-import com.laosun.aluminium.enums.DamageElement;
-import com.laosun.aluminium.enums.DamageType;
-import com.laosun.aluminium.enums.SkillCategory;
-import com.laosun.aluminium.enums.TriggerEvent;
+import com.laosun.aluminium.enums.*;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Damage;
 import com.laosun.aluminium.models.DoubleValue;
 import com.laosun.aluminium.models.Weapon;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -29,7 +25,7 @@ public class ALittleGetawayTest {
     private static final int CONE = 21066;
     private static final int WEARER = 1205;
     private static final int LEVEL = 80;
-        private static final double IGNORE = 0.08;
+    private static final double IGNORE = 0.08;
 
     private Character wearer;
     private Enemy enemy;

@@ -7,8 +7,8 @@ import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Damage;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -24,7 +24,8 @@ public class MoonConsumedTest {
     private static final int OBSERVER = 1212;
     private static final int PAYER = 1205;
     private static final int LEVEL = 80;
-        private Battle ready(Character observer, Character payer, Enemy enemy) {
+
+    private Battle ready(Character observer, Character payer, Enemy enemy) {
         Battle battle = new Battle(List.of(observer, payer), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         // Chain: 1 layer on SKILL_CAST, 1 on ULT_CAST -> 2 layers -> the entry rule grants [转魄].

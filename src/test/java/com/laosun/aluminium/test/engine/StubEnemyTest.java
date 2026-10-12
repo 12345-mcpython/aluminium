@@ -3,13 +3,12 @@ package com.laosun.aluminium.test.engine;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageElement;
-import com.laosun.aluminium.enums.DamageType;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.StubEnemy;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -32,7 +31,9 @@ public class StubEnemyTest {
     private static final int MONSTERISH = 1002011;
     private static final double EPS = 1e-9;
 
-    /** The stated numbers are the ones the enemy has - none of them comes from the dump. */
+    /**
+     * The stated numbers are the ones the enemy has - none of them comes from the dump.
+     */
     @Test
     public void theStatedNumbersAreTheEnemys() {
         Enemy stub = StubEnemy.named("测试木桩")
@@ -87,7 +88,9 @@ public class StubEnemyTest {
                 "and it is weak to its own element unless told otherwise");
     }
 
-    /** Stating weaknesses replaces the default, and a stated element is what it deals. */
+    /**
+     * Stating weaknesses replaces the default, and a stated element is what it deals.
+     */
     @Test
     public void weaknessesAndElementAreStatedNotGuessed() {
         Enemy stub = StubEnemy.named("冰弱点").withElement(DamageElement.ICE).weakTo(DamageElement.ICE).build();
@@ -97,7 +100,9 @@ public class StubEnemyTest {
         Assertions.assertFalse(stub.isWeakTo(DamageElement.FIRE), "and nothing else");
     }
 
-    /** An enemy that resists one element and not another - the shape the damage zones read. */
+    /**
+     * An enemy that resists one element and not another - the shape the damage zones read.
+     */
     @Test
     public void damageResistanceIsStatedPerElement() {
         Enemy stub = StubEnemy.dummy().withDamageResistance(DamageElement.FIRE, 0.5).build();
@@ -128,14 +133,16 @@ public class StubEnemyTest {
         stub.takeDamage(600);                                   // down to 40% of max
         System.out.println("[stub] at " + Math.round(100 * stub.getCurrentHp() / stub.getMaxHp())
                 + "% HP the active skill is " + (stub.activeSkill() == null ? "the ordinary one"
-                        : ((com.laosun.aluminium.models.enemy.EnemySkill) stub.activeSkill()).getElement()));
+                : ((com.laosun.aluminium.models.enemy.EnemySkill) stub.activeSkill()).getElement()));
         Assertions.assertNotNull(stub.activeSkill(), "at or below half HP the phase skill takes over");
         Assertions.assertEquals(DamageElement.FIRE,
                 ((com.laosun.aluminium.models.enemy.EnemySkill) stub.activeSkill()).getElement(),
                 "and it is the skill that was registered");
     }
 
-    /** A stub stands in a real battle and can hit a real character - which is what a harness needs from it. */
+    /**
+     * A stub stands in a real battle and can hit a real character - which is what a harness needs from it.
+     */
     @Test
     public void itFightsInABattle() {
         Character pearl = CharacterFactory.create(PEARL, 80);
@@ -149,7 +156,9 @@ public class StubEnemyTest {
                 + " with " + battle.enemyUnits().getFirst().getMaxHp() + " HP");
     }
 
-    /** The dump's own path still works, so the stub is an addition rather than a replacement. */
+    /**
+     * The dump's own path still works, so the stub is an addition rather than a replacement.
+     */
     @Test
     public void theDataBackedFactoryIsUntouched() {
         Enemy real = com.laosun.aluminium.models.enemy.EnemyFactory.create(MONSTERISH, 90, 1);

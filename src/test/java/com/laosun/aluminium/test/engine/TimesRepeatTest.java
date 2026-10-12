@@ -5,18 +5,17 @@ import com.laosun.aluminium.data.RelicTriggerTables;
 import com.laosun.aluminium.enums.SkillCategory;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerInterpreter;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
+import com.laosun.aluminium.models.trigger.TriggerInterpreter;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.utils.RelicFactory;
-import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Effect-level repetition: the {@code times} field on an effect.
@@ -35,7 +34,9 @@ public class TimesRepeatTest {
     private static final int WEARER = 1001;
     private static final int LEVEL = 80;
 
-    /** Applies the named rule of 99004 applications times INSIDE one battle; returns the enemy HP loss. */
+    /**
+     * Applies the named rule of 99004 applications times INSIDE one battle; returns the enemy HP loss.
+     */
     private static double lossWith(String ruleId, int applications) {
         Character c = CharacterFactory.create(WEARER, LEVEL, true, null, RelicFactory.suit(99004, 5, 15));
         Enemy e = EnemyFactory.create(1002011, 90, 1);

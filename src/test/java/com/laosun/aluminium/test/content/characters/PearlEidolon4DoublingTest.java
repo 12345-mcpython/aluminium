@@ -5,8 +5,8 @@ import com.laosun.aluminium.enums.SkillCategory;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -32,7 +32,8 @@ public class PearlEidolon4DoublingTest {
     private static final int PEARL = 1503;
     private static final int ELATION = 1502;
     private static final int HUNTER = 1204;
-        /**
+
+    /**
      * At E4 the arming pays twice what it pays at E3 - the two ranks whose Elation-skill level is the SAME.
      *
      * <p>Note: Why E3 is the control rather than E0, which is what the first version used. Eidolon 3 grants
@@ -95,10 +96,12 @@ public class PearlEidolon4DoublingTest {
         Assertions.assertEquals(4, checked, "one added clause per tier");
     }
 
-    /** The doubling follows the tier the team qualifies for, not a single flat number. */
+    /**
+     * The doubling follows the tier the team qualifies for, not a single flat number.
+     */
     @Test
     public void theDoublingFollowsTheTier() {
-        for (int allies : new int[] {1, 2, 3, 4}) {
+        for (int allies : new int[]{1, 2, 3, 4}) {
             double atE3 = payout(3, allies);
             double atE4 = payout(4, allies);
             System.out.println("[pearl_e4] " + allies + " Elation allies: E3 = " + atE3 + " ; E4 = " + atE4);
@@ -112,7 +115,9 @@ public class PearlEidolon4DoublingTest {
     // Helpers
     // ==================================================================
 
-    /** What arming the team pays: (armed - unarmed) for one ally's basic attack on the same enemy. */
+    /**
+     * What arming the team pays: (armed - unarmed) for one ally's basic attack on the same enemy.
+     */
     private static double payout(int eidolonRank, int elationAllies) {
         double unarmed = attackingDamage(eidolonRank, elationAllies, false);
         double armed = attackingDamage(eidolonRank, elationAllies, true);

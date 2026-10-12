@@ -4,8 +4,8 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.skill.SkillExecutor;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -21,7 +21,8 @@ public class OceanOdeDamageTest {
     private static final int LEVEL = 80;
     private static final int CYRENE = 1415;
     private static final int HYSILENS = 1410;
-        @Test
+
+    @Test
     public void theOdeRaisesHerDamageToTheRowsOwnShare() {
         double without = boost(false);
         double[] with = boostWithExpected();
@@ -53,7 +54,9 @@ public class OceanOdeDamageTest {
         return new double[]{hysilens.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get(), expected};
     }
 
-    /** Her boost with the ode never cast. */
+    /**
+     * Her boost with the ode never cast.
+     */
     private static double boost(boolean ignored) {
         Character cyrene = CharacterFactory.create(CYRENE, LEVEL);
         Character hysilens = CharacterFactory.create(HYSILENS, LEVEL);

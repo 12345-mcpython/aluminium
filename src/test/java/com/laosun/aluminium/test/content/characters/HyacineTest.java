@@ -6,8 +6,8 @@ import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -25,7 +25,10 @@ public class HyacineTest {
     private static final int HYACINE = 1409;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-        /** Note: "风堇进入[雨过天晴]状态" and "我方全体目标生命上限提高30.00%". */
+
+    /**
+     * Note: "风堇进入[雨过天晴]状态" and "我方全体目标生命上限提高30.00%".
+     */
     @Test
     public void herUltimateMarksHerAndRaisesThePartysMaxHp() {
         Character hyacine = CharacterFactory.create(HYACINE, LEVEL);
@@ -44,7 +47,9 @@ public class HyacineTest {
         Assertions.assertTrue(hyacine.getMaxHp() > herMaxBefore, "「我方全体」 (all allies) includes Hyacine herself");
     }
 
-    /** Census: the ultimate's rule and the level convention; the heals belong to the skill data, not to rules. */
+    /**
+     * Census: the ultimate's rule and the level convention; the heals belong to the skill data, not to rules.
+     */
     @Test
     public void herFileCarriesTheClauses() {
         var table = TriggerTables.of(HYACINE);

@@ -1,17 +1,17 @@
 package com.laosun.aluminium.test.trigger;
 
 
-import com.laosun.aluminium.test.support.TestTurns;
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.google.gson.Gson;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TestTurns;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -42,9 +42,13 @@ import java.util.List;
  * caps at 5, so no test below lets the fingerprint exceed it).
  */
 public class TriggerLimitTest {
-    /** Himeko (姬子): her own table is replaced by the rule under test, so nothing else is ever in play. */
+    /**
+     * Himeko (姬子): her own table is replaced by the rule under test, so nothing else is ever in play.
+     */
     private static final int OWNER = 1003;
-    /** Tingyun: likewise, and used as the "somebody else acted" actor in the two-character cases. */
+    /**
+     * Tingyun: likewise, and used as the "somebody else acted" actor in the two-character cases.
+     */
     private static final int ALLY = 1202;
     private static final int LEVEL = 80;
 
@@ -119,7 +123,9 @@ public class TriggerLimitTest {
     // 3. Per-turn count, counted in the owner's turns like the cooldown
     // ==================================================================
 
-    /** "this effect can trigger 2 times per turn": the third firing in one turn is refused, the first two are not. */
+    /**
+     * "this effect can trigger 2 times per turn": the third firing in one turn is refused, the first two are not.
+     */
     @Test
     public void perTurnTwoLetsTheRuleFireTwiceInOneTurn() {
         Battle battle = battleWith(perTurn(2));
@@ -131,7 +137,9 @@ public class TriggerLimitTest {
         Assertions.assertEquals(2, battle.getSkillPoints(), "exactly two firings paid out");
     }
 
-    /** The count comes back on the owner's own turn - the same moment a cooldown is decremented. */
+    /**
+     * The count comes back on the owner's own turn - the same moment a cooldown is decremented.
+     */
     @Test
     public void theTurnLimitComesBackOnTheOwnersOwnTurn() {
         Battle battle = battleWith(perTurn(2));
@@ -190,7 +198,9 @@ public class TriggerLimitTest {
     // 4. Limits are per rule, and only where stated
     // ==================================================================
 
-    /** A limit must not leak onto the other rules of the same table. */
+    /**
+     * A limit must not leak onto the other rules of the same table.
+     */
     @Test
     public void anUnlimitedRuleNextToALimitedOneKeepsFiring() {
         Battle battle = battleWith(limited(1, null), unlimited(2));
@@ -264,7 +274,9 @@ public class TriggerLimitTest {
                 "the message must name the rule's source: " + both.getMessage());
     }
 
-    /** {@code per_turn: 0} reads like "no per-turn limit", which is spelled by omitting the field. */
+    /**
+     * {@code per_turn: 0} reads like "no per-turn limit", which is spelled by omitting the field.
+     */
     @Test
     public void aTurnLimitBelowOneIsRejectedAtLoadTime() {
         IllegalArgumentException zero = Assertions.assertThrows(IllegalArgumentException.class,
@@ -344,7 +356,9 @@ public class TriggerLimitTest {
         return spec;
     }
 
-    /** An unlimited rule with a different fingerprint, to prove limits do not leak. */
+    /**
+     * An unlimited rule with a different fingerprint, to prove limits do not leak.
+     */
     private static TriggerSpec unlimited(double points) {
         return TriggerSpecs.rule("ALLY_ATTACK", null, "TriggerLimitTest (unlimited)", gain(points));
     }

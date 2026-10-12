@@ -1,19 +1,18 @@
 package com.laosun.aluminium.test.data;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
-import com.laosun.aluminium.data.TriggerTables;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.DoubleValue;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -42,7 +41,9 @@ public class RuleAmendmentTest {
 
     private static final int MARCH_7TH = 1001;
     private static final int LEVEL = 80;
-    /** 1003010 states no {@code STAT_CTRL_*} resistances (Ice Edge (冰锋) cannot be frozen at all). */
+    /**
+     * 1003010 states no {@code STAT_CTRL_*} resistances (Ice Edge (冰锋) cannot be frozen at all).
+     */
     private static final int MONSTER = 1003010;
 
     /**
@@ -78,7 +79,9 @@ public class RuleAmendmentTest {
         Assertions.assertTrue(freezeLands(0.0, 0.4), "…and it does reach 0.4 (the control case)");
     }
 
-    /** Note: An unnamed target is refused: a reference that points at nothing must not load. */
+    /**
+     * Note: An unnamed target is refused: a reference that points at nothing must not load.
+     */
     @Test
     public void anUnknownRuleIdIsRefusedAtLoad() {
         IllegalArgumentException refused = Assertions.assertThrows(IllegalArgumentException.class,
@@ -90,7 +93,9 @@ public class RuleAmendmentTest {
         Assertions.assertTrue(refused.getMessage().contains("counter"), "the message lists the ids it knows");
     }
 
-    /** Two rules sharing one id are refused, because a reference to that id would be ambiguous. */
+    /**
+     * Two rules sharing one id are refused, because a reference to that id would be ambiguous.
+     */
     @Test
     public void aDuplicateRuleIdIsRefusedAtLoad() {
         IllegalArgumentException refused = Assertions.assertThrows(IllegalArgumentException.class,
@@ -101,7 +106,9 @@ public class RuleAmendmentTest {
         Assertions.assertTrue(refused.getMessage().contains("share the id"), refused.getMessage());
     }
 
-    /** Note: Raising a limit the target does not state is refused: 0 + 1 would silently impose a cap of one. */
+    /**
+     * Note: Raising a limit the target does not state is refused: 0 + 1 would silently impose a cap of one.
+     */
     @Test
     public void raisingAPerTurnLimitThatDoesNotExistIsRefused() {
         IllegalArgumentException refused = Assertions.assertThrows(IllegalArgumentException.class,
@@ -112,7 +119,9 @@ public class RuleAmendmentTest {
         Assertions.assertTrue(refused.getMessage().contains("per_turn"), refused.getMessage());
     }
 
-    /** Note: Raising the chance of a rule that states none is refused: an unstated chance is 100%, with no number to raise. */
+    /**
+     * Note: Raising the chance of a rule that states none is refused: an unstated chance is 100%, with no number to raise.
+     */
     @Test
     public void raisingAChanceThatIsNotStatedIsRefused() {
         IllegalArgumentException refused = Assertions.assertThrows(IllegalArgumentException.class,
@@ -124,7 +133,9 @@ public class RuleAmendmentTest {
         Assertions.assertTrue(refused.getMessage().contains("base_chance"), refused.getMessage());
     }
 
-    /** Both spellings at once (or neither) leave the reader guessing which number on the target moves. */
+    /**
+     * Both spellings at once (or neither) leave the reader guessing which number on the target moves.
+     */
     @Test
     public void theTwoSpellingsAreMutuallyExclusive() {
         EffectSpec both = TriggerSpecs.rule("BATTLE_START", null, amend("counter", 1.0, 0.15))
@@ -135,7 +146,9 @@ public class RuleAmendmentTest {
         Assertions.assertTrue(refused.getMessage().contains("amount"), refused.getMessage());
     }
 
-    /** A delta that is not a positive whole count (or not a fraction of 1) is refused where it is stated. */
+    /**
+     * A delta that is not a positive whole count (or not a fraction of 1) is refused where it is stated.
+     */
     @Test
     public void anOutOfRangeDeltaIsRefused() {
         IllegalArgumentException fractional = Assertions.assertThrows(IllegalArgumentException.class,
@@ -147,7 +160,9 @@ public class RuleAmendmentTest {
         Assertions.assertTrue(tooBig.getMessage().contains("fraction of 1"), tooBig.getMessage());
     }
 
-    /** Note: A raise that is not made at battle start is refused: nothing would ever take it back. */
+    /**
+     * Note: A raise that is not made at battle start is refused: nothing would ever take it back.
+     */
     @Test
     public void anAmendmentOutsideBattleStartIsRefused() {
         IllegalArgumentException refused = Assertions.assertThrows(IllegalArgumentException.class,
@@ -156,7 +171,9 @@ public class RuleAmendmentTest {
         Assertions.assertTrue(refused.getMessage().contains("BATTLE_START"), refused.getMessage());
     }
 
-    /** A field the op does not read is refused rather than ignored. */
+    /**
+     * A field the op does not read is refused rather than ignored.
+     */
     @Test
     public void anUnreadFieldIsRefused() {
         EffectSpec effect = amend("counter", 1.0, null);
@@ -172,7 +189,9 @@ public class RuleAmendmentTest {
     // The shipped content: 1001 Eidolon 4 and trace "冰咒"
     // ==================================================================
 
-    /** Her file ships both raises: the counter's cap and the ultimate's chance. */
+    /**
+     * Her file ships both raises: the counter's cap and the ultimate's chance.
+     */
     @Test
     public void theShippedFileCarriesBothRaises() {
         Assertions.assertEquals(3, counterFiringsWithHerFile(4),
@@ -188,7 +207,9 @@ public class RuleAmendmentTest {
     // Helpers
     // ==================================================================
 
-    /** How many times the counter rule fires when one turn is given three hits, with or without a raise. */
+    /**
+     * How many times the counter rule fires when one turn is given three hits, with or without a raise.
+     */
     private static int counterFirings(boolean amended) {
         Character hero = CharacterFactory.create(MARCH_7TH, LEVEL);
         List<TriggerSpec> specs = new ArrayList<>();
@@ -208,7 +229,9 @@ public class RuleAmendmentTest {
         return fired;
     }
 
-    /** The same measurement through her shipped file, at the given Eidolon rank. */
+    /**
+     * The same measurement through her shipped file, at the given Eidolon rank.
+     */
     private static int counterFiringsWithHerFile(int rank) {
         Character hero = CharacterFactory.create(MARCH_7TH, LEVEL, true, null, null, rank);
         Battle battle = new Battle(List.of(hero), List.of(monster()), fixed(0.0));
@@ -237,7 +260,9 @@ public class RuleAmendmentTest {
         return battle.enemyUnits().getFirst().getBuffManager().hasState("冻结");
     }
 
-    /** One freeze rule (with or without a stated chance) plus a raise, driven with a pinned generator. */
+    /**
+     * One freeze rule (with or without a stated chance) plus a raise, driven with a pinned generator.
+     */
     private static boolean freezeLands(double raise, double roll) {
         Character hero = CharacterFactory.create(MARCH_7TH, LEVEL);
         List<TriggerSpec> specs = new ArrayList<>();
@@ -255,7 +280,9 @@ public class RuleAmendmentTest {
         return battle.enemyUnits().getFirst().getBuffManager().hasState("冻结");
     }
 
-    /** Her talent's counter, in the shape the tests above need (a damage instance aimed at the attacker). */
+    /**
+     * Her talent's counter, in the shape the tests above need (a damage instance aimed at the attacker).
+     */
     private static EffectSpec damageCounter() {
         EffectSpec effect = new EffectSpec();
         TriggerSpecs.set(effect, "op", "DAMAGE");
@@ -270,7 +297,9 @@ public class RuleAmendmentTest {
         return rule;
     }
 
-    /** A counter rule with the given id (and, optionally, the per-turn limit the documents state). */
+    /**
+     * A counter rule with the given id (and, optionally, the per-turn limit the documents state).
+     */
     private static TriggerSpec counterRule(String id, Integer perTurn) {
         TriggerSpec spec = named(id, TriggerSpecs.rule("TAKING_HIT", null, damageCounter()));
         if (perTurn != null) {
@@ -279,12 +308,16 @@ public class RuleAmendmentTest {
         return spec;
     }
 
-    /** {@code {"op":"MODIFY_RULE","rule":"…","amount":1}} - one more firing per turn. */
+    /**
+     * {@code {"op":"MODIFY_RULE","rule":"…","amount":1}} - one more firing per turn.
+     */
     private static TriggerSpec amendPerTurn(String rule) {
         return TriggerSpecs.rule("BATTLE_START", null, amend(rule, 1.0, null));
     }
 
-    /** {@code {"op":"MODIFY_RULE","rule":"…","percent":0.15}} - a higher base chance. */
+    /**
+     * {@code {"op":"MODIFY_RULE","rule":"…","percent":0.15}} - a higher base chance.
+     */
     private static TriggerSpec amendChance(String rule, double percent) {
         return TriggerSpecs.rule("BATTLE_START", null, amend(rule, null, percent));
     }
@@ -298,7 +331,9 @@ public class RuleAmendmentTest {
         return effect;
     }
 
-    /** Compiles one rule into a table, which is where load-time validation runs. */
+    /**
+     * Compiles one rule into a table, which is where load-time validation runs.
+     */
     private static TriggerTable tableOf(TriggerSpec rule) {
         return new TriggerTable(MARCH_7TH, List.of(rule));
     }
@@ -309,7 +344,9 @@ public class RuleAmendmentTest {
         return enemy;
     }
 
-    /** A generator that always answers the same value, so a probability becomes an assertion. */
+    /**
+     * A generator that always answers the same value, so a probability becomes an assertion.
+     */
     private static Random fixed(double value) {
         return BattleFixture.alwaysRoll(value);
     }

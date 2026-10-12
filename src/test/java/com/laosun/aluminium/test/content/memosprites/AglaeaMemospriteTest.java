@@ -8,10 +8,10 @@ import com.laosun.aluminium.models.CanHit;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Signal;
 import com.laosun.aluminium.models.Summon;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.models.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -38,7 +38,7 @@ import java.util.List;
  * first and then healing, because a fresh memosprite is at full HP.
  *
  * <p>Note: What is deliberately <b>not</b> authored, and why it is not an oversight: the Garmentmaker's own attack. Its Memosprite Skill 1 is
- * a Blast for "110% ATK (攻击力)" of Lightning damage, but no document gives the Garmentmaker an ATK - the panel states HP and SPD only - 
+ * a Blast for "110% ATK (攻击力)" of Lightning damage, but no document gives the Garmentmaker an ATK - the panel states HP and SPD only -
  * and scaling it off Aglaea's ATK would be a guess. The loader would refuse it anyway: an attack whose base the
  * panel never states is exactly the "every hit deals zero" case {@code Memosprites.validateAttack} exists for.
  */
@@ -46,14 +46,18 @@ public class AglaeaMemospriteTest {
     private static final double EPS = 1e-6;
 
     private static final int AGLAEA = 1402;
-    /** The stance her ultimate enters, and the state whose life is anchored to the memosprite. */
+    /**
+     * The stance her ultimate enters, and the state whose life is anchored to the memosprite.
+     */
     private static final String STANCE = "至高之姿";
     private static final int LEVEL = 80;
-        // ==================================================================
+    // ==================================================================
     // 1. The skill: heal, or summon and advance
     // ==================================================================
 
-    /** "衣匠已在场" ("the Garmentmaker is already on the field"): the skill restores 50% of the memosprite's Max HP. */
+    /**
+     * "衣匠已在场" ("the Garmentmaker is already on the field"): the skill restores 50% of the memosprite's Max HP.
+     */
     @Test
     public void herSkillHealsTheMemospriteThatIsAlreadyOut() {
         Battle battle = battle();
@@ -71,7 +75,9 @@ public class AglaeaMemospriteTest {
         Assertions.assertEquals(1, battle.summonCountOf(aglaea), "…and no second one appeared");
     }
 
-    /** "衣匠不在场" ("the Garmentmaker is not on the field"): the skill brings it out <b>and</b> makes her act immediately. */
+    /**
+     * "衣匠不在场" ("the Garmentmaker is not on the field"): the skill brings it out <b>and</b> makes her act immediately.
+     */
     @Test
     public void herSkillSummonsAndAdvancesHerWhenItIsNotOut() {
         Battle battle = battle();
@@ -89,7 +95,9 @@ public class AglaeaMemospriteTest {
                 "the advance is HERS: the memosprite's own turn is untouched (it is not memosprite skill 3 (忆灵技能3))");
     }
 
-    /** The two halves are mutually exclusive, so a skill cast never heals and summons at once. */
+    /**
+     * The two halves are mutually exclusive, so a skill cast never heals and summons at once.
+     */
     @Test
     public void onlyOneHalfOfTheSkillAppliesAtATime() {
         Character aglaea = CharacterFactory.create(AGLAEA, LEVEL);
@@ -112,7 +120,9 @@ public class AglaeaMemospriteTest {
     // 2. The ultimate: summon, restore to full, act immediately
     // ==================================================================
 
-    /** From empty: it is brought out, and she acts immediately. */
+    /**
+     * From empty: it is brought out, and she acts immediately.
+     */
     @Test
     public void herUltimateBringsItOutAndAdvancesHer() {
         Battle battle = battle();
@@ -155,7 +165,9 @@ public class AglaeaMemospriteTest {
     // 3. The authored rules state their numbers
     // ==================================================================
 
-    /** Both abilities are filed with the effects their sentences name, in the order they name them. */
+    /**
+     * Both abilities are filed with the effects their sentences name, in the order they name them.
+     */
     @Test
     public void theAuthoredRulesStateTheirShape() {
         Character aglaea = CharacterFactory.create(AGLAEA, LEVEL);
@@ -253,7 +265,9 @@ public class AglaeaMemospriteTest {
         return new Battle(List.of(CharacterFactory.create(AGLAEA, LEVEL)), List.of(dummy()), BattleFixture.seeded());
     }
 
-    /** How much action value the unit still has - zero means "acts now". */
+    /**
+     * How much action value the unit still has - zero means "acts now".
+     */
     private static double timeRemaining(Battle battle, CanHit target) {
         for (Signal signal : battle.queue.snapshot()) {
             if (signal.getCanHit() == target) {

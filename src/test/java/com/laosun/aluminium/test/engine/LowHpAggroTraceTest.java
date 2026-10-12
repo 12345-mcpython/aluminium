@@ -7,8 +7,8 @@ import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Damage;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -29,7 +29,8 @@ public class LowHpAggroTraceTest {
     private static final int[] OWNERS = {1002, 1102, 1206};
     private static final int ALLY = 1210;
     private static final int LEVEL = 80;
-        @Test
+
+    @Test
     public void theLowHpTraceHalvesTheWeightAndComesBackOnHealing() {
         for (int cid : OWNERS) {
             Character owner = CharacterFactory.create(cid, LEVEL);
@@ -58,7 +59,9 @@ public class LowHpAggroTraceTest {
         }
     }
 
-    /** Damages the unit until its HP is at or below half, leaving it alive. */
+    /**
+     * Damages the unit until its HP is at or below half, leaving it alive.
+     */
     private static void dropBelowHalf(Battle battle, Character unit, Enemy enemy) {
         int guard = 0;
         while (unit.getCurrentHp() / unit.getMaxHp() > 0.5 && guard++ < 40) {
@@ -69,7 +72,9 @@ public class LowHpAggroTraceTest {
         Assertions.assertTrue(unit.getCurrentHp() / unit.getMaxHp() <= 0.5, "and at or below the gate");
     }
 
-    /** Heals the unit back above half. */
+    /**
+     * Heals the unit back above half.
+     */
     private static void healAboveHalf(Battle battle, Character unit) {
         int guard = 0;
         while (unit.getCurrentHp() / unit.getMaxHp() <= 0.5 && guard++ < 40) {

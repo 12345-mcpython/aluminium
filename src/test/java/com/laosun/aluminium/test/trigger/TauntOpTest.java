@@ -1,18 +1,17 @@
 package com.laosun.aluminium.test.trigger;
 
 
-import com.laosun.aluminium.test.engine.DebuffResistTest;
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.data.TriggerTables;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.buff.TauntBuff;
 import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -34,7 +33,10 @@ public class TauntOpTest {
     private static final double EPS = 1e-6;
     private static final int OWNER = 1003;
     private static final int LEVEL = 80;
-        /** The op attaches the marker with the duration the rule states. */
+
+    /**
+     * The op attaches the marker with the duration the rule states.
+     */
     @Test
     public void tauntAttachesTheMarkerForTheStatedTurns() {
         Character owner = characterWith(tauntRule(2));
@@ -49,7 +51,9 @@ public class TauntOpTest {
         Assertions.assertEquals(2, buffs.getFirst().duration(), "\"lasts #N turns\" (「持续#N回合」)");
     }
 
-    /** Nothing to taunt is not a silent success: the marker is on the unit the rule resolved. */
+    /**
+     * Nothing to taunt is not a silent success: the marker is on the unit the rule resolved.
+     */
     @Test
     public void tauntGoesOnTheResolvedTargetAndNowhereElse() {
         Character owner = characterWith(tauntRule(1));
@@ -63,7 +67,9 @@ public class TauntOpTest {
                 "the rule owner is not taunted -- `target` names the event's subject");
     }
 
-    /** A duration is required, and the open-ended spellings are refused (a taunt that never ends). */
+    /**
+     * A duration is required, and the open-ended spellings are refused (a taunt that never ends).
+     */
     @Test
     public void tauntRefusesAnOpenEndedDuration() {
         EffectSpec noTurns = new EffectSpec();
@@ -79,7 +85,9 @@ public class TauntOpTest {
         Assertions.assertTrue(refused.getMessage().contains("permanent"), refused.getMessage());
     }
 
-    /** Mortenax Blade (千冶-刃)'s Skill states it: one cast, one taunted enemy. */
+    /**
+     * Mortenax Blade (千冶-刃)'s Skill states it: one cast, one taunted enemy.
+     */
     @Test
     public void theAuthoredRuleTauntsTheAimedEnemy() {
         Assertions.assertEquals(1, TriggerTables.of(1507).ruleCount(TriggerEvent.SKILL_CAST),

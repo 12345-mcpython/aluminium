@@ -6,8 +6,8 @@ import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.skill.Skill;
 import com.laosun.aluminium.models.skill.SkillExecutor;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -22,7 +22,10 @@ import java.util.List;
 public class TransformationStatsTest {
     private static final double EPS = 1e-6;
     private static final int OWNER = 1408;
-        /** The transformation is worth exactly +80% ATK and +20% Max HP. */
+
+    /**
+     * The transformation is worth exactly +80% ATK and +20% Max HP.
+     */
     @Test
     public void theTransformationRaisesAtkAndMaxHp() {
         Character owner = CharacterFactory.create(OWNER, 80, false, null, null, 0);
@@ -51,7 +54,9 @@ public class TransformationStatsTest {
                 "「生命上限提高 270%」 (Max HP raised by 270%) (before=" + hp0 + ")");
     }
 
-    /** Note: Without the ultimate there is no transformation, so the block is not there either. */
+    /**
+     * Note: Without the ultimate there is no transformation, so the block is not there either.
+     */
     @Test
     public void withoutTheUltimateTheBlockIsAbsent() {
         Character owner = CharacterFactory.create(OWNER, 80, false, null, null, 0);

@@ -1,14 +1,13 @@
 package com.laosun.aluminium.test.content.characters;
 
 
-import com.laosun.aluminium.test.engine.SkillPointGameParityTest;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.DoubleValue;
 import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -31,7 +30,9 @@ import java.util.Random;
  */
 public class BronyaEidolonTest {
     private static final int BRONYA = 1101;
-    /** Tingyun: a real ally with no rule file of her own, so only Bronya's table can act. */
+    /**
+     * Tingyun: a real ally with no rule file of her own, so only Bronya's table can act.
+     */
     private static final int ALLY = 1202;
     private static final int LEVEL = 80;
     private static final double DEFENCE_TRACE = 0.2;
@@ -126,7 +127,9 @@ public class BronyaEidolonTest {
                 "the DEFENCE trace is hers too, and its own duration is untouched");
     }
 
-    /** Below rank 6 the boost is the Skill's own one turn - the Eidolon gate, not a shorter extension. */
+    /**
+     * Below rank 6 the boost is the Skill's own one turn - the Eidolon gate, not a shorter extension.
+     */
     @Test
     public void theSixthEidolonsExtensionIsGatedOnItsRank() {
         Battle battle = battleWith(5, 0.0);
@@ -144,7 +147,9 @@ public class BronyaEidolonTest {
     // Helpers
     // ==================================================================
 
-    /** The remaining durations of a unit's timed stat modifiers on one attribute. */
+    /**
+     * The remaining durations of a unit's timed stat modifiers on one attribute.
+     */
     private static List<Integer> durationsOf(Character who, AttributeType attribute) {
         return who.getBuffManager().allBuffsOf(com.laosun.aluminium.models.buff.StatModifierBuff.class).stream()
                 .filter(buff -> buff.getAttribute() == attribute)
@@ -160,7 +165,9 @@ public class BronyaEidolonTest {
         return battle.getSkillPoints();
     }
 
-    /** The Skill aimed at one ally -- what "战技对指定我方目标" means (the sentence under test is about an ally). */
+    /**
+     * The Skill aimed at one ally -- what "战技对指定我方目标" means (the sentence under test is about an ally).
+     */
     private static void castSkillOn(Battle battle, Character hero, Character ally) {
         battle.castImmediate(hero.getSkills().get(SkillType.SKILL), hero, List.of(ally));
     }
@@ -176,7 +183,9 @@ public class BronyaEidolonTest {
         }
     }
 
-    /** The BUFF-sourced modifiers on DEFENCE, as values - the idiom the relic tests use for a set's bonus. */
+    /**
+     * The BUFF-sourced modifiers on DEFENCE, as values - the idiom the relic tests use for a set's bonus.
+     */
     private static List<Double> defenceBuffsOn(Character who) {
         return who.getAttribute(AttributeType.DEFENCE)
                 .filterBySource(DoubleValue.Modifier.ModifierSource.BUFF)
@@ -193,10 +202,13 @@ public class BronyaEidolonTest {
         return battle;
     }
 
-    /** A generator that always answers the same value, so the 50% becomes an assertion. */
+    /**
+     * A generator that always answers the same value, so the 50% becomes an assertion.
+     */
     private static Random fixed(double value) {
         return BattleFixture.alwaysRoll(value);
     }
+
     private static Enemy dummy() {
         return Enemy.fromAttributes("dummy", 1_000_000, 0, 100, 100);
     }

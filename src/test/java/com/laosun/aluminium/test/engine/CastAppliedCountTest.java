@@ -1,8 +1,6 @@
 package com.laosun.aluminium.test.engine;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
@@ -10,10 +8,12 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.DoubleValue;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.models.skill.DefaultSkill;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -44,11 +44,15 @@ import java.util.Random;
 public class CastAppliedCountTest {
     private static final double EPS = 1e-6;
 
-    /** March 7th (三月七) - the reader, and the character whose energy bar makes the count observable. */
+    /**
+     * March 7th (三月七) - the reader, and the character whose energy bar makes the count observable.
+     */
     private static final int MARCH_7TH = 1001;
     private static final int LEVEL = 80;
     private static final int ULTIMATE_SLOT = 3;
-    /** 1003010 states no {@code STAT_CTRL_*} resistances, unlike Ice Edge (冰锋) (which cannot be frozen at all). */
+    /**
+     * 1003010 states no {@code STAT_CTRL_*} resistances, unlike Ice Edge (冰锋) (which cannot be frozen at all).
+     */
     private static final int MONSTER = 1003010;
 
     /**
@@ -67,7 +71,9 @@ public class CastAppliedCountTest {
                 "6 energy × the 3 targets the freeze really landed on");
     }
 
-    /** ...and a partial result pays partially: two of three frozen is 12, not 18 and not 0. */
+    /**
+     * ...and a partial result pays partially: two of three frozen is 12, not 18 and not 0.
+     */
     @Test
     public void aPartialResultPaysPartially() {
         Assertions.assertEquals(12, energyFromAnUltimate(3, 1) - energyFromAnUltimate(3, 3), EPS);
@@ -134,7 +140,9 @@ public class CastAppliedCountTest {
         Assertions.assertEquals(12, second, EPS, "the second cast starts from zero instead of adding to the first");
     }
 
-    /** Note: A rule that reads the count on an event outside a cast is refused at load, not answered with 0. */
+    /**
+     * Note: A rule that reads the count on an event outside a cast is refused at load, not answered with 0.
+     */
     @Test
     public void readingTheCountOutsideACastIsRefusedAtLoad() {
         IllegalArgumentException refused = Assertions.assertThrows(IllegalArgumentException.class,
@@ -145,7 +153,9 @@ public class CastAppliedCountTest {
         Assertions.assertTrue(refused.getMessage().contains("ULT_CAST"), "the message lists the cast events");
     }
 
-    /** Note: A state name this engine does not roll for is refused: a typo would make the counter answer 0 forever. */
+    /**
+     * Note: A state name this engine does not roll for is refused: a typo would make the counter answer 0 forever.
+     */
     @Test
     public void anUnknownStateNameIsRefusedAtLoad() {
         IllegalArgumentException refused = Assertions.assertThrows(IllegalArgumentException.class,
@@ -155,7 +165,9 @@ public class CastAppliedCountTest {
         Assertions.assertTrue(refused.getMessage().contains("冻结"), "the message lists the states it knows");
     }
 
-    /** The DOT spelling counts too, through the same table that maps an element to its state name. */
+    /**
+     * The DOT spelling counts too, through the same table that maps an element to its state name.
+     */
     @Test
     public void theCountAlsoWorksForADotAppliedByTheCast() {
         Character hero = hero();
@@ -190,7 +202,9 @@ public class CastAppliedCountTest {
                 "「终结技每冻结1个目标，为三月七恢复6点能量」 (for every target the Ultimate freezes, March 7th restores 6 Energy) × the 3 enemies her ultimate froze");
     }
 
-    /** ...and her file really states the count, rather than the aim count that would pay the same 18 here. */
+    /**
+     * ...and her file really states the count, rather than the aim count that would pay the same 18 here.
+     */
     @Test
     public void theShippedRuleReadsTheLandedCount() {
         // The context's actor is the character: her cast rules are all gated on `actor == self`, so a context
@@ -230,7 +244,9 @@ public class CastAppliedCountTest {
         return castUltimate(battle);
     }
 
-    /** One cast of March 7th (三月七)'s ultimate data, measured as the energy it granted. */
+    /**
+     * One cast of March 7th (三月七)'s ultimate data, measured as the energy it granted.
+     */
     private static double castUltimate(Battle battle) {
         Character hero = battle.characters.getFirst();
         double before = hero.getCurrentEnergy();
@@ -239,14 +255,18 @@ public class CastAppliedCountTest {
         return hero.getCurrentEnergy() - before;
     }
 
-    /** The shipped Eidolon (星魂) 1 measurement: her real file, her real ultimate, {@code rank} Eidolons active. */
+    /**
+     * The shipped Eidolon (星魂) 1 measurement: her real file, her real ultimate, {@code rank} Eidolons active.
+     */
     private static double shippedUltimateEnergy(int rank) {
         Character hero = CharacterFactory.create(MARCH_7TH, LEVEL, true, null, null, rank);
         Battle battle = ultimateBattle(hero, 3, 0);
         return castUltimate(battle);
     }
 
-    /** A hero whose table is only the two rules under test: freeze everything, then pay per landed freeze. */
+    /**
+     * A hero whose table is only the two rules under test: freeze everything, then pay per landed freeze.
+     */
     private static Character countingHero() {
         Character hero = hero();
         hero.setTriggerTable(new TriggerTable(MARCH_7TH, List.of(
@@ -256,7 +276,9 @@ public class CastAppliedCountTest {
         return hero;
     }
 
-    /** The same cast with the counter rule removed - the control for "what did the counter itself add". */
+    /**
+     * The same cast with the counter rule removed - the control for "what did the counter itself add".
+     */
     private static Character freezeOnlyHero() {
         Character hero = hero();
         hero.setTriggerTable(new TriggerTable(MARCH_7TH, List.of(
@@ -293,7 +315,9 @@ public class CastAppliedCountTest {
         return ultimateBattle(countingHero(), enemies, immune);
     }
 
-    /** The battle shape: {@code enemies} ordinary monsters, {@code immune} of them unfreezable. */
+    /**
+     * The battle shape: {@code enemies} ordinary monsters, {@code immune} of them unfreezable.
+     */
     private static Battle ultimateBattle(Character hero, int enemies, int immune) {
         List<Enemy> monsters = new java.util.ArrayList<>();
         for (int i = 0; i < enemies; i++) {
@@ -310,7 +334,9 @@ public class CastAppliedCountTest {
         return battle;
     }
 
-    /** A {@code GAIN_ENERGY} whose magnitude is "per landed application of this state". */
+    /**
+     * A {@code GAIN_ENERGY} whose magnitude is "per landed application of this state".
+     */
     private static EffectSpec countedEnergy(String state, double perApplication) {
         EffectSpec effect = new EffectSpec();
         TriggerSpecs.set(effect, "op", "GAIN_ENERGY");
@@ -319,11 +345,16 @@ public class CastAppliedCountTest {
         return effect;
     }
 
-    /** A generator that always answers the same value, so "a 100% base chance" really is certain. */
+    /**
+     * A generator that always answers the same value, so "a 100% base chance" really is certain.
+     */
     private static Random fixed(double value) {
         return BattleFixture.alwaysRoll(value);
     }
-    /** Compiles one rule into a table, which is where load-time validation runs. */
+
+    /**
+     * Compiles one rule into a table, which is where load-time validation runs.
+     */
     private static TriggerTable tableOf(TriggerSpec rule) {
         return new TriggerTable(MARCH_7TH, List.of(rule));
     }

@@ -1,15 +1,19 @@
 package com.laosun.aluminium.test.engine;
+
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
 import java.util.List;
 
-/** The extra Ice hits of slot 26's second clause. */
+/**
+ * The extra Ice hits of slot 26's second clause.
+ */
 public class TrueSelfOdeExtraIceTest {
     private static final String COUNTER = "忆灵技的额外一击";
 

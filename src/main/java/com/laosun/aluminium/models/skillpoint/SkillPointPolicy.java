@@ -8,7 +8,7 @@ import com.laosun.aluminium.models.skill.Skill;
  * {@code Battle}.
  *
  * <p><b>Why this interface exists</b> (an architecture decision added after a design review, see <b>F-8</b> of
- * {@code ROADMAP.md} §12.5): skill points are a team-level resource, but their rules keep growing - 
+ * {@code ROADMAP.md} §12.5): skill points are a team-level resource, but their rules keep growing -
  * Bronya's (布洛妮娅) "50% chance to restore 1 point when casting the skill", Sushang's (素裳) "restore 1 point
  * after casting the skill on a broken target", Sparkle's (花火) "max +2", the 4-piece Passerby set "restore 1 point
  * at the start of battle" ...

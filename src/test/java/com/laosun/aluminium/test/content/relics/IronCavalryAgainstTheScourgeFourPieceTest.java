@@ -9,16 +9,15 @@ import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Damage;
 import com.laosun.aluminium.models.DoubleValue;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.utils.RelicFactory;
-import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Random;
 
 /**
  * Relic 119's four-piece: "击破特攻 >=150% 时，造成的击破伤害无视其 10% 防御力；>=250% 时，超击破伤害额外无视 15%".
@@ -30,7 +29,8 @@ public class IronCavalryAgainstTheScourgeFourPieceTest {
     private static final int SET = 119;
     private static final int WEARER = 1205;
     private static final int LEVEL = 80;
-        private Character wearer(boolean aboveThreshold) {
+
+    private Character wearer(boolean aboveThreshold) {
         Character unit = CharacterFactory.create(WEARER, LEVEL, true, null, RelicFactory.suit(SET, 5, 15));
         if (aboveThreshold) {
             unit.getAttribute(AttributeType.BREAKING_EFFECT)

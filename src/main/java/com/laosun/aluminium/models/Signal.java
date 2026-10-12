@@ -43,7 +43,7 @@ public final class Signal implements Comparable<Signal>, Cloneable {
      * <p>Why it is needed: when {@link #nextActionTime} ties, the order of a {@code PriorityQueue} is undefined
      * (it only guarantees the heap top is the smallest element, not the relative order of equal elements). So "which
      * of two equal-speed units acts first" turns into a coin flip, and since
-     * {@link com.laosun.aluminium.Queue#snapshot()} does a stable sort over the heap array - 
+     * {@link com.laosun.aluminium.Queue#snapshot()} does a stable sort over the heap array -
      * <b>the displayed order may not equal the actual acting order</b>.
      *
      * <p>The tie-break semantics: "whoever was enqueued first acts first": {@link #markScheduled()} takes a
@@ -80,7 +80,7 @@ public final class Signal implements Comparable<Signal>, Cloneable {
      * </ul>
      *
      * <p>First-round invariant: {@code nextActionTime - elapsed == remaining} holds when
-     * {@code markFirstRound()} is called (both are {@code 1.5  x  cycleTime()}), and keeps holding from then on - 
+     * {@code markFirstRound()} is called (both are {@code 1.5  x  cycleTime()}), and keeps holding from then on -
      * this is exactly what the E2 fix has to preserve.
      */
     private double remaining = 0;
@@ -97,7 +97,7 @@ public final class Signal implements Comparable<Signal>, Cloneable {
      */
 
     /**
- * A signal that exists to NAME an actor, not to schedule one.
+     * A signal that exists to NAME an actor, not to schedule one.
      *
      * <p>Note: It is deliberately outside the normal constructor: a unit whose speed is 0 has no action value at all, which is exactly the case
      * an inserted action has to cover (the game pins a memosprite's speed to 0 with `SpeedOverride`). Such a signal must NEVER enter the heap --
@@ -109,9 +109,12 @@ public final class Signal implements Comparable<Signal>, Cloneable {
         return signal;
     }
 
-    /** For {@link #inserted(CanHit)} only. */
+    /**
+     * For {@link #inserted(CanHit)} only.
+     */
     private Signal() {
     }
+
     public Signal(CanHit moveable) {
         this.canHit = moveable;
         this.speed = moveable.getAttribute(AttributeType.SPEED).get();
@@ -126,7 +129,7 @@ public final class Signal implements Comparable<Signal>, Cloneable {
      * IT'S IMPORTANT TO CALL WHEN CHANGING SPEED!!!
      */
     /**
- * The signal's owner (; readers: cone 23033's advance judge, and every "行动提前 / 延后" sentence that
+     * The signal's owner (; readers: cone 23033's advance judge, and every "行动提前 / 延后" sentence that
      * has to say WHOSE action value moved). {@code Queue.getTimeRemaining(Signal)} and {@code Queue.getActionLength(Signal)} already
      * take a signal, but until now nothing could tie one back to a unit: {@code canHit} is private and had no accessor.
      */
@@ -227,7 +230,7 @@ public final class Signal implements Comparable<Signal>, Cloneable {
      * {@link #nextActionTime}.
      *
      * <p>{@code remaining} and {@code nextActionTime} are two ledgers of the same state
-     * (see {@code engine.md} §5.6), so changing one of them means the other must be synchronised - 
+     * (see {@code engine.md} §5.6), so changing one of them means the other must be synchronised -
      * this method exists precisely so that callers do not have to guarantee that themselves.
      *
      * <p>The only caller at the moment is {@link com.laosun.aluminium.Queue#grantExtraTurn}:

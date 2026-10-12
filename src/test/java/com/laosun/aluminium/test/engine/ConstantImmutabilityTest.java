@@ -37,7 +37,9 @@ import java.util.Map;
  */
 public class ConstantImmutabilityTest {
 
-    /** A key no table has: removing it changes nothing even when the map is writable. */
+    /**
+     * A key no table has: removing it changes nothing even when the map is writable.
+     */
     private static final int ABSENT_KEY = Integer.MIN_VALUE;
 
     @Test

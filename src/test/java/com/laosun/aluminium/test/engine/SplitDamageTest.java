@@ -2,13 +2,12 @@ package com.laosun.aluminium.test.engine;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
-import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.models.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -31,7 +30,10 @@ import java.util.Random;
 public class SplitDamageTest {
     private static final int WOLF = 1506;
     private static final int ALLY = 1204;
-        /** One enemy takes the stated share whole; two take half each; the total does not move with the enemy count. */
+
+    /**
+     * One enemy takes the stated share whole; two take half each; the total does not move with the enemy count.
+     */
     @Test
     public void theStatedShareIsATotalSplitAmongTheVictims() {
         double alone = perEnemyLoss(1);
@@ -47,7 +49,9 @@ public class SplitDamageTest {
                 "and the TOTAL is what the sentence fixes - it must not grow with the enemy count");
     }
 
-    /** Without the field, every victim takes the full share - which is what makes the field meaningful. */
+    /**
+     * Without the field, every victim takes the full share - which is what makes the field meaningful.
+     */
     @Test
     public void withoutTheFieldEachVictimTakesTheWholeShare() {
         double split = perEnemyLoss(2);
@@ -80,7 +84,9 @@ public class SplitDamageTest {
                 "the divisor is the LIVING victims: a corpse must not take a share that then never lands");
     }
 
-    /** The two combinations that would read two ways, or say nothing, are refused at load. */
+    /**
+     * The two combinations that would read two ways, or say nothing, are refused at load.
+     */
     @Test
     public void theCombinationsThatSayNothingAreRefused() {
         EffectSpec both = box();
@@ -108,7 +114,9 @@ public class SplitDamageTest {
         return perEnemyLoss(enemies, true);
     }
 
-    /** One firing of the hand-built box against {@code enemies} identical enemies, read per enemy. */
+    /**
+     * One firing of the hand-built box against {@code enemies} identical enemies, read per enemy.
+     */
     private static double perEnemyLoss(int enemies, boolean split) {
         Battle battle = battle(enemies, split);
         var roster = battle.enemyUnits();
@@ -142,7 +150,9 @@ public class SplitDamageTest {
         return battle;
     }
 
-    /** 「造成 90% 的虚数属性欢愉伤害，由敌方全体均分」: the box's own damage, split or not. */
+    /**
+     * 「造成 90% 的虚数属性欢愉伤害，由敌方全体均分」: the box's own damage, split or not.
+     */
     private static EffectSpec box() {
         return box(true);
     }

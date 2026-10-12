@@ -1,16 +1,15 @@
 package com.laosun.aluminium.test.engine;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
-import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.skill.Skill;
 import com.laosun.aluminium.models.skill.SkillExecutor;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -31,7 +30,8 @@ public class HighestHpAmongHitsTest {
     private static final int LEVEL = 80;
     private static final int OWNER = 1402;
     private static final int ALLY = 1002;
-        private static EffectSpec speedBoost() {
+
+    private static EffectSpec speedBoost() {
         EffectSpec effect = new EffectSpec();
         TriggerSpecs.set(effect, "op", "MODIFY_ATTR");
         TriggerSpecs.set(effect, "attribute", "SPEED");
@@ -41,7 +41,9 @@ public class HighestHpAmongHitsTest {
         return effect;
     }
 
-    /** A real cast: exactly one of the units the attack connected with is picked, and it is one of them. */
+    /**
+     * A real cast: exactly one of the units the attack connected with is picked, and it is one of them.
+     */
     @Test
     public void oneOfTheUnitsTheAttackHitIsPicked() {
         Character owner = CharacterFactory.create(OWNER, LEVEL);
@@ -74,7 +76,9 @@ public class HighestHpAmongHitsTest {
                 "「被攻击目标中当前生命值最高的目标」 (the target with the highest current HP among those hit)-- ONE of the units the attack hit");
     }
 
-    /** With no instance at all there is no hit set, and the selector says so rather than aiming at nobody. */
+    /**
+     * With no instance at all there is no hit set, and the selector says so rather than aiming at nobody.
+     */
     @Test
     public void anEmptyHitSetIsRefusedLoudly() {
         Character owner = CharacterFactory.create(OWNER, LEVEL);

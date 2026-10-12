@@ -1,7 +1,6 @@
 package com.laosun.aluminium.test.content.memosprites;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.MemospriteSpec;
@@ -11,18 +10,16 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.Camp;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.SkillType;
-import com.laosun.aluminium.models.CanHit;
+import com.laosun.aluminium.models.*;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.DoubleValue;
-import com.laosun.aluminium.models.Signal;
-import com.laosun.aluminium.models.Summon;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.buff.AbstractBuff;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.models.enemy.EnemySkill;
 import com.laosun.aluminium.models.enemy.SummonFactory;
 import com.laosun.aluminium.models.skill.Skill;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -59,9 +56,13 @@ import java.util.Set;
 public class MemospriteAttackTest {
     private static final double EPS = 1e-6;
 
-    /** Evernight (长夜月) - the one shipped memosprite whose document states an attack (memosprite skill 1). */
+    /**
+     * Evernight (长夜月) - the one shipped memosprite whose document states an attack (memosprite skill 1).
+     */
     private static final int CASTORICE_LIKE = 1413;
-    /** Aglaea (阿格莱雅) - used as the summoner for fixture specs; her rule summons only on her ultimate. */
+    /**
+     * Aglaea (阿格莱雅) - used as the summoner for fixture specs; her rule summons only on her ultimate.
+     */
     private static final int AGLAEA = 1402;
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
@@ -71,7 +72,9 @@ public class MemospriteAttackTest {
     // 1. The shipped attack
     // ==================================================================
 
-    /** Evey (长夜) acts with its own memosprite skill 1, and the numbers are that skill's. */
+    /**
+     * Evey (长夜) acts with its own memosprite skill 1, and the numbers are that skill's.
+     */
     @Test
     public void theShippedAttackIsTheMemospriteSkillsOwnNumbers() {
         Character summoner = CharacterFactory.create(CASTORICE_LIKE, LEVEL);
@@ -117,7 +120,9 @@ public class MemospriteAttackTest {
     // 2. What it deals, measured
     // ==================================================================
 
-    /** The attack lands on the monsters - and takes nothing off our own side. */
+    /**
+     * The attack lands on the monsters - and takes nothing off our own side.
+     */
     @Test
     public void theAttackLandsOnTheOpposingCampAndNotOnOurs() {
         Character summoner = CharacterFactory.create(CASTORICE_LIKE, LEVEL);
@@ -177,7 +182,9 @@ public class MemospriteAttackTest {
                 "3 × 20% and 1 × 60% of the same Max HP are the same total");
     }
 
-    /** An AOE attack reaches <b>every</b> monster - the multi-target half of "opposing camp". */
+    /**
+     * An AOE attack reaches <b>every</b> monster - the multi-target half of "opposing camp".
+     */
     @Test
     public void anAoeAttackReachesEveryMonster() {
         Character summoner = CharacterFactory.create(AGLAEA, LEVEL);
@@ -225,7 +232,7 @@ public class MemospriteAttackTest {
     }
 
     /**
-     *  ...and the <b>summoner's</b> own {@code until} buff is <b>not</b> consumed by the memosprite's attack.
+     * ...and the <b>summoner's</b> own {@code until} buff is <b>not</b> consumed by the memosprite's attack.
      *
      * <p>This is the owner test doing its job on a new path. A memosprite's attack is a real attack by a unit of
      * ours, so the whole side hears about it; but "until the wearer's next attack" is about the <em>wearer</em> attacking,
@@ -369,7 +376,9 @@ public class MemospriteAttackTest {
         assertAttackRejected(attackSpec("Ice", "HEALTH", 0.5, 1, "Nonsense"), "does not deal damage");
     }
 
-    /** The spec-taking seam validates too, so a bad spec cannot slip in through the one caller a test uses. */
+    /**
+     * The spec-taking seam validates too, so a bad spec cannot slip in through the one caller a test uses.
+     */
     @Test
     public void theSpecTakingSeamValidatesTheAttackAsWell() {
         Character summoner = CharacterFactory.create(AGLAEA, LEVEL);
@@ -380,7 +389,9 @@ public class MemospriteAttackTest {
         Assertions.assertTrue(refused.getMessage().contains("ATTACK"), refused.getMessage());
     }
 
-    /** The optional block is optional: a panel-only spec is still valid, through the loader and the seam. */
+    /**
+     * The optional block is optional: a panel-only spec is still valid, through the loader and the seam.
+     */
     @Test
     public void aPanelOnlySpecIsStillValid() {
         MemospriteSpec spec = panelOnlySpec();
@@ -394,7 +405,9 @@ public class MemospriteAttackTest {
     // Fixture
     // ==================================================================
 
-    /** What one cast cost each side: the damage dealt, and how much of it came off our own camp. */
+    /**
+     * What one cast cost each side: the damage dealt, and how much of it came off our own camp.
+     */
     private record Cast(double dealt, double ourSideLost) {
     }
 
@@ -471,7 +484,9 @@ public class MemospriteAttackTest {
         return null;                                 // unreachable: fail throws
     }
 
-    /** One memosprite, one monster, one cast - the damage dealt, for comparing two specs. */
+    /**
+     * One memosprite, one monster, one cast - the damage dealt, for comparing two specs.
+     */
     private static double damageFrom(Character summoner, MemospriteSpec spec) {
         Enemy target = monster();
         Battle battle = battleWith(summoner, List.of(target), 7);
@@ -519,7 +534,9 @@ public class MemospriteAttackTest {
         return effect;
     }
 
-    /** The memosprite's/character's own CRIT DMG (spelled {@code CRIT_ATTACK} here) - 0 on a memosprite. */
+    /**
+     * The memosprite's/character's own CRIT DMG (spelled {@code CRIT_ATTACK} here) - 0 on a memosprite.
+     */
     private static double critDamageOf(CanHit unit) {
         return unit.getAttribute(AttributeType.CRIT_ATTACK).get();
     }
@@ -528,7 +545,9 @@ public class MemospriteAttackTest {
         return CharacterFactory.create(CASTORICE_LIKE, LEVEL).getAttribute(AttributeType.CRIT_ATTACK).get();
     }
 
-    /** Puts a fixture memosprite on the field exactly the way {@code Battle.summonMemosprite} does. */
+    /**
+     * Puts a fixture memosprite on the field exactly the way {@code Battle.summonMemosprite} does.
+     */
     private static Summon place(Battle battle, Character master, MemospriteSpec spec) {
         Summon summon = SummonFactory.memosprite(master, spec);
         summon.setMaster(master);

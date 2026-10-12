@@ -7,7 +7,9 @@ import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-/** Light cone 24003, from the shipped file (discipline 232). */
+/**
+ * Light cone 24003, from the shipped file (discipline 232).
+ */
 public class SolitaryHealingTest {
     private static final int WEAPON_ID = 24003;
     private static final int WEARER = 1210;

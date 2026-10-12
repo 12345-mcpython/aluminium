@@ -1,15 +1,15 @@
 package com.laosun.aluminium.test.engine;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -32,10 +32,15 @@ import java.util.Random;
  * ceiling measurable without touching HP.
  */
 public class DotCapTest {
-    /** Himeko: no shipped rule file, so the table under test is the only one. */
+    /**
+     * Himeko: no shipped rule file, so the table under test is the only one.
+     */
     private static final int OWNER = 1003;
     private static final int LEVEL = 80;
-        /** Note: Without a ceiling every application pays, which is what the engine has always done. */
+
+    /**
+     * Note: Without a ceiling every application pays, which is what the engine has always done.
+     */
     @Test
     public void withoutACeilingEveryLayerPays() {
         double one = tickAfter(1, null);
@@ -46,7 +51,9 @@ public class DotCapTest {
                 "three applications of the same state deal three times one layer (DOTs are never evicted)");
     }
 
-    /** Note: With a ceiling, only the first N layers pay - the extra applications add nothing. */
+    /**
+     * Note: With a ceiling, only the first N layers pay - the extra applications add nothing.
+     */
     @Test
     public void pastTheCeilingExtraLayersPayNothing() {
         double one = tickAfter(1, 2);
@@ -58,7 +65,9 @@ public class DotCapTest {
                 "⚠ 「最多叠加 N 层」: five applications still deal exactly two layers' damage (the rest are inert)");
     }
 
-    /** Note: A ceiling has to be a real count; zero or negative is refused when the rule is compiled. */
+    /**
+     * Note: A ceiling has to be a real count; zero or negative is refused when the rule is compiled.
+     */
     @Test
     public void aNonsenseCeilingIsRefused() {
         IllegalArgumentException refused = Assertions.assertThrows(IllegalArgumentException.class,

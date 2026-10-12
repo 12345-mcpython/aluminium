@@ -6,8 +6,8 @@ import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.skill.Skill;
 import com.laosun.aluminium.models.skill.SkillExecutor;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -21,15 +21,19 @@ import java.util.List;
  */
 public class EidolonSixExtendsSoulsteelTest {
     private static final int YANQING = 1209;
-        private static final String STATE = "智剑连心";
+    private static final String STATE = "智剑连心";
 
-    /** At E6 the kill lengthens it by a turn, so it outlives the tick that would have ended it. */
+    /**
+     * At E6 the kill lengthens it by a turn, so it outlives the tick that would have ended it.
+     */
     @Test
     public void atEidolonSixTheKillLengthensIt() {
         Assertions.assertTrue(survivesTheTick(6), "\"extends the duration of all these buffs by 1 turn\" (「使这些增益效果的持续时间全部延长 1 回合」)");
     }
 
-    /** Note: Below E6 the rule is off, so one tick ends it. */
+    /**
+     * Note: Below E6 the rule is off, so one tick ends it.
+     */
     @Test
     public void belowEidolonSixItEnds() {
         Assertions.assertFalse(survivesTheTick(0), "only Eidolon (星魂) 6 has this clause");

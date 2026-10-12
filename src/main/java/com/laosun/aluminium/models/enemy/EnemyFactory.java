@@ -133,7 +133,7 @@ public final class EnemyFactory {
      * Builds the skill an enemy acts with.
      *
      * <p>The skill comes from {@code enemy_skills.json} ({@link Constant#ENEMY_SKILLS}).
-     * That table covers only the few monsters used for the demo; other monsters have no entry - 
+     * That table covers only the few monsters used for the demo; other monsters have no entry -
      * in that case it falls back to a default basic attack: multiplier 1.0, single hit, element
      * taken from the monster's own {@code stance_type}. That way "any monster can hit people" and
      * it will not just stand there doing nothing because there is no data.

@@ -6,8 +6,8 @@ import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Weapon;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -36,14 +36,18 @@ public class SecretLightConeTest {
     private static final int WEARER = 1210;
     private static final int ALLY = 1204;
     private static final int OTHER_ALLY = 1312;
-        private static final int LEVEL = 80;
-    /** The three effects, as the document states them: name, attribute, magnitude. */
+    private static final int LEVEL = 80;
+    /**
+     * The three effects, as the document states them: name, attribute, magnitude.
+     */
     private static final String[] NAMES = {"秘密-攻击力", "秘密-暴击伤害", "秘密-能量恢复"};
     private static final AttributeType[] ATTRS = {
             AttributeType.ATTACK, AttributeType.CRIT_ATTACK, AttributeType.ENERGY_REGENERATION_RATE};
     private static final double[] SHARES = {0.10, 0.12, 0.06};
 
-    /** Over several seeds: one effect at battle start, and every following pick different from the last. */
+    /**
+     * Over several seeds: one effect at battle start, and every following pick different from the last.
+     */
     @Test
     public void theEffectIsReplacedAndNeverRepeatsItself() {
         boolean sawAttack = false;
@@ -76,7 +80,9 @@ public class SecretLightConeTest {
                 "and the first pick is uniform over all three - a pick that never lands on one of them is not a choice");
     }
 
-    /** An unequipped character has none of it: the rules come from the cone. */
+    /**
+     * An unequipped character has none of it: the rules come from the cone.
+     */
     @Test
     public void withoutTheConeNothingIsRaised() {
         Fixture f = fixture(0, false);
@@ -86,7 +92,9 @@ public class SecretLightConeTest {
         Assertions.assertEquals(-1, activeEffect(f), "and none after a turn either");
     }
 
-    /** 「我方全体」: two allies without cones carry the same effect, and it is the same ONE of the three. */
+    /**
+     * 「我方全体」: two allies without cones carry the same effect, and it is the same ONE of the three.
+     */
     @Test
     public void theEffectReachesTheWholeParty() {
         Fixture f = fixture(3, true);
@@ -101,7 +109,9 @@ public class SecretLightConeTest {
     // Helpers
     // ==================================================================
 
-    /** One battle: the wearer (with or without the cone), two plain allies, and the allies' pre-battle readings. */
+    /**
+     * One battle: the wearer (with or without the cone), two plain allies, and the allies' pre-battle readings.
+     */
     private record Fixture(Battle battle, Character wearer, Character ally, double[] baseline,
                            Character otherAlly, double[] otherBaseline) {
         void start() {

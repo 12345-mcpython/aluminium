@@ -6,7 +6,7 @@ import com.laosun.aluminium.models.CanHit;
 /**
  * Heal event: fired once after someone's HP is actually restored.
  *
- * <p>{@code actuallyHealed} is the amount actually restored, not the base healing amount passed in - 
+ * <p>{@code actuallyHealed} is the amount actually restored, not the base healing amount passed in -
  * being healed at full HP is 0, and then it does not fire ("received healing" and "got HP back" are two
  * different things, and healing-type trigger sources care about the latter).
  *

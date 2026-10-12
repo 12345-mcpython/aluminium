@@ -1,19 +1,23 @@
 package com.laosun.aluminium.test.engine;
+
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
-import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.models.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
 import java.util.ArrayList;
 import java.util.List;
 
-/** The parameterised variable `allies_with_path:<PATH>`: how many of my team share a Path. */
+/**
+ * The parameterised variable `allies_with_path:<PATH>`: how many of my team share a Path.
+ */
 public class AlliesWithPathTest {
     private static final int PEARL = 1503;      // Elation
     private static final int YAO_GUANG = 1502;  // Elation, per her panel entry
@@ -30,7 +34,9 @@ public class AlliesWithPathTest {
                 "with Yao Guang alongside her the gate holds and the ATK modifier lands (measured " + two + ")");
     }
 
-    /** Runs a battle and returns the ATK boost from a rule gated on the team's Elation count. */
+    /**
+     * Runs a battle and returns the ATK boost from a rule gated on the team's Elation count.
+     */
     private static double boostWith(boolean withYaoGuang) {
         List<Character> team = new ArrayList<>();
         team.add(CharacterFactory.create(PEARL, 80));

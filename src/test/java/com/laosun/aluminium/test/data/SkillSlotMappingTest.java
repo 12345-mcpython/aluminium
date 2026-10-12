@@ -1,20 +1,17 @@
 package com.laosun.aluminium.test.data;
 
 
-import com.laosun.aluminium.test.engine.EnergyTest;
-import com.laosun.aluminium.test.engine.SkillExecutorTest;
-import com.laosun.aluminium.test.engine.SuperBreakTest;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.skill.DefaultSkill;
 import com.laosun.aluminium.models.DoubleValue;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
+import com.laosun.aluminium.models.skill.DefaultSkill;
 import com.laosun.aluminium.models.skill.Skill;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -38,7 +35,9 @@ import java.util.Map;
 public class SkillSlotMappingTest {
     private static final double EPS = 1e-9;
 
-    /** The slot table itself: 1 basic attack / 2 skill / 3 ultimate / 4 talent / 6 map basic attack / technique (5 does not exist in the data). */
+    /**
+     * The slot table itself: 1 basic attack / 2 skill / 3 ultimate / 4 talent / 6 map basic attack / technique (5 does not exist in the data).
+     */
     @Test
     public void slotTableIsTheSingleSourceOfTruth() {
         Assertions.assertEquals(Map.of(
@@ -109,7 +108,9 @@ public class SkillSlotMappingTest {
                 .getData().getSkillType());
     }
 
-    /** A map skill explicitly installed is not overwritten at battle start (tests / custom scenarios). */
+    /**
+     * A map skill explicitly installed is not overwritten at battle start (tests / custom scenarios).
+     */
     @Test
     public void explicitlyInstalledMapSkillIsNotOverwritten() {
         Character hero = CharacterFactory.create(1204, 80);
@@ -274,7 +275,7 @@ public class SkillSlotMappingTest {
      * entire per-level table, so {@code getFirst()} of course still returns tier 1.
      * I mistook my own wrong row lookup for the engine not looking up a row.
      *
-     * <p>The real call chain: {@code skill.getLevel()} to {@code index = level - 1} to 
+     * <p>The real call chain: {@code skill.getLevel()} to {@code index = level - 1} to
      * {@code levels.get(index)}.
      * For the end-to-end view see {@link #skillLevelScalesActualDamage}.
      */
@@ -331,7 +332,9 @@ public class SkillSlotMappingTest {
                 .getData().getSkills().get(2).getFirst(), EPS, "level 3 → tier 3 = 0.7");
     }
 
-    /** Deals one basic attack at the given skill level, returning the damage dealt to the enemy. */
+    /**
+     * Deals one basic attack at the given skill level, returning the damage dealt to the enemy.
+     */
     private static double damageOfBasicAttack(int level) {
         Character hero = CharacterFactory.create(1204, 80);
         Enemy enemy = EnemyFactory.create(1002011, 90, 1);
@@ -344,7 +347,9 @@ public class SkillSlotMappingTest {
         return 1_000_000 - enemy.getCurrentHp();
     }
 
-    /** Starts a minimal battle (only to trigger {@code startBattle()}'s map-skill attachment). */
+    /**
+     * Starts a minimal battle (only to trigger {@code startBattle()}'s map-skill attachment).
+     */
     private static Battle newBattle(Character hero) {
         Enemy enemy = EnemyFactory.create(1002011, 90, 1);
         Battle battle = new Battle(List.of(hero), List.of(enemy), BattleFixture.seeded());

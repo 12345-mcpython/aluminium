@@ -4,13 +4,16 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
 import java.util.List;
 
-/** Character 1503 (Pearl): Eidolon 2 raises the whole team's 增笑 by 15%. */
+/**
+ * Character 1503 (Pearl): Eidolon 2 raises the whole team's 增笑 by 15%.
+ */
 public class PearlEidolon2AmpTest {
     private static final int PEARL = 1503;
     private static final int ALLY = 1204;
@@ -27,10 +30,12 @@ public class PearlEidolon2AmpTest {
         Assertions.assertEquals(0.15, two, 1e-9, "Eidolon 2 grants 15%");
     }
 
-    /** Returns a NON-Pearl ally's 增笑 at the given Eidolon rank -- "我方全体目标" includes the others. */
+    /**
+     * Returns a NON-Pearl ally's 增笑 at the given Eidolon rank -- "我方全体目标" includes the others.
+     */
     private static double ampAt(int rank) {
         Battle battle = new Battle(List.of(CharacterFactory.create(PEARL, 80, true, null, null, rank),
-                        CharacterFactory.create(ALLY, 80)),
+                CharacterFactory.create(ALLY, 80)),
                 List.of(EnemyFactory.create(1002011, 100, 1)), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();

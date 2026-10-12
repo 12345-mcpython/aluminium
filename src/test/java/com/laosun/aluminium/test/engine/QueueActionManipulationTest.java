@@ -6,10 +6,10 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.models.CanHit;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.DoubleValue;
-import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.models.Signal;
 import com.laosun.aluminium.models.buff.SpeedBoostBuff;
+import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -218,7 +218,7 @@ public class QueueActionManipulationTest {
 
     /**
      * The necessity of the clamp: when a signal that already lies before {@code elapsed} (even
-     * by a single ulp) is advanced by a percentage again, {@code remaining} MUST be maxed to 0 - 
+     * by a single ulp) is advanced by a percentage again, {@code remaining} MUST be maxed to 0 -
      * otherwise the "difference" is negative and the advance would push it further into the past,
      * and {@link Queue#move()} would then wind the global clock backwards.
      *
@@ -229,7 +229,7 @@ public class QueueActionManipulationTest {
      *
      * <p>How it is constructed: take the signal reference out of the heap (the {@code Queue}'s
      * "remaining distance" ledger is only synchronised on move/setTopZero/refreshSpeed, so changing
-     * {@code nextActionTime} directly does not break the logic this test verifies - 
+     * {@code nextActionTime} directly does not break the logic this test verifies -
      * {@code advanceActionByPercent} only reads {@code nextActionTime}).
      */
     @Test
@@ -320,7 +320,9 @@ public class QueueActionManipulationTest {
         Assertions.assertSame(a, q.peekNext(), "so A still acts first");
     }
 
-    /** Applies a real speed change the way the engine does: rewrite the attribute, then reschedule. */
+    /**
+     * Applies a real speed change the way the engine does: rewrite the attribute, then reschedule.
+     */
     private static void slowDown(Queue q, Character target) {
         target.setAttribute(AttributeType.SPEED, new DoubleValue(80));
         q.refreshSpeed(target);
@@ -334,7 +336,9 @@ public class QueueActionManipulationTest {
         return EnemyFactory.create(1002011, 90, 1);
     }
 
-    /** The enemy in the team (Ice Edge (冰锋), 132 speed): first round {@code 10000/132  x  1.5 ~= 113.64}, so it acts before a speed-100 character (150). */
+    /**
+     * The enemy in the team (Ice Edge (冰锋), 132 speed): first round {@code 10000/132  x  1.5 ~= 113.64}, so it acts before a speed-100 character (150).
+     */
     private static CanHit dummyOf(Battle battle) {
         return battle.enemies.getFirst();
     }

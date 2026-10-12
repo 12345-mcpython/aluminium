@@ -5,8 +5,8 @@ import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Summon;
 import com.laosun.aluminium.models.skill.Skill;
 import com.laosun.aluminium.models.skill.SkillExecutor;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -23,7 +23,7 @@ public class OdeOfRomanceEnergyTest {
     private static final int LEVEL = 80;
     private static final int CYRENE = 1415;
     private static final int AGLAEA = 1402;
-        private static final int ODE_OF_ROMANCE = 14;
+    private static final int ODE_OF_ROMANCE = 14;
     private static final double ENERGY = 70.0;
     private static final String STATE = "浪漫";
 

@@ -8,7 +8,6 @@ import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.DoubleValue;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.utils.CharacterFactory;
-import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -43,7 +42,9 @@ public class PearlEidolon6DamageTest {
     private static final int PEARL = 1503;
     private static final int ELATION_ALLY = 1502;
     private static final int HUNTER = 1204;
-        /** The archetype's 欢愉度, the term the sentence borrows. */
+    /**
+     * The archetype's 欢愉度, the term the sentence borrows.
+     */
     private static final double BOOSTED = 1.0;
     private static final double PLAIN = 0.0;
 
@@ -158,7 +159,9 @@ public class PearlEidolon6DamageTest {
         return before - victim.getCurrentHp();
     }
 
-    /** A source that never crits, so the two extra instances' difference is exactly the instance and not a roll order. */
+    /**
+     * A source that never crits, so the two extra instances' difference is exactly the instance and not a roll order.
+     */
     private static final class NoCrit extends Random {
         @Override
         public double nextDouble() {

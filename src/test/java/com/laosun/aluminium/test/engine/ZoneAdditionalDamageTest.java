@@ -6,8 +6,8 @@ import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.skill.Skill;
 import com.laosun.aluminium.models.skill.SkillExecutor;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -26,7 +26,7 @@ public class ZoneAdditionalDamageTest {
     private static final int LEVEL = 80;
     private static final int TRIBBIE = 1403;
     private static final int ATTACKER = 1402;
-        private static final String ZONE = "结界";
+    private static final String ZONE = "结界";
 
     @Test
     public void theZoneAddsExactlyItsOwnInstance() {
@@ -48,7 +48,9 @@ public class ZoneAdditionalDamageTest {
         Assertions.assertTrue(rawAt80 > rawAtLow, "#3 x Max HP runs with level, which is what percent_from_skill_param reads");
     }
 
-    /** `#3  x  Max HP` at a level, read the way the engine reads it -- at the skill level that character actually has. */
+    /**
+     * `#3  x  Max HP` at a level, read the way the engine reads it -- at the skill level that character actually has.
+     */
     private static double rawShare(int level) {
         Character tribbie = CharacterFactory.create(TRIBBIE, level);
         Skill ultra = tribbie.getSkills().get(SkillType.ULTRA);

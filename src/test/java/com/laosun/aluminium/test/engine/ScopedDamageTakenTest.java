@@ -1,7 +1,6 @@
 package com.laosun.aluminium.test.engine;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
@@ -11,9 +10,10 @@ import com.laosun.aluminium.enums.DamageType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Damage;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.buff.VulnerabilityBuff;
 import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -35,14 +35,18 @@ import java.util.Random;
  * " x 1.5 /  x 1.3 on the scoped kind,  x 1.0 on everything else" is what is pinned.
  */
 public class ScopedDamageTakenTest {
-    /** Himeko: no shipped rule file, so the table under test is the only one. */
+    /**
+     * Himeko: no shipped rule file, so the table under test is the only one.
+     */
     private static final int OWNER = 1003;
     private static final int SAMPO = 1108;
     private static final int LEVEL = 80;
     private static final double BASE = 1000;
     private static final double EPS = 1e-6;
 
-    /** Note: A break-scoped vulnerability raises break damage and leaves every other kind alone. */
+    /**
+     * Note: A break-scoped vulnerability raises break damage and leaves every other kind alone.
+     */
     @Test
     public void aScopedVulnerabilityOnlyTouchesItsOwnType() {
         double plainBreak = settle(DamageType.BREAK);
@@ -57,7 +61,9 @@ public class ScopedDamageTakenTest {
                 "⚠ …and an ordinary hit is untouched: that is the whole point of the scope");
     }
 
-    /** Note: 1108's clause is the DOT kind, and DOT ticks are their own {@link DamageType}. */
+    /**
+     * Note: 1108's clause is the DOT kind, and DOT ticks are their own {@link DamageType}.
+     */
     @Test
     public void theDotScopedVulnerabilityMatchesSampoClause() {
         double plainDot = settle(DamageType.DOT);
@@ -72,7 +78,9 @@ public class ScopedDamageTakenTest {
                 "⚠ …and ordinary damage is not: the mirror-image mistake is DOT_DAMAGE_BOOST, which is the dealer's side");
     }
 
-    /** Note: No scope stated still means every type, which is what every earlier file relies on. */
+    /**
+     * Note: No scope stated still means every type, which is what every earlier file relies on.
+     */
     @Test
     public void anUnscopedVulnerabilityStillRaisesEveryType() {
         double plainBreak = settle(DamageType.BREAK);
@@ -85,7 +93,9 @@ public class ScopedDamageTakenTest {
         Assertions.assertEquals(plainBreak * 1.5, settle(enemy, DamageType.BREAK), EPS, "…including break");
     }
 
-    /** Note: A misspelled type is refused when the rule is compiled rather than silently meaning "all kinds". */
+    /**
+     * Note: A misspelled type is refused when the rule is compiled rather than silently meaning "all kinds".
+     */
     @Test
     public void aMisspelledTypeIsRefused() {
         EffectSpec effect = new EffectSpec();
@@ -101,7 +111,9 @@ public class ScopedDamageTakenTest {
         Assertions.assertTrue(refused.getMessage().contains("BREK"), refused.getMessage());
     }
 
-    /** Note: Sampo's file carries the clause - and the fact that it LOADED is itself the spelling check. */
+    /**
+     * Note: Sampo's file carries the clause - and the fact that it LOADED is itself the spelling check.
+     */
     @Test
     public void hisFileCarriesTheRolledDotVulnerability() {
         Assertions.assertEquals(1, TriggerTables.of(SAMPO).ruleCount(TriggerEvent.ULT_CAST),
@@ -109,7 +121,9 @@ public class ScopedDamageTakenTest {
                         + "`damage_type` or `base_chance` would have thrown before this line ran");
     }
 
-    /** Note: A stated chance is really ROLLED: a tiny one against a 0.5 draw leaves the victim with no zone at all. */
+    /**
+     * Note: A stated chance is really ROLLED: a tiny one against a 0.5 draw leaves the victim with no zone at all.
+     */
     @Test
     public void aStatedChanceOnAZoneIsRolled() {
         double plain = settle(DamageType.DOT);

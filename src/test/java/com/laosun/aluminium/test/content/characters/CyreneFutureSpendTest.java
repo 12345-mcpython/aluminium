@@ -1,15 +1,19 @@
 package com.laosun.aluminium.test.content.characters;
+
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Signal;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
 import java.util.List;
 
-/** "持有[未来]的我方目标行动时消耗[未来]使昔涟获得 1 点[追忆]". */
+/**
+ * "持有[未来]的我方目标行动时消耗[未来]使昔涟获得 1 点[追忆]".
+ */
 public class CyreneFutureSpendTest {
     private static final int LEVEL = 80;
     private static final int CYRENE = 1415;

@@ -290,7 +290,7 @@ public class BuffManager {
      * Adds turns to every <b>timed</b> buff on this unit that {@code source} applied <b>and that the rule named</b>,
      * and reports how many.
      *
-     * <p><b>Why the two filters.</b> Every sentence in this family identifies the buff by its <b>origin</b> - 
+     * <p><b>Why the two filters.</b> Every sentence in this family identifies the buff by its <b>origin</b> -
      * "<b>the shield provided by the Skill</b>'s duration is increased by 1 turn" (March 7th's Reinforce (加护)) - and then by <b>what it is</b>: "the
      * <b>damage-increase effect</b> the Skill inflicted on the designated ally's duration is increased by 1 turn" (Bronya's Eidolon (星魂) 6), "the windshear state <b>the talent makes enemy targets enter</b> has its duration extended by 1 turn"
      * (Sampo (桑博)), "for our targets that <b>already have</b> [<b>生息</b>]... extended by 1 turn" (Bailu (白露)). The origin is exact ({@code AbstractBuff.source});
@@ -421,7 +421,9 @@ public class BuffManager {
      * @param element the DOT's element, or {@code null}
      * @return burn (灼烧) / shock (触电) / bleed (裂伤) / windshear (风化), or {@code null}
      */
-    /** The document's name for "韧性被削减至 0" (see {@link #hasState}). */
+    /**
+     * The document's name for "韧性被削减至 0" (see {@link #hasState}).
+     */
     public static final String BROKEN_STATE = "弱点击破";
 
     public static String dotStateName(DamageElement element) {

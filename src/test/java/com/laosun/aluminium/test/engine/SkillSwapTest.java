@@ -1,18 +1,18 @@
 package com.laosun.aluminium.test.engine;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.buff.SkillSwapBuff;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.skill.Skill;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -37,9 +37,11 @@ public class SkillSwapTest {
     private static final int GALLAGHER = 1301;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-        private static final int ENHANCED_ROW = 130108;
+    private static final int ENHANCED_ROW = 130108;
 
-    /** Note: The swap installs a different skill into the slot, and it is that row (the buff says which). */
+    /**
+     * Note: The swap installs a different skill into the slot, and it is that row (the buff says which).
+     */
     @Test
     public void theSwapInstallsTheNamedRow() {
         Fixture f = new Fixture();
@@ -52,7 +54,9 @@ public class SkillSwapTest {
                 "…and it is the row the rule named (130108 for 加拉赫's enhanced attack)");
     }
 
-    /** Note: It is a swap, not a permanent replacement: the buff captured the original and puts it back. */
+    /**
+     * Note: It is a swap, not a permanent replacement: the buff captured the original and puts it back.
+     */
     @Test
     public void endingTheSwapRestoresTheOriginal() {
         Fixture f = new Fixture();
@@ -64,7 +68,9 @@ public class SkillSwapTest {
         Assertions.assertSame(before, f.slot(), "the original skill is back in the slot");
     }
 
-    /** Note: A swap needs a row id: without one the rule is refused instead of silently doing nothing. */
+    /**
+     * Note: A swap needs a row id: without one the rule is refused instead of silently doing nothing.
+     */
     @Test
     public void aMissingRowIdIsRefused() {
         EffectSpec effect = new EffectSpec();
@@ -97,7 +103,9 @@ public class SkillSwapTest {
             return gallagher.getSkills().get(SkillType.COMMON);
         }
 
-        /** Fires a hand-made REPLACE_SKILL rule and returns the buff that landed. */
+        /**
+         * Fires a hand-made REPLACE_SKILL rule and returns the buff that landed.
+         */
         private SkillSwapBuff swap() {
             EffectSpec effect = new EffectSpec();
             TriggerSpecs.set(effect, "op", "REPLACE_SKILL");

@@ -1,14 +1,10 @@
 package com.laosun.aluminium.test.engine;
 
 import com.laosun.aluminium.Battle;
-import com.laosun.aluminium.beans.EffectSpec;
-import com.laosun.aluminium.beans.TriggerSpec;
-import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Summon;
-import com.laosun.aluminium.models.TriggerTable;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -28,7 +24,7 @@ public class InsertedActionTest {
     private static final int LEVEL = 80;
     private static final int CYRENE = 1415;
     private static final int ALLY = 1002;
-        private static final int MEMOSPRITE_SKILL_SLOT = 1;
+    private static final int MEMOSPRITE_SKILL_SLOT = 1;
 
     // Note: A second case (the memosprite's own cast after the insertion) was WITHDRAWN, not asserted around: it fails with
     // "德谬歌 has no SKILL skill, so a CAST_SKILL effect has nothing to read" -- the memosprite keeps its skills by SLOT, and

@@ -4,8 +4,8 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -21,7 +21,10 @@ public class AshveilTest {
     private static final int ASHVEIL = 1504;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-        /** Note: The reaction fires for a teammate's attack on the Bait, and not for her own. */
+
+    /**
+     * Note: The reaction fires for a teammate's attack on the Bait, and not for her own.
+     */
     @Test
     public void theBaitReactionNeedsATeammate() {
         double fromAlly = energyGain(true);
@@ -33,7 +36,9 @@ public class AshveilTest {
                 "「我方**其他**目标攻击后」 (after another one of our targets attacks) -- her own attack must not trigger it");
     }
 
-    /** Note: One layer per firing, and a LOUD refusal once the two declared charges are spent (measured, not assumed). */
+    /**
+     * Note: One layer per firing, and a LOUD refusal once the two declared charges are spent (measured, not assumed).
+     */
     @Test
     public void eachReactionAddsALayerAndNeedsACharge() {
         Character ashveil = CharacterFactory.create(ASHVEIL, LEVEL);
@@ -55,7 +60,9 @@ public class AshveilTest {
                 "the engine refuses to spend a charge she does not have");
     }
 
-    /** Note: The technique's opening: the AoE and one Charge, whose declaration makes the gain real. */
+    /**
+     * Note: The technique's opening: the AoE and one Charge, whose declaration makes the gain real.
+     */
     @Test
     public void theTechniqueHitsAndGrantsCharge() {
         Character ashveil = CharacterFactory.create(ASHVEIL, LEVEL);
@@ -70,7 +77,9 @@ public class AshveilTest {
                 "「对敌方全体造成等同于不死途攻击力100%的雷属性伤害」 (Lightning damage to all enemies equal to 100% of 不死途's ATK)");
     }
 
-    /** The energy gain for a teammate's attack; mode false fires it from Ashveil herself. */
+    /**
+     * The energy gain for a teammate's attack; mode false fires it from Ashveil herself.
+     */
     private static double energyGain(boolean teammate) {
         Character ashveil = CharacterFactory.create(ASHVEIL, LEVEL);
         Character ally = CharacterFactory.create(ALLY, LEVEL);

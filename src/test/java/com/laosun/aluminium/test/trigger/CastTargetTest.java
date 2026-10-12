@@ -1,8 +1,6 @@
 package com.laosun.aluminium.test.trigger;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
@@ -12,9 +10,11 @@ import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.CanHit;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Signal;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.skill.DefaultSkill;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -41,18 +41,26 @@ import java.util.List;
 public class CastTargetTest {
     private static final double EPS = 1e-6;
 
-    /** Bronya (布洛妮娅) - her skill is the first user of "the ally this cast was aimed at". */
+    /**
+     * Bronya (布洛妮娅) - her skill is the first user of "the ally this cast was aimed at".
+     */
     private static final int BRONYA = 1101;
-    /** Guinaifen (桂乃芬) - a plain teammate to aim at. */
+    /**
+     * Guinaifen (桂乃芬) - a plain teammate to aim at.
+     */
     private static final int ALLY = 1210;
-    /** Tingyun (停云) - a second plain teammate, so "aimed at" can be told apart from "also hit". */
+    /**
+     * Tingyun (停云) - a second plain teammate, so "aimed at" can be told apart from "also hit".
+     */
     private static final int OTHER = 1202;
     private static final int LEVEL = 80;
-        // ==================================================================
+    // ==================================================================
     // 1. The aimed unit is the event's subject
     // ==================================================================
 
-    /** Aimed at one teammate, the rule on that teammate fires - and it does not fire for the other one. */
+    /**
+     * Aimed at one teammate, the rule on that teammate fires - and it does not fire for the other one.
+     */
     @Test
     public void theCastCarriesTheUnitItWasAimedAt() {
         Battle battle = party();
@@ -95,7 +103,9 @@ public class CastTargetTest {
     // 2. Bronya's skill, end to end
     // ==================================================================
 
-    /** Aimed at an ally: they act immediately, and Bronya's own place in the turn order is untouched. */
+    /**
+     * Aimed at an ally: they act immediately, and Bronya's own place in the turn order is untouched.
+     */
     @Test
     public void herSkillAdvancesTheAllySheAimedAt() {
         Battle battle = new Battle(List.of(CharacterFactory.create(BRONYA, LEVEL),
@@ -141,7 +151,9 @@ public class CastTargetTest {
     // 3. The authored rules state their numbers
     // ==================================================================
 
-    /** Her skill is two rules, and the only difference between them is the self-cast gate. */
+    /**
+     * Her skill is two rules, and the only difference between them is the self-cast gate.
+     */
     @Test
     public void theAuthoredRulesStateTheirShape() {
         Character bronya = CharacterFactory.create(BRONYA, LEVEL);
@@ -181,7 +193,9 @@ public class CastTargetTest {
     // Fixture
     // ==================================================================
 
-    /** Bronya plus two teammates, each carrying a rule that answers a cast aimed at it. */
+    /**
+     * Bronya plus two teammates, each carrying a rule that answers a cast aimed at it.
+     */
     private static Battle party() {
         Character bronya = CharacterFactory.create(BRONYA, LEVEL);
         Character ally = characterWith(rule("SKILL_CAST", "target == self"));
@@ -189,7 +203,9 @@ public class CastTargetTest {
         return new Battle(List.of(bronya, ally, other), List.of(dummy()), BattleFixture.seeded());
     }
 
-    /** Three characters, the first two carrying a rule that answers "a cast aimed at me". */
+    /**
+     * Three characters, the first two carrying a rule that answers "a cast aimed at me".
+     */
     private static Battle party(int unused) {
         return party();
     }
@@ -200,7 +216,9 @@ public class CastTargetTest {
         return character;
     }
 
-    /** Fires on a cast aimed at <b>me</b>, by someone else, and credits 0.5 damage boost to me. */
+    /**
+     * Fires on a cast aimed at <b>me</b>, by someone else, and credits 0.5 damage boost to me.
+     */
     private static TriggerSpec rule(String event, String targetCondition) {
         EffectSpec effect = new EffectSpec();
         TriggerSpecs.set(effect, "op", "MODIFY_ATTR");
@@ -222,7 +240,9 @@ public class CastTargetTest {
                 .orElseThrow(() -> new AssertionError("no rule conditioned on '" + condition + "'"));
     }
 
-    /** The rule that contains an effect with this op (her file has two rules whose conditions are identical). */
+    /**
+     * The rule that contains an effect with this op (her file has two rules whose conditions are identical).
+     */
     private static TriggerTable.CompiledRule ruleWithEffect(List<TriggerTable.CompiledRule> rules, String op) {
         return rules.stream()
                 .filter(rule -> rule.effects().stream().anyMatch(e -> op.equals(e.getOp())))
@@ -234,7 +254,9 @@ public class CastTargetTest {
         return unit.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
     }
 
-    /** How much action value the unit still has - zero means "acts now". */
+    /**
+     * How much action value the unit still has - zero means "acts now".
+     */
     private static double timeRemaining(Battle battle, CanHit target) {
         for (Signal signal : battle.queue.snapshot()) {
             if (signal.getCanHit() == target) {

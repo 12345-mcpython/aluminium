@@ -5,8 +5,8 @@ import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Weapon;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -23,10 +23,12 @@ public class QuidProQuoEnergyTest {
     private static final int WEARER = 1003;
     private static final int ALLY_LOW = 1002;
     private static final int ALLY_FULL = 1004;
-        private static final int LEVEL = 80;
+    private static final int LEVEL = 80;
     private static final double AMOUNT = 8;
 
-    /** Wears 21021 (superimposition 1), fires one TURN_START, and returns the energy gain of the {wearer, 30% teammate, full teammate}. */
+    /**
+     * Wears 21021 (superimposition 1), fires one TURN_START, and returns the energy gain of the {wearer, 30% teammate, full teammate}.
+     */
     private static double[] gainsAtTurnStart() {
         Character wearer = CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(21021, LEVEL, false, 1));
         Character low = CharacterFactory.create(ALLY_LOW, LEVEL);

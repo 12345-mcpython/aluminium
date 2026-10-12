@@ -1,6 +1,6 @@
 package com.laosun.aluminium.test.trigger;
 
-import com.laosun.aluminium.models.TriggerOperator;
+import com.laosun.aluminium.models.trigger.TriggerOperator;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -25,7 +25,9 @@ import java.util.List;
  */
 public class TriggerOperatorVocabularyTest {
 
-    /** The wired ops, in enum order. Additions here mean the engine gained a capability. */
+    /**
+     * The wired ops, in enum order. Additions here mean the engine gained a capability.
+     */
     private static final List<String> WIRED = List.of(
             "ABSORB_DAMAGE", "ADD_DAMAGE", "ADD_ELEMENTAL_WEAKNESS", "ADD_STACK", "ADVANCE",
             "APPLY_BUFF", "APPLY_CONTROL", "APPLY_DOT", "APPLY_REGEN", "BOOST_DAMAGE",
@@ -39,7 +41,9 @@ public class TriggerOperatorVocabularyTest {
             "SPEND_STEPS", "START_COUNTDOWN", "SUMMON", "SUMMON_SERVANT", "SUPER_BREAK", "TAUNT",
             "TICK_DOT");
 
-    /** Declared in the roadmap, not yet performed. A rule naming one is refused with the reason. */
+    /**
+     * Declared in the roadmap, not yet performed. A rule naming one is refused with the reason.
+     */
     private static final List<String> PLANNED = List.of("REDUCE_TOUGHNESS");
 
     @Test

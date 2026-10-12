@@ -1,13 +1,13 @@
 package com.laosun.aluminium.test.engine;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -23,9 +23,11 @@ import java.util.List;
 public class AhaEndExtraTurnTest {
     private static final int OWNER = 1501;
     private static final int ALLY = 1002;
-        private static final String MOMENT = "阿哈时刻";
+    private static final String MOMENT = "阿哈时刻";
 
-    /** Ending the moment owes her an extra turn. */
+    /**
+     * Ending the moment owes her an extra turn.
+     */
     @Test
     public void endingTheMomentGrantsAnExtraTurn() {
         Character owner = CharacterFactory.create(OWNER, 80);

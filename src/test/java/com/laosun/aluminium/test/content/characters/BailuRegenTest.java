@@ -4,8 +4,8 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -26,7 +26,10 @@ public class BailuRegenTest {
     private static final int BAILU = 1211;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-        /** The fresh branch: allies without [生息] get it. */
+
+    /**
+     * The fresh branch: allies without [生息] get it.
+     */
     @Test
     public void theUltimateGivesRegenerationToThoseWithoutIt() {
         Fixture f = new Fixture();
@@ -37,7 +40,9 @@ public class BailuRegenTest {
         Assertions.assertTrue(f.bailu.getBuffManager().hasState("生息"), "...and 「all of our side」 includes her");
     }
 
-    /** Note: An ally that already has it is <b>extended</b>, not re-applied - the other branch of the same sentence. */
+    /**
+     * Note: An ally that already has it is <b>extended</b>, not re-applied - the other branch of the same sentence.
+     */
     @Test
     public void anAllyThatAlreadyHasItIsExtended() {
         Fixture f = new Fixture();
@@ -54,7 +59,9 @@ public class BailuRegenTest {
                 "「this effect cannot stack」: the second branch EXTENDS the state instead of applying another one");
     }
 
-    /** trace Aquatic Benediction (鳞渊福泽) rides on the state: the bearer takes 10% less while it lasts. */
+    /**
+     * trace Aquatic Benediction (鳞渊福泽) rides on the state: the bearer takes 10% less while it lasts.
+     */
     @Test
     public void theTraceReducesDamageTakenForTheBearers() {
         Fixture f = new Fixture();

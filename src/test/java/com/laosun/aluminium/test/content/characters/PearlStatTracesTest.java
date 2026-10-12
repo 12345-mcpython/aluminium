@@ -3,9 +3,9 @@ package com.laosun.aluminium.test.content.characters;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
-import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.models.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -35,7 +35,7 @@ import java.util.List;
 public class PearlStatTracesTest {
     private static final int PEARL = 1503;
     private static final int ALLY = 1204;
-        private static final int LEVEL = 80;
+    private static final int LEVEL = 80;
     private static final double EPS = 1e-6;
 
     /**
@@ -107,7 +107,9 @@ public class PearlStatTracesTest {
                         + without + " would be " + (0.09 * without) + ")");
     }
 
-    /** Her Speed with the stat-trace clause in place, or with her whole trigger table emptied. */
+    /**
+     * Her Speed with the stat-trace clause in place, or with her whole trigger table emptied.
+     */
     private static double speedOf(boolean withTraces) {
         Character pearl = CharacterFactory.create(PEARL, LEVEL);
         if (!withTraces) {
@@ -120,12 +122,16 @@ public class PearlStatTracesTest {
         return battle.characters.getFirst().getAttribute(AttributeType.SPEED).get();
     }
 
-    /** Her Elation with no rules of hers at all - the part of the panel that does not come from this file. */
+    /**
+     * Her Elation with no rules of hers at all - the part of the panel that does not come from this file.
+     */
     private static double elationOfPearlWithNoRules() {
         return attributeWithNoRules(AttributeType.ELATION_DAMAGE_BOOST);
     }
 
-    /** Her Defence with no rules of hers at all - the base the 22.5% is measured against. */
+    /**
+     * Her Defence with no rules of hers at all - the base the 22.5% is measured against.
+     */
     private static double defenceOfPearlWithNoRules() {
         return attributeWithNoRules(AttributeType.DEFENCE);
     }

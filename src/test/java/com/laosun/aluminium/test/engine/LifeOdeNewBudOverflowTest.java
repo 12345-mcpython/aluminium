@@ -1,16 +1,18 @@
 package com.laosun.aluminium.test.engine;
+
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.skill.SkillExecutor;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
 import java.util.List;
 
 /**
  * 1415's memosprite skill 1, first clause: "对遐蝶施放时，[新蕊]可以溢出至 #3%" (#3 = 2).
- *
+ * <p>
  * Two-sided: after the ode lands on her, filling [新蕊] far past its cap stops at `max + 2% of max`; without the ode the same fill stops at `max`. Both numbers are the
  * engine's: the cap her file declares, and the overflow the sentence widens.
  */
@@ -18,7 +20,7 @@ public class LifeOdeNewBudOverflowTest {
     private static final int LEVEL = 80;
     private static final int CASTORICE = 1407;
     private static final int CYRENE = 1415;
-        private static final int ODE_SLOT = 17;
+    private static final int ODE_SLOT = 17;
     private static final String BUD = "新蕊";
     private static final int MAX = 34000;
     private static final int OVERFLOW = 680;
@@ -32,7 +34,9 @@ public class LifeOdeNewBudOverflowTest {
         Assertions.assertEquals(MAX, without, "and without it there is no overflow to use");
     }
 
-    /** Her [新蕊] after asking for far more than any cap. */
+    /**
+     * Her [新蕊] after asking for far more than any cap.
+     */
     private static int filled(boolean castTheOde) {
         Character cyrene = CharacterFactory.create(CYRENE, LEVEL);
         Character her = CharacterFactory.create(CASTORICE, LEVEL);

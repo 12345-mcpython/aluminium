@@ -1,16 +1,16 @@
 package com.laosun.aluminium.test.engine;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.skill.Skill;
 import com.laosun.aluminium.models.skill.SkillExecutor;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -25,27 +25,33 @@ import java.util.List;
 public class ExtendAllBuffsTest {
     private static final int FIRST = 1002;
     private static final int SECOND = 1003;
-        private static final String MARK = "probe_mark";
+    private static final String MARK = "probe_mark";
 
-    /** `kind: all` lengthens a buff that somebody ELSE applied. */
+    /**
+     * `kind: all` lengthens a buff that somebody ELSE applied.
+     */
     @Test
     public void kindAllLengthensAnotherUnitsBuff() {
         Assertions.assertTrue(survivesTheTicks(ExtendKind.ALL),
                 "\"extends **all** of her own buffs by 1 turn\" (「使自身**所有**增益效果延长 1 回合」) -- the buff came from unit A (甲), and it must still be lengthened");
     }
 
-    /** Note: Naming the buff keeps the shipped origin filter: B (乙) did not apply it, A (甲) did. */
+    /**
+     * Note: Naming the buff keeps the shipped origin filter: B (乙) did not apply it, A (甲) did.
+     */
     @Test
     public void namingTheBuffKeepsTheOriginFilter() {
         Assertions.assertFalse(survivesTheTicks(ExtendKind.BY_NAME),
                 "⚠ the origin filter is the old behaviour: unit B's (乙’s) rule may only lengthen unit B's own buffs");
     }
 
-    private enum ExtendKind { ALL, BY_NAME }
+    private enum ExtendKind {ALL, BY_NAME}
 
     // ==================================================================
 
-    /** builds the scene, extends, takes two ticks, and asks whether A (甲)'s buff is still there. */
+    /**
+     * builds the scene, extends, takes two ticks, and asks whether A (甲)'s buff is still there.
+     */
     private static boolean survivesTheTicks(ExtendKind kind) {
         Character first = CharacterFactory.create(FIRST, 80);
         first.setTriggerTable(new TriggerTable(FIRST, List.of(
@@ -78,7 +84,9 @@ public class ExtendAllBuffsTest {
         return second.getBuffManager().hasState(MARK);
     }
 
-    /** A (甲)'s buff: two turns, put on the OTHER ally. */
+    /**
+     * A (甲)'s buff: two turns, put on the OTHER ally.
+     */
     private static EffectSpec mark() {
         EffectSpec e = new EffectSpec();
         TriggerSpecs.set(e, "op", "APPLY_BUFF");
@@ -88,7 +96,9 @@ public class ExtendAllBuffsTest {
         return e;
     }
 
-    /** B (乙)'s extender: one turn, either "all" (所有) or the shipped name form -- the only difference between the runs. */
+    /**
+     * B (乙)'s extender: one turn, either "all" (所有) or the shipped name form -- the only difference between the runs.
+     */
     private static EffectSpec extend(ExtendKind kind) {
         EffectSpec e = new EffectSpec();
         TriggerSpecs.set(e, "op", "EXTEND_BUFF");

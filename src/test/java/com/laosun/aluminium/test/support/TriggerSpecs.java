@@ -1,7 +1,6 @@
 package com.laosun.aluminium.test.support;
 
 
-import com.laosun.aluminium.test.trigger.RelicTriggerTableTest;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
 
@@ -23,7 +22,9 @@ import java.util.List;
  */
 public final class TriggerSpecs {
 
-    /** The {@code source} string used when a test does not care where the rule came from. */
+    /**
+     * The {@code source} string used when a test does not care where the rule came from.
+     */
     public static final String TEST_SOURCE = "TriggerSpecs (test)";
 
     private TriggerSpecs() {
@@ -46,7 +47,9 @@ public final class TriggerSpecs {
         return spec;
     }
 
-    /** One rule with the default provenance. */
+    /**
+     * One rule with the default provenance.
+     */
     public static TriggerSpec rule(String event, List<String> conditions, EffectSpec... effects) {
         return rule(event, conditions, TEST_SOURCE, effects);
     }
@@ -54,16 +57,16 @@ public final class TriggerSpecs {
     /**
      * A {@code MODIFY_ATTR} effect.
      *
-     * @param attribute  the attribute name as the JSON spells it (e.g. {@code "ATTACK"})
-     * @param percent    the magnitude (negative = debuff)
-     * @param turns      the turn count, or {@code null} when {@code permanent} is used
-     * @param permanent  the {@code permanent} flag, or {@code null} to leave it out
-     * @param maxStacks  the stack cap, or {@code null} to leave it out
-     * @param stacks     the alias spelling of the cap, or {@code null} to leave it out
-     * @param target     the optional {@code target} selector, or {@code null}
+     * @param attribute the attribute name as the JSON spells it (e.g. {@code "ATTACK"})
+     * @param percent   the magnitude (negative = debuff)
+     * @param turns     the turn count, or {@code null} when {@code permanent} is used
+     * @param permanent the {@code permanent} flag, or {@code null} to leave it out
+     * @param maxStacks the stack cap, or {@code null} to leave it out
+     * @param stacks    the alias spelling of the cap, or {@code null} to leave it out
+     * @param target    the optional {@code target} selector, or {@code null}
      */
     public static EffectSpec modifyAttr(String attribute, double percent, Integer turns, Boolean permanent,
-                                 Integer maxStacks, Integer stacks, String target) {
+                                        Integer maxStacks, Integer stacks, String target) {
         EffectSpec effect = new EffectSpec();
         set(effect, "op", "MODIFY_ATTR");
         set(effect, "attribute", attribute);
@@ -76,12 +79,16 @@ public final class TriggerSpecs {
         return effect;
     }
 
-    /** {@code MODIFY_ATTR} with only a turn count. */
+    /**
+     * {@code MODIFY_ATTR} with only a turn count.
+     */
     public static EffectSpec modifyAttr(String attribute, double percent, int turns) {
         return modifyAttr(attribute, percent, turns, null, null, null, null);
     }
 
-    /** An {@code ADVANCE} effect taking a fraction of the target's remaining time. */
+    /**
+     * An {@code ADVANCE} effect taking a fraction of the target's remaining time.
+     */
     public static EffectSpec advance(double percent) {
         EffectSpec effect = new EffectSpec();
         set(effect, "op", "ADVANCE");
@@ -89,7 +96,9 @@ public final class TriggerSpecs {
         return effect;
     }
 
-    /** A {@code GAIN_ENERGY} effect with a flat amount (credited to the owner). */
+    /**
+     * A {@code GAIN_ENERGY} effect with a flat amount (credited to the owner).
+     */
     public static EffectSpec gainEnergy(double amount) {
         EffectSpec effect = new EffectSpec();
         set(effect, "op", "GAIN_ENERGY");
@@ -97,7 +106,9 @@ public final class TriggerSpecs {
         return effect;
     }
 
-    /** A {@code HEAL} effect with a flat amount. */
+    /**
+     * A {@code HEAL} effect with a flat amount.
+     */
     public static EffectSpec heal(double amount, String target) {
         EffectSpec effect = new EffectSpec();
         set(effect, "op", "HEAL");
@@ -135,7 +146,9 @@ public final class TriggerSpecs {
         return effect;
     }
 
-    /** A {@code SPEND_RESOURCE} effect. */
+    /**
+     * A {@code SPEND_RESOURCE} effect.
+     */
     public static EffectSpec spendResource(String resource, int amount) {
         EffectSpec effect = new EffectSpec();
         set(effect, "op", "SPEND_RESOURCE");
@@ -144,7 +157,9 @@ public final class TriggerSpecs {
         return effect;
     }
 
-    /** {@code MODIFY_DAMAGE_TAKEN} with a turn count (positive = vulnerability, negative = damage reduction). */
+    /**
+     * {@code MODIFY_DAMAGE_TAKEN} with a turn count (positive = vulnerability, negative = damage reduction).
+     */
     public static EffectSpec modifyDamageTaken(double percent, int turns) {
         EffectSpec effect = new EffectSpec();
         set(effect, "op", "MODIFY_DAMAGE_TAKEN");
@@ -171,7 +186,9 @@ public final class TriggerSpecs {
         return effect;
     }
 
-    /** {@code TAUNT} for a number of turns. */
+    /**
+     * {@code TAUNT} for a number of turns.
+     */
     public static EffectSpec taunt(int turns) {
         EffectSpec effect = new EffectSpec();
         set(effect, "op", "TAUNT");
@@ -200,15 +217,15 @@ public final class TriggerSpecs {
     /**
      * An {@code APPLY_DOT} effect: "使目标陷入…状态，每回合造成…伤害，持续 N 回合".
      *
-     * @param element  the {@code DamageElement} spelling ({@code "Fire"} to burn), or {@code null} to leave it out
-     * @param amount   a flat per-turn amount, or the constant term of a derived one, or {@code null}
-     * @param scale    {@code "self_attr:<ATTRIBUTE>"} for a value derived from the rule owner, or {@code null}
-     * @param percent  the share of that attribute, or {@code null}
-     * @param turns    how many of the victim's turns it lasts, or {@code null} to leave the field out
-     * @param chance   the base chance (基础概率), or {@code null} for one that always lands
+     * @param element the {@code DamageElement} spelling ({@code "Fire"} to burn), or {@code null} to leave it out
+     * @param amount  a flat per-turn amount, or the constant term of a derived one, or {@code null}
+     * @param scale   {@code "self_attr:<ATTRIBUTE>"} for a value derived from the rule owner, or {@code null}
+     * @param percent the share of that attribute, or {@code null}
+     * @param turns   how many of the victim's turns it lasts, or {@code null} to leave the field out
+     * @param chance  the base chance (基础概率), or {@code null} for one that always lands
      */
     public static EffectSpec dot(String element, Double amount, String scale, Double percent, Integer turns,
-                          Double chance) {
+                                 Double chance) {
         EffectSpec effect = new EffectSpec();
         set(effect, "op", "APPLY_DOT");
         set(effect, "element", element);

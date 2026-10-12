@@ -1,6 +1,7 @@
 package com.laosun.aluminium.beans;
 
 import com.google.gson.annotations.SerializedName;
+import com.laosun.aluminium.models.trigger.TriggerTable;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -43,7 +44,7 @@ public class TriggerSpec {
 
     /**
      * Conditions that must all hold, in the small DSL understood by
-     * {@link com.laosun.aluminium.models.TriggerTable}. An empty or absent list means
+     * {@link TriggerTable}. An empty or absent list means
      * "always".
      */
     @SerializedName("when")
@@ -106,7 +107,7 @@ public class TriggerSpec {
 
     /**
      * Whose firings {@link #perTurn} and {@link #cooldown} count, when it is not the rule owner - the count-and-reset
- * family counts on the marked TARGET, on the TRIGGERER, or per UNIT.
+     * family counts on the marked TARGET, on the TRIGGERER, or per UNIT.
      * One of {@code self} / {@code target} / {@code actor}; absent means the owner, which is what every
      * shipped rule already does, so omitting it changes nothing.
      */
@@ -134,7 +135,7 @@ public class TriggerSpec {
      * the next one. Cumulative with the other caps (they are all upper bounds).
      */
     /**
- * [WAVE-LIMITED] at most one firing per WAVE.
+     * [WAVE-LIMITED] at most one firing per WAVE.
      *
      * <p><b>Why neither neighbour can say it.</b> {@code per_turn} counts one unit's turns and {@code once_per_battle} covers the
      * whole fight; a wave is neither. So it gets the treatment {@code once_per_attack} got: a SEQUENCE comparison, which needs no
@@ -143,10 +144,13 @@ public class TriggerSpec {
     @SerializedName("once_per_wave")
     private Boolean oncePerWave;
 
-    /** The per-wave cap, as the engine reads it. Written out because the builder reads this exact name. */
+    /**
+     * The per-wave cap, as the engine reads it. Written out because the builder reads this exact name.
+     */
     public Boolean getOncePerWave() {
         return oncePerWave;
     }
+
     @SerializedName("once_per_attack")
     private Boolean oncePerAttack;
 
@@ -167,7 +171,7 @@ public class TriggerSpec {
      * cooldown nor a once-per-battle flag is started, because nothing happened.
      *
      * <p>A fraction of 1, and it must be strictly positive: {@code chance: 1} is legal and simply means "always"
-     * (it does not even consume a draw), while {@code chance: 0} would be a rule that can never do anything - 
+     * (it does not even consume a draw), while {@code chance: 0} would be a rule that can never do anything -
      * a mistake, not a way to spell "off".
      */
     @SerializedName("chance")
@@ -241,7 +245,9 @@ public class TriggerSpec {
     @SerializedName("one_of")
     private Boolean oneOf;
 
-    /** Whether this rule executes one of its effects at random; see the field. */
+    /**
+     * Whether this rule executes one of its effects at random; see the field.
+     */
     public Boolean getOneOf() {
         return oneOf;
     }

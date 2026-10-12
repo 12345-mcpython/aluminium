@@ -1,27 +1,21 @@
 package com.laosun.aluminium.test.content.memosprites;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
-import com.laosun.aluminium.enums.AttributeType;
-import com.laosun.aluminium.enums.Camp;
-import com.laosun.aluminium.enums.DamageElement;
-import com.laosun.aluminium.enums.SkillEffectType;
-import com.laosun.aluminium.enums.SkillType;
-import com.laosun.aluminium.enums.TriggerEvent;
+import com.laosun.aluminium.enums.*;
 import com.laosun.aluminium.models.CanHit;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Damage;
-import com.laosun.aluminium.models.DoubleValue;
 import com.laosun.aluminium.models.Summon;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.models.enemy.EnemySkill;
 import com.laosun.aluminium.models.skill.DefaultSkill;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -50,10 +44,14 @@ import java.util.List;
 public class PlayerSideSummonTest {
     private static final double EPS = 1e-6;
 
-    /** Our hero, and the master of the summon. */
+    /**
+     * Our hero, and the master of the summon.
+     */
     private static final int HERO = 1003;
     private static final int LEVEL = 80;
-    /** Silvermane Soldier (银鬃近卫) - a monster id used as the friendly summon's data. */
+    /**
+     * Silvermane Soldier (银鬃近卫) - a monster id used as the friendly summon's data.
+     */
     private static final int MINION = 1002040;
     private static final int GROUP = 1;
 
@@ -61,7 +59,9 @@ public class PlayerSideSummonTest {
     // 1. The roster split
     // ==================================================================
 
-    /** It joins our camp and the action bar, and it is NOT one of our characters. */
+    /**
+     * It joins our camp and the action bar, and it is NOT one of our characters.
+     */
     @Test
     public void aFriendlySummonJoinsOurCampAndNotOurCharacters() {
         Fixture f = fixture();
@@ -74,7 +74,9 @@ public class PlayerSideSummonTest {
         Assertions.assertEquals(1, f.battle.enemies.size(), "and nothing leaked into the enemy camp");
     }
 
-    /** Our own attacks look at the enemy camp, so a friendly summon is not a legal target for us. */
+    /**
+     * Our own attacks look at the enemy camp, so a friendly summon is not a legal target for us.
+     */
     @Test
     public void ourOwnAttacksCannotTargetIt() {
         Fixture f = fixture();
@@ -84,7 +86,9 @@ public class PlayerSideSummonTest {
         Assertions.assertFalse(f.battle.targetableEnemies().contains(f.summon));
     }
 
-    /** It takes its turn: it is on the action bar with a signal of its own. */
+    /**
+     * It takes its turn: it is on the action bar with a signal of its own.
+     */
     @Test
     public void itTakesItsTurnOnTheActionBar() {
         Fixture f = fixture();
@@ -98,7 +102,9 @@ public class PlayerSideSummonTest {
     // 2. The camp-level sites, one each (this is the compiler's stand-in)
     // ==================================================================
 
-    /** {@code getOpponents}: an enemy asking "who is on the other side" must see the whole camp. */
+    /**
+     * {@code getOpponents}: an enemy asking "who is on the other side" must see the whole camp.
+     */
     @Test
     public void anEnemySeesTheSummonAsAnOpponent() {
         Fixture f = fixture();
@@ -130,7 +136,9 @@ public class PlayerSideSummonTest {
                 "and so did the summon: an AOE iterates the camp, not the characters");
     }
 
-    /** {@code all_allies}: a party-wide buff reaches the summon. */
+    /**
+     * {@code all_allies}: a party-wide buff reaches the summon.
+     */
     @Test
     public void aPartyWideBuffReachesTheSummon() {
         Fixture f = fixture();
@@ -186,7 +194,9 @@ public class PlayerSideSummonTest {
     // 3. Lifecycle and outcome
     // ==================================================================
 
-    /** The master falling takes the friendly summon with it - the orphan sweep must cover our camp too. */
+    /**
+     * The master falling takes the friendly summon with it - the orphan sweep must cover our camp too.
+     */
     @Test
     public void theMasterFallingTakesTheFriendlySummonAlong() {
         Fixture f = fixture();
@@ -202,7 +212,9 @@ public class PlayerSideSummonTest {
         Assertions.assertFalse(f.battle.queue.snapshot().stream().anyMatch(s -> s.getCanHit() == f.summon));
     }
 
-    /** Our side being wiped out is a loss, and the summon does not keep the battle alive. */
+    /**
+     * Our side being wiped out is a loss, and the summon does not keep the battle alive.
+     */
     @Test
     public void losingAllOurCharactersLosesTheBattle() {
         Fixture f = fixture();
@@ -220,7 +232,7 @@ public class PlayerSideSummonTest {
      *
      * <p>Note: This is the only case that can tell the two readings apart, and it needs a <b>masterless</b>
      * summon to do it. With a summon that follows its master (the ordinary kind), "all characters are down"
-     * and "the whole camp is down" are the same state, because the master's death took the summon with it - 
+     * and "the whole camp is down" are the same state, because the master's death took the summon with it -
      * so a case built on one would pass under either reading and prove nothing. A hand-built summon with no
      * master (which {@code Summon} allows: the link is optional by design) survives the wipe, and then the
      * question "is this battle lost" has two answers depending on which list the check reads.
@@ -266,7 +278,9 @@ public class PlayerSideSummonTest {
                 "and it is not an enemy, so the enemy side really is wiped out");
     }
 
-    /** A master with no camp roster is refused rather than guessed at. */
+    /**
+     * A master with no camp roster is refused rather than guessed at.
+     */
     @Test
     public void aNeutralMasterIsRefused() {
         Fixture f = fixture();
@@ -310,7 +324,9 @@ public class PlayerSideSummonTest {
         return new Fixture(battle, hero, monster, summon);
     }
 
-    /** {@code BATTLE_START} -> +10% ATK for "all of our side". */
+    /**
+     * {@code BATTLE_START} -> +10% ATK for "all of our side".
+     */
     private static TriggerSpec partyAttackRule() {
         EffectSpec effect = new EffectSpec();
         TriggerSpecs.set(effect, "op", "MODIFY_ATTR");

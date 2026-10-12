@@ -9,8 +9,8 @@ import com.laosun.aluminium.models.Damage;
 import com.laosun.aluminium.models.Signal;
 import com.laosun.aluminium.models.Weapon;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -24,7 +24,8 @@ import java.util.List;
 public class MutualDemiseTest {
     private static final int WEARER = 1001;
     private static final int LEVEL = 80;
-        @Test
+
+    @Test
     public void theConeRaisesCritChanceOnlyBelowTheThreshold() {
         double healthy = gain(0.0);
         double hurt = gain(0.8);

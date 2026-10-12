@@ -5,8 +5,8 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -19,7 +19,10 @@ import java.util.Random;
 public class YanqingTest {
     private static final int YANQING = 1209;
     private static final int LEVEL = 80;
-        /** Note: The Skill applies the state AND its two modifiers, all on himself, all for the document's one turn. */
+
+    /**
+     * Note: The Skill applies the state AND its two modifiers, all on himself, all for the document's one turn.
+     */
     @Test
     public void theSkillSyncsAndRaisesBothCritStats() {
         Character yanqing = CharacterFactory.create(YANQING, LEVEL);
@@ -39,7 +42,9 @@ public class YanqingTest {
                 "「和30%暴击伤害」 (and 30% CRIT DMG)");
     }
 
-    /** Note: The Ultimate's conditional half: +50% CRIT DMG ONLY while the state is up. */
+    /**
+     * Note: The Ultimate's conditional half: +50% CRIT DMG ONLY while the state is up.
+     */
     @Test
     public void theUltimateAddsCritDamageOnlyWhileSynced() {
         double synced = ultCritDamageGain(true);
@@ -51,7 +56,9 @@ public class YanqingTest {
                 "without the state the extra 50% must not be granted");
     }
 
-    /** Note: A 60% chance, pinned from both sides by the fixture: 0.0 always fires, 1.0 never does. */
+    /**
+     * Note: A 60% chance, pinned from both sides by the fixture: 0.0 always fires, 1.0 never does.
+     */
     @Test
     public void theFollowUpChanceIsPinnedByTwoFixtures() {
         double always = followUpLoss(0.0);
@@ -63,7 +70,9 @@ public class YanqingTest {
                 "a 1.0 roll is not below 0.6, so it must not fire -- which is what makes this a test of the CHANCE and not of the damage");
     }
 
-    /** The Ultimate's CRIT DMG gain, with the state applied first when asked. */
+    /**
+     * The Ultimate's CRIT DMG gain, with the state applied first when asked.
+     */
     private static double ultCritDamageGain(boolean synced) {
         Character yanqing = CharacterFactory.create(YANQING, LEVEL);
         Enemy enemy = BattleFixture.monster();
@@ -78,7 +87,9 @@ public class YanqingTest {
         return yanqing.getAttribute(AttributeType.CRIT_ATTACK).get() - before;
     }
 
-    /** The damage the follow-up deals on one attack, under a chosen roll. */
+    /**
+     * The damage the follow-up deals on one attack, under a chosen roll.
+     */
     private static double followUpLoss(double roll) {
         Character yanqing = CharacterFactory.create(YANQING, LEVEL);
         Enemy enemy = BattleFixture.monster();

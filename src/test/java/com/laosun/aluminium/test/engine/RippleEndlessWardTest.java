@@ -1,15 +1,19 @@
 package com.laosun.aluminium.test.engine;
+
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
 import java.util.List;
 
-/** "展开战技的结界并使其没有持续时间". */
+/**
+ * "展开战技的结界并使其没有持续时间".
+ */
 public class RippleEndlessWardTest {
     private static final String WARD = "结界";
 
@@ -23,7 +27,9 @@ public class RippleEndlessWardTest {
         Assertions.assertEquals(0, viaUltimate, "her ultimate makes it permanent, and permanents are skipped");
     }
 
-    /** How many of her buffs a one-turn lengthening finds -- the ward counts only while it is timed. */
+    /**
+     * How many of her buffs a one-turn lengthening finds -- the ward counts only while it is timed.
+     */
     private static int lengthenable(boolean thenTheUltimate) {
         Character cyrene = CharacterFactory.create(1415, 80);
         Battle battle = new Battle(List.of(cyrene), List.of(EnemyFactory.create(1002011, 100, 1)), BattleFixture.seeded());

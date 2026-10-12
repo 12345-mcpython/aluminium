@@ -4,7 +4,6 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.Weapon;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
@@ -33,7 +32,9 @@ public class ContentWeaknessClausesTest {
         return (Enemy) battle.getOpponents(battle.characters.getFirst()).getFirst();
     }
 
-    /** Whether light cone 23050 is equipped or nothing is, neither affects these four - they are the character's own rules. */
+    /**
+     * Whether light cone 23050 is equipped or nothing is, neither affects these four - they are the character's own rules.
+     */
     private static Battle battleWith(Character wearer) {
         Enemy enemy = BattleFixture.monster();
         Battle battle = BattleFixture.battle(List.of(wearer), List.of(enemy));

@@ -3,7 +3,7 @@ package com.laosun.aluminium.data;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.laosun.aluminium.beans.TriggerSpec;
-import com.laosun.aluminium.models.TriggerTable;
+import com.laosun.aluminium.models.trigger.TriggerTable;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -35,7 +35,9 @@ public final class WeaponTriggerTables {
     private WeaponTriggerTables() {
     }
 
-    /** Whether this light cone has a rule file at all (most do not, yet). */
+    /**
+     * Whether this light cone has a rule file at all (most do not, yet).
+     */
     public static boolean has(int weaponId) {
         return WeaponTriggerTables.class.getResource(pathFor(weaponId)) != null;
     }
@@ -88,7 +90,8 @@ public final class WeaponTriggerTables {
     }
 
     private static final java.lang.reflect.Type RESOURCE_LIST =
-            new com.google.gson.reflect.TypeToken<List<com.laosun.aluminium.beans.ResourceSpec>>() { }.getType();
+            new com.google.gson.reflect.TypeToken<List<com.laosun.aluminium.beans.ResourceSpec>>() {
+            }.getType();
 
     private static List<TriggerSpec> read(int weaponId, int rank) {
         Map<String, com.google.gson.JsonElement> file = parse(weaponId);

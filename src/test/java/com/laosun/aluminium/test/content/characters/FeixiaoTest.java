@@ -1,14 +1,12 @@
 package com.laosun.aluminium.test.content.characters;
 
 import com.laosun.aluminium.Battle;
-import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -22,7 +20,10 @@ public class FeixiaoTest {
     private static final int FEIXIAO = 1220;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-        /** Note: The follow-up needs a TEAMMATE, and `per_turn: 1` caps it: the second firing in a turn does nothing. */
+
+    /**
+     * Note: The follow-up needs a TEAMMATE, and `per_turn: 1` caps it: the second firing in a turn does nothing.
+     */
     @Test
     public void theFollowUpNeedsATeammateAndFiresOncePerTurn() {
         double first = followUpLoss(true, 1);
@@ -36,7 +37,9 @@ public class FeixiaoTest {
                 "「当飞霄的队友对敌方目标施放攻击后」 (after Feixiao's ally casts an attack on an enemy target) -- her OWN attack must not draw it");
     }
 
-    /** Note: The boost the same trigger grants her: 60% for two turns. */
+    /**
+     * Note: The boost the same trigger grants her: 60% for two turns.
+     */
     @Test
     public void theTriggerAlsoBoostsHerself() {
         Character feixiao = CharacterFactory.create(FEIXIAO, LEVEL);
@@ -52,7 +55,9 @@ public class FeixiaoTest {
                 "「发动此攻击时使自身造成的伤害提高60%」 (this attack raises her own DMG dealt by 60%)");
     }
 
-    /** Fires `times` teammate attacks and returns the total damage they drew; `byTeammate` false means Feixiao herself attacks. */
+    /**
+     * Fires `times` teammate attacks and returns the total damage they drew; `byTeammate` false means Feixiao herself attacks.
+     */
     private static double followUpLoss(boolean byTeammate, int times) {
         Character feixiao = CharacterFactory.create(FEIXIAO, LEVEL);
         Character ally = CharacterFactory.create(ALLY, LEVEL);

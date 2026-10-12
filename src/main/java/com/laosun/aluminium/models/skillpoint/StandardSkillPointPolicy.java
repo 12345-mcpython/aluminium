@@ -97,7 +97,7 @@ public class StandardSkillPointPolicy implements SkillPointPolicy {
          * Actually spent {@code amount} points ({@code > 0}).
          */
         /**
- * A spend, WITH the unit that spent (战技点",
+         * A spend, WITH the unit that spent (战技点",
          * "any character on our side accumulates >= 4 skill points spent within its own turn").
          *
          * <p>The spender was always known one frame up -- {@code onSkillCast(CanHit user, Skill skill)} is where the

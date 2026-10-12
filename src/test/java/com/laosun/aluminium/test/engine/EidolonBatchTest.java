@@ -6,17 +6,20 @@ import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Signal;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-/** Eidolon clauses "施放X后，<attr>提高N%，持续M回合", values verified against `eidolons.json`, expectations split by attribute kind. */
+/**
+ * Eidolon clauses "施放X后，<attr>提高N%，持续M回合", values verified against `eidolons.json`, expectations split by attribute kind.
+ */
 public class EidolonBatchTest {
     private static final int LEVEL = 80;
-        @Test
+
+    @Test
     public void character1214Eidolon4GivesBREAKING_EFFECT() {
         Assertions.assertEquals(0.4, gain(1214, TriggerEvent.ULT_CAST, AttributeType.BREAKING_EFFECT, false), 1e-6, "the data's own value");
     }

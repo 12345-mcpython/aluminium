@@ -1,15 +1,19 @@
 package com.laosun.aluminium.test.content.characters;
+
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
 import java.util.List;
 
-/** F-9: Firefly's talent raises energy TO 50% at battle start -- a floor, not a gain. */
+/**
+ * F-9: Firefly's talent raises energy TO 50% at battle start -- a floor, not a gain.
+ */
 public class FireflyEnergyFloorTest {
 
     @Test
@@ -30,7 +34,9 @@ public class FireflyEnergyFloorTest {
         Assertions.assertEquals(0.8 * max, high, 1e-6, "from above the floor, energy is left exactly as it was");
     }
 
-    /** Sets energy, fires the battle-start trigger again, and reports where it ended up. */
+    /**
+     * Sets energy, fires the battle-start trigger again, and reports where it ended up.
+     */
     private static double energyAfterTrigger(Battle battle, Character firefly, double start) {
         firefly.setCurrentEnergy(start);
         battle.fireTriggers(TriggerEvent.BATTLE_START, firefly, null, 0, 0);

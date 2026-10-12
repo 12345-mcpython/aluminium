@@ -7,7 +7,7 @@ import com.laosun.aluminium.models.CanHit;
  * Advances a battle until a named unit has <b>had one turn</b> - begun and finished.
  *
  * <p><b>Why this is a shared helper.</b> Three suites need the same moment: a buff's duration is ticked and a
- * per-turn firing limit is cleared at the start of its carrier's turn ({@code Battle.beforeMove} to 
+ * per-turn firing limit is cleared at the start of its carrier's turn ({@code Battle.beforeMove} to
  * {@code BuffManager} tick / {@code CanHit.tickTriggerCooldowns}), so "how many of its own turns has this
  * lasted" and "does the counter come back next turn" are both measured by driving real turns. A second copy of
  * this loop is how the two measurements drift apart.

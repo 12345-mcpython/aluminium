@@ -8,8 +8,8 @@ import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Damage;
 import com.laosun.aluminium.models.Weapon;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -22,7 +22,8 @@ import java.util.List;
 public class LandauSChoiceSemanticsTest {
     private static final int WEARER = 1001;
     private static final int LEVEL = 80;
-        @Test
+
+    @Test
     public void theAggroClauseDoublesTheWeightAndTheReductionMatchesTheTier() {
         double[] withCone = state(true);
         double[] without = state(false);
@@ -39,7 +40,9 @@ public class LandauSChoiceSemanticsTest {
         Assertions.assertTrue(reduction > 0, "the cone does reduce damage taken: " + reduction);
     }
 
-    /** Returns {aggroOf, damageTaken, AGGRO_ADDED_RATIO}. */
+    /**
+     * Returns {aggroOf, damageTaken, AGGRO_ADDED_RATIO}.
+     */
     private static double[] state(boolean withCone) {
         Character unit = CharacterFactory.create(WEARER, LEVEL, true,
                 withCone ? Weapon.build(21009, LEVEL, false, 5) : null);
@@ -50,6 +53,6 @@ public class LandauSChoiceSemanticsTest {
         double ratio = unit.getAttribute(AttributeType.AGGRO_ADDED_RATIO).get();
         double before = unit.getCurrentHp();
         battle.applyDamage(unit, new Damage(enemy, unit, DamageElement.PHYSICAL, DamageType.NORMAL, 1000));
-        return new double[] {aggro, before - unit.getCurrentHp(), ratio};
+        return new double[]{aggro, before - unit.getCurrentHp(), ratio};
     }
 }

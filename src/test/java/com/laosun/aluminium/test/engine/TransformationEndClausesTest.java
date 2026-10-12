@@ -6,8 +6,8 @@ import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.skill.Skill;
 import com.laosun.aluminium.models.skill.SkillExecutor;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -22,10 +22,12 @@ import java.util.List;
 public class TransformationEndClausesTest {
     private static final int OWNER = 1408;
     private static final int ALLY = 1002;
-        private static final String STATE = "变身";
+    private static final String STATE = "变身";
     private static final String SEEDS = "火种";
 
-    /** "变身结束时，使我方全体速度提高 15%，持续 1 回合" -- and "我方全体" is read on two units, not one. */
+    /**
+     * "变身结束时，使我方全体速度提高 15%，持续 1 回合" -- and "我方全体" is read on two units, not one.
+     */
     @Test
     public void theEndSpeedsTheWholeParty() {
         Character owner = CharacterFactory.create(OWNER, 80, false, null, null, 0);
@@ -59,7 +61,9 @@ public class TransformationEndClausesTest {
                 "all allies (「我方全体」) -- and on the ally, which is what \"all\" (全体) means");
     }
 
-    /** "变身结束时，获得 3 点[火种]". */
+    /**
+     * "变身结束时，获得 3 点[火种]".
+     */
     @Test
     public void theEndGrantsThreeSeeds() {
         Character owner = CharacterFactory.create(OWNER, 80, false, null, null, 0);

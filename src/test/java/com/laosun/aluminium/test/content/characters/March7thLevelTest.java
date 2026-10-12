@@ -4,8 +4,8 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -30,7 +30,10 @@ public class March7thLevelTest {
     private static final int MARCH = 1001;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-        /** The document's level for her talent, stated by the file instead of by a per-effect pin. */
+
+    /**
+     * The document's level for her talent, stated by the file instead of by a per-effect pin.
+     */
     @Test
     public void herTalentIsReadAtTheDocumentsLevel() {
         Character march = CharacterFactory.create(MARCH, LEVEL, true, null, null, 0);
@@ -42,7 +45,9 @@ public class March7thLevelTest {
                 "…so every effect that reads her talent indexes row 10");
     }
 
-    /** Eidolon 3 raises the ultimate and the basic attack - and nothing else. */
+    /**
+     * Eidolon 3 raises the ultimate and the basic attack - and nothing else.
+     */
     @Test
     public void starRailThreeRaisesTheUltimateAndTheBasicAttack() {
         Character march = CharacterFactory.create(MARCH, LEVEL, true, null, null, 2);
@@ -56,7 +61,9 @@ public class March7thLevelTest {
         Assertions.assertEquals(0, atThree.skillLevelBonus(SkillType.SKILL), "…and Eidolon (星魂) 5 has not landed yet");
     }
 
-    /** Eidolon 5 raises the skill and the talent; the talent's raise sits <b>on top of</b> the base level. */
+    /**
+     * Eidolon 5 raises the skill and the talent; the talent's raise sits <b>on top of</b> the base level.
+     */
     @Test
     public void starRailFiveRaisesTheSkillAndTheTalent() {
         Character march = CharacterFactory.create(MARCH, LEVEL, true, null, null, 5);

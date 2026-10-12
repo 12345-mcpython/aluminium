@@ -1,15 +1,15 @@
 package com.laosun.aluminium.test.trigger;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -31,7 +31,9 @@ import java.util.List;
  * that restores 8% of <i>each ally's own</i> Max HP is not one number.
  */
 public class TriggerScaledHealTest {
-    /** Himeko: no shipped rule file, so the table under test is the only one. */
+    /**
+     * Himeko: no shipped rule file, so the table under test is the only one.
+     */
     private static final int OWNER = 1003;
     private static final int ALLY = 1202;
     private static final int LEVEL = 80;
@@ -95,7 +97,9 @@ public class TriggerScaledHealTest {
         Assertions.assertEquals(owner.getMaxHp() * 0.1, owner.getShield(), EPS);
     }
 
-    /** The flat spelling still works, unchanged. */
+    /**
+     * The flat spelling still works, unchanged.
+     */
     @Test
     public void aFlatAmountStillMeansAFlatAmount() {
         Battle battle = battleWith(flatHealRule(500));

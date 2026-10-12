@@ -6,8 +6,8 @@ import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.skill.Skill;
 import com.laosun.aluminium.models.skill.SkillExecutor;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -22,9 +22,11 @@ import java.util.List;
 public class LethalHitTest {
     private static final int PHAINON = 1408;
     private static final int JINGLIU = 1104;
-        private static final String STATE = "变身";
+    private static final String STATE = "变身";
 
-    /** 1408: transformed, a lethal blow leaves her standing at a fifth of her (raised) Max HP. */
+    /**
+     * 1408: transformed, a lethal blow leaves her standing at a fifth of her (raised) Max HP.
+     */
     @Test
     public void theTransformedFormSurvivesALethalBlow() {
         Character her = survivor(PHAINON, true);
@@ -33,14 +35,18 @@ public class LethalHitTest {
                 "\"instead restores HP equal to 20% of her own Max HP\" (「而是回复等同于自身生命上限 20% 的生命值」)");
     }
 
-    /** Note: 1408 untransformed: the same blow kills her. */
+    /**
+     * Note: 1408 untransformed: the same blow kills her.
+     */
     @Test
     public void withoutTheTransformationTheBlowKills() {
         Assertions.assertTrue(survivor(PHAINON, false).isDeath(),
                 "「变身期间」 (during the transformation)-- outside it the clause does not apply");
     }
 
-    /** 1104: her trace saves her once -- at half of Max HP -- and the SECOND lethal blow kills her. */
+    /**
+     * 1104: her trace saves her once -- at half of Max HP -- and the SECOND lethal blow kills her.
+     */
     @Test
     public void jingliuSurvivesOnce() {
         Character her = survivor(JINGLIU, false);
@@ -49,7 +55,9 @@ public class LethalHitTest {
                 "\"restores HP equal to 50% of her own Max HP\" (「回复等同于自身生命上限 50% 的生命值」)");
     }
 
-    /** Note: "该效果单场战斗中只能触发 1 次": the second lethal blow kills her. */
+    /**
+     * Note: "该效果单场战斗中只能触发 1 次": the second lethal blow kills her.
+     */
     @Test
     public void jingliuDiesToASecondLethalBlow() {
         Character her = CharacterFactory.create(JINGLIU, 80, false, null, null, 0);
@@ -70,7 +78,9 @@ public class LethalHitTest {
 
     // ==================================================================
 
-    /** builds the scene, optionally transforms her, deals one lethal hit, and returns her. */
+    /**
+     * builds the scene, optionally transforms her, deals one lethal hit, and returns her.
+     */
     private static Character survivor(int cid, boolean transform) {
         Character her = CharacterFactory.create(cid, 80, false, null, null, 0);
         Battle battle = new Battle(List.of(her),

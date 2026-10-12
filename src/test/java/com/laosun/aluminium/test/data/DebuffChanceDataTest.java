@@ -2,8 +2,8 @@ package com.laosun.aluminium.test.data;
 
 import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.beans.Skill;
-import com.laosun.aluminium.enums.SkillEffectType;
 import com.laosun.aluminium.data.SkillData;
+import com.laosun.aluminium.enums.SkillEffectType;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

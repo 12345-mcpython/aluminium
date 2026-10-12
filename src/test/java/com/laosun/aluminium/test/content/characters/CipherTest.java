@@ -1,15 +1,15 @@
 package com.laosun.aluminium.test.content.characters;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -24,7 +24,10 @@ public class CipherTest {
     private static final int CIPHER = 1406;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-        /** Note: The reaction needs the Patron mark, and its 150% is compared with a hand-built 300% reference in the same pipeline. */
+
+    /**
+     * Note: The reaction needs the Patron mark, and its 150% is compared with a hand-built 300% reference in the same pipeline.
+     */
     @Test
     public void theReactionNeedsThePatronAndDealsItsShare() {
         double unmarked = reactionLoss(true, false);
@@ -38,7 +41,9 @@ public class CipherTest {
                 "150% against a hand-built 300% reference: " + marked + " vs " + reference);
     }
 
-    /** Note: "increases Cipher's ATK by 30%" -- a share of her own BASE attack. */
+    /**
+     * Note: "increases Cipher's ATK by 30%" -- a share of her own BASE attack.
+     */
     @Test
     public void theSkillRaisesHerOwnAttack() {
         Character cipher = CharacterFactory.create(CIPHER, LEVEL);
@@ -55,7 +60,9 @@ public class CipherTest {
                 "「increases Cipher's ATK by 30%」 of the BASE: base " + base);
     }
 
-    /** Fires a teammate's attack at the enemy; optionally marks it first, optionally uses a hand-built 300% reference rule. */
+    /**
+     * Fires a teammate's attack at the enemy; optionally marks it first, optionally uses a hand-built 300% reference rule.
+     */
     private static double reactionLoss(boolean shipped, boolean mark) {
         Character cipher = CharacterFactory.create(CIPHER, LEVEL);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
@@ -99,7 +106,7 @@ public class CipherTest {
     }
 
     /**
- * Note: Returns 1.0, i.e. NEVER crits. It used to return 0.0, which forced every hit to crit -- and that silently
+     * Note: Returns 1.0, i.e. NEVER crits. It used to return 0.0, which forced every hit to crit -- and that silently
      * coupled this test to 1406's follow-up attack crit-damage clause: the shipped path carries it, the hand-built reference (which REPLACES her
      * trigger table) does not, so the 150%/300% comparison drifted from 0.5 to 0.833 the moment that clause shipped. The test's subject is
      * the BASE SHARE, so measuring it without crits is both the minimal fix and the more honest reading.

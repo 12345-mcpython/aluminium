@@ -6,8 +6,8 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -22,7 +22,10 @@ import java.util.Random;
 public class TrailblazerDestructionTest {
     private static final int TB = 8001;
     private static final int LEVEL = 80;
-        /** Note: "每次击破敌方目标的弱点后，攻击力提高20%…最多叠加2层". */
+
+    /**
+     * Note: "每次击破敌方目标的弱点后，攻击力提高20%…最多叠加2层".
+     */
     @Test
     public void hisTalentStacksAttackOnBreaksAndStopsAtTwo() {
         Character tb = CharacterFactory.create(TB, LEVEL);
@@ -44,7 +47,9 @@ public class TrailblazerDestructionTest {
                 "「该效果最多叠加2层」 (this effect stacks at most 2 times) -- a third break must not add a third layer");
     }
 
-    /** Census: the talent and the level convention. */
+    /**
+     * Census: the talent and the level convention.
+     */
     @Test
     public void hisFileCarriesTheClauses() {
         var table = TriggerTables.of(TB);

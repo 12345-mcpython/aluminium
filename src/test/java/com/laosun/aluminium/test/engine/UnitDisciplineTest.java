@@ -14,7 +14,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -34,13 +33,15 @@ import java.util.stream.Stream;
  * </ul>
  */
 public class UnitDisciplineTest {
-    /** {@code TriggerTable}'s numeric-variable switch (set at "hit_count" ... "from_skill_id"). */
+    /**
+     * {@code TriggerTable}'s numeric-variable switch (set at "hit_count" ... "from_skill_id").
+     */
     private static final Set<String> KNOWN = Set.of(
             "hit_count", "hp_percent", "target_hp_percent", "target_debuff_count",
             "self_summon_count", "target_summon_count", "self_max_energy", "self_energy_percent", "from_skill_id",
-        // Added with the condition itself: the skill that produced a SETTLED damage. The discipline test mirrors TriggerTable switch, so a new
-        // condition belongs in BOTH -- that is the fifth place a condition name lives (closed set, switch, this list, and the docs that describe them).
-        "damage_skill_key",
+            // Added with the condition itself: the skill that produced a SETTLED damage. The discipline test mirrors TriggerTable switch, so a new
+            // condition belongs in BOTH -- that is the fifth place a condition name lives (closed set, switch, this list, and the docs that describe them).
+            "damage_skill_key",
             "target_hp_percent_before", "enemy_count", "ally_count",
             "skill_point_max",   // the team pool's cap, for light cone 23046 (a count, not a fraction)
             // The owner's Eidolon rank. A COUNT of ranks (1..6), never a fraction: "eidolon >= 4" means four ranks, and
@@ -54,7 +55,9 @@ public class UnitDisciplineTest {
             // since the state arrived, which is the case that state exists to describe.
             "counted_laughs");
 
-    /** Of those, the ones that resolve to 0..1 rather than a count. */
+    /**
+     * Of those, the ones that resolve to 0..1 rather than a count.
+     */
     // self_energy_percent is a RATIO (current/max), so it joins the fraction family: any literal above 1 is refused.
     private static final Set<String> FRACTION = Set.of("hp_percent", "target_hp_percent", "target_hp_percent_before",
             "self_energy_percent");
@@ -71,8 +74,8 @@ public class UnitDisciplineTest {
             JsonElement root = JsonParser.parseString(Files.readString(file, StandardCharsets.UTF_8));
             JsonArray rules = root.isJsonArray() ? root.getAsJsonArray()
                     : root.getAsJsonObject().has("rules") && root.getAsJsonObject().get("rules").isJsonArray()
-                            ? root.getAsJsonObject().getAsJsonArray("rules")
-                            : new JsonArray();
+                    ? root.getAsJsonObject().getAsJsonArray("rules")
+                    : new JsonArray();
             for (JsonElement element : rules) {
                 if (!element.isJsonObject()) {
                     continue;

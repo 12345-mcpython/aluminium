@@ -5,9 +5,9 @@ import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
-import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.models.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -31,10 +31,14 @@ import java.util.Random;
 public class SettledDamageTotalTest {
     private static final int WOLF = 1506;
     private static final int ALLY = 1204;
-        /** Fixed so the two fixtures below draw the same numbers: only the extra rule differs between them. */
+    /**
+     * Fixed so the two fixtures below draw the same numbers: only the extra rule differs between them.
+     */
     private static final int SEED = 7;
 
-    /** The rider is exactly a fifth of everything the firing settled, and it lands on ONE enemy. */
+    /**
+     * The rider is exactly a fifth of everything the firing settled, and it lands on ONE enemy.
+     */
     @Test
     public void theShareIsTakenOfEveryInstanceTheFiringSettled() {
         double base = lossOfTheBoxAlone();
@@ -79,12 +83,16 @@ public class SettledDamageTotalTest {
     // Helpers
     // ==================================================================
 
-    /** The box's own damage, with no rider in the table at all - the baseline the share is asserted against. */
+    /**
+     * The box's own damage, with no rider in the table at all - the baseline the share is asserted against.
+     */
     private static double lossOfTheBoxAlone() {
         return lostAfterFiring(List.of(theBox()), 1)[0];
     }
 
-    /** The same firing, with the 20% true-damage rider as a SECOND rule so it runs after the box has settled. */
+    /**
+     * The same firing, with the 20% true-damage rider as a SECOND rule so it runs after the box has settled.
+     */
     private static double[] lossesOfTheBoxAndTheSword(int firings) {
         return lostAfterFiring(List.of(theBox(), swordRule()), firings);
     }
@@ -97,7 +105,9 @@ public class SettledDamageTotalTest {
                 "the message must name what is missing, and it says: " + error.getMessage());
     }
 
-    /** One firing per entry, each returning the total HP the whole enemy side lost to it. */
+    /**
+     * One firing per entry, each returning the total HP the whole enemy side lost to it.
+     */
     private static double[] lostAfterFiring(List<TriggerSpec> specs, int firings) {
         Battle battle = new Battle(
                 List.of(CharacterFactory.create(WOLF, 80), CharacterFactory.create(ALLY, 80)),
@@ -126,7 +136,9 @@ public class SettledDamageTotalTest {
         return TriggerSpecs.rule("SKILL_POINT_SPENT", List.of(), sword());
     }
 
-    /** 「造成 90% 的虚数属性欢愉伤害」 - the one effect in the control table, and the first in the real one. */
+    /**
+     * 「造成 90% 的虚数属性欢愉伤害」 - the one effect in the control table, and the first in the real one.
+     */
     private static EffectSpec box() {
         EffectSpec effect = new EffectSpec();
         TriggerSpecs.set(effect, "op", "DAMAGE");
@@ -138,7 +150,9 @@ public class SettledDamageTotalTest {
         return effect;
     }
 
-    /** 【超超超大剑】: a fifth of the settled total, as true damage on the highest-HP enemy. */
+    /**
+     * 【超超超大剑】: a fifth of the settled total, as true damage on the highest-HP enemy.
+     */
     private static EffectSpec sword() {
         EffectSpec effect = new EffectSpec();
         TriggerSpecs.set(effect, "op", "DAMAGE");

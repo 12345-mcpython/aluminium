@@ -7,10 +7,9 @@ import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.buff.DotBuff;
-import com.laosun.aluminium.models.buff.RegenBuff;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -27,7 +26,10 @@ public class LynxTest {
     private static final int LYNX = 1110;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-        /** Note: The state lands on the aimed ally, and it raises THEIR Max HP. */
+
+    /**
+     * Note: The state lands on the aimed ally, and it raises THEIR Max HP.
+     */
     @Test
     public void herSkillGrantsTheStateAndRaisesMaxHp() {
         Fixture f = new Fixture();
@@ -41,7 +43,9 @@ public class LynxTest {
                 "⚠ 「指定我方**单体**」 (a designated single **ally**): not party-wide");
     }
 
-    /** Her ultimate cleanses the whole side. */
+    /**
+     * Her ultimate cleanses the whole side.
+     */
     @Test
     public void herUltimateCleansesTheParty() {
         Fixture f = new Fixture();
@@ -54,7 +58,9 @@ public class LynxTest {
                 "「解除我方全体的1个负面效果」 (dispels 1 debuff from all allies) -- the cleanse reaches every ally, not just the aimed one");
     }
 
-    /** Census: the clauses are where the notes say they are. */
+    /**
+     * Census: the clauses are where the notes say they are.
+     */
     @Test
     public void herFileCarriesTheClauses() {
         var table = TriggerTables.of(LYNX);

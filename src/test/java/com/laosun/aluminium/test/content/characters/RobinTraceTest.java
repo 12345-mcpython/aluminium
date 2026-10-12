@@ -3,11 +3,11 @@ package com.laosun.aluminium.test.content.characters;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.skill.Skill;
-import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.models.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -88,7 +88,7 @@ public class RobinTraceTest {
      *
      * <p>This is the test that found the bug rather than pinning a known behaviour: {@code SKILL_CAST}
      * used to mean "any cast that is not an ultimate" (the emitter only split ultimate from everything
-     * else), so her own basic attacks were paying her the extra 5 as well. Her relic-109 sibling - 
+     * else), so her own basic attacks were paying her the extra 5 as well. Her relic-109 sibling -
      * "when casting the Skill, ATK is increased by 20%" - had the same over-trigger, shipped, with a note claiming the
      * emitter's split already handled it.
      */

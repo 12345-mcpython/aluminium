@@ -1,13 +1,13 @@
 package com.laosun.aluminium.test.engine;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.ResourceSpec;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -23,10 +23,12 @@ import java.util.List;
 public class StackTimesTest {
     private static final int OWNER = 1002;
     private static final int LEVEL = 80;
-        private static final String COUNTER = "probeParty";
+    private static final String COUNTER = "probeParty";
     private static final String STATE = "probeGift";
 
-    /** Seven on the counter, seven instances on the unit. */
+    /**
+     * Seven on the counter, seven instances on the unit.
+     */
     @Test
     public void theCountComesFromThePartyCounter() {
         Character owner = owner(true);
@@ -35,7 +37,9 @@ public class StackTimesTest {
                 "the instances are the party counter's number");
     }
 
-    /** A plain state is NOT repeated: re-applying it refreshes, so the effect must stay one instance. */
+    /**
+     * A plain state is NOT repeated: re-applying it refreshes, so the effect must stay one instance.
+     */
     @Test
     public void aPlainStateStaysOne() {
         Character owner = owner(false);
@@ -66,8 +70,8 @@ public class StackTimesTest {
         // hold a count -- so the control states neither.
         EffectSpec apply = stackable
                 ? effect("APPLY_BUFF", "buff", STATE, "permanent", Boolean.TRUE, "target", "self",
-                        "stackable", Boolean.TRUE, "maxStacks", 99,
-                        "scale", "party_resource:" + COUNTER, "percent", 1.0)
+                "stackable", Boolean.TRUE, "maxStacks", 99,
+                "scale", "party_resource:" + COUNTER, "percent", 1.0)
                 : effect("APPLY_BUFF", "buff", STATE, "permanent", Boolean.TRUE, "target", "self");
         return new TriggerTable(OWNER,
                 List.of(TriggerSpecs.rule("BATTLE_START", List.of(), grant, apply)),

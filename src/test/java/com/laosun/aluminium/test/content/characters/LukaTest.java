@@ -5,10 +5,10 @@ import com.laosun.aluminium.data.TriggerTables;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.models.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -31,7 +31,10 @@ public class LukaTest {
     private static final int LUKA = 1111;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-        /** "战斗开始时,卢卡持有1层[斗志]", and each ultimate adds the two his document states. */
+
+    /**
+     * "战斗开始时,卢卡持有1层[斗志]", and each ultimate adds the two his document states.
+     */
     @Test
     public void theLayersStartAtOneAndGrow() {
         Fixture f = new Fixture();
@@ -43,7 +46,9 @@ public class LukaTest {
                 "「施放终结技时获得2层【斗志】」 (gains 2 stacks of Fighting Will when casting the Ultimate) -- one from the battle start plus two from the ultimate");
     }
 
-    /** Note: "最多可持有 4 层" holds no matter how often it is applied. */
+    /**
+     * Note: "最多可持有 4 层" holds no matter how often it is applied.
+     */
     @Test
     public void theCapHolds() {
         Fixture f = new Fixture();
@@ -55,7 +60,9 @@ public class LukaTest {
                 "⚠ the cap is what makes 「最多可持有4层【斗志】」 (can hold at most 4 stacks of Fighting Will) true rather than decorative");
     }
 
-    /** Note: The vulnerability is rolled, and an easy draw lands it. */
+    /**
+     * Note: The vulnerability is rolled, and an easy draw lands it.
+     */
     @Test
     public void theUltimatesVulnerabilityIsRolled() {
         Fixture f = new Fixture();
@@ -65,7 +72,9 @@ public class LukaTest {
                 "「有100%的基础概率使指定敌方单体受到的伤害提高20.00%」 -- the zone is up (an easy draw)");
     }
 
-    /** Note: One layer per relevant cast, and `from_skill` is what keeps the ultimate off the basic attack / Skill rules. */
+    /**
+     * Note: One layer per relevant cast, and `from_skill` is what keeps the ultimate off the basic attack / Skill rules.
+     */
     @Test
     public void eachCastCategoryAddsExactlyOneLayer() {
         Fixture f = new Fixture();
@@ -84,7 +93,9 @@ public class LukaTest {
                         + "because all three are 「attack」 events");
     }
 
-    /** Note: Content-level: the SHIPPED Skill's ceiling must really be there - an unmapped key is silently ignored. */
+    /**
+     * Note: Content-level: the SHIPPED Skill's ceiling must really be there - an unmapped key is silently ignored.
+     */
     @Test
     public void theShippedSkillCarriesItsCeiling() {
         Fixture f = new Fixture();
@@ -100,7 +111,9 @@ public class LukaTest {
                         + "reflective unit test can see, which is why this case goes through the FILE.");
     }
 
-    /** Note: End to end: two layers swap in a skill that loads, and that attack lands. */
+    /**
+     * Note: End to end: two layers swap in a skill that loads, and that attack lands.
+     */
     @Test
     public void theSwappedSkillDealsDamage() {
         Fixture f = new Fixture();
@@ -143,7 +156,9 @@ public class LukaTest {
                         + "enhanced basic attack are both `Normal` casts");
     }
 
-    /** Census: the two layer rules, the trace and the level convention are all there. */
+    /**
+     * Census: the two layer rules, the trace and the level convention are all there.
+     */
     @Test
     public void hisFileCarriesTheClauses() {
         TriggerTable table = TriggerTables.of(LUKA);

@@ -7,19 +7,21 @@ import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Damage;
 import com.laosun.aluminium.models.buff.DotBuff;
 import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.utils.RelicFactory;
-import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-/** Relic 116, 4 pieces: "每承受 1 个持续伤害效果…无视其 6% 防御力，最多计入 3 个" -- instance-scoped, counted per DoT. */
+/**
+ * Relic 116, 4 pieces: "每承受 1 个持续伤害效果…无视其 6% 防御力，最多计入 3 个" -- instance-scoped, counted per DoT.
+ */
 public class DotCountIgnoreTest {
     private static final int WEARER = 1001;
     private static final int LEVEL = 80;
-        private static final int RELIC_LEVEL = 15;
+    private static final int RELIC_LEVEL = 15;
     private static final double SHARE = 0.06;
     private static final int CAP = 3;
 
@@ -46,6 +48,6 @@ public class DotCountIgnoreTest {
         }
         Damage damage = new Damage(unit, enemy, DamageElement.QUANTUM, DamageType.NORMAL, 1000);
         battle.applyDamage(enemy, damage);
-        return new double[] {damage.getDefenceIgnore(), enemy.getBuffManager().countBuffs(DotBuff.class)};
+        return new double[]{damage.getDefenceIgnore(), enemy.getBuffManager().countBuffs(DotBuff.class)};
     }
 }

@@ -7,7 +7,9 @@ import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-/** Light cone 23029, its expressible clause, read off the shipped file (discipline 232). */
+/**
+ * Light cone 23029, its expressible clause, read off the shipped file (discipline 232).
+ */
 public class ThoseManySpringsTest {
     private static final int WEAPON_ID = 23029;
     private static final int WEARER = 1210;

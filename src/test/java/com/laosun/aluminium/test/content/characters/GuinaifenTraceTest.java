@@ -7,11 +7,11 @@ import com.laosun.aluminium.enums.DamageType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Damage;
 import com.laosun.aluminium.models.DoubleValue;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.buff.DotBuff;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.models.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -35,7 +35,9 @@ import java.util.List;
  */
 public class GuinaifenTraceTest {
     private static final int GUINAIFEN = 1210;
-    /** Tingyun: a character with no rule file of her own, used as the "not hers" side. */
+    /**
+     * Tingyun: a character with no rule file of her own, used as the "not hers" side.
+     */
     private static final int ALLY = 1202;
     private static final int LEVEL = 80;
     private static final double BASE = 1000;
@@ -75,7 +77,9 @@ public class GuinaifenTraceTest {
                 "nothing was attached to anybody, so the very next hit is back to normal");
     }
 
-    /** The trace is about her damage: the same burning target does not raise an <b>ally's</b> hit. */
+    /**
+     * The trace is about her damage: the same burning target does not raise an <b>ally's</b> hit.
+     */
     @Test
     public void anAllysHitOnTheSameBurningTargetIsUntouched() {
         Character ally = CharacterFactory.create(ALLY, LEVEL);
@@ -109,12 +113,16 @@ public class GuinaifenTraceTest {
     // Helpers
     // ==================================================================
 
-    /** A battle with her real, shipped table (the file is the thing under test). */
+    /**
+     * A battle with her real, shipped table (the file is the thing under test).
+     */
     private static Battle battleWithHerRules() {
         return newBattle(List.of(CharacterFactory.create(GUINAIFEN, LEVEL)));
     }
 
-    /** Builds a battle from a roster, with crit and typed boosts neutralised on everybody. */
+    /**
+     * Builds a battle from a roster, with crit and typed boosts neutralised on everybody.
+     */
     private static Battle newBattle(List<Character> team) {
         team.forEach(GuinaifenTraceTest::neutralise);
         Battle battle = new Battle(team, List.of(dummy()), BattleFixture.seeded());
@@ -122,7 +130,9 @@ public class GuinaifenTraceTest {
         return battle;
     }
 
-    /** The same character with an emptied table, for the advance comparison. */
+    /**
+     * The same character with an emptied table, for the advance comparison.
+     */
     private static double remainingAtBattleStart(boolean keepRules) {
         Character hero = CharacterFactory.create(GUINAIFEN, LEVEL);
         if (!keepRules) {

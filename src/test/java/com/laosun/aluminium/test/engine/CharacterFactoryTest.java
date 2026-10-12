@@ -6,9 +6,9 @@ import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.Path;
 import com.laosun.aluminium.exceptions.CharacterException;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.skill.SkillTrace;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
+import com.laosun.aluminium.models.skill.SkillTrace;
 import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.utils.LevelPromotionCalc;
 import org.junit.jupiter.api.Assertions;
@@ -87,7 +87,7 @@ public class CharacterFactoryTest {
      * <p>Note: My first version asserted attack / defence directly as {@code data  x  multiplier} and
      * missed the traces; the failure values 894.136 / 545.35 looked like "attribute array
      * index misalignment", which sent me down a wrong diagnosis for one round.
-     * Here it was changed to explicitly include the traces via {@code SkillTrace.sumAttributes} - 
+     * Here it was changed to explicitly include the traces via {@code SkillTrace.sumAttributes} -
      * the test explains that 28% / 12.5% by itself.
      */
     @Test
@@ -179,7 +179,7 @@ public class CharacterFactoryTest {
     }
 
     /**
-     * The unascended panel is never higher than the ascended one (at Lv0 it really is lower - 
+     * The unascended panel is never higher than the ascended one (at Lv0 it really is lower -
      * at Lv80 the two are the same, see the test above).
      */
     @Test

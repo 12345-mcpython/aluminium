@@ -39,13 +39,17 @@ public final class BattleFixture {
      */
     public static final int MONSTER_ID = 1002011;
 
-    /** The level {@link #monster()} is created at, as the same files spelled it. */
+    /**
+     * The level {@link #monster()} is created at, as the same files spelled it.
+     */
     public static final int MONSTER_LEVEL = 90;
 
     private BattleFixture() {
     }
 
-    /** The standard test enemy: id {@value #MONSTER_ID} at level {@value #MONSTER_LEVEL}, one of it. */
+    /**
+     * The standard test enemy: id {@value #MONSTER_ID} at level {@value #MONSTER_LEVEL}, one of it.
+     */
     public static Enemy monster() {
         return EnemyFactory.create(MONSTER_ID, MONSTER_LEVEL, 1);
     }
@@ -93,12 +97,16 @@ public final class BattleFixture {
         };
     }
 
-    /** A battle with the suite's standard RNG, not started: the judge decides when that happens. */
+    /**
+     * A battle with the suite's standard RNG, not started: the judge decides when that happens.
+     */
     public static Battle battle(List<Character> party, List<? extends CanHit> enemies) {
         return new Battle(party, enemies, seeded());
     }
 
-    /** A battle with the judge's own RNG. */
+    /**
+     * A battle with the judge's own RNG.
+     */
     public static Battle battle(List<Character> party, List<? extends CanHit> enemies, Random rng) {
         return new Battle(party, enemies, rng);
     }

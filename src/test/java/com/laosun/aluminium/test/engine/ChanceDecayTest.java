@@ -5,9 +5,9 @@ import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
-import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.models.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -28,11 +28,15 @@ import java.util.Random;
 public class ChanceDecayTest {
     private static final int WOLF = 1506;
     private static final int ALLY = 1204;
-        /** A resource 1506's own file declares, so the fixture does not have to invent one. */
+    /**
+     * A resource 1506's own file declares, so the fixture does not have to invent one.
+     */
     private static final String COUNTER = "隐藏分";
     private static final String BOX = "test_decaying_rule";
 
-    /** 100% (no draw taken) → 20% → 4%, and a failed roll leaves the number alone. */
+    /**
+     * 100% (no draw taken) → 20% → 4%, and a failed roll leaves the number alone.
+     */
     @Test
     public void eachSuccessMultipliesTheChanceAndAFailureDoesNot() {
         ScriptedRng rng = new ScriptedRng();
@@ -64,7 +68,9 @@ public class ChanceDecayTest {
                 "RESET_RULE_CHANCE puts it back to the initial value, so a 0.9 draw cannot stop it again");
     }
 
-    /** Every combination that would decay nothing, or make a rule that can never fire again, is refused at load. */
+    /**
+     * Every combination that would decay nothing, or make a rule that can never fire again, is refused at load.
+     */
     @Test
     public void theTwoShapesOfNonsenseAreRefused() {
         assertRefused(rule(BOX, "TURN_START", null, 0.2, gainOne()), "chance");
@@ -72,7 +78,9 @@ public class ChanceDecayTest {
         assertRefused(rule(BOX, "TURN_START", 1.0, 0.0, gainOne()), "decay");
     }
 
-    /** A reset that names a rule which does not decay would change nothing, so it is refused rather than loaded. */
+    /**
+     * A reset that names a rule which does not decay would change nothing, so it is refused rather than loaded.
+     */
     @Test
     public void resettingARuleThatDoesNotDecayIsRefused() {
         assertRefused(List.of(
@@ -98,7 +106,9 @@ public class ChanceDecayTest {
                 "the message must name the field it is about, and it says: " + error.getMessage());
     }
 
-    /** One firing of {@code TURN_START} with the given draw. */
+    /**
+     * One firing of {@code TURN_START} with the given draw.
+     */
     private static void fire(Battle battle, ScriptedRng rng, double draw) {
         rng.nextDoubleValue = draw;
         Character wolf = battle.characters.getFirst();
@@ -124,7 +134,9 @@ public class ChanceDecayTest {
         return spec;
     }
 
-    /** One point of a declared counter per firing, so the counter's value counts the successful triggers. */
+    /**
+     * One point of a declared counter per firing, so the counter's value counts the successful triggers.
+     */
     private static EffectSpec gainOne() {
         EffectSpec effect = TriggerSpecs.gainResource(COUNTER, 1);
         TriggerSpecs.set(effect, "target", "self");
@@ -138,7 +150,9 @@ public class ChanceDecayTest {
         return effect;
     }
 
-    /** {@code nextDouble} is whatever the case set; nothing here draws an index. */
+    /**
+     * {@code nextDouble} is whatever the case set; nothing here draws an index.
+     */
     private static final class ScriptedRng extends Random {
         private double nextDoubleValue = 0.9999;
 

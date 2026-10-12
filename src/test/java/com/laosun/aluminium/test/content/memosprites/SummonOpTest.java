@@ -1,8 +1,6 @@
 package com.laosun.aluminium.test.content.memosprites;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
@@ -12,8 +10,10 @@ import com.laosun.aluminium.exceptions.CharacterException;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.RelicSuit;
 import com.laosun.aluminium.models.Summon;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.utils.RelicFactory;
 import org.junit.jupiter.api.Assertions;
@@ -45,18 +45,26 @@ import java.util.List;
 public class SummonOpTest {
     private static final double EPS = 1e-6;
 
-    /** Evernight (长夜月) - "summon the memosprite '长夜' on entering battle", authored in characters/1413.json. */
+    /**
+     * Evernight (长夜月) - "summon the memosprite '长夜' on entering battle", authored in characters/1413.json.
+     */
     private static final int CASTORICE_LIKE = 1413;
-    /** Aglaea (阿格莱雅) - "summon the memosprite 衣匠" on her Ultimate, authored in characters/1402.json. */
+    /**
+     * Aglaea (阿格莱雅) - "summon the memosprite 衣匠" on her Ultimate, authored in characters/1402.json.
+     */
     private static final int AGLAEA = 1402;
-    /** Himeko (姬子) - a character with no memosprite spec, for the refusal cases. */
+    /**
+     * Himeko (姬子) - a character with no memosprite spec, for the refusal cases.
+     */
     private static final int NO_MEMOSPRITE = 1003;
     private static final int LEVEL = 80;
-        // ==================================================================
+    // ==================================================================
     // 1. The shipped content summons through the real event path
     // ==================================================================
 
-    /** Evernight (长夜月) has the memosprite out as soon as the battle starts. */
+    /**
+     * Evernight (长夜月) has the memosprite out as soon as the battle starts.
+     */
     @Test
     public void theBattleStartClauseBringsItOut() {
         Character castorice = CharacterFactory.create(CASTORICE_LIKE, LEVEL);
@@ -70,13 +78,15 @@ public class SummonOpTest {
         Assertions.assertNotNull(nightfall, "the authored BATTLE_START rule summoned it");
         Assertions.assertEquals("长夜", nightfall.getName());
         Assertions.assertEquals(160, nightfall.getAttribute(
-                com.laosun.aluminium.enums.AttributeType.SPEED).get(), EPS,
+                        com.laosun.aluminium.enums.AttributeType.SPEED).get(), EPS,
                 "with the panel from its own spec, not a monster row");
         Assertions.assertTrue(battle.queue.snapshot().stream().anyMatch(s -> s.getCanHit() == nightfall),
                 "and it is on the action bar: startBattle's processRequests() admits it");
     }
 
-    /** The op is the only thing her file says so far, and the loader reads exactly it. */
+    /**
+     * The op is the only thing her file says so far, and the loader reads exactly it.
+     */
     @Test
     public void herFileContainsTheSummoningClauseAndHerLevel() {
         // Note: two rules: the summoning clause and the rule that states which level her ultimate's numbers were
@@ -86,7 +96,9 @@ public class SummonOpTest {
         Assertions.assertFalse(TriggerTables.of(CASTORICE_LIKE).isEmpty());
     }
 
-    /** Aglaea (阿格莱雅)'s Ultimate summons the Garmentmaker (衣匠) - and it is HER Ultimate, not a teammate's. */
+    /**
+     * Aglaea (阿格莱雅)'s Ultimate summons the Garmentmaker (衣匠) - and it is HER Ultimate, not a teammate's.
+     */
     @Test
     public void herUltimateSummonsItAndSomeoneElsesDoesNot() {
         Character aglaea = CharacterFactory.create(AGLAEA, LEVEL);
@@ -127,7 +139,9 @@ public class SummonOpTest {
     // 2. Load-time and build-time refusals
     // ==================================================================
 
-    /** A {@code target} on this op is refused, because it would be ignored rather than used. */
+    /**
+     * A {@code target} on this op is refused, because it would be ignored rather than used.
+     */
     @Test
     public void aTargetOnSummonIsRejected() {
         IllegalArgumentException rejected = Assertions.assertThrows(IllegalArgumentException.class,
@@ -136,7 +150,9 @@ public class SummonOpTest {
         Assertions.assertTrue(rejected.getMessage().contains("target"), rejected.getMessage());
     }
 
-    /** A duration is refused: the op acts in one moment. */
+    /**
+     * A duration is refused: the op acts in one moment.
+     */
     @Test
     public void aDurationOnSummonIsRejected() {
         IllegalArgumentException rejected = Assertions.assertThrows(IllegalArgumentException.class,
@@ -220,7 +236,9 @@ public class SummonOpTest {
     // Fixture
     // ==================================================================
 
-    /** A table whose one rule fires {@code SUMMON} at battle start, with the given effect built in. */
+    /**
+     * A table whose one rule fires {@code SUMMON} at battle start, with the given effect built in.
+     */
     private static TriggerTable summonTable(int cid, EffectSpec effect) {
         return new TriggerTable(cid, List.of(
                 TriggerSpecs.rule("BATTLE_START", null, effect)));
@@ -236,7 +254,9 @@ public class SummonOpTest {
         return effect;
     }
 
-    /** The same effect plus one extra field, to check that the field is refused. */
+    /**
+     * The same effect plus one extra field, to check that the field is refused.
+     */
     private static EffectSpec effectWith(String field, Object value) {
         EffectSpec effect = summonEffect();
         TriggerSpecs.set(effect, field, value);

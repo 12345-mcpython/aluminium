@@ -105,7 +105,7 @@ public final class BreakDamageCalculator {
      * DEF zone / RES zone are assembled centrally by {@link Battle#applyDamage}.
      *
      * <p><b>Why {@code notCountsAsAttack()} is set here but not in {@link #build}</b>:
-     * the two entry points have different "settlement contexts" - 
+     * the two entry points have different "settlement contexts" -
      * <ul>
      *   <li>{@link #build} (break damage) is settled inside {@code Battle.reduceToughness},
      *       where {@code EnergyGrant.KILL_ONLY} can already be passed explicitly, so there is no

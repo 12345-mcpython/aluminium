@@ -5,9 +5,9 @@ import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
-import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.models.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -39,10 +39,12 @@ public class ElationGiftSnapshotTest {
      */
     private static final int ALLY = 1505;
     private static final int OTHER = 1204;
-        private static final String GIFT = "好活当赏";
+    private static final String GIFT = "好活当赏";
     private static final String LAUGH = "笑点";
 
-    /** The count is taken when the state is granted, and the pool growing afterwards does not change it. */
+    /**
+     * The count is taken when the state is granted, and the pool growing afterwards does not change it.
+     */
     @Test
     public void theCountIsFrozenWhenTheStateIsGranted() {
         Fixture f = new Fixture();
@@ -60,7 +62,9 @@ public class ElationGiftSnapshotTest {
         Assertions.assertEquals(240, f.battle.partyResource(LAUGH).value(), "precondition: the pool really did grow");
     }
 
-    /** Several holders each keep their own count, and the figure the damage uses is their SUM. */
+    /**
+     * Several holders each keep their own count, and the figure the damage uses is their SUM.
+     */
     @Test
     public void severalHoldersAreMergedAndKeptApart() {
         Fixture f = new Fixture();
@@ -77,7 +81,9 @@ public class ElationGiftSnapshotTest {
         Assertions.assertEquals(2, f.battle.laughSnapshotHolders(), "and both are still counted");
     }
 
-    /** 「各个…持续时间各自独立计算」: one holder's turn runs down ITS count and nobody else's. */
+    /**
+     * 「各个…持续时间各自独立计算」: one holder's turn runs down ITS count and nobody else's.
+     */
     @Test
     public void eachHolderKeepsItsOwnClock() {
         Fixture f = new Fixture();
@@ -99,7 +105,9 @@ public class ElationGiftSnapshotTest {
         Assertions.assertEquals(90, f.battle.laughSnapshotOf(f.ally), "and so is the ally");
     }
 
-    /** It lasts two of the holder's turns, and the third ends it. */
+    /**
+     * It lasts two of the holder's turns, and the third ends it.
+     */
     @Test
     public void itLastsTwoOfItsHoldersTurns() {
         Fixture f = new Fixture();
@@ -121,7 +129,9 @@ public class ElationGiftSnapshotTest {
         Assertions.assertEquals(0, f.battle.countedLaughPoints(), "so nothing is counted any more");
     }
 
-    /** Being granted again REPLACES the holder's count with the pool's current value. */
+    /**
+     * Being granted again REPLACES the holder's count with the pool's current value.
+     */
     @Test
     public void grantingItAgainTakesANewCount() {
         Fixture f = new Fixture();
@@ -202,13 +212,17 @@ public class ElationGiftSnapshotTest {
             putOnly(holder, null);                              // the rule has served its purpose
         }
 
-        /** Ends the unit's turn, which is where its own snapshot is counted. */
+        /**
+         * Ends the unit's turn, which is where its own snapshot is counted.
+         */
         void endTurn(Character unit) {
             battle.endTurnOf(unit);
             battle.processRequests();
         }
 
-        /** Puts one rule on the holder and empties every other table, so only this unit's turn is in play. */
+        /**
+         * Puts one rule on the holder and empties every other table, so only this unit's turn is in play.
+         */
         private void putOnly(Character holder, TriggerSpec rule) {
             for (Character unit : battle.characters) {
                 List<TriggerSpec> rules = unit == holder && rule != null ? List.of(rule) : List.of();

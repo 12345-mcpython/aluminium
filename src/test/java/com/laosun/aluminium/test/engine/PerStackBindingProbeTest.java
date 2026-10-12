@@ -5,17 +5,19 @@ import com.laosun.aluminium.data.RelicTriggerTables;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.buff.DotBuff;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
-import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.models.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-/** Reads the COMPILED rule with a real context (the earlier attempt had no target, so nothing matched). */
+/**
+ * Reads the COMPILED rule with a real context (the earlier attempt had no target, so nothing matched).
+ */
 public class PerStackBindingProbeTest {
     @Test
     public void printTheCompiledSpec() {

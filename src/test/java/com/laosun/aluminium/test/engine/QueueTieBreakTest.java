@@ -26,7 +26,7 @@ public class QueueTieBreakTest {
     private static final double EPS = 1e-9;
 
     /**
-     * The turn order of same-speed units must be the entry order, and must be reproducible - 
+     * The turn order of same-speed units must be the entry order, and must be reproducible -
      * running the same battle repeatedly gives the same result.
      *
      * <p>Two things are asserted: {@code peekNext()} returns the first one to enter; and the order
@@ -214,7 +214,9 @@ public class QueueTieBreakTest {
 
     // ==================================================================
 
-    /** Builds 8 same-speed units and records the names of the first 8 turns. */
+    /**
+     * Builds 8 same-speed units and records the names of the first 8 turns.
+     */
     private static List<String> runEqualSpeedBatch(int count) {
         List<CanHit> characters = new ArrayList<>();
         for (int i = 0; i < count; i++) {
@@ -229,7 +231,9 @@ public class QueueTieBreakTest {
         return order;
     }
 
-    /** {@code move()} + {@code setTopZero()}: consumes one turn and returns the actor. */
+    /**
+     * {@code move()} + {@code setTopZero()}: consumes one turn and returns the actor.
+     */
     private static CanHit nextActor(Queue q) {
         q.move();
         CanHit actor = q.getCurrentActor().getCanHit();

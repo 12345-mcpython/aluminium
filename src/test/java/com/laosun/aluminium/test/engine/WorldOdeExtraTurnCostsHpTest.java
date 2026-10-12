@@ -1,25 +1,27 @@
 package com.laosun.aluminium.test.engine;
+
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Countdown;
 import com.laosun.aluminium.models.Signal;
 import com.laosun.aluminium.models.skill.SkillExecutor;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
 import java.util.List;
 
 /**
  * 1415's memosprite skill 21, the last clause: "额外回合开始时，卡厄斯兰那消耗等同于当前生命值 #2% 的生命值".
- *
+ * <p>
  * Two-sided: with the state the turn costs him about 15% of the HP he had; without it the same turn costs him nothing. The cost is a share of his CURRENT HP, so the judge
  * computes the expectation from the HP it reads immediately before the turn -- the engine's own number.
  */
 public class WorldOdeExtraTurnCostsHpTest {
     private static final int LEVEL = 80;
     private static final int PHAINON = 1408;
-        private static final String STATE = "永续的燃烧";
+    private static final String STATE = "永续的燃烧";
 
     @Test
     public void theExtraTurnCostsHpWhileEverBurning() {
@@ -32,7 +34,9 @@ public class WorldOdeExtraTurnCostsHpTest {
         Assertions.assertEquals(0.0, without[0], 1e-9, "and without the state the same turn costs nothing");
     }
 
-    /** [the HP the extra turn cost, the HP he had just before it] */
+    /**
+     * [the HP the extra turn cost, the HP he had just before it]
+     */
     private static double[] run(boolean everBurning) {
         Character him = CharacterFactory.create(PHAINON, LEVEL);
         Battle battle = new Battle(List.of(him),

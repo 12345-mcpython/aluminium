@@ -3,8 +3,8 @@ package com.laosun.aluminium.test.content.characters;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -19,11 +19,13 @@ import java.util.List;
  */
 public class NatashaHealingBoostTest {
     private static final int NATASHA = 1105;
-    /** A healer with no such rule, used as the control. */
+    /**
+     * A healer with no such rule, used as the control.
+     */
     private static final int PLAIN = 1002;
     private static final int TARGET_ALLY = 1210;
     private static final int LEVEL = 80;
-        private static final double BASE_HEAL = 500;
+    private static final double BASE_HEAL = 500;
 
     @Test
     public void herTraceRaisesTheHealingSheProvidesByTenPercent() {

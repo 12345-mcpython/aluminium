@@ -6,9 +6,9 @@ import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.DoubleValue;
+import com.laosun.aluminium.models.buff.CounterMechanic;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
-import com.laosun.aluminium.models.buff.CounterMechanic;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -32,7 +32,9 @@ public class BossMechanicTest {
     private static final int CHARACTER_LEVEL = 80;
     private static final int DURATION = 5;
 
-    /** Counter damage = the wearer's ATK  x  this. */
+    /**
+     * Counter damage = the wearer's ATK  x  this.
+     */
     private static final double RATIO = 0.5;
 
     // ==================================================================
@@ -95,7 +97,9 @@ public class BossMechanicTest {
         Assertions.assertTrue(heroHp(battle) < heroMaxHp(battle), "and the exchange really happened");
     }
 
-    /** A wearer that is already down does not counter - a corpse does not hit back. */
+    /**
+     * A wearer that is already down does not counter - a corpse does not hit back.
+     */
     @Test
     public void aDeadWearerDoesNotCounter() {
         Battle battle = newBattle(false);
@@ -110,7 +114,9 @@ public class BossMechanicTest {
                 "the dead enemy must not have countered");
     }
 
-    /** Losing HP for a reason with no author (a DOT whose applier is gone) must not throw. */
+    /**
+     * Losing HP for a reason with no author (a DOT whose applier is gone) must not throw.
+     */
     @Test
     public void anAttributelessLossDoesNotThrow() {
         Battle battle = newBattle(true);
@@ -137,7 +143,7 @@ public class BossMechanicTest {
      *   ENEMY-counter  target=hero   source=enemy   -> skips    (owner check: not my loss)
      *   HERO-counter   target=enemy  source=hero    -> skips    (owner check)
      * </pre>
-     *
+     * <p>
      * So the enemy takes the attack and nothing comes back: its HP loss equals the case where only the
      * enemy counters. Remove {@code Battle.runCounter}'s nesting check and the hero's answer lands, which
      * is what turns this test red.
@@ -154,7 +160,9 @@ public class BossMechanicTest {
 
     // ==================================================================
 
-    /** One real character against one real enemy; the flags decide who wears a counter. */
+    /**
+     * One real character against one real enemy; the flags decide who wears a counter.
+     */
     private static Battle newBattle(boolean countering) {
         return newBattle(countering, false);
     }
@@ -183,7 +191,9 @@ public class BossMechanicTest {
         return battle.enemyUnits().getFirst().getMaxHp() - battle.enemyUnits().getFirst().getCurrentHp();
     }
 
-    /** The hero's basic attack on the enemy. */
+    /**
+     * The hero's basic attack on the enemy.
+     */
     private static void attack(Battle battle) {
         battle.castImmediate(battle.characters.getFirst().getSkills().get(SkillType.COMMON),
                 battle.characters.getFirst(), List.of(battle.enemyUnits().getFirst()));

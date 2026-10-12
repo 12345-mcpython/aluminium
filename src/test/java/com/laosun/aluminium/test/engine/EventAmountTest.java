@@ -1,15 +1,15 @@
 package com.laosun.aluminium.test.engine;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.ResourceSpec;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -31,7 +31,10 @@ import java.util.List;
 public class EventAmountTest {
     private static final int OWNER = 1003;
     private static final int LEVEL = 80;
-        /** Spending three points repeats the instance three times; spending none repeats it not at all. */
+
+    /**
+     * Spending three points repeats the instance three times; spending none repeats it not at all.
+     */
     @Test
     public void theRepeatCountFollowsTheEvent() {
         double one = damage(1);
@@ -44,7 +47,9 @@ public class EventAmountTest {
 
     // ==================================================================
 
-    /** What the enemy loses when the rule repeats its instance once per point spent. */
+    /**
+     * What the enemy loses when the rule repeats its instance once per point spent.
+     */
     private static double damage(int spent) {
         Character owner = CharacterFactory.create(OWNER, LEVEL, false, null, null, 0);
         EffectSpec effect = new EffectSpec();

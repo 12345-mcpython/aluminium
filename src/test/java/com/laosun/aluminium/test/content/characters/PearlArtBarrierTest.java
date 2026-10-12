@@ -4,8 +4,8 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -28,7 +28,7 @@ public class PearlArtBarrierTest {
     private static final int PEARL = 1503;
     private static final int ELATION_ALLY = 1505;      // 「欢愉」命途: the barrier applies
     private static final int OTHER_ALLY = 1002;        // not that path: it must not
-        private static final String BARRIER = "艺术壁垒";
+    private static final String BARRIER = "艺术壁垒";
     private static final int ENERGY = 90;
 
     private Character pearl;
@@ -36,7 +36,9 @@ public class PearlArtBarrierTest {
     private Enemy enemy;
     private Battle battle;
 
-    /** The whole sentence: marker, a Skill that leaves it, the next ultimate paying 90 and consuming it. */
+    /**
+     * The whole sentence: marker, a Skill that leaves it, the next ultimate paying 90 and consuming it.
+     */
     @Test
     public void theBarrierPaysPearlOnTheHoldersNextUltimate() {
         build(ELATION_ALLY);
@@ -62,7 +64,9 @@ public class PearlArtBarrierTest {
         Assertions.assertEquals(0, pearlEnergy(), "and the next one pays nothing: the effect happened once");
     }
 
-    /** 「若【美学底本】为「欢愉」命途角色」: somebody off that path never carries it. */
+    /**
+     * 「若【美学底本】为「欢愉」命途角色」: somebody off that path never carries it.
+     */
     @Test
     public void aNonElationArchetypeGetsNothing() {
         build(OTHER_ALLY);
@@ -111,14 +115,18 @@ public class PearlArtBarrierTest {
         battle.processRequests();
     }
 
-    /** Her own ultimate, aimed at the archetype: the rule that hands out the marker. */
+    /**
+     * Her own ultimate, aimed at the archetype: the rule that hands out the marker.
+     */
     private void pearlUltimateOnTheArchetype() {
         pearl.setCurrentEnergy(pearl.getMaxEnergy());
         Assertions.assertTrue(battle.castUltra(pearl, List.of(ally)), "precondition: her ultimate is cast");
         battle.processRequests();
     }
 
-    /** The ally's own ultimate; answers with how much energy 真珠 gained from it. */
+    /**
+     * The ally's own ultimate; answers with how much energy 真珠 gained from it.
+     */
     private double allyUltimate() {
         double before = pearlEnergy();
         ally.setCurrentEnergy(ally.getMaxEnergy());

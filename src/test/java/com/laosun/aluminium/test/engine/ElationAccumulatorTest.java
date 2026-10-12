@@ -3,8 +3,8 @@ package com.laosun.aluminium.test.engine;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -20,7 +20,7 @@ public class ElationAccumulatorTest {
     private static final int WEARER = 1505;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-        private static final String ACC = "累计能量";
+    private static final String ACC = "累计能量";
 
     private Character elation;
     private Battle battle;
@@ -51,7 +51,9 @@ public class ElationAccumulatorTest {
         Assertions.assertEquals(340, first, "and the counter accumulates rather than resetting");
     }
 
-    /** The shipped rule, read off the compiled table (discipline 232). */
+    /**
+     * The shipped rule, read off the compiled table (discipline 232).
+     */
     @Test
     public void theShippedRuleCarriesTheCeiling() {
         build();

@@ -1,18 +1,17 @@
 package com.laosun.aluminium.test.engine;
 
 
-import com.laosun.aluminium.test.content.memosprites.AglaeaMemospriteTest;
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.buff.StatModifierBuff;
 import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -39,7 +38,7 @@ public class TickAnchorTest {
     private static final int OWNER = 1003;
     private static final int ALLY = 1202;
     private static final int LEVEL = 80;
-        // ==================================================================
+    // ==================================================================
     // 1. Whose turns spend it
     // ==================================================================
 
@@ -63,7 +62,9 @@ public class TickAnchorTest {
         Assertions.assertEquals(2, durationOf(ally), "the rule owner's turn does");
     }
 
-    /** ...and it expires on his turns, not on hers. */
+    /**
+     * ...and it expires on his turns, not on hers.
+     */
     @Test
     public void itExpiresOnTheCastersTurns() {
         Battle battle = battleWith(grantToAlly(true, 2), BattleFixture.seeded());
@@ -126,7 +127,9 @@ public class TickAnchorTest {
     // 3. The spelling is closed
     // ==================================================================
 
-    /** Only the rule owner's clock has a document behind it, so anything else is refused while the file is read. */
+    /**
+     * Only the rule owner's clock has a document behind it, so anything else is refused while the file is read.
+     */
     @Test
     public void anUnknownTickOwnerIsRefused() {
         EffectSpec effect = boost("BREAKING_EFFECT", 0.5, 3);
@@ -160,7 +163,9 @@ public class TickAnchorTest {
                 "「permanent」 says nothing counts it down; the anchor still says what ends it");
     }
 
-    /** And an anchor naming neither clock is still refused, with both spellings named in the message. */
+    /**
+     * And an anchor naming neither clock is still refused, with both spellings named in the message.
+     */
     @Test
     public void anAnchorOnSomethingThatIsNotAClockIsRefused() {
         EffectSpec effect = boost("BREAKING_EFFECT", 0.5, 3);
@@ -176,7 +181,9 @@ public class TickAnchorTest {
     // Fixture
     // ==================================================================
 
-    /** A rule that grants the ally a boost (提升) lasting {@code turns}, anchored to the owner's turns when asked. */
+    /**
+     * A rule that grants the ally a boost (提升) lasting {@code turns}, anchored to the owner's turns when asked.
+     */
     private static TriggerSpec grantToAlly(boolean anchoredToOwner, int turns) {
         EffectSpec effect = boost("BREAKING_EFFECT", 0.5, turns);
         TriggerSpecs.set(effect, "target", "target");

@@ -1,7 +1,6 @@
 package com.laosun.aluminium.test.trigger;
 
 
-import com.laosun.aluminium.test.engine.TalismanSavesAnAllyTest;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -39,7 +38,9 @@ public class ExpressionChecklistTest {
     private static final Path TEST_DIR = Path.of("src", "test", "java", "com", "laosun", "aluminium", "test");
     private static final Pattern PATH_TOKEN = Pattern.compile("src/[A-Za-z0-9_/.\\-]+\\.(json|java)");
 
-    /** §2: every writable family points at files that exist, and names a judge that exists. */
+    /**
+     * §2: every writable family points at files that exist, and names a judge that exists.
+     */
     @Test
     public void everyWritableFamilyPointsAtRealEvidence() throws IOException {
         List<String> rows = tableRows(section(heading("## §2")));
@@ -70,7 +71,9 @@ public class ExpressionChecklistTest {
         }
     }
 
-    /** §3: a registered family must say what is missing, WHO the readers are, and what the prerequisite is. */
+    /**
+     * §3: a registered family must say what is missing, WHO the readers are, and what the prerequisite is.
+     */
     @Test
     public void everyRegisteredFamilyFillsAllThreeColumns() throws IOException {
         List<String> rows = tableRows(section(heading("## §3")));
@@ -87,7 +90,9 @@ public class ExpressionChecklistTest {
         }
     }
 
-    /** §1: the four steps of the procedure are the part that must not be dropped. */
+    /**
+     * §1: the four steps of the procedure are the part that must not be dropped.
+     */
     @Test
     public void theProcedureKeepsItsFourSteps() throws IOException {
         List<String> body = section(heading("## §1"));
@@ -124,7 +129,9 @@ public class ExpressionChecklistTest {
         return out;
     }
 
-    /** The data rows of a markdown table: no header, no separator. */
+    /**
+     * The data rows of a markdown table: no header, no separator.
+     */
     private static List<String> tableRows(List<String> lines) {
         List<String> out = new ArrayList<>();
         for (String line : lines) {

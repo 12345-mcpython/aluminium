@@ -5,10 +5,11 @@ import com.laosun.aluminium.enums.SkillCategory;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
 import java.util.List;
 
 /**
@@ -20,7 +21,8 @@ import java.util.List;
 public class PearlElationPayoutTest {
     private static final int PEARL = 1503;
     private static final int ELATION = 1502;
-        @Test
+
+    @Test
     public void thePayoutScalesWithHowManyTiersTheTeamQualifiesFor() {
         double two = payoutWith(2);
         double four = payoutWith(4);
@@ -32,7 +34,9 @@ public class PearlElationPayoutTest {
                         + " cancel in the ratio");
     }
 
-    /** The armour the payout adds, measured as (armed - unarmed) for a team with that many Elation characters. */
+    /**
+     * The armour the payout adds, measured as (armed - unarmed) for a team with that many Elation characters.
+     */
     private static double payoutWith(int elationAllies) {
         double unarmed = basicAttackDamage(elationAllies, false);
         double armed = basicAttackDamage(elationAllies, true);

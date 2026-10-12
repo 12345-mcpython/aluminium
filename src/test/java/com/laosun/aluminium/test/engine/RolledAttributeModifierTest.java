@@ -1,17 +1,17 @@
 package com.laosun.aluminium.test.engine;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -30,9 +30,11 @@ public class RolledAttributeModifierTest {
     private static final int SILVER_WOLF = 1006;
     private static final int ALLY = 1210;
     private static final int LEVEL = 80;
-        private static final double EPS = 1e-9;
+    private static final double EPS = 1e-9;
 
-    /** The shipped clause states 0.1, through the roll, on the skill's target. */
+    /**
+     * The shipped clause states 0.1, through the roll, on the skill's target.
+     */
     @Test
     public void herSkillStatesTenPercentOnItsTarget() {
         Character wolf = CharacterFactory.create(SILVER_WOLF, LEVEL);
@@ -57,7 +59,9 @@ public class RolledAttributeModifierTest {
         Assertions.assertEquals(0.0, landed(1.0), EPS, "a roll at 1.0 never lands, whatever the chance is");
     }
 
-    /** Applies a rolled 25% resistance reduction with a generator fixed at the given value. */
+    /**
+     * Applies a rolled 25% resistance reduction with a generator fixed at the given value.
+     */
     private static double landed(double roll) {
         Character applier = Character.fromAttributes("applier", 10_000, 100, 100, 100);
         applier.setTriggerTable(new TriggerTable(9995, List.of(TriggerSpecs.rule(
@@ -86,7 +90,10 @@ public class RolledAttributeModifierTest {
         TriggerSpecs.set(effect, "target", "target");
         return effect;
     }
-    /** Two technique clauses that roll a base chance before lowering a FLAT attribute. */
+
+    /**
+     * Two technique clauses that roll a base chance before lowering a FLAT attribute.
+     */
     @Test
     public void twoTechniquesLowerAnEnemyAttributeThroughTheRoll() {
         Assertions.assertEquals(0.8, appliedRatio(1106, AttributeType.DEFENCE, false), 1e-6,
@@ -139,7 +146,10 @@ public class RolledAttributeModifierTest {
         }
         throw new AssertionError("no monster in the probed range takes the " + attribute + " reduction");
     }
-    /** 1004's Skill: 5% base chance, 10% slow, two turns -- the sixth stale registration refuted. */
+
+    /**
+     * 1004's Skill: 5% base chance, 10% slow, two turns -- the sixth stale registration refuted.
+     */
     @Test
     public void weltsSkillSlowsTheTargetThroughItsBaseChance() {
         Assertions.assertEquals(0.9, appliedRatio(1004, AttributeType.SPEED, true), 1e-6,

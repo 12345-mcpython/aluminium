@@ -6,8 +6,8 @@ import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.DoubleValue;
 import com.laosun.aluminium.models.Weapon;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -22,7 +22,7 @@ import java.util.List;
 public class DestinySThreadsForewovenTest {
     private static final int WEARER = 1001;
     private static final int LEVEL = 80;
-        private static final double SHARE_PER_DEFENCE = 0.00012;
+    private static final double SHARE_PER_DEFENCE = 0.00012;
     private static final double CAP = 0.48;
 
     @Test
@@ -59,7 +59,7 @@ public class DestinySThreadsForewovenTest {
         Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
         double before = unit.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
         battle.startBattle();
-        return new double[] {unit.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get() - before,
+        return new double[]{unit.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get() - before,
                 unit.getAttribute(AttributeType.DEFENCE).get()};
     }
 }

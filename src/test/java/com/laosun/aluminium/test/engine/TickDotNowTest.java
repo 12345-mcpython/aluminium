@@ -1,17 +1,17 @@
 package com.laosun.aluminium.test.engine;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.buff.DotBuff;
 import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -28,10 +28,15 @@ import java.util.Random;
  * is dealing <b>now</b>.
  */
 public class TickDotNowTest {
-    /** Himeko: no shipped rule file, so the table under test is the only one. */
+    /**
+     * Himeko: no shipped rule file, so the table under test is the only one.
+     */
     private static final int OWNER = 1003;
     private static final int LEVEL = 80;
-        /** Note: The extra instance is exactly {@code percent} of what the state was dealing. */
+
+    /**
+     * Note: The extra instance is exactly {@code percent} of what the state was dealing.
+     */
     @Test
     public void theExtraInstanceIsAShareOfTheState() {
         Fixture f = new Fixture();
@@ -45,7 +50,9 @@ public class TickDotNowTest {
                 "「立即产生 1 次相当于原伤害 85% 的伤害」 (immediately deals 1 instance of damage equal to 85% of the original damage) -- a share of the state's own damage, through the same settlement");
     }
 
-    /** Note: It is damage, not ageing: the state keeps its remaining turns. */
+    /**
+     * Note: It is damage, not ageing: the state keeps its remaining turns.
+     */
     @Test
     public void theExtraInstanceDoesNotAgeTheState() {
         Fixture f = new Fixture();
@@ -60,7 +67,9 @@ public class TickDotNowTest {
         Assertions.assertFalse(f.enemy.getBuffManager().allBuffsOf(DotBuff.class).isEmpty(), "…and the state is still there");
     }
 
-    /** Note: Only the named state ticks: a different element's DOT is left alone. */
+    /**
+     * Note: Only the named state ticks: a different element's DOT is left alone.
+     */
     @Test
     public void onlyTheNamedStateTicks() {
         Fixture f = new Fixture();
@@ -71,7 +80,9 @@ public class TickDotNowTest {
         Assertions.assertEquals(0.0, windTick, 1e-9, "no Wind DOT is up, so the Wind state has nothing to settle");
     }
 
-    /** Note: A rule that names no share is refused: "立即产生 1 次" always comes with a percentage or an amount. */
+    /**
+     * Note: A rule that names no share is refused: "立即产生 1 次" always comes with a percentage or an amount.
+     */
     @Test
     public void aMissingShareIsRefused() {
         EffectSpec effect = new EffectSpec();
@@ -103,7 +114,9 @@ public class TickDotNowTest {
             battle.startBattle();
         }
 
-        /** Applies a Thunder DOT through a rule; {@code caps} selects whether the rule states a layer ceiling. */
+        /**
+         * Applies a Thunder DOT through a rule; {@code caps} selects whether the rule states a layer ceiling.
+         */
         private void applyDot(boolean caps) {
             EffectSpec dot = new EffectSpec();
             TriggerSpecs.set(dot, "op", "APPLY_DOT");

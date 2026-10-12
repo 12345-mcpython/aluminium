@@ -5,9 +5,9 @@ import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
-import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.models.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -29,11 +29,13 @@ import java.util.Random;
 public class OneOfEffectTest {
     private static final int WOLF = 1506;
     private static final int ALLY = 1204;
-        private static final String A = "标记A";
+    private static final String A = "标记A";
     private static final String B = "标记B";
     private static final String C = "标记C";
 
-    /** Exactly one of the three markers is applied, and which one moves with the seed. */
+    /**
+     * Exactly one of the three markers is applied, and which one moves with the seed.
+     */
     @Test
     public void exactlyOneEffectRuns() {
         boolean sawA = false;
@@ -54,7 +56,9 @@ public class OneOfEffectTest {
                 "and the pick varies with the roll - always the same effect would be a constant, not a choice");
     }
 
-    /** Without the field, EVERY effect runs - which is what makes the field meaningful. */
+    /**
+     * Without the field, EVERY effect runs - which is what makes the field meaningful.
+     */
     @Test
     public void withoutTheFieldAllEffectsRun() {
         Character wolf = marksAfterOneFiring(0, false);
@@ -98,7 +102,9 @@ public class OneOfEffectTest {
         Assertions.assertTrue(sawA && sawB, "and the pool is what the roll chooses from - both of its effects appear");
     }
 
-    /** `always` on a rule with no `one_of` marks nothing: it reads like a forgotten field, so it is refused. */
+    /**
+     * `always` on a rule with no `one_of` marks nothing: it reads like a forgotten field, so it is refused.
+     */
     @Test
     public void alwaysWithoutOneOfIsRefused() {
         EffectSpec constant = mark(A);
@@ -109,7 +115,9 @@ public class OneOfEffectTest {
         Assertions.assertTrue(error.getMessage().contains("one_of"), "the message names the field it needs");
     }
 
-    /** And so is a WEIGHT on a rule with no `one_of`: there is no pick for it to be a share of. */
+    /**
+     * And so is a WEIGHT on a rule with no `one_of`: there is no pick for it to be a share of.
+     */
     @Test
     public void aWeightWithoutOneOfIsRefused() {
         EffectSpec weighted = mark(A);
@@ -120,7 +128,9 @@ public class OneOfEffectTest {
         Assertions.assertTrue(error.getMessage().contains("one_of"), "the message names the field it needs");
     }
 
-    /** The POOL is what "at least two" counts: one constant plus one pick is "pick one of one". */
+    /**
+     * The POOL is what "at least two" counts: one constant plus one pick is "pick one of one".
+     */
     @Test
     public void aPoolOfOneBesideAnAlwaysEffectIsRefused() {
         EffectSpec constant = mark(C);
@@ -133,7 +143,9 @@ public class OneOfEffectTest {
         Assertions.assertTrue(error.getMessage().contains("one_of"), "the message names the field");
     }
 
-    /** "Pick one of one" states nothing, and reads exactly like a rule that forgot the field. */
+    /**
+     * "Pick one of one" states nothing, and reads exactly like a rule that forgot the field.
+     */
     @Test
     public void aSingleEffectWithTheFieldIsRefused() {
         IllegalArgumentException error = Assertions.assertThrows(IllegalArgumentException.class,
@@ -142,7 +154,9 @@ public class OneOfEffectTest {
         Assertions.assertTrue(error.getMessage().contains("one_of"), "the message names the field");
     }
 
-    /** Combined with a per-effect `min_eidolon` the two filters compose two ways, so the pair is refused. */
+    /**
+     * Combined with a per-effect `min_eidolon` the two filters compose two ways, so the pair is refused.
+     */
     @Test
     public void theFieldBesideAPerEffectEidolonGateIsRefused() {
         EffectSpec first = mark(A);
@@ -163,7 +177,9 @@ public class OneOfEffectTest {
         return marksAfterOneFiring(seed, true);
     }
 
-    /** The same firing, with a rule of three marks where the THIRD is {@code always}: A/B are the pool, C is constant. */
+    /**
+     * The same firing, with a rule of three marks where the THIRD is {@code always}: A/B are the pool, C is constant.
+     */
     private static Character marksWithAnAlwaysEffect(int seed) {
         Battle battle = new Battle(
                 List.of(CharacterFactory.create(WOLF, 80), CharacterFactory.create(ALLY, 80)),
@@ -190,7 +206,9 @@ public class OneOfEffectTest {
         return wolf;
     }
 
-    /** Applies one firing of a three-effect rule and returns the unit, so the caller can read the markers. */
+    /**
+     * Applies one firing of a three-effect rule and returns the unit, so the caller can read the markers.
+     */
     private static Character marksAfterOneFiring(int seed, boolean oneOf) {
         Battle battle = new Battle(
                 List.of(CharacterFactory.create(WOLF, 80), CharacterFactory.create(ALLY, 80)),
@@ -208,7 +226,9 @@ public class OneOfEffectTest {
         return new TriggerTable(WOLF, List.of(spec));
     }
 
-    /** A rule whose N effects each mark the unit, so a count says how many ran. */
+    /**
+     * A rule whose N effects each mark the unit, so a count says how many ran.
+     */
     private static TriggerSpec spec(boolean oneOf, int effects) {
         List<EffectSpec> marks = List.of(mark(A), mark(B), mark(C)).subList(0, effects);
         TriggerSpec spec = TriggerSpecs.rule("TURN_START", List.of("actor == self"),

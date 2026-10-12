@@ -1,8 +1,6 @@
 package com.laosun.aluminium.test.engine;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.enums.AttributeType;
@@ -10,11 +8,14 @@ import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.DamageType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.skill.DefaultSkill;
 import com.laosun.aluminium.models.DoubleValue;
+import com.laosun.aluminium.models.buff.DotBuff;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
-import com.laosun.aluminium.models.buff.DotBuff;
+import com.laosun.aluminium.models.skill.DefaultSkill;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.AttributeBuilder;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -256,7 +257,9 @@ public class DotTest {
                 "and frozen: a later change to her panel cannot change a DOT that is already burning");
     }
 
-    /** A flat constant may sit on top of the derived share - "等同于 60% 攻击力 + 50". */
+    /**
+     * A flat constant may sit on top of the derived share - "等同于 60% 攻击力 + 50".
+     */
     @Test
     public void aDerivedMagnitudeMayCarryAConstant() {
         Fixture f = new Fixture(TriggerSpecs.dot("Ice", 50.0, "self_attr:ATTACK", 0.6, 2, null));
@@ -270,7 +273,7 @@ public class DotTest {
     /**
      * A DOT may state a <b>base chance</b>, and it is the same per-target pipeline a control uses.
      *
-     * <p>"有一定基础概率使目标陷入灼烧状态" is common in the documents, so the field is read here too - 
+     * <p>"有一定基础概率使目标陷入灼烧状态" is common in the documents, so the field is read here too -
      * and when the roll fails, nothing is attached (not a DOT with 0 turns, which would still settle nothing but
      * would show up in "有几个负面效果").
      */
@@ -301,7 +304,9 @@ public class DotTest {
                 () -> tableOf(TriggerSpecs.dot("Fire", 500.0, null, null, null, null)), "no turns");
     }
 
-    /** An unknown element would attach nothing at all, so it is refused where the file is read. */
+    /**
+     * An unknown element would attach nothing at all, so it is refused where the file is read.
+     */
     @Test
     public void anUnknownElementIsRejectedAtLoadTime() {
         IllegalArgumentException rejected = Assertions.assertThrows(IllegalArgumentException.class,
@@ -310,7 +315,9 @@ public class DotTest {
         Assertions.assertTrue(rejected.getMessage().contains("Burning"), rejected.getMessage());
     }
 
-    /** A DOT has to know how much each turn takes: neither an amount nor a scale+percent means 0 damage forever. */
+    /**
+     * A DOT has to know how much each turn takes: neither an amount nor a scale+percent means 0 damage forever.
+     */
     @Test
     public void aDotWithoutAMagnitudeIsRejected() {
         IllegalArgumentException rejected = Assertions.assertThrows(IllegalArgumentException.class,
@@ -323,7 +330,9 @@ public class DotTest {
                 "a percent with no scale is a share of nothing");
     }
 
-    /** One battle with a rule under test, one enemy, and a way to read the DOT it attached. */
+    /**
+     * One battle with a rule under test, one enemy, and a way to read the DOT it attached.
+     */
     private static final class Fixture {
         private final Character hero;
         private final Enemy enemy;
@@ -332,7 +341,7 @@ public class DotTest {
         private Fixture(com.laosun.aluminium.beans.EffectSpec effect) {
             this.hero = character("applier", 0.0);
             this.enemy = dummy(100_000, 100, 100);
-            this.hero.setTriggerTable(new com.laosun.aluminium.models.TriggerTable(0,
+            this.hero.setTriggerTable(new TriggerTable(0,
                     List.of(TriggerSpecs.rule("ALLY_ATTACK", null, effect))));
             this.battle = new Battle(List.of(hero), List.of(enemy), BattleFixture.seeded());
             battle.startBattle();
@@ -342,7 +351,9 @@ public class DotTest {
             return battle.fireTriggers(TriggerEvent.ALLY_ATTACK, hero, enemy, 1, 0);
         }
 
-        /** The DOT the rule attached, failing loudly when there is none. */
+        /**
+         * The DOT the rule attached, failing loudly when there is none.
+         */
         private DotBuff dot() {
             DotBuff found = enemy.getBuffManager().findBuff(DotBuff.class);
             Assertions.assertNotNull(found, "the rule was expected to attach a DOT");
@@ -350,10 +361,12 @@ public class DotTest {
         }
     }
 
-    /** Compiles one effect into a table, which is where its validation runs. */
-    private static com.laosun.aluminium.models.TriggerTable tableOf(
+    /**
+     * Compiles one effect into a table, which is where its validation runs.
+     */
+    private static TriggerTable tableOf(
             com.laosun.aluminium.beans.EffectSpec effect) {
-        return new com.laosun.aluminium.models.TriggerTable(0,
+        return new TriggerTable(0,
                 List.of(TriggerSpecs.rule("ALLY_ATTACK", null, effect)));
     }
 
@@ -367,7 +380,9 @@ public class DotTest {
         return Enemy.fromAttributes("dummy", hp, defence, 100, speed);
     }
 
-    /** Records the order of elements received by onDamage, used to assert "first applied, first settled". */
+    /**
+     * Records the order of elements received by onDamage, used to assert "first applied, first settled".
+     */
     private static Enemy recorder(double hp, double defence, double speed, List<DamageElement> seen) {
         AttributeBuilder builder = new AttributeBuilder();
         builder.setBase(AttributeType.HEALTH, hp)

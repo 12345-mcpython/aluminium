@@ -9,9 +9,10 @@ import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Damage;
 import com.laosun.aluminium.models.DoubleValue;
 import com.laosun.aluminium.models.Weapon;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.models.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -29,7 +30,7 @@ public class ThusBurnsTheDawnTest {
     private static final int WEARER = 1205;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-        private static final String SUN = "烈阳";
+    private static final String SUN = "烈阳";
 
     private Character wearer;
     private Enemy enemy;
@@ -92,7 +93,7 @@ public class ThusBurnsTheDawnTest {
         int ignores = 0;
         int boosts = 0;
         for (var rule : wearer.getTriggerTable().matching(TriggerEvent.DEALING_DAMAGE,
-                new com.laosun.aluminium.models.TriggerTable.TriggerContext(wearer, wearer, enemy, 0, 0, null,
+                new TriggerTable.TriggerContext(wearer, wearer, enemy, 0, 0, null,
                         battle, null))) {
             if (!rule.id().startsWith("cone23044_")) {
                 continue;

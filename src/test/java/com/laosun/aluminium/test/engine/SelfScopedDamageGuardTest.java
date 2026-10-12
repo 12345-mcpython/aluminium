@@ -6,8 +6,8 @@ import com.laosun.aluminium.enums.DamageType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Damage;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -22,7 +22,10 @@ import java.util.List;
 public class SelfScopedDamageGuardTest {
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-        /** The ally's damage against an enemy already below half HP, optionally with the owner in the party. */
+
+    /**
+     * The ally's damage against an enemy already below half HP, optionally with the owner in the party.
+     */
     private double allyDamage(int owner, boolean withOwner) {
         Character ally = CharacterFactory.create(ALLY, LEVEL);
         Enemy enemy = BattleFixture.monster();
@@ -53,7 +56,9 @@ public class SelfScopedDamageGuardTest {
         Assertions.assertEquals(alone, watched, 1e-6, "1220's ultimate multiplier must not reach a teammate");
     }
 
-    /** The owner's own damage: the ultimate multiplier must apply to an ULTRA-category instance and to nothing else. */
+    /**
+     * The owner's own damage: the ultimate multiplier must apply to an ULTRA-category instance and to nothing else.
+     */
     @Test
     public void onlyAnUltimateCategoryInstanceGetsTheMultiplier() {
         Character owner = CharacterFactory.create(1220, LEVEL);
@@ -70,7 +75,9 @@ public class SelfScopedDamageGuardTest {
                 "only the ULTRA-category instance is multiplied, by exactly 30%");
     }
 
-    /** An ALLY's own ULTRA-category instance, with and without the owner in the party. */
+    /**
+     * An ALLY's own ULTRA-category instance, with and without the owner in the party.
+     */
     private double allyUltimate(int owner, boolean withOwner) {
         Character ally = CharacterFactory.create(ALLY, LEVEL);
         Enemy enemy = BattleFixture.monster();

@@ -7,8 +7,8 @@ import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Weapon;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -25,7 +25,7 @@ public class CornucopiaAndPostOpConversationTest {
     private static final int WEARER = 1205;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-        private Character wearer;
+    private Character wearer;
     private Character ally;
     private Enemy enemy;
 
@@ -40,7 +40,9 @@ public class CornucopiaAndPostOpConversationTest {
         return battle;
     }
 
-    /** One cast, measured at three moments: base, inside the window, and after the delivery is over. */
+    /**
+     * One cast, measured at three moments: base, inside the window, and after the delivery is over.
+     */
     private double[] castAndMeasure(Battle battle, SkillCategory category) {
         double base = wearer.getAttribute(AttributeType.OUTGOING_HEALING_BOOST).get();
         var skill = wearer.getSkills().values().iterator().next();

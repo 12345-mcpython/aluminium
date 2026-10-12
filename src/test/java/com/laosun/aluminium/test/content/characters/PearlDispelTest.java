@@ -1,24 +1,23 @@
 package com.laosun.aluminium.test.content.characters;
-import com.laosun.aluminium.test.support.TestTurns;
-import com.laosun.aluminium.test.support.BattleFixture;
+
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.DamageElement;
-import com.laosun.aluminium.enums.DebuffClass;
+import com.laosun.aluminium.enums.SkillCategory;
+import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.Damage;
-import com.laosun.aluminium.models.buff.ClassResistBuff;
 import com.laosun.aluminium.models.buff.DotBuff;
 import com.laosun.aluminium.models.buff.StateBuff;
-import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
-import com.laosun.aluminium.enums.SkillCategory;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
-import com.laosun.aluminium.enums.TriggerEvent;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
 import java.util.List;
 
-/** Character 1503 (Pearl): her trait dispels a debuff on the Skill and on an enhanced basic. */
+/**
+ * Character 1503 (Pearl): her trait dispels a debuff on the Skill and on an enhanced basic.
+ */
 public class PearlDispelTest {
     private static final int PEARL = 1503;
     private static final int ALLY = 1204;

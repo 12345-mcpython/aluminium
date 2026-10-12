@@ -1,17 +1,17 @@
 package com.laosun.aluminium.test.engine;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -35,7 +35,9 @@ public class SuperBreakTest {
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
 
-    /** The state tracks the toughness bar: false while it stands, true once it is emptied. */
+    /**
+     * The state tracks the toughness bar: false while it stands, true once it is emptied.
+     */
     @Test
     public void theBrokenStateFollowsTheToughnessBar() {
         Char enemy = strongEnemy();
@@ -49,7 +51,9 @@ public class SuperBreakTest {
                 "…and a character is never in it");
     }
 
-    /** Note: The conversion lands on a broken target and nowhere else. */
+    /**
+     * Note: The conversion lands on a broken target and nowhere else.
+     */
     @Test
     public void theConversionLandsOnlyOnBrokenTargets() {
         double plain = damageWith(false, rule(2.0));
@@ -67,7 +71,9 @@ public class SuperBreakTest {
                 "against a broken target the same attack is followed by the converted super-break instance");
     }
 
-    /** Note: The magnitude is the instance's toughness reduction, not its damage: doubling the percentage doubles the extra. */
+    /**
+     * Note: The magnitude is the instance's toughness reduction, not its damage: doubling the percentage doubles the extra.
+     */
     @Test
     public void theConversionScalesWithTheStanceValue() {
         double once = damageWith(true, rule(1.0));
@@ -79,7 +85,9 @@ public class SuperBreakTest {
                         + "in both runs)");
     }
 
-    /** Note: The op is refused anywhere but DEALING_DAMAGE: it reads the instance being settled. */
+    /**
+     * Note: The op is refused anywhere but DEALING_DAMAGE: it reads the instance being settled.
+     */
     @Test
     public void theOpIsRefusedOnOtherEvents() {
         EffectSpec effect = new EffectSpec();
@@ -105,7 +113,9 @@ public class SuperBreakTest {
         return TriggerSpecs.rule("DEALING_DAMAGE", List.of("target has_state 弱点击破"), effect);
     }
 
-    /** Settles her basic attack against a (optionally broken) weak enemy and reports the damage it did. */
+    /**
+     * Settles her basic attack against a (optionally broken) weak enemy and reports the damage it did.
+     */
     private static double damageWith(boolean broken, TriggerSpec extra) {
         Char c = strongEnemy();
         if (broken) {
@@ -119,7 +129,9 @@ public class SuperBreakTest {
         return before - c.enemy.getCurrentHp();
     }
 
-    /** A hero, a battle and an enemy that the hero's element can actually reduce. */
+    /**
+     * A hero, a battle and an enemy that the hero's element can actually reduce.
+     */
     private static Char strongEnemy() {
         Character hero = CharacterFactory.create(CID, LEVEL);
         DamageElement element = hero.getSkills().get(SkillType.COMMON).getData().getElement();
@@ -146,7 +158,9 @@ public class SuperBreakTest {
     }
 
     private record Char(Character hero, Enemy enemy, Battle battle) {
-        /** Empties the toughness bar through the engine's own entry point. */
+        /**
+         * Empties the toughness bar through the engine's own entry point.
+         */
         private void breakIt() {
             DamageElement element = hero.getSkills().get(SkillType.COMMON).getData().getElement();
             battle.reduceToughness(hero, enemy, element, 999);

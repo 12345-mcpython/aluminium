@@ -6,8 +6,8 @@ import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -21,7 +21,10 @@ public class SparkleTest {
     private static final int SPARKLE = 1306;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-        /** Note: "等同于花火24.00%暴击伤害+45.00%" -- a derived share PLUS a flat amount, both read from the engine. */
+
+    /**
+     * Note: "等同于花火24.00%暴击伤害+45.00%" -- a derived share PLUS a flat amount, both read from the engine.
+     */
     @Test
     public void theSkillHandsOverHerCritDamageShare() {
         Character sparkle = CharacterFactory.create(SPARKLE, LEVEL);
@@ -38,7 +41,9 @@ public class SparkleTest {
                 "24% of her CRIT_ATTACK plus a flat 45%: expected " + expected);
     }
 
-    /** Note: The talent's party-wide boost on a Skill Point spent, capped at the document's three stacks. */
+    /**
+     * Note: The talent's party-wide boost on a Skill Point spent, capped at the document's three stacks.
+     */
     @Test
     public void everySpentSkillPointRaisesThePartysDamage() {
         Character sparkle = CharacterFactory.create(SPARKLE, LEVEL);
@@ -61,7 +66,9 @@ public class SparkleTest {
                 "「最多可叠加 3 层」 (stacks at most 3 times) -- five firings must still read three stacks of 6%");
     }
 
-    /** Note: The Ultimate: four Skill Points and the [谜诡] state on every ally. */
+    /**
+     * Note: The Ultimate: four Skill Points and the [谜诡] state on every ally.
+     */
     @Test
     public void theUltimateGrantsSkillPointsAndCipher() {
         Character sparkle = CharacterFactory.create(SPARKLE, LEVEL);
@@ -83,7 +90,10 @@ public class SparkleTest {
     private static Random fixed() {
         return BattleFixture.alwaysRoll(0.0);
     }
-    /** Note: Her talent: "while Sparkle is on the field the skill point cap is raised by 2" (tbgd 130604). */
+
+    /**
+     * Note: Her talent: "while Sparkle is on the field the skill point cap is raised by 2" (tbgd 130604).
+     */
     @Test
     public void herTalentRaisesTheTeamCap() {
         int withHer = capWith(List.of(CharacterFactory.create(SPARKLE, LEVEL), CharacterFactory.create(ALLY, LEVEL)));

@@ -1,15 +1,19 @@
 package com.laosun.aluminium.test.content.characters;
+
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
 import java.util.List;
 
-/** Character 1503 (Pearl): the Ultimate marks an ally as the archetype and Pearl as its deep learner. */
+/**
+ * Character 1503 (Pearl): the Ultimate marks an ally as the archetype and Pearl as its deep learner.
+ */
 public class PearlDeepStudyStateTest {
     private static final int PEARL = 1503;
     private static final int ELATION = 1502;

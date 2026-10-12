@@ -7,9 +7,9 @@ import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Damage;
 import com.laosun.aluminium.models.buff.DotBuff;
 import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.utils.RelicFactory;
-import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -23,7 +23,7 @@ import java.util.List;
 public class DebuffAppliedTierTest {
     private static final int WEARER = 1001;
     private static final int LEVEL = 80;
-        private static final int RELIC_LEVEL = 15;
+    private static final int RELIC_LEVEL = 15;
     private static final String COUNTER = "负面激化";
 
     @Test

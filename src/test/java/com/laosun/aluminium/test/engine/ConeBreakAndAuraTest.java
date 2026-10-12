@@ -10,8 +10,9 @@ import com.laosun.aluminium.models.Damage;
 import com.laosun.aluminium.models.DoubleValue;
 import com.laosun.aluminium.models.Weapon;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.models.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -24,7 +25,8 @@ public class ConeBreakAndAuraTest {
     private static final int WEARER = 1205;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-        private Battle battle(Character... units) {
+
+    private Battle battle(Character... units) {
         Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(units), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
@@ -49,7 +51,7 @@ public class ConeBreakAndAuraTest {
         // damage ratio below did move). So the stacking is asserted where it is observable: the ratio and the spec.
         int spec = 0;
         for (var rule : withCone.getTriggerTable().matching(TriggerEvent.BREAK,
-                new com.laosun.aluminium.models.TriggerTable.TriggerContext(withCone, withCone, target, 0, 0))) {
+                new TriggerTable.TriggerContext(withCone, withCone, target, 0, 0))) {
             for (var effect : rule.effects()) {
                 if ("ADD_STACK".equals(effect.getOp())) {
                     spec++;
@@ -99,7 +101,7 @@ public class ConeBreakAndAuraTest {
         // invisible to them (measured: 2 -> 1 turn gave reds 0). Discipline 14.
         int pinnedTurns = 0;
         for (var rule : wearer.getTriggerTable().matching(TriggerEvent.FOLLOW_UP,
-                new com.laosun.aluminium.models.TriggerTable.TriggerContext(wearer, wearer, wearer, 0, 0))) {
+                new TriggerTable.TriggerContext(wearer, wearer, wearer, 0, 0))) {
             for (var effect : rule.effects()) {
                 if ("CRIT_ATTACK".equals(effect.getAttribute()) && "all_allies".equals(effect.getTarget())) {
                     pinnedTurns++;

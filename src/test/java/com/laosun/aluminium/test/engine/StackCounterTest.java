@@ -1,15 +1,15 @@
 package com.laosun.aluminium.test.engine;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -33,7 +33,10 @@ public class StackCounterTest {
     private static final int HANYA = 1215;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-        /** The counter accumulates one mark per firing, and a threshold rule can read it. */
+
+    /**
+     * The counter accumulates one mark per firing, and a threshold rule can read it.
+     */
     @Test
     public void theCountIsReadableAtTheThreshold() {
         Character hero = CharacterFactory.create(HANYA, LEVEL);
@@ -55,7 +58,9 @@ public class StackCounterTest {
                 "…and counting starts again (the cap stops a stray event from pushing it past the threshold)");
     }
 
-    /** The two removal directions work on a counter: one mark off, or the whole counter by name. */
+    /**
+     * The two removal directions work on a counter: one mark off, or the whole counter by name.
+     */
     @Test
     public void bothRemovalDirectionsWork() {
         Character hero = CharacterFactory.create(HANYA, LEVEL);
@@ -74,7 +79,9 @@ public class StackCounterTest {
         Assertions.assertEquals(0, enemy.getBuffManager().stacksOf("承负"));
     }
 
-    /** Note: A name that no effect in this file creates is refused at load: it would be a condition that never holds. */
+    /**
+     * Note: A name that no effect in this file creates is refused at load: it would be a condition that never holds.
+     */
     @Test
     public void anUndeclaredCounterNameIsRefusedAtLoad() {
         Character hero = CharacterFactory.create(HANYA, LEVEL);
@@ -95,7 +102,9 @@ public class StackCounterTest {
     // Helpers
     // ==================================================================
 
-    /** One mark on the enemy's Bondmate (承负) counter, capped at 2. */
+    /**
+     * One mark on the enemy's Bondmate (承负) counter, capped at 2.
+     */
     private static TriggerSpec countMark() {
         EffectSpec effect = new EffectSpec();
         TriggerSpecs.set(effect, "op", "ADD_STACK");
@@ -106,7 +115,9 @@ public class StackCounterTest {
         return TriggerSpecs.rule("ALLY_ATTACK", null, effect);
     }
 
-    /** The threshold rule: at two marks, pays 1 skill point and clears the counter. */
+    /**
+     * The threshold rule: at two marks, pays 1 skill point and clears the counter.
+     */
     private static TriggerSpec atThreshold() {
         EffectSpec pay = new EffectSpec();
         TriggerSpecs.set(pay, "op", "GAIN_SKILL_POINT");

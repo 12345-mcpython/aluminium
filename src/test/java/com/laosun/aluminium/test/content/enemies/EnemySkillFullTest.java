@@ -36,7 +36,9 @@ public class EnemySkillFullTest {
     private static final int ENEMY_LEVEL = 90;
     private static final int SEGMENTS = 2;
 
-    /** Enough HP that a skill never kills, so the assertions measure damage rather than overkill. */
+    /**
+     * Enough HP that a skill never kills, so the assertions measure damage rather than overkill.
+     */
     private static final double HERO_HP = 100_000;
 
     // ==================================================================
@@ -61,7 +63,9 @@ public class EnemySkillFullTest {
         Assertions.assertEquals(HERO_HP, team.get(2).getCurrentHp(), "nor the third");
     }
 
-    /** An AoE skill reaches every living character on our side. */
+    /**
+     * An AoE skill reaches every living character on our side.
+     */
     @Test
     public void anAoeSkillReachesEveryLivingCharacter() {
         Battle battle = newBattle();
@@ -77,7 +81,9 @@ public class EnemySkillFullTest {
         }
     }
 
-    /** Blast reaches the main target and the characters next to it, but not the far one. */
+    /**
+     * Blast reaches the main target and the characters next to it, but not the far one.
+     */
     @Test
     public void blastReachesTheMainTargetAndItsNeighbours() {
         Battle battle = newBattle();
@@ -166,7 +172,9 @@ public class EnemySkillFullTest {
 
     // ==================================================================
 
-    /** Three characters with a lot of HP against one enemy, with crit switched off for determinism. */
+    /**
+     * Three characters with a lot of HP against one enemy, with crit switched off for determinism.
+     */
     private static Battle newBattle() {
         List<Character> team = List.of(
                 Character.fromAttributes("left", HERO_HP, 100, 100, 100),

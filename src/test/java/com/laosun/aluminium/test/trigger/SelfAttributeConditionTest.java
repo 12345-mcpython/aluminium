@@ -1,8 +1,6 @@
 package com.laosun.aluminium.test.trigger;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.beans.EffectSpec;
@@ -13,9 +11,11 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.DoubleValue;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.utils.RelicFactory;
 import org.junit.jupiter.api.Assertions;
@@ -53,27 +53,45 @@ import java.util.List;
 public class SelfAttributeConditionTest {
     private static final double EPS = 1e-6;
 
-    /** Himeko: no shipped rule file, so the table under test is the only one in play. */
+    /**
+     * Himeko: no shipped rule file, so the table under test is the only one in play.
+     */
     private static final int OWNER = 1003;
     private static final int LEVEL = 80;
 
     // The planar 2-pieces authored with this vocabulary. None of them had a rule file before.
-    /** Space Sealing Station (太空封印站): ATK +12%; SPD >= 120 -> ATK additionally +12%. */
+    /**
+     * Space Sealing Station (太空封印站): ATK +12%; SPD >= 120 -> ATK additionally +12%.
+     */
     private static final int SPACE_SEALING_STATION = 301;
-    /** Fleet of the Ageless (不老者的仙舟): Max HP +12%; SPD >= 120 -> all of our ATK +8%. */
+    /**
+     * Fleet of the Ageless (不老者的仙舟): Max HP +12%; SPD >= 120 -> all of our ATK +8%.
+     */
     private static final int FLEET_OF_THE_AGELESS = 302;
-    /** Belobog of the Architects (筑城者的贝洛伯格): DEF +15%; Effect Hit Rate >= 50% -> DEF additionally +15%. */
+    /**
+     * Belobog of the Architects (筑城者的贝洛伯格): DEF +15%; Effect Hit Rate >= 50% -> DEF additionally +15%.
+     */
     private static final int BELOBOG = 304;
-    /** Inert Salsotto (停转的萨尔索图): CRIT Rate +8%; current CRIT Rate >= 50% -> Ultimate and follow-up attack damage +15%. */
+    /**
+     * Inert Salsotto (停转的萨尔索图): CRIT Rate +8%; current CRIT Rate >= 50% -> Ultimate and follow-up attack damage +15%.
+     */
     private static final int INERT_SALSOTTO = 306;
-    /** Talia: Kingdom of Banditry (盗贼公国塔利亚): Break Effect +16%; SPD >= 145 -> Break Effect additionally +20%. */
+    /**
+     * Talia: Kingdom of Banditry (盗贼公国塔利亚): Break Effect +16%; SPD >= 145 -> Break Effect additionally +20%.
+     */
     private static final int TALIA = 307;
-    /** Sprightly Vonwacq (生命的翁瓦克): Energy Regeneration Rate +5%; SPD >= 120 -> action advances 40% on entering battle. */
+    /**
+     * Sprightly Vonwacq (生命的翁瓦克): Energy Regeneration Rate +5%; SPD >= 120 -> action advances 40% on entering battle.
+     */
     private static final int SPRIGHTLY_VONWACQ = 308;
-    /** Rutilant Arena (繁星竞技场): CRIT Rate +8%; current CRIT Rate >= 0% -> basic attack and Skill damage +20%. */
+    /**
+     * Rutilant Arena (繁星竞技场): CRIT Rate +8%; current CRIT Rate >= 0% -> basic attack and Skill damage +20%.
+     */
     private static final int CELESTIAL_DIFFERENTIATOR = 309;
 
-    /** All seven, for the cases that make a claim about the whole authored batch. */
+    /**
+     * All seven, for the cases that make a claim about the whole authored batch.
+     */
     private static final List<Integer> AUTHORED_PLANAR_TWO_PIECES = List.of(
             SPACE_SEALING_STATION, FLEET_OF_THE_AGELESS, BELOBOG, INERT_SALSOTTO, TALIA,
             SPRIGHTLY_VONWACQ, CELESTIAL_DIFFERENTIATOR);
@@ -82,7 +100,9 @@ public class SelfAttributeConditionTest {
     // 1. The value is read, and it is the owner's
     // ==================================================================
 
-    /** The threshold decides: just short does not fire, at it and above does. */
+    /**
+     * The threshold decides: just short does not fire, at it and above does.
+     */
     @Test
     public void theThresholdDecidesWhetherTheRuleFires() {
         Assertions.assertEquals(0, fireAtSpeed(144.9), "just short of 145");
@@ -111,7 +131,9 @@ public class SelfAttributeConditionTest {
                 "and not even when the slow one acts: 100 speed is below the threshold either way");
     }
 
-    /** The same rule fires for a fast owner, so the case above is not passing because nothing works. */
+    /**
+     * The same rule fires for a fast owner, so the case above is not passing because nothing works.
+     */
     @Test
     public void theSameRuleFiresForAFastOwner() {
         Character fast = ownerWithTrigger(speedThresholdRule(120), 130);
@@ -125,7 +147,7 @@ public class SelfAttributeConditionTest {
      * A <b>ratio</b> attribute is compared as a fraction, not as a percentage.
      *
      * <p>{@code self_attr:CRIT_CHANCE >= 0.} is "0% crit rate or better". An author who writes
-     * {@code >= 0}, or an implementation that scaled the literal, fails here instead of in production - 
+     * {@code >= 0}, or an implementation that scaled the literal, fails here instead of in production -
      * where the only symptom would be "this set bonus never seems to do anything". The flat counterpart is
      * asserted in the same case so both scales are on one page: 145 speed is written {@code 145}, and
      * {@code 1.45} is nonsense for it.
@@ -139,7 +161,9 @@ public class SelfAttributeConditionTest {
         Assertions.assertEquals(0, fireAtSpeed(1.45), "the fraction spelling of 145 need not fire");
     }
 
-    /** The literal may sit on either side, like every other numeric variable. */
+    /**
+     * The literal may sit on either side, like every other numeric variable.
+     */
     @Test
     public void theLiteralMayBeOnEitherSide() {
         // "100 <= self_attr:SPEED" -- true for a 130-speed owner.
@@ -154,7 +178,9 @@ public class SelfAttributeConditionTest {
     // 2. Load-time rejections
     // ==================================================================
 
-    /** A typo in the attribute name is a load error, not a rule that never fires. */
+    /**
+     * A typo in the attribute name is a load error, not a rule that never fires.
+     */
     @Test
     public void anUnknownAttributeNameIsRejectedAtLoadTime() {
         IllegalArgumentException unknown = Assertions.assertThrows(IllegalArgumentException.class,
@@ -207,7 +233,9 @@ public class SelfAttributeConditionTest {
         Assertions.assertTrue(empty.getMessage().contains("self_attr:SPEED"), empty.getMessage());
     }
 
-    /** The "unknown variable" error mentions the new form, so the vocabulary is discoverable from the error. */
+    /**
+     * The "unknown variable" error mentions the new form, so the vocabulary is discoverable from the error.
+     */
     @Test
     public void theUnknownVariableMessagePointsAtTheNewSpelling() {
         TriggerSpec spec = TriggerSpecs.rule("ALLY_ATTACK", List.of("self_attack >= 1"),
@@ -263,7 +291,9 @@ public class SelfAttributeConditionTest {
         Assertions.assertEquals(0.08, effect.getPercent(), EPS, "param #3 is 0.08");
     }
 
-    /** Set 301's conditional extra is `+12% ATK, for the rest of the battle` - the file's own numbers. */
+    /**
+     * Set 301's conditional extra is `+12% ATK, for the rest of the battle` - the file's own numbers.
+     */
     @Test
     public void theAuthoredEffectsCarryTheNumbersFromTheText() {
         EffectSpec station = soleEffect(SPACE_SEALING_STATION, AttributeType.SPEED, 200);
@@ -279,7 +309,9 @@ public class SelfAttributeConditionTest {
         Assertions.assertEquals(0.2, talia.getPercent(), EPS, "param #3 is 0.2");
     }
 
-    /** Set 309's ability is a disjunction over two cast scopes, so it needs one modifier each. */
+    /**
+     * Set 309's ability is a disjunction over two cast scopes, so it needs one modifier each.
+     */
     @Test
     public void theBasicAttackAndSkillBoostIsTwoScopedModifiers() {
         List<TriggerTable.CompiledRule> rules = RelicTriggerTables.of(CELESTIAL_DIFFERENTIATOR)
@@ -376,7 +408,9 @@ public class SelfAttributeConditionTest {
     // Fixture
     // ==================================================================
 
-    /** Whenever an ally attacks, if my own SPEED is at least {@code threshold}, +12% ATK for a turn. */
+    /**
+     * Whenever an ally attacks, if my own SPEED is at least {@code threshold}, +12% ATK for a turn.
+     */
     private static TriggerSpec speedThresholdRule(double threshold) {
         return speedThresholdRule(threshold, "SPEED");
     }
@@ -388,7 +422,9 @@ public class SelfAttributeConditionTest {
         return spec;
     }
 
-    /** The same shape on a ratio attribute. */
+    /**
+     * The same shape on a ratio attribute.
+     */
     private static TriggerSpec critThresholdRule(double threshold) {
         TriggerSpec spec = TriggerSpecs.rule("ALLY_ATTACK", null,
                 TriggerSpecs.modifyAttr("ATTACK", 0.12, 1));
@@ -415,12 +451,16 @@ public class SelfAttributeConditionTest {
         return owner;
     }
 
-    /** How many rules fire for an owner at the given speed. */
+    /**
+     * How many rules fire for an owner at the given speed.
+     */
     private static int fireAtSpeed(double speed) {
         return fireWithCondition("self_attr:SPEED >= 145", speed);
     }
 
-    /** How many rules fire for an owner at the given crit rate. */
+    /**
+     * How many rules fire for an owner at the given crit rate.
+     */
     private static int fireAtCrit(double critChance) {
         Character owner = newOwner(100);
         owner.setAttribute(AttributeType.CRIT_CHANCE, new DoubleValue(critChance));
@@ -431,7 +471,9 @@ public class SelfAttributeConditionTest {
         return battle.fireTriggers(TriggerEvent.ALLY_ATTACK, owner, null, 1, 0);
     }
 
-    /** How many rules fire for a 130-speed owner whose table holds a rule carrying {@code condition}. */
+    /**
+     * How many rules fire for a 130-speed owner whose table holds a rule carrying {@code condition}.
+     */
     private static int fireWithCondition(String condition, double speed) {
         TriggerSpec spec = TriggerSpecs.rule("ALLY_ATTACK", null,
                 TriggerSpecs.modifyAttr("ATTACK", 0.12, 1));
@@ -443,7 +485,9 @@ public class SelfAttributeConditionTest {
         return battle.fireTriggers(TriggerEvent.ALLY_ATTACK, owner, null, 1, 0);
     }
 
-    /** The wearer's resolved ATTACK after the battle opened, wearing {@code setId} at one fixed speed. */
+    /**
+     * The wearer's resolved ATTACK after the battle opened, wearing {@code setId} at one fixed speed.
+     */
     private static double resolvedAttackAfterBattleStart(int setId, double speed) {
         Character wearer = CharacterFactory.create(OWNER, LEVEL, true, null,
                 RelicFactory.suit(setId, 5, 15));
@@ -454,7 +498,9 @@ public class SelfAttributeConditionTest {
         return wearer.getAttribute(AttributeType.ATTACK).get();
     }
 
-    /** The set's one 2-piece rule states exactly one condition, and this is how it prints itself. */
+    /**
+     * The set's one 2-piece rule states exactly one condition, and this is how it prints itself.
+     */
     private static void assertSingleThreshold(int setId, String expected, AttributeType attribute,
                                               double value) {
         List<TriggerTable.CompiledRule> rules = RelicTriggerTables.of(setId).at(2)
@@ -467,7 +513,9 @@ public class SelfAttributeConditionTest {
                 "set " + setId + "'s threshold, as the condition prints itself back");
     }
 
-    /** The single effect of the set's 2-piece rule, read with a context that satisfies its threshold. */
+    /**
+     * The single effect of the set's 2-piece rule, read with a context that satisfies its threshold.
+     */
     private static EffectSpec soleEffect(int setId, AttributeType attribute, double value) {
         List<TriggerTable.CompiledRule> rules = RelicTriggerTables.of(setId).at(2)
                 .matching(TriggerEvent.BATTLE_START, context(satisfyingOwner(attribute, value)));
@@ -478,14 +526,18 @@ public class SelfAttributeConditionTest {
         return rules.getFirst().effects().getFirst();
     }
 
-    /** A character whose given attribute satisfies a threshold, for evaluating a condition that gates. */
+    /**
+     * A character whose given attribute satisfies a threshold, for evaluating a condition that gates.
+     */
     private static Character satisfyingOwner(AttributeType attribute, double value) {
         Character owner = CharacterFactory.create(OWNER, LEVEL);
         owner.setAttribute(attribute, new DoubleValue(value));
         return owner;
     }
 
-    /** When the given unit's next turn comes, in the battle's action-value clock. */
+    /**
+     * When the given unit's next turn comes, in the battle's action-value clock.
+     */
     private static double nextActionTime(Character unit) {
         Battle battle = new Battle(List.of(unit), List.of(dummy()), BattleFixture.seeded());
         battle.startBattle();

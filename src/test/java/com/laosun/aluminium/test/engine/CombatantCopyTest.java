@@ -45,7 +45,7 @@ public class CombatantCopyTest {
      * The mechanism, asserted directly: the copy's attribute objects are <b>different objects</b>.
      *
      * <p>Kept alongside the behavioural test rather than instead of it, because the two fail for
-     * different reasons: the behavioural one says "a buff leaked", this one says "the sheet is shared" - 
+     * different reasons: the behavioural one says "a buff leaked", this one says "the sheet is shared" -
      * and a fix that made buffs not leak for some other reason while still sharing the objects would
      * leave the next mutation bug (any in-place change) in place.
      *
@@ -67,7 +67,9 @@ public class CombatantCopyTest {
                 "and every slot, not just the one a test happened to look at");
     }
 
-    /** A copy is a fresh participant in a new battle, not a snapshot of the current one. */
+    /**
+     * A copy is a fresh participant in a new battle, not a snapshot of the current one.
+     */
     @Test
     public void aCopyStartsWithAFreshBattleState() {
         Character original = Character.fromAttributes("hero", 10_000, 100, 100, 100);

@@ -5,8 +5,8 @@ import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.skill.Skill;
 import com.laosun.aluminium.models.skill.SkillExecutor;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -20,12 +20,12 @@ import java.util.List;
  */
 public class CoreflameOverflowTest {
     private static final int OWNER = 1408;
-        private static final String COREFLAME = "火种";
+    private static final String COREFLAME = "火种";
 
     /**
      * Past the maximum: six casts reach thirteen, which a cap of twelve could never allow.
      *
- * <p>Note: Updated: "战斗开始时，获得 1 点[火种]" is now written (trace 1408101), so the pool opens at one. Seven casts
+     * <p>Note: Updated: "战斗开始时，获得 1 点[火种]" is now written (trace 1408101), so the pool opens at one. Seven casts
      * would then sit exactly ON the ceiling of 15 and stop isolating "past twelve" -- six reads 1 + 12 = 13, which is the same
      * reading the judge was written for.
      */
@@ -35,7 +35,9 @@ public class CoreflameOverflowTest {
                 "「达到上限后还可溢出」 (can overflow past the ceiling)-- 1 + 12 = 13 is above the declared max of 12");
     }
 
-    /** The allowance is exactly three: ten casts stop at fifteen. */
+    /**
+     * The allowance is exactly three: ten casts stop at fifteen.
+     */
     @Test
     public void theAllowanceIsExactlyThree() {
         Assertions.assertEquals(15.0, afterCasts(10), 1e-9,

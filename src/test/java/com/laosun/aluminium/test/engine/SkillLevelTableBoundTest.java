@@ -3,8 +3,8 @@ package com.laosun.aluminium.test.engine;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -24,7 +24,8 @@ import java.util.List;
 public class SkillLevelTableBoundTest {
     private static final int PEARL = 1503;
     private static final int ALLY = 1204;
-        /**
+
+    /**
      * At an Eidolon whose raise would overshoot, the level is the table size and the skill still hits.
      *
      * <p>Eidolon 3 grants "普攻等级+1" and the file's convention already sits COMMON at 10, so the raise asks for 11.
@@ -81,7 +82,9 @@ public class SkillLevelTableBoundTest {
                         + " table bound removes");
     }
 
-    /** The same at E0, where nothing overshoots: the convention's own level is inside the table. */
+    /**
+     * The same at E0, where nothing overshoots: the convention's own level is inside the table.
+     */
     @Test
     public void theConventionsOwnLevelIsInsideTheTable() {
         Character pearl = CharacterFactory.create(PEARL, 80, false, null, null, 0);

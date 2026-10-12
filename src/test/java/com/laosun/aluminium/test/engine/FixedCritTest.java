@@ -1,18 +1,17 @@
 package com.laosun.aluminium.test.engine;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.AttributeType;
-import com.laosun.aluminium.enums.DamageType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.DoubleValue;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -36,7 +35,10 @@ public class FixedCritTest {
 
     private static final int MARCH = 1001;
     private static final int LEVEL = 80;
-        /** With {@code crit_rate: 1} the instance crits even though the RNG never would. */
+
+    /**
+     * With {@code crit_rate: 1} the instance crits even though the RNG never would.
+     */
     @Test
     public void theInstanceCritsAlthoughTheRollWouldNot() {
         double normal = damage(null, null);
@@ -73,7 +75,9 @@ public class FixedCritTest {
                         + ") is not what it uses (×2.5, not ×1.5)");
     }
 
-    /** The shape is refused at load: half a pair, a rate that is not 1.0, a non-positive crit damage. */
+    /**
+     * The shape is refused at load: half a pair, a rate that is not 1.0, a non-positive crit damage.
+     */
     @Test
     public void theShapeIsRefusedAtLoad() {
         Assertions.assertThrows(IllegalArgumentException.class, () -> table(rule(1.0, null)),
@@ -88,7 +92,9 @@ public class FixedCritTest {
     // Helpers
     // ==================================================================
 
-    /** A rule-driven attack from her ultimate's row, settled, measured as the enemy's HP loss. */
+    /**
+     * A rule-driven attack from her ultimate's row, settled, measured as the enemy's HP loss.
+     */
     private static double damage(Double critRate, Double critDamage) {
         Character hero = CharacterFactory.create(MARCH, LEVEL);
         hero.setTriggerTable(new TriggerTable(MARCH, List.of(rule(critRate, critDamage))));
@@ -117,7 +123,9 @@ public class FixedCritTest {
         return new TriggerTable(MARCH, List.of(rule));
     }
 
-    /** An RNG that never rolls a crit on its own -- so anything that crits did so because it was told to. */
+    /**
+     * An RNG that never rolls a crit on its own -- so anything that crits did so because it was told to.
+     */
     private static Random fixed() {
         return BattleFixture.alwaysRoll(0.999);
     }

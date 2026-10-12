@@ -5,8 +5,8 @@ import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Weapon;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -25,9 +25,11 @@ import java.util.List;
  */
 public class NeverForgetHerFlameWeaknessTest {
     private static final int WEARER = 1315;
-        private static final int LEVEL = 80;
+    private static final int LEVEL = 80;
 
-    /** 1315 at rank 1 wearing 23050, facing one enemy; returns {battle, wearer, enemy}. */
+    /**
+     * 1315 at rank 1 wearing 23050, facing one enemy; returns {battle, wearer, enemy}.
+     */
     private static Object[] scene() {
         Character wearer = CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(23050, LEVEL, false, 1));
         Enemy enemy = BattleFixture.monster();
@@ -36,7 +38,9 @@ public class NeverForgetHerFlameWeaknessTest {
         return new Object[]{battle, wearer, enemy};
     }
 
-    /** Casts the Ultimate once (filling energy first), returns {skill points before, skill points after}. */
+    /**
+     * Casts the Ultimate once (filling energy first), returns {skill points before, skill points after}.
+     */
     private static int[] castOnce(Battle battle, Character wearer, Enemy enemy) {
         wearer.setCurrentEnergy(wearer.getMaxEnergy());
         battle.spendSkillPoint();                     // Note: make room: at the cap nothing could be measured

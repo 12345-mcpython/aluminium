@@ -30,7 +30,7 @@ import lombok.Getter;
  * restoring, the overflowed skill point count is recorded, up to 10 points" (see
  * {@code 1306_花火.md}).
  *
- * <p><b>Threading model</b>: like {@code Battle}, used single-threaded, with no synchronization - 
+ * <p><b>Threading model</b>: like {@code Battle}, used single-threaded, with no synchronization -
  * one battle is advanced on one thread.
  *
  * @see com.laosun.aluminium.models.skillpoint.SkillPointPolicy
@@ -279,7 +279,7 @@ public class Resource {
      * <p>The clamping range is {@code [0, max + maxOverflow]}.
      */
     /**
- * The current amount. `ResourceManager.value(id)` was the only reader; the party-level store holds
+     * The current amount. `ResourceManager.value(id)` was the only reader; the party-level store holds
      * {@link Resource} objects directly, so the accessor belongs here next to {@code setValue}.
      */
     public int value() {

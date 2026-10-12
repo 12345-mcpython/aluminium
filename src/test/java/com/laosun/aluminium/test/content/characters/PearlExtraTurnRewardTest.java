@@ -3,8 +3,8 @@ package com.laosun.aluminium.test.content.characters;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -31,10 +31,12 @@ import java.util.List;
 public class PearlExtraTurnRewardTest {
     private static final int PEARL = 1503;
     private static final int ELATION_ALLY = 1502;
-        private static final String COUNTER = "好活当赏";
+    private static final String COUNTER = "好活当赏";
     private static final String PUNCHLINE = "笑点";
 
-    /** The turn begins: the count gains 30 and the team gains 60 punchline. */
+    /**
+     * The turn begins: the count gains 30 and the team gains 60 punchline.
+     */
     @Test
     public void theExtraTurnPaysThirtyAndSixty() {
         Battle battle = newBattle();
@@ -53,7 +55,9 @@ public class PearlExtraTurnRewardTest {
         Assertions.assertEquals(60, partyGained, "and 60 points of punchline");
     }
 
-    /** The turn ends with the reward untouched: it comes straight back off. */
+    /**
+     * The turn ends with the reward untouched: it comes straight back off.
+     */
     @Test
     public void theRewardIsTakenBackWhenTheTurnEnds() {
         Battle battle = newBattle();
@@ -97,7 +101,9 @@ public class PearlExtraTurnRewardTest {
                 "the removal clamps to what is there (18) rather than failing or leaving a residue");
     }
 
-    /** The turn ends with the counter already empty: nothing happens and nothing errors. */
+    /**
+     * The turn ends with the counter already empty: nothing happens and nothing errors.
+     */
     @Test
     public void anAlreadyEmptyRewardIsNotAnError() {
         Battle battle = newBattle();
@@ -116,7 +122,9 @@ public class PearlExtraTurnRewardTest {
                 "an empty count stays empty rather than the removal failing");
     }
 
-    /** A unit that is NOT the archetype gets nothing, which is what the clause's own condition says. */
+    /**
+     * A unit that is NOT the archetype gets nothing, which is what the clause's own condition says.
+     */
     @Test
     public void aUnitWithoutTheArchetypeMarkIsNotPaid() {
         Battle battle = newBattle();

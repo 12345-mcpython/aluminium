@@ -6,19 +6,21 @@ import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.DoubleValue;
 import com.laosun.aluminium.models.Weapon;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-/** Light cone 22000: hit a target whose DEFENCE was lowered and 4 energy comes back. */
+/**
+ * Light cone 22000: hit a target whose DEFENCE was lowered and 4 energy comes back.
+ */
 public class BeforeTheTutorialMissionStartsTest {
     private static final int CONE = 22000;
     private static final int WEARER = 1205;
     private static final int LEVEL = 80;
-        private static final int MODIFIER_ID = 990002;
+    private static final int MODIFIER_ID = 990002;
 
     private Character wearer;
     private Enemy enemy;

@@ -119,7 +119,7 @@ public class StateBuff extends AbstractBuff {
      *
      * @param other the buff being applied
      * @return {@code true} only for a state with an equal name, so unrelated states coexist and the same
-     *         state refreshes instead of stacking
+     * state refreshes instead of stacking
      */
     @Override
     public boolean isSameKind(AbstractBuff other) {

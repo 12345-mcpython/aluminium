@@ -1,24 +1,15 @@
-package com.laosun.aluminium.models;
+package com.laosun.aluminium.models.trigger;
 
-import com.laosun.aluminium.Battle;
-import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.beans.TriggerSpec;
-import com.laosun.aluminium.enums.AttributeType;
-import com.laosun.aluminium.enums.DamageElement;
-import com.laosun.aluminium.enums.Path;
-import com.laosun.aluminium.enums.SkillCategory;
-import com.laosun.aluminium.enums.SkillType;
-import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.TriggerTable.CompiledRule;
-import com.laosun.aluminium.models.TriggerTable.Condition;
-import com.laosun.aluminium.models.TriggerTable.PartyCondition;
-import com.laosun.aluminium.models.TriggerTable.TriggerContext;
-import com.laosun.aluminium.models.buff.BuffManager;
-import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.enums.*;
+import com.laosun.aluminium.models.*;
+import com.laosun.aluminium.models.Character;
+import com.laosun.aluminium.models.trigger.TriggerTable.Condition;
+import com.laosun.aluminium.models.trigger.TriggerTable.PartyCondition;
+import com.laosun.aluminium.models.trigger.TriggerTable.TriggerContext;
 
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -722,7 +713,9 @@ final class TriggerConditionParser {
         return slot;
     }
 
-    /** The {@link SkillType} names, for the message a misspelled {@code has_skill} slot gets. */
+    /**
+     * The {@link SkillType} names, for the message a misspelled {@code has_skill} slot gets.
+     */
     private static List<String> skillSlots() {
         return java.util.Arrays.stream(SkillType.values()).map(Enum::name).toList();
     }
@@ -734,7 +727,7 @@ final class TriggerConditionParser {
      * target ({@code Battle.startBattle} to {@code fireTriggers(TriggerEvent.BATTLE_START)}). A rule written there
      * as {@code "when": ["actor == self"]} therefore <b>can never fire</b> - and it looks completely reasonable,
      * which is exactly the failure mode this DSL refuses everywhere else: a rule that loads, is filed under the
-     * right event, and silently does nothing. (Written by hand first, caught by the rule failing to grant anything.) On this event "my own table" is already the unit of delivery - the table <i>is</i> the owner's - 
+     * right event, and silently does nothing. (Written by hand first, caught by the rule failing to grant anything.) On this event "my own table" is already the unit of delivery - the table <i>is</i> the owner's -
      * so the condition was never needed.
      *
      * <p>{@code self} is always carried (the owner exists for every event) and is therefore always allowed.
@@ -784,7 +777,9 @@ final class TriggerConditionParser {
         return token.trim().toLowerCase(Locale.ROOT);
     }
 
-    /** Whether a side may stand as a numeric variable on its own. */
+    /**
+     * Whether a side may stand as a numeric variable on its own.
+     */
     private static boolean isNumericVariable(String token) {
         String name = token == null ? "" : token.trim();
         return NUMERIC_VARIABLES.contains(name) || name.startsWith(SELF_ATTR_PREFIX)
@@ -924,7 +919,7 @@ final class TriggerConditionParser {
      * the battlefield, like {@code self_summon_count} - and it is the first condition whose answer depends on the
      * <b>party</b> rather than on the owner, the event or the subject.
      *
-     * <p>Note: Three things it deliberately does not count: a <b>dead</b> ally (a corpse is not somebody on the field - 
+     * <p>Note: Three things it deliberately does not count: a <b>dead</b> ally (a corpse is not somebody on the field -
      * the same reading {@code Battle.summonsOf} uses), the wearer itself, and a Path the engine cannot name
      * ({@link com.laosun.aluminium.enums.Path#OTHER}): two units whose data carries an unknown Path are not "the same
      * Path", they are both unknown, and matching them would be a coincidence dressed as a rule.
@@ -944,7 +939,7 @@ final class TriggerConditionParser {
 
         @Override
         public boolean test(TriggerContext ctx) {
-            if (ctx.battle() == null || !(ctx.owner() instanceof Character me)) {
+            if (ctx.battle() == null || !(ctx.owner() instanceof com.laosun.aluminium.models.Character me)) {
                 return false;
             }
             com.laosun.aluminium.enums.Path mine = me.getPath();
@@ -952,7 +947,7 @@ final class TriggerConditionParser {
                 return false;
             }
             for (CanHit ally : ctx.battle().allies) {
-                if (ally != me && !ally.isDeath() && ally instanceof Character other && other.getPath() == mine) {
+                if (ally != me && !ally.isDeath() && ally instanceof com.laosun.aluminium.models.Character other && other.getPath() == mine) {
                     return true;
                 }
             }
@@ -990,7 +985,9 @@ final class TriggerConditionParser {
      * "若装备者不是队伍第一名，则使队伍第一名的攻击力提高" -- one rule needs both halves, so this answers the condition
      * half and {@code party_first} (a target selector) answers the other.
      */
-    /** {@code <who> is_companion} ? the unit is one of the Trailblaze Companions (relic 32). */
+    /**
+     * {@code <who> is_companion} ? the unit is one of the Trailblaze Companions (relic 32).
+     */
     static final class IsCompanion implements Condition, PartyCondition {
         private final String subject;
         private final String raw;
@@ -1022,7 +1019,9 @@ final class TriggerConditionParser {
         }
     }
 
-    /** {@code self has_companion_ally} ? somebody else on our side is a Trailblaze Companion (relic 32). */
+    /**
+     * {@code self has_companion_ally} ? somebody else on our side is a Trailblaze Companion (relic 32).
+     */
     static final class HasCompanionAlly implements Condition, PartyCondition {
         private final String raw;
 
@@ -1122,7 +1121,9 @@ final class TriggerConditionParser {
         }
     }
 
-    /** {@code <who> is_summon}: the subject is a memosprite, whatever its slot or its side in the party. */
+    /**
+     * {@code <who> is_summon}: the subject is a memosprite, whatever its slot or its side in the party.
+     */
     static final class IsSummon implements Condition {
 
         private final String subject;
@@ -1182,7 +1183,9 @@ final class TriggerConditionParser {
         }
     }
 
-    /** Side test: {@code actor is_enemy} - "the unit that caused this event is on the other side". */
+    /**
+     * Side test: {@code actor is_enemy} - "the unit that caused this event is on the other side".
+     */
     static final class IsEnemy implements Condition, PartyCondition {
 
         private final String subject;
@@ -1241,7 +1244,9 @@ final class TriggerConditionParser {
      * the placeholder ({@code Path.OTHER}) has no twin by definition -- the same refusal {@code has_same_path_ally} makes.
      */
     /** "变化的是[NAME]": the guard that stops a forwarding rule from eating its own output. */
-    /** "施加的是[X]类负面状态": the family of the debuff that just landed (control / dot). */
+    /**
+     * "施加的是[X]类负面状态": the family of the debuff that just landed (control / dot).
+     */
     static final class AppliedDebuffClass implements Condition {
         private final String raw;
         private final com.laosun.aluminium.enums.DebuffClass expected;
@@ -1389,7 +1394,9 @@ final class TriggerConditionParser {
     }
 
     /** The element half of {@link #DAMAGE_IS_ATTACK}: the instance's element against the rule owner's own. */
-    /** The complement of {@link #DAMAGE_IS_ATTACK}: the instance is additional damage, not an ordinary attack. */
+    /**
+     * The complement of {@link #DAMAGE_IS_ATTACK}: the instance is additional damage, not an ordinary attack.
+     */
     static final class DamageIsAdditional implements Condition {
         private final String raw;
 
@@ -1494,7 +1501,9 @@ final class TriggerConditionParser {
         }
     }
 
-    /** {@code from_category}: the causing cast's category, read straight from the event's context. */
+    /**
+     * {@code from_category}: the causing cast's category, read straight from the event's context.
+     */
     static final class FromCategory implements Condition {
 
         private final SkillCategory wanted;
@@ -1612,7 +1621,7 @@ final class TriggerConditionParser {
         @Override
         public boolean test(TriggerContext ctx) {
             CanHit who = partyOf(ctx);
-            return who instanceof Character character && character.getPath() == path;
+            return who instanceof com.laosun.aluminium.models.Character character && character.getPath() == path;
         }
 
         @Override
@@ -1928,24 +1937,24 @@ final class TriggerConditionParser {
     static final Set<String> NUMERIC_VARIABLES =
             Set.of("ally_count", "enemy_count", "hit_count", "weakness_hit_count", "target_weakness_count", "hp_percent", "target_hp_percent", "target_hp_percent_before", "target_debuff_count", "self_summon_count",
                     "target_summon_count", "self_max_energy", "self_energy_percent", "from_skill_id", "damage_skill_key", "target_dot_count",
-            "actor_hp_percent",
-            // "when entering combat, if the allies' Skill Points limit is #2 or higher" (reader: light cone 23046):
-            // the cap is not a field of the unit -- it belongs to the battle's skill point policy -- so the value
-            // comes from the battle, and a context without one answers NaN like every other unreadable variable.
-            "skill_point_max",
-            // The owner's Eidolon rank, as a condition. Note: `min_eidolon` already gates a whole RULE on it, and that
-            // is enough when the clause IS the Eidolon's ("【深度学习】时 ... 抗性穿透提高 20%"). It is not enough when an
-            // Eidolon clause MODIFIES an effect the base kit also has at the same event: the two rules then carry
-            // identical content and differ only in a rule-level field, which is exactly what the duplicate guard exists
-            // to catch (measured: 1503's Eidolon 4 doubling was refused as "one sentence written twice"). Reading the
-            // rank as a CONDITION puts the difference inside the clause, where the guard can see it and where a reader
-            // can see it too.
-            "eidolon",
-            // "施放欢愉技计入的笑点大于等于 20 个" (reader: 1506 Silver Wolf LV.999's trace 1506102). Distinct from
-            // `self_resource:笑点`: that reads a POOL's current value, while this reads the count Elation damage is
-            // actually computed from - the merged snapshots taken when 【好活当赏】 was granted. They differ whenever the
-            // pool has moved since the state arrived, which is exactly the case the state exists to describe.
-            "counted_laughs");
+                    "actor_hp_percent",
+                    // "when entering combat, if the allies' Skill Points limit is #2 or higher" (reader: light cone 23046):
+                    // the cap is not a field of the unit -- it belongs to the battle's skill point policy -- so the value
+                    // comes from the battle, and a context without one answers NaN like every other unreadable variable.
+                    "skill_point_max",
+                    // The owner's Eidolon rank, as a condition. Note: `min_eidolon` already gates a whole RULE on it, and that
+                    // is enough when the clause IS the Eidolon's ("【深度学习】时 ... 抗性穿透提高 20%"). It is not enough when an
+                    // Eidolon clause MODIFIES an effect the base kit also has at the same event: the two rules then carry
+                    // identical content and differ only in a rule-level field, which is exactly what the duplicate guard exists
+                    // to catch (measured: 1503's Eidolon 4 doubling was refused as "one sentence written twice"). Reading the
+                    // rank as a CONDITION puts the difference inside the clause, where the guard can see it and where a reader
+                    // can see it too.
+                    "eidolon",
+                    // "施放欢愉技计入的笑点大于等于 20 个" (reader: 1506 Silver Wolf LV.999's trace 1506102). Distinct from
+                    // `self_resource:笑点`: that reads a POOL's current value, while this reads the count Elation damage is
+                    // actually computed from - the merged snapshots taken when 【好活当赏】 was granted. They differ whenever the
+                    // pool has moved since the state arrived, which is exactly the case the state exists to describe.
+                    "counted_laughs");
 
     /**
      * The prefix of one parameterised numeric variable: {@code self_attr:SPEED}.
@@ -2072,18 +2081,22 @@ final class TriggerConditionParser {
     /**
      * The {@code is_other_ally} keyword: "<b>that unit is on our side and is not me</b>".
      *
-     * <p>Note: Why it exists: the corpus says "卡芙卡的队友对敌方目标施放普攻后…" in 16 files, and neither existing spelling fits - 
+     * <p>Note: Why it exists: the corpus says "卡芙卡的队友对敌方目标施放普攻后…" in 16 files, and neither existing spelling fits -
      * {@code actor is_ally} counts the owner herself (she is in {@code battle.allies}), while {@code !actor == self} is refused
      * because negation only applies to party conditions and an equality is not one.
      */
     private static final Pattern IS_OTHER_ALLY =
             Pattern.compile("(?<![\\w])is_other_ally(?![\\w])", Pattern.CASE_INSENSITIVE);
 
-    /** The {@code is_companion} keyword: "<b>that unit is a Trailblaze Companion</b>". */
+    /**
+     * The {@code is_companion} keyword: "<b>that unit is a Trailblaze Companion</b>".
+     */
     private static final Pattern IS_COMPANION =
             Pattern.compile("(?<![\\w])is_companion(?![\\w])", Pattern.CASE_INSENSITIVE);
 
-    /** The {@code has_companion_ally} keyword: "<b>somebody else on my side is a Trailblaze Companion</b>". */
+    /**
+     * The {@code has_companion_ally} keyword: "<b>somebody else on my side is a Trailblaze Companion</b>".
+     */
     private static final Pattern HAS_COMPANION_ALLY =
             Pattern.compile("(?<![\\w])has_companion_ally(?![\\w])", Pattern.CASE_INSENSITIVE);
 
@@ -2315,7 +2328,9 @@ final class TriggerConditionParser {
      */
     private static final Set<String> IDENTITY_TERMS = Set.of("self", "summon", "countdown");
 
-    /** Companion-group membership, by character id (never by name: Himeko (姬子) is a prefix of 姬子-启行). */
+    /**
+     * Companion-group membership, by character id (never by name: Himeko (姬子) is a prefix of 姬子-启行).
+     */
     static boolean isCompanion(CanHit unit) {
         return unit instanceof Character c && TRAILBLAZE_COMPANIONS.contains(c.getCid());
     }
@@ -2324,7 +2339,7 @@ final class TriggerConditionParser {
      * The Path a {@code has_path} condition names, checked against the closed vocabulary of the nine.
      *
      * <p>Unlike {@code Path.fromName} - which degrades an unknown name to {@link
-     * com.laosun.aluminium.enums.Path#OTHER} because data may legitimately carry a Path this build does not know - 
+     * com.laosun.aluminium.enums.Path#OTHER} because data may legitimately carry a Path this build does not know -
      * a <b>rule file</b> may not: {@code target has_path 同谐} with a typo would silently become "the target is on
      * some other Path", and for Sunday (星期日)'s sentence that means the exception fires on exactly the units it was
      * written to exclude. So the name is refused while the file is read.

@@ -1,15 +1,15 @@
 package com.laosun.aluminium.test.trigger;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -30,7 +30,9 @@ import java.util.Random;
  * and it is what makes "a failed roll costs nothing" checkable rather than probabilistic.
  */
 public class TriggerChanceTest {
-    /** Himeko: no shipped rule file, so the table under test is the only one. */
+    /**
+     * Himeko: no shipped rule file, so the table under test is the only one.
+     */
     private static final int OWNER = 1003;
     private static final int LEVEL = 80;
 
@@ -60,7 +62,7 @@ public class TriggerChanceTest {
      * 65% of its opportunities on nothing.
      *
      * <p>The generator answers 0.9 first and 0.1 afterwards, so the first attempt fails and the second succeeds
-     * <b>in the same turn</b>. A fixed generator would fail both times and prove nothing about the cooldown - 
+     * <b>in the same turn</b>. A fixed generator would fail both times and prove nothing about the cooldown -
      * which is exactly how the first version of this test read.
      */
     @Test
@@ -103,11 +105,16 @@ public class TriggerChanceTest {
     // Helpers
     // ==================================================================
 
-    /** A generator that always answers the same value, so a coin flip becomes an assertion. */
+    /**
+     * A generator that always answers the same value, so a coin flip becomes an assertion.
+     */
     static Random fixed(double value) {
         return BattleFixture.alwaysRoll(value);
     }
-    /** A generator that answers the given values in order, then repeats the last one. */
+
+    /**
+     * A generator that answers the given values in order, then repeats the last one.
+     */
     private static Random sequence(double first, double... rest) {
         return new Random() {
             private final double[] values = rest.length == 0 ? new double[]{first} : prepend(first, rest);
@@ -129,7 +136,9 @@ public class TriggerChanceTest {
         };
     }
 
-    /** The same, counting how many draws were taken. */
+    /**
+     * The same, counting how many draws were taken.
+     */
     private static final class CountingRandom extends Random {
         private final double value;
         private int draws;

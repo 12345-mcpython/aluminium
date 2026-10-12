@@ -4,8 +4,8 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -21,7 +21,7 @@ public class YaoGuangTest {
     private static final int WEARER = 1502;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-        private static final String LAUGH = "笑点";
+    private static final String LAUGH = "笑点";
 
     private Character yaoguang;
     private Character ally;
@@ -62,7 +62,9 @@ public class YaoGuangTest {
         Assertions.assertFalse(yaoguang.getResources().has(LAUGH), "which no single unit owns");
     }
 
-    /** The shipped rule, read off the compiled table (discipline 232). */
+    /**
+     * The shipped rule, read off the compiled table (discipline 232).
+     */
     @Test
     public void theShippedRuleCarriesTheNumbersAndDuration() {
         build();

@@ -4,10 +4,9 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.Signal;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -23,7 +22,8 @@ public class LingshaHealTest {
     private static final int LINGSHA = 1222;
     private static final int ALLY = 1001;
     private static final int LEVEL = 80;
-        @Test
+
+    @Test
     public void herSkillHealsThePartyForHerOwnNumbers() {
         Character lingsha = CharacterFactory.create(LINGSHA, LEVEL);
         Character ally = CharacterFactory.create(ALLY, LEVEL);

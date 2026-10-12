@@ -19,12 +19,12 @@ public class SixConeStatsTest {
     private static final int WEARER = 1210;
 
     private static final Object[][] TABLE = {
-        {23001, "CRIT_CHANCE", new double[]{0.18, 0.21, 0.24, 0.27, 0.3}},
-        {23028, "CRIT_CHANCE", new double[]{0.16, 0.19, 0.22, 0.25, 0.28}},
-        {23042, "SPEED", new double[]{0.18, 0.21, 0.24, 0.27, 0.3}},
-        {23043, "SPEED", new double[]{0.18, 0.21, 0.24, 0.27, 0.3}},
-        {23045, "CRIT_ATTACK", new double[]{0.36, 0.45, 0.54, 0.63, 0.72}},
-        {23049, "HEALTH", new double[]{0.3, 0.375, 0.45, 0.525, 0.6}}
+            {23001, "CRIT_CHANCE", new double[]{0.18, 0.21, 0.24, 0.27, 0.3}},
+            {23028, "CRIT_CHANCE", new double[]{0.16, 0.19, 0.22, 0.25, 0.28}},
+            {23042, "SPEED", new double[]{0.18, 0.21, 0.24, 0.27, 0.3}},
+            {23043, "SPEED", new double[]{0.18, 0.21, 0.24, 0.27, 0.3}},
+            {23045, "CRIT_ATTACK", new double[]{0.36, 0.45, 0.54, 0.63, 0.72}},
+            {23049, "HEALTH", new double[]{0.3, 0.375, 0.45, 0.525, 0.6}}
     };
 
     @Test

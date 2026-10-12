@@ -7,8 +7,8 @@ import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Signal;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -22,7 +22,10 @@ public class FugueTest {
     private static final int FUGUE = 1225;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-        /** Note: The Skill marks the ally, puts [炽灼] on HER, and hands the ally 30% Break Effect -- a share, so it is compared with her own base. */
+
+    /**
+     * Note: The Skill marks the ally, puts [炽灼] on HER, and hands the ally 30% Break Effect -- a share, so it is compared with her own base.
+     */
     @Test
     public void theSkillMarksTheAllyAndHandsOverBreakEffect() {
         Character fugue = CharacterFactory.create(FUGUE, LEVEL);
@@ -42,7 +45,9 @@ public class FugueTest {
                 "「持有【狐祈】的我方目标，击破特攻提高30%」 (an ally holding [狐祈] gets 30% more Break Effect)");
     }
 
-    /** Note: The reaction: the mark is on the ATTACKER, and the shredded enemy is the one attacked. */
+    /**
+     * Note: The reaction: the mark is on the ATTACKER, and the shredded enemy is the one attacked.
+     */
     @Test
     public void theDefenceShredNeedsAMarkedAttacker() {
         double unmarked = defenceLoss(false);
@@ -54,7 +59,9 @@ public class FugueTest {
                 "「使受到攻击的敌方目标防御力降低18%」 (lowers the attacked enemy target's DEF by 18%) of the enemy's own defence");
     }
 
-    /** Note: The technique advances her by 40%: round 216's recipe says the remaining wait becomes 0.6 of what it was. */
+    /**
+     * Note: The technique advances her by 40%: round 216's recipe says the remaining wait becomes 0.6 of what it was.
+     */
     @Test
     public void theTechniqueLeavesSixtyPercentOfTheWait() {
         Character fugue = CharacterFactory.create(FUGUE, LEVEL);
@@ -76,7 +83,9 @@ public class FugueTest {
                 "「进入战斗后忘归人行动提前40%」 (after entering battle, Fugue (忘归人) advances her action by 40%): " + untouched + " -> " + after);
     }
 
-    /** The enemy's defence drop after one attack by an ally, marked or not. */
+    /**
+     * The enemy's defence drop after one attack by an ally, marked or not.
+     */
     private static double defenceLoss(boolean mark) {
         Character fugue = CharacterFactory.create(FUGUE, LEVEL);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
@@ -93,7 +102,9 @@ public class FugueTest {
         return (before - after) / before;
     }
 
-    /** The unit's remaining wait, read off the queue's public snapshot (round 216's recipe). */
+    /**
+     * The unit's remaining wait, read off the queue's public snapshot (round 216's recipe).
+     */
     private static double remaining(Battle battle, Character unit) {
         for (Signal signal : battle.queue.snapshot()) {
             if (signal.getCanHit() == unit) {

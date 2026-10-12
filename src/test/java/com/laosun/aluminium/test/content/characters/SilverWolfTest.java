@@ -5,8 +5,8 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -19,7 +19,10 @@ import java.util.Random;
 public class SilverWolfTest {
     private static final int SILVER_WOLF = 1006;
     private static final int LEVEL = 80;
-        /** Note: Exactly 45% of the enemy's own defence, and nothing at all until the Ultimate is cast. */
+
+    /**
+     * Note: Exactly 45% of the enemy's own defence, and nothing at all until the Ultimate is cast.
+     */
     @Test
     public void theUltimateShredsFortyFivePercentOfTheDefence() {
         Character silverWolf = CharacterFactory.create(SILVER_WOLF, LEVEL);

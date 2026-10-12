@@ -15,7 +15,9 @@ import java.util.List;
  * stackable state's cap became 1 -- so the sentence behaved as "one instance" with nothing to report.
  */
 public class EffectKeyGuardTest {
-    /** The Java name is dropped by Gson; the annotated key is what lands. */
+    /**
+     * The Java name is dropped by Gson; the annotated key is what lands.
+     */
     @Test
     public void theJavaNameIsSilentlyDropped() {
         EffectSpec camel = new Gson().fromJson("{\"op\":\"APPLY_BUFF\",\"maxStacks\":99}", EffectSpec.class);
@@ -27,7 +29,9 @@ public class EffectKeyGuardTest {
         Assertions.assertEquals(99, snake.getMaxStacks(), "the annotated key is the one that lands");
     }
 
-    /** And the guard lets the whole shipped corpus through, so it refuses only what Gson would drop. */
+    /**
+     * And the guard lets the whole shipped corpus through, so it refuses only what Gson would drop.
+     */
     @Test
     public void everyShippedCharacterLoads() {
         List<Integer> ids = List.of(1002, 1112, 1314, 1407, 1409, 1412, 1415, 1505, 1513);

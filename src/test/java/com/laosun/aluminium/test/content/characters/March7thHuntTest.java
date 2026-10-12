@@ -1,16 +1,16 @@
 package com.laosun.aluminium.test.content.characters;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -28,7 +28,10 @@ public class March7thHuntTest {
     private static final int MARCH = 1224;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-        /** Note: The Skill marks the ally AND speeds them by 10%, measured against a hand-built 20% reference. */
+
+    /**
+     * Note: The Skill marks the ally AND speeds them by 10%, measured against a hand-built 20% reference.
+     */
     @Test
     public void theSkillMarksTheShifuAndSpeedsThem() {
         double content = skillSpeedGain(0);
@@ -39,7 +42,9 @@ public class March7thHuntTest {
                 "content " + content + " vs reference " + reference);
     }
 
-    /** Note: The charge is granted by HER basic attack and by the SHIFU's attack, and by nobody else. */
+    /**
+     * Note: The charge is granted by HER basic attack and by the SHIFU's attack, and by nobody else.
+     */
     @Test
     public void theChargeComesFromHerBasicAndFromTheShifu() {
         Character march = CharacterFactory.create(MARCH, LEVEL);
@@ -69,12 +74,16 @@ public class March7thHuntTest {
                 "「【师父】施放攻击后，三月七每次获得最多1点充能」 (after the Shifu attacks, March 7th gains at most 1 point of charge each time)");
     }
 
-    /** The declared resource's value, read through the combatant's own manager. */
+    /**
+     * The declared resource's value, read through the combatant's own manager.
+     */
     private static int chargeOf(Character march) {
         return march.getResources().get("充能").getValue();
     }
 
-    /** mode 0 = the shipped file, 1 = a hand-built 20% reference. Returns the ally's speed gain after the Skill. */
+    /**
+     * mode 0 = the shipped file, 1 = a hand-built 20% reference. Returns the ally's speed gain after the Skill.
+     */
     private static double skillSpeedGain(int mode) {
         Character march = CharacterFactory.create(MARCH, LEVEL);
         Character ally = CharacterFactory.create(ALLY, LEVEL);

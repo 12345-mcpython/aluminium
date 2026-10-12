@@ -1,10 +1,6 @@
 package com.laosun.aluminium.test.engine;
 
 
-import com.laosun.aluminium.test.support.TestCharacters;
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.trigger.SelfAttributeConditionTest;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.google.gson.Gson;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.ResourceSpec;
@@ -13,8 +9,11 @@ import com.laosun.aluminium.data.TriggerTables;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.exceptions.CharacterException;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TestCharacters;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -50,16 +49,22 @@ import java.util.Set;
 public class CharacterResourceTest {
     private static final double EPS = 1e-6;
 
-    /** Himeko: the shipped character whose file declares a resource. */
+    /**
+     * Himeko: the shipped character whose file declares a resource.
+     */
     private static final int HIMEKO = 1003;
-    /** An ordinary character with no rules and no declarations ({@link TestCharacters}). */
+    /**
+     * An ordinary character with no rules and no declarations ({@link TestCharacters}).
+     */
     // Note: a REAL character with no `resources` block (1002 is a bare rule list, and it has a content file -- see TestCharacters). The assertions here are about DECLARATIONS, and
     // every one of them installs its own rule table, so the character's own rules never enter the measurement.
     private static final int PLAIN = 1002;
     private static final int LEVEL = 80;
-        private static final String CHARGE = "充能";
+    private static final String CHARGE = "充能";
 
-    /** The fixture cids (see {@code src/test/resources/characters/}). */
+    /**
+     * The fixture cids (see {@code src/test/resources/characters/}).
+     */
     private static final int OBJECT_FORM = 9001;
     private static final int OBJECT_WITHOUT_RULES = 9002;
     private static final int UNKNOWN_TOP_LEVEL_KEY = 9003;
@@ -71,7 +76,9 @@ public class CharacterResourceTest {
     // 1. The two file shapes
     // ==================================================================
 
-    /** The object form: declarations and rules in one file, which is what a resource-bearing character needs. */
+    /**
+     * The object form: declarations and rules in one file, which is what a resource-bearing character needs.
+     */
     @Test
     public void theObjectFormCarriesDeclarationsAndRules() {
         TriggerTable table = TriggerTables.of(OBJECT_FORM);
@@ -102,7 +109,9 @@ public class CharacterResourceTest {
                 "the rule still references one -- and that is exactly what the assembly check must catch");
     }
 
-    /** An object with no {@code rules} is refused: the shape exists to hold both halves. */
+    /**
+     * An object with no {@code rules} is refused: the shape exists to hold both halves.
+     */
     @Test
     public void anObjectWithoutRulesIsRefused() {
         IllegalStateException rejected = Assertions.assertThrows(IllegalStateException.class,
@@ -131,7 +140,9 @@ public class CharacterResourceTest {
                 "so must \"intial\": " + inDeclaration.getMessage());
     }
 
-    /** A cap that cannot hold anything is a mistake, and it is refused where the file is read. */
+    /**
+     * A cap that cannot hold anything is a mistake, and it is refused where the file is read.
+     */
     @Test
     public void aZeroCapIsRefused() {
         IllegalStateException rejected = Assertions.assertThrows(IllegalStateException.class,
@@ -170,7 +181,9 @@ public class CharacterResourceTest {
     // 2. Declared = registered on the character
     // ==================================================================
 
-    /** The assembly point registers what the file declares, with the cap it declares. */
+    /**
+     * The assembly point registers what the file declares, with the cap it declares.
+     */
     @Test
     public void aDeclaredResourceIsRegisteredOnTheCharacter() {
         Character himeko = CharacterFactory.create(HIMEKO, LEVEL);
@@ -181,7 +194,9 @@ public class CharacterResourceTest {
         Assertions.assertEquals(3, himeko.getResources().get(CHARGE).getMax(), "with the declared cap");
     }
 
-    /** And a character who declares nothing gets nothing - no resource appears out of the engine's sleeve. */
+    /**
+     * And a character who declares nothing gets nothing - no resource appears out of the engine's sleeve.
+     */
     @Test
     public void aCharacterWithoutDeclarationsHasNoResources() {
         Assertions.assertEquals(0, CharacterFactory.create(PLAIN, LEVEL).getResources().size());
@@ -191,7 +206,9 @@ public class CharacterResourceTest {
     // 3. The condition: read, and read off the owner
     // ==================================================================
 
-    /** The threshold decides, and the value is the owner's own. */
+    /**
+     * The threshold decides, and the value is the owner's own.
+     */
     @Test
     public void theThresholdDecidesWhetherTheRuleFires() {
         Assertions.assertEquals(0, fireAtCharge(2), "one short of the cap");
@@ -250,7 +267,9 @@ public class CharacterResourceTest {
                 "cannot read it -> the condition fails, the same rule every other unreadable variable follows");
     }
 
-    /** The shape of the variable is validated at load time, like every other condition in the DSL. */
+    /**
+     * The shape of the variable is validated at load time, like every other condition in the DSL.
+     */
     @Test
     public void aMalformedResourceVariableIsRejected() {
         IllegalArgumentException noName = Assertions.assertThrows(IllegalArgumentException.class,
@@ -268,7 +287,9 @@ public class CharacterResourceTest {
     // 4. The assembly point refuses what the character cannot satisfy
     // ==================================================================
 
-    /** A rule that <b>reads</b> an undeclared resource is refused when the character is built. */
+    /**
+     * A rule that <b>reads</b> an undeclared resource is refused when the character is built.
+     */
     @Test
     public void aRuleThatReadsAnUndeclaredResourceIsRefusedAtAssembly() {
         TriggerTable table = new TriggerTable(HIMEKO, List.of(chargeThresholdRule()));
@@ -280,7 +301,9 @@ public class CharacterResourceTest {
                 "and it must say where to declare it: " + rejected.getMessage());
     }
 
-    /** So is a rule that only <b>writes</b> one: gaining nothing, silently, is the same wrong answer. */
+    /**
+     * So is a rule that only <b>writes</b> one: gaining nothing, silently, is the same wrong answer.
+     */
     @Test
     public void aRuleThatGainsAnUndeclaredResourceIsRefusedAtAssembly() {
         TriggerSpec spec = TriggerSpecs.rule("BREAK", null, TriggerSpecs.gainResource(CHARGE, 1));
@@ -290,14 +313,18 @@ public class CharacterResourceTest {
                 () -> CharacterFactory.requireReadableResources(HIMEKO, table));
     }
 
-    /** The shipped character satisfies it, so the check above is not passing because it always throws. */
+    /**
+     * The shipped character satisfies it, so the check above is not passing because it always throws.
+     */
     @Test
     public void theShippedCharacterPassesTheAssemblyCheck() {
         Assertions.assertDoesNotThrow(
                 () -> CharacterFactory.requireReadableResources(HIMEKO, TriggerTables.of(HIMEKO)));
     }
 
-    /** A declaration nobody reads is not an error: the check is one-directional on purpose. */
+    /**
+     * A declaration nobody reads is not an error: the check is one-directional on purpose.
+     */
     @Test
     public void aDeclaredButUnreadResourceIsAccepted() {
         TriggerTable table = new TriggerTable(HIMEKO,
@@ -331,7 +358,9 @@ public class CharacterResourceTest {
         Assertions.assertEquals(1, merged.ruleCount(TriggerEvent.BREAK));
     }
 
-    /** Two sets of declarations have no defined owner, so the merge refuses rather than picking one. */
+    /**
+     * Two sets of declarations have no defined owner, so the merge refuses rather than picking one.
+     */
     @Test
     public void mergingTwoDeclaringTablesIsRefused() {
         TriggerTable one = new TriggerTable(HIMEKO, List.of(chargeThresholdRule()),
@@ -344,7 +373,9 @@ public class CharacterResourceTest {
         Assertions.assertTrue(rejected.getMessage().contains("declare resources"), rejected.getMessage());
     }
 
-    /** And one file declaring the same resource twice is refused, because the second would silently win. */
+    /**
+     * And one file declaring the same resource twice is refused, because the second would silently win.
+     */
     @Test
     public void theSameResourceDeclaredTwiceIsRefused() {
         IllegalArgumentException rejected = Assertions.assertThrows(IllegalArgumentException.class,
@@ -366,14 +397,18 @@ public class CharacterResourceTest {
         return battle.fireTriggers(TriggerEvent.ALLY_ATTACK, owner, null, 1, 0);
     }
 
-    /** A plain character carrying {@code charge} of charge (充能), registered exactly as the assembly point would. */
+    /**
+     * A plain character carrying {@code charge} of charge (充能), registered exactly as the assembly point would.
+     */
     private static Character characterWithCharge(int charge) {
         Character owner = CharacterFactory.create(PLAIN, LEVEL);
         owner.getResources().register(CHARGE, 3, charge);
         return owner;
     }
 
-    /** A rule gated on "充能达到上限" (charge reaching its cap). */
+    /**
+     * A rule gated on "充能达到上限" (charge reaching its cap).
+     */
     private static TriggerSpec chargeThresholdRule() {
         return ruleWithCondition("self_resource:" + CHARGE + " >= 3");
     }
@@ -385,7 +420,9 @@ public class CharacterResourceTest {
         return spec;
     }
 
-    /** Why a declaration was refused, unwrapped from whatever Gson put around the constructor's own failure. */
+    /**
+     * Why a declaration was refused, unwrapped from whatever Gson put around the constructor's own failure.
+     */
     private static String rejectionOf(String json) {
         RuntimeException wrapper = Assertions.assertThrows(RuntimeException.class,
                 () -> new Gson().fromJson(json, ResourceSpec.class));

@@ -6,18 +6,21 @@ import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Signal;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-/** 1209's trace Frost Favors the Brave (凌霜): "while in the [智剑连心] effect, effect resistance is increased by 20%". */
+/**
+ * 1209's trace Frost Favors the Brave (凌霜): "while in the [智剑连心] effect, effect resistance is increased by 20%".
+ */
 public class YanqingTraceTest {
     private static final int WEARER = 1209;
     private static final int LEVEL = 80;
-        @Test
+
+    @Test
     public void theTraceRaisesEffectResistanceForTheTurn() {
         Character unit = CharacterFactory.create(WEARER, LEVEL);
         Enemy enemy = BattleFixture.monster();

@@ -6,8 +6,8 @@ import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -26,7 +26,7 @@ public class StackScaledMagnitudeTest {
     private static final int JIAOQIU = 1218;
     private static final int ATTACKER = 1210;
     private static final int LEVEL = 80;
-        private static final double EPS = 1e-9;
+    private static final double EPS = 1e-9;
     private static final String COUNTER = "烬煨";
 
     @Test

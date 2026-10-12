@@ -6,8 +6,8 @@ import com.laosun.aluminium.enums.SkillCategory;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Weapon;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -25,7 +25,7 @@ public class DazzledByAFloweryWorldPushTest {
     private static final int WEARER = 1205;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-        private static final int THRESHOLD = 4;
+    private static final int THRESHOLD = 4;
     private static final double BURST = 0.2;
     private static final String SPENT = "本回合消耗";
     private static final String PUSH = "推流";

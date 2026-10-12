@@ -1,11 +1,11 @@
 package com.laosun.aluminium.test.engine;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -47,7 +47,9 @@ public class AddDamageCountTest {
         Assertions.assertTrue(threw, "a count on an amount is refused, not silently dropped");
     }
 
-    /** The same effect without the count still loads -- the guard is not a blanket refusal. */
+    /**
+     * The same effect without the count still loads -- the guard is not a blanket refusal.
+     */
     @Test
     public void theAmountItselfStillLoads() {
         EffectSpec effect = new EffectSpec();

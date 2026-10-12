@@ -1,16 +1,20 @@
 package com.laosun.aluminium.test.content.characters;
+
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.buff.ControlBuff;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
 import java.util.List;
 
-/** "[追忆] (Recollection) reaching 24 points activates the ultimate and removes all of her own negative effects" and "may overflow up to 2 points". */
+/**
+ * "[追忆] (Recollection) reaching 24 points activates the ultimate and removes all of her own negative effects" and "may overflow up to 2 points".
+ */
 public class CyreneRecollectionCapTest {
     private static final int LEVEL = 80;
     private static final int CYRENE = 1415;

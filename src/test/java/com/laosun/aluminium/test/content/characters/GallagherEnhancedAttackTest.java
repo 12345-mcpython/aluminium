@@ -6,8 +6,8 @@ import com.laosun.aluminium.enums.SkillCategory;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -27,7 +27,8 @@ import java.util.Random;
 public class GallagherEnhancedAttackTest {
     private static final int GALLAGHER = 1301;
     private static final int LEVEL = 80;
-        @Test
+
+    @Test
     public void theEnhancedAttackLowersTheTargetsAttack() {
         Fixture f = new Fixture();
         f.battle.castImmediate(f.gallagher.getSkills().get(SkillType.ULTRA), f.gallagher, List.of(f.enemy));
@@ -45,7 +46,9 @@ public class GallagherEnhancedAttackTest {
                 "「并使目标攻击力降低 15.00%，持续 2 回合」 (and lowers the target's ATK by 15.00% for 2 turns) — an ordinary basic attack would not have done this");
     }
 
-    /** Note: The negative control: the ordinary basic attack must NOT lower anything. */
+    /**
+     * Note: The negative control: the ordinary basic attack must NOT lower anything.
+     */
     @Test
     public void theOrdinaryBasicAttackDoesNothing() {
         Fixture f = new Fixture();

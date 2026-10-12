@@ -1,28 +1,27 @@
 package com.laosun.aluminium.test.engine;
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
-import com.laosun.aluminium.beans.ResourceSpec;
-import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
 import java.util.List;
 
 /**
  * `SPEND_RESOURCE{overflow_only: true}` spends only the tier above the cap.
- *
+ * <p>
  * The judge tests the CAPABILITY, on a spare character whose hand-built table cannot disturb any loaded content, and with a resource it declares itself.
  */
 public class OverflowOnlySpendTest {
     private static final int LEVEL = 80;
     private static final int SPARE = 1002;
-        private static final int MAX = 10;
+    private static final int MAX = 10;
     private static final int OVERFLOW = 4;
     private static final String MARK = "探针数";
 
@@ -45,7 +44,9 @@ public class OverflowOnlySpendTest {
         Assertions.assertEquals(MAX, partial[1], "and a partly used overflow is emptied too");
     }
 
-    /** [the value before the spend, the value after] */
+    /**
+     * [the value before the spend, the value after]
+     */
     private static int[] run(int start) {
         Character spare = CharacterFactory.create(SPARE, LEVEL);
         Battle battle = new Battle(List.of(spare),

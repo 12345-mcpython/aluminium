@@ -1,8 +1,6 @@
 package com.laosun.aluminium.test.engine;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
@@ -12,7 +10,9 @@ import com.laosun.aluminium.models.CanHit;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Countdown;
 import com.laosun.aluminium.models.Signal;
-import com.laosun.aluminium.models.TriggerTable;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -37,7 +37,10 @@ public class CountdownTest {
     private static final int MARCH = 1001;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-        /** Its own turn is announced to our rules, which is the whole point of the unit. */
+
+    /**
+     * Its own turn is announced to our rules, which is the whole point of the unit.
+     */
     @Test
     public void itsTurnIsAnnouncedToOurRules() {
         Fixture f = new Fixture(markerOnCountdownTurn());
@@ -84,7 +87,9 @@ public class CountdownTest {
         Assertions.assertTrue(f.hero.getAttribute(AttributeType.ATTACK).get() > before, "…and hers does");
     }
 
-    /** Note: It is not a party member: "all of our side" must not see it, or every group sentence would include a clock. */
+    /**
+     * Note: It is not a party member: "all of our side" must not see it, or every group sentence would include a clock.
+     */
     @Test
     public void itIsNotInTheParty() {
         Fixture f = new Fixture(null);
@@ -97,7 +102,9 @@ public class CountdownTest {
                 "…and it is not an enemy either");
     }
 
-    /** Note: A clock cannot be killed: a stray AoE must not end a duration early. */
+    /**
+     * Note: A clock cannot be killed: a stray AoE must not end a duration early.
+     */
     @Test
     public void itCannotBeKilledOrDamaged() {
         Fixture f = new Fixture(null);
@@ -107,7 +114,9 @@ public class CountdownTest {
         Assertions.assertFalse(countdown.isDeath(), "and it is never dead");
     }
 
-    /** The shape is refused at load: no speed, a non-positive speed, or a field it does not read. */
+    /**
+     * The shape is refused at load: no speed, a non-positive speed, or a field it does not read.
+     */
     @Test
     public void theShapeIsRefusedAtLoad() {
         Assertions.assertThrows(IllegalArgumentException.class, () -> table(countdown(null, null)),
@@ -141,7 +150,9 @@ public class CountdownTest {
         }
     }
 
-    /** A rule that fires on a countdown's turn and leaves a visible mark. */
+    /**
+     * A rule that fires on a countdown's turn and leaves a visible mark.
+     */
     private static TriggerSpec markerOnCountdownTurn() {
         return markerOnCountdownTurn(null);
     }

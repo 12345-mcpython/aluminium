@@ -3,7 +3,6 @@ package com.laosun.aluminium.test.engine;
 import com.laosun.aluminium.beans.MemospriteSpec;
 import com.laosun.aluminium.data.Memosprites;
 import com.laosun.aluminium.enums.AttributeType;
-import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Summon;
 import com.laosun.aluminium.models.enemy.SummonFactory;
@@ -19,7 +18,9 @@ import org.junit.jupiter.api.Test;
  * attributes, which the plain branch cannot express because it reads the SAME attribute the entry names).
  */
 public class DragonPanelTest {
-    /** The panel is a share of a battle-level RESOURCE, and the flat speed rides beside it. */
+    /**
+     * The panel is a share of a battle-level RESOURCE, and the flat speed rides beside it.
+     */
     @Test
     public void theDragonPanelFollowsNewbud() {
         MemospriteSpec spec = Memosprites.of(1407);
@@ -37,7 +38,9 @@ public class DragonPanelTest {
                 "the document states 165 speed, flat");
     }
 
-    /** memosprite skill 1 as the document states it, and the panel slot it scales off. */
+    /**
+     * memosprite skill 1 as the document states it, and the panel slot it scales off.
+     */
     @Test
     public void theDragonSkillIsWhatTheDocumentSays() {
         MemospriteSpec spec = Memosprites.of(1407);

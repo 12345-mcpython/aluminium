@@ -6,11 +6,11 @@ import com.laosun.aluminium.enums.DamageType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Damage;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.Weapon;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.models.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -29,13 +29,15 @@ public class WeAreWildfireTest {
     private static final int WEARER = 1205;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-        private static final double SHARE = 0.3;
+    private static final double SHARE = 0.3;
 
     private Character wearer;
     private Character ally;
     private Enemy enemy;
 
-    /** Builds the battle but does NOT start it, so a unit can be hurt before the cone's battle-start heal fires. */
+    /**
+     * Builds the battle but does NOT start it, so a unit can be hurt before the cone's battle-start heal fires.
+     */
     private Battle preBattle(boolean withCone) {
         wearer = withCone
                 ? CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(CONE, LEVEL, false, 1))

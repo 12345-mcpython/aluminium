@@ -6,8 +6,8 @@ import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.skill.Skill;
 import com.laosun.aluminium.models.skill.SkillExecutor;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -23,9 +23,11 @@ import java.util.List;
 public class FuxuanEidolonTwoTest {
     private static final int FUXUAN = 1208;
     private static final int ALLY = 1002;
-        private static final String ZONE = "鉴知";
+    private static final String ZONE = "鉴知";
 
-    /** The first blow is answered; the second kills, because the sentence allows one. */
+    /**
+     * The first blow is answered; the second kills, because the sentence allows one.
+     */
     @Test
     public void theFirstBlowIsAnsweredAndTheSecondIsNot() {
         Character her = CharacterFactory.create(FUXUAN, 80, false, null, null, 2);

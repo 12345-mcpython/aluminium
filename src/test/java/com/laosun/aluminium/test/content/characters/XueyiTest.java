@@ -1,14 +1,14 @@
 package com.laosun.aluminium.test.content.characters;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -24,7 +24,10 @@ import java.util.Random;
 public class XueyiTest {
     private static final int XUEYI = 1214;
     private static final int LEVEL = 80;
-        /** Note: The ratio, the wiring and the control. */
+
+    /**
+     * Note: The ratio, the wiring and the control.
+     */
     @Test
     public void theTechniqueDealsEightyPercentOfHerAttack() {
         double content = openingLoss(0);
@@ -37,7 +40,9 @@ public class XueyiTest {
                 "content " + content + " vs reference " + reference + " (expected " + (0.8 / 0.5) + ")");
     }
 
-    /** 0 = the shipped file, 1 = a hand-built 50% reference, 2 = the shipped file with no technique declared. */
+    /**
+     * 0 = the shipped file, 1 = a hand-built 50% reference, 2 = the shipped file with no technique declared.
+     */
     private static double openingLoss(int mode) {
         Character xueyi = CharacterFactory.create(XUEYI, LEVEL);
         if (mode == 1) {

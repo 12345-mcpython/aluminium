@@ -4,8 +4,8 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -21,7 +21,7 @@ import java.util.List;
 public class SilverWolfLV999ForwardingTest {
     private static final int SOURCE = 1505;
     private static final int LEVEL = 80;
-        private static final String LAUGH = "笑点";
+    private static final String LAUGH = "笑点";
     private static final String HIDDEN = "隐藏分";
 
     private Character source;
@@ -50,7 +50,9 @@ public class SilverWolfLV999ForwardingTest {
                 "and every one of them became a hidden point -- the forwarding clause");
     }
 
-    /** The false case: the same cast, an ally with no forwarding clause. */
+    /**
+     * The false case: the same cast, an ally with no forwarding clause.
+     */
     @Test
     public void anAllyWithoutTheClauseGainsNothing() {
         build(1002);
@@ -64,7 +66,9 @@ public class SilverWolfLV999ForwardingTest {
         Assertions.assertFalse(other.getResources().has(HIDDEN), "and nothing is forwarded to that ally");
     }
 
-    /** The shipped rule and its scope, read off the compiled table (discipline 232). */
+    /**
+     * The shipped rule and its scope, read off the compiled table (discipline 232).
+     */
     @Test
     public void theShippedRuleWatchesTheResourceItForwards() {
         build(1506);

@@ -5,8 +5,8 @@ import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Signal;
 import com.laosun.aluminium.models.skill.SkillExecutor;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -21,9 +21,11 @@ import java.util.List;
 public class HuohuoTalismanDurationTest {
     private static final int HUOHUO = 1217;
     private static final int ALLY = 1002;
-        private static final String STATE = "禳命";
+    private static final String STATE = "禳命";
 
-    /** A teammate's turn does not spend it; hers does, and the count is the one the sentence states. */
+    /**
+     * A teammate's turn does not spend it; hers does, and the count is the one the sentence states.
+     */
     @Test
     public void theTalismanRunsOnHerOwnClock() {
         Character her = CharacterFactory.create(HUOHUO, 80, false, null, null, 0);
@@ -52,7 +54,9 @@ public class HuohuoTalismanDurationTest {
         Assertions.assertFalse(afterHerSecondTurn, "「持续回合数减 1」 (the remaining turns are reduced by 1)-- two of her turns spend it");
     }
 
-    /** Note: Half a turn is `beforeMove()` alone; a full one is both halves, and expiry lands on the late half. */
+    /**
+     * Note: Half a turn is `beforeMove()` alone; a full one is both halves, and expiry lands on the late half.
+     */
     private static void spendTurnOf(Battle battle, Character unit) {
         Signal signal = battle.queue.snapshot().stream()
                 .filter(candidate -> candidate.getCanHit() == unit).findFirst()

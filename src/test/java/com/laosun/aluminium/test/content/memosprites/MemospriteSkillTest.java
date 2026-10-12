@@ -8,8 +8,8 @@ import com.laosun.aluminium.models.Summon;
 import com.laosun.aluminium.models.enemy.SummonFactory;
 import com.laosun.aluminium.models.skill.Skill;
 import com.laosun.aluminium.models.skill.SkillExecutor;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -32,7 +32,10 @@ public class MemospriteSkillTest {
     private static final int CYRENE = 1415;
     private static final int SERVANT_ID = 11415;
     private static final int ODE_TO_STRIFE = 16;
-        /** Demiurge (德谬歌) carries "Ode to Strife" (献予'纷争'之诗) as a Skill with the SERVANT's cid, and the engine can deliver it. */
+
+    /**
+     * Demiurge (德谬歌) carries "Ode to Strife" (献予'纷争'之诗) as a Skill with the SERVANT's cid, and the engine can deliver it.
+     */
     @Test
     public void theMemospriteCarriesItsOwnSkill() {
         Summon demiurge = servantOf(CYRENE);
@@ -49,7 +52,9 @@ public class MemospriteSkillTest {
                 "\"the poem offered to Strife\" (「献予「纷争」之诗」) is a support skill whose work is on the rule side, so the Rules entry is what makes it deliverable");
     }
 
-    /** Every memosprite that the servant table knows carries all of its skills, keyed by the servant's id. */
+    /**
+     * Every memosprite that the servant table knows carries all of its skills, keyed by the servant's id.
+     */
     @Test
     public void everyMemospriteCarriesItsImportedSkills() {
         StringBuilder report = new StringBuilder("[memosprites] ");
@@ -105,6 +110,7 @@ public class MemospriteSkillTest {
         }
         System.out.println(report.toString().trim());
     }
+
     /**
      * The imported elements are the ones the SERVANT'S ABILITY states -- not a default.
      *
@@ -147,7 +153,10 @@ public class MemospriteSkillTest {
         }
         System.out.println(report.toString().trim());
     }
-    /** The memosprite at that cid, built through the seam a test uses. */
+
+    /**
+     * The memosprite at that cid, built through the seam a test uses.
+     */
     private static Summon servantOf(int cid) {
         Character master = CharacterFactory.create(cid, 80, false, null, null, 0);
         Battle battle = new Battle(List.of(master),

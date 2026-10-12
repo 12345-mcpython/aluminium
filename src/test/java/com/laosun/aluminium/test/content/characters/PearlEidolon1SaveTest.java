@@ -6,8 +6,8 @@ import com.laosun.aluminium.enums.DamageType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Damage;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -29,9 +29,11 @@ import java.util.List;
 public class PearlEidolon1SaveTest {
     private static final int PEARL = 1503;
     private static final int ALLY = 1204;
-        private static final double EPS = 1.0;
+    private static final double EPS = 1.0;
 
-    /** E1 saves the ally; E0 does not. */
+    /**
+     * E1 saves the ally; E0 does not.
+     */
     @Test
     public void theSaveNeedsTheEidolon() {
         double savedAtOne = hpFractionAfterLethalBlow(1);
@@ -61,7 +63,9 @@ public class PearlEidolon1SaveTest {
                 "「回复等同于其生命上限 50% 的生命值」 - half, plus the heal boost her own trace grants");
     }
 
-    /** 「单场战斗中可以触发 2 次」: the third lethal blow in one battle is not saved. */
+    /**
+     * 「单场战斗中可以触发 2 次」: the third lethal blow in one battle is not saved.
+     */
     @Test
     public void theAllowanceIsTwoSavesInOneBattle() {
         Battle battle = newBattle(1);
@@ -82,14 +86,18 @@ public class PearlEidolon1SaveTest {
     // Helpers
     // ==================================================================
 
-    /** The ally's HP as a fraction of its Max HP after one lethal blow, for a Pearl of the given rank. */
+    /**
+     * The ally's HP as a fraction of its Max HP after one lethal blow, for a Pearl of the given rank.
+     */
     private static double hpFractionAfterLethalBlow(int eidolonRank) {
         Battle battle = newBattle(eidolonRank);
         Character ally = battle.characters.get(1);
         return lethalBlow(battle, battle.enemyUnits().getFirst(), ally);
     }
 
-    /** Settles an overwhelming hit and returns the ally's HP afterwards, as a fraction of its maximum. */
+    /**
+     * Settles an overwhelming hit and returns the ally's HP afterwards, as a fraction of its maximum.
+     */
     private static double lethalBlow(Battle battle, Enemy attacker, Character ally) {
         battle.applyDamage(ally, new Damage(attacker, ally, DamageElement.PHYSICAL, DamageType.NORMAL,
                 ally.getMaxHp() * 4));

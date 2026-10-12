@@ -5,8 +5,8 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -20,7 +20,8 @@ public class AventurineWaveflairTest {
     private static final int AVENTURINE = 1513;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-        /**
+
+    /**
      * Note: One Fervor per TEAMMATE's attack, and the document's cap of 30 enforced by exceeding it.
      *
      * <p>⚠ The cap is driven by ONE gain, and the reason is measured: 「【热意】达到10点时…立即施放…」 means each crossing casts
@@ -57,7 +58,9 @@ public class AventurineWaveflairTest {
                 "「【热意】上限为30点」 is the DECLARATION's clamp on one gain");
     }
 
-    /** Note: The Ultimate: 8 Fervor and 30% more SPEED for the document's four turns. */
+    /**
+     * Note: The Ultimate: 8 Fervor and 30% more SPEED for the document's four turns.
+     */
     @Test
     public void theUltimateAddsFervorAndSpeed() {
         Character aventurine = CharacterFactory.create(AVENTURINE, LEVEL);
@@ -76,7 +79,9 @@ public class AventurineWaveflairTest {
                 "「使自身速度提高30%，持续4回合」 (raises its own SPD by 30% for 4 turns) of the BASE speed: base " + base);
     }
 
-    /** The declared resource's value, read through the combatant's own manager. */
+    /**
+     * The declared resource's value, read through the combatant's own manager.
+     */
     private static int fervorOf(Character unit) {
         return unit.getResources().get("热意").getValue();
     }

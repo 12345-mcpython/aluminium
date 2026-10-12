@@ -1,12 +1,7 @@
 package com.laosun.aluminium.test.support;
 
 
-import com.laosun.aluminium.test.content.characters.HimekoChargeTest;
-import com.laosun.aluminium.test.trigger.RelicTriggerTableTest;
-import com.laosun.aluminium.test.trigger.TriggerTableTest;
-import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.data.TriggerTables;
-import com.laosun.aluminium.utils.CharacterFactory;
 
 /**
  * A real character with <b>no trigger file of their own</b> - the "unregistered" control that the trigger-table

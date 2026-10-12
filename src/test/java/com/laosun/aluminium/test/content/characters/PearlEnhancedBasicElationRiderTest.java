@@ -6,8 +6,8 @@ import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -33,11 +33,15 @@ public class PearlEnhancedBasicElationRiderTest {
     private static final int PEARL = 1503;
     private static final int ELATION_ALLY = 1502;
     private static final int HUNTER = 1204;
-        private static final String COUNTER = "好活当赏";
-    /** The level her character is built at in this fixture; the Elation base table is indexed by THIS. */
+    private static final String COUNTER = "好活当赏";
+    /**
+     * The level her character is built at in this fixture; the Elation base table is indexed by THIS.
+     */
     private static final int FIXTURE_LEVEL = 80;
 
-    /** Holding the counter, the enhanced basic pays extra; without it, it does not. */
+    /**
+     * Holding the counter, the enhanced basic pays extra; without it, it does not.
+     */
     @Test
     public void theEnhancedBasicPaysTheElationRiderOnlyWhileHolding() {
         double holding = damageOnTheEnhancedBasic(true);

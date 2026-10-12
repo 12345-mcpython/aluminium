@@ -4,12 +4,13 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
-import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.models.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,7 +25,8 @@ import java.util.List;
  */
 public class ElationAmpTest {
     private static final int PEARL = 1503;
-        @Test
+
+    @Test
     public void theAmpMultipliesWithElationBoostRatherThanAddingToIt() {
         // Note: The two granted attributes do NOT read the same against this fixture, and the difference is measured
         // rather than assumed. The fixture's baseline Elation is not zero (measured 0.1, and not from her own rules -
@@ -65,7 +67,9 @@ public class ElationAmpTest {
                         + "(baseline) boost, and the two granted attributes move it by nothing");
     }
 
-    /** Her Elation (欢愉度) with no rules granted - read off the same fixture the cases below use. */
+    /**
+     * Her Elation (欢愉度) with no rules granted - read off the same fixture the cases below use.
+     */
     private static double baselineElation() {
         Character pearl = CharacterFactory.create(PEARL, 80);
         Battle battle = new Battle(List.of(pearl, CharacterFactory.create(1204, 80)),
@@ -76,7 +80,9 @@ public class ElationAmpTest {
                 .getAttribute(com.laosun.aluminium.enums.AttributeType.ELATION_DAMAGE_BOOST).get();
     }
 
-    /** Settles one rule-driven instance; `normal` picks the damage type, the two doubles grant the attributes. */
+    /**
+     * Settles one rule-driven instance; `normal` picks the damage type, the two doubles grant the attributes.
+     */
     private static double damage(boolean normal, double boost, double amp) {
         Character pearl = CharacterFactory.create(PEARL, 80);
         var enemy = BattleFixture.monster();

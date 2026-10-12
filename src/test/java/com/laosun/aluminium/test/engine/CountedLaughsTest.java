@@ -4,10 +4,10 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.models.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -36,7 +36,9 @@ public class CountedLaughsTest {
     private static final String LAUGH = "笑点";
     private static final double EPS = 1e-9;
 
-    /** A declared 99 is the whole factor: the ratio to the same instance without it is exactly 1 + 99*5/(99+240). */
+    /**
+     * A declared 99 is the whole factor: the ratio to the same instance without it is exactly 1 + 99*5/(99+240).
+     */
     @Test
     public void aDeclaredCountIsTheWholeFactor() {
         double plain = damage(null, 0);
@@ -48,7 +50,9 @@ public class CountedLaughsTest {
                 "「固定计入 99 点」 is the factor itself, and everything else in the instance cancels in the ratio");
     }
 
-    /** ⭐ The pool is irrelevant to a declared count - the case that stops the field from being the snapshot by another name. */
+    /**
+     * ⭐ The pool is irrelevant to a declared count - the case that stops the field from being the snapshot by another name.
+     */
     @Test
     public void aDeclaredCountIgnoresThePool() {
         double empty = damage(99.0, 0);
@@ -58,7 +62,9 @@ public class CountedLaughsTest {
                 "the sentence says 固定计入 - the pool's value must not reach this instance at all");
     }
 
-    /** And an instance that states nothing keeps the snapshot route, so nothing shipped changes. */
+    /**
+     * And an instance that states nothing keeps the snapshot route, so nothing shipped changes.
+     */
     @Test
     public void withoutTheFieldTheSnapshotStillDrives() {
         double empty = damage(null, 0);
@@ -68,7 +74,9 @@ public class CountedLaughsTest {
                 "an instance with no declared count still follows the counted snapshot (" + full + " vs " + empty + ")");
     }
 
-    /** A negative count is a rule error, not a zero. */
+    /**
+     * A negative count is a rule error, not a zero.
+     */
     @Test
     public void aNegativeCountIsRefused() {
         IllegalStateException error = Assertions.assertThrows(IllegalStateException.class, () -> damage(-1.0, 0));

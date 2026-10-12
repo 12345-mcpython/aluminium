@@ -9,8 +9,8 @@ import com.laosun.aluminium.models.Damage;
 import com.laosun.aluminium.models.Weapon;
 import com.laosun.aluminium.models.buff.DotBuff;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -24,7 +24,8 @@ import java.util.List;
 public class WoofWalkTimeTest {
     private static final int WEARER = 1001;
     private static final int LEVEL = 80;
-        @Test
+
+    @Test
     public void theConeRaisesAttackAndBoostsEitherStateOnce() {
         double clean = settled(0);
         double burning = settled(1);
@@ -49,7 +50,9 @@ public class WoofWalkTimeTest {
         return gain / unit.getAttribute(AttributeType.ATTACK).baseValue();
     }
 
-    /** 0 = clean, 1 = burn (灼烧), 2 = bleed (裂伤), 3 = both. */
+    /**
+     * 0 = clean, 1 = burn (灼烧), 2 = bleed (裂伤), 3 = both.
+     */
     private static double settled(int which) {
         Character unit = CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(21026, LEVEL, false, 5));
         Enemy enemy = BattleFixture.monster();

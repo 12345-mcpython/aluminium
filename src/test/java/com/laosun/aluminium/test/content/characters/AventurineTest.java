@@ -7,8 +7,8 @@ import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -25,7 +25,10 @@ public class AventurineTest {
     private static final int AVENTURINE = 1304;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-        /** Note: "为我方全体提供…等同于砂金24.00%防御力+320伤害的护盾[坚垣筹码]，持续3回合". */
+
+    /**
+     * Note: "为我方全体提供…等同于砂金24.00%防御力+320伤害的护盾[坚垣筹码]，持续3回合".
+     */
     @Test
     public void hisOpeningShieldUsesHisDefencePlusTheFlatAddend() {
         Character aventurine = CharacterFactory.create(AVENTURINE, LEVEL);
@@ -41,7 +44,9 @@ public class AventurineTest {
                 "「等同于砂金24.00%防御力+320的护盾」 (a shield equal to 24.00% of Aventurine's DEF + 320): expected " + expected + ", shield " + aventurine.getShield());
     }
 
-    /** Note: "使指定敌方单体陷入[惊惶]状态，持续3回合". */
+    /**
+     * Note: "使指定敌方单体陷入[惊惶]状态，持续3回合".
+     */
     @Test
     public void hisUltimateUnnervesTheTarget() {
         Character aventurine = CharacterFactory.create(AVENTURINE, LEVEL);
@@ -56,7 +61,9 @@ public class AventurineTest {
                 "「使指定敌方单体陷入【惊惶】状态，持续3回合」 (puts a designated single enemy into the Unnerved (【惊惶】) state for 3 turns)");
     }
 
-    /** Census: the shield, the state and the level convention - and the skill's own shield is the DATA TABLE's job. */
+    /**
+     * Census: the shield, the state and the level convention - and the skill's own shield is the DATA TABLE's job.
+     */
     @Test
     public void hisFileCarriesTheClauses() {
         var table = TriggerTables.of(AVENTURINE);

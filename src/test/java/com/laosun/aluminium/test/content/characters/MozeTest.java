@@ -1,15 +1,15 @@
 package com.laosun.aluminium.test.content.characters;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -24,7 +24,10 @@ public class MozeTest {
     private static final int MOZE = 1223;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-        /** Note: The additional damage needs the Prey mark, and its 30% is compared with a hand-built 60% reference in the same pipeline. */
+
+    /**
+     * Note: The additional damage needs the Prey mark, and its 30% is compared with a hand-built 60% reference in the same pipeline.
+     */
     @Test
     public void theAdditionalDamageNeedsPrey() {
         double unmarked = additionalLoss(true, false);
@@ -38,7 +41,9 @@ public class MozeTest {
                 "30% against a hand-built 60% reference: " + marked + " vs " + reference);
     }
 
-    /** Note: The Ultimate fires the talent's follow-up, and the number is the talent's own 160%. */
+    /**
+     * Note: The Ultimate fires the talent's follow-up, and the number is the talent's own 160%.
+     */
     @Test
     public void theUltimateFiresTheTalentsFollowUp() {
         double fired = ultFollowUp();
@@ -52,7 +57,9 @@ public class MozeTest {
                 "the talent's own 160% of his ATTACK: expected about " + expected + ", measured " + fired);
     }
 
-    /** Fires a teammate's attack at the enemy; optionally marks it first, optionally uses a hand-built 60% reference rule. */
+    /**
+     * Fires a teammate's attack at the enemy; optionally marks it first, optionally uses a hand-built 60% reference rule.
+     */
     private static double additionalLoss(boolean shipped, boolean mark) {
         Character moze = CharacterFactory.create(MOZE, LEVEL);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
@@ -78,7 +85,9 @@ public class MozeTest {
         return before - enemy.getCurrentHp();
     }
 
-    /** Fires the Ultimate event WITHOUT casting the skill, so only the rule's follow-up damage is measured. */
+    /**
+     * Fires the Ultimate event WITHOUT casting the skill, so only the rule's follow-up damage is measured.
+     */
     private static double ultFollowUp() {
         Character moze = CharacterFactory.create(MOZE, LEVEL);
         Character ally = CharacterFactory.create(ALLY, LEVEL);

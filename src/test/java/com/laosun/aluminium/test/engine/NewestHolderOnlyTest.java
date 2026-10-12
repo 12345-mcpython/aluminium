@@ -1,15 +1,15 @@
 package com.laosun.aluminium.test.engine;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -18,7 +18,7 @@ import java.util.List;
 
 /**
  * The move of the "only the newest target it was applied to is affected" family: `REMOVE_STATE` first takes the name off everybody, then `APPLY_BUFF` gives it to the new target
- *  so Note: order is meaning (the note at `TriggerInterpreter:2515`: *takes the named state off every resolved target - 
+ * so Note: order is meaning (the note at `TriggerInterpreter:2515`: *takes the named state off every resolved target -
  * the only-the-newest-one-holds-it half*; `1215`'s note says it even more plainly: *the state goes off everybody, then onto the
  * new target - there is no only-one-holder flag, the removal IS that clause*).
  *
@@ -28,10 +28,12 @@ import java.util.List;
 public class NewestHolderOnlyTest {
     private static final int WEARER = 1003;
     private static final int OTHER = 1002;
-        private static final int LEVEL = 80;
+    private static final int LEVEL = 80;
     private static final String MARK = "最新标记";
 
-    /** A rule that "leaves the mark only on the target aimed at this time": take it off everybody first, then attach the new one. */
+    /**
+     * A rule that "leaves the mark only on the target aimed at this time": take it off everybody first, then attach the new one.
+     */
     private static TriggerSpec newestOnlyRule(boolean removeFirst) {
         EffectSpec apply = new EffectSpec();
         TriggerSpecs.set(apply, "op", "APPLY_BUFF");
@@ -54,7 +56,9 @@ public class NewestHolderOnlyTest {
         return who.getBuffManager().hasState(MARK);
     }
 
-    /** Cast "Skill" twice, the first aimed at a and the second at b; returns {does a still have the mark, does b still have the mark}. */
+    /**
+     * Cast "Skill" twice, the first aimed at a and the second at b; returns {does a still have the mark, does b still have the mark}.
+     */
     private static boolean[] twoCasts(boolean removeFirst) {
         Character wearer = CharacterFactory.create(WEARER, LEVEL);
         Character a = CharacterFactory.create(OTHER, LEVEL);

@@ -8,10 +8,10 @@ import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Damage;
 import com.laosun.aluminium.models.DoubleValue;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.models.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -27,7 +27,10 @@ public class AshveilAuraTest {
     private static final int OWNER = 1504;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-        /** One ally, with or without 1504 in the party; both readings fixed to crit via CRIT_CHANCE. */
+
+    /**
+     * One ally, with or without 1504 in the party; both readings fixed to crit via CRIT_CHANCE.
+     */
     private double[] readings(boolean withOwner) {
         Character ally = CharacterFactory.create(ALLY, LEVEL);
         Enemy enemy = BattleFixture.monster();
@@ -42,7 +45,7 @@ public class AshveilAuraTest {
                 "precondition: the ally always crits");
         double normal = battle.applyDamage(enemy, new Damage(ally, enemy, DamageElement.QUANTUM, DamageType.NORMAL, 1000));
         double followUp = battle.applyAdditionalDamage(ally, enemy, DamageElement.QUANTUM, 1000, null, null);
-        return new double[] {normal, followUp};
+        return new double[]{normal, followUp};
     }
 
     @Test

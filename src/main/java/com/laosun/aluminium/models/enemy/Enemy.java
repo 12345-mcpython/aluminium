@@ -60,7 +60,7 @@ public class Enemy extends CanHit {
     private Set<DamageElement> stanceWeak = Set.of();
 
     /**
- * Weaknesses an EFFECT inserted, which EXPIRE: element so turns still to run.
+     * Weaknesses an EFFECT inserted, which EXPIRE: element so turns still to run.
      * Note: A second table on purpose, not a replacement: {@link #stanceWeak} is DATA (from
      * {@code monster_config.json}) and never expires, so every existing reader keeps its meaning.
      * Note: Counted in the TARGET's own turns, matching {@code TURN_END} where it is ticked.
@@ -196,7 +196,7 @@ public class Enemy extends CanHit {
     /**
      * Whether the given element is one of this enemy's weaknesses.
      *
-     * <p>This is the single judgement point for "weakness toughness reduction" - 
+     * <p>This is the single judgement point for "weakness toughness reduction" -
      * do not reach for {@link #stanceWeak} directly any more, or a future change to the
      * judgement rule will miss the call sites.
      *
@@ -208,12 +208,14 @@ public class Enemy extends CanHit {
     }
 
     /**
- * Adds an element to this enemy weaknesses ("为指定敌方单体添加 X 属性弱点",; readers 1315, 1310).
+     * Adds an element to this enemy weaknesses ("为指定敌方单体添加 X 属性弱点",; readers 1315, 1310).
      * Goes through the setter, as the note above asks. Note: No LIFETIME: the documents say "持续 2 回合",
      * and a set has no expiry -- that half stays registered.
      */
     public void addWeakness(DamageElement element) {
-        if (element == null || stanceWeak.contains(element)) { return; }
+        if (element == null || stanceWeak.contains(element)) {
+            return;
+        }
         java.util.Set<DamageElement> widened = new java.util.HashSet<>(stanceWeak);
         widened.add(element);
         setStanceWeak(widened);
@@ -232,7 +234,9 @@ public class Enemy extends CanHit {
         timedWeak.put(element, turns);
     }
 
-    /** One of the target's own turns has ended: run every timed weakness down, dropping the expired. */
+    /**
+     * One of the target's own turns has ended: run every timed weakness down, dropping the expired.
+     */
     public void tickTimedWeaknesses() {
         if (timedWeak.isEmpty()) {
             return;
@@ -248,7 +252,7 @@ public class Enemy extends CanHit {
     }
 
     /**
- * How many elements this one is weak to.
+     * How many elements this one is weak to.
      *
      * <p>The enemy's own data is the answer (its {@code stance_weak} list); no new state is tracked, and a unit with no
      * weakness bar (a character, a summon) is not this class at all, so asking one is a type question the caller answers.
@@ -286,7 +290,7 @@ public class Enemy extends CanHit {
      * so the return value of this method and the nominal value the caller holds are needed
      * together; do not keep only one of them.
      *
-     * @param amount toughness reduction points (the skill's {@code stance_list} value  x 
+     * @param amount toughness reduction points (the skill's {@code stance_list} value  x
      *               weakness / non-weakness coefficient)
      * @return the points actually deducted from the toughness bar (0 = nothing shaved off:
      * already broken / non-positive / bar already empty)

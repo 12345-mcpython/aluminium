@@ -1,16 +1,16 @@
 package com.laosun.aluminium.test.engine;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -31,9 +31,11 @@ import java.util.List;
  */
 public class WeaknessElementSourceTest {
     private static final int WEARER = 1006;
-        private static final int LEVEL = 80;
+    private static final int LEVEL = 80;
 
-    /** Hangs one "on a Skill hit, add a weakness of some source to the target" rule on a character, and returns {battle, wearer, enemy}. */
+    /**
+     * Hangs one "on a Skill hit, add a weakness of some source to the target" rule on a character, and returns {battle, wearer, enemy}.
+     */
     private static Object[] scene(String element) {
         Character wearer = CharacterFactory.create(WEARER, LEVEL);
         EffectSpec add = new EffectSpec();
@@ -53,7 +55,9 @@ public class WeaknessElementSourceTest {
         return new Object[]{battle, wearer, enemy};
     }
 
-    /** The weakness this enemy already had. */
+    /**
+     * The weakness this enemy already had.
+     */
     private static List<DamageElement> before(Enemy enemy) {
         List<DamageElement> had = new ArrayList<>();
         for (DamageElement e : DamageElement.values()) {

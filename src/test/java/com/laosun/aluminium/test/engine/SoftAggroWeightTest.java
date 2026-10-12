@@ -1,21 +1,17 @@
 package com.laosun.aluminium.test.engine;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
-import com.laosun.aluminium.enums.AttributeType;
-import com.laosun.aluminium.enums.DamageElement;
-import com.laosun.aluminium.enums.DamageType;
-import com.laosun.aluminium.enums.SkillType;
-import com.laosun.aluminium.enums.TriggerEvent;
+import com.laosun.aluminium.enums.*;
 import com.laosun.aluminium.models.CanHit;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Damage;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.buff.ShieldBuff;
 import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -37,7 +33,10 @@ public class SoftAggroWeightTest {
     private static final int ALLY = 1210;
     private static final int BYSTANDER = 1002;
     private static final int LEVEL = 80;
-        /** Note: The ratio multiplies the unit's OWN weight: 100 x (1 + 5) = 600, so two equal allies become 6:1. */
+
+    /**
+     * Note: The ratio multiplies the unit's OWN weight: 100 x (1 + 5) = 600, so two equal allies become 6:1.
+     */
     @Test
     public void theRatioMultipliesTheUnitsOwnAggroWeight() {
         Character marked = withAggro(100);
@@ -56,7 +55,9 @@ public class SoftAggroWeightTest {
         Assertions.assertEquals(100.0 / 700, table.get(plain), EPS, "and the other ally is still a candidate");
     }
 
-    /** Note: The guard: a stated change that would zero the weight keeps the weight instead of deleting the unit. */
+    /**
+     * Note: The guard: a stated change that would zero the weight keeps the weight instead of deleting the unit.
+     */
     @Test
     public void aStatedChangeThatWouldZeroTheWeightDoesNotDeleteTheUnit() {
         Character doomed = withAggro(100);
@@ -71,7 +72,9 @@ public class SoftAggroWeightTest {
         Assertions.assertEquals(1.0, battle.getAggroTable(List.of(doomed)).get(doomed), EPS, "still a legal candidate");
     }
 
-    /** Note: Her Skill's gate, both branches: at or above 30% HP it lands, below it her Skill raises nothing. */
+    /**
+     * Note: Her Skill's gate, both branches: at or above 30% HP it lands, below it her Skill raises nothing.
+     */
     @Test
     public void herSkillRaisesAggroOnlyWhileTheAimedAllyIsAtThirtyPercentOrMore() {
         Assertions.assertEquals(6.0, aimedAllyWeightRatio(false), 1e-6,
@@ -80,7 +83,9 @@ public class SoftAggroWeightTest {
                 "below 30% the game pins MDF_AggroUp to 0, so the weight must be untouched");
     }
 
-    /** Note: Only the aimed ally is affected, and Eidolon (星魂) 2's battle-start shield carries no aggro at all. */
+    /**
+     * Note: Only the aimed ally is affected, and Eidolon (星魂) 2's battle-start shield carries no aggro at all.
+     */
     @Test
     public void onlyTheAimedAllyIsAffectedAndTheEidolonShieldIsNot() {
         Character march = CharacterFactory.create(MARCH, LEVEL);
@@ -118,7 +123,9 @@ public class SoftAggroWeightTest {
 
     // ==================================================================
 
-    /** The aimed ally's aggro after her Skill, divided by what it was before; `belowGate` damages them first. */
+    /**
+     * The aimed ally's aggro after her Skill, divided by what it was before; `belowGate` damages them first.
+     */
     private static double aimedAllyWeightRatio(boolean belowGate) {
         Character march = CharacterFactory.create(MARCH, LEVEL);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
@@ -151,7 +158,9 @@ public class SoftAggroWeightTest {
         return effect;
     }
 
-    /** A character with the given stated aggro, bypassing the data (the shape AggroTest uses). */
+    /**
+     * A character with the given stated aggro, bypassing the data (the shape AggroTest uses).
+     */
     private static Character withAggro(int aggro) {
         Character character = Character.fromAttributes("c" + aggro, 10_000, 100, 100, 100);
         character.setAggro(aggro);

@@ -19,7 +19,9 @@ import lombok.Getter;
  */
 public class ToughnessBoostBuff extends AbstractBuff {
 
-    /** How much extra reduction, as a fraction ({@code 1.0} = "提高 100%"). */
+    /**
+     * How much extra reduction, as a fraction ({@code 1.0} = "提高 100%").
+     */
     @Getter
     private final double percent;
 
@@ -52,7 +54,9 @@ public class ToughnessBoostBuff extends AbstractBuff {
         return true;
     }
 
-    /** Two of these on one attacker add up ("提高 50%" on top of "提高 100%"), so they are never "the same buff". */
+    /**
+     * Two of these on one attacker add up ("提高 50%" on top of "提高 100%"), so they are never "the same buff".
+     */
     @Override
     public boolean isSameKind(AbstractBuff other) {
         return false;

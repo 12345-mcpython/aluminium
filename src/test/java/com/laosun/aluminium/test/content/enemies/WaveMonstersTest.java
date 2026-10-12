@@ -1,9 +1,6 @@
 package com.laosun.aluminium.test.content.enemies;
 
 
-import com.laosun.aluminium.test.content.lightcones.SheAlreadyShutHerEyesTest;
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.beans.EffectSpec;
@@ -11,8 +8,10 @@ import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.models.CanHit;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.WaveManager;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Assumptions;
@@ -40,7 +39,9 @@ public class WaveMonstersTest {
     private static final int ALLY = 1002;
     private static final int MULTI_WAVE_STAGE = 310030;
 
-    /** Entering a wave puts THAT wave's enemies in the set, and a later wave starts the set over. */
+    /**
+     * Entering a wave puts THAT wave's enemies in the set, and a later wave starts the set over.
+     */
     @Test
     public void enteringAWaveIsWhatFillsTheSet() {
         Assumptions.assumeFalse(Constant.stages().isEmpty(), "stage.json has not been generated");

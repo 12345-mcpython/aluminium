@@ -1,15 +1,15 @@
 package com.laosun.aluminium.test.content.lightcones;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -32,10 +32,12 @@ import java.util.List;
 public class IAmAsYouBeholdWriteSide2Test {
     private static final int LEVEL = 80;
     private static final int WEARER = 1003;
-        private static final double PER_POINT = 0.02;
+    private static final double PER_POINT = 0.02;
     private static final double FLAT = 0.001;
 
-    /** Casts one ultimate at full energy; a hand-built BOOST_DAMAGE rule reads what the instance spent. */
+    /**
+     * Casts one ultimate at full energy; a hand-built BOOST_DAMAGE rule reads what the instance spent.
+     */
     private static double ultimateDamage(boolean scaled) {
         Character wearer = CharacterFactory.create(WEARER, LEVEL);
         Enemy enemy = BattleFixture.monster();

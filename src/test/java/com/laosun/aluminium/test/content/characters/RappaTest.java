@@ -4,8 +4,8 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -20,7 +20,10 @@ import java.util.Random;
 public class RappaTest {
     private static final int RAPPA = 1317;
     private static final int LEVEL = 80;
-        /** Note: One Charge per Weakness Break, stopped at the document's ten. */
+
+    /**
+     * Note: One Charge per Weakness Break, stopped at the document's ten.
+     */
     @Test
     public void everyBreakAddsOneChargeUpToTen() {
         Character rappa = CharacterFactory.create(RAPPA, LEVEL);
@@ -40,7 +43,9 @@ public class RappaTest {
                 "「最多拥有10点充能」 (holds at most 10 points of Charge) -- twelve breaks must still read ten");
     }
 
-    /** The declared resource's value, read through the combatant's own manager. */
+    /**
+     * The declared resource's value, read through the combatant's own manager.
+     */
     private static int chargeOf(Character rappa) {
         return rappa.getResources().get("充能").getValue();
     }

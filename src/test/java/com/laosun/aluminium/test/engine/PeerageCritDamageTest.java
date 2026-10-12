@@ -1,13 +1,12 @@
 package com.laosun.aluminium.test.engine;
 
 
-import com.laosun.aluminium.test.content.characters.FeixiaoFollowUpCritTest;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.skill.Skill;
 import com.laosun.aluminium.models.skill.SkillExecutor;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -28,9 +27,11 @@ import java.util.Random;
 public class PeerageCritDamageTest {
     private static final int OWNER = 1412;
     private static final int ALLY = 1002;
-        private static final String PEERAGE = "爵位";
+    private static final String PEERAGE = "爵位";
 
-    /** The peer's skill crits harder than the same skill without the peerage. */
+    /**
+     * The peer's skill crits harder than the same skill without the peerage.
+     */
     @Test
     public void thePeerCritsHarderOnSkillDamage() {
         double withPeer = critRatio(true);
@@ -40,7 +41,9 @@ public class PeerageCritDamageTest {
                 "「战技伤害的暴击伤害提高 72%」 (Skill DMG's CRIT DMG is raised by 72%) (crit/non-crit: with=" + withPeer + ", without=" + without + ")");
     }
 
-    /** forced-crit damage divided by never-crit damage, same scene, same six casts. */
+    /**
+     * forced-crit damage divided by never-crit damage, same scene, same six casts.
+     */
     private static double critRatio(boolean keepPeerage) {
         double crit = damage(keepPeerage, true);
         double plain = damage(keepPeerage, false);
@@ -53,11 +56,11 @@ public class PeerageCritDamageTest {
         Character ally = CharacterFactory.create(ALLY, 80);
         Battle battle = new Battle(List.of(owner, ally),
                 List.of(BattleFixture.monster()), new Random() {
-                    @Override
-                    public double nextDouble() {
-                        return forceCrit ? 0.0 : 1.0;
-                    }
-                });
+            @Override
+            public double nextDouble() {
+                return forceCrit ? 0.0 : 1.0;
+            }
+        });
         battle.startBattle();
         battle.processRequests();
 

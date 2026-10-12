@@ -4,9 +4,9 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
-import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.models.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -42,7 +42,7 @@ import java.util.List;
 public class ExtraTurnEventTest {
     private static final int PEARL = 1503;          // used as the fixture character, and for the counters' names
     private static final int ALLY = 1502;           // a second real unit, and a legal Elation ally
-        private static final String COUNTER = "好活当赏";
+    private static final String COUNTER = "好活当赏";
     private static final String LAUGH = "笑点";
     private static final double EPS = 1e-9;
 
@@ -92,7 +92,9 @@ public class ExtraTurnEventTest {
                 "and the start did not fire a second time");
     }
 
-    /** The end is not "the same move as the start": an ordinary turn after the extra one must not announce an end. */
+    /**
+     * The end is not "the same move as the start": an ordinary turn after the extra one must not announce an end.
+     */
     @Test
     public void anOrdinaryTurnAfterwardsAnnouncesNoEnd() {
         Character pearl = CharacterFactory.create(PEARL, 80);
@@ -116,7 +118,9 @@ public class ExtraTurnEventTest {
                 "no further end events: the extra turn ended exactly once");
     }
 
-    /** A grant that never becomes a turn emits nothing. */
+    /**
+     * A grant that never becomes a turn emits nothing.
+     */
     @Test
     public void aGrantThatNeverBecomesATurnEmitsNothing() {
         Character pearl = CharacterFactory.create(PEARL, 80);
@@ -175,7 +179,9 @@ public class ExtraTurnEventTest {
         return effect;
     }
 
-    /** Drives one complete ordinary turn: settle the actor's start, then finish it. */
+    /**
+     * Drives one complete ordinary turn: settle the actor's start, then finish it.
+     */
     private static void runOneFullTurn(Battle battle) {
         battle.stepForward();
         battle.beforeMove();

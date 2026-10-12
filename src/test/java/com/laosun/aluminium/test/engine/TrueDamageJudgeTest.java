@@ -1,14 +1,14 @@
 package com.laosun.aluminium.test.engine;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -31,7 +31,9 @@ public class TrueDamageJudgeTest {
     private static final int OWNER = 1003;
     private static final int LEVEL = 80;
 
-    /** The rider's damage does not move with the victim's defence, while an ordinary instance's does. */
+    /**
+     * The rider's damage does not move with the victim's defence, while an ordinary instance's does.
+     */
     @Test
     public void trueDamageIgnoresDefence() {
         double soft = riderShare(0, "TRUE");
@@ -51,7 +53,9 @@ public class TrueDamageJudgeTest {
     // Fixture
     // ==================================================================
 
-    /** The extra damage a 100%-of-ATK rider adds, with the victim at the given defence. */
+    /**
+     * The extra damage a 100%-of-ATK rider adds, with the victim at the given defence.
+     */
     private static double riderShare(int defence, String damageType) {
         return cast(true, defence, damageType) - cast(false, defence, damageType);
     }

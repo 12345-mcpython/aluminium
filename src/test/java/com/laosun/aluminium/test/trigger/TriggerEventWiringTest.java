@@ -1,9 +1,6 @@
 package com.laosun.aluminium.test.trigger;
 
 
-import com.laosun.aluminium.test.engine.EventBusTest;
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.AttributeType;
@@ -15,7 +12,9 @@ import com.laosun.aluminium.models.Damage;
 import com.laosun.aluminium.models.DoubleValue;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
-import com.laosun.aluminium.models.TriggerTable;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -43,10 +42,14 @@ import java.util.List;
  */
 public class TriggerEventWiringTest {
 
-    /** The owner of the rule needs to be distinguishable from everyone else in the assertions. */
+    /**
+     * The owner of the rule needs to be distinguishable from everyone else in the assertions.
+     */
     private static final int HIMEKO = 1003;
 
-    /** Enough HP that one basic attack never kills it. */
+    /**
+     * Enough HP that one basic attack never kills it.
+     */
     private static final double ENEMY_HP = 1_000_000;
 
     private static final double TOLERANCE = 1e-9;
@@ -55,7 +58,9 @@ public class TriggerEventWiringTest {
     // 1. TURN_START
     // ==================================================================
 
-    /** The rule fires on the wearer's own turn and gives the wearer the modifier. */
+    /**
+     * The rule fires on the wearer's own turn and gives the wearer the modifier.
+     */
     @Test
     public void turnStartFiresWhenTheWearersTurnBegins() {
         Character hero = character(heroTable(TriggerSpecs.rule("TURN_START",
@@ -165,7 +170,9 @@ public class TriggerEventWiringTest {
                 "HP_LOST must NOT fire when no HP was lost -- the two events are different facts");
     }
 
-    /** A hit that really costs HP fires both events. */
+    /**
+     * A hit that really costs HP fires both events.
+     */
     @Test
     public void takingHitAndHpLostBothFireOnRealDamage() {
         Character hero = plain(HIMEKO);
@@ -180,7 +187,9 @@ public class TriggerEventWiringTest {
                 "and so does HP_LOST, because HP really was lost");
     }
 
-    /** The event carries who was hit, so {@code target == self} is the wearer. */
+    /**
+     * The event carries who was hit, so {@code target == self} is the wearer.
+     */
     @Test
     public void takingHitTargetsTheOneWhoWasHit() {
         Character hero = plain(HIMEKO);
@@ -198,7 +207,9 @@ public class TriggerEventWiringTest {
                 "a teammate who was not hit must not receive it");
     }
 
-    /** An invulnerable target is not hit at all, so no event fires (nothing landed). */
+    /**
+     * An invulnerable target is not hit at all, so no event fires (nothing landed).
+     */
     @Test
     public void anInvulnerableTargetTakesNoHitEvent() {
         Character hero = plain(HIMEKO);
@@ -259,7 +270,9 @@ public class TriggerEventWiringTest {
     // 3. The hp_percent condition
     // ==================================================================
 
-    /** {@code hp_percent <= 0.5} holds at half HP (the game says "equal to or less than"). */
+    /**
+     * {@code hp_percent <= 0.5} holds at half HP (the game says "equal to or less than").
+     */
     @Test
     public void hpPercentMatchesAtAndBelowTheThreshold() {
         Character hero = character(heroTable(TriggerSpecs.rule("ALLY_ATTACK",
@@ -277,7 +290,9 @@ public class TriggerEventWiringTest {
                 "'equal to or less than 50%' must include exactly 50%");
     }
 
-    /** The literal may sit on either side, like every other numeric condition. */
+    /**
+     * The literal may sit on either side, like every other numeric condition.
+     */
     @Test
     public void hpPercentAcceptsTheLiteralOnEitherSide() {
         Character hero = character(heroTable(TriggerSpecs.rule("ALLY_ATTACK",
@@ -291,7 +306,9 @@ public class TriggerEventWiringTest {
                 "'0.5 >= hp_percent' is the same condition written the other way round");
     }
 
-    /** A character at full HP does not satisfy it (the boundary is below, not "always"). */
+    /**
+     * A character at full HP does not satisfy it (the boundary is below, not "always").
+     */
     @Test
     public void hpPercentIsFalseAtFullHealth() {
         Character hero = character(heroTable(TriggerSpecs.rule("ALLY_ATTACK",
@@ -322,7 +339,9 @@ public class TriggerEventWiringTest {
                 "…including the new one: " + e.getMessage());
     }
 
-    /** {@code 50} without a variable is still not a condition. */
+    /**
+     * {@code 50} without a variable is still not a condition.
+     */
     @Test
     public void aBareLiteralIsNotACondition() {
         Assertions.assertThrows(IllegalArgumentException.class,
@@ -351,12 +370,16 @@ public class TriggerEventWiringTest {
         return new TriggerTable(0, specs);
     }
 
-    /** A table of turn-start rules. */
+    /**
+     * A table of turn-start rules.
+     */
     private static TriggerTable heroTable(TriggerSpec... specs) {
         return new TriggerTable(0, List.of(specs));
     }
 
-    /** A character with an explicit trigger table. */
+    /**
+     * A character with an explicit trigger table.
+     */
     private static Character character(TriggerTable table) {
         Character character = plain(HIMEKO);
         character.setTriggerTable(table);
@@ -379,7 +402,9 @@ public class TriggerEventWiringTest {
         return character;
     }
 
-    /** A real character (level 80, no relics), so the HP ratio maths is the game's own. */
+    /**
+     * A real character (level 80, no relics), so the HP ratio maths is the game's own.
+     */
     private static Character plain(int cid) {
         return CharacterFactory.create(cid, 80);
     }
@@ -393,7 +418,9 @@ public class TriggerEventWiringTest {
         return battle;
     }
 
-    /** Steps the action bar until {@code unit}'s turn is the current one, then starts it. */
+    /**
+     * Steps the action bar until {@code unit}'s turn is the current one, then starts it.
+     */
     private static void reachTurnOf(Battle battle, CanHit unit) {
         for (int step = 0; step < 30; step++) {
             battle.stepForward();

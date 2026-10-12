@@ -76,11 +76,16 @@ public record MemospriteSpec(@SerializedName("name") String name,
         this(name, source, note, panel, null, null, null, null, null);
     }
 
-    /** The same, with an attack and no aggro - the shape most specs have. */
+    /**
+     * The same, with an attack and no aggro - the shape most specs have.
+     */
     public MemospriteSpec(String name, String source, String note, List<Panel> panel, Attack attack) {
         this(name, source, note, panel, attack, null, null, null, null);
     }
-    /** The original six, before the servant id and its skill rows existed -- kept so every existing caller still compiles. */
+
+    /**
+     * The original six, before the servant id and its skill rows existed -- kept so every existing caller still compiles.
+     */
     public MemospriteSpec(String name, String source, String note, List<Panel> panel, Attack attack, Double aggro) {
         this(name, source, note, panel, attack, aggro, null, null, null);
     }
@@ -112,7 +117,9 @@ public record MemospriteSpec(@SerializedName("name") String name,
             this(attribute, percent, flat, null, null);
         }
 
-        /** The resource-derived panel, with nothing said about abilities. */
+        /**
+         * The resource-derived panel, with nothing said about abilities.
+         */
         public Panel(String attribute, Double percent, Double flat, String source) {
             this(attribute, percent, flat, source, null);
         }
@@ -150,7 +157,9 @@ public record MemospriteSpec(@SerializedName("name") String name,
                          @SerializedName("shape") String shape,
                          @SerializedName("stance") Double stance) {
 
-        /** The same without a toughness value -- an attack that does not touch the bar, the default. */
+        /**
+         * The same without a toughness value -- an attack that does not touch the bar, the default.
+         */
         public Attack(String element, String base, Double percent, Integer hits, String shape) {
             this(element, base, percent, hits, shape, null);
         }

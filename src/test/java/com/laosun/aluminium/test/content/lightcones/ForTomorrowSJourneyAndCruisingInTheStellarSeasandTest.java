@@ -9,8 +9,8 @@ import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Damage;
 import com.laosun.aluminium.models.Weapon;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -25,7 +25,8 @@ import java.util.List;
 public class ForTomorrowSJourneyAndCruisingInTheStellarSeasandTest {
     private static final int WEARER = 1001;
     private static final int LEVEL = 80;
-        @Test
+
+    @Test
     public void cone22002RaisesAttackAndThenDamageAfterTheUlt() {
         Character unit = CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(22002, LEVEL, false, 5));
         Enemy enemy = BattleFixture.monster();
@@ -47,7 +48,9 @@ public class ForTomorrowSJourneyAndCruisingInTheStellarSeasandTest {
         Assertions.assertEquals(0.16, low, 1e-6, "rank 5 states 16% against a target at or below 50% HP");
     }
 
-    /** The instance-scoped crit chance written into the damage, with the enemy optionally brought low. */
+    /**
+     * The instance-scoped crit chance written into the damage, with the enemy optionally brought low.
+     */
     private static double instanceCrit(double fraction) {
         Character unit = CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(24001, LEVEL, false, 5));
         Enemy enemy = BattleFixture.monster();

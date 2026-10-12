@@ -28,7 +28,7 @@ import com.laosun.aluminium.models.event.HpLossEvent;
  * that cast the skill", not necessarily the character itself).
  *
  * <p><b>Generic on purpose.</b> Nothing here is enemy-specific: it is introduced for boss mechanics
- *  but a character could carry it too, and it deliberately does not duplicate the follow-up shape
+ * but a character could carry it too, and it deliberately does not duplicate the follow-up shape
  * that {@code TriggerInterpreter}'s {@code DAMAGE} op already expresses - both end up in
  * {@link Battle#applyAdditionalDamage}, so a counter is {@code ADDITIONAL} damage that
  * <b>does not count as an attack</b> (the victim gains no energy, no toughness is reduced).

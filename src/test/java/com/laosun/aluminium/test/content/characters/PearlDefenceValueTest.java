@@ -6,8 +6,8 @@ import com.laosun.aluminium.enums.DamageType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Damage;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -31,10 +31,12 @@ import java.util.List;
 public class PearlDefenceValueTest {
     private static final int PEARL = 1503;
     private static final int ALLY = 1204;
-        private static final String COUNTER = "好活当赏";
+    private static final String COUNTER = "好活当赏";
     private static final double INSTANCE = 100;
 
-    /** A full counter blocks the share of an ally's hit, and the points come off HER pool. */
+    /**
+     * A full counter blocks the share of an ally's hit, and the points come off HER pool.
+     */
     @Test
     public void herCounterBlocksTheAlliesDamage() {
         Battle rich = newBattle(30);
@@ -127,7 +129,9 @@ public class PearlDefenceValueTest {
     // Helpers
     // ==================================================================
 
-    /** One settled hit on {@code ally} (the party's second slot when null), returning what it cost in HP. */
+    /**
+     * One settled hit on {@code ally} (the party's second slot when null), returning what it cost in HP.
+     */
     private static double hit(Battle battle, Character ally, double instance) {
         Character victim = ally == null ? battle.characters.get(1) : ally;
         Enemy attacker = battle.enemyUnits().getFirst();
@@ -136,7 +140,9 @@ public class PearlDefenceValueTest {
         return before - victim.getCurrentHp();
     }
 
-    /** A fresh battle with Pearl holding {@code points} of 好活当赏. */
+    /**
+     * A fresh battle with Pearl holding {@code points} of 好活当赏.
+     */
     private static Battle newBattle(int points) {
         Battle battle = new Battle(List.of(CharacterFactory.create(PEARL, 80), CharacterFactory.create(ALLY, 80)),
                 List.of(BattleFixture.monster()), BattleFixture.seeded());

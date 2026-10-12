@@ -1,8 +1,6 @@
 package com.laosun.aluminium.test.engine;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
@@ -13,9 +11,11 @@ import com.laosun.aluminium.enums.DamageType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Damage;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -45,12 +45,18 @@ import java.util.List;
 public class DefenceIgnoreTest {
     private static final double EPS = 1e-6;
 
-    /** Jade (翡翠) - no other test uses this id, so a rule file for her cannot invalidate anyone's premise. */
+    /**
+     * Jade (翡翠) - no other test uses this id, so a rule file for her cannot invalidate anyone's premise.
+     */
     private static final int JADE = 1314;
-    /** Himeko (姬子), a plain attacker with no rule file of her own. */
+    /**
+     * Himeko (姬子), a plain attacker with no rule file of her own.
+     */
     private static final int ATTACKER = 1003;
     private static final int LEVEL = 80;
-    /** Ice Edge (冰锋): a real monster with real defence, so the zone arithmetic is not on a hand-made number. */
+    /**
+     * Ice Edge (冰锋): a real monster with real defence, so the zone arithmetic is not on a hand-made number.
+     */
     private static final int MONSTER = 1002011;
     private static final int MONSTER_LEVEL = 90;
 
@@ -101,7 +107,9 @@ public class DefenceIgnoreTest {
                 "…so more ignore really is more damage, and the replacement above is not hiding a no-op");
     }
 
-    /** Everything past "ignore it all" is the same hit: the zone clamps the ratio to 100%. */
+    /**
+     * Everything past "ignore it all" is the same hit: the zone clamps the ratio to 100%.
+     */
     @Test
     public void fullIgnoreIsTheCeiling() {
         Assertions.assertEquals(damageWithGrant(1.0), damageWithGrant(1.5), EPS,
@@ -167,7 +175,9 @@ public class DefenceIgnoreTest {
                 "the effect is about the damage SHE deals, so it is a buff on herself (absent means self)");
     }
 
-    /** At rank four the Ultimate grants it - through the event, not by reaching into the attribute. */
+    /**
+     * At rank four the Ultimate grants it - through the event, not by reaching into the attribute.
+     */
     @Test
     public void atRankFourTheUltimateGrantsIt() {
         Character jade = jadeAt(4);
@@ -179,7 +189,9 @@ public class DefenceIgnoreTest {
         Assertions.assertEquals(0.12, jade.getAttribute(AttributeType.DEFENCE_IGNORE).get(), EPS);
     }
 
-    /** Below the rank the rule is silent, which is what makes it an Eidolon ability. */
+    /**
+     * Below the rank the rule is silent, which is what makes it an Eidolon ability.
+     */
     @Test
     public void belowRankFourNothingIsGranted() {
         Character jade = jadeAt(3);
@@ -192,7 +204,9 @@ public class DefenceIgnoreTest {
                 "at Eidolon 3 the ability does not exist yet");
     }
 
-    /** Someone else's Ultimate does not grant it. */
+    /**
+     * Someone else's Ultimate does not grant it.
+     */
     @Test
     public void anAllyUltimateDoesNotGrantIt() {
         Character jade = jadeAt(4);
@@ -206,7 +220,9 @@ public class DefenceIgnoreTest {
                 "the text says when casting the ultimate -- HER ultimate, so `actor == self` is doing its job");
     }
 
-    /** Her file is found by the ordinary per-character loader (it is data, not a test fixture). */
+    /**
+     * Her file is found by the ordinary per-character loader (it is data, not a test fixture).
+     */
     @Test
     public void herFileIsTheOneTheLoaderReads() {
         Assertions.assertFalse(TriggerTables.of(JADE).isEmpty(),
@@ -230,13 +246,15 @@ public class DefenceIgnoreTest {
         return damageWithGrants(1, percent == null ? new Double[0] : new Double[]{percent});
     }
 
-    /** The same, with {@code rules} rules each granting every percent in {@code percents}. */
+    /**
+     * The same, with {@code rules} rules each granting every percent in {@code percents}.
+     */
     private static double damageWithGrants(int maxStacks, Double... percents) {
         Character attacker = percents.length == 0
                 ? attackerWith(neverFiringRule())
                 : attackerWith(java.util.Arrays.stream(percents)
-                        .map(p -> defenceIgnoreRule(p, null, maxStacks))
-                        .toArray(TriggerSpec[]::new));
+                .map(p -> defenceIgnoreRule(p, null, maxStacks))
+                .toArray(TriggerSpec[]::new));
         Enemy target = freshMonster();
         Battle battle = new Battle(List.of(attacker), List.of(target), BattleFixture.seeded());
         battle.startBattle();
@@ -290,7 +308,9 @@ public class DefenceIgnoreTest {
         return TriggerSpecs.rule("BATTLE_START", null, effect);
     }
 
-    /** A rule with the same shape that subscribes to an event this fixture never fires. */
+    /**
+     * A rule with the same shape that subscribes to an event this fixture never fires.
+     */
     private static TriggerSpec neverFiringRule() {
         EffectSpec effect = new EffectSpec();
         TriggerSpecs.set(effect, "op", "MODIFY_ATTR");
@@ -300,7 +320,9 @@ public class DefenceIgnoreTest {
         return TriggerSpecs.rule("KILL", null, effect);
     }
 
-    /** A fresh instance every time: HP is state, and two hits must start from the same point. */
+    /**
+     * A fresh instance every time: HP is state, and two hits must start from the same point.
+     */
     private static Enemy freshMonster() {
         return EnemyFactory.create(MONSTER, MONSTER_LEVEL, 1);
     }

@@ -78,7 +78,7 @@ public class IncessantRainTest {
      *
      * <p>Note: The bonus belongs to THIS hit, so it carries {@code instance: true} -- without it the op would raise the
      * WEARER's attribute for a while, a different sentence. Note: It also carries {@code permanent}, because the op's
- * validation demands one of turn/permanent/until even on the instance path (measured).
+     * validation demands one of turn/permanent/until even on the instance path (measured).
      * Note: The threshold reads {@code >= 3.0}: the parser writes an integral threshold with a decimal point.
      */
     @Test

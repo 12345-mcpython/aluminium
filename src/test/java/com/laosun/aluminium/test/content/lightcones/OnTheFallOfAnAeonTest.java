@@ -5,9 +5,10 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Weapon;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.models.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -25,7 +26,7 @@ public class OnTheFallOfAnAeonTest {
     private static final int WEARER = 1002;
     private static final int ALLY = 1003;
     private static final int LEVEL = 80;
-        private Character wearer;
+    private Character wearer;
     private Enemy enemy;
     private Battle battle;
 
@@ -99,7 +100,7 @@ public class OnTheFallOfAnAeonTest {
         // these two numbers are what a `8 -> 4 percent` or `max_stacks 4 -> 2` change would otherwise slip past.
         build(true);
         var rules = wearer.getTriggerTable().matching(com.laosun.aluminium.enums.TriggerEvent.ALLY_ATTACK,
-                new com.laosun.aluminium.models.TriggerTable.TriggerContext(wearer, wearer, enemy, 1, 0, null,
+                new TriggerTable.TriggerContext(wearer, wearer, enemy, 1, 0, null,
                         battle, null));
         int pinned = 0;
         for (var rule : rules) {

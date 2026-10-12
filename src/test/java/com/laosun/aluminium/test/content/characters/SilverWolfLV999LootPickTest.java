@@ -3,8 +3,8 @@ package com.laosun.aluminium.test.content.characters;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -35,7 +35,7 @@ import java.util.Random;
 public class SilverWolfLV999LootPickTest {
     private static final int WOLF = 1506;
     private static final int ALLY = 1204;
-        private static final String LAUGH = "笑点";
+    private static final String LAUGH = "笑点";
     /**
      * What the scripted roll answers with: a value inside the effect's WEIGHT bucket.
      *
@@ -45,10 +45,14 @@ public class SilverWolfLV999LootPickTest {
     private static final int PICK_SWORD = 0;
     private static final int PICK_POINTS = 1000;
     private static final int PICK_LAUGHS = 2000;
-    /** The box's share of its own total, as the document states it (「等同于本次总伤害值 20%」). */
+    /**
+     * The box's share of its own total, as the document states it (「等同于本次总伤害值 20%」).
+     */
     private static final double SHARE = 0.2;
 
-    /** 【超超超大剑】 is a fifth of what the box settled, over BOTH enemies, and it lands on ONE of them. */
+    /**
+     * 【超超超大剑】 is a fifth of what the box settled, over BOTH enemies, and it lands on ONE of them.
+     */
     @Test
     public void theSwordIsAFifthOfWhatTheBoxSettled() {
         ScriptedRng rng = new ScriptedRng(PICK_SWORD);
@@ -85,7 +89,9 @@ public class SilverWolfLV999LootPickTest {
                 "the stated 90% is the total: with two enemies each takes half, so the TOTAL does not move with N");
     }
 
-    /** 【爆爆爆炸蛋】 restores 2 skill points and settles nothing else: the other end of the same pick. */
+    /**
+     * 【爆爆爆炸蛋】 restores 2 skill points and settles nothing else: the other end of the same pick.
+     */
     @Test
     public void thePointsEffectDoesNotTouchTheEnemySide() {
         ScriptedRng rng = new ScriptedRng(PICK_POINTS);
@@ -95,7 +101,9 @@ public class SilverWolfLV999LootPickTest {
         Assertions.assertEquals(0, points.laughsGained, "and no laughs");
     }
 
-    /** 【怪怪怪味豆】 grants 3 laughs and settles nothing else. */
+    /**
+     * 【怪怪怪味豆】 grants 3 laughs and settles nothing else.
+     */
     @Test
     public void theLaughsEffectDoesNotTouchTheEnemySide() {
         ScriptedRng rng = new ScriptedRng(PICK_LAUGHS);
@@ -109,7 +117,9 @@ public class SilverWolfLV999LootPickTest {
     // Helpers
     // ==================================================================
 
-    /** One firing with {@code enemies} identical enemies, 【爆爆爆炸蛋】 picked, returning what each enemy lost. */
+    /**
+     * One firing with {@code enemies} identical enemies, 【爆爆爆炸蛋】 picked, returning what each enemy lost.
+     */
     private static double boxsOwnDamagePerEnemy(int enemies) {
         ScriptedRng rng = new ScriptedRng(PICK_POINTS);
         Battle battle = battle(rng, enemies);
@@ -121,11 +131,15 @@ public class SilverWolfLV999LootPickTest {
         return reading.hpLostEach[0];
     }
 
-    /** What one firing of the box moved: HP (in total and per enemy), skill points and laughs. */
+    /**
+     * What one firing of the box moved: HP (in total and per enemy), skill points and laughs.
+     */
     private record Reading(double hpLost, double[] hpLostEach, int skillPointsGained, int laughsGained) {
     }
 
-    /** Fires the one event the box listens to and reads everything either side of it. */
+    /**
+     * Fires the one event the box listens to and reads everything either side of it.
+     */
     private static Reading fire(Battle battle, ScriptedRng rng) {
         var enemies = battle.enemyUnits();
         double[] beforeHp = enemies.stream().mapToDouble(e -> e.getCurrentHp()).toArray();
@@ -144,12 +158,16 @@ public class SilverWolfLV999LootPickTest {
                 battle.partyResourceValue(LAUGH) - laughsBefore);
     }
 
-    /** The wolf with her zone and 【无敌玩家】 up, and TWO identical enemies so "the total" is not one instance. */
+    /**
+     * The wolf with her zone and 【无敌玩家】 up, and TWO identical enemies so "the total" is not one instance.
+     */
     private static Battle battle(ScriptedRng rng) {
         return battle(rng, 2);
     }
 
-    /** The same, with however many identical enemies the case needs. */
+    /**
+     * The same, with however many identical enemies the case needs.
+     */
     private static Battle battle(ScriptedRng rng, int enemies) {
         List<com.laosun.aluminium.models.enemy.Enemy> roster = new java.util.ArrayList<>();
         for (int i = 0; i < enemies; i++) {

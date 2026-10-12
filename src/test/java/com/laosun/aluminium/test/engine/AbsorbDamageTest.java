@@ -8,8 +8,8 @@ import com.laosun.aluminium.enums.DamageType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Damage;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.models.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
@@ -38,7 +38,9 @@ public class AbsorbDamageTest {
     private static final int ALLY = 1204;
     private static final String COUNTER = "抵御值计数";
 
-    /** Enough points behind the target: the whole share is blocked, and the payer is charged for it. */
+    /**
+     * Enough points behind the target: the whole share is blocked, and the payer is charged for it.
+     */
     @Test
     public void theShareIsBlockedWhenTheCounterCanPay() {
         Reading armed = absorb(30, 1000, 0.6, 200, true);
@@ -78,7 +80,9 @@ public class AbsorbDamageTest {
                 "the rest of the hit still lands: partial absorption, not a save");
     }
 
-    /** No points at all: nothing is blocked and nothing is spent. */
+    /**
+     * No points at all: nothing is blocked and nothing is spent.
+     */
     @Test
     public void anEmptyCounterBlocksNothing() {
         Reading armed = absorb(0, 1000, 0.6, 200, true);
@@ -139,7 +143,9 @@ public class AbsorbDamageTest {
     // Helpers
     // ==================================================================
 
-    /** The two facts a reading has to carry together: what the hit cost, and what the counter holds afterwards. */
+    /**
+     * The two facts a reading has to carry together: what the hit cost, and what the counter holds afterwards.
+     */
     private record Reading(double hpCost, int counterAfter) {
     }
 
@@ -173,7 +179,9 @@ public class AbsorbDamageTest {
         battle.processRequests();
     }
 
-    /** Settles one hit of {@code instance} on {@code ally} through the engine's own entrance. */
+    /**
+     * Settles one hit of {@code instance} on {@code ally} through the engine's own entrance.
+     */
     private static double hitAlly(Battle battle, Character ally, double instance) {
         Enemy attacker = battle.enemyUnits().getFirst();
         double before = ally.getCurrentHp();

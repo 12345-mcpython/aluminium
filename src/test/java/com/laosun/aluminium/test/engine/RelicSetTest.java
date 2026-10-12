@@ -9,19 +9,11 @@ import com.laosun.aluminium.exceptions.RelicException;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Relic;
 import com.laosun.aluminium.models.RelicSuit;
-import com.laosun.aluminium.utils.AttributeBuilder;
-import com.laosun.aluminium.utils.CharacterFactory;
-import com.laosun.aluminium.utils.LevelPromotionCalc;
-import com.laosun.aluminium.utils.RelicFactory;
-import com.laosun.aluminium.utils.StageFactory;
+import com.laosun.aluminium.utils.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Relic set bonuses: {@code relic_sets.json} is loaded, the game's property vocabulary maps onto
@@ -38,11 +30,17 @@ import java.util.Set;
  */
 public class RelicSetTest {
 
-    /** "Musketeer of Wild Wheat" - a cavern set: HEAD / HAND / BODY / BOOT. */
+    /**
+     * "Musketeer of Wild Wheat" - a cavern set: HEAD / HAND / BODY / BOOT.
+     */
     private static final int CAVERN_SET = 102;
-    /** "Space Sealing Station" - a planar ornament set: NECK (sphere) / OBJECT (rope). */
+    /**
+     * "Space Sealing Station" - a planar ornament set: NECK (sphere) / OBJECT (rope).
+     */
     private static final int PLANAR_SET = 301;
-    /** The reference star rating and level: 5-star, level 15. */
+    /**
+     * The reference star rating and level: 5-star, level 15.
+     */
     private static final int STAR = 5;
     private static final int LEVEL = 15;
     /**
@@ -51,14 +49,22 @@ public class RelicSetTest {
      * the shipped file rather than to this test's arithmetic.
      */
     private static final double MUSKETEER_2PC_ATTACK_PERCENT = 0.12;
-    /** Set 102's 4-piece bonus: {@code SpeedAddedRatio: 0.06}. */
+    /**
+     * Set 102's 4-piece bonus: {@code SpeedAddedRatio: 0.06}.
+     */
     private static final double MUSKETEER_4PC_SPEED_PERCENT = 0.06;
-    /** Set 301's 2-piece bonus: {@code AttackAddedRatio: 0.12}. */
+    /**
+     * Set 301's 2-piece bonus: {@code AttackAddedRatio: 0.12}.
+     */
     private static final double SPACE_SEALING_2PC_ATTACK_PERCENT = 0.12;
-    /** Jing Yuan: used for the "does the bonus reach a real character's sheet" case. */
+    /**
+     * Jing Yuan: used for the "does the bonus reach a real character's sheet" case.
+     */
     private static final int JING_YUAN = 1204;
     private static final int CHARACTER_LEVEL = 80;
-    /** Base values the relic pipeline is fed with; the base is what a percentage multiplies. */
+    /**
+     * Base values the relic pipeline is fed with; the base is what a percentage multiplies.
+     */
     private static final double BASE_ATTACK = 1000.0;
     private static final double BASE_SPEED = 100.0;
     private static final double TOLERANCE = 1e-9;
@@ -171,7 +177,9 @@ public class RelicSetTest {
                 AttributeType.fromGameProperty("ElationDamageAddedRatioBase"), "ElationDamageAddedRatioBase");
     }
 
-    /** An unknown property name is an error, not a skip - that is what makes the guard above worth having. */
+    /**
+     * An unknown property name is an error, not a skip - that is what makes the guard above worth having.
+     */
     @Test
     public void anUnmappablePropertyNameThrowsInsteadOfBeingSkipped() {
         IllegalArgumentException unknown = Assertions.assertThrows(IllegalArgumentException.class,
@@ -380,7 +388,9 @@ public class RelicSetTest {
                 TOLERANCE, "a second build must produce the same panel, or the build is not reproducible");
     }
 
-    /** The real team really wears the reference build (the wiring, not just the factory). */
+    /**
+     * The real team really wears the reference build (the wiring, not just the factory).
+     */
     @Test
     public void theRealTeamActuallyWearsRelics() {
         for (Character character : StageFactory.realTeam()) {
@@ -473,7 +483,9 @@ public class RelicSetTest {
                 "a relic with no set contributes its own affix and no bonus");
     }
 
-    /** The factory refuses to build a piece the set does not have (rather than inventing one). */
+    /**
+     * The factory refuses to build a piece the set does not have (rather than inventing one).
+     */
     @Test
     public void theFactoryRejectsAPartTheSetDoesNotHave() {
         Assertions.assertThrows(RelicException.class,
@@ -500,17 +512,23 @@ public class RelicSetTest {
     // Helpers
     // ==================================================================
 
-    /** A suit wearing exactly the given slots of the cavern set, built from the real data. */
+    /**
+     * A suit wearing exactly the given slots of the cavern set, built from the real data.
+     */
     private static RelicSuit musketeer(RelicType... slots) {
         return suitOf(CAVERN_SET, slots);
     }
 
-    /** The same pieces as {@link #musketeer}, with the set id cleared: the control that isolates the bonus. */
+    /**
+     * The same pieces as {@link #musketeer}, with the set id cleared: the control that isolates the bonus.
+     */
     private static RelicSuit musketeerWithoutSetBonuses(RelicType... slots) {
         return suitOfWithoutSetId(CAVERN_SET, slots);
     }
 
-    /** The whole reference build (cavern + planar), with every set id cleared. */
+    /**
+     * The whole reference build (cavern + planar), with every set id cleared.
+     */
     private static RelicSuit combinedWithoutSetBonuses() {
         RelicSuit suit = suitOfWithoutSetId(CAVERN_SET, RelicType.HEAD, RelicType.HAND, RelicType.BODY,
                 RelicType.BOOT);
@@ -540,7 +558,9 @@ public class RelicSetTest {
         return suit;
     }
 
-    /** Runs a suit through the same pipeline a character uses and returns one computed attribute. */
+    /**
+     * Runs a suit through the same pipeline a character uses and returns one computed attribute.
+     */
     private static double attribute(RelicSuit suit, AttributeType type, double base) {
         AttributeBuilder builder = new AttributeBuilder();
         builder.setBase(type, base);
@@ -548,19 +568,25 @@ public class RelicSetTest {
         return builder.build()[type.ordinal()].get();
     }
 
-    /** The attack the 4-piece cavern set contributes at the given piece count. */
+    /**
+     * The attack the 4-piece cavern set contributes at the given piece count.
+     */
     private static double attackBonus(int pieces) {
         return attribute(musketeer(firstSlots(pieces)), AttributeType.ATTACK, BASE_ATTACK)
                 - attribute(musketeerWithoutSetBonuses(firstSlots(pieces)), AttributeType.ATTACK, BASE_ATTACK);
     }
 
-    /** The speed the 4-piece cavern set contributes at the given piece count. */
+    /**
+     * The speed the 4-piece cavern set contributes at the given piece count.
+     */
     private static double speedBonus(int pieces) {
         return attribute(musketeer(firstSlots(pieces)), AttributeType.SPEED, BASE_SPEED)
                 - attribute(musketeerWithoutSetBonuses(firstSlots(pieces)), AttributeType.SPEED, BASE_SPEED);
     }
 
-    /** The first {@code pieces} cavern slots, in head to hand to body to boot order. */
+    /**
+     * The first {@code pieces} cavern slots, in head to hand to body to boot order.
+     */
     private static RelicType[] firstSlots(int pieces) {
         RelicType[] order = {RelicType.HEAD, RelicType.HAND, RelicType.BODY, RelicType.BOOT};
         RelicType[] selected = new RelicType[Math.max(pieces, 0)];
@@ -568,7 +594,9 @@ public class RelicSetTest {
         return selected;
     }
 
-    /** The relics of a suit, read through the public slot fields. */
+    /**
+     * The relics of a suit, read through the public slot fields.
+     */
     private static List<Relic> piecesOf(RelicSuit suit) {
         Relic[] slots = {suit.hand, suit.head, suit.body, suit.boot, suit.ball, suit.line};
         List<Relic> pieces = new ArrayList<>();
@@ -580,17 +608,23 @@ public class RelicSetTest {
         return pieces;
     }
 
-    /** The slots a set occupies, in data order. */
+    /**
+     * The slots a set occupies, in data order.
+     */
     private static List<RelicType> slotsOf(RelicSet set) {
         return set.parts().stream().map(part -> RelicType.fromSetPart(part.type())).toList();
     }
 
-    /** The piece requirements a suit actually satisfies, in data order. */
+    /**
+     * The piece requirements a suit actually satisfies, in data order.
+     */
     private static List<Integer> requiresOf(RelicSet set) {
         return set.effects().stream().map(RelicSet.Effect::require).toList();
     }
 
-    /** The piece requirements a suit actually satisfies, in data order. */
+    /**
+     * The piece requirements a suit actually satisfies, in data order.
+     */
     private static List<Integer> requiresOf(RelicSuit suit) {
         return suit.activeEffects().stream().map(RelicSet.Effect::require).toList();
     }

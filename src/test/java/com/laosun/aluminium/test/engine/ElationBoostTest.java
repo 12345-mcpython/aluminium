@@ -1,16 +1,15 @@
 package com.laosun.aluminium.test.engine;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
-import com.laosun.aluminium.enums.DamageType;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -28,7 +27,7 @@ public class ElationBoostTest {
     private static final int WEARER = 1501;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-        private Character wearer;
+    private Character wearer;
     private Enemy enemy;
     private Battle battle;
 
@@ -50,7 +49,9 @@ public class ElationBoostTest {
         }
     }
 
-    /** Casts a real skill of the kit and reports the health the enemy lost. */
+    /**
+     * Casts a real skill of the kit and reports the health the enemy lost.
+     */
     private double castAndMeasure(SkillType type) {
         double before = enemy.getCurrentHp();
         battle.castImmediate(wearer.getSkills().get(type), wearer, List.of(enemy));

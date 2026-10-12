@@ -7,8 +7,8 @@ import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -26,7 +26,10 @@ public class DanHengTest {
     private static final int DANHENG = 1002;
     private static final int ALLY = 1001;
     private static final int LEVEL = 80;
-        /** Note: An ally's skill aimed at him raises his penetration; a skill aimed elsewhere does not. */
+
+    /**
+     * Note: An ally's skill aimed at him raises his penetration; a skill aimed elsewhere does not.
+     */
     @Test
     public void anAllysSkillAimedAtHimRaisesHisPenetration() {
         Fixture f = new Fixture();
@@ -39,7 +42,9 @@ public class DanHengTest {
                         + before + " -> " + f.danheng.getAttribute(AttributeType.DAMAGE_PENETRATION).get());
     }
 
-    /** Note: The control: an ally's skill aimed at someone ELSE must leave his penetration alone. */
+    /**
+     * Note: The control: an ally's skill aimed at someone ELSE must leave his penetration alone.
+     */
     @Test
     public void anAllysSkillAimedElsewhereLeavesItAlone() {
         Fixture f = new Fixture();
@@ -51,7 +56,9 @@ public class DanHengTest {
                 "「成为我方技能的施放目标」 (becomes the target of one of our Skills) -- being on the field is not enough");
     }
 
-    /** Census: the talent and the level convention are where the notes say. */
+    /**
+     * Census: the talent and the level convention are where the notes say.
+     */
     @Test
     public void hisFileCarriesTheClauses() {
         var table = TriggerTables.of(DANHENG);

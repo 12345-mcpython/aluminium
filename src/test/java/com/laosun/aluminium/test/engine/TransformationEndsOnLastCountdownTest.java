@@ -6,8 +6,8 @@ import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Countdown;
 import com.laosun.aluminium.models.skill.Skill;
 import com.laosun.aluminium.models.skill.SkillExecutor;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -22,17 +22,21 @@ import java.util.List;
  */
 public class TransformationEndsOnLastCountdownTest {
     private static final int OWNER = 1408;
-        private static final String STATE = "变身";
+    private static final String STATE = "变身";
     private static final int TURNS = 8;
 
-    /** After the eighth countdown turn the transformation is gone. */
+    /**
+     * After the eighth countdown turn the transformation is gone.
+     */
     @Test
     public void theEighthCountdownTurnEndsIt() {
         Assertions.assertFalse(transformedAfterCountdownTurns(TURNS),
                 "\"the last countdown turn ... ends the transformation\" (「最后 1 个倒计时回合…结束变身」)");
     }
 
-    /** Note: One turn earlier the transformation must still be on. */
+    /**
+     * Note: One turn earlier the transformation must still be on.
+     */
     @Test
     public void oneTurnEarlierItIsStillOn() {
         Assertions.assertTrue(transformedAfterCountdownTurns(TURNS - 1),

@@ -1,14 +1,14 @@
 package com.laosun.aluminium.test.engine;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -25,7 +25,7 @@ import java.util.List;
 public class OncePerAttackLimitTest {
     private static final int OWNER = 1205;
     private static final int LEVEL = 80;
-        // Note: Kept as fields: Battle exposes no "give me my party" accessor (measured), and every reading here needs
+    // Note: Kept as fields: Battle exposes no "give me my party" accessor (measured), and every reading here needs
     // the same two units.
     private Character owner;
     private Enemy enemy;
@@ -98,7 +98,9 @@ public class OncePerAttackLimitTest {
     }
 
     /** perAttackThree is named so the reason this file exists stays visible when it fails. */
-    /** The contrast that proves the field is not `per_turn`: two attacks in ONE turn. */
+    /**
+     * The contrast that proves the field is not `per_turn`: two attacks in ONE turn.
+     */
     @Test
     public void perTurnIsNotTheSameThing() {
         TriggerSpec rule = TriggerSpecs.rule("DEALING_DAMAGE", null, TriggerSpecs.gainEnergy(1));

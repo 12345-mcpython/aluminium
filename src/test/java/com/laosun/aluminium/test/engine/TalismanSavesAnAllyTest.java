@@ -6,8 +6,8 @@ import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.skill.Skill;
 import com.laosun.aluminium.models.skill.SkillExecutor;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -23,9 +23,11 @@ import java.util.List;
 public class TalismanSavesAnAllyTest {
     private static final int HUOHUO = 1217;
     private static final int ALLY = 1002;
-        private static final String STATE = "禳命";
+    private static final String STATE = "禳命";
 
-    /** At E2 the ally survives, at HALF OF ITS OWN Max HP. */
+    /**
+     * At E2 the ally survives, at HALF OF ITS OWN Max HP.
+     */
     @Test
     public void atEidolonTwoTheAllySurvives() {
         double[] result = afterLethalBlows(2, 1);
@@ -34,7 +36,9 @@ public class TalismanSavesAnAllyTest {
                 "\"restore equal to 50% of **its own** Max HP\" -- the VICTIM's own, not the healer's");
     }
 
-    /** Note: Below E2 the ally falls. */
+    /**
+     * Note: Below E2 the ally falls.
+     */
     @Test
     public void belowEidolonTwoTheAllyFalls() {
         Assertions.assertTrue(afterLethalBlows(0, 1)[0] <= 0, "only Eidolon 2 has this clause");
@@ -60,7 +64,9 @@ public class TalismanSavesAnAllyTest {
 
     // ==================================================================
 
-    /** { the ally's HP after the blows, the ally's Max HP }. */
+    /**
+     * { the ally's HP after the blows, the ally's Max HP }.
+     */
     private static double[] afterLethalBlows(int eidolon, int blows) {
         Character her = CharacterFactory.create(HUOHUO, 80, false, null, null, eidolon);
         Character ally = CharacterFactory.create(ALLY, 80, false, null, null, 0);

@@ -1,12 +1,12 @@
 package com.laosun.aluminium.test.content.characters;
 
 import com.laosun.aluminium.Battle;
-import com.laosun.aluminium.models.Signal;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
+import com.laosun.aluminium.models.Signal;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -22,7 +22,10 @@ import java.util.Random;
 public class FireflyTest {
     private static final int FIREFLY = 1310;
     private static final int LEVEL = 80;
-        /** Note: 25% of the REMAINING wait is skipped: what is left is 0.5 of what it was, and nothing moves without firing. */
+
+    /**
+     * Note: 25% of the REMAINING wait is skipped: what is left is 0.5 of what it was, and nothing moves without firing.
+     */
     @Test
     public void theSkillLeavesThreeQuartersOfTheWait() {
         Character firefly = CharacterFactory.create(FIREFLY, LEVEL);
@@ -39,7 +42,9 @@ public class FireflyTest {
                 "「使自身下一次行动提前25%」 (advances her own next action by 25%): " + before + " -> " + after);
     }
 
-    /** Note: 100% means the wait is gone. */
+    /**
+     * Note: 100% means the wait is gone.
+     */
     @Test
     public void theUltimateRemovesTheWaitEntirely() {
         Character firefly = CharacterFactory.create(FIREFLY, LEVEL);
@@ -55,7 +60,9 @@ public class FireflyTest {
                 "「自身行动提前100%」 (advances her own action by 100%): " + before + " -> 0");
     }
 
-    /** The owner's remaining wait, read off the queue's public snapshot. */
+    /**
+     * The owner's remaining wait, read off the queue's public snapshot.
+     */
     private static double remaining(Battle battle, Character unit) {
         for (Signal signal : battle.queue.snapshot()) {
             if (signal.getCanHit() == unit) {

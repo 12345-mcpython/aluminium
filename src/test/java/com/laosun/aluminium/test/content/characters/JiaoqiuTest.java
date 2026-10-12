@@ -4,8 +4,8 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -21,7 +21,10 @@ import java.util.Random;
 public class JiaoqiuTest {
     private static final int JIAOQIU = 1218;
     private static final int LEVEL = 80;
-        /** Note: Seven applications, five layers (the document's cap), and the Burn state alongside it. */
+
+    /**
+     * Note: Seven applications, five layers (the document's cap), and the Burn state alongside it.
+     */
     @Test
     public void theStacksStopAtFiveAndTheBurnIsReal() {
         Character jiaoqiu = CharacterFactory.create(JIAOQIU, LEVEL);
@@ -40,7 +43,9 @@ public class JiaoqiuTest {
         // and this rule applies a Fire DoT. Registered as an open question rather than asserted falsely or deleted silently.
     }
 
-    /** Note: The technique's opening: the AoE and a stack, only when the technique was declared. */
+    /**
+     * Note: The technique's opening: the AoE and a stack, only when the technique was declared.
+     */
     @Test
     public void theTechniqueHitsAndStacksOnlyWhenDeclared() {
         Character jiaoqiu = CharacterFactory.create(JIAOQIU, LEVEL);

@@ -20,7 +20,7 @@ package com.laosun.aluminium.models.buff;
 public class StackBuff extends AbstractBuff {
 
     /**
-     * @param name what it is counting (the key {@code *_stacks:<name>} reads; never blank)
+     * @param name      what it is counting (the key {@code *_stacks:<name>} reads; never blank)
      * @param turns     how many of the owner's turns it lasts, at least 1
      * @param permanent {@code true} = lasts until the battle ends and is never counted down ({@code turns} is then
      *                  only a placeholder)
@@ -35,7 +35,9 @@ public class StackBuff extends AbstractBuff {
         this.maxStacks = Math.max(1, maxStacks);
     }
 
-    /** How many marks this counter accepts ({@code 1} = a plain flag) - read by {@code BuffManager.addStackable}. */
+    /**
+     * How many marks this counter accepts ({@code 1} = a plain flag) - read by {@code BuffManager.addStackable}.
+     */
     private final int maxStacks;
 
     @Override
@@ -43,12 +45,16 @@ public class StackBuff extends AbstractBuff {
         return maxStacks;
     }
 
-    /** A counter that lasts {@code turns} of its owner's turns, capped at {@code maxStacks} marks. */
+    /**
+     * A counter that lasts {@code turns} of its owner's turns, capped at {@code maxStacks} marks.
+     */
     public StackBuff(String name, int turns, int maxStacks) {
         this(name, turns, false, maxStacks);
     }
 
-    /** A single-mark flag with the given lifetime. */
+    /**
+     * A single-mark flag with the given lifetime.
+     */
     public StackBuff(String name, int turns) {
         this(name, turns, false, 1);
     }
@@ -65,31 +71,41 @@ public class StackBuff extends AbstractBuff {
         return true;
     }
 
-    /** Two marks of the same counter group together; a different name is a different counter. */
+    /**
+     * Two marks of the same counter group together; a different name is a different counter.
+     */
     @Override
     public Object stackGroupKey() {
         return "stack:" + getBuffName();
     }
 
-    /** A counter never blocks anything: it is a number, not a state. */
+    /**
+     * A counter never blocks anything: it is a number, not a state.
+     */
     @Override
     public boolean canAct() {
         return true;
     }
 
-    /** Note: Nothing happens on its owner's turn: a counter is only ever read (and removed) by the content that made it. */
+    /**
+     * Note: Nothing happens on its owner's turn: a counter is only ever read (and removed) by the content that made it.
+     */
     @Override
     public void tickEffect(com.laosun.aluminium.models.CanHit owner) {
         // deliberately nothing
     }
 
-    /** Note: Applying it does nothing either: the buff itself IS the count (see the class comment). */
+    /**
+     * Note: Applying it does nothing either: the buff itself IS the count (see the class comment).
+     */
     @Override
     public void applyEffect(com.laosun.aluminium.models.CanHit owner) {
         // deliberately nothing
     }
 
-    /** Note: And nothing happens when it comes off: the count is the buffs, so removing one is the whole effect. */
+    /**
+     * Note: And nothing happens when it comes off: the count is the buffs, so removing one is the whole effect.
+     */
     @Override
     public void removeBuff(com.laosun.aluminium.models.CanHit owner) {
         // deliberately nothing

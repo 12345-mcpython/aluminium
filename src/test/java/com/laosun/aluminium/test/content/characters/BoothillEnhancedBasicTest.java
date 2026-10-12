@@ -1,16 +1,20 @@
 package com.laosun.aluminium.test.content.characters;
+
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Signal;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
 import java.util.List;
 
-/** F-3: \u300c\u5f3a\u5316\u666e\u653b\u65e0\u6cd5\u6062\u590d\u6218\u6280\u70b9\u300d, from the data's bp_add column (2026-10-02). */
+/**
+ * F-3: \u300c\u5f3a\u5316\u666e\u653b\u65e0\u6cd5\u6062\u590d\u6218\u6280\u70b9\u300d, from the data's bp_add column (2026-10-02).
+ */
 public class BoothillEnhancedBasicTest {
     private static final String STANDOFF = "\u7edd\u547d\u5bf9\u5cd9";
 
@@ -24,7 +28,9 @@ public class BoothillEnhancedBasicTest {
         Assertions.assertEquals(2, enhanced, "his Skill spent one and the enhanced basic restored none");
     }
 
-    /** Casts his basic once, either straight away or after his Skill has put him in Standoff. */
+    /**
+     * Casts his basic once, either straight away or after his Skill has put him in Standoff.
+     */
     private static int skillPointsAfter(boolean enhanced) {
         Character boothill = CharacterFactory.create(1315, 80);
         Battle battle = new Battle(List.of(boothill), List.of(EnemyFactory.create(1002011, 100, 1)), BattleFixture.seeded());

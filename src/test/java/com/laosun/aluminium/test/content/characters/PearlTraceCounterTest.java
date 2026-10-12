@@ -1,15 +1,19 @@
 package com.laosun.aluminium.test.content.characters;
+
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
 import java.util.List;
 
-/** Character 1503 (Pearl): her trace gains 5 of the counter at the start of an ALLY's turn, capped at 50. */
+/**
+ * Character 1503 (Pearl): her trace gains 5 of the counter at the start of an ALLY's turn, capped at 50.
+ */
 public class PearlTraceCounterTest {
     private static final int PEARL = 1503;
     private static final int ALLY = 1204;

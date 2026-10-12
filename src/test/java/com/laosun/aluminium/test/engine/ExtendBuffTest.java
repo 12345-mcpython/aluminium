@@ -1,25 +1,16 @@
 package com.laosun.aluminium.test.engine;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
-import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
-import com.laosun.aluminium.models.buff.AbstractBuff;
-import com.laosun.aluminium.models.buff.BuffManager;
-import com.laosun.aluminium.models.buff.ControlBuff;
-import com.laosun.aluminium.models.buff.DotBuff;
-import com.laosun.aluminium.models.buff.ShieldBuff;
-import com.laosun.aluminium.models.buff.StateBuff;
-import com.laosun.aluminium.models.buff.StatModifierBuff;
-import com.laosun.aluminium.models.buff.TauntBuff;
-import com.laosun.aluminium.models.buff.VulnerabilityBuff;
+import com.laosun.aluminium.models.buff.*;
 import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -47,7 +38,10 @@ public class ExtendBuffTest {
     private static final int OWNER = 1002;
     private static final int ALLY = 1202;
     private static final int LEVEL = 80;
-        /** The "加护" (Reinforce) shape: the same rule applies the shield and then lengthens it. */
+
+    /**
+     * The "加护" (Reinforce) shape: the same rule applies the shield and then lengthens it.
+     */
     @Test
     public void itLengthensTheBuffTheSameRuleJustApplied() {
         Fixture f = new Fixture(
@@ -60,7 +54,9 @@ public class ExtendBuffTest {
                 "2 turns from the shield + 1 from the trace -- and the two numbers stay in two rules");
     }
 
-    /** A state's name is the filter for a named state and for a DOT (whose name comes from its element). */
+    /**
+     * A state's name is the filter for a named state and for a DOT (whose name comes from its element).
+     */
     @Test
     public void aStateNameNamesTheBuff() {
         Fixture state = new Fixture(
@@ -77,7 +73,9 @@ public class ExtendBuffTest {
                 "the DOT's name is its element's (Fire -> Burning), translated in one place");
     }
 
-    /** When the sentence names an <i>effect</i> rather than a state, the attribute a modifier sits on names it. */
+    /**
+     * When the sentence names an <i>effect</i> rather than a state, the attribute a modifier sits on names it.
+     */
     @Test
     public void anAttributeNamesAModifier() {
         Fixture f = new Fixture(
@@ -89,7 +87,9 @@ public class ExtendBuffTest {
         Assertions.assertEquals(2, f.buff(StatModifierBuff.class).duration(), "1 + 1");
     }
 
-    /** Note: Only the owner's own buffs: "provided by the Skill" / "inflicted on the enemy target by the talent" are all about who applied it. */
+    /**
+     * Note: Only the owner's own buffs: "provided by the Skill" / "inflicted on the enemy target by the talent" are all about who applied it.
+     */
     @Test
     public void itDoesNotLengthenAnotherUnitsBuff() {
         Fixture f = new Fixture(TriggerSpecs.extendBuff(BuffManager.SHIELD_STATE, null, 1));
@@ -210,7 +210,9 @@ public class ExtendBuffTest {
     // helpers
     // ==================================================================
 
-    /** One owner (with the rule under test), one ally to hold the buff, one enemy. */
+    /**
+     * One owner (with the rule under test), one ally to hold the buff, one enemy.
+     */
     private static final class Fixture {
         private final Character owner;
         private final Character target;
@@ -229,7 +231,9 @@ public class ExtendBuffTest {
             battle.startBattle();
         }
 
-        /** Fires the rule with the ally as the event's subject (which is what {@code target} resolves to). */
+        /**
+         * Fires the rule with the ally as the event's subject (which is what {@code target} resolves to).
+         */
         private int fire() {
             return fire(TriggerEvent.ALLY_ATTACK);
         }
@@ -238,7 +242,9 @@ public class ExtendBuffTest {
             return battle.fireTriggers(event, owner, target, 1, 0);
         }
 
-        /** The buff the rule was expected to touch, failing loudly when it is not there. */
+        /**
+         * The buff the rule was expected to touch, failing loudly when it is not there.
+         */
         private <T extends AbstractBuff> T buff(Class<T> kind) {
             T found = target.getBuffManager().findBuff(kind);
             Assertions.assertNotNull(found, kind.getSimpleName() + " was expected on the ally");
@@ -246,7 +252,9 @@ public class ExtendBuffTest {
         }
     }
 
-    /** Compiles one effect into a table, which is where its validation runs. */
+    /**
+     * Compiles one effect into a table, which is where its validation runs.
+     */
     private static TriggerTable tableOf(EffectSpec effect) {
         return new TriggerTable(OWNER, List.of(TriggerSpecs.rule("ALLY_ATTACK", null, effect)));
     }

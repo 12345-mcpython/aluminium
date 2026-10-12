@@ -3,8 +3,8 @@ package com.laosun.aluminium.test.content.characters;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -28,10 +28,12 @@ import java.util.Random;
 public class SilverWolfLV999LootBoxWeightsTest {
     private static final int WOLF = 1506;
     private static final int ALLY = 1204;
-        private static final String LAUGH = "笑点";
+    private static final String LAUGH = "笑点";
     private static final String HIDDEN = "隐藏分";
 
-    /** 1 : 1 : 10 at the start of a battle - the hidden score is under 60, so 获得笑点 is ten times as likely. */
+    /**
+     * 1 : 1 : 10 at the start of a battle - the hidden score is under 60, so 获得笑点 is ten times as likely.
+     */
     @Test
     public void theWeightsAreTheGamesOwnGrades() {
         Assertions.assertEquals(12000, boundOf(3, 0), "a battle opens with 3 skill points: 1 + 1 + 10, in thousandths");
@@ -68,13 +70,17 @@ public class SilverWolfLV999LootBoxWeightsTest {
     // Helpers
     // ==================================================================
 
-    /** The weight total the box's roll asks for, at the given skill points and hidden score. */
+    /**
+     * The weight total the box's roll asks for, at the given skill points and hidden score.
+     */
     private static int boundOf(int skillPoints, int hiddenScore) {
         Fixture f = fixture(skillPoints, hiddenScore, 0);
         return f.roll();
     }
 
-    /** Which of the three effects a roll at {@code roll} lands on. */
+    /**
+     * Which of the three effects a roll at {@code roll} lands on.
+     */
     private static int whichEffect(int skillPoints, int hiddenScore, int roll) {
         Fixture f = fixture(skillPoints, hiddenScore, roll);
         f.roll();
@@ -90,7 +96,9 @@ public class SilverWolfLV999LootBoxWeightsTest {
             return rng.lastBound;
         }
 
-        /** 0 = the sword, 1 = the points, 2 = the laughs. */
+        /**
+         * 0 = the sword, 1 = the points, 2 = the laughs.
+         */
         int landedOn() {
             if (battle.getSkillPoints() > pointsBefore) {
                 return 1;
@@ -133,7 +141,9 @@ public class SilverWolfLV999LootBoxWeightsTest {
         return new Fixture(battle, wolf, rng, points, hp);
     }
 
-    /** Brings the battle's skill points to {@code wanted}, by gaining or spending one at a time. */
+    /**
+     * Brings the battle's skill points to {@code wanted}, by gaining or spending one at a time.
+     */
     private static void setSkillPoints(Battle battle, int wanted) {
         while (battle.getSkillPoints() > wanted) {
             battle.skillPointPolicy.spend();
@@ -144,7 +154,9 @@ public class SilverWolfLV999LootBoxWeightsTest {
         Assertions.assertEquals(wanted, battle.getSkillPoints(), "the fixture must start where the case says");
     }
 
-    /** {@code nextInt} answers with the scripted roll (clamped, because other draws share this source) and records it. */
+    /**
+     * {@code nextInt} answers with the scripted roll (clamped, because other draws share this source) and records it.
+     */
     private static final class ScriptedRng extends Random {
         private final int roll;
         private int lastBound = -1;
