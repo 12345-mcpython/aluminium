@@ -18,7 +18,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 /**
- * `actor_attr:<ATTRIBUTE>`: a magnitude that is a share of the ACTOR's own attribute.
+ * `actor_attr:&lt;ATTRIBUTE&gt;`: a magnitude that is a share of the ACTOR's own attribute.
  *
  * <p>The reader is 1415's memosprite skill 10 "献予'创世'之诗" -- "<b>when cast on Trailblazer - Remembrance (开拓者-记忆)</b>, raise Trailblazer - Remembrance (开拓者-记忆)'s ATK, the raise being equal to
  * #1% of <b>Demiurge (德谬歌)'s Max HP</b>". Read that carefully: the rule belongs to Trailblazer - Remembrance (开拓者-记忆), but the share is of <b>Demiurge (德谬歌)</b> -- the unit doing the casting. Neither

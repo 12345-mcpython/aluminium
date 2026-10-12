@@ -93,7 +93,7 @@ public class SkillExecutorDiagnosticTest {
      * <p>Note: March 7th (三月七)'s skill is deliberately <b>not</b> used here even though it is the obvious
      * shield: its row carries two percentage terms (a shield plus something else), so the ambiguity
      * guard refuses it. That is the guard working as intended, and
-     * {@link #ambiguousHealEntriesAreRefusedRatherThanSummed} covers that behaviour.
+     * {@link #mixedHealRowsApplyOnlyTheImmediatePart} covers that behaviour.
      *
      * <p>Note: Formerly {@code shieldSkillIsAlsoReported}, which asserted the opposite - that a shield
      * skill only printed a notice.

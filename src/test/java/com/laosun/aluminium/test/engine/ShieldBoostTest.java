@@ -118,7 +118,7 @@ public class ShieldBoostTest {
     }
 
     /**
-     * A boost cannot conjure a shield: 0 stays 0, and the "<= 0 clears it" reading is unchanged.
+     * A boost cannot conjure a shield: 0 stays 0, and the "{@code <= 0} clears it" reading is unchanged.
      */
     @Test
     public void aBoostDoesNotCreateOrUnclearAShield() {

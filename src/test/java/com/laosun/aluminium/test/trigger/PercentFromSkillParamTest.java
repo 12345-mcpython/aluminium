@@ -18,7 +18,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 /**
- * `percent_from_skill_param: "<SKILLTYPE>:<index>"`.
+ * `percent_from_skill_param: "&lt;SKILLTYPE&gt;:&lt;index&gt;"`.
  *
  * <p>Reader: 1403 Tribbie's ultimate, whose zone rider deals damage equal to "#3% of his Max HP" on somebody else's attack. #3 lives in HIS ultimate and runs
  * with level (0.06 -> 0.15), so neither `percent_from_cast_param` (the skill that produced the event) nor a literal can say it.

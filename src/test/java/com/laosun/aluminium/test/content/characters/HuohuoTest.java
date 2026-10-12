@@ -21,7 +21,7 @@ import java.util.Random;
  *
  * <p><b>What it needed.</b> Nothing new: `DISPEL`, `other_allies`, `GAIN_ENERGY` with a per-target share of max energy, a
  * [`owner_max_hp` + constant] heal, `ticks_on: "self"`, and `target_when` with `target_hp_percent` for "each of our targets whose current HP
- * percentage is <= 50% produces 1 stack each".
+ * percentage is {@code <= 50}% produces 1 stack each".
  *
  * <p><b>What is registered</b> (the file's notes): the Skill (战技)'s "adjacent target" heal (no position axis), the talent's "after being enhanced" variant
  * (a talent upgrade no gate can select) and its "or when casting the Ultimate" trigger (no selector names a cast's caster for a heal).

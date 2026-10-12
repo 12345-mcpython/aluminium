@@ -18,7 +18,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 /**
- * `skill_param:<SKILLTYPE>:<index>`: a parameter of one of the RULE OWNER's own skills.
+ * `skill_param:&lt;SKILLTYPE&gt;:&lt;index&gt;`: a parameter of one of the RULE OWNER's own skills.
  *
  * <p>Reader: 1403 Tribbie (缇宝)'s ultimate, whose zone rider deals "等同于缇宝 #3% 生命上限" damage on somebody else's attack. `cast_skill_param:` reads the skill that
  * PRODUCED the event -- the attack -- which is the wrong one, and a literal `percent` would freeze one level of a value that runs 0.06 -> 0.126.

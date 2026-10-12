@@ -24,7 +24,7 @@ import java.util.Random;
  *
  * <p><b>What it needed.</b> Nothing new - which is the point: the talent's "for each 1 enemy target hit ... restore 3 energy"
  * is {@code per_target} on {@code GAIN_ENERGY}, [升格] is a <b>stackable named modifier</b> (`max_stacks: 10` + `buff: 升格`),
- * and Courage (勇气)'s "enemy targets whose current HP percentage <= 50%" is the existing {@code target_hp_percent} condition. The two rules that
+ * and Courage (勇气)'s "enemy targets whose current HP percentage {@code <= 50}%" is the existing {@code target_hp_percent} condition. The two rules that
  * read like new vocabulary (Eidolon 4's cap raise, Eidolon 6's defence ignore) are registered instead of approximated.
  */
 public class ArgentiStacksTest {

@@ -19,7 +19,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 /**
- * `cast_skill_param:<index>`: a magnitude that is a parameter of the skill that produced the event, at its CURRENT level.
+ * `cast_skill_param:&lt;index&gt;`: a magnitude that is a parameter of the skill that produced the event, at its CURRENT level.
  *
  * <p>Reader: 1415's memosprite skill 10 "献予'创世'之诗" -- "使开拓者-记忆的攻击力提高，提高数值等同于德谬歌生命上限的 #1%", where #1 runs
  * with the skill level. A literal `percent` would have frozen one level.
