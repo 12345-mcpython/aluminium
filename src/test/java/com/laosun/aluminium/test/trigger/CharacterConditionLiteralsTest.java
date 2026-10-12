@@ -80,7 +80,7 @@ public class CharacterConditionLiteralsTest {
         assertRule(1104, "BATTLE_START", "eidolon5_levels", List.of());
         assertRule(1104, "BATTLE_START", "technique_opening_shield", List.of("self has_state 秘技"));
         assertRule(1105, "SKILL_CAST", "trace_conditioning", List.of("actor == self"));
-        assertRule(1105, "BASIC_ATTACK", "trace_max_hp_additional_damage", List.of("actor == self"));
+        assertRule(1105, "BASIC_ATTACK", "eidolon6_max_hp_additional_damage", List.of("actor == self"));
         assertRule(1106, "SKILL_CAST", "skill_dispel_buff", List.of("actor == self"));
         assertRule(1106, "ULT_CAST", "ult_zone_suppression", List.of("actor == self"));
         assertRule(1106, "BATTLE_START", "technique_defence_down", List.of("self has_state 秘技"));
