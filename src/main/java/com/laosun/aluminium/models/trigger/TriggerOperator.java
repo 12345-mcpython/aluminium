@@ -1,5 +1,7 @@
 package com.laosun.aluminium.models.trigger;
 
+import lombok.Getter;
+
 import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -21,6 +23,11 @@ import java.util.stream.Collectors;
  * name does not exist. {@link TriggerVocabulary} derives its {@code WIRED} and {@code PLANNED} sets
  * from this flag, so the two can no longer drift -- which is the one thing a second copy of the
  * vocabulary always eventually does.
+ *
+ * <p>Note: {@code @Getter} sits on the {@code wired} field rather than on the enum, so what it
+ * generates is exactly {@code isWired()} -- the accessor this class has always exposed -- and nothing
+ * else. It stays a hand-written-looking API on purpose: {@code enums.ResourceScope} and
+ * {@code enums.TriggerEvent} carry the same flag under the same name.
  */
 public enum TriggerOperator {
 
@@ -79,6 +86,18 @@ public enum TriggerOperator {
     TAUNT(true),
     TICK_DOT(true);
 
+    /**
+     * Whether the engine can perform this op today. {@code false} is a statement about the ENGINE,
+     * not about the data: a rule naming such an op is refused while its table is compiled, and the
+     * error names the prerequisite phase rather than claiming the name does not exist.
+     *
+     * <p>The accessor is Lombok's, and it must keep being named {@code isWired}: the enums
+     * {@code ResourceScope} and {@code TriggerEvent} spell the same flag the same way. Note: Written
+     * as {@code isWired()} rather than as a {@code {@link}} on purpose -- the method is generated, so
+     * a link to it resolves to nothing. {@link #isPlanned()} is the mirror, named for the reader that
+     * asks the opposite question.
+     */
+    @Getter
     private final boolean wired;
 
     TriggerOperator(boolean wired) {
@@ -86,17 +105,7 @@ public enum TriggerOperator {
     }
 
     /**
-     * Whether the engine can perform this op today.
-     *
-     * <p>A {@code false} here is a statement about the engine, not about the data: a rule naming
-     * this op is refused while its table is compiled, with the prerequisite phase named.
-     */
-    public boolean isWired() {
-        return wired;
-    }
-
-    /**
-     * The mirror of {@link #isWired()}, named for the reader that asks this question.
+     * The mirror of {@code isWired()}, named for the reader that asks this question.
      */
     public boolean isPlanned() {
         return !wired;
@@ -114,7 +123,7 @@ public enum TriggerOperator {
     }
 
     /**
-     * Every op declared but not yet performed -- see {@link #isWired()}.
+     * Every op declared but not yet performed -- see {@code isWired()}.
      */
     public static Set<String> plannedNames() {
         return names(false);
