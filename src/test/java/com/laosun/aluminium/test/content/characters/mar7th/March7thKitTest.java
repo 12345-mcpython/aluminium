@@ -303,10 +303,11 @@ public class March7thKitTest {
         Assertions.assertEquals(2, TriggerTables.of(MARCH).ruleCount(TriggerEvent.ULT_CAST),
                 "the ultimate's freeze (its damage is the engine's own path, so there is no damage rule) and Eidolon 1's "
                         + "energy per landed freeze");
-        Assertions.assertEquals(6, TriggerTables.of(MARCH).ruleCount(TriggerEvent.BATTLE_START),
+        Assertions.assertEquals(7, TriggerTables.of(MARCH).ruleCount(TriggerEvent.BATTLE_START),
                 "Eidolon 2's battle-start shield; the two amendments (Eidolon 4 raising the talent's per-turn cap, the Traces (行迹) \"Ice Spell\" (「冰咒」) "
-                        + "raising the ultimate's base chance); and Eidolon 3's and Eidolon 5's skill levels plus the talent's "
-                        + "base level (three rules, )");
+                        + "raising the ultimate's base chance); Eidolon 3's and Eidolon 5's skill levels plus the talent's "
+                        + "base level (three rules); and the technique's freeze (「进入战斗后…使随机敌方单体陷入冻结状态」), "
+                        + "which was the last clause of hers left unwritten -- see March7thTechniqueTest");
         Assertions.assertEquals(0, TriggerTables.of(MARCH).ruleCount(TriggerEvent.KILL),
                 "and nothing of hers reacts to kills");
         Assertions.assertEquals(1, TriggerTables.of(MARCH).ruleCount(TriggerEvent.TURN_START),
