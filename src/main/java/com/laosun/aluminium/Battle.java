@@ -192,6 +192,18 @@ public class Battle {
     private final List<CanHit> techniqueUsers = new ArrayList<>();
 
     /**
+     * The techniques the battle was CREATED with, or {@code null} when the caller marks them later.
+     *
+     * <p>Kept beside {@link #techniqueUsers} rather than replacing it: the battle's own state is still
+     * "which units hold 秘技", and this is only the construction-time answer to that question. Both routes
+     * end in the same list, so nothing downstream can tell which one was used.
+     *
+     * <p>Not final only because the two technique-taking constructors delegate to the older ones and then
+     * record their argument; there is no setter and nothing past construction writes it.
+     */
+    private Techniques techniques;
+
+    /**
      * The cast being resolved right now, or {@code null} outside a cast - what
      * {@link TriggerEvent#CAST_SETUP} hands to the trigger tables.
      *
@@ -626,6 +638,100 @@ public class Battle {
         }
         for (CanHit e : enemyQueue) {
             e.getBuffManager().setBattle(this);
+        }
+    }
+
+    /**
+     * Which characters released their technique before the battle, stated at construction.
+     *
+     * <p><b>Why this exists as a constructor argument.</b> A technique happens on the map, before the battle
+     * exists, so the engine cannot observe it -- it has to be told. {@link #markTechniqueUsed(CanHit)} is the
+     * other way to tell it, and it is the right one for a caller that assembles a battle and decides
+     * afterwards. But the decision is really part of "what battle are we fighting": a player chose which
+     * characters used a technique while setting the team up, and passing it here keeps that fact with the
+     * roster instead of as a sequence of calls whose order the engine has to tolerate.
+     *
+     * <p><b>What is not modelled, and why.</b> Not "released or not" as a per-character toggle the engine
+     * could default. A technique consumes a limited map resource and the map decides; the engine's business
+     * is only the battle-start consequence, which is the {@code 秘技} state.
+     *
+     * @param released       whether each character released its technique, keyed by character id. A character
+     *                       absent from the map did not. {@code null} means none did.
+     * @param archetypeHolder the unit holding the technique archetype mark (「美学底本」), or {@code null}
+     *                       for none. Read by {@link #markArchetypeHolder} as well; only Pearl (真珠) reads it.
+     */
+    public record Techniques(Map<Integer, Boolean> released, CanHit archetypeHolder) {
+
+        /**
+         * The characters that released a technique, with no archetype holder.
+         *
+         * @param cids the character ids that used their technique
+         * @return the flags
+         */
+        public static Techniques released(Integer... cids) {
+            Map<Integer, Boolean> map = new LinkedHashMap<>();
+            for (Integer cid : cids) {
+                if (cid != null) {
+                    map.put(cid, Boolean.TRUE);
+                }
+            }
+            return new Techniques(map, null);
+        }
+    }
+
+    /**
+     * A battle whose characters' technique releases are stated up front.
+     *
+     * <p>An overload rather than a changed signature: the two existing constructors are called from more
+     * than a thousand places, and none of them is about techniques.
+     *
+     * @param characterQueue our side
+     * @param enemyQueue     the enemy camp
+     * @param techniques     which characters released a technique; {@code null} means none did
+     */
+    public Battle(List<Character> characterQueue, List<? extends CanHit> enemyQueue, Techniques techniques) {
+        this(characterQueue, enemyQueue);
+        this.techniques = techniques;
+        applyStatedTechniques();
+    }
+
+    /**
+     * A battle whose technique releases and random source are both stated up front.
+     *
+     * @param characterQueue our side
+     * @param enemyQueue     the enemy camp
+     * @param rng            the random source, so a run is reproducible
+     * @param techniques     which characters released a technique; {@code null} means none did
+     */
+    public Battle(List<Character> characterQueue, List<? extends CanHit> enemyQueue, Random rng,
+                  Techniques techniques) {
+        this(characterQueue, enemyQueue, rng);
+        this.techniques = techniques;
+        applyStatedTechniques();
+    }
+
+    /**
+     * Turns the construction-time technique flags into the units that will be given the {@code 秘技} state.
+     *
+     * <p>Resolution is by character id against {@link #characters}, and the enemy camp is deliberately not
+     * searched: a monster has no technique. A cid that matches nobody is ignored rather than refused -- the
+     * flags describe a team the caller assembled, and a battle may legitimately be built from a subset of
+     * it (a wave, a test fixture), which is not an error.
+     */
+    private void applyStatedTechniques() {
+        if (techniques == null) {
+            return;
+        }
+        for (Character member : characters) {
+            if (member == null) {
+                continue;
+            }
+            if (Boolean.TRUE.equals(techniques.released().get(member.getCid()))) {
+                markTechniqueUsed(member);
+            }
+        }
+        if (techniques.archetypeHolder() != null) {
+            markArchetypeHolder(techniques.archetypeHolder());
         }
     }
 

@@ -54,6 +54,45 @@ public class March7thTechniqueTest {
     private static final int MONSTER = 1003010;
 
     /**
+     * The technique can be declared when the battle is BUILT, not only marked afterwards.
+     *
+     * <p>Two ways to say the same thing, and they must not disagree: a caller that assembles a battle and
+     * then decides calls {@link Battle#markTechniqueUsed}, while a caller that knows the team's technique
+     * releases up front passes them to the constructor. The assertion is that the second route produces the
+     * same battle as the first -- compared against the marking route rather than against a constant, so the
+     * two cannot drift apart.
+     */
+    @Test
+    public void theTechniqueCanBeDeclaredAtConstruction() {
+        Battle declared = techniqueBattleWithTechniques();
+        Battle marked = techniqueBattle(true);
+        declared.startBattle();
+        marked.startBattle();
+
+        Assertions.assertNotNull(controlOn(declared.enemyUnits().getFirst()),
+                "declaring the release at construction must freeze, exactly as marking does");
+        Assertions.assertEquals(controlOn(marked.enemyUnits().getFirst()) != null,
+                controlOn(declared.enemyUnits().getFirst()) != null,
+                "the two routes must reach the same state");
+    }
+
+    /**
+     * The old constructors are untouched: building a battle without techniques still freezes nobody.
+     *
+     * <p>The change was an overload, so the thousand-odd existing call sites had to keep their behaviour.
+     * Stated as the contrast that would break first if the new path leaked into the old one.
+     */
+    @Test
+    public void theOlderConstructorsStillDeclareNoTechnique() {
+        Battle battle = techniqueBattle(false);
+        battle.startBattle();
+
+        Assertions.assertEquals(0, frozenCount(false),
+                "a battle built without technique flags must freeze nobody -- the flags are the only new "
+                        + "input, so silence is the correct default");
+    }
+
+    /**
      * The technique freezes an enemy, and the gate is what pays for it.
      *
      * <p>Stated as the difference between two otherwise identical battles, because the freeze is the only
@@ -177,6 +216,24 @@ public class March7thTechniqueTest {
         return battle;
     }
 
+    /**
+     * The same battle, with the technique release stated to the constructor instead of marked afterwards.
+     *
+     * <p>Same monster, same fixed RNG, and the same single character -- the only difference from
+     * {@link #techniqueBattle(boolean)} is which route tells the battle about the technique, which is what
+     * makes the two comparable.
+     *
+     * @return the battle, not started
+     */
+    private static Battle techniqueBattleWithTechniques() {
+        Character march = CharacterFactory.create(MARCH_7TH, LEVEL, false, null, null, 0);
+        Enemy monster = EnemyFactory.create(MONSTER, LEVEL, 1);
+        monster.setAttribute(AttributeType.EFFECT_RESISTANCE, new DoubleValue(0));
+        monster.setDebuffResist(Map.of());
+
+        return new Battle(List.of(march), List.of(monster), BattleFixture.alwaysRoll(0.0),
+                Battle.Techniques.released(MARCH_7TH));
+    }
     /**
      * The first enemy of a started battle.
      *
