@@ -5,8 +5,8 @@
 
 ## 一、已完成（分支 `refactor/god-class-split`）
 
-护栏：**751 suites / 2574 tests / 0 failures** ＋ `run` / `run --args=mechanics` /
-`run --args=all` **三份 demo 输出内容级一致**。每批都跑这四项 ＋ 逐行内容核对 ＋
+护栏：**752 suites / 2578 tests / 0 failures** ＋ `run` / `run --args=mechanics` /
+`run --args=all` **三份 demo 输出内容级一致**（**302 / 45 / 347 行**）。每批都跑这四项 ＋ 逐行内容核对 ＋
 javadoc 引用审计，**每批一个提交**。
 
 | 原 | 现 | 拆出的类 | 行数 | 职责 |
@@ -16,7 +16,7 @@ javadoc 引用审计，**每批一个提交**。
 | | | `TriggerTargets` | 674 | 这条效果**打到谁**（触发期） |
 | | | `TriggerMagnitudes` | 795 | 这个效果**是多少**（触发期） |
 | | | `TriggerEffects` | 964 | 这个效果**做什么**（触发期） |
-| | | `TriggerLifetimes` | 125 | 一个 buff **什么时候结束**、**谁的回合花掉它**（§四之二） |
+| | | `TriggerLifetimes` | 125 | 一个 buff **什么时候结束**、**谁的回合花掉它**（§三之一） |
 | `Battle` 3844 | **3621** | `BattleDamage` | 307 | 伤害六乘区装配 ＋ 吸收 ＋ 击破两骑手 |
 | `TriggerTable` 4049 | **1844** | `TriggerConditionParser` | 2353 | 条件 DSL（`when` 的解释器：19 方法 ＋ 26 个条件类 ＋ 38 个常量） |
 
@@ -52,152 +52,10 @@ N 个文件之一里，归一化掉 `private` 与新增限定符）；**javadoc 
 `git worktree add build/_baseline_wt HEAD` ＋ 把 `src/main/resources/data/` 拷进去，
 在那个 worktree 里跑 demo 取基线，取完 `git worktree remove`。
 
-## 三、`TriggerTable` 的刀口（**已落地**；本节留作"为什么量了三次"的记录）
 
-✅ **第三次尝试成功并已提交**（`41de90fc`）：`TriggerTable` **4049 → 1844**，
-新类 `TriggerConditionParser` **2353**。全量 751/2574/0、三份 demo 一致、逐行零丢失。
+## 三、`TriggerInterpreter`：已落地的刀口与剩下的
 
-**最终边界（照这个做就一次成）**：
-
-| 搬走 | 留下 |
-|---|---|
-| 19 个方法（`parseCondition` ＋ 18 助手）＋ 后补的 `requirePath` / `isCompanion` | `CompiledRule` / `TriggerContext` / `Condition`（**公开 API**） |
-| 26 个私有条件类（改 package-private） | `PartyCondition`（**接口没有 `static`**，正则搜不到）、`HasShield`、`Numeric` |
-| **38 个常量**（含 `NUMERIC_VARIABLES` / `SELF_ATTR_PREFIX` / 三个 `*_STACKS_PREFIX` / 各关键字 Pattern） | — |
-
-⚠⚠ **关键方向**：常量**跟着 DSL 走**，而 `TriggerMagnitudes` / `TriggerValidator` **反过来指向新家**
-（`TriggerConditionParser.X`）。我第二轮搞反了这一条 —— 当时以为"共享 ⇒ 留在原地"，于是把解析器
-改成读 `TriggerTable.X`，结果 180 个错误。**共享不意味着留在原地，意味着其他读者要跟着走。**
-
-⚠ 留下的三个类型，解析器要**反过来限定**它们：`new TriggerTable.HasShield(...)`、
-`new TriggerTable.Numeric(...)`，且这两者与其被读的字段都放宽为 package-private。
-
-⚠ **动手前先量**：`refactor_callmap.py` 在这个文件上**给错 span**（把 `isNumericVariable` 报成
-2226-2290，与 `requireCarriedParty` 的 2226-2255 重叠 ⇒ 并集会把 **65 行邻居**带走）。
-可用的量法在 §三之三末（最短 span 胜出、声明要求修饰符、常量扫到 `;`、javadoc 只跨注释行）。
-
-⚠ **脚本红线**：给共享常量批量加限定符时**必须跳过声明行**（判据：行内含 `static final`），
-否则会把声明本身改成 `public static final String TriggerTable.X = ...` 这种非法形式。
-
-以下两节保留两次失败的过程与理由，供后来者看清"哪一步会量漏"。
-
-## 三之一、第一次试抽
-
-⚠ **第一次实测订正**：条件 DSL 那一刀**不是"19 个方法"那么小**。我按"19 声明 / 678 行 / 出向依赖 0"
-抽了一次，编译失败 —— 失败**不是**常量或助手，而是：**`parseCondition` 会构造 28 个嵌套类型**，
-它们是这套 DSL 的真正实现：
-
-```
-AppliedDebuffClass  DamageElementIsSelf  DamageHasNoCast  DamageIsAdditional  DamageIsAttack
-Equality  FromCategory  FromSkill  HasCompanionAlly  HasDebuffOn  HasPath  HasSamePathAlly
-HasShield  HasSkill  HasState  HasWeakness  IsAlly  IsCompanion  IsEnemy  IsOtherAlly
-IsPartyFirst  IsSameElementAsSelf  IsSummon  Negated  Numeric  ResourceChanged
-SharesPathWithAnAlly  StateEnded
-```
-
-（`TriggerTable` 里 2582–3720，都实现公共的 `TriggerTable.Condition`。已整体回退，树干净、
-全量仍 751/2574/0。）
-
-⇒ **可搬移集合的正确边界是**：19 个方法 ＋ 34 个常量 ＋ **这 28 个嵌套类型**。
-动手前必须先定三件事，否则会像我这次一样抽到一半：
-
-1. **`Condition` 接口留在 `TriggerTable`** —— 它是**公开 API**（`CompiledRule` 的字段类型、
-   测试在用），不能跟着搬。
-2. **28 个实现类的引用方式**：留在 `TriggerTable` 就得写 `TriggerTable.HasState`（28 处）；
-   搬进新类就必须**先量**有没有测试/内容直接引用 `TriggerTable.HasState` 之类的名字。
-3. **`public` 收窄**：这些嵌套 record 现在是 public 的，搬进 package-private 新类会收窄公开面 ——
-   需先确认无外部引用。
-
-⭐ **量法（已验证可靠）**：不要用 `refactor_callmap.py` —— 它在这个文件上**给出错的 span**
-（把 `requireCarriedParty` 报成 2226-2255、`isNumericVariable` 报成 2226-2290，两者重叠，
-并集会把 65 行邻居一起带走）。用 `build/_refactor_baseline/_move_parser.py` 的做法：
-
-- 声明要**最短 span 胜出**（调用点也会匹配声明正则）；
-- 声明正则应**要求修饰符**（`private static` 等），否则 `    requireSkillSlot(x, y, z);` 这种
-  第 5 列开始的**调用**会被当成声明，而"最短胜出"会让它**赢过真正的 12 行方法**；
-- 常量的**结束位置要扫到 `;`**：`Pattern.compile(...)` 与 `Set.of(...)` 都跨多行，把它们当成
-  单行会让之后每个常量都**少切一行**（表现为"每个块都丢了开头那行 javadoc"）；
-- javadoc 的起点要**只向上跨注释行**：跳过空行会越过单行 javadoc（造成重叠），
-  多跨一行又会把上一段末尾的空行圈进来（虽然能编译，但块不再以 `/**` 或声明开头 ⇒ 无法校验）。
-
-⚠ **`gradlew clean` 会删掉 `build/`**，包括这些分析脚本与基线。基线要重建时用
-`git worktree add build/_baseline_wt HEAD` ＋ 把 `src/main/resources/data/` 拷进去，
-在那个 worktree 里跑 demo 取基线，取完 `git worktree remove`。
-
-## 三之二、⚠⚠ 第二次试抽的订正：**常量要"往外挂"，不能往里搬**（2026-10-08 第二轮实测）
-
-第二轮试抽（把 19 方法 ＋ 34 常量 ＋ **29 个私有嵌套类型**一起搬）**已经能编译到只剩收尾**，
-但暴露出一条上一轮没量到的、决定性的方向问题：
-
-> **那些"看起来只有解析器在用"的常量，其实被别的类用；所以它们不能搬进解析器，
-> 只能留在 `TriggerTable` 并把解析器改成引用 `TriggerTable.X`。**
-
-实测到的共享面（**跨 3 个类**，不是 2 个）：
-
-| 常量 | 谁在用 | 结果 |
-|---|---|---|
-| `SELF_ATTR_PREFIX` | 解析器 ＋ **`TriggerMagnitudes`** | 留 |
-| `SELF_STACKS_PREFIX` / `ACTOR_STACKS_PREFIX` / `TARGET_STACKS_PREFIX` | 解析器 ＋ **`TriggerMagnitudes`** | 留 |
-| `NUMERIC_VARIABLES` | 解析器 ＋ **`TriggerMagnitudes`** | 留 |
-| `ALLIES_WITH_PATH_PREFIX` / `SELF_RESOURCE_PREFIX` / `SUMMON_RESOURCE_PREFIX` / `STATE_SUBJECTS` | 解析器 ＋ `TriggerTable` 自己的效果侧 | 留 |
-
-⇒ **10 个常量留下、全部改 package-private**（本轮实测订正：不是 4 个）。
-`TriggerMagnitudes` 是第 3 个消费者 —— 它读 `self_attr:` / `self_stacks:` / `target_stacks:` /
-`actor_stacks:` 来解 scale，正是"同一套拼写、两个半边都要读"的又一处。
-
-⚠ **迁移脚本的红线（本轮踩到）**：给"共享常量"批量加 `Owner.` 前缀时，**声明行本身也被改写**了 ——
-`public static final String TriggerTable.SELF_STACKS_PREFIX = ...` 这种非法形式。
-⇒ **限定符脚本必须跳过声明行**（判据：行里含 `static final`），不能只看"是否注释行"。
-
-### 另一条订正：`PartyCondition`
-
-它是 `private interface`（**接口没有 `static` 关键字**），所以按 `private static` 找嵌套类型会**漏掉它**。
-第二轮里它因此没被搬走，而 28 个实现类却搬走了 ⇒ 编译失败。**正确做法：留在 `TriggerTable`、改
-package-private**（它 `extends Condition`，而 `Condition` 是公开 API）。
-
-### 还有两个类型不能搬
-
-- **`HasShield`**：`TriggerTable.requireShieldSource(...)` 的**形参类型**就是它 ⇒ 必须从新类可见
-  （package-private ＋ 两个被 `TriggerTable` 读的字段 `ruleId` / `raw` 也要放宽）；
-- **`Numeric`**：`TriggerTable` 有 `condition instanceof Numeric` 两处（`stacksName` / `resource` 判空）
-  ⇒ 同理，字段也要放宽。
-
-⇒ **最终正确的可搬移边界**：19 方法 ＋ **24 个**私有嵌套类型（29 减去 `PartyCondition`、
-`HasShield`、`Numeric` —— 这三个留）＋ **0 个常量**（10 个共享常量全部留 `TriggerTable`）。
-`compile` 调用改成 `TriggerConditionParser.parseCondition(...)`。
-
-## 三之三、第一次的原始测量（不完整，保留以看清“哪一步量漏了”）
-
-`TriggerTable` 4049 行 / 51 方法。**条件 DSL 的解析器是一个可整体搬移的集合**，实测：
-
-- **19 个声明 / 678 行**：`parseCondition`(461 行) ＋ 18 个单调用者助手
-  （`selfAttributeOf` / `selfResourceOf` / `containsOperator` / `pathOf` / `stacksNameOf` /
-  `knownNumericVariables` / `requireIdentityVariable` / `requireStateSubject` /
-  `requireSkillSlot` / `requireCarriedParty` / `splitOperator` / `normalize` /
-  `isNumericVariable` / `isNumeric` / `requireElement` / `requireInBattleSlot` /
-  `skillSlots` / `inBattleSlots`）；
-- **接口只有 1 个**：`parseCondition` ← `compile`（唯一调用者）；
-- **出向依赖 0 个**：不调用任何留下的助手。
-
-⚠ **常量**（本轮实测订正为 **34 个解析器独占 ＋ 4 个共用**）：解析器独占的
-（`NUMERIC_VARIABLES` / `SELF_ATTR_PREFIX` / `STATE_ENDED_KEYWORD` / `HAS_STATE` / `DEBUFF_ON` /
-`HAS_PATH` / `IS_ALLY` … / `DAMAGE_CARRYING_EVENTS` / `CAST_CARRYING_EVENTS` /
-`SELF_STACKS_PREFIX` / `ACTOR_STACKS_PREFIX` / `TARGET_STACKS_PREFIX` / `IDENTITY_VARIABLES` /
-`IDENTITY_TERMS`）⇒ **随解析器搬走**（本轮的抽取已证明这一步是通的）。
-
-⚠⚠ **4 个是两个半边共用的** ⇒ **留下**、改 package-private，解析器引用 `TriggerTable.X`：
-`ALLIES_WITH_PATH_PREFIX`（`pathOf` 是**留下**的方法，在 1973/1976/1979 读它）、
-`SELF_RESOURCE_PREFIX`（`selfResourceOf` 同理，2079）、
-`SUMMON_RESOURCE_PREFIX`（2080 ＋ 3854）、
-`STATE_SUBJECTS`（3519/3522）。
-⚠ 这解释了一处容易误判的细节：**`pathOf` 与 `selfResourceOf` 的实际范围越过 `parseCondition`
-的结束行（1945）**，所以它们的助手 span 与解析器 span 是分开的两段 —— 本轮的
-`_move_parser.py` 已按此处理（19 个 span、0 重叠、逐块校验头部合法）。
-
-落法：新类 `TriggerConditionParser`（静态工具，照 `TriggerTargets` 的范式），
-`parseCondition` 改 package-private 供 `compile` 调用。
-
-## 三之四、`TriggerInterpreter` 的第二刀：`TriggerLifetimes`（**已落地**）
+### 三之一、`TriggerLifetimes`（**已落地**）
 
 ✅ 提交 `e57d4363`：`TriggerInterpreter` **2205 → 2110**，新类 `TriggerLifetimes` **125 行**（5 个声明）。
 
@@ -244,6 +102,7 @@ package-private**（它 `extends Condition`，而 `Condition` 是公开 API）�
 `applyOne` 就是那张 47 个 op 的 `switch` 本身 ✓。**它就是"解释器"的定义** ✓：
 把 `switch` 拆成映射表只是**换一种写法**，不是换一个刀口 ✓ ⇒ 按"能搬 ≠ 该搬"，**不动** ✓。
 
+
 ## 四、`Battle` 剩余部分：不要按名字猜子系统
 
 实测（`refactor_movable.py`）：`Battle` 140 方法 / **33 个实例字段**，140 个方法里
@@ -255,7 +114,7 @@ package-private**（它 `extends Condition`，而 `Condition` 是公开 API）�
 
 ⇒ 下一刀的选法：**先数候选集读几个私有字段**，再决定。
 
-## 四之一、⚠⚠ 仪器本身错了三次，`Battle` 的结论要重来（2026-10-09 实测）
+### 四之一、⚠⚠ 仪器本身错了三次，`Battle` 的结论要重来（2026-10-09 实测）
 
 **先用仪器，再信仪器。** 上面 §四 引的 `refactor_movable.py` 当时有**三个**盲点，
 **每一个都朝"看起来可拆"的方向错**：
@@ -334,52 +193,43 @@ DOT/回复那一组正是如此：读 0 字段、0 阻塞调用，却经
 | `refactor_javadoc_starts.py` ＋ `refactor_check_spans.py` | **全库**有几处 span 起点落在注释行（盲点 3 的判据） |
 | `refactor_decls.py` | 一个类的**布局**：顺序 / 可见性 / 每个名字的行数 |
 
+## 四之二、刀口怎么选（把上面三次失败与三批清扫的教训合起来）
 
-## 五、测试重复清理：**三批已落地**（2026-10-08）
+这四条是**花钱买来的**，合并了原本散在 §三之一/§三之二/§三之三 与 §五 里的三份过程记录：
 
-`HANDOFF.md` 末节给的那张"下一批"清单（批 2–5）**数字全都不准** —— 它自己就写着
-"下一批清单也会过时"。**重新量过**之后，三批做完：
+1. **可达性不能选刀口。** `resolveTarget` 被调度器调用 ⇒ 任何"谁调用了它"的查询都答"共享"。
+   要问的是**"这个候选集读哪些实例字段、调哪些非公开方法、提到哪些私有类型"**（三样都算）。
+2. **共享常量"往外挂"，不往里搬。** 方向搞反过一次，180 个编译错误。
+   ⭐ **共享不意味着留在原地，意味着其他读者要跟着走** —— 常量跟 DSL 走，
+   `TriggerMagnitudes` / `TriggerValidator` 反过来指向新家。
+3. **测量看得见访问权限，看不见语义。** 仪器把 `applyAdditionalDamage` / `applyTrueDamage`
+   排除了 ✓，与"人读源码"的结论一致 —— 但那是**复现已知答案**，不是新发现：
+   真正的不变量写在测试里（`DamagePipelineTest` 数"收 `Damage` 的公开方法恰好 1 个"）。
+   ⇒ **仪器是筛子，留下的候选仍要过成文不变量。**
+4. **能搬 ≠ 该搬。** 三批测试清扫里，"1M 血 ＋ heal"那一项**不做**：实测 `fromAttributes` 有
+   **42 种形状**，每个名字与血量都是那个判据的前提。⭐ 反过来，"下一批清单也会过时" ——
+   抄旧注记之前先 grep 内容。
+
+⚠ **别再犯的形状错误**（每次都是编译器或栈溢出抓出来的，不是看出来的）：
+
+- **判据要用"精确字符串"，不要用"看起来像"**（清扫按 `MONSTER` 是某次 `create` 的参数就放行，
+  没检查 level ⇒ 10 个文件用别的 level ⇒ 38 个文件编译不过）。
+- **有些正则要带上后面那个字符**：`new Random(0)` 与 `new Random(0) {`（匿名子类）是两回事。
+- **排除要按解析后的路径**，不能按文件名（否则夹具把自己重写成自我调用 ⇒ 264 个 `StackOverflowError`）。
+- **重载名不能整体搬**：`reduceToughness` 的名字级 span 是 1849-1925，中间夹着别的声明与它自己的
+  javadoc ⇒ 一次 `move` 会把整段切走并报成功（`refactor_extract.py` 现在**拒绝**重载名）。
+- **声明行号取"名字所在行"，不是正则匹配起点**：`DECL` 在 DOTALL 下起点会漂到 javadoc 上
+  （`isCastParamScale` 曾被报成 852，实际 859）⇒ 全库 **97 个**声明的行号是错的。
+
+## 五、测试与内容侧的结构性清理（**已落地**）
 
 | 批次 | 改写 | 结果 | 提交 |
 |---|---|---|---|
-| 标准敌人 | `private static final int MONSTER = 1002011;` ＋ `EnemyFactory.create(MONSTER, 90, 1)` | **495 文件 / 708 处** → `BattleFixture.monster()` | `182610b9` |
+| 标准敌人 | 内联 `EnemyFactory.create(MONSTER, 90, 1)` | **495 文件 / 708 处** → `BattleFixture.monster()` | `182610b9` |
 | 标准种子 | 内联 `new Random(0)` | **496 文件 / 787 处** → `BattleFixture.seeded()` | `ed7b7ec9` |
 | 固定掷骰 | 手写 `Random` 子类（只覆写 `nextDouble`） | **98 文件 / 98 方法** → `BattleFixture.alwaysRoll(v)` | `9e781550` |
+| 夹具层抽出 | `new Battle(..., new Random(0))` ＋ 标准敌人 | **23 个纯样板 engine 文件** → `test/support/BattleFixture.java` | `重构批 1` |
 
-`BattleFixture.` 的使用点从 30 涨到 **1616**。行为零改变（751/2574/0 ＋ 三份 demo 一致）。
-
-### ⚠⚠ 这一节真正的价值：三次"量法"各自漏了一种形状
-
-**每次都是编译器/栈溢出抓住的，不是我先看出来的。** 所以做这类清扫的规矩是：
-
-1. **判据要用"精确字符串"，不要用"看起来像"。** 第一版 preflight 只检查"`MONSTER` 是某个
-   `EnemyFactory.create` 的参数"，**没检查 level** ⇒ 10 个文件用 level 100、4 个 group 2、
-   1 个 level 91，清扫删了常量却没改那些调用 ⇒ **38 个文件编译不过**，全量回退重来。
-2. **有些形状的正则要带上"后面那个字符"。** `new Random(0)` 与 `new Random(0) {` 是两回事
-   （后者是**匿名子类**，改成 `seeded() {` 不编译）；12 个文件两者混用 ⇒ 第一次清扫又炸。
-3. **排除要按解析后的路径，不能按文件名。** `BattleFixture.java` 按 basename 排除、而候选清单
-   存的是路径 ⇒ 排除没生效 ⇒ **夹具把自己重写成了自我调用**（`alwaysRoll` 调用 `alwaysRoll`）
-   ⇒ 264 个测试 `StackOverflowError`。现在 preflight 比 `abspath`，清扫里还加了第二道
-   "不许把自我调用写进定义它的那个文件"。
-
-### ⭐ 让结果**可查**而不只是"绿的"
-
-两件事让这三批不是"跑绿了就提交"：
-
-- **preflight 把每份文件预期的改写次数写进清单，清扫断言自己正好做了那么多次** ——
-  正则静默漏掉变成**硬失败**，而不是"400 个文件之后才发现编译不过"。
-- **事后对账**：全库剩余 45 个 `MONSTER` 声明、26 处 `new Random(0)`、2 处手写
-  `new Random() {` —— **每一个都能点名到"为什么留下"**（少数派 id / 匿名子类 /
-  `TriggerChanceTest.sequence()` 是真的多值生成器 / 夹具自己的实现），**没有一处是漏掉的**。
-
-### 还没做，以及**为什么不做**（重新量过之后）
-
-- ⚠ **"1M 血 ＋ heal"惯用法：`HANDOFF.md` 说"9 处 ⇒ `withHp`"，重新量完全不是**。
-  实测：`fromAttributes(name, hp, ...)` 在测试里有 **42 种不同形状**
-  （`dummy` hp=1_000_000 有 15 个文件，但还有 `hero` 10_000 ×10、`attacker` 1000 ×7、
-  `Dummy` 60000 ×5、`dummy` 100_000 ×4、`boss` 1_000_000 ×1、`solo` 50_000 ×1 …），
-  **每个名字与血量都是那个判据自己的前提**，不是样板。而且
-  **`BattleFixture.dummy()` 当前的调用点是 0** —— 抽象在那儿但没人用。
-  ⇒ 光"能搬"不等于"该搬"，这一项**不做**，理由如上。
-- 少数派守卫留下的 **37 个 `MONSTER` 声明**、**12 个匿名子类文件**、**`TriggerChanceTest.sequence()`**
-  **有意保留** —— 它们各自测的是别的东西。
+`BattleFixture.` 的使用点从 30 涨到 **1616**。行为零改变（全量 ＋ 三份 demo 一致）。
+⭐ **夹具承重的证据**：`seeded()` 改种子 ⇒ 红（红的正是迁过的那条判据）；
+而 `monster()` 等级 90→91 ⇒ **绿** ✗ ⇒ 把标准敌人收成一处是**可读性**收益，**不是**风险收益。

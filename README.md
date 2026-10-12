@@ -10,19 +10,23 @@ a game like HSR written by java
 | `ROADMAP.md` | **开发路线图**：设计原则（引擎不认角色 / 三分法）+ 待办任务（每个自带验收标准）+ 踩坑记录 + **§12 遗留缺陷登记** |
 | `HANDOFF.md` | **纪律手册 ＋ 当前实测状态** —— 动手前读它；历史不在这里 |
 | `REFACTOR.md` | **结构重构**：已完成的 god-class 拆分、量刀口的工具、剩余刀口在哪 |
-| `GAPS.md` | **未实现的登记**：每一条写着"缺什么 / 读者是谁 / 前置是什么" |
-| `GAPS_LOG.md` | **逐轮日志**（从 `GAPS.md` 拆出），查"当初为什么这么做" |
+| `GAPS.md` | **未出货的登记**：每一条写着"缺什么 / 读者是谁 / 前置是什么" |
 | `EXPRESSION.md` | **「完全表达」判定清单** —— ⚠ 被 `ExpressionChecklistTest` 机器校验，不能凭印象改 |
 | `HSR.md` | 游戏机制的**权威公式**（正典副本在仓库外） |
 
 > 2026-09-26 删掉了 `CODE_REVIEW.md` 与 `DOC_VS_CODE.md`（一次性的审查/不一致分析快照，已多处腐烂），
 > 2026-09-27 又删掉了 v2 存档 `docs/archive/ROADMAP-v2-历史.md`（2446 行纯历史）。
 > 前两者的**未修条目**全部并进了 `ROADMAP.md` §12；已修条目不保留。
-> **三份文件的全文都在 git 历史里**（`git log --diff-filter=D --name-only`），需要查"当初为什么这么做"时去那里翻。
-> 旧文档里"`ROADMAP` 第 N 行指向 v2"的行号说法随之彻底作废 —— 现在只用任务编号（`P3-4` 等）引用。
+>
+> ⚠ **2026-10-12 又删掉两份**：`GAPS_LOG.md`（36361 行逐轮台账）与 `tools/gaps_section4.md`
+> （已作废的 1415 受阻快照 —— 它说"受阻"的 4 条**都已出货**）。
+> `GAPS.md` 也同时从 **4082 行**收敛成**只列未出货项**的登记册。
+> ⇒ **需要查"当初为什么这么做"时去 git 历史里翻**：
+> `git log --diff-filter=D --name-only` 找出删除提交，再 `git show <commit>:<path>` 按 blob 取回。
+> ⚠ **不要用 `>` 重定向**（Windows PowerShell 下写 UTF-16）。
 >
 > ⚠ **本仓库没有 `HISTORY.md`，也没有 `HISTORICAL.md`** —— 两者都从未存在过。
-> 需要历史时用 `GAPS_LOG.md` 与 `REFACTOR.md`。引用任何文件前先 `Test-Path` 一下。
+> 需要历史时用 git 历史。引用任何文件前先 `Test-Path` 一下。
 
 > 游戏机制的**权威公式**在 `HSR.md`（"崩坏：星穹铁道 战斗机制总结"）里，**正典位置在仓库外**（`E:\code\blog\hsr\HSR.md`）。
 > 遇到公式疑义时以它为准；`engine.md` 的 §18 记了它与本实现的差异。

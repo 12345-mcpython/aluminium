@@ -2,10 +2,10 @@
 
 > **这份文件只放两样东西：① 现在是什么状态（实测，不是抄注记）；② 项目用代价换来的纪律。**
 >
-> ⚠ **历史不在这里。** 逐轮台账在 `GAPS_LOG.md`，重构过程在 `REFACTOR.md`，
-> 踩坑与设计原则在 `ROADMAP.md` §1/§4，引擎行为在 `engine.md`。
-> 本文件曾经是**十份带日期的会话交接**叠在一起（727 行，状态表互相矛盾、
-> 纪律编号重排四次），2026-10-12 按上面的分工收敛。
+> ⚠ **历史不在这里。** 逐轮台账与完成叙事**已从版本库删除**（2026-10-12），
+> 全文在 **git 历史**里（`git log --diff-filter=D --name-only` ＋ `git show <rev>:<path>`）。
+> 现存文档各管一件事：`engine.md`（引擎行为）、`ROADMAP.md`（设计原则 ＋ 待办 ＋ 踩坑）、
+> `GAPS.md`（未出货登记）、`REFACTOR.md`（结构重构）、`EXPRESSION.md`（表达判定清单）。
 
 ## 一、当前状态（2026-10-12 实测）
 
@@ -232,21 +232,20 @@
 | 击破伤害（break DMG） | 两轮两角色 | 需削韧/击破公式整族 |
 | 忆灵面板依赖其他单位 | 3+ | 面板本身写不出数字 |
 
-## 五、文档分工（改文档前先读这一节）
+## 五、文档分工
 
-| 文件 | 放什么 | 不放什么 |
-|---|---|---|
-| `engine.md` | **引擎当前行为**，从代码推导，逐条给实现位置 | 设计意图、进度、历史 |
-| `ROADMAP.md` | **设计原则（§1 三条红线 ＋ 三分法）**、待办、踩坑记录、遗留缺陷登记 | 已完成的逐轮叙事 |
-| `GAPS.md` | **未实现/未表达的登记**：缺什么、读者是谁、前置是什么 | 逐轮台账（那在 `GAPS_LOG.md`） |
-| `GAPS_LOG.md` | **逐轮日志**（从 `GAPS.md` 拆出） | 需要一眼看到的结论 |
-| `REFACTOR.md` | **结构重构**：已完成、量刀口的工具、剩余刀口 | 内容/机制的事 |
-| `EXPRESSION.md` | 「完全表达」判定清单 —— ⚠ **被 `ExpressionChecklistTest` 机器校验** | 印象式结论 |
-| `HSR.md` | 游戏机制的**权威公式**（正典副本在仓库外） | 本实现的差异（那在 `engine.md` §18） |
-| `HANDOFF.md` | 本文件：纪律 ＋ 当前实测状态 | 历史 |
+⚠ **不在这里重复那张表** —— 它只有一个正本：`README.md` 的 `## docs` 一节。
+（`ROADMAP.md` §12 也有一份指针表。）⚠ 分工写三份就会漂三份。
+
+一句话版：`engine.md` 引擎行为 ｜ `ROADMAP.md` 设计原则 ＋ 待办 ＋ 踩坑 ｜
+`GAPS.md` 未出货登记 ｜ 本文件 纪律 ＋ 当前状态 ｜ `REFACTOR.md` 结构重构 ｜
+`EXPRESSION.md` 表达判定清单（**机器校验**）｜ `HSR.md` 权威公式。
 
 ⚠ **引用别处的文件前先确认它存在。** 本仓库**没有任何**名为 `*HISTOR*` 的文件
 （既无 `HISTORY.md` 也无 `HISTORICAL.md`，git 历史里也从未有过 —— 写本节第一版时我正是
-凭印象写了"只有 `HISTORICAL.md`"，**当场被 `Test-Path` 证伪**，正好是这一条要防的事）。
-`CODE_REVIEW.md` / `DOC_VS_CODE.md` / `docs/archive/ROADMAP-v2-历史.md` 已于 2026-09-26/27 删除，
-未修条目并入 `ROADMAP.md` §12，全文在 git 历史里（`git log --diff-filter=D --name-only`）。
+凭印象写了"只有 `HISTORICAL.md`"，**当场被 `Test-Path` 证伪**）。
+⚠ **2026-10-12 删掉的两份**同样不需要找：`GAPS_LOG.md`（36361 行逐轮台账）与
+`tools/gaps_section4.md`（已作废的 1415 受阻快照）—— 连同 2026-09 删的
+`CODE_REVIEW.md` / `DOC_VS_CODE.md` / `docs/archive/`，**全文都在 git 历史里**：
+`git log --diff-filter=D --name-only` 找出删除提交，再 `git show <commit>:<path>`。
+⚠ **不要用 `>` 重定向**（Windows PowerShell 下写 UTF-16）。
