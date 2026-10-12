@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 /**
  * A whole battle runs to a decision with no human, and says how it ended.
@@ -216,5 +217,59 @@ public class BattleDriverTest {
         Assertions.assertEquals(silent.status(), watched.status());
         Assertions.assertEquals(silent.turns(), watched.turns(),
                 "narration must not consume the battle's randomness");
+    }
+
+    /**
+     * The deterministic targeting mode consumes no randomness, proved against an unstepped twin.
+     *
+     * <p>This is what lets a scripted run stay reproducible. Aggro-weighted selection draws from the
+     * battle's random source, so an ally switching to it would shift every later crit roll and a
+     * recorded run would stop matching.
+     *
+     * <p>Two battles built from the same seed are identical, so if stepping one advances its random
+     * stream the two next values must differ. A test that merely checked "a target was chosen" would
+     * pass either way.
+     */
+    @Test
+    void firstAliveTargetingConsumesNoRandomness() {
+        Battle stepped = twinBattle();
+        Battle untouched = twinBattle();
+        stepped.startBattle();
+        untouched.startBattle();
+
+        // A roll drawn for the weighted selector would come from the same stream, so compare like for like.
+        BattleDriver driver = new BattleDriver(stepped, new AutoPolicy(0, AutoPolicy.Targeting.FIRST_ALIVE));
+        Assertions.assertTrue(driver.step(), "the turn should be played");
+
+        Assertions.assertEquals(untouched.getRng().nextLong(), stepped.getRng().nextLong(),
+                "deterministic targeting must leave the random stream where the twin left it");
+    }
+
+    private static Battle twinBattle() {
+        return new Battle(
+                List.of(CharacterFactory.create(1109, 80, false, null, null, 0)),
+                List.of(Enemy.fromAttributes("一号", 3000, 0, 100, 100),
+                        Enemy.fromAttributes("二号", 3000, 0, 100, 100)),
+                new Random(20260919L));
+    }
+
+    /**
+     * The same deterministic run twice reaches the same conclusion and the same turn count.
+     */
+    @Test
+    void deterministicTargetingIsReproducible() {
+        BattleDriver.Result first = deterministicRun();
+        BattleDriver.Result second = deterministicRun();
+
+        Assertions.assertEquals(first.status(), second.status());
+        Assertions.assertEquals(first.turns(), second.turns());
+    }
+
+    private static BattleDriver.Result deterministicRun() {
+        return new BattleDriver(
+                BattleFixture.battle(
+                        List.of(CharacterFactory.create(1109, 80, false, null, null, 0)),
+                        List.of(Enemy.fromAttributes("训练假人", 800, 0, 100, 100))),
+                new AutoPolicy(1, AutoPolicy.Targeting.FIRST_ALIVE)).run();
     }
 }
