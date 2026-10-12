@@ -16,13 +16,14 @@ import com.laosun.aluminium.models.CanHit;
  *
  * <p>Note: Difference from {@link KillEvent}: a break does not necessarily kill, and a death does not
  * necessarily go through a break.
- *
- * @param battle   the running battle
- * @param attacker the one causing the break
- * @param target   the enemy being broken
- * @param element  break element (decides which DOT is attached: Fire = burn / Lightning = shock / Physical = bleed / Wind = wind shear)
  */
 public interface BreakEvent {
+    /**
+     * @param battle   the running battle
+     * @param attacker the one causing the break
+     * @param target   the enemy being broken
+     * @param element  break element (decides which DOT is attached: Fire = burn / Lightning = shock / Physical = bleed / Wind = wind shear)
+     */
     default void onBreak(Battle battle, CanHit attacker, CanHit target, DamageElement element) {
     }
 }

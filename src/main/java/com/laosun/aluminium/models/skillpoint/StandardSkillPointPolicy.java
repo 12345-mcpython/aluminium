@@ -13,6 +13,7 @@ import com.laosun.aluminium.models.skill.Skill;
  * <p>Rule table (see the full comparison and gap list in {@code engine.md} §9.6):
  *
  * <table border="1">
+ *   <caption>Skill points granted or spent, by skill category</caption>
  *   <tr><th>Skill category</th><th>Skill points</th></tr>
  *   <tr><td>{@link SkillCategory#NORMAL}</td><td>+{@link Constant#SKILL_POINT_GAIN_BASIC}</td></tr>
  *   <tr><td>{@link SkillCategory#BPSKILL}</td><td>-1; if there are not enough, the unit cannot act</td></tr>

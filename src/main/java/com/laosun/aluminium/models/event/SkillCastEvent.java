@@ -30,15 +30,16 @@ import java.util.List;
  * <p>Note: Currently it is only emitted from {@code SkillExecutor}. {@code castImmediate} goes through it too,
  * so it is fired; but enemy skills ({@code EnemySkill}'s own {@code execute}) currently do not emit it -
  * to be aligned when enemy skills are wired into the unified executor.
- *
- * @param battle     the running battle
- * @param user       the caster
- * @param skill      the skill being cast
- * @param hitTargets the actual hit set (empty for non-damaging skills; includes those that died on the
- *                   spot, deduplicated in hit order)
- * @param targets    the targets chosen by the caller (passed through as-is, with no liveness filtering)
  */
 public interface SkillCastEvent {
+    /**
+     * @param battle     the running battle
+     * @param user       the caster
+     * @param skill      the skill being cast
+     * @param hitTargets the actual hit set (empty for non-damaging skills; includes those that died on the
+     *                   spot, deduplicated in hit order)
+     * @param targets    the targets chosen by the caller (passed through as-is, with no liveness filtering)
+     */
     default void onSkillCast(Battle battle, CanHit user, Skill skill,
                              List<? extends CanHit> hitTargets, List<? extends CanHit> targets) {
     }

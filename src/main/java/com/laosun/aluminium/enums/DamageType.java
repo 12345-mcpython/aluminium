@@ -29,6 +29,7 @@ import java.util.Map;
  * Do not assume that being declared means being wired up:
  *
  * <table>
+ *   <caption>Which damage types the engine actually produces</caption>
  *   <tr><th>Type</th><th>Status</th></tr>
  *   <tr><td>{@link #NORMAL}</td><td>The only actual outlet of character skills - the data has
  *       no {@code damage_type} field (see the keys of {@code skills.json}), so skills/ultimates are

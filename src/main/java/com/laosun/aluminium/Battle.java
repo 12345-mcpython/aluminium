@@ -2201,7 +2201,7 @@ public class Battle {
      * ({@code CanHit.heal} caps it itself and does nothing for the dead).
      *
      * @return the HP actually restored (after truncation by the cap; 0 when the target is dead or the
-     * healing amount <= 0)
+     * healing amount {@code <= 0})
      */
     public double heal(CanHit healer, CanHit target, double baseAmount) {
         if (target == null || target.isDeath()) {
@@ -2300,7 +2300,7 @@ public class Battle {
      *
      * @param provider who is granting it ({@code null} = unknown, so unboosted)
      * @param target   the one gaining the shield (no effect if already dead)
-     * @param amount   the shield amount before the provider's boost (<= 0 is treated as clearing the shield)
+     * @param amount   the shield amount before the provider's boost ({@code <= 0} is treated as clearing the shield)
      * @return the shield value actually set
      */
     public double grantShield(CanHit provider, CanHit target, double amount) {
@@ -2316,7 +2316,7 @@ public class Battle {
      *
      * @param provider who is granting it ({@code null} = unknown, so unboosted)
      * @param target   the one gaining the shield (no effect if already dead)
-     * @param amount   the shield amount before the provider's boost (<= 0 is treated as clearing the shield)
+     * @param amount   the shield amount before the provider's boost ({@code <= 0} is treated as clearing the shield)
      * @param ruleId the id of the rule granting it ({@code ""} = unnamed)
      * @return the shield value actually set
      */

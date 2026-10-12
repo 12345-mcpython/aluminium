@@ -30,6 +30,7 @@ import java.util.Set;
  * declared in {@link TriggerVocabulary}.
  *
  * <table border="1">
+ *   <caption>Every op: its arguments and whether the engine performs it</caption>
  *   <tr><th>op</th><th>arguments</th><th>status</th></tr>
  *   <tr><td>{@code GAIN_ENERGY}</td><td>{@code amount}</td><td>wired</td></tr>
  *   <tr><td>{@code RAISE_ENERGY_TO}</td><td>{@code percent} (a floor; no-op when already above)</td><td>wired</td></tr>

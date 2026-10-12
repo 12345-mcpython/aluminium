@@ -17,13 +17,14 @@ import com.laosun.aluminium.models.CanHit;
  * In other words: this event = "the energy bar moved", not "someone gained a resource".
  *
  * <p>Emission point: {@code Battle.applyEnergyGain} (the only energy-gain entry point inside battle).
- *
- * @param battle        the running battle
- * @param target        the one credited
- * @param actuallyAdded the actually credited value ({@code > 0}; 0 when clipped by the cap, in which case
- *                      it is not fired)
  */
 public interface EnergyEvent {
+    /**
+     * @param battle        the running battle
+     * @param target        the one credited
+     * @param actuallyAdded the actually credited value ({@code > 0}; 0 when clipped by the cap, in which case
+     *                      it is not fired)
+     */
     default void onEnergyGain(Battle battle, CanHit target, double actuallyAdded) {
     }
 }

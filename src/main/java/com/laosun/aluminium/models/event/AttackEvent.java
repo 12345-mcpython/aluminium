@@ -26,16 +26,17 @@ import java.util.List;
  *
  * <p>An attack that <b>hits nothing</b> is not announced: {@code Battle.fireAfterAttack} returns early when
  * no target was hit, so a swing at a battlefield with nothing alive does not count as an attack.
- *
- * @param battle      the running battle
- * @param attacker    the unit that performed the attack (a character or a summon; may be either camp)
- * @param mainTarget  the target the attacker selected (with AOE it may not be the first in hit order)
- * @param hitTargets  targets the attack actually connected with (including those that died on the spot, deduped
- *                    in hit order)
- * @param totalDamage the sum of the settled values of all segments of this attack (TODO data (D2): whether
- *                    overflow counts is not settled yet)
  */
 public interface AttackEvent {
+    /**
+     * @param battle      the running battle
+     * @param attacker    the unit that performed the attack (a character or a summon; may be either camp)
+     * @param mainTarget  the target the attacker selected (with AOE it may not be the first in hit order)
+     * @param hitTargets  targets the attack actually connected with (including those that died on the spot, deduped
+     *                    in hit order)
+     * @param totalDamage the sum of the settled values of all segments of this attack (TODO data (D2): whether
+     *                    overflow counts is not settled yet)
+     */
     default void afterAttack(Battle battle, CanHit attacker, CanHit mainTarget,
                              List<? extends CanHit> hitTargets, double totalDamage) {
     }

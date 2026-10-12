@@ -19,7 +19,8 @@ public final class LevelPromotionCalc {
      * <p>Formula: {@code 1 + (level-1) x 0.05 + promotion count x 0.4}. The promotion count is derived
      * from the level bracket (one bracket per 10 levels, 0.4 per bracket), i.e. the rows of the
      * game's {@code AvatarPromotionConfig}:
-     * ascension 0 (<=20) / 1 (<=30) / 2 (<=40) / 3 (<=50) / 4 (<=60) / 5 (<=0) / 6 (<=80).
+     * ascension 0 ({@code <=20}) / 1 ({@code <=30}) / 2 ({@code <=40}) / 3 ({@code <=50}) /
+     * 4 ({@code <=60}) / 5 ({@code <=0}) / 6 ({@code <=80}).
      *
      * <p>Note: <b>The promotion count MUST be clamped to >= 0</b>: previously a low level
      * combined with {@code promotion=true} produced a negative value (Lv1 to {@code 1/10 - 1 = -1}),

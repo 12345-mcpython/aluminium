@@ -32,7 +32,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public final class Constant {
     /**
      * Relic main attribute value tables (keyed by star level 2-5).
-     * <star level> part attribute <base bonus> <double value>
+     * &lt;star level&gt; part attribute &lt;base bonus&gt; &lt;double value&gt;
      */
     public static final RelicMainAttribute RELIC_MAIN_ATTRIBUTES;
     /**
