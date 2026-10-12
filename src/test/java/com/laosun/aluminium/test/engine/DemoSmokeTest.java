@@ -41,6 +41,19 @@ public class DemoSmokeTest {
                 "the default path is what gradlew run exercises, so it must stay valid");
     }
 
+    /**
+     * The technique variant of the battle demo runs.
+     *
+     * <p>It is the only demo that declares a technique release, so it is the only one that exercises the
+     * construction-time technique flags down the real content path. Without this, a signature change to
+     * {@code Battle.Techniques} would break {@code gradlew run --args=technique} and nothing would say so.
+     */
+    @Test
+    public void theTechniqueDemoStillRuns() {
+        Assertions.assertDoesNotThrow(() -> Main.main(new String[]{"technique"}),
+                "the technique demo declares a release for 三月七 and drives the same battle");
+    }
+
     @Test
     public void anUnknownArgumentIsReportedRatherThanThrown() {
         Assertions.assertDoesNotThrow(() -> Main.main(new String[]{"nonsense"}),

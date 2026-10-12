@@ -81,17 +81,43 @@ public class Main {
         String which = args.length == 0 ? "battle" : args[0].toLowerCase();
         switch (which) {
             case "battle" -> battleDemo();
+            case "technique" -> battleDemo(new Battle.Techniques(
+                    java.util.Map.of(MARCH_7TH_CID, Boolean.TRUE), null));
             case "mechanics" -> mechanicsDemo();
             case "all" -> {
                 battleDemo();
                 mechanicsDemo();
             }
             default -> System.out.println("unknown demo '" + args[0]
-                    + "'; use 'battle' (default), 'mechanics' or 'all'");
+                    + "'; use 'battle' (default), 'technique', 'mechanics' or 'all'");
         }
     }
 
+    /**
+     * 三月七 (March 7th)'s character id -- the one party member whose technique is modelled.
+     */
+    private static final int MARCH_7TH_CID = 1001;
+
     private static void battleDemo() {
+        battleDemo(null);
+    }
+
+    /**
+     * The full battle, optionally with a character having released her technique beforehand.
+     *
+     * <p><b>Why the technique is a parameter rather than always on.</b> A technique is cast on the map and
+     * spends a limited map resource; a battle in which everyone always uses one is a different game. So the
+     * default demo keeps saying "nobody used a technique", byte for byte as before, and
+     * {@code gradlew run --args="technique"} declares 三月七's.
+     *
+     * <p><b>Only 三月七 (1001) can show it.</b> Her party-mates have technique <i>skills</i> in the data
+     * (姬子 1003's 不完全燃烧, 罗刹 1203's 愚者的悲悯) but no technique <b>rule</b> -- nothing models what they
+     * do -- so declaring a release for them would claim an effect that does not exist. The demo declares what
+     * is implemented and says so.
+     *
+     * @param techniques the technique releases to declare, or {@code null} for none
+     */
+    private static void battleDemo(Battle.Techniques techniques) {
         System.out.println("=".repeat(78));
         System.out.println(" aluminium battle demo: Himeko (姬子) / March 7th (三月七) / Luocha (罗刹)  vs  Ice Edge (冰锋) + Junior Staff·Field Agent (基层员工·外勤) + Warp Trotter (次元扑满)");
         System.out.println("=".repeat(78));
@@ -136,7 +162,30 @@ public class Main {
         System.out.println();
 
         // -- Battle start -----------------------------------------------------
-        Battle battle = new Battle(team, enemies, new Random(20260919));
+        Battle battle = new Battle(team, enemies, new Random(20260919), techniques);
+        if (techniques != null) {
+            // Print what the declaration is FOR, and only the members that actually have a technique rule:
+            // naming all three would imply 姬子's and 罗刹's unmodelled techniques did something.
+            System.out.println("[Technique] declared before the battle: " + declaredTechniqueNames(team, techniques));
+            System.out.println("        → only 三月七 has one modelled (冻人的瞬间: a battle-start Freeze);"
+                    + " 姬子's and 罗刹's technique skills have no rule yet");
+            // Which enemies the Freeze can actually take. Printed because the answer is not obvious and the
+            // battle numbers do not show it: Ice Edge (冰锋) is IMMUNE (STAT_CTRL_Frozen = 1.0), and a
+            // 1-turn Freeze on a mook that acts later in the round is spent before it changes anything.
+            // Without this line the mode looks identical to the ordinary demo, which is exactly the sort of
+            // silent no-op the technique gate was hiding.
+            List<String> freezable = new ArrayList<>();
+            List<String> immune = new ArrayList<>();
+            for (Enemy enemy : enemies) {
+                if (enemy.getDebuffResist().getOrDefault("STAT_CTRL_Frozen", 0.0) >= 1.0) {
+                    immune.add(enemy.getName());
+                } else {
+                    freezable.add(enemy.getName());
+                }
+            }
+            System.out.println("        → the Freeze can land on " + freezable
+                    + "; immune: " + immune + " (STAT_CTRL_Frozen = 1.0)");
+        }
         battle.startBattle();
 
         // A simplified version of Trailblazer-Harmony [伴舞]: hang a super break marker on a teammate
@@ -833,6 +882,27 @@ public class Main {
             }
         }
         return null;
+    }
+
+    /**
+     * The names of the party members a technique declaration actually names.
+     *
+     * <p>Reported from the {@code Battle.Techniques} map rather than from "everyone in the party", so the
+     * demo prints what it declared and not what it might have. A cid with no matching member is skipped, the
+     * same way the battle skips it.
+     *
+     * @param team       the party
+     * @param techniques the declaration
+     * @return a comma-separated list of names, or a note when none matched
+     */
+    private static String declaredTechniqueNames(List<Character> team, Battle.Techniques techniques) {
+        List<String> names = new ArrayList<>();
+        for (Character member : team) {
+            if (Boolean.TRUE.equals(techniques.released().get(member.getCid()))) {
+                names.add(member.getName() + "(" + member.getCid() + ")");
+            }
+        }
+        return names.isEmpty() ? "(nobody in this party)" : String.join(", ", names);
     }
 
     /**
