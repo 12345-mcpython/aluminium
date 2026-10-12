@@ -506,7 +506,7 @@ public class Damage {
     }
 
     /**
-     * Adds to the DEF-ignore this instance carries: "对<某类目标>造成伤害时无视其 X% 防御力" is a property of this hit,
+     * Adds to the DEF-ignore this instance carries: "对&lt;某类目标&gt;造成伤害时无视其 X% 防御力" is a property of this hit,
      * not of the wearer. `Battle` fires `DEALING_DAMAGE` before it settles the defence zone, so this is read in time.
      */
     public Damage addDefenceIgnore(double value) {

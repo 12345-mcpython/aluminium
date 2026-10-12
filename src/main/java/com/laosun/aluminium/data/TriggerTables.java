@@ -188,7 +188,7 @@ public final class TriggerTables {
 
     /**
      * [WAREHOUSE] the global-support clauses of a character that is OWNED but need not be deployed
-     * ("获得该角色即生效，无需上场"), read from `warehouse/<cid>.json`.
+     * ("获得该角色即生效，无需上场"), read from `warehouse/&lt;cid&gt;.json`.
      *
      * <p>Deliberately the same parser as `characters/`: same rule keys, same effect keys, same validation, so a warehouse clause cannot
      * be written in a dialect of its own. EMPTY when the character has no warehouse file -- the ordinary case.

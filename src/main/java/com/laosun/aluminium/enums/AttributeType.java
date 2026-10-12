@@ -192,7 +192,7 @@ public enum AttributeType {
      * The game's own ability config for that Skill settles what it is: the shield modifier is attached with the
      * property <b>{@code AggroAddedRatio}</b> on the shield's owner, gated on {@code ByCompareHPRatio} against
      * param #3, where the {@code SuccessTaskList} (HP% >= 30%) carries that fifth value dynamically while the
-     * {@code FailedTaskList} (HP% < 30%) pins it to <b>0</b> - the sentence's gate and its magnitude, one per branch.
+     * {@code FailedTaskList} (HP% {@code <} 30%) pins it to <b>0</b> - the sentence's gate and its magnitude, one per branch.
      * {@code AggroAddedRatio} is a <i>ratio</i>, so 5 reads as  x (1 + 5) =  x 6 on the unit's weight
      * ({@code Battle.aggroOf}), which is what "大幅提高" means.
      *

@@ -182,7 +182,7 @@ public final class Queue {
 
     /**
      * Returns the combatant whose turn it is right now - i.e. the top of
-     * the heap with remaining time <= 0. Returns {@code null} if no one
+     * the heap with remaining time {@code <= 0}. Returns {@code null} if no one
      * is at their action point, or if the queue is empty.
      *
      * <p>Typically called after {@link #move()} to get the acting combatant:</p>

@@ -185,7 +185,6 @@ public class SkillData {
     /**
      * The debuff's base chance, read out of the description, or {@code null} when the skill states none.
      *
-     * <h2>Which parameter it is</h2>
      * Note: <b>Not a fixed slot.</b> The chance is <b>not</b> the 3rd {@code param_list}
      * entry: against the real data that is wrong for <b>every</b> skill examined, and wrong
      * in the worst way - for Himeko's technique (1003/) index 3 holds {@code 15}, so the "chance"

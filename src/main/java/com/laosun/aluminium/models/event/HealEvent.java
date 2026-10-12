@@ -14,13 +14,14 @@ import com.laosun.aluminium.models.CanHit;
  * Note: {@code CanHit.heal(double)} (the raw HP addition) does not fire - it is the low-level opening shared by
  * {@code Battle.heal} and "directly set the HP", and emitting on it would treat "directly setting HP" as healing
  * too.
- *
- * @param battle         the running battle
- * @param healer         the healer (may be {@code null}, e.g. field/blessing recovery)
- * @param target         the one who was healed
- * @param actuallyHealed the amount actually restored (always {@code > 0})
  */
 public interface HealEvent {
+    /**
+     * @param battle         the running battle
+     * @param healer         the healer (may be {@code null}, e.g. field/blessing recovery)
+     * @param target         the one who was healed
+     * @param actuallyHealed the amount actually restored (always {@code > 0})
+     */
     default void onHeal(Battle battle, CanHit healer, CanHit target, double actuallyHealed) {
     }
 }

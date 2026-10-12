@@ -21,15 +21,16 @@ import com.laosun.aluminium.models.CanHit;
  *
  * <p>Emission point: {@code Battle.applyDamage} (the internal settlement overload), between the HP
  * deduction and the energy settlement.
- *
- * @param battle the running battle
- * @param target the one losing HP
- * @param before HP before the deduction
- * @param after  HP after the deduction
- * @param source the one who caused this instance (may be {@code null}, e.g. the source of a DOT has died)
- * @param amount the actual HP lost ({@code before - after}, always {@code > 0})
  */
 public interface HpLossEvent {
+    /**
+     * @param battle the running battle
+     * @param target the one losing HP
+     * @param before HP before the deduction
+     * @param after  HP after the deduction
+     * @param source the one who caused this instance (may be {@code null}, e.g. the source of a DOT has died)
+     * @param amount the actual HP lost ({@code before - after}, always {@code > 0})
+     */
     default void onHpLoss(Battle battle, CanHit target, double before, double after,
                           CanHit source, double amount) {
     }
