@@ -207,6 +207,69 @@ package-private**（它 `extends Condition`，而 `Condition` 是公开 API）�
 
 ⇒ 下一刀的选法：**先数候选集读几个私有字段**，再决定。
 
+## 四之一、⚠⚠ 仪器本身错了两次，`Battle` 的结论要重来（2026-10-09 实测）
+
+**先用仪器，再信仪器。** 上面 §四 引的 `refactor_movable.py` 当时有两个盲点，
+**都朝"看起来可拆"的方向错**：
+
+### 盲点 1：**重载只算了第一个声明**（`scan` 按名字建表，`setdefault`）
+
+委派式重载在这个代码库里是**常规写法**，所以"第一个胜出"错的不是边角，而是**大部分有意思的名字**：
+
+| 名字 | 仪器当时算的 | 实际 | 谁被藏了 |
+|---|---|---|---|
+| `applyDamage` | 3 行 | **100 行** | 真正结算那 84 行（私有的 3 参重载） |
+| `reduceToughness` | 5 行 | **77 行** | 真正削韧那 56 行 |
+| `fireTriggers` | 3 行 | **190 行** | 62 行的 `…, Damage, …` 重载 |
+| `grantShield` | 3 行 | **62 行** | 16 行的 `…, ruleId` 重载 |
+
+实测代价：`Battle` **328 行**、`TriggerInterpreter` **276 行**、`BuffManager` 73 行、
+`CanHit` 37 行对**每一个消费者**不可见。⚠ **`TriggerInterpreter` 就是用这台仪器拆的**，
+`TriggerTable` / `TriggerConditionParser` 恰好 0 行不可见 —— 那两次成功**有运气成分**。
+
+⚠ 连带一处更贵的：`refactor_extract` 继承了同一个塌缩。`reduceToughness` 的并集 span 是
+**1849-1925**，中间夹着它的 javadoc 与别的声明 ⇒ 一次 `move` 会把**整段切走**并报成功。
+
+### 盲点 2：**私有嵌套类型**（读字段/调方法都看不见）
+
+一个方法可以**不读任何字段**、**只调一起走的方法**，却仍然搬不动 —— 因为它**提到一个私有类型**。
+DOT/回复那一组正是如此：读 0 字段、0 阻塞调用，却经
+`applyDamage(target, damage, EnergyGrant.KILL_ONLY)` 结算，而
+**`EnergyGrant` 是私有嵌套 enum** ⇒ **整组必须留下**。
+
+⇒ 修好之后，仪器**自己**把 `applyAdditionalDamage` / `applyTrueDamage` 排除掉了 ✓ ——
+与 §一 那段**人读源码得出的**结论一致 ✓。⚠ 这是一次**已知答案的复现**，不是新发现：
+真正的不变量写在测试里（`DamagePipelineTest` 数"收 `Damage` 的公开方法恰好 1 个"），
+**测量看得见访问权限，看不见语义** ⇒ 仪器是**筛子**，留下的候选仍要过成文不变量。
+
+### 修好之后重量的结果：**机械刀口基本用完了**
+
+| 候选组 | 行数 | 字段 | 阻塞调用 | 私有类型 |
+|---|---|---|---|---|
+| `grantSkillEnergy` / `isUltraReady` / `ultraEnergyCost` | 37 | 0 | 0 | 0 |
+| `hitChance` / `registerWarehouseListener` / `noteAppliedDebuffClass` / `laughSnapshotHolders` | 28 | 0 | 0 | 0 |
+| `gainBreakEnergy` / `handleBrokenTurn` | 17 | 0 | 0 | 0 |
+| `calculateHeal` / `boostedShield` | 12 | 0 | 0 | 0 |
+| ~~DOT / 回复三件套~~ | ~~61~~ | 0 | 0 | **1 (`EnergyGrant`) ✗ 搬不动** |
+
+⇒ **`Battle` 现在最大的可动连贯集合是 37 行**（`grantSkillEnergy` ＋ 两个终结技门槛）。
+`refactor_clusters.py` 仍然报 **1421 行 / 68 方法的连通块**，而那一块**每一组都读私有字段
+或调私有方法** —— 剩下的行数不是"还没找到刀口"，而是**访问约束**：
+`Battle` 的私有面就是它的真正内聚核。
+
+⇒ 结论按"能搬 ≠ 该搬"：**`Battle` 再切只能切出几十行，收益低于风险**。
+要真正再降一个量级，需要的**不是**找刀口，而是一次**新抽象**（把私有面本身重新划界）。
+按收益排序，下一刀更该落在**仍然藏着 276 行的 `TriggerInterpreter`**（读者更多、行为面更宽）。
+
+### 新增的三件仪器（都已纳入版本控制）
+
+| 脚本 | 回答什么 |
+|---|---|
+| `refactor_overloads.py` | 这个文件因"第一个重载胜出"丢了哪些行、丢在哪 |
+| `refactor_spans.py` | 候选组多大、**是否连续**（不连续 = 中间的行要留下） |
+| `refactor_verify_spans.py` | span 是否真的对：花括号配平 / 首行是签名 / 无嵌套包含 |
+
+
 ## 五、测试重复清理：**三批已落地**（2026-10-08）
 
 `HANDOFF.md` 末节给的那张"下一批"清单（批 2–5）**数字全都不准** —— 它自己就写着
