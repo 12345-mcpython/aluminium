@@ -13,6 +13,16 @@ Two things are extracted with balanced-delimiter scans rather than regexes:
 A call is counted only when the name is followed by ``(`` and is not preceded by
 ``.`` -- so ``battle.applyDamage(...)`` is not mistaken for a local call.
 
+OVERLOADS: a name maps to EVERY declaration that bears it, not just the first. The
+map value carries ``decls`` (one entry per declaration) alongside ``line``/``end``,
+which span all of them. This is not a convenience -- keying by name and keeping the
+first body is how this file used to lose ``Battle.applyDamage``'s 84-line body behind
+its 3-line delegator, and every consumer then measured the delegator and reported the
+name as movable. In ``Battle`` that hid 328 lines; in ``TriggerInterpreter``, which was
+ALREADY split using this scanner, 276. The underlying cause is that a delegating
+overload is a shape this codebase uses deliberately and often, so "first wins" is
+wrong for the majority of the interesting names rather than an edge case.
+
 Usage:
     python tools/refactor_callmap.py <file.java> [rootMethod ...]
 
@@ -125,6 +135,7 @@ def scan(path):
         return lo + 1
 
     methods, fields = {}, []
+    decls = []
     for m in DECL.finditer(clean):
         if m.group("indent") != "    ":
             continue
@@ -147,22 +158,44 @@ def scan(path):
             if depth <= 0:
                 end = k + 1
                 break
-        name = m.group("name")
-        # First declaration wins: an overload keeps the earliest body, which is
-        # enough to attribute calls; overloads are reported separately.
-        methods.setdefault(name, {"line": start, "end": end, "args": m.group("args")})
+        decls.append({"name": m.group("name"), "line": start, "end": end,
+                      "args": m.group("args")})
+
+    # Group by name, keeping EVERY declaration. `line`/`end` span the whole name (min start
+    # to max end) so that consumers which only look at those two fields see the real extent
+    # rather than one arbitrary overload; `decls` keeps the individual bodies for the tools
+    # that must move or size them one at a time.
+    for d in decls:
+        entry = methods.get(d["name"])
+        if entry is None:
+            methods[d["name"]] = {"line": d["line"], "end": d["end"],
+                                  "args": d["args"], "decls": [d]}
+        else:
+            entry["decls"].append(d)
+            entry["line"] = min(entry["line"], d["line"])
+            entry["end"] = max(entry["end"] or 0, d["end"] or 0) or None
 
     for lineno, line in enumerate(clean_lines, start=1):
         fm = FIELD.match(line)
         if fm:
             fields.append((lineno, fm.group("name")))
 
-    # Attribute each call site to the method whose span contains it.
+    # Attribute each call site to the method whose span contains it. Ownership is built from
+    # the individual bodies first, so a name never steals a line from another method that sits
+    # between two of its overloads. What is left over inside an overloaded name's union range
+    # (the gap text between its bodies) is then given to that name: it belongs to neither
+    # neighbour, and leaving it unowned would UNDER-attribute calls for exactly the names this
+    # change exists to fix.
     sites = defaultdict(set)
     owner_of = {}
+    for d in decls:
+        for k in range(d["line"] - 1, d["end"]):
+            owner_of.setdefault(k, d["name"])
     for name, info in methods.items():
+        if len(info["decls"]) < 2:
+            continue
         for k in range(info["line"] - 1, info["end"]):
-            owner_of[k] = name
+            owner_of.setdefault(k, name)
     for lineno, line in enumerate(clean_lines):
         owner = owner_of.get(lineno)
         if owner is None:
@@ -190,13 +223,17 @@ def main():
     roots = sys.argv[2:]
     methods, fields, sites = scan(path)
     print(f"{path}: {len(methods)} methods, {len(fields)} static fields")
+    over = {n: i for n, i in methods.items() if len(i["decls"]) > 1}
+    if over:
+        print(f"  ({len(over)} overloaded names; their line/end spans cover every declaration)")
 
     if not roots:
         by_size = sorted(methods.items(), key=lambda kv: (kv[1]["end"] or 0) - kv[1]["line"], reverse=True)
         print("\n-- largest methods --")
         for name, info in by_size[:15]:
             span = (info["end"] or 0) - info["line"]
-            print(f"  {span:5} lines  {name}  (line {info['line']})")
+            many = f"  [{len(info['decls'])} decls]" if len(info["decls"]) > 1 else ""
+            print(f"  {span:5} lines  {name}  (line {info['line']}){many}")
         return
 
     print("\n-- reachable from: " + ", ".join(roots) + " --")
