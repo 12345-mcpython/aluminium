@@ -8,6 +8,7 @@ import com.laosun.aluminium.beans.MonsterTemplate;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.DamageType;
 import com.laosun.aluminium.enums.SkillEffectType;
+import com.laosun.aluminium.utils.MapUtils;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.skill.Skill;
 import com.laosun.aluminium.utils.AttributeBuilder;
@@ -101,7 +102,7 @@ public final class EnemyFactory {
         enemy.setLevel(level);                                  // level enters the defence zone
         enemy.setDamageResist(config.damageResistance());       // the resistance zone takes effect directly
         enemy.setDebuffResist(config.debuffResistance());        // specific debuff resistance
-        enemy.setStanceWeak(Set.copyOf(config.stanceWeak()));   // weaknesses (used by the toughness-reduction check)
+        enemy.setStanceWeak(MapUtils.orderedSet(config.stanceWeak()));   // weaknesses (used by the toughness-reduction check)
         enemy.setStance(resolved.stats().stance());
         enemy.setMaxStance(resolved.stats().stance());
         enemy.setStanceCount(template.stanceCount());

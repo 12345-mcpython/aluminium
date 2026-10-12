@@ -20,6 +20,7 @@ import com.laosun.aluminium.models.enemy.EnemySkill;
 import com.laosun.aluminium.models.skill.DefaultSkill;
 import com.laosun.aluminium.models.skill.Skill;
 import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.utils.MapUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -225,8 +226,10 @@ public class Main {
         Character hero = Character.fromAttributes("hero", 10_000, 100, 100, 100);
         Enemy enemy = EnemyFactory.create(8002040, 90, 1);          // Warp Trotter (次元扑满)
         // Demo affordance #1: make one target weak to all three control elements so each can be shown.
-        enemy.setStanceWeak(java.util.Set.of(DamageElement.ICE, DamageElement.QUANTUM,
-                DamageElement.IMAGINARY));
+        // The set is insertion-ordered rather than `Set.of`, whose iteration order is salted per run, so
+        // that this printed line reads the same on every run.
+        enemy.setStanceWeak(MapUtils.orderedSet(List.of(DamageElement.ICE, DamageElement.QUANTUM,
+                DamageElement.IMAGINARY)));
         Battle battle = new Battle(List.of(hero), List.of(enemy), new Random(7));
         System.out.println("    target " + enemy.getName() + "  speed " + fmt(speedOf(enemy))
                 + "  weakness rewritten to " + enemy.getStanceWeak() + " (demo affordance)");

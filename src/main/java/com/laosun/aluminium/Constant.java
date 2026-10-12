@@ -7,6 +7,7 @@ import com.laosun.aluminium.data.RelicSets;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.SkillType;
+import com.laosun.aluminium.utils.MapUtils;
 import com.laosun.aluminium.utils.JSONReader;
 
 import java.util.*;
@@ -762,8 +763,8 @@ public final class Constant {
                 orOne(config.defenceRatio()),
                 orOne(config.speedRatio()),
                 orOne(config.stanceRatio()),
-                config.damageResistance() == null ? Map.of() : Map.copyOf(config.damageResistance()),
-                config.debuffResistance() == null ? Map.of() : Map.copyOf(config.debuffResistance()),
+                config.damageResistance() == null ? Map.of() : MapUtils.orderedMap(config.damageResistance()),
+                config.debuffResistance() == null ? Map.of() : MapUtils.orderedMap(config.debuffResistance()),
                 // The summon roster. `summon_id` is spelled as a list even when a monster has none
                 // (`[]` for 195of them) and occasionally as `[0]` for "none" (one monster, 405301004), so
                 // non-positive entries are dropped here -- once, at load time -- rather than at every read.
@@ -771,7 +772,7 @@ public final class Constant {
                 // a data error, and dropping it would turn a broken summon into an absent one (see
                 // MonsterConfig#summonIds).
                 filterPositive(config.summonIds()))));
-        return Map.copyOf(normalized);
+        return MapUtils.orderedMap(normalized);
     }
 
     /**
