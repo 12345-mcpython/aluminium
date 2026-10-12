@@ -139,7 +139,19 @@ def scan(path):
     for m in DECL.finditer(clean):
         if m.group("indent") != "    ":
             continue
-        start = line_of(m.start())
+        # The declaration's line is where its NAME is, not where the regex match begins. `type` is
+        # an alternation whose first branch is `[A-Z]\w*`, the `\s+` after it matches newlines, and
+        # `args` is `[^)]*` under DOTALL -- so the match start floats: it can land on the `/**` of
+        # the javadoc above (TriggerInterpreter.isCastParamScale was reported from 852 when it is
+        # declared at 859, and TriggerEffects.modifyAttr from 43 instead of 83), or on an earlier
+        # line of a wrapped signature. Every consumer slices the body from this line, so a start
+        # inside a comment silently prepends the javadoc to the body.
+        #
+        # The group offsets do NOT float: `name` matched a real identifier on the declaration line
+        # in every case measured (0 of the 1140 declarations in src/main/java start on a comment
+        # line once this is used). So the name's line is the anchor, and the `end` found by brace
+        # counting from that line is already correct.
+        start = line_of(m.start("name"))
         if STATEMENT_STARTS.match(clean_lines[start - 1]):
             continue
         # Brace-count from the declaration's OWN opening brace, not from the start of
