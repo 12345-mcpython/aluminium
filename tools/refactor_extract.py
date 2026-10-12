@@ -37,15 +37,38 @@ FIELD = re.compile(r"^ {1,6}(?:(?:public|private|protected)\s+)?")
 
 
 def declarations(path):
-    """name -> {kind, first, last} where first includes the leading javadoc."""
+    """name -> {kind, first, last} where first includes the leading javadoc.
+
+    Only names with a SINGLE declaration are returned. An overloaded name is refused rather
+    than collapsed: `scan` reports one span per name, so for a name with two bodies the span
+    runs from the first body's start to the last body's end and CONTAINS EVERYTHING BETWEEN
+    THEM. Moving that span does not move an overload -- it moves whatever else happens to sit
+    in the gap. `Battle.reduceToughness` is the worked example: its 3-line delegator at 1849
+    and its real body at 1870-1925 make the name's span 1849-1925, and 1854-1869 holds the
+    real body's javadoc while other methods sit after it. The old tool would have sliced the
+    whole region and reported success.
+
+    Callers that need to move an overloaded name must pick a declaration from `ambiguous`.
+    """
+    return declarations_all(path)
+
+
+def declarations_all(path):
+    """(found, ambiguous, lines): every SINGLE-declaration name, plus the overloaded ones."""
     methods, fields, _sites = cm.scan(path)
     lines = open(path, encoding="utf-8").read().split("\n")
 
     found = {}
+    ambiguous = {}
     for name, info in methods.items():
-        if info["end"] is None:
+        decls = sorted(info["decls"], key=lambda d: d["line"])
+        if len(decls) > 1:
+            ambiguous[name] = decls
+            continue
+        d = decls[0]
+        if d["end"] is None:
             raise SystemExit(f"unterminated body for {name} in {path}")
-        found[name] = {"kind": "method", "start": info["line"], "end": info["end"]}
+        found[name] = {"kind": "method", "start": d["line"], "end": d["end"]}
 
     for lineno, name in fields:
         if name in found:
@@ -94,7 +117,7 @@ def declarations(path):
                 info["first"] = j
                 continue
         info["first"] = info["start"]
-    return found, lines
+    return found, ambiguous, lines
 
 
 def block(lines, info):
@@ -137,20 +160,35 @@ def parse_names(argv):
 def main():
     mode = sys.argv[1]
     if mode == "list":
-        found, lines = declarations(sys.argv[2])
+        found, ambiguous, lines = declarations(sys.argv[2])
         for name, info in sorted(found.items(), key=lambda kv: kv[1]["start"]):
             span = info["end"] - info["first"] + 1
             print(f"{name:34} {info['kind']:6} lines {info['first']:5}-{info['end']:<5} ({span} incl. doc)")
+        if ambiguous:
+            print(f"\n-- {len(ambiguous)} overloaded name(s): move one declaration at a time --")
+            for name, decls in sorted(ambiguous.items(), key=lambda kv: kv[1][0]["line"]):
+                print(f"{name:34} {len(decls)} declarations")
+                for d in decls:
+                    # A javadoc that is not the body's first line is the body's real head, so
+                    # report it: moving the declaration alone would strand its documentation.
+                    print(f"{'':34}   args({d['args']})")
+                    print(f"{'':34}   body {d['line']}-{d['end']}")
         return
 
     if mode == "show":
         # Print the exact slice a move would take, so a wrong javadoc attachment is
         # caught by reading rather than by a corrupted file.
-        found, lines = declarations(sys.argv[2])
+        found, ambiguous, lines = declarations(sys.argv[2])
         for name in sys.argv[3:]:
             info = found.get(name)
             if info is None:
-                print(f"!! {name} not found")
+                if name in ambiguous:
+                    print(f"!! {name} is overloaded ({len(ambiguous[name])} declarations): "
+                          f"showing one body at a time is the only safe form")
+                    for d in ambiguous[name]:
+                        print(f"   args({d['args']})  body {d['line']}-{d['end']}")
+                else:
+                    print(f"!! {name} not found")
                 continue
             print(f"===== {name}  lines {info['first']}-{info['end']} =====")
             for i in range(info["first"], info["end"] + 1):
@@ -162,7 +200,21 @@ def main():
     names, flags = parse_names(rest)
     package_visibility = "--visibility" in flags
 
-    found, lines = declarations(src)
+    found, ambiguous, lines = declarations(src)
+    overloaded = [n for n in names if n in ambiguous]
+    if overloaded:
+        # Refuse rather than half-move. The span of an overloaded name runs from its first body
+        # to its last, so cutting it takes every declaration in between, and moving it takes
+        # them into the destination as well. Neither failure is visible in the tool's output,
+        # and both compile differently from what was asked for.
+        detail = "\n".join(
+            f"    {n}: " + ", ".join(f"args({d['args']}) body {d['line']}-{d['end']}"
+                                    for d in ambiguous[n])
+            for n in overloaded)
+        raise SystemExit(
+            f"refusing to move overloaded name(s) in {src}:\n{detail}\n"
+            f"    one name now maps to several bodies, and the span between them is not part of "
+            f"either;\n    split the move by arity, or hand the declarations a distinct name first")
     missing = [n for n in names if n not in found]
     if missing:
         raise SystemExit(f"not found in {src}: {missing} (refusing to write a half-move)")

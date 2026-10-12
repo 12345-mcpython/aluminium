@@ -32,7 +32,10 @@ def main():
     staying = args[args.index("--stay") + 1:]
 
     methods, _fields, sites = cm.scan(path)
-    found, lines = ex.declarations(path)
+    found, ambiguous, lines = ex.declarations(path)
+    if ambiguous:
+        print(f"note: {len(ambiguous)} overloaded name(s) hold several bodies; their spans in this "
+              f"report cover all of them\n")
 
     def reach(roots):
         out = set()
