@@ -513,25 +513,6 @@ final class TriggerConditionParser {
     }
 
     /**
-     * The attribute behind a {@code self_attr:<ATTRIBUTE>} variable, or {@code null} for a plain name.
-     *
-     * <p>Two load-time rejections, both of them things that would otherwise look like a working rule:
-     * <ul>
-     *   <li>an attribute name that is not in {@link AttributeType} - a typo would compare against nothing
-     *       and the rule would simply never fire;</li>
-     *   <li>one of the four {@code *_PERCENT} builder keys ({@link AttributeType#isPercentVariant()}). They
-     *       are inputs to {@code AttributeBuilder}, not runtime attributes: the builder folds them into
-     *       their base attribute and stores the slot as {@code null}, so reading one would NPE at fire time
-     *        - during a battle, in the middle of a damage calculation. The author means {@code
-     *       HEALTH_PERCENT}'s <em>base</em> here, so say which one they want instead.</li>
-     * </ul>
-     *
-     * @param variable the already-normalised variable token
-     * @param raw      the original condition text, for the error messages
-     * @param spec     the owning rule, for the source
-     * @return the attribute, or {@code null} when the variable is a plain numeric name
-     */
-    /**
      * The Path an {@code allies_with_path:<PATH>} variable names, or {@code null} for every other variable.
      *
      * <p>The name is checked by the same {@code requirePath} that {@code has_path} uses, so an unknown Path is a
@@ -551,6 +532,25 @@ final class TriggerConditionParser {
         return name;
     }
 
+    /**
+     * The attribute behind a {@code self_attr:<ATTRIBUTE>} variable, or {@code null} for a plain name.
+     *
+     * <p>Two load-time rejections, both of them things that would otherwise look like a working rule:
+     * <ul>
+     *   <li>an attribute name that is not in {@link AttributeType} - a typo would compare against nothing
+     *       and the rule would simply never fire;</li>
+     *   <li>one of the four {@code *_PERCENT} builder keys ({@link AttributeType#isPercentVariant()}). They
+     *       are inputs to {@code AttributeBuilder}, not runtime attributes: the builder folds them into
+     *       their base attribute and stores the slot as {@code null}, so reading one would NPE at fire time
+     *        - during a battle, in the middle of a damage calculation. The author means {@code
+     *       HEALTH_PERCENT}'s <em>base</em> here, so say which one they want instead.</li>
+     * </ul>
+     *
+     * @param variable the already-normalised variable token
+     * @param raw      the original condition text, for the error messages
+     * @param spec     the owning rule, for the source
+     * @return the attribute, or {@code null} when the variable is a plain numeric name
+     */
     private static AttributeType selfAttributeOf(String variable, String raw, TriggerSpec spec) {
         if (!variable.startsWith(SELF_ATTR_PREFIX)) {
             return null;
@@ -2012,12 +2012,6 @@ final class TriggerConditionParser {
     static final String SUMMON_RESOURCE_PREFIX = "summon_resource:";
 
     /**
-     * The keyword of the named-state condition, and the parties it may ask about.
-     *
-     * <p>The keyword has to stand alone (a state whose name contains {@code has_state} must not be
-     * mistaken for the operator), hence the lookarounds rather than a plain {@code contains}.
-     */
-    /**
      * The keyword of the "the named state just left that unit" condition.
      *
      * <p>Boundary-guarded for the same reason {@link #HAS_STATE} is: a state whose NAME contains the
@@ -2028,6 +2022,12 @@ final class TriggerConditionParser {
     private static final Pattern STATE_ENDED_KEYWORD =
             Pattern.compile("(?<![\\w])state_ended(?![\\w])", Pattern.CASE_INSENSITIVE);
 
+    /**
+     * The keyword of the named-state condition, and the parties it may ask about.
+     *
+     * <p>The keyword has to stand alone (a state whose name contains {@code has_state} must not be
+     * mistaken for the operator), hence the lookarounds rather than a plain {@code contains}.
+     */
     private static final Pattern HAS_STATE =
             Pattern.compile("(?<![\\w])has_state(?![\\w])", Pattern.CASE_INSENSITIVE);
 
