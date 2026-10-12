@@ -247,5 +247,26 @@
     "min_eidolon": 6,
     "source": "1001 三月七 星魂 6 就这样，一直… (Avatar_March7th_Rank06): 「在<u>战技提供的</u>护盾保护下的我方目标，每回合开始时回复等同于各自4%生命上限+106的生命值。」 param = [0.04, 106]",
     "note": "Two clauses, and the first one is the whole reason this rule needed a new condition: 「在**战技提供的**护盾保护下的」 names the <b>ability</b>, not just the giver. ⚠ 三月七 has two shields of her own -- her Skill's (`id: \"skill_shield\"`, above) and 星魂 2's at battle start -- so a condition that only asked 「有盾」 or even 「我给的盾」 would heal an ally through the 星魂 2 shield as well, for the three turns it lasts: a wrong number with nothing to report. `has_shield from_rule skill_shield` reads exactly that rule's shield (`CanHit.getShieldRuleId()`, stamped on every buff a rule creates), and the negative case is pinned by `ShieldOriginConditionTest`: an ally holding only the battle-start shield is <b>not</b> healed. ⚠ 「各自4%生命上限」 is `scale: target_max_hp` + `percent: 0.04` -- a share of the RECIPIENT's own maximum, computed per target (that is what the scale family does; `owner_max_hp` would read 三月七's). The flat `+ 106` rides in `amount`, the 「share plus a constant」 shape the Skill's shield already uses. ⚠ The trigger 「每回合开始时」 is `TURN_START`, whose event carries the unit whose turn is beginning as BOTH `actor` and `target` -- so the rule fires once per ally per round, with `target` being the one to heal. ⚠ A turn start belongs to whoever's turn it is, so an enemy's turn start delivers the same event with `target` = that enemy: the condition is false for it (our shields are never on enemies), which is why no side filter is needed. ⚠ `min_eidolon: 6` is the gate. ⚠ This is the LAST clause of hers that today's vocabulary can carry completely: nothing of hers remains registered -- 战技's soft taunt SHIPPED on 2026-09-29, so the only history here is -- 星魂 3/5 SHIPPED on 2026-09-28 as skill levels (`RAISE_SKILL_LEVEL`, M-32); the historical wording here said (the document states no magnitude)."
+  },
+  {
+    "on": "BATTLE_START",
+    "id": "technique_freeze",
+    "when": [
+      "self has_state 秘技"
+    ],
+    "do": [
+      {
+        "op": "APPLY_CONTROL",
+        "control": "冻结",
+        "turns": 1,
+        "base_chance": 1.0,
+        "element": "Ice",
+        "scale": "self_attr:ATTACK",
+        "percent": 0.5,
+        "target": "random_enemy"
+      }
+    ],
+    "source": "1001 三月七 秘技 冻人的瞬间 (100107, Maze/Ice): 「立即攻击敌人，进入战斗后有100%的基础概率使随机敌方单体陷入冻结状态，持续1回合。冻结状态下，敌方目标不能行动同时每回合开始时受到等同于三月七50%攻击力的冰属性附加伤害。」 param = [1, 1, 0.5] → #1 = 1（100% 基础概率）、#2 = 1（持续回合）、#3 = 0.5（每回合冰属性附加伤害 = 50% 攻击力）",
+    "note": "「**立即攻击敌人**，进入战斗后有 **100% 的基础概率**使**随机敌方单体**陷入**冻结**状态，持续 **1 回合**。冻结状态下，敌方目标不能行动同时每回合开始时受到等同于三月七 **50% 攻击力**的冰属性**附加伤害**。」—— every clause is stated, and each maps onto vocabulary that already existed for her ultimate's freeze, which is deliberate: 「冻结状态」 must not answer differently depending on what froze the victim. ① 「使用秘技后/进入战斗后」 = `on: BATTLE_START` + `when: self has_state 秘技`, the gate other files use, and the engine's side of it is `Battle.applyTechniqueStates()` adding the state **before** any `BATTLE_START` rule runs; ② 「100% 的**基础**概率」 = `base_chance: 1.0` —— a *base* chance, still rolled per target through the real pipeline (`Battle.hitChance`: base × (1 + her 效果命中) × (1 − the victim's 效果抵抗) × (1 − its `STAT_CTRL_Frozen` resistance)), so 100% is the base and not a promise; ③ 「**随机**敌方单体」 = `target: random_enemy`, an existing selector (`TriggerVocabulary.TARGET_RANDOM_ENEMY`) already used by seven other rules —— the roll is the battle's own seeded one, so a fixed seed still reproduces it; ④ 「陷入**冻结**状态」 = `control: 冻结`, the state's own name, the same spelling `has_state` reads and the same state her ultimate and an Ice **break** leave behind; ⑤ 「持续**1**回合」 = `turns: 1`, required rather than defaulted (a control with no duration is a permanent lock); ⑥ 「每回合开始时受到等同于三月七**50%攻击力**的冰属性附加伤害」 = the state's own per-turn damage, `element: Ice` + `scale: self_attr:ATTACK` + `percent: 0.5` (param #3) —— read **once when it lands** and frozen into the DOT, the snapshot rule every derived value follows, exactly as her ultimate's 60% is. ⚠ What is deliberately NOT written: the 「立即攻击敌人」 half. It is the map attack itself (entering the battle by hitting the enemy), whose toughness value is on the MAZE skill slot; the document gives this technique's `param_list` as `[1, 1, 0.5]` and **all three** are claimed above, so there is no fourth number left for an opening damage instance —— writing one would be inventing a magnitude. ⚠ This was the LAST clause of hers left unwritten: her ten 行迹 stat nodes (1001201..1001210: `IceAddedRatio` 22.4% total, `DefenceAddedRatio` 22.5%, `StatusResistanceBase` 10%) are **not** a rule's job at all —— `Character.Builder.build()` calls `SkillTrace.appendTo(...)`, so they are already on her panel (precedent: `PearlStatTracesTest`), and writing them here as well would double them."
   }
 ]
