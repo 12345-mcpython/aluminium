@@ -1,9 +1,11 @@
 package com.laosun.aluminium.test.engine;
 
 import com.laosun.aluminium.Battle;
+import com.laosun.aluminium.models.CanHit;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.battle.AutoPolicy;
 import com.laosun.aluminium.models.battle.BattleDriver;
+import com.laosun.aluminium.models.battle.BattleListener;
 import com.laosun.aluminium.models.battle.SkillPolicy;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.test.support.BattleFixture;
@@ -11,6 +13,7 @@ import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -126,5 +129,92 @@ public class BattleDriverTest {
         Assertions.assertEquals(BattleDriver.Outcome.TURN_LIMIT, result.outcome());
         Assertions.assertEquals(8, result.turns(),
                 "every step must have advanced the bar even though no action was taken");
+    }
+
+    /**
+     * A listener sees every turn, in order, and each start is matched by an end.
+     *
+     * <p>The pairing is the part worth pinning: a front end that reports "X acts" on a start and never
+     * hears the end would leave its own state half-updated, and the driver taking over the loop is
+     * exactly what makes such an omission possible.
+     */
+    @Test
+    void aListenerSeesEveryTurnStartPairedWithAnEnd() {
+        List<String> events = new ArrayList<>();
+        BattleDriver driver = BattleDriver.of(
+                List.of(CharacterFactory.create(1109, 80, false, null, null, 0)),
+                List.of(Enemy.fromAttributes("训练假人", 800, 0, 100, 100)), 20260919L)
+                .withListener(new BattleListener() {
+                    @Override
+                    public void onBattleStart(BattleDriver d) {
+                        events.add("start");
+                    }
+
+                    @Override
+                    public void onTurnStart(CanHit actor, int turn) {
+                        events.add("turn+" + turn + ":" + actor.getName());
+                    }
+
+                    @Override
+                    public void onAction(CanHit actor, SkillPolicy.Decision decision) {
+                        events.add("act:" + actor.getName());
+                    }
+
+                    @Override
+                    public void onTurnEnd(CanHit actor, int turn) {
+                        events.add("end+" + turn + ":" + actor.getName());
+                    }
+
+                    @Override
+                    public void onBattleEnd(BattleDriver.Result result) {
+                        events.add("over:" + result.outcome());
+                    }
+                });
+
+        BattleDriver.Result result = driver.run();
+
+        Assertions.assertEquals("start", events.getFirst(), "the battle start comes first");
+        Assertions.assertTrue(events.getLast().startsWith("over:"),
+                "the battle end comes last, got " + events.getLast());
+
+        int starts = 0;
+        int ends = 0;
+        for (String event : events) {
+            if (event.startsWith("turn+")) {
+                starts++;
+            }
+            if (event.startsWith("end+")) {
+                ends++;
+            }
+        }
+        Assertions.assertEquals(result.turns(), starts, "one start per turn taken");
+        Assertions.assertEquals(starts, ends, "every start must be paired with an end");
+    }
+
+    /**
+     * A battle driven with a listener decides exactly as one driven without, so observing cannot
+     * change the outcome.
+     */
+    @Test
+    void attachingAListenerDoesNotChangeTheOutcome() {
+        BattleDriver.Result silent = BattleDriver.of(
+                List.of(CharacterFactory.create(1109, 80, false, null, null, 0)),
+                List.of(Enemy.fromAttributes("训练假人", 800, 0, 100, 100)), 20260919L).run();
+
+        BattleDriver.Result watched = BattleDriver.of(
+                        List.of(CharacterFactory.create(1109, 80, false, null, null, 0)),
+                        List.of(Enemy.fromAttributes("训练假人", 800, 0, 100, 100)), 20260919L)
+                .withListener(new BattleListener() {
+                    @Override
+                    public void onTurnStart(CanHit actor, int turn) {
+                        // a listener that reads state must not perturb the random stream
+                        actor.getName();
+                    }
+                })
+                .run();
+
+        Assertions.assertEquals(silent.status(), watched.status());
+        Assertions.assertEquals(silent.turns(), watched.turns(),
+                "narration must not consume the battle's randomness");
     }
 }

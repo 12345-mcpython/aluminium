@@ -90,6 +90,8 @@ public final class BattleDriver {
     private final Battle battle;
     private final SkillPolicy policy;
     private final int maxTurns;
+    private BattleListener listener = new BattleListener() {
+    };
 
     /**
      * Drive {@code battle}, letting one policy act for every unit.
@@ -113,23 +115,42 @@ public final class BattleDriver {
     }
 
     /**
+     * Attach an observer for this run.
+     *
+     * <p>A listener cannot change what happens: it is notified, and its return values are ignored. Kept
+     * out of the constructor so a test can drive a battle silently with the two-argument form.
+     *
+     * @param listener the observer; {@code null} restores the silent default
+     * @return this driver, for chaining
+     */
+    public BattleDriver withListener(BattleListener listener) {
+        this.listener = listener == null ? new BattleListener() {
+        } : listener;
+        return this;
+    }
+
+    /**
      * Start the battle and run until it is decided or the turn ceiling is reached.
      *
      * @return how it ended
      */
     public Result run() {
         battle.startBattle();
+        listener.onBattleStart(this);
         int turns = 0;
         while (!battle.isOver() && turns < maxTurns) {
-            if (!step()) {
-                return new Result(Outcome.STALLED, battle.checkResult(), turns, battle.getRound());
+            if (!step(turns + 1)) {
+                Result stalled = new Result(Outcome.STALLED, battle.checkResult(), turns, battle.getRound());
+                listener.onBattleEnd(stalled);
+                return stalled;
             }
             turns++;
         }
-        if (battle.isOver()) {
-            return new Result(Outcome.FINISHED, battle.checkResult(), turns, battle.getRound());
-        }
-        return new Result(Outcome.TURN_LIMIT, battle.checkResult(), turns, battle.getRound());
+        Result result = battle.isOver()
+                ? new Result(Outcome.FINISHED, battle.checkResult(), turns, battle.getRound())
+                : new Result(Outcome.TURN_LIMIT, battle.checkResult(), turns, battle.getRound());
+        listener.onBattleEnd(result);
+        return result;
     }
 
     /**
@@ -141,6 +162,16 @@ public final class BattleDriver {
      * @return {@code false} when no unit could act, so the caller stops
      */
     public boolean step() {
+        return step(-1);
+    }
+
+    /**
+     * Play one turn, optionally telling the listener which turn number this is.
+     *
+     * @param turn the 1-based turn number to report, or a non-positive value to report none
+     * @return {@code false} when no unit could act, so the caller stops
+     */
+    private boolean step(int turn) {
         battle.stepForward();
         Signal current = battle.queue.getCurrentActor();
         if (current == null) {
@@ -151,6 +182,9 @@ public final class BattleDriver {
             return false;
         }
 
+        if (turn > 0) {
+            listener.onTurnStart(actor, turn);
+        }
         battle.beforeMove();
 
         // The turn still has to end even when the actor cannot use it: damage over time may have killed
@@ -160,11 +194,17 @@ public final class BattleDriver {
         if (mayAct) {
             SkillPolicy.Decision decision = policy.choose(battle, actor);
             if (decision != null) {
+                if (turn > 0) {
+                    listener.onAction(actor, decision);
+                }
                 cast(actor, decision);
             }
         }
 
         battle.afterMove();
+        if (turn > 0) {
+            listener.onTurnEnd(actor, turn);
+        }
         return true;
     }
 
