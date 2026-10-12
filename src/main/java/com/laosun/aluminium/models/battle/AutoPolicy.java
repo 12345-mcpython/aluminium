@@ -6,6 +6,7 @@ import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.CanHit;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.ai.TargetSelector;
+import com.laosun.aluminium.models.buff.TauntBuff;
 import com.laosun.aluminium.models.skill.Skill;
 
 import java.util.ArrayList;
@@ -35,22 +36,56 @@ import java.util.List;
 public final class AutoPolicy implements SkillPolicy {
 
     /**
+     * How a main target is picked from the legal candidates.
+     *
+     * <p>A strategy rather than a fixed rule because the two camps genuinely differ, and the difference
+     * is not cosmetic: enemy targeting is aggro-weighted and therefore <b>consumes a random roll</b>,
+     * while a player's choice does not. Mixing them up shifts every later crit roll, so a battle that
+     * used to be reproducible stops being so. Callers that need a deterministic scripted run (a demo
+     * used as a regression anchor, for instance) select {@link #FIRST_ALIVE}.
+     */
+    public enum Targeting {
+        /**
+         * Aggro-weighted, via the engine's {@code TargetSelector}. Uses the battle's random source.
+         */
+        WEIGHTED,
+        /**
+         * The first living candidate in order. Consumes no randomness.
+         */
+        FIRST_ALIVE
+    }
+
+    /**
      * Skill points kept in hand before an ally is willing to spend one.
      */
     private final int skillPointReserve;
 
     /**
-     * A policy that keeps one point in reserve, as the demo did.
+     * How this policy picks a target.
+     */
+    private final Targeting targeting;
+
+    /**
+     * A policy that keeps one point in reserve and targets by aggro weight, as an enemy does.
      */
     public AutoPolicy() {
-        this(1);
+        this(1, Targeting.WEIGHTED);
     }
 
     /**
      * @param skillPointReserve points to keep before casting a skill; 0 spends freely
      */
     public AutoPolicy(int skillPointReserve) {
+        this(skillPointReserve, Targeting.WEIGHTED);
+    }
+
+    /**
+     * @param skillPointReserve points to keep before casting a skill; 0 spends freely
+     * @param targeting        how to pick a main target
+     */
+    public AutoPolicy(int skillPointReserve, Targeting targeting) {
         this.skillPointReserve = Math.max(0, skillPointReserve);
+        this.targeting = targeting == null ? Targeting.WEIGHTED : targeting;
     }
 
     @Override
@@ -161,7 +196,10 @@ public final class AutoPolicy implements SkillPolicy {
     }
 
     /**
-     * Pick the main target with the engine's own selector, so taunts and aggro weigh as they do elsewhere.
+     * Pick the main target according to this policy's {@link Targeting}.
+     *
+     * <p>Taunt is honoured in both modes: it is a rule, not a preference, so a taunting unit takes the
+     * hit whether or not the policy would have chosen it. Only the weighted mode then rolls.
      *
      * @param battle    the battle
      * @param actor     the acting unit
@@ -170,6 +208,17 @@ public final class AutoPolicy implements SkillPolicy {
      * @return the chosen target, or {@code null} if none
      */
     private CanHit mainTarget(Battle battle, CanHit actor, List<CanHit> foes, TargetSelector.Intent intent) {
+        if (foes.isEmpty()) {
+            return null;
+        }
+        if (targeting == Targeting.FIRST_ALIVE) {
+            for (CanHit candidate : foes) {
+                if (candidate.getBuffManager().hasBuff(TauntBuff.class)) {
+                    return candidate;
+                }
+            }
+            return foes.getFirst();
+        }
         return TargetSelector.select(battle, foes, intent, battle.getRng());
     }
 
