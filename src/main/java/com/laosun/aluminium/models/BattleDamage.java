@@ -270,7 +270,7 @@ public final class BattleDamage {
      *
      * <p><b>No effect-hit roll, and no {@code resistKey} lookup, on this path.</b> A break is not a resisted
      * debuff: it happens because the toughness bar emptied. {@code ControlEffect.resistKey} is for the
-     * <i>skill</i>-applied case, which goes through {@link #tryApplyDebuff}, and letting a monster's
+     * <i>skill</i>-applied case, which goes through {@link Battle#tryApplyDebuff}, and letting a monster's
      * {@code STAT_CTRL_*} resistance cancel a break would make a weakness break silently do nothing.
      *
      * @param enemy   the enemy that was just broken

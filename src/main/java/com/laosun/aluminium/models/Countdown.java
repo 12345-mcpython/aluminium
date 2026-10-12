@@ -14,7 +14,7 @@ import com.laosun.aluminium.enums.Camp;
  * move the order around).
  *
  * <p>So the countdown is an ordinary {@link CanHit} with a speed and no life: it is scheduled by the same
- * {@link Queue} as everybody else, which means every mechanic that already moves the action order (advance, delay,
+ * {@link com.laosun.aluminium.Queue} as everybody else, which means every mechanic that already moves the action order (advance, delay,
  * break) moves it too - for free and by construction.
  *
  * <p>Note: <b>What it deliberately is not.</b>
