@@ -1,23 +1,18 @@
 package com.laosun.aluminium.test.engine;
 
 
-import com.laosun.aluminium.test.support.BattleFixture;
-import com.laosun.aluminium.test.trigger.RelicTriggerTableTest;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.RelicType;
 import com.laosun.aluminium.enums.SkillType;
-import com.laosun.aluminium.models.CanHit;
+import com.laosun.aluminium.models.*;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.Damage;
-import com.laosun.aluminium.models.DoubleValue;
+import com.laosun.aluminium.models.buff.ReductionBuff;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
-import com.laosun.aluminium.models.RelicSuit;
-import com.laosun.aluminium.models.Signal;
-import com.laosun.aluminium.models.buff.ReductionBuff;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.utils.RelicFactory;
 import org.junit.jupiter.api.Assertions;
@@ -38,56 +33,86 @@ import java.util.List;
  * <h2>The F-2 case</h2>
  * {@link #openingSkillPointsIncludeThePasserbyFourPiece()} is the end-to-end claim registered as
  * {@code F-2} in {@code ROADMAP.md}: a team wearing the Passerby of Wandering Cloud 4-piece starts
- * with <b>4</b> skill points instead of 3. It also pins the <b>ordering</b> the claim depends on - 
+ * with <b>4</b> skill points instead of 3. It also pins the <b>ordering</b> the claim depends on -
  * the opening value is assigned when the {@link Battle} is constructed, and {@code BATTLE_START} is
  * fired later by {@code startBattle()}, which is what makes the +1 observable.
  */
 public class RelicAbilityBattleTest {
 
-    /** "Passerby of Wandering Cloud" - 4-piece: at the start of the battle, regenerate 1 skill point. */
+    /**
+     * "Passerby of Wandering Cloud" - 4-piece: at the start of the battle, regenerate 1 skill point.
+     */
     private static final int PASSERBY = 101;
-    /** "Hunter of Glacial Forest" - 4-piece: after the Ultimate, +25% CRIT DMG for 2 turns. */
+    /**
+     * "Hunter of Glacial Forest" - 4-piece: after the Ultimate, +25% CRIT DMG for 2 turns.
+     */
     private static final int GLACIAL_FOREST = 104;
-    /** "Band of Sizzling Thunder" - 4-piece: on Skill, +20% ATK for 1 turn. */
+    /**
+     * "Band of Sizzling Thunder" - 4-piece: on Skill, +20% ATK for 1 turn.
+     */
     private static final int SIZZLING_THUNDER = 109;
-    /** "Eagle of Twilight Line" - 4-piece: after the Ultimate, advance forward 25%. */
+    /**
+     * "Eagle of Twilight Line" - 4-piece: after the Ultimate, advance forward 25%.
+     */
     private static final int TWILIGHT_EAGLE = 110;
-    /** "Champion of Streetwise Boxing" - 4-piece: +5% ATK per attack taken/given, up to 5 stacks. */
+    /**
+     * "Champion of Streetwise Boxing" - 4-piece: +5% ATK per attack taken/given, up to 5 stacks.
+     */
     private static final int STREETWISE_BOXING = 105;
-    /** "City of Converging Stars" (planar) - 2-piece: on Follow-Up ATK +24% ATK; on a kill +12% CRIT DMG. */
+    /**
+     * "City of Converging Stars" (planar) - 2-piece: on Follow-Up ATK +24% ATK; on a kill +12% CRIT DMG.
+     */
     private static final int CONVERGING_STARS = 326;
-    /** "The Ashblazing Grand Duke" - 2-piece: +20% DMG dealt by Follow-Up ATK. */
+    /**
+     * "The Ashblazing Grand Duke" - 2-piece: +20% DMG dealt by Follow-Up ATK.
+     */
     private static final int ASHBLAZING = 115;
 
-    /** "the Navigator who sees the stars as I do" (星如我见的领航员) - 4-piece: a Skill/Ultimate DMG stack counter that grows and shrinks. */
+    /**
+     * "the Navigator who sees the stars as I do" (星如我见的领航员) - 4-piece: a Skill/Ultimate DMG stack counter that grows and shrinks.
+     */
     private static final int NAVIGATOR = 131;
-    /** "the Iron Guard that wards the wind and snow" (戍卫风雪的铁卫) - 2-piece: reduces the damage the wearer takes (a damage-taken zone). */
+    /**
+     * "the Iron Guard that wards the wind and snow" (戍卫风雪的铁卫) - 2-piece: reduces the damage the wearer takes (a damage-taken zone).
+     */
     private static final int GUARD_OF_SNOW = 106;
 
-    /** Himeko: basic attack / skill / ultimate are all real, damaging skill slots. */
+    /**
+     * Himeko: basic attack / skill / ultimate are all real, damaging skill slots.
+     */
     private static final int HIMEKO = 1003;
     private static final int ICE_EDGE = 1002011;
     private static final int ENEMY_LEVEL = 90;
     private static final int CHARACTER_LEVEL = 80;
 
-    /** Enough HP that a cast never kills the enemy mid-test. */
+    /**
+     * Enough HP that a cast never kills the enemy mid-test.
+     */
     private static final double ENEMY_HP = 1_000_000;
 
     private static final int STAR = 5;
     private static final int LEVEL = 15;
 
-    /** How many pieces a partial suit wears - one short of every set's 4-piece tier. */
+    /**
+     * How many pieces a partial suit wears - one short of every set's 4-piece tier.
+     */
     private static final int PARTIAL_PIECES = 3;
 
-    /** The four cavern slots, in the order a partial suit fills them. */
+    /**
+     * The four cavern slots, in the order a partial suit fills them.
+     */
     private static final List<RelicType> CAVERN_SLOTS =
             List.of(RelicType.HEAD, RelicType.HAND, RelicType.BODY, RelicType.BOOT);
 
-    /** The authored numbers, so an assertion can never silently drift from the data file. */
+    /**
+     * The authored numbers, so an assertion can never silently drift from the data file.
+     */
     private static final double GLACIAL_CRIT_DMG = 0.25;
     private static final double SIZZLING_ATTACK = 0.2;
     private static final double EAGLE_ADVANCE = 0.25;
-    /** Ability51051: +5% ATK per application, at most 5 applications. */
+    /**
+     * Ability51051: +5% ATK per application, at most 5 applications.
+     */
     private static final double STREETWISE_ATTACK_PER_STACK = 0.05;
     private static final int STREETWISE_MAX_STACKS = 5;
 
@@ -142,7 +167,9 @@ public class RelicAbilityBattleTest {
                 "BATTLE_START is fired by startBattle() and adds the set's point on top of the opening 3");
     }
 
-    /** Three pieces is one short of the 4-piece bonus, so the team opens at 3. */
+    /**
+     * Three pieces is one short of the 4-piece bonus, so the team opens at 3.
+     */
     @Test
     public void belowTheThresholdTheOpeningValueIsUnchanged() {
         Battle threePieces = newBattle(List.of(partial(HIMEKO, PASSERBY)), true);
@@ -228,7 +255,9 @@ public class RelicAbilityBattleTest {
         Assertions.assertEquals(ultimateBefore, ultimateUser.getAttribute(AttributeType.ATTACK).get(), TOLERANCE);
     }
 
-    /** Set 110: after the wearer's Ultimate, their action is advanced forward by 25%. */
+    /**
+     * Set 110: after the wearer's Ultimate, their action is advanced forward by 25%.
+     */
     @Test
     public void ultimateAdvancesTheWearersAction() {
         Battle battle = newBattle(List.of(wearing(HIMEKO, TWILIGHT_EAGLE)), true);
@@ -316,7 +345,7 @@ public class RelicAbilityBattleTest {
      *
      * <p>Split from the test above because that one is already at the cap when the hits land. Here the
      * shield guarantees {@code HP_LOST} does not fire, so a rule hung on it would leave the count at zero
-     *  - which is exactly the regression this pins.
+     * - which is exactly the regression this pins.
      */
     @Test
     public void streetwiseBoxingStacksOnAShieldedHitAsWell() {
@@ -335,7 +364,9 @@ public class RelicAbilityBattleTest {
                 "a hit the shield absorbed is still 'being hit', so the set must gain a stack");
     }
 
-    /** Every installed stack carries the modifier the ability states, of the kind a base attribute needs. */
+    /**
+     * Every installed stack carries the modifier the ability states, of the kind a base attribute needs.
+     */
     private static void assertEachStackIsStreetwise(Character hero) {
         for (DoubleValue.Modifier modifier : buffsOn(hero, AttributeType.ATTACK)) {
             Assertions.assertEquals(STREETWISE_ATTACK_PER_STACK, modifier.getValue(), TOLERANCE);
@@ -375,7 +406,9 @@ public class RelicAbilityBattleTest {
         assertEachStackIsStreetwise(hero);
     }
 
-    /** Three pieces must not grant the 4-piece ability. */
+    /**
+     * Three pieces must not grant the 4-piece ability.
+     */
     @Test
     public void streetwiseBoxingNeedsAllFourPieces() {
         Battle battle = newBattle(List.of(partial(HIMEKO, STREETWISE_BOXING)), true);
@@ -394,7 +427,9 @@ public class RelicAbilityBattleTest {
     // 6. FOLLOW_UP: City of Converging Stars (326)
     // ==================================================================
 
-    /** Ability53261: on Follow-Up ATK, +24% ATK for 2 turns; on a kill, +12% CRIT DMG for all allies. */
+    /**
+     * Ability53261: on Follow-Up ATK, +24% ATK for 2 turns; on a kill, +12% CRIT DMG for all allies.
+     */
     private static final double CONVERGING_ATTACK = 0.24;
     private static final double CONVERGING_CRIT_DMG = 0.12;
 
@@ -496,7 +531,9 @@ public class RelicAbilityBattleTest {
     // . The follow-up-only damage boost: The Ashblazing Grand Duke (115)
     // ==================================================================
 
-    /** Ability51150: "Increases the DMG dealt by Follow-Up ATK by 20%." */
+    /**
+     * Ability51150: "Increases the DMG dealt by Follow-Up ATK by 20%."
+     */
     private static final double ASHBLAZING_BOOST = 0.2;
 
     /**
@@ -544,7 +581,9 @@ public class RelicAbilityBattleTest {
                 "a basic attack must be completely unaffected: " + normalWith + " vs " + normalWithout);
     }
 
-    /** Settles one hit and returns how much HP the enemy lost. */
+    /**
+     * Settles one hit and returns how much HP the enemy lost.
+     */
     private static double hitFor(Battle battle, boolean followUp) {
         Enemy enemy = battle.enemyUnits().getFirst();
         Character hero = battle.characters.getFirst();
@@ -561,9 +600,13 @@ public class RelicAbilityBattleTest {
     // 131 "the Navigator who sees the stars as I do" (星如我见的领航员): the stack counter that also comes back down
     // ==================================================================
 
-    /** One stack of the set's boost (param #1[i] = 0.18). */
+    /**
+     * One stack of the set's boost (param #1[i] = 0.18).
+     */
     private static final double NAVIGATOR_BOOST = 0.18;
-    /** The text's cap (param #2[i] = 3). */
+    /**
+     * The text's cap (param #2[i] = 3).
+     */
     private static final int NAVIGATOR_MAX_STACKS = 3;
 
     /**
@@ -607,7 +650,9 @@ public class RelicAbilityBattleTest {
                 "one comes off per turn start, so the counter never just sits at the cap");
     }
 
-    /** "or after casting the Ultimate, remove 1 layer" - the other half of the removal clause. */
+    /**
+     * "or after casting the Ultimate, remove 1 layer" - the other half of the removal clause.
+     */
     @Test
     public void navigatorLosesAStackAfterTheWearersUltimate() {
         Battle battle = newBattle(List.of(wearing(HIMEKO, NAVIGATOR)), true);
@@ -624,7 +669,9 @@ public class RelicAbilityBattleTest {
                 "the Skill scope loses one too -- the text does not distinguish them");
     }
 
-    /** Three pieces must not grant the 4-piece ability (the same guard the other sets have). */
+    /**
+     * Three pieces must not grant the 4-piece ability (the same guard the other sets have).
+     */
     @Test
     public void navigatorNeedsAllFourPieces() {
         Battle battle = newBattle(List.of(partial(HIMEKO, NAVIGATOR)), true);
@@ -638,7 +685,9 @@ public class RelicAbilityBattleTest {
     // 106 "the Iron Guard that wards the wind and snow" (戍卫风雪的铁卫): a damage-taken zone the data could not reach
     // ==================================================================
 
-    /** The 2-piece's number (param #1[i] = 0.08). */
+    /**
+     * The 2-piece's number (param #1[i] = 0.08).
+     */
     private static final double SNOW_REDUCTION = 0.08;
 
     /**
@@ -667,7 +716,9 @@ public class RelicAbilityBattleTest {
                 "8% less, in the multiplicative reduction zone");
     }
 
-    /** It is the <b>2-piece</b> tier, so three pieces are already enough - and none of them is not. */
+    /**
+     * It is the <b>2-piece</b> tier, so three pieces are already enough - and none of them is not.
+     */
     @Test
     public void guardOfSnowIsATwoPieceAbility() {
         Battle threePieces = newBattle(List.of(partial(HIMEKO, GUARD_OF_SNOW)), true);
@@ -700,7 +751,9 @@ public class RelicAbilityBattleTest {
         Assertions.assertEquals(energyBefore + 5, hero.getCurrentEnergy(), TOLERANCE, "and the text's 5 Energy");
     }
 
-    /** Above the threshold the same turn start does nothing at all. */
+    /**
+     * Above the threshold the same turn start does nothing at all.
+     */
     @Test
     public void guardOfSnowFourPieceDoesNothingAboveHalfHealth() {
         Battle battle = newBattle(List.of(wearing(HIMEKO, GUARD_OF_SNOW)), true);
@@ -719,18 +772,24 @@ public class RelicAbilityBattleTest {
     // Helpers
     // ==================================================================
 
-    /** A character wearing the whole set (four pieces for a cavern set). */
+    /**
+     * A character wearing the whole set (four pieces for a cavern set).
+     */
     private static Character wearing(int cid, int setId) {
         return CharacterFactory.create(cid, CHARACTER_LEVEL, true, null,
                 RelicFactory.suit(setId, STAR, LEVEL));
     }
 
-    /** A character with no relics at all. */
+    /**
+     * A character with no relics at all.
+     */
     private static Character plain(int cid) {
         return CharacterFactory.create(cid, CHARACTER_LEVEL);
     }
 
-    /** A character wearing the first {@link #PARTIAL_PIECES} cavern pieces of a set. */
+    /**
+     * A character wearing the first {@link #PARTIAL_PIECES} cavern pieces of a set.
+     */
     private static Character partial(int cid, int setId) {
         RelicSuit suit = new RelicSuit();
         for (RelicType slot : CAVERN_SLOTS.subList(0, PARTIAL_PIECES)) {
@@ -767,13 +826,17 @@ public class RelicAbilityBattleTest {
         return before - victim.getCurrentHp();
     }
 
-    /** Casts the character's ultimate for real (through {@code Battle.castUltra}, energy gate included). */
+    /**
+     * Casts the character's ultimate for real (through {@code Battle.castUltra}, energy gate included).
+     */
     private static boolean castUltimate(Battle battle, Character hero) {
         hero.setCurrentEnergy(hero.getMaxEnergy());
         return battle.castUltra(hero, List.of(battle.enemyUnits().getFirst()));
     }
 
-    /** Casts the character's Skill (through the action-bar-free entry point, so no turn is needed). */
+    /**
+     * Casts the character's Skill (through the action-bar-free entry point, so no turn is needed).
+     */
     private static void castSkill(Battle battle, Character hero) {
         battle.castImmediate(hero.getSkills().get(SkillType.SKILL), hero,
                 List.of(battle.enemyUnits().getFirst()));
@@ -803,12 +866,16 @@ public class RelicAbilityBattleTest {
         throw new AssertionError("no turn for the requested unit within 40 steps");
     }
 
-    /** The modifiers a buff has installed on one attribute, in application order. */
+    /**
+     * The modifiers a buff has installed on one attribute, in application order.
+     */
     private static List<DoubleValue.Modifier> buffsOn(Character character, AttributeType type) {
         return character.getAttribute(type).filterBySource(DoubleValue.Modifier.ModifierSource.BUFF);
     }
 
-    /** How much action value the unit still has to accumulate before its next turn. */
+    /**
+     * How much action value the unit still has to accumulate before its next turn.
+     */
     private static double timeRemaining(Battle battle, CanHit unit) {
         for (Signal signal : battle.queue.snapshot()) {
             if (signal.getCanHit() == unit) {

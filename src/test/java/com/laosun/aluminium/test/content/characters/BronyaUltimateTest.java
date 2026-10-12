@@ -5,19 +5,22 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-/** 1101 Bronya (布洛妮娅)'s ultimate: an all-allies ATK share and a DERIVED CRIT DMG amount, both judged on a teammate. */
+/**
+ * 1101 Bronya (布洛妮娅)'s ultimate: an all-allies ATK share and a DERIVED CRIT DMG amount, both judged on a teammate.
+ */
 public class BronyaUltimateTest {
     private static final int BRONYA = 1101;
     private static final int ALLY = 1001;
     private static final int LEVEL = 80;
-        @Test
+
+    @Test
     public void theUltimateRaisesThePartysAttackAndDerivedCritDamage() {
         Character bronya = CharacterFactory.create(BRONYA, LEVEL);
         Character ally = CharacterFactory.create(ALLY, LEVEL);

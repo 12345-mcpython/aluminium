@@ -1,11 +1,10 @@
 package com.laosun.aluminium.test.engine;
 
 
-import com.laosun.aluminium.test.content.characters.EvanesciaEnergySyncTest;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -23,7 +22,7 @@ public class ElationAmountCapTest {
     private static final int WEARER = 1505;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-        private static final String GIFTS = "好活当赏";
+    private static final String GIFTS = "好活当赏";
 
     private int mirrored(double energy) {
         Character elation = CharacterFactory.create(WEARER, LEVEL);
@@ -44,7 +43,9 @@ public class ElationAmountCapTest {
         Assertions.assertEquals(60, small, "a conversion below the ceiling is untouched (false case)");
     }
 
-    /** The shipped ceiling, read off the compiled rule (discipline 232). */
+    /**
+     * The shipped ceiling, read off the compiled rule (discipline 232).
+     */
     @Test
     public void theShippedRuleCarriesTheCeiling() {
         Character elation = CharacterFactory.create(WEARER, LEVEL);

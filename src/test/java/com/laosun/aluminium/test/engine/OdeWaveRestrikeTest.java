@@ -8,8 +8,8 @@ import com.laosun.aluminium.models.Summon;
 import com.laosun.aluminium.models.WaveManager;
 import com.laosun.aluminium.models.skill.Skill;
 import com.laosun.aluminium.models.skill.SkillExecutor;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
@@ -33,12 +33,14 @@ public class OdeWaveRestrikeTest {
     private static final int LEVEL = 80;
     private static final int CYRENE = 1415;
     private static final int MYDEI = 1404;
-        private static final int ODE_TO_STRIFE = 16;
+    private static final int ODE_TO_STRIFE = 16;
     private static final int GODSLAYER = 11;
     private static final int MULTI_WAVE_STAGE = 310030;
     private static final String MARK = "献予「纷争」之诗";
 
-    /** The ode marks him; a wave monster entering then makes him strike again. */
+    /**
+     * The ode marks him; a wave monster entering then makes him strike again.
+     */
     @Test
     public void aWaveMonsterEnteringMakesHimStrikeAgain() {
         Assumptions.assumeFalse(Constant.stages().isEmpty(), "stage.json has not been generated");
@@ -70,7 +72,9 @@ public class OdeWaveRestrikeTest {
                 "「cast on a **newly entered** enemy target」-- a wave monster entering makes him restrike");
     }
 
-    /** Without the ode's mark, a wave changes nothing -- the gate is the mark, not the wave. */
+    /**
+     * Without the ode's mark, a wave changes nothing -- the gate is the mark, not the wave.
+     */
     @Test
     public void withoutTheMarkAWaveChangesNothing() {
         Assumptions.assumeFalse(Constant.stages().isEmpty(), "stage.json has not been generated");

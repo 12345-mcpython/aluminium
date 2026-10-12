@@ -64,7 +64,9 @@ public class ArcadiaDamageTest {
         return wearer.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
     }
 
-    /** Note: Takes the number of CHARACTERS: the memosprite adds one more target. */
+    /**
+     * Note: Takes the number of CHARACTERS: the memosprite adds one more target.
+     */
     private static double memospriteDamage(int allies) {
         Character master = CharacterFactory.create(MEMOSPRITE_OWNER, LEVEL, true, null,
                 RelicFactory.suit(321, 5, RELIC_LEVEL));
@@ -94,7 +96,9 @@ public class ArcadiaDamageTest {
         return dealt;
     }
 
-    /** Note: A whole turn: SUMMONED and TURN_START both come out of a settle, so nothing may be read without one. */
+    /**
+     * Note: A whole turn: SUMMONED and TURN_START both come out of a settle, so nothing may be read without one.
+     */
     private static void driveTurn(Battle battle, Character unit) {
         battle.currentMove = new Signal(unit);
         battle.beforeMove();

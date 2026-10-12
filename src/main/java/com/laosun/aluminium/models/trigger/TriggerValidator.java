@@ -1,15 +1,10 @@
-package com.laosun.aluminium.models;
+package com.laosun.aluminium.models.trigger;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
-import com.laosun.aluminium.enums.AttributeType;
-import com.laosun.aluminium.enums.DamageElement;
-import com.laosun.aluminium.enums.DebuffClass;
-import com.laosun.aluminium.enums.SkillType;
-import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.TriggerTable.CompiledRule;
+import com.laosun.aluminium.enums.*;
 import com.laosun.aluminium.models.buff.BuffManager;
 
 import java.util.Locale;
@@ -936,7 +931,7 @@ final class TriggerValidator {
      * what?), and a {@code scale} together with {@code per_target} (a share of a Max HP is already per unit).
      */
     static void requireAmountOrScale(EffectSpec effect, String op, TriggerSpec spec,
-                                             Set<String> scales, String what) {
+                                     Set<String> scales, String what) {
         String scale = effect.getScale() == null ? null : effect.getScale().trim();
         if (scale == null || scale.isEmpty()) {
             // A percentage without a scale is refused *before* the missing amount, because the author clearly

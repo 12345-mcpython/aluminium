@@ -1,11 +1,10 @@
 package com.laosun.aluminium.test.engine;
 
 
-import com.laosun.aluminium.test.content.memosprites.AglaeaMemospriteTest;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.skill.SkillExecutor;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -22,7 +21,8 @@ public class ReasonOdePointAndActionTest {
     private static final int LEVEL = 80;
     private static final int CYRENE = 1415;
     private static final int ANAXA = 1405;
-        @Test
+
+    @Test
     public void itGivesAPointAndMovesHimUp() {
         Character cyrene = CharacterFactory.create(CYRENE, LEVEL);
         Character anaxa = CharacterFactory.create(ANAXA, LEVEL);
@@ -53,7 +53,9 @@ public class ReasonOdePointAndActionTest {
                 "「使那刻夏立即行动」 (makes Anaxa act immediately)-- his action value must come DOWN (" + avBefore + " -> " + avAfter + ")");
     }
 
-    /** How much action value the unit still has -- zero means "acts now" (mirrors AglaeaMemospriteTest). */
+    /**
+     * How much action value the unit still has -- zero means "acts now" (mirrors AglaeaMemospriteTest).
+     */
     private static double timeRemaining(Battle battle, com.laosun.aluminium.models.CanHit target) {
         for (var signal : battle.queue.snapshot()) {
             if (signal.getCanHit() == target) {

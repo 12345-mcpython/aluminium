@@ -1,16 +1,16 @@
 package com.laosun.aluminium.test.trigger;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.skill.DefaultSkill;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -46,16 +46,24 @@ import java.util.Set;
 public class CastSetupTest {
     private static final double EPS = 1e-6;
 
-    /** Evernight (长夜月) - the character whose ultimate is the first user of the op. */
+    /**
+     * Evernight (长夜月) - the character whose ultimate is the first user of the op.
+     */
     private static final int OWNER = 1413;
-    /** Himeko (姬子) - a plain ally, whose casts must not be affected by Evernight (长夜月)'s rule. */
+    /**
+     * Himeko (姬子) - a plain ally, whose casts must not be affected by Evernight (长夜月)'s rule.
+     */
     private static final int ALLY = 1003;
     private static final int LEVEL = 80;
-        /** Slot numbers as {@code skills.json} numbers them. */
+    /**
+     * Slot numbers as {@code skills.json} numbers them.
+     */
     private static final int SKILL_SLOT = 2;
     private static final int ULTRA_SLOT = 3;
 
-    /** The bar is widened so that "removed nothing" and "removed 90" cannot read the same. */
+    /**
+     * The bar is widened so that "removed nothing" and "removed 90" cannot read the same.
+     */
     private static final double BAR = 300;
 
     // ==================================================================
@@ -86,7 +94,9 @@ public class CastSetupTest {
                 "...and the toughness of that swing goes with it, to whoever delivers it");
     }
 
-    /** The gate is the slot the rule names, not "the ultimate": another slot delegates just as well. */
+    /**
+     * The gate is the slot the rule names, not "the ultimate": another slot delegates just as well.
+     */
     @Test
     public void delegatingAnotherSlotWorksTheSameWay() {
         // Himeko (姬子)'s Skill rather than Evernight (长夜月)'s: the point is that the gate is the slot the rule names, and Evernight (长夜月)'s own
@@ -106,7 +116,9 @@ public class CastSetupTest {
     // 2. Refusals - at load time
     // ==================================================================
 
-    /** The op changes the cast being set up, so only the event that hands one over may carry it. */
+    /**
+     * The op changes the cast being set up, so only the event that hands one over may carry it.
+     */
     @Test
     public void theOpIsRefusedOnAnyOtherEvent() {
         IllegalArgumentException refused = Assertions.assertThrows(IllegalArgumentException.class,
@@ -115,7 +127,9 @@ public class CastSetupTest {
         Assertions.assertTrue(refused.getMessage().contains("CAST_SETUP"), refused.getMessage());
     }
 
-    /** The slot is what the op acts on, so it is required. */
+    /**
+     * The slot is what the op acts on, so it is required.
+     */
     @Test
     public void theSlotIsRequired() {
         EffectSpec effect = new EffectSpec();
@@ -178,12 +192,16 @@ public class CastSetupTest {
     // Fixture
     // ==================================================================
 
-    /** How much HP a real cast of {@code slot} takes off the enemy, under the given table. */
+    /**
+     * How much HP a real cast of {@code slot} takes off the enemy, under the given table.
+     */
     private static double hitPointsLost(TriggerTable table, int slot) {
         return hitPointsLost(OWNER, table, slot);
     }
 
-    /** The same, for a caster that is not Evernight (长夜月) (the slot gate is not about ultimates, so it needs another). */
+    /**
+     * The same, for a caster that is not Evernight (长夜月) (the slot gate is not about ultimates, so it needs another).
+     */
     private static double hitPointsLost(int cid, TriggerTable table, int slot) {
         Character owner = CharacterFactory.create(cid, LEVEL);
         owner.setTriggerTable(table);

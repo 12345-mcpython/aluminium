@@ -6,6 +6,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
 import com.google.gson.annotations.JsonAdapter;
 import com.google.gson.annotations.SerializedName;
+import com.laosun.aluminium.models.trigger.TriggerInterpreter;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -20,7 +21,7 @@ import java.util.List;
  * <p>Every effect is a {@code (op, ...args)} pair. The {@code op} vocabulary is deliberately
  * restricted to <b>capabilities the engine already has</b> -- the trigger table is an interpreter
  * over existing engine operations, not a second engine. See
- * {@link com.laosun.aluminium.models.TriggerInterpreter} for the implemented ops - the rest are
+ * {@link TriggerInterpreter} for the implemented ops - the rest are
  * still only planned.
  *
  * <p>Which fields an op reads depends on the op (for example {@code GAIN_ENERGY} uses
@@ -116,16 +117,18 @@ public class EffectSpec {
         copy.effectTurns = this.effectTurns;
         copy.targetWhen = this.targetWhen == null ? null : new java.util.ArrayList<>(this.targetWhen);
         copy.effectMaxStacks = this.effectMaxStacks;
-copy.damageType = this.damageType;
-                copy.capScale = this.capScale;
+        copy.damageType = this.damageType;
+        copy.capScale = this.capScale;
         copy.capPercent = this.capPercent;
         copy.capAmount = this.capAmount;
         copy.skillId = this.skillId;
-return copy;
+        return copy;
     }
 
 
-    /** The same, with the value every {@code percent} read is raised by (see {@code MODIFY_RULE}). */
+    /**
+     * The same, with the value every {@code percent} read is raised by (see {@code MODIFY_RULE}).
+     */
     public EffectSpec withPercent(Double delta) {
         EffectSpec copy = copy();
         if (copy.percent != null && delta != null) {
@@ -134,7 +137,9 @@ return copy;
         return copy;
     }
 
-    /** The same, with every {@code max_stacks} read raised by {@code delta} (see {@code MODIFY_RULE}). */
+    /**
+     * The same, with every {@code max_stacks} read raised by {@code delta} (see {@code MODIFY_RULE}).
+     */
     public EffectSpec withMaxStacks(int delta) {
         EffectSpec copy = copy();
         if (copy.maxStacks != null) {
@@ -143,7 +148,9 @@ return copy;
         return copy;
     }
 
-    /** The same, with the duration every {@code turns} read is raised by (see {@code MODIFY_RULE}). */
+    /**
+     * The same, with the duration every {@code turns} read is raised by (see {@code MODIFY_RULE}).
+     */
     public EffectSpec withTurns(Integer delta) {
         EffectSpec copy = copy();
         if (copy.turns != null && delta != null) {
@@ -390,7 +397,8 @@ return copy;
      * 1505 Feixiao's technique, "进入战斗后，对敌方全体造成等同于绯英 <b>100%</b> 攻击力的
      * <b>物理属性伤容</b>". The two are not the same thing and the difference is measurable: additional damage is
      * boostable-only-as-additional, does not count as an attack and credits the victim energy only on a kill, while the
-     * sentence above describes an ordinary hit.\n     */
+     * sentence above describes an ordinary hit.\n
+     */
     private Boolean ordinary;
 
     /**
@@ -450,8 +458,10 @@ return copy;
     @SerializedName("percent")
     private Double percent;
 
-    /** A counter this modifier's magnitude is multiplied by: "每层[当品]额外使翡翠的攻击力
-     * 提高0.50%" is a SHARE of the base per layer. Read from the effect's TARGET. */
+    /**
+     * A counter this modifier's magnitude is multiplied by: "每层[当品]额外使翡翠的攻击力
+     * 提高0.50%" is a SHARE of the base per layer. Read from the effect's TARGET.
+     */
     @SerializedName("per_stack")
     private String perStack;
 
@@ -476,7 +486,9 @@ return copy;
     @SerializedName("cap_scale")
     private String capScale;
 
-    /** The ceiling's share, used with {@link #capScale} (both are required together). */
+    /**
+     * The ceiling's share, used with {@link #capScale} (both are required together).
+     */
     @SerializedName("cap_percent")
     private Double capPercent;
 
@@ -980,7 +992,7 @@ return copy;
      *   <li>a rule's {@code chance} is a <b>fixed</b> probability (fixed chance) for the whole rule: one roll per
      *       firing, and nothing in the battle can change it;</li>
      *   <li>this is a <b>base</b> chance per target, which the engine runs through the real pipeline
-     *       ({@code Battle.hitChance}: base  x  (1 + the applier's effect hit rate)  x  (1 - the victim's effect resistance)  x 
+     *       ({@code Battle.hitChance}: base  x  (1 + the applier's effect hit rate)  x  (1 - the victim's effect resistance)  x
      *       (1 - its specific resistance for this state)). "50% 基础概率" is 50% <i>before</i> those, exactly
      *       as the text means it, and the roll happens once per victim - three enemies can see three different
      *       outcomes, which a rule-level roll could never express.</li>

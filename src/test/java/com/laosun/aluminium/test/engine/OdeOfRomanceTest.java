@@ -5,8 +5,8 @@ import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Summon;
 import com.laosun.aluminium.models.skill.Skill;
 import com.laosun.aluminium.models.skill.SkillExecutor;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -28,10 +28,12 @@ public class OdeOfRomanceTest {
     private static final int LEVEL = 80;
     private static final int CYRENE = 1415;
     private static final int AGLAEA = 1402;
-        private static final int ODE_OF_ROMANCE = 14;
+    private static final int ODE_OF_ROMANCE = 14;
     private static final String STATE = "浪漫";
 
-    /** The ode is deliverable, and reaching Aglaea leaves [浪漫] on her. */
+    /**
+     * The ode is deliverable, and reaching Aglaea leaves [浪漫] on her.
+     */
     @Test
     public void theOdeIsDeliverableAndMarksAglaea() {
         Character cyrene = CharacterFactory.create(CYRENE, LEVEL);
@@ -57,7 +59,9 @@ public class OdeOfRomanceTest {
                 "「对阿格莱雅施放时，使阿格莱雅获得【" + STATE + "】」 (when cast on Aglaea, makes Aglaea gain that state)");
     }
 
-    /** And the other ally is untouched -- the ode is aimed at ONE unit. */
+    /**
+     * And the other ally is untouched -- the ode is aimed at ONE unit.
+     */
     @Test
     public void anotherAllyIsNotMarked() {
         Character cyrene = CharacterFactory.create(CYRENE, LEVEL);

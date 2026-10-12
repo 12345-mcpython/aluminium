@@ -7,8 +7,8 @@ import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -40,7 +40,10 @@ public class GepardKitTest {
     private static final int GEPARD = 1104;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-        /** Note: "为我方全体提供…护盾": read as the engine reads it - a shield VALUE on each unit. */
+
+    /**
+     * Note: "为我方全体提供…护盾": read as the engine reads it - a shield VALUE on each unit.
+     */
     @Test
     public void hisUltimateShieldsTheCasterAndTheParty() {
         Fixture f = new Fixture(0);
@@ -54,7 +57,9 @@ public class GepardKitTest {
                 "…and the aimed ally, so the rule is not written for `target` alone");
     }
 
-    /** Note: The trace "每回合开始时刷新": his own turn start puts the defence-derived attack bonus on him. */
+    /**
+     * Note: The trace "每回合开始时刷新": his own turn start puts the defence-derived attack bonus on him.
+     */
     @Test
     public void hisTraceRefreshesOnHisTurn() {
         Fixture f = new Fixture(0);
@@ -66,7 +71,9 @@ public class GepardKitTest {
                 "「提高等同于自身当前防御力35%的攻击力，每回合开始时刷新」 (raises ATK by an amount equal to 35% of his current DEF, refreshed at the start of every turn)");
     }
 
-    /** Census: the clauses are where the notes say they are. */
+    /**
+     * Census: the clauses are where the notes say they are.
+     */
     @Test
     public void hisFileCarriesTheClauses() {
         var table = TriggerTables.of(GEPARD);

@@ -8,11 +8,11 @@ import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Damage;
 import com.laosun.aluminium.models.DoubleValue;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.Weapon;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.models.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -25,7 +25,8 @@ import java.util.List;
 public class ConeAggroAndStateTest {
     private static final int WEARER = 1205;
     private static final int LEVEL = 80;
-        private Character wearer(int cone) {
+
+    private Character wearer(int cone) {
         return cone == 0 ? CharacterFactory.create(WEARER, LEVEL)
                 : CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(cone, LEVEL, false, 1));
     }
@@ -75,7 +76,9 @@ public class ConeAggroAndStateTest {
                 "four ultimates cap at two layers of 36%: (1 + 0.72) / 1");
     }
 
-    /** One hit against a FRESH enemy per configuration, so no reading inherits another's damage or state. */
+    /**
+     * One hit against a FRESH enemy per configuration, so no reading inherits another's damage or state.
+     */
     private double hitWith(int cone, boolean applyState, double breakingEffectBonus) {
         Character unit = wearer(cone);
         Enemy enemy = BattleFixture.monster();

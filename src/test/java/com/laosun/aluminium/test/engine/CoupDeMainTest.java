@@ -5,8 +5,8 @@ import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.skill.Skill;
 import com.laosun.aluminium.models.skill.SkillExecutor;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -24,11 +24,13 @@ import java.util.List;
 public class CoupDeMainTest {
     private static final int OWNER = 1412;
     private static final int ALLY = 1002;
-        private static final String PEERAGE = "爵位";
+    private static final String PEERAGE = "爵位";
     private static final String MERIT = "军功";
     private static final String CHARGE = "充能";
 
-    /** The peer's skill is cast twice -- the copy first, then the original -- and not forever. */
+    /**
+     * The peer's skill is cast twice -- the copy first, then the original -- and not forever.
+     */
     @Test
     public void thePeerCastsItsSkillTwice() {
         double withCoup = damageDealt(true);
@@ -40,7 +42,9 @@ public class CoupDeMainTest {
                 "「奇袭不会再次触发奇袭」 (a Coup de Main does not trigger another Coup de Main) -- two casts, not a chain (with=" + withCoup + ", without=" + without + ")");
     }
 
-    /** After the coup, she pays six Charge and the peerage reverts to the merit. */
+    /**
+     * After the coup, she pays six Charge and the peerage reverts to the merit.
+     */
     @Test
     public void theCoupEndsBySpendingSixCharge() {
         Character owner = CharacterFactory.create(OWNER, 80);

@@ -8,13 +8,13 @@ import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.CanHit;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Damage;
-import com.laosun.aluminium.models.skill.DefaultSkill;
 import com.laosun.aluminium.models.DoubleValue;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
-import com.laosun.aluminium.models.skill.Skill;
 import com.laosun.aluminium.models.energy.EnergyGain;
 import com.laosun.aluminium.models.energy.EnergyProvider;
+import com.laosun.aluminium.models.skill.DefaultSkill;
+import com.laosun.aluminium.models.skill.Skill;
 import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -140,7 +140,7 @@ public class EnergyBattleTest {
     }
 
     /**
- * Kill energy gain is independent of damage type: any damage
+     * Kill energy gain is independent of damage type: any damage
      * attributed to a character, as long as it kills a monster, settles kill energy gain for the
      * attacker - including additional damage and true damage, which are "not treated as one attack".
      *
@@ -188,7 +188,7 @@ public class EnergyBattleTest {
     }
 
     /**
- * One attack action grants the target only one energy gain: when one
+     * One attack action grants the target only one energy gain: when one
      * hit breaks an enemy, the skill segment grants the target energy, and the derived break segment /
      * super break segment no longer grants energy (they already have
      * {@code notCountsAsAttack()} set).

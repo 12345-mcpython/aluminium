@@ -2,12 +2,11 @@ package com.laosun.aluminium.test.engine;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
-import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
-import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.models.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -32,12 +31,14 @@ import java.util.List;
  * That is fixed now - {@code ResourceChangeScopeTest} is the case for it - so the split is only a habit.
  */
 public class ResourceChangeHolderTest {
-        private static final String COUNTER = "测试计数";
+    private static final String COUNTER = "测试计数";
     private static final String RECORDED = "测试记录";
     private static final String FROM_SELF = "测试主体是自己";
     private static final String FROM_OTHER = "测试主体是他人";
 
-    /** The announced delta is the GRANTEE's, and the event names the grantee. */
+    /**
+     * The announced delta is the GRANTEE's, and the event names the grantee.
+     */
     @Test
     public void theAnnouncementIsAboutTheStoreThatMoved() {
         Character recorded = granted(record());
@@ -56,7 +57,9 @@ public class ResourceChangeHolderTest {
                 "not the unit that ran the effect - that is the reading this case replaces");
     }
 
-    /** A move the owner makes on its own counter is announced exactly as before (this is the shipped shape). */
+    /**
+     * A move the owner makes on its own counter is announced exactly as before (this is the shipped shape).
+     */
     @Test
     public void aSelfMoveIsUnchanged() {
         Character unit = Character.fromAttributes("unit", 1000, 100, 100, 100);
@@ -162,7 +165,9 @@ public class ResourceChangeHolderTest {
         return receiver;
     }
 
-    /** The four counters the cases read. */
+    /**
+     * The four counters the cases read.
+     */
     private static void declare(Character unit) {
         for (String resource : List.of(COUNTER, RECORDED, FROM_SELF, FROM_OTHER)) {
             if (!unit.getResources().has(resource)) {
@@ -171,7 +176,9 @@ public class ResourceChangeHolderTest {
         }
     }
 
-    /** Books the event's OWN magnitude, which is the number under test. */
+    /**
+     * Books the event's OWN magnitude, which is the number under test.
+     */
     private static EffectSpec record() {
         EffectSpec effect = new EffectSpec();
         TriggerSpecs.set(effect, "op", "GAIN_RESOURCE");

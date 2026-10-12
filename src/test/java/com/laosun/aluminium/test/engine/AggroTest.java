@@ -73,7 +73,9 @@ public class AggroTest {
 
     // ==================================================================
 
-    /** Build a character with the given aggro: set aggro directly, bypassing the data. */
+    /**
+     * Build a character with the given aggro: set aggro directly, bypassing the data.
+     */
     private static Character withAggro(int aggro) {
         Character c = Character.fromAttributes("c" + aggro, 10_000, 100, 100, 100);
         c.setAggro(aggro);

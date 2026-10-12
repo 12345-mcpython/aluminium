@@ -10,11 +10,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Loads memosprite panels from {@code resources/memosprites/<ownerCid>.json} (the memosprite half).
@@ -82,7 +78,9 @@ public final class Memosprites {
         }
     }
 
-    /** The same lookup against a named directory (the servant directory vs the memosprite one). */
+    /**
+     * The same lookup against a named directory (the servant directory vs the memosprite one).
+     */
     public static MemospriteSpec of(int ownerCid, String dir) {
         synchronized (CACHE) {
             if (CACHE.containsKey(ownerCid)) {
@@ -254,7 +252,7 @@ public final class Memosprites {
     }
 
     private static AttributeType requireAttribute(MemospriteSpec.Panel entry, MemospriteSpec spec,
-                                                 String source) {
+                                                  String source) {
         if (entry == null || entry.attribute() == null || entry.attribute().isBlank()) {
             throw new IllegalArgumentException(
                     "Memosprite '" + spec.name() + "' has a panel entry with no \"attribute\" (" + source + ")");
@@ -366,7 +364,9 @@ public final class Memosprites {
         }
     }
 
-    /** The same load against a named directory (the servant directory vs the memosprite one). */
+    /**
+     * The same load against a named directory (the servant directory vs the memosprite one).
+     */
     private static MemospriteSpec load(int ownerCid, String dir) {
         String path = resourceFor(ownerCid, dir);
         if (path == null) {
@@ -402,7 +402,9 @@ public final class Memosprites {
         return Memosprites.class.getResource(path) == null ? null : path;
     }
 
-    /** The same path rule for a named directory. */
+    /**
+     * The same path rule for a named directory.
+     */
     private static String resourceFor(int ownerCid, String dir) {
         String path = "/" + dir + "/" + ownerCid + ".json";
         return Memosprites.class.getResource(path) == null ? null : path;

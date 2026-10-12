@@ -1,25 +1,29 @@
 package com.laosun.aluminium.test.engine;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-/** How many stacks survive when they come from one rule vs two? */
+/**
+ * How many stacks survive when they come from one rule vs two?
+ */
 public class HandBuiltStackProbeTest {
     private static final int OWNER = 1002;
     private static final int LEVEL = 80;
-        private static final String STACK = "probeStack";
+    private static final String STACK = "probeStack";
 
-    /** Baseline: one rule, one application. */
+    /**
+     * Baseline: one rule, one application.
+     */
     @Test
     public void oneRuleGivesOne() {
         int stacks = stacksAfter(1);
@@ -27,7 +31,9 @@ public class HandBuiltStackProbeTest {
         Assertions.assertEquals(1, stacks, "one application is one stack");
     }
 
-    /** The question: does a second rule add a second stack, or replace the first? */
+    /**
+     * The question: does a second rule add a second stack, or replace the first?
+     */
     @Test
     public void twoRulesGiveHowMany() {
         int stacks = stacksAfter(2);
@@ -36,7 +42,9 @@ public class HandBuiltStackProbeTest {
                 "if this fails with 1, the hand-built-table plumbing replaces instead of accumulating");
     }
 
-    /** The third variable: the same two rules, but the table also DECLARES a resource. */
+    /**
+     * The third variable: the same two rules, but the table also DECLARES a resource.
+     */
     @Test
     public void twoRulesWithADeclaredResource() {
         int stacks = stacksAfter(2, true, false);
@@ -44,7 +52,9 @@ public class HandBuiltStackProbeTest {
         Assertions.assertEquals(2, stacks, "declaring a resource must not empty the table");
     }
 
-    /** And with a STATE_ENDED rule as well, which is what the rolled-back judge had. */
+    /**
+     * And with a STATE_ENDED rule as well, which is what the rolled-back judge had.
+     */
     @Test
     public void twoRulesPlusAStateEndedRule() {
         int stacks = stacksAfter(2, true, true);

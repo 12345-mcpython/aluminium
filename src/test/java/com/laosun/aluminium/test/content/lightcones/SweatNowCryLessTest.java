@@ -4,14 +4,12 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.DamageType;
+import com.laosun.aluminium.models.*;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.Damage;
-import com.laosun.aluminium.models.DoubleValue;
-import com.laosun.aluminium.models.Summon;
-import com.laosun.aluminium.models.Weapon;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.models.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -29,7 +27,7 @@ public class SweatNowCryLessTest {
     private static final int WEARER = 1402;   // has resources/memosprites/1402.json
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-        private Character wearer;
+    private Character wearer;
     private Enemy enemy;
     private Battle battle;
 
@@ -89,7 +87,7 @@ public class SweatNowCryLessTest {
         battle.summonMemosprite(wearer);
         int pinned = 0;
         for (var rule : wearer.getTriggerTable().matching(com.laosun.aluminium.enums.TriggerEvent.DEALING_DAMAGE,
-                new com.laosun.aluminium.models.TriggerTable.TriggerContext(wearer, wearer, enemy, 0, 0, null,
+                new TriggerTable.TriggerContext(wearer, wearer, enemy, 0, 0, null,
                         battle, null))) {
             if (!rule.id().startsWith("cone21052_")) {
                 continue;

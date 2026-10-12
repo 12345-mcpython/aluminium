@@ -1,10 +1,12 @@
-package com.laosun.aluminium.models;
+package com.laosun.aluminium.models.trigger;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.Path;
-import com.laosun.aluminium.models.TriggerTable.TriggerContext;
+import com.laosun.aluminium.models.CanHit;
+import com.laosun.aluminium.models.Character;
+import com.laosun.aluminium.models.trigger.TriggerTable.TriggerContext;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -114,7 +116,8 @@ final class TriggerTargets {
                             ? null
                             : ctx.battle().waveMonsters().getFirst(),
                     "wave_monster", ctx);
-            case TriggerVocabulary.TARGET_RANDOM_HIT_ENEMY -> require(randomHitEnemy(ctx), TriggerVocabulary.TARGET_RANDOM_HIT_ENEMY, ctx);
+            case TriggerVocabulary.TARGET_RANDOM_HIT_ENEMY ->
+                    require(randomHitEnemy(ctx), TriggerVocabulary.TARGET_RANDOM_HIT_ENEMY, ctx);
             // Among the units this attack hit, the one with the highest CURRENT HP.
             case "highest_hp_attack_hit" -> require(highestHitTarget(ctx), "highest_hp_attack_hit", ctx);
             // The fallback: "if the target is defeated ..., launch it at a random single enemy". The preferred target
@@ -127,8 +130,9 @@ final class TriggerTargets {
                         : require(ctx.battle() == null ? null
                         : ctx.battle().randomOpponent(ctx.owner()), "target_else_random_enemy", ctx);
             }
-            case TriggerVocabulary.TARGET_RANDOM_ENEMY -> require(ctx.battle() == null ? null : ctx.battle().randomOpponent(ctx.owner()),
-                    TriggerVocabulary.TARGET_RANDOM_ENEMY, ctx);
+            case TriggerVocabulary.TARGET_RANDOM_ENEMY ->
+                    require(ctx.battle() == null ? null : ctx.battle().randomOpponent(ctx.owner()),
+                            TriggerVocabulary.TARGET_RANDOM_ENEMY, ctx);
             // "the enemy target with the highest HP" - ALL of the opponents, not the ones this attack happened to hit.
             // Reader: 1506 Silver Wolf LV.999's 【超超超大剑】 - 「对生命值最高的敌方目标额外造成…真实伤害」 - which fires from a
             // Skill-Point event that carries no hit set at all, so `highest_hp_attack_hit` (same pool as
@@ -175,7 +179,7 @@ final class TriggerTargets {
                 // EVERY memosprite on our side, not just the rule owner's: the clause is "raise the CRIT DMG of all of our memosprites", and `summonsOf` is keyed
                 // by master -- so each of our characters is asked. `all_allies` answers "who is on that side" the same way.
                 List<CanHit> everySummon = new ArrayList<>();
-                for (Character ally : battle.characters) {
+                for (com.laosun.aluminium.models.Character ally : battle.characters) {
                     everySummon.addAll(battle.summonsOf(ally));
                 }
                 return List.copyOf(everySummon);
@@ -221,7 +225,7 @@ final class TriggerTargets {
             }
             List<CanHit> ofPath = new ArrayList<>();
             for (CanHit ally : battle.allies) {
-                if (ally instanceof Character character && character.getPath() == wanted) {
+                if (ally instanceof com.laosun.aluminium.models.Character character && character.getPath() == wanted) {
                     ofPath.add(ally);
                 }
             }
@@ -359,7 +363,7 @@ final class TriggerTargets {
         }
         List<CanHit> selected = new ArrayList<>();
         for (CanHit ally : ctx.battle().allies) {
-            if (ally instanceof Character character && character.getPath() == wanted && !excluded.contains(ally)) {
+            if (ally instanceof com.laosun.aluminium.models.Character character && character.getPath() == wanted && !excluded.contains(ally)) {
                 selected.add(ally);
             }
         }
@@ -382,7 +386,7 @@ final class TriggerTargets {
         if (ctx.battle() == null) {
             return null;
         }
-        for (Character member : ctx.battle().characters) {
+        for (com.laosun.aluminium.models.Character member : ctx.battle().characters) {
             if (member.getCid() == cid) {
                 return member;
             }

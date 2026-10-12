@@ -6,11 +6,11 @@ import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
-import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.models.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -35,7 +35,9 @@ public class SuperBreakContentTest {
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
 
-    /** Note: Both gates are on the rule: the attacker carries [伴舞] and the target is "处于弱点击破状态". */
+    /**
+     * Note: Both gates are on the rule: the attacker carries [伴舞] and the target is "处于弱点击破状态".
+     */
     @Test
     public void bothGatesAreOnTheRule() {
         Character harmony = CharacterFactory.create(HARMONY, LEVEL);
@@ -57,14 +59,18 @@ public class SuperBreakContentTest {
                 "⚠ 「**持有【伴舞】的**我方目标」 (an ally **holding Backup Dancer**): an attacker without the state does not match");
     }
 
-    /** Her file carries the clause now (and the tally says so). */
+    /**
+     * Her file carries the clause now (and the tally says so).
+     */
     @Test
     public void herFileCarriesTheConversion() {
         Assertions.assertEquals(2, TriggerTables.of(HARMONY).ruleCount(TriggerEvent.DEALING_DAMAGE),
                 "the conversion rule is one of the file's DEALING_DAMAGE rules (2 since the skill extra-hits clause landed)");
     }
 
-    /** 1321's Skill hands the whole side the toughness boost - "弱点击破效率提高 50%". */
+    /**
+     * 1321's Skill hands the whole side the toughness boost - "弱点击破效率提高 50%".
+     */
     @Test
     public void herSkillRaisesThePartysToughnessEfficiency() {
         Character bloom = CharacterFactory.create(BLOOM, LEVEL);
@@ -89,7 +95,9 @@ public class SuperBreakContentTest {
         return new TriggerTable.TriggerContext(owner, actor, target, 0, 0, null, battle);
     }
 
-    /** Note: An enemy that HAS a toughness bar and a weakness, found by asking rather than assumed. */
+    /**
+     * Note: An enemy that HAS a toughness bar and a weakness, found by asking rather than assumed.
+     */
     private static Enemy enemyWithAToughnessBar() {
         for (int id = 1002010; id < 1002100; id++) {
             try {
@@ -104,7 +112,9 @@ public class SuperBreakContentTest {
         throw new AssertionError("no enemy with a toughness bar in the probed range");
     }
 
-    /** Breaks an enemy through the engine, using <b>its own declared weakness</b> (never a hard-coded element). */
+    /**
+     * Breaks an enemy through the engine, using <b>its own declared weakness</b> (never a hard-coded element).
+     */
     private static void breakIt(Battle battle, Character breaker, Enemy enemy) {
         DamageElement element = enemy.getStanceWeak().iterator().next();
         battle.reduceToughness(breaker, enemy, element, 999);

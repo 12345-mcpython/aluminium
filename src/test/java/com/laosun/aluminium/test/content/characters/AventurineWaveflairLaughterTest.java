@@ -3,8 +3,8 @@ package com.laosun.aluminium.test.content.characters;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -20,9 +20,11 @@ import java.util.List;
 public class AventurineWaveflairLaughterTest {
     private static final int AVENTURINE = 1513;
     private static final int ALLY = 1002;
-        private static final String LAUGH = "笑点";
+    private static final String LAUGH = "笑点";
 
-    /** "Skill ... gain 4 笑点" */
+    /**
+     * "Skill ... gain 4 笑点"
+     */
     @Test
     public void herSkillGivesFour() {
         Scene scene = fight();
@@ -31,7 +33,9 @@ public class AventurineWaveflairLaughterTest {
         Assertions.assertEquals(4, scene.battle.partyResourceValue(LAUGH), "\"gain 4 笑点\" (gain 4 Punchline)");
     }
 
-    /** "Ultimate ... gain 6 笑点" */
+    /**
+     * "Ultimate ... gain 6 笑点"
+     */
     @Test
     public void herUltimateGivesSix() {
         Scene scene = fight();
@@ -39,7 +43,9 @@ public class AventurineWaveflairLaughterTest {
         Assertions.assertEquals(6, scene.battle.partyResourceValue(LAUGH), "\"gain 6 笑点\" (gain 6 Punchline)");
     }
 
-    /** "after a teammate casts an attack ... and 1 笑点" -- a REAL teammate attack, not a hand-fired event. */
+    /**
+     * "after a teammate casts an attack ... and 1 笑点" -- a REAL teammate attack, not a hand-fired event.
+     */
     @Test
     public void aTeammateAttackGivesOne() {
         Scene scene = fight();
@@ -48,7 +54,9 @@ public class AventurineWaveflairLaughterTest {
         Assertions.assertEquals(1, scene.battle.partyResourceValue(LAUGH), "\"and 1 笑点\" (and 1 more Punchline)");
     }
 
-    /** THE SHARED COUNTER: all three in one battle sum, because Punchline (笑点) is party-scoped. */
+    /**
+     * THE SHARED COUNTER: all three in one battle sum, because Punchline (笑点) is party-scoped.
+     */
     @Test
     public void theCounterIsSharedAcrossTheParty() {
         Scene scene = fight();

@@ -4,11 +4,11 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.SkillCategory;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.Weapon;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.models.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -23,7 +23,7 @@ public class NinjutsuInscriptionDazzlingEvilbreakerTest {
     private static final int WEARER = 1205;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-        private static final String MINE = "雷遁";
+    private static final String MINE = "雷遁";
     private static final String COUNT = "普攻计数";
     private static final double RANK_ONE = 0.5;
     private static final double RANK_TWO = 0.55;
@@ -96,7 +96,9 @@ public class NinjutsuInscriptionDazzlingEvilbreakerTest {
                 "the two ranks' advances must be in the ratio of their shares");
     }
 
-    /** How far the wearer's next action moves when the payout fires, at the given superimposition rank. */
+    /**
+     * How far the wearer's next action moves when the payout fires, at the given superimposition rank.
+     */
     private double advanceDistance(int rank) {
         wearer = CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(CONE, LEVEL, false, rank));
         Character ally = CharacterFactory.create(ALLY, LEVEL);

@@ -1,16 +1,16 @@
 package com.laosun.aluminium.test.trigger;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Damage;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -29,7 +29,7 @@ import java.util.Random;
 public class AddDamageOpTest {
     private static final int OWNER = 1001;
     private static final int LEVEL = 80;
-        /**
+    /**
      * The instance base every case uses.
      *
      * <p>Note: Deliberately NOT 100: with a base of 100, "+X" and "+X%" are the same number, so the trap this op
@@ -38,7 +38,9 @@ public class AddDamageOpTest {
      */
     private static final double BASE = 400;
 
-    /** The addend is 30% of the owner's DEFENCE, added to the settled instance. */
+    /**
+     * The addend is 30% of the owner's DEFENCE, added to the settled instance.
+     */
     @Test
     public void theAddendIsDerivedFromTheOwnersAttribute() {
         Fixture f = new Fixture(0.30);
@@ -54,7 +56,9 @@ public class AddDamageOpTest {
                 "the settled damage equals a base of \"100 + 30% DEF\" run through the same zones");
     }
 
-    /** Note: The trap: a percentage of the instance and a value equal to 30% DEF are different numbers unless they coincide. */
+    /**
+     * Note: The trap: a percentage of the instance and a value equal to 30% DEF are different numbers unless they coincide.
+     */
     @Test
     public void itIsNotAPercentageOfTheInstance() {
         Fixture f = new Fixture(0.30);
@@ -69,7 +73,9 @@ public class AddDamageOpTest {
                         + " against an addend of " + addend);
     }
 
-    /** A rule may not state it anywhere but on the instance's own event, and it reads no other field. */
+    /**
+     * A rule may not state it anywhere but on the instance's own event, and it reads no other field.
+     */
     @Test
     public void theShapeIsRefusedAtLoad() {
         IllegalArgumentException wrongEvent = Assertions.assertThrows(IllegalArgumentException.class,
@@ -82,7 +88,9 @@ public class AddDamageOpTest {
                 () -> table(TriggerSpecs.rule("DEALING_DAMAGE", null, noScale)), "a derived value needs its scale");
     }
 
-    /** The shipped sentence: her Eidolon 4 states the addend on the counter's own damage instance. */
+    /**
+     * The shipped sentence: her Eidolon 4 states the addend on the counter's own damage instance.
+     */
     @Test
     public void theShippedEidolonStatesTheAddend() {
         Character owner = CharacterFactory.create(OWNER, LEVEL, true, null, null, 4);
@@ -119,7 +127,9 @@ public class AddDamageOpTest {
             this.rule = null;
         }
 
-        /** Runs one damage instance of a fixed base, optionally with the op armed on DEALING_DAMAGE. */
+        /**
+         * Runs one damage instance of a fixed base, optionally with the op armed on DEALING_DAMAGE.
+         */
         private double damageTaken(TriggerSpec armed) {
             if (armed != null) {
                 owner.setTriggerTable(new TriggerTable(OWNER, List.of(armed)));
@@ -133,7 +143,9 @@ public class AddDamageOpTest {
         }
     }
 
-    /** The op as a rule on the instance's own event. */
+    /**
+     * The op as a rule on the instance's own event.
+     */
     private static TriggerSpec armed(double percent) {
         return TriggerSpecs.rule("DEALING_DAMAGE", null, addDamage(percent));
     }

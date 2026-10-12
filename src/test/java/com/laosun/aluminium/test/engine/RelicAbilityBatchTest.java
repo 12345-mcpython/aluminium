@@ -2,26 +2,23 @@ package com.laosun.aluminium.test.engine;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
+import com.laosun.aluminium.beans.MemospriteSpec;
 import com.laosun.aluminium.data.RelicTriggerTables;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.DamageType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.CanHit;
+import com.laosun.aluminium.models.*;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.Damage;
-import com.laosun.aluminium.models.DoubleValue;
-import com.laosun.aluminium.beans.MemospriteSpec;
-import com.laosun.aluminium.models.Summon;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.buff.StatModifierBuff;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.models.enemy.SummonFactory;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.models.skill.DefaultSkill;
-import com.laosun.aluminium.utils.RelicFactory;
+import com.laosun.aluminium.models.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.utils.RelicFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -45,7 +42,9 @@ import java.util.List;
 public class RelicAbilityBatchTest {
     private static final double EPS = 1e-6;
 
-    /** Himeko (姬子) - carries no rule file of her own, so only the set's rules are in play. */
+    /**
+     * Himeko (姬子) - carries no rule file of her own, so only the set's rules are in play.
+     */
     private static final int WEARER = 1003;
     /**
      * The "someone else" in the cases that need a second character. Deliberately the SAME rule-less character as
@@ -71,26 +70,38 @@ public class RelicAbilityBatchTest {
     private static final int POET = 124;
     private static final int SERENE_DEMESNE = 319;
     private static final int RAPT_BROODING = 320;
-    /** "对己方角色施放" family, authored with the `is_ally` condition. */
+    /**
+     * "对己方角色施放" family, authored with the `is_ally` condition.
+     */
     private static final int MESSENGER = 114;
     private static final int WATCHMAKER = 118;
     private static final int SACERDOS = 121;
     private static final int SKILL_SLOT = 2;
     private static final int ULT_SLOT = 3;
-    /** Amphoreus, the Eternal Land (生命的翁法罗斯): the derived-value set (its bonus is a function of Max Energy). */
+    /**
+     * Amphoreus, the Eternal Land (生命的翁法罗斯): the derived-value set (its bonus is a function of Max Energy).
+     */
     private static final int AMPHOREUS = 328;
-    /** Izumo Gensei and Takama Divine Realm (出云显世与高天神国): the party-composition set (its CRIT Rate needs a teammate on the same Path). */
+    /**
+     * Izumo Gensei and Takama Divine Realm (出云显世与高天神国): the party-composition set (its CRIT Rate needs a teammate on the same Path).
+     */
     private static final int IZUMO = 314;
-    /** Talia: Kingdom of Banditry (盗贼公国塔利亚): the weakness-gated set (its Break Effect needs a fire-weak enemy). */
+    /**
+     * Talia: Kingdom of Banditry (盗贼公国塔利亚): the weakness-gated set (its Break Effect needs a fire-weak enemy).
+     */
     private static final int BANDITRY = 316;
-    /** 逐火者的航迹 (Revelry by the Sea): the damage-category set (its boost touches DoT only). */
+    /**
+     * 逐火者的航迹 (Revelry by the Sea): the damage-category set (its boost touches DoT only).
+     */
     private static final int REVELRY = 322;
 
     // ==================================================================
     // 102 - basic attack damage +10%
     // ==================================================================
 
-    /** The Basic ATK half is a rule; the SPD half is the data path's `properties` stat (and is not repeated). */
+    /**
+     * The Basic ATK half is a rule; the SPD half is the data path's `properties` stat (and is not repeated).
+     */
     @Test
     public void theMusketeerBoostsBasicAttacksAndNotSkills() {
         Character wearer = wearing(MUSKETEER);
@@ -106,7 +117,9 @@ public class RelicAbilityBatchTest {
     // 111 - energy back after breaking a weakness
     // ==================================================================
 
-    /** Only the wearer's own break pays, and the amount is the parameter's 3. */
+    /**
+     * Only the wearer's own break pays, and the amount is the parameter's 3.
+     */
     @Test
     public void theThiefRegainsEnergyOnItsOwnBreak() {
         Character wearer = wearing(THIEF);
@@ -191,7 +204,9 @@ public class RelicAbilityBatchTest {
     // 310 - when effect RES >= 30%, the whole party's CRIT DMG +10%
     // ==================================================================
 
-    /** The threshold is 30%, it is a fraction, and it reaches the whole side. */
+    /**
+     * The threshold is 30%, it is a fraction, and it reaches the whole side.
+     */
     @Test
     public void theBrokenKeelAppliesAboveItsThreshold() {
         Assertions.assertEquals(0.1,
@@ -206,7 +221,9 @@ public class RelicAbilityBatchTest {
     // 10, 120, 311, 12-- the second pass over the backlog
     // ==================================================================
 
-    /** The Skill boost is permanent, and the fire boost is consumed by the next attack. */
+    /**
+     * The Skill boost is permanent, and the fire boost is consumed by the next attack.
+     */
     @Test
     public void theFiresmithBoostsTheNextAttackAfterItsUltimate() {
         Character wearer = wearing(FIRESMITH);
@@ -225,7 +242,9 @@ public class RelicAbilityBatchTest {
                 "「下一次攻击」 (the next attack): the attack has happened, so the boost is gone");
     }
 
-    /** Only the wearer's own follow-up grants it, and the share is the parameter's 36%. */
+    /**
+     * Only the wearer's own follow-up grants it, and the share is the parameter's 36%.
+     */
     @Test
     public void theValorousBoostsUltimateDamageAfterItsOwnFollowUp() {
         Character wearer = wearing(VALOROUS);
@@ -242,7 +261,9 @@ public class RelicAbilityBatchTest {
                 "param #2 is 0.36 -- the registered reason said 12%");
     }
 
-    /** The two nested thresholds must not both apply: 160 speed grants 18%, not 12% + 18%. */
+    /**
+     * The two nested thresholds must not both apply: 160 speed grants 18%, not 12% + 18%.
+     */
     @Test
     public void theGlamothTiersAreExclusive() {
         Assertions.assertEquals(0, damageBoostAtSpeed(130), EPS, "below the first threshold");
@@ -335,7 +356,9 @@ public class RelicAbilityBatchTest {
                         + "the base 0.5 CRIT DMG every character has, and the memosprite's panel gives it none.)");
     }
 
-    /** Below the threshold nothing is granted, to either unit. */
+    /**
+     * Below the threshold nothing is granted, to either unit.
+     */
     @Test
     public void aPreBattleMemospriteEffectRespectsItsThreshold() {
         Character wearer = wearing(SERENE_DEMESNE);
@@ -353,7 +376,9 @@ public class RelicAbilityBatchTest {
                 "4000 is below 「大于等于 5000 点」 (at least 5000 points) -- and HEALTH is a base attribute, so the literal is absolute");
     }
 
-    /** The nested tiers hold on both halves: 90 speed grants 32%, not 20% + 32%. */
+    /**
+     * The nested tiers hold on both halves: 90 speed grants 32%, not 20% + 32%.
+     */
     @Test
     public void thePoetsNestedTiersHoldOnBothHalves() {
         Character wearer = wearing(POET);                        // 哀歌覆国的诗人 (Poet of Mourning Collapse): SPD < 110 / < 95
@@ -375,7 +400,9 @@ public class RelicAbilityBatchTest {
                 "and the wearer was granted hers at the start");
     }
 
-    /** The healing tiers reach the memosprite too, through OUTGOING_HEALING_BOOST. */
+    /**
+     * The healing tiers reach the memosprite too, through OUTGOING_HEALING_BOOST.
+     */
     @Test
     public void theGiantTreesHealingTiersReachTheMemosprite() {
         Character wearer = wearing(RAPT_BROODING);               // 渊思寂虑的巨树 (Giant Tree of Rapt Brooding): SPD >= 135 / >= 180
@@ -432,7 +459,9 @@ public class RelicAbilityBatchTest {
                 "aimed at an ENEMY: 「对己方角色」 (on one of our own characters) does not hold, so nothing is granted");
     }
 
-    /** 118 Watchmaker, Master of Dream Machinations (梦游者钟表匠): the same trigger, a ratio attribute (+30% Break Effect, 2 turns). */
+    /**
+     * 118 Watchmaker, Master of Dream Machinations (梦游者钟表匠): the same trigger, a ratio attribute (+30% Break Effect, 2 turns).
+     */
     @Test
     public void theWatchmakerUltimateRaisesThePartysBreakEffect() {
         Character wearer = wearing(WATCHMAKER);
@@ -447,7 +476,9 @@ public class RelicAbilityBatchTest {
                 "「击破特攻提高#1[i]%」 (Break Effect is raised by #1[i]%) -- a ratio attribute, so 0.3 is an absolute +30%");
     }
 
-    /** 121 Sacerdos' Relived Ordeal (祭司的旧日祭礼): the Skill on an ally raises THAT ally's CRIT DMG, and it stacks to the cap it states. */
+    /**
+     * 121 Sacerdos' Relived Ordeal (祭司的旧日祭礼): the Skill on an ally raises THAT ally's CRIT DMG, and it stacks to the cap it states.
+     */
     @Test
     public void theSacerdosSkillBuffsTheAimedAllyAndStacksTwice() {
         Character wearer = wearing(SACERDOS);
@@ -488,7 +519,9 @@ public class RelicAbilityBatchTest {
                 "below the threshold nothing is granted at all (and 0.002 x 150 - 0.4 would have been negative)");
     }
 
-    /** The modifier the rule granted on all-damage boost, or 0 when it granted none. */
+    /**
+     * The modifier the rule granted on all-damage boost, or 0 when it granted none.
+     */
     private static double grantedDamageBoost(double maxEnergy) {
         Character wearer = wearing(AMPHOREUS);
         wearer.setMaxEnergy(maxEnergy);
@@ -523,7 +556,9 @@ public class RelicAbilityBatchTest {
                 "Guinaifen (桂乃芬) is Nihility (虚无): the condition does not hold, so nothing is granted");
     }
 
-    /** The CRIT Rate modifier the suit granted, or 0 when it granted none. */
+    /**
+     * The CRIT Rate modifier the suit granted, or 0 when it granted none.
+     */
     private static double grantedCritRateWith(int allyCid) {
         Character wearer = wearing(IZUMO);
         Character ally = CharacterFactory.create(allyCid, LEVEL);
@@ -557,7 +592,9 @@ public class RelicAbilityBatchTest {
                 "the same hit on an enemy without that weakness grants nothing");
     }
 
-    /** The wearer's Break Effect after it deals one instance of damage to an enemy (weak to fire or not). */
+    /**
+     * The wearer's Break Effect after it deals one instance of damage to an enemy (weak to fire or not).
+     */
     private static double breakEffectAfterHit(boolean fireWeak) {
         Character wearer = wearing(BANDITRY);
         Enemy target = dummy();
@@ -615,7 +652,9 @@ public class RelicAbilityBatchTest {
                 "「使装备者造成的持续伤害额外提高 12%」 (raises the DoT the wearer deals by an extra 12%) must reach the tick (" + boosted + " vs " + plain + ")");
     }
 
-    /** How much HP one DoT tick takes off the enemy, with the wearer at this ATK. */
+    /**
+     * How much HP one DoT tick takes off the enemy, with the wearer at this ATK.
+     */
     private static double firstDotDamage(double attack) {
         Character wearer = wearing(REVELRY);
         wearer.setAttribute(AttributeType.ATTACK, new DoubleValue(attack));
@@ -637,7 +676,9 @@ public class RelicAbilityBatchTest {
         return before - enemy.getCurrentHp();
     }
 
-    /** The DoT-boost modifier the suit granted to a wearer with this ATK, or 0 when it granted none. */
+    /**
+     * The DoT-boost modifier the suit granted to a wearer with this ATK, or 0 when it granted none.
+     */
     private static double dotBoostAtAttack(double attack) {
         Character wearer = wearing(REVELRY);
         wearer.setAttribute(AttributeType.ATTACK, new DoubleValue(attack));
@@ -657,7 +698,9 @@ public class RelicAbilityBatchTest {
     // Fixture
     // ==================================================================
 
-    /** A minimal memosprite for a master whose own file has none, placed the way summonMemosprite does. */
+    /**
+     * A minimal memosprite for a master whose own file has none, placed the way summonMemosprite does.
+     */
     private static Summon fixtureMemosprite(Battle battle, Character master) {
         Summon summon = SummonFactory.memosprite(master, new MemospriteSpec("fixture", "RelicAbilityBatchTest", null,
                 List.of(new MemospriteSpec.Panel("HEALTH", 0.5, null),
@@ -669,7 +712,9 @@ public class RelicAbilityBatchTest {
         return summon;
     }
 
-    /** The wearer at a stated speed, with set 311 on: the scoped boost it grants. */
+    /**
+     * The wearer at a stated speed, with set 311 on: the scoped boost it grants.
+     */
     private static double damageBoostAtSpeed(double speed) {
         Character wearer = wearing(GLAMOTH);
         wearer.setAttribute(AttributeType.SPEED, new DoubleValue(speed));
@@ -683,7 +728,9 @@ public class RelicAbilityBatchTest {
                 RelicFactory.suit(setId, STAR, RELIC_LEVEL));
     }
 
-    /** The wearer at a stated Effect RES, with the set on: her CRIT DMG (the party buff lands on her too). */
+    /**
+     * The wearer at a stated Effect RES, with the set on: her CRIT DMG (the party buff lands on her too).
+     */
     private static double brokenKeelCritDamageAt(double effectRes) {
         Character wearer = wearing(BROKEN_KEEL);
         wearer.setAttribute(AttributeType.EFFECT_RESISTANCE, new DoubleValue(effectRes));
@@ -700,7 +747,9 @@ public class RelicAbilityBatchTest {
         return CharacterFactory.create(WEARER, LEVEL).getAttribute(AttributeType.CRIT_ATTACK).get();
     }
 
-    /** One settled hit with no crit and no weakness games, so two runs differ only by the rule under test. */
+    /**
+     * One settled hit with no crit and no weakness games, so two runs differ only by the rule under test.
+     */
     private static double hit(Battle battle, Character attacker, Enemy target) {
         return battle.applyDamage(target,
                 new Damage(attacker, target, DamageElement.PHYSICAL, DamageType.NORMAL, 1_000));

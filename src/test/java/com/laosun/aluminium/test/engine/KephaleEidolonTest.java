@@ -5,8 +5,8 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -22,7 +22,7 @@ public class KephaleEidolonTest {
     private static final int OWNER = 1412;   // the marked ally is the Skill's target
     private static final int ALLY = 1210;
     private static final int LEVEL = 80;
-        private static final double EPS = 1e-9;
+    private static final double EPS = 1e-9;
     private static final int RANK = 1;
 
     @Test
@@ -31,7 +31,9 @@ public class KephaleEidolonTest {
         Assertions.assertEquals(0.0, marked(false), EPS, "without the gate nothing is stated");
     }
 
-    /** The candidate's DEFENCE_IGNORE with and without the gating cast. */
+    /**
+     * The candidate's DEFENCE_IGNORE with and without the gating cast.
+     */
     private static double marked(boolean gated) {
         Character owner = CharacterFactory.create(OWNER, LEVEL, true, null, null, RANK);
         Character partner = CharacterFactory.create(ALLY, LEVEL);

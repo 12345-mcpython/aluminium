@@ -4,8 +4,8 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Signal;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -20,9 +20,11 @@ import java.util.List;
  */
 public class ArlanEidolonFourTest {
     private static final int ARLAN = 1008;
-        private static final String STATE = "绝处反击";
+    private static final String STATE = "绝处反击";
 
-    /** At E4 the first lethal blow restores him to a quarter of his Max HP. */
+    /**
+     * At E4 the first lethal blow restores him to a quarter of his Max HP.
+     */
     @Test
     public void atEidolonFourHeSurvivesAtAQuarter() {
         double[] result = afterLethalBlows(4, 1, 0);
@@ -31,13 +33,17 @@ public class ArlanEidolonFourTest {
                 "\"restore to 25% of one's own Max HP\"");
     }
 
-    /** Note: Below E4 he falls. */
+    /**
+     * Note: Below E4 he falls.
+     */
     @Test
     public void belowEidolonFourHeFalls() {
         Assertions.assertTrue(afterLethalBlows(0, 1, 0)[0] <= 0, "only Eidolon 4 has this clause");
     }
 
-    /** "this effect is automatically removed after triggering 1 time ...": the second blow in the same battle is NOT answered. */
+    /**
+     * "this effect is automatically removed after triggering 1 time ...": the second blow in the same battle is NOT answered.
+     */
     @Test
     public void theFirstBlowConsumesTheTrace() {
         double[] one = afterLethalBlows(4, 1, 0);
@@ -46,7 +52,9 @@ public class ArlanEidolonFourTest {
         Assertions.assertTrue(two[0] <= 0, "the second is **no longer** answered (\"automatically removed after triggering 1 time\")");
     }
 
-    /** "or automatically removed after lasting 2 turns": after two of HIS turns the trace is gone, even though it never triggered. */
+    /**
+     * "or automatically removed after lasting 2 turns": after two of HIS turns the trace is gone, even though it never triggered.
+     */
     @Test
     public void twoTurnsEndTheTraceUntriggered() {
         double[] fresh = afterLethalBlows(4, 1, 0);
@@ -57,7 +65,9 @@ public class ArlanEidolonFourTest {
 
     // ==================================================================
 
-    /** { his HP after the blows, his Max HP }. {@code turns} of his own turns elapse before the blows. */
+    /**
+     * { his HP after the blows, his Max HP }. {@code turns} of his own turns elapse before the blows.
+     */
     private static double[] afterLethalBlows(int eidolon, int blows, int turns) {
         Character him = CharacterFactory.create(ARLAN, 80, false, null, null, eidolon);
         Battle battle = new Battle(List.of(him),

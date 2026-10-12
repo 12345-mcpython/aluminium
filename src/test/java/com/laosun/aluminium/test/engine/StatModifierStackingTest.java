@@ -1,23 +1,22 @@
 package com.laosun.aluminium.test.engine;
 
 
-import com.laosun.aluminium.test.data.BuffRuleTest;
-import com.laosun.aluminium.test.support.BattleFixture;
-import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.buff.AbstractBuff;
 import com.laosun.aluminium.models.CanHit;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.DoubleValue;
+import com.laosun.aluminium.models.buff.AbstractBuff;
+import com.laosun.aluminium.models.buff.StatModifierBuff;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
-import com.laosun.aluminium.models.TriggerTable;
-import com.laosun.aluminium.models.buff.StatModifierBuff;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -32,7 +31,7 @@ import java.util.List;
  * <ul>
  *   <li><b>Stacking is opt-in.</b> {@code StatModifierBuff.isSameKind} historically means "re-applying
  *       this replaces it", and two shipped tests depend on that. A stackable buff must accumulate
- *       <em>without</em> changing that predicate, so both behaviours are asserted here side by side - 
+ *       <em>without</em> changing that predicate, so both behaviours are asserted here side by side -
  *       a change that makes the plain {@code MODIFY_ATTR} start stacking would be a silent buff to
  *       every character in the game.</li>
  *   <li><b>The cap is a cap, not a rolling window.</b> Applying a sixth copy of a 5-stack buff must
@@ -51,7 +50,9 @@ import java.util.List;
  */
 public class StatModifierStackingTest {
 
-    /** hp 1000 / def 200 / atk 300 / speed 100 - all different, so a mix-up shows. */
+    /**
+     * hp 1000 / def 200 / atk 300 / speed 100 - all different, so a mix-up shows.
+     */
     private static Character hero() {
         return Character.fromAttributes("hero", 1000, 200, 300, 100);
     }
@@ -69,7 +70,9 @@ public class StatModifierStackingTest {
     // 1. The primitive: a stackable stat buff
     // ==================================================================
 
-    /** Copies accumulate: five applications of +5% ATK are +25%, not +5%. */
+    /**
+     * Copies accumulate: five applications of +5% ATK are +25%, not +5%.
+     */
     @Test
     public void stackableModifiersAccumulate() {
         Character c = hero();
@@ -84,7 +87,9 @@ public class StatModifierStackingTest {
         Assertions.assertEquals(5, c.getBuffManager().countBuffs(StatModifierBuff.class));
     }
 
-    /** The cap is enforced: a sixth application changes nothing, and nothing is evicted. */
+    /**
+     * The cap is enforced: a sixth application changes nothing, and nothing is evicted.
+     */
     @Test
     public void theStackCapIsEnforcedAndNothingIsEvicted() {
         Character c = hero();
@@ -98,7 +103,9 @@ public class StatModifierStackingTest {
                 "the sixth, seventh and eighth applications are no-ops");
     }
 
-    /** Removal is per stack and exact: two stacks off leaves three stacks' worth. */
+    /**
+     * Removal is per stack and exact: two stacks off leaves three stacks' worth.
+     */
     @Test
     public void stacksAreRemovedOneAtATimeAndExactly() {
         Character c = hero();
@@ -147,7 +154,9 @@ public class StatModifierStackingTest {
         Assertions.assertTrue(permanent.isPermanent());
     }
 
-    /** A stackable buff is still removable as a whole (dispel / death / {@code clearAll}). */
+    /**
+     * A stackable buff is still removable as a whole (dispel / death / {@code clearAll}).
+     */
     @Test
     public void clearingRemovesEveryStack() {
         Character c = hero();
@@ -214,7 +223,9 @@ public class StatModifierStackingTest {
     // 3. The trigger-table view: max_stacks / permanent
     // ==================================================================
 
-    /** {@code max_stacks} + {@code permanent} make one rule accumulate instead of refreshing. */
+    /**
+     * {@code max_stacks} + {@code permanent} make one rule accumulate instead of refreshing.
+     */
     @Test
     public void theTriggerTableCanAskForAStackingPermanentModifier() {
         Character c = hero();
@@ -232,7 +243,9 @@ public class StatModifierStackingTest {
         }
     }
 
-    /** The cap reaches through the table too: ten firings of a 3-stack rule stop at three. */
+    /**
+     * The cap reaches through the table too: ten firings of a 3-stack rule stop at three.
+     */
     @Test
     public void theTriggerTableHonoursTheCap() {
         Character c = hero();
@@ -246,7 +259,9 @@ public class StatModifierStackingTest {
         Assertions.assertEquals(300 * 1.15, attackOf(c), 1e-9);
     }
 
-    /** The alias spelling {@code stacks} means the same thing as {@code max_stacks}. */
+    /**
+     * The alias spelling {@code stacks} means the same thing as {@code max_stacks}.
+     */
     @Test
     public void theStacksAliasIsAccepted() {
         Character c = hero();
@@ -294,7 +309,9 @@ public class StatModifierStackingTest {
                 "the attribute returns to base exactly (0 for a ratio attribute)");
     }
 
-    /** One turn of the owner's own action bar: the early tick, then the late one. */
+    /**
+     * One turn of the owner's own action bar: the early tick, then the late one.
+     */
     private static void turnBoundary(Character c) {
         c.getBuffManager().beforeMove();
         c.getBuffManager().afterMove();
@@ -304,7 +321,9 @@ public class StatModifierStackingTest {
     // 4. Load-time validation, naming the phase
     // ==================================================================
 
-    /** A cap that could never apply is rejected where the table is compiled, not mid-battle. */
+    /**
+     * A cap that could never apply is rejected where the table is compiled, not mid-battle.
+     */
     @Test
     public void nonPositiveStackCapsAreRejectedAtLoad() {
         IllegalArgumentException zero = Assertions.assertThrows(IllegalArgumentException.class,
@@ -317,7 +336,9 @@ public class StatModifierStackingTest {
                         TriggerSpecs.modifyAttr("ATTACK", 0.05, null, true, -3, null, null))));
     }
 
-    /** Above the engine's limit is rejected too, so a typo cannot grow the buff list without bound. */
+    /**
+     * Above the engine's limit is rejected too, so a typo cannot grow the buff list without bound.
+     */
     @Test
     public void absurdStackCapsAreRejectedAtLoad() {
         IllegalArgumentException e = Assertions.assertThrows(IllegalArgumentException.class,
@@ -328,7 +349,9 @@ public class StatModifierStackingTest {
                 e.getMessage());
     }
 
-    /** Stating both spellings is ambiguous and is rejected rather than silently picking one. */
+    /**
+     * Stating both spellings is ambiguous and is rejected rather than silently picking one.
+     */
     @Test
     public void bothSpellingsOfTheCapAreRejectedAtLoad() {
         IllegalArgumentException e = Assertions.assertThrows(IllegalArgumentException.class,
@@ -357,7 +380,9 @@ public class StatModifierStackingTest {
         Assertions.assertTrue(both.getMessage().contains("both"), both.getMessage());
     }
 
-    /** A non-positive turn count points the author at the argument that means "no turn limit". */
+    /**
+     * A non-positive turn count points the author at the argument that means "no turn limit".
+     */
     @Test
     public void aNonPositiveTurnCountStillPointsAtPermanent() {
         IllegalArgumentException e = Assertions.assertThrows(IllegalArgumentException.class,
@@ -372,7 +397,7 @@ public class StatModifierStackingTest {
      * The new arguments belong to {@code MODIFY_ATTR} only.
      *
      * <p>Without this check a {@code max_stacks} written on, say, {@code GAIN_ENERGY} would be read by
-     * Gson, ignored by the interpreter, and the rule would load perfectly while doing the wrong thing - 
+     * Gson, ignored by the interpreter, and the rule would load perfectly while doing the wrong thing -
      * the same silent-typo class the closed op vocabulary exists to eliminate.
      */
     @Test
@@ -389,7 +414,9 @@ public class StatModifierStackingTest {
                 () -> table(TriggerSpecs.rule("ALLY_ATTACK", List.of(), permanentHeal)));
     }
 
-    /** The primitive itself refuses a nonsensical cap / duration, independent of the JSON layer. */
+    /**
+     * The primitive itself refuses a nonsensical cap / duration, independent of the JSON layer.
+     */
     @Test
     public void theBuffFactoryRejectsNonsense() {
         Assertions.assertThrows(IllegalArgumentException.class,
@@ -450,7 +477,9 @@ public class StatModifierStackingTest {
     // Helpers
     // ==================================================================
 
-    /** The duration placeholder: never read for a permanent buff (see {@code TriggerInterpreter}). */
+    /**
+     * The duration placeholder: never read for a permanent buff (see {@code TriggerInterpreter}).
+     */
     private static int turnsPlaceholder() {
         return 1;
     }
@@ -468,7 +497,9 @@ public class StatModifierStackingTest {
         return new TriggerTable(0, List.of(specs));
     }
 
-    /** A battle of one character against one enemy with far more HP than any test needs. */
+    /**
+     * A battle of one character against one enemy with far more HP than any test needs.
+     */
     private static Battle battleWith(Character hero) {
         Enemy enemy = EnemyFactory.create(1002011, 90, 1);
         enemy.setAttribute(AttributeType.HEALTH, new DoubleValue(1_000_000));

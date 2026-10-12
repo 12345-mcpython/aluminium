@@ -3,11 +3,11 @@ package com.laosun.aluminium.test.content.lightcones;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.Weapon;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.models.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -24,7 +24,7 @@ public class ShadowburnTest {
     private static final int CONE = 20021;
     private static final int WEARER = 1205;
     private static final int LEVEL = 80;
-        private Character wearer;
+    private Character wearer;
     private Enemy enemy;
 
     private Battle battle(boolean withCone) {

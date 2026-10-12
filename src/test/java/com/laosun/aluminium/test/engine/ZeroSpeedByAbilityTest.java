@@ -19,7 +19,9 @@ import org.junit.jupiter.api.Test;
  * an ability supplies the real value", which is different from silently accepting a zero nobody stated.
  */
 public class ZeroSpeedByAbilityTest {
-    /** Little Ica (小伊卡): half of Hyacine (风堇)'s Max HP, and the stated zero speed. */
+    /**
+     * Little Ica (小伊卡): half of Hyacine (风堇)'s Max HP, and the stated zero speed.
+     */
     @Test
     public void theIcaCarriesTheShareTheDataStates() {
         MemospriteSpec spec = Memosprites.of(1409);
@@ -38,7 +40,9 @@ public class ZeroSpeedByAbilityTest {
                 "the table states 0 -- written down, not hidden");
     }
 
-    /** Demiurge (德谬歌): all of Cyrene (昔涟)'s Max HP, same zero speed. */
+    /**
+     * Demiurge (德谬歌): all of Cyrene (昔涟)'s Max HP, same zero speed.
+     */
     @Test
     public void theDemiurgeCarriesHers() {
         MemospriteSpec spec = Memosprites.of(1415);

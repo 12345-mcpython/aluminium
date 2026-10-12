@@ -43,7 +43,7 @@ public class Countdown extends CanHit {
 
     /**
      * @param owner who placed it ({@code null} = a hand-built one) - the link {@code actor == countdown} reads, so a
- * rule can tell <b>its own</b> countdown from somebody else's
+     *              rule can tell <b>its own</b> countdown from somebody else's
      */
     public Countdown(CanHit owner, String name, double speed) {
         super(name, Camp.PLAYER, blankSheet(speed));
@@ -60,7 +60,9 @@ public class Countdown extends CanHit {
     @lombok.Getter
     private final CanHit owner;
 
-    /** A sheet with just the speed (and a harmless HEALTH of 1) - see the class comment for why nothing else. */
+    /**
+     * A sheet with just the speed (and a harmless HEALTH of 1) - see the class comment for why nothing else.
+     */
     private static com.laosun.aluminium.models.DoubleValue[] blankSheet(double speed) {
         com.laosun.aluminium.models.DoubleValue[] attributes =
                 new com.laosun.aluminium.models.DoubleValue[AttributeType.values().length];
@@ -81,7 +83,9 @@ public class Countdown extends CanHit {
         return false;
     }
 
-    /** Note: And it cannot be damaged at all (which also means it never fires HP-loss style rules about itself). */
+    /**
+     * Note: And it cannot be damaged at all (which also means it never fires HP-loss style rules about itself).
+     */
     @Override
     public boolean takeDamage(double damage) {
         // deliberately nothing: a clock has no health bar to take it out of

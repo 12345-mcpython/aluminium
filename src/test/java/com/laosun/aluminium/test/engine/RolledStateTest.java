@@ -1,15 +1,14 @@
 package com.laosun.aluminium.test.engine;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
-import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -32,13 +31,18 @@ import java.util.Random;
 public class RolledStateTest {
     private static final int CID = 1106;
     private static final int LEVEL = 80;
-        /** A stated chance is rolled: 0.0001 against a 0.5 roll attaches nothing. */
+
+    /**
+     * A stated chance is rolled: 0.0001 against a 0.5 roll attaches nothing.
+     */
     @Test
     public void aStatedChanceIsRolled() {
         Assertions.assertFalse(lands(0.0001, 0.5), "「基础概率」 (base chance) is a real roll, not a label");
     }
 
-    /** …while the same rule with no chance stated attaches unconditionally (every existing file's behaviour). */
+    /**
+     * …while the same rule with no chance stated attaches unconditionally (every existing file's behaviour).
+     */
     @Test
     public void noStatedChanceIsNotARoll() {
         Assertions.assertTrue(lands(null, 0.5), "unstated = applied directly, which is what every earlier file relies on");

@@ -5,8 +5,8 @@ import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -29,10 +29,12 @@ public class PearlChargeCounterTest {
     private static final int PEARL = 1503;
     private static final int ELATION = 1502;
     private static final int HUNTER = 1204;
-        private static final String CHARGE = "充能";
+    private static final String CHARGE = "充能";
     private static final String DEEP = "深度学习";
 
-    /** The Ultimate fills the counter to its declared three. */
+    /**
+     * The Ultimate fills the counter to its declared three.
+     */
     @Test
     public void theUltimateFillsTheCounterToThree() {
         Battle battle = newBattle(HUNTER);
@@ -44,7 +46,9 @@ public class PearlChargeCounterTest {
         Assertions.assertTrue(pearl.getBuffManager().hasState(DEEP), "and the state it pays for is on");
     }
 
-    /** One enhanced basic spends exactly one charge - not all three, and not none. */
+    /**
+     * One enhanced basic spends exactly one charge - not all three, and not none.
+     */
     @Test
     public void oneEnhancedBasicSpendsExactlyOneCharge() {
         Battle battle = newBattle(HUNTER);
@@ -59,7 +63,9 @@ public class PearlChargeCounterTest {
         Assertions.assertEquals(1, afterTwo, "and another use spends another");
     }
 
-    /** While a charge is left the state stands, and when the last one is spent the state is gone. */
+    /**
+     * While a charge is left the state stands, and when the last one is spent the state is gone.
+     */
     @Test
     public void theStateEndsWithTheLastCharge() {
         Battle battle = newBattle(HUNTER);
@@ -130,7 +136,9 @@ public class PearlChargeCounterTest {
         battle.processRequests();
     }
 
-    /** Drives one enhanced basic through the engine's own skill request path, so the cast events fire. */
+    /**
+     * Drives one enhanced basic through the engine's own skill request path, so the cast events fire.
+     */
     private static void attack(Battle battle, Character pearl) {
         Enemy victim = battle.enemyUnits().getFirst();
         battle.requestSkill(pearl.getSkills().get(SkillType.COMMON), pearl, List.of(victim));

@@ -6,10 +6,10 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.models.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -30,7 +30,10 @@ public class HuohuoTest {
     private static final int HUOHUO = 1217;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-        /** The state she applies to herself, on her own clock. */
+
+    /**
+     * The state she applies to herself, on her own clock.
+     */
     @Test
     public void herSkillGrantsTheStateToHerself() {
         Fixture f = new Fixture();
@@ -42,7 +45,9 @@ public class HuohuoTest {
         Assertions.assertFalse(f.ally.getBuffManager().hasState("禳命"), "…and it is hers (「藿藿获得」), not the party's");
     }
 
-    /** Note: "除自身以外的队友": the ultimate boosts every OTHER ally's attack (the energy half is registered). */
+    /**
+     * Note: "除自身以外的队友": the ultimate boosts every OTHER ally's attack (the energy half is registered).
+     */
     @Test
     public void herUltimatePaysTheOthersNotHerself() {
         Fixture f = new Fixture();
@@ -63,7 +68,9 @@ public class HuohuoTest {
                 "⚠ …and her own bar is untouched: 「除自身以外」 (other than herself) governs both halves");
     }
 
-    /** The talent's trigger is gated on HER state, and both of its halves are on the rule. */
+    /**
+     * The talent's trigger is gated on HER state, and both of its halves are on the rule.
+     */
     @Test
     public void theTalentTriggerNeedsHerState() {
         Fixture f = new Fixture();
@@ -77,7 +84,9 @@ public class HuohuoTest {
                 "with 【禳命】 (Divine Provision) up, a turn start matches");
     }
 
-    /** Census: the clauses are where the notes say they are. */
+    /**
+     * Census: the clauses are where the notes say they are.
+     */
     @Test
     public void herFileCarriesTheClauses() {
         Assertions.assertEquals(2, TriggerTables.of(HUOHUO).ruleCount(TriggerEvent.SKILL_CAST),

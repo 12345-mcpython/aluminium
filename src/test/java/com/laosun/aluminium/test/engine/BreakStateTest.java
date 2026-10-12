@@ -4,10 +4,10 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.skill.DefaultSkill;
+import com.laosun.aluminium.models.Signal;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
-import com.laosun.aluminium.models.Signal;
+import com.laosun.aluminium.models.skill.DefaultSkill;
 import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -89,7 +89,9 @@ public class BreakStateTest {
         Assertions.assertFalse(battle.delayMovePercent(iceEdge, -1));
     }
 
-    /** Himeko's two Fire basic attacks (30 toughness reduction each) empty Ice Edge's 60 toughness. */
+    /**
+     * Himeko's two Fire basic attacks (30 toughness reduction each) empty Ice Edge's 60 toughness.
+     */
     private static void breakIt(Battle battle, Character himeko, Enemy iceEdge) {
         battle.castImmediate(new DefaultSkill(1003, 1, 1), himeko, List.of(iceEdge));
         battle.castImmediate(new DefaultSkill(1003, 1, 1), himeko, List.of(iceEdge));

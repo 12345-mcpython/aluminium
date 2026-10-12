@@ -36,7 +36,9 @@ public class StackableStateBuff extends StateBuff {
         return cap;
     }
 
-    /** So that {@code stacksOf(name)} counts instances of this state, like any other named buff. */
+    /**
+     * So that {@code stacksOf(name)} counts instances of this state, like any other named buff.
+     */
     @Override
     public String getBuffName() {
         return getState();

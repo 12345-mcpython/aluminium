@@ -1,17 +1,19 @@
 package com.laosun.aluminium.test.engine;
+
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.skill.SkillExecutor;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
 import java.util.List;
 
 /**
  * 1415's memosprite skill 24, third sentence: "长夜月战技的暴击伤害提高效果额外提高，提高数值等同于长夜月暴击伤害的 #3%".
- *
+ * <p>
  * Her skill states its share as `percent_from_skill_param` (it varies with level: 0.12 -> 0.264), so the amendment must ADD to whatever that resolves to -- not write a `percent`,
  * which `shareOf` reads first and which would therefore erase her skill's own number. Both readings come from the engine: the gain a memosprite actually received, and her own CRIT DMG.
  */
@@ -19,7 +21,7 @@ public class TimeOdeRaisesHerCritTest {
     private static final int LEVEL = 80;
     private static final int LONGNIGHT = 1413;
     private static final int CYRENE = 1415;
-        private static final int ODE_SLOT = 24;
+    private static final int ODE_SLOT = 24;
 
     @Test
     public void theOdeRaisesHerSkillCritEffect() {
@@ -33,7 +35,9 @@ public class TimeOdeRaisesHerCritTest {
                 "and without the ode it is only her skill's #1 times her CRIT DMG");
     }
 
-    /** [the memosprite's CRIT DMG gain, her CRIT DMG, her skill's #1] */
+    /**
+     * [the memosprite's CRIT DMG gain, her CRIT DMG, her skill's #1]
+     */
     private static double[] run(boolean castTheOde) {
         Character cyrene = CharacterFactory.create(CYRENE, LEVEL);
         Character longnight = CharacterFactory.create(LONGNIGHT, LEVEL);

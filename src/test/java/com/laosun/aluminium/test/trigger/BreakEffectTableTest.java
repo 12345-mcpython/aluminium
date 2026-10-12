@@ -35,7 +35,7 @@ public class BreakEffectTableTest {
 
     /**
      * The four damaging elements are exactly "a DOT and nothing else": no control state, and no extra delay
-     *  - which is what makes the table reproduce their pre-table behaviour bit for bit.
+     * - which is what makes the table reproduce their pre-table behaviour bit for bit.
      */
     @Test
     public void damagingElementsCarryADotAndNoControl() {

@@ -1,20 +1,20 @@
 package com.laosun.aluminium.test.engine;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.data.RelicTriggerTables;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.CanHit;
+import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.DoubleValue;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.skill.DefaultSkill;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.utils.RelicFactory;
 import org.junit.jupiter.api.Assertions;
@@ -47,17 +47,23 @@ import java.util.List;
 public class BuffLifetimeTest {
     private static final double EPS = 1e-6;
 
-    /** Himeko (姬子) - the plain character, and the one whose attacks this class drives. */
+    /**
+     * Himeko (姬子) - the plain character, and the one whose attacks this class drives.
+     */
     private static final int OWNER = 1003;
     private static final int LEVEL = 80;
-        /** Celestial Differentiator (星体差分机) - "lasts until the first attack is cast, then ends". */
+    /**
+     * Celestial Differentiator (星体差分机) - "lasts until the first attack is cast, then ends".
+     */
     private static final int STELLAR_DIFFERENTIATOR = 305;
 
     // ==================================================================
     // 1. The event ends it
     // ==================================================================
 
-    /** "for the next attack": the owner's attack consumes it. */
+    /**
+     * "for the next attack": the owner's attack consumes it.
+     */
     @Test
     public void theOwnersAttackConsumesIt() {
         Battle battle = battleWithBuff("next_attack");
@@ -74,7 +80,7 @@ public class BuffLifetimeTest {
      * A teammate's attack does <b>not</b>.
      *
      * <p>The engine delivers "an attack happened" to every member of our side ({@code AttackEvent} is how
-     * Robin's and Tribbie's third-party kits hear about it), so this is the case that pins the owner test - 
+     * Robin's and Tribbie's third-party kits hear about it), so this is the case that pins the owner test -
      * without it, whoever attacks first would consume everybody's "for the next attack" buff.
      */
     @Test
@@ -131,7 +137,9 @@ public class BuffLifetimeTest {
                 "not one hit landed, so nothing attacked");
     }
 
-    /** The three spellings are three different events. */
+    /**
+     * The three spellings are three different events.
+     */
     @Test
     public void theSpellingsNameDifferentEvents() {
         // next_skill: a basic attack does not consume it, a Skill does.
@@ -229,7 +237,9 @@ public class BuffLifetimeTest {
     // 2. Load-time validation
     // ==================================================================
 
-    /** An unknown lifetime is rejected while the file is read, not by watching a buff never expire. */
+    /**
+     * An unknown lifetime is rejected while the file is read, not by watching a buff never expire.
+     */
     @Test
     public void anUnknownLifetimeIsRejected() {
         IllegalArgumentException unknown = Assertions.assertThrows(IllegalArgumentException.class,
@@ -257,7 +267,9 @@ public class BuffLifetimeTest {
         Assertions.assertTrue(unknown.getMessage().contains("next_atack"), unknown.getMessage());
     }
 
-    /** Stating a lifetime <i>and</i> a turn count is two disagreements, so it is refused. */
+    /**
+     * Stating a lifetime <i>and</i> a turn count is two disagreements, so it is refused.
+     */
     @Test
     public void aLifetimeTogetherWithTurnsIsRejected() {
         EffectSpec both = effect("next_attack");
@@ -269,7 +281,9 @@ public class BuffLifetimeTest {
         Assertions.assertTrue(refused.getMessage().contains("until"), refused.getMessage());
     }
 
-    /** An op that creates no buff has nothing an {@code until} could end. */
+    /**
+     * An op that creates no buff has nothing an {@code until} could end.
+     */
     @Test
     public void aLifetimeOnAnOpWithoutABuffIsRejected() {
         EffectSpec boost = new EffectSpec();
@@ -310,7 +324,9 @@ public class BuffLifetimeTest {
                 "「持续到施放首次攻击后结束」 (lasts until the first attack is cast, then ends) -- and the first attack has happened");
     }
 
-    /** Below the threshold nothing is granted at all. */
+    /**
+     * Below the threshold nothing is granted at all.
+     */
     @Test
     public void belowTheCritDamageThresholdNothingIsGranted() {
         Character wearer = wearer(1.0);            // 100% CRIT DMG, below the text's 120%
@@ -323,7 +339,9 @@ public class BuffLifetimeTest {
                 "`self_attr:CRIT_ATTACK >= 1.2` is a fraction, and 1.0 is below it");
     }
 
-    /** The rule is filed at the 2-piece tier and states the lifetime from the text. */
+    /**
+     * The rule is filed at the 2-piece tier and states the lifetime from the text.
+     */
     @Test
     public void theAuthoredRuleStatesItsOwnLifetime() {
         Character wearer = wearer(1.3);
@@ -347,12 +365,16 @@ public class BuffLifetimeTest {
     // Fixture
     // ==================================================================
 
-    /** A battle whose owner carries one battle-start rule granting +50% CRIT Rate with the given lifetime. */
+    /**
+     * A battle whose owner carries one battle-start rule granting +50% CRIT Rate with the given lifetime.
+     */
     private static Battle battleWithBuff(String until) {
         return battleWithBuff(until, 1);
     }
 
-    /** The same, for a duration that names several events ("普攻<b>或</b>战技"). */
+    /**
+     * The same, for a duration that names several events ("普攻<b>或</b>战技").
+     */
     private static Battle battleWithBuff(List<String> until) {
         return battleWithBuff(until, 1);
     }
@@ -400,7 +422,9 @@ public class BuffLifetimeTest {
         return effect;
     }
 
-    /** The owner casts its slot-{@code slotNo} skill at the monster - a real cast through the executor. */
+    /**
+     * The owner casts its slot-{@code slotNo} skill at the monster - a real cast through the executor.
+     */
     private static void attack(Battle battle, Character actor, int slotNo) {
         battle.castImmediate(new DefaultSkill(OWNER, slotNo, 1), actor, List.of(monster()));
     }
@@ -424,7 +448,9 @@ public class BuffLifetimeTest {
         return character.getAttribute(AttributeType.CRIT_CHANCE).get();
     }
 
-    /** How much CRIT Rate the battle-start rule added. */
+    /**
+     * How much CRIT Rate the battle-start rule added.
+     */
     private static double critRateBonus(Character owner) {
         double bare = CharacterFactory.create(OWNER, LEVEL).getAttribute(AttributeType.CRIT_CHANCE).get();
         return critRateOf(owner) - bare;

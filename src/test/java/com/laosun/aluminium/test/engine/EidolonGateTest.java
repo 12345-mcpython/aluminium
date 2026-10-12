@@ -1,16 +1,16 @@
 package com.laosun.aluminium.test.engine;
 
 
-import com.laosun.aluminium.test.support.BattleFixture;
-import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -31,7 +31,9 @@ import java.util.List;
  * Eidolon must not vanish because somebody cloned the combatant).
  */
 public class EidolonGateTest {
-    /** Himeko: no shipped rule file, so the table under test is the only one. */
+    /**
+     * Himeko: no shipped rule file, so the table under test is the only one.
+     */
     private static final int OWNER = 1003;
     private static final int ALLY = 1202;
     private static final int LEVEL = 80;

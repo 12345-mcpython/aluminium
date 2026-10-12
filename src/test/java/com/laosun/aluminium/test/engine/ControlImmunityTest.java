@@ -1,16 +1,16 @@
 package com.laosun.aluminium.test.engine;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.skill.Skill;
 import com.laosun.aluminium.models.skill.SkillExecutor;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -27,16 +27,20 @@ import java.util.List;
 public class ControlImmunityTest {
     private static final int OWNER = 1408;
     private static final int APPLIER = 1002;
-        private static final String STATE = "变身";
+    private static final String STATE = "变身";
     private static final String FREEZE = "冻结";
 
-    /** Transformed: the control does not land. */
+    /**
+     * Transformed: the control does not land.
+     */
     @Test
     public void theTransformedFormShrugsOffControl() {
         Assertions.assertFalse(controlledAfter(true), "\"Khaslana (卡厄斯兰那) is immune to Crowd Control debuffs\" (「卡厄斯兰那免疫控制类负面状态」)");
     }
 
-    /** Note: Untransformed: the same control lands, so the immunity really is the transformation's. */
+    /**
+     * Note: Untransformed: the same control lands, so the immunity really is the transformation's.
+     */
     @Test
     public void withoutTheTransformationTheControlLands() {
         Assertions.assertTrue(controlledAfter(false), "「变身期间」 (during the transformation)-- outside it she is controlable");
@@ -76,7 +80,9 @@ public class ControlImmunityTest {
         return owner.getBuffManager().hasState(FREEZE);
     }
 
-    /** APPLY_CONTROL of [冻结] on the rule owner's own target -- the spare aims it at 1408 through the trigger's target. */
+    /**
+     * APPLY_CONTROL of [冻结] on the rule owner's own target -- the spare aims it at 1408 through the trigger's target.
+     */
     private static EffectSpec control() {
         EffectSpec e = new EffectSpec();
         TriggerSpecs.set(e, "op", "APPLY_CONTROL");

@@ -1,7 +1,6 @@
 package com.laosun.aluminium.test.trigger;
 
 
-import com.laosun.aluminium.test.support.TestCharacters;
 import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.RelicSet;
@@ -12,18 +11,14 @@ import com.laosun.aluminium.enums.RelicType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.RelicSuit;
-import com.laosun.aluminium.models.TriggerTable;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.TestCharacters;
 import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.utils.RelicFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Relic-set trigger rules: the loader, the assembly point, and the registry of
@@ -49,19 +44,33 @@ import java.util.Set;
  */
 public class RelicTriggerTableTest {
 
-    /** "Passerby of Wandering Cloud" - 4-piece: at battle start, +1 skill point. */
+    /**
+     * "Passerby of Wandering Cloud" - 4-piece: at battle start, +1 skill point.
+     */
     private static final int PASSERBY = 101;
-    /** "Hunter of Glacial Forest" - 4-piece: after the Ultimate, +25% CRIT DMG for 2 turns. */
+    /**
+     * "Hunter of Glacial Forest" - 4-piece: after the Ultimate, +25% CRIT DMG for 2 turns.
+     */
     private static final int GLACIAL = 104;
-    /** "Band of Sizzling Thunder" - 4-piece: on Skill, +20% ATK for 1 turn. */
+    /**
+     * "Band of Sizzling Thunder" - 4-piece: on Skill, +20% ATK for 1 turn.
+     */
     private static final int SIZZLING = 109;
-    /** "Eagle of Twilight Line" - 4-piece: after the Ultimate, advance forward 25%. */
+    /**
+     * "Eagle of Twilight Line" - 4-piece: after the Ultimate, advance forward 25%.
+     */
     private static final int EAGLE = 110;
-    /** "Champion of Streetwise Boxing" - 4-piece: on attacking or being hit, +5% ATK, up to 5 stacks. */
+    /**
+     * "Champion of Streetwise Boxing" - 4-piece: on attacking or being hit, +5% ATK, up to 5 stacks.
+     */
     private static final int CHAMPION = 105;
-    /** City of Converging Stars (planar), whose 2-piece is authorable now that {@code FOLLOW_UP} exists. */
+    /**
+     * City of Converging Stars (planar), whose 2-piece is authorable now that {@code FOLLOW_UP} exists.
+     */
     private static final int CONVERGING_STARS = 326;
-    /** The Ashblazing Grand Duke, whose 2-piece needs the follow-up-only damage boost attribute. */
+    /**
+     * The Ashblazing Grand Duke, whose 2-piece needs the follow-up-only damage boost attribute.
+     */
     private static final int ASHBLAZING = 115;
     /**
      * "星如我见的领航员" - 4-piece: a Skill/Ultimate DMG boost that stacks to 3 and loses one per turn.
@@ -81,69 +90,123 @@ public class RelicTriggerTableTest {
     // The seven MIXED (stat + ability) planar 2-pieces authored when `self_attr` and
     // ADVANCE made their conditional sentence expressible. Before that they were not in this test's
     // world at all -- see MIXED_STAT_AND_ABILITY.
-    /** Space Sealing Station (太空封印站): ATK +12%; SPD >= 120 -> ATK +12% more. */
+    /**
+     * Space Sealing Station (太空封印站): ATK +12%; SPD >= 120 -> ATK +12% more.
+     */
     private static final int SPACE_SEALING_STATION = 301;
-    /** Fleet of the Ageless (不老者的仙舟): Max HP +12%; SPD >= 120 -> the whole party's ATK +8%. */
+    /**
+     * Fleet of the Ageless (不老者的仙舟): Max HP +12%; SPD >= 120 -> the whole party's ATK +8%.
+     */
     private static final int FLEET_OF_THE_AGELESS = 302;
-    /** Belobog of the Architects (筑城者的贝洛伯格): DEF +15%; effect hit rate >= 50% -> DEF +15% more. */
+    /**
+     * Belobog of the Architects (筑城者的贝洛伯格): DEF +15%; effect hit rate >= 50% -> DEF +15% more.
+     */
     private static final int BELOBOG = 304;
-    /** Inert Salsotto (停转的萨尔索图): CRIT Rate +8%; current CRIT Rate >= 50% -> Ultimate and follow-up attack DMG +15%. */
+    /**
+     * Inert Salsotto (停转的萨尔索图): CRIT Rate +8%; current CRIT Rate >= 50% -> Ultimate and follow-up attack DMG +15%.
+     */
     private static final int INERT_SALSOTTO = 306;
-    /** Talia - Kingdom of Banditry (盗贼公国塔利亚): break effect +16%; SPD >= 145 -> break effect +20% more. */
+    /**
+     * Talia - Kingdom of Banditry (盗贼公国塔利亚): break effect +16%; SPD >= 145 -> break effect +20% more.
+     */
     private static final int TALIA = 307;
-    /** Sprightly Vonwacq (生命的翁瓦克): energy regeneration rate +5%; SPD >= 120 -> action advance 40% at battle start. */
+    /**
+     * Sprightly Vonwacq (生命的翁瓦克): energy regeneration rate +5%; SPD >= 120 -> action advance 40% at battle start.
+     */
     private static final int SPRIGHTLY_VONWACQ = 308;
-    /** Rutilant Arena (繁星竞技场): CRIT Rate +8%; current CRIT Rate >= 0% -> basic attack and Skill DMG +20%. */
+    /**
+     * Rutilant Arena (繁星竞技场): CRIT Rate +8%; current CRIT Rate >= 0% -> basic attack and Skill DMG +20%.
+     */
     private static final int CELESTIAL_DIFFERENTIATOR = 309;
-    /** Celestial Differentiator (星体差分机): CRIT DMG +16%; CRIT DMG >= 120% -> CRIT Rate +60% until after the first attack (the first user of `until`). */
+    /**
+     * Celestial Differentiator (星体差分机): CRIT DMG +16%; CRIT DMG >= 120% -> CRIT Rate +60% until after the first attack (the first user of `until`).
+     */
     private static final int STELLAR_DIFFERENTIATOR = 305;
-    /** The Wondrous BananAmusement Park (奇想蕉乐园): CRIT DMG +16%; a summon on the field -> CRIT DMG +32% more (the first user of `self_summon_count`). */
+    /**
+     * The Wondrous BananAmusement Park (奇想蕉乐园): CRIT DMG +16%; a summon on the field -> CRIT DMG +32% more (the first user of `self_summon_count`).
+     */
     private static final int BANANA_PARADISE = 318;
-    /** Hero of Triumphant Song (凯歌祝捷的英豪): ATK +12%; a memosprite on the field -> SPD +6%, when the memosprite attacks -> both sides' CRIT DMG +30% for 2 turns. */
+    /**
+     * Hero of Triumphant Song (凯歌祝捷的英豪): ATK +12%; a memosprite on the field -> SPD +6%, when the memosprite attacks -> both sides' CRIT DMG +30% for 2 turns.
+     */
     private static final int HERO_OF_TRIUMPHANT_SONG = 123;
-    /** Poet of Mourning Collapse (哀歌覆国的诗人): SPD -8%; SPD before battle <110/<95 -> CRIT Rate +20%/+32%, the memosprite shares it. */
+    /**
+     * Poet of Mourning Collapse (哀歌覆国的诗人): SPD -8%; SPD before battle <110/<95 -> CRIT Rate +20%/+32%, the memosprite shares it.
+     */
     private static final int POET = 124;
-    /** Bone Collection's Serene Demesne (谧宁拾骨地): Max HP +12%; Max HP >= 5000 -> the wearer's and the memosprite's CRIT DMG +28%. */
+    /**
+     * Bone Collection's Serene Demesne (谧宁拾骨地): Max HP +12%; Max HP >= 5000 -> the wearer's and the memosprite's CRIT DMG +28%.
+     */
     private static final int SERENE_DEMESNE = 319;
-    /** Giant Tree of Rapt Brooding (渊思寂虑的巨树): SPD +6%; SPD >=135/180 -> the wearer's and the memosprite's healing +12%/20%. */
+    /**
+     * Giant Tree of Rapt Brooding (渊思寂虑的巨树): SPD +6%; SPD >=135/180 -> the wearer's and the memosprite's healing +12%/20%.
+     */
     private static final int RAPT_BROODING = 320;
-    /** Firesmith of Lava-Forging (熔岩锻铸的火匠): Skill DMG +12%; after the Ultimate, the next attack's Fire DMG +12%. */
+    /**
+     * Firesmith of Lava-Forging (熔岩锻铸的火匠): Skill DMG +12%; after the Ultimate, the next attack's Fire DMG +12%.
+     */
     private static final int FIRESMITH = 107;
-    /** The Wind-Soaring Valorous (风举云飞的勇烈): CRIT Rate +6%; after a follow-up attack, Ultimate DMG +36% for 1 turn. */
+    /**
+     * The Wind-Soaring Valorous (风举云飞的勇烈): CRIT Rate +6%; after a follow-up attack, Ultimate DMG +36% for 1 turn.
+     */
     private static final int VALOROUS = 120;
-    /** Hero of the Shattered World (再创天地的救世主): after a basic attack/Skill, a memosprite on the field -> the wearer's and the memosprite's Max HP +24%, the whole party's DMG +15%. */
+    /**
+     * Hero of the Shattered World (再创天地的救世主): after a basic attack/Skill, a memosprite on the field -> the wearer's and the memosprite's Max HP +24%, the whole party's DMG +15%.
+     */
     private static final int SHATTERED_WORLD = 127;
-    /** Glamoth's Iron Cavalry Regiment (苍穹战线格拉默): ATK +12%; SPD >= 135/160 -> DMG dealt +12%/18%. */
+    /**
+     * Glamoth's Iron Cavalry Regiment (苍穹战线格拉默): ATK +12%; SPD >= 135/160 -> DMG dealt +12%/18%.
+     */
     private static final int GLAMOTH = 311;
-    /** Musketeer of Wild Wheat (野穗伴行的快枪手): SPD +6%; basic attack DMG +10%. */
+    /**
+     * Musketeer of Wild Wheat (野穗伴行的快枪手): SPD +6%; basic attack DMG +10%.
+     */
     private static final int MUSKETEER = 102;
-    /** Thief of Shooting Meteor (流星追迹的怪盗): break effect +16%; after breaking a weakness, restore 3 energy. */
+    /**
+     * Thief of Shooting Meteor (流星追迹的怪盗): break effect +16%; after breaking a weakness, restore 3 energy.
+     */
     private static final int THIEF = 111;
-    /** Pioneer Diver of Dead Waters (死水深潜的先驱): DMG dealt to an enemy affected by a negative state +12%. */
+    /**
+     * Pioneer Diver of Dead Waters (死水深潜的先驱): DMG dealt to an enemy affected by a negative state +12%.
+     */
     private static final int PIONEER = 117;
-    /** Scholar Lost in Erudition (识海迷坠的学者): Skill and Ultimate DMG +20%; after the Ultimate, the next Skill +25%. */
+    /**
+     * Scholar Lost in Erudition (识海迷坠的学者): Skill and Ultimate DMG +20%; after the Ultimate, the next Skill +25%.
+     */
     private static final int SCHOLAR = 122;
-    /** Broken Keel (折断的龙骨): effect resistance +10%; when effect resistance >= 30%, the whole party's CRIT DMG +10%. */
+    /**
+     * Broken Keel (折断的龙骨): effect resistance +10%; when effect resistance >= 30%, the whole party's CRIT DMG +10%.
+     */
     private static final int BROKEN_KEEL = 310;
-    /** Knight of Purity Palace (净庭教宗的圣骑士): DEF +15%; raise the shield the wearer provides by 20%. */
+    /**
+     * Knight of Purity Palace (净庭教宗的圣骑士): DEF +15%; raise the shield the wearer provides by 20%.
+     */
     private static final int KNIGHT_OF_PURITY = 103;
-    /** Self-Enshrouded Recluse (自匿星芒的隐士): the shield provided is raised by 10%; 12% more, and when an ally holds a shield the wearer provided, CRIT DMG +15%. */
+    /**
+     * Self-Enshrouded Recluse (自匿星芒的隐士): the shield provided is raised by 10%; 12% more, and when an ally holds a shield the wearer provided, CRIT DMG +15%.
+     */
     private static final int RECLUSE = 128;
 
     /**
      * A set with a registered ability and <b>no</b> rule file - used by the "nothing to merge" case, which must
- * therefore pick a set that is still unwritten (102 was that set until it was authored on).
+     * therefore pick a set that is still unwritten (102 was that set until it was authored on).
      */
     private static final int NO_RULE_SET = 99002;
 
-    /** A set id no rule file can exist for (it is not even in {@code relic_sets.json}). */
+    /**
+     * A set id no rule file can exist for (it is not even in {@code relic_sets.json}).
+     */
     private static final int UNKNOWN_SET = 999_999;
 
-    /** The cavern sets used here all have a 2-piece and a 4-piece tier. */
+    /**
+     * The cavern sets used here all have a 2-piece and a 4-piece tier.
+     */
     private static final int TWO_PIECE = 2;
     private static final int FOUR_PIECE = 4;
 
-    /** A character with its own trigger file, used to prove the merge keeps both sides. */
+    /**
+     * A character with its own trigger file, used to prove the merge keeps both sides.
+     */
     private static final int TRIBBIE = 1403;
     /**
      * An ordinary character with <b>no trigger rules of their own</b>, so every rule the tests below see comes
@@ -169,7 +232,7 @@ public class RelicTriggerTableTest {
      * mixed ones ({@code properties} plus an ability).
      */
     private static final Set<String> AUTHORED = Set.of("126/4", "327/2", "130/4", "317/2", "325/2", "324/2", "129/4",
-            
+
             "312/2", "119/4",
             "303/2",
             "113/4",
@@ -253,7 +316,7 @@ public class RelicTriggerTableTest {
             "103/4",
             "128/2",
             "128/4",
-        "115/4");
+            "115/4");
 
     /**
      * How many ability-only bonuses the shipped file still cannot express.
@@ -264,13 +327,15 @@ public class RelicTriggerTableTest {
      * {@code MODIFY_DAMAGE_TAKEN} existed), then to <b>25</b> when the same set's 4-piece became
      * authorable - and then to <b>4</b> when the MIXED effects joined the partition (see
      * {@link #MIXED_STAT_AND_ABILITY}); those 22 mixed entries are not a regression, they are the half of
- * the data this test could not see before. It went to <b>44</b> on, when set 123
- * was authored (see {@link #HERO_OF_TRIUMPHANT_SONG}), and to <b>22</b> on when the shield-amount
+     * the data this test could not see before. It went to <b>44</b> on, when set 123
+     * was authored (see {@link #HERO_OF_TRIUMPHANT_SONG}), and to <b>22</b> on when the shield-amount
      * family became authorable (sets 103 and 128, three entries - see {@link #KNIGHT_OF_PURITY}).
      */
     private static final int STILL_REGISTERED = 1;
 
-    /** Ability-only bonuses: {@code properties} empty, the ability is the whole effect. */
+    /**
+     * Ability-only bonuses: {@code properties} empty, the ability is the whole effect.
+     */
     private static final int PURE_ABILITY_ONLY = 35;
 
     /**
@@ -279,7 +344,7 @@ public class RelicTriggerTableTest {
      * <p>Note: <b>This half was invisible</b>. The partition below used to skip
      * every effect with a non-empty {@code properties}, so the common planar-ornament shape
      * ("攻击力提高 12%。当速度 >= 120 时，攻击力额外提高 12%") had its first clause applied by
-     * {@code RelicSuit} and its second clause <b>silently dropped</b>, with no registry entry to say so - 
+     * {@code RelicSuit} and its second clause <b>silently dropped</b>, with no registry entry to say so -
      * "no rule file written" and "somebody forgot" looked exactly alike for that shape. Pinned as its own
      * denominator so the next data update that adds one shows up here.
      */
@@ -300,7 +365,9 @@ public class RelicTriggerTableTest {
     // 1. The shipped rule files
     // ==================================================================
 
-    /** Every authored set file loads, declares its threshold, and carries a rule on the right event. */
+    /**
+     * Every authored set file loads, declares its threshold, and carries a rule on the right event.
+     */
     @Test
     public void theShippedRuleFilesAreLoaded() {
         assertRuleOn(PASSERBY, TriggerEvent.BATTLE_START);
@@ -315,7 +382,7 @@ public class RelicTriggerTableTest {
         // The provenance rule: a number has to be traceable to its document.
         TriggerTable passerby = RelicTriggerTables.of(PASSERBY).at(FOUR_PIECE);
         var rule = passerby.matching(TriggerEvent.BATTLE_START,
-                new TriggerTable.TriggerContext(CharacterFactory.create(NO_RULES, 80), null, null, 0, 0))
+                        new TriggerTable.TriggerContext(CharacterFactory.create(NO_RULES, 80), null, null, 0, 0))
                 .getFirst();
         Assertions.assertTrue(rule.source().contains("101") && rule.source().contains("Ability51011"),
                 "the source must name the set and the ability it came from: " + rule.source());
@@ -324,7 +391,9 @@ public class RelicTriggerTableTest {
                 "the description states 1 Skill Point literally (param is empty)");
     }
 
-    /** A 4-piece rule file is inactive below four pieces - that is what the threshold key means. */
+    /**
+     * A 4-piece rule file is inactive below four pieces - that is what the threshold key means.
+     */
     @Test
     public void aRuleAppliesOnlyFromItsThresholdUpwards() {
         RelicTriggerTables.Rules rules = RelicTriggerTables.of(PASSERBY);
@@ -371,7 +440,10 @@ public class RelicTriggerTableTest {
     // ==================================================================
     // 2. The loader's contract: lazy, cached, absent = empty, broken = loud
     // ==================================================================
-    /** A set with no file is an ordinary empty rule set, not an error. */
+
+    /**
+     * A set with no file is an ordinary empty rule set, not an error.
+     */
     @Test
     public void aSetWithoutAFileIsAnEmptyRuleSet() {
         Assertions.assertFalse(RelicTriggerTables.exists(UNKNOWN_SET));
@@ -380,7 +452,9 @@ public class RelicTriggerTableTest {
         Assertions.assertTrue(rules.at(FOUR_PIECE).isEmpty());
     }
 
-    /** A set file is read once and cached; {@code clearCache} is the only way to re-read it. */
+    /**
+     * A set file is read once and cached; {@code clearCache} is the only way to re-read it.
+     */
     @Test
     public void aSetFileIsReadOnceAndCached() {
         RelicTriggerTables.clearCache();
@@ -398,7 +472,9 @@ public class RelicTriggerTableTest {
                 "asking for a set with no file must not count as a read");
     }
 
-    /** Cumulative tiers: four pieces keeps the 2-piece rules as well. */
+    /**
+     * Cumulative tiers: four pieces keeps the 2-piece rules as well.
+     */
     @Test
     public void thresholdsAreCumulative() {
         TriggerSpec twoPieceRule = rule("BATTLE_START", gainSkillPoint(1));
@@ -472,7 +548,9 @@ public class RelicTriggerTableTest {
     // 3. The assembly point
     // ==================================================================
 
-    /** Four pieces of the set put its rules on the character; fewer pieces do not. */
+    /**
+     * Four pieces of the set put its rules on the character; fewer pieces do not.
+     */
     @Test
     public void theCharacterCarriesTheSetRulesOnlyWhenEnoughPiecesAreWorn() {
         Character fourPieces = CharacterFactory.create(NO_RULES, 80, true, null,
@@ -494,7 +572,9 @@ public class RelicTriggerTableTest {
                 "…which is literally its own (empty) table, not a merged copy");
     }
 
-    /** The merge keeps <b>both</b> sides: the character's own rules and the set's. */
+    /**
+     * The merge keeps <b>both</b> sides: the character's own rules and the set's.
+     */
     @Test
     public void theCarriedTableHasTheCharacterRulesAndTheSetRules() {
         Character tribbie = CharacterFactory.create(TRIBBIE, 80, true, null,
@@ -506,7 +586,9 @@ public class RelicTriggerTableTest {
                 "her ALLY_ATTACK rule must survive the merge");
     }
 
-    /** A set with no rule file contributes nothing, even at four pieces. */
+    /**
+     * A set with no rule file contributes nothing, even at four pieces.
+     */
     @Test
     public void aSetWithoutRulesContributesNothing() {
         Character wearer = CharacterFactory.create(NO_RULES, 80, true, null,
@@ -623,7 +705,9 @@ public class RelicTriggerTableTest {
         }
     }
 
-    /** The registry itself rejects an entry that would leave a reader without an actionable reason. */
+    /**
+     * The registry itself rejects an entry that would leave a reader without an actionable reason.
+     */
     @Test
     public void aRegistryEntryWithoutAReasonIsRejected() {
         Map<String, List<RelicTriggerTables.Unmodelled>> entry = Map.of(String.valueOf(PASSERBY),
@@ -635,13 +719,13 @@ public class RelicTriggerTableTest {
 
         IllegalStateException noAbility = Assertions.assertThrows(IllegalStateException.class,
                 () -> RelicTriggerTables.indexUnmodelled(Map.of(String.valueOf(PASSERBY),
-                        List.of(new RelicTriggerTables.Unmodelled(PASSERBY, FOUR_PIECE, "", "because"))),
+                                List.of(new RelicTriggerTables.Unmodelled(PASSERBY, FOUR_PIECE, "", "because"))),
                         "test-file"));
         Assertions.assertTrue(noAbility.getMessage().contains("ability"), noAbility.getMessage());
 
         IllegalStateException badKey = Assertions.assertThrows(IllegalStateException.class,
                 () -> RelicTriggerTables.indexUnmodelled(Map.of("passerby",
-                        List.of(new RelicTriggerTables.Unmodelled(PASSERBY, FOUR_PIECE, "A", "because"))),
+                                List.of(new RelicTriggerTables.Unmodelled(PASSERBY, FOUR_PIECE, "A", "because"))),
                         "test-file"));
         Assertions.assertTrue(badKey.getMessage().contains("not a number"), badKey.getMessage());
 
@@ -688,7 +772,7 @@ public class RelicTriggerTableTest {
      * (stat + ability) shape lives, so missing that tier would hide most of the gap. It was eight before 326
      * (City of Converging Stars) and 115 (The Ashblazing Grand Duke) became authorable, <b>five</b> once
      * set 106 joined them, and <b>22</b> once the mixed 2-piece abilities that no longer
- * count as invisible were registered. It is <b>11</b> since, when 128's 2-piece
+     * count as invisible were registered. It is <b>11</b> since, when 128's 2-piece
      * ("提供的护盾量提高10%") became authorable with the shield-amount boost.
      */
     @Test
@@ -703,7 +787,9 @@ public class RelicTriggerTableTest {
     // Helpers
     // ==================================================================
 
-    /** The single effect of the rule a set files under a threshold for an event. */
+    /**
+     * The single effect of the rule a set files under a threshold for an event.
+     */
     private static EffectSpec firstEffect(int setId, TriggerEvent event) {
         Character owner = CharacterFactory.create(NO_RULES, 80);
         List<TriggerTable.CompiledRule> rules = RelicTriggerTables.of(setId).at(FOUR_PIECE)
@@ -713,7 +799,8 @@ public class RelicTriggerTableTest {
         return rules.getFirst().effects().getFirst();
     }
 
-    private static void assertRuleOn(int setId, TriggerEvent event) {        Assertions.assertTrue(RelicTriggerTables.exists(setId), "set " + setId + " must have a rule file");
+    private static void assertRuleOn(int setId, TriggerEvent event) {
+        Assertions.assertTrue(RelicTriggerTables.exists(setId), "set " + setId + " must have a rule file");
         RelicTriggerTables.Rules rules = RelicTriggerTables.of(setId);
         Assertions.assertTrue(rules.thresholds().contains(FOUR_PIECE),
                 "set " + setId + "'s ability is a 4-piece one, so its rules are filed under \"4\"");
@@ -721,7 +808,9 @@ public class RelicTriggerTableTest {
                 "set " + setId + " must carry exactly one rule on " + event);
     }
 
-    /** A suit wearing exactly the given slots of one set (no planar pieces). */
+    /**
+     * A suit wearing exactly the given slots of one set (no planar pieces).
+     */
     private static RelicSuit partialSuit(int setId, RelicType... slots) {
         RelicSuit suit = new RelicSuit();
         for (RelicType slot : slots) {

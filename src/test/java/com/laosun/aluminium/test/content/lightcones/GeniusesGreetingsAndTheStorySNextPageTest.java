@@ -5,11 +5,11 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Summon;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.Weapon;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.models.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -28,7 +28,7 @@ public class GeniusesGreetingsAndTheStorySNextPageTest {
     private static final int MASTER = 1413;      // the wearer must have a memosprite spec (see resources/memosprites)
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-        private Character wearer;
+    private Character wearer;
     private Character ally;
     private Summon memosprite;
     private Enemy enemy;
@@ -106,7 +106,9 @@ public class GeniusesGreetingsAndTheStorySNextPageTest {
         System.out.println("[21051/21054] spec percents " + basicPercent + " / " + healPercent);
     }
 
-    /** Every effect of the one rule for that event: attribute, percent, turns, and the two targets exactly once each. */
+    /**
+     * Every effect of the one rule for that event: attribute, percent, turns, and the two targets exactly once each.
+     */
     private double pinOne(Battle battle, TriggerEvent event, com.laosun.aluminium.models.CanHit actor,
                           String ruleId, String attribute, double percent, int turns) {
         int effects = 0;

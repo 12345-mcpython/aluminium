@@ -1,8 +1,6 @@
 package com.laosun.aluminium.test.trigger;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
@@ -10,9 +8,11 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.DoubleValue;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.buff.ShieldBuff;
 import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -41,7 +41,10 @@ public class ShieldOriginConditionTest {
     private static final int MARCH_7TH = 1001;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-        /** The Skill's shield satisfies the condition; the battle-start one (a different rule) does not. */
+
+    /**
+     * The Skill's shield satisfies the condition; the battle-start one (a different rule) does not.
+     */
     @Test
     public void onlyTheNamedRulesShieldCounts() {
         Assertions.assertTrue(healFires(true, "skill_shield"),
@@ -50,33 +53,43 @@ public class ShieldOriginConditionTest {
                 "…and a different rule of hers is a different shield, even though the giver is the same");
     }
 
-    /** Note: The negative case stated the other way: with ONLY the battle-start shield up, the Skill's condition is false. */
+    /**
+     * Note: The negative case stated the other way: with ONLY the battle-start shield up, the Skill's condition is false.
+     */
     @Test
     public void theBattleStartShieldDoesNotSatisfyIt() {
         Assertions.assertFalse(healFires(false, "skill_shield"),
                 "the ally holds a shield from March 7th, but not from that rule");
     }
 
-    /** Plain {@code has_shield} still means "any living shield", whichever rule made it. */
+    /**
+     * Plain {@code has_shield} still means "any living shield", whichever rule made it.
+     */
     @Test
     public void theUnqualifiedConditionIsUnchanged() {
         Assertions.assertTrue(healFires(false, ""), "no qualifier: the battle-start shield is enough");
         Assertions.assertTrue(healFires(true, ""), "…and so is the Skill's");
     }
 
-    /** Note: A shield nothing created (a raw grant) states no rule, so a {@code from_rule} question answers no. */
+    /**
+     * Note: A shield nothing created (a raw grant) states no rule, so a {@code from_rule} question answers no.
+     */
     @Test
     public void aRawGrantHasNoOrigin() {
         Assertions.assertFalse(healFiresRaw(), "setShield states no rule, and guessing one would be worse");
     }
 
-    /** A raw grant still satisfies the unqualified condition. */
+    /**
+     * A raw grant still satisfies the unqualified condition.
+     */
     @Test
     public void aRawGrantStillCountsAsAShield() {
         Assertions.assertTrue(healFiresRawWithPlainCondition());
     }
 
-    /** Note: An id that resolves to nothing is refused at load: a condition that can never hold must not load. */
+    /**
+     * Note: An id that resolves to nothing is refused at load: a condition that can never hold must not load.
+     */
     @Test
     public void anUnknownRuleIdIsRefusedAtLoad() {
         IllegalArgumentException refused = Assertions.assertThrows(IllegalArgumentException.class,
@@ -86,7 +99,9 @@ public class ShieldOriginConditionTest {
         Assertions.assertTrue(refused.getMessage().contains("skill_shield"), "the message lists the ids it knows");
     }
 
-    /** Note: An id that names a rule which creates no shield is refused too - the condition could never hold. */
+    /**
+     * Note: An id that names a rule which creates no shield is refused too - the condition could never hold.
+     */
     @Test
     public void anIdThatMakesNoShieldIsRefusedAtLoad() {
         IllegalArgumentException refused = Assertions.assertThrows(IllegalArgumentException.class,
@@ -95,7 +110,9 @@ public class ShieldOriginConditionTest {
         Assertions.assertTrue(refused.getMessage().contains("no SHIELD effect"), refused.getMessage());
     }
 
-    /** An unknown qualifier after {@code has_shield} is refused, naming the one that works. */
+    /**
+     * An unknown qualifier after {@code has_shield} is refused, naming the one that works.
+     */
     @Test
     public void anUnknownQualifierIsRefusedAtLoad() {
         IllegalArgumentException refused = Assertions.assertThrows(IllegalArgumentException.class,
@@ -132,8 +149,8 @@ public class ShieldOriginConditionTest {
      * Whether the condition-gated heal fires for an ally whose shield came from {@code ruleId}.
      *
      * @param fromTheSkill {@code true} to the shield is installed by {@code skill_shield}; {@code false} to by
-     *  {@code eidolon_shield}
-     * @param asked the rule the condition names ({@code ""} = the unqualified spelling)
+     *                     {@code eidolon_shield}
+     * @param asked        the rule the condition names ({@code ""} = the unqualified spelling)
      */
     private static boolean healFires(boolean fromTheSkill, String asked) {
         Character hero = CharacterFactory.create(MARCH_7TH, LEVEL);
@@ -148,7 +165,9 @@ public class ShieldOriginConditionTest {
         return turnStartHeals(battle, hero, ally);
     }
 
-    /** The same, with a shield written straight onto the ally (no rule created it). */
+    /**
+     * The same, with a shield written straight onto the ally (no rule created it).
+     */
     private static boolean healFiresRaw() {
         return rawCase(false);
     }
@@ -175,14 +194,18 @@ public class ShieldOriginConditionTest {
         return turnStartHeals(battle, hero, ally);
     }
 
-    /** Fires the ally's own turn start and reports whether March 7th's rule healed them. */
+    /**
+     * Fires the ally's own turn start and reports whether March 7th's rule healed them.
+     */
     private static boolean turnStartHeals(Battle battle, Character hero, Character ally) {
         double before = ally.getCurrentHp();
         battle.fireTriggers(TriggerEvent.TURN_START, ally, ally, 0, 0);
         return ally.getCurrentHp() > before;
     }
 
-    /** Takes half of a unit's HP, so a heal has something to restore (a heal at full HP restores 0). */
+    /**
+     * Takes half of a unit's HP, so a heal has something to restore (a heal at full HP restores 0).
+     */
     private static void hurt(Character unit) {
         unit.takeDamage(unit.getMaxHp() * 0.5);
     }
@@ -193,7 +216,9 @@ public class ShieldOriginConditionTest {
         ally.getBuffManager().addBuff(shield);
     }
 
-    /** A rule that gives {@code ruleId}'s shield to its owner's ally - the shape a shield rule has. */
+    /**
+     * A rule that gives {@code ruleId}'s shield to its owner's ally - the shape a shield rule has.
+     */
     private static TriggerSpec shieldRule(String ruleId) {
         EffectSpec effect = new EffectSpec();
         TriggerSpecs.set(effect, "op", "SHIELD");
@@ -205,7 +230,9 @@ public class ShieldOriginConditionTest {
         return rule;
     }
 
-    /** A rule with no shield in it, for the "the id resolves but creates nothing" case. */
+    /**
+     * A rule with no shield in it, for the "the id resolves but creates nothing" case.
+     */
     private static TriggerSpec buffRule(String ruleId) {
         EffectSpec effect = new EffectSpec();
         TriggerSpecs.set(effect, "op", "MODIFY_ATTR");
@@ -217,7 +244,9 @@ public class ShieldOriginConditionTest {
         return rule;
     }
 
-    /** The heal under test: 4% of the target's own maximum + 106, on their turn start, gated on the shield. */
+    /**
+     * The heal under test: 4% of the target's own maximum + 106, on their turn start, gated on the shield.
+     */
     private static TriggerSpec healOnTurnStart(String askedRule) {
         EffectSpec effect = new EffectSpec();
         TriggerSpecs.set(effect, "op", "HEAL");
@@ -229,7 +258,9 @@ public class ShieldOriginConditionTest {
         return TriggerSpecs.rule("TURN_START", List.of(condition), effect);
     }
 
-    /** Compiles one condition into a table, which is where its cross-rule validation runs. */
+    /**
+     * Compiles one condition into a table, which is where its cross-rule validation runs.
+     */
     private static TriggerTable tableOf(String condition, TriggerSpec namedRule) {
         Character owner = CharacterFactory.create(MARCH_7TH, LEVEL);
         List<TriggerSpec> rules = List.of(
@@ -239,7 +270,9 @@ public class ShieldOriginConditionTest {
         return owner.getTriggerTable();
     }
 
-    /** A bare heal, so the tables above are about the condition rather than about the amount. */
+    /**
+     * A bare heal, so the tables above are about the condition rather than about the amount.
+     */
     private static EffectSpec heal() {
         EffectSpec effect = new EffectSpec();
         TriggerSpecs.set(effect, "op", "HEAL");
@@ -248,7 +281,9 @@ public class ShieldOriginConditionTest {
         return effect;
     }
 
-    /** March 7th with her real file, one ally, and Eidolon 6: heal on the ally's turn start, through one of the two shields. */
+    /**
+     * March 7th with her real file, one ally, and Eidolon 6: heal on the ally's turn start, through one of the two shields.
+     */
     private static double shippedTurnStartHeal(boolean throughTheSkill) {
         Character hero = CharacterFactory.create(MARCH_7TH, LEVEL, true, null, null, 6);
         Character ally = CharacterFactory.create(ALLY, LEVEL);

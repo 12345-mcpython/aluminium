@@ -7,8 +7,6 @@ import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
-
 /**
  * Light cone 23026: both clauses -- and the first content to combine REMOVE_STATE with per_stack.
  *

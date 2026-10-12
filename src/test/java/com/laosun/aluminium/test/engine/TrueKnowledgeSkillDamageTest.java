@@ -1,28 +1,30 @@
 package com.laosun.aluminium.test.engine;
+
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
 import java.util.List;
 
 /**
  * Capability (2) and the clause it unlocks: "... raise the Skill damage dealt by #2(20)%".
- *
+ * <p>
  * The control is RNG-identical: the ode is cast in BOTH readings, aimed at him in one and at Cyrene (昔涟) in the other, so the same casts draw the same random numbers and the only difference is
  * whether True Knowledge (真知) landed on him. (Measured: comparing against "no ode at all" moved the basic attack by 0.11% of pure RNG drift, which swamped the gate.)
- *
+ * <p>
  * And one attack per battle, because True Knowledge (真知) is spent by the next attack.
- *
+ * <p>
  * Note: The share comes from the LEVEL row (measured: 5600 bp). The ratio it produces (1.3948 rather than 1.56) implies a baseline of 0.4184 this round did not trace; registered, not guessed.
  */
 public class TrueKnowledgeSkillDamageTest {
     private static final int LEVEL = 80;
     private static final int CYRENE = 1415;
     private static final int ANAXA = 1405;
-        private static final int ODE_SLOT = 18;
+    private static final int ODE_SLOT = 18;
     private static final String CAPTURED = "真知的战技增伤";
 
     @Test
@@ -44,7 +46,9 @@ public class TrueKnowledgeSkillDamageTest {
                 "and his BASIC attack is essentially untouched: " + basicRatio + " (the attack-raise's own +0.111%)");
     }
 
-    /** [the damage that one attack dealt, the captured #2 in basis points] */
+    /**
+     * [the damage that one attack dealt, the captured #2 in basis points]
+     */
     private static double[] hit(boolean atHim, SkillType slot) {
         Character cyrene = CharacterFactory.create(CYRENE, LEVEL);
         Character him = CharacterFactory.create(ANAXA, LEVEL);

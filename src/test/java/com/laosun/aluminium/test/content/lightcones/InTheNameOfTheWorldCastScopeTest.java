@@ -5,8 +5,8 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Weapon;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -30,11 +30,13 @@ import java.util.List;
 public class InTheNameOfTheWorldCastScopeTest {
     private static final int WEARER = 1001;
     private static final int LEVEL = 80;
-        private static final int CONE = 23004;
+    private static final int CONE = 23004;
     private static final int RANK = 5;
     private static final String RULE = "cone23004_cast_scope_stats";
 
-    /** No residue: both attributes are back to where they started once the cast is over. */
+    /**
+     * No residue: both attributes are back to where they started once the cast is over.
+     */
     @Test
     public void theBoostDoesNotOutliveTheCast() {
         Character unit = CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(CONE, LEVEL, false, RANK));
@@ -60,7 +62,9 @@ public class InTheNameOfTheWorldCastScopeTest {
                 "ATK is the same: `until: cast_end` stops right there");
     }
 
-    /** The content guard: every rank carries the rule, with that rank's own two numbers and the cast-end lifetime. */
+    /**
+     * The content guard: every rank carries the rule, with that rank's own two numbers and the cast-end lifetime.
+     */
     @Test
     public void everyRankCarriesTheCastScopedRule() throws java.io.IOException {
         String raw = java.nio.file.Files.readString(

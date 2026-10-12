@@ -5,15 +5,15 @@ import com.laosun.aluminium.beans.CharacterData;
 import com.laosun.aluminium.beans.ResourceSpec;
 import com.laosun.aluminium.data.Memosprites;
 import com.laosun.aluminium.data.RelicTriggerTables;
-import com.laosun.aluminium.data.WeaponTriggerTables;
 import com.laosun.aluminium.data.TriggerTables;
+import com.laosun.aluminium.data.WeaponTriggerTables;
 import com.laosun.aluminium.exceptions.CharacterException;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.RelicSuit;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.Weapon;
 import com.laosun.aluminium.models.energy.EnergyProvider;
 import com.laosun.aluminium.models.energy.NoConventionalEnergyProvider;
+import com.laosun.aluminium.models.trigger.TriggerTable;
 import it.unimi.dsi.fastutil.ints.Int2IntMap;
 
 import java.util.Set;
@@ -195,16 +195,16 @@ public final class CharacterFactory {
         // directly, so the cap a rule is gated on is the same number that was registered -- there is one
         // reader of the declaration (`requireReadableResources`), not two.
         for (ResourceSpec spec : table.resources()) {
-                // A PARTY-scoped declaration is NOT registered per character: `ResourceManager.register` itself
-                // refuses an unwired scope because "a party-level resource needs a PER-BATTLE owner", and `Battle` is that owner
-                // (it registers these from the party's declarations at the start of the battle). Registering a copy here as well would
-                // quietly give the declaring character a private counter and the shared one would read 0 -- measured, before this.
-                if ("PARTY".equalsIgnoreCase(spec.scope() == null ? "" : spec.scope().trim())) {
-                    continue;
-                }
+            // A PARTY-scoped declaration is NOT registered per character: `ResourceManager.register` itself
+            // refuses an unwired scope because "a party-level resource needs a PER-BATTLE owner", and `Battle` is that owner
+            // (it registers these from the party's declarations at the start of the battle). Registering a copy here as well would
+            // quietly give the declaring character a private counter and the shared one would read 0 -- measured, before this.
+            if ("PARTY".equalsIgnoreCase(spec.scope() == null ? "" : spec.scope().trim())) {
+                continue;
+            }
             // The declared overflow rides along.
-                character.getResources().register(spec.id(), spec.max(), spec.initial(),
-                        spec.overflow() == null ? 0 : spec.overflow());
+            character.getResources().register(spec.id(), spec.max(), spec.initial(),
+                    spec.overflow() == null ? 0 : spec.overflow());
         }
         // stack/special-resource characters: swap out conventional energy gain (otherwise they could fill the bar just by getting hit and fire an ultimate they should not have)
         if (SPECIAL_RESOURCE_CHARACTERS.contains(cid)) {

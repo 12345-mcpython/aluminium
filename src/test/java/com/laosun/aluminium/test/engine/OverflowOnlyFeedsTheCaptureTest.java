@@ -1,23 +1,25 @@
 package com.laosun.aluminium.test.engine;
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
-import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
 import java.util.List;
 
-/** Does an `overflow_only` spend set the amount the next effect reads? */
+/**
+ * Does an `overflow_only` spend set the amount the next effect reads?
+ */
 public class OverflowOnlyFeedsTheCaptureTest {
     private static final int LEVEL = 80;
     private static final int SPARE = 1002;
-        private static final int MAX = 10;
+    private static final int MAX = 10;
     private static final int OVERFLOW = 4;
     private static final String SPENT = "被花掉";
     private static final String MARK = "探针数";
@@ -50,7 +52,9 @@ public class OverflowOnlyFeedsTheCaptureTest {
         Assertions.assertEquals(OVERFLOW, overflow[2], "and the next effect must see exactly that");
     }
 
-    /** [the value before, the value after, what the follower gained] */
+    /**
+     * [the value before, the value after, what the follower gained]
+     */
     private static int[] run(boolean overflowOnly) {
         Character spare = CharacterFactory.create(SPARE, LEVEL);
         Battle battle = new Battle(List.of(spare),

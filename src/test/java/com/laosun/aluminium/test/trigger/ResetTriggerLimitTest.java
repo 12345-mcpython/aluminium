@@ -1,16 +1,16 @@
 package com.laosun.aluminium.test.trigger;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -59,8 +59,8 @@ public class ResetTriggerLimitTest {
         battle.fireTriggers(TriggerEvent.SKILL_CAST, owner, enemy, 0, 0);
         System.out.println("[reset] keyOf=" + owner.getTriggerTable().keyOf(CAPPED)
                 + " key=" + owner.getTriggerTable().rulesFor(TriggerEvent.SKILL_CAST)
-                        .stream().filter(r -> CAPPED.equals(r.id())).findFirst()
-                        .map(r -> r.key()).orElse("<none>"));
+                .stream().filter(r -> CAPPED.equals(r.id())).findFirst()
+                .map(r -> r.key()).orElse("<none>"));
         battle.fireTriggers(TriggerEvent.ULT_CAST, owner, enemy, 0, 0);
         battle.fireTriggers(TriggerEvent.SKILL_CAST, owner, enemy, 0, 0);
         return owner.getBuffManager().stacksOf("探针");

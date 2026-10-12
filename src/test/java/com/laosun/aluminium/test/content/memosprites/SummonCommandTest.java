@@ -1,27 +1,22 @@
 package com.laosun.aluminium.test.content.memosprites;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
-import com.laosun.aluminium.beans.MemospriteSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.data.TriggerTables;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.CanHit;
+import com.laosun.aluminium.models.*;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.DoubleValue;
-import com.laosun.aluminium.models.Signal;
-import com.laosun.aluminium.models.Summon;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
-import com.laosun.aluminium.models.enemy.SummonFactory;
 import com.laosun.aluminium.models.skill.DefaultSkill;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -60,7 +55,9 @@ import java.util.List;
 public class SummonCommandTest {
     private static final double EPS = 1e-6;
 
-    /** Evernight (长夜月) - her ultimate is the first user of {@code COMMAND_SUMMON}. */
+    /**
+     * Evernight (长夜月) - her ultimate is the first user of {@code COMMAND_SUMMON}.
+     */
     private static final int OWNER = 1413;
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
@@ -102,10 +99,12 @@ public class SummonCommandTest {
      */
     @Test
     public void theBaseIsTheSummonsOwnAttribute() {
-        double plain = commandedDamage(summon -> { });
+        double plain = commandedDamage(summon -> {
+        });
         double summonFatter = commandedDamage(summon -> summon.setAttribute(AttributeType.HEALTH,
                 new DoubleValue(summon.getMaxHp() * 2)));
-        double ownerFatter = commandedDamage(summon -> { }, owner -> owner.setAttribute(AttributeType.HEALTH,
+        double ownerFatter = commandedDamage(summon -> {
+        }, owner -> owner.setAttribute(AttributeType.HEALTH,
                 new DoubleValue(owner.getMaxHp() * 2)));
 
         Assertions.assertTrue(plain > 0, "precondition: the commanded attack dealt damage");
@@ -115,7 +114,9 @@ public class SummonCommandTest {
                 "…and the owner's Max HP is not what it reads");
     }
 
-    /** The shape comes from the named skill, so an AOE ultimate reaches every enemy. */
+    /**
+     * The shape comes from the named skill, so an AOE ultimate reaches every enemy.
+     */
     @Test
     public void itHitsEveryEnemyBecauseTheSkillIsAnAoe() {
         Character owner = characterWith(rule("ULT_CAST", command(0, 10)));
@@ -177,7 +178,9 @@ public class SummonCommandTest {
     // 2. Refusals
     // ==================================================================
 
-    /** Every argument is required, and a stray one is refused rather than ignored. */
+    /**
+     * Every argument is required, and a stray one is refused rather than ignored.
+     */
     @Test
     public void theArgumentsAreCheckedAtLoadTime() {
         assertRejected(commandWithout("skill"), "skill");
@@ -206,7 +209,9 @@ public class SummonCommandTest {
         Assertions.assertTrue(refused.getMessage().contains("self_summon_count >= 1"), refused.getMessage());
     }
 
-    /** Naming a slot whose skill does not deal damage is refused when the effect fires. */
+    /**
+     * Naming a slot whose skill does not deal damage is refused when the effect fires.
+     */
     @Test
     public void aNonDamagingSkillIsRefused() {
         Character owner = characterWith(rule("ULT_CAST",
@@ -293,7 +298,9 @@ public class SummonCommandTest {
         Assertions.assertTrue(second.getCurrentHp() < secondBefore, "every one of them");
     }
 
-    /** The authored rule states the skill, the column, the row and the base - and nothing it does not need. */
+    /**
+     * The authored rule states the skill, the column, the row and the base - and nothing it does not need.
+     */
     @Test
     public void theAuthoredRuleNamesItsSkillAndRow() {
         Character owner = CharacterFactory.create(OWNER, LEVEL);
@@ -321,7 +328,7 @@ public class SummonCommandTest {
         // ...and the file really does state that level, as a BATTLE_START raise of the ULTRA slot (10 - 1).
         TriggerTable table = TriggerTables.of(OWNER);
         Assertions.assertTrue(table.matching(TriggerEvent.BATTLE_START,
-                        new TriggerTable.TriggerContext(owner, owner, null, 0, 0, null, battle)).stream()
+                                new TriggerTable.TriggerContext(owner, owner, null, 0, 0, null, battle)).stream()
                         .flatMap(rule -> rule.effects().stream())
                         .anyMatch(effect -> "RAISE_SKILL_LEVEL".equals(effect.getOp())
                                 && "ULTRA".equals(effect.getSkill())
@@ -355,7 +362,9 @@ public class SummonCommandTest {
         return effect;
     }
 
-    /** The same, with one field removed or replaced (for the refusal cases). */
+    /**
+     * The same, with one field removed or replaced (for the refusal cases).
+     */
     private static EffectSpec commandWithout(String field) {
         EffectSpec effect = command(0, 10);
         TriggerSpecs.set(effect, field, null);
@@ -390,9 +399,12 @@ public class SummonCommandTest {
         return owner;
     }
 
-    /** One battle, one command: how much HP the enemy camp lost. */
+    /**
+     * One battle, one command: how much HP the enemy camp lost.
+     */
     private static double commandedDamage(java.util.function.Consumer<Summon> tweak) {
-        return commandedDamage(tweak, owner -> { });
+        return commandedDamage(tweak, owner -> {
+        });
     }
 
     private static double commandedDamage(java.util.function.Consumer<Summon> tweakSummon,
@@ -410,7 +422,9 @@ public class SummonCommandTest {
         return before - target.getCurrentHp();
     }
 
-    /** The same, at a stated level, for the row case. */
+    /**
+     * The same, at a stated level, for the row case.
+     */
     private static double commandedDamageWith(int level) {
         Character owner = characterWith(rule("ULT_CAST", command(0, level)));
         Enemy target = dummy();
@@ -439,7 +453,9 @@ public class SummonCommandTest {
         return battle.allies.stream().mapToDouble(CanHit::getCurrentHp).sum();
     }
 
-    /** How much action value the unit still has - the number an action would reset. */
+    /**
+     * How much action value the unit still has - the number an action would reset.
+     */
     private static double timeRemaining(Battle battle, CanHit target) {
         for (Signal signal : battle.queue.snapshot()) {
             if (signal.getCanHit() == target) {

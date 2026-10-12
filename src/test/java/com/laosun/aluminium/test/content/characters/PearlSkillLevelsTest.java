@@ -1,12 +1,14 @@
 package com.laosun.aluminium.test.content.characters;
+
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
 import java.util.List;
 
 /**
@@ -40,10 +42,12 @@ public class PearlSkillLevelsTest {
         Assertions.assertEquals(12, five[3], "and 2 to the talent");
     }
 
-    /** Effective levels for a Pearl at the given Eidolon rank: ULTRA, COMMON, SKILL, TALENT. */
+    /**
+     * Effective levels for a Pearl at the given Eidolon rank: ULTRA, COMMON, SKILL, TALENT.
+     */
     private static int[] levels(int rank) {
         Battle battle = new Battle(List.of(CharacterFactory.create(PEARL, 80, true, null, null, rank),
-                        CharacterFactory.create(ALLY, 80)),
+                CharacterFactory.create(ALLY, 80)),
                 List.of(EnemyFactory.create(1002011, 100, 1)), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();

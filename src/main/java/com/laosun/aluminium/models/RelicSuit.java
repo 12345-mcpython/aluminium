@@ -34,7 +34,7 @@ import static com.laosun.aluminium.Constant.PERCENT_TO_BASE;
  * ("at the start of the battle, immediately regenerates 1 Skill Point") is not a stat-sheet effect and
  * this class contributes nothing for it. Such abilities are executed by <b>trigger rules</b>
  * ({@code resources/relic_sets/<setId>.json}, loaded by
- * {@link com.laosun.aluminium.data.RelicTriggerTables} and attached at the assembly point), not here - 
+ * {@link com.laosun.aluminium.data.RelicTriggerTables} and attached at the assembly point), not here -
  * see that class. An ability whose text the current op vocabulary cannot express is registered as an
  * explicit gap ({@code relic_sets/_unmodelled.json}, reported as {@code F-10} in {@code ROADMAP.md})
  * rather than being silently forgotten; {@link RelicSet.Effect#hasAbility()} and

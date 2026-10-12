@@ -1,8 +1,6 @@
 package com.laosun.aluminium.test.engine;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
@@ -10,9 +8,11 @@ import com.laosun.aluminium.data.RelicTriggerTables;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerInterpreter;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.models.trigger.TriggerInterpreter;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -34,7 +34,7 @@ import java.util.Map;
  */
 public class PerStackRuntimeTest {
     private static final int WEARER = 1210;
-        private static final String MARK = "per_stack_runtime_mark";
+    private static final String MARK = "per_stack_runtime_mark";
 
     @Test
     public void aSelfStackMultiplierActuallyScalesTheBonus() {

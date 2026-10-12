@@ -4,13 +4,13 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.CanHit;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.skill.DefaultSkill;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
-import com.laosun.aluminium.models.skill.Skill;
 import com.laosun.aluminium.models.energy.EnergyProvider;
 import com.laosun.aluminium.models.energy.NoConventionalEnergyProvider;
 import com.laosun.aluminium.models.energy.StandardEnergyProvider;
+import com.laosun.aluminium.models.skill.DefaultSkill;
+import com.laosun.aluminium.models.skill.Skill;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -40,7 +40,9 @@ import java.util.Set;
 public class SpecialEnergyProviderTest {
     private static final double EPS = 1e-9;
 
-    /** Every character in the project that "uses a special resource", written out one by one (adding or removing one must be an explicit change). */
+    /**
+     * Every character in the project that "uses a special resource", written out one by one (adding or removing one must be an explicit change).
+     */
     private static final int[] SPECIAL = {1220, 1308, 1407, 1408, 1415, 1506};
 
     private final EnergyProvider standard = new StandardEnergyProvider();
@@ -50,7 +52,9 @@ public class SpecialEnergyProviderTest {
     // 1. The provider itself
     // ==================================================================
 
-    /** All 5 hooks credit nothing - this is the complete expression of "no source should grant energy". */
+    /**
+     * All 5 hooks credit nothing - this is the complete expression of "no source should grant energy".
+     */
     @Test
     public void specialProviderGrantsNothingFromAnySource() {
         Character any = CharacterFactory.create(1308, 80);      // Acheron
@@ -67,7 +71,9 @@ public class SpecialEnergyProviderTest {
         Assertions.assertNull(none.onBreak(any, any), "break");
     }
 
-    /** Control: the standard provider's same 5 hooks all grant something (hit 10 / kill 5 / break 5). */
+    /**
+     * Control: the standard provider's same 5 hooks all grant something (hit 10 / kill 5 / break 5).
+     */
     @Test
     public void standardProviderGrantsFromEverySource() {
         Character regular = CharacterFactory.create(1204, 80);
@@ -88,7 +94,9 @@ public class SpecialEnergyProviderTest {
         Assertions.assertEquals(5, standard.onBreak(regular, regular).amount(), EPS);
     }
 
-    /** The standard provider still uses the constants (20/30/5), matching the standard tier - it does not depend on skill data. */
+    /**
+     * The standard provider still uses the constants (20/30/5), matching the standard tier - it does not depend on skill data.
+     */
     @Test
     public void standardProviderUsesTheConventionalConstants() {
         Character yaoGuang = CharacterFactory.create(1502, 80);   // Yao Guang: the basic-attack data says 30 (off-tier)
@@ -101,7 +109,9 @@ public class SpecialEnergyProviderTest {
     // 2. The assembly point
     // ==================================================================
 
-    /** {@code CharacterFactory} swaps in the special provider for these 6 characters. */
+    /**
+     * {@code CharacterFactory} swaps in the special provider for these 6 characters.
+     */
     @Test
     public void factoryInjectsTheSpecialProvider() {
         for (int cid : SPECIAL) {
@@ -116,7 +126,9 @@ public class SpecialEnergyProviderTest {
         Assertions.assertFalse(CharacterFactory.usesSpecialResource(1204));
     }
 
-    /** Placeholder entry points are unaffected (it does not look up character data, so there is no cid to judge by). */
+    /**
+     * Placeholder entry points are unaffected (it does not look up character data, so there is no cid to judge by).
+     */
     @Test
     public void placeholderCharactersKeepTheStandardProvider() {
         Character placeholder = Character.fromAttributes("hero", 10_000, 100, 100, 100);
@@ -234,7 +246,9 @@ public class SpecialEnergyProviderTest {
         return new DefaultSkill(cid, slot, 1);
     }
 
-    /** The enemy's basic attack (the skill attached to enemies at assembly). */
+    /**
+     * The enemy's basic attack (the skill attached to enemies at assembly).
+     */
     private static Skill enemySkill(Enemy enemy) {
         return enemy.getSkills().values().iterator().next();
     }

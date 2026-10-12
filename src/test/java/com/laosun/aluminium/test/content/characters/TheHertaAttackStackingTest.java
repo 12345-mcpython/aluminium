@@ -4,8 +4,8 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -20,7 +20,10 @@ import java.util.List;
  */
 public class TheHertaAttackStackingTest {
     private static final int OWNER = 1401;
-        /** Both sources present means the two increments ADD (model-free: no share of the total is assumed). */
+
+    /**
+     * Both sources present means the two increments ADD (model-free: no share of the total is assumed).
+     */
     @Test
     public void bothAttackSourcesAreCounted() {
         double plain = attack(false, false);

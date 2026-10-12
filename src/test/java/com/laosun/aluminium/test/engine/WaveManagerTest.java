@@ -1,15 +1,15 @@
 package com.laosun.aluminium.test.engine;
 
 
-import com.laosun.aluminium.test.data.StageLazyLoadTest;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.beans.StageBean;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.WaveManager;
+import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
+import com.laosun.aluminium.test.data.StageLazyLoadTest;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
@@ -315,7 +315,9 @@ public class WaveManagerTest {
 
     // ==================================================================
 
-    /** Builds a battle with "an empty enemy team + a wave manager" (P-4's standard usage). */
+    /**
+     * Builds a battle with "an empty enemy team + a wave manager" (P-4's standard usage).
+     */
     private static Battle waveBattle(int stageId) {
         StageBean stage = stage(stageId);
         Battle battle = new Battle(List.of(character()), new ArrayList<>(), BattleFixture.seeded());
@@ -323,7 +325,9 @@ public class WaveManagerTest {
         return battle;
     }
 
-    /** Fetches a stage; skips if there is no data (stage.json is produced by a generator - see the class docs). */
+    /**
+     * Fetches a stage; skips if there is no data (stage.json is produced by a generator - see the class docs).
+     */
     private static StageBean stage(int stageId) {
         StageBean stage = Constant.stages().get(stageId);
         Assumptions.assumeFalse(Constant.stages().isEmpty(),
@@ -332,7 +336,9 @@ public class WaveManagerTest {
         return stage;
     }
 
-    /** Builds one wave in {@code Monster0..N} order (simulating the LinkedHashMap Gson reads). */
+    /**
+     * Builds one wave in {@code Monster0..N} order (simulating the LinkedHashMap Gson reads).
+     */
     private static Map<String, Integer> wave(int... ids) {
         Map<String, Integer> wave = new LinkedHashMap<>();
         for (int i = 0; i < ids.length; i++) {

@@ -93,7 +93,7 @@ public final class Queue {
     private int extraTurnsOwed;
 
     /**
- * A unit that will act BEFORE the heap is consulted.
+     * A unit that will act BEFORE the heap is consulted.
      *
      * <p>Why a separate slot rather than a heap entry: the heap is a schedule, and a unit with no action value cannot have one. This is
      * "who acts next regardless of the clock", which is what an inserted action is, and it is what `move()` hands out first.
@@ -113,7 +113,9 @@ public final class Queue {
         return true;
     }
 
-    /** Whether this unit has a place in the action order (as opposed to acting through an inserted action). */
+    /**
+     * Whether this unit has a place in the action order (as opposed to acting through an inserted action).
+     */
     public boolean isInActionOrder(CanHit actor) {
         if (actor == null) {
             return false;
@@ -125,6 +127,7 @@ public final class Queue {
         }
         return false;
     }
+
     /**
      * When the extra turn was granted, that actor's original {@code nextActionTime}.
      *
@@ -502,7 +505,7 @@ public final class Queue {
      *       replaces the previous holder (registered gap: no shipped reader needs more than one holder yet).</li>
      * </ul>
      *
-     * <p>Typical usage (on-kill talents, e.g. Seele): call it inside {@code afterMove()} - 
+     * <p>Typical usage (on-kill talents, e.g. Seele): call it inside {@code afterMove()} -
      * that is, after {@code setTopZero()} - so that the stored "original schedule" is the one from
      * after they acted and got pushed back.
      *

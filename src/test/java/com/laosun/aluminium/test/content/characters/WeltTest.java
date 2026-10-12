@@ -60,7 +60,9 @@ public class WeltTest {
         }
     }
 
-    /** Note: Bounce: his skill's own damage must land at all (it computed zero hits before the round-10 fix). */
+    /**
+     * Note: Bounce: his skill's own damage must land at all (it computed zero hits before the round-10 fix).
+     */
     @Test
     public void hisSkillActuallyDealsDamage() {
         Fixture f = new Fixture();

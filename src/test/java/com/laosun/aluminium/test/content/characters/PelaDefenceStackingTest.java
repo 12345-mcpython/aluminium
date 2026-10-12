@@ -5,8 +5,8 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -20,7 +20,10 @@ import java.util.List;
  */
 public class PelaDefenceStackingTest {
     private static final int OWNER = 1106;
-        /** Both sources present means the two differences add. */
+
+    /**
+     * Both sources present means the two differences add.
+     */
     @Test
     public void bothSourcesAreCounted() {
         double plain = read(false, false);

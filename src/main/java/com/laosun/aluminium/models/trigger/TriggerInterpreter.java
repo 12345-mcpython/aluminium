@@ -1,36 +1,18 @@
-package com.laosun.aluminium.models;
+package com.laosun.aluminium.models.trigger;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
-import com.laosun.aluminium.enums.AttributeType;
-import com.laosun.aluminium.enums.DamageElement;
-import com.laosun.aluminium.enums.DamageType;
-import com.laosun.aluminium.enums.DebuffClass;
-import com.laosun.aluminium.enums.Path;
-import com.laosun.aluminium.enums.SkillType;
-import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.TriggerTable.CompiledRule;
-import com.laosun.aluminium.models.TriggerTable.TriggerContext;
-import com.laosun.aluminium.models.buff.AbstractBuff;
-import com.laosun.aluminium.models.buff.BuffManager;
-import com.laosun.aluminium.models.buff.ClassResistBuff;
-import com.laosun.aluminium.models.buff.ControlBuff;
-import com.laosun.aluminium.models.buff.DotBuff;
-import com.laosun.aluminium.models.buff.ReductionBuff;
-import com.laosun.aluminium.models.buff.ShieldBuff;
-import com.laosun.aluminium.models.buff.StatModifierBuff;
-import com.laosun.aluminium.models.buff.DeferredDeathBuff;
-import com.laosun.aluminium.models.buff.StackableStateBuff;
-import com.laosun.aluminium.models.buff.StateBuff;
-import com.laosun.aluminium.models.buff.TauntBuff;
-import com.laosun.aluminium.models.buff.VulnerabilityBuff;
-import com.laosun.aluminium.models.enemy.EnemySkill;
+import com.laosun.aluminium.enums.*;
+import com.laosun.aluminium.models.CanHit;
+import com.laosun.aluminium.models.Character;
+import com.laosun.aluminium.models.Damage;
+import com.laosun.aluminium.models.buff.*;
 import com.laosun.aluminium.models.skill.Skill;
-import com.laosun.aluminium.models.skill.SkillExecutor;
+import com.laosun.aluminium.models.trigger.TriggerTable.CompiledRule;
+import com.laosun.aluminium.models.trigger.TriggerTable.TriggerContext;
 
-import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
@@ -844,7 +826,7 @@ public final class TriggerInterpreter {
                     "DELEGATE_DAMAGE ran with no cast in progress; CAST_SETUP is fired by SkillExecutor.execute "
                             + "with a cast token, so this is an engine fault rather than a content error");
         }
-        Character owner = TriggerMagnitudes.requireCharacterOwner(effect, ctx);
+        com.laosun.aluminium.models.Character owner = TriggerMagnitudes.requireCharacterOwner(effect, ctx);
         if (cast.caster() != owner) {
             throw new IllegalStateException(
                     "DELEGATE_DAMAGE names the rule owner's own cast, but the cast in progress belongs to "
@@ -941,7 +923,7 @@ public final class TriggerInterpreter {
      */
     private static double eventShare(EffectSpec effect, TriggerContext ctx) {
         if (effect.getAmountPercentFromResource() != null) {
-            Character holder = TriggerMagnitudes.requireCharacterOwner(effect, ctx);
+            com.laosun.aluminium.models.Character holder = TriggerMagnitudes.requireCharacterOwner(effect, ctx);
             return holder.getResources().value(effect.getAmountPercentFromResource().trim()) / 10000.0;
         }
         return effect.getAmountPercent() == null ? 1 : effect.getAmountPercent();
@@ -992,7 +974,7 @@ public final class TriggerInterpreter {
             amount = (int) Math.round(ctx.amount() * eventShare(effect, ctx));
         } else if (effect.getAmountFromResource() != null) {
             // The amount IS a resource's value: a number captured while an ode was cast, handed over when the character later casts.
-            Character owner = TriggerMagnitudes.requireCharacterOwner(effect, ctx);
+            com.laosun.aluminium.models.Character owner = TriggerMagnitudes.requireCharacterOwner(effect, ctx);
             amount = owner.getResources().value(effect.getAmountFromResource().trim());
         } else if (isCastParamScale(effect)) {
             //  x percent: the share is usually BELOW 1 and a resource holds an integer, so content stores basis points (percent: 10000).
@@ -1279,31 +1261,6 @@ public final class TriggerInterpreter {
     }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     static String normalizeOp(EffectSpec effect, TriggerSpec spec) {
         if (effect == null || effect.getOp() == null || effect.getOp().isBlank()) {
             throw new IllegalArgumentException(
@@ -1363,14 +1320,6 @@ public final class TriggerInterpreter {
             default -> target.getBuffManager().stacksOf(name.trim());
         };
     }
-
-
-
-
-
-
-
-
 
 
     /**
@@ -1467,8 +1416,6 @@ public final class TriggerInterpreter {
         }
         return lifetimes;
     }
-
-
 
 
     /**
@@ -1570,7 +1517,6 @@ public final class TriggerInterpreter {
             "target_debuff_count", "target_dot_count", "target_weakness_count", "shielded_count");
 
 
-
     /**
      * The one derived scale that is not an attribute: {@code MODIFY_ATTR}'s magnitude may be a share of the rule
      * owner's <b>maximum energy</b> (relic set 328's "for each 1 point above"). Same spelling family as the condition variable
@@ -1636,8 +1582,6 @@ public final class TriggerInterpreter {
     static final String STEPS_PREFIX = "steps:";
 
 
-
-
     /**
      * The magnitude of a {@code HEAL} / {@code SHIELD} for one target: the flat {@code amount}, or a share of a
      * Max HP.
@@ -1662,17 +1606,20 @@ public final class TriggerInterpreter {
             // `target` already means here -- the heal is granted per recipient -- so the reading is `target`'s max HP minus
             // its current HP, never the healer's and never a battle-wide total (that is 1205's separate cumulative idea).
             case "target_lost_hp" -> Math.max(0, target.getMaxHp() - target.getCurrentHp()) * share + flat;
-            case "owner_max_hp" -> TriggerMagnitudes.ownerAttributeOf(ctx, "owner_max_hp", AttributeType.HEALTH) * share + flat;
+            case "owner_max_hp" ->
+                    TriggerMagnitudes.ownerAttributeOf(ctx, "owner_max_hp", AttributeType.HEALTH) * share + flat;
             // "consume HP equal to 35% of Mydei (万敌)'s current HP" (reader: 1404's two enhanced skills). The
             // vocabulary had max-HP shares and a lost-HP share, and neither says "a share of what is left": 35% of MAX on a
             // wounded unit is a plausible-looking wrong number, which is exactly the kind this engine refuses to guess.
             // Note: `target` is the unit being resolved (for CONSUME_HP, the spender), matching the `target_*` family.
             case "target_current_hp" -> target.getCurrentHp() * share + flat;
             // March 7th (三月七) 100102: a shield of "5% of DEF + 60" -- a share of the maker's DEFENCE plus a constant.
-            case "owner_def" -> TriggerMagnitudes.ownerAttributeOf(ctx, "owner_def", AttributeType.DEFENCE) * share + flat;
+            case "owner_def" ->
+                    TriggerMagnitudes.ownerAttributeOf(ctx, "owner_def", AttributeType.DEFENCE) * share + flat;
             // ? 1414's shield is "20.00% of ATK + 400": the same derived shape, off ATTACK. Seven documents state
             // an ATK-scaled shield or heal and the vocabulary had no name for it.
-            case "owner_attack" -> TriggerMagnitudes.ownerAttributeOf(ctx, "owner_attack", AttributeType.ATTACK) * share + flat;
+            case "owner_attack" ->
+                    TriggerMagnitudes.ownerAttributeOf(ctx, "owner_attack", AttributeType.ATTACK) * share + flat;
             // "for each 1 point consumed/lost ...": the triggering EVENT's own magnitude.
             // The absolute value, because a spend arrives negative and "per 1 point" counts points.
             default -> throw new IllegalStateException(
@@ -1709,7 +1656,7 @@ public final class TriggerInterpreter {
      * @return {@code true} when the state was attached (or when the rule stated no chance at all)
      */
     static boolean attachRolled(Battle battle, CanHit target, AbstractBuff buff, EffectSpec effect,
-                                        TriggerContext ctx) {
+                                TriggerContext ctx) {
         if (effect.getBaseChance() == null) {
             target.getBuffManager().addBuff(buff);
             return true;
@@ -1813,19 +1760,6 @@ public final class TriggerInterpreter {
     static int dotStackCap(EffectSpec effect) {
         return effect.stackCap() == null ? 0 : effect.stackCap();
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     /**
@@ -2009,8 +1943,6 @@ public final class TriggerInterpreter {
     }
 
 
-
-
     /**
      * The modifier a {@code MODIFY_ATTR} effect produces, as a buff or a debuff according to the sign.
      *
@@ -2025,7 +1957,7 @@ public final class TriggerInterpreter {
      * @param maxStacks how many copies may accumulate; {@code 1} = replace on re-application
      */
     static StatModifierBuff statModifier(AttributeType attribute, double percent, int turns,
-                                                 boolean permanent, int maxStacks) {
+                                         boolean permanent, int maxStacks) {
         return statModifier(attribute, percent, turns, permanent, maxStacks, false);
     }
 
@@ -2038,28 +1970,13 @@ public final class TriggerInterpreter {
      * multiply the derived number by the target's own stat.
      */
     static StatModifierBuff statModifier(AttributeType attribute, double percent, int turns,
-                                                 boolean permanent, int maxStacks, boolean absolute) {
+                                         boolean permanent, int maxStacks, boolean absolute) {
         boolean debuff = percent < 0;
         // The sign is carried by `percent` itself (a negative value), which is what the original
         // percentBuff/flatBuff/... factories produced; only the modifier kind depends on the attribute.
         return StatModifierBuff.of(attribute, absolute || attribute.isPercent ? "pure" : "add_percent", percent,
                 debuff ? "debuff" : "buff", turns, false, permanent, maxStacks);
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     /**
@@ -2139,8 +2056,6 @@ public final class TriggerInterpreter {
         }
         return parseCounterSteps(written.trim(), "per_steps").wholeSteps(ctx);
     }
-
-
 
 
     /**
@@ -2270,27 +2185,6 @@ public final class TriggerInterpreter {
                         ? null
                         : com.laosun.aluminium.enums.SkillCategory.fromString(effect.getCastCategory().trim()));
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     /**

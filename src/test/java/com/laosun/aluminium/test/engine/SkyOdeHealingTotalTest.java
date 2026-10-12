@@ -1,22 +1,22 @@
 package com.laosun.aluminium.test.engine;
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
-import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.skill.SkillExecutor;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
 import java.util.List;
 
 /**
  * 1415's memosprite skill 19, last sentence: "提高数值等同于本次治疗数值的 #1%", counted into Little Ica's (小伊卡) healing total.
- *
+ * <p>
  * Two-sided: the ode is cast at her (capturing #1 in basis points), then a 1000-heal runs while she wears the ode -- the total must gain exactly 1000 * #1. In the control the
  * ode is never cast, so nothing was captured and the same heal adds nothing.
  */
@@ -25,10 +25,12 @@ public class SkyOdeHealingTotalTest {
     private static final int HYACINE = 1409;
     private static final int CYRENE = 1415;
     private static final int HEALER = 1002;
-        private static final String MARK = "献予「天空」之诗";
+    private static final String MARK = "献予「天空」之诗";
     private static final String TOTAL = "小伊卡累计治疗";
     private static final double HEAL = 1000;
-    /** Her HP at this level, and the HP she is left at before the heal -- the heal is capped by the missing amount. */
+    /**
+     * Her HP at this level, and the HP she is left at before the heal -- the heal is capped by the missing amount.
+     */
     private static final double HEAL_UNIT_MAX = 1195.2864000000002;
     private static final double HEAL_UNIT_HP = 597.6432000000001;
 
@@ -45,7 +47,9 @@ public class SkyOdeHealingTotalTest {
                 "the total gained the healed amount times #1, rounded into the resource");
     }
 
-    /** The healing total after one exact 1000 heal, with or without the ode cast at her. */
+    /**
+     * The healing total after one exact 1000 heal, with or without the ode cast at her.
+     */
     private static double[] total(boolean castTheOde) {
         Character cyrene = CharacterFactory.create(CYRENE, LEVEL);
         Character hyacine = CharacterFactory.create(HYACINE, LEVEL);

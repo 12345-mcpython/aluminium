@@ -4,9 +4,9 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
-import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.models.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -35,10 +35,12 @@ import java.util.List;
 public class SilverWolfLV999TalentCritTest {
     private static final int WOLF = 1506;
     private static final int ALLY = 1204;
-        private static final String LAUGH = "笑点";
+    private static final String LAUGH = "笑点";
     private static final String HIDDEN = "隐藏分";
 
-    /** Below full: +0.4% CRIT Rate per hidden point, and the crit-damage half stays out of it. */
+    /**
+     * Below full: +0.4% CRIT Rate per hidden point, and the crit-damage half stays out of it.
+     */
     @Test
     public void eachHiddenPointRaisesCritRateByPointFourPercent() {
         Reading plain = read(0);
@@ -78,7 +80,9 @@ public class SilverWolfLV999TalentCritTest {
                 "and over it the excess pays 2x - 「每溢出 1% 暴击率提高 2% 暴击伤害」");
     }
 
-    /** Past full, every point pays 0.8% CRIT DMG - read as the MARGINAL rate, since the first ~190 points pay none. */
+    /**
+     * Past full, every point pays 0.8% CRIT DMG - read as the MARGINAL rate, since the first ~190 points pay none.
+     */
     @Test
     public void theOverflowPaysPointEightPercentPerPoint() {
         Reading plain = read(0);
@@ -111,8 +115,8 @@ public class SilverWolfLV999TalentCritTest {
     @Test
     public void twoGainsRecomputeInsteadOfAccumulating() {
         Reading oneGain = read(200);
-        Reading twice = read(new int[] {100, 100});
-        Reading threeTimes = read(new int[] {60, 80, 60});
+        Reading twice = read(new int[]{100, 100});
+        Reading threeTimes = read(new int[]{60, 80, 60});
         System.out.println("[1506-talent] 200 at once = " + oneGain.crit() + " ; 100 then 100 = " + twice.crit()
                 + " ; 60+80+60 = " + threeTimes.crit() + " ; 隐藏分 " + threeTimes.hidden());
         Assertions.assertEquals(200, twice.hidden(), "precondition: two gains of 100 are 200 points");
@@ -128,12 +132,14 @@ public class SilverWolfLV999TalentCritTest {
     // Helpers
     // ==================================================================
 
-    /** Her CRIT RATE, CRIT DMG and 隐藏分 after the party gains {@code laughs} 笑点 (which her trace turns into 隐藏分). */
+    /**
+     * Her CRIT RATE, CRIT DMG and 隐藏分 after the party gains {@code laughs} 笑点 (which her trace turns into 隐藏分).
+     */
     private record Reading(double crit, double critDamage, int hidden) {
     }
 
     private static Reading read(int hiddenPoints) {
-        return read(new int[] {hiddenPoints});
+        return read(new int[]{hiddenPoints});
     }
 
     /**

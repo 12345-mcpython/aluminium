@@ -3,14 +3,10 @@ package com.laosun.aluminium.models.enemy;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.DamageType;
 import com.laosun.aluminium.enums.SkillType;
-import com.laosun.aluminium.utils.AttributeBuilder;
 import com.laosun.aluminium.models.skill.Skill;
+import com.laosun.aluminium.utils.AttributeBuilder;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * A made-up enemy, for tests and for the demo - a monster whose numbers and skills the caller states instead of the
@@ -34,7 +30,9 @@ import java.util.Set;
  */
 public final class StubEnemy {
 
-    /** The defaults: ordinary enough that forgetting a field does not change what a case is measuring. */
+    /**
+     * The defaults: ordinary enough that forgetting a field does not change what a case is measuring.
+     */
     private static final double DEFAULT_HEALTH = 10_000;
     private static final double DEFAULT_ATTACK = 1_000;
     private static final double DEFAULT_DEFENCE = 1_000;
@@ -57,7 +55,9 @@ public final class StubEnemy {
     private int hits = 1;
     private Set<DamageElement> weaknesses = Set.of();
     private Map<String, Double> debuffResist = Map.of();
-    /** Extra skills, with the HP ratio at or below which each takes over. */
+    /**
+     * Extra skills, with the HP ratio at or below which each takes over.
+     */
     private final List<double[]> thresholds = new ArrayList<>();
     private final List<Skill> extraSkills = new ArrayList<>();
 
@@ -73,7 +73,9 @@ public final class StubEnemy {
         return new StubEnemy(name == null || name.isBlank() ? "木桩" : name);
     }
 
-    /** A stub called 木桩 ("training dummy"), which is what most engine cases want. */
+    /**
+     * A stub called 木桩 ("training dummy"), which is what most engine cases want.
+     */
     public static StubEnemy dummy() {
         return named("木桩");
     }
@@ -126,7 +128,9 @@ public final class StubEnemy {
         return this;
     }
 
-    /** The same, applied to every element. */
+    /**
+     * The same, applied to every element.
+     */
     public StubEnemy withDamageResistanceAgainstEverything(double value) {
         for (DamageElement each : DamageElement.values()) {
             this.damageResist.put(each, value);
@@ -134,7 +138,9 @@ public final class StubEnemy {
         return this;
     }
 
-    /** The element its ordinary attack deals, and (unless a weakness set is stated) the element it is weak to. */
+    /**
+     * The element its ordinary attack deals, and (unless a weakness set is stated) the element it is weak to.
+     */
     public StubEnemy withElement(DamageElement value) {
         if (value != null) {
             this.element = value;
@@ -149,14 +155,18 @@ public final class StubEnemy {
         return this;
     }
 
-    /** The ordinary attack's multiplier and hit count. */
+    /**
+     * The ordinary attack's multiplier and hit count.
+     */
     public StubEnemy withAttackProfile(double multiplier, int hits) {
         this.multiplier = multiplier;
         this.hits = Math.max(1, hits);
         return this;
     }
 
-    /** Which elements break its toughness. */
+    /**
+     * Which elements break its toughness.
+     */
     public StubEnemy weakTo(DamageElement... elements) {
         this.weaknesses = elements == null ? Set.of() : Set.of(elements);
         return this;
@@ -176,15 +186,17 @@ public final class StubEnemy {
      * @param hpRatio at or below this share of max HP, this skill is what the enemy acts with
      */
     public StubEnemy phase(double hpRatio, DamageElement element, double multiplier) {
-        thresholds.add(new double[] {hpRatio});
+        thresholds.add(new double[]{hpRatio});
         extraSkills.add(new EnemySkill(element == null ? this.element : element, multiplier, 1,
                 DamageType.NORMAL));
         return this;
     }
 
-    /** A second ordinary skill with a stated hit count, for cases that need a multi-hit enemy. */
+    /**
+     * A second ordinary skill with a stated hit count, for cases that need a multi-hit enemy.
+     */
     public StubEnemy phase(double hpRatio, DamageElement element, double multiplier, int hits) {
-        thresholds.add(new double[] {hpRatio});
+        thresholds.add(new double[]{hpRatio});
         extraSkills.add(new EnemySkill(element == null ? this.element : element, multiplier, Math.max(1, hits),
                 DamageType.NORMAL));
         return this;

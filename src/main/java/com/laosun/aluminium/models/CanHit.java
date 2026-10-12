@@ -8,22 +8,17 @@ import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.buff.AbstractBuff;
 import com.laosun.aluminium.models.buff.BuffManager;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.event.*;
 import com.laosun.aluminium.models.energy.EnergyGain;
 import com.laosun.aluminium.models.energy.EnergyProvider;
 import com.laosun.aluminium.models.energy.StandardEnergyProvider;
+import com.laosun.aluminium.models.event.*;
 import com.laosun.aluminium.models.skill.Skill;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Consumer;
 
 /**
@@ -153,14 +148,18 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
      * <p>Kept next to the cooldowns because it is the same kind of fact (battle state, per combatant, keyed by
      * the rule) and because both are cleared at the same moment: the start of this combatant's own turn. A
      * counter stored on the rule would be shared by every wearer of a relic set and by every battle in the JVM
-     *  - the reason the cooldowns live here in the first place.
+     * - the reason the cooldowns live here in the first place.
      */
     @Getter(AccessLevel.NONE)
     private final Map<String, Integer> triggerTurnUses = new HashMap<>();
 
-    /** Per rule, the attack sequence of its last "once per attack" firing (see {@link #isAttackLimitReady}). */
+    /**
+     * Per rule, the attack sequence of its last "once per attack" firing (see {@link #isAttackLimitReady}).
+     */
     private final Map<String, Integer> ruleAttackUses = new HashMap<>();
-    /** Per rule, the wave sequence of its last "once per wave" firing (see {@link #isWaveLimitReady}). */
+    /**
+     * Per rule, the wave sequence of its last "once per wave" firing (see {@link #isWaveLimitReady}).
+     */
     private final Map<String, Integer> ruleWaveUses = new HashMap<>();
 
     /**
@@ -172,12 +171,16 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
         return sequence == null || sequence.intValue() != waveSequence;
     }
 
-    /** Records that the rule has had its wave allowance in {@code waveSequence}. */
+    /**
+     * Records that the rule has had its wave allowance in {@code waveSequence}.
+     */
     public void recordWaveUse(String key, int waveSequence) {
         ruleWaveUses.put(key, waveSequence);
     }
 
-    /** Per rule, how many times it has fired inside that attack (the cap is {@code per_attack}). */
+    /**
+     * Per rule, how many times it has fired inside that attack (the cap is {@code per_attack}).
+     */
     private final Map<String, Integer> ruleAttackFirings = new HashMap<>();
     /**
      * The rules that have used up a {@code once_per_battle} limit; they never fire again this battle.
@@ -212,9 +215,13 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
      * that is already there.
      */
     private final Map<String, Double> ruleEffectPercentBonus = new HashMap<>();
-    /** The duration half of the same idea: "持续时间额外增加 N 回合". */
+    /**
+     * The duration half of the same idea: "持续时间额外增加 N 回合".
+     */
     private final Map<String, Integer> ruleEffectTurnsBonus = new HashMap<>();
-    /** The cap half: "可叠加上限提高 N 层" - filed at battle start, so it is in place before any stack is attached. */
+    /**
+     * The cap half: "可叠加上限提高 N 层" - filed at battle start, so it is in place before any stack is attached.
+     */
     private final Map<String, Integer> ruleEffectMaxStacksBonus = new HashMap<>();
 
     /**
@@ -617,7 +624,7 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
      * nobody killed it".
      *
      * <p>What the callers must still do, because this method cannot: take the unit out of the roster
-     * ({@code Battle.enemies}) and off the action bar. {@link #isDeath()} alone does not remove anybody - 
+     * ({@code Battle.enemies}) and off the action bar. {@link #isDeath()} alone does not remove anybody -
      * see {@code Battle.removeDeadCombatants}, the one place both happen together.
      *
      * <p>Idempotent; a combatant that is already dead stays dead (and keeps the HP it had).
@@ -651,7 +658,8 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
         return spent;
     }
 
-    public void heal(double amount) {        if (death || amount <= 0) {
+    public void heal(double amount) {
+        if (death || amount <= 0) {
             return;
         }
         currentHp = Math.min(currentHp + amount, getMaxHp());
@@ -774,7 +782,9 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
         return ruleAttackFirings.getOrDefault(key, 0) < cap;
     }
 
-    /** Records one firing of a rule inside the attack identified by {@code attackSequence}. */
+    /**
+     * Records one firing of a rule inside the attack identified by {@code attackSequence}.
+     */
     public void recordAttackUse(String key, int attackSequence) {
         Integer sequence = ruleAttackUses.get(key);
         if (sequence == null || sequence.intValue() != attackSequence) {
@@ -954,7 +964,9 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
         skillHitBonus.merge(slot, delta, Integer::sum);
     }
 
-    /** The extra segments a data slot has been granted, or {@code 0}. */
+    /**
+     * The extra segments a data slot has been granted, or {@code 0}.
+     */
     public int skillHitBonus(int slot) {
         return skillHitBonus.getOrDefault(slot, 0);
     }
@@ -1071,38 +1083,50 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
      * @param ruleId the rule's {@code id}
      * @return the amendment, or {@code 0}
      */
-    /** Adds {@code delta} to every {@code percent} read of the named rule's effects. */
+    /**
+     * Adds {@code delta} to every {@code percent} read of the named rule's effects.
+     */
     public void amendRuleEffectPercent(String ruleId, double delta) {
         if (ruleId != null && !ruleId.isBlank()) {
             ruleEffectPercentBonus.merge(ruleId.trim(), delta, Double::sum);
         }
     }
 
-    /** Adds {@code delta} to every {@code turns} read of the named rule's effects. */
+    /**
+     * Adds {@code delta} to every {@code turns} read of the named rule's effects.
+     */
     public void amendRuleEffectTurns(String ruleId, int delta) {
         if (ruleId != null && !ruleId.isBlank()) {
             ruleEffectTurnsBonus.merge(ruleId.trim(), delta, Integer::sum);
         }
     }
 
-    /** Adds {@code delta} layers to the stack cap of every {@code max_stacks} read of the named rule's effects. */
+    /**
+     * Adds {@code delta} layers to the stack cap of every {@code max_stacks} read of the named rule's effects.
+     */
     public void amendRuleEffectMaxStacks(String ruleId, int delta) {
         if (ruleId != null && !ruleId.isBlank()) {
             ruleEffectMaxStacksBonus.merge(ruleId.trim(), delta, Integer::sum);
         }
     }
 
-    /** The cap amendment for a rule, or {@code null} when nothing raised it. */
+    /**
+     * The cap amendment for a rule, or {@code null} when nothing raised it.
+     */
     public Integer ruleEffectMaxStacksBonus(String ruleId) {
         return ruleId == null || ruleId.isBlank() ? null : ruleEffectMaxStacksBonus.get(ruleId.trim());
     }
 
-    /** The value amendment for a rule, or {@code null} when nothing raised it. */
+    /**
+     * The value amendment for a rule, or {@code null} when nothing raised it.
+     */
     public Double ruleEffectPercentBonus(String ruleId) {
         return ruleId == null || ruleId.isBlank() ? null : ruleEffectPercentBonus.get(ruleId.trim());
     }
 
-    /** The duration amendment for a rule, or {@code null} when nothing raised it. */
+    /**
+     * The duration amendment for a rule, or {@code null} when nothing raised it.
+     */
     public Integer ruleEffectTurnsBonus(String ruleId) {
         return ruleId == null || ruleId.isBlank() ? null : ruleEffectTurnsBonus.get(ruleId.trim());
     }

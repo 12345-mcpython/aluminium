@@ -24,7 +24,9 @@ public class SkillSwapBuff extends AbstractBuff {
     private final SkillType slot;
     private final Skill replacement;
 
-    /** What that slot held before this swap; captured on apply so it can be put back on remove. */
+    /**
+     * What that slot held before this swap; captured on apply so it can be put back on remove.
+     */
     private Skill original;
 
     public SkillSwapBuff(SkillType slot, Skill replacement) {
@@ -38,12 +40,16 @@ public class SkillSwapBuff extends AbstractBuff {
         return false;
     }
 
-    /** The slot this swap owns (readable by tests and by future "which skill is equipped" conditions). */
+    /**
+     * The slot this swap owns (readable by tests and by future "which skill is equipped" conditions).
+     */
     public SkillType getSlot() {
         return slot;
     }
 
-    /** The skill installed into the slot. */
+    /**
+     * The skill installed into the slot.
+     */
     public Skill getReplacement() {
         return replacement;
     }

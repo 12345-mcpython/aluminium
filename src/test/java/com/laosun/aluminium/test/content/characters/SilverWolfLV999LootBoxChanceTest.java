@@ -4,8 +4,8 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -32,7 +32,7 @@ import java.util.Random;
 public class SilverWolfLV999LootBoxChanceTest {
     private static final int WOLF = 1506;
     private static final int ALLY = 1204;
-        /**
+    /**
      * 【爆爆爆炸蛋】's WEIGHT bucket: it restores skill points and settles no damage.
      *
      * <p>⚠ The pick is WEIGHTED (the game's grades: 1 / 1 / 10 while 隐藏分 is under 60), so the roll is over the weight
@@ -40,7 +40,9 @@ public class SilverWolfLV999LootBoxChanceTest {
      */
     private static final int PICK_POINTS = 1000;
 
-    /** 100% → 20% → 4% → 【崩坏级伤害演示】 → 100%, each step read through the roll. */
+    /**
+     * 100% → 20% → 4% → 【崩坏级伤害演示】 → 100%, each step read through the roll.
+     */
     @Test
     public void theBoxsChanceDecaysAndTheDemoResetsIt() {
         ScriptedRng rng = new ScriptedRng(PICK_POINTS);
@@ -70,7 +72,9 @@ public class SilverWolfLV999LootBoxChanceTest {
     // Helpers
     // ==================================================================
 
-    /** Fires the one event the box listens to, with the given draw, and returns the HP the enemy side lost to it. */
+    /**
+     * Fires the one event the box listens to, with the given draw, and returns the HP the enemy side lost to it.
+     */
     private static double fireTheBox(Battle battle, ScriptedRng rng, double draw) {
         rng.nextDoubleValue = draw;
         var enemies = battle.enemyUnits();
@@ -93,7 +97,9 @@ public class SilverWolfLV999LootBoxChanceTest {
         battle.processRequests();
     }
 
-    /** The wolf with her zone and 【无敌玩家】 up, and TWO enemies so a box's own damage is unmistakable. */
+    /**
+     * The wolf with her zone and 【无敌玩家】 up, and TWO enemies so a box's own damage is unmistakable.
+     */
     private static Battle battle(ScriptedRng rng) {
         Battle battle = new Battle(
                 List.of(CharacterFactory.create(WOLF, 80), CharacterFactory.create(ALLY, 80)),
@@ -107,7 +113,9 @@ public class SilverWolfLV999LootBoxChanceTest {
         return battle;
     }
 
-    /** {@code nextInt} answers with the scripted pick; {@code nextDouble} is whatever the case set for this firing. */
+    /**
+     * {@code nextInt} answers with the scripted pick; {@code nextDouble} is whatever the case set for this firing.
+     */
     private static final class ScriptedRng extends Random {
         private final int pick;
         private double nextDoubleValue = 0.9999;

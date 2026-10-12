@@ -4,8 +4,8 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -30,7 +30,7 @@ import java.util.Random;
 public class SilverWolfLV999LootBoxWaveTest {
     private static final int WOLF = 1506;
     private static final int ALLY = 1204;
-        /**
+    /**
      * 【爆爆爆炸蛋】's WEIGHT bucket: 2 skill points, and no damage of its own.
      *
      * <p>⚠ The pick is WEIGHTED (the game's grades: 1 / 1 / 10 while 隐藏分 is under 60), so the roll is over the weight
@@ -38,7 +38,9 @@ public class SilverWolfLV999LootBoxWaveTest {
      */
     private static final int PICK_POINTS = 1000;
 
-    /** The box triggered with nobody on the field is held, and the wave delivers it to the enemy that just entered. */
+    /**
+     * The box triggered with nobody on the field is held, and the wave delivers it to the enemy that just entered.
+     */
     @Test
     public void aBoxWithNobodyToHitWaitsForTheWave() {
         ScriptedRng rng = new ScriptedRng(PICK_POINTS);
@@ -66,7 +68,9 @@ public class SilverWolfLV999LootBoxWaveTest {
                 "the box's own 90% lands on the enemy that just entered - that is the half the sentence is about");
     }
 
-    /** The control: with an enemy still standing, the very same firing is delivered at once. */
+    /**
+     * The control: with an enemy still standing, the very same firing is delivered at once.
+     */
     @Test
     public void aBoxWithSomeoneToHitIsNotHeld() {
         ScriptedRng rng = new ScriptedRng(PICK_POINTS);
@@ -118,7 +122,9 @@ public class SilverWolfLV999LootBoxWaveTest {
     // Helpers
     // ==================================================================
 
-    /** The wolf with her zone and 【无敌玩家】 up, and one enemy, so the box is armed. */
+    /**
+     * The wolf with her zone and 【无敌玩家】 up, and one enemy, so the box is armed.
+     */
     private static Battle battle(ScriptedRng rng) {
         Battle battle = new Battle(
                 List.of(CharacterFactory.create(WOLF, 80), CharacterFactory.create(ALLY, 80)),
@@ -132,7 +138,9 @@ public class SilverWolfLV999LootBoxWaveTest {
         return battle;
     }
 
-    /** {@code nextInt} answers with the scripted pick; {@code nextDouble} is whatever the case set. */
+    /**
+     * {@code nextInt} answers with the scripted pick; {@code nextDouble} is whatever the case set.
+     */
     private static final class ScriptedRng extends Random {
         private final int pick;
         private double nextDoubleValue = 0.9999;

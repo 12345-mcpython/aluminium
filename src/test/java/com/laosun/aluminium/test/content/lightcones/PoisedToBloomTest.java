@@ -5,9 +5,8 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.Path;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Weapon;
-import com.laosun.aluminium.utils.CharacterFactory;
-import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -27,7 +26,7 @@ public class PoisedToBloomTest {
     private static final int CONE = 21046;
     private static final int WEARER = 1002;
     private static final int LEVEL = 80;
-        private static final int[] CANDIDATES = {1003, 1004, 1006, 1008, 1009, 1013, 1101, 1102, 1103, 1104, 1105, 1106,
+    private static final int[] CANDIDATES = {1003, 1004, 1006, 1008, 1009, 1013, 1101, 1102, 1103, 1104, 1105, 1106,
             1107, 1108, 1109, 1110, 1111, 1112, 1201, 1202, 1203, 1204, 1205, 1206, 1207, 1208, 1209, 1210, 1211, 1212,
             1213, 1214, 1215, 1217, 1301, 1302, 1303, 1304, 1305, 1306, 1307, 1308, 1309, 1310, 1312, 1314, 1315};
 

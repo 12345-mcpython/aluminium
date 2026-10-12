@@ -5,8 +5,9 @@ import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.CanHit;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Signal;
-import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.models.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -32,7 +33,7 @@ public class PearlUltAdvanceTest {
     private static final int ELATION_B = 1505;  // Evanescia (绯英), Elation
     private static final int ELATION_C = 1506;  // Silver Wolf LV.999 (银狼LV.999), Elation
     private static final int HUNTER = 1204;     // The Hunt (巡猎): NOT Elation
-        private static final double EPS = 1e-9;
+    private static final double EPS = 1e-9;
 
     /**
      * Each tier moves the archetype by its own percentage, and the tiers compound because the thresholds nest.
@@ -76,7 +77,9 @@ public class PearlUltAdvanceTest {
         Assertions.assertNull(atThree, "three Elation allies are one short of the extra turn");
     }
 
-    /** The Technique's opening counter: 20 with the marker, none without it. */
+    /**
+     * The Technique's opening counter: 20 with the marker, none without it.
+     */
     @Test
     public void theTechniqueGrantsTheOpeningCounter() {
         double without = counterAfterOpening(false);
@@ -105,7 +108,9 @@ public class PearlUltAdvanceTest {
         return advanced / untouched;
     }
 
-    /** Who was handed the extra turn, or {@code null} when the Ultimate granted none. */
+    /**
+     * Who was handed the extra turn, or {@code null} when the Ultimate granted none.
+     */
     private static Character extraTurnActorWith(int elationAllies) {
         Battle battle = new Battle(team(elationAllies), List.of(BattleFixture.monster()),
                 BattleFixture.seeded());
@@ -118,7 +123,9 @@ public class PearlUltAdvanceTest {
         return actor instanceof Character character ? character : null;
     }
 
-    /** The counter at the opening of a battle, with or without the Technique marker. */
+    /**
+     * The counter at the opening of a battle, with or without the Technique marker.
+     */
     private static double counterAfterOpening(boolean techniqueUsed) {
         Character pearl = CharacterFactory.create(PEARL, 80);
         Battle battle = new Battle(List.of(pearl, CharacterFactory.create(HUNTER, 80)),
@@ -146,14 +153,16 @@ public class PearlUltAdvanceTest {
         return team;
     }
 
-    /** How much action value the aiming target still has, fired through Pearl's own Ultimate or with no rules. */
+    /**
+     * How much action value the aiming target still has, fired through Pearl's own Ultimate or with no rules.
+     */
     private static double timeRemaining(List<Character> team, boolean fireTheUltimate) {
         List<Character> fresh = new ArrayList<>();
         for (Character c : team) {
             fresh.add(CharacterFactory.create(c.getCid(), 80));
         }
         if (!fireTheUltimate) {
-            fresh.getFirst().setTriggerTable(com.laosun.aluminium.models.TriggerTable.EMPTY);
+            fresh.getFirst().setTriggerTable(TriggerTable.EMPTY);
         }
         Battle battle = new Battle(fresh, List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();

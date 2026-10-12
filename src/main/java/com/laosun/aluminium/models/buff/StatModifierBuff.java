@@ -62,7 +62,7 @@ public class StatModifierBuff extends AbstractBuff {
     private final int maxStacks;
     /**
      * When set, this modifier asks for its share on every read instead of holding the number it was built with
- *. Only add-percent modifiers may be live -- a
+     * . Only add-percent modifiers may be live -- a
      * pure or multiply share has no spelling for "随层数变化" yet, and this refuses rather than guessing.
      */
     private java.util.function.DoubleSupplier liveShare;
@@ -292,7 +292,7 @@ public class StatModifierBuff extends AbstractBuff {
     }
 
     /**
-     * A stat modifier is a negative effect exactly when it landed in the <b>debuff</b> half of the attribute - 
+     * A stat modifier is a negative effect exactly when it landed in the <b>debuff</b> half of the attribute -
      * the same {@code sourceRole} that {@code TriggerInterpreter} decided from the sign of {@code percent}. So
      * "ATK -30%" is a debuff that dispel (解除) can remove, while "ATK +50%" is not, without either of them needing a
      * separate flag.
@@ -303,7 +303,7 @@ public class StatModifierBuff extends AbstractBuff {
     }
 
     /**
- * Makes this modifier LIVE: its share is asked for on every read.
+     * Makes this modifier LIVE: its share is asked for on every read.
      *
      * @throws IllegalStateException when the modifier is not an add-percent one, because the live kind only exists for
      *                               that type -- silently keeping the stored number would be a wrong number with no symptom
@@ -317,7 +317,9 @@ public class StatModifierBuff extends AbstractBuff {
         this.liveShare = share;
     }
 
-    /** Whether the share is re-read on every computation. */
+    /**
+     * Whether the share is re-read on every computation.
+     */
     public boolean isLive() {
         return liveShare != null;
     }

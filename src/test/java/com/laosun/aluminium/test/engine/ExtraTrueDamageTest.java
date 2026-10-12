@@ -4,14 +4,14 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.DamageType;
-import com.laosun.aluminium.models.buff.AbstractBuff;
 import com.laosun.aluminium.models.CanHit;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Damage;
-import com.laosun.aluminium.models.skill.DefaultSkill;
+import com.laosun.aluminium.models.buff.AbstractBuff;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.skill.Skill;
 import com.laosun.aluminium.models.event.AttackEvent;
+import com.laosun.aluminium.models.skill.DefaultSkill;
+import com.laosun.aluminium.models.skill.Skill;
 import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -26,7 +26,7 @@ import java.util.Map;
  *
  * <p><b>Additional damage (附加伤害)</b> official definition: "makes the hit target take 1 extra
  * instance of damage; this damage is not considered to have dealt 1 attack"
- *  to it goes through the full zones (its base is a panel value: ATK / MaxHP  x  multiplier) and is
+ * to it goes through the full zones (its base is a panel value: ATK / MaxHP  x  multiplier) and is
  * flagged {@code notCountsAsAttack()}.
  *
  * <p><b>True damage (真伤, true damage)</b> (Tribbie E1): the base is derived from this attack's total damage
@@ -221,7 +221,9 @@ public class ExtraTrueDamageTest {
     // here they are reproduced with the documented values
     // ==================================================================
 
-    /** Skeleton for a damage-reacting buff with no actual effect (applyEffect / removeBuff left empty; only the duration decreases). */
+    /**
+     * Skeleton for a damage-reacting buff with no actual effect (applyEffect / removeBuff left empty; only the duration decreases).
+     */
     private abstract static class DamageReactor extends AbstractBuff {
         protected final CanHit owner;
 
@@ -248,7 +250,9 @@ public class ExtraTrueDamageTest {
             decreaseDuration();
         }
 
-        /** The "highest current HP" survivor among the hit targets; null if all are dead. */
+        /**
+         * The "highest current HP" survivor among the hit targets; null if all are dead.
+         */
         protected static CanHit highestHpAlive(List<? extends CanHit> candidates) {
             CanHit best = null;
             for (CanHit candidate : candidates) {

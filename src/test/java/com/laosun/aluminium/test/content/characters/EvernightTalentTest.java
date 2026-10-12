@@ -40,7 +40,9 @@ public class EvernightTalentTest {
                 "120% at four enemies and 150% at one: " + four + " vs " + one);
     }
 
-    /** One hit by the memosprite against a victim that cannot die, on a field of the given size. */
+    /**
+     * One hit by the memosprite against a victim that cannot die, on a field of the given size.
+     */
     private static double memospriteDamage(int enemies) {
         Character master = CharacterFactory.create(SUMMONER, LEVEL);
         List<Enemy> foes = new ArrayList<>();

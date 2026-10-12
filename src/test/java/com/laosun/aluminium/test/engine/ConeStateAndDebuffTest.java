@@ -8,10 +8,10 @@ import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Damage;
 import com.laosun.aluminium.models.DoubleValue;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.Weapon;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
+import com.laosun.aluminium.models.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -19,7 +19,9 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-/** Cones 21015 (a state and the defence drop it implies) and 23020 (debuff-fed crit damage, debate state). */
+/**
+ * Cones 21015 (a state and the defence drop it implies) and 23020 (debuff-fed crit damage, debate state).
+ */
 public class ConeStateAndDebuffTest {
     private static final int WEARER = 1205;
     private static final int LEVEL = 80;
@@ -102,7 +104,9 @@ public class ConeStateAndDebuffTest {
         Assertions.assertEquals(0, statedApply, "and no longer the state");
     }
 
-    /** A real debuff, attached through the engine's own roll path, so `target_debuff_count` is genuinely >= 1. */
+    /**
+     * A real debuff, attached through the engine's own roll path, so `target_debuff_count` is genuinely >= 1.
+     */
     private void giveTheEnemyADebuff(Character unit, Enemy enemy, Battle battle) {
         // Note: A 1.0 base chance STILL rolls against the target's effect RES (discipline 145): without this the
         // helper silently attached nothing and the spec query saw 0 debuffs.
@@ -112,7 +116,9 @@ public class ConeStateAndDebuffTest {
                 new com.laosun.aluminium.models.buff.DotBuff(unit, DamageElement.FIRE, 100, 2), 1.0, null);
     }
 
-    /** One guaranteed-crit hit, so the instance-scoped crit-damage bonus is what moves. */
+    /**
+     * One guaranteed-crit hit, so the instance-scoped crit-damage bonus is what moves.
+     */
     private double critHit(Character unit, Enemy enemy, Battle battle) {
         unit.getAttribute(AttributeType.CRIT_CHANCE)
                 .addModifier(DoubleValue.Modifier.pure(1.0, DoubleValue.Modifier.ModifierSource.BUFF, 230209));

@@ -10,11 +10,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * One damage instance - always a single hit on a single target (it has carried its own
@@ -76,7 +72,9 @@ public class Damage {
      */
     private final SkillCategory castCategory;
 
-    /** @see #castCategory */
+    /**
+     * @see #castCategory
+     */
     public SkillCategory getCastCategory() {
         return castCategory;
     }
@@ -111,7 +109,7 @@ public class Damage {
      * <p>{@code Battle.assemble} broadcasts the {@code DamageEvent} to both the attacker and
      * the defender (§2.2 requires it), so a buff that injects a zone MUST decide for itself
      * "which side am I attached to"; otherwise a vulnerability sitting on the enemy would also
-     * boost that enemy's own outgoing damage. The check goes through here and only here - 
+     * boost that enemy's own outgoing damage. The check goes through here and only here -
      * do not write {@code damage.getDefender() == ...} separately in each buff.
      *
      * @param entity the entity to test ({@code null} to {@code false})
@@ -152,19 +150,23 @@ public class Damage {
      */
     private int skillKey;
 
-    /** @see #skillKey */
+    /**
+     * @see #skillKey
+     */
     public int getSkillKey() {
         return skillKey;
     }
 
-    /** @see #skillKey */
+    /**
+     * @see #skillKey
+     */
     public void setSkillKey(int skillKey) {
         this.skillKey = skillKey;
     }
 
     /** Records the intended toughness reduction (fluent, like the other instance mutators). */
     /**
- * The targets hit by the attack that produced this instance.
+     * The targets hit by the attack that produced this instance.
      *
      * <p>Note: The engine's pattern for "a cast-level fact a rule must be able to read": the caller holds it and
      * <b>the instance carries the answer</b> (see {@code setSkillKey} / {@code setStance}). An EMPTY set means
@@ -172,12 +174,16 @@ public class Damage {
      */
     private java.util.Set<CanHit> hitTargets = java.util.Set.of();
 
-    /** Records the targets of the attack behind this instance. Immutable by construction. */
+    /**
+     * Records the targets of the attack behind this instance. Immutable by construction.
+     */
     public void setHitTargets(java.util.Set<? extends CanHit> targets) {
         this.hitTargets = java.util.Set.copyOf(targets);
     }
 
-    /** The targets of the attack behind this instance; empty means unknown. */
+    /**
+     * The targets of the attack behind this instance; empty means unknown.
+     */
     public java.util.Set<CanHit> hitTargets() {
         return hitTargets;
     }
@@ -439,44 +445,62 @@ public class Damage {
      */
     private double castEnergySpent = 0;
 
-    /** Extra DEF-ignore carried by THIS hit, added by a rule firing on {@code DEALING_DAMAGE}. */
+    /**
+     * Extra DEF-ignore carried by THIS hit, added by a rule firing on {@code DEALING_DAMAGE}.
+     */
     private double extraDefenceIgnore = 0;
 
-    /** Extra CRIT CHANCE carried by THIS hit, added by a rule on {@code DEALING_DAMAGE}. */
+    /**
+     * Extra CRIT CHANCE carried by THIS hit, added by a rule on {@code DEALING_DAMAGE}.
+     */
     private double extraCritChance = 0;
 
-    /** Extra CRIT DAMAGE carried by THIS hit, same route. */
+    /**
+     * Extra CRIT DAMAGE carried by THIS hit, same route.
+     */
     private double extraCritDamage = 0;
 
-    /** Records how much energy the producing cast spent; the settlement reads it (light cone 23062). */
+    /**
+     * Records how much energy the producing cast spent; the settlement reads it (light cone 23062).
+     */
     public Damage withCastEnergySpent(double value) {
         this.castEnergySpent = value;
         return this;
     }
 
-    /** The energy the producing cast spent ({@code 0} for anything that is not an ultimate). */
+    /**
+     * The energy the producing cast spent ({@code 0} for anything that is not an ultimate).
+     */
     public double getCastEnergySpent() {
         return castEnergySpent;
     }
 
-    /** "对陷入负面效果的敌方目标造成伤害时暴击率提高 X%" is a property of the hit, not of the wearer. */
+    /**
+     * "对陷入负面效果的敌方目标造成伤害时暴击率提高 X%" is a property of the hit, not of the wearer.
+     */
     public Damage addCritChance(double value) {
         this.extraCritChance += value;
         return this;
     }
 
-    /** "对陷入禁锢状态的敌方目标造成伤害时暴击伤害提高 X%". */
+    /**
+     * "对陷入禁锢状态的敌方目标造成伤害时暴击伤害提高 X%".
+     */
     public Damage addCritDamage(double value) {
         this.extraCritDamage += value;
         return this;
     }
 
-    /** The crit chance this hit adds beyond the attacker's attribute, as a fraction. */
+    /**
+     * The crit chance this hit adds beyond the attacker's attribute, as a fraction.
+     */
     public double getExtraCritChance() {
         return this.extraCritChance;
     }
 
-    /** The crit damage this hit adds beyond the attacker's attribute, as a fraction. */
+    /**
+     * The crit damage this hit adds beyond the attacker's attribute, as a fraction.
+     */
     public double getExtraCritDamage() {
         return this.extraCritDamage;
     }
@@ -490,7 +514,9 @@ public class Damage {
         return this;
     }
 
-    /** The DEF-ignore this instance carries beyond the attacker's attribute, as a fraction. */
+    /**
+     * The DEF-ignore this instance carries beyond the attacker's attribute, as a fraction.
+     */
     public double getDefenceIgnore() {
         return this.extraDefenceIgnore;
     }
@@ -567,7 +593,7 @@ public class Damage {
     }
 
     /**
-     * A read-only snapshot of the zones used by this hit. For tests and logs only - 
+     * A read-only snapshot of the zones used by this hit. For tests and logs only -
      * the settlement loop iterates the field directly.
      *
      * @return an immutable copy of the zone list, in creation order
@@ -793,7 +819,9 @@ public class Damage {
             return this;
         }
 
-        /** Whether this instance crit -- the reader {@code Battle} needs to fire {@code CRIT_DEALT}. */
+        /**
+         * Whether this instance crit -- the reader {@code Battle} needs to fire {@code CRIT_DEALT}.
+         */
         public boolean isCrit() {
             return crit;
         }

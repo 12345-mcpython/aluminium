@@ -5,9 +5,9 @@ import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.CanHit;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.skill.DefaultSkill;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
+import com.laosun.aluminium.models.skill.DefaultSkill;
 import com.laosun.aluminium.models.skill.Skill;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
@@ -38,7 +38,9 @@ public class SkillPointTest {
     // 1. The pool itself
     // ==================================================================
 
-    /** Starts at 3 points, caps at 5. */
+    /**
+     * Starts at 3 points, caps at 5.
+     */
     @Test
     public void startsAtThreeAndCapsAtFive() {
         Battle battle = newBattle();
@@ -57,7 +59,9 @@ public class SkillPointTest {
         Assertions.assertEquals(5, battle.getSkillPoints(), "adding 100 at once still only reaches 5");
     }
 
-    /** After spending down to 0, any further spend must return false (rather than going negative). */
+    /**
+     * After spending down to 0, any further spend must return false (rather than going negative).
+     */
     @Test
     public void spendingStopsAtZero() {
         Battle battle = newBattle();
@@ -72,7 +76,9 @@ public class SkillPointTest {
         Assertions.assertEquals(0, battle.getSkillPoints(), "a failure must not go negative");
     }
 
-    /** Gaining a non-positive amount is a caller bug: ignore it silently, do not treat it as "spending a point". */
+    /**
+     * Gaining a non-positive amount is a caller bug: ignore it silently, do not treat it as "spending a point".
+     */
     @Test
     public void gainingNonPositiveAmountIsIgnored() {
         Battle battle = newBattle();
@@ -87,7 +93,9 @@ public class SkillPointTest {
     // 2. The real chain: performAction really does change skill points
     // ==================================================================
 
-    /** One basic attack through the real chain to +1. */
+    /**
+     * One basic attack through the real chain to +1.
+     */
     @Test
     public void basicAttackInRealActionFlowGainsOnePoint() {
         Battle battle = newBattle();
@@ -99,7 +107,9 @@ public class SkillPointTest {
         Assertions.assertEquals(4, battle.getSkillPoints(), "basic attack +1");
     }
 
-    /** One skill cast through the real chain to -1. */
+    /**
+     * One skill cast through the real chain to -1.
+     */
     @Test
     public void skillInRealActionFlowSpendsOnePoint() {
         Battle battle = newBattle();
@@ -110,7 +120,9 @@ public class SkillPointTest {
         Assertions.assertEquals(2, battle.getSkillPoints(), "skill -1");
     }
 
-    /** Basic attacks in a row up to the cap: 3 to 4 to 5 to 5. */
+    /**
+     * Basic attacks in a row up to the cap: 3 to 4 to 5 to 5.
+     */
     @Test
     public void repeatedBasicAttacksCapAtFive() {
         Battle battle = newBattle();
@@ -160,7 +172,9 @@ public class SkillPointTest {
     // 4. The ultimate and follow-up attacks are "neutral"
     // ==================================================================
 
-    /** The ultimate neither spends nor restores skill points (the 5 points given back at the end go to energy, not to skill points). */
+    /**
+     * The ultimate neither spends nor restores skill points (the 5 points given back at the end go to energy, not to skill points).
+     */
     @Test
     public void ultimateNeitherSpendsNorGainsSkillPoints() {
         Character jingYuan = CharacterFactory.create(1204, 80);
@@ -193,7 +207,9 @@ public class SkillPointTest {
         Assertions.assertEquals(before, battle.getSkillPoints(), "neither rises nor falls");
     }
 
-    /** The map basic attack (slot 6, {@code MazeNormal}) is treated as neutral too, it does not count as "basic attack restores a point". */
+    /**
+     * The map basic attack (slot 6, {@code MazeNormal}) is treated as neutral too, it does not count as "basic attack restores a point".
+     */
     @Test
     public void mazeAttackTypeIsNeutral() {
         Battle battle = newBattle();
@@ -213,7 +229,7 @@ public class SkillPointTest {
      *
      * <p>Note: <b>The trap in this test (already fixed)</b>: the enemy's default skill {@code EnemySkill} has a
      * {@code getData()} that is always null (it does not go through the character multiplier table, see that
-     * class's javadoc), so it returns early at the null guard in {@code applySkillPointCost} - 
+     * class's javadoc), so it returns early at the null guard in {@code applySkillPointCost} -
      * testing "the enemy does not affect skill points" with the default skill passes whether or not the camp
      * check exists. That is exactly how I wrote it the first time, and only mutation testing exposed it (it
      * stayed green after the camp check was removed).
@@ -245,7 +261,9 @@ public class SkillPointTest {
     // 6. applySkillPointCost is atomic
     // ==================================================================
 
-    /** Trying to cast the skill at 0 points: returns false and the count is unchanged (it must not deduct to -1 and then check). */
+    /**
+     * Trying to cast the skill at 0 points: returns false and the count is unchanged (it must not deduct to -1 and then check).
+     */
     @Test
     public void skillPointCostIsAtomicAtZero() {
         Battle battle = newBattle();
@@ -277,7 +295,9 @@ public class SkillPointTest {
         return new DefaultSkill(hero.getCid(), slot.slot, 1);
     }
 
-    /** Himeko (姬子) 1003: in the data slots 1/2 are {@code Normal} / {@code BPSkill} respectively. */
+    /**
+     * Himeko (姬子) 1003: in the data slots 1/2 are {@code Normal} / {@code BPSkill} respectively.
+     */
     private static Battle newBattle() {
         return newBattle(CharacterFactory.create(1003, 80));
     }
@@ -289,7 +309,9 @@ public class SkillPointTest {
         return battle;
     }
 
-    /** The enemy's basic attack (the skill enemies are equipped with). */
+    /**
+     * The enemy's basic attack (the skill enemies are equipped with).
+     */
     private static Skill enemySkill(Enemy enemy) {
         return enemy.getSkills().values().iterator().next();
     }
@@ -307,7 +329,9 @@ public class SkillPointTest {
         return result;
     }
 
-    /** As above, but does not finish it - left to the caller to assert before settlement (the "no damage" case needs this). */
+    /**
+     * As above, but does not finish it - left to the caller to assert before settlement (the "no damage" case needs this).
+     */
     private static boolean actWithoutAfterMove(Battle battle, CanHit actor, Supplier<Skill> skill,
                                                List<? extends CanHit> targets) {
         for (int i = 0; i < 30; i++) {

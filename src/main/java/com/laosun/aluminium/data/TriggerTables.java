@@ -7,7 +7,7 @@ import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 import com.laosun.aluminium.beans.ResourceSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
-import com.laosun.aluminium.models.TriggerTable;
+import com.laosun.aluminium.models.trigger.TriggerTable;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -242,7 +242,7 @@ public final class TriggerTables {
                     // so they cannot drift from what Gson maps.
                     requireKnownRuleKeys(rules);
                     requireKnownEffectKeys(rules);
-        specs = GSON.fromJson(rules, SPEC_LIST);
+                    specs = GSON.fromJson(rules, SPEC_LIST);
                     JsonElement declared = object.get("resources");
                     if (declared != null && !declared.isJsonNull()) {
                         // Checked on the raw JSON, before Gson sees it: Gson drops a key it does not know, so
@@ -305,7 +305,7 @@ public final class TriggerTables {
      * array may be empty, and anything else is not a shape this file understands.
      */
     /**
- * The keys {@link EffectSpec} actually maps, read from its own annotations.
+     * The keys {@link EffectSpec} actually maps, read from its own annotations.
      *
      * <p>Reflection rather than a hand-kept list: the failure this guards is exactly a key the loader "knows" and Gson does
      * not, so the two must be the same source of truth.
@@ -332,7 +332,7 @@ public final class TriggerTables {
     }
 
     /**
- * The keys {@link com.laosun.aluminium.beans.TriggerSpec} actually maps, read from its own annotations.
+     * The keys {@link com.laosun.aluminium.beans.TriggerSpec} actually maps, read from its own annotations.
      *
      * <p>The same reflection the effect guard uses, for the same reason: a key the loader "knows" and Gson does not is a value
      * that vanishes without a word.
@@ -353,7 +353,9 @@ public final class TriggerTables {
         return Set.copyOf(keys);
     }
 
-    /** Walks the rules themselves: known keys, and an event to listen to. */
+    /**
+     * Walks the rules themselves: known keys, and an event to listen to.
+     */
     private static void requireKnownRuleKeys(JsonElement rules) {
         if (rules == null || !rules.isJsonArray()) {
             return;
@@ -373,7 +375,9 @@ public final class TriggerTables {
         }
     }
 
-    /** Walks every rule's {@code do} array and refuses a key Gson would silently drop. */
+    /**
+     * Walks every rule's {@code do} array and refuses a key Gson would silently drop.
+     */
     private static void requireKnownEffectKeys(JsonElement rules) {
         if (rules == null || !rules.isJsonArray()) {
             return;

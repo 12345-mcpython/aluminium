@@ -7,10 +7,10 @@ import com.laosun.aluminium.enums.DamageType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Damage;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.models.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -35,7 +35,7 @@ import java.util.List;
 public class PearlInsightTraceTest {
     private static final int PEARL = 1503;
     private static final int HUNTER = 1204;      // The Hunt (巡猎): not Elation, a plain bystander
-        private static final double ELATION = 0.32;
+    private static final double ELATION = 0.32;
     private static final double PER_POINT_OVER = 0.0003;   // 3% per 100 DEF
     private static final double EPS = 1e-6;
 
@@ -183,7 +183,9 @@ public class PearlInsightTraceTest {
     private static final String DEEP = "深度学习";
     private static final String COUNTER = "好活当赏";
 
-    /** Pearl at the given Defence and Eidolon rank, with every {@code BATTLE_START} rule settled. */
+    /**
+     * Pearl at the given Defence and Eidolon rank, with every {@code BATTLE_START} rule settled.
+     */
     private static Character pearlWith(double defence, int eidolon) {
         Character pearl = CharacterFactory.create(PEARL, 80, false, null, null, eidolon);
         pearl.setAttribute(AttributeType.DEFENCE, new com.laosun.aluminium.models.DoubleValue(defence));
@@ -194,7 +196,9 @@ public class PearlInsightTraceTest {
         return battle.characters.getFirst();
     }
 
-    /** Her Elation (欢愉度) at the given Defence, i.e. after the 洞察万物 tier has run. */
+    /**
+     * Her Elation (欢愉度) at the given Defence, i.e. after the 洞察万物 tier has run.
+     */
     private static double elationWith(double defence) {
         return pearlWith(defence, 0).getAttribute(AttributeType.ELATION_DAMAGE_BOOST).get();
     }

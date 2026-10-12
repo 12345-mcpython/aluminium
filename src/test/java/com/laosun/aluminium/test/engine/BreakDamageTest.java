@@ -20,7 +20,7 @@ import java.util.List;
  * acceptance: the break damage formula.
  *
  * <p>Anchor (from the design notes): attacker Lv80, break effect 300%, toughness reduction 112.5 points,
- * enemy DEF 1150, no resistance and no reduction to 
+ * enemy DEF 1150, no resistance and no reduction to
  * 36.5535 * 4.0 * 112.5 * 1000/2150 ~= 8855.8.
  */
 public class BreakDamageTest {

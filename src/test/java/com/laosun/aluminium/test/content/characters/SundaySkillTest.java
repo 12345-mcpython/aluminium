@@ -4,16 +4,13 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.data.TriggerTables;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.CanHit;
+import com.laosun.aluminium.models.*;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.DoubleValue;
-import com.laosun.aluminium.models.Signal;
-import com.laosun.aluminium.models.Summon;
 import com.laosun.aluminium.models.buff.StatModifierBuff;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.skill.DefaultSkill;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -47,18 +44,30 @@ public class SundaySkillTest {
     private static final double EPS = 1e-6;
 
     private static final int SUNDAY = 1313;
-    /** Himeko - Erudition (智识), so the advance happens; and she owns no summon, which is the 15% side. */
+    /**
+     * Himeko - Erudition (智识), so the advance happens; and she owns no summon, which is the 15% side.
+     */
     private static final int ERUDITION_ALLY = 1003;
-    /** Robin - Harmony (同谐), so the advance must <b>not</b> happen. */
+    /**
+     * Robin - Harmony (同谐), so the advance must <b>not</b> happen.
+     */
     private static final int HARMONY_ALLY = 1309;
-    /** Aglaea - Remembrance (记忆) and a memosprite owner, so she is the "target has a summon" side. */
+    /**
+     * Aglaea - Remembrance (记忆) and a memosprite owner, so she is the "target has a summon" side.
+     */
     private static final int MEMOSPRITE_ALLY = 1402;
     private static final int LEVEL = 80;
-        /** His Skill's slot in {@code skills.json}. */
+    /**
+     * His Skill's slot in {@code skills.json}.
+     */
     private static final int SKILL_SLOT = 2;
-    /** His ultimate's slot. */
+    /**
+     * His ultimate's slot.
+     */
     private static final int ULTIMATE_SLOT = 3;
-    /** Himeko's CRIT DMG with no buffs - she is the fixture the derived value is measured against. */
+    /**
+     * Himeko's CRIT DMG with no buffs - she is the fixture the derived value is measured against.
+     */
     private static final double HARMONY_BARE_CRIT_DMG =
             CharacterFactory.create(ERUDITION_ALLY, LEVEL).getAttribute(AttributeType.CRIT_ATTACK).get();
 
@@ -66,7 +75,9 @@ public class SundaySkillTest {
     // 1. "指定我方单体及其召唤物立即行动"
     // ==================================================================
 
-    /** The chosen ally and its memosprite both act now - the pair, not just the ally. */
+    /**
+     * The chosen ally and its memosprite both act now - the pair, not just the ally.
+     */
     @Test
     public void theChosenAllyAndItsSummonActImmediately() {
         Character sunday = CharacterFactory.create(SUNDAY, LEVEL);
@@ -105,7 +116,9 @@ public class SundaySkillTest {
                 "「当星期日对「同谐」命途的角色施放该技能时，无法触发立即行动效果」 (when Sunday casts this Skill on a character of the Harmony (「同谐」) Path, the immediate-action effect cannot be triggered)");
     }
 
-    /** ...but the damage share is a different clause, and it is granted to a Harmony (同谐) target all the same. */
+    /**
+     * ...but the damage share is a different clause, and it is granted to a Harmony (同谐) target all the same.
+     */
     @Test
     public void theShareIsStillGrantedToAHarmonyTarget() {
         Character sunday = CharacterFactory.create(SUNDAY, LEVEL);
@@ -123,7 +136,9 @@ public class SundaySkillTest {
     // 2. The share: 15%, or 40% when the target has a summon
     // ==================================================================
 
-    /** The document's own arithmetic: #2 alone, or #2 + #4 when the target has a memosprite, for #3 turns. */
+    /**
+     * The document's own arithmetic: #2 alone, or #2 + #4 when the target has a memosprite, for #3 turns.
+     */
     @Test
     public void theShareIsFifteenPercentWithoutASummonAndFortyWith() {
         Assertions.assertEquals(0.15, boostAfterCastAt(ERUDITION_ALLY, false), EPS,
@@ -132,7 +147,9 @@ public class SundaySkillTest {
                 "「若目标拥有召唤物，则…额外提高#4[i]%」 (if the target has a summon, ... raises it by an extra #4[i]%) -- 0.15 + 0.25, the sum the target ends up with");
     }
 
-    /**  ...and it lasts the 2 turns the row says (#3), not a number this file invented. */
+    /**
+     * ...and it lasts the 2 turns the row says (#3), not a number this file invented.
+     */
     @Test
     public void theShareLastsTheStatedTurns() {
         Character sunday = CharacterFactory.create(SUNDAY, LEVEL);
@@ -151,7 +168,9 @@ public class SundaySkillTest {
     // 2b. The [蒙福者] kit: his ultimate's clause and the state it makes
     // ==================================================================
 
-    /** The state and the CRIT DMG it carries land on the ally and its summon - and only on the newest target. */
+    /**
+     * The state and the CRIT DMG it carries land on the ally and its summon - and only on the newest target.
+     */
     @Test
     public void theUltimateBlessesTheTargetAndItsSummon() {
         Battle battle = ultimateBattle(MEMOSPRITE_ALLY, null);
@@ -200,7 +219,8 @@ public class SundaySkillTest {
                 "20% of HER maximum (" + max + "), not of his, and not a literal");
     }
 
-    /** His death takes the state off the ally: "当星期日陷入无法战斗状态时，[蒙福者]效果也会被解除" (the state is
+    /**
+     * His death takes the state off the ally: "当星期日陷入无法战斗状态时，[蒙福者]效果也会被解除" (the state is
      * released when Sunday is knocked out).
      */
     @Test
@@ -218,7 +238,9 @@ public class SundaySkillTest {
                 "the state's clock was HIS turns -- once he is gone there is no clock, so it goes with him");
     }
 
-    /** The state's duration is spent by <b>his</b> turns, not by the ally's. */
+    /**
+     * The state's duration is spent by <b>his</b> turns, not by the ally's.
+     */
     @Test
     public void theStateIsSpentByHisTurns() {
         Battle battle = ultimateBattle(ERUDITION_ALLY, null);
@@ -232,7 +254,9 @@ public class SundaySkillTest {
         Assertions.assertEquals(2, blessingDuration(ally), "his does");
     }
 
-    /** Casting the Skill on the [蒙福者] gives the skill point back -- the sentence's last clause. */
+    /**
+     * Casting the Skill on the [蒙福者] gives the skill point back -- the sentence's last clause.
+     */
     @Test
     public void theSkillRefundsItsPointOnTheBlessed() {
         Battle battle = ultimateBattle(ERUDITION_ALLY, null);
@@ -272,7 +296,9 @@ public class SundaySkillTest {
     // Fixture
     // ==================================================================
 
-    /** How much damage boost the ally carries after Sunday casts his Skill on it. */
+    /**
+     * How much damage boost the ally carries after Sunday casts his Skill on it.
+     */
     private static double boostAfterCastAt(int allyCid, boolean withMemosprite) {
         Character sunday = CharacterFactory.create(SUNDAY, LEVEL);
         Character ally = CharacterFactory.create(allyCid, LEVEL);
@@ -288,7 +314,9 @@ public class SundaySkillTest {
         return damageBoostOf(ally);
     }
 
-    /** A real cast of his Skill, aimed at {@code ally} - the path that carries "指定" as the event's target. */
+    /**
+     * A real cast of his Skill, aimed at {@code ally} - the path that carries "指定" as the event's target.
+     */
     private static void cast(Battle battle, Character sunday, Character ally) {
         battle.castImmediate(new DefaultSkill(SUNDAY, SKILL_SLOT, 1), sunday, List.of(ally));
     }
@@ -297,7 +325,9 @@ public class SundaySkillTest {
         return unit.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
     }
 
-    /** How much action value the unit still has - zero means "acts now". */
+    /**
+     * How much action value the unit still has - zero means "acts now".
+     */
     private static double timeRemaining(Battle battle, CanHit target) {
         for (Signal signal : battle.queue.snapshot()) {
             if (signal.getCanHit() == target) {
@@ -328,7 +358,9 @@ public class SundaySkillTest {
         battle.castImmediate(new DefaultSkill(SUNDAY, ULTIMATE_SLOT, 1), sunday, List.of(ally));
     }
 
-    /** The CRIT DMG of the [蒙福者] state's modifier, or {@code -1} when it is not attached. */
+    /**
+     * The CRIT DMG of the [蒙福者] state's modifier, or {@code -1} when it is not attached.
+     */
     private static int blessingDuration(CanHit who) {
         for (StatModifierBuff buff : who.getBuffManager().allBuffsOf(StatModifierBuff.class)) {
             if (buff.getAttribute() == AttributeType.CRIT_ATTACK) {
@@ -348,7 +380,9 @@ public class SundaySkillTest {
         }
     }
 
-    /** Runs the queue up to {@code who}'s turn and settles both boundaries of it. */
+    /**
+     * Runs the queue up to {@code who}'s turn and settles both boundaries of it.
+     */
     private static void takeTurn(Battle battle, Character who) {
         for (int guard = 0; guard < 60; guard++) {
             battle.stepForward();

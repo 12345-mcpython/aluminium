@@ -29,16 +29,24 @@ import com.laosun.aluminium.models.CanHit;
  */
 public class AbsorbBuff extends AbstractBuff {
 
-    /** Which counter pays. Read from the PAYER, not from this buff's holder. */
+    /**
+     * Which counter pays. Read from the PAYER, not from this buff's holder.
+     */
     private final String resource;
 
-    /** How much damage one point of {@link #resource} is worth (200 in the corpus). */
+    /**
+     * How much damage one point of {@link #resource} is worth (200 in the corpus).
+     */
     private final double unitAmount;
 
-    /** The share of the hit that may be blocked at all (0.6 = 60%). */
+    /**
+     * The share of the hit that may be blocked at all (0.6 = 60%).
+     */
     private final double percent;
 
-    /** The unit whose counter pays - normally the rule's owner, i.e. Pearl, while the buff sits on an ally. */
+    /**
+     * The unit whose counter pays - normally the rule's owner, i.e. Pearl, while the buff sits on an ally.
+     */
     private final CanHit payer;
 
     public AbsorbBuff(int duration, boolean permanent, String resource, double unitAmount, double percent,

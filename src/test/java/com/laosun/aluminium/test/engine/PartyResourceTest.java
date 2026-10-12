@@ -4,8 +4,8 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -22,7 +22,7 @@ public class PartyResourceTest {
     private static final int WEARER = 1505;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-        private static final String LAUGH = "笑点";
+    private static final String LAUGH = "笑点";
 
     private Battle battle;
     private Character elation;
@@ -48,7 +48,9 @@ public class PartyResourceTest {
                 "and the counter does not live on the caster (that is what makes it party-level)");
     }
 
-    /** The shipped declaration and rule, read off the compiled character (discipline 232). */
+    /**
+     * The shipped declaration and rule, read off the compiled character (discipline 232).
+     */
     @Test
     public void theShippedDeclarationSaysParty() {
         build();

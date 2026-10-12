@@ -1,8 +1,6 @@
 package com.laosun.aluminium.test.content.characters;
 
 
-import com.laosun.aluminium.test.support.TestCharacters;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.data.TriggerTables;
 import com.laosun.aluminium.enums.AttributeType;
@@ -11,10 +9,12 @@ import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.CanHit;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.DoubleValue;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.models.skill.DefaultSkill;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TestCharacters;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -38,7 +38,9 @@ import java.util.List;
 public class HimekoChargeTest {
     private static final double EPS = 1e-6;
 
-    /** Himeko (姬子) herself. */
+    /**
+     * Himeko (姬子) herself.
+     */
     private static final int HIMEKO = 1003;
     /**
      * An ordinary character with no rules of their own: the ally who attacks, so nothing but her own table can
@@ -52,16 +54,22 @@ public class HimekoChargeTest {
     // reach whatever the shared control happens to be.
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-    /** Ice Edge (冰刃) @90: Fire-weak with 60 toughness, so two Fire basic attacks break it. */
+    /**
+     * Ice Edge (冰刃) @90: Fire-weak with 60 toughness, so two Fire basic attacks break it.
+     */
     private static final int ICE_EDGE = 1002011;
-    /** The resource her Talent declares. */
+    /**
+     * The resource her Talent declares.
+     */
     private static final String CHARGE = "充能";
 
     // ==================================================================
     // The three clauses of the talent (天赋) "乘胜追击" (Press the Advantage)
     // ==================================================================
 
-    /** "战斗开始时获得1点充能。" */
+    /**
+     * "战斗开始时获得1点充能。"
+     */
     @Test
     public void theBattleStartsHerAtOneCharge() {
         Character himeko = CharacterFactory.create(HIMEKO, LEVEL);
@@ -135,7 +143,9 @@ public class HimekoChargeTest {
         Assertions.assertEquals(0, himeko.getResources().value(CHARGE), "「并消耗全部充能」 (and consumes all of the Charge)");
     }
 
-    /** Below the cap nothing happens - the same attack, one point short. */
+    /**
+     * Below the cap nothing happens - the same attack, one point short.
+     */
     @Test
     public void onePointShortOfTheCapNothingHappens() {
         Character himeko = CharacterFactory.create(HIMEKO, LEVEL);
@@ -194,7 +204,9 @@ public class HimekoChargeTest {
                 "the rule's damage is the skill row's share of her ATTACK, settled by the engine's own channel");
     }
 
-    /** The follow-up is not an attack that can trigger itself: at 0 charge the next ally attack does nothing. */
+    /**
+     * The follow-up is not an attack that can trigger itself: at 0 charge the next ally attack does nothing.
+     */
     @Test
     public void theFollowUpCannotRetriggerItself() {
         Character himeko = CharacterFactory.create(HIMEKO, LEVEL);
@@ -254,16 +266,22 @@ public class HimekoChargeTest {
     // helpers
     // ==================================================================
 
-    /** The row the document quotes for a maxed ability (its param tables are 1-based). */
+    /**
+     * The row the document quotes for a maxed ability (its param tables are 1-based).
+     */
     private static final int LEVEL_ROW = 10;
 
-    /** One entry of a skill's parameter row, as the interpreter reads it. */
+    /**
+     * One entry of a skill's parameter row, as the interpreter reads it.
+     */
     private static double talentRow(int cid, int level, int column) {
         Character character = CharacterFactory.create(cid, LEVEL);
         return character.getSkills().get(SkillType.TALENT).getData().getSkills().get(level - 1).get(column);
     }
 
-    /** Grants charge through her own BREAK rule until it reaches the cap. */
+    /**
+     * Grants charge through her own BREAK rule until it reaches the cap.
+     */
     private static void chargeTo(Character himeko, Enemy enemy, Battle battle) {
         while (himeko.getResources().value(CHARGE) < 3) {
             Assertions.assertEquals(1, battle.fireTriggers(TriggerEvent.BREAK, himeko, enemy, 0, 0),

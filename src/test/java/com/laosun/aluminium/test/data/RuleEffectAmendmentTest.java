@@ -1,15 +1,15 @@
 package com.laosun.aluminium.test.data;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -34,9 +34,11 @@ import java.util.Random;
 public class RuleEffectAmendmentTest {
     private static final int CID = 1001;
     private static final int LEVEL = 80;
-        private static final double EPS = 1e-6;
+    private static final double EPS = 1e-6;
 
-    /** The value amendment is what the effect reads: 30% becomes 40%. */
+    /**
+     * The value amendment is what the effect reads: 30% becomes 40%.
+     */
     @Test
     public void theRaisedValueIsWhatTheOpUses() {
         double base = attackOf(new TriggerTable(CID, List.of(boostRule())), 0);
@@ -56,7 +58,7 @@ public class RuleEffectAmendmentTest {
      * <p>Note: This case exists because the previous version only asserted the amendment was <i>filed</i>, and deleting
      * the code that <b>applies</b> it left the test green (measured mutation m2, 0 red) - a pin on the bookkeeping
      * instead of on the behaviour. Getting it to fail took a harness detail worth recording: a {@code StateBuff} is a
-     * <b>late</b> buff, so its duration is counted down in {@code Battle.afterMove()}, not in {@code beforeMove()} - 
+     * <b>late</b> buff, so its duration is counted down in {@code Battle.afterMove()}, not in {@code beforeMove()} -
      * a turn is a move, and a test that only opens turns never runs anything out.
      */
     @Test
@@ -68,7 +70,9 @@ public class RuleEffectAmendmentTest {
         Assertions.assertFalse(afterOneFullTurn(3, true), "…and it does end, one turn later than before");
     }
 
-    /** The amendment is filed against the named rule (the bookkeeping half). */
+    /**
+     * The amendment is filed against the named rule (the bookkeeping half).
+     */
     @Test
     public void theDurationAmendmentIsFiledAgainstTheNamedRule() {
         Character hero = hero(new TriggerTable(CID, List.of(turnsAmendment(), boostRule())));
@@ -104,7 +108,9 @@ public class RuleEffectAmendmentTest {
         return hero.getBuffManager().hasState("测试状态");
     }
 
-    /** A rule with an id that applies a 2-turn named state to its owner. */
+    /**
+     * A rule with an id that applies a 2-turn named state to its owner.
+     */
     private static TriggerSpec stateRule() {
         EffectSpec effect = new EffectSpec();
         TriggerSpecs.set(effect, "op", "APPLY_BUFF");
@@ -157,7 +163,9 @@ public class RuleEffectAmendmentTest {
         }
     }
 
-    /** Note: Naming a rule that states no such field is refused at load: there would be no number to raise. */
+    /**
+     * Note: Naming a rule that states no such field is refused at load: there would be no number to raise.
+     */
     @Test
     public void anAmendmentWithNothingToRaiseIsRefused() {
         EffectSpec instant = new EffectSpec();
@@ -182,7 +190,9 @@ public class RuleEffectAmendmentTest {
     // Helpers
     // ==================================================================
 
-    /** A rule with an id and one 30% ATTACK boost lasting 2 turns. */
+    /**
+     * A rule with an id and one 30% ATTACK boost lasting 2 turns.
+     */
     private static TriggerSpec boostRule() {
         EffectSpec effect = new EffectSpec();
         TriggerSpecs.set(effect, "op", "MODIFY_ATTR");

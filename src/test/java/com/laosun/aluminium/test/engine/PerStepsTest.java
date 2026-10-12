@@ -7,10 +7,10 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.DoubleValue;
-import com.laosun.aluminium.models.TriggerInterpreter;
-import com.laosun.aluminium.models.TriggerTable;
-import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.models.trigger.TriggerInterpreter;
+import com.laosun.aluminium.models.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -33,7 +33,7 @@ import java.util.List;
  */
 public class PerStepsTest {
     private static final int ALLY = 1204;
-        private static final String COUNTER = "测试配额";
+    private static final String COUNTER = "测试配额";
     private static final String TALLY = "测试结果";
     private static final String OTHER_TALLY = "测试结果二";
     private static final int MAX = 10000;
@@ -42,7 +42,9 @@ public class PerStepsTest {
     private Character unit;
     private Battle battle;
 
-    /** ⚠ The case that justifies the primitive: one move of 400 crosses THREE milestones, not one. */
+    /**
+     * ⚠ The case that justifies the primitive: one move of 400 crosses THREE milestones, not one.
+     */
     @Test
     public void oneJumpOfFourHundredPaysThreeMilestones() {
         gain(400,
@@ -71,7 +73,9 @@ public class PerStepsTest {
         Assertions.assertEquals(40, value(COUNTER), "while the counter is charged once, not twice");
     }
 
-    /** An effect that states no {@code per_steps} runs exactly once, which is what keeps every shipped rule unchanged. */
+    /**
+     * An effect that states no {@code per_steps} runs exactly once, which is what keeps every shipped rule unchanged.
+     */
     @Test
     public void anEffectWithoutTheFieldRunsOnce() {
         gain(400,
@@ -82,7 +86,9 @@ public class PerStepsTest {
         Assertions.assertEquals(400, value(COUNTER), "and nothing consumed it");
     }
 
-    /** Below one whole step nothing happens: no extra turn, and no error from a spend that has nothing to take. */
+    /**
+     * Below one whole step nothing happens: no extra turn, and no error from a spend that has nothing to take.
+     */
     @Test
     public void theLastIncompleteStepPaysNothing() {
         gain(STEP - 1,
@@ -113,7 +119,9 @@ public class PerStepsTest {
     // The refusals: a bad spelling must fail at LOAD time, not read 0 forever
     // ==================================================================
 
-    /** A step of zero (or one that is not a number) is refused, and the message says what the spelling has to be. */
+    /**
+     * A step of zero (or one that is not a number) is refused, and the message says what the spelling has to be.
+     */
     @Test
     public void aBadStepIsRefusedAtLoadTime() {
         IllegalArgumentException zero = Assertions.assertThrows(IllegalArgumentException.class,
@@ -144,7 +152,9 @@ public class PerStepsTest {
         Assertions.assertTrue(refused.getMessage().contains("amount_from_previous"), "the message names the pair");
     }
 
-    /** {@code steps} belongs to SPEND_STEPS; on any other op it would be silently ignored. */
+    /**
+     * {@code steps} belongs to SPEND_STEPS; on any other op it would be silently ignored.
+     */
     @Test
     public void stepsOnAnotherOpIsRefused() {
         IllegalArgumentException refused = Assertions.assertThrows(IllegalArgumentException.class,
@@ -154,7 +164,9 @@ public class PerStepsTest {
         Assertions.assertTrue(refused.getMessage().contains("only SPEND_STEPS reads"), "the message names the reader");
     }
 
-    /** SPEND_STEPS needs its own spelling, and refuses the counting one (it consumes, it does not repeat). */
+    /**
+     * SPEND_STEPS needs its own spelling, and refuses the counting one (it consumes, it does not repeat).
+     */
     @Test
     public void spendStepsNeedsStepsAndRefusesPerSteps() {
         IllegalArgumentException missing = Assertions.assertThrows(IllegalArgumentException.class,
@@ -190,7 +202,9 @@ public class PerStepsTest {
     // Helpers
     // ==================================================================
 
-    /** A TURN_START rule moves the counter by {@code jump}, then the given rules answer the change. */
+    /**
+     * A TURN_START rule moves the counter by {@code jump}, then the given rules answer the change.
+     */
     private void gain(int jump, TriggerSpec... answering) {
         unit = unit();
         List<TriggerSpec> rules = new ArrayList<>();

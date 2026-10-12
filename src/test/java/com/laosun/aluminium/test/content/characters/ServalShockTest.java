@@ -1,8 +1,6 @@
 package com.laosun.aluminium.test.content.characters;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
@@ -10,8 +8,10 @@ import com.laosun.aluminium.data.TriggerTables;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -35,7 +35,10 @@ public class ServalShockTest {
     private static final int SERVAL = 1103;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-        /** Her Rock 'n' Roll (摇滚) trace makes the 80% roll certain - and the same roll misses without an amendment (pinned below). */
+
+    /**
+     * Her Rock 'n' Roll (摇滚) trace makes the 80% roll certain - and the same roll misses without an amendment (pinned below).
+     */
     @Test
     public void theShockIsCertainWithHerTrace() {
         Fixture f = new Fixture(0.9);
@@ -59,7 +62,9 @@ public class ServalShockTest {
                         + "(two rules would roll twice: 96%, not 100%)");
     }
 
-    /** The shock settles on the enemy's own turns. */
+    /**
+     * The shock settles on the enemy's own turns.
+     */
     @Test
     public void theShockTicksOnTheEnemysTurn() {
         Fixture f = new Fixture(0.0);
@@ -90,7 +95,9 @@ public class ServalShockTest {
         Assertions.assertTrue(without >= 2, "precondition: the Skill's own shock settles at least twice");
     }
 
-    /** How many times the shock settles over six of the enemy's turns, with or without the ultimate. */
+    /**
+     * How many times the shock settles over six of the enemy's turns, with or without the ultimate.
+     */
     private static int settlements(boolean ultimate) {
         Fixture f = new Fixture(0.0);
         f.castSkill();
@@ -109,7 +116,9 @@ public class ServalShockTest {
     }
 
     /** The whole file is present, and the registered clauses are absent on purpose. */
-    /** The whole file is present, and the registered clauses are absent on purpose. */
+    /**
+     * The whole file is present, and the registered clauses are absent on purpose.
+     */
     public void herFileCarriesWhatItSays() {
         Assertions.assertEquals(1, TriggerTables.of(SERVAL).ruleCount(TriggerEvent.SKILL_CAST),
                 "the shock (the blast's damage is the engine's own path)");
@@ -125,7 +134,9 @@ public class ServalShockTest {
     // Helpers
     // ==================================================================
 
-    /** A hand-built table: one shock rule with a base chance, optionally amended by +0.2. */
+    /**
+     * A hand-built table: one shock rule with a base chance, optionally amended by +0.2.
+     */
     private static boolean shockWith(double roll, boolean amended) {
         Character serval = CharacterFactory.create(SERVAL, LEVEL);
         EffectSpec shock = new EffectSpec();

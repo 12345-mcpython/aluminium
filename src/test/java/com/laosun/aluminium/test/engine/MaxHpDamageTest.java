@@ -1,14 +1,14 @@
 package com.laosun.aluminium.test.engine;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -28,7 +28,9 @@ public class MaxHpDamageTest {
     private static final double CONTENT = 0.4;
     private static final double REFERENCE = 0.5;
 
-    /** Note: The content's 40% against a reference 50%, same pipeline and same scale. */
+    /**
+     * Note: The content's 40% against a reference 50%, same pipeline and same scale.
+     */
     @Test
     public void theTraceAddsFortyPercentOfHerMaxHp() {
         double content = basicAttackLoss(false, 0.0);
@@ -39,14 +41,18 @@ public class MaxHpDamageTest {
                 "content " + content + " vs reference " + reference + " (expected ratio " + (CONTENT / REFERENCE) + ")");
     }
 
-    /** Note: The control: with no rule installed, a basic attack adds nothing beyond its own data. */
+    /**
+     * Note: The control: with no rule installed, a basic attack adds nothing beyond its own data.
+     */
     @Test
     public void withoutTheRuleNothingExtra() {
         Assertions.assertEquals(0.0, basicAttackLoss(false, 0.0) - basicAttackLoss(false, 0.0), 1e-9,
                 "the fixture is deterministic");
     }
 
-    /** Note: The engine refuses a Max-HP share it cannot read rather than guessing. */
+    /**
+     * Note: The engine refuses a Max-HP share it cannot read rather than guessing.
+     */
     @Test
     public void anUnknownScaleIsRefused() {
         Character hero = CharacterFactory.create(NATASHA, LEVEL);
@@ -66,7 +72,9 @@ public class MaxHpDamageTest {
                 "an unreadable scale must be loud, not a silent zero (and loud at load time)");
     }
 
-    /** Runs one basic attack, optionally replacing the file's table with a single reference rule. */
+    /**
+     * Runs one basic attack, optionally replacing the file's table with a single reference rule.
+     */
     private static double basicAttackLoss(boolean useReference, double percent) {
         Character hero = CharacterFactory.create(NATASHA, LEVEL);
         if (useReference) {

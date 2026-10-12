@@ -13,7 +13,7 @@ import java.util.concurrent.ConcurrentMap;
  * The generic implementation that resolves a skill from the data by
  * {@code (cid, slot, level)}.
  *
- * <p>Note: There used to be a `// TODO: DELETE IT BECAUSE OF EVERY CHARACTERS HAS EVERY SKILLS` here - 
+ * <p>Note: There used to be a `// TODO: DELETE IT BECAUSE OF EVERY CHARACTERS HAS EVERY SKILLS` here -
  * that comment is misleading and has been deleted. What it probably meant to say was "a skill should
  * not be a Java class each", but that is the other direction (the three-way split (三分法, the three-way split):
  * mechanics go through data/triggers, only escape-hatch (逃生舱, the escape hatch) cases get a class), which in fact shows

@@ -7,8 +7,6 @@ import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.util.List;
-
 /**
  * The damage base an HP- or DEF-scaled skill must use.
  *
@@ -23,7 +21,9 @@ public class DamageBaseTest {
     private static final int DANHENG = 1002;
     private static final int LEVEL = 80;
 
-    /** Note: "等同于琳希#1[i]%生命上限的伤害" -> HEALTH. */
+    /**
+     * Note: "等同于琳希#1[i]%生命上限的伤害" -> HEALTH.
+     */
     @Test
     public void aMaxHpSentenceNamesMaxHp() {
         Character lynx = CharacterFactory.create(LYNX, LEVEL);
@@ -31,7 +31,9 @@ public class DamageBaseTest {
                 "\"damage equal to ... Max HP\" (「等同于…生命上限的伤害」)");
     }
 
-    /** Note: "等同于砂金100%防御力的伤害" -> DEFENCE. */
+    /**
+     * Note: "等同于砂金100%防御力的伤害" -> DEFENCE.
+     */
     @Test
     public void aDefenceSentenceNamesDefence() {
         Character aventurine = CharacterFactory.create(AVENTURINE, LEVEL);
@@ -39,7 +41,9 @@ public class DamageBaseTest {
                 "\"damage equal to 100% of Aventurine (砂金)'s DEF\" (「等同于砂金100%防御力的伤害」)");
     }
 
-    /** Note: The ordinary case stays ATK: "等同于丹恒100%攻击力". */
+    /**
+     * Note: The ordinary case stays ATK: "等同于丹恒100%攻击力".
+     */
     @Test
     public void anAttackSentenceStaysAttack() {
         Character danheng = CharacterFactory.create(DANHENG, LEVEL);

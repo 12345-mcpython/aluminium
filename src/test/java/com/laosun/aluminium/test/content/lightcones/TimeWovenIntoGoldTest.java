@@ -5,14 +5,11 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.DamageType;
 import com.laosun.aluminium.enums.TriggerEvent;
+import com.laosun.aluminium.models.*;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.Damage;
-import com.laosun.aluminium.models.DoubleValue;
-import com.laosun.aluminium.models.Summon;
-import com.laosun.aluminium.models.Weapon;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -30,7 +27,7 @@ public class TimeWovenIntoGoldTest {
     private static final int WEARER = 1402;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-        private static final String BROCADE = "织锦";
+    private static final String BROCADE = "织锦";
     private static final int CAP = 6;
 
     private Character wearer;

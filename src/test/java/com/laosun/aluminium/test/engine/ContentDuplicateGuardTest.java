@@ -11,11 +11,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Stream;
 
 /**
@@ -30,7 +26,9 @@ import java.util.stream.Stream;
 public class ContentDuplicateGuardTest {
     private static final Path ROOT = Path.of("src", "main", "resources").toAbsolutePath();
     private static final List<String> DIRS = List.of("characters", "light_cones", "relic_sets", "memosprites");
-    /** `op` plus every operand that names WHAT is affected -- the parts that make two effects the same effect. */
+    /**
+     * `op` plus every operand that names WHAT is affected -- the parts that make two effects the same effect.
+     */
     private static final List<String> OPERANDS =
             List.of("attribute", "buff", "resource", "rule", "state", "scale", "target", "permanent", "turns",
                     "percent", "amount", "crit_rate", "crit_damage", "per_stack", "max_stacks",
@@ -98,7 +96,9 @@ public class ContentDuplicateGuardTest {
                 "one sentence written twice (the round-71 mistake), " + duplicates.size() + " case(s): " + duplicates);
     }
 
-    /** Each rule of a file as {scope, json}; the scope is the rank/piece key it lives under, "" for a bare list. */
+    /**
+     * Each rule of a file as {scope, json}; the scope is the rank/piece key it lives under, "" for a bare list.
+     */
     private static void collect(JsonElement element, String scope, List<String[]> out) {
         if (element == null || element.isJsonNull()) {
             return;
@@ -116,7 +116,7 @@ public class ContentDuplicateGuardTest {
         }
         JsonObject object = element.getAsJsonObject();
         if (object.has("on") && object.has("do")) {
-            out.add(new String[] {scope, object.toString()});
+            out.add(new String[]{scope, object.toString()});
             return;
         }
         for (Map.Entry<String, JsonElement> entry : object.entrySet()) {

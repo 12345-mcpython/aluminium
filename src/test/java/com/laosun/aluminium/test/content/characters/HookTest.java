@@ -25,7 +25,9 @@ public class HookTest {
     private static final int HOOK = 1109;
     private static final int LEVEL = 80;
 
-    /** Note: His skill's burn lands as a DOT with the document's magnitude, and the trace pays energy on the ultimate. */
+    /**
+     * Note: His skill's burn lands as a DOT with the document's magnitude, and the trace pays energy on the ultimate.
+     */
     @Test
     public void hisBurnLandsAndHisUltimateTracePaysEnergy() {
         Fixture f = new Fixture(0);
@@ -44,7 +46,9 @@ public class HookTest {
                 "「施放终结技后，虎克的行动提前20%并额外恢复5点能量」 (after casting the ultimate, Hook advances 20% and restores 5 extra energy) — the trace pays on the cast");
     }
 
-    /** Census: the burn, the level convention, and the five traces/eidolons are all there. */
+    /**
+     * Census: the burn, the level convention, and the five traces/eidolons are all there.
+     */
     @Test
     public void hisFileCarriesTheClauses() {
         var table = TriggerTables.of(HOOK);

@@ -1,8 +1,6 @@
 package com.laosun.aluminium.test.content.characters;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -10,8 +8,10 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -31,7 +31,10 @@ public class MydeiTest {
     private static final int MYDEI = 1404;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-        /** Note: With the technique declared the enemies are hit; without it, nothing happens at all. */
+
+    /**
+     * Note: With the technique declared the enemies are hit; without it, nothing happens at all.
+     */
     @Test
     public void theTechniqueHitsOnlyWhenDeclared() {
         double declared = openingLoss(true);
@@ -41,7 +44,9 @@ public class MydeiTest {
         Assertions.assertEquals(0.0, undeclared, 1e-9, "「使用秘技后」 (after using the Technique) -- undeclared, so nothing");
     }
 
-    /** Note: The number: 80% of his Max HP must be 1.6 of a hand-built 50% in the same pipeline. */
+    /**
+     * Note: The number: 80% of his Max HP must be 1.6 of a hand-built 50% in the same pipeline.
+     */
     @Test
     public void theTechniqueDealsEightyPercentOfHisMaxHp() {
         double content = openingLoss(true);
@@ -52,7 +57,9 @@ public class MydeiTest {
                 "content " + content + " vs reference " + reference + " (expected " + (0.8 / 0.5) + ")");
     }
 
-    /** Note: The file declares the charge resource with the document's cap. */
+    /**
+     * Note: The file declares the charge resource with the document's cap.
+     */
     @Test
     public void theFileDeclaresTheChargeResource() {
         try (InputStream stream = MydeiTest.class.getResourceAsStream("/characters/1404.json")) {
@@ -68,7 +75,9 @@ public class MydeiTest {
         }
     }
 
-    /** Runs the opening with or without the technique marker. */
+    /**
+     * Runs the opening with or without the technique marker.
+     */
     private static double openingLoss(boolean declared) {
         Character mydei = CharacterFactory.create(MYDEI, LEVEL);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
@@ -82,7 +91,9 @@ public class MydeiTest {
         return before - enemy.getCurrentHp();
     }
 
-    /** A hand-built 50%-Max-HP instance in the same pipeline, as the ratio's denominator. */
+    /**
+     * A hand-built 50%-Max-HP instance in the same pipeline, as the ratio's denominator.
+     */
     private static double referenceLoss() {
         Character mydei = CharacterFactory.create(MYDEI, LEVEL);
         EffectSpec effect = new EffectSpec();

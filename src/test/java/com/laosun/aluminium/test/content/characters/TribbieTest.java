@@ -1,14 +1,14 @@
 package com.laosun.aluminium.test.content.characters;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.data.TriggerTables;
-import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -26,7 +26,10 @@ public class TribbieTest {
     private static final int TRIBBIE = 1403;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-        /** Note: A teammate's ultimate triggers it; her own does not. */
+
+    /**
+     * Note: A teammate's ultimate triggers it; her own does not.
+     */
     @Test
     public void onlyATeammatesUltimateTriggersTheFollowUp() {
         double fromAlly = lossWhenTheEventComesFrom(true);
@@ -37,7 +40,9 @@ public class TribbieTest {
                 "「我方**其他**角色」 (**another** one of our characters) -- her own ultimate is excluded, and firing the event by hand means no ultimate damage is mixed in: " + fromSelf);
     }
 
-    /** Note: "进入战斗时获得[神启]，持续3回合", and the trace's own battle-start energy. */
+    /**
+     * Note: "进入战斗时获得[神启]，持续3回合", and the trace's own battle-start energy.
+     */
     @Test
     public void theTechniqueGrantsNuminosity() {
         Character tribbie = CharacterFactory.create(TRIBBIE, LEVEL);
@@ -51,7 +56,9 @@ public class TribbieTest {
                 "「使用秘技后，进入战斗时获得【神启】」 (after using the Technique, gains Numinosity (【神启】) on entering battle)");
     }
 
-    /** Census: the ultimate, the skill, the technique, two traces and the convention all live on BATTLE_START/other events as stated. */
+    /**
+     * Census: the ultimate, the skill, the technique, two traces and the convention all live on BATTLE_START/other events as stated.
+     */
     @Test
     public void herFileCarriesTheClauses() {
         var table = TriggerTables.of(TRIBBIE);
@@ -83,7 +90,9 @@ public class TribbieTest {
     }
 
 
-    /** Note: The number itself: 18% of her Max HP must be 0.36 of a hand-built 50% in the same pipeline. */
+    /**
+     * Note: The number itself: 18% of her Max HP must be 0.36 of a hand-built 50% in the same pipeline.
+     */
     @Test
     public void theFollowUpDealsEighteenPercentOfHerMaxHp() {
         double content = followUpLoss(false);
@@ -94,7 +103,9 @@ public class TribbieTest {
                 "content " + content + " vs reference " + reference + " (expected " + (0.18 / 0.50) + ")");
     }
 
-    /** Fires one teammate ULT_CAST, optionally replacing her table with a single 50%-Max-HP reference rule. */
+    /**
+     * Fires one teammate ULT_CAST, optionally replacing her table with a single 50%-Max-HP reference rule.
+     */
     private static double followUpLoss(boolean useReference) {
         Character tribbie = CharacterFactory.create(TRIBBIE, LEVEL);
         if (useReference) {
@@ -104,7 +115,7 @@ public class TribbieTest {
             TriggerSpecs.set(effect, "percent", 0.50);
             TriggerSpecs.set(effect, "element", "Quantum");
             TriggerSpecs.set(effect, "target", "all_enemies");
-            tribbie.setTriggerTable(new com.laosun.aluminium.models.TriggerTable(TRIBBIE,
+            tribbie.setTriggerTable(new TriggerTable(TRIBBIE,
                     List.of(TriggerSpecs.rule(TriggerEvent.ULT_CAST.name(), List.of("actor is_other_ally"), effect))));
         }
         Character ally = CharacterFactory.create(ALLY, LEVEL);

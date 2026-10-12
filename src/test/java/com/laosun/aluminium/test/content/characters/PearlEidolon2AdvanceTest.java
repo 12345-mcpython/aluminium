@@ -4,8 +4,8 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Signal;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -31,7 +31,8 @@ public class PearlEidolon2AdvanceTest {
     private static final int ELATION_A = 1502;  // Elation
     private static final int ELATION_B = 1505;  // Elation
     private static final int HUNTER = 1204;     // NOT Elation - the archetype in these teams
-        /**
+
+    /**
      * From Eidolon 2 the OTHER Elation allies are advanced where they were not before, and the non-Elation archetype
      * no longer is.
      *
@@ -80,7 +81,9 @@ public class PearlEidolon2AdvanceTest {
     // Helpers
     // ==================================================================
 
-    /** The fraction of its wait each unit KEEPS after the Ultimate. */
+    /**
+     * The fraction of its wait each unit KEEPS after the Ultimate.
+     */
     private record Fraction(double archetype, double elationA, double elationB) {
     }
 
@@ -100,7 +103,9 @@ public class PearlEidolon2AdvanceTest {
         return new Fraction(after[3] / before[3], after[1] / before[1], after[2] / before[2]);
     }
 
-    /** Remaining action value for Pearl, the two Elation allies and the archetype, in that order. */
+    /**
+     * Remaining action value for Pearl, the two Elation allies and the archetype, in that order.
+     */
     private static double[] waits(Battle battle, Character pearl, Character elationA, Character elationB,
                                   Character archetype) {
         double[] out = new double[4];

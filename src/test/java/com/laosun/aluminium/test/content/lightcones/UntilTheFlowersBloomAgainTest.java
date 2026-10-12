@@ -1,18 +1,15 @@
 package com.laosun.aluminium.test.content.lightcones;
 
 import com.laosun.aluminium.Battle;
-import com.laosun.aluminium.enums.AttributeType;
-import com.laosun.aluminium.enums.DamageElement;
-import com.laosun.aluminium.enums.DamageType;
-import com.laosun.aluminium.enums.SkillCategory;
-import com.laosun.aluminium.enums.TriggerEvent;
+import com.laosun.aluminium.enums.*;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Damage;
 import com.laosun.aluminium.models.DoubleValue;
 import com.laosun.aluminium.models.Weapon;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.models.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -30,7 +27,7 @@ public class UntilTheFlowersBloomAgainTest {
     private static final int CONE = 23058;
     private static final int WEARER = 1205;
     private static final int LEVEL = 80;
-        private static final double SHARE = 0.15;
+    private static final double SHARE = 0.15;
 
     private Character wearer;
     private Enemy enemy;
@@ -80,13 +77,15 @@ public class UntilTheFlowersBloomAgainTest {
         Assertions.assertEquals(before, ordinaryHit(battle), 1e-9, "the clause names an ELATION skill (false case)");
     }
 
-    /** The spec half: op, share, duration and the target set pinned, so a wrong duration has something to break. */
+    /**
+     * The spec half: op, share, duration and the target set pinned, so a wrong duration has something to break.
+     */
     @Test
     public void theSpecPinsTheNumbers() {
         Battle battle = battle(true);
         int pinned = 0;
         for (var rule : wearer.getTriggerTable().matching(TriggerEvent.CAST_SETUP,
-                new com.laosun.aluminium.models.TriggerTable.TriggerContext(wearer, wearer, enemy, 0, 0, null, battle,
+                new TriggerTable.TriggerContext(wearer, wearer, enemy, 0, 0, null, battle,
                         SkillCategory.ELATION_DAMAGE))) {
             for (var effect : rule.effects()) {
                 if (!"MODIFY_DAMAGE_TAKEN".equals(effect.getOp())) {

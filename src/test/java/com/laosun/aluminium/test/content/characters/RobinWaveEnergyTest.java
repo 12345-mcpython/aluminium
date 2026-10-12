@@ -3,8 +3,8 @@ package com.laosun.aluminium.test.content.characters;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -19,9 +19,11 @@ import java.util.List;
  */
 public class RobinWaveEnergyTest {
     private static final int ROBIN = 1309;
-        private static final double EPS = 1e-6;
+    private static final double EPS = 1e-6;
 
-    /** Five with the field, nothing without it. */
+    /**
+     * Five with the field, nothing without it.
+     */
     @Test
     public void theFieldPaysFiveAtEachWave() {
         double withField = gainAtWaveStart(true);
@@ -34,7 +36,9 @@ public class RobinWaveEnergyTest {
                 "「领域展开期间进入战斗后」 (after entering battle while the field is open)-- no field, no energy: this half is what makes the reading about the clause");
     }
 
-    /** Her energy gain when a wave starts, with or without the technique's field. */
+    /**
+     * Her energy gain when a wave starts, with or without the technique's field.
+     */
     private static double gainAtWaveStart(boolean technique) {
         Character robin = CharacterFactory.create(ROBIN, 80, false, null, null, 0);
         Battle battle = new Battle(List.of(robin),

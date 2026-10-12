@@ -6,8 +6,8 @@ import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -26,7 +26,10 @@ public class HanyaBurdenTest {
     private static final int HANYA = 1215;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-        /** "[承负] applies only to the most recently applied target" ([承负]仅对最新被施加的目标生效): the second cast takes it off the first enemy. */
+
+    /**
+     * "[承负] applies only to the most recently applied target" ([承负]仅对最新被施加的目标生效): the second cast takes it off the first enemy.
+     */
     @Test
     public void theSkillMovesBurdenToTheLatestTarget() {
         Fixture f = new Fixture();
@@ -40,7 +43,9 @@ public class HanyaBurdenTest {
         Assertions.assertTrue(f.second.getBuffManager().hasState("承负"));
     }
 
-    /** Two qualifying attacks reach the threshold, and that clears the state ("触发 2 次后自动解除", removed automatically after triggering twice). */
+    /**
+     * Two qualifying attacks reach the threshold, and that clears the state ("触发 2 次后自动解除", removed automatically after triggering twice).
+     */
     @Test
     public void twoAlliedAttacksReachTheRefundThreshold() {
         Fixture f = new Fixture();
@@ -55,7 +60,9 @@ public class HanyaBurdenTest {
                 "the second qualifying cast reached the threshold, the party got a skill point and 【承负】 (Burden) came off");
     }
 
-    /** Note: The counter counts <b>casts</b>, not hits: a multi-hit skill marks once. */
+    /**
+     * Note: The counter counts <b>casts</b>, not hits: a multi-hit skill marks once.
+     */
     @Test
     public void aMultiHitCastCountsOnce() {
         Fixture f = new Fixture();
@@ -67,7 +74,9 @@ public class HanyaBurdenTest {
                         + "damage instances");
     }
 
-    /** The whole family is present, and nothing else was written. */
+    /**
+     * The whole family is present, and nothing else was written.
+     */
     @Test
     public void herFileCarriesTheBurdenFamily() {
         Assertions.assertEquals(4, TriggerTables.of(HANYA).ruleCount(TriggerEvent.ALLY_ATTACK),
@@ -86,7 +95,9 @@ public class HanyaBurdenTest {
 
     private static final class Fixture {
         private final Character hanya = CharacterFactory.create(HANYA, LEVEL, true, null, null, 0);
-        /** The teammate (队友) the marks are about: an ally OTHER than the carrier, hence a field of its own. */
+        /**
+         * The teammate (队友) the marks are about: an ally OTHER than the carrier, hence a field of its own.
+         */
         private final Character ally = CharacterFactory.create(ALLY, LEVEL);
         private final Enemy first = BattleFixture.monster();
         private final Enemy second = BattleFixture.monster();
@@ -106,7 +117,9 @@ public class HanyaBurdenTest {
             allyAttacks(target, category, 1);
         }
 
-        /** One attack by Hanya herself ("我方目标" -- our targets -- includes her), stating the cast category the event now carries. */
+        /**
+         * One attack by Hanya herself ("我方目标" -- our targets -- includes her), stating the cast category the event now carries.
+         */
         private void allyAttacks(Enemy target, com.laosun.aluminium.enums.SkillCategory category, int hits) {
             battle.fireTriggers(TriggerEvent.ALLY_ATTACK, ally, target, hits, 0, category);
         }

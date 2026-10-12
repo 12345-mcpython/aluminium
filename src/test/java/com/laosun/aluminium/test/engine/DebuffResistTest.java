@@ -1,24 +1,24 @@
 package com.laosun.aluminium.test.engine;
 
 
-import com.laosun.aluminium.test.support.TestTurns;
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DebuffClass;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.CanHit;
+import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.DoubleValue;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.buff.ClassResistBuff;
 import com.laosun.aluminium.models.buff.ControlBuff;
 import com.laosun.aluminium.models.buff.DotBuff;
 import com.laosun.aluminium.models.buff.TauntBuff;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TestTurns;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -79,7 +79,9 @@ public class DebuffResistTest {
         Assertions.assertFalse(freezeLands(1.0, 0.0), "1.0 is immunity: nothing lands, not even on a 0 roll");
     }
 
-    /** The two classes do not cross: being immune to control says nothing about Burn. */
+    /**
+     * The two classes do not cross: being immune to control says nothing about Burn.
+     */
     @Test
     public void immunityToControlDoesNotStopTheBurn() {
         Fixture f = new Fixture(0.0, resist(1.0), TriggerSpecs.dot("Fire", 500.0, null, null, 2, null));
@@ -90,7 +92,9 @@ public class DebuffResistTest {
                 "「immune to control-class debuffs」 is about control, and a burn is damage-over-time class");
     }
 
-    /** And the immunity really stops a control the rule states <b>no</b> probability for. */
+    /**
+     * And the immunity really stops a control the rule states <b>no</b> probability for.
+     */
     @Test
     public void immunityStopsAControlTheRuleStatesNoProbabilityFor() {
         Fixture f = new Fixture(0.0, resist(1.0), TriggerSpecs.applyControl("冻结", 1, null, "target"));
@@ -102,7 +106,9 @@ public class DebuffResistTest {
         Assertions.assertTrue(f.enemy.getBuffManager().canAct(), "and the victim keeps its turn");
     }
 
-    /** Two appliers add: 35% + 35% is 0%, not two independent rolls (a different curve). */
+    /**
+     * Two appliers add: 35% + 35% is 0%, not two independent rolls (a different curve).
+     */
     @Test
     public void twoResistancesOfTheSameClassAddAndClampAtOne() {
         Fixture f = new Fixture();
@@ -145,7 +151,9 @@ public class DebuffResistTest {
         Assertions.assertEquals(2, f.enemy.getBuffManager().countBuffs(ClassResistBuff.class));
     }
 
-    /** A timed resistance expires on its carrier's turns, like every other timed buff. */
+    /**
+     * A timed resistance expires on its carrier's turns, like every other timed buff.
+     */
     @Test
     public void aTimedResistanceExpires() {
         Fixture f = new Fixture(0.0, resist(1.0, 1));
@@ -158,7 +166,9 @@ public class DebuffResistTest {
                 "「while in the [防火墙] (Firewall) state ... immune」 lasts a turn — a buff covers both that and a permanent trace");
     }
 
-    /** A permanent one is never ticked, so it holds for the whole fight. */
+    /**
+     * A permanent one is never ticked, so it holds for the whole fight.
+     */
     @Test
     public void aPermanentResistanceHolds() {
         Fixture f = new Fixture(0.0, resistPermanent(0.35));
@@ -170,7 +180,9 @@ public class DebuffResistTest {
         Assertions.assertEquals(0.35, f.enemy.getBuffManager().debuffResistOf(DebuffClass.CONTROL), EPS);
     }
 
-    /** It is a <b>positive</b> effect on its bearer, so "removes N negative effects" must not take it off. */
+    /**
+     * It is a <b>positive</b> effect on its bearer, so "removes N negative effects" must not take it off.
+     */
     @Test
     public void theResistanceIsNotADebuff() {
         Fixture f = new Fixture(0.0, resist(0.35));
@@ -268,13 +280,17 @@ public class DebuffResistTest {
         return f.enemy.getBuffManager().hasState("冻结");
     }
 
-    /** One battle: the rule under test fires at the enemy, whose own numbers are stated rather than inherited. */
+    /**
+     * One battle: the rule under test fires at the enemy, whose own numbers are stated rather than inherited.
+     */
     private static final class Fixture {
         private final Character owner;
         private final Enemy enemy;
         private final Battle battle;
 
-        /** Stand-in appliers for the cases about how two contributions relate; see {@link #applier(int)}. */
+        /**
+         * Stand-in appliers for the cases about how two contributions relate; see {@link #applier(int)}.
+         */
         private final List<CanHit> standIns = new ArrayList<>();
 
         private Fixture(double roll, EffectSpec... effects) {
@@ -293,7 +309,9 @@ public class DebuffResistTest {
             this(0.0, new EffectSpec[0]);
         }
 
-        /** Attaches a class resistance directly, for the cases that are about the resistance itself. */
+        /**
+         * Attaches a class resistance directly, for the cases that are about the resistance itself.
+         */
         private void resist(DebuffClass kind, double percent) {
             resist(kind, percent, owner);
         }
@@ -326,13 +344,17 @@ public class DebuffResistTest {
             return battle.fireTriggers(TriggerEvent.ALLY_ATTACK, owner, enemy, 1, 0);
         }
 
-        /** A generator that always answers the same value, so a roll becomes an assertion. */
+        /**
+         * A generator that always answers the same value, so a roll becomes an assertion.
+         */
         private static Random fixed(double value) {
             return BattleFixture.alwaysRoll(value);
         }
     }
 
-    /** A {@code RESIST_DEBUFF} for the control class. */
+    /**
+     * A {@code RESIST_DEBUFF} for the control class.
+     */
     private static EffectSpec resist(double percent) {
         return resistEffect("control", percent, 1, null);
     }
@@ -366,7 +388,9 @@ public class DebuffResistTest {
         return effect;
     }
 
-    /** Compiles one effect into a table, which is where its validation runs. */
+    /**
+     * Compiles one effect into a table, which is where its validation runs.
+     */
     private static TriggerTable tableOf(EffectSpec effect) {
         return new TriggerTable(OWNER, List.of(TriggerSpecs.rule("ALLY_ATTACK", null, effect)));
     }

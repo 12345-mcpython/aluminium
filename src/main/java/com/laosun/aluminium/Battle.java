@@ -1,41 +1,26 @@
 package com.laosun.aluminium;
 
-import com.laosun.aluminium.enums.AttributeType;
-import com.laosun.aluminium.enums.Camp;
-import com.laosun.aluminium.enums.DamageElement;
-import com.laosun.aluminium.enums.DamageType;
-import com.laosun.aluminium.enums.SkillCategory;
-import com.laosun.aluminium.enums.SkillType;
-import com.laosun.aluminium.enums.TriggerEvent;
+import com.laosun.aluminium.data.SkillData;
+import com.laosun.aluminium.enums.*;
 import com.laosun.aluminium.models.*;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.ai.TargetSelector;
 import com.laosun.aluminium.models.buff.AbstractBuff;
-import com.laosun.aluminium.models.buff.ControlBuff;
 import com.laosun.aluminium.models.buff.DotBuff;
-import com.laosun.aluminium.models.buff.StatModifierBuff;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.SummonFactory;
 import com.laosun.aluminium.models.energy.EnergyGain;
 import com.laosun.aluminium.models.skill.DefaultSkill;
 import com.laosun.aluminium.models.skill.Skill;
-import com.laosun.aluminium.data.SkillData;
 import com.laosun.aluminium.models.skill.SkillExecutor;
 import com.laosun.aluminium.models.skillpoint.SkillPointPolicy;
 import com.laosun.aluminium.models.skillpoint.StandardSkillPointPolicy;
+import com.laosun.aluminium.models.trigger.TriggerInterpreter;
+import com.laosun.aluminium.models.trigger.TriggerTable;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.IdentityHashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Consumer;
 
 
@@ -85,7 +70,7 @@ public class Battle {
      * {@code Character} has: {@code attachBattleSkills} (map skills), {@code fireTriggers} (trigger tables)
      * and the two skill-point broadcasts.
      *
-     * <p>It starts as a copy of the constructor's character list, so it holds <b>the same instances</b> - 
+     * <p>It starts as a copy of the constructor's character list, so it holds <b>the same instances</b> -
      * this is a second view of one roster, not a second roster. Dead members stay in it, like every other
      * roster in the engine ({@code enemies} / {@code characters}): "is it alive" is asked with
      * {@code isDeath()}.
@@ -182,8 +167,10 @@ public class Battle {
      */
     private final List<Countdown> countdowns = new ArrayList<>();
 
-    /** Note: the read-only entry point for countdowns (1408's transformation countdown predicate, and the like predicates at 150/1309).
-     *  The name avoids the field countdowns. */
+    /**
+     * Note: the read-only entry point for countdowns (1408's transformation countdown predicate, and the like predicates at 150/1309).
+     * The name avoids the field countdowns.
+     */
     public List<Countdown> countdownUnits() {
         return List.copyOf(countdowns);
     }
@@ -371,7 +358,7 @@ public class Battle {
     /**
      * Starts a cast and returns its token; {@link #endCast(PendingCast)} must be called in a {@code finally}.
      *
-     * @param skill the skill being cast
+     * @param skill  the skill being cast
      * @param caster who casts it
      * @return the token identifying this cast
      */
@@ -499,8 +486,8 @@ public class Battle {
      *
      * @param skill the skill to settle
      * @param user  the actor -- must be passed explicitly. Earlier this guessed the actor from
-     *  {@code currentMove}, and in scenarios with no actor (directly-called tests, the demo's
-     *  healing branch) it guessed {@code null}, while {@code null != Camp.PLAYER} silently turned
+     *              {@code currentMove}, and in scenarios with no actor (directly-called tests, the demo's
+     *              healing branch) it guessed {@code null}, while {@code null != Camp.PLAYER} silently turned
      *              the policy into a no-op -- a wrong answer that reports no error. Passing it explicitly makes
      *              this kind of misuse surface as a compile error.
      * @return whether this action may continue (enough skill points); basic attack/ultimate/follow-up attack are always true
@@ -519,7 +506,9 @@ public class Battle {
      */
     @Getter
     private final Random rng;
-    /** The resource a RESOURCE_CHANGED event is about (1506's forwarding clause). */
+    /**
+     * The resource a RESOURCE_CHANGED event is about (1506's forwarding clause).
+     */
     private String lastChangedResource;
     /**
      * [WAVE SEQUENCE] how many waves have begun. A sequence, not a flag: a per-wave cap is a comparison against the
@@ -527,12 +516,16 @@ public class Battle {
      */
     private int waveSequence;
 
-    /** Starts a wave: the counter every per-wave limit is compared against. Called by WaveManager before WAVE_START. */
+    /**
+     * Starts a wave: the counter every per-wave limit is compared against. Called by WaveManager before WAVE_START.
+     */
     public void beginWave() {
         waveSequence++;
     }
 
-    /** The current wave's number. */
+    /**
+     * The current wave's number.
+     */
     public int waveSequence() {
         return waveSequence;
     }
@@ -793,7 +786,7 @@ public class Battle {
         EnergyGain ultraGain = user.getEnergyProvider().onUltCast(user, ultra);
         if (ultraGain != null) {
             applyEnergyGain(user, ultraGain);   // then the 5 points of its own ( x  energy gain rate)
-        lastUltEnergySpent = 0;             // Note: cleared, so the instance write cannot leak into later hits
+            lastUltEnergySpent = 0;             // Note: cleared, so the instance write cannot leak into later hits
         }
         return true;
     }
@@ -807,7 +800,9 @@ public class Battle {
      */
     private double lastUltEnergySpent;
 
-    /** The energy the ultimate now settling consumed ({@code 0} when none is in flight). */
+    /**
+     * The energy the ultimate now settling consumed ({@code 0} when none is in flight).
+     */
     public double getLastUltEnergySpent() {
         return lastUltEnergySpent;
     }
@@ -915,7 +910,9 @@ public class Battle {
         }
     }
 
-    /** One record per holder, replaced when the state is granted again. */
+    /**
+     * One record per holder, replaced when the state is granted again.
+     */
     private final java.util.Map<CanHit, Snapshot> laughSnapshots = new java.util.IdentityHashMap<>();
 
     /**
@@ -933,18 +930,24 @@ public class Battle {
         laughSnapshots.put(holder, new Snapshot(partyResourceValue("\u7b11\u70b9"), Math.max(1, turns)));
     }
 
-    /** One holder's frozen count, 0 when it holds none. For judges, and for the demo's output. */
+    /**
+     * One holder's frozen count, 0 when it holds none. For judges, and for the demo's output.
+     */
     public int laughSnapshotOf(CanHit holder) {
         Snapshot snapshot = laughSnapshots.get(holder);
         return snapshot == null || snapshot.hasExpired() ? 0 : snapshot.points();
     }
 
-    /** How many holders are counted right now - the "how many【好活当赏】" a judge can read. */
+    /**
+     * How many holders are counted right now - the "how many【好活当赏】" a judge can read.
+     */
     public int laughSnapshotHolders() {
         return (int) laughSnapshots.values().stream().filter(s -> !s.hasExpired()).count();
     }
 
-    /** Counts one of the unit's own turns against its snapshot, dropping it when the last one is gone. */
+    /**
+     * Counts one of the unit's own turns against its snapshot, dropping it when the last one is gone.
+     */
     private void tickLaughSnapshots(CanHit holder) {
         Snapshot snapshot = laughSnapshots.get(holder);
         if (snapshot == null) {
@@ -985,12 +988,16 @@ public class Battle {
     }
 
     /** Notes which resource a change is about, then fires. */
-    /** Records the class of the debuff that just landed (see {@link #lastAppliedDebuffClass()}). */
+    /**
+     * Records the class of the debuff that just landed (see {@link #lastAppliedDebuffClass()}).
+     */
     public void noteAppliedDebuffClass(com.laosun.aluminium.enums.DebuffClass debuffClass) {
         lastAppliedDebuffClass = debuffClass;
     }
 
-    /** The class of the debuff that just landed, or {@code null} for a state belonging to neither family. */
+    /**
+     * The class of the debuff that just landed, or {@code null} for a state belonging to neither family.
+     */
     public com.laosun.aluminium.enums.DebuffClass lastAppliedDebuffClass() {
         return lastAppliedDebuffClass;
     }
@@ -999,7 +1006,9 @@ public class Battle {
         lastChangedResource = resource;
     }
 
-    /** The resource the change being evaluated is about, or null. */
+    /**
+     * The resource the change being evaluated is about, or null.
+     */
     public String lastChangedResource() {
         return lastChangedResource;
     }
@@ -1012,7 +1021,7 @@ public class Battle {
             if (member == null) {
                 continue;
             }
-            com.laosun.aluminium.models.TriggerTable warehouse =
+            TriggerTable warehouse =
                     com.laosun.aluminium.data.TriggerTables.warehouse(member.getCid());
             if (warehouse != null && !warehouse.isEmpty()) {
                 registerWarehouseListener(member, warehouse);
@@ -1381,7 +1390,6 @@ public class Battle {
     }
 
 
-
     public boolean performAction(Skill skill, List<? extends CanHit> targets) {
         if (currentMove == null || skill == null || targets == null) {
             return false;
@@ -1443,12 +1451,12 @@ public class Battle {
             // 「各个【好活当赏】的持续时间各自独立计算」: a laugh snapshot is counted in ITS HOLDER's own turns, exactly like
             // the timed weakness above is counted in the target's. Same boundary, same reason.
             endTurnOf(actor);
-        // "(if not restored) otherwise it will immediately fall into the unable-to-fight state" (140's Moon Cocoon's Ward (月茧之庇)): a death that a deferring state held
-        // is committed HERE -- the carrier's turn is over (so it really did "act normally"), and the next turn has not begun
-        // (so a heal or a shield up to this point still saves it). Nothing removed the state, so it falls now.
-        if (actor.getCurrentHp() <= 0 && actor.getBuffManager().defersDeath()) {
-            actor.perish();
-        }
+            // "(if not restored) otherwise it will immediately fall into the unable-to-fight state" (140's Moon Cocoon's Ward (月茧之庇)): a death that a deferring state held
+            // is committed HERE -- the carrier's turn is over (so it really did "act normally"), and the next turn has not begun
+            // (so a heal or a shield up to this point still saves it). Nothing removed the state, so it falls now.
+            if (actor.getCurrentHp() <= 0 && actor.getBuffManager().defersDeath()) {
+                actor.perish();
+            }
         }
         // EXTRA_TURN_ENDED, and why it belongs HERE rather than beside the start.
         // "At the end of this extra turn" is exactly this boundary: the unit has acted, its own hook has run
@@ -1470,7 +1478,7 @@ public class Battle {
      * point of the feature is that it sits on somebody else.
      *
      * @param clockOwner the unit whose turn boundary this is
-     * @param early {@code true} = before the move, {@code false} = after it
+     * @param early      {@code true} = before the move, {@code false} = after it
      */
     private void tickForeignBuffs(CanHit clockOwner, boolean early) {
         for (CanHit ally : allies) {
@@ -1856,7 +1864,7 @@ public class Battle {
      * @param enemy        the target being hit
      * @param element      the element of this instance
      * @param stanceDamage the toughness reduction points
-     * @param fromCast the category of the cast this reduction belongs to, or {@code null}
+     * @param fromCast     the category of the cast this reduction belongs to, or {@code null}
      * @return the toughness reduction result
      */
     public StanceResult reduceToughness(CanHit attacker, Enemy enemy, DamageElement element, double stanceDamage,
@@ -1908,11 +1916,11 @@ public class Battle {
         // (one attack grants energy only once); but if the main instance did not kill and the break finishes it
         // off, the kill energy gain is still credited to the attacker.
         double breakDamage = applyDamage(enemy,
-                BreakDamageCalculator.build(attacker, enemy, element, consumed), EnergyGrant.KILL_ONLY); 
+                BreakDamageCalculator.build(attacker, enemy, element, consumed), EnergyGrant.KILL_ONLY);
         delayMovePercent(enemy, Constant.BREAK_DELAY_RATIO);                                       // action delay
         BattleDamage.attachBreakDot(this, attacker, enemy, element);                                                  // DOT
         BattleDamage.attachBreakControl(this, enemy, element);                                                        // control state
-        gainBreakEnergy(attacker, enemy);            
+        gainBreakEnergy(attacker, enemy);
         return new StanceResult(consumed, overkill, breakDamage, true);
     }
 
@@ -1926,10 +1934,10 @@ public class Battle {
      * @param overkill    the points beyond the remaining toughness (super break damage uses this; 0 when the
      *                    bar was not emptied)
      * @param breakDamage the settled break damage triggered this time (0 = no break triggered).
-     *  It is settled inside this method via {@link #applyDamage}, which the caller cannot
+     *                    It is settled inside this method via {@link #applyDamage}, which the caller cannot
      *                    reach, so it must be carried out through the return value -- otherwise an attack's
      *                    "total damage" would miss the break chain
-     *  (see {@code AttackEvent#totalDamage})
+     *                    (see {@code AttackEvent#totalDamage})
      * @param broke       whether this instance emptied the toughness and triggered a break
      */
     public record StanceResult(double consumed, double overkill, double breakDamage, boolean broke) {
@@ -2085,8 +2093,8 @@ public class Battle {
      * <p>Only the probability is computed, no dice are rolled: the roll is in {@link #rollDebuff} (using the
      * injected rng), so an AI can "look only at the expectation" without consuming random numbers.
      *
-     * @param caster the applier (reads {@code EFFECT_HIT_RATE})
-     * @param target the victim (reads {@code EFFECT_RESISTANCE} and possibly a specific resistance)
+     * @param caster            the applier (reads {@code EFFECT_HIT_RATE})
+     * @param target            the victim (reads {@code EFFECT_RESISTANCE} and possibly a specific resistance)
      * @param baseChance        the base chance on the skill panel (0.8 = 80%)
      * @param specificResistKey the specific resistance key; {@code null} or the target is not an enemy to not looked up
      * @return the application chance, falling in {@code [0, 1]}
@@ -2172,7 +2180,7 @@ public class Battle {
      * <p>It only computes the number and does not change HP: the execution is in
      * {@link #heal(CanHit, CanHit, double)}.
      *
-     * @param healer the one applying the heal ({@code null} to only the healing-taken side is computed)
+     * @param healer     the one applying the heal ({@code null} to only the healing-taken side is computed)
      * @param target     the one being healed
      * @param baseAmount the base healing amount (skill multiplier  x  attribute + flat value, computed by the caller)
      * @return the final healing amount (may be negative -- when healing reduction > 100%; a caller treating it
@@ -2258,12 +2266,16 @@ public class Battle {
         return countdown;
     }
 
-    /** The countdown units placed so far, in the order they were started. */
+    /**
+     * The countdown units placed so far, in the order they were started.
+     */
     public List<Countdown> countdowns() {
         return java.util.Collections.unmodifiableList(countdowns);
     }
 
-    /** The countdowns a given unit placed - the list {@code actor == countdown} reads (mirrors {@code summonsOf}). */
+    /**
+     * The countdowns a given unit placed - the list {@code actor == countdown} reads (mirrors {@code summonsOf}).
+     */
     public List<Countdown> countdownsOf(CanHit owner) {
         List<Countdown> mine = new ArrayList<>();
         for (Countdown countdown : countdowns) {
@@ -2414,7 +2426,7 @@ public class Battle {
     /**
      * Deliver an event to "the directly involved parties + our entire side (de-duplicated)".
      *
-     * @param targets the directly involved parties (may contain {@code null}, which is skipped)
+     * @param targets  the directly involved parties (may contain {@code null}, which is skipped)
      * @param consumer the delivery action
      */
     private void dispatch(Consumer<CanHit> consumer, CanHit... targets) {
@@ -2508,10 +2520,14 @@ public class Battle {
      */
     private int triggerDepth;
 
-    /** How many attacks have FINISHED; see {@link #fireAfterAttack} and {@code CanHit.isAttackLimitReady}. */
+    /**
+     * How many attacks have FINISHED; see {@link #fireAfterAttack} and {@code CanHit.isAttackLimitReady}.
+     */
     private int attackSequence;
 
-    /** How many attacks have finished -- the boundary a rule-level {@code once_per_attack} reads. */
+    /**
+     * How many attacks have finished -- the boundary a rule-level {@code once_per_attack} reads.
+     */
     public int attackSequence() {
         return attackSequence;
     }
@@ -2586,7 +2602,9 @@ public class Battle {
      */
     private String lastStateEndedName;
 
-    /** The state named by the {@link TriggerEvent#STATE_ENDED} currently being fired, or {@code null}. */
+    /**
+     * The state named by the {@link TriggerEvent#STATE_ENDED} currently being fired, or {@code null}.
+     */
     public String getLastStateEndedName() {
         return lastStateEndedName;
     }
@@ -2634,8 +2652,8 @@ public class Battle {
      * Enemies have no tables, so nothing is fired for them.
      *
      * @param event    the event that happened
-     * @param actor who caused it, or {@code null}
-     * @param target the event's subject, or {@code null}
+     * @param actor    who caused it, or {@code null}
+     * @param target   the event's subject, or {@code null}
      * @param hitCount how many targets an attack connected with (0 when not applicable)
      * @param amount   the event's magnitude where it has one
      * @return how many rules fired in total
@@ -2670,8 +2688,8 @@ public class Battle {
      * exactly one method taking a {@code Damage} - {@code applyDamage} - so that "the same hit assembled twice"
      * stays structurally impossible. This is the internal carrier for that context, not a second way in.
      *
-     * @param damage the instance being settled, or {@code null} for every other event (which is what the
-     *               five-argument overload passes)
+     * @param damage   the instance being settled, or {@code null} for every other event (which is what the
+     *                 five-argument overload passes)
      * @param fromCast the cast category that produced the event's instance, or {@code null} when nothing can name one
      */
     private int fireTriggers(TriggerEvent event, CanHit actor, CanHit target, int hitCount, double amount,
@@ -2729,14 +2747,14 @@ public class Battle {
     }
 
     private int fireTriggers(TriggerEvent event, CanHit actor, CanHit target, int hitCount, double amount,
-                            Damage damage, SkillCategory fromCast, int skillId) {
+                             Damage damage, SkillCategory fromCast, int skillId) {
         return fireTriggers(event, actor, target, hitCount, amount, damage, fromCast, skillId, 0);
     }
 
     /**
      * Note: Kept beside the ten-parameter terminal on purpose: the other overloads and their call sites still
      * forward nine arguments, and REPLACING a signature moves every one of those call sites' type matching with it
-                 * (measured: the compiler then reports type mismatches that look like bad arguments but are a missing overload).
+     * (measured: the compiler then reports type mismatches that look like bad arguments but are a missing overload).
      */
     private int fireTriggers(TriggerEvent event, CanHit actor, CanHit target, int hitCount, double amount,
                              Damage damage, SkillCategory fromCast, int skillId, int weakHitCount) {
@@ -2817,7 +2835,9 @@ public class Battle {
     private record DeferredTrigger(TriggerTable.CompiledRule rule, TriggerTable.TriggerContext context) {
     }
 
-    /** Triggers held until a wave arrives; see {@link TriggerSpec#getDeferUntilWave()}. */
+    /**
+     * Triggers held until a wave arrives; see {@link TriggerSpec#getDeferUntilWave()}.
+     */
     private final List<DeferredTrigger> deferredTriggers = new ArrayList<>();
 
     /**
@@ -2837,7 +2857,7 @@ public class Battle {
      * and enemy events are not ours to data-ise yet (the enemy side owns monsters).
      *
      * @param event  the event
-     * @param actor who caused it (may be {@code null})
+     * @param actor  who caused it (may be {@code null})
      * @param target the subject; the call is skipped entirely when this is not one of ours
      * @return how many rules fired in total
      */
@@ -2911,7 +2931,7 @@ public class Battle {
      * under-consumption is recorded rather than hidden.
      *
      * <p><b>Why it is broadcast to {@link #allies} whatever the attacker's camp.</b> The listeners are buffs on
-     * our characters, and every one of them answers with its own question ("is this <em>my</em> attack?" - 
+     * our characters, and every one of them answers with its own question ("is this <em>my</em> attack?" -
      * {@code AbstractBuff.afterAttack} compares {@code attacker == owner}). So an enemy's attack can be
      * delivered here without any of them acting on it, and a future listener that <em>wants</em> to react to
      * being attacked has somewhere to do it. Deciding "who cares" is the listener's job; deciding "an attack
@@ -2961,7 +2981,7 @@ public class Battle {
      *
      * @param target the one being hit
      * @param damage this hit's damage
-     * @param died whether this instance killed {@code target}
+     * @param died   whether this instance killed {@code target}
      */
     private void grantHitAndKillEnergy(CanHit target, Damage damage, boolean died, EnergyGrant grant) {
         if (!died) {
@@ -3090,7 +3110,7 @@ public class Battle {
      * overload is the honest place for them - a second public way to build and settle an instance is exactly what
      * that invariant exists to prevent.
      *
-     * @param fixedCritRate {@code 1.0} for "always crits, no roll" ({@code null} = roll normally)
+     * @param fixedCritRate   {@code 1.0} for "always crits, no roll" ({@code null} = roll normally)
      * @param fixedCritDamage the crit damage to use ({@code 1.5} = 150%; {@code null} with a rate is refused at load)
      */
     public double applyAdditionalDamage(CanHit attacker, CanHit target, DamageElement element, double base,
@@ -3211,24 +3231,31 @@ public class Battle {
         waveMonsters.clear();
     }
 
-    /** Records an enemy that has just entered with a wave ({@code WaveManager.spawnWave}). */
+    /**
+     * Records an enemy that has just entered with a wave ({@code WaveManager.spawnWave}).
+     */
     public void noteWaveMonster(CanHit enemy) {
         if (enemy != null && !waveMonsters.contains(enemy)) {
             waveMonsters.add(enemy);
         }
     }
 
-    /** The enemies that entered with the current wave. */
+    /**
+     * The enemies that entered with the current wave.
+     */
     public List<CanHit> waveMonsters() {
         return List.copyOf(waveMonsters);
     }
 
     private final List<CanHit> lethallyHitThisAction = new ArrayList<>();
 
-    /** The allies a lethal blow has landed on since this action began, in the order it happened. */
+    /**
+     * The allies a lethal blow has landed on since this action began, in the order it happened.
+     */
     public List<CanHit> lethallyHitThisAction() {
         return List.copyOf(lethallyHitThisAction);
     }
+
     private void processAddRequests() {
         if (addRequestItems.isEmpty()) {
             return;
@@ -3345,7 +3372,7 @@ public class Battle {
      * Brings a summon onto the field.
      *
      * <p>The summon comes from real monster data ({@code SummonFactory}, keyed by {@code monster_config.json}
-     *  - so {@code monster_config.json}'s {@code summon_id} roster on the master tells you the candidates and
+     * - so {@code monster_config.json}'s {@code summon_id} roster on the master tells you the candidates and
      * this call picks one). It joins the master's camp and enters the action bar through the same door a
      * wave does, so it acts from the <b>current</b> action value rather than restarting a round.
      *
@@ -3365,7 +3392,7 @@ public class Battle {
      * one for it would silently make a neutral unit either our ally or our enemy.
      *
      * @param master         the unit calling the summon; supplies the camp, and the level
-     * @param summonId the summon's own monster id (a key of {@code monster_config.json})
+     * @param summonId       the summon's own monster id (a key of {@code monster_config.json})
      * @param hardLevelGroup the stage's hard level group
      * @return the summon, already in its camp's roster and queued to enter the action bar
      * @throws IllegalArgumentException if the master is null, already down, or on a camp with no roster, or
@@ -3416,7 +3443,7 @@ public class Battle {
      *
      * @param master the summoning character
      * @return the memosprite (newly placed, or the one already standing), already in the camp roster and
-     *         queued to enter the action bar
+     * queued to enter the action bar
      * @throws IllegalArgumentException if the master is null, already down, or has no memosprite spec
      */
     public Summon summonMemosprite(Character master) {
@@ -3564,7 +3591,9 @@ public class Battle {
         System.out.println("================");
     }
 
-    /** Records that this unit used its technique before the battle. Call before {@link #startBattle()}. */
+    /**
+     * Records that this unit used its technique before the battle. Call before {@link #startBattle()}.
+     */
     public void markTechniqueUsed(CanHit unit) {
         if (unit != null && !techniqueUsers.contains(unit)) {
             techniqueUsers.add(unit);
@@ -3591,12 +3620,16 @@ public class Battle {
         techniqueArchetype = unit;
     }
 
-    /** The unit 【美学底本】 sat on when the battle began, or {@code null} when the caller named none. */
+    /**
+     * The unit 【美学底本】 sat on when the battle began, or {@code null} when the caller named none.
+     */
     public CanHit archetypeHolder() {
         return techniqueArchetype;
     }
 
-    /** Gives every unit whose technique was used a permanent "秘技" state, before anything reads BATTLE_START. */
+    /**
+     * Gives every unit whose technique was used a permanent "秘技" state, before anything reads BATTLE_START.
+     */
     private void applyTechniqueStates() {
         for (CanHit unit : techniqueUsers) {
             if (unit == null || unit.isDeath()) {
@@ -3618,7 +3651,9 @@ public class Battle {
         }
     }
 
-    /** The unit 【美学底本】 sat on at the start of the battle; see {@link #markArchetypeHolder}. */
+    /**
+     * The unit 【美学底本】 sat on at the start of the battle; see {@link #markArchetypeHolder}.
+     */
     private CanHit techniqueArchetype;
 
 }

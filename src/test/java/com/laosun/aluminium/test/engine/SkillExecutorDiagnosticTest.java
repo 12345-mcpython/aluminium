@@ -2,10 +2,11 @@ package com.laosun.aluminium.test.engine;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.skill.DefaultSkill;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
+import com.laosun.aluminium.models.skill.DefaultSkill;
 import com.laosun.aluminium.models.skill.SkillExecutor;
+import com.laosun.aluminium.models.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.AfterEach;
@@ -72,7 +73,7 @@ public class SkillExecutorDiagnosticTest {
         // Note: This case measures the ENGINE's skill execution against the parameter row, so the loadout is
         // isolated: 1105 has a file now, and its trace Healer (医者) raises outgoing healing by 10%, which would otherwise
         // fold a content effect into an engine number.
-        natasha.setTriggerTable(new com.laosun.aluminium.models.TriggerTable(1105, java.util.List.of()));
+        natasha.setTriggerTable(new TriggerTable(1105, java.util.List.of()));
         Battle battle = newBattle(natasha);
 
         String out = capture(() ->
@@ -151,7 +152,7 @@ public class SkillExecutorDiagnosticTest {
         // Note: This case measures the ENGINE's skill execution against the parameter row, so the loadout is
         // isolated: 1105 has a file now, and its trace Healer (医者) raises outgoing healing by 10%, which would otherwise
         // fold a content effect into an engine number.
-        natasha.setTriggerTable(new com.laosun.aluminium.models.TriggerTable(1105, java.util.List.of()));
+        natasha.setTriggerTable(new TriggerTable(1105, java.util.List.of()));
         Battle battle = newBattle(natasha);
         natasha.takeDamage(natasha.getMaxHp() / 2);      // currentHp has no setter, so create a gap
         double hpBefore = natasha.getCurrentHp();
@@ -165,7 +166,7 @@ public class SkillExecutorDiagnosticTest {
                 "9.2% of Natasha's OWN Max HP plus a flat 92; got "
                         + (natasha.getCurrentHp() - hpBefore) + " for maxHp " + natasha.getMaxHp()
                         + " and ATK " + natasha.getAttribute(
-                                com.laosun.aluminium.enums.AttributeType.ATTACK).get());
+                        com.laosun.aluminium.enums.AttributeType.ATTACK).get());
     }
 
     /**
@@ -183,7 +184,7 @@ public class SkillExecutorDiagnosticTest {
         // Note: This case measures the ENGINE's skill execution against the parameter row, so the loadout is
         // isolated: 1105 has a file now, and its trace Healer (医者) raises outgoing healing by 10%, which would otherwise
         // fold a content effect into an engine number.
-        natasha.setTriggerTable(new com.laosun.aluminium.models.TriggerTable(1105, java.util.List.of()));
+        natasha.setTriggerTable(new TriggerTable(1105, java.util.List.of()));
         Battle battle = newBattle(natasha);
         natasha.takeDamage(natasha.getMaxHp() / 2);
         double hpBefore = natasha.getCurrentHp();
@@ -245,7 +246,9 @@ public class SkillExecutorDiagnosticTest {
         return battle;
     }
 
-    /** Captures {@code System.out} ({@code IO.println} writes to stdout). */
+    /**
+     * Captures {@code System.out} ({@code IO.println} writes to stdout).
+     */
     private static String capture(Runnable action) {
         PrintStream original = System.out;
         ByteArrayOutputStream buffer = new ByteArrayOutputStream();

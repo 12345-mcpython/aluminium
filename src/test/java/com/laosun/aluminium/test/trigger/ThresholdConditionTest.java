@@ -1,15 +1,15 @@
 package com.laosun.aluminium.test.trigger;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Damage;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -26,14 +26,19 @@ import java.util.Random;
 public class ThresholdConditionTest {
     private static final int OWNER = 1224;
     private static final int LEVEL = 80;
-        /** Note: `<=` is INCLUSIVE: the boundary value fires. */
+
+    /**
+     * Note: `<=` is INCLUSIVE: the boundary value fires.
+     */
     @Test
     public void lessOrEqualFiresOnTheBoundary() {
         Assertions.assertEquals(1, fires("hit_count <= 0", 0), "at the boundary, `<=` must fire");
         Assertions.assertEquals(0, fires("hit_count <= 0", 1), "one above the boundary, it must not");
     }
 
-    /** Note: `>=` is inclusive too, and `>` is not. */
+    /**
+     * Note: `>=` is inclusive too, and `>` is not.
+     */
     @Test
     public void greaterComparisonsDifferAtTheBoundary() {
         Assertions.assertEquals(0, fires("hit_count >= 2", 1), "one below");
@@ -42,7 +47,9 @@ public class ThresholdConditionTest {
         Assertions.assertEquals(1, fires("hit_count > 2", 3), "one above");
     }
 
-    /** Note: `hp_percent` is a FRACTION, probed with a threshold STRICTER than the fraction can reach. */
+    /**
+     * Note: `hp_percent` is a FRACTION, probed with a threshold STRICTER than the fraction can reach.
+     */
     @Test
     public void hpPercentIsAFractionNotAPercentage() {
         Assertions.assertEquals(0, firesAfterDamage("hp_percent <= 0.5", false),
@@ -57,7 +64,9 @@ public class ThresholdConditionTest {
                 "⚠ the percentage reading would make this >= 50 with 1.0, so it must NEVER fire");
     }
 
-    /** Fires once at FULL HP, so "at or above half" and "at or above 50" can be told apart. */
+    /**
+     * Fires once at FULL HP, so "at or above half" and "at or above 50" can be told apart.
+     */
     private static int firesAtFullHp(String condition) {
         Character owner = CharacterFactory.create(OWNER, LEVEL);
         Enemy enemy = BattleFixture.monster();
@@ -68,7 +77,9 @@ public class ThresholdConditionTest {
         return battle.fireTriggers(TriggerEvent.ALLY_ATTACK, owner, enemy, 0, 0);
     }
 
-    /** Fires an event with a chosen hit count and returns how many rules burned. */
+    /**
+     * Fires an event with a chosen hit count and returns how many rules burned.
+     */
     private static int fires(String condition, int hitCount) {
         Character owner = CharacterFactory.create(OWNER, LEVEL);
         Enemy enemy = BattleFixture.monster();
@@ -79,7 +90,9 @@ public class ThresholdConditionTest {
         return battle.fireTriggers(TriggerEvent.ALLY_ATTACK, owner, enemy, hitCount, 0);
     }
 
-    /** Fires once at full HP and once after heavy damage, returning the count for the damaged case. */
+    /**
+     * Fires once at full HP and once after heavy damage, returning the count for the damaged case.
+     */
     private static int firesAfterDamage(String condition, boolean damageFirst) {
         Character owner = CharacterFactory.create(OWNER, LEVEL);
         Enemy enemy = BattleFixture.monster();

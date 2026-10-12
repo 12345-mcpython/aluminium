@@ -1,8 +1,6 @@
 package com.laosun.aluminium.test.trigger;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.ResourceSpec;
@@ -10,15 +8,15 @@ import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.data.TriggerTables;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageElement;
-import com.laosun.aluminium.enums.DamageType;
 import com.laosun.aluminium.enums.SkillCategory;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.Damage;
 import com.laosun.aluminium.models.DoubleValue;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.skill.DefaultSkill;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -46,14 +44,18 @@ import java.util.Set;
 public class SkillAttributionTest {
     private static final int HIMEKO = 1003;
     private static final int LEVEL = 80;
-    /** Ice Edge (冰锋): toughness 60, weak to FIRE/THUNDER - one Skill (战技) (stance 60) breaks it. */
-        private static final int SKILL_SLOT = 2;
+    /**
+     * Ice Edge (冰锋): toughness 60, weak to FIRE/THUNDER - one Skill (战技) (stance 60) breaks it.
+     */
+    private static final int SKILL_SLOT = 2;
     private static final int BASIC_SLOT = 1;
     private static final int ULTIMATE_SLOT = 3;
     private static final String CHARGE = "充能";
     private static final int CAP = 3;
 
-    /** Her Skill (战技) breaks it: both break rules pay, so two charges. */
+    /**
+     * Her Skill (战技) breaks it: both break rules pay, so two charges.
+     */
     @Test
     public void theSkillThatBreaksPaysTheEidolon() {
         Fixture f = new Fixture();
@@ -98,7 +100,9 @@ public class SkillAttributionTest {
         Assertions.assertEquals(1, f.charge(), "「施放战技」 (casting a Skill) is not 「施放终结技」 (casting an Ultimate)");
     }
 
-    /** The actor gate still matters: a break caused by an ally's Skill (战技) pays the talent but not her Eidolon. */
+    /**
+     * The actor gate still matters: a break caused by an ally's Skill (战技) pays the talent but not her Eidolon.
+     */
     @Test
     public void anAlliesSkillDoesNotPayHerEidolon() {
         Fixture f = new Fixture();
@@ -109,7 +113,9 @@ public class SkillAttributionTest {
         Assertions.assertEquals(1, f.charge(), "an ally's skill break is not 「姬子施放战技」 (Himeko casts a Skill)");
     }
 
-    /** Note: A break with no causing instance answers false: the event happened, but nothing can say which slot caused it. */
+    /**
+     * Note: A break with no causing instance answers false: the event happened, but nothing can say which slot caused it.
+     */
     @Test
     public void aBreakWithNoCausingInstanceIsNotAttributed() {
         Fixture f = new Fixture();
@@ -121,7 +127,9 @@ public class SkillAttributionTest {
                         + "instance");
     }
 
-    /** Note: A slot that can never be an in-battle cast is refused at load, rather than never matching. */
+    /**
+     * Note: A slot that can never be an in-battle cast is refused at load, rather than never matching.
+     */
     @Test
     public void anOutOfBattleSlotIsRefusedAtLoad() {
         IllegalArgumentException refused = Assertions.assertThrows(IllegalArgumentException.class,
@@ -131,7 +139,9 @@ public class SkillAttributionTest {
         Assertions.assertTrue(refused.getMessage().contains("in-battle"), refused.getMessage());
     }
 
-    /** A misspelled slot is refused with the list of the ones that work. */
+    /**
+     * A misspelled slot is refused with the list of the ones that work.
+     */
     @Test
     public void anUnknownSlotIsRefusedAtLoad() {
         IllegalArgumentException refused = Assertions.assertThrows(IllegalArgumentException.class,
@@ -141,7 +151,9 @@ public class SkillAttributionTest {
         Assertions.assertTrue(refused.getMessage().contains("ULTRA"), "the message lists the known slots");
     }
 
-    /** Note: An event that carries no instance cannot answer the question, so the condition is refused on it. */
+    /**
+     * Note: An event that carries no instance cannot answer the question, so the condition is refused on it.
+     */
     @Test
     public void anEventWithoutACausingInstanceIsRefusedAtLoad() {
         IllegalArgumentException refused = Assertions.assertThrows(IllegalArgumentException.class,
@@ -151,7 +163,9 @@ public class SkillAttributionTest {
         Assertions.assertTrue(refused.getMessage().contains("BREAK"), "the message lists the events that work");
     }
 
-    /** A subject is refused: "who caused it" is its own condition. */
+    /**
+     * A subject is refused: "who caused it" is its own condition.
+     */
     @Test
     public void aSubjectOnFromSkillIsRefusedAtLoad() {
         IllegalArgumentException refused = Assertions.assertThrows(IllegalArgumentException.class,
@@ -182,7 +196,9 @@ public class SkillAttributionTest {
                 "the extra charge is what made her talent's follow-up attack happen");
     }
 
-    /** ...and the shipped rule really states BOTH conditions, rather than only the actor. */
+    /**
+     * ...and the shipped rule really states BOTH conditions, rather than only the actor.
+     */
     @Test
     public void theShippedRuleStatesTheSkillCondition() {
         Character owner = CharacterFactory.create(HIMEKO, LEVEL, true, null, null, 4);
@@ -217,7 +233,9 @@ public class SkillAttributionTest {
         private final Enemy enemy;
         private final Battle battle;
 
-        /** A fixture with the two break rules; {@code withFollowUp} adds her talent's follow-up attack too. */
+        /**
+         * A fixture with the two break rules; {@code withFollowUp} adds her talent's follow-up attack too.
+         */
         private Fixture() {
             this(false);
         }
@@ -239,7 +257,9 @@ public class SkillAttributionTest {
             battle.castImmediate(skill, hero, List.of(enemy));
         }
 
-        /** Removes toughness <b>without</b> emitting a break event, so a smaller hit can be the one that breaks. */
+        /**
+         * Removes toughness <b>without</b> emitting a break event, so a smaller hit can be the one that breaks.
+         */
         private void chipToughness(double amount) {
             enemy.reduceStance(amount);
         }
@@ -249,7 +269,9 @@ public class SkillAttributionTest {
         }
     }
 
-    /** What one skill break did to her charge (充能) and to the enemy, through her real file. */
+    /**
+     * What one skill break did to her charge (充能) and to the enemy, through her real file.
+     */
     private record Outcome(int charge, double enemyHp) {
     }
 
@@ -271,7 +293,9 @@ public class SkillAttributionTest {
         return enemy;
     }
 
-    /** A `DAMAGE` from the TALENT slot - what her own file writes for the follow-up attack. */
+    /**
+     * A `DAMAGE` from the TALENT slot - what her own file writes for the follow-up attack.
+     */
     private static EffectSpec followUpDamage() {
         EffectSpec effect = new EffectSpec();
         TriggerSpecs.set(effect, "op", "DAMAGE");
@@ -282,7 +306,9 @@ public class SkillAttributionTest {
         return effect;
     }
 
-    /** One charge (充能), so the cases are about counting rather than about amounts. */
+    /**
+     * One charge (充能), so the cases are about counting rather than about amounts.
+     */
     private static EffectSpec chargeOne() {
         EffectSpec effect = new EffectSpec();
         TriggerSpecs.set(effect, "op", "GAIN_RESOURCE");
@@ -291,7 +317,9 @@ public class SkillAttributionTest {
         return effect;
     }
 
-    /** Compiles one `BREAK` rule carrying the condition, which is where its validation runs. */
+    /**
+     * Compiles one `BREAK` rule carrying the condition, which is where its validation runs.
+     */
     private static TriggerTable tableOf(String condition) {
         return tableOfOn("BREAK", condition);
     }

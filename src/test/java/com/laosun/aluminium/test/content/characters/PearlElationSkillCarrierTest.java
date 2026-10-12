@@ -5,10 +5,11 @@ import com.laosun.aluminium.enums.SkillCategory;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,7 +41,9 @@ public class PearlElationSkillCarrierTest {
         Assertions.assertTrue(elsewhere.isEmpty(), "and another category arms nobody (got " + elsewhere + ")");
     }
 
-    /** Fires CAST_SETUP with the given category and lists the allies that carry the carrier. */
+    /**
+     * Fires CAST_SETUP with the given category and lists the allies that carry the carrier.
+     */
     private static List<String> armedWith(SkillCategory category) {
         List<Character> team = new ArrayList<>();
         team.add(CharacterFactory.create(PEARL, 80));

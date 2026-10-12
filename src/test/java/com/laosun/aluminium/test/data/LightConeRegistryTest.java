@@ -31,7 +31,8 @@ public class LightConeRegistryTest {
         try (InputStream in = LightConeRegistryTest.class.getResourceAsStream(REGISTRY)) {
             Assertions.assertNotNull(in, REGISTRY + " is not on the classpath");
             return new Gson().fromJson(new InputStreamReader(in, StandardCharsets.UTF_8),
-                    new TypeToken<Map<String, List<Map<String, Object>>>>() { }.getType());
+                    new TypeToken<Map<String, List<Map<String, Object>>>>() {
+                    }.getType());
         } catch (Exception e) {
             throw new AssertionError("cannot read " + REGISTRY, e);
         }
@@ -62,7 +63,8 @@ public class LightConeRegistryTest {
                                 + "This is not ceremony: 21029 was registered three times wrongly (its random-target "
                                 + "selector and ADD_DAMAGE both already existed), because the reasons were written "
                                 + "from the cone text alone. A reason that does not say what was searched cannot be "
-                                + "trusted, and this registry is only worth having if it can be trusted.");}
+                                + "trusted, and this registry is only worth having if it can be trusted.");
+            }
             Assertions.assertFalse(hasRuleFile(id),
                     id + " IS written (a rule file exists), so it must be removed from the registry in the same "
                             + "commit -- that is how every relic reclaim worked");

@@ -6,8 +6,8 @@ import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.DoubleValue;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -23,7 +23,7 @@ import java.util.Random;
 public class AglaeaThreadStateTest {
     private static final int AGLAEA = 1402;
     private static final int LEVEL = 80;
-        private static final String STATE = "间隙织线";
+    private static final String STATE = "间隙织线";
 
     @Test
     public void withTheMemoSpriteOutTheAttackThreadsTheTarget() {
@@ -35,7 +35,9 @@ public class AglaeaThreadStateTest {
         Assertions.assertFalse(attacked(false), "no Garmentmaker (衣匠), no mark -- the sentence is conditional on it");
     }
 
-    /** Whether her attack left the state on the target, with or without the Garmentmaker (衣匠) on the field. */
+    /**
+     * Whether her attack left the state on the target, with or without the Garmentmaker (衣匠) on the field.
+     */
     private static boolean attacked(boolean withMemoSprite) {
         Character aglaea = CharacterFactory.create(AGLAEA, LEVEL);
         Character ally = CharacterFactory.create(1001, LEVEL);

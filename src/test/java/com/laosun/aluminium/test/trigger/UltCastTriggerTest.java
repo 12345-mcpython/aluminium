@@ -12,9 +12,9 @@ import com.laosun.aluminium.models.DoubleValue;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.models.skill.Skill;
-import com.laosun.aluminium.models.TriggerTable;
-import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.models.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -50,7 +50,9 @@ import java.util.List;
  */
 public class UltCastTriggerTest {
 
-    /** Himeko: an ordinary character with no trigger file, so the table under test is the only one. */
+    /**
+     * Himeko: an ordinary character with no trigger file, so the table under test is the only one.
+     */
     private static final int HIMEKO = 1003;
     private static final int ICE_EDGE = 1002011;
     private static final int ENEMY_LEVEL = 90;
@@ -79,7 +81,9 @@ public class UltCastTriggerTest {
     // 1. The wiring itself
     // ==================================================================
 
-    /** The event is now declared as wired, which is also what lets a data file reference it. */
+    /**
+     * The event is now declared as wired, which is also what lets a data file reference it.
+     */
     @Test
     public void ultCastIsDeclaredWired() {
         Assertions.assertTrue(TriggerEvent.ULT_CAST.isWired(),
@@ -87,7 +91,9 @@ public class UltCastTriggerTest {
                         + "is rejected at load time");
     }
 
-    /** One ultimate fires its {@code ULT_CAST} rule - exactly once, not once per hit. */
+    /**
+     * One ultimate fires its {@code ULT_CAST} rule - exactly once, not once per hit.
+     */
     @Test
     public void ultCastFiresOncePerUltimate() {
         Battle battle = battleWith(rule("ULT_CAST", null, gainSkillPoint(ULT_CAST_POINTS)));
@@ -99,7 +105,9 @@ public class UltCastTriggerTest {
                         + "must still fire it once)");
     }
 
-    /** A basic attack, a skill and a map attack are not ultimates. */
+    /**
+     * A basic attack, a skill and a map attack are not ultimates.
+     */
     @Test
     public void ultCastDoesNotFireForOtherSkillTypes() {
         Battle battle = battleWith(rule("ULT_CAST", null, gainSkillPoint(ULT_CAST_POINTS)));
@@ -173,7 +181,9 @@ public class UltCastTriggerTest {
                         + " would mean SKILL_CAST fired for a basic attack");
     }
 
-    /** A basic attack is still an attack: {@code ALLY_ATTACK} keeps firing for it. */
+    /**
+     * A basic attack is still an attack: {@code ALLY_ATTACK} keeps firing for it.
+     */
     @Test
     public void basicAttackStillFiresAllyAttack() {
         Battle battle = battleWith(
@@ -249,7 +259,9 @@ public class UltCastTriggerTest {
     // Helpers
     // ==================================================================
 
-    /** A battle whose single character carries exactly the given trigger rules. */
+    /**
+     * A battle whose single character carries exactly the given trigger rules.
+     */
     private static Battle battleWith(TriggerSpec... specs) {
         Character hero = CharacterFactory.create(HIMEKO, CHARACTER_LEVEL);
         hero.setTriggerTable(new TriggerTable(HIMEKO, List.of(specs)));
@@ -261,14 +273,18 @@ public class UltCastTriggerTest {
         return battle;
     }
 
-    /** Casts the hero's ultimate for real (through {@code Battle.castUltra}, energy gate included). */
+    /**
+     * Casts the hero's ultimate for real (through {@code Battle.castUltra}, energy gate included).
+     */
     private static boolean castUltimate(Battle battle) {
         Character hero = battle.characters.getFirst();
         hero.setCurrentEnergy(hero.getMaxEnergy());
         return battle.castUltra(hero, List.of(battle.enemies.getFirst()));
     }
 
-    /** Casts a skill slot directly, bypassing the action bar and the skill-point policy. */
+    /**
+     * Casts a skill slot directly, bypassing the action bar and the skill-point policy.
+     */
     private static void cast(Battle battle, Character hero, SkillType slot) {
         Skill skill = hero.getSkills().get(slot);
         Assertions.assertNotNull(skill, "precondition: the character carries the " + slot + " slot");
@@ -277,7 +293,9 @@ public class UltCastTriggerTest {
         battle.castImmediate(skill, hero, List.of(battle.enemies.getFirst()));
     }
 
-    /** Empties the skill points so the next gain can only come from a rule under test. */
+    /**
+     * Empties the skill points so the next gain can only come from a rule under test.
+     */
     private static void drainSkillPoints(Battle battle) {
         while (battle.spendSkillPoint()) {
             // drain to zero

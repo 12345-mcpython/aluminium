@@ -1,19 +1,15 @@
 package com.laosun.aluminium.test.engine;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
-import com.laosun.aluminium.enums.AttributeType;
-import com.laosun.aluminium.enums.DamageElement;
-import com.laosun.aluminium.enums.DamageType;
-import com.laosun.aluminium.enums.SkillType;
-import com.laosun.aluminium.enums.TriggerEvent;
+import com.laosun.aluminium.enums.*;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Damage;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -31,9 +27,11 @@ public class ResistanceReductionTest {
     private static final int ALLY = 1210;
     private static final int TRINNON = 1403;
     private static final int LEVEL = 80;
-        private static final double EPS = 1e-6;
+    private static final double EPS = 1e-6;
 
-    /** The engine reads the attribute: the same hit deals more once the reduction is on the victim. */
+    /**
+     * The engine reads the attribute: the same hit deals more once the reduction is on the victim.
+     */
     @Test
     public void theDamagePipelineSubtractsTheVictimsResistanceReduction() {
         Character caster = CharacterFactory.create(ALLY, LEVEL);
@@ -57,7 +55,9 @@ public class ResistanceReductionTest {
                 "All-Type RES Reduction 20% (全属性抗性降低 20%): " + before + " -> " + after);
     }
 
-    /** 1321's shipped aura: "大丽花在场时，敌方全体全属性抗性降低20%" - a stated 0.2 on every enemy. */
+    /**
+     * 1321's shipped aura: "大丽花在场时，敌方全体全属性抗性降低20%" - a stated 0.2 on every enemy.
+     */
     @Test
     public void herAuraStatesTwentyPercentOnEveryEnemy() {
         Character dahlia = CharacterFactory.create(1321, LEVEL);
@@ -70,7 +70,9 @@ public class ResistanceReductionTest {
                 "\\u300c\\u5927\\u4e3d\\u82b1\\u5728\\u573a\\u65f6\\uff0c\\u654c\\u65b9\\u5168\\u4f53\\u5168\\u5c5e\\u6027\\u6297\\u6027\\u964d\\u4f4e20%\\u300d");
     }
 
-    /** One identical hit, returned as the enemy's HP loss. */
+    /**
+     * One identical hit, returned as the enemy's HP loss.
+     */
     private static double hit(Battle battle, Character attacker, Enemy enemy) {
         double before = enemy.getCurrentHp();
         battle.applyDamage(enemy, new Damage(attacker, enemy, DamageElement.PHYSICAL, DamageType.NORMAL, 1000));
@@ -86,7 +88,10 @@ public class ResistanceReductionTest {
         TriggerSpecs.set(effect, "target", "all_enemies");
         return effect;
     }
-    /** Two more readers: 1203's Ultimate and 1304's Basic Attack state their own percentages. */
+
+    /**
+     * Two more readers: 1203's Ultimate and 1304's Basic Attack state their own percentages.
+     */
     @Test
     public void theTwoNewReadersStateTheirOwnPercentages() {
         Character fuxuan = CharacterFactory.create(1203, LEVEL);

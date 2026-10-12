@@ -7,8 +7,8 @@ import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.buff.ReductionBuff;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -25,7 +25,7 @@ public class MortenaxZoneTest {
     private static final int MORTENAX = 1507;
     private static final int ALLY = 1210;
     private static final int LEVEL = 80;
-        private static final double EPS = 1e-6;
+    private static final double EPS = 1e-6;
 
     @Test
     public void theZoneGrantsThreeEffectsAndTheCountdownTakesThemAllOff() {
@@ -55,6 +55,7 @@ public class MortenaxZoneTest {
         Assertions.assertEquals(baseHeal, battle.calculateHeal(ally, mortenax, 1000), EPS,
                 "and so does the healing taken bonus");
     }
+
     /**
      * Eidolon 1 (星魂 1): the zone also lowers enemies' resistance, and the countdown takes that off with everything else.
      *

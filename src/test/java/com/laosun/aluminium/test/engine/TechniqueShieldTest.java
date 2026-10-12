@@ -4,8 +4,8 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -21,7 +21,10 @@ public class TechniqueShieldTest {
     private static final int GEPARD = 1104;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-        /** Note: "为我方全体提供…等同于杰帕德24%防御力+150伤害的护盾，持续2回合". */
+
+    /**
+     * Note: "为我方全体提供…等同于杰帕德24%防御力+150伤害的护盾，持续2回合".
+     */
     @Test
     public void aDeclaredTechniqueShieldsTheParty() {
         Character gepard = CharacterFactory.create(GEPARD, LEVEL);
@@ -38,7 +41,9 @@ public class TechniqueShieldTest {
                 "「等同于杰帕德24%防御力+150的护盾」 (a shield equal to 24% of Gepard's DEF + 150): expected " + expected + ", shield " + ally.getShield());
     }
 
-    /** Note: The control: no technique declared, no shield. */
+    /**
+     * Note: The control: no technique declared, no shield.
+     */
     @Test
     public void withoutTheTechniqueNobodyIsShielded() {
         Character gepard = CharacterFactory.create(GEPARD, LEVEL);

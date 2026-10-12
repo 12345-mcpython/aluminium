@@ -1,22 +1,25 @@
 package com.laosun.aluminium.test.engine;
+
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
 import java.util.List;
 
 /**
  * The dragon's talent [灼掠幽墟的晦翼]: "造成 #2 次伤害，每次伤害对敌方随机单体造成等同于遐蝶 #1% 生命上限的量子属性伤害…".
- *
+ * <p>
  * Two-sided: summoning the dragon deals its six hits and heals our side; and the rule that carries the damage ratio is there BY ID, because 114151raises it with `MODIFY_RULE`.
  */
 public class DragonHollowWingTest {
     private static final int LEVEL = 80;
     private static final int CASTORICE = 1407;
     private static final int OTHER = 1002;
-        @Test
+
+    @Test
     public void theDragonTalentHitsAndHeals() {
         double[] r = run();
         System.out.println("[dragon] the enemy lost " + r[0] + " ; our side gained " + r[1]
@@ -30,7 +33,9 @@ public class DragonHollowWingTest {
         Assertions.assertTrue(r[1] > 0, "and the party must be healed");
     }
 
-    /** [what the enemy lost, what our side gained, the HP cost the talent paid, the mitigation, her max HP]. */
+    /**
+     * [what the enemy lost, what our side gained, the HP cost the talent paid, the mitigation, her max HP].
+     */
     private static double[] run() {
         Character her = CharacterFactory.create(CASTORICE, LEVEL);
         Character other = CharacterFactory.create(OTHER, LEVEL);

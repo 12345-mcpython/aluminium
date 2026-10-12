@@ -1,8 +1,6 @@
 package com.laosun.aluminium.test.engine;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
@@ -10,8 +8,10 @@ import com.laosun.aluminium.data.TriggerTables;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -43,9 +43,11 @@ public class ShieldGrantedEventTest {
     private static final int DAHLIA = 1321;
     private static final int ALLY = 1001;
     private static final int LEVEL = 80;
-        private static final double HEAL = 100;
+    private static final double HEAL = 100;
 
-    /** An ally's shield on her fires it (the raw grant path). */
+    /**
+     * An ally's shield on her fires it (the raw grant path).
+     */
     @Test
     public void anAlliesShieldFiresIt() {
         Fixture f = new Fixture();
@@ -56,7 +58,9 @@ public class ShieldGrantedEventTest {
         Assertions.assertEquals(HEAL, f.healed(), EPS, "\"when receiving ... a shield provided by an ally\" (「受到队友提供的…护盾时」)");
     }
 
-    /** Note: The timed path goes through a buff, not through {@code grantShield}: it has to be announced separately. */
+    /**
+     * Note: The timed path goes through a buff, not through {@code grantShield}: it has to be announced separately.
+     */
     @Test
     public void aTimedShieldFiresItToo() {
         Fixture f = new Fixture();
@@ -71,7 +75,9 @@ public class ShieldGrantedEventTest {
                         + "announces it, and a rule that answered only the raw path would miss every timed shield");
     }
 
-    /** Note: "队友提供的": a shield she gives herself is not one. */
+    /**
+     * Note: "队友提供的": a shield she gives herself is not one.
+     */
     @Test
     public void aShieldSheGaveHerselfDoesNotFire() {
         Fixture f = new Fixture();
@@ -83,7 +89,9 @@ public class ShieldGrantedEventTest {
                 "`actor is_ally` alone would accept this (she IS on our side) -- `actor != self` is the other half");
     }
 
-    /** Note: A raw grant names no provider, so a question about who provided it must answer no. */
+    /**
+     * Note: A raw grant names no provider, so a question about who provided it must answer no.
+     */
     @Test
     public void aShieldNobodyIsCreditedWithDoesNotFire() {
         Fixture f = new Fixture();
@@ -94,7 +102,9 @@ public class ShieldGrantedEventTest {
         Assertions.assertEquals(0, f.healed(), EPS, "no provider stated = no one to be a teammate");
     }
 
-    /** Note: A grant of 0 is how this API says "clear the shield": it is not a grant. */
+    /**
+     * Note: A grant of 0 is how this API says "clear the shield": it is not a grant.
+     */
     @Test
     public void clearingAShieldIsNotGrantingOne() {
         Fixture f = new Fixture();
@@ -106,7 +116,9 @@ public class ShieldGrantedEventTest {
                 "the same convention as HEALED, which only fires when HP was really restored");
     }
 
-    /** "单个回合内不可重复触发" is `per_turn: 1` (the engine counts the owner's turns). */
+    /**
+     * "单个回合内不可重复触发" is `per_turn: 1` (the engine counts the owner's turns).
+     */
     @Test
     public void itFiresOncePerTurn() {
         Fixture f = new Fixture();
@@ -119,7 +131,9 @@ public class ShieldGrantedEventTest {
                 "two shields in the same turn, one trigger -- without the limit this would read " + (2 * HEAL));
     }
 
-    /** The healing half is the same rule shape: a teammate's heal (and NOT her own). */
+    /**
+     * The healing half is the same rule shape: a teammate's heal (and NOT her own).
+     */
     @Test
     public void aTeammatesHealFiresTheHealingHalf() {
         Fixture f = new Fixture();
@@ -184,7 +198,9 @@ public class ShieldGrantedEventTest {
     // Helpers
     // ==================================================================
 
-    /** Dahlia (大丽花) with a hand-built copy of her trace's two rules, one ally to shield her, and one enemy. */
+    /**
+     * Dahlia (大丽花) with a hand-built copy of her trace's two rules, one ally to shield her, and one enemy.
+     */
     private static final class Fixture {
         private final Character dahlia = CharacterFactory.create(DAHLIA, LEVEL);
         private final Character ally = CharacterFactory.create(ALLY, LEVEL);
@@ -198,13 +214,17 @@ public class ShieldGrantedEventTest {
             battle.startBattle();
         }
 
-        /** Leaves her damaged, so a 100-point heal is visible. The baseline is captured here, not in a field init. */
+        /**
+         * Leaves her damaged, so a 100-point heal is visible. The baseline is captured here, not in a field init.
+         */
         private void hurt() {
             dahlia.takeDamage(dahlia.getMaxHp() * 0.5);
             hpAfterHurt = dahlia.getCurrentHp();
         }
 
-        /** How much the rule healed her (0 = it never fired). */
+        /**
+         * How much the rule healed her (0 = it never fired).
+         */
         private double healed() {
             return dahlia.getCurrentHp() - hpAfterHurt;
         }
@@ -224,7 +244,9 @@ public class ShieldGrantedEventTest {
         return rule;
     }
 
-    /** A rule that gives the aimed ally a shield that lasts: the interpreter's timed `SHIELD` arm. */
+    /**
+     * A rule that gives the aimed ally a shield that lasts: the interpreter's timed `SHIELD` arm.
+     */
     private static TriggerSpec timedShieldRule() {
         EffectSpec effect = new EffectSpec();
         TriggerSpecs.set(effect, "op", "SHIELD");

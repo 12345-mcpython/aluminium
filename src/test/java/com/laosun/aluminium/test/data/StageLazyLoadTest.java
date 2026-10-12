@@ -85,7 +85,9 @@ public class StageLazyLoadTest {
 
     // ==================================================================
 
-    /** Disassemble the given class with the current JDK's javap; return {@code null} when unavailable (the caller skips). */
+    /**
+     * Disassemble the given class with the current JDK's javap; return {@code null} when unavailable (the caller skips).
+     */
     private static String disassemble(String className) {
         try {
             String javap = System.getProperty("java.home") + "/bin/javap";

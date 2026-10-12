@@ -3,14 +3,12 @@ package com.laosun.aluminium.test.content.characters;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.SkillType;
-import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Damage;
 import com.laosun.aluminium.models.Signal;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.skill.DefaultSkill;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -33,9 +31,11 @@ public class HanyaKitTest {
     private static final int HANYA = 1215;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-        private static final double EPS = 1e-6;
+    private static final double EPS = 1e-6;
 
-    /** One cast: the ally's SPD grows by 20% of <b>her</b> SPD, the ATK by 60%, and the marker state lands. */
+    /**
+     * One cast: the ally's SPD grows by 20% of <b>her</b> SPD, the ATK by 60%, and the marker state lands.
+     */
     @Test
     public void herUltimateBuffsTheAimedAllyNotHerself() {
         Fixture f = new Fixture(0);
@@ -55,7 +55,9 @@ public class HanyaKitTest {
                 "「指定我方单体」 (a designated single ally): a self-cast is not a target (target != self)");
     }
 
-    /** Eidolon 1: the ally who carries her ultimate gets a kill to she advances; once per turn. */
+    /**
+     * Eidolon 1: the ally who carries her ultimate gets a kill to she advances; once per turn.
+     */
     @Test
     public void herFirstEidolonAdvancesHerWhenTheCarrierGetsAKill() {
         Fixture f = new Fixture(1);
@@ -77,7 +79,7 @@ public class HanyaKitTest {
     /**
      * Note: The other half of Eidolon 1: a kill by somebody <b>without</b> her ultimate's effect does not advance her.
      *
-     * <p>This case exists because the gate `actor has_state 敕令` (the decree state, 敕令) is <b>not covered</b> by the positive test alone - 
+     * <p>This case exists because the gate `actor has_state 敕令` (the decree state, 敕令) is <b>not covered</b> by the positive test alone -
      * removing the condition left every assertion green (measured mutation m1, 0 red), which is exactly the
      * "a test that cannot fail" shape this project keeps hunting.
      */
@@ -92,7 +94,9 @@ public class HanyaKitTest {
                 "the ally never received the decree state (敕令), so 「持有终结技效果的我方目标消灭敌方目标时」 (when an ally holding the Ultimate's effect kills an enemy target) does not apply");
     }
 
-    /** Eidolon 2: her own Skill raises her speed for a turn. */
+    /**
+     * Eidolon 2: her own Skill raises her speed for a turn.
+     */
     @Test
     public void herSecondEidolonSpeedsHerUpAfterASkill() {
         Fixture f = new Fixture(2);
@@ -104,7 +108,9 @@ public class HanyaKitTest {
                 "「施放战技后，速度提高20%，持续1回合」 (after casting the Skill, SPD is raised by 20% for 1 turn)");
     }
 
-    /** Eidolon 3 / 5: the level raises, and the talent's base level composes with them. */
+    /**
+     * Eidolon 3 / 5: the level raises, and the talent's base level composes with them.
+     */
     @Test
     public void herEidolonLevelRaisesAreStated() {
         Fixture atThree = new Fixture(3);
@@ -143,7 +149,9 @@ public class HanyaKitTest {
             battle.castImmediate(hanya.getSkills().get(SkillType.SKILL), hanya, List.of(enemy));
         }
 
-        /** The ally lands the killing blow: a KILL event whose actor is the ally. */
+        /**
+         * The ally lands the killing blow: a KILL event whose actor is the ally.
+         */
         private void allyKills() {
             enemy.takeDamage(enemy.getMaxHp() - 1);
             battle.applyDamage(enemy, new Damage(ally, enemy, com.laosun.aluminium.enums.DamageElement.PHYSICAL,

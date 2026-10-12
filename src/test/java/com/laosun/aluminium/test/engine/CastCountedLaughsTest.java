@@ -7,10 +7,10 @@ import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.DoubleValue;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.models.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -32,12 +32,14 @@ import java.util.List;
  */
 public class CastCountedLaughsTest {
     private static final int CASTER = 1505;
-        private static final String ELATION = "ELATION_SKILL";
+    private static final String ELATION = "ELATION_SKILL";
     private static final String SKILL = "SKILL";
     private static final double FACTOR_20 = 1 + 20 * 5.0 / (20 + 240);
     private static final double FACTOR_NONE = 1.0;
 
-    /** The cast states the count: while the snapshot is empty the fold is the stated 20 and not 1.0. */
+    /**
+     * The cast states the count: while the snapshot is empty the fold is the stated 20 and not 1.0.
+     */
     @Test
     public void theCommandedCastFoldsTheStatedCount() {
         double stated = commandedCastDamage(20, ELATION);
@@ -75,7 +77,9 @@ public class CastCountedLaughsTest {
                 "the next cast folds the snapshot again - the count did not outlive its own cast");
     }
 
-    /** A cast that settles anything but Elation damage refuses the number: nothing would fold it. */
+    /**
+     * A cast that settles anything but Elation damage refuses the number: nothing would fold it.
+     */
     @Test
     public void aCastThatSettlesSomethingElseRefusesTheCount() {
         IllegalStateException refused = Assertions.assertThrows(IllegalStateException.class,
@@ -85,7 +89,9 @@ public class CastCountedLaughsTest {
                 "the message says where a laugh count can be folded");
     }
 
-    /** The bookkeeping the last two cases measure: the claim is consumed by the cast that follows it. */
+    /**
+     * The bookkeeping the last two cases measure: the claim is consumed by the cast that follows it.
+     */
     @Test
     public void theClaimDoesNotSurviveTheCastThatConsumedIt() {
         Battle battle = build(ELATION, 20);
@@ -103,7 +109,9 @@ public class CastCountedLaughsTest {
     // Helpers
     // ==================================================================
 
-    /** The settled damage of one commanded cast, with (or without) the laugh count the rule states. */
+    /**
+     * The settled damage of one commanded cast, with (or without) the laugh count the rule states.
+     */
     private static double commandedCastDamage(Integer countedLaughs, String skill) {
         Battle battle = build(skill, countedLaughs);
         Character commander = battle.characters.get(1);

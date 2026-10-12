@@ -3,12 +3,11 @@ package com.laosun.aluminium.test.content.characters;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.data.TriggerTables;
 import com.laosun.aluminium.enums.AttributeType;
-import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -26,7 +25,10 @@ public class GallagherTest {
     private static final int GALLAGHER = 1301;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-        /** The "秘技" (technique)'s in-battle half puts [酩酊] on the whole enemy side at battle start. */
+
+    /**
+     * The "秘技" (technique)'s in-battle half puts [酩酊] on the whole enemy side at battle start.
+     */
     @Test
     public void theStateComesFromBattleStartToo() {
         Fixture f = new Fixture();
@@ -34,7 +36,9 @@ public class GallagherTest {
                 "「进入战斗后使敌方全体陷入【酩酊】状态，持续2回合」 (after entering battle, puts all enemies into the Besotted (【酩酊】) state for 2 turns)");
     }
 
-    /** Census: his file carries the two ULT_CAST rules, the talent's heal and the trace. */
+    /**
+     * Census: his file carries the two ULT_CAST rules, the talent's heal and the trace.
+     */
     @Test
     public void hisFileCarriesTheClauses() {
         Assertions.assertEquals(2, TriggerTables.of(GALLAGHER).ruleCount(TriggerEvent.ULT_CAST),
@@ -43,7 +47,9 @@ public class GallagherTest {
                 "the talent's 「每次受到我方角色攻击后」 (after every time it is attacked by one of our characters) heal");
     }
 
-    /** Note: The heal's target is the ATTACKER: an ally's attack heals the ally, not Gallagher. */
+    /**
+     * Note: The heal's target is the ATTACKER: an ally's attack heals the ally, not Gallagher.
+     */
     @Test
     public void hisFirstEidolonIsGated() {
         Fixture atE0 = new Fixture(0);
@@ -58,7 +64,9 @@ public class GallagherTest {
     // Helpers
     // ==================================================================
 
-    /** Note: End to end: the swapped slot-8 skill loads REAL data, so the enhanced attack actually lands. */
+    /**
+     * Note: End to end: the swapped slot-8 skill loads REAL data, so the enhanced attack actually lands.
+     */
     @Test
     public void theShippedSwapDealsDamage() {
         Fixture f = new Fixture();

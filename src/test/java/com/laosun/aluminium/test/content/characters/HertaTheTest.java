@@ -6,8 +6,8 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -23,7 +23,10 @@ import java.util.Random;
 public class HertaTheTest {
     private static final int HERTA = 1401;
     private static final int LEVEL = 80;
-        /** Note: "使用秘技后，下一次战斗开始时大黑塔攻击力提高60%，持续2回合", and the control. */
+
+    /**
+     * Note: "使用秘技后，下一次战斗开始时大黑塔攻击力提高60%，持续2回合", and the control.
+     */
     @Test
     public void theTechniqueRaisesHerAttackAndNothingWithoutIt() {
         Character plain = CharacterFactory.create(HERTA, LEVEL);
@@ -44,7 +47,9 @@ public class HertaTheTest {
                 "「攻击力提高60%」 (ATK raised by 60%) of the BASE: base " + base + ", gain " + (boosted - untouched));
     }
 
-    /** Note: The ultimate's own effects: +80% ATK, a full advance, and one Inspiration stack. */
+    /**
+     * Note: The ultimate's own effects: +80% ATK, a full advance, and one Inspiration stack.
+     */
     @Test
     public void herUltimateRaisesAttackAdvancesAndGrantsInspiration() {
         Character herta = CharacterFactory.create(HERTA, LEVEL);
@@ -69,7 +74,9 @@ public class HertaTheTest {
                 "「【灵感】最多持有4层」 ([灵感] can be held up to 4 stacks)");
     }
 
-    /** Census: the technique, the ultimate and the convention. */
+    /**
+     * Census: the technique, the ultimate and the convention.
+     */
     @Test
     public void herFileCarriesTheClauses() {
         var table = TriggerTables.of(HERTA);

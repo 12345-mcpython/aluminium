@@ -5,8 +5,8 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -22,7 +22,10 @@ public class AstaTest {
     private static final int ASTA = 1009;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-        /** Note: "使我方全体速度提高50点，持续2回合" -- fifty points, for the party. */
+
+    /**
+     * Note: "使我方全体速度提高50点，持续2回合" -- fifty points, for the party.
+     */
     @Test
     public void herUltimateRaisesEveryAllysSpeedByFiftyPoints() {
         Character asta = CharacterFactory.create(ASTA, LEVEL);
@@ -38,7 +41,9 @@ public class AstaTest {
                 "「使我方全体速度提高50点」 (raises all allies' SPD by 50): before " + before + ", after " + ally.getAttribute(AttributeType.SPEED).get());
     }
 
-    /** Note: The technique's 50%-ATK opening, and its control. */
+    /**
+     * Note: The technique's 50%-ATK opening, and its control.
+     */
     @Test
     public void theTechniqueHitsOnlyWhenDeclared() {
         Character asta = CharacterFactory.create(ASTA, LEVEL);

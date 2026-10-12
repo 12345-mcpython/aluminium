@@ -1,16 +1,16 @@
 package com.laosun.aluminium.test.engine;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.buff.StateBuff;
 import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -38,7 +38,7 @@ public class HolderAttrScaleTest {
     private static final int OWNER = 1503;      // Pearl (真珠) herself: the rule owner, who must NOT be read
     private static final int HOLDER = 1002;     // the ally the sentence is about
     private static final int BYSTANDER = 1202;  // the other ally: also not to be read
-        private static final String MARK = "美学底本";
+    private static final String MARK = "美学底本";
     private static final double SHARE = 0.6;
 
     /**
@@ -94,7 +94,9 @@ public class HolderAttrScaleTest {
                 "the rule owner is not the holder, so nothing lands on it either");
     }
 
-    /** Nobody holds the state: the scale has no unit to read, and says so instead of quietly reading the owner. */
+    /**
+     * Nobody holds the state: the scale has no unit to read, and says so instead of quietly reading the owner.
+     */
     @Test
     public void nobodyHoldingTheStateIsAnErrorRatherThanTheOwnersOwnValue() {
         Character owner = CharacterFactory.create(OWNER, LEVEL);
@@ -141,7 +143,9 @@ public class HolderAttrScaleTest {
                         + " ratios differ)");
     }
 
-    /** The shape is checked while the FILE is read: the state alone does not say which stat to read. */
+    /**
+     * The shape is checked while the FILE is read: the state alone does not say which stat to read.
+     */
     @Test
     public void aStateWithoutAnAttributeIsRefusedAtLoadTime() {
         IllegalArgumentException refused = Assertions.assertThrows(IllegalArgumentException.class,
@@ -184,7 +188,9 @@ public class HolderAttrScaleTest {
                         + " (measured " + onFirst + " vs " + onSecond + ")");
     }
 
-    /** No holder, a DAMAGE rider: the same loud refusal as the modifier path, rather than a silent zero instance. */
+    /**
+     * No holder, a DAMAGE rider: the same loud refusal as the modifier path, rather than a silent zero instance.
+     */
     @Test
     public void aDamageRiderWithNoHolderIsRefused() {
         Character owner = CharacterFactory.create(OWNER, LEVEL);
@@ -201,12 +207,16 @@ public class HolderAttrScaleTest {
         Assertions.assertTrue(refused.getMessage().contains(MARK), refused.getMessage());
     }
 
-    /** The rider's damage when the state is on the given ally (the other ally holds nothing), reading DEFENCE. */
+    /**
+     * The rider's damage when the state is on the given ally (the other ally holds nothing), reading DEFENCE.
+     */
     private static double riderDamage(int markedCid) {
         return riderDamageReading(markedCid, "DEFENCE");
     }
 
-    /** The same, for whichever of the holder's attributes the spelling names. */
+    /**
+     * The same, for whichever of the holder's attributes the spelling names.
+     */
     private static double riderDamageReading(int markedCid, String attribute) {
         Character owner = CharacterFactory.create(OWNER, LEVEL);
         Character first = CharacterFactory.create(HOLDER, LEVEL);
@@ -231,7 +241,9 @@ public class HolderAttrScaleTest {
     // Helpers
     // ==================================================================
 
-    /** "使<持有【美学底本】的目标>的防御力提高，等同于其自身防御力的 60%" - the shape the scale is written in. */
+    /**
+     * "使<持有【美学底本】的目标>的防御力提高，等同于其自身防御力的 60%" - the shape the scale is written in.
+     */
     private static EffectSpec holderDefenceShare() {
         EffectSpec effect = withTurns(scale("holder_attr:" + MARK + ":DEFENCE", "MODIFY_ATTR", "DEFENCE"));
         // And the target is the same lookup as the scale: one answer to "who holds it", two readings. (Its own test
@@ -240,12 +252,16 @@ public class HolderAttrScaleTest {
         return effect;
     }
 
-    /** A literal-ratio DAMAGE whose magnitude is 60% of the state-holder's Defence. */
+    /**
+     * A literal-ratio DAMAGE whose magnitude is 60% of the state-holder's Defence.
+     */
     private static EffectSpec defensiveRider() {
         return riderOn("DEFENCE");
     }
 
-    /** A literal-ratio DAMAGE whose magnitude is 60% of the named attribute of the state-holder. */
+    /**
+     * A literal-ratio DAMAGE whose magnitude is 60% of the named attribute of the state-holder.
+     */
     private static EffectSpec riderOn(String attribute) {
         EffectSpec effect = scale("holder_attr:" + MARK + ":" + attribute, "DAMAGE", null);
         TriggerSpecs.set(effect, "element", "Ice");
@@ -253,13 +269,17 @@ public class HolderAttrScaleTest {
         return effect;
     }
 
-    /** A modifier with a stated lifetime: {@code MODIFY_ATTR} refuses to load without one. */
+    /**
+     * A modifier with a stated lifetime: {@code MODIFY_ATTR} refuses to load without one.
+     */
     private static EffectSpec withTurns(EffectSpec effect) {
         TriggerSpecs.set(effect, "turns", 3);
         return effect;
     }
 
-    /** One effect with the op, the scale and (for a modifier) the attribute it raises. */
+    /**
+     * One effect with the op, the scale and (for a modifier) the attribute it raises.
+     */
     private static EffectSpec scale(String scale, String op, String attribute) {
         EffectSpec effect = new EffectSpec();
         TriggerSpecs.set(effect, "op", op);

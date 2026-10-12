@@ -1,16 +1,16 @@
 package com.laosun.aluminium.test.content.lightcones;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.Weapon;
 import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -30,7 +30,7 @@ public class LingeringTearTest {
     private static final int WEARER = 1205;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-        private static final int THRESHOLD = 10;
+    private static final int THRESHOLD = 10;
     private static final double BONUS = 0.2;
     private static final String LAUGHTER = "笑点";
 
@@ -133,7 +133,9 @@ public class LingeringTearTest {
                 "no cone, no panel (false case)");
     }
 
-    /** The WIRING test: the resource moves through a real GAIN_RESOURCE, which is what must fire the event. */
+    /**
+     * The WIRING test: the resource moves through a real GAIN_RESOURCE, which is what must fire the event.
+     */
     @Test
     public void aRealOpFiresTheEvent() {
         Character unit = CharacterFactory.create(ALLY, LEVEL);

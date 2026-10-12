@@ -13,12 +13,7 @@ import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.stream.Stream;
 
 /**
@@ -32,7 +27,9 @@ import java.util.stream.Stream;
  * <p>The known set is read off {@link EffectSpec} by reflection, so adding a field extends the guard automatically.
  */
 public class EffectKeyDisciplineTest {
-    /** `note` belongs to a RULE; an effect that repeats one is dead text, but harmless and already shipped. */
+    /**
+     * `note` belongs to a RULE; an effect that repeats one is dead text, but harmless and already shipped.
+     */
     private static final Set<String> ALSO_ALLOWED = Set.of("note");
 
     private static Set<String> knownKeys() {

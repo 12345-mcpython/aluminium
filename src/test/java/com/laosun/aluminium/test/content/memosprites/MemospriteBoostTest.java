@@ -1,8 +1,6 @@
 package com.laosun.aluminium.test.content.memosprites;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.AttributeType;
@@ -11,13 +9,14 @@ import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.DoubleValue;
 import com.laosun.aluminium.models.Summon;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -37,7 +36,7 @@ import java.util.Random;
 public class MemospriteBoostTest {
     private static final int SUMMONER = 1413;
     private static final int LEVEL = 80;
-        private static final double BOOST = 0.48;
+    private static final double BOOST = 0.48;
 
     @Test
     public void theMemospriteBoostRaisesItsDamage() {
@@ -65,7 +64,9 @@ public class MemospriteBoostTest {
         Assertions.assertNotSame(master, battle.memospriteOf(master), "and the master is not its own memosprite");
     }
 
-    /** One hit by the memosprite, against a victim that cannot die, with or without the synthetic grant. */
+    /**
+     * One hit by the memosprite, against a victim that cannot die, with or without the synthetic grant.
+     */
     private static double memospriteDamage(boolean boosted) {
         Character master = CharacterFactory.create(SUMMONER, LEVEL);
         // Note: Both runs must be equally free of SHIPPED content: 1413's talent is real now and fires at one enemy, and while

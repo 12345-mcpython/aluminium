@@ -1,10 +1,9 @@
 package com.laosun.aluminium.test.content.characters;
 
 import com.laosun.aluminium.Battle;
-import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -28,11 +27,13 @@ public class PearlTechniqueArchetypeTest {
     private static final int PEARL = 1503;
     private static final int ARCHETYPE = 1502;
     private static final int OTHER = 1204;
-        private static final String MARK = "美学底本";
+    private static final String MARK = "美学底本";
     private static final String DEEP = "深度学习";
     private static final String COUNTER = "好活当赏";
 
-    /** The technique marks the archetype and deep-studies THAT unit, and pays Pearl her 20. */
+    /**
+     * The technique marks the archetype and deep-studies THAT unit, and pays Pearl her 20.
+     */
     @Test
     public void theTechniqueMarksTheArchetypeAndDeepStudiesIt() {
         Battle battle = newBattle(true, true);
@@ -98,7 +99,9 @@ public class PearlTechniqueArchetypeTest {
                 "while 深度学习 still needs the technique rule, whose gate is the 秘技 marker");
     }
 
-    /** Nobody named means no archetype, and that is not an error. */
+    /**
+     * Nobody named means no archetype, and that is not an error.
+     */
     @Test
     public void nobodyNamedMeansNoArchetype() {
         Battle battle = newBattle(true, false);

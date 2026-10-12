@@ -1,15 +1,19 @@
 package com.laosun.aluminium.test.engine;
+
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
 import java.util.List;
 
-/** "[追忆]达到 24 点时可激活终结技" and "处于[往昔的涟漪]时 12 点". */
+/**
+ * "[追忆]达到 24 点时可激活终结技" and "处于[往昔的涟漪]时 12 点".
+ */
 public class RecollectionUltimateReadinessTest {
     private static final String MEMORY = "追忆";
 
@@ -27,7 +31,9 @@ public class RecollectionUltimateReadinessTest {
         Assertions.assertTrue(twentyFour, "and twenty-four always is");
     }
 
-    /** Seeds just short of the line and lets her BASIC carry her over it, which is what raises the event. */
+    /**
+     * Seeds just short of the line and lets her BASIC carry her over it, which is what raises the event.
+     */
     private static boolean ready(int seeded, boolean insideTheRipple) {
         Character her = CharacterFactory.create(1415, 80);
         Battle battle = new Battle(List.of(her), List.of(EnemyFactory.create(1002011, 100, 1)), BattleFixture.seeded());

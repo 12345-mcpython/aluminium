@@ -36,7 +36,9 @@ public class EnergyGainSafetyTest {
         return c;
     }
 
-    /** A NaN amount must be refused, and the bar must still be usable afterwards. */
+    /**
+     * A NaN amount must be refused, and the bar must still be usable afterwards.
+     */
     @Test
     public void aNaNAmountDoesNotPoisonTheBar() {
         Character hero = bar(100, 95);
@@ -51,7 +53,9 @@ public class EnergyGainSafetyTest {
                 "the bar still works: 95 + 10 reaches the cap, so the ultimate is still reachable");
     }
 
-    /** The same poison through the efficiency attribute rather than the amount. */
+    /**
+     * The same poison through the efficiency attribute rather than the amount.
+     */
     @Test
     public void aNaNEfficiencyDoesNotPoisonTheBar() {
         Character hero = bar(100, 95);
@@ -86,7 +90,9 @@ public class EnergyGainSafetyTest {
         Assertions.assertEquals(50, hero.getCurrentEnergy(), EPS);
     }
 
-    /** {@code ENERGY_REGENERATION_RATE = -3} means efficiency -2; a gain must not become a subtraction. */
+    /**
+     * {@code ENERGY_REGENERATION_RATE = -3} means efficiency -2; a gain must not become a subtraction.
+     */
     @Test
     public void aGainNeverTakesEnergyAway() {
         Character hero = bar(100, 50);
@@ -112,7 +118,9 @@ public class EnergyGainSafetyTest {
         Assertions.assertEquals(150, hero.getCurrentEnergy(), EPS, "unchanged, not pulled down to the cap");
     }
 
-    /** The ordinary paths must be untouched: proportional gain, the cap, and the efficiency bypass. */
+    /**
+     * The ordinary paths must be untouched: proportional gain, the cap, and the efficiency bypass.
+     */
     @Test
     public void normalGainsStillWork() {
         Character hero = bar(100, 50);

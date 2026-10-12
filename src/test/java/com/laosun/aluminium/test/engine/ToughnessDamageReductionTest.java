@@ -37,7 +37,9 @@ public class ToughnessDamageReductionTest {
     private static final double BASE = 1000.0;
     private static final double EPS = 1e-9;
 
-    /** Breaking the bar removes the reduction: the same instance settles 1/0.9 higher. */
+    /**
+     * Breaking the bar removes the reduction: the same instance settles 1/0.9 higher.
+     */
     @Test
     public void breakingTheBarRemovesIt() {
         Enemy unbroken = enemy();
@@ -53,7 +55,9 @@ public class ToughnessDamageReductionTest {
                 "「该减伤当且仅当敌人处于弱点击破状态时被移除」: breaking the bar gives back exactly the 10%");
     }
 
-    /** An enemy with no toughness bar at all never takes it - the sentence's premise is 「韧性条不为0」. */
+    /**
+     * An enemy with no toughness bar at all never takes it - the sentence's premise is 「韧性条不为0」.
+     */
     @Test
     public void anEnemyWithoutAToughnessBarNeverTakesIt() {
         Enemy dummy = Enemy.fromAttributes("dummy", 1_000_000, 0, 100, 100);
@@ -69,7 +73,9 @@ public class ToughnessDamageReductionTest {
                 "a bar-less enemy keeps the whole instance: the reduction is about a bar that is not empty");
     }
 
-    /** 「击破伤害一定会受该减伤影响」: the BREAK instance keeps it even though the bar emptied first. */
+    /**
+     * 「击破伤害一定会受该减伤影响」: the BREAK instance keeps it even though the bar emptied first.
+     */
     @Test
     public void theBreakInstanceAlwaysTakesIt() {
         Enemy enemy = enemy();
@@ -92,7 +98,9 @@ public class ToughnessDamageReductionTest {
                 "break damage 「一定会受该减伤影响」, so it settles 0.9 against the ordinary instance beside it");
     }
 
-    /** And it MULTIPLIES with the victim's other reductions - Π(1-r), with the 0.01 floor on top. */
+    /**
+     * And it MULTIPLIES with the victim's other reductions - Π(1-r), with the 0.01 floor on top.
+     */
     @Test
     public void itMultipliesWithOtherReductions() {
         Enemy unbroken = enemy();
@@ -133,7 +141,9 @@ public class ToughnessDamageReductionTest {
     // Helpers
     // ==================================================================
 
-    /** One enemy of the fixed kind, on its own battlefield, plus the attacker those readings share. */
+    /**
+     * One enemy of the fixed kind, on its own battlefield, plus the attacker those readings share.
+     */
     private static Enemy enemy() {
         return EnemyFactory.create(ICE_EDGE, 90, 1);
     }
@@ -146,7 +156,9 @@ public class ToughnessDamageReductionTest {
         return battle;
     }
 
-    /** The settled value of one instance of {@link #BASE} against {@code enemy}, of the given type. */
+    /**
+     * The settled value of one instance of {@link #BASE} against {@code enemy}, of the given type.
+     */
     private static double settle(Enemy enemy, DamageType type) {
         Battle battle = battleWith(enemy);
         return battle.applyDamage(enemy, new Damage(battle.characters.getFirst(), enemy, DamageElement.ICE, type, BASE));

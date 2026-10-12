@@ -1,15 +1,19 @@
 package com.laosun.aluminium.test.engine;
+
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Signal;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
 import java.util.List;
 
-/** "每从 1 个除德谬歌以外不同的队友处获得[追忆]后". */
+/**
+ * "每从 1 个除德谬歌以外不同的队友处获得[追忆]后".
+ */
 public class TrueSelfOdeDistinctAlliesTest {
     private static final String COUNTER = "忆灵技的额外一击";
 

@@ -1,8 +1,6 @@
 package com.laosun.aluminium.test.engine;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.AttributeType;
@@ -11,8 +9,10 @@ import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.CanHit;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Signal;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -23,15 +23,20 @@ import java.util.Random;
 /**
  * 8009 and 8010, the Elation Trailblazer pair: the chosen ally's +50% CRIT DMG, for both ids.
  *
- * <p>The gain is asserted against a hand-built reference at percent 1.0 in the SAME pipeline, so the ratio 0.5 is the claim and the engine's own factors cancel - 
+ * <p>The gain is asserted against a hand-built reference at percent 1.0 in the SAME pipeline, so the ratio 0.5 is the claim and the engine's own factors cancel -
  * the round-19lesson, where asserting a share of a zero base compared nothing.
  */
 public class SiblingElationTest {
     private static final int ALLY = 1002;
-    /** The ally whose kit really carries an Elation skill (data slot 20) -- the auto-cast's true side. */
+    /**
+     * The ally whose kit really carries an Elation skill (data slot 20) -- the auto-cast's true side.
+     */
     private static final int ELATION_ALLY = 1501;
     private static final int LEVEL = 80;
-        /** Note: The content's 0.5 against a reference 1.0, and the control, for BOTH ids. */
+
+    /**
+     * Note: The content's 0.5 against a reference 1.0, and the control, for BOTH ids.
+     */
     @Test
     public void theUltimateRaisesTheChosenAllysCritDamage() {
         for (int cid : new int[]{8009, 8010}) {
@@ -44,7 +49,9 @@ public class SiblingElationTest {
         }
     }
 
-    /** Note: "施放攻击后，固定恢复10点能量" -- and the document's number, not just "some energy". */
+    /**
+     * Note: "施放攻击后，固定恢复10点能量" -- and the document's number, not just "some energy".
+     */
     @Test
     public void theTalentGivesTenEnergyPerAttack() {
         for (int cid : new int[]{8009, 8010}) {
@@ -61,7 +68,9 @@ public class SiblingElationTest {
         }
     }
 
-    /** Census for both ids. */
+    /**
+     * Census for both ids.
+     */
     @Test
     public void theirFilesCarryTheClauses() {
         for (int cid : new int[]{8009, 8010}) {
@@ -110,7 +119,9 @@ public class SiblingElationTest {
                         + elation[0] + " -> " + elation[1] + ")");
     }
 
-    /** Fires 8010's ultimate at {@code allyCid}; returns {remaining action value before, after}. */
+    /**
+     * Fires 8010's ultimate at {@code allyCid}; returns {remaining action value before, after}.
+     */
     private static double[] advanceAfterUltimate(int allyCid) {
         Character tb = CharacterFactory.create(8010, LEVEL);
         Character ally = CharacterFactory.create(allyCid, LEVEL);
@@ -121,7 +132,9 @@ public class SiblingElationTest {
         return new double[]{before, timeRemaining(battle, ally)};
     }
 
-    /** How much action value the unit still has - the action bar's own answer (same helper as the 1402 judge). */
+    /**
+     * How much action value the unit still has - the action bar's own answer (same helper as the 1402 judge).
+     */
     private static double timeRemaining(Battle battle, CanHit target) {
         for (Signal signal : battle.queue.snapshot()) {
             if (signal.getCanHit() == target) {
@@ -131,7 +144,9 @@ public class SiblingElationTest {
         return Double.NaN;
     }
 
-    /** mode 0 = the shipped file, 1 = a hand-built 100% reference. Returns the chosen ally's CRIT DMG gain. */
+    /**
+     * mode 0 = the shipped file, 1 = a hand-built 100% reference. Returns the chosen ally's CRIT DMG gain.
+     */
     private static double ultimateGain(int cid, int mode) {
         Character tb = CharacterFactory.create(cid, LEVEL);
         Character ally = CharacterFactory.create(ALLY, LEVEL);

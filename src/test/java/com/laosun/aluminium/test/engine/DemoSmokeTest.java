@@ -1,8 +1,6 @@
 package com.laosun.aluminium.test.engine;
 
 
-import com.laosun.aluminium.test.content.memosprites.EnemyCampSummonTest;
-import com.laosun.aluminium.test.content.memosprites.MemospriteAttackTest;
 import com.laosun.Main;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

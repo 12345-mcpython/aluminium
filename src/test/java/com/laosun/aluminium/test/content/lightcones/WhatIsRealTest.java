@@ -7,8 +7,8 @@ import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Signal;
 import com.laosun.aluminium.models.Weapon;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -22,7 +22,8 @@ import java.util.List;
 public class WhatIsRealTest {
     private static final int WEARER = 1001;
     private static final int LEVEL = 80;
-        @Test
+
+    @Test
     public void cone21035GivesBreakEffectAndBothHealTerms() {
         Assertions.assertEquals(0.24, breakEffect(1), 1e-6, "rank 1 break effect");
         Assertions.assertEquals(0.48, breakEffect(5), 1e-6, "rank 5 break effect");

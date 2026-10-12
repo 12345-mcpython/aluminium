@@ -1,16 +1,20 @@
 package com.laosun.aluminium.test.content.characters;
+
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.buff.ControlBuff;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
 import java.util.List;
 
-/** "处于[往昔的涟漪]状态时在[追忆]达到 12 点时可激活终结技". */
+/**
+ * "处于[往昔的涟漪]状态时在[追忆]达到 12 点时可激活终结技".
+ */
 public class CyreneRippleTierTest {
     private static final String STATE = "往昔的涟漪";
     private static final String MEMORY = "追忆";

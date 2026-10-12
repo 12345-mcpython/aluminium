@@ -28,7 +28,7 @@ import java.util.List;
  * not yet settled - that way a listener can get both "what was cast" and "who was actually hit".
  *
  * <p>Note: Currently it is only emitted from {@code SkillExecutor}. {@code castImmediate} goes through it too,
- * so it is fired; but enemy skills ({@code EnemySkill}'s own {@code execute}) currently do not emit it - 
+ * so it is fired; but enemy skills ({@code EnemySkill}'s own {@code execute}) currently do not emit it -
  * to be aligned when enemy skills are wired into the unified executor.
  *
  * @param battle     the running battle

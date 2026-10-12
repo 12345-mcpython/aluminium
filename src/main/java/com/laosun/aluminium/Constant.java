@@ -9,12 +9,7 @@ import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.utils.JSONReader;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -107,7 +102,7 @@ public final class Constant {
      *
      * <p>Note: The second difference from the other data tables: when {@code stage.json} is missing this
      * returns an empty table instead of throwing. It only serves stage-driven code, and
-     * the static block of `Constant` is the place where "one touch brings down the entire test suite" - 
+     * the static block of `Constant` is the place where "one touch brings down the entire test suite" -
      * an optional feature must not drag the whole suite down with it. When the stages cannot be loaded,
      * the caller ({@code StageFactory.load}) produces a self-explanatory error.
      *
@@ -591,7 +586,7 @@ public final class Constant {
      * have a DOT" cannot disagree with the effect table.
      *
      * <p>Note: <b>No engine code reads this.</b> {@code Battle.attachBreakDot} asks
-     * {@link BreakEffect#hasDot()} of the element's own entry, which is the single judgement point - 
+     * {@link BreakEffect#hasDot()} of the element's own entry, which is the single judgement point -
      * and since this set is derived from that same table, the two can never disagree. It survives as a
      * convenience for callers that want the list (tests do: {@code BreakEffectTableTest}); do not
      * reintroduce it as a decision input at a call site, or the "one judgement point" property is lost

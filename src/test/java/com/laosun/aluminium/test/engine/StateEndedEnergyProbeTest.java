@@ -2,8 +2,8 @@ package com.laosun.aluminium.test.engine;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -17,15 +17,19 @@ import java.util.List;
  */
 public class StateEndedEnergyProbeTest {
     private static final int OWNER = 1211;
-        private static final String STATE = "生息";
+    private static final String STATE = "生息";
 
-    /** At full HP the clause pays. */
+    /**
+     * At full HP the clause pays.
+     */
     @Test
     public void theClausePaysAtFullHealth() {
         Assertions.assertEquals(8.0, gain(0.0), 1e-6, "full HP pays the document's 8");
     }
 
-    /** Note: And below full HP it does not -- the clause is the point. */
+    /**
+     * Note: And below full HP it does not -- the clause is the point.
+     */
     @Test
     public void theClauseRefusesBelowFullHealth() {
         Assertions.assertEquals(0.0, gain(0.5), 1e-6, "half HP pays nothing");
@@ -33,7 +37,9 @@ public class StateEndedEnergyProbeTest {
 
     // ==================================================================
 
-    /** @param missing the share of max HP to take away before the announcement */
+    /**
+     * @param missing the share of max HP to take away before the announcement
+     */
     private static double gain(double missing) {
         Character owner = CharacterFactory.create(OWNER, 80, false, null, null, 0);
         Battle battle = new Battle(List.of(owner),

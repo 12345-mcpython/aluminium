@@ -1,29 +1,32 @@
 package com.laosun.aluminium.test.engine;
+
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.models.skill.SkillExecutor;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
 import java.util.List;
 
 /**
  * GAIN_RESOURCE captures the CAST skill parameter.
- *
+ * <p>
  * Why it matters: a memosprite skill row is unreachable by EVERY share -- Summon keys its skills by int data slot while shares read Character.getSkills(), keyed by SkillType --
  * but the cast moment CAN read it, because castParamValue goes through the event actor. So a number that belongs to an ode is captured into a resource as it is cast.
- *
+ * <p>
  * The reader is a content rule on 1412 (the character the law ode is aimed at), because two preconditions were measured to be necessary: the rule must sit on the AIMED character
  * table (a memosprite cast does not reach the memosprite own file), and the resource must be declared BY CONTENT (a table installed before battle start is never registered).
- *
+ * <p>
  * Two-sided: with the ode the charge rises by the row value; with no ode it does not move. And the read is the character's OWN store -- measured, that is where the credit lands,
  * while the party store is a separate copy.
  */
 public class CaptureCastParamTest {
     private static final int LEVEL = 80;
     private static final String CHARGE = "充能";
+
     @Test
     public void theChargeGainsTheOdeRowsValue() {
         int[] with = run(true);
@@ -36,7 +39,10 @@ public class CaptureCastParamTest {
                 "the charge rises by the captured basis points, capped at her 8");
         Assertions.assertEquals(without[0], without[1], "and with no ode it does not move");
     }
-    /** [charge before, charge after, the row value] -- casting the ode, or not. */
+
+    /**
+     * [charge before, charge after, the row value] -- casting the ode, or not.
+     */
     private static int[] run(boolean castTheOde) {
         Character cyrene = CharacterFactory.create(1415, LEVEL);
         Character cerydra = CharacterFactory.create(1412, LEVEL);

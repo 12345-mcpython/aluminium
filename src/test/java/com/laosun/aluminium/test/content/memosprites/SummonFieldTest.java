@@ -1,23 +1,21 @@
 package com.laosun.aluminium.test.content.memosprites;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.data.RelicTriggerTables;
 import com.laosun.aluminium.enums.AttributeType;
-import com.laosun.aluminium.enums.Camp;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.CanHit;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.DoubleValue;
 import com.laosun.aluminium.models.Summon;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.models.enemy.SummonFactory;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.utils.RelicFactory;
 import org.junit.jupiter.api.Assertions;
@@ -46,22 +44,32 @@ import java.util.List;
 public class SummonFieldTest {
     private static final double EPS = 1e-6;
 
-    /** Aglaea (阿格莱雅) - has a memosprite spec (1402), and no other test uses her id. */
+    /**
+     * Aglaea (阿格莱雅) - has a memosprite spec (1402), and no other test uses her id.
+     */
     private static final int AGLAEA = 1402;
-    /** Himeko (姬子) - our plain character, no memosprite. */
+    /**
+     * Himeko (姬子) - our plain character, no memosprite.
+     */
     private static final int PLAIN = 1003;
     private static final int LEVEL = 80;
-        /** Silvermane Guard (银鬃近卫), the monster id used for an enemy-side summon. */
+    /**
+     * Silvermane Guard (银鬃近卫), the monster id used for an enemy-side summon.
+     */
     private static final int MINION = 1002040;
 
-    /** Banana Paradise (奇想蕉乐园) - the set whose 2-piece is authored with {@code self_summon_count}. */
+    /**
+     * Banana Paradise (奇想蕉乐园) - the set whose 2-piece is authored with {@code self_summon_count}.
+     */
     private static final int BANANA_PARADISE = 318;
 
     // ==================================================================
     // 1. Counting the owner's own summons
     // ==================================================================
 
-    /** The count is per owner: my summon is mine, a teammate's is not. */
+    /**
+     * The count is per owner: my summon is mine, a teammate's is not.
+     */
     @Test
     public void theCountIsOfTheOwnersOwnSummons() {
         Character owner = CharacterFactory.create(AGLAEA, LEVEL);
@@ -76,7 +84,9 @@ public class SummonFieldTest {
                 "a teammate's memosprite is not mine -- 「the wearer's memosprite」 is possessive");
     }
 
-    /** A dead summon stops counting: the roster keeps corpses, the count does not. */
+    /**
+     * A dead summon stops counting: the roster keeps corpses, the count does not.
+     */
     @Test
     public void aDeadSummonIsNotCounted() {
         Fixture f = fixture();
@@ -89,7 +99,9 @@ public class SummonFieldTest {
         Assertions.assertNull(f.battle.summonOf(f.owner));
     }
 
-    /** It counts all of them, not just the first - Robin - Summeretto (知更鸟-晴歌)'s Sky Musician (晴空乐手) is a trio. */
+    /**
+     * It counts all of them, not just the first - Robin - Summeretto (知更鸟-晴歌)'s Sky Musician (晴空乐手) is a trio.
+     */
     @Test
     public void severalSummonsAreAllCounted() {
         Fixture f = fixture();
@@ -102,7 +114,9 @@ public class SummonFieldTest {
         Assertions.assertSame(f.memosprite, f.battle.summonOf(f.owner), "the first one, in roster order");
     }
 
-    /** An enemy's minion counts for the enemy, through the same query. */
+    /**
+     * An enemy's minion counts for the enemy, through the same query.
+     */
     @Test
     public void anEnemySummonCountsForTheEnemy() {
         Character hero = CharacterFactory.create(PLAIN, LEVEL);
@@ -120,7 +134,9 @@ public class SummonFieldTest {
     // 2. The condition gates a rule
     // ==================================================================
 
-    /** A rule gated on the count fires with a summon out and stays quiet without one. */
+    /**
+     * A rule gated on the count fires with a summon out and stays quiet without one.
+     */
     @Test
     public void theConditionGatesTheRule() {
         Assertions.assertEquals(0, fireWithSummon(false), "no summon, no fire");
@@ -161,7 +177,9 @@ public class SummonFieldTest {
     // 3. Addressing the summon as a target
     // ==================================================================
 
-    /** {@code target: "summon"} applies the effect to the memosprite, not to the wearer. */
+    /**
+     * {@code target: "summon"} applies the effect to the memosprite, not to the wearer.
+     */
     @Test
     public void theSummonSelectorAddressesTheMemosprite() {
         Fixture f = fixture();
@@ -228,7 +246,9 @@ public class SummonFieldTest {
                 "so the extra really depends on the summon: " + withSummon + " vs " + withoutSummon);
     }
 
-    /** The 2-piece is filed at the 2-piece tier and states the parameters from the text. */
+    /**
+     * The 2-piece is filed at the 2-piece tier and states the parameters from the text.
+     */
     @Test
     public void theBananaParadiseRuleStatesItsOwnNumbers() {
         Fixture f = fixture();
@@ -257,7 +277,9 @@ public class SummonFieldTest {
     private record Fixture(Battle battle, Character owner, Summon memosprite) {
     }
 
-    /** A battle with one memosprite already on the field (before the battle starts). */
+    /**
+     * A battle with one memosprite already on the field (before the battle starts).
+     */
     private static Fixture fixture() {
         Character owner = CharacterFactory.create(AGLAEA, LEVEL);
         Battle battle = new Battle(List.of(owner), List.of(monster()), BattleFixture.seeded());
@@ -266,7 +288,9 @@ public class SummonFieldTest {
         return new Fixture(battle, owner, memosprite);
     }
 
-    /** How many rules fire for an owner that does or does not have a memosprite out. */
+    /**
+     * How many rules fire for an owner that does or does not have a memosprite out.
+     */
     private static int fireWithSummon(boolean withSummon) {
         Character owner = CharacterFactory.create(AGLAEA, LEVEL);
         Battle battle = new Battle(List.of(owner), List.of(monster()), BattleFixture.seeded());
@@ -279,7 +303,9 @@ public class SummonFieldTest {
         return battle.fireTriggers(TriggerEvent.BATTLE_START, owner, null, 0, 0);
     }
 
-    /** A rule that buffs "my memosprite" - the {@code target: "summon"} selector. */
+    /**
+     * A rule that buffs "my memosprite" - the {@code target: "summon"} selector.
+     */
     private static TriggerSpec summonAttackRule() {
         EffectSpec effect = TriggerSpecs.modifyAttr("ATTACK", 0.5, 2);
         TriggerSpecs.set(effect, "target", "summon");
@@ -298,7 +324,7 @@ public class SummonFieldTest {
     private static double critDamageAtOwnTurnStart(boolean withSet, boolean withSummon) {
         Character wearer = withSet
                 ? CharacterFactory.create(AGLAEA, LEVEL, true, null,
-                        RelicFactory.suit(BANANA_PARADISE, 5, 15))
+                RelicFactory.suit(BANANA_PARADISE, 5, 15))
                 : CharacterFactory.create(AGLAEA, LEVEL);
         // Make the wearer unambiguously first, so the turn this case opens is hers.
         wearer.setAttribute(AttributeType.SPEED, new DoubleValue(10_000));

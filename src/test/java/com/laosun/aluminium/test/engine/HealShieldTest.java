@@ -182,7 +182,7 @@ public class HealShieldTest {
     }
 
     private static Battle newBattle(com.laosun.aluminium.models.CanHit a,
-                                   com.laosun.aluminium.models.CanHit b) {
+                                    com.laosun.aluminium.models.CanHit b) {
         List<Character> characters = new java.util.ArrayList<>();
         List<Enemy> enemies = new java.util.ArrayList<>();
         for (com.laosun.aluminium.models.CanHit c : List.of(a, b)) {

@@ -1,15 +1,12 @@
 package com.laosun.aluminium.test.content.characters;
 
 import com.laosun.aluminium.Battle;
-import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.SkillType;
-import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -23,7 +20,10 @@ public class RuanMeiTest {
     private static final int RUANMEI = 1303;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-        /** Note: "除自身以外": the TEAMMATE gains 10% speed and she does not - measured against a hand-built 20% reference. */
+
+    /**
+     * Note: "除自身以外": the TEAMMATE gains 10% speed and she does not - measured against a hand-built 20% reference.
+     */
     @Test
     public void theTalentSpeedsTeammatesButNotHerself() {
         Character ruanmei = CharacterFactory.create(RUANMEI, LEVEL);
@@ -44,7 +44,9 @@ public class RuanMeiTest {
         Assertions.assertTrue(battle.getSkillPoints() >= 0, "the battle ran");
     }
 
-    /** Note: The Skill puts [弦外音] on HER, for the document's three turns. */
+    /**
+     * Note: The Skill puts [弦外音] on HER, for the document's three turns.
+     */
     @Test
     public void theSkillPutsOvertoneOnHerself() {
         Character ruanmei = CharacterFactory.create(RUANMEI, LEVEL);

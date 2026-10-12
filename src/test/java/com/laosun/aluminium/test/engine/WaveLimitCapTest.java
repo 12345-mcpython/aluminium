@@ -5,9 +5,9 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
-import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.models.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -24,9 +24,11 @@ import java.util.List;
  */
 public class WaveLimitCapTest {
     private static final int OWNER = 1002;
-        private static final double EPS = 1e-6;
+    private static final double EPS = 1e-6;
 
-    /** Twice in one wave = once; a new wave = once more. */
+    /**
+     * Twice in one wave = once; a new wave = once more.
+     */
     @Test
     public void theCapIsPerWaveNotPerBattle() {
         Character owner = CharacterFactory.create(OWNER, 80, false, null, null, 0);

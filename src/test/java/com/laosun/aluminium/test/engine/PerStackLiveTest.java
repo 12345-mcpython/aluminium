@@ -1,14 +1,14 @@
 package com.laosun.aluminium.test.engine;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Signal;
-import com.laosun.aluminium.models.TriggerTable;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -24,9 +24,11 @@ import java.util.List;
 public class PerStackLiveTest {
     private static final int OWNER = 1002;
     private static final int LEVEL = 80;
-        private static final String COUNTER = "probeCharge";
+    private static final String COUNTER = "probeCharge";
 
-    /** One stack, then five: the same attached aura yields 14% and then 0%. */
+    /**
+     * One stack, then five: the same attached aura yields 14% and then 0%.
+     */
     @Test
     public void theAuraFollowsTheCounter() {
         Character owner = CharacterFactory.create(OWNER, LEVEL, false, null, null, 0);
@@ -67,7 +69,7 @@ public class PerStackLiveTest {
     private static TriggerTable scene() {
         EffectSpec oneStack = stack(1.0);
         EffectSpec aura = effect("MODIFY_ATTR", "attribute", "ATTACK", "percent", 0.14,
-                "perStack", "self_stacks:" + COUNTER, "perStackLive", Boolean.TRUE, 
+                "perStack", "self_stacks:" + COUNTER, "perStackLive", Boolean.TRUE,
                 "permanent", Boolean.TRUE, "target", "self");
         EffectSpec fourMore = stack(4.0);
         return new TriggerTable(OWNER,

@@ -1,8 +1,6 @@
 package com.laosun.aluminium.test.content.memosprites;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.MemospriteSpec;
@@ -12,15 +10,14 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.Camp;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.CanHit;
+import com.laosun.aluminium.models.*;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.DoubleValue;
-import com.laosun.aluminium.models.Signal;
-import com.laosun.aluminium.models.Summon;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.models.enemy.SummonFactory;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.utils.RelicFactory;
 import org.junit.jupiter.api.Assertions;
@@ -63,9 +60,13 @@ import java.util.List;
 public class SummonConditionTest {
     private static final double EPS = 1e-6;
 
-    /** Evernight (长夜月) - has a memosprite spec, and a hand-built table replaces her own rules cleanly. */
+    /**
+     * Evernight (长夜月) - has a memosprite spec, and a hand-built table replaces her own rules cleanly.
+     */
     private static final int OWNER = 1413;
-    /** Aglaea (阿格莱雅) - the second memosprite owner, for "a teammate's summon does not count". */
+    /**
+     * Aglaea (阿格莱雅) - the second memosprite owner, for "a teammate's summon does not count".
+     */
     private static final int TEAMMATE = 1402;
     /**
      * Himeko (姬子) - a plain character with no memosprite spec at all, i.e. the "owns nothing" side of
@@ -75,16 +76,22 @@ public class SummonConditionTest {
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
     private static final int OTHER_MONSTER = 8002040;
-    /** Hero of Triumphant Song (凯歌祝捷的英豪): ATK +12%; a memosprite on the field -> SPD +6%, when the memosprite attacks -> both sides' CRIT DMG +30% / 2 turns. */
+    /**
+     * Hero of Triumphant Song (凯歌祝捷的英豪): ATK +12%; a memosprite on the field -> SPD +6%, when the memosprite attacks -> both sides' CRIT DMG +30% / 2 turns.
+     */
     private static final int HERO_OF_TRIUMPHANT_SONG = 123;
-    /** The magnitude the fixture rules grant - a ratio attribute, so the delta is exact. */
+    /**
+     * The magnitude the fixture rules grant - a ratio attribute, so the delta is exact.
+     */
     private static final double GRANT = 0.5;
 
     // ==================================================================
     // 1. Whose summon, and which side
     // ==================================================================
 
-    /** The rule fires for the owner's own memosprite and <b>not</b> for a teammate's. */
+    /**
+     * The rule fires for the owner's own memosprite and <b>not</b> for a teammate's.
+     */
     @Test
     public void onlyTheOwnersSummonCounts() {
         Character owner = characterWith(rule("SUMMON_ATTACK", List.of("actor == summon")));
@@ -100,7 +107,9 @@ public class SummonConditionTest {
                 "my own is");
     }
 
-    /** An enemy's minion is a summon too, and it is nobody's summon of ours. */
+    /**
+     * An enemy's minion is a summon too, and it is nobody's summon of ours.
+     */
     @Test
     public void anEnemyMinionIsNotMySummon() {
         Character owner = characterWith(rule("SUMMON_ATTACK", List.of("actor == summon")));
@@ -113,7 +122,9 @@ public class SummonConditionTest {
                 "…but it belongs to the other camp, so `summon` is not it");
     }
 
-    /** {@code actor == self} on this event is never true: a summon is not its owner. */
+    /**
+     * {@code actor == self} on this event is never true: a summon is not its owner.
+     */
     @Test
     public void theSummonIsNotItsOwner() {
         Character owner = characterWith(rule("SUMMON_ATTACK", List.of("actor == self")));
@@ -125,7 +136,9 @@ public class SummonConditionTest {
                 "…while the owner acting is exactly what it means");
     }
 
-    /** {@code actor != summon} is the other polarity: the owner acting counts, the summon does not. */
+    /**
+     * {@code actor != summon} is the other polarity: the owner acting counts, the summon does not.
+     */
     @Test
     public void theNegatedSpellingExcludesOnlyTheSummon() {
         Character owner = characterWith(rule("SUMMON_ATTACK", List.of("actor != summon")));
@@ -136,7 +149,9 @@ public class SummonConditionTest {
         Assertions.assertEquals(0, battle.fireTriggers(TriggerEvent.SUMMON_ATTACK, mine, null, 1, 0));
     }
 
-    /** Written the other way round, {@code summon == actor} is the same question. */
+    /**
+     * Written the other way round, {@code summon == actor} is the same question.
+     */
     @Test
     public void theMirrorSpellingMeansTheSameThing() {
         Character owner = characterWith(rule("SUMMON_ATTACK", List.of("summon == actor")));
@@ -167,7 +182,9 @@ public class SummonConditionTest {
                 "the second one is mine too");
     }
 
-    /** {@code target == summon} is the same vocabulary on the receiving side: "it happened to my summon". */
+    /**
+     * {@code target == summon} is the same vocabulary on the receiving side: "it happened to my summon".
+     */
     @Test
     public void theTargetSideAsksTheSameQuestionAboutTheSubject() {
         Character owner = characterWith(rule("TAKING_HIT", List.of("target == summon")));
@@ -227,7 +244,9 @@ public class SummonConditionTest {
                 "my own summon is out; the ALLY has none -- so only one of the two questions answers yes");
     }
 
-    /** …and when the subject does own one, the answer flips. */
+    /**
+     * …and when the subject does own one, the answer flips.
+     */
     @Test
     public void theTargetSideReadsTheFieldToo() {
         Character owner = characterWith(
@@ -270,7 +289,9 @@ public class SummonConditionTest {
     // 2. Refusals
     // ==================================================================
 
-    /** A spelling that can never mean anything is refused where the file is read. */
+    /**
+     * A spelling that can never mean anything is refused where the file is read.
+     */
     @Test
     public void unusableIdentityComparisonsAreRefused() {
         assertConditionRejected("actor == all_allies", "all_allies");
@@ -307,7 +328,9 @@ public class SummonConditionTest {
                 "one event for the attack, with hit_count 2 -- not one event per target");
     }
 
-    /** The count is what the attack reached, so a single-target attack does not satisfy {@code >= 2}. */
+    /**
+     * The count is what the attack reached, so a single-target attack does not satisfy {@code >= 2}.
+     */
     @Test
     public void theHitCountIsTheNumberOfTargetsReached() {
         Character owner = characterWith(rule("SUMMON_ATTACK", List.of("actor == summon", "hit_count >= 2")));
@@ -325,7 +348,9 @@ public class SummonConditionTest {
     // 4. The shipped content: relic set 123's 4-piece
     // ==================================================================
 
-    /** Both authored rules state what the effect's {@code param} states - including the duration. */
+    /**
+     * Both authored rules state what the effect's {@code param} states - including the duration.
+     */
     @Test
     public void theAuthoredRulesStateTheirOwnNumbers() {
         Character wearer = wearer();
@@ -359,7 +384,9 @@ public class SummonConditionTest {
         Assertions.assertEquals("summon", onSummon.getTarget(), "「忆灵」 (the memosprite) is the second effect");
     }
 
-    /** Both units gain the CRIT DMG from a real attack, measured as a delta. */
+    /**
+     * Both units gain the CRIT DMG from a real attack, measured as a delta.
+     */
     @Test
     public void theAuthoredSetBuffsBothUnitsWhenTheMemospriteAttacks() {
         Character wearer = wearer();
@@ -379,7 +406,9 @@ public class SummonConditionTest {
                 "…and the memosprite's half");
     }
 
-    /** A teammate's memosprite attacking grants nothing: the condition is what keeps the set to its wearer. */
+    /**
+     * A teammate's memosprite attacking grants nothing: the condition is what keeps the set to its wearer.
+     */
     @Test
     public void theAuthoredSetIgnoresATeammatesMemosprite() {
         Character wearer = wearer();
@@ -397,7 +426,9 @@ public class SummonConditionTest {
                 "an over-trigger would be a wrong number with nothing to report");
     }
 
-    /** The SPD clause needs the memosprite out: it is a WHILE condition, re-read at the wearer's turn. */
+    /**
+     * The SPD clause needs the memosprite out: it is a WHILE condition, re-read at the wearer's turn.
+     */
     @Test
     public void theSpeedClauseNeedsTheMemospriteOut() {
         // Aglaea, not Cyrene: her rule summons on her ULTIMATE, so the battlefield really starts without one
@@ -429,13 +460,17 @@ public class SummonConditionTest {
         return owner;
     }
 
-    /** The 4-piece on Cyrene, whose own rule (BATTLE_START to SUMMON) is left in place. */
+    /**
+     * The 4-piece on Cyrene, whose own rule (BATTLE_START to SUMMON) is left in place.
+     */
     private static Character wearer() {
         return CharacterFactory.create(OWNER, LEVEL, true, null,
                 RelicFactory.suit(HERO_OF_TRIUMPHANT_SONG, 5, 15));
     }
 
-    /** One rule that grants {@link #GRANT} CRIT DMG, so "did it fire" is a readable number. */
+    /**
+     * One rule that grants {@link #GRANT} CRIT DMG, so "did it fire" is a readable number.
+     */
     private static TriggerSpec rule(String event, List<String> when) {
         EffectSpec effect = new EffectSpec();
         TriggerSpecs.set(effect, "op", "MODIFY_ATTR");
@@ -480,7 +515,9 @@ public class SummonConditionTest {
         return character.getAttribute(AttributeType.SPEED).get();
     }
 
-    /** Drives to the given unit's turn and lets {@code beforeMove} run - where TURN_START is fired. */
+    /**
+     * Drives to the given unit's turn and lets {@code beforeMove} run - where TURN_START is fired.
+     */
     private static void startItsTurn(Battle battle, CanHit actor) {
         for (int action = 0; action < 20; action++) {
             battle.stepForward();
@@ -497,7 +534,9 @@ public class SummonConditionTest {
         Assertions.fail("the unit never reached a turn within 20 actions");
     }
 
-    /** Advances to the summon's turn, attacks, and returns the damage dealt. */
+    /**
+     * Advances to the summon's turn, attacks, and returns the damage dealt.
+     */
     private static double letItAttack(Battle battle, Summon summon, List<CanHit> targets) {
         Assertions.assertNotNull(summon.getSkills().get(SkillType.COMMON),
                 "the summon has no attack to take a turn with");
@@ -523,7 +562,9 @@ public class SummonConditionTest {
         return 0;
     }
 
-    /** Puts a fixture memosprite on the field exactly the way {@code Battle.summonMemosprite} does. */
+    /**
+     * Puts a fixture memosprite on the field exactly the way {@code Battle.summonMemosprite} does.
+     */
     private static Summon place(Battle battle, Character master, MemospriteSpec spec) {
         Summon summon = SummonFactory.memosprite(master, spec);
         summon.setMaster(master);
@@ -533,7 +574,9 @@ public class SummonConditionTest {
         return summon;
     }
 
-    /** A memosprite that hits every enemy for a share of its own Max HP - only reachable through the seam. */
+    /**
+     * A memosprite that hits every enemy for a share of its own Max HP - only reachable through the seam.
+     */
     private static MemospriteSpec aoeSpec() {
         return new MemospriteSpec("fixture", "SummonConditionTest", null,
                 List.of(new MemospriteSpec.Panel("HEALTH", 0.5, null),

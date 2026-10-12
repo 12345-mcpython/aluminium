@@ -1,8 +1,6 @@
 package com.laosun.aluminium.test.engine;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.AttributeType;
@@ -10,9 +8,11 @@ import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.CanHit;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Signal;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.buff.StateBuff;
 import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -43,7 +43,7 @@ public class BondmateHolderTest {
     private static final int ALLY = 1002;
     private static final int OTHER_ALLY = 1202;
     private static final int LEVEL = 80;
-        private static final String BONDMATE = "同袍";
+    private static final String BONDMATE = "同袍";
     private static final double EPS = 1e-6;
 
     // ==================================================================
@@ -88,7 +88,9 @@ public class BondmateHolderTest {
                 "nor is the rule's owner (the sentence is about the holder, not about me)");
     }
 
-    /** Note: The prefix with no state after it is refused while the file is read. */
+    /**
+     * Note: The prefix with no state after it is refused while the file is read.
+     */
     @Test
     public void anEmptyHolderStateIsRefused() {
         EffectSpec effect = new EffectSpec();
@@ -108,7 +110,9 @@ public class BondmateHolderTest {
     // 2. His shipped clauses
     // ==================================================================
 
-    /** technique (秘技) "使用秘技后获得[同袍]" - and its control: without the technique there is no Bondmate. */
+    /**
+     * technique (秘技) "使用秘技后获得[同袍]" - and its control: without the technique there is no Bondmate.
+     */
     @Test
     public void hisTechniqueGivesHimTheBondmate() {
         Character without = CharacterFactory.create(DHPT, LEVEL);
@@ -152,7 +156,9 @@ public class BondmateHolderTest {
                 "and not its own owner");
     }
 
-    /** trace (行迹) Weirui (葳蕤) "战斗开始时，丹恒-腾荒行动提前40%" - measured on the action bar, against no rules at all. */
+    /**
+     * trace (行迹) Weirui (葳蕤) "战斗开始时，丹恒-腾荒行动提前40%" - measured on the action bar, against no rules at all.
+     */
     @Test
     public void hisTraceAdvancesHimAtBattleStart() {
         Character plain = CharacterFactory.create(DHPT, LEVEL);
@@ -170,7 +176,9 @@ public class BondmateHolderTest {
                 "\"action advance 40%\" (「行动提前40%」): " + untouched + " -> " + timeRemaining(battle, him));
     }
 
-    /** trace (行迹) Weirui (葳蕤)'s second half "[同袍]施放攻击时，丹恒-腾荒恢复6点能量" - gated on the ATTACKER holding it. */
+    /**
+     * trace (行迹) Weirui (葳蕤)'s second half "[同袍]施放攻击时，丹恒-腾荒恢复6点能量" - gated on the ATTACKER holding it.
+     */
     @Test
     public void hisTracePaysEnergyWhenTheBondmateAttacks() {
         Character him = CharacterFactory.create(DHPT, LEVEL);
@@ -194,7 +202,9 @@ public class BondmateHolderTest {
     // Helpers
     // ==================================================================
 
-    /** "使<持有某个状态的目标>攻击力提高，等同于我自己攻击力的 15%" - the shape the trace is written in. */
+    /**
+     * "使<持有某个状态的目标>攻击力提高，等同于我自己攻击力的 15%" - the shape the trace is written in.
+     */
     private static EffectSpec holderBuff() {
         EffectSpec effect = new EffectSpec();
         TriggerSpecs.set(effect, "op", "MODIFY_ATTR");
@@ -206,7 +216,9 @@ public class BondmateHolderTest {
         return effect;
     }
 
-    /** How much action value the unit still has - the action bar's own answer. */
+    /**
+     * How much action value the unit still has - the action bar's own answer.
+     */
     private static double timeRemaining(Battle battle, CanHit target) {
         for (Signal signal : battle.queue.snapshot()) {
             if (signal.getCanHit() == target) {

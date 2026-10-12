@@ -25,13 +25,15 @@ import java.util.List;
  * So what is asserted is "the engine settles correctly by the multiplier", not "this multiplier is
  * the true game value".
  *
- * <p>Expected values are always derived from the actual panel (attack power  x  multiplier  x 
+ * <p>Expected values are always derived from the actual panel (attack power  x  multiplier  x
  * defence zone), never hardcoded - it was hardcoded once, and that ended up swapping the enemy's
  * defence and ours.
  */
 public class EnemySkillTest {
     private static final double EPS = 1e-9;
-    /** Victim defence 1000, Lv80 to defence zone = (200 + 10 x 80) / (1000 + 1000) = 0.5. */
+    /**
+     * Victim defence 1000, Lv80 to defence zone = (200 + 10 x 80) / (1000 + 1000) = 0.5.
+     */
     private static final double VICTIM_DEFENCE = 1000;
 
     @Test
@@ -125,7 +127,9 @@ public class EnemySkillTest {
         return Character.fromAttributes("victim", 100_000, VICTIM_DEFENCE, 100, 100);
     }
 
-    /** Defence zone = (200 + 10  x  attacker level) / (defender defence + 200 + 10  x  attacker level). */
+    /**
+     * Defence zone = (200 + 10  x  attacker level) / (defender defence + 200 + 10  x  attacker level).
+     */
     private static double defenceZone(int attackerLevel, double defenderDefence) {
         double levelTerm = Constant.DEFENCE_CONST + Constant.DEFENCE_PER_LEVEL * attackerLevel;
         return levelTerm / (defenderDefence + levelTerm);

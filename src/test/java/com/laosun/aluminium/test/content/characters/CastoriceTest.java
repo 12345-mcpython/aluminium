@@ -5,8 +5,8 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -20,7 +20,10 @@ public class CastoriceTest {
     private static final int CASTORICE = 1407;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-        /** Note: The boost needs an HP loss, and its three-stack cap is enforced by exceeding it. */
+
+    /**
+     * Note: The boost needs an HP loss, and its three-stack cap is enforced by exceeding it.
+     */
     @Test
     public void theBoostNeedsAnHpLossAndStopsAtThreeStacks() {
         Character castorice = CharacterFactory.create(CASTORICE, LEVEL);

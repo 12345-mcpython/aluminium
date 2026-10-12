@@ -1,17 +1,19 @@
 package com.laosun.aluminium.test.engine;
+
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
 import java.util.List;
 
 /**
  * Slot 15's narrowing: "缇宝施放追加攻击触发缇宝的结界的附加伤害时，会额外造成 #1(1) 次附加伤害".
- *
+ * <p>
  * The control lives INSIDE one battle. The ode is cast at her in both readings, so its other clause (the passage ode's `DEFENCE_IGNORE`, measured to raise every instance she deals from
  * 82.20 to 90.13) applies identically; the only thing that differs is the extra rule's own gate, the state the ode grants. Note: Comparing "ode vs no ode" instead would measure two effects
  * at once -- which is what the earlier attempts did.
@@ -34,7 +36,9 @@ public class PassageOdeExtraZoneHitTest {
         Assertions.assertTrue(ungated > 0, "and her ordinary damage is still there either way");
     }
 
-    /** One basic attack with the ode cast at her; the state is removed first when {@code keepGate} is false. */
+    /**
+     * One basic attack with the ode cast at her; the state is removed first when {@code keepGate} is false.
+     */
     private static double hit(boolean keepGate) {
         Character cyrene = CharacterFactory.create(CYRENE, LEVEL);
         Character tribbie = CharacterFactory.create(TRIBBIE, LEVEL);

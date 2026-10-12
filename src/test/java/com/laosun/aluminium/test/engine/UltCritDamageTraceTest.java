@@ -6,8 +6,8 @@ import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.skill.Skill;
 import com.laosun.aluminium.models.skill.SkillExecutor;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -21,7 +21,10 @@ import java.util.List;
 public class UltCritDamageTraceTest {
     private static final double EPS = 1e-9;
     private static final int OWNER = 1408;
-        /** Casting the ultimate raises her crit damage by exactly 50%. */
+
+    /**
+     * Casting the ultimate raises her crit damage by exactly 50%.
+     */
     @Test
     public void theUltimateRaisesCritDamage() {
         Character owner = CharacterFactory.create(OWNER, 80, false, null, null, 0);
@@ -42,7 +45,9 @@ public class UltCritDamageTraceTest {
                 "「施放终结技时，暴击伤害提高 50%」 (when casting the Ultimate, CRIT DMG is raised by 50%) (before=" + before + ")");
     }
 
-    /** Note: Before the ultimate the trace has not started, so the panel is untouched. */
+    /**
+     * Note: Before the ultimate the trace has not started, so the panel is untouched.
+     */
     @Test
     public void beforeTheUltimateThePanelIsUntouched() {
         Character owner = CharacterFactory.create(OWNER, 80, false, null, null, 0);

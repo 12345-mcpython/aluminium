@@ -1,18 +1,14 @@
 package com.laosun.aluminium.test.engine;
 
 import com.laosun.aluminium.Battle;
-import com.laosun.aluminium.enums.AttributeType;
-import com.laosun.aluminium.enums.DamageElement;
-import com.laosun.aluminium.enums.DamageType;
-import com.laosun.aluminium.enums.SkillCategory;
-import com.laosun.aluminium.enums.SkillType;
+import com.laosun.aluminium.enums.*;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Damage;
 import com.laosun.aluminium.models.DoubleValue;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.skill.Skill;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -37,7 +33,9 @@ import java.util.List;
  * two measurements cannot kill it.
  */
 public class DamageScopeBoostTest {
-    /** Himeko: a real character whose data carries a damaging basic attack, skill and ultimate. */
+    /**
+     * Himeko: a real character whose data carries a damaging basic attack, skill and ultimate.
+     */
     private static final int HERO = 1003;
     private static final int LEVEL = 80;
     private static final double EPS = 1e-6;
@@ -169,7 +167,9 @@ public class DamageScopeBoostTest {
         return before - dummy.getCurrentHp();
     }
 
-    /** The same, for an additional-damage instance (a follow-up), which is settled directly. */
+    /**
+     * The same, for an additional-damage instance (a follow-up), which is settled directly.
+     */
     private static double additionalDamage(AttributeType boost, double value) {
         Character hero = boostedHero(boost, value);
         Enemy dummy = dummy();

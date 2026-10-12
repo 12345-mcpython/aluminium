@@ -6,8 +6,8 @@ import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Summon;
 import com.laosun.aluminium.models.skill.Skill;
 import com.laosun.aluminium.models.skill.SkillExecutor;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -26,7 +26,7 @@ public class OdeOfPassageTest {
     private static final int CYRENE = 1415;
     private static final int TRIBBIE = 1403;
     private static final int BYSTANDER = 1002;
-        private static final int ODE_OF_PASSAGE = 15;
+    private static final int ODE_OF_PASSAGE = 15;
 
     @Test
     public void thePiercingLandsOnTribbieOnly() {

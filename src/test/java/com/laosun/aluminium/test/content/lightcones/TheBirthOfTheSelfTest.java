@@ -6,11 +6,11 @@ import com.laosun.aluminium.enums.DamageType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Damage;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.Weapon;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.models.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -27,7 +27,10 @@ public class TheBirthOfTheSelfTest {
     private static final int CONE = 21006;
     private static final int WEARER = 1205;
     private static final int LEVEL = 80;
-        /** One deterministic additional-damage instance against a FRESH enemy per reading (discipline 149). */
+
+    /**
+     * One deterministic additional-damage instance against a FRESH enemy per reading (discipline 149).
+     */
     private double followUp(boolean withCone, double enemyHpShare) {
         Character unit = withCone
                 ? CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(CONE, LEVEL, false, 1))
@@ -42,7 +45,9 @@ public class TheBirthOfTheSelfTest {
         return battle.applyAdditionalDamage(unit, enemy, DamageElement.FIRE, 1000, 0.0, 1.5);
     }
 
-    /** The same low-HP enemy, but hit with an ORDINARY instance: the extra half must not touch it. */
+    /**
+     * The same low-HP enemy, but hit with an ORDINARY instance: the extra half must not touch it.
+     */
     private double ordinaryHit(boolean withCone, double enemyHpShare) {
         Character unit = withCone
                 ? CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(CONE, LEVEL, false, 1))

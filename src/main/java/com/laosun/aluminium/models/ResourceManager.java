@@ -25,7 +25,9 @@ import java.util.function.Consumer;
  */
 public class ResourceManager {
 
-    /** The combatant these resources belong to. */
+    /**
+     * The combatant these resources belong to.
+     */
     @Getter
     private final CanHit owner;
 
@@ -92,7 +94,7 @@ public class ResourceManager {
     }
 
     /**
- * The same, for a declaration that also states an <b>overflow</b>.
+     * The same, for a declaration that also states an <b>overflow</b>.
      *
      * <p>`Resource` has had both tiers all along; a DECLARATION could not state the second one, so
      * "达到上限后还可溢出 240 点" could only be written as one flat cap -- a different rule.

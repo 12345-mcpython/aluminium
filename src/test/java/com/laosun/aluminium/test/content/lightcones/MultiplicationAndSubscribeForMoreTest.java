@@ -1,8 +1,6 @@
 package com.laosun.aluminium.test.content.lightcones;
 
 
-import com.laosun.aluminium.test.trigger.CastTargetTest;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
@@ -11,6 +9,7 @@ import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Signal;
 import com.laosun.aluminium.models.Weapon;
 import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -24,7 +23,8 @@ import java.util.List;
 public class MultiplicationAndSubscribeForMoreTest {
     private static final int WEARER = 1001;
     private static final int LEVEL = 80;
-        @Test
+
+    @Test
     public void theBasicAttackAdvancesTheWearersNextAction() {
         Character unit = CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(20015, LEVEL, false, 5));
         Enemy enemy = BattleFixture.monster();
@@ -57,7 +57,9 @@ public class MultiplicationAndSubscribeForMoreTest {
         Assertions.assertEquals(0.48, skill, 1e-6, "and the same for the skill");
     }
 
-    /** Copied verbatim from CastTargetTest: how much action value the unit still has. */
+    /**
+     * Copied verbatim from CastTargetTest: how much action value the unit still has.
+     */
     private static double timeRemaining(Battle battle, CanHit target) {
         for (Signal signal : battle.queue.snapshot()) {
             if (signal.getCanHit() == target) {

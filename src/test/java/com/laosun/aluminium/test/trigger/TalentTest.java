@@ -8,13 +8,14 @@ import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.CanHit;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.DoubleValue;
+import com.laosun.aluminium.models.Signal;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
-import com.laosun.aluminium.models.Signal;
 import com.laosun.aluminium.models.skill.DefaultSkill;
 import com.laosun.aluminium.models.skill.Skill;
-import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.models.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -46,14 +47,18 @@ public class TalentTest {
     private static final int SEELE = 1102;
     private static final int ICE_EDGE = 1002011;
 
-    /** Doc: Clara's counter is 160% of her ATK, which is her talent's level-10 value. */
+    /**
+     * Doc: Clara's counter is 160% of her ATK, which is her talent's level-10 value.
+     */
     private static final double CLARA_DOC = 1.6;
 
     // ==================================================================
     // The data is what makes it work
     // ==================================================================
 
-    /** Both characters are registered, and the tables carry the expected rules. */
+    /**
+     * Both characters are registered, and the tables carry the expected rules.
+     */
     @Test
     public void bothCharactersHaveTalentRules() {
         Assertions.assertTrue(TriggerTables.exists(CLARA), "1107 must have a trigger file");
@@ -105,7 +110,9 @@ public class TalentTest {
     // Clara: the counter actually fires
     // ==================================================================
 
-    /** The counter fires on a real enemy turn and lands on the enemy that hit her. */
+    /**
+     * The counter fires on a real enemy turn and lands on the enemy that hit her.
+     */
     @Test
     public void claraCountersTheEnemyThatHitHer() {
         Character clara = CharacterFactory.create(CLARA, 80);
@@ -163,7 +170,7 @@ public class TalentTest {
         Character clara = CharacterFactory.create(CLARA, 80);
         var rule = TriggerTables.of(CLARA)
                 .matching(TriggerEvent.HP_LOST,
-                        new com.laosun.aluminium.models.TriggerTable.TriggerContext(
+                        new TriggerTable.TriggerContext(
                                 clara, CharacterFactory.create(1003, 80), clara, 0, 0))
                 .getFirst();
 
@@ -188,22 +195,24 @@ public class TalentTest {
         var table = TriggerTables.of(CLARA);
 
         Assertions.assertEquals(1, table.matching(TriggerEvent.HP_LOST,
-                new com.laosun.aluminium.models.TriggerTable.TriggerContext(clara, ally, clara, 0, 10))
+                        new TriggerTable.TriggerContext(clara, ally, clara, 0, 10))
                 .size(), "Clara is the victim -> matches");
 
         Assertions.assertEquals(0, table.matching(TriggerEvent.HP_LOST,
-                new com.laosun.aluminium.models.TriggerTable.TriggerContext(clara, ally, ally, 0, 10))
+                        new TriggerTable.TriggerContext(clara, ally, ally, 0, 10))
                 .size(), "an ally is the victim -> must not match");
     }
 
-    /** Settles one counter with the given parameter index and returns the damage it dealt. */
+    /**
+     * Settles one counter with the given parameter index and returns the damage it dealt.
+     */
     private static double counterDamage(int damageParam) {
         Character clara = CharacterFactory.create(CLARA, 80);
         Battle battle = newBattle(List.of(clara));
         Enemy enemy = firstEnemy(battle);
 
         // Replace the JSON rule with one that uses the requested index; everything else identical.
-        clara.setTriggerTable(new com.laosun.aluminium.models.TriggerTable(CLARA, List.of(
+        clara.setTriggerTable(new TriggerTable(CLARA, List.of(
                 rule("HP_LOST", List.of("target == self"),
                         damageEffect("TALENT", damageParam, "attacker")))));
 
@@ -212,7 +221,9 @@ public class TalentTest {
         return before - enemy.getCurrentHp();
     }
 
-    /** The counter does not fire for a teammate's wounds: {@code target == self} does the filtering. */
+    /**
+     * The counter does not fire for a teammate's wounds: {@code target == self} does the filtering.
+     */
     @Test
     public void claraDoesNotCounterWhenSomeoneElseIsHit() {
         Character clara = CharacterFactory.create(CLARA, 80);
@@ -228,7 +239,9 @@ public class TalentTest {
                 "Clara must not counter for someone else's wound");
     }
 
-    /** Turned around: the HP-loss rule alone fires for anyone, so the condition is doing the work. */
+    /**
+     * Turned around: the HP-loss rule alone fires for anyone, so the condition is doing the work.
+     */
     @Test
     public void withoutTheSubjectConditionTheCounterWouldFireForAnyone() {
         Character clara = CharacterFactory.create(CLARA, 80);
@@ -271,7 +284,9 @@ public class TalentTest {
                 "and it must be Seele's turn, not a teammate's");
     }
 
-    /** A teammate's kill must not grant Seele an extra turn ({@code actor == self}). */
+    /**
+     * A teammate's kill must not grant Seele an extra turn ({@code actor == self}).
+     */
     @Test
     public void seeleDoesNotGetATurnFromATeammatesKill() {
         Character seele = CharacterFactory.create(SEELE, 80);
@@ -293,15 +308,19 @@ public class TalentTest {
     // Helpers
     // ==================================================================
 
-    /** One parameter of a talent's row for a given skill level. */
+    /**
+     * One parameter of a talent's row for a given skill level.
+     */
     private static double talentRow(int cid, int paramIndex, int level) {
         var skill = new DefaultSkill(cid, 4, level);
         return skill.getData().getSkills().get(level - 1).get(paramIndex);
     }
 
-    /** Builds a {@code DAMAGE} effect for the tests (the beans are read-only, so this uses reflection). */
+    /**
+     * Builds a {@code DAMAGE} effect for the tests (the beans are read-only, so this uses reflection).
+     */
     private static com.laosun.aluminium.beans.EffectSpec damageEffect(String skill, int damageParam,
-                                                                     String target) {
+                                                                      String target) {
         var effect = new com.laosun.aluminium.beans.EffectSpec();
         set(effect, "op", "DAMAGE");
         set(effect, "skill", skill);
@@ -310,7 +329,9 @@ public class TalentTest {
         return effect;
     }
 
-    /** Builds a trigger rule for the tests. */
+    /**
+     * Builds a trigger rule for the tests.
+     */
     private static com.laosun.aluminium.beans.TriggerSpec rule(
             String on, List<String> when, com.laosun.aluminium.beans.EffectSpec effect) {
         var spec = new com.laosun.aluminium.beans.TriggerSpec();
@@ -349,7 +370,9 @@ public class TalentTest {
         return battle.enemyUnits().getFirst();
     }
 
-    /** Advances until {@code actor}'s turn, then has it use {@code skill} on {@code targets}. */
+    /**
+     * Advances until {@code actor}'s turn, then has it use {@code skill} on {@code targets}.
+     */
     private static boolean actOnOwnTurn(Battle battle, CanHit actor,
                                         java.util.function.Supplier<Skill> skill,
                                         List<? extends CanHit> targets) {
@@ -370,7 +393,9 @@ public class TalentTest {
         return false;
     }
 
-    /** Advances until the enemy acts, then has it hit {@code victim}. */
+    /**
+     * Advances until the enemy acts, then has it hit {@code victim}.
+     */
     private static void letEnemyAttack(Battle battle, Enemy attacker, CanHit victim) {
         for (int i = 0; i < 40; i++) {
             battle.stepForward();

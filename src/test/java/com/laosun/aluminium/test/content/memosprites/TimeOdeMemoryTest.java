@@ -1,16 +1,18 @@
 package com.laosun.aluminium.test.content.memosprites;
+
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.skill.SkillExecutor;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
 import java.util.List;
 
 /**
  * 1415's memosprite skill 24, second sentence: "after 长夜月 casts a Skill/Ultimate, additionally gain #2 points of [忆质]".
- *
+ * <p>
  * Two-sided: with the ode cast at her, her skill grants the captured #2 (1 at this level); without it nothing was captured, so nothing is granted. The value never appears as
  * a literal in content: it is read from the ode's own row and handed over through a resource.
  */
@@ -18,7 +20,7 @@ public class TimeOdeMemoryTest {
     private static final int LEVEL = 80;
     private static final int LONGNIGHT = 1413;
     private static final int CYRENE = 1415;
-        private static final int ODE_SLOT = 24;
+    private static final int ODE_SLOT = 24;
     private static final String MEM = "亿质";
 
     @Test

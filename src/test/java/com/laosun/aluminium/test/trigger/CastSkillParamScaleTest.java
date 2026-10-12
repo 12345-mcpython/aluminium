@@ -1,17 +1,16 @@
 package com.laosun.aluminium.test.trigger;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
-import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Summon;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.skill.Skill;
 import com.laosun.aluminium.models.skill.SkillExecutor;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Assumptions;
@@ -35,9 +34,11 @@ public class CastSkillParamScaleTest {
     private static final int LEVEL = 80;
     private static final int CYRENE = 1415;
     private static final int ALLY = 1002;
-        private static final int ODE_OF_ROMANCE = 14;
+    private static final int ODE_OF_ROMANCE = 14;
 
-    /** The magnitude is the skill's own parameter, out of the row of the caster's current level. */
+    /**
+     * The magnitude is the skill's own parameter, out of the row of the caster's current level.
+     */
     @Test
     public void theMagnitudeIsTheCastingSkillsOwnParameter() {
         Scene scene = scene();
@@ -52,7 +53,9 @@ public class CastSkillParamScaleTest {
                 "「提高数值等同于…的 #1%」 (raises by an amount equal to #1% of ...)-- #1 is the skill own parameter, at the level the cast is at");
     }
 
-    /** A different index gives a different member of the same row, so the reading really is the index. */
+    /**
+     * A different index gives a different member of the same row, so the reading really is the index.
+     */
     @Test
     public void aDifferentIndexYieldsADifferentMember() {
         Scene scene = scene();

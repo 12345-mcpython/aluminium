@@ -4,9 +4,9 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.utils.RelicFactory;
-import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -21,7 +21,7 @@ public class MemospriteSpeedTierTest {
     private static final int WEARER = 1402;
     private static final int ALLY = 1001;
     private static final int LEVEL = 80;
-        private static final int RELIC_LEVEL = 15;
+    private static final int RELIC_LEVEL = 15;
     private static final double SPEED_SHARE = 0.08;
 
     @Test

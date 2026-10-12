@@ -1,8 +1,6 @@
 package com.laosun.aluminium.test.engine;
 
 
-import com.laosun.aluminium.test.content.characters.BailuRegenTest;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.DamageType;
@@ -11,6 +9,7 @@ import com.laosun.aluminium.models.Damage;
 import com.laosun.aluminium.models.buff.DotBuff;
 import com.laosun.aluminium.models.buff.StateBuff;
 import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.utils.RelicFactory;
 import org.junit.jupiter.api.Assertions;
@@ -27,7 +26,7 @@ import java.util.List;
 public class ImprisonedTargetCritTest {
     private static final int WEARER = 1001;
     private static final int LEVEL = 80;
-        private static final int RELIC_LEVEL = 15;
+    private static final int RELIC_LEVEL = 15;
     private static final String IMPRISONED = "禁锢";
 
     @Test

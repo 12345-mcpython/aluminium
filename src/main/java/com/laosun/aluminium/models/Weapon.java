@@ -28,13 +28,13 @@ public class Weapon implements Cloneable {
      * Display name (bilingual).
      */
     /**
- * The light cone's id, which names its rule file under {@code resources/light_cones/}.
+     * The light cone's id, which names its rule file under {@code resources/light_cones/}.
      * It was already in hand at construction and simply not kept.
      */
     private int wid;
 
     /**
- * The light cone's <b>superimposition rank</b> (1..5), which selects the skill row whose values apply.
+     * The light cone's <b>superimposition rank</b> (1..5), which selects the skill row whose values apply.
      *
      * <p>Note: Before this the engine always read the FIRST row - i.e. it modelled rank 1 without saying so. The default stays
      * 1, so every existing caller behaves exactly as before; a caller that knows the wearer's rank can now say it.

@@ -3,8 +3,8 @@ package com.laosun.aluminium.test.engine;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.energy.EnergyGain;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -18,23 +18,29 @@ import java.util.List;
  */
 public class ElationRewardBoostTest {
     private static final int OWNER = 1505;
-        private static final String REWARD = "好活当赏";
+    private static final String REWARD = "好活当赏";
 
-    /** With the Eidolon: 150 energy -> 20 + 100 (capped) + 50. */
+    /**
+     * With the Eidolon: 150 energy -> 20 + 100 (capped) + 50.
+     */
     @Test
     public void theEidolonAddsHalfOfTheCappedCredit() {
         Assertions.assertEquals(170, rewardAfterGain(1, 150),
                 "rank 1: 20 (technique) + 100 (capped) + 50 (the eidolon's half)");
     }
 
-    /** Note: Without it: the base trace only, exactly as the older guards expect. */
+    /**
+     * Note: Without it: the base trace only, exactly as the older guards expect.
+     */
     @Test
     public void theBaseIsUntouchedWithoutTheEidolon() {
         Assertions.assertEquals(120, rewardAfterGain(0, 150),
                 "rank 0: 20 (technique) + 100 (capped), no eidolon share");
     }
 
-    /** Note: The technique is not a trace, so its own 20 must not be boosted at any rank. */
+    /**
+     * Note: The technique is not a trace, so its own 20 must not be boosted at any rank.
+     */
     @Test
     public void theTechniqueGainIsNotBoosted() {
         Assertions.assertEquals(20, rewardAfterGain(1, 0),

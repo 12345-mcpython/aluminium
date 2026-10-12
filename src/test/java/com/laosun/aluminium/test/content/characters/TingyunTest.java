@@ -7,8 +7,8 @@ import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -25,7 +25,10 @@ public class TingyunTest {
     private static final int TINGYUN = 1202;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-        /** Note: "使其攻击力提高50%，最高不超过停云当前攻击力的25%": the gain must respect the ceiling. */
+
+    /**
+     * Note: "使其攻击力提高50%，最高不超过停云当前攻击力的25%": the gain must respect the ceiling.
+     */
     @Test
     public void herSkillBlessesWithACappedGain() {
         Fixture f = new Fixture();
@@ -41,7 +44,9 @@ public class TingyunTest {
                 "「最高不超过停云当前攻击力的25%」 (at most 25% of Tingyun's current ATK) -- gain " + (after - before) + " vs ceiling " + ceiling);
     }
 
-    /** Note: The ultimate grants energy AND a two-turn damage boost to the chosen ally. */
+    /**
+     * Note: The ultimate grants energy AND a two-turn damage boost to the chosen ally.
+     */
     @Test
     public void herUltimateGrantsEnergyAndABoost() {
         Fixture f = new Fixture();
@@ -56,7 +61,9 @@ public class TingyunTest {
                 "「同时使目标造成的伤害提高50%，持续2回合」 (and raises the target's DMG dealt by 50% for 2 turns)");
     }
 
-    /** Census: five rules of hers plus the level convention. */
+    /**
+     * Census: five rules of hers plus the level convention.
+     */
     @Test
     public void herFileCarriesTheClauses() {
         var table = TriggerTables.of(TINGYUN);

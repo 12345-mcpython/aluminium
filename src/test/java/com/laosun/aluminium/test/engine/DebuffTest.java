@@ -1,8 +1,6 @@
 package com.laosun.aluminium.test.engine;
 
 
-import com.laosun.aluminium.test.support.BattleFixture;
-import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
@@ -10,16 +8,11 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
-import com.laosun.aluminium.models.buff.AbstractBuff;
-import com.laosun.aluminium.models.buff.DotBuff;
-import com.laosun.aluminium.models.buff.ReductionBuff;
-import com.laosun.aluminium.models.buff.StatModifierBuff;
-import com.laosun.aluminium.models.buff.StateBuff;
-import com.laosun.aluminium.models.buff.StunBuff;
-import com.laosun.aluminium.models.buff.TauntBuff;
-import com.laosun.aluminium.models.buff.VulnerabilityBuff;
+import com.laosun.aluminium.models.buff.*;
 import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -49,7 +42,9 @@ public class DebuffTest {
     // 1. The classification
     // ==================================================================
 
-    /** Every buff class that can be built without a rule, and the side the game gives it. */
+    /**
+     * Every buff class that can be built without a rule, and the side the game gives it.
+     */
     @Test
     public void theClassificationIsDecidedPerBuffClass() {
         Assertions.assertTrue(new DotBuff(attacker(), DamageElement.FIRE, 100, 2).isDebuff(),
@@ -166,7 +161,9 @@ public class DebuffTest {
                 "an event with no subject reads NaN, which fails every comparison instead of passing it");
     }
 
-    /** The count is the <b>subject's</b>: the rule's owner having debuffs of its own must not satisfy it. */
+    /**
+     * The count is the <b>subject's</b>: the rule's owner having debuffs of its own must not satisfy it.
+     */
     @Test
     public void theCountDoesNotReadTheRulesOwner() {
         Battle battle = withAlly(TriggerSpecs.rule("ALLY_ATTACK", List.of("target_debuff_count >= 1"), gain(1)));

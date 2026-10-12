@@ -1,9 +1,6 @@
 package com.laosun.aluminium.test.engine;
 
 
-import com.laosun.aluminium.test.support.TestTurns;
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
@@ -11,9 +8,12 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.DoubleValue;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.buff.ShieldBuff;
 import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TestTurns;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -42,10 +42,12 @@ import java.util.List;
 public class ShieldDurationTest {
     private static final double EPS = 1e-9;
 
-    /** The ally the shield lands on. Its table is emptied explicitly below, so no shipped content joins in. */
+    /**
+     * The ally the shield lands on. Its table is emptied explicitly below, so no shipped content joins in.
+     */
     private static final int ALLY = 1202;
     private static final int LEVEL = 80;
-        /**
+    /**
      * The speeds the fixture states outright.
      *
      * <p>Note: Not decoration: "持续N回合" is counted in the <b>carrier's</b> turns, so a test that takes "the caster's
@@ -60,7 +62,9 @@ public class ShieldDurationTest {
     // 1. The lifetime
     // ==================================================================
 
-    /** "持续2回合": the shield is up, survives one of its carrier's turns, and is gone after the second. */
+    /**
+     * "持续2回合": the shield is up, survives one of its carrier's turns, and is gone after the second.
+     */
     @Test
     public void aTimedShieldIsUpUntilItsCarriersTurnsAreSpent() {
         Fixture f = new Fixture(shieldRule(500, 2, "target"));
@@ -75,7 +79,9 @@ public class ShieldDurationTest {
         Assertions.assertEquals(0, f.ally.getShield(), EPS, "the second turn is the last one");
     }
 
-    /** Whose turns: the carrier's, not the caster's - "为指定我方单体提供…持续3回合的护盾". */
+    /**
+     * Whose turns: the carrier's, not the caster's - "为指定我方单体提供…持续3回合的护盾".
+     */
     @Test
     public void theCastersTurnsDoNotSpendTheShieldsDuration() {
         Fixture f = new Fixture(shieldRule(500, 1, "target"));
@@ -87,7 +93,9 @@ public class ShieldDurationTest {
                 "the shield is on the ally, so only the ally's turns count it down");
     }
 
-    /** A shield with no {@code turns} is the raw grant it always was: only being used up removes it. */
+    /**
+     * A shield with no {@code turns} is the raw grant it always was: only being used up removes it.
+     */
     @Test
     public void aShieldWithoutTurnsIsOnlyRemovedByBeingUsedUp() {
         Fixture f = new Fixture(shieldRule(500, null, "target"));
@@ -104,7 +112,9 @@ public class ShieldDurationTest {
         Assertions.assertEquals(0, f.ally.getShield(), EPS, "being used up does");
     }
 
-    /** A shield that has been partly drained still expires on schedule - its duration is not "until used up". */
+    /**
+     * A shield that has been partly drained still expires on schedule - its duration is not "until used up".
+     */
     @Test
     public void aPartlyUsedTimedShieldStillExpires() {
         Fixture f = new Fixture(shieldRule(500, 1, "target"));
@@ -135,7 +145,9 @@ public class ShieldDurationTest {
                 "the timed shield took off its own value, not the raw one that replaced it");
     }
 
-    /** Casting a second timed shield replaces the first, exactly like the value itself does. */
+    /**
+     * Casting a second timed shield replaces the first, exactly like the value itself does.
+     */
     @Test
     public void aSecondTimedShieldReplacesTheFirst() {
         Fixture f = new Fixture(shieldRule(500, 5, "target"), shieldRule(900, 1, "target"));
@@ -153,7 +165,9 @@ public class ShieldDurationTest {
     // 2. The condition: "持有护盾的…"
     // ==================================================================
 
-    /** {@code target has_shield} is true while a shield is up and false once it is gone. */
+    /**
+     * {@code target has_shield} is true while a shield is up and false once it is gone.
+     */
     @Test
     public void theConditionAsksWhetherTheShieldIsStillUp() {
         // Note: The shield is granted by hand rather than by a second rule in the same table: rules fire in order
@@ -171,7 +185,9 @@ public class ShieldDurationTest {
                 "a shield that has been used up is gone -- otherwise 「持有护盾的」 (one that holds a shield) would stay true forever");
     }
 
-    /** Its negation is the other half of the same question, and is read the same way. */
+    /**
+     * Its negation is the other half of the same question, and is read the same way.
+     */
     @Test
     public void theNegatedConditionAsksTheOpposite() {
         Fixture f = new Fixture(conditionRule("!target has_shield"));
@@ -182,7 +198,9 @@ public class ShieldDurationTest {
         Assertions.assertEquals(0, fireCondition(f), "and stops holding once one is up");
     }
 
-    /** Note: The subject decides whose shield is asked about: {@code self} is the rule's owner, not the event's target. */
+    /**
+     * Note: The subject decides whose shield is asked about: {@code self} is the rule's owner, not the event's target.
+     */
     @Test
     public void theConditionReadsTheSubjectItNames() {
         Fixture f = new Fixture(conditionRule("self has_shield"));
@@ -198,7 +216,9 @@ public class ShieldDurationTest {
     // 3. Fail fast
     // ==================================================================
 
-    /** Healing has no duration: HP comes back and stays back, so a {@code turns} there is a mistake. */
+    /**
+     * Healing has no duration: HP comes back and stays back, so a {@code turns} there is a mistake.
+     */
     @Test
     public void healingCannotClaimADuration() {
         EffectSpec heal = TriggerSpecs.heal(500, "target");
@@ -209,7 +229,9 @@ public class ShieldDurationTest {
         Assertions.assertTrue(rejected.getMessage().contains("HEAL"), rejected.getMessage());
     }
 
-    /** A timed shield needs a positive duration; "0 turns" is a shield that expires before it can be used. */
+    /**
+     * A timed shield needs a positive duration; "0 turns" is a shield that expires before it can be used.
+     */
     @Test
     public void aShieldWithANonPositiveDurationIsRejected() {
         IllegalArgumentException rejected = Assertions.assertThrows(IllegalArgumentException.class,
@@ -218,7 +240,9 @@ public class ShieldDurationTest {
         Assertions.assertTrue(rejected.getMessage().contains("turns"), rejected.getMessage());
     }
 
-    /** {@code has_shield} takes no argument, and the mistake is named rather than ignored. */
+    /**
+     * {@code has_shield} takes no argument, and the mistake is named rather than ignored.
+     */
     @Test
     public void hasShieldRejectsAnArgument() {
         IllegalArgumentException rejected = Assertions.assertThrows(IllegalArgumentException.class,
@@ -246,7 +270,9 @@ public class ShieldDurationTest {
     // helpers
     // ==================================================================
 
-    /** One battle: a caster with the rules under test, an ally to shield, and one enemy. */
+    /**
+     * One battle: a caster with the rules under test, an ally to shield, and one enemy.
+     */
     private static final class Fixture {
         private final Character caster;
         private final Character ally;
@@ -270,23 +296,31 @@ public class ShieldDurationTest {
             battle.startBattle();
         }
 
-        /** Fires the attack event with the ally as its subject -- the shield's target. */
+        /**
+         * Fires the attack event with the ally as its subject -- the shield's target.
+         */
         private int fire() {
             return battle.fireTriggers(TriggerEvent.ALLY_ATTACK, caster, ally, 1, 0);
         }
     }
 
-    /** Fires the same event and reports whether the condition-only rule matched. */
+    /**
+     * Fires the same event and reports whether the condition-only rule matched.
+     */
     private static int fireCondition(Fixture f) {
         return f.battle.fireTriggers(TriggerEvent.ALLY_ATTACK, f.caster, f.ally, 1, 0);
     }
 
-    /** A rule that shields the event's subject. */
+    /**
+     * A rule that shields the event's subject.
+     */
     private static TriggerSpec shieldRule(double amount, Integer turns, String target) {
         return TriggerSpecs.rule("ALLY_ATTACK", null, TriggerSpecs.shield(amount, turns, target));
     }
 
-    /** A rule gated on {@code condition}, whose effect is a fingerprint the caller counts (1 energy). */
+    /**
+     * A rule gated on {@code condition}, whose effect is a fingerprint the caller counts (1 energy).
+     */
     private static TriggerSpec conditionRule(String condition) {
         return TriggerSpecs.rule("ALLY_ATTACK", List.of(condition), TriggerSpecs.gainEnergy(1));
     }

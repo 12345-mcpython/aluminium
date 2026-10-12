@@ -1,8 +1,6 @@
 package com.laosun.aluminium.test.content.characters;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.AttributeType;
@@ -10,8 +8,10 @@ import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Damage;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -26,7 +26,10 @@ public class FuXuanTest {
     private static final int FUXUAN = 1208;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-        /** Note: [避厄]'s 18% reduction, in the measured convention: damage x (1 - 0.18), compared with a hand-built -36% rule. */
+
+    /**
+     * Note: [避厄]'s 18% reduction, in the measured convention: damage x (1 - 0.18), compared with a hand-built -36% rule.
+     */
     @Test
     public void misfortuneAvoidanceCutsTheDamageTheTeamTakes() {
         double plain = hitLoss(false);
@@ -40,7 +43,9 @@ public class FuXuanTest {
                 "18% against a hand-built 36% must be half the reduction");
     }
 
-    /** Note: [鉴知]: 6% of HER max HP as extra max HP, and +12% crit rate, on an ally. */
+    /**
+     * Note: [鉴知]: 6% of HER max HP as extra max HP, and +12% crit rate, on an ally.
+     */
     @Test
     public void knowledgeRaisesMaxHpByHerShareAndCritRate() {
         Character fuxuan = CharacterFactory.create(FUXUAN, LEVEL);
@@ -62,7 +67,9 @@ public class FuXuanTest {
                 "「暴击率提高12.00%」 (CRIT Rate is raised by 12.00%)");
     }
 
-    /** One fixed hit against an ally, with her talent active or not. */
+    /**
+     * One fixed hit against an ally, with her talent active or not.
+     */
     private static double hitLoss(boolean talent) {
         Character fuxuan = CharacterFactory.create(FUXUAN, LEVEL);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
@@ -77,7 +84,9 @@ public class FuXuanTest {
         return before - ally.getCurrentHp();
     }
 
-    /** The same hit with a hand-built -36% damage-taken rule, for the scale of comparison. */
+    /**
+     * The same hit with a hand-built -36% damage-taken rule, for the scale of comparison.
+     */
     private static double referenceHitLoss() {
         Character fuxuan = CharacterFactory.create(FUXUAN, LEVEL);
         EffectSpec effect = new EffectSpec();

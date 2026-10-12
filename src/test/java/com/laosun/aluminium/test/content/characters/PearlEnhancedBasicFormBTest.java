@@ -5,8 +5,8 @@ import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -31,7 +31,10 @@ public class PearlEnhancedBasicFormBTest {
     private static final int ELATION = 1502;
     private static final int HUNTER = 1204;
     private static final int OTHER = 1101;
-        /** The slot-9 form heals the whole party, and the lowest-HP ally a second time. */
+
+    /**
+     * The slot-9 form heals the whole party, and the lowest-HP ally a second time.
+     */
     @Test
     public void theSlotNineFormHealsThePartyAndTheLowestAllyAgain() {
         Battle battle = newBattle();
@@ -67,7 +70,9 @@ public class PearlEnhancedBasicFormBTest {
                 "and the lowest-HP ally is healed a second time, so it gains twice as much");
     }
 
-    /** A clean control: the same battle WITHOUT her Ultimate, so the ordinary basic is what attacks. */
+    /**
+     * A clean control: the same battle WITHOUT her Ultimate, so the ordinary basic is what attacks.
+     */
     @Test
     public void theOrdinaryBasicDoesNotHealTheParty() {
         Battle battle = newBattle();
@@ -88,14 +93,18 @@ public class PearlEnhancedBasicFormBTest {
     // Helpers
     // ==================================================================
 
-    /** Casts her COMMON skill at the first enemy through the engine's own skill request path. */
+    /**
+     * Casts her COMMON skill at the first enemy through the engine's own skill request path.
+     */
     private static void attack(Battle battle, Character pearl) {
         Enemy victim = battle.enemyUnits().getFirst();
         battle.requestSkill(pearl.getSkills().get(SkillType.COMMON), pearl, List.of(victim));
         battle.processRequests();
     }
 
-    /** Which slot a non-Elation archetype installs, read the same way the branch case reads it. */
+    /**
+     * Which slot a non-Elation archetype installs, read the same way the branch case reads it.
+     */
     private static int slotAfterUltimate() {
         Battle battle = newBattle();
         Character pearl = battle.characters.get(0);

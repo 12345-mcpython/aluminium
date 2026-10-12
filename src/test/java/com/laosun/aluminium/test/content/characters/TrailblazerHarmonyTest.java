@@ -6,8 +6,8 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -28,7 +28,10 @@ public class TrailblazerHarmonyTest {
     private static final int HARMONY = 8006;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-        /** [伴舞] lands on the whole side and carries the break-effect boost. */
+
+    /**
+     * [伴舞] lands on the whole side and carries the break-effect boost.
+     */
     @Test
     public void herUltimateGrantsDanceToEveryone() {
         Fixture f = new Fixture();
@@ -65,7 +68,9 @@ public class TrailblazerHarmonyTest {
                 "three of HER turns run the 3-turn state out, even on the allies carrying copies");
     }
 
-    /** The talent pays energy on any break, and Eidolon 4 passes her break effect to the others. */
+    /**
+     * The talent pays energy on any break, and Eidolon 4 passes her break effect to the others.
+     */
     @Test
     public void herTalentAndFourthEidolonAreAsStated() {
         Fixture f = new Fixture();
@@ -81,7 +86,9 @@ public class TrailblazerHarmonyTest {
                 "…and \"other than oneself\" means she is not boosted by it");
     }
 
-    /** The registered clauses stay registered. */
+    /**
+     * The registered clauses stay registered.
+     */
     @Test
     public void herFileCarriesWhatItSays() {
         Assertions.assertEquals(1, TriggerTables.of(HARMONY).ruleCount(TriggerEvent.ULT_CAST));
@@ -118,7 +125,7 @@ public class TrailblazerHarmonyTest {
          * One unit's <b>whole turn</b>, run through the engine rather than fired by hand.
          *
          * <p>Note: Both halves are needed, and that is the whole lesson of this case: a `TURN_START` fired by hand does not run
-         * the foreign-buff tick at all, and driving only `beforeMove` does not run it for a <b>late</b> buff either - 
+         * the foreign-buff tick at all, and driving only `beforeMove` does not run it for a <b>late</b> buff either -
          * `APPLY_BUFF` creates a late one, and "the Trailblazer's duration is reduced by 1 at the start of each of her turns" is delivered by
          * `tickForeignBuffs(actor, false)` inside `afterMove`. Two earlier versions of this case failed on exactly that.
          */

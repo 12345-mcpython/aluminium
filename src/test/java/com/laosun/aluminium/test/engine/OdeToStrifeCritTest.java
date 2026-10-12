@@ -7,8 +7,8 @@ import com.laosun.aluminium.models.Summon;
 import com.laosun.aluminium.models.buff.StateBuff;
 import com.laosun.aluminium.models.skill.Skill;
 import com.laosun.aluminium.models.skill.SkillExecutor;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -33,10 +33,12 @@ public class OdeToStrifeCritTest {
     private static final int LEVEL = 80;
     private static final int CYRENE = 1415;
     private static final int MYDEI = 1404;
-        private static final int ODE_TO_STRIFE = 16;
+    private static final int ODE_TO_STRIFE = 16;
     private static final String BLOODFEUD = "血仇";
 
-    /** The strike the ode commands, with every roll a crit, carries the crit-damage clause. */
+    /**
+     * The strike the ode commands, with every roll a crit, carries the crit-damage clause.
+     */
     @Test
     public void theCommandedStrikeCarriesTheCritBoost() {
         Character cyrene = CharacterFactory.create(CYRENE, LEVEL);
@@ -76,6 +78,8 @@ public class OdeToStrifeCritTest {
                 "「本次攻击中万敌的暴击伤害提高 #1[i]%」 (in this attack Mydei's CRIT DMG is raised by #1[i]%)-- on a crit, the boost is what this number is");
     }
 
-    /** Measured with the clause in place, and BEFORE the 10% toughness damage reduction an unbroken enemy takes. */
+    /**
+     * Measured with the clause in place, and BEFORE the 10% toughness damage reduction an unbroken enemy takes.
+     */
     private static final double EXPECTED_BEFORE_TOUGHNESS = 9080.729463951842;
 }

@@ -1,4 +1,4 @@
-package com.laosun.aluminium.models;
+package com.laosun.aluminium.models.trigger;
 
 import java.util.Locale;
 import java.util.Set;
@@ -56,7 +56,9 @@ public enum TriggerOperator {
     RAISE_SKILL_HITS(true),
     RAISE_SKILL_LEVEL(true),
     RAISE_SKILL_POINT_CAP(true),
-    /** Declared in the roadmap; its prerequisite phase has not landed, so nothing performs it. */
+    /**
+     * Declared in the roadmap; its prerequisite phase has not landed, so nothing performs it.
+     */
     REDUCE_TOUGHNESS(false),
     REMOVE_BUFF(true),
     REMOVE_RESOURCE(true),
@@ -93,7 +95,9 @@ public enum TriggerOperator {
         return wired;
     }
 
-    /** The mirror of {@link #isWired()}, named for the reader that asks this question. */
+    /**
+     * The mirror of {@link #isWired()}, named for the reader that asks this question.
+     */
     public boolean isPlanned() {
         return !wired;
     }
@@ -109,7 +113,9 @@ public enum TriggerOperator {
         return names(true);
     }
 
-    /** Every op declared but not yet performed -- see {@link #isWired()}. */
+    /**
+     * Every op declared but not yet performed -- see {@link #isWired()}.
+     */
     public static Set<String> plannedNames() {
         return names(false);
     }

@@ -6,18 +6,20 @@ import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Signal;
 import com.laosun.aluminium.models.buff.StateBuff;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-/** 1205's eidolon 2: "刃处于[地狱变]状态时，暴击率提高 15%". */
+/**
+ * 1205's eidolon 2: "刃处于[地狱变]状态时，暴击率提高 15%".
+ */
 public class BladeEidolonStateTest {
     private static final int WEARER = 1205;
     private static final int LEVEL = 80;
-        private static final String STATE = "地狱变";
+    private static final String STATE = "地狱变";
 
     @Test
     public void theSecondEidolonRaisesCritRateOnlyWhileTheStateHolds() {

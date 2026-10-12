@@ -1,8 +1,6 @@
 package com.laosun.aluminium.test.trigger;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
@@ -10,10 +8,12 @@ import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.buff.DotBuff;
 import com.laosun.aluminium.models.buff.StateBuff;
 import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -46,9 +46,13 @@ import java.util.Set;
  * </ul>
  */
 public class TriggerStateTest {
-    /** Himeko: no shipped rule file, so the table under test is the only one in the battle. */
+    /**
+     * Himeko: no shipped rule file, so the table under test is the only one in the battle.
+     */
     private static final int OWNER = 1003;
-    /** Tingyun: the "somebody else" whose state {@code target has_state} is asked about. */
+    /**
+     * Tingyun: the "somebody else" whose state {@code target has_state} is asked about.
+     */
     private static final int ALLY = 1202;
     private static final int LEVEL = 80;
 
@@ -277,7 +281,9 @@ public class TriggerStateTest {
                 "「removes ... the state」 works on the DoT names too -- one name, one meaning");
     }
 
-    /** Removing a state that is not there is nothing to do, not a failure. */
+    /**
+     * Removing a state that is not there is nothing to do, not a failure.
+     */
     @Test
     public void removingAStateThatIsNotThereIsQuiet() {
         Battle battle = battleWith(removeStateOn("ALLY_ATTACK", "蒙福者"));
@@ -287,7 +293,9 @@ public class TriggerStateTest {
         Assertions.assertFalse(owner.getBuffManager().hasState("蒙福者"));
     }
 
-    /** The op takes the state off entirely, so a count is refused rather than silently ignored. */
+    /**
+     * The op takes the state off entirely, so a count is refused rather than silently ignored.
+     */
     @Test
     public void removeStateRefusesAnAmount() {
         EffectSpec effect = new EffectSpec();
@@ -301,7 +309,9 @@ public class TriggerStateTest {
         Assertions.assertTrue(refused.getMessage().contains("amount"), refused.getMessage());
     }
 
-    /** …and the name is required, like every other op that names something. */
+    /**
+     * …and the name is required, like every other op that names something.
+     */
     @Test
     public void removeStateRequiresTheStateName() {
         EffectSpec effect = new EffectSpec();
@@ -338,7 +348,9 @@ public class TriggerStateTest {
                 "…and an enemy target is not: the rule must not fire on a cast aimed at the other side");
     }
 
-    /** {@code !target is_ally} is the opposite, and - like every negated party condition - fails with no target. */
+    /**
+     * {@code !target is_ally} is the opposite, and - like every negated party condition - fails with no target.
+     */
     @Test
     public void isAllyNegatedIsTheOtherSide() {
         Battle battle = withAlly(TriggerSpecs.rule("ALLY_ATTACK", List.of("!target is_ally"), gain(1)));
@@ -353,7 +365,9 @@ public class TriggerStateTest {
                 "no target at all is not \"the other side\" either");
     }
 
-    /** It takes no argument, so anything after the keyword is refused while the file is read. */
+    /**
+     * It takes no argument, so anything after the keyword is refused while the file is read.
+     */
     @Test
     public void isAllyTakesNoArgument() {
         IllegalArgumentException refused = Assertions.assertThrows(IllegalArgumentException.class,
@@ -393,7 +407,9 @@ public class TriggerStateTest {
                 "nobody else on the field is not 「at least one teammate exists」");
     }
 
-    /** A <b>dead</b> teammate is not somebody on the field - the same reading `summonsOf` uses. */
+    /**
+     * A <b>dead</b> teammate is not somebody on the field - the same reading `summonsOf` uses.
+     */
     @Test
     public void aDeadSamePathAllyDoesNotCount() {
         Battle battle = withAllyOf(1013, pathRule(gain(1)));
@@ -407,7 +423,9 @@ public class TriggerStateTest {
                 "a corpse is not 「a teammate on the same Path as the wearer」");
     }
 
-    /** {@code !self has_same_path_ally} is the opposite (and still needs a party to look at). */
+    /**
+     * {@code !self has_same_path_ally} is the opposite (and still needs a party to look at).
+     */
     @Test
     public void hasSamePathAllyCanBeNegated() {
         Battle battle = withAllyOf(1210, pathRule(gain(1)));
@@ -424,7 +442,9 @@ public class TriggerStateTest {
                 negated.fireTriggers(TriggerEvent.ALLY_ATTACK, negated.characters.getFirst(), null, 1, 0));
     }
 
-    /** The question is about MY side, so no other subject (and no argument) is accepted. */
+    /**
+     * The question is about MY side, so no other subject (and no argument) is accepted.
+     */
     @Test
     public void hasSamePathAllyTakesNoOtherSubject() {
         IllegalArgumentException refused = Assertions.assertThrows(IllegalArgumentException.class,
@@ -461,7 +481,9 @@ public class TriggerStateTest {
                 "a character has no weakness bar at all");
     }
 
-    /** A misspelled element is refused while the file is read, and the message lists the vocabulary. */
+    /**
+     * A misspelled element is refused while the file is read, and the message lists the vocabulary.
+     */
     @Test
     public void anUnknownWeaknessElementIsRefused() {
         IllegalArgumentException refused = Assertions.assertThrows(IllegalArgumentException.class,
@@ -579,7 +601,9 @@ public class TriggerStateTest {
         Assertions.assertEquals(1, battle.getSkillPoints(), "and it is the one that granted a point");
     }
 
-    /** A near miss is refused where the file is read, and the message lists the vocabulary. */
+    /**
+     * A near miss is refused where the file is read, and the message lists the vocabulary.
+     */
     @Test
     public void anUnknownPathNameIsRefused() {
         IllegalArgumentException rejected = Assertions.assertThrows(IllegalArgumentException.class,
@@ -648,7 +672,9 @@ public class TriggerStateTest {
     // Helpers
     // ==================================================================
 
-    /** A rule that puts {@code name} onto the owner for {@code turns} (or permanently) on {@code event}. */
+    /**
+     * A rule that puts {@code name} onto the owner for {@code turns} (or permanently) on {@code event}.
+     */
     private static TriggerSpec stateOp(String event, String name, Integer turns, Boolean permanent) {
         EffectSpec effect = new EffectSpec();
         TriggerSpecs.set(effect, "op", "APPLY_BUFF");
@@ -658,7 +684,9 @@ public class TriggerStateTest {
         return TriggerSpecs.rule(event, null, effect);
     }
 
-    /** A rule that takes the named state off the resolved targets (default: the owner). */
+    /**
+     * A rule that takes the named state off the resolved targets (default: the owner).
+     */
     private static TriggerSpec removeStateOn(String event, String name) {
         EffectSpec effect = new EffectSpec();
         TriggerSpecs.set(effect, "op", "REMOVE_STATE");
@@ -673,7 +701,9 @@ public class TriggerStateTest {
         return effect;
     }
 
-    /** The remaining duration of a named state, or {@code null} when it is not attached. */
+    /**
+     * The remaining duration of a named state, or {@code null} when it is not attached.
+     */
     private static Integer stateDuration(Character who, String name) {
         for (StateBuff buff : who.getBuffManager().allBuffsOf(StateBuff.class)) {
             if (name.equals(buff.getState())) {
@@ -689,7 +719,9 @@ public class TriggerStateTest {
         return battle;
     }
 
-    /** The same, but with a chosen ally - the Path comparison needs control over who is beside the owner. */
+    /**
+     * The same, but with a chosen ally - the Path comparison needs control over who is beside the owner.
+     */
     private static Battle withAllyOf(int allyCid, TriggerSpec... specs) {
         Battle battle = new Battle(List.of(ownerWith(specs), CharacterFactory.create(allyCid, LEVEL)),
                 List.of(dummy()), BattleFixture.seeded());
@@ -697,7 +729,9 @@ public class TriggerStateTest {
         return battle;
     }
 
-    /** A rule that fires when the party contains somebody on the wearer's Path. */
+    /**
+     * A rule that fires when the party contains somebody on the wearer's Path.
+     */
     private static TriggerSpec pathRule(EffectSpec effect) {
         return TriggerSpecs.rule("ALLY_ATTACK", List.of("self has_same_path_ally"), effect);
     }
@@ -715,7 +749,9 @@ public class TriggerStateTest {
         return owner;
     }
 
-    /** Fires the event with the owner as actor and returns how many rules really ran. */
+    /**
+     * Fires the event with the owner as actor and returns how many rules really ran.
+     */
     private static int fire(Battle battle, Character actor) {
         return fire(battle, actor, TriggerEvent.ALLY_ATTACK);
     }

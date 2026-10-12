@@ -1,17 +1,17 @@
 package com.laosun.aluminium.test.engine;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
+import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.skill.Skill;
 import com.laosun.aluminium.models.skill.SkillExecutor;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
-import com.laosun.aluminium.enums.SkillType;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -30,18 +30,22 @@ import java.util.List;
 public class PeerageDispelsControlTest {
     private static final int OWNER = 1412;
     private static final int ALLY = 1002;
-        private static final String FREEZE = "冻结";
+    private static final String FREEZE = "冻结";
     private static final String SHOCK = "电触";
     private static final String PEERAGE = "爵位";
 
-    /** Promotion strips the control and keeps everything else. */
+    /**
+     * Promotion strips the control and keeps everything else.
+     */
     @Test
     public void promotionDispelsTheControlOnly() {
         Assertions.assertFalse(stateAfter(FREEZE, 6), "「remove their control-class negative states」 -- Frozen must be gone");
         Assertions.assertTrue(stateAfter(SHOCK, 6), "Note: a DOT is not a control, so it must survive");
     }
 
-    /** Note: Below the threshold there is no promotion, so the control stays. */
+    /**
+     * Note: Below the threshold there is no promotion, so the control stays.
+     */
     @Test
     public void belowSixChargeTheControlStays() {
         Assertions.assertTrue(stateAfter(FREEZE, 1), "one cast is not a promotion");

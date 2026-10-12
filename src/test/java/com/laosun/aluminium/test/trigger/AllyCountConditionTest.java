@@ -1,15 +1,15 @@
 package com.laosun.aluminium.test.trigger;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Signal;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -27,7 +27,9 @@ public class AllyCountConditionTest {
     private static final int WEARER = 1001;
     private static final int TEAMMATE = 1002;
     private static final int LEVEL = 80;
-        /** Note: Measured: a battle opens with 3 skill points. */
+    /**
+     * Note: Measured: a battle opens with 3 skill points.
+     */
     private static final int OPENING = 3;
 
     @Test
@@ -42,7 +44,9 @@ public class AllyCountConditionTest {
         Assertions.assertEquals(OPENING, points(2, true), "with two the same rule must not fire");
     }
 
-    /** Skill points after the wearer's turn starts, with the given number of allies, with or without the rule. */
+    /**
+     * Skill points after the wearer's turn starts, with the given number of allies, with or without the rule.
+     */
     private static int points(int allies, boolean withRule) {
         Character wearer = CharacterFactory.create(WEARER, LEVEL);
         if (withRule) {

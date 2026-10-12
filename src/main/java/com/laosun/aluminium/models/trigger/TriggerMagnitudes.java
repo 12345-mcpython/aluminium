@@ -1,14 +1,17 @@
-package com.laosun.aluminium.models;
+package com.laosun.aluminium.models.trigger;
 
-import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.DamageType;
 import com.laosun.aluminium.enums.SkillType;
-import com.laosun.aluminium.models.TriggerTable.TriggerContext;
+import com.laosun.aluminium.models.CanHit;
+import com.laosun.aluminium.models.Character;
+import com.laosun.aluminium.models.DoubleValue;
+import com.laosun.aluminium.models.Summon;
 import com.laosun.aluminium.models.skill.Skill;
+import com.laosun.aluminium.models.trigger.TriggerTable.TriggerContext;
 
 import java.util.Locale;
 
@@ -182,7 +185,7 @@ final class TriggerMagnitudes {
             if (TriggerInterpreter.ATTACKER_ELEMENT.equalsIgnoreCase(named)) {
                 // `getElement()` lives on Character, not on CanHit: a summon's element comes from its
                 // master, and the loose test would have to guess it, so a non-character answers null.
-                return attacker instanceof Character character ? character.getElement() : null;
+                return attacker instanceof com.laosun.aluminium.models.Character character ? character.getElement() : null;
             }
             return DamageElement.fromString(named);
         }
@@ -302,7 +305,7 @@ final class TriggerMagnitudes {
             }
             return victim.getMaxHp() * percent;
         }
-        Character owner = requireCharacterOwner(null, ctx);
+        com.laosun.aluminium.models.Character owner = requireCharacterOwner(null, ctx);
         if ("self_max_energy".equals(key) || "owner_max_energy".equals(key)) {
             return percent * owner.getMaxEnergy();
         }
@@ -370,7 +373,7 @@ final class TriggerMagnitudes {
     static double shareOf(EffectSpec effect, TriggerContext ctx) {
         // A share CARRIED IN A RESOURCE, in basis points: how a number captured at cast time is used later.
         if (effect.getPercentFromResource() != null) {
-            Character holder = requireCharacterOwner(effect, ctx);
+            com.laosun.aluminium.models.Character holder = requireCharacterOwner(effect, ctx);
             return holder.getResources().value(effect.getPercentFromResource().trim()) / 10000.0;
         }
         if (effect.getPercent() != null) {
@@ -466,7 +469,7 @@ final class TriggerMagnitudes {
             double points = ctx.battle() == null ? 0 : ctx.battle().countedLaughPoints();
             return effect.getPercent() * points + (effect.getAmount() == null ? 0 : effect.getAmount());
         }
-        Character owner = requireCharacterOwner(effect, ctx);
+        com.laosun.aluminium.models.Character owner = requireCharacterOwner(effect, ctx);
         // Note: `stackScale` takes a primitive, so handing it `effect.getPercent()` unboxes a null the moment a rule states
         // its share as `percent_from_cast_param` instead. The share is what the counter multiplies, so ask for it the one way.
         Double fromStacks = stackScale(effect.getScale(), shareOf(effect, ctx), ctx);
@@ -678,8 +681,8 @@ final class TriggerMagnitudes {
      * the engine grew a second kind of table owner and this op needs a story for it. That is worth an
      * exception rather than a silent skip - {@code SUMMON} would otherwise simply do nothing.
      */
-    static Character requireCharacterOwner(EffectSpec effect, TriggerContext ctx) {
-        if (ctx.owner() instanceof Character character) {
+    static com.laosun.aluminium.models.Character requireCharacterOwner(EffectSpec effect, TriggerContext ctx) {
+        if (ctx.owner() instanceof com.laosun.aluminium.models.Character character) {
             return character;
         }
         throw new IllegalStateException(
@@ -764,10 +767,10 @@ final class TriggerMagnitudes {
      */
     static double ownerSkillParamValue(EffectSpec effect, TriggerContext ctx, String spelled) {
         // a share may name ANOTHER character's row: the field says whose, and the slot stays a legal SkillType so the loader check still means something
-        Character owner;
+        com.laosun.aluminium.models.Character owner;
         if (effect.getSkillParamCid() != null) {
             CanHit found = TriggerTargets.allyWithCid(ctx, effect.getSkillParamCid());
-            if (!(found instanceof Character)) {
+            if (!(found instanceof com.laosun.aluminium.models.Character)) {
                 throw new IllegalStateException("the share names cid " + effect.getSkillParamCid()
                         + ", which is not a character in this battle's party");
             }

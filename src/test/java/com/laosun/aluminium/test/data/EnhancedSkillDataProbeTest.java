@@ -26,7 +26,9 @@ public class EnhancedSkillDataProbeTest {
     private static final int LUKA_ENHANCED_ROW = 111108;
     private static final int LEVEL = 10;
 
-    /** Note: The row exists in the data dump (130108 = Normal/SingleAttack), so a real row must load as NORMAL. */
+    /**
+     * Note: The row exists in the data dump (130108 = Normal/SingleAttack), so a real row must load as NORMAL.
+     */
     @Test
     public void gallaghersEnhancedRowLoadsRealData() {
         Skill enhanced = new DefaultSkill(GALLAGHER, GALLAGHER_ENHANCED_ROW, LEVEL);
@@ -37,7 +39,9 @@ public class EnhancedSkillDataProbeTest {
                         + "⚠ It is why the two REPLACE_SKILL clauses were withdrawn: they installed a no-op.");
     }
 
-    /** The same question for 1111's [直冲碎天拳]. */
+    /**
+     * The same question for 1111's [直冲碎天拳].
+     */
     @Test
     public void lukasEnhancedRowLoadsRealData() {
         Skill enhanced = new DefaultSkill(LUKA, LUKA_ENHANCED_ROW, LEVEL);
@@ -45,7 +49,9 @@ public class EnhancedSkillDataProbeTest {
                 "the same measured fact for 111108");
     }
 
-    /** Note: The positive half of the same question: the LOADER KEY is a slot, and slot 8 is the enhanced attack. */
+    /**
+     * Note: The positive half of the same question: the LOADER KEY is a slot, and slot 8 is the enhanced attack.
+     */
     @Test
     public void theEnhancedAttackLoadsUnderItsSlot() {
         Assertions.assertEquals(SkillCategory.NORMAL, new DefaultSkill(GALLAGHER, 8, LEVEL).getData().getCategory(),
@@ -54,7 +60,9 @@ public class EnhancedSkillDataProbeTest {
                 "the same slot for 1111's 【直冲碎天拳】 (Sky-Shatter Fist)");
     }
 
-    /** Control: an ordinary slot row loads real data, so the probe can tell the two apart. */
+    /**
+     * Control: an ordinary slot row loads real data, so the probe can tell the two apart.
+     */
     @Test
     public void anOrdinaryRowLoadsRealData() {
         Skill ordinary = new DefaultSkill(GALLAGHER, 130101, LEVEL);

@@ -4,22 +4,15 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.laosun.aluminium.beans.RelicSet;
 import com.laosun.aluminium.beans.TriggerSpec;
-import com.laosun.aluminium.models.TriggerTable;
+import com.laosun.aluminium.models.trigger.TriggerTable;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.io.IOException;
 import java.lang.reflect.Type;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.NavigableMap;
-import java.util.Set;
-import java.util.TreeMap;
+import java.util.*;
 
 /**
  * Loads relic-set trigger rules from {@code resources/relic_sets/<setId>.json}.
@@ -370,7 +363,7 @@ public final class RelicTriggerTables {
      * Turns the registry's {@code "set id" to entries} map into a flat, validated list.
      *
      * <p>Public for the same reason as {@link #parse}: the rejections must be testable on hand-made
-     * data. Every entry is required to name a set, a piece count, an ability and a <b>reason</b> - 
+     * data. Every entry is required to name a set, a piece count, an ability and a <b>reason</b> -
      * an entry without a reason would be a gap nobody can act on.
      *
      * @param parsed the parsed registry, possibly {@code null}

@@ -1,8 +1,6 @@
 package com.laosun.aluminium.test.trigger;
 
 
-import com.laosun.aluminium.test.support.TestCharacters;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
@@ -15,8 +13,10 @@ import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.DoubleValue;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
-import com.laosun.aluminium.models.TriggerInterpreter;
-import com.laosun.aluminium.models.TriggerTable;
+import com.laosun.aluminium.models.trigger.TriggerInterpreter;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TestCharacters;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -101,7 +101,9 @@ public class TriggerTableTest {
         assertEnergyEquals(gained, 1.5 * 3, "1.5 per target x 3 targets");
     }
 
-    /** One target hit => exactly 1.5 (the same rule, smaller count). */
+    /**
+     * One target hit => exactly 1.5 (the same rule, smaller count).
+     */
     @Test
     public void tribbieScalesWithTheNumberOfTargets() {
         Character tribbie = CharacterFactory.create(TRIBBIE, 80);
@@ -157,7 +159,9 @@ public class TriggerTableTest {
                 "only the base skill energy: the talent must not fire on Robin's own attack");
     }
 
-    /** The same exclusion for Tribbie: her own attack must not feed her trace. */
+    /**
+     * The same exclusion for Tribbie: her own attack must not feed her trace.
+     */
     @Test
     public void tribbieDoesNotTriggerOnHerOwnAttack() {
         Character tribbie = CharacterFactory.create(TRIBBIE, 80);
@@ -189,7 +193,7 @@ public class TriggerTableTest {
         // so it reads 0.0. Replacing a table is usually a trap (it deletes the rule under test), but here the
         // empty table IS the subject, which is exactly why it is the right construction.
         Character plain = CharacterFactory.create(1002, 80);
-        plain.setTriggerTable(new com.laosun.aluminium.models.TriggerTable(1002, java.util.List.of()));
+        plain.setTriggerTable(new TriggerTable(1002, java.util.List.of()));
         Assertions.assertTrue(plain.getTriggerTable().isEmpty(), "the table really is empty");
         // The file-less property is a separate fact and keeps its own witness (1506 is a key of character_data.json with no file).
         Assertions.assertFalse(TriggerTables.exists(NO_TRIGGERS), "and no resource either");
@@ -204,7 +208,9 @@ public class TriggerTableTest {
                 "an empty table changes nothing");
     }
 
-    /** Tables are cached: asking twice must not read the classpath twice. */
+    /**
+     * Tables are cached: asking twice must not read the classpath twice.
+     */
     @Test
     public void tablesAreLoadedOncePerCid() {
         TriggerTables.clearCache();
@@ -252,7 +258,9 @@ public class TriggerTableTest {
     // 4. Fail fast: a bad table is rejected at load, not silently ignored
     // ==================================================================
 
-    /** An unknown event name is a typo and must be reported, not skipped. */
+    /**
+     * An unknown event name is a typo and must be reported, not skipped.
+     */
     @Test
     public void unknownEventIsRejected() {
         IllegalArgumentException e = Assertions.assertThrows(IllegalArgumentException.class,
@@ -306,7 +314,9 @@ public class TriggerTableTest {
                 .orElse(null);
     }
 
-    /** An unknown condition variable is rejected rather than evaluating to false forever. */
+    /**
+     * An unknown condition variable is rejected rather than evaluating to false forever.
+     */
     @Test
     public void unknownConditionVariableIsRejected() {
         IllegalArgumentException e = Assertions.assertThrows(IllegalArgumentException.class,
@@ -314,7 +324,9 @@ public class TriggerTableTest {
         Assertions.assertTrue(e.getMessage().contains("hp"), e.getMessage());
     }
 
-    /** A malformed condition is rejected. */
+    /**
+     * A malformed condition is rejected.
+     */
     @Test
     public void malformedConditionIsRejected() {
         Assertions.assertThrows(IllegalArgumentException.class,
@@ -364,7 +376,9 @@ public class TriggerTableTest {
         Assertions.assertTrue(twoVariables.getMessage().contains("two variables"), twoVariables.getMessage());
     }
 
-    /** An unknown op is rejected. */
+    /**
+     * An unknown op is rejected.
+     */
     @Test
     public void unknownOpIsRejected() {
         IllegalArgumentException e = Assertions.assertThrows(IllegalArgumentException.class,
@@ -387,7 +401,9 @@ public class TriggerTableTest {
         Assertions.assertTrue(e.getMessage().contains("roadmap"), e.getMessage());
     }
 
-    /** A required argument that is missing is reported. */
+    /**
+     * A required argument that is missing is reported.
+     */
     @Test
     public void missingArgumentIsRejected() {
         IllegalArgumentException e = Assertions.assertThrows(IllegalArgumentException.class,
@@ -395,7 +411,9 @@ public class TriggerTableTest {
         Assertions.assertTrue(e.getMessage().contains("amount"), e.getMessage());
     }
 
-    /** A rule with no effects is meaningless and is rejected. */
+    /**
+     * A rule with no effects is meaningless and is rejected.
+     */
     @Test
     public void ruleWithoutEffectsIsRejected() {
         Assertions.assertThrows(IllegalArgumentException.class,
@@ -406,7 +424,9 @@ public class TriggerTableTest {
     // 4b. MODIFY_ATTR: the generic stat buff
     // ==================================================================
 
-    /** The op writes a real modifier onto the owner's attribute. */
+    /**
+     * The op writes a real modifier onto the owner's attribute.
+     */
     @Test
     public void modifyAttrOpBuffsTheOwner() {
         Character owner = character("owner");
@@ -451,7 +471,8 @@ public class TriggerTableTest {
      * debuff does not silently overwrite a buff on the same stat.
      */
     @Test
-    public void negativePercentBecomesADebuff() {        Character owner = character("owner");
+    public void negativePercentBecomesADebuff() {
+        Character owner = character("owner");
 
         fireAttr(null, owner, owner, attrOp(AttributeType.DEFENCE, -0.25, 2, null));
 
@@ -463,7 +484,9 @@ public class TriggerTableTest {
                 .filterBySource(DoubleValue.Modifier.ModifierSource.DEBUFF).size());
     }
 
-    /** {@code target: "target"} sends the buff to the event's subject instead of the table's owner. */
+    /**
+     * {@code target: "target"} sends the buff to the event's subject instead of the table's owner.
+     */
     @Test
     public void modifyAttrOpCanTargetTheEventsSubject() {
         Character owner = character("owner");
@@ -495,7 +518,9 @@ public class TriggerTableTest {
         }
     }
 
-    /** {@code all_allies} needs a battle to take the party from; without one it must say so. */
+    /**
+     * {@code all_allies} needs a battle to take the party from; without one it must say so.
+     */
     @Test
     public void allAlliesWithoutABattleFailsLoudly() {
         Character owner = character("owner");
@@ -507,7 +532,9 @@ public class TriggerTableTest {
         Assertions.assertTrue(e.getMessage().contains("no battle"), e.getMessage());
     }
 
-    /** A misspelled attribute is a load-time error, not a silently missing buff. */
+    /**
+     * A misspelled attribute is a load-time error, not a silently missing buff.
+     */
     @Test
     public void modifyAttrOpRejectsAnUnknownAttribute() {
         IllegalArgumentException e = Assertions.assertThrows(IllegalArgumentException.class,
@@ -527,7 +554,9 @@ public class TriggerTableTest {
         Assertions.assertTrue(e.getMessage().contains("ATTACK_PERCENT"), e.getMessage());
     }
 
-    /** No duration default exists, for the same reason {@code damage_param} has none. */
+    /**
+     * No duration default exists, for the same reason {@code damage_param} has none.
+     */
     @Test
     public void modifyAttrOpRequiresTurns() {
         IllegalArgumentException e = Assertions.assertThrows(IllegalArgumentException.class,
@@ -535,7 +564,9 @@ public class TriggerTableTest {
         Assertions.assertTrue(e.getMessage().contains("turns"), e.getMessage());
     }
 
-    /** A zero-turn buff would expire before it could do anything, so it is rejected. */
+    /**
+     * A zero-turn buff would expire before it could do anything, so it is rejected.
+     */
     @Test
     public void modifyAttrOpRejectsNonPositiveTurns() {
         IllegalArgumentException e = Assertions.assertThrows(IllegalArgumentException.class,
@@ -573,7 +604,9 @@ public class TriggerTableTest {
     // 5. Conditions behave as the data implies
     // ==================================================================
 
-    /** {@code actor != self} lets an ally's attack through and blocks the owner's own. */
+    /**
+     * {@code actor != self} lets an ally's attack through and blocks the owner's own.
+     */
     @Test
     public void conditionsDiscriminateBetweenSelfAndOthers() {
         TriggerTable table = new TriggerTable(1, List.of(
@@ -583,17 +616,19 @@ public class TriggerTableTest {
         Character other = CharacterFactory.create(1002, 80);
 
         Assertions.assertEquals(1, table.matching(TriggerEvent.ALLY_ATTACK,
-                new TriggerTable.TriggerContext(owner, other, null, 1, 0)).size(),
+                        new TriggerTable.TriggerContext(owner, other, null, 1, 0)).size(),
                 "an ally's attack matches");
         Assertions.assertEquals(0, table.matching(TriggerEvent.ALLY_ATTACK,
-                new TriggerTable.TriggerContext(owner, owner, null, 1, 0)).size(),
+                        new TriggerTable.TriggerContext(owner, owner, null, 1, 0)).size(),
                 "the owner's own attack is excluded");
         Assertions.assertEquals(0, table.matching(TriggerEvent.ALLY_ATTACK,
-                new TriggerTable.TriggerContext(owner, other, null, 0, 0)).size(),
+                        new TriggerTable.TriggerContext(owner, other, null, 0, 0)).size(),
                 "and an attack that hit nothing is excluded by hit_count > 0");
     }
 
-    /** The literal may sit on either side of a numeric comparison. */
+    /**
+     * The literal may sit on either side of a numeric comparison.
+     */
     @Test
     public void numericConditionAcceptsEitherOperandOrder() {
         TriggerTable left = new TriggerTable(1, List.of(
@@ -612,7 +647,9 @@ public class TriggerTableTest {
         Assertions.assertEquals(0, right.matching(TriggerEvent.ALLY_ATTACK, noHit).size());
     }
 
-    /** The bare {@code self} shorthand means "the actor is me". */
+    /**
+     * The bare {@code self} shorthand means "the actor is me".
+     */
     @Test
     public void bareSelfShorthandMeansTheActorIsMe() {
         TriggerTable table = new TriggerTable(1, List.of(
@@ -646,7 +683,9 @@ public class TriggerTableTest {
         return battle;
     }
 
-    /** A single-target basic attack, settled immediately. */
+    /**
+     * A single-target basic attack, settled immediately.
+     */
     private static void strike(Battle battle, Character attacker, CanHit target) {
         battle.castImmediate(attacker.getSkills().get(SkillType.COMMON), attacker, List.of(target));
     }
@@ -674,7 +713,9 @@ public class TriggerTableTest {
         Assertions.assertEquals(expected, actual, 1e-6, why);
     }
 
-    /** Builds a raw rule for the validation tests. */
+    /**
+     * Builds a raw rule for the validation tests.
+     */
     private static TriggerSpec trigger(String on, List<String> when, EffectSpec effect) {
         TriggerSpec spec = new TriggerSpec();
         set(spec, "on", on);
@@ -692,7 +733,9 @@ public class TriggerTableTest {
 
     // ---- MODIFY_ATTR helpers ----
 
-    /** hp 1000 / def 200 / atk 300 / speed 100 - all different, so a mix-up shows up as a number. */
+    /**
+     * hp 1000 / def 200 / atk 300 / speed 100 - all different, so a mix-up shows up as a number.
+     */
     private static Character character(String name) {
         return Character.fromAttributes(name, 1000, 200, 300, 100);
     }
@@ -702,7 +745,9 @@ public class TriggerTableTest {
         return attrOp(attribute.name(), percent, turns, target);
     }
 
-    /** The name-taking overload exists so the "unknown attribute" tests can pass a literal. */
+    /**
+     * The name-taking overload exists so the "unknown attribute" tests can pass a literal.
+     */
     private static EffectSpec attrOp(String attributeName, double percent, Integer turns,
                                      String target) {
         EffectSpec effect = new EffectSpec();
@@ -714,7 +759,9 @@ public class TriggerTableTest {
         return effect;
     }
 
-    /** A one-rule table that fires on any skill cast, so the tests exercise load-time validation. */
+    /**
+     * A one-rule table that fires on any skill cast, so the tests exercise load-time validation.
+     */
     private static TriggerTable table(EffectSpec effect) {
         TriggerSpec spec = new TriggerSpec();
         set(spec, "on", "SKILL_CAST");

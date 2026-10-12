@@ -150,24 +150,24 @@ public abstract class AbstractBuff implements Buff, AttackEvent, SkillCastEvent 
          * does, as {@code BOOST_DAMAGE}) -- so this is the shape that states what the documents state.
          */
         CAST_END,
-    /**
-     * Until the carrier's own turn ends (cone 23053's "若在同一回合内消耗 >= 4 个战技点"
-     * and cone 23061's "我方任意角色在自身同一回合内累计消耗…").
-     *
-     * <p>The symmetric partner of {@link #CAST_END}: that one scopes a value to one cast, this one to one turn. It is
-     * swept by {@code BuffManager.afterMove}, which is the carrier's OWN turn end -- the tick point that already advances
-     * every duration, so no battle handle is needed. Measured: a plain {@code turns: 1} stack is NOT
-     * cleared by beforeMove / afterMove / tickForeign, so "同一回合内" had no spelling at all.
-     */
-    TURN_END,
-    
-    /**
-     * "持续至下一个…回合开始时" (1405's [真知], whose text is "持续至下一个那刻夏回合开始时").
-     *
-     * <p>Ends when the OWNER's own turn starts, which is neither `TURN_END` (the end of the current turn, too early when the buff is granted during that turn) nor `NEXT_ATTACK` (ends when
-     * the owner next lands an attack, which the sentence does not say).
-     */
-    NEXT_TURN_START
+        /**
+         * Until the carrier's own turn ends (cone 23053's "若在同一回合内消耗 >= 4 个战技点"
+         * and cone 23061's "我方任意角色在自身同一回合内累计消耗…").
+         *
+         * <p>The symmetric partner of {@link #CAST_END}: that one scopes a value to one cast, this one to one turn. It is
+         * swept by {@code BuffManager.afterMove}, which is the carrier's OWN turn end -- the tick point that already advances
+         * every duration, so no battle handle is needed. Measured: a plain {@code turns: 1} stack is NOT
+         * cleared by beforeMove / afterMove / tickForeign, so "同一回合内" had no spelling at all.
+         */
+        TURN_END,
+
+        /**
+         * "持续至下一个…回合开始时" (1405's [真知], whose text is "持续至下一个那刻夏回合开始时").
+         *
+         * <p>Ends when the OWNER's own turn starts, which is neither `TURN_END` (the end of the current turn, too early when the buff is granted during that turn) nor `NEXT_ATTACK` (ends when
+         * the owner next lands an attack, which the sentence does not say).
+         */
+        NEXT_TURN_START
     }
 
     /**
@@ -276,12 +276,16 @@ public abstract class AbstractBuff implements Buff, AttackEvent, SkillCastEvent 
      */
     private boolean keepsSiblings;
 
-    /** Whether this buff asks not to evict others of its kind. */
+    /**
+     * Whether this buff asks not to evict others of its kind.
+     */
     public boolean keepsSiblings() {
         return keepsSiblings;
     }
 
-    /** Sets the ask (see {@link #keepsSiblings()}). */
+    /**
+     * Sets the ask (see {@link #keepsSiblings()}).
+     */
     public void setKeepsSiblings(boolean keeps) {
         this.keepsSiblings = keeps;
     }

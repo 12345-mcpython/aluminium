@@ -1,8 +1,6 @@
 package com.laosun.aluminium.test.engine;
 
 
-import com.laosun.aluminium.test.content.memosprites.AglaeaMemospriteTest;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.models.CanHit;
 import com.laosun.aluminium.models.Character;
@@ -11,6 +9,7 @@ import com.laosun.aluminium.models.Summon;
 import com.laosun.aluminium.models.buff.StateBuff;
 import com.laosun.aluminium.models.skill.Skill;
 import com.laosun.aluminium.models.skill.SkillExecutor;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -34,11 +33,13 @@ public class OdeToStrifeAdvanceTest {
     private static final int LEVEL = 80;
     private static final int CYRENE = 1415;
     private static final int MYDEI = 1404;
-        private static final int ODE_TO_STRIFE = 16;
+    private static final int ODE_TO_STRIFE = 16;
     private static final double EPS = 1e-6;
     private static final String BLOODFEUD = "血仇";
 
-    /** Outside [血仇] (Bloodfeud) he is advanced: his remaining action value collapses. */
+    /**
+     * Outside [血仇] (Bloodfeud) he is advanced: his remaining action value collapses.
+     */
     @Test
     public void outsideBloodfeudTheOdeAdvancesHim() {
         Character mydei = scene(false);
@@ -54,7 +55,9 @@ public class OdeToStrifeAdvanceTest {
                 "「then advance Mydei's action by #2[i]%」-- 100%, so his action value collapses toward zero");
     }
 
-    /** In [血仇] (Bloodfeud) the other branch runs instead -- the two halves are mutually exclusive. */
+    /**
+     * In [血仇] (Bloodfeud) the other branch runs instead -- the two halves are mutually exclusive.
+     */
     @Test
     public void inBloodfeudItCommandsInsteadOfAdvancing() {
         Character mydei = scene(true);
@@ -76,7 +79,9 @@ public class OdeToStrifeAdvanceTest {
     private Battle battle;
     private Summon lastSummon;
 
-    /** The scene both cases share: Cyrene (昔涟), Mydei (万敌) and her memosprite, with [血仇] stated or not. */
+    /**
+     * The scene both cases share: Cyrene (昔涟), Mydei (万敌) and her memosprite, with [血仇] stated or not.
+     */
     private Character scene(boolean inBloodfeud) {
         Character cyrene = CharacterFactory.create(CYRENE, LEVEL);
         Character mydei = CharacterFactory.create(MYDEI, LEVEL);
@@ -94,7 +99,9 @@ public class OdeToStrifeAdvanceTest {
         return mydei;
     }
 
-    /** How much action value the unit still has -- zero means "acts now" (the shipped reader). */
+    /**
+     * How much action value the unit still has -- zero means "acts now" (the shipped reader).
+     */
     private static double timeRemaining(Battle battle, CanHit target) {
         for (Signal signal : battle.queue.snapshot()) {
             if (signal.getCanHit() == target) {

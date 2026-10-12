@@ -1,4 +1,5 @@
 package com.laosun.aluminium.test.content.characters;
+
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.DamageType;
@@ -7,13 +8,16 @@ import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Damage;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
 import java.util.List;
 
-/** Character 1503 (Pearl): the art barrier only lands on an Elation archetype, and the talent's reduction tracks the HP threshold. */
+/**
+ * Character 1503 (Pearl): the art barrier only lands on an Elation archetype, and the talent's reduction tracks the HP threshold.
+ */
 public class PearlArtBarrierAndTalentTest {
     private static final int PEARL = 1503;
     private static final int ELATION = 1502;   // Yao Guang, Elation

@@ -25,11 +25,15 @@ import lombok.Getter;
  */
 public class RegenBuff extends AbstractBuff {
 
-    /** Who applied it - the healer whose {@code OUTGOING_HEALING_BOOST} and whose stats the amount was derived from. */
+    /**
+     * Who applied it - the healer whose {@code OUTGOING_HEALING_BOOST} and whose stats the amount was derived from.
+     */
     @Getter
     private final CanHit source;
 
-    /** The flat amount settled each turn (already derived when the rule fired, and held). */
+    /**
+     * The flat amount settled each turn (already derived when the rule fired, and held).
+     */
     @Getter
     private final double baseHeal;
 
@@ -47,13 +51,17 @@ public class RegenBuff extends AbstractBuff {
         setBuffName(name);
     }
 
-    /** Note: Only the duration: the healing is settled by {@code Battle.tickRegens}, where the healer and the zones are. */
+    /**
+     * Note: Only the duration: the healing is settled by {@code Battle.tickRegens}, where the healer and the zones are.
+     */
     @Override
     public void tickEffect(CanHit owner) {
         decreaseDuration();
     }
 
-    /** A regeneration never stops its owner from acting: it is a benefit, not a state. */
+    /**
+     * A regeneration never stops its owner from acting: it is a benefit, not a state.
+     */
     @Override
     public boolean canAct() {
         return true;
@@ -69,7 +77,9 @@ public class RegenBuff extends AbstractBuff {
         // deliberately nothing: the healing already happened, turn by turn
     }
 
-    /** A second cast restarts the same regeneration instead of adding another one. */
+    /**
+     * A second cast restarts the same regeneration instead of adding another one.
+     */
     @Override
     public boolean isSameKind(AbstractBuff other) {
         return other instanceof RegenBuff;

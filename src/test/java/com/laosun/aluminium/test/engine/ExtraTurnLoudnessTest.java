@@ -1,19 +1,17 @@
 package com.laosun.aluminium.test.engine;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
-import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -30,14 +28,17 @@ public class ExtraTurnLoudnessTest {
     private static final int LEVEL = 80;
     private static final int CYRENE = 1415;
     private static final int ALLY = 1002;
-        private static EffectSpec extraTurn(String target) {
+
+    private static EffectSpec extraTurn(String target) {
         EffectSpec effect = new EffectSpec();
         TriggerSpecs.set(effect, "op", "EXTRA_TURN");
         TriggerSpecs.set(effect, "target", target);
         return effect;
     }
 
-    /** A memosprite at Speed 0 is not in the action order, so the grant is refused -- loudly. */
+    /**
+     * A memosprite at Speed 0 is not in the action order, so the grant is refused -- loudly.
+     */
     @Test
     public void aMemospriteOutsideTheActionOrderIsRefusedLoudly() {
         Character cyrene = CharacterFactory.create(CYRENE, LEVEL);
@@ -61,7 +62,9 @@ public class ExtraTurnLoudnessTest {
         Assertions.assertTrue(message.contains("action order"), "the message must name the reason");
     }
 
-    /** A character who IS in the action order still gets one -- the guard is not a blanket refusal. */
+    /**
+     * A character who IS in the action order still gets one -- the guard is not a blanket refusal.
+     */
     @Test
     public void anOrdinaryCharacterStillGetsOne() {
         Character cyrene = CharacterFactory.create(CYRENE, LEVEL);

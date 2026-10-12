@@ -4,8 +4,8 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -31,7 +31,10 @@ import java.util.List;
 public class SilverWolfLV999EidolonLevelsTest {
     private static final int WOLF = 1506;
     private static final int ALLY = 1204;
-        /** The convention puts each slot at the last row of its own table: 15 for the 15-row skills, 10 for the Basic. */
+
+    /**
+     * The convention puts each slot at the last row of its own table: 15 for the 15-row skills, 10 for the Basic.
+     */
     @Test
     public void theLevelConventionPutsEverySlotAtItsTableMaximum() {
         Character wolf = battleAt(0).characters.getFirst();
@@ -52,7 +55,9 @@ public class SilverWolfLV999EidolonLevelsTest {
         Assertions.assertEquals(15, extra, "欢愉技·强化 15 行");
     }
 
-    /** Eidolon 3's and 5's increments are shipped, and cannot be seen at these levels - stated, not hidden. */
+    /**
+     * Eidolon 3's and 5's increments are shipped, and cannot be seen at these levels - stated, not hidden.
+     */
     @Test
     public void theEidolonIncrementsAreClampedAwayAtFullLevels() {
         Character atZero = battleAt(0).characters.getFirst();
@@ -107,7 +112,9 @@ public class SilverWolfLV999EidolonLevelsTest {
                         + unbounded);
     }
 
-    /** E6's 增笑 lands with the Ultimate and not before it. */
+    /**
+     * E6's 增笑 lands with the Ultimate and not before it.
+     */
     @Test
     public void eidolonSixAmpsOnlyAfterTheUltimate() {
         Battle battle = battleAt(6);

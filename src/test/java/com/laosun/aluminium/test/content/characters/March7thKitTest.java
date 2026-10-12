@@ -1,15 +1,11 @@
 package com.laosun.aluminium.test.content.characters;
 
 
-import com.laosun.aluminium.test.engine.SoftAggroWeightTest;
-import com.laosun.aluminium.test.support.TestTurns;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.data.TriggerTables;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.DamageType;
-import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Damage;
@@ -18,6 +14,8 @@ import com.laosun.aluminium.models.buff.DotBuff;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.models.skill.DefaultSkill;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TestTurns;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -39,13 +37,19 @@ import java.util.List;
 public class March7thKitTest {
     private static final double EPS = 1e-6;
 
-    /** March 7th herself. */
+    /**
+     * March 7th herself.
+     */
     private static final int MARCH = 1001;
-    /** Guinaifen - a plain ally to be shielded and cleansed; her own rules never touch the numbers below. */
+    /**
+     * Guinaifen - a plain ally to be shielded and cleansed; her own rules never touch the numbers below.
+     */
     private static final int ALLY = 1210;
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
-    /** An ordinary monster with no specific resistances (1002011 is immune to freeze - see the freeze cases). */
+    /**
+     * An ordinary monster with no specific resistances (1002011 is immune to freeze - see the freeze cases).
+     */
     private static final int ORDINARY_MONSTER = 1003010;
     private static final int SKILL_SLOT = 2;
 
@@ -113,7 +117,9 @@ public class March7thKitTest {
                 "「立即向攻击者发起反击」 (immediately counterattacks the attacker) -- the ATTACKER takes it, and the trigger is being attacked, not losing HP");
     }
 
-    /** "该效果每回合可触发2次": the third hit of the same turn is not answered, and her own turn refreshes it. */
+    /**
+     * "该效果每回合可触发2次": the third hit of the same turn is not answered, and her own turn refreshes it.
+     */
     @Test
     public void theCounterStopsAtTwoPerTurnAndComesBackOnHerOwnTurn() {
         Fixture f = new Fixture();
@@ -134,7 +140,9 @@ public class March7thKitTest {
         Assertions.assertTrue(f.enemy.getCurrentHp() < afterSecond, "her own turn hands the two uses back");
     }
 
-    /** "持有护盾的" is a real gate: an ally with no shield is not counter-protected. */
+    /**
+     * "持有护盾的" is a real gate: an ally with no shield is not counter-protected.
+     */
     @Test
     public void anAllyWithNoShieldIsNotCounteredFor() {
         Fixture f = new Fixture();
@@ -233,7 +241,9 @@ public class March7thKitTest {
                 "precondition: she is first in the party order");
     }
 
-    /** Below rank 2 the rule is not there at all - the Eidolon gate, not a weaker shield. */
+    /**
+     * Below rank 2 the rule is not there at all - the Eidolon gate, not a weaker shield.
+     */
     @Test
     public void theSecondEidolonsShieldDoesNotExistBelowItsRank() {
         Character march = CharacterFactory.create(MARCH, LEVEL, true, null, null, 1);
@@ -247,7 +257,7 @@ public class March7thKitTest {
     /**
      * The "加护" (Reinforce) trace: "战技提供的护盾持续时间增加1回合".
      *
-     * <p>Note: The +1 is a <b>separate rule</b> from the Skill's shield, and it has to run after it in the same event - 
+     * <p>Note: The +1 is a <b>separate rule</b> from the Skill's shield, and it has to run after it in the same event -
      * which it does, because effects of one event run in order (only *conditions* are all evaluated up front). The
      * two numbers therefore stay in two rules, and the trace can be gated on its own one day.
      */
@@ -307,7 +317,9 @@ public class March7thKitTest {
     // helpers
     // ==================================================================
 
-    /** March 7th, one plain ally and one enemy: the shape every case above needs. */
+    /**
+     * March 7th, one plain ally and one enemy: the shape every case above needs.
+     */
     private static final class Fixture {
         private final Character march;
         private final Character ally;
@@ -322,13 +334,17 @@ public class March7thKitTest {
             battle.startBattle();
         }
 
-        /** Casts her Skill on the ally, which is what puts a shield on them. */
+        /**
+         * Casts her Skill on the ally, which is what puts a shield on them.
+         */
         private void shieldTheAlly() {
             battle.castImmediate(new DefaultSkill(MARCH, SKILL_SLOT, 1), march, List.of(ally));
             Assertions.assertTrue(ally.getShield() > 0, "precondition: 「为指定我方单体提供…护盾」 (provides a shield to a designated single ally)");
         }
 
-        /** One enemy hit on the ally, through the engine's own damage path (which emits {@code TAKING_HIT}). */
+        /**
+         * One enemy hit on the ally, through the engine's own damage path (which emits {@code TAKING_HIT}).
+         */
         private void hitTheAlly(double amount) {
             battle.applyDamage(ally, new Damage(enemy, ally, DamageElement.ICE, DamageType.NORMAL, amount));
         }

@@ -58,13 +58,13 @@ public enum SkillType {
      * Passive talent of a summoned entity.
      */
     /**
- * The data's slot 20: the Elation skill "欢愉技", named by the game's own text
+     * The data's slot 20: the Elation skill "欢愉技", named by the game's own text
      * (relic set 130 says "首次使用欢愉技"). Nine skills in `skills.json` carry `attack_type: ElationDamage`
      * and every one of them was invisible to the loader until this constant existed.
      */
     ELATION_SKILL,
     /**
- * Note: The data's slot 21: a second Elation-damage skill carried by 1506 and 1513 only. The game text
+     * Note: The data's slot 21: a second Elation-damage skill carried by 1506 and 1513 only. The game text
      * does not name it, so this name records the SLOT and nothing more.
      */
     ELATION_EXTRA,

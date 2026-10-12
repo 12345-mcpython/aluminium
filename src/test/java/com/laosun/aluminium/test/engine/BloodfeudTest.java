@@ -6,8 +6,8 @@ import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.skill.Skill;
 import com.laosun.aluminium.models.skill.SkillExecutor;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -21,10 +21,12 @@ import java.util.List;
  */
 public class BloodfeudTest {
     private static final int MYDEI = 1404;
-        private static final String STATE = "血仇";
+    private static final String STATE = "血仇";
     private static final String CHARGE = "天赋充能";
 
-    /** A hundred charge enters [血仇], and a lethal blow then leaves it -- at half his Max HP. */
+    /**
+     * A hundred charge enters [血仇], and a lethal blow then leaves it -- at half his Max HP.
+     */
     @Test
     public void aLethalBlowEndsItAndHeSurvives() {
         Character him = CharacterFactory.create(MYDEI, 80, false, null, null, 0);
@@ -47,7 +49,9 @@ public class BloodfeudTest {
         Assertions.assertEquals(0.0, him.getResources().value(CHARGE), 1e-9, "\"clear the charge\"");
     }
 
-    /** Note: Without [血仇] the same blow kills him -- the clause is the state's, not his. */
+    /**
+     * Note: Without [血仇] the same blow kills him -- the clause is the state's, not his.
+     */
     @Test
     public void withoutBloodfeudTheBlowKills() {
         Character him = CharacterFactory.create(MYDEI, 80, false, null, null, 0);
@@ -64,7 +68,9 @@ public class BloodfeudTest {
 
     // ==================================================================
 
-    /** his ultimate grants 20 charge, so five casts reach a hundred. */
+    /**
+     * his ultimate grants 20 charge, so five casts reach a hundred.
+     */
     private static void chargeToAHundred(Battle battle, Character him) {
         Skill ult = him.getSkills().get(SkillType.ULTRA);
         Assertions.assertNotNull(ult, "precondition: he has an ultimate");

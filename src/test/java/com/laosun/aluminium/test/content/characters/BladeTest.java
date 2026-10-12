@@ -1,14 +1,14 @@
 package com.laosun.aluminium.test.content.characters;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -24,7 +24,10 @@ import java.util.Random;
 public class BladeTest {
     private static final int BLADE = 1205;
     private static final int LEVEL = 80;
-        /** Note: The Skill enters the state. */
+
+    /**
+     * Note: The Skill enters the state.
+     */
     @Test
     public void theSkillEntersHellscape() {
         Character blade = CharacterFactory.create(BLADE, LEVEL);
@@ -38,7 +41,9 @@ public class BladeTest {
                 "「进入【地狱变】状态」 (enters the Hellscape (【地狱变】) state)");
     }
 
-    /** Note: The technique's 40% of his Max HP, measured against a hand-built 50% in the same pipeline, and the control. */
+    /**
+     * Note: The technique's 40% of his Max HP, measured against a hand-built 50% in the same pipeline, and the control.
+     */
     @Test
     public void theTechniqueDealsFortyPercentOfHisMaxHp() {
         double content = openingLoss(true);
@@ -51,7 +56,9 @@ public class BladeTest {
                 "content " + content + " vs reference " + reference + " (expected " + (0.4 / 0.5) + ")");
     }
 
-    /** Note: The charge cap, tested by exceeding it. */
+    /**
+     * Note: The charge cap, tested by exceeding it.
+     */
     @Test
     public void theChargeStopsAtFive() {
         Character blade = CharacterFactory.create(BLADE, LEVEL);
@@ -67,7 +74,9 @@ public class BladeTest {
                 "「最多叠加5层」 (stacks at most 5 times) -- six hits must still read five");
     }
 
-    /** Runs the opening with or without the technique marker. */
+    /**
+     * Runs the opening with or without the technique marker.
+     */
     private static double openingLoss(boolean declared) {
         Character blade = CharacterFactory.create(BLADE, LEVEL);
         Enemy enemy = BattleFixture.monster();
@@ -80,7 +89,9 @@ public class BladeTest {
         return before - enemy.getCurrentHp();
     }
 
-    /** A hand-built 50%-Max-HP instance in the same pipeline, as the ratio's denominator. */
+    /**
+     * A hand-built 50%-Max-HP instance in the same pipeline, as the ratio's denominator.
+     */
     private static double referenceLoss() {
         Character blade = CharacterFactory.create(BLADE, LEVEL);
         EffectSpec effect = new EffectSpec();

@@ -2,15 +2,11 @@ package com.laosun.aluminium.models.enemy;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EnemySkillData;
-import com.laosun.aluminium.enums.AttributeType;
-import com.laosun.aluminium.enums.DamageElement;
-import com.laosun.aluminium.enums.DamageType;
-import com.laosun.aluminium.enums.SkillEffectType;
-import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.*;
-import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.skill.Skill;
 import com.laosun.aluminium.data.SkillData;
+import com.laosun.aluminium.enums.*;
+import com.laosun.aluminium.models.CanHit;
+import com.laosun.aluminium.models.Damage;
+import com.laosun.aluminium.models.skill.Skill;
 import lombok.Getter;
 
 import java.util.ArrayList;

@@ -23,7 +23,9 @@ import java.util.Random;
 public class LiteralDamageCensusTest {
     private static final double DOCUMENT = 1.0;
 
-    /** Note: The three converted rules state the document's 100% literally, with an element and no row. */
+    /**
+     * Note: The three converted rules state the document's 100% literally, with an element and no row.
+     */
     @Test
     public void theConvertedRulesStateTheDocumentNumberLiterally() {
         for (Object[] target : new Object[][]{{1109, "talent_followup_against_burning"},
@@ -40,7 +42,9 @@ public class LiteralDamageCensusTest {
         }
     }
 
-    /** Reads one rule's DAMAGE effect straight out of the shipped file. */
+    /**
+     * Reads one rule's DAMAGE effect straight out of the shipped file.
+     */
     private static JsonObject damageEffectOf(String cid, String ruleId) {
         String path = "/characters/" + cid + ".json";
         try (InputStream stream = LiteralDamageCensusTest.class.getResourceAsStream(path)) {
@@ -64,7 +68,9 @@ public class LiteralDamageCensusTest {
         throw new IllegalStateException("no DAMAGE rule " + ruleId + " for cid " + cid);
     }
 
-    /** Note: The ship still loads: a battle with 1206 runs, so the converted rules pass the loader's validation. */
+    /**
+     * Note: The ship still loads: a battle with 1206 runs, so the converted rules pass the loader's validation.
+     */
     @Test
     public void herFileStillLoads() {
         var hero = com.laosun.aluminium.utils.CharacterFactory.create(1206, 80);

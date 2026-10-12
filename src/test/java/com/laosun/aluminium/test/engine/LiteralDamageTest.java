@@ -1,14 +1,14 @@
 package com.laosun.aluminium.test.engine;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -32,7 +32,9 @@ public class LiteralDamageTest {
     private static final double HEAVY = 0.8;
     private static final double LIGHT = 0.4;
 
-    /** Note: The stated percent is applied linearly: half the percent, half the damage. */
+    /**
+     * Note: The stated percent is applied linearly: half the percent, half the damage.
+     */
     @Test
     public void theStatedPercentIsAppliedLinearly() {
         double heavy = openingDamage(HEAVY);
@@ -43,7 +45,9 @@ public class LiteralDamageTest {
                 "percent " + HEAVY + " vs " + LIGHT + " must differ by exactly two: heavy " + heavy + ", light " + light);
     }
 
-    /** Note: The control: with no technique declared, the opening rule does not fire at all. */
+    /**
+     * Note: The control: with no technique declared, the opening rule does not fire at all.
+     */
     @Test
     public void withoutTheTechniqueNoOpeningDamage() {
         Character tb = CharacterFactory.create(SUSHANG, LEVEL);
@@ -56,7 +60,9 @@ public class LiteralDamageTest {
                 "「使用秘技后」 (after using the Technique) -- undeclared, so no damage");
     }
 
-    /** Fires one literal-ratio DAMAGE at the given percent and returns what it cost the enemy. */
+    /**
+     * Fires one literal-ratio DAMAGE at the given percent and returns what it cost the enemy.
+     */
     private static double openingDamage(double percent) {
         Character hero = CharacterFactory.create(SUSHANG, LEVEL);
         Enemy enemy = Enemy.fromAttributes("Dummy", 60000, 500, 100, 90);

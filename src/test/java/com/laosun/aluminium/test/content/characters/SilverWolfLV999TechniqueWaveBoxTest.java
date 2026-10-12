@@ -33,7 +33,9 @@ public class SilverWolfLV999TechniqueWaveBoxTest {
     private static final int WOLF = 1506;
     private static final String RULE = "p1506_technique_box_each_wave";
 
-    /** The wave rule exists, hangs on the technique, fires the same box, and counts 99 laughs for that firing. */
+    /**
+     * The wave rule exists, hangs on the technique, fires the same box, and counts 99 laughs for that firing.
+     */
     @Test
     public void theTechniqueFiresTheBoxEachWaveCounting99Laughs() {
         var table = CharacterFactory.create(WOLF, 80).getTriggerTable();
@@ -45,8 +47,8 @@ public class SilverWolfLV999TechniqueWaveBoxTest {
         var effects = rule.effects();
         System.out.println("[1506-tech] " + RULE + " when=" + conditions + " effects=" + effects.size()
                 + " countedLaughs=" + effects.stream()
-                        .filter(e -> "ELATION".equalsIgnoreCase(e.getDamageType() == null ? "" : e.getDamageType().trim()))
-                        .findFirst().map(e -> e.getCountedLaughs()).orElse(null));
+                .filter(e -> "ELATION".equalsIgnoreCase(e.getDamageType() == null ? "" : e.getDamageType().trim()))
+                .findFirst().map(e -> e.getCountedLaughs()).orElse(null));
 
         Assertions.assertTrue(conditions.contains("self has_state 秘技"),
                 "「【怪怪怪味豆】在场时」 is the technique state the engine applies before every BATTLE_START");

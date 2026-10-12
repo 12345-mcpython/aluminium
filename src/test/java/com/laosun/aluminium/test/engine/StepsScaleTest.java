@@ -1,13 +1,13 @@
 package com.laosun.aluminium.test.engine;
 
 import com.laosun.aluminium.Battle;
-import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.beans.EffectSpec;
+import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
-import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.models.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -33,9 +33,11 @@ import java.util.List;
  */
 public class StepsScaleTest {
     private static final int ALLY = 1204;
-        private static final String COUNTER = "测试计数";
+    private static final String COUNTER = "测试计数";
 
-    /** 119 / 120 / 239: the boundaries of one step. */
+    /**
+     * 119 / 120 / 239: the boundaries of one step.
+     */
     @Test
     public void theValueIsTheNumberOfWholeSteps() {
         Assertions.assertEquals(0.0, steps(119, 120), 1e-9, "one short of the step pays nothing");
@@ -44,7 +46,9 @@ public class StepsScaleTest {
         Assertions.assertEquals(2.0, steps(240, 120), 1e-9, "and past it, twice");
     }
 
-    /** ⚠ The case that justifies the primitive: one jump of 400 is THREE milestones, not one. */
+    /**
+     * ⚠ The case that justifies the primitive: one jump of 400 is THREE milestones, not one.
+     */
     @Test
     public void oneJumpPaysEveryStepItCrossed() {
         double jumped = steps(400, 120);
@@ -53,7 +57,9 @@ public class StepsScaleTest {
                 "a per-event '>= 120 then spend 120' check would say 1 and silently under-pay");
     }
 
-    /** The usual share multiplies the step count, and the counter may be a resource rather than an attribute. */
+    /**
+     * The usual share multiplies the step count, and the counter may be a resource rather than an attribute.
+     */
     @Test
     public void theShareMultipliesAndTheCounterMayBeAResource() {
         Character unit = unit(COUNTER, 260);
@@ -70,7 +76,9 @@ public class StepsScaleTest {
                 "174 speed is three whole 50s, and the name resolved as an attribute");
     }
 
-    /** A step of zero (or nonsense) is refused loudly: dividing by it is not a number. */
+    /**
+     * A step of zero (or nonsense) is refused loudly: dividing by it is not a number.
+     */
     @Test
     public void aBadStepIsRefused() {
         IllegalStateException zero = Assertions.assertThrows(IllegalStateException.class,
@@ -113,7 +121,9 @@ public class StepsScaleTest {
         return effect;
     }
 
-    /** The magnitude the engine computes for one effect, through a real firing (the scale is only read there). */
+    /**
+     * The magnitude the engine computes for one effect, through a real firing (the scale is only read there).
+     */
     private static double read(Character unit, EffectSpec effect) {
         unit.setTriggerTable(new TriggerTable(1, List.of(
                 TriggerSpecs.rule("TURN_START", List.of(), effect))));
@@ -130,7 +140,9 @@ public class StepsScaleTest {
         return after - before;
     }
 
-    /** A plain unit whose SPEED carries the step count (see {@link #stepsEffect}). */
+    /**
+     * A plain unit whose SPEED carries the step count (see {@link #stepsEffect}).
+     */
     private static Character unit(String ignoredCounterName, int value) {
         Character unit = Character.fromAttributes("unit", 1000, 100, 100, 100);
         unit.setAttribute(AttributeType.SPEED, new com.laosun.aluminium.models.DoubleValue(value));

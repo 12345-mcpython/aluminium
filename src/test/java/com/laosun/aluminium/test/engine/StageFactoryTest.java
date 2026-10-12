@@ -4,8 +4,8 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.beans.StageBean;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.WaveManager;
+import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.utils.StageFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Assumptions;
@@ -222,7 +222,9 @@ public class StageFactoryTest {
 
     // ==================================================================
 
-    /** The stage data is not in the repository; skip when missing (see the generator section of the README). */
+    /**
+     * The stage data is not in the repository; skip when missing (see the generator section of the README).
+     */
     private static void assumeStageData() {
         Assumptions.assumeFalse(Constant.stages().isEmpty(),
                 "missing stage.json (generator output), skipping the StageFactory-related assertions");
@@ -232,7 +234,9 @@ public class StageFactoryTest {
         return StageFactory.load(stageId, StageFactory.realTeam(), new Random(0));
     }
 
-    /** Flattens a battle's visible state into a string, for comparing whether two assemblies are identical. */
+    /**
+     * Flattens a battle's visible state into a string, for comparing whether two assemblies are identical.
+     */
     private static String describe(Battle battle) {
         StringBuilder text = new StringBuilder();
         text.append("elapsed=").append(battle.queue.getElapsed())

@@ -4,10 +4,10 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.models.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -25,7 +25,10 @@ public class ElysiumZoneTest {
     private static final int CYRENE = 1415;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-        /** With the zone up, an ally's attack is followed by a true-damage rider of 24% of what it settled. */
+
+    /**
+     * With the zone up, an ally's attack is followed by a true-damage rider of 24% of what it settled.
+     */
     @Test
     public void theZoneAddsAQuarterOfTheAllysDamage() {
         double with = enemyLoss(true);
@@ -40,7 +43,9 @@ public class ElysiumZoneTest {
     // Fixture
     // ==================================================================
 
-    /** The enemy's total HP loss when {@code ALLY} attacks, with Cyrene (昔涟)'s skill cast first (or not). */
+    /**
+     * The enemy's total HP loss when {@code ALLY} attacks, with Cyrene (昔涟)'s skill cast first (or not).
+     */
     private static double enemyLoss(boolean zone) {
         Character cyrene = CharacterFactory.create(CYRENE, LEVEL, false, null, null, 0);
         Character ally = CharacterFactory.create(ALLY, LEVEL, false, null, null, 0);

@@ -1,19 +1,15 @@
 package com.laosun.aluminium.test.content.lightcones;
 
 
-import com.laosun.aluminium.test.engine.OncePerAttackLimitTest;
-import com.laosun.aluminium.test.support.BattleFixture;
-import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.Weapon;
 import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
 
 /**
  * Light cone 21031: on a crit, a fixed chance strips one BUFF from the victim, at most once per attack.
@@ -26,7 +22,8 @@ public class ReturnToDarknessTest {
     private static final int CONE = 21031;
     private static final int WEARER = 1205;
     private static final int LEVEL = 80;
-        @Test
+
+    @Test
     public void theSpecCarriesTheOpTheChanceAndThePerAttackLimit() {
         Character unit = CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(CONE, LEVEL, false, 1));
         Enemy enemy = BattleFixture.monster();

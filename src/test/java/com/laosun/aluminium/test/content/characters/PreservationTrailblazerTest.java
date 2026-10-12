@@ -6,8 +6,8 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -25,7 +25,10 @@ public class PreservationTrailblazerTest {
     private static final int TB4 = 8004;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-        /** Note: "每受到1次攻击，叠加1层[灼热意志]，最多可叠加8层". */
+
+    /**
+     * Note: "每受到1次攻击，叠加1层[灼热意志]，最多可叠加8层".
+     */
     @Test
     public void hisTalentStacksMagmaWillUpToEight() {
         Character tb = CharacterFactory.create(TB3, LEVEL);
@@ -43,7 +46,9 @@ public class PreservationTrailblazerTest {
         Assertions.assertEquals(8, tb.getBuffManager().stacksOf("灼热意志"), "the ninth hit must not pass the cap");
     }
 
-    /** Note: "施放普攻、战技、终结技后，为我方全体提供…等同于6.00%防御力+80的护盾，持续2回合" -- all three casts, both ids. */
+    /**
+     * Note: "施放普攻、战技、终结技后，为我方全体提供…等同于6.00%防御力+80的护盾，持续2回合" -- all three casts, both ids.
+     */
     @Test
     public void everyCastShieldsThePartyForBothIds() {
         for (int cid : new int[]{TB3, TB4}) {
@@ -60,7 +65,9 @@ public class PreservationTrailblazerTest {
         }
     }
 
-    /** Note: The technique's self-shield, gated on the marker; and the control. */
+    /**
+     * Note: The technique's self-shield, gated on the marker; and the control.
+     */
     @Test
     public void theTechniqueShieldsHimOnlyWhenDeclared() {
         Character withTechnique = CharacterFactory.create(TB3, LEVEL);
@@ -80,7 +87,9 @@ public class PreservationTrailblazerTest {
                 "「使用秘技后」 (after using the Technique) -- undeclared, so no shield");
     }
 
-    /** Census: the stacks, the three shields, the skill's two effects, the technique and the convention. */
+    /**
+     * Census: the stacks, the three shields, the skill's two effects, the technique and the convention.
+     */
     @Test
     public void hisFileCarriesTheClauses() {
         for (int cid : new int[]{TB3, TB4}) {

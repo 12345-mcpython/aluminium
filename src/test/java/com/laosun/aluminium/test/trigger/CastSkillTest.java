@@ -1,16 +1,15 @@
 package com.laosun.aluminium.test.trigger;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.CanHit;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -41,17 +40,29 @@ import java.util.List;
  */
 public class CastSkillTest {
     private static final int LEVEL = 80;
-        /** Himeko (姬子): damage whose number we do not care about, used as the rule owner wherever the owner must not matter. */
+    /**
+     * Himeko (姬子): damage whose number we do not care about, used as the rule owner wherever the owner must not matter.
+     */
     private static final int OWNER = 1003;
-    /** Dan Heng (丹恒): the unit being commanded. His ULTRA is a damaging single-target skill. */
+    /**
+     * Dan Heng (丹恒): the unit being commanded. His ULTRA is a damaging single-target skill.
+     */
     private static final int CASTER = 1002;
-    /** Mydei (万敌): his SKILL is a BLAST, i.e. the one shape whose two columns differ. */
+    /**
+     * Mydei (万敌): his SKILL is a BLAST, i.e. the one shape whose two columns differ.
+     */
     private static final int BLAST_CASTER = 1404;
-    /** Sparkle (火花): her ELATION_SKILL is the only kind of skill that settles as a non-NORMAL damage type. */
+    /**
+     * Sparkle (火花): her ELATION_SKILL is the only kind of skill that settles as a non-NORMAL damage type.
+     */
     private static final int ELATION_CASTER = 1501;
-    /** Dan Heng - Permansor Terrae (丹恒-腾荒): the commanded cast of a NON-damaging skill (his skill is a {@code Defence} shield). */
+    /**
+     * Dan Heng - Permansor Terrae (丹恒-腾荒): the commanded cast of a NON-damaging skill (his skill is a {@code Defence} shield).
+     */
     private static final int DHPT = 1414;
-    /** Ruan Mei (阮-梅): her skill is a {@code Support} buff with no {@code skill_effects.json} entry -- undeliverable. */
+    /**
+     * Ruan Mei (阮-梅): her skill is a {@code Support} buff with no {@code skill_effects.json} entry -- undeliverable.
+     */
     private static final int UNDELIVERABLE = 1303;
 
     // ==================================================================
@@ -201,7 +212,9 @@ public class CastSkillTest {
     // 3. Shipped content, no scaffold
     // ==================================================================
 
-    /** 1404 Mydei "自身回合开始时自动施放[弑王成王]" - the rule fires and the skill really lands. */
+    /**
+     * 1404 Mydei "自身回合开始时自动施放[弑王成王]" - the rule fires and the skill really lands.
+     */
     @Test
     public void hisTurnStartAutoCastDealsDamage() {
         Character him = CharacterFactory.create(BLAST_CASTER, LEVEL);
@@ -221,7 +234,9 @@ public class CastSkillTest {
                 "the commanded cast moved the enemy's HP (" + before + " -> " + enemy.getCurrentHp() + ")");
     }
 
-    /** 1504 Cipher "随后立即对[饲饵]发动 1 次获得强化的天赋追加攻击" - the commanded TALENT lands. */
+    /**
+     * 1504 Cipher "随后立即对[饲饵]发动 1 次获得强化的天赋追加攻击" - the commanded TALENT lands.
+     */
     @Test
     public void hisUltimateCommandsHisTalentRightNow() {
         Character him = CharacterFactory.create(1504, LEVEL);
@@ -262,7 +277,9 @@ public class CastSkillTest {
         Assertions.assertTrue(refused.getMessage().contains("damage_param"), refused.getMessage());
     }
 
-    /** 1414 Dan Heng - Permansor Terrae technique "下一次战斗开始时自动对持有[同袍]的角色施放1次战技，此次战技不消耗战技点". */
+    /**
+     * 1414 Dan Heng - Permansor Terrae technique "下一次战斗开始时自动对持有[同袍]的角色施放1次战技，此次战技不消耗战技点".
+     */
     @Test
     public void aCommandedSupportCastShieldsOurSide() {
         // Note: The Bondmate is 1414 HIMSELF (his technique grants it to him), and he is deliberately NOT first in the
@@ -300,7 +317,9 @@ public class CastSkillTest {
                         + "(one commanded cast, both halves of the clause)");
     }
 
-    /** 1414's ATK right now - a named helper so the assertion above reads as the claim it is. */
+    /**
+     * 1414's ATK right now - a named helper so the assertion above reads as the claim it is.
+     */
     private static double Attack(Character who) {
         return who.getAttribute(com.laosun.aluminium.enums.AttributeType.ATTACK).get();
     }
@@ -327,7 +346,9 @@ public class CastSkillTest {
         Assertions.assertTrue(refused.getMessage().contains("skill_effects.json"), refused.getMessage());
     }
 
-    /** Note: {@code cast_target} is read by this op alone, so another op stating it is refused while the file is read. */
+    /**
+     * Note: {@code cast_target} is read by this op alone, so another op stating it is refused while the file is read.
+     */
     @Test
     public void castTargetOnAnotherOpIsRefused() {
         EffectSpec effect = new EffectSpec();
@@ -347,7 +368,9 @@ public class CastSkillTest {
     // Helpers
     // ==================================================================
 
-    /** A rule that commands the resolved target to cast {@code slot}, right now. */
+    /**
+     * A rule that commands the resolved target to cast {@code slot}, right now.
+     */
     private static com.laosun.aluminium.beans.TriggerSpec command(String slot) {
         EffectSpec effect = new EffectSpec();
         TriggerSpecs.set(effect, "op", "CAST_SKILL");

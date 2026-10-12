@@ -3,8 +3,8 @@ package com.laosun.aluminium.test.engine;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.skill.SkillExecutor;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -21,7 +21,7 @@ public class SkyOdeStackTest {
     private static final int CYRENE = 1415;
     private static final int HYACINE = 1409;
     private static final int OTHER = 1002;
-        private static final String MARK = "献予「天空」之诗";
+    private static final String MARK = "献予「天空」之诗";
 
     @Test
     public void theNamedCharacterGetsTwoLayersAndNobodyElseDoes() {

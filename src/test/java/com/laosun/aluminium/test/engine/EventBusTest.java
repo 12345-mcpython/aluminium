@@ -4,10 +4,10 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.SkillType;
-import com.laosun.aluminium.models.buff.AbstractBuff;
 import com.laosun.aluminium.models.CanHit;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.DoubleValue;
+import com.laosun.aluminium.models.buff.AbstractBuff;
 import com.laosun.aluminium.models.buff.DotBuff;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
@@ -49,7 +49,9 @@ import java.util.List;
 public class EventBusTest {
     private static final double EPS = 1e-9;
 
-    /** Event name constants (used in assertions, to avoid spelling drift). */
+    /**
+     * Event name constants (used in assertions, to avoid spelling drift).
+     */
     private static final String SKILL_CAST = "SKILL_CAST";
     private static final String ENERGY = "ENERGY";
     private static final String HP_LOSS = "HP_LOSS";
@@ -63,7 +65,9 @@ public class EventBusTest {
     // 1. Skill cast: both damaging and non-damaging skills must emit
     // ==================================================================
 
-    /** Damaging skill: `SkillCastEvent` carries the actual hit set. */
+    /**
+     * Damaging skill: `SkillCastEvent` carries the actual hit set.
+     */
     @Test
     public void damagingSkillFiresSkillCastWithHitTargets() {
         Battle battle = newBattle();
@@ -106,7 +110,9 @@ public class EventBusTest {
         Assertions.assertEquals(List.of(luocha), last.chosen(), "but the targets the caller chose must be carried out verbatim");
     }
 
-    /** One cast emits SkillCastEvent exactly once (not once per hit). */
+    /**
+     * One cast emits SkillCastEvent exactly once (not once per hit).
+     */
     @Test
     public void skillCastFiresOncePerCastNotPerHit() {
         Battle battle = newBattle();
@@ -123,7 +129,9 @@ public class EventBusTest {
     // 2. Energy: emitted only on an actual credit; characters with no energy bar do not emit
     // ==================================================================
 
-    /** Basic attack lands to energy gain to `EnergyEvent`, carrying the actually credited value (20). */
+    /**
+     * Basic attack lands to energy gain to `EnergyEvent`, carrying the actually credited value (20).
+     */
     @Test
     public void energyEventCarriesTheActuallyCreditedAmount() {
         Battle battle = newBattle();
@@ -138,7 +146,9 @@ public class EventBusTest {
         Assertions.assertEquals(20, last.amount(), EPS, "basic attack conventional energy gain is 20");
     }
 
-    /** When energy is already full the actual credit is 0 to no emission ("clipped by the cap" is not an energy gain). */
+    /**
+     * When energy is already full the actual credit is 0 to no emission ("clipped by the cap" is not an energy gain).
+     */
     @Test
     public void cappedEnergyFiresNoEvent() {
         Battle battle = newBattle();
@@ -175,7 +185,9 @@ public class EventBusTest {
     // 3. HP loss vs taking damage
     // ==================================================================
 
-    /** Taking a normal hit to the HP-loss event carries before/after and the real amount lost. */
+    /**
+     * Taking a normal hit to the HP-loss event carries before/after and the real amount lost.
+     */
     @Test
     public void hpLossReportsBeforeAndAfter() {
         Battle battle = newBattle();
@@ -223,7 +235,9 @@ public class EventBusTest {
     // 4. Healing: emitted only when HP is really restored
     // ==================================================================
 
-    /** Heal skill to HP really restored to emit `HealEvent`. */
+    /**
+     * Heal skill to HP really restored to emit `HealEvent`.
+     */
     @Test
     public void healEventCarriesActuallyHealed() {
         Character luocha = CharacterFactory.create(1203, 80);
@@ -242,7 +256,9 @@ public class EventBusTest {
         Assertions.assertTrue(last.amount() > 0);
     }
 
-    /** Healing a full-HP target to actual restore 0 to no emission. */
+    /**
+     * Healing a full-HP target to actual restore 0 to no emission.
+     */
     @Test
     public void healingAFullHpTargetFiresNoEvent() {
         Character luocha = CharacterFactory.create(1203, 80);
@@ -259,7 +275,9 @@ public class EventBusTest {
     // 5. Kill / break
     // ==================================================================
 
-    /** Kill an enemy to `KillEvent`, and the killer is the one who cast the skill. */
+    /**
+     * Kill an enemy to `KillEvent`, and the killer is the one who cast the skill.
+     */
     @Test
     public void killEventNamesTheAttacker() {
         Battle battle = newBattle();
@@ -333,7 +351,9 @@ public class EventBusTest {
                 "a DOT kill emits KillEvent too (same convention as kill energy gain; the original plan's 'does not emit' was wrong)");
     }
 
-    /** True damage finishing a target off is the same: damage attributed to the attacker kills the target to emit `KillEvent`. */
+    /**
+     * True damage finishing a target off is the same: damage attributed to the attacker kills the target to emit `KillEvent`.
+     */
     @Test
     public void trueDamageKillFiresEvent() {
         Battle battle = newBattle();
@@ -348,7 +368,9 @@ public class EventBusTest {
         Assertions.assertNotNull(probe.last(KILL), "a kill by true damage must emit KillEvent too");
     }
 
-    /** Give the enemy a huge shield to no HP lost to hence no kill (guards against "does not die before the shield breaks" being bypassed by events). */
+    /**
+     * Give the enemy a huge shield to no HP lost to hence no kill (guards against "does not die before the shield breaks" being bypassed by events).
+     */
     @Test
     public void shieldedTargetIsNotReportedAsKilled() {
         Battle battle = newBattle();
@@ -367,7 +389,9 @@ public class EventBusTest {
     // 6. Skill points: emitted only when really spent/gained
     // ==================================================================
 
-    /** Basic attack to skill point +1 to emit `SkillPointEvent.onSkillPointGained`. */
+    /**
+     * Basic attack to skill point +1 to emit `SkillPointEvent.onSkillPointGained`.
+     */
     @Test
     public void skillPointGainFiresEvent() {
         Battle battle = newBattle();
@@ -383,7 +407,9 @@ public class EventBusTest {
         Assertions.assertEquals(1, last.amount(), EPS);
     }
 
-    /** Skill to skill point -1 to emit `SkillPointEvent.onSkillPointSpent`. */
+    /**
+     * Skill to skill point -1 to emit `SkillPointEvent.onSkillPointSpent`.
+     */
     @Test
     public void skillPointSpendFiresEvent() {
         Battle battle = newBattle();
@@ -425,7 +451,9 @@ public class EventBusTest {
         Assertions.assertEquals(0, battle.getSkillPoints(), "the point count did not change either");
     }
 
-    /** Basic attack while skill points are already full to actual credit 0 to do not emit the gain event. */
+    /**
+     * Basic attack while skill points are already full to actual credit 0 to do not emit the gain event.
+     */
     @Test
     public void cappedSkillPointsFireNoGainEvent() {
         Battle battle = newBattle();
@@ -529,7 +557,9 @@ public class EventBusTest {
     // Helpers: the probe buff and battle setup
     // ==================================================================
 
-    /** Event record: stores only the minimal fields the assertions need. */
+    /**
+     * Event record: stores only the minimal fields the assertions need.
+     */
     private record Event(String name, CanHit user, CanHit target, CanHit attacker, CanHit victim,
                          double before, double after, double amount,
                          List<? extends CanHit> hits, List<? extends CanHit> chosen) {
@@ -572,7 +602,9 @@ public class EventBusTest {
             return null;
         }
 
-        /** Index of the first occurrence; {@code Integer.MAX_VALUE} if absent (convenient for comparing order). */
+        /**
+         * Index of the first occurrence; {@code Integer.MAX_VALUE} if absent (convenient for comparing order).
+         */
         int indexOf(String name) {
             for (int i = 0; i < events.size(); i++) {
                 if (events.get(i).name().equals(name)) {
@@ -648,14 +680,18 @@ public class EventBusTest {
         }
     }
 
-    /** Attach a probe to {@code target} and return it so it can be asserted on. */
+    /**
+     * Attach a probe to {@code target} and return it so it can be asserted on.
+     */
     private static Probe attachProbe(CanHit target) {
         Probe probe = new Probe();
         probe.attachOn(target);
         return probe;
     }
 
-    /** Default team: Himeko 1003 (Fire; basic attack and skill are both damaging). */
+    /**
+     * Default team: Himeko 1003 (Fire; basic attack and skill are both damaging).
+     */
     private static Battle newBattle() {
         return newBattle(CharacterFactory.create(1003, 80));
     }
@@ -669,7 +705,9 @@ public class EventBusTest {
         return battle;
     }
 
-    /** Bypass the queue and settle directly (verifying "the event itself" needs no action bar involvement). */
+    /**
+     * Bypass the queue and settle directly (verifying "the event itself" needs no action bar involvement).
+     */
     private static void castNow(Battle battle, CanHit user, Skill skill, List<? extends CanHit> targets) {
         battle.castImmediate(skill, user, targets);
     }

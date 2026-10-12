@@ -24,7 +24,9 @@ public class SkillCategoryAndResourceTest {
     // SkillCategory: parsing must be robust (the data is an external artifact)
     // ==================================================================
 
-    /** All values that really exist in the data must parse correctly. */
+    /**
+     * All values that really exist in the data must parse correctly.
+     */
     @Test
     public void knownValuesRoundTrip() {
         Assertions.assertEquals(SkillCategory.NORMAL, SkillCategory.fromString("Normal"));
@@ -36,7 +38,9 @@ public class SkillCategoryAndResourceTest {
         Assertions.assertEquals(SkillCategory.ELATION_DAMAGE, SkillCategory.fromString("ElationDamage"));
     }
 
-    /** {@code value()} must be able to look the original data value back up - otherwise writing back to the data later would not line up. */
+    /**
+     * {@code value()} must be able to look the original data value back up - otherwise writing back to the data later would not line up.
+     */
     @Test
     public void valueMatchesTheDataString() {
         Assertions.assertEquals("Normal", SkillCategory.NORMAL.value());
@@ -84,7 +88,9 @@ public class SkillCategoryAndResourceTest {
         Assertions.assertEquals(SkillCategory.UNKNOWN, SkillCategory.fromString("Normal2"));
     }
 
-    /** Case-insensitive + trimming - a non-uniform style on the data side should not fail to match. */
+    /**
+     * Case-insensitive + trimming - a non-uniform style on the data side should not fail to match.
+     */
     @Test
     public void parsingIsCaseInsensitiveAndTrims() {
         Assertions.assertEquals(SkillCategory.NORMAL, SkillCategory.fromString("normal"));
@@ -93,7 +99,9 @@ public class SkillCategoryAndResourceTest {
         Assertions.assertEquals(SkillCategory.ELATION_DAMAGE, SkillCategory.fromString("elationdamage"));
     }
 
-    /** Only basic attack / skill / ultimate count as "actively acting in combat"; map skills and empty values do not. */
+    /**
+     * Only basic attack / skill / ultimate count as "actively acting in combat"; map skills and empty values do not.
+     */
     @Test
     public void combatActionClassification() {
         Assertions.assertTrue(SkillCategory.NORMAL.isCombatAction());
@@ -112,7 +120,9 @@ public class SkillCategoryAndResourceTest {
     // Resource: the three boundaries
     // ==================================================================
 
-    /** The regular path does not cross the cap, and returns the actual amount credited. */
+    /**
+     * The regular path does not cross the cap, and returns the actual amount credited.
+     */
     @Test
     public void gainClampedStopsAtMax() {
         Resource r = new Resource("sp", 5, 3);
@@ -126,7 +136,9 @@ public class SkillCategoryAndResourceTest {
         Assertions.assertEquals(5, r.getValue());
     }
 
-    /** Adding a non-positive number is a caller bug: ignored silently, and must not turn into a deduction. */
+    /**
+     * Adding a non-positive number is a caller bug: ignored silently, and must not turn into a deduction.
+     */
     @Test
     public void nonPositiveGainIsIgnored() {
         Resource r = new Resource("sp", 5, 3);
@@ -137,7 +149,9 @@ public class SkillCategoryAndResourceTest {
         Assertions.assertEquals(3, r.getValue(), "must not be deducted by 'adding a negative number'");
     }
 
-    /** Overflow is not allowed by default: with no allowance configured, {@code gain} and {@code gainClamped} are equivalent. */
+    /**
+     * Overflow is not allowed by default: with no allowance configured, {@code gain} and {@code gainClamped} are equivalent.
+     */
     @Test
     public void overflowIsOffByDefault() {
         Resource r = new Resource("sp", 5, 5);
@@ -152,7 +166,7 @@ public class SkillCategoryAndResourceTest {
      * capped at max + overflow.
      *
      * <p>Corresponds to Sparkle's ultimate "restore 4/6 skill points; if skill points overflow when
-     * restoring, record the number of overflowing skill points, up to 10" ({@code 1306_花火.md}) - 
+     * restoring, record the number of overflowing skill points, up to 10" ({@code 1306_花火.md}) -
      * the engine side only provides the "can overflow and is capped" capability.
      */
     @Test
@@ -195,7 +209,9 @@ public class SkillCategoryAndResourceTest {
         Assertions.assertEquals(0, r.gain(1), "it is full, cannot be added to");
     }
 
-    /** Raising the allowance does not touch the stored value, it just allows adding more afterwards. */
+    /**
+     * Raising the allowance does not touch the stored value, it just allows adding more afterwards.
+     */
     @Test
     public void raisingOverflowKeepsCurrentValue() {
         Resource r = new Resource("sp", 5, 3);
@@ -206,7 +222,9 @@ public class SkillCategoryAndResourceTest {
         Assertions.assertEquals(11, r.getValue());
     }
 
-    /** A negative overflow allowance is treated as 0. */
+    /**
+     * A negative overflow allowance is treated as 0.
+     */
     @Test
     public void negativeOverflowIsClampedToZero() {
         Resource r = new Resource("sp", 5, 0);
@@ -216,7 +234,9 @@ public class SkillCategoryAndResourceTest {
         Assertions.assertEquals(0, r.gain(1));
     }
 
-    /** {@code spend} = "deduct as much as it can"; {@code spendExactly} = "if it is not enough, deduct nothing at all". */
+    /**
+     * {@code spend} = "deduct as much as it can"; {@code spendExactly} = "if it is not enough, deduct nothing at all".
+     */
     @Test
     public void spendVersusSpendExactly() {
         Resource r = new Resource("sp", 5, 3);
@@ -234,7 +254,9 @@ public class SkillCategoryAndResourceTest {
         Assertions.assertEquals(0, r.getValue(), "a failed spend must not deduct into the negative");
     }
 
-    /** {@code setValue} is an unprotected raw write, but it still clamps (used for save restoration). */
+    /**
+     * {@code setValue} is an unprotected raw write, but it still clamps (used for save restoration).
+     */
     @Test
     public void setValueClampsButDoesNotFail() {
         Resource r = new Resource("sp", 5, 0);
@@ -249,14 +271,18 @@ public class SkillCategoryAndResourceTest {
         Assertions.assertEquals(8, r.getValue(), "clamped to max + overflow");
     }
 
-    /** The initial value is clamped too - passing an out-of-range value to the constructor should neither blow up nor leave an illegal state. */
+    /**
+     * The initial value is clamped too - passing an out-of-range value to the constructor should neither blow up nor leave an illegal state.
+     */
     @Test
     public void initialValueIsClamped() {
         Assertions.assertEquals(5, new Resource("sp", 5, 99).getValue());
         Assertions.assertEquals(0, new Resource("sp", 5, -99).getValue());
     }
 
-    /** Illegal constructor arguments must fail fast (these are coding errors, not data errors, and must not be silent). */
+    /**
+     * Illegal constructor arguments must fail fast (these are coding errors, not data errors, and must not be silent).
+     */
     @Test
     public void invalidConstructionFailsFast() {
         Assertions.assertThrows(IllegalArgumentException.class, () -> new Resource(null, 5, 0));
@@ -270,7 +296,9 @@ public class SkillCategoryAndResourceTest {
         Assertions.assertEquals(0, zero.gain(5));
     }
 
-    /** The boundaries of {@code missingToMax} and {@code isEmpty}. */
+    /**
+     * The boundaries of {@code missingToMax} and {@code isEmpty}.
+     */
     @Test
     public void queryHelpers() {
         Resource r = new Resource("sp", 5, 0);

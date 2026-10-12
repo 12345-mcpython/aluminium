@@ -46,7 +46,7 @@ public class SkillData {
      * Is this a real row, or the {@link #EMPTY} placeholder the loader hands back for an id the data does not have?
      *
      * <p><b>Why this question needs a name.</b> {@code Character.Builder} fills every intrinsic slot with a
-     * {@code DefaultSkill}, and a slot whose character has no such row still ends up <b>present in the map</b> - 
+     * {@code DefaultSkill}, and a slot whose character has no such row still ends up <b>present in the map</b> -
      * holding this placeholder. So "the slot is there" and "the character has that skill" are different facts, and
      * the difference is invisible to a null check: {@code getData()} answers non-null either way. Measured:
      * Himeko carries a {@code ELATION_SKILL} key whose row is this placeholder, while 8010's is a real

@@ -1,27 +1,25 @@
 package com.laosun.aluminium.test.engine;
+
 import com.laosun.aluminium.Battle;
-import com.laosun.aluminium.beans.EffectSpec;
-import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.AttributeType;
-import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.skill.SkillExecutor;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
 import java.util.List;
 
 /**
  * 1415's memosprite skill 21, the fire-seed CRIT clause: "变身时若[火种]大于 #5 点，每超出 1 点，卡厄斯兰那的暴击伤害提高 #6%，最多可提高 #%".
- *
+ * <p>
  * The cap is the step count (`#/ #6 = 6`), so the six gates are the sentence. This judge sets [火种] to a chosen value and reads the CRIT DMG the transformation grants.
  */
 public class WorldOdeFireSeedCritTest {
     private static final int LEVEL = 80;
     private static final int PHAINON = 1408;
-        private static final String FIRE_SEED = "火种";
+    private static final String FIRE_SEED = "火种";
 
     @Test
     public void theTransformationTurnsExcessSeedsIntoCritDamage() {
@@ -39,12 +37,16 @@ public class WorldOdeFireSeedCritTest {
         Assertions.assertEquals(steps(fifteen[1]) * 0.06, fifteen[0] - baseline[0], 1e-6, "and four seeds past it, four steps");
     }
 
-    /** How many steps a seed count is past the threshold. */
+    /**
+     * How many steps a seed count is past the threshold.
+     */
     private static int steps(double seeds) {
         return (int) Math.max(0, Math.min(seeds - 12, 6));
     }
 
-    /** [the CRIT DMG the transformation granted, the seeds it ended with] */
+    /**
+     * [the CRIT DMG the transformation granted, the seeds it ended with]
+     */
     private static double[] run(int seeds) {
         Character him = CharacterFactory.create(PHAINON, LEVEL);
         Battle battle = new Battle(List.of(him),

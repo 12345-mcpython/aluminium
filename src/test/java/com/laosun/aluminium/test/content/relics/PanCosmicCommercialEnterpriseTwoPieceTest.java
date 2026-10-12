@@ -2,10 +2,10 @@ package com.laosun.aluminium.test.content.relics;
 
 import com.laosun.aluminium.data.RelicTriggerTables;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.models.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -18,7 +18,8 @@ public class PanCosmicCommercialEnterpriseTwoPieceTest {
     private static final int SET = 303;
     private static final int WEARER = 1205;
     private static final int LEVEL = 80;
-        private TriggerTable.TriggerContext ctx() {
+
+    private TriggerTable.TriggerContext ctx() {
         var wearer = CharacterFactory.create(WEARER, LEVEL);
         Enemy enemy = BattleFixture.monster();
         return new TriggerTable.TriggerContext(wearer, wearer, enemy, 0, 0);

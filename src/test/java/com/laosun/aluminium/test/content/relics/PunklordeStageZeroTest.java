@@ -2,7 +2,7 @@ package com.laosun.aluminium.test.content.relics;
 
 import com.laosun.aluminium.data.RelicTriggerTables;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.TriggerTable;
+import com.laosun.aluminium.models.trigger.TriggerTable;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 

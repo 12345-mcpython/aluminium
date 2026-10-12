@@ -1,10 +1,10 @@
 package com.laosun.aluminium.test.data;
 
 
-import com.laosun.aluminium.test.trigger.TriggerTableTest;
 import com.laosun.aluminium.data.TriggerTables;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.TriggerTable;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.trigger.TriggerTableTest;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -21,7 +21,9 @@ public class TriggerDataBindingTest {
     private static final int TRIBBIE = 1403;
     private static final int ROBIN = 1309;
 
-    /** Both validation characters must actually have a file, and it must produce rules. */
+    /**
+     * Both validation characters must actually have a file, and it must produce rules.
+     */
     @Test
     public void bothCharactersHaveLoadableTables() {
         Assertions.assertTrue(TriggerTables.exists(TRIBBIE), "1403 must have a trigger file");
@@ -69,7 +71,9 @@ public class TriggerDataBindingTest {
                 "per_target must deserialize to TRUE; if this is null the rule silently becomes flat");
     }
 
-    /** Robin's rule is deliberately flat, so {@code per_target} must stay unset. */
+    /**
+     * Robin's rule is deliberately flat, so {@code per_target} must stay unset.
+     */
     @Test
     public void robinRuleIsFlatNotPerTarget() {
         TriggerTable robin = TriggerTables.of(ROBIN);
@@ -83,7 +87,9 @@ public class TriggerDataBindingTest {
         Assertions.assertEquals(2.0, rule.effects().getFirst().getAmount(), 1e-9);
     }
 
-    /** Conditions must survive too: both characters rely on {@code actor != self}. */
+    /**
+     * Conditions must survive too: both characters rely on {@code actor != self}.
+     */
     @Test
     public void conditionsSurviveJsonBinding() {
         TriggerTable robin = TriggerTables.of(ROBIN);
@@ -96,13 +102,15 @@ public class TriggerDataBindingTest {
                 "the file declares two conditions (actor != self, hit_count > 0)");
     }
 
-    /** The provenance fields are present, so a number can be traced back to its document. */
+    /**
+     * The provenance fields are present, so a number can be traced back to its document.
+     */
     @Test
     public void rulesCarryTheirSource() {
         TriggerTable tribbie = TriggerTables.of(TRIBBIE);
         var rule = tribbie.matching(TriggerEvent.BATTLE_START,
-                new TriggerTable.TriggerContext(
-                        com.laosun.aluminium.utils.CharacterFactory.create(TRIBBIE, 80), null, null, 0, 0))
+                        new TriggerTable.TriggerContext(
+                                com.laosun.aluminium.utils.CharacterFactory.create(TRIBBIE, 80), null, null, 0, 0))
                 .getFirst();
         Assertions.assertNotNull(rule.source(), "every rule must state its source");
         Assertions.assertTrue(rule.source().contains("1403"), rule.source());

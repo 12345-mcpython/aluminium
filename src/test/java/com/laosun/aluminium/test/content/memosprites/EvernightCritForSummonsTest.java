@@ -1,26 +1,29 @@
 package com.laosun.aluminium.test.content.memosprites;
+
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.skill.SkillExecutor;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
 import java.util.List;
 
 /**
  * 1413's skill, the clause that raises every memosprite's CRIT DMG: "使我方全体忆灵的暴击伤害提高，提高数值等同于长夜月暴击伤害的 #1%".
- *
+ * <p>
  * It is also the effect that 1141524's third sentence later raises, so it has to exist before that can be written.
- *
+ * <p>
  * Two-sided: after her skill, a memosprite's CRIT DMG rises by her own CRIT DMG times her skill's #1 (read from the skill row, never a literal); before it, it does not.
  */
 public class EvernightCritForSummonsTest {
     private static final int LEVEL = 80;
     private static final int LONGNIGHT = 1413;
     private static final int CYRENE = 1415;
-        @Test
+
+    @Test
     public void herSkillRaisesTheSummonsCritDamage() {
         double[] gained = run(true);
         double[] clean = run(false);
@@ -31,7 +34,9 @@ public class EvernightCritForSummonsTest {
         Assertions.assertEquals(0.0, clean[0], 1e-9, "and before the skill there is no gain");
     }
 
-    /** [what a memosprite's CRIT DMG gained, her CRIT DMG, her skill's #1] */
+    /**
+     * [what a memosprite's CRIT DMG gained, her CRIT DMG, her skill's #1]
+     */
     private static double[] run(boolean castHerSkill) {
         Character cyrene = CharacterFactory.create(CYRENE, LEVEL);
         Character longnight = CharacterFactory.create(LONGNIGHT, LEVEL);

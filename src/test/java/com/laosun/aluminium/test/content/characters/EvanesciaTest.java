@@ -1,13 +1,13 @@
 package com.laosun.aluminium.test.content.characters;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -22,7 +22,8 @@ public class EvanesciaTest {
     private static final int WEARER = 1505;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-        private static EffectSpec derive() {
+
+    private static EffectSpec derive() {
         EffectSpec spec = new EffectSpec();
         TriggerSpecs.set(spec, "op", "GAIN_RESOURCE");
         TriggerSpecs.set(spec, "resource", "欢愉度");
@@ -76,7 +77,7 @@ public class EvanesciaTest {
     }
 
     /**
- * The shipped numbers themselves. The behavioural tests above build their own effect in Java, so a
+     * The shipped numbers themselves. The behavioural tests above build their own effect in Java, so a
      * json-only change to `amountPercent` slipped past them -- measured: `0.5 -> 0.25` came back with 0 red. This reads the
      * character's OWN compiled rules, which is exactly what the content file says.
      */
@@ -117,7 +118,7 @@ public class EvanesciaTest {
         // is triggered by ENERGY_GAINED, so it is pinned by reading that event's rules -- the first version of this test counted
         // BATTLE_START only and read 2, which is exactly what made it obvious.
         var theSyncRule = elation.getTriggerTable().rulesFor(
-                com.laosun.aluminium.enums.TriggerEvent.ENERGY_GAINED).stream()
+                        com.laosun.aluminium.enums.TriggerEvent.ENERGY_GAINED).stream()
                 .filter(rule -> rule.id().endsWith("energy_sync")).toList();
         Assertions.assertEquals(1, theSyncRule.size(), "the energy sync is wired to ENERGY_GAINED");
         var syncEffect = theSyncRule.getFirst().effects().getFirst();

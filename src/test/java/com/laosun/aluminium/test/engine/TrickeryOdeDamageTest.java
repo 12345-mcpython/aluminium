@@ -4,8 +4,8 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.skill.SkillExecutor;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -21,7 +21,8 @@ public class TrickeryOdeDamageTest {
     private static final int LEVEL = 80;
     private static final int CYRENE = 1415;
     private static final int CIPHER = 1406;
-        @Test
+
+    @Test
     public void theOdeRaisesHerDamage() {
         Boost withoutOde = damageBoost(false);
         Boost withOde = damageBoost(true);

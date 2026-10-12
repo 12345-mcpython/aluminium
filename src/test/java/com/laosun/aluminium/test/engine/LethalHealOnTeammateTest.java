@@ -3,8 +3,8 @@ package com.laosun.aluminium.test.engine;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -12,14 +12,17 @@ import java.util.List;
 
 /**
  * 1211: "when a teammate of Bailu (白露) takes a lethal attack ... Bailu immediately provides healing for it, restoring health equal to 18.00% of Bailu's Max HP + 480"
- *.
+ * .
  *
  * <p>ONE VARIABLE: whether the blow would have killed the teammate. Nothing else differs -- same party, same heal amount, same scene.
  */
 public class LethalHealOnTeammateTest {
     private static final int BAILU = 1211;
     private static final int TEAMMATE = 1002;
-        /** A lethal blow: the teammate is saved, at Bailu (白露)'s 18% Max HP plus 480. */
+
+    /**
+     * A lethal blow: the teammate is saved, at Bailu (白露)'s 18% Max HP plus 480.
+     */
     @Test
     public void aLethalBlowIsHealed() {
         double[] result = afterBlow(true);
@@ -29,7 +32,9 @@ public class LethalHealOnTeammateTest {
                 "「restores health equal to 18.00% of Bailu's Max HP + 480」");
     }
 
-    /** Note: A survivable blow: the clause has not started, so the damage simply lands. */
+    /**
+     * Note: A survivable blow: the clause has not started, so the damage simply lands.
+     */
     @Test
     public void aSurvivableBlowIsNotHealed() {
         double[] result = afterBlow(false);
@@ -38,7 +43,9 @@ public class LethalHealOnTeammateTest {
 
     // ==================================================================
 
-    /** { hp after, the amount the sentence promises, hp before }. */
+    /**
+     * { hp after, the amount the sentence promises, hp before }.
+     */
     private static double[] afterBlow(boolean lethal) {
         Character healer = CharacterFactory.create(BAILU, 80, false, null, null, 0);
         Character teammate = CharacterFactory.create(TEAMMATE, 80, false, null, null, 0);

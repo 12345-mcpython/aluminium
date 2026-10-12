@@ -125,7 +125,9 @@ public class DotBuff extends AbstractBuff {
         }
     }
 
-    /** @param maxStacks the layer ceiling (0 = none); see {@link #getMaxStacks()} */
+    /**
+     * @param maxStacks the layer ceiling (0 = none); see {@link #getMaxStacks()}
+     */
     public DotBuff(CanHit source, DamageElement element, double baseDamage, int turns, int maxStacks) {
         super(turns, true);
         this.maxStacks = maxStacks;
@@ -210,7 +212,9 @@ public class DotBuff extends AbstractBuff {
      * @param other the buff being attached
      * @return {@code false}, so {@code BuffManager.addBuff} appends instead of replacing
      */
-    /** The authored layer ceiling ({@code 0} = uncapped); read by {@code Battle.tickDots}. */
+    /**
+     * The authored layer ceiling ({@code 0} = uncapped); read by {@code Battle.tickDots}.
+     */
     public int getMaxStacks() {
         return maxStacks;
     }

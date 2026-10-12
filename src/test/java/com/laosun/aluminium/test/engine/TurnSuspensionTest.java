@@ -1,8 +1,6 @@
 package com.laosun.aluminium.test.engine;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
@@ -10,9 +8,10 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.Signal;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.buff.DotBuff;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -36,7 +35,10 @@ public class TurnSuspensionTest {
     private static final int MARCH = 1001;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-        /** A suspended unit's turn passes without it: no TURN_START, no DOT tick. */
+
+    /**
+     * A suspended unit's turn passes without it: no TURN_START, no DOT tick.
+     */
     @Test
     public void aSuspendedUnitTakesNoTurn() {
         Fixture f = new Fixture();
@@ -52,7 +54,9 @@ public class TurnSuspensionTest {
                 "…and the burn on her did not tick either");
     }
 
-    /** Note: Everyone else is untouched: the flag is about the carrier, not about the battle. */
+    /**
+     * Note: Everyone else is untouched: the flag is about the carrier, not about the battle.
+     */
     @Test
     public void everybodyElseStillActs() {
         Fixture f = new Fixture();
@@ -64,7 +68,9 @@ public class TurnSuspensionTest {
         Assertions.assertTrue(f.attack(f.ally) > attackBefore, "the ally's own turn is normal");
     }
 
-    /** Note: The flag rides on the state: removing the state gives the turns back, with no second switch to forget. */
+    /**
+     * Note: The flag rides on the state: removing the state gives the turns back, with no second switch to forget.
+     */
     @Test
     public void removingTheStateGivesTheTurnsBack() {
         Fixture f = new Fixture();
@@ -93,7 +99,9 @@ public class TurnSuspensionTest {
             battle.startBattle();
         }
 
-        /** The state comes from a RULE, so the op path (`suspends_turns` on APPLY_BUFF) is what is being tested. */
+        /**
+         * The state comes from a RULE, so the op path (`suspends_turns` on APPLY_BUFF) is what is being tested.
+         */
         private void suspendMarchFromARule() {
             march.setTriggerTable(new TriggerTable(MARCH, List.of(turnStartMarker(), suspendingState())));
             battle.fireTriggers(TriggerEvent.BATTLE_START, march, march, 0, 0);
@@ -123,7 +131,9 @@ public class TurnSuspensionTest {
         }
     }
 
-    /** A rule that leaves a visible mark whenever a TURN_START reaches its owner's table. */
+    /**
+     * A rule that leaves a visible mark whenever a TURN_START reaches its owner's table.
+     */
     private static TriggerSpec turnStartMarker() {
         EffectSpec effect = new EffectSpec();
         TriggerSpecs.set(effect, "op", "MODIFY_ATTR");
@@ -134,7 +144,9 @@ public class TurnSuspensionTest {
         return TriggerSpecs.rule(TriggerEvent.TURN_START.value(), null, effect);
     }
 
-    /** "before the [协奏] state ends it will not enter its own turn" as the data spells it. */
+    /**
+     * "before the [协奏] state ends it will not enter its own turn" as the data spells it.
+     */
     private static TriggerSpec suspendingState() {
         EffectSpec effect = new EffectSpec();
         TriggerSpecs.set(effect, "op", "APPLY_BUFF");

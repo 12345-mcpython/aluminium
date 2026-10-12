@@ -29,14 +29,18 @@ import java.util.Random;
  */
 public class RealTeamTest {
 
-    /** A stage with wave data, used by the acceptance case. */
+    /**
+     * A stage with wave data, used by the acceptance case.
+     */
     private static final int STAGE = 103201;
 
     // ==================================================================
     // The team itself
     // ==================================================================
 
-    /** The acceptance criterion: the team is 4 characters, every one with a real element. */
+    /**
+     * The acceptance criterion: the team is 4 characters, every one with a real element.
+     */
     @Test
     public void theTeamIsFourRealCharacters() {
         List<Character> team = StageFactory.realTeam();
@@ -89,7 +93,9 @@ public class RealTeamTest {
         }
     }
 
-    /** The cone's panel actually reaches the character's sheet. */
+    /**
+     * The cone's panel actually reaches the character's sheet.
+     */
     @Test
     public void theWeaponContributesToTheStatSheet() {
         Character withCone = StageFactory.realTeam().getFirst();
@@ -118,7 +124,9 @@ public class RealTeamTest {
                 "weapons.json has 5-star cones; a max of 0 means rarity failed to bind");
     }
 
-    /** The team therefore carries the strongest available cone per path, not a starter one. */
+    /**
+     * The team therefore carries the strongest available cone per path, not a starter one.
+     */
     @Test
     public void teamCarriesBestAvailableConePerPath() {
         for (Character character : StageFactory.realTeam()) {
@@ -134,7 +142,9 @@ public class RealTeamTest {
         }
     }
 
-    /** The team is built fresh each call, so two teams never share mutable state. */
+    /**
+     * The team is built fresh each call, so two teams never share mutable state.
+     */
     @Test
     public void eachCallBuildsAFreshTeam() {
         List<Character> first = StageFactory.realTeam();
@@ -147,7 +157,9 @@ public class RealTeamTest {
                 "damaging one team must not affect the other");
     }
 
-    /** Speeds differ, so the action bar order is meaningful rather than a tie. */
+    /**
+     * Speeds differ, so the action bar order is meaningful rather than a tie.
+     */
     @Test
     public void speedsAreDistinct() {
         List<Character> team = StageFactory.realTeam();
@@ -161,7 +173,9 @@ public class RealTeamTest {
     // Through a real stage
     // ==================================================================
 
-    /** The acceptance criterion: {@code load(103201)} fights with this team and runs without blowing up. */
+    /**
+     * The acceptance criterion: {@code load(103201)} fights with this team and runs without blowing up.
+     */
     @Test
     public void stageDoesNotGetBuiltWithPlaceholders() {
         assumeStageData();
@@ -189,7 +203,9 @@ public class RealTeamTest {
         Assertions.assertTrue(battle.queue.getElapsed() > 0);
     }
 
-    /** The no-argument {@code load} uses the real team too (that is the whole point of the real team). */
+    /**
+     * The no-argument {@code load} uses the real team too (that is the whole point of the real team).
+     */
     @Test
     public void defaultLoadUsesTheRealTeam() {
         assumeStageData();
@@ -203,7 +219,9 @@ public class RealTeamTest {
         }
     }
 
-    /** The old placeholder entry point is gone, so nothing can silently go back to it. */
+    /**
+     * The old placeholder entry point is gone, so nothing can silently go back to it.
+     */
     @Test
     public void placeholderTeamNoLongerExists() {
         boolean present = false;
@@ -216,7 +234,9 @@ public class RealTeamTest {
                 "StageFactory must not still expose a temporary/placeholder team");
     }
 
-    /** Stage data is generator output and is not in the repository. */
+    /**
+     * Stage data is generator output and is not in the repository.
+     */
     private static void assumeStageData() {
         Assumptions.assumeFalse(Constant.stages().isEmpty(),
                 "missing stage.json (generator output), skipping the stage-level assertions");

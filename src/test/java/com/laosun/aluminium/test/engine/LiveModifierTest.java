@@ -12,7 +12,9 @@ import org.junit.jupiter.api.Test;
  * and re-attaching on every change would stack the buff itself.
  */
 public class LiveModifierTest {
-    /** The value follows the count, with the modifier attached once. */
+    /**
+     * The value follows the count, with the modifier attached once.
+     */
     @Test
     public void aLiveModifierFollowsTheCount() {
         int[] stacks = {1};
@@ -31,7 +33,9 @@ public class LiveModifierTest {
         Assertions.assertEquals(100.0, attack.get(), 1e-9, "and back to the base when the stacks are gone");
     }
 
-    /** Control: a stored modifier is a snapshot, which is what the family cannot use. */
+    /**
+     * Control: a stored modifier is a snapshot, which is what the family cannot use.
+     */
     @Test
     public void aStoredModifierDoesNotFollow() {
         int[] stacks = {1};

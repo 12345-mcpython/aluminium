@@ -5,9 +5,9 @@ import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
-import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.models.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -39,13 +39,15 @@ import java.util.List;
  * 0 clobber risks, so this changes no shipped number - which the full suite confirms.
  */
 public class ResourceChangeScopeTest {
-        private static final String OUTER = "测试外层";
+    private static final String OUTER = "测试外层";
     private static final String INNER = "测试内层";
     private static final String INNER_SEEN = "内层看到了";
     private static final String OUTER_SEEN = "外层看到了";
     private static final String LATE = "后来那次看到了";
 
-    /** The outer event's later rules still fire, and the nested event's own rules fire too. */
+    /**
+     * The outer event's later rules still fire, and the nested event's own rules fire too.
+     */
     @Test
     public void aNestedMoveDoesNotSilenceTheRestOfTheEvent() {
         Character receiver = receiver();
@@ -126,7 +128,9 @@ public class ResourceChangeScopeTest {
         return unit;
     }
 
-    /** The giver moves the party's FIRST member's counter - the receiver, so the readings are about its store. */
+    /**
+     * The giver moves the party's FIRST member's counter - the receiver, so the readings are about its store.
+     */
     private static TriggerSpec grantOuterAtTurnStart() {
         return TriggerSpecs.rule(TriggerEvent.TURN_START.name(), List.of(), gainFor(OUTER, 3.0, "party_first"));
     }
@@ -147,7 +151,9 @@ public class ResourceChangeScopeTest {
         return battle;
     }
 
-    /** Books the event's own magnitude when {@code amount} is null, or a flat amount otherwise. */
+    /**
+     * Books the event's own magnitude when {@code amount} is null, or a flat amount otherwise.
+     */
     private static EffectSpec gain(String resource, Double amount) {
         EffectSpec effect = new EffectSpec();
         TriggerSpecs.set(effect, "op", "GAIN_RESOURCE");

@@ -4,13 +4,13 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.Camp;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.skill.DefaultSkill;
-import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.models.Signal;
 import com.laosun.aluminium.models.Summon;
-import com.laosun.aluminium.utils.AttributeBuilder;
+import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.models.enemy.EnemyFactory;
+import com.laosun.aluminium.models.skill.DefaultSkill;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.AttributeBuilder;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -23,11 +23,11 @@ import java.util.List;
  * the engine stops assuming "enemy camp == monsters". Four things could each have quietly kept the old
  * assumption, and each is asserted here:
  * <ol>
- *   <li>the camp holds it ({@code enemies}) while the monster view ({@code enemyUnits()}) does not - 
+ *   <li>the camp holds it ({@code enemies}) while the monster view ({@code enemyUnits()}) does not -
  *       the two questions "who is on that side" and "which of them are monsters" are now separate;</li>
  *   <li>our side can reach it: the engine's own target expansion ({@code targetableEnemies}) includes it,
  *       which is what an AOE skill iterates;</li>
- *   <li><b>the outcome waits for it</b>: killing every monster while a summon lives must not be a win - 
+ *   <li><b>the outcome waits for it</b>: killing every monster while a summon lives must not be a win -
  *       the failure mode this guards against is a summon that is simply ignored by the victory check;</li>
  *   <li>it takes a turn: it is on the action bar like anything else.</li>
  * </ol>
@@ -38,7 +38,9 @@ import java.util.List;
 public class EnemyCampSummonTest {
     private static final double EPS = 1e-6;
 
-    /** The camp holds it; the monster view does not. */
+    /**
+     * The camp holds it; the monster view does not.
+     */
     @Test
     public void theEnemyCampHoldsANonMonsterAndTheMonsterViewDoesNot() {
         Fixture f = fixture();
@@ -50,7 +52,9 @@ public class EnemyCampSummonTest {
         Assertions.assertSame(f.monster, f.battle.enemyUnits().getFirst());
     }
 
-    /** Our side's target list includes it, so an AOE reaches it without the caller naming it. */
+    /**
+     * Our side's target list includes it, so an AOE reaches it without the caller naming it.
+     */
     @Test
     public void theEngineTargetListIncludesTheSummon() {
         Fixture f = fixture();
@@ -94,7 +98,9 @@ public class EnemyCampSummonTest {
                 "now the whole camp is down");
     }
 
-    /** It really is a combatant: on the action bar, with its own signal. */
+    /**
+     * It really is a combatant: on the action bar, with its own signal.
+     */
     @Test
     public void theSummonTakesItsTurnOnTheActionBar() {
         Fixture f = fixture();
@@ -113,7 +119,9 @@ public class EnemyCampSummonTest {
     private record Fixture(Battle battle, Character hero, Enemy monster, Summon summon) {
     }
 
-    /** A hero, one real monster, and one enemy-side summon. */
+    /**
+     * A hero, one real monster, and one enemy-side summon.
+     */
     private static Fixture fixture() {
         Character hero = Character.fromAttributes("hero", 10_000, 100, 100, 100);
         Enemy monster = EnemyFactory.create(1002011, 90, 1);        // Ice Edge (冰锋), toughness 60

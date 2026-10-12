@@ -5,8 +5,8 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -22,7 +22,10 @@ import java.util.Random;
 public class RemembranceTrailblazerTest {
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-        /** Note: The memorisprite arrives with the document's own panel, for both ids. */
+
+    /**
+     * Note: The memorisprite arrives with the document's own panel, for both ids.
+     */
     @Test
     public void theSummonArrivesWithTheDocumentedPanel() {
         for (int cid : new int[]{8007, 8008}) {
@@ -43,7 +46,9 @@ public class RemembranceTrailblazerTest {
         }
     }
 
-    /** Note: Casting again does not create a second memosprite - the first is still the one on the field. */
+    /**
+     * Note: Casting again does not create a second memosprite - the first is still the one on the field.
+     */
     @Test
     public void castingAgainKeepsTheSameMemosprite() {
         Character tb = CharacterFactory.create(8007, LEVEL);
@@ -59,7 +64,9 @@ public class RemembranceTrailblazerTest {
         Assertions.assertSame(first, second, "「若迷迷已在场」 (if Mem is already on the field) -- the same memosprite, not a second one");
     }
 
-    /** Census: the summon (Skill), the summon (Ultimate) and the level convention. */
+    /**
+     * Census: the summon (Skill), the summon (Ultimate) and the level convention.
+     */
     @Test
     public void hisFileCarriesTheClauses() {
         for (int cid : new int[]{8007, 8008}) {

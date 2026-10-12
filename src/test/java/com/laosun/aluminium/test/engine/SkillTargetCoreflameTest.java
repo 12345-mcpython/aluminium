@@ -6,8 +6,8 @@ import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.skill.Skill;
 import com.laosun.aluminium.models.skill.SkillExecutor;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -24,9 +24,11 @@ public class SkillTargetCoreflameTest {
     private static final double EPS = 1e-9;
     private static final int OWNER = 1408;
     private static final int SUPPORT = 1414;
-        private static final String COREFLAME = "火种";
+    private static final String COREFLAME = "火种";
 
-    /** Aimed at: she gains a point of Coreflame and 30% crit damage. */
+    /**
+     * Aimed at: she gains a point of Coreflame and 30% crit damage.
+     */
     @Test
     public void beingTargetedGrantsCoreflameAndCritDamage() {
         double[] aimedAtHer = scene(true);
@@ -34,7 +36,9 @@ public class SkillTargetCoreflameTest {
         Assertions.assertEquals(0.30, aimedAtHer[1], EPS, "「crit damage increased by 30%」");
     }
 
-    /** Note: Aimed at an enemy instead: the sentence has not started. */
+    /**
+     * Note: Aimed at an enemy instead: the sentence has not started.
+     */
     @Test
     public void aimingElsewhereChangesNothing() {
         double[] aimedAway = scene(false);
@@ -44,7 +48,9 @@ public class SkillTargetCoreflameTest {
 
     // ==================================================================
 
-    /** returns { Coreflame gained, crit damage gained }. */
+    /**
+     * returns { Coreflame gained, crit damage gained }.
+     */
     private static double[] scene(boolean aimAtHer) {
         Character owner = CharacterFactory.create(OWNER, 80, false, null, null, 0);
         Character support = CharacterFactory.create(SUPPORT, 80, false, null, null, 0);

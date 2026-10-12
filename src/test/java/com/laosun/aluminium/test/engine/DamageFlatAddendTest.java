@@ -9,8 +9,8 @@ import com.laosun.aluminium.models.Damage;
 import com.laosun.aluminium.models.DoubleValue;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -28,7 +28,9 @@ import java.util.Random;
 public class DamageFlatAddendTest {
     private static final double EPS = 1e-6;
 
-    /** The addend survives the zone chain by being part of the base: 100  x  1.5 = 150, not 100  x  1.5 + 50. */
+    /**
+     * The addend survives the zone chain by being part of the base: 100  x  1.5 = 150, not 100  x  1.5 + 50.
+     */
     @Test
     public void theAddendIsMultipliedByTheZonesLikeTheBase() {
         Damage damage = damage(100);
@@ -43,7 +45,9 @@ public class DamageFlatAddendTest {
                         + "spelling would have given 100 × 2.0 = 200");
     }
 
-    /** A boost is a percentage of the base; the addend is a value - so they are not interchangeable, and this is the pair. */
+    /**
+     * A boost is a percentage of the base; the addend is a value - so they are not interchangeable, and this is the pair.
+     */
     @Test
     public void anAddendIsNotAPercentage() {
         Damage asAddend = damage(100);
@@ -60,7 +64,9 @@ public class DamageFlatAddendTest {
         Assertions.assertEquals(1030, otherBase.toValue(), EPS, "+30 is +30 whatever the base is");
     }
 
-    /** The addend rides into the assembled value through the real pipeline, so the zone order is the real one. */
+    /**
+     * The addend rides into the assembled value through the real pipeline, so the zone order is the real one.
+     */
     @Test
     public void theEngineAppliesItThroughAssemble() {
         Character attacker = CharacterFactory.create(1003, 80);

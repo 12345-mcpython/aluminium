@@ -4,15 +4,9 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.SkillEffectSpec;
 import com.laosun.aluminium.data.SkillData;
 import com.laosun.aluminium.data.SkillEffects;
-import com.laosun.aluminium.enums.AttributeType;
-import com.laosun.aluminium.enums.DamageElement;
-import com.laosun.aluminium.enums.DamageType;
-import com.laosun.aluminium.enums.SkillCategory;
-import com.laosun.aluminium.enums.SkillEffectType;
-import com.laosun.aluminium.enums.TriggerEvent;
+import com.laosun.aluminium.enums.*;
 import com.laosun.aluminium.models.BreakDamageCalculator;
 import com.laosun.aluminium.models.CanHit;
-import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Damage;
 import com.laosun.aluminium.models.buff.SuperBreakBuff;
 import com.laosun.aluminium.models.enemy.Enemy;
@@ -123,7 +117,7 @@ public final class SkillExecutor {
     }
 
     /**
-     * Fires {@link com.laosun.aluminium.models.event.SkillCastEvent} - 
+     * Fires {@link com.laosun.aluminium.models.event.SkillCastEvent} -
      * same convention as {@link #broadcastAfterAttack}: every one of our members receives it,
      * and interested parties receive it directly. Deliberately does not require {@code hitTargets} to
      * be non-empty (non-damaging skills fire it too).
@@ -193,9 +187,12 @@ public final class SkillExecutor {
                 ? SkillCategory.UNSPECIFIED
                 : skill.getData().getCategory();
         switch (category) {
-            case ULTRA -> battle.fireTriggers(TriggerEvent.ULT_CAST, user, aimed, hits.size(), battle.getLastUltEnergySpent(), category, skill.getSkillSlot(), weakHitCount);
-            case BPSKILL -> battle.fireTriggers(TriggerEvent.SKILL_CAST, user, aimed, hits.size(), 0, category, skill.getSkillSlot(), weakHitCount);
-            case NORMAL -> battle.fireTriggers(TriggerEvent.BASIC_ATTACK, user, aimed, hits.size(), 0, category, skill.getSkillSlot(), weakHitCount);
+            case ULTRA ->
+                    battle.fireTriggers(TriggerEvent.ULT_CAST, user, aimed, hits.size(), battle.getLastUltEnergySpent(), category, skill.getSkillSlot(), weakHitCount);
+            case BPSKILL ->
+                    battle.fireTriggers(TriggerEvent.SKILL_CAST, user, aimed, hits.size(), 0, category, skill.getSkillSlot(), weakHitCount);
+            case NORMAL ->
+                    battle.fireTriggers(TriggerEvent.BASIC_ATTACK, user, aimed, hits.size(), 0, category, skill.getSkillSlot(), weakHitCount);
             default -> {
                 // not an in-battle cast: see above
             }

@@ -7,8 +7,8 @@ import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.buff.StateBuff;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -36,14 +36,18 @@ import java.util.List;
 public class SilverWolfLV999KitTest {
     private static final int WOLF = 1506;
     private static final int ALLY = 1204;
-        private static final String LAUGH = "笑点";
+    private static final String LAUGH = "笑点";
     private static final String HIDDEN = "隐藏分";
     private static final String CHARGES = "强化普攻次数";
     private static final String GOD = "无敌玩家";
-    /** 【好活当赏】 - a STATE here, because that is what her rider's gate asks about (`self has_state 好活当赏`). */
+    /**
+     * 【好活当赏】 - a STATE here, because that is what her rider's gate asks about (`self has_state 好活当赏`).
+     */
     private static final String GIFT = "好活当赏";
 
-    /** Her Skill gains the 5 笑点 her page states. */
+    /**
+     * Her Skill gains the 5 笑点 her page states.
+     */
     @Test
     public void theSkillGainsFiveLaughs() {
         Battle battle = newBattle();
@@ -55,7 +59,9 @@ public class SilverWolfLV999KitTest {
         Assertions.assertEquals(5, gained, "战技: 「获得 5 个笑点」");
     }
 
-    /** Her Elation skill gains 15 隐藏分. */
+    /**
+     * Her Elation skill gains 15 隐藏分.
+     */
     @Test
     public void theElationSkillGainsFifteenHidden() {
         Battle battle = newBattle();
@@ -69,7 +75,9 @@ public class SilverWolfLV999KitTest {
                 "欢愉技 殿堂级操作回放: 「获得 15 点【隐藏分】」");
     }
 
-    /** Her Ultimate enters 【无敌玩家】, fills the enhanced-basic allowance, and pays the trace's 20. */
+    /**
+     * Her Ultimate enters 【无敌玩家】, fills the enhanced-basic allowance, and pays the trace's 20.
+     */
     @Test
     public void theUltimateEntersGodmodeAndPaysTheTrace() {
         Battle battle = newBattle();
@@ -86,7 +94,9 @@ public class SilverWolfLV999KitTest {
                 "行迹 隐藏关卡全成就: 「进入【无敌玩家】状态后，获得 20 点【隐藏分】」");
     }
 
-    /** Three enhanced basics spend the allowance and end the state, and leaving it clears 隐藏分. */
+    /**
+     * Three enhanced basics spend the allowance and end the state, and leaving it clears 隐藏分.
+     */
     @Test
     public void threeEnhancedBasicsEndGodmodeAndClearHidden() {
         Battle battle = newBattle();
@@ -133,7 +143,8 @@ public class SilverWolfLV999KitTest {
      * Her true-ending trace pays 20 at 20 counted laughs and another 20 at 40.
      */
     @Test
-    public void theTrueEndingTracePaysAtTwentyAndAtForty() {        int below = hiddenFromElationCastAt(19);
+    public void theTrueEndingTracePaysAtTwentyAndAtForty() {
+        int below = hiddenFromElationCastAt(19);
         int at20 = hiddenFromElationCastAt(20);
         int at39 = hiddenFromElationCastAt(39);
         int at40 = hiddenFromElationCastAt(40);
@@ -252,14 +263,18 @@ public class SilverWolfLV999KitTest {
         return wolf.getResources().value(HIDDEN) - before;
     }
 
-    /** Fires the Elation skill's cast event, which is what her trace and her slot-20 rule both hang on. */
+    /**
+     * Fires the Elation skill's cast event, which is what her trace and her slot-20 rule both hang on.
+     */
     private static void fireElationSkill(Battle battle, Character wolf) {
         battle.fireTriggers(TriggerEvent.CAST_SETUP, wolf, battle.enemyUnits().getFirst(), 0, 0,
                 com.laosun.aluminium.enums.SkillCategory.ELATION_DAMAGE, 20);
         battle.processRequests();
     }
 
-    /** Casts a slot through the engine's own request path and settles the action. */
+    /**
+     * Casts a slot through the engine's own request path and settles the action.
+     */
     private static void cast(Battle battle, Character unit, SkillType slot, Enemy victim) {
         battle.requestSkill(unit.getSkills().get(slot), unit, List.of(victim));
         battle.processRequests();

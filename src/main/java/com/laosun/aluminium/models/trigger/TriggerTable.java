@@ -1,4 +1,4 @@
-package com.laosun.aluminium.models;
+package com.laosun.aluminium.models.trigger;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.Constant;
@@ -6,21 +6,15 @@ import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.ResourceSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.AttributeType;
-import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.SkillCategory;
-import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
+import com.laosun.aluminium.models.CanHit;
+import com.laosun.aluminium.models.Character;
+import com.laosun.aluminium.models.Damage;
+import com.laosun.aluminium.models.DoubleValue;
 import lombok.Getter;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.*;
 
 /**
  * A character's compiled trigger table: the data form of its mechanics.

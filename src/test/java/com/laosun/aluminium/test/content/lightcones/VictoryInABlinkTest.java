@@ -4,13 +4,12 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.Weapon;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.SummonFactory;
 import com.laosun.aluminium.models.skill.DefaultSkill;
-import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.models.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -29,7 +28,7 @@ public class VictoryInABlinkTest {
     private static final int WEARER = 1402;   // has a memosprite spec
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-        private static final double BOOST = 0.08;
+    private static final double BOOST = 0.08;
 
     private Character wearer;
     private Character ally;

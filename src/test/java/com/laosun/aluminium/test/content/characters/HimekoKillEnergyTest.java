@@ -6,11 +6,11 @@ import com.laosun.aluminium.enums.DamageType;
 import com.laosun.aluminium.enums.SkillCategory;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Damage;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.skill.DefaultSkill;
-import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.models.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -37,9 +37,11 @@ public class HimekoKillEnergyTest {
 
     private static final int HIMEKO = 1003;
     private static final int LEVEL = 80;
-        private static final int ULTIMATE_SLOT = 3;
+    private static final int ULTIMATE_SLOT = 3;
 
-    /** A kill by her ultimate pays the general 5 AND her extra 5. */
+    /**
+     * A kill by her ultimate pays the general 5 AND her extra 5.
+     */
     @Test
     public void theUltimatesKillPaysFiveOnTopOfTheGeneralCredit() {
         double killed = ultimateEnergy(true);
@@ -81,7 +83,9 @@ public class HimekoKillEnergyTest {
     // Helpers
     // ==================================================================
 
-    /** Her ultimate against the same enemy, one hit away from death or at full HP. */
+    /**
+     * Her ultimate against the same enemy, one hit away from death or at full HP.
+     */
     private static double ultimateEnergy(boolean theEnemyDies) {
         Character hero = CharacterFactory.create(HIMEKO, LEVEL);
         Enemy enemy = weakEnemy();

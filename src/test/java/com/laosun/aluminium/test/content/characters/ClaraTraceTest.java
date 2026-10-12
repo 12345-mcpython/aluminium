@@ -1,10 +1,6 @@
 package com.laosun.aluminium.test.content.characters;
 
 
-import com.laosun.aluminium.test.engine.DebuffResistTest;
-import com.laosun.aluminium.test.support.TestTurns;
-import com.laosun.aluminium.test.trigger.TriggerChanceTest;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.DebuffClass;
@@ -14,6 +10,8 @@ import com.laosun.aluminium.models.buff.ClassResistBuff;
 import com.laosun.aluminium.models.buff.DotBuff;
 import com.laosun.aluminium.models.buff.StateBuff;
 import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TestTurns;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -65,7 +63,9 @@ public class ClaraTraceTest {
                 "0.9 is not below 0.35, so nothing is dispelled -- and the same hit still happened");
     }
 
-    /** Her counter talent (already in the file) still works next to the new trace. */
+    /**
+     * Her counter talent (already in the file) still works next to the new trace.
+     */
     @Test
     public void herCounterTalentStillFires() {
         Battle battle = battleWith(fixed(0.9));
@@ -101,7 +101,9 @@ public class ClaraTraceTest {
                 "being harder to control is good for her: a dispel-negative (解除负面) must not take it off");
     }
 
-    /** ...and it is permanent, which is what a trace (行迹) is: two of her own turns do not spend it. */
+    /**
+     * ...and it is permanent, which is what a trace (行迹) is: two of her own turns do not spend it.
+     */
     @Test
     public void herGuardianTraceIsNotSpentByTurns() {
         Battle battle = battleWith(fixed(0.9));
@@ -130,10 +132,13 @@ public class ClaraTraceTest {
         return battle;
     }
 
-    /** A generator that always answers the same value (see {@code TriggerChanceTest.fixed}). */
+    /**
+     * A generator that always answers the same value (see {@code TriggerChanceTest.fixed}).
+     */
     private static Random fixed(double value) {
         return BattleFixture.alwaysRoll(value);
     }
+
     private static Enemy dummy() {
         return Enemy.fromAttributes("dummy", 1_000_000, 0, 100, 100);
     }

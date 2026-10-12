@@ -1,17 +1,16 @@
 package com.laosun.aluminium.test.engine;
 
 
-import com.laosun.aluminium.test.content.characters.BronyaEidolonTest;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.models.CanHit;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.skill.DefaultSkill;
+import com.laosun.aluminium.models.buff.StunBuff;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
-import com.laosun.aluminium.models.skill.Skill;
-import com.laosun.aluminium.models.buff.StunBuff;
 import com.laosun.aluminium.models.energy.NoConventionalEnergyProvider;
+import com.laosun.aluminium.models.skill.DefaultSkill;
+import com.laosun.aluminium.models.skill.Skill;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -59,7 +58,9 @@ public class SkillPointGameParityTest {
     // Consistent
     // ==================================================================
 
-    /** Rule: skill points are party-wide shared. Engine: the pool lives on {@code Battle}, not one per character. */
+    /**
+     * Rule: skill points are party-wide shared. Engine: the pool lives on {@code Battle}, not one per character.
+     */
     @Test
     public void poolIsPartyWideNotPerCharacter() {
         Character a = CharacterFactory.create(1003, 80);
@@ -77,7 +78,9 @@ public class SkillPointGameParityTest {
         Assertions.assertEquals(1, battle.getSkillPoints());
     }
 
-    /** Rule: start at 3 points. Engine: {@code SKILL_POINT_START}. */
+    /**
+     * Rule: start at 3 points. Engine: {@code SKILL_POINT_START}.
+     */
     @Test
     public void battleStartsAtThree() {
         Assertions.assertEquals(3, newBattle(List.of(CharacterFactory.create(1003, 80))).getSkillPoints());
@@ -175,7 +178,7 @@ public class SkillPointGameParityTest {
      * 恢复 1 个战技点，该效果有 1 回合的触发冷却") is authored in {@code characters/1101.json} as
      * {@code chance} + {@code cooldown} + {@code min_eidolon}, and pinned by {@code BronyaEidolonTest}. The other
      * five still have no data, but they have a <b>shape</b> - a rule on the trigger table that grants a point
-     *  - so what is missing for them is their own numbers rather than engine machinery.
+     * - so what is missing for them is their own numbers rather than engine machinery.
      *
      * <p>What is left here is the narrower claim this test actually asserts: no character can change the
      * party-level <b>cap</b>, and the basic attack's own gain stays {@code Constant.SKILL_POINT_GAIN_BASIC}.

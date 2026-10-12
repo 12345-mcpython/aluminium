@@ -2,12 +2,11 @@ package com.laosun.aluminium.test.engine;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
-import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
-import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.models.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -31,9 +30,11 @@ import java.util.List;
  */
 public class GainResourceToMaxTest {
     private static final int PEARL = 1503;
-        private static final String COUNTER = "溢出的计数";
+    private static final String COUNTER = "溢出的计数";
 
-    /** With the field, the counter stops at its maximum however much is granted. */
+    /**
+     * With the field, the counter stops at its maximum however much is granted.
+     */
     @Test
     public void toMaxStopsAtTheDeclaredMaximum() {
         int reached = grant(1, 3, true, 5);
@@ -41,7 +42,9 @@ public class GainResourceToMaxTest {
         Assertions.assertEquals(3, reached, "the maximum, not the maximum plus the spare");
     }
 
-    /** Without it, the same grant spills into the overflow allowance - which is the difference the field makes. */
+    /**
+     * Without it, the same grant spills into the overflow allowance - which is the difference the field makes.
+     */
     @Test
     public void aPlainGainSpillsIntoOverflow() {
         int reached = grant(1, 3, false, 5);
@@ -49,7 +52,9 @@ public class GainResourceToMaxTest {
         Assertions.assertEquals(4, reached, "1 + 3, allowed past the ceiling by the overflow allowance");
     }
 
-    /** And a counter that is already full is a no-op, not a no-op that fills the overflow. */
+    /**
+     * And a counter that is already full is a no-op, not a no-op that fills the overflow.
+     */
     @Test
     public void atTheMaximumItChangesNothing() {
         int reached = grant(3, 3, true, 5);
@@ -64,10 +69,10 @@ public class GainResourceToMaxTest {
     /**
      * Grants from a counter declared with the given maximum and overflow allowance, and returns where it ends up.
      *
-     * @param from      the counter's starting value
-     * @param amount    what the rule grants
-     * @param toMax     whether the rule states {@code to_max}
-     * @param overflow  the overflow allowance the declaration carries (the ceiling is maximum + this)
+     * @param from     the counter's starting value
+     * @param amount   what the rule grants
+     * @param toMax    whether the rule states {@code to_max}
+     * @param overflow the overflow allowance the declaration carries (the ceiling is maximum + this)
      */
     private static int grant(int from, int amount, boolean toMax, int overflow) {
         Character pearl = CharacterFactory.create(PEARL, 80);

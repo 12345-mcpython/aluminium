@@ -1,15 +1,14 @@
 package com.laosun.aluminium.test.trigger;
 
 
-import com.laosun.aluminium.test.engine.ControlImmunityTest;
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -29,7 +28,9 @@ public class DebuffClassConditionTest {
     private static final String FREEZE = "冻结";
     private static final double EPS = 1e-9;
 
-    /** The control rule fires; the dot rule does not. */
+    /**
+     * The control rule fires; the dot rule does not.
+     */
     @Test
     public void theFilterTellsTheTwoFamiliesApart() {
         double[] gains = run();
@@ -40,7 +41,9 @@ public class DebuffClassConditionTest {
                 "「持续伤害类」 (the DOT class)-- the same event does NOT fire the rule that asked for the other family");
     }
 
-    /** { the control-watch's ATTACK gain, the dot-watch's DEFENCE gain }. */
+    /**
+     * { the control-watch's ATTACK gain, the dot-watch's DEFENCE gain }.
+     */
     private static double[] run() {
         Character owner = CharacterFactory.create(OWNER, 80, false, null, null, 0);
 
@@ -65,12 +68,14 @@ public class DebuffClassConditionTest {
         double defenceBefore = owner.getAttribute(AttributeType.DEFENCE).get();
         battle.startBattle();
         battle.processRequests();
-        return new double[] {
+        return new double[]{
                 owner.getAttribute(AttributeType.ATTACK).get() - attackBefore,
                 owner.getAttribute(AttributeType.DEFENCE).get() - defenceBefore};
     }
 
-    /** A rule effect that leaves a mark on a panel, so the reading needs no declared resource. */
+    /**
+     * A rule effect that leaves a mark on a panel, so the reading needs no declared resource.
+     */
     private static EffectSpec boost(String attribute) {
         EffectSpec spec = new EffectSpec();
         TriggerSpecs.set(spec, "op", "MODIFY_ATTR");

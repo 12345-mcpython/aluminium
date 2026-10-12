@@ -1,15 +1,15 @@
 package com.laosun.aluminium.test.content.characters;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -27,7 +27,10 @@ public class DrRatioTest {
     private static final int RATIO = 1305;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-        /** Note: The reaction needs the MARK: without it a teammate's attack does nothing. */
+
+    /**
+     * Note: The reaction needs the MARK: without it a teammate's attack does nothing.
+     */
     @Test
     public void theReactionNeedsTheMark() {
         double beforeMark = reactionLoss(false);
@@ -39,7 +42,9 @@ public class DrRatioTest {
                 "「理真医生对该目标发动1次天赋的追加攻击」 (Dr. Ratio launches 1 follow-up attack from his Talent at that target): " + afterMark);
     }
 
-    /** Note: The technique's 15% slow, against a hand-built -30% reference in the same pipeline. */
+    /**
+     * Note: The technique's 15% slow, against a hand-built -30% reference in the same pipeline.
+     */
     @Test
     public void theTechniqueSlowsTheEnemiesByFifteenPercent() {
         double content = techniqueSlow(0);
@@ -50,7 +55,9 @@ public class DrRatioTest {
                 "content " + content + " vs reference " + reference);
     }
 
-    /** Fires a TEAMMATE's attack at the enemy and returns its HP loss; optionally marks the enemy first. */
+    /**
+     * Fires a TEAMMATE's attack at the enemy and returns its HP loss; optionally marks the enemy first.
+     */
     private static double reactionLoss(boolean mark) {
         Character ratio = CharacterFactory.create(RATIO, LEVEL);
         Character ally = CharacterFactory.create(ALLY, LEVEL);
@@ -65,7 +72,9 @@ public class DrRatioTest {
         return before - enemy.getCurrentHp();
     }
 
-    /** mode 0 = the shipped file, 1 = a hand-built -30% reference. Returns the enemy's speed drop at battle start. */
+    /**
+     * mode 0 = the shipped file, 1 = a hand-built -30% reference. Returns the enemy's speed drop at battle start.
+     */
     private static double techniqueSlow(int mode) {
         Character ratio = CharacterFactory.create(RATIO, LEVEL);
         if (mode == 1) {

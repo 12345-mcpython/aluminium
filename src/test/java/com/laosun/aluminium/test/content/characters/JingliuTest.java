@@ -1,12 +1,11 @@
 package com.laosun.aluminium.test.content.characters;
 
 import com.laosun.aluminium.Battle;
-import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -21,7 +20,10 @@ import java.util.Random;
 public class JingliuTest {
     private static final int JINGLIU = 1212;
     private static final int LEVEL = 80;
-        /** Note: One stack per Skill, stopped at the document's three. */
+
+    /**
+     * Note: One stack per Skill, stopped at the document's three.
+     */
     @Test
     public void theSkillAddsOneStackUpToThree() {
         Character jingliu = CharacterFactory.create(JINGLIU, LEVEL);
@@ -40,7 +42,9 @@ public class JingliuTest {
                 "「【朔望】最多可累计3层」 ([朔望] accumulates at most 3 stacks) -- five casts must still read three");
     }
 
-    /** Note: The threshold: the SECOND cast reaches two stacks and must Advance; the first must not. */
+    /**
+     * Note: The threshold: the SECOND cast reaches two stacks and must Advance; the first must not.
+     */
     @Test
     public void theAdvanceNeedsTwoStacks() {
         double afterOne = waitAfterCasts(1);
@@ -54,7 +58,9 @@ public class JingliuTest {
                 "「当拥有2层【朔望】时…使行动提前100%」 (at 2 stacks of [朔望] ... advances her action by 100%): " + untouched + " -> " + afterTwo);
     }
 
-    /** Casts the Skill `casts` times (the RULES build the stacks) and returns her remaining wait. */
+    /**
+     * Casts the Skill `casts` times (the RULES build the stacks) and returns her remaining wait.
+     */
     private static double waitAfterCasts(int casts) {
         Character jingliu = CharacterFactory.create(JINGLIU, LEVEL);
         Enemy enemy = BattleFixture.monster();

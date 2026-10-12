@@ -1,23 +1,19 @@
 package com.laosun.aluminium.test.content.memosprites;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.data.TriggerTables;
 import com.laosun.aluminium.enums.AttributeType;
-import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.CanHit;
+import com.laosun.aluminium.models.*;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.DoubleValue;
-import com.laosun.aluminium.models.Signal;
-import com.laosun.aluminium.models.Summon;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -47,9 +43,13 @@ import java.util.List;
 public class SummonEntryTest {
     private static final double EPS = 1e-6;
 
-    /** Evernight (长夜月) - her memosprite skill 3 is the shipped user of this event. */
+    /**
+     * Evernight (长夜月) - her memosprite skill 3 is the shipped user of this event.
+     */
     private static final int OWNER = 1413;
-    /** Aglaea (阿格莱雅) - the second memosprite owner, for "a teammate's summon does not count". */
+    /**
+     * Aglaea (阿格莱雅) - the second memosprite owner, for "a teammate's summon does not count".
+     */
     private static final int TEAMMATE = 1402;
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002011;
@@ -58,7 +58,9 @@ public class SummonEntryTest {
     // 1. It fires once, for the summon, at the right moment
     // ==================================================================
 
-    /** Once per arrival, with the summoned unit as the actor. */
+    /**
+     * Once per arrival, with the summoned unit as the actor.
+     */
     @Test
     public void itFiresOnceWithTheSummonAsActor() {
         Character owner = characterWith(rule("SUMMONED", List.of("actor == summon"),
@@ -96,7 +98,9 @@ public class SummonEntryTest {
                 "「act immediately」 put it at the head of the action bar, so the advance did find it");
     }
 
-    /** A summon that is not the rule owner's does not fire the rule. */
+    /**
+     * A summon that is not the rule owner's does not fire the rule.
+     */
     @Test
     public void aTeammatesSummonDoesNotCount() {
         Character owner = characterWith(rule("SUMMONED", List.of("actor == summon"),
@@ -112,7 +116,9 @@ public class SummonEntryTest {
                 "a teammate's memosprite entering is not mine entering");
     }
 
-    /** Summoning while one is already out is a no-op, so there is no arrival to announce. */
+    /**
+     * Summoning while one is already out is a no-op, so there is no arrival to announce.
+     */
     @Test
     public void summoningAgainWhileOneIsOutAnnouncesNothing() {
         Character owner = characterWith(rule("SUMMONED", List.of("actor == summon"),
@@ -207,7 +213,9 @@ public class SummonEntryTest {
         return effect;
     }
 
-    /** "make itself act immediately": skip all of the summon's remaining time to act. */
+    /**
+     * "make itself act immediately": skip all of the summon's remaining time to act.
+     */
     private static EffectSpec advanceSummon() {
         EffectSpec effect = new EffectSpec();
         TriggerSpecs.set(effect, "op", "ADVANCE");
@@ -216,7 +224,9 @@ public class SummonEntryTest {
         return effect;
     }
 
-    /** How much action value the unit still has - zero means "acts now". */
+    /**
+     * How much action value the unit still has - zero means "acts now".
+     */
     private static double timeRemaining(Battle battle, CanHit target) {
         for (Signal signal : battle.queue.snapshot()) {
             if (signal.getCanHit() == target) {

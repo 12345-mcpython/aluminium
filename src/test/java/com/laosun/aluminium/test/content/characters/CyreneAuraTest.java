@@ -4,8 +4,8 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -26,7 +26,8 @@ public class CyreneAuraTest {
     private static final int CYRENE = 1415;
     private static final int TEAMMATE = 1001;
     private static final int LEVEL = 80;
-        @Test
+
+    @Test
     public void theAuraReachesATeammate() {
         double withHer = boost(true);
         double withoutHer = boost(false);
@@ -34,7 +35,9 @@ public class CyreneAuraTest {
                 "the aura adds 20% to a teammate and nothing when she is absent: " + withoutHer + " -> " + withHer);
     }
 
-    /** A teammate's ALL_DAMAGE_TYPE_BOOST with Cyrene on the team or not. */
+    /**
+     * A teammate's ALL_DAMAGE_TYPE_BOOST with Cyrene on the team or not.
+     */
     private static double boost(boolean withCyrene) {
         Character teammate = CharacterFactory.create(TEAMMATE, LEVEL);
         Enemy enemy = BattleFixture.monster();

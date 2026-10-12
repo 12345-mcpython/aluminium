@@ -47,13 +47,13 @@ import com.google.gson.annotations.SerializedName;
 public record ResourceSpec(@SerializedName("id") String id,
                            @SerializedName("max") Integer max,
                            @SerializedName("initial") Integer initial,
-        // A declared OVERFLOW (reader: 1506's [隐藏分] (Hidden MMR): "the Ultimate can be activated after reaching 60 points, and a further 240 points can overflow past the cap"). `Resource` has both tiers all along (`max` + `maxOverflow`);
-        // what was missing was a way for a DECLARATION to state the second number.
-        @SerializedName("overflow") Integer overflow,
-        // A declared SCOPE (reader: the shared Punchline (笑点) counter, "gain 10 Punchline (笑点)"). Note: A party-level resource needs a
-        // PER-BATTLE owner rather than a copy per character -- which is exactly what `ResourceManager.register` says when it
-        // refuses an unwired scope, and what `Battle` now provides.
-        @SerializedName("scope") String scope,
+                           // A declared OVERFLOW (reader: 1506's [隐藏分] (Hidden MMR): "the Ultimate can be activated after reaching 60 points, and a further 240 points can overflow past the cap"). `Resource` has both tiers all along (`max` + `maxOverflow`);
+                           // what was missing was a way for a DECLARATION to state the second number.
+                           @SerializedName("overflow") Integer overflow,
+                           // A declared SCOPE (reader: the shared Punchline (笑点) counter, "gain 10 Punchline (笑点)"). Note: A party-level resource needs a
+                           // PER-BATTLE owner rather than a copy per character -- which is exactly what `ResourceManager.register` says when it
+                           // refuses an unwired scope, and what `Battle` now provides.
+                           @SerializedName("scope") String scope,
                            @SerializedName("source") String source,
                            @SerializedName("note") String note) {
 

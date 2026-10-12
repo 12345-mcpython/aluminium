@@ -7,8 +7,8 @@ import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -28,7 +28,10 @@ public class YukongCommandTest {
     private static final int YUKONG = 1207;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-        /** The Skill grants two layers and the party boost; the layers are one buff each. */
+
+    /**
+     * The Skill grants two layers and the party boost; the layers are one buff each.
+     */
     @Test
     public void herSkillGrantsTwoLayersAndThePartyBoost() {
         Fixture f = new Fixture();
@@ -41,7 +44,9 @@ public class YukongCommandTest {
                 "「increases the ATK of all of our side by 80%」 -- the boost lands on the whole side, not just on her");
     }
 
-    /** Note: An ally's turn end removes exactly ONE layer; her own does not. */
+    /**
+     * Note: An ally's turn end removes exactly ONE layer; her own does not.
+     */
     @Test
     public void anAllysTurnEndRemovesOneLayerButHersDoesNot() {
         Fixture f = new Fixture();
@@ -56,7 +61,9 @@ public class YukongCommandTest {
                 "「at the end of each of our targets' turns, remove 1 layer from Yukong」");
     }
 
-    /** When the last layer goes, the party boost goes with it - one removal, everyone. */
+    /**
+     * When the last layer goes, the party boost goes with it - one removal, everyone.
+     */
     @Test
     public void thePartyBoostEndsWithTheLastLayer() {
         Fixture f = new Fixture();
@@ -73,7 +80,9 @@ public class YukongCommandTest {
                 "「while Yukong holds [鸣弦号令] (Roaring Bowstrings)」 -- with no layers left the boost is off, for every ally");
     }
 
-    /** The ultimate's crit buffs only appear while she holds a layer. */
+    /**
+     * The ultimate's crit buffs only appear while she holds a layer.
+     */
     @Test
     public void herUltimateNeedsALayerToBuffTheParty() {
         Fixture without = new Fixture();
@@ -90,7 +99,9 @@ public class YukongCommandTest {
                 "…and with a layer up, the party gets +28% crit and +65% crit damage");
     }
 
-    /** The file is present as described, and the registered clauses are absent on purpose. */
+    /**
+     * The file is present as described, and the registered clauses are absent on purpose.
+     */
     @Test
     public void herFileCarriesWhatItSays() {
         Assertions.assertEquals(3, TriggerTables.of(YUKONG).ruleCount(TriggerEvent.TURN_END),
@@ -122,7 +133,9 @@ public class YukongCommandTest {
             battle.castImmediate(yukong.getSkills().get(SkillType.ULTRA), yukong, List.of(enemy));
         }
 
-        /** One unit's turn end, the way the engine delivers it. */
+        /**
+         * One unit's turn end, the way the engine delivers it.
+         */
         private void turnEndOf(Character unit) {
             battle.fireTriggers(TriggerEvent.TURN_END, unit, unit, 0, 0);
         }

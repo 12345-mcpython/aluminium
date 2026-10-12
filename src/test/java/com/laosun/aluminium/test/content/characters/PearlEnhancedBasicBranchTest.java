@@ -6,10 +6,11 @@ import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.buff.SkillSwapBuff;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
 import java.util.List;
 
 /**
@@ -18,8 +19,8 @@ import java.util.List;
  * <p>`SkillSwapBuff` documents its own accessors as test-readable -- "the slot this swap owns (readable by
  * tests and by future 'which skill is equipped' conditions)" -- and `BuffManager.findBuff(Class)` returns it.
  * So the branch is observable without touching any transient-state guesswork:
- *   * the archetype is on the Elation Path -> COMMON is swapped for the skill in slot 8 ([行笔，幻造星月]);
- *   * otherwise                            -> slot 9 ([行笔，绘制末浪]).
+ * * the archetype is on the Elation Path -> COMMON is swapped for the skill in slot 8 ([行笔，幻造星月]);
+ * * otherwise                            -> slot 9 ([行笔，绘制末浪]).
  *
  * <p>Two-sided by construction: the same call with two different targets must install two different skills.
  */
@@ -40,10 +41,12 @@ public class PearlEnhancedBasicBranchTest {
         Assertions.assertEquals(9, hunterSlot, "any other Path upgrades it to the slot-9 form");
     }
 
-    /** Fires her Ultimate at the given ally and returns the skill slot it swapped COMMON for. */
+    /**
+     * Fires her Ultimate at the given ally and returns the skill slot it swapped COMMON for.
+     */
     private static int swappedSlot(int archetype) {
         Battle battle = new Battle(List.of(CharacterFactory.create(PEARL, 80),
-                        CharacterFactory.create(ELATION, 80), CharacterFactory.create(HUNTER, 80)),
+                CharacterFactory.create(ELATION, 80), CharacterFactory.create(HUNTER, 80)),
                 List.of(EnemyFactory.create(1002011, 100, 1)), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();

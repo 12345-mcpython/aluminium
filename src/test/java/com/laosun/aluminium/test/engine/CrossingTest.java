@@ -1,14 +1,13 @@
 package com.laosun.aluminium.test.engine;
 
 import com.laosun.aluminium.Battle;
-import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.DamageType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Damage;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -25,7 +24,10 @@ public class CrossingTest {
     private static final int LUOCHA = 1203;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-        /** Note: Crossing from above half to below it triggers the heal. */
+
+    /**
+     * Note: Crossing from above half to below it triggers the heal.
+     */
     @Test
     public void aCrossingTriggersTheHeal() {
         Character luocha = CharacterFactory.create(LUOCHA, LEVEL);
@@ -44,7 +46,9 @@ public class CrossingTest {
                 "「当我方任意单体当前生命值百分比降到50%或以下时，罗刹会立即对其触发一次等同于战技的效果」 (when any one of our units' current HP percentage drops to 50% or below, Luocha immediately triggers a Skill-equivalent effect on them) -- after the crossing he must be back above half: " + (ally.getCurrentHp() / ally.getMaxHp()));
     }
 
-    /** Note: The control: hitting someone who is ALREADY below half is not a crossing. */
+    /**
+     * Note: The control: hitting someone who is ALREADY below half is not a crossing.
+     */
     @Test
     public void damageBelowTheThresholdIsNotACrossing() {
         Character luocha = CharacterFactory.create(LUOCHA, LEVEL);

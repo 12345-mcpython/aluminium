@@ -3,8 +3,8 @@ package com.laosun.aluminium.test.content.characters;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -25,7 +25,7 @@ import java.util.List;
 public class PearlEidolon2RewardTest {
     private static final int PEARL = 1503;
     private static final int ELATION_ALLY = 1502;
-        private static final String COUNTER = "好活当赏";
+    private static final String COUNTER = "好活当赏";
     private static final String PUNCHLINE = "笑点";
 
     /**
@@ -89,7 +89,9 @@ public class PearlEidolon2RewardTest {
     // Helpers
     // ==================================================================
 
-    /** What the turn granted, what it took back, and what is left on each counter. */
+    /**
+     * What the turn granted, what it took back, and what is left on each counter.
+     */
     private record Reading(int granted, int punchlineGranted, int counterLeft, int punchlineLeft) {
     }
 

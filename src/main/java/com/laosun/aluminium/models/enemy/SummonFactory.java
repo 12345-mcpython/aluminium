@@ -2,12 +2,7 @@ package com.laosun.aluminium.models.enemy;
 
 import com.laosun.aluminium.beans.MemospriteSpec;
 import com.laosun.aluminium.data.Memosprites;
-import com.laosun.aluminium.enums.AttributeType;
-import com.laosun.aluminium.enums.Camp;
-import com.laosun.aluminium.enums.DamageElement;
-import com.laosun.aluminium.enums.DamageType;
-import com.laosun.aluminium.enums.SkillEffectType;
-import com.laosun.aluminium.enums.SkillType;
+import com.laosun.aluminium.enums.*;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.DoubleValue;
 import com.laosun.aluminium.models.Summon;
@@ -154,7 +149,7 @@ public final class SummonFactory {
      *
      * @param master the summoning character (a {@link Character}: the spec is keyed by its cid)
      * @return the memosprite, with a panel derived from {@code master} and, when the spec states one, its
-     *         attack installed
+     * attack installed
      * @throws IllegalArgumentException when the character has no memosprite spec - a loud failure naming the
      *                                  file to write, rather than an unnamed 0-HP unit
      */
@@ -172,7 +167,9 @@ public final class SummonFactory {
         return memosprite(master, spec);
     }
 
-    /** The same, for a panel that derives from a battle-level RESOURCE (see {@link #panelOf}). */
+    /**
+     * The same, for a panel that derives from a battle-level RESOURCE (see {@link #panelOf}).
+     */
     public static Summon memosprite(Character master, java.util.function.ToIntFunction<String> resourceValue) {
         MemospriteSpec spec = Memosprites.of(master.getCid());
         if (spec == null) {
@@ -200,7 +197,9 @@ public final class SummonFactory {
         return servant(master, spec);
     }
 
-    /** The same, for a panel that derives from a battle-level RESOURCE (see {@link #panelOf}). */
+    /**
+     * The same, for a panel that derives from a battle-level RESOURCE (see {@link #panelOf}).
+     */
     public static Summon servant(Character master, java.util.function.ToIntFunction<String> resourceValue) {
         MemospriteSpec spec = Memosprites.of(master.getCid(), Memosprites.SERVANT_DIR);
         if (spec == null) {
@@ -273,7 +272,9 @@ public final class SummonFactory {
      * @param spec   the validated spec
      * @return the memosprite, with its attack installed when the spec states one
      */
-    /** The same, for a panel that derives from a battle-level RESOURCE (see {@link #panelOf}). */
+    /**
+     * The same, for a panel that derives from a battle-level RESOURCE (see {@link #panelOf}).
+     */
     public static Summon memosprite(Character master, MemospriteSpec spec, java.util.function.ToIntFunction<String> resourceValue) {
         return memospriteWith(master, spec, resourceValue);
     }
@@ -310,7 +311,9 @@ public final class SummonFactory {
         return summon;
     }
 
-    /** The same, for a panel that derives from a battle-level RESOURCE (see {@link #panelOf}). */
+    /**
+     * The same, for a panel that derives from a battle-level RESOURCE (see {@link #panelOf}).
+     */
     public static Summon servant(Character master, MemospriteSpec spec, java.util.function.ToIntFunction<String> resourceValue) {
         return servantWith(master, spec, resourceValue);
     }
@@ -364,7 +367,9 @@ public final class SummonFactory {
      * every hit (see {@code EnemySkill.strike}), so a buff that lands on the memosprite mid-battle is
      * reflected - the panel decides what it starts with, not what it is worth.
      */
-    /** A memosprite's attack is memory damage; the two-argument form is what a servant uses. */
+    /**
+     * A memosprite's attack is memory damage; the two-argument form is what a servant uses.
+     */
     private static EnemySkill attackOf(MemospriteSpec spec) {
         return attackOf(spec, DamageType.MEMORY);
     }

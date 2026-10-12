@@ -7,9 +7,9 @@ import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
-import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.models.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -38,14 +38,18 @@ import java.util.stream.Stream;
  * only ever fire once.
  */
 public class RecomputeNotAccumulateTest {
-    /** The events a rule can be fired on many times in one battle. */
+    /**
+     * The events a rule can be fired on many times in one battle.
+     */
     private static final Set<String> REPEATABLE = Set.of(
             "DEALING_DAMAGE", "TAKING_HIT", "HP_LOST", "HP_CONSUMED", "DAMAGE_SETTLED", "ATTACK_FINISHED", "SKILL_CAST",
             "BASIC_ATTACK", "ULT_CAST", "RESOURCE_CHANGED", "TURN_START", "TURN_END", "CRIT_DEALT", "BREAK",
             "ENERGY_GAINED", "HEALED", "ALLY_ATTACK", "FOLLOW_UP", "SKILL_POINT_SPENT", "SKILL_POINT_GAINED",
             "WAVE_START", "STATE_ENDED", "DEBUFF_APPLIED", "SUMMON_ATTACK", "WEAKNESS_ADDED", "EXTRA_TURN_STARTED");
 
-    /** Two firings: with a self-removal the attribute is stable, without one it compounds. */
+    /**
+     * Two firings: with a self-removal the attribute is stable, without one it compounds.
+     */
     @Test
     public void aReFiringPermanentModifierMustRemoveItselfFirst() {
         double stable = firedTwice(true);
@@ -59,7 +63,9 @@ public class RecomputeNotAccumulateTest {
                         + compounding + " vs " + stable + ") - this is the failure 1506's talent and her ramp both had");
     }
 
-    /** The sweep: every shipped rule of that shape either names + removes its own modifier, or is gated to fire once. */
+    /**
+     * The sweep: every shipped rule of that shape either names + removes its own modifier, or is gated to fire once.
+     */
     @Test
     public void everyShippedRuleOfThatShapeTakesItsOwnModifierOff() throws IOException {
         List<String> offenders = new ArrayList<>();
@@ -152,7 +158,9 @@ public class RecomputeNotAccumulateTest {
         return unit.getAttribute(AttributeType.ATTACK).get();
     }
 
-    /** Every shipped character and light-cone file, skipping the registry of unwritten ones. */
+    /**
+     * Every shipped character and light-cone file, skipping the registry of unwritten ones.
+     */
     private static List<Path> contentFiles() throws IOException {
         List<Path> files = new ArrayList<>();
         for (String directory : List.of("src/main/resources/characters", "src/main/resources/light_cones")) {

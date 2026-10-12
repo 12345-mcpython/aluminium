@@ -1,8 +1,6 @@
 package com.laosun.aluminium.test.trigger;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
@@ -11,9 +9,11 @@ import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.DoubleValue;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.skill.Skill;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -42,9 +42,11 @@ import java.util.Random;
 public class SkillLevelTest {
     private static final int HIMEKO = 1003;
     private static final int LEVEL = 80;
-        private static final int RAISE = 9;
+    private static final int RAISE = 9;
 
-    /** The resolver itself: base level + this battle's raise, per slot. */
+    /**
+     * The resolver itself: base level + this battle's raise, per slot.
+     */
     @Test
     public void theResolverAddsTheRaiseToTheBase() {
         Fixture f = new Fixture(RAISE, SkillType.ULTRA);
@@ -56,7 +58,9 @@ public class SkillLevelTest {
         Assertions.assertEquals(0, f.hero.skillLevelBonus(SkillType.SKILL), "…and only that slot");
     }
 
-    /** Her Skill's own cast reads the raised row: the swing grows when the slot's rows differ. */
+    /**
+     * Her Skill's own cast reads the raised row: the swing grows when the slot's rows differ.
+     */
     @Test
     public void theSkillsOwnCastReadsTheRaise() {
         SkillType slot = aSlotWhoseRowsDiffer();
@@ -89,13 +93,17 @@ public class SkillLevelTest {
                         + "→" + ruleRaised + ")");
     }
 
-    /** How much one slot's first parameter grows between level 1 and level {@code RAISE + 1}, from the data itself. */
+    /**
+     * How much one slot's first parameter grows between level 1 and level {@code RAISE + 1}, from the data itself.
+     */
     private static double rowRatio(SkillType slot) {
         List<List<Double>> rows = CharacterFactory.create(HIMEKO, LEVEL).getSkills().get(slot).getData().getSkills();
         return rows.get(RAISE).getFirst() / rows.getFirst().getFirst();
     }
 
-    /** An explicit {@code damage_level} still wins: it says which row the document quotes. */
+    /**
+     * An explicit {@code damage_level} still wins: it says which row the document quotes.
+     */
     @Test
     public void anExplicitRowBeatsTheRaise() {
         SkillType slot = aSlotWhoseRowsDiffer();
@@ -103,7 +111,9 @@ public class SkillLevelTest {
                 slot + ": a rule stating `damage_level: 1` reads row 1 whether or not the battle raised the slot");
     }
 
-    /** Note: Per battle, not per character: the raise is cleared and re-earned, never stacked by reuse. */
+    /**
+     * Note: Per battle, not per character: the raise is cleared and re-earned, never stacked by reuse.
+     */
     @Test
     public void theRaiseDoesNotSurviveIntoTheNextBattle() {
         Character hero = CharacterFactory.create(HIMEKO, LEVEL);
@@ -139,7 +149,9 @@ public class SkillLevelTest {
                 "the generated effect reads the raised row too (base " + base + " vs raised " + raised + ")");
     }
 
-    /** 1105's Skill, cast on a hurt ally, measured as the HP restored. */
+    /**
+     * 1105's Skill, cast on a hurt ally, measured as the HP restored.
+     */
     private static double generatedHeal(int raiseBy) {
         Character healer = CharacterFactory.create(1105, LEVEL);
         Character ally = CharacterFactory.create(1002, LEVEL);
@@ -152,7 +164,9 @@ public class SkillLevelTest {
         return ally.getCurrentHp() - before;
     }
 
-    /** The shape is refused at load: no slot, an unknown slot, a zero or fractional amount, a wrong event. */
+    /**
+     * The shape is refused at load: no slot, an unknown slot, a zero or fractional amount, a wrong event.
+     */
     @Test
     public void theShapeIsRefusedAtLoad() {
         Assertions.assertThrows(IllegalArgumentException.class, () -> table(ruleSpec(null, 1.0, "BATTLE_START")),
@@ -195,7 +209,9 @@ public class SkillLevelTest {
                         + "file cannot measure the level wiring at all (the data changed, not the engine)");
     }
 
-    /** That slot's own cast, measured as the enemy's HP loss. */
+    /**
+     * That slot's own cast, measured as the enemy's HP loss.
+     */
     private static double castDamage(SkillType slot, int raiseBy) {
         Fixture f = new Fixture(raiseBy, slot);
         double before = f.enemy.getCurrentHp();
@@ -203,7 +219,9 @@ public class SkillLevelTest {
         return before - f.enemy.getCurrentHp();
     }
 
-    /** A rule-driven DAMAGE from the same slot, measured the same way. */
+    /**
+     * A rule-driven DAMAGE from the same slot, measured the same way.
+     */
     private static double ruleDamage(SkillType slot, Integer level, int raiseBy) {
         Fixture f = new Fixture(raiseBy, slot);
         List<TriggerSpec> rules = new ArrayList<>();
@@ -259,7 +277,9 @@ public class SkillLevelTest {
         return TriggerSpecs.rule(event, null, effect);
     }
 
-    /** A rule-driven attack reading a slot's parameter row (optionally pinned to a level). */
+    /**
+     * A rule-driven attack reading a slot's parameter row (optionally pinned to a level).
+     */
     private static TriggerSpec damageRule(SkillType slot, Integer level) {
         EffectSpec effect = new EffectSpec();
         TriggerSpecs.set(effect, "op", "DAMAGE");

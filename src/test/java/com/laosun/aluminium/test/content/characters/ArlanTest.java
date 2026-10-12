@@ -7,8 +7,8 @@ import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -24,7 +24,10 @@ import java.util.Random;
 public class ArlanTest {
     private static final int ARLAN = 1008;
     private static final int LEVEL = 80;
-        /** Note: "320%…and 160% to enemies adjacent to it": the neighbour takes HALF of what the centre takes. */
+
+    /**
+     * Note: "320%…and 160% to enemies adjacent to it": the neighbour takes HALF of what the centre takes.
+     */
     @Test
     public void hisUltimateHitsNeighboursForHalf() {
         Character arlan = CharacterFactory.create(ARLAN, LEVEL);
@@ -47,7 +50,9 @@ public class ArlanTest {
                         + centreLoss + " vs neighbours " + neighbourLoss);
     }
 
-    /** Note: "消灭敌方目标时，若当前生命值百分比小于等于30%，则立即回复等同于自身生命上限20%的生命值". */
+    /**
+     * Note: "消灭敌方目标时，若当前生命值百分比小于等于30%，则立即回复等同于自身生命上限20%的生命值".
+     */
     @Test
     public void hisSurvivalTraceHealsOnAKillBelowThirtyPercent() {
         Character arlan = CharacterFactory.create(ARLAN, LEVEL);
@@ -71,7 +76,9 @@ public class ArlanTest {
                 "「立即回复等同于自身生命上限20%的生命值」 (immediately restores HP equal to 20% of his own Max HP): " + before + " -> " + arlan.getCurrentHp());
     }
 
-    /** Note: "抵抗持续伤害类负面状态的概率提高50%": the per-class resistance, and only that class. */
+    /**
+     * Note: "抵抗持续伤害类负面状态的概率提高50%": the per-class resistance, and only that class.
+     */
     @Test
     public void hisEnduranceTraceResistsDotOnly() {
         Character arlan = CharacterFactory.create(ARLAN, LEVEL);
@@ -85,7 +92,9 @@ public class ArlanTest {
                 "it must not become a general resistance to every debuff class");
     }
 
-    /** Census: the traces that carry rules plus the level convention. */
+    /**
+     * Census: the traces that carry rules plus the level convention.
+     */
     @Test
     public void hisFileCarriesTheClauses() {
         var table = TriggerTables.of(ARLAN);

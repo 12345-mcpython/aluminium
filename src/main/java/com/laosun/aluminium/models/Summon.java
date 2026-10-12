@@ -44,19 +44,25 @@ public class Summon extends CanHit {
     private final java.util.Map<Integer, com.laosun.aluminium.models.skill.Skill> skillsByDataSlot =
             new java.util.LinkedHashMap<>();
 
-    /** Attaches one of this memosprite's own skills, addressed the way the data addresses it. */
+    /**
+     * Attaches one of this memosprite's own skills, addressed the way the data addresses it.
+     */
     public void setSkillAt(int dataSlot, com.laosun.aluminium.models.skill.Skill skill) {
         if (skill != null) {
             skillsByDataSlot.put(dataSlot, skill);
         }
     }
 
-    /** This memosprite's own skill at that data slot, or {@code null}. */
+    /**
+     * This memosprite's own skill at that data slot, or {@code null}.
+     */
     public com.laosun.aluminium.models.skill.Skill skillAt(int dataSlot) {
         return skillsByDataSlot.get(dataSlot);
     }
 
-    /** Every own skill of this memosprite, by data slot. */
+    /**
+     * Every own skill of this memosprite, by data slot.
+     */
     public java.util.Map<Integer, com.laosun.aluminium.models.skill.Skill> skillsByDataSlot() {
         return java.util.Map.copyOf(skillsByDataSlot);
     }

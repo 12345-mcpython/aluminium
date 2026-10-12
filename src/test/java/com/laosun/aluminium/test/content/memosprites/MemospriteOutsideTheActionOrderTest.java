@@ -3,8 +3,8 @@ package com.laosun.aluminium.test.content.memosprites;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Summon;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -26,13 +26,18 @@ import java.util.List;
  */
 public class MemospriteOutsideTheActionOrderTest {
     private static final int LEVEL = 80;
-        /** Demiurge (德谬歌): summoned, in the battle, out of the order. */
+
+    /**
+     * Demiurge (德谬歌): summoned, in the battle, out of the order.
+     */
     @Test
     public void theZeroSpeedMemospriteIsInTheBattleButNotInTheOrder() {
         assertOutsideTheOrder(1415, 1404);
     }
 
-    /** Little Ica (小伊卡): the other memosprite whose panel says the same thing. */
+    /**
+     * Little Ica (小伊卡): the other memosprite whose panel says the same thing.
+     */
     @Test
     public void littleIcaIsInTheBattleButNotInTheOrder() {
         assertOutsideTheOrder(1409, 1217);

@@ -1,23 +1,19 @@
 package com.laosun.aluminium.test.engine;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.SkillCategory;
-import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.TriggerTable;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 
 /**
  * \\u300ca random one of the enemies this attack HIT\\u300d reads the ATTACK-LEVEL set.
@@ -32,7 +28,7 @@ import java.util.Set;
 public class AttackFinishedHitSetTest {
     private static final int CASTER = 1003;          // Himeko: slot 2 is Fire + Blast, as 21040's judge uses
     private static final int ALLY = 1002;
-        private static final int LEVEL = 80;
+    private static final int LEVEL = 80;
     private static final String MARK = "\\u547d\\u4e2d\\u6807\\u8bb0";
 
     private EffectSpec mark() {
@@ -45,7 +41,9 @@ public class AttackFinishedHitSetTest {
         return effect;
     }
 
-    /** Casts at {@code targets} enemies with the given seed, and reports which of them were marked. */
+    /**
+     * Casts at {@code targets} enemies with the given seed, and reports which of them were marked.
+     */
     private Set<Integer> markedByOneCast(int targets, long seed) {
         Character caster = CharacterFactory.create(CASTER, LEVEL);
         caster.setTriggerTable(new TriggerTable(CASTER, List.of(

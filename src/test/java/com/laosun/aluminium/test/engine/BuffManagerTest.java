@@ -1,22 +1,21 @@
 package com.laosun.aluminium.test.engine;
 
 
-import com.laosun.aluminium.test.content.characters.DamageHookTest;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.DamageType;
-import com.laosun.aluminium.models.buff.AbstractBuff;
-import com.laosun.aluminium.models.buff.BuffManager;
 import com.laosun.aluminium.models.CanHit;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Damage;
 import com.laosun.aluminium.models.DoubleValue;
-import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.models.buff.AbstractBuff;
 import com.laosun.aluminium.models.buff.BoostDamageBuff;
+import com.laosun.aluminium.models.buff.BuffManager;
 import com.laosun.aluminium.models.buff.StunBuff;
+import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.event.DamageEvent;
+import com.laosun.aluminium.test.support.BattleFixture;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -203,7 +202,9 @@ public class BuffManagerTest {
                 "and the buff it attached must really be there, not skipped by the iteration");
     }
 
-    /** A damage reaction that attaches a second buff - the shape described above. */
+    /**
+     * A damage reaction that attaches a second buff - the shape described above.
+     */
     private static final class BoostsItselfWhenHit extends AbstractBuff implements DamageEvent {
         private BoostsItselfWhenHit() {
             super(5, false);
@@ -254,7 +255,9 @@ public class BuffManagerTest {
                 "and the ticking buff itself expired, as its duration said");
     }
 
-    /** An early buff of duration 1 that attaches a boost as it ticks out. */
+    /**
+     * An early buff of duration 1 that attaches a boost as it ticks out.
+     */
     private static final class AddsABuffWhileTicking extends AbstractBuff {
         private AddsABuffWhileTicking() {
             super(1, true);

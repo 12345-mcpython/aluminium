@@ -1,9 +1,6 @@
 package com.laosun.aluminium.test.engine;
 
 
-import com.laosun.aluminium.test.content.characters.HimekoChargeTest;
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
@@ -12,10 +9,12 @@ import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.CanHit;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.DoubleValue;
-import com.laosun.aluminium.models.TriggerInterpreter;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
+import com.laosun.aluminium.models.trigger.TriggerInterpreter;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -39,12 +38,16 @@ import java.util.List;
 public class AllEnemiesTargetTest {
     private static final double EPS = 1e-6;
 
-    /** Himeko (姬子): a real character with a damaging Talent (AoEAttack, Fire), which is what {@code DAMAGE} reads. */
+    /**
+     * Himeko (姬子): a real character with a damaging Talent (AoEAttack, Fire), which is what {@code DAMAGE} reads.
+     */
     private static final int OWNER = 1003;
     private static final int LEVEL = 80;
     private static final int ICE_EDGE = 1002011;
 
-    /** One effect targeting the whole enemy camp hits every enemy and nobody on our side. */
+    /**
+     * One effect targeting the whole enemy camp hits every enemy and nobody on our side.
+     */
     @Test
     public void allEnemiesReachesEveryEnemyAndNobodyOnOurSide() {
         Fixture fixture = new Fixture();
@@ -82,7 +85,9 @@ public class AllEnemiesTargetTest {
                 "one instance per victim, all with the same numbers");
     }
 
-    /** The selector needs a battlefield: a hand-built context has none, and that fails loudly. */
+    /**
+     * The selector needs a battlefield: a hand-built context has none, and that fails loudly.
+     */
     @Test
     public void allEnemiesWithoutABattleFailsLoudly() {
         Character owner = characterWith(damageRule(true));
@@ -118,14 +123,18 @@ public class AllEnemiesTargetTest {
     // helpers
     // ==================================================================
 
-    /** One battle with a whole enemy camp: the owner, two enemies, and a rule to fire. */
+    /**
+     * One battle with a whole enemy camp: the owner, two enemies, and a rule to fire.
+     */
     private static final class Fixture {
         private final Character owner;
         private final Enemy first;
         private final Enemy second;
         private final Battle battle;
 
-        /** The owner with the group-damage rule. */
+        /**
+         * The owner with the group-damage rule.
+         */
         private Fixture() {
             this(characterWith(damageRule(true)));
         }

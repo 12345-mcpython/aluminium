@@ -6,8 +6,8 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -24,7 +24,10 @@ public class TrailblazerSiblingTest {
     private static final int TB2 = 8002;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-        /** Note: "每次击破敌方目标的弱点后，攻击力提高20%…最多叠加2层". */
+
+    /**
+     * Note: "每次击破敌方目标的弱点后，攻击力提高20%…最多叠加2层".
+     */
     @Test
     public void hisTalentStacksAttackOnBreaksAndStopsAtTwo() {
         Character tb = CharacterFactory.create(TB2, LEVEL);
@@ -45,7 +48,9 @@ public class TrailblazerSiblingTest {
         Assertions.assertEquals(afterTwo, afterThree, 1e-9, "stacks at most 2 times (最多叠加2层)");
     }
 
-    /** Note: The technique heal, gated on the round-18 marker. */
+    /**
+     * Note: The technique heal, gated on the round-18 marker.
+     */
     @Test
     public void aDeclaredTechniqueHealsTheParty() {
         Character tb = CharacterFactory.create(TB2, LEVEL);
@@ -66,7 +71,9 @@ public class TrailblazerSiblingTest {
     }
 
 
-    /** Note: The control: without the marker the same battle heals nobody - this is what makes the gate testable. */
+    /**
+     * Note: The control: without the marker the same battle heals nobody - this is what makes the gate testable.
+     */
     @Test
     public void withoutTheTechniqueNobodyIsHealed() {
         Character tb = CharacterFactory.create(TB2, LEVEL);
@@ -84,7 +91,9 @@ public class TrailblazerSiblingTest {
                 "「使用秘技后」 (after using the Technique) -- undeclared, so no heal");
     }
 
-    /** Census: the talent, the technique heal and the level convention. */
+    /**
+     * Census: the talent, the technique heal and the level convention.
+     */
     @Test
     public void hisFileCarriesTheClauses() {
         var table = TriggerTables.of(TB2);

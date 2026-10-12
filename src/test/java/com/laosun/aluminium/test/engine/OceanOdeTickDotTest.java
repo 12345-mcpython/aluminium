@@ -1,31 +1,31 @@
 package com.laosun.aluminium.test.engine;
 
-import com.laosun.aluminium.test.content.lightcones.WoofWalkTimeTest;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.buff.DotBuff;
 import com.laosun.aluminium.models.skill.SkillExecutor;
+import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
 import java.util.List;
 
 /**
  * 1415's memosprite skill 22, last sentence: "使受到攻击的敌方目标当前承受的所有持续伤害立即产生相当于原伤害 #2%/#3% 的伤害".
- *
+ * <p>
  * The DoT goes on the enemy the SHIPPED way (`enemy.getBuffManager().addBuff(new DotBuff(...))`, as WoofWalkTimeTest does) -- two rounds were spent trying to apply it through a
  * rule, and the probe showed it never landed. The event is fired by hand so that only the clause is under test.
- *
+ * <p>
  * Two-sided: with the ode the captured basic-attack share (0.3) makes the 100-damage burn bite for 30; without it nothing was captured and TICK_DOT resolves nothing.
  */
 public class OceanOdeTickDotTest {
     private static final int LEVEL = 80;
     private static final int HYSILENS = 1410;
     private static final int CYRENE = 1415;
-        private static final int ODE_SLOT = 22;
+    private static final int ODE_SLOT = 22;
     private static final double BURN = 100;
 
     @Test
@@ -43,7 +43,9 @@ public class OceanOdeTickDotTest {
                 "and with no ode almost nothing happens: " + none + " vs " + basic);
     }
 
-    /** How much the enemy loses when the basic attack fires the rule, with or without the ode cast at her. */
+    /**
+     * How much the enemy loses when the basic attack fires the rule, with or without the ode cast at her.
+     */
     private static double tickDamage(boolean castTheOde, int skillId) {
         Character cyrene = CharacterFactory.create(CYRENE, LEVEL);
         Character hysilens = CharacterFactory.create(HYSILENS, LEVEL);

@@ -8,7 +8,9 @@ import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-/** Light cone 21061, from the shipped file (discipline 232). */
+/**
+ * Light cone 21061, from the shipped file (discipline 232).
+ */
 public class HolidayThermaeEscapadeTest {
     private static final int WEAPON_ID = 21061;
     private static final int WEARER = 1210;

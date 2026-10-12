@@ -5,8 +5,8 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -20,7 +20,10 @@ public class CyreneTest {
     private static final int CYRENE = 1415;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-        /** Note: Both writers feed [追忆], stopped at the document's twenty-four. */
+
+    /**
+     * Note: Both writers feed [追忆], stopped at the document's twenty-four.
+     */
     @Test
     public void bothWritersFeedRecollectionUpToItsStatedOverflow() {
         Character cyrene = CharacterFactory.create(CYRENE, LEVEL);
@@ -41,7 +44,9 @@ public class CyreneTest {
                 "「【追忆】达到24点时可激活终结技」 (at 24 points of Recollection the Ultimate can be activated) -- thirty-two casts must still read twenty-four");
     }
 
-    /** Note: The party boost, which the document conditions on nothing at all: an ally gains it, an enemy does not. */
+    /**
+     * Note: The party boost, which the document conditions on nothing at all: an ally gains it, an enemy does not.
+     */
     @Test
     public void thePartyBoostNeedsNoCondition() {
         Character cyrene = CharacterFactory.create(CYRENE, LEVEL);
@@ -59,7 +64,9 @@ public class CyreneTest {
                 "the selector is `all_allies`: the enemy side must be untouched");
     }
 
-    /** The declared resource's value, read through the combatant's own manager. */
+    /**
+     * The declared resource's value, read through the combatant's own manager.
+     */
     private static int recollectionOf(Character unit) {
         return unit.getResources().get("追忆").getValue();
     }

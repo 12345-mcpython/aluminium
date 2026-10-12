@@ -3,8 +3,8 @@ package com.laosun.aluminium.test.content.characters;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -22,7 +22,7 @@ public class SilverWolfLV999Test {
     private static final int WEARER = 1506;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-        private static final String HIDDEN = "隐藏分";
+    private static final String HIDDEN = "隐藏分";
 
     private Character wolf;
     private Battle battle;
@@ -48,7 +48,9 @@ public class SilverWolfLV999Test {
         Assertions.assertEquals(60, afterClamped, "but a clamped gain stops exactly at it");
     }
 
-    /** The shipped declarations, read off the compiled character (discipline 232). */
+    /**
+     * The shipped declarations, read off the compiled character (discipline 232).
+     */
     @Test
     public void theShippedDeclarationsCarryTheirNumbers() {
         build();

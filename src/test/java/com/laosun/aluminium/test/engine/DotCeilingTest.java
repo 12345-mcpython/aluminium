@@ -1,16 +1,16 @@
 package com.laosun.aluminium.test.engine;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.beans.TriggerSpec;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.buff.DotBuff;
 import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -29,12 +29,16 @@ import java.util.Random;
  * the defence/resistance zones, so a settled number would mix the question being asked with the defender's stats.
  */
 public class DotCeilingTest {
-    /** Himeko: no shipped rule file, so the table under test is the only one. */
+    /**
+     * Himeko: no shipped rule file, so the table under test is the only one.
+     */
     private static final int OWNER = 1003;
     private static final int LEVEL = 80;
     private static final double EPS = 1e-6;
 
-    /** Note: A high-HP victim is capped by the owner's attack, not by its own enormous bar. */
+    /**
+     * Note: A high-HP victim is capped by the owner's attack, not by its own enormous bar.
+     */
     @Test
     public void aBigVictimIsCappedByTheOwnerSideValue() {
         Character owner = CharacterFactory.create(OWNER, LEVEL);
@@ -46,7 +50,9 @@ public class DotCeilingTest {
                 "「最多不超过卢卡攻击力的 338%」 (at most 338% of Luka's ATK) -- the ceiling wins for a victim whose 24% share would be larger");
     }
 
-    /** Note: A small victim keeps its own small share: the ceiling is a ceiling, not a replacement. */
+    /**
+     * Note: A small victim keeps its own small share: the ceiling is a ceiling, not a replacement.
+     */
     @Test
     public void aSmallVictimKeepsItsOwnShare() {
         Character owner = CharacterFactory.create(OWNER, LEVEL);
@@ -59,7 +65,9 @@ public class DotCeilingTest {
                         + "would have paid the ceiling here)");
     }
 
-    /** Note: Only the DOT reads a ceiling today; every other op refuses it instead of ignoring it. */
+    /**
+     * Note: Only the DOT reads a ceiling today; every other op refuses it instead of ignoring it.
+     */
     @Test
     public void otherOpsRefuseACeiling() {
         EffectSpec effect = new EffectSpec();
@@ -79,7 +87,9 @@ public class DotCeilingTest {
     // Helpers
     // ==================================================================
 
-    /** Applies the rule's DOT once and reports the base damage the buff carries. */
+    /**
+     * Applies the rule's DOT once and reports the base damage the buff carries.
+     */
     private static double baseDamageOn(Character owner, Enemy victim) {
         EffectSpec dot = new EffectSpec();
         TriggerSpecs.set(dot, "op", "APPLY_DOT");

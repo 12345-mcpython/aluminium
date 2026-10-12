@@ -4,9 +4,9 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
-import com.laosun.aluminium.test.support.TriggerSpecs;
+import com.laosun.aluminium.models.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -32,9 +32,11 @@ public class AlliesOfPathExceptSelectorTest {
     private static final int PEARL = 1503;      // Elation - the rule's owner and one of the two exclusions
     private static final int ELATION_MATE = 1502;   // Elation - must be reached
     private static final int HUNTER = 1204;     // NOT Elation - must not be reached
-        private static final String MARK = "测试标记";
+    private static final String MARK = "测试标记";
 
-    /** The Path mate is reached; the owner (excluded as `self`), the aimed ally (as `target`) and the off-Path allies are not. */
+    /**
+     * The Path mate is reached; the owner (excluded as `self`), the aimed ally (as `target`) and the off-Path allies are not.
+     */
     @Test
     public void itReachesThePathMateAndNeitherExclusionNorTheOffPathAlly() {
         Fixture f = new Fixture();
@@ -77,7 +79,9 @@ public class AlliesOfPathExceptSelectorTest {
                 "the message says what is wrong: " + refused.getMessage());
     }
 
-    /** An unknown Path is a refused spelling, not an empty answer. */
+    /**
+     * An unknown Path is a refused spelling, not an empty answer.
+     */
     @Test
     public void anUnknownPathIsRefused() {
         Fixture f = new Fixture();
@@ -91,7 +95,9 @@ public class AlliesOfPathExceptSelectorTest {
                 "the message names the problem: " + refused.getMessage());
     }
 
-    /** A selector with no exclusion list at all is a spelling mistake too. */
+    /**
+     * A selector with no exclusion list at all is a spelling mistake too.
+     */
     @Test
     public void aSelectorWithNoExclusionListIsRefused() {
         Fixture f = new Fixture();
@@ -109,7 +115,9 @@ public class AlliesOfPathExceptSelectorTest {
     // Helpers
     // ==================================================================
 
-    /** A rule that puts one marked stack on whatever the selector names. */
+    /**
+     * A rule that puts one marked stack on whatever the selector names.
+     */
     private static EffectSpec marker(String selector) {
         EffectSpec effect = new EffectSpec();
         TriggerSpecs.set(effect, "op", "ADD_STACK");

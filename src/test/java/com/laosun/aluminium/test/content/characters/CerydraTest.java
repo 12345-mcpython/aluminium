@@ -1,14 +1,12 @@
 package com.laosun.aluminium.test.content.characters;
 
 import com.laosun.aluminium.Battle;
-import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -22,7 +20,10 @@ public class CerydraTest {
     private static final int CERYDRA = 1412;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-        /** Note: The mark's own claims: the state on the ally, her +1 Charge (充能), and the ATTACK share = 24% of HER attack (a derived, absolute number). */
+
+    /**
+     * Note: The mark's own claims: the state on the ally, her +1 Charge (充能), and the ATTACK share = 24% of HER attack (a derived, absolute number).
+     */
     @Test
     public void theSkillMarksTheAllyAndSharesHerAttack() {
         Character cerydra = CharacterFactory.create(CERYDRA, LEVEL);
@@ -44,7 +45,9 @@ public class CerydraTest {
                 "「并使刻律德菈获得1点充能」 (and Cerydra (刻律德菈) gains 1 point of Charge)");
     }
 
-    /** Note: The mark's reaction: a marked ally's attack grants Charge AND draws her 60% additional damage; an unmarked one does neither. */
+    /**
+     * Note: The mark's reaction: a marked ally's attack grants Charge AND draws her 60% additional damage; an unmarked one does neither.
+     */
     @Test
     public void theMarkDrivesBothTheChargeAndTheAdditionalDamage() {
         double unmarked = markedAttackLoss(false);
@@ -55,7 +58,9 @@ public class CerydraTest {
         Assertions.assertTrue(marked > 0, "with the mark, the additional damage lands: " + marked);
     }
 
-    /** Fires the ally's attack, optionally after marking them, and returns the enemy's HP loss from HER additional damage only. */
+    /**
+     * Fires the ally's attack, optionally after marking them, and returns the enemy's HP loss from HER additional damage only.
+     */
     private static double markedAttackLoss(boolean mark) {
         Character cerydra = CharacterFactory.create(CERYDRA, LEVEL);
         Character ally = CharacterFactory.create(ALLY, LEVEL);

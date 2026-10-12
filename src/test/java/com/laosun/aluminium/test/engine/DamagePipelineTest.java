@@ -28,7 +28,9 @@ import java.util.Random;
 public class DamagePipelineTest {
     private static final double EPS = 1e-6;
     private static final double BASE = 1000.0;
-    /** The level term of the defence zone when the attacker is level 80: 200 + 10  x  80. */
+    /**
+     * The level term of the defence zone when the attacker is level 80: 200 + 10  x  80.
+     */
     private static final double LEVEL_TERM = 1000.0;
 
     private static Character attacker() {

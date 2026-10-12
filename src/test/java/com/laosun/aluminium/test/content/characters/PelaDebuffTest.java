@@ -5,10 +5,10 @@ import com.laosun.aluminium.data.TriggerTables;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
+import com.laosun.aluminium.models.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -28,7 +28,10 @@ public class PelaDebuffTest {
     private static final int PELA = 1106;
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
-        /** Note: Both "in a negative effect" clauses are gated on the target's debuff count. */
+
+    /**
+     * Note: Both "in a negative effect" clauses are gated on the target's debuff count.
+     */
     @Test
     public void theDebuffConditionsAreOnTheRules() {
         TriggerTable table = TriggerTables.of(PELA);
@@ -45,7 +48,9 @@ public class PelaDebuffTest {
                 "Note: with none it does not: 「to an enemy target in a **negative effect**」");
     }
 
-    /** trace The Secret Strategy (秘策) hands the whole side the effect-hit rate, and the file says so. */
+    /**
+     * trace The Secret Strategy (秘策) hands the whole side the effect-hit rate, and the file says so.
+     */
     @Test
     public void herTraceRaisesThePartysEffectHitRate() {
         Fixture f = new Fixture();
@@ -92,7 +97,9 @@ public class PelaDebuffTest {
             battle.startBattle();
         }
 
-        /** The rule's context, with the target carrying a debuff or not. */
+        /**
+         * The rule's context, with the target carrying a debuff or not.
+         */
         private TriggerTable.TriggerContext ctx(boolean debuffed) {
             if (debuffed) {
                 enemy.getBuffManager().addBuff(new com.laosun.aluminium.models.buff.DotBuff(pela,

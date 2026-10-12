@@ -4,8 +4,8 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -20,7 +20,10 @@ import java.util.Random;
 public class TechniqueHarvestTest {
     private static final int DANHENG = 1002;
     private static final int LEVEL = 80;
-        /** Note: "使用秘技后，下一次战斗开始时丹恒攻击力提高40%". */
+
+    /**
+     * Note: "使用秘技后，下一次战斗开始时丹恒攻击力提高40%".
+     */
     @Test
     public void aDeclaredTechniqueRaisesHisAttackAtBattleStart() {
         Character plain = CharacterFactory.create(DANHENG, LEVEL);
@@ -45,7 +48,9 @@ public class TechniqueHarvestTest {
                         + ", actual gain " + (boosted - untouched));
     }
 
-    /** Note: The control: without the marker his ATK is untouched at battle start. */
+    /**
+     * Note: The control: without the marker his ATK is untouched at battle start.
+     */
     @Test
     public void withoutTheTechniqueHisAttackIsUntouched() {
         Character plain = CharacterFactory.create(DANHENG, LEVEL);

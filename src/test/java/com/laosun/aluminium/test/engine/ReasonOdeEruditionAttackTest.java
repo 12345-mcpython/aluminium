@@ -1,16 +1,18 @@
 package com.laosun.aluminium.test.engine;
+
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
 import java.util.List;
 
 /**
  * `allies_of_path:智识` and the clause it unlocks: "所有'智识'命途角色攻击力提高 #3(30)%" (all characters on the Erudition path gain #3(30)% ATK).
- *
+ * <p>
  * The party is chosen so the selector's REACH is what the reading shows: Anaxa (1405) and Jing Yuan (1204) are Erudition, Tribbie (1403) is Harmony, Cyrene (1415) is Remembrance. A raise
  * aimed at the path must move exactly the first two.
  */
@@ -20,7 +22,7 @@ public class ReasonOdeEruditionAttackTest {
     private static final int ANAXA = 1405;
     private static final int JING_YUAN = 1204;
     private static final int TRIBBIE = 1403;
-        private static final int ODE_SLOT = 18;
+    private static final int ODE_SLOT = 18;
 
     @Test
     public void theRaiseReachesTheEruditionAllyOnly() {
@@ -41,7 +43,9 @@ public class ReasonOdeEruditionAttackTest {
         Assertions.assertEquals(0.0, with[0] - without[0], 1e-9, "and so does the Remembrance caster");
     }
 
-    /** [Anaxa, Jing Yuan, Tribbie, Cyrene] attack values. */
+    /**
+     * [Anaxa, Jing Yuan, Tribbie, Cyrene] attack values.
+     */
     private static double[] run(boolean castTheOde) {
         Character cyrene = CharacterFactory.create(CYRENE, LEVEL);
         Character anaxa = CharacterFactory.create(ANAXA, LEVEL);

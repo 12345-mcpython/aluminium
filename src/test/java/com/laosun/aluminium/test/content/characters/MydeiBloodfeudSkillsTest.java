@@ -1,19 +1,17 @@
 package com.laosun.aluminium.test.content.characters;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
-import com.laosun.aluminium.enums.TriggerEvent;
-
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.beans.EffectSpec;
-import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.SkillType;
+import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Signal;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.buff.StateBuff;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -29,10 +27,12 @@ import java.util.List;
  */
 public class MydeiBloodfeudSkillsTest {
     private static final int MYDEI = 1404;
-        private static final String BLOODFEUD = "血仇";
+    private static final String BLOODFEUD = "血仇";
     private static final String CHARGE = "天赋充能";
 
-    /** "消耗等同于万敌当前生命值 35% 的生命值"-- the cost is paid, on the CURRENT value, at the start of his turn. */
+    /**
+     * "消耗等同于万敌当前生命值 35% 的生命值"-- the cost is paid, on the CURRENT value, at the start of his turn.
+     */
     @Test
     public void theTurnStartPaysTheSkillsCost() {
         Character him = CharacterFactory.create(MYDEI, 80, false, null, null, 0);
@@ -67,7 +67,9 @@ public class MydeiBloodfeudSkillsTest {
         // old row (6.585 against 383.93 for a direct cast of slot 9). Registered in EXPRESSION §3, so the note does not claim it.
     }
 
-    /** Note: The other half on its own: `REPLACE_SKILL` really installs the row the cast then uses. */
+    /**
+     * Note: The other half on its own: `REPLACE_SKILL` really installs the row the cast then uses.
+     */
     @Test
     public void theSwapInstallsTheEnhancedRow() {
         Character him = CharacterFactory.create(MYDEI, 80, false, null, null, 0);
@@ -90,7 +92,9 @@ public class MydeiBloodfeudSkillsTest {
         Assertions.assertEquals(9, slot, "the row swapped in is **slot 9** (Kingslayer Be King (【弑王成王】) toughness 60/30 ✓), where it used to be slot 2");
     }
 
-    /** Note: Half a turn is `beforeMove()` alone; a full one is both halves (see `ArlanEidolonFourTest`). */
+    /**
+     * Note: Half a turn is `beforeMove()` alone; a full one is both halves (see `ArlanEidolonFourTest`).
+     */
     private static void spendTurnOf(Battle battle, Character unit) {
         Signal signal = battle.queue.snapshot().stream()
                 .filter(candidate -> candidate.getCanHit() == unit).findFirst()
@@ -140,7 +144,9 @@ public class MydeiBloodfeudSkillsTest {
                 "「自动施放【弑王成王】」 (automatically casts Kingslayer Be King)-- the commanded cast runs the row the swap installed, not the slot's original one");
     }
 
-    /** The gate: a charge that arrives WHILE [血仇] is already on must not be drained again. */
+    /**
+     * The gate: a charge that arrives WHILE [血仇] is already on must not be drained again.
+     */
     @Test
     public void aChargeArrivingInBloodfeudIsNotDrainedAgain() {
         Character him = CharacterFactory.create(MYDEI, 80, false, null, null, 0);
@@ -163,7 +169,9 @@ public class MydeiBloodfeudSkillsTest {
                         + "without this the charge can never reach 150 and the next sentence is unreachable");
     }
 
-    /** "充能达到 150 点时，立即获得 1 个额外回合并自动施放[弑神登神]". */
+    /**
+     * "充能达到 150 点时，立即获得 1 个额外回合并自动施放[弑神登神]".
+     */
     @Test
     public void theHundredAndFiftyChargeCastsGodslayer() {
         Character him = CharacterFactory.create(MYDEI, 80, false, null, null, 0);

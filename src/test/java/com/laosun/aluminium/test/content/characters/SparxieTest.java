@@ -4,8 +4,8 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -18,7 +18,10 @@ import java.util.Random;
 public class SparxieTest {
     private static final int SPARXIE = 1501;
     private static final int LEVEL = 80;
-        /** Note: The technique hits and restores exactly two Skill Points, and only when declared. */
+
+    /**
+     * Note: The technique hits and restores exactly two Skill Points, and only when declared.
+     */
     @Test
     public void theTechniqueHitsAndRestoresSkillPoints() {
         Character sparxie = CharacterFactory.create(SPARXIE, LEVEL);
@@ -41,7 +44,9 @@ public class SparxieTest {
                 "「使用秘技后」 (after using the Technique) -- undeclared, so nothing");
     }
 
-    /** Note: Exactly two Skill Points: spend two first so the pool's cap cannot clamp the grant, then observe it in isolation. */
+    /**
+     * Note: Exactly two Skill Points: spend two first so the pool's cap cannot clamp the grant, then observe it in isolation.
+     */
     @Test
     public void theTechniqueGrantsExactlyTwoSkillPoints() {
         Character sparxie = CharacterFactory.create(SPARXIE, LEVEL);

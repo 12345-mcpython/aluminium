@@ -1,7 +1,6 @@
 package com.laosun.aluminium.test.data;
 
 
-import com.laosun.aluminium.test.content.memosprites.SummonOpTest;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import org.junit.jupiter.api.Assertions;
@@ -34,7 +33,8 @@ public class TestRelicSetDataIsInSyncTest {
     private static Map<String, String> load(Path p) {
         try {
             Map<String, Object> raw = new Gson().fromJson(Files.readString(p, StandardCharsets.UTF_8),
-                    new TypeToken<Map<String, Object>>() { }.getType());
+                    new TypeToken<Map<String, Object>>() {
+                    }.getType());
             Map<String, String> flat = new TreeMap<>();
             for (Map.Entry<String, Object> e : raw.entrySet()) {
                 flat.put(e.getKey(), new Gson().toJson(e.getValue()));

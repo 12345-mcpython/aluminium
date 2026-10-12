@@ -7,18 +7,14 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.ResourceScope;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
-import com.laosun.aluminium.models.CanHit;
+import com.laosun.aluminium.models.*;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.Damage;
-import com.laosun.aluminium.models.DoubleValue;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
-import com.laosun.aluminium.models.Resource;
-import com.laosun.aluminium.models.ResourceManager;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.energy.EnergyGain;
 import com.laosun.aluminium.models.energy.EnergyProvider;
 import com.laosun.aluminium.models.skill.Skill;
+import com.laosun.aluminium.models.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -44,14 +40,18 @@ public class ResourceTest {
     private static final int ACHERON = 1308;
     private static final int ICE_EDGE = 1002011;
 
-    /** Acheron's [残梦] cap, from her character doc. */
+    /**
+     * Acheron's [残梦] cap, from her character doc.
+     */
     private static final int ACHERON_STACKS = 9;
 
     // ==================================================================
     // 1. The manager: registration, scope, gain/spend
     // ==================================================================
 
-    /** A registered resource can be gained and spent through the manager. */
+    /**
+     * A registered resource can be gained and spent through the manager.
+     */
     @Test
     public void managerGainsAndSpends() {
         Character hero = CharacterFactory.create(NO_TRIGGERS, 80);
@@ -71,7 +71,9 @@ public class ResourceTest {
         Assertions.assertEquals(0, manager.value("stacks"));
     }
 
-    /** Asking about a resource that was never registered is a no-op, not a crash. */
+    /**
+     * Asking about a resource that was never registered is a no-op, not a crash.
+     */
     @Test
     public void unknownResourceIsInert() {
         Character hero = CharacterFactory.create(NO_TRIGGERS, 80);
@@ -83,7 +85,9 @@ public class ResourceTest {
         Assertions.assertFalse(hero.getResources().has("nope"));
     }
 
-    /** Registering the same id twice is a bug in the content, and is reported. */
+    /**
+     * Registering the same id twice is a bug in the content, and is reported.
+     */
     @Test
     public void duplicateRegistrationIsRejected() {
         Character hero = CharacterFactory.create(NO_TRIGGERS, 80);
@@ -112,7 +116,9 @@ public class ResourceTest {
         Assertions.assertTrue(ResourceScope.SELF.isWired());
     }
 
-    /** The "became full" signal fires on the rising edge, once. */
+    /**
+     * The "became full" signal fires on the rising edge, once.
+     */
     @Test
     public void becameFullFiresOnceOnArrival() {
         Character hero = CharacterFactory.create(NO_TRIGGERS, 80);
@@ -154,7 +160,9 @@ public class ResourceTest {
         Assertions.assertEquals(1, fired[0]);
     }
 
-    /** Spending below the cap and coming back re-arms the edge. */
+    /**
+     * Spending below the cap and coming back re-arms the edge.
+     */
     @Test
     public void refillsAfterSpendingFireAgain() {
         Character hero = CharacterFactory.create(NO_TRIGGERS, 80);
@@ -169,7 +177,9 @@ public class ResourceTest {
         Assertions.assertEquals(2, fired[0], "each arrival counts");
     }
 
-    /** Cyrene's shape: pool 24 that may overflow to 2. */
+    /**
+     * Cyrene's shape: pool 24 that may overflow to 2.
+     */
     @Test
     public void overflowAllowsStoringAboveThePool() {
         Character cyrene = CharacterFactory.create(1415, 80);
@@ -219,7 +229,9 @@ public class ResourceTest {
                 "and the ultimate can actually be cast");
     }
 
-    /** The stand-in provider gains no conventional energy, so her bar stays empty the whole time. */
+    /**
+     * The stand-in provider gains no conventional energy, so her bar stays empty the whole time.
+     */
     @Test
     public void stackCharacterGainsNoConventionalEnergy() {
         Character acheron = CharacterFactory.create(ACHERON, 80);
@@ -235,7 +247,9 @@ public class ResourceTest {
         Assertions.assertFalse(battle.isUltraReady(acheron), "and that alone cannot unlock the ultimate");
     }
 
-    /** Conventional characters are untouched: the default rule still requires energy. */
+    /**
+     * Conventional characters are untouched: the default rule still requires energy.
+     */
     @Test
     public void conventionalGateIsUnchanged() {
         Character hero = CharacterFactory.create(NO_TRIGGERS, 80);
@@ -251,7 +265,7 @@ public class ResourceTest {
     // ==================================================================
 
     /**
-     * {@code HP_LOST} really reaches the owner's table: the wiring is byte-for-byte (real enemy turn to 
+     * {@code HP_LOST} really reaches the owner's table: the wiring is byte-for-byte (real enemy turn to
      * {@code Battle.applyDamage} to the event to the rule to the manager).
      *
      * <p>Driven through a real enemy turn rather than firing the event by hand, so the test covers
@@ -361,7 +375,9 @@ public class ResourceTest {
                         + "not a subject filter: a teammate-caused loss would still fire it");
     }
 
-    /** {@code GAIN_RESOURCE} and {@code SPEND_RESOURCE} work through the trigger pathway. */
+    /**
+     * {@code GAIN_RESOURCE} and {@code SPEND_RESOURCE} work through the trigger pathway.
+     */
     @Test
     public void triggerCanGainAndSpendResource() {
         Character hero = CharacterFactory.create(TRIBBIE, 80);
@@ -401,7 +417,9 @@ public class ResourceTest {
         Assertions.assertTrue(e.getMessage().contains("needs 5"), e.getMessage());
     }
 
-    /** Spending a resource that was never registered is reported too. */
+    /**
+     * Spending a resource that was never registered is reported too.
+     */
     @Test
     public void spendingAnUnknownResourceIsReported() {
         Character hero = CharacterFactory.create(TRIBBIE, 80);
@@ -414,7 +432,9 @@ public class ResourceTest {
         Assertions.assertTrue(e.getMessage().contains("no such resource"), e.getMessage());
     }
 
-    /** A resource op without a {@code resource} name is rejected at load time. */
+    /**
+     * A resource op without a {@code resource} name is rejected at load time.
+     */
     @Test
     public void resourceOpWithoutANameIsRejected() {
         EffectSpec incomplete = op("GAIN_RESOURCE", 1.0);
@@ -448,7 +468,7 @@ public class ResourceTest {
         // No conventional energy from any source.
         @Override
         public EnergyGain onSkillCast(CanHit user, Skill skill,
-                                     java.util.Set<? extends CanHit> hitTargets) {
+                                      java.util.Set<? extends CanHit> hitTargets) {
             return null;
         }
 

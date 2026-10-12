@@ -1,15 +1,14 @@
 package com.laosun.aluminium.test.engine;
 
 
-import com.laosun.aluminium.test.support.TriggerSpecs;
-import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.Battle;
-import com.laosun.aluminium.enums.SkillCategory;
-import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.beans.EffectSpec;
+import com.laosun.aluminium.enums.SkillCategory;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.TriggerTable;
 import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.models.trigger.TriggerTable;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TriggerSpecs;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -25,7 +24,7 @@ import java.util.List;
 public class OneTurnCounterProbeTest {
     private static final int UNIT = 1205;
     private static final int LEVEL = 80;
-        private static final String COUNT = "本回合消耗";
+    private static final String COUNT = "本回合消耗";
 
     private static EffectSpec oneTurnCounter() {
         EffectSpec stack = new EffectSpec();
