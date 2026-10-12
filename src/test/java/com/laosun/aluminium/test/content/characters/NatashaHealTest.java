@@ -20,7 +20,7 @@ import java.util.Random;
  * while "生命上限" (Max HP) is {@code getMaxHp()}, which every +HP% effect moves; the two agree until one does.
  *
  * <p><b>What is registered instead</b> (the file's own notes): the regeneration and everything that rides on it, plus the
- * talent's "为生命百分比 <= 30% 的我方目标提供治疗时，治疗量提高 50%" (when healing one of our targets with an HP percentage <= 30%, the healing is raised by 50%) - a heal-over-time has no spelling yet, and a
+ * talent's "为生命百分比 {@code <= 30}% 的我方目标提供治疗时，治疗量提高 50%" (when healing one of our targets with an HP percentage {@code <= 30}%, the healing is raised by 50%) - a heal-over-time has no spelling yet, and a
  * boost that must be in place <i>before</i> a heal is computed has no hook ({@code HEALED} fires after).
  */
 public class NatashaHealTest {

@@ -21,7 +21,7 @@ import java.util.List;
  *
  * <p>"if Mydei (万敌) is <b>not</b> in the [血仇] state, then <b>advance Mydei's action by 100%</b>" -- `#2` is 1 at every level, i.e. 100%.
  *
- * <p>The predicate is the existing `!`: `HasState` already implements `PartyCondition`, so `!self has_state <state>` is an ordinary
+ * <p>The predicate is the existing `!`: `HasState` already implements `PartyCondition`, so `!self has_state &lt;state&gt;` is an ordinary
  * negation and needed no new vocabulary. (An earlier round concluded the opposite from the loader's comments without trying it; the
  * class declaration is what settles it.)
  *

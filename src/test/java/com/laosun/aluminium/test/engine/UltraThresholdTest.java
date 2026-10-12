@@ -61,7 +61,7 @@ public class UltraThresholdTest {
     }
 
     /**
-     * All 93 characters: the threshold must be <= the cap and > 0.
+     * All 93 characters: the threshold must be {@code <=} the cap and {@code >} 0.
      */
     @Test
     public void thresholdNeverExceedsTheCap() {
@@ -122,7 +122,7 @@ public class UltraThresholdTest {
     }
 
     /**
-     * After casting it is zeroed: for a character whose threshold < cap, that is equivalent to "consuming the
+     * After casting it is zeroed: for a character whose threshold {@code <} cap, that is equivalent to "consuming the
      * threshold part".
      */
     @Test

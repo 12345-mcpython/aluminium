@@ -28,7 +28,7 @@ public class ThresholdConditionTest {
     private static final int LEVEL = 80;
 
     /**
-     * Note: `<=` is INCLUSIVE: the boundary value fires.
+     * Note: {@code <=} is INCLUSIVE: the boundary value fires.
      */
     @Test
     public void lessOrEqualFiresOnTheBoundary() {

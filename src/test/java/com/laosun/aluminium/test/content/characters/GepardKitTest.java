@@ -28,7 +28,7 @@ import java.util.Random;
  * cannot miss whatever {@code rng} hands back. The case therefore verifies the freeze AND eidolon 1 in one go.
  *
  * <p>Note: <b>The E1 freeze is unverified.</b> The control roll is
- * Battle.rng.nextDouble() < hitChance(...), so a fixed roll cannot make the plain skill deterministic, and even at E1 - where
+ * Battle.rng.nextDouble() {@code <} hitChance(...), so a fixed roll cannot make the plain skill deterministic, and even at E1 - where
  * his own rule raises the base chance by 35% - the target does not end up frozen under this fixture. Either that MODIFY_RULE
  * does not reach the control roll, or the monster carries a specific resistance to this control. Answering it needs one source
  * read (where MODIFY_RULE files its modifier and what hitChance's specificResistKey resolves to); until then the freeze stays unverified rather than flaky.

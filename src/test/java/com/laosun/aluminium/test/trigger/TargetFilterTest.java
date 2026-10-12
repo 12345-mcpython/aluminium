@@ -22,7 +22,7 @@ import java.util.Random;
  * <b>Per-target conditions</b>: an effect's {@code target_when}.
  *
  * <p><b>The sentences that needed it.</b> "deals additional damage to all enemies <b>in the shocked state</b>" (1103's talent), "makes enemies <b>not in the shocked state</b>
- * fall into shock" (her Eidolon (星魂) 4) and "attaches continuous healing to our targets <b>whose HP percentage is <= 30%</b>" (1105's Eidolon (星魂) 2). A rule's own conditions
+ * fall into shock" (her Eidolon (星魂) 4) and "attaches continuous healing to our targets <b>whose HP percentage is {@code <= 30}%</b>" (1105's Eidolon (星魂) 2). A rule's own conditions
  * filter the <b>rule</b>, so "all shocked enemies" can only be spelled as "the enemy I hit was shocked" -
  * which then also hit the unshocked ones. The selector says which units; this filter says which of them qualify.
  *

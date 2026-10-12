@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * The parameterised variable `allies_with_path:<PATH>`: how many of my team share a Path.
+ * The parameterised variable `allies_with_path:&lt;PATH&gt;`: how many of my team share a Path.
  */
 public class AlliesWithPathTest {
     private static final int PEARL = 1503;      // Elation

@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 /**
- * {@code CAST_SKILL}: "使<那个单位>立即施放 1 次…" - the op that lets a rule command somebody else to cast.
+ * {@code CAST_SKILL}: "使&lt;那个单位&gt;立即施放 1 次…" - the op that lets a rule command somebody else to cast.
  *
  * <p><b>Why this file exists now.</b> The op was added on by loosening {@code commandSummon}, and on
  * the <b>first attempt to make it fire</b> found that it could never have worked: it read the multiplier

@@ -34,7 +34,7 @@ import java.util.function.Supplier;
  *       explained);
  *   <li>Cap 5 / basic attack +1 - "each time a character uses a basic attack they restore one
  *       skill point; the skill point cap is 5";
- *   <li><b>Start at 3</b> - the player Q&A states explicitly "normally every battle starts with
+ *   <li><b>Start at 3</b> - the player Q&amp;A states explicitly "normally every battle starts with
  *       three skill points";
  *   <li>The start value is variable - this project's own {@code RELICS.md}: the 4-piece
  *       Passerby set "immediately restores 1 skill point for our side at the start of battle", so
