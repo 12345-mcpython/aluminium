@@ -505,42 +505,56 @@ chance = base × (1 + 效果命中) × (1 - 效果抵抗) × (1 - 具体 debuff 
   要做就得让 `generate_data.py` 也导出 Impair 的 `(属性, 数值, 持续)`，属数据补全。
 - **依赖**：P6-1、P8-2 ✅（P10-2 ✅）
 
-### P10-7 「按被治疗者的状态，加治疗者的治疗量」= 数据 🚧 引擎侧缺一个前置
+### P10-7 「按被治疗者的状态，加治疗者的治疗量」= 数据 ✅ 已落地
 
-- **要表达的句子**：1105 娜塔莎 天赋 生机焕发 (110504, Enhance) ——
-  「为当前生命值百分比小于等于 30% 的我方目标提供治疗时，娜塔莎的治疗量提高 50%，**该效果对持续治疗效果也会生效**」，
-  `param` Lv1 = `[0.3, 0.25]`、Lv10 = `[0.3, 0.5]`。
-- **⚠ 为什么它不是一条规则就能写完的（三条实测结论）**：
-  1. **它不是治疗者的属性**。`Battle.calculateHeal` 读的是
-     `baseAmount × (1 + healer.OUTGOING_HEALING_BOOST) × (1 + target.HEAL_TAKEN_RATIO)`
-     —— 治疗者的 `OUTGOING_HEALING_BOOST` **不知道被治疗的是谁**，同一个 +50% 会平等地加到
-     "治疗满血队友"上 ⇒ 写成一个属性就是**错数字**。
-  2. **`target_when` 帮不上**。它（`TriggerContext.withTargetFilter`）决定一条修正**落到哪些单位身上**
-     （`TriggerEffects.modifyAttr` → 被修改单位的 `DoubleValue`），**不能**把"我治疗谁"当作修改自己属性的条件。
-  3. ⚠ **没有"治疗前"事件**。`TriggerEvent` 里与治疗有关的只有 `HEALED`，而它在
-     `Battle.heal` 里是**治疗结算之后**才发的 ⇒ 一条规则**没有时机**在治疗落地前抬高她的治疗量。
-- **所以缺的是**：一个由**治疗者持有**、在 `Battle.calculateHeal` 里**逐次治疗**求值的
-  "条件治疗加成"（治疗者 + 被治疗者 + `Battle` 三者同时在场的地方只有这里；
-  ✅ 已确认续疗走 `tickRegens` → `heal(regen.getSource(), target, base)`，**带的是原始施加者**，
-  所以同一条加成对「持续治疗也生效」天然成立）。
-- **怎么做（已探明的最小形状，不新开架构）**：
-  1. `CanHit` 上一个 `List<ConditionalHealBonus(Condition, double percent)>`（✅ **已加**，
-     含 `addConditionalHealBonus` / `conditionalHealBonuses()`）；
-  2. 新 op `REGISTER_HEAL_BONUS`（`when` + `percent`）在 `BATTLE_START` 登记；
-  3. `Battle.calculateHeal` 用它构造 `TriggerContext(healer, healer, target, 0, 0, null, battle)`
-     （✅ 该 7 参构造器 **public**，`Condition.test(ctx)` 也 **public**）逐条 `test`，通过的乘 `(1 + percent)`。
-- **⚠ 唯一的卡点（这一步才需要动 `TriggerInterpreter`）**：`parseCondition(raw, spec)` **要一个
-  `TriggerSpec`**，而 `applyOne(battle, effect, ctx, previousCredited)` **拿不到 spec**
-  （`CompiledRule` 只存了 effects + targetFilters，`spec.getWhen()` 在 `compile()` 里被解析成
-  `List<Condition>` 后就丢了）。⇒ 二选一：
-  **(a)** 给 `CompiledRule` 加一份**逐 effect 的 `List<Condition>`**（在 `compile()` 里顺手解析，
-  与既有 `targetFilters` **完全同形**的法子），再让 `applyOne` 从 `ctx` 读到它；
-  **(b)** 把 `spec` 一路传进 `applyOne`。
-  ⚠ 我倾向 **(a)**：与 `targetFilters` 同形，且不用给 50 个 op 的调用链加参数。
-- **验收**：`NatashaTalentTest`：满血队友治疗不受加成；**≤30%** 队友的治疗量是**同一条件下的 1.5 倍**；
-  **续疗的每一跳也吃这 1.5 倍**；**变异验证**：把 `percent` 改成 `0` 或把条件改成永远为假 ⇒ 三条全红。
-- **依赖**：无（P10-3 ✅ 已给 `TriggerContext` 与 `Condition` 的可见性）
+> 读者：**1105 娜塔莎 天赋 生机焕发** (110504, Enhance) ——
+> 「为当前生命值百分比小于等于 30% 的我方目标提供治疗时，娜塔莎的治疗量提高 50%，
+> **该效果对持续治疗效果也会生效**」，`param` Lv10 = `[0.3, 0.5]`。
 
+**为什么不能写成属性或普通规则（三条实测结论，正是这条 op 存在的理由）**：
+
+1. **它不是治疗者的属性**：`Battle.calculateHeal` 读的是治疗者自己的 `OUTGOING_HEALING_BOOST`，
+   **它看不见被治疗的是谁** ⇒ 写成属性会把 +50% 平等加到「治疗满血队友」上，**是错数字**。
+2. **`target_when` 不能改自己的属性**：它决定一条修正**落到哪些单位身上**
+   （`TriggerEffects.modifyAttr` 改的是**被作用单位**的 `DoubleValue`），
+   没法把「我在治疗谁」当作抬高**自己**属性的条件。
+3. ⚠ **没有「治疗前」事件**：`TriggerEvent` 里与治疗有关的只有 `HEALED`，
+   而它由 `Battle.heal` 在**算完之后**发出 ⇒ 规则**没有时机**在这笔治疗落地前抬治疗量。
+
+⇒ 唯一同时握着治疗者、被治疗者与 `Battle` 的地方是 `calculateHeal`。
+
+**落地形状（`REGISTER_HEAL_BONUS`）**：
+
+- `TriggerOperator.REGISTER_HEAL_BONUS`（wired）＋ `TriggerInterpreter.registerHealBonus`：
+  在 `BATTLE_START` 把条件登记到**规则主人**身上。
+- ⚠ **条件复用 `target_when`，引擎侧一行解析都没加**：`EffectSpec` **根本没有** effect 级的 `when`，
+  而 `target_when` 在 `TriggerTable.compile` 里**已经**被解析成 `Condition` 并交给解释器
+  （`ctx.targetFilter()`），含义也一致（「这条效果是关于哪些单位的」）—— 只是这里的单位是
+  **将来的被治疗者**，且**求值时机推迟到治疗那一刻**。
+  （写这条待办时我以为要给 `CompiledRule` 加一份 effect 条件，**那是错的**：没有 effect 级 `when` 可加。）
+- `CanHit.ConditionalHealBonus(condition, percent)` 列表 ＋ `addConditionalHealBonus`。
+- `Battle.calculateHeal` 求出乘区：用**治疗者**当 `owner`/`actor`、**被治疗者**当 `target` 造
+  `TriggerContext`，逐条 `test`，把过的加起来乘 `(1 + Σ)`。所以 `target_hp_percent` 读的正是被治疗者。
+- ⚠ **校验器拒绝**没有 `target_when` 的 `REGISTER_HEAL_BONUS`：无条件版本会抬高每一笔治疗。
+- ✅ 「**对持续治疗也生效**」**不需要额外写**：续疗走 `Battle.tickRegens` → `heal(regen.getSource(), …)`，
+  **带的是原始施加者** ⇒ 同一条加成天然对每一跳生效（有用例钉住，不是假设）。
+
+**⚠ 真正的坑在测试里，不在引擎里**：`Battle.heal` 返回的是**实际落地**的量，
+而它被 `CanHit.heal` **按受疗者缺失的血量钳住**。80% 血的队友只缺 ~316，
+于是「+50% 的 500」与「825」**都会落地成 316**，**测不出来** ⇒
+`calculateHeal` 才是这条天赋真正缩放的那个量，用例必须断言它。
+（第一版用例断言的正是落地量，因此**连"无条件加成"这个错误实现都能通过**。）
+
+**变异验证（3 种错法各红一片，用例真的能区分）**：
+`percent: 0` ⇒ 3 条全红；条件改**恒真**（= 无条件加成）⇒ **健康那一半**红；
+条件改**恒假** ⇒ 低血那半与续疗红。
+
+**⚠ 复核时发现的坑（写给下一个改 1105 的人）**：
+`"target_hp_percent <= 0.3"` 在 `1105.json` 里**出现两次** —— 她的**星魂 2**（终结技对 ≤30% 血队友
+附加持续治疗）用的是**同一条件**。任何按**首次匹配**改文件的脚本都会改到那条，
+于是「变异验证」会在**没改到天赋**的情况下"通过"。锚点必须带 `"op": "REGISTER_HEAL_BONUS"`。
+
+**验收**：`NatashaTalentTest` 3 条（阈值内/外对比、30% 含等号、续疗也生效）。
 ---
 
 ## 7. 待办 D 层：演示与收尾

@@ -2299,7 +2299,46 @@ public class Battle {
         double outgoing = healer == null ? 0
                 : healer.getAttribute(AttributeType.OUTGOING_HEALING_BOOST).get();
         double taken = target.getAttribute(AttributeType.HEAL_TAKEN_RATIO).get();
-        return baseAmount * (1 + outgoing) * (1 + taken);
+        return baseAmount * (1 + outgoing) * conditionalHealBonus(healer, target) * (1 + taken);
+    }
+
+    /**
+     * The heal bonus the healer declared for a heal <b>on this particular recipient</b>, as a multiplier.
+     *
+     * <p><b>Why it is evaluated here and not as an attribute.</b> 1105's talent raises her healing by 50% only when
+     * the target is at 30% HP or lower. A stat cannot say that -- {@code OUTGOING_HEALING_BOOST} is a fact about the
+     * healer alone, so reading it would raise every heal equally, including one on a full-HP ally. And no rule can say
+     * it either: there is no pre-heal event ({@code HEALED} fires from {@link #heal} <i>after</i> the amount is
+     * computed), so no rule has a moment in which to raise her healing before it applies. The one place that holds the
+     * healer, the recipient and the battle together is here.
+     *
+     * <p>The conditions were parsed at load time and handed over by {@code REGISTER_HEAL_BONUS}; each is asked with
+     * the healer as {@code owner} and {@code actor} and the recipient as {@code target}, which is what makes
+     * {@code target_hp_percent} read the person being healed.
+     *
+     * <p>Bonuses multiply together, like every other zone in this engine, and an unconditional bonus cannot be
+     * registered at all (the validator refuses it).
+     *
+     * @param healer the one performing the heal; {@code null} yields no bonus
+     * @param target the one being healed
+     * @return {@code 1 + Σ} of the bonuses whose conditions hold for this heal
+     */
+    private double conditionalHealBonus(CanHit healer, CanHit target) {
+        if (healer == null || healer.conditionalHealBonuses().isEmpty()) {
+            return 1.0;
+        }
+        // The recipient's HP as it stands now, i.e. BEFORE this heal lands -- which is what the sentence means by
+        // "a target whose current HP percentage is 30% or lower".
+        com.laosun.aluminium.models.trigger.TriggerTable.TriggerContext ctx =
+                new com.laosun.aluminium.models.trigger.TriggerTable.TriggerContext(
+                        healer, healer, target, 0, 0, null, this);
+        double bonus = 0;
+        for (CanHit.ConditionalHealBonus entry : healer.conditionalHealBonuses()) {
+            if (entry.condition().test(ctx)) {
+                bonus += entry.percent();
+            }
+        }
+        return 1 + bonus;
     }
 
     /**

@@ -1140,6 +1140,11 @@ public class TriggerTable {
          *
          * <p>Parsed at load time - a misspelled condition is refused rather than ignored - and kept <b>per effect</b>,
          * because two effects of one rule may filter differently.
+         *
+         * <p>Also the vehicle for a condition that is evaluated <b>later than the firing</b>: {@code
+         * REGISTER_HEAL_BONUS} hands this list to the unit so it can be asked at <b>heal time</b>, because "when I heal
+         * a target below 30% HP" cannot be answered while the effect runs -- the recipient is not known yet. The list
+         * is already parsed, so nothing new has to be threaded to the interpreter to make that possible.
          */
         public List<Condition> targetFilterAt(int index) {
             if (effectTargetFilters == null || index < 0 || index >= effectTargetFilters.size()) {
