@@ -64,6 +64,16 @@ public enum TriggerOperator {
     RAISE_SKILL_LEVEL(true),
     RAISE_SKILL_POINT_CAP(true),
     /**
+     * A heal bonus whose applicability is decided per heal rather than per unit: "when I heal a target below
+     * 30% HP, my healing is raised by 50%".
+     *
+     * <p>It exists because neither of the two obvious spellings is correct. A stat on the healer cannot see who
+     * is being healed, so it would raise every heal; and no rule can raise it just before a heal, because there
+     * is no pre-heal event. The condition travels in the effect's {@code target_when} and is evaluated by
+     * {@code Battle.calculateHeal}, which is the only place holding the healer, the recipient and the battle.
+     */
+    REGISTER_HEAL_BONUS(true),
+    /**
      * Declared in the roadmap; its prerequisite phase has not landed, so nothing performs it.
      */
     REDUCE_TOUGHNESS(false),

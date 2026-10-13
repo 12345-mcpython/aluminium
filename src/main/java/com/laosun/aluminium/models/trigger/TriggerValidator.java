@@ -706,6 +706,20 @@ final class TriggerValidator {
                 requireDuration(effect, op, spec);
                 requireBuff(effect, op, spec);
             }
+            case "REGISTER_HEAL_BONUS" -> {
+                // A heal bonus conditional on WHO is being healed (1105's talent). The condition is the whole op:
+                // without one it would raise every heal the owner performs, including on a healthy ally, which is
+                // precisely the wrong number it exists to avoid -- so it is required loudly here rather than left to
+                // show up as a silent over-heal.
+                requirePercent(effect, op, spec);
+                if (effect.getTargetWhen() == null || effect.getTargetWhen().isEmpty()) {
+                    throw new IllegalArgumentException(
+                            "Op " + op + " needs a \"target_when\" saying which heals it applies to: the condition "
+                                    + "is the whole op, and an unconditional version would raise every heal, "
+                                    + "including on a full-HP ally (source: " + spec.getSource() + ")");
+                }
+                // The conditions themselves are parsed by TriggerTable.compile, which refuses a misspelling.
+            }
             case "ADD_STACK" -> {
                 // "after our targets ... cast 2 times..." / "automatically removed after triggering 2 times": a counter, which is a named stack buff (see StackBuff).
                 requireBuff(effect, op, spec);

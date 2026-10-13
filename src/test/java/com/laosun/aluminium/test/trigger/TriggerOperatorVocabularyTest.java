@@ -26,7 +26,9 @@ import java.util.List;
 public class TriggerOperatorVocabularyTest {
 
     /**
-     * The wired ops, in enum order. Additions here mean the engine gained a capability.
+     * The wired ops. Additions here mean the engine gained a capability.
+     *
+     * <p>Order is not significant: the assertion below compares sorted lists.
      */
     private static final List<String> WIRED = List.of(
             "ABSORB_DAMAGE", "ADD_DAMAGE", "ADD_ELEMENTAL_WEAKNESS", "ADD_STACK", "ADVANCE",
@@ -35,7 +37,8 @@ public class TriggerOperatorVocabularyTest {
             "DELEGATE_DAMAGE", "DISPEL", "EXTEND_BUFF", "EXTRA_TURN", "GAIN_ENERGY",
             "GAIN_RESOURCE", "GAIN_SKILL_POINT", "HEAL", "INSERT_ACTION", "MODIFY_ATTR",
             "MODIFY_DAMAGE_TAKEN", "MODIFY_RULE", "RAISE_ENERGY_TO", "RAISE_RESOURCE_CAP",
-            "RAISE_SKILL_HITS", "RAISE_SKILL_LEVEL", "RAISE_SKILL_POINT_CAP", "REMOVE_BUFF",
+            "RAISE_SKILL_HITS", "RAISE_SKILL_LEVEL", "RAISE_SKILL_POINT_CAP", "REGISTER_HEAL_BONUS",
+            "REMOVE_BUFF",
             "REMOVE_RESOURCE", "REMOVE_STACK", "REMOVE_STATE", "REPLACE_SKILL", "RESET_RESOURCE_CAP",
             "RESET_RULE_CHANCE", "RESET_TRIGGER_LIMIT", "RESIST_DEBUFF", "SHIELD", "SPEND_RESOURCE",
             "SPEND_STEPS", "START_COUNTDOWN", "SUMMON", "SUMMON_SERVANT", "SUPER_BREAK", "TAUNT",

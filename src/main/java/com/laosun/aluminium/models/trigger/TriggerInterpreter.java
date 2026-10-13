@@ -791,6 +791,7 @@ public final class TriggerInterpreter {
             case "BOOST_TOUGHNESS" -> TriggerEffects.boostToughness(battle, effect, ctx);
             case "SUPER_BREAK" -> TriggerEffects.superBreak(battle, effect, ctx);
             case "APPLY_REGEN" -> TriggerEffects.applyRegen(battle, effect, ctx);
+            case "REGISTER_HEAL_BONUS" -> registerHealBonus(effect, ctx);
             case "SUMMON" -> battle.summonMemosprite(TriggerMagnitudes.requireCharacterOwner(effect, ctx));
             case "COMMAND_SUMMON" -> TriggerEffects.commandSummon(battle, effect, ctx);
             case "CAST_SKILL" -> TriggerEffects.castSkill(battle, effect, ctx);
@@ -818,6 +819,46 @@ public final class TriggerInterpreter {
      *       content one - and it is reported as such rather than as a quiet no-op.</li>
      * </ul>
      */
+    /**
+     * Files a heal bonus whose applicability is decided <b>per heal</b>, on the rule's owner.
+     *
+     * <p><b>What this expresses.</b> 「为当前生命值百分比小于等于 30% 的我方目标提供治疗时，娜塔莎的治疗量提高
+     * 50%，该效果对持续治疗效果也会生效」 (1105's talent). The bonus cannot be an attribute -- one stat on the
+     * healer would raise every heal, including one on a full-HP ally -- and it cannot be a fire-time rule, because
+     * <b>no pre-heal event exists</b>: {@code HEALED} is emitted by {@code Battle.heal} after the amount is computed.
+     *
+     * <p><b>How the condition is carried.</b> The effect's {@code target_when} list, which is parsed at load time and
+     * already delivered to the interpreter as {@code ctx.targetFilter()}. It is the effect-level condition slot that
+     * exists today (an effect has no {@code when} of its own), and its meaning here is the one it has everywhere else
+     * -- "which units is this about" -- except that the units are the future recipients of the heal rather than the
+     * aim of a damage instance. {@code Battle.calculateHeal} asks it with the healer as {@code owner}/{@code actor}
+     * and the recipient as {@code target}, so {@code target_hp_percent} reads the person being healed.
+     *
+     * <p><b>Why the list and not one condition.</b> An effect may state several, and they are conjunctive in the same
+     * way a rule's own {@code when} is: the bonus applies only when all of them hold.
+     *
+     * @param effect the effect carrying the op (its {@code percent} is the bonus)
+     * @param ctx    the firing context; {@code owner} is the healer, {@code targetFilter} its condition
+     */
+    private static void registerHealBonus(EffectSpec effect, TriggerContext ctx) {
+        CanHit owner = ctx.owner();
+        if (owner == null) {
+            return;
+        }
+        List<TriggerTable.Condition> conditions = ctx.targetFilter();
+        if (conditions == null || conditions.isEmpty()) {
+            // A bonus with no condition would apply to every heal, which is exactly the wrong number this op exists
+            // to avoid. Refused loudly rather than registered unconditionally.
+            throw new IllegalStateException(
+                    "REGISTER_HEAL_BONUS needs a target_when condition saying WHICH heals it applies to "
+                            + "(an unconditional version would raise every heal, including on a full-HP ally)");
+        }
+        double percent = effect.getPercent() == null ? 0 : effect.getPercent();
+        for (TriggerTable.Condition condition : conditions) {
+            owner.addConditionalHealBonus(condition, percent);
+        }
+    }
+
     private static void delegateDamage(EffectSpec effect, TriggerContext ctx) {
         Battle battle = ctx.battle();
         Battle.PendingCast cast = battle == null ? null : battle.currentCast();
