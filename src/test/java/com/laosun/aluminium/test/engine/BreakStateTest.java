@@ -40,23 +40,36 @@ public class BreakStateTest {
         Assertions.assertEquals(Constant.BROKEN_REMAIN_TURNS, iceEdge.getBrokenRemainTurns());
     }
 
+    /**
+     * A break costs exactly the turns it announces, and the unit acts on the turn it recovers.
+     *
+     * <p>⚠ <b>The last assertion is the contract that changed, and it is the point of this case.</b>
+     * {@code handleBrokenTurn} answers "is this turn skipped". It used to answer {@code true} whenever the unit was
+     * broken on entry -- including the turn its countdown reached zero -- so recovery itself cost an action and a break
+     * actually took {@code BROKEN_REMAIN_TURNS + 1} turns. Measured, a monster that recovered with a full toughness bar
+     * dealt no damage on that turn either, which reads as "it recovered and skipped anyway".
+     *
+     * <p>Now the countdown's own number of turns is what it costs: with {@code BROKEN_REMAIN_TURNS} of two, one turn is
+     * skipped and the second one is the recovery turn, on which it acts.
+     */
     @Test
-    public void brokenEnemySkipsItsTurnsThenRecovers() {
+    public void brokenEnemySkipsItsTurnsThenRecoversAndActs() {
         Character himeko = character("himeko");
         Enemy iceEdge = EnemyFactory.create(ICE_EDGE, 90, 1);
         Battle battle = new Battle(List.of(himeko), List.of(iceEdge), BattleFixture.seeded());
         breakIt(battle, himeko, iceEdge);
 
-        Assertions.assertTrue(battle.handleBrokenTurn(iceEdge), "turn 1: skipped");
+        Assertions.assertTrue(battle.handleBrokenTurn(iceEdge), "turn 1: still broken, so it is skipped");
         Assertions.assertEquals(1, iceEdge.getBrokenRemainTurns());
         Assertions.assertTrue(iceEdge.isBroken());
 
-        Assertions.assertTrue(battle.handleBrokenTurn(iceEdge), "turn 2: skipped, and it recovers right on schedule");
+        Assertions.assertFalse(battle.handleBrokenTurn(iceEdge),
+                "turn 2: the countdown reaches zero on this turn, so it is NOT skipped -- it recovers and acts");
         Assertions.assertEquals(0, iceEdge.getBrokenRemainTurns());
         Assertions.assertFalse(iceEdge.isBroken());
         Assertions.assertEquals(60, iceEdge.getStance(), EPS, "recovery = toughness restored to full");
 
-        Assertions.assertFalse(battle.handleBrokenTurn(iceEdge), "it has already recovered, no skip");
+        Assertions.assertFalse(battle.handleBrokenTurn(iceEdge), "already recovered, so nothing to skip");
     }
 
     @Test
