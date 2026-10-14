@@ -89,7 +89,10 @@ public final class BattleDriver {
     }
 
     private final Battle battle;
-    private final SkillPolicy policy;
+    /**
+     * What decides each unit's action. Not final: see {@link #withPolicy}. Same shape as {@link #listener}.
+     */
+    private SkillPolicy policy;
     private final int maxTurns;
     private BattleListener listener = new BattleListener() {
     };
@@ -127,6 +130,26 @@ public final class BattleDriver {
     public BattleDriver withListener(BattleListener listener) {
         this.listener = listener == null ? new BattleListener() {
         } : listener;
+        return this;
+    }
+
+    /**
+     * Replace the policy that decides what each unit does.
+     *
+     * <p>⚠ <b>Why this exists beside the constructor.</b> {@link #of} takes the party and the monsters and builds
+     * everything else, which is what a caller who wants "just play this battle" needs -- and it installs an
+     * {@link AutoPolicy} for <b>both</b> camps, because a driver that plays the whole battle has to decide for
+     * everyone. A caller that wants one camp played by a person and the other by the engine therefore has to swap the
+     * policy after construction, because {@code of} cannot know which camp is a person's. Letting that caller write
+     * its own {@code Battle} instead would duplicate the driver's construction just to change one field.
+     *
+     * <p>Kept out of the constructor for the same reason {@link #withListener} is: the common case stays a one-liner.
+     *
+     * @param policy the decision-maker; {@code null} restores the reference opponent
+     * @return this driver, for chaining
+     */
+    public BattleDriver withPolicy(SkillPolicy policy) {
+        this.policy = policy == null ? new AutoPolicy() : policy;
         return this;
     }
 
