@@ -40,6 +40,60 @@ public class Battle {
         NOT_STARTED, RUNNING, WIN, LOSE
     }
 
+    /**
+     * Told what a damage instance actually settled, so a front end can show a number the engine stands behind.
+     *
+     * <p><b>Why this exists rather than a buff hook.</b> {@link com.laosun.aluminium.models.event.DamageEvent} is the
+     * buff-facing surface and it fires <i>inside</i> the zone arithmetic, before the zones are multiplied -- so the
+     * damage it carries is intermediate, and a screen reading it would print a figure the engine never applied. The
+     * settled amount also cannot be worked out afterwards by assembling the hit again: assembly is additive
+     * ({@code addBoost} appends), so a second pass would count DMG boost, vulnerability, reduction and weakness twice.
+     *
+     * <p>So this is an <b>observer</b>, not a mechanic: it is announced at the one place the settled figure exists, it
+     * cannot change anything, and a battle with no observer registered behaves exactly as before.
+     *
+     * @see #addDamageObserver(DamageObserver)
+     */
+    @FunctionalInterface
+    public interface DamageObserver {
+
+        /**
+         * One damage instance has been settled and applied.
+         *
+         * <p>Fired for every instance of the hit, so one skill that derives break damage and then super break damage
+         * reports each separately.
+         *
+         * @param damage         the instance that landed
+         * @param applied        what it had effect with: shield absorbed plus HP actually lost
+         * @param hpLoss         the part that came out of HP
+         * @param shieldAbsorbed the part a shield ate
+         * @param died           whether this instance is what killed the target
+         */
+        void onDamageSettled(Damage damage, double applied, double hpLoss, double shieldAbsorbed, boolean died);
+    }
+
+    /**
+     * Observers told about every settled damage instance.
+     *
+     * <p>Copy-on-write: registration is rare and a settlement is not, so iteration must not allocate or risk
+     * concurrent modification while a battle is running.
+     */
+    private volatile List<DamageObserver> damageObservers = List.of();
+
+    /**
+     * Registers an observer for settled damage.
+     *
+     * @param observer the observer, ignored (rather than throwing) when {@code null}
+     */
+    public void addDamageObserver(DamageObserver observer) {
+        if (observer == null) {
+            return;
+        }
+        List<DamageObserver> next = new ArrayList<>(damageObservers);
+        next.add(observer);
+        damageObservers = List.copyOf(next);
+    }
+
     public Queue queue;
 
     /**
@@ -1808,7 +1862,17 @@ public class Battle {
         // it; adding them would exactly double it).
         // Identity: settled == shieldAbsorbed + hpLoss (the shield is eaten first, HP is deducted only after it
         // runs out); computing them separately is just so that both parts stay observable.
-        return shieldAbsorbed + hpLoss;
+        double applied = shieldAbsorbed + hpLoss;
+        // ⚠ The ONE place a front end can learn what a hit actually dealt, and it must be HERE.
+        //
+        // `DamageEvent.onDamage` runs inside the zone arithmetic, before the zones are multiplied, so the numbers it
+        // sees are intermediate: a caller reading them would display a figure the engine never settled. And the amount
+        // cannot be assembled again to find out -- assembly is additive, so a second pass would count DMG boost,
+        // vulnerability, reduction and weakness twice. So the settled figure is handed over at the moment it exists.
+        for (DamageObserver observer : damageObservers) {
+            observer.onDamageSettled(damage, applied, hpLoss, shieldAbsorbed, died);
+        }
+        return applied;
     }
 
 

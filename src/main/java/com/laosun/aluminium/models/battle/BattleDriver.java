@@ -116,6 +116,16 @@ public final class BattleDriver {
         this.battle = Objects.requireNonNull(battle, "battle");
         this.policy = Objects.requireNonNull(policy, "policy");
         this.maxTurns = maxTurns > 0 ? maxTurns : DEFAULT_MAX_TURNS;
+        // ⚠ Registered once, here, and relayed to whatever listener the run ends up with.
+        //
+        // `withListener` can be called after construction, so the relay cannot capture the listener -- it forwards to
+        // `this.listener` at the moment the damage settles. That also means a caller may replace the listener mid-run
+        // and the damage still goes to the current one, which is what `withListener`'s own javadoc implies.
+        //
+        // The settled figure only exists inside `Battle.applyDamage`, so this is where the engine hands it over; see
+        // `Battle.DamageObserver` for why a front end cannot work it out for itself.
+        battle.addDamageObserver((damage, applied, hpLoss, shieldAbsorbed, died) ->
+                listener.onDamage(damage, applied, hpLoss, shieldAbsorbed, died));
     }
 
     /**
