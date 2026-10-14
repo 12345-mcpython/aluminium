@@ -229,20 +229,32 @@ public final class BattleDriver {
         // The turn still has to end even when the actor cannot use it: damage over time may have killed
         // it, and a control may forbid acting. `afterMove` is what re-times the bar and removes the dead,
         // so skipping it would leave the queue inconsistent rather than merely skipping an action.
-        boolean mayAct = !actor.isDeath() && actor.getBuffManager().canAct();
-        // ⚠ A BROKEN enemy does not act, and the engine's broken-countdown has to be ticked by somebody.
+        boolean mayAct = !actor.isDeath();
+
+        // ⚠ The BROKEN check comes FIRST, before `canAct()`, and the order is load-bearing.
         //
-        // `Battle.handleBrokenTurn` is documented as "the caller asks", and the hand-written demo is that caller:
-        // `enemyTurn` opens with it and returns early on `true`. The driver never called it, so on the driven path a
-        // broken enemy acted anyway and its broken state never expired by turn -- the weakness-break reward simply
-        // did not exist. Measured before the fix: 姬子 broke 冰锋 on her first turn and it kept attacking.
+        // `handleBrokenTurn` is what ticks a broken unit's countdown and, at zero, recovers it -- and it must run
+        // whether or not the unit could otherwise act. Evaluating `canAct()` first meant that a unit which was broken
+        // AND blocked by a control never reached the branch: its countdown never ticked, so it stayed broken and silent
+        // for the rest of the battle. Measured, one unit frozen at its initial count for seventeen consecutive turns
+        // while the fight went on around it.
         //
-        // This is the same lesson as the ultimate's cost and the skill point's: a rule that only a caller can apply
-        // is a rule that some caller will not. It is applied here, where the turn happens, instead of being left to
-        // the policy -- and deliberately BEFORE `policy.choose`, because a broken enemy has no decision to make.
-        if (mayAct && actor instanceof Enemy broken && broken.isBroken()) {
-            battle.handleBrokenTurn(broken);
-            mayAct = false;
+        // ⚠ Note what the trigger is NOT. A broken unit in this engine still reports `canAct() == true`; being broken
+        // does not by itself block acting, so the first version of this comment was wrong and the first two cases
+        // written against it could not fail. The freeze needs broken AND a control (frozen, imprisoned, ...).
+        //
+        // Nothing is lost by asking first: if it is still broken the turn is skipped either way, and if it has just
+        // recovered then `canAct()` is asked again below, on the state that recovery produced.
+        if (!actor.isDeath() && actor instanceof Enemy broken && broken.isBroken()) {
+            // The return value is always true here -- `handleBrokenTurn` reports "still broken" whenever it entered --
+            // so this reads as the engine's own answer rather than as an assumption about it.
+            if (battle.handleBrokenTurn(broken)) {
+                mayAct = false;
+            } else {
+                mayAct = broken.getBuffManager().canAct();
+            }
+        } else if (!actor.isDeath()) {
+            mayAct = actor.getBuffManager().canAct();
         }
         if (mayAct) {
             SkillPolicy.Decision decision = policy.choose(battle, actor);
