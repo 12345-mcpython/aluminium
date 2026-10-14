@@ -1,6 +1,7 @@
 package com.laosun.aluminium.models.battle;
 
 import com.laosun.aluminium.models.CanHit;
+import com.laosun.aluminium.models.Damage;
 
 /**
  * Observes a driven battle, one turn at a time, without being able to change it.
@@ -59,6 +60,29 @@ public interface BattleListener {
      * @param turn  the same 1-based count given to {@link #onTurnStart}
      */
     default void onTurnEnd(CanHit actor, int turn) {
+    }
+
+    /**
+     * A damage instance was settled and applied.
+     *
+     * <p>⚠ <b>This is the only one of these notifications that carries a number the engine stands behind, and that is
+     * why it is announced from where the settlement happens.</b> {@code DamageEvent} -- the buff-facing hook -- fires
+     * inside the zone arithmetic, before the zones are multiplied, so what it carries is intermediate; and the settled
+     * figure cannot be recovered afterwards by assembling the hit again, because assembly is additive and a second pass
+     * would count every zone twice.
+     *
+     * <p>Fired for <b>every</b> instance of a hit, not once per action: a skill that derives break damage and then super
+     * break damage reports each separately, which is what a reader needs in order to tell them apart. It also fires for
+     * damage over time and for damage that is not the acting unit's, so a listener should read
+     * {@link Damage#getAttacker()} rather than assuming the current actor dealt it.
+     *
+     * @param damage         the instance that landed
+     * @param applied        what it had effect with: shield absorbed plus HP actually lost
+     * @param hpLoss         the part that came out of HP
+     * @param shieldAbsorbed the part a shield ate
+     * @param died           whether this instance is what killed the target
+     */
+    default void onDamage(Damage damage, double applied, double hpLoss, double shieldAbsorbed, boolean died) {
     }
 
     /**
