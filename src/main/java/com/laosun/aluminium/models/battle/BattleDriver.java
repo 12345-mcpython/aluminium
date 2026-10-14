@@ -160,6 +160,11 @@ public final class BattleDriver {
      * <p>Exposed so a test or a front end can step a battle rather than only run it, which is what an
      * interactive client needs. Callers that only want the result should use {@link #run()}.
      *
+     * <p>⚠ <b>This overload reports no turn number, so it fires none of the listener's per-turn callbacks</b>
+     * ({@code onTurnStart} / {@code onAction} / {@code onTurnEnd}) — those are gated on having a number to report.
+     * A caller that wants to see what each turn did must use {@link #step(int)}, which is why that one is public:
+     * an interactive front end needs exactly the events this overload withholds.
+     *
      * @return {@code false} when no unit could act, so the caller stops
      */
     public boolean step() {
@@ -167,12 +172,22 @@ public final class BattleDriver {
     }
 
     /**
-     * Play one turn, optionally telling the listener which turn number this is.
+     * Play one turn, telling the listener which turn number this is.
+     *
+     * <p>⚠ <b>Why this is public.</b> It was private, and the consequence was concrete: a front end could advance a
+     * battle but could not observe it. {@code run()} reports turns and this reports a single one, so a client that
+     * wanted to play turn by turn — which is what an interactive UI does, and what this method's own documentation
+     * says {@link #step()} exists for — got a battle it could watch only by diffing HP before and after. It could
+     * see THAT something happened but never WHAT.
+     *
+     * <p>The turn number also matters to the engine's own bookkeeping: firing limits and "once per turn" rules are
+     * counted in {@code beforeMove}, which runs inside here, so a caller stepping a battle is responsible for
+     * supplying a monotonically increasing number, exactly as {@code run()} does.
      *
      * @param turn the 1-based turn number to report, or a non-positive value to report none
      * @return {@code false} when no unit could act, so the caller stops
      */
-    private boolean step(int turn) {
+    public boolean step(int turn) {
         battle.stepForward();
         Signal current = battle.queue.getCurrentActor();
         if (current == null) {
