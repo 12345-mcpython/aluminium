@@ -389,6 +389,48 @@ $t = [System.IO.File]::ReadAllText('src/main/resources/data/skills.json')
 - **验收**：`DrivenBrokenTurnTest` 一条 ✓ —— 驱动路径上破韧的敌人**① 不造成伤害** ✓、**② 回合计数递减** ✓
   （两条刻意分开：只做其中一条仍然算坏 —— 计数不动意味着敌人**永远不会恢复** ✓）。
   **变异验证**：删掉驱动里那一段 ⇒ **变红** ✓。
+
+### 3.8 同一形状的**系统排查**（结论：找到三个，**没有第四个**）
+
+§3.5 / §3.6 / §3.7 **连着三次**都是同一个形状 —— 所以做了一次**系统性排查**，而不是继续等 bug 冒出来。
+
+**形状**：引擎把一条规则**拆成"半个操作"**暴露出来，另一半**靠调用方记得**。
+
+**排查方法（两条互补）**：
+1. **让文档自证**：搜 `Battle` 里 javadoc 写「由调用方 / caller must / must be called」的地方；
+2. ⭐ **机械可查的那条**：列出**手写演示调了、而 `BattleDriver` 没调**的 `Battle` 公开方法 ——
+   这正是三个 bug 的共同特征。结果是 **13 个**，逐个判定：
+
+| 方法 | 判定 |
+|---|---|
+| `handleBrokenTurn` | ✗ **就是 §3.7 那个 bug**（已修）|
+| `applySkillPointCost` | ✓ **演示是对的** —— 它走 `skill.execute`（不收费），所以手动那次是唯一一次；驱动走 `useSkill`（已收费），所以驱动**不该**调它（§3.6）|
+| `castImmediate` | ✓ 演示的便捷包装（`execute` + `processRequests` + `removeDeadCombatants`）；驱动走 `performAction` → `useSkill` → `afterMove`，**同一批善后** |
+| `processRequests` | ✓ **驱动会经 `afterMove()` 调到**（`afterMove` 末尾就是它）—— 手动调用只服务 `castImmediate` / `castUltra` / `BATTLE_START` 那几处 |
+| `reduceToughness` | ✓ **查询/显示用**；真正的破韧在 `applyDamage` 管线里，两条路都走 |
+| `isUltraReady`, `getSkillPoints`, `getOpponents`, `getQueueSnapshot`, `aggroOf`, `enemyUnits`, `targetableEnemies`, `memospriteOf`, `printHp` | ✓ **全是查询**（`printHp` 是打印）—— 不做决定、不改状态 |
+
+**另外查了一圈"配对调用"**：
+- `beginCast` / `endCast` 的 javadoc 写着「**必须在 `finally` 里调用**」 ——
+  但它的调用方是 **`SkillExecutor` 自己**（`SkillExecutor:77/99`，配 `finally`），**不是外部调用方** ⇒ 由引擎内部拥有 ✓；
+- `markNextCastCountedLaughs` / `castCountedLaughs` 是一对，但两个调用方（`TriggerInterpreter` / 规则）**都成对使用** ✓；
+- `StanceResult.breakDamage` 是**故意**用返回值带出来的（它说自己 `applyDamage` 调用方够不着）✓
+  —— 这**不是**"忘了结算"，而是**已经结算了、把数字带出来给总伤害用** ✓。
+
+**结论**：**没有找到第四个** ✓。三个 bug 的共同点是**规则被拆到了"决定"与"付款"两个方法里** ✓
+—— 现在这三处的规矩是统一的：
+
+> **引擎收费/引擎执行，调用方不许代劳。**
+
+**⚠ 并且补上了另一半的测试**：`DrivenBrokenTurnTest` 现在**两条**：
+① 破韧的敌人**跳过**（不造成伤害）✓；② **它会恢复**（计数走完、并且**再次出手**）✓。
+第二条是刻意分开的 —— 只测"不造成伤害"的话，一个**永远不递减计数**的实现也会通过 ✓，
+而那意味着敌人**永久无害** ✗ —— **比原 bug 更糟** ✓。
+
+**⚠ 顺带记一条失败的方法论（别重犯）**：我一度想写一个"两条路径效果完全对等"的**差分测试** ✓，
+但 `BattleDriver.step()` **自己**调 `stepForward()` ✓ ⇒ 想"把某个角色塞进驱动"是**做不到的** ✓
+（它比较的其实是**不同的行动者** ✗）。⇒ **我把那个测试删了** ✓，而不是留一个建立在错误前提上的绿测试 ✓。
+**能机械查的已经查完（上面那张表）**；剩下要靠"读日志"的部分，**没有捷径** ✓。
   `CharacterFactory.create(1003, 90)` 只有 **1051** ⇒ 用工厂角色做的探针**复现不出日志的数字**。
 ---
 
