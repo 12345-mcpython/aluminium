@@ -42,6 +42,14 @@ public class Battle {
 
     public Queue queue;
 
+    /**
+     * The event-announcement surface: who is told about what (see {@link BattleEvents}).
+     *
+     * <p>Kept as one object rather than eight private methods so the routing rules live in a file whose
+     * whole subject is routing. The delegates below keep every call site unchanged.
+     */
+    private final BattleEvents events = new BattleEvents(this);
+
     public List<Character> characters;
 
     /**
@@ -2574,58 +2582,38 @@ public class Battle {
     // ==================================================================
 
     /**
-     * Deliver an event to "the directly involved parties + our entire side (de-duplicated)".
-     *
-     * @param targets  the directly involved parties (may contain {@code null}, which is skipped)
-     * @param consumer the delivery action
-     */
-    private void dispatch(Consumer<CanHit> consumer, CanHit... targets) {
-        Set<CanHit> notified = Collections.newSetFromMap(new IdentityHashMap<>());
-        for (CanHit target : targets) {
-            if (target != null && notified.add(target)) {
-                consumer.accept(target);
-            }
-        }
-        for (CanHit ally : allies) {
-            if (notified.add(ally)) {
-                consumer.accept(ally);
-            }
-        }
-    }
-
-    /**
      * Energy credited.
      */
     private void broadcastEnergyGain(CanHit target, double added) {
-        dispatch(t -> t.onEnergyGain(this, target, added), target);
+        events.energyGain(target, added);
     }
 
     /**
      * HP loss. {@code source} is this hit's attacker and may be {@code null}.
      */
     private void broadcastHpLoss(CanHit target, double before, double after, CanHit source, double amount) {
-        dispatch(t -> t.onHpLoss(this, target, before, after, source, amount), target, source);
+        events.hpLoss(target, before, after, source, amount);
     }
 
     /**
      * Kill.
      */
     private void broadcastKill(CanHit attacker, CanHit victim) {
-        dispatch(t -> t.onKill(this, attacker, victim), victim, attacker);
+        events.kill(attacker, victim);
     }
 
     /**
      * Heal.
      */
     private void broadcastHeal(CanHit healer, CanHit target, double healed) {
-        dispatch(t -> t.onHeal(this, healer, target, healed), target, healer);
+        events.heal(healer, target, healed);
     }
 
     /**
      * Weakness break.
      */
     private void broadcastBreak(CanHit attacker, CanHit target, DamageElement element) {
-        dispatch(t -> t.onBreak(this, attacker, target, element), target, attacker);
+        events.weaknessBreak(attacker, target, element);
     }
 
     /**
@@ -2638,18 +2626,14 @@ public class Battle {
      * event policy -- and because a future summon that does care should not have to be remembered here.
      */
     private void broadcastSkillPointGained(int amount) {
-        for (CanHit ally : allies) {
-            ally.onSkillPointGained(this, amount);
-        }
+        events.skillPointGained(amount);
     }
 
     /**
      * Skill points spent. Only delivered to our side, same as {@link #broadcastSkillPointGained}.
      */
     private void broadcastSkillPointSpent(int amount) {
-        for (CanHit ally : allies) {
-            ally.onSkillPointSpent(this, amount);
-        }
+        events.skillPointSpent(amount);
     }
 
     // ==================================================================
