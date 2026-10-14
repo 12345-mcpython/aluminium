@@ -4,6 +4,7 @@ import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.models.CanHit;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Signal;
+import com.laosun.aluminium.models.enemy.Enemy;
 
 import java.util.List;
 import java.util.Objects;
@@ -191,6 +192,20 @@ public final class BattleDriver {
         // it, and a control may forbid acting. `afterMove` is what re-times the bar and removes the dead,
         // so skipping it would leave the queue inconsistent rather than merely skipping an action.
         boolean mayAct = !actor.isDeath() && actor.getBuffManager().canAct();
+        // ⚠ A BROKEN enemy does not act, and the engine's broken-countdown has to be ticked by somebody.
+        //
+        // `Battle.handleBrokenTurn` is documented as "the caller asks", and the hand-written demo is that caller:
+        // `enemyTurn` opens with it and returns early on `true`. The driver never called it, so on the driven path a
+        // broken enemy acted anyway and its broken state never expired by turn -- the weakness-break reward simply
+        // did not exist. Measured before the fix: 姬子 broke 冰锋 on her first turn and it kept attacking.
+        //
+        // This is the same lesson as the ultimate's cost and the skill point's: a rule that only a caller can apply
+        // is a rule that some caller will not. It is applied here, where the turn happens, instead of being left to
+        // the policy -- and deliberately BEFORE `policy.choose`, because a broken enemy has no decision to make.
+        if (mayAct && actor instanceof Enemy broken && broken.isBroken()) {
+            battle.handleBrokenTurn(broken);
+            mayAct = false;
+        }
         if (mayAct) {
             SkillPolicy.Decision decision = policy.choose(battle, actor);
             if (decision != null) {
