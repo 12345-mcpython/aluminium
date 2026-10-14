@@ -1746,6 +1746,11 @@ public class Battle {
                 damage, damage.getCastCategory());
         if (died) {
             broadcastKill(damage.getAttacker(), target);
+            // The DYING-side fact, and the only event addressed to a corpse: 「当罗刹陷入无法战斗状态时，结界也会被解除」
+            // needs the unit that fell to act on its own way out, and `fireTriggers` skips the dead (see its loop).
+            // Delivered here, where the death is known, with the victim as BOTH actor and target so a rule can say
+            // `when: ["target == self"]` -- the same spelling TAKING_HIT and the counter rules use.
+            fireTriggers(TriggerEvent.DEATH, target, target, 0, 0.0, damage, damage.getCastCategory());
             // The causing instance's cast category rides along: "each time 1 enemy target is defeated"-style rules have to be able to
             // ask WHICH skill produced the kill (see the `from_skill` condition), and the instance already knows.
             fireTriggersWithSubject(TriggerEvent.KILL, damage.getAttacker(), target, 0, damage.getCastCategory());
@@ -2925,8 +2930,16 @@ public class Battle {
         try {
             int fired = 0;
             for (Character ally : characters) {
-                if (ally == null || ally.isDeath()) {
+                if (ally == null) {
                     continue;
+                }
+                if (ally.isDeath()) {
+                    // Note: The ONE exception is DEATH, which is addressed to the unit that just fell. Every other
+                    // event keeps the rule that a dead unit reacts to nothing, because a corpse has no turn, no
+                    // energy and no say.
+                    if (event != TriggerEvent.DEATH || ally != target) {
+                        continue;
+                    }
                 }
                 TriggerTable table = ally.getTriggerTable();
                 if (table == null || table.isEmpty()) {

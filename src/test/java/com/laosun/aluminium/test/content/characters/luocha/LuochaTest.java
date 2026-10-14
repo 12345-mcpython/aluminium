@@ -64,6 +64,8 @@ public class LuochaTest {
         Assertions.assertEquals(2, table.ruleCount(TriggerEvent.ALLY_ATTACK),
                 "the talent's heal to the attacker and the trace's heal to the others");
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.HP_LOST), "the low-HP retrigger");
+        // 「当罗刹陷入无法战斗状态时，结界也会被解除」 -- the one clause addressed to the unit leaving the fight.
+        Assertions.assertEquals(1, table.ruleCount(TriggerEvent.DEATH), "the field's death clause");
     }
 
     private static final class Fixture {

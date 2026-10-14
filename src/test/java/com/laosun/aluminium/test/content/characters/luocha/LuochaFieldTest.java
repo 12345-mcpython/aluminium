@@ -60,23 +60,26 @@ public class LuochaFieldTest {
     }
 
     /**
-     * ⚠ NOT YET IMPLEMENTED: the field disappears when 罗刹 is knocked down.
+     * The field disappears when 罗刹 is knocked down.
      *
-     * <p>The document states it separately from the duration: 「当罗刹陷入无法战斗状态时，结界也会被解除」. It is
-     * recorded as ROADMAP P10-8 rather than faked, and this case documents <b>why</b> the obvious fix does not work,
-     * because that is the expensive part to rediscover:
+     * <p>The document states this separately from the duration, and it is the clause that used to be impossible to
+     * write. The reason is structural: {@code fireTriggers} iterates the party and <b>skips any unit that is dead</b>,
+     * so the one unit that has to clean up after itself -- the one leaving -- could never run a rule. The engine now
+     * has a {@code DEATH} event delivered to that unit's own table past the skip, and his Talent keys a rule on it.
      *
-     * <p>The obvious fix is to sweep a dead unit's own-anchored buffs in {@code releaseBuffsAnchoredToTheDead}. That
-     * was tried and reverted: it also strips buffs that a unit legitimately receives <b>as it dies</b> or after --
-     * "all allies lethally hit this action" is a real rule family, and its carrier is a unit that is already
-     * {@code isDeath()} when the buff lands. Two shipped cases went red ({@code LethalSetTest},
-     * {@code RelicAbilityBatchTest}).
+     * <p>⚠ <b>Why the fight is driven rather than poked.</b> The engine removes the dead at <b>turn end</b>
+     * ({@code Battle.afterMove} → {@code removeDeadCombatants}), and {@code afterMove} returns immediately unless a
+     * turn is actually in progress -- so a case that applies lethal damage and then looks would be testing nothing.
+     * The loop runs real turns until he falls and that turn ends.
      *
-     * <p>So the clause needs a mechanism that distinguishes "this buff was anchored to its own carrier on purpose"
-     * from "this buff's clock happens to be its carrier", which is what the engine currently cannot tell apart.
+     * <p>⚠ <b>Why it is not a broad sweep.</b> Removing a dead unit's own-clock buffs in
+     * {@code releaseBuffsAnchoredToTheDead} was tried and reverted: it also strips buffs that a unit legitimately
+     * receives as it dies -- 「all allies lethally hit this action」 is a real rule family, and its carrier is already
+     * {@code isDeath()} when the buff lands ({@code LethalSetTest}, {@code RelicAbilityBatchTest}). The removal has
+     * to be <b>asked for</b> by content, which is what the {@code DEATH} rule does.
      */
     @Test
-    public void theFieldIsStillUpAfterHeFalls_pinningTheGap() {
+    public void theFieldLeavesWhenHeIsKnockedDown() {
         Fixture f = new Fixture();
         f.openField();
         Assertions.assertTrue(f.fieldUp(), "precondition: the field is up");
@@ -84,11 +87,8 @@ public class LuochaFieldTest {
         f.killHimOnARealTurn();
 
         Assertions.assertTrue(f.luocha.isDeath(), "precondition: he really fell");
-        // ⚠ This assertion encodes the GAP, not the document. It is here so the gap is visible and cannot close
-        // silently: when P10-8 is implemented this case must be inverted to assertFalse.
-        Assertions.assertTrue(f.fieldUp(),
-                "KNOWN GAP (P10-8): 「当罗刹陷入无法战斗状态时，结界也会被解除」 is not implemented; "
-                        + "this assertion flips to assertFalse when it is");
+        Assertions.assertFalse(f.fieldUp(),
+                "「当罗刹陷入无法战斗状态时，结界也会被解除」 -- it must not outlive him");
     }
 
     /**
