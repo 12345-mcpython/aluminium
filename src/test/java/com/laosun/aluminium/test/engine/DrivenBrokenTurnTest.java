@@ -57,7 +57,10 @@ public class DrivenBrokenTurnTest {
         // to be set too, because that is what the engine does at the moment toughness reaches zero
         // (Battle.reduceToughness: breakEnemy + setBrokenRemainTurns(BROKEN_REMAIN_TURNS)).
         foe.breakEnemy(com.laosun.aluminium.enums.DamageElement.FIRE);
-        foe.setBrokenRemainTurns(com.laosun.aluminium.Constant.BROKEN_REMAIN_TURNS);
+        // ⚠ Pinned to 2 rather than to BROKEN_REMAIN_TURNS, because this case is about the SKIP. The constant is 1, and
+        // at 1 the enemy's next turn is the one it recovers and acts on -- so it would never skip, and "a broken enemy
+        // deals no damage while it skips" would have nothing to assert.
+        foe.setBrokenRemainTurns(2);
         Assertions.assertTrue(foe.isBroken(), "precondition: the enemy is broken");
         int remainBefore = foe.getBrokenRemainTurns();
         double heroHpBefore = himeko.getCurrentHp();

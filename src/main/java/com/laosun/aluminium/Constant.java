@@ -366,10 +366,19 @@ public final class Constant {
     public static final double BREAK_DELAY_RATIO = 0.25;
 
     /**
-     * Weakness break duration in turns: after an enemy is broken it skips this many of its own turns,
-     * then toughness is restored to full.
+     * Weakness break duration: an enemy broken now skips this many of its own turns, and on the next one its toughness
+     * is restored and it acts again.
+     *
+     * <p>\u26a0 <b>The counter is not that number, and reading it as one is what made this off by a turn.</b> The value set
+     * on the enemy is this figure, and {@code handleBrokenTurn} spends one turn decrementing it: at 2 the enemy skipped
+     * one turn, then spent the second recovering <i>and</i> acting. So the counter used to be one more than the number
+     * of turns actually lost, and the old javadoc here ("skips this many of its own turns") described a behaviour the
+     * engine did not have.
+     *
+     * <p>At 1 the intent is literal: the enemy loses exactly one turn, and on its next turn toughness is restored and it
+     * acts.
      */
-    public static final int BROKEN_REMAIN_TURNS = 2;
+    public static final int BROKEN_REMAIN_TURNS = 1;
 
     /**
      * Super break independent DMG boost: {@code 1 + SUPER_BREAK_BOOST} is multiplied into super break
