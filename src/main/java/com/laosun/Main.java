@@ -18,6 +18,8 @@ import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
 import com.laosun.aluminium.models.enemy.EnemySkill;
 import com.laosun.aluminium.models.skill.DefaultSkill;
+import com.laosun.aluminium.models.battle.BattleDriver;
+import com.laosun.aluminium.models.battle.BattleNarrator;
 import com.laosun.aluminium.models.skill.Skill;
 import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.utils.MapUtils;
@@ -83,15 +85,56 @@ public class Main {
             case "battle" -> battleDemo();
             case "technique" -> battleDemo(new Battle.Techniques(
                     java.util.Map.of(MARCH_7TH_CID, Boolean.TRUE), null));
+            case "driven" -> drivenBattleDemo();
             case "mechanics" -> mechanicsDemo();
             case "all" -> {
                 battleDemo();
                 mechanicsDemo();
             }
             default -> System.out.println("unknown demo '" + args[0]
-                    + "'; use 'battle' (default), 'technique', 'mechanics' or 'all'");
+                    + "'; use 'battle' (default), 'technique', 'driven', 'mechanics' or 'all'");
         }
     }
+
+    /**
+     * The same battle, but with {@link BattleDriver} running it instead of this class's own turn loop.
+     *
+     * <p><b>Why this exists beside {@link #battleDemo()}.</b> {@code battleDemo} predates the driver: it calls
+     * {@code stepForward} / {@code beforeMove} / {@code afterMove} itself and decides what each character does
+     * inline. That made the engine's own battle reachable only through that one hand-written script -- a character
+     * whose kit the script did not anticipate simply never used it, and the engine could not be played headlessly at
+     * all.
+     *
+     * <p>{@code BattleDriver} now owns that loop and {@code AutoPolicy} owns the choice, so this command is the
+     * proof that both work end to end on real content: the same three characters and the same three enemies as
+     * {@code battle}, driven by the engine rather than narrated by a script. Nothing here decides what anyone casts.
+     *
+     * <p>Kept beside the old demo rather than replacing it, because the two answer different questions: this one
+     * shows that the engine can play itself, and the old one remains the readable, step-by-step walkthrough whose
+     * output is pinned by {@code DemoSmokeTest}.
+     */
+    private static void drivenBattleDemo() {
+        List<Character> team = List.of(himeko(), march7th(), luocha());
+        List<Enemy> enemies = new ArrayList<>(List.of(
+                EnemyFactory.create(1002011, 90, 1),
+                EnemyFactory.create(8032010, 90, 1),
+                EnemyFactory.create(8002040, 90, 1)));
+        for (Enemy enemy : enemies) {
+            // The same scale the hand-driven demo uses, so the two are comparable rather than merely both running.
+            enemy.setAttribute(AttributeType.HEALTH, new DoubleValue(30_000));
+            enemy.heal(30_000);
+            enemy.setMaxEnergy(0);
+        }
+
+        BattleDriver.of(team, enemies, DRIVEN_SEED)
+                .withListener(new BattleNarrator())
+                .run();
+    }
+
+    /**
+     * The seed the driven demo runs on, fixed so its output is reproducible.
+     */
+    private static final long DRIVEN_SEED = 20261012L;
 
     /**
      * 三月七 (March 7th)'s character id -- the one party member whose technique is modelled.

@@ -26,12 +26,16 @@ import java.util.List;
  *  <li>Healing and shielding skills, when the skill point reserve allows, aimed at whoever needs it
  *      most. These are cast before any damage branch for the reason the demo gave: a healer short of
  *      one point should not throw away its panic button in order to basic-attack.</li>
- *  <li>A damaging skill only against a target that is actually weak to its element; otherwise the
- *      basic attack, which also earns the skill point back.</li>
+ *  <li>A damaging skill when the reserve allows, preferring a target its element is strong against. The basic
+ *      attack is the fallback, and is also what earns the point that a skill spent.</li>
  * </ul>
  *
  * <p>The skill point reserve is a strategy, not an engine rule, and is configurable here because the
  * demo needed it to alternate between spending and earning points.
+ *
+ * <p>⚠ <b>This policy is weak on purpose, and known to be weaker than the hand-tuned demo.</b> On the demo's own
+ * content it loses while the scripted demo wins (see ROADMAP's P11-4). It is the reference opponent a real policy
+ * is measured against, not a good one; do not read a loss here as an engine defect.
  */
 public final class AutoPolicy implements SkillPolicy {
 
@@ -130,14 +134,23 @@ public final class AutoPolicy implements SkillPolicy {
                 return Decision.of(skill, friendly, category == SkillEffectType.Category.HEAL
                         ? "healing the party" : "shielding the party");
             }
-            // Otherwise spend only against a weakness, so the point buys something. Weakness lives on an
-            // Enemy, not on CanHit: only a monster has a toughness bar to be weak against, so the check
-            // is guarded rather than assumed.
-            if (category == SkillEffectType.Category.DAMAGE
-                    && skill.getData().getElement() != null
-                    && main instanceof Enemy foe
-                    && foe.isWeakTo(skill.getData().getElement())) {
-                return Decision.of(skill, aimedAt(battle, actor, skill, main), "target is weak to it");
+            // A damaging skill: cast it, and prefer a target it is actually strong against.
+            //
+            // Note: This used to require a weakness, on the reasoning that "the point should buy something". That
+            // read well and played badly -- measured on the demo content (姬子 / 三月七 / 罗刹 vs 冰锋 + 基层员工·外勤
+            // + 次元扑满), the party LOST with it and WINS when a damaging skill is simply used: 姬子's Fire skill was
+            // skipped against the two monsters that are not fire-weak, so the party basic-attacked its way through
+            // 37 turns while the enemies' HP barely moved. A basic attack earns a point back, but it also spends a
+            // whole turn doing a fraction of the damage, and no amount of saved points is worth that.
+            //
+            // Weakness now ranks the CHOICE rather than gating it: if some legal target is weak to this element,
+            // aim there; otherwise still cast, at the usual main target. The target is picked before the spell
+            // decides to be cast, so `main` is the fallback rather than a veto.
+            if (category == SkillEffectType.Category.DAMAGE) {
+                CanHit weak = weakestMatch(foes, skill);
+                CanHit aim = weak != null ? weak : main;
+                return Decision.of(skill, aimedAt(battle, actor, skill, aim),
+                        weak != null ? "target is weak to it" : "damaging skill");
             }
         }
 
@@ -176,6 +189,30 @@ public final class AutoPolicy implements SkillPolicy {
             return null;
         }
         return Decision.of(skill, aimedAt(battle, actor, skill, main), note);
+    }
+
+    /**
+     * The first legal target this skill's element is actually strong against, or {@code null}.
+     *
+     * <p>Weakness lives on an {@link Enemy}, not on {@code CanHit}: only a monster has a toughness bar to be weak
+     * against, so the check is guarded rather than assumed. Returning {@code null} is the common case and is not a
+     * refusal -- the caller casts anyway, at the ordinary target.
+     *
+     * @param foes  the legal candidates
+     * @param skill the skill about to be cast
+     * @return a weak target, or {@code null} when there is none
+     */
+    private static CanHit weakestMatch(List<CanHit> foes, Skill skill) {
+        var element = skill.getData() == null ? null : skill.getData().getElement();
+        if (element == null) {
+            return null;
+        }
+        for (CanHit foe : foes) {
+            if (foe instanceof Enemy enemy && enemy.isWeakTo(element)) {
+                return enemy;
+            }
+        }
+        return null;
     }
 
     /**

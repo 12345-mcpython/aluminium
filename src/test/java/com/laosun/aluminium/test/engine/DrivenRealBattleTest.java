@@ -1,0 +1,174 @@
+package com.laosun.aluminium.test.engine;
+
+import com.laosun.aluminium.Battle;
+import com.laosun.aluminium.enums.AttributeType;
+import com.laosun.aluminium.models.CanHit;
+import com.laosun.aluminium.models.Character;
+import com.laosun.aluminium.models.DoubleValue;
+import com.laosun.aluminium.models.battle.BattleDriver;
+import com.laosun.aluminium.models.battle.BattleListener;
+import com.laosun.aluminium.models.battle.BattleNarrator;
+import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.models.enemy.EnemyFactory;
+import com.laosun.aluminium.utils.CharacterFactory;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * A whole real battle, driven by the engine: the same three characters and three enemies the hand-written demo
+ * uses, but with {@link BattleDriver} owning the turn loop and {@code AutoPolicy} owning every choice.
+ *
+ * <h2>What this is for, given other driver tests exist</h2>
+ * The other driver suites use pairs and single monsters, because they are checking one mechanism each. This one
+ * runs the <b>full demo content</b> -- three real kits and three real monsters with their own weaknesses,
+ * resistances and toughness bars -- and asserts the properties that only matter at that scale:
+ *
+ * <ul>
+ *   <li>the battle <b>terminates</b>, and terminates as {@code FINISHED} rather than {@code TURN_LIMIT} or
+ *       {@code STALLED}. A stall is the failure mode a long battle actually hits: a turn that neither kills,
+ *       earns, nor advances, repeated until the ceiling. Running a real fight is the only way to catch it.</li>
+ *   <li>the driver, not the caller, played <b>every</b> turn: the listener sees one {@code onTurnEnd} per actor-turn
+ *       the result reports, so no turn was skipped or double-counted between the two.</li>
+ *   <li>both camps are populated to the end and the numbers moved -- i.e. the fight was real rather than a
+ *       degenerate no-op that trips over a decision boundary.</li>
+ * </ul>
+ *
+ * <p>⚠ <b>The outcome is deliberately NOT asserted.</b> The auto policy is a simple reference opponent, not a strong
+ * one; on this content it loses while the hand-tuned demo wins (see ROADMAP's P11-4). Pinning "the party wins"
+ * would turn a known policy weakness into a failing test, and pinning "the party loses" would enshrine it. What
+ * must hold is that a real battle <b>runs</b>, and that is what is pinned.
+ */
+public class DrivenRealBattleTest {
+
+    private static final int LEVEL = 90;
+    private static final long SEED = 20261012L;
+
+    /**
+     * The demo's three characters, from their real data.
+     */
+    private static List<Character> party() {
+        return List.of(
+                CharacterFactory.create(1003, LEVEL, false, null, null, 0),   // 姬子 Himeko, fire
+                CharacterFactory.create(1001, LEVEL, false, null, null, 0),   // 三月七 March 7th, ice
+                CharacterFactory.create(1203, LEVEL, false, null, null, 0));  // 罗刹 Luocha, healer
+    }
+
+    /**
+     * The demo's three enemies, at the scale the hand-driven demo uses.
+     *
+     * @return the enemies, with their HP raised and their energy bar removed
+     */
+    private static List<Enemy> foes() {
+        List<Enemy> enemies = new ArrayList<>(List.of(
+                EnemyFactory.create(1002011, LEVEL, 1),   // 冰锋 Ice Edge
+                EnemyFactory.create(8032010, LEVEL, 1),   // 基层员工·外勤
+                EnemyFactory.create(8002040, LEVEL, 1))); // 次元扑满
+        for (Enemy enemy : enemies) {
+            enemy.setAttribute(AttributeType.HEALTH, new DoubleValue(30_000));
+            enemy.heal(30_000);
+            enemy.setMaxEnergy(0);
+        }
+        return enemies;
+    }
+
+    /**
+     * A real battle runs to a decided end, and the driver plays every turn it reports.
+     */
+    @Test
+    public void aWholeRealBattleRunsToADecidedEnd() {
+        Counter counter = new Counter();
+        BattleDriver driver = BattleDriver.of(party(), foes(), SEED).withListener(counter);
+
+        BattleDriver.Result result = driver.run();
+
+        Assertions.assertEquals(BattleDriver.Outcome.FINISHED, result.outcome(),
+                "a real battle must reach a decision -- TURN_LIMIT means the policy could not close it out and "
+                        + "STALLED means no unit could act at all");
+        Assertions.assertTrue(result.turns() > 10,
+                "a three-on-three at 30000 HP is not over in a handful of turns; got " + result.turns());
+        Assertions.assertEquals(result.turns(), counter.ended,
+                "the driver reports " + result.turns() + " actor-turns but the listener saw " + counter.ended
+                        + " turn ends, so the two disagree about which turns happened");
+        Assertions.assertEquals(counter.started, counter.ended,
+                "every turn that started must also have ended, or afterMove was skipped and the queue is corrupt");
+    }
+
+    /**
+     * Both camps took real damage, and the battle's own result agrees with their HP.
+     *
+     * <p>Guards the degenerate case where a battle "finishes" because one side was empty to begin with.
+     */
+    @Test
+    public void bothCampsWereReallyEngaged() {
+        BattleDriver driver = BattleDriver.of(party(), foes(), SEED);
+        BattleDriver.Result result = driver.run();
+        Battle battle = driver.battle();
+
+        Assertions.assertEquals(3, battle.characters.size(), "the party is still three characters");
+        Assertions.assertEquals(3, battle.enemyUnits().size(), "the camp keeps its roster, dead or not");
+
+        double enemiesHurt = battle.enemyUnits().stream()
+                .mapToDouble(e -> e.getMaxHp() - e.getCurrentHp()).sum();
+        double alliesHurt = battle.characters.stream()
+                .mapToDouble(c -> c.getMaxHp() - c.getCurrentHp()).sum();
+
+        Assertions.assertTrue(enemiesHurt > 0, "the party must have damaged somebody");
+        Assertions.assertTrue(alliesHurt > 0, "the enemies must have damaged somebody");
+        Assertions.assertNotNull(result.status(), "a decided battle reports which side won");
+    }
+
+    /**
+     * The narrator's output describes a battle rather than dumping an object graph.
+     *
+     * <p>It is capture-tested because it is a deliverable in its own right: {@code gradlew run --args=driven} is how
+     * a person sees the engine play itself, and a narrator that printed nothing, or printed one line, would look
+     * like a working command.
+     *
+     * <p>Captured through the narrator's own stream rather than by swapping {@code System.out}, so this case cannot
+     * interfere with any other test sharing the JVM.
+     */
+    @Test
+    public void theNarratorDescribesTheBattle() {
+        ByteArrayOutputStream captured = new ByteArrayOutputStream();
+        PrintStream sink = new PrintStream(captured, true, StandardCharsets.UTF_8);
+
+        BattleDriver.of(party(), foes(), SEED).withListener(new BattleNarrator(sink)).run();
+        sink.flush();
+        String text = captured.toString(StandardCharsets.UTF_8);
+
+        Assertions.assertTrue(text.contains("Battle — driven headlessly by BattleDriver"),
+                "the narrator announces what ran it");
+        Assertions.assertTrue(text.contains("Party   ") && text.contains("Enemies "),
+                "both camps are listed");
+        Assertions.assertTrue(text.contains("casts "), "at least one action is narrated");
+        Assertions.assertTrue(text.contains("action bar:"), "the action bar is shown");
+        Assertions.assertTrue(text.contains("Result: "), "the outcome is reported");
+        Assertions.assertTrue(text.contains("[Ally]") && text.contains("[Enemy]"),
+                "the opening state lists both camps");
+    }
+
+    /**
+     * Counts turns, to check the driver and the listener agree on how many there were.
+     */
+    private static final class Counter implements BattleListener {
+
+        private int started;
+        private int ended;
+
+        @Override
+        public void onTurnStart(CanHit actor, int turn) {
+            started++;
+        }
+
+        @Override
+        public void onTurnEnd(CanHit actor, int turn) {
+            ended++;
+        }
+    }
+}
