@@ -556,21 +556,39 @@ chance = base × (1 + 效果命中) × (1 - 效果抵抗) × (1 - 具体 debuff 
 
 **验收**：`NatashaTalentTest` 3 条（阈值内/外对比、30% 含等号、续疗也生效）。
 
-### P10-8 罗刹的【结界】还缺一条死时解除（其余已落地）
+### P10-8 罗刹的【结界】死时解除 —— 试过了，**naive 做法会破两条既有行为**
 
-- **读者**：1203 罗刹 天赋 生息的轮转 —— 唯一**未做**的一句是
-  「当罗刹**陷入无法战斗状态**时，结界**也会被解除**」。
-- **现状**：结界是罗刹身上的一个 `StateBuff`（`APPLY_BUFF 结界`），带 `turns: 2`（按**他自己的回合**递减，
-  与文档「持续 2 回合」一致 ✓）。⚠ 它**不会**因为罗刹死亡而消失 ✗。
-- **怎么做（**不需要新机制**）**：引擎**已经**会清扫挂到死者身上的 buff ——
-  `Battle.removeDeadCombatants` → `BuffManager.removeBuffsAnchoredTo(CanHit)`；`AbstractBuff.setTickOwner`
-  与 `AbstractBuff` 关于 anchor 的说明就是为这类"计时主体"设计的。⇒ 给结界加一个 **anchor（钟主）** 即可。
-  ⚠ 注意 `setTickOwner` 管的是**时长按谁的回合递减**，与"随某人死亡一起消失"是**两件事**，
-  别用同一个字段糊过去。
-- **验收**：`LuochaFieldTest` —— 罗刹死亡后 `has_state 结界` 为**假**；而**只是**回合数走完时也为假
-  （两条路径分别钉住，别让一条掩盖另一条）。
-- **依赖**：无
+> 读者：1203 罗刹 天赋 生息的轮转 —— 唯一**未做**的是
+> 「当罗刹**陷入无法战斗状态**时，结界**也会被解除**」。
+> ⚠ 本条目**原写成"只需加 anchor"**，**那是错的**，下面是实测修正。
 
+**现状**：结界是罗刹身上的 `StateBuff`（`APPLY_BUFF 结界` + `ticks_on: self` + `turns: 2`）⇒
+**时长那半是对的** ✓（按他自己的回合递减，有用例钉住 ✓）；**死时解除那半没有** ✗。
+
+**为什么"加 anchor"不够（实测）**：`Battle.releaseBuffsAnchoredToTheDead` **只遍历活着的载体**，
+且 `removeBuffsAnchoredTo` 的判据是 `clockOwner != instance` —— 对**挂在死者自己身上、以自己为钟**的 buff，
+这两条**各自**都把它排除掉 ⇒ 这正是清扫**表达不了**的形状。
+
+**⚠ 那"顺手把死者的自身锚定 buff 也扫掉"呢？试过了，会红两条（已回退）**：
+
+| 挂掉的用例 | 原因 |
+|---|---|
+| `LethalSetTest` | 「**all allies lethally hit this action**」是**真规则族** ✓ —— 那条 buff **就是**落在**已经 `isDeath()`** 的单位身上的 ✓ |
+| `RelicAbilityBatchTest` | 同上：一条在**死亡那一刻**生效的增益 |
+
+⇒ 所以缺的不是"多扫一遍"，而是一个能把**"这条 buff 是故意锚在自己身上的"** 与
+**"这条 buff 的钟恰好是自己"** 分开的机制 —— 引擎**目前分不出来**（`ticksOn(instance)` 两者都为真）。
+
+**怎么做（候选，未定）**：
+**(a)** 给 `AbstractBuff` 一个**显式**的"随主人死亡而消失"标记，只有规则写明（如 `remove_on_death: true`）
+的 buff 才被扫 ⇒ 语义明确，但要加字段 + 校验 + 数据；
+**(b)** 让结界**挂在队友身上**（像 1303 阮•梅那样 `target: all_allies` + `ticks_on: self`）⇒ 清扫**天然生效** ✓，
+但 `self has_state 结界` 这类条件要改成"队友身上有" ✓，且结界会**随队友死亡**而消失 ✗（与文档无关的副作用）。
+⚠ 我倾向 **(a)**：`(b)` 把"罗刹死了"和"某个队友死了"混成了同一件事。
+
+**验收**（实现时）：`LuochaFieldTest` 里那条**现在断言"仍在"**的用例（`theFieldIsStillUpAfterHeFalls_pinningTheGap`）
+必须**反转成"已解除"** ✓ —— 它存在的意义就是让这个缺口**不会悄悄合上** ✓。
+⚠ 同时**必须**保留 `LethalSetTest` / `RelicAbilityBatchTest` 为绿：那是本条目真正的难点所在。
 ---
 
 ## 7. 待办 D 层：演示与收尾
