@@ -37,6 +37,27 @@ public enum TriggerEvent {
     STATE_ENDED("STATE_ENDED", true),
 
     /**
+     * A unit has just been knocked down, and is delivered <b>to that unit's own table</b> even though it is dead.
+     *
+     * <p><b>Why this had to exist.</b> 「当罗刹陷入无法战斗状态时，结界也会被解除」 (1203's Talent) -- and the whole
+     * family of fields that end with their caster -- had no way to be written, for a reason that is structural rather
+     * than a missing op: {@code fireTriggers} iterates the party and <b>skips any unit that is dead</b>
+     * ({@code if (ally == null || ally.isDeath()) continue}). A dying unit is dead by the time anybody could react,
+     * so its own table could never run the rule that cleans up after it.
+     *
+     * <p><b>Who receives it.</b> Only the unit that fell. The engine delivers this one event past the dead-unit
+     * skip, because "take my zone with me" is by definition addressed to the one leaving. Everything else keeps the
+     * ordinary rule that a dead unit reacts to nothing.
+     *
+     * <p>⚠ <b>Distinct from {@link #KILL}</b>, which is the KILLER-side fact ("someone I defeated") and goes to the
+     * party. This is the DYING-side fact, and it is the only event addressed to a corpse.
+     *
+     * <p>Readers: 1203 罗刹's 结界. The buff-level half of the same sentence is {@code remove_on_death} on an effect,
+     * which needs no rule at all.
+     */
+    DEATH("DEATH", true),
+
+    /**
      * The end of a cast that a RULE commanded -- "an inserted cast".
      *
      * <p>Note: A commanded cast IS a real cast: it announces CAST_SETUP / SKILL_CAST and settles its own energy, so no existing

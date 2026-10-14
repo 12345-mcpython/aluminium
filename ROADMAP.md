@@ -556,39 +556,38 @@ chance = base × (1 + 效果命中) × (1 - 效果抵抗) × (1 - 具体 debuff 
 
 **验收**：`NatashaTalentTest` 3 条（阈值内/外对比、30% 含等号、续疗也生效）。
 
-### P10-8 罗刹的【结界】死时解除 —— 试过了，**naive 做法会破两条既有行为**
+### P10-8 罗刹的【结界】死时解除 ✅ 已落地（靠**新事件 `DEATH`**）
 
-> 读者：1203 罗刹 天赋 生息的轮转 —— 唯一**未做**的是
-> 「当罗刹**陷入无法战斗状态**时，结界**也会被解除**」。
-> ⚠ 本条目**原写成"只需加 anchor"**，**那是错的**，下面是实测修正。
+> 读者：1203 罗刹 天赋 生息的轮转 —— 「当罗刹**陷入无法战斗状态**时，结界**也会被解除**」。
 
-**现状**：结界是罗刹身上的 `StateBuff`（`APPLY_BUFF 结界` + `ticks_on: self` + `turns: 2`）⇒
-**时长那半是对的** ✓（按他自己的回合递减，有用例钉住 ✓）；**死时解除那半没有** ✗。
+**为什么这句曾经写不出来（结构性原因，不是缺某个 op）**：
+`fireTriggers` 遍历队伍时会 **skip 掉已死单位** ✗（`if (ally.isDeath()) continue` ✓）——
+而"收拾自己的结界"按定义**只有倒下的人自己能做** ✗ ⇒ **躺下的人永远没机会执行规则** ✓。
 
-**为什么"加 anchor"不够（实测）**：`Battle.releaseBuffsAnchoredToTheDead` **只遍历活着的载体**，
-且 `removeBuffsAnchoredTo` 的判据是 `clockOwner != instance` —— 对**挂在死者自己身上、以自己为钟**的 buff，
-这两条**各自**都把它排除掉 ⇒ 这正是清扫**表达不了**的形状。
+**⚠ 先试过、**已回退**的做法（这条值得留着）**：把"死者的自身锚定 buff"一并扫掉。
+它**会破两条既有行为** ✗：
+- `LethalSetTest` —— 「**all allies lethally hit this action**」是**真规则族** ✓，那条 buff **就是**落在
+  **已经 `isDeath()`** 的单位身上的 ✓；
+- `RelicAbilityBatchTest` —— 同类，一条在**死亡那一刻**生效的增益 ✓。
 
-**⚠ 那"顺手把死者的自身锚定 buff 也扫掉"呢？试过了，会红两条（已回退）**：
+⇒ 结论：**不能靠"多扫一遍"** ✓，而必须让**内容自己说**"这条随我死而消失" ✓。
 
-| 挂掉的用例 | 原因 |
-|---|---|
-| `LethalSetTest` | 「**all allies lethally hit this action**」是**真规则族** ✓ —— 那条 buff **就是**落在**已经 `isDeath()`** 的单位身上的 ✓ |
-| `RelicAbilityBatchTest` | 同上：一条在**死亡那一刻**生效的增益 |
+**落地形状**：
+1. **新事件 `TriggerEvent.DEATH`** ✓ —— **只发给倒下的那一个** ✓，且**绕过** dead-unit skip ✓；
+   发出点为 `Battle.applyDamage` 判定死亡处 ✓，**以倒下者同时作 `actor` 与 `target`** ✓
+   ⇒ 规则写 `when: ["target == self"]` ✓（与 `TAKING_HIT`、反击规则**同一写法** ✓）。
+   ⚠ 引擎**只开这一个例外** ✓：其它事件**仍然**是"死人什么都不响应" ✓。
+   ⚠ 与 `KILL` **不是一回事** ✓：`KILL` 是**击杀者**的事实（发给我方全体）✓，`DEATH` 是**倒下者**的事实 ✓。
+2. **内容规则** ✓：`on: DEATH` + `when: ["target == self"]` + `REMOVE_STATE 结界` ✓（见 1203.json
+   `talent_zone_ends_when_he_falls` ✓）。
 
-⇒ 所以缺的不是"多扫一遍"，而是一个能把**"这条 buff 是故意锚在自己身上的"** 与
-**"这条 buff 的钟恰好是自己"** 分开的机制 —— 引擎**目前分不出来**（`ticksOn(instance)` 两者都为真）。
+**验收**：`LuochaFieldTest.theFieldLeavesWhenHeIsKnockedDown` ✓ ——
+⚠ 实现之前它**故意断言"仍在"**（把缺口钉住，不让它悄悄合上 ✓），实现后**按注释要求反转成"已解除"** ✓。
+**变异验证**：把 `DEATH` 的那个例外改回去（死者再次被 skip）⇒ **该用例变红** ✓。
 
-**怎么做（候选，未定）**：
-**(a)** 给 `AbstractBuff` 一个**显式**的"随主人死亡而消失"标记，只有规则写明（如 `remove_on_death: true`）
-的 buff 才被扫 ⇒ 语义明确，但要加字段 + 校验 + 数据；
-**(b)** 让结界**挂在队友身上**（像 1303 阮•梅那样 `target: all_allies` + `ticks_on: self`）⇒ 清扫**天然生效** ✓，
-但 `self has_state 结界` 这类条件要改成"队友身上有" ✓，且结界会**随队友死亡**而消失 ✗（与文档无关的副作用）。
-⚠ 我倾向 **(a)**：`(b)` 把"罗刹死了"和"某个队友死了"混成了同一件事。
-
-**验收**（实现时）：`LuochaFieldTest` 里那条**现在断言"仍在"**的用例（`theFieldIsStillUpAfterHeFalls_pinningTheGap`）
-必须**反转成"已解除"** ✓ —— 它存在的意义就是让这个缺口**不会悄悄合上** ✓。
-⚠ 同时**必须**保留 `LethalSetTest` / `RelicAbilityBatchTest` 为绿：那是本条目真正的难点所在。
+**⚠ 顺带说明域类效果**：本事件对**所有"施法者倒下则领域解除"的写法**都可用 ✓
+（1218 椒丘的结界、1321 大丽花的结界等 —— 它们原先靠 `ticks_on: self` 由**清扫**兜住 ✓，
+因为它们的 buff 挂在**活着的别人**身上 ✓；挂在**自己**身上的那种（本条）才是清扫够不到的 ✓）。
 ---
 
 ## 7. 待办 D 层：演示与收尾
@@ -654,7 +653,7 @@ chance = base × (1 + 效果命中) × (1 - 效果抵抗) × (1 - 具体 debuff 
 | `Battle.java`  | **3766 行**，172 个方法                                                                                                                                                                            |
 | 其中**组装**   | **只有 9 个方法**：`startBattle` / `registerPartyResources` / `attachBattleSkills` / `applyTechniqueStates` / `registerWarehouseListener` / `beginWave` / `noteWaveMonster` / `forgetWaveMonsters` |
 | 其中**运行时** | 20 个（`beforeMove` / `afterMove` / `applyDamage` / `reduceToughness` / `heal` / `grantShield` / …）                                                                                               |
-| **触发点**     | `Battle` 内 **26 处**，发出 **25 个事件**；另有 8 个事件由 `SkillExecutor` / `EnemySkill` / `WaveManager` / `TriggerInterpreter` 发出 ⇒ **33 个事件**                                              |
+| **触发点**     | `Battle` 内 **27 处**，发出 **27 个事件**；另有 **12 个事件**由 `SkillExecutor`(5) / `EnemySkill`(2) / `WaveManager`(1) / `TriggerInterpreter`(4) / `TriggerEffects`(2) 发出 ⇒ 声明 **39 个事件**，**无一悬空** |
 | 事件总线入口   | `fireTriggers` **8 个重载**；**10 个类**在调用它                                                                                                                                                   |
 
 **⚠ 关键结论一：`Battle` 的大小不在"组装"里。** 9 个组装方法，占 3766 行的一小部分。
