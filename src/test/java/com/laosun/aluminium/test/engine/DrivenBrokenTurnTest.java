@@ -1,5 +1,6 @@
 package com.laosun.aluminium.test.engine;
 
+import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.DoubleValue;
@@ -86,5 +87,45 @@ public class DrivenBrokenTurnTest {
         e.heal(500_000);
         e.setMaxEnergy(0);
         return e;
+    }
+
+    /**
+     * The broken state <b>ends</b>: after the countdown runs out the enemy recovers and acts again.
+     *
+     * <p>This is the other half of "the countdown ticks", and worth stating separately: a driven path that skipped
+     * broken enemies but never decremented the counter would leave them <b>permanently</b> harmless -- which is a
+     * worse bug than the one that was fixed, and would still pass a test that only measured "it dealt no damage".
+     */
+    @Test
+    public void theEnemyRecoversAndActsAgain() {
+        Character himeko = CharacterFactory.create(HIMEKO, LEVEL);
+        Enemy foe = bigEnemy();
+
+        BattleDriver driver = BattleDriver.of(List.of(himeko), List.of(foe), 1L);
+        driver.battle().startBattle();
+
+        foe.breakEnemy(com.laosun.aluminium.enums.DamageElement.FIRE);
+        foe.setBrokenRemainTurns(Constant.BROKEN_REMAIN_TURNS);
+        double heroHpWhileBroken = himeko.getCurrentHp();
+
+        // Run on PAST the recovery: the loop has to survive the moment `isBroken()` turns false, because the enemy
+        // does not act on the turn it recovers -- it acts on its next one. Stopping at the recovery would assert on a
+        // hero who simply has not been hit yet, which is what the first version of this case did.
+        for (int i = 0; i < STEPS * 4 && !driver.battle().isOver(); i++) {
+            driver.step();
+            if (!foe.isBroken() && himeko.getCurrentHp() < heroHpWhileBroken) {
+                break;
+            }
+        }
+
+        Assertions.assertFalse(foe.isBroken(),
+                "the countdown must actually run out -- one that never moves leaves a broken enemy permanently "
+                        + "harmless, which is worse than the bug that was fixed");
+        Assertions.assertTrue(himeko.getCurrentHp() < heroHpWhileBroken,
+                "and once it is back it attacks again -- recovery has to mean something; hero HP was "
+                        + heroHpWhileBroken + " and is " + himeko.getCurrentHp());
+        // ⚠ Deliberately NOT asserting that the toughness bar is full here: the hero keeps attacking, so it may
+        // already have been shaved again, and "is it full at this arbitrary instant" is not what this case is about.
+        // `recoverFromBroken` restoring the bar is its own claim, tested where it belongs.
     }
 }
