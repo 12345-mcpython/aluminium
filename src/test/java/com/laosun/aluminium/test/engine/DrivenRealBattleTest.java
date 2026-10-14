@@ -60,21 +60,48 @@ public class DrivenRealBattleTest {
     }
 
     /**
-     * The demo's three enemies, at the scale the hand-driven demo uses.
+     * The demo's three enemies at the given HP each, with their energy bar removed.
      *
-     * @return the enemies, with their HP raised and their energy bar removed
+     * @param hp per-enemy HP
+     * @return the enemies
      */
-    private static List<Enemy> foes() {
+    private static List<Enemy> foes(int hp) {
         List<Enemy> enemies = new ArrayList<>(List.of(
                 EnemyFactory.create(1002011, LEVEL, 1),   // 冰锋 Ice Edge
                 EnemyFactory.create(8032010, LEVEL, 1),   // 基层员工·外勤
                 EnemyFactory.create(8002040, LEVEL, 1))); // 次元扑满
         for (Enemy enemy : enemies) {
-            enemy.setAttribute(AttributeType.HEALTH, new DoubleValue(30_000));
-            enemy.heal(30_000);
+            enemy.setAttribute(AttributeType.HEALTH, new DoubleValue(hp));
+            enemy.heal(hp);
             enemy.setMaxEnergy(0);
         }
         return enemies;
+    }
+
+    /**
+     * The party WINS the fight the driven demo runs -- at the scale that demo uses.
+     *
+     * <p>This is the other half of {@link #aWholeRealBattleRunsToADecidedEnd()}, and the reason there are two
+     * scales. At 15000 HP apiece the auto policy wins this fight on every seed tried (8/8, 6-7 rounds); at 30000 it
+     * loses on every one (0/8) with the enemies still standing. Both are real outcomes of the same engine, so the
+     * near-impossible one is kept as the decided-end case above and this one pins the winnable scale the
+     * {@code driven} demo narrates.
+     *
+     * <p>⚠ <b>What a WIN here does and does not claim.</b> It claims the engine can play a real three-on-three
+     * through to a victory with nothing scripting the choices -- which is what {@code gradlew run --args=driven}
+     * shows. It does NOT claim the policy is strong: it loses the same fight at twice the HP, and P11-4 records why.
+     */
+    @Test
+    public void theDrivenDemoWinsAtItsOwnScale() {
+        BattleDriver driver = BattleDriver.of(party(), foes(15_000), SEED);
+        BattleDriver.Result result = driver.run();
+
+        Assertions.assertEquals(BattleDriver.Outcome.FINISHED, result.outcome(),
+                "the battle must be decided, not merely stopped");
+        Assertions.assertEquals(Battle.Status.WIN, result.status(),
+                "at the demo's own scale the party must come out ahead: " + result);
+        Assertions.assertTrue(driver.battle().enemyUnits().stream().allMatch(CanHit::isDeath),
+                "a win means the enemy camp is gone, not that a turn ceiling was reached");
     }
 
     /**
@@ -83,7 +110,7 @@ public class DrivenRealBattleTest {
     @Test
     public void aWholeRealBattleRunsToADecidedEnd() {
         Counter counter = new Counter();
-        BattleDriver driver = BattleDriver.of(party(), foes(), SEED).withListener(counter);
+        BattleDriver driver = BattleDriver.of(party(), foes(30_000), SEED).withListener(counter);
 
         BattleDriver.Result result = driver.run();
 
@@ -106,7 +133,7 @@ public class DrivenRealBattleTest {
      */
     @Test
     public void bothCampsWereReallyEngaged() {
-        BattleDriver driver = BattleDriver.of(party(), foes(), SEED);
+        BattleDriver driver = BattleDriver.of(party(), foes(30_000), SEED);
         BattleDriver.Result result = driver.run();
         Battle battle = driver.battle();
 
@@ -138,7 +165,7 @@ public class DrivenRealBattleTest {
         ByteArrayOutputStream captured = new ByteArrayOutputStream();
         PrintStream sink = new PrintStream(captured, true, StandardCharsets.UTF_8);
 
-        BattleDriver.of(party(), foes(), SEED).withListener(new BattleNarrator(sink)).run();
+        BattleDriver.of(party(), foes(30_000), SEED).withListener(new BattleNarrator(sink)).run();
         sink.flush();
         String text = captured.toString(StandardCharsets.UTF_8);
 

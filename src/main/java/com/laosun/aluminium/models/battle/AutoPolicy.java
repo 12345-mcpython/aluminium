@@ -65,6 +65,19 @@ public final class AutoPolicy implements SkillPolicy {
     private final int skillPointReserve;
 
     /**
+     * An ally at or below this HP fraction is worth healing.
+     *
+     * <p>Deliberately not "any scratch": a heal spends the turn <b>and</b> a shared point, and keeping the party
+     * topped up at full price leaves the damage dealers unable to act.
+     */
+    private static final double HEAL_THRESHOLD = 0.75;
+
+    /**
+     * An ally at or below this HP fraction, with no shield up, is worth shielding.
+     */
+    private static final double SHIELD_THRESHOLD = 0.9;
+
+    /**
      * How this policy picks a target.
      */
     private final Targeting targeting;
@@ -127,25 +140,29 @@ public final class AutoPolicy implements SkillPolicy {
         if (affordable) {
             SkillEffectType.Category category = skill.getData().getEffect() == null
                     ? null : skill.getData().getEffect().getCategory();
-            // Healing and shielding first: the demo's ordering, and the reason is that these are the
-            // actions worth spending a scarce point on.
+            // A protective skill only when protection is actually MISSING.
+            //
+            // Note: This used to fire unconditionally, and that is what lost the demo fight -- measured on 姬子 /
+            // 三月七 / 罗刹 vs 冰锋 + 基层员工·外勤 + 次元扑满: 罗刹 has no healing Skill at all (his is a
+            // RESTORE row) so he basic-attacked 21 times, while 三月七 re-shielded a healthy party on every single
+            // turn and drained the pool. The pool is shared, so 姬子 -- the only real damage -- was left below the
+            // reserve and cast her Skill exactly ONCE in 37 turns. The party then died to enemies it could not
+            // out-damage. A shield nobody needs is not worth a point that the damage dealer cannot spend.
             if (category == SkillEffectType.Category.HEAL || category == SkillEffectType.Category.BUFF) {
-                List<CanHit> friendly = aimedAt(battle, actor, skill, actor);
-                return Decision.of(skill, friendly, category == SkillEffectType.Category.HEAL
-                        ? "healing the party" : "shielding the party");
+                if (needsProtection(battle, actor, category)) {
+                    List<CanHit> friendly = aimedAt(battle, actor, skill, actor);
+                    return Decision.of(skill, friendly, category == SkillEffectType.Category.HEAL
+                            ? "healing the party" : "shielding the party");
+                }
+                // Otherwise fall through to damage: a wasted turn is better than a wasted point, and a point kept
+                // is one the damage dealer can spend.
             }
             // A damaging skill: cast it, and prefer a target it is actually strong against.
             //
             // Note: This used to require a weakness, on the reasoning that "the point should buy something". That
-            // read well and played badly -- measured on the demo content (姬子 / 三月七 / 罗刹 vs 冰锋 + 基层员工·外勤
-            // + 次元扑满), the party LOST with it and WINS when a damaging skill is simply used: 姬子's Fire skill was
-            // skipped against the two monsters that are not fire-weak, so the party basic-attacked its way through
-            // 37 turns while the enemies' HP barely moved. A basic attack earns a point back, but it also spends a
-            // whole turn doing a fraction of the damage, and no amount of saved points is worth that.
-            //
-            // Weakness now ranks the CHOICE rather than gating it: if some legal target is weak to this element,
-            // aim there; otherwise still cast, at the usual main target. The target is picked before the spell
-            // decides to be cast, so `main` is the fallback rather than a veto.
+            // read well and played badly -- 姬子's Fire skill was skipped against the two monsters that are not
+            // fire-weak. Weakness now ranks the CHOICE rather than gating it: if some legal target is weak to this
+            // element, aim there; otherwise still cast, at the usual main target.
             if (category == SkillEffectType.Category.DAMAGE) {
                 CanHit weak = weakestMatch(foes, skill);
                 CanHit aim = weak != null ? weak : main;
@@ -213,6 +230,42 @@ public final class AutoPolicy implements SkillPolicy {
             }
         }
         return null;
+    }
+
+    /**
+     * Whether a protective skill is worth a skill point right now.
+     *
+     * <p>Two questions, and both have to be "yes" for the cast to make sense:
+     * <ul>
+     *   <li><b>Is protection missing?</b> A heal on a party nobody has scratched, or a shield on allies who already
+     *       carry one, buys nothing. Measured threshold rather than a guess: a heal is worth it once somebody is
+     *       below {@link #HEAL_THRESHOLD}, and a shield once somebody is below {@link #SHIELD_THRESHOLD} <b>and</b>
+     *       unshielded.</li>
+     *   <li><b>Can it be paid for?</b> The pool is shared with the damage dealers, so a protective cast that would
+     *       drop the party to the reserve is competing with the damage that ends the fight. 罗刹's own pool had to
+     *       stay above the reserve or the party simply out-lasts nothing.</li>
+     * </ul>
+     *
+     * @param battle   the battle
+     * @param actor    the one considering the cast
+     * @param category which kind of protection (a heal and a shield look for different gaps)
+     * @return {@code true} when the cast is worth its point
+     */
+    private boolean needsProtection(Battle battle, CanHit actor, SkillEffectType.Category category) {
+        for (CanHit ally : battle.getSideOf(actor)) {
+            if (ally == null || ally.isDeath() || ally.getMaxHp() <= 0) {
+                continue;
+            }
+            double ratio = ally.getCurrentHp() / ally.getMaxHp();
+            if (category == SkillEffectType.Category.HEAL) {
+                if (ratio <= HEAL_THRESHOLD) {
+                    return true;
+                }
+            } else if (ratio <= SHIELD_THRESHOLD && ally.getShield() <= 0) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
