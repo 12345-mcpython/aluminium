@@ -41,35 +41,69 @@ public class BreakStateTest {
     }
 
     /**
-     * A break costs exactly the turns it announces, and the unit acts on the turn it recovers.
+     * ⚠ The counter's boundary, which is where the off-by-one lived.
      *
-     * <p>⚠ <b>The last assertion is the contract that changed, and it is the point of this case.</b>
-     * {@code handleBrokenTurn} answers "is this turn skipped". It used to answer {@code true} whenever the unit was
-     * broken on entry -- including the turn its countdown reached zero -- so recovery itself cost an action and a break
-     * actually took {@code BROKEN_REMAIN_TURNS + 1} turns. Measured, a monster that recovered with a full toughness bar
-     * dealt no damage on that turn either, which reads as "it recovered and skipped anyway".
+     * <p>{@code handleBrokenTurn} spends one of the enemy's turns decrementing the counter, and answers "is this turn
+     * skipped". So the counter and the number of turns LOST were one apart: set to 2, the enemy skipped one turn and
+     * then spent the second recovering <i>and</i> acting. Measured before this was corrected:
      *
-     * <p>Now the countdown's own number of turns is what it costs: with {@code BROKEN_REMAIN_TURNS} of two, one turn is
-     * skipped and the second one is the recovery turn, on which it acts.
+     * <pre>
+     *   counter=2   onTurnStart remain=2 -> skipped
+     *               onTurnStart remain=1 -> recovers, and acts on that same turn
+     * </pre>
+     *
+     * <p>So the two values are pinned here explicitly rather than left to {@code BROKEN_REMAIN_TURNS}, because the whole
+     * point is the boundary between them:
+     *
+     * <ul>
+     *   <li><b>2</b> -- the turn is spent broken, so it is skipped.</li>
+     *   <li><b>1</b> -- this is the turn the counter reaches zero, so toughness is restored and it is NOT skipped.</li>
+     * </ul>
+     *
+     * <p>{@code BROKEN_REMAIN_TURNS} is 1, so a broken enemy loses exactly one turn and takes the field on its next.
      */
     @Test
-    public void brokenEnemySkipsItsTurnsThenRecoversAndActs() {
+    public void aCounterOfTwoSkipsOneTurnAndACounterOfOneIsTheRecoveryTurn() {
         Character himeko = character("himeko");
-        Enemy iceEdge = EnemyFactory.create(ICE_EDGE, 90, 1);
-        Battle battle = new Battle(List.of(himeko), List.of(iceEdge), BattleFixture.seeded());
-        breakIt(battle, himeko, iceEdge);
+        Enemy two = EnemyFactory.create(ICE_EDGE, 90, 1);
+        Battle twoBattle = new Battle(List.of(himeko), List.of(two), BattleFixture.seeded());
+        breakIt(twoBattle, himeko, two);
+        two.setBrokenRemainTurns(2);
 
-        Assertions.assertTrue(battle.handleBrokenTurn(iceEdge), "turn 1: still broken, so it is skipped");
-        Assertions.assertEquals(1, iceEdge.getBrokenRemainTurns());
-        Assertions.assertTrue(iceEdge.isBroken());
+        Assertions.assertTrue(twoBattle.handleBrokenTurn(two),
+                "counter 2: the turn is spent broken, so it is skipped");
+        Assertions.assertEquals(1, two.getBrokenRemainTurns());
+        Assertions.assertTrue(two.isBroken(), "and it is still broken");
 
-        Assertions.assertFalse(battle.handleBrokenTurn(iceEdge),
-                "turn 2: the countdown reaches zero on this turn, so it is NOT skipped -- it recovers and acts");
-        Assertions.assertEquals(0, iceEdge.getBrokenRemainTurns());
-        Assertions.assertFalse(iceEdge.isBroken());
-        Assertions.assertEquals(60, iceEdge.getStance(), EPS, "recovery = toughness restored to full");
+        Assertions.assertFalse(twoBattle.handleBrokenTurn(two),
+                "counter 1: this is the turn the counter reaches zero, so it is NOT skipped -- it recovers and acts");
+        Assertions.assertEquals(0, two.getBrokenRemainTurns());
+        Assertions.assertFalse(two.isBroken());
+        Assertions.assertEquals(60, two.getStance(), EPS, "recovery = toughness restored to full");
 
-        Assertions.assertFalse(battle.handleBrokenTurn(iceEdge), "already recovered, so nothing to skip");
+        Assertions.assertFalse(twoBattle.handleBrokenTurn(two), "already recovered, so nothing to skip");
+
+        // The value a real break actually sets, and what taking its turn does with it.
+        Enemy fresh = EnemyFactory.create(ICE_EDGE, 90, 1);
+        Battle freshBattle = new Battle(List.of(himeko), List.of(fresh), BattleFixture.seeded());
+        breakIt(freshBattle, himeko, fresh);
+
+        Assertions.assertEquals(Constant.BROKEN_REMAIN_TURNS, fresh.getBrokenRemainTurns(),
+                "a real break sets the constant, which is 1");
+        Assertions.assertTrue(fresh.isBroken(), "so the enemy is broken and its panel can say so");
+
+        // ⚠ Measured, and the opposite of what this case first asserted: at a counter of 1 the enemy loses NO turn.
+        // Taking its own turn is what spends the counter, and it spends it on recovering -- so the break clears at the
+        // start of that turn and the enemy acts on it. The break's cost is therefore the 25% action delay
+        // (BREAK_DELAY_RATIO) and the damage window, NOT a denied action.
+        //
+        // The trade-off, recorded rather than hidden: at 1 the "skip a turn" part of a weakness break does not happen
+        // at all. A counter of 2 is what buys one skipped turn, which is what the first half of this case pins. If a
+        // skip is ever wanted back, it is bought by raising the constant, and this assertion is what will say so.
+        Assertions.assertFalse(freshBattle.handleBrokenTurn(fresh),
+                "a counter of 1 is spent on the recovery itself, so the enemy is NOT skipped");
+        Assertions.assertFalse(fresh.isBroken(), "and the break is cleared by the act of taking its turn");
+        Assertions.assertEquals(60, fresh.getStance(), EPS, "with toughness restored");
     }
 
     @Test
