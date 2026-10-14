@@ -887,13 +887,25 @@ public class Battle {
         if (ultra == null) {
             return false;
         }
+        // Note: The payment and settlement below are the SAME ones `useSkill` performs, deliberately duplicated
+        // rather than factored out -- see `useSkill`'s ultimate gate for why the gate has to exist in both places.
         if (!requestSkill(ultra, user, targets)) {
             return false;
         }
-        // Zero it first (the order is deliberate), then let the ultimate body settle.
-        // Reversing the order eats the energy the ultimate itself earns: the kill energy / break energy
-        // inside processRequests are both credited to damage.getAttacker (= the one casting the ultimate),
-        // so settling first and zeroing afterwards wipes those entries out.
+        return settleUltimate(user, ultra);
+    }
+
+    /**
+     * Zero the bar for an ultimate that is now in flight, settle its body, then credit its own gain.
+     *
+     * <p><b>Why the zeroing comes first.</b> The order is deliberate and was measured: the ultimate body can earn
+     * energy of its own (kill credit, break credit), and settling before zeroing wipes exactly those entries.
+     *
+     * @param user  the caster
+     * @param ultra its ultimate skill
+     * @return always {@code true}; the caller has already decided the cast is legal
+     */
+    private boolean settleUltimate(CanHit user, Skill ultra) {
         lastUltEnergySpent = user.getCurrentEnergy();   // read it BEFORE the zeroing below
         user.setCurrentEnergy(0);
         processRequests();                      // ultimate body settles: the Ultra slot gains no energy in onSkillCast, so no double credit
@@ -1525,6 +1537,32 @@ public class Battle {
         CanHit user = currentMove.getCanHit();
         if (user.isDeath()) {
             return false;
+        }
+        // ⚠ <b>An ultimate may not be cast through here without paying for it.</b>
+        //
+        // Note: This gate exists because the alternative already bit once, and silently. The ultimate's cost lived
+        // only in `castUltra`, so a caller that reached `useSkill` directly -- `BattleDriver` did exactly that, for
+        // EVERY action including ultimates -- cast a 120-cost ultimate for free: measured, 姬子 fired hers four times
+        // in one fight with the bar reading 120 before and 120 after each cast.
+        //
+        // A cost that lives in a sibling method is a cost any front end can skip, so the rule is now enforced where
+        // the cast actually happens. An ultimate that arrives here therefore has to be READY, and its bar is spent
+        // by the same code path `castUltra` uses.
+        if (skill == user.getSkills().get(SkillType.ULTRA)) {
+            if (!isUltraReady(user)) {
+                // Not ready: refuse, exactly as castUltra would. Refusing is the safe direction -- a front end that
+                // forgot to ask gets no cast rather than a free one.
+                return false;
+            }
+            CanHit extraTurnActor = queue.getExtraTurnActor();
+            if (extraTurnActor != null && extraTurnActor != user) {
+                return false;               // same extra-turn rule castUltra enforces
+            }
+            if (!skillPointPolicy.onSkillCast(user, skill)) {
+                return false;
+            }
+            skillRequest(skill, user, target);
+            return settleUltimate(user, skill);
         }
         // Skill points: all the rules are in skillPointPolicy (including the our-side/enemy-side camp
         // check); Battle only asks once "does this action hold up" -- it knows no character, see F-8 in §12.5.

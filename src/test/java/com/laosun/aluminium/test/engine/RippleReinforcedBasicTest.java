@@ -59,7 +59,12 @@ public class RippleReinforcedBasicTest {
         her = battle.characters.getFirst();
         if (insideTheRipple) {
             battle.currentMove = new Signal(her);
-            Assertions.assertTrue(battle.useSkill(her.getSkills().get(SkillType.ULTRA), List.of(battle.enemies.getFirst())),
+            // ⚠ `castUltra`, not `useSkill`: an ultimate is cast through its own entry, and the engine now refuses
+            // an ultimate that reaches `useSkill` with a bar that is not full -- which this case used to get away
+            // with, because nothing charged for it before. The subject here is skill points ("the ultimate spends
+            // nothing"), so the ultimate still has to be a real, affordable cast or the case means nothing.
+            her.gainEnergy(her.getMaxEnergy());
+            Assertions.assertTrue(battle.castUltra(her, List.of(battle.enemies.getFirst())),
                     "precondition: her ultimate is affordable");
             battle.processRequests();
             her = battle.characters.getFirst();

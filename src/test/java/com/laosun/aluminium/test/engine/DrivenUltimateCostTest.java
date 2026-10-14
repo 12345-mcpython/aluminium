@@ -5,6 +5,7 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.models.CanHit;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.DoubleValue;
+import com.laosun.aluminium.models.Signal;
 import com.laosun.aluminium.models.battle.BattleDriver;
 import com.laosun.aluminium.models.battle.BattleListener;
 import com.laosun.aluminium.models.battle.SkillPolicy;
@@ -92,6 +93,44 @@ public class DrivenUltimateCostTest {
         Assertions.assertTrue(cast, "the ultimate was cast");
         Assertions.assertFalse(battle.isUltraReady(hero),
                 "after paying for the ultimate the bar cannot still count as full");
+    }
+
+    /**
+     * An ultimate that reaches the ORDINARY action path cannot be cast for free.
+     *
+     * <h2>Why this case is the important one</h2>
+     * The bug was not "the driver forgot"; it was that <b>the cost lived in a sibling method</b>, so any caller
+     * reaching {@code useSkill} directly got an ultimate for nothing -- and {@code BattleDriver} did exactly that,
+     * for every action. Fixing the driver alone would have left the same trap for the next front end.
+     *
+     * <p>So the rule is now enforced where the cast happens: an ultimate arriving at {@code useSkill} must be ready,
+     * and its bar is spent by the same path {@code castUltra} uses. This pins that <b>from the outside</b> -- through
+     * {@code useSkill}, the path that used to be free -- rather than through the entry that was always correct.
+     */
+    @Test
+    public void anUltimateCannotBeCastForFreeThroughTheOrdinaryPath() {
+        Character hero = CharacterFactory.create(HIMEKO, LEVEL);
+        Enemy foe = enemy();
+
+        Battle battle = new Battle(List.of(hero), List.of(foe), BattleFixture.seeded());
+        battle.startBattle();
+        battle.currentMove = new Signal(hero);
+
+        // (a) not ready: the ordinary path must REFUSE rather than hand out a free ultimate.
+        Assertions.assertFalse(battle.isUltraReady(hero), "precondition: the bar starts empty");
+        Assertions.assertFalse(battle.useSkill(hero.getSkills().get(SkillType.ULTRA), List.of(foe)),
+                "an ultimate with an empty bar must be refused through useSkill, not cast for free");
+
+        // (b) ready: casting it through the ordinary path must SPEND the bar.
+        hero.gainEnergy(hero.getMaxEnergy());
+        Assertions.assertTrue(battle.isUltraReady(hero), "precondition: the bar is full");
+        double before = hero.getCurrentEnergy();
+
+        Assertions.assertTrue(battle.useSkill(hero.getSkills().get(SkillType.ULTRA), List.of(foe)),
+                "a ready ultimate is cast through the ordinary path");
+
+        Assertions.assertTrue(hero.getCurrentEnergy() < before - 1,
+                "and it PAYS: before=" + before + " after=" + hero.getCurrentEnergy());
     }
 
     /**
