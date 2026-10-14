@@ -39,10 +39,22 @@ import java.util.List;
  *       degenerate no-op that trips over a decision boundary.</li>
  * </ul>
  *
- * <p>⚠ <b>The outcome is deliberately NOT asserted.</b> The auto policy is a simple reference opponent, not a strong
- * one; on this content it loses while the hand-tuned demo wins (see ROADMAP's P11-4). Pinning "the party wins"
- * would turn a known policy weakness into a failing test, and pinning "the party loses" would enshrine it. What
- * must hold is that a real battle <b>runs</b>, and that is what is pinned.
+ * <p>⚠ <b>This class used to say the outcome was deliberately NOT asserted</b>, on the reasoning that the auto policy
+ * is a weak reference opponent that loses this content while the hand-tuned demo wins. <b>Both halves of that were
+ * wrong</b>, and are recorded in ROADMAP §3.5-§3.8 and P11-4:
+ *
+ * <ul>
+ *   <li>the policy was not losing to a strategy gap -- three engine rules simply were not applied on the driven path
+ *       (a free ultimate, a doubled skill-point charge, and a broken enemy that acted anyway). With those fixed the
+ *       same party wins this fight on every seed tried;</li>
+ *   <li>the hand-tuned demo is not a stronger opponent. Its own decision order, replicated as a policy and run on the
+ *       same 30000 HP content, also wins -- but takes more turns (66 against 47 with the demo's own party), because this policy is thriftier
+ *       with skill points on protection and leaves more for the damage. Slower is not stronger.</li>
+ * </ul>
+ *
+ * <p>So {@link #theDrivenDemoWinsAtItsOwnScale()} does pin the win. What is <b>still</b> not asserted is any claim
+ * that the policy is strong: it is a simple reference implementation, and a loss elsewhere would not be an engine
+ * defect.
  */
 public class DrivenRealBattleTest {
 
