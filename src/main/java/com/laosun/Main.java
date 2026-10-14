@@ -105,13 +105,17 @@ public class Main {
      * whose kit the script did not anticipate simply never used it, and the engine could not be played headlessly at
      * all.
      *
-     * <p>{@code BattleDriver} now owns that loop and {@code AutoPolicy} owns the choice, so this command is the
-     * proof that both work end to end on real content: the same three characters and the same three enemies as
-     * {@code battle}, driven by the engine rather than narrated by a script. Nothing here decides what anyone casts.
+     * <p>{@code BattleDriver} now owns that loop and {@code AutoPolicy} owns the choice, so this command shows both
+     * working end to end on real content: the same three characters and the same three enemies as {@code battle},
+     * driven by the engine. Nothing here decides what anyone casts.
      *
-     * <p>Kept beside the old demo rather than replacing it, because the two answer different questions: this one
-     * shows that the engine can play itself, and the old one remains the readable, step-by-step walkthrough whose
-     * output is pinned by {@code DemoSmokeTest}.
+     * <p><b>⚠ The enemies carry less HP here than in {@code battleDemo}, and that is a measured difference rather
+     * than tidiness.</b> {@code AutoPolicy} is the reference opponent, not a strong one (see ROADMAP P11-4), and this
+     * party simply cannot out-damage 30000 HP apiece: measured over eight seeds at both level 90 and level 80, that
+     * is <b>0 wins out of 8</b>, every fight lost in 6-7 rounds with the enemies still standing -- not a seed
+     * artifact but a wall. At 15000 it is <b>8 wins out of 8</b> in 6-7 rounds. The point of this command is to show
+     * that the engine can play itself, and a demonstration that always loses says the opposite of what is true.
+     * The 30000 case is still exercised, as a deliberate loss, by {@code DrivenRealBattleTest}.
      */
     private static void drivenBattleDemo() {
         List<Character> team = List.of(himeko(), march7th(), luocha());
@@ -120,9 +124,8 @@ public class Main {
                 EnemyFactory.create(8032010, 90, 1),
                 EnemyFactory.create(8002040, 90, 1)));
         for (Enemy enemy : enemies) {
-            // The same scale the hand-driven demo uses, so the two are comparable rather than merely both running.
-            enemy.setAttribute(AttributeType.HEALTH, new DoubleValue(30_000));
-            enemy.heal(30_000);
+            enemy.setAttribute(AttributeType.HEALTH, new DoubleValue(DRIVEN_ENEMY_HP));
+            enemy.heal(DRIVEN_ENEMY_HP);
             enemy.setMaxEnergy(0);
         }
 
@@ -135,6 +138,12 @@ public class Main {
      * The seed the driven demo runs on, fixed so its output is reproducible.
      */
     private static final long DRIVEN_SEED = 20261012L;
+
+    /**
+     * Per-enemy HP for the driven demo: measured as the scale this party can actually beat (see
+     * {@link #drivenBattleDemo()}).
+     */
+    private static final int DRIVEN_ENEMY_HP = 15_000;
 
     /**
      * 三月七 (March 7th)'s character id -- the one party member whose technique is modelled.
