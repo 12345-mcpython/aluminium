@@ -33,9 +33,28 @@ import java.util.List;
  * <p>The skill point reserve is a strategy, not an engine rule, and is configurable here because the
  * demo needed it to alternate between spending and earning points.
  *
- * <p>⚠ <b>This policy is weak on purpose, and known to be weaker than the hand-tuned demo.</b> On the demo's own
- * content it loses while the scripted demo wins (see ROADMAP's P11-4). It is the reference opponent a real policy
- * is measured against, not a good one; do not read a loss here as an engine defect.
+ * <p>⚠ <b>This policy used to be documented as "weak on purpose, and known to be weaker than the hand-tuned demo".</b>
+ * That was wrong on both counts, and the correction is worth keeping because the reasoning error is a common one
+ * (ROADMAP §3.5-§3.8, P11-4):
+ *
+ * <ul>
+ *   <li><b>It was not losing to a strategy gap.</b> Three engine rules were simply not applied on the driven path --
+ *       an ultimate cost nothing, every Skill was charged twice, and a broken enemy acted anyway. Every one of them
+ *       made this policy look worse than it was. With them fixed it wins the full three-on-three at 30000 HP per
+ *       enemy on every seed tried.</li>
+ *   <li><b>It is not weaker than the hand-written demo.</b> The demo's own decision order was replicated as a policy
+ *       and run on the same content and the same seeds: it wins too, but it takes <b>more</b> turns (66 against 47 in
+ *       the first seeded run at 30000 HP per enemy, with the demo's own party). The reason is that this policy is thriftier where it counts --
+ *       it shields only when somebody is below the threshold and unshielded, while the demo's script spends a skill
+ *       point on protection whenever it can afford one, which leaves less for the damage that ends the fight. Being
+ *       slower is not the same as being weaker, but it is also not evidence that the script is the stronger
+ *       strategist.</li>
+ * </ul>
+ *
+ * <p>What remains true is that this is a <b>simple reference implementation</b>, not a good opponent: it has no
+ * notion of focus fire, of holding damage for a break window, or of spending a point now for a kill next turn. A
+ * loss against real content would still not be an engine defect. But "simple" is the honest word, not "weak", and
+ * the difference matters -- the earlier wording sent a bug hunt after strategy when the mechanics were unwired.
  */
 public final class AutoPolicy implements SkillPolicy {
 
