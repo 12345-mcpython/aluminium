@@ -15,11 +15,16 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * 1203 Luocha, from his own file: the Abyss Flower counter and the low-HP retrigger.
+ * 1203 Luocha, from his own file: the Abyss Flower counter, the low-HP retrigger, and the clauses that used to be
+ * registered as missing.
  *
- * <p>Both clauses are built from vocabularies that already exist: `ADD_STACK` for a named counter (1111's Fighting Will (斗志)), and the
- * `HP_LOST` event together with the `target_hp_percent` numeric variable for the threshold. The retrigger's 2-turn cooldown and
- * the ultimate's "解除增益" (dispel buffs) are registered, not written.
+ * <p>Every clause is built from vocabulary that already existed: {@code ADD_STACK} for the named counter (1111's
+ * Fighting Will (斗志)), the {@code HP_LOST} event with the {@code target_hp_percent} numeric variable for the
+ * threshold crossing, {@code REMOVE_BUFF} for the ultimate's 「解除敌方全体1个增益效果」, and {@code RESIST_DEBUFF}
+ * for 行过幽谷's control resistance -- the same sentence 1013, 1107 and 1109 carry.
+ *
+ * <p>⚠ Still NOT covered, and deliberately so: the Field's (结界) 2-turn duration and its removal when Luocha is
+ * knocked down. A 结界 has no lifetime in this engine yet, so it is recorded rather than faked -- see ROADMAP.
  */
 public class LuochaTest {
     private static final int LUOCHA = 1203;
@@ -41,14 +46,24 @@ public class LuochaTest {
     }
 
     /**
-     * Census: the counter, the low-HP retrigger and the level convention are where the notes say.
+     * Census: which event each clause hangs on, so a rule cannot silently move or vanish.
      */
     @Test
     public void hisFileCarriesTheClauses() {
         var table = TriggerTables.of(LUOCHA);
-        // Note: the count is 2: the counter, plus the rule that opens the Abyss Flower (白花之刻) zone at two stacks
-        Assertions.assertEquals(2, table.ruleCount(TriggerEvent.SKILL_CAST), "the counter and the zone opener");
-        Assertions.assertEquals(1, table.ruleCount(TriggerEvent.BATTLE_START), "the level convention");
+        // The counter, the zone opener that consumes it, 行迹 浸池苏生's dispel, and 星魂 2's two halves.
+        Assertions.assertEquals(5, table.ruleCount(TriggerEvent.SKILL_CAST),
+                "the counter, the zone opener, the dispel, and Eidolon 2's heal-boost and shield");
+        // The level convention, 行迹 行过幽谷's control resistance, 秘技 愚者的悲悯's field, and 星魂 5.
+        Assertions.assertEquals(4, table.ruleCount(TriggerEvent.BATTLE_START),
+                "the level convention, the control resistance, the technique, and Eidolon 5's levels");
+        // 星魂 6's resistance reduction and the ultimate's own dispel + stack.
+        Assertions.assertEquals(2, table.ruleCount(TriggerEvent.ULT_CAST),
+                "Eidolon 6's resistance reduction and the ultimate's dispel");
+        // The talent's heal to the attacker and 行迹 浇灌尘身's heal to the others share one trigger.
+        Assertions.assertEquals(2, table.ruleCount(TriggerEvent.ALLY_ATTACK),
+                "the talent's heal to the attacker and the trace's heal to the others");
+        Assertions.assertEquals(1, table.ruleCount(TriggerEvent.HP_LOST), "the low-HP retrigger");
     }
 
     private static final class Fixture {

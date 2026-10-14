@@ -1918,7 +1918,18 @@ public final class TriggerInterpreter {
      */
     static StatModifierBuff statModifier(AttributeType attribute, double percent, int turns,
                                          boolean permanent, int maxStacks, boolean absolute) {
-        boolean debuff = percent < 0;
+        // A negative number is a debuff for every attribute EXCEPT the ones whose NAME is already the negative
+        // direction. `RESISTANCE_REDUCTION` is the one that has bitten: the formula SUBTRACTS it from the victim's
+        // resistance (`rawResist -= defender.getAttribute(RESISTANCE_REDUCTION).get()`), so a POSITIVE value there
+        // means "their resistance is lower" -- a debuff on the victim. Reading the sign alone filed all seven
+        // shipped readers as BUFFS, so "解除敌方 N 个增益效果" could strip the very reduction the same cast had just
+        // applied. Measured: 罗刹's Ultimate dispelled his own 星魂 6.
+        //
+        // Note: Fixed here, at the single place that decides the role, rather than by asking content to write a
+        // negative percent -- that spelling would be true to the role but false to the attribute's documented
+        // direction, and every future reader would have to remember it.
+        boolean negativeDirection = attribute == AttributeType.RESISTANCE_REDUCTION;
+        boolean debuff = negativeDirection ? percent > 0 : percent < 0;
         // The sign is carried by `percent` itself (a negative value), which is what the original
         // percentBuff/flatBuff/... factories produced; only the modifier kind depends on the attribute.
         return StatModifierBuff.of(attribute, absolute || attribute.isPercent ? "pure" : "add_percent", percent,
