@@ -243,16 +243,11 @@ public final class BattleDriver {
         // does not by itself block acting, so the first version of this comment was wrong and the first two cases
         // written against it could not fail. The freeze needs broken AND a control (frozen, imprisoned, ...).
         //
-        // Nothing is lost by asking first: if it is still broken the turn is skipped either way, and if it has just
-        // recovered then `canAct()` is asked again below, on the state that recovery produced.
         if (!actor.isDeath() && actor instanceof Enemy broken && broken.isBroken()) {
-            // The return value is always true here -- `handleBrokenTurn` reports "still broken" whenever it entered --
-            // so this reads as the engine's own answer rather than as an assumption about it.
-            if (battle.handleBrokenTurn(broken)) {
-                mayAct = false;
-            } else {
-                mayAct = broken.getBuffManager().canAct();
-            }
+            // The answer is "is this turn skipped", and that is exactly the complement of "may it act" -- so it is used
+            // directly. The turn that ENDS a break answers false and the unit acts again on it, which is the contract
+            // `handleBrokenTurn` now documents.
+            mayAct = !battle.handleBrokenTurn(broken);
         } else if (!actor.isDeath()) {
             mayAct = actor.getBuffManager().canAct();
         }

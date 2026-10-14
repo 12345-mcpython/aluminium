@@ -2134,14 +2134,20 @@ public class Battle {
     }
 
     /**
-     * Called when a broken enemy's turn comes up: decrements the broken turn count, restores toughness
-     * at 0, and returns "this turn is skipped".
+     * Called when a broken enemy's turn comes up: decrements the broken turn count and, at zero, restores the
+     * toughness bar.
      *
-     * <p>When the caller (today the {@code Main} demo, in the enemy turn execution) gets {@code true},
-     * it must not let it act and goes straight to {@link #afterMove()}.
+     * <p>⚠ <b>The return value means "this turn is skipped", and the turn on which the unit RECOVERS is not
+     * skipped.</b> That is the change from the earlier contract, which answered {@code true} whenever the unit was
+     * broken on entry -- including the turn it came back -- so recovery itself cost an action. A weakened enemy
+     * therefore lost {@code BROKEN_REMAIN_TURNS + 1} actions and returned one turn later than its own countdown said,
+     * which read as "it recovered and then skipped anyway".
+     *
+     * <p>The caller reads it as "may this unit act": a broken enemy answers {@code true} and spends the turn skipping
+     * it, while the turn that ends the break answers {@code false} and the unit takes the field again immediately.
      *
      * @param enemy the enemy whose turn it is
-     * @return {@code true} = it is still broken, so it does not act this turn
+     * @return {@code true} = still broken after this turn's count, so this turn is skipped
      */
     public boolean handleBrokenTurn(Enemy enemy) {
         if (enemy == null || !enemy.isBroken()) {
@@ -2150,6 +2156,9 @@ public class Battle {
         enemy.setBrokenRemainTurns(enemy.getBrokenRemainTurns() - 1);
         if (enemy.getBrokenRemainTurns() <= 0) {
             enemy.recoverFromBroken();
+            // Recovered on this very turn, so this turn is NOT skipped: the countdown has now cost exactly the number
+            // of turns it announced, and the unit acts again straight away.
+            return false;
         }
         return true;
     }

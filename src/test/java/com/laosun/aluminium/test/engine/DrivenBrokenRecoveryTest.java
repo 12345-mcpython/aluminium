@@ -38,10 +38,9 @@ import java.util.List;
  * only checked the skip. A rule with no test is a rule that can be deleted, or in this case broken, without anyone
  * noticing.
  *
- * <p>Note the split of responsibilities that the fix preserves: a broken unit misses the <b>N</b> turns its countdown
- * covers, real time and all, and acts on the first turn of its own after those. The turn on which the countdown reaches
- * zero is still a missed turn, because that is what the engine's own {@code handleBrokenTurn} reports — and the demo
- * does the same.
+ * <p>Note the split of responsibilities: a broken unit misses exactly the turns its countdown announces, and the
+ * turn on which the countdown reaches zero is the one it recovers on and acts. It used to be skipped as well, which
+ * made a break cost one action more than it said.
  */
 public class DrivenBrokenRecoveryTest {
 
@@ -91,6 +90,13 @@ public class DrivenBrokenRecoveryTest {
                 "and it must have had turns while broken, or the skip was never exercised");
         Assertions.assertTrue(recorder.actionsAfterRecovery >= 1,
                 "and it must act again once recovered -- the half the softlock destroyed");
+        // ⚠ The precise claim, and the reason this case exists in this shape: the action lands on the RECOVERY TURN
+        // itself, not on the next one. "It acted at some point after recovering" was already true under the old
+        // contract, one turn later, so it could not tell the two apart -- a control proved that by reverting the
+        // contract and leaving this case green.
+        Assertions.assertEquals(recorder.recoveryTurn, recorder.firstActionTurnAfterRecovery,
+                "the unit must act on the turn it recovers (turn " + recorder.recoveryTurn + "), not on a later one: "
+                        + "its first action after recovering was on turn " + recorder.firstActionTurnAfterRecovery);
     }
 
     /**
@@ -190,6 +196,9 @@ public class DrivenBrokenRecoveryTest {
         int turnsWhileBroken;
         int actionsAfterRecovery;
         int recoveries;
+        int recoveryTurn = -1;
+        int firstActionTurnAfterRecovery = -1;
+        private int currentTurn = -1;
 
         private Recorder(Enemy foe) {
             this.foe = foe;
@@ -197,6 +206,7 @@ public class DrivenBrokenRecoveryTest {
 
         @Override
         public void onTurnStart(CanHit actor, int turn) {
+            currentTurn = turn;
             if (actor != foe) {
                 return;
             }
@@ -206,7 +216,8 @@ public class DrivenBrokenRecoveryTest {
                 turnsWhileBroken++;
             } else {
                 if (!recovered) {
-                    recoveries++;       // the first turn it came back
+                    recoveries++;               // the first turn it came back
+                    recoveryTurn = turn;
                 }
                 recovered = true;
             }
@@ -214,8 +225,12 @@ public class DrivenBrokenRecoveryTest {
 
         @Override
         public void onAction(CanHit actor, SkillPolicy.Decision decision) {
-            if (actor == foe && recovered) {
-                actionsAfterRecovery++;
+            if (actor != foe || !recovered) {
+                return;
+            }
+            actionsAfterRecovery++;
+            if (firstActionTurnAfterRecovery < 0) {
+                firstActionTurnAfterRecovery = currentTurn;
             }
         }
     }
