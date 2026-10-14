@@ -11,7 +11,8 @@
         "buff": "白花之刻",
         "amount": 1,
         "permanent": true,
-        "target": "self"
+        "target": "self",
+        "max_stacks": 2
       }
     ],
     "source": "1203 罗刹 战技 白花的祈望 (120302, BPSkill/Restore): 「施放战技后立即为指定我方单体回复等同于罗刹60%攻击力+800的生命值，并使罗刹获得1层【白花之刻】。」",
@@ -106,7 +107,8 @@
         "op": "APPLY_BUFF",
         "buff": "结界",
         "turns": 2,
-        "target": "self"
+        "target": "self",
+        "ticks_on": "self"
       },
       {
         "op": "MODIFY_ATTR",
@@ -114,14 +116,16 @@
         "percent": 0.2,
         "turns": 2,
         "target": "all_allies",
-        "min_eidolon": 1
+        "min_eidolon": 1,
+        "ticks_on": "self"
       },
       {
         "op": "APPLY_BUFF",
         "buff": "虚弱",
         "turns": 2,
         "target": "all_enemies",
-        "min_eidolon": 4
+        "min_eidolon": 4,
+        "ticks_on": "self"
       },
       {
         "op": "MODIFY_ATTR",
@@ -129,7 +133,8 @@
         "percent": -0.12,
         "turns": 2,
         "target": "all_enemies",
-        "min_eidolon": 4
+        "min_eidolon": 4,
+        "ticks_on": "self"
       }
     ],
     "source": "1203 罗刹 天赋 生息的轮转 (120304, Enhance): 「当【白花之刻】达到2层时，罗刹会消耗全部【白花之刻】展开结界。」",
@@ -220,7 +225,8 @@
         "buff": "白花之刻",
         "amount": 1,
         "permanent": true,
-        "target": "self"
+        "target": "self",
+        "max_stacks": 2
       }
     ],
     "source": "1203 罗刹 终结技 归葬的遂愿 (120303, Ultra/AllAttack): 「解除敌方全体1个增益效果，并对敌方全体造成等同于罗刹200%攻击力的虚数属性伤害，同时使罗刹获得1层【白花之刻】。」",
