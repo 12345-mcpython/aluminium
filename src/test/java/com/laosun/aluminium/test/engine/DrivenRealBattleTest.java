@@ -81,19 +81,20 @@ public class DrivenRealBattleTest {
     /**
      * The party WINS the fight the driven demo runs -- at the scale that demo uses.
      *
-     * <p>This is the other half of {@link #aWholeRealBattleRunsToADecidedEnd()}, and the reason there are two
-     * scales. At 15000 HP apiece the auto policy wins this fight on every seed tried (8/8, 6-7 rounds); at 30000 it
-     * loses on every one (0/8) with the enemies still standing. Both are real outcomes of the same engine, so the
-     * near-impossible one is kept as the decided-end case above and this one pins the winnable scale the
-     * {@code driven} demo narrates.
+     * <p>⚠ <b>This used to be measured at 15000, because 30000 appeared to be a wall</b> (0/8, every fight lost with
+     * the enemies still standing). That appearance came from three defects, all of which made the driven party look
+     * weaker than it is: ultimates cost no energy (§3.5), every Skill was charged twice (§3.6), and a <b>broken enemy
+     * never skipped its turn</b> because only the hand-written demo ticked the broken countdown. With those fixed the
+     * party wins 8 of 8 at the data's own 30000 scale, so the scale is no longer lowered for it.
      *
      * <p>⚠ <b>What a WIN here does and does not claim.</b> It claims the engine can play a real three-on-three
      * through to a victory with nothing scripting the choices -- which is what {@code gradlew run --args=driven}
-     * shows. It does NOT claim the policy is strong: it loses the same fight at twice the HP, and P11-4 records why.
+     * shows. It does NOT claim the policy is strong: it is a simple reference opponent, and a loss elsewhere is not
+     * an engine defect.
      */
     @Test
     public void theDrivenDemoWinsAtItsOwnScale() {
-        BattleDriver driver = BattleDriver.of(party(), foes(15_000), SEED);
+        BattleDriver driver = BattleDriver.of(party(), foes(30_000), SEED);
         BattleDriver.Result result = driver.run();
 
         Assertions.assertEquals(BattleDriver.Outcome.FINISHED, result.outcome(),

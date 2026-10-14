@@ -109,13 +109,13 @@ public class Main {
      * working end to end on real content: the same three characters and the same three enemies as {@code battle},
      * driven by the engine. Nothing here decides what anyone casts.
      *
-     * <p><b>⚠ The enemies carry less HP here than in {@code battleDemo}, and that is a measured difference rather
-     * than tidiness.</b> {@code AutoPolicy} is the reference opponent, not a strong one (see ROADMAP P11-4), and this
-     * party simply cannot out-damage 30000 HP apiece: measured over eight seeds at both level 90 and level 80, that
-     * is <b>0 wins out of 8</b>, every fight lost in 6-7 rounds with the enemies still standing -- not a seed
-     * artifact but a wall. At 15000 it is <b>8 wins out of 8</b> in 6-7 rounds. The point of this command is to show
-     * that the engine can play itself, and a demonstration that always loses says the opposite of what is true.
-     * The 30000 case is still exercised, as a deliberate loss, by {@code DrivenRealBattleTest}.
+     * <p><b>The enemies used to carry less HP here than the data gives them, and no longer do.</b> This command was
+     * pointed at 15000 per enemy because 30000 looked unwinnable: measured over eight seeds it was <b>0 wins out of
+     * 8</b>, every fight lost with the enemies still standing. That measurement was taken while three defects were
+     * live, and all three made the driven party look weaker than it is (see ROADMAP §3.5, §3.6 and the broken-turn
+     * entry): ultimates cost nothing, every Skill was charged twice, and a broken enemy never actually skipped its
+     * turn. With those fixed the same party wins <b>8 of 8</b> at 30000, so the demo runs at the scale the content
+     * states and the party is asked to earn the win.
      */
     private static void drivenBattleDemo() {
         List<Character> team = List.of(himeko(), march7th(), luocha());
@@ -140,10 +140,12 @@ public class Main {
     private static final long DRIVEN_SEED = 20261012L;
 
     /**
-     * Per-enemy HP for the driven demo: measured as the scale this party can actually beat (see
-     * {@link #drivenBattleDemo()}).
+     * Per-enemy HP for the driven demo: the scale the content itself states.
+     *
+     * <p>It was 15000 while 30000 appeared unwinnable. That appearance was three defects (see
+     * {@link #drivenBattleDemo()}); with them fixed the party wins 8 of 8 here.
      */
-    private static final int DRIVEN_ENEMY_HP = 15_000;
+    private static final int DRIVEN_ENEMY_HP = 30_000;
 
     /**
      * 三月七 (March 7th)'s character id -- the one party member whose technique is modelled.
