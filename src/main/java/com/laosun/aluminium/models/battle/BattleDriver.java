@@ -223,6 +223,21 @@ public final class BattleDriver {
         if (decision.targets().isEmpty()) {
             return;
         }
+        // ⚠ An ultimate must go through `castUltra`, NOT through the ordinary action path.
+        //
+        // Measured: routing it through `performAction` made ultimates FREE on the driven path. `castUltra` is the
+        // only entry that spends the bar (`lastUltEnergySpent = user.getCurrentEnergy(); user.setCurrentEnergy(0)`),
+        // and `useSkill` never touches energy -- so 姬子 fired her 120-cost ultimate four times in one fight with her
+        // bar reading 120 before and 120 after every cast, while calling `castUltra` directly in isolation drained it
+        // correctly to 15. The hand-written demo hid this because it calls `castUltra` itself; the moment the engine
+        // owned the choice, nothing paid for the ultimate.
+        //
+        // Note: the order matters. `castUltra` zeroes the bar BEFORE the ultimate body settles, deliberately, so the
+        // kill/break energy the ultimate itself earns is not wiped by the zeroing.
+        if (decision.skill() == actor.getSkills().get(com.laosun.aluminium.enums.SkillType.ULTRA)) {
+            battle.castUltra(actor, decision.targets());
+            return;
+        }
         SkillEffectTypeCategory category = categoryOf(decision);
         if (category == SkillEffectTypeCategory.NON_DAMAGING) {
             battle.applySkillPointCost(decision.skill(), actor);
