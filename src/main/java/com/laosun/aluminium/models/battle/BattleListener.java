@@ -112,6 +112,19 @@ public interface BattleListener {
     }
 
     /**
+     * A data rule fired.
+     *
+     * <p>⚠ This is the only notification for a talent whose effect is not damage, a heal or a shield. The engine announces
+     * THOSE effects, so a talent that only raises a skill level, gains a resource, applies a control or installs a rule
+     * reaches no other hook -- measured: forty-four rule effects in twenty turns, six of them visible.
+     *
+     * @param owner the unit the rule belongs to
+     * @param op    the operation it performed, as the data names it
+     */
+    default void onRule(CanHit owner, String op) {
+    }
+
+    /**
      * The battle reached a terminal state or the turn ceiling.
      *
      * @param result how it ended

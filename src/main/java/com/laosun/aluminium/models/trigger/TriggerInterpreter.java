@@ -490,6 +490,13 @@ public final class TriggerInterpreter {
 
     private static void applyOne(Battle battle, EffectSpec effect, TriggerContext ctx,
                                  double previousCredited) {
+        // ⚠ The only place that sees EVERY rule effect: the engine announces effects elsewhere, but a rule whose
+        // effect is a skill-level raise or a resource gain reaches no other hook at all.
+        // ⚠ Guarded: `apply(null, ...)` is a supported call for single-target selectors -- the engine's own unit tests use it,
+        // because MODIFY_ATTR only touches the resolved unit. An announcement must not make that illegal.
+        if (battle != null) {
+            battle.announceRuleFired(ctx.owner(), effect.getOp());
+        }
         String op = normalizeOp(effect, null);
         switch (op) {
             case "ADD_ELEMENTAL_WEAKNESS" -> {
