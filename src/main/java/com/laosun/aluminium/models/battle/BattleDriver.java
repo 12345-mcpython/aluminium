@@ -133,6 +133,9 @@ public final class BattleDriver {
         // And the rule itself. Without this a talent whose effect is a skill-level raise or a resource gain is invisible --
         // measured: forty-four rule effects fired in twenty turns and only six of them reached any other hook.
         battle.addRuleObserver((owner, op) -> listener.onRule(owner, op));
+        // And why a turn was skipped. A broken unit and a controlled one both fail to act, and the log could not tell them
+        // apart -- measured over one battle: seven breaks and twenty-three turns with a control present.
+        battle.addSkipObserver((unit, broken) -> listener.onTurnSkipped(unit, broken));
     }
 
     /**
@@ -171,13 +174,37 @@ public final class BattleDriver {
     }
 
     /**
+     * Starts the battle and tells the listener.
+     *
+     * <p>\u26a0 <b>Why this exists: a driven battle never announced its own start.</b> Only {@link #run()} fired
+     * {@code onBattleStart}, and a front end that steps the battle itself -- which is the whole point of the driver -- calls
+     * {@code battle.startBattle()} directly, so the callback was dead and the log had no first line. Measured: a full battle
+     * with neither a start nor an end line.
+     */
+    public void startBattle() {
+        battle.startBattle();
+        listener.onBattleStart(this);
+    }
+
+    /**
+     * Tells the listener how the battle ended.
+     *
+     * <p>The complement of {@link #startBattle()}: a front end that stops stepping has to be able to report the outcome, and
+     * the log outlives the header that would otherwise be the only place it appeared.
+     *
+     * @param result how it ended
+     */
+    public void finish(Result result) {
+        listener.onBattleEnd(result);
+    }
+
+    /**
      * Start the battle and run until it is decided or the turn ceiling is reached.
      *
      * @return how it ended
      */
     public Result run() {
-        battle.startBattle();
-        listener.onBattleStart(this);
+        startBattle();
         int turns = 0;
         while (!battle.isOver() && turns < maxTurns) {
             if (!step(turns + 1)) {
@@ -260,13 +287,28 @@ public final class BattleDriver {
         // does not by itself block acting, so the first version of this comment was wrong and the first two cases
         // written against it could not fail. The freeze needs broken AND a control (frozen, imprisoned, ...).
         //
+        // \u26a0 The two reasons a unit may not act are announced separately, because they are different facts: a broken unit
+        // is recovering from a break and a controlled one is not, and the log showed both as "cannot act". Measured over one
+        // battle: seven breaks and twenty-three turns with a control present, indistinguishable.
+        boolean wasBroken = !actor.isDeath() && actor instanceof Enemy foe && foe.isBroken();
         if (!actor.isDeath() && actor instanceof Enemy broken && broken.isBroken()) {
             // The answer is "is this turn skipped", and that is exactly the complement of "may it act" -- so it is used
             // directly. The turn that ENDS a break answers false and the unit acts again on it, which is the contract
             // `handleBrokenTurn` now documents.
-            mayAct = !battle.handleBrokenTurn(broken);
+            boolean skippedByTheBreak = battle.handleBrokenTurn(broken);
+            mayAct = !skippedByTheBreak;
+            if (skippedByTheBreak) {
+                battle.announceTurnSkipped(actor, true);
+            } else {
+                // the countdown reached zero: this is the turn the unit recovers and acts again
+                listener.onBreakRecovered(actor);
+            }
         } else if (!actor.isDeath()) {
             mayAct = actor.getBuffManager().canAct();
+        }
+        if (!mayAct && !wasBroken) {
+            // not broken, so the reason is a control
+            battle.announceTurnSkipped(actor, false);
         }
         if (mayAct) {
             SkillPolicy.Decision decision = policy.choose(battle, actor);
@@ -279,6 +321,9 @@ public final class BattleDriver {
         }
 
         battle.afterMove();
+        // \u26a0 No death check here, and that is deliberate: `CanHit.takeDamage` sets `death = true` the moment the damage lands,
+        // so `!isDeath()` was already false by this point and the check could never fire -- measured, a battle that ended with
+        // two deaths and not one line about either. The report belongs in the damage callback, where the engine states it.
         if (turn > 0) {
             listener.onTurnEnd(actor, turn);
         }

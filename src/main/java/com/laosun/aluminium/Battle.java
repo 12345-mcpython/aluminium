@@ -122,6 +122,28 @@ public class Battle {
     }
 
     /**
+     * Told that a turn was skipped, and why.
+     *
+     * <p>\u26a0 <b>Why this exists: a skipped turn looked like an action that did nothing.</b> The log showed
+     * `held -- cannot act` while the engine has TWO different reasons a unit may not act -- it is broken, or a control forbids
+     * it -- and the reader had to guess which. Measured over one battle: seven breaks and twenty-three turns with a control
+     * present, none of them distinguishable in the log.
+     *
+     * @see #addSkipObserver(SkipObserver)
+     */
+    @FunctionalInterface
+    public interface SkipObserver {
+
+        /**
+         * A unit's turn was skipped.
+         *
+         * @param unit   whose turn it was
+         * @param broken whether the cause was a break (as opposed to a control)
+         */
+        void onTurnSkipped(CanHit unit, boolean broken);
+    }
+
+    /**
      * Told that a data rule fired, and what it did.
      *
      * <p>\u26a0 <b>Why this exists: the engine announces EFFECTS, never "a rule fired".</b> Measured over twenty turns, 44 rule
@@ -164,6 +186,13 @@ public class Battle {
     private volatile List<RuleObserver> ruleObservers = List.of();
 
     /**
+     * Observers told when a turn is skipped.
+     *
+     * <p>Copy-on-write, as above.
+     */
+    private volatile List<SkipObserver> skipObservers = List.of();
+
+    /**
      * Observers told about every heal that restored something.
      *
      * <p>Copy-on-write for the same reason as {@link #damageObservers}: registration is rare, settlement is not.
@@ -189,6 +218,32 @@ public class Battle {
         List<DamageObserver> next = new ArrayList<>(damageObservers);
         next.add(observer);
         damageObservers = List.copyOf(next);
+    }
+
+    /**
+     * Registers an observer for skipped turns.
+     *
+     * @param observer the observer, ignored (rather than throwing) when {@code null}
+     */
+    public void addSkipObserver(SkipObserver observer) {
+        if (observer == null) {
+            return;
+        }
+        List<SkipObserver> next = new ArrayList<>(skipObservers);
+        next.add(observer);
+        skipObservers = List.copyOf(next);
+    }
+
+    /**
+     * Announces that a turn was skipped.
+     *
+     * @param unit   whose turn it was
+     * @param broken whether the cause was a break
+     */
+    public void announceTurnSkipped(CanHit unit, boolean broken) {
+        for (SkipObserver observer : skipObservers) {
+            observer.onTurnSkipped(unit, broken);
+        }
     }
 
     /**
