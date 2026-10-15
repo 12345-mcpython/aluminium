@@ -1,5 +1,6 @@
 package com.laosun.aluminium.models.battle;
 
+import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.models.CanHit;
 import com.laosun.aluminium.models.Damage;
 
@@ -120,6 +121,31 @@ public interface BattleListener {
      * @param unit the unit that recovered
      */
     default void onBreakRecovered(CanHit unit) {
+    }
+
+    /**
+     * A weakness break happened.
+     *
+     * <p>\u26a0 Announced because it was invisible: the engine broadcast it to the buff hooks, and a screen was never told, so
+     * seven breaks in one battle left no trace.
+     *
+     * @param attacker who broke it
+     * @param target   the unit that was broken
+     * @param element  the element that broke it
+     */
+    default void onBroken(CanHit attacker, CanHit target, DamageElement element) {
+    }
+
+    /**
+     * A control state landed on a unit.
+     *
+     * <p>\u26a0 Landed, not attempted -- a resisted control is a different event.
+     *
+     * @param applier who applied it
+     * @param target  the unit it landed on
+     * @param name    the state's name
+     */
+    default void onControl(CanHit applier, CanHit target, String name) {
     }
 
     /**
