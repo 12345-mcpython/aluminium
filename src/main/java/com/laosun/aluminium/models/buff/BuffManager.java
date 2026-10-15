@@ -1221,6 +1221,21 @@ public class BuffManager {
      * @param <T>  the buff type
      * @return a new list of the attached instances, oldest first; empty for {@code null}
      */
+    /**
+     * <b>A snapshot</b> of every buff on this unit, in attachment order (oldest first).
+     *
+     * <p>Same guarantee as {@link #allBuffsOf(Class)} and for the same reason -- a caller holding the live list could mutate
+     * it, and `getBuffs()` is deliberately absent for exactly that reason. This answers the question a detail screen asks:
+     * "what is on this unit", where {@code allBuffsOf} answers it one class at a time.
+     *
+     * <p>⚠ The returned list is a copy, so a caller may iterate it while the manager adds or removes buffs.
+     *
+     * @return a new list of the attached instances, oldest first; never {@code null}
+     */
+    public List<AbstractBuff> activeBuffs() {
+        return List.copyOf(buffs);
+    }
+
     public <T extends AbstractBuff> List<T> allBuffsOf(Class<T> kind) {
         if (kind == null) {
             return List.of();
