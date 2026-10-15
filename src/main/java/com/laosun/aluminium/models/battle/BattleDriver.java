@@ -126,6 +126,10 @@ public final class BattleDriver {
         // `Battle.DamageObserver` for why a front end cannot work it out for itself.
         battle.addDamageObserver((damage, applied, hpLoss, shieldAbsorbed, died) ->
                 listener.onDamage(damage, applied, hpLoss, shieldAbsorbed, died));
+        // The other two figures a front end cannot reconstruct for itself: how much a heal restored, and how much shield
+        // actually stood. Both are computed inside the engine and then forgotten.
+        battle.addHealObserver((healer, target, healed) -> listener.onHeal(healer, target, healed));
+        battle.addShieldObserver((provider, target, granted) -> listener.onShield(provider, target, granted));
     }
 
     /**

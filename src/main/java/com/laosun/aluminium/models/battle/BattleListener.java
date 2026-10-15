@@ -86,6 +86,32 @@ public interface BattleListener {
     }
 
     /**
+     * A heal restored health.
+     *
+     * <p>Carries the amount <b>actually</b> restored, which is not the amount requested: the engine caps it against the
+     * target's maximum and does nothing at all for the dead.
+     *
+     * @param healer the one who healed
+     * @param target the one healed
+     * @param healed the HP actually restored, always above zero
+     */
+    default void onHeal(CanHit healer, CanHit target, double healed) {
+    }
+
+    /**
+     * A shield was granted and left standing.
+     *
+     * <p>Carries the amount applied <b>after</b> the provider's own shield boost, so a listener reporting the requested
+     * figure would print a number the battle does not have. Not fired for a grant that only clears a shield.
+     *
+     * @param provider who granted it
+     * @param target   who received it
+     * @param granted  the shield value actually applied
+     */
+    default void onShield(CanHit provider, CanHit target, double granted) {
+    }
+
+    /**
      * The battle reached a terminal state or the turn ceiling.
      *
      * @param result how it ended
