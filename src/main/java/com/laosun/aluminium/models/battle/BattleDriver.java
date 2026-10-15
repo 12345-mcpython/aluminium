@@ -130,6 +130,9 @@ public final class BattleDriver {
         // actually stood. Both are computed inside the engine and then forgotten.
         battle.addHealObserver((healer, target, healed) -> listener.onHeal(healer, target, healed));
         battle.addShieldObserver((provider, target, granted) -> listener.onShield(provider, target, granted));
+        // And the rule itself. Without this a talent whose effect is a skill-level raise or a resource gain is invisible --
+        // measured: forty-four rule effects fired in twenty turns and only six of them reached any other hook.
+        battle.addRuleObserver((owner, op) -> listener.onRule(owner, op));
     }
 
     /**

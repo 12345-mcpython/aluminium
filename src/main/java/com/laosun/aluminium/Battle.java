@@ -122,12 +122,46 @@ public class Battle {
     }
 
     /**
+     * Told that a data rule fired, and what it did.
+     *
+     * <p>\u26a0 <b>Why this exists: the engine announces EFFECTS, never "a rule fired".</b> Measured over twenty turns, 44 rule
+     * effects were applied and only six of them -- the damage, shield and heal -- produced anything a screen could show. The
+     * rest were silent, so a talent whose whole effect is "raise the skill level" or "gain a resource" was invisible: it
+     * happened, and nothing anywhere said so.
+     *
+     * <p>It reports and cannot change anything, like the other observers.
+     *
+     * @see #addRuleObserver(RuleObserver)
+     */
+    @FunctionalInterface
+    public interface RuleObserver {
+
+        /**
+         * One rule effect was applied.
+         *
+         * <p>\u26a0 A rule that does several things reports each of them separately, because they are applied separately -- a
+         * talent that freezes a target and heals its owner is two effects, and collapsing them would hide one.
+         *
+         * @param owner the unit the rule belongs to
+         * @param op    the operation it performed, as the data names it
+         */
+        void onRuleFired(CanHit owner, String op);
+    }
+
+    /**
      * Observers told about every settled damage instance.
      *
      * <p>Copy-on-write: registration is rare and a settlement is not, so iteration must not allocate or risk
      * concurrent modification while a battle is running.
      */
     private volatile List<DamageObserver> damageObservers = List.of();
+
+    /**
+     * Observers told about every rule that fires.
+     *
+     * <p>Copy-on-write, as above.
+     */
+    private volatile List<RuleObserver> ruleObservers = List.of();
 
     /**
      * Observers told about every heal that restored something.
@@ -155,6 +189,34 @@ public class Battle {
         List<DamageObserver> next = new ArrayList<>(damageObservers);
         next.add(observer);
         damageObservers = List.copyOf(next);
+    }
+
+    /**
+     * Registers an observer for rules that fire.
+     *
+     * @param observer the observer, ignored (rather than throwing) when {@code null}
+     */
+    public void addRuleObserver(RuleObserver observer) {
+        if (observer == null) {
+            return;
+        }
+        List<RuleObserver> next = new ArrayList<>(ruleObservers);
+        next.add(observer);
+        ruleObservers = List.copyOf(next);
+    }
+
+    /**
+     * Announces that a rule effect was applied.
+     *
+     * <p>Called from {@code TriggerInterpreter.applyOne}, the single place every rule effect passes through.
+     *
+     * @param owner the unit the rule belongs to
+     * @param op    the operation performed
+     */
+    public void announceRuleFired(CanHit owner, String op) {
+        for (RuleObserver observer : ruleObservers) {
+            observer.onRuleFired(owner, op);
+        }
     }
 
     /**
