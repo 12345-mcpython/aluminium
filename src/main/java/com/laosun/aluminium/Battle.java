@@ -73,12 +73,75 @@ public class Battle {
     }
 
     /**
+     * Told how much a heal actually restored.
+     *
+     * <p>A sibling of {@link DamageObserver}, and an observer for the same reason: the amount restored is computed
+     * inside {@code heal} and then forgotten, so a front end cannot recover it -- reading the target's HP before and
+     * after would be wrong the moment anything else moves HP in between.
+     *
+     * @see #addHealObserver(HealObserver)
+     */
+    @FunctionalInterface
+    public interface HealObserver {
+
+        /**
+         * A heal restored health.
+         *
+         * <p>Not fired for a heal that restored nothing (a heal on a corpse, or at full HP): that is not a heal event,
+         * and reporting "0 healed" would put a row on screen for something that did not happen.
+         *
+         * @param healer the one who healed
+         * @param target the one healed
+         * @param healed the HP actually restored
+         */
+        void onHealSettled(CanHit healer, CanHit target, double healed);
+    }
+
+    /**
+     * Told how much shield a grant actually applied.
+     *
+     * <p>Not the amount that was asked for: the provider's own shield boost is applied inside {@code grantShield}, so a
+     * caller that reported the request would print a number the battle does not have.
+     *
+     * @see #addShieldObserver(ShieldObserver)
+     */
+    @FunctionalInterface
+    public interface ShieldObserver {
+
+        /**
+         * A shield was granted and left standing.
+         *
+         * <p>Not fired when the grant clears a shield ({@code amount <= 0} is how this API spells "clear it") or when
+         * the target is dead: neither puts a shield on the field, and "gained 0 shield" is not a fact worth a row.
+         *
+         * @param provider who granted it
+         * @param target   who received it
+         * @param granted  the shield value actually applied
+         */
+        void onShieldGranted(CanHit provider, CanHit target, double granted);
+    }
+
+    /**
      * Observers told about every settled damage instance.
      *
      * <p>Copy-on-write: registration is rare and a settlement is not, so iteration must not allocate or risk
      * concurrent modification while a battle is running.
      */
     private volatile List<DamageObserver> damageObservers = List.of();
+
+    /**
+     * Observers told about every heal that restored something.
+     *
+     * <p>Copy-on-write for the same reason as {@link #damageObservers}: registration is rare, settlement is not.
+     */
+    private volatile List<HealObserver> healObservers = List.of();
+
+    /**
+     * Observers told about every shield that was granted.
+     *
+     * <p>Copy-on-write, as above.
+     */
+    private volatile List<ShieldObserver> shieldObservers = List.of();
 
     /**
      * Registers an observer for settled damage.
@@ -92,6 +155,34 @@ public class Battle {
         List<DamageObserver> next = new ArrayList<>(damageObservers);
         next.add(observer);
         damageObservers = List.copyOf(next);
+    }
+
+    /**
+     * Registers an observer for settled heals.
+     *
+     * @param observer the observer, ignored (rather than throwing) when {@code null}
+     */
+    public void addHealObserver(HealObserver observer) {
+        if (observer == null) {
+            return;
+        }
+        List<HealObserver> next = new ArrayList<>(healObservers);
+        next.add(observer);
+        healObservers = List.copyOf(next);
+    }
+
+    /**
+     * Registers an observer for granted shields.
+     *
+     * @param observer the observer, ignored (rather than throwing) when {@code null}
+     */
+    public void addShieldObserver(ShieldObserver observer) {
+        if (observer == null) {
+            return;
+        }
+        List<ShieldObserver> next = new ArrayList<>(shieldObservers);
+        next.add(observer);
+        shieldObservers = List.copyOf(next);
     }
 
     public Queue queue;
@@ -2487,6 +2578,12 @@ public class Battle {
         if (healed > 0) {
             broadcastHeal(healer, target, healed);
             fireTriggersForAlly(TriggerEvent.HEALED, healer, target, healed);
+            // The restored amount exists only here: `CanHit.heal` caps it against the target's maximum and silently does
+            // nothing for the dead, so the request is not the answer and the HP difference is not one either once
+            // anything else moves HP.
+            for (HealObserver observer : healObservers) {
+                observer.onHealSettled(healer, target, healed);
+            }
         }
         return healed;
     }
@@ -2614,6 +2711,10 @@ public class Battle {
         // ShieldBuff, which has no Battle handle, so the interpreter announces that one itself.
         if (value > 0) {
             fireTriggersForAlly(TriggerEvent.SHIELD_GRANTED, provider, target, value);
+            // The amount AFTER the provider's own shield boost -- the request would be a number the battle does not have.
+            for (ShieldObserver observer : shieldObservers) {
+                observer.onShieldGranted(provider, target, value);
+            }
         }
         return value;
     }
