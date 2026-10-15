@@ -112,6 +112,39 @@ public interface BattleListener {
     }
 
     /**
+     * A broken unit's break ended and it acted again.
+     *
+     * <p>\u26a0 The complement of {@link #onTurnSkipped}: without it a break's end was invisible, and the log could not say
+     * whether the unit was still broken or had recovered on this very turn.
+     *
+     * @param unit the unit that recovered
+     */
+    default void onBreakRecovered(CanHit unit) {
+    }
+
+    /**
+     * A unit's turn was skipped, and why.
+     *
+     * <p>\u26a0 The reason matters: a broken unit and a controlled one both fail to act, and the log could not tell them apart.
+     *
+     * @param unit   whose turn it was
+     * @param broken whether the cause was a break
+     */
+    default void onTurnSkipped(CanHit unit, boolean broken) {
+    }
+
+    /**
+     * A unit died.
+     *
+     * <p>\u26a0 Announced because a death was otherwise silent: the unit simply stopped appearing in the action bar, and a
+     * reader could not tell a kill from a target that had gone out of range.
+     *
+     * @param unit the unit that died
+     */
+    default void onDeath(CanHit unit) {
+    }
+
+    /**
      * A data rule fired.
      *
      * <p>⚠ This is the only notification for a talent whose effect is not damage, a heal or a shield. The engine announces
