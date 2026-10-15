@@ -136,6 +136,10 @@ public final class BattleDriver {
         // And why a turn was skipped. A broken unit and a controlled one both fail to act, and the log could not tell them
         // apart -- measured over one battle: seven breaks and twenty-three turns with a control present.
         battle.addSkipObserver((unit, broken) -> listener.onTurnSkipped(unit, broken));
+        // A break and a landed control. Both were announced only to the buff hooks, so a screen saw neither -- measured: seven
+        // breaks in one battle, and not one line about any of them.
+        battle.addBreakObserver((attacker, target, element) -> listener.onBroken(attacker, target, element));
+        battle.addControlObserver((applier, target, name) -> listener.onControl(applier, target, name));
     }
 
     /**

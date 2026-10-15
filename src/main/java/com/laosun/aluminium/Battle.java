@@ -122,6 +122,49 @@ public class Battle {
     }
 
     /**
+     * Told that a weakness break just happened.
+     *
+     * <p>\u26a0 <b>Why this exists: a break was broadcast only to the buff hooks.</b> The engine fires {@code events.weaknessBreak}
+     * so buffs can react, and a LISTENER -- the thing a screen attaches -- was never told, so seven breaks in one battle
+     * produced no log line at all.
+     *
+     * @see #addBreakObserver(BreakObserver)
+     */
+    @FunctionalInterface
+    public interface BreakObserver {
+
+        /**
+         * A weakness break happened.
+         *
+         * @param attacker who broke it
+         * @param target   the unit that was broken
+         * @param element  the element that broke it
+         */
+        void onBroken(CanHit attacker, CanHit target, DamageElement element);
+    }
+
+    /**
+     * Told that a control state landed on a unit.
+     *
+     * <p>\u26a0 Landed, not attempted: the engine rolls the control through the resist pipeline, and a resisted application is a
+     * different event. Reporting the attempt would claim a freeze that never happened.
+     *
+     * @see #addControlObserver(ControlObserver)
+     */
+    @FunctionalInterface
+    public interface ControlObserver {
+
+        /**
+         * A control state was applied.
+         *
+         * @param applier who applied it
+         * @param target  the unit it landed on
+         * @param name    the state's own name (冻结)
+         */
+        void onControl(CanHit applier, CanHit target, String name);
+    }
+
+    /**
      * Told that a turn was skipped, and why.
      *
      * <p>\u26a0 <b>Why this exists: a skipped turn looked like an action that did nothing.</b> The log showed
@@ -193,6 +236,20 @@ public class Battle {
     private volatile List<SkipObserver> skipObservers = List.of();
 
     /**
+     * Observers told about weakness breaks.
+     *
+     * <p>Copy-on-write, as above.
+     */
+    private volatile List<BreakObserver> breakObservers = List.of();
+
+    /**
+     * Observers told about landed controls.
+     *
+     * <p>Copy-on-write, as above.
+     */
+    private volatile List<ControlObserver> controlObservers = List.of();
+
+    /**
      * Observers told about every heal that restored something.
      *
      * <p>Copy-on-write for the same reason as {@link #damageObservers}: registration is rare, settlement is not.
@@ -218,6 +275,60 @@ public class Battle {
         List<DamageObserver> next = new ArrayList<>(damageObservers);
         next.add(observer);
         damageObservers = List.copyOf(next);
+    }
+
+    /**
+     * Registers an observer for weakness breaks.
+     *
+     * @param observer the observer, ignored (rather than throwing) when {@code null}
+     */
+    public void addBreakObserver(BreakObserver observer) {
+        if (observer == null) {
+            return;
+        }
+        List<BreakObserver> next = new ArrayList<>(breakObservers);
+        next.add(observer);
+        breakObservers = List.copyOf(next);
+    }
+
+    /**
+     * Announces a weakness break.
+     *
+     * @param attacker who broke it
+     * @param target   the unit that was broken
+     * @param element  the element that broke it
+     */
+    public void announceBroken(CanHit attacker, CanHit target, DamageElement element) {
+        for (BreakObserver observer : breakObservers) {
+            observer.onBroken(attacker, target, element);
+        }
+    }
+
+    /**
+     * Registers an observer for landed controls.
+     *
+     * @param observer the observer, ignored (rather than throwing) when {@code null}
+     */
+    public void addControlObserver(ControlObserver observer) {
+        if (observer == null) {
+            return;
+        }
+        List<ControlObserver> next = new ArrayList<>(controlObservers);
+        next.add(observer);
+        controlObservers = List.copyOf(next);
+    }
+
+    /**
+     * Announces that a control landed.
+     *
+     * @param applier who applied it
+     * @param target  the unit it landed on
+     * @param name    the state's name
+     */
+    public void announceControl(CanHit applier, CanHit target, String name) {
+        for (ControlObserver observer : controlObservers) {
+            observer.onControl(applier, target, name);
+        }
     }
 
     /**
@@ -2338,6 +2449,9 @@ public class Battle {
         // reaches this line a second time).
         // Placed before damage/delay/DOT/energy: listeners want the moment of "just got broken".
         broadcastBreak(attacker, enemy, element);
+        // \u26a0 And to the listener. `broadcastBreak` above reaches the buff hooks only, so a screen was never told a break had
+        // happened -- measured: seven breaks in one battle, no log line for any of them.
+        announceBroken(attacker, enemy, element);
         fireTriggersWithSubject(TriggerEvent.BREAK, attacker, enemy, 0, fromCast);
         // The break damage is settled right here, so the settled value must be carried out -- it belongs to
         // this attack, and dropping it would make AttackEvent.totalDamage miss a whole break chain.
