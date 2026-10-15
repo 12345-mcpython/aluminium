@@ -2006,11 +2006,30 @@ public class Battle {
      * @param early      {@code true} = before the move, {@code false} = after it
      */
     private void tickForeignBuffs(CanHit clockOwner, boolean early) {
-        for (CanHit ally : allies) {
-            if (ally != null && ally != clockOwner) {
-                ally.getBuffManager().tickForeign(clockOwner, early);
+        // \u26a0 BOTH camps. This walked `allies` only, so a state on an ENEMY whose clock is one of our characters was never
+        // spent: measured, 1203 Luocha's zone -- applied to all enemies, `ticksOn: "self"` -- held `duration() == 2` for fifteen
+        // consecutive turns with `tickOwner` correctly set to him. Nothing was wrong with the anchor; the sweep never reached it.
+        //
+        // The gap was invisible while that state sat on Luocha himself, because then it was the CARRIER's own tick that spent it.
+        for (CanHit unit : combatants()) {
+            if (unit != null && unit != clockOwner) {
+                unit.getBuffManager().tickForeign(clockOwner, early);
             }
         }
+    }
+
+    /**
+     * Every combatant on both sides, for the sweeps that must reach either camp.
+     *
+     * <p>\u26a0 Not `allies` plus `enemies` field access: the roster is fixed after construction but a summon joins mid-battle,
+     * and a sweep that read a stale list would miss it -- the same reason {@code Battle.enemyUnits()} exists.
+     *
+     * @return the combatants
+     */
+    private java.util.List<CanHit> combatants() {
+        java.util.List<CanHit> all = new java.util.ArrayList<>(allies);
+        all.addAll(enemies);
+        return all;
     }
 
     public void processRequests() {
