@@ -1817,26 +1817,6 @@ final class TriggerValidator {
         }
     }
 
-    /**
-     * Refuses {@code scope_element} on an op that does not read it.
-     *
-     * <p>\u26a0 This exists because the engine has no global "unknown argument" check -- refusals are per-op
-     * ({@link #rejectCountdownExtras}, {@link #rejectSkillLevelExtras}) -- so a field one op reads is SILENTLY IGNORED by the
-     * other forty. Measured: before this, {@code scope_element} was accepted everywhere, so a rule that wrote it on, say,
-     * {@code APPLY_BUFF} would look scoped and be unscoped.
-     *
-     * @param effect the effect
-     * @param op     the op, for the message
-     * @param spec   the rule, for the message
-     */
-    static void rejectForeignScopeElement(EffectSpec effect, String op, TriggerSpec spec) {
-        if (effect.getScopeElement() != null && !effect.getScopeElement().isBlank()) {
-            throw new IllegalArgumentException(
-                    "Op " + op + " does not read \"scope_element\" (only MODIFY_DAMAGE_TAKEN scopes a damage-taken zone by "
-                            + "element), so the scope would be silently ignored (source: " + spec.getSource() + ")");
-        }
-    }
-
     static void requireElement(EffectSpec effect, String op, TriggerSpec spec, boolean allowAttackerElement) {
         if (allowAttackerElement && effect.getElement() != null
                 && TriggerInterpreter.ATTACKER_ELEMENT.equalsIgnoreCase(effect.getElement().trim())) {
