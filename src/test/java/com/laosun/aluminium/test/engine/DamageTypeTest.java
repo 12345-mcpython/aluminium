@@ -10,7 +10,9 @@ import org.junit.jupiter.api.Test;
 public class DamageTypeTest {
     @Test
     public void valueCount() {
-        Assertions.assertEquals(12, DamageType.values().length);
+        // \u26a0 13 since TALENT: a Talent's follow-up had been indistinguishable from a counter and from an ultimate's extra hits,
+        // and the type is what names it. Raising this number is the point of the guard.
+        Assertions.assertEquals(13, DamageType.values().length);
     }
 
     @Test
@@ -53,5 +55,24 @@ public class DamageTypeTest {
     public void fromStringRejectsUnknown() {
         Assertions.assertThrows(IllegalArgumentException.class, () -> DamageType.fromString("nope"));
         Assertions.assertThrows(IllegalArgumentException.class, () -> DamageType.fromString(null));
+    }
+
+    /**
+     * \u2b50 TALENT behaves as ADDITIONAL does, in every mechanical way.
+     *
+     * <p>It exists to NAME a Talent's follow-up, not to change one: a Talent's damage IS additional damage, so it crits and is
+     * boostable exactly as `ADDITIONAL` is, and it collects the follow-up boost. A difference in any of those would silently move
+     * damage numbers, which is why it is asserted rather than assumed.
+     */
+    @Test
+    public void talentFollowsAdditionalRules() {
+        Assertions.assertEquals(DamageType.ADDITIONAL.isCrittable(), DamageType.TALENT.isCrittable(),
+                "a Talent's follow-up crits exactly as additional damage does");
+        Assertions.assertEquals(DamageType.ADDITIONAL.isBoostable(), DamageType.TALENT.isBoostable(),
+                "and the damage-bonus zone applies to it in exactly the same way");
+        Assertions.assertEquals(DamageType.TALENT, DamageType.fromString("talent"),
+                "the string table resolves it");
+        Assertions.assertEquals(DamageType.TALENT, DamageType.fromString("TALENT"),
+                "case-insensitively, like every other entry");
     }
 }
