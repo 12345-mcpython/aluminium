@@ -118,6 +118,7 @@ public class EffectSpec {
         copy.targetWhen = this.targetWhen == null ? null : new java.util.ArrayList<>(this.targetWhen);
         copy.effectMaxStacks = this.effectMaxStacks;
         copy.damageType = this.damageType;
+        copy.scopeElement = this.scopeElement;
         copy.capScale = this.capScale;
         copy.capPercent = this.capPercent;
         copy.capAmount = this.capAmount;
@@ -524,6 +525,19 @@ public class EffectSpec {
 
     @SerializedName("damage_type")
     private String damageType;
+
+    /**
+     * The one ELEMENT a damage-taken zone is about, e.g. "increases the Fire DMG the target takes".
+     *
+     * <p>⚠ A field of its own, NOT {@code element}: that one is what {@code DAMAGE}, {@code APPLY_DOT} and
+     * {@code APPLY_CONTROL} read for the element of the thing they produce, and a zone's scope is a different fact. Reading the
+     * same field for both meanings would make one of them wrong the first time a rule needed the other.
+     *
+     * <p>Read by {@code MODIFY_DAMAGE_TAKEN} only. {@code null} -- the state of every rule written before it -- means the zone
+     * applies to every element, exactly as before.
+     */
+    @SerializedName("scope_element")
+    private String scopeElement;
 
     /**
      * Duration in turns, where the op needs one.

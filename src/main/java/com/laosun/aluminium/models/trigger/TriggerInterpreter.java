@@ -1402,9 +1402,14 @@ public final class TriggerInterpreter {
         int turns = permanent ? TriggerEffects.UNBOUNDED_DURATION_PLACEHOLDER : effect.getTurns();
         // "break damage taken is raised": an optional damage-type scope, spelled with the enum's own names.
         com.laosun.aluminium.enums.DamageType scope = parseDamageType(effect, "MODIFY_DAMAGE_TAKEN", null);
+        // "increases the Fire DMG the target takes": the ELEMENT scope, beside the damage-type one. Each is checked by the zone
+        // itself, so nothing here decides precedence.
+        com.laosun.aluminium.enums.DamageElement elementScope = parseScopeElement(effect, "MODIFY_DAMAGE_TAKEN");
         for (CanHit target : TriggerTargets.resolveTargets(battle, effect, ctx)) {
             AbstractBuff zone = withSource(TriggerLifetimes.withTickOwner(TriggerLifetimes.withLifetime(percent > 0
-                    ? new VulnerabilityBuff(turns, percent, permanent, scope)
+                    // \u26a0 The element scope goes to the VULNERABILITY branch only: measured, `ReductionBuff` has no scope
+                    // field and no guard at all -- only the vulnerability half ever scoped.
+                    ? new VulnerabilityBuff(turns, percent, permanent, scope, elementScope)
                     : new ReductionBuff(turns, -percent, permanent, scope), effect), effect, ctx), ctx);
             // Note: `withTickOwner` joined this chain on. It was missing, so `ticks_on` was a SILENT no-op on
             // this op: 1218's zone carried `ticks_on: "self"` and its clock still belonged to the carrier, which meant
@@ -1625,6 +1630,33 @@ public final class TriggerInterpreter {
      * <p>Note: A misspelling that silently meant "all damage types" would be a wrong number with no symptom - the same hole the
      * closed-set checks elsewhere in this interpreter exist to close, so the error names every legal value.
      */
+    /**
+     * Reads an optional {@code scope_element} for a damage-taken zone and turns it into the engine's own spelling.
+     *
+     * <p>The sibling of {@link #parseDamageType}, closed the same way: a misspelling that silently meant "every element" would be a
+     * wrong number with no symptom, so the error names every legal value.
+     *
+     * <p>⚠ {@code scope_element}, not {@code element}: the latter belongs to {@code DAMAGE} / {@code APPLY_DOT} /
+     * {@code APPLY_CONTROL}, which use it for the element of what they produce. A zone's scope is a different fact.
+     *
+     * @param effect the effect
+     * @param op     the op, for the message
+     * @return the element, or {@code null} when the rule names none
+     */
+    static com.laosun.aluminium.enums.DamageElement parseScopeElement(EffectSpec effect, String op) {
+        String raw = effect.getScopeElement();
+        if (raw == null || raw.isBlank()) {
+            return null;
+        }
+        try {
+            return com.laosun.aluminium.enums.DamageElement.fromString(raw.trim());
+        } catch (IllegalArgumentException unknown) {
+            throw new IllegalArgumentException(
+                    "Op " + op + " names the scope element '" + raw + "', which is not one this engine settles; known: "
+                            + java.util.Arrays.toString(com.laosun.aluminium.enums.DamageElement.values()));
+        }
+    }
+
     static com.laosun.aluminium.enums.DamageType parseDamageType(EffectSpec effect, String op, TriggerSpec spec) {
         String raw = effect.getDamageType();
         if (raw == null || raw.isBlank()) {

@@ -243,11 +243,12 @@ public class HimekoChargeTest {
     @Test
     public void theRestOfHerKitIsNotAuthored() {
         TriggerTable table = TriggerTables.of(HIMEKO);
-        // Note: 2 rules: "战斗开始时获得1点充能" and the rule that states which level her talent's numbers were
-        // quoted at ("quoted at Lv10" as a TALENT +9 raise) - before that the level lived in a `damage_level` field
-        // on the follow-up's damage effect.
-        Assertions.assertEquals(2, table.ruleCount(TriggerEvent.BATTLE_START),
-                "「战斗开始时获得1点充能」 (gains 1 point of Charge at the start of battle) and the talent's level statement");
+        // Note: 3 rules: "战斗开始时获得1点充能", the rule that states which level her talent's numbers were quoted at
+        // ("quoted at Lv10" as a TALENT +9 raise) - before that the level lived in a `damage_level` field on the
+        // follow-up's damage effect - and `technique_incomplete_combustion`, her 秘技.
+        Assertions.assertEquals(3, table.ruleCount(TriggerEvent.BATTLE_START),
+                "「战斗开始时获得1点充能」 (gains 1 point of Charge at the start of battle), the talent's level statement, "
+                        + "and her 秘技 「不完全燃烧」 (Incomplete Combustion), gated on `self has_state 秘技` like the other 38");
         Assertions.assertEquals(2, table.ruleCount(TriggerEvent.BREAK),
                 "\"when an enemy target's Weakness is Broken\" (「当有敌方目标的弱点被击破时」) (anybody's break) and Eidolon (星魂) 4's \"when casting the Skill ... causing a Weakness Break\" (「施放战技…造成弱点击破时」)");
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.ALLY_ATTACK), "\"after one of our targets casts an attack\" (「当我方目标施放攻击后」)");
