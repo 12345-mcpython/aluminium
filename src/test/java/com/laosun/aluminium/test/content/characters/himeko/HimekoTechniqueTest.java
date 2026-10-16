@@ -126,4 +126,44 @@ public class HimekoTechniqueTest {
         battle.startBattle();
         return battle;
     }
+
+    /**
+     * ⭐ The SETTLED number rises by exactly 10% for Fire, and not at all for Ice.
+     *
+     * <p>⚠ The other cases read the zone's own multiplier, which proves only that it was INJECTED. This one reads what the engine
+     * actually settles, because `Battle.applyDamage` is where a zone turns into damage: measured, Fire `550.799986` becomes
+     * `605.879985` -- a ratio of exactly 1.1 -- while Ice stays `359.999991` to the last digit. A zone attached to an instance whose
+     * settlement ignored it would pass every other case here and fail this one.
+     */
+    @Test
+    public void theSettledFireDamageRisesByTenPercent() {
+        double fireOff = settled(false, DamageElement.FIRE);
+        double fireOn = settled(true, DamageElement.FIRE);
+        double iceOff = settled(false, DamageElement.ICE);
+        double iceOn = settled(true, DamageElement.ICE);
+
+        Assertions.assertEquals(1.1, fireOn / fireOff, 1e-9,
+                "「使敌方目标受到的火属性伤害提高10%」 -- the settled Fire damage must scale by exactly 1.1: "
+                        + fireOff + " -> " + fireOn);
+        Assertions.assertEquals(iceOff, iceOn, 0.0,
+                "and Ice must be BIT-IDENTICAL, not merely close: an element scope is a filter, not a multiplier to trim. "
+                        + iceOff + " vs " + iceOn);
+    }
+
+    /**
+     * The damage the engine actually settles for one element's hit, against a nominal 1000 base.
+     *
+     * <p>⚠ Through {@link Battle#applyDamage}, the settlement entry point, so this goes through the whole zone pipeline -- defence,
+     * resistance, boosts and the vulnerable area together -- rather than summing the zone by hand.
+     *
+     * @param technique whether the technique was declared
+     * @param element   the element of the hit
+     * @return the settled amount
+     */
+    private static double settled(boolean technique, DamageElement element) {
+        Battle battle = battle(technique);
+        Enemy enemy = battle.enemyUnits().get(0);
+        return battle.applyDamage(enemy,
+                new Damage(battle.characters.get(0), enemy, element, DamageType.NORMAL, 1000));
+    }
 }

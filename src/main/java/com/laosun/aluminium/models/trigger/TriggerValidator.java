@@ -67,6 +67,17 @@ final class TriggerValidator {
                             + " read it; an op that ignores it would silently apply to every damage type "
                             + "(source: " + spec.getSource() + ")");
         }
+
+        // The same shape for the element scope: only MODIFY_DAMAGE_TAKEN reads it, so stating it anywhere else is refused
+        // rather than dropped silently. ⚠ This half was missing when the field was added, and the audit found it: the field
+        // was accepted by every op, so a scoped-looking rule on another op was in fact unscoped.
+        if (effect.getScopeElement() != null && !effect.getScopeElement().isBlank()
+                && !TriggerVocabulary.SCOPE_ELEMENT_READERS.contains(op)) {
+            throw new IllegalArgumentException(
+                    "Op " + op + " states \"scope_element\", but only " + TriggerVocabulary.SCOPE_ELEMENT_READERS
+                            + " read it; an op that ignores it would silently apply to every element "
+                            + "(source: " + spec.getSource() + ")");
+        }
         // `per_steps` and `SPEND_STEPS` are the two halves of one primitive - "every N points of a counter" as a repeat
         // COUNT and as a SPEND - so both spellings are checked here, at LOAD time, for every op that may state them.
         if (effect.getPerSteps() != null && !effect.getPerSteps().isBlank()) {
@@ -452,6 +463,9 @@ final class TriggerValidator {
             }
             case "MODIFY_DAMAGE_TAKEN" -> {
                 // "with a 100% base chance, raise the DoT damage taken by ...": an optional roll (see requireBaseChance).
+                // "increases the Fire DMG the target takes": an optional ELEMENT scope, validated because an unknown spelling
+                // would widen the zone rather than narrow it.
+                requireScopeElement(effect, op, spec);
                 requireBaseChance(effect, op, spec);
                 requirePercent(effect, op, spec);
                 requireNonZeroPercent(effect, op, spec);
@@ -1779,6 +1793,50 @@ final class TriggerValidator {
      * {@code APPLY_CONTROL} pass {@code false} -- their instance is the rule's own, so "the attacker's element"
      * is a sentence with no subject.
      */
+    /**
+     * Validates the optional {@code scope_element} of a damage-taken zone: an optional argument, but a CLOSED-SET one.
+     *
+     * <p>\u26a0 Optional, so an absent one passes. But a misspelling must not: {@link DamageElement#fromString} answers {@code null}
+     * for "Unknown" and for typos alike, and {@code parseScopeElement} turns that null into "no scope", i.e. a zone that applies to
+     * EVERY element -- a wrong number with no symptom, which is the hole the closed-set checks in this class exist to close.
+     *
+     * @param effect the effect
+     * @param op     the op, for the message
+     * @param spec   the rule, for the message
+     */
+    static void requireScopeElement(EffectSpec effect, String op, TriggerSpec spec) {
+        String raw = effect.getScopeElement();
+        if (raw == null || raw.isBlank()) {
+            return;
+        }
+        if (DamageElement.fromString(raw.trim()) == null) {
+            throw new IllegalArgumentException(
+                    "Op " + op + " names scope_element '" + raw + "', which is not a DamageElement spelling "
+                            + "(e.g. Fire / Ice / Wind / Thunder / Physical / Quantum / Imaginary); an unknown element would "
+                            + "widen the zone to every element instead of narrowing it (source: " + spec.getSource() + ")");
+        }
+    }
+
+    /**
+     * Refuses {@code scope_element} on an op that does not read it.
+     *
+     * <p>\u26a0 This exists because the engine has no global "unknown argument" check -- refusals are per-op
+     * ({@link #rejectCountdownExtras}, {@link #rejectSkillLevelExtras}) -- so a field one op reads is SILENTLY IGNORED by the
+     * other forty. Measured: before this, {@code scope_element} was accepted everywhere, so a rule that wrote it on, say,
+     * {@code APPLY_BUFF} would look scoped and be unscoped.
+     *
+     * @param effect the effect
+     * @param op     the op, for the message
+     * @param spec   the rule, for the message
+     */
+    static void rejectForeignScopeElement(EffectSpec effect, String op, TriggerSpec spec) {
+        if (effect.getScopeElement() != null && !effect.getScopeElement().isBlank()) {
+            throw new IllegalArgumentException(
+                    "Op " + op + " does not read \"scope_element\" (only MODIFY_DAMAGE_TAKEN scopes a damage-taken zone by "
+                            + "element), so the scope would be silently ignored (source: " + spec.getSource() + ")");
+        }
+    }
+
     static void requireElement(EffectSpec effect, String op, TriggerSpec spec, boolean allowAttackerElement) {
         if (allowAttackerElement && effect.getElement() != null
                 && TriggerInterpreter.ATTACKER_ELEMENT.equalsIgnoreCase(effect.getElement().trim())) {

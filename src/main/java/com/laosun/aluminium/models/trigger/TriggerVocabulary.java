@@ -224,4 +224,14 @@ final class TriggerVocabulary {
      */
     static final java.util.Set<String> DAMAGE_TYPE_READERS =
             java.util.Set.of("BOOST_DAMAGE", "DAMAGE", "MODIFY_ATTR", "MODIFY_DAMAGE_TAKEN", "ADD_DAMAGE");
+
+    /**
+     * The ops that actually read {@code scope_element} (see the guard in
+     * {@link TriggerValidator#validateOne}).
+     *
+     * <p>\u26a0 One op, and the set exists for the reason {@link #DAMAGE_TYPE_READERS} does: the engine has no global
+     * "unknown argument" check, so a field one op reads is SILENTLY IGNORED by every other. A rule that wrote
+     * {@code scope_element} on, say, {@code APPLY_BUFF} would look scoped and not be.
+     */
+    static final java.util.Set<String> SCOPE_ELEMENT_READERS = java.util.Set.of("MODIFY_DAMAGE_TAKEN");
 }
