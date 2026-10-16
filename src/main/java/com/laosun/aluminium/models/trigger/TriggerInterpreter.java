@@ -2121,6 +2121,13 @@ public final class TriggerInterpreter {
         DamageType damageType = effect.getDamageType() == null || effect.getDamageType().isBlank()
                 ? null
                 : DamageType.fromString(effect.getDamageType().trim());
+        // \u26a0 A rule whose `skill` is TALENT deals a Talent's damage, and stating it here is what lets a screen tell it from a
+        // counter or an ultimate's extra hits -- measured, all three arrive as ADDITIONAL and a front end cannot separate them
+        // from the rule ordering (six attempts, each breaking a different case). The rule says so, so the engine stamps it.
+        // A rule that names its own `damage_type` keeps it: that is a deliberate statement about the instance.
+        if (damageType == null && "TALENT".equalsIgnoreCase(effect.getSkill())) {
+            damageType = DamageType.TALENT;
+        }
         double settledBase = damageType == DamageType.ELATION
                 ? base * (1 + elationSource.getAttribute(com.laosun.aluminium.enums.AttributeType.ELATION_DAMAGE_BOOST).get()) * (1 + elationSource.getAttribute(com.laosun.aluminium.enums.AttributeType.ELATION_DAMAGE_AMP).get()) * laughFactor(ctx, effect)
                 : base;

@@ -54,6 +54,11 @@ import java.util.Map;
 public enum DamageType {
     NORMAL("normal", true, true), SKILL("skill", true, true),
     ULTRA("ultra", true, true), ADDITIONAL("additional", true, true),
+    // ⚠ A Talent's follow-up. It IS additional damage -- same crit/boost flags, same follow-up boost -- with the
+    // difference that the engine can NAME it, which `ADDITIONAL` alone could not: a Talent's hit, a counter and an ultimate's
+    // extra hits were indistinguishable to a screen. Stated here rather than inferred downstream, because the rule says so
+    // (`SkillType.TALENT`) and inference was tried six times in the front end and broke a different case each time.
+    TALENT("talent", true, true),
     BREAK("break", false, false), SUPER_BREAK("super_break", false, false),
     DOT("dot", false, true), EXTRA("extra", true, true),
     // Maze Skill
@@ -72,6 +77,7 @@ public enum DamageType {
             Map.entry("skill", SKILL),
             Map.entry("ultra", ULTRA),
             Map.entry("additional", ADDITIONAL),
+            Map.entry("talent", TALENT),
             Map.entry("break", BREAK),
             Map.entry("super_break", SUPER_BREAK),
             Map.entry("dot", DOT),
