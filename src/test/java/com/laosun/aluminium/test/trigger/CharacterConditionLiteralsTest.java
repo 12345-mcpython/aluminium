@@ -15,7 +15,7 @@ import java.util.List;
  * both sides together (measured). To catch "the content itself was changed" the expectation must live here. The
  * literals are the parser's spelling: attribute names lowered, integral thresholds given a decimal point.
  *
- * <p>Generated from the shipped files; regenerate after any condition change (see GAPS.md).
+ * <p>Generated from the shipped files; regenerate after any condition change.
  */
 public class CharacterConditionLiteralsTest {
     private static final int LEVEL = 80;

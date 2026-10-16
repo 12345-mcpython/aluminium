@@ -105,7 +105,7 @@ public enum AttributeType {
     /**
      * 增笑 -- Elation damage's OWN amplifier, distinct from {@link #ELATION_DAMAGE_BOOST} (欢榆度).
      *
-     * <p>The spec at {@code ROADMAP.md:1262} keeps them apart on purpose:
+     * <p>The spec keeps them apart on purpose:
      * {@code 基础值 × 欢榆倍率 × (1+欢榆度) × (1+增笑) × (1+笑点×5/(笑点+240))} -- two separate factors, so a rule that
      * grants one must not be written as the other. The corpus glossary says the same: 增笑 is
      * "影响欢榆伤害的特殊效果，可额外提高造成的欢榆伤害".

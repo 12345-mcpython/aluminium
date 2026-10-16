@@ -10,7 +10,7 @@ import com.laosun.aluminium.models.skill.Skill;
  * Standard skill point (SP) policy: start at 3, cap 5, our side's basic attack +1,
  * skill -1, everything else neutral.
  *
- * <p>Rule table (see the full comparison and gap list in {@code engine.md} §9.6):
+ * <p>Rule table:
  *
  * <table border="1">
  *   <caption>Skill points granted or spent, by skill category</caption>
@@ -27,7 +27,7 @@ import com.laosun.aluminium.models.skill.Skill;
  * rather than "is it player-controlled": when friendly summons (memosprite) are added later they
  * should also supply points, and this behaviour is pinned by {@code SkillPointGameParityTest}.
  *
- * <p>Note: <b>Known deviation</b> (the finding ledger in {@code ROADMAP.md}): here {@code NORMAL} is
+ * <p>Note: <b>Known deviation</b> (the finding ledger in {@code AGENT.md}): here {@code NORMAL} is
  * uniformly +1, whereas in the game enhanced basic attacks have exceptions - Boothill (波提欧)
  * enhanced basic attack "cannot restore skill points", while Qingque's (青雀) enhanced basic attack
  * "restores 1 skill point". In the data both are {@code "Normal"} (there is no separate type), so this
@@ -36,7 +36,7 @@ import com.laosun.aluminium.models.skill.Skill;
  * right fix is a per-skill skill-point delta field (a data completion). This class leaves
  * {@link #gainForCast} as the override point.
  *
- * <p>Note: <b>Character-level modifiers are not wired up</b> (the finding ledger in {@code ROADMAP.md}): Bronya (布洛妮娅)
+ * <p>Note: <b>Character-level modifiers are not wired up</b> (the finding ledger in {@code AGENT.md}): Bronya (布洛妮娅)
  * "50% chance to +1 on skill", Sushang's (素裳) "+1 on a skill that hits a broken target", Sparkle's
  * (花火) "cap +2" and so on all have to wait for the trigger table. This class deliberately knows
  * no character - when adding these, extend and override {@link #gainForCast} (or drive it from the
@@ -61,7 +61,7 @@ public class StandardSkillPointPolicy implements SkillPointPolicy {
 
     /**
      * Construct with the given cap/start value (for tests and for the future "cap raised by a light
-     * cone/character", see the cap note in {@code ROADMAP.md}).
+     * cone/character", see the cap note in {@code AGENT.md}).
      *
      * @param max     the conventional cap
      * @param initial the start value (clamped to {@code [0, max]})
@@ -86,7 +86,7 @@ public class StandardSkillPointPolicy implements SkillPointPolicy {
      * (for example, when already at cap after a basic attack the actual credited amount is 0, and no
      * event should be fired). {@code Battle} is only responsible for broadcasting the reported events
      * to the team - that way {@code Battle} still does not need to know the skill point rules
-     * (see {@code ROADMAP.md}).
+     * (see {@code AGENT.md}).
      */
     public interface Listener {
         /**
@@ -190,7 +190,7 @@ public class StandardSkillPointPolicy implements SkillPointPolicy {
      *
      * <p>Note: Go through {@code SkillData.getCategory()} and not a bare-string {@code switch} - the
      * latter silently mismatches when the data side changes a spelling or adds a new value
-     * (see the finding ledger in {@code ROADMAP.md}).
+     * (see the finding ledger in {@code AGENT.md}).
      *
      * @return {@code null} means "there is no category to speak of" (the skill or its skill data is
      * empty); the caller treats it as neutral

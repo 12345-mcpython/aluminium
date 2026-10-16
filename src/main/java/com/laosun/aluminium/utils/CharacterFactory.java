@@ -41,7 +41,7 @@ import java.util.Set;
  * <p><b>Skill assembly is wired up</b>: a character built by {@code create()} carries
  * {@code DefaultSkill} with the real slot mapping (basic attack 1 / skill 2 / ultimate 3 /
  * talent 4); there is only one mapping table ({@code Constant.SKILL_SLOT}) and the assembly point is
- * {@code Character.Builder#build()} - see {@code engine.md} §7.2. Map basic attack (6) / technique
+ * {@code Character.Builder#build()} - see {@code Constant.SKILL_SLOT}. Map basic attack (6) / technique
  * are not installed here; they are attached by {@code Battle.startBattle()}.
  *
  * <p>Note: This class only handles character identity and resources and does not touch skill
@@ -66,7 +66,7 @@ public final class CharacterFactory {
             1308,   // Acheron (黄泉): stacks (cap 9)
             1407,   // Castorice (遐蝶): [新蕊] (max_energy is null; there was never an energy bar)
             1408,   // Phainon (白厄): [火种] (cap 12)
-            1415,   // Cyrene (昔涟): [追忆] (see engine.md §9.5)
+            1415,   // Cyrene (昔涟): [追忆]
             1506    // Silver Wolf LV.999 (银狼LV.999): the Elation (欢愉) system
     );
 

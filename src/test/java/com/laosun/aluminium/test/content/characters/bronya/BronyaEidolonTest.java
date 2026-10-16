@@ -18,7 +18,7 @@ import java.util.Random;
 /**
  * 1101 Bronya (布洛妮娅): her Battlefield (阵地) trace and her first <b>Eidolon</b>.
  *
- * <p>Eidolon 1, Hone Your Strength (养精蓄锐), is the case {@code engine.md} §9 and {@code SkillPointGameParityTest} carry as "not
+ * <p>Eidolon 1, Hone Your Strength (养精蓄锐), is the case {@code SkillPointGameParityTest} carries as "not
  * implemented": "施放战技时,有 50% 的固定概率恢复 1 个战技点,该效果
  * 有 1 回合的触发冷却". The missing part is never one hook: it is a rule-level probability, a cooldown, and a
  * way to say "this belongs to an Eidolon", all three of which are needed together, which is why the rule is

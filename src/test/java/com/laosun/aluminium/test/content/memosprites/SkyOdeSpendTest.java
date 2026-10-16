@@ -40,7 +40,7 @@ public class SkyOdeSpendTest {
         ally = battle.characters.get(1);
 
         // Note:Note: The layers are placed by ANOTHER character rule, NOT by replacing Hyacine own table: the two rules under test live in that table, and
-        // `setTriggerTable` would have deleted them. This exact mistake has been made six times in this project; it is discipline #1 in GAPS.md.
+        // `setTriggerTable` would have deleted them. This exact mistake has been made six times in this project; it is why every such test in this project restores the table it borrowed.
         EffectSpec layers = new EffectSpec();
         TriggerSpecs.set(layers, "op", "ADD_STACK");
         TriggerSpecs.set(layers, "buff", MARK);

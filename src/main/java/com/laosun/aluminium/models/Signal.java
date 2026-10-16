@@ -230,7 +230,7 @@ public final class Signal implements Comparable<Signal>, Cloneable {
      * {@link #nextActionTime}.
      *
      * <p>{@code remaining} and {@code nextActionTime} are two ledgers of the same state
-     * (see {@code engine.md} §5.6), so changing one of them means the other must be synchronised -
+     * (see {@link com.laosun.aluminium.Queue}), so changing one of them means the other must be synchronised -
      * this method exists precisely so that callers do not have to guarantee that themselves.
      *
      * <p>The only caller at the moment is {@link com.laosun.aluminium.Queue#grantExtraTurn}:

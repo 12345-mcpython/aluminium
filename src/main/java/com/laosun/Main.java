@@ -779,7 +779,7 @@ public class Main {
      * action bar schedules it like any other unit and {@code Battle.performAction} casts whatever skill it
      * was given. This is the demo's policy, written down in one place - attack the opposing camp with the
      * {@code COMMON} skill, main target picked by the same aggro-weighted selector the enemies use. A real
-     * client would pick differently (memosprite skill 1 says "优先攻击长夜月上次攻击的敌方目标" - see {@code ROADMAP.md});
+     * client would pick differently (memosprite skill 1 says "优先攻击长夜月上次攻击的敌方目标" - see {@code AGENT.md});
      * the point here is that a summon <b>acts</b>, and that its damage is not a character's.
      *
      * <p>Which side it hits comes from {@code battle.getOpponents(summon)}, never from a hard-coded camp: an

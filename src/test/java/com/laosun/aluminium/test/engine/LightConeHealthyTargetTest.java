@@ -74,7 +74,7 @@ public class LightConeHealthyTargetTest {
     @Test
     // Note: This case PASSES but is NOT mutation-sensitive: changing the threshold from `> 0.5` to `> 0.0`
     // leaves it green, so it currently shows only that the two ranks agree on a wounded target -- which would
-    // also hold if the condition never evaluated to true. See round 53 in GAPS.md; the probe that settles it is
+    // also hold if the condition never evaluated to true. The probe that settles it is
     // named there (print `ctx.target()` and `hpPercent` inside TriggerTable's `target_hp_percent` case).
     public void belowTheThresholdTheRankStopsMattering() {
         double rankOne = damageAgainstWoundedTarget(1);

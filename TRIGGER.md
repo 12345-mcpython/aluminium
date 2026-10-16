@@ -1,6 +1,6 @@
 # 触发器（trigger）JSON 格式
 
-> 本文写的是**规则文件怎么写**。引擎的架构与取舍在 `ROADMAP.md`，游戏侧的资料在 `HSR.md`。
+> 本文写的是**规则文件怎么写**。引擎的架构与取舍在 `AGENT.md`，游戏侧的资料在 `HSR.md`。
 >
 > ⚠ **本文的每张表都是从代码里读出来的，不是凭印象写的** ✓ —— 字段名来自 `beans/TriggerSpec.java` 与 `beans/EffectSpec.java` 的
 > `@SerializedName`；运算符、事件、操作、选择器、`scale` 来自引擎自己的闭集与**语料里的实际用法**（**94** 个角色文件；重新数：`ls src/main/resources/characters/*.json | wc -l`）。
@@ -381,6 +381,6 @@ SUPER_BREAK            TAUNT                  TICK_DOT
 
 | 文件 | 内容 |
 |---|---|
-| `ROADMAP.md` | 引擎的分阶段设计与**每条决策的理由**、**已知缺口** |
+| `AGENT.md` | 引擎的架构与红线、分阶段设计与**每条决策的理由**、**已知缺口**、踩坑记录 |
 | `HSR.md` | 游戏侧的资料（伤害公式、属性表等） |
 | `README.md` | 项目入口 |

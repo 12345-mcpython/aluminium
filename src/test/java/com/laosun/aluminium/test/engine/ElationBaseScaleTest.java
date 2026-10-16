@@ -15,7 +15,7 @@ import java.util.List;
 
 /**
  * The `elation_base` scale: an Elation damage instance's base comes from the loaded level table, and NOT from
- * attack power -- which is the definition the spec gives at {@code ROADMAP.md:1262}
+ * attack power -- which is the definition the spec gives at the {@code AGENT.md} §3.9 Elation formula
  * ({@code 基础值 × 欢愉倍率 × (1+欢愉度) × (1+增笑) × (1+笑点×5/(笑点+240))}, "禁攻击力/属性增伤").
  *
  * <p>That definition is what makes the judge two-sided without pinning a magic number: the same rule, run

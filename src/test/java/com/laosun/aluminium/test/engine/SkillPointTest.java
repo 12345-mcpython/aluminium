@@ -23,7 +23,7 @@ import java.util.function.Supplier;
  *
  * <p><b>Data fact</b>: {@code skills.json} has no skill point field - among the 638 skills, the
  * {@code sp_need} of all 122 basic attacks and 109 skills is {@code null} (the 99 entries that do have a value are
- * all ultimates, and that is the ultimate energy threshold, see {@code engine.md} §9.4). So skill points can only
+ * all ultimates, and that is the ultimate energy threshold, see {@code SkillPointGameParityTest}). So skill points can only
  * come from the game rules, and they live in {@link Constant}.
  *
  * <p>This test deliberately does not use {@code castImmediate} (that is a test/demo entry point that bypasses

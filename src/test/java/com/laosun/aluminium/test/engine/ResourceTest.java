@@ -321,8 +321,8 @@ public class ResourceTest {
      * healer or an off-field stack character react to a teammate's wounds.
      *
      * <p>Note: This is the opposite of what I first assumed (I wrote a test asserting a bystander stays at
-     * 0 stacks, and it failed). The engine's broadcast rule for this event is documented in
-     * {@code engine.md} §4.1 as "related parties + our whole side", so an ally *does* see it.
+     * 0 stacks, and it failed). The engine's broadcast rule for this event is guarded by
+     * this class as "related parties + our whole side", so an ally *does* see it.
      * A character that only cares about its own wounds therefore needs a subject filter
      * ({@code target == self}) - see {@link #subjectFilterIsNotExpressibleYet()} for where that stands.
      */

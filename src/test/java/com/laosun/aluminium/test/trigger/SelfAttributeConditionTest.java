@@ -386,7 +386,7 @@ public class SelfAttributeConditionTest {
      * <p>Note: <b>This asserts direction, not magnitude, and that is deliberate.</b> The contribution is 12% of
      * the character's <em>base</em> ATK, and base ATK is not readable from outside: a relic-less character's
      * resolved ATK (892.9 for Himeko (姬子) at 80) is already base x (traces' percentages), so the measured 90.81 is
-     * 12% of 56.6, not of 892.9- the "panel != base x multiplier" trap recorded in {@code engine.md} §22.
+     * 12% of 56.6, not of 892.9- the "panel != base x multiplier" trap.
      * The magnitude in the file is pinned exactly by {@link #theAuthoredEffectsCarryTheNumbersFromTheText}
      * instead, and the modifier arithmetic by the engine's own tests; what needs an end-to-end case is that
      * this condition lets the effect through <b>only</b> above its threshold.

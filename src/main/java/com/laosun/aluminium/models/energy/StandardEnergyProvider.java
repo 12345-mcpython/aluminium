@@ -29,7 +29,7 @@ import java.util.Set;
  * <p><b>Characters that do not use conventional energy are not judged here</b>: Feixiao /
  * Acheron / Castorice / Phainon / Cyrene / Silver Wolf LV.999 use stacks / special resources
  * and are injected at the assembly point by {@link NoConventionalEnergyProvider} - see
- * {@code CharacterFactory} and {@code engine.md} §9.5.
+ * {@code CharacterFactory}.
  *
  * <p>Not handled for now: additional attacks (skills whose {@code AttackType} is empty or
  * is neither Normal nor BPSkill) gain no energy, techniques / maze skills gain no energy, and
@@ -45,7 +45,7 @@ public class StandardEnergyProvider implements EnergyProvider {
         // Note: Switch on the SkillCategory enum, never on a bare string: when the data side
         //    changes the spelling or adds a value, a string switch fails silently (it falls
         //    into default and is swallowed, with no compile-time protection).
-        //    See F-6 in ROADMAP.md §12.5.
+        //    See {@code AGENT.md}.
         return switch (skill.getData().getCategory()) {
             case NORMAL -> EnergyGain.normal(Constant.ENERGY_GAIN_BASIC);
             case BPSKILL -> EnergyGain.normal(Constant.ENERGY_GAIN_SKILL);
