@@ -792,7 +792,7 @@ public class Battle {
      * "skill has a 50% chance of +1", Sushang (素裳) "skill on a weakness-broken target +1",
      * Sparkle (花火) "max +2", ...). If all of those branches were added here,
      * {@code Battle} would fill up with "because of some character" conditionals, violating the three-way split.
-     * See <b>F-8</b> in §12.5 of {@code ROADMAP.md}.
+     * See {@link com.laosun.aluminium.models.skillpoint.SkillPointPolicy}.
      *
      * <p>The default is {@link StandardSkillPointPolicy} (start 3 / max 5 / our basic attack +1 / skill -1 /
      * everything else neutral). To swap in another rule set for the team (e.g. Sparkle (花火) raising the max),
@@ -1335,7 +1335,7 @@ public class Battle {
     /**
      * The laugh-point factor of Elation damage: {@code 1 + 笑点×5/(笑点+240)}.
      *
-     * <p>From the spec at {@code ROADMAP.md:1262}
+     * <p>From the spec
      * ({@code 基础值 × 欢愉倍率 × (1+欢愉度) × (1+增笑) × (1+笑点×5/(笑点+240))}, attack power banned). The curve lives
      * here so the three settlement sites cannot drift apart, the same reason {@code ELATION_DAMAGE_BOOST} is folded in
      * one step.
@@ -1938,7 +1938,7 @@ public class Battle {
             return settleUltimate(user, skill);
         }
         // Skill points: all the rules are in skillPointPolicy (including the our-side/enemy-side camp
-        // check); Battle only asks once "does this action hold up" -- it knows no character, see F-8 in §12.5.
+        // check); Battle only asks once "does this action hold up" -- it knows no character.
         if (!skillPointPolicy.onSkillCast(user, skill)) {
             return false;
         }

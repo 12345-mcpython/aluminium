@@ -13,9 +13,9 @@ import org.junit.jupiter.api.Test;
  * <p>The reason both exist is stability:
  * <ul>
  *   <li>{@code SkillCategory} eliminates the class of bugs "bare string switch to a spelling change
- *       in the data silently fails to match" ({@code ROADMAP.md} §12.5, F-6);</li>
+ *       in the data silently fails to match" ({@code AGENT.md});</li>
  *   <li>{@code Resource} gives "cap / overflow / atomic spend" a named boundary semantics, shared
- *       by skill points and the stack resource ({@code ROADMAP.md} §12.5, F-1/F-).
+ *       by skill points and the stack resource ({@code AGENT.md}).
  * </ul>
  */
 public class SkillCategoryAndResourceTest {

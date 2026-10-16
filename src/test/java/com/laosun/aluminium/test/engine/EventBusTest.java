@@ -331,8 +331,8 @@ public class EventBusTest {
      * job also counts as a defeat", consistent with the kill-energy convention (`KILL_ONLY`
      * only affects the energy-gain category, not the fact of "death").
      *
-     * <p>So here we assert the measured behaviour, and this correction is recorded in
-     * `engine.md` §4.2.
+     * <p>So here we assert the measured behaviour, and this correction is guarded by
+     * this class.
      */
     @Test
     public void dotKillAlsoFiresKillEvent() {

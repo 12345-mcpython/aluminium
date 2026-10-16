@@ -350,7 +350,7 @@ public class Damage {
      *
      * <p><b>Where it enters.</b> The <b>base layer</b>: {@code Battle.assemble} adds it before the first zone, so the
      * addition takes crit / DMG boost / defence / resistance exactly like the skill multiplier does. That is the
-     * documented decision (the {@code engine.md} zone table) rather than an accident: "伤害<b>值</b>提高" names a
+     * documented decision (the HSR.md §2 zone table) rather than an accident: "伤害<b>值</b>提高" names a
      * value, and a value that did not crit would be a different mechanic from the one the text describes.
      *
      * @param value the amount to add (may be negative, and the assembled total is still floored at 1)

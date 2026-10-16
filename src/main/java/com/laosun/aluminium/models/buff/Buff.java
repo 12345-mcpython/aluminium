@@ -16,7 +16,7 @@ import com.laosun.aluminium.models.CanHit;
  * <p>Another easily confused point: injection-type buffs (`VulnerabilityBuff` /
  * `ReductionBuff`) have no persistent state; their `applyEffect` / `removeBuff` are empty and they
  * only inject the correction into the zones of that one segment's `Damage` at each settlement.
- * For how the two are told apart, see {@code engine.md} §10.2.
+ * For how the two are told apart, see {@link StateBuff} and {@link DotBuff}.
  */
 public interface Buff {
     CanHit getSource();

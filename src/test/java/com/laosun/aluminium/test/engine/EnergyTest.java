@@ -21,7 +21,7 @@ import java.util.Set;
  * acceptance: the energy field + the single credit entry point {@code gainEnergy} + the
  * standard provider's numeric mapping.
  *
- * <p>For the numbers see the standard tier in {@code ROADMAP.md}: basic attack 20 / skill 30 / ultimate 5 / taking a hit 10 /
+ * <p>For the numbers see the standard tier in {@code AGENT.md}: basic attack 20 / skill 30 / ultimate 5 / taking a hit 10 /
  * kill 5 / break 5;
  * the ultimate clears to zero first and then regains 5 (the clear is done in {@code castUltra}).
  */

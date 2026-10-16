@@ -24,7 +24,7 @@ import java.util.Random;
  *
  * <p>Asserting the absolute number against a row-based instance turned out impossible to do honestly: measured, a row-based DAMAGE at her Lv10 COMMON row (where
  * the document says 100%) came out 1.4x the plain settled ATK, so that table row's parameter carries a different semantic than "the ATK ratio". That question is
- * registered in GAPS.md instead of being papered over with a magic constant.
+ * registered in AGENT.md instead of being papered over with a magic constant.
  */
 public class LiteralDamageTest {
     private static final int SUSHANG = 1206;

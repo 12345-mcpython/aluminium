@@ -320,7 +320,7 @@ public final class Constant {
      *
      * <p>Note: <b>The cap is not always 5</b>: Sparkle's talent "cap +2" and a light cone's "for each character
      * on the Path of Elation +1", and some light cones even trigger on "cap >= 6". The engine currently has
-     * no hook for "changing a team-level resource cap" - recorded in {@code ROADMAP.md}.
+     * no hook for "changing a team-level resource cap" - recorded in {@code AGENT.md}.
      */
     public static final int SKILL_POINT_MAX = 5;
 
@@ -331,7 +331,7 @@ public final class Constant {
      * "at the start of battle immediately recover 1 skill point for our side" to start at 4 (5 if two
      * characters wear it). That bonus is an <b>ability</b> rather than stats - {@link #RELIC_SETS} now
      * carries it as {@code Ability51011} with an empty property list - and the engine has no ability
-     * interpreter, so it is still not applied: recorded in {@code ROADMAP.md}.
+     * interpreter, so it is still not applied: recorded in {@code AGENT.md}.
      */
     public static final int SKILL_POINT_START = 3;
 
@@ -510,7 +510,7 @@ public final class Constant {
      * <b>not</b> contain a break-control table: {@code breaking_rate.json} is level to break base value, and
      * the only descriptions of these states live in the encyclopedia text, which states the mechanics but
      * not the numbers. What the text settles is the mechanics, and two of them contradict the
-     * earlier design notes (recorded in {@code ROADMAP.md}):
+     * earlier design notes (recorded in {@code AGENT.md}):
      * <ul>
      *   <li>frozen (冻结) = <b>cannot act</b> (+ ice damage every turn) - the earlier notes said "while frozen, damage taken +30%",
      *       which nothing in the data supports;</li>
@@ -637,7 +637,7 @@ public final class Constant {
 
     /**
      * {@code data/elation_basic_level_damage.json} -- the level-indexed base for Elation damage, i.e. the
-     * {@code 基础值 × 欢愉倍率} factor of the spec at {@code ROADMAP.md:1262}
+     * {@code 基础值 × 欢愉倍率} factor of the spec
      * ({@code 基础值 × 欢愉倍率 × (1+欢愉度) × (1+增笑) × (1+笑点×5/(笑点+240))}, attack power banned).
      *
      * <p>Loaded strictly, through {@link JSONReader} like every other table in this class: the data files

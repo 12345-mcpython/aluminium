@@ -17,7 +17,7 @@ import java.util.List;
 /**
  * 增笑 ({@code ELATION_DAMAGE_AMP}) is Elation damage's own amplifier, MULTIPLIED with 欢愉度, not added to it.
  *
- * <p>The spec at {@code ROADMAP.md:1262} writes them as two separate factors --
+ * <p>The spec at the {@code AGENT.md} §3.9 Elation formula writes them as two separate factors --
  * {@code (1+欢愉度) × (1+增笑)} -- so +100% of each must quadruple the instance, not triple it. That is the
  * assertion this judge is built around: an implementation that added them would read 3x and fail.
  *

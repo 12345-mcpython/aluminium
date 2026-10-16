@@ -24,7 +24,7 @@ import java.util.function.Supplier;
  * while itself "knowing nothing about character mechanics"?
  *
  * <p>The requirement is that "the skill point policy must be pulled out of
- * {@code Battle} (see the finding ledger in {@code ROADMAP.md})", and this class is the acceptance test
+ * {@code Battle} (see the finding ledger in {@code AGENT.md})", and this class is the acceptance test
  * for that sentence - without changing a single line of the engine, it only swaps
  * {@link Battle#skillPointPolicy} and sees whether the engine follows
  * the new rules.

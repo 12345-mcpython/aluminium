@@ -13,7 +13,7 @@ import java.util.Map;
  *
  * <p>Note: <b>Not every value is wired yet.</b> The ones marked have an emitter in the engine; the
  * rest are declared so the JSON vocabulary is stable and so an unwired trigger fails <b>loudly at
- * load time</b> ({@link #isWired()}) rather than silently doing nothing. See {@code engine.md} §4
+ * load time</b> ({@link #isWired()}) rather than silently doing nothing. See {@link com.laosun.aluminium.models.trigger.TriggerVocabulary}
  * for the events that actually fire today.
  */
 public enum TriggerEvent {
@@ -333,7 +333,7 @@ public enum TriggerEvent {
      *
      * <p><b>It is fired for a summon of either camp</b> (a boss's minion attacks too); which summons a
      * rule cares about is its own question, and the condition for it is {@code actor == summon} (the
-     * rule owner's own summon) - see {@code engine.md} §4.6. Without that condition a rule would also
+     * rule owner's own summon) - see {@link com.laosun.aluminium.models.trigger.TriggerVocabulary}. Without that condition a rule would also
      * fire when a <em>teammate's</em> summon attacks, which is the same over-trigger in another coat.
      *
      * <p>An attack that connected with nothing does not fire it, and neither does a summon with no
