@@ -962,6 +962,7 @@ C 层全是**填口子** ✓，依赖已完成的机制，**不该出现新架�
 | **`is_slowed`**（`SPEED` 上有负修饰即算减速；+20% 加速不掩盖 −12% 减速） | `SlowedConditionTest` |
 | **`MODIFY_RULE{cooldown_delta}`**（缩短等待一个回合；点名无冷却 / 结果转负 / 0 都在加载期拒绝） | `CooldownAmendmentTest` |
 | **1002 的三句减速随动**（终结技 +120% 走基数层、罡风 +40% 走增伤区、星魂 2 冷却 −1） | `DanHengKitCompletionTest` |
+| **地图攻击的入场削韧**（读 slot 6 自己的元素与韧性；非弱点不削；削空即击破；无地图技能的单位拒绝声明） | `MapAttackTest` |
 
 ### 7.2 **只靠散文**（所以上面必须写完整）
 
