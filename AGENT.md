@@ -527,6 +527,12 @@ if (isSelected) buffer.setStyle(rowArea, highlightStyle);
     `sp_base` ✓ —— **弹射按段数乘**（每段值 × 实际段数 ✓），其它形状那一行本来就是整次的值 ✓。
     ⚠ 与常量**只在 3 行不一致**（`1212/2`、`1402/2`、`1502/1` ✓，实测枚举）⇒ 数据是权威 ✓；
     `EnergyDataConformanceTest` 把"引擎答案 = `sp_base` × 段数"和"偏离常量的正好这三行"都钉住 ✓。
+  - **伤害段数（分裂比）**（2026-10-17 补 ✓）：`data/skill_effects.json` 的 `segments` ✓ 让一次施放结算**多段** ✓
+    （每段各自掷暴击、各自发 `DEALING_DAMAGE` / `CRIT_DEALT` / `TAKING_HIT` ✓，削韧按段均分 ✓；
+    `SkillExecutor.segmentsOf` 是唯一读者 ✓，没有条目就仍是**单段** ✓）。
+    已导出：**只有 1002** 的普攻 2 段 / 战技 4 段 ✓。⚠ 全库还有 **96 张 >1 段的表、59 个角色文件** 未导出 ✓
+    ⇒ 它们仍按单段结算 ✓ —— **合计一样、段数不同**（差在"每段独立暴击"与逐段事件 ✓），所以这是**登记**不是近似 ✓。
+    判据：`DanHengSegmentsTest`（2/4 段 / 各段是行倍率的分数且和 = 1 / 4 段各自暴击 / 减速仍只有一条 ✓）。
   - **Impair 的 debuff 派发仍缺**（2026-10-17 核对 ✓）：`skill_effects.json` 里**一条 `Impair` 行都没有** ✗，
     缺的不是"多少"，而是**"哪个 debuff"** ✓（一句 `陷入【吞火】状态` / `风化/裂伤/灼烧/触电其中1种` 只在正文里 ✓）。
     ⇒ `SkillData.debuffChance(int)` 已有等级感知 ✓ 但**没有调用者** ✓；`ImpairDebuffGapTest` 把两件事钉住：
@@ -1037,6 +1043,7 @@ C 层全是**填口子** ✓，依赖已完成的机制，**不该出现新架�
 | **弹射的份额与次数读的是当前等级那一行**（两行两个数 / 行为比值 = 两行份额之比 / 造表让次数也随行变 / **次数优先读正文**「额外造成N次」） | `BounceSkillLevelTest` |
 | **回能读技能自己的 `sp_base`**（弹射按段数乘 / 偏离常量的行正好三行 / 两发弹射的 6×5 与 10×3 都是 30） | `EnergyDataConformanceTest` |
 | **Impair 的 debuff 派发缺口**（没有一条 `Impair` 带 effect 行 / 正文点战斗内状态的正好三条） | `ImpairDebuffGapTest` |
+| **伤害段数（分裂比）**（普攻 2 段 / 战技 4 段 / 各段是行倍率的分数且和 = 1 / 每段独立暴击 / 同一减速 Refresh 不成四层） | `DanHengSegmentsTest` |
 | **台账不写"现在是什么"的数字**（套件 / 用例 / 文件 / 方法 / 类 / 规则数、`file:line`、大小、提交数、「N 处」） | `LedgerNumberGuardTest` |
 
 ### 7.2 **只靠散文**（所以上面必须写完整）
