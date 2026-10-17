@@ -1,0 +1,136 @@
+package com.laosun.aluminium.test.content.characters.sushang;
+
+import com.laosun.aluminium.Battle;
+import com.laosun.aluminium.data.TriggerTables;
+import com.laosun.aluminium.enums.AttributeType;
+import com.laosun.aluminium.enums.SkillType;
+import com.laosun.aluminium.enums.TriggerEvent;
+import com.laosun.aluminium.models.Character;
+import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.utils.CharacterFactory;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
+import java.util.List;
+import java.util.Random;
+
+/**
+ * 1206 Sushang: the ultimate's two clauses, and the trace that counts her own Sword Stance.
+ *
+ * <p>Each case drives the rule through {@code Battle.fireTriggers} and asserts the <b>observable</b> the
+ * clause names - an extra turn, a raised ATTACK, a stack count - rather than re-reading the JSON, because
+ * "the rule is in the file" is what {@code herFileCarriesTheClauses} already says and it is not evidence
+ * that the clause does anything.
+ */
+public class SushangUltimateAndTraceTest {
+    private static final int SUSHANG = 1206;
+    private static final int ALLY = 1201;
+    private static final int LEVEL = 80;
+
+    /**
+     * ⭐ 「并使素裳立即行动」: casting her ultimate puts Sushang at the front of the queue again.
+     *
+     * <p>⚠ Asserted on the SCHEDULED actor, not on a return value: {@code ULT_CAST} is an event she may not
+     * be the target of, so the clause is "who acts next", which is what {@code getExtraTurnActor} answers.
+     */
+    @Test
+    public void herUltimateSchedulesHerOwnExtraTurn() {
+        Fixture f = new Fixture();
+        Assertions.assertNull(f.battle.getExtraTurnActor(), "precondition: nothing is scheduled yet");
+
+        f.battle.fireTriggers(TriggerEvent.ULT_CAST, f.sushang, f.enemy, 0, 0);
+
+        Assertions.assertSame(f.sushang, f.battle.getExtraTurnActor(),
+                "「使素裳立即行动」 must schedule HER extra turn, not our ally's or nobody's");
+    }
+
+    /**
+     * ⭐ The same sentence's other clause: 「攻击力提高30%…持续2回合」.
+     *
+     * <p>⚠ This is a SEPARATE rule from the extra turn on purpose - one clause each - so a case can say which
+     * half is missing. Asserting on ATTACK rather than on damage keeps the level convention out of it.
+     */
+    @Test
+    public void herUltimateRaisesHerOwnAttack() {
+        Fixture f = new Fixture();
+        double before = f.sushang.getAttribute(AttributeType.ATTACK).get();
+        double allyBefore = f.ally.getAttribute(AttributeType.ATTACK).get();
+
+        f.battle.fireTriggers(TriggerEvent.ULT_CAST, f.sushang, f.enemy, 0, 0);
+
+        Assertions.assertTrue(f.sushang.getAttribute(AttributeType.ATTACK).get() > before,
+                "「攻击力提高30%」 must raise her ATTACK: " + before + " -> "
+                        + f.sushang.getAttribute(AttributeType.ATTACK).get());
+        Assertions.assertEquals(allyBefore, f.ally.getAttribute(AttributeType.ATTACK).get(), 1e-9,
+                "and it is HER attack (「其」 = Sushang, the subject of 「使素裳立即行动」), not the whole party's");
+    }
+
+    /**
+     * ⭐ 行迹 逐寇: each Sword Stance that lands is counted, up to the 10-layer ceiling.
+     *
+     * <p>⚠ Driven by a REAL Skill cast, not by a hand-fired {@code DAMAGE_SETTLED}. Measured: the synthetic
+     * event carries no damage instance, so {@code damage_is_additional} cannot be evaluated and the rule
+     * correctly does not fire - the case read 0. The discriminator this clause rests on is a property of the
+     * instance, so only a real hit can exercise it.
+     *
+     * <p>⚠ The dice are pinned to 0.0 so the 33% Sword Stance always triggers; and the count is asserted at
+     * the cap as well, because a ceiling that is declared but not enforced is the failure mode this pins.
+     */
+    @Test
+    public void theTraceCountsSwordStanceLayersUpToTen() {
+        Fixture f = new Fixture();
+        Assertions.assertEquals(0, f.sushang.getBuffManager().stacksOf("剑势"),
+                "precondition: nothing counted yet");
+
+        // One cast: the Sword Stance lands (the dice are pinned so it always does) and must be counted once.
+        // ⚠ The hit is verified by the enemy's HP rather than assumed, so a count of 0 would mean the
+        // counter is broken and not that the Sword Stance never happened.
+        double before = f.enemy.getCurrentHp();
+        f.castSkill();
+        Assertions.assertTrue(f.enemy.getCurrentHp() < before, "precondition: the Skill hit");
+        Assertions.assertEquals(1, f.sushang.getBuffManager().stacksOf("剑势"),
+                "「每发动1次【剑势】」 counts one layer per Sword Stance that lands");
+
+        for (int i = 0; i < 15; i++) {
+            f.castSkill();
+        }
+        Assertions.assertEquals(10, f.sushang.getBuffManager().stacksOf("剑势"),
+                "「最多叠加10层」 must hold: the cap is declared on ADD_STACK and must be enforced there");
+    }
+
+
+    /**
+     * Census of the clauses this class asserts, so a rule that disappears is named rather than silently
+     * shrinking the file.
+     */
+    @Test
+    public void theFileCarriesTheUltimateAndTraceClauses() {
+        var table = TriggerTables.of(SUSHANG);
+        Assertions.assertEquals(2, table.ruleCount(TriggerEvent.ULT_CAST),
+                "the extra turn and the attack raise - one clause each, so a missing half is visible");
+        // Two: the Sword Stance counter, and eidolon 2's damage reduction - both keyed on "this instance is
+        // additional damage", which is how the engine names a Sword Stance. The pair sharing one discriminator
+        // is the point, so the count is stated rather than left implicit.
+        Assertions.assertEquals(2, table.ruleCount(TriggerEvent.DAMAGE_SETTLED),
+                "the Sword Stance counter and eidolon 2");
+        Assertions.assertEquals(1, table.ruleCount(TriggerEvent.DEALING_DAMAGE), "the per-stack boost");
+    }
+
+    private static final class Fixture {
+        private final Character sushang = CharacterFactory.create(SUSHANG, LEVEL);
+        private final Character ally = CharacterFactory.create(ALLY, LEVEL);
+        private final Enemy enemy = BattleFixture.monster();
+        private final Battle battle = new Battle(List.of(sushang, ally), List.of(enemy),
+                BattleFixture.alwaysRoll(0.0));
+
+        private Fixture() {
+            battle.startBattle();
+        }
+
+        /** Her Skill at the enemy, through the engine's own immediate-cast entry point. */
+        private void castSkill() {
+            battle.castImmediate(sushang.getSkills().get(SkillType.SKILL), sushang, List.of(enemy));
+        }
+    }
+}
