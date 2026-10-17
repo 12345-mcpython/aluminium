@@ -6,6 +6,7 @@ import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.DamageType;
 import com.laosun.aluminium.enums.SkillCategory;
 import com.laosun.aluminium.enums.SkillType;
+import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Damage;
 import com.laosun.aluminium.models.buff.StatModifierBuff;
@@ -114,6 +115,42 @@ public class DanHengKitCompletionTest {
         noEidolon.killWith(SkillCategory.ULTRA);
         Assertions.assertNull(noEidolon.battle.getExtraTurnActor(),
                 "at rank 0 the eidolon is not active, so even an ultimate kill pays nothing");
+    }
+
+    /**
+     * 天赋 寸长寸强 - the <b>three negatives</b> the sentence's two nouns imply: 「<b>我方技能</b>的<b>施放目标</b>」.
+     *
+     * <p>Asserting only the positive (an ally's Skill aimed at him) leaves three ways for the rule to be wrong without a
+     * symptom: dropping `actor is_ally` makes an enemy Skill aimed at him raise his penetration; dropping `target == self`
+     * makes any ally Skill raise it, whoever it was aimed at; and a rule that read 「我方攻击」 instead of 「我方技能」 would
+     * answer to the ally's basic attack too. The middle one is the subtlest: the document says 「成为我方技能的施放目标」,
+     * so being on the same team is not enough - he has to be the target.
+     *
+     * <p>The events are fired directly, the same way the 绝影 case below does it: this is about the rule's conditions,
+     * not about whether a cast can be assembled.
+     */
+    @Test
+    public void theTalentAnswersOnlyToAnAllySkillAimedAtHim() {
+        // (1) an ENEMY skill aimed at him: 「我方技能」 says no
+        Fixture enemySkill = new Fixture(0);
+        enemySkill.battle.fireTriggers(TriggerEvent.SKILL_CAST, enemySkill.enemy, enemySkill.danheng, 0, 0);
+        Assertions.assertEquals(0.0,
+                enemySkill.danheng.getAttribute(AttributeType.DAMAGE_PENETRATION).get(), 1e-9,
+                "「我方技能」 - an enemy's Skill aimed at him must not raise his penetration");
+
+        // (2) an ALLY skill aimed at somebody ELSE: 「的施放目标」 says no
+        Fixture elsewhere = new Fixture(0);
+        elsewhere.battle.fireTriggers(TriggerEvent.SKILL_CAST, elsewhere.ally, elsewhere.ally, 0, 0);
+        Assertions.assertEquals(0.0,
+                elsewhere.danheng.getAttribute(AttributeType.DAMAGE_PENETRATION).get(), 1e-9,
+                "being on his team is not enough - the Skill has to be aimed at HIM");
+
+        // (3) the ally's BASIC attack aimed at him: 「技能」 in this document includes a basic attack (the rule's note
+        // records that reading), so this one DOES fire - it is the control that the gate is 「我方」, not 「战技」.
+        Fixture allyBasic = new Fixture(0);
+        allyBasic.battle.fireTriggers(TriggerEvent.SKILL_CAST, allyBasic.ally, allyBasic.danheng, 0, 0);
+        Assertions.assertTrue(allyBasic.danheng.getAttribute(AttributeType.DAMAGE_PENETRATION).get() > 0,
+                "an ally's attack aimed at him does trigger it: the gate is 「我方技能」, not a particular slot");
     }
 
     /**
