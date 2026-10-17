@@ -79,6 +79,61 @@ public enum AttributeType {
     @SerializedName("all_damage_type_boost") ALL_DAMAGE_TYPE_BOOST("all_damage_type_boost"),
 
     /**
+     * The game's {@code Level_FinalDamageAddedRatio} (damage-object field {@code 0x308}) - the <b>second</b>
+     * additive factor of the DMG-boost chain, applied as its own multiplier after the element/all-type/DoT sum.
+     *
+     * <p>Why it is not folded into {@link #ALL_DAMAGE_TYPE_BOOST}: the game multiplies
+     * {@code (1 + Σ元素增伤 + 全属性增伤 + DotDamageAddedRatio) × (1 + Level_FinalDamageAddedRatio)} - two separate
+     * factors, so folding them would read a different number whenever both are non-zero
+     * ({@code (1+0.2+0.3)=1.5} vs {@code 1.2×1.3=1.56}). See {@code HSR.md} §2.2 / §10.3.
+     *
+     * <p>Stored as the ratio's DELTA (0 = none), like every boost attribute here, so an unset attribute cannot
+     * divide a hit by zero.
+     */
+    @SerializedName("final_damage_boost") FINAL_DAMAGE_BOOST("final_damage_boost"),
+    /**
+     * The game's {@code ComboDamageAddedRatio} (field {@code 0x250}) - the combo/co-op attack's own boost, applied
+     * as its own multiplier after the crit zone (see {@code HSR.md} §10.3).
+     *
+     * <p>Neither the documents nor the data use it yet; it exists so that a sentence about it has a home, and so the
+     * chain is complete rather than "the factors somebody happened to need".
+     */
+    @SerializedName("combo_damage_boost") COMBO_DAMAGE_BOOST("combo_damage_boost"),
+    /**
+     * The game's {@code BaseDamageMultiRatio} (field {@code 0x210}) - a <b>multiplier on the base damage</b> applied
+     * after the crit zone, before the absorb subtraction.
+     *
+     * <p>Stored as a DELTA from 1 ({@code 0} = no change): the game's field is already the multiplier (default
+     * {@code 1}), and storing it as-is would make every unset attribute multiply the hit by {@code 0}.
+     */
+    @SerializedName("base_damage_multi_ratio") BASE_DAMAGE_MULTI_RATIO("base_damage_multi_ratio"),
+    /**
+     * The defender's {@code Monster_DamageTakenRatio} (field {@code 0x6B0}) - "the monster takes more damage",
+     * applied as its <b>own</b> multiplier <b>outside</b> the vulnerability cap.
+     *
+     * <p>Why it is separate: the capped vulnerability zone is {@code min(3.5, 1 + Σ单元易伤 + 全属性易伤)}, and the
+     * game multiplies this ratio <i>after</i> that cap. Folding it in would silently lose any part above the cap.
+     */
+    @SerializedName("monster_damage_taken") MONSTER_DAMAGE_TAKEN("monster_damage_taken"),
+
+    /**
+     * The defender's per-element absorb - the game's {@code Defender_*Absorb} fields (e.g. {@code 0x678} for
+     * physical). <b>Subtracted</b> from the settled damage after every multiplier, not multiplied into it
+     * ({@code HSR.md} §2.2 "吸收是减法项").
+     *
+     * <p>Stored in damage units (the same units as the settled number), because that is what a subtraction can take.
+     * No content sets it today, so nothing depends on a finer reading; the per-element split mirrors the game, where a
+     * defender can absorb one element and not another.
+     */
+    @SerializedName("physical_damage_absorb") PHYSICAL_DAMAGE_ABSORB("physical_damage_absorb"),
+    @SerializedName("fire_damage_absorb") FIRE_DAMAGE_ABSORB("fire_damage_absorb"),
+    @SerializedName("ice_damage_absorb") ICE_DAMAGE_ABSORB("ice_damage_absorb"),
+    @SerializedName("thunder_damage_absorb") THUNDER_DAMAGE_ABSORB("thunder_damage_absorb"),
+    @SerializedName("wind_damage_absorb") WIND_DAMAGE_ABSORB("wind_damage_absorb"),
+    @SerializedName("quantum_damage_absorb") QUANTUM_DAMAGE_ABSORB("quantum_damage_absorb"),
+    @SerializedName("imaginary_damage_absorb") IMAGINARY_DAMAGE_ABSORB("imaginary_damage_absorb"),
+
+    /**
      * Damage dealt by <b>follow-up attacks only</b> - i.e. by additional damage
      * ({@code DamageType.ADDITIONAL}), which is the engine's one representation of a follow-up.
      *
@@ -251,6 +306,24 @@ public enum AttributeType {
 
     public static AttributeType getBoostByElement(DamageElement elementType) {
         return BOOST_DAMAGE_MAPPING.get(elementType);
+    }
+
+    private static final Map<DamageElement, AttributeType> ABSORB_DAMAGE_MAPPING = Map.ofEntries(
+            Map.entry(DamageElement.PHYSICAL, PHYSICAL_DAMAGE_ABSORB),
+            Map.entry(DamageElement.FIRE, FIRE_DAMAGE_ABSORB),
+            Map.entry(DamageElement.ICE, ICE_DAMAGE_ABSORB),
+            Map.entry(DamageElement.THUNDER, THUNDER_DAMAGE_ABSORB),
+            Map.entry(DamageElement.WIND, WIND_DAMAGE_ABSORB),
+            Map.entry(DamageElement.QUANTUM, QUANTUM_DAMAGE_ABSORB),
+            Map.entry(DamageElement.IMAGINARY, IMAGINARY_DAMAGE_ABSORB)
+    );
+
+    /**
+     * The absorb attribute for one element ({@code null} for a null element), the mirror of
+     * {@link #getBoostByElement}.
+     */
+    public static AttributeType getAbsorbByElement(DamageElement elementType) {
+        return elementType == null ? null : ABSORB_DAMAGE_MAPPING.get(elementType);
     }
 
     /**
