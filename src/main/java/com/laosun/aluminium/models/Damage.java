@@ -605,6 +605,19 @@ public class Damage {
     }
 
     /**
+     * Whether this instance's crit roll came out as a hit - {@code false} when the instance has no crit zone at all (a
+     * DOT, break damage, Elation damage: none of them can crit).
+     *
+     * <p>Why this accessor and not {@link #critArea()}: that one <b>creates</b> the zone on demand, so a caller that only
+     * wants to read would silently add it to the settlement. Readers: a front end's per-instance line, and the guard
+     * that counts how many chances a 「触发暴击时…」 clause got on a multi-segment skill (1002 Dan Heng (丹恒)'s Skill is
+     * four instances, so four rolls).
+     */
+    public boolean isCrit() {
+        return critArea != null && critArea.isCrit();
+    }
+
+    /**
      * Adds to the DEF-ignore this instance carries: "对&lt;某类目标&gt;造成伤害时无视其 X% 防御力" is a property of this hit,
      * not of the wearer. `Battle` fires `DEALING_DAMAGE` before it settles the defence zone, so this is read in time.
      */
