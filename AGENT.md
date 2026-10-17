@@ -532,6 +532,11 @@ if (isSelected) buffer.setStyle(rowArea, highlightStyle);
   - **忆灵技能的等级上限**（2026-10-17 核对 ✓）：与**角色同一条规则** ✓ —— `CanHit.skillLevel` 把等级 clamp 到
     表的行数 ✓，而**行数就是文档写的上限** ✓。所以"声明在最后一行时 +1 看不出变化"**不是缺陷** ✓
     （角色的「普攻等级+1」在 10 行表上完全一样 ✓）。判据：`MemospriteSkillLevelTest.aRaisePastTheTableIsClampedToTheTablesRows` ✓。
+  - **派生伤害的"来源施放"**（2026-10-17 补 ✓）：击破/超击破是引擎从某一发派生出来的实例 ✓，它自己带 `UNSPECIFIED` ✓
+    （**不能**改成那一发的槽位 ✗ —— `ADD_DAMAGE` / `BOOST_DAMAGE` / 增伤区 / `original_damage` 都读实例的槽位 ✓，
+    改了就等于把终结技的 +120% 加到击破伤害上 ✗），另带 `causedByCast` ✓。**只有 `KILL`** 沿链 ✓（判据：1002 星魂 4
+    「施放终结技消灭敌方目标时」✓ —— 终结技击破、击破伤害致死不触发 ✗ 曾是错的 ✓）；`DAMAGE_SETTLED` **不**沿链 ✓
+    （实测：沿链会让 1003 姬子星魂 6 对击破实例再算一次 ✓ 并撞上 `random_enemy` 解析不了 ✓）。判据：`DanHengKitCompletionTest` 的四条 ✓。
   - **回能已改成读数据**（2026-10-17 ✓，原登记为"走常量"）：`StandardEnergyProvider` 现在读技能自己的
     `sp_base` ✓ —— **弹射按段数乘**（每段值 × 实际段数 ✓），其它形状那一行本来就是整次的值 ✓。
     ⚠ 与常量**只在 3 行不一致**（`1212/2`、`1402/2`、`1502/1` ✓，实测枚举）⇒ 数据是权威 ✓；
