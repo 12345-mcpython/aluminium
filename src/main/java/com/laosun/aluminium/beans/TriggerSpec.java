@@ -178,6 +178,29 @@ public class TriggerSpec {
     private Double chance;
 
     /**
+     * How many <b>independent</b> rolls of {@link #chance} one firing makes: "额外增加 2 次【剑势】的发动判定" is
+     * {@code 2}, and each attempt rolls on its own so the two can come out differently.
+     *
+     * <p><b>Why this field and not two rules.</b> The obvious data-only spelling is a second rule with the same
+     * {@code chance} - the repo even says so in passing ({@code per_turn}'s javadoc: "a second chance rule
+     * <i>rolls twice</i>"). That spelling is only available when the two rules <b>differ</b> in something: a
+     * symmetric pair has the same {@code on}, the same {@code when} and the same effects, which is exactly what
+     * {@code ContentDuplicateGuardTest} refuses as "one sentence written twice" (measured: writing 1206's two
+     * extra Sword Stance rolls as two rules turns that guard red). So the count belongs to the rule.
+     *
+     * <p>⚠ NOT the same thing as an effect's {@code times}: that one repeats the <b>settlement</b> of an
+     * effect that has already been decided, so {@code chance: 0.33, times: 2} is "one roll, two hits". This one
+     * repeats the <b>roll</b>, so {@code chance: 0.33, chance_rolls: 2} is "two rolls, each hit its own". The
+     * expected number of hits is the same and the distribution is not - which is why they cannot stand in for
+     * one another.
+     *
+     * <p>Absent or {@code 1} = the historical behaviour: one roll per firing. A value above 1 on a rule that
+     * states no {@code chance} is refused at load time, because "roll twice for always" says nothing.
+     */
+    @SerializedName("chance_rolls")
+    private Integer chanceRolls;
+
+    /**
      * What {@link #chance} is multiplied by <b>after this rule triggers</b>: "触发该效果的初始固定概率为 100%，成功触发后下一次触发的
      * 固定概率降低至当前概率的 20%" ({@code 0.2} for that sentence).
      *

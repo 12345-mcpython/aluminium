@@ -48,7 +48,7 @@ public class SushangTest {
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.BREAK), "the talent");
         // Four: the Sword Stance pair, and trace 破敌's two halves - "普攻**或**战技" has no single spelling in a
         // DSL without `or`, so it is one rule per cast slot and the count moves by two when that trace lands.
-        Assertions.assertEquals(4, table.ruleCount(TriggerEvent.ALLY_ATTACK),
+        Assertions.assertEquals(6, table.ruleCount(TriggerEvent.ALLY_ATTACK),
                 "the Sword Stance pair and trace 破敌 for COMMON / SKILL");
         // Six: the technique damage, the level convention, and the four eidolons that declare at battle start
         // (3/5 raise skill levels, 4 raises BREAKING_EFFECT, 6 amends the talent's cap). `ruleCount` counts the

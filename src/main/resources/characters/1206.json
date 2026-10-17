@@ -83,7 +83,7 @@
       }
     ],
     "source": "1206 素裳 技能表的等级口径: 文档引用的是 Lv10/Lv15 行（普攻 100%、战技 210%、终结技 320%、天赋 速度+20%）",
-    "note": "本文件说明自己的数字来自哪一行（M-32）。⚠ **本条的旧注记已过时，按 TRIGGER.md §1 改写**（「过时的 note 比缺失的 note 更坏」）：旧文说「终结技…尚未写；秘技、行迹与星魂亦未写」✗ —— 这些**都已落地** ✓，逐条如下。① 终结技：「使素裳立即行动」= `ult_acts_again_immediately` ✓；「攻击力提高 30%…持续 2 回合」= `ult_raises_her_attack` ✓；终伤本身**不写规则** ✓（数据层按 `param_list` 结算 ✓）。② 战技的两条【剑势】= `skill_sword_stance_chance` / `skill_sword_stance_guaranteed` ✓（本文件原有 ✓）。③ 秘技 = `technique_opening_damage` ✓（本文件原有 ✓）。④ 行迹三项：赤子 = `trace_low_hp_aggro_down` + `trace_low_hp_aggro_down_cleanup` ✓（原有）；逐寇 = `trace_sword_stance_counts_itself` + `trace_sword_stance_damage_per_stack` ✓（计数 + 加成一对）；破敌 = `trace_breaking_advance_after_common` + `trace_breaking_advance_after_skill` ✓（「普攻**或**战技」在无 or 的 DSL 里是**两条** ✓，`when` 不同故不算重复 ✓）。⑤ 星魂 1–6 = 六条 `eidolonN_*` ✓ 全部落地 ✓。⚠ **仍然缺的一处，是引擎能力缺口，不是没写** ✗：终结技「施放战技时额外增加 **2** 次【剑势】的发动判定，通过额外判定发动的【剑势】伤害为**原伤害的 50%**」—— 需要「本次施放多掷 N 次骰子、且这几次的倍率减半」的**按次计数并改倍率**参数 ✗，全库没有该形状的读者 ✓。这一处按 §4.3 登记，**没有近似** ✓。"
+    "note": "本文件说明自己的数字来自哪一行（M-32）。⚠ **本条的旧注记已过时，按 TRIGGER.md §1 改写**（「过时的 note 比缺失的 note 更坏」）：旧文说「终结技…尚未写；秘技、行迹与星魂亦未写」✗ —— 这些**都已落地** ✓，逐条如下。① 终结技：「使素裳立即行动」= `ult_acts_again_immediately` ✓；「攻击力提高 30%…持续 2 回合」= `ult_raises_her_attack` ✓；终伤本身**不写规则** ✓（数据层按 `param_list` 结算 ✓）。② 战技的两条【剑势】= `skill_sword_stance_chance` / `skill_sword_stance_guaranteed` ✓（本文件原有 ✓）。③ 秘技 = `technique_opening_damage` ✓（本文件原有 ✓）。④ 行迹三项：赤子 = `trace_low_hp_aggro_down` + `trace_low_hp_aggro_down_cleanup` ✓（原有）；逐寇 = `trace_sword_stance_counts_itself` + `trace_sword_stance_damage_per_stack` ✓（计数 + 加成一对）；破敌 = `trace_breaking_advance_after_common` + `trace_breaking_advance_after_skill` ✓（「普攻**或**战技」在无 or 的 DSL 里是**两条** ✓，`when` 不同故不算重复 ✓）。⑤ 星魂 1–6 = 六条 `eidolonN_*` ✓ 全部落地 ✓。✅ **本文件已无登记缺口**：终结技那句「额外增加 2 次【剑势】的发动判定，伤害为原伤害的 50%」现由 `ult_grants_two_extra_sword_stance_rolls` + `extra_sword_stance_roll_chance` / `extra_sword_stance_roll_guaranteed` 兑现 ✓ —— 它需要的「多掷 N 次」参数就是本轮新增的 `chance_rolls` ✓（规则级**独立**掷骰 ✓）。为什么不能写成两条相同规则：仓库自己的 `ContentDuplicateGuardTest` 会判「one sentence written twice」✗（**实测**过 ✓）。"
   },
   {
     "on": "BATTLE_START",
@@ -359,5 +359,69 @@
     "source": "1206 行迹 破敌 (1206103): 「施放普攻或战技后，若场上有敌方目标处于弱点击破状态，则素裳的行动提前15%。」 param = [0.15]",
     "note": "「**施放普攻或战技后**，若**场上有敌方目标处于弱点击破状态**，则素裳的**行动提前 15%**」—— ① 事件 `ALLY_ATTACK` ✓：它**每次施放只发一次** ✓（本文件两条【剑势】用的是同一个事件 ✓，理由也写在它们的 note 里：挂逐段的 `DEALING_DAMAGE` 会逐段触发 ✗）；② 「普攻**或**战技」写成**两条**规则 ✓ —— DSL 没有 or ✗（`when` 是 AND ✓），而两条的 `when` 不同（`from_skill SKILL` ✓）⇒ 不是「一句话写两遍」✓（`ContentDuplicateGuardTest` 的签名含 `when` ✓，同形先例 1111 的 COMMON/SKILL 一对 ✓）；③ ⭐ **本条是 `enemy_state_count:` 的第一个读者** ✓（本轮新增的引擎能力 ✓）—— 原文问的是**全场**（「场上有敌方目标」✓），而 `has_state` 只问**某个具体单位** ✗，`enemy_count` 又只数人头不问状态 ✗ ⇒ 两者都写不出这句 ✓。计数 == 1 与 >= 1 在这句话上等价 ✓，但仍按**数量**写 ✓：同一句话的「有」只是数量 >= 1 的一种说法 ✓；④ `ADVANCE` + `percent: 0.15` ✓，`target: self` ✓（行动提前的是**素裳**✓）。⚠ `percent` 的口径按引擎自己的定义 ✓：**1.0 = 跳过目标剩余等待时间的全部** ✓，所以 0.15 = 跳过剩余的 15% ✓ —— 与 1215 星魂1 的「行动提前 15%」写法**逐字相同** ✓；⚠ 原文没有说「剩余」，但这是本引擎对「行动提前 X%」的**统一口径** ✓（全库 33 处 `ADVANCE` 同此），本条不另立一套 ✓。⚠ **登记**：`enemy_state_count` 只数**活着**的敌人 ✓（`enemyCount` 同款过滤 ✓），而原文说「场上有」✓ —— 已死的敌人本来就不该算「在场上」✓，两者的差别只出现在「破韧后被打死」这一瞬间 ✓。",
     "id": "trace_breaking_advance_after_skill"
+  },
+  {
+    "on": "ULT_CAST",
+    "id": "ult_grants_two_extra_sword_stance_rolls",
+    "when": [
+      "actor == self"
+    ],
+    "do": [
+      {
+        "op": "ADD_STACK",
+        "buff": "剑势额外判定",
+        "amount": 1,
+        "turns": 2,
+        "target": "self"
+      }
+    ],
+    "source": "1206 素裳 终结技 太虚形蕴•烛夜: 「…且施放战技时额外增加2次【剑势】的发动判定，持续2回合。」 param Lv10 → [3.2, 2, 0.5, 0.3]（#2 = 额外判定次数 2、#3 = 额外判定的伤害比率 0.5）",
+    "note": "这句话里**「持续 2 回合」的标记那一半** ✓：用 `ADD_STACK` + `turns: 2` 做一个**限时标记** ✓（`StackBuff` 的 `turns` 就是「到点自己掉」✓，与本库其它限时标记同形 ✓）。⚠ **不是层数消耗**：原文说「持续 2 回合」✗，没有说每掷一次消耗一层 ✗ ⇒ 一个不带层数的标记就够了 ✓（`amount: 1` ✓）；下面两条用 `self_stacks:` 读它 ✓。⚠ 具名 `剑势额外判定` 是必须的 ✓：`self_stacks:` 按**名字**读 ✓。⚠ 参数交叉验证 ✓：`AvatarConfigLD` 那一行 Lv10 的 `#2` 是 **2**（额外判定次数）✓、`#3` 是 **0.5** ✓，与正文的「2 次」「50%」逐字一致 ✓ —— 所以本句没有第二个数字歧义 ✓。"
+  },
+  {
+    "on": "ALLY_ATTACK",
+    "id": "extra_sword_stance_roll_chance",
+    "when": [
+      "actor == self",
+      "from_skill SKILL",
+      "self_stacks:剑势额外判定 >= 1",
+      "!target has_state 弱点击破"
+    ],
+    "chance": 0.33,
+    "chance_rolls": 2,
+    "do": [
+      {
+        "op": "DAMAGE",
+        "element": "Physical",
+        "target": "target",
+        "scale": "self_attr:ATTACK",
+        "percent": 0.5
+      }
+    ],
+    "source": "1206 素裳 终结技: 「施放战技时额外增加2次【剑势】的发动判定，持续2回合。通过额外判定发动的【剑势】伤害为原伤害的50%。」",
+    "note": "「额外增加 **2** 次【剑势】的**发动判定**…通过额外判定发动的【剑势】伤害为**原伤害的 50%**」—— ① ⭐ **`chance_rolls: 2` 是本轮新增的引擎能力** ✓（规则级**独立**掷骰 ✓）—— 为什么不能写成两条相同规则：仓库自己的 `ContentDuplicateGuardTest` 会把它判成「one sentence written twice」✗（**实测**：两条对称规则报 `ids extra_sword_stance_roll1 / _roll2` ✓）；② ⚠ 也**不是** `times: 2` ✗：`times` 重复的是**已经判定的结算** ✓，所以 `chance: 0.33, times: 2` 是「**一次**判定、两个伤害实例」✗，而原文说的是「**2 次**判定」✓ ⇒ 期望值相同、**分布不同** ✓，不能用前者近似后者 ✓；③ `chance: 0.33` 与基础【剑势】同值 ✓（同一句「33% 概率发动【剑势】」✓ —— 额外判定用的就是同一个判定 ✓）；④ `percent: 0.5` = 「原伤害的 50%」✓，`scale: self_attr:ATTACK` ✓（原伤害 = 100% 攻击力 ✓，与 `skill_sword_stance_chance` 同一口径 ✓）；⑤ `!target has_state 弱点击破` ✓ 与基础那条**成对** ✓（破韧时由 `_guaranteed` 接管 ✓，避免「破韧时还掷 33% 骰子」✗ —— 与基础那对完全同构 ✓）。"
+  },
+  {
+    "on": "ALLY_ATTACK",
+    "id": "extra_sword_stance_roll_guaranteed",
+    "when": [
+      "actor == self",
+      "from_skill SKILL",
+      "self_stacks:剑势额外判定 >= 1",
+      "target has_state 弱点击破"
+    ],
+    "chance": 1.0,
+    "chance_rolls": 2,
+    "do": [
+      {
+        "op": "DAMAGE",
+        "element": "Physical",
+        "target": "target",
+        "scale": "self_attr:ATTACK",
+        "percent": 0.5
+      }
+    ],
+    "source": "1206 素裳 战技: 「若该目标处于弱点击破状态，则【剑势】必定发动。」+ 终结技: 「…额外增加2次【剑势】的发动判定…」",
+    "note": "破韧时额外的那 2 次判定**同样必定发动** ✓ —— 原文的「必定发动」是**关于【剑势】这个判定**说的 ✓，而终结技只说了「额外增加 2 次…判定」✓（**沿用**同一个判定 ✓，不另立规则 ✗）。⚠ `chance: 1.0` 是需要的 ✓：`chance_rolls` 在**没有** `chance` 时会被加载期拒绝 ✓（「roll twice for always」说不清要掷什么 ✓），而 `chance: 1.0` 不消耗骰子 ✓ ⇒ 两次都必定结算 ✓。⚠ `percent: 0.5` 同样适用 ✓：原文的 50% 说的是「通过额外判定发动的【剑势】」✓，与是否破韧无关 ✓。⚠ 与本文件的 `skill_sword_stance_guaranteed` **成对** ✓（一条是基础判定、一条是额外判定 ✓，`when` 不同 ✓）。"
   }
 ]

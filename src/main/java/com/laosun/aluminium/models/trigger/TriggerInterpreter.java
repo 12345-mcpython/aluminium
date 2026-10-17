@@ -397,38 +397,48 @@ public final class TriggerInterpreter {
             // 概率为 100%，成功触发后…降低至当前概率的 20%" (reader: 1506's 【头号补给盲盒】). `chance` is then the initial value
             // and the owner holds where it has got to; a rule with no `chance_decay` has no entry and answers its own
             // `chance` forever, which is why this read changed no shipped rule's behaviour.
-            double chance = owner == null ? rule.chance() : owner.currentRuleChance(rule.id(), rule.chance());
-            if (chance < 1 && !battle.rollChance(chance)) {
-                continue;
-            }
-            // "若触发前目标被消灭则对新入场的敌方目标触发": the trigger already HAPPENED (its conditions and its roll are
-            // spent), but there is nobody to deliver it to - so it is held and delivered when a wave brings enemies in.
-            // Note: The effects - including which one a `one_of` picks - are decided at delivery; only the gate is now.
-            if (rule.deferUntilWave() && !hasLivingOpponent(battle, owner)) {
-                battle.deferUntilWave(rule, ctx.withRule(rule.id()));
-            } else {
-                apply(battle, rule, ctx.withRule(rule.id()));
-            }
-            if (owner != null && rule.chanceDecay() > 0) {
-                // "成功触发后": the rule really ran, so the NEXT time it is asked for, its probability is this much
-                // smaller. A failed roll returned above, and a firing turned away by a condition or a limit never got
-                // here at all - neither is a successful trigger.
-                owner.decayRuleChance(rule.id(), rule.chance(), rule.chanceDecay());
-            }
-            if (owner != null) {
-                // Note: The count recorded is the SAME number the check above used: recording the stated per_turn while
-                // checking the amended one would make an amended rule fire forever (its counter would never reach the
-                // raised cap). One expression, read twice -- see `amendedPerTurn`.
-                owner.startTriggerCooldown(limitKey, rule.cooldownTurns(), rule.oncePerBattle(),
-                        rule.perTurn() + owner.rulePerTurnBonus(rule.id()));
-                if (rule.oncePerWave()) {
-                    owner.recordWaveUse(limitKey, battle.waveSequence());
+            //
+            // `chance_rolls` makes those rolls INDEPENDENT within one firing ("施放战技时额外增加 2 次【剑势】的发动判定",
+            // reader 1206). It is not an effect's `times`: that repeats the SETTLEMENT of a decision already taken, so
+            // `chance: 0.33, times: 2` is "one roll, two hits" while this is "two rolls, each hit its own". The two have
+            // the same mean and different distributions, which is exactly why one cannot stand in for the other.
+            // Note: The roll is re-read per attempt, so a decaying rule decays BETWEEN attempts - the second attempt of
+            // one firing sees the reduced number, the same way a second firing would.
+            int attempts = rule.chanceRolls();
+            for (int attempt = 0; attempt < attempts; attempt++) {
+                double chance = owner == null ? rule.chance() : owner.currentRuleChance(rule.id(), rule.chance());
+                if (chance < 1 && !battle.rollChance(chance)) {
+                    continue;
                 }
-                if (rule.perAttack() > 0) {
-                    owner.recordAttackUse(limitKey, battle.attackSequence());
+                // "若触发前目标被消灭则对新入场的敌方目标触发": the trigger already HAPPENED (its conditions and its roll are
+                // spent), but there is nobody to deliver it to - so it is held and delivered when a wave brings enemies in.
+                // Note: The effects - including which one a `one_of` picks - are decided at delivery; only the gate is now.
+                if (rule.deferUntilWave() && !hasLivingOpponent(battle, owner)) {
+                    battle.deferUntilWave(rule, ctx.withRule(rule.id()));
+                } else {
+                    apply(battle, rule, ctx.withRule(rule.id()));
                 }
+                if (owner != null && rule.chanceDecay() > 0) {
+                    // "成功触发后": the rule really ran, so the NEXT time it is asked for, its probability is this much
+                    // smaller. A failed roll returned above, and a firing turned away by a condition or a limit never got
+                    // here at all - neither is a successful trigger.
+                    owner.decayRuleChance(rule.id(), rule.chance(), rule.chanceDecay());
+                }
+                if (owner != null) {
+                    // Note: The count recorded is the SAME number the check above used: recording the stated per_turn while
+                    // checking the amended one would make an amended rule fire forever (its counter would never reach the
+                    // raised cap). One expression, read twice -- see `amendedPerTurn`.
+                    owner.startTriggerCooldown(limitKey, rule.cooldownTurns(), rule.oncePerBattle(),
+                            rule.perTurn() + owner.rulePerTurnBonus(rule.id()));
+                    if (rule.oncePerWave()) {
+                        owner.recordWaveUse(limitKey, battle.waveSequence());
+                    }
+                    if (rule.perAttack() > 0) {
+                        owner.recordAttackUse(limitKey, battle.attackSequence());
+                    }
+                }
+                fired++;
             }
-            fired++;
         }
         return fired;
     }
