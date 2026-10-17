@@ -164,6 +164,36 @@ public class Damage {
         this.skillKey = skillKey;
     }
 
+    /**
+     * For damage the engine <b>derived</b> from another instance (weakness break, super break): the cast of the instance
+     * that produced it. {@code null} for an instance that IS a cast's own damage.
+     *
+     * <p><b>Why a second field instead of stamping {@link #getCastCategory()}.</b> The instance's own category is read by
+     * the scoped DMG boost ({@code BattleDamage}) and by every {@code ADD_DAMAGE} / {@code BOOST_DAMAGE} reader - "damage
+     * dealt by ultimates is raised by X%", "the ultimate's multiplier is raised by 120%". Break damage is <b>not</b> that
+     * multiplier, so stamping it would inflate the break. But the <b>event</b> 「who caused this damage」 must still see the
+     * chain: 1002 Dan Heng (丹恒)'s Eidolon 4 「施放终结技消灭敌方目标时」 fires when the ultimate breaks the target and
+     * the <b>break damage</b> lands the killing blow.
+     *
+     * <p>Reader: {@code Battle.castOf(damage)}, which every cast-carrying event uses ({@code KILL} / {@code DEATH} /
+     * {@code DAMAGE_SETTLED}).
+     */
+    private com.laosun.aluminium.enums.SkillCategory causedByCast;
+
+    /**
+     * The cast this instance was derived from - see {@link #causedByCast}.
+     */
+    public com.laosun.aluminium.enums.SkillCategory getCausedByCast() {
+        return causedByCast;
+    }
+
+    /**
+     * Records the cast that produced this derived instance.
+     */
+    public void setCausedByCast(com.laosun.aluminium.enums.SkillCategory causedByCast) {
+        this.causedByCast = causedByCast;
+    }
+
     /** Records the intended toughness reduction (fluent, like the other instance mutators). */
     /**
      * The targets hit by the attack that produced this instance.

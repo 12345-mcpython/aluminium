@@ -2246,7 +2246,7 @@ public class Battle {
             fireTriggers(TriggerEvent.DEATH, target, target, 0, 0.0, damage, damage.getCastCategory());
             // The causing instance's cast category rides along: "each time 1 enemy target is defeated"-style rules have to be able to
             // ask WHICH skill produced the kill (see the `from_skill` condition), and the instance already knows.
-            fireTriggersWithSubject(TriggerEvent.KILL, damage.getAttacker(), target, 0, damage.getCastCategory());
+            fireTriggersWithSubject(TriggerEvent.KILL, damage.getAttacker(), target, 0, castOf(damage));
         }
         grantHitAndKillEnergy(target, damage, died, grant);     // hit energy gain / kill energy gain
         // The return value = the damage this hit actually had effect with = shield-absorbed + HP really lost.
@@ -2463,6 +2463,30 @@ public class Battle {
         return Math.max(1, damage.toValue());
     }
 
+    /**
+     * The cast an event carries: the instance's own cast, or - for damage the engine derived from it (break / super break) -
+     * the cast of the instance that produced it.
+     *
+     * <p><b>Why only KILL, and why not the instance.</b> {@code getCastCategory()} is also what the scoped DMG boost and
+     * every {@code ADD_DAMAGE} / {@code BOOST_DAMAGE} / {@code original_damage} reader sees, and a derived instance must not
+     * be treated as the cast's own multiplier: measured, making {@code DAMAGE_SETTLED} follow the chain made 1003 Himeko
+     * (姬子)'s Eidolon 6 「原伤害的 40%」 fire on the <b>break</b> instance as well (and it then failed to resolve its
+     * {@code random_enemy}). The <b>kill</b> is the one question that is about the chain rather than about the multiplier -
+     * 「施放终结技消灭敌方目标时」 - so only {@code KILL} uses this, and it is what makes 1002 Dan Heng (丹恒)'s Eidolon 4 fire
+     * when his ultimate breaks the target and the break damage lands the killing blow.
+     */
+    private static SkillCategory castOf(Damage damage) {
+        if (damage == null) {
+            return SkillCategory.UNSPECIFIED;
+        }
+        SkillCategory own = damage.getCastCategory();
+        if (own != null && own != SkillCategory.UNSPECIFIED) {
+            return own;
+        }
+        SkillCategory cause = damage.getCausedByCast();
+        return cause == null ? SkillCategory.UNSPECIFIED : cause;
+    }
+
     public StanceResult reduceToughness(CanHit attacker, Enemy enemy, DamageElement element, double stanceDamage) {
         // No causing cast known (a test, a demo, an enemy skill that builds its damage inline): the break still
         // happens, it just cannot say which skill produced it -- so `from_skill` conditions do not match it.
@@ -2535,8 +2559,12 @@ public class Battle {
         // KILL_ONLY: the break is extra damage derived from the main instance, so the victim gains no energy
         // (one attack grants energy only once); but if the main instance did not kill and the break finishes it
         // off, the kill energy gain is still credited to the attacker.
-        double breakDamage = applyDamage(enemy,
-                BreakDamageCalculator.build(attacker, enemy, element, consumed), EnergyGrant.KILL_ONLY);
+        // The break damage is damage THIS cast caused, but it is not this cast's own multiplier: it keeps its own
+        // (UNSPECIFIED) category so the scoped DMG boost and every ADD_DAMAGE/BOOST_DAMAGE reader leave it alone, and it
+        // carries the cast as `causedByCast` for the events that ask 「who caused this」 (see `Battle.castOf`).
+        Damage breakHit = BreakDamageCalculator.build(attacker, enemy, element, consumed);
+        breakHit.setCausedByCast(fromCast);
+        double breakDamage = applyDamage(enemy, breakHit, EnergyGrant.KILL_ONLY);
         delayMovePercent(enemy, Constant.BREAK_DELAY_RATIO);                                       // action delay
         BattleDamage.attachBreakDot(this, attacker, enemy, element);                                                  // DOT
         BattleDamage.attachBreakControl(this, enemy, element);                                                        // control state

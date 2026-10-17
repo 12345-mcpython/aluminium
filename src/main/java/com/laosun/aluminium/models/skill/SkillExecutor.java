@@ -724,7 +724,8 @@ public final class SkillExecutor {
         // The instance is passed on: a weakness break caused by THIS cast has to be attributable to it
         // ("when casting the Skill ... causes a weakness break"), and damage is the only thing carrying the cast's category.
         Battle.StanceResult stance = battle.reduceToughness(user, enemy, element, effectiveStance, damage.getCastCategory());
-        return stance.breakDamage() + applySuperBreak(battle, user, enemy, element, stance.superBreakStance());
+        return stance.breakDamage()
+                + applySuperBreak(battle, user, enemy, element, stance.superBreakStance(), damage.getCastCategory());
     }
 
     /**
@@ -743,11 +744,15 @@ public final class SkillExecutor {
      * @return the super break damage settled by this hit (0 = not triggered)
      */
     private static double applySuperBreak(Battle battle, CanHit user, Enemy enemy, DamageElement element,
-                                          double superBreakStance) {
+                                          double superBreakStance, com.laosun.aluminium.enums.SkillCategory cast) {
         if (superBreakStance <= 0 || !user.getBuffManager().hasBuff(SuperBreakBuff.class)) {
             return 0;
         }
         Damage superBreak = BreakDamageCalculator.buildSuperBreak(user, enemy, element, superBreakStance);
+        // Same reason as the break damage in `Battle.reduceToughness`: the instance keeps its own category (break damage is
+        // not the cast's multiplier, so the scoped boost and ADD_DAMAGE must leave it alone), and the cast that produced it
+        // rides along for the kill-side events - `Battle.castOf` is what reads it.
+        superBreak.setCausedByCast(cast);
         return battle.applyDamage(enemy, superBreak);
     }
 }

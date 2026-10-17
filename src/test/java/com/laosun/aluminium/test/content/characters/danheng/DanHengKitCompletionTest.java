@@ -9,6 +9,7 @@ import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Damage;
+import com.laosun.aluminium.models.DoubleValue;
 import com.laosun.aluminium.models.buff.StatModifierBuff;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.test.support.BattleFixture;
@@ -115,6 +116,89 @@ public class DanHengKitCompletionTest {
         noEidolon.killWith(SkillCategory.ULTRA);
         Assertions.assertNull(noEidolon.battle.getExtraTurnActor(),
                 "at rank 0 the eidolon is not active, so even an ultimate kill pays nothing");
+
+        // ---- the two cases that separate「这一发伤害的来源施放」 from「实例自己的槽位」 ----
+        //
+        // (A) the ultimate breaks a Wind-weak target and the BREAK damage lands the kill: the break instance carries its own
+        //     UNSPECIFIED category (it must - otherwise the ultimate's +120% multiplier would be added to the break), but the
+        //     event follows the chain through `causedByCast`, so this IS 「施放终结技造成」.
+        Assertions.assertNotNull(breakingUltimateKillActor(),
+                "the ultimate broke it and the break damage killed it: still that ultimate's kill");
+        // (B) the ultimate leaves the target alive and a LATER dot instance of his finishes it: no.
+        Assertions.assertNull(dotAfterTheUltimate(),
+                "a later持续伤害 is not damage this cast caused");
+    }
+
+    /**
+     * 星魂 4, case (A): Dan Heng's ultimate against a Wind-weak target with 1 toughness left and just enough HP to survive
+     * the ultimate's own instance - so the <b>break damage</b> is what kills. Returns the unit the engine granted the extra
+     * turn to (or {@code null}).
+     */
+    private static Object breakingUltimateKillActor() {
+        Character danHeng = CharacterFactory.create(DANHENG, LEVEL, true, null, null, 4);
+        com.laosun.aluminium.models.enemy.Enemy enemy =
+                BattleFixture.enemy(100201602, 90);              // weak to Wind: his ultimate can break it
+        Battle battle = new Battle(new ArrayList<>(List.of(danHeng)), new ArrayList<>(List.of(enemy)),
+                BattleFixture.seeded());
+        battle.startBattle();
+
+        // The ultimate's own settled damage, measured on a spare copy of the same fight.
+        double ultDamage = ultimateDamageAgainst(100201602);
+        enemy.setAttribute(AttributeType.HEALTH, new DoubleValue(ultDamage + 1));
+        enemy.heal(ultDamage + 1);
+        enemy.reduceStance(enemy.getStance() - 1);                // one point left: the ultimate breaks it
+        Assertions.assertEquals(1.0, enemy.getStance(), 1e-9, "precondition: one toughness point left");
+        Assertions.assertTrue(enemy.isWeakTo(com.laosun.aluminium.enums.DamageElement.WIND),
+                "precondition: Wind reduces its toughness at all");
+
+        com.laosun.aluminium.models.skill.SkillExecutor.execute(battle, danHeng.getSkills().get(SkillType.ULTRA),
+                danHeng, List.of(enemy));
+        Assertions.assertTrue(enemy.isDeath(), "precondition: the break damage killed it");
+        Assertions.assertTrue(enemy.isBroken(), "precondition: the ultimate broke it");
+        return battle.getExtraTurnActor() == null ? null : danHeng;
+    }
+
+    /** The ultimate's settled normal damage against that monster, measured rather than assumed. */
+    private static double ultimateDamageAgainst(int monsterId) {
+        Character danHeng = CharacterFactory.create(DANHENG, LEVEL, true, null, null, 4);
+        com.laosun.aluminium.models.enemy.Enemy enemy = BattleFixture.enemy(monsterId, 90);
+        Battle battle = new Battle(new ArrayList<>(List.of(danHeng)), new ArrayList<>(List.of(enemy)),
+                BattleFixture.seeded());
+        battle.startBattle();
+        enemy.setAttribute(AttributeType.HEALTH, new DoubleValue(1_000_000));
+        enemy.heal(1_000_000);
+        double[] settled = new double[1];
+        battle.addDamageObserver((damage, applied, hpLoss, shieldAbsorbed, died) -> {
+            if (damage.getType() == com.laosun.aluminium.enums.DamageType.NORMAL) {
+                settled[0] = applied;
+            }
+        });
+        com.laosun.aluminium.models.skill.SkillExecutor.execute(battle, danHeng.getSkills().get(SkillType.ULTRA),
+                danHeng, List.of(enemy));
+        return settled[0];
+    }
+
+    /**
+     * 星魂 4, case (B): the ultimate hits a target that survives it, and a <b>later</b> damage instance of his (a 持续伤害
+     * tick) finishes the target. The kill is not the ultimate's.
+     */
+    private static Object dotAfterTheUltimate() {
+        Character danHeng = CharacterFactory.create(DANHENG, LEVEL, true, null, null, 4);
+        var enemy = BattleFixture.monster();
+        Battle battle = new Battle(new ArrayList<>(List.of(danHeng)), new ArrayList<>(List.of(enemy)),
+                BattleFixture.seeded());
+        battle.startBattle();
+        enemy.setAttribute(AttributeType.HEALTH, new DoubleValue(1_000_000));
+        enemy.heal(1_000_000);
+        com.laosun.aluminium.models.skill.SkillExecutor.execute(battle, danHeng.getSkills().get(SkillType.ULTRA),
+                danHeng, List.of(enemy));
+        Assertions.assertFalse(enemy.isDeath(), "precondition: the ultimate did not kill it");
+        Assertions.assertNull(battle.getExtraTurnActor(), "precondition: nothing scheduled yet");
+        enemy.takeDamage(enemy.getCurrentHp() - 1);
+        battle.applyDamage(enemy, new Damage(danHeng, enemy, com.laosun.aluminium.enums.DamageElement.WIND,
+                com.laosun.aluminium.enums.DamageType.DOT, 5_000, SkillCategory.UNSPECIFIED));
+        Assertions.assertTrue(enemy.isDeath(), "precondition: the dot finished it");
+        return battle.getExtraTurnActor();
     }
 
     /**
