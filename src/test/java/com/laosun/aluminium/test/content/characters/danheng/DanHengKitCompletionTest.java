@@ -128,8 +128,12 @@ public class DanHengKitCompletionTest {
         f.battle.fireTriggers(com.laosun.aluminium.enums.TriggerEvent.ALLY_ATTACK,
                 f.danheng, f.enemy, 0, 0);
 
-        Assertions.assertTrue(f.danheng.getAttribute(AttributeType.SPEED).get() > before,
-                "「使自身速度提高20%」: " + before + " -> " + f.danheng.getAttribute(AttributeType.SPEED).get());
+        double after = f.danheng.getAttribute(AttributeType.SPEED).get();
+        // The VALUE, not just the direction: `> before` would stay green for a 2% raise. Provenance: `1002102`'s
+        // `ParamList = [{0.5}, {0.2}, {2}]` - fixed chance 50%, SPEED 20%, 2 turns - and the 0.5 is the rule-level
+        // `chance` (a fixed probability that never goes through effect hit/resistance), not `base_chance`.
+        Assertions.assertEquals(0.2, after / before - 1.0, 1e-9,
+                "「使自身速度提高20%」: " + before + " -> " + after);
     }
 
     /**
