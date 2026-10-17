@@ -131,6 +131,10 @@
 | `damage_has_no_cast` | 这一发**没有施放来源** |
 | `damage_element_is_self` | 这一发的属性 = 我自己的属性 |
 
+⚠ **`from_skill` / `from_skill_id` 只在那几个"携带施放"的事件上为真** ✓（源码 `CAST_CARRYING_EVENTS` ✓）：`DEALING_DAMAGE` / `BREAK` / `KILL` / `ALLY_ATTACK` / `CAST_SETUP` / `DAMAGE_SETTLED` / `ATTACK_FINISHED` / **`CRIT_DEALT`** ✓。
+挂到别的事件上会在**加载期**报错 ✓ —— 故意的 ✓：否则那条规则永不匹配，而且没有症状 ✗。
+⚠ `CRIT_DEALT` 是最后加进来的一个 ✓（读者：1002 丹恒战技「战技造成的伤害触发暴击时」✓）：它的上下文带着**这一发的伤害实例** ✓，实例知道自己来自哪个技能 ✓，所以不必另造"这一发暴击了"的谓词 ✓。
+
 ### 3.5 数值变量（**闭集**，`TriggerConditionParser.NUMERIC_VARIABLES`）
 
 | 变量 | 读的是 |
