@@ -898,6 +898,7 @@ C 层全是**填口子** ✓，依赖已完成的机制，**不该出现新架�
 | **`enemy_state_count:` 全场状态计数**（状态过滤 / 只数活人 / 空状态名在加载期被拒 / 未知变量提示它） | `EnemyStateCountTest` / `EnemyStateCountSpellingTest` | 4 / 3 |
 | **`chance_rolls:` 规则级独立掷骰**（两次判定都结算、各 50% 伤害；0 次与"无 chance 却要掷两次"在加载期被拒） | `ChanceRollsTest` / `ChanceRollsValidationTest` | 3 / 4 |
 | **§3.5 变量表与加载器零漂移**（双向：代码有文档无 / 文档有代码无 / 标题消失时大声失败而非空集相等） | `TriggerVocabularyDriftTest` | 3 |
+| **`CRIT_DEALT` 携带施放槽位**（战技暴击才减速、普攻暴击不减速；星魂 6 的 20% vs 12%；星魂 4 的 0 魂不生效；星魂 1 的 12% 只对 ≥50% 生命的敌人） | `DanHengKitCompletionTest` | 6 |
 
 ### 7.2 **只靠散文**（所以上面必须写完整）
 

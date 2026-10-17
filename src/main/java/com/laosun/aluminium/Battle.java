@@ -2353,7 +2353,10 @@ public class Battle {
             // "removes 1 buff from the attacked enemy target" acts on it. `fireTriggersWithSubject` (unlike its ally-only sibling)
             // does not refuse a subject from the other camp -- and enemy crits still reach nobody, because every such
             // rule says `actor == self` and the actor here is whoever dealt it.
-            fireTriggersWithSubject(TriggerEvent.CRIT_DEALT, attacker, defender, 0);
+            // Note: The CAST CATEGORY goes with it. The crit belongs to this instance, and the instance knows which
+            // skill produced it, so "战技造成的伤害触发暴击时" (reader: 1002 Dan Heng's Skill) can be scoped to the
+            // Skill without inventing a predicate -- `from_skill` reads this field on the events that state one.
+            fireTriggersWithSubject(TriggerEvent.CRIT_DEALT, attacker, defender, 0, damage.getCastCategory());
         }
 
         // 3) Defence zone: attacker level / victim defence / attacker defence ignore

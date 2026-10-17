@@ -57,14 +57,21 @@ public class DanHengTest {
     }
 
     /**
-     * Census: the talent and the level convention are where the notes say.
+     * Census: every event his file states a clause on, with the number of rules on each.
+     *
+     * <p>⚠ `ruleCount` counts the WHOLE table, eidolon gating included - it is a census of what the file states,
+     * not of what is active at rank 0, so these numbers move when a clause is added.
      */
     @Test
     public void hisFileCarriesTheClauses() {
         var table = TriggerTables.of(DANHENG);
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.SKILL_CAST), "the talent");
-        Assertions.assertEquals(2, table.ruleCount(TriggerEvent.BATTLE_START),
-                "the technique opening ATK (round 179) and the level convention");
+        Assertions.assertEquals(4, table.ruleCount(TriggerEvent.BATTLE_START),
+                "the technique opening ATK, the level convention, and the two eidolon level statements (3 and 5)");
+        Assertions.assertEquals(2, table.ruleCount(TriggerEvent.CRIT_DEALT),
+                "the Skill's crit-slow, and eidolon 6's deeper version of it (mutually exclusive on rank)");
+        Assertions.assertEquals(1, table.ruleCount(TriggerEvent.ALLY_ATTACK), "trace 绝影");
+        Assertions.assertEquals(1, table.ruleCount(TriggerEvent.KILL), "eidolon 4's extra turn");
     }
 
     private static final class Fixture {

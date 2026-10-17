@@ -2331,7 +2331,11 @@ final class TriggerConditionParser {
                     // to know WHICH skill produced the damage it is a share of, and `Battle.applyDamage` states the
                     // category when it announces the settlement (the same field KILL already rides).
                     TriggerEvent.DAMAGE_SETTLED,
-                    TriggerEvent.ATTACK_FINISHED);
+                    TriggerEvent.ATTACK_FINISHED,
+                    // A crit belongs to the instance that crit, and the instance names its cast: 「战技造成的伤害
+                    // 触发暴击时」 (reader: 1002 Dan Heng) asks which slot produced the critting hit. Measured: this
+                    // event had zero readers before that clause, so nothing was written against its absence.
+                    TriggerEvent.CRIT_DEALT);
 
     /**
      * The resource behind a {@code self_resource:<NAME>} variable, or {@code null} for anything else.
