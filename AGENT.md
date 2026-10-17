@@ -895,6 +895,7 @@ C 层全是**填口子** ✓，依赖已完成的机制，**不该出现新架�
 | 命中率 clamp 的**上界**（命中 0.32 时返回 1.0 而不是 1.32） | `HitResistTest` | — |
 | 演示至少不抛异常 | `DemoSmokeTest` | 5 |
 | 触发规则表装载 | `TriggerTableTest` | — |
+| **`enemy_state_count:` 全场状态计数**（状态过滤 / 只数活人 / 空状态名在加载期被拒 / 未知变量提示它） | `EnemyStateCountTest` / `EnemyStateCountSpellingTest` | 4 / 3 |
 
 ### 7.2 **只靠散文**（所以上面必须写完整）
 

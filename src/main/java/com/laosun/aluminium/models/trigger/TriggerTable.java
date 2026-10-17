@@ -1573,6 +1573,14 @@ public class TriggerTable {
          */
         private double value(TriggerContext ctx, String variable, AttributeType attribute, String resource,
                              String stacksName, boolean stacksOnTarget, boolean stacksOnActor) {
+            // A whole-field count. Resolved from the variable's own name rather than from a `Numeric` field,
+            // because the name IS the parameter: there is nothing to resolve at parse time beyond its shape
+            // (which `requireEnemyStateName` already refused), so a field would be a slot that only ever holds
+            // a suffix of `variable`.
+            if (variable.startsWith(TriggerConditionParser.ENEMY_STATE_COUNT_PREFIX)) {
+                return enemyStateCount(ctx,
+                        variable.substring(TriggerConditionParser.ENEMY_STATE_COUNT_PREFIX.length()).trim());
+            }
             if (attribute != null) {
                 return ownerAttribute(ctx.owner(), attribute);
             }
@@ -1695,6 +1703,36 @@ public class TriggerTable {
                 return Double.NaN;
             }
             return ctx.battle().enemyUnits().stream().filter(enemy -> !enemy.isDeath()).count();
+        }
+
+        /**
+         * How many living enemies are currently in the named state -- "场上有敌方目标处于<某状态>".
+         *
+         * <p>The reader is 1206 Sushang's trace 破敌, whose clause is "施放普攻或战技后，<b>若场上有敌方目标处于弱点击破
+         * 状态</b>，则素裳的行动提前 15%": a question about the FIELD rather than about one unit, which neither
+         * {@code has_state} (one named party) nor {@code enemy_count} (the camp as a whole) could ask.
+         *
+         * <p>⚠ The state is resolved by the <b>same</b> {@code BuffManager.hasState} the {@code has_state}
+         * keyword calls, so the two spellings cannot disagree about what "in that state" means - including the
+         * engine's own aliases ({@code BuffManager.BROKEN_STATE} is "弱点击破", which is exactly the name
+         * 1206 asks about).
+         *
+         * <p>{@code NaN} when there is no battlefield, the rule every count in this vocabulary follows: "cannot
+         * read it" and "there are none" are different answers, and only one of them has a symptom. The dead are
+         * skipped - a corpse is not "on the field", and it cannot carry a state either.
+         */
+        private static double enemyStateCount(TriggerContext ctx, String stateName) {
+            if (ctx.battle() == null || ctx.battle().enemyUnits() == null) {
+                return Double.NaN;
+            }
+            if (stateName == null || stateName.isBlank()) {
+                // Unreachable through a validated table; a hand-built one should say so rather than count zero.
+                return Double.NaN;
+            }
+            return ctx.battle().enemyUnits().stream()
+                    .filter(enemy -> !enemy.isDeath())
+                    .filter(enemy -> enemy.getBuffManager().hasState(stateName))
+                    .count();
         }
 
         /**
