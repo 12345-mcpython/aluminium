@@ -510,7 +510,7 @@ if (isSelected) buffer.setStyle(rowArea, highlightStyle);
     ⇒ "这条天赋伤害是哪个规则发的"**类型这一层区分不了** ✓ ⇒ **留作已知缺口，不猜** ✓（§3.9 的 TALENT 讨论 ✓）。
   - **`element: "attacker"`** ✓ 已补 ✓（含"作用域只给伤害类 op"＋一条判据 ✓）。
   - **`steps:` 形式的 `scale` 对 GAIN 被静默忽略** ✗ —— 用**量化计数器** ＋ **第二个** `amount_from_resource` 即可写出 ✓（§6.2 的撤回 ✓）。
-  - **忆灵的技能等级：现在读得到、也改得到、也点得到**（2026-10-17 补齐 ✓，原先登记为"读得到、改不了、点不到"）：
+  - **忆灵的技能等级：读得到、也改得到、也点得到**（2026-10-17 补齐 ✓，原先登记为"读得到、改不了、点不到"）：
     - **读得到** ✓：忆灵技能按 `(servant_id, data slot)` 建 ✓，等级来自 `memosprites/<id>.json` 的
       `skills: [{slot, level}]` ✓ ⇒ `CastSkillParamScaleTest` 钉住的就是"读的是**当前等级那一行**" ✓。
     - **改得到** ✓：`RAISE_SKILL_LEVEL` ＋ `memosprite: true` ＋ `skill_id: <数据槽位>` ✓ —— 加成记在**召唤者**身上
@@ -520,9 +520,18 @@ if (isSelected) buffer.setStyle(rowArea, highlightStyle);
       `amount_from_cast_param` 补上了"忆灵施放 + 随等级变的常数项" ✓。
       判据：`MemospriteSkillLevelTest`（加成落在召唤者 / 解析器读到 / 超表行数被 clamp / 两种读法 / 加载期五种拒绝 ✓；
       变异：把向主人取加成的那一段关掉 ⇒ 该用例当场红 ✓）。
-    - ⚠ **仍是常量**：忆灵的等级**来自 spec 的声明** ✓，今天全部声明成表的最后一行（10 行 10 级 ✓）⇒
-      再 +1 会被 clamp 回去 ✓ —— 这不是缺陷，**行数就是文档的上限** ✓（与角色同一条 `skillLevel` 规则 ✓）。
-      真要有内容写「忆灵技等级+N」，把 spec 的声明调低，加成才有可见效果 ✓（判据里就是这么造的可观察状态 ✓）。
+  - **忆灵技能的等级上限**（2026-10-17 核对 ✓）：与**角色同一条规则** ✓ —— `CanHit.skillLevel` 把等级 clamp 到
+    表的行数 ✓，而**行数就是文档写的上限** ✓。所以"声明在最后一行时 +1 看不出变化"**不是缺陷** ✓
+    （角色的「普攻等级+1」在 10 行表上完全一样 ✓）。判据：`MemospriteSkillLevelTest.aRaisePastTheTableIsClampedToTheTablesRows` ✓。
+  - **回能已改成读数据**（2026-10-17 ✓，原登记为"走常量"）：`StandardEnergyProvider` 现在读技能自己的
+    `sp_base` ✓ —— **弹射按段数乘**（每段值 × 实际段数 ✓），其它形状那一行本来就是整次的值 ✓。
+    ⚠ 与常量**只在 3 行不一致**（`1212/2`、`1402/2`、`1502/1` ✓，实测枚举）⇒ 数据是权威 ✓；
+    `EnergyDataConformanceTest` 把"引擎答案 = `sp_base` × 段数"和"偏离常量的正好这三行"都钉住 ✓。
+  - **Impair 的 debuff 派发仍缺**（2026-10-17 核对 ✓）：`skill_effects.json` 里**一条 `Impair` 行都没有** ✗，
+    缺的不是"多少"，而是**"哪个 debuff"** ✓（一句 `陷入【吞火】状态` / `风化/裂伤/灼烧/触电其中1种` 只在正文里 ✓）。
+    ⇒ `SkillData.debuffChance(int)` 已有等级感知 ✓ 但**没有调用者** ✓；`ImpairDebuffGapTest` 把两件事钉住：
+    ① 没有一条 `Impair` 技能带 effect 行（有了一条就红，说明派发有了输入 ✓）；② 正文点了**战斗内**状态的只有
+    `1210/4`、`1218/4`、`1410/4`（其余是**地图**层，本引擎没有那一层 ✓）。
 
 ### 4.4 层序与状态（**替代旧的"为什么这样排序"**）
 
@@ -1025,7 +1034,9 @@ C 层全是**填口子** ✓，依赖已完成的机制，**不该出现新架�
 | **`HEAL` / `SHIELD` 的份额与常数项都读「当前等级」的参数**（两个半都动 / 只读字面量时会红 / 拼法写错在加载期被拒 / 两种金额来源互斥） | `SkillParamMagnitudeTest` |
 | **读「当前等级」的规则不会早于设置等级的那条跑**（`BATTLE_START` 上与 `level_convention` 同事件时，顺序即语义） | `LevelConventionOrderTest` |
 | **忆灵的技能等级**（加成记在召唤者、按数据槽位 / 解析器读到并 clamp 到表行数 / `summon_param` 与 `amount_from_cast_param` 两种读法 / 加载期五种拒绝） | `MemospriteSkillLevelTest` |
-| **弹射的份额与次数读的是当前等级那一行**（两行两个数 / 行为比值 = 两行份额之比 / 造表让次数也随行变） | `BounceSkillLevelTest` |
+| **弹射的份额与次数读的是当前等级那一行**（两行两个数 / 行为比值 = 两行份额之比 / 造表让次数也随行变 / **次数优先读正文**「额外造成N次」） | `BounceSkillLevelTest` |
+| **回能读技能自己的 `sp_base`**（弹射按段数乘 / 偏离常量的行正好三行 / 两发弹射的 6×5 与 10×3 都是 30） | `EnergyDataConformanceTest` |
+| **Impair 的 debuff 派发缺口**（没有一条 `Impair` 带 effect 行 / 正文点战斗内状态的正好三条） | `ImpairDebuffGapTest` |
 | **台账不写"现在是什么"的数字**（套件 / 用例 / 文件 / 方法 / 类 / 规则数、`file:line`、大小、提交数、「N 处」） | `LedgerNumberGuardTest` |
 
 ### 7.2 **只靠散文**（所以上面必须写完整）
