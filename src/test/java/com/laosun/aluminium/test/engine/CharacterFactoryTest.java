@@ -50,12 +50,16 @@ public class CharacterFactoryTest {
      * Every character's star rating can be read, and the only values are 4 / 5 (a prerequisite of skill assembly).
      *
      * <p>{@code rarity} is obtained by the generator from the last digit of
-     * {@code AvatarConfig.Rarity} (of the form {@code CombatPowerAvatarRarityType5}); in the data it
-     * is 23 four-stars + 0 five-stars (consistent with the docs' index table).
+     * {@code AvatarConfig.Rarity} (of the form {@code CombatPowerAvatarRarityType5}).
      *
      * <p>Why pin it down now: in skill assembly the skill level cap differs by star rating (it must be
      * readable before skill assembly), and if the {@code CharacterData} record is missing a field,
      * Gson silently gives 0 - no error, just everything wrong.
+     *
+     * <p>⚠ The two counts are updated when characters are added, and that is the point of the case: a
+     * new character that quietly landed with no rarity, or with the wrong one, moves these numbers and
+     * says so. The four collaboration characters (1014 Saber, 1015 Archer, 1508, 1509) took 5★ from 71
+     * to 75; 4★ stayed at 23.
      */
     @Test
     public void everyCharacterHasAStarRating() {
@@ -66,10 +70,37 @@ public class CharacterFactoryTest {
         Assertions.assertEquals(Set.of(4, 5), distribution.keySet(),
                 "the star rating should only be 4 and 5, actually " + distribution);
         Assertions.assertEquals(23L, distribution.get(4), "number of 4★");
-        Assertions.assertEquals(71L, distribution.get(5), "number of 5★");
+        Assertions.assertEquals(75L, distribution.get(5), "number of 5★");
 
         Assertions.assertEquals(5, CharacterFactory.data(1204).rarity(), "Jing Yuan is 5★");
         Assertions.assertEquals(4, CharacterFactory.data(1001).rarity(), "March 7th is 4★");
+    }
+
+    /**
+     * The four collaboration characters are present, and buildable.
+     *
+     * <p>⚠ They live only in the game's {@code *LD} tables, which the generator merges - so a data
+     * snapshot taken before that merge, or a regeneration that stopped merging, drops exactly this set and
+     * nothing else. The star-rating count above cannot name them; this can.
+     */
+    @Test
+    public void theCollaborationCharactersAreBuildable() {
+        for (String[] expected : new String[][]{
+                {"1014", "wind", "Saber"},
+                {"1015", "quantum", "Archer"},
+                {"1508", "quantum", "Rin Tohsaka"},
+                {"1509", "thunder", "Gilgamesh"}}) {
+            int cid = Integer.parseInt(expected[0]);
+            CharacterData data = CharacterFactory.data(cid);
+            Assertions.assertNotNull(data, expected[0] + " must be in the generated data");
+            Assertions.assertEquals(expected[1], data.attribute(),
+                    expected[0] + "'s element must match AvatarConfigLD");
+            Assertions.assertEquals(5, data.rarity(), expected[0] + " is a 5★");
+            Assertions.assertEquals(expected[2], data.name().english(),
+                    expected[0] + "'s name must resolve, not fall back to a missing text id");
+            Assertions.assertNotNull(CharacterFactory.create(cid, 80),
+                    expected[0] + " must build from the generated data alone");
+        }
     }
 
     /**
