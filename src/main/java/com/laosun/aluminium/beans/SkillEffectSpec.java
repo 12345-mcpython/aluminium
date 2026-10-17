@@ -60,6 +60,22 @@ public class SkillEffectSpec {
     private String formula;
 
     /**
+     * The skill's damage <b>segments</b>, as fractions of its own multiplier row (「分裂比」).
+     *
+     * <p>Reader: 1002 Dan Heng (丹恒) - 「官方最大命中次数 2」 for his basic attack (0.45 + 0.55 of the row's
+     * multiplier) and <b>4</b> for his Skill (0.30 + 0.15 + 0.15 + 0.40). The <b>total is unchanged</b> (the fractions sum
+     * to 1), and that is the point: what changes is how many damage <b>instances</b> the cast settles - each with its own
+     * crit roll and its own events, which is what 「战技造成的伤害<b>触发暴击时</b>」 counts in the game.
+     *
+     * <p>Note: Absent means "one instance", which is every other skill's behaviour and the state before this field
+     * existed. The data is generated from the ability config's segment table; only the rows that were derived are
+     * listed, and a skill without an entry is not an approximation - it is the single-instance shape the whole engine
+     * used before.
+     */
+    @SerializedName("segments")
+    private List<Double> segments;
+
+    /**
      * Human-readable provenance. The engine never reads it.
      */
     @SerializedName("source")

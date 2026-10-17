@@ -486,9 +486,26 @@ public final class SkillExecutor {
         }
 
         switch (effect) {
-            case SINGLE_ATTACK, MAZE_ATTACK ->
-                    totalDamage += hit(battle, data, user, element, base, mainTarget, hitTargets,
-                            data.getStanceList().single(), skill.getSkillSlot());
+            case SINGLE_ATTACK, MAZE_ATTACK -> {
+                // A single-target skill may state its damage in SEGMENTS (「分裂比」): 1002 Dan Heng (丹恒)'s basic
+                // attack is 2 instances (0.45 + 0.55) and his Skill is 4 (0.30 + 0.15 + 0.15 + 0.40). The fractions sum
+                // to 1, so the total is unchanged; what changes is that each instance settles on its own - its own crit
+                // roll, its own DEALING_DAMAGE / CRIT_DEALT / TAKING_HIT - which is what the game counts when a sentence
+                // says 「战技造成的伤害触发暴击时」. The stance (toughness) is one number for the cast, so it is spread
+                // over the instances the same way the bounce branch spreads it.
+                List<Double> segments = segmentsOf(skill);
+                double stance = data.getStanceList().single();
+                if (segments.size() <= 1) {
+                    totalDamage += hit(battle, data, user, element, base, mainTarget, hitTargets, stance,
+                            skill.getSkillSlot());
+                } else {
+                    double perInstanceStance = stance / segments.size();
+                    for (Double ratio : segments) {
+                        totalDamage += hit(battle, data, user, element, base * ratio, mainTarget, hitTargets,
+                                perInstanceStance, skill.getSkillSlot());
+                    }
+                }
+            }
 
             case AOE_ATTACK -> {
                 double stance = data.stanceFor(true);
@@ -552,6 +569,24 @@ public final class SkillExecutor {
         // (EnemySkill) is an attack too and must raise the same notification -- see Battle.fireAfterAttack for
         // which attacks qualify and why derived hits deliberately do not.
         battle.fireAfterAttack(user, mainTarget, hitTargets, totalDamage);
+    }
+
+    /**
+     * The damage segments a skill states, as fractions of its own multiplier row - {@code [1.0]} when it states none.
+     *
+     * <p>Note: The list comes from {@code data/skill_effects.json} (see
+     * {@link com.laosun.aluminium.beans.SkillEffectSpec#getSegments()}), which is the same generated table that says how
+     * to read a non-damaging skill. A skill with no entry keeps the single-instance shape - that is the answer for every
+     * row whose segment table has not been derived, and it is what the engine did before the field existed.
+     */
+    private static List<Double> segmentsOf(Skill skill) {
+        com.laosun.aluminium.beans.SkillEffectSpec spec =
+                com.laosun.aluminium.data.SkillEffects.forSkill(skill);
+        List<Double> segments = spec == null ? null : spec.getSegments();
+        if (segments == null || segments.size() <= 1) {
+            return List.of(1.0);
+        }
+        return segments;
     }
 
     /**
