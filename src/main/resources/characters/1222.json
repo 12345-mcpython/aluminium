@@ -37,8 +37,8 @@
       {
         "op": "HEAL",
         "scale": "owner_attack",
-        "percent": 0.14,
-        "amount": 420,
+        "percent_from_skill_param": "SKILL:1",
+        "amount_from_skill_param": "SKILL:2",
         "target": "all_allies"
       }
     ],
@@ -74,8 +74,8 @@
       {
         "op": "HEAL",
         "scale": "owner_attack",
-        "percent": 0.12,
-        "amount": 360,
+        "percent_from_skill_param": "ULTRA:1",
+        "amount_from_skill_param": "ULTRA:2",
         "target": "all_allies"
       }
     ],
