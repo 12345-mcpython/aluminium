@@ -509,22 +509,19 @@ if (isSelected) buffer.setStyle(rowArea, highlightStyle);
     ⇒ "这条天赋伤害是哪个规则发的"**类型这一层区分不了** ✓ ⇒ **留作已知缺口，不猜** ✓（§3.9 的 TALENT 讨论 ✓）。
   - **`element: "attacker"`** ✓ 已补 ✓（含"作用域只给伤害类 op"＋一条判据 ✓）。
   - **`steps:` 形式的 `scale` 对 GAIN 被静默忽略** ✗ —— 用**量化计数器** ＋ **第二个** `amount_from_resource` 即可写出 ✓（§6.2 的撤回 ✓）。
-  - **忆灵的技能等级：读得到，改不了，也点不到**（2026-10-17 核对 ✓）：
+  - **忆灵的技能等级：现在读得到、也改得到、也点得到**（2026-10-17 补齐 ✓，原先登记为"读得到、改不了、点不到"）：
     - **读得到** ✓：忆灵技能按 `(servant_id, data slot)` 建 ✓，等级来自 `memosprites/<id>.json` 的
-      `skills: [{slot, level}]` ✓ ⇒ `CastSkillParamScaleTest` 钉住的就是"读的是**当前等级那一行**" ✓；
-      伤害与 `cast_skill_param:` / `percent_from_cast_param:` 走同一个 `CanHit.skillLevel` ✓。
-    - **改不了** ✗：`CanHit.skillLevel` 只对 `Character` 加 `skillLevelBonus` ✓（忆灵的技能按 data slot 存，
-      不按 `SkillType` ✓）；`RAISE_SKILL_LEVEL` 只作用于**规则主人** ✓，而忆灵**没有规则表** ✓
-      （`Battle.fireTriggers` / `fireTriggersForAlly` 只遍历 `characters` ✓）⇒ 忆灵等级**只能是内容写的常量** ✓。
-    - **点不到** ✗：`percent_from_skill_param` / `amount_from_skill_param` 要求规则主人是 `Character` ✓，
-      而 `SkillType` 只有 `SUMMON_SKILL` / `SUMMON_TALENT` 两个入口 ✓（忆灵自己的槽位是 1..N 的 data slot ✓）
-      ⇒ "某个**忆灵**槽位在当前等级的第 n 项"只在**它自己施放的事件**上读得到 ✓，别人的事件上读不到 ✗。
-    - **要不要补**：全库**没有一句**内容要求忆灵技能等级变化 ✓（`忆灵`/`灵技`/`servant` 与 `等级` 同现 0 命中 ✓）
-      ⇒ **登记，不造能力** ✓（§3.5 的假前置）。真需要时的三处：① `skillLevel` 对 `Summon` 也读 bonus ✓；
-      ② `RAISE_SKILL_LEVEL` 能指向"主人的忆灵" ✓；③ `skill_param` 加一个忆灵入口 ✓。
-    - ⚠ 对称性缺口：`amount_from_skill_param` 只有"**主人的自己技能**"这一支 ✓，**没有** `amount_from_cast_param` ✗
-      ⇒ 「忆灵施放 + 一个随等级变化的常数项」写不出来 ✓（实测全库**没有**内容同时用 `percent_from_cast_param`
-      与字面常数 ✓ ⇒ 今天不需要 ✓；要补就是同一个 reader 加一个字段 ✓）。
+      `skills: [{slot, level}]` ✓ ⇒ `CastSkillParamScaleTest` 钉住的就是"读的是**当前等级那一行**" ✓。
+    - **改得到** ✓：`RAISE_SKILL_LEVEL` ＋ `memosprite: true` ＋ `skill_id: <数据槽位>` ✓ —— 加成记在**召唤者**身上
+      （忆灵在 `BATTLE_START` 时还不存在 ✓、且可能重复出场 ✓），`CanHit.skillLevel` 解析忆灵技能时向主人取 ✓；
+      `CanHit.memospriteSkillLevelBonus` 按 **data slot** 键 ✓（角色的那张按 `SkillType` 键 ✓，两张不混 ✓）。
+    - **点得到** ✓：`percent_from_summon_param` / `amount_from_summon_param` 写 `"<数据槽位>:<index>"` ✓；
+      `amount_from_cast_param` 补上了"忆灵施放 + 随等级变的常数项" ✓。
+      判据：`MemospriteSkillLevelTest`（加成落在召唤者 / 解析器读到 / 超表行数被 clamp / 两种读法 / 加载期五种拒绝 ✓；
+      变异：把向主人取加成的那一段关掉 ⇒ 该用例当场红 ✓）。
+    - ⚠ **仍是常量**：忆灵的等级**来自 spec 的声明** ✓，今天全部声明成表的最后一行（10 行 10 级 ✓）⇒
+      再 +1 会被 clamp 回去 ✓ —— 这不是缺陷，**行数就是文档的上限** ✓（与角色同一条 `skillLevel` 规则 ✓）。
+      真要有内容写「忆灵技等级+N」，把 spec 的声明调低，加成才有可见效果 ✓（判据里就是这么造的可观察状态 ✓）。
 
 ### 4.4 层序与状态（**替代旧的"为什么这样排序"**）
 
@@ -1026,6 +1023,7 @@ C 层全是**填口子** ✓，依赖已完成的机制，**不该出现新架�
 | **伤害乘区的形状**（增伤四因子相乘 / 易伤上限之外的 `Monster_DamageTakenRatio` / 吸收是减法 / 这四个数从两个单位身上读） | `DamageChainFactorsTest` |
 | **`HEAL` / `SHIELD` 的份额与常数项都读「当前等级」的参数**（两个半都动 / 只读字面量时会红 / 拼法写错在加载期被拒 / 两种金额来源互斥） | `SkillParamMagnitudeTest` |
 | **读「当前等级」的规则不会早于设置等级的那条跑**（`BATTLE_START` 上与 `level_convention` 同事件时，顺序即语义） | `LevelConventionOrderTest` |
+| **忆灵的技能等级**（加成记在召唤者、按数据槽位 / 解析器读到并 clamp 到表行数 / `summon_param` 与 `amount_from_cast_param` 两种读法 / 加载期五种拒绝） | `MemospriteSkillLevelTest` |
 | **台账不写"现在是什么"的数字**（套件 / 用例 / 文件 / 方法 / 类 / 规则数、`file:line`、大小、提交数、「N 处」） | `LedgerNumberGuardTest` |
 
 ### 7.2 **只靠散文**（所以上面必须写完整）
