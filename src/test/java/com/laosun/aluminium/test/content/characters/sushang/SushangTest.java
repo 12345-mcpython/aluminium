@@ -47,8 +47,12 @@ public class SushangTest {
         var table = TriggerTables.of(SUSHANG);
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.BREAK), "the talent");
         Assertions.assertEquals(2, table.ruleCount(TriggerEvent.ALLY_ATTACK), "the chance half and the guaranteed half");
-        Assertions.assertEquals(2, table.ruleCount(TriggerEvent.BATTLE_START),
-                "the technique damage (round 186) and the level convention");
+        // Six: the technique damage, the level convention, and the four eidolons that declare at battle start
+        // (3/5 raise skill levels, 4 raises BREAKING_EFFECT, 6 amends the talent's cap). `ruleCount` counts the
+        // WHOLE table, eidolon gating included - it is a census of what the file states, not of what is active
+        // at rank 0, so these numbers move when a clause is added.
+        Assertions.assertEquals(6, table.ruleCount(TriggerEvent.BATTLE_START),
+                "the technique damage, the level convention and eidolons 3/4/5/6");
     }
 
     private static final class Fixture {

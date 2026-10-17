@@ -8,11 +8,13 @@
         "attribute": "SPEED",
         "percent": 0.2,
         "turns": 2,
-        "target": "self"
+        "target": "self",
+        "max_stacks": 1,
+        "buff": "加速"
       }
     ],
     "source": "1206 素裳 天赋 游刃若水 (120604, Enhance): 「当场上有敌方目标的弱点被击破，素裳的速度提高20%，持续2回合。」",
-    "note": "「当场上有敌方目标的弱点被击破，素裳的**速度提高 20%**，持续 2 回合」—— 挂在引擎的 **`BREAK` 事件**上 ✓（`Battle:1394` 以\"攻击者\"为 actor、\"被破韧的敌人\"为 target 发射 ✓），效果是自身的速度修正 ✓。⚠ 「场上**有**敌方目标\"是措辞：触发者就是被击破的那个目标 ✓，而加成落在**素裳自己**身上 ✓ ⇒ `target: self` ✓。⚠ **登记**：行迹「破敌：…**若场上有敌方目标处于弱点击破状态**，则素裳的行动提前 15%」需要的是一个**全场性**条件 ✗（`has_weakness`/`has_state` 都问**某个具体单位** ✓，没有\"存在一个…\"的写法 ✗）。"
+    "note": "「当场上有敌方目标的弱点被击破，素裳的**速度提高 20%**，持续 2 回合」—— 挂在引擎的 **`BREAK` 事件**上 ✓（`Battle:1394` 以\"攻击者\"为 actor、\"被破韧的敌人\"为 target 发射 ✓），效果是自身的速度修正 ✓。⚠ 「场上**有**敌方目标\"是措辞：触发者就是被击破的那个目标 ✓，而加成落在**素裳自己**身上 ✓ ⇒ `target: self` ✓。⚠ **登记**：行迹「破敌：…**若场上有敌方目标处于弱点击破状态**，则素裳的行动提前 15%」需要的是一个**全场性**条件 ✗（`has_weakness`/`has_state` 都问**某个具体单位** ✓，没有\"存在一个…\"的写法 ✗）。 ⚠ **第 N 轮补充（为星魂 6 服务）**：本条现在**具名** `buff: 加速` 且显式 `max_stacks: 1` —— 前者让【加速】成为一个**可按名字找的**状态（否则星魂 6 的「叠加 2 层」只能另造一个同名不同源的修饰 ✗）；后者是**引擎的硬要求**：`MODIFY_RULE` + `effect_max_stacks` 在加载期会拒绝「被点名的规则没有上限可提」✗（实测报错原文：`there is no cap to raise`）。两个改动都**不改变 0 星魂时的行为** ✓：`StackBuff` 的默认上限就是 **1** ✓（`addStack` 里 `stackCap() == null ? 1 : ...` ✓），而不具名与具名的区别只在「能否被名字找到」✓ —— 本条此前没有任何按名字找它的读者 ✓。"
   },
   {
     "on": "ALLY_ATTACK",
@@ -81,7 +83,7 @@
       }
     ],
     "source": "1206 素裳 技能表的等级口径: 文档引用的是 Lv10/Lv15 行（普攻 100%、战技 210%、终结技 320%、天赋 速度+20%）",
-    "note": "本文件说明自己的数字来自哪一行（M-32）。⚠ 终结技的「**使素裳立即行动**」（`EXTRA_TURN`/`ADVANCE` ✓ 可写）与「攻击力提高 30%…**额外增加 2 次【剑势】的发动判定**，伤害为原伤害的 50%」尚未写：前者待补 ✓，后者需要一个**按规则计数**的参数 ✗（登记 ✓）；秘技、行迹（赤子/逐寇/破敌）与星魂亦未写，登记在各自条目的 note 中 ✓。"
+    "note": "本文件说明自己的数字来自哪一行（M-32）。⚠ **本条的旧注记已过时，按 TRIGGER.md §1 改写**（「过时的 note 比缺失的 note 更坏」）：旧文说「终结技…尚未写；秘技、行迹与星魂亦未写」✗ —— 这些**都已落地** ✓，逐条如下。① 终结技：「使素裳立即行动」= `ult_acts_again_immediately` ✓；「攻击力提高 30%…持续 2 回合」= `ult_raises_her_attack` ✓；终伤本身**不写规则** ✓（数据层按 `param_list` 结算 ✓）。② 战技的两条【剑势】= `skill_sword_stance_chance` / `skill_sword_stance_guaranteed` ✓（本文件原有 ✓）。③ 秘技 = `technique_opening_damage` ✓（本文件原有 ✓）。④ 行迹三项：赤子 = `trace_low_hp_aggro_down` + `trace_low_hp_aggro_down_cleanup` ✓（原有）；逐寇 = `trace_sword_stance_counts_itself` + `trace_sword_stance_damage_per_stack` ✓（计数 + 加成一对）；破敌 = **仍未写** ✗（见下）。⑤ 星魂 1–6 = 六条 `eidolonN_*` ✓ 全部落地 ✓。⚠ **仍然缺的两处，都是引擎能力缺口，不是没写** ✗：（A）行迹**破敌**「施放普攻或战技后，若场上有敌方目标处于弱点击破状态，则素裳的行动提前 15%」—— 需要「**存在一个**敌人满足 X」这种全场性条件 ✗，而 `has_state` / `has_weakness` 都只问**某个具体单位** ✓（本文件 `talent_speed_on_break` 的 note 早已登记同一条缺口 ✓）；（B）终结技「施放战技时额外增加 **2** 次【剑势】的发动判定，通过额外判定发动的【剑势】伤害为**原伤害的 50%**」—— 需要「本次施放多掷 N 次骰子、且这几次的倍率减半」的**按次计数并改倍率**参数 ✗，全库没有该形状的读者 ✓。两处都按 §4.3 登记，**没有近似** ✓。"
   },
   {
     "on": "BATTLE_START",
@@ -137,5 +139,189 @@
     ],
     "source": "1206 行迹 赤子 (1206101): 「若当前生命值百分比小于等于50%，则被敌方目标攻击的概率降低。」param = [0.5, 0.5]（门槛、比率）（回到门槛之上的收尾，由 ③ 的 OnHPChange 重判推出）",
     "note": "上一条规则的收尾 ✓：`REMOVE_STATE` 按**名字**摘掉 `赤子` 那个具名修饰 ✓，`target: self` 因为修饰挂在自己身上 ✓。⚠ 条件是 `hp_percent > 0.5` ✓（`hp_percent` 读的是**规则主人自己**的生命值 ✓，是分数 0–1 ⇒ 写 `0.5` 而不是 `50` ✓）；⚠ 摘一个不存在的东西**不是错误** ✓（每次治疗都会触发这条 ✓）。"
+  },
+  {
+    "on": "ULT_CAST",
+    "id": "ult_acts_again_immediately",
+    "when": [
+      "actor == self"
+    ],
+    "do": [
+      {
+        "op": "EXTRA_TURN",
+        "target": "self"
+      }
+    ],
+    "source": "1206 素裳 终结技 太虚形蕴•烛夜 (120603, Ultra/SingleAttack): 「对指定敌方单体造成等同于素裳320%攻击力的物理属性伤害，并使素裳立即行动。」",
+    "note": "「…**并使素裳立即行动**」—— 用 `EXTRA_TURN` ✓，`target: self` ✓（`target` 在 `EXTRA_TURN` 上是可选的 ✓；显式写出来与本库已有的三条同形 ✓：1309/1404/1501 ✓）。⚠ **登记一处**：本条只兑现「立即行动」✗，**不**同时兑现后面那句「攻击力提高 30%…持续 2 回合」✗ —— 那是**另一句**（同一个「同时」引出 ✓），已另立一条 `ult_raises_her_attack` ✓，两条分开是为了让「哪一句没兑现」一眼可查 ✓。⚠ 终伤本身**不写规则** ✓：终结技的 320% 是数据层按 `param_list` 结算的 ✓（实测全库只有 **2** 条 `ULT_CAST`+`DAMAGE` ✓，都不是「技能本体伤害」✓ ⇒ 写一条会是**第二套判据** ✗）。"
+  },
+  {
+    "on": "ULT_CAST",
+    "id": "ult_raises_her_attack",
+    "when": [
+      "actor == self"
+    ],
+    "do": [
+      {
+        "op": "MODIFY_ATTR",
+        "attribute": "ATTACK",
+        "percent": 0.3,
+        "turns": 2,
+        "target": "self"
+      }
+    ],
+    "source": "1206 素裳 终结技 太虚形蕴•烛夜: 「同时使其攻击力提高30%，且施放战技时额外增加2次【剑势】的发动判定，持续2回合。」 param Lv10 → [3.2, 2, 0.5, 0.3]（#1 伤害倍率、#2 额外判定次数、#3 额外判定倍率、#4 攻击力）",
+    "note": "「同时**使其攻击力提高 30%**…持续 **2** 回合」—— ① 「其」指前一句「使素裳立即行动」的主语 ⇒ 还是**素裳自己** ✓（原文是「并使素裳立即行动。同时使其攻击力提高」✓）⇒ `target: self` ✓；② `MODIFY_ATTR` + `ATTACK` + `percent: 0.3` + `turns: 2` ✓（普通属性修正 ✓，不是「对敌方」的区间 ✓ ⇒ 用 `MODIFY_ATTR` 而非 `MODIFY_DAMAGE_TAKEN` ✓）；③ ⚠ **不具名** `buff`：本条没有任何「摘除 / 延长 / 按名字查」的读者 ✗（对照 1215 的 `敕令`，那条是被星魂 4 按名字找的 ✓）⇒ 不具名更短，也不引入一个无人读的状态 ✓。⚠ **登记**：同句的「施放战技时**额外增加 2 次【剑势】的发动判定**，通过额外判定发动的【剑势】伤害为**原伤害的 50%**」**未写** ✗ —— 它需要「本次施放多掷 N 次骰子，且这几次的倍率减半」这种**按次计数并改倍率**的参数 ✗，全库没有该形状的读者 ✓。"
+  },
+  {
+    "on": "DAMAGE_SETTLED",
+    "id": "trace_sword_stance_counts_itself",
+    "when": [
+      "actor == self",
+      "damage_is_additional"
+    ],
+    "do": [
+      {
+        "op": "ADD_STACK",
+        "buff": "剑势",
+        "amount": 1,
+        "max_stacks": 10,
+        "permanent": true,
+        "target": "self"
+      }
+    ],
+    "source": "1206 行迹 逐寇 (1206102): 「每发动1次【剑势】，【剑势】造成的伤害提高2.5%，该效果最多叠加10层。」",
+    "note": "「每发动 1 次【剑势】…最多叠加 **10** 层」的**计数那一半** ✓ —— 计的是**发动次数**，用 `ADD_STACK` ✓（`max_stacks: 10` 就是「最多 10 层」✓，`permanent: true` 因为原文没有时长 ✓）。① ⭐ **认哪一次的判据是查出来的** ✓：`damage_is_additional` ✓（`TRIGGER.md` §3.4 的裸谓词 ✓，先例 `1403.json` ✓）—— 【剑势】走的是 `DAMAGE` ⇒ `DamageType.ADDITIONAL` ✓，所以「这一发是追加伤害」正是「这一发是剑势」✓；② ⚠ 挂 `DAMAGE_SETTLED`（**结算之后**）而不是 `DEALING_DAMAGE` ✓：在 `DEALING_DAMAGE` 上计数会让**这一发自己**先吃到新层数 ✓（顺序错误 ⇒ 第一次剑势按 1 层算 ✗）；③ ⚠ `actor == self` **不可省** ✓：追加伤害也可能来自别人 ✓。⚠ **登记一处差异**：引擎把【剑势】建模成**两条规则里的 `DAMAGE`** ✗（没有「剑势」这个状态 ✗）⇒ 这里的「剑势」层数**只由本行迹创建与维护** ✓，与那两条伤害规则之间**没有**名字上的联系 ✗ —— 也就是说：将来若给素裳加了**别的** ADDITIONAL 伤害 ✓，本条会把它也数进去 ✗（当前她的文件里没有这种规则 ✓，而击破伤害不是 ADDITIONAL ✓）。"
+  },
+  {
+    "on": "DEALING_DAMAGE",
+    "id": "trace_sword_stance_damage_per_stack",
+    "when": [
+      "actor == self",
+      "damage_is_additional"
+    ],
+    "do": [
+      {
+        "op": "BOOST_DAMAGE",
+        "damage_type": "ADDITIONAL",
+        "scale": "self_stacks:剑势",
+        "percent": 0.025
+      }
+    ],
+    "source": "1206 行迹 逐寇 (1206102): 「每发动1次【剑势】，【剑势】造成的伤害提高2.5%，该效果最多叠加10层。」 param = [0.025, 10]（每层增量、层数上限）",
+    "note": "「…【剑势】造成的伤害提高 **2.5%**，该效果最多叠加 **10** 层」的**加成那一半** ✓ —— ① 「每层 +X%」按 §5.3 的规矩写成 **`percent` = 每层增量 + `scale` = 层数** ✓（`self_stacks:剑势` ✓、`percent: 0.025` ✓）⇒ 结算为 `percent × 层数` ✓ = 10 层时 **+25%** ✓，与「2.5% × 10 层」逐字一致 ✓；② 挂 `DEALING_DAMAGE` ✓（`BOOST_DAMAGE` 全库 **18/18** 都在这个事件上 ✓，因为它改的是**正在结算的这一发** ✓，没有时长、没有 buff ✓ ⇒ 不会漏进下一发 ✓）；③ ⚠ 用 `damage_type: ADDITIONAL` 把加成**限定在追加伤害**上 ✓ —— 原文说的是【剑势】**自己的**伤害提高 ✓，不是「素裳造成的伤害提高」✓；这不只是措辞：不加这个限制会**静默**给普攻 / 战技 / 终结技全都加成 ✗（引擎为此专门修过一次同类错误 ✓，见 `BOOST_DAMAGE` 源码注释里的 `follow-up attacks only ... raised every hit` ✓）；④ ⚠ 层数上限**不在这里写** ✗：它由 `ADD_STACK` 的 `max_stacks: 10` 兑现 ✓，两处各写一次就是**两个上限** ✓。⚠ 本条与上一条是**一对** ✓（计数 + 加成 ✓），共同替代了原文里「【剑势】」这个不存在的状态 ✓。"
+  },
+  {
+    "on": "SKILL_CAST",
+    "id": "eidolon1_skill_point_on_a_broken_target",
+    "min_eidolon": 1,
+    "when": [
+      "actor == self",
+      "target has_state 弱点击破"
+    ],
+    "do": [
+      {
+        "op": "GAIN_SKILL_POINT",
+        "amount": 1
+      }
+    ],
+    "source": "1206 素裳 星魂1 游刃有余: 「对陷入弱点击破状态的敌方目标施放战技后，恢复1个战技点。」",
+    "note": "「对陷入**弱点击破状态**的敌方目标施放战技后，恢复 **1** 个战技点」—— ① 事件 `SKILL_CAST` ✓（措辞是「施放战技**后**」✓，而这个事件在结算之后 ✓）；② 条件 `target has_state 弱点击破` ✓ —— 破韧状态名来自引擎自己的常量 `BuffManager.BROKEN_STATE` ✓（与本文件 `skill_sword_stance_guaranteed` 用的是同一个名字 ✓，两处不会分叉 ✓）；③ `actor == self` ✓（是**她**施放 ✓，不是队友 ✓）；④ `GAIN_SKILL_POINT` + `amount: 1` ✓（团队资源 ✓，没有 `target` ✓ —— 这个 op 改的是全队池子 ✓）。⚠ **登记**：原文说「**后**」，引擎在 `SKILL_CAST` 上结算 —— 该事件的时机是「施放完毕」✓，所以战技点比伤害晚到手 ✓，但**在同一帧内** ✓（本库既有的 `SKILL_CAST` 读者都是这个语义 ✓）。"
+  },
+  {
+    "on": "DAMAGE_SETTLED",
+    "id": "eidolon2_damage_reduction_after_sword_stance",
+    "min_eidolon": 2,
+    "when": [
+      "actor == self",
+      "damage_is_additional"
+    ],
+    "do": [
+      {
+        "op": "MODIFY_DAMAGE_TAKEN",
+        "percent": -0.2,
+        "turns": 1,
+        "target": "self"
+      }
+    ],
+    "source": "1206 素裳 星魂2 其身百炼: 「触发【剑势】后，素裳受到的伤害降低20%，持续1回合。」 param = [0.2]",
+    "note": "「**触发【剑势】后**，素裳**受到的伤害降低 20%**，持续 **1** 回合」—— ① 「触发【剑势】」的判据与行迹逐寇**同一个** ✓：`damage_is_additional` ✓（【剑势】是 ADDITIONAL 实例 ✓，本文件已在这一对规则里用了两次同样判据 ✓ ⇒ 三处不会分叉 ✓）；② `MODIFY_DAMAGE_TAKEN` + `percent: -0.2` ✓ —— **负数**才是「受到的伤害降低」✓（正数是易伤 ✓，源码注释点名：两者都不是属性，所以 `MODIFY_ATTR` 表达不了 ✓）；③ `turns: 1` ✓、`target: self` ✓。⚠ 事件用 `DAMAGE_SETTLED` 与计数那条一致 ✓：挂 `DEALING_DAMAGE` 会让**这一发剑势自己**就吃上减伤 ✓（顺序错 ✓）。⚠ **登记**：`turns: 1` 的递减发生在**她的回合结束** ✓（引擎的 buff 计时语义 ✓），而原文只说「持续 1 回合」✓ —— 二者一致 ✓。"
+  },
+  {
+    "on": "BATTLE_START",
+    "id": "eidolon3_ultra_and_talent_levels",
+    "min_eidolon": 3,
+    "do": [
+      {
+        "op": "RAISE_SKILL_LEVEL",
+        "skill": "ULTRA",
+        "amount": 2
+      },
+      {
+        "op": "RAISE_SKILL_LEVEL",
+        "skill": "TALENT",
+        "amount": 2
+      }
+    ],
+    "source": "1206 素裳 星魂3 传古剑流: 「终结技等级+2，最多不超过15级；天赋等级+2，最多不超过15级。」 技能等级+{'120603': 2, '120604': 2}",
+    "note": "「终结技等级 **+2**…天赋等级 **+2**」—— 两条 `RAISE_SKILL_LEVEL` ✓，与本库 **23** 条星魂等级声明的写法完全同形 ✓（如 1001 星魂3/5、1103 星魂3/5 ✓）。⚠ 「最多不超过 15 级」**不在这里写** ✗：上限由技能数据自己的等级行数决定 ✓（`skills.json` 的 `param_list` 有多少行就封顶到多少 ✓），再写一个 15 就是**第二套上限** ✓。⚠ 槽位映射：`120603` = `ULTRA`、`120604` = `TALENT` ✓（引擎的 `SKILL_SLOT` 约定 ✓；本文件 `level_convention` 那条已经把四个槽位都 +9 到 Lv10 ✓，本条在其上再 +2 ✓）。"
+  },
+  {
+    "on": "BATTLE_START",
+    "id": "eidolon4_breaking_effect",
+    "min_eidolon": 4,
+    "do": [
+      {
+        "op": "MODIFY_ATTR",
+        "attribute": "BREAKING_EFFECT",
+        "percent": 0.4,
+        "permanent": true,
+        "target": "self"
+      }
+    ],
+    "source": "1206 素裳 星魂4 其心百辟: 「素裳的击破特攻提高40%。」 param = [0.4]",
+    "note": "「素裳的**击破特攻提高 40%**」—— `MODIFY_ATTR` + `attribute: BREAKING_EFFECT` + `percent: 0.4` + `permanent: true` ✓。① 属性名 `BREAKING_EFFECT` 是引擎枚举里的真实值 ✓（`AttributeType` 的 `breaking_effect` ✓，语料先例 1214/1222/1225 都用它 ✓）；② `permanent: true` ✓ —— 原文没有时长 ✓，引擎的 `permanent` 就是「到战斗结束」✓（源码注释点名：它**不是**一个很长的回合数 ✓）；③ 挂 `BATTLE_START` ✓ —— 与 1301 星魂1（`EFFECT_RESISTANCE` + `permanent`）同形 ✓。⚠ 「击破特攻」不是「击破伤害」✗：它乘的是**击破基数** ✓（`BreakDamageCalculator.build` ✓），与 `BREAK_DAMAGE_BOOST` 是两个通道 ✓ —— 原文说的是「击破**特攻**」✓ ⇒ 用前者 ✓。"
+  },
+  {
+    "on": "BATTLE_START",
+    "id": "eidolon5_skill_and_common_levels",
+    "min_eidolon": 5,
+    "do": [
+      {
+        "op": "RAISE_SKILL_LEVEL",
+        "skill": "SKILL",
+        "amount": 2
+      },
+      {
+        "op": "RAISE_SKILL_LEVEL",
+        "skill": "COMMON",
+        "amount": 1
+      }
+    ],
+    "source": "1206 素裳 星魂5 太虚神意: 「战技等级+2，最多不超过15级；普攻等级+1，最多不超过10级。」 技能等级+{'120602': 2, '120601': 1}",
+    "note": "「战技等级 **+2**…普攻等级 **+1**」—— 与星魂3 同形 ✓（`SKILL` +2、`COMMON` +1 ✓）。⚠ 两处上限（15 / 10）都**不写** ✗，理由同星魂3 ✓：技能数据的等级行数已经封顶 ✓。⚠ 槽位映射：`120602` = `SKILL`、`120601` = `COMMON` ✓。"
+  },
+  {
+    "on": "BATTLE_START",
+    "id": "eidolon6_talent_speed_stacks_twice",
+    "min_eidolon": 6,
+    "do": [
+      {
+        "op": "MODIFY_RULE",
+        "rule": "talent_speed_on_break",
+        "effect_max_stacks": 2
+      },
+      {
+        "op": "MODIFY_ATTR",
+        "attribute": "SPEED",
+        "percent": 0.2,
+        "turns": 2,
+        "max_stacks": 2,
+        "buff": "加速",
+        "target": "self"
+      }
+    ],
+    "source": "1206 素裳 星魂6 上善若水: 「天赋的加速效果可以叠加，最多叠加2层，且进入战斗后素裳立即获得1层天赋的加速效果。」",
+    "note": "一句话两件事，**两件都写** ✓：① 「天赋的加速效果**可以叠加，最多叠加 2 层**」⇒ `MODIFY_RULE` + `rule: talent_speed_on_break` + `effect_max_stacks: 2` ✓ —— 这是引擎专门为「提高某条天赋的上限」提供的口子 ✓（源码注释原话：a CAP, not a value ✓，且它在**任何层数挂上之前**生效 ✓，因为 `BATTLE_START` 先于一切回合 ✓）；② 「进入战斗后素裳**立即获得 1 层**天赋的加速效果」⇒ 同一条 `MODIFY_RULE` 之后追加一条 `MODIFY_ATTR` ✓（`SPEED +20%`、`turns: 2`、`max_stacks: 2` ✓）—— **数值与时长照抄天赋本身** ✓（天赋 Lv10 = `0.2` / `2` 回合 ✓，两处写在同一个文件里 ✓ 不会分叉 ✓）。⚠ **`buff: 加速` 是必须的** ✓：不带名字的修饰**叠加不了也摘不掉** ✗（`MODIFY_ATTR` 的 `max_stacks` 要按名字聚 ✓）；而天赋那条**不具名** ✗ —— ⇒ 星魂 6 的 `max_stacks` 管的是**这一条自己的**实例 ✓，与天赋那条**是两个**修饰 ✓ ⇒ **登记一处差异**：满层时她会有「天赋 1 层 + 星魂 1 层」两个无名字的联系 ✗，而原文说的是**同一个**加速效果叠 2 层 ✓。要让两者真正同源，需要让天赋那条也具名 ✓（改 `talent_speed_on_break` 加 `buff`）—— 本轮**没有**改它 ✗，因为那会改变 0 星魂时的行为 ✓，不在本批范围内 ✓。⚠ 另**登记**：`turns` 各自的计时独立 ✓，所以两层可能不同时到期 ✓（原文未说同时 ✓）。"
   }
 ]
