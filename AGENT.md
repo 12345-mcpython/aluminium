@@ -378,6 +378,16 @@ if (isSelected) buffer.setStyle(rowArea, highlightStyle);
 ### 3.9 已核对的公式结论（**别再重新推导**）
 
 - HSR.md §2.2 伤害修饰区 = 增伤 `1+Σ` × 易伤 `1+Σ`（cap **3.5**）× 减伤 `Π(1-r)`（floor **0.01**） × 虚弱 `1-Σ`（floor **0.2**）
+- HSR.md §2.2 / §10.3 **增伤的四个因子是相乘的**（2026-10-17 补齐 ✓）：`(1 + Σ元素增伤 + 全属性增伤 + DoT增伤)` × `(1 + Level_FinalDamageAddedRatio)` × `(1 + ComboDamageAddedRatio)` × `BaseDamageMultiRatio`
+  ⇒ 引擎属性 `FINAL_DAMAGE_BOOST` / `COMBO_DAMAGE_BOOST` / `BASE_DAMAGE_MULTI_RATIO`（后两个存**相对 1 的增量**）✓。
+  ⚠ 判据钉的是**位置**：`1.2 × 1.3` 而不是 `1 + 0.2 + 0.3` ✓【已把守：`DamageChainFactorsTest`】
+- HSR.md §2.2 **易伤上限之外**还有一项：`× (1 + Monster_DamageTakenRatio)`（引擎属性 `MONSTER_DAMAGE_TAKEN`）✓
+  ⇒ 已经顶到 3.5 的目标**仍然**吃这一项 ✓（折进上限里会把它吞掉）【已把守：`DamageChainFactorsTest`】
+- HSR.md §2.2 **元素吸收是减法**，不是乘区：结算后减、floor 0（引擎属性 `<元素>_DAMAGE_ABSORB`）✓【已把守：`DamageChainFactorsTest`】
+  ⚠ 这三组能力目前**没有内容读者**（全库扫过 ✓），是用户要求为公式完整性补的 ✓ —— 判据钉的是**乘/减与上限内外**，不是某个角色的数字 ✓。
+- ⚠ **仍未建模的一项**：游戏链末还有 `_GetExtraDamageRatio`（攻击类型附加增伤）✗ —— 逆向资料只写到它的地址与调用点 ✓，
+  **没有给出它读哪些属性** ✗ ⇒ 现有的 `FOLLOW_UP_DAMAGE_BOOST` / 槽位加伤（`BASIC_ATTACK_DAMAGE_BOOST` 等）**仍留在加性桶里** ✓
+  ⇒ 这是一个**待核**：要动它们，先拿到 `_GetExtraDamageRatio` 的字段表 ✓，不要按"看着像"把它挪成乘性 ✗。
 - HSR.md §2.5 抗性区 = `1 - 抗性`，范围 `-100% ~ 90%` ⇒ 抗性区 `0.1 ~ 2.0`；**负抗全效**（不是半效）
 - HSR.md §2.4 防御区 `(200+10L)/(def+200+10L)`，`def = 原始防御 × (1 - 减防% - 穿透%)`（**加算**），上限 1、不为负
 - HSR.md §5.4 欢愉伤害**吃双爆、不吃增伤** ⇒ `DamageType.ELATION(isCrittable=true, isBoostable=false)`
@@ -963,6 +973,7 @@ C 层全是**填口子** ✓，依赖已完成的机制，**不该出现新架�
 | **`MODIFY_RULE{cooldown_delta}`**（缩短等待一个回合；点名无冷却 / 结果转负 / 0 都在加载期拒绝） | `CooldownAmendmentTest` |
 | **1002 的三句减速随动**（终结技 +120% 走基数层、罡风 +40% 走增伤区、星魂 2 冷却 −1） | `DanHengKitCompletionTest` |
 | **地图攻击的入场削韧**（读 slot 6 自己的元素与韧性；非弱点不削；削空即击破；无地图技能的单位拒绝声明） | `MapAttackTest` |
+| **伤害乘区的形状**（增伤四因子相乘 / 易伤上限之外的 `Monster_DamageTakenRatio` / 吸收是减法 / 这四个数从两个单位身上读） | `DamageChainFactorsTest` |
 
 ### 7.2 **只靠散文**（所以上面必须写完整）
 

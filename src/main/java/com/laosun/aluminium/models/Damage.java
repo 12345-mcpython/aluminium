@@ -246,6 +246,60 @@ public class Damage {
     private DefenceArea defenceArea;
     @Getter(AccessLevel.NONE)
     private ResistArea resistArea;
+    @Getter(AccessLevel.NONE)
+    private FinalBoostArea finalBoostArea;
+    @Getter(AccessLevel.NONE)
+    private ComboArea comboArea;
+    @Getter(AccessLevel.NONE)
+    private BaseMultiArea baseMultiArea;
+    @Getter(AccessLevel.NONE)
+    private MonsterTakenArea monsterTakenArea;
+
+    /**
+     * How much of this hit an element absorb eats, in the settled number's units. Subtracted after every
+     * multiplier, floored at zero (see {@link #toValue()}).
+     */
+    private double absorbed;
+
+    /**
+     * The game's second additive DMG-boost factor (created if it does not exist).
+     */
+    public FinalBoostArea finalBoostArea() {
+        if (finalBoostArea == null) {
+            damageArea.add(finalBoostArea = new FinalBoostArea());
+        }
+        return finalBoostArea;
+    }
+
+    /**
+     * The combo-attack boost (created if it does not exist).
+     */
+    public ComboArea comboArea() {
+        if (comboArea == null) {
+            damageArea.add(comboArea = new ComboArea());
+        }
+        return comboArea;
+    }
+
+    /**
+     * The base-damage multiplier (created if it does not exist).
+     */
+    public BaseMultiArea baseMultiArea() {
+        if (baseMultiArea == null) {
+            damageArea.add(baseMultiArea = new BaseMultiArea());
+        }
+        return baseMultiArea;
+    }
+
+    /**
+     * The monster's own vulnerability, outside the cap (created if it does not exist).
+     */
+    public MonsterTakenArea monsterTakenArea() {
+        if (monsterTakenArea == null) {
+            damageArea.add(monsterTakenArea = new MonsterTakenArea());
+        }
+        return monsterTakenArea;
+    }
 
     /**
      * DMG boost zone (created if it does not exist).
@@ -336,6 +390,51 @@ public class Damage {
      */
     public Damage addBoost(double pct, ModifierSource source, int roleId) {
         boostArea().add(pct, source, roleId);
+        return this;
+    }
+
+    /**
+     * The game's second DMG-boost factor ({@code Level_FinalDamageAddedRatio}): its own multiplier, applied after
+     * the additive element/all-type/DoT sum. Kept separate because folding it in reads a different number whenever
+     * both are non-zero ({@code HSR.md} §2.2 / §10.3).
+     */
+    public Damage addFinalBoost(double pct) {
+        finalBoostArea().add(pct);
+        return this;
+    }
+
+    /**
+     * The combo-attack boost ({@code ComboDamageAddedRatio}): its own multiplier after the crit zone.
+     */
+    public Damage addComboBoost(double pct) {
+        comboArea().add(pct);
+        return this;
+    }
+
+    /**
+     * The base-damage multiplier ({@code BaseDamageMultiRatio}), stored as a delta from 1.
+     */
+    public Damage addBaseMulti(double pct) {
+        baseMultiArea().add(pct);
+        return this;
+    }
+
+    /**
+     * The defender's own vulnerability, applied as a multiplier <b>outside</b> the capped vulnerability zone.
+     */
+    public Damage addMonsterTaken(double pct) {
+        monsterTakenArea().add(pct);
+        return this;
+    }
+
+    /**
+     * Element absorb: an absolute number subtracted from the settled damage after every multiplier
+     * ("吸收是减法项", {@code HSR.md} §2.2). Not a zone: a subtraction cannot be expressed as a multiplier.
+     */
+    public Damage addAbsorb(double amount) {
+        if (amount > 0) {
+            absorbed += amount;
+        }
         return this;
     }
 
@@ -571,6 +670,12 @@ public class Damage {
                 value *= area.getRate();
             }
         }
+        // Element absorb is a SUBTRACTION, not a multiplier ("吸收是减法项", HSR.md §2.2): it comes after every
+        // multiplier and can take the hit to zero. Break / super break / true damage keep their own formulas and
+        // never see it - the same gating the boost zone uses, because the absorb sits in the boost chain.
+        if (absorbed > 0 && type.isBoostable()) {
+            value = Math.max(0, value - absorbed);
+        }
         return value;
     }
 
@@ -587,6 +692,9 @@ public class Damage {
             if (area.applies(type)) {
                 breakdown.put(area.getClass().getSimpleName(), area.getRate());
             }
+        }
+        if (absorbed > 0 && type.isBoostable()) {
+            breakdown.put("absorb", -absorbed);
         }
         breakdown.put("final", toValue());
         return breakdown;
@@ -732,6 +840,64 @@ public class Damage {
 
         public BoostArea add(double pct, ModifierSource source, int roleId) {
             addPercent(pct, source, roleId);
+            return this;
+        }
+    }
+
+    /**
+     * The game's second additive DMG-boost factor ({@code Level_FinalDamageAddedRatio}): {@code 1 + delta}.
+     *
+     * <p>Gated like {@link BoostArea} - break / super break / true damage do not take the boost chain at all.
+     */
+    public static final class FinalBoostArea extends PercentArea {
+        @Override
+        public boolean applies(DamageType type) {
+            return type.isBoostable();
+        }
+
+        public FinalBoostArea add(double pct) {
+            addPercent(pct, ModifierSource.UNKNOWN, 0);
+            return this;
+        }
+    }
+
+    /**
+     * The combo-attack boost ({@code ComboDamageAddedRatio}): {@code 1 + delta}, gated like {@link BoostArea}.
+     */
+    public static final class ComboArea extends PercentArea {
+        @Override
+        public boolean applies(DamageType type) {
+            return type.isBoostable();
+        }
+
+        public ComboArea add(double pct) {
+            addPercent(pct, ModifierSource.UNKNOWN, 0);
+            return this;
+        }
+    }
+
+    /**
+     * The base-damage multiplier ({@code BaseDamageMultiRatio}): {@code 1 + delta} (delta from 1, see the attribute).
+     */
+    public static final class BaseMultiArea extends PercentArea {
+        @Override
+        public boolean applies(DamageType type) {
+            return type.isBoostable();
+        }
+
+        public BaseMultiArea add(double pct) {
+            addPercent(pct, ModifierSource.UNKNOWN, 0);
+            return this;
+        }
+    }
+
+    /**
+     * The defender's own vulnerability ({@code Monster_DamageTakenRatio}): {@code 1 + delta}, applied
+     * <b>outside</b> {@link VulnerableArea}'s cap - so a target at the cap still takes this much more.
+     */
+    public static final class MonsterTakenArea extends PercentArea {
+        public MonsterTakenArea add(double pct) {
+            addPercent(pct, ModifierSource.UNKNOWN, 0);
             return this;
         }
     }

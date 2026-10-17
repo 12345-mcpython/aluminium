@@ -116,6 +116,22 @@ public final class BattleDamage {
             damage.addBoost(attacker.getAttribute(scopeBoost).get());
         }
 
+        // 1b) The three multiplicative factors that FOLLOW the additive bucket in the game's chain
+        //     (HSR.md §2.2 / §10.3). Each is its own multiplier, so they must not be folded into `addBoost`'s sum:
+        //       (1 + Σ元素/全属性/DoT) × (1 + Level_FinalDamageAddedRatio) × (1 + ComboDamageAddedRatio) × BaseDamageMultiRatio
+        //     Measured difference for the first one: 1+0.2+0.3 = 1.5 versus 1.2 × 1.3 = 1.56.
+        damage.addFinalBoost(attacker.getAttribute(AttributeType.FINAL_DAMAGE_BOOST).get());
+        damage.addComboBoost(attacker.getAttribute(AttributeType.COMBO_DAMAGE_BOOST).get());
+        damage.addBaseMulti(attacker.getAttribute(AttributeType.BASE_DAMAGE_MULTI_RATIO).get());
+
+        // 1c) The defender's side of the same chain: its own vulnerability, which sits OUTSIDE the vulnerability
+        //     cap, and per-element absorb, which is a SUBTRACTION after every multiplier (not a zone).
+        damage.addMonsterTaken(defender.getAttribute(AttributeType.MONSTER_DAMAGE_TAKEN).get());
+        AttributeType absorbOf = AttributeType.getAbsorbByElement(damage.getElement());
+        if (absorbOf != null) {
+            damage.addAbsorb(defender.getAttribute(absorbOf).get());
+        }
+
         // Damage-instance conditions: "increases the damage dealt to a target in state X by Y%". Fired *before* the zones
         // are read, because afterwards the number is final and all a rule could do is describe it. `target` is
         // the one about to take the damage; a rule that changes this instance uses BOOST_DAMAGE, which mutates
