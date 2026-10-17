@@ -375,6 +375,15 @@ if (isSelected) buffer.setStyle(rowArea, highlightStyle);
 | `stage.json` | `stage_id → {type, hard_level_group, level, monster:[...]}`（**懒加载**） | `103201`：level 29 |
 | `monster_attack_modify_ratio.json` | **本项目补丁**（相当一部分怪 ≠1，要数就现数） | 见 §6.1(e) 陷阱 2 |
 | `enemy_skills.json` | **自建**，只覆盖演示怪，倍率是猜的 | 见 §6.1(e) 陷阱 7 |
+| `skill_effects.json` | **自建**：非伤害技能怎么读参数（`effect` / `scale` / `params` / `turns_param`），外加伤害**段数** `segments` | §4.3 的段数条目 |
+| `dump_data.json` | `Benchmark` 用的预计算遗器套表（**唯一读者**，不在 `Constant` 的加载链里） | — |
+
+> ⚠ **2026-10-17 清理过一批"生成了但没人读"的表** ✓：`challenge_*` / `enhanced_*` / `growth` / `materials` /
+> `recommend` / `property_names` / `global_buffs` / `character_id_mappings` ✓ —— 全库 `src/main` + `src/test`
+> 里对它们的引用是 **0** ✓（`enhanced` 的命中全是"强化普攻"这类**正文**，不是文件 ✓），删掉后
+> 全量测试与四个 demo **逐字节不变** ✓。
+> ⚠ **它们由仓库外的 `generate_data.py` 产出** ✓ ⇒ 再跑一次生成器会**重新出现** ✓（那些文件也不在 git 里 ✓，
+> 所以这次清理只影响本机 ✓）。想让清理**长期有效**，得改生成器的输出清单 —— 那是仓库外的文件，本项目没动 ✓。
 
 ### 3.9 已核对的公式结论（**别再重新推导**）
 
