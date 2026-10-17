@@ -296,7 +296,7 @@ public final class CharacterFactory {
                 throw new CharacterException(
                         "Character " + cid + " has a rule that uses the resource \"" + referenced
                                 + "\", which the character does not declare. Add it to the \"resources\" block "
-                                + "of resources/characters/" + cid + ".json (e.g. { \"id\": \"" + referenced
+                                + "of resources/game/characters/" + cid + ".json (e.g. { \"id\": \"" + referenced
                                 + "\", \"max\": 3 }) — without a declaration every gain of it is silently "
                                 + "credited as 0 and every read of it is 0, so the rule would do nothing and "
                                 + "report nothing. ⚠ A relic-set rule may be the source: those are shared by "
@@ -310,7 +310,7 @@ public final class CharacterFactory {
      * Refuses a merged table whose {@code SUMMON} rules this character could never satisfy.
      *
      * <p><b>Why the check lives here.</b> "summon a memosprite on entering battle" is only meaningful for a character with a
-     * memosprite spec ({@code resources/memosprites/<cid>.json}), and a rule file cannot know its own cid:
+     * memosprite spec ({@code resources/game/memosprites/<cid>.json}), and a rule file cannot know its own cid:
      * {@link TriggerTable} is compiled from the file alone, and a <b>relic</b> rule is shared by every wearer.
      * The assembly point is the first place that knows both the character and the full set of rules it ends up
      * with, so it is the only place this can be caught at build time instead of in the middle of a battle.

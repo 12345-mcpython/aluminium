@@ -44,7 +44,7 @@ public class CharacterConditionCoverageTest {
         for (int cid : CHARACTERS) {
             Character c = CharacterFactory.create(cid, LEVEL);
             JsonObject file = new Gson().fromJson(new InputStreamReader(
-                    CharacterConditionCoverageTest.class.getResourceAsStream("/characters/" + cid + ".json"),
+                    CharacterConditionCoverageTest.class.getResourceAsStream("/game/characters/" + cid + ".json"),
                     StandardCharsets.UTF_8), JsonObject.class);
             var rules = file.getAsJsonArray("rules");
             int checked = 0;

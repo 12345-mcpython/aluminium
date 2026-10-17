@@ -27,7 +27,7 @@ import java.util.List;
  * <p>These sets are the ones the current op vocabulary can express exactly (see
  * {@code RelicTriggerTableTest} for the rest, which are registered as gaps instead of being
  * approximated). Each is asserted through a real battle, because that is the point: the rules live in
- * {@code resources/relic_sets/<setId>.json} and are attached by {@code CharacterFactory}, so a test
+ * {@code resources/game/relic_sets/<setId>.json} and are attached by {@code CharacterFactory}, so a test
  * that only read the JSON would prove nothing about whether the engine executes it.
  *
  * <h2>The F-2 case</h2>
@@ -437,7 +437,7 @@ public class RelicAbilityBattleTest {
      * The wearer's own follow-up attack raises their ATK by the authored amount.
      *
      * <p>This is the end-to-end proof that {@code FOLLOW_UP} has a real emitter: the event is fired from
-     * {@code Battle.applyAdditionalDamage}, the rule lives in {@code resources/relic_sets/326.json}, and
+     * {@code Battle.applyAdditionalDamage}, the rule lives in {@code resources/game/relic_sets/326.json}, and
      * neither half is visible unless both work. Asserting on the resulting <b>attribute value</b> rather
      * than on "a modifier exists" is deliberate - a rule that fired but applied nothing would pass the
      * weaker check.

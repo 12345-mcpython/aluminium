@@ -3,7 +3,7 @@
 > 本文写的是**规则文件怎么写**。引擎的架构与取舍在 `AGENT.md`，游戏侧的资料在 `HSR.md`。
 >
 > ⚠ **本文的每张表都是从代码里读出来的，不是凭印象写的** ✓ —— 字段名来自 `beans/TriggerSpec.java` 与 `beans/EffectSpec.java` 的
-> `@SerializedName`；运算符、事件、操作、选择器、`scale` 来自引擎自己的闭集与**语料里的实际用法**（**94** 个角色文件；重新数：`ls src/main/resources/characters/*.json | wc -l`）。
+> `@SerializedName`；运算符、事件、操作、选择器、`scale` 来自引擎自己的闭集与**语料里的实际用法**（**94** 个角色文件；重新数：`ls src/main/resources/game/characters/*.json | wc -l`）。
 > 语料目前用到 **50** 个 op、**211** 条不同的条件串 ✓。凡本文没列的名字，引擎都会在**加载期**报错并列出合法值 ✓，所以不会出现"写错了但静默无效"的情况 ✓。
 
 ---
@@ -12,7 +12,7 @@
 
 | 位置 | 内容 |
 |---|---|
-| `src/main/resources/characters/<cid>.json` | 一个角色（或光锥）的**全部规则** |
+| `src/main/resources/game/characters/<cid>.json` | 一个角色（或光锥）的**全部规则** |
 | 顶层 `rules` | 规则的数组；有些文件顶层直接就是数组 |
 
 一条规则 = **一个事件** + **一组条件** + **一串效果**。

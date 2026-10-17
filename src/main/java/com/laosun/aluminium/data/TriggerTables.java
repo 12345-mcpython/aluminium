@@ -20,7 +20,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Loads character trigger tables from {@code resources/characters/<cid>.json}.
+ * Loads character trigger tables from {@code resources/game/characters/<cid>.json}.
  *
  * <p>This is the "character content is data" side of the three-way split: a character's
  * mechanics live in a JSON file next to the code, and the engine only interprets them.
@@ -70,7 +70,7 @@ public final class TriggerTables {
     /**
      * Directory holding the per-character files, relative to the classpath.
      */
-    private static final String DIR = "characters";
+    private static final String DIR = "game/characters";
 
     /**
      * Cached because a cid asked for twice must not hit the classpath twice.
@@ -197,7 +197,7 @@ public final class TriggerTables {
      * exists for the per-character table that is asked on every event.
      */
     public static TriggerTable warehouse(int cid) {
-        return load(cid, "/warehouse/" + cid + ".json");
+        return load(cid, "/game/warehouse/" + cid + ".json");
     }
 
     private static TriggerTable load(int cid, String path) {

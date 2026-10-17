@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName;
 
 /**
  * One resource a character <b>declares</b>, from the {@code resources} block of
- * {@code resources/characters/<cid>.json}:
+ * {@code resources/game/characters/<cid>.json}:
  *
  * <pre>
  * {

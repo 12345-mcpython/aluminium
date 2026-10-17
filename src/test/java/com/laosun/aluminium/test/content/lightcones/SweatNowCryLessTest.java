@@ -24,7 +24,7 @@ import java.util.List;
  */
 public class SweatNowCryLessTest {
     private static final int CONE = 21052;
-    private static final int WEARER = 1402;   // has resources/memosprites/1402.json
+    private static final int WEARER = 1402;   // has resources/game/memosprites/1402.json
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
     private Character wearer;

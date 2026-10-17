@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Loads a light cone's trigger rules from {@code resources/light_cones/<weaponId>.json}.
+ * Loads a light cone's trigger rules from {@code resources/game/light_cones/<weaponId>.json}.
  *
  * <h2>Why a light cone reuses the trigger table</h2>
  * Its ability is the same kind of sentence as a relic set's or a character's -- "when &lt;event&gt;, do &lt;something the
@@ -28,7 +28,7 @@ import java.util.Map;
  * file says so in its note rather than approximating a value.
  */
 public final class WeaponTriggerTables {
-    private static final String DIR = "light_cones";
+    private static final String DIR = "game/light_cones";
     private static final Gson GSON = new Gson();
     private static final Map<Integer, TriggerTable> CACHE = new HashMap<>();
 

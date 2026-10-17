@@ -28,7 +28,7 @@ public class Weapon implements Cloneable {
      * Display name (bilingual).
      */
     /**
-     * The light cone's id, which names its rule file under {@code resources/light_cones/}.
+     * The light cone's id, which names its rule file under {@code resources/game/light_cones/}.
      * It was already in hand at construction and simply not kept.
      */
     private int wid;

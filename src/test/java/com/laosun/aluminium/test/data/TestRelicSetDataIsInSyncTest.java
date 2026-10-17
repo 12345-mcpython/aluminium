@@ -23,12 +23,12 @@ import java.util.stream.Collectors;
  * would silently change what every relic judge is looking at -- so the drift must fail loudly here.
  *
  * <p>Note: Measured: the first version of this guard read BOTH files through {@code getResourceAsStream} with
- * the same path, so it saw null ("/data/relic_sets.json is not on the classpath"). The classpath can only ever show
+ * the same path, so it saw null ("/game/data/relic_sets.json is not on the classpath"). The classpath can only ever show
  * one of the two copies; the two REAL files must be read from disk by path.
  */
 public class TestRelicSetDataIsInSyncTest {
-    private static final Path MAIN = Path.of("src/main/resources/data/relic_sets.json");
-    private static final Path TEST = Path.of("src/test/resources/data/relic_sets.json");
+    private static final Path MAIN = Path.of("src/main/resources/game/data/relic_sets.json");
+    private static final Path TEST = Path.of("src/test/resources/game/data/relic_sets.json");
 
     private static Map<String, String> load(Path p) {
         try {

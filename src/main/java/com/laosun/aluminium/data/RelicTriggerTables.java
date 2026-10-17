@@ -15,14 +15,14 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
- * Loads relic-set trigger rules from {@code resources/relic_sets/<setId>.json}.
+ * Loads relic-set trigger rules from {@code resources/game/relic_sets/<setId>.json}.
  *
  * <h2>Why relic abilities are trigger rules and not a second mechanism</h2>
  * Most relic 4-piece bonuses are not stats: they are exactly "when &lt;event&gt;, do &lt;something the
  * engine can already do&gt;" ("at the start of the battle, immediately regenerates 1 Skill Point").
  * That is what {@link TriggerTable} already is - the same JSON shape, the same
  * {@code TriggerInterpreter} op vocabulary, the same condition DSL as
- * {@code resources/characters/<cid>.json}. Relic sets therefore reuse all of it and add no new
+ * {@code resources/game/characters/<cid>.json}. Relic sets therefore reuse all of it and add no new
  * interpreter, no new op and no per-set Java class. A set that needs a capability the vocabulary does
  * not have is <b>not approximated</b>: it is registered in {@code _unmodelled.json} and recorded as a
  * gap in {@code AGENT.md}.
@@ -57,7 +57,7 @@ public final class RelicTriggerTables {
     /**
      * Directory holding the per-set files, relative to the classpath.
      */
-    private static final String DIR = "relic_sets";
+    private static final String DIR = "game/relic_sets";
 
     /**
      * The registry of ability-only bonuses this vocabulary cannot express yet.

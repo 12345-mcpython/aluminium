@@ -106,7 +106,7 @@ public class UnitDisciplineTest {
     }
 
     private static List<Path> characterFiles() throws IOException {
-        Path dir = Path.of("src", "main", "resources", "characters");
+        Path dir = Path.of("src", "main", "resources", "game", "characters");
         Assertions.assertTrue(Files.isDirectory(dir), "character directory must exist: " + dir.toAbsolutePath());
         try (Stream<Path> stream = Files.list(dir)) {
             return stream.filter(p -> p.getFileName().toString().endsWith(".json")).sorted().toList();

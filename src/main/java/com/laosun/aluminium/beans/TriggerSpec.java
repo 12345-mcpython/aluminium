@@ -9,7 +9,7 @@ import lombok.ToString;
 import java.util.List;
 
 /**
- * One trigger rule from {@code resources/characters/<cid>.json}:
+ * One trigger rule from {@code resources/game/characters/<cid>.json}:
  * "on &lt;event&gt;, when &lt;conditions&gt;, do &lt;effects&gt;".
  *
  * <p>This is the unit that replaces a `XxxTalent.java` class. The engine only interprets it --
@@ -223,7 +223,7 @@ public class TriggerSpec {
      * The Eidolon rank (星魂, Eidolon) this rule needs: "unlocked at Eidolon N". Absent = the rule is not gated.
      *
      * <p>An Eidolon's <b>mechanic</b> is written like every other one - as a rule in
-     * {@code resources/characters/<cid>.json} - and this field is the whole of what makes it an Eidolon: the
+     * {@code resources/game/characters/<cid>.json} - and this field is the whole of what makes it an Eidolon: the
      * interpreter compares it with the rank the assembly point handed to the character. So the engine still knows
      * nothing about Eidolons beyond a number, and {@code eidolons.json}'s names and descriptions stay reference
      * material for the rule's {@code source}.

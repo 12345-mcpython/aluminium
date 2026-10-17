@@ -69,12 +69,12 @@ public class RobinSummerettoTest {
      */
     @Test
     public void theFilesDeclareTheResourceAndThePanel() {
-        JsonObject character = read("/characters/1512.json");
+        JsonObject character = read("/game/characters/1512.json");
         JsonArray resources = character.getAsJsonArray("resources");
         Assertions.assertNotNull(resources, "the character file must declare the atmosphere resource (气氛值)");
         Assertions.assertEquals(50, resources.get(0).getAsJsonObject().get("max").getAsInt(), "\"the ceiling is 50 points\" (「上限50点」)");
 
-        JsonObject memo = read("/memosprites/1512.json");
+        JsonObject memo = read("/game/memosprites/1512.json");
         JsonArray panel = memo.getAsJsonArray("panel");
         Assertions.assertEquals(2, panel.size(), "the panel states exactly the two numbers the document gives");
     }

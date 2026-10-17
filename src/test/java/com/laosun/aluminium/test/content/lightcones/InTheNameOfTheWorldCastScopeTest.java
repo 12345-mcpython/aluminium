@@ -68,7 +68,7 @@ public class InTheNameOfTheWorldCastScopeTest {
     @Test
     public void everyRankCarriesTheCastScopedRule() throws java.io.IOException {
         String raw = java.nio.file.Files.readString(
-                java.nio.file.Path.of("src", "main", "resources", "light_cones", "23004.json"),
+                java.nio.file.Path.of("src", "main", "resources", "game", "light_cones", "23004.json"),
                 java.nio.charset.StandardCharsets.UTF_8);
         Assertions.assertTrue(raw.contains(RULE), "the shipped file must carry " + RULE);
         Assertions.assertEquals(5, count(raw, "\"id\": \"" + RULE + "\""),

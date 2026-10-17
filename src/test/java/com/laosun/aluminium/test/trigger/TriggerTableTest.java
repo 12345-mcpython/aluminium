@@ -29,7 +29,7 @@ import java.util.List;
  *
  * <p>The acceptance criterion is that <b>two real characters work with no Java
  * character class at all</b> -- their mechanics exist only as JSON under
- * {@code resources/characters/}:
+ * {@code resources/game/characters/}:
  * <ul>
  *   <li><b>Tribbie 1403</b> - trace 1403103: 30 energy at battle start, and 1.50 energy
  *       <b>per target hit</b> when another ally attacks;</li>
@@ -61,7 +61,7 @@ public class TriggerTableTest {
      * <b>skill data</b> (1003's ultimate is all-target attack (全体攻击), 60 toughness, Fire), not about the engine. Note: She has a rule
      * file of her own, and that is deliberately acceptable here: the number each test measures is
      * <em>Tribbie's</em> or <em>Robin's</em> energy, which only their own tables can credit, and none of her rules
-     * grants energy to anybody ({@code resources/characters/1003.json}).
+     * grants energy to anybody ({@code resources/game/characters/1003.json}).
      */
     private static final int AOE_ALLY = 1003;
     private static final int ICE_EDGE = 1002011;

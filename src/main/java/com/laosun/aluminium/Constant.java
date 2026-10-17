@@ -16,7 +16,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * Global constants and static game data loaded at startup.
  *
- * <p>All game data files under {@code resources/data/} are deserialized via
+ * <p>All game data files under {@code resources/game/data/} are deserialized via
  * {@link JSONReader} when this class is first loaded. The following data sets are available:
  * <ul>
  *   <li>{@link #RELIC_MAIN_ATTRIBUTES} - main attribute value tables by star level</li>

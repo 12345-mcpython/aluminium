@@ -24,7 +24,7 @@ public class DragonPanelTest {
     @Test
     public void theDragonPanelFollowsNewbud() {
         MemospriteSpec spec = Memosprites.of(1407);
-        Assertions.assertNotNull(spec, "the dragon's spec must load from resources/memosprites/1407.json");
+        Assertions.assertNotNull(spec, "the dragon's spec must load from resources/game/memosprites/1407.json");
         Character master = CharacterFactory.create(1407, 80, false, null, null, 0);
 
         Summon small = SummonFactory.memosprite(master, spec, name -> 1000);

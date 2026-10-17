@@ -11,7 +11,7 @@ import java.lang.reflect.Field;
  *
  * <p>⚠ Why reflection to set the field: {@code TriggerSpec} is a Gson-mapped bean with getters only (@Getter), so
  * there is no setter to call - which is exactly what "content authors write JSON, not Java" looks like. The
- * alternative, shipping a deliberately broken rule in {@code resources/characters/}, would leave a permanently red
+ * alternative, shipping a deliberately broken rule in {@code resources/game/characters/}, would leave a permanently red
  * rule in the corpus for every other content guard to tolerate.
  *
  * <p>⚠ Why these are worth asserting at all: both refusals guard the "no symptom" failure mode. A

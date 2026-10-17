@@ -69,7 +69,7 @@ public class Character extends CanHit {
     private int cid;
 
     /**
-     * This character's own data id (its file name under {@code resources/characters/}).
+     * This character's own data id (its file name under {@code resources/game/characters/}).
      *
      * <p>Reader: the {@code ally_cid:<cid>} selector -- "when the Demiurge (德谬歌) casts a memosprite skill, make <b>Hyacine (风堇)</b> gain 2 layers ..." names a character, and nothing in the selector set could.
      */
@@ -143,7 +143,7 @@ public class Character extends CanHit {
      * <p><b>It is a construction-time property, like the relic suit.</b> The assembly point decides which ranks
      * are active and hands the number over; a trigger rule that belongs to an Eidolon says so with
      * {@code min_eidolon}, and the interpreter compares the two. So the engine never looks an Eidolon up by cid
-     * - the mechanics stay in {@code resources/characters/<cid>.json}, the same as talents and traces.
+     * - the mechanics stay in {@code resources/game/characters/<cid>.json}, the same as talents and traces.
      *
      * <p>Which is also why {@code eidolons.json} is <b>reference material</b> rather than a loaded table: its
      * names, descriptions and parameters are what a rule's {@code source} and {@code note} cite, exactly like the

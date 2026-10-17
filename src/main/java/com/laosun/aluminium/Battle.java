@@ -4093,7 +4093,7 @@ public class Battle {
      *
      * <p>This is the character-side sibling of {@link #summon(CanHit, int, int)}: the monster path takes an
      * id from a roster, this one takes nothing but the summoner and reads
-     * {@code resources/memosprites/<cid>.json} for how the panel is inherited. It always joins
+     * {@code resources/game/memosprites/<cid>.json} for how the panel is inherited. It always joins
      * {@link #allies}, because a memosprite fights for whoever summoned it and its summoner is one of ours.
      *
      * <p><b>Idempotent per summoner.</b> If that character already has a living memosprite on the field,

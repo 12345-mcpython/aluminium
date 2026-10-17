@@ -19,7 +19,7 @@ import java.util.*;
 /**
  * A character's compiled trigger table: the data form of its mechanics.
  *
- * <p>Loadable from {@code resources/characters/<cid>.json}; an unregistered character simply has an
+ * <p>Loadable from {@code resources/game/characters/<cid>.json}; an unregistered character simply has an
  * <b>empty table</b>, which is normal rather than an error (there are 93 characters and only a
  * handful are data-ised so far).
  *
@@ -410,9 +410,9 @@ public class TriggerTable {
      * This table's rules followed by another table's - one table with both sets of mechanics.
      *
      * <p><b>Why this exists.</b> A character's effective mechanics are not always in one file: the
-     * character's own {@code resources/characters/<cid>.json} supplies its kit, and every relic set
+     * character's own {@code resources/game/characters/<cid>.json} supplies its kit, and every relic set
      * worn in sufficient numbers supplies its own rules
-     * ({@code resources/relic_sets/<setId>.json}). The assembly point
+     * ({@code resources/game/relic_sets/<setId>.json}). The assembly point
      * ({@code CharacterFactory}) needs one table on {@link Character#getTriggerTable()}, and the
      * alternative - teaching {@code Battle} to consult several tables - would spread the composition
      * across the hot path instead of doing it once, at build time.
@@ -705,7 +705,7 @@ public class TriggerTable {
      * failure mode with no symptom that the rest of this class already refuses.
      *
      * <p>⚠ Package-visible only so the same-package guard can reach it ({@code ChanceRollsValidationTest}). The
-     * alternative was to ship deliberately broken content in {@code resources/characters/} and load it, which
+     * alternative was to ship deliberately broken content in {@code resources/game/characters/} and load it, which
      * would put a permanently red rule in the corpus that every other content guard has to tolerate.
      */
     static int validateChanceRolls(TriggerSpec spec) {

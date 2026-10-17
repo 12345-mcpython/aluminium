@@ -11,7 +11,7 @@ import java.util.Map;
  * The type of effect a skill produces, mapped from the {@code skill_effect} field
  * in {@code skills.json}.
  *
- * <p>Every value present in the game data ({@code src/main/resources/data/skills.json})
+ * <p>Every value present in the game data ({@code src/main/resources/game/data/skills.json})
  * is covered here. Each effect is assigned to a {@link Category} which describes
  * whether the skill produces {@link Category#DAMAGE damage} or some other kind
  * of effect ({@link Category#HEAL heal}, {@link Category#BUFF buff}, ...).

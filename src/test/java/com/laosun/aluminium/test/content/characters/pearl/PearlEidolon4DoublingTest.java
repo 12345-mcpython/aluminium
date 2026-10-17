@@ -68,7 +68,7 @@ public class PearlEidolon4DoublingTest {
      */
     @Test
     public void theAddedClausesRepeatTheirSiblingsConditionsAndNameTheRank() throws Exception {
-        var path = java.nio.file.Path.of("src/main/resources/characters/" + PEARL + ".json");
+        var path = java.nio.file.Path.of("src/main/resources/game/characters/" + PEARL + ".json");
         var root = com.google.gson.JsonParser.parseString(java.nio.file.Files.readString(path))
                 .getAsJsonObject();
         int checked = 0;

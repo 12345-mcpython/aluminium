@@ -62,7 +62,7 @@ public class MydeiTest {
      */
     @Test
     public void theFileDeclaresTheChargeResource() {
-        try (InputStream stream = MydeiTest.class.getResourceAsStream("/characters/1404.json")) {
+        try (InputStream stream = MydeiTest.class.getResourceAsStream("/game/characters/1404.json")) {
             Assertions.assertNotNull(stream, "1404 must have a file");
             JsonObject root = JsonParser.parseReader(new InputStreamReader(stream, StandardCharsets.UTF_8)).getAsJsonObject();
             JsonArray resources = root.getAsJsonArray("resources");
