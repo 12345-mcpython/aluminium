@@ -39,15 +39,25 @@ public class TrueKnowledgeSkillDamageTest {
                 + " without it");
         double skillRatio = skillAtHim[0] / skillElsewhere[0];
         double basicRatio = basicAtHim[0] / basicElsewhere[0];
+        double attackRatio = basicAtHim[2] / basicElsewhere[2];
         Assertions.assertTrue(skillRatio > 1.05, "his SKILL hits much harder with [真知] (True Knowledge) up: " + skillRatio);
-        // The BASIC's move is the OTHER clause of the same sentence (the +30% attack for Erudition, which is +0.84 on ~5= +0.111%), NOT a gate leak. A boost that lost its
-        // `from_skill SKILL` gate would move this ratio to the skill's own ~1.39 and fail here.
-        Assertions.assertTrue(basicRatio < 1.01,
-                "and his BASIC attack is essentially untouched: " + basicRatio + " (the attack-raise's own +0.111%)");
+        // The BASIC's move is the OTHER clause of the same sentence (「所有智识命途角色攻击力提高 #3」), NOT a gate leak: so
+        // it must move by exactly what the ATTACK raise did and no more.
+        //
+        // ⚠ CORRECTED (2026-10-17): this used to assert `basicRatio < 1.01` with the comment "the attack-raise's own
+        // +0.111%". That number was the signature of a BUG, not of the rule: the share was handed to the modifier as an
+        // ABSOLUTE value (+0.84 attack, ~0.111% of his ATK) instead of a fraction of it (row #3 = 84%). Now that the
+        // magnitude is a share, the basic really does move - so the assertion is "it moves exactly as much as the ATTACK
+        // raise", which is the property that matters and does not depend on the share's size.
+        Assertions.assertEquals(attackRatio, basicRatio, 1e-6,
+                "the basic attack's move must be exactly the attack raise (" + attackRatio + "), i.e. the skill gate "
+                        + "did not leak");
+        Assertions.assertTrue(attackRatio > 1.5,
+                "and the attack raise is the row's 84%, not 0.84 points of attack: " + attackRatio);
     }
 
     /**
-     * [the damage that one attack dealt, the captured #2 in basis points]
+     * [the damage that one attack dealt, the captured #2 in basis points, his ATTACK]
      */
     private static double[] hit(boolean atHim, SkillType slot) {
         Character cyrene = CharacterFactory.create(CYRENE, LEVEL);
@@ -72,6 +82,7 @@ public class TrueKnowledgeSkillDamageTest {
         com.laosun.aluminium.models.skill.SkillExecutor.execute(battle, skill, him,
                 List.of(battle.enemies.getFirst()));
         battle.processRequests();
-        return new double[]{before - battle.enemies.getFirst().getCurrentHp(), captured};
+        return new double[]{before - battle.enemies.getFirst().getCurrentHp(), captured,
+                him.getAttribute(com.laosun.aluminium.enums.AttributeType.ATTACK).get()};
     }
 }

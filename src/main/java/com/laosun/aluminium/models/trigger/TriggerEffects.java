@@ -132,7 +132,21 @@ final class TriggerEffects {
             throw new IllegalStateException("Op MODIFY_ATTR with instance=true supports DEFENCE_IGNORE, CRIT_CHANCE and CRIT_ATTACK on "
                     + "DEALING_DAMAGE; " + attribute + " has no instance-level slot yet");
         }
-        boolean derived = (effect.getScale() != null && !effect.getScale().isBlank()) || effect.getPercent() == null;
+        // Whether the magnitude is a PRODUCT (scale x share, i.e. already an absolute number in the attribute's units)
+        // or a bare SHARE of the target's base. This is the flag everything below needs: a scaled magnitude must be
+        // handed to `statModifier` as "pure" (absolute), while a share - including one stated by SPELLING
+        // (`percent_from_skill_param` and friends) with no scale - is a percentage of the base.
+        //
+        // Note: Before this, the flag passed down was `derived` (= scaled OR "no literal percent"), which is true for a
+        // no-scale share as well. Measured consequence: 1002 Dan Heng (丹恒)'s technique 「攻击力提高 40%」, stated as
+        // `percent_from_skill_param: "TECHNIQUE:0"`, produced a modifier of `ATTACK PURE_VALUE 0.4` - i.e. +0.4 attack
+        // instead of +40% - while the literal `percent: 0.4` it replaced produced `add_percent` and the right thing.
+        boolean scaled = effect.getScale() != null && !effect.getScale().isBlank();
+        boolean derived = scaled || effect.getPercent() == null;
+        // Whether the magnitude is already ABSOLUTE in the attribute's units: a flat `amount` ("raise SPEED by 50
+        // points", 艾丝妲's ultimate) or a scaled product ("equal to X% of DEF"). A bare share - a literal `percent` or
+        // one of its spellings with no scale - is a fraction of the target's base instead.
+        boolean absolute = !TriggerMagnitudes.statesShare(effect) || scaled;
         // ? A plain modifier is a share OR a flat value: `amount` alone means "raise the attribute by this many points", which the
         // validator enforces as exactly one of the two.
         // Note: The share may come from the skill parameter now, so "is a share stated" is NOT `percent != null`:
@@ -174,7 +188,7 @@ final class TriggerEffects {
                 // shipped behaviour -- it removes the trap.
                 applied *= TriggerInterpreter.perStackFactor(effect, target, ctx);
             }
-            if (derived) {
+            if (absolute) {
                 applied = TriggerMagnitudes.applyDerivedCeiling(effect, ctx, applied);
             } else if (effect.getCapScale() != null || effect.getCapPercent() != null) {
                 double ceiling = TriggerMagnitudes.resolveScale(effect.getCapScale(), effect.getCapPercent(), ctx);
@@ -184,7 +198,7 @@ final class TriggerEffects {
                 }
             }
             AbstractBuff buff = TriggerInterpreter.withSource(TriggerLifetimes.withTickOwner(
-                    TriggerLifetimes.withLifetime(TriggerInterpreter.statModifier(attribute, applied, turns, permanent, maxStacks, derived), effect),
+                    TriggerLifetimes.withLifetime(TriggerInterpreter.statModifier(attribute, applied, turns, permanent, maxStacks, absolute), effect),
                     effect, ctx), ctx);
             // "while in the [协奏] state, raise the ATK of all of us ...": the boost lasts as long as the STATE, and the state ends
             // when a countdown's turn arrives -- a lifetime no `turns` can state. Naming the modifier is what lets

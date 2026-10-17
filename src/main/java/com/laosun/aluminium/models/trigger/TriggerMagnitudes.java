@@ -576,11 +576,21 @@ final class TriggerMagnitudes {
     }
 
     static double derivedMagnitude(EffectSpec effect, TriggerContext ctx) {
-        // A share from the cast skill with NO scale. This method is entered whenever `derived` is true, and `derived`
-        // is "(has a scale) OR (no percent)", so the flat-`amount` case arrives here too -- hence the guard: only the cast-skill share, and
-        // only when there is no scale to read.
-        if ((effect.getScale() == null || effect.getScale().isBlank())
-                && (effect.getPercentFromCastParam() != null || effect.getPercentFromResource() != null)) {
+        // A share with NO scale: the magnitude IS the share (plus any constant term) - for EVERY share spelling.
+        //
+        // Note: The gap this closes: 1002 Dan Heng (丹恒)'s talent, 「下一次攻击的风属性抗性穿透提高 36%」, where the 36% lives in
+        // his Talent's OWN parameter row (0.18 at Lv1 -> 0.36 at Lv10 -> 0.45 at Lv15, so rank 5 moves it to 0.396). There
+        // is no scale to multiply - the modifier IS the share - and while the cast-param spelling was covered, the
+        // skill-row spelling fell through to the scale branches below and died on a null scale. A flat `amount` still
+        // arrives here (this method is entered whenever `derived` is true, and `derived` is "(has a scale) OR (no
+        // percent)"), which is why the "states a share" test stays: a pure amount must not be treated as a share.
+        if (effect.getScale() == null || effect.getScale().isBlank()) {
+            if (!statesShare(effect)) {
+                throw new IllegalStateException("Op " + effect.getOp() + " states neither a scale nor a share: a modifier "
+                        + "needs one of them (a scale is \"self_attr:...\" / \"target_attr:...\" / \"stack:...\" / ..., a "
+                        + "share is \"percent\" / \"percent_from_cast_param\" / \"percent_from_skill_param\" / "
+                        + "\"percent_from_summon_param\" / \"percent_from_resource\")");
+            }
             return shareOf(effect, ctx) + constantTerm(effect, ctx);
         }
         // `counted_laughs`: the laugh points Elation damage is computed from - the merged snapshots of 【好活当赏】, NOT
