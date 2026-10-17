@@ -57,7 +57,7 @@ final class TriggerMagnitudes {
         // Note: `shareOf`, not the raw field: a share may also come from one of the owner's own skills (`percent_from_skill_param`),
         // and `derivedMagnitude` was fixed for exactly this one round earlier. Same family, same line.
         double share = shareOf(effect, ctx);
-        double flat = effect.getAmount() == null ? 0.0 : effect.getAmount();
+        double flat = constantTerm(effect, ctx);
         // Note: A share of the TRIGGERING instance ("equal to X% of the original damage") was implemented here on and ROLLED
         // BACK the same round, because it read the wrong quantity: at `DEALING_DAMAGE` -- the only event that carries
         // the instance -- `damage.toValue()` is 4.2x the value the victim actually loses (measured: 1093.02 vs
@@ -251,6 +251,33 @@ final class TriggerMagnitudes {
     }
 
     /**
+     * The <b>constant term</b> of a magnitude: {@code percent x scale + THIS}.
+     *
+     * <p>It is a literal {@code amount}, or one parameter of the rule owner's own skill at that skill's
+     * <b>current level</b> ({@code amount_from_skill_param}) - the same level-aware read the share has had through
+     * {@code percent_from_skill_param}, now for the other half.
+     *
+     * <p>Why one reader and not a branch per op: a sentence like 「等同于三月七 #1% 防御力 + #4」 states <b>two</b>
+     * numbers that both run with the level, and every op that computes {@code share x scale + constant} has to read them
+     * the same way. Fifteen call sites were spelling the constant as {@code amount == null ? 0 : amount}; a second
+     * spelling there is how the two halves drift apart (one moves with the level, the other stays frozen - a number no
+     * row of the table contains).
+     *
+     * @param effect the effect
+     * @param ctx    the context (the flat spelling reads the RULE OWNER's own skill)
+     * @return the constant term, {@code 0} when neither spelling is stated
+     */
+    static double constantTerm(EffectSpec effect, TriggerContext ctx) {
+        if (effect.getAmount() != null) {
+            return effect.getAmount();
+        }
+        if (effect.getAmountFromSkillParam() != null) {
+            return ownerSkillParamValue(effect, ctx, effect.getAmountFromSkillParam().trim());
+        }
+        return 0;
+    }
+
+    /**
      * How much damage one tick of a rule's DOT deals: the flat {@code amount}, or {@code percent}  x  one of the
      * rule owner's own attributes (+ the optional constant {@code amount}).
      *
@@ -260,7 +287,7 @@ final class TriggerMagnitudes {
     static double dotMagnitude(EffectSpec effect, TriggerContext ctx) {
         double magnitude;
         if (effect.getScale() == null) {
-            magnitude = effect.getAmount();
+            magnitude = constantTerm(effect, ctx);
         } else if ("target_max_hp".equals(effect.getScale().trim())) {
             // Note: The victim's own maximum: "take ... DoT equal to 24.00% of its own Max HP" (1111 卢卡). Every other scale here
             // is the rule OWNER's, which is why this spelling had to be added -- and it is read when the buff LANDS, so a
@@ -392,24 +419,49 @@ final class TriggerMagnitudes {
         return castParamValue(effect, ctx, spelled);
     }
 
+    /**
+     * The value of one parameter of the skill that produced the event, at the caster's CURRENT level.
+     *
+     * <p><b>Both kinds of caster.</b> A memosprite answers through {@code Summon.skillAt}; a <b>character</b> answers
+     * through the skill equipped in the slot the context carries ({@code ctx.skillId()}, i.e.
+     * {@code Skill.getSkillSlot()} - the same number {@code from_skill_id} and {@code CAST_SKILL{skill_id}} use). The
+     * character half exists because the same sentence shape appears in ordinary kits: 1001 March 7th's shield is
+     * 「等同于三月七 #1% 防御力 + #4」, where both numbers live in HER Skill's row and both change with its level. Before
+     * this, only a memosprite could be read, so a character's "the skill I just cast" number had to be spelled
+     * {@code percent_from_skill_param} with the slot named by hand - correct, but a second way to say one thing.
+     *
+     * <p>Note: Shared by the {@code cast_skill_param:<index>} scale and by {@code percent_from_cast_param}, so the two cannot drift: the damage
+     * path reads the same row the same way ({@code multiplierOf} - {@code skill.getData().getSkills()},
+     * {@code attacker.skillLevel(skill)}, {@code level - 1}).
+     */
     static double castParamValue(EffectSpec effect, TriggerContext ctx, String spelled) {
         int index = Integer.parseInt(spelled);
         CanHit caster = ctx.actor();
-        if (!(caster instanceof Summon from)) {
+        if (caster == null) {
+            throw new IllegalStateException("the scale \"" + effect.getScale()
+                    + "\" reads the parameter of the skill that produced the event, but this event carries no actor");
+        }
+        Skill casting;
+        if (caster instanceof Summon from) {
+            casting = from.skillAt(ctx.skillId());
+        } else if (caster instanceof com.laosun.aluminium.models.Character character) {
+            casting = character.getSkills().values().stream()
+                    .filter(skill -> skill != null && skill.getSkillSlot() == ctx.skillId())
+                    .findFirst().orElse(null);
+        } else {
             throw new IllegalStateException("the scale \"" + effect.getScale()
                     + "\" reads the parameter of the skill that produced the event, but the actor is "
-                    + (caster == null ? "nobody" : caster.getName() + ", which is not a memosprite"));
+                    + caster.getName() + ", which owns no skill row (only a character or a memosprite does)");
         }
-        Skill casting = from.skillAt(ctx.skillId());
         if (casting == null || casting.getData() == null || !casting.getData().isLoaded()) {
             throw new IllegalStateException("the scale \"" + effect.getScale()
-                    + "\" reads the skill that produced the event, but " + from.getName()
+                    + "\" reads the skill that produced the event, but " + caster.getName()
                     + " has no loaded skill at slot " + ctx.skillId());
         }
         var rows = casting.getData().getSkills();
         int row = caster.skillLevel(casting) - 1;
         if (row < 0 || row >= rows.size()) {
-            throw new IllegalStateException("skill level " + caster.skillLevel(casting) + " is outside " + from.getName()
+            throw new IllegalStateException("skill level " + caster.skillLevel(casting) + " is outside " + caster.getName()
                     + " skill " + ctx.skillId() + " parameter table (rows=" + rows.size() + ")");
         }
         var values = rows.get(row);
@@ -459,7 +511,7 @@ final class TriggerMagnitudes {
         // only when there is no scale to read.
         if ((effect.getScale() == null || effect.getScale().isBlank())
                 && (effect.getPercentFromCastParam() != null || effect.getPercentFromResource() != null)) {
-            return shareOf(effect, ctx) + (effect.getAmount() == null ? 0 : effect.getAmount());
+            return shareOf(effect, ctx) + constantTerm(effect, ctx);
         }
         // `counted_laughs`: the laugh points Elation damage is computed from - the merged snapshots of 【好活当赏】, NOT
         // the party's live pool (the same distinction the damage factor makes). Reader: 1506 Silver Wolf LV.999's Eidolon
@@ -467,21 +519,21 @@ final class TriggerMagnitudes {
         // cast-skill share gives: the count belongs to the battle, so a context without a rule owner can still read it.
         if (effect.getScale() != null && TriggerInterpreter.COUNTED_LAUGHS.equals(effect.getScale().trim())) {
             double points = ctx.battle() == null ? 0 : ctx.battle().countedLaughPoints();
-            return effect.getPercent() * points + (effect.getAmount() == null ? 0 : effect.getAmount());
+            return effect.getPercent() * points + constantTerm(effect, ctx);
         }
         com.laosun.aluminium.models.Character owner = requireCharacterOwner(effect, ctx);
         // Note: `stackScale` takes a primitive, so handing it `effect.getPercent()` unboxes a null the moment a rule states
         // its share as `percent_from_cast_param` instead. The share is what the counter multiplies, so ask for it the one way.
         Double fromStacks = stackScale(effect.getScale(), shareOf(effect, ctx), ctx);
         if (fromStacks != null) {
-            return fromStacks + (effect.getAmount() == null ? 0 : effect.getAmount());
+            return fromStacks + constantTerm(effect, ctx);
         }
         if (TriggerInterpreter.CAST_ENERGY_SPENT.equals(effect.getScale().trim())) {
             // Note: Before the attribute branch below, because this source is not an attribute and
             // scaleAttribute would throw a message that reads like missing unit data.
             com.laosun.aluminium.models.Damage hit = ctx.damage();
             double spent = hit == null ? 0 : hit.getCastEnergySpent();
-            return effect.getPercent() * spent + (effect.getAmount() == null ? 0 : effect.getAmount());
+            return effect.getPercent() * spent + constantTerm(effect, ctx);
         }
         if (TriggerInterpreter.EVENT_AMOUNT.equals(effect.getScale().trim())) {            // "raise X% for each 1 point spent ...": the triggering event's own magnitude, as a
             // modifier. Note: `event_amount` is NOT a new spelling: `ADD_STACK` already read it (1306's
@@ -490,7 +542,7 @@ final class TriggerMagnitudes {
             // `grantAmount`, where `amount_from_event` already served GAIN_RESOURCE; that note lives there.)
             // Before the attribute branch below, for the reason `cast_energy_spent` gives.
             return effect.getPercent() * Math.abs(ctx.amount())
-                    + (effect.getAmount() == null ? 0 : effect.getAmount());
+                    + constantTerm(effect, ctx);
         }
         if (effect.getScale().trim().startsWith(TriggerTable.CAST_SKILL_PARAM_PREFIX)) {
             // The skill that produced THIS event, and its parameter at the CURRENT level (1415 memosprite skill 10).
@@ -498,7 +550,7 @@ final class TriggerMagnitudes {
                     effect.getScale().trim().substring(TriggerTable.CAST_SKILL_PARAM_PREFIX.length()).trim());
             double share = effect.getPercent() == null ? 1.0 : effect.getPercent();
             return share * castParamValue(effect, ctx, String.valueOf(index))
-                    + (effect.getAmount() == null ? 0 : effect.getAmount());
+                    + constantTerm(effect, ctx);
         }
         if (effect.getScale().trim().startsWith(TriggerTable.ACTOR_ATTR_PREFIX)) {
             // The unit the event is ABOUT (1415 memosprite skill 10: "equal to #1% of Demiurge (德谬歌)'s Max HP", and Demiurge (德谬歌) is the actor of the
@@ -513,10 +565,10 @@ final class TriggerMagnitudes {
             // Note: The share, not `percent` raw: this branch was written before `shareOf` existed, and left reading `percent`
             // directly -- so a rule whose share is `percent_from_cast_param` crashed on a null here. Same fix as its sibling below.
             return shareOf(effect, ctx) * subject.getAttribute(from).get()
-                    + (effect.getAmount() == null ? 0 : effect.getAmount());
+                    + constantTerm(effect, ctx);
         }
         if (effect.getScale().trim().startsWith(TriggerTable.SKILL_PARAM_PREFIX)) {
-            return shareOf(effect, ctx) * ownerSkillParamValue(effect, ctx) + (effect.getAmount() == null ? 0 : effect.getAmount());
+            return shareOf(effect, ctx) * ownerSkillParamValue(effect, ctx) + constantTerm(effect, ctx);
         }
         if (effect.getScale().trim().startsWith(TriggerTable.HOLDER_ATTR_PREFIX)) {
             // The state-holder's own attribute (1503: "该次欢愉伤害使用【美学底本】的属性值计算"). Resolved through
@@ -531,7 +583,7 @@ final class TriggerMagnitudes {
                         + TriggerTargets.holderAttrAttribute(effect) + " from");
             }
             return shareOf(effect, ctx) * holder.getAttribute(TriggerTargets.holderAttrAttribute(effect)).get()
-                    + (effect.getAmount() == null ? 0 : effect.getAmount());
+                    + constantTerm(effect, ctx);
         }
         if (effect.getScale().trim().startsWith(TriggerTable.SUMMON_ATTR_PREFIX)) {
             // The owner's MEMOSPRITE (1415 memosprite skill 10). Resolved through `Battle.summonOf`, the same accessor the `summon`
@@ -545,7 +597,7 @@ final class TriggerMagnitudes {
             AttributeType from = AttributeType.fromString(
                     effect.getScale().trim().substring(TriggerTable.SUMMON_ATTR_PREFIX.length()).trim());
             return shareOf(effect, ctx) * fielded.getAttribute(from).get()
-                    + (effect.getAmount() == null ? 0 : effect.getAmount());
+                    + constantTerm(effect, ctx);
         }
         if (effect.getScale().trim().startsWith(TriggerInterpreter.STEPS_PREFIX)) {
             // 「每累计 N 点…」 - how many WHOLE steps a counter has reached: floor(value / N), as a number.
@@ -586,7 +638,7 @@ final class TriggerMagnitudes {
                         + "battle's skill points");
             }
             return shareOf(effect, ctx) * Math.floor(value / step)
-                    + (effect.getAmount() == null ? 0 : effect.getAmount());
+                    + constantTerm(effect, ctx);
         }
         if (effect.getScale().trim().startsWith(TriggerInterpreter.ABOVE_PREFIX)) {
             // "when SPD is greater than or equal to 120 ... for each 1 point of SPD above that ...": the EXCESS over a
@@ -625,19 +677,19 @@ final class TriggerMagnitudes {
             if (effect.getMaxPoints() != null) {
                 excess = Math.min(excess, effect.getMaxPoints());
             }
-            return effect.getPercent() * excess + (effect.getAmount() == null ? 0 : effect.getAmount());
+            return effect.getPercent() * excess + constantTerm(effect, ctx);
         }
         // A battle-level PARTY counter (reader: 1513's reward): the counter lives on the battle, so it is
         // resolved here rather than through `scaleAttribute`, which answers "which attribute" and has no answer for it.
         if (effect.getScale().trim().startsWith("party_resource:")) {
             return resolveScale(effect.getScale(),
                     effect.getPercent() == null ? 1 : effect.getPercent(), ctx)
-                    + (effect.getAmount() == null ? 0 : effect.getAmount());
+                    + constantTerm(effect, ctx);
         }
         if (TriggerInterpreter.SELF_MAX_ENERGY.equals(effect.getScale().trim())) {
             // "for each 1 point above" where the points are MAX ENERGY: the same derived shape, off a value the attribute
             // table has no slot for (see the `self_max_energy` condition variable).
-            return effect.getPercent() * owner.getMaxEnergy() + (effect.getAmount() == null ? 0 : effect.getAmount());
+            return effect.getPercent() * owner.getMaxEnergy() + constantTerm(effect, ctx);
         }
         AttributeType source = TriggerMagnitudes.scaleAttribute(effect, effect.getOp(), null);
         if (source == null) {
@@ -651,7 +703,7 @@ final class TriggerMagnitudes {
         }
         // Note: `shareOf`, not `effect.getPercent()`: the share may also come from one of the owner's own skills, and reading the raw field
         // NPEs on a rule that states it that way. Every other branch of this method already goes through `shareOf`; this line was the one left behind.
-        return shareOf(effect, ctx) * value.get() + (effect.getAmount() == null ? 0 : effect.getAmount());
+        return shareOf(effect, ctx) * value.get() + constantTerm(effect, ctx);
     }
 
     /**

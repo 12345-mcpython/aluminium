@@ -1964,22 +1964,18 @@ final class TriggerValidator {
      * derived values follow (a later buff on the applier must not change damage that is already burning).
      */
     static void requireDotMagnitude(EffectSpec effect, String op, TriggerSpec spec) {
-        // The level-aware FLAT spelling is not wired here: `dotMagnitude` reads `amount` literally (and the derived
-        // branch adds `amount` as its constant), so `amount_from_skill_param` would be validated and then silently read
-        // as 0 -- a wrong number with no symptom. Refused until a DOT actually needs it (the house rule: refuse what you
-        // cannot read, do not accept and ignore).
-        if (effect.getAmountFromSkillParam() != null) {
-            throw new IllegalArgumentException(
-                    "Op " + op + " states \"amount_from_skill_param\", which its per-turn damage does not read yet: the "
-                            + "constant term is a literal \"amount\" (the share may still come from "
-                            + "\"percent_from_skill_param\") (source: " + spec.getSource() + ")");
-        }
+        // The flat spelling is shared with every other magnitude: one source, and a `<SKILLTYPE>:<index>` spelling that
+        // is checked here rather than when the DOT fires. Note: this family used to REFUSE the level-aware constant
+        // because `dotMagnitude` read only a literal; that reader now goes through `constantTerm`, which is the same
+        // one the derived magnitudes use.
+        requireSingleFlatSource(effect, op, spec);
         boolean derived = effect.getScale() != null;
         if (!derived) {
-            if (effect.getAmount() == null) {
+            if (effect.getAmount() == null && effect.getAmountFromSkillParam() == null) {
                 throw new IllegalArgumentException(
                         "Op " + op + " requires a magnitude for its per-turn damage: either \"amount\" (a flat "
-                                + "number) or \"scale\" + \"percent\" (a share of one of the rule owner's own "
+                                + "number, or \"amount_from_skill_param\" for one from the owner's own skill row) or "
+                                + "\"scale\" + \"percent\" (a share of one of the rule owner's own "
                                 + "attributes, e.g. \"self_attr:ATTACK\" with 0.6) "
                                 + "(source: " + spec.getSource() + ")");
             }
