@@ -9,7 +9,7 @@ import java.util.Map;
  * <p>This is the data-side name of an engine event. The whole point of the trigger table is that
  * character content is expressed as "on &lt;event&gt;, if &lt;condition&gt;, do &lt;effects&gt;", so
  * this enum is the closed vocabulary of {@code "on"} values in
- * {@code resources/characters/<cid>.json}.
+ * {@code resources/game/characters/<cid>.json}.
  *
  * <p>Note: <b>Not every value is wired yet.</b> The ones marked have an emitter in the engine; the
  * rest are declared so the JSON vocabulary is stable and so an unwired trigger fails <b>loudly at

@@ -899,7 +899,7 @@ final class TriggerValidator {
             }
             case "SUMMON" -> {
                 // No arguments at all: the memosprite belongs to the rule's owner, and everything about it
-                // (name, panel derivation) lives in resources/memosprites/<cid>.json. A `target` here would
+                // (name, panel derivation) lives in resources/game/memosprites/<cid>.json. A `target` here would
                 // be silently ignored, which is the class of mistake the closed selector set exists to
                 // prevent -- so it is refused rather than dropped.
                 requireNoDuration(effect, op, spec);

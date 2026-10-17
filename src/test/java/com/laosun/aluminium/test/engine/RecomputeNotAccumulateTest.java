@@ -163,7 +163,7 @@ public class RecomputeNotAccumulateTest {
      */
     private static List<Path> contentFiles() throws IOException {
         List<Path> files = new ArrayList<>();
-        for (String directory : List.of("src/main/resources/characters", "src/main/resources/light_cones")) {
+        for (String directory : List.of("src/main/resources/game/characters", "src/main/resources/game/light_cones")) {
             try (Stream<Path> stream = Files.list(Path.of(directory))) {
                 stream.filter(path -> path.getFileName().toString().endsWith(".json"))
                         .filter(path -> !path.getFileName().toString().startsWith("_"))

@@ -13,7 +13,7 @@ import java.nio.charset.StandardCharsets;
  *
  * <p>Uses Gson for deserialization. All resources are read with UTF-8 encoding.
  *
- * <p><b>The data files are not in the repository.</b> {@code src/main/resources/data/} is excluded by
+ * <p><b>The data files are not in the repository.</b> {@code src/main/resources/game/data/} is excluded by
  * {@code .gitignore} (the only one checked in is the patch file {@code monster_attack_modify_ratio.json}),
  * so right after a {@code git clone} none of these files exist and they must first be produced with the
  * generator script in the README. When a file is missing, this class throws {@link IllegalStateException}
@@ -30,7 +30,7 @@ public final class JSONReader {
      * The directory where game data is stored (relative to the classpath), and also the path shown to the
      * user in error messages.
      */
-    private static final String DATA_DIR = "/data/";
+    private static final String DATA_DIR = "/game/data/";
 
     /**
      * Reads and deserializes a JSON resource file.
@@ -53,7 +53,7 @@ public final class JSONReader {
             // thrown from Constant's static block turns into that).
             throw new IllegalStateException("""
                     缺少数据文件 %s（应位于 src/main/resources%s）
-                    游戏数据不在仓库里（.gitignore 排除了 src/main/resources/data/），\
+                    游戏数据不在仓库里（.gitignore 排除了 src/main/resources/game/data/），\
                     请先按 README 的 generator 一节生成数据，否则所有测试都会失败。"""
                     .formatted(resourcePath, DATA_DIR));
         }

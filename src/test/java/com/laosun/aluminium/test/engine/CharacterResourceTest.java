@@ -42,7 +42,7 @@ import java.util.Set;
  *       event's actor.</li>
  * </ol>
  *
- * <p>The fixtures under {@code src/test/resources/characters/} are the loader's own fixtures - the same trick
+ * <p>The fixtures under {@code src/test/resources/game/characters/} are the loader's own fixtures - the same trick
  * {@code relic_sets/113.json} uses for relic rules - so the shapes are exercised through {@link TriggerTables}
  * rather than by calling Gson directly.
  */
@@ -63,7 +63,7 @@ public class CharacterResourceTest {
     private static final String CHARGE = "充能";
 
     /**
-     * The fixture cids (see {@code src/test/resources/characters/}).
+     * The fixture cids (see {@code src/test/resources/game/characters/}).
      */
     private static final int OBJECT_FORM = 9001;
     private static final int OBJECT_WITHOUT_RULES = 9002;

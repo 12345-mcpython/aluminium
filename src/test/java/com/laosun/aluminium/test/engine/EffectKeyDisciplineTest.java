@@ -69,7 +69,7 @@ public class EffectKeyDisciplineTest {
         Map<String, Set<String>> unknown = new TreeMap<>();
         int files = 0;
         for (String dir : List.of("characters", "light_cones", "relic_sets", "memosprites")) {
-            Path root = Path.of("src", "main", "resources", dir);
+            Path root = Path.of("src", "main", "resources", "game", dir);
             if (!Files.isDirectory(root)) {
                 continue;
             }

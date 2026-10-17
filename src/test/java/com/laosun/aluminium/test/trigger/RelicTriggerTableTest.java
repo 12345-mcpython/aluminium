@@ -26,7 +26,7 @@ import java.util.*;
  *
  * <p>Relic set bonuses that are not plain stats are "when &lt;event&gt;, do &lt;something the engine
  * can already do&gt;", which is exactly a {@link TriggerTable}. So a set's rules live in
- * {@code resources/relic_sets/<setId>.json} - the same JSON shape as a character's - keyed by the
+ * {@code resources/game/relic_sets/<setId>.json} - the same JSON shape as a character's - keyed by the
  * <b>worn piece count</b> they need, and the assembly point
  * ({@code CharacterFactory.effectiveTriggerTable}) merges them into the character's own table.
  *

@@ -12,7 +12,7 @@
 >
 > 仓库外的两份资料：`TRIGGER.md`（触发器 JSON 格式——是**规范**不是台账）、
 > `HSR.md`（游戏侧公式，正典副本在仓库外）。**"现在是什么"的权威是代码** ✓，
-> 以及 `src/main/resources/characters/<cid>.json` 里每条规则自带的 `source` / `note` ✓。
+> 以及 `src/main/resources/game/characters/<cid>.json` 里每条规则自带的 `source` / `note` ✓。
 
 ---
 
@@ -678,7 +678,7 @@ C 层全是**填口子** ✓，依赖已完成的机制，**不该出现新架�
 #### (d) `gradlew clean` 会删掉 `build/` 下的基线
 
 基线（demo 输出、分析脚本）放 `build/` 里会被构建清掉 ✓。**重建办法**：
-`git worktree add build/_baseline_wt HEAD` ＋ 把 gitignore 的 `src/main/resources/data/` 拷进去 ✓，
+`git worktree add build/_baseline_wt HEAD` ＋ 把 gitignore 的 `src/main/resources/game/data/` 拷进去 ✓，
 在那个 worktree 里跑 demo 取基线，取完 `git worktree remove` ✓。
 ⚠ 长期看**分析脚本应放仓库外** ✓。
 

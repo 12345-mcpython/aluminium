@@ -13,7 +13,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
- * Loads memosprite panels from {@code resources/memosprites/<ownerCid>.json} (the memosprite half).
+ * Loads memosprite panels from {@code resources/game/memosprites/<ownerCid>.json} (the memosprite half).
  *
  * <p>Same contract as {@link TriggerTables}, and for the same reasons: it is <b>hand-written</b> content
  * rather than generated data (so it does not belong in {@code Constant}), it lives outside the gitignored
@@ -30,13 +30,13 @@ public final class Memosprites {
     /**
      * Directory holding the per-owner files, relative to the classpath.
      */
-    public static final String DIR = "memosprites";
+    public static final String DIR = "game/memosprites";
 
     /**
      * The directory a general SERVANT's panel lives in (the servant directory, not the memosprite one): the same panel vocabulary -- shares and flats of the
      * OWNER's sheet -- as a different category, and a different damage type.
      */
-    public static final String SERVANT_DIR = "servants";
+    public static final String SERVANT_DIR = "game/servants";
 
     /**
      * Cached because an owner asked for twice must not hit the classpath twice.

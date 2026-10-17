@@ -29,7 +29,7 @@ import java.util.List;
  */
 public class ReminiscenceTest {
     private static final int CONE = 20022;
-    private static final int WEARER = 1402;   // has resources/memosprites/1402.json
+    private static final int WEARER = 1402;   // has resources/game/memosprites/1402.json
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
     private static final String MEMORIAL = "缅怀";

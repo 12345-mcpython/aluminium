@@ -46,7 +46,7 @@ public class LiteralDamageCensusTest {
      * Reads one rule's DAMAGE effect straight out of the shipped file.
      */
     private static JsonObject damageEffectOf(String cid, String ruleId) {
-        String path = "/characters/" + cid + ".json";
+        String path = "/game/characters/" + cid + ".json";
         try (InputStream stream = LiteralDamageCensusTest.class.getResourceAsStream(path)) {
             Assertions.assertNotNull(stream, "missing resource " + path);
             JsonArray rules = JsonParser.parseReader(new InputStreamReader(stream, StandardCharsets.UTF_8)).getAsJsonArray();

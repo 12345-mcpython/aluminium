@@ -21,7 +21,7 @@ import java.util.List;
  * The Eidolon gate ({@code "min_eidolon"}) and the rank it is compared against.
  *
  * <p><b>What an Eidolon is, in this engine.</b> Nothing but a number plus a gate: the mechanic itself is an
- * ordinary rule in {@code resources/characters/<cid>.json}, the assembly point hands the character a rank
+ * ordinary rule in {@code resources/game/characters/<cid>.json}, the assembly point hands the character a rank
  * ({@code CharacterFactory.create(..., eidolonRank)}), and the interpreter skips a rule whose
  * {@code min_eidolon} is above it. So {@code eidolons.json} - which has been generated all along and never
  * loaded - stays reference material: its text is what the rule's {@code source} cites, the same as a trace's.

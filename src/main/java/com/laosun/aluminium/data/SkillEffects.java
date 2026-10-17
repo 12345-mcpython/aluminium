@@ -27,7 +27,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public final class SkillEffects {
 
-    private static final String RESOURCE = "/data/skill_effects.json";
+    private static final String RESOURCE = "/game/data/skill_effects.json";
 
     private static final Type SHAPE =
             new TypeToken<Map<String, Map<String, SkillEffectSpec>>>() {

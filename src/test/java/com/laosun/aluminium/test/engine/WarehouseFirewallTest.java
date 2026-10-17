@@ -16,7 +16,7 @@ import java.util.List;
  *
  * <p>This is what three shipped pieces were for: the warehouse LOAD POINT (she is owned but not deployed), the CONTROL-CLASS FILTER
  * ("控制类负面状态", control-class negative states), and the PER-WAVE CAP ("每个波次最多触发 1 次", at most once per wave). The rule itself is read from the real content file
- * `resources/warehouse/1506.json` -- so the readings below are about the file, not about a scene built in this test.
+ * `resources/game/warehouse/1506.json` -- so the readings below are about the file, not about a scene built in this test.
  *
  * <p>Timing is the document's own: the control that TRIGGERS the clause still lands; [防火墙] is what immunises the ones after it.
  */

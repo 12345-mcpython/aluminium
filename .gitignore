@@ -4,7 +4,7 @@ build
 
 # The engine's generated data tables. They are produced by an out-of-repo generator
 # (E:\code\python\generate_data.py) and are not source.
-src/main/resources/data/
+src/main/resources/game/data/
 
 logs/
 

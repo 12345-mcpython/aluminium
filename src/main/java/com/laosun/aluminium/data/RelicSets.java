@@ -40,7 +40,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public final class RelicSets {
 
-    private static final String RESOURCE = "/data/relic_sets.json";
+    private static final String RESOURCE = "/game/data/relic_sets.json";
 
     /**
      * The file is {@code {"<set id>": {...set...}}}.

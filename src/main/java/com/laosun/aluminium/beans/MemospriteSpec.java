@@ -8,7 +8,7 @@ import java.util.List;
  * A character's memosprite (Memosprite, 忆灵) as data: its name, and how its panel is <b>derived from its
  * summoner</b>.
  *
- * <p>Loaded from {@code resources/memosprites/<ownerCid>.json} by {@link com.laosun.aluminium.data.Memosprites}.
+ * <p>Loaded from {@code resources/game/memosprites/<ownerCid>.json} by {@link com.laosun.aluminium.data.Memosprites}.
  *
  * <h2>Why the panel is stated as an inheritance rather than as numbers</h2>
  * Every memosprite in the documents is described that way, and the ratios differ per character:

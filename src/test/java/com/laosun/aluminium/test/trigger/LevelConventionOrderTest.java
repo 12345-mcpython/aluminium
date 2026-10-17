@@ -89,7 +89,7 @@ public class LevelConventionOrderTest {
      * The character files, as the shipped content directory holds them.
      */
     private static List<Path> characterFiles() {
-        Path root = Path.of("src", "main", "resources", "characters");
+        Path root = Path.of("src", "main", "resources", "game", "characters");
         Assertions.assertTrue(Files.isDirectory(root), "the character directory must exist: " + root.toAbsolutePath());
         try (Stream<Path> paths = Files.list(root)) {
             return paths.filter(p -> p.toString().endsWith(".json")).sorted().toList();

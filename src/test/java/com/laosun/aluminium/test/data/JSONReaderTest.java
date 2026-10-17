@@ -20,7 +20,7 @@ import java.util.Map;
  * generated/regenerated properly", not "the engine has a bug", so it has to be reported where it is
  * detected, with the file name attached.
  *
- * <p>The fixtures live in {@code src/test/resources/data/} - they cannot share the main data
+ * <p>The fixtures live in {@code src/test/resources/game/data/} - they cannot share the main data
  * directory, which is gitignored (and therefore absent right after a clone). The last case is a
  * control: it reads a real generated file, so the new guard cannot pass by simply always throwing.
  */

@@ -24,7 +24,7 @@ import java.util.stream.Stream;
  * and rules it saw, and a couple of the signatures it built -- so "it did not fire" can be told apart from "it saw nothing".
  */
 public class ContentDuplicateGuardTest {
-    private static final Path ROOT = Path.of("src", "main", "resources").toAbsolutePath();
+    private static final Path ROOT = Path.of("src", "main", "resources", "game").toAbsolutePath();
     private static final List<String> DIRS = List.of("characters", "light_cones", "relic_sets", "memosprites");
     /**
      * `op` plus every operand that names WHAT is affected -- the parts that make two effects the same effect.

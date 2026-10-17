@@ -24,7 +24,7 @@ import java.util.TreeSet;
  * test until the registry entry is deleted in the same commit -- which is exactly how the six relic reclaims worked.
  */
 public class LightConeRegistryTest {
-    private static final String REGISTRY = "/light_cones/_unmodelled.json";
+    private static final String REGISTRY = "/game/light_cones/_unmodelled.json";
 
     @SuppressWarnings("unchecked")
     private static Map<String, List<Map<String, Object>>> registry() {
@@ -39,7 +39,7 @@ public class LightConeRegistryTest {
     }
 
     private static boolean hasRuleFile(String id) {
-        return LightConeRegistryTest.class.getResourceAsStream("/light_cones/" + id + ".json") != null;
+        return LightConeRegistryTest.class.getResourceAsStream("/game/light_cones/" + id + ".json") != null;
     }
 
     @Test

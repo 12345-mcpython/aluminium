@@ -24,7 +24,7 @@ import java.util.List;
 /**
  * The {@code SUMMON} op: a rule bringing its owner's <b>memosprite</b> (忆灵) onto the field.
  *
- * <p><b>Where this sits in the chain.</b> {@code resources/memosprites/<cid>.json} says how a memosprite's
+ * <p><b>Where this sits in the chain.</b> {@code resources/game/memosprites/<cid>.json} says how a memosprite's
  * panel derives from its summoner, {@code Battle.summonMemosprite} puts one on the field, and this op is what
  * lets <b>content</b> ask for it: "summon the memosprite '长夜' on entering battle" (1413) and "summon the memosprite 衣匠" (1402) are rule files
  * rather than prose.
@@ -191,7 +191,7 @@ public class SummonOpTest {
      * The assembly point really calls that check - a rule file alone cannot be trusted to be consistent.
      *
      * <p>Driven through {@code CharacterFactory.create} with a <b>relic</b> whose rules summon (a test-resource
-     * fixture, {@code src/test/resources/relic_sets/99001.json}) on a character with no memosprite spec. The
+     * fixture, {@code src/test/resources/game/relic_sets/99001.json}) on a character with no memosprite spec. The
      * relic half is the harder one and the reason the check lives at assembly at all: a relic rule is shared by
      * every wearer, so no rule file can know the cid it will be checked against.
      *

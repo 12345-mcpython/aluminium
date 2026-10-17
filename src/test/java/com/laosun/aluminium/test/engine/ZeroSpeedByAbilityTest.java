@@ -25,7 +25,7 @@ public class ZeroSpeedByAbilityTest {
     @Test
     public void theIcaCarriesTheShareTheDataStates() {
         MemospriteSpec spec = Memosprites.of(1409);
-        Assertions.assertNotNull(spec, "the spec loads from resources/memosprites/1409.json");
+        Assertions.assertNotNull(spec, "the spec loads from resources/game/memosprites/1409.json");
         Assertions.assertEquals(Boolean.TRUE, spec.panel().get(1).byAbility(),
                 "the file states that an ability supplies the speed");
 
@@ -46,7 +46,7 @@ public class ZeroSpeedByAbilityTest {
     @Test
     public void theDemiurgeCarriesHers() {
         MemospriteSpec spec = Memosprites.of(1415);
-        Assertions.assertNotNull(spec, "the spec loads from resources/memosprites/1415.json");
+        Assertions.assertNotNull(spec, "the spec loads from resources/game/memosprites/1415.json");
         Assertions.assertEquals(1.0, spec.panel().getFirst().percent(), 1e-9,
                 "HPInherit #1 of skill 141503 is 1");
 
