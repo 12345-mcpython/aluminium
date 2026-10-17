@@ -37,15 +37,15 @@
         {
           "op": "HEAL",
           "scale": "owner_def",
-          "percent": 0.12,
-          "amount": 240,
+          "percent_from_skill_param": "SKILL:1",
+          "amount_from_skill_param": "SKILL:2",
           "target": "all_allies"
         },
         {
           "op": "HEAL",
           "scale": "owner_def",
-          "percent": 0.12,
-          "amount": 240,
+          "percent_from_skill_param": "SKILL:1",
+          "amount_from_skill_param": "SKILL:2",
           "target": "lowest_hp_ally"
         },
         {

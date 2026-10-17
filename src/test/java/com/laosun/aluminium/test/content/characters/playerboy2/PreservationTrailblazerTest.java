@@ -48,6 +48,13 @@ public class PreservationTrailblazerTest {
 
     /**
      * Note: "施放普攻、战技、终结技后，为我方全体提供…等同于6.00%防御力+80的护盾，持续2回合" -- all three casts, both ids.
+     *
+     * <p>⚠ <b>The battle is started first, and that is load-bearing.</b> The shield's two numbers are read out of the
+     * TALENT's row at its <b>current level</b> (`percent_from_skill_param` / `amount_from_skill_param`), and the level is
+     * put there by the file's own `level_convention` rule on `BATTLE_START`. This case used to cast into a battle that
+     * had never started, which was invisible while the numbers were literals (they do not depend on any level) and
+     * became a silent 6%-of-row-1 the moment they followed the row - measured: 52.744 instead of 129.116. A real battle
+     * always starts, so starting it is what the sentence assumes.
      */
     @Test
     public void everyCastShieldsThePartyForBothIds() {
@@ -56,6 +63,7 @@ public class PreservationTrailblazerTest {
             Character ally = CharacterFactory.create(ALLY, LEVEL);
             Enemy enemy = BattleFixture.monster();
             Battle battle = new Battle(List.of(tb, ally), List.of(enemy), fixed());
+            battle.startBattle();
             double expected = tb.getAttribute(AttributeType.DEFENCE).get() * 0.06 + 80;
 
             battle.castImmediate(tb.getSkills().get(com.laosun.aluminium.enums.SkillType.SKILL), tb, List.of(enemy));
