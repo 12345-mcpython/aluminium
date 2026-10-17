@@ -37,9 +37,11 @@ import java.util.Set;
  *   <tr><td>{@code GAIN_SKILL_POINT}</td><td>{@code amount}</td><td>wired</td></tr>
  *   <tr><td>{@code RAISE_SKILL_POINT_CAP}</td><td>{@code amount} (negative takes the bonus away)</td><td>wired</td></tr>
  *   <tr><td>{@code HEAL}</td><td>{@code amount}, optional {@code target} - <b>or</b> {@code scale} +
- *       {@code percent} (a share of a Max HP)</td><td>wired</td></tr>
+ *       {@code percent} (a share of a Max HP); the share may also be read out of the owner's own skill row at its
+ *       current level ({@code percent_from_skill_param}), and the flat part either literally or the same way
+ *       ({@code amount_from_skill_param})</td><td>wired</td></tr>
  *   <tr><td>{@code SHIELD}</td><td>{@code amount}, optional {@code target} - <b>or</b> {@code scale} +
- *       {@code percent}</td><td>wired</td></tr>
+ *       {@code percent}; same two level-aware spellings as {@code HEAL}</td><td>wired</td></tr>
  *   <tr><td>{@code EXTRA_TURN}</td><td>optional {@code target}</td><td>wired</td></tr>
  *   <tr><td>{@code ADVANCE}</td><td>{@code percent}, optional {@code target}</td><td>wired (0.0-1.0 = the fraction of the target's <b>remaining</b> time to act that gets skipped)</td></tr>
  *   <tr><td>{@code MODIFY_ATTR}</td><td>{@code attribute}, {@code percent}, <b>exactly one of</b>
@@ -1317,8 +1319,31 @@ public final class TriggerInterpreter {
      * @return the amount to apply
      */
     private static double scaledAmount(EffectSpec effect, TriggerContext ctx) {
-        double amount = effect.getAmount() == null ? 0 : effect.getAmount();
+        double amount = flatAmount(effect, ctx);
         return Boolean.TRUE.equals(effect.getPerTarget()) ? amount * ctx.hitCount() : amount;
+    }
+
+    /**
+     * The <b>flat</b> part of a magnitude: the literal {@code amount}, or one parameter of the rule owner's own skill
+     * at that skill's <b>current level</b> ({@code amount_from_skill_param}).
+     *
+     * <p>Why a second source. March 7th (1001)'s Skill states a shield of 「等同于三月七 #1% 防御力 + #4」 - both #1
+     * and #4 run with the Skill's level, so a rule that writes the constant as a literal freezes one row while the
+     * share (read from the same row) moves with it. A hybrid of "current-level share" and "authored-level constant" is
+     * a number no level of the Skill produces.
+     *
+     * <p>Note: A rule that states neither reads {@code 0}, which is what {@link #scaledAmount} has always returned for
+     * an absent {@code amount} (the ops that require one are refused at load time by {@code requireAmount}).
+     */
+    private static double flatAmount(EffectSpec effect, TriggerContext ctx) {
+        if (effect.getAmount() != null) {
+            return effect.getAmount();
+        }
+        if (effect.getAmountFromSkillParam() != null) {
+            return TriggerMagnitudes.ownerSkillParamValue(effect, ctx,
+                    effect.getAmountFromSkillParam().trim());
+        }
+        return 0;
     }
 
 
@@ -1556,7 +1581,12 @@ public final class TriggerInterpreter {
 
     /**
      * The magnitude of a {@code HEAL} / {@code SHIELD} for one target: the flat {@code amount}, or a share of a
-     * Max HP.
+     * Max HP / of the healer's DEF or ATK.
+     *
+     * <p><b>Both parts may follow a skill's level.</b> The share can be read out of the rule owner's own skill row
+     * ({@code percent_from_skill_param: "<SKILLTYPE>:<index>"}) and the constant the same way
+     * ({@code amount_from_skill_param}) - the two halves of 「等同于三月七 #1% 防御力 + #4」, which both run with the
+     * Skill's level and would otherwise be a hybrid of one row's share and another row's constant.
      *
      * <p>Computed <b>per target</b> because {@code target_max_hp} differs from one recipient to the next: a
      * party-wide heal that restores 8% of each ally's own Max HP cannot be one number.
@@ -1570,8 +1600,11 @@ public final class TriggerInterpreter {
         if (scale == null || scale.isBlank()) {
             return scaledAmount(effect, ctx);
         }
-        double share = effect.getPercent();
-        double flat = effect.getAmount() == null ? 0 : effect.getAmount();
+        // Note: `shareOf`, not `percent`: the share may come from a skill row ("#1% 防御力") instead of a literal, and
+        // reading the raw field would have made `percent_from_skill_param` NPE here -- the same shape that once crashed
+        // MODIFY_ATTR (see PercentFromSkillParamTest) and the one 1001's shield needs, where #1 and #4 both run with level.
+        double share = TriggerMagnitudes.shareOf(effect, ctx);
+        double flat = flatAmount(effect, ctx);
         return switch (scale.trim()) {
             case "target_max_hp" -> target.getMaxHp() * share + flat;
             // "restore HP equal to X% of each one's own lost HP" (cone 21023): "each one's own" is what

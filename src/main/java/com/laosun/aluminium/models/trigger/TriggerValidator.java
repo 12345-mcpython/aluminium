@@ -969,14 +969,21 @@ final class TriggerValidator {
      */
     static void requireAmountOrScale(EffectSpec effect, String op, TriggerSpec spec,
                                      Set<String> scales, String what) {
+        // The flat half is validated here too: this family's scaled path never calls `requireAmount`.
+        requireSingleFlatSource(effect, op, spec);
         String scale = effect.getScale() == null ? null : effect.getScale().trim();
         if (scale == null || scale.isEmpty()) {
             // A percentage without a scale is refused *before* the missing amount, because the author clearly
             // meant the scaled spelling: "requires amount" alone would send them looking in the wrong place.
-            if (effect.getPercent() != null) {
+            // Note: All four share spellings are refused here, not just `percent`: a share read out of a skill row
+            // ("#1% of DEF") needs a scale exactly as much as a literal does, and accepting it would fall through to
+            // `requireAmount`, whose message ("requires amount") points at the wrong field.
+            if (statesShare(effect)) {
                 throw new IllegalArgumentException(
-                        "Op " + op + " has \"percent\" but no \"scale\": the flat spelling states "
-                                + "\"amount\" instead, and the scaled one states \"scale\" + \"percent\" "
+                        "Op " + op + " states a share but no \"scale\": a share (\"percent\" / "
+                                + "\"percent_from_cast_param\" / \"percent_from_skill_param\" / \"percent_from_resource\")"
+                                + " says how much of SOMETHING, and the scale says what that something is; the flat "
+                                + "spelling states \"amount\" instead "
                                 + "(source: " + spec.getSource() + ")");
             }
             requireAmount(effect, op, spec);
@@ -985,10 +992,20 @@ final class TriggerValidator {
         // Note: `amount` together with a `scale` is the shape "equal to X% of DEF + 60": the scale is the share OF
         // something, and the amount is the flat addend. It is refused here ("which one wins?"), which is why
         // no shipped rule states both -- so allowing it now changes no existing content.
-        if (effect.getAmount() != null && effect.getPercent() == null) {
+        // Note: "no share" is asked with `statesShare`, not `getPercent`: a share read out of the owner's own skill row
+        // (`percent_from_skill_param`) is a share, and a rule that mixes a level-aware share with a literal constant is
+        // well-formed -- refusing it would send its author looking for a `percent` they deliberately did not write.
+        if (effect.getAmount() != null && !statesShare(effect)) {
             throw new IllegalArgumentException(
                     "Op " + op + " states \"scale\" together with \"amount\" but no \"percent\": the scale says what "
                             + "the share is OF, so the share itself is missing "
+                            + "(source: " + spec.getSource() + ")");
+        }
+        // The same refusal for the level-aware flat spelling: it is an addend to a share, not a magnitude by itself.
+        if (effect.getAmountFromSkillParam() != null && !statesShare(effect)) {
+            throw new IllegalArgumentException(
+                    "Op " + op + " states \"scale\" together with \"amount_from_skill_param\" but no share: the scale "
+                            + "says what the share is OF, and #<index> is the flat addend to it "
                             + "(source: " + spec.getSource() + ")");
         }
         if (!scales.contains(scale) && !scale.startsWith(TriggerTable.CAST_APPLIED_PREFIX)
@@ -1177,20 +1194,10 @@ final class TriggerValidator {
         }
         // The owner's OWN skill, named by slot: `<SKILLTYPE>:<index>`. Checked here for the reason the family below gives --
         // `scaleAttribute` is shared with the DAMAGE path, where the subject is already the attacker.
+        // Note: The parsing lives in `requireSkillParamSpelling`, which `amount_from_skill_param` shares: one spelling,
+        // one definition, so the two cannot drift.
         if (scale.startsWith(TriggerTable.SKILL_PARAM_PREFIX)) {
-            String[] parts = scale.substring(TriggerTable.SKILL_PARAM_PREFIX.length()).split(":", 2);
-            if (parts.length != 2 || parts[0].isBlank() || parts[1].isBlank()) {
-                throw new IllegalArgumentException(
-                        "Op " + op + " scales off one of the owner's skills but does not name it as <SKILLTYPE>:<index>: \"" + scale
-                                + "\" (source: " + spec.getSource() + ")");
-            }
-            try {
-                SkillType.valueOf(parts[0].trim().toUpperCase(Locale.ROOT));
-            } catch (IllegalArgumentException notASlot) {
-                throw new IllegalArgumentException(
-                        "Op " + op + " scales off skill slot \"" + parts[0] + "\", which is not a SkillType (source: "
-                                + spec.getSource() + ")");
-            }
+            requireSkillParamSpelling(scale.substring(TriggerTable.SKILL_PARAM_PREFIX.length()).trim(), "scale", op, spec);
             requirePercent(effect, op, spec);
             return;
         }
@@ -1318,13 +1325,80 @@ final class TriggerValidator {
     }
 
     static void requireAmount(EffectSpec effect, String op, TriggerSpec spec) {
+        requireSingleFlatSource(effect, op, spec);
         if (effect.getAmount() == null && effect.getAmountFromAttr() == null
                 && effect.getAmountFromResource() == null
                 && !Boolean.TRUE.equals(effect.getAmountFromEvent())
-                && !Boolean.TRUE.equals(effect.getAmountFromPrevious())) {
+                && !Boolean.TRUE.equals(effect.getAmountFromPrevious())
+                && effect.getAmountFromSkillParam() == null) {
             throw new IllegalArgumentException(
-                    "Op " + op + " requires \"amount\" (source: " + spec.getSource() + ")");
+                    "Op " + op + " requires \"amount\" -- a literal, or one of \"amount_from_attr\" / "
+                            + "\"amount_from_resource\" / \"amount_from_skill_param\" / \"amount_from_event\" / "
+                            + "\"amount_from_previous\" (source: " + spec.getSource() + ")");
         }
+    }
+
+    /**
+     * The flat part of a magnitude is stated <b>once</b>, and a skill parameter is spelled
+     * {@code "<SKILLTYPE>:<index>"}.
+     *
+     * <p>Called from both magnitude families, because the scaled path ({@code scale} + share + {@code amount}) never
+     * reaches {@link #requireAmount}: a check that lived only there would let
+     * {@code "scale" + "amount" + "amount_from_skill_param"} through, and Gson would then have two flat answers with
+     * nothing to say which won.
+     */
+    static void requireSingleFlatSource(EffectSpec effect, String op, TriggerSpec spec) {
+        boolean fromSkillParam = effect.getAmountFromSkillParam() != null;
+        if (effect.getAmount() != null && fromSkillParam) {
+            throw new IllegalArgumentException(
+                    "Op " + op + " states BOTH \"amount\" and \"amount_from_skill_param\": the flat value comes from "
+                            + "one of them, and keeping both would silently prefer the literal "
+                            + "(source: " + spec.getSource() + ")");
+        }
+        if (fromSkillParam) {
+            requireSkillParamSpelling(effect.getAmountFromSkillParam(), "amount_from_skill_param", op, spec);
+        }
+    }
+
+    /**
+     * Validates the {@code "<SKILLTYPE>:<index>"} spelling shared by {@code percent_from_skill_param} and
+     * {@code amount_from_skill_param}.
+     *
+     * <p>Checked at load time for the reason the {@code scale} family gives: the slot is a closed vocabulary
+     * ({@link SkillType}) and the index is a column, so a typo would otherwise read a row that has no such member,
+     * or none at all, only once the rule fires -- or worse, read the neighbouring member silently.
+     *
+     * @param spelled the value as the file states it
+     * @param field   the JSON key, for the message (so the author knows which of the two spellings to look at)
+     * @param op      the op, for the message
+     * @param spec    the rule, for its {@code source}
+     * @return the parsed slot
+     */
+    static SkillType requireSkillParamSpelling(String spelled, String field, String op, TriggerSpec spec) {
+        String[] parts = spelled.split(":", 2);
+        if (parts.length != 2 || parts[0].isBlank() || parts[1].isBlank()) {
+            throw new IllegalArgumentException(
+                    "Op " + op + " states \"" + field + "\": \"" + spelled + "\", which does not name it as "
+                            + "<SKILLTYPE>:<index> (e.g. \"SKILL:3\") (source: " + spec.getSource() + ")");
+        }
+        SkillType slot;
+        try {
+            slot = SkillType.valueOf(parts[0].trim().toUpperCase(Locale.ROOT));
+        } catch (IllegalArgumentException notASlot) {
+            throw new IllegalArgumentException(
+                    "Op " + op + " states \"" + field + "\": \"" + spelled + "\", whose slot \"" + parts[0]
+                            + "\" is not a SkillType (source: " + spec.getSource() + ")");
+        }
+        try {
+            if (Integer.parseInt(parts[1].trim()) < 0) {
+                throw new NumberFormatException();
+            }
+        } catch (NumberFormatException notAnIndex) {
+            throw new IllegalArgumentException(
+                    "Op " + op + " states \"" + field + "\": \"" + spelled + "\", whose \"" + parts[1]
+                            + "\" is not a zero-based index (source: " + spec.getSource() + ")");
+        }
+        return slot;
     }
 
     /**
@@ -1343,6 +1417,18 @@ final class TriggerValidator {
                             + "; a removal of 0 would load and silently do nothing "
                             + "(source: " + spec.getSource() + ")");
         }
+    }
+
+    /**
+     * Whether the effect states a <b>share</b>, in any of its four spellings.
+     *
+     * <p>It exists so that "is a share stated?" has one answer: {@code requirePercent} accepts four spellings, and a
+     * caller that asked only about {@code percent} would call a {@code percent_from_skill_param} rule "neither"
+     * (measured once: that shape NPEs on a null {@code amount} -- see {@code PercentFromSkillParamTest}).
+     */
+    static boolean statesShare(EffectSpec effect) {
+        return effect.getPercent() != null || effect.getPercentFromCastParam() != null
+                || effect.getPercentFromSkillParam() != null || effect.getPercentFromResource() != null;
     }
 
     static void requirePercent(EffectSpec effect, String op, TriggerSpec spec) {
@@ -1364,6 +1450,9 @@ final class TriggerValidator {
                                 + "\"percent_from_skill_param\"); the share comes from exactly one of them (source: "
                                 + spec.getSource() + ")");
             }
+            // The spelling is checked here rather than only where it is read: a rule whose slot or index is malformed
+            // would otherwise load happily and fail the first time it fires (or read the neighbouring column silently).
+            requireSkillParamSpelling(effect.getPercentFromSkillParam(), "percent_from_skill_param", op, spec);
             return;
         }
         if (effect.getPercentFromCastParam() != null) {
