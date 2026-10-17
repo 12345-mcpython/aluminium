@@ -1964,6 +1964,16 @@ final class TriggerValidator {
      * derived values follow (a later buff on the applier must not change damage that is already burning).
      */
     static void requireDotMagnitude(EffectSpec effect, String op, TriggerSpec spec) {
+        // The level-aware FLAT spelling is not wired here: `dotMagnitude` reads `amount` literally (and the derived
+        // branch adds `amount` as its constant), so `amount_from_skill_param` would be validated and then silently read
+        // as 0 -- a wrong number with no symptom. Refused until a DOT actually needs it (the house rule: refuse what you
+        // cannot read, do not accept and ignore).
+        if (effect.getAmountFromSkillParam() != null) {
+            throw new IllegalArgumentException(
+                    "Op " + op + " states \"amount_from_skill_param\", which its per-turn damage does not read yet: the "
+                            + "constant term is a literal \"amount\" (the share may still come from "
+                            + "\"percent_from_skill_param\") (source: " + spec.getSource() + ")");
+        }
         boolean derived = effect.getScale() != null;
         if (!derived) {
             if (effect.getAmount() == null) {

@@ -264,7 +264,7 @@ SUPER_BREAK            TAUNT                  TICK_DOT
 |---|---|---|
 | `percent_from_skill_param: "<SKILLTYPE>:<index>"` | **持有者自己**某个槽位、**当前等级**那一行的第 index 项 | 伤害类 + `MODIFY_ATTR` + `HEAL` / `SHIELD`（+ `APPLY_DOT` / `APPLY_CONTROL` 的每回合伤害）✓ |
 | `percent_from_cast_param: <index>` | **产生这次事件的那个技能**当前等级的第 index 项 —— ⚠ 目前只有**忆灵**当施放者时才读得出（`TriggerMagnitudes.castParamValue`） | 同上 |
-| `amount_from_skill_param: "<SKILLTYPE>:<index>"` | 同第一行，但读的是**常数项**（`percent × scale + amount` 的那个 `amount`） | `HEAL` / `SHIELD`（以及所有只收 `amount` 的 op）✓ |
+| `amount_from_skill_param: "<SKILLTYPE>:<index>"` | 同第一行，但读的是**常数项**（`percent × scale + amount` 的那个 `amount`） | `HEAL` / `SHIELD` ✓、`GAIN_ENERGY` / `GAIN_SKILL_POINT` / `GAIN_RESOURCE` / `CONSUME_HP`（它们只读平值 ✓）；⚠ **`APPLY_DOT` / `APPLY_CONTROL` 的每回合伤害不读它** ✗（加载期就拒绝 ✓ 而不是读了当 0 ✓） |
 
 ⚠ **两个半都随等级才算"随技能等级浮动"** ✓：像「#1% 防御力 + #4」这种句子，**份额与常数在表里都逐行变化** ✓，
 只让一个半跟着走会得到**任何一行都不存在**的数字 ✓（§6 的例子）。

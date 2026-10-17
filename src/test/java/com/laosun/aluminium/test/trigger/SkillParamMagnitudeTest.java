@@ -164,6 +164,30 @@ public class SkillParamMagnitudeTest {
         Assertions.assertTrue(shape.getMessage().contains("SKILLTYPE"), shape.getMessage());
     }
 
+    /**
+     * An op that does <b>not</b> read the level-aware constant refuses it rather than reading 0.
+     *
+     * <p>Note: {@code APPLY_DOT}'s per-turn damage reads its constant term literally, so a rule that stated
+     * {@code amount_from_skill_param} there would load, pass every gate, and settle a DOT with no constant - the exact
+     * "wrong number with no symptom" this validator exists to prevent. The share spelling is fine there (that one the
+     * DOT path does read), which is why the refusal names the constant only.
+     */
+    @Test
+    public void opsThatDoNotReadTheConstantRefuseIt() {
+        EffectSpec dot = new EffectSpec();
+        TriggerSpecs.set(dot, "op", "APPLY_DOT");
+        TriggerSpecs.set(dot, "element", "Ice");
+        TriggerSpecs.set(dot, "scale", "self_attr:ATTACK");
+        TriggerSpecs.set(dot, "percentFromSkillParam", "ULTRA:3");
+        TriggerSpecs.set(dot, "amountFromSkillParam", "ULTRA:0");
+        TriggerSpecs.set(dot, "turns", 1);
+
+        IllegalArgumentException refused = Assertions.assertThrows(IllegalArgumentException.class,
+                () -> new TriggerTable(MARCH, List.of(TriggerSpecs.rule("BATTLE_START", null, dot))));
+        Assertions.assertTrue(refused.getMessage().contains("amount_from_skill_param"), refused.getMessage());
+        Assertions.assertTrue(refused.getMessage().contains("APPLY_DOT"), refused.getMessage());
+    }
+
     // ==================================================================
     // Fixture
     // ==================================================================
