@@ -509,6 +509,22 @@ if (isSelected) buffer.setStyle(rowArea, highlightStyle);
     ⇒ "这条天赋伤害是哪个规则发的"**类型这一层区分不了** ✓ ⇒ **留作已知缺口，不猜** ✓（§3.9 的 TALENT 讨论 ✓）。
   - **`element: "attacker"`** ✓ 已补 ✓（含"作用域只给伤害类 op"＋一条判据 ✓）。
   - **`steps:` 形式的 `scale` 对 GAIN 被静默忽略** ✗ —— 用**量化计数器** ＋ **第二个** `amount_from_resource` 即可写出 ✓（§6.2 的撤回 ✓）。
+  - **忆灵的技能等级：读得到，改不了，也点不到**（2026-10-17 核对 ✓）：
+    - **读得到** ✓：忆灵技能按 `(servant_id, data slot)` 建 ✓，等级来自 `memosprites/<id>.json` 的
+      `skills: [{slot, level}]` ✓ ⇒ `CastSkillParamScaleTest` 钉住的就是"读的是**当前等级那一行**" ✓；
+      伤害与 `cast_skill_param:` / `percent_from_cast_param:` 走同一个 `CanHit.skillLevel` ✓。
+    - **改不了** ✗：`CanHit.skillLevel` 只对 `Character` 加 `skillLevelBonus` ✓（忆灵的技能按 data slot 存，
+      不按 `SkillType` ✓）；`RAISE_SKILL_LEVEL` 只作用于**规则主人** ✓，而忆灵**没有规则表** ✓
+      （`Battle.fireTriggers` / `fireTriggersForAlly` 只遍历 `characters` ✓）⇒ 忆灵等级**只能是内容写的常量** ✓。
+    - **点不到** ✗：`percent_from_skill_param` / `amount_from_skill_param` 要求规则主人是 `Character` ✓，
+      而 `SkillType` 只有 `SUMMON_SKILL` / `SUMMON_TALENT` 两个入口 ✓（忆灵自己的槽位是 1..N 的 data slot ✓）
+      ⇒ "某个**忆灵**槽位在当前等级的第 n 项"只在**它自己施放的事件**上读得到 ✓，别人的事件上读不到 ✗。
+    - **要不要补**：全库**没有一句**内容要求忆灵技能等级变化 ✓（`忆灵`/`灵技`/`servant` 与 `等级` 同现 0 命中 ✓）
+      ⇒ **登记，不造能力** ✓（§3.5 的假前置）。真需要时的三处：① `skillLevel` 对 `Summon` 也读 bonus ✓；
+      ② `RAISE_SKILL_LEVEL` 能指向"主人的忆灵" ✓；③ `skill_param` 加一个忆灵入口 ✓。
+    - ⚠ 对称性缺口：`amount_from_skill_param` 只有"**主人的自己技能**"这一支 ✓，**没有** `amount_from_cast_param` ✗
+      ⇒ 「忆灵施放 + 一个随等级变化的常数项」写不出来 ✓（实测全库**没有**内容同时用 `percent_from_cast_param`
+      与字面常数 ✓ ⇒ 今天不需要 ✓；要补就是同一个 reader 加一个字段 ✓）。
 
 ### 4.4 层序与状态（**替代旧的"为什么这样排序"**）
 
