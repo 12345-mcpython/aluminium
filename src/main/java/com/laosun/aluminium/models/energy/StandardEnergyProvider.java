@@ -47,8 +47,8 @@ public class StandardEnergyProvider implements EnergyProvider {
         //    into default and is swallowed, with no compile-time protection).
         //    See {@code AGENT.md}.
         return switch (skill.getData().getCategory()) {
-            case NORMAL -> EnergyGain.normal(Constant.ENERGY_GAIN_BASIC);
-            case BPSKILL -> EnergyGain.normal(Constant.ENERGY_GAIN_SKILL);
+            case NORMAL -> EnergyGain.normal(energyOf(user, skill, Constant.ENERGY_GAIN_BASIC));
+            case BPSKILL -> EnergyGain.normal(energyOf(user, skill, Constant.ENERGY_GAIN_SKILL));
             // Ultra goes through onUltCast; Maze / additional attacks (UNSPECIFIED) /
             // unknown values gain no energy at this stage
             default -> null;
@@ -57,7 +57,48 @@ public class StandardEnergyProvider implements EnergyProvider {
 
     @Override
     public EnergyGain onUltCast(CanHit user, Skill skill) {
-        return EnergyGain.normal(Constant.ENERGY_GAIN_ULTRA);
+        // The ultimate's own row states 5 for every shipped character, so reading it changes nothing today - but it is
+        // the same fact the data states, and the fallback is there for the rows that state nothing.
+        return EnergyGain.normal(skill == null || skill.getData() == null || skill.getData().getSpBase() == null
+                ? Constant.ENERGY_GAIN_ULTRA
+                : skill.getData().getSpBase());
+    }
+
+    /**
+     * How much energy one cast of this skill restores: the data's <b>own</b> {@code sp_base}, times the number of damage
+     * instances when the row states a <b>per-hit</b> value.
+     *
+     * <h2>Why the data, and why the multiplication</h2>
+     * {@code sp_base} is tbgd's {@code AvatarSkillConfig.SPBase}. For a single-target / AoE / blast skill it is the
+     * <b>total</b> for the cast, while a <b>bounce</b> skill states it <b>per hit</b> (Asta 6 x 5 hits, Welt 10 x 3) -
+     * which is why reading the raw number would have made those characters come out low. The multiplication used to be
+     * deferred for want of the ability config's {@code SPHitRatio}; the actual instance count is the same number without
+     * that table, and {@code EnergyDataConformanceTest} pins that the two agree for every shipped damaging skill.
+     *
+     * <p>Note: The constants remain the fallback for a row that states nothing (an enemy skill, a hand-built fixture),
+     * so "no row" still behaves exactly as before.
+     */
+    private static double energyOf(CanHit user, Skill skill, double fallback) {
+        Double stated = skill.getData().getSpBase();
+        if (stated == null) {
+            return fallback;
+        }
+        return stated * damageInstances(user, skill);
+    }
+
+    /**
+     * How many damage instances one cast of this skill settles. Only {@code Bounce} needs it, because only its row
+     * states a per-hit value; every other damaging shape's row states the total for the cast.
+     */
+    private static int damageInstances(CanHit user, Skill skill) {
+        var data = skill.getData();
+        if (data.getEffect() != com.laosun.aluminium.enums.SkillEffectType.BOUNCE
+                || data.getSkills().isEmpty()) {
+            return 1;
+        }
+        int level = Math.max(1, Math.min(user.skillLevel(skill), data.getSkills().size()));
+        Integer extra = data.bounceAdditionalHits(data.bounceDamageShare(level), level);
+        return 1 + (extra == null ? 0 : extra);
     }
 
     @Override
