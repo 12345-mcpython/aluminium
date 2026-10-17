@@ -115,6 +115,7 @@ public class EffectSpec {
         copy.effectPercent = this.effectPercent;
         copy.effectPercentFromResource = effectPercentFromResource;
         copy.effectTurns = this.effectTurns;
+        copy.cooldownDelta = this.cooldownDelta;
         copy.targetWhen = this.targetWhen == null ? null : new java.util.ArrayList<>(this.targetWhen);
         copy.effectMaxStacks = this.effectMaxStacks;
         copy.damageType = this.damageType;
@@ -1089,6 +1090,21 @@ public class EffectSpec {
      */
     @SerializedName("effect_turns")
     private Integer effectTurns;
+
+    /**
+     * {@code MODIFY_RULE}: raise (positive) or lower (negative) the named rule's {@code cooldown} by this many of
+     * the owner's turns ("天赋的冷却时间减少 1 回合", 1002 Dan Heng's Eidolon 2: 2 turns becomes 1).
+     *
+     * <p>Note: <b>A delta, not the new value.</b> The rule keeps stating its own {@code cooldown} - the number the
+     * document's kit is written with - and the amendment is the correction an Eidolon makes to it, exactly the way
+     * {@code effect_turns} amends a duration instead of restating it.
+     *
+     * <p>Note: The named rule must state a {@code cooldown}, and the result may not go below zero; both are checked
+     * at load time by {@code TriggerTable.validateAmendments}, because "reduce the cooldown of a rule that has none"
+     * would load, fire and change nothing.
+     */
+    @SerializedName("cooldown_delta")
+    private Integer cooldownDelta;
     /**
      * <b>Per-target conditions</b>: the effect reaches only the units that satisfy these, tested one
      * candidate at a time with {@code target} bound to that candidate.

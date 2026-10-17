@@ -66,12 +66,16 @@ public class DanHengTest {
     public void hisFileCarriesTheClauses() {
         var table = TriggerTables.of(DANHENG);
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.SKILL_CAST), "the talent");
-        Assertions.assertEquals(4, table.ruleCount(TriggerEvent.BATTLE_START),
-                "the technique opening ATK, the level convention, and the two eidolon level statements (3 and 5)");
+        Assertions.assertEquals(5, table.ruleCount(TriggerEvent.BATTLE_START),
+                "the technique opening ATK, the level convention, the two eidolon level statements (3 and 5), and "
+                        + "eidolon 2's cooldown amendment");
         Assertions.assertEquals(2, table.ruleCount(TriggerEvent.CRIT_DEALT),
                 "the Skill's crit-slow, and eidolon 6's deeper version of it (mutually exclusive on rank)");
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.ALLY_ATTACK), "trace 绝影");
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.KILL), "eidolon 4's extra turn");
+        Assertions.assertEquals(3, table.ruleCount(TriggerEvent.DEALING_DAMAGE),
+                "eidolon 1's crit chance, the ultimate's extra multiplier against a slowed target, and trace 罡风's "
+                        + "basic-attack boost");
     }
 
     private static final class Fixture {

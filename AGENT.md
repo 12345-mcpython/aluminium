@@ -959,6 +959,9 @@ C 层全是**填口子** ✓，依赖已完成的机制，**不该出现新架�
 | **`chance_rolls:` 规则级独立掷骰**（两次判定都结算、各 50% 伤害；0 次与"无 chance 却要掷两次"在加载期被拒） | `ChanceRollsTest` / `ChanceRollsValidationTest` |
 | **§3.5 变量表与加载器零漂移**（双向：代码有文档无 / 文档有代码无 / 标题消失时大声失败而非空集相等） | `TriggerVocabularyDriftTest` |
 | **`CRIT_DEALT` 携带施放槽位**（战技暴击才减速、普攻暴击不减速；星魂 6 的 20% vs 12%；星魂 4 的 0 魂不生效；星魂 1 的 12% 只对 ≥50% 生命的敌人） | `DanHengKitCompletionTest` |
+| **`is_slowed`**（`SPEED` 上有负修饰即算减速；+20% 加速不掩盖 −12% 减速） | `SlowedConditionTest` |
+| **`MODIFY_RULE{cooldown_delta}`**（缩短等待一个回合；点名无冷却 / 结果转负 / 0 都在加载期拒绝） | `CooldownAmendmentTest` |
+| **1002 的三句减速随动**（终结技 +120% 走基数层、罡风 +40% 走增伤区、星魂 2 冷却 −1） | `DanHengKitCompletionTest` |
 
 ### 7.2 **只靠散文**（所以上面必须写完整）
 

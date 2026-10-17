@@ -17,7 +17,7 @@
       }
     ],
     "source": "1002 丹恒 天赋 寸长寸强 (100204, Enhance): 「当丹恒成为我方技能的施放目标时，下一次攻击的风属性抗性穿透提高36%。该效果在2回合后可再次触发。」",
-    "note": "「当丹恒**成为我方技能的施放目标**时，**下一次攻击**的风属性**抗性穿透**提高 **36%**；该效果在 **2 回合后可再次触发**」—— ① 事件用 `SKILL_CAST` ✓：它是**带被瞄准单位**的施放事件 ✓（`aimed` ✓），所以 `target == self` 正好是\"被瞄准的是我\" ✓；② 「我方技能」= `actor is_ally` ✓；③ 「风属性抗性穿透」对应引擎的 **`DAMAGE_PENETRATION`** ✓（术语表释义是\"造成伤害时**无视**敌方目标一部分对应伤害属性的**抗性值**\" ✓，正是 `Damage` 的 penetration 区 ✓）；④ 「下一次攻击」用既有的 **`until: next_attack`** 时长 ✓（不是 N 回合 ✗）；⑤ 「2 回合后可再次触发」用规则级 **`cooldown: 2`** ✓。⚠ **本条旧注记的四处登记，逐条交代现状** ✓（纪律 33：登记会过期，过期的登记比缺失更坏 ✓）：\n① 战技「触发暴击时 100% 基础概率使目标速度降低 12%」 ✅ **已落地** ✓ = `skill_crit_slows_the_target`（`CRIT_DEALT` + `from_skill SKILL` + `base_chance: 1.0` ✓）—— 当时登记的两个理由**都过期了** ✗：「缺\"这一发暴击了\"的可观测」错在**没查到 `CRIT_DEALT` 事件** ✓（它由引擎在暴击判定后立刻发出 ✓），而「`MODIFY_ATTR` 上没有 `base_chance`」错在**没查字段** ✓（它有 ✓，先例 1004 ✓）；本轮另给该事件补了**施放信息** ✓（`CAST_CARRYING_EVENTS` ✓），否则 `from_skill` 在它上面会被加载期拒绝 ✗。\n② 秘技「下一次战斗开始时攻击力提高 40%，持续 3 回合」 ✅ **已落地** ✓ = `technique_opening_attack`。\n③ 行迹与星魂 ✅ **已读** ✓：赤子（潜龙）= `trace_low_hp_aggro_down` + `_cleanup` ✓；绝影 = `trace_fleeting_shadow_speed` ✓；星魂 3/5 = `eidolon3_levels` / `eidolon5_levels` ✓；星魂 4 = `eidolon4_ult_kill_acts_again` ✓；星魂 6 = `eidolon6_deepens_the_slow` ✓。\n⚠ **仍然写不了的四句，都是引擎能力缺口** ✗（**登记，不近似** ✓）：\n（A）终结技「当受到攻击的敌方目标**处于减速状态**时，终结技造成的伤害倍率提高 120%」—— 需要「**目标是否处于减速**」这个**可问状态** ✗：引擎里速度降低只是一个**属性修饰** ✓（`MODIFY_ATTR SPEED` 负数 ✓），没有任何谓词能问「它被减速了吗」✗，也读不到**目标**的属性 ✗（`self_attr:` 只读自己 ✓）。1004 瓦尔特的天赋面对同一句话，登记的是同一条缺口 ✓。⚠ 若把减速写成**具名状态**再问 `target has_state`，那只对**本角色自己施加的**减速生效 ✗ ⇒ 别的角色的减速不会被认 ✓，这是**近似**，所以没写 ✓。\n（B）行迹**罡风**「普攻对**减速状态**下的敌方目标造成的伤害提高 40%」—— 同 (A) 的缺口 ✗。\n（C）星魂 1「暴击率提高 12%」 ✅ **本轮已落地** ✓ = `eidolon1_crit_chance_against_a_healthy_target` —— 当时登记的理由「`instance` 通道时机对不上这一发」**是错的** ✗：`DEALING_DAMAGE` 在 `applyDamage` 里发出的位置**就在暴击判定之前** ✓（源码注释点名 crit 属于「让它读到改后数值」的那几个区 ✓）⇒ 这一发真的会读到 `damage.addCritChance(...)` ✓。\n（D）星魂 2「天赋的冷却时间减少 1 回合」—— `MODIFY_RULE` 能改 `per_turn` / 效果时长 / 上限 / 倍率 ✗，**没有改 `cooldown` 的口子** ✓。\n⚠ 另**登记**（不是缺口，是原文边界）：本条只兑现「成为**我方技能**的施放目标」✓ ⇒ 友方的**普攻**也会触发 ✓（普攻也是「技能」✓），而敌方技能不会 ✓（`actor is_ally` ✓）。"
+    "note": "「当丹恒**成为我方技能的施放目标**时，**下一次攻击**的风属性**抗性穿透**提高 **36%**；该效果在 **2 回合后可再次触发**」—— ① 事件用 `SKILL_CAST` ✓：它是**带被瞄准单位**的施放事件 ✓（`aimed` ✓），所以 `target == self` 正好是\"被瞄准的是我\" ✓；② 「我方技能」= `actor is_ally` ✓；③ 「风属性抗性穿透」对应引擎的 **`DAMAGE_PENETRATION`** ✓（术语表释义是\"造成伤害时**无视**敌方目标一部分对应伤害属性的**抗性值**\" ✓，正是 `Damage` 的 penetration 区 ✓）；④ 「下一次攻击」用既有的 **`until: next_attack`** 时长 ✓（不是 N 回合 ✗）；⑤ 「2 回合后可再次触发」用规则级 **`cooldown: 2`** ✓。⚠ **本条旧注记的四处登记，逐条交代现状** ✓（纪律 33：登记会过期，过期的登记比缺失更坏 ✓）：\n① 战技「触发暴击时 100% 基础概率使目标速度降低 12%」 ✅ **已落地** ✓ = `skill_crit_slows_the_target`（`CRIT_DEALT` + `from_skill SKILL` + `base_chance: 1.0` ✓）—— 当时登记的两个理由**都过期了** ✗：「缺\"这一发暴击了\"的可观测」错在**没查到 `CRIT_DEALT` 事件** ✓（它由引擎在暴击判定后立刻发出 ✓），而「`MODIFY_ATTR` 上没有 `base_chance`」错在**没查字段** ✓（它有 ✓，先例 1004 ✓）；本轮另给该事件补了**施放信息** ✓（`CAST_CARRYING_EVENTS` ✓），否则 `from_skill` 在它上面会被加载期拒绝 ✗。\n② 秘技「下一次战斗开始时攻击力提高 40%，持续 3 回合」 ✅ **已落地** ✓ = `technique_opening_attack`。\n③ 行迹与星魂 ✅ **已读** ✓：赤子（潜龙）= `trace_low_hp_aggro_down` + `_cleanup` ✓；绝影 = `trace_fleeting_shadow_speed` ✓；星魂 3/5 = `eidolon3_levels` / `eidolon5_levels` ✓；星魂 4 = `eidolon4_ult_kill_acts_again` ✓；星魂 6 = `eidolon6_deepens_the_slow` ✓。\n⚠ **仍然写不了的四句，都是引擎能力缺口** ✗（**登记，不近似** ✓）：\n（A）终结技「当受到攻击的敌方目标**处于减速状态**时，终结技造成的伤害倍率提高 120%」—— 需要「**目标是否处于减速**」这个**可问状态** ✗：引擎里速度降低只是一个**属性修饰** ✓（`MODIFY_ATTR SPEED` 负数 ✓），没有任何谓词能问「它被减速了吗」✗，也读不到**目标**的属性 ✗（`self_attr:` 只读自己 ✓）。1004 瓦尔特的天赋面对同一句话，登记的是同一条缺口 ✓。⚠ 若把减速写成**具名状态**再问 `target has_state`，那只对**本角色自己施加的**减速生效 ✗ ⇒ 别的角色的减速不会被认 ✓，这是**近似**，所以没写 ✓。\n（B）行迹**罡风**「普攻对**减速状态**下的敌方目标造成的伤害提高 40%」—— 同 (A) 的缺口 ✗。\n（C）星魂 1「暴击率提高 12%」 ✅ **本轮已落地** ✓ = `eidolon1_crit_chance_against_a_healthy_target` —— 当时登记的理由「`instance` 通道时机对不上这一发」**是错的** ✗：`DEALING_DAMAGE` 在 `applyDamage` 里发出的位置**就在暴击判定之前** ✓（源码注释点名 crit 属于「让它读到改后数值」的那几个区 ✓）⇒ 这一发真的会读到 `damage.addCritChance(...)` ✓。\n（D）星魂 2「天赋的冷却时间减少 1 回合」—— `MODIFY_RULE` 能改 `per_turn` / 效果时长 / 上限 / 倍率 ✗，**没有改 `cooldown` 的口子** ✓。\n⚠ 另**登记**（不是缺口，是原文边界）：本条只兑现「成为**我方技能**的施放目标」✓ ⇒ 友方的**普攻**也会触发 ✓（普攻也是「技能」✓），而敌方技能不会 ✓（`actor is_ally` ✓）。\n\n⚠ **2026-10-17 更新：下面 (A)(B)(D) 三句已全部落地** ✓（原文保留，作为**当时的判断** ✓ —— 下一个人会踩同一个坑 ✓）。① (A) 终结技「目标处于减速状态时倍率 +120%」 ⇒ `ult_ethereal_dream_hits_a_slowed_target` ✓；② (B) 行迹罡风「普攻对减速目标 +40%」 ⇒ `trace_gang_feng_hits_a_slowed_target` ✓；③ (D) 星魂 2「天赋冷却 −1」 ⇒ `eidolon2_shortens_the_talent_cooldown` ✓。⚠ **当时的错在哪**（§6.2 要求把错理由留下 ✓）：(A)(B) 我断定「减速不可问」✗ —— 前提「减速只是属性修饰」✓ **是对的**，错在我由此推出「没有别的读法」✗：问 **`SPEED` 上有没有负修饰** 就是原文的意思 ✓；(D) 我断定「`MODIFY_RULE` 没有改冷却的口子」✗ —— 当时**确实没有** ✓，但那是一个**缺的能力** ✓，不是一句**写不出来的话** ✗：缺能力就补能力 ✓，而我把「引擎没做」写成了「句子写不了」✗。"
   },
   {
     "on": "BATTLE_START",
@@ -238,5 +238,54 @@
     ],
     "source": "1002 星魂1 穷高极天，亢盈难久: 「当击中的敌方目标当前生命值百分比大于等于50%时，暴击率提高12%。」 param = [0.5, 0.12]",
     "note": "「当**击中的敌方目标当前生命值百分比大于等于 50%** 时，**暴击率提高 12%**」—— ① 事件 `DEALING_DAMAGE` ✓ —— ⭐ **这是能写这一句的关键** ✓：该事件在 `Battle.applyDamage` 里发出的位置**在暴击判定之前** ✓（源码注释原话：announcement sits between the two halves，「every zone below -- crit, defence, toughness reduction, resistance -- has to read the mutated numbers」✓）⇒ 规则在这里改的暴击率**这一发真的会读到** ✓；② `MODIFY_ATTR` + `attribute: CRIT_CHANCE` + **`instance: true`** ✓ —— `instance` 表示「这个修正属于**正在结算的这一发**」✓（不是给角色挂一个持续 buff ✓），引擎对 `CRIT_CHANCE` 走 `damage.addCritChance(...)` ✓、而暴击判定读的正是 `damage.getExtraCritChance()` ✓ ⇒ 两者是同一根线 ✓；③ ⚠ **比率型属性** ⇒ `percent: 0.12` 就是**百分点** ✓（0.12 = +12%，不是 ×1.12 ✓，见 `AttributeType` 的比率约定 ✓）；④ 条件 `target_hp_percent >= 0.5` ✓（读**目标**的生命百分比 ✓，`0.5` 是分数 ✓）；⑤ `min_eidolon: 1` ✓。⚠ **本条此前被我登记为\"写不了\"** ✗ —— 理由是「需要在暴击判定之前改这一次的暴击率」✗，而那个理由**错了** ✓：`DEALING_DAMAGE` 本来就在判定之前 ✓。这是同一轮里**第三处**因为\"没去读代码\"而写错的登记 ✓（前两处：`base_chance` ✓、`CRIT_DEALT` ✓）。⚠ **登记一处范围差**：原文说「击中的敌方目标」✓，本条读的是**事件的目标**（`target_hp_percent` ✓）⇒ 对**单体**技能完全等价 ✓；若将来给丹恒加**弹射/群攻** ✗，则每个被命中的目标各判一次 ✓，而本条的 `instance` 修正只作用于**这一发** ✓ —— 那仍然是逐发各判 ✓，与原文一致 ✓。⚠ **`until: next_attack` 是给校验器写的，不是给引擎读的** ✓：`MODIFY_ATTR` 的校验要求「时长三选一」✓（`turns` / `permanent` / `until` ✓），而 `instance: true` 的分支在**创建任何 buff 之前就 `return` 了** ✓（它只调 `damage.addCritChance(...)` ✓）⇒ 这个时长**永远不会被用到** ✓；写 `next_attack` 而不是别的，是因为它最贴近含义（「下一次攻击」= 这一发 ✓），让读的人不会误解 ✓。"
+  },
+  {
+    "on": "DEALING_DAMAGE",
+    "id": "ult_ethereal_dream_hits_a_slowed_target",
+    "when": [
+      "actor == self",
+      "from_skill ULTRA",
+      "target is_slowed"
+    ],
+    "do": [
+      {
+        "op": "ADD_DAMAGE",
+        "scale": "self_attr:ATTACK",
+        "percent_from_skill_param": "ULTRA:1"
+      }
+    ],
+    "source": "1002 丹恒 终结技 洞天幻化，长梦一觉 (100203, Ultra/SingleAttack): 「对指定敌方单体造成等同于丹恒400%攻击力的风属性伤害。当受到攻击的敌方目标处于减速状态时，终结技造成的伤害倍率提高120%。」 param Lv10 → [4, 1.2]（#1 = 倍率、#2 = 目标减速时追加的倍率）",
+    "note": "「当受到攻击的敌方目标**处于减速状态**时，终结技造成的伤害**倍率提高 120%**」—— ① 条件用 **`target is_slowed`** ✓（本轮为这句补的谓词 ✓）：减速在引擎里只有一个表示 —— **负的 `SPEED` 修饰** ✓（战技的 `MODIFY_ATTR` 与 `ControlBuff` 的减速都是它 ✓），所以谓词问的是 **`SPEED` 身上有没有负修饰** ✓，而不是「有没有本文件施加的那条」✗ —— 后者会把**别的角色**施加的减速判成没有 ✓。② **「倍率提高」不是「伤害提高」** ✓：120% 是**攻击力倍数的一部分**（Lv10：4.0 + 1.2 = 5.2 ✓），所以走 **`ADD_DAMAGE`** ✓ —— 它加到这一发的**基数层**（`Damage.addFlat` ✓），和技能倍率一起过增伤 / 暴击 / 防御 / 抗性 ✓；写成 `BOOST_DAMAGE`（增伤区 `1 + Σ`）会得到 `4.0 × (1 + 1.2)` ✗ —— 一个看起来像做完了的错数字 ✗（`AddDamageOpTest` 专门钉住这一对不相等 ✓）。③ **数值走技能参数** ✓：`percent_from_skill_param: ULTRA:1` 读**自己终结技当前等级的第 2 项** ✓（0 基）—— Lv10 是 1.2 ✓，而且**随等级走** ✓：星魂 5 把终结技抬到 12 级后基础倍率变 4.32、这一项变 1.296 ✓，写死 1.2 会在那里悄悄少算 ✗。④ `actor == self` ✓ + `from_skill ULTRA` ✓（别人的终结技、自己的别的槽位都不吃这一句 ✓）。⚠ **登记一处形状差**：原文的伤害分段表写的是「默认 1 段 ＋ **互斥分支**的变体 1 段」✓ ⇒ 本条把这一发做成**同一次结算**（5.2 倍率、暴击只掷一次 ✓）；若将来发现游戏是两次独立结算 ✗，改法是把 `ADD_DAMAGE` 换成一次追加实例 ✓ —— 数值不变、暴击次数变 ✓。"
+  },
+  {
+    "on": "DEALING_DAMAGE",
+    "id": "trace_gang_feng_hits_a_slowed_target",
+    "when": [
+      "actor == self",
+      "from_skill COMMON",
+      "target is_slowed"
+    ],
+    "do": [
+      {
+        "op": "BOOST_DAMAGE",
+        "percent": 0.4
+      }
+    ],
+    "source": "1002 行迹 罡风 (1002103): 「普攻对减速状态下的敌方目标造成的伤害提高40%。」",
+    "note": "「**普攻**对**减速状态**下的敌方目标造成的**伤害提高 40%**」—— ① `from_skill COMMON` ✓（普攻槽位；战技 / 终结技不吃 ✓）；② `target is_slowed` ✓（与终结技那条**同一个谓词** ✓）；③ **`BOOST_DAMAGE`** ✓ —— 这句是「造成的**伤害**提高」✓，加的是这一发的**增伤区**（`1 + Σ`）✓，不是倍率 ✓：与 1001 三月七的「伤害**值**提高，提高数值等同于防御力的 30%」**不同** ✗（那条是 `ADD_DAMAGE` ✓）—— 两条 op 的分界就在「伤害」与「伤害值 / 倍率」这几个字上 ✓。⚠ **登记一处边界**：原文说「普攻对…」✓，本条读的是**这一发伤害的目标** ✓ ⇒ 对单体普攻完全等价 ✓。"
+  },
+  {
+    "on": "BATTLE_START",
+    "id": "eidolon2_shortens_the_talent_cooldown",
+    "min_eidolon": 2,
+    "do": [
+      {
+        "op": "MODIFY_RULE",
+        "rule": "talent_wind_pen",
+        "cooldown_delta": -1
+      }
+    ],
+    "source": "1002 星魂2 威制八毒，灭却炎烟: 「天赋的冷却时间减少1回合。」",
+    "note": "「天赋的**冷却时间减少 1 回合**」—— ① **`MODIFY_RULE` + `cooldown_delta: -1`** ✓（本轮为这句补的能力 ✓：`MODIFY_RULE` 原先只改每回合次数 / 概率 / 时长 / 上限 / 倍率 ✗，没有改冷却的口子 ✗）；② 点名 `talent_wind_pen` ✓（那条自己写着 `cooldown: 2` ✓ ⇒ 2 − 1 = 1 ✓，规则本体**不改** ✓ —— 修正属于星魂，不属于天赋 ✓）；③ 加载期就查两件事 ✓：被点名的规则**确实写了 `cooldown`** ✓、结果**不为负** ✓（否则「减少」会悄悄把一条有限制的规则变成无限制 ✗）；④ `min_eidolon: 2` ✓。"
   }
 ]

@@ -344,6 +344,21 @@ public class TriggerTable {
             }
             return;
         }
+        if (effect.getCooldownDelta() != null) {
+            if (named.cooldownTurns() < 1) {
+                throw new IllegalArgumentException(
+                        "MODIFY_RULE amends the cooldown of rule \"" + target + "\", but that rule states no "
+                                + "\"cooldown\"; an unlimited rule has no number to lower or raise "
+                                + "(source: " + amender.source() + ")");
+            }
+            if (named.cooldownTurns() + effect.getCooldownDelta() < 0) {
+                throw new IllegalArgumentException(
+                        "MODIFY_RULE amends the cooldown of rule \"" + target + "\" by " + effect.getCooldownDelta()
+                                + ", but that rule's cooldown is " + named.cooldownTurns()
+                                + " turns and the result may not be negative (source: " + amender.source() + ")");
+            }
+            return;
+        }
         if (effect.getEffectPercent() != null) {
             // A share stated by a SPELLING counts as a number to raise: the target rule may read its share from the owner's skill (`percent_from_skill_param`),
             // which is the honest way to write a value that varies with level -- demanding a literal would force a lie.
@@ -1460,6 +1475,53 @@ public class TriggerTable {
             // No qualifier: any living shield counts. With one: the shield must have come from THAT rule, which is
             // what makes "战技提供的" different from "三月七给的" (see CanHit.getShieldRuleId).
             return ruleId.isEmpty() || ruleId.equals(who.getShieldRuleId());
+        }
+
+        @Override
+        public String source() {
+            return raw;
+        }
+    }
+
+
+    /**
+     * Slow test: {@code target is_slowed} / {@code self is_slowed}.
+     *
+     * <p><b>Why the condition DSL needs it.</b> "处于减速状态" is not a buff with a name: the engine's slows are
+     * {@code SPEED} modifiers (the Skill's {@code MODIFY_ATTR} debuff, and {@code ControlBuff}'s own slow), so
+     * {@code has_state} cannot answer it, and a named state written only by one file would answer "no" for a slow
+     * another file applied - an approximation, not the sentence. Readers: 1002 Dan Heng's ultimate ("当受到攻击的
+     * 敌方目标处于减速状态时，终结技造成的伤害倍率提高 120%") and his trace 罡风 ("普攻对减速状态下的敌方目标造成的
+     * 伤害提高 40%"); light cone 20011 asks the same question of an enemy.
+     *
+     * <p>Note: The test is {@link DoubleValue#isReduced()} - "at least one modifier lowers it" - rather than
+     * "current is below base". The question is whether the unit is <b>under a slow</b>, and a unit carrying
+     * {@code +20%} speed next to a {@code -12%} slow still is; the net comparison would silently clear it.
+     */
+    static final class IsSlowed implements Condition, PartyCondition {
+        private final String subject;
+        private final String raw;
+
+        IsSlowed(String subject, String raw) {
+            this.subject = subject;
+            this.raw = raw;
+        }
+
+        @Override
+        public CanHit partyOf(TriggerContext ctx) {
+            return switch (subject) {
+                case "self" -> ctx.owner();
+                case "actor" -> ctx.actor();
+                case "target" -> ctx.target();
+                default -> null;
+            };
+        }
+
+        @Override
+        public boolean test(TriggerContext ctx) {
+            CanHit who = partyOf(ctx);
+            return who != null && who.getAttribute(AttributeType.SPEED) != null
+                    && who.getAttribute(AttributeType.SPEED).isReduced();
         }
 
         @Override
