@@ -91,8 +91,12 @@ public class Main {
                 battleDemo();
                 mechanicsDemo();
             }
+            // Compares one scenario file against the original game's numbers, zone by zone. Deliberately NOT part of
+            // `all`: it is a diagnostic, not a demo, and its exit code is a gate (see `DamageComparator`).
+            case "compare" -> System.exit(com.laosun.compare.DamageComparator.run(args));
             default -> System.out.println("unknown demo '" + args[0]
-                    + "'; use 'battle' (default), 'technique', 'driven', 'mechanics' or 'all'");
+                    + "'; use 'battle' (default), 'technique', 'driven', 'mechanics', 'all' or "
+                    + "'compare <scenario.json>'");
         }
     }
 

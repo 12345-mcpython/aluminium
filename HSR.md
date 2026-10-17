@@ -68,8 +68,9 @@
 - **虚弱区** `1 - Σ虚弱系数`：来源攻击方负面，下限 **0.2**
 
 **逆向确认的各区精确构成**（字段名见 §10.2）：
-- **增伤区** = `(1 + Σ元素增伤 + 全属性增伤 + 持续伤害增伤) × (1 + Level_FinalDamageAddedRatio) × (1 + 追加攻击增伤) × BaseDamageMultiRatio × 攻击类型附加增伤`
+- **增伤区** = `(1 + Σ元素增伤 + 全属性增伤 + 持续伤害增伤) × (1 + Level_FinalDamageAddedRatio) × (1 + 连携攻击增伤 ComboDamageAddedRatio) × BaseDamageMultiRatio × 攻击类型附加增伤`
   - 注意 `Level_FinalDamageAddedRatio`（内部名）与 `AllDamageTypeAddedRatio` 是**两个不同的加项**
+  - ⚠ 「连携攻击增伤」的属性是 `Combo`(165)，**不是追加攻击**；`AbilityProperty` 里**根本没有「追加攻击」**这一项（§10.8）
 - **易伤区** = `min(上限, 1 + Σ元素易伤 + 全属性易伤) × (1 + 怪物易伤)` —— `Monster_DamageTakenRatio` 在**上限之外**单独相乘
 - **抗性区** = `1 − 净抗性`（净抗性 = 元素抗性 + 全属性抗性 − 元素穿透 − 全属性穿透，已 clamp）
 - **减伤区** 与防御、抗性用 `1 − Π(1−x)` 合并（见 §10.6），不是三者各自独立相乘
