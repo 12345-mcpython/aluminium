@@ -763,7 +763,12 @@ final class TriggerMagnitudes {
     }
 
     /**
-     * The same read, for a caller that spells the slot itself (`percent_from_skill_param`).
+     * The same read, for a caller that spells the slot itself ({@code percent_from_skill_param} /
+     * {@code amount_from_skill_param} / the {@code skill_param:<SKILLTYPE>:<index>} scale).
+     *
+     * <p>Note: The messages name the <b>op</b> rather than the {@code scale}: the flat caller
+     * ({@code amount_from_skill_param}) states no scale at all, and "the scale \"null\"" would send its author looking
+     * for a field they never wrote.
      */
     static double ownerSkillParamValue(EffectSpec effect, TriggerContext ctx, String spelled) {
         // a share may name ANOTHER character's row: the field says whose, and the slot stays a legal SkillType so the loader check still means something
@@ -783,7 +788,7 @@ final class TriggerMagnitudes {
         SkillType slot = SkillType.valueOf(parts[0].trim().toUpperCase(Locale.ROOT));
         Skill named = owner.getSkills().get(slot);
         if (named == null || named.getData() == null || !named.getData().isLoaded()) {
-            throw new IllegalStateException("the scale \"" + effect.getScale() + "\" reads " + owner.getName()
+            throw new IllegalStateException("Op " + effect.getOp() + " reads " + owner.getName()
                     + "'s own " + slot + " skill, and there is no loaded such skill");
         }
         var rows = named.getData().getSkills();
@@ -794,7 +799,7 @@ final class TriggerMagnitudes {
         }
         var values = rows.get(row);
         if (index >= values.size()) {
-            throw new IllegalStateException("the scale \"" + effect.getScale() + "\" names index " + index
+            throw new IllegalStateException("Op " + effect.getOp() + " names index " + index
                     + ", which is outside that skill parameter row (size=" + values.size() + ")");
         }
         return values.get(index);

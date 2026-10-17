@@ -96,6 +96,7 @@ public class EffectSpec {
         copy.damageParam = this.damageParam;
         copy.percentFromCastParam = this.percentFromCastParam;
         copy.percentFromSkillParam = this.percentFromSkillParam;
+        copy.amountFromSkillParam = this.amountFromSkillParam;
         copy.castCategory = this.castCategory;
         copy.damageLevel = this.damageLevel;
         copy.asAttack = this.asAttack;
@@ -889,6 +890,22 @@ public class EffectSpec {
 
     @SerializedName("percent_from_cast_param")
     private Integer percentFromCastParam;
+
+    /**
+     * The FLAT part of a magnitude, read from one of the RULE OWNER's OWN skills as {@code "<SKILLTYPE>:<index>"},
+     * at that skill's CURRENT level - the sibling of {@link #percentFromSkillParam}, which does the same for the share.
+     *
+     * <p>Reader: March 7th (1001)'s Skill 「提供等同于三月七 #1% 防御力 + #4 的护盾」 - the share is #1 and the constant
+     * is #4, and BOTH run with the Skill's level (190 at Lv1, 760 at Lv10). A literal {@code amount} pinned the constant
+     * to whichever row the author happened to read, so the shield could not move with the level at all while its DEF
+     * share would have; writing the share from the row and the constant as a literal would be a hybrid number that no
+     * level produces.
+     *
+     * <p>Note: A single {@code amount} is either the literal or one of these spellings, never both - two answers to one
+     * question is refused at load time (see {@code TriggerValidator.requireAmount}).
+     */
+    @SerializedName("amount_from_skill_param")
+    private String amountFromSkillParam;
 
     /**
      * Which <b>level row</b> of the skill's parameter table the multiplier is read from; absent means the

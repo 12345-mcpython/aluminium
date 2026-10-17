@@ -258,6 +258,18 @@ SUPER_BREAK            TAUNT                  TICK_DOT
 | `self_attr_above:<阈值>` | 属性**超出阈值的那部分** |
 | `steps:<n>` | 按步长分段（阶梯式加成） |
 
+⚠ **`percent` 不是唯一的"份额"写法** ✓ —— 份额也可以从**技能参数表**里读（跑了代码核对的五个 op 家族）✓：
+
+| 字段 | 读的是 | 哪些 op 读 |
+|---|---|---|
+| `percent_from_skill_param: "<SKILLTYPE>:<index>"` | **持有者自己**某个槽位、**当前等级**那一行的第 index 项 | 伤害类 + `MODIFY_ATTR` + `HEAL` / `SHIELD`（+ `APPLY_DOT` / `APPLY_CONTROL` 的每回合伤害）✓ |
+| `percent_from_cast_param: <index>` | **产生这次事件的那个技能**当前等级的第 index 项 —— ⚠ 目前只有**忆灵**当施放者时才读得出（`TriggerMagnitudes.castParamValue`） | 同上 |
+| `amount_from_skill_param: "<SKILLTYPE>:<index>"` | 同第一行，但读的是**常数项**（`percent × scale + amount` 的那个 `amount`） | `HEAL` / `SHIELD`（以及所有只收 `amount` 的 op）✓ |
+
+⚠ **两个半都随等级才算"随技能等级浮动"** ✓：像「#1% 防御力 + #4」这种句子，**份额与常数在表里都逐行变化** ✓，
+只让一个半跟着走会得到**任何一行都不存在**的数字 ✓（§6 的例子）。
+⚠ **一个 `amount` 只有一种来源** ✓ —— 字面量与 `amount_from_skill_param` 同时写，加载期就拒绝 ✓。
+
 ⚠ **`self_stacks:` / `target_stacks:` 读的是【层数】，而 `MODIFY_ATTR` 的 `percent` 是每层的增量** ✓ ——
 所以"每层 +5%"写 `percent: 0.05` + `scale: "target_stacks:烬煨"` ✓（对照 §8 的例子）
 
