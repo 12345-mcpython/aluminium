@@ -158,6 +158,7 @@
 | `self_stacks:` / `actor_stacks:` / `target_stacks:` | `self_stacks:白花之刻 >= 2` |
 | `self_resource:` / `summon_resource:` | `self_resource:充能 >= 3` |
 | `allies_with_path:` | 按命途数我方 |
+| `enemy_state_count:<状态>` | 场上**活着**的敌人在该状态的有几个（「场上有敌方目标处于X」= `>= 1`） |
 
 ⚠ **拼错的名字会在加载期报错** ✓ —— 这条是**故意的** ✗：曾经的行为是"不认识的变量一律当假" ✓，
 ⇒ **一条永不触发的规则看起来和"条件不满足"一模一样** ✗（没有症状的错误 ✓）。

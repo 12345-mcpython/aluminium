@@ -83,7 +83,7 @@
       }
     ],
     "source": "1206 素裳 技能表的等级口径: 文档引用的是 Lv10/Lv15 行（普攻 100%、战技 210%、终结技 320%、天赋 速度+20%）",
-    "note": "本文件说明自己的数字来自哪一行（M-32）。⚠ **本条的旧注记已过时，按 TRIGGER.md §1 改写**（「过时的 note 比缺失的 note 更坏」）：旧文说「终结技…尚未写；秘技、行迹与星魂亦未写」✗ —— 这些**都已落地** ✓，逐条如下。① 终结技：「使素裳立即行动」= `ult_acts_again_immediately` ✓；「攻击力提高 30%…持续 2 回合」= `ult_raises_her_attack` ✓；终伤本身**不写规则** ✓（数据层按 `param_list` 结算 ✓）。② 战技的两条【剑势】= `skill_sword_stance_chance` / `skill_sword_stance_guaranteed` ✓（本文件原有 ✓）。③ 秘技 = `technique_opening_damage` ✓（本文件原有 ✓）。④ 行迹三项：赤子 = `trace_low_hp_aggro_down` + `trace_low_hp_aggro_down_cleanup` ✓（原有）；逐寇 = `trace_sword_stance_counts_itself` + `trace_sword_stance_damage_per_stack` ✓（计数 + 加成一对）；破敌 = **仍未写** ✗（见下）。⑤ 星魂 1–6 = 六条 `eidolonN_*` ✓ 全部落地 ✓。⚠ **仍然缺的两处，都是引擎能力缺口，不是没写** ✗：（A）行迹**破敌**「施放普攻或战技后，若场上有敌方目标处于弱点击破状态，则素裳的行动提前 15%」—— 需要「**存在一个**敌人满足 X」这种全场性条件 ✗，而 `has_state` / `has_weakness` 都只问**某个具体单位** ✓（本文件 `talent_speed_on_break` 的 note 早已登记同一条缺口 ✓）；（B）终结技「施放战技时额外增加 **2** 次【剑势】的发动判定，通过额外判定发动的【剑势】伤害为**原伤害的 50%**」—— 需要「本次施放多掷 N 次骰子、且这几次的倍率减半」的**按次计数并改倍率**参数 ✗，全库没有该形状的读者 ✓。两处都按 §4.3 登记，**没有近似** ✓。"
+    "note": "本文件说明自己的数字来自哪一行（M-32）。⚠ **本条的旧注记已过时，按 TRIGGER.md §1 改写**（「过时的 note 比缺失的 note 更坏」）：旧文说「终结技…尚未写；秘技、行迹与星魂亦未写」✗ —— 这些**都已落地** ✓，逐条如下。① 终结技：「使素裳立即行动」= `ult_acts_again_immediately` ✓；「攻击力提高 30%…持续 2 回合」= `ult_raises_her_attack` ✓；终伤本身**不写规则** ✓（数据层按 `param_list` 结算 ✓）。② 战技的两条【剑势】= `skill_sword_stance_chance` / `skill_sword_stance_guaranteed` ✓（本文件原有 ✓）。③ 秘技 = `technique_opening_damage` ✓（本文件原有 ✓）。④ 行迹三项：赤子 = `trace_low_hp_aggro_down` + `trace_low_hp_aggro_down_cleanup` ✓（原有）；逐寇 = `trace_sword_stance_counts_itself` + `trace_sword_stance_damage_per_stack` ✓（计数 + 加成一对）；破敌 = `trace_breaking_advance_after_common` + `trace_breaking_advance_after_skill` ✓（「普攻**或**战技」在无 or 的 DSL 里是**两条** ✓，`when` 不同故不算重复 ✓）。⑤ 星魂 1–6 = 六条 `eidolonN_*` ✓ 全部落地 ✓。⚠ **仍然缺的一处，是引擎能力缺口，不是没写** ✗：终结技「施放战技时额外增加 **2** 次【剑势】的发动判定，通过额外判定发动的【剑势】伤害为**原伤害的 50%**」—— 需要「本次施放多掷 N 次骰子、且这几次的倍率减半」的**按次计数并改倍率**参数 ✗，全库没有该形状的读者 ✓。这一处按 §4.3 登记，**没有近似** ✓。"
   },
   {
     "on": "BATTLE_START",
@@ -323,5 +323,41 @@
     ],
     "source": "1206 素裳 星魂6 上善若水: 「天赋的加速效果可以叠加，最多叠加2层，且进入战斗后素裳立即获得1层天赋的加速效果。」",
     "note": "一句话两件事，**两件都写** ✓：① 「天赋的加速效果**可以叠加，最多叠加 2 层**」⇒ `MODIFY_RULE` + `rule: talent_speed_on_break` + `effect_max_stacks: 2` ✓ —— 这是引擎专门为「提高某条天赋的上限」提供的口子 ✓（源码注释原话：a CAP, not a value ✓，且它在**任何层数挂上之前**生效 ✓，因为 `BATTLE_START` 先于一切回合 ✓）；② 「进入战斗后素裳**立即获得 1 层**天赋的加速效果」⇒ 同一条 `MODIFY_RULE` 之后追加一条 `MODIFY_ATTR` ✓（`SPEED +20%`、`turns: 2`、`max_stacks: 2` ✓）—— **数值与时长照抄天赋本身** ✓（天赋 Lv10 = `0.2` / `2` 回合 ✓，两处写在同一个文件里 ✓ 不会分叉 ✓）。⚠ **`buff: 加速` 是必须的** ✓：不带名字的修饰**叠加不了也摘不掉** ✗（`MODIFY_ATTR` 的 `max_stacks` 要按名字聚 ✓）；而天赋那条**不具名** ✗ —— ⇒ 星魂 6 的 `max_stacks` 管的是**这一条自己的**实例 ✓，与天赋那条**是两个**修饰 ✓ ⇒ **登记一处差异**：满层时她会有「天赋 1 层 + 星魂 1 层」两个无名字的联系 ✗，而原文说的是**同一个**加速效果叠 2 层 ✓。要让两者真正同源，需要让天赋那条也具名 ✓（改 `talent_speed_on_break` 加 `buff`）—— 本轮**没有**改它 ✗，因为那会改变 0 星魂时的行为 ✓，不在本批范围内 ✓。⚠ 另**登记**：`turns` 各自的计时独立 ✓，所以两层可能不同时到期 ✓（原文未说同时 ✓）。"
+  },
+  {
+    "on": "ALLY_ATTACK",
+    "when": [
+      "actor == self",
+      "from_skill COMMON",
+      "enemy_state_count:弱点击破 >= 1"
+    ],
+    "do": [
+      {
+        "op": "ADVANCE",
+        "percent": 0.15,
+        "target": "self"
+      }
+    ],
+    "source": "1206 行迹 破敌 (1206103): 「施放普攻或战技后，若场上有敌方目标处于弱点击破状态，则素裳的行动提前15%。」 param = [0.15]",
+    "note": "「**施放普攻或战技后**，若**场上有敌方目标处于弱点击破状态**，则素裳的**行动提前 15%**」—— ① 事件 `ALLY_ATTACK` ✓：它**每次施放只发一次** ✓（本文件两条【剑势】用的是同一个事件 ✓，理由也写在它们的 note 里：挂逐段的 `DEALING_DAMAGE` 会逐段触发 ✗）；② 「普攻**或**战技」写成**两条**规则 ✓ —— DSL 没有 or ✗（`when` 是 AND ✓），而两条的 `when` 不同（`from_skill COMMON` ✓）⇒ 不是「一句话写两遍」✓（`ContentDuplicateGuardTest` 的签名含 `when` ✓，同形先例 1111 的 COMMON/SKILL 一对 ✓）；③ ⭐ **本条是 `enemy_state_count:` 的第一个读者** ✓（本轮新增的引擎能力 ✓）—— 原文问的是**全场**（「场上有敌方目标」✓），而 `has_state` 只问**某个具体单位** ✗，`enemy_count` 又只数人头不问状态 ✗ ⇒ 两者都写不出这句 ✓。计数 == 1 与 >= 1 在这句话上等价 ✓，但仍按**数量**写 ✓：同一句话的「有」只是数量 >= 1 的一种说法 ✓；④ `ADVANCE` + `percent: 0.15` ✓，`target: self` ✓（行动提前的是**素裳**✓）。⚠ `percent` 的口径按引擎自己的定义 ✓：**1.0 = 跳过目标剩余等待时间的全部** ✓，所以 0.15 = 跳过剩余的 15% ✓ —— 与 1215 星魂1 的「行动提前 15%」写法**逐字相同** ✓；⚠ 原文没有说「剩余」，但这是本引擎对「行动提前 X%」的**统一口径** ✓（全库 33 处 `ADVANCE` 同此），本条不另立一套 ✓。⚠ **登记**：`enemy_state_count` 只数**活着**的敌人 ✓（`enemyCount` 同款过滤 ✓），而原文说「场上有」✓ —— 已死的敌人本来就不该算「在场上」✓，两者的差别只出现在「破韧后被打死」这一瞬间 ✓。",
+    "id": "trace_breaking_advance_after_common"
+  },
+  {
+    "on": "ALLY_ATTACK",
+    "when": [
+      "actor == self",
+      "from_skill SKILL",
+      "enemy_state_count:弱点击破 >= 1"
+    ],
+    "do": [
+      {
+        "op": "ADVANCE",
+        "percent": 0.15,
+        "target": "self"
+      }
+    ],
+    "source": "1206 行迹 破敌 (1206103): 「施放普攻或战技后，若场上有敌方目标处于弱点击破状态，则素裳的行动提前15%。」 param = [0.15]",
+    "note": "「**施放普攻或战技后**，若**场上有敌方目标处于弱点击破状态**，则素裳的**行动提前 15%**」—— ① 事件 `ALLY_ATTACK` ✓：它**每次施放只发一次** ✓（本文件两条【剑势】用的是同一个事件 ✓，理由也写在它们的 note 里：挂逐段的 `DEALING_DAMAGE` 会逐段触发 ✗）；② 「普攻**或**战技」写成**两条**规则 ✓ —— DSL 没有 or ✗（`when` 是 AND ✓），而两条的 `when` 不同（`from_skill SKILL` ✓）⇒ 不是「一句话写两遍」✓（`ContentDuplicateGuardTest` 的签名含 `when` ✓，同形先例 1111 的 COMMON/SKILL 一对 ✓）；③ ⭐ **本条是 `enemy_state_count:` 的第一个读者** ✓（本轮新增的引擎能力 ✓）—— 原文问的是**全场**（「场上有敌方目标」✓），而 `has_state` 只问**某个具体单位** ✗，`enemy_count` 又只数人头不问状态 ✗ ⇒ 两者都写不出这句 ✓。计数 == 1 与 >= 1 在这句话上等价 ✓，但仍按**数量**写 ✓：同一句话的「有」只是数量 >= 1 的一种说法 ✓；④ `ADVANCE` + `percent: 0.15` ✓，`target: self` ✓（行动提前的是**素裳**✓）。⚠ `percent` 的口径按引擎自己的定义 ✓：**1.0 = 跳过目标剩余等待时间的全部** ✓，所以 0.15 = 跳过剩余的 15% ✓ —— 与 1215 星魂1 的「行动提前 15%」写法**逐字相同** ✓；⚠ 原文没有说「剩余」，但这是本引擎对「行动提前 X%」的**统一口径** ✓（全库 33 处 `ADVANCE` 同此），本条不另立一套 ✓。⚠ **登记**：`enemy_state_count` 只数**活着**的敌人 ✓（`enemyCount` 同款过滤 ✓），而原文说「场上有」✓ —— 已死的敌人本来就不该算「在场上」✓，两者的差别只出现在「破韧后被打死」这一瞬间 ✓。",
+    "id": "trace_breaking_advance_after_skill"
   }
 ]

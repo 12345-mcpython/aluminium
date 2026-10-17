@@ -492,17 +492,23 @@ final class TriggerConditionParser {
                 && !variable.startsWith(SELF_RESOURCE_PREFIX) && !variable.startsWith(SELF_STACKS_PREFIX)
                 && !variable.startsWith(TARGET_STACKS_PREFIX) && !variable.startsWith(ACTOR_STACKS_PREFIX)
                 && !variable.startsWith(SUMMON_RESOURCE_PREFIX)
-                && !variable.startsWith(ALLIES_WITH_PATH_PREFIX)) {
+                && !variable.startsWith(ALLIES_WITH_PATH_PREFIX)
+                && !variable.startsWith(ENEMY_STATE_COUNT_PREFIX)) {
             throw new IllegalArgumentException(
                     "Condition '" + raw + "' compares unknown variable '" + variable
                             + "'; known numeric variables: " + String.join(", ", knownNumericVariables())
                             + ", plus \"self_attr:<ATTRIBUTE>\" for one of my own attribute values, e.g. "
                             + "\"self_attr:SPEED >= 145\", \"self_resource:<NAME>\" for how much of one "
-                            + "of MY declared resources I hold, e.g. \"self_resource:充能 >= 3\", and "
+                            + "of MY declared resources I hold, e.g. \"self_resource:充能 >= 3\", "
                             + "\"self_stacks:<NAME>\" / \"target_stacks:<NAME>\" for how many times a named "
-                            + "counter has been marked, e.g. \"target_stacks:承负 >= 2\" "
+                            + "counter has been marked, e.g. \"target_stacks:承负 >= 2\", and "
+                            + "\"enemy_state_count:<STATE>\" for how many living enemies are in that state, "
+                            + "e.g. \"enemy_state_count:弱点击破 >= 1\" "
                             + "(source: " + spec.getSource() + ")");
         }
+        // The state name is checked for SHAPE here; what "in that state" means is `BuffManager.hasState`'s
+        // business and is deliberately not second-guessed - the same split `has_state` already makes.
+        requireEnemyStateName(variable, raw, spec);
         boolean onActor = variable.startsWith(ACTOR_STACKS_PREFIX);
         return new TriggerTable.Numeric(variable, selfAttributeOf(variable, raw, spec),
                 selfResourceOf(variable, raw, spec),
@@ -530,6 +536,29 @@ final class TriggerConditionParser {
         }
         requirePath(name, raw, spec);
         return name;
+    }
+
+    /**
+     * Refuses an {@code enemy_state_count:} variable with no state name after it.
+     *
+     * <p>Only the SHAPE is checked, and that is the same line {@code has_state} draws: the engine does not own
+     * the vocabulary of state names (content does), so guessing whether a name exists would refuse names that a
+     * character legitimately declares elsewhere in its own file. An empty name, by contrast, is not a name at
+     * all - the rule would compare zero >= 1 forever, which is a guard that can never fire.
+     *
+     * @param variable the already-normalised variable token
+     * @param raw      the original condition text, for the error message
+     * @param spec     the owning rule, for the source
+     */
+    private static void requireEnemyStateName(String variable, String raw, TriggerSpec spec) {
+        if (!variable.startsWith(ENEMY_STATE_COUNT_PREFIX)) {
+            return;
+        }
+        if (variable.substring(ENEMY_STATE_COUNT_PREFIX.length()).trim().isEmpty()) {
+            throw new IllegalArgumentException(
+                    "Condition '" + raw + "' writes \"" + ENEMY_STATE_COUNT_PREFIX + "\" with no state after it; "
+                            + "give one, e.g. \"enemy_state_count:弱点击破 >= 1\" (source: " + spec.getSource() + ")");
+        }
     }
 
     /**
@@ -785,7 +814,8 @@ final class TriggerConditionParser {
         return NUMERIC_VARIABLES.contains(name) || name.startsWith(SELF_ATTR_PREFIX)
                 || name.startsWith(SELF_RESOURCE_PREFIX) || name.startsWith(SELF_STACKS_PREFIX)
                 || name.startsWith(TARGET_STACKS_PREFIX) || name.startsWith(ACTOR_STACKS_PREFIX)
-                || name.startsWith(ALLIES_WITH_PATH_PREFIX);
+                || name.startsWith(ALLIES_WITH_PATH_PREFIX)
+                || name.startsWith(ENEMY_STATE_COUNT_PREFIX);
     }
 
     private static boolean isNumeric(String token) {
@@ -1988,6 +2018,32 @@ final class TriggerConditionParser {
      * typo is refused at load time rather than counting zero.
      */
     static final String ALLIES_WITH_PATH_PREFIX = "allies_with_path:";
+
+    /**
+     * The prefix of a whole-field count: {@code enemy_state_count:<STATE>} - "how many living enemies are in
+     * that state right now".
+     *
+     * <p><b>Why it had to exist.</b> The corpus states conditions about the battlefield rather than about one
+     * unit: 1206 Sushang's trace 破敌 reads "施放普攻或战技后，<b>若场上有敌方目标处于弱点击破状态</b>，则素裳的行动提前
+     * 15%", and 1503 Pearl's Eidolon 1 states its Elation bonus over "队伍中欢愉命途角色数量". The DSL could ask
+     * whether ONE named party is in a state ({@code <who> has_state <name>}), and could count the enemy camp as a
+     * whole ({@code enemy_count}), but nothing could count <b>how many enemies satisfy a state</b> - so the
+     * sentence had no spelling at all, and the honest options were to register it or to approximate it.
+     *
+     * <p>A COUNT rather than a boolean on purpose: "any enemy is broken" is {@code >= 1}, and the same variable
+     * also spells "two enemies are broken" or "each broken enemy", which the corpus will ask for. The gain over a
+     * boolean is free; the risk it adds is none, because the reader is one line.
+     *
+     * <p>The state name is resolved by the <b>same</b> {@code BuffManager.hasState} the {@code has_state}
+     * keyword calls, so {@code target has_state 弱点击破} and {@code enemy_state_count:弱点击破 >= 1} cannot
+     * disagree about what "in that state" means - including the engine's own aliases such as
+     * {@code BuffManager.BROKEN_STATE}.
+     *
+     * <p>Note: The ally-side mirror ({@code ally_state_count:}) is deliberately NOT added. Every whole-field
+     * count in the shipped data is about the enemy camp, and an axis with one used value is an axis nobody has
+     * tested (§3.1) - add the sibling spelling when a sentence needs it.
+     */
+    static final String ENEMY_STATE_COUNT_PREFIX = "enemy_state_count:";
 
     /**
      * The prefix of the other parameterised numeric variable: {@code self_resource:<resource>} - "how many
