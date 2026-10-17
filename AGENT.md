@@ -532,6 +532,7 @@ if (isSelected) buffer.setStyle(rowArea, highlightStyle);
   - **忆灵技能的等级上限**（2026-10-17 核对 ✓）：与**角色同一条规则** ✓ —— `CanHit.skillLevel` 把等级 clamp 到
     表的行数 ✓，而**行数就是文档写的上限** ✓。所以"声明在最后一行时 +1 看不出变化"**不是缺陷** ✓
     （角色的「普攻等级+1」在 10 行表上完全一样 ✓）。判据：`MemospriteSkillLevelTest.aRaisePastTheTableIsClampedToTheTablesRows` ✓。
+  - **与原游戏逐乘区对数值**（2026-10-17 出厂 ✓）：`gradlew run --args="compare <场景.json>"` ✓ —— 场景说清**谁 / 什么技能 / 几级 / 打谁 / 什么面板 / 这一发暴击没有** ✓（面板用**绝对**属性覆盖 ✓，因为引擎的面板不含光锥遗器 ✓），比较器按 `Damage.breakdown()` 的乘区逐行打 `game / engine / diff / relative` ✓，退出码即闸门 ✓（每一行对上 = 0 ✓）。⚠ **`expect` 里的 zone 名拼错 = 报错** ✓（不是「跳过」✗ —— 跳过会让一次少比一行看着像通过 ✓）；⚠ **留空 `expect` = 只打印引擎自己的数** ✓（就是填格式用的清单 ✓，退出码 0 ✓）。形状与乘区对照表见 `scenarios/README.md` ✓；判据 `DamageComparatorTest` ✓。
   - **派生伤害的"来源施放"**（2026-10-17 补 ✓）：击破/超击破是引擎从某一发派生出来的实例 ✓，它自己带 `UNSPECIFIED` ✓
     （**不能**改成那一发的槽位 ✗ —— `ADD_DAMAGE` / `BOOST_DAMAGE` / 增伤区 / `original_damage` 都读实例的槽位 ✓，
     改了就等于把终结技的 +120% 加到击破伤害上 ✗），另带 `causedByCast` ✓。**只有 `KILL`** 沿链 ✓（判据：1002 星魂 4
@@ -1072,6 +1073,7 @@ C 层全是**填口子** ✓，依赖已完成的机制，**不该出现新架�
 | **Impair 的 debuff 派发缺口**（没有一条 `Impair` 带 effect 行 / 正文点战斗内状态的正好三条） | `ImpairDebuffGapTest` |
 | **1002 潜龙：低血仇恨减半，以及它会被收回去**（AGGRO_ADDED_RATIO = -0.5 / 权重 ×0.5 / 治疗过 50% 后归零并移除状态 / 高于 50% 不触发） | `DanHengAggroDownTest` |
 | **伤害段数（分裂比）**（普攻 2 段 / 战技 4 段 / 各段是行倍率的分数且和 = 1 / 每段独立暴击 / 同一减速 Refresh 不成四层） | `DanHengSegmentsTest` |
+| **与原游戏逐乘区比较**（出货场景跑通 / 错数必红 / 拼错的 zone 必红 / 空期望只是清单不是通过） | `DamageComparatorTest` |
 | **1002 每一处数的来源**（天赋穿透随天赋等级 → 星魂 5 为 row12 / 秘技 40% 是份额不是 0.4 点 / 减速 -12% 是行的量乘正文的符号） | `DanHengLevelSourceTest` |
 | **1002 的面板与行值与文档一致**（Lv80 882/546.84/396.9/110、行迹 18%/12.5%/22.4%、破韧 30/60/90、终结技能量 100、四个 Lv10 行） | `DanHengPanelAgreementTest` |
 | **台账不写"现在是什么"的数字**（套件 / 用例 / 文件 / 方法 / 类 / 规则数、`file:line`、大小、提交数、「N 处」） | `LedgerNumberGuardTest` |
