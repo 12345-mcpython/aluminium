@@ -79,6 +79,9 @@ public class March7thKitTest {
      *
      * <p>Note: Asserted exactly, off her own DEFENCE as the engine resolves it: that is the whole point of
      * {@code scale: "owner_def"} -- a literal would be wrong for every build and every skill level.
+     *
+     * <p>Note: The 57% / 760 are <b>row 10</b> of her Skill, which is the row the file's {@code level_convention} puts
+     * the slot on. The row itself is read at the skill's current level, so the next case (星魂 5) moves it.
      */
     @Test
     public void herSkillShieldsTheAimedAllyFromHerOwnDefence() {
@@ -93,6 +96,37 @@ public class March7thKitTest {
         Assertions.assertEquals(expected, ally.getShield(), EPS,
                 "「抵消等同于三月七 57% 防御力 + 760 伤害的护盾」 (a shield that absorbs damage equal to 57% of March 7th's DEF + 760) -- the ally's shield, scaled off HER Defence");
         Assertions.assertEquals(0, march.getShield(), EPS, "and not on herself: 「指定我方单体」 (a designated single ally) is the ally");
+    }
+
+    /**
+     * The shield is not a frozen pair of literals: at 星魂 5 「战技等级+2」 moves the Skill to row 12, and <b>both</b>
+     * halves of the sentence move with it (0.608 x DEF + 845.5 instead of 0.57 x DEF + 760).
+     *
+     * <p>Note: This is the case that would have been impossible before {@code amount_from_skill_param} existed: a rule
+     * with the share read from the row and the constant written as a literal produces a number that <b>no row</b> of
+     * the Skill contains, and the assertion below is deliberately computed from the row rather than from written-down
+     * numbers, so a changed table moves the expectation with it.
+     */
+    @Test
+    public void theShieldFollowsTheSkillsLevel() {
+        Character atFive = CharacterFactory.create(MARCH, LEVEL, true, null, null, 5);
+        Character ally = CharacterFactory.create(ALLY, LEVEL);
+        Battle battle = new Battle(List.of(atFive, ally), List.of(dummy()), BattleFixture.seeded());
+        battle.startBattle();
+
+        int level = atFive.skillLevel(atFive.getSkills().get(com.laosun.aluminium.enums.SkillType.SKILL));
+        Assertions.assertEquals(12, level, "precondition: 星魂 5's 「战技等级+2」 on top of the file's Lv10 convention");
+        var row = atFive.getSkills().get(com.laosun.aluminium.enums.SkillType.SKILL).getData().getSkills()
+                .get(level - 1);
+        double expected = row.get(0) * atFive.getAttribute(com.laosun.aluminium.enums.AttributeType.DEFENCE).get()
+                + row.get(3);
+
+        battle.castImmediate(new DefaultSkill(MARCH, SKILL_SLOT, 1), atFive, List.of(ally));
+
+        Assertions.assertEquals(expected, ally.getShield(), EPS,
+                "row 12 of her Skill: " + row + " -- #1 of DEF \"+\" #4, read at the skill's current level");
+        Assertions.assertNotEquals(0.57 * atFive.getAttribute(com.laosun.aluminium.enums.AttributeType.DEFENCE).get() + 760,
+                ally.getShield(), EPS, "and NOT the row-10 pair the file used to write as two literals");
     }
 
     /**
@@ -190,6 +224,37 @@ public class March7thKitTest {
         Assertions.assertEquals(0.6 * march.getAttribute(AttributeType.ATTACK).get(), ice.getBaseDamage(), EPS,
                 "60% of HER attack, read when the freeze landed");
         Assertions.assertEquals(DamageElement.ICE, ice.getElement());
+    }
+
+    /**
+     * The ultimate reads its own row for <b>both</b> halves: the AoE damage (the engine's ordinary path) and the
+     * freeze's per-turn damage ({@code percent_from_skill_param: "ULTRA:3"}).
+     *
+     * <p>Note: The two halves are checked together on purpose. They used to sit on different rows - the damage came
+     * from the skill's own level (row 1, 0.9) while the DOT was a literal 0.6 (row 10) - so a case that only looked at
+     * one of them would have passed while the sentence contradicted itself. 星魂 3's 「终结技等级+2」 moves both.
+     */
+    @Test
+    public void theUltimateFollowsItsOwnLevelForItsDamageAndItsFreeze() {
+        double[] atZero = ultimateOutcome(0);
+        double[] atThree = ultimateOutcome(3);
+
+        Character atThreeUnit = startedAt(3);
+        int level = atThreeUnit.skillLevel(atThreeUnit.getSkills().get(com.laosun.aluminium.enums.SkillType.ULTRA));
+        Assertions.assertEquals(12, level, "precondition: 星魂 3's 「终结技等级+2」 on top of the file's Lv10 convention");
+        var row = atThreeUnit.getSkills().get(com.laosun.aluminium.enums.SkillType.ULTRA).getData().getSkills()
+                .get(level - 1);
+        double attack = atThreeUnit.getAttribute(AttributeType.ATTACK).get();
+
+        Assertions.assertEquals(row.get(3) * attack, atThree[1], EPS,
+                "row 12's #4 (0.66 of her attack) -- the freeze's per-turn damage follows the ultimate's level");
+        Assertions.assertNotEquals(0.6 * attack, atThree[1], EPS,
+                "and not the row-10 literal (0.6) it used to be written as");
+        Assertions.assertEquals(1.0, atZero[1] / (0.6 * attack), EPS,
+                "precondition: at 星魂 0 the file's Lv10 convention puts the DOT on row 10, so 0.6 x ATK is right there");
+
+        Assertions.assertEquals(row.get(0) / 1.5, atThree[0] / atZero[0], 1e-6,
+                "the AoE damage moves by the same rows: row 12's #1 over row 10's (1.62 / 1.5), zones cancelling");
     }
 
     /**
@@ -317,6 +382,39 @@ public class March7thKitTest {
     // ==================================================================
     // helpers
     // ==================================================================
+
+    /**
+     * Her at the given 星魂 count, with a battle started - so the file's own rules (the level convention and the
+     * Eidolon raises) have run and {@code skillLevel} answers with the row an effect would read.
+     */
+    private static Character startedAt(int eidolon) {
+        Character march = CharacterFactory.create(MARCH, LEVEL, true, null, null, eidolon);
+        new Battle(List.of(march), List.of(dummy()), BattleFixture.seeded()).startBattle();
+        return march;
+    }
+
+    /**
+     * One ultimate from her at the given 星魂 count, against a victim that can be frozen.
+     *
+     * @return {@code {damage dealt, the freeze's per-turn damage}}
+     */
+    private static double[] ultimateOutcome(int eidolon) {
+        Character march = CharacterFactory.create(MARCH, LEVEL, true, null, null, eidolon);
+        march.setAttribute(AttributeType.EFFECT_HIT_RATE, new DoubleValue(1.0));
+        Enemy enemy = EnemyFactory.create(ORDINARY_MONSTER, 90, 1);
+        enemy.setAttribute(AttributeType.EFFECT_RESISTANCE, new DoubleValue(0));
+        enemy.setAttribute(AttributeType.HEALTH, new DoubleValue(5_000_000));
+        enemy.heal(5_000_000);
+        Battle battle = new Battle(List.of(march), List.of(enemy), BattleFixture.seeded());
+        battle.startBattle();
+
+        battle.castImmediate(
+                march.getSkills().get(com.laosun.aluminium.enums.SkillType.ULTRA), march, List.of(enemy));
+
+        DotBuff ice = enemy.getBuffManager().findBuff(DotBuff.class);
+        Assertions.assertNotNull(ice, "precondition: the freeze landed, so it carries its per-turn damage");
+        return new double[]{5_000_000 - enemy.getCurrentHp(), ice.getBaseDamage()};
+    }
 
     /**
      * March 7th, one plain ally and one enemy: the shape every case above needs.

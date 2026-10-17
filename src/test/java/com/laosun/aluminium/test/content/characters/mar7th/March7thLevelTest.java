@@ -18,8 +18,9 @@ import java.util.Random;
  *
  * <p><b>What the documents say.</b> Eidolon 3 = "<b>终结技</b>等级+2，最多不超过15级；<b>普攻</b>等级+1，最多不超过10级" (data row
  * {@code {'100103': 2, '100101': 1}}), Eidolon 5 = "<b>战技</b>等级+2，最多不超过15级；<b>天赋</b>等级+2，最多不超过15级" (row
- * {@code {'100102': 2, '100104': 2}}). Her talent is quoted at Lv10 in the prose, which used to be pinned per-effect with
- * {@code damage_level: 10} and is now the <b>base level</b> the file states, so the Eidolon raises compose with it.
+ * {@code {'100102': 2, '100104': 2}}). Every one of her four slots is quoted at Lv10 in the prose (her shield's #1 and #4,
+ * her ultimate's #1 and #4, her talent's #1), which the file states once as a `level_convention` rule (+9), so the
+ * Eidolon raises compose with it instead of being pinned per effect.
  *
  * <p>Note: The last case is why that composition matters: at Eidolon 5 her counter reads a row that no fixed
  * {@code damage_level} could ever have expressed.
@@ -47,18 +48,25 @@ public class March7thLevelTest {
 
     /**
      * Eidolon 3 raises the ultimate and the basic attack - and nothing else.
+     *
+     * <p>Measured as a <b>delta against 星魂 0</b>, not as an absolute bonus: the file's own `level_convention` rule
+     * already puts all four slots at +9 (「the document quotes Lv10」), so an absolute assertion would be reading the
+     * convention's number and calling it the Eidolon's. The question this case asks is what the Eidolon <b>adds</b>.
      */
     @Test
     public void starRailThreeRaisesTheUltimateAndTheBasicAttack() {
-        Character march = CharacterFactory.create(MARCH, LEVEL, true, null, null, 2);
-        new Battle(List.of(march), List.of(enemy()), fixed()).startBattle();
-        Assertions.assertEquals(0, march.skillLevelBonus(SkillType.ULTRA), "Eidolon (星魂) 2 is not Eidolon 3");
+        Character atZero = startedAt(0);
+        Character atTwo = startedAt(2);
+        Assertions.assertEquals(0, bonus(atTwo, SkillType.ULTRA) - bonus(atZero, SkillType.ULTRA),
+                "Eidolon (星魂) 2 is not Eidolon 3");
 
-        Character atThree = CharacterFactory.create(MARCH, LEVEL, true, null, null, 3);
-        new Battle(List.of(atThree), List.of(enemy()), fixed()).startBattle();
-        Assertions.assertEquals(2, atThree.skillLevelBonus(SkillType.ULTRA), "\"Ultimate Lv. +2\" (「终结技等级+2」)");
-        Assertions.assertEquals(1, atThree.skillLevelBonus(SkillType.COMMON), "\"Basic ATK Lv. +1\" (「普攻等级+1」)");
-        Assertions.assertEquals(0, atThree.skillLevelBonus(SkillType.SKILL), "…and Eidolon (星魂) 5 has not landed yet");
+        Character atThree = startedAt(3);
+        Assertions.assertEquals(2, bonus(atThree, SkillType.ULTRA) - bonus(atZero, SkillType.ULTRA),
+                "\"Ultimate Lv. +2\" (「终结技等级+2」)");
+        Assertions.assertEquals(1, bonus(atThree, SkillType.COMMON) - bonus(atZero, SkillType.COMMON),
+                "\"Basic ATK Lv. +1\" (「普攻等级+1」)");
+        Assertions.assertEquals(0, bonus(atThree, SkillType.SKILL) - bonus(atZero, SkillType.SKILL),
+                "…and Eidolon (星魂) 5 has not landed yet");
     }
 
     /**
@@ -66,12 +74,15 @@ public class March7thLevelTest {
      */
     @Test
     public void starRailFiveRaisesTheSkillAndTheTalent() {
-        Character march = CharacterFactory.create(MARCH, LEVEL, true, null, null, 5);
-        new Battle(List.of(march), List.of(enemy()), fixed()).startBattle();
+        Character atZero = startedAt(0);
+        Character atFive = startedAt(5);
 
-        Assertions.assertEquals(2, march.skillLevelBonus(SkillType.SKILL), "\"Skill Lv. +2\" (「战技等级+2」)");
-        Assertions.assertEquals(11, march.skillLevelBonus(SkillType.TALENT), "+9 base and +2 from this Eidolon (星魂)");
-        Assertions.assertEquals(12, march.skillLevel(march.getSkills().get(SkillType.TALENT)),
+        Assertions.assertEquals(2, bonus(atFive, SkillType.SKILL) - bonus(atZero, SkillType.SKILL),
+                "\"Skill Lv. +2\" (「战技等级+2」)");
+        Assertions.assertEquals(9, bonus(atZero, SkillType.TALENT),
+                "the file's own `level_convention` states 「the document quotes Lv10」 as +9");
+        Assertions.assertEquals(11, bonus(atFive, SkillType.TALENT), "+9 base and +2 from this Eidolon (星魂)");
+        Assertions.assertEquals(12, atFive.skillLevel(atFive.getSkills().get(SkillType.TALENT)),
                 "so her talent is read at level 12 — its table has 15 rows, and this is the number the game means");
     }
 
@@ -101,6 +112,22 @@ public class March7thLevelTest {
     // ==================================================================
     // Helpers
     // ==================================================================
+
+    /**
+     * Her, at the given 星魂 count, with the battle started so the file's own rules have run.
+     */
+    private static Character startedAt(int eidolon) {
+        Character march = CharacterFactory.create(MARCH, LEVEL, true, null, null, eidolon);
+        new Battle(List.of(march), List.of(enemy()), fixed()).startBattle();
+        return march;
+    }
+
+    /**
+     * How far above its base level that slot reads, i.e. the file's convention plus whatever the 星魂 adds.
+     */
+    private static int bonus(Character who, SkillType slot) {
+        return who.skillLevelBonus(slot);
+    }
 
     private static Enemy enemy() {
         Enemy enemy = BattleFixture.monster();
