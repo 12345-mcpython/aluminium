@@ -573,6 +573,20 @@ public class Battle {
     private final List<CanHit> techniqueUsers = new ArrayList<>();
 
     /**
+     * Map basic attacks the caller declared before the battle started (see {@link #declareMapAttack}).
+     *
+     * <p>A map hit happens OUTSIDE the battle - the engine cannot observe it - so the caller states it and
+     * {@link #startBattle()} applies its only in-battle consequence: 「进入战斗后削弱敌方目标对应属性韧性」.
+     * The pair is kept because the effect belongs to both units: whose map skill (its element and stance value)
+     * and which enemy's bar.
+     */
+    private final List<MapAttack> mapAttacks = new ArrayList<>();
+
+    /** One declared map basic attack: who swung, and which enemy was struck. */
+    private record MapAttack(CanHit attacker, CanHit target) {
+    }
+
+    /**
      * The techniques the battle was CREATED with, or {@code null} when the caller marks them later.
      *
      * <p>Kept beside {@link #techniqueUsers} rather than replacing it: the battle's own state is still
@@ -1528,6 +1542,9 @@ public class Battle {
         }
         registerPartyResources();   // before any hook, so a BATTLE_START rule can already gain a shared counter
         attachBattleSkills();
+        // Before the technique states and every BATTLE_START rule: the map hit happened first, so the bar a rule
+        // reads is the bar the battle opens with.
+        applyDeclaredMapAttacks();
         applyTechniqueStates();   // before every BATTLE_START rule, so `self has_state 秘技` already answers
         for (Signal signal : queue.snapshot()) {
             signal.getCanHit().onBattleStart(this);
@@ -1577,6 +1594,44 @@ public class Battle {
                 }
                 character.setSkill(type, new DefaultSkill(character.getCid(), slot, 1));
             }
+        }
+    }
+
+    /**
+     * Applies the map basic attacks declared before the battle - 「攻击敌人，进入战斗后削弱敌方目标对应属性韧性」.
+     *
+     * <p>The numbers come from the attacker's <b>map</b> skill (slot 6), never from the in-battle basic attack: the
+     * data files them under different slots, and the sentence names the map one (attack type {@code MazeNormal},
+     * effect {@code MazeAttack}). 1002 Dan Heng's slot 6 says 30 toughness and Wind - the two values this reads.
+     *
+     * <p>Through {@link #reduceToughness}, so the engine's one weakness rule applies: only an enemy weak to that
+     * element loses toughness at all, and an emptied bar settles the break right here - the state the enemy then
+     * carries into the first turn. A map skill whose data states no element or no stance reduces nothing rather
+     * than being guessed at (the data really does contain such skills).
+     */
+    private void applyDeclaredMapAttacks() {
+        for (MapAttack hit : mapAttacks) {
+            // The cast is safe: `declareMapAttack` refuses a target that is not an enemy.
+            Enemy enemy = (Enemy) hit.target();
+            if (enemy.isDeath()) {
+                continue;                                  // a map hit can only land on a living monster
+            }
+            Skill mapSkill = hit.attacker() instanceof Character character
+                    ? character.getSkills().get(SkillType.MAZE) : null;
+            if (mapSkill == null || mapSkill.getData() == null || !mapSkill.getData().isLoaded()) {
+                // Not skipped: the caller stated that this unit's map hit landed, so the number to read must exist -
+                // a silent no-op would look exactly like "the map attack does nothing".
+                throw new IllegalStateException(
+                        "The declared map attack names " + hit.attacker().getName()
+                                + ", but that unit has no loaded map skill (slot 6), so its toughness reduction "
+                                + "cannot be read; declare a hit only for a unit whose map attack really happened");
+            }
+            double stance = mapSkill.getData().stanceFor(true);
+            DamageElement element = mapSkill.getData().getElement();
+            if (stance <= 0 || element == null) {
+                continue;                                  // the data gives this map hit nothing to reduce
+            }
+            reduceToughness(hit.attacker(), enemy, element, stance, SkillCategory.MAZE_NORMAL);
         }
     }
 
@@ -4205,6 +4260,35 @@ public class Battle {
         if (unit != null && !techniqueUsers.contains(unit)) {
             techniqueUsers.add(unit);
         }
+    }
+
+    /**
+     * Declares that this unit used its <b>map basic attack</b> on an enemy before the battle. Call before
+     * {@link #startBattle()}.
+     *
+     * <p><b>Why the battle has to be told.</b> The hit happens on the overworld, which this engine does not model -
+     * the same reason {@link #markTechniqueUsed} exists. The battle's half is the sentence's in-battle consequence,
+     * 「攻击敌人，进入战斗后削弱敌方目标对应属性韧性」: the struck enemy opens the battle with that much of its
+     * <b>matching</b> toughness already gone. The amount and the element are read from the character's slot-6 skill
+     * ({@link #applyDeclaredMapAttacks}), so they stay data rather than constants here.
+     *
+     * <p>Note: Calling it twice is two hits - the caller said so, and nothing here imposes a cap.
+     *
+     * @param attacker the character whose map attack landed
+     * @param target   the enemy it hit
+     */
+    public void declareMapAttack(CanHit attacker, CanHit target) {
+        if (attacker == null || target == null) {
+            throw new IllegalArgumentException(
+                    "declareMapAttack needs both the unit that swung and the enemy it hit: a half-declared hit has "
+                            + "no toughness value to apply");
+        }
+        if (!(target instanceof Enemy)) {
+            throw new IllegalArgumentException(
+                    "declareMapAttack names " + target.getName() + ", which is not an enemy: the map hit reduces an "
+                            + "enemy's toughness bar, and nothing else on the field has one");
+        }
+        mapAttacks.add(new MapAttack(attacker, target));
     }
 
     /**
