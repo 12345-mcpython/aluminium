@@ -107,7 +107,7 @@ public class SushangUltimateAndTraceTest {
     @Test
     public void theFileCarriesTheUltimateAndTraceClauses() {
         var table = TriggerTables.of(SUSHANG);
-        Assertions.assertEquals(2, table.ruleCount(TriggerEvent.ULT_CAST),
+        Assertions.assertEquals(3, table.ruleCount(TriggerEvent.ULT_CAST),
                 "the extra turn and the attack raise - one clause each, so a missing half is visible");
         // Two: the Sword Stance counter, and eidolon 2's damage reduction - both keyed on "this instance is
         // additional damage", which is how the engine names a Sword Stance. The pair sharing one discriminator

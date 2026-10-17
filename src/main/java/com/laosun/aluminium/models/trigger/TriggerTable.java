@@ -677,7 +677,40 @@ public class TriggerTable {
                 Boolean.TRUE.equals(spec.getOncePerWave()), List.copyOf(targetFilters),
                 validatePerSubject(spec), validateOneOf(spec, effects), validateChanceDecay(spec),
                 spec.getOneOfNoRepeat() == null ? "" : spec.getOneOfNoRepeat().trim(),
-                Boolean.TRUE.equals(spec.getDeferUntilWave())));
+                Boolean.TRUE.equals(spec.getDeferUntilWave()), validateChanceRolls(spec)));
+    }
+
+    /**
+     * Validates a rule's number of independent chance rolls and returns it ({@code 1} = the historical single
+     * roll).
+     *
+     * <p>The two refusals are the shapes this vocabulary keeps out: a count below 1 is not a count, and a
+     * count above 1 on a rule that states no {@code chance} says nothing at all ("roll twice for always" is
+     * "roll once for always"). Both would load and behave as if the field had not been written, which is the
+     * failure mode with no symptom that the rest of this class already refuses.
+     *
+     * <p>⚠ Package-visible only so the same-package guard can reach it ({@code ChanceRollsValidationTest}). The
+     * alternative was to ship deliberately broken content in {@code resources/characters/} and load it, which
+     * would put a permanently red rule in the corpus that every other content guard has to tolerate.
+     */
+    static int validateChanceRolls(TriggerSpec spec) {
+        Integer rolls = spec.getChanceRolls();
+        if (rolls == null) {
+            return 1;
+        }
+        if (rolls < 1) {
+            throw new IllegalArgumentException(
+                    "Trigger rule has \"chance_rolls\": " + rolls + ", but a count of rolls is 1 or more "
+                            + "(omit the field for the single roll every rule has by default) "
+                            + "(source: " + spec.getSource() + ")");
+        }
+        if (rolls > 1 && spec.getChance() == null) {
+            throw new IllegalArgumentException(
+                    "Trigger rule has \"chance_rolls\": " + rolls + " but no \"chance\": there is no "
+                            + "probability to roll twice. Rolling an always-hit rule twice changes nothing "
+                            + "(source: " + spec.getSource() + ")");
+        }
+        return rolls;
     }
 
     /**
@@ -1133,7 +1166,13 @@ public class TriggerTable {
                                int maxEidolon,
                                int perTurn, int perAttack, boolean oncePerWave,
                                List<List<Condition>> effectTargetFilters, String perSubject,
-                               boolean oneOf, double chanceDecay, String oneOfNoRepeat, boolean deferUntilWave) {
+                               boolean oneOf, double chanceDecay, String oneOfNoRepeat, boolean deferUntilWave,
+                               /**
+                                * How many independent rolls of {@link #chance} one firing makes - 1 unless the
+                                * rule states "额外增加 N 次…判定". See {@code TriggerSpec.chanceRolls} for why
+                                * the count lives on the rule and not on a second, identical rule.
+                                */
+                               int chanceRolls) {
 
         /**
          * The per-target conditions of one effect ({@code target_when}), by that effect's index in {@link #effects}.

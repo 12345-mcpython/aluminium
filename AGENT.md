@@ -896,6 +896,7 @@ C 层全是**填口子** ✓，依赖已完成的机制，**不该出现新架�
 | 演示至少不抛异常 | `DemoSmokeTest` | 5 |
 | 触发规则表装载 | `TriggerTableTest` | — |
 | **`enemy_state_count:` 全场状态计数**（状态过滤 / 只数活人 / 空状态名在加载期被拒 / 未知变量提示它） | `EnemyStateCountTest` / `EnemyStateCountSpellingTest` | 4 / 3 |
+| **`chance_rolls:` 规则级独立掷骰**（两次判定都结算、各 50% 伤害；0 次与"无 chance 却要掷两次"在加载期被拒） | `ChanceRollsTest` / `ChanceRollsValidationTest` | 3 / 4 |
 
 ### 7.2 **只靠散文**（所以上面必须写完整）
 
