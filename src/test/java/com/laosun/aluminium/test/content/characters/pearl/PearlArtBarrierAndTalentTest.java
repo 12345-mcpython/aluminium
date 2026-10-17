@@ -22,8 +22,8 @@ public class PearlArtBarrierAndTalentTest {
     private static final int PEARL = 1503;
     private static final int ELATION = 1502;   // Yao Guang, Elation
     private static final int HUNTER = 1204;
-    private static final String BARRIER = "\u827a\u672f\u58c1\u5792";
-    private static final String GRIT = "\u541e\u7eb3\u6c99\u783e";
+    private static final String BARRIER = "艺术壁垒";
+    private static final String GRIT = "吞纳沙砾";
 
     /**
      * The art barrier lands on an Elation archetype and on nobody else.

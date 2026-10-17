@@ -411,7 +411,7 @@ final class TriggerEffects {
             // froze, so a resisted application must not be counted (see Battle.recordCastApplied).
             if (battle.tryApplyDebuff(ctx.owner(), target, applied, baseChance, control.resistKey())) {
                 battle.recordCastApplied(control.name());
-                // \u26a0 Announced on the SUCCESS branch. The attempt is not the event: the state was rolled through the resist
+                // ⚠ Announced on the SUCCESS branch. The attempt is not the event: the state was rolled through the resist
                 // pipeline, and reporting a resisted application would claim a freeze that never happened.
                 battle.announceControl(ctx.owner(), target, control.name());
             }

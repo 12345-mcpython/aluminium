@@ -76,7 +76,7 @@ public class ContentDuplicateGuardTest {
                         if (id != null && !id.isJsonNull()) {
                             // Note: Scoped by the rank/piece key: per-rank content reuses the rule id across ranks on purpose
                             // (each rank states its own numbers), so only a repeat INSIDE one scope is the copy-paste fault.
-                            String earlier = ids.put(entry[0] + "\u0000" + id.getAsString(), entry[0]);
+                            String earlier = ids.put(entry[0] + "\0" + id.getAsString(), entry[0]);
                             if (earlier != null) {
                                 duplicates.add(path + " reuses id \"" + id.getAsString() + "\" twice inside scope \""
                                         + entry[0] + "\"");

@@ -40,7 +40,7 @@ public class HimekoTechniqueTest {
     private static final double NO_ZONE = 1.0;
 
     /**
-     * \u2b50 The gate: a declared technique raises the Fire damage the enemies take by 10%.
+     * ⭐ The gate: a declared technique raises the Fire damage the enemies take by 10%.
      *
      * <p>The pair is asserted together, because a rule gated on {@code self has_state 秘技} can only be trusted against its own
      * control: "the zone appeared" alone would pass for the wrong reason if something else also applied it.
@@ -57,7 +57,7 @@ public class HimekoTechniqueTest {
     }
 
     /**
-     * \u2b50 It is FIRE-only: the same battle leaves Ice and Physical damage untouched.
+     * ⭐ It is FIRE-only: the same battle leaves Ice and Physical damage untouched.
      *
      * <p>⚠ This is the case the element scope exists for. A 10% zone applying to every element would be wrong against every
      * non-Fire attacker in the party, and the only way to tell is to compare the elements against each other.
@@ -103,7 +103,7 @@ public class HimekoTechniqueTest {
         Battle battle = battle(technique);
         Enemy enemy = battle.enemyUnits().get(0);
         Damage damage = new Damage(null, enemy, element, DamageType.NORMAL, 1000);
-        // \u26a0 The unit's own entry point, which is the path settlement takes: `CanHit.onDamage` walks its own buffs, so this
+        // ⚠ The unit's own entry point, which is the path settlement takes: `CanHit.onDamage` walks its own buffs, so this
         // cannot drift from what a real hit would collect. Casting instead would fold in resistance, defence and crit as well, and
         // this test's claim is about the zone alone.
         enemy.onDamage(battle, damage);

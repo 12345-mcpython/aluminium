@@ -69,7 +69,7 @@ public final class BattleDamage {
         // ...plus the follow-up-only boost, which exists because set 115's 2-piece must raise
         // follow-up damage without touching any other attack. Gated on the damage type, not on a flag:
         // additional damage is the engine's one representation of a follow-up attack.
-        // \u26a0 TALENT alongside ADDITIONAL: a Talent's follow-up IS a follow-up, so it collects the same boost. Leaving it out
+        // ⚠ TALENT alongside ADDITIONAL: a Talent's follow-up IS a follow-up, so it collects the same boost. Leaving it out
         // would have silently reduced every Talent's damage the moment the type was introduced.
         if (damage.getType() == DamageType.ADDITIONAL || damage.getType() == DamageType.TALENT) {
             damage.addBoost(attacker.getAttribute(AttributeType.FOLLOW_UP_DAMAGE_BOOST).get());

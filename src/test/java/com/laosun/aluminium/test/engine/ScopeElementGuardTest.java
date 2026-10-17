@@ -15,11 +15,11 @@ import java.util.List;
  * <p>The sibling of {@link DamageTypeScopeValidationTest}, and for the same reason: an argument the loader accepts and the
  * runtime ignores is worse than one it refuses, because the rule looks right.
  *
- * <p>\u26a0 <b>Gap 1 -- a closed set.</b> {@code DamageElement.fromString} answers {@code null} for "Unknown" and for typos alike, and
+ * <p>⚠ <b>Gap 1 -- a closed set.</b> {@code DamageElement.fromString} answers {@code null} for "Unknown" and for typos alike, and
  * the interpreter turns that null into "no scope". So a misspelt element would have produced a zone applying to EVERY element: a
  * wrong number with no symptom. The other arguments in that class are closed sets for exactly this reason.
  *
- * <p>\u26a0 <b>Gap 2 -- only the reading op may state it.</b> The engine has no global "unknown argument" check: refusals are
+ * <p>⚠ <b>Gap 2 -- only the reading op may state it.</b> The engine has no global "unknown argument" check: refusals are
  * per-op, so a field one op READS is silently IGNORED by the other forty. {@code damage_type} already had this half
  * ({@code DAMAGE_TYPE_READERS}) after an op accepted it and ignored it; {@code scope_element} was first written without it and was
  * accepted by every op, which this case pins.
@@ -42,7 +42,7 @@ public class ScopeElementGuardTest {
     }
 
     /**
-     * \u2b50 The op that READS it accepts a real element.
+     * ⭐ The op that READS it accepts a real element.
      */
     @Test
     public void theReadingOpAcceptsARealElement() {
@@ -52,7 +52,7 @@ public class ScopeElementGuardTest {
     }
 
     /**
-     * \u2b50 A misspelt element is refused, rather than quietly meaning "every element".
+     * ⭐ A misspelt element is refused, rather than quietly meaning "every element".
      */
     @Test
     public void anUnknownElementIsRefused() {
@@ -65,7 +65,7 @@ public class ScopeElementGuardTest {
     }
 
     /**
-     * \u2b50 An op that does not read it refuses it, rather than accepting and ignoring it.
+     * ⭐ An op that does not read it refuses it, rather than accepting and ignoring it.
      */
     @Test
     public void anOpThatDoesNotReadItIsRefused() {

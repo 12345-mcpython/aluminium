@@ -180,7 +180,7 @@ public final class BattleDriver {
     /**
      * Starts the battle and tells the listener.
      *
-     * <p>\u26a0 <b>Why this exists: a driven battle never announced its own start.</b> Only {@link #run()} fired
+     * <p>⚠ <b>Why this exists: a driven battle never announced its own start.</b> Only {@link #run()} fired
      * {@code onBattleStart}, and a front end that steps the battle itself -- which is the whole point of the driver -- calls
      * {@code battle.startBattle()} directly, so the callback was dead and the log had no first line. Measured: a full battle
      * with neither a start nor an end line.
@@ -291,7 +291,7 @@ public final class BattleDriver {
         // does not by itself block acting, so the first version of this comment was wrong and the first two cases
         // written against it could not fail. The freeze needs broken AND a control (frozen, imprisoned, ...).
         //
-        // \u26a0 The two reasons a unit may not act are announced separately, because they are different facts: a broken unit
+        // ⚠ The two reasons a unit may not act are announced separately, because they are different facts: a broken unit
         // is recovering from a break and a controlled one is not, and the log showed both as "cannot act". Measured over one
         // battle: seven breaks and twenty-three turns with a control present, indistinguishable.
         boolean wasBroken = !actor.isDeath() && actor instanceof Enemy foe && foe.isBroken();
@@ -325,7 +325,7 @@ public final class BattleDriver {
         }
 
         battle.afterMove();
-        // \u26a0 No death check here, and that is deliberate: `CanHit.takeDamage` sets `death = true` the moment the damage lands,
+        // ⚠ No death check here, and that is deliberate: `CanHit.takeDamage` sets `death = true` the moment the damage lands,
         // so `!isDeath()` was already false by this point and the check could never fire -- measured, a battle that ended with
         // two deaths and not one line about either. The report belongs in the damage callback, where the engine states it.
         if (turn > 0) {

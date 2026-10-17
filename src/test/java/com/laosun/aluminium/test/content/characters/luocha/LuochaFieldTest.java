@@ -173,7 +173,7 @@ public class LuochaFieldTest {
         /**
          * Whether the zone is open.
          *
-         * <p>\u26a0 Read on the ENEMIES, not on Luocha. The zone marks the units that were in it when it opened -- 「处于结界中的
+         * <p>⚠ Read on the ENEMIES, not on Luocha. The zone marks the units that were in it when it opened -- 「处于结界中的
          * 任意敌方目标受到我方攻击后」 -- and the two healing rules test `target has_state 结界` against the enemy that was
          * attacked. It used to be applied to `self`, which meant no enemy ever carried it and the talent healed nothing;
          * measured, the zone was up for fourteen turns with allies attacking on six of them and not one zone heal.

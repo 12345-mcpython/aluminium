@@ -369,7 +369,7 @@ public final class Constant {
      * Weakness break duration: an enemy broken now skips this many of its own turns, and on the next one its toughness
      * is restored and it acts again.
      *
-     * <p>\u26a0 <b>The counter is not that number, and reading it as one is what made this off by a turn.</b> The value set
+     * <p>⚠ <b>The counter is not that number, and reading it as one is what made this off by a turn.</b> The value set
      * on the enemy is this figure, and {@code handleBrokenTurn} spends one turn decrementing it: at 2 the enemy skipped
      * one turn, then spent the second recovering <i>and</i> acting. So the counter used to be one more than the number
      * of turns actually lost, and the old javadoc here ("skips this many of its own turns") described a behaviour the

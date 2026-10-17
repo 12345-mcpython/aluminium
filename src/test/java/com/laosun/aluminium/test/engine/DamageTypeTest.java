@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 public class DamageTypeTest {
     @Test
     public void valueCount() {
-        // \u26a0 13 since TALENT: a Talent's follow-up had been indistinguishable from a counter and from an ultimate's extra hits,
+        // ⚠ 13 since TALENT: a Talent's follow-up had been indistinguishable from a counter and from an ultimate's extra hits,
         // and the type is what names it. Raising this number is the point of the guard.
         Assertions.assertEquals(13, DamageType.values().length);
     }
@@ -58,7 +58,7 @@ public class DamageTypeTest {
     }
 
     /**
-     * \u2b50 TALENT behaves as ADDITIONAL does, in every mechanical way.
+     * ⭐ TALENT behaves as ADDITIONAL does, in every mechanical way.
      *
      * <p>It exists to NAME a Talent's follow-up, not to change one: a Talent's damage IS additional damage, so it crits and is
      * boostable exactly as `ADDITIONAL` is, and it collects the follow-up boost. A difference in any of those would silently move
