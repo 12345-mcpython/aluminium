@@ -2,8 +2,10 @@ package com.laosun.aluminium.test.engine;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
+import com.laosun.aluminium.enums.Camp;
 import com.laosun.aluminium.models.CanHit;
 import com.laosun.aluminium.models.Character;
+import com.laosun.aluminium.models.Damage;
 import com.laosun.aluminium.models.DoubleValue;
 import com.laosun.aluminium.models.battle.BattleDriver;
 import com.laosun.aluminium.models.battle.BattleListener;
@@ -140,13 +142,24 @@ public class DrivenRealBattleTest {
     }
 
     /**
-     * Both camps took real damage, and the battle's own result agrees with their HP.
+     * Both camps really acted: the party damaged somebody, and the enemies landed hits on our side.
      *
-     * <p>Guards the degenerate case where a battle "finishes" because one side was empty to begin with.
+     * <p>Guards the degenerate case where a battle "finishes" because one side was empty to begin with, or where the
+     * enemy camp never got a turn.
+     *
+     * <p>⚠ <b>Why the second half is not "our side ends wounded".</b> It used to assert exactly that (final
+     * {@code maxHp - currentHp} > 0), and it went red the day 1001 March 7th (三月七)'s slots started reading their
+     * documented level row - not because the enemies stopped attacking, but because the party now wins with Luocha (罗刹)
+     * having healed everyone back to full. Measured at seed {@value #SEED}: <b>19</b> enemy→ally damage instances
+     * settling <b>6546.86</b> (2979.67 of it absorbed by shields) while the final HP deficit was <b>0</b>. Healing makes
+     * the final deficit a proxy that answers a different question, so the case now counts what the sentence means:
+     * enemy attacks that landed on our side. It still fails on the regression it exists for - an enemy camp that never
+     * acts delivers zero instances.
      */
     @Test
     public void bothCampsWereReallyEngaged() {
-        BattleDriver driver = BattleDriver.of(party(), foes(30_000), SEED);
+        Engagement engagement = new Engagement();
+        BattleDriver driver = BattleDriver.of(party(), foes(30_000), SEED).withListener(engagement);
         BattleDriver.Result result = driver.run();
         Battle battle = driver.battle();
 
@@ -155,12 +168,16 @@ public class DrivenRealBattleTest {
 
         double enemiesHurt = battle.enemyUnits().stream()
                 .mapToDouble(e -> e.getMaxHp() - e.getCurrentHp()).sum();
-        double alliesHurt = battle.characters.stream()
-                .mapToDouble(c -> c.getMaxHp() - c.getCurrentHp()).sum();
 
         Assertions.assertTrue(enemiesHurt > 0, "the party must have damaged somebody");
-        Assertions.assertTrue(alliesHurt > 0, "the enemies must have damaged somebody");
+        Assertions.assertTrue(engagement.enemyHits > 0,
+                "the enemies must have attacked our side; measured " + engagement.enemyHits + " landed hits");
+        Assertions.assertTrue(engagement.enemyApplied > 0,
+                "…and settled damage, not a parade of zeroes (applied " + engagement.enemyApplied + ")");
         Assertions.assertNotNull(result.status(), "a decided battle reports which side won");
+        System.out.println("[driven] enemy hits on our side = " + engagement.enemyHits
+                + " ; applied = " + engagement.enemyApplied
+                + " ; absorbed = " + engagement.enemyAbsorbed);
     }
 
     /**
@@ -209,6 +226,34 @@ public class DrivenRealBattleTest {
         @Override
         public void onTurnEnd(CanHit actor, int turn) {
             ended++;
+        }
+    }
+
+    /**
+     * Counts the hits each camp landed on the other, which is what "both camps were really engaged" means.
+     *
+     * <p>Note: Counted from {@link BattleListener#onDamage}, i.e. from settled instances rather than from final HP: a
+     * heal after the hit leaves the HP deficit at zero while the battle was perfectly real (measured: 19 landed enemy
+     * hits, final deficit 0).
+     */
+    private static final class Engagement implements BattleListener {
+
+        private int enemyHits;
+        private double enemyApplied;
+        private double enemyAbsorbed;
+
+        @Override
+        public void onDamage(Damage damage, double applied, double hpLoss, double shieldAbsorbed, boolean died) {
+            CanHit attacker = damage.getAttacker();
+            CanHit defender = damage.getDefender();
+            if (attacker == null || defender == null) {
+                return;
+            }
+            if (attacker.getCamp() == Camp.ENEMY && defender.getCamp() == Camp.PLAYER) {
+                enemyHits++;
+                enemyApplied += applied;
+                enemyAbsorbed += shieldAbsorbed;
+            }
         }
     }
 }

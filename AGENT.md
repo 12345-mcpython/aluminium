@@ -385,9 +385,15 @@ if (isSelected) buffer.setStyle(rowArea, highlightStyle);
   ⇒ 已经顶到 3.5 的目标**仍然**吃这一项 ✓（折进上限里会把它吞掉）【已把守：`DamageChainFactorsTest`】
 - HSR.md §2.2 **元素吸收是减法**，不是乘区：结算后减、floor 0（引擎属性 `<元素>_DAMAGE_ABSORB`）✓【已把守：`DamageChainFactorsTest`】
   ⚠ 这三组能力目前**没有内容读者**（全库扫过 ✓），是用户要求为公式完整性补的 ✓ —— 判据钉的是**乘/减与上限内外**，不是某个角色的数字 ✓。
-- ⚠ **仍未建模的一项**：游戏链末还有 `_GetExtraDamageRatio`（攻击类型附加增伤）✗ —— 逆向资料只写到它的地址与调用点 ✓，
-  **没有给出它读哪些属性** ✗ ⇒ 现有的 `FOLLOW_UP_DAMAGE_BOOST` / 槽位加伤（`BASIC_ATTACK_DAMAGE_BOOST` 等）**仍留在加性桶里** ✓
-  ⇒ 这是一个**待核**：要动它们，先拿到 `_GetExtraDamageRatio` 的字段表 ✓，不要按"看着像"把它挪成乘性 ✗。
+- ✅ **已核（2026-10-17）：`_GetExtraDamageRatio` 字段表已拿到** —— 它是**链末独立乘区**（在 `− 吸收` **之后**乘），**不是**主增伤桶 ✓
+  `x = (前后排基准 GetFrontBackPower/200) × (1 + 幸运触发时的 ExtraLuckDamage) × (1 + ExtraAllDamageTypeAddedRatio1 + Σ对应攻击类型) × (1+ExtraAllDamageTypeAddedRatio2) × …3 × …4 × …5`
+  - 攻击类型槽（`AbilityProperty`，`switch(AttackType)` 累加进**同一个**累加器）：`ExtraNormalDamageAddedRatio1`(203 普攻) / `ExtraSkill…1`(202 战技) /
+    `ExtraUltra…1`(201 终结技) / `ExtraInsert…1`(204 附加) / `ExtraDOT…1`(205 持续) / `ExtraElement…1`(206 击破) / `ExtraElation…1`(207 欢愉)
+  - ⇒ `BASIC_ATTACK_DAMAGE_BOOST` / `SKILL_DAMAGE_BOOST` / `ULTRA_DAMAGE_BOOST`（及附加/持续/击破/欢愉槽位）**应挪到这个独立乘区**：
+    它们**彼此加算**、并与 `ExtraAllDamageTypeAddedRatio1` 加算成**一个** `(1+…)` 因子，**不是**留在主加性桶 ✓
+  - ⚠ **`FOLLOW_UP_DAMAGE_BOOST` 例外**：游戏**没有「追加攻击」槽**（该表只有 7 项，无 追加/忆灵/秘技/真实）⇒ 它**不**属于这个乘区，
+    **保持原状**，别按"看着像"挪进来 ✓（游戏要让追加攻击吃到普攻增伤，走的是 `RegardAsAttackTypeMap`「视为攻击类型」）
+  - 依据：`HSR.md §10.8`（含 `ToExtraDamageDataFinal` VA `0x18E5236F0`、跳表 VA `0x1957CD29C`、`PAKIJFOGOJF` VA `0x1957CD2E0`）
 - HSR.md §2.5 抗性区 = `1 - 抗性`，范围 `-100% ~ 90%` ⇒ 抗性区 `0.1 ~ 2.0`；**负抗全效**（不是半效）
 - HSR.md §2.4 防御区 `(200+10L)/(def+200+10L)`，`def = 原始防御 × (1 - 减防% - 穿透%)`（**加算**），上限 1、不为负
 - HSR.md §5.4 欢愉伤害**吃双爆、不吃增伤** ⇒ `DamageType.ELATION(isCrittable=true, isBoostable=false)`
@@ -672,6 +678,11 @@ C 层全是**填口子** ✓，依赖已完成的机制，**不该出现新架�
   **没有出处就写"待核"** ✗ 不许写成"引擎没有" ✓（与本节第一条同源 ✓）。
   ⚠ 反向也记一笔：登记**被推翻**时 ✓，把那三句**错理由原文**留在 note 里 ✓ ——
   下一个人会犯同一个错，而"当时我是这么想的"比"已修"更能拦住他 ✓。
+  ⚠ **同一形状又一处**（2026-10-17 实测 ✓）：1001 的护盾把 `0.57` / `760` 写成**字面量**、note 里登记成
+  「registered as a data gap，因为引擎的角色都是 1 级」✓ —— 前半句（引擎读不出等级份额）是**真的** ✓，
+  后半句（所以这句话写不了）**是错的** ✗：缺的是 `HEAL` / `SHIELD` 读**当前等级参数**的拼法 ✓，
+  补上之后规则自己就能写 ✓（`percent_from_skill_param` ＋ `amount_from_skill_param` ✓）。
+  ⇒ **"引擎没做"与"句子写不了"是两件事** ✓：前者是**待补的能力** ✓，后者才是**真的缺口** ✗。
 - **撤回留在原地** ✓（§1.3）—— 而**本仓库那两次的撤回原文已经随旧台账被删** ✓
   ⇒ 所以它现在**只活在本节** ✓，别再去别的文件里找 ✗。
 
@@ -984,6 +995,7 @@ C 层全是**填口子** ✓，依赖已完成的机制，**不该出现新架�
 | **1002 的三句减速随动**（终结技 +120% 走基数层、罡风 +40% 走增伤区、星魂 2 冷却 −1） | `DanHengKitCompletionTest` |
 | **地图攻击的入场削韧**（读 slot 6 自己的元素与韧性；非弱点不削；削空即击破；无地图技能的单位拒绝声明） | `MapAttackTest` |
 | **伤害乘区的形状**（增伤四因子相乘 / 易伤上限之外的 `Monster_DamageTakenRatio` / 吸收是减法 / 这四个数从两个单位身上读） | `DamageChainFactorsTest` |
+| **`HEAL` / `SHIELD` 的份额与常数项都读「当前等级」的参数**（两个半都动 / 只读字面量时会红 / 拼法写错在加载期被拒 / 两种金额来源互斥） | `SkillParamMagnitudeTest` |
 | **台账不写"现在是什么"的数字**（套件 / 用例 / 文件 / 方法 / 类 / 规则数、`file:line`、大小、提交数、「N 处」） | `LedgerNumberGuardTest` |
 
 ### 7.2 **只靠散文**（所以上面必须写完整）
