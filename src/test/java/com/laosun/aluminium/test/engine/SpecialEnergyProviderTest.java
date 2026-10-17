@@ -95,14 +95,21 @@ public class SpecialEnergyProviderTest {
     }
 
     /**
-     * The standard provider still uses the constants (20/30/5), matching the standard tier - it does not depend on skill data.
+     * The standard provider reads the skill's <b>own</b> {@code sp_base}, so an off-tier row wins over the conventional
+     * number.
+     *
+     * <p>⚠ <b>CORRECTED (2026-10-17)</b>: this case used to assert the opposite - 20 for a basic attack whose data says
+     * 30 - and its message recorded the constant as the deliberate choice, 「fidelity to the off-tier value is left to
+     * datafication」. That datafication is what happened: the provider now multiplies the row's own {@code sp_base} by the
+     * instance count, and the constants survive only as the fallback for a row that states nothing. A case that pinned
+     * the pre-datafication number would have gone green on the very regression this change is meant to remove.
      */
     @Test
-    public void standardProviderUsesTheConventionalConstants() {
+    public void theProviderReadsTheSkillsOwnSpBase() {
         Character yaoGuang = CharacterFactory.create(1502, 80);   // Yao Guang: the basic-attack data says 30 (off-tier)
-        Assertions.assertEquals(20, standard.onSkillCast(yaoGuang,
+        Assertions.assertEquals(30, standard.onSkillCast(yaoGuang,
                         realSkill(1502, SkillType.COMMON), Set.of()).amount(), EPS,
-                "the standard provider grants the constant 20 (fidelity to the off-tier value is left to datafication)");
+                "the data's own sp_base (30) wins over the conventional 20");
     }
 
     // ==================================================================

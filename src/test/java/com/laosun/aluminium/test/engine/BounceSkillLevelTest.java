@@ -94,6 +94,29 @@ public class BounceSkillLevelTest {
                 "…and they differ, so a row-1 reader cannot pass");
     }
 
+    /**
+     * The count is read from the <b>sentence</b> when the row has none - and even when the row's integer contradicts it.
+     *
+     * <p>Note: Measured on the shipped data: 1009 Asta (艾丝妲) states 「额外造成4次伤害」 and her row is just {@code [0.25]},
+     * so the row heuristic answered "none" and the skill hit <b>once</b>; 8005/8006 state the same sentence while their
+     * row carries a {@code 2} that is <b>not</b> the count. Both cases are pinned here, because the row heuristic alone
+     * cannot tell them apart.
+     */
+    @Test
+    public void theCountComesFromTheSentenceWhenTheRowHasNone() {
+        SkillData astaBounce = SkillData.init(ASTA, 2);
+        Assertions.assertEquals(4, astaBounce.bounceAdditionalHits(astaBounce.bounceDamageShare(10), 10),
+                "「并额外造成4次伤害」 → 4 extra hits (5 in total); her row has no integer at all");
+
+        SkillData trailblazer = SkillData.init(8005, 2);
+        Assertions.assertEquals(4, trailblazer.bounceAdditionalHits(trailblazer.bounceDamageShare(1), 1),
+                "the same sentence, while the row's own 2 means something else");
+
+        SkillData weltBounce = SkillData.init(WELT, 2);
+        Assertions.assertEquals(2, weltBounce.bounceAdditionalHits(weltBounce.bounceDamageShare(1), 1),
+                "1004 Welt (瓦尔特): sentence and row agree on 2 - the case the old heuristic got right");
+    }
+
     // ==================================================================
     // 2. The behaviour follows the same row
     // ==================================================================

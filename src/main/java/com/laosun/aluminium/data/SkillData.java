@@ -151,6 +151,15 @@ public class SkillData {
             java.util.regex.Pattern.compile("<[^>]*>|\\\\n");
 
     /**
+     * The prose a Bounce uses to state its extra hits: 「额外造成 N 次伤害」.
+     *
+     * <p>Measured: this sentence is the ONLY place 1009 Asta (艾丝妲) and 8005/8006 state their count (their rows carry
+     * no such number), and for 8005/8006 the row's {@code 2} is <b>not</b> the count while the sentence says 4.
+     */
+    private static final java.util.regex.Pattern PROSE_EXTRA_HITS =
+            java.util.regex.Pattern.compile("额外造成\\s*(\\d+)\\s*次");
+
+    /**
      * Resolves the skill data of a character skill from the global data set.
      *
      * @param cid     character id (key of {@code skills.json})
@@ -265,6 +274,25 @@ public class SkillData {
     }
 
     /**
+     * The extra hits a Bounce description states <b>in words</b> - 「额外造成 N 次伤害」 - or {@code null} when it says
+     * it another way.
+     *
+     * <p>Reader: 1009 Asta (艾丝妲) 「并额外造成4次伤害」, whose row carries no count at all; 8005/8006 state 4 the same
+     * way while their row's {@code 2} means something else. A number the sentence spells out beats a guess from the
+     * row's shape.
+     */
+    private Integer proseAdditionalHits() {
+        if (description == null) {
+            return null;
+        }
+        java.util.regex.Matcher matcher = PROSE_EXTRA_HITS.matcher(MARKUP.matcher(description).replaceAll(""));
+        if (!matcher.find()) {
+            return null;
+        }
+        return Integer.parseInt(matcher.group(1));
+    }
+
+    /**
      * The enum parsed from the data's {@code attack_type} - use this to branch, do not take the
      * bare string from {@link #getSkillType()} and {@code switch}/{@code equals} on it.
      *
@@ -337,14 +365,24 @@ public class SkillData {
     }
 
     /**
-     * The number of ADDITIONAL hits a Bounce skill's description states: the integer parameter that is not the damage share.
-     * 1004's `2` and 1108's `4` are such numbers; 1009 states its count in prose, so this returns {@code null} for it.
+     * The number of ADDITIONAL hits a Bounce skill states: <b>the prose first</b> ("额外造成 N 次伤害"), and only
+     * then the row's integer that is not the damage share.
+     *
+     * <p><b>Why the prose wins.</b> Measured against the shipped data: 1009 Asta (艾丝妲) and 8005/8006 state their
+     * count <b>only in prose</b> - Asta's row is {@code [0.25]} with no integer at all (so the old row heuristic
+     * answered "none" and the skill hit <b>once</b> instead of five times), and 8005's row carries a {@code 2} that is
+     * <b>not</b> its count while the prose says 4. 1004 Welt (瓦尔特) is the one case where they agree ({@code 2}).
+     * A number the sentence states needs no heuristic.
      *
      * @param damageShare the share read from the SAME row (pass {@link #bounceDamageShare(int)}'s result, or the scan
      *                    would count the share itself as the hit count on a row where the two differ)
      * @param level       the level whose row is read
      */
     public Integer bounceAdditionalHits(Double damageShare, int level) {
+        Integer saidInProse = proseAdditionalHits();
+        if (saidInProse != null) {
+            return saidInProse;
+        }
         if (skills.isEmpty()) {
             return null;
         }
