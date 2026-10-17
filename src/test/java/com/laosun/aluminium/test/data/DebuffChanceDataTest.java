@@ -31,20 +31,39 @@ public class DebuffChanceDataTest {
     @Test
     public void theChanceIsThePlaceholderNextToTheProbabilityWording() {
         // the wording that states a base chance: "有<unbreak>#1[i]%</unbreak>的<u>基础概率</u>" -> param[0] = 1
-        Assertions.assertEquals(1.0, SkillData.init(1003, 7).debuffChance(), 1e-9,
+        Assertions.assertEquals(1.0, SkillData.init(1003, 7).debuffChance(1), 1e-9,
                 "Himeko Incomplete Combustion (不完全燃烧): #1 → param_list[0]");
         // the same wording: "有<unbreak>#1[i]%</unbreak>的<u>基础概率</u>" -> param[0] = 1
-        Assertions.assertEquals(1.0, SkillData.init(1004, 7).debuffChance(), 1e-9,
+        Assertions.assertEquals(1.0, SkillData.init(1004, 7).debuffChance(1), 1e-9,
                 "Welt Gravitational Imprisonment (画地为牢): #1 → param_list[0]");
         // the fixed-chance wording: "有<unbreak>#2[i]%</unbreak><u>固定概率</u>" -> param[1] = 1 (no possessive marker, and NOT index 0)
-        Assertions.assertEquals(1.0, SkillData.init(1108, 7).debuffChance(), 1e-9,
+        Assertions.assertEquals(1.0, SkillData.init(1108, 7).debuffChance(1), 1e-9,
                 "Sampo Shining Bright (你最闪亮): #2 → param_list[1]; this is what proves the slot is read from the text");
         // the coloured form: "有<color=#f29e38ff><unbreak>#4[i]%</unbreak></color>的<u>基础概率</u>" -> param[3] = 0.6
-        Assertions.assertEquals(0.6, SkillData.init(1006, 4).debuffChance(), 1e-9,
+        Assertions.assertEquals(0.6, SkillData.init(1006, 4).debuffChance(1), 1e-9,
                 "Silver Wolf Waiting for Program Response (等待程序响应): #4 → param_list[3] = 0.6");
         // the coloured form again: "有<color=#f29e38ff><unbreak>#2[i]%</unbreak></color>的<u>基础概率</u>" -> param[1] = 0.5
-        Assertions.assertEquals(0.5, SkillData.init(1307, 4).debuffChance(), 1e-9,
+        Assertions.assertEquals(0.5, SkillData.init(1307, 4).debuffChance(1), 1e-9,
                 "Black Swan Loom of Fate's Caprice (无端命运的机杼): #2 → param_list[1] = 0.5 (the text names it twice, both #2)");
+    }
+
+    /**
+     * The <b>level</b> decides which row is read - the anchors above are row 1, and this is the case that would have
+     * stayed green while the reader ignored the level.
+     *
+     * <p>Note: {@code debuffChance()} used to take no level at all and read {@code param_list[0]} unconditionally.
+     * 1004 Welt (瓦尔特)'s Bounce is the measurement: its chance is {@code 0.65} at row 1 and {@code 0.75} at row 10, so
+     * a leveled read and a row-1 read cannot be confused.
+     */
+    @Test
+    public void theLevelSelectsTheRow() {
+        SkillData weltBounce = SkillData.init(1004, 2);
+        Assertions.assertEquals(0.65, weltBounce.debuffChance(1), 1e-9, "row 1");
+        Assertions.assertEquals(0.75, weltBounce.debuffChance(10), 1e-9, "row 10");
+        Assertions.assertEquals(weltBounce.debuffChance(3), weltBounce.debuffChance(3), 1e-9,
+                "the same level answers the same number twice");
+        Assertions.assertNotEquals(weltBounce.debuffChance(1), weltBounce.debuffChance(10), 1e-9,
+                "…and these two are different rows, so a reader that ignores the level cannot pass");
     }
 
     /**
@@ -58,7 +77,7 @@ public class DebuffChanceDataTest {
 
         Assertions.assertEquals(15.0, plannedWrongValue, 1e-9,
                 "the number the old plan would have read as a base chance (it is a duration in seconds)");
-        Assertions.assertNotEquals(plannedWrongValue, himekoTechnique.debuffChance(), 1e-9,
+        Assertions.assertNotEquals(plannedWrongValue, himekoTechnique.debuffChance(1), 1e-9,
                 "reading param_list[3] would report a 1500% base chance, which hitChance clamps to "
                         + "'always lands' -- a wrong answer that looks like a correct one");
     }
@@ -72,7 +91,7 @@ public class DebuffChanceDataTest {
      */
     @Test
     public void aSkillWhoseTextStatesNoChanceReportsNoChance() {
-        Assertions.assertNull(SkillData.init(1315, 2).debuffChance(),
+        Assertions.assertNull(SkillData.init(1315, 2).debuffChance(1),
                 "Boothill Standoff (绝命对峙): the description states no probability, so there is nothing to read");
     }
 
@@ -99,7 +118,7 @@ public class DebuffChanceDataTest {
                 if (data.getEffect() != SkillEffectType.IMPAIR) {
                     continue;
                 }
-                Double chance = data.debuffChance();
+                Double chance = data.debuffChance(1);
                 if (chance == null) {
                     continue;
                 }

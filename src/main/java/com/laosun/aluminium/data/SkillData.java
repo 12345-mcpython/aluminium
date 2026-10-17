@@ -215,11 +215,13 @@ public class SkillData {
      * <p>Matching stops at the first hit, which is what the data needs: when a description names the
      * chance twice (130/4 Black Swan) both spellings point at the same placeholder.
      *
-     * @return the chance ({@code param_list} of level 1), or {@code null} when the description states
+     * @param level the level the row is read at - the caller resolves it through
+     *              {@link com.laosun.aluminium.models.CanHit#skillLevel}, the one resolver every read site uses
+     * @return the chance at that row, or {@code null} when the description states
      * no chance at all - which is a real answer, not a failure: 14 of the 28 {@code Impair}
      * skills (e.g. 1315/2 Boothill (波提欧)'s [Standoff (绝命对峙)]) apply their effect unconditionally
      */
-    public Double debuffChance() {
+    public Double debuffChance(int level) {
         if (description == null || skills.isEmpty()) {
             return null;
         }
@@ -241,10 +243,25 @@ public class SkillData {
                 continue;
             }
             int index = Integer.parseInt(matcher.group(1)) - 1;   // placeholders are 1-based
-            List<Double> level1 = skills.getFirst();
-            return index >= 0 && index < level1.size() ? level1.get(index) : null;
+            List<Double> row = rowAt(level);
+            return index >= 0 && index < row.size() ? row.get(index) : null;
         }
         return null;
+    }
+
+    /**
+     * The parameter row a level reads, clamped to the table - the same 「row count IS the level cap」 reading
+     * {@code CanHit.skillLevel} applies, so a caller that hands over a level resolved there cannot land outside.
+     *
+     * <p>Note: It exists because three readers here (the bounce share, the bounce hit count and the debuff chance) used
+     * to read {@code skills.getFirst()} unconditionally. That was invisible while the values happened to be flat across
+     * rows, and became a wrong number once the content stated its level convention (「the document quotes Lv10」):
+     * measured on 1004 Welt (瓦尔特)'s Bounce, the per-hit share was read as 0.36 (row 1) while the damage multiplier
+     * came from row 10, which says 0.72.
+     */
+    private List<Double> rowAt(int level) {
+        int index = Math.max(0, Math.min(level, skills.size()) - 1);
+        return skills.get(index);
     }
 
     /**
@@ -295,11 +312,13 @@ public class SkillData {
      *
      * <p>Bounce rows do not agree on layout: 1009 is `[0.25]` (its "额外造成4次", "4 extra hits", is prose only), 1108 is `[4, 0.28]` (count first) and 1004 is
      * `[0.36, 0.65, 0.1, 2]` (count last). The only reliable map is the description: the share is the parameter a `#N[i]` placeholder
-     * references immediately before a `%`, read the same way {@link #debuffChance()} reads its own.
+     * references immediately before a `%`, read the same way {@link #debuffChance(int)} reads its own.
      *
-     * @return the level-1 share, or {@code null} when the description does not state one
+     * @param level the level whose row is read - resolved by the caller through
+     *              {@link com.laosun.aluminium.models.CanHit#skillLevel}
+     * @return the share at that row, or {@code null} when the description does not state one
      */
-    public Double bounceDamageShare() {
+    public Double bounceDamageShare(int level) {
         if (description == null || skills.isEmpty()) {
             return null;
         }
@@ -311,8 +330,8 @@ public class SkillData {
                 continue;
             }
             int index = Integer.parseInt(matcher.group(1)) - 1;   // placeholders are 1-based
-            List<Double> level1 = skills.getFirst();
-            return index >= 0 && index < level1.size() ? level1.get(index) : null;
+            List<Double> row = rowAt(level);
+            return index >= 0 && index < row.size() ? row.get(index) : null;
         }
         return null;
     }
@@ -320,12 +339,16 @@ public class SkillData {
     /**
      * The number of ADDITIONAL hits a Bounce skill's description states: the integer parameter that is not the damage share.
      * 1004's `2` and 1108's `4` are such numbers; 1009 states its count in prose, so this returns {@code null} for it.
+     *
+     * @param damageShare the share read from the SAME row (pass {@link #bounceDamageShare(int)}'s result, or the scan
+     *                    would count the share itself as the hit count on a row where the two differ)
+     * @param level       the level whose row is read
      */
-    public Integer bounceAdditionalHits(Double damageShare) {
+    public Integer bounceAdditionalHits(Double damageShare, int level) {
         if (skills.isEmpty()) {
             return null;
         }
-        for (Double value : skills.getFirst()) {
+        for (Double value : rowAt(level)) {
             if (value == null || value.equals(damageShare)) {
                 continue;
             }

@@ -521,11 +521,11 @@ public final class SkillExecutor {
                 // Note: Bounce rows disagree on layout (measured): 1009 `[0.25]` (count in prose), 1108 `[4, 0.28]`
                 // (count first), 1004 `[0.36, 0.65, 0.1, 2]` (count last). Reading a fixed index makes shipped Welt compute
                 // `(int) 0.65` = 0 hits, i.e. no damage at all - so both numbers now come from the description's placeholders.
-                Double bounceShare = data.bounceDamageShare();
+                Double bounceShare = data.bounceDamageShare(user.skillLevel(skill));
                 double bounceBase = bounceShare == null
                         ? base
                         : user.getAttribute(baseAttribute).get() * bounceShare;
-                Integer additional = data.bounceAdditionalHits(bounceShare);
+                Integer additional = data.bounceAdditionalHits(bounceShare, user.skillLevel(skill));
                 int hits = (additional == null ? 0 : additional) + 1;
                 // plus whatever a rule has granted this slot.
                 hits += user.skillHitBonus(skill.getSkillSlot());   // "additionally deal N instances": the total is N + 1
