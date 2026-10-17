@@ -229,7 +229,7 @@ final class TriggerVocabulary {
      * The ops that actually read {@code scope_element} (see the guard in
      * {@link TriggerValidator#validateOne}).
      *
-     * <p>\u26a0 One op, and the set exists for the reason {@link #DAMAGE_TYPE_READERS} does: the engine has no global
+     * <p>⚠ One op, and the set exists for the reason {@link #DAMAGE_TYPE_READERS} does: the engine has no global
      * "unknown argument" check, so a field one op reads is SILENTLY IGNORED by every other. A rule that wrote
      * {@code scope_element} on, say, {@code APPLY_BUFF} would look scoped and not be.
      */

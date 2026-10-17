@@ -18,9 +18,9 @@ public class PearlDeepStudyStateTest {
     private static final int PEARL = 1503;
     private static final int ELATION = 1502;
     private static final int HUNTER = 1204;
-    private static final String ARCHETYPE = "\u7f8e\u5b66\u5e95\u672c";
-    private static final String DEEP = "\u6df1\u5ea6\u5b66\u4e60";
-    private static final String COUNTER = "\u597d\u6d3b\u5f53\u8d4f";
+    private static final String ARCHETYPE = "美学底本";
+    private static final String DEEP = "深度学习";
+    private static final String COUNTER = "好活当赏";
 
     @Test
     public void theUltimateMarksTheArchetypeAndTheDeepLearner() {

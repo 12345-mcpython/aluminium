@@ -1420,7 +1420,7 @@ public final class TriggerInterpreter {
         com.laosun.aluminium.enums.DamageElement elementScope = parseScopeElement(effect, "MODIFY_DAMAGE_TAKEN");
         for (CanHit target : TriggerTargets.resolveTargets(battle, effect, ctx)) {
             AbstractBuff zone = withSource(TriggerLifetimes.withTickOwner(TriggerLifetimes.withLifetime(percent > 0
-                    // \u26a0 The element scope goes to the VULNERABILITY branch only: measured, `ReductionBuff` has no scope
+                    // ⚠ The element scope goes to the VULNERABILITY branch only: measured, `ReductionBuff` has no scope
                     // field and no guard at all -- only the vulnerability half ever scoped.
                     ? new VulnerabilityBuff(turns, percent, permanent, scope, elementScope)
                     : new ReductionBuff(turns, -percent, permanent, scope), effect), effect, ctx), ctx);
@@ -2170,7 +2170,7 @@ public final class TriggerInterpreter {
         DamageType damageType = effect.getDamageType() == null || effect.getDamageType().isBlank()
                 ? null
                 : DamageType.fromString(effect.getDamageType().trim());
-        // \u26a0 A rule whose `skill` is TALENT deals a Talent's damage, and stating it here is what lets a screen tell it from a
+        // ⚠ A rule whose `skill` is TALENT deals a Talent's damage, and stating it here is what lets a screen tell it from a
         // counter or an ultimate's extra hits -- measured, all three arrive as ADDITIONAL and a front end cannot separate them
         // from the rule ordering (six attempts, each breaking a different case). The rule says so, so the engine stamps it.
         // A rule that names its own `damage_type` keeps it: that is a deliberate statement about the instance.

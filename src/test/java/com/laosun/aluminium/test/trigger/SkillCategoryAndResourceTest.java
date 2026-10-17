@@ -84,7 +84,7 @@ public class SkillCategoryAndResourceTest {
         Assertions.assertFalse(weird.isUnspecified(), "unrecognized ≠ legitimate empty; the two must be distinguishable");
 
         // Extreme input must not blow up either
-        Assertions.assertEquals(SkillCategory.UNKNOWN, SkillCategory.fromString("\u0000"));
+        Assertions.assertEquals(SkillCategory.UNKNOWN, SkillCategory.fromString("\0"));
         Assertions.assertEquals(SkillCategory.UNKNOWN, SkillCategory.fromString("Normal2"));
     }
 

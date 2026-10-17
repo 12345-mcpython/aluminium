@@ -13,10 +13,10 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 /**
- * F-3: \u300c\u5f3a\u5316\u666e\u653b\u65e0\u6cd5\u6062\u590d\u6218\u6280\u70b9\u300d, from the data's bp_add column (2026-10-02).
+ * F-3: 「强化普攻无法恢复战技点」, from the data's bp_add column (2026-10-02).
  */
 public class BoothillEnhancedBasicTest {
-    private static final String STANDOFF = "\u7edd\u547d\u5bf9\u5cd9";
+    private static final String STANDOFF = "绝命对峙";
 
     @Test
     public void theEnhancedBasicRestoresNothingWhileTheOrdinaryOneRestoresAPoint() {

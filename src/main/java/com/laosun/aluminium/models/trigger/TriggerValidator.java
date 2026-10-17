@@ -1806,7 +1806,7 @@ final class TriggerValidator {
     /**
      * Validates the optional {@code scope_element} of a damage-taken zone: an optional argument, but a CLOSED-SET one.
      *
-     * <p>\u26a0 Optional, so an absent one passes. But a misspelling must not: {@link DamageElement#fromString} answers {@code null}
+     * <p>⚠ Optional, so an absent one passes. But a misspelling must not: {@link DamageElement#fromString} answers {@code null}
      * for "Unknown" and for typos alike, and {@code parseScopeElement} turns that null into "no scope", i.e. a zone that applies to
      * EVERY element -- a wrong number with no symptom, which is the hole the closed-set checks in this class exist to close.
      *

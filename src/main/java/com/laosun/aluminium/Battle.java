@@ -124,7 +124,7 @@ public class Battle {
     /**
      * Told that a weakness break just happened.
      *
-     * <p>\u26a0 <b>Why this exists: a break was broadcast only to the buff hooks.</b> The engine fires {@code events.weaknessBreak}
+     * <p>⚠ <b>Why this exists: a break was broadcast only to the buff hooks.</b> The engine fires {@code events.weaknessBreak}
      * so buffs can react, and a LISTENER -- the thing a screen attaches -- was never told, so seven breaks in one battle
      * produced no log line at all.
      *
@@ -146,7 +146,7 @@ public class Battle {
     /**
      * Told that a control state landed on a unit.
      *
-     * <p>\u26a0 Landed, not attempted: the engine rolls the control through the resist pipeline, and a resisted application is a
+     * <p>⚠ Landed, not attempted: the engine rolls the control through the resist pipeline, and a resisted application is a
      * different event. Reporting the attempt would claim a freeze that never happened.
      *
      * @see #addControlObserver(ControlObserver)
@@ -167,7 +167,7 @@ public class Battle {
     /**
      * Told that a turn was skipped, and why.
      *
-     * <p>\u26a0 <b>Why this exists: a skipped turn looked like an action that did nothing.</b> The log showed
+     * <p>⚠ <b>Why this exists: a skipped turn looked like an action that did nothing.</b> The log showed
      * `held -- cannot act` while the engine has TWO different reasons a unit may not act -- it is broken, or a control forbids
      * it -- and the reader had to guess which. Measured over one battle: seven breaks and twenty-three turns with a control
      * present, none of them distinguishable in the log.
@@ -189,7 +189,7 @@ public class Battle {
     /**
      * Told that a data rule fired, and what it did.
      *
-     * <p>\u26a0 <b>Why this exists: the engine announces EFFECTS, never "a rule fired".</b> Measured over twenty turns, 44 rule
+     * <p>⚠ <b>Why this exists: the engine announces EFFECTS, never "a rule fired".</b> Measured over twenty turns, 44 rule
      * effects were applied and only six of them -- the damage, shield and heal -- produced anything a screen could show. The
      * rest were silent, so a talent whose whole effect is "raise the skill level" or "gain a resource" was invisible: it
      * happened, and nothing anywhere said so.
@@ -204,7 +204,7 @@ public class Battle {
         /**
          * One rule effect was applied.
          *
-         * <p>\u26a0 A rule that does several things reports each of them separately, because they are applied separately -- a
+         * <p>⚠ A rule that does several things reports each of them separately, because they are applied separately -- a
          * talent that freezes a target and heals its owner is two effects, and collapsing them would hide one.
          *
          * @param owner the unit the rule belongs to
@@ -1440,7 +1440,7 @@ public class Battle {
         if (holder == null || holder.isDeath()) {
             return;
         }
-        laughSnapshots.put(holder, new Snapshot(partyResourceValue("\u7b11\u70b9"), Math.max(1, turns)));
+        laughSnapshots.put(holder, new Snapshot(partyResourceValue("笑点"), Math.max(1, turns)));
     }
 
     /**
@@ -2061,7 +2061,7 @@ public class Battle {
      * @param early      {@code true} = before the move, {@code false} = after it
      */
     private void tickForeignBuffs(CanHit clockOwner, boolean early) {
-        // \u26a0 BOTH camps. This walked `allies` only, so a state on an ENEMY whose clock is one of our characters was never
+        // ⚠ BOTH camps. This walked `allies` only, so a state on an ENEMY whose clock is one of our characters was never
         // spent: measured, 1203 Luocha's zone -- applied to all enemies, `ticksOn: "self"` -- held `duration() == 2` for fifteen
         // consecutive turns with `tickOwner` correctly set to him. Nothing was wrong with the anchor; the sweep never reached it.
         //
@@ -2076,7 +2076,7 @@ public class Battle {
     /**
      * Every combatant on both sides, for the sweeps that must reach either camp.
      *
-     * <p>\u26a0 Not `allies` plus `enemies` field access: the roster is fixed after construction but a summon joins mid-battle,
+     * <p>⚠ Not `allies` plus `enemies` field access: the roster is fixed after construction but a summon joins mid-battle,
      * and a sweep that read a stale list would miss it -- the same reason {@code Battle.enemyUnits()} exists.
      *
      * @return the combatants
@@ -2526,7 +2526,7 @@ public class Battle {
         // reaches this line a second time).
         // Placed before damage/delay/DOT/energy: listeners want the moment of "just got broken".
         broadcastBreak(attacker, enemy, element);
-        // \u26a0 And to the listener. `broadcastBreak` above reaches the buff hooks only, so a screen was never told a break had
+        // ⚠ And to the listener. `broadcastBreak` above reaches the buff hooks only, so a screen was never told a break had
         // happened -- measured: seven breaks in one battle, no log line for any of them.
         announceBroken(attacker, enemy, element);
         fireTriggersWithSubject(TriggerEvent.BREAK, attacker, enemy, 0, fromCast);

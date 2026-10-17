@@ -33,7 +33,7 @@ public class LuochaTechniqueTest {
     private static final int LEVEL = 80;
 
     /**
-     * \u2b50 The declared technique opens the battle with the zone already on the enemies.
+     * ⭐ The declared technique opens the battle with the zone already on the enemies.
      */
     @Test
     public void theDeclaredTechniqueExpandsTheZoneOnTheEnemies() {
@@ -46,7 +46,7 @@ public class LuochaTechniqueTest {
     }
 
     /**
-     * \u2b50 And the control: without the declaration the zone is not there.
+     * ⭐ And the control: without the declaration the zone is not there.
      *
      * <p>Told apart from "the rule works", because a zone that appeared for some other reason would satisfy the case above.
      */
@@ -60,7 +60,7 @@ public class LuochaTechniqueTest {
     }
 
     /**
-     * \u2b50 The zone is on the enemies, NOT on him.
+     * ⭐ The zone is on the enemies, NOT on him.
      *
      * <p>⚠ Asserted negatively as well, because the defect was exactly a zone that existed in the wrong place: a case that only
      * asked "is there a 结界 anywhere" would have passed against the broken version.

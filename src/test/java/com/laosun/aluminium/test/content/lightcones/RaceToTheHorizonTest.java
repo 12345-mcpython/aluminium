@@ -58,7 +58,7 @@ public class RaceToTheHorizonTest {
                 + " (eleven)");
         Assertions.assertEquals(before + 0.03, one, 1e-9, "one follow-up is +3%");
         Assertions.assertEquals(before + 0.30, full, 1e-9, "ten is +30%");
-        Assertions.assertEquals(full, extra, 1e-9, \u0022and the eleventh changes nothing: 最多叠加 10 层\u0022);
+        Assertions.assertEquals(full, extra, 1e-9, "and the eleventh changes nothing: 最多叠加 10 层");
     }
 
     @Test

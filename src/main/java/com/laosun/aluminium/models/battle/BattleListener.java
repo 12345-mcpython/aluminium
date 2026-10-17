@@ -115,7 +115,7 @@ public interface BattleListener {
     /**
      * A broken unit's break ended and it acted again.
      *
-     * <p>\u26a0 The complement of {@link #onTurnSkipped}: without it a break's end was invisible, and the log could not say
+     * <p>⚠ The complement of {@link #onTurnSkipped}: without it a break's end was invisible, and the log could not say
      * whether the unit was still broken or had recovered on this very turn.
      *
      * @param unit the unit that recovered
@@ -126,7 +126,7 @@ public interface BattleListener {
     /**
      * A weakness break happened.
      *
-     * <p>\u26a0 Announced because it was invisible: the engine broadcast it to the buff hooks, and a screen was never told, so
+     * <p>⚠ Announced because it was invisible: the engine broadcast it to the buff hooks, and a screen was never told, so
      * seven breaks in one battle left no trace.
      *
      * @param attacker who broke it
@@ -139,7 +139,7 @@ public interface BattleListener {
     /**
      * A control state landed on a unit.
      *
-     * <p>\u26a0 Landed, not attempted -- a resisted control is a different event.
+     * <p>⚠ Landed, not attempted -- a resisted control is a different event.
      *
      * @param applier who applied it
      * @param target  the unit it landed on
@@ -151,7 +151,7 @@ public interface BattleListener {
     /**
      * A unit's turn was skipped, and why.
      *
-     * <p>\u26a0 The reason matters: a broken unit and a controlled one both fail to act, and the log could not tell them apart.
+     * <p>⚠ The reason matters: a broken unit and a controlled one both fail to act, and the log could not tell them apart.
      *
      * @param unit   whose turn it was
      * @param broken whether the cause was a break
@@ -162,7 +162,7 @@ public interface BattleListener {
     /**
      * A unit died.
      *
-     * <p>\u26a0 Announced because a death was otherwise silent: the unit simply stopped appearing in the action bar, and a
+     * <p>⚠ Announced because a death was otherwise silent: the unit simply stopped appearing in the action bar, and a
      * reader could not tell a kill from a target that had gone out of range.
      *
      * @param unit the unit that died

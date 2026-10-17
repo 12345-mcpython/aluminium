@@ -17,7 +17,7 @@ import java.util.List;
 public class PearlTraceCounterTest {
     private static final int PEARL = 1503;
     private static final int ALLY = 1204;
-    private static final String COUNTER = "\u597d\u6d3b\u5f53\u8d4f";
+    private static final String COUNTER = "好活当赏";
 
     @Test
     public void anAllyTurnStartGrantsFiveCappedAtFifty() {
