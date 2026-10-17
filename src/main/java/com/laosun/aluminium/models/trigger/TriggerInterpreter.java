@@ -1332,18 +1332,11 @@ public final class TriggerInterpreter {
      * share (read from the same row) moves with it. A hybrid of "current-level share" and "authored-level constant" is
      * a number no level of the Skill produces.
      *
-     * <p>Note: A rule that states neither reads {@code 0}, which is what {@link #scaledAmount} has always returned for
-     * an absent {@code amount} (the ops that require one are refused at load time by {@code requireAmount}).
+     * <p>Note: This is the same reader the derived magnitudes use - {@link TriggerMagnitudes#constantTerm} - so the
+     * flat and the derived paths cannot disagree about where a constant comes from.
      */
     private static double flatAmount(EffectSpec effect, TriggerContext ctx) {
-        if (effect.getAmount() != null) {
-            return effect.getAmount();
-        }
-        if (effect.getAmountFromSkillParam() != null) {
-            return TriggerMagnitudes.ownerSkillParamValue(effect, ctx,
-                    effect.getAmountFromSkillParam().trim());
-        }
-        return 0;
+        return TriggerMagnitudes.constantTerm(effect, ctx);
     }
 
 

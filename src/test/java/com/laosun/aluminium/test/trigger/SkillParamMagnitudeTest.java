@@ -6,6 +6,7 @@ import com.laosun.aluminium.beans.EffectSpec;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.Character;
+import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.trigger.TriggerTable;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.test.support.TriggerSpecs;
@@ -165,27 +166,52 @@ public class SkillParamMagnitudeTest {
     }
 
     /**
-     * An op that does <b>not</b> read the level-aware constant refuses it rather than reading 0.
+     * The same spelling on a per-turn damage: {@code APPLY_DOT}'s constant term can come from the row too.
      *
-     * <p>Note: {@code APPLY_DOT}'s per-turn damage reads its constant term literally, so a rule that stated
-     * {@code amount_from_skill_param} there would load, pass every gate, and settle a DOT with no constant - the exact
-     * "wrong number with no symptom" this validator exists to prevent. The share spelling is fine there (that one the
-     * DOT path does read), which is why the refusal names the constant only.
+     * <p>Note: This family used to <b>refuse</b> the level-aware constant, because {@code dotMagnitude} read only a
+     * literal - so a rule that stated it would have been accepted and then settled with no constant. The reader is now
+     * the shared {@code constantTerm}, and this case pins that the DOT sees it: the per-turn value is
+     * {@code row[0] x ATK + row[1]}, at two different rows.
      */
     @Test
-    public void opsThatDoNotReadTheConstantRefuseIt() {
-        EffectSpec dot = new EffectSpec();
-        TriggerSpecs.set(dot, "op", "APPLY_DOT");
-        TriggerSpecs.set(dot, "element", "Ice");
-        TriggerSpecs.set(dot, "scale", "self_attr:ATTACK");
-        TriggerSpecs.set(dot, "percentFromSkillParam", "ULTRA:3");
-        TriggerSpecs.set(dot, "amountFromSkillParam", "ULTRA:0");
-        TriggerSpecs.set(dot, "turns", 1);
+    public void aDotsConstantCanComeFromTheRowToo() {
+        double atOne = dotPerTurnAt(1);
+        double atTen = dotPerTurnAt(10);
 
-        IllegalArgumentException refused = Assertions.assertThrows(IllegalArgumentException.class,
-                () -> new TriggerTable(MARCH, List.of(TriggerSpecs.rule("BATTLE_START", null, dot))));
-        Assertions.assertTrue(refused.getMessage().contains("amount_from_skill_param"), refused.getMessage());
-        Assertions.assertTrue(refused.getMessage().contains("APPLY_DOT"), refused.getMessage());
+        Character reference = Character.builder().cid(MARCH).level(LEVEL).build();
+        var rows = reference.getSkills().get(SkillType.SKILL).getData().getSkills();
+        double attack = reference.getAttribute(AttributeType.ATTACK).get();
+
+        Assertions.assertEquals(rows.get(0).get(0) * attack + rows.get(0).get(1), atOne, EPS,
+                "row 1: " + rows.get(0));
+        Assertions.assertEquals(rows.get(9).get(0) * attack + rows.get(9).get(1), atTen, EPS,
+                "row 10: " + rows.get(9));
+        Assertions.assertNotEquals(atOne, atTen, EPS,
+                "…and the two levels differ, or the DOT was reading a frozen pair");
+    }
+
+    /**
+     * {@code percent_from_cast_param} works for a <b>character</b> caster, not only for a memosprite.
+     *
+     * <p>Note: It used to require the actor to be a {@code Summon}, so an ordinary character's "the skill I just cast"
+     * number had to be spelled {@code percent_from_skill_param} with the slot named by hand. The reader now resolves the
+     * slot the context carries ({@code Skill.getSkillSlot()}) against the caster's own skills, so both kinds answer.
+     */
+    @Test
+    public void theCastSpellingAlsoAnswersForACharacterCaster() {
+        double atOne = shieldFromTheCastAt(1);
+        double atTen = shieldFromTheCastAt(10);
+
+        Character reference = Character.builder().cid(MARCH).level(LEVEL).build();
+        var rows = reference.getSkills().get(SkillType.SKILL).getData().getSkills();
+        double defence = reference.getAttribute(AttributeType.DEFENCE).get();
+
+        Assertions.assertEquals(rows.get(0).get(0) * defence, atOne, EPS,
+                "#1 of the row of the skill that was actually cast (row 1): " + rows.get(0));
+        Assertions.assertEquals(rows.get(9).get(0) * defence, atTen, EPS,
+                "…and at row 10, because 「the skill that produced the event」 is at its own level: " + rows.get(9));
+        Assertions.assertNotEquals(atOne, atTen, EPS,
+                "a memosprite-only reader could not have produced two answers here");
     }
 
     // ==================================================================
@@ -202,6 +228,62 @@ public class SkillParamMagnitudeTest {
             builder = builder.skillLevel(SkillType.SKILL);
         }
         return builder.build();
+    }
+
+    /**
+     * The per-turn damage of a rule-applied DOT whose share AND constant both come from her Skill's row, at the given
+     * Skill level. Bound against a dummy so the value is the buff's own magnitude, not a settled number.
+     */
+    private static double dotPerTurnAt(int skillLevel) {
+        EffectSpec dot = new EffectSpec();
+        TriggerSpecs.set(dot, "op", "APPLY_DOT");
+        TriggerSpecs.set(dot, "element", "Fire");
+        TriggerSpecs.set(dot, "scale", "self_attr:ATTACK");
+        TriggerSpecs.set(dot, "percentFromSkillParam", "SKILL:0");
+        TriggerSpecs.set(dot, "amountFromSkillParam", "SKILL:1");
+        TriggerSpecs.set(dot, "turns", 2);
+        TriggerSpecs.set(dot, "target", "all_enemies");
+
+        Character.Builder builder = Character.builder().cid(MARCH).level(LEVEL)
+                .triggerTable(new TriggerTable(MARCH, List.of(TriggerSpecs.rule("ULT_CAST", null, dot))));
+        for (int i = 1; i < skillLevel; i++) {
+            builder = builder.skillLevel(SkillType.SKILL);
+        }
+        Character march = builder.build();
+        Enemy enemy = BattleFixture.monster();
+        Battle battle = new Battle(List.of(march), List.of(enemy), BattleFixture.seeded());
+        battle.startBattle();
+        battle.castImmediate(march.getSkills().get(SkillType.ULTRA), march, List.of(enemy));
+
+        var burn = enemy.getBuffManager().findBuff(com.laosun.aluminium.models.buff.DotBuff.class);
+        Assertions.assertNotNull(burn, "precondition: the DOT landed on the enemy");
+        return burn.getBaseDamage();
+    }
+
+    /**
+     * A shield whose share is {@code percent_from_cast_param} - "the skill that produced THIS event", which here is a
+     * <b>character's</b> Skill cast.
+     */
+    private static double shieldFromTheCastAt(int skillLevel) {
+        EffectSpec effect = new EffectSpec();
+        TriggerSpecs.set(effect, "op", "SHIELD");
+        TriggerSpecs.set(effect, "scale", "owner_def");
+        TriggerSpecs.set(effect, "percentFromCastParam", 0);
+        TriggerSpecs.set(effect, "turns", 3);
+        TriggerSpecs.set(effect, "target", "target");
+
+        Character.Builder builder = Character.builder().cid(MARCH).level(LEVEL)
+                .triggerTable(new TriggerTable(MARCH,
+                        List.of(TriggerSpecs.rule("SKILL_CAST", null, effect))));
+        for (int i = 1; i < skillLevel; i++) {
+            builder = builder.skillLevel(SkillType.SKILL);
+        }
+        Character march = builder.build();
+        Battle battle = new Battle(List.of(march), List.of(BattleFixture.dummy()), BattleFixture.seeded());
+        battle.startBattle();
+        battle.castImmediate(new com.laosun.aluminium.models.skill.DefaultSkill(MARCH, 2, skillLevel), march,
+                List.of(march));
+        return march.getShield();
     }
 
     /**
