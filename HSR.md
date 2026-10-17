@@ -26,11 +26,22 @@
 ```
 敌人属性 = 基础值 × 等级组系数 × 自身调整系数 × Π精英组别系数 + 自身调整值
 ```
+**完整链路（已逐项验证，详见 §10.7）**：
+```
+敌人属性 = 模板基础值 (tbgd MonsterTemplateConfig)
+         × 等级组系数 (来自「关卡」StageConfig.HardLevelGroup + Level)
+         × 自身调整系数 (MonsterConfig；HP 用 health_modify_ratio)
+         × 精英组系数 (来自「波次」StageInfiniteMonsterGroup.EliteGroup
+                       → EliteGroup / InfiniteEliteGroup 的 HPRatio)
+```
+- **等级组 / 精英组都不来自怪物自身**：怪物自身的 `hard_level_group` / `elite_group` 通常恒为 1，真正的组号与等级由**关卡**给，精英组由**波次**给。
+- HP 的自身调整字段是 **`health_modify_ratio`**；同文件里的 `hp_modify_ratio` 是解析残留的**幽灵字段**（恒为 1），误用会导致 HP 差几倍。
+- 普通关卡用 `EliteGroup.json`；无限波次关卡（`_StageInfiniteGroup`）用 **`InfiniteEliteGroup.json`** —— **用错表 HP 会差几倍**。
 - 通用等级组：90 级敌人防御 ≈ `200 + 10 × 等级`（扑满 `300 + 15 × 等级`）。
 - 部分精英 90 级速度可达 190.08。
 - 双爆：基础暴击率 0%、暴伤 20%，不随等级成长。
 - 效果命中：50 级后每级 +0.8%，90 级 32%。
-- 效果抵抗：精英/Boss 20%–30%，50 级后每级 +0.4%，90 级 30%–40%。
+- 效果抵抗：精英/Boss 20%–30%，50 级后每级 +0.4%，90 级 30%–40%。**该字段是加法**：`模板值 + 等级组值`（如冰锋 0.2 + 组1-Lv90 的 0.1 = 0.3），不是相乘。
 
 ---
 
@@ -56,6 +67,14 @@
 - **减伤区** `Π(1 - 减伤)`：来源受击方增益，乘算，下限 **0.01**（减伤上限 0.99）
 - **虚弱区** `1 - Σ虚弱系数`：来源攻击方负面，下限 **0.2**
 
+**逆向确认的各区精确构成**（字段名见 §10.2）：
+- **增伤区** = `(1 + Σ元素增伤 + 全属性增伤 + 持续伤害增伤) × (1 + Level_FinalDamageAddedRatio) × (1 + 追加攻击增伤) × BaseDamageMultiRatio × 攻击类型附加增伤`
+  - 注意 `Level_FinalDamageAddedRatio`（内部名）与 `AllDamageTypeAddedRatio` 是**两个不同的加项**
+- **易伤区** = `min(上限, 1 + Σ元素易伤 + 全属性易伤) × (1 + 怪物易伤)` —— `Monster_DamageTakenRatio` 在**上限之外**单独相乘
+- **抗性区** = `1 − 净抗性`（净抗性 = 元素抗性 + 全属性抗性 − 元素穿透 − 全属性穿透，已 clamp）
+- **减伤区** 与防御、抗性用 `1 − Π(1−x)` 合并（见 §10.6），不是三者各自独立相乘
+- **吸收（Absorb）** 是**减法项**，不属于乘区
+
 ### 2.3 暴击区
 可暴击伤害才生效（击破、持续伤害、超击破不可暴击）：
 ```
@@ -71,6 +90,7 @@
 受击方防御 = 原始防御 × (1 - 减防% - 防御穿透%)
 ```
 - 防御不为负，防御区上限 1。
+- **逆向确认**：游戏内部先算「防御减伤」`D / (D + 等级项)`，再与抗性、减伤一起用 `1 − Π(1−x)` 合成，最后取 `1 −` 得到三者乘积（见 §10.6）。
 
 ### 2.5 抗性区
 ```
@@ -79,9 +99,13 @@
 ```
 - 取值范围：抗性 `-100% ~ 90%`（抗性区 `0.1 ~ 2.0`）。
 - 弱点击破状态不改变抗性；是否降低抗性看技能描述。
+- **逆向确认**：`净抗性 = 元素抗性 + 全属性抗性 − 元素穿透 − 全属性穿透`（先 clamp），`抗性区 = 1 − 净抗性`；该净抗性会被单独存进伤害对象，便于逐项校验。
 
 ### 2.6 特殊乘区
 独立于上述乘区的增伤/易伤，仅特定机制出现（活动、Boss 技能），常规计算忽略。
+- **真实伤害**（`TrueDamage`）：独立分类，通常绕过防御/抗性等常规乘区（具体看技能）。
+- **独立乘区**（如忆灵/欢愉/超击破的专属增伤）：与常规增伤区**相乘**，不并入 `Σ增伤`。
+- 实现建议：把「独立乘区」显式建模为单独的乘数，不要塞进 §2.2 的求和里。
 
 ---
 
@@ -249,6 +273,25 @@
 ### 8.1 伤害类型分类
 普攻/战技/终结技伤害、追加攻击伤害、击破伤害、超击破伤害、持续伤害、附加伤害、秘技伤害、忆灵伤害（3.0）、欢愉伤害（4.0）、真实伤害。
 
+游戏内部枚举 `AttackType`（用于伤害分类与增伤判定）：
+
+| 值 | 名称 | 中文 |
+|---|---|---|
+| 0 | Unknown | — |
+| 1 | Normal | 普攻 |
+| 2 | BPSkill | 战技 |
+| 3 | Ultra | 终结技 |
+| 4 | QTE | 终结技连携/秘技 |
+| 5 | DOT | 持续伤害 |
+| 6 | Pursued | 追加攻击 |
+| 7 / 8 | Maze / MazeNormal | 秘技 |
+| 9 | Insert | 插入/附加攻击 |
+| 10 | ElementDamage | 击破 |
+| 11 | Level | 场景/关卡伤害 |
+| 12 | Servant | 忆灵 |
+| 13 | TrueDamage | 真实伤害 |
+| 14 | ElationDamage | 欢愉 |
+
 ### 8.2 召唤物体系层级
 ```
 召唤物（广义）
@@ -262,6 +305,308 @@
 2. **忆灵模块**：独立单位管理（位置/血条/仇恨/能量/增益）；战斗开始时快照本体面板（不含临时增益）；连携攻击按一次行动中的两次独立攻击判定。
 3. **欢愉模块**：阿哈为特殊行动单位；笑点计数器独立累加；欢愉伤害禁用攻击力与属性增伤；释放顺序按参演编号。
 4. **超击破模块**：统一削韧为"点"单位（普攻=10）；每次攻击前检查击破状态与同谐终结技光环；独立公式、独立增伤乘区；双击破逐段判定。
+5. **贪饕（污染）模块**：见 §9。按 `StageMonsterInvasionParam` 取参数；`DirtyHPRatio` 累积压制进度（普通伤害 ×1、**欢愉伤害 ×3**）；多血条怪上限 ×`MaxHPRatioForMultHP`；压制到阈值前 HP 归零只复活、不死。
+
+---
+
+## 9. 贪饕（污染 / StageInvasion）机制
+
+> 结论来自对当前版本（`GameAssembly.dll` dump + tbgd `ExcelOutput` / `Config`）的逆向与实测校验。
+
+### 9.1 触发与形态
+
+- 关卡里符合条件的敌人有概率被「贪饕」侵蚀（`ExcelOutput/StageInvasionConfig.json` 按 `StageID` 指定 `InvasionID`）。
+- 被侵蚀的敌人获得 modifier **`MCommon_Gluttony_LV{1,2,3}`**（污染等级 1/2/3），我方获得 `MCommon_Gluttony_BUFF_LV{1,2,3}`。
+- **判定**：实体身上存在名字含 `Gluttony` 的 modifier 即为被侵蚀，等级 = `LV{n}`。
+- 敌人血条变为品红色（`GameCoreUISetting.json` → `MonsterHPBarStyleColorConfig.StageInvasion = #ff53a4 → #f92eb9`）。
+
+### 9.2 参数表（`ExcelOutput/StageMonsterInvasionParam.json`）
+
+| 污染等级 InvasionID | KillThresh | MaxHPRatio | NormalDamageConvertRatio | ElationDamageConvertRatio | MaxHPRatioForMultHP |
+|---|---|---|---|---|---|
+| 1 | 0.4 | 0.2 | 1 | 1 | 0.4 |
+| 2 | 0.4 | 0.4 | 1 | 1 | 0.72 |
+| 3 | 0.6 | 0.8 | 1 | **3** | **1.44** |
+
+参数语义来自枚举 `StageMonsterInvasionParamType`：
+
+| 序号 | 名称 | 含义 |
+|---|---|---|
+| 0 | `KillThresh` | 击杀阈值 |
+| 1 | `MaxHPRatio` | **单血条**怪的生命上限倍率（压制后） |
+| 2 | `NormalDamageConvertRatio` | 普通伤害 → 压制进度 的转化率 |
+| 3 | `ElationDamageConvertRatio` | 欢愉伤害 → 压制进度 的转化率 |
+| 4 | `MaxHPRatioForMultHP` | **多血条（MultHP）**怪的生命上限倍率 |
+
+### 9.3 敌人生命上限（公式，已精确验证）
+
+```
+正常 HP = template.health × hardLevelGroup(组, 等级).health × config.hpRatio × EliteGroup(波次.EliteGroup).HPRatio
+```
+
+- `template.health`：`monster_template_config.json` 的 `health`（tbgd `HPBase`）
+- `hardLevelGroup`：来自**关卡**（`StageConfig.HardLevelGroup` + `StageConfig.Level`），不是怪物自身的
+- `EliteGroup`：来自**波次**（`StageInfiniteMonsterGroup.EliteGroup` → `InfiniteEliteGroup.json` 的 `HPRatio`）；普通关卡用 `EliteGroup.json`
+- `config.hpRatio`：`monster_config.json` 的 `health_modify_ratio`（注意：**不是** `hp_modify_ratio`，那是幽灵字段恒为 1）
+
+**贪饕对上限的作用**：
+
+| 怪形态 | 开战上限 | 每次致命伤后 |
+|---|---|---|
+| 单血条（Elite 等） | 正常 HP × **1.0** | × `MaxHPRatio`（污染3 → ×0.8） |
+| **多血条（MultHP）** | 正常 HP × **`MaxHPRatioForMultHP`**（污染3 → **×1.44**） | 按同一参数 |
+
+> `1.44` 只给**多血条**怪，单血条怪不吃 —— 这就是「同关卡、同污染等级，两只怪上限倍率不同」的原因。
+
+### 9.4 压制进度（DirtyHP）
+
+- 血条上的**灰条** = 属性 **`DirtyHPRatio`**（modifier `MCommon_Gluttony_DirtyHp` 读的 `MDF_AccumDirtyHPRatio`）。
+- 累积规则：
+  ```
+  ΔDirtyHPRatio = 本次伤害 × 转化率 / 参考值
+    转化率：普通伤害 = NormalDamageConvertRatio（=1）
+            欢愉伤害 = ElationDamageConvertRatio（污染3 = 3）
+  ```
+  → **欢愉伤害的压制效果是普通伤害的 3 倍**（污染3级），因此「欢愉伤害能让它少复活一遍」。
+- **普通伤害压制**与**欢愉伤害压制**共用同一条灰条，仅权重不同。
+
+### 9.5 复活与彻底死亡
+
+- **每次 HP 归零**：敌人不死亡，立即回满到当前上限，并推进压制进度。
+- 未达阈值前，无论打空多少次都会复活。
+- **压制进度达到阈值后**，下一次致命伤 = 彻底消灭。
+- 实测（污染3级）：`DirtyHPRatio` 到 **0.75** 时死亡；`0.75 = KillThresh / MaxHPRatio = 0.6 / 0.8`。
+
+### 9.6 血条布局（与游戏一致）
+
+```
+[ 品红 = 当前 HP ][ ◆ 分界线 = 阈值 ][ 灰 = 压制进度 ]
+```
+- 灰条**从右往左**填充；
+- 分界线在**左侧** `1 − 阈值` 处（污染3级 = 25%）；
+- 灰条左边缘推到分界线 = 压制完成，可彻底击杀。
+
+### 9.7 相关 modifier 速查
+
+| modifier | 作用 |
+|---|---|
+| `MCommon_Gluttony_LV{1,2,3}` | 侵蚀标记 + 等级 |
+| `MCommon_Gluttony_DirtyHp` | DirtyHP 血层（压制过程中出现） |
+| `MCommon_LockHPThresholdReached_Mark` | 达到击杀阈值标记 |
+| `MCommon_Gluttony_PendingLockHP_Mark` | 待锁定标记 |
+| `MCommon_Gluttony_BUFF_LV{1,2,3}` | 我方对应的加成 |
+
+### 9.8 实测校验样本（污染3级）
+
+| 怪 | 单血条? | 正常 HP | 实测 MaxHP | 倍率 | 精英组 |
+|---|---|---|---|---|---|
+| 破晓战队·苍翼 (5013040) | 是 | 3,142,420.21 | 3,142,420.21 → 2,513,936.17 | ×1.0 → ×0.8 | EliteGroup 361 (HPRatio 6.0) |
+| 合金机铠·帕姆王 (5014020) | **多血条** | 7,332,313.83 | 10,558,531.91 | **×1.44** | EliteGroup 358 (HPRatio 5.6) |
+
+正常 HP 验算（关卡 30510011，`HardLevelGroup = 3`，`Level = 95`，`hard_level_group[3][95].health = 375.4385`）：
+
+```
+苍翼 : 1395   × 375.4385 × 1 × 6.0 = 3,142,420.21 ✓
+帕姆王: 3487.5 × 375.4385 × 1 × 5.6 = 7,332,313.83 ✓
+```
+
+### 9.9 数据来源
+
+- `ExcelOutput/StageMonsterInvasionParam.json` — 污染参数表
+- `ExcelOutput/StageInvasionConfig.json` — 关卡 → 污染等级 → 怪
+- `ExcelOutput/StageInvasionBuff.json` — 污染等级 → MazeBuffID
+- `ExcelOutput/InfiniteEliteGroup.json` / `EliteGroup.json` — 精英组倍率
+- `ExcelOutput/StageInfiniteGroup.json` / `StageInfiniteMonsterGroup.json` — 波次 → 精英组
+- `Config/ConfigAbility/BattleEventAbility_ChallengePeakBattle.json` — 污染能力
+- `Config/GameCoreUISetting.json` — 血条配色
+
+---
+
+## 10. 游戏内部实现（逆向补充）
+
+> 由 veritas 插件 + il2cpp 反汇编 + tbgd 数据交叉验证，用于把 §2 的「社区公式」与游戏实际实现对齐。
+
+### 10.1 定点数 FixPoint
+
+游戏所有数值是 `RPG.GameCore.FixPoint`（`i64` 定点），bit0 选小数位宽：
+
+```
+value = (raw & ~1) >> 33     (bit0 == 0)
+value = (raw & ~1) >> 26     (bit0 == 1)
+1.0   = 0x200000000
+```
+
+转浮点用 `op_Explicit(double)`。**全程定点**，只在最后转浮点 —— 验算要按定点精度对齐（不要用 double 一路乘）。
+
+### 10.2 一次伤害的乘区对象
+
+游戏为每一击构造一个对象（`NCJILFFNINI`，167 个字段），存放全部乘区输入与中间量。关键字段：
+
+| 含义 | 字段 |
+|---|---|
+| 基础倍率 | `DamagePercentage`、`ExtraDamagePercentage`、`DamageValue`、`BreakDamagePercentage`、`BaseDamageMultiRatio` |
+| 攻击 / 防御 / 生命 | `Attack` / `Defence` / `HP`（`AbilityLinearProperty`，即 `base×(1+ratio)+delta`） |
+| 增伤（元素） | 物理 / 火 / 冰 / 雷 / 风 / 量子 / 虚数 `AddedRatio` |
+| 增伤（全/其他） | `AllDamageTypeAddedRatio`、`AllDamageAddedRatio`(内部名 `Level_FinalDamageAddedRatio`)、`DotDamageAddedRatio`、`BreakDamageAddedRatio`、`ComboDamageAddedRatio`、`ElationDamageAddedRatio` |
+| 穿透 | 元素 `Penetrate` + `AllDamageTypePenetrate` |
+| 抗性 | 元素 `Resistance` + `AllDamageTypeResistance`；**净抗性**单独存一个字段 |
+| 易伤 | 元素 `TakenRatio` + `AllDamageTypeTakenRatio` + `Monster_DamageTakenRatio` |
+| 减伤 | `AllDamageReduce` |
+| 暴击 | `CriticalChance`、`CriticalDamage`、`CriticalResistance` |
+| 吸收 | 元素 `Absorb`（**减法项**） |
+| 破韧易伤 | 元素 `StanceBreakTakenRatio` |
+
+### 10.3 公式链（`AbilityStatic.DamageFormula`）
+
+```
+x = 基础(按 AttackFormulaType 选择)
+x = x × DamagePercentage + DamageValue
+x = x × ExtraDamagePercentage (击破时再 × BreakDamagePercentage)
+x = x × (1 + Σ元素增伤 + AllDamageTypeAddedRatio + DotDamageAddedRatio)
+x = x × (1 + Level_FinalDamageAddedRatio)
+x = x × (防御区 × 抗性区 × 减伤区)          // 用 InverseMultiply 合成，见 10.6
+x = x × min(上限, 1 + Σ元素易伤 + AllDamageTypeTakenRatio)
+x = x × (1 + Monster_DamageTakenRatio)
+x = x × 暴击区
+x = x × (1 + ComboDamageAddedRatio)
+x = x × BaseDamageMultiRatio
+x = x − 元素吸收
+x = x × _GetExtraDamageRatio               // 攻击类型附加增伤
+```
+
+- `FinalDamageFormulaType` 决定走**全链**还是**精简链**；`ByBaseDamage` 直接返回基础值（且**不暴击**）。
+- 暴击由 `DamageCriticalEvaluate` 判定：`暴击率 − 暴击抗性 ≥ rand`；`ByPureDamage`/`ByBaseDamage` 强制不暴击。
+
+### 10.4 基础伤害来源（`AttackFormulaType`）
+
+| 值 | 来源 |
+|---|---|
+| 1 `ByAttack` | 攻击力 |
+| 2 `ByDefence` | 防御力 |
+| 3 `ByMaxHP` / 4 `ByCurrentHP` | 生命 |
+| 5 `ByDefenderMaxHP` / 6 `ByDefenderCurrentHP` | 受击方生命 |
+| 7 `ByBreakDamage` | 击破倍率 |
+| 8 `BySummonerMaxHP` | 召唤者生命 |
+| 9 `ByElationDamage` | 欢愉 |
+
+### 10.5 击破 / 欢愉 的基数表
+
+- **击破基数**：`AvatarBreakDamageRow.BreakBaseDamage` —— **按「等级」**查表（`ExcelOutput/AvatarBreakDamage.json`，101 行 = Level 1..101）。**80 级 = 3767.55**（社区说的 3767 就是它）、**95 级 = 7494.37**。**与角色无关**（表里没有 AvatarID，查表键是等级）。
+- **欢愉基础值**：`ElationBasicLevelDamageRow.ElationBasicLevelDamage`（按等级）。
+- **笑点**：实体属性 `ElationEchoPoint`。
+- 击破 / 超击破不吃攻击力、增伤、双暴；欢愉伤害不吃攻击力与属性增伤（§6.5）。
+
+### 10.6 与社区公式的差异（验算必看）
+
+1. **防御 / 抗性 / 减伤**：游戏用 `InverseMultiply(a,b) = 1 − (1−a)(1−b)` 把「减伤类」因子合成 `1 − Π(1−xᵢ)`，最后再 `1 −` 还原成乘数。**代数等价，但中间取整不同** → 请在**最终因子层**对比，别比中间值。
+2. **吸收**是**减法**，不是乘区。
+3. **易伤有上限**（常量），`Monster_DamageTakenRatio` 在**上限之外**单独加。
+4. **击破基数只与「等级」有关**（`AvatarBreakDamage.json`：80 级 = 3767.55、95 级 = 7494.37），与角色无关。
+5. `Level_FinalDamageAddedRatio` 与 `AllDamageTypeAddedRatio` 是**两个不同**的增伤加项。
+
+### 10.7 敌人 HP 完整验算样例（污染 3 级）
+
+关卡 `30510011`：`HardLevelGroup = 3`、`Level = 95`、`_StageInfiniteGroup`（无限波次）。
+
+```
+等级组:  hard_level_group[3][95].health = 375.4385
+波次 → 精英组: StageInfiniteMonsterGroup.EliteGroup
+   wave 305100111 → 361 → InfiniteEliteGroup.HPRatio = 6.0
+   wave 305100112 → 358 → InfiniteEliteGroup.HPRatio = 5.6
+
+正常 HP = template.health × 375.4385 × health_modify_ratio(=1) × HPRatio
+苍翼   : 1395   × 375.4385 × 6.0 = 3,142,420.21 ✓
+帕姆王 : 3487.5 × 375.4385 × 5.6 = 7,332,313.83 ✓
+```
+
+### 10.8 `_GetExtraDamageRatio`（攻击类型附加增伤）字段表
+
+> 已完整逆向：`AbilityStatic._GetExtraDamageRatio`（VA `0x18E52C690`）→ 结构 `FJLAKILIMEN` 的
+> `LMIEIPAKDGC`（VA `0x1957CD1F0`，跳表 `0x1957CD29C`）与 `PAKIJFOGOJF`（VA `0x1957CD2E0`）；
+> 槽位来源 = `ToExtraDamageDataFinal`（VA `0x18E5236F0`）；调用点 = `DamageFormula` VA `0x18E4DA957` / `0x18E4DAA27`。
+
+**位置**：链末**独立乘区**，在「− 吸收」之后：
+
+```
+最终伤害 = ( … × BaseDamageMultiRatio − 元素吸收 ) × _GetExtraDamageRatio(…)
+```
+
+**载体**：`NCJILFFNINI + 0x380`（`DDMHHFBIJMA`，类型 `FJLAKILIMEN`，0x88 字节）。偏移与 `AbilityProperty` 的对应：
+
+| 偏移 (+0x380) | 字段 | AbilityProperty | 含义 |
+|---|---|---|---|
+| `0x00` | `MOKNCFJICIC` | — | **有效位**；为 0 时整个乘区恒 `1.0` |
+| `0x08` | `HLDABCGMLEN` | `ExtraLuckDamage`(192) + `ExtraLuckDamageConvert`(218) | 幸运伤害 |
+| `0x10` | `JFCJNHNBMCB` | `ExtraLuckChance`(191) + `ExtraLuckChanceConvert`(219) | 幸运率 |
+| `0x18` | `BICKCCGOKCE` | `GetFrontBackPower(攻击方)/200` | **前后排基准**（不是加项） |
+| `0x20` | `GHMBPGFLGKM` | `ExtraAllDamageTypeAddedRatio1`(180) | 通用附加增伤 #1 |
+| `0x28` | `AIJFGKGCGDI` | `ExtraAllDamageTypeAddedRatio2`(181) | #2 |
+| `0x30` | `PKLIENJDEIH` | `ExtraAllDamageTypeAddedRatio3`(182) | #3 |
+| `0x38` | `PBEJAEPALEI` | `ExtraAllDamageTypeAddedRatio4`(183) | #4 |
+| `0x40` | `ILBFKHJONOI` | `ExtraAllDamageTypeAddedRatio5`(184) | #5 |
+| `0x48` | `MMPHCDCGCKE` | `ExtraSkillDamageAddedRatio1`(202) | **战技** |
+| `0x50` | `LKLMCAKKGEP` | `ExtraNormalDamageAddedRatio1`(203) | **普攻** |
+| `0x58` | `LKIELCNNLNL` | `ExtraInsertDamageAddedRatio1`(204) | **附加** |
+| `0x60` | `DEGHPAJIPFP` | `ExtraUltraDamageAddedRatio1`(201) | **终结技** |
+| `0x68` | `CEKOBBDOINO` | `ExtraDOTDamageAddedRatio1`(205) | **持续伤害** |
+| `0x70` | `IEEKAECICIF` | `ExtraElementDamageAddedRatio1`(206) | **击破** |
+| `0x78` | `ECFJMELFHIO` | — | **累加器**（每次结算前清零） |
+| `0x80` | `CILOCPLHJLK` | `ExtraElationDamageAddedRatio1`(207) | **欢愉** |
+
+**按攻击类型累加**（`LMIEIPAKDGC` 的 `switch(AttackType)`）：
+
+| `AttackType` | 累加进累加器的槽 |
+|---|---|
+| 1 `Normal` 普攻 | `ExtraNormalDamageAddedRatio1` |
+| 2 `BPSkill` 战技 | `ExtraSkillDamageAddedRatio1` |
+| 3 `Ultra` 终结技 | `ExtraUltraDamageAddedRatio1` |
+| 5 `DOT` 持续伤害 | `ExtraDOTDamageAddedRatio1` |
+| 9 `Insert` 附加 | `ExtraInsertDamageAddedRatio1` |
+| 10 `ElementDamage` 击破 | `ExtraElementDamageAddedRatio1` |
+| 14 `ElationDamage` 欢愉 | `ExtraElationDamageAddedRatio1` |
+| 4 / 6 / 7 / 8 / 11 / 12 / 13 | **无槽 → 不计入** |
+
+**最终公式**（`PAKIJFOGOJF`）：
+
+```
+x = FrontBackPower / 200
+x = x × (1 + 幸运触发时的 ExtraLuckDamage)                 // 幸运未触发则为 ×1
+x = x × (1 + ExtraAllDamageTypeAddedRatio1 + Σ对应攻击类型的 Extra*DamageAddedRatio1)
+x = x × (1 + ExtraAllDamageTypeAddedRatio2)
+x = x × (1 + ExtraAllDamageTypeAddedRatio3)
+x = x × (1 + ExtraAllDamageTypeAddedRatio4)
+x = x × (1 + ExtraAllDamageTypeAddedRatio5)
+```
+
+其中前后排基准：
+
+```
+GetFrontBackPower(攻击方, useFront) =
+    base × (1 + addedRatio1) × (1 + addedRatio2) + convert
+  useFront → ExtraFrontPowerBase(194) / ExtraFrontPowerAddedRatio1(195) / …2(196) / ExtraFrontPowerConvert(217)
+  !useFront → ExtraBackPowerBase(198)  / ExtraBackPowerAddedRatio1(199)  / …2(200) / ExtraBackPowerConvert(216)
+```
+
+**建模结论（关键 6 条）**：
+
+1. **攻击类型增伤不在主增伤桶里**。它不在 `(1 + Σ元素增伤 + AllDamageTypeAddedRatio + DotDamageAddedRatio)` 中，而是**链末独立乘区**（与吸收同层，在吸收之后乘）。
+2. **七种攻击类型之间是加算**，且与 `ExtraAllDamageTypeAddedRatio1` **加算**，共同构成**一个** `(1+…)` 因子。
+3. `ExtraAllDamageTypeAddedRatio2..5` 各自是**独立因子**，**不**并入 #1。
+4. **追加攻击（`Pursued`）没有专属属性**：整张 `Extra*DamageAddedRatio1` 表只有 7 项（Ultra/Skill/Normal/Insert/DOT/Element/Elation），**没有追加攻击 / 忆灵 / 秘技 / 真实伤害**。若要让追加攻击吃到普攻增伤，游戏用的是 `TurnBasedAbilityComponent.RegardAsAttackTypeMap`（`+0xC8`，`Dictionary<AttackType, List<…>>`「视为攻击类型」）—— `GetTargetAttackTypes` 会把别名一并返回，再逐个累加。
+5. **前后排加成**（`GetFrontBackPower/200`）是该乘区的**基准**（乘性），不是加项。
+6. 有效位由攻击方组件的能力标志决定（`attacker.PropertyEnumBoundary == AbilityProperty.Count(226)`）；未启用时**整区恒 `1.0`**，即该版本/模式下这些属性全为 0，不影响任何伤害。
+
+**依据（可复现）**：
+
+| 符号 | VA | 作用 |
+|---|---|---|
+| `AbilityStatic._GetExtraDamageRatio` | `0x18E52C690` | 入口；调 `GetTargetAttackTypes` + 累加 + 求值 |
+| `AbilityStatic.GetTargetAttackTypes` | `0x18E52C360` | 攻击类型 + 「视为攻击类型」别名 |
+| `AbilityStatic.ToExtraDamageDataFinal` | `0x18E5236F0` | 属性 → 槽位（即上表的来源） |
+| `FJLAKILIMEN::LMIEIPAKDGC` | `0x1957CD1F0` | `switch(AttackType)` 累加 |
+| `FJLAKILIMEN::PAKIJFOGOJF` | `0x1957CD2E0` | 最终乘积 |
+| `AbilityStatic.GetFrontBackPower` | `0x18E523A20` | 前后排基准 |
+| `AbilityStatic.DamageFormula` | `0x18E4DA957` / `0x18E4DAA27` | 乘入点 |
 
 ---
 
