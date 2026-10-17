@@ -141,9 +141,11 @@ final class TriggerEffects {
         double magnitude;
         // Note: `percent_from_skill_param` is the THIRD way to state a share, and this is the very condition the comment above warns
         // about: a share spelling left out of it sends the effect down the flat `amount` arm and unboxes a null. Measured: that is exactly what happened.
-        if (effect.getPercent() != null || effect.getPercentFromCastParam() != null
-                || effect.getPercentFromSkillParam() != null || effect.getPercentFromResource() != null) {
-            magnitude = derived ? TriggerMagnitudes.derivedMagnitude(effect, ctx) : effect.getPercent();
+        // Note: The fork now asks the magnitude reader's own predicate (`TriggerMagnitudes.statesShare`), which is the
+        // list of spellings `shareOf` actually reads - a copy here is the thing that kept falling one spelling behind
+        // (cast_param, then skill_param, then summon_param).
+        if (TriggerMagnitudes.statesShare(effect)) {
+            magnitude = derived ? TriggerMagnitudes.derivedMagnitude(effect, ctx) : TriggerMagnitudes.shareOf(effect, ctx);
         } else {
             magnitude = effect.getAmount();
         }

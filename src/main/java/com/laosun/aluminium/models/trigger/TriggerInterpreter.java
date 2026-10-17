@@ -1846,8 +1846,16 @@ public final class TriggerInterpreter {
                     "RAISE_SKILL_LEVEL ran without a rule owner, so there is no combatant whose skill to raise; this "
                             + "is an engine fault (the op is validated onto BATTLE_START, which always has one)");
         }
-        owner.raiseSkillLevel(SkillType.valueOf(effect.getSkill().trim().toUpperCase(Locale.ROOT)),
-                (int) Math.round(effect.getAmount()));
+        int delta = (int) Math.round(effect.getAmount());
+        if (Boolean.TRUE.equals(effect.getMemosprite())) {
+            // 「忆灵技等级+1」: the raise is filed on the OWNER (the summoner's kit), not on the memosprite, because
+            // the memosprite does not exist yet at BATTLE_START - it is summoned later, possibly more than once. The
+            // slot is its DATA SLOT (`skill_id`), which no SkillType names. `CanHit.skillLevel` reads the owner's map
+            // when it resolves a memosprite's skill, so every summon of this character inherits the raise.
+            owner.raiseMemospriteSkillLevel(effect.getSkillId(), delta);
+            return;
+        }
+        owner.raiseSkillLevel(SkillType.valueOf(effect.getSkill().trim().toUpperCase(Locale.ROOT)), delta);
     }
 
 

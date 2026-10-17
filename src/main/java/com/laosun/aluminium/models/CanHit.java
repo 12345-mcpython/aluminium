@@ -329,6 +329,20 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
     private final Map<SkillType, Integer> skillLevelBonus = new HashMap<>();
 
     /**
+     * Per-battle skill level raises for a <b>memosprite</b>'s own skills, keyed by the <b>data slot</b>.
+     *
+     * <p><b>Why a second map and not the one above.</b> A character's skills are stored by {@link SkillType} (six entries,
+     * five of them meaningful), while a memosprite's run to the eighteen-plus data slots the game's own servant table
+     * uses ({@code Summon.skillsByDataSlot}, and {@code skillHitBonus} next door is keyed the same way for the same
+     * reason). A raise the game spells 「忆灵技等级+1」 names one of THOSE slots, which no {@code SkillType} can address.
+     *
+     * <p>Reader: {@link #skillLevel}, which is the one resolver every read site goes through (a skill's own execution,
+     * a rule-driven {@code DAMAGE}, a {@code cast_skill_param:} magnitude). Empty until a rule raises something.
+     */
+    @Getter(AccessLevel.NONE)
+    private final Map<Integer, Integer> memospriteSkillLevelBonus = new HashMap<>();
+
+    /**
      * Extra damage SEGMENTS per DATA SLOT (the reader is 1405's "使其战技的伤害次数增加 3 次", the ode of reason).
      *
      * <p>Keyed by the slot number because that is what `Skill.getSkillSlot()` answers with -- the same number `CAST_SKILL{skill_id}` names -- and a skill's hit count itself comes from the data's
@@ -926,6 +940,7 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
         ruleCurrentChance.clear();
         rulePickMemory.clear();
         skillLevelBonus.clear();
+        memospriteSkillLevelBonus.clear();
     }
 
     /**
@@ -1037,6 +1052,35 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
     }
 
     /**
+     * Raises one of a <b>memosprite</b>'s own skills by {@code delta}, addressed by its <b>data slot</b>.
+     *
+     * <p>The memosprite half of {@link #raiseSkillLevel}: 「忆灵技等级+1」 names a data slot (1 / 3 / 5 …), not a
+     * {@link SkillType}, so it needs the int-keyed map. Called through {@code RAISE_SKILL_LEVEL} with
+     * {@code memosprite: true}, and read back by {@link #skillLevel} - the same one resolver, so a raised memosprite
+     * slot moves its damage and every {@code cast_skill_param:} / {@code summon_param:} read together.
+     *
+     * @param dataSlot the memosprite skill's data slot ({@code > 0}); ignored otherwise
+     * @param delta    how many levels to add (negative takes them away)
+     */
+    public void raiseMemospriteSkillLevel(int dataSlot, int delta) {
+        if (dataSlot <= 0 || delta == 0) {
+            return;
+        }
+        memospriteSkillLevelBonus.merge(dataSlot, delta, Integer::sum);
+    }
+
+    /**
+     * How many levels this unit's <b>memosprite</b> skills were raised by, for one data slot.
+     *
+     * <p>Reader: {@link #skillLevel}, when it resolves a skill that belongs to a {@code Summon} - the raise is filed on
+     * the <b>summoner</b> (「忆灵技等级+1」 is the character's Eidolon (星魂)/trace, and the memosprite may not be on the field
+     * when a {@code BATTLE_START} rule runs), so a summon has to ask its master. A unit with no raises answers 0.
+     */
+    public int memospriteSkillLevelBonus(int dataSlot) {
+        return memospriteSkillLevelBonus.getOrDefault(dataSlot, 0);
+    }
+
+    /**
      * <b>The</b> level a skill is read at: its own level plus this battle's raises.
      *
      * <p>Note: <b>One resolver on purpose.</b> Three call sites read a parameter row from a level ({@code SkillExecutor}
@@ -1056,17 +1100,47 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
         // line passed the int into `Map<SkillType, Integer>.getOrDefault` - which compiles (the int boxes to Object)
         // and always misses - so the raise was filed and never read, with every test still green on the map's own
         // getter. The character's own map is the honest answer: the raise is keyed the way the skills are stored.
-        SkillType slot = null;
+        //
+        // Note: A MEMOSPRITE's skills are stored by data slot (`Summon.skillsByDataSlot`), so its raises are keyed that
+        // way too (`raiseMemospriteSkillLevel`). Before that map existed, a summon always fell into the "no bonus" arm
+        // below and its level was whatever the spec declared - which is why 「忆灵技等级+1」 had no spelling at all.
+        int level;
         if (this instanceof Character character) {
+            SkillType slot = null;
             for (var entry : character.getSkills().entrySet()) {
                 if (entry.getValue() == skill) {
                     slot = entry.getKey();
                     break;
                 }
             }
+            level = skill.getLevel() + (slot == null ? 0 : skillLevelBonus.getOrDefault(slot, 0));
+        } else {
+            Integer dataSlot = dataSlotOf(skill);
+            int bonus = dataSlot == null ? 0 : memospriteSkillLevelBonus.getOrDefault(dataSlot, 0);
+            // The raise is filed on the SUMMONER (see `raiseMemospriteSkillLevel`): a memosprite's Eidolon (星魂)/trace raise
+            // is a fact about its master's kit, and the memosprite does not exist yet when a BATTLE_START rule runs.
+            if (dataSlot != null && this instanceof Summon summon
+                    && summon.getMaster() != null) {
+                bonus += summon.getMaster().memospriteSkillLevelBonus(dataSlot);
+            }
+            level = skill.getLevel() + bonus;
         }
-        int level = skill.getLevel() + (slot == null ? 0 : skillLevelBonus.getOrDefault(slot, 0));
         return Math.min(level, tableRows(skill));
+    }
+
+    /**
+     * The data slot one of <b>this</b> unit's own skills is stored under, or {@code null} when that question has no
+     * answer (a character's skills are keyed by {@link SkillType}, a monster's by nothing).
+     */
+    private Integer dataSlotOf(Skill skill) {
+        if (this instanceof Summon summon) {
+            for (var entry : summon.skillsByDataSlot().entrySet()) {
+                if (entry.getValue() == skill) {
+                    return entry.getKey();
+                }
+            }
+        }
+        return null;
     }
 
     /**
