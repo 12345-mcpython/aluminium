@@ -258,13 +258,19 @@ SUPER_BREAK            TAUNT                  TICK_DOT
 | `self_attr_above:<阈值>` | 属性**超出阈值的那部分** |
 | `steps:<n>` | 按步长分段（阶梯式加成） |
 
-⚠ **`percent` 不是唯一的"份额"写法** ✓ —— 份额也可以从**技能参数表**里读（三条拼法、各自的读者跑过代码核对）✓：
+⚠ **`percent` 不是唯一的"份额"写法** ✓ —— 份额也可以从**技能参数表**里读（五条拼法、各自的读者跑过代码核对）✓：
 
 | 字段 | 读的是 | 哪些 op 读 |
 |---|---|---|
 | `percent_from_skill_param: "<SKILLTYPE>:<index>"` | **持有者自己**某个槽位、**当前等级**那一行的第 index 项 | 伤害类 + `MODIFY_ATTR` + `HEAL` / `SHIELD`（+ `APPLY_DOT` / `APPLY_CONTROL` 的每回合伤害）✓ |
 | `percent_from_cast_param: <index>` | **产生这次事件的那个技能**当前等级的第 index 项（施放者是**角色或忆灵**都行 ✓：槽位就是 `Skill.getSkillSlot()` ✓） | 同上 |
 | `amount_from_skill_param: "<SKILLTYPE>:<index>"` | 同第一行，但读的是**常数项**（`percent × scale + amount` 的那个 `amount`） | **所有读平值的 op** ✓：`HEAL` / `SHIELD` / `GAIN_ENERGY` / `GAIN_SKILL_POINT` / `GAIN_RESOURCE` / `CONSUME_HP` / `APPLY_DOT` / `APPLY_CONTROL` 的每回合伤害 ✓（同一 reader：`TriggerMagnitudes.constantTerm` ✓） |
+| `percent_from_summon_param: "<DATA SLOT>:<index>"` / `amount_from_summon_param: "<DATA SLOT>:<index>"` | **规则主人的忆灵**某个**数据槽位**（1 / 3 / 5 …）在**当前等级**那一行的第 index 项 | 与上面两支相同 ✓；⚠ 忆灵的技能**不按 `SkillType` 存** ✗ ⇒ 只能用这个写法 ✓，而且它属于"别人的事件上也读得到"那一类 ✓ |
+| `amount_from_cast_param: <index>` | 同 `percent_from_cast_param`，但读**常数项** | 同上 ✓（读者：忆灵施放且常数也随等级变的那种句子 ✓） |
+
+⚠ **`RAISE_SKILL_LEVEL` 的忆灵拼法** ✓：`{"op": "RAISE_SKILL_LEVEL", "memosprite": true, "skill_id": 1, "amount": 1}` ✓ ——
+`skill_id` 是忆灵的**数据槽位** ✓（角色槽位仍写 `skill`，两者互斥 ✓）。⚠ 加成记在**召唤者**身上 ✓
+（忆灵在 `BATTLE_START` 时**还不存在** ✓，它出场更晚、而且可能重复出场 ✓）。
 
 ⚠ **两个半都随等级才算"随技能等级浮动"** ✓：像「#1% 防御力 + #4」这种句子，**份额与常数在表里都逐行变化** ✓，
 只让一个半跟着走会得到**任何一行都不存在**的数字 ✓（§6 的例子）。

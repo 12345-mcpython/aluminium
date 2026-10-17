@@ -251,6 +251,21 @@ final class TriggerMagnitudes {
     }
 
     /**
+     * Whether the effect states a <b>share</b>, in any of its five spellings.
+     *
+     * <p>It lives here rather than in the validator because the <b>readers</b> are what break when it is incomplete:
+     * {@code MODIFY_ATTR} decides between "a share" and "a flat amount" with this question, and a spelling left out
+     * of it sends the effect down the flat arm and unboxes a null. Measured twice - {@code percent_from_cast_param}
+     * and then {@code percent_from_skill_param} each cost a round that way, and {@code percent_from_summon_param} was
+     * the third.
+     */
+    static boolean statesShare(EffectSpec effect) {
+        return effect.getPercent() != null || effect.getPercentFromCastParam() != null
+                || effect.getPercentFromSkillParam() != null || effect.getPercentFromResource() != null
+                || effect.getPercentFromSummonParam() != null;
+    }
+
+    /**
      * The <b>constant term</b> of a magnitude: {@code percent x scale + THIS}.
      *
      * <p>It is a literal {@code amount}, or one parameter of the rule owner's own skill at that skill's
@@ -271,8 +286,14 @@ final class TriggerMagnitudes {
         if (effect.getAmount() != null) {
             return effect.getAmount();
         }
+        if (effect.getAmountFromCastParam() != null) {
+            return castParamValue(effect, ctx, String.valueOf(effect.getAmountFromCastParam()));
+        }
         if (effect.getAmountFromSkillParam() != null) {
             return ownerSkillParamValue(effect, ctx, effect.getAmountFromSkillParam().trim());
+        }
+        if (effect.getAmountFromSummonParam() != null) {
+            return summonSkillParamValue(effect, ctx, effect.getAmountFromSummonParam().trim());
         }
         return 0;
     }
@@ -411,12 +432,61 @@ final class TriggerMagnitudes {
             return ownerSkillParamValue(effect, ctx, effect.getPercentFromSkillParam().trim())
                     + amendmentDelta(effect, ctx);
         }
+        if (effect.getPercentFromSummonParam() != null) {
+            // The share out of the owner's MEMOSPRITE: its skills are keyed by data slot, which no SkillType can name.
+            return summonSkillParamValue(effect, ctx, effect.getPercentFromSummonParam().trim());
+        }
         String spelled = effect.getPercentFromCastParam() == null ? null
                 : String.valueOf(effect.getPercentFromCastParam());
         if (spelled == null) {
-            throw new IllegalStateException("a magnitude needs a share: neither \"percent\" nor \"percent_from_cast_param\" is stated");
+            throw new IllegalStateException("a magnitude needs a share: neither \"percent\" nor one of its spellings "
+                    + "(\"percent_from_cast_param\" / \"percent_from_skill_param\" / \"percent_from_summon_param\" / "
+                    + "\"percent_from_resource\") is stated");
         }
         return castParamValue(effect, ctx, spelled);
+    }
+
+    /**
+     * One parameter of the rule owner's <b>memosprite</b>, as {@code "<DATA SLOT>:<index>"}, at that skill's current
+     * level.
+     *
+     * <p><b>Why a separate reader.</b> A memosprite's skills are stored by <b>data slot</b>
+     * ({@code Summon.skillsByDataSlot}, the game's servant table slots 1 / 3 / 5 …), while a character's are stored by
+     * {@code SkillType}. {@link #ownerSkillParamValue} therefore cannot name one: its spelling is a
+     * {@code <SKILLTYPE>} that no memosprite slot can be. Reader: 「忆灵技 #n」 on a rule that fires on
+     * <b>somebody else's</b> event, where {@code percent_from_cast_param} has no cast to look at.
+     *
+     * <p>Note: A memosprite that is not on the field is a <b>loud</b> failure, not 0 - the same rule
+     * {@code summon_attr:} follows: a share of a unit that is not there is not a number.
+     */
+    static double summonSkillParamValue(EffectSpec effect, TriggerContext ctx, String spelled) {
+        String[] parts = spelled.split(":", 2);
+        int slot = Integer.parseInt(parts[0].trim());
+        int index = Integer.parseInt(parts[1].trim());
+        com.laosun.aluminium.models.Character owner = requireCharacterOwner(effect, ctx);
+        CanHit fielded = ctx.battle() == null ? null : ctx.battle().summonOf(owner);
+        if (!(fielded instanceof Summon summon)) {
+            throw new IllegalStateException("Op " + effect.getOp() + " reads its memosprite's skill row, but "
+                    + owner.getName() + " has no memosprite on the field");
+        }
+        Skill named = summon.skillAt(slot);
+        if (named == null || named.getData() == null || !named.getData().isLoaded()) {
+            throw new IllegalStateException("Op " + effect.getOp() + " reads the memosprite's skill at data slot "
+                    + slot + ", and there is no loaded such skill (its spec lists the slots it owns)");
+        }
+        var rows = named.getData().getSkills();
+        int row = summon.skillLevel(named) - 1;
+        if (row < 0 || row >= rows.size()) {
+            throw new IllegalStateException("skill level " + summon.skillLevel(named) + " is outside the memosprite's "
+                    + "data slot " + slot + " parameter table (rows=" + rows.size() + ")");
+        }
+        var values = rows.get(row);
+        if (index >= values.size()) {
+            throw new IllegalStateException("Op " + effect.getOp() + " names index " + index
+                    + ", which is outside the memosprite's data slot " + slot + " parameter row (size="
+                    + values.size() + ")");
+        }
+        return values.get(index);
     }
 
     /**

@@ -771,8 +771,33 @@ final class TriggerValidator {
                 // "Skill Lv. +1""Ultimate Lv. +1" (1001 Eidolon (星魂) 3/5 and the same sentence in most kits): the level a skill is
                 // READ at is character data plus this battle's raises, and one op is what raises it -- never a
                 // second copy of the rule at another level, which would double a cast like `per_turn` doubling does.
-                requireSkill(effect, op, spec);
                 requireEvent(spec, op, TriggerEvent.BATTLE_START);
+                if (Boolean.TRUE.equals(effect.getMemosprite())) {
+                    // 「忆灵技等级+1」: the OWNER's memosprite, addressed by its DATA SLOT. Both halves are stated here
+                    // because each one is a different mistake: a `skill` would name a character slot (a different
+                    // skill), and no `skill_id` would raise nothing at all.
+                    if (effect.getSkill() != null && !effect.getSkill().isBlank()) {
+                        throw new IllegalArgumentException(
+                                "Op " + op + " states both \"skill\" and \"memosprite\": a memosprite's skills are "
+                                        + "addressed by \"skill_id\" (their data slot), while \"skill\" names one of "
+                                        + "the CHARACTER's SkillType slots - which is a different skill "
+                                        + "(source: " + spec.getSource() + ")");
+                    }
+                    if (effect.getSkillId() == null || effect.getSkillId() <= 0) {
+                        throw new IllegalArgumentException(
+                                "Op " + op + " states \"memosprite\" but no \"skill_id\": name the memosprite's DATA "
+                                        + "SLOT there (a positive number, e.g. 1) "
+                                        + "(source: " + spec.getSource() + ")");
+                    }
+                } else {
+                    if (effect.getSkillId() != null) {
+                        throw new IllegalArgumentException(
+                                "Op " + op + " states \"skill_id\" without \"memosprite\": that field names one of a "
+                                        + "memosprite's data slots; a character's slot is stated as \"skill\" "
+                                        + "(a SkillType) (source: " + spec.getSource() + ")");
+                    }
+                    requireSkill(effect, op, spec);
+                }
                 double amount = effect.getAmount() == null ? 0 : effect.getAmount();
                 if (amount < 1 || amount != Math.floor(amount)) {
                     throw new IllegalArgumentException(
@@ -1330,17 +1355,20 @@ final class TriggerValidator {
                 && effect.getAmountFromResource() == null
                 && !Boolean.TRUE.equals(effect.getAmountFromEvent())
                 && !Boolean.TRUE.equals(effect.getAmountFromPrevious())
-                && effect.getAmountFromSkillParam() == null) {
+                && effect.getAmountFromSkillParam() == null
+                && effect.getAmountFromCastParam() == null
+                && effect.getAmountFromSummonParam() == null) {
             throw new IllegalArgumentException(
                     "Op " + op + " requires \"amount\" -- a literal, or one of \"amount_from_attr\" / "
-                            + "\"amount_from_resource\" / \"amount_from_skill_param\" / \"amount_from_event\" / "
+                            + "\"amount_from_resource\" / \"amount_from_skill_param\" / \"amount_from_cast_param\" / "
+                            + "\"amount_from_summon_param\" / \"amount_from_event\" / "
                             + "\"amount_from_previous\" (source: " + spec.getSource() + ")");
         }
     }
 
     /**
-     * The flat part of a magnitude is stated <b>once</b>, and a skill parameter is spelled
-     * {@code "<SKILLTYPE>:<index>"}.
+     * The flat part of a magnitude is stated <b>once</b>, and a skill parameter is spelled either
+     * {@code "<SKILLTYPE>:<index>"} (a character's own slot) or {@code "<DATA SLOT>:<index>"} (its memosprite's).
      *
      * <p>Called from both magnitude families, because the scaled path ({@code scale} + share + {@code amount}) never
      * reaches {@link #requireAmount}: a check that lived only there would let
@@ -1348,15 +1376,30 @@ final class TriggerValidator {
      * nothing to say which won.
      */
     static void requireSingleFlatSource(EffectSpec effect, String op, TriggerSpec spec) {
-        boolean fromSkillParam = effect.getAmountFromSkillParam() != null;
-        if (effect.getAmount() != null && fromSkillParam) {
+        java.util.List<String> stated = new java.util.ArrayList<>();
+        if (effect.getAmount() != null) {
+            stated.add("amount");
+        }
+        if (effect.getAmountFromCastParam() != null) {
+            stated.add("amount_from_cast_param");
+        }
+        if (effect.getAmountFromSkillParam() != null) {
+            stated.add("amount_from_skill_param");
+        }
+        if (effect.getAmountFromSummonParam() != null) {
+            stated.add("amount_from_summon_param");
+        }
+        if (stated.size() > 1) {
             throw new IllegalArgumentException(
-                    "Op " + op + " states BOTH \"amount\" and \"amount_from_skill_param\": the flat value comes from "
-                            + "one of them, and keeping both would silently prefer the literal "
+                    "Op " + op + " states more than one flat source (" + String.join(" / ", stated)
+                            + "): the constant term comes from exactly one of them "
                             + "(source: " + spec.getSource() + ")");
         }
-        if (fromSkillParam) {
+        if (effect.getAmountFromSkillParam() != null) {
             requireSkillParamSpelling(effect.getAmountFromSkillParam(), "amount_from_skill_param", op, spec);
+        }
+        if (effect.getAmountFromSummonParam() != null) {
+            requireSummonParamSpelling(effect.getAmountFromSummonParam(), "amount_from_summon_param", op, spec);
         }
     }
 
@@ -1426,46 +1469,92 @@ final class TriggerValidator {
      * caller that asked only about {@code percent} would call a {@code percent_from_skill_param} rule "neither"
      * (measured once: that shape NPEs on a null {@code amount} -- see {@code PercentFromSkillParamTest}).
      */
+    /**
+     * Whether the effect states a <b>share</b>, in any of its five spellings.
+     *
+     * <p>Note: The definition moved to {@link TriggerMagnitudes#statesShare} because the READER is what breaks when a
+     * spelling is missing from it ({@code MODIFY_ATTR}'s derived/flat fork). This is the delegate, so the loader and
+     * the interpreter cannot answer the question differently.
+     */
     static boolean statesShare(EffectSpec effect) {
-        return effect.getPercent() != null || effect.getPercentFromCastParam() != null
-                || effect.getPercentFromSkillParam() != null || effect.getPercentFromResource() != null;
+        return TriggerMagnitudes.statesShare(effect);
+    }
+
+    /**
+     * Validates the {@code "<DATA SLOT>:<index>"} spelling of the memosprite spellings
+     * ({@code percent_from_summon_param} / {@code amount_from_summon_param}).
+     *
+     * <p>The sibling of {@link #requireSkillParamSpelling} for the units whose skills are keyed by an int data slot
+     * instead of a {@code SkillType}: the slot is a positive number (the game's servant table starts at 1), the index is
+     * zero-based, and both are checked here so a typo is a load-time failure rather than a fire-time one.
+     */
+    static void requireSummonParamSpelling(String spelled, String field, String op, TriggerSpec spec) {
+        String[] parts = spelled.split(":", 2);
+        if (parts.length != 2 || parts[0].isBlank() || parts[1].isBlank()) {
+            throw new IllegalArgumentException(
+                    "Op " + op + " states \"" + field + "\": \"" + spelled + "\", which does not name it as "
+                            + "<DATA SLOT>:<index> (e.g. \"1:0\") (source: " + spec.getSource() + ")");
+        }
+        try {
+            if (Integer.parseInt(parts[0].trim()) <= 0) {
+                throw new NumberFormatException();
+            }
+        } catch (NumberFormatException notASlot) {
+            throw new IllegalArgumentException(
+                    "Op " + op + " states \"" + field + "\": \"" + spelled + "\", whose slot \"" + parts[0]
+                            + "\" is not a memosprite data slot (a positive number, e.g. 1) "
+                            + "(source: " + spec.getSource() + ")");
+        }
+        try {
+            if (Integer.parseInt(parts[1].trim()) < 0) {
+                throw new NumberFormatException();
+            }
+        } catch (NumberFormatException notAnIndex) {
+            throw new IllegalArgumentException(
+                    "Op " + op + " states \"" + field + "\": \"" + spelled + "\", whose \"" + parts[1]
+                            + "\" is not a zero-based index (source: " + spec.getSource() + ")");
+        }
     }
 
     static void requirePercent(EffectSpec effect, String op, TriggerSpec spec) {
-        // A share carried in a resource is a fourth spelling: the way a number captured at cast time is spent later.
-        if (effect.getPercentFromResource() != null) {
-            if (effect.getPercent() != null || effect.getPercentFromCastParam() != null
-                    || effect.getPercentFromSkillParam() != null) {
-                throw new IllegalArgumentException(
-                        "Op " + op + " states more than one share (\"percent\" / \"percent_from_cast_param\" / "
-                                + "\"percent_from_skill_param\" / \"percent_from_resource\"); the share comes from exactly one of them (source: "
-                                + spec.getSource() + ")");
-            }
-            return;
-        }
-        if (effect.getPercentFromSkillParam() != null) {
-            if (effect.getPercent() != null || effect.getPercentFromCastParam() != null) {
-                throw new IllegalArgumentException(
-                        "Op " + op + " states more than one share (\"percent\" / \"percent_from_cast_param\" / "
-                                + "\"percent_from_skill_param\"); the share comes from exactly one of them (source: "
-                                + spec.getSource() + ")");
-            }
-            // The spelling is checked here rather than only where it is read: a rule whose slot or index is malformed
-            // would otherwise load happily and fail the first time it fires (or read the neighbouring column silently).
-            requireSkillParamSpelling(effect.getPercentFromSkillParam(), "percent_from_skill_param", op, spec);
-            return;
+        // Note: All five spellings are collected before anything is refused, so the message can name them and the
+        // "exactly one" rule is stated once. The earlier version was a chain of ifs, and each new spelling had to
+        // remember to check the ones before it -- which is how `percent_from_resource` once slipped through.
+        java.util.List<String> stated = new java.util.ArrayList<>();
+        if (effect.getPercent() != null) {
+            stated.add("percent");
         }
         if (effect.getPercentFromCastParam() != null) {
-            if (effect.getPercent() != null) {
-                throw new IllegalArgumentException(
-                        "Op " + op + " states BOTH \"percent\" and \"percent_from_cast_param\"; the share comes from one of them"
-                                + " (source: " + spec.getSource() + ")");
-            }
-            return;
+            stated.add("percent_from_cast_param");
         }
-        if (effect.getPercent() == null) {
+        if (effect.getPercentFromSkillParam() != null) {
+            stated.add("percent_from_skill_param");
+        }
+        if (effect.getPercentFromResource() != null) {
+            stated.add("percent_from_resource");
+        }
+        if (effect.getPercentFromSummonParam() != null) {
+            stated.add("percent_from_summon_param");
+        }
+        if (stated.size() > 1) {
             throw new IllegalArgumentException(
-                    "Op " + op + " requires \"percent\" (source: " + spec.getSource() + ")");
+                    "Op " + op + " states more than one share (" + String.join(" / ", stated)
+                            + "); the share comes from exactly one of them (source: " + spec.getSource() + ")");
+        }
+        if (stated.isEmpty()) {
+            throw new IllegalArgumentException(
+                    "Op " + op + " requires \"percent\" - or one of its spellings "
+                            + "(\"percent_from_cast_param\" / \"percent_from_skill_param\" / "
+                            + "\"percent_from_summon_param\" / \"percent_from_resource\") "
+                            + "(source: " + spec.getSource() + ")");
+        }
+        // The spellings are checked HERE rather than only where they are read: a rule whose slot or index is malformed
+        // would otherwise load happily and fail the first time it fires (or read the neighbouring column silently).
+        if (effect.getPercentFromSkillParam() != null) {
+            requireSkillParamSpelling(effect.getPercentFromSkillParam(), "percent_from_skill_param", op, spec);
+        }
+        if (effect.getPercentFromSummonParam() != null) {
+            requireSummonParamSpelling(effect.getPercentFromSummonParam(), "percent_from_summon_param", op, spec);
         }
     }
 

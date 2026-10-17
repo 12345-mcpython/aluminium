@@ -97,6 +97,10 @@ public class EffectSpec {
         copy.percentFromCastParam = this.percentFromCastParam;
         copy.percentFromSkillParam = this.percentFromSkillParam;
         copy.amountFromSkillParam = this.amountFromSkillParam;
+        copy.amountFromCastParam = this.amountFromCastParam;
+        copy.percentFromSummonParam = this.percentFromSummonParam;
+        copy.amountFromSummonParam = this.amountFromSummonParam;
+        copy.memosprite = this.memosprite;
         copy.castCategory = this.castCategory;
         copy.damageLevel = this.damageLevel;
         copy.asAttack = this.asAttack;
@@ -890,6 +894,46 @@ public class EffectSpec {
 
     @SerializedName("percent_from_cast_param")
     private Integer percentFromCastParam;
+
+    /**
+     * The FLAT part of a magnitude, read from the skill that produced the event at its current level - the sibling of
+     * {@link #percentFromCastParam} for the constant term.
+     *
+     * <p>Reader: a <b>memosprite</b> whose sentence is 「等同于其 #1% 生命上限 + #2」 and whose #2 also runs with the
+     * level. A character's constant can be spelled {@link #amountFromSkillParam} (it names its own slot), but a
+     * memosprite's slot cannot be named by a {@code SkillType}, so a memosprite cast needs this spelling.
+     */
+    @SerializedName("amount_from_cast_param")
+    private Integer amountFromCastParam;
+
+    /**
+     * A share read from the <b>rule owner's memosprite</b>, as {@code "<DATA SLOT>:<index>"}, at that skill's current
+     * level - the memosprite half of {@link #percentFromSkillParam}.
+     *
+     * <p>Why a spelling of its own: a memosprite's skills live on {@code Summon.skillsByDataSlot} (they run to the
+     * eighteen-plus slots the game's servant table uses), so no {@code SkillType} can address them. The prefix is the
+     * same {@code summon_} the {@code summon_attr:} scale already uses for "the owner's memosprite".
+     */
+    @SerializedName("percent_from_summon_param")
+    private String percentFromSummonParam;
+
+    /**
+     * The flat sibling of {@link #percentFromSummonParam}: {@code "<DATA SLOT>:<index>"} out of the rule owner's
+     * memosprite, at that skill's current level.
+     */
+    @SerializedName("amount_from_summon_param")
+    private String amountFromSummonParam;
+
+    /**
+     * Whether {@code skill_id} names a <b>memosprite data slot</b> instead of a character slot, for
+     * {@code RAISE_SKILL_LEVEL}.
+     *
+     * <p>Reader: 「忆灵技等级+1」 - the raise applies to the rule owner's <b>memosprite</b>, and the slot is one of its
+     * data slots (1 / 3 / 5 …), which no {@code SkillType} names. Absent means the ordinary character spelling
+     * ({@code skill} = a {@code SkillType}).
+     */
+    @SerializedName("memosprite")
+    private Boolean memosprite;
 
     /**
      * The FLAT part of a magnitude, read from one of the RULE OWNER's OWN skills as {@code "<SKILLTYPE>:<index>"},
