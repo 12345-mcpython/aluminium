@@ -221,6 +221,15 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
      */
     private final Map<String, Integer> ruleEffectTurnsBonus = new HashMap<>();
     /**
+     * The firing-rate half of the same idea: "天赋的冷却时间减少 1 回合" (1002's Eidolon 2) lowers the named
+     * rule's {@code cooldown}.
+     *
+     * <p>Note: A delta stored beside the others rather than a replacement value: the rule keeps stating the
+     * cooldown its document writes, and the amendment is what an Eidolon corrects it by - the same split as
+     * {@link #ruleEffectTurnsBonus}.
+     */
+    private final Map<String, Integer> ruleCooldownDelta = new HashMap<>();
+    /**
      * The cap half: "可叠加上限提高 N 层" - filed at battle start, so it is in place before any stack is attached.
      */
     private final Map<String, Integer> ruleEffectMaxStacksBonus = new HashMap<>();
@@ -1139,6 +1148,35 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
         if (ruleId != null && !ruleId.isBlank()) {
             ruleEffectPercentBonus.merge(ruleId.trim(), delta, Double::sum);
         }
+    }
+
+    /**
+     * Adds {@code delta} to the cooldown of the rule named {@code ruleId} for this battle.
+     *
+     * <p>Called by the {@code MODIFY_RULE} op, whose load-time check already made sure the named rule states a
+     * {@code cooldown} and that the result does not go below zero.
+     *
+     * @param ruleId the target rule's {@code id}
+     * @param delta  how many of the owner's turns to add (negative = "comes back sooner")
+     */
+    public void addRuleCooldownDelta(String ruleId, int delta) {
+        if (ruleId == null || ruleId.isBlank()) {
+            return;
+        }
+        ruleCooldownDelta.merge(ruleId.trim(), delta, Integer::sum);
+    }
+
+    /**
+     * How much the cooldown of the rule named {@code ruleId} is amended this battle ({@code 0} = none).
+     *
+     * <p>Read where the cooldown is recorded after a firing, so the amendment is applied to the number the rule
+     * states rather than replacing it.
+     *
+     * @param ruleId the rule's own {@code id} ({@code ""} for an unnamed rule, which can never be amended)
+     * @return the amendment, or {@code 0}
+     */
+    public int ruleCooldownDelta(String ruleId) {
+        return ruleId == null || ruleId.isBlank() ? 0 : ruleCooldownDelta.getOrDefault(ruleId.trim(), 0);
     }
 
     /**

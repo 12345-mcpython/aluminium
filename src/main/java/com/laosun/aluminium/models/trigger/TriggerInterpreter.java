@@ -428,7 +428,10 @@ public final class TriggerInterpreter {
                     // Note: The count recorded is the SAME number the check above used: recording the stated per_turn while
                     // checking the amended one would make an amended rule fire forever (its counter would never reach the
                     // raised cap). One expression, read twice -- see `amendedPerTurn`.
-                    owner.startTriggerCooldown(limitKey, rule.cooldownTurns(), rule.oncePerBattle(),
+                    // The same one-expression rule applies to the cooldown: `MODIFY_RULE{cooldown_delta}` amends the number
+                    // the rule states, so the record must be the amended one (never below zero).
+                    owner.startTriggerCooldown(limitKey,
+                            Math.max(0, rule.cooldownTurns() + owner.ruleCooldownDelta(rule.id())), rule.oncePerBattle(),
                             rule.perTurn() + owner.rulePerTurnBonus(rule.id()));
                     if (rule.oncePerWave()) {
                         owner.recordWaveUse(limitKey, battle.waveSequence());
@@ -1839,9 +1842,9 @@ public final class TriggerInterpreter {
      * only when the rule they are running carries the id it was filed under.
      *
      * <p>Note: Which number moves is decided by <b>which field is stated</b>: {@code amount} raises a count, {@code
-     * percent} raises a probability. The load-time validator refuses both-at-once, neither, an out-of-range value, a
-     * non-integer count, any other field, a non-{@code BATTLE_START} event, an unknown rule id, and a named rule that
-     * does not state the number being raised.
+     * percent} raises a probability, {@code cooldown_delta} moves a cooldown. The load-time validator refuses
+     * both-at-once, neither, an out-of-range value, a non-integer count, any other field, a non-{@code BATTLE_START}
+     * event, an unknown rule id, and a named rule that does not state the number being raised.
      */
     private static void modifyRule(EffectSpec effect, TriggerContext ctx) {
         CanHit owner = ctx.owner();
@@ -1869,6 +1872,10 @@ public final class TriggerInterpreter {
             // The SAME amendment, sized by a resource in basis points (reader: 114151"for each 1% of overflow spent...").
             int basisPoints = resourceAmount(ctx.battle(), owner, effect.getEffectPercentFromResource().trim());
             owner.amendRuleEffectPercent(target, basisPoints / 10000.0);
+        } else if (effect.getCooldownDelta() != null) {
+            // "天赋的冷却时间减少 1 回合" (1002's Eidolon 2): a delta on the number the named rule states. Read where the
+            // cooldown is recorded, so the rule keeps saying "2" and the Eidolon is the correction.
+            owner.addRuleCooldownDelta(target, effect.getCooldownDelta());
         } else {
             owner.addRuleBaseChanceBonus(target, effect.getPercent());
         }

@@ -272,6 +272,22 @@ final class TriggerConditionParser {
                     ruleId, raw, spec);
         }
 
+        // `is_slowed`: "<who> is_slowed" - argument-less like `has_shield`, and the question is about a STATE the
+        // engine keeps only as arithmetic (a negative SPEED modifier). Reader: 1002 Dan Heng's ultimate ("目标处于
+        // 减速状态时，伤害倍率提高 120%") and his trace 罡风; light cone 20011 asks the same of an enemy.
+        Matcher isSlowed = IS_SLOWED.matcher(text);
+        if (isSlowed.find()) {
+            String subject = normalize(text.substring(0, isSlowed.start()));
+            String trailing = text.substring(isSlowed.end()).trim();
+            if (!trailing.isEmpty()) {
+                throw new IllegalArgumentException(
+                        "Condition '" + raw + "' writes something after \"is_slowed\": it takes no argument "
+                                + "(write \"target is_slowed\", or \"!target is_slowed\" for the opposite) "
+                                + "(source: " + spec.getSource() + ")");
+            }
+            return new TriggerTable.IsSlowed(requireStateSubject(subject, raw, spec), raw);
+        }
+
         // `from_skill COMMON|SKILL|ULTRA|TALENT`: the causing instance's cast category. No subject: the "who" is
         // already a separate condition (`actor == self`), and the sentence never names a second unit.
         // `damage_is_attack`: a bare keyword, no subject and no value. Kept positive on purpose -- see DAMAGE_IS_ATTACK.
@@ -2230,6 +2246,16 @@ final class TriggerConditionParser {
      */
     private static final Pattern HAS_SHIELD =
             Pattern.compile("(?<![\\w])has_shield(?![\\w])", Pattern.CASE_INSENSITIVE);
+
+    /**
+     * The {@code is_slowed} keyword: "<b>that unit's Speed is currently lowered</b>".
+     *
+     * <p>Read exactly like the other party predicates ({@link #requireStateSubject} for the subject, the same
+     * {@code !} prefix for the opposite), and evaluated by {@code TriggerTable.IsSlowed}, which asks the SPEED
+     * attribute for its negative modifiers - so a slow from ANY source counts, not only one this file applied.
+     */
+    private static final Pattern IS_SLOWED =
+            Pattern.compile("(?<![\\w])is_slowed(?![\\w])", Pattern.CASE_INSENSITIVE);
 
     /**
      * The {@code from_rule} qualifier of {@code has_shield}: the shield was created by the rule with this id.

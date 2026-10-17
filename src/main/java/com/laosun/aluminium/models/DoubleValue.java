@@ -167,6 +167,36 @@ public final class DoubleValue implements Cloneable {
     }
 
     /**
+     * Whether at least one attached modifier pushes this attribute <b>down</b>.
+     *
+     * <p>This is the engine's answer to "the unit is slowed": no state carries that name, because a slow IS a
+     * {@code SPEED} modifier (see {@code StatModifierBuff.percentDebuff} and {@code ControlBuff}), so the question is
+     * asked of the attribute the sentence is about ({@code is_slowed} in the condition DSL).
+     *
+     * <p>Note: It asks about the <b>modifiers</b>, not about the net value. A unit carrying {@code +20%} speed and a
+     * {@code -12%} slow is still "under a slow" - the sentence names the state, not the arithmetic - and comparing
+     * {@link #get()} with {@link #baseValue()} would silently clear the state whenever a buff outweighed it.
+     */
+    public boolean isReduced() {
+        for (Modifier modifier : addPercentModifiers) {
+            if (modifier.rate() < 0) {
+                return true;
+            }
+        }
+        for (Modifier modifier : multiplyPercentModifiers) {
+            if (modifier.rate() < 0) {
+                return true;
+            }
+        }
+        for (Modifier modifier : valueModifiers) {
+            if (modifier.rate() < 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Adds a modifier and recomputes the final value immediately.
      *
      * @param modifier the modifier to add

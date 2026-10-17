@@ -8,8 +8,10 @@ import com.laosun.aluminium.enums.SkillCategory;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Damage;
+import com.laosun.aluminium.models.buff.StatModifierBuff;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.test.support.BattleFixture;
+import com.laosun.aluminium.test.support.TestTurns;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -164,6 +166,78 @@ public class DanHengKitCompletionTest {
 
     private enum Skin { NORMAL, LOW }
 
+    /**
+     * 终结技「当受到攻击的敌方目标处于减速状态时，终结技造成的伤害倍率提高 120%」.
+     *
+     * <p>⚠ What makes this observable: the extra 120% is a <b>multiplier</b> (4.0 -> 5.2 at Lv10), so the same
+     * zones give a ratio of 1.3 - and the same hit against an unslowed target is the control. A `BOOST_DAMAGE`
+     * implementation would read 2.2 instead, which is why the assertion is the ratio and not the absolute number.
+     */
+    @Test
+    public void theUltimateHitsHarderAtASlowedTarget() {
+        double plain = new Fixture(0).ult();
+        Fixture slowed = new Fixture(0);
+        slowed.slowTheEnemy();
+        double boosted = slowed.ult();
+
+        Assertions.assertEquals(1.3, boosted / plain, 1e-9,
+                "4.0 + 1.2 at Lv10 is +30% of the multiplier, not +120% of the damage: " + plain + " -> " + boosted);
+    }
+
+    /**
+     * The scoping: 「终结技」 only. A slowed target does not make the Skill hit harder.
+     */
+    @Test
+    public void theUltimateBonusIsNotTheSkills() {
+        double plain = new Fixture(0).skillDamage();
+        Fixture slowed = new Fixture(0);
+        slowed.slowTheEnemy();
+        Assertions.assertEquals(plain, slowed.skillDamage(), 1e-9, "「终结技造成的伤害」 - not any hit");
+    }
+
+    /**
+     * 行迹 罡风「普攻对减速状态下的敌方目标造成的伤害提高 40%」.
+     */
+    @Test
+    public void theBasicAttackHitsHarderAtASlowedTarget() {
+        double plain = new Fixture(0).basic();
+        Fixture slowed = new Fixture(0);
+        slowed.slowTheEnemy();
+        double boosted = slowed.basic();
+
+        // Note: The ratio is measured against the boost zone he already has (his wind-damage traces), because +40%
+        // enters that ADDITIVE zone: (1 + wind + 0.4) / (1 + wind), not 1.4.
+        double wind = slowed.danheng.getAttribute(AttributeType.WIND_DAMAGE_BOOST).get();
+        Assertions.assertEquals((1 + wind + 0.4) / (1 + wind), boosted / plain, 1e-9,
+                "「伤害提高 40%」 lands in the DMG-boost zone he already carries (" + wind + ")");
+    }
+
+    /**
+     * 星魂 2「天赋的冷却时间减少 1 回合」.
+     *
+     * <p>⚠ The state has to be observable, so the sequence is: the talent fires (penetration rises), his own attack
+     * consumes `until: next_attack`, one of HIS turns passes (where a cooldown is counted down), then the same ally
+     * Skill is aimed at him again. At rank 2 the talent fires again; at rank 0 the stated cooldown is still 2 and it
+     * must not.
+     */
+    @Test
+    public void eidolon2BringsTheTalentBackOneTurnSooner() {
+        Assertions.assertTrue(talentFiresAgainAfterOneOwnTurn(2),
+                "「天赋的冷却时间减少 1 回合」: one turn later the ally's Skill raises his penetration again");
+        Assertions.assertFalse(talentFiresAgainAfterOneOwnTurn(0),
+                "the control: at rank 0 the talent states 2 turns, so one turn is not enough");
+    }
+
+    /** Fires the talent, consumes its buff, takes one of his turns, and reports whether a second firing happened. */
+    private static boolean talentFiresAgainAfterOneOwnTurn(int eidolon) {
+        Fixture f = new Fixture(eidolon);
+        f.aimAllySkillAtHim();
+        f.basic();
+        TestTurns.take(f.battle, f.danheng);
+        f.aimAllySkillAtHim();
+        return f.danheng.getAttribute(AttributeType.DAMAGE_PENETRATION).get() > 1e-9;
+    }
+
     /** Settles one WIND hit of the given category against a full or half-dead enemy, and returns the amount. */
     private static double settled(Skin skin, double roll) {
         return settled(skin, roll, 0);
@@ -213,6 +287,31 @@ public class DanHengKitCompletionTest {
 
         private void cast(SkillType slot) {
             battle.castImmediate(danheng.getSkills().get(slot), danheng, List.of(enemy));
+        }
+
+        /** 「减速状态」: the engine's only representation of a slow - a negative SPEED modifier. */
+        private void slowTheEnemy() {
+            enemy.getBuffManager().addBuff(StatModifierBuff.percentDebuff(AttributeType.SPEED, -0.12, 2));
+        }
+
+        /** The ally's Skill, aimed at him - what his talent listens for. */
+        private void aimAllySkillAtHim() {
+            battle.castImmediate(ally.getSkills().get(SkillType.SKILL), ally, List.of(danheng));
+        }
+
+        private double ult() {
+            cast(SkillType.ULTRA);
+            return lastSettled;
+        }
+
+        private double basic() {
+            cast(SkillType.COMMON);
+            return lastSettled;
+        }
+
+        private double skillDamage() {
+            cast(SkillType.SKILL);
+            return lastSettled;
         }
 
         /** A killing blow of the given cast category, so the KILL event carries that slot. */

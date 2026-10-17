@@ -826,6 +826,15 @@ final class TriggerValidator {
                     // Note: NOT `requireResource`: that checks `resource`, and this spelling names its resource in `effect_percent_from_resource`.
                     rejectAmendmentExtras(effect, op, spec, "effect_percent_from_resource");
                     rejectAmendmentExtras(effect, op, spec, "effect_percent");
+                } else if (effect.getCooldownDelta() != null) {
+                    // "天赋的冷却时间减少 1 回合": a delta in whole turns, and zero is not a delta (it is already
+                    // spelled by omitting the field) -- the same reason `effect_turns` refuses 0.
+                    if (effect.getCooldownDelta() == 0) {
+                        throw new IllegalArgumentException(
+                                "Op " + op + " amends a rule's cooldown, so \"cooldown_delta\" is a whole number of "
+                                        + "turns other than 0 (negative lowers it) (source: " + spec.getSource() + ")");
+                    }
+                    rejectAmendmentExtras(effect, op, spec, "cooldown_delta");
                 } else {
                     requirePercent(effect, op, spec);
                     if (effect.getPercent() <= 0 || effect.getPercent() > 1) {
@@ -1084,7 +1093,7 @@ final class TriggerValidator {
         int stated = 0;
         for (Object candidate : new Object[]{effect.getAmount(), effect.getBaseChance(), effect.getPercent(),
                 effect.getEffectPercent(), effect.getEffectPercentFromResource(), effect.getEffectTurns(),
-                effect.getEffectMaxStacks()}) {
+                effect.getEffectMaxStacks(), effect.getCooldownDelta()}) {
             if (candidate != null) {
                 stated++;
             }
@@ -1092,8 +1101,9 @@ final class TriggerValidator {
         if (stated != 1) {
             throw new IllegalArgumentException(
                     "Op " + op + " must state exactly ONE amendment -- \"amount\" (firings per turn), \"base_chance\" "
-                            + "(probability), \"effect_percent\" (raise a value) or \"effect_turns\" (raise a "
-                            + "duration) -- but " + stated + " were stated (source: " + spec.getSource() + ")");
+                            + "(probability), \"effect_percent\" (raise a value), \"effect_turns\" (raise a "
+                            + "duration) or \"cooldown_delta\" (raise or lower a cooldown) -- but " + stated
+                            + " were stated (source: " + spec.getSource() + ")");
         }
     }
 
@@ -2025,7 +2035,8 @@ final class TriggerValidator {
                 || effect.getBaseChance() != null || effect.getKind() != null
                 || effect.getStacks() != null || effect.getTicksOn() != null
                 || effect.getAsAttack() != null || effect.getPerTarget() != null
-                || effect.getCritRate() != null || effect.getCritDamage() != null) {
+                || effect.getCritRate() != null || effect.getCritDamage() != null
+                || (!"cooldown_delta".equals(kept) && effect.getCooldownDelta() != null)) {
             throw new IllegalArgumentException(
                     "Op " + op + " raises exactly one number on the rule it names: either \"amount\" (how many more "
                             + "times per turn) or \"percent\" (how much more likely), and it reads no other field "
