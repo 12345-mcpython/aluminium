@@ -4,6 +4,7 @@ package com.laosun.compare;
 import lombok.Getter;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -70,6 +71,15 @@ public class DamageScenario {
 
         /** Absolute attribute values to install on the attacker, so both sides use the same panel. */
         private Map<String, Double> attributes;
+
+        /**
+         * The base layer itself ({@code damage_value} in a captured game event: the skill multiplier times ATK).
+         *
+         * <p>When stated, the attacker's ATK is solved from it ({@code ATK = base / multiplier}), so the comparison starts
+         * from <b>the game's own base</b> instead of depending on this engine's 4-star panel - which is what makes a
+         * capture comparable at all, since the game's number came from a panel with light cone, relics and buffs.
+         */
+        private Double base;
     }
 
     /**
@@ -88,5 +98,32 @@ public class DamageScenario {
 
         /** Absolute attribute values to install on the enemy (e.g. a smaller HEALTH so it survives one hit). */
         private Map<String, Double> attributes;
+
+        /**
+         * Whether the target is in the <b>broken</b> state.
+         *
+         * <p>It matters to the numbers: an unbroken enemy takes the extra 10% toughness reduction inside the reduction
+         * zone, so a capture whose {@code all_damage_reduce} is the total must state this or the engine will apply
+         * {@code 0.75 x 0.9} where the game applied {@code 0.75}.
+         */
+        private Boolean broken;
+
+        /** Damage-side state on the target: vulnerability and/or reduction, exactly as the capture reports them. */
+        private List<Modifier> buffs;
+
+        /**
+         * One damage-side modifier on the target.
+         */
+        @Getter
+        public static class Modifier {
+
+            /** {@code vulnerable} ({@code all_damage_type_taken_ratio}) or {@code reduction} ({@code all_damage_reduce}). */
+            private String kind;
+
+            private Double value;
+
+            /** Turns; absent = 1. */
+            private Integer turns;
+        }
     }
 }

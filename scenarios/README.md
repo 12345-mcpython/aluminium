@@ -50,6 +50,9 @@ gradlew run --args="compare"                     # 列出 scenarios/ 下的场�
 | `attacker.skill` | ✓ | `COMMON` / `SKILL` / `ULTRA` / `TALENT` |
 | `attacker.skillLevel` | | 施放等级；不写 = 该表的最大行（本库的 Lv10 口径） |
 | `attacker.attributes` | | **绝对**属性覆盖，让两边用同一面板（见下） |
+| `attacker.base` | | 直接给**基数层**（= 捕获里的 `damage_value`）。给了它，引擎的 `base` 就按 `ATK = base / 倍率` 反解，比较从游戏的起点开始 |
+| `target.broken` | | `true` = 目标已处于击破状态。它影响减伤区：未击破的敌人会**再叠 0.9 的韧性减伤** |
+| `target.buffs` | | 捕获里的伤害侧状态：`[{"kind":"vulnerable","value":0.64},{"kind":"reduction","value":0.75}]` |
 | `target.monsterId` / `level` | ✓ | 敌人实例与等级（`monster_config.json` 的键） |
 | `target.hardLevelGroup` | | 关卡难度组，默认 1 |
 | `target.attributes` | | 同上（常用：`HEALTH` 调大，保证一击打不死） |
@@ -58,6 +61,29 @@ gradlew run --args="compare"                     # 列出 scenarios/ 下的场�
 | `instances` | | 期望段数，不符会报一条差异 |
 | `tolerance` | | 相对容差，默认 `1e-6` |
 | `expect` | | zone 名 → 游戏的值。**留空则只打印引擎自己的数**（就是给你抄格式用的） |
+
+### 一次真实捕获的复算（`scenarios/capture-858483.json`）
+
+拿一份游戏伤害事件（`damage` + `zones`）做了端到端核对，结论：**公式逐项对上，12 个乘区全 0 误差**，
+最终值差 `0.00016`（相对 `1.9e-10`，来自游戏侧 float32 与反解出来的 DEF）。
+
+对齐关系（这就是本仓库的乘区命名与游戏字段的对应）：
+
+| 游戏字段 | 引擎 | 数值（该捕获） |
+|---|---|---|
+| `damage_value` | `base` | 91155.27047840762 |
+| `all_damage_type_added_ratio`（+元素/全属性/DoT） | `BoostArea` | 1 + 3.49 = **4.49** |
+| `base_damage_multi_ratio` | `BaseMultiArea` | **1.5**（引擎存**增量** 0.5） |
+| `critical_damage`（`is_critical`） | `CritArea` | 1 + 5.0913 = **6.0913** |
+| `all_damage_type_taken_ratio` | `VulnerableArea`（**上限 3.5**） | 1 + 0.64 = **1.64** |
+| `all_damage_reduce` | `ReductionArea`（**下限 0.01**，含韧性 0.9） | 1 − 0.75 = **0.25** |
+| `resistance`（元素 0.2）− `all_damage_type_penetrate`（0.2）= `net_resistance` 0 | `ResistArea` | **1.0** |
+| 未出现在 zones 里 | `DefenceArea` | 反解 **0.559910** ⇒ **DEF = 786.000056** |
+| `absorb.<元素>`（全 0） | `absorb`（**减法**，链末） | 0 |
+
+⚠ 捕获里**唯一没给的输入是目标的 DEF**，它可以从等级 80 的防御式反解：`1 − DEF/(DEF+200+10×80)` ⇒
+`DEF = 786.000056`（= `210 × 3.742857`；本仓库的 `hard_level_group` 里没有这一档，所以它更可能是**该场战斗的
+DEF 下调**或一个未入库的等级/分组，这一点保留为待查，而不是近似）。
 
 ### 为什么需要 `attributes` 覆盖
 
@@ -98,6 +124,9 @@ gradlew run --args="compare"                     # 列出 scenarios/ 下的场�
 2. 先**不写** `expect` 跑一次 ⇒ 打印引擎的全部 zone（格式现成）。
 3. 把原游戏的数填进 `expect`（能填几项填几项；只填 `final` 也行）。
 4. 再跑一次 ⇒ 逐行 `game / engine / diff / relative`，对不上的行标 `<-- differs`。
+
+⚠ **`skillLevel` 是基础等级**：角色文件自己的 `level_convention` 会在 `BATTLE_START` 把它抬高（1002 是 `+9`）。
+所以想比"Lv10 那一行"要写 `skillLevel: 1`，而 `inputs:` 那行打印的 `Lv…` 才是**实际施放等级**（它也是反解 `base` 用的行）。
 
 ⚠ **精度**：`expect` 请填原游戏的**原始精度**。如果游戏只给了 4–6 位小数，`tolerance` 要跟着放到同一量级（默认 `1e-6`，是按“两边都是全精度”设的），否则会看到 `0.0001%` 这种假差异。
 

@@ -186,10 +186,6 @@ public final class DamageComparator {
 
         Character attacker = CharacterFactory.create(stated.getCid(), stated.getLevel(), true, null, null,
                 stated.getEidolon() == null ? 0 : stated.getEidolon());
-        int level = stated.getSkillLevel() == null
-                ? (int) attacker.skillLevel(attacker.getSkills().get(slot))
-                : stated.getSkillLevel();
-        attacker.setSkill(slot, new DefaultSkill(stated.getCid(), dataSlot, level));
 
         Enemy enemy = EnemyFactory.create(targetSpec.getMonsterId(), targetSpec.getLevel(),
                 targetSpec.getHardLevelGroup() == null ? 1 : targetSpec.getHardLevelGroup());
@@ -197,8 +193,38 @@ public final class DamageComparator {
         Battle battle = new Battle(new ArrayList<>(List.of(attacker)), new ArrayList<>(List.of(enemy)),
                 roll(scenario.getCrit()));
         battle.startBattle();
+        // The skill is installed AFTER the battle starts, on purpose: a character file's `level_convention` raises the
+        // slots at BATTLE_START (1002's is +9, i.e. "the document quotes Lv10"), so installing the scenario's level before
+        // that would let the raise win and the cast would use another row - measured: 4.8 instead of 4.0 on his ultimate,
+        // a 20% error that showed up as a base 20% above the capture's `damage_value`.
+        int level = stated.getSkillLevel() == null
+                ? (int) attacker.skillLevel(attacker.getSkills().get(slot))
+                : stated.getSkillLevel();
+        attacker.setSkill(slot, new DefaultSkill(stated.getCid(), dataSlot, level));
+        // What the engine will cast with, raises included - reported below so the header cannot lie about the row.
+        int effectiveLevel = (int) attacker.skillLevel(attacker.getSkills().get(slot));
         applyOverrides(attacker, stated.getAttributes());
+        if (stated.getBase() != null) {
+            // Solve ATK from the game's own base: the comparison must start where the capture starts.
+            //
+            // The multiplier comes from the row the engine will ACTUALLY cast with - `skillLevel(skill)` includes the
+            // per-battle raises, and a character file's `level_convention` raises every slot at BATTLE_START (1002's is
+            // +9, "the document quotes Lv10"). Measured: using the requested level instead read row 10's 4.0 while the cast
+            // used row 15's 4.8, and the base came out 20% above the capture - a wrong ATK that looks like a wrong formula.
+            Double statedMultiplier = multiplierOf(attacker.getSkills().get(slot), effectiveLevel);
+            if (statedMultiplier == null || statedMultiplier == 0) {
+                throw new IllegalArgumentException("cannot read the multiplier of " + slot + " at level " + effectiveLevel);
+            }
+            double multiplier = statedMultiplier;
+            attacker.setAttribute(AttributeType.ATTACK, new DoubleValue(stated.getBase() / multiplier));
+        }
         applyOverrides(enemy, targetSpec.getAttributes());
+        if (Boolean.TRUE.equals(targetSpec.getBroken())) {
+            // Before the cast: an unbroken enemy carries the extra toughness reduction, and a capture that reports a
+            // single reduction number has already accounted for it.
+            enemy.breakEnemy(skillElement(attacker.getSkills().get(slot)));
+        }
+        applyModifiers(enemy, targetSpec.getBuffs());
 
         List<Damage> settled = new ArrayList<>();
         battle.addDamageObserver((damage, applied, hpLoss, shieldAbsorbed, died) -> settled.add(damage));
@@ -208,13 +234,41 @@ public final class DamageComparator {
 
         String inputs = "attacker=" + stated.getCid() + "@" + stated.getLevel()
                 + (stated.getEidolon() == null || stated.getEidolon() == 0 ? "" : " E" + stated.getEidolon())
-                + " " + slot + " Lv" + level
+                + " " + slot + " Lv" + effectiveLevel
                 + " ATK=" + num(attacker.getAttribute(AttributeType.ATTACK).get())
-                + " multiplier=" + num(multiplierOf(skill, level))
+                + " multiplier=" + num(multiplierOf(skill, effectiveLevel))
                 + " | enemy=" + targetSpec.getMonsterId() + "@" + targetSpec.getLevel()
                 + " DEF=" + num(enemy.getAttribute(AttributeType.DEFENCE).get())
                 + " crit=" + (scenario.getCrit() == null ? "left to the dice" : scenario.getCrit());
         return new Result(inputs, settled, scenario.getInstance() == null ? 0 : scenario.getInstance());
+    }
+
+    /**
+     * Installs the capture's damage-side state on the target: vulnerability and reduction.
+     */
+    private static void applyModifiers(Enemy enemy, java.util.List<DamageScenario.Target.Modifier> buffs) {
+        if (buffs == null) {
+            return;
+        }
+        for (DamageScenario.Target.Modifier buff : buffs) {
+            int turns = buff.getTurns() == null ? 1 : buff.getTurns();
+            double value = buff.getValue() == null ? 0 : buff.getValue();
+            switch (String.valueOf(buff.getKind()).toLowerCase(Locale.ROOT)) {
+                case "vulnerable" -> enemy.getBuffManager().addBuff(
+                        new com.laosun.aluminium.models.buff.VulnerabilityBuff(turns, value));
+                case "reduction" -> enemy.getBuffManager().addBuff(
+                        new com.laosun.aluminium.models.buff.ReductionBuff(turns, value));
+                default -> throw new IllegalArgumentException("unknown buff kind \"" + buff.getKind()
+                        + "\": use \"vulnerable\" or \"reduction\"");
+            }
+        }
+    }
+
+    /**
+     * The element a skill's damage carries - what the break state and the resistance zone need.
+     */
+    private static com.laosun.aluminium.enums.DamageElement skillElement(Skill skill) {
+        return skill.getData() == null ? null : skill.getData().getElement();
     }
 
     /**
