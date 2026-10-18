@@ -312,6 +312,45 @@
     },
     {
       "on": "CAST_SETUP",
+      "id": "memosprite_rainclouds_clears_half_the_tally",
+      "max_eidolon": 5,
+      "when": [
+        "actor is_summon",
+        "from_skill_id == 1"
+      ],
+      "do": [
+        {
+          "op": "REMOVE_RESOURCE",
+          "resource": "小伊卡累计治疗",
+          "scale": "self_resource:小伊卡累计治疗",
+          "percent": 0.5,
+          "target": "self"
+        }
+      ],
+      "source": "1409 风堇 忆灵技1：「…并清空累计治疗数值的 50%」param = [0.1…0.28, 0.5]",
+      "note": "「清空累计治疗数值的 **50%**」—— ① `REMOVE_RESOURCE` 按「能扣多少扣多少」**夹取** ✓；② 份额是新词汇 `scale: \"self_resource:小伊卡累计治疗\"` + `percent: 0.5` ✓（本轮给它开了 REMOVE_RESOURCE 的口子 ✓，§3.7r）；③ 必须排在伤害那条**之后** ✓（伤害读的是**扣之前**的计量 ✓）；④ `max_eidolon: 5` ✓ —— 星魂6 改成 12%，两条孪生各开一条 ✓。"
+    },
+    {
+      "on": "CAST_SETUP",
+      "id": "eidolon_six_clears_twelve_percent_instead",
+      "min_eidolon": 6,
+      "when": [
+        "actor is_summon",
+        "from_skill_id == 1"
+      ],
+      "do": [
+        {
+          "op": "REMOVE_RESOURCE",
+          "resource": "小伊卡累计治疗",
+          "scale": "self_resource:小伊卡累计治疗",
+          "percent": 0.12,
+          "target": "self"
+        }
+      ],
+      "source": "1409 风堇 星魂6（1409_风堇.md:382）：「小伊卡施放忆灵技清空累计治疗数值改为 12%」param = [0.12, 0.2]",
+      "note": "「**改为 12%**」—— 与上一条同形孪生 ✓：`min_eidolon: 6` 开、上一条 `max_eidolon: 5` 关 ✓ ⇒ 一次施放只有一条在跑 ✓（不会 50% + 12% 扣两次 ✗）。第二个参数 `0.2` 是抗性穿透，已在 §3.7l 那条规则里 ✓。"
+    },
+    {
       "on": "BATTLE_START",
       "id": "trace_windstorm_raises_her_max_hp_above_200_speed",
       "when": [
