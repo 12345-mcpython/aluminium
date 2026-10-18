@@ -562,6 +562,9 @@ public class Battle {
      * shared with wave entries, and a wave arriving is not a summon.
      */
     private final List<CanHit> justSummoned = new ArrayList<>();
+
+    /** Summons whose departure has already been announced (see {@code TriggerEvent.SUMMON_LEFT}). */
+    private final java.util.Set<CanHit> summonsAnnouncedGone = java.util.Collections.newSetFromMap(new java.util.IdentityHashMap<>());
     /**
      * Units whose technique was used before this battle.
      *
@@ -3974,6 +3977,7 @@ public class Battle {
 
     private void removeDeadCombatants() {
         perishOrphanedSummons();                     // a summon goes when its master does
+        announceSummonsThatLeft();                   // 「消失时…」: the departure nobody kills
         for (Signal signal : queue.snapshot()) {
             if (signal.getCanHit().isDeath()) {
                 queue.removeCombatant(signal.getCanHit());
@@ -4001,6 +4005,25 @@ public class Battle {
      * exactly 1.40x before and after she fell (the {@code AnchorDeathTest} that caught it). The buff's carrier is
      * not necessarily on the dying unit's side.
      */
+    /**
+     * Fires {@link TriggerEvent#SUMMON_LEFT} for every memosprite that is gone, once each.
+     *
+     * <p>Runs inside {@link #removeDeadCombatants}, which is the one place a departure becomes a fact: a memosprite
+     * either fell to damage or was taken off by {@code perish()} (its own master dying takes it too). The rule
+     * <b>owner</b> is alive and receives the event, which is what makes 「消失时使风堇行动提前 30%」 writable.
+     *
+     * <p>⚠ The announcement is remembered: the sweep runs on every settlement, and a rule that pays out per firing
+     * would otherwise advance the owner's action bar again and again for one departure.
+     */
+    private void announceSummonsThatLeft() {
+        List<CanHit> everyone = new ArrayList<>(allies);
+        everyone.addAll(enemies);
+        for (CanHit unit : everyone) {
+            if (unit instanceof Summon && unit.isDeath() && summonsAnnouncedGone.add(unit)) {
+                fireTriggers(TriggerEvent.SUMMON_LEFT, unit, unit, 0, 0.0, null, null);
+            }
+        }
+    }
     private void releaseBuffsAnchoredToTheDead() {
         List<CanHit> everyone = new ArrayList<>(allies);
         everyone.addAll(enemies);
@@ -4376,3 +4399,4 @@ public class Battle {
     private CanHit techniqueArchetype;
 
 }
+
