@@ -106,10 +106,16 @@
           "op": "RAISE_SKILL_LEVEL",
           "skill": "COMMON",
           "amount": 1
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "memosprite": true,
+          "skill_id": 1,
+          "amount": 1
         }
       ],
       "source": "1409 风堇 星魂3（E:/code/blog/hsr/1409_风堇.md:366）：「终结技等级+2，最多不超过15级；普攻等级+1，最多不超过10级；忆灵技等级+1，最多不超过10级」",
-      "note": "⭐ 引擎的 `eidolonRank` 只开规则、**不抬技能等级** —— 本次用 `min_eidolon: 3` + `RAISE_SKILL_LEVEL` 补上。⚠ 同句的「忆灵技等级+1」还没有写法（忆灵技能按数据槽位存），登记。"
+      "note": "⭐ 引擎的 `eidolonRank` 只开规则、**不抬技能等级** —— 本次用 `min_eidolon: 3` + `RAISE_SKILL_LEVEL` 补上；「忆灵技等级+1」用 `memosprite: true` + `skill_id: 1`（小伊卡的数据槽 1）✓。"
     },
     {
       "on": "HEALED",
