@@ -2,6 +2,7 @@ package com.laosun.compare;
 
 
 import lombok.Getter;
+import lombok.Setter;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -18,6 +19,7 @@ import java.util.Map;
  * sources, so a scenario file can be handed over as-is.
  */
 @Getter
+@Setter
 public class DamageScenario {
 
     /** A short label, printed as the table's title. */
@@ -54,6 +56,7 @@ public class DamageScenario {
      * Who casts.
      */
     @Getter
+    @Setter
     public static class Attacker {
 
         private Integer cid;
@@ -96,6 +99,7 @@ public class DamageScenario {
      * What it hits.
      */
     @Getter
+    @Setter
     public static class Target {
 
         /** A key of {@code monster_config.json}, e.g. 1002011. */
@@ -125,6 +129,7 @@ public class DamageScenario {
          * One damage-side modifier on the target.
          */
         @Getter
+        @Setter
         public static class Modifier {
 
             /** {@code vulnerable} ({@code all_damage_type_taken_ratio}) or {@code reduction} ({@code all_damage_reduce}). */

@@ -348,6 +348,35 @@ DEF = 1150 × { 1.00000, 0.77500, 0.77000, 0.76000, 0.72500, 0.71000, 0.70500, 0
 ⚠ 夹具上的两处说明（不是游戏数值）：1002 的普攻是**两段**（`skill_effects.json` 的 `0.45 / 0.55`），所以基数与最终值都乘 0.45；
 `WIND_DAMAGE_BOOST` 要显式置 0（抵掉角色自带的 0.224），否则增伤区会高 0.224。
 
+### `compare-capture <capture.json>`：整场捕获直接回放
+
+```bash
+gradlew run --args="compare-capture C:\path\to\veritas_capture_*.json"      # 全部事件
+gradlew run --args="compare-capture ...json --limit 5"                        # 只看前几条
+```
+
+它把捕获里的每一条伤害事件**逐条**变成一个场景，交给同一套测量路径（`DamageComparator.measure`），
+比对 `base` 与 `final`，逐行打印 `# / type / element / game / engine / relative`，末尾给 `reproduced: n/m`，
+退出码 0/1。
+
+事件到场景的换算（全部取自捕获，不来自引擎）：
+
+| 输入 | 取自 |
+|---|---|
+| 元素 | `damage_type` 位掩码（游戏自己的 `DamageType`：1 物理 / 2 火 / 4 冰 / 8 雷 / 16 风 / 32 量子 / 64 虚数） |
+| 基数 | `raw_damage_before_modifiers` |
+| 增伤 | `added_ratio[元素]` + `all_damage_type_added_ratio` + `all_damage_added_ratio` + `dot_*` |
+| 乘算倍率 / 暴击 / 易伤 / 减伤 | `base_damage_multi_ratio` / `critical_damage` / `all_damage_type_taken_ratio` / `all_damage_reduce` |
+| **无视防御** | `1 − target_defence_effective / target_defence` |
+| 穿透 | 解成 `resistance[元素] − net_resistance`，这样引擎的 `1 − (res − pen)` 就是捕获的 `1 − net` |
+| 韧性减伤 | 捕获把韧性 10% 折进了 `all_damage_reduce`；回放把目标标为已击破，再把该值作为减伤 buff 给进去，乘积与游戏一致 |
+
+**结果**：`src/test/resources/captures/veritas-085418.json`（82 条事件，裁剪到只留驱动读的字段）
+→ **81 / 81 可回放事件逐位复现，1 条击破事件按原因跳过**，已作为 `CaptureComparatorTest` 进判据。
+
+⚠ 跳过的原因：击破伤害的乘区**不吃**增伤桶，而回放装的是一发普通命中（会吃）—— 击破那条另行验证
+（`3767.553 × 击破倍率 × (1 + break_damage_added_ratio)`，见上文的整场审计）。
+
 ### 为什么需要 `attributes` 覆盖
 
 引擎的面板 = `character_data` + 晋阶 + 行迹，**没有光锥/遗器**。原游戏的数来自某个具体面板，所以比较时必须把那个面板的
