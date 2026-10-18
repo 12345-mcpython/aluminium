@@ -211,6 +211,26 @@
       "note": "「**小伊卡在场时**，我方全体目标的**全属性抗性穿透提高 20%**」—— ① 「全属性抗性穿透」= 引擎的 **`DAMAGE_PENETRATION`** ✓：它减的是**任何**元素的那一发抗性 ✓（`Battle` 里 `damage.resist(rawResist, attacker.getAttribute(DAMAGE_PENETRATION).get())`，而 `rawResist` 早已按元素取过 ✓）—— 与 1303 阮•梅结界、1408、1412、1502 同一拼写 ✓；⚠ **不用** `RESISTANCE_REDUCTION` ✗：那是**受击方**的属性 ✓，这句的主语是**我方** ✓。② 「**小伊卡在场时**」= 事件 `SUMMONED` ✓ + `actor == summon` ✓ + `self_summon_count >= 1` ✓：忆灵第一次真的**进入场地**才给光环 ✓，而不是在战斗开始时先给 ✓；⚠ `actor == summon` 不能省 ✗ —— `SUMMONED` 对**两方**的召唤都发 ✓，少了它，队友的忆灵登场也会给全队抗性穿透 ✓。③ 「我方全体」= `all_allies` ✓，而它取的是 `battle.allies`（**阵营**）✓ ⇒ 我方忆灵**也在里面** ✓ —— 与「我方全体目标」含忆灵一致 ✓。④ `permanent: true` ✓（原文没有时长 ✓）。⚠ **登记**：忆灵**离场后**这条不会自己撤下 ✗ —— 引擎今天没有「召唤物离场」这个事件，也没有按召唤物存续计时的 `ticks_on: \"summon\"`（1407 登记过同一缺口 ✓）；本条**没有**用近似去盖住它 ✓。⚠ **登记**：同句前半「小伊卡施放忆灵技清空累计治疗数值**改为 12%**」✗ —— 它改的是忆灵技 1 的**累计治疗**结算（数据 `[0.1…0.28, 0.5]`，`#2 = 0.5` 就是被改的那个 50% ✓），而那条忆灵技**本身还没规则化** ✗ ⇒ 无从改起 ✓。"
     },
     {
+      "on": "SUMMONED",
+      "id": "eidolon_six_aura_covers_later_arrivals",
+      "when": [
+        "self_summon_count >= 1"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DAMAGE_PENETRATION",
+          "percent": 0.2,
+          "permanent": true,
+          "buff": "天空应我的祈愿",
+          "target": "all_allies"
+        }
+      ],
+      "min_eidolon": 6,
+      "source": "1409 风堇 星魂6：「**小伊卡在场时**，我方全体目标的全属性抗性穿透提高 20%」—— 「在场时」是**场的状态**，不是「小伊卡登场的那一刻」",
+      "note": "这条是 §3.7l 登记的那个缺口：光环原先只在**小伊卡自己登场**时发给当时在场的单位，所以**之后**才登场的忆灵（德谬歌 / 晴空乐手 / 别人的长夜）永远拿不到。现在补上另一半：只要【小伊卡在场】（`self_summon_count >= 1`），**任何**一次 `SUMMONED` 都把这条发给全场。⚠ 与那一条**不冲突**：同一个具名 buff 重复施加是**替换**（身份 = 属性 + 修饰类型 + 来源角色，名字不参与），所以不会叠成 0.4。判据 `HyacineEidolonSixLateSummonTest`：小伊卡先登场、德谬歌后登场 ⇒ 后者也读到 0.2。"
+    },
+    {
       "on": "BATTLE_START",
       "id": "technique_heals_and_raises_max_hp",
       "when": [
