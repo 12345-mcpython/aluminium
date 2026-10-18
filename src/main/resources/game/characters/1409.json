@@ -68,8 +68,8 @@
     },
     {
       "on": "ULT_CAST",
-      "id": "eidolon_two_raises_max_hp_while_rain_clear",
-      "min_eidolon": 2,
+      "id": "eidolon_one_raises_max_hp_while_rain_clear",
+      "min_eidolon": 1,
       "when": [
         "actor == self"
       ],
@@ -89,8 +89,43 @@
           "target": "all_allies"
         }
       ],
-      "source": "1409 风堇 星魂2（E:/code/blog/hsr/1409_风堇.md:354）：「风堇处于【雨过天晴】状态时，我方全体目标生命上限额外提高 50%」",
-      "note": "⭐ 捕获的「83% + 667」= 0.33（140903 Lv12 的 #3，孪生规则）+ 0.50（本条）+ 667.5（Lv12 的 #4）✓。两条 HEALTH% 都用 `max_stacks: 2` ⇒ 相加 ✓；固定项只在孪生规则里加一次 ✓。"
+      "source": "1409 风堇 星魂1（E:/code/blog/hsr/1409_风堇.md「星魂 1：呵护黑夜中的烛火」）：「风堇处于【雨过天晴】状态时，我方全体目标生命上限额外提高 50%」",
+      "note": "⭐ 捕获的「83% + 667」= 0.33（140903 Lv12 的 #3，孪生规则）+ 0.50（**星魂1**，不是星魂2 —— 2026-10-18 按文档更正）+ 667.5（Lv12 的 #4）✓。两条 HEALTH% 都用 `max_stacks: 2` ⇒ 相加 ✓；固定项只在孪生规则里加一次 ✓。"
+    },
+    {
+      "on": "ALLY_ATTACK",
+      "id": "eidolon_one_heals_after_an_attack_while_rain_clear",
+      "min_eidolon": 1,
+      "when": [
+        "self has_state 雨过天晴",
+        "actor is_ally"
+      ],
+      "do": [
+        {
+          "op": "HEAL",
+          "scale": "owner_max_hp",
+          "percent": 0.08,
+          "target": "attacker"
+        }
+      ],
+      "source": "1409 风堇 星魂1（1409_风堇.md「星魂 1：呵护黑夜中的烛火」）：「风堇处于【雨过天晴】状态时…并且施放攻击后立即回复等同于风堇 8% 生命上限的生命值」",
+      "note": "⭐ 「**施放攻击后**」= `ALLY_ATTACK`（任何我方攻击），回血对象是**攻击者**（`target: attacker`）✓；8% 取 `owner_max_hp`（风堇的生命上限，不是攻击者的）✓。"
+    },
+    {
+      "on": "HP_LOST",
+      "id": "eidolon_two_speed_on_hp_loss",
+      "min_eidolon": 2,
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SPEED",
+          "percent": 0.3,
+          "turns": 2,
+          "target": "target"
+        }
+      ],
+      "source": "1409 风堇 星魂2（1409_风堇.md「星魂 2：请来我的庭院坐坐」）：「我方目标生命值降低时，速度提高 30%，持续 2 回合」 param = [0.3, 2]",
+      "note": "⭐ `HP_LOST` 的 `target` 就是掉血的那位 ✓；SPEED 的 30% 是**基础速度的 30%**（`percent`）✓。⚠ 登记：「我方目标」含忆灵 ✓（HP_LOST 双阵营都会发，忆灵掉血也吃）。"
     },
     {
       "on": "BATTLE_START",
