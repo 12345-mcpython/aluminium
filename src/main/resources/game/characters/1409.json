@@ -547,6 +547,27 @@
       "source": "1409 风堇 忆灵技2 牵起晴空的手（数据槽位 3）：「若除小伊卡外的我方目标生命值降低，小伊卡会…消耗自身 4% 生命上限的生命值，并为我方生命值降低的目标回复等同于风堇 2.00% 生命上限 + 20 的生命值」 param Lv10 = [0.04, 0.028, 28, …]",
       "note": "「**生命值降低**时，小伊卡消耗**自身** 4% 生命上限，并为我方**生命值降低的目标**回复等同于风堇 **2%** 生命上限 + **20**」—— ① 事件 `HP_LOST` ✓ + `target is_ally` ✓；② 治疗对象 = **本轮新加的选择器** `all_allies_lost_hp_this_action` ✓（回答「刚掉过血的那位」✓，**不是** `lowest_hp_ally` ✗）；③ 自耗用 **`target_max_hp`** ✓（是**小伊卡自己**的上限 ✓，`owner_max_hp` 会读成风堇的 ✗），代价走 `CONSUME_HP` ✓（不吃护盾、不发 `HP_LOST` ✓）；④ 治疗用 `owner_max_hp` ✓（原文是「等同于**风堇** X% 生命上限」✓）；⑤ 数字是**字面量** ✓，取自数据行 Lv10 ✓（这条是**被动**、没有“这一发施放”可读 ✗，且忆灵技等级被 `memosprites/1409.json` 钉在 10 ✓）；⚠ **登记**：星魂5 给忆灵天赋 +1，而该表只到 10 ✗。⚠ **不加 `target != summon`** ✗：父句已写「**除小伊卡外**」✓，而 `CONSUME_HP` 走的是 `HP_CONSUMED` ✓、**不**发 `HP_LOST` ✓ ⇒ 不会自我递归 ✓（实测：一次结算这条只付一次 ✓）。"
     },    {
+      "on": "SKILL_CAST",
+      "id": "ikachi_acts_right_after_she_uses_a_skill_in_the_rain",
+      "when": [
+        "actor == self",
+        "self has_state 雨过天晴",
+        "self_summon_count >= 1"
+      ],
+      "do": [
+        {
+          "op": "INSERT_ACTION",
+          "target": "summon"
+        },
+        {
+          "op": "CAST_SKILL",
+          "skill_id": 1,
+          "target": "summon"
+        }
+      ],
+      "source": "1409 风堇 忆灵技2：「风堇处于【雨过天晴】状态时，小伊卡会在风堇施放技能后立即获得 1 个额外回合并自动施放【乌云乌云快走开！】」",
+      "note": "「施放技能后小伊卡**立即**获得 1 个额外回合**并自动施放**【乌云乌云快走开！】」—— ① 回合用 **`INSERT_ACTION`** ✓（`EXTRA_TURN` 会拒绝 Speed 0、不在行动序列的忆灵 ✗）；② 施放用 **`CAST_SKILL skill_id: 1`** ✓ —— 忆灵的技能按**数据槽**存 ✓（`skillAt` ✓），`CAST_SKILL` 现在认这个字段 ✓。⚠ 两半**必须成对** ✓：只插回合时那一回合是**空转**的（实测没有伤害实例 ✓）。"
+    },    {
       "on": "SUMMONED",
       "id": "ikachi_is_immune_to_negative_effects",
       "when": [
