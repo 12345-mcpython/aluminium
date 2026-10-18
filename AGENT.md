@@ -414,6 +414,22 @@ double instanceMagnitude = effect.getPercent() == null ? 0 : effect.getPercent()
 **与实测吻合**：整场捕获反解出的无视防御 = 22.5% / 23% / 24% / 27.5% / 29% / 29.5% / 31.5% / 40%
 = 这条公式在气氛值 15 / 16 / 18 / 25 / 28 / 29 / 33 / 50 时的值 ✓✓。
 
+### 3.7d 缺口：`SUMMON_ATTACK` 只在 `EnemySkill` 上触发（**2026-10-18**）
+
+`TriggerEvent.SUMMON_ATTACK` 的注释写的是"忆灵通过 `EnemySkill` 出手时触发"，**全仓只有一处 fire**：
+
+```java
+EnemySkill.java:166  battle.fireTriggers(TriggerEvent.SUMMON_ATTACK, user, null, hitTargets.size(), 0);
+```
+
+而**数据驱动的忆灵**（1512 的「晴空乐手」）技能是 `Summon.skillsByDataSlot` 里的 `DefaultSkill`，走的是 `SkillExecutor` ⇒
+**这个事件永远不会触发** ✗。实测（第 15 轮探针）：`memospriteOf(robin).getSkills() == {}`，技能在
+`skillsByDataSlot = {1, 3, 5, 6}` 里 ✓。后果：光锥 23042 的易伤从句「装备者的**忆灵施放忆灵技**时」写好了也**不会生效** ✗；
+Fever 增伤里"与**自身（忆灵）**"那一半同理 ✗。
+
+⇒ 需要的能力：**`SkillExecutor` 在执行者是 `Summon` 时也 fire `SUMMON_ATTACK`**（与 `EnemySkill` 那条同语义，
+带命中的目标数 ✓）。补上之后两条行为判据才能写（光锥 +36%、Fever 增伤对忆灵）。
+
 ### 3.8 数据文件速查
 
 | 文件 | 内容 | 已确认锚点 |
