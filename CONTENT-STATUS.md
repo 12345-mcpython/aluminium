@@ -11,14 +11,14 @@ python C:\Users\laosu\Downloads\aluminium-baseline\content_status2.py
 ## 怎么判定（**只测这三件事**）
 
 1. 内容文件在不在、有几条规则；
-2. 有没有哪条规则的 `source` / `note` 还留着 `未写 / 仍未 / 未核 / 待核 / 未实现 / 登记 / 近似 / 待定` —— 即作者自己留下的**未完成痕迹**；
+2. **逐句**读每条规则的 `source` / `note`：某句说了 `未写 / 仍未 / 未核 / 待核 / 未实现 / 仍缺 / 还没 / 尚未 / 近似`，**且那句里没有** `已落 / 已修 / 已补 / 已实现 / 已撤回 / 已经` ⇒ 这条从句**仍开着**。（⚠ 上一版按「整份文本搜词」判，把**引述旧缺口**的句子也算成欠账，把 42 个角色误判成「有登记」；单独一个「登记在 `AGENT.md` §…」是**指针**，不是缺口，本版不再计。）
 3. `src/test` 里**提到**该 id 的测试文件数（**代理量**，见下）。
 
-所以状态列叫 **「无登记痕迹」**，**不叫「完全」**：
+所以状态列叫 **「无仍开着的缺口」**，**不叫「完全」**：
 
-- 一个文件可以**一句登记都没留**而 kit 没写完（例：本表里 `1210` 桂乃芬只有 2 条规则 / 6 个技能槽）；
-- 一条注记也常在**引述**已经修好的缺口，于是「有登记」会把补完的算成欠账 —— 这个口径**两头都不准**；
-- 「无登记痕迹」= **必要条件**，**不是**「实现完全」。
+- 一个文件可以**一句都没留**而 kit 没写完（例：`1210` 桂乃芬只有 2 条规则 / 6 个技能槽）；
+- 「无仍开着的缺口」= **必要条件**，**不是**「实现完全」；
+- 判据本身是文本级的：它读的是**作者有没有把话说全**，不是 kit 的从句有没有写完。
 
 ## 这张表不能回答什么
 
@@ -31,110 +31,110 @@ python C:\Users\laosu\Downloads\aluminium-baseline\content_status2.py
 
 ## 汇总
 
-| 类 | 数据里有的 | 无登记痕迹（**不代表性**） | 有登记 | 零规则 | 无文件 |
+| 类 | 数据里有的 | 无仍开着的缺口（**不代表性**） | 有登记 | 零规则 | 无文件 |
 |---|---|---|---|---|---|
-| 角色 | 98 | 9 | 85 | 0 | 4 |
-| 光锥 | 170 | 110 | 57 | 0 | 3 |
-| 遗器套装 | 62 | 50 | 11 | 0 | 1 |
+| 角色 | 98 | 42 | 52 | 0 | 4 |
+| 光锥 | 170 | 143 | 24 | 0 | 3 |
+| 遗器套装 | 62 | 59 | 2 | 0 | 1 |
 
 ## 角色（全部）
 
 | id | 名称 | 元素 · 命途 | 星级 | 规则数 | 技能槽数 | 状态 | 提到它的测试文件 | 还挂着的登记 |
 |---|---|---|---|---|---|---|---|---|
-| 1101 | 布洛妮娅 | 风 · 同谐 | 5 | 7 | 6 | 无登记痕迹 | 14 | — |
-| 1103 | 希露瓦 | 雷 · 智识 | 4 | 11 | 6 | 无登记痕迹 | 10 | — |
-| 1105 | 娜塔莎 | 物理 · 丰饶 | 4 | 11 | 6 | 无登记痕迹 | 17 | — |
-| 1210 | 桂乃芬 | 火 · 虚无 | 4 | 2 | 6 | 无登记痕迹 | 67 | — |
-| 1211 | 白露 | 雷 · 丰饶 | 5 | 4 | 6 | 无登记痕迹 | 9 | — |
-| 1215 | 寒鸦 | 物理 · 同谐 | 4 | 17 | 6 | 无登记痕迹 | 9 | — |
-| 1313 | 星期日 | 虚数 · 同谐 | 5 | 5 | 6 | 无登记痕迹 | 3 | — |
-| 1321 | 大丽花 | 火 · 虚无 | 5 | 5 | 6 | 无登记痕迹 | 8 | — |
-| 8006 | 开拓者 | 虚数 · 同谐 | 5 | 10 | 6 | 无登记痕迹 | 8 | — |
+| 1003 | 姬子 | 火 · 智识 | 5 | 9 | 6 | 无仍开着的缺口 | 89 | — |
+| 1004 | 瓦尔特 | 虚数 · 虚无 | 5 | 3 | 6 | 无仍开着的缺口 | 13 | — |
+| 1008 | 阿兰 | 雷 · 毁灭 | 4 | 5 | 6 | 无仍开着的缺口 | 9 | — |
+| 1009 | 艾丝妲 | 火 · 同谐 | 4 | 4 | 6 | 无仍开着的缺口 | 7 | — |
+| 1101 | 布洛妮娅 | 风 · 同谐 | 5 | 7 | 6 | 无仍开着的缺口 | 14 | — |
+| 1103 | 希露瓦 | 雷 · 智识 | 4 | 11 | 6 | 无仍开着的缺口 | 10 | — |
+| 1105 | 娜塔莎 | 物理 · 丰饶 | 4 | 11 | 6 | 无仍开着的缺口 | 17 | — |
+| 1106 | 佩拉 | 冰 · 虚无 | 4 | 7 | 6 | 无仍开着的缺口 | 8 | — |
+| 1107 | 克拉拉 | 物理 · 毁灭 | 5 | 5 | 6 | 无仍开着的缺口 | 10 | — |
+| 1111 | 卢卡 | 物理 · 虚无 | 4 | 10 | 7 | 无仍开着的缺口 | 10 | — |
+| 1112 | 托帕&账账 | 火 · 巡猎 | 5 | 3 | 6 | 无仍开着的缺口 | 10 | — |
+| 1201 | 青雀 | 量子 · 智识 | 4 | 5 | 7 | 无仍开着的缺口 | 11 | — |
+| 1202 | 停云 | 雷 · 同谐 | 4 | 6 | 6 | 无仍开着的缺口 | 25 | — |
+| 1208 | 符玄 | 量子 · 存护 | 5 | 5 | 6 | 无仍开着的缺口 | 6 | — |
+| 1209 | 彦卿 | 冰 · 巡猎 | 5 | 7 | 6 | 无仍开着的缺口 | 10 | — |
+| 1210 | 桂乃芬 | 火 · 虚无 | 4 | 2 | 6 | 无仍开着的缺口 | 67 | — |
+| 1211 | 白露 | 雷 · 丰饶 | 5 | 4 | 6 | 无仍开着的缺口 | 9 | — |
+| 1214 | 雪衣 | 量子 · 毁灭 | 4 | 3 | 6 | 无仍开着的缺口 | 5 | — |
+| 1215 | 寒鸦 | 物理 · 同谐 | 4 | 17 | 6 | 无仍开着的缺口 | 9 | — |
+| 1217 | 藿藿 | 风 · 丰饶 | 5 | 7 | 6 | 无仍开着的缺口 | 13 | — |
+| 1224 | 三月七 | 虚数 · 巡猎 | 4 | 6 | 7 | 无仍开着的缺口 | 5 | — |
+| 1302 | 银枝 | 物理 · 智识 | 5 | 11 | 7 | 无仍开着的缺口 | 5 | — |
+| 1303 | 阮•梅 | 冰 · 同谐 | 5 | 6 | 6 | 无仍开着的缺口 | 8 | — |
+| 1304 | 砂金 | 虚数 · 存护 | 5 | 4 | 6 | 无仍开着的缺口 | 7 | — |
+| 1306 | 花火 | 量子 · 同谐 | 5 | 9 | 6 | 无仍开着的缺口 | 11 | — |
+| 1308 | 黄泉 | 雷 · 虚无 | 5 | 3 | 10 | 无仍开着的缺口 | 9 | — |
+| 1309 | 知更鸟 | 物理 · 同谐 | 5 | 11 | 6 | 无仍开着的缺口 | 13 | — |
+| 1312 | 米沙 | 冰 · 毁灭 | 4 | 2 | 6 | 无仍开着的缺口 | 9 | — |
+| 1313 | 星期日 | 虚数 · 同谐 | 5 | 5 | 6 | 无仍开着的缺口 | 3 | — |
+| 1314 | 翡翠 | 量子 · 智识 | 5 | 4 | 6 | 无仍开着的缺口 | 9 | — |
+| 1317 | 乱破 | 虚数 · 智识 | 5 | 12 | 14 | 无仍开着的缺口 | 4 | — |
+| 1321 | 大丽花 | 火 · 虚无 | 5 | 5 | 6 | 无仍开着的缺口 | 8 | — |
+| 1401 | 大黑塔 | 冰 · 智识 | 5 | 3 | 7 | 无仍开着的缺口 | 4 | — |
+| 1407 | 遐蝶 | 量子 · 记忆 | 5 | 12 | 7 | 无仍开着的缺口 | 18 | — |
+| 1501 | 火花 | 火 · 欢愉 | 5 | 3 | 10 | 无仍开着的缺口 | 8 | — |
+| 1502 | 爻光 | 物理 · 欢愉 | 5 | 1 | 7 | 无仍开着的缺口 | 34 | — |
+| 1504 | 不死途 | 雷 · 巡猎 | 5 | 9 | 6 | 无仍开着的缺口 | 7 | — |
+| 1505 | 绯英 | 物理 · 欢愉 | 5 | 10 | 7 | 无仍开着的缺口 | 34 | — |
+| 8002 | 开拓者 | 物理 · 毁灭 | 5 | 5 | 8 | 无仍开着的缺口 | 5 | — |
+| 8006 | 开拓者 | 虚数 · 同谐 | 5 | 10 | 6 | 无仍开着的缺口 | 8 | — |
+| 8007 | 开拓者 | 冰 · 记忆 | 5 | 7 | 8 | 无仍开着的缺口 | 9 | — |
+| 8008 | 开拓者 | 冰 · 记忆 | 5 | 3 | 8 | 无仍开着的缺口 | 3 | — |
 | 1001 | 三月七 | 冰 · 存护 | 4 | 16 | 6 | 有登记 | 125 | (无 id) |
-| 1002 | 丹恒 | 风 · 巡猎 | 4 | 15 | 6 | 有登记 | 260 | talent_wind_pen、level_convention、technique_opening_attack… |
-| 1003 | 姬子 | 火 · 智识 | 5 | 9 | 6 | 有登记 | 89 | eidolon6_two_extra_random_hits、(无 id)、technique_incomplete_combustion |
-| 1004 | 瓦尔特 | 虚数 · 虚无 | 5 | 3 | 6 | 有登记 | 13 | ult_imprison、skill_speed_down |
-| 1005 | 卡芙卡 | 雷 · 虚无 | 5 | 5 | 6 | 有登记 | 5 | ult_shock_and_tick、level_convention、trace_shock_lasts_one_more_turn |
-| 1006 | 银狼 | 量子 · 虚无 | 5 | 4 | 6 | 有登记 | 12 | ult_defence_down、level_convention、skill_all_type_res_down… |
-| 1008 | 阿兰 | 雷 · 毁灭 | 4 | 5 | 6 | 有登记 | 9 | level_convention、e4_survives_a_lethal_blow_at_a_quarter |
-| 1009 | 艾丝妲 | 火 · 同谐 | 4 | 4 | 6 | 有登记 | 7 | level_convention、skill_extra_hits_random |
+| 1002 | 丹恒 | 风 · 巡猎 | 4 | 15 | 6 | 有登记 | 260 | talent_wind_pen、level_convention、trace_low_hp_aggro_down |
+| 1005 | 卡芙卡 | 雷 · 虚无 | 5 | 5 | 6 | 有登记 | 5 | level_convention |
+| 1006 | 银狼 | 量子 · 虚无 | 5 | 4 | 6 | 有登记 | 12 | ult_defence_down |
 | 1013 | 黑塔 | 冰 · 智识 | 4 | 5 | 6 | 有登记 | 9 | level_convention |
 | 1102 | 希儿 | 量子 · 巡猎 | 5 | 3 | 6 | 有登记 | 8 | trace_low_hp_aggro_down |
-| 1104 | 杰帕德 | 冰 · 存护 | 5 | 11 | 6 | 有登记 | 14 | trace_steadfast_aggro、(无 id)、eidolon4_party_resistance… |
-| 1106 | 佩拉 | 冰 · 虚无 | 4 | 7 | 6 | 有登记 | 8 | (无 id)、technique_defence_down |
-| 1107 | 克拉拉 | 物理 · 毁灭 | 5 | 5 | 6 | 有登记 | 10 | technique_taunt_aggro |
+| 1104 | 杰帕德 | 冰 · 存护 | 5 | 11 | 6 | 有登记 | 14 | trace_steadfast_aggro、(无 id) |
 | 1108 | 桑博 | 风 · 虚无 | 4 | 3 | 6 | 有登记 | 8 | (无 id) |
 | 1109 | 虎克 | 火 · 毁灭 | 4 | 10 | 7 | 有登记 | 14 | (无 id)、eidolon3_levels |
-| 1110 | 玲可 | 量子 · 丰饶 | 4 | 5 | 6 | 有登记 | 6 | skill_survival_response、talent_regen_after_skill、talent_regen_after_ult |
-| 1111 | 卢卡 | 物理 · 虚无 | 4 | 10 | 7 | 有登记 | 10 | ult_coup、(无 id) |
-| 1112 | 托帕&账账 | 火 · 巡猎 | 5 | 3 | 6 | 有登记 | 10 | skill_proof_of_debt |
-| 1201 | 青雀 | 量子 · 智识 | 4 | 5 | 7 | 有登记 | 11 | skill_damage_up_stacks、level_convention |
-| 1202 | 停云 | 雷 · 同谐 | 4 | 6 | 6 | 有登记 | 25 | skill_benediction、level_convention |
-| 1203 | 罗刹 | 虚数 · 丰饶 | 5 | 15 | 6 | 有登记 | 17 | skill_abyss_flower、level_convention、skill_trigger_on_crossing… |
+| 1110 | 玲可 | 量子 · 丰饶 | 4 | 5 | 6 | 有登记 | 6 | (无 id) |
+| 1203 | 罗刹 | 虚数 · 丰饶 | 5 | 15 | 6 | 有登记 | 17 | level_convention、skill_trigger_on_crossing、talent_zone_opens_at_two_stacks |
 | 1204 | 景元 | 雷 · 智识 | 5 | 2 | 6 | 有登记 | 75 | trace_dispatch_crit_chance |
-| 1205 | 刃 | 风 · 毁灭 | 5 | 5 | 7 | 有登记 | 90 | skill_hellscape_state、technique_opening_aoe、talent_charge_on_hit… |
-| 1206 | 素裳 | 物理 · 巡猎 | 4 | 22 | 6 | 有登记 | 15 | talent_speed_on_break、level_convention、trace_low_hp_aggro_down… |
+| 1205 | 刃 | 风 · 毁灭 | 5 | 5 | 7 | 有登记 | 90 | technique_opening_aoe |
+| 1206 | 素裳 | 物理 · 巡猎 | 4 | 22 | 6 | 有登记 | 15 | level_convention、trace_low_hp_aggro_down |
 | 1207 | 驭空 | 虚数 · 同谐 | 4 | 15 | 6 | 有登记 | 8 | eidolon2_energy_on_ally_full |
-| 1208 | 符玄 | 量子 · 存护 | 5 | 5 | 6 | 有登记 | 6 | talent_misfortune_avoidance、skill_knowledge_state_and_modifiers、level_convention |
-| 1209 | 彦卿 | 冰 · 巡猎 | 5 | 7 | 6 | 有登记 | 10 | skill_soulsteel_sync_and_its_modifiers、talent_chance_followup、level_convention… |
-| 1212 | 镜流 | 冰 · 毁灭 | 5 | 6 | 7 | 有登记 | 7 | skill_syzygy_stack、ult_syzygy_stack、talent_transmigration_at_two_stacks… |
-| 1213 | 丹恒•饮月 | 虚数 · 毁灭 | 5 | 2 | 10 | 有登记 | 5 | talent_righteous_heart、level_convention |
-| 1214 | 雪衣 | 量子 · 毁灭 | 4 | 3 | 6 | 有登记 | 5 | level_convention |
-| 1217 | 藿藿 | 风 · 丰饶 | 5 | 7 | 6 | 有登记 | 13 | ult_tail、e2_saves_an_ally_with_the_talisman |
-| 1218 | 椒丘 | 火 · 虚无 | 5 | 7 | 6 | 有登记 | 6 | talent_ashen_roast_and_burn、level_convention、talent_res_down_per_ashen_roast… |
-| 1220 | 飞霄 | 风 · 巡猎 | 5 | 7 | 9 | 有登记 | 10 | talent_followup_on_teammate_attack、skill_repeats_the_talent_followup、level_convention… |
-| 1221 | 云璃 | 物理 · 毁灭 | 5 | 3 | 6 | 有登记 | 4 | skill_heal、talent_counter_on_being_hit、level_convention |
-| 1222 | 灵砂 | 火 · 丰饶 | 5 | 5 | 6 | 有登记 | 6 | skill_party_heal、ult_befog_break_damage_taken |
-| 1223 | 貊泽 | 雷 · 巡猎 | 4 | 9 | 6 | 有登记 | 4 | skill_marks_prey、talent_additional_damage_on_prey、ult_triggers_talent_followup… |
-| 1224 | 三月七 | 虚数 · 巡猎 | 4 | 6 | 7 | 有登记 | 5 | skill_shifu_and_speed、talent_charge_on_shifu_attack、talent_charge_on_shifu_ult… |
-| 1225 | 忘归人 | 火 · 虚无 | 5 | 6 | 7 | 有登记 | 4 | skill_marks_foxian_prayer、skill_torrid_scorch_on_self、skill_break_effect_for_marked_ally… |
-| 1301 | 加拉赫 | 火 · 丰饶 | 4 | 7 | 7 | 有登记 | 10 | ult_tipsy、(无 id) |
-| 1302 | 银枝 | 物理 · 智识 | 5 | 11 | 7 | 有登记 | 5 | (无 id) |
-| 1303 | 阮•梅 | 冰 · 同谐 | 5 | 6 | 6 | 有登记 | 8 | talent_speed_for_teammates、skill_overtone_on_self、level_convention… |
-| 1304 | 砂金 | 虚数 · 存护 | 5 | 4 | 6 | 有登记 | 7 | level_convention、trace_hot_hand_opening_shield、ult_unnerved_state |
-| 1305 | 真理医生 | 虚数 · 巡猎 | 5 | 6 | 6 | 有登记 | 6 | talent_chance_followup、ult_marks_wisemans_folly、ult_reaction_followup… |
-| 1306 | 花火 | 量子 · 同谐 | 5 | 9 | 6 | 有登记 | 11 | skill_crit_damage_share_and_advance、ult_skill_points_and_cipher、talent_party_damage_on_spend… |
-| 1307 | 黑天鹅 | 风 · 虚无 | 5 | 3 | 6 | 有登记 | 5 | skill_arcana_stack、skill_defence_down、level_convention |
-| 1308 | 黄泉 | 雷 · 虚无 | 5 | 3 | 10 | 有登记 | 9 | level_convention |
-| 1309 | 知更鸟 | 物理 · 同谐 | 5 | 11 | 6 | 有登记 | 13 | (无 id)、technique_field_recovers_five_at_each_wave |
-| 1310 | 流萤 | 火 · 毁灭 | 5 | 6 | 8 | 有登记 | 7 | skill_action_advance、ult_action_advance、level_convention… |
-| 1312 | 米沙 | 冰 · 毁灭 | 4 | 2 | 6 | 有登记 | 9 | talent_energy_on_skill_point_spent、level_convention |
-| 1314 | 翡翠 | 量子 · 智识 | 5 | 4 | 6 | 有登记 | 9 | trace_reverse_repo_one_goods、technique_fifteen_goods、eidolon2_crit_chance_at_fifteen_goods |
-| 1315 | 波提欧 | 物理 · 巡猎 | 5 | 6 | 7 | 有登记 | 12 | skill_standoff_on_both、standoff_stack_on_kill、standoff_stack_on_break… |
-| 1317 | 乱破 | 虚数 · 智识 | 5 | 12 | 14 | 有登记 | 4 | talent_charge_on_break、level_convention |
-| 1401 | 大黑塔 | 冰 · 智识 | 5 | 3 | 7 | 有登记 | 4 | technique_opening_attack、ult_attack_advance_and_inspiration、level_convention |
-| 1402 | 阿格莱雅 | 雷 · 记忆 | 5 | 11 | 8 | 有登记 | 38 | (无 id)、talent_fissure_thread_applies_state、memosprite_ode_of_romance_marks_aglaea… |
+| 1212 | 镜流 | 冰 · 毁灭 | 5 | 6 | 7 | 有登记 | 7 | talent_transmigration_at_two_stacks |
+| 1213 | 丹恒•饮月 | 虚数 · 毁灭 | 5 | 2 | 10 | 有登记 | 5 | level_convention |
+| 1218 | 椒丘 | 火 · 虚无 | 5 | 7 | 6 | 有登记 | 6 | talent_ashen_roast_and_burn、ult_domain_ult_damage_taken |
+| 1220 | 飞霄 | 风 · 巡猎 | 5 | 7 | 9 | 有登记 | 10 | trace_followup_crit_damage |
+| 1221 | 云璃 | 物理 · 毁灭 | 5 | 3 | 6 | 有登记 | 4 | level_convention |
+| 1222 | 灵砂 | 火 · 丰饶 | 5 | 5 | 6 | 有登记 | 6 | skill_party_heal |
+| 1223 | 貊泽 | 雷 · 巡猎 | 4 | 9 | 6 | 有登记 | 4 | skill_marks_prey |
+| 1225 | 忘归人 | 火 · 虚无 | 5 | 6 | 7 | 有登记 | 4 | skill_defence_down_on_marked_attack、technique_advance_and_defence_down |
+| 1301 | 加拉赫 | 火 · 丰饶 | 4 | 7 | 7 | 有登记 | 10 | ult_tipsy |
+| 1305 | 真理医生 | 虚数 · 巡猎 | 5 | 6 | 6 | 有登记 | 6 | talent_chance_followup、technique_speed_down、ult_resets_the_marked_target_count |
+| 1307 | 黑天鹅 | 风 · 虚无 | 5 | 3 | 6 | 有登记 | 5 | skill_arcana_stack |
+| 1310 | 流萤 | 火 · 毁灭 | 5 | 6 | 8 | 有登记 | 7 | talent_dispel_when_energy_full |
+| 1315 | 波提欧 | 物理 · 巡猎 | 5 | 6 | 7 | 有登记 | 12 | level_convention |
+| 1402 | 阿格莱雅 | 雷 · 记忆 | 5 | 11 | 8 | 有登记 | 38 | talent_fissure_thread_applies_state、memosprite_ode_of_romance_marks_aglaea、memosprite_ode_of_romance_spends_itself_for_energy |
 | 1403 | 缇宝 | 量子 · 同谐 | 5 | 13 | 6 | 有登记 | 22 | trace_energy_per_target、talent_followup_on_other_ult、skill_numinosity… |
-| 1404 | 万敌 | 虚数 · 毁灭 | 5 | 13 | 8 | 有登记 | 19 | ult_heal_charge_and_taunt、level_convention、turn_start_autocasts_skill… |
-| 1405 | 那刻夏 | 风 · 智识 | 5 | 8 | 6 | 有登记 | 18 | eidolon1_defence_down_on_skill、level_convention、talent_random_weakness_on_hit… |
-| 1406 | 赛飞儿 | 量子 · 虚无 | 5 | 12 | 6 | 有登记 | 8 | skill_weakness_and_attack、talent_reaction_followup、technique_opening_aoe… |
-| 1407 | 遐蝶 | 量子 · 记忆 | 5 | 12 | 7 | 有登记 | 18 | talent_damage_up_on_hp_loss、level_convention、mooncocoon_holds_the_blow… |
-| 1408 | 白厄 | 物理 · 毁灭 | 5 | 28 | 10 | 有登记 | 27 | technique_energy_and_skill_point、level_convention、ult_transformation… |
-| 1409 | 风堇 | 风 · 记忆 | 5 | 36 | 6 | 有登记 | 38 | eidolon_two_speed_on_hp_loss、eidolon_six_gives_the_party_all_type_resistance_penetration、tally_counts_hyacines_own_healing… |
-| 1410 | 海瑟音 | 物理 · 虚无 | 5 | 21 | 6 | 有登记 | 9 | skill_damage_taken_up、level_convention、ult_zone_opens_and_lowers… |
-| 1412 | 刻律德菈 | 风 · 同谐 | 5 | 15 | 6 | 有登记 | 20 | skill_grants_military_merit、talent_attack_share_on_marked_ally、talent_charge_from_marked_ally… |
-| 1413 | 长夜月 | 冰 · 记忆 | 5 | 21 | 7 | 有登记 | 29 | skill_consumes_hp、talent_hp_cost_raises_her_crit_damage、(无 id)… |
-| 1414 | 丹恒•腾荒 | 物理 · 存护 | 5 | 11 | 6 | 有登记 | 9 | skill_bondmate_and_shield、ult_party_shield、technique_grants_bondmate… |
-| 1415 | 昔涟 | 冰 · 记忆 | 5 | 26 | 9 | 有登记 | 102 | true_self_counts_a_new_allies_recollection_first、true_self_marks_the_allies_that_gave_one、skill_recollection… |
-| 1501 | 火花 | 火 · 欢愉 | 5 | 3 | 10 | 有登记 | 8 | technique_opening_aoe_and_skill_points、level_convention、aha_end_extra_turn |
-| 1502 | 爻光 | 物理 · 欢愉 | 5 | 1 | 7 | 有登记 | 34 | p1502_ult_penetration |
+| 1404 | 万敌 | 虚数 · 毁灭 | 5 | 13 | 8 | 有登记 | 19 | ult_heal_charge_and_taunt、turn_start_autocasts_skill |
+| 1405 | 那刻夏 | 风 · 智识 | 5 | 8 | 6 | 有登记 | 18 | level_convention、talent_random_weakness_on_hit、memosprite_ode_of_reason_grants_true_knowledge |
+| 1406 | 赛飞儿 | 量子 · 虚无 | 5 | 12 | 6 | 有登记 | 8 | skill_weakness_and_attack、eidolon2_damage_taken |
+| 1408 | 白厄 | 物理 · 毁灭 | 5 | 28 | 10 | 有登记 | 27 | ult_transformation |
+| 1409 | 风堇 | 风 · 记忆 | 5 | 36 | 6 | 有登记 | 38 | eidolon_six_gives_the_party_all_type_resistance_penetration、skill_summons_ica、eidolon_six_aura_ends_when_ikachi_leaves… |
+| 1410 | 海瑟音 | 物理 · 虚无 | 5 | 21 | 6 | 有登记 | 9 | skill_damage_taken_up |
+| 1412 | 刻律德菈 | 风 · 同谐 | 5 | 15 | 6 | 有登记 | 20 | talent_attack_share_on_marked_ally、talent_charge_from_marked_ally、peerage_upgrade_at_six_charge |
+| 1413 | 长夜月 | 冰 · 记忆 | 5 | 21 | 7 | 有登记 | 29 | (无 id)、ult_summons_and_darkens、memosprite_skill_one_grants_memory |
+| 1414 | 丹恒•腾荒 | 物理 · 存护 | 5 | 11 | 6 | 有登记 | 9 | trace_sylvanity_advances_him、level_convention |
+| 1415 | 昔涟 | 冰 · 记忆 | 5 | 26 | 9 | 有登记 | 102 | true_self_counts_a_new_allies_recollection_first、memosprite_ode_to_law_pays_charge、talent_cleanses_at_a_full_recollection |
 | 1503 | 真珠 | 冰 · 欢愉 | 5 | 56 | 9 | 有登记 | 47 | technique_grants_the_opening_counter、eidolon1_saves_an_ally_twice、trace_gains_on_an_ally_turn_start… |
-| 1504 | 不死途 | 雷 · 巡猎 | 5 | 9 | 6 | 有登记 | 7 | talent_reaction_to_bait、skill_marks_the_bait、eidolon1_enemies_take_more… |
-| 1505 | 绯英 | 物理 · 欢愉 | 5 | 10 | 7 | 有登记 | 34 | p1505_elation_value、p1505_technique_gift、p1505_skill_elation_rider… |
-| 1506 | 银狼LV.<unbreak>999</unbreak> | 虚数 · 欢愉 | 5 | 27 | 12 | 有登记 | 37 | p1506_ult_advance、p1506_ult_enters_godmode、p1506_e3_raises_skill_levels… |
-| 1507 | 千冶•刃 | 火 · 虚无 | 5 | 4 | 9 | 有登记 | 4 | ult_zone_and_thousand_forgings、zone_ends_takes_thousand_forgings_off、eidolon1_zone_enemy_res_down |
-| 1510 | 姬子•启行 | 火 · 智识 | 5 | 2 | 12 | 有登记 | 4 | skill_navigators_semaphore、level_convention |
-| 1512 | 知更鸟•晴歌 | 风 · 记忆 | 5 | 9 | 6 | 有登记 | 9 | skill_summon_and_vibes、fever_aura_ignores_defence_by_vibes、fever_boosts_her_and_her_memosprites_damage… |
-| 1513 | 砂金•戏浪 | 量子 · 欢愉 | 5 | 9 | 8 | 有登记 | 21 | talent_fervor_on_teammate_attack、skill_fervor、ult_fervor_and_speed… |
-| 8001 | 开拓者 | 物理 · 毁灭 | 5 | 5 | 8 | 有登记 | 7 | level_convention、technique_party_heal、trace_tough_defence_per_stack |
-| 8002 | 开拓者 | 物理 · 毁灭 | 5 | 5 | 8 | 有登记 | 5 | level_convention、trace_tough_defence_per_stack |
-| 8003 | 开拓者 | 火 · 存护 | 5 | 7 | 7 | 有登记 | 4 | talent_magma_will、talent_shield_on_basic、skill_reduction_and_taunt… |
-| 8004 | 开拓者 | 火 · 存护 | 5 | 7 | 7 | 有登记 | 4 | talent_magma_will、talent_shield_on_basic、skill_reduction_and_taunt… |
-| 8005 | 开拓者 | 虚数 · 同谐 | 5 | 6 | 6 | 有登记 | 6 | ult_dance、technique_breaking_effect、level_convention… |
-| 8007 | 开拓者 | 冰 · 记忆 | 5 | 7 | 8 | 有登记 | 9 | skill_summon_mem、ult_summon_mem、level_convention |
-| 8008 | 开拓者 | 冰 · 记忆 | 5 | 3 | 8 | 有登记 | 3 | skill_summon_mem、ult_summon_mem、level_convention |
-| 8009 | 开拓者 | 雷 · 欢愉 | 5 | 6 | 7 | 有登记 | 10 | ult_crit_damage_for_the_chosen_ally、talent_energy_after_attack、level_convention… |
-| 8010 | 开拓者 | 雷 · 欢愉 | 5 | 6 | 7 | 有登记 | 9 | ult_crit_damage_for_the_chosen_ally、talent_energy_after_attack、level_convention… |
+| 1506 | 银狼LV.<unbreak>999</unbreak> | 虚数 · 欢愉 | 5 | 27 | 12 | 有登记 | 37 | p1506_e3_raises_skill_levels、p1506_trace_speed_becomes_elation、p1506_e6_amp_while_in_godmode… |
+| 1507 | 千冶•刃 | 火 · 虚无 | 5 | 4 | 9 | 有登记 | 4 | ult_zone_and_thousand_forgings、eidolon1_zone_enemy_res_down |
+| 1510 | 姬子•启行 | 火 · 智识 | 5 | 2 | 12 | 有登记 | 4 | level_convention |
+| 1512 | 知更鸟•晴歌 | 风 · 记忆 | 5 | 9 | 6 | 有登记 | 9 | level_convention |
+| 1513 | 砂金•戏浪 | 量子 · 欢愉 | 5 | 9 | 8 | 有登记 | 21 | fervor_extra_hit_per_point、elation_moment_reward |
+| 8001 | 开拓者 | 物理 · 毁灭 | 5 | 5 | 8 | 有登记 | 7 | technique_party_heal |
+| 8003 | 开拓者 | 火 · 存护 | 5 | 7 | 7 | 有登记 | 4 | skill_reduction_and_taunt、level_convention |
+| 8004 | 开拓者 | 火 · 存护 | 5 | 7 | 7 | 有登记 | 4 | skill_reduction_and_taunt、level_convention |
+| 8005 | 开拓者 | 虚数 · 同谐 | 5 | 6 | 6 | 有登记 | 6 | technique_breaking_effect、skill_extra_hits_random |
+| 8009 | 开拓者 | 雷 · 欢愉 | 5 | 6 | 7 | 有登记 | 10 | ult_crit_damage_for_the_chosen_ally、level_convention |
+| 8010 | 开拓者 | 雷 · 欢愉 | 5 | 6 | 7 | 有登记 | 9 | ult_crit_damage_for_the_chosen_ally、level_convention |
 | 1014 | Saber | 风 · 毁灭 | 5 | 0 | 7 | 无文件 | 1 | — |
 | 1015 | Archer | 量子 · 巡猎 | 5 | 0 | 7 | 无文件 | 1 | — |
 | 1508 | 远坂凛 | 量子 · 智识 | 5 | 0 | 8 | 无文件 | 1 | — |
@@ -144,171 +144,171 @@ python C:\Users\laosu\Downloads\aluminium-baseline\content_status2.py
 
 | id | 名称 | 规则数 | 状态 | 提到它的测试文件 | 还挂着的登记 |
 |---|---|---|---|---|---|
-| 20000 | 锋镝 | 5 | 无登记痕迹 | 0 | — |
-| 20001 | 物穰 | 10 | 无登记痕迹 | 0 | — |
-| 20002 | 天倾 | 10 | 无登记痕迹 | 0 | — |
-| 20003 | 琥珀 | 10 | 无登记痕迹 | 0 | — |
-| 20004 | 幽邃 | 5 | 无登记痕迹 | 0 | — |
-| 20005 | 齐颂 | 5 | 无登记痕迹 | 0 | — |
-| 20006 | 智库 | 5 | 无登记痕迹 | 0 | — |
-| 20007 | 离弦 | 5 | 无登记痕迹 | 0 | — |
-| 20008 | 嘉果 | 5 | 无登记痕迹 | 0 | — |
-| 20010 | 戍御 | 5 | 无登记痕迹 | 0 | — |
-| 20011 | 渊环 | 5 | 无登记痕迹 | 0 | — |
-| 20012 | 轮契 | 5 | 无登记痕迹 | 0 | — |
-| 20013 | 灵钥 | 5 | 无登记痕迹 | 0 | — |
-| 20014 | 相抗 | 5 | 无登记痕迹 | 0 | — |
-| 20016 | 俱殁 | 5 | 无登记痕迹 | 0 | — |
-| 20017 | 开疆 | 5 | 无登记痕迹 | 0 | — |
-| 20018 | 匿影 | 10 | 无登记痕迹 | 0 | — |
-| 20019 | 调和 | 5 | 无登记痕迹 | 0 | — |
-| 20020 | 睿见 | 5 | 无登记痕迹 | 0 | — |
-| 20021 | 焚影 | 5 | 无登记痕迹 | 0 | — |
-| 20022 | 溯忆 | 10 | 无登记痕迹 | 0 | — |
-| 21000 | 一场术后对话 | 5 | 无登记痕迹 | 0 | — |
-| 21001 | 晚安与睡颜 | 10 | 无登记痕迹 | 0 | — |
-| 21002 | 余生的第一天 | 5 | 无登记痕迹 | 0 | — |
-| 21003 | 唯有沉默 | 10 | 无登记痕迹 | 0 | — |
-| 21004 | 记忆中的模样 | 10 | 无登记痕迹 | 0 | — |
-| 21006 | 「我」的诞生 | 10 | 无登记痕迹 | 0 | — |
-| 21007 | 同一种心情 | 10 | 无登记痕迹 | 0 | — |
-| 21008 | 猎物的视线 | 5 | 无登记痕迹 | 0 | — |
-| 21011 | 与行星相会 | 5 | 无登记痕迹 | 0 | — |
-| 21012 | 秘密誓心 | 5 | 无登记痕迹 | 0 | — |
-| 21013 | 别让世界静下来 | 10 | 无登记痕迹 | 0 | — |
-| 21014 | 此时恰好 | 10 | 无登记痕迹 | 0 | — |
-| 21015 | 决心如汗珠般闪耀 | 10 | 无登记痕迹 | 0 | — |
-| 21016 | 宇宙市场趋势 | 5 | 无登记痕迹 | 0 | — |
-| 21018 | 舞！舞！舞！ | 5 | 无登记痕迹 | 0 | — |
-| 21019 | 在蓝天下 | 10 | 无登记痕迹 | 0 | — |
-| 21020 | 天才们的休憩 | 10 | 无登记痕迹 | 0 | — |
-| 21022 | 延长记号 | 15 | 无登记痕迹 | 0 | — |
-| 21025 | 过往未来 | 5 | 无登记痕迹 | 0 | — |
-| 21026 | 汪！散步时间！ | 15 | 无登记痕迹 | 0 | — |
-| 21027 | 早餐的仪式感 | 5 | 无登记痕迹 | 0 | — |
-| 21028 | 暖夜不会漫长 | 10 | 无登记痕迹 | 0 | — |
-| 21031 | 重返幽冥 | 5 | 无登记痕迹 | 0 | — |
-| 21033 | 无处可逃 | 10 | 无登记痕迹 | 0 | — |
-| 21034 | 今日亦是和平的一日 | 5 | 无登记痕迹 | 0 | — |
-| 21035 | 何物为真 | 10 | 无登记痕迹 | 0 | — |
-| 21036 | 美梦小镇大冒险 | 15 | 无登记痕迹 | 0 | — |
-| 21037 | 最后的赢家 | 10 | 无登记痕迹 | 0 | — |
-| 21039 | 织造命运之线 | 10 | 无登记痕迹 | 0 | — |
-| 21040 | 银河沦陷日 | 5 | 无登记痕迹 | 0 | — |
-| 21041 | 好戏开演 | 10 | 无登记痕迹 | 0 | — |
-| 21043 | 两个人的演唱会 | 5 | 无登记痕迹 | 0 | — |
-| 21045 | 谐乐静默之后 | 10 | 无登记痕迹 | 0 | — |
-| 21046 | 芳华待灼 | 5 | 无登记痕迹 | 0 | — |
-| 21047 | 黑夜如影随行 | 10 | 无登记痕迹 | 0 | — |
-| 21048 | 梦的蒙太奇 | 10 | 无登记痕迹 | 0 | — |
-| 21050 | 胜利只在朝夕间 | 5 | 无登记痕迹 | 0 | — |
-| 21051 | 天才们的问候 | 5 | 无登记痕迹 | 0 | — |
-| 21052 | 多流汗，少流泪 | 10 | 无登记痕迹 | 0 | — |
-| 21053 | 愿旅途永远坦然 | 10 | 无登记痕迹 | 0 | — |
-| 21054 | 故事的下一页 | 5 | 无登记痕迹 | 0 | — |
-| 21055 | 直到明天的明天 | 5 | 无登记痕迹 | 0 | — |
-| 21056 | 追逐风的时候 | 5 | 无登记痕迹 | 0 | — |
-| 21057 | 花儿不会忘记 | 5 | 无登记痕迹 | 0 | — |
-| 21058 | 一行往日的血 | 10 | 无登记痕迹 | 0 | — |
-| 21060 | 氤氲麦香的梦 | 10 | 无登记痕迹 | 0 | — |
-| 21062 | 于那终点再见 | 10 | 无登记痕迹 | 0 | — |
-| 21064 | 菇菇嘎嘎历险记 | 5 | 无登记痕迹 | 0 | — |
-| 21066 | 放个短假 | 5 | 无登记痕迹 | 0 | — |
-| 22002 | 为了明日的旅途 | 10 | 无登记痕迹 | 0 | — |
-| 22003 | 忍事录•音律狩猎 | 10 | 无登记痕迹 | 0 | — |
-| 22004 | 宇宙大生意 | 5 | 无登记痕迹 | 0 | — |
-| 22005 | 永远的迷境饭 | 5 | 无登记痕迹 | 0 | — |
-| 22006 | 飞向粉色的明天 | 5 | 无登记痕迹 | 0 | — |
-| 22007 | 未来，有我们一起 | 5 | 无登记痕迹 | 0 | — |
-| 22008 | 向着地平线的终点 | 5 | 无登记痕迹 | 0 | — |
-| 23002 | 无可取代的东西 | 10 | 无登记痕迹 | 0 | — |
-| 23003 | 但战斗还未结束 | 10 | 无登记痕迹 | 0 | — |
-| 23007 | 雨一直下 | 20 | 无登记痕迹 | 0 | — |
-| 23008 | 棺的回响 | 10 | 无登记痕迹 | 0 | — |
-| 23009 | 到不了的彼岸 | 10 | 无登记痕迹 | 0 | — |
-| 23013 | 时节不居 | 5 | 无登记痕迹 | 0 | — |
-| 23014 | 此身为剑 | 25 | 无登记痕迹 | 0 | — |
-| 23015 | 比阳光更明亮的 | 5 | 无登记痕迹 | 0 | — |
-| 23016 | 烦恼着，幸福着 | 15 | 无登记痕迹 | 0 | — |
-| 23020 | 纯粹思维的洗礼 | 15 | 无登记痕迹 | 0 | — |
-| 23023 | 命运从未公平 | 15 | 无登记痕迹 | 0 | — |
-| 23024 | 行于流逝的岸 | 15 | 无登记痕迹 | 0 | — |
-| 23026 | 夜色流光溢彩 | 10 | 无登记痕迹 | 0 | — |
-| 23030 | 落日时起舞 | 10 | 无登记痕迹 | 0 | — |
-| 23031 | 我将，巡征追猎 | 15 | 无登记痕迹 | 0 | — |
-| 23032 | 唯有香如故 | 15 | 无登记痕迹 | 0 | — |
-| 23033 | 忍法帖•缭乱破魔 | 20 | 无登记痕迹 | 0 | — |
-| 23035 | 长路终有归途 | 5 | 无登记痕迹 | 0 | — |
-| 23036 | 将光阴织成黄金 | 20 | 无登记痕迹 | 0 | — |
-| 23038 | 如果时间是一朵花 | 10 | 无登记痕迹 | 0 | — |
-| 23040 | 让告别，更美一些 | 10 | 无登记痕迹 | 0 | — |
-| 23044 | 黎明恰如此燃烧 | 20 | 无登记痕迹 | 0 | — |
-| 23046 | 理想燃烧的地狱 | 2 | 无登记痕迹 | 0 | — |
-| 23047 | 海洋为何而歌 | 10 | 无登记痕迹 | 0 | — |
-| 23054 | 当她决定看见 | 15 | 无登记痕迹 | 0 | — |
-| 23056 | 一场谎言的终幕 | 20 | 无登记痕迹 | 0 | — |
-| 23057 | 欢迎来到银河城 | 21 | 无登记痕迹 | 0 | — |
-| 23062 | 所见即我 | 20 | 无登记痕迹 | 0 | — |
-| 24000 | 记一位星神的陨落 | 10 | 无登记痕迹 | 0 | — |
-| 24001 | 星海巡航 | 15 | 无登记痕迹 | 0 | — |
-| 24004 | 不息的演算 | 10 | 无登记痕迹 | 0 | — |
-| 24005 | 记忆永不落幕 | 5 | 无登记痕迹 | 0 | — |
-| 24006 | 欢愉满溢祝福 | 10 | 无登记痕迹 | 0 | — |
-| 20009 | 乐圮 | 5 | 有登记 | 0 | shattered_home_against_healthy、shattered_home_against_healthy、shattered_home_against_healthy… |
+| 20000 | 锋镝 | 5 | 无仍开着的缺口 | 0 | — |
+| 20001 | 物穰 | 10 | 无仍开着的缺口 | 0 | — |
+| 20002 | 天倾 | 10 | 无仍开着的缺口 | 0 | — |
+| 20003 | 琥珀 | 10 | 无仍开着的缺口 | 0 | — |
+| 20004 | 幽邃 | 5 | 无仍开着的缺口 | 0 | — |
+| 20005 | 齐颂 | 5 | 无仍开着的缺口 | 0 | — |
+| 20006 | 智库 | 5 | 无仍开着的缺口 | 0 | — |
+| 20007 | 离弦 | 5 | 无仍开着的缺口 | 0 | — |
+| 20008 | 嘉果 | 5 | 无仍开着的缺口 | 0 | — |
+| 20009 | 乐圮 | 5 | 无仍开着的缺口 | 0 | — |
+| 20010 | 戍御 | 5 | 无仍开着的缺口 | 0 | — |
+| 20011 | 渊环 | 5 | 无仍开着的缺口 | 0 | — |
+| 20012 | 轮契 | 5 | 无仍开着的缺口 | 0 | — |
+| 20013 | 灵钥 | 5 | 无仍开着的缺口 | 0 | — |
+| 20014 | 相抗 | 5 | 无仍开着的缺口 | 0 | — |
+| 20016 | 俱殁 | 5 | 无仍开着的缺口 | 0 | — |
+| 20017 | 开疆 | 5 | 无仍开着的缺口 | 0 | — |
+| 20018 | 匿影 | 10 | 无仍开着的缺口 | 0 | — |
+| 20019 | 调和 | 5 | 无仍开着的缺口 | 0 | — |
+| 20020 | 睿见 | 5 | 无仍开着的缺口 | 0 | — |
+| 20021 | 焚影 | 5 | 无仍开着的缺口 | 0 | — |
+| 20022 | 溯忆 | 10 | 无仍开着的缺口 | 0 | — |
+| 20024 | 残泪 | 11 | 无仍开着的缺口 | 0 | — |
+| 21000 | 一场术后对话 | 5 | 无仍开着的缺口 | 0 | — |
+| 21001 | 晚安与睡颜 | 10 | 无仍开着的缺口 | 0 | — |
+| 21002 | 余生的第一天 | 5 | 无仍开着的缺口 | 0 | — |
+| 21003 | 唯有沉默 | 10 | 无仍开着的缺口 | 0 | — |
+| 21004 | 记忆中的模样 | 10 | 无仍开着的缺口 | 0 | — |
+| 21005 | 鼹鼠党欢迎你 | 15 | 无仍开着的缺口 | 0 | — |
+| 21006 | 「我」的诞生 | 10 | 无仍开着的缺口 | 0 | — |
+| 21007 | 同一种心情 | 10 | 无仍开着的缺口 | 0 | — |
+| 21008 | 猎物的视线 | 5 | 无仍开着的缺口 | 0 | — |
+| 21009 | 朗道的选择 | 10 | 无仍开着的缺口 | 0 | — |
+| 21010 | 论剑 | 10 | 无仍开着的缺口 | 0 | — |
+| 21011 | 与行星相会 | 5 | 无仍开着的缺口 | 0 | — |
+| 21012 | 秘密誓心 | 5 | 无仍开着的缺口 | 0 | — |
+| 21013 | 别让世界静下来 | 10 | 无仍开着的缺口 | 0 | — |
+| 21014 | 此时恰好 | 10 | 无仍开着的缺口 | 0 | — |
+| 21015 | 决心如汗珠般闪耀 | 10 | 无仍开着的缺口 | 0 | — |
+| 21016 | 宇宙市场趋势 | 5 | 无仍开着的缺口 | 0 | — |
+| 21018 | 舞！舞！舞！ | 5 | 无仍开着的缺口 | 0 | — |
+| 21019 | 在蓝天下 | 10 | 无仍开着的缺口 | 0 | — |
+| 21020 | 天才们的休憩 | 10 | 无仍开着的缺口 | 0 | — |
+| 21022 | 延长记号 | 15 | 无仍开着的缺口 | 0 | — |
+| 21024 | 春水初生 | 5 | 无仍开着的缺口 | 0 | — |
+| 21025 | 过往未来 | 5 | 无仍开着的缺口 | 0 | — |
+| 21026 | 汪！散步时间！ | 15 | 无仍开着的缺口 | 0 | — |
+| 21027 | 早餐的仪式感 | 5 | 无仍开着的缺口 | 0 | — |
+| 21028 | 暖夜不会漫长 | 10 | 无仍开着的缺口 | 0 | — |
+| 21029 | 后会有期 | 10 | 无仍开着的缺口 | 0 | — |
+| 21030 | 这就是我啦！ | 5 | 无仍开着的缺口 | 0 | — |
+| 21031 | 重返幽冥 | 5 | 无仍开着的缺口 | 0 | — |
+| 21032 | 镂月裁云之意 | 10 | 无仍开着的缺口 | 0 | — |
+| 21033 | 无处可逃 | 10 | 无仍开着的缺口 | 0 | — |
+| 21034 | 今日亦是和平的一日 | 5 | 无仍开着的缺口 | 0 | — |
+| 21035 | 何物为真 | 10 | 无仍开着的缺口 | 0 | — |
+| 21036 | 美梦小镇大冒险 | 15 | 无仍开着的缺口 | 0 | — |
+| 21037 | 最后的赢家 | 10 | 无仍开着的缺口 | 0 | — |
+| 21039 | 织造命运之线 | 10 | 无仍开着的缺口 | 0 | — |
+| 21040 | 银河沦陷日 | 5 | 无仍开着的缺口 | 0 | — |
+| 21041 | 好戏开演 | 10 | 无仍开着的缺口 | 0 | — |
+| 21043 | 两个人的演唱会 | 5 | 无仍开着的缺口 | 0 | — |
+| 21044 | 无边曼舞 | 10 | 无仍开着的缺口 | 0 | — |
+| 21045 | 谐乐静默之后 | 10 | 无仍开着的缺口 | 0 | — |
+| 21046 | 芳华待灼 | 5 | 无仍开着的缺口 | 0 | — |
+| 21047 | 黑夜如影随行 | 10 | 无仍开着的缺口 | 0 | — |
+| 21048 | 梦的蒙太奇 | 10 | 无仍开着的缺口 | 0 | — |
+| 21050 | 胜利只在朝夕间 | 5 | 无仍开着的缺口 | 0 | — |
+| 21051 | 天才们的问候 | 5 | 无仍开着的缺口 | 0 | — |
+| 21052 | 多流汗，少流泪 | 10 | 无仍开着的缺口 | 0 | — |
+| 21053 | 愿旅途永远坦然 | 10 | 无仍开着的缺口 | 0 | — |
+| 21054 | 故事的下一页 | 5 | 无仍开着的缺口 | 0 | — |
+| 21055 | 直到明天的明天 | 5 | 无仍开着的缺口 | 0 | — |
+| 21056 | 追逐风的时候 | 5 | 无仍开着的缺口 | 0 | — |
+| 21057 | 花儿不会忘记 | 5 | 无仍开着的缺口 | 0 | — |
+| 21058 | 一行往日的血 | 10 | 无仍开着的缺口 | 0 | — |
+| 21060 | 氤氲麦香的梦 | 10 | 无仍开着的缺口 | 0 | — |
+| 21061 | 假日浴场大冒险 | 2 | 无仍开着的缺口 | 0 | — |
+| 21062 | 于那终点再见 | 10 | 无仍开着的缺口 | 0 | — |
+| 21064 | 菇菇嘎嘎历险记 | 5 | 无仍开着的缺口 | 0 | — |
+| 21065 | 今日好手气 | 5 | 无仍开着的缺口 | 0 | — |
+| 21066 | 放个短假 | 5 | 无仍开着的缺口 | 0 | — |
+| 22000 | 新手任务开始前 | 5 | 无仍开着的缺口 | 0 | — |
+| 22002 | 为了明日的旅途 | 10 | 无仍开着的缺口 | 0 | — |
+| 22003 | 忍事录•音律狩猎 | 10 | 无仍开着的缺口 | 0 | — |
+| 22004 | 宇宙大生意 | 5 | 无仍开着的缺口 | 0 | — |
+| 22005 | 永远的迷境饭 | 5 | 无仍开着的缺口 | 0 | — |
+| 22006 | 飞向粉色的明天 | 5 | 无仍开着的缺口 | 0 | — |
+| 22007 | 未来，有我们一起 | 5 | 无仍开着的缺口 | 0 | — |
+| 22008 | 向着地平线的终点 | 5 | 无仍开着的缺口 | 0 | — |
+| 23002 | 无可取代的东西 | 10 | 无仍开着的缺口 | 0 | — |
+| 23003 | 但战斗还未结束 | 10 | 无仍开着的缺口 | 0 | — |
+| 23005 | 制胜的瞬间 | 5 | 无仍开着的缺口 | 0 | — |
+| 23006 | 只需等待 | 10 | 无仍开着的缺口 | 0 | — |
+| 23007 | 雨一直下 | 20 | 无仍开着的缺口 | 0 | — |
+| 23008 | 棺的回响 | 10 | 无仍开着的缺口 | 0 | — |
+| 23009 | 到不了的彼岸 | 10 | 无仍开着的缺口 | 0 | — |
+| 23010 | 拂晓之前 | 15 | 无仍开着的缺口 | 0 | — |
+| 23011 | 她已闭上双眼 | 10 | 无仍开着的缺口 | 0 | — |
+| 23013 | 时节不居 | 5 | 无仍开着的缺口 | 0 | — |
+| 23014 | 此身为剑 | 25 | 无仍开着的缺口 | 0 | — |
+| 23015 | 比阳光更明亮的 | 5 | 无仍开着的缺口 | 0 | — |
+| 23016 | 烦恼着，幸福着 | 15 | 无仍开着的缺口 | 0 | — |
+| 23017 | 惊魂夜 | 5 | 无仍开着的缺口 | 0 | — |
+| 23019 | 镜中故我 | 3 | 无仍开着的缺口 | 0 | — |
+| 23020 | 纯粹思维的洗礼 | 15 | 无仍开着的缺口 | 0 | — |
+| 23023 | 命运从未公平 | 15 | 无仍开着的缺口 | 0 | — |
+| 23024 | 行于流逝的岸 | 15 | 无仍开着的缺口 | 0 | — |
+| 23026 | 夜色流光溢彩 | 10 | 无仍开着的缺口 | 0 | — |
+| 23029 | 那无数个春天 | 1 | 无仍开着的缺口 | 0 | — |
+| 23030 | 落日时起舞 | 10 | 无仍开着的缺口 | 0 | — |
+| 23031 | 我将，巡征追猎 | 15 | 无仍开着的缺口 | 0 | — |
+| 23032 | 唯有香如故 | 15 | 无仍开着的缺口 | 0 | — |
+| 23033 | 忍法帖•缭乱破魔 | 20 | 无仍开着的缺口 | 0 | — |
+| 23034 | 回到大地的飞行 | 30 | 无仍开着的缺口 | 0 | — |
+| 23035 | 长路终有归途 | 5 | 无仍开着的缺口 | 0 | — |
+| 23036 | 将光阴织成黄金 | 20 | 无仍开着的缺口 | 0 | — |
+| 23037 | 向着不可追问处 | 5 | 无仍开着的缺口 | 0 | — |
+| 23038 | 如果时间是一朵花 | 10 | 无仍开着的缺口 | 0 | — |
+| 23039 | 血火啊，燃烧前路 | 5 | 无仍开着的缺口 | 0 | — |
+| 23040 | 让告别，更美一些 | 10 | 无仍开着的缺口 | 0 | — |
+| 23041 | 生命当付之一炬 | 2 | 无仍开着的缺口 | 0 | — |
+| 23044 | 黎明恰如此燃烧 | 20 | 无仍开着的缺口 | 0 | — |
+| 23046 | 理想燃烧的地狱 | 2 | 无仍开着的缺口 | 0 | — |
+| 23047 | 海洋为何而歌 | 10 | 无仍开着的缺口 | 0 | — |
+| 23050 | 勿忘她的火焰 | 15 | 无仍开着的缺口 | 0 | — |
+| 23051 | 纵然山河万程 | 1 | 无仍开着的缺口 | 0 | — |
+| 23052 | 爱如此刻永恒 | 10 | 无仍开着的缺口 | 0 | — |
+| 23053 | 花花世界迷人眼 | 20 | 无仍开着的缺口 | 0 | — |
+| 23054 | 当她决定看见 | 15 | 无仍开着的缺口 | 0 | — |
+| 23056 | 一场谎言的终幕 | 20 | 无仍开着的缺口 | 0 | — |
+| 23058 | 邂逅于下一个花季 | 5 | 无仍开着的缺口 | 0 | — |
+| 23059 | 灼尽炼狱的新骸 | 20 | 无仍开着的缺口 | 0 | — |
+| 23060 | 当一颗星照亮夜空 | 5 | 无仍开着的缺口 | 0 | — |
+| 23061 | 星火悄然闪耀 | 15 | 无仍开着的缺口 | 0 | — |
+| 23062 | 所见即我 | 20 | 无仍开着的缺口 | 0 | — |
+| 23063 | 你将起身歌唱 | 2 | 无仍开着的缺口 | 0 | — |
+| 23064 | 向浪花掷下盛夏 | 20 | 无仍开着的缺口 | 0 | — |
+| 24000 | 记一位星神的陨落 | 10 | 无仍开着的缺口 | 0 | — |
+| 24001 | 星海巡航 | 15 | 无仍开着的缺口 | 0 | — |
+| 24004 | 不息的演算 | 10 | 无仍开着的缺口 | 0 | — |
+| 24005 | 记忆永不落幕 | 5 | 无仍开着的缺口 | 0 | — |
+| 24006 | 欢愉满溢祝福 | 10 | 无仍开着的缺口 | 0 | — |
 | 20015 | 蕃息 | 5 | 有登记 | 0 | cone20015_advance_after_basic、cone20015_advance_after_basic、cone20015_advance_after_basic… |
-| 20024 | 残泪 | 11 | 有登记 | 0 | cone20024_threshold_met、cone20024_threshold_lost、cone20024_threshold_met… |
-| 21005 | 鼹鼠党欢迎你 | 15 | 有登记 | 0 | moles_stack_on_basic_attack、moles_stack_on_skill_cast、moles_stack_on_ult_cast… |
-| 21009 | 朗道的选择 | 10 | 有登记 | 0 | landau_damage_taken_down、landau_damage_taken_down、landau_damage_taken_down… |
-| 21010 | 论剑 | 10 | 有登记 | 0 | cone21010_stack_on_the_target、cone21010_damage_per_stack、cone21010_stack_on_the_target… |
 | 21017 | 点个关注吧！ | 10 | 有登记 | 0 | cone21017_basic_boost、cone21017_basic_boost、cone21017_basic_boost… |
 | 21021 | 等价交换 | 5 | 有登记 | 0 | talent_energy_for_low_ally、talent_energy_for_low_ally、talent_energy_for_low_ally… |
-| 21023 | 我们是地火 | 10 | 有登记 | 0 | cone21023_party_damage_taken_down、cone21023_party_damage_taken_down、cone21023_party_damage_taken_down… |
-| 21024 | 春水初生 | 5 | 有登记 | 0 | cone21024_battle_start、cone21024_battle_start、cone21024_battle_start… |
-| 21029 | 后会有期 | 10 | 有登记 | 0 | cone21029_extra_damage_normal、cone21029_extra_damage_bpskill、cone21029_extra_damage_normal… |
-| 21030 | 这就是我啦！ | 5 | 有登记 | 0 | cone21030_ult_defence_scaled_damage、cone21030_ult_defence_scaled_damage、cone21030_ult_defence_scaled_damage… |
-| 21032 | 镂月裁云之意 | 10 | 有登记 | 0 | cone21032_battle_start、cone21032_wearer_turn_start、cone21032_battle_start… |
+| 21023 | 我们是地火 | 10 | 有登记 | 0 | cone21023_heal_lost_hp、cone21023_heal_lost_hp、cone21023_heal_lost_hp… |
 | 21042 | 铭记于心的约定 | 10 | 有登记 | 0 | cone21042_turns、cone21042_turns、cone21042_turns… |
-| 21044 | 无边曼舞 | 10 | 有登记 | 0 | cone21044_crit_vs_defence_down、cone21044_crit_vs_slowed、cone21044_crit_vs_defence_down… |
-| 21061 | 假日浴场大冒险 | 2 | 有登记 | 0 | cone21061_vulnerability |
-| 21065 | 今日好手气 | 5 | 有登记 | 0 | cone21065_elation_stack、cone21065_elation_stack、cone21065_elation_stack… |
-| 22000 | 新手任务开始前 | 5 | 有登记 | 0 | cone22000_energy_after_hitting_a_lowered_target、cone22000_energy_after_hitting_a_lowered_target、cone22000_energy_after_hitting_a_lowered_target… |
 | 22001 | 嘿，我在这儿 | 10 | 有登记 | 0 | cone22001_turns、cone22001_turns、cone22001_turns… |
 | 23000 | 银河铁道之夜 | 5 | 有登记 | 0 | cone23000_damage_up_on_break、cone23000_damage_up_on_break、cone23000_damage_up_on_break… |
 | 23001 | 于夜色中 | 5 | 有登记 | 0 | cone23001_stat、cone23001_stat、cone23001_stat… |
-| 23004 | 以世界之名 | 10 | 有登记 | 0 | cone23004_boost_vs_debuffed、cone23004_cast_scope_stats、cone23004_boost_vs_debuffed… |
-| 23005 | 制胜的瞬间 | 5 | 有登记 | 0 | moment_aggro_up、moment_aggro_up、moment_aggro_up… |
-| 23006 | 只需等待 | 10 | 有登记 | 0 | cone23006_speed_stack_on_attack、cone23006_thread_dot、cone23006_speed_stack_on_attack… |
-| 23010 | 拂晓之前 | 15 | 有登记 | 0 | cone23010_skill_damage、cone23010_ult_damage、cone23010_skill_damage… |
-| 23011 | 她已闭上双眼 | 10 | 有登记 | 0 | cone23011_party_damage_up_when_wearer_hurt、cone23011_party_damage_up_when_wearer_hurt、cone23011_party_damage_up_when_wearer_hurt… |
+| 23004 | 以世界之名 | 10 | 有登记 | 0 | cone23004_boost_vs_debuffed、cone23004_boost_vs_debuffed、cone23004_boost_vs_debuffed… |
 | 23012 | 如泥酣眠 | 5 | 有登记 | 0 | cone23012_crit_damage、cone23012_crit_damage、cone23012_crit_damage… |
-| 23017 | 惊魂夜 | 5 | 有登记 | 0 | cone23017_heal_lowest_ally、cone23017_heal_lowest_ally、cone23017_heal_lowest_ally… |
 | 23018 | 片刻，留在眼底 | 10 | 有登记 | 0 | cone23018_ult_damage_per_energy、cone23018_ult_damage_per_energy、cone23018_ult_damage_per_energy… |
-| 23019 | 镜中故我 | 3 | 有登记 | 0 | cone23019_wave_energy |
 | 23021 | 游戏尘寰 | 25 | 有登记 | 0 | cone23021_mask_at_battle_start、cone23021_flame_per_point、cone23021_flame_pays_out… |
 | 23022 | 重塑时光之忆 | 25 | 有登记 | 0 | cone23022_seer_from_dot_1、cone23022_seer_from_dot_2、cone23022_seer_from_dot_3… |
 | 23025 | 梦应归于何处 | 10 | 有登记 | 0 | cone23025_collapse_on_break、cone23025_collapse_on_break、cone23025_collapse_on_break… |
 | 23027 | 驶向第二次生命 | 5 | 有登记 | 0 | cone23027_break_ignores_defence、cone23027_break_ignores_defence、cone23027_break_ignores_defence… |
 | 23028 | 偏偏希望无价 | 5 | 有登记 | 0 | cone23028_stat、cone23028_stat、cone23028_stat… |
-| 23029 | 那无数个春天 | 1 | 有登记 | 0 | cone23029_armor_break |
-| 23034 | 回到大地的飞行 | 30 | 有登记 | 0 | cone23034_chant_for_the_target_skill、cone23034_chant_for_the_target_ult、cone23034_chant_for_the_target_skill… |
-| 23037 | 向着不可追问处 | 5 | 有登记 | 0 | cone23037_skill_and_ult_damage_up、cone23037_skill_and_ult_damage_up、cone23037_skill_and_ult_damage_up… |
-| 23039 | 血火啊，燃烧前路 | 5 | 有登记 | 0 | cone23039_health、cone23039_health、cone23039_health… |
-| 23041 | 生命当付之一炬 | 2 | 有登记 | 0 | cone23041_defence_down |
 | 23042 | 愿虹光永驻天空 | 10 | 有登记 | 0 | cone23042_stat、cone23042_stat、cone23042_stat… |
 | 23043 | 谎言在风中飘扬 | 5 | 有登记 | 0 | cone23043_stat、cone23043_stat、cone23043_stat… |
 | 23045 | 没有回报的加冕 | 5 | 有登记 | 0 | cone23045_stat、cone23045_stat、cone23045_stat… |
 | 23048 | 金血铭刻的时代 | 15 | 有登记 | 0 | cone23048_skill_point、cone23048_skill_point、cone23048_skill_point… |
 | 23049 | 致长夜的星光 | 5 | 有登记 | 0 | cone23049_stat、cone23049_stat、cone23049_stat… |
-| 23050 | 勿忘她的火焰 | 15 | 有登记 | 0 | cone23050_weakness_grants_skill_point、cone23050_weakness_grants_skill_point、cone23050_weakness_grants_skill_point… |
-| 23051 | 纵然山河万程 | 1 | 有登记 | 0 | cone23051_ult_heal |
-| 23052 | 爱如此刻永恒 | 10 | 有登记 | 0 | cone23052_blank_on_ally、cone23052_poem_on_enemy、cone23052_blank_on_ally… |
-| 23053 | 花花世界迷人眼 | 20 | 有登记 | 0 | cone23053_spent_stack、cone23053_def_ignore_per_stack、cone23053_spent_stack… |
-| 23058 | 邂逅于下一个花季 | 5 | 有登记 | 0 | cone23058_elation_cast_damage_taken、cone23058_elation_cast_damage_taken、cone23058_elation_cast_damage_taken… |
-| 23059 | 灼尽炼狱的新骸 | 20 | 有登记 | 0 | cone23059_purgatory、cone23059_purgatory、cone23059_purgatory… |
-| 23060 | 当一颗星照亮夜空 | 5 | 有登记 | 0 | cone23060_def_ignore、cone23060_def_ignore、cone23060_def_ignore… |
-| 23061 | 星火悄然闪耀 | 15 | 有登记 | 0 | cone23061_crown_pays_out、cone23061_crown_pays_out、cone23061_crown_pays_out… |
-| 23063 | 你将起身歌唱 | 2 | 有登记 | 0 | cone23063_battle_advance |
-| 23064 | 向浪花掷下盛夏 | 20 | 有登记 | 0 | cone23064_wind_gust、cone23064_skill_point_per_wave、cone23064_elation_cast_count… |
+| 23057 | 欢迎来到银河城 | 21 | 有登记 | 0 | cone23057_elation_def_ignore、cone23057_elation_def_ignore、cone23057_elation_def_ignore… |
 | 24002 | 记忆的质料 | 5 | 有登记 | 0 | cone24002_shield_when_unshielded、cone24002_shield_when_unshielded、cone24002_shield_when_unshielded… |
 | 24003 | 孤独的疗愈 | 1 | 有登记 | 0 | cone24003_ult_dot |
 | 20023 | 嗤笑 | 0 | 无文件（已登记为不建模） | 0 | — |
@@ -319,67 +319,67 @@ python C:\Users\laosu\Downloads\aluminium-baseline\content_status2.py
 
 | id | 名称 | 规则数 | 状态 | 提到它的测试文件 | 还挂着的登记 |
 |---|---|---|---|---|---|
-| 101 | 云无留迹的过客 | 1 | 无登记痕迹 | 0 | — |
-| 102 | 野穗伴行的快枪手 | 1 | 无登记痕迹 | 0 | — |
-| 103 | 净庭教宗的圣骑士 | 1 | 无登记痕迹 | 0 | — |
-| 104 | 密林卧雪的猎人 | 1 | 无登记痕迹 | 0 | — |
-| 105 | 街头出身的拳王 | 2 | 无登记痕迹 | 0 | — |
-| 106 | 戍卫风雪的铁卫 | 2 | 无登记痕迹 | 0 | — |
-| 107 | 熔岩锻铸的火匠 | 2 | 无登记痕迹 | 0 | — |
-| 108 | 繁星璀璨的天才 | 2 | 无登记痕迹 | 0 | — |
-| 109 | 激奏雷电的乐队 | 1 | 无登记痕迹 | 0 | — |
-| 110 | 晨昏交界的翔鹰 | 1 | 无登记痕迹 | 0 | — |
-| 111 | 流星追迹的怪盗 | 1 | 无登记痕迹 | 0 | — |
-| 112 | 盗匪荒漠的废土客 | 2 | 无登记痕迹 | 0 | — |
-| 114 | 骇域漫游的信使 | 1 | 无登记痕迹 | 0 | — |
-| 116 | 幽锁深牢的系囚 | 2 | 无登记痕迹 | 0 | — |
-| 117 | 死水深潜的先驱 | 6 | 无登记痕迹 | 0 | — |
-| 118 | 机心戏梦的钟表匠 | 1 | 无登记痕迹 | 0 | — |
-| 120 | 风举云飞的勇烈 | 1 | 无登记痕迹 | 0 | — |
-| 121 | 重循苦旅的司铎 | 2 | 无登记痕迹 | 0 | — |
-| 122 | 识海迷坠的学者 | 2 | 无登记痕迹 | 0 | — |
-| 123 | 凯歌祝捷的英豪 | 2 | 无登记痕迹 | 0 | — |
-| 124 | 哀歌覆国的诗人 | 4 | 无登记痕迹 | 0 | — |
-| 127 | 再创天地的救世主 | 2 | 无登记痕迹 | 0 | — |
-| 128 | 自匿星芒的隐士 | 2 | 无登记痕迹 | 0 | — |
-| 131 | 星如我见的领航员 | 4 | 无登记痕迹 | 0 | — |
-| 133 | 戏梦点星的伶人 | 4 | 无登记痕迹 | 0 | — |
-| 134 | 贪噬禁果的异端 | 2 | 无登记痕迹 | 0 | — |
-| 301 | 太空封印站 | 1 | 无登记痕迹 | 0 | — |
-| 302 | 不老者的仙舟 | 1 | 无登记痕迹 | 0 | — |
-| 304 | 筑城者的贝洛伯格 | 1 | 无登记痕迹 | 0 | — |
-| 305 | 星体差分机 | 1 | 无登记痕迹 | 0 | — |
-| 306 | 停转的萨尔索图 | 1 | 无登记痕迹 | 0 | — |
-| 307 | 盗贼公国塔利亚 | 1 | 无登记痕迹 | 0 | — |
-| 308 | 生命的翁瓦克 | 1 | 无登记痕迹 | 0 | — |
-| 309 | 繁星竞技场 | 1 | 无登记痕迹 | 0 | — |
-| 310 | 折断的龙骨 | 1 | 无登记痕迹 | 0 | — |
-| 311 | 苍穹战线格拉默 | 2 | 无登记痕迹 | 0 | — |
-| 312 | 梦想之地匹诺康尼 | 1 | 无登记痕迹 | 0 | — |
-| 313 | 无主荒星茨冈尼亚 | 2 | 无登记痕迹 | 0 | — |
-| 314 | 出云显世与高天神国 | 1 | 无登记痕迹 | 0 | — |
-| 315 | 奔狼的都蓝王朝 | 3 | 无登记痕迹 | 0 | — |
-| 316 | 劫火莲灯铸炼宫 | 1 | 无登记痕迹 | 0 | — |
-| 317 | 沉陆海域露莎卡 | 1 | 无登记痕迹 | 0 | — |
-| 318 | 奇想蕉乐园 | 1 | 无登记痕迹 | 0 | — |
-| 319 | 谧宁拾骨地 | 2 | 无登记痕迹 | 0 | — |
-| 320 | 渊思寂虑的巨树 | 4 | 无登记痕迹 | 0 | — |
-| 322 | 沉欢醉饮的海隅 | 2 | 无登记痕迹 | 0 | — |
-| 323 | 永恒之地翁法罗斯 | 1 | 无登记痕迹 | 0 | — |
-| 325 | 零号关卡朋克洛德 | 8 | 无登记痕迹 | 0 | — |
-| 326 | 千星荟萃之城 | 2 | 无登记痕迹 | 0 | — |
-| 328 | 寰宇生研院 | 2 | 无登记痕迹 | 0 | — |
+| 101 | 云无留迹的过客 | 1 | 无仍开着的缺口 | 0 | — |
+| 102 | 野穗伴行的快枪手 | 1 | 无仍开着的缺口 | 0 | — |
+| 103 | 净庭教宗的圣骑士 | 1 | 无仍开着的缺口 | 0 | — |
+| 104 | 密林卧雪的猎人 | 1 | 无仍开着的缺口 | 0 | — |
+| 105 | 街头出身的拳王 | 2 | 无仍开着的缺口 | 0 | — |
+| 106 | 戍卫风雪的铁卫 | 2 | 无仍开着的缺口 | 0 | — |
+| 107 | 熔岩锻铸的火匠 | 2 | 无仍开着的缺口 | 0 | — |
+| 108 | 繁星璀璨的天才 | 2 | 无仍开着的缺口 | 0 | — |
+| 109 | 激奏雷电的乐队 | 1 | 无仍开着的缺口 | 0 | — |
+| 110 | 晨昏交界的翔鹰 | 1 | 无仍开着的缺口 | 0 | — |
+| 111 | 流星追迹的怪盗 | 1 | 无仍开着的缺口 | 0 | — |
+| 112 | 盗匪荒漠的废土客 | 2 | 无仍开着的缺口 | 0 | — |
+| 114 | 骇域漫游的信使 | 1 | 无仍开着的缺口 | 0 | — |
+| 115 | 毁烬焚骨的大公 | 3 | 无仍开着的缺口 | 0 | — |
+| 116 | 幽锁深牢的系囚 | 2 | 无仍开着的缺口 | 0 | — |
+| 117 | 死水深潜的先驱 | 6 | 无仍开着的缺口 | 0 | — |
+| 118 | 机心戏梦的钟表匠 | 1 | 无仍开着的缺口 | 0 | — |
+| 119 | 荡除蠹灾的铁骑 | 2 | 无仍开着的缺口 | 0 | — |
+| 120 | 风举云飞的勇烈 | 1 | 无仍开着的缺口 | 0 | — |
+| 121 | 重循苦旅的司铎 | 2 | 无仍开着的缺口 | 0 | — |
+| 122 | 识海迷坠的学者 | 2 | 无仍开着的缺口 | 0 | — |
+| 123 | 凯歌祝捷的英豪 | 2 | 无仍开着的缺口 | 0 | — |
+| 124 | 哀歌覆国的诗人 | 4 | 无仍开着的缺口 | 0 | — |
+| 126 | 恶海逐波的船长 | 2 | 无仍开着的缺口 | 0 | — |
+| 127 | 再创天地的救世主 | 2 | 无仍开着的缺口 | 0 | — |
+| 128 | 自匿星芒的隐士 | 2 | 无仍开着的缺口 | 0 | — |
+| 129 | 闪耀功勋的魔法少女 | 1 | 无仍开着的缺口 | 0 | — |
+| 130 | 应天涉远的卜者 | 3 | 无仍开着的缺口 | 0 | — |
+| 131 | 星如我见的领航员 | 4 | 无仍开着的缺口 | 0 | — |
+| 133 | 戏梦点星的伶人 | 4 | 无仍开着的缺口 | 0 | — |
+| 134 | 贪噬禁果的异端 | 2 | 无仍开着的缺口 | 0 | — |
+| 301 | 太空封印站 | 1 | 无仍开着的缺口 | 0 | — |
+| 302 | 不老者的仙舟 | 1 | 无仍开着的缺口 | 0 | — |
+| 303 | 泛银河商业公司 | 1 | 无仍开着的缺口 | 0 | — |
+| 304 | 筑城者的贝洛伯格 | 1 | 无仍开着的缺口 | 0 | — |
+| 305 | 星体差分机 | 1 | 无仍开着的缺口 | 0 | — |
+| 306 | 停转的萨尔索图 | 1 | 无仍开着的缺口 | 0 | — |
+| 307 | 盗贼公国塔利亚 | 1 | 无仍开着的缺口 | 0 | — |
+| 308 | 生命的翁瓦克 | 1 | 无仍开着的缺口 | 0 | — |
+| 309 | 繁星竞技场 | 1 | 无仍开着的缺口 | 0 | — |
+| 310 | 折断的龙骨 | 1 | 无仍开着的缺口 | 0 | — |
+| 311 | 苍穹战线格拉默 | 2 | 无仍开着的缺口 | 0 | — |
+| 312 | 梦想之地匹诺康尼 | 1 | 无仍开着的缺口 | 0 | — |
+| 313 | 无主荒星茨冈尼亚 | 2 | 无仍开着的缺口 | 0 | — |
+| 314 | 出云显世与高天神国 | 1 | 无仍开着的缺口 | 0 | — |
+| 315 | 奔狼的都蓝王朝 | 3 | 无仍开着的缺口 | 0 | — |
+| 316 | 劫火莲灯铸炼宫 | 1 | 无仍开着的缺口 | 0 | — |
+| 317 | 沉陆海域露莎卡 | 1 | 无仍开着的缺口 | 0 | — |
+| 318 | 奇想蕉乐园 | 1 | 无仍开着的缺口 | 0 | — |
+| 319 | 谧宁拾骨地 | 2 | 无仍开着的缺口 | 0 | — |
+| 320 | 渊思寂虑的巨树 | 4 | 无仍开着的缺口 | 0 | — |
+| 321 | 妖精织梦的乐园 | 6 | 无仍开着的缺口 | 0 | — |
+| 322 | 沉欢醉饮的海隅 | 2 | 无仍开着的缺口 | 0 | — |
+| 323 | 永恒之地翁法罗斯 | 1 | 无仍开着的缺口 | 0 | — |
+| 324 | 天国@直播间 | 2 | 无仍开着的缺口 | 0 | — |
+| 325 | 零号关卡朋克洛德 | 8 | 无仍开着的缺口 | 0 | — |
+| 326 | 千星荟萃之城 | 2 | 无仍开着的缺口 | 0 | — |
+| 327 | 坠星启航地 | 1 | 无仍开着的缺口 | 0 | — |
+| 328 | 寰宇生研院 | 2 | 无仍开着的缺口 | 0 | — |
 | 113 | 宝命长存的莳者 | 1 | 有登记 | 0 | relic113_4_crit_after_hit_or_price |
-| 115 | 毁烬焚骨的大公 | 3 | 有登记 | 0 | relic115_clear_on_followup、relic115_stack_per_followup_hit |
-| 119 | 荡除蠹灾的铁骑 | 2 | 有登记 | 0 | relic119_4_break_ignores_defence、relic119_4_super_break_ignores_more_defence |
 | 125 | 烈阳惊雷的女武神 | 1 | 有登记 | 0 | gentle_rain_on_healing_another |
-| 126 | 恶海逐波的船长 | 2 | 有登记 | 0 | relic126_help_stack |
-| 129 | 闪耀功勋的魔法少女 | 1 | 有登记 | 0 | relic129_elation_ignores_defence |
-| 130 | 应天涉远的卜者 | 3 | 有登记 | 0 | relic130_elation_first |
-| 303 | 泛银河商业公司 | 1 | 有登记 | 0 | relic303_2_atk_from_effect_hit_rate |
-| 321 | 妖精织梦的乐园 | 6 | 有登记 | 0 | arcadia_wearer_1_missing、arcadia_memosprite_1_missing、arcadia_wearer_2_missing… |
-| 324 | 天国@直播间 | 2 | 有登记 | 0 | (无 id) |
-| 327 | 坠星启航地 | 1 | 有登记 | 0 | relic327_companion_crit_dmg |
 | 132 | 叩问天工的名冶 | 0 | 无文件（已登记为不建模） | 0 | — |
 
 ## 静默的半成品（**需要人复核**）
