@@ -71,7 +71,9 @@ public class HyacineTest {
                 "the summon rule the document states -- the heal still comes from the skill data, so no rule states it");
         // Rank 6's aura, the trace's healing share on 小伊卡, Rank 4's CRIT DMG on 小伊卡, and 忆灵技3's two energy
         // clauses (15 on every arrival, 30 more on the first) -- all of them wait for the memosprite to enter the field.
-        Assertions.assertEquals(6, table.ruleCount(TriggerEvent.SUMMONED),
+        // Seven since 2026-10-18: Rank 6s aura also has to reach the memsprites that arrive AFTER 小伊卡
+        // (eidolon_six_aura_covers_later_arrivals), which is a SUMMONED rule of its own.
+        Assertions.assertEquals(7, table.ruleCount(TriggerEvent.SUMMONED),
                 "Rank 6's RES PEN, the two memosprite halves that cannot be inherited, and 忆灵技3's 15 + first-time 30");
         // The talent's +80%/layer on 小伊卡, the two halves of 「风堇与小伊卡累计治疗」(忆灵技1's multiplicand), and
         // 1415 昔涟's extra share written into the same counter.
