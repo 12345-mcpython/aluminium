@@ -190,6 +190,27 @@
       "note": "⭐ 引擎的 `eidolonRank` 只开规则、**不抬技能等级** —— 本次用 `min_eidolon: 3` + `RAISE_SKILL_LEVEL` 补上；「忆灵技等级+1」用 `memosprite: true` + `skill_id: 1`（小伊卡的数据槽 1）✓。"
     },
     {
+      "on": "SUMMONED",
+      "id": "eidolon_six_gives_the_party_all_type_resistance_penetration",
+      "min_eidolon": 6,
+      "when": [
+        "actor == summon",
+        "self_summon_count >= 1"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DAMAGE_PENETRATION",
+          "percent": 0.2,
+          "permanent": true,
+          "buff": "天空应我的祈愿",
+          "target": "all_allies"
+        }
+      ],
+      "source": "1409 风堇 星魂6（E:/code/blog/hsr/1409_风堇.md:382）：「…小伊卡在场时，我方全体目标的全属性抗性穿透提高 20%」 param = [0.12, 0.2]",
+      "note": "「**小伊卡在场时**，我方全体目标的**全属性抗性穿透提高 20%**」—— ① 「全属性抗性穿透」= 引擎的 **`DAMAGE_PENETRATION`** ✓：它减的是**任何**元素的那一发抗性 ✓（`Battle` 里 `damage.resist(rawResist, attacker.getAttribute(DAMAGE_PENETRATION).get())`，而 `rawResist` 早已按元素取过 ✓）—— 与 1303 阮•梅结界、1408、1412、1502 同一拼写 ✓；⚠ **不用** `RESISTANCE_REDUCTION` ✗：那是**受击方**的属性 ✓，这句的主语是**我方** ✓。② 「**小伊卡在场时**」= 事件 `SUMMONED` ✓ + `actor == summon` ✓ + `self_summon_count >= 1` ✓：忆灵第一次真的**进入场地**才给光环 ✓，而不是在战斗开始时先给 ✓；⚠ `actor == summon` 不能省 ✗ —— `SUMMONED` 对**两方**的召唤都发 ✓，少了它，队友的忆灵登场也会给全队抗性穿透 ✓。③ 「我方全体」= `all_allies` ✓，而它取的是 `battle.allies`（**阵营**）✓ ⇒ 我方忆灵**也在里面** ✓ —— 与「我方全体目标」含忆灵一致 ✓。④ `permanent: true` ✓（原文没有时长 ✓）。⚠ **登记**：忆灵**离场后**这条不会自己撤下 ✗ —— 引擎今天没有「召唤物离场」这个事件，也没有按召唤物存续计时的 `ticks_on: \"summon\"`（1407 登记过同一缺口 ✓）；本条**没有**用近似去盖住它 ✓。⚠ **登记**：同句前半「小伊卡施放忆灵技清空累计治疗数值**改为 12%**」✗ —— 它改的是忆灵技 1 的**累计治疗**结算（数据 `[0.1…0.28, 0.5]`，`#2 = 0.5` 就是被改的那个 50% ✓），而那条忆灵技**本身还没规则化** ✗ ⇒ 无从改起 ✓。"
+    },
+    {
       "on": "BATTLE_START",
       "id": "technique_heals_and_raises_max_hp",
       "when": [
