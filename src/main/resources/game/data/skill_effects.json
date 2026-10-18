@@ -618,6 +618,20 @@
             "note": "⚠ `CAST_SKILL` 拒绝过它 ✗（报错原文自己点名：*\"1303/1412's are buffs the table has no entry for\"* ✓）。"
         }
     },
+    "11413": {
+        "1": {
+            "segments": [
+                0.1,
+                0.1,
+                0.1,
+                0.1,
+                0.1,
+                0.5
+            ],
+            "source": "11413「长夜」忆灵技能 1「追忆，蹁跹，如雨」(SkillID 1141301, SkillTriggerKey Skill01, SingleAttack)：上游 ConfigAbility 的 Servant_EvernightServant_00_Skill01_Phase02 里是**六次** DamageByAttackProperty（同一目标、同一 DamagePercentage），HitSplitRatio 依次 0.1/0.1/0.1/0.1/0.1/0.5（合计 1.0；最后一次 HitAnimation=Hit_H）⇒ 一行六段、分裂比 [0.1×5, 0.5]。段数与游戏自己的最大命中次数一致（skill_max_hits.json servants.Servant_EvernightServant_00_Config.Skill01 = 6）。捕获里 177.60×5 + 888.01×1（= 0.06×5 + 0.3，即同一发的 5×0.1 + 0.5）也是六段 —— capture-flow 按 base 分组才看起来像 5+1。",
+            "note": "⚠ 句子里的「每有 #3 点【忆质】额外造成 #2%」由游戏**并进这六发**的 DamagePercentage（两发捕获的总份额实测 0.6 → 0.9），不是额外的实例；引擎还没有这条口径（登记在 AGENT.md §3.7h）。"
+        }
+    },
     "11415": {
         "16": {
             "effect": "Rules",
