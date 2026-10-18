@@ -67,4 +67,56 @@ public class SegmentCountAgreementTest {
         Assertions.assertEquals(List.of(), problems,
                 "hand-written segment counts disagree with skill_max_hits.json: " + problems);
     }
+
+    /**
+     * The same agreement for a <b>servant's</b> hand-written segments.
+     *
+     * <p>The max-hit column for a memosprite is keyed by the ability CONFIG name
+     * ({@code Servant_EvernightServant_00_Config}), not by the servant id ({@code 11413}) - that is how
+     * {@code skill_max_hits.json} is generated - so the two spellings are bridged here explicitly rather than guessed.
+     *
+     * <p>Reader: 11413 「长夜」's skill 1, whose six instances are the six {@code DamageByAttackProperty} tasks of
+     * {@code Servant_EvernightServant_00_Skill01_Phase02} (HitSplitRatio 0.1 x 5 + 0.5). The capture carries the same
+     * cast as 177.60 x 5 + 888.01 x 1; it looks like five because {@code capture-flow} groups by unmodified base.
+     */
+    @Test
+    public void everyServantSegmentCountMatchesTheData() {
+        Map<String, Map<String, Map<String, Integer>>> table = JSONReader.fromJSON("skill_max_hits.json",
+                new TypeToken<Map<String, Map<String, Map<String, Integer>>>>() {
+                }.getType());
+        Assertions.assertNotNull(table, "skill_max_hits.json must be generated (see README's generator section)");
+        // servant id -> the ability config the max-hit section is keyed by.
+        Map<Integer, String> servants = Map.of(11413, "Servant_EvernightServant_00_Config");
+
+        List<String> problems = new ArrayList<>();
+        TreeSet<String> checked = new TreeSet<>();
+        for (Map.Entry<Integer, String> servant : servants.entrySet()) {
+            for (int slot = 1; slot <= 7; slot++) {
+                var spec = SkillEffects.forSkill(new DefaultSkill(servant.getKey(), slot, 10));
+                List<Double> segments = spec == null ? null : spec.getSegments();
+                if (segments == null || segments.isEmpty()) {
+                    continue;
+                }
+                Integer maxHits = table.getOrDefault("servants", Map.of())
+                        .getOrDefault(servant.getValue(), Map.of())
+                        .get("Skill" + String.format("%02d", slot));
+                if (maxHits == null) {
+                    problems.add(servant.getKey() + "/" + slot + ": segments stated but the data has no max-hit row");
+                    continue;
+                }
+                checked.add(servant.getKey() + "/" + slot + "=" + maxHits);
+                if (maxHits != segments.size()) {
+                    problems.add(servant.getKey() + "/" + slot + ": " + segments.size() + " segments, data says " + maxHits);
+                }
+                double sum = segments.stream().mapToDouble(Double::doubleValue).sum();
+                if (Math.abs(sum - 1.0) > 1e-9) {
+                    problems.add(servant.getKey() + "/" + slot + ": the split fractions sum to " + sum + ", not 1");
+                }
+            }
+        }
+        Assertions.assertFalse(checked.isEmpty(),
+                "precondition: at least one servant skill states segments (11413's skill 1 does)");
+        Assertions.assertEquals(List.of(), problems,
+                "servant segment counts disagree with skill_max_hits.json: " + problems);
+    }
 }
