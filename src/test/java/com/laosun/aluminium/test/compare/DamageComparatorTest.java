@@ -46,11 +46,15 @@ public class DamageComparatorTest {
      * </ul>
      */
     @Test
-    public void bothRealCapturesReproduce() {
+    public void allRealCapturesReproduce() {
         Assertions.assertEquals(0, DamageComparator.run("compare", "scenarios/capture-858483.json"),
                 "the ByAttack capture must compare cleanly");
         Assertions.assertEquals(0, DamageComparator.run("compare", "scenarios/capture-876170.json"),
                 "the ByMaxHP capture must compare cleanly");
+        // #12 of the whole-battle capture: the one event whose implied DEF is exactly the stated 1150 (no DEF debuff),
+        // so it is replayable without knowing the debuff state - see the audit in scenarios/README.md.
+        Assertions.assertEquals(0, DamageComparator.run("compare", "scenarios/capture-174678.json"),
+                "the whole-battle event must compare cleanly");
     }
 
     /**
