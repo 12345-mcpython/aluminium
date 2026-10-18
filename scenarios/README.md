@@ -148,6 +148,37 @@ boss（Lv100 + 模板 210 会给出 1200，与反解的 786 不符 ⇒ 存在 DE
 
 ⇒ 要让这 23 条也精确复算，还需要：**每条事件的战斗侧加成**（贪饕/压制/其它随时间变化的增益），或至少把那个加成作为 `zones` 的一行给出来。
 
+### 第三份整场捕获（`veritas_capture_2026-10-18T07-33-33-078Z.json`）：基数来源被点名了
+
+这一份又补了一批字段，最重要的是**每条事件的攻方面板**与**链末附加乘区**：
+
+| 新增字段 | 意义 |
+|---|---|
+| `attacker_attack` / `attacker_base_attack` / `attacker_defence` / `attacker_max_hp` / `attacker_base_hp` / `attacker_hp_added_ratio` | **基数层的数据来源逐条给出** —— 不必再从总量反解 |
+| `target_defence` / `target_level` / `target_defence_added_ratio` | 目标侧同样逐条给出 |
+| `extra_damage_ratio` / `extra_ratio_valid` / `extra_front_back_base` / `extra_luck_chance` / `extra_luck_damage` / `extra_all_damage_type_added_ratio[]` / `extra_attack_type_added_ratio{dot,elation,element_damage,insert,normal,skill,ultra}` / `extra_accumulated` | HSR.md §10.3 的**链末独立乘区**（前后排基准 × 幸运 × 攻击类型附加…） |
+| `stage_final_damage_added_ratio` | **关卡侧**的最终伤害加成 |
+
+**`AttackFormulaType` 到"用哪个面板数"的映射，现在是被数据验证过的**（HSR.md §10.4 的表）：
+
+| 公式 | 基数 = | 本捕获里的证据 |
+|---|---|---|
+| 1 `ByAttack` | `attacker_attack` | 用它能精确复现的事件都能对上 ✓ |
+| 3 `ByMaxHP` | `attacker_max_hp` | 例：忆灵 `attacker_max_hp = 3560.0287`（正是上一份捕获反解出的 3560.03 ✓✓） |
+
+复算结果：**97 条事件里 64 条逐位复现**（含 48 条真实伤害）；剩下 **33 条**系统性偏低，偏差**每回合递增、同一回合内恒定**：
+
+```
+回合 1   miss-1 = 0.1368
+回合 2   miss-1 = 0.1403
+回合 3   miss-1 = 0.1473
+回合 4   miss-1 = 0.1725
+回合 5   miss-1 = 0.1761
+回合 6   miss-1 = 0.1874   …
+```
+
+⚠ 同一回合里目标血量从 72% 掉到 31% 而偏差**不动** ⇒ 它不是"按目标状态"的因子，而是**随时间/回合累积的伤害加成**；而这份捕获里 `extra_accumulated` 与 `stage_final_damage_added_ratio` 在这些事件上都是 **0** ⇒ 它**仍未被命名**。这场是 `gluttony_level: 3`（`MCommon_Gluttony_LV3` / `MCommon_Gluttony_DirtyHp`、`dirty_hp_ratio` + `split_source: 上限压制`），最可能就是**贪饕/压制的战斗侧累积加成**。
+
 ### 为什么需要 `attributes` 覆盖
 
 引擎的面板 = `character_data` + 晋阶 + 行迹，**没有光锥/遗器**。原游戏的数来自某个具体面板，所以比较时必须把那个面板的
