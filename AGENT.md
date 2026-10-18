@@ -397,6 +397,24 @@ if (isSelected) buffer.setStyle(rowArea, highlightStyle);
 ⭐ 这条**已被整场捕获证实存在且数值正确**：捕获里反解出的有效 DEF = `1150 × {0.775, 0.77, 0.76, 0.725, 0.71, 0.705, 0.685, 0.6}`
 = 无视防御 22.5% … **40%**，正是 `15% + 0.5% × 气氛值`（气氛值上限 50 ⇒ 封顶 40%）✓。
 
+#### 已经量过的两种写法（都不对，记录在此，别再重走）
+
+| 写法 | 期望 ignore | 实测反推得 | 结论 |
+|---|---|---|---|
+| `amount: 0.15` + `percent: 0.005`（**份额**） | 22.5% | **≈0.16%** | 被当点数吃掉 100 倍 ✗ |
+| `amount: 15` + `percent: 0.5`（**百分点**） | 22.5% | **≈50%**（且 `cap_amount 40` 没夹住）✗ | 被放大、上限失效 ✗ |
+
+⇒ 带 `scale` 的 `MODIFY_ATTR` 至少涉及三个未定的单位问题：① `derivedMagnitude` 返回**份额**还是**百分点**；
+② `statModifier(absolute=false)` 对份额属性把值当 `值/100` 还是 `值 × base`；③ `cap_amount` 在 `absolute=false` 分支是否经
+`ceiling / base`（源码里有这行，但上面的实测里没夹住）。
+
+#### 探测方法本身也踩了两个坑（记下来省下一次）
+
+1. **`Resources.gain` 改不动队级计数器**：把 `气氛值` 的 scope 改成 `PARTY` 后，`robin.getResources().gain("气氛值", 15)`
+   之后 `value("气氛值")` 仍是 **0** ✗ ⇒ 判据里"设气氛值"这条路要么找队级的池子，要么用一条 `GAIN_RESOURCE` 规则去加 ✓。
+2. **`DEFENCE_IGNORE` 读不到角色属性**：连 1302 施放终结技之后 `getAttribute(DEFENCE_IGNORE)` 都是 **0** ✗
+   ⇒ 它是**实例级**（`instance: true`）修饰、活在这一发 `Damage` 上，正确的观测口是 settled 的 `DefenceArea`（`breakdown()` 的 `DefenceArea` 行）✓。
+
 ⇒ 需要的能力：**份额型属性也允许 `scale`**（"基准份额 + 每单位资源"，且仍按份额写），补上后 1512 那条规则原样可写。
 当前状态：规则**没有**写进内容表，只在 `characters/1512.json` 里登记（不假装实现 ✓）。
 
