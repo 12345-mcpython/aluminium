@@ -111,14 +111,15 @@ final class TriggerEffects {
                 return;
             }
             if (attribute == AttributeType.CRIT_CHANCE) {
-                ctx.damage().addCritChance(effect.getPercent() == null ? 0 : effect.getPercent());
+                // Same fix as DEFENCE_IGNORE: `percent` alone dropped a stated `amount`/`scale`.
+                ctx.damage().addCritChance(TriggerMagnitudes.magnitudeOf(effect, ctx));
                 return;
             }
             if (attribute == AttributeType.CRIT_ATTACK) {
                 // per_stack belongs here too (reader: cone 23016's "each stack of [温驯] raises CRIT DMG"):
                 // the two branches beside this one already scaled by the factor, and this one did not -- measured, a rule at
                 // one layer and at two layers produced the SAME number. Same shape as DEFENCE_IGNORE / the boost channel.
-                double critDamage = effect.getPercent() == null ? 0 : effect.getPercent();
+                double critDamage = TriggerMagnitudes.magnitudeOf(effect, ctx);
                 critDamage *= ctx.target() == null ? 1 : TriggerInterpreter.perStackFactor(effect, ctx.target(), ctx);
                 ctx.damage().addCritDamage(critDamage);
                 return;
@@ -129,7 +130,11 @@ final class TriggerEffects {
             // `per_stack` is honoured, which is what makes a LIVE count ("the field right now") expressible at all.
             // Note: Before this, such a rule had to be a written modifier, i.e. a snapshot taken at cast time.
             if (attribute == AttributeType.ALL_DAMAGE_TYPE_BOOST) {
-                double instanceBoost = effect.getPercent() == null ? 0 : effect.getPercent();
+                // Same fix as DEFENCE_IGNORE: `percent` alone dropped a stated `amount`/`scale`.
+                double instanceBoost = TriggerMagnitudes.magnitudeOf(effect, ctx);
+                if (effect.getAmountCap() != null) {
+                    instanceBoost = Math.min(instanceBoost, effect.getAmountCap());
+                }
                 instanceBoost *= ctx.target() == null ? 1 : TriggerInterpreter.perStackFactor(effect, ctx.target(), ctx);
                 ctx.damage().addBoost(instanceBoost);
                 return;
