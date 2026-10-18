@@ -695,6 +695,19 @@ HP_LOST 计数 = 0 ; HP_CONSUMED 计数 = 0   ← 两个事件都没发
 
 **下一步（数据侧，已就绪）**：忆灵技1 还剩两半 —— ① 那份「计算量 × `#1`」的伤害（`DAMAGE` / `DELEGATE_DAMAGE` 配 `scale: "self_resource:小伊卡累计治疗"` ✓，**注意**：忆灵技1 的数据行会让小伊卡按 `%ATK` 出一发，而它 **ATK 恒为 0**（实测 `ikaAtk=0.0`、那一发只结算 **1** 点），所以要么把它换掉、要么登记这 1 点 ✓）；② 「清空 **50%**」（星魂6 → **12%**）—— `REMOVE_RESOURCE` + `percent: 0.5` + 同一个 `scale` ✓，两条孪生规则用 `max_eidolon: 5` / `min_eidolon: 6` ✓。
 
+### 3.7q 已落：1409 忆灵技1 的**伤害**那一半（累计治疗 × #1%）（**2026-10-18**）
+
+**落地（1 条规则）**：`memosprite_rainclouds_deals_a_share_of_the_tally`
+- `on: CAST_SETUP` + `when: ["actor is_summon", "from_skill_id == 1"]`；
+- `DAMAGE` + **`scale: "self_resource:小伊卡累计治疗"`**（§3.7p 新词汇 ✓）+ **`percent_from_cast_param: 0`**（读**这一发施放自己的行** ⇒ Lv10 的 `0.28` ✓）+ `element: Wind` + `all_enemies`。
+
+**判据**：`HyacineRaincloudsTest` —— 治疗一次把计量记上，再放忆灵技1，伤害 = `计量 × 0.28 + 1`（那 **1** 点是数据侧的残渣，见下 ✓）。
+
+**三处登记**（都测到了，不猜）：
+1. **「清空 50%（星魂6 → 12%）」还没写** ✗ —— `REMOVE_RESOURCE` **拒绝** `scale` + `percent`（装载期原话：「requires \"amount\" -- a literal, or one of `amount_from_attr` / `amount_from_resource` / …」）⇒ “计数器的一半”**没有拼法** ✓（下一步：给它开 `scale: self_resource:X` + `percent` 那条口子，与 §3.7p 同一个词汇 ✓）。两条孪生规则本来已写好（`max_eidolon: 5` / `min_eidolon: 6`），**因装载失败已撤下** ✓，不是“写完了只是没生效” ✗。
+2. **规则那一发的归属** ✓：`DAMAGE` 实例的攻击者是**规则持有人（风堇）**，不是忆灵 ⇒ **小伊卡自己的天赋增伤（+80%/层）不作用在这一发上** ✗（实测：`HyacineTalentTest` 原先读 `settled.get(0)` 变成 0.0，因为它读到的是规则那一发；改为读**最后一个**实例后恢复 0.8/1.6/2.4 ✓）。⚠ 要修就得让 DAMAGE 能“**以忆灵的身份**结算”，今天没有这个字段 ✓（`DELEGATE_DAMAGE` 只认**规则持有人自己的**施放 ✗，忆灵技的施放者不是她 ✓）。
+3. **数据侧的 1 点残渣** ✗：忆灵技1 自己的数据行还会结算一发 `%ATK`，而小伊卡的 **ATK 恒为 0** ✓（实测 `ikaAtk = 0.0`）⇒ 只留引擎的**最小 1 点** ✓ ⇒ 总伤害 = `计量 × #1 + 1` ✓（判据按 `+1` 钉 ✓，未消除 ✓）。
+
 ### 3.8 数据文件速查
 
 | 文件 | 内容 | 已确认锚点 |
