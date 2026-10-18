@@ -314,7 +314,9 @@ public class SummonCommandTest {
                 .map(TriggerTable.Condition::source).toList());
 
         List<EffectSpec> effects = rules.getFirst().effects();
-        Assertions.assertEquals(2, effects.size(), "summon, then command");
+        // CORRECTED (2026-10-18): the same rule also states the 【至暗之谜】 clause (vulnerability + her and her
+        // memosprite damage boost), so it carries six effects; "one rule per ultimate" still holds.
+        Assertions.assertEquals(6, effects.size(), "summon, then command, then the darkening clause");
         Assertions.assertEquals("SUMMON", effects.get(0).getOp());
 
         EffectSpec command = effects.get(1);

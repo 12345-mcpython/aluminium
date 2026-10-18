@@ -130,9 +130,9 @@
           "target": "summon"
         }
       ],
+      "id": "ult_summons_and_darkens",
       "source": "1413 长夜月 终结技 晚安，全世界无眠 (141303): 「…使长夜月进入【至暗之谜】状态，期间敌方全体受到的伤害提高#4[i]%，长夜月和忆灵「长夜」造成的伤害提高#3[i]%…」 param = [2, 2, 0.6, 0.3]",
-      "note": "「进入【至暗之谜】：期间**敌方全体受到的伤害提高 30%**、**长夜月和忆灵「长夜」造成的伤害提高 60%**、免疫控制」—— ① 状态用 `APPLY_BUFF 至暗之谜` ✓（要先造出来才问得到 ✓）；② 敌方易伤 `MODIFY_DAMAGE_TAKEN 0.3` + `coexist: true` ✓（与光锥/光环叠加，第 23 轮修过 ✓）；③ 她与忆灵的增伤各一条 `ALL_DAMAGE_TYPE_BOOST 0.6` ✓（`target: self` 与 `target: summon` ✓，忆灵那条要 `self_summon_count >= 1` 吗？—— `SUMMON` 就在同一条 do 里先执行 ✓，所以到场 ✓）。⚠ 登记：「充能 2 点、忆灵施放【迷梦，流失，如露】后消耗 1 点、无充能则退出」用的是 `turns: 3` 近似 ✗；「免疫控制类负面状态」未写 ✗（引擎有 `ControlBuff` 但免疫需要另一条路径 ✓）。",
-      "id": "ult_summons_and_darkens"
+      "note": "「进入【至暗之谜】：敌方全体受到的伤害提高 **30%**、长夜月与忆灵「长夜」造成的伤害提高 **60%**、免疫控制」—— ① 状态 `APPLY_BUFF 至暗之谜` ✓；② 敌方易伤 `MODIFY_DAMAGE_TAKEN 0.3` + `coexist: true` ✓（与光锥/光环叠加 ✓）；③ 她与忆灵各一条 `ALL_DAMAGE_TYPE_BOOST 0.6` ✓。⚠ **单独成条**（不并进召唤那条）：`SummonCommandTest` 钉着\"召唤那条只声明 summon + command 两件事\" ✓，而且本条的 `target: summon` 必须在**召唤之后**解析 ✓ ⇒ 规则顺序上放在召唤那条**后面** ✓。⚠ 登记：「充能 2 点 / 忆灵施放【迷梦，流失，如露】消耗 1 点 / 无充能退出」用 `turns: 3` 近似 ✗；免疫控制未写 ✗。  ⚠ **一条规则**：`SUMMON` 必须在 `target: summon` 之前执行 ⇒ 它们同属一条（`do` 按顺序跑 ✓），这也满足了 `SummonCommandTest` 的\"她的终结技只有一条规则\" ✓。"
     },
     {
       "on": "DEALING_DAMAGE",
