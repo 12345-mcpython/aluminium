@@ -2252,6 +2252,12 @@ final class TriggerValidator {
      * that no state belongs to - a rule that loads, fires, and does nothing, with nothing to report.
      */
     static void requireDebuffClass(EffectSpec effect, String op, TriggerSpec spec) {
+        // `RESIST_DEBUFF` is the ONE op that may state no class: 1409's 小伊卡 is 「免疫负面效果」 - every family,
+        // including the states that belong to none of the two classes (a stat-down, a vulnerability). Omission is
+        // meaningful there ("any"), so it must not be confused with the misspelling this check exists to catch.
+        if ("RESIST_DEBUFF".equals(op) && (effect.getKind() == null || effect.getKind().isBlank())) {
+            return;
+        }
         if (effect.getKind() == null || effect.getKind().isBlank()) {
             throw new IllegalArgumentException(
                     "Op " + op + " requires \"kind\" (which class of negative state it resists; known: "

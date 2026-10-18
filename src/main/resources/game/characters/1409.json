@@ -636,21 +636,13 @@
       "do": [
         {
           "op": "RESIST_DEBUFF",
-          "kind": "control",
-          "percent": 1.0,
-          "permanent": true,
-          "target": "summon"
-        },
-        {
-          "op": "RESIST_DEBUFF",
-          "kind": "dot",
           "percent": 1.0,
           "permanent": true,
           "target": "summon"
         }
       ],
       "source": "1409 风堇 忆灵技2 牵起晴空的手（数据槽位 3）：「小伊卡的速度保持为0，**免疫负面效果**，并且不会出现在行动序列上」",
-      "note": "「**免疫负面效果**」⇒ `RESIST_DEBUFF` + **`percent: 1.0`**（引擎注释写明「`percent: 1` 就是免疫」；1413 与 1506 同一拼法）。⚠ **登记的缺口（2026-10-18 重新量过，原先的说法要改）**：`DebuffClass` **总共只有两档** （`CONTROL` / `DOT`），而**声明类别**的也只有 `ControlBuff`（CONTROL）与 `DotBuff`（DOT）—— `AbstractBuff.debuffClass()` 默认返回 **null**。⇒ 这两条已经覆盖了**引擎的全部类别**；真正没覆盖的是**不带类别的负面 buff**（降属性、易伤一类，`debuffClass()` 为 null ⇒ 免不到）。所以缺的不是「再补几档」，而是「按 is_debuff 兜底」这条引擎口径 —— 登记，不假装补完。"
+      "note": "「**免疫负面效果**」⇒ `RESIST_DEBUFF` + `percent: 1.0`，**不写 `kind`** —— 省略即「任意负面状态」，覆盖引擎的**全部类别**（CONTROL / DOT）**以及不带类别的负面 buff**（降属性、易伤一类，`AbstractBuff.debuffClass()` 返回 null）✓。⚠ 这是本轮**新开的引擎口径**：`ClassResistBuff` 允许 null 类别 = 「任意」，`BuffManager.debuffResistOf` 不再对 null 类别早退返回 0。原先这里是**两条**（`control` + `dot`），因为当时 null 类别没有拼法；那两条**漏掉了**不带类别的负面状态。判据：`BuffAnyClassResistTest`（引擎级：null 类别抵抗对 CONTROL / DOT / 无类别三问都答 1，而具名类别只覆盖自己那一档）、`HyacineNegativeImmunityTest`（数据级：小伊卡身上挂的就是这条）✓。"
     },
     {
       "on": "SUMMONED",
