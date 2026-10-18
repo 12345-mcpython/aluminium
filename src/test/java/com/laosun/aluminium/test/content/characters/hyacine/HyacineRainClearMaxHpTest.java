@@ -42,6 +42,20 @@ public class HyacineRainClearMaxHpTest {
                 "E6: Lv12 row #3 = 0.33, plus Rank 2's 0.50, plus the Lv12 flat 667.5");
     }
 
+    @Test
+    public void rankThreeRaisesIkachisSkillByOne() {
+        Character hyacine = CharacterFactory.create(HYACINE, 80, true, null, null, 6);
+        Battle battle = new Battle(List.of(hyacine), List.of(BattleFixture.monster()), BattleFixture.seeded());
+        battle.startBattle();
+        battle.processRequests();
+        com.laosun.aluminium.models.Summon ikachi = battle.summonServant(hyacine);
+        Assertions.assertNotNull(ikachi, "precondition: her talent summons 小伊卡");
+        Assertions.assertEquals(1, hyacine.memospriteSkillLevelBonus(1),
+                "Rank 3: 「忆灵技等级+1」 is filed on the summoner at data slot 1");
+        Assertions.assertEquals(10, ikachi.skillLevel(ikachi.skillAt(1)),
+                "…and the read stays 10 because the spec's level is already the table's cap 「最多不超过10级」");
+    }
+
     private static double climb(int rank) {
         Character hyacine = CharacterFactory.create(HYACINE, 80, true, null, null, rank);
         Character ally = CharacterFactory.create(ALLY, 80);
