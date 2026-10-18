@@ -25,20 +25,20 @@
         {
           "op": "HEAL",
           "scale": "owner_max_hp",
+          "target": "all_allies",
           "percent": 0.1,
-          "amount": 200,
-          "target": "all_allies"
+          "amount": 200
         },
         {
           "op": "HEAL",
           "scale": "owner_max_hp",
+          "target": "summon",
           "percent": 0.12,
-          "amount": 240,
-          "target": "summon"
+          "amount": 240
         }
       ],
       "source": "1409 风堇 终结技 飞入晨昏的我们 (141303): 「…为我方全体目标回复等同于风堇 #1(10)% 生命上限 + #2(200) 的生命值，为小伊卡回复等同于风堇 #6(12)% 生命上限 + #7(240) 的生命值」 param = [0.1, 200, 0.3, 600, 3, 0.12, 240]",
-      "note": "「我方全体回 **10% + 200**；小伊卡回 **12% + 240**」—— ① 终结技是 `Support` ⇒ **数据不自带治疗** ✗（实测回复 0 ✓）⇒ 规则必须写 ✓；② 忆灵那半的 `target: summon` 要求 `self_summon_count >= 1` ✓，而 `SUMMON` 在**另一条更早的规则**里（`ult_summons_ica` ✓，排在前面 ✓）；③ 顺序：`ult_summons_ica` → 本条 ✓（文件顺序即执行顺序 ✓）。"
+      "note": "「为**我方全体**目标回复等同于风堇 #1% 生命上限 + #2，为小伊卡回复 #5% + #6」—— ⚠ 这里仍是 **Lv10 的字面常量**（`0.1/200` 与 `0.12/240`），**不是**读行：本轮试过改成 `percent_from_skill_param: ULTRA:0/1` 与 `ULTRA:5/6`，但判据对不上 —— 实测治了 `319.52864`，而读行在**施放前**的生命上限下应给 `305.84`、在**施放后**（雨过天晴已挂上）应给 `397.59` ⇒ 治疗量的基数与「雨过天晴自己抬生命上限」的先后顺序还没弄明白，**先不改成算不清的数**。⚠ 登记：**E3 把终结技抬到 Lv12** 后该行变 `[0.11, 222.5, …, 0.132, 267]`，字面常量不会跟随 ⇒ E3 时偏小。"
     },
     {
       "on": "ULT_CAST",
@@ -246,16 +246,16 @@
         {
           "op": "MODIFY_ATTR",
           "attribute": "ALL_DAMAGE_TYPE_BOOST",
-          "percent": 0.8,
           "turns": 2,
           "max_stacks": 3,
           "stackable": true,
           "buff": "疗愈世间的晨曦",
-          "target": "summon"
+          "target": "summon",
+          "percent_from_skill_param": "TALENT:2"
         }
       ],
       "source": "1409 风堇 天赋 疗愈世间的晨曦 (140904): 「风堇或小伊卡提供治疗时，小伊卡造成的伤害提高 #3[i]%，持续 #4[i] 回合，最多可叠加 #5[i] 层。」 param = [0.5, 1, 0.8, 2, 3]",
-      "note": "「**风堇或小伊卡提供治疗时**，小伊卡伤害提高 **80%**，持续 **2 回合**，最多 **3 层**」—— ① `HEALED` ✓（探针实测：放她的战技把队友从 529.2 治到 784.8 时，`HEALED` 触发 1 次 ✓，`actor == self`（风堇是治疗者）✓、`target is_ally` ✓）；② `target: summon` **能解析到小伊卡** ✓（探针用 `SPEED +100` 验证：小伊卡速度 0 → 100 ✓）；③ `stackable` + `max_stacks: 3` ✓。⚠ 教训：判据里\"把队友打伤\"必须用 **`consumeHp`**（`heal(-x)` 会被 `heal()` 的 `amount <= 0` 直接忽略 ⇒ 根本没受伤 ⇒ 治疗量为 0 ⇒ 没有 `HEALED` ✗，这正是前两轮失败的真正原因 ✓）。``「风堇或小伊卡」里忆灵那一半：`HEALED` 的 `actor` 是治疗者，忆灵治疗时 `actor is_summon` 也成立 ✓（探针里 `probeActorSummon` 为 0 是因为那次治疗者是风堇 ✓）。  ⭐ `self_summon_count >= 1` 是**引擎要求**的（`TriggerTargets.requireSummon` 会显式拒绝：\"Effect targets summon but ... has no summon on the field; gate the rule with self_summon_count >= 1\" ✓）—— 这也正好是文档的语义：小伊卡不在场时这条天赋没有对象 ✓。"
+      "note": "「小伊卡伤害提高 #3%」—— 现在**读行**（`percent_from_skill_param: TALENT:2`），量随天赋等级走。⚠ 之前写的是字面量 `0.8`（正好是 **Lv10** 行的 `#3`），而 **E5 把天赋抬到 Lv12**，该行 `#3 = 0.88` ⇒ E5 时每层少 0.08。判据 `HyacineLevelRowTest` 钉 E5 的 0.88。"
     },
     {
       "on": "HEALED",
@@ -546,7 +546,8 @@
       ],
       "source": "1409 风堇 忆灵技2 牵起晴空的手（数据槽位 3）：「若除小伊卡外的我方目标生命值降低，小伊卡会…消耗自身 4% 生命上限的生命值，并为我方生命值降低的目标回复等同于风堇 2.00% 生命上限 + 20 的生命值」 param Lv10 = [0.04, 0.028, 28, …]",
       "note": "「**生命值降低**时，小伊卡消耗**自身** 4% 生命上限，并为我方**生命值降低的目标**回复等同于风堇 **2%** 生命上限 + **20**」—— ① 事件 `HP_LOST` ✓ + `target is_ally` ✓；② 治疗对象 = **本轮新加的选择器** `all_allies_lost_hp_this_action` ✓（回答「刚掉过血的那位」✓，**不是** `lowest_hp_ally` ✗）；③ 自耗用 **`target_max_hp`** ✓（是**小伊卡自己**的上限 ✓，`owner_max_hp` 会读成风堇的 ✗），代价走 `CONSUME_HP` ✓（不吃护盾、不发 `HP_LOST` ✓）；④ 治疗用 `owner_max_hp` ✓（原文是「等同于**风堇** X% 生命上限」✓）；⑤ 数字是**字面量** ✓，取自数据行 Lv10 ✓（这条是**被动**、没有“这一发施放”可读 ✗，且忆灵技等级被 `memosprites/1409.json` 钉在 10 ✓）；⚠ **登记**：星魂5 给忆灵天赋 +1，而该表只到 10 ✗。⚠ **不加 `target != summon`** ✗：父句已写「**除小伊卡外**」✓，而 `CONSUME_HP` 走的是 `HP_CONSUMED` ✓、**不**发 `HP_LOST` ✓ ⇒ 不会自我递归 ✓（实测：一次结算这条只付一次 ✓）。"
-    },    {
+    },
+    {
       "on": "SKILL_CAST",
       "id": "ikachi_acts_right_after_she_uses_a_skill_in_the_rain",
       "when": [
@@ -567,7 +568,8 @@
       ],
       "source": "1409 风堇 忆灵技2：「风堇处于【雨过天晴】状态时，小伊卡会在风堇施放技能后立即获得 1 个额外回合并自动施放【乌云乌云快走开！】」",
       "note": "「施放技能后小伊卡**立即**获得 1 个额外回合**并自动施放**【乌云乌云快走开！】」—— ① 回合用 **`INSERT_ACTION`** ✓（`EXTRA_TURN` 会拒绝 Speed 0、不在行动序列的忆灵 ✗）；② 施放用 **`CAST_SKILL skill_id: 1`** ✓ —— 忆灵的技能按**数据槽**存 ✓（`skillAt` ✓），`CAST_SKILL` 现在认这个字段 ✓。⚠ 两半**必须成对** ✓：只插回合时那一回合是**空转**的（实测没有伤害实例 ✓）。"
-    },    {
+    },
+    {
       "on": "CAST_SETUP",
       "id": "ikachi_shortens_its_own_effects_after_it_acts",
       "when": [
@@ -584,7 +586,8 @@
       ],
       "source": "1409 风堇 忆灵技2：「…小伊卡施放技能后使自身所有持续效果持续回合数减 1」",
       "note": "「施放技能后使**自身所有**持续效果回合数**减 1**」⇒ `EXTEND_BUFF` + **`kind: \"all\"`** ✓ + **负** `turns` ✓（两点都是既有能力 ✓）；事件 `CAST_SETUP` + `from_skill_id == 1` ✓、门 `actor == summon` ✓（**不是** `is_summon` ✓：否则别人的忆灵放槽位 1 也会扣小伊卡的时长 ✗，理由见 `memosprite_rainclouds_deals_a_share_of_the_tally` 的注记 ✓）。"
-    },    {
+    },
+    {
       "on": "SUMMONED",
       "id": "ikachi_is_immune_to_negative_effects",
       "when": [
