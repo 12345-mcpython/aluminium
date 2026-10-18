@@ -419,7 +419,7 @@ double instanceMagnitude = effect.getPercent() == null ? 0 : effect.getPercent()
 `TriggerEvent.SUMMON_ATTACK` 的注释写的是"忆灵通过 `EnemySkill` 出手时触发"，**全仓只有一处 fire**：
 
 ```java
-EnemySkill.java:166  battle.fireTriggers(TriggerEvent.SUMMON_ATTACK, user, null, hitTargets.size(), 0);
+`EnemySkill.execute` 里那一行 battle.fireTriggers(TriggerEvent.SUMMON_ATTACK, ...) （全仓唯一一处）
 ```
 
 而**数据驱动的忆灵**（1512 的「晴空乐手」）技能是 `Summon.skillsByDataSlot` 里的 `DefaultSkill`，走的是 `SkillExecutor` ⇒
