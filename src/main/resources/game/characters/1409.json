@@ -259,6 +259,103 @@
     },
     {
       "on": "BATTLE_START",
+      "id": "trace_windstorm_raises_her_max_hp_above_200_speed",
+      "when": [
+        "self_attr:SPEED > 200"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "HEALTH",
+          "percent": 0.2,
+          "permanent": true,
+          "coexist": true,
+          "target": "self"
+        }
+      ],
+      "source": "1409 风堇 行迹 暴风停歇 (1409103，E:/code/blog/hsr/1409_风堇.md:339)：「风堇的速度大于 200 时，她与小伊卡的生命上限提高 20%…」",
+      "note": "「**速度大于 200** 时，她**与小伊卡**的生命上限提高 **20%**」—— ① 门用 **`self_attr:SPEED > 200`** ✓：`>` 是既有运算符 ✓，而文档写的是「**大于**」⇒ 不用 `>=` ✗（200 整点不该吃这 20% ✓）；② `MODIFY_ATTR HEALTH percent 0.2 permanent` ✓。③ ⚠ 「**与小伊卡**」**不另写一条** ✗：忆灵的生命上限是 `memosprites/1409.json` 的 `HEALTH percent 0.5` ✓，而 `SummonFactory` 读的是召唤者**已解析**的面板（`share * master.getAttribute(attribute).get()` ✓）⇒ 她这 20% **已经通过 50% 继承落到小伊卡身上** ✓；再给小伊卡写一条 +20% 就是**双重计算** ✗（判据同时钉住「她 +20%」与「小伊卡 = 她的 50%」✓）。④ **必须带 `coexist: true`** ✓，且这是**量出来的**（不是照抄 1503）：`StatModifierBuff.isSameKind` 的身份是 **(属性, modifierType, sourceRole)**、**名字不参与** ✓ ⇒ 同一个主人身上的两条 `HEALTH` 修饰会互相驱逐 ✓。**实测两例**：㈠ **秘技**那条 `HEALTH 0.2`（同为 `BATTLE_START`、无 `max_stacks`）**会被本条顶掉** ✗ —— 去掉 `coexist` 后 `theTraceStacksWithTheTechniquesOwnMaxHpRaise` 立刻红 ✓，带上则两条**相加**（`0.20 + 0.20`）✓；㈡ **终结技**那条**不受影响** ✓ —— 它自己带 `max_stacks: 2`（走的是叠加而非驱逐 ✓），去掉 `coexist` 时 `theRaisedMaxHpSurvivesTheUltimate…` **仍然绿** ✓。⇒ 这条字段守的是**秘技**那一对，判据钉的也是它 ✓。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "trace_windstorm_raises_her_healing_per_point_of_speed",
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "OUTGOING_HEALING_BOOST",
+          "percent": 0.01,
+          "scale": "self_attr_above:SPEED:200",
+          "max_points": 200,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "1409 风堇 行迹 暴风停歇 (1409103)：「…之后每超出 1 点速度，风堇与小伊卡提供的治疗量提高 1%，最多计入 200 点超出的速度」",
+      "note": "「之后**每超出 1 点速度**…**治疗量提高 1%**，**最多计入 200 点**超出的速度」—— ① 每点 1% = `percent: 0.01` ✓ + 超出量 = `scale: \"self_attr_above:SPEED:200\"` ✓（这个拼法就是为这句话造的 ✓，阈值以下给 0 ✓ ⇒ **不需要**再写 `when` ✓）；② 「**最多计入 200 点**」= **`max_points: 200`** ✓ —— 它夹的是**点数**、不是最终份额 ✓，与文档同形 ✓（1506 的字段 ✓）；读数：SPEED 400 ⇒ `2.0` ✓，SPEED 500 **仍是** `2.0` ✓（判据量了 400 与 500 两点 ✓）；③ 属性用 **`OUTGOING_HEALING_BOOST`** ✓ —— `Battle.heal` 读的正是**治疗者**身上这一项 ✓；⚠ 这条**只写她自己** ✗：小伊卡那一半在 `trace_windstorm_raises_ikachis_healing_too`（`SUMMONED`）里 ✓，因为它的治疗还不是规则驱动的（读到之前只钉「改落到了忆灵身上」✓）。"
+    },
+    {
+      "on": "SUMMONED",
+      "id": "trace_windstorm_raises_ikachis_healing_too",
+      "when": [
+        "actor == summon",
+        "self_summon_count >= 1"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "OUTGOING_HEALING_BOOST",
+          "percent": 0.01,
+          "scale": "self_attr_above:SPEED:200",
+          "max_points": 200,
+          "permanent": true,
+          "target": "summon"
+        }
+      ],
+      "source": "1409 风堇 行迹 暴风停歇 (1409103)：「…风堇与小伊卡提供的治疗量提高 1%…」—— 忆灵那一半",
+      "note": "「**与小伊卡**提供的治疗量提高」—— 与上一条**同一条属性、同一个超出量** ✓，只是 `target: summon` ✓（`self_attr_above` 读的是**规则的持有人** ✓，所以量的是**她的**速度 ✓，不是小伊卡那 0 速 ✓）。⚠ 「她与小伊卡的生命上限 +20%」**不在这里** ✗ —— 那半由 50% 继承覆盖 ✓（见 `trace_windstorm_raises_her_max_hp_above_200_speed` 的注记 ✓）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon_four_adds_crit_damage_per_point_of_speed",
+      "min_eidolon": 4,
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.02,
+          "scale": "self_attr_above:SPEED:200",
+          "max_points": 200,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "1409 风堇 星魂4（E:/code/blog/hsr/1409_风堇.md:371）：「行迹【暴风停歇】获得强化，每超过 1 点速度，风堇和小伊卡的暴击伤害额外提高 2%」 param = [1, 0.02]",
+      "note": "「行迹【暴风停歇】**获得强化**，每超过 **1** 点速度，风堇和小伊卡的**暴击伤害额外提高 2%**」—— ① 「**强化**【暴风停歇】」⇒ 超出量用**同一个** `self_attr_above:SPEED:200` ✓（它继承行迹的阈值，不是另立一个 ✓）；② 每点 **2%** ⇒ `percent: 0.02` ✓；③ ⚠ **上限是解释、不是原文** ✓：这句话自己**没给上限** ✗，而它强化的是同一条行迹、行迹写的是「最多计入 **200** 点超出的速度」✓ ⇒ 沿用 `max_points: 200` ✓（顶格 +`4.0` ✓，判据量了 250 与 500 两点：`1.0` 与 `4.0` ✓）。**登记**：若日后拿到反证（这条不吃行迹的上限），要改的就是这一个字段 ✓；④ `min_eidolon: 4` ✓；⑤ 属性 `CRIT_ATTACK` ✓（面板的暴击伤害 ✓）。"
+    },
+    {
+      "on": "SUMMONED",
+      "id": "eidolon_four_adds_ikachis_crit_damage_too",
+      "min_eidolon": 4,
+      "when": [
+        "actor == summon",
+        "self_summon_count >= 1"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 0.02,
+          "scale": "self_attr_above:SPEED:200",
+          "max_points": 200,
+          "permanent": true,
+          "target": "summon"
+        }
+      ],
+      "source": "1409 风堇 星魂4：「…风堇和小伊卡的暴击伤害额外提高 2%」—— 忆灵那一半",
+      "note": "「**和小伊卡**的暴击伤害」—— 与上一条同属性、同超出量，`target: summon` ✓。⚠ 与生命上限不同，这条**不能靠继承** ✗（忆灵面板只按 `percent` 继承**属性本身**，不会继承暴击伤害上的**修饰** ✓）⇒ 必须单独写 ✓。"
+    },
+    {
+      "on": "BATTLE_START",
       "id": "level_convention",
       "do": [
         {
