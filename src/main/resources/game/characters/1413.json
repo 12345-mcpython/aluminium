@@ -10,7 +10,7 @@
         }
       ],
       "source": "1413 长夜月 终结技 (skill 141303) 的**等级口径**: 她的终结技在文档里按 Lv10 引用（#1[i]% 长夜生命上限的冰属性伤害按 Lv10 行读）",
-      "note": "The file stating **which level its numbers were quoted at** (M-32), replacing the `damage_level: 10` that her ultimate's damage rule used to carry. ⚠ A level is a fact about the skill (every effect reads it, and a 星魂's raise composes with it), while `damage_level` pins one effect to one row — the difference only shows once something raises a level, which is exactly what the 星魂 sentences do. ⚠ Base 1 in the engine, so 「quoted at Lv10」 is +9. ⚠ Unconditional, and not a mechanic. ⚠ Her ultimate's parameter table has 15 rows, so a later raise stays inside it; going past the table fails loudly at fire time. || 2026-10-18：**天赋（生命降低 → 暴伤 +60%，2 回合，+2 点【忆质】）尚未落地**，三条实测结论：① 文档写作【忆质】✓，本文件声明的是 **`亿质`** ✓ —— 用错名字会在**装配期**直接报错（`CharacterException: ... uses the resource 忆质, which the character does not declare` ✓，这次正是这么被抓到的 ✓）；② 她的战技是「**消耗**当前生命值 10%」⇒ 引擎区分\"受伤\"（`HP_LOST`）与\"代价\"（`consumeHp` 不触发 `HP_LOST` ✓）——所以按 `HP_LOST` 写，放完战技暴伤**不动** ✗；③ 又补了一条 `HP_CONSUMED` 的孪生规则，**仍然不动** ✗ ⇒ 说明\"战技消耗 10% 生命\"这件事在引擎里**要么没被执行、要么没发 `HP_CONSUMED`** ✗。下一步：用探针打印放战技前后的 `currentHp` 与 `HP_CONSUMED`/`HP_LOST` 计数，再决定挂哪个事件 ✓。"
+      "note": "The file stating **which level its numbers were quoted at** (M-32), replacing the `damage_level: 10` that her ultimate's damage rule used to carry. ⚠ A level is a fact about the skill (every effect reads it, and a 星魂's raise composes with it), while `damage_level` pins one effect to one row — the difference only shows once something raises a level, which is exactly what the 星魂 sentences do. ⚠ Base 1 in the engine, so 「quoted at Lv10」 is +9. ⚠ Unconditional, and not a mechanic. ⚠ Her ultimate's parameter table has 15 rows, so a later raise stays inside it; going past the table fails loudly at fire time. || 2026-10-18：**天赋（生命降低 → 暴伤 +60%，2 回合，+2 点【忆质】）尚未落地**，三条实测结论：① 文档写作【忆质】✓，本文件声明的是 **`亿质`** ✓ —— 用错名字会在**装配期**直接报错（`CharacterException: ... uses the resource 忆质, which the character does not declare` ✓，这次正是这么被抓到的 ✓）；② 她的战技是「**消耗**当前生命值 10%」⇒ 引擎区分\"受伤\"（`HP_LOST`）与\"代价\"（`consumeHp` 不触发 `HP_LOST` ✓）——所以按 `HP_LOST` 写，放完战技暴伤**不动** ✗；③ 又补了一条 `HP_CONSUMED` 的孪生规则，**仍然不动** ✗ ⇒ 说明\"战技消耗 10% 生命\"这件事在引擎里**要么没被执行、要么没发 `HP_CONSUMED`** ✗。下一步：用探针打印放战技前后的 `currentHp` 与 `HP_CONSUMED`/`HP_LOST` 计数，再决定挂哪个事件 ✓。 || 2026-10-18：天赋（生命降低 → 暴伤 +60%，2 回合，+2 点【忆质】）尚未落地。三条实测：① 资源名：文档写【忆质】，本文件声明的是 亿质 —— 用错会在装配期直接抛 CharacterException；② 只挂 HP_LOST 时放完战技暴伤不动（0.633 → 0.633）；补 HP_CONSUMED 孪生规则仍不动；③ 第 32 轮探针把原因钉死：放战技前后 currentHp 一模一样（1556.97696 → 1556.97696），HP_LOST 与 HP_CONSUMED 计数都是 0 ⇒ 引擎根本没有执行技能数据里的\"消耗 #6% 生命值\"这个代价（引擎缺口，见 AGENT.md 3.7g）⇒ 天赋要等这个能力补上。"
     },
     {
       "on": "BATTLE_START",
@@ -326,32 +326,6 @@
       ],
       "source": "1415 昔涟 忆灵技能 24：「**长夜月战技的暴击伤害提高效果额外提高，提高数值等同于长夜月暴击伤害的 #3%」（#3 = 0.06）。",
       "note": "⭐ 增量加在**拼法解出的份额**上（本轮引擎改动）：`(0.12 + 0.06) × 暴伤`。"
-    },
-    {
-      "on": "HP_LOST",
-      "id": "probe_lost",
-      "when": [],
-      "do": [
-        {
-          "op": "GAIN_RESOURCE",
-          "resource": "probeLost",
-          "amount": 1
-        }
-      ],
-      "source": "临时探针"
-    },
-    {
-      "on": "HP_CONSUMED",
-      "id": "probe_consumed",
-      "when": [],
-      "do": [
-        {
-          "op": "GAIN_RESOURCE",
-          "resource": "probeConsumed",
-          "amount": 1
-        }
-      ],
-      "source": "临时探针"
     }
   ],
   "resources": [
@@ -369,16 +343,6 @@
       "id": "岁月之诗的亿质点数",
       "max": 2147483647,
       "source": "⚠ **不是数据里的名字** —— 数据行 24 的 `#2`（ParamList 下标 1）在施放那一刻被捕获后存放的地方（基点）。"
-    },
-    {
-      "id": "probeLost",
-      "max": 999,
-      "source": "临时探针"
-    },
-    {
-      "id": "probeConsumed",
-      "max": 999,
-      "source": "临时探针"
     }
   ]
 }
