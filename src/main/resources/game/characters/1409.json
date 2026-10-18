@@ -57,20 +57,14 @@
           "op": "MODIFY_ATTR",
           "attribute": "HEALTH",
           "percent_from_skill_param": "ULTRA:2",
+          "amount_from_skill_param": "ULTRA:3",
           "max_stacks": 2,
-          "turns": 3,
-          "target": "all_allies"
-        },
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "HEALTH",
-          "amount": 600,
           "turns": 3,
           "target": "all_allies"
         }
       ],
       "source": "1409 风堇 终结技 飞入晨昏的我们 (140903, Ultra/Support): 「…风堇进入【雨过天晴】状态，持续3回合，风堇每回合开始时持续回合数减1。处于【雨过天晴】状态时，我方全体目标生命上限提高30.00%+600点。」",
-      "note": "「我方全体目标**生命上限提高 30.00%+600**」—— ① 状态 `APPLY_BUFF 雨过天晴` ✓；② 份额读**当前等级行**（`percent_from_skill_param: ULTRA:2`：Lv10 = 0.30、星魂3 抬到 Lv12 = 0.33 ✓）；③ `max_stacks: 2` 让星魂2 那条的 +50% 与本条**相加**而不是覆盖 ✓（同 1415 天赋/行迹的写法）；④ 固定项 600 仍是字面量（`MODIFY_ATTR` 的 flat 没有\"读当前行\"的拼法；Lv12 游戏是 667.5，登记）。⚠ 星魂2 及以上由孪生规则补 +50%，两条都保留 `APPLY_BUFF`（幂等）。"
+      "note": "「我方全体目标**生命上限提高 30.00%+600**」—— ① 状态 `APPLY_BUFF 雨过天晴` ✓；② 份额与固定项**都读当前等级行**（`percent_from_skill_param: ULTRA:2` + `amount_from_skill_param: ULTRA:3`：Lv10 = 0.30/600、星魂3 抬到 Lv12 = 0.33/667.5 ✓）；③ `max_stacks: 2` 让星魂2 那条的 +50% 与本条**相加**而不是覆盖 ✓；④ 引擎侧 2026-10-18 补的「份额 + 固定项」两条修饰（`TriggerEffects.modifyAttr`）就是为这条服务的 ✓。⚠ 星魂2 及以上由孪生规则补 +50%，两条都保留 `APPLY_BUFF`（幂等）。"
     },
     {
       "on": "ULT_CAST",
