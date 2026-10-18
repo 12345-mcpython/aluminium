@@ -429,6 +429,16 @@ public abstract class AbstractBuff implements Buff, AttackEvent, SkillCastEvent 
      *
      * @param turns how many turns to add (positive; the op that calls this validates that)
      */
+    /**
+     * The turns this buff has left (emainingDuration is protected). Needed to measure a clause that <b>shortens</b>
+     * a live effect: 「使自身所有持续效果持续回合数减 1」 - 'the state is still there' cannot tell 3 turns from 2.
+     *
+     * @return remaining turns (0 for a permanent buff, which has no countdown)
+     */
+    public int remainingTurns() {
+        return remainingDuration;
+    }
+
     public void extendDuration(int turns) {
         remainingDuration = Math.max(0, remainingDuration + turns);   // signed, clamped at zero (the game's Min: 0)
     }
