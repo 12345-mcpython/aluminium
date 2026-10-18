@@ -914,9 +914,13 @@ final class TriggerValidator {
                 requireNoTarget(effect, op, spec);
             }
             case "CAST_SKILL" -> {
-                if (effect.getSkill() == null || effect.getSkill().isBlank()) {
-                    throw new IllegalArgumentException("Op CAST_SKILL requires skill, a SkillType slot name (source: "
+                if (effect.getSkillId() == null && (effect.getSkill() == null || effect.getSkill().isBlank())) {
+                    throw new IllegalArgumentException("Op CAST_SKILL requires skill (a SkillType slot name) or skill_id (a memosprite data slot) (source: "
                             + spec.getSource() + ")");
+                }
+                if (effect.getSkill() == null || effect.getSkill().isBlank()) {
+                    requireNoRowArguments(effect, op, spec);
+                    return;
                 }
                 try {
                     SkillType.valueOf(effect.getSkill().trim().toUpperCase(Locale.ROOT));

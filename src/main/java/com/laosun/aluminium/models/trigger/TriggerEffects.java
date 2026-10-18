@@ -288,8 +288,10 @@ final class TriggerEffects {
      */
     static void castSkill(Battle battle, EffectSpec effect, TriggerContext ctx) {
         CanHit actor = TriggerTargets.require(TriggerTargets.resolveTarget(effect, ctx), "target", ctx);
-        SkillType slot = SkillType.valueOf(effect.getSkill().trim().toUpperCase(Locale.ROOT));
-        Skill skill = actor.getSkills().get(slot);
+        SkillType slot = effect.getSkill() == null || effect.getSkill().isBlank()
+                ? null
+                : SkillType.valueOf(effect.getSkill().trim().toUpperCase(Locale.ROOT));
+        Skill skill = slot == null ? null : actor.getSkills().get(slot);
         // A MEMOSPRITE keeps its skills by DATA SLOT, not by SkillType: its table is `Summon.skillsByDataSlot`, and
         // "automatically cast [花与箭的舞曲]" is its slot 1. Commanding that cast fails with "has no SKILL skill" because only
         // the character table was consulted. The slot is named with `skill_id`, the same field `REPLACE_SKILL` uses for a data row.
