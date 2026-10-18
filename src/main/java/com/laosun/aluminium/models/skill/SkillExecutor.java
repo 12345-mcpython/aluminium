@@ -108,6 +108,15 @@ public final class SkillExecutor {
         // delegated cast is "no damage of mine", never "no cast happened".
         try {
             broadcastSkillCast(battle, user, skill, hitTargets, targets);
+            // A MEMOSPRITE swinging through this path is still "the memosprite attacked": SUMMON_ATTACK used to be
+            // raised only from `EnemySkill.execute`, so a data-driven memosprite (its skills live in
+            // `Summon.skillsByDataSlot`, cast through here) never raised it - and every clause of the form "when the
+            // wearer's memosprite uses its skill" (cone 23042's vulnerability, 1512's own damage boost) was dead.
+            // Measured: no firing site for a DefaultSkill cast by a Summon.
+            if (user instanceof com.laosun.aluminium.models.Summon && !hitTargets.isEmpty()) {
+                battle.fireTriggers(com.laosun.aluminium.enums.TriggerEvent.SUMMON_ATTACK, user, null,
+                        hitTargets.size(), 0);
+            }
             battle.grantSkillEnergy(user, skill, hitTargets);
         } finally {
             // The cast's own events have been delivered, so its "what did it actually apply" record goes away: a
