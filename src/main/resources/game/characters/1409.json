@@ -258,6 +258,40 @@
       "note": "「**风堇或小伊卡提供治疗时**，小伊卡伤害提高 **80%**，持续 **2 回合**，最多 **3 层**」—— ① `HEALED` ✓（探针实测：放她的战技把队友从 529.2 治到 784.8 时，`HEALED` 触发 1 次 ✓，`actor == self`（风堇是治疗者）✓、`target is_ally` ✓）；② `target: summon` **能解析到小伊卡** ✓（探针用 `SPEED +100` 验证：小伊卡速度 0 → 100 ✓）；③ `stackable` + `max_stacks: 3` ✓。⚠ 教训：判据里\"把队友打伤\"必须用 **`consumeHp`**（`heal(-x)` 会被 `heal()` 的 `amount <= 0` 直接忽略 ⇒ 根本没受伤 ⇒ 治疗量为 0 ⇒ 没有 `HEALED` ✗，这正是前两轮失败的真正原因 ✓）。``「风堇或小伊卡」里忆灵那一半：`HEALED` 的 `actor` 是治疗者，忆灵治疗时 `actor is_summon` 也成立 ✓（探针里 `probeActorSummon` 为 0 是因为那次治疗者是风堇 ✓）。  ⭐ `self_summon_count >= 1` 是**引擎要求**的（`TriggerTargets.requireSummon` 会显式拒绝：\"Effect targets summon but ... has no summon on the field; gate the rule with self_summon_count >= 1\" ✓）—— 这也正好是文档的语义：小伊卡不在场时这条天赋没有对象 ✓。"
     },
     {
+      "on": "HEALED",
+      "id": "tally_counts_hyacines_own_healing",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "小伊卡累计治疗",
+          "amountFromEvent": true,
+          "target": "self"
+        }
+      ],
+      "source": "1409 风堇 忆灵技1 乌云乌云快走开！（数据槽位 1）：「对敌方全体造成等同于**本场战斗风堇与小伊卡累计治疗数值** #1% 的风属性伤害…」—— 本条只做**计量**的那一半。",
+      "note": "「**本场战斗风堇与小伊卡累计治疗数值**」= 这条资源 ✓ —— 它是忆灵技1 的**被乘数** ✓，而在此之前它只被 1415 昔涟那条「额外提高」写过 ✓（`sky_ode_adds_a_share_of_each_heal_to_ikachis_total`），**总治疗**从来没人记 ✗。① 事件 `HEALED` ✓（带**实际回复量** ✓）；② 门 `actor == self` ✓ = 治疗者是风堇 ✓（`HEALED` 的 `actor` 就是治疗者 ✓）；③ `amountFromEvent: true` ✓ = 把**这次回复的量**原样记进去 ✓（与 1415 那条同一个字段 ✓）；④ 目标 `self` ✓ —— 计量挂在**她**身上 ✓（忆灵技1 要读的就是它 ✓）。⚠ 与 1415 那条**不冲突、不是重复** ✓：那条记的是「**额外**提高」的那一份 ✓ ⇒ 两者相加才是「计入忆灵技1 的治疗数值」✓。⚠ 满血治疗**不发** `HEALED` ✓（引擎既有约定 ✓）⇒ 计量按“**实际**回复量”算 ✓，与游戏口径一致 ✓。⚠⚠ **精度**：`Resource` 是**整数**计数器 ✓ ⇒ 计量只保留**整点生命** ✓（实测：治了 `255.6229…`、读数是 `256` ✓）—— 误差 < 1 点治疗，落到忆灵技1 的伤害上是 < `0.28` 点 ✓（Lv10 的 `#1` ✓）；**登记**：若日后需要逐位对齐（例如与捕获的伤害数对账），改成**千分之一**存储即可（1415 的 `天空之诗的治疗份额` 用的就是 `percent: 10000` 那种换算 ✓），读取端把系数除以同一个数就行 ✓。"
+    },
+    {
+      "on": "HEALED",
+      "id": "tally_counts_ikachis_healing_too",
+      "when": [
+        "actor == summon"
+      ],
+      "do": [
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "小伊卡累计治疗",
+          "amountFromEvent": true,
+          "target": "self"
+        }
+      ],
+      "source": "1409 风堇 忆灵技1：「…**风堇与小伊卡**累计治疗数值…」—— 忆灵那一半",
+      "note": "「风堇**与小伊卡**」—— 与上一条**同一条资源、同一个字段** ✓，只是门换成 `actor == summon` ✓（忆灵治疗时 `HEALED` 的 `actor` 是它 ✓，与天赋那条「风堇**或小伊卡**提供治疗时」同一个读法 ✓）。⚠ 与上一条**必须是两条规则** ✓：条件是 AND 的，而「她**或**忆灵」是 OR ✓ ⇒ 一个门写不了两句话 ✓。"
+    },
+    {
       "on": "BATTLE_START",
       "id": "trace_windstorm_raises_her_max_hp_above_200_speed",
       "when": [
