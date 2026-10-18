@@ -122,8 +122,12 @@ final class TriggerValidator {
             throw new IllegalArgumentException(
                     "Unknown trigger op '" + op + "' (source: " + spec.getSource() + ")");
         }
-        switch (op) {
-            case "ADD_ELEMENTAL_WEAKNESS" -> {
+        TriggerOperator operator = TriggerOperator.parse(op);
+        if (operator == null) {
+            throw new IllegalArgumentException("Trigger op " + op + " is not in TriggerOperator; the validator and the dispatcher share that vocabulary");
+        }
+        switch (operator) {
+            case ADD_ELEMENTAL_WEAKNESS -> {
                 if (effect.getElement() == null || effect.getElement().isBlank()) {
                     throw new IllegalArgumentException("Op ADD_ELEMENTAL_WEAKNESS requires element (source: " + spec.getSource() + ")");
                 }
@@ -138,14 +142,14 @@ final class TriggerValidator {
                 }
                 requireNoStackArguments(effect, op, spec);
             }
-            case "RESET_TRIGGER_LIMIT" -> {
+            case RESET_TRIGGER_LIMIT -> {
                 if (effect.getRule() == null || effect.getRule().isBlank()) {
                     throw new IllegalArgumentException(
                             "Op RESET_TRIGGER_LIMIT requires \"rule\" (source: " + spec.getSource() + ")");
                 }
                 requireNoStackArguments(effect, op, spec);
             }
-            case "GAIN_ENERGY" -> {
+            case GAIN_ENERGY -> {
                 // A cast parameter is a third spelling (reader: 1415's ode of sky, "restore #2 energy to Hyacine (风堇)", whose
                 // #2 runs 12 -> 33.6). `ENERGY_SCALES` holds only a share of max energy, so the op could not read a number out of the skill that produced it.
                 if (TriggerInterpreter.isCastParamScale(effect)) {
@@ -155,7 +159,7 @@ final class TriggerValidator {
                     requireNoStackArguments(effect, op, spec);
                 }
             }
-            case "RAISE_ENERGY_TO" -> {
+            case RAISE_ENERGY_TO -> {
                 // A plain share, because the handler reads it directly: accepting the
                 // percent_from_* spellings here would leave the share unresolved at run time.
                 requirePercent(effect, op, spec);
@@ -166,11 +170,11 @@ final class TriggerValidator {
                 }
                 requireNoStackArguments(effect, op, spec);
             }
-            case "GAIN_SKILL_POINT" -> {
+            case GAIN_SKILL_POINT -> {
                 requireAmount(effect, op, spec);
                 requireNoStackArguments(effect, op, spec);
             }
-            case "RAISE_SKILL_POINT_CAP" -> {
+            case RAISE_SKILL_POINT_CAP -> {
                 // Unlike GAIN_SKILL_POINT, a negative amount is meaningful here: it takes a granted bonus
                 // back. Zero is not, because it would silently do nothing.
                 if (effect.getAmount() == null || effect.getAmount() == 0) {
@@ -182,7 +186,7 @@ final class TriggerValidator {
                 }
                 requireNoStackArguments(effect, op, spec);
             }
-            case "HEAL", "SHIELD" -> {
+            case HEAL, SHIELD -> {
                 requireAmountOrScale(effect, op, spec, SCALES, "Max HP");
                 requireNoStackArguments(effect, op, spec);
                 if ("HEAL".equals(op)) {
@@ -201,11 +205,11 @@ final class TriggerValidator {
                                     + "(source: " + spec.getSource() + ")");
                 }
             }
-            case "ADVANCE" -> {
+            case ADVANCE -> {
                 requirePercent(effect, op, spec);
                 requireNoStackArguments(effect, op, spec);
             }
-            case "RAISE_RESOURCE_CAP" -> {
+            case RAISE_RESOURCE_CAP -> {
                 // A resource the owner DECLARES, and how far to widen its overflow.
                 requireResource(effect, op, spec);
                 if (effect.getAmount() == null || effect.getAmount() <= 0) {
@@ -215,7 +219,7 @@ final class TriggerValidator {
                                     + " (source: " + spec.getSource() + ")");
                 }
             }
-            case "GAIN_RESOURCE", "SPEND_RESOURCE", "REMOVE_RESOURCE" -> {
+            case GAIN_RESOURCE, SPEND_RESOURCE, REMOVE_RESOURCE -> {
                 if (Boolean.TRUE.equals(effect.getSpendAll())) {
                     // "consume all [X]": a spend with no stated SIZE -- and stating one
                     // beside it is a contradiction, so it is refused rather than silently preferring one.
@@ -264,13 +268,13 @@ final class TriggerValidator {
                 }
                 requireNoStackArguments(effect, op, spec);
             }
-            case "RESET_RESOURCE_CAP" -> {
+            case RESET_RESOURCE_CAP -> {
                 // The other half of `max_per_round`, and it needs the counter named for the same reason: "reset my
                 // allowances" without saying which one is a rule whose subject is missing.
                 requireResource(effect, op, spec);
                 requireNoDuration(effect, op, spec);
             }
-            case "RESET_RULE_CHANCE" -> {
+            case RESET_RULE_CHANCE -> {
                 // "将触发【头号补给盲盒】的固定概率重置为初始值" (1506's 崩坏级伤害演示): the decaying probability's own reset. It
                 // names the rule for the same reason MODIFY_RULE does - "reset the probability" without saying whose
                 // has no subject - and the shape check (the named rule really decays) lives in
@@ -279,7 +283,7 @@ final class TriggerValidator {
                 requireNoDuration(effect, op, spec);
                 requireNoStackArguments(effect, op, spec);
             }
-            case "DAMAGE" -> {
+            case DAMAGE -> {
                 // Note: `times` says "settle N independent times"; `per_target` says "multiply this one settlement
                 // by the event's hit count". Together they have two readings, so the pair is refused -- the
                 // same house rule that refuses `scale` next to `per_target`.
@@ -379,7 +383,7 @@ final class TriggerValidator {
                     }
                 }
             }
-            case "MODIFY_ATTR" -> {
+            case MODIFY_ATTR -> {
                 // Note: A damage-type scope is only read on the INSTANCE route. Stating it on an ordinary modifier would
                 // be silently ignored, which is the hole the closed-set checks exist to close.
                 if (effect.getDamageType() != null && !effect.getDamageType().isBlank()
@@ -437,7 +441,7 @@ final class TriggerValidator {
                 requireStackCap(effect, op, spec);
                 requireTickOwner(effect, op, spec);
             }
-            case "APPLY_BUFF" -> {
+            case APPLY_BUFF -> {
                 requireBuff(effect, op, spec);
                 requireDuration(effect, op, spec);
                 requireNoStackArguments(effect, op, spec);
@@ -450,7 +454,7 @@ final class TriggerValidator {
                                     + "fraction of 1 in (0, 1]: 0.8 = \"an 80% base chance\" (source: " + spec.getSource() + ")");
                 }
             }
-            case "REMOVE_STACK" -> {
+            case REMOVE_STACK -> {
                 // Note: `attribute` OR `buff` (a name), exactly one -- the same "name or attribute" filter `EXTEND_BUFF`
                 // takes, for [鸣弦号令]: "remove 1 stack of [鸣弦号令] from Yukong (驭空)" is about a *named* stackable
                 // modifier, which the attribute form cannot address (and REMOVE_STATE takes all of them off).
@@ -468,7 +472,7 @@ final class TriggerValidator {
                 requirePositiveAmount(effect, op, spec);
                 requireNoStackArguments(effect, op, spec);
             }
-            case "MODIFY_DAMAGE_TAKEN" -> {
+            case MODIFY_DAMAGE_TAKEN -> {
                 // "with a 100% base chance, raise the DoT damage taken by ...": an optional roll (see requireBaseChance).
                 // "increases the Fire DMG the target takes": an optional ELEMENT scope, validated because an unknown spelling
                 // would widen the zone rather than narrow it.
@@ -479,7 +483,7 @@ final class TriggerValidator {
                 requireDuration(effect, op, spec);
                 requireNoStackArguments(effect, op, spec);
             }
-            case "ABSORB_DAMAGE" -> {
+            case ABSORB_DAMAGE -> {
                 // "每点【好活当赏】等同于 200 点抵御值 ... 抵挡 60% 的伤害": three things have to be stated, and each one is
                 // a silent no-op if it is missing -- an absorber with no pool blocks nothing, one with no rate cannot
                 // turn points into damage, and one with no share would block the whole hit. So all three are required
@@ -506,21 +510,21 @@ final class TriggerValidator {
                 requireDuration(effect, op, spec);
                 requireNoStackArguments(effect, op, spec);
             }
-            case "SUPER_BREAK" -> {
+            case SUPER_BREAK -> {
                 // "converts this damage's toughness reduction value into 1 instance of 200% super break damage": needs the instance (`ctx.damage()`) for the same reason
                 // ADD_DAMAGE does, plus a percentage of that instance's toughness reduction.
                 requirePercent(effect, op, spec);
                 requireNonZeroPercent(effect, op, spec);
                 requireNoStackArguments(effect, op, spec);
             }
-            case "CONSUME_HP" -> {
+            case CONSUME_HP -> {
                 // "consume HP equal to 30% of Blade (刃)'s Max HP": a COST paid in HP, not damage.
                 requirePercent(effect, op, spec);
                 requireNonZeroPercent(effect, op, spec);
                 requireNoDuration(effect, op, spec);
                 requireNoStackArguments(effect, op, spec);
             }
-            case "BOOST_TOUGHNESS" -> {
+            case BOOST_TOUGHNESS -> {
                 // "raise this attack's toughness reduction value by 100%" / "the first 2 hits of the attack ... raise the toughness reduction value by 50%": a multiplier on the toughness reduction this
                 // instance will cause. Note: Read at ONE place (SkillExecutor.applyStanceDamage), never inside
                 // Battle.reduceToughness -- that method is also called by enemy skills and by the demo script.
@@ -537,21 +541,21 @@ final class TriggerValidator {
                 requireDuration(effect, op, spec);
                 requireNoStackArguments(effect, op, spec);
             }
-            case "BOOST_DAMAGE" -> {
+            case BOOST_DAMAGE -> {
                 requirePercent(effect, op, spec);
                 requireNonZeroPercent(effect, op, spec);
                 requireNoDuration(effect, op, spec);
                 requireNoStackArguments(effect, op, spec);
                 requireEvent(spec, op, TriggerEvent.DEALING_DAMAGE);
             }
-            case "TICK_DOT" -> {
+            case TICK_DOT -> {
                 // "make its currently suffered bleed state immediately produce 1 instance of damage equal to 85% of the original damage": which state, and what share of it.
                 requireElement(effect, op, spec, false);
                 requirePercent(effect, op, spec);
                 requireNonZeroPercent(effect, op, spec);
                 requireNoStackArguments(effect, op, spec);
             }
-            case "REPLACE_SKILL" -> {
+            case REPLACE_SKILL -> {
                 // "strengthen the next basic attack into [酒花奔涌]": which slot, which data row, and how long the swap lasts.
                 requireSkill(effect, op, spec);
                 if (effect.getSkillId() == null || effect.getSkillId() <= 0) {
@@ -562,14 +566,14 @@ final class TriggerValidator {
                 requireDuration(effect, op, spec);
                 requireNoStackArguments(effect, op, spec);
             }
-            case "REMOVE_BUFF" -> {
+            case REMOVE_BUFF -> {
                 // "remove 1 buff effect from a designated single enemy": the mirror of DISPEL -- that one cleans OUR side's debuffs, this one
                 // strips the TARGET's benefits. Permanent buffs are skipped (see BuffManager.removeBuffs): nobody's skill
                 // dispels a loadout.
                 requirePositiveAmount(effect, op, spec);
                 requireNoStackArguments(effect, op, spec);
             }
-            case "DISPEL" -> {
+            case DISPEL -> {
                 // Either an amount, or a CLASS -- and with a class the amount is optional, because "all control-class negative states"
                 // counts nothing. Both together is allowed too: "the newest two of that class".
                 if (effect.getKind() != null && !effect.getKind().isBlank()) {
@@ -580,7 +584,7 @@ final class TriggerValidator {
                 requireNoDuration(effect, op, spec);
                 requireNoStackArguments(effect, op, spec);
             }
-            case "TAUNT" -> {
+            case TAUNT -> {
                 // "make the target enter the taunt state for N turns": the engine's TauntBuff is a pure marker with a hard
                 // target-selection constraint, so all this op needs is the duration. No `permanent` / `until`: a
                 // marker with no turn count would never come off, and no document writes it that way.
@@ -597,7 +601,7 @@ final class TriggerValidator {
                 }
                 requireNoStackArguments(effect, op, spec);
             }
-            case "REMOVE_STATE" -> {
+            case REMOVE_STATE -> {
                 // `buff` is the state's name - the same spelling `has_state` reads and `APPLY_BUFF` writes, so the
                 // three are one vocabulary. Note: No count: "remove ... state" takes the state off, it does not take N of
                 // them, and an `amount` here would be silently ignored (which is what this op exists to avoid).
@@ -624,7 +628,7 @@ final class TriggerValidator {
                                     + "(source: " + spec.getSource() + ")");
                 }
             }
-            case "APPLY_CONTROL" -> {
+            case APPLY_CONTROL -> {
                 // "with a 50% base chance, make the enemy target enter the frozen state for 1 turn": a named control state, a duration, and
                 // (optionally) a base chance that goes through Effect Hit Rate / Effect RES. The effect may also carry the
                 // state's OWN per-turn damage (`element` + a magnitude), which lands with the state.
@@ -639,7 +643,7 @@ final class TriggerValidator {
                 }
                 requireStateDamage(effect, op, spec);
             }
-            case "APPLY_DOT" -> {
+            case APPLY_DOT -> {
                 // "make the target enter the burn state, dealing damage equal to ... each turn": a damage-over-time attached by a rule. The
                 // element is the engine's own spelling (Fire to burn), the magnitude is either flat or derived
                 // from the RULE OWNER's attribute, and it is frozen into the buff when it lands.
@@ -667,7 +671,7 @@ final class TriggerValidator {
                 }
                 requireNoMalformedArguments(effect, op, spec);
             }
-            case "EXTEND_BUFF" -> {
+            case EXTEND_BUFF -> {
                 // "...'s duration is increased by 1 turn": lengthen the buffs THIS owner already applied to the target, named by
                 // their state ("the shield provided by the Skill"/"the wind shear state the talent makes the enemy target enter") or by the attribute a modifier
                 // sits on ("damage boost effect"). Nothing else is stated.
@@ -681,7 +685,7 @@ final class TriggerValidator {
                 }
                 requireExtendFilter(effect, op, spec);
             }
-            case "RESIST_DEBUFF" -> {
+            case RESIST_DEBUFF -> {
                 // "raise the chance to resist control-class negative states by 35%" / "immune to control-class negative states": a class resistance the CARRIER holds, so
                 // it is a buff on the target (timed, or permanent for a trace).
                 requireDebuffClass(effect, op, spec);
@@ -709,7 +713,7 @@ final class TriggerValidator {
                                     + "(source: " + spec.getSource() + ")");
                 }
             }
-            case "START_COUNTDOWN" -> {
+            case START_COUNTDOWN -> {
                 // "a [协奏] countdown appears on the action order ... the countdown has a fixed 90 SPD": a unit whose only job is to have a turn.
                 if (effect.getSpeed() == null || effect.getSpeed() <= 0) {
                     throw new IllegalArgumentException(
@@ -719,7 +723,7 @@ final class TriggerValidator {
                 }
                 rejectCountdownExtras(effect, op, spec);
             }
-            case "APPLY_REGEN" -> {
+            case APPLY_REGEN -> {
                 // "at the start of each turn, restore to them HP equal to ... X% of Max HP + N, lasting M turns": the healing twin of APPLY_DOT.
                 // Its magnitude is a HEAL amount, so it takes the heal/shield scale vocabulary (SCALES), NOT the
                 // self_attr: one the MODIFY_ATTR family uses -- "equal to .2% of her Max HP" is owner_max_hp.
@@ -727,7 +731,7 @@ final class TriggerValidator {
                 requireDuration(effect, op, spec);
                 requireBuff(effect, op, spec);
             }
-            case "REGISTER_HEAL_BONUS" -> {
+            case REGISTER_HEAL_BONUS -> {
                 // A heal bonus conditional on WHO is being healed (1105's talent). The condition is the whole op:
                 // without one it would raise every heal the owner performs, including on a healthy ally, which is
                 // precisely the wrong number it exists to avoid -- so it is required loudly here rather than left to
@@ -741,12 +745,12 @@ final class TriggerValidator {
                 }
                 // The conditions themselves are parsed by TriggerTable.compile, which refuses a misspelling.
             }
-            case "ADD_STACK" -> {
+            case ADD_STACK -> {
                 // "after our targets ... cast 2 times..." / "automatically removed after triggering 2 times": a counter, which is a named stack buff (see StackBuff).
                 requireBuff(effect, op, spec);
                 requireDuration(effect, op, spec);
             }
-            case "SPEND_STEPS" -> {
+            case SPEND_STEPS -> {
                 // The other half of `per_steps`: the milestones a repeating effect just paid for, consumed ONCE out of a
                 // counter - her sentence pays two effects per milestone (an extra turn and a charge) and the counter may
                 // be charged only once. See spendSteps.
@@ -765,7 +769,7 @@ final class TriggerValidator {
                 }
                 requireNoStackArguments(effect, op, spec);
             }
-            case "RAISE_SKILL_HITS" -> {
+            case RAISE_SKILL_HITS -> {
                 // The DATA SLOT, not a SkillType letter: the executor knows the slot number.
                 if (effect.getSkillId() == null || effect.getSkillId() <= 0) {
                     throw new IllegalArgumentException(
@@ -774,7 +778,7 @@ final class TriggerValidator {
                 }
                 requireAmount(effect, op, spec);
             }
-            case "RAISE_SKILL_LEVEL" -> {
+            case RAISE_SKILL_LEVEL -> {
                 // "Skill Lv. +1""Ultimate Lv. +1" (1001 Eidolon (星魂) 3/5 and the same sentence in most kits): the level a skill is
                 // READ at is character data plus this battle's raises, and one op is what raises it -- never a
                 // second copy of the rule at another level, which would double a cast like `per_turn` doubling does.
@@ -814,7 +818,7 @@ final class TriggerValidator {
                 }
                 rejectSkillLevelExtras(effect, op, spec);
             }
-            case "MODIFY_RULE" -> {
+            case MODIFY_RULE -> {
                 // "raise the number of times the talent's counter effect can trigger per turn by 1" / "when casting the Ultimate, raise the base chance to freeze the enemy target by 15%": a passive
                 // that RAISES a number on another rule in the same file. Which number is decided by which field is
                 // stated -- an `amount` is a count of firings, a `percent` is a probability -- and the shape of the
@@ -890,7 +894,7 @@ final class TriggerValidator {
                                     + spec.getOn() + " (source: " + spec.getSource() + ")");
                 }
             }
-            case "ADD_DAMAGE" -> {
+            case ADD_DAMAGE -> {
                 requireEvent(spec, op, TriggerEvent.DEALING_DAMAGE);
                 TriggerMagnitudes.scaleAttribute(effect, op, spec);
                 requirePercent(effect, op, spec);
@@ -904,7 +908,7 @@ final class TriggerValidator {
                                     + "count instances, and a count is not an amount (source: " + spec.getSource() + ")");
                 }
             }
-            case "SUMMON" -> {
+            case SUMMON -> {
                 // No arguments at all: the memosprite belongs to the rule's owner, and everything about it
                 // (name, panel derivation) lives in resources/game/memosprites/<cid>.json. A `target` here would
                 // be silently ignored, which is the class of mistake the closed selector set exists to
@@ -913,7 +917,7 @@ final class TriggerValidator {
                 requireNoStackArguments(effect, op, spec);
                 requireNoTarget(effect, op, spec);
             }
-            case "CAST_SKILL" -> {
+            case CAST_SKILL -> {
                 if (effect.getSkillId() == null && (effect.getSkill() == null || effect.getSkill().isBlank())) {
                     throw new IllegalArgumentException("Op CAST_SKILL requires skill (a SkillType slot name) or skill_id (a memosprite data slot) (source: "
                             + spec.getSource() + ")");
@@ -932,7 +936,7 @@ final class TriggerValidator {
                 // the fields that would be a second reading of the row are refused rather than silently ignored.
                 requireNoRowArguments(effect, op, spec);
             }
-            case "COMMAND_SUMMON" -> {
+            case COMMAND_SUMMON -> {
                 // The numbers are the NAMED SKILL's, not this file's: Evernight (长夜月)'s ultimate is skill 141303, whose
                 // parameter row says 2.0 at Lv10 and whose effect says AoEAttack / Ice. Stating them again here
                 // would be a second copy that drifts (and would lose the per-level table).
@@ -945,7 +949,7 @@ final class TriggerValidator {
                 // pointing this op at `self` or at a teammate would deal the summon's damage to our own side.
                 requireNoTarget(effect, op, spec);
             }
-            case "DELEGATE_DAMAGE" -> {
+            case DELEGATE_DAMAGE -> {
                 // Only the slot being cast is named. Everything else about the swing -- who delivers it and with
                 // what numbers -- belongs to the rule that DOES deliver it (for Evernight (长夜月), the COMMAND_SUMMON on
                 // ULT_CAST below); this op only says "not by me".

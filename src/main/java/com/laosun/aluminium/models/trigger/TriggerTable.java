@@ -292,9 +292,10 @@ public class TriggerTable {
         if (op == null) {
             return false;
         }
-        return switch (op.trim().toUpperCase(java.util.Locale.ROOT)) {
-            case "ADD_STACK", "APPLY_BUFF", "MODIFY_ATTR", "RESIST_DEBUFF", "SHIELD" -> true;
-            default -> false;
+        TriggerOperator operator = TriggerOperator.parse(op);
+        return switch (operator == null ? null : operator) {
+            case ADD_STACK, APPLY_BUFF, MODIFY_ATTR, RESIST_DEBUFF, SHIELD -> true;
+            case null, default -> false;
         };
     }
 
