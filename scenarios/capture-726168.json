@@ -1,0 +1,58 @@
+{
+  "name": "原游戏实测复算：整场捕获 #52，无视防御 29% 的一击 726,168.1419",
+  "note": "取自 `veritas_capture_2026-10-18T08-54-18-537Z.json` 的第 53 条事件（下标 52）。这一条的价值是它带**受击方的有效 DEF**：`target_defence 1149.9999`、`target_defence_effective 816.4999400502993` ⇒ 减防 = 1 − 816.5/1150 = **0.29**，而引擎的防御区正是 `effDef = def × (1 − ignore)`（`Damage.DefenceArea.rate()`），所以场景用 `attacker.attributes.DEFENCE_IGNORE = 0.29` 承载，而不是把 DEF 改成 816.5 —— 这样检验的才是**引擎的减防路径**。其余：火属性（resistance fire 0.2，`net_resistance 0` ⇒ 穿透 0.2 正好抵消，与引擎的 `DAMAGE_PENETRATION 0.2` 一致，不必凑数）；`all_damage_reduce 0` ⇒ 目标已击破（`broken: true`，让引擎不加韧性 10%）；易伤 0.64 ⇒ 1.64；`extra_damage_ratio` 为 0（重建失败按 1）、`stage_final` 0、combo/monster_taken 全 0。   ⚠ 夹具细节（两处是夹具的，不是游戏的）：① 1003 自带 0.374 的火属性增伤（行迹），必须显式置 0 才能只测游戏那 3.35；② 夹具怪 1002011 的火抗是 **0**（不是 0.2），所以 `DAMAGE_PENETRATION` 要置 0 才能得到捕获里的 `net_resistance 0`；③ 目标已击破 ⇒ 引擎不注册减伤区（语义上等于 1.0），所以 `expect` 里不含 `ReductionArea`。   ⚠ 攻方改用 1002（风）：1002 自身没有任何增伤行迹（`capture-858483` 已证实），而 1003 自带 0.15~0.374 的火属性增伤会把增伤区抬高、污染这条判据；换风属性后 `1002011` 的风抗也是 0.2 ⇒ `DAMAGE_PENETRATION 0.2` 与捕获的 `net_resistance 0` 完全一致，不需要凑数。   ⚠ 1002 的普攻是**两段**（`skill_effects.json`: `1002/Skill01 = [0.45, 0.55]`），所以 `instances: 2`、这里比的是第 0 段（基数与最终值都乘 0.45）；`WIND_DAMAGE_BOOST` 显式置 0 以抵掉 1002 自带的 0.224 风增伤。",
+  "attacker": {
+    "cid": 1002,
+    "level": 80,
+    "eidolon": 0,
+    "skill": "COMMON",
+    "skillLevel": 1,
+    "base": 24000.05920003401,
+    "attributes": {
+      "ALL_DAMAGE_TYPE_BOOST": 3.3500000031199306,
+      "BASE_DAMAGE_MULTI_RATIO": 0.3000000002793968,
+      "CRIT_CHANCE": 1.0,
+      "CRIT_ATTACK": 4.926302406005561,
+      "DEFENCE_IGNORE": 0.29,
+      "DAMAGE_PENETRATION": 0.20000000018626451,
+      "FINAL_DAMAGE_BOOST": 0.0,
+      "COMBO_DAMAGE_BOOST": 0.0,
+      "BASIC_ATTACK_DAMAGE_BOOST": 0.0,
+      "SKILL_DAMAGE_BOOST": 0.0,
+      "DOT_DAMAGE_BOOST": 0.0,
+      "WIND_DAMAGE_BOOST": 0.0
+    }
+  },
+  "target": {
+    "monsterId": 1002011,
+    "level": 90,
+    "attributes": {
+      "DEFENCE": 1149.99990016222,
+      "HEALTH": 50000000.0
+    },
+    "broken": true,
+    "buffs": [
+      {
+        "kind": "vulnerable",
+        "value": 0.6400000005960464
+      }
+    ]
+  },
+  "crit": true,
+  "instance": 0,
+  "instances": 1,
+  "tolerance": 1e-06,
+  "expect": {
+    "base": 10800.026640015305,
+    "BoostArea": 4.350000003119931,
+    "FinalBoostArea": 1.0,
+    "ComboArea": 1.0,
+    "BaseMultiArea": 1.3000000002793968,
+    "MonsterTakenArea": 1.0,
+    "VulnerableArea": 1.6400000005960464,
+    "CritArea": 5.926302406005561,
+    "DefenceArea": 0.5505092413648894,
+    "ResistArea": 1.0,
+    "final": 326775.66387130396
+  }
+}
