@@ -568,6 +568,22 @@
       "source": "1409 风堇 忆灵技2：「风堇处于【雨过天晴】状态时，小伊卡会在风堇施放技能后立即获得 1 个额外回合并自动施放【乌云乌云快走开！】」",
       "note": "「施放技能后小伊卡**立即**获得 1 个额外回合**并自动施放**【乌云乌云快走开！】」—— ① 回合用 **`INSERT_ACTION`** ✓（`EXTRA_TURN` 会拒绝 Speed 0、不在行动序列的忆灵 ✗）；② 施放用 **`CAST_SKILL skill_id: 1`** ✓ —— 忆灵的技能按**数据槽**存 ✓（`skillAt` ✓），`CAST_SKILL` 现在认这个字段 ✓。⚠ 两半**必须成对** ✓：只插回合时那一回合是**空转**的（实测没有伤害实例 ✓）。"
     },    {
+      "on": "SUMMON_ATTACK",
+      "id": "ikachi_shortens_its_own_effects_after_it_acts",
+      "when": [
+        "actor is_summon"
+      ],
+      "do": [
+        {
+          "op": "EXTEND_BUFF",
+          "kind": "all",
+          "turns": -1,
+          "target": "summon"
+        }
+      ],
+      "source": "1409 风堇 忆灵技2：「…小伊卡施放技能后使自身所有持续效果持续回合数减 1」",
+      "note": "「施放技能后使**自身所有**持续效果回合数**减 1**」⇒ `EXTEND_BUFF` + **`kind: \"all\"`** ✓ + **负** `turns` ✓（两点都是既有能力 ✓）；事件 `SUMMON_ATTACK` ✓ + `actor is_summon` ✓（两方召唤都发 ✓）。⭐ **为什么现在才敢写**：引擎修好了「自由回合不扣时长」✓ —— 否则这条会在插入回合计 tick 之外**再**扣一次 ✓（实测曾 3 → 1 ✓）。"
+    },    {
       "on": "SUMMONED",
       "id": "ikachi_is_immune_to_negative_effects",
       "when": [

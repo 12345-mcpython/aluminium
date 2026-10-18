@@ -17,24 +17,26 @@ import java.util.List;
 public class HyacineIkachiShortensItsEffectsTest {
 
     @Test
-    public void theEngineAlreadyTicksTheMemospriteOwnEffectsWhenItActs() {
+    public void itsOwnEffectsLoseExactlyOneTurnWhenItCasts() {
         Character hyacine = CharacterFactory.create(1409, 80);
         Battle battle = new Battle(List.of(hyacine, CharacterFactory.create(1001, 80)),
                 List.of(BattleFixture.dummy()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        SkillExecutor.execute(battle, hyacine.getSkills().get(SkillType.SKILL), hyacine,
+        SkillExecutor.execute(battle, hyacine.getSkills().get(SkillType.ULTRA), hyacine,
                 List.of(battle.enemies.getFirst()));
         battle.processRequests();
         Summon ika = (Summon) battle.memospriteOf(hyacine);
         Assertions.assertNotNull(ika, "precondition: 小伊卡 is out");
         ika.getBuffManager().addBuff(new StateBuff("测试持续效果", 3));
 
-        SkillExecutor.execute(battle, ika.skillAt(1), ika, List.of(battle.enemies.getFirst()));
+        SkillExecutor.execute(battle, hyacine.getSkills().get(SkillType.SKILL), hyacine,
+                List.of(battle.enemies.getFirst()));
         battle.processRequests();
 
-        // Positional read: a plain StateBuff does not answer getBuffName(), which is how this looked "gone" once.
-        Assertions.assertEquals(1, ika.getBuffManager().activeBuffs().getFirst().remainingTurns(),
-                "no rule: the engine already takes 2 turns off when the memosprite acts (3 -> 1)");
+        // One turn off -- the cast's own -1, and NOTHING from the free turn it acted on (3 would have become 1
+        // before the free-turn fix).
+        Assertions.assertEquals(2, ika.getBuffManager().activeBuffs().getFirst().remainingTurns(),
+                "「施放技能后使自身所有持续效果持续回合数减 1」: 3 -> 2");
     }
 }
