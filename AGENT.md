@@ -410,8 +410,11 @@ if (isSelected) buffer.setStyle(rowArea, highlightStyle);
 
 #### 探测方法本身也踩了两个坑（记下来省下一次）
 
-1. **`Resources.gain` 改不动队级计数器**：把 `气氛值` 的 scope 改成 `PARTY` 后，`robin.getResources().gain("气氛值", 15)`
-   之后 `value("气氛值")` 仍是 **0** ✗ ⇒ 判据里"设气氛值"这条路要么找队级的池子，要么用一条 `GAIN_RESOURCE` 规则去加 ✓。
+1. ~~**`Resources.gain` 改不动队级计数器**~~ → **已查清（第 7 轮）**：队级计数器**不在** `CanHit.getResources()` 里 ✓，
+   而在 `Battle` 自己的 `partyResources` 表里 ✓ —— 公开入口是 **`battle.partyResourceValue(id)`**（读）与
+   **`battle.partyResource(id)`**（拿到 `Resource` 本体，可 `gain`）✓；`registerPartyResources()` 在开战时按
+   `scope: "PARTY"` 的声明建表 ✓。所以判据里设气量应当写 `battle.partyResource("气氛值").gain(15)` ✓，
+   而我第 6 轮探针读的是**角色自己的 SELF 池**（永远是 0）✗ —— 那是探针的错，不是引擎的缺口 ✓。
 2. **`DEFENCE_IGNORE` 读不到角色属性**：连 1302 施放终结技之后 `getAttribute(DEFENCE_IGNORE)` 都是 **0** ✗
    ⇒ 它是**实例级**（`instance: true`）修饰、活在这一发 `Damage` 上，正确的观测口是 settled 的 `DefenceArea`（`breakdown()` 的 `DefenceArea` 行）✓。
 
