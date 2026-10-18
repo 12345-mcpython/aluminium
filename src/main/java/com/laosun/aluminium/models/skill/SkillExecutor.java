@@ -415,6 +415,14 @@ public final class SkillExecutor {
                                     Set<CanHit> hitTargets) {
         SkillData data = skill.getData();
         SkillEffectType effect = data.getEffect();
+        // The curated table may say this cast is delivered BY RULES (effect: Rules), even when the generated row calls
+        // itself damaging: 1409's 忆灵技1 has a [share, clearPercent] row that is no ATK multiplier, and with the
+        // memosprite's ATK = 0 the swing settled as a 1-point floor beside the rule's real damage.
+        SkillEffectSpec curated = deliverableSpec(skill);
+        if (curated != null && "Rules".equals(curated.getEffect())) {
+            dispatchNonDamaging(battle, skill, user, targets, effect);
+            return;
+        }
 
         // 1) first decide whether it is a damaging skill: for shield/heal/buff skills the first param is not a damage multiplier
         if (!effect.isDamaging() || targets == null || targets.isEmpty()) {

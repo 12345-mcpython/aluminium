@@ -568,10 +568,11 @@
       "source": "1409 风堇 忆灵技2：「风堇处于【雨过天晴】状态时，小伊卡会在风堇施放技能后立即获得 1 个额外回合并自动施放【乌云乌云快走开！】」",
       "note": "「施放技能后小伊卡**立即**获得 1 个额外回合**并自动施放**【乌云乌云快走开！】」—— ① 回合用 **`INSERT_ACTION`** ✓（`EXTRA_TURN` 会拒绝 Speed 0、不在行动序列的忆灵 ✗）；② 施放用 **`CAST_SKILL skill_id: 1`** ✓ —— 忆灵的技能按**数据槽**存 ✓（`skillAt` ✓），`CAST_SKILL` 现在认这个字段 ✓。⚠ 两半**必须成对** ✓：只插回合时那一回合是**空转**的（实测没有伤害实例 ✓）。"
     },    {
-      "on": "SUMMON_ATTACK",
+      "on": "CAST_SETUP",
       "id": "ikachi_shortens_its_own_effects_after_it_acts",
       "when": [
-        "actor is_summon"
+        "actor is_summon",
+        "from_skill_id == 1"
       ],
       "do": [
         {
