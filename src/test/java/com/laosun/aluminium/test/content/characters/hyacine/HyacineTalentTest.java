@@ -64,6 +64,9 @@ public class HyacineTalentTest {
         SkillExecutor.execute(battle, ika.skillAt(1), ika, List.of(battle.enemies.get(0)));
         battle.processRequests();
         Assertions.assertFalse(settled.isEmpty(), "precondition: 小伊卡's hit settled");
-        return settled.get(0).breakdown().get("BoostArea");
+        // ⚠ 2026-10-18: 忆灵技1 的「按累计治疗出伤害」现在是 CAST_SETUP 上的一条**规则**，它在数据那一发**之前**结算
+        // ⇒ 第一个实例是那条规则的（它的攻击者是**风堇**，身上没有忆灵的天赋增伤），数据那一发排在它后面。这里读
+        // **最后一个**实例 = 数据那一发，也就是这条用例原本要测的对象。规则实例的归属问题登记在 AGENT.md §3.7q。
+        return settled.get(settled.size() - 1).breakdown().get("BoostArea");
     }
 }
