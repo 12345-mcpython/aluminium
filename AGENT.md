@@ -778,6 +778,7 @@ HP_LOST 计数 = 0 ; HP_CONSUMED 计数 = 0   ← 两个事件都没发
 - `EXTEND_BUFF` 存在 ✓（阮•梅星魂6 用它 +1 ✓），但**负数**这一半没验过 ✗：是否接受 `turns: -1`、以及「**所有**持续效果」（不点名 `buff` 也不点名 `attribute`）是否有写法 ✗ ⇒ **未量，不下结论** ✓。
 
 **⚠ 同日试过的第三次尝试（已回滚，记下来免得重跑）**：③「施放后使自身所有持续效果减 1」—— `extendBuff` 的 `kind: "all"` 与 `requireSignedTurns`（**带符号**）都支持 ✓，规则写出来也装载得过 ✓（`SUMMON_ATTACK` + `actor is_summon` + `EXTEND_BUFF kind all turns -1 target summon` ✓）；但**判据立不起来** ✗：给忆灵挂一个 3 回合的状态、放一次忆灵技1，之后它在 `BuffManager.activeBuffs()` 里**找不到** ✓（实测 `the state must still be there` 红 ✓）⇒ 要么 `-1` 走了两遍、要么**忆灵自己的回合把它 tick 掉了** ✓，二选一还没分清 ✓。⇒ 规则与判据**一起撤下** ✓（`remainingTurns()` 那个读数也一起撤 ✓，不留没有读者的 getter ✓）。**下一步**：先弄清「忆灵行动时它的 buff 会不会按自己的回合 tick」✓ —— 这决定了「施放后 −1」是**额外**的一次还是**就是**那次 ✓。`
+**②-b 当日勘明的两件事（2026-10-18）**：㈠「获得 1 个额外回合」**不能用 `EXTRA_TURN`** ✗ —— 它对不在行动序列里的单位**直接抛错** ✓（`grantExtraTurn` 返回 false 时就是那句 “not in the action order (a memosprite at Speed 0 is skipped)” ✓），而小伊卡正是 **Speed 0、不进序列** ✓ ⇒ 该用 **`INSERT_ACTION`** ✓（同一文件的注记写着「NOT `EXTRA_TURN`：…a memosprite at Speed 0 is not in it at all」✓）；㈡「自动施放忆灵技１」**两种施放 op 都寻址不到** ✗：`CAST_SKILL` 只认 `SkillType` 槽名 ✓、`COMMAND_SUMMON` 也只要 `skill`（`SkillType`）✓，而小伊卡的技能在**数据槽**里 ✓（实测：它的 `getSkills()` 是**空的** ✓，只能用 `skillAt(1)` ✓）⇒ 要么给这两个 op 加 `memosprite: true` + `skill_id`（与 `RAISE_SKILL_LEVEL` 已有的同形 ✓），要么新开一个 op ✓。
 **⇒ 结论**：忆灵技2 的第一从句（掉血治疗）**已落** ✓；另两句各卡在**一个具体词汇**上（`CAST_SKILL` 的忆灵寻址、`EXTEND_BUFF` 的负数/全量），可分别独立开工 ✓。
 
 ### 3.7z 忆灵技2 第一从句：**选择器已落，规则回滚**（**2026-10-18**）
