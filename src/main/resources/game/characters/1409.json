@@ -26,19 +26,19 @@
           "op": "HEAL",
           "scale": "owner_max_hp",
           "target": "all_allies",
-          "percent": 0.1,
-          "amount": 200
+          "percent_from_skill_param": "ULTRA:0",
+          "amount_from_skill_param": "ULTRA:1"
         },
         {
           "op": "HEAL",
           "scale": "owner_max_hp",
           "target": "summon",
-          "percent": 0.12,
-          "amount": 240
+          "percent_from_skill_param": "ULTRA:5",
+          "amount_from_skill_param": "ULTRA:6"
         }
       ],
       "source": "1409 风堇 终结技 飞入晨昏的我们 (141303): 「…为我方全体目标回复等同于风堇 #1(10)% 生命上限 + #2(200) 的生命值，为小伊卡回复等同于风堇 #6(12)% 生命上限 + #7(240) 的生命值」 param = [0.1, 200, 0.3, 600, 3, 0.12, 240]",
-      "note": "「为**我方全体**目标回复等同于风堇 #1% 生命上限 + #2，为小伊卡回复 #5% + #6」—— ⚠ 这里仍是 **Lv10 的字面常量**（`0.1/200` 与 `0.12/240`），**不是**读行：本轮试过改成 `percent_from_skill_param: ULTRA:0/1` 与 `ULTRA:5/6`，但判据对不上 —— 实测治了 `319.52864`，而读行在**施放前**的生命上限下应给 `305.84`、在**施放后**（雨过天晴已挂上）应给 `397.59` ⇒ 治疗量的基数与「雨过天晴自己抬生命上限」的先后顺序还没弄明白，**先不改成算不清的数**。⚠ 登记：**E3 把终结技抬到 Lv12** 后该行变 `[0.11, 222.5, …, 0.132, 267]`，字面常量不会跟随 ⇒ E3 时偏小。"
+      "note": "「为**我方全体**目标回复等同于风堇 #1% 生命上限 + #2 的生命值，为小伊卡回复等同于风堇 #5% 生命上限 + #6 的生命值」—— 现在**读行**（`percent_from_skill_param: ULTRA:0` / `amount_from_skill_param: ULTRA:1`，小伊卡那一半读 `ULTRA:5` / `ULTRA:6`），与同批已改好的 `ult_state_and_max_hp`（`ULTRA:2`）同一口径。⚠ 之前写的是字面量 `0.1/200` 与 `0.12/240` —— 那正好是 **Lv10 行**的值，而 **E3 把终结技抬到 Lv12**，该行变成 `[0.11, 222.5, …, 0.132, 267]` ⇒ E3 时治疗量会偏小，且没有任何症状（数字看起来完全合理）。判据 `HyacineLevelRowTest` 钉 E0 读到 Lv10、E3 读到 Lv12。"
     },
     {
       "on": "ULT_CAST",
