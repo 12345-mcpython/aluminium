@@ -492,6 +492,32 @@
     },
     {
       "on": "SUMMONED",
+      "id": "ikachi_is_immune_to_negative_effects",
+      "when": [
+        "actor == summon",
+        "self_summon_count >= 1"
+      ],
+      "do": [
+        {
+          "op": "RESIST_DEBUFF",
+          "kind": "control",
+          "percent": 1.0,
+          "permanent": true,
+          "target": "summon"
+        },
+        {
+          "op": "RESIST_DEBUFF",
+          "kind": "dot",
+          "percent": 1.0,
+          "permanent": true,
+          "target": "summon"
+        }
+      ],
+      "source": "1409 风堇 忆灵技2 牵起晴空的手（数据槽位 3）：「小伊卡的速度保持为0，**免疫负面效果**，并且不会出现在行动序列上」",
+      "note": "「**免疫负面效果**」⇒ `RESIST_DEBUFF` + **`percent: 1.0`** ✓（引擎的注释写明「`percent: 1` **就是免疫**」✓，1413 与 1506 同一拼法 ✓），两条各管一个**类别** ✓。⚠ **登记（这是近似）**：文档说「负面效果」是一个**总类** ✓（它自己的定义：「对战斗有负面效果的所有持续状态」✓），而引擎的 `RESIST_DEBUFF` 只认 `control` / `dot` 两类 ✗ ⇒ **既非控制也非持续伤害的减益**（例如易伤类）今天**挡不住** ✗；要写全得给 `RESIST_DEBUFF` 第三种 `kind`（或让它接受“全部”）✓。⚠ 「**速度保持为0**」与「**不会出现在行动序列上**」**不写** ✗：前者是 `memosprites/1409.json` 的面板（`flat: 0` + `by_ability` ✓），后者由同一个 `by_ability` 表达 ✓ —— 数据侧已经说过一次，规则不该重复声明 ✓。"
+    },
+    {
+      "on": "SUMMONED",
       "id": "memosprite_soaring_gives_her_energy_when_it_arrives",
       "when": [
         "actor == summon",
