@@ -511,6 +511,25 @@
       "note": "「**召唤忆灵 小伊卡**」⇒ `SKILL_CAST` ⇒ **`SUMMON`** ✓（无参数 ✓：忆灵属于召唤者 ✓）；面板在 `resources/memosprites/1409.json` ✓。⚠ 同句的**治疗部分**：**主治疗已由技能数据交付** ✓ —— `skill_effects.json` 的 `1409/2` 是 `Restore`（`healer_max_hp`，`#1` 份额 + `#2` 固定项，Lv10 = `0.08 × 上限 + 160` ✓），且**技能数据的治疗会发 `HEALED`** ✓（实测，`AGENT.md` §3.7f：`HyacineTalentTest` 先扣血再施放，每治疗一次小伊卡增伤 +0.8 ✓）。⚠ **仍差两半** ✗：① 范围是「我方**全体**」，而现在由**调用方**选目标（`Restore` 只治传进来的那些 ✓，演示只治一人 ✗）—— 缺的是「施放者自己决定打全体」的目标词汇 ✓；② 「**小伊卡自己** 10% 生命上限 + 200」是参数 `#3` / `#4`，`1409/2` 的 `params` 只收了 `#1` / `#2` ✓ ⇒ 那一半没有读者 ✓。两条都登记 ✓，不近似 ✓。"
     },
     {
+      "on": "SKILL_CAST",
+      "id": "the_skill_also_heals_ikachi_itself",
+      "when": [
+        "actor == self",
+        "self_summon_count >= 1"
+      ],
+      "do": [
+        {
+          "op": "HEAL",
+          "scale": "owner_max_hp",
+          "percent_from_skill_param": "SKILL:2",
+          "amount_from_skill_param": "SKILL:3",
+          "target": "summon"
+        }
+      ],
+      "source": "1409 风堇 战技 疗愈世间的晨曦：「为我方全体目标回复等同于风堇 #1% 生命上限 + #2 的生命值，为小伊卡回复等同于风堇 #3% 生命上限 + #4 的生命值」—— 本行是**小伊卡自己那一半**",
+      "note": "「**为小伊卡回复等同于风堇 #3% 生命上限 + #4**」—— 读的是她战技自己的行（Lv10 = `#3 0.10` / `#4 200`）✓：`percent_from_skill_param: SKILL:2` + `amount_from_skill_param: SKILL:3`，所以等级一涨数也跟着涨 ✓。⚠ 这一半以前**没有读者**（`skill_effects.json` 的 `1409/2` 只收了 `#1/#2`，那一对是**我方全体**那半，由技能数据交付 ✓）。⚠ 本条**排在** `skill_summons_ica` **之后** ✓ —— 小伊卡是她战技召唤出来的，排在前面的规则触发时它还不存在。⚠ 仍登记：主治疗的范围是「我方**全体**」，而 `Restore` 只治**调用方传进来的目标** （演示与判据都只传一个），这一半要等一个「施放者自己决定打全体」的目标词汇。判据 `HyacineIkachiSelfHealTest`。"
+    },
+    {
       "on": "SUMMON_LEFT",
       "id": "memosprite_fall_advances_her_action",
       "when": [
