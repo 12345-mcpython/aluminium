@@ -513,8 +513,13 @@ public final class TriggerInterpreter {
             battle.announceRuleFired(ctx.owner(), effect.getOp());
         }
         String op = normalizeOp(effect, null);
-        switch (op) {
-            case "ADD_ELEMENTAL_WEAKNESS" -> {
+        TriggerOperator operator = TriggerOperator.parse(op);
+        if (operator == null) {
+            throw new IllegalStateException("Op " + op + " is not in TriggerOperator; the enum is the vocabulary, so an unknown"
+                    + " name here is an engine fault rather than a content one");
+        }
+        switch (operator) {
+            case ADD_ELEMENTAL_WEAKNESS -> {
                 // Note: Two named sources beside a real element name (the loader keeps this a closed set):
                 //   `party_first` -- the first character of the party, per 1006's own skill text.
                 //   `random_absent` -- a random element the target does NOT already have (1405).
@@ -561,7 +566,7 @@ public final class TriggerInterpreter {
                     }
                 }
             }
-            case "RESET_TRIGGER_LIMIT" -> {
+            case RESET_TRIGGER_LIMIT -> {
                 String wanted = effect.getRule().trim();
                 for (CanHit cleared : TriggerTargets.resolveTargets(battle, effect, ctx)) {
                     TriggerTable table = cleared instanceof com.laosun.aluminium.models.Character ch
@@ -575,8 +580,8 @@ public final class TriggerInterpreter {
                     cleared.resetTriggerLimit(limitKey);
                 }
             }
-            case "GAIN_ENERGY" -> gainEnergy(battle, effect, ctx);
-            case "RAISE_ENERGY_TO" -> {
+            case GAIN_ENERGY -> gainEnergy(battle, effect, ctx);
+            case RAISE_ENERGY_TO -> {
                 // A FLOOR, not a gain: energy is raised to the stated share of the maximum and left alone
                 // when it is already at or above it. Adding a share instead would overshoot.
                 for (CanHit target : TriggerTargets.resolveTargets(battle, effect, ctx)) {
@@ -586,8 +591,8 @@ public final class TriggerInterpreter {
                     }
                 }
             }
-            case "GAIN_SKILL_POINT" -> battle.gainSkillPoint((int) Math.round(scaledAmount(effect, ctx)));
-            case "HEAL" -> {
+            case GAIN_SKILL_POINT -> battle.gainSkillPoint((int) Math.round(scaledAmount(effect, ctx)));
+            case HEAL -> {
                 for (CanHit target : TriggerTargets.resolveTargets(battle, effect, ctx)) {
                     // Note: The healer is the RULE OWNER, not `null`. A `HEAL` effect is
                     // the owner healing somebody, and `HEALED`'s `actor` is what "healing <b>provided by a teammate</b>" reads; with
@@ -598,7 +603,7 @@ public final class TriggerInterpreter {
                     battle.heal(ctx.owner(), target, grantAmount(effect, target, ctx));
                 }
             }
-            case "SHIELD" -> {
+            case SHIELD -> {
                 for (CanHit target : TriggerTargets.resolveTargets(battle, effect, ctx)) {
                     double amount = grantAmount(effect, target, ctx);
                     // "lasting N turns" is a *timed* shield: the ShieldBuff installs the value and takes it off
@@ -620,7 +625,7 @@ public final class TriggerInterpreter {
                     }
                 }
             }
-            case "ABSORB_DAMAGE" -> {
+            case ABSORB_DAMAGE -> {
                 // "每点【好活当赏】等同于 200 点抵御值，我方目标受到伤害时，真珠可消耗抵御值抵挡 60% 的伤害" (1503 Pearl (真珠)'s
                 // talent). The grant rides on the PROTECTED unit - that is where the hit lands, so that is where the
                 // absorber has to be - while the counter belongs to whoever PAYS.
@@ -646,7 +651,7 @@ public final class TriggerInterpreter {
                             effect), ctx));
                 }
             }
-            case "INSERT_ACTION" -> {
+            case INSERT_ACTION -> {
                 // "Demiurge (德谬歌) immediately gains 1 extra turn and automatically casts [花与箭的舞曲]"(1415 memosprite skill 10): a unit outside the action
                 // order acts now -- the game's `TurnInsertAction`. Note: NOT `EXTRA_TURN`: that one cuts into a queue the unit is already in, and
                 // a memosprite at Speed 0 is not in it at all (the game pins it there with `SpeedOverride`).
@@ -656,7 +661,7 @@ public final class TriggerInterpreter {
                             + " act now, but it is dead or already waiting to act");
                 }
             }
-            case "EXTRA_TURN" -> {
+            case EXTRA_TURN -> {
                 // Note: A refused grant can vanish: `grantExtraTurn` answers false for a unit that is not in the action
                 // order -- and a memosprite at Speed 0 is exactly that -- so the rule looked like it had worked. Measured on 1415's ode of
                 // genesis, whose clause grants Demiurge (德谬歌) an extra turn: the judge read "extra turn actor = none" and nothing said why.
@@ -667,7 +672,7 @@ public final class TriggerInterpreter {
                             + "when the battle starts), so no extra turn can be granted");
                 }
             }
-            case "ADVANCE" -> {
+            case ADVANCE -> {
                 // One target or a group: "make that target act immediately" and "make the teammates other than oneself act immediately" are the same op, and
                 // the list resolver is what tells them apart (it is the one HEAL/SHIELD already use for "our
                 // side"). Advancing several units is what the group selectors were resolved for.
@@ -675,11 +680,11 @@ public final class TriggerInterpreter {
                     battle.queue.advanceActionByPercent(target, effect.getPercent());
                 }
             }
-            case "RAISE_RESOURCE_CAP" -> raiseResourceCap(effect, ctx);
+            case RAISE_RESOURCE_CAP -> raiseResourceCap(effect, ctx);
             // The pool is team-level and its owner is the policy, so this is the one op that goes
             // straight to the policy rather than through a unit's resources.
-            case "RAISE_SKILL_POINT_CAP" -> battle.skillPointPolicy.raiseMax((int) Math.round(effect.getAmount()));
-            case "GAIN_RESOURCE" -> {
+            case RAISE_SKILL_POINT_CAP -> battle.skillPointPolicy.raiseMax((int) Math.round(effect.getAmount()));
+            case GAIN_RESOURCE -> {
                 // ⚠ The store that MOVED, not the rule owner's: an effect may grant to somebody else ("give that ally 2
                 // points"), and `resourceAmount(owner)` measured on a unit that does not carry the counter reads 0 on
                 // both sides - measured: a teammate granted her 280 hidden points, her store went 20 to 300, and the
@@ -690,7 +695,7 @@ public final class TriggerInterpreter {
                 gainResource(effect, ctx, previousCredited, mover);
                 fireResourceChanged(battle, ctx, mover, movedId, resourceAmount(battle, mover, movedId) - before);
             }
-            case "SPEND_RESOURCE" -> {
+            case SPEND_RESOURCE -> {
                 CanHit mover = TriggerTargets.resolveTarget(effect, ctx);
                 String movedId = effect.getResource();
                 int before = resourceAmount(battle, mover, movedId);
@@ -700,7 +705,7 @@ public final class TriggerInterpreter {
             // "该额外回合开始时，【美学底本】获得 30 点【好活当赏】…额外回合结束时移除" (1503 Pearl (真珠)'s ultimate): the
             // inverse of a temporary grant. Deliberately NOT `SPEND_RESOURCE`, which is a strict cost that errors when
             // the pool is short - a revocation has to clamp instead, because this pool is meant to be consumed.
-            case "REMOVE_RESOURCE" -> {
+            case REMOVE_RESOURCE -> {
                 CanHit mover = TriggerTargets.resolveTarget(effect, ctx);
                 String movedId = effect.getResource();
                 int removed = removeResource(effect, ctx, mover);
@@ -709,7 +714,7 @@ public final class TriggerInterpreter {
             // "真珠回合开始时重置可获得【好活当赏】数量" (1503 Pearl (真珠)'s trace): starts a new round for the per-round
             // allowances that `max_per_round` charges against. Nothing about the COUNTER changes - only what this round
             // may still hand out.
-            case "RESET_RESOURCE_CAP" -> {
+            case RESET_RESOURCE_CAP -> {
                 CanHit resetOwner = ctx.owner();
                 if (resetOwner != null) {
                     resetOwner.getResources().resetRoundAllowances();
@@ -717,13 +722,13 @@ public final class TriggerInterpreter {
             }
             // "将触发【头号补给盲盒】的固定概率重置为初始值" (1506's 崩坏级伤害演示): the decaying probability goes back to the
             // rule's own `chance`, so the next firing rolls the initial number again.
-            case "RESET_RULE_CHANCE" -> {
+            case RESET_RULE_CHANCE -> {
                 CanHit chanceOwner = ctx.owner();
                 if (chanceOwner != null) {
                     chanceOwner.resetRuleChance(effect.getRule().trim());
                 }
             }
-            case "DAMAGE" -> {
+            case DAMAGE -> {
                 // A list, like HEAL/SHIELD: "to all enemies" is one effect that reaches several units, and the
                 // engine settles one instance per victim (that is what a group attack is here).
                 // Note: `times` repeats the WHOLE settlement, and because resolveTargets is called INSIDE the outer
@@ -775,29 +780,29 @@ public final class TriggerInterpreter {
                     }
                 }
             }
-            case "MODIFY_ATTR" -> TriggerEffects.modifyAttr(battle, effect, ctx);
-            case "APPLY_BUFF" -> TriggerEffects.applyState(battle, effect, ctx);
-            case "REMOVE_STACK" -> TriggerEffects.removeStacks(battle, effect, ctx);
-            case "MODIFY_DAMAGE_TAKEN" -> modifyDamageTaken(battle, effect, ctx);
-            case "BOOST_DAMAGE" -> boostDamage(effect, ctx);
-            case "ADD_DAMAGE" -> TriggerEffects.addDamageFlat(effect, ctx);
-            case "DISPEL" -> TriggerEffects.dispel(battle, effect, ctx);
-            case "REMOVE_BUFF" -> TriggerEffects.removeBuffs(battle, effect, ctx);
-            case "REPLACE_SKILL" -> TriggerEffects.replaceSkill(battle, effect, ctx);
-            case "TICK_DOT" -> TriggerEffects.tickDot(battle, effect, ctx);
-            case "REMOVE_STATE" -> TriggerEffects.removeState(effect, ctx);
-            case "TAUNT" -> TriggerEffects.taunt(battle, effect, ctx);
-            case "APPLY_CONTROL" -> TriggerEffects.applyControl(battle, effect, ctx);
-            case "APPLY_DOT" -> TriggerEffects.applyDot(battle, effect, ctx);
-            case "EXTEND_BUFF" -> TriggerEffects.extendBuff(battle, effect, ctx);
-            case "RESIST_DEBUFF" -> resistDebuff(battle, effect, ctx);
-            case "MODIFY_RULE" -> modifyRule(effect, ctx);
-            case "RAISE_SKILL_LEVEL" -> raiseSkillLevel(effect, ctx);
-            case "RAISE_SKILL_HITS" -> raiseSkillHits(effect, ctx);
-            case "START_COUNTDOWN" -> startCountdown(battle, effect, ctx);
-            case "ADD_STACK" -> TriggerEffects.addStack(battle, effect, ctx);
-            case "SPEND_STEPS" -> spendSteps(effect, ctx);
-            case "CONSUME_HP" -> {
+            case MODIFY_ATTR -> TriggerEffects.modifyAttr(battle, effect, ctx);
+            case APPLY_BUFF -> TriggerEffects.applyState(battle, effect, ctx);
+            case REMOVE_STACK -> TriggerEffects.removeStacks(battle, effect, ctx);
+            case MODIFY_DAMAGE_TAKEN -> modifyDamageTaken(battle, effect, ctx);
+            case BOOST_DAMAGE -> boostDamage(effect, ctx);
+            case ADD_DAMAGE -> TriggerEffects.addDamageFlat(effect, ctx);
+            case DISPEL -> TriggerEffects.dispel(battle, effect, ctx);
+            case REMOVE_BUFF -> TriggerEffects.removeBuffs(battle, effect, ctx);
+            case REPLACE_SKILL -> TriggerEffects.replaceSkill(battle, effect, ctx);
+            case TICK_DOT -> TriggerEffects.tickDot(battle, effect, ctx);
+            case REMOVE_STATE -> TriggerEffects.removeState(effect, ctx);
+            case TAUNT -> TriggerEffects.taunt(battle, effect, ctx);
+            case APPLY_CONTROL -> TriggerEffects.applyControl(battle, effect, ctx);
+            case APPLY_DOT -> TriggerEffects.applyDot(battle, effect, ctx);
+            case EXTEND_BUFF -> TriggerEffects.extendBuff(battle, effect, ctx);
+            case RESIST_DEBUFF -> resistDebuff(battle, effect, ctx);
+            case MODIFY_RULE -> modifyRule(effect, ctx);
+            case RAISE_SKILL_LEVEL -> raiseSkillLevel(effect, ctx);
+            case RAISE_SKILL_HITS -> raiseSkillHits(effect, ctx);
+            case START_COUNTDOWN -> startCountdown(battle, effect, ctx);
+            case ADD_STACK -> TriggerEffects.addStack(battle, effect, ctx);
+            case SPEND_STEPS -> spendSteps(effect, ctx);
+            case CONSUME_HP -> {
                 // Note: The share vocabulary is the HEAL/SHIELD one, not the modifier one: "consume HP equal to 30% of Blade (刃)'s Max HP"
                 // is `owner_max_hp`, which derivedMagnitude refuses (it names an ATTRIBUTE).
                 for (CanHit spender : TriggerTargets.resolveTargets(battle, effect, ctx)) {
@@ -810,17 +815,17 @@ public final class TriggerInterpreter {
                     }
                 }
             }
-            case "BOOST_TOUGHNESS" -> TriggerEffects.boostToughness(battle, effect, ctx);
-            case "SUPER_BREAK" -> TriggerEffects.superBreak(battle, effect, ctx);
-            case "APPLY_REGEN" -> TriggerEffects.applyRegen(battle, effect, ctx);
-            case "REGISTER_HEAL_BONUS" -> registerHealBonus(effect, ctx);
-            case "SUMMON" -> battle.summonMemosprite(TriggerMagnitudes.requireCharacterOwner(effect, ctx));
-            case "COMMAND_SUMMON" -> TriggerEffects.commandSummon(battle, effect, ctx);
-            case "CAST_SKILL" -> TriggerEffects.castSkill(battle, effect, ctx);
-            case "SUMMON_SERVANT" -> battle.summonServant(TriggerMagnitudes.requireCharacterOwner(effect, ctx));
-            case "DELEGATE_DAMAGE" -> delegateDamage(effect, ctx);
+            case BOOST_TOUGHNESS -> TriggerEffects.boostToughness(battle, effect, ctx);
+            case SUPER_BREAK -> TriggerEffects.superBreak(battle, effect, ctx);
+            case APPLY_REGEN -> TriggerEffects.applyRegen(battle, effect, ctx);
+            case REGISTER_HEAL_BONUS -> registerHealBonus(effect, ctx);
+            case SUMMON -> battle.summonMemosprite(TriggerMagnitudes.requireCharacterOwner(effect, ctx));
+            case COMMAND_SUMMON -> TriggerEffects.commandSummon(battle, effect, ctx);
+            case CAST_SKILL -> TriggerEffects.castSkill(battle, effect, ctx);
+            case SUMMON_SERVANT -> battle.summonServant(TriggerMagnitudes.requireCharacterOwner(effect, ctx));
+            case DELEGATE_DAMAGE -> delegateDamage(effect, ctx);
             default -> throw new IllegalStateException(
-                    "Op '" + op + "' passed validation but has no implementation");
+                    "Op '" + op + "' reached the dispatcher without an arm");
         }
     }
 
