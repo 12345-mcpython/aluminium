@@ -42,10 +42,9 @@ public class ClassResistBuff extends AbstractBuff {
      */
     public ClassResistBuff(DebuffClass kind, double percent, int turns, boolean permanent) {
         super(turns, false, permanent);
-        if (kind == null) {
-            throw new IllegalArgumentException(
-                    "ClassResistBuff needs a class: it says WHICH family of states it resists");
-        }
+        // A null class means 「任意负面状态」 (1409's 小伊卡 is 「免疫负面效果」 with no family named) - NOT the old
+        // "missing field" failure: the loader lets ONLY `RESIST_DEBUFF` omit `kind`, and every other op still
+        // requires one, so a null here is a deliberate spelling rather than a typo slipping through.
         // `!(percent > 0)` rather than `percent <= 0`: it also rejects NaN, and a resistance of exactly 0 is a buff
         // that provably does nothing (the rule that stated it would be a rule with no effect).
         if (!(percent > 0) || percent > 1) {
@@ -119,6 +118,7 @@ public class ClassResistBuff extends AbstractBuff {
 
     @Override
     public String toString() {
-        return "ClassResistBuff[" + kind.value() + " " + (percent * 100) + "%, " + remainingDuration + "t]";
+        return "ClassResistBuff[" + (kind == null ? "any" : kind.value()) + " " + (percent * 100) + "%, "
+                + remainingDuration + "t]";
     }
 }

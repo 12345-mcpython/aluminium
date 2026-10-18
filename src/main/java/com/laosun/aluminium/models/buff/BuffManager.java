@@ -267,19 +267,17 @@ public class BuffManager {
      * are two boosts to one probability rather than two independent rolls. {@code 1.0} means immunity - the same
      * mechanism at its limit, which is how "免疫控制类负面状态" and "抵抗…的概率提高35%" end up sharing one vocabulary.
      *
-     * <p>Note: A {@code null} class (a state nobody classified) answers {@code 0}: it is not protected by any class
-     * resistance, which is the safe direction for content.
+     * <p>Note: A resistance whose own class is {@code null} covers <b>every</b> incoming state, including one nobody
+     * classified (a stat-down, a vulnerability). That is 1409's 小伊卡: 「免疫负面效果」 with no family named. The old
+     * answer - "a null class is not protected by anything" - was exactly the hole such a state fell through.
      *
-     * @param kind the family being applied, or {@code null}
+     * @param kind the family being applied, or {@code null} for a state that belongs to none
      * @return the resistance fraction in {@code [0, 1]}
      */
     public double debuffResistOf(com.laosun.aluminium.enums.DebuffClass kind) {
-        if (kind == null) {
-            return 0;
-        }
         double total = 0;
         for (ClassResistBuff resist : allBuffsOf(ClassResistBuff.class)) {
-            if (resist.getKind() == kind) {
+            if (resist.getKind() == null || resist.getKind() == kind) {
                 total += resist.getPercent();
             }
         }

@@ -1991,12 +1991,7 @@ public final class TriggerInterpreter {
      */
     private static void resistDebuff(Battle battle, EffectSpec effect, TriggerContext ctx) {
         DebuffClass kind = DebuffClass.fromString(effect.getKind());
-        if (kind == null) {
-            throw new IllegalStateException(
-                    "RESIST_DEBUFF ran with kind '" + effect.getKind() + "'; the loader validates it against "
-                            + "DebuffClass (" + String.join(" / ", DebuffClass.names())
-                            + "), so this is an engine fault");
-        }
+        // kind may be absent: RESIST_DEBUFF without a class means ANY negative state (1409s immunity clause).
         boolean permanent = TriggerLifetimes.unticked(effect);
         int turns = permanent ? TriggerEffects.UNBOUNDED_DURATION_PLACEHOLDER : effect.getTurns();
         for (CanHit target : TriggerTargets.resolveTargets(battle, effect, ctx)) {

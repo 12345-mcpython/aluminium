@@ -240,9 +240,12 @@ public class DebuffResistTest {
 
     @Test
     public void theClassMustBeOneTheDocumentsName() {
-        IllegalArgumentException missing = Assertions.assertThrows(IllegalArgumentException.class,
-                () -> tableOf(resistEffect(null, 0.35, 1, null)));
-        Assertions.assertTrue(missing.getMessage().contains("kind"), missing.getMessage());
+        // CORRECTED (2026-10-18): omission used to be refused here. It is now MEANINGFUL for RESIST_DEBUFF --
+        // 「免疫负面效果」 (1409's 小伊卡) names no family, and a null class covers every family INCLUDING the states
+        // that belong to none. What must still fail is a class the documents do not name (the case below), which is
+        // the misspelling this check exists to catch.
+        Assertions.assertDoesNotThrow(() -> tableOf(resistEffect(null, 0.35, 1, null)),
+                "a RESIST_DEBUFF with no kind is the any-family spelling");
 
         IllegalArgumentException unknown = Assertions.assertThrows(IllegalArgumentException.class,
                 () -> tableOf(resistEffect("debuff", 0.35, 1, null)));
