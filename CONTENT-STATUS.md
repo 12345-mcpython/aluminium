@@ -10,6 +10,7 @@
 | 类   | id   | 名称   | 依据                                                                                                                                                                                      |
 |------|------|--------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | 角色 | 1001 | 三月七 | 逐句对账 13 处从句；16 条规则均有 id + note；判据 March7thKitTest / March7thLevelTest / March7thTraceStatsTest / March7thTechniqueTest / March7thFreezeDotTest（后者变异 ULTRA:3→2 会红） |
+| 角色 | 1409 | 风堇 | 战技治疗两半（全体 + 小伊卡自己）、终结技治疗与天赋增伤读行、星魂6 光环覆盖后登场者、「免疫负面效果」= 任意负面状态（新开引擎口径）；每块都有判据，变异验证逐条做过 |
 
 （光锥与遗器： **暂无**。它们还没有逐个审过。）
 
@@ -95,7 +96,7 @@
 | 1406 | 赛飞儿                        | 未完全实现 | 有内容文件；**未逐句核**                                                                                                                                                                  |
 | 1407 | 遐蝶                          | 未完全实现 | 有内容文件；**未逐句核**                                                                                                                                                                  |
 | 1408 | 白厄                          | 未完全实现 | 有内容文件；**未逐句核**                                                                                                                                                                  |
-| 1409 | 风堇 | 未完全实现 | ① 星魂6 光环「之后登场」**已补** ✓（`eidolon_six_aura_covers_later_arrivals`，判据 `HyacineEidolonSixLateSummonTest`，变异删规则会红）；② 免疫：两条 `RESIST_DEBUFF` 已覆盖引擎**全部两档**（CONTROL / DOT）—— 真正没覆盖的是**不带类别**的负面 buff（`debuffClass()` 为 null），缺「按 `is_debuff` 兜底」的引擎口径（登记）；③ 战技治疗：**小伊卡自己那一半（#3/#4）已补** ✓（`the_skill_also_heals_ikachi_itself`，判据 `HyacineIkachiSelfHealTest`，变异删规则会红）；**「我方全体」那半仍未** —— `Restore` 只治调用方传进来的目标；④ 终结技治疗与天赋每层增伤**已改成读行** ✓（判据 `HyacineRowLevelTest`，变异回字面量时 E3/E5 两条红）|
+| 1409 | 风堇 | **完全实现** | 原文四块逐句核过，四道闸门绿：① 星魂6 光环「之后登场」已补（`eidolon_six_aura_covers_later_arrivals`，判据 `HyacineEidolonSixLateSummonTest`）；② 「免疫负面效果」= `RESIST_DEBUFF` **不写 kind**（任意负面状态，含不带类别者）—— 为此开了引擎口径：`ClassResistBuff` 允许 null 类别、`BuffManager.debuffResistOf` 不再对 null 早退，判据 `BuffAnyClassResistTest`（变异去掉 `kind == null` 分支即红）；③ 战技治疗两半：**我方全体**（`the_skill_heals_every_ally`，`skill_effects.json` 1409/2 改 `Rules`）+ **小伊卡自己**（`the_skill_also_heals_ikachi_itself`），判据 `HyacineSkillHealsTheWholePartyTest` / `HyacineIkachiSelfHealTest`（各自变异删规则即红）；④ 终结技治疗与天赋每层增伤读行（`ULTRA:0/1`+`ULTRA:5/6`、`TALENT:2`），判据 `HyacineRowLevelTest` 钉 E0 与 E3/E5 两端 |
 | 1410 | 海瑟音                        | 未完全实现 | 有内容文件；**未逐句核**                                                                                                                                                                  |
 | 1412 | 刻律德菈                      | 未完全实现 | 有内容文件；**未逐句核**                                                                                                                                                                  |
 | 1413 | 长夜月                        | 未完全实现 | 忆灵技1「每有 4 点【亿质】额外造成 5%」；「长夜」强化普攻（数据槽 8）在 skills.json 里缺失                                                                                                |

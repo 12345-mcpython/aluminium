@@ -512,6 +512,24 @@
     },
     {
       "on": "SKILL_CAST",
+      "id": "the_skill_heals_every_ally",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "HEAL",
+          "scale": "owner_max_hp",
+          "percent_from_skill_param": "SKILL:0",
+          "amount_from_skill_param": "SKILL:1",
+          "target": "all_allies"
+        }
+      ],
+      "source": "1409 风堇 战技 疗愈世间的晨曦：「为我方**全体**目标回复等同于风堇 #1% 生命上限 + #2 的生命值」——「全体」这一半",
+      "note": "「为我方**全体**目标回复」⇒ `target: all_allies` ✓ —— 这一半以前由 `skill_effects.json` 的 `Restore` 交付，而 `Restore` 只治**调用方传进来的目标**（演示与判据都只传一个）⇒ 范围其实只有一人 ✗。现在数据侧声明 `Rules`（本发不由数据交付），范围与数值都归这条规则：读她战技自己的行（`SKILL:0` / `SKILL:1`，Lv10 = `0.08` / `160`）✓。⚠ 忆灵**也在** `allies` 里 ⇒ 小伊卡会先吃这一发、再吃它自己那条（`the_skill_also_heals_ikachi_itself`，`#3`/`#4`）✓，与原文两句相加一致。判据 `HyacineSkillHealsTheWholePartyTest`。"
+    },
+    {
+      "on": "SKILL_CAST",
       "id": "the_skill_also_heals_ikachi_itself",
       "when": [
         "actor == self",

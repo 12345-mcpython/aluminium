@@ -42,16 +42,19 @@ public class HyacineIkachiSelfHealTest {
 
         // Leave room for the heal on BOTH sides, so the amount is what the rule delivers and not the cap.
         ally.consumeHp(ally.getMaxHp() * 0.5);
-        ika.consumeHp(ika.getMaxHp() * 0.9);  // keep the heal below its own cap: 0.10 x her max HP + 200 exceeds 10% of ika max HP
+        // It receives BOTH halves now: 「我方全体」 (0.08/160) and 「为小伊卡」 (0.10/200). Leave nearly all of its
+        // bar empty so two heals fit under its own cap.
+        ika.consumeHp(ika.getMaxHp() * 0.98);
         double herMaxHpBefore = hyacine.getMaxHp();
         double ikaBefore = ika.getCurrentHp();
 
         SkillExecutor.execute(battle, hyacine.getSkills().get(SkillType.SKILL), hyacine, List.of(ally));
         battle.processRequests();
 
-        double expected = SHARE_AT_LV10 * herMaxHpBefore + FLAT_AT_LV10;
+        // Both clauses land on it: it is 我方一员 (0.08/160) AND the one 「为小伊卡」 names (0.10/200).
+        double expected = (0.08 + SHARE_AT_LV10) * herMaxHpBefore + 160 + FLAT_AT_LV10;
         Assertions.assertEquals(expected, ika.getCurrentHp() - ikaBefore, Math.max(1e-6, expected * 1e-9),
-                "「为小伊卡回复等同于风堇 #3% 生命上限 + #4」 at Lv10 = 0.10 x " + herMaxHpBefore + " + 200");
+                "「为小伊卡回复 #3% + #4」 on top of 「我方全体 #1% + #2」 at Lv10 = 0.18 x " + herMaxHpBefore + " + 360");
     }
 
 }
