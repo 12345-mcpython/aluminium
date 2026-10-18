@@ -113,6 +113,11 @@ final class TriggerMagnitudes {
         if (scale.startsWith(TriggerTable.HOLDER_ATTR_PREFIX)) {
             return derivedMagnitude(effect, ctx);
         }
+        // ? One of the OWNER's own counters, as the base of a damage instance (`self_resource:<id>`). Reader: 1409
+        // Hyacine (风堇)'s 忆灵技1 - 「造成等同于本场战斗风堇与小伊卡累计治疗数值 #1% 的风属性伤害」.
+        if (scale.startsWith(TriggerInterpreter.SELF_RESOURCE_PREFIX)) {
+            return selfResourceOf(scale, ctx) * share + flat;
+        }
         // ? A Max HP share: "deal damage equal to X% of Max HP" -- 16 documents state it. `owner_max_hp` is the attacker's own, `target_max_hp` the
         // victim's, which is why the victim is passed in. These are not `self_attr:` names, so they are handled before the attribute reader.
         switch (scale) {
@@ -345,6 +350,11 @@ final class TriggerMagnitudes {
             }
             return percent * ctx.battle().partyResourceValue(counter);
         }
+        // A share of one of the OWNER's own counters (reader: 1409 Hyacine (风堇) 忆灵技1 - the damage is a share of
+        // 「本场战斗风堇与小伊卡累计治疗数值」, and the same sentence clears a share of it).
+        if (key.startsWith(TriggerInterpreter.SELF_RESOURCE_PREFIX)) {
+            return percent * selfResourceOf(key, ctx);
+        }
         if ("target_max_hp".equals(key)) {
             CanHit victim = ctx.target();
             if (victim == null) {
@@ -366,6 +376,46 @@ final class TriggerMagnitudes {
                     "a ceiling scales off " + attribute + ", which " + owner.getName() + " has no resolved value for");
         }
         return percent * value.get();
+    }
+
+    /**
+     * The value of the counter a {@code self_resource:&lt;id&gt;} scale names.
+     *
+     * <p><b>Whose counter.</b> The <b>rule owner's</b> - the same subject {@code self_attr:} and
+     * {@code self_attr_above:} read. That is the whole distinction from {@code party_resource:}, which lives on the
+     * {@code Battle} because it is shared by the side.
+     *
+     * <p><b>Why a missing counter is loud.</b> A counter that answers 0 turns "deal 28% of the tally" into "deal 0",
+     * which is a wrong number with no symptom - the rule still fires, the log still looks healthy. The alternative
+     * spelling (a party counter) is checked the same way, for the same reason.
+     *
+     * @param scale the full scale spelling (one of the two readers passes it in already trimmed)
+     * @param ctx   the context the counter is read from
+     * @return the counter's current value
+     */
+    static double selfResourceOf(String scale, TriggerContext ctx) {
+        String counter = scale.trim().substring(TriggerInterpreter.SELF_RESOURCE_PREFIX.length()).trim();
+        if (counter.isEmpty()) {
+            throw new IllegalStateException(
+                    "a scale reads '" + scale + "', which names no counter; write the id of one of the rule owner's"
+                            + " resources, e.g. \"" + TriggerInterpreter.SELF_RESOURCE_PREFIX + "小伊卡累计治疗\"");
+        }
+        CanHit owner = ctx == null ? null : ctx.owner();
+        if (owner == null) {
+            throw new IllegalStateException(
+                    "the scale '" + scale + "' reads the rule owner's own counter, and this rule was evaluated"
+                            + " without an owner to read it from");
+        }
+        if (owner.getResources() != null && owner.getResources().has(counter)) {
+            return owner.getResources().value(counter);
+        }
+        if (ctx.battle() != null && ctx.battle().partyResource(counter) != null) {
+            return ctx.battle().partyResourceValue(counter);
+        }
+        throw new IllegalStateException(
+                "the scale '" + scale + "' reads '" + counter + "', which " + owner.getName()
+                        + " does not own and no party counter declares; a counter that answers 0 would be a wrong"
+                        + " number with no symptom");
     }
 
     /**
@@ -785,6 +835,14 @@ final class TriggerMagnitudes {
                     effect.getPercent() == null ? 1 : effect.getPercent(), ctx)
                     + constantTerm(effect, ctx);
         }
+        // A share of one of the OWNER's counters (reader: 1409 Hyacine (风堇) 忆灵技1's damage and its "clear half of
+        // it"). Routed through `resolveScale` for the same reason the party counter above is: that reader is where
+        // "share x a counter" lives, and a second copy here is where the two would drift.
+        if (effect.getScale().trim().startsWith(TriggerInterpreter.SELF_RESOURCE_PREFIX)) {
+            return resolveScale(effect.getScale(),
+                    effect.getPercent() == null ? 1 : effect.getPercent(), ctx)
+                    + constantTerm(effect, ctx);
+        }
         if (TriggerInterpreter.SELF_MAX_ENERGY.equals(effect.getScale().trim())) {
             // "for each 1 point above" where the points are MAX ENERGY: the same derived shape, off a value the attribute
             // table has no slot for (see the `self_max_energy` condition variable).
@@ -862,6 +920,7 @@ final class TriggerMagnitudes {
         if (TriggerInterpreter.SELF_MAX_ENERGY.equals(raw) || TriggerInterpreter.EVENT_AMOUNT.equals(raw) || raw.startsWith(TriggerInterpreter.ABOVE_PREFIX)
                 || raw.startsWith(TriggerInterpreter.STEPS_PREFIX)
                 || raw.startsWith("party_resource:") || raw.startsWith(TriggerTable.HOLDER_ATTR_PREFIX)
+                || raw.startsWith(TriggerInterpreter.SELF_RESOURCE_PREFIX)
                 || TriggerInterpreter.COUNTED_LAUGHS.equals(raw) || "elation_base".equals(raw)) {
             // `holder_attr:` joins them for the same reason `summon_attr:`/`actor_attr:` are not here: it names a
             // SUBJECT, and the magnitude is read from that subject's attribute by its own branch of

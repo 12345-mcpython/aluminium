@@ -1567,6 +1567,24 @@ public final class TriggerInterpreter {
      * energy cap - and, like it, not an {@code AttributeType}.
      */
     static final String ABOVE_PREFIX = "self_attr_above:";
+
+    /**
+     * {@code self_resource:<id>} - a share of <b>one of the rule owner's own counters</b> (its {@code self_resource:} is:
+     * the counter belongs to the unit the sentence is about, not to the battle).
+     *
+     * <p><b>Why it had to exist.</b> A counter could already be GAINED, SPENT and read in a <b>condition</b>
+     * ({@code self_resource:X >= 1}), and a battle-PARTY counter could already be a magnitude
+     * ({@code party_resource:X}) - but there was no spelling for "the damage is X% of <b>this unit's</b> counter".
+     * The reader is 1409 Hyacine (风堇)'s 忆灵技1: 「造成等同于<b>本场战斗风堇与小伊卡累计治疗数值</b> #1% 的风属性伤害并清空
+     * 累计治疗数值的 <b>50%</b>」- the same spelling also buys the "clear half of it" half, because a share of a counter is
+     * exactly what {@code percent} means on a {@code scale} ({@code scale: self_resource:tally, percent: 0.5} on
+     * {@code REMOVE_RESOURCE}).
+     *
+     * <p>⚠ Not an {@link com.laosun.aluminium.enums.AttributeType}: the question "which attribute does this name" has no
+     * answer, which is why every reader returns before the attribute family (see
+     * {@link com.laosun.aluminium.models.trigger.TriggerMagnitudes}).
+     */
+    static final String SELF_RESOURCE_PREFIX = "self_resource:";
     /**
      * {@code steps:<COUNTER>:<N>} - "every N points of a counter", as the number of WHOLE steps: {@code floor(value / N)}.
      *
