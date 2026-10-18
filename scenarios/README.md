@@ -126,6 +126,28 @@ boss（Lv100 + 模板 210 会给出 1200，与反解的 786 不符 ⇒ 存在 DE
 ② 忆灵/随从的**面板**（`ByMaxHP` 用的是**忆灵自己**的生命上限，不是角色的 `MaxHP`，捕获的 `allies` 里没有它）；
 ③ 64 条事件的目标不在 `enemies` 表里（`target_max_hp` 对不上任何一只）⇒ 目标面板缺失。
 
+### 第二份整场捕获（`veritas_capture_2026-10-18T07-20-25-672Z.json`）：它补上了缺的两样
+
+同一场战斗的更早一份捕获缺"每条事件的有效 DEF"与"忆灵面板"，这一份**都补上了**：
+
+| 新增 | 内容 |
+|---|---|
+| `zones.target_defence` / `target_base_defence` / `target_defence_added_ratio` / `target_level` | **逐条事件的目标防御与等级**（不必再反解） |
+| `allies` 的 `kind: "Avatar"` / `kind: "Servant"` | **忆灵也有自己的面板**（`Attack` / `MaxHP` / `CurrentHP` / `Defence`），并与主人共享 `Defence`，可据此配对 |
+
+用它复核的结果：
+
+| 项目 | 结果 |
+|---|---|
+| 真实伤害（`type: "True"`） | 76 条，`damage == damage_value` **全部逐位相等** ✓ |
+| 基数已完整给出的事件（`damage_value` 且 `damage_percentage` 缺省、非真实伤害） | 27 条 |
+| 其中**重建到 6e-10** 的 | 4 条（战斗开局、目标满血、`all_damage_type_taken_ratio 0.18`、DEF 1150）✓ |
+| 其余 23 条 | 重建值**系统性偏低**，偏差在**每组 4 条内恒定、组间单调增长**：1.1725 → 1.1874 → 1.2263 → 1.2385 → 1.2426 → 1.2509 → 1.2679 → 1.2722 |
+
+⚠ 那 23 条的偏差**在 `zones` 里找不到对应字段**（同组事件的 `vuln` / `crit` / `baseMul` / 增伤 / 抗性 / DEF 全相同，组内目标血量 0%–72% 变化也不影响偏差）⇒ 缺的是一个**随时间增长的伤害加成**，最可能是**贪饕/污染**的战斗侧增益（这场是 `gluttony_level: 3`，敌人带 `MCommon_Gluttony_LV3` / `MCommon_Gluttony_DirtyHp`，且 `dirty_hp_ratio 0.75` + `split_source: 上限压制` —— 正是 HSR.md §9 的那套机制）。
+
+⇒ 要让这 23 条也精确复算，还需要：**每条事件的战斗侧加成**（贪饕/压制/其它随时间变化的增益），或至少把那个加成作为 `zones` 的一行给出来。
+
 ### 为什么需要 `attributes` 覆盖
 
 引擎的面板 = `character_data` + 晋阶 + 行迹，**没有光锥/遗器**。原游戏的数来自某个具体面板，所以比较时必须把那个面板的
