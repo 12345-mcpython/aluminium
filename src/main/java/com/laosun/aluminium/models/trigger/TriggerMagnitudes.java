@@ -575,6 +575,25 @@ final class TriggerMagnitudes {
         return delta == null ? 0 : delta;
     }
 
+    /**
+     * The magnitude an effect states, read the one way: a share (literal, from a skill row, ...) or a derived product
+     * ({@code percent x scale + amount}), or a flat {@code amount}.
+     *
+     * <p>Why it exists: the instance-level {@code MODIFY_ATTR} branch read {@code effect.getPercent()} alone, so a rule
+     * that stated its number as {@code amount + percent x scale} - 1512's 【Fever】 aura, "ignore (15% + 0.5% per
+     * 气氛值) of DEF" - applied only the {@code percent} (0.5%) and silently dropped both the base and the gauge.
+     * Measured: the settled {@code DefenceArea} moved by 0.5% at every gauge value, from 0 to 50.
+     */
+    static double magnitudeOf(EffectSpec effect, TriggerContext ctx) {
+        boolean scaled = effect.getScale() != null && !effect.getScale().isBlank();
+        if (statesShare(effect)) {
+            return scaled || effect.getPercent() == null
+                    ? derivedMagnitude(effect, ctx)
+                    : shareOf(effect, ctx);
+        }
+        return effect.getAmount() == null ? 0.0 : effect.getAmount();
+    }
+
     static double derivedMagnitude(EffectSpec effect, TriggerContext ctx) {
         // A share with NO scale: the magnitude IS the share (plus any constant term) - for EVERY share spelling.
         //
