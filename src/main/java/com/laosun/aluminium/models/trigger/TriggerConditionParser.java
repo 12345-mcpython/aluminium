@@ -2077,7 +2077,7 @@ final class TriggerConditionParser {
      * no symptom this project refuses. (In a shipped character that state is impossible: the assembly point
      * refuses a rule that reads a resource its character never declares.)
      */
-    static final String SELF_RESOURCE_PREFIX = "self_resource:";
+    static final String SELF_RESOURCE_PREFIX = com.laosun.aluminium.models.trigger.TriggerInterpreter.SELF_RESOURCE_PREFIX;
 
     /**
      * A resource read off the rule owner's <b>summon</b> (1141526's [故事], which the sentence puts on the memosprite: "使德谬歌获得 1 点[故事]").

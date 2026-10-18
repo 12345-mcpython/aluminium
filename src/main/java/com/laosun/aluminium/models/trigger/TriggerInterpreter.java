@@ -1606,6 +1606,12 @@ public final class TriggerInterpreter {
      * {@link com.laosun.aluminium.models.trigger.TriggerMagnitudes}).
      */
     static final String SELF_RESOURCE_PREFIX = "self_resource:";
+
+    /**
+     * {@code party_resource:<id>} - a share of a counter that belongs to the SIDE, so it lives on the {@code Battle}.
+     * The sibling of {@link #SELF_RESOURCE_PREFIX}: same arithmetic, different owner.
+     */
+    static final String PARTY_RESOURCE_PREFIX = "party_resource:";
     /**
      * {@code steps:<COUNTER>:<N>} - "every N points of a counter", as the number of WHOLE steps: {@code floor(value / N)}.
      *

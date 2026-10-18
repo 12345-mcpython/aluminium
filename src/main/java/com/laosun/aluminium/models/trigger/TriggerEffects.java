@@ -491,7 +491,7 @@ final class TriggerEffects {
         // otherwise the loop would be a no-op dressed as a feature.
         int times = 1;
         if (Boolean.TRUE.equals(effect.getStackable())) {
-            if (effect.getScale() != null && effect.getScale().trim().startsWith("party_resource:")) {
+            if (effect.getScale() != null && effect.getScale().trim().startsWith(TriggerInterpreter.PARTY_RESOURCE_PREFIX)) {
                 times = Math.max(1, (int) Math.round(TriggerMagnitudes.resolveScale(effect.getScale(),
                         effect.getPercent() == null ? 1 : effect.getPercent(), ctx)));
             } else if (effect.getAmount() != null) {
