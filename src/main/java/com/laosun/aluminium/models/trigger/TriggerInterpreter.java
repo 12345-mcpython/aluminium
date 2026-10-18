@@ -2193,6 +2193,24 @@ public final class TriggerInterpreter {
      */
     private static void damage(Battle battle, EffectSpec effect, TriggerContext ctx, CanHit victim, int divisor) {
         CanHit attacker = ctx.owner();
+        // `"attacker": "summon"`: the sentence says the MEMOSPRITE deals it (1409's 忆灵技1: 「小伊卡对敌方全体造成…」).
+        // Everything downstream - which unit's damage-dealt buffs apply, whose ATK a row-based scale would read - follows
+        // this one choice, so it is resolved once here rather than patched per zone.
+        if (effect.getAttacker() != null && !effect.getAttacker().isBlank()) {
+            String named = effect.getAttacker().trim();
+            if (!"summon".equalsIgnoreCase(named)) {
+                throw new IllegalStateException("a DAMAGE states \"attacker\": \"" + named
+                        + "\", and the only subject this engine can name is \"summon\" (the rule owner's memosprite)");
+            }
+            CanHit owner = ctx.owner();
+            CanHit summon = owner == null || ctx.battle() == null ? null : ctx.battle().summonOf(owner);
+            if (summon == null) {
+                throw new IllegalStateException("a DAMAGE states \"attacker\": \"summon\", but " 
+                        + (owner == null ? "the rule has no owner" : owner.getName() + " has no summon on the field")
+                        + "; gate the rule with `self_summon_count >= 1` so it only fires while the memosprite is out");
+            }
+            attacker = summon;
+        }
         if (victim == null || victim.isDeath()) {
             return;
         }
