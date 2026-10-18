@@ -69,10 +69,10 @@ public class HyacineTest {
         // Two now as well: the summon, and the sky ode spending a layer on a SKILL_CAST.
         Assertions.assertEquals(2, table.ruleCount(TriggerEvent.SKILL_CAST),
                 "the summon rule the document states -- the heal still comes from the skill data, so no rule states it");
-        // Rank 6's aura, the trace's healing share on 小伊卡, and Rank 4's CRIT DMG on 小伊卡 -- all three have to wait
-        // for the memosprite to actually enter the field (see HyacineEidolonSixTest / HyacineWindstormTraceTest).
-        Assertions.assertEquals(3, table.ruleCount(TriggerEvent.SUMMONED),
-                "Rank 6's all-type RES PEN while 小伊卡 is out, plus the two memosprite halves that cannot be inherited");
+        // Rank 6's aura, the trace's healing share on 小伊卡, Rank 4's CRIT DMG on 小伊卡, and 忆灵技3's two energy
+        // clauses (15 on every arrival, 30 more on the first) -- all of them wait for the memosprite to enter the field.
+        Assertions.assertEquals(5, table.ruleCount(TriggerEvent.SUMMONED),
+                "Rank 6's RES PEN, the two memosprite halves that cannot be inherited, and 忆灵技3's 15 + first-time 30");
     }
 
     private static Random fixed() {
