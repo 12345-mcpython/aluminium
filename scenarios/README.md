@@ -91,6 +91,19 @@ gradlew run --args="compare"                     # 列出 scenarios/ 下的场�
 `MEquip_23042_AllDamageTypeTakenRatio` + `MServant_RobinSServant_00_DamageTakenAura`，把 0.75 减伤指到了
 `MonsterAllDamageReduce`。
 
+### 第二份捕获（`scenarios/capture-876170.json`）：三点各自验证一个乘区
+
+| 与第一份的差别 | 它证明了什么 |
+|---|---|
+| `attack_formula_type: 3`（**ByMaxHP**）＋ `damage_percentage 3.6` | 基数层是**生命上限 × 伤害百分比**（6576.99 × 3.6 = 23677.17），引擎侧由 `attacker.base` 承载 ✓ |
+| `all_damage_type_added_ratio 2.13` **与** `added_ratio.ice 0.3888` 分开给 | 两者进**同一个加性桶** ⇒ 增伤区 3.5188 ✓（引擎的 `ALL_DAMAGE_TYPE_BOOST` ＋ `ICE_DAMAGE_BOOST` ✓） |
+| `all_damage_reduce 0.1` 而目标 **CurrentStance 480/480（未击破）** | 那个 0.1 就是**韧性 10% 减伤** ⇒ 引擎自己的 `TOUGHNESS_DAMAGE_REDUCTION` 0.9 已经复现 ✓（不必再加减伤 buff）—— 与第一份「已击破 ⇒ 0.75 全来自 `MonsterAllDamageReduce`」互为印证 ✓ |
+| **目标 DEF 由游戏给出 = 1150** | 这是**唯一**一份 DEF 是游戏自己说出来的捕获 ⇒ 防御区 0.4651163 与引擎逐位吻合 ✓（也反过来说明第一份反解出的 786 是**关卡值**，不是表值） |
+
+两份的结果：**12 个乘区全部 0 误差**，最终值差 2.5e-4（相对 3e-10，float32 噪声）。
+
+⚠ 与第一份相同的两点仍成立：易伤 1.64 来自 `MServant_RobinSServant_00_DamageTakenAura` ＋ 光锥 23042；`penetrate 0.2` 抵消元素抗 0.2 ⇒ `net_resistance 0` ⇒ 抗性区 1.0 ✓。
+
 ⚠ **DEF 仍待补**：dump 只列了 modifier 的**名字**、没有 `Defence` 数值，而本仓库的 `monster_config.json` 里没有这位
 boss（Lv100 + 模板 210 会给出 1200，与反解的 786 不符 ⇒ 存在 DEF 侧修正，或它的模板 DEF 更低）。所以它是
 `target.attributes.DEFENCE` 的手工输入，等拿到 DEF 面板再换成数据。

@@ -1,0 +1,57 @@
+{
+  "name": "原游戏实测复算：1413 长夜月的 Servant 一击 876,170.2861（暴击，ByMaxHP）",
+  "note": "数值取自你给的第二份伤害事件。攻击者 1413 = 冰属性、Memory（记忆）命途，伤害由 Servant **11413**（Servant_EvernightServant_00）打出；目标 = W5_Ranger 系（MaxStance 480、DEF 1150、四系抗性 0.2、虚数抗 0.8）。★ 这份与第一份的三点不同，正好各自验证一个乘区：① `attack_formula_type: 3` = **ByMaxHP**（HSR.md §10.4）⇒ 基数层是**生命上限**，再 × `damage_percentage 3.6` ⇒ 引擎的 `base` = 6576.992629931704 × 3.6 = 23677.17348980522；② 元素增伤**分开给**：`all_damage_type_added_ratio 2.13` + `added_ratio.ice 0.38880301429890096` ⇒ 增伤区 = 3.518803016282618；③ `all_damage_reduce 0.1` 而目标**未击破**（CurrentStance 480/480）⇒ 那个 0.1 就是引擎的**韧性 10% 减伤**（`MonsterAllDamageReduce` 这里是 0），所以本场景**不**设 broken、也**不**加减伤 buff，让引擎自己的 0.9 生效。易伤仍来自 RobinSServant 光环 + 光锥 23042（1.64）；`penetrate 0.2` 抵消冰抗 0.2 ⇒ `net_resistance 0`。攻方用 1001 的普攻（冰、单体、单段）承载，`base` 反解 ATK。",
+  "attacker": {
+    "cid": 1001,
+    "level": 80,
+    "eidolon": 0,
+    "skill": "COMMON",
+    "skillLevel": 1,
+    "base": 23677.17348980522,
+    "attributes": {
+      "ALL_DAMAGE_TYPE_BOOST": 2.130000001983717,
+      "ICE_DAMAGE_BOOST": 0.38880301429890096,
+      "BASE_DAMAGE_MULTI_RATIO": 0.2500000002328306,
+      "CRIT_CHANCE": 1.0,
+      "CRIT_ATTACK": 6.61282241391018,
+      "DAMAGE_PENETRATION": 0.20000000018626451,
+      "FINAL_DAMAGE_BOOST": 0.0,
+      "COMBO_DAMAGE_BOOST": 0.0,
+      "BASIC_ATTACK_DAMAGE_BOOST": 0.0,
+      "SKILL_DAMAGE_BOOST": 0.0,
+      "DOT_DAMAGE_BOOST": 0.0
+    }
+  },
+  "target": {
+    "monsterId": 1002011,
+    "level": 90,
+    "attributes": {
+      "DEFENCE": 1149.9999,
+      "HEALTH": 50000000.0
+    },
+    "buffs": [
+      {
+        "kind": "vulnerable",
+        "value": 1.6400000005960464
+      }
+    ]
+  },
+  "crit": true,
+  "instance": 0,
+  "instances": 1,
+  "tolerance": 1e-6,
+  "expect": {
+    "base": 23677.17348980522,
+    "BoostArea": 3.518803016282618,
+    "FinalBoostArea": 1.0,
+    "ComboArea": 1.0,
+    "BaseMultiArea": 1.2500000002328306,
+    "MonsterTakenArea": 1.0,
+    "VulnerableArea": 2.6400000005960464,
+    "CritArea": 7.61282241391018,
+    "DefenceArea": 0.4651163007030838,
+    "ReductionArea": 0.8999999999068677,
+    "ResistArea": 1.0,
+    "final": 876170.2861033948
+  }
+}

@@ -33,6 +33,27 @@ public class DamageComparatorTest {
     }
 
     /**
+     * The two real game captures: both must reproduce, zone by zone.
+     *
+     * <p>They are worth keeping side by side because they exercise different halves of the chain:
+     * <ul>
+     *   <li>{@code capture-858483} - {@code ByAttack}, a boss that was <b>broken</b> (so its whole reduction is the
+     *       monster's own 0.75), no element boost, and the DEF supplied by reverse-engineering;</li>
+     *   <li>{@code capture-876170} - {@code ByMaxHP} with {@code damage_percentage 3.6}, a target that was <b>not</b>
+     *       broken (so its 0.1 reduction IS the toughness 10%), the element boost split from the all-type boost, and
+     *       <b>DEF given by the game</b> (1150) - the one capture where the defence zone is checked against a number
+     *       the game states rather than one derived from the total.</li>
+     * </ul>
+     */
+    @Test
+    public void bothRealCapturesReproduce() {
+        Assertions.assertEquals(0, DamageComparator.run("compare", "scenarios/capture-858483.json"),
+                "the ByAttack capture must compare cleanly");
+        Assertions.assertEquals(0, DamageComparator.run("compare", "scenarios/capture-876170.json"),
+                "the ByMaxHP capture must compare cleanly");
+    }
+
+    /**
      * A scenario that states a wrong number must fail - otherwise a typo in {@code expect} reads as a pass.
      */
     @Test
