@@ -586,9 +586,33 @@ HP_LOST 计数 = 0 ; HP_CONSUMED 计数 = 0   ← 两个事件都没发
 
 **判据**：`HyacineRainClearMaxHpTest` —— E0：涨 `1086.624 × 0.30 + 600`；E6：涨 `1086.624 × (0.33 + 0.50) + 600`，且 `skillLevel(ULTRA)` = 12/10 ✓。`HyacineTest` 的规则计数同步为 5（ULT_CAST）/ 2（BATTLE_START）。
 
-**仍登记**：① ~~固定项 600 字面量~~ **已落**（2026-10-18：引擎补了「份额 + 固定项」两条修饰，`amount_from_skill_param` 现在按**点数**加，Lv12 = 667.5 ✓）；② ~~忆灵技等级+1~~ **已落**（`memosprite: true` + `skill_id: 1`；1409 的忆灵技已在表上限 10，所以读数仍是 10，判据钉的是"改动落在召唤者的 bonus 上"）；③ 秘技【天气正好】**已落**（`technique_heals_and_raises_max_hp`：`BATTLE_START` + `self has_state 秘技`，`HEAL owner_max_hp 0.3+600` 与 `MODIFY_ATTR HEALTH 0.2` 两回合；判据 `HyacineTechniqueTest`）✓；④ 星魂5 **已落**（2026-10-18：`SKILL`/`TALENT` +2、忆灵槽 3/5/6 各 +1）；星魂 4（暴伤按超速）与星魂 6（抗性穿透、12% 阈值）仍未读未写；⑤ 星魂1/2（2026-10-18）：**+50% 实为星魂1**（原按星魂2 写，门从 2 改成 1）✓，并补「攻击后回 8% 生命上限」（`ALLY_ATTACK` + `HEAL owner_max_hp 0.08 target attacker`）✓；**星魂2 的速度修饰**已写（`HP_LOST` → `SPEED 30%` 2 回合）但 `takeDamage` 路径上**观测不到**（before==after），判据 `@Disabled` 登记待查；⑤ **4 件套 127 已经在 `relic_sets/127.json` 实现**（两条 `BASIC_ATTACK`/`SKILL_CAST` 规则，24%/24%/15%），不是缺口 —— 那一场它**没有生效**是因为 1415 没开大、德谬歌不在场（`self_summon_count >= 1` 不满足）✓；此前"未实现"的说法撤回。
+**仍登记**：① ~~固定项 600 字面量~~ **已落**（2026-10-18：引擎补了「份额 + 固定项」两条修饰，`amount_from_skill_param` 现在按**点数**加，Lv12 = 667.5 ✓）；② ~~忆灵技等级+1~~ **已落**（`memosprite: true` + `skill_id: 1`；1409 的忆灵技已在表上限 10，所以读数仍是 10，判据钉的是"改动落在召唤者的 bonus 上"）；③ 秘技【天气正好】**已落**（`technique_heals_and_raises_max_hp`：`BATTLE_START` + `self has_state 秘技`，`HEAL owner_max_hp 0.3+600` 与 `MODIFY_ATTR HEALTH 0.2` 两回合；判据 `HyacineTechniqueTest`）✓；④ 星魂5 **已落**（2026-10-18：`SKILL`/`TALENT` +2、忆灵槽 3/5/6 各 +1）；星魂 6 的**抗性穿透**已落（**§3.7l**）✓，它的**12% 阈值**那一半仍登记 ✓；星魂 4（暴伤按超速）**仍未写** ✗ —— 它改的是行迹【暴风停歇】，而那条行迹**本身也还没写** ✗（`self_attr_above:SPEED:200` + `max_points: 200` 两个词汇都在，缺的是先落行迹 ✓）；⑤ 星魂1/2（2026-10-18）：**+50% 实为星魂1**（原按星魂2 写，门从 2 改成 1）✓，并补「攻击后回 8% 生命上限」（`ALLY_ATTACK` + `HEAL owner_max_hp 0.08 target attacker`）✓；**星魂2 的速度修饰**已写（`HP_LOST` → `SPEED 30%` 2 回合）但 `takeDamage` 路径上**观测不到**（before==after），判据 `@Disabled` 登记待查；⑤ **4 件套 127 已经在 `relic_sets/127.json` 实现**（两条 `BASIC_ATTACK`/`SKILL_CAST` 规则，24%/24%/15%），不是缺口 —— 那一场它**没有生效**是因为 1415 没开大、德谬歌不在场（`self_summon_count >= 1` 不满足）✓；此前"未实现"的说法撤回。
 
 ---
+### 3.7l 已落：1409 星魂6 的「小伊卡在场时，我方全体抗性穿透 +20%」（**2026-10-18**）
+
+**为什么先落这一半**：星魂6 是两句话。后半「**小伊卡在场时**，我方全体目标的**全属性抗性穿透提高 20%**」用现成的 `DAMAGE_PENETRATION` + 现成的 `SUMMONED` 事件就能写完 ✓；前半「**清空累计治疗数值改为 12%**」改的是**忆灵技 1** 的结算（它的参数表 `[0.1…0.28, 0.5]` 里 `#2 = 0.5` 就是被改的那个 50% ✓），而那条忆灵技**本身还没有规则** ✗ ⇒ 无从改起 ✓（登记，不猜 ✓）。
+
+**修法**（`characters/1409.json`，一条规则）：`eidolon_six_gives_the_party_all_type_resistance_penetration`
+- `on: SUMMONED` + `min_eidolon: 6`；
+- `when: ["actor == summon", "self_summon_count >= 1"]`；
+- `MODIFY_ATTR DAMAGE_PENETRATION percent 0.2 permanent buff「天空应我的祈愿」target all_allies`。
+
+**三处口径（都是量过的，不是想当然）**：
+1. **门是事件，不是读盘事实** ✓ —— 写成 `BATTLE_START` 更省事，但那会在**第一回合**就给全队抗性穿透 ✗，而原文是「**小伊卡在场时**」✓ ⇒ 必须挂 `SUMMONED`（忆灵真的进入场地那一刻 ✓）。判据的第一句断言就是「召唤前读到 **0**」✓，它钉的正是这个门 ✓。
+2. **`actor == summon` 不能省** ✗ —— `SUMMONED` 对**两方**的召唤都发 ✓（敌人小怪登场也是 summon ✓），少了它，队友的忆灵登场也会给风堇的全队抗性穿透 ✗。
+3. **`all_allies` 取的是 `battle.allies` 阵营** ✓ —— 我方忆灵**也在里面** ✓，与「我方全体目标」含忆灵一致 ✓；判据同时读了主角、队友、**忆灵**三个单位 ✓。⚠ 顺带：「**全属性**抗性穿透」就是 `DAMAGE_PENETRATION` ✓ —— 它减的是**那一发已按元素取过**的抗性 ✓（`Battle` 抗性区），与 1303 阮•梅结界、1408、1412、1502 同一拼写 ✓；**不用** `RESISTANCE_REDUCTION` ✗（那是**受击方**的属性，这句的主语是**我方**）。
+
+**判据**：`HyacineEidolonSixTest`（2 例）——
+- E6：召唤前 `0`（门）✓；施放战技召唤后，风堇 / 队友 / 小伊卡各 `0.2` ✓；
+- E0：同样召唤后仍是 `0` ✓（这条规则就是星魂 6 本身）。
+
+**变异验证** ✓：把这条规则从 JSON 里摘掉 ⇒ `rankSixGives…` 在**第 50 行**（风堇那 0.2）红 ✓；恢复后 2 例全绿 ✓。
+
+**仍登记**：① 忆灵**离场后**这条光环不会自己撤下 ✗ —— 引擎没有「召唤物离场」事件，也没有按召唤物存续计时的 `ticks_on: "summon"`（与 1407 同一个缺口 ✓）；同理，**之后才登场的**别的忆灵不会补拿到它 ✓（形状是「每个单位身上一个修饰」，不是真光环 ✓）；② 星魂6 前半（12% 阈值）见上；③ **星魂 4** 仍未写 —— 它强化的是行迹【暴风停歇】，而那条行迹本身也还没写（`self_attr_above:SPEED:200` + `max_points: 200` 两个词汇都已存在，缺的是先把行迹落下 ✓）。
+
+---
+
 ### 3.8 数据文件速查
 
 | 文件 | 内容 | 已确认锚点 |
