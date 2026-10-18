@@ -759,7 +759,7 @@ HP_LOST 计数 = 0 ; HP_CONSUMED 计数 = 0   ← 两个事件都没发
 - `ADVANCE` op **不走** `advanceRequests` ✓ —— 它直接 `battle.queue.advanceActionByPercent(target, percent)` ✓（`TriggerInterpreter:675`）；
 - 于是 `advanceRequests` 这个 public 列表、`advanceRequest(...)`、`processAdvanceRequests()`、`AdvanceRequest` record，**全库没有任何一处会往里填** ✓（唯一的 `add` 就在 `advanceRequest` 自己里面 ✓，而它**没有调用者** ✗）⇒ 这是一条**空转的通道** ✓。
 
-**已做**：删掉这四个成员与 `processRequests()` 里那行调用 ✓（编译干净、824 套件 / 2814 用例全绿 ✓、demo **MATCH** ✓ 均无变化 —— 正因为它本来就是死的 ✓）。`skillRequests` **不动** ✓：它是 private 且被 `processSkillRequests()` 真正消费 ✓（名字像、性质完全不同 ✓）。
+**已做**：删掉这四个成员与 `processRequests()` 里那行调用 ✓（编译干净、全量测试**全绿** ✓、demo **MATCH** ✓ 均无变化 —— 正因为它本来就是死的 ✓）。`skillRequests` **不动** ✓：它是 private 且被 `processSkillRequests()` 真正消费 ✓（名字像、性质完全不同 ✓）。
 
 **教训**：「入口已经存在」这种判断**必须跟到调用点** ✓ —— 我只看到 `public void advanceRequest(...)` 就登记成可用，没有确认**谁会调它** ✗。同一个形状在这一轮出现了两次（另一次是把 `advanceRequests.size()` 当判据，跑出绿而其实什么也没测 ✓）⇒ **一个没有调用者的 public 方法，与被注释掉的代码等价** ✓。
 
