@@ -54,6 +54,10 @@ public class HyacineRainClearMaxHpTest {
                 "Rank 3: 「忆灵技等级+1」 is filed on the summoner at data slot 1");
         Assertions.assertEquals(10, ikachi.skillLevel(ikachi.skillAt(1)),
                 "…and the read stays 10 because the spec's level is already the table's cap 「最多不超过10级」");
+        Assertions.assertEquals(12, hyacine.skillLevel(hyacine.getSkills().get(SkillType.SKILL)),
+                "Rank 5: 「战技等级+2」 (10 + 2)");
+        Assertions.assertEquals(12, hyacine.skillLevel(hyacine.getSkills().get(SkillType.TALENT)),
+                "Rank 5: 「天赋等级+2」 (10 + 2)");
     }
 
     private static double climb(int rank) {
