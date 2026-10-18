@@ -397,6 +397,41 @@
       "note": "「**召唤忆灵 小伊卡**」⇒ `SKILL_CAST` ⇒ **`SUMMON`** ✓（无参数 ✓：忆灵属于召唤者 ✓）；面板在 `resources/memosprites/1409.json` ✓。⚠ 同句的**治疗部分**（我方全体 8% 生命 + 160 ✗、小伊卡自己 10% + 200 ✗）尚未写 ✗ ⇒ 登记 ✓（它需要“除小伊卡以外”的目标词汇 ✗）。"
     },
     {
+      "on": "SUMMONED",
+      "id": "memosprite_soaring_gives_her_energy_when_it_arrives",
+      "when": [
+        "actor == summon",
+        "self_summon_count >= 1"
+      ],
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 15,
+          "target": "self"
+        }
+      ],
+      "source": "1409 风堇 忆灵技3 展翼，奔向日辉（数据槽位 5，ServantID 11409）：「被召唤时，为风堇恢复 15 点能量」 param = [15, 30]（全等级一致）",
+      "note": "「**被召唤时**，为风堇恢复 **15** 点能量」—— ① 事件用 **`SUMMONED`** ✓（忆灵真的进场那一刻 ✓，与星魂6 光环同一个事件 ✓）；② `actor == summon` + `self_summon_count >= 1` ✓（**只有自己的忆灵**进场才算 ✓ —— `SUMMONED` 对两方的召唤都发 ✓）；③ 数值取数据行 `#1 = 15` ✓（**全等级恒定** ✓ ⇒ 字面量 + 与行对得上的判据 ✓，同「2 回合」那类 ✓）；④ `target: self` ✓ = 风堇自己 ✓（`GAIN_ENERGY` 的 `target` 就是收能量的单位 ✓）。"
+    },
+    {
+      "on": "SUMMONED",
+      "id": "memosprite_soaring_gives_thirty_more_on_its_first_arrival",
+      "when": [
+        "actor == summon",
+        "self_summon_count >= 1"
+      ],
+      "once_per_battle": true,
+      "do": [
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 30,
+          "target": "self"
+        }
+      ],
+      "source": "1409 风堇 忆灵技3 展翼，奔向日辉：「…**首次被召唤时**，额外恢复 **30** 点能量」 param = [15, 30]",
+      "note": "「**首次**被召唤时，额外恢复 **30** 点能量」—— 「首次」= **`once_per_battle: true`** ✓，这正是这个词在仓库里的既有拼法 ✓（8006 星魂1 的「**首次**施放战技」用的就是它 ✓，注记原话「『首次』is `once_per_battle: true`, which is exactly \"the first one, once\"」✓）；⚠ 不用 `cooldown` ✗（这句话讲的是**整场战斗**，不是回合 ✓）。⚠ 它与上一条**必须是两条规则** ✓：一条每次召唤都给 ✓、一条只给一次 ✓ —— 合成一条就得给 `amount` 一个「第一次才加」的开关，而那种开关不存在 ✓。⚠ 顺序无关 ✓（两条同事件、互不影响 ✓）。"
+    },
+    {
       "id": "memosprite_ode_of_sky_gives_her_energy",
       "on": "CAST_SETUP",
       "when": [
