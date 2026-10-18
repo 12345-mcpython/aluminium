@@ -114,6 +114,18 @@ public final class Queue {
     }
 
     /**
+     * Whether an inserted action is waiting: the game's TurnInsertAction, i.e. a FREE turn - 「不消耗回合数」.
+     * Battle.stepForward asks this beside hasPendingExtraTurn() so an inserted turn is announced and treated as an
+     * extra one; otherwise nothing could tell it apart, and the unit's timed effects would be counted down by a turn
+     * that costs nothing.
+     *
+     * @return {@code true} = a unit is waiting to act on an inserted turn
+     */
+    public boolean hasPendingInsertedAction() {
+        return insertedSignal != null;
+    }
+
+    /**
      * Whether this unit has a place in the action order (as opposed to acting through an inserted action).
      */
     public boolean isInActionOrder(CanHit actor) {

@@ -1649,7 +1649,9 @@ public class Battle {
         // been acted out yet. See `afterMove()`.
         // A grant that never becomes a turn (the holder dies or leaves the queue) never reaches this branch, so it
         // announces neither boundary: the honest reading is that no extra turn happened.
-        boolean startingExtraTurn = queue.hasPendingExtraTurn();
+        // An INSERTED action (TurnInsertAction) is a FREE turn - 「不消耗回合数」 - so it is announced and treated exactly
+        // like an extra one, or its unit's timed effects would be counted down by a turn that costs nothing.
+        boolean startingExtraTurn = queue.hasPendingExtraTurn() || queue.hasPendingInsertedAction();
         queue.move();
         currentMove = queue.getCurrentActor();
         if (startingExtraTurn && currentMove != null) {
@@ -1781,11 +1783,17 @@ public class Battle {
         // early tick count it down and, at zero, remove it. Swapping the two gives N-1 settlements, and
         // for a 1-turn DOT it burns for nothing. `DotBuff` is an early buff precisely so this line is
         // what counts it down.
-        actor.getBuffManager().beforeMove();
+        // 「不消耗回合数」: a free (extra / inserted) turn spends no duration.
+        boolean freeTurn = extraTurnBeingTaken != null && extraTurnBeingTaken == actor;
+        if (!freeTurn) {
+            actor.getBuffManager().beforeMove();
+        }
         // (d): and the buffs on the rest of the field whose clock is this unit's ("at the start of Sunday (星期日)'s own every turn the
         // [蒙福者] state's remaining turns are reduced by 1"). Swept here rather than inside the manager, because "whose turns count it"
         // is a fact about the battle's turn boundary, not about the unit that happens to carry the buff.
-        tickForeignBuffs(actor, true);
+        if (!freeTurn) {
+            tickForeignBuffs(actor, true);
+        }
         if (actor.isDeath()) {
             return;
         }
@@ -2021,8 +2029,10 @@ public class Battle {
         removeDeadCombatants();
         if (!actor.isDeath()) {
             actor.afterMove(this);
-            actor.getBuffManager().afterMove();
-            tickForeignBuffs(actor, false);
+            if (extraTurnBeingTaken == null || extraTurnBeingTaken != actor) {
+                actor.getBuffManager().afterMove();
+                tickForeignBuffs(actor, false);
+            }
             // "at the end of the turn": the turn is over HERE -- after the actor's own hook and the late tick, so a rule
             // sees the state the turn ended in.
             // A timed weakness is counted in the TARGET's own turns, so it runs down when that unit's turn ends.
