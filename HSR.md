@@ -352,42 +352,159 @@
 
 **贪饕对上限的作用**：
 
-| 怪形态 | 开战上限 | 每次致命伤后 |
+| 怪形态 | 常规血条 | 贪饕血条（清空常规血条后回满的那条） |
 |---|---|---|
-| 单血条（Elite 等） | 正常 HP × **1.0** | × `MaxHPRatio`（污染3 → ×0.8） |
-| **多血条（MultHP）** | 正常 HP × **`MaxHPRatioForMultHP`**（污染3 → **×1.44**） | 按同一参数 |
+| 单阶段（单血条） | 正常 HP × 1.0 | 正常 HP × **`MaxHPRatio`**（污染3 → 80%） |
+| **多阶段（多血条）** | 正常 HP × 1.0 | 正常 HP × **`MaxHPRatioForMultHP`**（污染3 → **144%**） |
 
-> `1.44` 只给**多血条**怪，单血条怪不吃 —— 这就是「同关卡、同污染等级，两只怪上限倍率不同」的原因。
+> `MaxHPRatioForMultHP` 只给**多阶段**怪，单阶段怪用 `MaxHPRatio` —— 这就是「同关卡、同污染等级，两只怪血量不同」的原因。
+> 两者都是**贪饕血条的上限**（清空常规血条后回满的那条），见 §9.4。
 
-### 9.4 压制进度（DirtyHP）
+### 9.4 压制进度（DirtyHP）与击杀阈值（逆向 + 社区实测交叉确认）
 
-- 血条上的**灰条** = 属性 **`DirtyHPRatio`**（modifier `MCommon_Gluttony_DirtyHp` 读的 `MDF_AccumDirtyHPRatio`）。
-- 累积规则：
+- **「压制」= 削减敌人的「可回复生命上限」**。官方文案（`StageInvasionBuff.InvasionDesc`）：
+  > 被污染的怪物获得了「贪饕」的力量，受到致命攻击后**不会被消灭**，而是**立即回复一定比例的生命值**。
+  > 对其造成伤害可**不断压制其生命上限**，压制到**一定比例**后，可将敌人**彻底消灭**。
+
+- **贪饕血条**：常规血条清空后，敌人**回满一条特殊血条**，上限 = 正常 HP ×
+  `MaxHPRatio`（单阶段）/ `MaxHPRatioForMultHP`（多阶段）。
+  - **只回一次**（实测苍翼 `3,142,420.21 → 2,513,936.17` = ×0.8 就是**这条血条**）
+  - 不计为一次击败、不触发击败效果；**污染1 不锁血**，**污染2/3 锁血且打断攻击**（社区实测）
+
+- **一次伤害双结算**（社区实测，与参数表一致）：
   ```
-  ΔDirtyHPRatio = 本次伤害 × 转化率 / 参考值
-    转化率：普通伤害 = NormalDamageConvertRatio（=1）
-            欢愉伤害 = ElationDamageConvertRatio（污染3 = 3）
+  实际伤害 = D × 1/(1+c)
+  血量流失 = D × c/(1+c)      ← 同时扣「当前 HP」与「生命上限」，并累加压制进度
+    c = NormalDamageConvertRatio(=1) / ElationDamageConvertRatio(污染3 欢愉 = 3)
+  上限：实际伤害 + 血量流失 ≤ 本条命的血量上限
   ```
-  → **欢愉伤害的压制效果是普通伤害的 3 倍**（污染3级），因此「欢愉伤害能让它少复活一遍」。
-- **普通伤害压制**与**欢愉伤害压制**共用同一条灰条，仅权重不同。
+  ⇒ **清空一条血条（不论打多大）带来的压制增量恒为 `c/(1+c)`**：污染1/2 = **0.50**、污染3 = **0.75**
+
+- **灰条** = 属性 **`DirtyHPRatio`**（= 压制进度）；**可回复上限比** = `1 − DirtyHPRatio`。
+  - `TurnBasedAbilityComponent.GetDirtyHP() = MaxHP × DirtyHPRatio + DirtyHPDelta`（VA `0x18E7B8800`）
+  - 灰条显示值 `UINumberUtils.CurrentDirtyHPPercent(entity) = DirtyHP / MaxHP`（clamp `0~1`，VA `0x18E3CA610`）
+  - HP **回复被夹在 `MaxHP − DirtyHP`**（`DirectChangeHP` 内）—— 这就是状态「可回复的生命上限降低 X%」
+
+- **击杀阈值**：`HDIEJLMEELG::.ctor`（VA `0x195C2A450`）算出 UI 标记
+  ```
+  KillMarkRatio = 1 − KillThresh        // 读 ParamList[0]，写入 UIData.KillMarkRatio
+  ```
+  **`KillMarkRatio` 是「剩余可回复上限比」的标记位置**（血条上那条分界线），判定是：
+  > **压制进度 > `KillThresh`** ⟺ **剩余可回复上限比 < `KillMarkRatio`**
+
+  | 污染等级 | `KillThresh`（**压制**阈值） | `KillMarkRatio`（**剩余上限**阈值） |
+  |---|---|---|
+  | 1 / 2 | 0.40 | 0.60 |
+  | 3 | 0.60 | 0.40 |
+
+- **实测死亡点 = `c/(1+c)`**（一条血条清空就跨过阈值）：
+
+  | 污染 | 一条血条清空的压制增量 | 阈值 `KillThresh` | **死亡时压制** |
+  |---|---|---|---|
+  | 1 / 2 | 0.50 | 0.40 | **50%** |
+  | 3 | 0.75 | 0.60 | **75%** |
+
+- 转化率：普通伤害 × `NormalDamageConvertRatio`（=1）、欢愉伤害 × `ElationDamageConvertRatio`（污染3 = **3**）。
 
 ### 9.5 复活与彻底死亡
 
-- **每次 HP 归零**：敌人不死亡，立即回满到当前上限，并推进压制进度。
-- 未达阈值前，无论打空多少次都会复活。
-- **压制进度达到阈值后**，下一次致命伤 = 彻底消灭。
-- 实测（污染3级）：`DirtyHPRatio` 到 **0.75** 时死亡；`0.75 = KillThresh / MaxHPRatio = 0.6 / 0.8`。
+- **常规血条清空**：敌人不死亡，回满**贪饕血条**（= 正常 HP × `MaxHPRatio` / `MaxHPRatioForMultHP`），不计击败。
+- **继续输出**：每次伤害同时造成「实际伤害 + 血量流失」，压制进度上升。
+- **压制进度 > `KillThresh` 后**，下一次致命伤 = **彻底消灭**。
+- 实测死亡点：污染1/2 = 压制 **50%**、污染3 = 压制 **75%**（= 一条血条清空的压制增量 `c/(1+c)`）。
 
-### 9.6 血条布局（与游戏一致）
+### 9.6 分级机制（污染一 / 二 / 三）
+
+三级**共用同一套规则**（§9.3–§9.5），只有 5 个参数不同。下面按级给出完整数值。
+
+#### 9.6.1 污染一（`InvasionID = 1`）
+
+| 参数 | 值 |
+|---|---|
+| `KillThresh`（**压制**阈值） | 0.4 |
+| `MaxHPRatio`（**单阶段**贪饕血条） | 0.2 |
+| `MaxHPRatioForMultHP`（**多阶段**贪饕血条） | 0.4 |
+| `NormalDamageConvertRatio` | 1 |
+| `ElationDamageConvertRatio` | 1 |
+
+- **贪饕血条**：单阶段 = 正常 HP 的 **20%**；多阶段 = **40%**
+- **压制效率**：非欢愉 100%、欢愉 100%（清空一条血条 = 压制 **+50%**）
+- **可消灭条件**：压制 > **40%**（剩余上限 < 60%）
+- **实测死亡点**：压制 **50%**
+- **总伤害**：单阶段 **1.2×**、多阶段 **1.4×** 正常 HP
+- **复活表现**：**不锁血**（不打断攻击、不视为击败）
+- **我方加成**（`MCommon_Gluttony_BUFF_LV1`）：攻击力 / 防御力 / 生命上限 / 暴击伤害（**无速度**）
+- 每只怪汇聚愿力 **4**
+
+#### 9.6.2 污染二（`InvasionID = 2`）
+
+| 参数 | 值 |
+|---|---|
+| `KillThresh`（压制阈值） | 0.4 |
+| `MaxHPRatio`（单阶段） | 0.4 |
+| `MaxHPRatioForMultHP`（多阶段） | 0.72 |
+| `NormalDamageConvertRatio` | 1 |
+| `ElationDamageConvertRatio` | 1 |
+
+- **贪饕血条**：单阶段 **40%**；多阶段 **72%**
+- **压制效率**：非欢愉 100%、欢愉 100%（一条血条 = 压制 **+50%**）
+- **可消灭条件**：压制 > **40%**（剩余上限 < 60%）
+- **实测死亡点**：压制 **50%**
+- **总伤害**：单阶段 **1.4×**、多阶段 **1.72×**
+- **复活表现**：**锁血且打断攻击**（污染2 起）
+- **我方加成**（`MCommon_Gluttony_BUFF_LV2`）：攻击力 / 防御力 / 生命上限 / **速度** / 暴击伤害
+- 每只怪汇聚愿力 **10**
+
+#### 9.6.3 污染三（`InvasionID = 3`）
+
+| 参数 | 值 |
+|---|---|
+| `KillThresh`（压制阈值） | 0.6 |
+| `MaxHPRatio`（单阶段） | 0.8 |
+| `MaxHPRatioForMultHP`（多阶段） | **1.44** |
+| `NormalDamageConvertRatio` | 1 |
+| `ElationDamageConvertRatio` | **3** |
+
+- **贪饕血条**：单阶段 **80%**；多阶段（帕姆王）**144%** ← 实测 `10,558,531.91 = 1.44 × 7,332,313.83` ✓
+- **压制效率**：非欢愉 100%、**欢愉 300%**（**唯一一级**有此加成；一条血条 = 压制 **+75%**）
+  - 欢愉伤害下「实际伤害 : 血量流失」= **1 : 3** ⇒ 清血条时**只有 1/4 是真伤害**，其余直接削上限
+- **可消灭条件**：压制 > **60%**（剩余上限 < 40%）
+- **实测死亡点**：压制 **75%**
+- **总伤害**：单阶段 **1.8×**、多阶段 **2.44×**
+- **复活表现**：**锁血且打断攻击**
+- **我方加成**（`MCommon_Gluttony_BUFF_LV3`）：攻击力 / 防御力 / 生命上限 / **速度** / 暴击伤害
+- 每只怪汇聚愿力 **40**
+
+#### 9.6.4 三级对比
+
+| | 污染一 | 污染二 | 污染三 |
+|---|---|---|---|
+| `KillThresh`（**压制**阈值） | 0.40 | 0.40 | 0.60 |
+| `KillMarkRatio`（**剩余上限**阈值） | 0.60 | 0.60 | 0.40 |
+| 贪饕血条（单 / 多） | 20% / 40% | 40% / 72% | 80% / **144%** |
+| 压制效率（非欢愉 / 欢愉） | 100% / 100% | 100% / 100% | 100% / **300%** |
+| 一条血条的压制增量 | +50% | +50% | +75% |
+| **实测死亡点（压制）** | **50%** | **50%** | **75%** |
+| 总伤害（单 / 多） | 1.2× / 1.4× | 1.4× / 1.72× | 1.8× / 2.44× |
+| 复活锁血 | 否 | 是 | 是 |
+| 我方加成含速度 | 否 | 是 | 是 |
+| 愿力 / 只 | 4 | 10 | 40 |
+
+> **为什么三级都是「两条命」**：常规血条 + **一条**贪饕血条。贪饕血条清空的瞬间压制 = `c/(1+c)`
+> （污染1/2 = 0.50、污染3 = 0.75），**已经越过各自阈值**（0.40 / 0.60）⇒ 当场可击杀。
+> 单阶段与多阶段的**死亡压制百分比相同**，差别只在**贪饕血条的绝对血量**。
+
+### 9.7 血条布局（与游戏一致）
 
 ```
-[ 品红 = 当前 HP ][ ◆ 分界线 = 阈值 ][ 灰 = 压制进度 ]
+[ 品红 = 剩余可回复上限 ][ ◆ KillMarkRatio 分界线 ][ 灰 = 已压制 DirtyHPRatio ]
 ```
 - 灰条**从右往左**填充；
-- 分界线在**左侧** `1 − 阈值` 处（污染3级 = 25%）；
-- 灰条左边缘推到分界线 = 压制完成，可彻底击杀。
+- 分界线在**左侧** `KillMarkRatio = 1 − KillThresh` 处（**污染3 = 40%**，污染1/2 = 60%）；
+- 灰条左边缘**推到分界线**即满足阈值，但真正死亡要等**下一次致命伤**（清空贪饕血条），
+  所以实测灰条会**越过**分界线：污染1/2 停在 **50%**、污染3 停在 **75%**。
 
-### 9.7 相关 modifier 速查
+### 9.8 相关 modifier 速查
 
 | modifier | 作用 |
 |---|---|
@@ -397,12 +514,12 @@
 | `MCommon_Gluttony_PendingLockHP_Mark` | 待锁定标记 |
 | `MCommon_Gluttony_BUFF_LV{1,2,3}` | 我方对应的加成 |
 
-### 9.8 实测校验样本（污染3级）
+### 9.9 实测校验样本（污染3级）
 
-| 怪 | 单血条? | 正常 HP | 实测 MaxHP | 倍率 | 精英组 |
+| 怪 | 阶段 | 正常 HP | 实测 MaxHP | 贪饕血条 | 精英组 |
 |---|---|---|---|---|---|
-| 破晓战队·苍翼 (5013040) | 是 | 3,142,420.21 | 3,142,420.21 → 2,513,936.17 | ×1.0 → ×0.8 | EliteGroup 361 (HPRatio 6.0) |
-| 合金机铠·帕姆王 (5014020) | **多血条** | 7,332,313.83 | 10,558,531.91 | **×1.44** | EliteGroup 358 (HPRatio 5.6) |
+| 破晓战队·苍翼 (5013040) | 单阶段 | 3,142,420.21 | 3,142,420.21 → 2,513,936.17 | **80%** | EliteGroup 361 (HPRatio 6.0) |
+| 合金机铠·帕姆王 (5014020) | **多阶段** | 7,332,313.83 | 10,558,531.91 | **144%** | EliteGroup 358 (HPRatio 5.6) |
 
 正常 HP 验算（关卡 30510011，`HardLevelGroup = 3`，`Level = 95`，`hard_level_group[3][95].health = 375.4385`）：
 
@@ -411,15 +528,40 @@
 帕姆王: 3487.5 × 375.4385 × 1 × 5.6 = 7,332,313.83 ✓
 ```
 
-### 9.9 数据来源
+死亡点（污染3）：两者 `DirtyHPRatio` 都停在 **0.75**（一条贪饕血条清空的压制增量 `3/4`，已越过阈值 `0.60`）；
+总伤害 = 常规血条 + 贪饕血条 = 苍翼 **`1.8×`**、帕姆王 **`2.44×`** 正常 HP。
+
+### 9.10 数据来源
 
 - `ExcelOutput/StageMonsterInvasionParam.json` — 污染参数表
 - `ExcelOutput/StageInvasionConfig.json` — 关卡 → 污染等级 → 怪
-- `ExcelOutput/StageInvasionBuff.json` — 污染等级 → MazeBuffID
+- `ExcelOutput/StageInvasionBuff.json` — 污染等级 → MazeBuffID + 机制文案 hash
 - `ExcelOutput/InfiniteEliteGroup.json` / `EliteGroup.json` — 精英组倍率
 - `ExcelOutput/StageInfiniteGroup.json` / `StageInfiniteMonsterGroup.json` — 波次 → 精英组
-- `Config/ConfigAbility/BattleEventAbility_ChallengePeakBattle.json` — 污染能力
+- `ExcelOutput/StatusConfig.json` — `MCommon_Gluttony_*` 状态（名称/图标/读取的 MDF）
+- `TextMap/TextMapCHS.json` — 机制文案（「压制其生命上限…彻底消灭」）
+- `Config/ConfigAbility/BattleEventAbility_ChallengePeakBattle.json` — 污染能力（写 `MDF_Param1..5`）
 - `Config/GameCoreUISetting.json` — 血条配色
+
+**逆向依据（阈值部分）**：
+
+| 符号 | VA | 作用 |
+|---|---|---|
+| `HDIEJLMEELG::.ctor` | `0x195C2A450` | 读 `ParamList[0]` → `KillMarkRatio = 1 − KillThresh` |
+| `LACLKDPNNLH::EOMGLEBFMAM` | `0x18B5D3190` | 按 `StageMonsterInvasionParamType` 取参数 |
+| `TurnBasedAbilityComponent::GetDirtyHP` | `0x18E7B8800` | `MaxHP × DirtyHPRatio + DirtyHPDelta` |
+| `UINumberUtils::CurrentDirtyHPPercent` | `0x18E3CA610` | 灰条 = `DirtyHP / MaxHP` |
+| `TurnBasedAbilityComponent::DirectChangeHP` | `0x18E7B8405` 附近 | HP 回复夹在 `MaxHP − DirtyHP` |
+
+**社区实测/解包来源**（2026-10-18 检索，与上面参数表逐项吻合）：
+
+| 来源 | 内容 |
+|---|---|
+| [bwiki《贪饕污染》](https://wiki.biligame.com/sr/%E8%B4%AA%E9%A5%95%E6%B1%A1%E6%9F%93) | **数值表**：贪饕血条 20%/40%/80%（单阶段）、40%/72%/144%（多阶段）；压制效率 100%（欢愉 300%）；可消灭条件 压制>40%/40%/60%；复活锁血表现；「双结算」机制与算例 |
+| [bwiki《幻影一览》/《仲裁一览》](https://wiki.biligame.com/sr/%E5%B9%BB%E5%BD%B1%E4%B8%80%E8%A7%88) | 关卡 → 污染等级（如 难度3 = 污染2、难度4 = 污染3） |
+| [showgamer《Gluttony Suppression》](https://showgamer.com/en/guides/6106-usmirenie-nenasytnosti-v-honkai-star-rail-hsr-gde-nayti-prispeshnikov) | 愿力 4 / 10 / 40；污染等级出现位置（纯虚构/忘却 2 节点 = 2 级、末日 1 节点 = 2 级、异相仲裁骑士一 = 3 级） |
+| [Gachabase 4.5 教程文本](https://hsr.gachabase.net/tutorials/battle/10502/how-to-play/beta/4.5.53/16399740) | 英文官方文案（与 `TextMapCHS` 一致） |
+| [TapTap / 什么值得买 攻略](https://www.taptap.cn/moment/844197476763175402) | 社区口径的「多打 X%」（非欢愉/欢愉），口径与本文的「总伤害」不同，仅供参考 |
 
 ---
 

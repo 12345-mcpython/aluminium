@@ -1,12 +1,12 @@
 {
   "name": "1002 丹恒 · 战技 Lv10 · 对 1002011 冰锋 Lv90（不暴击）",
-  "note": "⚠ 骨架：expect 里现在填的是**引擎自己的实测值**，用来证明比较器逐区打印正常。请替换成原游戏的数值（同面板、同技能等级、同暴击结论）。zone 名的含义见 scenarios/README.md。",
+  "note": "⚠ 骨架：expect 里现在填的是**引擎自己的实测值**，用来证明比较器逐区打印正常。请替换成原游戏的数值（同面板、同技能等级、同暴击结论）。⚠ skillLevel 是**基础等级**：角色文件自己的 level_convention 会在BATTLE_START 把它抬高（1002 是 +9，即「文档引用的是 Lv10」），所以这里写 1，实际施放等级见 inputs 那行的 Lv10。zone 名的含义见 scenarios/README.md。",
   "attacker": {
     "cid": 1002,
     "level": 80,
     "eidolon": 0,
     "skill": "SKILL",
-    "skillLevel": 10
+    "skillLevel": 1
   },
   "target": {
     "monsterId": 1002011,
@@ -16,16 +16,16 @@
   "instance": 0,
   "instances": 4,
   "expect": {
-    "base": 629.139420,
-    "BoostArea": 1.224000,
-    "FinalBoostArea": 1.000000,
-    "ComboArea": 1.000000,
-    "BaseMultiArea": 1.000000,
-    "MonsterTakenArea": 1.000000,
-    "CritArea": 1.000000,
-    "DefenceArea": 0.476190,
-    "ReductionArea": 0.900000,
-    "ResistArea": 0.800000,
-    "final": 264.022858
+    "base": 503.311536,
+    "BoostArea": 1.224,
+    "FinalBoostArea": 1.0,
+    "ComboArea": 1.0,
+    "BaseMultiArea": 1.0,
+    "MonsterTakenArea": 1.0,
+    "CritArea": 1.0,
+    "DefenceArea": 0.47619,
+    "ReductionArea": 0.9,
+    "ResistArea": 0.8,
+    "final": 211.218286
   }
 }
