@@ -557,6 +557,12 @@ if (isSelected) buffer.setStyle(rowArea, highlightStyle);
     现在 `absolute = 非份额 || 有 scale` ✓，天花板（`cap_*`）与它同源 ✓。
     判据：`DanHengLevelSourceTest`（40% 必须是份额 ✓）、`ReasonOdeEruditionAttackTest`（两位智识按**各自基础**涨 84% ✓）、
     `TrueKnowledgeSkillDamageTest`（普攻只按攻击力涨 ✓）。
+  - **捕获复算时的一个数据缺口**（2026-10-18 查过 ✓）：实测捕获的目标是 **5034011 亚婆离**，它的**抗性表与韧性**都能在
+    tbgd 对上 ✓（Physical/Fire/Thunder/Wind 各 0.2 ✓、StanceBase 1080 ✓），但**这一场的 HP 与 DEF 都偏离表值** ✗：
+    表值 Lv100 = HP 845,928 / DEF 1200（210 × DefenceRatio 5.714286 ✓，也等于「200+10×等级」✓），而 dump 的 BaseHP 是
+    6,389,558（×7.55）再 ×2、反解 DEF 是 786（−34.5%）✓。⇒ **观战数值是关卡改的** ✓，不是表值 ✗ —— 比较场景里
+    `target.attributes.DEFENCE` 因此是**输入**而不是数据 ✓（判据：`scenarios/capture-858483.json` ✓）。
+    ⚠ 另：本仓库 `monster_config.json` 是 tbgd 2722 条实例的**子集** ✓（这位 boss 不在其中 ✓），要按需补就得重跑生成器 ✓。
   - **Impair 的 debuff 派发仍缺**（2026-10-17 核对 ✓）：`skill_effects.json` 里**一条 `Impair` 行都没有** ✗，
     缺的不是"多少"，而是**"哪个 debuff"** ✓（一句 `陷入【吞火】状态` / `风化/裂伤/灼烧/触电其中1种` 只在正文里 ✓）。
     ⇒ `SkillData.debuffChance(int)` 已有等级感知 ✓ 但**没有调用者** ✓；`ImpairDebuffGapTest` 把两件事钉住：
