@@ -673,6 +673,28 @@ HP_LOST 计数 = 0 ; HP_CONSUMED 计数 = 0   ← 两个事件都没发
 
 **仍登记（忆灵技1 的后半句）**：① **按资源出伤害** ✗ —— `DAMAGE` 的 `scale` 词汇表**不收**单位资源 ✓（`scaleAttribute` 只认 `self_attr:` 与几个特例；`resolveScale` 里有 `party_resource:` 但**没有** `self_resource:`）⇒ 这一步要**动引擎** ✓（加一个分支 + 判据 ✓）；② **清空 50%**（星魂6 → **12%**）✗ —— 需要一个「按**份额**扣减资源」的写法 ✓（`SPEND_RESOURCE` / `REMOVE_RESOURCE` 今天只收**点数** ✓，而 `max_eidolon: 5` / `min_eidolon: 6` 正好能表达两条孪生规则 ✓，缺的只是份额写法 ✓）。
 
+### 3.7p 已落（**引擎**）：`scale: "self_resource:<id>"` —— 以「单位自己的计数器」为倍数（**2026-10-18**）
+
+**缺的是什么**：计数器今天已经能被 `GAIN_RESOURCE` 加、被 `SPEND_RESOURCE` 扣、被**条件**读（`self_resource:X >= 1`），而**战斗级**的计数器早就能当倍数（`party_resource:X`）✓ —— 唯独「**这个单位自己的**计数器 × 比例」**没有拼法** ✗。读者是 1409 忆灵技1：「造成等同于**本场战斗风堇与小伊卡累计治疗数值** `#1%` 的风属性伤害并清空累计治疗数值的 **50%**」。
+
+**改动（4 个读点 + 1 个校验点）**：
+| 位置 | 改动 |
+|---|---|
+| `TriggerInterpreter.SELF_RESOURCE_PREFIX` | 新常量 `"self_resource:"`（附带读者与「不是 `AttributeType`」的理由） |
+| `TriggerMagnitudes.literalBase` | **DAMAGE** 家族：`selfResourceOf(...) × share + flat` |
+| `TriggerMagnitudes.derivedMagnitude` | `MODIFY_ATTR` 家族：转给 `resolveScale`（与 `party_resource:` 同一路由，避免两份算术漂移） |
+| `TriggerMagnitudes.resolveScale` | `percent × 计数器值`（`MODIFY_ATTR` / 天花板 / `REMOVE_RESOURCE` 等共用） |
+| `TriggerMagnitudes.scaleAttribute` | 前缀加入「不映射成属性」的早退名单 |
+| `TriggerValidator` | 比例白名单豁免该前缀（与 `party_resource:` 并列） |
+
+**两处口径**：
+1. **读的是「规则持有人的」计数器** ✓ —— 与 `self_attr:` / `self_attr_above:` 同一个主语 ✓；`party_resource:` 则住在 `Battle` 上（全队共享）✓，两者是**不同的问题** ✓。
+2. **没有这个计数器 ⇒ 大声报错** ✓，不是 0 ✗ —— 「28% 的计量」在缺计数器时会变成「造成 0 伤害」，而那是一个**没有症状的错数** ✓（`party_resource:` 那条当初就是为此写的 ✓）。
+
+**判据**：`SelfResourceMagnitudeTest`（3 例，引擎级）—— 同一个计数器上 `0.5` 与 `0.25` 的伤害**差正好两倍** ✓；计数器**本身**翻倍伤害也翻倍 ✓；计数器**不存在**时抛错且**消息里带计数器名** ✓。
+
+**下一步（数据侧，已就绪）**：忆灵技1 还剩两半 —— ① 那份「计算量 × `#1`」的伤害（`DAMAGE` / `DELEGATE_DAMAGE` 配 `scale: "self_resource:小伊卡累计治疗"` ✓，**注意**：忆灵技1 的数据行会让小伊卡按 `%ATK` 出一发，而它 **ATK 恒为 0**（实测 `ikaAtk=0.0`、那一发只结算 **1** 点），所以要么把它换掉、要么登记这 1 点 ✓）；② 「清空 **50%**」（星魂6 → **12%**）—— `REMOVE_RESOURCE` + `percent: 0.5` + 同一个 `scale` ✓，两条孪生规则用 `max_eidolon: 5` / `min_eidolon: 6` ✓。
+
 ### 3.8 数据文件速查
 
 | 文件 | 内容 | 已确认锚点 |
