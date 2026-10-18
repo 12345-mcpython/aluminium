@@ -76,6 +76,45 @@ public class SkillEffectSpec {
     private List<Double> segments;
 
     /**
+     * The damage <b>parts</b> one parameter row states, in the order the sentence settles them, each reaching its own
+     * target shape - or {@code null} for the ordinary reading (the whole row is one shape, taken from
+     * {@code skills.json}'s {@code skill_effect}).
+     *
+     * <p>Reader: 1415 Cyrene (昔涟)'s enhanced basic 「向着爱与明天♪」 (141508), whose sentence is 「对指定敌方单体造成等同于昔涟
+     * #3% 生命上限的冰伤，<b>随后</b>对敌方全体造成等同于昔涟 #1% 生命上限的冰伤」 - two instances in one row, and the
+     * description's own order is the settlement order. The row's {@code skill_effect} says {@code AoEAttack}, so without
+     * this field it settles as one area hit and the single-target half is silently missing; the game's own max-hit column
+     * says the row is two instances ({@code skill_max_hits.json}, {@code avatars.1415.Skill11 = 2}).
+     *
+     * <p>Note: The shares are not in this table - each part names a parameter of the row
+     * ({@link DamagePart#getIndex()}), so a level change moves them with it and there is no second copy of the
+     * multiplier.
+     */
+    @SerializedName("damage_parts")
+    private List<DamagePart> damageParts;
+
+    /**
+     * One damage part of a multi-part row: which shape it reaches, and which parameter of the row it takes.
+     */
+    @Getter
+    public static class DamagePart {
+
+        /**
+         * The shape this part reaches, in the {@code skill_effect} vocabulary ({@code "SingleAttack"} /
+         * {@code "AoEAttack"}) - the spelling {@link com.laosun.aluminium.enums.SkillEffectType#fromString} parses.
+         */
+        @SerializedName("shape")
+        private String shape;
+
+        /**
+         * Index into the skill's parameter row, <b>0-based</b> like {@link Param#getIndex()} (the description writes
+         * {@code #1}).
+         */
+        @SerializedName("index")
+        private int index;
+    }
+
+    /**
      * Human-readable provenance. The engine never reads it.
      */
     @SerializedName("source")
