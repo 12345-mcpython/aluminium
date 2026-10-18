@@ -825,7 +825,7 @@ HP_LOST 计数 = 0 ; HP_CONSUMED 计数 = 0   ← 两个事件都没发
 
 **② 忆灵技4「消失时使风堇行动提前 30%」** —— 行动提前的**入口已经存在** ✓：`Battle.advanceRequest(CanHit, double rate)` 与 `Battle.AdvanceRequest`（`public ArrayList<AdvanceRequest> advanceRequests`）✓，缺的只是「**忆灵离场**」这个事件 ✗。今天两种走法都**观测不到**它：`CanHit.perish()` 的 javadoc 明写它**不发** `DEATH`（“它走了，没人杀它”✓），而 `removeDeadCombatants` 是清扫点、不是事件点 ✓。⇒ 要么给离场发一个**新事件**（如 `SUMMON_LEFT`，让召唤者的规则收得到 ✓），要么让 `ticks_on` 接受 `"summon"` ✓ —— 后者还能顺手闭合 §3.7l 里「星魂6 光环在忆灵离场后不撤下」那个缺口 ✓（**一次改动、两个收益** ✓）。
 
-**③ 忆灵技1 的 1 点地板** —— `skills.json` 的 `11409` 槽位 1 那行 `%ATK` 在 **ATK = 0** 时落到夹取下限 `1` ✓，而夹取发生在增伤区**之后**（`0 × 1.8 = 0` → `1` ✓）⇒ 这一发**不受任何增伤影响** ✓。只能从**数据侧**处理（让该槽不出伤害，或在 `skill_effects.json` 里声明它不出伤害 ✓）—— 引擎侧没有「这一发允许为 0」的开关 ✓。
+**③ 忆灵技1 的 1 点地板（结论：仓库内无法修）** —— 数据侧那条 `%ATK` 是否结算，由 `skills.json` 的 `effect` 决定 ✓（`SkillExecutor.resolveHits` 读 `data.getEffect()` ✓），`skill_effects.json` 只给**非伤害**技能供数值 ✓（`Restore` / `Defence` / `Rules` ✓，`Rules` 是“本发不由数据交付、交给规则”✓）⇒ 想让它不出伤害，只能在**生成器**里改 `11409` 槽 1 的 `effect` ✗（那份表 gitignore ✓），或在引擎里加“声明本发无伤害”的开关 ✓。⇒ 登记为**已知的数据侧残量** ✓ —— `skills.json` 的 `11409` 槽位 1 那行 `%ATK` 在 **ATK = 0** 时落到夹取下限 `1` ✓，而夹取发生在增伤区**之后**（`0 × 1.8 = 0` → `1` ✓）⇒ 这一发**不受任何增伤影响** ✓。只能从**数据侧**处理（让该槽不出伤害，或在 `skill_effects.json` 里声明它不出伤害 ✓）—— 引擎侧没有「这一发允许为 0」的开关 ✓。
 
 ### 3.8 数据文件速查
 
