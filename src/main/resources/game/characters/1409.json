@@ -35,7 +35,8 @@
       "on": "HEALED",
       "id": "talent_healing_raises_ikachis_damage",
       "when": [
-        "actor is_ally"
+        "actor is_ally",
+        "self_summon_count >= 1"
       ],
       "do": [
         {
@@ -50,7 +51,7 @@
         }
       ],
       "source": "1409 风堇 天赋 疗愈世间的晨曦 (140904): 「风堇或小伊卡提供治疗时，小伊卡造成的伤害提高 #3[i]%，持续 #4[i] 回合，最多可叠加 #5[i] 层。」 param = [0.5, 1, 0.8, 2, 3]",
-      "note": "「**风堇或小伊卡提供治疗时**，小伊卡伤害提高 **80%**，持续 **2 回合**，最多 **3 层**」—— ① `HEALED` ✓（探针实测：放她的战技把队友从 529.2 治到 784.8 时，`HEALED` 触发 1 次 ✓，`actor == self`（风堇是治疗者）✓、`target is_ally` ✓）；② `target: summon` **能解析到小伊卡** ✓（探针用 `SPEED +100` 验证：小伊卡速度 0 → 100 ✓）；③ `stackable` + `max_stacks: 3` ✓。⚠ 教训：判据里\"把队友打伤\"必须用 **`consumeHp`**（`heal(-x)` 会被 `heal()` 的 `amount <= 0` 直接忽略 ⇒ 根本没受伤 ⇒ 治疗量为 0 ⇒ 没有 `HEALED` ✗，这正是前两轮失败的真正原因 ✓）。``「风堇或小伊卡」里忆灵那一半：`HEALED` 的 `actor` 是治疗者，忆灵治疗时 `actor is_summon` 也成立 ✓（探针里 `probeActorSummon` 为 0 是因为那次治疗者是风堇 ✓）。"
+      "note": "「**风堇或小伊卡提供治疗时**，小伊卡伤害提高 **80%**，持续 **2 回合**，最多 **3 层**」—— ① `HEALED` ✓（探针实测：放她的战技把队友从 529.2 治到 784.8 时，`HEALED` 触发 1 次 ✓，`actor == self`（风堇是治疗者）✓、`target is_ally` ✓）；② `target: summon` **能解析到小伊卡** ✓（探针用 `SPEED +100` 验证：小伊卡速度 0 → 100 ✓）；③ `stackable` + `max_stacks: 3` ✓。⚠ 教训：判据里\"把队友打伤\"必须用 **`consumeHp`**（`heal(-x)` 会被 `heal()` 的 `amount <= 0` 直接忽略 ⇒ 根本没受伤 ⇒ 治疗量为 0 ⇒ 没有 `HEALED` ✗，这正是前两轮失败的真正原因 ✓）。``「风堇或小伊卡」里忆灵那一半：`HEALED` 的 `actor` 是治疗者，忆灵治疗时 `actor is_summon` 也成立 ✓（探针里 `probeActorSummon` 为 0 是因为那次治疗者是风堇 ✓）。  ⭐ `self_summon_count >= 1` 是**引擎要求**的（`TriggerTargets.requireSummon` 会显式拒绝：\"Effect targets summon but ... has no summon on the field; gate the rule with self_summon_count >= 1\" ✓）—— 这也正好是文档的语义：小伊卡不在场时这条天赋没有对象 ✓。"
     },
     {
       "on": "BATTLE_START",
