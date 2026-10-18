@@ -575,6 +575,22 @@ HP_LOST 计数 = 0 ; HP_CONSUMED 计数 = 0   ← 两个事件都没发
 
 **这 20 轮修掉的引擎问题**（都已进套件）：实例级 `MODIFY_ATTR` 只读 `percent`（四个分支）· 数据驱动忆灵不触发 `SUMMON_ATTACK` · `MODIFY_DAMAGE_TAKEN` 不认 `coexist`（多来源互相覆盖）· `target: summon` 缺 `self_summon_count` 门控时报错不清（现在给的是可执行建议 ✓）· 技能数据里的"消耗生命值"没有被执行（§3.7g）· 一行多段只结算第一段（1415 强化普攻，§3.7i）· 忆灵技能 1 的分段表缺失（11413 六段，§3.7h）。
 
+### 3.7k 已落：1409 的【雨过天晴】按当前行读 + 星魂2 的 +50%、星魂3 的终结技+2（**2026-10-18**）
+
+**症状**：捕获里 1415 的生命上限是 `10320.44`，其中【雨过天晴】给的是 **83% + 667**（游戏内 buff 面板截图）；而 `characters/1409.json` 的规则写死 **30% + 600**（按 Lv10 文档），对不上。
+
+**根因（都已核实）**：① 那一场 1409 的终结技是 **Lv12**（`140903` 的 `#4 = 667.5` 反证），来自 **星魂3「终结技等级+2」**——而引擎的 `eidolonRank` 只开规则、**不抬技能等级**；② **星魂2**「风堇处于【雨过天晴】状态时，我方全体目标生命上限**额外提高 50%**」没写；③ 规则里的 `percent` 是字面量，没读当前行。
+
+**修法**：
+- `ult_state_and_max_hp` 的份额改成 **`percent_from_skill_param: ULTRA:2`**（Lv10 = 0.30、Lv12 = 0.33 ✓），并加 **`max_stacks: 2`**；
+- 新增 `eidolon_two_raises_max_hp_while_rain_clear`（`min_eidolon: 2`，`MODIFY_ATTR HEALTH percent 0.5` + `max_stacks: 2`）⇒ 两条 HEALTH% **相加**（0.33 + 0.50 = 0.83 ✓），固定项只在孪生规则加一次；
+- 新增 `eidolon_three_raises_the_ult`（`min_eidolon: 3`，`RAISE_SKILL_LEVEL ULTRA +2`、`COMMON +1`）⇒ 终结技到 Lv12 ✓。
+
+**判据**：`HyacineRainClearMaxHpTest` —— E0：涨 `1086.624 × 0.30 + 600`；E6：涨 `1086.624 × (0.33 + 0.50) + 600`，且 `skillLevel(ULTRA)` = 12/10 ✓。`HyacineTest` 的规则计数同步为 5（ULT_CAST）/ 2（BATTLE_START）。
+
+**仍登记**：① 固定项 `600` 还是字面量（`MODIFY_ATTR` 没有"flat 读当前行"的拼法；Lv12 应是 667.5）；② 星魂3 同句的「忆灵技等级+1」没有写法（忆灵技能按数据槽位存）；③ 4 件套 127 的 24%（`Ability51271`）仍未实现 —— 那一场它**没有生效**（加了会到 10934，捕获是 10320.44）。
+
+---
 ### 3.8 数据文件速查
 
 | 文件 | 内容 | 已确认锚点 |
