@@ -753,6 +753,18 @@ HP_LOST 计数 = 0 ; HP_CONSUMED 计数 = 0   ← 两个事件都没发
 - ⚠ **本轮一次失败的尝试（记下来，别重复）**：我试着用 PowerShell 就地做「全表提取 + 与 `skill_effects.json` 对账」，得到「多段槽位只有 3 个、其中 1 个 `sum=4`、1 个槽位多 phase」这类数字 —— **这些数字不可信** ✗：脚本把「数组套数组」写成了 `@(@('_chars', $coll), …)`，而 PowerShell 会把内层集合**摊平** ✓，于是 `$scope[1]` 只枚举到一部分角色 ✓（1002 的两条明明存在却没进结果 ✓，这一点直接违反了我手上刚验证过的逐位复现 ✓）。⇒ **提取器要写在 Python 侧**（那份数据本来就在 `E:\code\python\` 的工具链里 ✓），写完先拿 1002 的两条做回归断言 ✓，**再**谈规模统计 ✓。事后我仍按纪律留了这段：**一次自相矛盾的结果应当作废，而不是换个口径解释它** ✓。
 - ⚠ **三处要小心**：① **同一槽位可能有多个 phase**（`Phase01/02/03`）—— 可能是**同一次施放的连续段**、也可能是**不同分支** ✓，数据里 `alternatives` / `branch_groups` / `default_fallback` 就是为这个留的 ✓（别把分支当成段 ✗，那会凭空多出伤害）；② `skill_effects.json` 是**进仓库的策展文件** ✓，而 `game/data/` 其它表是 **gitignore 的生成物** ✓ ⇒ 生成器输出放数据目录、**策展结果**才写进 `skill_effects.json` ✓；③ 忆灵在 `_servants` 下，键是 **ServantID**（`11402` ✓），与引擎 `skillAt(slot)` 的寻址一致 ✓。
 
+### 3.7x 订正：`advanceRequests` 是**没人填的死通道**，已删除（**2026-10-18**）
+
+**上一节（§3.7w）里那句「行动提前的**入口已经存在**：`Battle.advanceRequest(...)`」是错的** ✗。实际读源码：
+- `ADVANCE` op **不走** `advanceRequests` ✓ —— 它直接 `battle.queue.advanceActionByPercent(target, percent)` ✓（`TriggerInterpreter:675`）；
+- 于是 `advanceRequests` 这个 public 列表、`advanceRequest(...)`、`processAdvanceRequests()`、`AdvanceRequest` record，**全库没有任何一处会往里填** ✓（唯一的 `add` 就在 `advanceRequest` 自己里面 ✓，而它**没有调用者** ✗）⇒ 这是一条**空转的通道** ✓。
+
+**已做**：删掉这四个成员与 `processRequests()` 里那行调用 ✓（编译干净、824 套件 / 2814 用例全绿 ✓、demo **MATCH** ✓ 均无变化 —— 正因为它本来就是死的 ✓）。`skillRequests` **不动** ✓：它是 private 且被 `processSkillRequests()` 真正消费 ✓（名字像、性质完全不同 ✓）。
+
+**教训**：「入口已经存在」这种判断**必须跟到调用点** ✓ —— 我只看到 `public void advanceRequest(...)` 就登记成可用，没有确认**谁会调它** ✗。同一个形状在这一轮出现了两次（另一次是把 `advanceRequests.size()` 当判据，跑出绿而其实什么也没测 ✓）⇒ **一个没有调用者的 public 方法，与被注释掉的代码等价** ✓。
+
+**判据的缺口因此更清楚了**：忆灵技4 的 `ADVANCE` **确实生效**（它直接改行动条 ✓），但**观测不到** —— `Queue` 只暴露 `getNext` / `peekNext` / `timeUntilNext` / `getCombatant(index)`，**没有**「某单位的剩余等待」读数 ✗。要给它钉判据，得先加那个读数 ✓（**不要**再用任何请求列表冒充 ✓）。
+
 ### 3.7w 已落（**引擎**）：`SUMMON_LEFT` —— 「忆灵离场」这个事件（**2026-10-18**）
 
 **缺的是什么**：忆灵可以**走了而没人杀它** ✓（`CanHit.perish()` 的 javadoc 原话：「it left, nobody killed it」✓，且它**故意不发** `HpLoss` / `Kill` ✓），所以「消失时…」既不该用 `DEATH`（那是**被击杀** ✓），也不存在别的事件 ✗ —— 1409 忆灵技4「消失时使风堇行动提前 30%」与星魂6 光环的**撤下**（§3.7l 登记的缺口 ✓）都卡在这里 ✓。
