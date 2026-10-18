@@ -108,6 +108,28 @@
       "note": "「处于【Fever】状态时…使知更鸟•晴歌**与自身**造成的伤害提高（**0.84 + 气氛值 × 0.028**）」—— ① 增伤用 `ALL_DAMAGE_TYPE_BOOST`（份额型 ✓，与 1503 行迹同形 ✓）；② 数值 = `amount 0.84` + `percent 0.028 × party_resource:气氛值` ✓（这条**不需要** `instance` ✓：它是持续状态，每一发重新施加 ✓）；③ `target: actor` ⇒ 加在出手的人身上 ✓。⚠ **登记**：「与**自身**」里的\"自身\"是**忆灵** —— 引擎里忆灵出手走 `SUMMON_ATTACK`、`actor` 是忆灵，所以这一半要 `when: [\"actor == summon\"]` ✓，与光锥 23042 那条同形 ✓；本轮先只写角色本人那一半 ✓（忆灵那一半等光锥的行为判据一起做 ✓）。  ④ **`instance: true`** ✓ —— 引擎的实例级增伤通道（`Damage.addBoost`）与这条同形 ✓，且它现在读完整 magnitude（`percent×scale + amount`）✓。  ⑤ `self has_state Fever` ✓ —— 文档连的是「**处于【Fever】状态时**」，漏了它这条会在没有 Fever 时也生效（实测：漏写时两面差值 0.0 ✗，补上后 0.84 ✓）。"
     },
     {
+      "on": "DEALING_DAMAGE",
+      "id": "fever_boosts_the_memosprites_own_damage",
+      "when": [
+        "actor == summon",
+        "self has_state Fever"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.028,
+          "amount": 0.84,
+          "scale": "party_resource:气氛值",
+          "instance": true,
+          "turns": 1,
+          "target": "actor"
+        }
+      ],
+      "source": "1512 忆灵 11512 SkillP01 (1151203): 「处于【Fever】状态时…使知更鸟•晴歌**与自身**造成的伤害提高（#1%+气氛值*#2%）」 params = [0.84, 0.027999999, 0.112, 0.168, 0.224, 12, 0, 0, 140, 0.5]",
+      "note": "「与**自身**造成的伤害提高」里的\"自身\" = **忆灵** ✅ —— 忆灵出手走 `SUMMON_ATTACK`、`actor` 是忆灵 ⇒ `when: [\"actor == summon\", \"self has_state Fever\"]` ✓（与光锥 23042 那条同形 ✓）。数值同角色本人那条：`amount 0.84` + `percent 0.028 × party_resource:气氛值` ✓，`instance: true` 只作用于这一发 ✓。⚠ 引擎缺口已修（`SkillExecutor` 现在会为数据驱动的忆灵 fire `SUMMON_ATTACK` ✓，见 §3.7d ✓）。"
+    },
+    {
       "on": "BATTLE_START",
       "id": "level_convention",
       "do": [
