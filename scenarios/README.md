@@ -377,6 +377,38 @@ gradlew run --args="compare-capture ...json --limit 5"                        # 
 ⚠ 跳过的原因：击破伤害的乘区**不吃**增伤桶，而回放装的是一发普通命中（会吃）—— 击破那条另行验证
 （`3767.553 × 击破倍率 × (1 + break_damage_added_ratio)`，见上文的整场审计）。
 
+### `capture-flow <capture.json>`：从平铺事件还原**出手序列**
+
+```bash
+gradlew run --args="capture-flow src/test/resources/captures/veritas-085418.json"
+```
+
+捕获里的事件是平铺的（没有回合号、没有施放 id），但两条性质让分组可判定：
+
+1. **每一发真实命中后面紧跟一条配对事件**：`type: True` 且 `attack_type: 13`（这是 kit 给每个目标额外拍的一记真伤）。
+   所以"命中组" = 一条非 13 事件 + 它后面那条 13 事件；
+2. **一次施放重复同一个技能值**：同攻方、同 `raw_damage_before_modifiers` 的连续命中组属于同一次施放
+   （AoE 打两个敌人 ⇒ 同一个 base 出现两次；单体五段 ⇒ 出现五次）。
+
+规则之下，一次施放报出：**命中组数 / 不同目标数 / 真实伤害合计 / 配对真伤合计**。
+
+这份 fixture（真实战斗 82 条事件）的结果：
+
+```
+events:  82 ; casts: 21
+cast actor  kind                base   hits targets         damage    companion
+1    1413   Servant           177.60      5       1        7739.00      1857.36   ← 单体五段
+3    1409   Servant         10334.03      2       2      246233.94     59096.15   ← AoE 两目标
+7    1413   Ultimate         9053.00      2       2      485215.57    116451.74   ← 终结技 AoE
+10   1415   Break           10883.71      1       1       15601.45         0.00   ← 击破
+20   1512   Servant          7874.67      1       1      195703.98     82195.67   ← 第四位角色首次出手
+...
+covered: 82 / 82 events
+1413   casts: 8      1409   casts: 8      1415   casts: 4      1512   casts: 1
+```
+
+`CaptureFlowTest` 把"82 条事件 → 21 次施放、覆盖 82/82、有单体五段、有 AoE 两目标、四位角色都出手"这些**事实**钉住。
+
 ### 为什么需要 `attributes` 覆盖
 
 引擎的面板 = `character_data` + 晋阶 + 行迹，**没有光锥/遗器**。原游戏的数来自某个具体面板，所以比较时必须把那个面板的
