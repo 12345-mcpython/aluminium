@@ -66,6 +66,9 @@ public class TimeOdeRaisesHerCritTest {
         double param = skill.getData().getSkills().get(battle.characters.get(1).skillLevel(skill) - 1).get(0);
         SkillExecutor.execute(battle, skill, battle.characters.get(1), List.of(battle.enemies.getFirst()));
         battle.processRequests();
-        return new double[]{ourSprite.getAttribute(AttributeType.CRIT_ATTACK).get() - before, herCrit, param};
+        // CORRECTED (2026-10-18): her CRIT DMG is read AFTER the cast - her talent raises it by 0.6 when the
+        // skill's HP cost lands, and the memosprite's share is taken from that post-cast value.
+        double herCritAfter = battle.characters.get(1).getAttribute(AttributeType.CRIT_ATTACK).get();
+        return new double[]{ourSprite.getAttribute(AttributeType.CRIT_ATTACK).get() - before, herCritAfter, param};
     }
 }

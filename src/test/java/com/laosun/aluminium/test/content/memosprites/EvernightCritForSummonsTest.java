@@ -62,6 +62,9 @@ public class EvernightCritForSummonsTest {
             battle.processRequests();
         }
         double after = sprite.getAttribute(AttributeType.CRIT_ATTACK).get();
-        return new double[]{after - before, herCrit, param};
+        // CORRECTED (2026-10-18): read her CRIT DMG AFTER the cast. Her talent raises her own CRIT DMG by 0.6 when the
+        // skill's HP cost lands, and the share the memosprite gains is taken from the post-cast value.
+        double herCritAfter = battle.characters.get(1).getAttribute(AttributeType.CRIT_ATTACK).get();
+        return new double[]{after - before, herCritAfter, param};
     }
 }

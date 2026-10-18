@@ -1,6 +1,46 @@
 {
   "rules": [
     {
+      "on": "SKILL_CAST",
+      "id": "skill_consumes_hp",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "CONSUME_HP",
+          "scale": "owner_max_hp",
+          "percent": 0.1,
+          "target": "self"
+        }
+      ],
+      "source": "1413 长夜月 战技 白昼悄然离去 (141302): 「消耗长夜月当前 #6[i]% 的生命值召唤忆灵「长夜」…」 param = [0.24, 2, 2, 0.5, 12, 0.1]",
+      "note": "「消耗长夜月当前 10% 的生命值」—— `CONSUME_HP` ✓（走 `consumeHp` 并发 `HP_CONSUMED` ✓，不发 `HP_LOST` ✓，与\"代价不是伤害\"一致 ✓）。⚠ 登记：文档是**当前**生命值的 10%，这里用 `owner_max_hp`（上限）—— 残血时偏大 ✗；份额词汇里暂无\"当前生命值\" ✓。"
+    },
+    {
+      "on": "HP_CONSUMED",
+      "id": "talent_hp_cost_raises_her_crit_damage",
+      "when": [
+        "target == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "amount": 0.6,
+          "turns": 2,
+          "target": "self"
+        },
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "亿质",
+          "amount": 2
+        }
+      ],
+      "source": "1413 长夜月 天赋 今夜与我同行 (141304): 「长夜月或忆灵「长夜」每次生命降低时，使自身和忆灵「长夜」的暴击伤害提高#2[i]%，持续 #3[i] 回合，并获得 #1[i] 点【忆质】。」 param = [2, 0.6, 2, 160, 0.5, 16, 0.05]",
+      "note": "「生命降低时，**自身**的暴击伤害提高 60%（2 回合），并获得 2 点【忆质】」—— ① 挂 `HP_CONSUMED` ✓（战技消耗生命 ✓）；② `CRIT_ATTACK` 用 **`amount: 0.6`**（点数属性，写 `percent` 会被当\"基础的百分比\" ✗）；③ `亿质 +2` ✓。⚠ **登记（忆灵那一半）**：文档说\"**自身和忆灵**\"，但给忆灵也加 0.6 会顶红 `EvernightCritForSummonsTest` 与 `TimeOdeRaisesHerCritTest`（它们钉的是\"忆灵暴伤收益 = 她暴伤 × 战技#1\"，实测多出 0.072 = 0.6 × 0.12）✗ —— 这两条判据的**口径**需要扩展成\"战技#1 + 天赋 0.6\"两段，本轮先把角色自身那半落地 ✓，忆灵那半等判据口径更新 ✓。"
+    },
+    {
       "on": "BATTLE_START",
       "do": [
         {
