@@ -95,7 +95,8 @@ tasks.named('javadoc') {
     classpath = files(configurations.compileClasspath, configurations.annotationProcessor)
     options.encoding = 'UTF-8'
     options.addStringOption('Xdoclint:html,reference,accessibility,syntax', '-quiet')
-    failOnError = false
+    options.addStringOption('Xwerror', '-quiet')
+    failOnError = true
 }
 
 

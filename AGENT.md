@@ -279,7 +279,14 @@ if (isSelected) buffer.setStyle(rowArea, highlightStyle);
   否则你不知道这个闸门会不会**对任何输入都报警** ✗。
 - ⚠ **不要写"看起来对比了"的脚本**（§1.4）：对比脚本要**打印出判定行** ✓，
   且**元素缺失要报出来**（归并成集合后比较，**不能只比行数**）✗。
-- ⚠ **闸门 4 的 `failOnError = false`**：`BUILD SUCCESSFUL` **不是判据** ✓，
+- ⚠ **闸门 4 现在是"硬"的**（**2026-10-18 起**）：原先 `failOnError = false` ✓，所以 `BUILD SUCCESSFUL` **不是**判据 ✗，判据是"输出里有没有那一行" ✓ —— 那靠的是**人去看** ✓。现在改成：
+  ```groovy
+  options.addStringOption('Xdoclint:html,reference,accessibility,syntax', '-quiet')
+  options.addStringOption('Xwerror', '-quiet')
+  failOnError = true
+  ```
+  ⇒ **javadoc 报错就构建失败** ✓ 且 `-Xwerror` 把**警告也当错** ✓（`Task :javadoc` 真跑过：`BUILD SUCCESSFUL` ✓）；⚠ 输出里的 `WARNING: ... lombok.permit.Permit` 是 **JVM/lombok 的**，不是 javadoc 的 ✓，别把它当成闸门报警 ✓。
+  ⚠ **仍开着的口子**：doclint 的类别列表**不含 `missing`** ✓ ⇒ "public 成员少了 `@param` / `@return`" **不算错** ✗；要收紧就得先把全库补一遍，**未量过成本** ✓（下一步：临时加 `,missing` 跑一次、只数条数，再决定）。
   判据是**输出里有没有那一行** ✓；且它**对 `{@link}` 有效、对 `{@code X.md}` 完全瞎** ✓（§6.5）。
 - ⚠ **闸门跑一半要说清楚** ✓：只跑了闸门 1 就报「**绿只覆盖测试，不覆盖 demo 形状**」✓，
   **不许含糊成"全绿"** ✗。**没有对象**时（例如本批没搬迁）明写「**不适用**」✓，不要空转凑数 ✗。
