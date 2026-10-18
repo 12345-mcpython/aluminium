@@ -184,6 +184,13 @@ final class TriggerTargets {
                 }
                 return List.copyOf(everySummon);
             }
+            case "all_allies_lost_hp_this_action" -> {
+                if (battle == null) {
+                    throw new IllegalStateException(
+                            "Effect targets the allies that lost HP, but no battle was supplied to read that set");
+                }
+                return battle.lostHpThisAction();
+            }
             case "all_allies_lethally_hit_this_action" -> {
                 if (battle == null) {
                     throw new IllegalStateException(
@@ -676,3 +683,4 @@ final class TriggerTargets {
      */
     static final String ALLIES_OF_PATH_EXCEPT_PREFIX = "allies_of_path_except:";
 }
+

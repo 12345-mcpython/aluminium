@@ -1818,6 +1818,7 @@ public class Battle {
         // "within one action" begins here: the action boundary already existed (this event brackets
         // `performAction` and its settlement), so the lethal set is cleared at it.
         lethallyHitThisAction.clear();
+        lostHpThisAction.clear();
         fireTriggers(TriggerEvent.TURN_START, actor, actor, 0, 0);
         // "lasting until the start of the next ... turn" ends HERE: the owner's own turn is beginning.
         actor.getBuffManager().removeWithLifetime(AbstractBuff.Lifetime.NEXT_TURN_START);
@@ -2224,6 +2225,9 @@ public class Battle {
         // settlement -- the event means "an HP change happened", independent of the energy rule (who gains how
         // much, whether it counts as an attack).
         if (hpLoss > 0) {
+            if (!lostHpThisAction.contains(target)) {
+                lostHpThisAction.add(target);
+            }
             broadcastHpLoss(target, hpBefore, target.getCurrentHp(), damage.getAttacker(), hpLoss);
             // `actor` = whoever dealt the damage, `target` = the one who lost HP (i.e. the victim).
             // A counter rule keys off `target == self` -- see TriggerTable's DSL notes.
@@ -3945,6 +3949,22 @@ public class Battle {
         return List.copyOf(lethallyHitThisAction);
     }
 
+    private final List<CanHit> lostHpThisAction = new ArrayList<>();
+
+    /**
+     * The allies who <b>lost HP</b> since this action began, in the order it happened.
+     *
+     * <p>1409 Hyacine (风堇) 忆灵技2: 「若除小伊卡外的我方目标生命值降低，小伊卡会…消耗自身 4% 生命上限的生命值，并为我方生命值
+     * 降低的目标回复…」 - the recipient is <b>whoever just lost HP</b>, which is NOT low/highest HP: lowest_hp_ally answers
+     * 「当前血量百分比最低」, and that ally may not have been hit at all.
+     *
+     * <p>⚠ Filled before {@code HP_LOST} is fired (see {@code broadcastHpLoss}), so a rule hanging on that event can
+     * already read this list; cleared at the action boundary beside the lethal set, for the same reason.
+     */
+    public List<CanHit> lostHpThisAction() {
+        return List.copyOf(lostHpThisAction);
+    }
+
     private void processAddRequests() {
         if (addRequestItems.isEmpty()) {
             return;
@@ -4380,5 +4400,6 @@ public class Battle {
     private CanHit techniqueArchetype;
 
 }
+
 
 

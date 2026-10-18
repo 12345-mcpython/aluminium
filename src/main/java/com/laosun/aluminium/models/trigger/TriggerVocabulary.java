@@ -91,6 +91,9 @@ final class TriggerVocabulary {
                     "wave_monster",
                     "wave_monsters",
                     "all_allies_lethally_hit_this_action",
+                    // "the allies who lost HP in this action" (1409 Hyacine 忆灵技2): the recipient is 「生命值降低的目标」, which
+                    // is not lowest_hp_ally - the lowest-HP ally may not have been hit at all.
+                    "all_allies_lost_hp_this_action",
                     // "randomly 1 of our other targets whose current energy percentage is below 50%" (light cone 21021). Note: The 50%
                     // threshold is the text's own and no tier changes it, so it is in the method and registered there.
                     "random_ally_below_half_energy",
@@ -235,3 +238,4 @@ final class TriggerVocabulary {
      */
     static final java.util.Set<String> SCOPE_ELEMENT_READERS = java.util.Set.of("MODIFY_DAMAGE_TAKEN");
 }
+
