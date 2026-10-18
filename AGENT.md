@@ -742,6 +742,16 @@ HP_LOST 计数 = 0 ; HP_CONSUMED 计数 = 0   ← 两个事件都没发
 
 **教训（与 §3.7f 同一形状）**：**「观测不到」先怀疑观察方法** ✓ —— 那条判据错了两次，而登记替它背了三个月的锅 ✗。⇒ 全库现在 **0 个 `@Disabled`** ✓。
 
+### 3.7u 新数据：`skill_segments.json`（**全角色 / 忆灵的技能分段表**）（2026-10-18，**已勘，尚未接入**）
+
+- **位置**：`E:\code\python\data\skill_segments.json` —— **仓库外** ✓，1.8 MB，`_meta.generated = 2026-10-18 20:47:32` ✓。
+- **覆盖**：`_meta` 自报 **98 个角色 + 7 个忆灵、311 个 phase、668 个 hit** ✓，`skipped: []` ✓。
+- **形状**：顶层是 `cid → {id, name, element, mt, ability_file, hit_count, skills, groups, modifier_damage}` ✓；**忆灵在同文件的 `_servants` 下**，同形 ✓。`skills` 的键是**能力脚本里的 phase 名**（如 `Avatar_Mar_7th_00_Skill01_Phase02` ✓），每个 phase 带 `slot_guess`（1/2/3… ✓）、`attack_type` / `effect` / `label`、`hit_count` / `hit_count_by_target` / `executions`、**`split_ratio_sum`（自检用 ✓）**、以及 `segments[]` —— 每段有 `split_ratio`、`hit_split_ratio`、`split_source`（缺省 `ImplicitFull` ✓）、`formula`（如 `P#1` ✓）、`damage_type`、`target_kind`、`order`、`multiplier_lv1` ✓。
+- **它喂的是谁**：`game/data/skill_effects.json` 的 `segments` ✓ —— 今天那里只有 **3 条手写的**（1002 槽1 `[0.45,0.55]`、1002 槽2 `[0.3,0.15,0.15,0.4]`、11413 槽1 `[0.1,0.1,0.1,0.1,0.1,0.5]` ✓），而这份新数据一次给出 **668 个 hit** ✓。
+- ⭐ **可信度锚点（本轮已量）**：新数据把 1002 的两条手写值**逐位复现** —— `Skill01_Phase02` → `0.45, 0.55`（2 段）、`Skill02_Phase02` → `0.3, 0.15, 0.15, 0.4`（4 段），两条的 `split_ratio_sum` 都是 **1.0** ✓ ⇒ 提取口径与当初手推的一致 ✓（这正是接入**之前**该做的那次对账 ✓）。
+- **提取规则（下一轮的生成器照这个写）**：按 `slot_guess` 归到引擎槽位 ✓；只对 `hit_count > 1` 的 phase 出 `segments` ✓；**先验 `split_ratio_sum == 1.0`** ✓ —— 引擎把这张表当「同一发技能倍率内的份额」✓，**和不为 1 时必须拒绝**（不是归一化 ✗，那会把一个错数变成另一个错数 ✓）；`split_ratio` 缺时取 `hit_split_ratio`，两者都缺 ⇒ `ImplicitFull` = 1.0 ✓。
+- ⚠ **三处要小心**：① **同一槽位可能有多个 phase**（`Phase01/02/03`）—— 可能是**同一次施放的连续段**、也可能是**不同分支** ✓，数据里 `alternatives` / `branch_groups` / `default_fallback` 就是为这个留的 ✓（别把分支当成段 ✗，那会凭空多出伤害）；② `skill_effects.json` 是**进仓库的策展文件** ✓，而 `game/data/` 其它表是 **gitignore 的生成物** ✓ ⇒ 生成器输出放数据目录、**策展结果**才写进 `skill_effects.json` ✓；③ 忆灵在 `_servants` 下，键是 **ServantID**（`11402` ✓），与引擎 `skillAt(slot)` 的寻址一致 ✓。
+
 ### 3.8 数据文件速查
 
 | 文件 | 内容 | 已确认锚点 |
