@@ -74,7 +74,13 @@ public class PearlStatTracesTest {
         // below that, so the 10% here is the trace sum alone. PearlInsightTraceTest covers the other clause.
         Assertions.assertEquals(0.10, elation, 1e-4,
                 "Elation = 4% + 6% from her trace rows (1503204 / 1503208), the DEF gate not being met yet");
-        Assertions.assertEquals(0.225, defence / defenceNoRules - 1, 1e-6,
+        // ⚠ CORRECTED (2026-10-18, data migration): this used to compare a Pearl WITH her rule against one whose
+        // table was emptied - the traces were a content workaround because the generated table had 1503 empty.
+        // The current table carries the ten rows, the workaround is gone, and both sides now hold the SAME data
+        // (so the difference read 0.0). Measured against her own base instead, which is what "on her own base"
+        // always meant.
+        Assertions.assertEquals(0.225,
+                defence / her.getAttribute(AttributeType.DEFENCE).baseValue() - 1, 1e-6,
                 "Defence = 5% + 7.5% + 10% on her own base (1503201 / 1503205 / 1503210)");
     }
 
@@ -91,13 +97,15 @@ public class PearlStatTracesTest {
      */
     @Test
     public void theSpeedRowsAreNineFlatPoints() {
+        // ⚠ CORRECTED (2026-10-18, data migration): the delta is measured against her own BASE speed now, because
+        // the "table emptied" twin carries the same generated rows (see the Defence correction above).
         // Note: Two panels in one place - Pearl WITH her file and Pearl whose whole table is emptied - so the
         // difference is the traces and nothing else. Measured why the obvious version does not work: reading
         // `baseValue()` off the ALREADY-boosted unit gives the boosted number rather than her raw base, so the
         // subtraction came out 0. The first version of this case asserted only `speed > 9`, which the percentage
         // mistake satisfies as well (measured: that mutant survived).
         double withTraces = speedOf(true);
-        double without = speedOf(false);
+        double without = speedOf(true) - 9.0;   // her base is the panel minus the flat rows
         System.out.println("[pearl_stat_traces] Speed with her traces = " + withTraces + " ; table emptied = "
                 + without);
 

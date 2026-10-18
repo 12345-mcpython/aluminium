@@ -231,7 +231,8 @@ public class RelicTriggerTableTest {
      * <p>Spans <b>both</b> kinds of ability-bearing effect: the pure ones ({@code properties} empty) and the
      * mixed ones ({@code properties} plus an ability).
      */
-    private static final Set<String> AUTHORED = Set.of("126/4", "327/2", "130/4", "317/2", "325/2", "324/2", "129/4",
+    private static final Set<String> AUTHORED = Set.of("133/4", "134/4",
+            "126/4", "327/2", "130/4", "317/2", "325/2", "324/2", "129/4",
 
             "312/2", "119/4",
             "303/2",
@@ -336,7 +337,8 @@ public class RelicTriggerTableTest {
     /**
      * Ability-only bonuses: {@code properties} empty, the ability is the whole effect.
      */
-    private static final int PURE_ABILITY_ONLY = 35;
+    // ⚠ CORRECTED (2026-10-18, data migration): 35 -> 37 pure ability-only bonuses (sets 133 / 134 are new).
+    private static final int PURE_ABILITY_ONLY = 37;
 
     /**
      * Stat + ability bonuses: an unconditional {@code properties} stat <b>plus</b> an ability.

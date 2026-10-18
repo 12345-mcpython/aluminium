@@ -38,7 +38,9 @@ public class PearlEnhancedBasicBranchTest {
 
         Assertions.assertEquals(8, elationSlot,
                 "an Elation archetype upgrades the basic to the slot-8 form (with the extra Elation damage)");
-        Assertions.assertEquals(9, hunterSlot, "any other Path upgrades it to the slot-9 form");
+        // ⚠ CORRECTED (2026-10-18, data migration): the non-Elation form is data slot **10** now - the current
+        // tbgd has no `150309`, and `150310` is the same 「行笔，绘制末浪」.
+        Assertions.assertEquals(10, hunterSlot, "any other Path upgrades it to the slot-10 form");
     }
 
     /**

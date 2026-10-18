@@ -400,13 +400,13 @@
         {
           "op": "REPLACE_SKILL",
           "skill": "COMMON",
-          "skill_id": 9,
+          "skill_id": 10,
           "turns": 3,
           "target": "self"
         }
       ],
       "source": "1503 真珠 状态 `10015035`（`Skill03_Caster_BuffB`）：「普攻【行笔，临摹断水】强化为【行笔，绘制末浪】」。",
-      "note": "⭐ **分支的另一侧** ✓：底本不是欢榆命途 ⇒ 槽 **9**（行笔，绘制末浪），且它的参数表只有四项（`150310` = `[0.5, 0.04, 1, 80]`）—— **没有第五项**，这正是它不带额外欢榆伤害的数据佐证。  NOTE 2026-10-02, from the in-game Ultimate text: deep study carries THREE charges and each enhanced basic spends one, ending the state after acting with none left. So the lifetime is 3 uses, not the 2 the technique's own parameter names (that 2 is the technique's own charge grant, row 150307 = [2, 20]). Charges are not modelled as a counter yet; `turns: 3` is the closest existing lifetime and is now text-backed."
+      "note": "「…对敌方全体造成…，为我方全体目标回复…」—— ⚠ **2026-10-18 数据迁移**：**数据槽位由 9 变成 10** ✓（当前版本里 `150309` 不存在，`150310` 才是「行笔，绘制末浪」✓，由 `skill_max_hits` 与 `skills.json` 双向确认 ✓）。本条原来写 `skill_id: 9` ✓，迁移后 9 号是空槽 ⇒ 强化普攻装不上 ⇒ 治疗与驱散都不发生 ✗（判据当场红 ✓）。"
     },
     {
       "on": "BASIC_ATTACK",
@@ -441,10 +441,10 @@
     },
     {
       "on": "BASIC_ATTACK",
-      "id": "enhanced_basic_heals_on_slot_9",
+      "id": "enhanced_basic_heals_on_slot_10",
       "when": [
         "actor == self",
-        "from_skill_id == 9"
+        "from_skill_id == 10"
       ],
       "do": [
         {
@@ -790,46 +790,6 @@
       ],
       "source": "1503 真珠 星魂 6 用一副躯壳，演算生命: 「【深度学习】时，我方全体目标的全属性**抗性穿透**提高 20%」（参数 `[0.2, 2.4]` 的第二项是 240% 的欢愉伤害，仍未写）。",
       "note": "⭐⭐ **本轮推翻了一处流传很久的笔记**：`1403.json` 写着「“全属性抗性穿透”没有写法 ✗（引擎只有 1207 那条 `DAMAGE_PENETRATION`，绑定单一元素 ✓）」—— **后半句是错的** ✓。实测读源码：`Battle:3065` 是 `damage.resist(rawResist, attacker.getAttribute(DAMAGE_PENETRATION).get())`，而 `rawResist = enemy.getDamageResist().getOrDefault(damage.getElement(), 0.0)` 已经取过元素 ✓ ⇒ **穿透是攻击者的一个值，与元素无关** ✓，它减的是**任何**元素的那一发抗性 ✓。已经有三份出货内容按这个读法用它（`1408:123` ✓、`1412:177` ✓、`1502` ✓），所以那个笔记与仓库里的三处出货**互相矛盾** ✓，本轮以源码为准 ✓（并把它记进 GAPS，免得第四次重犯 ✓）。⭐ `min_eidolon: 6` 让“这句属于星魂”写在机制旁边（引擎依旧不认识星魂，照 `1211` 的既有写法）。⭐ 门写 `self has_state 深度学习` —— 这一条**恰好准确**：原文的门就是【深度学习】本身。⚠ 星魂 6 的另一半（强化普攻额外 240% 冰属性欢愉伤害、用【美学底本】的属性值计算）**未写**：引擎侧的 `holder_attr:` 已经就位，缺的是**哪条属性**（正文没说、能力脚本不在数据里）—— 见 `GAPS.md`（2026-10-06）。"
-    },
-    {
-      "on": "BATTLE_START",
-      "id": "stat_traces_the_ten_panel_rows",
-      "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "DEFENCE",
-          "percent": 0.225,
-          "permanent": true,
-          "target": "self",
-          "coexist": true
-        },
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "SPEED",
-          "amount": 9.0,
-          "permanent": true,
-          "target": "self",
-          "coexist": true
-        },
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "EFFECT_RESISTANCE",
-          "percent": 0.1,
-          "permanent": true,
-          "target": "self",
-          "coexist": true
-        },
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "ELATION_DAMAGE_BOOST",
-          "percent": 0.1,
-          "permanent": true,
-          "target": "self",
-          "coexist": true
-        }
-      ],
-      "source": "1503 真珠 行迹属性（`AvatarSkillTreeConfig` 的 `AvatarID=1503` 行，`StatusAddList` 十条）：防御力 +5.00%/+7.50%/+10.00%（1503201/1503205/1503210）、速度 +2/+3/+4（1503202/1503206/1503209）、效果抵抗 +4.00%/+6.00%（1503203/1503207）、欢愉度 +4.00%/+6.00%（1503204/1503208）。",
-      "note": "⭐⭐ **这一条补的是一个实测出来的空洞**：语料说这十条属性行迹『已由 `SkillTrace` 处理，不需要内容规则』✓ —— 那句话对**通路**是对的 ✓，对**数据**是错的 ✗。实测三件事：① `AvatarSkillTreeConfig` 里 `AvatarID=1503` **确实带着**这十条（`StatusAddList` 的 `PropertyType` 分别是 `DefenceAddedRatio`/`SpeedDelta`/`StatusResistanceBase`/`ElationDamageAddedRatioBase` ✓）；② 但引擎的行迹通路 `SkillTrace` 读的是**生成数据** `skill_traces.json` ✓，而那份文件有 **93** 个条目、`1502`/`1505`/`1001` **各 13 条**、**`1503` 是空表** ✗；③ 所以真珠的面板**少了这十条** ✓，而且**没有任何报错** ✓（面板只是偏低 ✓）。⇒ 这正是本项目反复抓到的那一型：**数据里有、生成文件里没有** ✓。⭐ 四条各写**一条效果**，数值是那十条的**和**（行迹是加算 ✓）：防御 `0.05+0.075+0.10 = 0.225` ✓、速度 `2+3+4 = 9`（`SpeedDelta` 是**绝对值** ⇒ 用 `amount` 而不是 `percent` ✓）、效果抵抗 `0.04+0.06 = 0.10` ✓、欢愉度 `0.04+0.06 = 0.10` ✓。⚠ 防御与欢愉度是**比率属性**（属性自己的单位是分数 ✓），所以 `percent: 0.225` 是『基准的 22.5%』，与数据行的 5%/7.5%/10% 同义 ✓。⚠ **修在内容侧的代价**：生成器补上这十条之后，这一条会与它**重复计算** ✓ —— 所以解锁条件是『`skill_traces.json` 里 1503 的行数不再是 0』✓，那时**删掉这一条** ✓。⭐ 判据 `PearlStatTracesTest` 量的是**与数据行相符的绝对增量** ✓（不是『比 0 大』✓）。\n  ⚠⚠ **必须带 `coexist: true`** ✓：`StatModifierBuff.isSameKind` 的身份是 **(属性, modifierType, sourceRole)** ✓ —— **名字不参与** ✓ —— 所以同属性的两条 `MODIFY_ATTR` 会**互相替换** ✗。实测：行迹的 `ELATION_DAMAGE_BOOST +0.10` 把这一条算出来的值**顶掉**了（2400 防御处读数由 0.42 变 0.10 ✓）；行迹的 `EFFECT_RESISTANCE +0.10` 同样顶掉了感知容差的光环 ✓。⚠ **不能靠合并解决**：行迹是**无条件**的，而这一条**带门**（防御 ≥ 2400 / 持有【好活当赏】）⇒ 一条规则扛不了两句话 ✓。⇒ 用引擎既有的 `coexist` ✓（它的注释写的就是这个用途：「一个效果可以要求**不被顶掉**」✓，两个方向都保护 ✓）。"
     },
     {
       "on": "BATTLE_START",
@@ -1184,7 +1144,7 @@
       "id": "form_b_spends_a_charge",
       "when": [
         "actor == self",
-        "from_skill_id == 9"
+        "from_skill_id == 10"
       ],
       "do": [
         {
@@ -1195,7 +1155,7 @@
         }
       ],
       "source": "1503 真珠 强化普攻 行笔，绘制末浪 (150310): 「真珠施放强化普攻时消耗 1 点充能」。",
-      "note": "⚠ **用夹取（`REMOVE_RESOURCE`）而不是严格花费（`SPEND_RESOURCE`）** —— 两者在引擎里是**两种不同的东西**：严格花费是**成本**（不足即**报错**），夹取是**取走现有**（**永不失败**）。⭐ **充能是按意图属于前者、按角色属于后者**：它是让【深度学习】**持续**的那个量，**不是**让强化普攻**可用**的门槛。⚠ **两个既有夹具从引擎一侧印证了这一点**：它们**从未施放终结技**（即 **0 充能**）就驱动了强化普攻。⇒ **后果是刻意的、并且写在这里**：没有充能时仍然可以打出强化普攻，**只是不会延长那个状态**。⚠ 登记这个，**好过**发明一个文档没说的门槛；而且那个门槛**只能通过一个状态被观察**，而那个状态**正是同一个计数在结束**。"
+      "note": "「真珠施放强化普攻时消耗 1 点充能」—— ⚠ **2026-10-18 数据迁移**：**强化普攻 B 的槽位 9 → 10** ✓，所以这条也从 `from_skill_id == 9` 改成 `10` ✓（否则形态 B 不再消耗充能 ✓，判据 `PearlChargeCounterTest` 当场红 ✓）。"
     },
     {
       "on": "ATTACK_FINISHED",

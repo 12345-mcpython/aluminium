@@ -119,6 +119,11 @@ public class EnergyDataConformanceTest {
                 if (data == null || !data.isLoaded() || data.getSpBase() == null) {
                     continue;
                 }
+                // A SERVANT (忆灵) is not a character: its basics carry their own energy values (measured: 11402 -> 10,
+                // 11409 -> 5, 18007 -> 10), and the 20/30/5 tiers describe the avatar table.
+                if (!Constant.CHARACTERS.containsKey(byCid.getKey())) {
+                    continue;
+                }
                 double total = slot == 3 ? data.getSpBase()
                         : data.getSpBase() * instancesOf(data, bySlot.getValue().maxLevel());
                 if (Math.abs(total - TIER.get(slot)) > EPS) {
