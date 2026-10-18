@@ -455,6 +455,18 @@ public final class SkillExecutor {
 
         double totalDamage = 0;
 
+        // A row may state its damage as MORE THAN ONE PART, each reaching its own target shape (「对指定敌方单体...
+        // 随后对敌方全体...」). The parts settle in the order the description states them, so the single-target half
+        // lands first. Without this branch a row whose `skill_effect` is AoEAttack settles one area hit and drops the
+        // other half SILENTLY - the failure mode this project treats as the worst one (a plausible wrong number).
+        // Reader: 1415 Cyrene (昔涟)'s enhanced basic 141508; see the field's own javadoc.
+        List<SkillEffectSpec.DamagePart> parts = damagePartsOf(skill);
+        if (!parts.isEmpty()) {
+            totalDamage += settleParts(battle, data, skill, user, element, params, mainTarget, parts, hitTargets);
+            battle.fireAfterAttack(user, mainTarget, hitTargets, totalDamage);
+            return;
+        }
+
         // An ElationDamage row reads its params as [hits, per-hit share, final split share] (readers 8009/8010
         // slot 20, whose text is "deal #1 instances of damage, each dealing #2% to a random single enemy ... The last deals #3% ..., divided evenly among all enemies").
         // Note: The row's own `skill_effect` is AoEAttack, so without this branch the leading 8 is read as a MULTIPLIER -- 800% damage
@@ -578,6 +590,64 @@ public final class SkillExecutor {
         // (EnemySkill) is an attack too and must raise the same notification -- see Battle.fireAfterAttack for
         // which attacks qualify and why derived hits deliberately do not.
         battle.fireAfterAttack(user, mainTarget, hitTargets, totalDamage);
+    }
+
+    /**
+     * The damage parts the skill's row states, or an empty list when it states the ordinary single shape.
+     *
+     * <p>Note: The table is {@code data/skill_effects.json} (the same hand-maintained table that carries
+     * {@code segments}), keyed by {@code (cid, slot)} - the replacement skill {@code REPLACE_SKILL} installs keeps
+     * both keys, so an enhanced attack finds its own entry.
+     */
+    private static List<SkillEffectSpec.DamagePart> damagePartsOf(Skill skill) {
+        SkillEffectSpec spec = SkillEffects.forSkill(skill);
+        List<SkillEffectSpec.DamagePart> parts = spec == null ? null : spec.getDamageParts();
+        return parts == null ? List.of() : parts;
+    }
+
+    /**
+     * Settles a multi-part row: each part takes its <b>own</b> parameter from the same level row and reaches the shape
+     * it names, in the order the description states them.
+     *
+     * <p>Each part's toughness comes from the column its own shape reads (single-target {@code single}, area
+     * {@code all}) - the same mapping {@link SkillData#stanceFor(boolean)} applies to every single-shape skill, so the
+     * two readings cannot drift.
+     *
+     * @return the damage the parts settled, for the attack summary
+     */
+    private static double settleParts(Battle battle, SkillData data, Skill skill, CanHit user, DamageElement element,
+                                      List<Double> params, CanHit mainTarget,
+                                      List<SkillEffectSpec.DamagePart> parts, Set<CanHit> hitTargets) {
+        AttributeType baseAttribute = data.damageBaseAttribute();
+        double total = 0;
+        for (SkillEffectSpec.DamagePart part : parts) {
+            int index = part.getIndex();
+            if (index < 0 || index >= params.size()) {
+                throw new IllegalStateException("skill_effects.json's damage part for " + data.getSkillType()
+                        + " points at parameter #" + (index + 1) + ", but the row has " + params.size()
+                        + " - a part's share must exist in the row it is read from");
+            }
+            SkillEffectType shape = SkillEffectType.fromString(part.getShape());
+            if (shape == null) {
+                throw new IllegalStateException("skill_effects.json's damage part names the unknown shape '"
+                        + part.getShape() + "'");
+            }
+            double partBase = user.getAttribute(baseAttribute).get() * params.get(index);
+            switch (shape) {
+                case SINGLE_ATTACK -> total += hit(battle, data, user, element, partBase, mainTarget, hitTargets,
+                        data.getStanceList().single(), skill.getSkillSlot());
+                case AOE_ATTACK -> {
+                    double stance = data.stanceFor(true);      // an area hit's per-victim column
+                    for (CanHit target : battle.targetableEnemies()) {
+                        total += hit(battle, data, user, element, partBase, target, hitTargets, stance,
+                                skill.getSkillSlot());
+                    }
+                }
+                default -> throw new IllegalStateException("skill_effects.json's damage part shape '" + shape
+                        + "' is not one this reading supports (SingleAttack / AoEAttack)");
+            }
+        }
+        return total;
     }
 
     /**
