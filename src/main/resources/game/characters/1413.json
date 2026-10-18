@@ -326,6 +326,32 @@
       ],
       "source": "1415 昔涟 忆灵技能 24：「**长夜月战技的暴击伤害提高效果额外提高，提高数值等同于长夜月暴击伤害的 #3%」（#3 = 0.06）。",
       "note": "⭐ 增量加在**拼法解出的份额**上（本轮引擎改动）：`(0.12 + 0.06) × 暴伤`。"
+    },
+    {
+      "on": "HP_LOST",
+      "id": "probe_lost",
+      "when": [],
+      "do": [
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "probeLost",
+          "amount": 1
+        }
+      ],
+      "source": "临时探针"
+    },
+    {
+      "on": "HP_CONSUMED",
+      "id": "probe_consumed",
+      "when": [],
+      "do": [
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "probeConsumed",
+          "amount": 1
+        }
+      ],
+      "source": "临时探针"
     }
   ],
   "resources": [
@@ -343,6 +369,16 @@
       "id": "岁月之诗的亿质点数",
       "max": 2147483647,
       "source": "⚠ **不是数据里的名字** —— 数据行 24 的 `#2`（ParamList 下标 1）在施放那一刻被捕获后存放的地方（基点）。"
+    },
+    {
+      "id": "probeLost",
+      "max": 999,
+      "source": "临时探针"
+    },
+    {
+      "id": "probeConsumed",
+      "max": 999,
+      "source": "临时探针"
     }
   ]
 }
