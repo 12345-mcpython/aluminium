@@ -1453,6 +1453,14 @@ public final class TriggerInterpreter {
             if (effect.getBuff() != null && !effect.getBuff().isBlank()) {
                 zone.setBuffName(effect.getBuff().trim());
             }
+            // "this zone must live beside another source's zone": the `coexist` ask that MODIFY_ATTR has honoured since
+            // 1408's trace was never read on THIS op, so a second `MODIFY_DAMAGE_TAKEN` from another rule evicted the
+            // first. Measured: 1512's memosprite aura (+11.2%, set at SUMMONED) disappeared the moment light cone 23042's
+            // +36% landed - the ratio came out (1+0.36)/(1+0.112) instead of 1+0.36+0.112, while the game's own capture
+            // carries 0.64 = 0.36 + 0.28, i.e. the two sources DO add.
+            if (Boolean.TRUE.equals(effect.getCoexist())) {
+                zone.setKeepsSiblings(true);
+            }
             // "with a 100% base chance, raise the DoT damage taken by ... by 30%" (1108 桑波): a zone may be ROLLED, through the same
             // resist pipeline APPLY_BUFF/APPLY_DOT use. Note: Unstated = attached directly, so no existing file changes.
             attachRolled(battle, target, zone, effect, ctx);
