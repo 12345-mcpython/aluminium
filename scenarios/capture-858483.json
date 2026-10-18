@@ -1,6 +1,6 @@
 {
   "name": "原游戏实测复算：一次暴击 Servant 伤害 858,483.460719418",
-  "note": "数值取自你给的游戏伤害事件（damage / zones）。引擎侧：攻方用 1002 的终结技（风、单体、单段）承载，base 直接由 damage_value 反解 ATK；攻方增益按 zones 覆盖（all_damage_type_added_ratio=3.49、critical_damage=5.0913、base_damage_multi_ratio=1.5、all_damage_type_penetrate=0.2）；守方 DEF 用反解出来的 786.000056（= 210 × 3.742857，即按 1000/(DEF+1000) 反解，见 scenarios/README.md），并施加 zones 里的易伤 0.64 与减伤 0.75；守方为已击破（否则引擎会再叠 0.9 韧性减伤）。",
+  "note": "数值取自你给的游戏伤害事件（damage / zones），目标已用你给的那份属性 dump 确认：**堕神之血•亚婆离**、`Level 100`、`MaxStance 1080`、抗性 Fire/Physical/Thunder/Wind 各 0.2（与 zones.resistance 完全一致）；`BaseHP 6,389,558.461337` 被 ×2 成 `MaxHP 12,779,116.922673`。⭐ dump 里 `mod:StanceBreakState` 在场 ⇒ 那一发打的是**已击破**目标 ⇒ 没有额外的 0.9 韧性减伤 ⇒ `all_damage_reduce 0.75` 就是总减伤，所以本场景用 `broken: true`（这一条现在是 dump 证明的，不是猜的）。⚠ **唯一仍缺的是目标 DEF**：dump 里没有 Defence/DefenceBase，也没有那些 `mod:Monster_W5_Fallen_00_*` 的数值；从等级 80 的防御式反解得 **786.000056**。引擎侧就以这个值输入（`target.attributes.DEFENCE`），待有 DEF 面板后替换。其余：攻方用 1002 终结技（风、单体、单段）承载，`base` 由 `damage_value` 反解 ATK；攻方增益按 zones 覆盖；0.64 易伤可指认到 `mod:MEquip_23042_AllDamageTypeTakenRatio` 与 `mod:MServant_RobinSServant_00_DamageTakenAura`，0.75 减伤对应 `mod:MonsterAllDamageReduce`。",
   "attacker": {
     "cid": 1002,
     "level": 80,
@@ -43,7 +43,7 @@
   "crit": true,
   "instance": 0,
   "instances": 1,
-  "tolerance": 1e-6,
+  "tolerance": 1e-06,
   "expect": {
     "base": 91155.27047840762,
     "BoostArea": 4.490000003250316,
