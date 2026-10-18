@@ -292,6 +292,26 @@
       "note": "「风堇**与小伊卡**」—— 与上一条**同一条资源、同一个字段** ✓，只是门换成 `actor == summon` ✓（忆灵治疗时 `HEALED` 的 `actor` 是它 ✓，与天赋那条「风堇**或小伊卡**提供治疗时」同一个读法 ✓）。⚠ 与上一条**必须是两条规则** ✓：条件是 AND 的，而「她**或**忆灵」是 OR ✓ ⇒ 一个门写不了两句话 ✓。"
     },
     {
+      "on": "CAST_SETUP",
+      "id": "memosprite_rainclouds_deals_a_share_of_the_tally",
+      "when": [
+        "actor is_summon",
+        "from_skill_id == 1"
+      ],
+      "do": [
+        {
+          "op": "DAMAGE",
+          "scale": "self_resource:小伊卡累计治疗",
+          "percent_from_cast_param": 0,
+          "element": "Wind",
+          "target": "all_enemies"
+        }
+      ],
+      "source": "1409 风堇 忆灵技1 乌云乌云快走开！（数据槽位 1，SkillID 1140901）：「对敌方全体造成等同于**本场战斗风堇与小伊卡累计治疗数值** #1% 的风属性伤害…」param = [0.1…0.28, 0.5]",
+      "note": "「造成等同于**累计治疗数值 #1%** 的风属性伤害」—— ① 基数用**新词汇** **`scale: \"self_resource:小伊卡累计治疗\"`** ✓（本轮 `AGENT.md` §3.7p：以**规则持有人的**计数器为倍数 ✓ —— 那条计量就在风堇身上 ✓）；② 比例取**这一发施放自己的行** ✓：`percent_from_cast_param: 0` ✓（`#1` 随等级变：Lv1 `0.1` … Lv10 `0.28` ✓，而忆灵技的行在 cid **11409** 的槽位 1 里 ✓，`cast_skill_param` 那一族读的就是**触发事件的那次施放** ✓）；③ 元素 `Wind` ✓、目标 `all_enemies` ✓；④ 事件 `CAST_SETUP` ✓ + `actor is_summon` + `from_skill_id == 1` ✓（`from_skill_id` 比的是数据槽 ✓，1415 的 `== 19` 是同一拼法 ✓）。⚠ **登记**：忆灵技1 **自己的数据**还会结算一发「`%ATK`」的伤害 ✗，而小伊卡的 **ATK 恒为 0** ✓（实测 `ikaAtk = 0.0`）⇒ 那一发只剩引擎的**最小 1 点** ✓（实测 `dealt = 1.0`）⇒ 本条与它**相加**，总伤害 = `tally × #1 + 1` ✓（那 1 点是数据侧的残渣，未消除；判据按 `+1` 钉 ✓）。"
+    },
+    {
+      "on": "CAST_SETUP",
       "on": "BATTLE_START",
       "id": "trace_windstorm_raises_her_max_hp_above_200_speed",
       "when": [
