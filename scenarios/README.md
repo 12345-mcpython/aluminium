@@ -383,31 +383,65 @@ gradlew run --args="compare-capture ...json --limit 5"                        # 
 gradlew run --args="capture-flow src/test/resources/captures/veritas-085418.json"
 ```
 
-捕获里的事件是平铺的（没有回合号、没有施放 id），但两条性质让分组可判定：
+捕获里的事件是平铺的（没有回合号、没有施放 id），但三条性质让分组可判定：
 
-1. **每一发真实命中后面紧跟一条配对事件**：`type: True` 且 `attack_type: 13`（这是 kit 给每个目标额外拍的一记真伤）。
-   所以"命中组" = 一条非 13 事件 + 它后面那条 13 事件；
-2. **一次施放重复同一个技能值**：同攻方、同 `raw_damage_before_modifiers` 的连续命中组属于同一次施放
-   （AoE 打两个敌人 ⇒ 同一个 base 出现两次；单体五段 ⇒ 出现五次）。
+1. **`attack_type` 就是游戏自己的分类**：`1` 普攻 / `3` 终结技 / `12` 忆灵技（这三类是**施放**）、`6` 是 kit 派生的附加伤害、
+   `10` 是弱点击破 —— 后两类是**后果**，不是施放 ⇒ **攻方或 `attack_type` 变了就是新的一次施放**；
+2. **一次施放可以有几段不同的 base**：忆灵「长夜」的技能 1 是**一次**施放，六段的 `HitSplitRatio` 是 `0.1×5 + 0.5`
+   （`skill_effects.json` 的 `11413/1`），所以载荷上是五个小的 base 加一个五倍大的。⚠ 早先那条「按 base 分组」的规则
+   把这一次施放**切成了 5 + 1**，看起来像五段 —— 已撤回；
+3. **配对真伤紧跟自己的命中**：每一发真实命中后面跟一条 `type: True` / `attack_type: 13`，顺序与命中一致 ⇒ 先进先出配对。
 
-规则之下，一次施放报出：**命中组数 / 不同目标数 / 真实伤害合计 / 配对真伤合计**。
+规则之下，一次施放报出：**命中数 / 不同目标数 / 真实伤害合计 / 配对真伤合计**。
 
-这份 fixture（真实战斗 82 条事件）的结果：
+这份 fixture（真实战斗，事件的条数由工具自己打印）的结果：
 
 ```
-events:  82 ; casts: 21
-cast actor  kind                base   hits targets         damage    companion
-1    1413   Servant           177.60      5       1        7739.00      1857.36   ← 单体五段
-3    1409   Servant         10334.03      2       2      246233.94     59096.15   ← AoE 两目标
-7    1413   Ultimate         9053.00      2       2      485215.57    116451.74   ← 终结技 AoE
-10   1415   Break           10883.71      1       1       15601.45         0.00   ← 击破
-20   1512   Servant          7874.67      1       1      195703.98     82195.67   ← 第四位角色首次出手
+capture: veritas-085418.json
+events:  82 ; casts: 13 ; derived hits: 4 ; breaks: 1
+cast actor  kind            base   hits targets         damage    companion class
+1    1413   Servant       177.60      6       1       15478.00      3714.72 cast    ← 六段单体
+2    1409   Servant     10334.03      2       2      246233.94     59096.15 cast    ← 规则交付的 AoE
+3    1409   Additional   1416.02      2       2       33740.19      8097.65 derived ← 上面那一发派生的
+7    1415   Break       10883.71      1       1       15601.45      3744.35 break   ← 击破不是施放
 ...
 covered: 82 / 82 events
-1413   casts: 8      1409   casts: 8      1415   casts: 4      1512   casts: 1
 ```
 
-`CaptureFlowTest` 把"82 条事件 → 21 次施放、覆盖 82/82、有单体五段、有 AoE 两目标、四位角色都出手"这些**事实**钉住。
+`CaptureFlowTest` 把"82 条事件 → 13 次施放 + 4 组派生 + 1 次击破、覆盖 82/82、有六段单体、有 AoE 两目标、
+四位角色都出手"这些**事实**钉住。
+
+### `replay <plan.replay.json>`：把整场捕获**喂给引擎**打一遍
+
+```bash
+gradlew run --args="replay scenarios/veritas-085418.replay.json"           # 对账表
+gradlew run --args="replay scenarios/veritas-085418.replay.json --detail"  # 再加每一发的实例与它读到的行
+```
+
+`compare-capture` 是**逐条事件**复算（引擎的乘区算术对不对）；`replay` 是**整场**重放（引擎的**规则**能不能自己长出那些修饰）。
+它做的事：
+
+1. 用捕获里**每一个目标**的 `target_max_hp` / `target_defence` / `target_resistance` 造敌人（`Enemy.fromAttributes` +
+   `setDamageResist`）—— 不是按 `monster_id` 猜；
+2. 用捕获里每个攻方的 `attacker_attack_lp` / `attacker_hp_lp` / `attacker_defence` 当**绝对面板**装到角色上；
+3. 按计划的 `casts` 表**依次**用 `Battle.castImmediate(skill, 施放者, 目标)` 施放 —— 不看行动条，捕获说了算；
+4. 每一发施放窗口里**结算了多少**（`DamageObserver` 的 `applied` 之和）与捕获那一发的 `damage + companion`
+   （加上紧跟它的派生组）逐行对账。
+
+**计划文件**（`scenarios/<fixture>.replay.json`）的形状：
+
+| 字段 | 内容 |
+|---|---|
+| `capture` | 要重放的捕获，相对工作目录 |
+| `party[]` | 每个攻方 uid：`owner`（捕获用的 uid）/ `cid` / `level` / `eidolon` / `memosprite`（是否先把它摆在场上）/ `attributes`（**绝对**面板） |
+| `enemies[]` | 捕获里的目标：`health` / `defence` / `level` / `speed` / `resistance`（元素名 → 抗性） |
+| `casts[]` | 一次施放：`cast`（**捕获 flow 里的序号**，连接键）/ `actor`（uid）/ `caster`（`character` 或 `memosprite`）/ `slot`（角色用 `SkillType` 名，忆灵用**数据槽**）/ `target`（`enemies` 的 1 基下标）/ `repeat`（连放几次）/ `note`（为什么是这个槽） |
+
+⚠ 计划**不能**跟捕获打架：驱动会核对每一发的 `actor` 与**第一发的 `target_max_hp`**，不一致就退 2（`BattleReplayTest`
+有一条反向用例钉它）。⚠ 一次施放驱动不了时（数据里没有那一槽），工具**指名**它，不静默跳过。
+
+⚠ **它不校验的东西**：settled 的总额现在还不是契约 —— 捕获是"已经在打"的一段窗口，前缀状态不在载荷里。
+差在哪、为什么差，登记在 `AGENT.md` §3.7zb；`--strict` 只是把那行差异变成退出码，给以后"对平了"的那天用。
 
 ### 为什么需要 `attributes` 覆盖
 

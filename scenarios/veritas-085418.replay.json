@@ -1,0 +1,213 @@
+{
+  "name": "veritas-085418 — the captured fight, cast by cast",
+  "capture": "src/test/resources/captures/veritas-085418.json",
+  "note": "⚠ The capture is a WINDOW of a fight already in progress, not a fight from its start: 1409's 「雨过天晴」 is up before event 0 (1415's 生命上限 10320.4433 already carries it, per AGENT.md §3.7k), and 1413's own 生命面板 moves inside the window (2960.0287 → 4526.4984 → 4309.8792). Those prefix states are NOT reproducible by driving this window, so they are declared missing in AGENT.md rather than invented here. What this plan does state is what the payload itself states: each actor's absolute panel (ATTACK / HEALTH / DEFENCE as the capture reports them), each enemy's 生命上限 / 防御 / 抗性, and which skill slot each captured cast used. The cast → slot table is the manual part ( §4 of the handover ): attack_type 12 is a 忆灵's skill, and a 忆灵's skills live by DATA SLOT, so each entry names the slot and the memosprite it belongs to.",
+  "party": [
+    {
+      "owner": 1409,
+      "cid": 1409,
+      "level": 80,
+      "eidolon": 0,
+      "memosprite": true,
+      "attributes": {
+        "ATTACK": 1325.447000,
+        "HEALTH": 4384.981600,
+        "DEFENCE": 1375.417000
+      }
+    },
+    {
+      "owner": 1413,
+      "cid": 1413,
+      "level": 80,
+      "eidolon": 0,
+      "memosprite": true,
+      "attributes": {
+        "ATTACK": 1500.771703,
+        "HEALTH": 2960.028710,
+        "DEFENCE": 1201.083676
+      }
+    },
+    {
+      "owner": 1415,
+      "cid": 1415,
+      "level": 80,
+      "eidolon": 0,
+      "memosprite": true,
+      "attributes": {
+        "ATTACK": 1275.372000,
+        "HEALTH": 10320.443300,
+        "DEFENCE": 1261.328300
+      }
+    },
+    {
+      "owner": 1512,
+      "cid": 1512,
+      "level": 80,
+      "eidolon": 0,
+      "memosprite": true,
+      "attributes": {
+        "ATTACK": 2655.858700,
+        "HEALTH": 5249.781100,
+        "DEFENCE": 1043.408900
+      }
+    }
+  ],
+  "enemies": [
+    {
+      "name": "captured enemy 1",
+      "health": 2496478.27933638,
+      "defence": 1149.99990016222,
+      "level": 95,
+      "speed": 100,
+      "resistance": {
+        "PHYSICAL": 0,
+        "FIRE": 0.2,
+        "ICE": 0,
+        "THUNDER": 0,
+        "WIND": 0.4,
+        "QUANTUM": 0.2,
+        "IMAGINARY": 0.2
+      }
+    },
+    {
+      "name": "captured enemy 2",
+      "health": 2269525.70848762,
+      "defence": 1149.99990016222,
+      "level": 95,
+      "speed": 100,
+      "resistance": {
+        "PHYSICAL": 0,
+        "FIRE": 0.2,
+        "ICE": 0,
+        "THUNDER": 0.2,
+        "WIND": 0.2,
+        "QUANTUM": 0,
+        "IMAGINARY": 0.2
+      }
+    },
+    {
+      "name": "captured enemy 3",
+      "health": 27234308.5018514,
+      "defence": 1149.99990016222,
+      "level": 95,
+      "speed": 100,
+      "resistance": {
+        "PHYSICAL": 0,
+        "FIRE": 0.2,
+        "ICE": 0,
+        "THUNDER": 0.2,
+        "WIND": 0,
+        "QUANTUM": 0.2,
+        "IMAGINARY": 0.2
+      }
+    }
+  ],
+  "casts": [
+    {
+      "cast": 1,
+      "actor": 1413,
+      "caster": "memosprite",
+      "slot": 1,
+      "target": 1,
+      "note": "长夜's 忆灵技1「追忆，蹁跹，如雨」: six instances on one target (skill_segments.json servants.11413 Skill01 = 6, main=6), ice, base 0.06 x 生命上限 each = the game's 5 x 0.1 + 1 x 0.5 split of one 0.6 row."
+    },
+    {
+      "cast": 2,
+      "actor": 1409,
+      "caster": "memosprite",
+      "slot": 1,
+      "target": 2,
+      "note": "小伊卡's 忆灵技1「乌云乌云快走开！」: the damage is DELIVERED BY RULES (11409/1 is effect Rules -> 1409's own rule reads the 累计治疗 tally), which expands to every living enemy - the capture shows two targets because the rule/attack reaches all of them."
+    },
+    {
+      "cast": 4,
+      "actor": 1413,
+      "caster": "memosprite",
+      "slot": 1,
+      "target": 1,
+      "note": "Same slot as cast 1. The capture's per-instance base is 0.09 x 生命上限 = 0.9 for the whole cast, i.e. 0.6 + the 「每有 #3 点【忆质】额外造成 #2%」 the game folds into the same six instances (registered gap, AGENT.md §3.7h)."
+    },
+    {
+      "cast": 5,
+      "actor": 1413,
+      "caster": "character",
+      "slot": "ULTRA",
+      "target": 2,
+      "note": "1413's own ultimate (attack_type 3): a 15-level AoE row, base 2.0 x 生命上限 on each enemy."
+    },
+    {
+      "cast": 6,
+      "actor": 1413,
+      "caster": "memosprite",
+      "slot": 8,
+      "target": 1,
+      "note": "⚠ NOT DRIVABLE: 长夜's 强化普攻 (skill_segments.json servants.11413 Skill11/Skill12, slot_guess 8) has NO row in skills.json - the servant's slots imported there are [1, 3, 5, 6, 7]. The capture proves the slot exists (two targets, 3.0 x 生命上限 on the main and 1.5 on the other = the 2:1 blast split). Registered, not guessed."
+    },
+    {
+      "cast": 8,
+      "actor": 1415,
+      "caster": "character",
+      "slot": "COMMON",
+      "target": 2,
+      "note": "1415's basic attack (attack_type 1), base 0.5 x 生命上限 - her row states its damage off Max HP, not ATK."
+    },
+    {
+      "cast": 9,
+      "actor": 1409,
+      "caster": "memosprite",
+      "slot": 1,
+      "target": 2,
+      "note": "小伊卡 again, after more healing raised the tally."
+    },
+    {
+      "cast": 11,
+      "actor": 1409,
+      "caster": "memosprite",
+      "slot": 1,
+      "target": 2,
+      "note": "小伊卡 again."
+    },
+    {
+      "cast": 13,
+      "actor": 1413,
+      "caster": "character",
+      "slot": "ULTRA",
+      "target": 1,
+      "note": "1413's ultimate, one living target this time."
+    },
+    {
+      "cast": 14,
+      "actor": 1409,
+      "caster": "memosprite",
+      "slot": 1,
+      "target": 1,
+      "note": "小伊卡, one living target."
+    },
+    {
+      "cast": 16,
+      "actor": 1415,
+      "caster": "memosprite",
+      "slot": 1,
+      "target": 3,
+      "repeat": 4,
+      "note": "德谬歌's 忆灵技1 (skill_segments.json servants.11415 = one hit per cast), base 0.6 x 生命上限. The flow groups four consecutive same-actor same-type hits as one cast; the segment table says each cast is ONE hit, so this entry is driven four times."
+    },
+    {
+      "cast": 17,
+      "actor": 1512,
+      "caster": "memosprite",
+      "slot": 1,
+      "target": 3,
+      "note": "晴空乐手's 忆灵技1, base 1.5 x 生命上限 = 11512 slot 1's SECOND parameter at the row the game used. ⚠ The engine reads parameter #1 (0) today, so its own base is 0 - a data-layout gap this table exposes (registered)."
+    },
+    {
+      "cast": 18,
+      "actor": 1415,
+      "caster": "memosprite",
+      "slot": 1,
+      "target": 3,
+      "repeat": 4,
+      "note": "Same as cast 16: four more one-hit casts of 德谬歌's slot 1."
+    }
+  ]
+}
