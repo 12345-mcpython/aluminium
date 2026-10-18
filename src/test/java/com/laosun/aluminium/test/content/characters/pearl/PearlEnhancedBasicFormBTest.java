@@ -44,8 +44,9 @@ public class PearlEnhancedBasicFormBTest {
         Character other = battle.characters.get(3);
         battle.fireTriggers(TriggerEvent.ULT_CAST, pearl, archetype, 0, 0);
         battle.processRequests();
-        Assertions.assertEquals(9, pearl.getSkills().get(SkillType.COMMON).getSkillSlot(),
-                "precondition: a non-Elation archetype installs the SLOT-9 form, which is what this case is about");
+        // ⚠ CORRECTED (2026-10-18, data migration): data slot **10**, not 9 (150309 no longer exists).
+        Assertions.assertEquals(10, pearl.getSkills().get(SkillType.COMMON).getSkillSlot(),
+                "precondition: a non-Elation archetype installs the SLOT-10 form, which is what this case is about");
 
         // Hurt the party, with ONE ally clearly the lowest so the "additional heal" has a unique target.
         for (Character ally : battle.characters) {

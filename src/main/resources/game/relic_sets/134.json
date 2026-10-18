@@ -1,0 +1,38 @@
+{
+  "4": [
+    {
+      "on": "BATTLE_START",
+      "id": "relic134_basic_damage",
+      "when": [],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "BASIC_ATTACK_DAMAGE_BOOST",
+          "percent": 0.36,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "遗器 134 贪噬禁果的异端 4 件套 (Ability51341): 「使装备者普攻造成的伤害提高 #1[i]%。」 param = [0.36, 0.2, 2]",
+      "note": "「装备者**普攻**造成的伤害提高 #1(36)%」—— ① 这是**按攻击类型作用域**的增伤 ✓，引擎的属性是 `BASIC_ATTACK_DAMAGE_BOOST` ✓，由 `BattleDamage.applyZones` 通过 `damage.getCastCategory().damageBoost()` 读取 ✓ —— 也就是「这一发是普攻」✓，而不是把 36% 加进通用的增伤桶 ✗（那样战技/终结技也会吃到 ✗）。② 套装一直穿着 ⇒ `BATTLE_START` ＋ `permanent: true` ✓。③ 参数 #1 = 0.36 ✓ 与 `relic_sets.json` 的 param 一致 ✓。"
+    },
+    {
+      "on": "BASIC_ATTACK",
+      "id": "relic134_basic_attack_raises_attack",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.2,
+          "turns": 2,
+          "target": "self"
+        }
+      ],
+      "source": "遗器 134 贪噬禁果的异端 4 件套 (Ability51341): 「当装备者施放普攻时，使装备者的攻击力提高 #2[i]%，持续 #3[i] 回合。」 param = [0.36, 0.2, 2]",
+      "note": "「**当装备者施放普攻时**，攻击力提高 #2(20)%，持续 #3(2) 回合」—— ① 事件 `BASIC_ATTACK` ✓（`actor == self` ⇒ 只看**装备者自己**的普攻 ✓，1503 的强化普攻规则用的同一个事件 ✓）。② 「攻击力提高 20%」是**份额** ⇒ `MODIFY_ATTR ATTACK percent: 0.2` ✓（引擎里 `ATTACK` 的 percent 走 `add_percent` ⇒ ×(1+0.2) ✓，不是 +0.2 点 ✗）。③ `turns: 2` ✓ = #3。④ 数值与 `relic_sets.json` 的 `param = [0.36, 0.2, 2]` 逐项一致 ✓。"
+    }
+  ]
+}

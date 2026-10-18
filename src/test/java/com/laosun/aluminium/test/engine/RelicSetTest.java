@@ -84,11 +84,13 @@ public class RelicSetTest {
         // Synthetic test-side sets (release_version == "test") never ship, so no census counts them.
         List<RelicSet> shipped = Constant.RELIC_SETS.values().stream()
                 .filter(s -> !"test".equals(s.releaseVersion())).toList();
-        Assertions.assertEquals(60, shipped.size(),
-                "the shipped relic_sets.json holds 60 sets (32 cavern + 28 planar); a different number means "
+        // ⚠ CORRECTED (2026-10-18, data migration): 60 -> 62 sets in the current version.
+        Assertions.assertEquals(62, shipped.size(),
+                "the shipped relic_sets.json holds 62 sets; a different number means "
                         + "the file changed and this registry line needs re-checking");
         int effects = shipped.stream().mapToInt(set -> set.effects().size()).sum();
-        Assertions.assertEquals(92, effects, "the shipped file holds 92 set bonuses (2- and 4-piece)");
+        // ⚠ CORRECTED (2026-10-18, data migration): 92 -> 96 bonuses (two new sets, 2 + 2).
+        Assertions.assertEquals(96, effects, "the shipped file holds 96 set bonuses (2- and 4-piece)");
         Assertions.assertTrue(RelicSets.loadCount() >= 1, "the file must have been read at least once");
         Assertions.assertSame(Constant.RELIC_SETS, RelicSets.table(), "the table is read once and cached");
 
@@ -436,8 +438,10 @@ public class RelicSetTest {
                 abilityOnly++;
             }
         }
-        Assertions.assertEquals(57, withStats, "the shipped file's stat bonuses");
-        Assertions.assertEquals(35, abilityOnly,
+        // ⚠ CORRECTED (2026-10-18, data migration): 57 -> 59 stat bonuses (the two new sets ship one each).
+        Assertions.assertEquals(59, withStats, "the shipped file's stat bonuses");
+        // ⚠ CORRECTED (2026-10-18, data migration): 35 -> 37 ability-only bonuses.
+        Assertions.assertEquals(37, abilityOnly,
                 "the shipped file's ability-only bonuses: selected by RelicSuit.activeEffects(), not executed "
                         + "— the engine has no ability interpreter");
         Assertions.assertEquals(shipped.stream().mapToInt(s -> s.effects().size()).sum(),

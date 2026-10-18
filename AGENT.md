@@ -362,6 +362,29 @@ if (isSelected) buffer.setStyle(rowArea, highlightStyle);
 | **技能等级表边界** | 等级越界要有定义 | 【已把守：`SkillLevelTableBoundTest`】 |
 | **读参数行只准走一个解析器** | 任何读参数行的地方都用 `CanHit.skillLevel` ✓（角色按 `SkillType`、忆灵按 data slot ✓）；写死行号 / `getFirst()` ✗ —— ⚠ 由**描述**驱动的那几个读法（弹射的份额与次数、Debuff 基础概率）曾是例外 ✓，在数值恰好平坦时**完全隐形** ✗（2026-10-17 实测：1004 瓦尔特 的弹射每段读 0.36 而第 10 行是 0.72 ✓） | 【已把守：`BounceSkillLevelTest`、`DebuffChanceDataTest.theLevelSelectsTheRow`】 |
 
+### 3.7b 数据版本与迁移（**2026-10-18**）
+
+> 数据由仓库外的 `E:\code\python\generate_data.py` 从 `E:\turnbasedgamedata` 生成。**这一次整体迁移到当前 tbgd**，
+> 生成器的四处缺口已补（备份 `generate_data.py.bak2..bak5`）：
+
+| 缺口 | 症状 | 修法 |
+|---|---|---|
+| `hp_modify_ratio` 读的是 **`AttackModifyRatio`** | **1381/2722** 只怪的 HP 倍率错（例 100201501 真实 2 → 存成 1） | 改读 `HPModifyRatio` |
+| 覆盖 `skill_effects.json`（**入库、手写**的表） | 60 条 → 42 条，丢 20 条（含 1002 的 `segments`） | 改成**合并**：保留人工键与人工行，只删「生成器自有且已消失」的行 |
+| 不写 `bp_add` | 强化普攻**开始回战技点**（1315 击锤连弩） | 读 `BPAdd`；`Normal` 型缺值一律写 **0** |
+| 不并**忆灵技能**（`AvatarServantSkillConfig`） | 7 个 servant cid 消失 ⇒ 忆灵规则全报 "no loaded skill at slot N" | 并进 `skills.json`（同 `SkillID//100 / %100` 形状） |
+
+⚠ 新表 **`skill_max_hits.json`**（`avatars` / `advanced` / `servants`）就是「官方最大命中次数」✓ —— 段数的**长度**
+现在是数据 ✓（判据 `SegmentCountAgreementTest` ✓），但**分裂比**仍只能从文档的分段表来（数据里没有）✓。
+
+⚠ 迁移带来的内容改动：**1503 的强化普攻 B 从数据槽位 9 → 10**（`150309` 已不存在，`150310` 是同名技能）✓；
+她的**十条行迹**现在由数据提供 ⇒ 原来那条"数据为空所以写成规则"的绕路 `stat_traces_the_ten_panel_rows` **已删除** ✓
+（留着会翻倍：实测效果抵抗 0.10 → 0.20 ✓）；新增遗器 **133 / 134** 的套装效果**已实现**（不是登记 ✓）。
+
+⚠ 闸门：迁移后全量测试**全绿** ✓（套件/用例数按 §2.4 不写在这里，跑一次就知道 ✓），**四个 demo + all 逐字节不变** ✓（演示用的那几只怪倍率本来就是 1 ✓）。
+⚠ **数据表仍不是全量**：`monster_config.json` 现在是 2722 条里的子集？不 —— 生成器写全量 ✓；但**关卡级**的数值覆盖
+（如 14.03 那份捕获的 HP/DEF）不在 Excel 里 ✓，见 §4.3。
+
 ### 3.8 数据文件速查
 
 | 文件 | 内容 | 已确认锚点 |
