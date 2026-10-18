@@ -1,0 +1,58 @@
+{
+  "name": "原游戏实测复算：整场捕获 #44，无视防御 27.5% 的一击 464,823.2536",
+  "note": "取自 `veritas_capture_2026-10-18T08-54-18-537Z.json` 的第 45 条事件（下标 44），与 `capture-726168` 成对：同一场战斗、同一目标，但减防是 **27.5%**（`target_defence_effective 833.7499373638994` = 1150 × 0.725）而不是 29% ⇒ 两条一起把引擎的 `DEFENCE_IGNORE` 路径夹住（一侧改大、一侧改小都能分辨）。其余字段与那条相同：火属性、`net_resistance 0`、目标已击破（`all_damage_reduce 0`）、易伤 0.64。夹具：1002 的普攻两段（第 0 段 = 0.45），`WIND_DAMAGE_BOOST` 置 0 抵掉自带 0.224。",
+  "attacker": {
+    "cid": 1002,
+    "level": 80,
+    "eidolon": 0,
+    "skill": "COMMON",
+    "skillLevel": 1,
+    "base": 17299.795983092627,
+    "attributes": {
+      "ALL_DAMAGE_TYPE_BOOST": 3.3500000031199306,
+      "BASE_DAMAGE_MULTI_RATIO": 0.3000000002793968,
+      "CRIT_CHANCE": 1.0,
+      "CRIT_ATTACK": 4.31264160387218,
+      "DEFENCE_IGNORE": 0.275,
+      "DAMAGE_PENETRATION": 0.20000000018626451,
+      "FINAL_DAMAGE_BOOST": 0.0,
+      "COMBO_DAMAGE_BOOST": 0.0,
+      "BASIC_ATTACK_DAMAGE_BOOST": 0.0,
+      "SKILL_DAMAGE_BOOST": 0.0,
+      "DOT_DAMAGE_BOOST": 0.0,
+      "WIND_DAMAGE_BOOST": 0.0
+    }
+  },
+  "target": {
+    "monsterId": 1002011,
+    "level": 90,
+    "attributes": {
+      "DEFENCE": 1149.99990016222,
+      "HEALTH": 50000000.0
+    },
+    "broken": true,
+    "buffs": [
+      {
+        "kind": "vulnerable",
+        "value": 0.6400000005960464
+      }
+    ]
+  },
+  "crit": true,
+  "instance": 0,
+  "instances": 1,
+  "tolerance": 1e-06,
+  "expect": {
+    "base": 7784.908192391682,
+    "BoostArea": 4.350000003119931,
+    "FinalBoostArea": 1.0,
+    "ComboArea": 1.0,
+    "BaseMultiArea": 1.3000000002793968,
+    "MonsterTakenArea": 1.0,
+    "VulnerableArea": 1.6400000005960464,
+    "CritArea": 5.31264160387218,
+    "DefenceArea": 0.545330628205772,
+    "ResistArea": 1.0,
+    "final": 209170.46412851944
+  }
+}

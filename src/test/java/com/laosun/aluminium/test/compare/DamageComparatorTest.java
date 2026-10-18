@@ -55,6 +55,12 @@ public class DamageComparatorTest {
         // so it is replayable without knowing the debuff state - see the audit in scenarios/README.md.
         Assertions.assertEquals(0, DamageComparator.run("compare", "scenarios/capture-174678.json"),
                 "the whole-battle event must compare cleanly");
+        // The pair that pins DEF-ignore: same fight, same target, 29% versus 27.5%. One side going the wrong way is
+        // visible as soon as the two numbers differ in the direction they should differ.
+        Assertions.assertEquals(0, DamageComparator.run("compare", "scenarios/capture-726168.json"),
+                "the 29% DEF-ignore event must compare cleanly");
+        Assertions.assertEquals(0, DamageComparator.run("compare", "scenarios/capture-464823.json"),
+                "the 27.5% DEF-ignore event must compare cleanly");
     }
 
     /**
