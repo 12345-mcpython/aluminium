@@ -32,6 +32,27 @@
       "note": "「风堇进入【雨过天晴】状态，持续 3 回合…我方全体目标**生命上限提高 30.00%+600**」—— ① 状态用 `APPLY_BUFF 雨过天晴` ✓（第 120 轮的教训：状态要**造出来**才问得到 ✓）；② 生命上限用 `MODIFY_ATTR` + **基础属性 `HEALTH`** ✓（不能写 `HEALTH_PERCENT` ✗：装载器说它是**构建期输入键** ✓）；⚠ **本条不写治疗** ✗ —— 见下面 level_convention 里的\"技能数据自带治疗\"说明 ✓。⚠ **登记**：「**+600**」的固定项 ✗（`MODIFY_ATTR` 的份额只能按属性百分比 ✓，需要\"按属性的固定加值\"这个能力 ✗）；「每回合开始时持续回合数减 1」由引擎自身的时长结算负责 ✓。  ⭐ **2026-10-18 补齐**：「生命上限提高 30% **+ 600 点**」的固定项现在也写了 ✓ —— `MODIFY_ATTR` 的 `amount`（不带宽 scale）是**扁平点数** ✓（1503 的 SPEED +9 就是这个写法 ✓），所以同一条里两条效果：`percent: 0.3` 与 `amount: 600` ✓。 || 2026-10-18：**天赋那条（治疗 → 小伊卡 +80%/层、3 层上限）尚未落地**：按 `on: HEALED` + `[[\"actor is_ally\"]]` + `target: summon` + `stackable/max_stacks 3` 写出来**实测为 0** ✗（判据 `testHyacineTalentTest` 的 one-heal 期望 0.8、实得 0.0）⇒ 说明\"技能数据自带的治疗\"这条路径上 `HEALED` 的 `actor` 不是我以为的那个角色（或 `target: summon` 没解析到小伊卡）✗。下一步要先用临时打印量清 `HEALED` 的 actor/target，再写这条 —— 不靠猜。 || 2026-10-18（第 27 轮）：天赋仍未落地。**排除**了\"满血治疗不算事件\"这个原因 —— 把队友先打到半血再放战技，小伊卡的 BoostArea 仍然没有 +0.8 ✗。剩下的候选：① 治疗目标不是那位队友（她的战技治\"除小伊卡以外的我方全体\"，引擎里可能落在别人身上）；② `target: summon` 没解析到小伊卡；③ `HEALED` 的 `actor` 不是治疗者。⇒ 下一轮用**带条件的探针**逐条区分（探针要同时打印治疗实际的 HP 变化 ✓），而不是继续改规则里猜。"
     },
     {
+      "on": "HEALED",
+      "id": "talent_healing_raises_ikachis_damage",
+      "when": [
+        "actor is_ally"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.8,
+          "turns": 2,
+          "max_stacks": 3,
+          "stackable": true,
+          "buff": "疗愈世间的晨曦",
+          "target": "summon"
+        }
+      ],
+      "source": "1409 风堇 天赋 疗愈世间的晨曦 (140904): 「风堇或小伊卡提供治疗时，小伊卡造成的伤害提高 #3[i]%，持续 #4[i] 回合，最多可叠加 #5[i] 层。」 param = [0.5, 1, 0.8, 2, 3]",
+      "note": "「**风堇或小伊卡提供治疗时**，小伊卡伤害提高 **80%**，持续 **2 回合**，最多 **3 层**」—— ① `HEALED` ✓（探针实测：放她的战技把队友从 529.2 治到 784.8 时，`HEALED` 触发 1 次 ✓，`actor == self`（风堇是治疗者）✓、`target is_ally` ✓）；② `target: summon` **能解析到小伊卡** ✓（探针用 `SPEED +100` 验证：小伊卡速度 0 → 100 ✓）；③ `stackable` + `max_stacks: 3` ✓。⚠ 教训：判据里\"把队友打伤\"必须用 **`consumeHp`**（`heal(-x)` 会被 `heal()` 的 `amount <= 0` 直接忽略 ⇒ 根本没受伤 ⇒ 治疗量为 0 ⇒ 没有 `HEALED` ✗，这正是前两轮失败的真正原因 ✓）。``「风堇或小伊卡」里忆灵那一半：`HEALED` 的 `actor` 是治疗者，忆灵治疗时 `actor is_summon` 也成立 ✓（探针里 `probeActorSummon` 为 0 是因为那次治疗者是风堇 ✓）。"
+    },
+    {
       "on": "BATTLE_START",
       "id": "level_convention",
       "do": [
