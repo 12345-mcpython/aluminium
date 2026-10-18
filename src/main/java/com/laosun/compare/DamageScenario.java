@@ -70,6 +70,16 @@ public class DamageScenario {
         private Integer skillLevel;
 
         /** Absolute attribute values to install on the attacker, so both sides use the same panel. */
+        /**
+         * When {@code true} the stand-in is built with an EMPTY trigger table, so its own kit contributes nothing and
+         * only {@link #attributes} describes the hit.
+         *
+         * <p>Needed by the capture replay: a capture states every modifier of a hit, and a stand-in character's own
+         * traces would otherwise add boosts the capture does not have (measured: 1002 carries 0.224 wind boost, 1003
+         * carries 0.374 fire boost plus another 0.15 that does not come from any attribute this scenario can reach).
+         */
+        private Boolean suppressContent;
+
         private Map<String, Double> attributes;
 
         /**

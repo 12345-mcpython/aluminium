@@ -169,7 +169,7 @@ public final class DamageComparator {
     // Running a scenario
     // ==================================================================
 
-    private static Result measure(DamageScenario scenario) {
+    static Result measure(DamageScenario scenario) {
         DamageScenario.Attacker stated = scenario.getAttacker();
         DamageScenario.Target targetSpec = scenario.getTarget();
         if (stated == null || stated.getCid() == null || stated.getLevel() == null) {
@@ -190,6 +190,10 @@ public final class DamageComparator {
         Enemy enemy = EnemyFactory.create(targetSpec.getMonsterId(), targetSpec.getLevel(),
                 targetSpec.getHardLevelGroup() == null ? 1 : targetSpec.getHardLevelGroup());
 
+        if (Boolean.TRUE.equals(stated.getSuppressContent())) {
+            // A stand-in, not a character: an empty trigger table keeps the kit out of a hit the capture already states.
+            attacker.setTriggerTable(com.laosun.aluminium.models.trigger.TriggerTable.EMPTY);
+        }
         Battle battle = new Battle(new ArrayList<>(List.of(attacker)), new ArrayList<>(List.of(enemy)),
                 roll(scenario.getCrit()));
         battle.startBattle();
@@ -356,7 +360,7 @@ public final class DamageComparator {
     }
 
     /** What one run produced: the inputs (for the header line) and every settled instance. */
-    private record Result(String inputs, List<Damage> instances, int reported) {
+    record Result(String inputs, List<Damage> instances, int reported) {
     }
 
     /** Unused, kept so a future "compare every scenario in a folder" loop has the shape it needs. */
