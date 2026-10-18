@@ -38,8 +38,8 @@ public class HyacineRainClearMaxHpTest {
         double rank6 = climb(6);
         Assertions.assertEquals(BASE_HP * 0.30 + 600, rank0, 1e-6,
                 "E0: Lv10 row #3 = 0.30 and the literal flat 600");
-        Assertions.assertEquals(BASE_HP * (0.33 + 0.50) + 600, rank6, 1e-6,
-                "E6: Lv12 row #3 = 0.33, plus Rank 2's 0.50, plus the literal flat 600");
+        Assertions.assertEquals(BASE_HP * (0.33 + 0.50) + 667.5, rank6, 1e-6,
+                "E6: Lv12 row #3 = 0.33, plus Rank 2's 0.50, plus the Lv12 flat 667.5");
     }
 
     private static double climb(int rank) {
