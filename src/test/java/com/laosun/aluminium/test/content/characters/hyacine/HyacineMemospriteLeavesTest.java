@@ -41,6 +41,20 @@ public class HyacineMemospriteLeavesTest {
     }
 
     @Test
+    public void herActionIsAdvancedByThirtyPercentWhenIkachiGoesAway() {
+        Fixture f = new Fixture(6);
+        double before = f.remainingWaitOf(f.hyacine);
+
+        f.ika.perish();
+        f.battle.processRequests();
+
+        // 「使风堇行动提前 30%」 is a share of her REMAINING wait, so the clock after is 70% of the one before. The
+        // readout is the action bar's own snapshot (Queue.snapshot + getTimeRemaining); the battle clock does not move.
+        Assertions.assertEquals(before * 0.7, f.remainingWaitOf(f.hyacine), Math.max(1e-9, before * 1e-9),
+                "「消失时，使风堇行动提前 30%」 (remaining before=" + before + ", after="
+                        + f.remainingWaitOf(f.hyacine) + ")");
+    }
+    @Test
     public void withoutRankSixNothingIsGivenBack() {
         Fixture f = new Fixture(0);
         double before = f.pen(f.hyacine);
@@ -69,8 +83,20 @@ public class HyacineMemospriteLeavesTest {
             Assertions.assertNotNull(ika, "precondition: 小伊卡 is out");
         }
 
+        /** 风堇 的剩余等待，从行动条自己的快照读。 */
+        double remainingWaitOf(com.laosun.aluminium.models.CanHit unit) {
+            for (var signal : battle.queue.snapshot()) {
+                if (signal.getCanHit() == unit) {
+                    return battle.queue.getTimeRemaining(signal);
+                }
+            }
+            throw new AssertionError(unit.getName() + " is not on the action bar");
+        }
+
         double pen(com.laosun.aluminium.models.CanHit unit) {
             return unit.getAttribute(AttributeType.DAMAGE_PENETRATION).get();
         }
     }
 }
+
+
