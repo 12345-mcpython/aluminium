@@ -533,6 +533,22 @@
             "source": "SkillDesc 占位符"
         }
     },
+    "1415": {
+        "8": {
+            "damage_parts": [
+                {
+                    "shape": "SingleAttack",
+                    "index": 2
+                },
+                {
+                    "shape": "AoEAttack",
+                    "index": 0
+                }
+            ],
+            "source": "1415 昔涟 强化普攻「向着爱与明天♪」(SkillID 141508, SkillTriggerKey Skill11; skills.json 的 skill_effect 是 AoEAttack)：文档原句「获得#2点【追忆】并对指定敌方单体造成等同于昔涟#3%生命上限的冰属性伤害，随后对敌方全体造成等同于昔涟#1%生命上限的冰属性伤害」⇒ 一行两段、按句子顺序结算：#3（参数索引 2）= 单体那一段、#1（索引 0）= 全体那一段。官方最大命中次数 skill_max_hits.json avatars.1415.Skill11 = 2，与两段一致。削韧按各段自己的形状取列（引擎既有的 stanceFor 口径）：单体段 stance_list.single=30，全体段 all=15（每名敌人）。",
+            "note": "⚠ 待核：游戏 ConfigAbility `Avatar_Cyrene_00_Skill11_Phase02` 的第一发 DamageByAttackProperty 写死 StanceValue=15，与「单体段取 single=30」不一致；两段各自的削韧没有更强证据前，按列读，别把 15 当成结论。"
+        }
+    },
     "8007": {
         "9": {
             "effect": "Restore",
