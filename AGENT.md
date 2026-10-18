@@ -753,6 +753,21 @@ HP_LOST 计数 = 0 ; HP_CONSUMED 计数 = 0   ← 两个事件都没发
 - ⚠ **本轮一次失败的尝试（记下来，别重复）**：我试着用 PowerShell 就地做「全表提取 + 与 `skill_effects.json` 对账」，得到「多段槽位只有 3 个、其中 1 个 `sum=4`、1 个槽位多 phase」这类数字 —— **这些数字不可信** ✗：脚本把「数组套数组」写成了 `@(@('_chars', $coll), …)`，而 PowerShell 会把内层集合**摊平** ✓，于是 `$scope[1]` 只枚举到一部分角色 ✓（1002 的两条明明存在却没进结果 ✓，这一点直接违反了我手上刚验证过的逐位复现 ✓）。⇒ **提取器要写在 Python 侧**（那份数据本来就在 `E:\code\python\` 的工具链里 ✓），写完先拿 1002 的两条做回归断言 ✓，**再**谈规模统计 ✓。事后我仍按纪律留了这段：**一次自相矛盾的结果应当作废，而不是换个口径解释它** ✓。
 - ⚠ **三处要小心**：① **同一槽位可能有多个 phase**（`Phase01/02/03`）—— 可能是**同一次施放的连续段**、也可能是**不同分支** ✓，数据里 `alternatives` / `branch_groups` / `default_fallback` 就是为这个留的 ✓（别把分支当成段 ✗，那会凭空多出伤害）；② `skill_effects.json` 是**进仓库的策展文件** ✓，而 `game/data/` 其它表是 **gitignore 的生成物** ✓ ⇒ 生成器输出放数据目录、**策展结果**才写进 `skill_effects.json` ✓；③ 忆灵在 `_servants` 下，键是 **ServantID**（`11402` ✓），与引擎 `skillAt(slot)` 的寻址一致 ✓。
 
+### 3.7w 已落（**引擎**）：`SUMMON_LEFT` —— 「忆灵离场」这个事件（**2026-10-18**）
+
+**缺的是什么**：忆灵可以**走了而没人杀它** ✓（`CanHit.perish()` 的 javadoc 原话：「it left, nobody killed it」✓，且它**故意不发** `HpLoss` / `Kill` ✓），所以「消失时…」既不该用 `DEATH`（那是**被击杀** ✓），也不存在别的事件 ✗ —— 1409 忆灵技4「消失时使风堇行动提前 30%」与星魂6 光环的**撤下**（§3.7l 登记的缺口 ✓）都卡在这里 ✓。
+
+**改动三处**：
+1. `TriggerEvent.SUMMON_LEFT("SUMMON_LEFT", true)` ✓（javadoc 写明「不是 `DEATH`」与「为什么从清扫点发」✓）；
+2. `Battle.removeDeadCombatants()` 里调 `announceSummonsThatLeft()` ✓ —— 遍历两方阵营，`instanceof Summon && isDeath()` 且**未宣告过**的，以**离场单位本身**为 `actor` 与 `target` 发事件 ✓；宣告集合用**身份**语义（`Collections.newSetFromMap(new IdentityHashMap<>())` ✓）⇒ **一次离场只发一次** ✓（清扫点每次结算都跑，否则一次离场会反复前进行动条 ✓）；
+3. 内容两条：`memosprite_fall_advances_her_action`（`ADVANCE percent 0.3`，不写 `target` ⇒ 默认规则持有人 ✓）与 `eidolon_six_aura_ends_when_ikachi_leaves`（`min_eidolon: 6` + `REMOVE_STATE` 按名字摘掉`天空应我的祈愿` ✓）。
+
+**⚠ 一处约定（写在这里，因为它反直觉）**：门的写法是 **`actor is_summon`** ✓，**不能**写 `target == summon` ✗ —— 后者按 `isDeath()` 过滤，而这条事件的单位**正是刚死的那个** ✓，会当场抛错 ✓。
+
+**判据**：`HyacineMemospriteLeavesTest`（2 例）—— 忆灵 `perish()` 后，星魂6 的 `DAMAGE_PENETRATION` 从 `0.2` 回到 `0` ✓（风堇与队友**都**撤下 ✓）；E0 时**没有**可撤的东西 ✓。
+
+**⚠ 登记（本轮的缺口，没含糊过去）**：忆灵技4 的**行动提前**那一半**写了，但没有判据** ✗ —— `Battle.advanceRequests` 在 `processRequests` 里就被**取走并清空** ✓，而 `Queue` 只暴露 `getNext` / `peekNext` / `timeUntilNext` / `getCombatant(index)`，**没有**任何「某单位的剩余等待」读数 ✗ ⇒ 想钉住「提前了 30%」得先给它一个读数口子 ✓（不要用「顺序变了」这种弱断言冒充它 ✓）。⇒ 那一条规则的**有效判据是待办** ✓。
+
 ### 3.7v 1409 剩余三块的**接入点**（已勘，未写）（2026-10-18）
 
 **① 忆灵技2 的三个从句** —— 都需要同一个时机：「**任意目标回合开始时或行动后**」（掉血触发的小治疗 自耗 4% + 治疗 `2%+20`；【雨过天晴】下施放技能后小伊卡**获得额外回合**并自动放忆灵技1；施放后**自身持续效果 −1**）。引擎今天只有 `TURN_START` / `TURN_END`，且它们是**规则持有人**的回合 ✗；`HP_LOST` 有 ✓ 但那是「掉血那一刻」，不是「之后任意目标的回合开始」✗ ⇒ 不是近似问题、是**缺一个时机** ✓。要开的是「**某单位的回合开始**」这类事件（并把 `actor`/`target` 绑到那个单位上）✓ —— 一处改动同时服务这三个从句 ✓。
