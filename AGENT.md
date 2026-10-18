@@ -708,6 +708,19 @@ HP_LOST 计数 = 0 ; HP_CONSUMED 计数 = 0   ← 两个事件都没发
 2. **规则那一发的归属** ✓：`DAMAGE` 实例的攻击者是**规则持有人（风堇）**，不是忆灵 ⇒ **小伊卡自己的天赋增伤（+80%/层）不作用在这一发上** ✗（实测：`HyacineTalentTest` 原先读 `settled.get(0)` 变成 0.0，因为它读到的是规则那一发；改为读**最后一个**实例后恢复 0.8/1.6/2.4 ✓）。⚠ 要修就得让 DAMAGE 能“**以忆灵的身份**结算”，今天没有这个字段 ✓（`DELEGATE_DAMAGE` 只认**规则持有人自己的**施放 ✗，忆灵技的施放者不是她 ✓）。
 3. **数据侧的 1 点残渣** ✗：忆灵技1 自己的数据行还会结算一发 `%ATK`，而小伊卡的 **ATK 恒为 0** ✓（实测 `ikaAtk = 0.0`）⇒ 只留引擎的**最小 1 点** ✓ ⇒ 总伤害 = `计量 × #1 + 1` ✓（判据按 `+1` 钉 ✓，未消除 ✓）。
 
+### 3.7r 已落：`REMOVE_RESOURCE` 收「计数器的**份额**」⇒ 忆灵技1 整句闭合（**2026-10-18**）
+
+**做了什么**：`REMOVE_RESOURCE` 原先只收 `amount`（字面量或 `amount_from_*`）✗，而忆灵技1 说的是「清空累计治疗数值的 **50%**」（星魂6 → **12%**）—— 「计数器的一半」**没有拼法** ✓。本轮给它开了与 §3.7p **同一个**词汇：
+- `TriggerInterpreter.percentOfOwnCounter`：`scale: "self_resource:<id>"` + `percent` ⇒ `round(计数器 × 份额)`；
+- `TriggerValidator`：`REMOVE_RESOURCE` 带该前缀时要求 `percent`（其余拼法照旧要求 `amount` ✓，只对这个前缀开口子 ✓）；
+- `removeResource` 先用它、没有该拼法再走原来的 `scaledAmount` ✓。
+
+**内容**：两条孪生规则 —— `memosprite_rainclouds_clears_half_the_tally`（`max_eidolon: 5`，`percent: 0.5`）与 `eidolon_six_clears_twelve_percent_instead`（`min_eidolon: 6`，`percent: 0.12`）；**排在伤害那条之后** ✓（伤害读扣之前的计量 ✓）。
+
+**判据**：`HyacineRaincloudsTest` 现在是 **3 例** —— 伤害 = `计量 × 0.28 + 1`；扣完剩 `计量 × 0.5`；星魂6 扣完剩 `计量 × 0.88` ✓（**不是**先 50% 再 12% 的 44% ✓）。
+
+**⚠ 同时修掉一处自己的错**：上一批（`59dd5aa1`）用按行删除的方式挪规则时，给 `trace_windstorm_raises_her_max_hp_above_200_speed` 留下了**重复的 `"on"` 键**（`CAST_SETUP` 与 `BATTLE_START` 各一个）✓ —— Gson **取后者**，所以行为是对的、四条闸门也全绿 ✓，但文件本身是错的 ✗（读文件的人会看到两个事件）。本轮已删掉那一行 ✓。教训：**按行号手术要回过头读一遍结果**，闸门绿不等于文件对 ✓。
+
 ### 3.8 数据文件速查
 
 | 文件 | 内容 | 已确认锚点 |
