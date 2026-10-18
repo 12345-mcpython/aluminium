@@ -169,7 +169,10 @@ final class TriggerEffects {
         // list of spellings `shareOf` actually reads - a copy here is the thing that kept falling one spelling behind
         // (cast_param, then skill_param, then summon_param).
         if (TriggerMagnitudes.statesShare(effect)) {
-            magnitude = derived ? TriggerMagnitudes.derivedMagnitude(effect, ctx) : TriggerMagnitudes.shareOf(effect, ctx);
+            // Note: `scaled`, not `derived` - a no-scale share is the magnitude ITSELF; its constant term (if any) is a
+            // separate absolute modifier, added below (`1409`'s 「30% + 600」). Folding the constant in here turned
+            // "30% + 600" into "600.3 x base" (measured: 652,900 instead of 926).
+            magnitude = scaled ? TriggerMagnitudes.derivedMagnitude(effect, ctx) : TriggerMagnitudes.shareOf(effect, ctx);
         } else {
             magnitude = effect.getAmount();
         }
@@ -253,6 +256,19 @@ final class TriggerEffects {
             // roll a base chance before an attribute change. Note: Unstated = attached directly, so no existing file changes
             // (no shipped file uses base_chance on MODIFY_ATTR).
             TriggerInterpreter.attachRolled(battle, target, buff, effect, ctx);
+            // "the raise is X% + Y points" (1409's 【雨过天晴】: `percent_from_skill_param` + `amount_from_skill_param`):
+            // the share arm is a FRACTION of the target's base, the constant term is in the attribute's own units - two
+            // different modifiers, so the constant gets its own, with the same lifetime and source. Without this the
+            // constant is silently dropped (or, when both spellings share one magnitude, applied as a fraction x base).
+            if (!absolute) {
+                double constant = TriggerMagnitudes.constantTerm(effect, ctx);
+                if (constant != 0) {
+                    AbstractBuff extra = TriggerInterpreter.withSource(TriggerLifetimes.withTickOwner(
+                            TriggerLifetimes.withLifetime(TriggerInterpreter.statModifier(attribute, constant, turns,
+                                    permanent, maxStacks, true), effect), effect, ctx), ctx);
+                    TriggerInterpreter.attachRolled(battle, target, extra, effect, ctx);
+                }
+            }
         }
     }
 
