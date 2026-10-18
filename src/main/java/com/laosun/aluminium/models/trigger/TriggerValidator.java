@@ -230,7 +230,14 @@ final class TriggerValidator {
                                         + "number are different claims (source: " + spec.getSource() + ")");
                     }
                 } else {
-                    if (TriggerInterpreter.isCastParamScale(effect)) {
+                    // 「清空累计治疗数值的 50%」: REMOVE_RESOURCE may name a SHARE of one of the owner's own counters
+                    // instead of a flat amount (`scale: self_resource:<id>` + `percent`). Reader: 1409 Hyacine (风堇)'s
+                    // 忆灵技1. Gated on the prefix so every other spelling keeps requiring an amount.
+                    String removeScale = effect.getScale() == null ? "" : effect.getScale().trim();
+                    if ("REMOVE_RESOURCE".equals(op)
+                            && removeScale.startsWith(TriggerInterpreter.SELF_RESOURCE_PREFIX)) {
+                        requirePercent(effect, op, spec);
+                    } else if (TriggerInterpreter.isCastParamScale(effect)) {
                         requireNoStackArguments(effect, op, spec);
                     } else {
                         if (!Boolean.TRUE.equals(effect.getOverflowOnly()) && !Boolean.TRUE.equals(effect.getSpendAll())) {
