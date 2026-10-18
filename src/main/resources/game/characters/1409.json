@@ -2,6 +2,46 @@
   "rules": [
     {
       "on": "ULT_CAST",
+      "id": "ult_summons_ica",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "SUMMON"
+        }
+      ],
+      "source": "1409 风堇 终结技 飞入晨昏的我们 (141303): 「召唤忆灵小伊卡，为我方全体目标回复…为小伊卡回复…」",
+      "note": "「**召唤忆灵小伊卡**」⇒ `SUMMON` ✓（无参数 ✓，面板在 `memosprites/1409.json` ✓）。⚠ 与战技那条同名不同事件 ✓：终结技也能召唤 ✓（文档明写 ✓）。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "ult_heals_party_and_ikachi",
+      "when": [
+        "actor == self",
+        "self_summon_count >= 1"
+      ],
+      "do": [
+        {
+          "op": "HEAL",
+          "scale": "owner_max_hp",
+          "percent": 0.1,
+          "amount": 200,
+          "target": "all_allies"
+        },
+        {
+          "op": "HEAL",
+          "scale": "owner_max_hp",
+          "percent": 0.12,
+          "amount": 240,
+          "target": "summon"
+        }
+      ],
+      "source": "1409 风堇 终结技 飞入晨昏的我们 (141303): 「…为我方全体目标回复等同于风堇 #1(10)% 生命上限 + #2(200) 的生命值，为小伊卡回复等同于风堇 #6(12)% 生命上限 + #7(240) 的生命值」 param = [0.1, 200, 0.3, 600, 3, 0.12, 240]",
+      "note": "「我方全体回 **10% + 200**；小伊卡回 **12% + 240**」—— ① 终结技是 `Support` ⇒ **数据不自带治疗** ✗（实测回复 0 ✓）⇒ 规则必须写 ✓；② 忆灵那半的 `target: summon` 要求 `self_summon_count >= 1` ✓，而 `SUMMON` 在**另一条更早的规则**里（`ult_summons_ica` ✓，排在前面 ✓）；③ 顺序：`ult_summons_ica` → 本条 ✓（文件顺序即执行顺序 ✓）。"
+    },
+    {
+      "on": "ULT_CAST",
       "id": "ult_state_and_max_hp",
       "when": [
         "actor == self"

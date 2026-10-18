@@ -54,7 +54,10 @@ public class HyacineTest {
     public void herFileCarriesTheClauses() {
         var table = TriggerTables.of(HYACINE);
         // Two now: her own ultimate, and the sky ode spending a layer on a ULT_CAST.
-        Assertions.assertEquals(2, table.ruleCount(TriggerEvent.ULT_CAST), "state and Max HP");
+        // CORRECTED (2026-10-18): the ultimate also SUMMONS and HEALS as rules now - its data carries neither
+        // (the skill is `Support`, so nothing heals, and no rule summoned 小伊卡 on a ULT_CAST). Four ULT_CAST rules:
+        // the summon, the heals, the state/Max HP, and the sky ode spending a layer.
+        Assertions.assertEquals(4, table.ruleCount(TriggerEvent.ULT_CAST), "summon, heals, state and Max HP, ode");
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.BATTLE_START), "the level convention");
         // Note: Narrowed: the reason is about the HEAL, and the same skill also says "召唤忆灵 小伊卡".
         // Exactly one SKILL_CAST rule exists and it only summons -- the heal is still absent from the file, so nothing is
