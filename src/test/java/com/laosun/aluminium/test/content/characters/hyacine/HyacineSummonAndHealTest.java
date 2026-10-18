@@ -2,6 +2,7 @@ package com.laosun.aluminium.test.content.characters.hyacine;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.enums.AttributeType;
+import com.laosun.aluminium.enums.DebuffClass;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Summon;
@@ -63,5 +64,23 @@ public class HyacineSummonAndHealTest {
         double expected = hyacine.getAttribute(AttributeType.HEALTH).get() * 0.08 + 160.0;
         Assertions.assertEquals(expected, healed, Math.max(1e-6, expected * 1e-9),
                 "「等同于风堇 8% 生命上限 + 160」 (healed=" + healed + ", expected=" + expected + ")");
+    }
+
+    @Test
+    public void ikachiIsImmuneToBothDebuffClasses() {
+        Character hyacine = CharacterFactory.create(HYACINE, 80);
+        Battle battle = new Battle(List.of(hyacine, CharacterFactory.create(ALLY, 80)),
+                List.of(BattleFixture.monster()), BattleFixture.seeded());
+        battle.startBattle();
+        battle.processRequests();
+        battle.summonMemosprite(hyacine);
+        battle.processRequests();
+        Summon ika = (Summon) battle.memospriteOf(hyacine);
+        Assertions.assertNotNull(ika, "precondition: 小伊卡 is out");
+
+        Assertions.assertEquals(1.0, ika.getBuffManager().debuffResistOf(DebuffClass.CONTROL), 1e-9,
+                "「免疫负面效果」 -- control class (percent 1.0 IS immunity in this engine)");
+        Assertions.assertEquals(1.0, ika.getBuffManager().debuffResistOf(DebuffClass.DOT), 1e-9,
+                "「免疫负面效果」 -- damage-over-time class");
     }
 }
