@@ -9,6 +9,9 @@
  },
  "damage_events": [
   {
+   "attacker": {
+    "uid": 1413
+   },
    "type": "Servant",
    "damage": 1547.8000785203185,
    "zones": {
@@ -65,10 +68,14 @@
      "wind": 0.40000000037252903
     },
     "break_damage_percentage": 0,
-    "break_damage_added_ratio": 0
+    "break_damage_added_ratio": 0,
+    "attack_type": 12
    }
   },
   {
+   "attacker": {
+    "uid": 1413
+   },
    "type": "True",
    "damage": 371.4720191906672,
    "zones": {
@@ -125,10 +132,14 @@
      "wind": 0.40000000037252903
     },
     "break_damage_percentage": 0,
-    "break_damage_added_ratio": 0
+    "break_damage_added_ratio": 0,
+    "attack_type": 13
    }
   },
   {
+   "attacker": {
+    "uid": 1413
+   },
    "type": "Servant",
    "damage": 1547.8000785203185,
    "zones": {
@@ -185,10 +196,14 @@
      "wind": 0.40000000037252903
     },
     "break_damage_percentage": 0,
-    "break_damage_added_ratio": 0
+    "break_damage_added_ratio": 0,
+    "attack_type": 12
    }
   },
   {
+   "attacker": {
+    "uid": 1413
+   },
    "type": "True",
    "damage": 371.4720191906672,
    "zones": {
@@ -245,10 +260,14 @@
      "wind": 0.40000000037252903
     },
     "break_damage_percentage": 0,
-    "break_damage_added_ratio": 0
+    "break_damage_added_ratio": 0,
+    "attack_type": 13
    }
   },
   {
+   "attacker": {
+    "uid": 1413
+   },
    "type": "Servant",
    "damage": 1547.8000785203185,
    "zones": {
@@ -305,10 +324,14 @@
      "wind": 0.40000000037252903
     },
     "break_damage_percentage": 0,
-    "break_damage_added_ratio": 0
+    "break_damage_added_ratio": 0,
+    "attack_type": 12
    }
   },
   {
+   "attacker": {
+    "uid": 1413
+   },
    "type": "True",
    "damage": 371.4720191906672,
    "zones": {
@@ -365,10 +388,14 @@
      "wind": 0.40000000037252903
     },
     "break_damage_percentage": 0,
-    "break_damage_added_ratio": 0
+    "break_damage_added_ratio": 0,
+    "attack_type": 13
    }
   },
   {
+   "attacker": {
+    "uid": 1413
+   },
    "type": "Servant",
    "damage": 1547.8000785203185,
    "zones": {
@@ -425,10 +452,14 @@
      "wind": 0.40000000037252903
     },
     "break_damage_percentage": 0,
-    "break_damage_added_ratio": 0
+    "break_damage_added_ratio": 0,
+    "attack_type": 12
    }
   },
   {
+   "attacker": {
+    "uid": 1413
+   },
    "type": "True",
    "damage": 371.4720191906672,
    "zones": {
@@ -485,10 +516,14 @@
      "wind": 0.40000000037252903
     },
     "break_damage_percentage": 0,
-    "break_damage_added_ratio": 0
+    "break_damage_added_ratio": 0,
+    "attack_type": 13
    }
   },
   {
+   "attacker": {
+    "uid": 1413
+   },
    "type": "Servant",
    "damage": 1547.8000785203185,
    "zones": {
@@ -545,10 +580,14 @@
      "wind": 0.40000000037252903
     },
     "break_damage_percentage": 0,
-    "break_damage_added_ratio": 0
+    "break_damage_added_ratio": 0,
+    "attack_type": 12
    }
   },
   {
+   "attacker": {
+    "uid": 1413
+   },
    "type": "True",
    "damage": 371.4720191906672,
    "zones": {
@@ -605,10 +644,14 @@
      "wind": 0.40000000037252903
     },
     "break_damage_percentage": 0,
-    "break_damage_added_ratio": 0
+    "break_damage_added_ratio": 0,
+    "attack_type": 13
    }
   },
   {
+   "attacker": {
+    "uid": 1413
+   },
    "type": "Servant",
    "damage": 7739.000398621196,
    "zones": {
@@ -665,10 +708,14 @@
      "wind": 0.40000000037252903
     },
     "break_damage_percentage": 0,
-    "break_damage_added_ratio": 0
+    "break_damage_added_ratio": 0,
+    "attack_type": 12
    }
   },
   {
+   "attacker": {
+    "uid": 1413
+   },
    "type": "True",
    "damage": 1857.3600973987486,
    "zones": {
@@ -725,10 +772,14 @@
      "wind": 0.40000000037252903
     },
     "break_damage_percentage": 0,
-    "break_damage_added_ratio": 0
+    "break_damage_added_ratio": 0,
+    "attack_type": 13
    }
   },
   {
+   "attacker": {
+    "uid": 1409
+   },
    "type": "Servant",
    "damage": 136796.63586363057,
    "zones": {
@@ -785,10 +836,14 @@
      "wind": 0.20000000018626451
     },
     "break_damage_percentage": 0,
-    "break_damage_added_ratio": 0
+    "break_damage_added_ratio": 0,
+    "attack_type": 12
    }
   },
   {
+   "attacker": {
+    "uid": 1409
+   },
    "type": "True",
    "damage": 32831.19263784774,
    "zones": {
@@ -845,10 +900,14 @@
      "wind": 0.20000000018626451
     },
     "break_damage_percentage": 0,
-    "break_damage_added_ratio": 0
+    "break_damage_added_ratio": 0,
+    "attack_type": 13
    }
   },
   {
+   "attacker": {
+    "uid": 1409
+   },
    "type": "Servant",
    "damage": 109437.30859959987,
    "zones": {
@@ -905,10 +964,14 @@
      "wind": 0.40000000037252903
     },
     "break_damage_percentage": 0,
-    "break_damage_added_ratio": 0
+    "break_damage_added_ratio": 0,
+    "attack_type": 12
    }
   },
   {
+   "attacker": {
+    "uid": 1409
+   },
    "type": "True",
    "damage": 26264.95408836496,
    "zones": {
@@ -965,10 +1028,14 @@
      "wind": 0.40000000037252903
     },
     "break_damage_percentage": 0,
-    "break_damage_added_ratio": 0
+    "break_damage_added_ratio": 0,
+    "attack_type": 13
    }
   },
   {
+   "attacker": {
+    "uid": 1409
+   },
    "type": "Additional",
    "damage": 18744.55182313407,
    "zones": {
@@ -1025,10 +1092,14 @@
      "wind": 0.20000000018626451
     },
     "break_damage_percentage": 0,
-    "break_damage_added_ratio": 0
+    "break_damage_added_ratio": 0,
+    "attack_type": 6
    }
   },
   {
+   "attacker": {
+    "uid": 1409
+   },
    "type": "True",
    "damage": 4498.692441741703,
    "zones": {
@@ -1085,10 +1156,14 @@
      "wind": 0.20000000018626451
     },
     "break_damage_percentage": 0,
-    "break_damage_added_ratio": 0
+    "break_damage_added_ratio": 0,
+    "attack_type": 13
    }
   },
   {
+   "attacker": {
+    "uid": 1409
+   },
    "type": "Additional",
    "damage": 14995.641445995308,
    "zones": {
@@ -1145,10 +1220,14 @@
      "wind": 0.40000000037252903
     },
     "break_damage_percentage": 0,
-    "break_damage_added_ratio": 0
+    "break_damage_added_ratio": 0,
+    "attack_type": 6
    }
   },
   {
+   "attacker": {
+    "uid": 1409
+   },
    "type": "True",
    "damage": 3598.9539503904525,
    "zones": {
@@ -1205,10 +1284,14 @@
      "wind": 0.40000000037252903
     },
     "break_damage_percentage": 0,
-    "break_damage_added_ratio": 0
+    "break_damage_added_ratio": 0,
+    "attack_type": 13
    }
   },
   {
+   "attacker": {
+    "uid": 1413
+   },
    "type": "Servant",
    "damage": 6261.938855999848,
    "zones": {
@@ -1265,10 +1348,14 @@
      "wind": 0.40000000037252903
     },
     "break_damage_percentage": 0,
-    "break_damage_added_ratio": 0
+    "break_damage_added_ratio": 0,
+    "attack_type": 12
    }
   },
   {
+   "attacker": {
+    "uid": 1413
+   },
    "type": "True",
    "damage": 1502.8653268394992,
    "zones": {
@@ -1325,10 +1412,14 @@
      "wind": 0.40000000037252903
     },
     "break_damage_percentage": 0,
-    "break_damage_added_ratio": 0
+    "break_damage_added_ratio": 0,
+    "attack_type": 13
    }
   },
   {
+   "attacker": {
+    "uid": 1413
+   },
    "type": "Servant",
    "damage": 6261.938855999848,
    "zones": {
@@ -1385,10 +1476,14 @@
      "wind": 0.40000000037252903
     },
     "break_damage_percentage": 0,
-    "break_damage_added_ratio": 0
+    "break_damage_added_ratio": 0,
+    "attack_type": 12
    }
   },
   {
+   "attacker": {
+    "uid": 1413
+   },
    "type": "True",
    "damage": 1502.8653268394992,
    "zones": {
@@ -1445,10 +1540,14 @@
      "wind": 0.40000000037252903
     },
     "break_damage_percentage": 0,
-    "break_damage_added_ratio": 0
+    "break_damage_added_ratio": 0,
+    "attack_type": 13
    }
   },
   {
+   "attacker": {
+    "uid": 1413
+   },
    "type": "Servant",
    "damage": 6261.938855999848,
    "zones": {
@@ -1505,10 +1604,14 @@
      "wind": 0.40000000037252903
     },
     "break_damage_percentage": 0,
-    "break_damage_added_ratio": 0
+    "break_damage_added_ratio": 0,
+    "attack_type": 12
    }
   },
   {
+   "attacker": {
+    "uid": 1413
+   },
    "type": "True",
    "damage": 1502.8653268394992,
    "zones": {
@@ -1565,10 +1668,14 @@
      "wind": 0.40000000037252903
     },
     "break_damage_percentage": 0,
-    "break_damage_added_ratio": 0
+    "break_damage_added_ratio": 0,
+    "attack_type": 13
    }
   },
   {
+   "attacker": {
+    "uid": 1413
+   },
    "type": "Servant",
    "damage": 6261.938855999848,
    "zones": {
@@ -1625,10 +1732,14 @@
      "wind": 0.40000000037252903
     },
     "break_damage_percentage": 0,
-    "break_damage_added_ratio": 0
+    "break_damage_added_ratio": 0,
+    "attack_type": 12
    }
   },
   {
+   "attacker": {
+    "uid": 1413
+   },
    "type": "True",
    "damage": 1502.8653268394992,
    "zones": {
@@ -1685,10 +1796,14 @@
      "wind": 0.40000000037252903
     },
     "break_damage_percentage": 0,
-    "break_damage_added_ratio": 0
+    "break_damage_added_ratio": 0,
+    "attack_type": 13
    }
   },
   {
+   "attacker": {
+    "uid": 1413
+   },
    "type": "Servant",
    "damage": 6261.938855999848,
    "zones": {
@@ -1745,10 +1860,14 @@
      "wind": 0.40000000037252903
     },
     "break_damage_percentage": 0,
-    "break_damage_added_ratio": 0
+    "break_damage_added_ratio": 0,
+    "attack_type": 12
    }
   },
   {
+   "attacker": {
+    "uid": 1413
+   },
    "type": "True",
    "damage": 1502.8653268394992,
    "zones": {
@@ -1805,10 +1924,14 @@
      "wind": 0.40000000037252903
     },
     "break_damage_percentage": 0,
-    "break_damage_added_ratio": 0
+    "break_damage_added_ratio": 0,
+    "attack_type": 13
    }
   },
   {
+   "attacker": {
+    "uid": 1413
+   },
    "type": "Servant",
    "damage": 31309.694296207977,
    "zones": {
@@ -1865,10 +1988,14 @@
      "wind": 0.40000000037252903
     },
     "break_damage_percentage": 0,
-    "break_damage_added_ratio": 0
+    "break_damage_added_ratio": 0,
+    "attack_type": 12
    }
   },
   {
+   "attacker": {
+    "uid": 1413
+   },
    "type": "True",
    "damage": 7514.326638088096,
    "zones": {
@@ -1925,10 +2052,14 @@
      "wind": 0.40000000037252903
     },
     "break_damage_percentage": 0,
-    "break_damage_added_ratio": 0
+    "break_damage_added_ratio": 0,
+    "attack_type": 13
    }
   },
   {
+   "attacker": {
+    "uid": 1413
+   },
    "type": "Ultimate",
    "damage": 242607.78462416492,
    "zones": {
@@ -1985,10 +2116,14 @@
      "wind": 0.20000000018626451
     },
     "break_damage_percentage": 0,
-    "break_damage_added_ratio": 0
+    "break_damage_added_ratio": 0,
+    "attack_type": 3
    }
   },
   {
+   "attacker": {
+    "uid": 1413
+   },
    "type": "True",
    "damage": 58225.86836402654,
    "zones": {
@@ -2045,10 +2180,14 @@
      "wind": 0.20000000018626451
     },
     "break_damage_percentage": 0,
-    "break_damage_added_ratio": 0
+    "break_damage_added_ratio": 0,
+    "attack_type": 13
    }
   },
   {
+   "attacker": {
+    "uid": 1413
+   },
    "type": "Ultimate",
    "damage": 242607.78462416492,
    "zones": {
@@ -2105,10 +2244,14 @@
      "wind": 0.40000000037252903
     },
     "break_damage_percentage": 0,
-    "break_damage_added_ratio": 0
+    "break_damage_added_ratio": 0,
+    "attack_type": 3
    }
   },
   {
+   "attacker": {
+    "uid": 1413
+   },
    "type": "True",
    "damage": 58225.86836402654,
    "zones": {
@@ -2165,10 +2308,14 @@
      "wind": 0.40000000037252903
     },
     "break_damage_percentage": 0,
-    "break_damage_added_ratio": 0
+    "break_damage_added_ratio": 0,
+    "attack_type": 13
    }
   },
   {
+   "attacker": {
+    "uid": 1413
+   },
    "type": "Servant",
    "damage": 25253.89024035586,
    "zones": {
@@ -2225,10 +2372,14 @@
      "wind": 0.40000000037252903
     },
     "break_damage_percentage": 0,
-    "break_damage_added_ratio": 0
+    "break_damage_added_ratio": 0,
+    "attack_type": 12
    }
   },
   {
+   "attacker": {
+    "uid": 1413
+   },
    "type": "True",
    "damage": 6060.933663330041,
    "zones": {
@@ -2285,10 +2436,14 @@
      "wind": 0.40000000037252903
     },
     "break_damage_percentage": 0,
-    "break_damage_added_ratio": 0
+    "break_damage_added_ratio": 0,
+    "attack_type": 13
    }
   },
   {
+   "attacker": {
+    "uid": 1413
+   },
    "type": "Servant",
    "damage": 318510.226870697,
    "zones": {
@@ -2345,10 +2500,14 @@
      "wind": 0.20000000018626451
     },
     "break_damage_percentage": 0,
-    "break_damage_added_ratio": 0
+    "break_damage_added_ratio": 0,
+    "attack_type": 12
    }
   },
   {
+   "attacker": {
+    "uid": 1413
+   },
    "type": "True",
    "damage": 76442.45452015963,
    "zones": {
@@ -2405,10 +2564,14 @@
      "wind": 0.20000000018626451
     },
     "break_damage_percentage": 0,
-    "break_damage_added_ratio": 0
+    "break_damage_added_ratio": 0,
+    "attack_type": 13
    }
   },
   {
+   "attacker": {
+    "uid": 1415
+   },
    "type": "Break",
    "damage": 15601.453525018878,
    "zones": {
@@ -2465,10 +2628,14 @@
      "wind": 0.20000000018626451
     },
     "break_damage_percentage": 2.5,
-    "break_damage_added_ratio": 0.15552000235766172
+    "break_damage_added_ratio": 0.15552000235766172,
+    "attack_type": 10
    }
   },
   {
+   "attacker": {
+    "uid": 1415
+   },
    "type": "Basic",
    "damage": 14868.001244388055,
    "zones": {
@@ -2525,10 +2692,14 @@
      "wind": 0.20000000018626451
     },
     "break_damage_percentage": 0,
-    "break_damage_added_ratio": 0.15552000235766172
+    "break_damage_added_ratio": 0.15552000235766172,
+    "attack_type": 1
    }
   },
   {
+   "attacker": {
+    "uid": 1415
+   },
    "type": "True",
    "damage": 3744.348849491682,
    "zones": {
@@ -2585,10 +2756,14 @@
      "wind": 0.20000000018626451
     },
     "break_damage_percentage": 0,
-    "break_damage_added_ratio": 0.15552000235766172
+    "break_damage_added_ratio": 0.15552000235766172,
+    "attack_type": 13
    }
   },
   {
+   "attacker": {
+    "uid": 1415
+   },
    "type": "True",
    "damage": 3568.3203019762877,
    "zones": {
@@ -2645,10 +2820,14 @@
      "wind": 0.20000000018626451
     },
     "break_damage_percentage": 0,
-    "break_damage_added_ratio": 0.15552000235766172
+    "break_damage_added_ratio": 0.15552000235766172,
+    "attack_type": 13
    }
   },
   {
+   "attacker": {
+    "uid": 1409
+   },
    "type": "Servant",
    "damage": 464823.2536189321,
    "zones": {
@@ -2705,10 +2884,14 @@
      "wind": 0.20000000018626451
     },
     "break_damage_percentage": 0,
-    "break_damage_added_ratio": 0
+    "break_damage_added_ratio": 0,
+    "attack_type": 12
    }
   },
   {
+   "attacker": {
+    "uid": 1409
+   },
    "type": "True",
    "damage": 111557.58097243961,
    "zones": {
@@ -2765,10 +2948,14 @@
      "wind": 0.20000000018626451
     },
     "break_damage_percentage": 0,
-    "break_damage_added_ratio": 0
+    "break_damage_added_ratio": 0,
+    "attack_type": 13
    }
   },
   {
+   "attacker": {
+    "uid": 1409
+   },
    "type": "Servant",
    "damage": 334672.7422642838,
    "zones": {
@@ -2825,10 +3012,14 @@
      "wind": 0.40000000037252903
     },
     "break_damage_percentage": 0,
-    "break_damage_added_ratio": 0
+    "break_damage_added_ratio": 0,
+    "attack_type": 12
    }
   },
   {
+   "attacker": {
+    "uid": 1409
+   },
    "type": "True",
    "damage": 80321.4582182332,
    "zones": {
@@ -2885,10 +3076,14 @@
      "wind": 0.40000000037252903
     },
     "break_damage_percentage": 0,
-    "break_damage_added_ratio": 0
+    "break_damage_added_ratio": 0,
+    "attack_type": 13
    }
   },
   {
+   "attacker": {
+    "uid": 1409
+   },
    "type": "Additional",
    "damage": 29931.238524754066,
    "zones": {
@@ -2945,10 +3140,14 @@
      "wind": 0.20000000018626451
     },
     "break_damage_percentage": 0,
-    "break_damage_added_ratio": 0
+    "break_damage_added_ratio": 0,
+    "attack_type": 6
    }
   },
   {
+   "attacker": {
+    "uid": 1409
+   },
    "type": "True",
    "damage": 7183.497252631001,
    "zones": {
@@ -3005,10 +3204,14 @@
      "wind": 0.20000000018626451
     },
     "break_damage_percentage": 0,
-    "break_damage_added_ratio": 0
+    "break_damage_added_ratio": 0,
+    "attack_type": 13
    }
   },
   {
+   "attacker": {
+    "uid": 1409
+   },
    "type": "Additional",
    "damage": 21550.491715842858,
    "zones": {
@@ -3065,10 +3268,14 @@
      "wind": 0.40000000037252903
     },
     "break_damage_percentage": 0,
-    "break_damage_added_ratio": 0
+    "break_damage_added_ratio": 0,
+    "attack_type": 6
    }
   },
   {
+   "attacker": {
+    "uid": 1409
+   },
    "type": "True",
    "damage": 5172.118016619002,
    "zones": {
@@ -3125,10 +3332,14 @@
      "wind": 0.40000000037252903
     },
     "break_damage_percentage": 0,
-    "break_damage_added_ratio": 0
+    "break_damage_added_ratio": 0,
+    "attack_type": 13
    }
   },
   {
+   "attacker": {
+    "uid": 1409
+   },
    "type": "Servant",
    "damage": 726168.1419362309,
    "zones": {
@@ -3185,10 +3396,14 @@
      "wind": 0.20000000018626451
     },
     "break_damage_percentage": 0,
-    "break_damage_added_ratio": 0
+    "break_damage_added_ratio": 0,
+    "attack_type": 12
    }
   },
   {
+   "attacker": {
+    "uid": 1409
+   },
    "type": "True",
    "damage": 304990.6198972615,
    "zones": {
@@ -3245,10 +3460,14 @@
      "wind": 0.20000000018626451
     },
     "break_damage_percentage": 0,
-    "break_damage_added_ratio": 0
+    "break_damage_added_ratio": 0,
+    "attack_type": 13
    }
   },
   {
+   "attacker": {
+    "uid": 1409
+   },
    "type": "Servant",
    "damage": 603278.1480768879,
    "zones": {
@@ -3305,10 +3524,14 @@
      "wind": 0.40000000037252903
     },
     "break_damage_percentage": 0,
-    "break_damage_added_ratio": 0
+    "break_damage_added_ratio": 0,
+    "attack_type": 12
    }
   },
   {
+   "attacker": {
+    "uid": 1409
+   },
    "type": "True",
    "damage": 253376.82242826838,
    "zones": {
@@ -3365,10 +3588,14 @@
      "wind": 0.40000000037252903
     },
     "break_damage_percentage": 0,
-    "break_damage_added_ratio": 0
+    "break_damage_added_ratio": 0,
+    "attack_type": 13
    }
   },
   {
+   "attacker": {
+    "uid": 1409
+   },
    "type": "Additional",
    "damage": 39427.65829260484,
    "zones": {
@@ -3425,10 +3652,14 @@
      "wind": 0.20000000018626451
     },
     "break_damage_percentage": 0,
-    "break_damage_added_ratio": 0
+    "break_damage_added_ratio": 0,
+    "attack_type": 6
    }
   },
   {
+   "attacker": {
+    "uid": 1409
+   },
    "type": "True",
    "damage": 16559.616498316173,
    "zones": {
@@ -3485,10 +3716,14 @@
      "wind": 0.20000000018626451
     },
     "break_damage_percentage": 0,
-    "break_damage_added_ratio": 0
+    "break_damage_added_ratio": 0,
+    "attack_type": 13
    }
   },
   {
+   "attacker": {
+    "uid": 1409
+   },
    "type": "Additional",
    "damage": 28387.91393932537,
    "zones": {
@@ -3545,10 +3780,14 @@
      "wind": 0.40000000037252903
     },
     "break_damage_percentage": 0,
-    "break_damage_added_ratio": 0
+    "break_damage_added_ratio": 0,
+    "attack_type": 6
    }
   },
   {
+   "attacker": {
+    "uid": 1409
+   },
    "type": "True",
    "damage": 11922.923865620513,
    "zones": {
@@ -3605,10 +3844,14 @@
      "wind": 0.40000000037252903
     },
     "break_damage_percentage": 0,
-    "break_damage_added_ratio": 0
+    "break_damage_added_ratio": 0,
+    "attack_type": 13
    }
   },
   {
+   "attacker": {
+    "uid": 1413
+   },
    "type": "Ultimate",
    "damage": 235968.39288493083,
    "zones": {
@@ -3665,10 +3908,14 @@
      "wind": 0.40000000037252903
     },
     "break_damage_percentage": 0,
-    "break_damage_added_ratio": 0
+    "break_damage_added_ratio": 0,
+    "attack_type": 3
    }
   },
   {
+   "attacker": {
+    "uid": 1413
+   },
    "type": "True",
    "damage": 99106.72510397108,
    "zones": {
@@ -3725,10 +3972,14 @@
      "wind": 0.40000000037252903
     },
     "break_damage_percentage": 0,
-    "break_damage_added_ratio": 0
+    "break_damage_added_ratio": 0,
+    "attack_type": 13
    }
   },
   {
+   "attacker": {
+    "uid": 1409
+   },
    "type": "Servant",
    "damage": 778491.3829796452,
    "zones": {
@@ -3785,10 +4036,14 @@
      "wind": 0.40000000037252903
     },
     "break_damage_percentage": 0,
-    "break_damage_added_ratio": 0
+    "break_damage_added_ratio": 0,
+    "attack_type": 12
    }
   },
   {
+   "attacker": {
+    "uid": 1409
+   },
    "type": "True",
    "damage": 326966.3811559621,
    "zones": {
@@ -3845,10 +4100,14 @@
      "wind": 0.40000000037252903
     },
     "break_damage_percentage": 0,
-    "break_damage_added_ratio": 0
+    "break_damage_added_ratio": 0,
+    "attack_type": 13
    }
   },
   {
+   "attacker": {
+    "uid": 1409
+   },
    "type": "Additional",
    "damage": 31886.968520457624,
    "zones": {
@@ -3905,10 +4164,14 @@
      "wind": 0.40000000037252903
     },
     "break_damage_percentage": 0,
-    "break_damage_added_ratio": 0
+    "break_damage_added_ratio": 0,
+    "attack_type": 6
    }
   },
   {
+   "attacker": {
+    "uid": 1409
+   },
    "type": "True",
    "damage": 13392.526791064767,
    "zones": {
@@ -3965,10 +4228,14 @@
      "wind": 0.40000000037252903
     },
     "break_damage_percentage": 0,
-    "break_damage_added_ratio": 0
+    "break_damage_added_ratio": 0,
+    "attack_type": 13
    }
   },
   {
+   "attacker": {
+    "uid": 1415
+   },
    "type": "Servant",
    "damage": 140940.61413811333,
    "zones": {
@@ -4025,10 +4292,14 @@
      "wind": 0
     },
     "break_damage_percentage": 0,
-    "break_damage_added_ratio": 0.15552000235766172
+    "break_damage_added_ratio": 0.15552000235766172,
+    "attack_type": 12
    }
   },
   {
+   "attacker": {
+    "uid": 1415
+   },
    "type": "True",
    "damage": 59195.05799313728,
    "zones": {
@@ -4085,10 +4356,14 @@
      "wind": 0
     },
     "break_damage_percentage": 0,
-    "break_damage_added_ratio": 0.15552000235766172
+    "break_damage_added_ratio": 0.15552000235766172,
+    "attack_type": 13
    }
   },
   {
+   "attacker": {
+    "uid": 1415
+   },
    "type": "Servant",
    "damage": 140940.61413811333,
    "zones": {
@@ -4145,10 +4420,14 @@
      "wind": 0
     },
     "break_damage_percentage": 0,
-    "break_damage_added_ratio": 0.15552000235766172
+    "break_damage_added_ratio": 0.15552000235766172,
+    "attack_type": 12
    }
   },
   {
+   "attacker": {
+    "uid": 1415
+   },
    "type": "True",
    "damage": 59195.05799313728,
    "zones": {
@@ -4205,10 +4484,14 @@
      "wind": 0
     },
     "break_damage_percentage": 0,
-    "break_damage_added_ratio": 0.15552000235766172
+    "break_damage_added_ratio": 0.15552000235766172,
+    "attack_type": 13
    }
   },
   {
+   "attacker": {
+    "uid": 1415
+   },
    "type": "Servant",
    "damage": 23922.694789469708,
    "zones": {
@@ -4265,10 +4548,14 @@
      "wind": 0
     },
     "break_damage_percentage": 0,
-    "break_damage_added_ratio": 0.15552000235766172
+    "break_damage_added_ratio": 0.15552000235766172,
+    "attack_type": 12
    }
   },
   {
+   "attacker": {
+    "uid": 1415
+   },
    "type": "True",
    "damage": 10047.531820934732,
    "zones": {
@@ -4325,10 +4612,14 @@
      "wind": 0
     },
     "break_damage_percentage": 0,
-    "break_damage_added_ratio": 0.15552000235766172
+    "break_damage_added_ratio": 0.15552000235766172,
+    "attack_type": 13
    }
   },
   {
+   "attacker": {
+    "uid": 1415
+   },
    "type": "Servant",
    "damage": 140940.61413811333,
    "zones": {
@@ -4385,10 +4676,14 @@
      "wind": 0
     },
     "break_damage_percentage": 0,
-    "break_damage_added_ratio": 0.15552000235766172
+    "break_damage_added_ratio": 0.15552000235766172,
+    "attack_type": 12
    }
   },
   {
+   "attacker": {
+    "uid": 1512
+   },
    "type": "Servant",
    "damage": 195703.9808260824,
    "zones": {
@@ -4445,10 +4740,14 @@
      "wind": 0
     },
     "break_damage_percentage": 0,
-    "break_damage_added_ratio": 0.11016000201925635
+    "break_damage_added_ratio": 0.11016000201925635,
+    "attack_type": 12
    }
   },
   {
+   "attacker": {
+    "uid": 1512
+   },
    "type": "True",
    "damage": 82195.6720235052,
    "zones": {
@@ -4505,10 +4804,14 @@
      "wind": 0
     },
     "break_damage_percentage": 0,
-    "break_damage_added_ratio": 0.11016000201925635
+    "break_damage_added_ratio": 0.11016000201925635,
+    "attack_type": 13
    }
   },
   {
+   "attacker": {
+    "uid": 1415
+   },
    "type": "Servant",
    "damage": 145083.0997317126,
    "zones": {
@@ -4565,10 +4868,14 @@
      "wind": 0
     },
     "break_damage_percentage": 0,
-    "break_damage_added_ratio": 0.15552000235766172
+    "break_damage_added_ratio": 0.15552000235766172,
+    "attack_type": 12
    }
   },
   {
+   "attacker": {
+    "uid": 1415
+   },
    "type": "True",
    "damage": 60934.90194406919,
    "zones": {
@@ -4625,10 +4932,14 @@
      "wind": 0
     },
     "break_damage_percentage": 0,
-    "break_damage_added_ratio": 0.15552000235766172
+    "break_damage_added_ratio": 0.15552000235766172,
+    "attack_type": 13
    }
   },
   {
+   "attacker": {
+    "uid": 1415
+   },
    "type": "Servant",
    "damage": 145083.0997317126,
    "zones": {
@@ -4685,10 +4996,14 @@
      "wind": 0
     },
     "break_damage_percentage": 0,
-    "break_damage_added_ratio": 0.15552000235766172
+    "break_damage_added_ratio": 0.15552000235766172,
+    "attack_type": 12
    }
   },
   {
+   "attacker": {
+    "uid": 1415
+   },
    "type": "True",
    "damage": 60934.90194406919,
    "zones": {
@@ -4745,10 +5060,14 @@
      "wind": 0
     },
     "break_damage_percentage": 0,
-    "break_damage_added_ratio": 0.15552000235766172
+    "break_damage_added_ratio": 0.15552000235766172,
+    "attack_type": 13
    }
   },
   {
+   "attacker": {
+    "uid": 1415
+   },
    "type": "Servant",
    "damage": 145083.0997317126,
    "zones": {
@@ -4805,10 +5124,14 @@
      "wind": 0
     },
     "break_damage_percentage": 0,
-    "break_damage_added_ratio": 0.15552000235766172
+    "break_damage_added_ratio": 0.15552000235766172,
+    "attack_type": 12
    }
   },
   {
+   "attacker": {
+    "uid": 1415
+   },
    "type": "True",
    "damage": 60934.90194406919,
    "zones": {
@@ -4865,10 +5188,14 @@
      "wind": 0
     },
     "break_damage_percentage": 0,
-    "break_damage_added_ratio": 0.15552000235766172
+    "break_damage_added_ratio": 0.15552000235766172,
+    "attack_type": 13
    }
   },
   {
+   "attacker": {
+    "uid": 1415
+   },
    "type": "Servant",
    "damage": 145083.0997317126,
    "zones": {
@@ -4925,7 +5252,8 @@
      "wind": 0
     },
     "break_damage_percentage": 0,
-    "break_damage_added_ratio": 0.15552000235766172
+    "break_damage_added_ratio": 0.15552000235766172,
+    "attack_type": 12
    }
   }
  ]
