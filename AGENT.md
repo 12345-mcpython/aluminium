@@ -484,6 +484,20 @@ HP_LOST 计数 = 0 ; HP_CONSUMED 计数 = 0   ← 两个事件都没发
 
 ⇒ 需要的能力：**执行技能数据里的生命消耗**（并按 `consumeHp` 的语义发 `HP_CONSUMED`，不发 `HP_LOST` —— 引擎的既有区分是对的 ✓）。
 
+### 3.7h 待办：忆灵的多段（1413 的「长夜」5~6 段）还没有分段（**2026-10-18**）
+
+`skill_max_hits.json` 的 `servants` 里有 `Servant_EvernightServant_00_Config: {Skill01: 6, Skill11: 2}`，
+即 1413 的忆灵「长夜」的**技能 1 最多 6 段**；而整场捕获里她的那几次施放是 **5 段**（`capture-flow` 的 `hits 5 / targets 1`，
+每段后面还跟一条配对真伤）。
+
+现状：`skill_effects.json` 里**没有** 11413（servant）的分段条目 ⇒ 引擎把这一发当成**单段**结算。
+后果：**总伤害不受影响**（分段只影响暴击的独立掷点与"每段配对真伤"的条数），但
+① 与捕获对齐时"事件条数"会不一致（捕获 5~6 条 + 5~6 条配对，引擎 1 条）；
+② 凡"每段触发一次"的从句会少算。
+
+⇒ 要做：给 servant 技能也支持 `segments`（`skill_effects` 目前的键是角色 cid ✓，servant 是 `servant_id` ✓），
+数据取 `skill_max_hits` 的段数（6）与文档的分裂比；再在 `compare-capture` 里允许"一个事件对应引擎的 N 段"。
+
 ### 3.8 数据文件速查
 
 | 文件 | 内容 | 已确认锚点 |
