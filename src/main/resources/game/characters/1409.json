@@ -118,6 +118,31 @@
       "note": "⭐ 引擎的 `eidolonRank` 只开规则、**不抬技能等级** —— 本次用 `min_eidolon: 3` + `RAISE_SKILL_LEVEL` 补上；「忆灵技等级+1」用 `memosprite: true` + `skill_id: 1`（小伊卡的数据槽 1）✓。"
     },
     {
+      "on": "BATTLE_START",
+      "id": "technique_heals_and_raises_max_hp",
+      "when": [
+        "self has_state 秘技"
+      ],
+      "do": [
+        {
+          "op": "HEAL",
+          "scale": "owner_max_hp",
+          "percent": 0.3,
+          "amount": 600,
+          "target": "all_allies"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "HEALTH",
+          "percent": 0.2,
+          "turns": 2,
+          "target": "all_allies"
+        }
+      ],
+      "source": "1409 风堇 秘技【天气正好，万物可爱！】(140907, Maze/Restore): 「下一次战斗开始时，为我方全体回复等同于风堇 #1(30)% 生命上限 + #2(600) 的生命值并使生命上限提高 #3(20)%，持续 #4(2) 回合」 param = [0.3, 600, 0.2, 2]（单行，各等级一致）",
+      "note": "⭐ 秘技在引擎里是「战前已使用」的标记（`Battle.markTechniqueUsed` ⇒ `self has_state 秘技`），所以挂 `BATTLE_START` + 该条件 ✓。数值取 140907 的唯一一行（0.3/600/0.2/2）✓；生命上限走 `MODIFY_ATTR HEALTH`（与雨过天晴同一条路径）✓，治疗走 `HEAL owner_max_hp` ✓。"
+    },
+    {
       "on": "HEALED",
       "id": "talent_healing_raises_ikachis_damage",
       "when": [
