@@ -65,6 +65,10 @@ public class HyacineTest {
         // Two now as well: the summon, and the sky ode spending a layer on a SKILL_CAST.
         Assertions.assertEquals(2, table.ruleCount(TriggerEvent.SKILL_CAST),
                 "the summon rule the document states -- the heal still comes from the skill data, so no rule states it");
+        // Rank 6 is the file's only SUMMONED rule, and that is the point of it: the aura is gated on 小伊卡 actually
+        // entering the field, so it cannot be counted under BATTLE_START (see HyacineEidolonSixTest).
+        Assertions.assertEquals(1, table.ruleCount(TriggerEvent.SUMMONED),
+                "Rank 6's all-type RES PEN while 小伊卡 is out");
     }
 
     private static Random fixed() {
