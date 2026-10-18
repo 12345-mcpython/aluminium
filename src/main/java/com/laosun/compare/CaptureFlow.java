@@ -59,9 +59,13 @@ public final class CaptureFlow {
      * @param targets        distinct {@code target_max_hp} values, i.e. distinct enemies
      * @param damage         the sum of the real hits
      * @param companion      the sum of the paired true-damage hits
+     * @param covered        how many events this group accounts for
+     * @param firstTarget    the {@code target_max_hp} of the group's FIRST hit - which unit the cast was aimed at,
+     *                       as the payload's only identity for a target. {@code BattleReplay} uses it to check that
+     *                       its plan names the same target the capture does.
      */
-    private record Cast(int index, long actor, String kind, String classification, double base, int hits, int targets,
-                        double damage, double companion, int covered) {
+    record Cast(int index, long actor, String kind, String classification, double base, int hits, int targets,
+                double damage, double companion, int covered, double firstTarget) {
     }
 
     /**
@@ -80,6 +84,7 @@ public final class CaptureFlow {
         private double damage;
         private double companion;
         private int covered;
+        private double firstTarget;
 
         private Group(int index, long actor, String kind, String classification, int attackType) {
             this.index = index;
@@ -90,7 +95,8 @@ public final class CaptureFlow {
         }
 
         private Cast toCast() {
-            return new Cast(index, actor, kind, classification, base, hits, targets.size(), damage, companion, covered);
+            return new Cast(index, actor, kind, classification, base, hits, targets.size(), damage, companion, covered,
+                    firstTarget);
         }
     }
 
@@ -208,6 +214,7 @@ public final class CaptureFlow {
             double base = numberOr(zones, "raw_damage_before_modifiers", 0);
             if (current.hits == 0) {
                 current.base = base;
+                current.firstTarget = numberOr(zones, "target_max_hp", 0);
             }
             current.hits++;
             current.damage += numberOr(event, "damage", 0);
