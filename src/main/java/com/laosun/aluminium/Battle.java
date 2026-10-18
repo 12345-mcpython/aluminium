@@ -906,7 +906,6 @@ public class Battle {
         return skillPointPolicy.onSkillCast(user, skill);
     }
 
-    public ArrayList<AdvanceRequest> advanceRequests = new ArrayList<>();
 
     private final ArrayList<SkillRequest> skillRequests = new ArrayList<>();
 
@@ -991,8 +990,6 @@ public class Battle {
     private final Map<String, com.laosun.aluminium.models.Resource> partyResources =
             new java.util.LinkedHashMap<>();
 
-    public record AdvanceRequest(CanHit object, double rate) {
-    }
 
     public record SkillRequest(Skill skill, CanHit object, List<? extends CanHit> target) {
     }
@@ -2096,7 +2093,6 @@ public class Battle {
         // The newly placed summons are on the roster AND in the action bar by now, which is what a rule
         // answering "when summoned" needs before it can touch their action value -- see TriggerEvent.SUMMONED.
         fireSummoned();
-        processAdvanceRequests();
         removeDeadCombatants();
     }
 
@@ -3959,21 +3955,6 @@ public class Battle {
         addRequestItems.clear();
     }
 
-    public void advanceRequest(CanHit canHit, double rate) {
-        if (canHit != null && rate >= 0 && rate <= 1) {
-            advanceRequests.add(new AdvanceRequest(canHit, rate));
-        }
-    }
-
-    private void processAdvanceRequests() {
-        if (advanceRequests.isEmpty()) {
-            return;
-        }
-        for (AdvanceRequest advanceRequest : advanceRequests) {
-            queue.advanceActionByPercent(advanceRequest.object, advanceRequest.rate);
-        }
-        advanceRequests.clear();
-    }
 
     private void removeDeadCombatants() {
         perishOrphanedSummons();                     // a summon goes when its master does
@@ -4399,4 +4380,5 @@ public class Battle {
     private CanHit techniqueArchetype;
 
 }
+
 
