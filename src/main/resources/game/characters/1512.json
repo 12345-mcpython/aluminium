@@ -130,57 +130,6 @@
       "note": "「与**自身**造成的伤害提高」里的\"自身\" = **忆灵** ✅ —— 忆灵出手走 `SUMMON_ATTACK`、`actor` 是忆灵 ⇒ `when: [\"actor == summon\", \"self has_state Fever\"]` ✓（与光锥 23042 那条同形 ✓）。数值同角色本人那条：`amount 0.84` + `percent 0.028 × party_resource:气氛值` ✓，`instance: true` 只作用于这一发 ✓。⚠ 引擎缺口已修（`SkillExecutor` 现在会为数据驱动的忆灵 fire `SUMMON_ATTACK` ✓，见 §3.7d ✓）。"
     },
     {
-      "on": "SUMMONED",
-      "id": "memosprite_aura_vulnerability_at_1",
-      "when": [
-        "self_summon_count >= 1"
-      ],
-      "do": [
-        {
-          "op": "MODIFY_DAMAGE_TAKEN",
-          "percent": 0.112,
-          "permanent": true,
-          "target": "all_enemies"
-        }
-      ],
-      "source": "1512 忆灵 11512 SkillP01 (1151203): 「「晴空乐手」在场时，根据成员数量使敌方全体受到的伤害分别提高#3[f1]%/#4[f1]%/#5[f1]%」 param = [0.84, 0.028, 0.112, 0.168, 0.224, 12, 0, 0, 140, 0.5]",
-      "note": "「根据成员数量使敌方全体受到的伤害提高 11.2% / 16.8% / 22.4%」—— 这份文档的写法是**逐档累加** ✓：1 名 = 0.112、2 名 = 0.112 + 0.168 = 0.28、3 名 = 0.504 ✓（与捕获对平：0.28 + 光锥 0.36 = 0.64 ✓✓）。所以三条规则分别按 self_summon_count >= 1/2/3 叠加 ✓，而不是三选一 ✗。⚠ 登记：① 文档说「在场时」，忆灵离场应当撤销 ✗，本文件写成 permanent: true（离场不撤销 ✗）；② 触发点用 SUMMONED ✓（忆灵入场那一刻按当时人数结算 ✓），人数后续变化不会再重算 ✗。两条限制都写在这里，不藏。"
-    },
-    {
-      "on": "SUMMONED",
-      "id": "memosprite_aura_vulnerability_at_2",
-      "when": [
-        "self_summon_count >= 2"
-      ],
-      "do": [
-        {
-          "op": "MODIFY_DAMAGE_TAKEN",
-          "percent": 0.168,
-          "permanent": true,
-          "target": "all_enemies"
-        }
-      ],
-      "source": "1512 忆灵 11512 SkillP01 (1151203): 「「晴空乐手」在场时，根据成员数量使敌方全体受到的伤害分别提高#3[f1]%/#4[f1]%/#5[f1]%」 param = [0.84, 0.028, 0.112, 0.168, 0.224, 12, 0, 0, 140, 0.5]",
-      "note": "「根据成员数量使敌方全体受到的伤害提高 11.2% / 16.8% / 22.4%」—— 这份文档的写法是**逐档累加** ✓：1 名 = 0.112、2 名 = 0.112 + 0.168 = 0.28、3 名 = 0.504 ✓（与捕获对平：0.28 + 光锥 0.36 = 0.64 ✓✓）。所以三条规则分别按 self_summon_count >= 1/2/3 叠加 ✓，而不是三选一 ✗。⚠ 登记：① 文档说「在场时」，忆灵离场应当撤销 ✗，本文件写成 permanent: true（离场不撤销 ✗）；② 触发点用 SUMMONED ✓（忆灵入场那一刻按当时人数结算 ✓），人数后续变化不会再重算 ✗。两条限制都写在这里，不藏。"
-    },
-    {
-      "on": "SUMMONED",
-      "id": "memosprite_aura_vulnerability_at_3",
-      "when": [
-        "self_summon_count >= 3"
-      ],
-      "do": [
-        {
-          "op": "MODIFY_DAMAGE_TAKEN",
-          "percent": 0.224,
-          "permanent": true,
-          "target": "all_enemies"
-        }
-      ],
-      "source": "1512 忆灵 11512 SkillP01 (1151203): 「「晴空乐手」在场时，根据成员数量使敌方全体受到的伤害分别提高#3[f1]%/#4[f1]%/#5[f1]%」 param = [0.84, 0.028, 0.112, 0.168, 0.224, 12, 0, 0, 140, 0.5]",
-      "note": "「根据成员数量使敌方全体受到的伤害提高 11.2% / 16.8% / 22.4%」—— 这份文档的写法是**逐档累加** ✓：1 名 = 0.112、2 名 = 0.112 + 0.168 = 0.28、3 名 = 0.504 ✓（与捕获对平：0.28 + 光锥 0.36 = 0.64 ✓✓）。所以三条规则分别按 self_summon_count >= 1/2/3 叠加 ✓，而不是三选一 ✗。⚠ 登记：① 文档说「在场时」，忆灵离场应当撤销 ✗，本文件写成 permanent: true（离场不撤销 ✗）；② 触发点用 SUMMONED ✓（忆灵入场那一刻按当时人数结算 ✓），人数后续变化不会再重算 ✗。两条限制都写在这里，不藏。"
-    },
-    {
       "on": "BATTLE_START",
       "id": "level_convention",
       "do": [
