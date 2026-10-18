@@ -586,7 +586,7 @@ HP_LOST 计数 = 0 ; HP_CONSUMED 计数 = 0   ← 两个事件都没发
 
 **判据**：`HyacineRainClearMaxHpTest` —— E0：涨 `1086.624 × 0.30 + 600`；E6：涨 `1086.624 × (0.33 + 0.50) + 600`，且 `skillLevel(ULTRA)` = 12/10 ✓。`HyacineTest` 的规则计数同步为 5（ULT_CAST）/ 2（BATTLE_START）。
 
-**仍登记**：① ~~固定项 600 字面量~~ **已落**（2026-10-18：引擎补了「份额 + 固定项」两条修饰，`amount_from_skill_param` 现在按**点数**加，Lv12 = 667.5 ✓）；② ~~忆灵技等级+1~~ **已落**（`memosprite: true` + `skill_id: 1`；1409 的忆灵技已在表上限 10，所以读数仍是 10，判据钉的是"改动落在召唤者的 bonus 上"）；③ 秘技【天气正好】**已落**（`technique_heals_and_raises_max_hp`：`BATTLE_START` + `self has_state 秘技`，`HEAL owner_max_hp 0.3+600` 与 `MODIFY_ATTR HEALTH 0.2` 两回合；判据 `HyacineTechniqueTest`）✓；④ 4 件套 127 的 24%（`Ability51271`）仍未实现 —— 那一场它**没有生效**（加了会到 10934，捕获是 10320.44）。
+**仍登记**：① ~~固定项 600 字面量~~ **已落**（2026-10-18：引擎补了「份额 + 固定项」两条修饰，`amount_from_skill_param` 现在按**点数**加，Lv12 = 667.5 ✓）；② ~~忆灵技等级+1~~ **已落**（`memosprite: true` + `skill_id: 1`；1409 的忆灵技已在表上限 10，所以读数仍是 10，判据钉的是"改动落在召唤者的 bonus 上"）；③ 秘技【天气正好】**已落**（`technique_heals_and_raises_max_hp`：`BATTLE_START` + `self has_state 秘技`，`HEAL owner_max_hp 0.3+600` 与 `MODIFY_ATTR HEALTH 0.2` 两回合；判据 `HyacineTechniqueTest`）✓；④ **4 件套 127 已经在 `relic_sets/127.json` 实现**（两条 `BASIC_ATTACK`/`SKILL_CAST` 规则，24%/24%/15%），不是缺口 —— 那一场它**没有生效**是因为 1415 没开大、德谬歌不在场（`self_summon_count >= 1` 不满足）✓；此前"未实现"的说法撤回。
 
 ---
 ### 3.8 数据文件速查
