@@ -93,6 +93,43 @@
       "note": "⭐ 捕获的「83% + 667」= 0.33（140903 Lv12 的 #3，孪生规则）+ 0.50（**星魂1**，不是星魂2 —— 2026-10-18 按文档更正）+ 667.5（Lv12 的 #4）✓。两条 HEALTH% 都用 `max_stacks: 2` ⇒ 相加 ✓；固定项只在孪生规则里加一次 ✓。"
     },
     {
+      "on": "BATTLE_START",
+      "id": "eidolon_five_raises_skill_and_talent",
+      "min_eidolon": 5,
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "SKILL",
+          "amount": 2
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "TALENT",
+          "amount": 2
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "memosprite": true,
+          "skill_id": 3,
+          "amount": 1
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "memosprite": true,
+          "skill_id": 5,
+          "amount": 1
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "memosprite": true,
+          "skill_id": 6,
+          "amount": 1
+        }
+      ],
+      "source": "1409 风堇 星魂5（1409_风堇.md「星魂 5：红霞映入海的背面」）：「战技等级+2，最多不超过15级；天赋等级+2，最多不超过15级；忆灵天赋等级+1，最多不超过10级」",
+      "note": "⭐ 与星魂3 同形；忆灵那三半按数据槽 3/5/6（小伊卡的辅助/增益技能）各 +1 ✓。⚠ 「忆灵**天赋**等级」按忆灵技能表的数据槽落。"
+    },
+    {
       "on": "ALLY_ATTACK",
       "id": "eidolon_one_heals_after_an_attack_while_rain_clear",
       "min_eidolon": 1,
