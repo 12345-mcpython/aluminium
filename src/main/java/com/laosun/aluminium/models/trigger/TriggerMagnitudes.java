@@ -341,8 +341,8 @@ final class TriggerMagnitudes {
         }
         // A battle-level PARTY counter as a magnitude (reader: 1513's reward, which hands
         // [好活当赏] the [笑点] the Aha moment spent). The counter lives on the battle, not on a unit.
-        if (key.startsWith("party_resource:")) {
-            String counter = key.substring("party_resource:".length()).trim();
+        if (key.startsWith(TriggerInterpreter.PARTY_RESOURCE_PREFIX)) {
+            String counter = key.substring(TriggerInterpreter.PARTY_RESOURCE_PREFIX.length()).trim();
             if (ctx.battle() == null || ctx.battle().partyResource(counter) == null) {
                 throw new IllegalStateException(
                         "a magnitude scales off the party counter '" + counter + "', which no file declares or which"
@@ -830,7 +830,7 @@ final class TriggerMagnitudes {
         }
         // A battle-level PARTY counter (reader: 1513's reward): the counter lives on the battle, so it is
         // resolved here rather than through `scaleAttribute`, which answers "which attribute" and has no answer for it.
-        if (effect.getScale().trim().startsWith("party_resource:")) {
+        if (effect.getScale().trim().startsWith(TriggerInterpreter.PARTY_RESOURCE_PREFIX)) {
             return resolveScale(effect.getScale(),
                     effect.getPercent() == null ? 1 : effect.getPercent(), ctx)
                     + constantTerm(effect, ctx);
@@ -919,7 +919,7 @@ final class TriggerMagnitudes {
         // but not an AttributeType, so the question "which attribute does this scale name" has no answer for it.
         if (TriggerInterpreter.SELF_MAX_ENERGY.equals(raw) || TriggerInterpreter.EVENT_AMOUNT.equals(raw) || raw.startsWith(TriggerInterpreter.ABOVE_PREFIX)
                 || raw.startsWith(TriggerInterpreter.STEPS_PREFIX)
-                || raw.startsWith("party_resource:") || raw.startsWith(TriggerTable.HOLDER_ATTR_PREFIX)
+                || raw.startsWith(TriggerInterpreter.PARTY_RESOURCE_PREFIX) || raw.startsWith(TriggerTable.HOLDER_ATTR_PREFIX)
                 || raw.startsWith(TriggerInterpreter.SELF_RESOURCE_PREFIX)
                 || TriggerInterpreter.COUNTED_LAUGHS.equals(raw) || "elation_base".equals(raw)) {
             // `holder_attr:` joins them for the same reason `summon_attr:`/`actor_attr:` are not here: it names a
