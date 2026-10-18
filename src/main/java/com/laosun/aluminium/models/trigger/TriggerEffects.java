@@ -100,7 +100,12 @@ final class TriggerEffects {
                 return;   // the instance belongs to another damage type: this rule does not speak about it
             }
             if (attribute == AttributeType.DEFENCE_IGNORE) {
-                double instanceMagnitude = effect.getPercent() == null ? 0 : effect.getPercent();
+                // Note: this read `effect.getPercent()` alone, which silently dropped a stated `amount` and `scale`.
+                // Measured on 1512's Fever aura ("15% + 0.5% per 气氛值"): only the 0.5% arrived, at every gauge value.
+                double instanceMagnitude = TriggerMagnitudes.magnitudeOf(effect, ctx);
+                if (effect.getAmountCap() != null) {
+                    instanceMagnitude = Math.min(instanceMagnitude, effect.getAmountCap());
+                }
                 instanceMagnitude *= ctx.target() == null ? 1 : TriggerInterpreter.perStackFactor(effect, ctx.target(), ctx);
                 ctx.damage().addDefenceIgnore(instanceMagnitude);
                 return;

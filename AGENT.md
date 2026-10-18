@@ -385,56 +385,34 @@ if (isSelected) buffer.setStyle(rowArea, highlightStyle);
 ⚠ **数据表仍不是全量**：`monster_config.json` 现在是 2722 条里的子集？不 —— 生成器写全量 ✓；但**关卡级**的数值覆盖
 （如 14.03 那份捕获的 HP/DEF）不在 Excel 里 ✓，见 §4.3。
 
-### 3.7c 缺口：份额型属性的"基准 + 每单位资源"（**2026-10-18**）
+### 3.7c 已修：实例级 `MODIFY_ATTR` 只读 `percent`（**2026-10-18**）
 
-`MODIFY_ATTR` 带 `scale` 时，引擎把算出来的数当**绝对值**写进属性（`absolute = !statesShare(effect) || scaled`）。
-对 `ATTACK` / `DEFENCE` 这类**点数**属性正确 ✓，但对**份额**属性（`DEFENCE_IGNORE`、`*_DAMAGE_BOOST`、`EFFECT_RESISTANCE`…）就偏了 100 倍 ✗。
+**症状**：1512 知更鸟•晴歌的【Fever】结界「无视敌方目标（15% + 0.5% × 气氛值）的防御力」写不出来 ——
+无论气氛值是 0 / 15 / 50，结算出来的 `DefenceArea` **一模一样**，反推 ignore 恒为 **0.005**，正好等于规则里的 `percent`。
 
-实测（`FeverDefenceIgnoreTest`，1512 知更鸟•晴歌的【Fever】结界）：
-`amount 0.15 + percent 0.005 × party_resource:气氛值` 应给 **22.5%**（气氛值 15），实际给 **0.15 点 = 0.15%**，
-防御区比值实测 1.0026，而正确值应是 1.1336 ✗。
+**根因**（不是单位问题，前几轮的反推方向都错了）：`TriggerEffects` 里 `instance: true` 的那条分支对
+`DEFENCE_IGNORE` **只读 `effect.getPercent()`**，`amount` 与 `scale` 直接丢弃：
 
-⭐ 这条**已被整场捕获证实存在且数值正确**：捕获里反解出的有效 DEF = `1150 × {0.775, 0.77, 0.76, 0.725, 0.71, 0.705, 0.685, 0.6}`
-= 无视防御 22.5% … **40%**，正是 `15% + 0.5% × 气氛值`（气氛值上限 50 ⇒ 封顶 40%）✓。
+```java
+double instanceMagnitude = effect.getPercent() == null ? 0 : effect.getPercent();   // ✗ 丢了 amount/scale/cap
+```
 
-#### 已经量过的两种写法（都不对，记录在此，别再重走）
+**修法**：把"份额 / 派生 / 扁平 amount"的选择收成**一处**（`TriggerMagnitudes.magnitudeOf`），实例级分支也用它，
+并让 `cap_amount` 生效。于是 `amount 0.15 + percent 0.005 × party_resource:气氛值` 得到 0.15 / 0.225 / 0.40。
 
-| 写法 | 期望 ignore | 实测反推得 | 结论 |
-|---|---|---|---|
-| `amount: 0.15` + `percent: 0.005`（**份额**） | 22.5% | **≈0.16%** | 被当点数吃掉 100 倍 ✗ |
-| `amount: 15` + `percent: 0.5`（**百分点**） | 22.5% | **≈50%**（且 `cap_amount 40` 没夹住）✗ | 被放大、上限失效 ✗ |
+**判据**：`FeverDefenceIgnoreTest` —— 气氛值 0 / 15 / 50 ⇒ ignore 0.15 / 0.225 / 0.40（容差 1e-6），
+没有 `Fever` 状态时再满的气量也是 0；观测口是**结算后的 `DefenceArea`**（实例级属性读不到角色身上，实测恒 0）。
 
-⇒ 带 `scale` 的 `MODIFY_ATTR` 至少涉及三个未定的单位问题：① `derivedMagnitude` 返回**份额**还是**百分点**；
-② `statModifier(absolute=false)` 对份额属性把值当 `值/100` 还是 `值 × base`；③ `cap_amount` 在 `absolute=false` 分支是否经
-`ceiling / base`（源码里有这行，但上面的实测里没夹住）。
+**顺带记下两条错误方向**（省得重走）：① 份额写法 `amount 0.15 + percent 0.005` 曾被判为"被吃 100 倍"、
+② 百分点写法 `amount 15 + percent 0.5` 曾被判为"放大且 cap 失效" —— 两次测量都混着"气量=0"的噪声，
+**都不是真的**；真正的病在实例级分支 ✗。
 
-#### 第 8 轮的量测（气量这次真的设上了，结论更硬）
+**队级计数器**：`气氛值` 的 `scope: "PARTY"` 是有效的 ✓ —— 它在 `Battle.partyResources` 里，
+公开入口 `battle.partyResourceValue(id)` / `battle.partyResource(id)` ✓；`CanHit.getResources()` 是 **SELF 池**，
+读它永远是 0（这不是缺口，是探针读错了对象 ✗）。
 
-用 `battle.partyResource("气氛值").gain(N)` 设值（回读确认 0 / 15 / 50 ✓），在 `addDamageObserver` 里取这一发的
-`breakdown()["DefenceArea"]`：
-
-| 气量 | 带 Fever 的 `DefenceArea` | 对照组 | 反推 ignore |
-|---|---|---|---|
-| 0 | 0.47744092802706417 | 0.47619048752834486 | **0.005** |
-| 15 | 0.47744092802706417 | 0.47619048752834486 | **0.005** |
-| 50 | 0.47744092802706417 | 0.47619048752834486 | **0.005** |
-
-⇒ 规则**触发了** ✓，但写进去的值 = **`percent` 本身（0.005）**，**与气量完全无关**、`amount: 0.15` 也没参与 ✗。
-也就是说带 `scale` 的这条路径上，`derivedMagnitude` 给出的数并不是 `percent × scale + amount` ⇒ 下一步要直接读
-`TriggerMagnitudes.derivedMagnitude` 对 `DEFENCE_IGNORE` / `party_resource:` 的返回值（或加临时打印），**而不是继续从外部反推** ✓。
-
-#### 探测方法本身也踩了两个坑（记下来省下一次）
-
-1. ~~**`Resources.gain` 改不动队级计数器**~~ → **已查清（第 7 轮）**：队级计数器**不在** `CanHit.getResources()` 里 ✓，
-   而在 `Battle` 自己的 `partyResources` 表里 ✓ —— 公开入口是 **`battle.partyResourceValue(id)`**（读）与
-   **`battle.partyResource(id)`**（拿到 `Resource` 本体，可 `gain`）✓；`registerPartyResources()` 在开战时按
-   `scope: "PARTY"` 的声明建表 ✓。所以判据里设气量应当写 `battle.partyResource("气氛值").gain(15)` ✓，
-   而我第 6 轮探针读的是**角色自己的 SELF 池**（永远是 0）✗ —— 那是探针的错，不是引擎的缺口 ✓。
-2. **`DEFENCE_IGNORE` 读不到角色属性**：连 1302 施放终结技之后 `getAttribute(DEFENCE_IGNORE)` 都是 **0** ✗
-   ⇒ 它是**实例级**（`instance: true`）修饰、活在这一发 `Damage` 上，正确的观测口是 settled 的 `DefenceArea`（`breakdown()` 的 `DefenceArea` 行）✓。
-
-⇒ 需要的能力：**份额型属性也允许 `scale`**（"基准份额 + 每单位资源"，且仍按份额写），补上后 1512 那条规则原样可写。
-当前状态：规则**没有**写进内容表，只在 `characters/1512.json` 里登记（不假装实现 ✓）。
+**与实测吻合**：整场捕获反解出的无视防御 = 22.5% / 23% / 24% / 27.5% / 29% / 29.5% / 31.5% / 40%
+= 这条公式在气氛值 15 / 16 / 18 / 25 / 28 / 29 / 33 / 50 时的值 ✓✓。
 
 ### 3.8 数据文件速查
 
