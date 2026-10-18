@@ -491,6 +491,38 @@
       "note": "「**召唤忆灵 小伊卡**」⇒ `SKILL_CAST` ⇒ **`SUMMON`** ✓（无参数 ✓：忆灵属于召唤者 ✓）；面板在 `resources/memosprites/1409.json` ✓。⚠ 同句的**治疗部分**（我方全体 8% 生命 + 160 ✗、小伊卡自己 10% + 200 ✗）尚未写 ✗ ⇒ 登记 ✓（它需要“除小伊卡以外”的目标词汇 ✗）。"
     },
     {
+      "on": "SUMMON_LEFT",
+      "id": "memosprite_fall_advances_her_action",
+      "when": [
+        "actor is_summon"
+      ],
+      "do": [
+        {
+          "op": "ADVANCE",
+          "percent": 0.3
+        }
+      ],
+      "source": "1409 风堇 忆灵技4 坠落，然后飞翔（数据槽位 6）：「**消失时**，使风堇**行动提前 30%**」param = [0.3]（全等级一致）",
+      "note": "「**消失时**，使风堇**行动提前 30%**」—— ① 事件用本轮新增的 **`SUMMON_LEFT`** ✓（`Battle.removeDeadCombatants` 在忆灵真的离开名册时发 ✓，**一次一单位** ✓）：它**不是** `DEATH` ✓ —— 忆灵可以「走了、没人杀它」（`CanHit.perish()` ✓），那种走法今天**没有任何事件** ✗；② `ADVANCE percent: 0.3` ✓（不写 `target` ⇒ 默认是**规则持有人**风堇 ✓，与 1210 桂乃芬同形 ✓）；③ 门 `actor is_summon` ✓ —— ⚠ **不能**写 `target == summon` ✗：那个选择器会拒绝「已经不在场上的召唤物」（它按 `isDeath()` 过滤 ✓）。"
+    },
+    {
+      "on": "SUMMON_LEFT",
+      "id": "eidolon_six_aura_ends_when_ikachi_leaves",
+      "min_eidolon": 6,
+      "when": [
+        "actor is_summon"
+      ],
+      "do": [
+        {
+          "op": "REMOVE_STATE",
+          "buff": "天空应我的祈愿",
+          "target": "all_allies"
+        }
+      ],
+      "source": "1409 风堇 星魂6：「**小伊卡在场时**，我方全体目标的全属性抗性穿透提高 20%」—— 「在场时」的另一半：不在场就该撤下",
+      "note": "这条补的是 §3.7l 登记的那个缺口 ✓：那条光环**没有时长** ✓（`permanent: true`），所以忆灵一离场它**不会自己撤下** ✗。⇒ 现在由 `SUMMON_LEFT` 按**名字**摘掉 ✓（`REMOVE_STATE` 认的就是 `buff` 名 ✓，名字在上一条规则里给过 ✓）。⚠ 仍是**按单位**而非真光环 ✓：之后才登场的**别的**忆灵不会补拿到它 ✓（那条登记仍未消 ✓）。"
+    },
+    {
       "on": "SUMMONED",
       "id": "ikachi_is_immune_to_negative_effects",
       "when": [
