@@ -219,6 +219,30 @@ base = 3767.553 × break_damage_percentage       # 3767.553 = 等级 80 的击�
 
 ⚠ 而且**击破路径不吃元素/类型增伤**：若把 `all_damage_type_added_ratio`（1.65 / 2.13）也乘进去，反解出的链末乘数会变成 0.387 / 0.362 —— 不可能，所以击破伤害的乘区里**没有那一段**（这与 HSR.md §10.3 里"击破时改用 `BreakDamageAddedRatio`"的写法一致）。
 
+### 第五份整场捕获（`veritas_capture_2026-10-18T08-00-26-209Z.json`）：基数层被"官方字段"证实了
+
+这一份新加了 8 个字段，其中一个是决定性的：
+
+| 字段 | 含义 |
+|---|---|
+| **`raw_damage_before_modifiers`** | **进乘区之前的原始伤害**（即基数层） |
+| `damage_result` / `target_damage_hp` / `default_multiplier` | 最终伤害 / 分摊后伤害 / 默认倍率 |
+| `attacker_fatigue_ratio` / `defender_minimum_fatigue_ratio` / `attacker_property_enum_boundary` / `sp_scaled_damage_value` | 疲劳与枚举边界（这些事件上都是 0） |
+
+**验证**：对 116 条事件里**有面板数**的 115 条，逐条检查
+
+```
+raw_damage_before_modifiers  ==  stat(由 attack_formula_type 选) × damage_percentage + damage_value
+```
+
+**115 / 115 全部逐位相等，0 个不符** ✓
+⇒ `AttackFormulaType → 用哪个面板数` 的映射（1→`attacker_attack`、3→`attacker_max_hp`、7→击破基数的特例…）
+**不再是"我用总量反推出来的"，而是游戏自己给出的字段确认的** ✓✓
+
+复算结果：**116 条里 73 条逐位复现**；剩下 42 条（`−19.8% ~ −21.4%`）—— 既然基数层已被证实与游戏一致，
+缺口就**完全在基数之后**：仍然只有那个**链末全局乘数**（`extra_damage_ratio` 依旧是占位 1、`extra_ratio_valid` 依旧全 false，
+`stage_final_damage_added_ratio` 全 0）✓
+
 ### 为什么需要 `attributes` 覆盖
 
 引擎的面板 = `character_data` + 晋阶 + 行迹，**没有光锥/遗器**。原游戏的数来自某个具体面板，所以比较时必须把那个面板的
