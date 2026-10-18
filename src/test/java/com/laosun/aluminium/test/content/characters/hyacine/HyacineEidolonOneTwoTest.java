@@ -47,7 +47,6 @@ public class HyacineEidolonOneTwoTest {
                 healed, 1e-6, "「回复等同于风堇 8% 生命上限」: " + healed);
     }
 
-    @org.junit.jupiter.api.Disabled("星魂2 的 SPEED 修饰在 takeDamage 的 HP_LOST 路径上观测不到（before==after），已登记在 AGENT.md §3.7k，待查")
     @Test
     public void rankTwoRaisesSpeedWhenAnAllyLosesHp() {
         Character hyacine = CharacterFactory.create(HYACINE, 80, true, null, null, 6);
@@ -55,11 +54,25 @@ public class HyacineEidolonOneTwoTest {
         Battle battle = new Battle(List.of(hyacine, ally), List.of(BattleFixture.dummy()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        double speedBefore = hyacine.getAttribute(com.laosun.aluminium.enums.AttributeType.SPEED).get();
-        ally.takeDamage(ally.getAttribute(com.laosun.aluminium.enums.AttributeType.HEALTH).get() * 0.1);
+        double base = ally.getAttribute(com.laosun.aluminium.enums.AttributeType.SPEED).baseValue();
+        double speedBefore = ally.getAttribute(com.laosun.aluminium.enums.AttributeType.SPEED).get();
+
+        // Two corrections against the version that was @Disabled until 2026-10-18:
+        //   ① the rule's target is `target` = the unit that LOST HP, not 风堇 -- the old assertion read the wrong unit;
+        //   ② `ally.takeDamage(...)` bypasses Battle, so HP_LOST was never emitted. Only Battle.applyDamage settles a
+        //      hit and pays out the event (CanHit.takeDamage's own javadoc says so).
+        battle.applyDamage(ally, new com.laosun.aluminium.models.Damage(hypotheticalAttacker(battle), ally,
+                com.laosun.aluminium.enums.DamageElement.PHYSICAL,
+                com.laosun.aluminium.enums.DamageType.NORMAL, ally.getMaxHp() * 0.1));
         battle.processRequests();
-        double speedAfter = hyacine.getAttribute(com.laosun.aluminium.enums.AttributeType.SPEED).get();
-        Assertions.assertTrue(speedAfter > speedBefore,
-                "Rank 2: 「生命值降低时，速度提高 30%」 (before=" + speedBefore + ", after=" + speedAfter + ")");
+
+        double speedAfter = ally.getAttribute(com.laosun.aluminium.enums.AttributeType.SPEED).get();
+        Assertions.assertEquals(base * 0.3, speedAfter - speedBefore, 1e-6,
+                "Rank 2: 「我方目标生命值降低时，速度提高 30%」 (before=" + speedBefore + ", after=" + speedAfter
+                        + ", base=" + base + ")");
+    }
+
+    private static com.laosun.aluminium.models.CanHit hypotheticalAttacker(Battle battle) {
+        return battle.enemies.getFirst();
     }
 }
