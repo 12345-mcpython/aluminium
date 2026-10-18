@@ -295,7 +295,7 @@
       "on": "CAST_SETUP",
       "id": "memosprite_rainclouds_deals_a_share_of_the_tally",
       "when": [
-        "actor is_summon",
+        "actor == summon",
         "from_skill_id == 1"
       ],
       "do": [
@@ -309,14 +309,14 @@
         }
       ],
       "source": "1409 风堇 忆灵技1 乌云乌云快走开！（数据槽位 1，SkillID 1140901）：「对敌方全体造成等同于**本场战斗风堇与小伊卡累计治疗数值** #1% 的风属性伤害…」param = [0.1…0.28, 0.5]",
-      "note": "「造成等同于**累计治疗数值 #1%** 的风属性伤害」—— ① 基数用**新词汇** **`scale: \"self_resource:小伊卡累计治疗\"`** ✓（本轮 `AGENT.md` §3.7p：以**规则持有人的**计数器为倍数 ✓ —— 那条计量就在风堇身上 ✓）；② 比例取**这一发施放自己的行** ✓：`percent_from_cast_param: 0` ✓（`#1` 随等级变：Lv1 `0.1` … Lv10 `0.28` ✓，而忆灵技的行在 cid **11409** 的槽位 1 里 ✓，`cast_skill_param` 那一族读的就是**触发事件的那次施放** ✓）；③ 元素 `Wind` ✓、目标 `all_enemies` ✓；④ 事件 `CAST_SETUP` ✓ + `actor is_summon` + `from_skill_id == 1` ✓（`from_skill_id` 比的是数据槽 ✓，1415 的 `== 19` 是同一拼法 ✓）。⚠ **登记**：忆灵技1 **自己的数据**还会结算一发「`%ATK`」的伤害 ✗，而小伊卡的 **ATK 恒为 0** ✓（实测 `ikaAtk = 0.0`）⇒ 那一发只剩引擎的**最小 1 点** ✓（实测 `dealt = 1.0`）⇒ 本条与它**相加**，总伤害 = `tally × #1 + 1` ✓（那 1 点是数据侧的残渣，未消除；判据按 `+1` 钉 ✓）。"
+      "note": "「造成等同于**累计治疗数值 #1%** 的风属性伤害」—— ① 基数用**新词汇** **`scale: \"self_resource:小伊卡累计治疗\"`** ✓（本轮 `AGENT.md` §3.7p：以**规则持有人的**计数器为倍数 ✓ —— 那条计量就在风堇身上 ✓）；② 比例取**这一发施放自己的行** ✓：`percent_from_cast_param: 0` ✓（`#1` 随等级变：Lv1 `0.1` … Lv10 `0.28` ✓，而忆灵技的行在 cid **11409** 的槽位 1 里 ✓，`cast_skill_param` 那一族读的就是**触发事件的那次施放** ✓）；③ 元素 `Wind` ✓、目标 `all_enemies` ✓；④ 事件 `CAST_SETUP` ✓ + `actor == summon` + `from_skill_id == 1` ✓（`from_skill_id` 比的是数据槽 ✓，1415 的 `== 19` 是同一拼法 ✓）。⚠⚠ **`actor == summon` 不是 `actor is_summon`**（2026-10-18 整场重放实测）：`is_summon` 的意思是「actor **是个**召唤物」（谁家的都算 ✓），所以在**多忆灵**的队伍里，**别人**的忆灵施放它自己的槽位 1 也会让这条开火 ⇒ 风堇替别人的忆灵结算一次伤害并清掉自己的计量 ✗（实测：1413 的「长夜」放槽位 1 时，小伊卡对**三个敌人**各留下 1 点 ADDITIONAL ✓）；`== summon` 才问「**是我的**召唤物吗」（身份比较 ✓）。⚠ **登记**：忆灵技1 **自己的数据**还会结算一发「`%ATK`」的伤害 ✗，而小伊卡的 **ATK 恒为 0** ✓（实测 `ikaAtk = 0.0`）⇒ 那一发只剩引擎的**最小 1 点** ✓（实测 `dealt = 1.0`）⇒ 本条与它**相加**，总伤害 = `tally × #1 + 1` ✓（那 1 点是数据侧的残渣，未消除；判据按 `+1` 钉 ✓）。"
     },
     {
       "on": "CAST_SETUP",
       "id": "memosprite_rainclouds_clears_half_the_tally",
       "max_eidolon": 5,
       "when": [
-        "actor is_summon",
+        "actor == summon",
         "from_skill_id == 1"
       ],
       "do": [
@@ -336,7 +336,7 @@
       "id": "eidolon_six_clears_twelve_percent_instead",
       "min_eidolon": 6,
       "when": [
-        "actor is_summon",
+        "actor == summon",
         "from_skill_id == 1"
       ],
       "do": [
@@ -494,7 +494,7 @@
       "on": "SUMMON_LEFT",
       "id": "memosprite_fall_advances_her_action",
       "when": [
-        "actor is_summon"
+        "actor == summon"
       ],
       "do": [
         {
@@ -503,14 +503,14 @@
         }
       ],
       "source": "1409 风堇 忆灵技4 坠落，然后飞翔（数据槽位 6）：「**消失时**，使风堇**行动提前 30%**」param = [0.3]（全等级一致）",
-      "note": "「**消失时**，使风堇**行动提前 30%**」—— ① 事件用本轮新增的 **`SUMMON_LEFT`** ✓（`Battle.removeDeadCombatants` 在忆灵真的离开名册时发 ✓，**一次一单位** ✓）：它**不是** `DEATH` ✓ —— 忆灵可以「走了、没人杀它」（`CanHit.perish()` ✓），那种走法今天**没有任何事件** ✗；② `ADVANCE percent: 0.3` ✓（不写 `target` ⇒ 默认是**规则持有人**风堇 ✓，与 1210 桂乃芬同形 ✓）；③ 门 `actor is_summon` ✓ —— ⚠ **不能**写 `target == summon` ✗：那个选择器会拒绝「已经不在场上的召唤物」（它按 `isDeath()` 过滤 ✓）。"
+      "note": "「**消失时**，使风堇**行动提前 30%**」—— ① 事件用本轮新增的 **`SUMMON_LEFT`** ✓（`Battle.removeDeadCombatants` 在忆灵真的离开名册时发 ✓，**一次一单位** ✓）：它**不是** `DEATH` ✓ —— 忆灵可以「走了、没人杀它」（`CanHit.perish()` ✓），那种走法今天**没有任何事件** ✗；② `ADVANCE percent: 0.3` ✓（不写 `target` ⇒ 默认是**规则持有人**风堇 ✓，与 1210 桂乃芬同形 ✓）；③ 门 `actor == summon` ✓（**不是** `is_summon` —— 理由见 `memosprite_rainclouds_deals_a_share_of_the_tally` 的注记 ✓：`is_summon` 会把**别人**的忆灵离场也算进来，于是别人的忆灵一走就拉着风堇提前 ✗）—— ⚠ **不能**写 `target == summon` ✗：那个选择器会拒绝「已经不在场上的召唤物」（它按 `isDeath()` 过滤 ✓）。"
     },
     {
       "on": "SUMMON_LEFT",
       "id": "eidolon_six_aura_ends_when_ikachi_leaves",
       "min_eidolon": 6,
       "when": [
-        "actor is_summon"
+        "actor == summon"
       ],
       "do": [
         {
@@ -571,7 +571,7 @@
       "on": "CAST_SETUP",
       "id": "ikachi_shortens_its_own_effects_after_it_acts",
       "when": [
-        "actor is_summon",
+        "actor == summon",
         "from_skill_id == 1"
       ],
       "do": [
@@ -583,7 +583,7 @@
         }
       ],
       "source": "1409 风堇 忆灵技2：「…小伊卡施放技能后使自身所有持续效果持续回合数减 1」",
-      "note": "「施放技能后使**自身所有**持续效果回合数**减 1**」⇒ `EXTEND_BUFF` + **`kind: \"all\"`** ✓ + **负** `turns` ✓（两点都是既有能力 ✓）；事件 `SUMMON_ATTACK` ✓ + `actor is_summon` ✓（两方召唤都发 ✓）。⭐ **为什么现在才敢写**：引擎修好了「自由回合不扣时长」✓ —— 否则这条会在插入回合计 tick 之外**再**扣一次 ✓（实测曾 3 → 1 ✓）。"
+      "note": "「施放技能后使**自身所有**持续效果回合数**减 1**」⇒ `EXTEND_BUFF` + **`kind: \"all\"`** ✓ + **负** `turns` ✓（两点都是既有能力 ✓）；事件 `CAST_SETUP` + `from_skill_id == 1` ✓、门 `actor == summon` ✓（**不是** `is_summon` ✓：否则别人的忆灵放槽位 1 也会扣小伊卡的时长 ✗，理由见 `memosprite_rainclouds_deals_a_share_of_the_tally` 的注记 ✓）。"
     },    {
       "on": "SUMMONED",
       "id": "ikachi_is_immune_to_negative_effects",
