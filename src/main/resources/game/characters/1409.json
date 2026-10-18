@@ -523,6 +523,30 @@
       "note": "这条补的是 §3.7l 登记的那个缺口 ✓：那条光环**没有时长** ✓（`permanent: true`），所以忆灵一离场它**不会自己撤下** ✗。⇒ 现在由 `SUMMON_LEFT` 按**名字**摘掉 ✓（`REMOVE_STATE` 认的就是 `buff` 名 ✓，名字在上一条规则里给过 ✓）。⚠ 仍是**按单位**而非真光环 ✓：之后才登场的**别的**忆灵不会补拿到它 ✓（那条登记仍未消 ✓）。"
     },
     {
+      "on": "HP_LOST",
+      "id": "ikachi_pays_and_heals_whoever_lost_hp",
+      "when": [
+        "target is_ally",
+        "self_summon_count >= 1"
+      ],
+      "do": [
+        {
+          "op": "CONSUME_HP",
+          "scale": "target_max_hp",
+          "percent": 0.04,
+          "target": "summon"
+        },
+        {
+          "op": "HEAL",
+          "scale": "owner_max_hp",
+          "percent": 0.02,
+          "amount": 20,
+          "target": "all_allies_lost_hp_this_action"
+        }
+      ],
+      "source": "1409 风堇 忆灵技2 牵起晴空的手（数据槽位 3）：「若除小伊卡外的我方目标生命值降低，小伊卡会…消耗自身 4% 生命上限的生命值，并为我方生命值降低的目标回复等同于风堇 2.00% 生命上限 + 20 的生命值」 param Lv10 = [0.04, 0.028, 28, …]",
+      "note": "「**生命值降低**时，小伊卡消耗**自身** 4% 生命上限，并为我方**生命值降低的目标**回复等同于风堇 **2%** 生命上限 + **20**」—— ① 事件 `HP_LOST` ✓ + `target is_ally` ✓；② 治疗对象 = **本轮新加的选择器** `all_allies_lost_hp_this_action` ✓（回答「刚掉过血的那位」✓，**不是** `lowest_hp_ally` ✗）；③ 自耗用 **`target_max_hp`** ✓（是**小伊卡自己**的上限 ✓，`owner_max_hp` 会读成风堇的 ✗），代价走 `CONSUME_HP` ✓（不吃护盾、不发 `HP_LOST` ✓）；④ 治疗用 `owner_max_hp` ✓（原文是「等同于**风堇** X% 生命上限」✓）；⑤ 数字是**字面量** ✓，取自数据行 Lv10 ✓（这条是**被动**、没有“这一发施放”可读 ✗，且忆灵技等级被 `memosprites/1409.json` 钉在 10 ✓）；⚠ **登记**：星魂5 给忆灵天赋 +1，而该表只到 10 ✗。⚠ **不加 `target != summon`** ✗：父句已写「**除小伊卡外**」✓，而 `CONSUME_HP` 走的是 `HP_CONSUMED` ✓、**不**发 `HP_LOST` ✓ ⇒ 不会自我递归 ✓（实测：一次结算这条只付一次 ✓）。"
+    },    {
       "on": "SUMMONED",
       "id": "ikachi_is_immune_to_negative_effects",
       "when": [
