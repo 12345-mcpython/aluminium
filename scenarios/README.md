@@ -296,6 +296,31 @@ raw_damage_before_modifiers  ==  stat(由 attack_formula_type 选) × damage_per
 判定它到底是减防还是全局加成的唯一实验：**dump 目标在那一下时的活 `Defence`**（或减防 debuff 列表）——
 若它是 816.5，就是减防；若仍是 1150，那就是全局加成。
 
+### 第七份整场捕获（`veritas_capture_2026-10-18T08-37-47-677Z.json`）：新字段 `target_defence_effective` 读错了方向
+
+工具加了 `target_defence_effective` / `target_defence_lp_base` / `_lp_override` / `_lp_is_override` 与
+`attacker_attack_lp` / `attacker_hp_lp`（`SetupDamageData_PropertyPart` 的 0x5B0 / 0x630 / 0x338）。
+但这些值**和攻击方自己的防御一模一样**：
+
+| 事件 | `target_defence_effective` | `attacker_defence` | `target_defence_lp_base` |
+|---|---|---|---|
+| #0 | 1201.0836764348396 | 1201.0836764348205 | 979.0200001229532（= 攻击方 `BaseDefence`） |
+| #52 | 1375.416964498682 | 1375.4169644985814 | 1159.830000066897（= 攻击方 `BaseDefence`） |
+
+⇒ 0x5B0 读到的是**攻击方**的 `Defence`（`LinearPropOverride`），不是**受击方**的。用它复算当然对不上
+（偏差 −22.8% ~ −23.5%）。
+
+**独立反解"该用的 DEF"**（把每条事件的防御区倒推出来）：34 条非真实伤害事件**全部**落在
+
+```
+DEF = 1150 × { 1.00000, 0.77500, 0.77000, 0.76000, 0.72500, 0.71000, 0.70500, 0.68500 }
+```
+
+即 **16 条 = 1150（精确复现 <1e-9）**、18 条 = 干净台阶（−22.5% ~ −31.5%）—— 与上一份捕获的 16 档台阶**同一套值**（同一场战斗）。
+
+⇒ 结论进一步收紧：**除 DEF 之外没有任何缺口**（34/34 事件都由 DEF 一个量解释），需要的是
+受击方那一路的 LP（同偏移、换 defende 侧），或者直接给 `target_defence_effective` 填**受击方**的值。
+
 ### 为什么需要 `attributes` 覆盖
 
 引擎的面板 = `character_data` + 晋阶 + 行迹，**没有光锥/遗器**。原游戏的数来自某个具体面板，所以比较时必须把那个面板的
