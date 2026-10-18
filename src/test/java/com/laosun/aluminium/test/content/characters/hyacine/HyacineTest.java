@@ -67,8 +67,8 @@ public class HyacineTest {
         // Exactly one SKILL_CAST rule exists and it only summons -- the heal is still absent from the file, so nothing is
         // double-counted. What the pin protects is unchanged; what it counts is now what the document states.
         // Two now as well: the summon, and the sky ode spending a layer on a SKILL_CAST.
-        Assertions.assertEquals(4, table.ruleCount(TriggerEvent.SKILL_CAST),
-                "the summon rule the document states -- the party heal still comes from the skill data; the fourth is 小伊卡 OWN share (#3/#4), landed 2026-10-18");
+        Assertions.assertEquals(5, table.ruleCount(TriggerEvent.SKILL_CAST),
+                "the summon rule the document states -- the fifth is the whole-party heal, which the data path could not state (a Restore heals only the caller's targets)");
         // Rank 6's aura, the trace's healing share on 小伊卡, Rank 4's CRIT DMG on 小伊卡, and 忆灵技3's two energy
         // clauses (15 on every arrival, 30 more on the first) -- all of them wait for the memosprite to enter the field.
         // Seven since 2026-10-18: Rank 6s aura also has to reach the memsprites that arrive AFTER 小伊卡
