@@ -1034,7 +1034,8 @@ final class TriggerValidator {
                             + "(source: " + spec.getSource() + ")");
         }
         if (!scales.contains(scale) && !scale.startsWith(TriggerTable.CAST_APPLIED_PREFIX)
-                && !scale.startsWith("party_resource:")) {
+                && !scale.startsWith("party_resource:")
+                && !scale.startsWith(TriggerInterpreter.SELF_RESOURCE_PREFIX)) {
             throw new IllegalArgumentException(
                     "Op " + op + " has unknown \"scale\": '" + effect.getScale() + "'; known scales for this op "
                             + "are " + String.join(", ", scales.stream().sorted().toList())
