@@ -1193,7 +1193,10 @@ public final class TriggerInterpreter {
      */
     private static int removeResource(EffectSpec effect, TriggerContext ctx, CanHit holder) {
         String id = effect.getResource();
-        int asked = (int) Math.round(scaledAmount(effect, ctx));
+        int asked = percentOfOwnCounter(effect, ctx);
+        if (asked <= 0) {
+            asked = (int) Math.round(scaledAmount(effect, ctx));
+        }
         if (asked <= 0) {
             return 0;
         }
@@ -1318,6 +1321,24 @@ public final class TriggerInterpreter {
      * @param ctx    the context supplying the hit count
      * @return the amount to apply
      */
+    /**
+     * {@code scale: "self_resource:<id>"} + {@code percent} on {@code REMOVE_RESOURCE}: a share of one of the rule
+     * owner's own counters - 「清空累计治疗数值的 50%」 (1409 Hyacine (风堇)'s 忆灵技1, which Rank 6 turns into 12%).
+     *
+     * <p>Why it is not a flat {@code amount}: the sentence names a FRACTION of whatever the counter holds at that
+     * moment, so a fixed number would be a different claim (and a wrong one the moment the tally changes).
+     *
+     * @return the points to take back, or {@code -1} when this effect is not spelled that way
+     */
+    private static int percentOfOwnCounter(EffectSpec effect, TriggerContext ctx) {
+        String scale = effect.getScale() == null ? "" : effect.getScale().trim();
+        if (!scale.startsWith(SELF_RESOURCE_PREFIX)) {
+            return -1;
+        }
+        double share = effect.getPercent() == null ? 1 : effect.getPercent();
+        return (int) Math.round(TriggerMagnitudes.selfResourceOf(scale, ctx) * share);
+    }
+
     private static double scaledAmount(EffectSpec effect, TriggerContext ctx) {
         double amount = flatAmount(effect, ctx);
         return Boolean.TRUE.equals(effect.getPerTarget()) ? amount * ctx.hitCount() : amount;
