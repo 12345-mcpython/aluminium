@@ -57,8 +57,8 @@ public class HyacineTest {
         // CORRECTED (2026-10-18): the ultimate also SUMMONS and HEALS as rules now - its data carries neither
         // (the skill is `Support`, so nothing heals, and no rule summoned 小伊卡 on a ULT_CAST). Four ULT_CAST rules:
         // the summon, the heals, the state/Max HP, and the sky ode spending a layer.
-        Assertions.assertEquals(4, table.ruleCount(TriggerEvent.ULT_CAST), "summon, heals, state and Max HP, ode");
-        Assertions.assertEquals(1, table.ruleCount(TriggerEvent.BATTLE_START), "the level convention");
+        Assertions.assertEquals(5, table.ruleCount(TriggerEvent.ULT_CAST), "summon, heals, state and Max HP, Rank 2's +50% Max HP, ode");
+        Assertions.assertEquals(2, table.ruleCount(TriggerEvent.BATTLE_START), "the level convention, and Rank 3's ultimate +2");
         // Note: Narrowed: the reason is about the HEAL, and the same skill also says "召唤忆灵 小伊卡".
         // Exactly one SKILL_CAST rule exists and it only summons -- the heal is still absent from the file, so nothing is
         // double-counted. What the pin protects is unchanged; what it counts is now what the document states.
