@@ -82,8 +82,18 @@ gradlew run --args="compare"                     # 列出 scenarios/ 下的场�
 | `absorb.<元素>`（全 0） | `absorb`（**减法**，链末） | 0 |
 
 ⚠ 捕获里**唯一没给的输入是目标的 DEF**，它可以从等级 80 的防御式反解：`1 − DEF/(DEF+200+10×80)` ⇒
-`DEF = 786.000056`（= `210 × 3.742857`；本仓库的 `hard_level_group` 里没有这一档，所以它更可能是**该场战斗的
-DEF 下调**或一个未入库的等级/分组，这一点保留为待查，而不是近似）。
+`DEF = 786.000056`。
+
+目标已用属性 dump 确认是 **堕神之血•亚婆离**（`Level 100`、`MaxStance 1080`、四系抗性 0.2 —— 与
+`zones.resistance` 逐项一致；`BaseHP 6,389,558.46` 被 **×2** 成 `MaxHP 12,779,116.92`）。dump 里还有
+**`mod:StanceBreakState`** —— 那一发打在**已击破**目标上，所以 `all_damage_reduce 0.75` 就是总减伤（没有额外的
+0.9 韧性减伤），场景里的 `broken: true` 是它证明的。同一份 dump 也把 0.64 易伤指到了
+`MEquip_23042_AllDamageTypeTakenRatio` + `MServant_RobinSServant_00_DamageTakenAura`，把 0.75 减伤指到了
+`MonsterAllDamageReduce`。
+
+⚠ **DEF 仍待补**：dump 只列了 modifier 的**名字**、没有 `Defence` 数值，而本仓库的 `monster_config.json` 里没有这位
+boss（Lv100 + 模板 210 会给出 1200，与反解的 786 不符 ⇒ 存在 DEF 侧修正，或它的模板 DEF 更低）。所以它是
+`target.attributes.DEFENCE` 的手工输入，等拿到 DEF 面板再换成数据。
 
 ### 为什么需要 `attributes` 覆盖
 
