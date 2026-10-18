@@ -375,6 +375,23 @@ public enum TriggerEvent {
      */
     SUMMONED("SUMMONED", true),
     /**
+     * A summon <b>left the field</b>: fired by {@code Battle.removeDeadCombatants} for every memosprite that is gone
+     * from the roster, with the departed unit as <b>both</b> actor and target.
+     *
+     * <p><b>Why it is not {@link #DEATH}.</b> A memosprite can leave without being killed: its own
+     * {@code CanHit.perish()} is the engine's "it went away, nobody killed it" (that method's javadoc says so, and it
+     * deliberately emits no {@code HpLoss} / {@code Kill}). A clause of the form 「消失时…」 (1409 Hyacine (风堇)'s
+     * 忆灵技4, 「使风堇行动提前 30%」) therefore had no event at all, and neither did 「小伊卡在场时…」 - the aura of
+     * her Rank 6 that must be taken back when the memosprite is gone.
+     *
+     * <p>Fired <b>once per unit</b> (the sweep runs on every settlement, so the announcement is remembered), and from
+     * the sweep rather than from {@code perish()} because {@code perish()} is on the unit and cannot reach the
+     * battle. ⚠ The rule owner is alive and receives it; the dead unit itself has no table to act with, so conditions
+     * about the departure read {@code actor is_summon} rather than {@code target == summon} (that selector refuses a
+     * unit that is no longer on the field).
+     */
+    SUMMON_LEFT("SUMMON_LEFT", true),
+    /**
      * A cast is <b>about to resolve</b>: fired by {@code SkillExecutor.execute} after the caster is known and
      * <b>before any damage is expanded</b>, so a rule can still change what this cast does.
      *
@@ -526,3 +543,4 @@ public enum TriggerEvent {
         return raw == null ? null : BY_NAME.get(raw.trim().toUpperCase(java.util.Locale.ROOT));
     }
 }
+
