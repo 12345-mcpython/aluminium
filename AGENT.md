@@ -408,6 +408,21 @@ if (isSelected) buffer.setStyle(rowArea, highlightStyle);
 ② `statModifier(absolute=false)` 对份额属性把值当 `值/100` 还是 `值 × base`；③ `cap_amount` 在 `absolute=false` 分支是否经
 `ceiling / base`（源码里有这行，但上面的实测里没夹住）。
 
+#### 第 8 轮的量测（气量这次真的设上了，结论更硬）
+
+用 `battle.partyResource("气氛值").gain(N)` 设值（回读确认 0 / 15 / 50 ✓），在 `addDamageObserver` 里取这一发的
+`breakdown()["DefenceArea"]`：
+
+| 气量 | 带 Fever 的 `DefenceArea` | 对照组 | 反推 ignore |
+|---|---|---|---|
+| 0 | 0.47744092802706417 | 0.47619048752834486 | **0.005** |
+| 15 | 0.47744092802706417 | 0.47619048752834486 | **0.005** |
+| 50 | 0.47744092802706417 | 0.47619048752834486 | **0.005** |
+
+⇒ 规则**触发了** ✓，但写进去的值 = **`percent` 本身（0.005）**，**与气量完全无关**、`amount: 0.15` 也没参与 ✗。
+也就是说带 `scale` 的这条路径上，`derivedMagnitude` 给出的数并不是 `percent × scale + amount` ⇒ 下一步要直接读
+`TriggerMagnitudes.derivedMagnitude` 对 `DEFENCE_IGNORE` / `party_resource:` 的返回值（或加临时打印），**而不是继续从外部反推** ✓。
+
 #### 探测方法本身也踩了两个坑（记下来省下一次）
 
 1. ~~**`Resources.gain` 改不动队级计数器**~~ → **已查清（第 7 轮）**：队级计数器**不在** `CanHit.getResources()` 里 ✓，
