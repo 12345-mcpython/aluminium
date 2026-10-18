@@ -51,9 +51,13 @@ public class HyacineRaincloudsTest {
 
         double dealt = f.castRainclouds();
 
-        Assertions.assertEquals(tally * SHARE_AT_LV10 + DATA_FLOOR, dealt, Math.max(1e-6, tally * 1e-9),
-                "「造成等同于累计治疗数值 #1% 的风属性伤害」: it is the TALLY that is multiplied, not the memosprite's "
-                        + "ATK (which is 0). tally=" + tally + ", dealt=" + dealt);
+        // Two things at once. The base is the TALLY (not the memosprite's ATK, which is 0) -- and because the rule
+        // says `"attacker": "summon"`, the instance is the MEMOSPRITE's, so her talent's +80% per layer (one layer
+        // here, from the heal that fed the tally) lands on it. Without the attribution this read exactly
+        // `tally * 0.28 + 1`, which is how the gap was found.
+        Assertions.assertEquals(tally * SHARE_AT_LV10 * 1.8 + DATA_FLOOR, dealt, Math.max(1e-6, tally * 1e-9),
+                "「造成等同于累计治疗数值 #1% 的风属性伤害」 by 小伊卡: tally=" + tally + ", dealt=" + dealt
+                        + " (expected tally x " + SHARE_AT_LV10 + " + " + DATA_FLOOR + ", all x1.8 for one talent layer)");
     }
 
     @Test
