@@ -286,7 +286,7 @@ if (isSelected) buffer.setStyle(rowArea, highlightStyle);
   failOnError = true
   ```
   ⇒ **javadoc 报错就构建失败** ✓ 且 `-Xwerror` 把**警告也当错** ✓（`Task :javadoc` 真跑过：`BUILD SUCCESSFUL` ✓）；⚠ 输出里的 `WARNING: ... lombok.permit.Permit` 是 **JVM/lombok 的**，不是 javadoc 的 ✓，别把它当成闸门报警 ✓。
-  ⚠ **仍开着的口子（成本已量，2026-10-18）**：doclint 的类别列表**不含 `missing`** ✓ ⇒ "public 成员少了 `@param` / `@return`" **不算错** ✗。临时把它加进去跑了一次：**全部落在 `beans/` 的 14 个 record 的规范构造器上** ✓（`CharacterData` / `MonsterConfig` / `RelicSubAttribute` / `WeaponData` 等，Gson 映射的 DTO ✓），每条是"某字段没有 `@param`" ✓，**没有一处**出现在引擎/触发器代码里 ✓ ⇒ 这不是"注释烂"，而是**DTO 的 `@param` 要不要写**这个取舍 ✓。⇒ 想开就把这 14 个文件的构造器各补一行 `@param <字段>` ✓（机械、量大、价值低 ✓）；**在那之前**保持现状，并记下这个口子是**已知且量化过的** ✓（不是"没发现" ✗）。
+  ⚠ **仍开着的口子（成本已量，2026-10-18）**：doclint 的类别列表**不含 `missing`** ✓ ⇒ "public 成员少了 `@param` / `@return`" **不算错** ✗。临时把它加进去跑了一次：**全部落在 `beans/` 下那些 Gson DTO record 的规范构造器上** ✓（`CharacterData` / `MonsterConfig` / `RelicSubAttribute` / `WeaponData` 等，Gson 映射的 DTO ✓），每条是"某字段没有 `@param`" ✓，**没有一处**出现在引擎/触发器代码里 ✓ ⇒ 这不是"注释烂"，而是**DTO 的 `@param` 要不要写**这个取舍 ✓。⇒ 想开就把这些文件的构造器各补一行 `@param <字段>` ✓（机械、量大、价值低 ✓）；**在那之前**保持现状，并记下这个口子是**已知且量化过的** ✓（不是"没发现" ✗）。
   判据是**输出里有没有那一行** ✓；且它**对 `{@link}` 有效、对 `{@code X.md}` 完全瞎** ✓（§6.5）。
 - ⚠ **闸门跑一半要说清楚** ✓：只跑了闸门 1 就报「**绿只覆盖测试，不覆盖 demo 形状**」✓，
   **不许含糊成"全绿"** ✗。**没有对象**时（例如本批没搬迁）明写「**不适用**」✓，不要空转凑数 ✗。
