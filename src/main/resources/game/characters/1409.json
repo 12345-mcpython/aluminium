@@ -303,6 +303,7 @@
           "op": "DAMAGE",
           "scale": "self_resource:小伊卡累计治疗",
           "percent_from_cast_param": 0,
+          "attacker": "summon",
           "element": "Wind",
           "target": "all_enemies"
         }
