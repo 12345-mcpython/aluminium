@@ -744,7 +744,7 @@ HP_LOST 计数 = 0 ; HP_CONSUMED 计数 = 0   ← 两个事件都没发
 
 ### 3.7u 新数据：`skill_segments.json`（**全角色 / 忆灵的技能分段表**）（2026-10-18，**已勘，尚未接入**）
 
-- **位置**：`E:\code\python\data\skill_segments.json` —— **仓库外** ✓，1.8 MB，`_meta.generated = 2026-10-18 20:47:32` ✓。
+- **位置**：`E:\code\python\data\skill_segments.json` —— **仓库外** ✓（生成时间见它自己的 `_meta.generated` ✓）。
 - **覆盖**：`_meta` 自报 **98 个角色 + 7 个忆灵、311 个 phase、668 个 hit** ✓，`skipped: []` ✓。
 - **形状**：顶层是 `cid → {id, name, element, mt, ability_file, hit_count, skills, groups, modifier_damage}` ✓；**忆灵在同文件的 `_servants` 下**，同形 ✓。`skills` 的键是**能力脚本里的 phase 名**（如 `Avatar_Mar_7th_00_Skill01_Phase02` ✓），每个 phase 带 `slot_guess`（1/2/3… ✓）、`attack_type` / `effect` / `label`、`hit_count` / `hit_count_by_target` / `executions`、**`split_ratio_sum`（自检用 ✓）**、以及 `segments[]` —— 每段有 `split_ratio`、`hit_split_ratio`、`split_source`（缺省 `ImplicitFull` ✓）、`formula`（如 `P#1` ✓）、`damage_type`、`target_kind`、`order`、`multiplier_lv1` ✓。
 - **它喂的是谁**：`game/data/skill_effects.json` 的 `segments` ✓ —— 今天那里只有 **3 条手写的**（1002 槽1 `[0.45,0.55]`、1002 槽2 `[0.3,0.15,0.15,0.4]`、11413 槽1 `[0.1,0.1,0.1,0.1,0.1,0.5]` ✓），而这份新数据一次给出 **668 个 hit** ✓。
