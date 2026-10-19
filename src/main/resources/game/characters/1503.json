@@ -437,7 +437,7 @@
         }
       ],
       "source": "1503 真珠 强化普攻 【行笔，幻造星月】 (150308): 「对敌方全体造成等同于真珠 100% 防御力的冰属性伤害，为我方全体目标回复等同于真珠 8.00% 防御力 + 160 的生命值，**额外**为**当前生命值百分比最低的**我方目标回复同样量」。",
-      "note": "「为我方全体目标回复等同于真珠 8.00% 防御力 + 160 的生命值」—— 描述里的 8% / 160 是低等级行的值。本文件的 level_convention 声明「语料页引用 Lv10」，而 150308 / 150310 的 Lv10 行是 [1.4, 0.112, 1, 224] → 11.2% 防御力 + 224 ⇒ 这里写的是 Lv10 的两个常量。⚠ 为什么不能读行（实测两次）：percent_from_skill_param: COMMON:1 会在强化普攻还没被 REPLACE_SKILL 装上时读到普通普攻的行（size=1，越界）；percent_from_cast_param 则报 the scale owner_def reads the skill that produced the event, but Pearl has no loaded skill at slot 8 —— 角色身上没有 8 号数据槽，8/10 号是 REPLACE_SKILL 装进 COMMON 的。⇒ 引擎目前没有「读被替换技能那一行」的拼法，所以保留常量并把值改成 Lv10 的正确值（原先写 0.08 / 160 是低等级行，满级少算约 28%）。⚠ 仍登记：E3 把普攻等级 +1 后这一行还会变，常量不会跟着走。判据 PearlEnhancedBasicHealAmountTest 钉 11.2% x 防御 + 224。"
+      "note": "「为我方全体目标回复等同于真珠 8.00% 防御力 + 160 的生命值」—— 描述里的 8% / 160 是低等级行的值。本文件的 level_convention 声明「语料页引用 Lv10」，而 150308 / 150310 的 Lv10 行是 [1.4, 0.112, 1, 224] → 11.2% 防御力 + 224 ⇒ 这里写的是 Lv10 的两个常量。⚠ 为什么不能读行（实测两次）：percent_from_skill_param: COMMON:1 会在强化普攻还没被 REPLACE_SKILL 装上时读到普通普攻的行（size=1，越界）；percent_from_cast_param 则报 the scale owner_def reads the skill that produced the event, but Pearl has no loaded skill at slot 8 —— 角色身上没有 8 号数据槽，8/10 号是 REPLACE_SKILL 装进 COMMON 的。⇒ 引擎目前没有「读被替换技能那一行」的拼法，所以保留常量并把值改成 Lv10 的正确值（原先写 0.08 / 160 是低等级行，满级少算约 28%）。⭐⭐ **CORRECTED（2026-10-19，探针实测）**：「E3 把普攻等级 +1 后这一行还会变，常量不会跟着走」**撤回** ✗ —— **实测**（E0 与 E3 各建一场、放大招装上替换）：替换槽的**对象等级**两处都是 **1** ✓，而 `CanHit.skillLevel` 的**有效等级**两处都是 **10** ✓（`RAISE_SKILL_LEVEL` 记在 `skillLevelBonus` 上 ✓，而 COMMON 的表只有 **10 行** ⇒ `min(level, rows)` 把 E3 那一级**夹掉**了 ✓）⇒ 有效等级那一行就是 `[1.4, 0.112, 1.0, 224.0]` ✓，**正是这两个常量** ✓ ⇒ **E3 不产生漂移** ✓。（⚠ 会漂移的是**对象等级**那一行 `[0.5, 0.04, 1.0, 80.0]` ✗ —— 那正是 `percent_from_cast_param` 读到的东西 ✓，所以常量不但没错，还比读行**更接近**原文 ✓。）⚠ **仍开的缺口**不变：引擎没有「读**被替换技能**在当前有效等级那一行」的拼法 ✗（`percent_from_skill_param: COMMON:1` 在替换装上之后本可以读对 ✓，但它在**装上之前**会读到普通普攻的 1 行表 ✗ ⇒ 需要一个「按有效等级读当前槽位」的拼法 ✓，登记在此 ✓）。判据 PearlEnhancedBasicHealAmountTest 钉 11.2% x 防御 + 224。"
     },
     {
       "on": "BASIC_ATTACK",
@@ -468,7 +468,7 @@
         }
       ],
       "source": "1503 真珠 强化普攻 【行笔，绘制末浪】 (150310): 「对敌方全体造成等同于真珠 100% 防御力的冰属性伤害，为我方全体目标回复等同于真珠 8.00% 防御力 + 160 的生命值，**额外**为**当前生命值百分比最低的**我方目标回复同样量」。",
-      "note": "「为我方全体目标回复等同于真珠 8.00% 防御力 + 160 的生命值」—— 描述里的 8% / 160 是低等级行的值。本文件的 level_convention 声明「语料页引用 Lv10」，而 150308 / 150310 的 Lv10 行是 [1.4, 0.112, 1, 224] → 11.2% 防御力 + 224 ⇒ 这里写的是 Lv10 的两个常量。⚠ 为什么不能读行（实测两次）：percent_from_skill_param: COMMON:1 会在强化普攻还没被 REPLACE_SKILL 装上时读到普通普攻的行（size=1，越界）；percent_from_cast_param 则报 the scale owner_def reads the skill that produced the event, but Pearl has no loaded skill at slot 8 —— 角色身上没有 8 号数据槽，8/10 号是 REPLACE_SKILL 装进 COMMON 的。⇒ 引擎目前没有「读被替换技能那一行」的拼法，所以保留常量并把值改成 Lv10 的正确值（原先写 0.08 / 160 是低等级行，满级少算约 28%）。⚠ 仍登记：E3 把普攻等级 +1 后这一行还会变，常量不会跟着走。判据 PearlEnhancedBasicHealAmountTest 钉 11.2% x 防御 + 224。"
+      "note": "「为我方全体目标回复等同于真珠 8.00% 防御力 + 160 的生命值」—— 描述里的 8% / 160 是低等级行的值。本文件的 level_convention 声明「语料页引用 Lv10」，而 150308 / 150310 的 Lv10 行是 [1.4, 0.112, 1, 224] → 11.2% 防御力 + 224 ⇒ 这里写的是 Lv10 的两个常量。⚠ 为什么不能读行（实测两次）：percent_from_skill_param: COMMON:1 会在强化普攻还没被 REPLACE_SKILL 装上时读到普通普攻的行（size=1，越界）；percent_from_cast_param 则报 the scale owner_def reads the skill that produced the event, but Pearl has no loaded skill at slot 8 —— 角色身上没有 8 号数据槽，8/10 号是 REPLACE_SKILL 装进 COMMON 的。⇒ 引擎目前没有「读被替换技能那一行」的拼法，所以保留常量并把值改成 Lv10 的正确值（原先写 0.08 / 160 是低等级行，满级少算约 28%）。⭐⭐ **CORRECTED（2026-10-19，探针实测）**：「E3 把普攻等级 +1 后这一行还会变，常量不会跟着走」**撤回** ✗ —— **实测**（E0 与 E3 各建一场、放大招装上替换）：替换槽的**对象等级**两处都是 **1** ✓，而 `CanHit.skillLevel` 的**有效等级**两处都是 **10** ✓（`RAISE_SKILL_LEVEL` 记在 `skillLevelBonus` 上 ✓，而 COMMON 的表只有 **10 行** ⇒ `min(level, rows)` 把 E3 那一级**夹掉**了 ✓）⇒ 有效等级那一行就是 `[1.4, 0.112, 1.0, 224.0]` ✓，**正是这两个常量** ✓ ⇒ **E3 不产生漂移** ✓。（⚠ 会漂移的是**对象等级**那一行 `[0.5, 0.04, 1.0, 80.0]` ✗ —— 那正是 `percent_from_cast_param` 读到的东西 ✓，所以常量不但没错，还比读行**更接近**原文 ✓。）⚠ **仍开的缺口**不变：引擎没有「读**被替换技能**在当前有效等级那一行」的拼法 ✗（`percent_from_skill_param: COMMON:1` 在替换装上之后本可以读对 ✓，但它在**装上之前**会读到普通普攻的 1 行表 ✗ ⇒ 需要一个「按有效等级读当前槽位」的拼法 ✓，登记在此 ✓）。判据 PearlEnhancedBasicHealAmountTest 钉 11.2% x 防御 + 224。"
     },
     {
       "on": "BATTLE_START",
@@ -562,16 +562,16 @@
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "渲染理性，解构欢榆",
+          "buff": "渲染理性，解构欢愉",
           "until": "next_attack",
           "target": "all_allies",
           "target_when": [
-            "!target has_state 渲染理性，解构欢榆"
+            "!target has_state 渲染理性，解构欢愉"
           ]
         }
       ],
       "source": "1503 真珠 欢愉技 渲染理性，解构欢愉 (150320): 「队伍中「欢愉」命途角色数量等于 1 或以上时，使我方全体目标**下一次攻击后**，对攻击目标额外造成 10% 的对应属性欢愉伤害」。",
-      "note": "⭐ **触发写法是现成的** ✓：引擎没有 Elation 专用事件，“这次施放是欢愉技”靠 `from_category ElationDamage`（见 `1513` 的 `elation_spend_all_fervor`）；实测 `TriggerEvent` 里没有任何 Elation 专用事件。⭐ **“下一次攻击”的寿命** 用 `until: \"next_attack\"`，它在 `LIFETIMES` 封闭词表里（`TriggerInterpreter:4798`），且已有三处出货（1002 / 1301 / 8001）。⚠ **兼现端本文件未写**：原文说的是“**对应属性**”，即每个队友各自的属性；而一条规则的 `element` 是一个固定词，所以它无法给四个队友四个属性。`1505` 的 rider 也只写一个单位的属性。兼现形态已登记（参考形状：`DAMAGE{scale: self_attr:ATTACK, percent: X, element: <属性>, damage_type: \"ELATION\", target: target}` 在 `DEALING_DAMAGE` 上）。"
+      "note": "⭐⭐ **状态名的订正（2026-10-19）** ✓：它原先是「渲染理性，解构**欢榆**」✗ —— 那是**仓库里的损坏字符**，不是游戏的写法 ✓（**实测**：`E:\\turnbasedgamedata\\aluminium_texts` 里 1503 与 1513 两份原文**一次都没有**「欢榆」✓；同一天 1513 的一处**误引**与 `AttributeType` 的注释也各有一处 ✓，一并还原 ✓）。⚠ 它是**四条规则共用的状态名** ✓（四个档位各 APPLY 一次 ✓，四条 rider 各按名字读一次 ✓）⇒ 改名必须**同时**动那些门与 `PearlElationSkillCarrierTest` 的 `CARRIER` 常量 ✓（都改了 ✓）。⚠ 名字与**技能名**一致 ✓（「渲染理性，解构欢愉」✓）—— 这是它唯一该有的拼法 ✓。⭐ **触发写法是现成的** ✓：引擎没有 Elation 专用事件，“这次施放是欢愉技”靠 `from_category ElationDamage`（见 `1513` 的 `elation_spend_all_fervor`）；实测 `TriggerEvent` 里没有任何 Elation 专用事件。⭐ **“下一次攻击”的寿命** 用 `until: \"next_attack\"`，它在 `LIFETIMES` 封闭词表里（`TriggerInterpreter:4798`），且已有三处出货（1002 / 1301 / 8001）。⚠ **兼现端本文件未写**：原文说的是“**对应属性**”，即每个队友各自的属性；而一条规则的 `element` 是一个固定词，所以它无法给四个队友四个属性。`1505` 的 rider 也只写一个单位的属性。兼现形态已登记（参考形状：`DAMAGE{scale: self_attr:ATTACK, percent: X, element: <属性>, damage_type: \"ELATION\", target: target}` 在 `DEALING_DAMAGE` 上）。"
     },
     {
       "on": "CAST_SETUP",
@@ -584,11 +584,11 @@
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "渲染理性，解构欢榆",
+          "buff": "渲染理性，解构欢愉",
           "until": "next_attack",
           "target": "all_allies",
           "target_when": [
-            "!target has_state 渲染理性，解构欢榆"
+            "!target has_state 渲染理性，解构欢愉"
           ]
         }
       ],
@@ -606,11 +606,11 @@
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "渲染理性，解构欢榆",
+          "buff": "渲染理性，解构欢愉",
           "until": "next_attack",
           "target": "all_allies",
           "target_when": [
-            "!target has_state 渲染理性，解构欢榆"
+            "!target has_state 渲染理性，解构欢愉"
           ]
         }
       ],
@@ -628,11 +628,11 @@
       "do": [
         {
           "op": "APPLY_BUFF",
-          "buff": "渲染理性，解构欢榆",
+          "buff": "渲染理性，解构欢愉",
           "until": "next_attack",
           "target": "all_allies",
           "target_when": [
-            "!target has_state 渲染理性，解构欢榆"
+            "!target has_state 渲染理性，解构欢愉"
           ]
         }
       ],
@@ -659,7 +659,7 @@
       "on": "DEALING_DAMAGE",
       "id": "elation_skill_pays_out_at_1_elation_allies",
       "when": [
-        "actor has_state 渲染理性，解构欢榆",
+        "actor has_state 渲染理性，解构欢愉",
         "allies_with_path:欢愉 >= 1"
       ],
       "do": [
@@ -677,7 +677,7 @@
       "on": "DEALING_DAMAGE",
       "id": "elation_skill_pays_out_at_2_elation_allies",
       "when": [
-        "actor has_state 渲染理性，解构欢榆",
+        "actor has_state 渲染理性，解构欢愉",
         "allies_with_path:欢愉 >= 2"
       ],
       "do": [
@@ -695,7 +695,7 @@
       "on": "DEALING_DAMAGE",
       "id": "elation_skill_pays_out_at_3_elation_allies",
       "when": [
-        "actor has_state 渲染理性，解构欢榆",
+        "actor has_state 渲染理性，解构欢愉",
         "allies_with_path:欢愉 >= 3"
       ],
       "do": [
@@ -713,7 +713,7 @@
       "on": "DEALING_DAMAGE",
       "id": "elation_skill_pays_out_at_4_elation_allies",
       "when": [
-        "actor has_state 渲染理性，解构欢榆",
+        "actor has_state 渲染理性，解构欢愉",
         "allies_with_path:欢愉 >= 4"
       ],
       "do": [
@@ -936,7 +936,7 @@
       "min_eidolon": 4,
       "when": [
         "eidolon >= 4",
-        "actor has_state 渲染理性，解构欢榆",
+        "actor has_state 渲染理性，解构欢愉",
         "allies_with_path:欢愉 >= 1"
       ],
       "do": [
@@ -956,7 +956,7 @@
       "min_eidolon": 4,
       "when": [
         "eidolon >= 4",
-        "actor has_state 渲染理性，解构欢榆",
+        "actor has_state 渲染理性，解构欢愉",
         "allies_with_path:欢愉 >= 2"
       ],
       "do": [
@@ -976,7 +976,7 @@
       "min_eidolon": 4,
       "when": [
         "eidolon >= 4",
-        "actor has_state 渲染理性，解构欢榆",
+        "actor has_state 渲染理性，解构欢愉",
         "allies_with_path:欢愉 >= 3"
       ],
       "do": [
@@ -996,7 +996,7 @@
       "min_eidolon": 4,
       "when": [
         "eidolon >= 4",
-        "actor has_state 渲染理性，解构欢榆",
+        "actor has_state 渲染理性，解构欢愉",
         "allies_with_path:欢愉 >= 4"
       ],
       "do": [
