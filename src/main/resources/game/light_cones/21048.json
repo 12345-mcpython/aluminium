@@ -1,21 +1,6 @@
 {
   "1": [
     {
-      "on": "BATTLE_START",
-      "id": "cone21048_speed",
-      "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "SPEED",
-          "percent": 0.08,
-          "permanent": true,
-          "target": "self"
-        }
-      ],
-      "source": "光锥 21048 梦的蒙太奇: 使装备者的速度提高#1[i]%，攻击处于弱点击破状态下的敌方目标后，恢复#2[f1]点能量，该效果每回合最多触发#3[i]次。",
-      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查** ✓：两段的触发都在**战斗中** ✓，初始那段开战即生效 ✓，不依赖开战瞬间的动态状态 ✓。⚠⚠ `on_any`（第 133/270 轮）只**增加**触发面 ✓；⚠ **`SPEED` 是平值型** ⇒ `percent` 按 **`baseValue()`** 缩放 ✓（第 125/270 轮实测 ✓，且基准取**规则生效后**的值 ✓）。"
-    },
-    {
       "on": "BASIC_ATTACK",
       "on_any": [
         "SKILL_CAST",
@@ -23,6 +8,7 @@
       ],
       "id": "cone21048_energy",
       "when": [
+        "actor == self",
         "target has_state 弱点击破"
       ],
       "do": [
@@ -33,26 +19,11 @@
         }
       ],
       "source": "光锥 21048 梦的蒙太奇: 「攻击处于弱点击破状态的敌方目标后，恢复#2点能量，该效果每回合最多触发#3次」",
-      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查** ✓：两段的触发都在**战斗中** ✓，初始那段开战即生效 ✓，不依赖开战瞬间的动态状态 ✓。⚠⚠ `on_any`（第 133/270 轮）只**增加**触发面 ✓；⚠ **`SPEED` 是平值型** ⇒ `percent` 按 **`baseValue()`** 缩放 ✓（第 125/270 轮实测 ✓，且基准取**规则生效后**的值 ✓）。 ⚠ 「**弱点击破**」是引擎已在跟踪的状态 ✓ ⇒ 条件 `target has_state 弱点击破` ✓；⚠ 「**每回合最多触发 #3 次**」⇒ **`perTurn: #3`** ✓（引擎已有的上限 ✓）。",
+      "note": "「**攻击处于弱点击破状态的敌方目标后**，恢复 #2 点能量，该效果**每回合最多触发 2 次**」—— `on: BASIC_ATTACK` ＋ **`on_any: [SKILL_CAST, ULT_CAST]`** ✓（「攻击」= 任意一种 ✓）、**`actor == self`** ✓、条件 `target has_state 弱点击破` ✓（`BuffManager.BROKEN_STATE` ✓ 就是这个字符串 ✓）、**`per_turn: 2`** ✓、3/3.5/4/4.5/5 点 ✓。\n⚠⚠ **2026-10-19 逐句核时改的三处**：① 补门与两种攻击事件 ✗（原先只挂普攻、没有门 ✗）；② 补 `per_turn: 2` ✗；③ 删掉 `cone21048_speed` ✗ —— 速度 +8% 是光锥自己的 `speed_percent` 属性 ✓。",
       "per_turn": 2
     }
   ],
   "2": [
-    {
-      "on": "BATTLE_START",
-      "id": "cone21048_speed",
-      "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "SPEED",
-          "percent": 0.09,
-          "permanent": true,
-          "target": "self"
-        }
-      ],
-      "source": "光锥 21048 梦的蒙太奇: 使装备者的速度提高#1[i]%，攻击处于弱点击破状态下的敌方目标后，恢复#2[f1]点能量，该效果每回合最多触发#3[i]次。",
-      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查** ✓：两段的触发都在**战斗中** ✓，初始那段开战即生效 ✓，不依赖开战瞬间的动态状态 ✓。⚠⚠ `on_any`（第 133/270 轮）只**增加**触发面 ✓；⚠ **`SPEED` 是平值型** ⇒ `percent` 按 **`baseValue()`** 缩放 ✓（第 125/270 轮实测 ✓，且基准取**规则生效后**的值 ✓）。"
-    },
     {
       "on": "BASIC_ATTACK",
       "on_any": [
@@ -61,6 +32,7 @@
       ],
       "id": "cone21048_energy",
       "when": [
+        "actor == self",
         "target has_state 弱点击破"
       ],
       "do": [
@@ -71,26 +43,11 @@
         }
       ],
       "source": "光锥 21048 梦的蒙太奇: 「攻击处于弱点击破状态的敌方目标后，恢复#2点能量，该效果每回合最多触发#3次」",
-      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查** ✓：两段的触发都在**战斗中** ✓，初始那段开战即生效 ✓，不依赖开战瞬间的动态状态 ✓。⚠⚠ `on_any`（第 133/270 轮）只**增加**触发面 ✓；⚠ **`SPEED` 是平值型** ⇒ `percent` 按 **`baseValue()`** 缩放 ✓（第 125/270 轮实测 ✓，且基准取**规则生效后**的值 ✓）。 ⚠ 「**弱点击破**」是引擎已在跟踪的状态 ✓ ⇒ 条件 `target has_state 弱点击破` ✓；⚠ 「**每回合最多触发 #3 次**」⇒ **`perTurn: #3`** ✓（引擎已有的上限 ✓）。",
+      "note": "「**攻击处于弱点击破状态的敌方目标后**，恢复 #2 点能量，该效果**每回合最多触发 2 次**」—— `on: BASIC_ATTACK` ＋ **`on_any: [SKILL_CAST, ULT_CAST]`** ✓（「攻击」= 任意一种 ✓）、**`actor == self`** ✓、条件 `target has_state 弱点击破` ✓（`BuffManager.BROKEN_STATE` ✓ 就是这个字符串 ✓）、**`per_turn: 2`** ✓、3/3.5/4/4.5/5 点 ✓。\n⚠⚠ **2026-10-19 逐句核时改的三处**：① 补门与两种攻击事件 ✗（原先只挂普攻、没有门 ✗）；② 补 `per_turn: 2` ✗；③ 删掉 `cone21048_speed` ✗ —— 速度 +8% 是光锥自己的 `speed_percent` 属性 ✓。",
       "per_turn": 2
     }
   ],
   "3": [
-    {
-      "on": "BATTLE_START",
-      "id": "cone21048_speed",
-      "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "SPEED",
-          "percent": 0.1,
-          "permanent": true,
-          "target": "self"
-        }
-      ],
-      "source": "光锥 21048 梦的蒙太奇: 使装备者的速度提高#1[i]%，攻击处于弱点击破状态下的敌方目标后，恢复#2[f1]点能量，该效果每回合最多触发#3[i]次。",
-      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查** ✓：两段的触发都在**战斗中** ✓，初始那段开战即生效 ✓，不依赖开战瞬间的动态状态 ✓。⚠⚠ `on_any`（第 133/270 轮）只**增加**触发面 ✓；⚠ **`SPEED` 是平值型** ⇒ `percent` 按 **`baseValue()`** 缩放 ✓（第 125/270 轮实测 ✓，且基准取**规则生效后**的值 ✓）。"
-    },
     {
       "on": "BASIC_ATTACK",
       "on_any": [
@@ -99,6 +56,7 @@
       ],
       "id": "cone21048_energy",
       "when": [
+        "actor == self",
         "target has_state 弱点击破"
       ],
       "do": [
@@ -109,26 +67,11 @@
         }
       ],
       "source": "光锥 21048 梦的蒙太奇: 「攻击处于弱点击破状态的敌方目标后，恢复#2点能量，该效果每回合最多触发#3次」",
-      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查** ✓：两段的触发都在**战斗中** ✓，初始那段开战即生效 ✓，不依赖开战瞬间的动态状态 ✓。⚠⚠ `on_any`（第 133/270 轮）只**增加**触发面 ✓；⚠ **`SPEED` 是平值型** ⇒ `percent` 按 **`baseValue()`** 缩放 ✓（第 125/270 轮实测 ✓，且基准取**规则生效后**的值 ✓）。 ⚠ 「**弱点击破**」是引擎已在跟踪的状态 ✓ ⇒ 条件 `target has_state 弱点击破` ✓；⚠ 「**每回合最多触发 #3 次**」⇒ **`perTurn: #3`** ✓（引擎已有的上限 ✓）。",
+      "note": "「**攻击处于弱点击破状态的敌方目标后**，恢复 #2 点能量，该效果**每回合最多触发 2 次**」—— `on: BASIC_ATTACK` ＋ **`on_any: [SKILL_CAST, ULT_CAST]`** ✓（「攻击」= 任意一种 ✓）、**`actor == self`** ✓、条件 `target has_state 弱点击破` ✓（`BuffManager.BROKEN_STATE` ✓ 就是这个字符串 ✓）、**`per_turn: 2`** ✓、3/3.5/4/4.5/5 点 ✓。\n⚠⚠ **2026-10-19 逐句核时改的三处**：① 补门与两种攻击事件 ✗（原先只挂普攻、没有门 ✗）；② 补 `per_turn: 2` ✗；③ 删掉 `cone21048_speed` ✗ —— 速度 +8% 是光锥自己的 `speed_percent` 属性 ✓。",
       "per_turn": 2
     }
   ],
   "4": [
-    {
-      "on": "BATTLE_START",
-      "id": "cone21048_speed",
-      "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "SPEED",
-          "percent": 0.11,
-          "permanent": true,
-          "target": "self"
-        }
-      ],
-      "source": "光锥 21048 梦的蒙太奇: 使装备者的速度提高#1[i]%，攻击处于弱点击破状态下的敌方目标后，恢复#2[f1]点能量，该效果每回合最多触发#3[i]次。",
-      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查** ✓：两段的触发都在**战斗中** ✓，初始那段开战即生效 ✓，不依赖开战瞬间的动态状态 ✓。⚠⚠ `on_any`（第 133/270 轮）只**增加**触发面 ✓；⚠ **`SPEED` 是平值型** ⇒ `percent` 按 **`baseValue()`** 缩放 ✓（第 125/270 轮实测 ✓，且基准取**规则生效后**的值 ✓）。"
-    },
     {
       "on": "BASIC_ATTACK",
       "on_any": [
@@ -137,6 +80,7 @@
       ],
       "id": "cone21048_energy",
       "when": [
+        "actor == self",
         "target has_state 弱点击破"
       ],
       "do": [
@@ -147,26 +91,11 @@
         }
       ],
       "source": "光锥 21048 梦的蒙太奇: 「攻击处于弱点击破状态的敌方目标后，恢复#2点能量，该效果每回合最多触发#3次」",
-      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查** ✓：两段的触发都在**战斗中** ✓，初始那段开战即生效 ✓，不依赖开战瞬间的动态状态 ✓。⚠⚠ `on_any`（第 133/270 轮）只**增加**触发面 ✓；⚠ **`SPEED` 是平值型** ⇒ `percent` 按 **`baseValue()`** 缩放 ✓（第 125/270 轮实测 ✓，且基准取**规则生效后**的值 ✓）。 ⚠ 「**弱点击破**」是引擎已在跟踪的状态 ✓ ⇒ 条件 `target has_state 弱点击破` ✓；⚠ 「**每回合最多触发 #3 次**」⇒ **`perTurn: #3`** ✓（引擎已有的上限 ✓）。",
+      "note": "「**攻击处于弱点击破状态的敌方目标后**，恢复 #2 点能量，该效果**每回合最多触发 2 次**」—— `on: BASIC_ATTACK` ＋ **`on_any: [SKILL_CAST, ULT_CAST]`** ✓（「攻击」= 任意一种 ✓）、**`actor == self`** ✓、条件 `target has_state 弱点击破` ✓（`BuffManager.BROKEN_STATE` ✓ 就是这个字符串 ✓）、**`per_turn: 2`** ✓、3/3.5/4/4.5/5 点 ✓。\n⚠⚠ **2026-10-19 逐句核时改的三处**：① 补门与两种攻击事件 ✗（原先只挂普攻、没有门 ✗）；② 补 `per_turn: 2` ✗；③ 删掉 `cone21048_speed` ✗ —— 速度 +8% 是光锥自己的 `speed_percent` 属性 ✓。",
       "per_turn": 2
     }
   ],
   "5": [
-    {
-      "on": "BATTLE_START",
-      "id": "cone21048_speed",
-      "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "SPEED",
-          "percent": 0.12,
-          "permanent": true,
-          "target": "self"
-        }
-      ],
-      "source": "光锥 21048 梦的蒙太奇: 使装备者的速度提高#1[i]%，攻击处于弱点击破状态下的敌方目标后，恢复#2[f1]点能量，该效果每回合最多触发#3[i]次。",
-      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查** ✓：两段的触发都在**战斗中** ✓，初始那段开战即生效 ✓，不依赖开战瞬间的动态状态 ✓。⚠⚠ `on_any`（第 133/270 轮）只**增加**触发面 ✓；⚠ **`SPEED` 是平值型** ⇒ `percent` 按 **`baseValue()`** 缩放 ✓（第 125/270 轮实测 ✓，且基准取**规则生效后**的值 ✓）。"
-    },
     {
       "on": "BASIC_ATTACK",
       "on_any": [
@@ -175,6 +104,7 @@
       ],
       "id": "cone21048_energy",
       "when": [
+        "actor == self",
         "target has_state 弱点击破"
       ],
       "do": [
@@ -185,7 +115,7 @@
         }
       ],
       "source": "光锥 21048 梦的蒙太奇: 「攻击处于弱点击破状态的敌方目标后，恢复#2点能量，该效果每回合最多触发#3次」",
-      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查** ✓：两段的触发都在**战斗中** ✓，初始那段开战即生效 ✓，不依赖开战瞬间的动态状态 ✓。⚠⚠ `on_any`（第 133/270 轮）只**增加**触发面 ✓；⚠ **`SPEED` 是平值型** ⇒ `percent` 按 **`baseValue()`** 缩放 ✓（第 125/270 轮实测 ✓，且基准取**规则生效后**的值 ✓）。 ⚠ 「**弱点击破**」是引擎已在跟踪的状态 ✓ ⇒ 条件 `target has_state 弱点击破` ✓；⚠ 「**每回合最多触发 #3 次**」⇒ **`perTurn: #3`** ✓（引擎已有的上限 ✓）。",
+      "note": "「**攻击处于弱点击破状态的敌方目标后**，恢复 #2 点能量，该效果**每回合最多触发 2 次**」—— `on: BASIC_ATTACK` ＋ **`on_any: [SKILL_CAST, ULT_CAST]`** ✓（「攻击」= 任意一种 ✓）、**`actor == self`** ✓、条件 `target has_state 弱点击破` ✓（`BuffManager.BROKEN_STATE` ✓ 就是这个字符串 ✓）、**`per_turn: 2`** ✓、3/3.5/4/4.5/5 点 ✓。\n⚠⚠ **2026-10-19 逐句核时改的三处**：① 补门与两种攻击事件 ✗（原先只挂普攻、没有门 ✗）；② 补 `per_turn: 2` ✗；③ 删掉 `cone21048_speed` ✗ —— 速度 +8% 是光锥自己的 `speed_percent` 属性 ✓。",
       "per_turn": 2
     }
   ]
