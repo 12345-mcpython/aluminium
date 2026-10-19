@@ -27,12 +27,14 @@ public class ConeKillGroupTest {
         Character unit = wearer(21019, 1);
         Enemy enemy = enemy();
         Battle battle = battle(unit, enemy);
-        double baseAttack = unit.getAttribute(AttributeType.ATTACK).baseValue();
         double attackBefore = unit.getAttribute(AttributeType.ATTACK).get();
         battle.startBattle();
         double critBefore = unit.getAttribute(AttributeType.CRIT_CHANCE).get();
-        Assertions.assertEquals(0.16 * baseAttack, unit.getAttribute(AttributeType.ATTACK).get() - attackBefore, 1e-3,
-                "attack at battle start");
+        // 2026-10-19: the cone's +16% attack is its own bility_property, which Weapon.build puts in the panel BEFORE the
+        // battle starts - so this gain is 0 now that the duplicate rule is gone (the share is read against a cone-less wearer in
+        // ConeAuditBatchEightTest).
+        Assertions.assertEquals(0.0, unit.getAttribute(AttributeType.ATTACK).get() - attackBefore, 1e-6,
+                "no attack is added at battle start (the property is already in the panel)");
         battle.currentMove = new Signal(unit);
         battle.beforeMove();
         battle.fireTriggers(TriggerEvent.KILL, unit, enemy, 0, 0);
