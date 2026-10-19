@@ -31,6 +31,12 @@ public class SilverWolfLV999LootBoxWaveTest {
     private static final int WOLF = 1506;
     private static final int ALLY = 1204;
     /**
+     * 【好活当赏】 - the box's own gate since the audit (「「银狼LV.999」持有【好活当赏】时」): a RESOURCE, because that is what
+     * the clause reads ({@code self_resource:好活当赏 >= 1}). Nothing in her file grants it - the Aha Moment does, and this
+     * engine has no Aha stage - so the fixture states the premise.
+     */
+    private static final String GIFT = "好活当赏";
+    /**
      * 【爆爆爆炸蛋】's WEIGHT bucket: 2 skill points, and no damage of its own.
      *
      * <p>⚠ The pick is WEIGHTED (the game's grades: 1 / 1 / 10 while 隐藏分 is under 60), so the roll is over the weight
@@ -132,6 +138,7 @@ public class SilverWolfLV999LootBoxWaveTest {
         battle.startBattle();
         battle.processRequests();
         Character wolf = battle.characters.getFirst();
+        wolf.getResources().gain(GIFT, 1);
         wolf.setCurrentEnergy(wolf.getMaxEnergy());
         battle.castUltra(wolf, List.of(battle.enemyUnits().getFirst()));
         battle.processRequests();
