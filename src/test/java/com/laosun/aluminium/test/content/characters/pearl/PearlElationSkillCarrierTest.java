@@ -28,7 +28,7 @@ public class PearlElationSkillCarrierTest {
     private static final int PEARL = 1503;
     private static final int ELATION = 1502;
     private static final int HUNTER = 1204;
-    private static final String CARRIER = "渲染理性，解构欢榆";
+    private static final String CARRIER = "渲染理性，解构欢愉";
 
     @Test
     public void theElationSkillArmsTheWholeTeamAndAnotherCategoryDoesNot() {
