@@ -927,7 +927,11 @@ public class ConeConditionLiteralsTest {
         assertRule(23027, 3, "DEALING_DAMAGE", "cone23027_break_ignores_defence", List.of("actor == self"));
         assertRule(23027, 4, "DEALING_DAMAGE", "cone23027_break_ignores_defence", List.of("actor == self"));
         assertRule(23027, 5, "DEALING_DAMAGE", "cone23027_break_ignores_defence", List.of("actor == self"));
-        assertRule(23029, 1, "DEALING_DAMAGE", "cone23029_armor_break", List.of("actor == self"));
+        assertRule(23029, 1, "BASIC_ATTACK", "cone23029_armor_break_normal", List.of("actor == self"));
+        assertRule(23029, 2, "BASIC_ATTACK", "cone23029_armor_break_normal", List.of("actor == self"));
+        assertRule(23029, 3, "BASIC_ATTACK", "cone23029_armor_break_normal", List.of("actor == self"));
+        assertRule(23029, 4, "BASIC_ATTACK", "cone23029_armor_break_normal", List.of("actor == self"));
+        assertRule(23029, 5, "BASIC_ATTACK", "cone23029_armor_break_normal", List.of("actor == self"));
         assertRule(23030, 1, "BATTLE_START", "cone23030_aggro_up", List.of());
         assertRule(23030, 1, "ULT_CAST", "cone23030_fire_dance", List.of("actor == self"));
         assertRule(23030, 2, "BATTLE_START", "cone23030_aggro_up", List.of());
