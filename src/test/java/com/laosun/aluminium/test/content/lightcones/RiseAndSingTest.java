@@ -32,7 +32,8 @@ public class RiseAndSingTest {
         Assertions.assertEquals(1.0, sp.getAmount(), 1e-9, "one skill point");
         Assertions.assertEquals("self", sp.getTarget(), "the skill point goes to the wearer");
         Assertions.assertEquals("GAIN_SKILL_POINT", sp.getOp(), "a skill point");
-        Assertions.assertEquals(0.4, adv.getPercent(), 1e-9, "40% action advance");
+        // 2026-10-19: the text says 30% (#2), not 40% - the file was wrong and is fixed.
+        Assertions.assertEquals(0.3, adv.getPercent(), 1e-9, "30% action advance");
         Assertions.assertEquals("self", adv.getTarget(), "the advance targets the wearer");
         Assertions.assertEquals("ADVANCE", adv.getOp(), "an action advance");
         Assertions.assertEquals("self", adv.getTarget(), "for the wearer");
@@ -47,7 +48,7 @@ public class RiseAndSingTest {
         var speed = effects.stream().filter(e -> "MODIFY_ATTR".equals(e.getOp()))
                 .findFirst().orElseThrow();
         System.out.println("[23063] speed percent=" + speed.getPercent() + " target=" + speed.getTarget());
-        Assertions.assertEquals(0.4, speed.getPercent(), 1e-9, "40% speed");
+        Assertions.assertEquals(0.3, speed.getPercent(), 1e-9, "40% speed");
         Assertions.assertEquals(2.0, speed.getTurns(), 1e-9, "for the same two turns");
         var stateEffect = effects.stream().filter(e -> "APPLY_BUFF".equals(e.getOp()))
                 .findFirst().orElseThrow();

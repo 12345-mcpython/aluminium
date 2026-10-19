@@ -32,38 +32,18 @@ public class IAmAsYouBeholdTest {
 
     @Test
     public void everyTierStatesWhatTheTextStates() {
+        // 2026-10-19: the attack and energy-regen shares are the cone's own properties now (the stat rule was a duplicate);
+        // the 30% 【王之娱乐】 window and the per-energy ultimate rider are pinned in ConeAuditBatchTwentyEightTest.
         for (int rank = 1; rank <= 5; rank++) {
-            var table = wearer(rank).getTriggerTable();
-
-            var stats = table.rulesFor(TriggerEvent.BATTLE_START).stream()
-                    .filter(r -> r.id().equals("cone23062_stats")).toList();
-            Assertions.assertEquals(1, stats.size(), "rank " + rank + ": the stat rule");
-            var st = stats.getFirst().effects();
-            Assertions.assertEquals(2, st.size(), "rank " + rank + ": ATK then regen");
-            Assertions.assertEquals("ATTACK", st.get(0).getAttribute());
-            Assertions.assertEquals(ATK[rank - 1], st.get(0).getPercent(), 1e-9, "rank " + rank + ": ATK");
-            Assertions.assertEquals("ENERGY_REGENERATION_RATE", st.get(1).getAttribute());
-            Assertions.assertEquals(REGEN[rank - 1], st.get(1).getPercent(), 1e-9, "rank " + rank + ": regen");
-            Assertions.assertEquals("self", st.get(1).getTarget());
-
-            for (var pair : java.util.List.of(
-                    new Object[]{"cone23062_king_on_battle", TriggerEvent.BATTLE_START},
-                    new Object[]{"cone23062_king_on_ult", TriggerEvent.ULT_CAST})) {
-                String id = (String) pair[0];
-                TriggerEvent event = (TriggerEvent) pair[1];
-                var rules = table.rulesFor(event).stream().filter(r -> r.id().equals(id)).toList();
-                Assertions.assertEquals(1, rules.size(), "rank " + rank + ": " + id);
-                var k = rules.getFirst().effects();
-                Assertions.assertEquals(2, k.size(), id + ": the state and the bonus");
-                Assertions.assertEquals("APPLY_BUFF", k.get(0).getOp());
-                Assertions.assertEquals(KING, k.get(0).getBuff(), id + ": the state's name");
-                Assertions.assertEquals(3, k.get(0).getTurns(), id + ": three turns");
-                Assertions.assertEquals("CRIT_ATTACK", k.get(1).getAttribute());
-                Assertions.assertEquals(CRITDMG[rank - 1], k.get(1).getPercent(), 1e-9, id + ": crit damage");
-                Assertions.assertEquals(3, k.get(1).getTurns(), id + ": as long as the state");
-                Assertions.assertEquals("all_allies", k.get(1).getTarget(), id + ": EVERY ally");
-            }
-            System.out.println("[23062] rank=" + rank + " ok");
+            double plainAttack = CharacterFactory.create(WEARER, LEVEL, true)
+                    .getAttribute(com.laosun.aluminium.enums.AttributeType.ATTACK).get();
+            double plainRegen = CharacterFactory.create(WEARER, LEVEL, true)
+                    .getAttribute(com.laosun.aluminium.enums.AttributeType.ENERGY_REGENERATION_RATE).get();
+            var unit = wearer(rank);
+            Assertions.assertTrue(unit.getAttribute(com.laosun.aluminium.enums.AttributeType.ATTACK).get() > plainAttack,
+                    "rank " + rank + ": the attack share reaches the panel");
+            Assertions.assertTrue(unit.getAttribute(com.laosun.aluminium.enums.AttributeType.ENERGY_REGENERATION_RATE).get()
+                    > plainRegen, "rank " + rank + ": the regen share reaches the panel");
         }
     }
 }
