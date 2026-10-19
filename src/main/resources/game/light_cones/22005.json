@@ -8,16 +8,24 @@
       ],
       "do": [
         {
+          "op": "ADD_STACK",
+          "buff": "迷境饭层数",
+          "amount": 1,
+          "max_stacks": 3,
+          "permanent": true,
+          "target": "self"
+        },
+        {
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
           "percent": 0.08,
-          "max_stacks": 3,
+          "per_stack": "迷境饭层数",
           "permanent": true,
           "target": "self"
         }
       ],
       "source": "光锥 22005 永远的迷境饭: 「装备者施放战技后，攻击力提高#2[i]%，该效果最多叠加#3[i]层」",
-      "note": "⭐⭐ **常数半由引擎的 `ability_property` 发放** ✓（第 136 条 ✓）⇒ **我们只写条件半** ✓。⭐ 文本**未给持续期** ✗ ⇒ 沿用库内先例 **`21005`** 的写法 `max_stacks` + `permanent: true` ✓（同形的\"叠层加成\" ✓）。"
+      "note": "「**施放战技后**，攻击力提高 #2%，**最多叠加 3 层**」—— ⭐ `ADD_STACK`（`max_stacks: 3` ✓）＋ `MODIFY_ATTR ATTACK per_stack: 迷境饭层数` ✓（8/10/12/14/16% ✓）。\n⚠⚠ **2026-10-19 逐句核时改的**：原先只有 `MODIFY_ATTR ... max_stacks: 3` ✗ —— 没有层缓冲、同属性修饰互相替换 ⇒ 三次战技仍然只 +8% ✗（同形：21027 ✓）。"
     }
   ],
   "2": [
@@ -29,16 +37,24 @@
       ],
       "do": [
         {
+          "op": "ADD_STACK",
+          "buff": "迷境饭层数",
+          "amount": 1,
+          "max_stacks": 3,
+          "permanent": true,
+          "target": "self"
+        },
+        {
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
-          "percent": 0.1,
-          "max_stacks": 3,
+          "percent": 0.08,
+          "per_stack": "迷境饭层数",
           "permanent": true,
           "target": "self"
         }
       ],
       "source": "光锥 22005 永远的迷境饭: 「装备者施放战技后，攻击力提高#2[i]%，该效果最多叠加#3[i]层」",
-      "note": "⭐⭐ **常数半由引擎的 `ability_property` 发放** ✓（第 136 条 ✓）⇒ **我们只写条件半** ✓。⭐ 文本**未给持续期** ✗ ⇒ 沿用库内先例 **`21005`** 的写法 `max_stacks` + `permanent: true` ✓（同形的\"叠层加成\" ✓）。"
+      "note": "「**施放战技后**，攻击力提高 #2%，**最多叠加 3 层**」—— ⭐ `ADD_STACK`（`max_stacks: 3` ✓）＋ `MODIFY_ATTR ATTACK per_stack: 迷境饭层数` ✓（8/10/12/14/16% ✓）。\n⚠⚠ **2026-10-19 逐句核时改的**：原先只有 `MODIFY_ATTR ... max_stacks: 3` ✗ —— 没有层缓冲、同属性修饰互相替换 ⇒ 三次战技仍然只 +8% ✗（同形：21027 ✓）。"
     }
   ],
   "3": [
@@ -50,16 +66,24 @@
       ],
       "do": [
         {
+          "op": "ADD_STACK",
+          "buff": "迷境饭层数",
+          "amount": 1,
+          "max_stacks": 3,
+          "permanent": true,
+          "target": "self"
+        },
+        {
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
-          "percent": 0.12,
-          "max_stacks": 3,
+          "percent": 0.08,
+          "per_stack": "迷境饭层数",
           "permanent": true,
           "target": "self"
         }
       ],
       "source": "光锥 22005 永远的迷境饭: 「装备者施放战技后，攻击力提高#2[i]%，该效果最多叠加#3[i]层」",
-      "note": "⭐⭐ **常数半由引擎的 `ability_property` 发放** ✓（第 136 条 ✓）⇒ **我们只写条件半** ✓。⭐ 文本**未给持续期** ✗ ⇒ 沿用库内先例 **`21005`** 的写法 `max_stacks` + `permanent: true` ✓（同形的\"叠层加成\" ✓）。"
+      "note": "「**施放战技后**，攻击力提高 #2%，**最多叠加 3 层**」—— ⭐ `ADD_STACK`（`max_stacks: 3` ✓）＋ `MODIFY_ATTR ATTACK per_stack: 迷境饭层数` ✓（8/10/12/14/16% ✓）。\n⚠⚠ **2026-10-19 逐句核时改的**：原先只有 `MODIFY_ATTR ... max_stacks: 3` ✗ —— 没有层缓冲、同属性修饰互相替换 ⇒ 三次战技仍然只 +8% ✗（同形：21027 ✓）。"
     }
   ],
   "4": [
@@ -71,16 +95,24 @@
       ],
       "do": [
         {
+          "op": "ADD_STACK",
+          "buff": "迷境饭层数",
+          "amount": 1,
+          "max_stacks": 3,
+          "permanent": true,
+          "target": "self"
+        },
+        {
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
-          "percent": 0.14,
-          "max_stacks": 3,
+          "percent": 0.08,
+          "per_stack": "迷境饭层数",
           "permanent": true,
           "target": "self"
         }
       ],
       "source": "光锥 22005 永远的迷境饭: 「装备者施放战技后，攻击力提高#2[i]%，该效果最多叠加#3[i]层」",
-      "note": "⭐⭐ **常数半由引擎的 `ability_property` 发放** ✓（第 136 条 ✓）⇒ **我们只写条件半** ✓。⭐ 文本**未给持续期** ✗ ⇒ 沿用库内先例 **`21005`** 的写法 `max_stacks` + `permanent: true` ✓（同形的\"叠层加成\" ✓）。"
+      "note": "「**施放战技后**，攻击力提高 #2%，**最多叠加 3 层**」—— ⭐ `ADD_STACK`（`max_stacks: 3` ✓）＋ `MODIFY_ATTR ATTACK per_stack: 迷境饭层数` ✓（8/10/12/14/16% ✓）。\n⚠⚠ **2026-10-19 逐句核时改的**：原先只有 `MODIFY_ATTR ... max_stacks: 3` ✗ —— 没有层缓冲、同属性修饰互相替换 ⇒ 三次战技仍然只 +8% ✗（同形：21027 ✓）。"
     }
   ],
   "5": [
@@ -92,16 +124,24 @@
       ],
       "do": [
         {
+          "op": "ADD_STACK",
+          "buff": "迷境饭层数",
+          "amount": 1,
+          "max_stacks": 3,
+          "permanent": true,
+          "target": "self"
+        },
+        {
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
-          "percent": 0.16,
-          "max_stacks": 3,
+          "percent": 0.08,
+          "per_stack": "迷境饭层数",
           "permanent": true,
           "target": "self"
         }
       ],
       "source": "光锥 22005 永远的迷境饭: 「装备者施放战技后，攻击力提高#2[i]%，该效果最多叠加#3[i]层」",
-      "note": "⭐⭐ **常数半由引擎的 `ability_property` 发放** ✓（第 136 条 ✓）⇒ **我们只写条件半** ✓。⭐ 文本**未给持续期** ✗ ⇒ 沿用库内先例 **`21005`** 的写法 `max_stacks` + `permanent: true` ✓（同形的\"叠层加成\" ✓）。"
+      "note": "「**施放战技后**，攻击力提高 #2%，**最多叠加 3 层**」—— ⭐ `ADD_STACK`（`max_stacks: 3` ✓）＋ `MODIFY_ATTR ATTACK per_stack: 迷境饭层数` ✓（8/10/12/14/16% ✓）。\n⚠⚠ **2026-10-19 逐句核时改的**：原先只有 `MODIFY_ATTR ... max_stacks: 3` ✗ —— 没有层缓冲、同属性修饰互相替换 ⇒ 三次战技仍然只 +8% ✗（同形：21027 ✓）。"
     }
   ]
 }
