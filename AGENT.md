@@ -647,6 +647,20 @@ if (isSelected) buffer.setStyle(rowArea, highlightStyle);
 
 #### 仍开的缺口
 
+- **光锥审计（2026-10-19，168 份逐条核完）新增的缺口族** ✓ —— 每族都写明**读者**（哪条光锥）、**缺的词**、**缺口见证** ✓：
+  - **「没有暴击」没有事件** ✗：`CRIT_DEALT` 只报**暴击成功** ✓。读者：**23012**（「普攻或战技伤害**未造成暴击**时暴击率 +36%」）。见证：`ConeAuditBatchNineteenTest` 的「规则数 0」✓。
+  - **「记录一个数、以后再读」没有写入端** ✗：读者：**23013**（「记录治疗量 → 按该记录的 36% 造成附加伤害」）。见证：`ConeAuditBatchNineteenTest` ✓。
+  - **「上一次施放的是哪一招」记不住** ✗：`damage_skill_key` 只描述当前这一发 ✓。读者：**23064**（「欢愉技与上一次不同 ⇒ 额外获得【潮流】」）。见证：`ConeAuditBatchTwentyEightTest` ✓。
+  - **「场上每有 1 名持盾角色」数不出来** ✗：只有 `enemy_state_count` 那一类 ✓。读者：**21043**。见证：`ConeAuditBatchTwelveTest` ✓。
+  - **「两名及以上相同命途」配不起来** ✗：`has_path` 只能问**某一个单位** ✓。读者：**21046**。见证：同前 ✓。
+  - **「击杀时检查这层 DoT 是不是她上的」没有归属** ✗：`target_dot_count` 数得到 ✓、问不了来源 ✗。读者：**24003**。见证：`ConeAuditBatchTwentyNineTest` ✓。
+  - **「受到的**暴击伤害**」不是一个可改的层** ✗：`MODIFY_DAMAGE_TAKEN` 改的是总区 ✓。读者：**23059**（【炼狱】）。见证：同批 ✓。
+  - **「助战技」不是技能类** ✗：`from_skill` 闭集只有 COMMON/SKILL/ULTRA/TALENT ✓。读者：**23060**。见证：`ConeAuditBatchTwentySevenTest` ✓。
+  - **「就地升级一个状态」没有拼法** ✗：`APPLY_BUFF` 只能新增 ✓。读者：**23029**（【卸甲】→【穷寇】）、**23047**（【魂迷】三条内部效果）。见证：各批 ✓。
+  - **「每场 1 次 + 终结技重置」的旗标不可复位** ✗：`once_per_battle` 不能复位 ✓（`RESET_TRIGGER_LIMIT` 只对**规则级**限流有效 ✓）。读者：**23040**（忆灵消失）。见证：`ConeAuditBatchTwentyFourTest` ✓。
+  - **「击破伤害」这一层只有在 `damage_type` 上才认** ✓（`BREAK` ✓，23025/23035 用它 ✓）；但**「受到的击破伤害」若要与「来自某人」叠加**仍不行 ✗（读者 **23025** ✓）。
+  - **⭐ 已解决的旧登记** ✓：**「这次施放花了多少能量」** —— 变量 **`cast_energy_spent`** 已存在 ✓（读者 **23062** ✓），所以 **23037** 的同类句子可以**下次直接写** ✓（不必再登记 ✓）。
+
 - **`DamageType` 给不出"规则身份"** ✗：`Damage` 上没有规则 id、也没有目标选择器 ⇒ "这条天赋伤害是哪个规则发的"在**类型这一层**区分不了 ✓ ⇒ 不猜 ✓（§6.8(d) 的 TALENT 讨论 ✓）。
 - **Impair 的 debuff 派发缺的是一列"哪个 debuff"** ✗：`skill_effects.json` 里一条 `Impair` 行都没有 ✓，而正文的 `陷入【吞火】状态` / `风化/裂伤/灼烧/触电其中1种` 只在散文里 ✓（`SkillData.debuffChance` 已有等级感知，**没有调用者** ✓）【缺口见证（§7.4）：`ImpairDebuffGapTest` —— ① 没有一条 `Impair` 带 effect 行 ✓（有一条就红，说明派发有了输入 ✓）；② 正文点名**战斗内**状态的只有极少数几处，其余是**地图层** ✓（本引擎没有那一层 ✓）】。
 - **`ENERGY_GAINED` 只说「谁收到了」，不说「谁给的」** ✗（2026-10-19 核对 ✓）：`fireTriggersForAlly(ENERGY_GAINED, target, target, added)` ⇒ `actor` **就是收能量的那位** ✓，`EnergyGain` 只有 `amount` ＋ `affectedByEfficiency` ✓ ⇒「受到**队友提供的**能量恢复…」判不了 ✗（读者：1408 行迹 1408102 的后半 ✓）。⚠ 不许拿「任何人给我回能」冒充 ✗；也不许把 `actor` 改成授予者 ✗ —— **4 条出货规则押在当前语义上** ✓（1207 星魂 2、1310 天赋、1505 两条）。要开这个口子：给事件加「授予者」事实，并复核那 4 条 ✓。【缺口见证：`PhainonTraceBideInFlamesTest.theEnergyHalfIsStillANoOp`】
