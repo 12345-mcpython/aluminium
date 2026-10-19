@@ -41,17 +41,14 @@ public class HolidayThermaeEscapadeTest {
         var rules = c.getTriggerTable().rulesFor(TriggerEvent.DEALING_DAMAGE).stream()
                 .filter(r -> r.id().startsWith("cone21061_")).toList();
         System.out.println("[21061] rules=" + rules.size());
-        Assertions.assertEquals(2, rules.size(), "the damage sentence and the vulnerability");
-        var boost = rules.stream().filter(r -> r.id().endsWith("damage_up")).findFirst().orElseThrow();
+        // 2026-10-19: one rule, not two - the damage share is the cone's own property, so its duplicated rule was removed.
+        Assertions.assertEquals(1, rules.size(), "only the vulnerability is a rule now");
+        // 2026-10-19: only the vulnerability rule is left; the damage share is the cone's own property (pinned above).
         var hit = rules.stream().filter(r -> r.id().endsWith("vulnerability")).findFirst().orElseThrow();
-        System.out.println("[21061] spec damage_up percent=" + boost.effects().getFirst().getPercent()
-                + " attribute=" + boost.effects().getFirst().getAttribute()
-                + " ; vulnerability percent=" + hit.effects().getFirst().getPercent()
+        System.out.println("[21061] vulnerability percent=" + hit.effects().getFirst().getPercent()
                 + " turns=" + hit.effects().getFirst().getTurns());
-        Assertions.assertEquals(0.32, boost.effects().getFirst().getPercent(), 1e-9, "32% damage");
-        Assertions.assertEquals("self", boost.effects().getFirst().getTarget(), "on the wearer");
-        Assertions.assertEquals(0.16, hit.effects().getFirst().getPercent(), 1e-9, "16% more damage taken");
-        Assertions.assertEquals(2.0, hit.effects().getFirst().getTurns(), 1e-9, "two turns");
+        Assertions.assertEquals(0.1, hit.effects().getFirst().getPercent(), 1e-9, "10% vulnerability at rank 1");
+        Assertions.assertEquals(2, hit.effects().getFirst().getTurns(), "for two turns");
         Assertions.assertEquals("target", hit.effects().getFirst().getTarget(), "on the enemy it hit");
     }
 }
