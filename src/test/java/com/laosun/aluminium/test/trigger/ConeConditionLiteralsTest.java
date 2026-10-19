@@ -674,6 +674,11 @@ public class ConeConditionLiteralsTest {
         assertRule(23000, 3, "BREAK", "cone23000_damage_up_on_break", List.of());
         assertRule(23000, 4, "BREAK", "cone23000_damage_up_on_break", List.of());
         assertRule(23000, 5, "BREAK", "cone23000_damage_up_on_break", List.of());
+        assertRule(23000, 1, "DEALING_DAMAGE", "cone23000_attack_per_enemy", List.of("actor == self"));
+        assertRule(23000, 2, "DEALING_DAMAGE", "cone23000_attack_per_enemy", List.of("actor == self"));
+        assertRule(23000, 3, "DEALING_DAMAGE", "cone23000_attack_per_enemy", List.of("actor == self"));
+        assertRule(23000, 4, "DEALING_DAMAGE", "cone23000_attack_per_enemy", List.of("actor == self"));
+        assertRule(23000, 5, "DEALING_DAMAGE", "cone23000_attack_per_enemy", List.of("actor == self"));
         assertRule(23002, 1, "KILL", "cone23002_after_kill", List.of("actor == self"));
         assertRule(23002, 1, "TAKING_HIT", "cone23002_after_being_hit", List.of("target == self"));
         assertRule(23002, 2, "KILL", "cone23002_after_kill", List.of("actor == self"));
