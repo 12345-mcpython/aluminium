@@ -161,14 +161,12 @@ if (isSelected) buffer.setStyle(rowArea, highlightStyle);
 ### 1.11 文档里的数字必须量过
 
 ⚠ **真实案例**：我在 `TRIGGER.md` 里写了一个「听起来对」的角色文件计数 ✗ —— **实测不是那个数** ✓。
-⇒ **一个"听起来对"的数字，而不是从数据里数出来的** ✗ —— 而那份文档存在的意义正是防止这类错误 ✓。
+⇒ 病不是那个数，而是**它没有从数据里数出来** ✗ —— 而那份文档存在的意义正是防止这类错误 ✓。
 
-- 真要写计数，必须附**一条能重算它的命令** ✓。
-- ⛔ **不写"现在是什么"的计数**：套件 / 用例 / 文件 / 规则 / 提交数、代码行号、行数、大小 ✗ ——
-  它们每轮都在变（§2.4）✓。需要数字就**现跑现量**，并把命令写在旁边 ✓；
-  引用代码只写**符号名**（`Constant.RESIST_MIN`），不写行号 ✓。
-- ✅ **可以写**：日期（出处）、公式与数据常量（它们是被验证的对象），
-  以及某个**具体实验**的读数（它描述"那一次"，不描述"现在"）✓。
+- **能写的只有三类** ✓：**日期**（带出处 ✓）、**公式与数据常量**（它们本身就是被验证的对象 ✓）、
+  以及某个**具体实验**的读数（它描述"那一次"，不描述"现在" ✓）。
+- 其余一律**现跑现量**，并把**一条能重算它的命令**写在旁边 ✓；引用代码只写**符号名**（`Constant.RESIST_MIN` ✓），不写行号 ✗。
+- ⛔ **"现在是什么"的计数**（套件 / 用例 / 文件 / 规则 / 提交数、行号、大小）由 §2.4 管 ✓ —— 那条有守卫，这条不重复说 ✗。
 - ⚠ 尤其小心**自己在文档里违反自己立的规矩** ✓。
 
 ### 1.12 交付时说清「没做什么」
@@ -364,6 +362,7 @@ if (isSelected) buffer.setStyle(rowArea, highlightStyle);
 | **单位** | 内容里的数字必须用**引擎自己的单位** ✓ | 【已把守：`UnitDisciplineTest`】 |
 | **内容不重复** | 同一件事不许在两处登记 | 【已把守：`ContentDuplicateGuardTest`】 |
 | **效果键** | 触发器的 effect key 有封闭词表，拼错即失败 | 【已把守：`EffectKeyGuardTest` / `EffectKeyDisciplineTest`】 |
+| **幅度：份额还是绝对值** | 判据是**有没有 `scale`** ✓ —— 有 scale（「等于 X% 的防御力」）= 已经是该属性的**绝对值** ✓；没有 scale 的**份额**（字面 `percent` 或其四种拼法）= **目标基础值的分数** ✓；纯 `amount`（「速度提高 50 点」）= 绝对值 ✓。⚠ 曾经的错法：**无 scale 的份额拼法**被当成绝对值 ✗（1002 秘技成了 +0.4 **点**攻击 ✗） | 【已把守：`DanHengLevelSourceTest`、`ReasonOdeEruditionAttackTest`、`TrueKnowledgeSkillDamageTest`】 |
 | **字段名大小写** | `EffectSpec` 的字段**多数没有** `@SerializedName` ⇒ JSON 里必须写**驼峰**（`amountFromEvent` ✓）；写蛇形会被 Gson **静默丢掉** ✗（2026-10-19 又踩一次：写了 `amount_from_event` ✓ —— 这次被装载期喊住 ✓，见 §3.7zd） | 【已把守：`TriggerTables.load` 的封闭键表（报 `unknown key`，不是静默 ✓）】 |
 | **伤害类型作用域** | 只在声明消费它的 op 上生效 | 【已把守：`DamageTypeScopeValidationTest`】 |
 | **集合顺序** | 打印 / 遍历顺序要确定 | 【已把守：`DeterministicCollectionOrderTest`】 |
@@ -371,512 +370,125 @@ if (isSelected) buffer.setStyle(rowArea, highlightStyle);
 | **读参数行只准走一个解析器** | 任何读参数行的地方都用 `CanHit.skillLevel` ✓（角色按 `SkillType`、忆灵按 data slot ✓）；写死行号 / `getFirst()` ✗ —— ⚠ 由**描述**驱动的那几个读法（弹射的份额与次数、Debuff 基础概率）曾是例外 ✓，在数值恰好平坦时**完全隐形** ✗（2026-10-17 实测：1004 瓦尔特 的弹射每段读 0.36 而第 10 行是 0.72 ✓） | 【已把守：`BounceSkillLevelTest`、`DebuffChanceDataTest.theLevelSelectsTheRow`】 |
 | **份额的分数** | `percent` 与**一个**行／计数份额**同时写** = 「**那个份额的** X%」✓（读者：1206「原伤害的 **50%**」✓ —— 那一份是 `SKILL:1`，E5 抬级后仍对 ✓）。⚠ **两条行份额**仍然互斥 ✓（一行与一个计数器不能都当份额 ✓）；⚠ 这个口子只在**伤害路径**开 ✓（`requireDerivedScale(…, percentMayScaleRow)` ✓） | 【已把守：`PercentFromSkillParamTest.aPercentBesideARowShareIsAFractionOfIt`、`SushangExtraRollFollowsTheRowTest`（E0／E5 两端）】 |
 
-### 3.7b 数据版本与迁移（**2026-10-18**）
+### 3.7b–3.7zd 已落能力索引（**原来逐条一节的记录，2026-10-19 压成索引**）
 
-> 数据由仓库外的 `E:\code\python\generate_data.py` 从 `E:\turnbasedgamedata` 生成。**这一次整体迁移到当前 tbgd**，
-> 生成器的四处缺口已补（备份 `generate_data.py.bak2..bak5`）：
+> ⚠ 这些是**已经修好/已经落地**的东西 ✓ —— 每条只留**不变量 ＋ 读者 ＋ 把守** ✓。
+> 为什么不再逐条叙述：§4.5 说"现在是什么"的权威是**代码**，而每条规则自带的 `note` 与判据已经把细节写在最近处 ✓；
+> 本文件只该留下**找不回来**的那一半（形状、教训、还开着的口子）✓。**仍开**的缺口汇总在 §4.3 ✓（本节只留「这条从句还差什么」的那半句 ✓）。
 
-| 缺口 | 症状 | 修法 |
-|---|---|---|
-| `hp_modify_ratio` 读的是 **`AttackModifyRatio`** | **1381/2722** 只怪的 HP 倍率错（例 100201501 真实 2 → 存成 1） | 改读 `HPModifyRatio` |
-| 覆盖 `skill_effects.json`（**入库、手写**的表） | 60 条 → 42 条，丢 20 条（含 1002 的 `segments`） | 改成**合并**：保留人工键与人工行，只删「生成器自有且已消失」的行 |
-| 不写 `bp_add` | 强化普攻**开始回战技点**（1315 击锤连弩） | 读 `BPAdd`；`Normal` 型缺值一律写 **0** |
-| 不并**忆灵技能**（`AvatarServantSkillConfig`） | 7 个 servant cid 消失 ⇒ 忆灵规则全报 "no loaded skill at slot N" | 并进 `skills.json`（同 `SkillID//100 / %100` 形状） |
+#### 3.7b 数据从 tbgd 生成（生成器的四处缺口已补）
+`hp_modify_ratio` 读 `HPModifyRatio`（曾读 `AttackModifyRatio` ⇒ 1381 只怪的血量倍率错 ✓）· `skill_effects.json` 改成**合并**（保住人工行 ✓）· 写 `bp_add`（强化普攻回战技点 ✓）· 并入忆灵技能（`AvatarServantSkillConfig` ✓）。
+新增表 `skill_max_hits.json` = 官方最大命中次数 ⇒ **段数的长度是数据** ✓【已把守：`SegmentCountAgreementTest`】；**分裂比**仍只能从文档的分段表来 ✓。生成器在仓库外（`E:\code\python\generate_data.py`）✓。
 
-⚠ 新表 **`skill_max_hits.json`**（`avatars` / `advanced` / `servants`）就是「官方最大命中次数」✓ —— 段数的**长度**
-现在是数据 ✓（判据 `SegmentCountAgreementTest` ✓），但**分裂比**仍只能从文档的分段表来（数据里没有）✓。
+#### 3.7c 实例级 `MODIFY_ATTR` 只读 `percent`
+已修：份额 / 派生 / 扁平 `amount` 收进 `TriggerMagnitudes.magnitudeOf`，`cap_amount` 生效 ✓。读者：1512【Fever】的无视防御 ✓【已把守：`FeverDefenceIgnoreTest`（观测口是结算后的 `DefenceArea` ✓）】。
+⚠ 两次**错误方向**（`amount 15 + percent 0.5`、`amount 0.15 + percent 0.005`）都不是真的，病在实例级分支 ✗。
 
-⚠ 迁移带来的内容改动：**1503 的强化普攻 B 从数据槽位 9 → 10**（`150309` 已不存在，`150310` 是同名技能）✓；
-她的**十条行迹**现在由数据提供 ⇒ 原来那条"数据为空所以写成规则"的绕路 `stat_traces_the_ten_panel_rows` **已删除** ✓
-（留着会翻倍：实测效果抵抗 0.10 → 0.20 ✓）；新增遗器 **133 / 134** 的套装效果**已实现**（不是登记 ✓）。
+#### 3.7d `SUMMON_ATTACK` 只在 `EnemySkill` 上触发
+已修：`SkillExecutor` 收尾时若执行者是 `Summon` 且命中，也 fire ✓（与 `EnemySkill` 两条路径不重叠 ✓）。读者：光锥 23042 ✓【已把守：`Cone23042TriggerTest`】。
 
-⚠ 闸门：迁移后全量测试**全绿** ✓（套件/用例数按 §2.4 不写在这里，跑一次就知道 ✓），**四个 demo + all 逐字节不变** ✓（演示用的那几只怪倍率本来就是 1 ✓）。
-⚠ **数据表仍不是全量**：`monster_config.json` 现在是 2722 条里的子集？不 —— 生成器写全量 ✓；但**关卡级**的数值覆盖
-（如 14.03 那份捕获的 HP/DEF）不在 Excel 里 ✓，见 §4.3。
+#### 3.7e 加性易伤（原「忆灵光环为什么没落地」）
+**已落** ✓：`MODIFY_DAMAGE_TAKEN` 收 `coexist: true`（`BuffManager` 的 `keepsSiblings` 两个方向都护住 ✓，见 §3.7l 的同一条注释）✓。读者：1512 忆灵光环（逐成员 0.112/0.168/0.224 ✓）＋ 光锥 23042（0.18…0.36 ✓），与捕获的 `all_damage_type_taken_ratio = 0.64 = 0.36 + 0.28` 逐位吻合 ✓。
+⚠ 当时那两个数（1.2230 / 1.112）**不是**"光环算了两遍" ✓：`1.112 × 1.1 = 1.2232` 里的 1.1 是**韧性减伤从 0.9 变 1.0**（忆灵那一发把目标打进了击破 ✓）⇒ 夹具两侧的韧性状态不同 ✓（§6.3·3「前提不许被抽走」的又一例 ✓）。
+**仍开**：光环**不随忆灵离场撤下**（与 3.7l 同一缺口，`SUMMON_LEFT` 已能补 ✓ 只是没写 ✓）。
 
-### 3.7c 已修：实例级 `MODIFY_ATTR` 只读 `percent`（**2026-10-18**）
+#### 3.7f `HEALED` 只在**真的回了血**时发（早先的「缺口」是满血探针假象）
+不变量：满血治疗**不发** `HEALED` ✓【已把守：`HyacineTalentTest`（先扣血再治 ✓）】。教训并进 §1.4/§1.7：**探针的前提本身就是变量** ✓。
 
-**症状**：1512 知更鸟•晴歌的【Fever】结界「无视敌方目标（15% + 0.5% × 气氛值）的防御力」写不出来 ——
-无论气氛值是 0 / 15 / 50，结算出来的 `DefenceArea` **一模一样**，反推 ignore 恒为 **0.005**，正好等于规则里的 `percent`。
+#### 3.7g 仍开：技能数据里的「消耗生命值」没有被执行
+`141302` 写明「消耗长夜月当前 #6(10)% 的生命值召唤忆灵」，实测施放前后 `currentHp` **一模一样**、`HP_LOST` / `HP_CONSUMED` 计数都是 0 ✗ ⇒ 引擎没读这一项代价 ✓。要的能力：**执行技能数据里的生命消耗**，按 `consumeHp` 的语义发 `HP_CONSUMED`（不发 `HP_LOST` ✓ 引擎的区分是对的）。
 
-**根因**（不是单位问题，前几轮的反推方向都错了）：`TriggerEffects` 里 `instance: true` 的那条分支对
-`DEFENCE_IGNORE` **只读 `effect.getPercent()`**，`amount` 与 `scale` 直接丢弃：
+#### 3.7h 忆灵的多段（分裂比 ＋ 段数都从上游数据来）
+落地：`skill_effects.json` 的 `segments` ✓（11413 = `[0.1×5, 0.5]` ✓，总份额不变、变的是**六次独立结算** ✓）【已把守：`EvernightServantSegmentsTest`、`SegmentCountAgreementTest`】。
+⚠ 「捕获 5 段」**撤回** ✓：那是 `capture-flow` 按 `raw_damage_before_modifiers` 分组的伪影 ✓（已改成按 `attack_type` 分组 ✓）。
+**仍开**：① 「每有 #3 点【忆质】额外造成 #2%」游戏是**并进那六发**（总份额 0.6→0.9 ✓），引擎没有这条口径 ✗；② 演示/回合路径仍走忆灵规格里的单段攻击（`COMMON` ✓），换成数据技能会改 demo 输出 ✓ 属另一件事 ✗。
 
-```java
-double instanceMagnitude = effect.getPercent() == null ? 0 : effect.getPercent();   // ✗ 丢了 amount/scale/cap
-```
+#### 3.7i 两段式强化普攻（一行多段、各段自己的目标形状）
+落地：`skill_effects.json` 的 **`damage_parts`**（每段 `shape` ＋ `index` ✓，按表顺序结算 ✓，削韧各取自己的列 ✓）【已把守：`CyreneEnhancedBasicTest`、`CyreneEnhancedBasicPartsTest`】。
+**仍开**：① 各段**削韧**未核（`stance_list` 给 single 30 / all 15，游戏 `Phase02` 写死 15 ✓ 两种读法都无更强证据 ✗ 等含强化普攻的捕获 ✓）；② 强化普攻「获得 **3** 点【追忆】」现在由 `basic_recollection` 无条件给 **1** 点 ✓ ⇒ 需要按 `from_skill_id`（1 vs 8）分两条 ✗（没做 ✓）。
 
-**修法**：把"份额 / 派生 / 扁平 amount"的选择收成**一处**（`TriggerMagnitudes.magnitudeOf`），实例级分支也用它，
-并让 `cap_amount` 生效。于是 `amount 0.15 + percent 0.005 × party_resource:气氛值` 得到 0.15 / 0.225 / 0.40。
-
-**判据**：`FeverDefenceIgnoreTest` —— 气氛值 0 / 15 / 50 ⇒ ignore 0.15 / 0.225 / 0.40（容差 1e-6），
-没有 `Fever` 状态时再满的气量也是 0；观测口是**结算后的 `DefenceArea`**（实例级属性读不到角色身上，实测恒 0）。
-
-**顺带记下两条错误方向**（省得重走）：① 份额写法 `amount 0.15 + percent 0.005` 曾被判为"被吃 100 倍"、
-② 百分点写法 `amount 15 + percent 0.5` 曾被判为"放大且 cap 失效" —— 两次测量都混着"气量=0"的噪声，
-**都不是真的**；真正的病在实例级分支 ✗。
-
-**队级计数器**：`气氛值` 的 `scope: "PARTY"` 是有效的 ✓ —— 它在 `Battle.partyResources` 里，
-公开入口 `battle.partyResourceValue(id)` / `battle.partyResource(id)` ✓；`CanHit.getResources()` 是 **SELF 池**，
-读它永远是 0（这不是缺口，是探针读错了对象 ✗）。
-
-**与实测吻合**：整场捕获反解出的无视防御 = 22.5% / 23% / 24% / 27.5% / 29% / 29.5% / 31.5% / 40%
-= 这条公式在气氛值 15 / 16 / 18 / 25 / 28 / 29 / 33 / 50 时的值 ✓✓。
-
-### 3.7d 已修：`SUMMON_ATTACK` 只在 `EnemySkill` 上触发（**2026-10-18**）
-
-**症状**：光锥 23042 的易伤从句「装备者的**忆灵施放忆灵技**时」写好了也**不生效**。
-
-**根因**：`SUMMON_ATTACK` 全仓**只有一处 fire**（`EnemySkill.execute`）。而数据驱动的忆灵（1512 的「晴空乐手」）技能在
-`Summon.skillsByDataSlot` 里、走 **`SkillExecutor`** ⇒ 那条路径上**没有任何地方**触发它 ⇒ 规则永远不触发 ✗。
-
-**修法**：`SkillExecutor.execute` 收尾时，若执行者是 `Summon` 且确实命中了目标，也 fire `SUMMON_ATTACK`
-（与 `EnemySkill` 那条同语义；两条路径分别是 `EnemySkill` 与 `DefaultSkill`，不重叠 ⇒ 不会重复触发 ✓）。
-
-**判据**：`Cone23042TriggerTest` —— 装光锥 23042 叠影 5 → 召唤忆灵 → 忆灵放技能 → **我方普攻伤害 ×1.36**
-（不是模型推出的数，是同一场战斗里"忆灵出手前/后"的实测比值 ✓）。
-
-### 3.7e 忆灵光环（易伤）为什么还没落地（**2026-10-18**）
-
-数值已对平（第 12 轮）：忆灵 11512 `SkillP01` 的「根据成员数量使敌方全体受到的伤害提高 0.112 / 0.168 / 0.224」是**逐档累加**
-⇒ 2 名 = 0.28、3 名 = 0.504；捕获恒定的 0.64 = 光锥 23042 叠影 5 的 0.36 + 忆灵 2 名的 0.28 ✓✓。
-
-但**按 `self_summon_count >= 1/2/3` 写成三条 `SUMMONED` 规则之后，实测不成立**：同一场里「召唤忆灵 + 忆灵放技能」
-让我方普攻的比值变成 **1.2230**，期望是 `1 + 光锥 0.36 + 光环 0.112 = 1.472` ✗。1.2230 = 1 + 0.223 而非 1.472
-⇒ 要么光环被**应用了两次**（0.112 × 2 ≈ 0.224），要么它与光锥那段不是简单相加 ✗ —— 没量清楚之前，那条改动**已回滚**
-（不留一个自己解释不了的红判据 ✓）。
-
-**第 21 轮查完（代码）：**
-
-- `SUMMONED` **不会重复触发** ✓ —— `Battle.fireSummoned()` 从 `justSummoned` 里"先取走再逐个 fire"，每次入场只一次 ✓；
-- `VulnerabilityBuff` 是**按实例注入**的 `DamageEvent`，比值在 `onDamage` 里逐条叠加 ⇒ 易伤区是**加性** ✓（与 `HSR.md` §2.2 一致）。
-
-⇒ 所以 1.2230 **不是**"光环算了两遍"。把实测值拆开：`1.112 × 1.1 = 1.2232` ≈ 1.2230 ✓✓ ⇒
-那 10% 是**韧性减伤从 0.9 变 1.0**：忆灵那一发**把目标打进了击破** ✗，而我的测试在"召唤前 / 忆灵出手后"两侧比的不是同一个韧性状态 ✗。
-同时这也说明那一轮里**光锥的 0.36 并没有出现在比值里**（否则会是 `1.112 × 1.1 × 1.36` 量级）✗ —— 这一条还要再确认。
-
-**第 22 轮（控制韧性 + 单变量之后）**：
-
-- 光环单独测：**1.112** ✓ 精确（召唤忆灵前/后各打一发，两侧都先击破）⇒ **光环规则本身是对的** ✓；
-- 光锥 + 光环一起：仍是 **1.2230** = `1.36 / 1.112` ✓✓ —— 拆开看就是"**加到 0.36，把 0.112 覆盖掉了**"：
-  `354.17/371.35`… 反过来算 `1.2230 × 1.112 = 1.3599 ≈ 1.36` ⇒ 施加光锥之后**总易伤只有 0.36**，不是 0.472 ✗；
-- 加 `coexist: true` **无效**（数字一模一样 ✗）⇒ `MODIFY_DAMAGE_TAKEN` 的不同来源**互相覆盖**，引擎里没有"叠加"。
-
-而游戏是**叠加**的：捕获里 `all_damage_type_taken_ratio` 恒为 **0.64 = 0.36 + 0.28** ✓。
-
-⇒ **引擎缺口（本条）**：不同来源的"受到伤害提高"必须**加性叠加**（现在后一条覆盖前一条；`coexist: true` 不生效）。
-补上之后忆灵光环那三条规则可以原样落地（规则与判据都已验证到"光环单独 = 1.112 ✓"）。
-
-### 3.7f 已核（更正）：技能数据自带的治疗**会**触发 `HEALED` —— 早先的「缺口」是满血探针假象（**2026-10-18**）
-
-**原记录（已撤回）**：曾写「1409 风堇的天赋挂不上，因为技能数据驱动的治疗不发 `HEALED`」，并用五条计数器探针（无条件 / actor==self / actor is_ally / actor is_summon / target is_ally）在"放完战技后"读到全 0。
-
-**更正**：`HyacineTalentTest.eachHealRaisesTheMemospriteDamageByEightyUpToThreeLayers` **通过** —— 它先用 `consumeHp` 把队友打到半血、再施放 1409 的战技（治疗来自**技能数据**），每治疗一次小伊卡的增伤 +0.8、三次到 2.4 封顶 ✓。⇒ **技能数据的治疗会发 `HEALED`**；那五个计数器为 0 的原因是**满血治疗** —— 引擎有一条既有约定「`HEALED` 只在真的回了血时才发」（交接时写在 §5.2），探针没有先扣血。
-
-**教训（并入 §1.4/§1.7）**：探针的**前提**（满血/非满血）本身就是变量；先给探针造前提，再读计数。
-
----
-### 3.7g 缺口：技能数据里的"消耗生命值"没有被执行（**2026-10-18**）
-
-1413 长夜月的战技 141302 写明「**消耗长夜月当前 #6(10)% 的生命值**召唤忆灵…」，而实测：
-
-```
-放战技前 currentHp = 1556.97696
-放战技后 currentHp = 1556.97696   ← 一模一样 ✗
-HP_LOST 计数 = 0 ; HP_CONSUMED 计数 = 0   ← 两个事件都没发
-```
-
-⇒ 引擎**根本没有读/执行**技能数据里的这一项代价（`consumeHp` 有实现，但没有人用技能参数调用它）。
-后果：1413 天赋「每次**生命降低**时暴击伤害 +60%」挂不上事件；凡以"消耗生命"为代价的 kit 都缺这一半。
-
-⇒ 需要的能力：**执行技能数据里的生命消耗**（并按 `consumeHp` 的语义发 `HP_CONSUMED`，不发 `HP_LOST` —— 引擎的既有区分是对的 ✓）。
-
-### 3.7h 已落：忆灵的多段（1413 的「长夜」六段）—— 分裂比与段数都从上游数据拿到（**2026-10-18**）
-
-**症状**：`skill_max_hits.json` 的 `servants` 里有 `Servant_EvernightServant_00_Config: {Skill01: 6, Skill11: 2}`，
-即「长夜」的**技能 1 是 6 段**；而 `skill_effects.json` 里**没有** 11413（servant）的分段条目 ⇒ 引擎把这一发当成**单段**结算，
-`capture-flow` 也读成 `hits 5 / targets 1`（该分组已在本轮改掉：按 `attack_type` 分组后是 **hits 6**）。
-
-**缺口早就该补的「两项数据」现在都量到了**（都在仓库外的 `E:\turnbasedgamedata`）：
-1. **分裂比** —— 上游 `Config/ConfigAbility/Servant/Servant_EvernightServant_00_Ability.json` 的
-   `Servant_EvernightServant_00_Skill01_Phase02` 是**六次** `DamageByAttackProperty`（同一目标、同一 `DamagePercentage`），
-   `HitSplitRatio` 依次 **0.1 / 0.1 / 0.1 / 0.1 / 0.1 / 0.5**（合计 1.0；最后一次 `HitAnimation = Hit_H`，是重击）。
-2. **实际段数 = 6** —— 与 `skill_max_hits` 的 `Skill01: 6` 一致；而**捕获其实是 6 段**：`veritas-085418.json` 里
-   177.60×5 + 888.01×1 = 0.06×5 + 0.3 = 同一份额（0.6）的 5×0.1 + 0.5。**看起来像 5 段是 `capture-flow` 分组伪影（已修：现在按 `attack_type` 分组，六段归一次施放）** ——
-   它按 `raw_damage_before_modifiers` 分组，而 0.5 那一段的 base 是其余五段的 5 倍 ⇒ 被拆成了另一个"施放"。
-   原条目写的「捕获 5 段」**撤回**（§1.3：量错了就留在原地改）。
-
-**修法（纯数据，引擎不动）**：`skill_effects.json` 的 `11413/1` 写
-`segments: [0.1, 0.1, 0.1, 0.1, 0.1, 0.5]` —— 引擎的 `SINGLE_ATTACK` 分段分支本来就按段结算
-（`base × ratio`、削韧 30 均分），而 `SkillEffects.forSkill` 按 `(cid, slot)` 查、servant 的 cid 就是 `servant_id` ✓。
-总伤害不变（份额合计 1.0），变的是**六次独立结算**与每段的事件。
-
-**判据**（都在套件里）：
-- `EvernightServantSegmentsTest` —— 召唤「长夜」后施放其数据槽 1：**恰好 6 次普通伤害**，按 0.1/0.1/0.1/0.1/0.1/0.5 的顺序，
-  每次 `base = ratio × 0.7 × 生命上限`（Lv10 行），全部落在同一目标；**削韧合计 30**（每段 5）。
-- `SegmentCountAgreementTest.everyServantSegmentCountMatchesTheData` —— servant 的分段数 = `skill_max_hits`
-  的 `servants.Servant_EvernightServant_00_Config.Skill01`（6），且分裂比合计为 1（servant 的键是**能力配置名**，不是 cid，桥接写在判据里）。
-- **变异验证**：把 `segments` 改名 ⇒ 两条都红（`expected: 6 but was: 1` / 前置断言"没有 servant 分段"红）✓。
-
-⚠ **仍未做（登记，不近似）**：
-1. **「每有 #3 点【忆质】额外造成 #2%」** —— 游戏**并进这六发**的 `DamagePercentage`，**不是额外实例**（两发捕获的总份额实测
-   0.6 → 0.9，六段的比例结构不变）；引擎没有这条口径。
-2. **「施放后获得 #4 点【忆质】」** 还没写成规则。
-3. **演示/回合路径仍走忆灵规格里的单段攻击** —— `Main.summonTurn` 与 `AutoPolicy` 取 `COMMON`，那是 `memosprites/1413.json`
-   的 `attack` 块（0.5、1 段，Lv6 口径），不是数据槽 1 的行；把 `COMMON` 换成数据技能会**改变 demo 输出**并动
-   `MemospriteAttackTest` 的前提（它钉着"规格里的攻击"这条路径），属于**另一件事**。本条只让**数据技能路径**（规则/判据）正确。
-
-### 3.7i 已落：两段式强化普攻（1415 的【向着爱与明天♪】）—— 一行多段、各段自己的目标形状（**2026-10-18**）
-
-**症状**：`skills.json` 的 `1415/slot 8` 一行 `param_list = [[0.15, 3, 0.15], …, [0.42, 3, 0.42]]`、`skill_effect: AoEAttack`，
-描述是「获得#2点【追忆】并**对指定敌方单体**造成等同于昔涟 **#3** 生命上限的冰伤，**随后对敌方全体**造成等同于昔涟 **#1** 生命上限的冰伤」
-⇒ 一行两段（**#1 = 全体那一段、#3 = 单体那一段**，顺序与"先单体后全体"的叙述相反 ✓ 容易读反 ✗；`#2 = 3` 是追忆点数）。
-引擎按 `AoEAttack` 只读 `param_list[0]`、只落全体一段 ⇒ **单体那一段被静默丢掉** ✗（最坏的失败形态：数字看起来合理）。
-
-**修法（选「技能数据支持一行多段」这一条，不是内容写两条 `DAMAGE`）** ✓：
-`skill_effects.json` 的 `1415/8` 新增 **`damage_parts`** —— 每段给 `shape`（`SingleAttack` / `AoEAttack`，与 `skill_effect` 同一套拼写）
-与 `index`（参数行下标，0 基，与既有 `params[].index` 同口径）⇒ `[{SingleAttack, 2}, {AoEAttack, 0}]`。
-`SkillExecutor.resolveHits` 见到 `damage_parts` 就按表顺序逐段结算（**描述的顺序 = 结算顺序**：先单体、后全体），每段从**同一个等级行**取自己的份额，
-削韧按各段自己的形状取列（单体段 `stance_list.single`、全体段 `all`，即既有 `stanceFor` 的口径）。没有表项的技能一行都不变 ⇒ **加法**，不是改口径 ✓。
-
-**为什么不是内容写两条 `DAMAGE`**：那会把数据驱动的全体段再写一遍（双算），或者得先让引擎**不结算**这个技能的数据伤害 —— 两条路都要改引擎，
-却把「哪一段是全体」写进规则而不是数据。`skill_effects.json` 本来就是「这个技能的参数怎么读」的表（`segments` 已在那里）✓。
-
-**判据**（都在套件里）：
-- `CyreneEnhancedBasicTest` —— 开大后打一发强化普攻（两只 1,000,000 HP 的 dummy）：恰好 **3 次普通伤害**，顺序 = 单体（瞄准目标）→ 全体（瞄准目标 + 第二只），
-  每次 `base = 0.42 × 生命上限`（Lv10 行），削韧 30 / 15 / 15。
-- `CyreneEnhancedBasicPartsTest` —— 表的段数 = 游戏自己的最大命中次数 `skill_max_hits.json avatars.1415.Skill11 = 2`；顺序与 `index` 都对（防止表被写反）。
-- **变异验证**：把 `damage_parts` 改名 ⇒ 两条都红（`expected: 3 but was: 2` / `parts == null`）；把两段顺序调换 ⇒ 顺序断言红。✓
-
-⚠ **未核（不许写成事实）**：每段的**削韧**。`stance_list` 给 `single 30 / all 15`，按列读 ⇒ 单体段 30、全体段 15（主目标合计 45）；
-而游戏 `Avatar_Cyrene_00_Skill11_Phase02` 的第一发 `DamageByAttackProperty` 写死 `StanceValue = 15`（主目标合计 30 的读法）。
-两种读法都没有更强的证据 —— 等一份**含强化普攻的捕获**再定 ✓；在那之前按引擎既有口径（各段取自己的列）落，别把 15 当结论。
-
-⚠ **验证材料的更正**：本条原来写的「捕获里她那几次施放的 hits/targets」**不适用** —— `veritas-085418.json` 里 1415 **没有开大**
-（没有 1415 的 Ultimate 事件；event 41 是她的普通普攻，乘数 0.5，不是强化普攻的 0.42），所以判据只能是上面那两条，**不是捕获**。
-
-⚠ **同句还差一半（新发现，未做）**：强化普攻的「获得#2点【追忆】」是 **3 点**，而 `1415.json` 的 `basic_recollection` 无条件给 **1 点**
-（那条的原句是槽位 1 的普通普攻）。`BASIC_ATTACK` 事件带着 `from_skill_id`（= 槽位）⇒ 可以：给 1 点的那条加 `from_skill_id == 1`、
-再给 `from_skill_id == 8` 加一条给 3 点的。**没做** —— 不属于「两段式伤害」这一条，登记在这里 ✓。
-
-### 3.7j 「复刻流程」这条线的现状（**2026-10-18 定稿**，给下一位接手的人）
-
-**已成立（都有判据钉着）**
-
+#### 3.7j 复刻流程这条线
 | 面 | 证据 |
 |---|---|
-| 单次命中全链算术 | 夹具 `veritas-085418.json`（82 事件）→ `compare-capture` **81/81 逐位复现**（1 条击破按原因跳过） |
-| 出手流程还原 | `capture-flow`：82 事件 → **13 次施放 + 4 次派生 + 1 次击破**、覆盖 82/82（`CaptureFlowTest`）；分组按 `attack_type`（1 普攻 / 3 终结技 / 12 忆灵技；6 = 派生、10 = 击破，不算施放），伴侣按先进先出配对 |
-| 减防 / 易伤 / 增伤 **由规则产生** | 1512 Fever（减防 `15%+0.5%×气氛值` cap 40%、增伤 `0.84+0.028×气量` 角色+忆灵）、光锥 23042（`SUMMON_ATTACK` → 0.18…0.36）、忆灵光环（逐成员 0.112/0.168/0.224，**与前两者加性共存**）、1413【至暗之谜】、1409 天赋、1415 结界 24% 真伤 |
-| 1409 风堇 | 完整：战技治疗（数据 8%+160）、终结技（召唤 + 10%+200 / 12%+240 + 【雨过天晴】+30%+600）、天赋（+80%/层×3）、忆灵 50% 面板 |
-| 1415 昔涟 | 全员 +20%、结界 24% 真伤（**与捕获的配对真伤比值 371.472019/1547.800079 = 24.0000% 逐位吻合**）、终结技双暴击 +50、德谬歌 100% 面板、强化普攻两段（§3.7i） |
-| 1413 长夜月 | 终结技【至暗之谜】（易伤 +30%、双向增伤 +60%）、战技消耗 10% 生命、天赋（自身暴伤 +60%、+2 亿质）、忆灵「长夜」技能 1 六段（§3.7h） |
-| 1512 知更鸟•晴歌 | 上面三类的全部条款，各有两条行为判据 |
+| 单次命中全链算术 | `veritas-085418.json`（82 事件）→ **81/81 逐位复现**（1 条击破按原因跳过 ✓） |
+| 出手流程 | `capture-flow`：13 次施放 ＋ 4 次派生 ＋ 1 次击破，覆盖 82/82 ✓【已把守：`CaptureFlowTest`】 |
+| 减防 / 易伤 / 增伤 | 1512【Fever】、光锥 23042、忆灵光环、1413【至暗之谜】、1409 天赋、1415 结界 24% 真伤 ✓ 全部由**规则**产生 ✓ |
+| 面板自算 | ✗ 等用户给遗器（主词条 + 副词条）；现在面板取自捕获 ✓ |
 
-**还没做（按优先级）**
+#### 3.7k 1409【雨过天晴】按行读 ＋ 星魂 2 的 +50% ＋ 星魂 3 的终结技 +2
+`percent_from_skill_param: ULTRA:2` ＋ `max_stacks: 2`；E2 的 `HEALTH 0.5` 与它**相加**（0.33 ＋ 0.50 = 0.83 ✓，固定项只加一次 ✓）；E3 的 `RAISE_SKILL_LEVEL ULTRA +2` ⇒ 终结技 Lv12 ✓【已把守：`HyacineRainClearMaxHpTest`（钉 E0 与 E6 两端 ＋ `skillLevel(ULTRA)` ✓）】。
 
-1. **面板自算**：等用户给遗器（主词条 + 副词条），现在面板取自捕获；
-2. **`Battle` 驱动的整场重放**：**第一刀已落**（§3.7zb ✓）—— 施放清单、技能槽的人工表、敌人的装配、`castImmediate` 驱动的顺序都通了 ✓；剩下的是**对账**：窗口前缀、忆灵「%生命上限」读谁、忆灵技的行号、`11512` 的倍率在参数 #2、以及敌人缺韧性条，五条都登记在 §3.7zb 里 ✓；
-3. 1413 天赋的**忆灵那一半**：给 `Summon` 的属性修饰走**份额**路径（`amount` 与 `percent` 同效，实测都是 0.6 × 0.12 = 0.072），需要先决定口径再写；
-4. 1413 忆灵技能 1 的**整句**还差两半：`#2`/`#3`（每 4 点【忆质】的额外伤害，游戏并进六发）与 `#4`（施放后 +忆质），见 §3.7h。
+#### 3.7l 1409 星魂 6 的「小伊卡在场时，我方全体抗性穿透 +20%」
+三条口径（都量过 ✓）：**门是事件不是读盘**（`SUMMONED` ✓，第一句断言就是"召唤前读到 0" ✓）· **`actor == summon` 不能省**（`SUMMONED` 对**两方**都发 ✓）· **`all_allies` 含忆灵** ✓（判据同时读主角/队友/忆灵 ✓）。`DAMAGE_PENETRATION` 是**我方**属性 ✓（不是 `RESISTANCE_REDUCTION` ✗）。【已把守：`HyacineEidolonSixTest`、`HyacineEidolonSixLateSummonTest`】
+⚠ **仍开**：忆灵**离场后**光环要撤下（`SUMMON_LEFT` 已落地 ✓，见 3.7w，规则已写 ✓）；星魂 6 前半的 **12% 阈值**改的是忆灵技 1 的 `#2` ✓（那条忆灵技现在有规则了 ✓ 见 3.7q/3.7r）。
 
-**这 20 轮修掉的引擎问题**（都已进套件）：实例级 `MODIFY_ATTR` 只读 `percent`（四个分支）· 数据驱动忆灵不触发 `SUMMON_ATTACK` · `MODIFY_DAMAGE_TAKEN` 不认 `coexist`（多来源互相覆盖）· `target: summon` 缺 `self_summon_count` 门控时报错不清（现在给的是可执行建议 ✓）· 技能数据里的"消耗生命值"没有被执行（§3.7g）· 一行多段只结算第一段（1415 强化普攻，§3.7i）· 忆灵技能 1 的分段表缺失（11413 六段，§3.7h）。
+#### 3.7m 1409 行迹【暴风停歇】＋ 星魂 4（速度 200 的三条从句）
+五条规则（生命 +20% ／ 每点超速治疗 +1% · `max_points: 200` ／ 忆灵同享 ／ 星魂 4 的暴伤每点 +2% ／ 忆灵同享 ✓）。三处判定：**严格大于 200** ✓（200 整点给 0 ✓）· **小伊卡的面板不另写**（它 = 她的面板 × 50%，再写就是双算 ✗）· **`coexist` 是量出来的** ✓（去掉它秘技那条 +20% 被顶掉 ⇒ 该用例红 ✓）。
+【已把守：`HyacineWindstormTraceTest`（6 例：0 / 0.5 / 2.0 / 2.0 封顶点在**点数**上 ✓）】
+⚠ 仍开：这 5 条都在**读盘那一刻**求值一次 ⇒ **战斗中途**越过 200 速度不会打开 ✓（没有"速度变了"事件）；忆灵的**治疗**那一半仍不可观测 ✓。
 
-### 3.7k 已落：1409 的【雨过天晴】按当前行读 + 星魂2 的 +50%、星魂3 的终结技+2（**2026-10-18**）
+#### 3.7n 1409 忆灵技 3【展翼，奔向日辉】（召唤回能）
+`GAIN_ENERGY 15`（每次 ✓）＋ `GAIN_ENERGY 30` ＋ `once_per_battle`（首次 ✓）**两条规则**：给 `amount` 加"第一次才加"的开关不存在 ✗。「首次」= `once_per_battle` ✓ 不是 `cooldown` ✗。【已把守：`HyacineMemospriteSummonEnergyTest`（首次 +45 / 再次 +15 ✓）】
 
-**症状**：捕获里 1415 的生命上限是 `10320.44`，其中【雨过天晴】给的是 **83% + 667**（游戏内 buff 面板截图）；而 `characters/1409.json` 的规则写死 **30% + 600**（按 Lv10 文档），对不上。
+#### 3.7o 1409「本场战斗累计治疗」的计量
+两条 `HEALED` 规则（`actor == self` / `actor == summon` ✓ 各管一方 ✓，因为条件只能 AND ✗）、`GAIN_RESOURCE` ＋ `amountFromEvent` ✓。与 1415 那条「额外提高」**相加**才是计入忆灵技 1 的数值 ✓。【已把守：`HyacineHealingTallyTest`（他人治疗不进账 ✓）】
+⚠ `Resource` 是**整数** ⇒ 计量只留整点（实测 255.62 → 256 ✓），落到忆灵技 1 的伤害上 < 0.28 ✓。
 
-**根因（都已核实）**：① 那一场 1409 的终结技是 **Lv12**（`140903` 的 `#4 = 667.5` 反证），来自 **星魂3「终结技等级+2」**——而引擎的 `eidolonRank` 只开规则、**不抬技能等级**；② **星魂2**「风堇处于【雨过天晴】状态时，我方全体目标生命上限**额外提高 50%**」没写；③ 规则里的 `percent` 是字面量，没读当前行。
+#### 3.7p（引擎）`scale: "self_resource:<id>"`
+以**单位自己的计数器**为倍数（`party_resource:` 是队伍的 ✓ 两个不同问题 ✓；计数器不存在时**大声报错** ✓ 不是 0 ✗）。判据：`SelfResourceMagnitudeTest`（0.5 与 0.25 差两倍 ✓、计数器不存在时消息带名字 ✓）。
 
-**修法**：
-- `ult_state_and_max_hp` 的份额改成 **`percent_from_skill_param: ULTRA:2`**（Lv10 = 0.30、Lv12 = 0.33 ✓），并加 **`max_stacks: 2`**；
-- 新增 `eidolon_two_raises_max_hp_while_rain_clear`（`min_eidolon: 2`，`MODIFY_ATTR HEALTH percent 0.5` + `max_stacks: 2`）⇒ 两条 HEALTH% **相加**（0.33 + 0.50 = 0.83 ✓），固定项只在孪生规则加一次；
-- 新增 `eidolon_three_raises_the_ult`（`min_eidolon: 3`，`RAISE_SKILL_LEVEL ULTRA +2`、`COMMON +1`）⇒ 终结技到 Lv12 ✓。
+#### 3.7q ／ 3.7r 1409 忆灵技 1 整句闭合
+- 伤害那一半：`DAMAGE` ＋ `scale: self_resource:小伊卡累计治疗` ＋ `percent_from_cast_param: 0` ✓。
+- 「清空 **50%**（星魂 6 → **12%**）」：`REMOVE_RESOURCE` 收 `scale: self_resource:X` ＋ `percent` ✓（两条孪生规则用 `max_eidolon`/`min_eidolon` 分档 —— 见内容文件 ✓）。
+【已把守：`HyacineRaincloudsTest`（3 例：伤害 = 计量 × #1 × 天赋层数 ✓、扣完剩 50% ✓、星魂 6 扣完剩 **88%** 而不是 44% ✓）】
+⚠ 仍开：规则那一发的攻击者是**风堇**（`attacker: "summon"` 已能改 ✓ 见 3.7s）、数据侧仍残留 **1 点**地板（`skill_effects` 已声明 `Rules` ✓ 见 3.7v ③）。
+⚠ 3.7r 末尾的教训（**按行号手术 ⇒ 留下重复的 `on` 键 ⇒ Gson 取后者，行为对而文件错** ✓）并进 §6.6 ✓。
 
-**判据**：`HyacineRainClearMaxHpTest` —— E0：涨 `1086.624 × 0.30 + 600`；E6：涨 `1086.624 × (0.33 + 0.50) + 600`，且 `skillLevel(ULTRA)` = 12/10 ✓。`HyacineTest` 的规则计数同步为 5（ULT_CAST）/ 2（BATTLE_START）。
+#### 3.7s（引擎）`"attacker": "summon"`
+规则那笔伤害可以**算忆灵的** ✓（没有忆灵时**大声报错**并给 `self_summon_count >= 1` 的建议 ✓）。`EffectSpec.copy()` 必须同步带该字段 ✓（`RuleEffectAmendmentTest.theCopyCarriesEveryField` 是它的把守 ✓）。
 
-**仍登记**：① ~~固定项 600 字面量~~ **已落**（2026-10-18：引擎补了「份额 + 固定项」两条修饰，`amount_from_skill_param` 现在按**点数**加，Lv12 = 667.5 ✓）；② ~~忆灵技等级+1~~ **已落**（`memosprite: true` + `skill_id: 1`；1409 的忆灵技已在表上限 10，所以读数仍是 10，判据钉的是"改动落在召唤者的 bonus 上"）；③ 秘技【天气正好】**已落**（`technique_heals_and_raises_max_hp`：`BATTLE_START` + `self has_state 秘技`，`HEAL owner_max_hp 0.3+600` 与 `MODIFY_ATTR HEALTH 0.2` 两回合；判据 `HyacineTechniqueTest`）✓；④ 星魂5 **已落**（2026-10-18：`SKILL`/`TALENT` +2、忆灵槽 3/5/6 各 +1）；星魂 6 的**抗性穿透**已落（**§3.7l**）✓，它的**12% 阈值**那一半仍登记 ✓；星魂 4（暴伤按超速）**仍未写** ✗ —— 它改的是行迹【暴风停歇】，而那条行迹**本身也还没写** ✗（`self_attr_above:SPEED:200` + `max_points: 200` 两个词汇都在，缺的是先落行迹 ✓）；⑤ 星魂1/2（2026-10-18）：**+50% 实为星魂1**（原按星魂2 写，门从 2 改成 1）✓，并补「攻击后回 8% 生命上限」（`ALLY_ATTACK` + `HEAL owner_max_hp 0.08 target attacker`）✓；**星魂2 的速度修饰**已写（`HP_LOST` → `SPEED 30%` 2 回合）但 `takeDamage` 路径上**观测不到**（before==after），判据 `@Disabled` 登记待查；⑤ **4 件套 127 已经在 `relic_sets/127.json` 实现**（两条 `BASIC_ATTACK`/`SKILL_CAST` 规则，24%/24%/15%），不是缺口 —— 那一场它**没有生效**是因为 1415 没开大、德谬歌不在场（`self_summon_count >= 1` 不满足）✓；此前"未实现"的说法撤回。
+#### 3.7t 撤回：星魂 2 的速度**是可观测的**
+错的是那条判据（读错了单位 ＋ 绕过了事件，`CanHit.takeDamage` **不发** `HP_LOST` ✓）⇒ 规则**一个字没改** ✓。全库现在 **0 个 `@Disabled`** ✓。教训并进 §6.3·1（「观测不到」先怀疑观察方法 ✓）。
 
----
-### 3.7l 已落：1409 星魂6 的「小伊卡在场时，我方全体抗性穿透 +20%」（**2026-10-18**）
+#### 3.7u 仍开：`skill_segments.json`（全角色/忆灵的分段表，已勘未接入）
+仓库外 `E:\code\python\data\skill_segments.json` ✓（98 角色 ＋ 7 忆灵、311 phase、668 hit ✓）。可信度锚点已量：它把 1002 的两条手写值**逐位复现** ✓。接入规则：按 `slot_guess` 归位 ✓、只对 `hit_count > 1` 出行 ✓、**先验 `split_ratio_sum == 1.0`** ✓（和不为 1 要**拒绝**，不是归一化 ✗）。⚠ 一次失败的尝试（PowerShell 摊平数组 ⇒ 数字不可信 ✓）并进 §6.6。
 
-**为什么先落这一半**：星魂6 是两句话。后半「**小伊卡在场时**，我方全体目标的**全属性抗性穿透提高 20%**」用现成的 `DAMAGE_PENETRATION` + 现成的 `SUMMONED` 事件就能写完 ✓；前半「**清空累计治疗数值改为 12%**」改的是**忆灵技 1** 的结算（它的参数表 `[0.1…0.28, 0.5]` 里 `#2 = 0.5` 就是被改的那个 50% ✓），而那条忆灵技**本身还没有规则** ✗ ⇒ 无从改起 ✓（登记，不猜 ✓）。
+#### 3.7v 1409 其余三块的落点（已全部收口）
+① 忆灵技 2 的「生命值降低的那个我方目标」⇒ 选择器 `all_allies_lost_hp_this_action` ✓（照抄 `all_allies_lethally_hit_this_action` ✓）见 3.7z；② 忆灵技 4 的「消失时提前 30%」⇒ `SUMMON_LEFT` ✓ 见 3.7w/3.7y；③ 忆灵技 1 的 1 点地板 ⇒ `skill_effects` 声明 `Rules` ✓ 见 3.7q。
 
-**修法**（`characters/1409.json`，一条规则）：`eidolon_six_gives_the_party_all_type_resistance_penetration`
-- `on: SUMMONED` + `min_eidolon: 6`；
-- `when: ["actor == summon", "self_summon_count >= 1"]`；
-- `MODIFY_ATTR DAMAGE_PENETRATION percent 0.2 permanent buff「天空应我的祈愿」target all_allies`。
+#### 3.7w（引擎）`SUMMON_LEFT`
+「忆灵离场」这个事件 ✓（`CanHit.perish()` **不发** `DEATH` ✓ 那是被击杀 ✓）。在**清扫点**发、用**身份**去重（一次离场只发一次 ✓）。⚠ 门的写法是 **`actor is_summon`**，**不能** `target == summon` ✗（后者按 `isDeath()` 过滤，而这条事件的单位**正是刚死的那个** ⇒ 当场抛错 ✓）。【已把守：`HyacineMemospriteLeavesTest`】
 
-**三处口径（都是量过的，不是想当然）**：
-1. **门是事件，不是读盘事实** ✓ —— 写成 `BATTLE_START` 更省事，但那会在**第一回合**就给全队抗性穿透 ✗，而原文是「**小伊卡在场时**」✓ ⇒ 必须挂 `SUMMONED`（忆灵真的进入场地那一刻 ✓）。判据的第一句断言就是「召唤前读到 **0**」✓，它钉的正是这个门 ✓。
-2. **`actor == summon` 不能省** ✗ —— `SUMMONED` 对**两方**的召唤都发 ✓（敌人小怪登场也是 summon ✓），少了它，队友的忆灵登场也会给风堇的全队抗性穿透 ✗。
-3. **`all_allies` 取的是 `battle.allies` 阵营** ✓ —— 我方忆灵**也在里面** ✓，与「我方全体目标」含忆灵一致 ✓；判据同时读了主角、队友、**忆灵**三个单位 ✓。⚠ 顺带：「**全属性**抗性穿透」就是 `DAMAGE_PENETRATION` ✓ —— 它减的是**那一发已按元素取过**的抗性 ✓（`Battle` 抗性区），与 1303 阮•梅结界、1408、1412、1502 同一拼写 ✓；**不用** `RESISTANCE_REDUCTION` ✗（那是**受击方**的属性，这句的主语是**我方**）。
+#### 3.7x 订正：`advanceRequests` 是没人填的死通道（已删）
+「入口已经存在」这种判断**必须跟到调用点** ✓。同一形状出现两次 ⇒ 并进 §2.2（×2 → 后并入 6.2 的"半对结论"一条 ✓）。
 
-**判据**：`HyacineEidolonSixTest`（2 例）——
-- E6：召唤前 `0`（门）✓；施放战技召唤后，风堇 / 队友 / 小伊卡各 `0.2` ✓；
-- E0：同样召唤后仍是 `0` ✓（这条规则就是星魂 6 本身）。
+#### 3.7y 忆灵技 4 的「行动提前 30%」有了真判据
+读数早就有：`Queue.snapshot()` ＋ `Queue.getTimeRemaining(Signal)` ✓（"顺序变了"是弱断言 ✗）。判据比的是**剩余等待 × 0.7** ✓（精确等式，因为战斗时钟不动 ✓）。【已把守：`HyacineMemospriteLeavesTest` 第 2 例】
 
-**变异验证** ✓：把这条规则从 JSON 里摘掉 ⇒ `rankSixGives…` 在**第 50 行**（风堇那 0.2）红 ✓；恢复后 2 例全绿 ✓。
+#### 3.7z 忆灵技 2 第一从句（掉血治疗）
+选择器 `all_allies_lost_hp_this_action` ✓ 落在 `HP_LOST` **之前**填 ✓（规则要**当场**读到它 ✓）。⚠ 当场撤回一次"付两次"的结论 ✓：那是**我的算术**错了（`Damage` 会过防御与抗性，20% 生命上限 ≠ 实际掉血量 ✓）⇒ 正确量法是**两场只差一个变量**、用差值读 ✓。【已把守：`HyacineIkachisCharityTest`】
 
-**仍登记**：① 忆灵**离场后**这条光环不会自己撤下 ✗ —— 引擎没有「召唤物离场」事件，也没有按召唤物存续计时的 `ticks_on: "summon"`（与 1407 同一个缺口 ✓）；同理，**之后才登场的**别的忆灵不会补拿到它 ✓（形状是「每个单位身上一个修饰」，不是真光环 ✓）；② 星魂6 前半（12% 阈值）见上；③ **星魂 4 已落** ✓ —— 但它强化的是行迹【暴风停歇】，所以先落了行迹（**§3.7m**）✓；
+#### 3.7za 忆灵技 2 其余两个从句 —— 剩**一个词**
+②「额外回合 ＋ 自动施放忆灵技 1」**已落** ✓：`INSERT_ACTION` ＋ `CAST_SKILL skill_id: 1`（`skill_id` 是数据槽 ✓ 校验器允许「`skill` 或 `skill_id` 二选一」✓）；⚠ 不能拆成两半（没有自动施放，额外回合就是个空转的回合 ✗）。
+③「施放后使自身所有持续效果 −1」**仍开** ✗：`EXTEND_BUFF` 收负数与 `kind: all` 都支持 ✓、规则装载得过 ✓，但**判据立不起来**（给忆灵挂 3 回合状态、放一次技能后就找不到了 ✓）⇒ 一次行动里扣了 **2**，来源不在一处（不是 `tickBuff` 双扣 ✗）⇒ **下一步是一枚探针**：数一次忆灵行动里 `beforeMove` / `afterMove` 各跑几次 ✓。⇒ 规则与判据**一起撤下** ✓。
 
----
+#### 3.7zb 整场重放（把捕获的每次施放喂给 `Battle`）
+`gradlew run --args="replay scenarios/veritas-085418.replay.json"`（`--detail` / `--strict` ✓），代码 `compare/BattleReplay` ✓。三件事原本就够：**施放→槽位**只能人工表（捕获只给 `attack_type` ✓，且表不许自由漂 ✓）、**敌人属性**用捕获自己的数字 ✓、**脚本驱动**早就有（`Battle.castImmediate` ✓ —— 缺的从来不是"能施放" ✗ 是"这是哪一招" ✓）。
+⭐ 它开箱抓到一个真 bug：`actor is_summon` 会把**别人的**忆灵也算进来 ⇒ 六条门改成 `actor == summon` ✓【已把守：`HyacineOwnMemospriteOnlyTest`（4 例）】
+**仍开（对账差异，逐条登记）**：窗口前缀（捕获是一段已经在打的战斗 ✓）· 忆灵的「%生命上限」读主人还是自己（这份捕获**分不开** ✓）· `11512` 槽 1 的倍率在参数 **#2**（引擎读 #1 = 0 ✓）· 忆灵技的行号（捕获像 Lv8/Lv6，规格写 10 ✓）· `skills.json` 缺「长夜」的强化普攻（槽 8/11 ✓）· 敌人没有韧性条（不加那 10% 减伤 ✓）。
 
-### 3.7m 已落：1409 行迹【暴风停歇】+ 星魂4（速度 200 的三条从句）（**2026-10-18**）
+#### 3.7zc 1413 忆灵技 1 的「施放后获得 #4 点【亿质】」
+`CAST_SETUP` ＋ `actor == summon` ＋ `from_skill_id == 1` → `GAIN_RESOURCE 亿质 amount_from_cast_param: 3` ✓（点数**读这一发自己的行** ✓）。⚠ 资源名是数据里的「**亿质**」不是「忆质」✗（写错只会得到一个恒 0 的计数器 ✓）。【已把守：`EvernightMemoryGainTest`（他人的忆灵施放一点不给 ✓）】
+⚠ 仍开：「每有 #3 点【亿质】额外造成 #2%」游戏是**并进那六发**的 `DamagePercentage` ✓（同 3.7h）。
 
-**为什么先落行迹**：星魂4 的原话是「行迹【暴风停歇】**获得强化**」⇒ 行迹没写，星魂就无处可强化 ✗。而行迹是**常驻**条款（不是星魂），它一句话里其实有**三条**从句：生命上限 **+20%**、治疗量**每点超速 +1%**（「最多计入 200 点」）、以及星魂4 在此之上再给的暴伤**每点 +2%**。
-
-**落地（5 条规则）**：
-
-| 规则 | 事件 / 门 | 动作 |
-|---|---|---|
-| `trace_windstorm_raises_her_max_hp_above_200_speed` | `BATTLE_START` + `self_attr:SPEED > 200` | `HEALTH` `percent 0.2` `permanent` `coexist` |
-| `trace_windstorm_raises_her_healing_per_point_of_speed` | `BATTLE_START` | `OUTGOING_HEALING_BOOST` `percent 0.01` × `self_attr_above:SPEED:200`，`max_points: 200` |
-| `trace_windstorm_raises_ikachis_healing_too` | `SUMMONED` + `actor == summon` | 同上，`target: summon` |
-| `eidolon_four_adds_crit_damage_per_point_of_speed` | `BATTLE_START` + `min_eidolon: 4` | `CRIT_ATTACK` `percent 0.02` × 同上，`max_points: 200` |
-| `eidolon_four_adds_ikachis_crit_damage_too` | `SUMMONED` + `min_eidolon: 4` | 同上，`target: summon` |
-
-**三处判定（都量过）**：
-1. **门是严格大于** ✓：文档写「**大于** 200」⇒ `self_attr:SPEED > 200`（`>` 是既有运算符 ✓），**不用** `>=` ✗ —— 200 整点必须给 0 ✓，判据第一例就是它 ✓。
-2. **小伊卡的生命上限不另写一条** ✓：忆灵面板是「召唤者**已解析**面板 × 50%」（`SummonFactory` 读 `master.getAttribute(HEALTH)` ✓）⇒ 她那 20% **已经继承过去** ✓，再写一条就是**双重计算** ✗。判据同时钉「她 +20%」与「小伊卡 = 她的 50%」✓ —— 这正是「继承 vs 重复」的判据形状 ✓。
-3. **`coexist` 不是照抄，是量出来的** ✓：同主人同属性的两条 `HEALTH` 会互相驱逐（`isSameKind` 的身份 = (属性, modifierType, sourceRole)，**名字不参与** ✓）。**实测两例**：㈠ 去掉 `coexist` ⇒ **秘技**那条 +20% 被本条顶掉 ✓（`theTraceStacksWithTheTechniquesOwnMaxHpRaise` **红** ✓），带上则 `0.20 + 0.20` **相加** ✓；㈡ **终结技**那条**不受影响** ✓（它自带 `max_stacks: 2`，走叠加 ✓ —— 去掉 `coexist` 时那条判据**仍然绿** ✓）。⇒ 这个字段守的是**秘技**那一对，不是终结技 ✓。
-
-**判据**：`HyacineWindstormTraceTest`（6 例）—— 200 整点给 **0** / 250 给 **+20%**；治疗份额 **0 / 0.5 / 2.0 / 2.0**（400 与 500 读数**相同** ⇒ 封顶落在**点数**上 ✓）；小伊卡 = 她的 **50%** 且治疗份额也落在它身上；星魂4 的暴伤 Δ = **1.0**（250）与 **4.0**（500）、E0 时 **0**；终结技的 `30% + 600` 与这条**相加**；秘技的 +20% 与这条**相加**。`HyacineTest` 的规则计数同步为 **BATTLE_START 7 / SUMMONED 3** ✓。
-
-**仍登记**：① 这 5 条都在**读盘那一刻**（`BATTLE_START` / 召唤时）求值**一次** ✗ —— 引擎没有「速度变了」这个事件，所以**战斗中途**才越过 200 速度不会把它们打开 ✓（与 1503 的 `self_attr:DEFENCE >= 2400` 同形 ✓，同一处缺口）；② 忆灵的**治疗**那一半仍**不可观测** ✓（小伊卡的治疗还不是规则驱动的，判据只钉「修饰落在了忆灵身上」✓）；③ 星魂4 的**上限**（`max_points: 200`）是**解释** ✓：E4 自己**没写上限** ✗，沿用的是行迹的「最多计入 200 点超出的速度」✓（登记：若日后有反证，要改的就是这一个字段 ✓）。
-
----
-
-### 3.7n 已落：1409 忆灵技3【展翼，奔向日辉】（召唤回能）（**2026-10-18**）
-
-**为什么先落这一条**：忆灵 4 个数据技能一直是「数据有、规则侧没写」。这一条最干净 —— 它不碰伤害、不碰治疗，只买两个能量数，但它把「忆灵进场」这条通道走通了 ✓（与星魂6 光环、行迹的治疗份额共用 `SUMMONED` ✓）。
-
-**落地（2 条规则，都在 `SUMMONED`）**：
-- `memosprite_soaring_gives_her_energy_when_it_arrives` → `GAIN_ENERGY 15`（**每次**忆灵进场 ✓）；
-- `memosprite_soaring_gives_thirty_more_on_its_first_arrival` → `GAIN_ENERGY 30` + **`once_per_battle: true`**（**首次** ✓）。
-
-**两处判定**：
-1. **「首次」= `once_per_battle`** ✓，**不是** `cooldown` ✗ —— 这句话讲的是**整场战斗**，不是回合 ✓；`8006` 星魂1「**首次**施放战技」用的就是它 ✓（它的注记原话：『「首次」is `once_per_battle: true`, which is exactly "the first one, once"』✓）。
-2. **必须是两条规则** ✓：给 `amount` 加一个「第一次才加」的开关**不存在** ✗ ⇒ 拆成「每次」+「只一次」两条，各自对应原文的**一小句** ✓（与 §3.7j 里「战技/终结技 ⇒ 两条规则」同一手法 ✓）。
-
-**判据**：`HyacineMemospriteSummonEnergyTest`（2 例）—— 首次进场 **+45**（15 + 30）✓；忆灵 `perish()` 后**再次召唤只 +15** ✓（`perish()` 是引擎的「它走了、没人杀它」✓，正是忆灵自行退场的形状 ✓，且它**不发** `DEATH` 结算 ✓）。**变异验证** ✓：去掉 `once_per_battle` ⇒ 第二条红（第二次给 45）✓。`HyacineTest` 的 `SUMMONED` 计数 **3 → 5** ✓。
-
-**仍登记（忆灵另外三个数据技能）**：① **忆灵技1**【乌云乌云快走开！】—— 「造成等同于**累计治疗数值 20%**（Lv10 = 28%）的伤害并**清空累计治疗 50%**」（星魂6 把 50% 改成 **12%** ✓）：缺的是「本场战斗累计治疗」这个**计量** ✓（今天 `小伊卡累计治疗` 只是 1415 昔涟那条加成的捕获点 ✓，不是总治疗 ✓）+ 「按资源出伤害」的写法 ✓；② **忆灵技2**【牵起晴空的手】—— 掉血触发的小治疗（`#1` 自耗 4% + `#2/#3` 治疗）、【雨过天晴】下的额外回合、施放后自身持续效果 -1 ✓（**四个从句，且要「任意目标回合开始时或行动后」这个时机** ✓）；③ **忆灵技4**【坠落，然后飞翔】—— 「消失时使风堇行动提前 30%」✗：缺「忆灵离场」事件 ✓（与星魂6 光环撤下是**同一个缺口** ✓）。
-
-### 3.7o 已落：1409「本场战斗累计治疗」的**计量**（忆灵技1 的被乘数）（**2026-10-18**）
-
-**为什么单独落这一半**：忆灵技1 是「造成等同于**本场战斗风堇与小伊卡累计治疗数值** #1% 的风属性伤害并**清空 50%**」。那个计数**此前只被 1415 昔涟那条「额外提高」写过** ✓（`sky_ode_adds_a_share_of_each_heal_to_ikachis_total`）—— 也就是说读它会读到**一份加成**，而不是**总和** ✗，这正是「有字段、但语义不是那个字段」的典型 ✓。
-
-**落地（2 条规则，都在 `HEALED`）**：
-- `tally_counts_hyacines_own_healing`：`when: ["actor == self"]`；
-- `tally_counts_ikachis_healing_too`：`when: ["actor == summon"]`；
-- 两条都 `GAIN_RESOURCE 小伊卡累计治疗 amountFromEvent: true target self`。
-
-**两处口径**：
-1. **两条规则而不是一条** ✓：条件是 **AND** 的，而原文是「风堇**或**小伊卡」✓ ⇒ 一个门写不了两句话 ✓（与 §3.7n 的 15/30 同一手法 ✓）。`HEALED` 的 `actor` 就是**治疗者** ✓，所以两个门正好各管一方 ✓。
-2. **与 1415 那条不重复** ✓：那条记的是「**额外**提高」的那一份 ✓ ⇒ 两者相加才是「计入忆灵技1 的治疗数值」✓。
-
-**判据**：`HyacineHealingTallyTest`（3 例）—— 计量 = **实际回复量** ✓；两次治疗**累加** ✓；**别人**治疗**不进账** ✓。`HyacineTest` 新增 `HEALED` 计数 **4** ✓。
-
-**⚠ 精度（实测，已登记）**：`Resource` 是**整数**计数器 ⇒ 计量只留整点生命 ✓（实测治了 `255.6229…`、读到 `256` ✓），误差 < 1 点治疗 ⇒ 落到忆灵技1 的伤害上 **< 0.28** 点 ✓。需要逐位对齐时改成**千分之一**存储 ✓（1415 的 `天空之诗的治疗份额` 用 `percent: 10000` 就是同一手法 ✓）。
-
-**仍登记（忆灵技1 的后半句）**：① **按资源出伤害** ✗ —— `DAMAGE` 的 `scale` 词汇表**不收**单位资源 ✓（`scaleAttribute` 只认 `self_attr:` 与几个特例；`resolveScale` 里有 `party_resource:` 但**没有** `self_resource:`）⇒ 这一步要**动引擎** ✓（加一个分支 + 判据 ✓）；② **清空 50%**（星魂6 → **12%**）✗ —— 需要一个「按**份额**扣减资源」的写法 ✓（`SPEND_RESOURCE` / `REMOVE_RESOURCE` 今天只收**点数** ✓，而 `max_eidolon: 5` / `min_eidolon: 6` 正好能表达两条孪生规则 ✓，缺的只是份额写法 ✓）。
-
-### 3.7p 已落（**引擎**）：`scale: "self_resource:<id>"` —— 以「单位自己的计数器」为倍数（**2026-10-18**）
-
-**缺的是什么**：计数器今天已经能被 `GAIN_RESOURCE` 加、被 `SPEND_RESOURCE` 扣、被**条件**读（`self_resource:X >= 1`），而**战斗级**的计数器早就能当倍数（`party_resource:X`）✓ —— 唯独「**这个单位自己的**计数器 × 比例」**没有拼法** ✗。读者是 1409 忆灵技1：「造成等同于**本场战斗风堇与小伊卡累计治疗数值** `#1%` 的风属性伤害并清空累计治疗数值的 **50%**」。
-
-**改动（4 个读点 + 1 个校验点）**：
-| 位置 | 改动 |
-|---|---|
-| `TriggerInterpreter.SELF_RESOURCE_PREFIX` | 新常量 `"self_resource:"`（附带读者与「不是 `AttributeType`」的理由） |
-| `TriggerMagnitudes.literalBase` | **DAMAGE** 家族：`selfResourceOf(...) × share + flat` |
-| `TriggerMagnitudes.derivedMagnitude` | `MODIFY_ATTR` 家族：转给 `resolveScale`（与 `party_resource:` 同一路由，避免两份算术漂移） |
-| `TriggerMagnitudes.resolveScale` | `percent × 计数器值`（`MODIFY_ATTR` / 天花板 / `REMOVE_RESOURCE` 等共用） |
-| `TriggerMagnitudes.scaleAttribute` | 前缀加入「不映射成属性」的早退名单 |
-| `TriggerValidator` | 比例白名单豁免该前缀（与 `party_resource:` 并列） |
-
-**两处口径**：
-1. **读的是「规则持有人的」计数器** ✓ —— 与 `self_attr:` / `self_attr_above:` 同一个主语 ✓；`party_resource:` 则住在 `Battle` 上（全队共享）✓，两者是**不同的问题** ✓。
-2. **没有这个计数器 ⇒ 大声报错** ✓，不是 0 ✗ —— 「28% 的计量」在缺计数器时会变成「造成 0 伤害」，而那是一个**没有症状的错数** ✓（`party_resource:` 那条当初就是为此写的 ✓）。
-
-**判据**：`SelfResourceMagnitudeTest`（3 例，引擎级）—— 同一个计数器上 `0.5` 与 `0.25` 的伤害**差正好两倍** ✓；计数器**本身**翻倍伤害也翻倍 ✓；计数器**不存在**时抛错且**消息里带计数器名** ✓。
-
-**下一步（数据侧，已就绪）**：忆灵技1 还剩两半 —— ① 那份「计算量 × `#1`」的伤害（`DAMAGE` / `DELEGATE_DAMAGE` 配 `scale: "self_resource:小伊卡累计治疗"` ✓，**注意**：忆灵技1 的数据行会让小伊卡按 `%ATK` 出一发，而它 **ATK 恒为 0**（实测 `ikaAtk=0.0`、那一发只结算 **1** 点），所以要么把它换掉、要么登记这 1 点 ✓）；② 「清空 **50%**」（星魂6 → **12%**）—— `REMOVE_RESOURCE` + `percent: 0.5` + 同一个 `scale` ✓，两条孪生规则用 `max_eidolon: 5` / `min_eidolon: 6` ✓。
-
-### 3.7q 已落：1409 忆灵技1 的**伤害**那一半（累计治疗 × #1%）（**2026-10-18**）
-
-**落地（1 条规则）**：`memosprite_rainclouds_deals_a_share_of_the_tally`
-- `on: CAST_SETUP` + `when: ["actor is_summon", "from_skill_id == 1"]`；
-- `DAMAGE` + **`scale: "self_resource:小伊卡累计治疗"`**（§3.7p 新词汇 ✓）+ **`percent_from_cast_param: 0`**（读**这一发施放自己的行** ⇒ Lv10 的 `0.28` ✓）+ `element: Wind` + `all_enemies`。
-
-**判据**：`HyacineRaincloudsTest` —— 治疗一次把计量记上，再放忆灵技1，伤害 = `计量 × 0.28 + 1`（那 **1** 点是数据侧的残渣，见下 ✓）。
-
-**三处登记**（都测到了，不猜）：
-1. **「清空 50%（星魂6 → 12%）」还没写** ✗ —— `REMOVE_RESOURCE` **拒绝** `scale` + `percent`（装载期原话：「requires \"amount\" -- a literal, or one of `amount_from_attr` / `amount_from_resource` / …」）⇒ “计数器的一半”**没有拼法** ✓（下一步：给它开 `scale: self_resource:X` + `percent` 那条口子，与 §3.7p 同一个词汇 ✓）。两条孪生规则本来已写好（`max_eidolon: 5` / `min_eidolon: 6`），**因装载失败已撤下** ✓，不是“写完了只是没生效” ✗。
-2. **规则那一发的归属** ✓：`DAMAGE` 实例的攻击者是**规则持有人（风堇）**，不是忆灵 ⇒ **小伊卡自己的天赋增伤（+80%/层）不作用在这一发上** ✗（实测：`HyacineTalentTest` 原先读 `settled.get(0)` 变成 0.0，因为它读到的是规则那一发；改为读**最后一个**实例后恢复 0.8/1.6/2.4 ✓）。⚠ 要修就得让 DAMAGE 能“**以忆灵的身份**结算”，今天没有这个字段 ✓（`DELEGATE_DAMAGE` 只认**规则持有人自己的**施放 ✗，忆灵技的施放者不是她 ✓）。
-3. **数据侧的 1 点残渣** ✗：忆灵技1 自己的数据行还会结算一发 `%ATK`，而小伊卡的 **ATK 恒为 0** ✓（实测 `ikaAtk = 0.0`）⇒ 只留引擎的**最小 1 点** ✓ ⇒ 总伤害 = `计量 × #1 + 1` ✓（判据按 `+1` 钉 ✓，未消除 ✓）。
-
-### 3.7r 已落：`REMOVE_RESOURCE` 收「计数器的**份额**」⇒ 忆灵技1 整句闭合（**2026-10-18**）
-
-**做了什么**：`REMOVE_RESOURCE` 原先只收 `amount`（字面量或 `amount_from_*`）✗，而忆灵技1 说的是「清空累计治疗数值的 **50%**」（星魂6 → **12%**）—— 「计数器的一半」**没有拼法** ✓。本轮给它开了与 §3.7p **同一个**词汇：
-- `TriggerInterpreter.percentOfOwnCounter`：`scale: "self_resource:<id>"` + `percent` ⇒ `round(计数器 × 份额)`；
-- `TriggerValidator`：`REMOVE_RESOURCE` 带该前缀时要求 `percent`（其余拼法照旧要求 `amount` ✓，只对这个前缀开口子 ✓）；
-- `removeResource` 先用它、没有该拼法再走原来的 `scaledAmount` ✓。
-
-**内容**：两条孪生规则 —— `memosprite_rainclouds_clears_half_the_tally`（`max_eidolon: 5`，`percent: 0.5`）与 `eidolon_six_clears_twelve_percent_instead`（`min_eidolon: 6`，`percent: 0.12`）；**排在伤害那条之后** ✓（伤害读扣之前的计量 ✓）。
-
-**判据**：`HyacineRaincloudsTest` 现在是 **3 例** —— 伤害 = `计量 × 0.28 + 1`；扣完剩 `计量 × 0.5`；星魂6 扣完剩 `计量 × 0.88` ✓（**不是**先 50% 再 12% 的 44% ✓）。
-
-**⚠ 同时修掉一处自己的错**：上一批（`59dd5aa1`）用按行删除的方式挪规则时，给 `trace_windstorm_raises_her_max_hp_above_200_speed` 留下了**重复的 `"on"` 键**（`CAST_SETUP` 与 `BATTLE_START` 各一个）✓ —— Gson **取后者**，所以行为是对的、四条闸门也全绿 ✓，但文件本身是错的 ✗（读文件的人会看到两个事件）。本轮已删掉那一行 ✓。教训：**按行号手术要回过头读一遍结果**，闸门绿不等于文件对 ✓。
-
-### 3.7s 已落（**引擎**）：`"attacker": "summon"` —— 让规则那笔伤害**算忆灵的**（**2026-10-18**）
-
-**缺的是什么**：规则里的 `DAMAGE` 永远由**规则持有人**结算（`TriggerInterpreter`：`CanHit attacker = ctx.owner();`）✗。而忆灵技1 的句子是「**小伊卡**对敌方全体造成…」✓ ⇒ 一切「这笔伤害算谁的」都读到错的那个单位：**小伊卡自己的天赋 +80%/层**（§3.7o 之前的 §3.7q 里登记过）压不上去 ✓。
-
-**改动**：`EffectSpec` 加一个字段 `attacker`（唯一合法值 `"summon"` = 持有人的忆灵）；`TriggerInterpreter` 在取 `attacker` 处解析它（**没有忆灵 ⇒ 大声报错并给出 `self_summon_count >= 1` 的建议** ✓）；`EffectSpec.copy()` 同步带该字段 ✓（漏了它时 `RuleEffectAmendmentTest.theCopyCarriesEveryField` 立刻红 ✓ —— 这正是那条判据存在的理由 ✓）。**内容**：忆灵技1 那条 `DAMAGE` 加上 `"attacker": "summon"` ✓。
-
-**判据（实测三位数）**：`HyacineRaincloudsTest` 的期望从 `tally × 0.28 + 1` 变成 **`tally × 0.28 × 1.8 + 1`** ✓ —— 计量 `256` 时伤害 = `129.024 + 1 = 130.024` ✓：**规则那一发吃到了天赋第 1 层的 +80%** ✓，而数据侧那 1 点**仍然不变** ✓（`0 × 1.8 = 0`，`1` 是**夹取后**的下限 ⇒ 见下）。
-
-**仍登记**：① 数据侧那 1 点是**夹取之后**的地板 ⇒ 任何增伤都动不了它 ✓（若要消掉，得让忆灵技1 的数据行不出伤害，那是数据侧的事 ✗）；② `attacker` 只认 `"summon"` ✓（第二份文档需要别的归属时再扩 ✓，现在写别的值会被拒 ✓）。
-
-### 3.7t 撤回：星魂2 的速度**是可观测的** —— 错的是那条判据（**2026-10-18**）
-
-**旧记录（已撤回）**：「星魂2 的 `SPEED` 修饰在 `takeDamage` 的 `HP_LOST` 路径上**观测不到**（before==after）」并用 `@Disabled` 挂了 3 个月。**这条结论是错的** ✗ —— 判据本身有**两处**错：
-
-1. **读错了单位** ✓：规则的 `target` 是 `target` = **掉血的那位** ✓，而旧判据读的是**风堇**的速度 ✗；
-2. **绕过了事件** ✓：旧判据用 `ally.takeDamage(...)` ✗ —— `CanHit.takeDamage` 自己的 javadoc 就写着「**不发** `HpLoss` / `Kill`，那些由 `Battle.applyDamage` 发」✓ ⇒ `HP_LOST` 从来没被广播过 ✓。
-
-**修法**：判据改成 `battle.applyDamage(ally, new Damage(enemy, ally, PHYSICAL, NORMAL, maxHp × 0.1))` ✓，断言**队友**的速度涨了 `base × 0.3` ✓。**规则一个字没改** ✓ —— 它一直是合格的 ✓。
-
-**教训（与 §3.7f 同一形状）**：**「观测不到」先怀疑观察方法** ✓ —— 那条判据错了两次，而登记替它背了三个月的锅 ✗。⇒ 全库现在 **0 个 `@Disabled`** ✓。
-
-### 3.7u 新数据：`skill_segments.json`（**全角色 / 忆灵的技能分段表**）（2026-10-18，**已勘，尚未接入**）
-
-- **位置**：`E:\code\python\data\skill_segments.json` —— **仓库外** ✓（生成时间见它自己的 `_meta.generated` ✓）。
-- **覆盖**：`_meta` 自报 **98 个角色 + 7 个忆灵、311 个 phase、668 个 hit** ✓，`skipped: []` ✓。
-- **形状**：顶层是 `cid → {id, name, element, mt, ability_file, hit_count, skills, groups, modifier_damage}` ✓；**忆灵在同文件的 `_servants` 下**，同形 ✓。`skills` 的键是**能力脚本里的 phase 名**（如 `Avatar_Mar_7th_00_Skill01_Phase02` ✓），每个 phase 带 `slot_guess`（1/2/3… ✓）、`attack_type` / `effect` / `label`、`hit_count` / `hit_count_by_target` / `executions`、**`split_ratio_sum`（自检用 ✓）**、以及 `segments[]` —— 每段有 `split_ratio`、`hit_split_ratio`、`split_source`（缺省 `ImplicitFull` ✓）、`formula`（如 `P#1` ✓）、`damage_type`、`target_kind`、`order`、`multiplier_lv1` ✓。
-- **它喂的是谁**：`game/data/skill_effects.json` 的 `segments` ✓ —— 今天那里只有 **3 条手写的**（1002 槽1 `[0.45,0.55]`、1002 槽2 `[0.3,0.15,0.15,0.4]`、11413 槽1 `[0.1,0.1,0.1,0.1,0.1,0.5]` ✓），而这份新数据一次给出 **668 个 hit** ✓。
-- ⭐ **可信度锚点（本轮已量）**：新数据把 1002 的两条手写值**逐位复现** —— `Skill01_Phase02` → `0.45, 0.55`（2 段）、`Skill02_Phase02` → `0.3, 0.15, 0.15, 0.4`（4 段），两条的 `split_ratio_sum` 都是 **1.0** ✓ ⇒ 提取口径与当初手推的一致 ✓（这正是接入**之前**该做的那次对账 ✓）。
-- **提取规则（下一轮的生成器照这个写）**：按 `slot_guess` 归到引擎槽位 ✓；只对 `hit_count > 1` 的 phase 出 `segments` ✓；**先验 `split_ratio_sum == 1.0`** ✓ —— 引擎把这张表当「同一发技能倍率内的份额」✓，**和不为 1 时必须拒绝**（不是归一化 ✗，那会把一个错数变成另一个错数 ✓）；`split_ratio` 缺时取 `hit_split_ratio`，两者都缺 ⇒ `ImplicitFull` = 1.0 ✓。
-- ⚠ **本轮一次失败的尝试（记下来，别重复）**：我试着用 PowerShell 就地做「全表提取 + 与 `skill_effects.json` 对账」，得到「多段槽位只有 3 个、其中 1 个 `sum=4`、1 个槽位多 phase」这类数字 —— **这些数字不可信** ✗：脚本把「数组套数组」写成了 `@(@('_chars', $coll), …)`，而 PowerShell 会把内层集合**摊平** ✓，于是 `$scope[1]` 只枚举到一部分角色 ✓（1002 的两条明明存在却没进结果 ✓，这一点直接违反了我手上刚验证过的逐位复现 ✓）。⇒ **提取器要写在 Python 侧**（那份数据本来就在 `E:\code\python\` 的工具链里 ✓），写完先拿 1002 的两条做回归断言 ✓，**再**谈规模统计 ✓。事后我仍按纪律留了这段：**一次自相矛盾的结果应当作废，而不是换个口径解释它** ✓。
-- ⚠ **三处要小心**：① **同一槽位可能有多个 phase**（`Phase01/02/03`）—— 可能是**同一次施放的连续段**、也可能是**不同分支** ✓，数据里 `alternatives` / `branch_groups` / `default_fallback` 就是为这个留的 ✓（别把分支当成段 ✗，那会凭空多出伤害）；② `skill_effects.json` 是**进仓库的策展文件** ✓，而 `game/data/` 其它表是 **gitignore 的生成物** ✓ ⇒ 生成器输出放数据目录、**策展结果**才写进 `skill_effects.json` ✓；③ 忆灵在 `_servants` 下，键是 **ServantID**（`11402` ✓），与引擎 `skillAt(slot)` 的寻址一致 ✓。
-
-### 3.7y 已落：忆灵技4 的「行动提前 30%」**有了真判据**（**2026-10-18**）
-
-**做法**：不动引擎 ✓ —— 读数本来就在：`Queue.snapshot()` 返回**按行动顺序**排好的 `Signal` 列表 ✓（它的 javadoc 明写排序规则与 `Signal.compareTo` 相同 ✓，所以"显示顺序 ≠ 实际顺序"这个老坑不会再回来 ✓），`Queue.getTimeRemaining(Signal)` 给出该信号**剩余等待** ✓。判据取风堇那个 `Signal`，比较忆灵 `perish()` 前后的剩余等待：**后 = 前 × 0.7** ✓（「提前 30%」是**剩余**的份额 ✓，而 `advanceActionByPercent` 的源码就是这么算的 ✓）。
-
-**判据**：`HyacineMemospriteLeavesTest` 第 2 例 `herActionIsAdvancedByThirtyPercentWhenIkachiGoesAway` ✓ —— 战斗时钟本身不动 ✓（`elapsed` 不变，只是那个信号的 `nextActionTime` 被拉近 ✓），所以这个等式是**精确**的 ✓，不是近似 ✓。
-
-**教训（这一轮第三次同形）**：我连着说"缺一个读数""缺一个入口""观测不到"，三次里有两次其实是**我没找到**而不是**它不存在** ✗ —— `advanceRequests` 那次是**真死**（已删 ✓），`getTimeRemaining` 这次是**我漏了** ✗。⇒ 「缺 X」这句结论必须附**搜索证据**（找过哪些名字、在哪个文件里）✓，否则它只是"我没看见" ✓。
-
-### 3.7za 忆灵技2 其余两个从句：**缺口精确到两个词**（2026-10-18）
-
-**②「【雨过天晴】下，小伊卡在风堇施放技能后立即获得 1 个额外回合并自动施放【乌云乌云快走开！】」**
-- 「额外回合」有 ✓：`EXTRA_TURN` op 存在 ✓（`TriggerOperator` 里 ✓）；
-- 「**自动施放忆灵技1**」**写不出来** ✗：`CAST_SKILL` 的 `skill` 只接受 **`SkillType` 槽名** ✓（`TriggerValidator` 原文：「requires skill, a SkillType slot name」✓），而忆灵技是按**数据槽**（`11409` 的槽位 1）寻址的 ✓ ⇒ **没有拼法** ✗。要开就得让 `CAST_SKILL` 接受「忆灵的某数据槽」（例如给 `CAST_SKILL` 一个 `memosprite` + `skill_id` 的孪生写法，与 `RAISE_SKILL_LEVEL` 已有的那两个字段同形 ✓ —— 那一对就是先例 ✓）。
-
-**③「小伊卡施放技能后使自身所有持续效果持续回合数减 1」**
-- `EXTEND_BUFF` 存在 ✓（阮•梅星魂6 用它 +1 ✓），但**负数**这一半没验过 ✗：是否接受 `turns: -1`、以及「**所有**持续效果」（不点名 `buff` 也不点名 `attribute`）是否有写法 ✗ ⇒ **未量，不下结论** ✓。
-
-**⚠ 同日试过的第三次尝试（已回滚，记下来免得重跑）**：③「施放后使自身所有持续效果减 1」—— `extendBuff` 的 `kind: "all"` 与 `requireSignedTurns`（**带符号**）都支持 ✓，规则写出来也装载得过 ✓（`SUMMON_ATTACK` + `actor is_summon` + `EXTEND_BUFF kind all turns -1 target summon` ✓）；但**判据立不起来** ✗：给忆灵挂一个 3 回合的状态、放一次忆灵技1，之后它在 `BuffManager.activeBuffs()` 里**找不到** ✓（实测 `the state must still be there` 红 ✓）⇒ 要么 `-1` 走了两遍、要么**忆灵自己的回合把它 tick 掉了** ✓，二选一还没分清 ✓。⇒ 规则与判据**一起撤下** ✓（`remainingTurns()` 那个读数也一起撤 ✓，不留没有读者的 getter ✓）。**已定位到一半（2026-10-18）**：**不是** `tickBuff` 双重递减 ✗ —— 每个 buff 只在自己那一遍被 tick ✓（`tickBuff` 里的 `isEarlyBuff != early` 就是这条 ✓，`beforeMove` 早、`afterMove` 晚各一遍 ✓），而 `Battle.beforeMove` / `Battle.afterMove` 各**只调一次** ✓（`Battle:1784` / `:2024`，且 `:1843` 的注记明写“Doing both here would burn two turns per settlement” ✓）⇒ 一次行动扣 **2** 只可能来自**两个回合边界** ✓（忆灵那一回合 + 别的），**不是**一处算了两遍 ✓。⚠ **下一步是一枚探针**：数一次忆灵行动里 `beforeMove` / `afterMove` 各跑了几次 ✓，再决定改哪里 ✓ —— 在 `tickBuff` 上动刀会连带影响全部带计时的效果 ✓。⇒ 忆灵技2 的「施放后 −1」**就是**这次 tick ✓，**不写规则** ✓（写了会扣三次 ✗）。`
-**②-b 当日勘明的两件事（2026-10-18）**：㈠「获得 1 个额外回合」**不能用 `EXTRA_TURN`** ✗ —— 它对不在行动序列里的单位**直接抛错** ✓（`grantExtraTurn` 返回 false 时就是那句 “not in the action order (a memosprite at Speed 0 is skipped)” ✓），而小伊卡正是 **Speed 0、不进序列** ✓ ⇒ 该用 **`INSERT_ACTION`** ✓（同一文件的注记写着「NOT `EXTRA_TURN`：…a memosprite at Speed 0 is not in it at all」✓）；㈡「自动施放忆灵技１」**两种施放 op 都寻址不到** ✗：`CAST_SKILL` 只认 `SkillType` 槽名 ✓、`COMMAND_SUMMON` 也只要 `skill`（`SkillType`）✓，而小伊卡的技能在**数据槽**里 ✓（实测：它的 `getSkills()` 是**空的** ✓，只能用 `skillAt(1)` ✓）⇒ 要么给这两个 op 加 `memosprite: true` + `skill_id`（与 `RAISE_SKILL_LEVEL` 已有的同形 ✓），要么新开一个 op ✓。
-**②-c 同日试过的 `INSERT_ACTION`（已回滚）**：规则写成 `SKILL_CAST` + `actor == self` + `self has_state 雨过天晴` + `self_summon_count >= 1` → `INSERT_ACTION target: summon` ✓，装载与触发都没报错 ✓，但**判据立不住** ✗：插进去之后它**当场就把那一回合用掉** ✓ ⇒ 之后再问 `queue.isInActionOrder(ika)` 是 **false** ✓（实测 ✓）⇒ 这个可观测点选错了 ✓。**第二次尝试（`EXTRA_TURN_STARTED`/“它动手了”）也回滚了，原因更根本**：把观察点换成**伤害观察者**（数“攻击者 = 小伊卡的实例”）之后读到 `instances = 0` ✓ —— 插进去的那一回合里**它什么也没做** ✗：`INSERT_ACTION` 只给“回合”，**不替它选技能** ✓，而句子的后半正是「**并自动施放**【乌云乌云快走开！】」✓。⇒ 这一句**不能拆成两半落** ✗：没有自动施放，额外回合就是个空转的回合 ✓。**已解决（同日第三轮）** ✓：`CAST_SKILL` 现在认 `skill_id`（忆灵的数据槽 ✓）—— 校验器允许「`skill` 或 `skill_id` 二选一」✓，`castSkill` 在 `skill` 为空时按 `skill_id` 取 `skillAt` ✓（它本来就有这段回退 ✓，缺的只是校验器那一关 ✓）。⇒ `INSERT_ACTION` + `CAST_SKILL skill_id: 1` **成对**落地 ✓，判据用伤害观察者数“攻击者 = 小伊卡的实例” ✓。
-**⇒ 结论**：忆灵技2 的第一从句（掉血治疗）**已落** ✓；另两句各卡在**一个具体词汇**上（`CAST_SKILL` 的忆灵寻址、`EXTEND_BUFF` 的负数/全量），可分别独立开工 ✓。
-
-### 3.7z 忆灵技2 第一从句：**选择器已落，规则回滚**（**2026-10-18**）
-
-**落了（引擎）**：`all_allies_lost_hp_this_action` —— `Battle.lostHpThisAction` 在**唯一**那处 `HP_LOST` 之前填 ✓（`broadcastHpLoss` 的同一个 `if (hpLoss > 0)` 里 ✓），在**行动边界**与 lethal 集合一起清 ✓；选择器与词表各一处 ✓。形状逐点照抄 `all_allies_lethally_hit_this_action` ✓。全量测试与 demo 均**无变化** ✓（还没有读者 ✓）。
-
-**为什么要把它填在 `HP_LOST` **之前**：规则挂在那个事件上时要能**当场**读到它 ✓（这条正是忆灵技2 需要的时机 ✓）。
-
-**⭐ 当场撤回上一版的结论（同一天、第二轮）：根本没有"付两次"** ✓。真相是**我的算术错了** ✗：`Damage` 会过**防御与抗性区** ✓，所以"20% 生命上限"**不是**受害者的实际掉血量 ✓；我按 20% 反推"命中后的血量"⇒ 期望值偏低 ⇒ 差额看起来像双倍 ✓。**正确量法**：两场**只差小伊卡在场与否**的战斗，用**差值**读治疗量 ✓（不预测命中后血量 ✓）。这样一量 ⇒ 4% 自耗**精确** ✓、治疗**精确**等于 `风堇上限 × 2% + 20` ✓、没挨打的那位**一点没治** ✓ ⇒ **规则与判据已入库** ✓（`HyacineIkachisCharityTest` ✓）。**教训**：与 §3.7f / §3.7t 同一个形状，**第三次** ✓ —— 量错了要先怀疑**量法**，别先怀疑机制 ✓；这次差点把一条**正确**的规则当成"付两倍的机制"撤掉 ✓。
-
-**⚠ 一处结构教训**：这轮我又一次用「按行号删规则」把 `1409.json` 切坏了（现已改成**按文本锚点插入** ✓：定位 `"id": …` 再回退到它前面的 `    {` ✓，两步都校验 JSON 解析与规则数 ✓） ✓（JSON 解析报 `rules[24].note` ✓）⇒ 已 `git checkout` 恢复 ✓。**第二次犯**（§3.7r 末尾记过一次 ✓）⇒ 以后动这个文件只用**整体重写该块**或 `ConvertFrom-Json`→改→写回 ✓，不用行号切片 ✓。
-
-### 3.7x 订正：`advanceRequests` 是**没人填的死通道**，已删除（**2026-10-18**）
-
-**上一节（§3.7w）里那句「行动提前的**入口已经存在**：`Battle.advanceRequest(...)`」是错的** ✗。实际读源码：
-- `ADVANCE` op **不走** `advanceRequests` ✓ —— 它直接 `battle.queue.advanceActionByPercent(target, percent)` ✓（`TriggerInterpreter:675`）；
-- 于是 `advanceRequests` 这个 public 列表、`advanceRequest(...)`、`processAdvanceRequests()`、`AdvanceRequest` record，**全库没有任何一处会往里填** ✓（唯一的 `add` 就在 `advanceRequest` 自己里面 ✓，而它**没有调用者** ✗）⇒ 这是一条**空转的通道** ✓。
-
-**已做**：删掉这四个成员与 `processRequests()` 里那行调用 ✓（编译干净、全量测试**全绿** ✓、demo **MATCH** ✓ 均无变化 —— 正因为它本来就是死的 ✓）。`skillRequests` **不动** ✓：它是 private 且被 `processSkillRequests()` 真正消费 ✓（名字像、性质完全不同 ✓）。
-
-**教训**：「入口已经存在」这种判断**必须跟到调用点** ✓ —— 我只看到 `public void advanceRequest(...)` 就登记成可用，没有确认**谁会调它** ✗。同一个形状在这一轮出现了两次（另一次是把 `advanceRequests.size()` 当判据，跑出绿而其实什么也没测 ✓）⇒ **一个没有调用者的 public 方法，与被注释掉的代码等价** ✓。
-
-**判据的缺口随后就被补上了（同一天，见 §3.7y）** ✓：`ADVANCE` **确实生效**（它直接改行动条 ✓），而读数**早就有** ✓ —— `Queue.snapshot()` 给出按行动顺序排的 `Signal` 列表 ✓，`Queue.getTimeRemaining(Signal)` 给出该信号**剩余等待** ✓ ⇒ 不必新加 getter ✓（我上一版以为要加，是**没查清就下结论** ✗）。
-
-### 3.7w 已落（**引擎**）：`SUMMON_LEFT` —— 「忆灵离场」这个事件（**2026-10-18**）
-
-**缺的是什么**：忆灵可以**走了而没人杀它** ✓（`CanHit.perish()` 的 javadoc 原话：「it left, nobody killed it」✓，且它**故意不发** `HpLoss` / `Kill` ✓），所以「消失时…」既不该用 `DEATH`（那是**被击杀** ✓），也不存在别的事件 ✗ —— 1409 忆灵技4「消失时使风堇行动提前 30%」与星魂6 光环的**撤下**（§3.7l 登记的缺口 ✓）都卡在这里 ✓。
-
-**改动三处**：
-1. `TriggerEvent.SUMMON_LEFT("SUMMON_LEFT", true)` ✓（javadoc 写明「不是 `DEATH`」与「为什么从清扫点发」✓）；
-2. `Battle.removeDeadCombatants()` 里调 `announceSummonsThatLeft()` ✓ —— 遍历两方阵营，`instanceof Summon && isDeath()` 且**未宣告过**的，以**离场单位本身**为 `actor` 与 `target` 发事件 ✓；宣告集合用**身份**语义（`Collections.newSetFromMap(new IdentityHashMap<>())` ✓）⇒ **一次离场只发一次** ✓（清扫点每次结算都跑，否则一次离场会反复前进行动条 ✓）；
-3. 内容两条：`memosprite_fall_advances_her_action`（`ADVANCE percent 0.3`，不写 `target` ⇒ 默认规则持有人 ✓）与 `eidolon_six_aura_ends_when_ikachi_leaves`（`min_eidolon: 6` + `REMOVE_STATE` 按名字摘掉`天空应我的祈愿` ✓）。
-
-**⚠ 一处约定（写在这里，因为它反直觉）**：门的写法是 **`actor is_summon`** ✓，**不能**写 `target == summon` ✗ —— 后者按 `isDeath()` 过滤，而这条事件的单位**正是刚死的那个** ✓，会当场抛错 ✓。
-
-**判据**：`HyacineMemospriteLeavesTest`（2 例）—— 忆灵 `perish()` 后，星魂6 的 `DAMAGE_PENETRATION` 从 `0.2` 回到 `0` ✓（风堇与队友**都**撤下 ✓）；E0 时**没有**可撤的东西 ✓。
-
-**⚠ 登记（本轮的缺口，没含糊过去）**：忆灵技4 的**行动提前**那一半**写了，但没有判据** ✗ —— `Battle.advanceRequests` 在 `processRequests` 里就被**取走并清空** ✓，而 `Queue` 只暴露 `getNext` / `peekNext` / `timeUntilNext` / `getCombatant(index)`，**没有**任何「某单位的剩余等待」读数 ✗ ⇒ 想钉住「提前了 30%」得先给它一个读数口子 ✓（不要用「顺序变了」这种弱断言冒充它 ✓）。⇒ 那一条规则的**有效判据是待办** ✓。
-
-### 3.7v 1409 剩余三块的**接入点**（已勘，未写）（2026-10-18）
-
-**① 忆灵技2 的三个从句** —— ⚠⚠ **本节第一版写错了，2026-10-18 当场订正**：原文写「`TURN_START` 是**规则持有人**的回合 ✗ ⇒ 缺一个时机」，**这是错的** ✗。`TURN_START` 对**每一个**单位的回合都发 ✓ —— 出货内容里现成的三种门就证明了这一点：`actor == self`（自己的回合 ✓）、**`actor is_other_ally`**（**别人的**回合 ✓）、`actor has_state 未来`（**任何人**带某状态时 ✓）✓ ⇒ 「**任意目标的回合开始**」**今天就能写** ✓，不必新开事件 ✗。⇒ 当天又量了两点（**2026-10-18**）：**(a)「或行动后」** —— **`TURN_END` 就是对任意单位发的** ✓：出货内容里既有 `actor == self` ✓，也有 **`actor is_ally`** ✓、甚至 `actor is_ally` + `target != self` ✓ ⇒ 「**任意我方目标回合结束**」现成可写 ✓（`ATTACK_FINISHED` 只见 `actor == self` 一种门 ✓，**范围未证** ✗）；**(b)「生命值降低的**那个**我方目标」这个指代** —— 治疗的对象不是“血量最低”（`lowest_hp_ally` ✓ 是另一个语义 ✗），而是“刚刚掉过血的那位”，需要一个能回答它的选择器或条件（`HP_LOST` 只有**在那一刻**才带这个信息 ✓，而本句的时机在**之后** ✗）⇒ 这才是那条从句真正卡住的地方 ✓。**具体做法（下一步）**：在 `Battle` 里维护一个「**本回合掉过血的我方单位**」集合（`HP_LOST` 是现成的挂点 ✓，回合结束时清空 ✓），再给目标选择器加一个 `lost_hp_ally`（读那个集合 ✓，空集合时**大声报错或给 no-op 要明确选一个** ✓）。⭐ **照抄的样板就在仓库里** ✓（**逐点锚位已核** ✓：字段 `Battle` 的 `private final List<CanHit> lethallyHitThisAction = new ArrayList<>();` ✓、取值口 `lethallyHitThisAction()` ✓、**填充**在 `applyDamage` 的 `if (!…contains) …add` 旁 ✓、**清空**在 `performAction` 开头 ✓、选择器分支在 `TriggerTargets` 的 `case "all_allies_lethally_hit_this_action"` ✓、名字在 `TriggerVocabulary` 的 `TARGET_SELECTORS` ✓）：`all_allies_lethally_hit_this_action` + `Battle.lethallyHitThisAction()` 是**同一对**（战斗级的集合 + 读它的选择器 ✓，`lethallyHitThisAction` 的 javadoc 还写了“为什么集合住在 `Battle` 而不是单位身上”✓）⇒ 照它复制一份、把“**致命一击命中**”换成“**掉过血**”、把清空时机从“每次行动后”换成“**回合结束**”即可 ✓，不需要再设计形状 ✓—— 有了它，忆灵技2 的第一从句就只差一条规则 ✓。⚠ **不要**拿 `lowest_hp_ally` 冒充它 ✗：那是「当前血量**百分比**最低」✓，与「**刚掉过血**」是两个问题 ✓（血量最低的那位这一回合可能根本没挨打 ✓）。
-
-**② 忆灵技4「消失时使风堇行动提前 30%」** —— 行动提前的**入口已经存在** ✓：`Battle.advanceRequest(CanHit, double rate)` 与 `Battle.AdvanceRequest`（`public ArrayList<AdvanceRequest> advanceRequests`）✓，缺的只是「**忆灵离场**」这个事件 ✗。今天两种走法都**观测不到**它：`CanHit.perish()` 的 javadoc 明写它**不发** `DEATH`（“它走了，没人杀它”✓），而 `removeDeadCombatants` 是清扫点、不是事件点 ✓。⇒ 要么给离场发一个**新事件**（如 `SUMMON_LEFT`，让召唤者的规则收得到 ✓），要么让 `ticks_on` 接受 `"summon"` ✓ —— 后者还能顺手闭合 §3.7l 里「星魂6 光环在忆灵离场后不撤下」那个缺口 ✓（**一次改动、两个收益** ✓）。
-
-**③ 忆灵技1 的 1 点地板（已修，2026-10-18）** —— `skill_effects.json` 给 `11409` 槽 1 声明 `"effect": "Rules"` ✓（数据**不由自己交付**，交给规则 ✓），`SkillExecutor.resolveHits` 现在**尊重**这条 ✓：即便生成的行自称 damaging，也走非伤害分支 ✓。⇒ 伤害只剩 `计量 × #1 × 天赋层数` ✓（判据 `HyacineRaincloudsTest` 去掉了 `+1` ✓）。⚠ 连带的：没有数据伤害就**没有 `SUMMON_ATTACK`** ✓ ⇒ 忆灵技2 那条「−1」改挂 `CAST_SETUP` + `from_skill_id == 1` ✓。~~结论：仓库内无法修~~ —— 数据侧那条 `%ATK` 是否结算，由 `skills.json` 的 `effect` 决定 ✓（`SkillExecutor.resolveHits` 读 `data.getEffect()` ✓），`skill_effects.json` 只给**非伤害**技能供数值 ✓（`Restore` / `Defence` / `Rules` ✓，`Rules` 是“本发不由数据交付、交给规则”✓）⇒ 想让它不出伤害，只能在**生成器**里改 `11409` 槽 1 的 `effect` ✗（那份表 gitignore ✓），或在引擎里加“声明本发无伤害”的开关 ✓。⇒ 登记为**已知的数据侧残量** ✓ —— `skills.json` 的 `11409` 槽位 1 那行 `%ATK` 在 **ATK = 0** 时落到夹取下限 `1` ✓，而夹取发生在增伤区**之后**（`0 × 1.8 = 0` → `1` ✓）⇒ 这一发**不受任何增伤影响** ✓。只能从**数据侧**处理（让该槽不出伤害，或在 `skill_effects.json` 里声明它不出伤害 ✓）—— 引擎侧没有「这一发允许为 0」的开关 ✓。
-
-### 3.7zb 已落：整场重放的第一刀 —— 把捕获的每一次施放喂给 `Battle`（**2026-10-18**）
-**入口**：`gradlew run --args="replay scenarios/veritas-085418.replay.json"`（`--detail` 打每一发的实例与**引擎读到的是哪一行**；`--strict` 把差异变成退出码 1）。代码在 `compare/BattleReplay`，**计划文件就是那份人工对照表** ✓。
-
-**交接里那三个缺口各落到哪**：
-
-1. **「施放 → 技能槽」的人工表** ✓：捕获只给 `attack_type`（`1` 普攻 / `3` 终结技 / `12` 忆灵技），**不给槽位**；而忆灵的技能按**数据槽**寻址 ✓ ⇒ 表只能手写，一条一注（为什么是这个槽 ✓，以及哪几条**驱动不了** ✓）。⚠ 表**不许自由漂**：驱动会拿捕获的 `actor` 与**第一发的 `target_max_hp`** 跟它对账，不一致就退 2 ✓（判据里有反向用例 ✓）。
-2. **敌人的 HP / DEF / 抗性装配** ✓：`Enemy.fromAttributes(生命上限, 防御, …)` ＋ `setDamageResist(捕获的原始抗性表)` —— 三个目标用的都是**捕获自己的数字** ✓，不是按 monster_id 猜的 ✓（判据对着**捕获**比，不针对计划 ✓）。
-3. **脚本驱动的施放顺序入口** ✓ —— **它早就存在**：`Battle.castImmediate(skill, user, targets)` 跑完一次完整施放（`CAST_SETUP` / 分段 / 全部施放事件 / 回能），**不经过行动条** ✓（`Main` 的 mechanics 演示就是它的读者 ✓）。⇒ 本轮**引擎一行没改** ✓：缺的从来不是「能施放」，而是「**这一次施放是哪一招**」✓（与 §3.7x 的教训同一形状：先跟到调用点 ✓）。
-
-**它开箱就抓到的一个真 bug（已修）**：1409 那四条「小伊卡做了什么」写的是 `actor is_summon`，而它问的是「actor **是个**召唤物」（**谁家的都算** ✓）。四只忆灵同时在场时，1413 的「长夜」放**它自己的**槽位 1 会让**风堇**替别人的忆灵结算一次伤害、还清掉自己的计量 ✓（实测：小伊卡对三个敌人各留下 1 点 `ADDITIONAL` ✓，`小伊卡累计治疗` 256 → 128 ✓）。改成 **`actor == summon`**（身份比较：`summon.getMaster() == ctx.owner()` ✓；**死者也仍然算** ✓ —— 这正是 `SUMMON_LEFT` 需要的那一半 ✓）。
-⚠ **为什么以前全绿**：每条判据只摆**一只**忆灵，两种拼法在那种战场上**结果相同** ✓ ——「一处通过 ≠ 处处通过」的又一例（§1.6 ✓）。
-判据 `HyacineOwnMemospriteOnlyTest`（4 例：别人的忆灵放槽位 1 / 它的 E6 孪生 / 它离场 / 它行动）。**变异验证逐条做过** ✓：把六条门各改回 `is_summon` 一次，每一条都**只让对应的那一句红**（读数：计量 256 → 128 ✓；风堇的剩余等待 120.9677 → 84.6774 = ×0.7 ✓；抗性穿透 0.2 → 0 ✓；持续回合 3 → 2 ✓）。
-
-**重放报出来的其余差异（登记，不近似）**：
-
-1. **窗口前缀**：捕获是**已经在打**的一段 —— 1409 的【雨过天晴】在事件 0 之前就上了（1415 的生命上限 10320.4433 含它 ✓，§3.7k ✓），而 1413 的生命面板在窗口内自己变（2960.0287 → 4526.4984 → 4309.8792 ✓）。驱动**不编造**这些状态 ⇒ 每个数都带着这段前缀的差 ✓。
-2. **忆灵的「%生命上限」读谁的**：捕获每一发都满足 `raw_damage_before_modifiers = damage_percentage × attacker_hp_lp`，而**忆灵那一发**的 `attacker_hp_lp` 等于**召唤者**的生命上限（1413 的 2960.0287 / 1415 的 10422.8964 / 1512 的 5249.7811，三例都是 ✓）。引擎读的是**忆灵自己**的面板 ⇒ 「长夜」那一发恰好是捕获的 **1/2**（它的面板份额 0.5 ✓），「德谬歌」**相同**（份额 1.0 ✓），「晴空乐手」再叠加第 3 条 ✓。**两种读法都自洽**（① 捕获对忆灵的命中在 `attacker_*` 里报的是**主人的**面板；② 游戏真的按**召唤者**的生命上限算）—— 这一份捕获**分不开**它们 ⇒ 登记为待定的口径问题 ✓，不猜 ✓。
-3. **`11512` 槽位 1 的倍率在参数 #2**：捕获 base = `1.5 × 生命上限`（`1.5` = 该槽 Lv6 行的**第二个**参数 ✓），而引擎读的是**第一个** = **0** ✓ ⇒ 那一发在引擎里是 0 基础（三敌各 1 点地板，实测 ✓）。修法有二（`skill_effects.json` 加 `params` 条目 / 引擎多一种「倍率在 #2」的拼法 ✓），都要先有第二条证据 ⇒ 登记 ✓。
-4. **忆灵技能的等级**：引擎按 `memosprites/<cid>.json` 的 `skills[].level`（都是 **10** ✓）取行，而捕获的比值恰好是 **Lv8 / Lv6**（长夜 0.6 对 0.7；德谬歌 0.6 对 0.84 ✓）⇒ 「忆灵技的行号」是**第二个**待定问题 ✓（⚠ 不是「引擎读错行」：`--detail` 打出它读的正是自己声明的那一行 ✓）。
-5. **`skills.json` 缺「长夜」的强化普攻**：`skill_segments.json` 的 `servants.11413` 有 `Skill11/Skill12`（`slot_guess 8` ✓），捕获也有那一次施放（2 命中 / 2 目标、主目标 3.0 与相邻 1.5 = **2:1 的 BLAST 分摊** ✓），而 `skills.json` 的 11413 只有槽位 `[1,3,5,6,7]` ✓ ⇒ 那一次施放**驱动不了**，工具**指名**它 ✓。
-6. **敌人没有韧性条** ⇒ 引擎不加捕获里那条「未破韧 10% 减伤」✓（`Enemy.fromAttributes` 的 `stance = 0`）⇒ 每个引擎数都缺这一项 ✓。**不补的理由**：这一场的韧性 / 弱点捕获没给 ✓，给一个假韧性条会让「击破」发生在错误的时刻 ✓。
-
-**判据**：`BattleReplayTest`（4 例）—— 13 次施放里驱动 12 次、不可驱动的那 1 次**指名原因** ✓；三个目标的**生命上限与防御**逐个对上**捕获** ✓；六段 / 全体 / 连放四次的**实例数**（6 / 3 / 12 ✓）；计划把目标写错时**退 2 并说出是哪一次、哪两个目标** ✓。变异验证 ✓：把 `11413/1` 的 `segments` 改成 `[1.0]` ⇒ 实例数那条红 ✓；把计划里 `repeat: 4` 改成 `1` ⇒ 同一条红 ✓。
-⚠ **故意不钉**：settled 的**总额** ✓ —— 它现在是「引擎 − 前缀 − 口径」的复合差，钉成期望就等于把缺口钉成契约 ✓（§6.3·6 同一形状 ✓）。
-
-### 3.7zc 已落：1413 忆灵技1 的「施放后获得 #4 点【亿质】」（**2026-10-18**）
-
-**说明**：这条是 §3.7h 登记的第二半（第一半是六段分裂比 ✓）。规则 `memosprite_skill_one_grants_memory` —— `CAST_SETUP` + `actor == summon` + `from_skill_id == 1` → `GAIN_RESOURCE 亿质 amount_from_cast_param: 3 target self`。
-
-**三处口径**：① 点数**读这一发自己的参数行**（`#4` = 下标 3，各等级都是 1）✓，**不写字面量** ✓；② 门用 `actor == summon` ✓（与 §3.7zb 同一条教训：`is_summon` 会把**别人**的忆灵也算进来 ✗）；③ 资源名是数据里的「**亿质**」（TextMap 哈希 14616362604670218887）✓，**不是**「忆质」✗ —— 同一个 kit 里两种写法都出现过，写错只会得到一个恒 0 的计数器 ✓。
-
-**判据**：`EvernightMemoryGainTest`（2 例）—— 一次施放 +1、两次 +2 ✓；**别人的忆灵**施放它自己的槽位 1 一点不给 ✓。**变异验证** ✓：把 `amount_from_cast_param` 改成 `2` ⇒ 读到 `#3` = 4，第一例红（`expected: <1> but was: <4>`）✓；把门改成 `is_summon` ⇒ 第二例红，而**红法**是「index 3 is outside that skill parameter row (size=2)」—— 因为 11409 的行只有两个参数 ✓，这本身正是「门松了」的证据（规则在**不该开火的地方**开火了）✓。
-
-⚠ **仍登记**：同句的「每有 #3 点【亿质】额外造成 #2%」未写 ✗ —— 游戏把它**并进那六发的 DamagePercentage**（捕获实测总份额 0.6 → 0.9 ✓），引擎缺「按计数器档位放大这一发倍率」的口径 ✓。
-
-### 3.7zd 已落（**引擎**）：三个「句子缺一个读数」的补口 —— 攻击的槽位 / 事件的量作伤害基数 / 溢出的「无上限」（**2026-10-19**）
-
-> 三条都是被**同一位角色的同一批从句**逼出来的（1408 星魂 2 / 星魂 6 ✓），但三条都是**通用能力** ✓ —— 引擎里没有一个字提到 cid ✓。按 §3.5「机制先行、角色当验收」：能力落地时 1408 是验收人 ✓。
-
-| 能力 | 之前为什么写不出来 | 现在是什么 | 判据 / 变异 |
+#### 3.7zd（引擎）三个「句子缺一个读数」的补口
+| 能力 | 之前为什么写不出来 | 现在是什么 | 判据 |
 |---|---|---|---|
-| **`ATTACK_FINISHED` 带 `from_skill_id`** | 它传的 `skillId` 是 **0** ✓ ⇒ 「**施放【支柱•死星天裁】的攻击后**」无法与「任何一次攻击后」区分 ✗（同一个角色还有强化普攻与两个强化战技 ✓） | `Battle.fireAfterAttack` 新增**带槽位的重载** ✓，`SkillExecutor` 传 `skill.getSkillSlot()` ✓；四个参数的旧口子保留（= **未知** ✓，`EnemySkill` 与既有判据还在用 ✓） | `PhainonEidolonSixTest.anotherAttackDoesNotPayTheRider`；变异：把 `skillSlot` 换回 `0` ⇒ 星魂 6 的那一条**再也不开火** ✓ |
-| **`amountFromEvent` 作为 `DAMAGE` 的基数** | 这个字段早就有 ✓（`GAIN_RESOURCE` / `GAIN_ENERGY` 的读者 ✓），而 **DAMAGE 路径上没有读者** ✗；`settled_damage_this_event` 在**最外层 firing 开始时清零** ✓，而 `ATTACK_FINISHED` **自己就是**最外层 ✓ ⇒ 读它恒得 **0** ✗（实测过，别重走 ✓） | `TriggerMagnitudes.literalBase` 读 `amountFromEvent × percent` ✓；装载期**只准配真伤害** ✓（这个数已经过完所有区 ✓，与 `settled_damage_this_event` 同一条理由 ✓）。⚠ **不是**新造 `scale: "event_amount"` ✗（它被**撤回**过 ✓，见 `EventAmountTest`：`amountFromEvent` 本来就够 ✓） | `EventAmountTest.theAttackTotalCanBeTheBaseOfATrueRider`（两条总量各钉一次 ✓）；变异：撤掉这个分支 ⇒ 基数落进 scale 读取并抛错 ✓ |
-| **`RAISE_RESOURCE_CAP{unbounded: true}`** | 溢出额度是**一个数** ✓，而「**不再拥有上限**」不是一个数 ✗：写任何数字都是文档否认的上限 ✓，而「够大」的那个数（`Integer.MAX_VALUE - 3`）会在 `getMaxOverflow() + raise` 里**溢出成负数** ✓ ⇒ `setMaxOverflow` 夹回 **0** ✗（症状：星魂 6 让溢变更**小** ✓） | 额度直接置 `Integer.MAX_VALUE` ✓（`Resource.absoluteMax()` 本来就**饱和** ✓）⇒ 「无上限」= **引擎能表示的最大上限** ✓ —— 与同库【毁伤】的 `"max": 2147483647`（数据没给上限 ✓）**同一个约定** ✓；两个拼法互斥（`unbounded` 不许与 `amount` 同写 ✓） | `ResourceOverflowUnboundedTest`（**两端**：解限后 100 点全进 ✓、按点数加则仍是 `max + overflow + N` ✓）；变异：让解释器忽略该旗标 ⇒ 100 只进 7 ✓ |
+| `ATTACK_FINISHED` 带 `from_skill_id` | 它传的 `skillId` 是 **0** ⇒ 无法说「施放**那一招**的攻击后」 | `fireAfterAttack` 新增带槽位的重载 ✓；四参数旧口子 = **未知**（`EnemySkill` 与既有判据仍在用 ✓） | `PhainonEidolonSixTest` |
+| `amountFromEvent` 作 `DAMAGE` 基数 | 字段早就有，**DAMAGE 路径没读者** ✗；`settled_damage_this_event` 在最外层 firing 清零 ⇒ 读它恒 **0** ✗ | `literalBase` 读 `amountFromEvent × percent` ✓，装载期**只准配真伤害** ✓。⚠ **不是**新造 `scale: "event_amount"` ✗（它被**撤回**过 ✓） | `EventAmountTest.theAttackTotalCanBeTheBaseOfATrueRider` |
+| `RAISE_RESOURCE_CAP{unbounded: true}` | 溢出额度是**一个数**，而「不再拥有上限」不是一个数 ✗（`MAX_VALUE - 3` 会在 `+raise` 里溢出成负数 ⇒ 夹回 0 ✗） | 额度置 `Integer.MAX_VALUE` ✓（与【毁伤】的 `max: 2147483647` 同一约定 ✓）；两个拼法互斥 ✓ | `ResourceOverflowUnboundedTest`（两端 ✓） |
 
-⚠ **同族但没做的（登记，别以为漏了）**：
-- **单位计数器的「这次花掉了多少」没有事件** ✗ —— 事件表里唯一的「花掉」事件是 `SKILL_POINT_SPENT` ✓（战技点专属 ✓），而 1408 星魂 2 的后半要的是「**单次施放【支柱•死星天裁】消耗【毁伤】点数达到 4 点**」✓ ⇒ 没有读数就没法写 ✓（**不要**拿 `self_resource:毁伤 >= 4` 冒充 ✗：那是「持有 4 点就送回合」，与「一次施放花掉 4 点」是两件事 ✓）。
-- **`amountFromEvent` 只开了 DAMAGE 这一条路** ✓：别的 op 要读事件量时先看它有没有自己的拼法（`amount_from_event` 是**通用**字段 ✓，不是伤害专用 ✓）。
+⚠ 同族仍开：**单位计数器的「这次花掉了多少」没有事件** ✗（唯一的「花掉」是 `SKILL_POINT_SPENT` ✓ 战技点专属 ✓）⇒ 1408 星魂 2 的后半写不了 ✓（不拿 `self_resource:毁伤 >= 4` 冒充 ✗：那是「持有 4 点」✓）。
 
 ### 3.8 数据文件速查
 
@@ -1029,110 +641,30 @@ HP_LOST 计数 = 0 ; HP_CONSUMED 计数 = 0   ← 两个事件都没发
 ### 4.3 登记（**缺能力时来这里，不要近似**）
 
 - ⚠ **缺引擎能力 ⇒ 先补能力，再数据化角色** ✓（§3.2 的逃生舱三选一 ✓）。
-- **登记要写在两处之一** ✓（§2.1）：**规则自带的 `note`** ✓（最贴近那条内容 ✓）或 **§4.2 的待办表** ✓。
-- ⚠ **已核对过的缺口**（避免重新推导）：
-  - **`DamageType` 给不出"规则身份"** ✗：`Damage` 上**没有规则 id、也没有目标选择器** ✓
-    ⇒ "这条天赋伤害是哪个规则发的"**类型这一层区分不了** ✓ ⇒ **留作已知缺口，不猜** ✓（§3.9 的 TALENT 讨论 ✓）。
-  - **`element: "attacker"`** ✓ 已补 ✓（含"作用域只给伤害类 op"＋一条判据 ✓）。
-  - **`steps:` 形式的 `scale` 对 GAIN 被静默忽略** ✗ —— 用**量化计数器** ＋ **第二个** `amount_from_resource` 即可写出 ✓（§6.2 的撤回 ✓）。
-  - **忆灵的技能等级：读得到、也改得到、也点得到**（2026-10-17 补齐 ✓，原先登记为"读得到、改不了、点不到"）：
-    - **读得到** ✓：忆灵技能按 `(servant_id, data slot)` 建 ✓，等级来自 `memosprites/<id>.json` 的
-      `skills: [{slot, level}]` ✓ ⇒ `CastSkillParamScaleTest` 钉住的就是"读的是**当前等级那一行**" ✓。
-    - **改得到** ✓：`RAISE_SKILL_LEVEL` ＋ `memosprite: true` ＋ `skill_id: <数据槽位>` ✓ —— 加成记在**召唤者**身上
-      （忆灵在 `BATTLE_START` 时还不存在 ✓、且可能重复出场 ✓），`CanHit.skillLevel` 解析忆灵技能时向主人取 ✓；
-      `CanHit.memospriteSkillLevelBonus` 按 **data slot** 键 ✓（角色的那张按 `SkillType` 键 ✓，两张不混 ✓）。
-    - **点得到** ✓：`percent_from_summon_param` / `amount_from_summon_param` 写 `"<数据槽位>:<index>"` ✓；
-      `amount_from_cast_param` 补上了"忆灵施放 + 随等级变的常数项" ✓。
-      判据：`MemospriteSkillLevelTest`（加成落在召唤者 / 解析器读到 / 超表行数被 clamp / 两种读法 / 加载期五种拒绝 ✓；
-      变异：把向主人取加成的那一段关掉 ⇒ 该用例当场红 ✓）。
-  - **忆灵技能的等级上限**（2026-10-17 核对 ✓）：与**角色同一条规则** ✓ —— `CanHit.skillLevel` 把等级 clamp 到
-    表的行数 ✓，而**行数就是文档写的上限** ✓。所以"声明在最后一行时 +1 看不出变化"**不是缺陷** ✓
-    （角色的「普攻等级+1」在 10 行表上完全一样 ✓）。判据：`MemospriteSkillLevelTest.aRaisePastTheTableIsClampedToTheTablesRows` ✓。
-  - **与原游戏逐乘区对数值**（2026-10-17 出厂 ✓）：`gradlew run --args="compare <场景.json>"` ✓ —— 场景说清**谁 / 什么技能 / 几级 / 打谁 / 什么面板 / 这一发暴击没有** ✓（面板用**绝对**属性覆盖 ✓，因为引擎的面板不含光锥遗器 ✓），比较器按 `Damage.breakdown()` 的乘区逐行打 `game / engine / diff / relative` ✓，退出码即闸门 ✓（每一行对上 = 0 ✓）。⚠ **`expect` 里的 zone 名拼错 = 报错** ✓（不是「跳过」✗ —— 跳过会让一次少比一行看着像通过 ✓）；⚠ **留空 `expect` = 只打印引擎自己的数** ✓（就是填格式用的清单 ✓，退出码 0 ✓）。形状与乘区对照表见 `scenarios/README.md` ✓；判据 `DamageComparatorTest` ✓。
-  - **派生伤害的"来源施放"**（2026-10-17 补 ✓）：击破/超击破是引擎从某一发派生出来的实例 ✓，它自己带 `UNSPECIFIED` ✓
-    （**不能**改成那一发的槽位 ✗ —— `ADD_DAMAGE` / `BOOST_DAMAGE` / 增伤区 / `original_damage` 都读实例的槽位 ✓，
-    改了就等于把终结技的 +120% 加到击破伤害上 ✗），另带 `causedByCast` ✓。**只有 `KILL`** 沿链 ✓（判据：1002 星魂 4
-    「施放终结技消灭敌方目标时」✓ —— 终结技击破、击破伤害致死不触发 ✗ 曾是错的 ✓）；`DAMAGE_SETTLED` **不**沿链 ✓
-    （实测：沿链会让 1003 姬子星魂 6 对击破实例再算一次 ✓ 并撞上 `random_enemy` 解析不了 ✓）。判据：`DanHengKitCompletionTest` 的四条 ✓。
-  - **回能已改成读数据**（2026-10-17 ✓，原登记为"走常量"）：`StandardEnergyProvider` 现在读技能自己的
-    `sp_base` ✓ —— **弹射按段数乘**（每段值 × 实际段数 ✓），其它形状那一行本来就是整次的值 ✓。
-    ⚠ 与常量**只在 3 行不一致**（`1212/2`、`1402/2`、`1502/1` ✓，实测枚举）⇒ 数据是权威 ✓；
-    `EnergyDataConformanceTest` 把"引擎答案 = `sp_base` × 段数"和"偏离常量的正好这三行"都钉住 ✓。
-  - **伤害段数（分裂比）**（2026-10-17 补 ✓）：`data/skill_effects.json` 的 `segments` ✓ 让一次施放结算**多段** ✓
-    （每段各自掷暴击、各自发 `DEALING_DAMAGE` / `CRIT_DEALT` / `TAKING_HIT` ✓，削韧按段均分 ✓；
-    `SkillExecutor.segmentsOf` 是唯一读者 ✓，没有条目就仍是**单段** ✓）。
-    已导出：**只有 1002** 的普攻 2 段 / 战技 4 段 ✓。⚠ 全库还有 **96 张 >1 段的表、59 个角色文件** 未导出 ✓
-    ⇒ 它们仍按单段结算 ✓ —— **合计一样、段数不同**（差在"每段独立暴击"与逐段事件 ✓），所以这是**登记**不是近似 ✓。
-    判据：`DanHengSegmentsTest`（2/4 段 / 各段是行倍率的分数且和 = 1 / 4 段各自暴击 / 减速仍只有一条 ✓）。
-  - **`MODIFY_ATTR` 的幅度：绝对值还是份额**（2026-10-17 修 ✓）：判据是**有没有 `scale`** ✓ ——
-    有 scale（"等于 X% 的防御力"）= 已经是属性单位里的**绝对值** ✓；没有 scale 的**份额**（字面 `percent` 或它的四种拼法）= 
-    **目标基础值的分数** ✓；纯 `amount`（"速度提高 50 点"）= 绝对值 ✓。
-    ⚠ 从前传下去的是 `derived`（= 有 scale **或** 没有字面 `percent`）✗ ⇒ **无 scale 的份额拼法**被当成绝对值 ✗：
-    1002 秘技 `percent_from_skill_param: "TECHNIQUE:0"` 产出 `ATTACK PURE_VALUE 0.4`（+0.4 **点**攻击）而不是 +40% ✗；
-    1405「智识命途攻击力提高 #3(84)%」同样成了 +0.84 **点** ✗（升到 `ATTACK ADD_PERCENT 0.4` 才对 ✓）。
-    现在 `absolute = 非份额 || 有 scale` ✓，天花板（`cap_*`）与它同源 ✓。
-    判据：`DanHengLevelSourceTest`（40% 必须是份额 ✓）、`ReasonOdeEruditionAttackTest`（两位智识按**各自基础**涨 84% ✓）、
-    `TrueKnowledgeSkillDamageTest`（普攻只按攻击力涨 ✓）。
-  - **捕获复算时的一个数据缺口**（2026-10-18 查过 ✓）：实测捕获的目标是 **5034011 亚婆离**，它的**抗性表与韧性**都能在
-    tbgd 对上 ✓（Physical/Fire/Thunder/Wind 各 0.2 ✓、StanceBase 1080 ✓），但**这一场的 HP 与 DEF 都偏离表值** ✗：
-    表值 Lv100 = HP 845,928 / DEF 1200（210 × DefenceRatio 5.714286 ✓，也等于「200+10×等级」✓），而 dump 的 BaseHP 是
-    6,389,558（×7.55）再 ×2、反解 DEF 是 786（−34.5%）✓。⇒ **观战数值是关卡改的** ✓，不是表值 ✗ —— 比较场景里
-    `target.attributes.DEFENCE` 因此是**输入**而不是数据 ✓（判据：`scenarios/capture-858483.json` ✓）。
-    ⚠ 另：本仓库 `monster_config.json` 是 tbgd 2722 条实例的**子集** ✓（这位 boss 不在其中 ✓），要按需补就得重跑生成器 ✓。
-  - **Impair 的 debuff 派发仍缺**（2026-10-17 核对 ✓）：`skill_effects.json` 里**一条 `Impair` 行都没有** ✗，
-    缺的不是"多少"，而是**"哪个 debuff"** ✓（一句 `陷入【吞火】状态` / `风化/裂伤/灼烧/触电其中1种` 只在正文里 ✓）。
-    ⇒ `SkillData.debuffChance(int)` 已有等级感知 ✓ 但**没有调用者** ✓；`ImpairDebuffGapTest` 把两件事钉住：
-    ① 没有一条 `Impair` 技能带 effect 行（有了一条就红，说明派发有了输入 ✓）；② 正文点了**战斗内**状态的只有
-    `1210/4`、`1218/4`、`1410/4`（其余是**地图**层，本引擎没有那一层 ✓）。
+- **登记写在哪里** ✓：**规则自带的 `note`** ✓（最贴近那条内容 ✓）或**本节** ✓；**已落**的东西**不留在本节** ✗（它们进 §3.7b–3.7zd 的索引 ✓）。
+- ⚠ **每条登记必须能回答三件事** ✓：**读者是谁**（哪条内容要它 ✓）、**缺的到底是什么词/事件**（不是"写不了"这个印象 ✓）、**缺口见证**（一条钉住"今天读数"的判据 ✓，能力落地时它红 ✓）。没有见证就把今天的样子钉住 —— 否则下一个人只能重新推导 ✓。
 
-  - **`ElationDamage` 的行不止一种布局，而欢愉行分支只认一种** ✗（2026-10-19 实测 ✓）：
-    `SkillExecutor` 的欢愉行分支按 `[次数, 每次份额, 最后一段份额]` 读 ✓ —— 读者 **8009／8010** 槽 20 正是这个布局
-    （`[8, 0.1, 0.3]` ✓），**读得对** ✓；而 **1506 槽 21 = `[1.125, 6]`**（**份额在前、次数在后** ✓ ——
-    正文「造成 **6** 次伤害，每次…**90%**」✓）、**1513 槽 20 = `[0.3, 10, 0.09]`**（**三段式**：先 AoE 份额、再次数、再每次份额 ✓）。
-    ⇒ 1506 那一行被读成 **1 次 600%**（`round(1.125) = 1` ✓）：**实测**一发 **878.17**，
-    而正文要的是 **6 次 × 112.5%**（合计 **6.75 × 攻击力** 对 **6.0 × 攻击力** ⇒ 合计差约 11% ✓、**段数差一个数量级** ✓）。
-    ⚠ **不许猜「哪个整数是次数」** ✗ —— 行本身不说，而三条行里整数的位置各不相同 ✓（猜错会**同时**改掉 8009 那种**已经读对**的行 ✗）。
-    ⇒ **缺的能力**：把布局写进导出物（`skill_effects.json` 的一列 ✓），或按「值域 ＋ 正文」定一条**可判**的规则 ✓；
-    **在那之前**保持现状 ✓，并由**缺口见证**把今天的读数钉住 ✓：`SilverWolfLV999ElationRowTest` ✓
-    （它同时钉住「她的行是 `[份额, 次数]`」与「今天结算 1 次」✓，改好之后它会红并指回这里 ✓）。
-    ⚠ 1513 那一行**早已**在自己的 note 里登记为「只取第一列」✓ —— 本条把**同族**的第三条也量过并写清楚 ✓。
-  - **`SkillSwapBuff` 的同类判定曾按「类」⇒ 同一单位只能有一个技能交换** ✗（**已修** ✓，2026-10-19 实测 ✓）：
-    身份改成**按槽位** ✓（`isSameKind` 比 `slot` ✓）—— 同槽位仍是「重新施加 = 刷新」✓（`SkillSwapTest.theSameSlotSwappedTwiceRefreshes` ✓）。
-    **症状**：1506 的「拥有强化普攻**和**强化欢愉技」是**一条大招里的两个** `REPLACE_SKILL` ✓，第二个落地时把第一个**挤掉** ✓
-    ⇒ 她的**强化普攻变回普通普攻** ✓，而唯一能看见的是**槽位读成 1 而不是 8** ✓
-    （`BuffManager.addBuff` 先移除同类 ✓，而那个类自己的 javadoc 偏偏写着「两个重叠的交换会**嵌套**」✗ —— 注释与实现不符 ✓）。
-    ⚠ **同一形状的第 2 次**：`StatModifierBuff` 的身份**不含名字** ✓（§3.7l ✓）⇒ 这一族的统一教训是
-    **「同类」的身份必须恰好回答「这两条效果会不会互相取代」** ✓ —— 太粗会**互相挤掉** ✗，太细会**叠出不存在的层数** ✗。
-    判据：`SkillSwapTest.twoSwapsOfDifferentSlotsCoexist` ✓（两个不同槽位同时在 ✓、摘掉一个只还原它自己 ✓）；
-    ⚠ 变异：把 `isSameKind` 改回按类 ⇒ 它与**四条** 1506 内容判据一起红 ✓（已做过 ✓）。
-    ⚠ 顺带修的一处**守卫太粗**：`ContentDuplicateGuardTest` 的操作数表原先没有 `skill` / `skill_id` ✓
-    ⇒ 它把「交换普攻」与「交换欢愉技」读成**同一条句子写了两遍** ✗（读者：1506 ✓）⇒ 已加进那张表 ✓，
-    并**变异验证过它仍然抓得住真重复** ✓（把第二条改成与第一条逐字相同 ⇒ 当场红 ✓）。
+#### 仍开的缺口
 
-  - **「没有 `SkillType` 的槽」是一族缺口** ✗（**×3** 已量 ✓）：抬等级（`RAISE_SKILL_LEVEL` ✓）与读行（`percent_from_skill_param` ✓）
-    都按 **`SkillType`** 说话 ✓，而 `SkillType` → 槽位的映射是一个**闭集** ✓（`SkillSlotMappingTest` 钉住 1／2／3／4／6／7／20／21 ✓）
-    ⇒ **其余的槽既抬不了级、也读不了那一行** ✗：1506 的 **8／10／12／18**（强化普攻与它的三个盲盒子技能 ✓）、
-    1408 的 **5／9／11**（天赋·强化与两个强化战技 ✓），以及 1408 星魂 3 点名的那一项 `140808` ✓。
-    ⇒ **两种症状、都沉默** ✓：① 星魂写的「＋2 级」**什么都没做** ✓（1408 的星魂 3／5 曾整条缺失 ✓，判据以前只读「变身有没有开」✗）；
-    ② 写在**不可读槽**上的份额**跟不上等级** ✓（1408 的攻击力 `0.8`／生命 `2.7` 取自槽 5 ✓，星魂 5 落地后它们开始漂移 ✓）。
-    ⇒ 这一条**已有缺口见证** ✓：`PhainonSlotFiveRowDriftTest` 钉住「E5 之后落下的仍是 **0.8 / 2.7**，而第 12 行是 **0.88 / 2.97**」✓
-    （量法是**两档的增量相等** ✓ —— 不需要假设基础属性、也不需要假设那条 +50% 攻击力的行迹 ✓）；
-    能力落地时它会红，并指回本条 ✓ —— 与 1506 的 `SilverWolfLV999ElationRowTest` 同一个手法 ✓。
+- **`DamageType` 给不出"规则身份"** ✗：`Damage` 上没有规则 id、也没有目标选择器 ⇒ "这条天赋伤害是哪个规则发的"在**类型这一层**区分不了 ✓ ⇒ 不猜 ✓（§6.8(d) 的 TALENT 讨论 ✓）。
+- **Impair 的 debuff 派发缺的是一列"哪个 debuff"** ✗：`skill_effects.json` 里一条 `Impair` 行都没有 ✓，而正文的 `陷入【吞火】状态` / `风化/裂伤/灼烧/触电其中1种` 只在散文里 ✓（`SkillData.debuffChance` 已有等级感知，**没有调用者** ✓）【缺口见证（§7.4）：`ImpairDebuffGapTest` —— ① 没有一条 `Impair` 带 effect 行 ✓（有一条就红，说明派发有了输入 ✓）；② 正文点名**战斗内**状态的只有极少数几处，其余是**地图层** ✓（本引擎没有那一层 ✓）】。
+- **`ENERGY_GAINED` 只说「谁收到了」，不说「谁给的」** ✗（2026-10-19 核对 ✓）：`fireTriggersForAlly(ENERGY_GAINED, target, target, added)` ⇒ `actor` **就是收能量的那位** ✓，`EnergyGain` 只有 `amount` ＋ `affectedByEfficiency` ✓ ⇒「受到**队友提供的**能量恢复…」判不了 ✗（读者：1408 行迹 1408102 的后半 ✓）。⚠ 不许拿「任何人给我回能」冒充 ✗；也不许把 `actor` 改成授予者 ✗ —— **4 条出货规则押在当前语义上** ✓（1207 星魂 2、1310 天赋、1505 两条）。要开这个口子：给事件加「授予者」事实，并复核那 4 条 ✓。【缺口见证：`PhainonTraceBideInFlamesTest.theEnergyHalfIsStillANoOp`】
+- **没有 `SkillType` 的槽是一族缺口（×3）** ✗：抬等级与读行都按 `SkillType` 说话 ✓，而映射是闭集 ✓（`SkillSlotMappingTest` 钉 1／2／3／4／6／7／20／21 ✓）⇒ 其余槽**既抬不了级、也读不了那一行** ✗（1506 的 8／10／12／18、1408 的 5／9／11 与 `140808`、1206/1015 的强化技能 ✓）。症状两种、都**沉默** ✓：星魂的「＋2 级」什么都不做 ✓；份额跟不上等级 ✓（1408 的 0.8／2.7 取自槽 5 ✓）。⚠ **补 `SkillType` 是决定不是补名字** ✓（要先回答「强化形态算不算同一个槽的等级」✓，上游把它们**并列**列 ✓）。【缺口见证：`SilverWolfLV999ElationRowTest`、`PhainonSlotFiveRowDriftTest`】
+- **`ElationDamage` 的行有三种布局，而欢愉行分支只认一种** ✗：`[次数, 每次份额, 末段份额]` 是 8009／8010 ✓ 读得对 ✓；1506 槽 21 = `[份额, 次数]`（被读成 **1 次 600%** ✓ 实测 878.17 对 987.94 ✓）、1513 槽 20 = `[份额, 次数, 每次份额]` ✓。⇒ **不许猜「哪个整数是次数」** ✗（三条行整数位置各不相同 ✓，猜错会**同时**改掉已经读对的行 ✗）。缺的能力：把布局写进导出物（`skill_effects.json` 一列 ✓）或按「值域 ＋ 正文」定一条**可判**规则 ✓。【缺口见证：`SilverWolfLV999ElationRowTest`】
+- **技能数据里的「消耗生命值」没有被执行** ✗（1408 那一族之外见 §3.7g ✓）：代价在数据里，引擎不读 ⇒ 以它为代价的 kit 缺一半 ✓。
+- **单位计数器的「这次花掉了多少」没有事件** ✗（§3.7zd ✓）：唯一的"花掉"事件是 `SKILL_POINT_SPENT`（战技点专属）✓ ⇒ 1408 星魂 2 后半写不了 ✓。
+- **`steps:` 形式的 `scale` 对 GAIN 被静默忽略** ✗ —— 用**量化计数器** ＋ 第二个 `amount_from_resource` 即可写出 ✓（§6.2 的撤回 ✓）。
+- **`skill_segments.json`（全角色/忆灵分段表）已勘未接入** ✗：见 §3.7u ✓。
+- **忆灵的「施放后持续效果 −1」判据立不起来** ✗：见 §3.7za ③ ✓（下一步是一枚探针，不是改 `tickBuff` ✓）。
 
-  - **`ENERGY_GAINED` 只说「谁**收到**了」，不说「谁**给**的」** ✗（2026-10-19 核对 ✓）：事件是
-    `fireTriggersForAlly(ENERGY_GAINED, target, target, added)` ✓ —— `actor` **就是收能量的那位** ✓，
-    而 `EnergyGain` 只有 `amount` ＋ `affectedByEfficiency` ✓、`applyEnergyGain` 也不收授予者 ✓
-    ⇒ 「受到**队友提供的**能量恢复的技能效果时…」这类从句**今天判不了** ✗（读者：1408 行迹 1408102 的后半 ✓）。
-    ⚠ **不许拿「任何人给我回能」冒充** ✗（那会把自己的普攻回能一起算 ✓）；也**不许把 `actor` 直接改成授予者** ✗ ——
-    **4 条出货规则押在当前语义上** ✓（1207 星魂 2 `actor is_ally` ✓、1310 天赋 `actor == self` ✓、1505 两条无条件 ✓）。
-    ⇒ 要开这个口子，得给事件加一个「授予者」**事实**（新字段，或 `energy_from_ally` 一类的条件 ✓），
-    并把那 4 条一起复核 ✓。缺口见证：`PhainonTraceBideInFlamesTest.theEnergyHalfIsStillANoOp` ✓
-    （钉住今天的读数 = 一点火种都不给 ✓，能力落地时它红 ✓）。
-    ⚠ **不猜**：给这些槽补 `SkillType` 是一个**决定**，不是补一个名字 ✓ —— 要先回答「强化形态算不算同一个槽的等级」✓，
-    而**上游数据把它们分开列** ✓（星魂 3 的 `140808+1` 与 `140801+1` **并列** ✓）⇒ 它们**各有一条等级** ✓。
-    ⚠ **谁要开这个口子，先读这几处的 note** ✓：1506 的 `level_convention`／`ult_installs_the_enhanced_*` ✓、
-    1408 的 `eidolon3_ultra_and_common_levels`／`eidolon5_skill_and_talent_levels`／`ult_transformation` ✓ ——
-    每一处都写清了「哪一项写不了、为什么」✓（判据 `PhainonEidolonLevelsTest` ✓ 与 1506 的缺口见证 ✓ 是这条规矩的守门人 ✓）。
+#### 已核实**不是**缺口（别再登记它们）
+- 忆灵技能的**读 / 改 / 点**三样都齐 ✓（`MemospriteSkillLevelTest` ✓）。
+- **等级上限**由技能表自己的行数封顶 ✓ ⇒「声明在最后一行 +1 看不出变化」不是缺陷 ✓。
+- **回能**读技能自己的 `sp_base` ✓（弹射按段数乘 ✓，`EnergyDataConformanceTest` ✓）。
+- **派生伤害的来源施放**：击破/超击破带 `UNSPECIFIED` ＋ `causedByCast` ✓（只有 `KILL` 沿链 ✓，`DAMAGE_SETTLED` 不沿 ✓，`DanHengKitCompletionTest` ✓）。
+- **`SkillSwapBuff` 的同类判定**：按槽位 ✓（`SkillSwapTest` ✓）；`StatModifierBuff` 的身份**不含名字** ✓（§3.7l ✓）⇒ 「同类」的身份必须恰好回答「这两条效果会不会互相取代」✓。
+- **捕获复算的敌人面板**：观战数值被关卡改过 ✓（HP ×7.55、DEF −34.5% ✓），所以比较场景里 `DEFENCE` 是**输入** ✓ 不是数据 ✓（`scenarios/capture-858483.json` ✓）。
+- **逐乘区对数值**：`gradlew run --args="compare <场景.json>"` ✓（拼错 zone 名 = 报错，不是跳过 ✓；留空 `expect` = 只打印引擎自己的数 ✓）✓。
 
 ### 4.4 层序与状态（**替代旧的"为什么这样排序"**）
 
@@ -1371,6 +903,7 @@ C 层全是**填口子** ✓，依赖已完成的机制，**不该出现新架�
   同一条规则里 **6 空格与 10 空格是两件不同的事** ✓。
 - **保存 / 回滚按字节** ✓：`git show HEAD:<path>` 取 blob 字节写回 ✓。
   ⚠⚠ **绝不用 `git checkout` 做回滚** ✗（见 §6.8(e) 的破坏性还原 ✓）；
+  ⚠⚠ **任何会 `git checkout` 的脚本只能在提交之后跑** ✓（**硬顺序，不是记性** ✓）：`git checkout [<commit>] -- <path>` 恢复的是**索引或旧版本** ✓，会把**未提交的 `src/main` 改动一并丢掉** ✗（本仓库实测丢过 `Battle.grantShield` 与解释器两处改动 ✓）；另两条同族：旧版本**没有**而工作区**有**的文件它**不会删** ✓（跑闸门前要自己删 ✓）；**工作区与 HEAD 相同时跑闸门比的是自己** ✓（看着像通过 ✗）。⇒ 跑闸门之前先 `git status` 确认干净 ✓。
   ⚠⚠ **PowerShell 的 `Set-Content -Encoding utf8` 会写 BOM** ✗ —— 用它回退一个 `.java`，编译**炸一串错** ✓。
   ⚠⚠ **「按字节」必须真的是字节** ✓：Python 用 `encoding="utf-8"` ＋ `newline="\n"` 写回一个 **CRLF** 文件，
   内容一样、**字节不一样** ✓ ⇒ 回滚后 SHA256 对不上 ✓（2026-10-19 实测：11 次变异**全部变红** ✓，
@@ -1396,78 +929,16 @@ C 层全是**填口子** ✓，依赖已完成的机制，**不该出现新架�
 
 ### 6.5 测量与探针：**先问"谁会在它被读之前重写它"**
 
-- ⚠⚠ **闸门会静默重放，删 `build/test-results` 挡不住** ✓：
-  实测删掉之后 `gradlew test` 仍报 **`Task :test UP-TO-DATE`**，几秒就结束 ✓，
-  被删的 XML **被原样写回** ✓。⇒ **正解是 `--rerun-tasks`** ✓（每个任务都 executed ✓）。
-  ⇒ **判据是"任务真的执行了"** ✓（读 Gradle 那一行 `UP-TO-DATE` / `FROM-CACHE` / `executed` ✓），
-  **不是**"XML 的文件时间变了" ✗ —— 只看文件时间会拿到一份**看起来全新**的旧结果 ✓。
-- ⚠⚠ **探针会被构建自己冲掉 ⇒ 读出假结论** ✓：
-  我把悬空 `{@link}` 注入到 **`build/delombok/`** ✗，结果 `javadoc` **0 error** ✓，
-  差点写成"**审计是瞎的**" ✗。真相：`delombok` **每次构建都从 `src/main/java` 重新生成**那棵树 ✓
-  ⇒ 注入**在执行前就被冲掉了** ✓。
-  ⇒ **探针打在构建真正读取的那份文件上** ✓；⚠ 打在**派生产物**上的探针，
-  先问一句"**谁会在它被读之前重写它**" ✓。（这是"过期的东西会替你回答"的**新形状** ✓：
-  这次替你回答的是**被重建的树** ✓。）
-- ⚠⚠ **先确认被测的是哪一份产物** ✓ —— 是上一条的**反向形状**：没有人重写它，是**它压根没被重建** ✓。
-  实测（TUI）：唯一支持的启动方式是从**安装目录**跑 ✓（`gradle run` 没有控制终端 ✓），
-  而安装目录里的 jar 是**前一天的** ✓ —— `test` / `assemble` 只刷新 `build/classes` 与 `build/libs` ✓，
-  `install/` 留着旧副本 ✓ ⇒ 连续两处修复"没生效"是**必然**的 ✓，第三处加的诊断（探针）也不在 jar 里 ✓
-  ⇒ **三轮读数全部关于旧代码** ✓，而每一轮看起来都像"修复无效" ✗。
-  ⭐ 这个坑的另一半在注释里 ✓：`build.gradle` 写着"`installDist` 已接进 `build`" ✓，而**根本没有那句接线** ✗
-  ⇒ **注释里"已经做了"的话，要用一次 `--dry-run` 或一次时间戳核对** ✓，不能当事实 ✗。
-  ⇒ **规矩**：诊断"改动没生效"之前 ✓，先量**被测产物的身份**（时间 / 内容 / 自报来源 ✓）；
-  **长期正解**是让产物**自报身份**（启动打印来源与时间戳 ✓），并让**唯一支持的构建命令**顺带重建它 ✓ ——
-  ⚠ 两者都要**默认安静** ✓（诊断输出放在同一个开关后面 ✓，正常启动一个字都不打印 ✓）。
-- ⭐ **双向灵敏度：只测"会红"不够** ✓：同一道闸门，喂它一个它该抓的 ✓ ＋
-  喂它一个**本项目真实存在**的坏形状 ✓。只做前者，会得到"闸门有效"这个**半对**的结论 ✗。
-  实证：javadoc 审计对 `{@link}` **有效** ✓（注入几处悬空链接 ⇒ 报出对应行 ✓），
-  对 `{@code 某个文件.md}` **完全瞎** ✓（注入大量指向已删文档 ⇒ **0 命中** ✓）。
-- ⚠⚠ **环境变量会漏进被测进程**，把"我的夹具坏了"伪装成"产品变了" ✓：
-  `JAVA_TOOL_OPTIONS=-Duser.language=en` 被 `gradlew run` 的子 JVM 继承 ✓ ⇒
-  demo 每份**多出两行** `Picked up JAVA_TOOL_OPTIONS: …` ✓ ⇒ **几份 demo 的行数一起 +2** ✗。
-  ⚠ **多份"一致地"变化看起来极像一次真实的行为改动** ✓。⇒ **规矩**：
-  ① 测量脚本开头**清掉** `JAVA_TOOL_OPTIONS` / `JAVA_OPTS` / `GRADLE_OPTS` ✓；
-  ② **行数变化要先归因再下结论** ✓（多份一致变化既可能是真改动 ✓，
-  也可能是**共同上游**：环境变量 / 日志级别 / 一个新警告 ✓）；
-  ③ 判据是**原始字节对比** ✓。⭐ 已**固化进夹具** ✓，并**故意把变量设回去**验证夹具真的挡住了 ✓。
-- ⚠⚠ **"当前"是别人写的 ⇒ 顺序即语义** ✓（2026-10-17 实测 ✓）：角色文件把「文档按 Lv10 引用」写成一条
-  `level_convention` 规则（`RAISE_SKILL_LEVEL +9`）✓，而**同一事件的规则按文件顺序执行** ✓
-  ⇒ 一条**读当前等级**的规则若把 `level_convention` 排在**它后面**，就会读到**第 1 行** ✓。
-  实测：1304 砂金 的行迹「热手」护盾是 `BATTLE_START` ✓ 而约定规则在文件**末尾** ✓ ——
-  改成读行之后它静默给出 `0.16 × DEF + 80`（第 1 行）✓ 而文档写的是 `0.24 × DEF + 320`（第 10 行）✓，
-  **唯一的症状是一条内容用例的精确期望变红** ✓。
-  ⇒ **规矩**：`level_convention` 放**文件第一条** ✓（它是"这个文件引的是哪一行"，不是机制 ✓）；
-  ⚠ **只有早于/等于 `BATTLE_START` 的事件才受影响** ✓ —— 施放类事件（`SKILL_CAST` / `ULT_CAST` / `BASIC_ATTACK`）
-  **永远在开战之后** ✓，它们在文件里的位置无关 ✓（1001 的护盾就排在文件最前面而读的是第 10 行 ✓）。
-  ⚠ 另一半同一形状：**测试里「没开战就施放」** ✓ —— 约定没跑过 ⇒ 等级是 1 ✓（实测 `PreservationTrailblazerTest`
-  的 52.744 应当是 129.116 ✓）⇒ 于是"数字变成读行"之后，夹具**必须先把战斗开起来** ✓ 再施放 ✓。
-  【已把守：`LevelConventionOrderTest`（早事件的规则不得读行在约定之前 / 没有约定也算 / 故意把一条规则搬到
-  `BATTLE_START` 时它会指名文件与规则 ✓）】
-- ⭐ **探针要打前提，不是打结论** ✓：一次判据失败后我没有继续猜，而是打了一行探针 ——
-  `before ult: COMMON slot = 1 ; counter = 0` / `after ult: COMMON slot = 8 ; counter = 20` /
-  `after skill: counter = 35` ✓ ⇒ 三行同时证实了"替换生效"与"**终结技自己就给计数**" ✓
-  ⇒ 直接定位到 §6.4 的假变量 ✓。**探针自回滚** ✓，别提交 ✓。
-- ⭐ **词汇是可询问的：让引擎的封闭词表回答** ✓：新 op / 新字段不要猜 ✓，
-  校验器会**指名它接受什么** ✓（实证三例：
-  `Op ADD_DAMAGE states "damage_type", but only [DAMAGE, MODIFY_ATTR, MODIFY_DAMAGE_TAKEN, BOOST_DAMAGE] read it` ✓；
-  `Op DAMAGE has "scale": "elation_base", which is not a spelling this op knows` ✓；
-  `Op ADD_DAMAGE needs the damage instance being settled, but this context carries none` ✓）。
-  ⭐ **同一个名字在不同事件上可能含义不同** ✓：`from_skill_id` 在 `BASIC_ATTACK` 上是**槽位** ✓，
-  而 `Battle` 同参数的 javadoc 写 "The row, not the slot" ✓ —— 两处注释矛盾 ✓
-  ⇒ **别跨事件搬结论** ✗。
-- ⚠⚠ **破坏性还原会冲掉未提交的改动**（**×5**）✓：`git checkout <旧提交> -- <路径>` /
-  `git checkout HEAD -- <路径>` 恢复的是**索引或旧版本** ✓，会把**未提交的 src/main 改动一并丢掉** ✗
-  （本仓库实测丢过 `Battle.grantShield`、解释器两处改动与一条规则 ✓，只剩一个未跟踪的测试文件 ✓）。
-  ⇒ **硬顺序，不是记性** ✓：**任何会 `git checkout` 的脚本只能在提交之后跑** ✓；
-  **跑闸门之前先 `git status` 确认工作区干净** ✓；
-  ⚠ 另外两条同族：`git checkout <旧提交> -- <路径>` **只会"更新"不会"删除"** ✓
-  ⇒ 跑闸门之前要把**旧版本没有、而工作区有**的文件也删掉 ✓；
-  ⚠ **工作区与 HEAD 相同时跑闸门比的是自己** ✓，看着像通过 ✗。
-  ⚠ 回滚改用 **`git show HEAD:<path>` 取字节写回** ✓（§6.4），**绝不用 `git checkout`** ✗。
+- ⚠⚠ **探针会被构建自己冲掉 ⇒ 读出假结论** ✓：把悬空 `{@link}` 注入到 **`build/delombok/`** ⇒ `javadoc` **0 error** ✓ —— 因为 `delombok` **每次构建都从 `src/main/java` 重新生成**那棵树 ✓（注入在执行前就被冲掉了 ✓）。⇒ **探针打在构建真正读取的那份文件上** ✓。
+- ⚠⚠ **先确认被测的是哪一份产物**（上一条的反向形状：没有人重写它，是它**压根没被重建** ✓）：实测一处修复"连续三轮没生效" ✓ —— 跑的是**安装目录里的旧 jar** ✓，而 `test`/`assemble` 只刷新 `build/**` ✓。⚠ 同一坑的另一半：`build.gradle` 注释写着"`installDist` 已接进 `build`"，而**根本没有那句接线** ✗ ⇒ **注释里"已经做了"的话要用一次 `--dry-run` 或时间戳核对** ✓。
+  ⇒ **规矩**：诊断"改动没生效"之前，先量**被测产物的身份**（时间 / 内容 / 自报来源 ✓）；长期正解是让产物**自报身份**并让唯一支持的构建命令顺带重建它 ✓（两者都**默认安静** ✓）。
+- ⭐ **双向灵敏度：只测"会红"不够** ✓：同一道闸门，喂一个它**该抓**的 ✓ ＋ 一个**本项目真实存在**的坏形状 ✓。只做前者会得到"闸门有效"这个**半对**结论 ✗。实证：javadoc 审计对 `{@link}` **有效** ✓，对 `{@code 某个文件.md}` **完全瞎** ✓（注入大量指向已删文档的引用 ⇒ **0 命中** ✓）。
+- ⚠⚠ **环境变量会漏进被测进程** ✓：`JAVA_TOOL_OPTIONS=-Duser.language=en` 被 `gradlew run` 的子 JVM 继承 ⇒ 每份 demo **多出两行** `Picked up JAVA_TOOL_OPTIONS: …` ✓ —— 而**多份"一致地"变化看起来极像一次真实的行为改动** ✗。⇒ ① 测量脚本开头清掉 `JAVA_TOOL_OPTIONS` / `JAVA_OPTS` / `GRADLE_OPTS` ✓；② **行数变化先归因**（共同上游：环境变量 / 日志级别 / 一个新警告 ✓）；③ 判据是**原始字节对比** ✓。⭐ 已固化进夹具，并**故意把变量设回去**验证夹具真的挡住了 ✓。
+- ⚠⚠ **"当前"是别人写的 ⇒ 顺序即语义** ✓：`level_convention`（`RAISE_SKILL_LEVEL +9`）与**读当前等级**的规则都在 `BATTLE_START` 上，而同一事件的规则**按文件顺序**执行 ⇒ 读行排在约定**后面**就会读到**第 1 行** ✓（实测 1304 砂金的行迹静默给出 `0.16 × DEF + 80` 而文档写 `0.24 × DEF + 320` ✓，**唯一症状是一条精确期望变红** ✓）。⇒ 约定放**文件第一条** ✓；⚠ 只有**早于或等于 `BATTLE_START`** 的事件受影响 ✓（施放类事件永远在开战之后 ✓）。另一半：**测试里「没开战就施放」** ⇒ 约定没跑过、等级是 1 ✓ ⇒ 夹具**必须先把战斗开起来** ✓。【已把守：`LevelConventionOrderTest`】
+- ⭐ **探针要打前提，不是打结论** ✓：判据失败后不去猜，而是打一行 `before ult: COMMON slot = 1 ; counter = 0` / `after ult: slot = 8 ; counter = 20` ✓ ⇒ 一次就定位到 §6.4 的假变量 ✓。**探针自回滚**，别提交 ✓。
+- ⭐ **词汇是可询问的：让引擎的封闭词表回答** ✓：新 op / 新字段不要猜 ✓ —— 校验器会**指名它接受什么** ✓（`Op ADD_DAMAGE states "damage_type", but only [DAMAGE, MODIFY_ATTR, MODIFY_DAMAGE_TAKEN, BOOST_DAMAGE] read it` ✓；`Op DAMAGE has "scale": "elation_base", which is not a spelling this op knows` ✓）。⚠ **同一个名字在不同事件上可能含义不同** ✓：`from_skill_id` 在 `BASIC_ATTACK` 上是**槽位** ✓，而 `Battle` 同参数的 javadoc 写 "The row, not the slot" ✓ ⇒ **别跨事件搬结论** ✗。
 - ⚠ **"闸门跑起来了"不等于"闸门比对了"** ✓：先看两边输出的**大小 / 首行**，确认没有编译错误 ✓。
-- ⚠ **提交信息里的数字要"跑完再读"** ✓，不能凭记忆写 ✗
-  （实测两次写错：报了一个数，实际是另一个 ✓）
-  ⇒ **先跑、读到 `tests=` 那行、再写信息** ✓。
+- ⚠ **提交信息里的数字要"跑完再读"** ✓（实测两次凭记忆写错 ✓）⇒ **先跑、读到那一行、再写信息** ✓。
 
 ### 6.6 文本改写与环境
 
@@ -1680,12 +1151,14 @@ C 层全是**填口子** ✓，依赖已完成的机制，**不该出现新架�
 | **忆灵的技能等级**（加成记在召唤者、按数据槽位 / 解析器读到并 clamp 到表行数 / `summon_param` 与 `amount_from_cast_param` 两种读法 / 加载期五种拒绝） | `MemospriteSkillLevelTest` |
 | **弹射的份额与次数读的是当前等级那一行**（两行两个数 / 行为比值 = 两行份额之比 / 造表让次数也随行变 / **次数优先读正文**「额外造成N次」） | `BounceSkillLevelTest` |
 | **回能读技能自己的 `sp_base`**（弹射按段数乘 / 偏离常量的行正好三行 / 两发弹射的 6×5 与 10×3 都是 30） | `EnergyDataConformanceTest` |
-| **Impair 的 debuff 派发缺口**（没有一条 `Impair` 带 effect 行 / 正文点战斗内状态的正好三条） | `ImpairDebuffGapTest` |
 | **1002 潜龙：低血仇恨减半，以及它会被收回去**（AGGRO_ADDED_RATIO = -0.5 / 权重 ×0.5 / 治疗过 50% 后归零并移除状态 / 高于 50% 不触发） | `DanHengAggroDownTest` |
 | **伤害段数（分裂比）**（普攻 2 段 / 战技 4 段 / 各段是行倍率的分数且和 = 1 / 每段独立暴击 / 同一减速 Refresh 不成四层） | `DanHengSegmentsTest` |
 | **与原游戏逐乘区比较**（出货场景跑通 / 错数必红 / 拼错的 zone 必红 / 空期望只是清单不是通过） | `DamageComparatorTest` |
 | **1002 每一处数的来源**（天赋穿透随天赋等级 → 星魂 5 为 row12 / 秘技 40% 是份额不是 0.4 点 / 减速 -12% 是行的量乘正文的符号） | `DanHengLevelSourceTest` |
 | **1002 的面板与行值与文档一致**（Lv80 882/546.84/396.9/110、行迹 18%/12.5%/22.4%、破韧 30/60/90、终结技能量 100、四个 Lv10 行） | `DanHengPanelAgreementTest` |
+| **规则对象的键必须是 Gson 认得的**（写错的键会让规则以 "Unknown trigger event 'null'" 到场 ✓） | `RuleKeyGuardTest` |
+| **`scope_element` 的两处拒绝**（元素是封闭集 ✓ / 只许出现在收它的 op 上 ✓） | `ScopeElementGuardTest` |
+| **`DEALING_DAMAGE` 的规则不许够到队友的伤害**（缺 `actor == self` 会把句子悄悄扩到全队 ✓；量法是「队里有他 / 没他」两场的队友伤害必须一样 ✓） | `SelfScopedDamageGuardTest` |
 | **台账不写"现在是什么"的数字**（套件 / 用例 / 文件 / 方法 / 类 / 规则数、`file:line`、大小、提交数、「N 处」） | `LedgerNumberGuardTest` |
 
 ### 7.2 **只靠散文**（所以上面必须写完整）
@@ -1719,3 +1192,15 @@ C 层全是**填口子** ✓，依赖已完成的机制，**不该出现新架�
 > ② **欢愉的 `elation_basic_level_damage.json`"从未被加载"** —— **已过时** ✓，
 > 现由 `Constant.ELATION_BASIC_LEVEL_DAMAGE` 加载 ✓，`ElationBaseTableTest` 钉住 ✓。
 > ⚠ 反向也有一处：**P10-4 那行的"公开 API 还没上移"已过时** ✓（`Battle.delayMovePercent` **已是 public** ✓）。
+
+### 7.4 缺口见证（**不是守卫，只是"能力落地时它会红"**）
+
+> ⚠ 这些**不拦任何人** ✗ —— 它们钉住的是**今天的样子** ✓：能力落地时变红，并指回登记处 ✓（§4.3 要求每条登记都有这么一条 ✓）。
+> ⚠ 所以别把它们当"已经守住" ✗：它们只保证**缺口被悄悄填上或悄悄加深**都看得见 ✓。
+
+| 钉住的缺口 | 见证 |
+|---|---|
+| 欢愉行的三种布局（1506 槽 21 被读成 **1 次 600%**） | `SilverWolfLV999ElationRowTest` |
+| 没有 `SkillType` 的槽读不到那一行（1408 槽 5 的 0.8／2.7 不随 E5 漂） | `PhainonSlotFiveRowDriftTest` |
+| `ENERGY_GAINED` 不带授予者（1408 行迹 1408102 的后半什么都不做） | `PhainonTraceBideInFlamesTest.theEnergyHalfIsStillANoOp` |
+| `Impair` 的 debuff 派发缺输入（没有一条 `Impair` 带 effect 行） | `ImpairDebuffGapTest` |
