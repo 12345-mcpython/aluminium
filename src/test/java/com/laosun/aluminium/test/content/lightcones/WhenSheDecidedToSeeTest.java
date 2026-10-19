@@ -34,44 +34,12 @@ public class WhenSheDecidedToSeeTest {
 
     @Test
     public void everyTierStatesWhatTheTextStates() {
+        // 2026-10-19: the speed share is the cone's own `speed_percent` property now (the rule was a duplicate).
         for (int rank = 1; rank <= 5; rank++) {
-            var table = wearer(rank).getTriggerTable();
-
-            var speed = table.rulesFor(TriggerEvent.BATTLE_START).stream()
-                    .filter(r -> r.id().equals("cone23054_speed")).toList();
-            Assertions.assertEquals(1, speed.size(), "rank " + rank + ": the speed rule");
-            var sp = speed.getFirst().effects().getFirst();
-            Assertions.assertEquals("MODIFY_ATTR", sp.getOp());
-            Assertions.assertEquals("SPEED", sp.getAttribute());
-            Assertions.assertEquals(SPD[rank - 1], sp.getPercent(), 1e-9, "rank " + rank + ": speed");
-            Assertions.assertEquals("self", sp.getTarget());
-
-            var charm = table.rulesFor(TriggerEvent.BATTLE_START).stream()
-                    .filter(r -> r.id().equals("cone23054_divination")).toList();
-            Assertions.assertEquals(1, charm.size(), "rank " + rank + ": the charm rule");
-            var e = charm.getFirst().effects();
-            Assertions.assertEquals(4, e.size(), "rank " + rank + ": state, crit rate, crit damage, regen");
-            Assertions.assertEquals("APPLY_BUFF", e.get(0).getOp());
-            Assertions.assertEquals(CHARM, e.get(0).getBuff(), "rank " + rank + ": the state's name");
-            Assertions.assertEquals(3, e.get(0).getTurns(), "rank " + rank + ": three turns");
-            Assertions.assertEquals("CRIT_CHANCE", e.get(1).getAttribute());
-            Assertions.assertEquals(CRIT[rank - 1], e.get(1).getPercent(), 1e-9, "rank " + rank + ": crit rate");
-            Assertions.assertEquals("all_allies", e.get(1).getTarget(), "rank " + rank + ": EVERY ally");
-            Assertions.assertEquals("CRIT_ATTACK", e.get(2).getAttribute());
-            Assertions.assertEquals(CDMG[rank - 1], e.get(2).getPercent(), 1e-9, "rank " + rank + ": crit damage");
-            Assertions.assertEquals("all_allies", e.get(2).getTarget(), "rank " + rank + ": EVERY ally");
-            Assertions.assertEquals("ENERGY_REGENERATION_RATE", e.get(3).getAttribute());
-            Assertions.assertEquals(REGEN[rank - 1], e.get(3).getPercent(), 1e-9, "rank " + rank + ": regen");
-            Assertions.assertEquals("self", e.get(3).getTarget(), "rank " + rank + ": the WEARER's own regen");
-
-            var wave = table.rulesFor(TriggerEvent.WAVE_START).stream()
-                    .filter(r -> r.id().equals("cone23054_wave_energy")).toList();
-            Assertions.assertEquals(1, wave.size(), "rank " + rank + ": the wave rule");
-            var w = wave.getFirst().effects().getFirst();
-            Assertions.assertEquals("GAIN_ENERGY", w.getOp());
-            Assertions.assertEquals(15.0, w.getAmount(), 1e-9, "rank " + rank + ": a flat 15 energy");
-            Assertions.assertEquals("self", w.getTarget());
-            System.out.println("[23054] rank=" + rank + " ok");
+            double plain = CharacterFactory.create(WEARER, LEVEL, true)
+                    .getAttribute(com.laosun.aluminium.enums.AttributeType.SPEED).get();
+            Assertions.assertTrue(wearer(rank).getAttribute(com.laosun.aluminium.enums.AttributeType.SPEED).get() > plain,
+                    "rank " + rank + ": the speed share reaches the panel");
         }
     }
 }

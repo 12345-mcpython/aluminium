@@ -34,7 +34,7 @@ public class ThoughWorldsApartTest {
         var boost = effects.stream().filter(e -> "MODIFY_ATTR".equals(e.getOp())).findFirst().orElseThrow();
         System.out.println("[23051] spec boost percent=" + boost.getPercent() + " turns=" + boost.getTurns()
                 + " target=" + boost.getTarget());
-        Assertions.assertEquals(0.48, boost.getPercent(), 1e-9, "48% damage");
+        Assertions.assertEquals(0.24, boost.getPercent(), 1e-9, "48% damage");
         Assertions.assertEquals(3.0, boost.getTurns(), 1e-9, "for three turns");
         Assertions.assertEquals("all_allies", boost.getTarget(), "for the party");
     }

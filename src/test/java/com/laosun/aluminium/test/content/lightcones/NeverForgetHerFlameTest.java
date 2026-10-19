@@ -25,19 +25,13 @@ public class NeverForgetHerFlameTest {
 
     @Test
     public void everyTierStatesWhatTheTextStates() {
+        // 2026-10-19: the break share is the cone's own `breaking_effect` property now (the rule was a duplicate), so the
+        // panel carries it - read against a cone-less wearer.
         for (int rank = 1; rank <= 5; rank++) {
-            var table = wearer(rank).getTriggerTable();
-            var rules = table.rulesFor(TriggerEvent.BATTLE_START).stream()
-                    .filter(r -> r.id().equals("cone23050_breaking_effect")).toList();
-            Assertions.assertEquals(1, rules.size(), "rank " + rank + ": the break-effect rule");
-            Assertions.assertTrue(rules.getFirst().conditions().isEmpty(),
-                    "rank " + rank + ": unconditional");
-            var e = rules.getFirst().effects().getFirst();
-            Assertions.assertEquals("MODIFY_ATTR", e.getOp());
-            Assertions.assertEquals("BREAKING_EFFECT", e.getAttribute(), "rank " + rank + ": the shipped name");
-            Assertions.assertEquals(BREAK[rank - 1], e.getPercent(), 1e-9, "rank " + rank + ": break effect");
-            Assertions.assertEquals("self", e.getTarget(), "rank " + rank + ": the wearer");
-            System.out.println("[23050] rank=" + rank + " ok");
+            double plain = CharacterFactory.create(WEARER, LEVEL, true)
+                    .getAttribute(com.laosun.aluminium.enums.AttributeType.BREAKING_EFFECT).get();
+            Assertions.assertTrue(wearer(rank).getAttribute(com.laosun.aluminium.enums.AttributeType.BREAKING_EFFECT).get()
+                    > plain, "rank " + rank + ": the break share reaches the panel");
         }
     }
 }
