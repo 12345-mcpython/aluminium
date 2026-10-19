@@ -212,7 +212,16 @@ final class TriggerValidator {
             case RAISE_RESOURCE_CAP -> {
                 // A resource the owner DECLARES, and how far to widen its overflow.
                 requireResource(effect, op, spec);
-                if (effect.getAmount() == null || effect.getAmount() <= 0) {
+                if (Boolean.TRUE.equals(effect.getUnbounded())) {
+                    // 「【火种】的可溢出点数不再拥有上限」 (1408's Eidolon 6): removing the allowance is not "raising it
+                    // by N", so the two spellings are refused together - a count beside "no limit" reads as a bound the
+                    // sentence denies.
+                    if (effect.getAmount() != null) {
+                        throw new IllegalArgumentException(
+                                "Op " + op + " states both \"unbounded\" and \"amount\": \"no upper limit\" and \"by this "
+                                        + "many more\" are different claims (source: " + spec.getSource() + ")");
+                    }
+                } else if (effect.getAmount() == null || effect.getAmount() <= 0) {
                     throw new IllegalArgumentException(
                             "Op " + op + " widens a resource's overflow, so \"amount\" is a positive count of points: got "
                                     + (effect.getAmount() == null ? "nothing" : effect.getAmount())
@@ -324,13 +333,23 @@ final class TriggerValidator {
                     // `target_max_hp`, added for "deal damage equal to X% of Max HP" -- 16 documents). `requireDerivedScale` stays strict because
                     // MODIFY_ATTR shares it and a modifier must not name a Max HP.
                     String literalScale = effect.getScale() == null ? "" : effect.getScale().trim();
-                    // A share of the SETTLED instance joins this branch: it states a `percent` and no
-                    // attribute, exactly like a Max HP share, and it needs `element` for the same reason (no skill row
-                    // lends one). Note: It is NOT a `requireDerivedScale` name -- that reader resolves an ATTRIBUTE, and
-                    // "original damage" is not one -- and it must hang on the ONE event whose `amount` is a settled damage.
-                    // A share of the SETTLED instance: `percent` + `element` like a Max HP share, and it
-                    // must hang on the one event whose `amount` is a settled damage (`DAMAGE_SETTLED`).
-                    if (TriggerInterpreter.SETTLED_DAMAGE_THIS_EVENT.equals(literalScale)) {
+                    if (Boolean.TRUE.equals(effect.getAmountFromEvent())) {
+                        // 「等同于本次攻击总伤害值 #1% 的真实伤害」 (1408's Eidolon 6): the base is the number the event
+                        // ANNOUNCES, and only one event announces an attack's settled total. Note: It is
+                        // `amount_from_event` (+ `percent`) and NOT `scale: "event_amount"` - that magnitude spelling was
+                        // withdrawn as a duplicate (see `EventAmountTest`); what was missing is this reader.
+                        requireEvent(spec, op, TriggerEvent.ATTACK_FINISHED);
+                        if (!literalScale.isEmpty()) {
+                            throw new IllegalArgumentException(
+                                    "Op " + op + " states both \"amount_from_event\" and \"scale\": the event's amount "
+                                            + "and a scale are two different bases (source: " + spec.getSource() + ")");
+                        }
+                        requirePercent(effect, op, spec);
+                        requireElement(effect, op, spec, true);
+                        // The announced total has already been through every zone: a rider that settles through them
+                        // again multiplies them a second time, and a sum has no single factor to divide by.
+                        requireTrueDamage(effect, op, spec);
+                    } else if (TriggerInterpreter.SETTLED_DAMAGE_THIS_EVENT.equals(literalScale)) {
                         // "equal to X% of the TOTAL damage value of this one": the share is taken of the SETTLED total,
                         // which has already been through every zone. A rider settled through the zones again would
                         // multiply them a second time, and - unlike `original_damage`, which can divide by the one

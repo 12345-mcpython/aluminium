@@ -1001,6 +1001,11 @@ public final class TriggerInterpreter {
      * Widens a resource's OVERFLOW for its owner (reader: 114151"[新蕊] can overflow to #3%").
      *
      * <p>A declaration states one overflow; a sentence can raise it for the battle. The NORMAL cap is untouched -- this is only the second tier, which is what the sentence is about.
+     *
+     * <p>{@code unbounded: true} sets the allowance to {@link Integer#MAX_VALUE} instead of adding a count, which is
+     * <b>the largest cap the engine can hold</b> - reader: 1408 Phainon (白厄)'s Eidolon 6, 「【火种】的可溢出点数<u>不再
+     * 拥有上限</u>」. {@code Resource.absoluteMax()} saturates on the sum, so the invariant still holds. The two spellings
+     * are exclusive: "by this many more" and "by no limit" are different claims (the validator refuses the pair).
      */
     private static void raiseResourceCap(EffectSpec effect, TriggerContext ctx) {
         CanHit holder = TriggerTargets.resolveTarget(effect, ctx);
@@ -1013,6 +1018,10 @@ public final class TriggerInterpreter {
         if (resource == null) {
             throw new IllegalStateException("RAISE_RESOURCE_CAP names the resource '" + effect.getResource()
                     + "', which this unit neither declares nor has at party level");
+        }
+        if (Boolean.TRUE.equals(effect.getUnbounded())) {
+            resource.setMaxOverflow(Integer.MAX_VALUE);
+            return;
         }
         int raise = (int) Math.round(effect.getAmount());
         resource.setMaxOverflow(resource.getMaxOverflow() + raise);

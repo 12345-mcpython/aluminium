@@ -3647,6 +3647,26 @@ public class Battle {
      */
     public void fireAfterAttack(CanHit attacker, CanHit mainTarget,
                                 Collection<? extends CanHit> hitTargets, double totalDamage) {
+        fireAfterAttack(attacker, mainTarget, hitTargets, totalDamage, 0);
+    }
+
+    /**
+     * The same, naming the <b>SLOT of the skill that made the attack</b> so a rule can ask "after <em>that</em> attack".
+     *
+     * <p>Why it was missing: every other cast-level event ({@code SKILL_CAST} / {@code CAST_SETUP} / {@code DAMAGE_SETTLED})
+     * carries the slot, so content gates on {@code from_skill_id} freely; {@code ATTACK_FINISHED} announced the attack but
+     * nothing about <em>which</em> attack it was, and it is the only event carrying the settled total. Reader: 1408
+     * Phainon (白厄)'s Eidolon 6 - 「<b>施放【支柱•死星天裁】的攻击后</b>，对生命值最高的敌方目标额外造成等同于本次攻击总伤害值
+     * #1% 的真实伤害」 - where every other transformed attack must NOT pay the rider.
+     *
+     * <p>Note: {@code 0} is "unknown", not a slot: the four-argument overload above and {@code EnemySkill} (an enemy or a
+     * memosprite skill is not addressed by a character slot) both pass it, and no rule can say {@code from_skill_id == 0}
+     * by accident because a slot is never 0.
+     *
+     * @param skillSlot the data slot of the skill whose attack just finished, or 0 when the caller has none
+     */
+    public void fireAfterAttack(CanHit attacker, CanHit mainTarget,
+                                Collection<? extends CanHit> hitTargets, double totalDamage, int skillSlot) {
         if (attacker == null || hitTargets == null || hitTargets.isEmpty()) {
             return;                                  // not a single hit landed to it does not count as an attack
         }
@@ -3658,7 +3678,7 @@ public class Battle {
         // that WAS HIT" -- the fact only this side holds (cone 21029). Note: Same early return
         // as above: an attack that hit nothing does not announce itself.
         fireTriggers(TriggerEvent.ATTACK_FINISHED, attacker, mainTarget, targets.size(), totalDamage,
-                null, null, 0, 0, targets);
+                null, null, skillSlot, 0, targets);
         for (CanHit ally : allies) {
             ally.afterAttack(this, attacker, mainTarget, targets, totalDamage);
         }
