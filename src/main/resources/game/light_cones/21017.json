@@ -29,6 +29,44 @@
       ],
       "source": "光锥 21017 点个关注吧！（战技半）: 使装备者普攻和战技造成的伤害提高#1[i]%，当装备者的当前能量值等于其能量上限时，该效果额外提高#2[i]%。",
       "note": "同上 ✓：战技增伤与普攻增伤是**两个属性** ✓ ⇒ 两条规则**不会**互相替换 ✓。"
+    },
+    {
+      "on": "TURN_START",
+      "id": "cone21017_basic_extra_when_full",
+      "when": [
+        "self_energy_percent >= 1"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "BASIC_ATTACK_DAMAGE_BOOST",
+          "percent": 0.24,
+          "turns": 1,
+          "coexist": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21017 点个关注吧！（能量满时的额外那一半）: 「当装备者的当前能量值等于其能量上限时，该效果额外提高 #2%」",
+      "note": "⚠⚠ **2026-10-19 逐句核时补的** ✓：本文件原先只有两条基础增伤规则，**「能量满时额外 +24%」整句没有** ✗。\n写法：TURN_START ✓（每个自己的回合开始重算 ✓）、条件 self_energy_percent >= 1 ✓、**coexist: true** ✓（否则同一属性的修饰会**替换**掉基础那一档 ✗ —— 两条必须叠着存在 ✓）、\turns: 1 ✓。\n⚠ 曾加过 on_any: [ENERGY_GAINED] 想让「回合中途充满」也立刻生效 ✓，**实测会重复叠加** ✗（两档合计多出 0.72 而不是 0.48）⇒ 撤回 ✓，代价是满能量要等到下一个回合开始才算 ✓（缺口记在状态表）。"
+    },
+    {
+      "on": "TURN_START",
+      "id": "cone21017_skill_extra_when_full",
+      "when": [
+        "self_energy_percent >= 1"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SKILL_DAMAGE_BOOST",
+          "percent": 0.24,
+          "turns": 1,
+          "coexist": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21017 点个关注吧！（能量满时的额外那一半）: 「当装备者的当前能量值等于其能量上限时，该效果额外提高 #2%」",
+      "note": "⚠⚠ **2026-10-19 逐句核时补的** ✓：本文件原先只有两条基础增伤规则，**「能量满时额外 +24%」整句没有** ✗。\n写法：TURN_START ✓（每个自己的回合开始重算 ✓）、条件 self_energy_percent >= 1 ✓、**coexist: true** ✓（否则同一属性的修饰会**替换**掉基础那一档 ✗ —— 两条必须叠着存在 ✓）、\turns: 1 ✓。\n⚠ 曾加过 on_any: [ENERGY_GAINED] 想让「回合中途充满」也立刻生效 ✓，**实测会重复叠加** ✗（两档合计多出 0.72 而不是 0.48）⇒ 撤回 ✓，代价是满能量要等到下一个回合开始才算 ✓（缺口记在状态表）。"
     }
   ],
   "2": [
@@ -61,6 +99,44 @@
       ],
       "source": "光锥 21017 点个关注吧！（战技半）: 使装备者普攻和战技造成的伤害提高#1[i]%，当装备者的当前能量值等于其能量上限时，该效果额外提高#2[i]%。",
       "note": "同上 ✓：战技增伤与普攻增伤是**两个属性** ✓ ⇒ 两条规则**不会**互相替换 ✓。"
+    },
+    {
+      "on": "TURN_START",
+      "id": "cone21017_basic_extra_when_full",
+      "when": [
+        "self_energy_percent >= 1"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "BASIC_ATTACK_DAMAGE_BOOST",
+          "percent": 0.24,
+          "turns": 1,
+          "coexist": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21017 点个关注吧！（能量满时的额外那一半）: 「当装备者的当前能量值等于其能量上限时，该效果额外提高 #2%」",
+      "note": "⚠⚠ **2026-10-19 逐句核时补的** ✓：本文件原先只有两条基础增伤规则，**「能量满时额外 +24%」整句没有** ✗。\n写法：TURN_START ✓（每个自己的回合开始重算 ✓）、条件 self_energy_percent >= 1 ✓、**coexist: true** ✓（否则同一属性的修饰会**替换**掉基础那一档 ✗ —— 两条必须叠着存在 ✓）、\turns: 1 ✓。\n⚠ 曾加过 on_any: [ENERGY_GAINED] 想让「回合中途充满」也立刻生效 ✓，**实测会重复叠加** ✗（两档合计多出 0.72 而不是 0.48）⇒ 撤回 ✓，代价是满能量要等到下一个回合开始才算 ✓（缺口记在状态表）。"
+    },
+    {
+      "on": "TURN_START",
+      "id": "cone21017_skill_extra_when_full",
+      "when": [
+        "self_energy_percent >= 1"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SKILL_DAMAGE_BOOST",
+          "percent": 0.24,
+          "turns": 1,
+          "coexist": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21017 点个关注吧！（能量满时的额外那一半）: 「当装备者的当前能量值等于其能量上限时，该效果额外提高 #2%」",
+      "note": "⚠⚠ **2026-10-19 逐句核时补的** ✓：本文件原先只有两条基础增伤规则，**「能量满时额外 +24%」整句没有** ✗。\n写法：TURN_START ✓（每个自己的回合开始重算 ✓）、条件 self_energy_percent >= 1 ✓、**coexist: true** ✓（否则同一属性的修饰会**替换**掉基础那一档 ✗ —— 两条必须叠着存在 ✓）、\turns: 1 ✓。\n⚠ 曾加过 on_any: [ENERGY_GAINED] 想让「回合中途充满」也立刻生效 ✓，**实测会重复叠加** ✗（两档合计多出 0.72 而不是 0.48）⇒ 撤回 ✓，代价是满能量要等到下一个回合开始才算 ✓（缺口记在状态表）。"
     }
   ],
   "3": [
@@ -93,6 +169,44 @@
       ],
       "source": "光锥 21017 点个关注吧！（战技半）: 使装备者普攻和战技造成的伤害提高#1[i]%，当装备者的当前能量值等于其能量上限时，该效果额外提高#2[i]%。",
       "note": "同上 ✓：战技增伤与普攻增伤是**两个属性** ✓ ⇒ 两条规则**不会**互相替换 ✓。"
+    },
+    {
+      "on": "TURN_START",
+      "id": "cone21017_basic_extra_when_full",
+      "when": [
+        "self_energy_percent >= 1"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "BASIC_ATTACK_DAMAGE_BOOST",
+          "percent": 0.24,
+          "turns": 1,
+          "coexist": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21017 点个关注吧！（能量满时的额外那一半）: 「当装备者的当前能量值等于其能量上限时，该效果额外提高 #2%」",
+      "note": "⚠⚠ **2026-10-19 逐句核时补的** ✓：本文件原先只有两条基础增伤规则，**「能量满时额外 +24%」整句没有** ✗。\n写法：TURN_START ✓（每个自己的回合开始重算 ✓）、条件 self_energy_percent >= 1 ✓、**coexist: true** ✓（否则同一属性的修饰会**替换**掉基础那一档 ✗ —— 两条必须叠着存在 ✓）、\turns: 1 ✓。\n⚠ 曾加过 on_any: [ENERGY_GAINED] 想让「回合中途充满」也立刻生效 ✓，**实测会重复叠加** ✗（两档合计多出 0.72 而不是 0.48）⇒ 撤回 ✓，代价是满能量要等到下一个回合开始才算 ✓（缺口记在状态表）。"
+    },
+    {
+      "on": "TURN_START",
+      "id": "cone21017_skill_extra_when_full",
+      "when": [
+        "self_energy_percent >= 1"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SKILL_DAMAGE_BOOST",
+          "percent": 0.24,
+          "turns": 1,
+          "coexist": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21017 点个关注吧！（能量满时的额外那一半）: 「当装备者的当前能量值等于其能量上限时，该效果额外提高 #2%」",
+      "note": "⚠⚠ **2026-10-19 逐句核时补的** ✓：本文件原先只有两条基础增伤规则，**「能量满时额外 +24%」整句没有** ✗。\n写法：TURN_START ✓（每个自己的回合开始重算 ✓）、条件 self_energy_percent >= 1 ✓、**coexist: true** ✓（否则同一属性的修饰会**替换**掉基础那一档 ✗ —— 两条必须叠着存在 ✓）、\turns: 1 ✓。\n⚠ 曾加过 on_any: [ENERGY_GAINED] 想让「回合中途充满」也立刻生效 ✓，**实测会重复叠加** ✗（两档合计多出 0.72 而不是 0.48）⇒ 撤回 ✓，代价是满能量要等到下一个回合开始才算 ✓（缺口记在状态表）。"
     }
   ],
   "4": [
@@ -125,6 +239,44 @@
       ],
       "source": "光锥 21017 点个关注吧！（战技半）: 使装备者普攻和战技造成的伤害提高#1[i]%，当装备者的当前能量值等于其能量上限时，该效果额外提高#2[i]%。",
       "note": "同上 ✓：战技增伤与普攻增伤是**两个属性** ✓ ⇒ 两条规则**不会**互相替换 ✓。"
+    },
+    {
+      "on": "TURN_START",
+      "id": "cone21017_basic_extra_when_full",
+      "when": [
+        "self_energy_percent >= 1"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "BASIC_ATTACK_DAMAGE_BOOST",
+          "percent": 0.24,
+          "turns": 1,
+          "coexist": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21017 点个关注吧！（能量满时的额外那一半）: 「当装备者的当前能量值等于其能量上限时，该效果额外提高 #2%」",
+      "note": "⚠⚠ **2026-10-19 逐句核时补的** ✓：本文件原先只有两条基础增伤规则，**「能量满时额外 +24%」整句没有** ✗。\n写法：TURN_START ✓（每个自己的回合开始重算 ✓）、条件 self_energy_percent >= 1 ✓、**coexist: true** ✓（否则同一属性的修饰会**替换**掉基础那一档 ✗ —— 两条必须叠着存在 ✓）、\turns: 1 ✓。\n⚠ 曾加过 on_any: [ENERGY_GAINED] 想让「回合中途充满」也立刻生效 ✓，**实测会重复叠加** ✗（两档合计多出 0.72 而不是 0.48）⇒ 撤回 ✓，代价是满能量要等到下一个回合开始才算 ✓（缺口记在状态表）。"
+    },
+    {
+      "on": "TURN_START",
+      "id": "cone21017_skill_extra_when_full",
+      "when": [
+        "self_energy_percent >= 1"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SKILL_DAMAGE_BOOST",
+          "percent": 0.24,
+          "turns": 1,
+          "coexist": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21017 点个关注吧！（能量满时的额外那一半）: 「当装备者的当前能量值等于其能量上限时，该效果额外提高 #2%」",
+      "note": "⚠⚠ **2026-10-19 逐句核时补的** ✓：本文件原先只有两条基础增伤规则，**「能量满时额外 +24%」整句没有** ✗。\n写法：TURN_START ✓（每个自己的回合开始重算 ✓）、条件 self_energy_percent >= 1 ✓、**coexist: true** ✓（否则同一属性的修饰会**替换**掉基础那一档 ✗ —— 两条必须叠着存在 ✓）、\turns: 1 ✓。\n⚠ 曾加过 on_any: [ENERGY_GAINED] 想让「回合中途充满」也立刻生效 ✓，**实测会重复叠加** ✗（两档合计多出 0.72 而不是 0.48）⇒ 撤回 ✓，代价是满能量要等到下一个回合开始才算 ✓（缺口记在状态表）。"
     }
   ],
   "5": [
@@ -157,6 +309,44 @@
       ],
       "source": "光锥 21017 点个关注吧！（战技半）: 使装备者普攻和战技造成的伤害提高#1[i]%，当装备者的当前能量值等于其能量上限时，该效果额外提高#2[i]%。",
       "note": "同上 ✓：战技增伤与普攻增伤是**两个属性** ✓ ⇒ 两条规则**不会**互相替换 ✓。"
+    },
+    {
+      "on": "TURN_START",
+      "id": "cone21017_basic_extra_when_full",
+      "when": [
+        "self_energy_percent >= 1"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "BASIC_ATTACK_DAMAGE_BOOST",
+          "percent": 0.24,
+          "turns": 1,
+          "coexist": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21017 点个关注吧！（能量满时的额外那一半）: 「当装备者的当前能量值等于其能量上限时，该效果额外提高 #2%」",
+      "note": "⚠⚠ **2026-10-19 逐句核时补的** ✓：本文件原先只有两条基础增伤规则，**「能量满时额外 +24%」整句没有** ✗。\n写法：TURN_START ✓（每个自己的回合开始重算 ✓）、条件 self_energy_percent >= 1 ✓、**coexist: true** ✓（否则同一属性的修饰会**替换**掉基础那一档 ✗ —— 两条必须叠着存在 ✓）、\turns: 1 ✓。\n⚠ 曾加过 on_any: [ENERGY_GAINED] 想让「回合中途充满」也立刻生效 ✓，**实测会重复叠加** ✗（两档合计多出 0.72 而不是 0.48）⇒ 撤回 ✓，代价是满能量要等到下一个回合开始才算 ✓（缺口记在状态表）。"
+    },
+    {
+      "on": "TURN_START",
+      "id": "cone21017_skill_extra_when_full",
+      "when": [
+        "self_energy_percent >= 1"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "SKILL_DAMAGE_BOOST",
+          "percent": 0.24,
+          "turns": 1,
+          "coexist": true,
+          "target": "self"
+        }
+      ],
+      "source": "光锥 21017 点个关注吧！（能量满时的额外那一半）: 「当装备者的当前能量值等于其能量上限时，该效果额外提高 #2%」",
+      "note": "⚠⚠ **2026-10-19 逐句核时补的** ✓：本文件原先只有两条基础增伤规则，**「能量满时额外 +24%」整句没有** ✗。\n写法：TURN_START ✓（每个自己的回合开始重算 ✓）、条件 self_energy_percent >= 1 ✓、**coexist: true** ✓（否则同一属性的修饰会**替换**掉基础那一档 ✗ —— 两条必须叠着存在 ✓）、\turns: 1 ✓。\n⚠ 曾加过 on_any: [ENERGY_GAINED] 想让「回合中途充满」也立刻生效 ✓，**实测会重复叠加** ✗（两档合计多出 0.72 而不是 0.48）⇒ 撤回 ✓，代价是满能量要等到下一个回合开始才算 ✓（缺口记在状态表）。"
     }
   ]
 }

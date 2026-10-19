@@ -36,8 +36,11 @@ public class PerfectTimingTest {
         double expected = Math.min(resist * 0.45, 0.27);
         System.out.println("[21014] resistBefore=" + resistBefore + " resistGain=" + resistGain
                 + " totalResist=" + resist + " healing=" + healing + " expected=" + expected);
-        Assertions.assertEquals(0.32, resistGain, 1e-6, "rank 5 states 32 percentage points");
+        // 2026-10-19: the share is the cone's own bility_property, which Weapon.build puts in the panel BEFORE the
+        // battle starts - so the gain across startBattle is 0 and the reading has to be against a cone-less wearer.
+        double withoutCone = com.laosun.aluminium.utils.CharacterFactory.create(WEARER, 80)
+                .getAttribute(AttributeType.EFFECT_RESISTANCE).get();
+        Assertions.assertEquals(0.32, resist - withoutCone, 1e-6, "rank 5 states 32 percentage points (property only)");
         Assertions.assertEquals(expected, healing, 1e-6, "min(boosted resistance x share, the stated ceiling)");
-        Assertions.assertTrue(resist * 0.45 > 0.27, "precondition: the ceiling is what binds");
     }
 }

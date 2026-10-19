@@ -2,21 +2,6 @@
   "1": [
     {
       "on": "BATTLE_START",
-      "id": "cone21014_effect_res",
-      "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "EFFECT_RESISTANCE",
-          "percent": 0.16,
-          "permanent": true,
-          "target": "self"
-        }
-      ],
-      "source": "光锥 21014 此时恰好: 使装备者的效果抵抗提高#1[i]%，并使装备者的治疗量提高，提高数值等同于效果抵抗的#2[i]%，最多使治疗量提高#3[i]%。",
-      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 1 阶）✓；属性名从 `AttributeType` 查出 ✓。 ⚠ **光锥没有 `properties` 行** ✗ ⇒ 常驻属性写成规则 ✓、用 `permanent` ✓。"
-    },
-    {
-      "on": "BATTLE_START",
       "id": "cone21014_healing_off_effect_res",
       "do": [
         {
@@ -30,25 +15,10 @@
         }
       ],
       "source": "光锥 21014 此时恰好（治疗量随效果抵抗）: 使装备者的效果抵抗提高#1[i]%，并使装备者的治疗量提高，提高数值等同于效果抵抗的#2[i]%，最多使治疗量提高#3[i]%。",
-      "note": "⭐ 「治疗量提高，提高数值**等同于效果抵抗的 #2**」= 派生份额 ✓ 配 `scale: self_attr:EFFECT_RESISTANCE` ✓；「**最多使治疗量提高 #3**」= **`cap_amount: 0.15`** ✓（第 203/240 轮落地的常量上限 ✓，夹取在 `applyDerivedCeiling` **内部** ✓）。⚠ 两条**属性不同** ✓ ⇒ 不会互相替换 ✓；⚠ 但**第二条依赖第一条的结果** ✓（效果抵抗先加 ✓ 再派生 ✓）——两者同在 `BATTLE_START` ✓，实测确认派生读到的是**加上之后**的值 ✓。"
+      "note": "「治疗量提高，提高数值等同于**效果抵抗**的 #2%，最多提高 #3%」—— ⭐ `scale: self_attr:EFFECT_RESISTANCE` ＋ `percent: 0.33` ＋ **`cap_amount`** ✓（叠影 1 的上限 = 0.15 ✓）；效果抵抗本身**由光锥属性给出** ✓（`effect_resistance` ✓）。\n⚠⚠ **2026-10-19 逐句核时删掉了一条重复**：本文件原先还有一条 `MODIFY_ATTR EFFECT_RESISTANCE 0.16` ✗ —— 那正是光锥的 `ability_property`（`Weapon.build` 施加 ✓）⇒ 面板会读成 **+32%** ✗（同形：20003 的防御、21007 的治疗、21008 的效果命中 ✓）。删掉之后 `self_attr:EFFECT_RESISTANCE` 读到的仍是**含光锥属性**的面板 ✓。"
     }
   ],
   "2": [
-    {
-      "on": "BATTLE_START",
-      "id": "cone21014_effect_res",
-      "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "EFFECT_RESISTANCE",
-          "percent": 0.2,
-          "permanent": true,
-          "target": "self"
-        }
-      ],
-      "source": "光锥 21014 此时恰好: 使装备者的效果抵抗提高#1[i]%，并使装备者的治疗量提高，提高数值等同于效果抵抗的#2[i]%，最多使治疗量提高#3[i]%。",
-      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 2 阶）✓；属性名从 `AttributeType` 查出 ✓。 ⚠ **光锥没有 `properties` 行** ✗ ⇒ 常驻属性写成规则 ✓、用 `permanent` ✓。"
-    },
     {
       "on": "BATTLE_START",
       "id": "cone21014_healing_off_effect_res",
@@ -64,25 +34,10 @@
         }
       ],
       "source": "光锥 21014 此时恰好（治疗量随效果抵抗）: 使装备者的效果抵抗提高#1[i]%，并使装备者的治疗量提高，提高数值等同于效果抵抗的#2[i]%，最多使治疗量提高#3[i]%。",
-      "note": "⭐ 「治疗量提高，提高数值**等同于效果抵抗的 #2**」= 派生份额 ✓ 配 `scale: self_attr:EFFECT_RESISTANCE` ✓；「**最多使治疗量提高 #3**」= **`cap_amount: 0.18`** ✓（第 203/240 轮落地的常量上限 ✓，夹取在 `applyDerivedCeiling` **内部** ✓）。⚠ 两条**属性不同** ✓ ⇒ 不会互相替换 ✓；⚠ 但**第二条依赖第一条的结果** ✓（效果抵抗先加 ✓ 再派生 ✓）——两者同在 `BATTLE_START` ✓，实测确认派生读到的是**加上之后**的值 ✓。"
+      "note": "「治疗量提高，提高数值等同于**效果抵抗**的 #2%，最多提高 #3%」—— ⭐ `scale: self_attr:EFFECT_RESISTANCE` ＋ `percent: 0.33` ＋ **`cap_amount`** ✓（叠影 1 的上限 = 0.15 ✓）；效果抵抗本身**由光锥属性给出** ✓（`effect_resistance` ✓）。\n⚠⚠ **2026-10-19 逐句核时删掉了一条重复**：本文件原先还有一条 `MODIFY_ATTR EFFECT_RESISTANCE 0.16` ✗ —— 那正是光锥的 `ability_property`（`Weapon.build` 施加 ✓）⇒ 面板会读成 **+32%** ✗（同形：20003 的防御、21007 的治疗、21008 的效果命中 ✓）。删掉之后 `self_attr:EFFECT_RESISTANCE` 读到的仍是**含光锥属性**的面板 ✓。"
     }
   ],
   "3": [
-    {
-      "on": "BATTLE_START",
-      "id": "cone21014_effect_res",
-      "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "EFFECT_RESISTANCE",
-          "percent": 0.24,
-          "permanent": true,
-          "target": "self"
-        }
-      ],
-      "source": "光锥 21014 此时恰好: 使装备者的效果抵抗提高#1[i]%，并使装备者的治疗量提高，提高数值等同于效果抵抗的#2[i]%，最多使治疗量提高#3[i]%。",
-      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 3 阶）✓；属性名从 `AttributeType` 查出 ✓。 ⚠ **光锥没有 `properties` 行** ✗ ⇒ 常驻属性写成规则 ✓、用 `permanent` ✓。"
-    },
     {
       "on": "BATTLE_START",
       "id": "cone21014_healing_off_effect_res",
@@ -98,25 +53,10 @@
         }
       ],
       "source": "光锥 21014 此时恰好（治疗量随效果抵抗）: 使装备者的效果抵抗提高#1[i]%，并使装备者的治疗量提高，提高数值等同于效果抵抗的#2[i]%，最多使治疗量提高#3[i]%。",
-      "note": "⭐ 「治疗量提高，提高数值**等同于效果抵抗的 #2**」= 派生份额 ✓ 配 `scale: self_attr:EFFECT_RESISTANCE` ✓；「**最多使治疗量提高 #3**」= **`cap_amount: 0.21`** ✓（第 203/240 轮落地的常量上限 ✓，夹取在 `applyDerivedCeiling` **内部** ✓）。⚠ 两条**属性不同** ✓ ⇒ 不会互相替换 ✓；⚠ 但**第二条依赖第一条的结果** ✓（效果抵抗先加 ✓ 再派生 ✓）——两者同在 `BATTLE_START` ✓，实测确认派生读到的是**加上之后**的值 ✓。"
+      "note": "「治疗量提高，提高数值等同于**效果抵抗**的 #2%，最多提高 #3%」—— ⭐ `scale: self_attr:EFFECT_RESISTANCE` ＋ `percent: 0.33` ＋ **`cap_amount`** ✓（叠影 1 的上限 = 0.15 ✓）；效果抵抗本身**由光锥属性给出** ✓（`effect_resistance` ✓）。\n⚠⚠ **2026-10-19 逐句核时删掉了一条重复**：本文件原先还有一条 `MODIFY_ATTR EFFECT_RESISTANCE 0.16` ✗ —— 那正是光锥的 `ability_property`（`Weapon.build` 施加 ✓）⇒ 面板会读成 **+32%** ✗（同形：20003 的防御、21007 的治疗、21008 的效果命中 ✓）。删掉之后 `self_attr:EFFECT_RESISTANCE` 读到的仍是**含光锥属性**的面板 ✓。"
     }
   ],
   "4": [
-    {
-      "on": "BATTLE_START",
-      "id": "cone21014_effect_res",
-      "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "EFFECT_RESISTANCE",
-          "percent": 0.28,
-          "permanent": true,
-          "target": "self"
-        }
-      ],
-      "source": "光锥 21014 此时恰好: 使装备者的效果抵抗提高#1[i]%，并使装备者的治疗量提高，提高数值等同于效果抵抗的#2[i]%，最多使治疗量提高#3[i]%。",
-      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 4 阶）✓；属性名从 `AttributeType` 查出 ✓。 ⚠ **光锥没有 `properties` 行** ✗ ⇒ 常驻属性写成规则 ✓、用 `permanent` ✓。"
-    },
     {
       "on": "BATTLE_START",
       "id": "cone21014_healing_off_effect_res",
@@ -132,25 +72,10 @@
         }
       ],
       "source": "光锥 21014 此时恰好（治疗量随效果抵抗）: 使装备者的效果抵抗提高#1[i]%，并使装备者的治疗量提高，提高数值等同于效果抵抗的#2[i]%，最多使治疗量提高#3[i]%。",
-      "note": "⭐ 「治疗量提高，提高数值**等同于效果抵抗的 #2**」= 派生份额 ✓ 配 `scale: self_attr:EFFECT_RESISTANCE` ✓；「**最多使治疗量提高 #3**」= **`cap_amount: 0.24`** ✓（第 203/240 轮落地的常量上限 ✓，夹取在 `applyDerivedCeiling` **内部** ✓）。⚠ 两条**属性不同** ✓ ⇒ 不会互相替换 ✓；⚠ 但**第二条依赖第一条的结果** ✓（效果抵抗先加 ✓ 再派生 ✓）——两者同在 `BATTLE_START` ✓，实测确认派生读到的是**加上之后**的值 ✓。"
+      "note": "「治疗量提高，提高数值等同于**效果抵抗**的 #2%，最多提高 #3%」—— ⭐ `scale: self_attr:EFFECT_RESISTANCE` ＋ `percent: 0.33` ＋ **`cap_amount`** ✓（叠影 1 的上限 = 0.15 ✓）；效果抵抗本身**由光锥属性给出** ✓（`effect_resistance` ✓）。\n⚠⚠ **2026-10-19 逐句核时删掉了一条重复**：本文件原先还有一条 `MODIFY_ATTR EFFECT_RESISTANCE 0.16` ✗ —— 那正是光锥的 `ability_property`（`Weapon.build` 施加 ✓）⇒ 面板会读成 **+32%** ✗（同形：20003 的防御、21007 的治疗、21008 的效果命中 ✓）。删掉之后 `self_attr:EFFECT_RESISTANCE` 读到的仍是**含光锥属性**的面板 ✓。"
     }
   ],
   "5": [
-    {
-      "on": "BATTLE_START",
-      "id": "cone21014_effect_res",
-      "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "EFFECT_RESISTANCE",
-          "percent": 0.32,
-          "permanent": true,
-          "target": "self"
-        }
-      ],
-      "source": "光锥 21014 此时恰好: 使装备者的效果抵抗提高#1[i]%，并使装备者的治疗量提高，提高数值等同于效果抵抗的#2[i]%，最多使治疗量提高#3[i]%。",
-      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 5 阶）✓；属性名从 `AttributeType` 查出 ✓。 ⚠ **光锥没有 `properties` 行** ✗ ⇒ 常驻属性写成规则 ✓、用 `permanent` ✓。"
-    },
     {
       "on": "BATTLE_START",
       "id": "cone21014_healing_off_effect_res",
@@ -166,7 +91,7 @@
         }
       ],
       "source": "光锥 21014 此时恰好（治疗量随效果抵抗）: 使装备者的效果抵抗提高#1[i]%，并使装备者的治疗量提高，提高数值等同于效果抵抗的#2[i]%，最多使治疗量提高#3[i]%。",
-      "note": "⭐ 「治疗量提高，提高数值**等同于效果抵抗的 #2**」= 派生份额 ✓ 配 `scale: self_attr:EFFECT_RESISTANCE` ✓；「**最多使治疗量提高 #3**」= **`cap_amount: 0.27`** ✓（第 203/240 轮落地的常量上限 ✓，夹取在 `applyDerivedCeiling` **内部** ✓）。⚠ 两条**属性不同** ✓ ⇒ 不会互相替换 ✓；⚠ 但**第二条依赖第一条的结果** ✓（效果抵抗先加 ✓ 再派生 ✓）——两者同在 `BATTLE_START` ✓，实测确认派生读到的是**加上之后**的值 ✓。"
+      "note": "「治疗量提高，提高数值等同于**效果抵抗**的 #2%，最多提高 #3%」—— ⭐ `scale: self_attr:EFFECT_RESISTANCE` ＋ `percent: 0.33` ＋ **`cap_amount`** ✓（叠影 1 的上限 = 0.15 ✓）；效果抵抗本身**由光锥属性给出** ✓（`effect_resistance` ✓）。\n⚠⚠ **2026-10-19 逐句核时删掉了一条重复**：本文件原先还有一条 `MODIFY_ATTR EFFECT_RESISTANCE 0.16` ✗ —— 那正是光锥的 `ability_property`（`Weapon.build` 施加 ✓）⇒ 面板会读成 **+32%** ✗（同形：20003 的防御、21007 的治疗、21008 的效果命中 ✓）。删掉之后 `self_attr:EFFECT_RESISTANCE` 读到的仍是**含光锥属性**的面板 ✓。"
     }
   ]
 }
