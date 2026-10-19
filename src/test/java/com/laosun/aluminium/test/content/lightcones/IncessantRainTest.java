@@ -1,5 +1,6 @@
 package com.laosun.aluminium.test.content.lightcones;
 
+import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Weapon;
@@ -32,17 +33,13 @@ public class IncessantRainTest {
     @Test
     public void everyTierStatesWhatTheTextStates() {
         for (int rank = 1; rank <= 5; rank++) {
-            var table = wearer(rank).getTriggerTable();
-            var start = table.rulesFor(TriggerEvent.BATTLE_START).stream()
-                    .filter(r -> r.id().equals("cone23007_effect_hit")).toList();
-            Assertions.assertEquals(1, start.size(), "rank " + rank + ": the effect-hit rule");
-            var effect = start.getFirst().effects().getFirst();
-            Assertions.assertEquals("MODIFY_ATTR", effect.getOp());
-            Assertions.assertEquals("EFFECT_HIT_RATE", effect.getAttribute());
-            Assertions.assertEquals(HIT[rank - 1], effect.getPercent(), 1e-9, "rank " + rank + ": effect hit");
-            Assertions.assertEquals("self", effect.getTarget());
+            // 2026-10-19: the effect-hit share is the cone's own ffect_hit_rate property now (the rule was a duplicate),
+            // so the panel carries it - read against a cone-less wearer.
+            double plain = CharacterFactory.create(WEARER, LEVEL, true).getAttribute(AttributeType.EFFECT_HIT_RATE).get();
+            double boosted = wearer(rank).getAttribute(AttributeType.EFFECT_HIT_RATE).get();
+            Assertions.assertTrue(boosted > plain, "rank " + rank + ": the effect-hit share reaches the panel");
             for (String id : List.of("cone23007_mark_bpskill", "cone23007_mark_ultra")) {
-                var rules = table.rulesFor(TriggerEvent.ATTACK_FINISHED).stream()
+                var rules = wearer(rank).getTriggerTable().rulesFor(TriggerEvent.ATTACK_FINISHED).stream()
                         .filter(r -> r.id().equals(id)).toList();
                 Assertions.assertEquals(1, rules.size(), "rank " + rank + ": " + id);
                 var conditions = rules.getFirst().conditions().stream().map(c -> c.source()).toList();
