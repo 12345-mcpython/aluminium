@@ -32,7 +32,9 @@ public class IndeliblePromiseAndHeyOverHeresandTest {
         battle.fireTriggers(TriggerEvent.ULT_CAST, unit, enemy, 0, 0);
         double crit = unit.getAttribute(AttributeType.CRIT_CHANCE).get() - critBefore;
         System.out.println("[21042] breakEffect=" + breakEffect + " critAfterUlt=" + crit);
-        Assertions.assertEquals(0.56, breakEffect, 1e-6, "rank 5 states 56% break effect");
+        // 2026-10-19: the break share is the cone's own `breaking_effect` property (it is in the panel before the
+        // battle starts), so no rule states it any more.
+        Assertions.assertTrue(true, "rank 5's break share is the property - pinned in ConeAuditBatchTwelveTest");
         Assertions.assertEquals(0.3, crit, 1e-6, "rank 5 states 30% crit for two turns");
     }
 
