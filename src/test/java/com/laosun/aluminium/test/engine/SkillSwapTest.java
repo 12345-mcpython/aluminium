@@ -85,6 +85,53 @@ public class SkillSwapTest {
         Assertions.assertTrue(refused.getMessage().contains("skill_id"), refused.getMessage());
     }
 
+    /**
+     * Note: <b>Two swaps of different slots are up at once</b> - and taking one off leaves the other alone.
+     *
+     * <p>Reader: 1506 Silver Wolf LV.999's 「拥有强化普攻<b>和</b>强化欢愉技」, one Ultimate installing both. Identity used to
+     * be the CLASS, so the second swap evicted the first: her enhanced basic reverted to the ordinary attack and the only
+     * symptom was a slot reading 1 instead of 8.
+     */
+    @Test
+    public void twoSwapsOfDifferentSlotsCoexist() {
+        Fixture f = new Fixture();
+        Skill commonBefore = f.slot(SkillType.COMMON);
+        Skill skillBefore = f.slot(SkillType.SKILL);
+
+        f.swap(SkillType.COMMON);
+        f.swap(SkillType.SKILL);
+        List<SkillSwapBuff> swaps = f.swaps();
+        System.out.println("[swap] two slots swapped at once: " + swaps.size() + " swaps up, COMMON "
+                + (f.slot(SkillType.COMMON) != commonBefore) + ", SKILL " + (f.slot(SkillType.SKILL) != skillBefore));
+        Assertions.assertEquals(2, swaps.size(), "both swaps are up - they are different slots, not the same kind");
+        assertNotSame(commonBefore, f.slot(SkillType.COMMON), "the first slot still holds its replacement");
+        assertNotSame(skillBefore, f.slot(SkillType.SKILL), "and so does the second");
+
+        swaps.stream().filter(swap -> swap.getSlot() == SkillType.COMMON).findFirst().orElseThrow()
+                .removeBuff(f.gallagher);
+        Assertions.assertSame(commonBefore, f.slot(SkillType.COMMON), "ending one swap restores its own slot");
+        assertNotSame(skillBefore, f.slot(SkillType.SKILL), "…and leaves the other swap's slot alone");
+    }
+
+    /**
+     * Note: The same slot swapped twice is a REFRESH, not two replacements: one buff, one slot.
+     */
+    @Test
+    public void theSameSlotSwappedTwiceRefreshes() {
+        Fixture f = new Fixture();
+        Skill before = f.slot(SkillType.COMMON);
+
+        f.swap(SkillType.COMMON);
+        f.swap(SkillType.COMMON);
+
+        Assertions.assertEquals(1, f.swaps().size(), "same slot, same kind: the second replaces the first");
+        assertNotSame(before, f.slot(SkillType.COMMON), "and the slot holds the replacement");
+    }
+
+    private static void assertNotSame(Object unexpected, Object actual, String message) {
+        Assertions.assertNotSame(unexpected, actual, message);
+    }
+
     // ==================================================================
     // Helpers
     // ==================================================================
@@ -100,16 +147,31 @@ public class SkillSwapTest {
         }
 
         private Skill slot() {
-            return gallagher.getSkills().get(SkillType.COMMON);
+            return slot(SkillType.COMMON);
+        }
+
+        private Skill slot(SkillType type) {
+            return gallagher.getSkills().get(type);
+        }
+
+        private List<SkillSwapBuff> swaps() {
+            return gallagher.getBuffManager().allBuffsOf(SkillSwapBuff.class);
         }
 
         /**
-         * Fires a hand-made REPLACE_SKILL rule and returns the buff that landed.
+         * Fires a hand-made REPLACE_SKILL rule for one slot and returns the buff that landed.
          */
         private SkillSwapBuff swap() {
+            return swap(SkillType.COMMON);
+        }
+
+        /**
+         * The same, for whichever slot the case needs.
+         */
+        private SkillSwapBuff swap(SkillType slot) {
             EffectSpec effect = new EffectSpec();
             TriggerSpecs.set(effect, "op", "REPLACE_SKILL");
-            TriggerSpecs.set(effect, "skill", "COMMON");
+            TriggerSpecs.set(effect, "skill", slot.name());
             TriggerSpecs.set(effect, "skillId", ENHANCED_ROW);
             TriggerSpecs.set(effect, "turns", 2);
             TriggerSpecs.set(effect, "target", "self");
@@ -117,8 +179,8 @@ public class SkillSwapTest {
                     List.of(TriggerSpecs.rule("KILL", List.of("actor == self"), effect))));
             battle.fireTriggers(TriggerEvent.KILL, gallagher, gallagher, 0, 0);
 
-            List<SkillSwapBuff> swaps = gallagher.getBuffManager().allBuffsOf(SkillSwapBuff.class);
-            Assertions.assertEquals(1, swaps.size(), "precondition: the swap landed");
+            List<SkillSwapBuff> swaps = swaps().stream().filter(swap -> swap.getSlot() == slot).toList();
+            Assertions.assertEquals(1, swaps.size(), "precondition: the swap for " + slot + " landed");
             return swaps.get(0);
         }
     }

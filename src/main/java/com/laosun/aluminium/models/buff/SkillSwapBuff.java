@@ -17,6 +17,11 @@ import com.laosun.aluminium.models.skill.Skill;
  * from ({@code Character.getSkills()}) - and restores <b>whatever was there</b> when it leaves, which is what makes two
  * overlapping swaps safe: the second one captures the first one's replacement as its "original".
  *
+ * <p>⚠ <b>A swap is identified by its SLOT</b> ({@link #isSameKind}): "拥有强化普攻<b>和</b>强化欢愉技" (1506 Silver Wolf
+ * LV.999) is two swaps up at the same time, and the class-level answer this used to inherit made the SECOND one evict the
+ * first - measured: her enhanced basic reverted to the ordinary attack the moment the Elation swap landed, while the notes
+ * above describe exactly the nesting that eviction prevented.
+ *
  * <p>Note: It is a buff on our own unit, not a debuff: {@code isDebuff()} stays {@code false}, so "解除负面效果" (dispel negative effects) can never take
  * an enhanced attack away.
  */
@@ -52,6 +57,21 @@ public class SkillSwapBuff extends AbstractBuff {
      */
     public Skill getReplacement() {
         return replacement;
+    }
+
+    /**
+     * Two swaps are the same kind when they own the <b>same slot</b> - not merely when they are both swaps.
+     *
+     * <p>Reader: 1506 Silver Wolf LV.999's 「拥有强化普攻<b>和</b>强化欢愉技」, which installs two swaps in one Ultimate. With
+     * the class-level default the second evicted the first (the manager removes same-kind buffs before adding), so her
+     * enhanced basic silently reverted - and the symptom was a slot that read 1 instead of 8, with nothing else to see.
+     *
+     * <p>Same slot still means replace: re-swapping a slot refreshes it rather than nesting two replacements that would then
+     * have to be unwound in order.
+     */
+    @Override
+    public boolean isSameKind(AbstractBuff other) {
+        return other instanceof SkillSwapBuff swap && swap.slot == this.slot;
     }
 
     @Override
