@@ -34,7 +34,12 @@ public class ContentDuplicateGuardTest {
                     "percent", "amount", "crit_rate", "crit_damage", "per_stack", "max_stacks",
                     // `element` names WHAT is affected as much as `buff` does: a Fire damage-over-time and an Ice one are different effects, and
                     // 1415's ocean ode writes one tick rule per element (TICK_DOT has no wildcard spelling) -- without this the guard read those 14 rules as duplicates.
-                    "element");
+                    "element",
+                    // `skill` and `skill_id` are the same kind of operand for a slot-naming effect: 「拥有强化普攻**和**强化欢愉技」
+                    // (1506 Silver Wolf LV.999) is two REPLACE_SKILL rules that differ ONLY in which slot they swap and which row
+                    // they swap it for -- measured: without these the guard called them "one sentence written twice", while a
+                    // rule that names a different slot is not the same sentence by construction.
+                    "skill", "skill_id");
 
     @Test
     public void noFileStatesTheSameRuleTwice() throws IOException {
