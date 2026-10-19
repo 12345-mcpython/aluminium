@@ -2,9 +2,9 @@
   "1": [
     {
       "on": "TURN_START",
-      "id": "cone20003_defence_base",
+      "id": "cone20003_defence_below_threshold",
       "when": [
-        "hp_percent >= 0.5"
+        "hp_percent < 0.5"
       ],
       "do": [
         {
@@ -15,34 +15,16 @@
           "target": "self"
         }
       ],
-      "source": "光锥 20003 琥珀（未达阈值分支）: 使装备者的防御力提高#1[i]%。当装备者当前生命值百分比小于#2[i]%时，其防御力额外提高#3[i]%。",
-      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 1 阶）✓；⚠ **`DEFENCE` 是平值属性** ⇒ 份额按 `baseValue()` 缩放 ✓。⭐⭐ **为什么用\"互斥分支\"** ✓：**同一修饰身份（`(attribute, modifierType, sourceRole)` ✓）的第二条会替换第一条** ✗，而**光锥没有 `properties` 行** ✗（遗器有 ✓ —— 见 `relic_sets/301.json` 的 note ✓）⇒ 常驻半只能写成规则 ✓ ⇒ 于是用**条件互斥**保证**任何时刻只有一条修饰** ✓（与 21022/21026/116 同一手法 ✓）。"
-    },
-    {
-      "on": "TURN_START",
-      "id": "cone20003_defence_below_threshold",
-      "when": [
-        "hp_percent < 0.5"
-      ],
-      "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "DEFENCE",
-          "percent": 0.32,
-          "turns": 1,
-          "target": "self"
-        }
-      ],
-      "source": "光锥 20003 琥珀（阈值分支，合计）: 使装备者的防御力提高#1[i]%。当装备者当前生命值百分比小于#2[i]%时，其防御力额外提高#3[i]%。",
-      "note": "⭐ **合计写法** ✓：本条直接给 **`#1 + #3` = 0.32** ✓；另一条只在 `hp_percent >= 0.5` 时触发 ✓ ⇒ **两条互斥** ✓。⚠ 两条都是 `turns: 1` ✓（每回合重算 ✓）—— 若写成 `permanent`，则在掉血后**旧值会残留** ✗。"
+      "source": "光锥 20003 琥珀（「额外」那一半）: 「使装备者的防御力提高 #1[i]%。当装备者当前生命值百分比小于 #2[i]% 时，其防御力额外提高 #3[i]%。」—— #1 由光锥自己的 `ability_property` 施加 ✓，本条只写 #3 ✓",
+      "note": "⭐ **只写「额外」那一半** ✓：「防御力提高 #1%」是光锥自己的 `ability_property`（`defence_percent` ✓，`Weapon.appendTo` 施加 ✓）；「小于 50% 时**额外**提高 #3%」才是规则 ✓ ⇒ 两条相加是**光锥属性 ＋ 这条规则** ✓。\n⚠⚠ **2026-10-19 逐句核时发现的错法**（原文件）✗：它写了 `cone20003_defence_base`（`hp_percent >= 0.5` 时 +16% ✓）与 `cone20003_defence_below_threshold`（+32% ✓）两条互斥规则，理由是「光锥没有 `properties` 行」✗ —— **实测那条理由是错的** ✓：`weapons.json` 的 `ability_property[0] = {defence_percent, 0.16}` 由 `Weapon.build` 按叠影那一行施加 ✓（同一份证据也是 23055 的防御判据 ✓）⇒ 基础那一半被算了**两次** ✓。**读数**：原文件下防御 = 1007.795 ✓，而「(无锥 486.2025 + 锥固定项 330.75) × 1.16」= 947.6649 ✓。\n⚠ 两条规则互斥那一手仍然成立 ✓（同一修饰身份的第二条会替换第一条 ✗），只是现在**只剩一条**：条件成立时它加的是**额外**份额 ✓，不成立时**没有规则**、由光锥属性独自给出基础份额 ✓。`turns: 1` 让它在每回合重算 ✓（写成 `permanent` 会在掉血后残留 ✗）。"
     }
   ],
   "2": [
     {
       "on": "TURN_START",
-      "id": "cone20003_defence_base",
+      "id": "cone20003_defence_below_threshold",
       "when": [
-        "hp_percent >= 0.5"
+        "hp_percent < 0.5"
       ],
       "do": [
         {
@@ -53,34 +35,16 @@
           "target": "self"
         }
       ],
-      "source": "光锥 20003 琥珀（未达阈值分支）: 使装备者的防御力提高#1[i]%。当装备者当前生命值百分比小于#2[i]%时，其防御力额外提高#3[i]%。",
-      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 2 阶）✓；⚠ **`DEFENCE` 是平值属性** ⇒ 份额按 `baseValue()` 缩放 ✓。⭐⭐ **为什么用\"互斥分支\"** ✓：**同一修饰身份（`(attribute, modifierType, sourceRole)` ✓）的第二条会替换第一条** ✗，而**光锥没有 `properties` 行** ✗（遗器有 ✓ —— 见 `relic_sets/301.json` 的 note ✓）⇒ 常驻半只能写成规则 ✓ ⇒ 于是用**条件互斥**保证**任何时刻只有一条修饰** ✓（与 21022/21026/116 同一手法 ✓）。"
-    },
-    {
-      "on": "TURN_START",
-      "id": "cone20003_defence_below_threshold",
-      "when": [
-        "hp_percent < 0.5"
-      ],
-      "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "DEFENCE",
-          "percent": 0.4,
-          "turns": 1,
-          "target": "self"
-        }
-      ],
-      "source": "光锥 20003 琥珀（阈值分支，合计）: 使装备者的防御力提高#1[i]%。当装备者当前生命值百分比小于#2[i]%时，其防御力额外提高#3[i]%。",
-      "note": "⭐ **合计写法** ✓：本条直接给 **`#1 + #3` = 0.4** ✓；另一条只在 `hp_percent >= 0.5` 时触发 ✓ ⇒ **两条互斥** ✓。⚠ 两条都是 `turns: 1` ✓（每回合重算 ✓）—— 若写成 `permanent`，则在掉血后**旧值会残留** ✗。"
+      "source": "光锥 20003 琥珀（「额外」那一半）: 「使装备者的防御力提高 #1[i]%。当装备者当前生命值百分比小于 #2[i]% 时，其防御力额外提高 #3[i]%。」—— #1 由光锥自己的 `ability_property` 施加 ✓，本条只写 #3 ✓",
+      "note": "⭐ **只写「额外」那一半** ✓：「防御力提高 #1%」是光锥自己的 `ability_property`（`defence_percent` ✓，`Weapon.appendTo` 施加 ✓）；「小于 50% 时**额外**提高 #3%」才是规则 ✓ ⇒ 两条相加是**光锥属性 ＋ 这条规则** ✓。\n⚠⚠ **2026-10-19 逐句核时发现的错法**（原文件）✗：它写了 `cone20003_defence_base`（`hp_percent >= 0.5` 时 +16% ✓）与 `cone20003_defence_below_threshold`（+32% ✓）两条互斥规则，理由是「光锥没有 `properties` 行」✗ —— **实测那条理由是错的** ✓：`weapons.json` 的 `ability_property[0] = {defence_percent, 0.16}` 由 `Weapon.build` 按叠影那一行施加 ✓（同一份证据也是 23055 的防御判据 ✓）⇒ 基础那一半被算了**两次** ✓。**读数**：原文件下防御 = 1007.795 ✓，而「(无锥 486.2025 + 锥固定项 330.75) × 1.16」= 947.6649 ✓。\n⚠ 两条规则互斥那一手仍然成立 ✓（同一修饰身份的第二条会替换第一条 ✗），只是现在**只剩一条**：条件成立时它加的是**额外**份额 ✓，不成立时**没有规则**、由光锥属性独自给出基础份额 ✓。`turns: 1` 让它在每回合重算 ✓（写成 `permanent` 会在掉血后残留 ✗）。"
     }
   ],
   "3": [
     {
       "on": "TURN_START",
-      "id": "cone20003_defence_base",
+      "id": "cone20003_defence_below_threshold",
       "when": [
-        "hp_percent >= 0.5"
+        "hp_percent < 0.5"
       ],
       "do": [
         {
@@ -91,34 +55,16 @@
           "target": "self"
         }
       ],
-      "source": "光锥 20003 琥珀（未达阈值分支）: 使装备者的防御力提高#1[i]%。当装备者当前生命值百分比小于#2[i]%时，其防御力额外提高#3[i]%。",
-      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 3 阶）✓；⚠ **`DEFENCE` 是平值属性** ⇒ 份额按 `baseValue()` 缩放 ✓。⭐⭐ **为什么用\"互斥分支\"** ✓：**同一修饰身份（`(attribute, modifierType, sourceRole)` ✓）的第二条会替换第一条** ✗，而**光锥没有 `properties` 行** ✗（遗器有 ✓ —— 见 `relic_sets/301.json` 的 note ✓）⇒ 常驻半只能写成规则 ✓ ⇒ 于是用**条件互斥**保证**任何时刻只有一条修饰** ✓（与 21022/21026/116 同一手法 ✓）。"
-    },
-    {
-      "on": "TURN_START",
-      "id": "cone20003_defence_below_threshold",
-      "when": [
-        "hp_percent < 0.5"
-      ],
-      "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "DEFENCE",
-          "percent": 0.48,
-          "turns": 1,
-          "target": "self"
-        }
-      ],
-      "source": "光锥 20003 琥珀（阈值分支，合计）: 使装备者的防御力提高#1[i]%。当装备者当前生命值百分比小于#2[i]%时，其防御力额外提高#3[i]%。",
-      "note": "⭐ **合计写法** ✓：本条直接给 **`#1 + #3` = 0.48** ✓；另一条只在 `hp_percent >= 0.5` 时触发 ✓ ⇒ **两条互斥** ✓。⚠ 两条都是 `turns: 1` ✓（每回合重算 ✓）—— 若写成 `permanent`，则在掉血后**旧值会残留** ✗。"
+      "source": "光锥 20003 琥珀（「额外」那一半）: 「使装备者的防御力提高 #1[i]%。当装备者当前生命值百分比小于 #2[i]% 时，其防御力额外提高 #3[i]%。」—— #1 由光锥自己的 `ability_property` 施加 ✓，本条只写 #3 ✓",
+      "note": "⭐ **只写「额外」那一半** ✓：「防御力提高 #1%」是光锥自己的 `ability_property`（`defence_percent` ✓，`Weapon.appendTo` 施加 ✓）；「小于 50% 时**额外**提高 #3%」才是规则 ✓ ⇒ 两条相加是**光锥属性 ＋ 这条规则** ✓。\n⚠⚠ **2026-10-19 逐句核时发现的错法**（原文件）✗：它写了 `cone20003_defence_base`（`hp_percent >= 0.5` 时 +16% ✓）与 `cone20003_defence_below_threshold`（+32% ✓）两条互斥规则，理由是「光锥没有 `properties` 行」✗ —— **实测那条理由是错的** ✓：`weapons.json` 的 `ability_property[0] = {defence_percent, 0.16}` 由 `Weapon.build` 按叠影那一行施加 ✓（同一份证据也是 23055 的防御判据 ✓）⇒ 基础那一半被算了**两次** ✓。**读数**：原文件下防御 = 1007.795 ✓，而「(无锥 486.2025 + 锥固定项 330.75) × 1.16」= 947.6649 ✓。\n⚠ 两条规则互斥那一手仍然成立 ✓（同一修饰身份的第二条会替换第一条 ✗），只是现在**只剩一条**：条件成立时它加的是**额外**份额 ✓，不成立时**没有规则**、由光锥属性独自给出基础份额 ✓。`turns: 1` 让它在每回合重算 ✓（写成 `permanent` 会在掉血后残留 ✗）。"
     }
   ],
   "4": [
     {
       "on": "TURN_START",
-      "id": "cone20003_defence_base",
+      "id": "cone20003_defence_below_threshold",
       "when": [
-        "hp_percent >= 0.5"
+        "hp_percent < 0.5"
       ],
       "do": [
         {
@@ -129,34 +75,16 @@
           "target": "self"
         }
       ],
-      "source": "光锥 20003 琥珀（未达阈值分支）: 使装备者的防御力提高#1[i]%。当装备者当前生命值百分比小于#2[i]%时，其防御力额外提高#3[i]%。",
-      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 4 阶）✓；⚠ **`DEFENCE` 是平值属性** ⇒ 份额按 `baseValue()` 缩放 ✓。⭐⭐ **为什么用\"互斥分支\"** ✓：**同一修饰身份（`(attribute, modifierType, sourceRole)` ✓）的第二条会替换第一条** ✗，而**光锥没有 `properties` 行** ✗（遗器有 ✓ —— 见 `relic_sets/301.json` 的 note ✓）⇒ 常驻半只能写成规则 ✓ ⇒ 于是用**条件互斥**保证**任何时刻只有一条修饰** ✓（与 21022/21026/116 同一手法 ✓）。"
-    },
-    {
-      "on": "TURN_START",
-      "id": "cone20003_defence_below_threshold",
-      "when": [
-        "hp_percent < 0.5"
-      ],
-      "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "DEFENCE",
-          "percent": 0.56,
-          "turns": 1,
-          "target": "self"
-        }
-      ],
-      "source": "光锥 20003 琥珀（阈值分支，合计）: 使装备者的防御力提高#1[i]%。当装备者当前生命值百分比小于#2[i]%时，其防御力额外提高#3[i]%。",
-      "note": "⭐ **合计写法** ✓：本条直接给 **`#1 + #3` = 0.56** ✓；另一条只在 `hp_percent >= 0.5` 时触发 ✓ ⇒ **两条互斥** ✓。⚠ 两条都是 `turns: 1` ✓（每回合重算 ✓）—— 若写成 `permanent`，则在掉血后**旧值会残留** ✗。"
+      "source": "光锥 20003 琥珀（「额外」那一半）: 「使装备者的防御力提高 #1[i]%。当装备者当前生命值百分比小于 #2[i]% 时，其防御力额外提高 #3[i]%。」—— #1 由光锥自己的 `ability_property` 施加 ✓，本条只写 #3 ✓",
+      "note": "⭐ **只写「额外」那一半** ✓：「防御力提高 #1%」是光锥自己的 `ability_property`（`defence_percent` ✓，`Weapon.appendTo` 施加 ✓）；「小于 50% 时**额外**提高 #3%」才是规则 ✓ ⇒ 两条相加是**光锥属性 ＋ 这条规则** ✓。\n⚠⚠ **2026-10-19 逐句核时发现的错法**（原文件）✗：它写了 `cone20003_defence_base`（`hp_percent >= 0.5` 时 +16% ✓）与 `cone20003_defence_below_threshold`（+32% ✓）两条互斥规则，理由是「光锥没有 `properties` 行」✗ —— **实测那条理由是错的** ✓：`weapons.json` 的 `ability_property[0] = {defence_percent, 0.16}` 由 `Weapon.build` 按叠影那一行施加 ✓（同一份证据也是 23055 的防御判据 ✓）⇒ 基础那一半被算了**两次** ✓。**读数**：原文件下防御 = 1007.795 ✓，而「(无锥 486.2025 + 锥固定项 330.75) × 1.16」= 947.6649 ✓。\n⚠ 两条规则互斥那一手仍然成立 ✓（同一修饰身份的第二条会替换第一条 ✗），只是现在**只剩一条**：条件成立时它加的是**额外**份额 ✓，不成立时**没有规则**、由光锥属性独自给出基础份额 ✓。`turns: 1` 让它在每回合重算 ✓（写成 `permanent` 会在掉血后残留 ✗）。"
     }
   ],
   "5": [
     {
       "on": "TURN_START",
-      "id": "cone20003_defence_base",
+      "id": "cone20003_defence_below_threshold",
       "when": [
-        "hp_percent >= 0.5"
+        "hp_percent < 0.5"
       ],
       "do": [
         {
@@ -167,26 +95,8 @@
           "target": "self"
         }
       ],
-      "source": "光锥 20003 琥珀（未达阈值分支）: 使装备者的防御力提高#1[i]%。当装备者当前生命值百分比小于#2[i]%时，其防御力额外提高#3[i]%。",
-      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 5 阶）✓；⚠ **`DEFENCE` 是平值属性** ⇒ 份额按 `baseValue()` 缩放 ✓。⭐⭐ **为什么用\"互斥分支\"** ✓：**同一修饰身份（`(attribute, modifierType, sourceRole)` ✓）的第二条会替换第一条** ✗，而**光锥没有 `properties` 行** ✗（遗器有 ✓ —— 见 `relic_sets/301.json` 的 note ✓）⇒ 常驻半只能写成规则 ✓ ⇒ 于是用**条件互斥**保证**任何时刻只有一条修饰** ✓（与 21022/21026/116 同一手法 ✓）。"
-    },
-    {
-      "on": "TURN_START",
-      "id": "cone20003_defence_below_threshold",
-      "when": [
-        "hp_percent < 0.5"
-      ],
-      "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "DEFENCE",
-          "percent": 0.64,
-          "turns": 1,
-          "target": "self"
-        }
-      ],
-      "source": "光锥 20003 琥珀（阈值分支，合计）: 使装备者的防御力提高#1[i]%。当装备者当前生命值百分比小于#2[i]%时，其防御力额外提高#3[i]%。",
-      "note": "⭐ **合计写法** ✓：本条直接给 **`#1 + #3` = 0.64** ✓；另一条只在 `hp_percent >= 0.5` 时触发 ✓ ⇒ **两条互斥** ✓。⚠ 两条都是 `turns: 1` ✓（每回合重算 ✓）—— 若写成 `permanent`，则在掉血后**旧值会残留** ✗。"
+      "source": "光锥 20003 琥珀（「额外」那一半）: 「使装备者的防御力提高 #1[i]%。当装备者当前生命值百分比小于 #2[i]% 时，其防御力额外提高 #3[i]%。」—— #1 由光锥自己的 `ability_property` 施加 ✓，本条只写 #3 ✓",
+      "note": "⭐ **只写「额外」那一半** ✓：「防御力提高 #1%」是光锥自己的 `ability_property`（`defence_percent` ✓，`Weapon.appendTo` 施加 ✓）；「小于 50% 时**额外**提高 #3%」才是规则 ✓ ⇒ 两条相加是**光锥属性 ＋ 这条规则** ✓。\n⚠⚠ **2026-10-19 逐句核时发现的错法**（原文件）✗：它写了 `cone20003_defence_base`（`hp_percent >= 0.5` 时 +16% ✓）与 `cone20003_defence_below_threshold`（+32% ✓）两条互斥规则，理由是「光锥没有 `properties` 行」✗ —— **实测那条理由是错的** ✓：`weapons.json` 的 `ability_property[0] = {defence_percent, 0.16}` 由 `Weapon.build` 按叠影那一行施加 ✓（同一份证据也是 23055 的防御判据 ✓）⇒ 基础那一半被算了**两次** ✓。**读数**：原文件下防御 = 1007.795 ✓，而「(无锥 486.2025 + 锥固定项 330.75) × 1.16」= 947.6649 ✓。\n⚠ 两条规则互斥那一手仍然成立 ✓（同一修饰身份的第二条会替换第一条 ✗），只是现在**只剩一条**：条件成立时它加的是**额外**份额 ✓，不成立时**没有规则**、由光锥属性独自给出基础份额 ✓。`turns: 1` 让它在每回合重算 ✓（写成 `permanent` 会在掉血后残留 ✗）。"
     }
   ]
 }
