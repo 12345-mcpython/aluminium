@@ -1,21 +1,6 @@
 {
   "1": [
     {
-      "on": "BATTLE_START",
-      "id": "cone22002_attack",
-      "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "ATTACK",
-          "percent": 0.16,
-          "permanent": true,
-          "target": "self"
-        }
-      ],
-      "source": "光锥 22002 为了明日的旅途: 使装备者的攻击力提高#1[i]%。装备者施放终结技后，造成的伤害提高#2[i]%，持续#3[i]回合。",
-      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 1 阶）✓；属性名从 `AttributeType` 查出 ✓。⚠ **`ATTACK` 是平值属性** ⇒ 份额按 `baseValue()` 缩放 ✓；两条从句**属性不同** ✓ ⇒ 不会互相替换 ✓。"
-    },
-    {
       "on": "ULT_CAST",
       "id": "cone22002_damage_after_ult",
       "when": [
@@ -31,25 +16,10 @@
         }
       ],
       "source": "光锥 22002 为了明日的旅途（终结技后）: 使装备者的攻击力提高#1[i]%。装备者施放终结技后，造成的伤害提高#2[i]%，持续#3[i]回合。",
-      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 1 阶）✓；属性名从 `AttributeType` 查出 ✓。⚠ **`ATTACK` 是平值属性** ⇒ 份额按 `baseValue()` 缩放 ✓；两条从句**属性不同** ✓ ⇒ 不会互相替换 ✓。 ⭐ 「造成的伤害提高」用 **`ALL_DAMAGE_TYPE_BOOST`** ✓（与 `CastTargetTest.damageBoostOf` 同一读法 ✓）；持续回合取 `#3` ✓。"
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 1 阶）✓；属性名从 `AttributeType` 查出 ✓。⚠ **`ATTACK` 是平值属性** ⇒ 份额按 `baseValue()` 缩放 ✓；两条从句**属性不同** ✓ ⇒ 不会互相替换 ✓。 ⭐ 「造成的伤害提高」用 **`ALL_DAMAGE_TYPE_BOOST`** ✓（与 `CastTargetTest.damageBoostOf` 同一读法 ✓）；持续回合取 `#3` ✓。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone22002_attack`** ✗ —— 那一半**就是光锥自己的** `attack_percent` 属性（`Weapon.build` 施加 ✓），重复会读成两倍 ✗。\n「施放终结技后造成的伤害提高 #2%，持续 1 回合」用 `ULT_CAST` ＋ `actor == self` ＋ `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST{turns: 1}` ✓（18/21/24/27/30% ✓）。"
     }
   ],
   "2": [
-    {
-      "on": "BATTLE_START",
-      "id": "cone22002_attack",
-      "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "ATTACK",
-          "percent": 0.2,
-          "permanent": true,
-          "target": "self"
-        }
-      ],
-      "source": "光锥 22002 为了明日的旅途: 使装备者的攻击力提高#1[i]%。装备者施放终结技后，造成的伤害提高#2[i]%，持续#3[i]回合。",
-      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 2 阶）✓；属性名从 `AttributeType` 查出 ✓。⚠ **`ATTACK` 是平值属性** ⇒ 份额按 `baseValue()` 缩放 ✓；两条从句**属性不同** ✓ ⇒ 不会互相替换 ✓。"
-    },
     {
       "on": "ULT_CAST",
       "id": "cone22002_damage_after_ult",
@@ -66,25 +36,10 @@
         }
       ],
       "source": "光锥 22002 为了明日的旅途（终结技后）: 使装备者的攻击力提高#1[i]%。装备者施放终结技后，造成的伤害提高#2[i]%，持续#3[i]回合。",
-      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 2 阶）✓；属性名从 `AttributeType` 查出 ✓。⚠ **`ATTACK` 是平值属性** ⇒ 份额按 `baseValue()` 缩放 ✓；两条从句**属性不同** ✓ ⇒ 不会互相替换 ✓。 ⭐ 「造成的伤害提高」用 **`ALL_DAMAGE_TYPE_BOOST`** ✓（与 `CastTargetTest.damageBoostOf` 同一读法 ✓）；持续回合取 `#3` ✓。"
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 2 阶）✓；属性名从 `AttributeType` 查出 ✓。⚠ **`ATTACK` 是平值属性** ⇒ 份额按 `baseValue()` 缩放 ✓；两条从句**属性不同** ✓ ⇒ 不会互相替换 ✓。 ⭐ 「造成的伤害提高」用 **`ALL_DAMAGE_TYPE_BOOST`** ✓（与 `CastTargetTest.damageBoostOf` 同一读法 ✓）；持续回合取 `#3` ✓。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone22002_attack`** ✗ —— 那一半**就是光锥自己的** `attack_percent` 属性（`Weapon.build` 施加 ✓），重复会读成两倍 ✗。\n「施放终结技后造成的伤害提高 #2%，持续 1 回合」用 `ULT_CAST` ＋ `actor == self` ＋ `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST{turns: 1}` ✓（18/21/24/27/30% ✓）。"
     }
   ],
   "3": [
-    {
-      "on": "BATTLE_START",
-      "id": "cone22002_attack",
-      "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "ATTACK",
-          "percent": 0.24,
-          "permanent": true,
-          "target": "self"
-        }
-      ],
-      "source": "光锥 22002 为了明日的旅途: 使装备者的攻击力提高#1[i]%。装备者施放终结技后，造成的伤害提高#2[i]%，持续#3[i]回合。",
-      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 3 阶）✓；属性名从 `AttributeType` 查出 ✓。⚠ **`ATTACK` 是平值属性** ⇒ 份额按 `baseValue()` 缩放 ✓；两条从句**属性不同** ✓ ⇒ 不会互相替换 ✓。"
-    },
     {
       "on": "ULT_CAST",
       "id": "cone22002_damage_after_ult",
@@ -101,25 +56,10 @@
         }
       ],
       "source": "光锥 22002 为了明日的旅途（终结技后）: 使装备者的攻击力提高#1[i]%。装备者施放终结技后，造成的伤害提高#2[i]%，持续#3[i]回合。",
-      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 3 阶）✓；属性名从 `AttributeType` 查出 ✓。⚠ **`ATTACK` 是平值属性** ⇒ 份额按 `baseValue()` 缩放 ✓；两条从句**属性不同** ✓ ⇒ 不会互相替换 ✓。 ⭐ 「造成的伤害提高」用 **`ALL_DAMAGE_TYPE_BOOST`** ✓（与 `CastTargetTest.damageBoostOf` 同一读法 ✓）；持续回合取 `#3` ✓。"
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 3 阶）✓；属性名从 `AttributeType` 查出 ✓。⚠ **`ATTACK` 是平值属性** ⇒ 份额按 `baseValue()` 缩放 ✓；两条从句**属性不同** ✓ ⇒ 不会互相替换 ✓。 ⭐ 「造成的伤害提高」用 **`ALL_DAMAGE_TYPE_BOOST`** ✓（与 `CastTargetTest.damageBoostOf` 同一读法 ✓）；持续回合取 `#3` ✓。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone22002_attack`** ✗ —— 那一半**就是光锥自己的** `attack_percent` 属性（`Weapon.build` 施加 ✓），重复会读成两倍 ✗。\n「施放终结技后造成的伤害提高 #2%，持续 1 回合」用 `ULT_CAST` ＋ `actor == self` ＋ `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST{turns: 1}` ✓（18/21/24/27/30% ✓）。"
     }
   ],
   "4": [
-    {
-      "on": "BATTLE_START",
-      "id": "cone22002_attack",
-      "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "ATTACK",
-          "percent": 0.28,
-          "permanent": true,
-          "target": "self"
-        }
-      ],
-      "source": "光锥 22002 为了明日的旅途: 使装备者的攻击力提高#1[i]%。装备者施放终结技后，造成的伤害提高#2[i]%，持续#3[i]回合。",
-      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 4 阶）✓；属性名从 `AttributeType` 查出 ✓。⚠ **`ATTACK` 是平值属性** ⇒ 份额按 `baseValue()` 缩放 ✓；两条从句**属性不同** ✓ ⇒ 不会互相替换 ✓。"
-    },
     {
       "on": "ULT_CAST",
       "id": "cone22002_damage_after_ult",
@@ -136,25 +76,10 @@
         }
       ],
       "source": "光锥 22002 为了明日的旅途（终结技后）: 使装备者的攻击力提高#1[i]%。装备者施放终结技后，造成的伤害提高#2[i]%，持续#3[i]回合。",
-      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 4 阶）✓；属性名从 `AttributeType` 查出 ✓。⚠ **`ATTACK` 是平值属性** ⇒ 份额按 `baseValue()` 缩放 ✓；两条从句**属性不同** ✓ ⇒ 不会互相替换 ✓。 ⭐ 「造成的伤害提高」用 **`ALL_DAMAGE_TYPE_BOOST`** ✓（与 `CastTargetTest.damageBoostOf` 同一读法 ✓）；持续回合取 `#3` ✓。"
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 4 阶）✓；属性名从 `AttributeType` 查出 ✓。⚠ **`ATTACK` 是平值属性** ⇒ 份额按 `baseValue()` 缩放 ✓；两条从句**属性不同** ✓ ⇒ 不会互相替换 ✓。 ⭐ 「造成的伤害提高」用 **`ALL_DAMAGE_TYPE_BOOST`** ✓（与 `CastTargetTest.damageBoostOf` 同一读法 ✓）；持续回合取 `#3` ✓。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone22002_attack`** ✗ —— 那一半**就是光锥自己的** `attack_percent` 属性（`Weapon.build` 施加 ✓），重复会读成两倍 ✗。\n「施放终结技后造成的伤害提高 #2%，持续 1 回合」用 `ULT_CAST` ＋ `actor == self` ＋ `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST{turns: 1}` ✓（18/21/24/27/30% ✓）。"
     }
   ],
   "5": [
-    {
-      "on": "BATTLE_START",
-      "id": "cone22002_attack",
-      "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "ATTACK",
-          "percent": 0.32,
-          "permanent": true,
-          "target": "self"
-        }
-      ],
-      "source": "光锥 22002 为了明日的旅途: 使装备者的攻击力提高#1[i]%。装备者施放终结技后，造成的伤害提高#2[i]%，持续#3[i]回合。",
-      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 5 阶）✓；属性名从 `AttributeType` 查出 ✓。⚠ **`ATTACK` 是平值属性** ⇒ 份额按 `baseValue()` 缩放 ✓；两条从句**属性不同** ✓ ⇒ 不会互相替换 ✓。"
-    },
     {
       "on": "ULT_CAST",
       "id": "cone22002_damage_after_ult",
@@ -171,7 +96,7 @@
         }
       ],
       "source": "光锥 22002 为了明日的旅途（终结技后）: 使装备者的攻击力提高#1[i]%。装备者施放终结技后，造成的伤害提高#2[i]%，持续#3[i]回合。",
-      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 5 阶）✓；属性名从 `AttributeType` 查出 ✓。⚠ **`ATTACK` 是平值属性** ⇒ 份额按 `baseValue()` 缩放 ✓；两条从句**属性不同** ✓ ⇒ 不会互相替换 ✓。 ⭐ 「造成的伤害提高」用 **`ALL_DAMAGE_TYPE_BOOST`** ✓（与 `CastTargetTest.damageBoostOf` 同一读法 ✓）；持续回合取 `#3` ✓。"
+      "note": "数值取自 `data/weapons.json` 的 `weapon_skill_data`（第 5 阶）✓；属性名从 `AttributeType` 查出 ✓。⚠ **`ATTACK` 是平值属性** ⇒ 份额按 `baseValue()` 缩放 ✓；两条从句**属性不同** ✓ ⇒ 不会互相替换 ✓。 ⭐ 「造成的伤害提高」用 **`ALL_DAMAGE_TYPE_BOOST`** ✓（与 `CastTargetTest.damageBoostOf` 同一读法 ✓）；持续回合取 `#3` ✓。\n⚠⚠ **2026-10-19 逐句核时删掉了 `cone22002_attack`** ✗ —— 那一半**就是光锥自己的** `attack_percent` 属性（`Weapon.build` 施加 ✓），重复会读成两倍 ✗。\n「施放终结技后造成的伤害提高 #2%，持续 1 回合」用 `ULT_CAST` ＋ `actor == self` ＋ `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST{turns: 1}` ✓（18/21/24/27/30% ✓）。"
     }
   ]
 }
