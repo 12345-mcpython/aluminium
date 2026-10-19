@@ -43,19 +43,20 @@ public class TimeWaitsForNoOneAndFlameOfBloodBlazeMyPathTest {
             System.out.println("[23013] rank=" + rank + " both shares in the panel");
         }
     }
-
     @Test
     public void cone23039ShipsOnlyTheHealthClause() {
+        // 2026-10-19: 23039 ships no rules now - both stat shares are the cone's own properties (the health rule was a
+        // duplicate of health_percent), and its payment clause is registered. The panel carries the two shares.
         for (int rank = 1; rank <= 5; rank++) {
-            var rules = wearer(23039, rank).getTriggerTable().rulesFor(TriggerEvent.BATTLE_START).stream()
-                    .filter(r -> r.id().equals("cone23039_health")).toList();
-            Assertions.assertEquals(1, rules.size(), "rank " + rank + ": the HP rule");
-            var e = rules.getFirst().effects();
-            Assertions.assertEquals(1, e.size(),
-                    "rank " + rank + ": ONLY the HP clause -- the incoming-healing one is registered");
-            Assertions.assertEquals("HEALTH", e.getFirst().getAttribute());
-            Assertions.assertEquals(HP[rank - 1], e.getFirst().getPercent(), 1e-9, "rank " + rank + ": HP");
-            System.out.println("[23039] rank=" + rank + " ok");
+            double plainHp = CharacterFactory.create(WEARER, LEVEL, true).getAttribute(AttributeType.HEALTH).get();
+            double plainHeal = CharacterFactory.create(WEARER, LEVEL, true)
+                    .getAttribute(AttributeType.HEAL_TAKEN_RATIO).get();
+            var unit = wearer(23039, rank);
+            Assertions.assertTrue(unit.getAttribute(AttributeType.HEALTH).get() > plainHp,
+                    "rank " + rank + ": the HP share reaches the panel");
+            Assertions.assertTrue(unit.getAttribute(AttributeType.HEAL_TAKEN_RATIO).get() > plainHeal,
+                    "rank " + rank + ": the healing-taken share reaches the panel");
+            System.out.println("[23039] rank=" + rank + " both shares in the panel");
         }
     }
-}
+    }
