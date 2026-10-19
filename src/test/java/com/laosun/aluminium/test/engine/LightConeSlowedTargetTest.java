@@ -26,6 +26,12 @@ import java.util.Random;
  *
  * <p>The negative case is the one that has to be mutation-sensitive: dropping the condition from the content makes the boost
  * apply to an unslowed target, and this case is what notices.
+ *
+ * <p>⚠⚠ <b>What this fixture used to prove.</b> It synthesised a BUFF <b>named 减速</b> and applied it, which satisfied the
+ * content's old spelling `target has_state 减速` - and that spelling was the bug: no such state exists, slow is a negative
+ * SPEED modifier, and the rule was a silent no-op in every real battle. The fixture manufactured the very thing the condition
+ * named, so it could only ever agree with itself (§6.3). It now slows the target the way the engine models it, which is what
+ * `is_slowed` answers for.
  */
 public class LightConeSlowedTargetTest {
     private static final int WEAPON_ID = 20011;
@@ -33,7 +39,7 @@ public class LightConeSlowedTargetTest {
     private static final int ALLY = 1002;
     private static final int LEVEL = 80;
     private static final int MONSTER = 1002064;
-    private static final String SLOW = "减速";
+
 
     @Test
     public void theBoostAppliesAgainstASlowedTarget() {
@@ -65,10 +71,12 @@ public class LightConeSlowedTargetTest {
         Battle battle = new Battle(List.of(wearer, ally), List.of(enemy), noCrit);
         battle.startBattle();
         if (slowed) {
-            // A synthetic rule applies the state the document names, so the condition is being tested rather than assumed.
+            // ⚠ Slow is a NEGATIVE SPEED modifier (that is what `is_slowed` reads), not a buff named 减速 - the old version of
+            // this fixture applied such a buff, which is why it could never have caught the no-op.
             EffectSpec slow = new EffectSpec();
-            TriggerSpecs.set(slow, "op", "APPLY_BUFF");
-            TriggerSpecs.set(slow, "buff", SLOW);
+            TriggerSpecs.set(slow, "op", "MODIFY_ATTR");
+            TriggerSpecs.set(slow, "attribute", "SPEED");
+            TriggerSpecs.set(slow, "percent", -0.2);
             TriggerSpecs.set(slow, "turns", 5);
             TriggerSpecs.set(slow, "target", "target");
             ally.setTriggerTable(new TriggerTable(9301, List.of(TriggerSpecs.rule(
