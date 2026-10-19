@@ -36,7 +36,7 @@ public class EpochEtchedInGoldenBloodClause3Test {
             var rules = wearer(rank).getTriggerTable().rulesFor(TriggerEvent.CAST_SETUP).stream()
                     .filter(r -> r.id().equals("cone23048_skill_damage")).toList();
             Assertions.assertEquals(1, rules.size(), "rank " + rank + ": the clause");
-            Assertions.assertEquals(List.of("from_category BPSKILL"),
+            Assertions.assertEquals(List.of("actor == self", "from_category BPSKILL", "target is_ally"),
                     rules.getFirst().conditions().stream().map(c -> c.source()).toList(),
                     "rank " + rank + ": a SKILL cast");
             var e = rules.getFirst().effects().getFirst();

@@ -22,12 +22,16 @@ public class TheHellWhereIdealsBurnTest {
                 .filter(r -> r.id().startsWith("cone23046_")).toList();
         Assertions.assertEquals(1, rules.size(), "one skill rule");
         var effect = rules.getFirst().effects().getFirst();
-        System.out.println("[23046] spec attribute=" + effect.getAttribute() + " percent=" + effect.getPercent()
-                + " target=" + effect.getTarget());
-        Assertions.assertEquals("ATTACK", effect.getAttribute(), "attack");
-        Assertions.assertEquals(0.2, effect.getPercent(), 1e-9, "20% per cast");
-        Assertions.assertEquals("self", effect.getTarget(), "on the wearer");
-        System.out.println("[23046] the stack cap is " + effect.stackCap());
-        Assertions.assertEquals(4, effect.stackCap(), "up to four stacks");
-    }
+        // 2026-10-19: the per-skill attack is a stack buffer plus a per_stack share now (it used to be a single modifier
+        // with a max_stacks that nothing honoured).
+        var stack = rules.getFirst().effects().get(0);
+        var share = rules.getFirst().effects().get(1);
+        System.out.println("[23046] spec stack=\"" + stack.getBuff() + "\" cap=" + stack.stackCap()
+                + " ; share per_stack=\"" + share.getPerStack() + "\" percent=" + share.getPercent());
+        Assertions.assertEquals("ADD_STACK", stack.getOp(), "the buffer");
+        Assertions.assertEquals(4, stack.stackCap(), "up to four stacks");
+        Assertions.assertEquals("ATTACK", share.getAttribute(), "attack");
+        Assertions.assertEquals(0.1, share.getPercent(), 1e-9, "10% per layer at rank 1");
+        Assertions.assertEquals("技能层", share.getPerStack(), "per layer");
 }
+    }
