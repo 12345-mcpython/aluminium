@@ -12,6 +12,21 @@ application {
 group = 'com.laosun'
 version = '1.0-SNAPSHOT'
 
+// ⚠ The version has to travel INSIDE the artifact to be readable FROM it. `Package.getImplementationVersion()` answers from the
+// jar's own manifest, and returns null when the attribute is absent - which is the default, so the engine's jar used to carry no
+// version at all. The TUI's About screen reports this one, so it is stated here rather than copied into that project at build time.
+//
+// ⚠ Main attributes, not per-package entries: they apply to every package in the jar, which is what makes the lookup work from the
+// package of any engine class without naming every package in the build file.
+tasks.named('jar') {
+    manifest {
+        attributes(
+                'Implementation-Title': 'aluminium',
+                'Implementation-Version': project.version,
+                'Implementation-Vendor': project.group)
+    }
+}
+
 java {
     sourceCompatibility = JavaVersion.VERSION_25
     targetCompatibility = JavaVersion.VERSION_25
