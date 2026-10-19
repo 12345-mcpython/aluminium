@@ -13,7 +13,28 @@
         }
       ],
       "source": "光锥 23000 银河铁道之夜: 「当有敌方目标的弱点被击破时，装备者造成的伤害提高#1[i]%，持续1回合」",
-      "note": "⭐ 本椎没有 `ability_property` ✗ ⇒ 两个句子都得自己写 ✓。⭐ 可写的那句：「**当有敌方目标的弱点被击破时**，装备者造成的伤害提高#1[i]%，持续1回合」⇒ **`BREAK`** ✓ + `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST` + `turns: 1` ✓。⚠⚠ **另一句已登记** ✗：「场上每有1个敌方目标，使装备者的**攻击力提高#2[f1]%**，最多叠加**5 层**」。⭐ **缺的不是计数谓词** ✗ —— `enemy_count` 已存在且**已有出货读者** ✓（角色 1413 ✓、光锥 21003/21007/21008 ✓，并有 `EnemyCountConditionTest` ✓）；真正缺的是**\"面板跟随活值\"** ✗：引擎的修饰器是**已写下的值** ✓（纪律 166 ✓），而敌人数随战斗变化 ✗ ⇒ `BATTLE_START` 会**冻结** ✗、每回合刷新只是**回合级近似** ✗。"
+      "note": "「当有敌方目标的弱点被击破时，装备者造成的伤害提高 #1%，持续 1 回合」—— `BREAK` ＋ `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST{turns: 1}` ✓（30/35/40/45/50% ✓）。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23000_attack_per_enemy",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.09,
+          "per_stack": "enemy_count",
+          "cap_amount": 0.44999999999999996,
+          "instance": true,
+          "target": "self",
+          "permanent": true
+        }
+      ],
+      "source": "光锥 23000 银河铁道之夜: 「场上每有 1 个敌方目标，使装备者的攻击力提高 #2%，该效果最多叠加 5 层。」",
+      "note": "「**场上每有 1 个敌方目标**，使装备者的攻击力提高 #2%，该效果**最多叠加 5 层**」—— `DEALING_DAMAGE` ＋ `actor == self` ＋ `per_stack: enemy_count` ✓ ＋ `cap_amount: 0.45` ✓（= 5 × 9% ✓）＋ `instance: true` ✓（场上有几个敌人是**会变**的 ✓，所以不能钉成开战时的常数 ✓）。\n⚠⚠ **2026-10-19 逐句核时补的**：原文件**只有击破那一句** ✗ —— 「场上每有 1 个敌方目标加攻击」**整块没有** ✗（这一句是它的一半 ✓）。"
     }
   ],
   "2": [
@@ -30,7 +51,28 @@
         }
       ],
       "source": "光锥 23000 银河铁道之夜: 「当有敌方目标的弱点被击破时，装备者造成的伤害提高#1[i]%，持续1回合」",
-      "note": "⭐ 本椎没有 `ability_property` ✗ ⇒ 两个句子都得自己写 ✓。⭐ 可写的那句：「**当有敌方目标的弱点被击破时**，装备者造成的伤害提高#1[i]%，持续1回合」⇒ **`BREAK`** ✓ + `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST` + `turns: 1` ✓。⚠⚠ **另一句已登记** ✗：「场上每有1个敌方目标，使装备者的**攻击力提高#2[f1]%**，最多叠加**5 层**」。⭐ **缺的不是计数谓词** ✗ —— `enemy_count` 已存在且**已有出货读者** ✓（角色 1413 ✓、光锥 21003/21007/21008 ✓，并有 `EnemyCountConditionTest` ✓）；真正缺的是**\"面板跟随活值\"** ✗：引擎的修饰器是**已写下的值** ✓（纪律 166 ✓），而敌人数随战斗变化 ✗ ⇒ `BATTLE_START` 会**冻结** ✗、每回合刷新只是**回合级近似** ✗。"
+      "note": "「当有敌方目标的弱点被击破时，装备者造成的伤害提高 #1%，持续 1 回合」—— `BREAK` ＋ `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST{turns: 1}` ✓（30/35/40/45/50% ✓）。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23000_attack_per_enemy",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.105,
+          "per_stack": "enemy_count",
+          "cap_amount": 0.525,
+          "instance": true,
+          "target": "self",
+          "permanent": true
+        }
+      ],
+      "source": "光锥 23000 银河铁道之夜: 「场上每有 1 个敌方目标，使装备者的攻击力提高 #2%，该效果最多叠加 5 层。」",
+      "note": "「**场上每有 1 个敌方目标**，使装备者的攻击力提高 #2%，该效果**最多叠加 5 层**」—— `DEALING_DAMAGE` ＋ `actor == self` ＋ `per_stack: enemy_count` ✓ ＋ `cap_amount: 0.45` ✓（= 5 × 9% ✓）＋ `instance: true` ✓（场上有几个敌人是**会变**的 ✓，所以不能钉成开战时的常数 ✓）。\n⚠⚠ **2026-10-19 逐句核时补的**：原文件**只有击破那一句** ✗ —— 「场上每有 1 个敌方目标加攻击」**整块没有** ✗（这一句是它的一半 ✓）。"
     }
   ],
   "3": [
@@ -47,7 +89,28 @@
         }
       ],
       "source": "光锥 23000 银河铁道之夜: 「当有敌方目标的弱点被击破时，装备者造成的伤害提高#1[i]%，持续1回合」",
-      "note": "⭐ 本椎没有 `ability_property` ✗ ⇒ 两个句子都得自己写 ✓。⭐ 可写的那句：「**当有敌方目标的弱点被击破时**，装备者造成的伤害提高#1[i]%，持续1回合」⇒ **`BREAK`** ✓ + `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST` + `turns: 1` ✓。⚠⚠ **另一句已登记** ✗：「场上每有1个敌方目标，使装备者的**攻击力提高#2[f1]%**，最多叠加**5 层**」。⭐ **缺的不是计数谓词** ✗ —— `enemy_count` 已存在且**已有出货读者** ✓（角色 1413 ✓、光锥 21003/21007/21008 ✓，并有 `EnemyCountConditionTest` ✓）；真正缺的是**\"面板跟随活值\"** ✗：引擎的修饰器是**已写下的值** ✓（纪律 166 ✓），而敌人数随战斗变化 ✗ ⇒ `BATTLE_START` 会**冻结** ✗、每回合刷新只是**回合级近似** ✗。"
+      "note": "「当有敌方目标的弱点被击破时，装备者造成的伤害提高 #1%，持续 1 回合」—— `BREAK` ＋ `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST{turns: 1}` ✓（30/35/40/45/50% ✓）。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23000_attack_per_enemy",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.12,
+          "per_stack": "enemy_count",
+          "cap_amount": 0.6,
+          "instance": true,
+          "target": "self",
+          "permanent": true
+        }
+      ],
+      "source": "光锥 23000 银河铁道之夜: 「场上每有 1 个敌方目标，使装备者的攻击力提高 #2%，该效果最多叠加 5 层。」",
+      "note": "「**场上每有 1 个敌方目标**，使装备者的攻击力提高 #2%，该效果**最多叠加 5 层**」—— `DEALING_DAMAGE` ＋ `actor == self` ＋ `per_stack: enemy_count` ✓ ＋ `cap_amount: 0.45` ✓（= 5 × 9% ✓）＋ `instance: true` ✓（场上有几个敌人是**会变**的 ✓，所以不能钉成开战时的常数 ✓）。\n⚠⚠ **2026-10-19 逐句核时补的**：原文件**只有击破那一句** ✗ —— 「场上每有 1 个敌方目标加攻击」**整块没有** ✗（这一句是它的一半 ✓）。"
     }
   ],
   "4": [
@@ -64,7 +127,28 @@
         }
       ],
       "source": "光锥 23000 银河铁道之夜: 「当有敌方目标的弱点被击破时，装备者造成的伤害提高#1[i]%，持续1回合」",
-      "note": "⭐ 本椎没有 `ability_property` ✗ ⇒ 两个句子都得自己写 ✓。⭐ 可写的那句：「**当有敌方目标的弱点被击破时**，装备者造成的伤害提高#1[i]%，持续1回合」⇒ **`BREAK`** ✓ + `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST` + `turns: 1` ✓。⚠⚠ **另一句已登记** ✗：「场上每有1个敌方目标，使装备者的**攻击力提高#2[f1]%**，最多叠加**5 层**」。⭐ **缺的不是计数谓词** ✗ —— `enemy_count` 已存在且**已有出货读者** ✓（角色 1413 ✓、光锥 21003/21007/21008 ✓，并有 `EnemyCountConditionTest` ✓）；真正缺的是**\"面板跟随活值\"** ✗：引擎的修饰器是**已写下的值** ✓（纪律 166 ✓），而敌人数随战斗变化 ✗ ⇒ `BATTLE_START` 会**冻结** ✗、每回合刷新只是**回合级近似** ✗。"
+      "note": "「当有敌方目标的弱点被击破时，装备者造成的伤害提高 #1%，持续 1 回合」—— `BREAK` ＋ `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST{turns: 1}` ✓（30/35/40/45/50% ✓）。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23000_attack_per_enemy",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.135,
+          "per_stack": "enemy_count",
+          "cap_amount": 0.675,
+          "instance": true,
+          "target": "self",
+          "permanent": true
+        }
+      ],
+      "source": "光锥 23000 银河铁道之夜: 「场上每有 1 个敌方目标，使装备者的攻击力提高 #2%，该效果最多叠加 5 层。」",
+      "note": "「**场上每有 1 个敌方目标**，使装备者的攻击力提高 #2%，该效果**最多叠加 5 层**」—— `DEALING_DAMAGE` ＋ `actor == self` ＋ `per_stack: enemy_count` ✓ ＋ `cap_amount: 0.45` ✓（= 5 × 9% ✓）＋ `instance: true` ✓（场上有几个敌人是**会变**的 ✓，所以不能钉成开战时的常数 ✓）。\n⚠⚠ **2026-10-19 逐句核时补的**：原文件**只有击破那一句** ✗ —— 「场上每有 1 个敌方目标加攻击」**整块没有** ✗（这一句是它的一半 ✓）。"
     }
   ],
   "5": [
@@ -81,7 +165,28 @@
         }
       ],
       "source": "光锥 23000 银河铁道之夜: 「当有敌方目标的弱点被击破时，装备者造成的伤害提高#1[i]%，持续1回合」",
-      "note": "⭐ 本椎没有 `ability_property` ✗ ⇒ 两个句子都得自己写 ✓。⭐ 可写的那句：「**当有敌方目标的弱点被击破时**，装备者造成的伤害提高#1[i]%，持续1回合」⇒ **`BREAK`** ✓ + `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST` + `turns: 1` ✓。⚠⚠ **另一句已登记** ✗：「场上每有1个敌方目标，使装备者的**攻击力提高#2[f1]%**，最多叠加**5 层**」。⭐ **缺的不是计数谓词** ✗ —— `enemy_count` 已存在且**已有出货读者** ✓（角色 1413 ✓、光锥 21003/21007/21008 ✓，并有 `EnemyCountConditionTest` ✓）；真正缺的是**\"面板跟随活值\"** ✗：引擎的修饰器是**已写下的值** ✓（纪律 166 ✓），而敌人数随战斗变化 ✗ ⇒ `BATTLE_START` 会**冻结** ✗、每回合刷新只是**回合级近似** ✗。"
+      "note": "「当有敌方目标的弱点被击破时，装备者造成的伤害提高 #1%，持续 1 回合」—— `BREAK` ＋ `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST{turns: 1}` ✓（30/35/40/45/50% ✓）。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "cone23000_attack_per_enemy",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.15,
+          "per_stack": "enemy_count",
+          "cap_amount": 0.75,
+          "instance": true,
+          "target": "self",
+          "permanent": true
+        }
+      ],
+      "source": "光锥 23000 银河铁道之夜: 「场上每有 1 个敌方目标，使装备者的攻击力提高 #2%，该效果最多叠加 5 层。」",
+      "note": "「**场上每有 1 个敌方目标**，使装备者的攻击力提高 #2%，该效果**最多叠加 5 层**」—— `DEALING_DAMAGE` ＋ `actor == self` ＋ `per_stack: enemy_count` ✓ ＋ `cap_amount: 0.45` ✓（= 5 × 9% ✓）＋ `instance: true` ✓（场上有几个敌人是**会变**的 ✓，所以不能钉成开战时的常数 ✓）。\n⚠⚠ **2026-10-19 逐句核时补的**：原文件**只有击破那一句** ✗ —— 「场上每有 1 个敌方目标加攻击」**整块没有** ✗（这一句是它的一半 ✓）。"
     }
   ]
 }

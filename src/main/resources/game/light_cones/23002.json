@@ -8,8 +8,9 @@
       ],
       "do": [
         {
-          "op": "GAIN_ENERGY",
-          "amount": 0.08,
+          "op": "HEAL",
+          "scale": "owner_attack",
+          "percent": 0.08,
           "target": "self"
         },
         {
@@ -21,7 +22,8 @@
         }
       ],
       "source": "光锥 23002: 「当装备者**消灭敌方目标或受到攻击后**，立即回复#2[i]点能量，并使造成的伤容提高#3[i]%，持续 1 回合。」",
-      "note": "⭐ 常数归引擎 ✓：`props` 写了 `attack_percent` ✓ ⇒ 攻击力那句**未重写** ✗。⭐ 本轮出货第二句 ✓：「当装备者**消灭敌方目标或受到攻击后**，立即回复#2[i]点能量，并使造成的伤容提高#3[i]%，持续 1 回合」⇒ **两条**规则 ✓：`KILL`（`actor == self` ✓）与 `TAKING_HIT`（`target == self` ✓ —— 被击者是目标 ✓，与 24002 同一写法 ✓），各自 `GAIN_ENERGY` + `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST turns 1` ✓。"
+      "note": "「当装备者**消灭敌方目标或受到攻击后**，**立即回复等同于装备者攻击力 8% 的生命值**，同时造成的伤害提高 24%，**持续到自身下个回合结束**；该效果**不可叠加**，**每回合只可触发 1 次**」—— 两条规则分挂 `KILL`（`actor == self` ✓）/ `TAKING_HIT`（`target == self` ✓）、**`HEAL{scale: owner_attack, percent: ...}`** ✓（**攻击力**的份额 ✓，不是能量 ✗）、`MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST{turns: 1}` ✓、「不可叠加」= 同修饰替换 ✓、**`cooldown: 1`** ✓（「每回合 1 次」✓）。\n⚠⚠ **2026-10-19 逐句核时改的两处**：① 回血原先写成了 **`GAIN_ENERGY`** ✗✗（回的是能量、不是生命，而且数值 0.08 点 ✗）⇒ 改 `HEAL scale: owner_attack` ✓；② 补 **`cooldown: 1`** ✗（原先没有上限 ✓）。",
+      "cooldown": 1
     },
     {
       "on": "TAKING_HIT",
@@ -31,8 +33,9 @@
       ],
       "do": [
         {
-          "op": "GAIN_ENERGY",
-          "amount": 0.08,
+          "op": "HEAL",
+          "scale": "owner_attack",
+          "percent": 0.08,
           "target": "self"
         },
         {
@@ -44,7 +47,8 @@
         }
       ],
       "source": "光锥 23002: 「当装备者**消灭敌方目标或受到攻击后**，立即回复#2[i]点能量，并使造成的伤容提高#3[i]%，持续 1 回合。」",
-      "note": "⭐ 常数归引擎 ✓：`props` 写了 `attack_percent` ✓ ⇒ 攻击力那句**未重写** ✗。⭐ 本轮出货第二句 ✓：「当装备者**消灭敌方目标或受到攻击后**，立即回复#2[i]点能量，并使造成的伤容提高#3[i]%，持续 1 回合」⇒ **两条**规则 ✓：`KILL`（`actor == self` ✓）与 `TAKING_HIT`（`target == self` ✓ —— 被击者是目标 ✓，与 24002 同一写法 ✓），各自 `GAIN_ENERGY` + `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST turns 1` ✓。"
+      "note": "「当装备者**消灭敌方目标或受到攻击后**，**立即回复等同于装备者攻击力 8% 的生命值**，同时造成的伤害提高 24%，**持续到自身下个回合结束**；该效果**不可叠加**，**每回合只可触发 1 次**」—— 两条规则分挂 `KILL`（`actor == self` ✓）/ `TAKING_HIT`（`target == self` ✓）、**`HEAL{scale: owner_attack, percent: ...}`** ✓（**攻击力**的份额 ✓，不是能量 ✗）、`MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST{turns: 1}` ✓、「不可叠加」= 同修饰替换 ✓、**`cooldown: 1`** ✓（「每回合 1 次」✓）。\n⚠⚠ **2026-10-19 逐句核时改的两处**：① 回血原先写成了 **`GAIN_ENERGY`** ✗✗（回的是能量、不是生命，而且数值 0.08 点 ✗）⇒ 改 `HEAL scale: owner_attack` ✓；② 补 **`cooldown: 1`** ✗（原先没有上限 ✓）。",
+      "cooldown": 1
     }
   ],
   "2": [
@@ -56,8 +60,9 @@
       ],
       "do": [
         {
-          "op": "GAIN_ENERGY",
-          "amount": 0.09,
+          "op": "HEAL",
+          "scale": "owner_attack",
+          "percent": 0.09,
           "target": "self"
         },
         {
@@ -69,7 +74,8 @@
         }
       ],
       "source": "光锥 23002: 「当装备者**消灭敌方目标或受到攻击后**，立即回复#2[i]点能量，并使造成的伤容提高#3[i]%，持续 1 回合。」",
-      "note": "⭐ 常数归引擎 ✓：`props` 写了 `attack_percent` ✓ ⇒ 攻击力那句**未重写** ✗。⭐ 本轮出货第二句 ✓：「当装备者**消灭敌方目标或受到攻击后**，立即回复#2[i]点能量，并使造成的伤容提高#3[i]%，持续 1 回合」⇒ **两条**规则 ✓：`KILL`（`actor == self` ✓）与 `TAKING_HIT`（`target == self` ✓ —— 被击者是目标 ✓，与 24002 同一写法 ✓），各自 `GAIN_ENERGY` + `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST turns 1` ✓。"
+      "note": "「当装备者**消灭敌方目标或受到攻击后**，**立即回复等同于装备者攻击力 9% 的生命值**，同时造成的伤害提高 28%，**持续到自身下个回合结束**；该效果**不可叠加**，**每回合只可触发 1 次**」—— 两条规则分挂 `KILL`（`actor == self` ✓）/ `TAKING_HIT`（`target == self` ✓）、**`HEAL{scale: owner_attack, percent: ...}`** ✓（**攻击力**的份额 ✓，不是能量 ✗）、`MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST{turns: 1}` ✓、「不可叠加」= 同修饰替换 ✓、**`cooldown: 1`** ✓（「每回合 1 次」✓）。\n⚠⚠ **2026-10-19 逐句核时改的两处**：① 回血原先写成了 **`GAIN_ENERGY`** ✗✗（回的是能量、不是生命，而且数值 0.08 点 ✗）⇒ 改 `HEAL scale: owner_attack` ✓；② 补 **`cooldown: 1`** ✗（原先没有上限 ✓）。",
+      "cooldown": 1
     },
     {
       "on": "TAKING_HIT",
@@ -79,8 +85,9 @@
       ],
       "do": [
         {
-          "op": "GAIN_ENERGY",
-          "amount": 0.09,
+          "op": "HEAL",
+          "scale": "owner_attack",
+          "percent": 0.09,
           "target": "self"
         },
         {
@@ -92,7 +99,8 @@
         }
       ],
       "source": "光锥 23002: 「当装备者**消灭敌方目标或受到攻击后**，立即回复#2[i]点能量，并使造成的伤容提高#3[i]%，持续 1 回合。」",
-      "note": "⭐ 常数归引擎 ✓：`props` 写了 `attack_percent` ✓ ⇒ 攻击力那句**未重写** ✗。⭐ 本轮出货第二句 ✓：「当装备者**消灭敌方目标或受到攻击后**，立即回复#2[i]点能量，并使造成的伤容提高#3[i]%，持续 1 回合」⇒ **两条**规则 ✓：`KILL`（`actor == self` ✓）与 `TAKING_HIT`（`target == self` ✓ —— 被击者是目标 ✓，与 24002 同一写法 ✓），各自 `GAIN_ENERGY` + `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST turns 1` ✓。"
+      "note": "「当装备者**消灭敌方目标或受到攻击后**，**立即回复等同于装备者攻击力 9% 的生命值**，同时造成的伤害提高 28%，**持续到自身下个回合结束**；该效果**不可叠加**，**每回合只可触发 1 次**」—— 两条规则分挂 `KILL`（`actor == self` ✓）/ `TAKING_HIT`（`target == self` ✓）、**`HEAL{scale: owner_attack, percent: ...}`** ✓（**攻击力**的份额 ✓，不是能量 ✗）、`MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST{turns: 1}` ✓、「不可叠加」= 同修饰替换 ✓、**`cooldown: 1`** ✓（「每回合 1 次」✓）。\n⚠⚠ **2026-10-19 逐句核时改的两处**：① 回血原先写成了 **`GAIN_ENERGY`** ✗✗（回的是能量、不是生命，而且数值 0.08 点 ✗）⇒ 改 `HEAL scale: owner_attack` ✓；② 补 **`cooldown: 1`** ✗（原先没有上限 ✓）。",
+      "cooldown": 1
     }
   ],
   "3": [
@@ -104,8 +112,9 @@
       ],
       "do": [
         {
-          "op": "GAIN_ENERGY",
-          "amount": 0.1,
+          "op": "HEAL",
+          "scale": "owner_attack",
+          "percent": 0.1,
           "target": "self"
         },
         {
@@ -117,7 +126,8 @@
         }
       ],
       "source": "光锥 23002: 「当装备者**消灭敌方目标或受到攻击后**，立即回复#2[i]点能量，并使造成的伤容提高#3[i]%，持续 1 回合。」",
-      "note": "⭐ 常数归引擎 ✓：`props` 写了 `attack_percent` ✓ ⇒ 攻击力那句**未重写** ✗。⭐ 本轮出货第二句 ✓：「当装备者**消灭敌方目标或受到攻击后**，立即回复#2[i]点能量，并使造成的伤容提高#3[i]%，持续 1 回合」⇒ **两条**规则 ✓：`KILL`（`actor == self` ✓）与 `TAKING_HIT`（`target == self` ✓ —— 被击者是目标 ✓，与 24002 同一写法 ✓），各自 `GAIN_ENERGY` + `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST turns 1` ✓。"
+      "note": "「当装备者**消灭敌方目标或受到攻击后**，**立即回复等同于装备者攻击力 10% 的生命值**，同时造成的伤害提高 32%，**持续到自身下个回合结束**；该效果**不可叠加**，**每回合只可触发 1 次**」—— 两条规则分挂 `KILL`（`actor == self` ✓）/ `TAKING_HIT`（`target == self` ✓）、**`HEAL{scale: owner_attack, percent: ...}`** ✓（**攻击力**的份额 ✓，不是能量 ✗）、`MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST{turns: 1}` ✓、「不可叠加」= 同修饰替换 ✓、**`cooldown: 1`** ✓（「每回合 1 次」✓）。\n⚠⚠ **2026-10-19 逐句核时改的两处**：① 回血原先写成了 **`GAIN_ENERGY`** ✗✗（回的是能量、不是生命，而且数值 0.08 点 ✗）⇒ 改 `HEAL scale: owner_attack` ✓；② 补 **`cooldown: 1`** ✗（原先没有上限 ✓）。",
+      "cooldown": 1
     },
     {
       "on": "TAKING_HIT",
@@ -127,8 +137,9 @@
       ],
       "do": [
         {
-          "op": "GAIN_ENERGY",
-          "amount": 0.1,
+          "op": "HEAL",
+          "scale": "owner_attack",
+          "percent": 0.1,
           "target": "self"
         },
         {
@@ -140,7 +151,8 @@
         }
       ],
       "source": "光锥 23002: 「当装备者**消灭敌方目标或受到攻击后**，立即回复#2[i]点能量，并使造成的伤容提高#3[i]%，持续 1 回合。」",
-      "note": "⭐ 常数归引擎 ✓：`props` 写了 `attack_percent` ✓ ⇒ 攻击力那句**未重写** ✗。⭐ 本轮出货第二句 ✓：「当装备者**消灭敌方目标或受到攻击后**，立即回复#2[i]点能量，并使造成的伤容提高#3[i]%，持续 1 回合」⇒ **两条**规则 ✓：`KILL`（`actor == self` ✓）与 `TAKING_HIT`（`target == self` ✓ —— 被击者是目标 ✓，与 24002 同一写法 ✓），各自 `GAIN_ENERGY` + `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST turns 1` ✓。"
+      "note": "「当装备者**消灭敌方目标或受到攻击后**，**立即回复等同于装备者攻击力 10% 的生命值**，同时造成的伤害提高 32%，**持续到自身下个回合结束**；该效果**不可叠加**，**每回合只可触发 1 次**」—— 两条规则分挂 `KILL`（`actor == self` ✓）/ `TAKING_HIT`（`target == self` ✓）、**`HEAL{scale: owner_attack, percent: ...}`** ✓（**攻击力**的份额 ✓，不是能量 ✗）、`MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST{turns: 1}` ✓、「不可叠加」= 同修饰替换 ✓、**`cooldown: 1`** ✓（「每回合 1 次」✓）。\n⚠⚠ **2026-10-19 逐句核时改的两处**：① 回血原先写成了 **`GAIN_ENERGY`** ✗✗（回的是能量、不是生命，而且数值 0.08 点 ✗）⇒ 改 `HEAL scale: owner_attack` ✓；② 补 **`cooldown: 1`** ✗（原先没有上限 ✓）。",
+      "cooldown": 1
     }
   ],
   "4": [
@@ -152,8 +164,9 @@
       ],
       "do": [
         {
-          "op": "GAIN_ENERGY",
-          "amount": 0.11,
+          "op": "HEAL",
+          "scale": "owner_attack",
+          "percent": 0.11,
           "target": "self"
         },
         {
@@ -165,7 +178,8 @@
         }
       ],
       "source": "光锥 23002: 「当装备者**消灭敌方目标或受到攻击后**，立即回复#2[i]点能量，并使造成的伤容提高#3[i]%，持续 1 回合。」",
-      "note": "⭐ 常数归引擎 ✓：`props` 写了 `attack_percent` ✓ ⇒ 攻击力那句**未重写** ✗。⭐ 本轮出货第二句 ✓：「当装备者**消灭敌方目标或受到攻击后**，立即回复#2[i]点能量，并使造成的伤容提高#3[i]%，持续 1 回合」⇒ **两条**规则 ✓：`KILL`（`actor == self` ✓）与 `TAKING_HIT`（`target == self` ✓ —— 被击者是目标 ✓，与 24002 同一写法 ✓），各自 `GAIN_ENERGY` + `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST turns 1` ✓。"
+      "note": "「当装备者**消灭敌方目标或受到攻击后**，**立即回复等同于装备者攻击力 11% 的生命值**，同时造成的伤害提高 36%，**持续到自身下个回合结束**；该效果**不可叠加**，**每回合只可触发 1 次**」—— 两条规则分挂 `KILL`（`actor == self` ✓）/ `TAKING_HIT`（`target == self` ✓）、**`HEAL{scale: owner_attack, percent: ...}`** ✓（**攻击力**的份额 ✓，不是能量 ✗）、`MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST{turns: 1}` ✓、「不可叠加」= 同修饰替换 ✓、**`cooldown: 1`** ✓（「每回合 1 次」✓）。\n⚠⚠ **2026-10-19 逐句核时改的两处**：① 回血原先写成了 **`GAIN_ENERGY`** ✗✗（回的是能量、不是生命，而且数值 0.08 点 ✗）⇒ 改 `HEAL scale: owner_attack` ✓；② 补 **`cooldown: 1`** ✗（原先没有上限 ✓）。",
+      "cooldown": 1
     },
     {
       "on": "TAKING_HIT",
@@ -175,8 +189,9 @@
       ],
       "do": [
         {
-          "op": "GAIN_ENERGY",
-          "amount": 0.11,
+          "op": "HEAL",
+          "scale": "owner_attack",
+          "percent": 0.11,
           "target": "self"
         },
         {
@@ -188,7 +203,8 @@
         }
       ],
       "source": "光锥 23002: 「当装备者**消灭敌方目标或受到攻击后**，立即回复#2[i]点能量，并使造成的伤容提高#3[i]%，持续 1 回合。」",
-      "note": "⭐ 常数归引擎 ✓：`props` 写了 `attack_percent` ✓ ⇒ 攻击力那句**未重写** ✗。⭐ 本轮出货第二句 ✓：「当装备者**消灭敌方目标或受到攻击后**，立即回复#2[i]点能量，并使造成的伤容提高#3[i]%，持续 1 回合」⇒ **两条**规则 ✓：`KILL`（`actor == self` ✓）与 `TAKING_HIT`（`target == self` ✓ —— 被击者是目标 ✓，与 24002 同一写法 ✓），各自 `GAIN_ENERGY` + `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST turns 1` ✓。"
+      "note": "「当装备者**消灭敌方目标或受到攻击后**，**立即回复等同于装备者攻击力 11% 的生命值**，同时造成的伤害提高 36%，**持续到自身下个回合结束**；该效果**不可叠加**，**每回合只可触发 1 次**」—— 两条规则分挂 `KILL`（`actor == self` ✓）/ `TAKING_HIT`（`target == self` ✓）、**`HEAL{scale: owner_attack, percent: ...}`** ✓（**攻击力**的份额 ✓，不是能量 ✗）、`MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST{turns: 1}` ✓、「不可叠加」= 同修饰替换 ✓、**`cooldown: 1`** ✓（「每回合 1 次」✓）。\n⚠⚠ **2026-10-19 逐句核时改的两处**：① 回血原先写成了 **`GAIN_ENERGY`** ✗✗（回的是能量、不是生命，而且数值 0.08 点 ✗）⇒ 改 `HEAL scale: owner_attack` ✓；② 补 **`cooldown: 1`** ✗（原先没有上限 ✓）。",
+      "cooldown": 1
     }
   ],
   "5": [
@@ -200,8 +216,9 @@
       ],
       "do": [
         {
-          "op": "GAIN_ENERGY",
-          "amount": 0.12,
+          "op": "HEAL",
+          "scale": "owner_attack",
+          "percent": 0.12,
           "target": "self"
         },
         {
@@ -213,7 +230,8 @@
         }
       ],
       "source": "光锥 23002: 「当装备者**消灭敌方目标或受到攻击后**，立即回复#2[i]点能量，并使造成的伤容提高#3[i]%，持续 1 回合。」",
-      "note": "⭐ 常数归引擎 ✓：`props` 写了 `attack_percent` ✓ ⇒ 攻击力那句**未重写** ✗。⭐ 本轮出货第二句 ✓：「当装备者**消灭敌方目标或受到攻击后**，立即回复#2[i]点能量，并使造成的伤容提高#3[i]%，持续 1 回合」⇒ **两条**规则 ✓：`KILL`（`actor == self` ✓）与 `TAKING_HIT`（`target == self` ✓ —— 被击者是目标 ✓，与 24002 同一写法 ✓），各自 `GAIN_ENERGY` + `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST turns 1` ✓。"
+      "note": "「当装备者**消灭敌方目标或受到攻击后**，**立即回复等同于装备者攻击力 12% 的生命值**，同时造成的伤害提高 40%，**持续到自身下个回合结束**；该效果**不可叠加**，**每回合只可触发 1 次**」—— 两条规则分挂 `KILL`（`actor == self` ✓）/ `TAKING_HIT`（`target == self` ✓）、**`HEAL{scale: owner_attack, percent: ...}`** ✓（**攻击力**的份额 ✓，不是能量 ✗）、`MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST{turns: 1}` ✓、「不可叠加」= 同修饰替换 ✓、**`cooldown: 1`** ✓（「每回合 1 次」✓）。\n⚠⚠ **2026-10-19 逐句核时改的两处**：① 回血原先写成了 **`GAIN_ENERGY`** ✗✗（回的是能量、不是生命，而且数值 0.08 点 ✗）⇒ 改 `HEAL scale: owner_attack` ✓；② 补 **`cooldown: 1`** ✗（原先没有上限 ✓）。",
+      "cooldown": 1
     },
     {
       "on": "TAKING_HIT",
@@ -223,8 +241,9 @@
       ],
       "do": [
         {
-          "op": "GAIN_ENERGY",
-          "amount": 0.12,
+          "op": "HEAL",
+          "scale": "owner_attack",
+          "percent": 0.12,
           "target": "self"
         },
         {
@@ -236,7 +255,8 @@
         }
       ],
       "source": "光锥 23002: 「当装备者**消灭敌方目标或受到攻击后**，立即回复#2[i]点能量，并使造成的伤容提高#3[i]%，持续 1 回合。」",
-      "note": "⭐ 常数归引擎 ✓：`props` 写了 `attack_percent` ✓ ⇒ 攻击力那句**未重写** ✗。⭐ 本轮出货第二句 ✓：「当装备者**消灭敌方目标或受到攻击后**，立即回复#2[i]点能量，并使造成的伤容提高#3[i]%，持续 1 回合」⇒ **两条**规则 ✓：`KILL`（`actor == self` ✓）与 `TAKING_HIT`（`target == self` ✓ —— 被击者是目标 ✓，与 24002 同一写法 ✓），各自 `GAIN_ENERGY` + `MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST turns 1` ✓。"
+      "note": "「当装备者**消灭敌方目标或受到攻击后**，**立即回复等同于装备者攻击力 12% 的生命值**，同时造成的伤害提高 40%，**持续到自身下个回合结束**；该效果**不可叠加**，**每回合只可触发 1 次**」—— 两条规则分挂 `KILL`（`actor == self` ✓）/ `TAKING_HIT`（`target == self` ✓）、**`HEAL{scale: owner_attack, percent: ...}`** ✓（**攻击力**的份额 ✓，不是能量 ✗）、`MODIFY_ATTR ALL_DAMAGE_TYPE_BOOST{turns: 1}` ✓、「不可叠加」= 同修饰替换 ✓、**`cooldown: 1`** ✓（「每回合 1 次」✓）。\n⚠⚠ **2026-10-19 逐句核时改的两处**：① 回血原先写成了 **`GAIN_ENERGY`** ✗✗（回的是能量、不是生命，而且数值 0.08 点 ✗）⇒ 改 `HEAL scale: owner_attack` ✓；② 补 **`cooldown: 1`** ✗（原先没有上限 ✓）。",
+      "cooldown": 1
     }
   ]
 }

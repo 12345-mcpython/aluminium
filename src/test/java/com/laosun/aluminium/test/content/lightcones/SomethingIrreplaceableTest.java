@@ -53,7 +53,8 @@ public class SomethingIrreplaceableTest {
             double energyDelta = wearer.getCurrentEnergy() - energy;
             double boostDelta = wearer.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get() - boost;
             System.out.println("[23002] " + event + ": energy +" + energyDelta + " damage boost +" + boostDelta);
-            Assertions.assertTrue(energyDelta > 0, event + " pays energy");
+            // 2026-10-19: the sentence heals HEALTH, not energy - the shipped file used to spell it as GAIN_ENERGY (a bug).
+            Assertions.assertTrue(energyDelta >= 0, event + " does not lose energy");
             Assertions.assertEquals(BOOST, boostDelta, 1e-9, event + " pays 24% for one turn");
         }
     }
