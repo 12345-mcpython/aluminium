@@ -1,12 +1,13 @@
 {
   "1": [
     {
-      "on": "ATTACK_FINISHED",
+      "on": "DEALING_DAMAGE",
       "id": "cone21029_extra_damage_normal",
       "when": [
         "actor == self",
         "from_category NORMAL"
       ],
+      "per_attack": 1,
       "do": [
         {
           "op": "ADD_DAMAGE",
@@ -15,16 +16,17 @@
           "target": "random_hit_enemy"
         }
       ],
-      "source": "光锥 21029 后会有期 · 能力「交手如交谈」: 「装备者施放普攻或战技后，对随机 1 个受到攻击的敌方目标造成等同于自身 #1[i]% 攻击力的附加伤害。」",
-      "note": "⚠ 本条的写法**全部来自既有出货内容**，并已按第 553 轮的新纪律**逐项 grep 过引擎** ✓：① **事件 `ATTACK_FINISHED`** ✓（⚠ 它携带本次攻击**已冻结的命中集合** ✓ —— 照光锥 `23007` ✓，该光锥正是在此事件上用 `random_hit_enemy` 共 8 次 ✓）；② **目标 `random_hit_enemy`** ✓ —— ⚠ 它**早已存在于 `TriggerInterpreter.TARGET_SELECTORS`** ✓（⚠ 我第 548 轮把它登记为\"缺失能力\"，**是错的** ✗）；写法照 `23007:30` ✓：`\"target\"` 与 `\"op\"` **同级、写在 `do` 条目内** ✓；③ **效果 `ADD_DAMAGE`** ✓ —— ⚠ 它**早已出货于 `21030`（五档）与 `20018`（五档）** ✓（⚠ 我第 550 轮仍以为缺它 ✗）；`percent` ＋ **`scale: \"self_attr:ATTACK\"`** ✓ 照 `21030:13-15` ✓；④ ⚠ 「**普攻或战技**」是**析取** ✗ ⇒ ⭐ 照遗器 `105` 的既有惯例写成**两条规则** ✓（⚠ 一条 `from_category NORMAL` ✓、一条 `BPSKILL` ✓）；⑤ 数值取自权威 `EquipmentSkillConfig` 的五档 `ParamList` ✓：0.48 / 0.6 / 0.72 / 0.84 / 0.96 ✓。⚠ 因此本张**不需要任何引擎改动** ✓。"
+      "source": "光锥 21029 后会有期: 「装备者施放普攻或战技后，对随机 1 个受到攻击的敌方目标造成等同于自身 #1% 攻击力的附加伤害。」",
+      "note": "⚠⚠ **2026-10-19 逐句核时换了事件** ✓：原文件把 `ADD_DAMAGE` 挂在 **`ATTACK_FINISHED`** 上 ✗ —— 装载器直接拒绝：「`ADD_DAMAGE` only means something on `DEALING_DAMAGE`」✓。⇒ 改挂 `DEALING_DAMAGE` ✓，用 `from_category NORMAL` / `BPSKILL` 圈定「普攻或战技」✓（两份条件不能用「或」✓，所以两条规则 ✓），并用 **`per_attack: 1`** ✓ 表达「**1** 个受到攻击的目标」✓（一次攻击只付一次 ✓）。"
     },
     {
-      "on": "ATTACK_FINISHED",
+      "on": "DEALING_DAMAGE",
       "id": "cone21029_extra_damage_bpskill",
       "when": [
         "actor == self",
         "from_category BPSKILL"
       ],
+      "per_attack": 1,
       "do": [
         {
           "op": "ADD_DAMAGE",
@@ -33,18 +35,19 @@
           "target": "random_hit_enemy"
         }
       ],
-      "source": "光锥 21029 后会有期 · 能力「交手如交谈」: 「装备者施放普攻或战技后，对随机 1 个受到攻击的敌方目标造成等同于自身 #1[i]% 攻击力的附加伤害。」",
-      "note": "⚠ 本条的写法**全部来自既有出货内容**，并已按第 553 轮的新纪律**逐项 grep 过引擎** ✓：① **事件 `ATTACK_FINISHED`** ✓（⚠ 它携带本次攻击**已冻结的命中集合** ✓ —— 照光锥 `23007` ✓，该光锥正是在此事件上用 `random_hit_enemy` 共 8 次 ✓）；② **目标 `random_hit_enemy`** ✓ —— ⚠ 它**早已存在于 `TriggerInterpreter.TARGET_SELECTORS`** ✓（⚠ 我第 548 轮把它登记为\"缺失能力\"，**是错的** ✗）；写法照 `23007:30` ✓：`\"target\"` 与 `\"op\"` **同级、写在 `do` 条目内** ✓；③ **效果 `ADD_DAMAGE`** ✓ —— ⚠ 它**早已出货于 `21030`（五档）与 `20018`（五档）** ✓（⚠ 我第 550 轮仍以为缺它 ✗）；`percent` ＋ **`scale: \"self_attr:ATTACK\"`** ✓ 照 `21030:13-15` ✓；④ ⚠ 「**普攻或战技**」是**析取** ✗ ⇒ ⭐ 照遗器 `105` 的既有惯例写成**两条规则** ✓（⚠ 一条 `from_category NORMAL` ✓、一条 `BPSKILL` ✓）；⑤ 数值取自权威 `EquipmentSkillConfig` 的五档 `ParamList` ✓：0.48 / 0.6 / 0.72 / 0.84 / 0.96 ✓。⚠ 因此本张**不需要任何引擎改动** ✓。"
+      "source": "光锥 21029 后会有期: 「装备者施放普攻或战技后，对随机 1 个受到攻击的敌方目标造成等同于自身 #1% 攻击力的附加伤害。」",
+      "note": "⚠⚠ **2026-10-19 逐句核时换了事件** ✓：原文件把 `ADD_DAMAGE` 挂在 **`ATTACK_FINISHED`** 上 ✗ —— 装载器直接拒绝：「`ADD_DAMAGE` only means something on `DEALING_DAMAGE`」✓。⇒ 改挂 `DEALING_DAMAGE` ✓，用 `from_category NORMAL` / `BPSKILL` 圈定「普攻或战技」✓（两份条件不能用「或」✓，所以两条规则 ✓），并用 **`per_attack: 1`** ✓ 表达「**1** 个受到攻击的目标」✓（一次攻击只付一次 ✓）。"
     }
   ],
   "2": [
     {
-      "on": "ATTACK_FINISHED",
+      "on": "DEALING_DAMAGE",
       "id": "cone21029_extra_damage_normal",
       "when": [
         "actor == self",
         "from_category NORMAL"
       ],
+      "per_attack": 1,
       "do": [
         {
           "op": "ADD_DAMAGE",
@@ -53,16 +56,17 @@
           "target": "random_hit_enemy"
         }
       ],
-      "source": "光锥 21029 后会有期 · 能力「交手如交谈」: 「装备者施放普攻或战技后，对随机 1 个受到攻击的敌方目标造成等同于自身 #1[i]% 攻击力的附加伤害。」",
-      "note": "⚠ 本条的写法**全部来自既有出货内容**，并已按第 553 轮的新纪律**逐项 grep 过引擎** ✓：① **事件 `ATTACK_FINISHED`** ✓（⚠ 它携带本次攻击**已冻结的命中集合** ✓ —— 照光锥 `23007` ✓，该光锥正是在此事件上用 `random_hit_enemy` 共 8 次 ✓）；② **目标 `random_hit_enemy`** ✓ —— ⚠ 它**早已存在于 `TriggerInterpreter.TARGET_SELECTORS`** ✓（⚠ 我第 548 轮把它登记为\"缺失能力\"，**是错的** ✗）；写法照 `23007:30` ✓：`\"target\"` 与 `\"op\"` **同级、写在 `do` 条目内** ✓；③ **效果 `ADD_DAMAGE`** ✓ —— ⚠ 它**早已出货于 `21030`（五档）与 `20018`（五档）** ✓（⚠ 我第 550 轮仍以为缺它 ✗）；`percent` ＋ **`scale: \"self_attr:ATTACK\"`** ✓ 照 `21030:13-15` ✓；④ ⚠ 「**普攻或战技**」是**析取** ✗ ⇒ ⭐ 照遗器 `105` 的既有惯例写成**两条规则** ✓（⚠ 一条 `from_category NORMAL` ✓、一条 `BPSKILL` ✓）；⑤ 数值取自权威 `EquipmentSkillConfig` 的五档 `ParamList` ✓：0.48 / 0.6 / 0.72 / 0.84 / 0.96 ✓。⚠ 因此本张**不需要任何引擎改动** ✓。"
+      "source": "光锥 21029 后会有期: 「装备者施放普攻或战技后，对随机 1 个受到攻击的敌方目标造成等同于自身 #1% 攻击力的附加伤害。」",
+      "note": "⚠⚠ **2026-10-19 逐句核时换了事件** ✓：原文件把 `ADD_DAMAGE` 挂在 **`ATTACK_FINISHED`** 上 ✗ —— 装载器直接拒绝：「`ADD_DAMAGE` only means something on `DEALING_DAMAGE`」✓。⇒ 改挂 `DEALING_DAMAGE` ✓，用 `from_category NORMAL` / `BPSKILL` 圈定「普攻或战技」✓（两份条件不能用「或」✓，所以两条规则 ✓），并用 **`per_attack: 1`** ✓ 表达「**1** 个受到攻击的目标」✓（一次攻击只付一次 ✓）。"
     },
     {
-      "on": "ATTACK_FINISHED",
+      "on": "DEALING_DAMAGE",
       "id": "cone21029_extra_damage_bpskill",
       "when": [
         "actor == self",
         "from_category BPSKILL"
       ],
+      "per_attack": 1,
       "do": [
         {
           "op": "ADD_DAMAGE",
@@ -71,18 +75,19 @@
           "target": "random_hit_enemy"
         }
       ],
-      "source": "光锥 21029 后会有期 · 能力「交手如交谈」: 「装备者施放普攻或战技后，对随机 1 个受到攻击的敌方目标造成等同于自身 #1[i]% 攻击力的附加伤害。」",
-      "note": "⚠ 本条的写法**全部来自既有出货内容**，并已按第 553 轮的新纪律**逐项 grep 过引擎** ✓：① **事件 `ATTACK_FINISHED`** ✓（⚠ 它携带本次攻击**已冻结的命中集合** ✓ —— 照光锥 `23007` ✓，该光锥正是在此事件上用 `random_hit_enemy` 共 8 次 ✓）；② **目标 `random_hit_enemy`** ✓ —— ⚠ 它**早已存在于 `TriggerInterpreter.TARGET_SELECTORS`** ✓（⚠ 我第 548 轮把它登记为\"缺失能力\"，**是错的** ✗）；写法照 `23007:30` ✓：`\"target\"` 与 `\"op\"` **同级、写在 `do` 条目内** ✓；③ **效果 `ADD_DAMAGE`** ✓ —— ⚠ 它**早已出货于 `21030`（五档）与 `20018`（五档）** ✓（⚠ 我第 550 轮仍以为缺它 ✗）；`percent` ＋ **`scale: \"self_attr:ATTACK\"`** ✓ 照 `21030:13-15` ✓；④ ⚠ 「**普攻或战技**」是**析取** ✗ ⇒ ⭐ 照遗器 `105` 的既有惯例写成**两条规则** ✓（⚠ 一条 `from_category NORMAL` ✓、一条 `BPSKILL` ✓）；⑤ 数值取自权威 `EquipmentSkillConfig` 的五档 `ParamList` ✓：0.48 / 0.6 / 0.72 / 0.84 / 0.96 ✓。⚠ 因此本张**不需要任何引擎改动** ✓。"
+      "source": "光锥 21029 后会有期: 「装备者施放普攻或战技后，对随机 1 个受到攻击的敌方目标造成等同于自身 #1% 攻击力的附加伤害。」",
+      "note": "⚠⚠ **2026-10-19 逐句核时换了事件** ✓：原文件把 `ADD_DAMAGE` 挂在 **`ATTACK_FINISHED`** 上 ✗ —— 装载器直接拒绝：「`ADD_DAMAGE` only means something on `DEALING_DAMAGE`」✓。⇒ 改挂 `DEALING_DAMAGE` ✓，用 `from_category NORMAL` / `BPSKILL` 圈定「普攻或战技」✓（两份条件不能用「或」✓，所以两条规则 ✓），并用 **`per_attack: 1`** ✓ 表达「**1** 个受到攻击的目标」✓（一次攻击只付一次 ✓）。"
     }
   ],
   "3": [
     {
-      "on": "ATTACK_FINISHED",
+      "on": "DEALING_DAMAGE",
       "id": "cone21029_extra_damage_normal",
       "when": [
         "actor == self",
         "from_category NORMAL"
       ],
+      "per_attack": 1,
       "do": [
         {
           "op": "ADD_DAMAGE",
@@ -91,16 +96,17 @@
           "target": "random_hit_enemy"
         }
       ],
-      "source": "光锥 21029 后会有期 · 能力「交手如交谈」: 「装备者施放普攻或战技后，对随机 1 个受到攻击的敌方目标造成等同于自身 #1[i]% 攻击力的附加伤害。」",
-      "note": "⚠ 本条的写法**全部来自既有出货内容**，并已按第 553 轮的新纪律**逐项 grep 过引擎** ✓：① **事件 `ATTACK_FINISHED`** ✓（⚠ 它携带本次攻击**已冻结的命中集合** ✓ —— 照光锥 `23007` ✓，该光锥正是在此事件上用 `random_hit_enemy` 共 8 次 ✓）；② **目标 `random_hit_enemy`** ✓ —— ⚠ 它**早已存在于 `TriggerInterpreter.TARGET_SELECTORS`** ✓（⚠ 我第 548 轮把它登记为\"缺失能力\"，**是错的** ✗）；写法照 `23007:30` ✓：`\"target\"` 与 `\"op\"` **同级、写在 `do` 条目内** ✓；③ **效果 `ADD_DAMAGE`** ✓ —— ⚠ 它**早已出货于 `21030`（五档）与 `20018`（五档）** ✓（⚠ 我第 550 轮仍以为缺它 ✗）；`percent` ＋ **`scale: \"self_attr:ATTACK\"`** ✓ 照 `21030:13-15` ✓；④ ⚠ 「**普攻或战技**」是**析取** ✗ ⇒ ⭐ 照遗器 `105` 的既有惯例写成**两条规则** ✓（⚠ 一条 `from_category NORMAL` ✓、一条 `BPSKILL` ✓）；⑤ 数值取自权威 `EquipmentSkillConfig` 的五档 `ParamList` ✓：0.48 / 0.6 / 0.72 / 0.84 / 0.96 ✓。⚠ 因此本张**不需要任何引擎改动** ✓。"
+      "source": "光锥 21029 后会有期: 「装备者施放普攻或战技后，对随机 1 个受到攻击的敌方目标造成等同于自身 #1% 攻击力的附加伤害。」",
+      "note": "⚠⚠ **2026-10-19 逐句核时换了事件** ✓：原文件把 `ADD_DAMAGE` 挂在 **`ATTACK_FINISHED`** 上 ✗ —— 装载器直接拒绝：「`ADD_DAMAGE` only means something on `DEALING_DAMAGE`」✓。⇒ 改挂 `DEALING_DAMAGE` ✓，用 `from_category NORMAL` / `BPSKILL` 圈定「普攻或战技」✓（两份条件不能用「或」✓，所以两条规则 ✓），并用 **`per_attack: 1`** ✓ 表达「**1** 个受到攻击的目标」✓（一次攻击只付一次 ✓）。"
     },
     {
-      "on": "ATTACK_FINISHED",
+      "on": "DEALING_DAMAGE",
       "id": "cone21029_extra_damage_bpskill",
       "when": [
         "actor == self",
         "from_category BPSKILL"
       ],
+      "per_attack": 1,
       "do": [
         {
           "op": "ADD_DAMAGE",
@@ -109,18 +115,19 @@
           "target": "random_hit_enemy"
         }
       ],
-      "source": "光锥 21029 后会有期 · 能力「交手如交谈」: 「装备者施放普攻或战技后，对随机 1 个受到攻击的敌方目标造成等同于自身 #1[i]% 攻击力的附加伤害。」",
-      "note": "⚠ 本条的写法**全部来自既有出货内容**，并已按第 553 轮的新纪律**逐项 grep 过引擎** ✓：① **事件 `ATTACK_FINISHED`** ✓（⚠ 它携带本次攻击**已冻结的命中集合** ✓ —— 照光锥 `23007` ✓，该光锥正是在此事件上用 `random_hit_enemy` 共 8 次 ✓）；② **目标 `random_hit_enemy`** ✓ —— ⚠ 它**早已存在于 `TriggerInterpreter.TARGET_SELECTORS`** ✓（⚠ 我第 548 轮把它登记为\"缺失能力\"，**是错的** ✗）；写法照 `23007:30` ✓：`\"target\"` 与 `\"op\"` **同级、写在 `do` 条目内** ✓；③ **效果 `ADD_DAMAGE`** ✓ —— ⚠ 它**早已出货于 `21030`（五档）与 `20018`（五档）** ✓（⚠ 我第 550 轮仍以为缺它 ✗）；`percent` ＋ **`scale: \"self_attr:ATTACK\"`** ✓ 照 `21030:13-15` ✓；④ ⚠ 「**普攻或战技**」是**析取** ✗ ⇒ ⭐ 照遗器 `105` 的既有惯例写成**两条规则** ✓（⚠ 一条 `from_category NORMAL` ✓、一条 `BPSKILL` ✓）；⑤ 数值取自权威 `EquipmentSkillConfig` 的五档 `ParamList` ✓：0.48 / 0.6 / 0.72 / 0.84 / 0.96 ✓。⚠ 因此本张**不需要任何引擎改动** ✓。"
+      "source": "光锥 21029 后会有期: 「装备者施放普攻或战技后，对随机 1 个受到攻击的敌方目标造成等同于自身 #1% 攻击力的附加伤害。」",
+      "note": "⚠⚠ **2026-10-19 逐句核时换了事件** ✓：原文件把 `ADD_DAMAGE` 挂在 **`ATTACK_FINISHED`** 上 ✗ —— 装载器直接拒绝：「`ADD_DAMAGE` only means something on `DEALING_DAMAGE`」✓。⇒ 改挂 `DEALING_DAMAGE` ✓，用 `from_category NORMAL` / `BPSKILL` 圈定「普攻或战技」✓（两份条件不能用「或」✓，所以两条规则 ✓），并用 **`per_attack: 1`** ✓ 表达「**1** 个受到攻击的目标」✓（一次攻击只付一次 ✓）。"
     }
   ],
   "4": [
     {
-      "on": "ATTACK_FINISHED",
+      "on": "DEALING_DAMAGE",
       "id": "cone21029_extra_damage_normal",
       "when": [
         "actor == self",
         "from_category NORMAL"
       ],
+      "per_attack": 1,
       "do": [
         {
           "op": "ADD_DAMAGE",
@@ -129,16 +136,17 @@
           "target": "random_hit_enemy"
         }
       ],
-      "source": "光锥 21029 后会有期 · 能力「交手如交谈」: 「装备者施放普攻或战技后，对随机 1 个受到攻击的敌方目标造成等同于自身 #1[i]% 攻击力的附加伤害。」",
-      "note": "⚠ 本条的写法**全部来自既有出货内容**，并已按第 553 轮的新纪律**逐项 grep 过引擎** ✓：① **事件 `ATTACK_FINISHED`** ✓（⚠ 它携带本次攻击**已冻结的命中集合** ✓ —— 照光锥 `23007` ✓，该光锥正是在此事件上用 `random_hit_enemy` 共 8 次 ✓）；② **目标 `random_hit_enemy`** ✓ —— ⚠ 它**早已存在于 `TriggerInterpreter.TARGET_SELECTORS`** ✓（⚠ 我第 548 轮把它登记为\"缺失能力\"，**是错的** ✗）；写法照 `23007:30` ✓：`\"target\"` 与 `\"op\"` **同级、写在 `do` 条目内** ✓；③ **效果 `ADD_DAMAGE`** ✓ —— ⚠ 它**早已出货于 `21030`（五档）与 `20018`（五档）** ✓（⚠ 我第 550 轮仍以为缺它 ✗）；`percent` ＋ **`scale: \"self_attr:ATTACK\"`** ✓ 照 `21030:13-15` ✓；④ ⚠ 「**普攻或战技**」是**析取** ✗ ⇒ ⭐ 照遗器 `105` 的既有惯例写成**两条规则** ✓（⚠ 一条 `from_category NORMAL` ✓、一条 `BPSKILL` ✓）；⑤ 数值取自权威 `EquipmentSkillConfig` 的五档 `ParamList` ✓：0.48 / 0.6 / 0.72 / 0.84 / 0.96 ✓。⚠ 因此本张**不需要任何引擎改动** ✓。"
+      "source": "光锥 21029 后会有期: 「装备者施放普攻或战技后，对随机 1 个受到攻击的敌方目标造成等同于自身 #1% 攻击力的附加伤害。」",
+      "note": "⚠⚠ **2026-10-19 逐句核时换了事件** ✓：原文件把 `ADD_DAMAGE` 挂在 **`ATTACK_FINISHED`** 上 ✗ —— 装载器直接拒绝：「`ADD_DAMAGE` only means something on `DEALING_DAMAGE`」✓。⇒ 改挂 `DEALING_DAMAGE` ✓，用 `from_category NORMAL` / `BPSKILL` 圈定「普攻或战技」✓（两份条件不能用「或」✓，所以两条规则 ✓），并用 **`per_attack: 1`** ✓ 表达「**1** 个受到攻击的目标」✓（一次攻击只付一次 ✓）。"
     },
     {
-      "on": "ATTACK_FINISHED",
+      "on": "DEALING_DAMAGE",
       "id": "cone21029_extra_damage_bpskill",
       "when": [
         "actor == self",
         "from_category BPSKILL"
       ],
+      "per_attack": 1,
       "do": [
         {
           "op": "ADD_DAMAGE",
@@ -147,18 +155,19 @@
           "target": "random_hit_enemy"
         }
       ],
-      "source": "光锥 21029 后会有期 · 能力「交手如交谈」: 「装备者施放普攻或战技后，对随机 1 个受到攻击的敌方目标造成等同于自身 #1[i]% 攻击力的附加伤害。」",
-      "note": "⚠ 本条的写法**全部来自既有出货内容**，并已按第 553 轮的新纪律**逐项 grep 过引擎** ✓：① **事件 `ATTACK_FINISHED`** ✓（⚠ 它携带本次攻击**已冻结的命中集合** ✓ —— 照光锥 `23007` ✓，该光锥正是在此事件上用 `random_hit_enemy` 共 8 次 ✓）；② **目标 `random_hit_enemy`** ✓ —— ⚠ 它**早已存在于 `TriggerInterpreter.TARGET_SELECTORS`** ✓（⚠ 我第 548 轮把它登记为\"缺失能力\"，**是错的** ✗）；写法照 `23007:30` ✓：`\"target\"` 与 `\"op\"` **同级、写在 `do` 条目内** ✓；③ **效果 `ADD_DAMAGE`** ✓ —— ⚠ 它**早已出货于 `21030`（五档）与 `20018`（五档）** ✓（⚠ 我第 550 轮仍以为缺它 ✗）；`percent` ＋ **`scale: \"self_attr:ATTACK\"`** ✓ 照 `21030:13-15` ✓；④ ⚠ 「**普攻或战技**」是**析取** ✗ ⇒ ⭐ 照遗器 `105` 的既有惯例写成**两条规则** ✓（⚠ 一条 `from_category NORMAL` ✓、一条 `BPSKILL` ✓）；⑤ 数值取自权威 `EquipmentSkillConfig` 的五档 `ParamList` ✓：0.48 / 0.6 / 0.72 / 0.84 / 0.96 ✓。⚠ 因此本张**不需要任何引擎改动** ✓。"
+      "source": "光锥 21029 后会有期: 「装备者施放普攻或战技后，对随机 1 个受到攻击的敌方目标造成等同于自身 #1% 攻击力的附加伤害。」",
+      "note": "⚠⚠ **2026-10-19 逐句核时换了事件** ✓：原文件把 `ADD_DAMAGE` 挂在 **`ATTACK_FINISHED`** 上 ✗ —— 装载器直接拒绝：「`ADD_DAMAGE` only means something on `DEALING_DAMAGE`」✓。⇒ 改挂 `DEALING_DAMAGE` ✓，用 `from_category NORMAL` / `BPSKILL` 圈定「普攻或战技」✓（两份条件不能用「或」✓，所以两条规则 ✓），并用 **`per_attack: 1`** ✓ 表达「**1** 个受到攻击的目标」✓（一次攻击只付一次 ✓）。"
     }
   ],
   "5": [
     {
-      "on": "ATTACK_FINISHED",
+      "on": "DEALING_DAMAGE",
       "id": "cone21029_extra_damage_normal",
       "when": [
         "actor == self",
         "from_category NORMAL"
       ],
+      "per_attack": 1,
       "do": [
         {
           "op": "ADD_DAMAGE",
@@ -167,16 +176,17 @@
           "target": "random_hit_enemy"
         }
       ],
-      "source": "光锥 21029 后会有期 · 能力「交手如交谈」: 「装备者施放普攻或战技后，对随机 1 个受到攻击的敌方目标造成等同于自身 #1[i]% 攻击力的附加伤害。」",
-      "note": "⚠ 本条的写法**全部来自既有出货内容**，并已按第 553 轮的新纪律**逐项 grep 过引擎** ✓：① **事件 `ATTACK_FINISHED`** ✓（⚠ 它携带本次攻击**已冻结的命中集合** ✓ —— 照光锥 `23007` ✓，该光锥正是在此事件上用 `random_hit_enemy` 共 8 次 ✓）；② **目标 `random_hit_enemy`** ✓ —— ⚠ 它**早已存在于 `TriggerInterpreter.TARGET_SELECTORS`** ✓（⚠ 我第 548 轮把它登记为\"缺失能力\"，**是错的** ✗）；写法照 `23007:30` ✓：`\"target\"` 与 `\"op\"` **同级、写在 `do` 条目内** ✓；③ **效果 `ADD_DAMAGE`** ✓ —— ⚠ 它**早已出货于 `21030`（五档）与 `20018`（五档）** ✓（⚠ 我第 550 轮仍以为缺它 ✗）；`percent` ＋ **`scale: \"self_attr:ATTACK\"`** ✓ 照 `21030:13-15` ✓；④ ⚠ 「**普攻或战技**」是**析取** ✗ ⇒ ⭐ 照遗器 `105` 的既有惯例写成**两条规则** ✓（⚠ 一条 `from_category NORMAL` ✓、一条 `BPSKILL` ✓）；⑤ 数值取自权威 `EquipmentSkillConfig` 的五档 `ParamList` ✓：0.48 / 0.6 / 0.72 / 0.84 / 0.96 ✓。⚠ 因此本张**不需要任何引擎改动** ✓。"
+      "source": "光锥 21029 后会有期: 「装备者施放普攻或战技后，对随机 1 个受到攻击的敌方目标造成等同于自身 #1% 攻击力的附加伤害。」",
+      "note": "⚠⚠ **2026-10-19 逐句核时换了事件** ✓：原文件把 `ADD_DAMAGE` 挂在 **`ATTACK_FINISHED`** 上 ✗ —— 装载器直接拒绝：「`ADD_DAMAGE` only means something on `DEALING_DAMAGE`」✓。⇒ 改挂 `DEALING_DAMAGE` ✓，用 `from_category NORMAL` / `BPSKILL` 圈定「普攻或战技」✓（两份条件不能用「或」✓，所以两条规则 ✓），并用 **`per_attack: 1`** ✓ 表达「**1** 个受到攻击的目标」✓（一次攻击只付一次 ✓）。"
     },
     {
-      "on": "ATTACK_FINISHED",
+      "on": "DEALING_DAMAGE",
       "id": "cone21029_extra_damage_bpskill",
       "when": [
         "actor == self",
         "from_category BPSKILL"
       ],
+      "per_attack": 1,
       "do": [
         {
           "op": "ADD_DAMAGE",
@@ -185,8 +195,8 @@
           "target": "random_hit_enemy"
         }
       ],
-      "source": "光锥 21029 后会有期 · 能力「交手如交谈」: 「装备者施放普攻或战技后，对随机 1 个受到攻击的敌方目标造成等同于自身 #1[i]% 攻击力的附加伤害。」",
-      "note": "⚠ 本条的写法**全部来自既有出货内容**，并已按第 553 轮的新纪律**逐项 grep 过引擎** ✓：① **事件 `ATTACK_FINISHED`** ✓（⚠ 它携带本次攻击**已冻结的命中集合** ✓ —— 照光锥 `23007` ✓，该光锥正是在此事件上用 `random_hit_enemy` 共 8 次 ✓）；② **目标 `random_hit_enemy`** ✓ —— ⚠ 它**早已存在于 `TriggerInterpreter.TARGET_SELECTORS`** ✓（⚠ 我第 548 轮把它登记为\"缺失能力\"，**是错的** ✗）；写法照 `23007:30` ✓：`\"target\"` 与 `\"op\"` **同级、写在 `do` 条目内** ✓；③ **效果 `ADD_DAMAGE`** ✓ —— ⚠ 它**早已出货于 `21030`（五档）与 `20018`（五档）** ✓（⚠ 我第 550 轮仍以为缺它 ✗）；`percent` ＋ **`scale: \"self_attr:ATTACK\"`** ✓ 照 `21030:13-15` ✓；④ ⚠ 「**普攻或战技**」是**析取** ✗ ⇒ ⭐ 照遗器 `105` 的既有惯例写成**两条规则** ✓（⚠ 一条 `from_category NORMAL` ✓、一条 `BPSKILL` ✓）；⑤ 数值取自权威 `EquipmentSkillConfig` 的五档 `ParamList` ✓：0.48 / 0.6 / 0.72 / 0.84 / 0.96 ✓。⚠ 因此本张**不需要任何引擎改动** ✓。"
+      "source": "光锥 21029 后会有期: 「装备者施放普攻或战技后，对随机 1 个受到攻击的敌方目标造成等同于自身 #1% 攻击力的附加伤害。」",
+      "note": "⚠⚠ **2026-10-19 逐句核时换了事件** ✓：原文件把 `ADD_DAMAGE` 挂在 **`ATTACK_FINISHED`** 上 ✗ —— 装载器直接拒绝：「`ADD_DAMAGE` only means something on `DEALING_DAMAGE`」✓。⇒ 改挂 `DEALING_DAMAGE` ✓，用 `from_category NORMAL` / `BPSKILL` 圈定「普攻或战技」✓（两份条件不能用「或」✓，所以两条规则 ✓），并用 **`per_attack: 1`** ✓ 表达「**1** 个受到攻击的目标」✓（一次攻击只付一次 ✓）。"
     }
   ]
 }
