@@ -30,6 +30,12 @@ public class SilverWolfLV999LootBoxWeightsTest {
     private static final int ALLY = 1204;
     private static final String LAUGH = "笑点";
     private static final String HIDDEN = "隐藏分";
+    /**
+     * 【好活当赏】 - the box's own gate since the audit (「「银狼LV.999」持有【好活当赏】时」): a RESOURCE, because that is what
+     * the clause reads ({@code self_resource:好活当赏 >= 1}). Nothing in her file grants it - the Aha Moment does, and this
+     * engine has no Aha stage - so the fixture states the premise.
+     */
+    private static final String GIFT = "好活当赏";
 
     /**
      * 1 : 1 : 10 at the start of a battle - the hidden score is under 60, so 获得笑点 is ten times as likely.
@@ -130,6 +136,7 @@ public class SilverWolfLV999LootBoxWeightsTest {
         // 【无敌玩家】 are not up yet; doing it after the ultimate would fire the box during the setup.
         setSkillPoints(battle, skillPoints);
         Character wolf = battle.characters.getFirst();
+        wolf.getResources().gain(GIFT, 1);
         wolf.setCurrentEnergy(wolf.getMaxEnergy());
         battle.castUltra(wolf, List.of(battle.enemyUnits().getFirst()));
         battle.processRequests();

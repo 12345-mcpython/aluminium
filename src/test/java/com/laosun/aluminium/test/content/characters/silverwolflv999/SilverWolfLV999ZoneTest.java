@@ -23,6 +23,12 @@ public class SilverWolfLV999ZoneTest {
     private static final int ALLY = 1204;
     private static final String ZONE = "结界";
     private static final String GOD = "无敌玩家";
+    /**
+     * 【好活当赏】 - the box's own gate since the audit (「「银狼LV.999」持有【好活当赏】时」): a RESOURCE, because that is what
+     * the clause reads ({@code self_resource:好活当赏 >= 1}). Nothing in her file grants it - the Aha Moment does, and this
+     * engine has no Aha stage - so the fixture states the premise.
+     */
+    private static final String GIFT = "好活当赏";
 
     /**
      * Her Ultimate deploys the Zone, and it lands on her rather than on the party.
@@ -86,6 +92,7 @@ public class SilverWolfLV999ZoneTest {
     }
 
     private static void castUltimate(Battle battle, Character wolf) {
+        wolf.getResources().gain(GIFT, 1);
         wolf.setCurrentEnergy(wolf.getMaxEnergy());
         battle.castUltra(wolf, List.of(battle.enemyUnits().getFirst()));
         battle.processRequests();

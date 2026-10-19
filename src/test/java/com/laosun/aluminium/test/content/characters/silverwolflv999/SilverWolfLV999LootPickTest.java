@@ -37,6 +37,12 @@ public class SilverWolfLV999LootPickTest {
     private static final int ALLY = 1204;
     private static final String LAUGH = "笑点";
     /**
+     * 【好活当赏】 - the box's own gate since the audit (「「银狼LV.999」持有【好活当赏】时」): a RESOURCE, because that is what
+     * the clause reads ({@code self_resource:好活当赏 >= 1}). Nothing in her file grants it - the Aha Moment does, and this
+     * engine has no Aha stage - so the fixture states the premise.
+     */
+    private static final String GIFT = "好活当赏";
+    /**
      * What the scripted roll answers with: a value inside the effect's WEIGHT bucket.
      *
      * <p>⚠ The pick is WEIGHTED - the game's own grades are 1, 1 and 10 while 隐藏分 is under 60 - so the roll is over
@@ -178,6 +184,7 @@ public class SilverWolfLV999LootPickTest {
         battle.startBattle();
         battle.processRequests();
         Character wolf = battle.characters.getFirst();
+        wolf.getResources().gain(GIFT, 1);
         wolf.setCurrentEnergy(wolf.getMaxEnergy());
         battle.castUltra(wolf, List.of(battle.enemyUnits().getFirst()));
         battle.processRequests();

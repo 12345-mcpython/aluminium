@@ -5,7 +5,6 @@ import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.buff.StateBuff;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.test.support.BattleFixture;
 import com.laosun.aluminium.utils.CharacterFactory;
@@ -29,6 +28,12 @@ import java.util.List;
  * her own slots through {@code requestSkill} closed it - and the case now reads BOTH slots, because the two rules state the
  * same 40% and reading only one would let the other be deleted without a red.
  *
+ * <p><b>The gate itself was the second defect, found by the audit.</b> Both riders asked {@code self has_state 好活当赏}, and
+ * <b>nothing in the corpus puts that state on her</b> - the only {@code APPLY_BUFF 好活当赏} in the whole data set is 1513's,
+ * and its target is itself. So the two clauses were dead on any real battlefield, while this fixture kept them alive by
+ * building the state by hand. They now read the resource the corpus already uses for 「持有【好活当赏】」
+ * ({@code self_resource:好活当赏 >= 1}).
+ *
  * <p><b>Eidolon 1's 「保留 20% 的【隐藏分】」 WAS open and is now closed</b>, and the reason is worth keeping: the clear and
  * the retention had been written as TWO rules, and `previousCredited` - what the retention's share reads - is per-RULE and
  * starts at 0, so the share was 20% of nothing. They are one rule now, and it reads a fifth of what she actually held.
@@ -41,7 +46,12 @@ public class SilverWolfLV999KitTest {
     private static final String CHARGES = "强化普攻次数";
     private static final String GOD = "无敌玩家";
     /**
-     * 【好活当赏】 - a STATE here, because that is what her rider's gate asks about (`self has_state 好活当赏`).
+     * 【好活当赏】 - a RESOURCE, because that is what her rider's gate asks about ({@code self_resource:好活当赏 >= 1}).
+     *
+     * <p>⚠ This constant used to be a {@code StateBuff}: the file's gate said {@code self has_state 好活当赏}, so the fixture
+     * synthesized the state. Nothing in the whole corpus grants it to her (1513 applies it to itself), so the rules could
+     * never fire and the case could not tell. The audit moved the gate to the resource spelling the corpus already uses
+     * (1503's note, 1505's identical clause) and the fixture now states that premise instead.
      */
     private static final String GIFT = "好活当赏";
 
@@ -208,17 +218,15 @@ public class SilverWolfLV999KitTest {
     /**
      * The settled damage of one 普攻/战技 against the single enemy, with or without 【好活当赏】.
      *
-     * <p>The state is granted as the STATE the rule's gate asks about (`has_state 好活当赏`), and the counted laughs are
-     * frozen the way the engine freezes them when the state arrives - without it the Elation factor would be 1 and the
+     * <p>The resource is granted the way the clause asks about it ({@code self_resource:好活当赏 >= 1}), and the counted laughs
+     * are frozen the way the engine freezes them when the gift arrives - without it the Elation factor would be 1 and the
      * rider would be measured under the wrong multiplier.
      */
     private static double attackDamage(Battle battle, boolean holding, SkillType slot) {
         Character wolf = battle.characters.getFirst();
         if (holding) {
             battle.partyResource(LAUGH).gain(20);
-            StateBuff gift = new StateBuff(GIFT, 2, false);
-            gift.setSource(wolf);
-            wolf.getBuffManager().addBuff(gift);
+            wolf.getResources().gain(GIFT, 1);
             battle.noteElationGift(wolf, 2);
         }
         Enemy victim = battle.enemyUnits().getFirst();
