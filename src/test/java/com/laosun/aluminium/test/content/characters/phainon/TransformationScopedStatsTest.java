@@ -14,12 +14,16 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 /**
- * 1408: "卡厄斯兰那的物理属性抗性穿透提高 20%" and "变身期间攻击力提高 80%，生命上限提高 20%"
- * .
+ * 1408: "变身期间攻击力提高 80%，生命上限提高 270%" - and, at 0 Eidolons, <b>no</b> RES PEN.
  *
- * <p>THE POINT IS THE THIRD ASSERTION: the block must live exactly as long as the state. Removing [变身] and watching ATK
- * come back down is what tells "during the transformation" apart from "for the rest of the battle" -- and item 34 shipped
- * without that link, so this judge would have caught it.
+ * <p>THE POINT IS THE THIRD ASSERTION OF THE SECOND CASE: the block must live exactly as long as the state. Removing
+ * [变身] and watching ATK come back down is what tells "during the transformation" apart from "for the rest of the battle"
+ * -- and item 34 shipped without that link, so this judge would have caught it.
+ *
+ * <p>⚠ <b>CORRECTED (2026-10-19).</b> This class used to assert 「卡厄斯兰那的物理属性抗性穿透提高 20%」 as part of the same
+ * block, at <b>0 Eidolons</b> - so the case pinned the defect as the expectation. That sentence is <b>Eidolon 2</b>'s first
+ * half (see {@code PhainonEidolonTwoTest}, which pins both ranks); a 0-Eidolon Phainon has 0. What is unchanged is what
+ * this case was written for: the ATK / Max HP block, and the fact that it dies with the state.
  */
 public class TransformationScopedStatsTest {
     private static final double EPS = 1e-9;
@@ -27,7 +31,7 @@ public class TransformationScopedStatsTest {
     private static final String STATE = "变身";
 
     /**
-     * Transformed: +80% ATK, +20% Max HP, +20% RES PEN. Un-transformed: none of them.
+     * Transformed: +80% ATK, +270% Max HP, and no RES PEN to speak of at E0.
      */
     @Test
     public void theBlockIsWorthWhatTheSentencesSay() {
@@ -50,8 +54,11 @@ public class TransformationScopedStatsTest {
                 "\"ATK raised by 80%\" (「攻击力提高 80%」)");
         Assertions.assertEquals(hp0 * 3.7, owner.getAttribute(AttributeType.HEALTH).get(), hp0 * 1e-9,
                 "\"Max HP raised by 270%\" (「生命上限提高 270%」)");
-        Assertions.assertEquals(pen0 + 0.20, owner.getAttribute(AttributeType.DAMAGE_PENETRATION).get(), EPS,
-                "\"Physical RES PEN raised by 20%\" (「物理属性抗性穿透提高 20%」)");
+        // Note: CORRECTED (2026-10-19) -- this read `pen0 + 0.20` and thereby PINNED the bug: the 20% is Eidolon 2's
+        // clause, recorded against a trace and therefore ungated, so E0 collected it. The reading at E2 is
+        // PhainonEidolonTwoTest's job; here the rank is 0, so the answer is "none".
+        Assertions.assertEquals(pen0, owner.getAttribute(AttributeType.DAMAGE_PENETRATION).get(), EPS,
+                "0 星魂没有抗性穿透 —— 那一句是星魂 2 的（判据见 PhainonEidolonTwoTest）");
     }
 
     /**
