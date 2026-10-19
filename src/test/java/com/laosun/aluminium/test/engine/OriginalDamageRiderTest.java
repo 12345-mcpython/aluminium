@@ -61,7 +61,8 @@ public class OriginalDamageRiderTest {
     public void hisEidolonSixShips() {
         double e6 = ultimateLoss(6);
         double e0 = ultimateLoss(0);
-        double ultimateOwnInstance = 718.255731;      // measured: her ultimate's own settled damage in this fixture
+        // measured again on 2026-10-19 after her three traces landed (道标/星火/灼热), with crit switched off below:
+        double ultimateOwnInstance = 933.7324506605253;
         // ⚠ The toughness damage reduction reaches this clause in a shape worth writing down, measured (ratio 1.0000000004):
         // the rider is 2 x 40% of the ultimate's own instance and the two instances take the reduction ONCE between them.
         // That is not an accident of arithmetic - "the original damage" is read when DEALING_DAMAGE fires, which is step 1
@@ -83,6 +84,10 @@ public class OriginalDamageRiderTest {
      */
     private static double ultimateLoss(int eidolon) {
         Character her = CharacterFactory.create(HIMEKO, LEVEL, false, null, null, eidolon);
+        // 2026-10-19: 行迹「道标」现在会在血线之上加暴击率，那会让这一发的暴击抽签变掉、原始伤害跟着变；
+        // 这条判据量的是「2 × 40% × 原伤害」，所以把暴击关掉（与 HimekoChargeTest 的同一手法）。
+        her.setAttribute(com.laosun.aluminium.enums.AttributeType.CRIT_CHANCE,
+                new com.laosun.aluminium.models.DoubleValue(0));
         Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(her), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
