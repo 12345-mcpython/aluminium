@@ -8,16 +8,24 @@
       ],
       "do": [
         {
+          "op": "ADD_STACK",
+          "buff": "早餐层数",
+          "amount": 1,
+          "max_stacks": 3,
+          "permanent": true,
+          "target": "self"
+        },
+        {
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
           "percent": 0.04,
-          "max_stacks": 3,
+          "per_stack": "早餐层数",
           "permanent": true,
           "target": "self"
         }
       ],
       "source": "光锥 21027 早餐的仪式感: 「每消灭1个敌方目标，装备者的攻击力提高#2[i]%，该效果最多叠加#3[i]层」",
-      "note": "⭐⭐ **常数半由引擎的 `ability_property` 发放** ✓（第 136 条 ✓）⇒ **我们只写条件半** ✓。⭐ 文本**未给持续期** ✗ ⇒ 沿用库内先例 **`21005`** 的写法 `max_stacks` + `permanent: true` ✓（同形的\"叠层加成\" ✓）。 ⭐ 这是 **`KILL` 事件的首个读者** ✓（事件本已存在且由 `broadcastKill` 发出 ✓）。"
+      "note": "「每消灭 1 个敌方目标，装备者的攻击力提高 #2%，该效果**最多叠加 3 层**」—— ⭐ `ADD_STACK`（`max_stacks: 3` ✓ = 「最多 3 层」✓）＋ `MODIFY_ATTR ATTACK per_stack: 早餐层数` ✓（加成排在加层之后 ✓，所以第 N 次击杀读到 N 层 ✓）。\n⚠⚠ **2026-10-19 逐句核时改的**：本文件原先只有一条 `MODIFY_ATTR ... max_stacks: 3` ✗ —— 没有层缓冲 ✓、而同一属性的修饰会**互相替换** ✓ ⇒ 三次击杀仍然只 +4% ✗（`max_stacks` 写在修饰上不起作用 ✓）。「造成伤害提高 #1%」由光锥属性 `all_damage_type_boost` 承担 ✓，本规则不重写 ✓。"
     }
   ],
   "2": [
@@ -29,16 +37,24 @@
       ],
       "do": [
         {
+          "op": "ADD_STACK",
+          "buff": "早餐层数",
+          "amount": 1,
+          "max_stacks": 3,
+          "permanent": true,
+          "target": "self"
+        },
+        {
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
-          "percent": 0.05,
-          "max_stacks": 3,
+          "percent": 0.04,
+          "per_stack": "早餐层数",
           "permanent": true,
           "target": "self"
         }
       ],
       "source": "光锥 21027 早餐的仪式感: 「每消灭1个敌方目标，装备者的攻击力提高#2[i]%，该效果最多叠加#3[i]层」",
-      "note": "⭐⭐ **常数半由引擎的 `ability_property` 发放** ✓（第 136 条 ✓）⇒ **我们只写条件半** ✓。⭐ 文本**未给持续期** ✗ ⇒ 沿用库内先例 **`21005`** 的写法 `max_stacks` + `permanent: true` ✓（同形的\"叠层加成\" ✓）。 ⭐ 这是 **`KILL` 事件的首个读者** ✓（事件本已存在且由 `broadcastKill` 发出 ✓）。"
+      "note": "「每消灭 1 个敌方目标，装备者的攻击力提高 #2%，该效果**最多叠加 3 层**」—— ⭐ `ADD_STACK`（`max_stacks: 3` ✓ = 「最多 3 层」✓）＋ `MODIFY_ATTR ATTACK per_stack: 早餐层数` ✓（加成排在加层之后 ✓，所以第 N 次击杀读到 N 层 ✓）。\n⚠⚠ **2026-10-19 逐句核时改的**：本文件原先只有一条 `MODIFY_ATTR ... max_stacks: 3` ✗ —— 没有层缓冲 ✓、而同一属性的修饰会**互相替换** ✓ ⇒ 三次击杀仍然只 +4% ✗（`max_stacks` 写在修饰上不起作用 ✓）。「造成伤害提高 #1%」由光锥属性 `all_damage_type_boost` 承担 ✓，本规则不重写 ✓。"
     }
   ],
   "3": [
@@ -50,16 +66,24 @@
       ],
       "do": [
         {
+          "op": "ADD_STACK",
+          "buff": "早餐层数",
+          "amount": 1,
+          "max_stacks": 3,
+          "permanent": true,
+          "target": "self"
+        },
+        {
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
-          "percent": 0.06,
-          "max_stacks": 3,
+          "percent": 0.04,
+          "per_stack": "早餐层数",
           "permanent": true,
           "target": "self"
         }
       ],
       "source": "光锥 21027 早餐的仪式感: 「每消灭1个敌方目标，装备者的攻击力提高#2[i]%，该效果最多叠加#3[i]层」",
-      "note": "⭐⭐ **常数半由引擎的 `ability_property` 发放** ✓（第 136 条 ✓）⇒ **我们只写条件半** ✓。⭐ 文本**未给持续期** ✗ ⇒ 沿用库内先例 **`21005`** 的写法 `max_stacks` + `permanent: true` ✓（同形的\"叠层加成\" ✓）。 ⭐ 这是 **`KILL` 事件的首个读者** ✓（事件本已存在且由 `broadcastKill` 发出 ✓）。"
+      "note": "「每消灭 1 个敌方目标，装备者的攻击力提高 #2%，该效果**最多叠加 3 层**」—— ⭐ `ADD_STACK`（`max_stacks: 3` ✓ = 「最多 3 层」✓）＋ `MODIFY_ATTR ATTACK per_stack: 早餐层数` ✓（加成排在加层之后 ✓，所以第 N 次击杀读到 N 层 ✓）。\n⚠⚠ **2026-10-19 逐句核时改的**：本文件原先只有一条 `MODIFY_ATTR ... max_stacks: 3` ✗ —— 没有层缓冲 ✓、而同一属性的修饰会**互相替换** ✓ ⇒ 三次击杀仍然只 +4% ✗（`max_stacks` 写在修饰上不起作用 ✓）。「造成伤害提高 #1%」由光锥属性 `all_damage_type_boost` 承担 ✓，本规则不重写 ✓。"
     }
   ],
   "4": [
@@ -71,16 +95,24 @@
       ],
       "do": [
         {
+          "op": "ADD_STACK",
+          "buff": "早餐层数",
+          "amount": 1,
+          "max_stacks": 3,
+          "permanent": true,
+          "target": "self"
+        },
+        {
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
-          "percent": 0.07,
-          "max_stacks": 3,
+          "percent": 0.04,
+          "per_stack": "早餐层数",
           "permanent": true,
           "target": "self"
         }
       ],
       "source": "光锥 21027 早餐的仪式感: 「每消灭1个敌方目标，装备者的攻击力提高#2[i]%，该效果最多叠加#3[i]层」",
-      "note": "⭐⭐ **常数半由引擎的 `ability_property` 发放** ✓（第 136 条 ✓）⇒ **我们只写条件半** ✓。⭐ 文本**未给持续期** ✗ ⇒ 沿用库内先例 **`21005`** 的写法 `max_stacks` + `permanent: true` ✓（同形的\"叠层加成\" ✓）。 ⭐ 这是 **`KILL` 事件的首个读者** ✓（事件本已存在且由 `broadcastKill` 发出 ✓）。"
+      "note": "「每消灭 1 个敌方目标，装备者的攻击力提高 #2%，该效果**最多叠加 3 层**」—— ⭐ `ADD_STACK`（`max_stacks: 3` ✓ = 「最多 3 层」✓）＋ `MODIFY_ATTR ATTACK per_stack: 早餐层数` ✓（加成排在加层之后 ✓，所以第 N 次击杀读到 N 层 ✓）。\n⚠⚠ **2026-10-19 逐句核时改的**：本文件原先只有一条 `MODIFY_ATTR ... max_stacks: 3` ✗ —— 没有层缓冲 ✓、而同一属性的修饰会**互相替换** ✓ ⇒ 三次击杀仍然只 +4% ✗（`max_stacks` 写在修饰上不起作用 ✓）。「造成伤害提高 #1%」由光锥属性 `all_damage_type_boost` 承担 ✓，本规则不重写 ✓。"
     }
   ],
   "5": [
@@ -92,16 +124,24 @@
       ],
       "do": [
         {
+          "op": "ADD_STACK",
+          "buff": "早餐层数",
+          "amount": 1,
+          "max_stacks": 3,
+          "permanent": true,
+          "target": "self"
+        },
+        {
           "op": "MODIFY_ATTR",
           "attribute": "ATTACK",
-          "percent": 0.08,
-          "max_stacks": 3,
+          "percent": 0.04,
+          "per_stack": "早餐层数",
           "permanent": true,
           "target": "self"
         }
       ],
       "source": "光锥 21027 早餐的仪式感: 「每消灭1个敌方目标，装备者的攻击力提高#2[i]%，该效果最多叠加#3[i]层」",
-      "note": "⭐⭐ **常数半由引擎的 `ability_property` 发放** ✓（第 136 条 ✓）⇒ **我们只写条件半** ✓。⭐ 文本**未给持续期** ✗ ⇒ 沿用库内先例 **`21005`** 的写法 `max_stacks` + `permanent: true` ✓（同形的\"叠层加成\" ✓）。 ⭐ 这是 **`KILL` 事件的首个读者** ✓（事件本已存在且由 `broadcastKill` 发出 ✓）。"
+      "note": "「每消灭 1 个敌方目标，装备者的攻击力提高 #2%，该效果**最多叠加 3 层**」—— ⭐ `ADD_STACK`（`max_stacks: 3` ✓ = 「最多 3 层」✓）＋ `MODIFY_ATTR ATTACK per_stack: 早餐层数` ✓（加成排在加层之后 ✓，所以第 N 次击杀读到 N 层 ✓）。\n⚠⚠ **2026-10-19 逐句核时改的**：本文件原先只有一条 `MODIFY_ATTR ... max_stacks: 3` ✗ —— 没有层缓冲 ✓、而同一属性的修饰会**互相替换** ✓ ⇒ 三次击杀仍然只 +4% ✗（`max_stacks` 写在修饰上不起作用 ✓）。「造成伤害提高 #1%」由光锥属性 `all_damage_type_boost` 承担 ✓，本规则不重写 ✓。"
     }
   ]
 }

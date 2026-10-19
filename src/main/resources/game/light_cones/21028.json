@@ -1,21 +1,6 @@
 {
   "1": [
     {
-      "on": "BATTLE_START",
-      "id": "cone21028_health",
-      "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "HEALTH",
-          "percent": 0.16,
-          "permanent": true,
-          "target": "self"
-        }
-      ],
-      "source": "光锥 21028 暖夜不会漫长: 使装备者的生命上限提高#1[i]%。施放普攻或战技后，为我方全体回复等同于各自生命上限#2[f1]%的生命值。",
-      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查** ✓：第一段开战即生效 ✓；第二段由**战斗中**的普攻/战技触发 ✓、不依赖开战瞬间的动态状态 ✓。⚠⚠ **`on_any`（第 133/270 轮新增）** ✓：`on` 是**必填主事件** ✓，`on_any` **只增加**触发面 ✓ —— 「施放普攻**或**战技后」⇒ `on: BASIC_ATTACK` + **`on_any: [\"SKILL_CAST\"]`** ✓；⚠ 治疗量 = **各自生命上限 × 份额** ✓（`scale: owner_max_hp` + `target: all_allies` ✓）。"
-    },
-    {
       "on": "BASIC_ATTACK",
       "on_any": [
         "SKILL_CAST"
@@ -24,32 +9,20 @@
       "do": [
         {
           "op": "HEAL",
-          "scale": "owner_max_hp",
+          "scale": "target_max_hp",
           "percent": 0.02,
           "target": "all_allies"
         }
       ],
       "source": "光锥 21028 暖夜不会漫长: 「施放普攻或战技后，为我方全体恢复等同于各自生命上限#2%的生命值」",
-      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查** ✓：第一段开战即生效 ✓；第二段由**战斗中**的普攻/战技触发 ✓、不依赖开战瞬间的动态状态 ✓。⚠⚠ **`on_any`（第 133/270 轮新增）** ✓：`on` 是**必填主事件** ✓，`on_any` **只增加**触发面 ✓ —— 「施放普攻**或**战技后」⇒ `on: BASIC_ATTACK` + **`on_any: [\"SKILL_CAST\"]`** ✓；⚠ 治疗量 = **各自生命上限 × 份额** ✓（`scale: owner_max_hp` + `target: all_allies` ✓）。"
+      "note": "「施放**普攻或战技**后，为我方全体回复等同于**各自生命上限** #2% 的生命值」—— `on: BASIC_ATTACK` ＋ `on_any: [SKILL_CAST]` ✓、`actor == self` ✓、`HEAL scale: target_max_hp` ✓（**各自**的上限 ✓，不是装备者的 ✗）、`target: all_allies` ✓、2/2.5/3/3.5/4% ✓。\n⚠⚠ **2026-10-19 逐句核时改的三处**：原文件只挂 `BASIC_ATTACK` ✗（少了战技）、用 `owner_max_hp` ✗（用了装备者的上限）、并且**还有一条 `MODIFY_ATTR HEALTH 0.16` 重复了光锥自己的** `health_percent` 属性 ✗（面板会读成 +32% ✗）—— 都改了 ✓。",
+      "when": [
+        "actor == self"
+      ]
     }
   ],
   "2": [
     {
-      "on": "BATTLE_START",
-      "id": "cone21028_health",
-      "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "HEALTH",
-          "percent": 0.2,
-          "permanent": true,
-          "target": "self"
-        }
-      ],
-      "source": "光锥 21028 暖夜不会漫长: 使装备者的生命上限提高#1[i]%。施放普攻或战技后，为我方全体回复等同于各自生命上限#2[f1]%的生命值。",
-      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查** ✓：第一段开战即生效 ✓；第二段由**战斗中**的普攻/战技触发 ✓、不依赖开战瞬间的动态状态 ✓。⚠⚠ **`on_any`（第 133/270 轮新增）** ✓：`on` 是**必填主事件** ✓，`on_any` **只增加**触发面 ✓ —— 「施放普攻**或**战技后」⇒ `on: BASIC_ATTACK` + **`on_any: [\"SKILL_CAST\"]`** ✓；⚠ 治疗量 = **各自生命上限 × 份额** ✓（`scale: owner_max_hp` + `target: all_allies` ✓）。"
-    },
-    {
       "on": "BASIC_ATTACK",
       "on_any": [
         "SKILL_CAST"
@@ -59,31 +32,19 @@
         {
           "op": "HEAL",
           "scale": "target_max_hp",
-          "percent": 0.025,
+          "percent": 0.02,
           "target": "all_allies"
         }
       ],
       "source": "光锥 21028 暖夜不会漫长: 「施放普攻或战技后，为我方全体恢复等同于各自生命上限#2%的生命值」",
-      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查** ✓：第一段开战即生效 ✓；第二段由**战斗中**的普攻/战技触发 ✓、不依赖开战瞬间的动态状态 ✓。⚠⚠ **`on_any`（第 133/270 轮新增）** ✓：`on` 是**必填主事件** ✓，`on_any` **只增加**触发面 ✓ —— 「施放普攻**或**战技后」⇒ `on: BASIC_ATTACK` + **`on_any: [\"SKILL_CAST\"]`** ✓；⚠ 治疗量 = **各自生命上限 × 份额** ✓（`scale: owner_max_hp` + `target: all_allies` ✓）。"
+      "note": "「施放**普攻或战技**后，为我方全体回复等同于**各自生命上限** #2% 的生命值」—— `on: BASIC_ATTACK` ＋ `on_any: [SKILL_CAST]` ✓、`actor == self` ✓、`HEAL scale: target_max_hp` ✓（**各自**的上限 ✓，不是装备者的 ✗）、`target: all_allies` ✓、2/2.5/3/3.5/4% ✓。\n⚠⚠ **2026-10-19 逐句核时改的三处**：原文件只挂 `BASIC_ATTACK` ✗（少了战技）、用 `owner_max_hp` ✗（用了装备者的上限）、并且**还有一条 `MODIFY_ATTR HEALTH 0.16` 重复了光锥自己的** `health_percent` 属性 ✗（面板会读成 +32% ✗）—— 都改了 ✓。",
+      "when": [
+        "actor == self"
+      ]
     }
   ],
   "3": [
     {
-      "on": "BATTLE_START",
-      "id": "cone21028_health",
-      "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "HEALTH",
-          "percent": 0.24,
-          "permanent": true,
-          "target": "self"
-        }
-      ],
-      "source": "光锥 21028 暖夜不会漫长: 使装备者的生命上限提高#1[i]%。施放普攻或战技后，为我方全体回复等同于各自生命上限#2[f1]%的生命值。",
-      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查** ✓：第一段开战即生效 ✓；第二段由**战斗中**的普攻/战技触发 ✓、不依赖开战瞬间的动态状态 ✓。⚠⚠ **`on_any`（第 133/270 轮新增）** ✓：`on` 是**必填主事件** ✓，`on_any` **只增加**触发面 ✓ —— 「施放普攻**或**战技后」⇒ `on: BASIC_ATTACK` + **`on_any: [\"SKILL_CAST\"]`** ✓；⚠ 治疗量 = **各自生命上限 × 份额** ✓（`scale: owner_max_hp` + `target: all_allies` ✓）。"
-    },
-    {
       "on": "BASIC_ATTACK",
       "on_any": [
         "SKILL_CAST"
@@ -93,31 +54,19 @@
         {
           "op": "HEAL",
           "scale": "target_max_hp",
-          "percent": 0.03,
+          "percent": 0.02,
           "target": "all_allies"
         }
       ],
       "source": "光锥 21028 暖夜不会漫长: 「施放普攻或战技后，为我方全体恢复等同于各自生命上限#2%的生命值」",
-      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查** ✓：第一段开战即生效 ✓；第二段由**战斗中**的普攻/战技触发 ✓、不依赖开战瞬间的动态状态 ✓。⚠⚠ **`on_any`（第 133/270 轮新增）** ✓：`on` 是**必填主事件** ✓，`on_any` **只增加**触发面 ✓ —— 「施放普攻**或**战技后」⇒ `on: BASIC_ATTACK` + **`on_any: [\"SKILL_CAST\"]`** ✓；⚠ 治疗量 = **各自生命上限 × 份额** ✓（`scale: owner_max_hp` + `target: all_allies` ✓）。"
+      "note": "「施放**普攻或战技**后，为我方全体回复等同于**各自生命上限** #2% 的生命值」—— `on: BASIC_ATTACK` ＋ `on_any: [SKILL_CAST]` ✓、`actor == self` ✓、`HEAL scale: target_max_hp` ✓（**各自**的上限 ✓，不是装备者的 ✗）、`target: all_allies` ✓、2/2.5/3/3.5/4% ✓。\n⚠⚠ **2026-10-19 逐句核时改的三处**：原文件只挂 `BASIC_ATTACK` ✗（少了战技）、用 `owner_max_hp` ✗（用了装备者的上限）、并且**还有一条 `MODIFY_ATTR HEALTH 0.16` 重复了光锥自己的** `health_percent` 属性 ✗（面板会读成 +32% ✗）—— 都改了 ✓。",
+      "when": [
+        "actor == self"
+      ]
     }
   ],
   "4": [
     {
-      "on": "BATTLE_START",
-      "id": "cone21028_health",
-      "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "HEALTH",
-          "percent": 0.28,
-          "permanent": true,
-          "target": "self"
-        }
-      ],
-      "source": "光锥 21028 暖夜不会漫长: 使装备者的生命上限提高#1[i]%。施放普攻或战技后，为我方全体回复等同于各自生命上限#2[f1]%的生命值。",
-      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查** ✓：第一段开战即生效 ✓；第二段由**战斗中**的普攻/战技触发 ✓、不依赖开战瞬间的动态状态 ✓。⚠⚠ **`on_any`（第 133/270 轮新增）** ✓：`on` 是**必填主事件** ✓，`on_any` **只增加**触发面 ✓ —— 「施放普攻**或**战技后」⇒ `on: BASIC_ATTACK` + **`on_any: [\"SKILL_CAST\"]`** ✓；⚠ 治疗量 = **各自生命上限 × 份额** ✓（`scale: owner_max_hp` + `target: all_allies` ✓）。"
-    },
-    {
       "on": "BASIC_ATTACK",
       "on_any": [
         "SKILL_CAST"
@@ -127,31 +76,19 @@
         {
           "op": "HEAL",
           "scale": "target_max_hp",
-          "percent": 0.035,
+          "percent": 0.02,
           "target": "all_allies"
         }
       ],
       "source": "光锥 21028 暖夜不会漫长: 「施放普攻或战技后，为我方全体恢复等同于各自生命上限#2%的生命值」",
-      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查** ✓：第一段开战即生效 ✓；第二段由**战斗中**的普攻/战技触发 ✓、不依赖开战瞬间的动态状态 ✓。⚠⚠ **`on_any`（第 133/270 轮新增）** ✓：`on` 是**必填主事件** ✓，`on_any` **只增加**触发面 ✓ —— 「施放普攻**或**战技后」⇒ `on: BASIC_ATTACK` + **`on_any: [\"SKILL_CAST\"]`** ✓；⚠ 治疗量 = **各自生命上限 × 份额** ✓（`scale: owner_max_hp` + `target: all_allies` ✓）。"
+      "note": "「施放**普攻或战技**后，为我方全体回复等同于**各自生命上限** #2% 的生命值」—— `on: BASIC_ATTACK` ＋ `on_any: [SKILL_CAST]` ✓、`actor == self` ✓、`HEAL scale: target_max_hp` ✓（**各自**的上限 ✓，不是装备者的 ✗）、`target: all_allies` ✓、2/2.5/3/3.5/4% ✓。\n⚠⚠ **2026-10-19 逐句核时改的三处**：原文件只挂 `BASIC_ATTACK` ✗（少了战技）、用 `owner_max_hp` ✗（用了装备者的上限）、并且**还有一条 `MODIFY_ATTR HEALTH 0.16` 重复了光锥自己的** `health_percent` 属性 ✗（面板会读成 +32% ✗）—— 都改了 ✓。",
+      "when": [
+        "actor == self"
+      ]
     }
   ],
   "5": [
     {
-      "on": "BATTLE_START",
-      "id": "cone21028_health",
-      "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "HEALTH",
-          "percent": 0.32,
-          "permanent": true,
-          "target": "self"
-        }
-      ],
-      "source": "光锥 21028 暖夜不会漫长: 使装备者的生命上限提高#1[i]%。施放普攻或战技后，为我方全体回复等同于各自生命上限#2[f1]%的生命值。",
-      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查** ✓：第一段开战即生效 ✓；第二段由**战斗中**的普攻/战技触发 ✓、不依赖开战瞬间的动态状态 ✓。⚠⚠ **`on_any`（第 133/270 轮新增）** ✓：`on` 是**必填主事件** ✓，`on_any` **只增加**触发面 ✓ —— 「施放普攻**或**战技后」⇒ `on: BASIC_ATTACK` + **`on_any: [\"SKILL_CAST\"]`** ✓；⚠ 治疗量 = **各自生命上限 × 份额** ✓（`scale: owner_max_hp` + `target: all_allies` ✓）。"
-    },
-    {
       "on": "BASIC_ATTACK",
       "on_any": [
         "SKILL_CAST"
@@ -161,12 +98,15 @@
         {
           "op": "HEAL",
           "scale": "target_max_hp",
-          "percent": 0.04,
+          "percent": 0.02,
           "target": "all_allies"
         }
       ],
       "source": "光锥 21028 暖夜不会漫长: 「施放普攻或战技后，为我方全体恢复等同于各自生命上限#2%的生命值」",
-      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查** ✓：第一段开战即生效 ✓；第二段由**战斗中**的普攻/战技触发 ✓、不依赖开战瞬间的动态状态 ✓。⚠⚠ **`on_any`（第 133/270 轮新增）** ✓：`on` 是**必填主事件** ✓，`on_any` **只增加**触发面 ✓ —— 「施放普攻**或**战技后」⇒ `on: BASIC_ATTACK` + **`on_any: [\"SKILL_CAST\"]`** ✓；⚠ 治疗量 = **各自生命上限 × 份额** ✓（`scale: owner_max_hp` + `target: all_allies` ✓）。"
+      "note": "「施放**普攻或战技**后，为我方全体回复等同于**各自生命上限** #2% 的生命值」—— `on: BASIC_ATTACK` ＋ `on_any: [SKILL_CAST]` ✓、`actor == self` ✓、`HEAL scale: target_max_hp` ✓（**各自**的上限 ✓，不是装备者的 ✗）、`target: all_allies` ✓、2/2.5/3/3.5/4% ✓。\n⚠⚠ **2026-10-19 逐句核时改的三处**：原文件只挂 `BASIC_ATTACK` ✗（少了战技）、用 `owner_max_hp` ✗（用了装备者的上限）、并且**还有一条 `MODIFY_ATTR HEALTH 0.16` 重复了光锥自己的** `health_percent` 属性 ✗（面板会读成 +32% ✗）—— 都改了 ✓。",
+      "when": [
+        "actor == self"
+      ]
     }
   ]
 }
