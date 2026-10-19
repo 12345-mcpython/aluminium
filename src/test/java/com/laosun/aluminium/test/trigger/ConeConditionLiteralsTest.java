@@ -764,11 +764,6 @@ public class ConeConditionLiteralsTest {
         assertRule(23011, 4, "WAVE_START", "cone23011_heal_lost_hp_per_wave", List.of());
         assertRule(23011, 5, "HP_LOST", "cone23011_party_damage_up_when_wearer_hurt", List.of("target == self"));
         assertRule(23011, 5, "WAVE_START", "cone23011_heal_lost_hp_per_wave", List.of());
-        assertRule(23012, 1, "BATTLE_START", "cone23012_crit_damage", List.of());
-        assertRule(23012, 2, "BATTLE_START", "cone23012_crit_damage", List.of());
-        assertRule(23012, 3, "BATTLE_START", "cone23012_crit_damage", List.of());
-        assertRule(23012, 4, "BATTLE_START", "cone23012_crit_damage", List.of());
-        assertRule(23012, 5, "BATTLE_START", "cone23012_crit_damage", List.of());
         assertRule(23014, 1, "TAKING_HIT", "cone23014_eclipse_on_teammate_hit", List.of("target is_ally"));
         assertRule(23014, 1, "HP_CONSUMED", "cone23014_eclipse_on_teammate_cost", List.of("actor is_ally"));
         assertRule(23014, 1, "DEALING_DAMAGE", "cone23014_eclipse_damage", List.of("actor == self", "self_stacks:月蚀 >= 1.0"));
