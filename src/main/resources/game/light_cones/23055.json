@@ -1,0 +1,167 @@
+{
+  "1": [
+    {
+      "on": "CAST_SETUP",
+      "id": "cone23055_elation_skill_on_allies",
+      "when": [
+        "actor == self",
+        "from_skill_id == 20",
+        "target is_ally"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "percent": 0.22,
+          "turns": 3,
+          "target": "all_enemies"
+        },
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 10,
+          "fixed": true,
+          "target": "self"
+        },
+        {
+          "op": "HEAL",
+          "scale": "owner_def",
+          "percent": 0.1,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 23055 献给明日的色彩（5★ 欢愉，叠影 1）: 「使装备者的防御力提高 #1[i]%。装备者对我方全体施放欢愉技时，使敌方全体受到的伤害提高 #4[i]%，持续 #3[i] 回合，为装备者固定恢复 #2[i] 点能量，并为我方全体回复等同于装备者防御力 #5[i]% 的生命值。」（`data/weapons.json` 的 `weapon_skill_data[0].skill_value` = `[0.48, 10, 3, 0.22, 0.1]` ⇒ #1 防御、#2 能量 10、#3 三回合、#4 易伤、#5 治疗份额 ✓）",
+      "note": "⚠ **防御力那一句不写规则** ✓：它是**光锥自己的** `ability_property`（`defence_percent` ✓），由 `Weapon.build` 按**叠影那一行**加进面板 ✓（实测：叠影 1 = +48%、叠影 5 = +96% ✓）—— 再写一条规则就是**同一件事登记两次** ✗（§2.2）。判据 `Cone23055Test.theWearerGetsTheConesDefence` 用「有锥 / 无锥」两场差值钉住它 ✓。\n⭐⭐ **门是 `from_skill_id == 20` ＋ `target is_ally`** ✓ —— 「**对我方全体**施放**欢愉技**」两个词各占一半 ✓：欢愉技 = **数据槽 20** ✓（1506／1513 有 ✓）。⚠ **不能**写 `from_skill ELATION_SKILL` ✗ —— `from_skill` 是一个**闭集**（COMMON／SKILL／ULTRA／TALENT ✓），装载期会以「不是一场战斗内的施放」拒绝欢愉槽 ✓（那个守卫的理由是「秘技／地图普攻不产生战斗内的实例」✓，欢愉槽被归进了同一桶 ✓）⇒ **槽号**是这条门的正确拼法 ✓（`CAST_SETUP` 带着槽号 ✓，`from_skill_id` 是开放整数 ✓）；「对我方」= 施放的**目标在我方** ✓（`target is_ally` ✓）。⚠ 引擎里**没有任何出货 kit** 会把欢愉技指向队友 ✗ —— 这一条是**为一个还没到的辅助型欢愉技**写的 ✓，判据用 `castImmediate(欢愉技, 装备者, [队友])` 把那个门**造出来** ✓（§6.3·3：夹具先把前提搭出来，再断言 ✓）。\n⚠ 事件用 **`CAST_SETUP`** ✓（`SKILL_CAST` **不带施放类别** ✗ —— 装载期会拒绝 `from_skill` ✓），并且它在**伤害之前** ✓ ⇒ 易伤对**这一发自己**也生效 ✓（对辅助技无影响 ✓）。\n⭐ 「**固定**恢复 #2 点能量」用 `fixed: true` ✓（本批新开的拼法 ✓：`EnergyGain.fixed` 一直在模型里 ✓，规则层原先只能到达 `normal` ✓ ⇒ 一个「固定」的句子会被**能量恢复效率**悄悄乘一遍 ✓，实测 +10 在 50% 效率下读成 +15 ✗）。判据把效率设成 50% 来区分两者 ✓。\n⭐ 「为我方全体回复等同于**装备者防御力** #5%」用 `scale: owner_def` ＋ `percent` ✓（`SCALES` 里现成的一档 ✓）—— 不是「生命上限」的份额 ✗。\n⚠ 叠影 2~5 是同一张表换数字（`[0.6…]` / `[0.72…]` / `[0.84…]` / `[0.96…]` ✓），各自的 `source` 写在那一层自己身上 ✓。"
+    }
+  ],
+  "2": [
+    {
+      "on": "CAST_SETUP",
+      "id": "cone23055_elation_skill_on_allies",
+      "when": [
+        "actor == self",
+        "from_skill_id == 20",
+        "target is_ally"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "percent": 0.275,
+          "turns": 3,
+          "target": "all_enemies"
+        },
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 10,
+          "fixed": true,
+          "target": "self"
+        },
+        {
+          "op": "HEAL",
+          "scale": "owner_def",
+          "percent": 0.125,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 23055（叠影 2）: `skill_value` = `[0.6, 10, 3, 0.275, 0.125]` ⇒ 防御 +60%／易伤 27.5%／三回合／固定 10 能量／治疗 12.5% 防御（⚠ 防御那一项由光锥自己的 `ability_property` 施加 ✓，这里不重复 ✗）",
+      "note": "与叠影 1 同一套规则，只换数字 ✓；口径与「为什么防御不写规则」见 `1` 的 note ✓。"
+    }
+  ],
+  "3": [
+    {
+      "on": "CAST_SETUP",
+      "id": "cone23055_elation_skill_on_allies",
+      "when": [
+        "actor == self",
+        "from_skill_id == 20",
+        "target is_ally"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "percent": 0.33,
+          "turns": 3,
+          "target": "all_enemies"
+        },
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 10,
+          "fixed": true,
+          "target": "self"
+        },
+        {
+          "op": "HEAL",
+          "scale": "owner_def",
+          "percent": 0.15,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 23055（叠影 3）: `skill_value` = `[0.72, 10, 3, 0.33, 0.15]` ⇒ 防御 +72%／易伤 33%／三回合／固定 10 能量／治疗 15% 防御",
+      "note": "与叠影 1 同一套规则，只换数字 ✓（见 `1` 的 note）。"
+    }
+  ],
+  "4": [
+    {
+      "on": "CAST_SETUP",
+      "id": "cone23055_elation_skill_on_allies",
+      "when": [
+        "actor == self",
+        "from_skill_id == 20",
+        "target is_ally"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "percent": 0.385,
+          "turns": 3,
+          "target": "all_enemies"
+        },
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 10,
+          "fixed": true,
+          "target": "self"
+        },
+        {
+          "op": "HEAL",
+          "scale": "owner_def",
+          "percent": 0.175,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 23055（叠影 4）: `skill_value` = `[0.84, 10, 3, 0.385, 0.175]` ⇒ 防御 +84%／易伤 38.5%／三回合／固定 10 能量／治疗 17.5% 防御",
+      "note": "与叠影 1 同一套规则，只换数字 ✓（见 `1` 的 note）。"
+    }
+  ],
+  "5": [
+    {
+      "on": "CAST_SETUP",
+      "id": "cone23055_elation_skill_on_allies",
+      "when": [
+        "actor == self",
+        "from_skill_id == 20",
+        "target is_ally"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_DAMAGE_TAKEN",
+          "percent": 0.44,
+          "turns": 3,
+          "target": "all_enemies"
+        },
+        {
+          "op": "GAIN_ENERGY",
+          "amount": 10,
+          "fixed": true,
+          "target": "self"
+        },
+        {
+          "op": "HEAL",
+          "scale": "owner_def",
+          "percent": 0.2,
+          "target": "all_allies"
+        }
+      ],
+      "source": "光锥 23055（叠影 5）: `skill_value` = `[0.96, 10, 3, 0.44, 0.2]` ⇒ 防御 +96%／易伤 44%／三回合／固定 10 能量／治疗 20% 防御",
+      "note": "与叠影 1 同一套规则，只换数字 ✓（见 `1` 的 note）。判据 `Cone23055Test` 用**叠影 5** 量：易伤 1.44、能量 +10（效率 50% 下也必须是 10 ✓）、治疗 = 防御 × 0.20 ✓。"
+    }
+  ]
+}
