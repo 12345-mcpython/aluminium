@@ -810,6 +810,11 @@ public class ConeConditionLiteralsTest {
         assertRule(23016, 5, "FOLLOW_UP", "cone23016_tame_the_target", List.of("actor == self"));
         assertRule(23016, 5, "DEALING_DAMAGE", "cone23016_crit_per_tame_layer", List.of("actor == self", "target_stacks:温驯 >= 1.0"));
         assertRule(23017, 1, "ULT_CAST", "cone23017_heal_lowest_ally", List.of("actor is_ally"));
+        assertRule(23017, 1, "HEALED", "cone23017_healed_ally_attack", List.of("target is_ally"));
+        assertRule(23017, 2, "HEALED", "cone23017_healed_ally_attack", List.of("target is_ally"));
+        assertRule(23017, 3, "HEALED", "cone23017_healed_ally_attack", List.of("target is_ally"));
+        assertRule(23017, 4, "HEALED", "cone23017_healed_ally_attack", List.of("target is_ally"));
+        assertRule(23017, 5, "HEALED", "cone23017_healed_ally_attack", List.of("target is_ally"));
         assertRule(23017, 2, "ULT_CAST", "cone23017_heal_lowest_ally", List.of("actor is_ally"));
         assertRule(23017, 3, "ULT_CAST", "cone23017_heal_lowest_ally", List.of("actor is_ally"));
         assertRule(23017, 4, "ULT_CAST", "cone23017_heal_lowest_ally", List.of("actor is_ally"));
