@@ -6,21 +6,15 @@
       "do": [
         {
           "op": "MODIFY_ATTR",
-          "attribute": "EFFECT_HIT_RATE",
-          "percent": 0.2,
-          "permanent": true,
-          "target": "self"
-        },
-        {
-          "op": "MODIFY_ATTR",
           "attribute": "DOT_DAMAGE_BOOST",
           "percent": 0.24,
           "permanent": true,
-          "target": "self"
+          "target": "self",
+          "note": "⚠⚠ **2026-10-19 逐句核时删掉了一条重复**：「效果命中提高 #1%」**就是光锥自己的** `ability_property`（`effect_hit_rate` ✓，`Weapon.build` 施加 ✓）⇒ 再写一条就是**同一件事两遍** ✗（实测会读成 +40% 而不是 +20% ✗，与光锥 20003 的防御同一形状 ✓）。剩下的是「持续伤害提高 #2%」= `DOT_DAMAGE_BOOST` ✓。"
         }
       ],
       "source": "光锥 21008 猎物的视线: 使装备者的效果命中提高#1[i]%，同时造成的持续伤害提高#2[i]%。",
-      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查**（第 127/270 轮纪律）：本条的**条件在开战瞬间即可判定** ✓（`enemy_count` 是开战事实 ✓，与\"当前生命\"这类**动态量**不同 ✗）⇒ **真实流程可驱动** ✓。"
+      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓（效果命中 20/25/30/35/40% ✓、持续伤害 24/30/36/42/48% ✓）。⭐ 效果命中那一句**由光锥属性承担** ✓，本规则只写**持续伤害**那一半 ✓。"
     }
   ],
   "2": [
@@ -30,21 +24,15 @@
       "do": [
         {
           "op": "MODIFY_ATTR",
-          "attribute": "EFFECT_HIT_RATE",
-          "percent": 0.25,
-          "permanent": true,
-          "target": "self"
-        },
-        {
-          "op": "MODIFY_ATTR",
           "attribute": "DOT_DAMAGE_BOOST",
           "percent": 0.3,
           "permanent": true,
-          "target": "self"
+          "target": "self",
+          "note": "⚠⚠ **2026-10-19 逐句核时删掉了一条重复**：「效果命中提高 #1%」**就是光锥自己的** `ability_property`（`effect_hit_rate` ✓，`Weapon.build` 施加 ✓）⇒ 再写一条就是**同一件事两遍** ✗（实测会读成 +40% 而不是 +20% ✗，与光锥 20003 的防御同一形状 ✓）。剩下的是「持续伤害提高 #2%」= `DOT_DAMAGE_BOOST` ✓。"
         }
       ],
       "source": "光锥 21008 猎物的视线: 使装备者的效果命中提高#1[i]%，同时造成的持续伤害提高#2[i]%。",
-      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查**（第 127/270 轮纪律）：本条的**条件在开战瞬间即可判定** ✓（`enemy_count` 是开战事实 ✓，与\"当前生命\"这类**动态量**不同 ✗）⇒ **真实流程可驱动** ✓。"
+      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓（效果命中 20/25/30/35/40% ✓、持续伤害 24/30/36/42/48% ✓）。⭐ 效果命中那一句**由光锥属性承担** ✓，本规则只写**持续伤害**那一半 ✓。"
     }
   ],
   "3": [
@@ -54,21 +42,15 @@
       "do": [
         {
           "op": "MODIFY_ATTR",
-          "attribute": "EFFECT_HIT_RATE",
-          "percent": 0.3,
-          "permanent": true,
-          "target": "self"
-        },
-        {
-          "op": "MODIFY_ATTR",
           "attribute": "DOT_DAMAGE_BOOST",
           "percent": 0.36,
           "permanent": true,
-          "target": "self"
+          "target": "self",
+          "note": "⚠⚠ **2026-10-19 逐句核时删掉了一条重复**：「效果命中提高 #1%」**就是光锥自己的** `ability_property`（`effect_hit_rate` ✓，`Weapon.build` 施加 ✓）⇒ 再写一条就是**同一件事两遍** ✗（实测会读成 +40% 而不是 +20% ✗，与光锥 20003 的防御同一形状 ✓）。剩下的是「持续伤害提高 #2%」= `DOT_DAMAGE_BOOST` ✓。"
         }
       ],
       "source": "光锥 21008 猎物的视线: 使装备者的效果命中提高#1[i]%，同时造成的持续伤害提高#2[i]%。",
-      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查**（第 127/270 轮纪律）：本条的**条件在开战瞬间即可判定** ✓（`enemy_count` 是开战事实 ✓，与\"当前生命\"这类**动态量**不同 ✗）⇒ **真实流程可驱动** ✓。"
+      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓（效果命中 20/25/30/35/40% ✓、持续伤害 24/30/36/42/48% ✓）。⭐ 效果命中那一句**由光锥属性承担** ✓，本规则只写**持续伤害**那一半 ✓。"
     }
   ],
   "4": [
@@ -78,21 +60,15 @@
       "do": [
         {
           "op": "MODIFY_ATTR",
-          "attribute": "EFFECT_HIT_RATE",
-          "percent": 0.35,
-          "permanent": true,
-          "target": "self"
-        },
-        {
-          "op": "MODIFY_ATTR",
           "attribute": "DOT_DAMAGE_BOOST",
           "percent": 0.42,
           "permanent": true,
-          "target": "self"
+          "target": "self",
+          "note": "⚠⚠ **2026-10-19 逐句核时删掉了一条重复**：「效果命中提高 #1%」**就是光锥自己的** `ability_property`（`effect_hit_rate` ✓，`Weapon.build` 施加 ✓）⇒ 再写一条就是**同一件事两遍** ✗（实测会读成 +40% 而不是 +20% ✗，与光锥 20003 的防御同一形状 ✓）。剩下的是「持续伤害提高 #2%」= `DOT_DAMAGE_BOOST` ✓。"
         }
       ],
       "source": "光锥 21008 猎物的视线: 使装备者的效果命中提高#1[i]%，同时造成的持续伤害提高#2[i]%。",
-      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查**（第 127/270 轮纪律）：本条的**条件在开战瞬间即可判定** ✓（`enemy_count` 是开战事实 ✓，与\"当前生命\"这类**动态量**不同 ✗）⇒ **真实流程可驱动** ✓。"
+      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓（效果命中 20/25/30/35/40% ✓、持续伤害 24/30/36/42/48% ✓）。⭐ 效果命中那一句**由光锥属性承担** ✓，本规则只写**持续伤害**那一半 ✓。"
     }
   ],
   "5": [
@@ -102,21 +78,15 @@
       "do": [
         {
           "op": "MODIFY_ATTR",
-          "attribute": "EFFECT_HIT_RATE",
-          "percent": 0.4,
-          "permanent": true,
-          "target": "self"
-        },
-        {
-          "op": "MODIFY_ATTR",
           "attribute": "DOT_DAMAGE_BOOST",
           "percent": 0.48,
           "permanent": true,
-          "target": "self"
+          "target": "self",
+          "note": "⚠⚠ **2026-10-19 逐句核时删掉了一条重复**：「效果命中提高 #1%」**就是光锥自己的** `ability_property`（`effect_hit_rate` ✓，`Weapon.build` 施加 ✓）⇒ 再写一条就是**同一件事两遍** ✗（实测会读成 +40% 而不是 +20% ✗，与光锥 20003 的防御同一形状 ✓）。剩下的是「持续伤害提高 #2%」= `DOT_DAMAGE_BOOST` ✓。"
         }
       ],
       "source": "光锥 21008 猎物的视线: 使装备者的效果命中提高#1[i]%，同时造成的持续伤害提高#2[i]%。",
-      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查**（第 127/270 轮纪律）：本条的**条件在开战瞬间即可判定** ✓（`enemy_count` 是开战事实 ✓，与\"当前生命\"这类**动态量**不同 ✗）⇒ **真实流程可驱动** ✓。"
+      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓（效果命中 20/25/30/35/40% ✓、持续伤害 24/30/36/42/48% ✓）。⭐ 效果命中那一句**由光锥属性承担** ✓，本规则只写**持续伤害**那一半 ✓。"
     }
   ]
 }
