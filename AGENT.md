@@ -364,6 +364,7 @@ if (isSelected) buffer.setStyle(rowArea, highlightStyle);
 | **单位** | 内容里的数字必须用**引擎自己的单位** ✓ | 【已把守：`UnitDisciplineTest`】 |
 | **内容不重复** | 同一件事不许在两处登记 | 【已把守：`ContentDuplicateGuardTest`】 |
 | **效果键** | 触发器的 effect key 有封闭词表，拼错即失败 | 【已把守：`EffectKeyGuardTest` / `EffectKeyDisciplineTest`】 |
+| **字段名大小写** | `EffectSpec` 的字段**多数没有** `@SerializedName` ⇒ JSON 里必须写**驼峰**（`amountFromEvent` ✓）；写蛇形会被 Gson **静默丢掉** ✗（2026-10-19 又踩一次：写了 `amount_from_event` ✓ —— 这次被装载期喊住 ✓，见 §3.7zd） | 【已把守：`TriggerTables.load` 的封闭键表（报 `unknown key`，不是静默 ✓）】 |
 | **伤害类型作用域** | 只在声明消费它的 op 上生效 | 【已把守：`DamageTypeScopeValidationTest`】 |
 | **集合顺序** | 打印 / 遍历顺序要确定 | 【已把守：`DeterministicCollectionOrderTest`】 |
 | **技能等级表边界** | 等级越界要有定义 | 【已把守：`SkillLevelTableBoundTest`】 |
@@ -862,6 +863,20 @@ HP_LOST 计数 = 0 ; HP_CONSUMED 计数 = 0   ← 两个事件都没发
 
 ⚠ **仍登记**：同句的「每有 #3 点【亿质】额外造成 #2%」未写 ✗ —— 游戏把它**并进那六发的 DamagePercentage**（捕获实测总份额 0.6 → 0.9 ✓），引擎缺「按计数器档位放大这一发倍率」的口径 ✓。
 
+### 3.7zd 已落（**引擎**）：三个「句子缺一个读数」的补口 —— 攻击的槽位 / 事件的量作伤害基数 / 溢出的「无上限」（**2026-10-19**）
+
+> 三条都是被**同一位角色的同一批从句**逼出来的（1408 星魂 2 / 星魂 6 ✓），但三条都是**通用能力** ✓ —— 引擎里没有一个字提到 cid ✓。按 §3.5「机制先行、角色当验收」：能力落地时 1408 是验收人 ✓。
+
+| 能力 | 之前为什么写不出来 | 现在是什么 | 判据 / 变异 |
+|---|---|---|---|
+| **`ATTACK_FINISHED` 带 `from_skill_id`** | 它传的 `skillId` 是 **0** ✓ ⇒ 「**施放【支柱•死星天裁】的攻击后**」无法与「任何一次攻击后」区分 ✗（同一个角色还有强化普攻与两个强化战技 ✓） | `Battle.fireAfterAttack` 新增**带槽位的重载** ✓，`SkillExecutor` 传 `skill.getSkillSlot()` ✓；四个参数的旧口子保留（= **未知** ✓，`EnemySkill` 与既有判据还在用 ✓） | `PhainonEidolonSixTest.anotherAttackDoesNotPayTheRider`；变异：把 `skillSlot` 换回 `0` ⇒ 星魂 6 的那一条**再也不开火** ✓ |
+| **`amountFromEvent` 作为 `DAMAGE` 的基数** | 这个字段早就有 ✓（`GAIN_RESOURCE` / `GAIN_ENERGY` 的读者 ✓），而 **DAMAGE 路径上没有读者** ✗；`settled_damage_this_event` 在**最外层 firing 开始时清零** ✓，而 `ATTACK_FINISHED` **自己就是**最外层 ✓ ⇒ 读它恒得 **0** ✗（实测过，别重走 ✓） | `TriggerMagnitudes.literalBase` 读 `amountFromEvent × percent` ✓；装载期**只准配真伤害** ✓（这个数已经过完所有区 ✓，与 `settled_damage_this_event` 同一条理由 ✓）。⚠ **不是**新造 `scale: "event_amount"` ✗（它被**撤回**过 ✓，见 `EventAmountTest`：`amountFromEvent` 本来就够 ✓） | `EventAmountTest.theAttackTotalCanBeTheBaseOfATrueRider`（两条总量各钉一次 ✓）；变异：撤掉这个分支 ⇒ 基数落进 scale 读取并抛错 ✓ |
+| **`RAISE_RESOURCE_CAP{unbounded: true}`** | 溢出额度是**一个数** ✓，而「**不再拥有上限**」不是一个数 ✗：写任何数字都是文档否认的上限 ✓，而「够大」的那个数（`Integer.MAX_VALUE - 3`）会在 `getMaxOverflow() + raise` 里**溢出成负数** ✓ ⇒ `setMaxOverflow` 夹回 **0** ✗（症状：星魂 6 让溢变更**小** ✓） | 额度直接置 `Integer.MAX_VALUE` ✓（`Resource.absoluteMax()` 本来就**饱和** ✓）⇒ 「无上限」= **引擎能表示的最大上限** ✓ —— 与同库【毁伤】的 `"max": 2147483647`（数据没给上限 ✓）**同一个约定** ✓；两个拼法互斥（`unbounded` 不许与 `amount` 同写 ✓） | `ResourceOverflowUnboundedTest`（**两端**：解限后 100 点全进 ✓、按点数加则仍是 `max + overflow + N` ✓）；变异：让解释器忽略该旗标 ⇒ 100 只进 7 ✓ |
+
+⚠ **同族但没做的（登记，别以为漏了）**：
+- **单位计数器的「这次花掉了多少」没有事件** ✗ —— 事件表里唯一的「花掉」事件是 `SKILL_POINT_SPENT` ✓（战技点专属 ✓），而 1408 星魂 2 的后半要的是「**单次施放【支柱•死星天裁】消耗【毁伤】点数达到 4 点**」✓ ⇒ 没有读数就没法写 ✓（**不要**拿 `self_resource:毁伤 >= 4` 冒充 ✗：那是「持有 4 点就送回合」，与「一次施放花掉 4 点」是两件事 ✓）。
+- **`amountFromEvent` 只开了 DAMAGE 这一条路** ✓：别的 op 要读事件量时先看它有没有自己的拼法（`amount_from_event` 是**通用**字段 ✓，不是伤害专用 ✓）。
+
 ### 3.8 数据文件速查
 
 | 文件 | 内容 | 已确认锚点 |
@@ -1099,6 +1114,9 @@ HP_LOST 计数 = 0 ; HP_CONSUMED 计数 = 0   ← 两个事件都没发
     1408 的 **5／9／11**（天赋·强化与两个强化战技 ✓），以及 1408 星魂 3 点名的那一项 `140808` ✓。
     ⇒ **两种症状、都沉默** ✓：① 星魂写的「＋2 级」**什么都没做** ✓（1408 的星魂 3／5 曾整条缺失 ✓，判据以前只读「变身有没有开」✗）；
     ② 写在**不可读槽**上的份额**跟不上等级** ✓（1408 的攻击力 `0.8`／生命 `2.7` 取自槽 5 ✓，星魂 5 落地后它们开始漂移 ✓）。
+    ⇒ 这一条**已有缺口见证** ✓：`PhainonSlotFiveRowDriftTest` 钉住「E5 之后落下的仍是 **0.8 / 2.7**，而第 12 行是 **0.88 / 2.97**」✓
+    （量法是**两档的增量相等** ✓ —— 不需要假设基础属性、也不需要假设那条 +50% 攻击力的行迹 ✓）；
+    能力落地时它会红，并指回本条 ✓ —— 与 1506 的 `SilverWolfLV999ElationRowTest` 同一个手法 ✓。
     ⚠ **不猜**：给这些槽补 `SkillType` 是一个**决定**，不是补一个名字 ✓ —— 要先回答「强化形态算不算同一个槽的等级」✓，
     而**上游数据把它们分开列** ✓（星魂 3 的 `140808+1` 与 `140801+1` **并列** ✓）⇒ 它们**各有一条等级** ✓。
     ⚠ **谁要开这个口子，先读这几处的 note** ✓：1506 的 `level_convention`／`ult_installs_the_enhanced_*` ✓、
@@ -1309,6 +1327,11 @@ C 层全是**填口子** ✓，依赖已完成的机制，**不该出现新架�
 - **保存 / 回滚按字节** ✓：`git show HEAD:<path>` 取 blob 字节写回 ✓。
   ⚠⚠ **绝不用 `git checkout` 做回滚** ✗（见 §6.8(e) 的破坏性还原 ✓）；
   ⚠⚠ **PowerShell 的 `Set-Content -Encoding utf8` 会写 BOM** ✗ —— 用它回退一个 `.java`，编译**炸一串错** ✓。
+  ⚠⚠ **「按字节」必须真的是字节** ✓：Python 用 `encoding="utf-8"` ＋ `newline="\n"` 写回一个 **CRLF** 文件，
+  内容一样、**字节不一样** ✓ ⇒ 回滚后 SHA256 对不上 ✓（2026-10-19 实测：11 次变异**全部变红** ✓，
+  而 4 个 `.java` 的回滚报 `BYTES DIFFER` ✓ —— CRLF 被无声换成 LF ✓）。
+  ⇒ 备份与回滚**用二进制读写** ✓，锚点里的 `\n` 再**映射到文件自己的行尾** ✓（`\r\n` 或 `\n` ✓）；
+  改完用 `git ls-files --eol <file>` 复核 `w/` 那一栏 ✓。
 - ⭐ **变异仍然绿时，先怀疑"变量没动"，再怀疑"判据太弱"** ✓ ——
   ⇒ **变异绿有三种可能**（判据弱 / 变量没动 / 变异写坏）★ **逐个排除**，别直接改判据 ✗。
   实证：一条"加持 > 不加持"的判据，变异（摘掉条件）后**仍绿** ✓ —— 因为**终结技自己就给了计数** ✓
