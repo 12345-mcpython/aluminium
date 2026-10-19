@@ -86,6 +86,7 @@ public class EffectSpec {
         copy.maxPoints = this.maxPoints;
         copy.toMax = this.toMax;
         copy.unbounded = this.unbounded;
+        copy.fixed = this.fixed;
         copy.maxPerRound = this.maxPerRound;
         copy.payer = this.payer;
         copy.until = this.until;
@@ -692,6 +693,19 @@ public class EffectSpec {
      * {@code "max": 2147483647} and says so). {@code Resource.absoluteMax()} saturates, so the value still cannot leave
      * {@code [0, max + overflow]}.
      */
+    /**
+     * For {@code GAIN_ENERGY}: restore the amount <b>as stated</b>, without the energy-regeneration rate.
+     *
+     * <p>The game says 「固定恢复 #2 点能量」 for exactly this - the number is not a base that the wearer's rate scales.
+     * The model already had both kinds ({@code EnergyGain.normal} vs {@code EnergyGain.fixed}), but the rule vocabulary could
+     * only reach the first one, so a "fixed" clause silently gained the rate on top (measured: +10 came out as +15 at a
+     * 50% rate).
+     *
+     * <p>Reader: light cone 23055 「为装备者固定恢复 #2 点能量」; 1014 Saber (Saber)'s talent 「每消耗1点... 固定恢复 #5 点」.
+     */
+    @SerializedName("fixed")
+    private Boolean fixed;
+
     @SerializedName("unbounded")
     private Boolean unbounded;
 

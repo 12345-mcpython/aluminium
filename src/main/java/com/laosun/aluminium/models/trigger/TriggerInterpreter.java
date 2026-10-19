@@ -952,6 +952,13 @@ public final class TriggerInterpreter {
      * the scale family makes everywhere else.
      */
     private static void gainEnergyFor(Battle battle, EffectSpec effect, TriggerContext ctx, CanHit target) {
+        // 「固定恢复 N 点」: the number as stated, NOT a base for the energy-regeneration rate (reader: light cone 23055).
+        // Note: the model already had the two kinds side by side (`EnergyGain.fixed` / `.normal`); what was missing was a
+        // way for a RULE to pick the fixed one. Measured before this: a fixed +10 became +15 at a 50% rate.
+        if (Boolean.TRUE.equals(effect.getFixed())) {
+            battle.applyEnergyGain(target, com.laosun.aluminium.models.energy.EnergyGain.fixed(effect.getAmount()));
+            return;
+        }
         // The event own magnitude (reader: 1312 per-spent-point energy), as gainResource does.
         if (Boolean.TRUE.equals(effect.getAmountFromEvent())) {
             double share = effect.getAmountPercent() == null ? 1 : effect.getAmountPercent();

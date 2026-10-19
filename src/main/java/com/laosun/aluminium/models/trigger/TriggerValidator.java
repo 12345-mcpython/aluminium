@@ -158,6 +158,21 @@ final class TriggerValidator {
                     requireAmountOrScale(effect, op, spec, ENERGY_SCALES, "max energy");
                     requireNoStackArguments(effect, op, spec);
                 }
+                if (Boolean.TRUE.equals(effect.getFixed())) {
+                    // 「固定恢复 N 点」 states a NUMBER, so it cannot also be a share: refusing the pair keeps "fixed" from
+                    // silently deciding which of two magnitudes wins (the same rule `to_max` + `amount` follows).
+                    if (effect.getAmount() == null) {
+                        throw new IllegalArgumentException(
+                                "Op " + op + " states \"fixed\", so \"amount\" must be the stated number of points: got "
+                                        + (effect.getScale() == null ? "nothing" : "\"scale\": \"" + effect.getScale()
+                                        + "\"") + " (source: " + spec.getSource() + ")");
+                    }
+                    if (effect.getScale() != null && !effect.getScale().isBlank()) {
+                        throw new IllegalArgumentException(
+                                "Op " + op + " states both \"fixed\" and \"scale\": a fixed number and a share of "
+                                        + "something are different magnitudes (source: " + spec.getSource() + ")");
+                    }
+                }
             }
             case RAISE_ENERGY_TO -> {
                 // A plain share, because the handler reads it directly: accepting the
