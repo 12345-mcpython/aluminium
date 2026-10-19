@@ -77,7 +77,102 @@ public class ConeAuditBatchSeventeenTest {
         Assertions.assertTrue(f.attribute(AttributeType.ALL_DAMAGE_TYPE_BOOST) - damageBefore >= 0, "受击也要能触发（限流由 cooldown 管）");
     }
 
+
+    /**
+     * 23001 于夜色中: the crit share is the property - and the speed clause has NO rules at all (registered, no variable).
+     */
+    @Test
+    public void coneTwoThreeZeroOneOnlyTheCritShareIsSpelled() {
+        Fixture f = new Fixture(23001, 1);
+        Fixture bare = new Fixture(null, 1);
+        double crit = f.attribute(AttributeType.CRIT_CHANCE) - bare.attribute(AttributeType.CRIT_CHANCE);
+        System.out.println("[23001] crit share " + crit + " (the speed clause has no rule at all)");
+        Assertions.assertEquals(0.18, crit, 1e-9, "the crit share comes from the property, once");
+        Assertions.assertEquals(0, ruleCount(23001), "witness: the speed clause has no spelling (see the status row)");
+    }
+
+    /**
+     * 23003 但战斗还未结束: two ultimates on allies pay one skill point, and the next-ally share has its shape.
+     */
+    @Test
+    public void coneTwoThreeZeroThreeEverySecondUltimatePaysASkillPoint() {
+        Fixture f = new Fixture(23003, 1);
+        int before = f.battle.getSkillPoints();
+        for (int i = 0; i < 2; i++) {
+            f.wearer.setCurrentEnergy(f.wearer.getMaxEnergy());
+            f.battle.castUltra(f.wearer, List.of(f.ally));
+            f.battle.processRequests();
+        }
+        int after = f.battle.getSkillPoints();
+        System.out.println("[23003] 两次终结技后的战技点 " + before + " -> " + after);
+        Assertions.assertEquals(before + 1, after, "「每施放 2 次终结技可触发 1 次」恢复 1 个战技点");
+
+        var share = rule(23003, "cone23003_next_ally_boost").getAsJsonArray("do").get(0).getAsJsonObject();
+        System.out.println("[23003] 下一个队友那条: target=" + share.get("target") + " percent=" + share.get("percent")
+                + " turns=" + share.get("turns"));
+        Assertions.assertEquals("next_ally", share.get("target").getAsString(), "「下一个行动的我方其他目标」");
+        Assertions.assertEquals(0.3, share.get("percent").getAsDouble(), 1e-12, "30%（叠影 1）");
+        Assertions.assertEquals(1, share.get("turns").getAsInt(), "「持续 1 回合」");
+    }
+
+    /**
+     * 23004 以世界之名: a debuffed target is hit 24% harder, and a skill's own cast carries +18% effect hit and +24% attack.
+     */
+    @Test
+    public void coneTwoThreeZeroFourBoostsAgainstDebuffedTargets() {
+        Fixture f = new Fixture(23004, 1);
+        var rule = rule(23004, "cone23004_boost_vs_debuffed");
+        System.out.println("[23004] 规则: when=" + rule.getAsJsonArray("when") + " percent="
+                + rule.getAsJsonArray("do").get(0).getAsJsonObject().get("percent"));
+        Assertions.assertEquals("target_debuff_count >= 1",
+                rule.getAsJsonArray("when").get(1).getAsString(), "「陷入负面效果的敌方目标」");
+        Assertions.assertEquals(0.24, rule.getAsJsonArray("do").get(0).getAsJsonObject().get("percent").getAsDouble(),
+                1e-12, "24%（叠影 1）");
+
+        var cast = rule(23004, "cone23004_cast_scope_stats");
+        for (com.google.gson.JsonElement each : cast.getAsJsonArray("do")) {
+            Assertions.assertEquals("cast_end", each.getAsJsonObject().get("until").getAsString(),
+                    "「**此次**攻击」—— 窗口是那一次施放");
+        }
+        System.out.println("[23004] 施放期间的修饰都在 cast_end 结束 ✓");
+        Assertions.assertTrue(f.attribute(AttributeType.ATTACK) > 0, "夹具可用");
+    }
+
+    /**
+     * 23005 制胜的瞬间: the defence and effect-hit shares are the properties, and being hit adds defence until her turn ends.
+     */
+    @Test
+    public void coneTwoThreeZeroFiveDefenceAfterBeingHit() {
+        Fixture f = new Fixture(23005, 1);
+        Fixture bare = new Fixture(null, 1);
+        System.out.println("[23005] 防御增量 " + (f.attribute(AttributeType.DEFENCE) - bare.attribute(AttributeType.DEFENCE))
+                + " ; 效果命中增量 " + (f.attribute(AttributeType.EFFECT_HIT_RATE) - bare.attribute(AttributeType.EFFECT_HIT_RATE)));
+        Assertions.assertTrue(f.attribute(AttributeType.DEFENCE) > bare.attribute(AttributeType.DEFENCE), "「防御力提高 24%」");
+        Assertions.assertEquals(0.24, f.attribute(AttributeType.EFFECT_HIT_RATE) - bare.attribute(AttributeType.EFFECT_HIT_RATE),
+                1e-9, "「效果命中提高 24%」—— 光锥属性给一次");
+
+        double before = f.attribute(AttributeType.DEFENCE);
+        f.battle.applyDamage(f.wearer, new Damage(f.battle.enemyUnits().getFirst(), f.wearer,
+                DamageElement.PHYSICAL, DamageType.NORMAL, 10));
+        f.battle.processRequests();
+        double after = f.attribute(AttributeType.DEFENCE) - before;
+        System.out.println("[23005] 受击后的防御增量 " + after + "（= 防御 × 0.24）");
+        Assertions.assertTrue(after > 0, "「受到攻击后防御力额外提高 24%，持续到自身回合结束」");
+    }
+
     // ==================================================================
+
+    private static int ruleCount(int cone) {
+        try (java.io.InputStream stream = ConeAuditBatchSeventeenTest.class
+                .getResourceAsStream("/game/light_cones/" + cone + ".json")) {
+            Assertions.assertNotNull(stream, "missing cone " + cone);
+            return com.google.gson.JsonParser.parseReader(
+                    new java.io.InputStreamReader(stream, java.nio.charset.StandardCharsets.UTF_8))
+                    .getAsJsonObject().getAsJsonArray("1").size();
+        } catch (java.io.IOException e) {
+            throw new IllegalStateException(e);
+        }
+    }
 
     private static com.google.gson.JsonObject rule(int cone, String id) {
         try (java.io.InputStream stream = ConeAuditBatchSeventeenTest.class
@@ -99,15 +194,17 @@ public class ConeAuditBatchSeventeenTest {
 
     private static final class Fixture {
         private final Character wearer;
+        private final Character ally;
         private final Battle battle;
 
         private Fixture(Integer cone, int enemies) {
             Weapon weapon = cone == null ? null : Weapon.build(cone, LEVEL, false, 1);
             this.wearer = CharacterFactory.create(WEARER, LEVEL, false, weapon);
+            this.ally = CharacterFactory.create(1204, LEVEL);
             List<com.laosun.aluminium.models.enemy.Enemy> foes = enemies == 1
                     ? List.of(BattleFixture.dummy())
                     : List.of(BattleFixture.dummy(), BattleFixture.dummy());
-            this.battle = new Battle(List.of(wearer), foes, BattleFixture.alwaysRoll(0.9999));
+            this.battle = new Battle(List.of(wearer, ally), foes, BattleFixture.alwaysRoll(0.9999));
             battle.startBattle();
             battle.processRequests();
         }
