@@ -12,8 +12,11 @@
           "target": "self"
         }
       ],
-      "source": "光锥 20007 离弦: 使装备者消灭敌方目标后，攻击力提高#1[i]%，持续#2[i]回合。",
-      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓；⚠ 条件段读 **`getCurrentHp()`** ✓（`TriggerTable` 的 `hpPercent(owner)` 用的就是它 ✓）—— **不是** `HEALTH.get()` ✗（那是生命上限属性 ✓），第 125/270 轮的夹具守卫就错在这里 ✓。"
+      "source": "光锥 20007 离弦: 「使装备者消灭敌方目标后，攻击力提高 #1[i]%，持续 #2[i] 回合。」（`weapon_skill_data` 逐档 = 0.24/0.3/0.36/0.42/0.48 ＋ 3 回合 ✓）",
+      "note": "⚠⚠ **门必须是 `actor == self`** ✓（2026-10-19 逐句核时的错法：本文件原先**没有任何条件** ✗）：`KILL` 是带着**击杀者**当 `actor` 发的 ✓（`Battle` 的 `fireTriggersWithSubject(KILL, damage.getAttacker(), …)` ✓），而引擎把事件发给**每一张我方表** ✓ ⇒ 没有这道门，**队友击杀**也会给装备者 +24% ✗（实测：队友击杀时装备者攻击 +0 ✗ → 加门后 +0 ✓）。⚠ 数值取自 `weapons.json` 的 `weapon_skill_data` ✓；`turns: 3` 的时钟与 20000 同一缺口（战斗开始时差一回合 ✗，本句由击杀触发、从击杀那一回合数起，**不是**同一情形 ✓）。",
+      "when": [
+        "actor == self"
+      ]
     }
   ],
   "2": [
@@ -29,8 +32,11 @@
           "target": "self"
         }
       ],
-      "source": "光锥 20007 离弦: 使装备者消灭敌方目标后，攻击力提高#1[i]%，持续#2[i]回合。",
-      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓；⚠ 条件段读 **`getCurrentHp()`** ✓（`TriggerTable` 的 `hpPercent(owner)` 用的就是它 ✓）—— **不是** `HEALTH.get()` ✗（那是生命上限属性 ✓），第 125/270 轮的夹具守卫就错在这里 ✓。"
+      "source": "光锥 20007 离弦: 「使装备者消灭敌方目标后，攻击力提高 #1[i]%，持续 #2[i] 回合。」（`weapon_skill_data` 逐档 = 0.24/0.3/0.36/0.42/0.48 ＋ 3 回合 ✓）",
+      "note": "⚠⚠ **门必须是 `actor == self`** ✓（2026-10-19 逐句核时的错法：本文件原先**没有任何条件** ✗）：`KILL` 是带着**击杀者**当 `actor` 发的 ✓（`Battle` 的 `fireTriggersWithSubject(KILL, damage.getAttacker(), …)` ✓），而引擎把事件发给**每一张我方表** ✓ ⇒ 没有这道门，**队友击杀**也会给装备者 +24% ✗（实测：队友击杀时装备者攻击 +0 ✗ → 加门后 +0 ✓）。⚠ 数值取自 `weapons.json` 的 `weapon_skill_data` ✓；`turns: 3` 的时钟与 20000 同一缺口（战斗开始时差一回合 ✗，本句由击杀触发、从击杀那一回合数起，**不是**同一情形 ✓）。",
+      "when": [
+        "actor == self"
+      ]
     }
   ],
   "3": [
@@ -46,8 +52,11 @@
           "target": "self"
         }
       ],
-      "source": "光锥 20007 离弦: 使装备者消灭敌方目标后，攻击力提高#1[i]%，持续#2[i]回合。",
-      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓；⚠ 条件段读 **`getCurrentHp()`** ✓（`TriggerTable` 的 `hpPercent(owner)` 用的就是它 ✓）—— **不是** `HEALTH.get()` ✗（那是生命上限属性 ✓），第 125/270 轮的夹具守卫就错在这里 ✓。"
+      "source": "光锥 20007 离弦: 「使装备者消灭敌方目标后，攻击力提高 #1[i]%，持续 #2[i] 回合。」（`weapon_skill_data` 逐档 = 0.24/0.3/0.36/0.42/0.48 ＋ 3 回合 ✓）",
+      "note": "⚠⚠ **门必须是 `actor == self`** ✓（2026-10-19 逐句核时的错法：本文件原先**没有任何条件** ✗）：`KILL` 是带着**击杀者**当 `actor` 发的 ✓（`Battle` 的 `fireTriggersWithSubject(KILL, damage.getAttacker(), …)` ✓），而引擎把事件发给**每一张我方表** ✓ ⇒ 没有这道门，**队友击杀**也会给装备者 +24% ✗（实测：队友击杀时装备者攻击 +0 ✗ → 加门后 +0 ✓）。⚠ 数值取自 `weapons.json` 的 `weapon_skill_data` ✓；`turns: 3` 的时钟与 20000 同一缺口（战斗开始时差一回合 ✗，本句由击杀触发、从击杀那一回合数起，**不是**同一情形 ✓）。",
+      "when": [
+        "actor == self"
+      ]
     }
   ],
   "4": [
@@ -63,8 +72,11 @@
           "target": "self"
         }
       ],
-      "source": "光锥 20007 离弦: 使装备者消灭敌方目标后，攻击力提高#1[i]%，持续#2[i]回合。",
-      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓；⚠ 条件段读 **`getCurrentHp()`** ✓（`TriggerTable` 的 `hpPercent(owner)` 用的就是它 ✓）—— **不是** `HEALTH.get()` ✗（那是生命上限属性 ✓），第 125/270 轮的夹具守卫就错在这里 ✓。"
+      "source": "光锥 20007 离弦: 「使装备者消灭敌方目标后，攻击力提高 #1[i]%，持续 #2[i] 回合。」（`weapon_skill_data` 逐档 = 0.24/0.3/0.36/0.42/0.48 ＋ 3 回合 ✓）",
+      "note": "⚠⚠ **门必须是 `actor == self`** ✓（2026-10-19 逐句核时的错法：本文件原先**没有任何条件** ✗）：`KILL` 是带着**击杀者**当 `actor` 发的 ✓（`Battle` 的 `fireTriggersWithSubject(KILL, damage.getAttacker(), …)` ✓），而引擎把事件发给**每一张我方表** ✓ ⇒ 没有这道门，**队友击杀**也会给装备者 +24% ✗（实测：队友击杀时装备者攻击 +0 ✗ → 加门后 +0 ✓）。⚠ 数值取自 `weapons.json` 的 `weapon_skill_data` ✓；`turns: 3` 的时钟与 20000 同一缺口（战斗开始时差一回合 ✗，本句由击杀触发、从击杀那一回合数起，**不是**同一情形 ✓）。",
+      "when": [
+        "actor == self"
+      ]
     }
   ],
   "5": [
@@ -80,8 +92,11 @@
           "target": "self"
         }
       ],
-      "source": "光锥 20007 离弦: 使装备者消灭敌方目标后，攻击力提高#1[i]%，持续#2[i]回合。",
-      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓；⚠ 条件段读 **`getCurrentHp()`** ✓（`TriggerTable` 的 `hpPercent(owner)` 用的就是它 ✓）—— **不是** `HEALTH.get()` ✗（那是生命上限属性 ✓），第 125/270 轮的夹具守卫就错在这里 ✓。"
+      "source": "光锥 20007 离弦: 「使装备者消灭敌方目标后，攻击力提高 #1[i]%，持续 #2[i] 回合。」（`weapon_skill_data` 逐档 = 0.24/0.3/0.36/0.42/0.48 ＋ 3 回合 ✓）",
+      "note": "⚠⚠ **门必须是 `actor == self`** ✓（2026-10-19 逐句核时的错法：本文件原先**没有任何条件** ✗）：`KILL` 是带着**击杀者**当 `actor` 发的 ✓（`Battle` 的 `fireTriggersWithSubject(KILL, damage.getAttacker(), …)` ✓），而引擎把事件发给**每一张我方表** ✓ ⇒ 没有这道门，**队友击杀**也会给装备者 +24% ✗（实测：队友击杀时装备者攻击 +0 ✗ → 加门后 +0 ✓）。⚠ 数值取自 `weapons.json` 的 `weapon_skill_data` ✓；`turns: 3` 的时钟与 20000 同一缺口（战斗开始时差一回合 ✗，本句由击杀触发、从击杀那一回合数起，**不是**同一情形 ✓）。",
+      "when": [
+        "actor == self"
+      ]
     }
   ]
 }

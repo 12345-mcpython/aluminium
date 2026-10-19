@@ -81,11 +81,21 @@ public class ConeConditionLiteralsTest {
         assertRule(20006, 3, "BATTLE_START", "boost_ultimate_damage_boost_3", List.of());
         assertRule(20006, 4, "BATTLE_START", "boost_ultimate_damage_boost_4", List.of());
         assertRule(20006, 5, "BATTLE_START", "boost_ultimate_damage_boost_5", List.of());
-        assertRule(20007, 1, "KILL", "cone20007_attack_on_kill", List.of());
-        assertRule(20007, 2, "KILL", "cone20007_attack_on_kill", List.of());
-        assertRule(20007, 3, "KILL", "cone20007_attack_on_kill", List.of());
-        assertRule(20007, 4, "KILL", "cone20007_attack_on_kill", List.of());
-        assertRule(20007, 5, "KILL", "cone20007_attack_on_kill", List.of());
+        // ⚠ It pinned `List.of()` - "no conditions" - which is exactly the defect: KILL carries the killer, and
+        // every ally's table sees the event, so without the gate a TEAMMATE's kill paid the wearer.
+        assertRule(20007, 1, "KILL", "cone20007_attack_on_kill", List.of("actor == self"));
+        // ⚠ It pinned `List.of()` - "no conditions" - which is exactly the defect: KILL carries the killer, and
+        // every ally's table sees the event, so without the gate a TEAMMATE's kill paid the wearer.
+        assertRule(20007, 2, "KILL", "cone20007_attack_on_kill", List.of("actor == self"));
+        // ⚠ It pinned `List.of()` - "no conditions" - which is exactly the defect: KILL carries the killer, and
+        // every ally's table sees the event, so without the gate a TEAMMATE's kill paid the wearer.
+        assertRule(20007, 3, "KILL", "cone20007_attack_on_kill", List.of("actor == self"));
+        // ⚠ It pinned `List.of()` - "no conditions" - which is exactly the defect: KILL carries the killer, and
+        // every ally's table sees the event, so without the gate a TEAMMATE's kill paid the wearer.
+        assertRule(20007, 4, "KILL", "cone20007_attack_on_kill", List.of("actor == self"));
+        // ⚠ It pinned `List.of()` - "no conditions" - which is exactly the defect: KILL carries the killer, and
+        // every ally's table sees the event, so without the gate a TEAMMATE's kill paid the wearer.
+        assertRule(20007, 5, "KILL", "cone20007_attack_on_kill", List.of("actor == self"));
         assertRule(20008, 1, "BATTLE_START", "cone20008_party_energy", List.of());
         assertRule(20008, 2, "BATTLE_START", "cone20008_party_energy", List.of());
         assertRule(20008, 3, "BATTLE_START", "cone20008_party_energy", List.of());
@@ -101,11 +111,21 @@ public class ConeConditionLiteralsTest {
         assertRule(20010, 3, "ULT_CAST", "cone20010_heal_on_ult", List.of());
         assertRule(20010, 4, "ULT_CAST", "cone20010_heal_on_ult", List.of());
         assertRule(20010, 5, "ULT_CAST", "cone20010_heal_on_ult", List.of());
-        assertRule(20011, 1, "DEALING_DAMAGE", "loop_against_slowed", List.of("actor == self", "target has_state 减速"));
-        assertRule(20011, 2, "DEALING_DAMAGE", "loop_against_slowed", List.of("actor == self", "target has_state 减速"));
-        assertRule(20011, 3, "DEALING_DAMAGE", "loop_against_slowed", List.of("actor == self", "target has_state 减速"));
-        assertRule(20011, 4, "DEALING_DAMAGE", "loop_against_slowed", List.of("actor == self", "target has_state 减速"));
-        assertRule(20011, 5, "DEALING_DAMAGE", "loop_against_slowed", List.of("actor == self", "target has_state 减速"));
+        // ⚠ It pinned `has_state 减速`, and no buff by that name exists (slow is a negative SPEED modifier): the
+        // rule was a silent no-op. The DSL spelling is `is_slowed`.
+        assertRule(20011, 1, "DEALING_DAMAGE", "loop_against_slowed", List.of("actor == self", "target is_slowed"));
+        // ⚠ It pinned `has_state 减速`, and no buff by that name exists (slow is a negative SPEED modifier): the
+        // rule was a silent no-op. The DSL spelling is `is_slowed`.
+        assertRule(20011, 2, "DEALING_DAMAGE", "loop_against_slowed", List.of("actor == self", "target is_slowed"));
+        // ⚠ It pinned `has_state 减速`, and no buff by that name exists (slow is a negative SPEED modifier): the
+        // rule was a silent no-op. The DSL spelling is `is_slowed`.
+        assertRule(20011, 3, "DEALING_DAMAGE", "loop_against_slowed", List.of("actor == self", "target is_slowed"));
+        // ⚠ It pinned `has_state 减速`, and no buff by that name exists (slow is a negative SPEED modifier): the
+        // rule was a silent no-op. The DSL spelling is `is_slowed`.
+        assertRule(20011, 4, "DEALING_DAMAGE", "loop_against_slowed", List.of("actor == self", "target is_slowed"));
+        // ⚠ It pinned `has_state 减速`, and no buff by that name exists (slow is a negative SPEED modifier): the
+        // rule was a silent no-op. The DSL spelling is `is_slowed`.
+        assertRule(20011, 5, "DEALING_DAMAGE", "loop_against_slowed", List.of("actor == self", "target is_slowed"));
         assertRule(20012, 1, "BASIC_ATTACK", "cone20012_energy", List.of());
         assertRule(20012, 2, "BASIC_ATTACK", "cone20012_energy", List.of());
         assertRule(20012, 3, "BASIC_ATTACK", "cone20012_energy", List.of());
