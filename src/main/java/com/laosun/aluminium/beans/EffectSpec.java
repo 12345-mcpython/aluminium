@@ -85,6 +85,7 @@ public class EffectSpec {
         copy.unitAmount = this.unitAmount;
         copy.maxPoints = this.maxPoints;
         copy.toMax = this.toMax;
+        copy.unbounded = this.unbounded;
         copy.maxPerRound = this.maxPerRound;
         copy.payer = this.payer;
         copy.until = this.until;
@@ -676,6 +677,23 @@ public class EffectSpec {
      */
     @SerializedName("to_max")
     private Boolean toMax;
+
+    /**
+     * For {@code RAISE_RESOURCE_CAP}: widen the resource's OVERFLOW to <b>no limit at all</b>, instead of by a count.
+     *
+     * <p>Reader: 1408 Phainon (白厄)'s Eidolon 6 - 「【火种】的可溢出点数<b>不再拥有上限</b>」. The declaration states one
+     * allowance ({@code "overflow": 3}), so the sentence has to remove it, and a count cannot state "removed": any number
+     * written there is a cap the document denies, and the one number that would work in practice
+     * ({@code Integer.MAX_VALUE - 3}) would overflow the allowance itself on the way in
+     * ({@code getMaxOverflow() + raise} in {@code TriggerInterpreter.raiseResourceCap}).
+     *
+     * <p>Note: "No limit" here means <b>the largest cap the engine can hold</b>, which is the same convention the file
+     * already uses for a resource the data gives no ceiling for ({@code characters/1408.json}'s 【毁伤】 declares
+     * {@code "max": 2147483647} and says so). {@code Resource.absoluteMax()} saturates, so the value still cannot leave
+     * {@code [0, max + overflow]}.
+     */
+    @SerializedName("unbounded")
+    private Boolean unbounded;
 
     /**
      * For {@code GAIN_RESOURCE}: how much may be gained <b>within one round</b>, across every gain of this resource by

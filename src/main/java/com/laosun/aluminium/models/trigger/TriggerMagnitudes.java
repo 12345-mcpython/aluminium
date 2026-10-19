@@ -58,6 +58,22 @@ final class TriggerMagnitudes {
         // and `derivedMagnitude` was fixed for exactly this one round earlier. Same family, same line.
         double share = shareOf(effect, ctx);
         double flat = constantTerm(effect, ctx);
+        // "equal to X% of the total damage value of THIS ATTACK" - the event's own announced magnitude.
+        // Note: Not a new `scale` spelling. `scale: "event_amount"` was tried for a MAGNITUDE and withdrawn, because
+        // `amount_from_event` + `amount_percent` already says it (see `EventAmountTest`); this branch is the missing
+        // READER of that existing pair on the damage path, exactly as `grantAmount` is its reader on the gain path.
+        // Note: The event's `amount` is a number that has already been through every zone, so a non-true rider would
+        // multiply them a second time and a sum has no single factor to divide by - `TriggerValidator` therefore
+        // refuses this field on anything but true damage, the same way it refuses `settled_damage_this_event` there.
+        // Reader: 1408 Phainon (白厄)'s Eidolon 6 - 「对生命值最高的敌方目标额外造成等同于本次攻击总伤害值 #1% 的真实伤害」,
+        // where `ATTACK_FINISHED` announces the whole attack's settled total.
+        if (Boolean.TRUE.equals(effect.getAmountFromEvent())) {
+            if (ctx == null) {
+                throw new IllegalStateException(
+                        "a DAMAGE whose base is the triggering event's amount was evaluated without an event");
+            }
+            return ctx.amount() * share + flat;
+        }
         // Note: A share of the TRIGGERING instance ("equal to X% of the original damage") was implemented here on and ROLLED
         // BACK the same round, because it read the wrong quantity: at `DEALING_DAMAGE` -- the only event that carries
         // the instance -- `damage.toValue()` is 4.2x the value the victim actually loses (measured: 1093.02 vs

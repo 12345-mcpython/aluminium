@@ -25,8 +25,15 @@ import java.util.List;
  * name for a thing the engine already had is exactly what this project refuses to keep. What is genuinely new is the
  * count: the existing field carries an AMOUNT, never a number of repetitions.
  *
+ * <p>Note: <b>CORRECTED (2026-10-19).</b> The withdrawal above is still right about the SPELLING, and this class held only
+ * the count half for as long as the amount half had no DAMAGE reader. 1408's Eidolon 6 needed one -
+ * 「等同于本次攻击总伤害值 #1% 的真实伤害」 - so the reader was added to {@code TriggerMagnitudes.literalBase}
+ * (see {@link #theAttackTotalCanBeTheBaseOfATrueRider}), still spelled {@code amount_from_event} + {@code percent}.
+ * What that clause also needed was a <em>fact</em>, not a spelling: {@code ATTACK_FINISHED} announces the settled total,
+ * and until then it named no skill (so "after THAT skill's attack" could not be said).
+ *
  * <p>Readers (all with data files): 1408 "每消耗1点[毁伤]造成4次伤害", 1510 "每消耗1点[源能]额外…1次30%",
- * 1513 "每消耗1点[热意]…1次21%".
+ * 1513 "每消耗1点[热意]…1次21%", and 1408's Eidolon 6 for the amount half.
  */
 public class EventAmountTest {
     private static final int OWNER = 1003;
@@ -46,6 +53,48 @@ public class EventAmountTest {
     }
 
     // ==================================================================
+
+    /**
+     * The amount half, now that a reader exists: {@code amount_from_event} + {@code percent} is the BASE of a damage
+     * instance, and {@code ATTACK_FINISHED}'s amount is the whole attack's settled total.
+     *
+     * <p>Reader: 1408's Eidolon 6 - 「对生命值最高的敌方目标额外造成等同于本次攻击总伤害值 36% 的真实伤害」. True damage
+     * skips every zone, so the settled rider is exactly {@code 36% x the announced total} - which is why the tolerance here
+     * is absolute and the two totals are pinned independently (a rule that read the OTHER event's amount, or that divided
+     * by a zone factor, would land on a different number).
+     */
+    @Test
+    public void theAttackTotalCanBeTheBaseOfATrueRider() {
+        Assertions.assertEquals(360.0, trueRider(1000), 1e-6, "36% of a 1000-point attack");
+        Assertions.assertEquals(720.0, trueRider(2000), 1e-6, "and it follows the total, not a fixed number");
+    }
+
+    // ==================================================================
+
+    /**
+     * What the enemy loses to a {@code 36%} true rider announced by an attack whose settled total is {@code total}.
+     */
+    private static double trueRider(double total) {
+        Character owner = CharacterFactory.create(OWNER, LEVEL, false, null, null, 0);
+        EffectSpec effect = new EffectSpec();
+        TriggerSpecs.set(effect, "op", "DAMAGE");
+        TriggerSpecs.set(effect, "amountFromEvent", true);
+        TriggerSpecs.set(effect, "percent", 0.36);
+        TriggerSpecs.set(effect, "element", "Physical");
+        TriggerSpecs.set(effect, "damageType", "TRUE");
+        TriggerSpecs.set(effect, "target", "target");
+        owner.setTriggerTable(new TriggerTable(OWNER, List.of(TriggerSpecs.rule("ATTACK_FINISHED",
+                List.of("actor == self"), effect)), List.of()));
+        // Note: A 1,000,000-HP dummy, so the reading is the rider itself and not the target's own health bar (measured:
+        // the standard monster is ~1358 HP and would clamp a 2000-point attack's rider).
+        Enemy enemy = BattleFixture.dummy();
+        Battle battle = new Battle(List.of(owner), List.of(enemy), BattleFixture.seeded());
+        battle.startBattle();
+        double before = enemy.getCurrentHp();
+        battle.fireAfterAttack(owner, enemy, List.of(enemy), total);
+        battle.processRequests();
+        return before - enemy.getCurrentHp();
+    }
 
     /**
      * What the enemy loses when the rule repeats its instance once per point spent.

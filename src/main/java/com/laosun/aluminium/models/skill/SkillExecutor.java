@@ -471,7 +471,7 @@ public final class SkillExecutor {
         List<SkillEffectSpec.DamagePart> parts = damagePartsOf(skill);
         if (!parts.isEmpty()) {
             totalDamage += settleParts(battle, data, skill, user, element, params, mainTarget, parts, hitTargets);
-            battle.fireAfterAttack(user, mainTarget, hitTargets, totalDamage);
+            battle.fireAfterAttack(user, mainTarget, hitTargets, totalDamage, skill.getSkillSlot());
             return;
         }
 
@@ -597,7 +597,9 @@ public final class SkillExecutor {
         // The attack-level event. Single implementation lives on Battle, because a summon's attack
         // (EnemySkill) is an attack too and must raise the same notification -- see Battle.fireAfterAttack for
         // which attacks qualify and why derived hits deliberately do not.
-        battle.fireAfterAttack(user, mainTarget, hitTargets, totalDamage);
+        // Note: The SLOT rides along, so a rule can gate on 「施放【支柱•死星天裁】的攻击后」 (1408's Eidolon 6). It is the
+        // same number every other cast event reports as `from_skill_id`.
+        battle.fireAfterAttack(user, mainTarget, hitTargets, totalDamage, skill.getSkillSlot());
     }
 
     /**
