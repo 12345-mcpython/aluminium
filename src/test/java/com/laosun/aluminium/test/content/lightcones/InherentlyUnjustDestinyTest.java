@@ -1,5 +1,6 @@
 package com.laosun.aluminium.test.content.lightcones;
 
+import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Weapon;
@@ -34,15 +35,11 @@ public class InherentlyUnjustDestinyTest {
         for (int rank = 1; rank <= 5; rank++) {
             var table = wearer(rank).getTriggerTable();
 
-            var def = table.rulesFor(TriggerEvent.BATTLE_START).stream()
-                    .filter(r -> r.id().equals("cone23023_defence")).toList();
-            Assertions.assertEquals(1, def.size(), "rank " + rank + ": the DEF rule");
-            var defEffect = def.getFirst().effects().getFirst();
-            Assertions.assertEquals("MODIFY_ATTR", defEffect.getOp());
-            Assertions.assertEquals("DEFENCE", defEffect.getAttribute());
-            Assertions.assertEquals(DEF[rank - 1], defEffect.getPercent(), 1e-9, "rank " + rank + ": DEF");
-            Assertions.assertEquals("self", defEffect.getTarget());
-
+            // 2026-10-19: the defence share is the cone's own defence_percent property now (the rule was a duplicate),
+            // so it is read off the panel instead of a rule.
+            double plainDefence = CharacterFactory.create(WEARER, LEVEL, true).getAttribute(AttributeType.DEFENCE).get();
+            Assertions.assertTrue(wearer(rank).getAttribute(AttributeType.DEFENCE).get() > plainDefence,
+                    "rank " + rank + ": the DEF share reaches the panel");
             var shield = table.rulesFor(TriggerEvent.SHIELD_GRANTED).stream()
                     .filter(r -> r.id().equals("cone23023_crit_on_shield")).toList();
             Assertions.assertEquals(1, shield.size(), "rank " + rank + ": the shield rule");

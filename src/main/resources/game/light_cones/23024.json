@@ -16,7 +16,7 @@
         }
       ],
       "source": "光锥 23024: 「当装备者击中敌方目标时，使敌方陷入【泡影】状态，持续1回合。装备者每次攻击时，对每个目标只可触发1次。」",
-      "note": "⭐⭐ **三句全用现成词汇** ✓：① `DEALING_DAMAGE` ⇒ `APPLY_BUFF 泡影 turns 1` ✓，并用**规则级** `per_attack: true` ✓ 表达「每次攻击时，对每个目标只可触发 1 次」✓（纪律 187：放到效果里会被**静默忽略** ✗）；② `DEALING_DAMAGE` + `target has_state 泡影` ⇒ 伤容 +24% ✓；③ `DEALING_DAMAGE` + `from_category ULTRA` ⇒ **额外** +24% ✓。⚠ **一处读法已写明** ✓：③ 的原文只写「**终结技**造成的伤容**额外**提高」，**没有**再提【泡影】✗ ⇒ 按\"独立句\"处理 ✓（不额外加泡影门槛 ✗）。⭐ **`per_attack` 是个数量，不是布尔** ✓（加载器报错原文：*\"Expected NUMBER but was BOOLEAN at path $[0].per_attack\"* ✓）⇒ `1` 表示「每次攻击只可触发 1 次」✓。"
+      "note": "「当装备者击中敌方目标时，使敌方陷入【泡影】状态，持续 1 回合。**装备者每次攻击时，对每个目标只可触发 1 次**」—— `DEALING_DAMAGE` ＋ `actor == self` ＋ `APPLY_BUFF{buff: 泡影, turns: 1, target: target}` ✓ ＋ **`per_attack: 1`** ✓（一次攻击对每个目标只上一次 ✓）。\n⚠⚠ **2026-10-19 逐句核时补的 `per_attack: 1`** ✗（原先每段伤害都会重新施加一次 ✓）。"
     },
     {
       "on": "DEALING_DAMAGE",
@@ -68,7 +68,7 @@
         }
       ],
       "source": "光锥 23024: 「当装备者击中敌方目标时，使敌方陷入【泡影】状态，持续1回合。装备者每次攻击时，对每个目标只可触发1次。」",
-      "note": "⭐⭐ **三句全用现成词汇** ✓：① `DEALING_DAMAGE` ⇒ `APPLY_BUFF 泡影 turns 1` ✓，并用**规则级** `per_attack: true` ✓ 表达「每次攻击时，对每个目标只可触发 1 次」✓（纪律 187：放到效果里会被**静默忽略** ✗）；② `DEALING_DAMAGE` + `target has_state 泡影` ⇒ 伤容 +24% ✓；③ `DEALING_DAMAGE` + `from_category ULTRA` ⇒ **额外** +24% ✓。⚠ **一处读法已写明** ✓：③ 的原文只写「**终结技**造成的伤容**额外**提高」，**没有**再提【泡影】✗ ⇒ 按\"独立句\"处理 ✓（不额外加泡影门槛 ✗）。⭐ **`per_attack` 是个数量，不是布尔** ✓（加载器报错原文：*\"Expected NUMBER but was BOOLEAN at path $[0].per_attack\"* ✓）⇒ `1` 表示「每次攻击只可触发 1 次」✓。"
+      "note": "「当装备者击中敌方目标时，使敌方陷入【泡影】状态，持续 1 回合。**装备者每次攻击时，对每个目标只可触发 1 次**」—— `DEALING_DAMAGE` ＋ `actor == self` ＋ `APPLY_BUFF{buff: 泡影, turns: 1, target: target}` ✓ ＋ **`per_attack: 1`** ✓（一次攻击对每个目标只上一次 ✓）。\n⚠⚠ **2026-10-19 逐句核时补的 `per_attack: 1`** ✗（原先每段伤害都会重新施加一次 ✓）。"
     },
     {
       "on": "DEALING_DAMAGE",
@@ -120,7 +120,7 @@
         }
       ],
       "source": "光锥 23024: 「当装备者击中敌方目标时，使敌方陷入【泡影】状态，持续1回合。装备者每次攻击时，对每个目标只可触发1次。」",
-      "note": "⭐⭐ **三句全用现成词汇** ✓：① `DEALING_DAMAGE` ⇒ `APPLY_BUFF 泡影 turns 1` ✓，并用**规则级** `per_attack: true` ✓ 表达「每次攻击时，对每个目标只可触发 1 次」✓（纪律 187：放到效果里会被**静默忽略** ✗）；② `DEALING_DAMAGE` + `target has_state 泡影` ⇒ 伤容 +24% ✓；③ `DEALING_DAMAGE` + `from_category ULTRA` ⇒ **额外** +24% ✓。⚠ **一处读法已写明** ✓：③ 的原文只写「**终结技**造成的伤容**额外**提高」，**没有**再提【泡影】✗ ⇒ 按\"独立句\"处理 ✓（不额外加泡影门槛 ✗）。⭐ **`per_attack` 是个数量，不是布尔** ✓（加载器报错原文：*\"Expected NUMBER but was BOOLEAN at path $[0].per_attack\"* ✓）⇒ `1` 表示「每次攻击只可触发 1 次」✓。"
+      "note": "「当装备者击中敌方目标时，使敌方陷入【泡影】状态，持续 1 回合。**装备者每次攻击时，对每个目标只可触发 1 次**」—— `DEALING_DAMAGE` ＋ `actor == self` ＋ `APPLY_BUFF{buff: 泡影, turns: 1, target: target}` ✓ ＋ **`per_attack: 1`** ✓（一次攻击对每个目标只上一次 ✓）。\n⚠⚠ **2026-10-19 逐句核时补的 `per_attack: 1`** ✗（原先每段伤害都会重新施加一次 ✓）。"
     },
     {
       "on": "DEALING_DAMAGE",
@@ -172,7 +172,7 @@
         }
       ],
       "source": "光锥 23024: 「当装备者击中敌方目标时，使敌方陷入【泡影】状态，持续1回合。装备者每次攻击时，对每个目标只可触发1次。」",
-      "note": "⭐⭐ **三句全用现成词汇** ✓：① `DEALING_DAMAGE` ⇒ `APPLY_BUFF 泡影 turns 1` ✓，并用**规则级** `per_attack: true` ✓ 表达「每次攻击时，对每个目标只可触发 1 次」✓（纪律 187：放到效果里会被**静默忽略** ✗）；② `DEALING_DAMAGE` + `target has_state 泡影` ⇒ 伤容 +24% ✓；③ `DEALING_DAMAGE` + `from_category ULTRA` ⇒ **额外** +24% ✓。⚠ **一处读法已写明** ✓：③ 的原文只写「**终结技**造成的伤容**额外**提高」，**没有**再提【泡影】✗ ⇒ 按\"独立句\"处理 ✓（不额外加泡影门槛 ✗）。⭐ **`per_attack` 是个数量，不是布尔** ✓（加载器报错原文：*\"Expected NUMBER but was BOOLEAN at path $[0].per_attack\"* ✓）⇒ `1` 表示「每次攻击只可触发 1 次」✓。"
+      "note": "「当装备者击中敌方目标时，使敌方陷入【泡影】状态，持续 1 回合。**装备者每次攻击时，对每个目标只可触发 1 次**」—— `DEALING_DAMAGE` ＋ `actor == self` ＋ `APPLY_BUFF{buff: 泡影, turns: 1, target: target}` ✓ ＋ **`per_attack: 1`** ✓（一次攻击对每个目标只上一次 ✓）。\n⚠⚠ **2026-10-19 逐句核时补的 `per_attack: 1`** ✗（原先每段伤害都会重新施加一次 ✓）。"
     },
     {
       "on": "DEALING_DAMAGE",
@@ -224,7 +224,7 @@
         }
       ],
       "source": "光锥 23024: 「当装备者击中敌方目标时，使敌方陷入【泡影】状态，持续1回合。装备者每次攻击时，对每个目标只可触发1次。」",
-      "note": "⭐⭐ **三句全用现成词汇** ✓：① `DEALING_DAMAGE` ⇒ `APPLY_BUFF 泡影 turns 1` ✓，并用**规则级** `per_attack: true` ✓ 表达「每次攻击时，对每个目标只可触发 1 次」✓（纪律 187：放到效果里会被**静默忽略** ✗）；② `DEALING_DAMAGE` + `target has_state 泡影` ⇒ 伤容 +24% ✓；③ `DEALING_DAMAGE` + `from_category ULTRA` ⇒ **额外** +24% ✓。⚠ **一处读法已写明** ✓：③ 的原文只写「**终结技**造成的伤容**额外**提高」，**没有**再提【泡影】✗ ⇒ 按\"独立句\"处理 ✓（不额外加泡影门槛 ✗）。⭐ **`per_attack` 是个数量，不是布尔** ✓（加载器报错原文：*\"Expected NUMBER but was BOOLEAN at path $[0].per_attack\"* ✓）⇒ `1` 表示「每次攻击只可触发 1 次」✓。"
+      "note": "「当装备者击中敌方目标时，使敌方陷入【泡影】状态，持续 1 回合。**装备者每次攻击时，对每个目标只可触发 1 次**」—— `DEALING_DAMAGE` ＋ `actor == self` ＋ `APPLY_BUFF{buff: 泡影, turns: 1, target: target}` ✓ ＋ **`per_attack: 1`** ✓（一次攻击对每个目标只上一次 ✓）。\n⚠⚠ **2026-10-19 逐句核时补的 `per_attack: 1`** ✗（原先每段伤害都会重新施加一次 ✓）。"
     },
     {
       "on": "DEALING_DAMAGE",
