@@ -99,7 +99,9 @@ public class PhainonEidolonSixTest {
      * {@code true instances / every other instance of the same cast}.
      */
     private static double trueDamageAfter(int slot, int eidolonRank) {
-        Battle battle = newBattle(eidolonRank, 3);
+        // Note: ONE enemy. With several, a `BOUNCE` re-draws its target from an unseeded `Random` (`alwaysRoll` pins only
+        // `nextDouble`), so which victim takes how much varies between runs - and with a single target it cannot.
+        Battle battle = newBattle(eidolonRank, 1);
         Character phainon = battle.characters.getFirst();
         List<Damage> settled = new ArrayList<>();
         battle.addDamageObserver((damage, applied, hpLoss, shieldAbsorbed, died) -> settled.add(damage));
@@ -119,8 +121,13 @@ public class PhainonEidolonSixTest {
         System.out.println("[1408] slot " + slot + " settled " + total + " of ordinary damage and " + trues
                 + " of true damage (" + (trues / total) + " of the total)");
         // 36% of the settled total, and the true instance is exact (it skips every zone), so the tolerance is the sum's.
+        // Note: the per-instance breakdown rides in the message on purpose - when this case failed in a full-suite run
+        // (order-dependent, not reproducible alone), the sums alone could not say WHICH instance had drifted.
+        String instances = settled.stream()
+                .map(d -> d.getType() + " " + d.breakdown())
+                .reduce("", (a, b) -> a + "\n    " + b);
         Assertions.assertEquals(0.36, trues / total, Math.max(1e-9, 1e-6 / total),
-                "「等同于本次攻击总伤害值 36% 的真实伤害」: total=" + total + " true=" + trues);
+                "「等同于本次攻击总伤害值 36% 的真实伤害」: total=" + total + " true=" + trues + instances);
         return trues / total;
     }
 
@@ -137,7 +144,14 @@ public class PhainonEidolonSixTest {
     private static Battle newBattle(int eidolonRank, int enemies) {
         List<com.laosun.aluminium.models.enemy.Enemy> foes = new ArrayList<>();
         for (int i = 0; i < enemies; i++) {
-            foes.add(BattleFixture.monster());
+            // Note: a 1,000,000-HP, 0-DEF dummy, and no crits. Both are load-bearing for the ratio this class asserts:
+            //   * a REAL monster can be over-killed, and the engine accumulates what the victim TOOK while the observer
+            //     reports what the instance was WORTH - two different numbers on the killing blow;
+            //   * a crit multiplies one instance of the cast but not the true rider (true damage never crits), so the
+            //     sum of the instances stops being the number the rider was computed from.
+            // Measured with both in play: 0.308 and 0.324 instead of 0.36. With a dummy and `alwaysRoll`, the sum and the
+            // engine's total are the same number by construction, so the case is also fully deterministic.
+            foes.add(BattleFixture.dummy());
         }
         Battle battle = new Battle(
                 List.of(CharacterFactory.create(PHAINON, 80, false, null, null, eidolonRank),

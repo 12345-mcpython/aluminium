@@ -1,0 +1,452 @@
+{
+  "resources": [
+    {
+      "id": "充能",
+      "max": 4,
+      "source": "1015 Archer 终结技 无限剑制 (101503): 「对指定敌方单体造成等同于Archer 1000%攻击力的量子属性伤害，并获得 2 点充能，最多可拥有 4 点充能。」",
+      "note": "上限 **4** 与每次 **2** 都来自同一行（`skills.json` 1015 槽 3 的 Lv10 = `[10, 2, 4]` ⇒ #2 = 2、#3 = 4 ✓）。⚠ 上限是**声明**（`GAIN_RESOURCE` 的钳位就在这里 ✓），不在规则里再写一次 ✗；⚠ 初始值文档没说 ⇒ 默认 **0** ✓，而「进入战斗时获得 1 点」是**行迹** 1015102 的一条规则 ✓（两条相加，不是把 initial 改成 1 ✗）。"
+    },
+    {
+      "id": "回路次数",
+      "max": 5,
+      "source": "1015 Archer 战技 伪•螺旋剑 (101502): 「主动施放 5 次战技后…退出【回路连接】状态」（`skills.json` 1015 槽 2 各等级的 #5 = 5）",
+      "note": "这是**本项目的计数器**，不是游戏资源 ✓（与 1408 的「额外回合计数」同一手法 ✓）：原文要数「在【回路连接】里施放了几次战技」✓，而引擎没有「某个状态存在期间的事件计数」✗。上限 **5** 直接取 #5 ✓；最后一发施放**照样结算**（伤害与加成都在），退出发生在**这一发之后** ✓（见 `loop_ends_after_five_casts` 的 note ✓）。"
+    }
+  ],
+  "rules": [
+    {
+      "on": "BATTLE_START",
+      "id": "level_convention",
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "COMMON",
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "SKILL",
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ULTRA",
+          "amount": 9
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "TALENT",
+          "amount": 9
+        }
+      ],
+      "source": "1015 Archer 技能表的等级口径：文档（`E:\\code\\blog\\hsr\\1015_Archer.md`）引用 **Lv10** 行 —— 战技 **360%** = 第 10 行 `[3.6, 1, 2, 1, 5]` 的 #1 ✓、终结技 **1000%/2/4** = 第 10 行 `[10, 2, 4]` ✓、天赋 **200%** = 第 10 行 `[2]` ✓（三处都逐位对上 ✓）",
+      "note": "口径与全库一致 ✓：`RAISE_SKILL_LEVEL` 四个槽各 **+9** ⇒ 有效等级 10 ✓（读者：1206 的同名规则 ✓）。⚠ **普攻**只有 **9 行** ⇒ +9 被它自己的表夹到第 9 行（**130%**）✓，而文档正文写的是「100%」✗ —— 那个数**不是第 10 行**（它在 9 行表里根本不存在）✓，与 1206 的普攻同形 ✓（文档的普攻数字来自 TextMap 的展示值 ✓，本项目的口径是**读行** ✓）。⚠ 星魂 3/5 的 +2 在各自规则里 ✓，不在这里重复 ✗。"
+    },
+    {
+      "on": "CAST_SETUP",
+      "id": "skill_enters_the_loop",
+      "when": [
+        "actor == self",
+        "from_skill SKILL"
+      ],
+      "do": [
+        {
+          "op": "APPLY_BUFF",
+          "buff": "回路连接",
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "1015 Archer 战技 伪•螺旋剑 (101502): 「**进入【回路连接】状态**。对指定敌方单体造成等同于Archer 360%攻击力的量子属性伤害。」",
+      "note": "⭐ **永久状态** ✓（「持续至退出【回路连接】状态」不是时长 ✓，而是**显式退出** ✓ ⇒ 由四条退出规则摘掉 ✓：次数用尽 / 战技点不足 / 波次清空 / 手动【结束】）。⚠ 事件用 **`CAST_SETUP`** ✓ 而不是 `SKILL_CAST`：后者**不带施放类别** ✗（装载期原话：「SKILL_CAST carries no cast category」✓ ⇒ `from_skill SKILL` 在它上面**永远不会成立** ✓），而 `CAST_SETUP` 既带槽位又在**伤害之前** ✓ —— 后者是承重的 ✓（见下一条 ✓）。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "loop_raises_skill_damage",
+      "when": [
+        "actor == self",
+        "from_skill SKILL",
+        "self_stacks:回路层数 >= 1"
+      ],
+      "do": [
+        {
+          "op": "BOOST_DAMAGE",
+          "percent": 1.0,
+          "scale": "self_stacks:回路层数"
+        }
+      ],
+      "source": "1015 Archer 战技 伪•螺旋剑 (101502): 「【回路连接】状态下施放战技后…使Archer**战技造成的伤害提高 100%**，该效果可以叠加 **2** 层」",
+      "note": "⭐⭐ **为什么不是 `damage_type: SKILL` 的 `MODIFY_ATTR`** ✗（**实测过，写不出来** ✓）：引擎把**技能自己**结算的那一发记成 `DamageType.NORMAL` ✓（`SkillExecutor.damageTypeOf` 只把欢愉改成 ELATION ✓，其余一律 NORMAL ✓）⇒ `damage_type: SKILL` 的修饰**永远不会命中**它 ✗（一条**永远不生效**的规则 = 一个没有症状的错数 ✓）。引擎里「这一发是战技伤害」的正确拼法是**事件上的条件** `from_skill SKILL` ✓（读者：1215 寒鸦的天赋三条 ✓）。⇒ 这条挂在 **`DEALING_DAMAGE`** 上 ✓，用 **`BOOST_DAMAGE`**（**只改正在结算的这一发** ✓，无时长、无 buff ✓）；层数从 `self_stacks:回路层数` 读 ✓（`scale` ＋ `percent` = 每层增量 × 层数 ✓，与 1206 的「每层 +2.5%」同一手法 ✓）。⚠ **进状态那一发不吃** ✓：层数在**上一发之后**才 +1 ⇒ 第 1 发读到 0 层 ✓（门 `>= 1` ✓）、第 2 发 1 层 ✓、第 3 发起 2 层封顶 ✓。"
+    },
+    {
+      "on": "ALLY_ATTACK",
+      "id": "loop_counts_its_layers",
+      "when": [
+        "actor == self",
+        "from_skill SKILL",
+        "self has_state 回路连接"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "回路层数",
+          "amount": 1,
+          "max_stacks": 2,
+          "permanent": true,
+          "target": "self"
+        },
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "回路次数",
+          "amount": 1,
+          "target": "self"
+        }
+      ],
+      "source": "1015 Archer 战技 伪•螺旋剑 (101502): 「【回路连接】状态下施放战技后…使Archer战技造成的伤害提高 **100%**，该效果可以叠加 **2** 层，持续至退出【回路连接】状态。主动施放 **5** 次战技后…退出」（`skills.json` 槽 2 的 Lv10 = `[3.6, 1, 2, 1, 5]` ⇒ #2 = 1.0 每层、#3 = 2 层、#5 = 5 次 ✓）",
+      "note": "⭐⭐ **这一条同时记两件事**：**层数**（§「可叠加 2 层」✓）与**次数**（§「主动施放 5 次战技后退出」✓）—— 两层含义都在**同一发施放之后**成立 ✓ ⇒ 同一个事件里两个效果 ✓（`ADD_STACK` ＋ `GAIN_RESOURCE` ✓）。⚠ **事件选 `ALLY_ATTACK`（这一发打完之后）** ✓，而不是 `CAST_SETUP` ✗：加成与退出都必须**晚于**这一发的结算 ✓ （挂在施放前的话，第 5 发会在自己结算之前被摘掉状态与层数 ✗ —— 最后一发少 200% ✓）。⚠ `max_stacks: 2` = #3 ✓（星魂 6 把它抬到 3 ⇒ `eidolon6_raises_the_stack_cap` ✓ **改的就是这一条的这个数** ✓）。⚠ 层数**具名**「回路层数」✓ 是必须的：`self_stacks:` 与 `BOOST_DAMAGE` 的 `scale` 都按名字读 ✓。⚠ 它**不叫**「回路连接」✗ —— 那个名字是**状态** ✓（`has_state` 与 `REMOVE_STATE` 都读它 ✓），同名会让「层数在不在」与「状态在不在」变成同一个问题 ✓。"
+    },
+    {
+      "on": "ALLY_ATTACK",
+      "id": "loop_ends_after_five_casts",
+      "when": [
+        "actor == self",
+        "self_resource:回路次数 >= 5"
+      ],
+      "do": [
+        {
+          "op": "REMOVE_STATE",
+          "buff": "回路连接",
+          "target": "self"
+        },
+        {
+          "op": "SPEND_RESOURCE",
+          "resource": "回路次数",
+          "spendAll": true,
+          "target": "self"
+        },
+        {
+          "op": "REMOVE_STACK",
+          "buff": "回路层数",
+          "amount": 9,
+          "target": "self"
+        }
+      ],
+      "source": "1015 Archer 战技 伪•螺旋剑 (101502): 「主动施放 5 次战技后…退出【回路连接】状态。」",
+      "note": "「**5 次**后退出」= 第 5 发**照常结算**（伤害、加成、层数、计数都发生在它身上 ✓），退出发生在**这一发之后** ✓ ⇒ 门是 `>= 5` 且排在计数规则**之后** ✓（**顺序即语义** ✓）。⚠ 退出时**三样一起清** ✓：状态（`REMOVE_STATE` ✓，它连带把挂在状态名下的东西摘掉 ✓）、次数计数器（`spendAll` ✓ —— 不清的话下一次进入会带着旧次数 ✓）与**层数**（`REMOVE_STACK` ✓ —— 不清的话下一轮第一发就带 2 层 ✗）。"
+    },
+    {
+      "on": "ALLY_ATTACK",
+      "id": "loop_ends_when_skill_points_run_out",
+      "when": [
+        "actor == self",
+        "from_skill SKILL",
+        "self has_state 回路连接",
+        "skill_point <= 0"
+      ],
+      "do": [
+        {
+          "op": "REMOVE_STATE",
+          "buff": "回路连接",
+          "target": "self"
+        },
+        {
+          "op": "SPEND_RESOURCE",
+          "resource": "回路次数",
+          "spendAll": true,
+          "target": "self"
+        },
+        {
+          "op": "REMOVE_STACK",
+          "buff": "回路层数",
+          "amount": 9,
+          "target": "self"
+        }
+      ],
+      "source": "1015 Archer 战技 伪•螺旋剑 (101502): 「…或**战技点不足以再次施放战技**则退出【回路连接】状态。」（战技的消耗是 1 点 ⇒ 不足 = `skill_point <= 0` ✓）",
+      "note": "⭐⭐ 这一句此前**根本写不出来** ✓：条件词表里有 `skill_point_max`（**上限** ✓）却**没有** `skill_point`（**当前值**）✗ ⇒ 本批次补上这个变量 ✓（`TriggerConditionParser.NUMERIC_VARIABLES` ＋ `TriggerTable` 的读数 ✓，判据 `SkillPointConditionTest` ✓）。⚠ 门槛是 **`<= 0`** 而不是 `<= 1`：战技消耗 **1** 点 ✓ ⇒ 「不足以再次施放」= 手里 0 点 ✓（手里 1 点**还够** ✓ —— 写成 `<= 1` 会提前一发退出 ✗）。⚠ 挂 `ALLY_ATTACK` ✓：这一发**已经结算** ✓，时机与「不足以**再次**施放」一致 ✓。"
+    },
+    {
+      "on": "WAVE_START",
+      "id": "loop_ends_when_the_wave_clears",
+      "when": [
+        "self has_state 回路连接"
+      ],
+      "do": [
+        {
+          "op": "REMOVE_STATE",
+          "buff": "回路连接",
+          "target": "self"
+        },
+        {
+          "op": "SPEND_RESOURCE",
+          "resource": "回路次数",
+          "spendAll": true,
+          "target": "self"
+        },
+        {
+          "op": "REMOVE_STACK",
+          "buff": "回路层数",
+          "amount": 9,
+          "target": "self"
+        }
+      ],
+      "source": "1015 Archer 战技 伪•螺旋剑 (101502): 「**每个波次中的所有敌方目标被消灭后**会退出【回路连接】状态。」",
+      "note": "⚠ **口径说明（不是近似）** ✓：引擎没有「本波敌人全灭」这个事件 ✗，而「下一个波次开始」`WAVE_START` ✓ 是同一件事的**可观测面** ✓（清完上一波才会有下一波 ✓ —— 最后一波清完则**战斗结束**，此时状态不再有任何读者 ✓）。⚠ 若日后有「波次清空」事件，改的就是这一条 ✓。"
+    },
+    {
+      "on": "CAST_SETUP",
+      "id": "manual_exit_ends_the_loop",
+      "when": [
+        "actor == self",
+        "from_skill_id == 9"
+      ],
+      "do": [
+        {
+          "op": "REMOVE_STATE",
+          "buff": "回路连接",
+          "target": "self"
+        },
+        {
+          "op": "SPEND_RESOURCE",
+          "resource": "回路次数",
+          "spendAll": true,
+          "target": "self"
+        },
+        {
+          "op": "REMOVE_STACK",
+          "buff": "回路层数",
+          "amount": 9,
+          "target": "self"
+        }
+      ],
+      "source": "1015 Archer 强化战技【结束】(101509, Enhance): 「**退出【回路连接】状态**，并结束回合。」",
+      "note": "槽 9 是**手动退出按钮** ✓（`skills.json` 1015 的槽 9 = `101509` ✓，`skill_effect: Enhance` ✓）；它能被施放的前提就是状态在 ✓ ⇒ 这一条只做「摘状态 ＋ 清计数 ＋ 清层数」✓。⚠ 事件用 `CAST_SETUP` ＋ `from_skill_id` ✓（槽 9 **没有 `SkillType`** ⇒ 不能用 `from_skill` ✓，而 `CAST_SETUP` 带槽位号 ✓）。⚠ **「并结束回合」不写** ✗：施放【结束】本身就是她的回合动作 ✓ ⇒ 回合在施放之后自然结束 ✓，再写一条是**第二套判据** ✗（与 1206「大招后立即行动」不同 —— 那一条的结束**不是**施放的自然结果 ✓）。"
+    },
+    {
+      "on": "ULT_CAST",
+      "id": "ult_grants_charge",
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "充能",
+          "amount": 2,
+          "target": "self"
+        }
+      ],
+      "source": "1015 Archer 终结技 无限剑制 (101503): 「…并获得 **2** 点充能，最多可拥有 **4** 点充能。」（Lv10 行 `[10, 2, 4]` 的 #2 = 2 ✓、#3 = 4 ✓）",
+      "note": "「获得 **2** 点」⇒ `GAIN_RESOURCE 2` ✓；上限 **4** 由**声明**承担 ✓（`resources` 里那一块 ✓）⇒ 规则里**不写**上限 ✗（写了就是两个上限 ✓）。⚠ 终结技本体伤害**不写规则** ✓：1000% 由技能数据按 `param_list` 结算 ✓。"
+    },
+    {
+      "on": "ALLY_ATTACK",
+      "id": "talent_follow_up_on_a_teammates_attack",
+      "when": [
+        "actor is_other_ally",
+        "self_resource:充能 >= 1"
+      ],
+      "do": [
+        {
+          "op": "SPEND_RESOURCE",
+          "resource": "充能",
+          "amount": 1,
+          "target": "self"
+        },
+        {
+          "op": "DAMAGE",
+          "scale": "self_attr:ATTACK",
+          "percent_from_skill_param": "TALENT:0",
+          "element": "Quantum",
+          "target": "target_else_random_enemy",
+          "as_attack": true
+        },
+        {
+          "op": "GAIN_SKILL_POINT",
+          "amount": 1
+        }
+      ],
+      "source": "1015 Archer 天赋 心眼（真）(101504): 「当Archer的队友对敌方目标**施放攻击后**，Archer**消耗1点充能**，立即对主目标发动【追加攻击】，造成等同于Archer **200%** 攻击力的量子属性伤害，并**恢复1个战技点**。若本次【追加攻击】施放前目标被消灭则对敌方**随机单体**发动【追加攻击】。」（Lv10 行 `[2]` ✓）",
+      "note": "四件事各一件：① **门** `actor is_other_ally` ✓ = 「**队友**」✓（我方且不是自己 ✓ —— 少了它，她自己那一击也会触发 ✗）；② **代价** `SPEND_RESOURCE 充能 1` ✓ + 前置 `self_resource:充能 >= 1` ✓（没有充能时那条**不触发**，而不是把充能扣成 0 ✗）；③ **追加攻击** = `DAMAGE` ＋ **`as_attack: true`** ✓（`EffectSpec.as_attack` 的注释就是「a follow-up attack: a real hit」✓，会让这一发参与攻击级事件与被击回能 ✓；⚠ 这是该字段的**第一个内容读者** ✓）；④ 目标 `target_else_random_enemy` ✓ = 「若施放前目标被消灭则对**随机单体**」✓。⚠ 倍率**读天赋那一行** ✓（`TALENT:0`）：星魂 5 给天赋 +2 级 ⇒ 第 12 行 = **2.2** ✓（写死 2.0 会少算 ✓，症状沉默 ✓）。⚠ 「恢复 **1** 个战技点」⇒ `GAIN_SKILL_POINT 1` ✓（战技点由战斗持有 ✓）。⚠ 我方**忆灵的攻击也算「队友」** ✓（`battle.allies` 含忆灵 ✓，与「队友提供的」那一族同一口径 ✓）—— 这是**选择**，登记在此 ✓。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "technique_damage_and_charge",
+      "when": [
+        "self has_state 秘技"
+      ],
+      "do": [
+        {
+          "op": "DAMAGE",
+          "scale": "self_attr:ATTACK",
+          "percent_from_skill_param": "TECHNIQUE:0",
+          "element": "Quantum",
+          "target": "all_enemies"
+        },
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "充能",
+          "amount": 1,
+          "target": "self"
+        }
+      ],
+      "source": "1015 Archer 秘技 千里眼 (101507): 「立即攻击敌人，进入战斗后对**敌方全体**造成等同于Archer **200%** 攻击力的量子属性伤害，并获得 **1** 点充能。」（`skills.json` 槽 7 = `[2, 1]` ✓）",
+      "note": "门 `self has_state 秘技` ✓ 是全库的秘技约定 ✓（`applyTechniqueStates` 在 `BATTLE_START` 之前把「用过秘技」变成同名状态 ✓）。⚠ 倍率读 `TECHNIQUE:0` ✓（槽 7 只有一行 ✓，与 1002 同一写法 ✓）；「并获得 1 点充能」✓ 与伤害**同一条规则** ✓（同一个「并」字引出 ✓）。⚠ **地图层**那半（「立即攻击敌人」）不在战斗引擎里 ✓ —— 与其它秘技同一取舍 ✓。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "trace_skill_point_cap",
+      "do": [
+        {
+          "op": "RAISE_SKILL_POINT_CAP",
+          "amount": 2,
+          "target": "self"
+        }
+      ],
+      "source": "1015 Archer 行迹 投影魔术 (1015101): 「Archer**在场时**，战技点上限额外增加 **2** 点。」",
+      "note": "用现成的 `RAISE_SKILL_POINT_CAP` ✓（1306 花火是它的读者 ✓）：它加的是**战斗的**战技点上限 ✓，不是某个单位的属性 ✓。「在场时」在 `BATTLE_START` 求值一次即成立 ✓（本引擎没有「离场」这个状态 ✓，与 1306 同一取舍 ✓）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "trace_charge_at_battle_start",
+      "do": [
+        {
+          "op": "GAIN_RESOURCE",
+          "resource": "充能",
+          "amount": 1,
+          "target": "self"
+        }
+      ],
+      "source": "1015 Archer 行迹 正义伙伴 (1015102): 「Archer**进入战斗时获得 1 点充能**。」",
+      "note": "`BATTLE_START` ＋ `GAIN_RESOURCE 1` ✓。⚠ 这句**不是**「初始 1 点」✗ —— 声明里的 `initial` 保持 **0** ✓：两者在**上限钳位**与**顺序**上不同（先给 1 点再被上限钳位 ✓，而初始值不经过钳位 ✓）。"
+    },
+    {
+      "on": "SKILL_POINT_GAINED",
+      "id": "trace_crit_damage_at_high_skill_points",
+      "when": [
+        "skill_point >= 4"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "CRIT_ATTACK",
+          "percent": 1.2,
+          "turns": 1,
+          "target": "self"
+        }
+      ],
+      "source": "1015 Archer 行迹 守护者 (1015103): 「**我方获得战技点后**，若**战技点大于等于 4 点**，Archer的暴击伤害提高 **120%**，持续 **1** 回合。」（`skill_traces.json` 1015103 的 param `[1.2, 1, 4]` ✓）",
+      "note": "⭐⭐ 条件里的 `skill_point >= 4` 是本批次**新补的引擎变量** ✓（此前只有 `skill_point_max` = **上限** ✗ —— 那句「大于等于 **4** 点」说的是**当前持有** ✓，拿上限冒充是错的 ✓）。⚠ 事件 `SKILL_POINT_GAINED` ✓ = 「我方获得战技点后」✓；本句的「我方」= 任一我方 ✓ ⇒ **不加 `actor` 门** ✓（与「Archer 在场即生效」一致 ✓）。⚠ 数值 **1.2 / 1 回合**读自 param ✓（`[1.2, 1, 4]` ⇒ #1 = 1.2、#2 = 1 ✓，#3 = 4 进了条件 ✓）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon3_skill_and_common_levels",
+      "min_eidolon": 3,
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "SKILL",
+          "amount": 2
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "COMMON",
+          "amount": 1
+        }
+      ],
+      "source": "1015 Archer 星魂 3 难为凡庸的意气: 「战技等级+2，最多不超过15级；普攻等级+1，最多不超过10级。」（`eidolons.json` 1015 E3 的 `skill_add_level` = `{'101502': 2, '101501': 1}` ✓）",
+      "note": "`101502` → 槽 2 = `SKILL` ✓、`101501` → 槽 1 = `COMMON` ✓（由 `skills.json` 的 `skill_id` 确认 ✓）。⚠ 上限**不写** ✓：引擎把等级夹在该技能表自己的行数上 ✓（普攻 9 行 ⇒ +9+1 仍夹在 9 ✓）。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "eidolon4_raises_ultimate_damage",
+      "min_eidolon": 4,
+      "when": [
+        "actor == self",
+        "from_skill ULTRA"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ALL_DAMAGE_TYPE_BOOST",
+          "percent": 0.5,
+          "instance": true,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "1015 Archer 星魂 4 难称英雄的一生: 「**造成的终结技伤害提高 50%**。」（`eidolons.json` 1015 E4 的 param = `[1.5]` ⇒ #1 = 0.5 是**增量** ✓）",
+      "note": "⭐⭐ **挂 `DEALING_DAMAGE` ＋ `from_skill ULTRA`** ✓（**实测改正** ✓）：原先写成 `BATTLE_START` 上的 `damage_type: ULTRA` ＋ `instance: true` ✗ —— 那个组合**不是实例级作用域** ✓：在战斗开始时挂上去的修饰是**普通修饰** ✓，于是这 +50% 落到了**所有**伤害上 ✓（实测：队友的追加攻击（ADDITIONAL）增伤区从 1.224 变成 **1.724** ✗）。引擎里实例级修饰的现有写法是**挂在伤害事件上** ✓（读者：1220／1309／1406 的追加攻击暴击加成 ✓）。⚠ 另外 `damage_type: ULTRA` 本身就是**错的作用域** ✗：技能自己那一发被引擎记成 **NORMAL** ✓（只有欢愉例外 ✓）⇒ 那个类型**永远不会命中终结技** ✓。正确的说法是事件条件 `from_skill ULTRA` ✓（与 1215 天赋三条同一手法 ✓）。⚠ 判据 `ArcherEidolonLevelsTest.theEidolonFourRaisesOnlyTheUltimatesBoostZone` ✓（终结技那一发 +0.5、而**队友的追加攻击不受影响** ✓）。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon5_ultra_and_talent_levels",
+      "min_eidolon": 5,
+      "do": [
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "ULTRA",
+          "amount": 2
+        },
+        {
+          "op": "RAISE_SKILL_LEVEL",
+          "skill": "TALENT",
+          "amount": 2
+        }
+      ],
+      "source": "1015 Archer 星魂 5 无铭孤影的守望: 「终结技等级+2，最多不超过15级；天赋等级+2，最多不超过15级。」（`eidolons.json` 1015 E5 的 `skill_add_level` = `{'101503': 2, '101504': 2}` ✓）",
+      "note": "`101503` → `ULTRA` ✓、`101504` → `TALENT` ✓。⚠ **连带效应**：天赋升到 12 行之后 `talent_follow_up_on_a_teammates_attack` 读的 `TALENT:0` = **2.2** ✓（它读行 ✓ 所以自动跟随 ✓，判据 `ArcherEidolonLevelsTest` 钉两端 ✓）。"
+    },
+    {
+      "on": "TURN_START",
+      "id": "eidolon6_skill_point_each_turn",
+      "min_eidolon": 6,
+      "when": [
+        "actor == self"
+      ],
+      "do": [
+        {
+          "op": "GAIN_SKILL_POINT",
+          "amount": 1
+        }
+      ],
+      "source": "1015 Archer 星魂 6 无尽徘徊的巡礼: 「**回合开始时为我方恢复 1 个战技点**。」",
+      "note": "门 `actor == self` ✓ = 「**她自己的**回合开始」✓（`TURN_START` 对每个单位的回合都发 ✓，不加门就是「任何人回合开始」✗）。⚠ 「为我方恢复」= 加**战技点**（全队共享 ✓）⇒ `GAIN_SKILL_POINT` ✓，不是资源 ✓。"
+    },
+    {
+      "on": "BATTLE_START",
+      "id": "eidolon6_raises_the_stack_cap",
+      "min_eidolon": 6,
+      "do": [
+        {
+          "op": "MODIFY_RULE",
+          "rule": "loop_counts_its_layers",
+          "effect_max_stacks": 1
+        }
+      ],
+      "source": "1015 Archer 星魂 6 无尽徘徊的巡礼: 「自身战技提供的伤害提高效果可以叠加的上限层数**提高 1 层**。」",
+      "note": "⚠ 这里改的是**另一条规则的一个数** ⇒ 用现成的 `MODIFY_RULE` ＋ `effect_max_stacks` ✓（与 `effect_percent` / `effect_turns` 同一族 ✓，`CanHit.ruleEffectMaxStacksBonus` 是它的读者 ✓）。⚠ 目标规则是 **`loop_counts_its_layers`** ✓（层数是在那里 `ADD_STACK` 的 ✓），**不是** `loop_raises_skill_damage` ✗（那条只是**读**层数 ✓）。⚠ **不改**基础值本身 ✗：2 是文档的数 ✓，星魂只在这个战斗里 +1 ✓。"
+    },
+    {
+      "on": "DEALING_DAMAGE",
+      "id": "eidolon6_skill_damage_ignores_defence",
+      "min_eidolon": 6,
+      "when": [
+        "actor == self",
+        "from_skill SKILL"
+      ],
+      "do": [
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "DEFENCE_IGNORE",
+          "percent": 0.2,
+          "instance": true,
+          "permanent": true,
+          "target": "self"
+        }
+      ],
+      "source": "1015 Archer 星魂 6 无尽徘徊的巡礼: 「造成的**战技伤害无视 20%** 的防御力。」（`eidolons.json` 1015 E6 的 param = `[1, 0.2]` ⇒ #2 = 0.2 ✓）",
+      "note": "⭐⭐ 与星魂 4 同一条教训 ✓（**实测改正** ✓）：原先写在 `BATTLE_START` ＋ `damage_type: SKILL` ＋ `instance: true` ✗ ⇒ 既**不是**实例级 ✓、那个类型又**永远不会命中**技能自己那一发（它是 NORMAL ✓）⇒ 实测防御区一动不动 ✓（`1.0 -> 1.0` ✓）。现在挂 **`DEALING_DAMAGE` ＋ `from_skill SKILL`** ✓ ＋ `instance: true` ✓：**只**给这一发穿防 ✓（§3.7c 修好的那个实例级分支正是它的读者 ✓）。⚠ 判据 `ArcherEidolonLevelsTest.theEidolonSixHasAllThreeHalves` 的第三段 ✓ —— 量的是**防御区因子** ✓，而那个因子要**有防御力**才动 ✓（`BattleFixture.dummy()` 的 DEF 是 **0** ⇒ 换真怪 ✓）。"
+    }
+  ]
+}
