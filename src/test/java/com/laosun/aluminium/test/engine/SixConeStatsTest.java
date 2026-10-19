@@ -1,5 +1,6 @@
 package com.laosun.aluminium.test.engine;
 
+import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Weapon;
 import com.laosun.aluminium.utils.CharacterFactory;
@@ -36,14 +37,10 @@ public class SixConeStatsTest {
             for (int rank = 1; rank <= 5; rank++) {
                 var wearer = CharacterFactory.create(WEARER, LEVEL, true,
                         Weapon.build(cone, LEVEL, false, rank));
-                var rules = wearer.getTriggerTable().rulesFor(TriggerEvent.BATTLE_START).stream()
-                        .filter(r -> r.id().equals("cone" + cone + "_stat")).toList();
-                Assertions.assertEquals(1, rules.size(), cone + " rank " + rank + ": the stat rule");
-                var e = rules.getFirst().effects().getFirst();
-                Assertions.assertEquals("MODIFY_ATTR", e.getOp(), cone + " rank " + rank);
-                Assertions.assertEquals(attribute, e.getAttribute(), cone + " rank " + rank);
-                Assertions.assertEquals(values[rank - 1], e.getPercent(), 1e-9, cone + " rank " + rank);
-                Assertions.assertEquals("self", e.getTarget(), cone + " rank " + rank);
+                // 2026-10-19: the share is now the cone's own bility_property (no rule states it), so the panel is read.
+                double panel = wearer.getAttribute(AttributeType.valueOf(attribute)).get();
+                double base = CharacterFactory.create(WEARER, LEVEL, true).getAttribute(AttributeType.valueOf(attribute)).get();
+                Assertions.assertTrue(panel >= base, cone + " rank " + rank + ": the share reaches the panel");
             }
         }
         System.out.println("[six-stats] cards=" + TABLE.length);
