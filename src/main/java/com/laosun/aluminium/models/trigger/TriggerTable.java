@@ -1773,6 +1773,14 @@ public class TriggerTable {
                 // battle rather than the owner, and a context with no battle answers NaN -- "cannot read it, so the
                 // condition fails", the convention every other variable follows.
                 case "skill_point_max" -> ctx.battle() == null ? Double.NaN : ctx.battle().getSkillPointMax();
+                // "if the Skill Points are 4 or more" / "or when Skill Points are insufficient to cast the Skill again" --
+                // the CURRENT count, which is what those sentences ask about. The cap above is a different number and
+                // substituting it would answer a question nobody asked (measured: no shipped rule read skill points in a
+                // condition before this, and the cap is what one light cone's own sentence states). Reader: 1015 Archer
+                // (Archer)'s trace 1015103, and his Skill's exit clause ("战技点不足以再次施放战技则退出").
+                // Note: Same convention as everything above - no battle, so the question cannot be answered, and NaN is
+                // the answer that makes the condition false instead of silently "0 points".
+                case "skill_point" -> ctx.battle() == null ? Double.NaN : ctx.battle().getSkillPoints();
                 default -> Double.NaN;
             };
         }

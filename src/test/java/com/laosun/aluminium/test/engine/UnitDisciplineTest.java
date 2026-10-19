@@ -44,6 +44,9 @@ public class UnitDisciplineTest {
             "damage_skill_key",
             "target_hp_percent_before", "enemy_count", "ally_count",
             "skill_point_max",   // the team pool's cap, for light cone 23046 (a count, not a fraction)
+            // The CURRENT count of that same pool, added with 1015 Archer: his trace asks 「若战技点大于等于 4 点」 and his
+            // Skill leaves the loop when 「战技点不足以再次施放战技」 - both about the count, neither about the cap.
+            "skill_point",
             // The owner's Eidolon rank. A COUNT of ranks (1..6), never a fraction: "eidolon >= 4" means four ranks, and
             // the rule-level `min_eidolon` field beside it uses the same unit. Added when 1503's Eidolon 4 doubling
             // needed the rank inside the clause's own conditions - a rule-level field alone left the two rules

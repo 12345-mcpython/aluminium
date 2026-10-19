@@ -1992,6 +1992,12 @@ final class TriggerConditionParser {
                     // the cap is not a field of the unit -- it belongs to the battle's skill point policy -- so the value
                     // comes from the battle, and a context without one answers NaN like every other unreadable variable.
                     "skill_point_max",
+                    // "if the Skill Points are 4 or more" (reader: 1015 Archer's trace 1015103) and "or when the Skill Points
+                    // are insufficient to cast the Skill again" (his Skill's exit clause): the CURRENT count, which is a
+                    // different number from the cap above. Measured before adding it: zero shipped conditions mentioned skill
+                    // points at all, and the cap cannot stand in for the count (a pool of 4 out of 7 and a pool of 4 out of 4
+                    // both satisfy "4 or more", while their caps are 7 and 4).
+                    "skill_point",
                     // The owner's Eidolon rank, as a condition. Note: `min_eidolon` already gates a whole RULE on it, and that
                     // is enough when the clause IS the Eidolon's ("【深度学习】时 ... 抗性穿透提高 20%"). It is not enough when an
                     // Eidolon clause MODIFIES an effect the base kit also has at the same event: the two rules then carry
