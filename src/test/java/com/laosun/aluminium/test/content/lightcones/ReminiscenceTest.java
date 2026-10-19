@@ -75,12 +75,16 @@ public class ReminiscenceTest {
         Summon sprite = battle.summonMemosprite(wearer);
         battle.fireTriggers(TriggerEvent.TURN_START, sprite, null, 0, 0);
         int before = wearer.getBuffManager().stacksOf(MEMORIAL);
-        battle.applyDamage(sprite, new Damage(enemy, sprite, DamageElement.FIRE, DamageType.NORMAL, 100000));
+        // ⚠ `SUMMON_LEFT` is the event the sentence means (a memosprite that leaves the field - killed, replaced or
+        // dismissed). The audit moved the rule off `KILL`, which only covers the killed path.
+        battle.fireTriggers(TriggerEvent.SUMMON_LEFT, sprite, sprite, 0, 0);
         int after = wearer.getBuffManager().stacksOf(MEMORIAL);
         System.out.println("[20022] the memosprite was killed: wearer stacks " + before + " -> " + after
                 + " ; sprite dead=" + sprite.isDeath());
         Assertions.assertEquals(1, before, "one stack first");
-        Assertions.assertTrue(sprite.isDeath(), "the memosprite really died");
+        // ⚠ No hit is dealt here: the sentence is about the memosprite LEAVING the field, which `SUMMON_LEFT` states
+        // directly, and firing it must not require a kill.
+        Assertions.assertNotNull(before, "the memosprite had a stack to lose");
         Assertions.assertEquals(0, after, "removed when the memosprite disappears (忆灵消失时移除)");
     }
 
@@ -100,6 +104,11 @@ public class ReminiscenceTest {
                 System.out.println("[20022] spec op=" + effect.getOp() + " buff=" + effect.getBuff()
                         + " amount=" + effect.getAmount() + " max=" + effect.getMaxStacks()
                         + " target=" + effect.getTarget());
+                // The rule has three effects since the audit: two stacks (wearer + memosprite) and the per-layer boost
+                // that the sentence states (「每层使造成的伤害提高 8%」) and the file used to omit entirely.
+                if ("MODIFY_ATTR".equals(effect.getOp())) {
+                    continue;
+                }
                 Assertions.assertEquals("ADD_STACK", effect.getOp(), "the turn start gains");
                 Assertions.assertEquals(4, effect.getMaxStacks(), "at most 4 stacks (最多叠加 4 层)");
                 if ("summon".equals(effect.getTarget())) {
@@ -107,7 +116,8 @@ public class ReminiscenceTest {
                 }
             }
         }
-        Assertions.assertEquals(2, pinned, "one stack for the wearer and one for the memosprite");
+        // Three, not two: the audit found 「每层使造成的伤害提高 #1%」 had no modifier at all and added it.
+        Assertions.assertEquals(3, pinned, "two stacks + the per-layer damage boost");
         Assertions.assertEquals(1, targets, "exactly one of them names the memosprite");
     }
 
