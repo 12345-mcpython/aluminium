@@ -14,19 +14,23 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 /**
- * 1408："施放终结技时，暴击伤害提高 50%，持续 3 回合".
+ * 1408: 「施放终结技时，暴击伤害提高 50%，持续 3 回合」 - <b>Eidolon 1</b>'s second half, not a trace.
  *
- * <p>TWO-WAY: the same character measured before and after her ultimate, so the only thing that differs is the cast.
+ * <p>⚠ <b>CORRECTED (2026-10-19).</b> This class was written as a TRACE case and asserted the +50% at <b>E0</b>,
+ * which is exactly what the shipped rule did: the clause had been attributed to 行迹 and therefore carried no Eidolon gate, so
+ * a 0-Eidolon Phainon collected it for free. The audit read it back to `eidolons.json` (rank 140801, param #2 = 0.5 / #3 = 3)
+ * and put `min_eidolon: 1` on that effect. What this file keeps is the CONTROL half - at E0 the same cast must change nothing -
+ * and the positive half now lives in {@code PhainonEidolonOneTest}, at both ranks, which is the shape this clause needs.
  */
 public class UltCritDamageTraceTest {
     private static final double EPS = 1e-9;
     private static final int OWNER = 1408;
 
     /**
-     * Casting the ultimate raises her crit damage by exactly 50%.
+     * At E0 the ultimate raises nothing: the clause is Eidolon 1's.
      */
     @Test
-    public void theUltimateRaisesCritDamage() {
+    public void withoutEidolonOneTheUltimateRaisesNothing() {
         Character owner = CharacterFactory.create(OWNER, 80, false, null, null, 0);
         Battle battle = new Battle(List.of(owner),
                 List.of(BattleFixture.monster()), BattleFixture.seeded());
@@ -41,8 +45,8 @@ public class UltCritDamageTraceTest {
         SkillExecutor.execute(battle, ult, owner, List.of(owner));
         battle.processRequests();
 
-        Assertions.assertEquals(before + 0.50, owner.getAttribute(AttributeType.CRIT_ATTACK).get(), EPS,
-                "「施放终结技时，暴击伤害提高 50%」 (when casting the Ultimate, CRIT DMG is raised by 50%) (before=" + before + ")");
+        Assertions.assertEquals(before, owner.getAttribute(AttributeType.CRIT_ATTACK).get(), EPS,
+                "「施放终结技时，暴击伤害提高 50%」 是星魂 1 的后半句 ⇒ 0 星魂不该白拿 (before=" + before + ")");
     }
 
     /**

@@ -25,14 +25,20 @@ public class LethalHitTest {
     private static final String STATE = "变身";
 
     /**
-     * 1408: transformed, a lethal blow leaves her standing at a fifth of her (raised) Max HP.
+     * 1408: transformed, a lethal blow leaves her standing at a QUARTER of her (raised) Max HP.
+     *
+     * <p>⚠ <b>CORRECTED (2026-10-19).</b> This case said 20% until the 1506/1408 audit re-read the sentence: the document
+     * (1408's 天赋·强化, `:189`) says 「回复等同于自身生命上限 <b>25%</b> 的生命值」, and the data row behind the same paragraph
+     * agrees - the enhanced talent's <b>#2 = 0.25</b>, while its <b>#7 = 0.2</b> is the OTHER clause (「施放攻击后回复 20%」,
+     * which `transformation_heals_on_attack` ships). The two numbers had been swapped, and this expectation was pinning the
+     * swap - which is why a wrong number survived a green suite.
      */
     @Test
     public void theTransformedFormSurvivesALethalBlow() {
         Character her = survivor(PHAINON, true);
         Assertions.assertFalse(her.isDeath(), "\"when Khaslana (卡厄斯兰那) takes a lethal hit, she does not fall into the unable-to-fight state\" (「卡厄斯兰那受到致命攻击时不会陷入无法战斗状态」)");
-        Assertions.assertEquals(her.getMaxHp() * 0.20, her.getCurrentHp(), her.getMaxHp() * 0.01,
-                "\"instead restores HP equal to 20% of her own Max HP\" (「而是回复等同于自身生命上限 20% 的生命值」)");
+        Assertions.assertEquals(her.getMaxHp() * 0.25, her.getCurrentHp(), her.getMaxHp() * 0.01,
+                "\"instead restores HP equal to 25% of her own Max HP\" (「而是回复等同于自身生命上限 25% 的生命值」)");
     }
 
     /**
