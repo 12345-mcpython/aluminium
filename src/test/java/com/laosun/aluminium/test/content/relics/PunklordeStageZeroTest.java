@@ -33,22 +33,22 @@ public class PunklordeStageZeroTest {
             var rules = rulesFor(event);
             Assertions.assertEquals(2, rules.size(), event + ": the two thresholds");
             var low = rules.get(0);
-            Assertions.assertEquals(List.of("self_attr:elation_damage_boost >= 0.3",
-                            "self_attr:elation_damage_boost < 0.6", "!self has_state " + MARK_A),
+            Assertions.assertEquals(List.of("self_attr:elation_damage_boost >= 0.4",
+                            "self_attr:elation_damage_boost < 0.8", "!self has_state " + MARK_A),
                     low.conditions().stream().map(c -> c.source()).toList(),
                     event + ": the low tier, with the upper bound that makes the tiers exclusive");
             Assertions.assertEquals("APPLY_BUFF", low.effects().get(0).getOp());
             Assertions.assertEquals(MARK_A, low.effects().get(0).getBuff(), event + ": the one-way marker");
             Assertions.assertEquals("CRIT_ATTACK", low.effects().get(1).getAttribute());
-            Assertions.assertEquals(0.15, low.effects().get(1).getPercent(), 1e-9, event + ": +15%");
+            Assertions.assertEquals(0.2, low.effects().get(1).getPercent(), 1e-9, event + ": +15%");
             Assertions.assertEquals("self", low.effects().get(1).getTarget());
 
             var high = rules.get(1);
-            Assertions.assertEquals(List.of("self_attr:elation_damage_boost >= 0.6",
+            Assertions.assertEquals(List.of("self_attr:elation_damage_boost >= 0.8",
                             "!self has_state " + MARK_B),
                     high.conditions().stream().map(c -> c.source()).toList(), event + ": the high tier");
             Assertions.assertEquals(MARK_B, high.effects().get(0).getBuff());
-            Assertions.assertEquals(0.30, high.effects().get(1).getPercent(), 1e-9, event + ": +30%");
+            Assertions.assertEquals(0.32, high.effects().get(1).getPercent(), 1e-9, event + ": +32%");
             System.out.println("[relic325] " + event + " ok");
         }
     }

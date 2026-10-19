@@ -33,27 +33,27 @@ public class TengokuLivestreamTest {
         Assertions.assertEquals(2, rules.size(), "a counting rule and a paying rule");
 
         var counting = rules.get(0);
-        Assertions.assertEquals(List.of("self_stacks:" + COUNTER + " < 4.0"),
+        Assertions.assertEquals(List.of("self_stacks:" + COUNTER + " < 3.0"),
                 counting.conditions().stream().map(c -> c.source()).toList(),
-                "count while under four, in the parser's form");
+                "count while under three, in the parser's form");
         var add = counting.effects().getFirst();
         Assertions.assertEquals("ADD_STACK", add.getOp());
         Assertions.assertEquals(COUNTER, add.getBuff(), "the counter's name");
         Assertions.assertEquals(1.0, add.getAmount(), 1e-9, "one point per spend");
-        Assertions.assertEquals(4, add.getMaxStacks(), "capped at four");
+        Assertions.assertEquals(3, add.getMaxStacks(), "capped at three (the text says #2 = 3)");
 
         var paying = rules.get(1);
-        Assertions.assertEquals(List.of("self_stacks:" + COUNTER + " >= 4.0"),
+        Assertions.assertEquals(List.of("self_stacks:" + COUNTER + " >= 3.0"),
                 paying.conditions().stream().map(c -> c.source()).toList(),
-                "pay out at four, in the parser's form");
+                "pay out at three, in the parser's form");
         var effects = paying.effects();
         Assertions.assertEquals(2, effects.size(), "reset, then the bonus");
         Assertions.assertEquals("REMOVE_STACK", effects.get(0).getOp());
         Assertions.assertEquals(COUNTER, effects.get(0).getBuff());
-        Assertions.assertEquals(4.0, effects.get(0).getAmount(), 1e-9, "reset by four, so it is every four");
+        Assertions.assertEquals(3.0, effects.get(0).getAmount(), 1e-9, "reset by three");
         Assertions.assertEquals("MODIFY_ATTR", effects.get(1).getOp());
         Assertions.assertEquals("CRIT_ATTACK", effects.get(1).getAttribute());
-        Assertions.assertEquals(0.16, effects.get(1).getPercent(), 1e-9, "the bonus");
+        Assertions.assertEquals(0.32, effects.get(1).getPercent(), 1e-9, "the bonus (#3 = 32%)");
         Assertions.assertEquals(3, effects.get(1).getTurns(), "three turns");
         Assertions.assertEquals("self", effects.get(1).getTarget());
         System.out.println("[relic324] ok");
