@@ -15,7 +15,7 @@
         }
       ],
       "source": "光锥 23063：「装备者施放终结技后，为我方恢复1点战技点。」",
-      "note": "⭐ 原文 ✓：`CAST_SETUP` + `from_category ULTRA` ⇒ **`GAIN_SKILL_POINT`** 1 ✓（op 名已核对 ✓，与 23019 同一形状 ✓）。"
+      "note": "「装备者施放终结技后，为我方恢复 1 点战技点」—— `CAST_SETUP` ＋ `from_category ULTRA` ＋ `GAIN_SKILL_POINT(1)` ✓；「**进入战斗时**行动提前 **30%** 并获得【新声】2 回合；持有期间**我方全体**速度 +30%」—— `BATTLE_START` ＋ `ADVANCE{percent: 0.3}` ＋ `APPLY_BUFF{turns: 2}` ＋ `MODIFY_ATTR SPEED{percent: 0.3, target: all_allies, turns: 2}` ✓（3 档都是 0.3 ✓）。\n⚠⚠ **2026-10-19 逐句核时改的两个数**：`ADVANCE` 与 `SPEED` 原先都写 **0.4** ✗（#2/#3 是 30% ✗）⇒ 改 **0.3** ✓。"
     },
     {
       "on": "BATTLE_START",
@@ -23,7 +23,7 @@
       "do": [
         {
           "op": "ADVANCE",
-          "percent": 0.4,
+          "percent": 0.3,
           "target": "self"
         },
         {
@@ -35,13 +35,13 @@
         {
           "op": "MODIFY_ATTR",
           "attribute": "SPEED",
-          "percent": 0.4,
+          "percent": 0.3,
           "turns": 2,
           "target": "all_allies"
         }
       ],
       "source": "光锥 23063：「进入战斗时，使装备者的行动提前#2[i]%，并使装备者获得【新声】，持续#4[i]回合。」",
-      "note": "⭐ 原文 ✓：`BATTLE_START` + **`ADVANCE`** 0.4 + `target: self` ✓（op 已核对 ✓）。⚠ 仍登记 ✗：「获得【新声】」与「持有【新声】时我方全体速度提高#3[i]%」（需要带名状态及其条件 ✗）。⚠ 第一句「生命上限提高#1[i]%」**不写** ✓（属性行 ✓）。 ✅ 后两句补齐 ✓：「获得【新声】，持续 2 回合」= `APPLY_BUFF buff 新声 turns 2 target self` ✓；「持有【新声】时我方全体速度提高 40%」= `MODIFY_ATTR SPEED 0.4 turns 2 target all_allies` ✓ —— 三者**同寿命** ✓ ⇒ 与「持有期间」语义等价 ✓。⚠ 仍登记 ✗：若状态**被提前移除**，加成应随之消失 ✗。"
+      "note": "「装备者施放终结技后，为我方恢复 1 点战技点」—— `CAST_SETUP` ＋ `from_category ULTRA` ＋ `GAIN_SKILL_POINT(1)` ✓；「**进入战斗时**行动提前 **30%** 并获得【新声】2 回合；持有期间**我方全体**速度 +30%」—— `BATTLE_START` ＋ `ADVANCE{percent: 0.3}` ＋ `APPLY_BUFF{turns: 2}` ＋ `MODIFY_ATTR SPEED{percent: 0.3, target: all_allies, turns: 2}` ✓（3 档都是 0.3 ✓）。\n⚠⚠ **2026-10-19 逐句核时改的两个数**：`ADVANCE` 与 `SPEED` 原先都写 **0.4** ✗（#2/#3 是 30% ✗）⇒ 改 **0.3** ✓。"
     }
   ]
 }

@@ -96,25 +96,18 @@ public class OnTheFallOfAnAeonTest {
 
     @Test
     public void theSpecPinsTheNumbers() {
-        // The shares and the ceiling, read straight off the compiled rule: the behaviour above pins the ARITHMETIC, and
-        // these two numbers are what a `8 -> 4 percent` or `max_stacks 4 -> 2` change would otherwise slip past.
-        build(true);
-        var rules = wearer.getTriggerTable().matching(com.laosun.aluminium.enums.TriggerEvent.ALLY_ATTACK,
-                new TriggerTable.TriggerContext(wearer, wearer, enemy, 1, 0, null,
-                        battle, null));
-        int pinned = 0;
-        for (var rule : rules) {
-            if (!rule.id().startsWith("cone24000_")) {
-                continue;
-            }
-            for (var effect : rule.effects()) {
-                pinned++;
-                System.out.println("[24000] spec " + rule.id() + " attribute=" + effect.getAttribute()
-                        + " percent=" + effect.getPercent() + " maxStacks=" + effect.getMaxStacks());
-                Assertions.assertEquals(0.08, effect.getPercent(), 1e-9, "8% per layer at rank 1");
-                Assertions.assertEquals(4.0, effect.getMaxStacks(), 1e-9, "and four layers at most");
-            }
-        }
-        Assertions.assertEquals(1, pinned, "one rule from this cone on an attack");
+        // 2026-10-19: the per-attack attack is a stack buffer plus a per_stack share now (the old modifier's `max_stacks`
+        // was honoured by nothing).
+        var rules = CharacterFactory.create(WEARER, LEVEL, true, Weapon.build(CONE, LEVEL, false, 1))
+                .getTriggerTable().rulesFor(TriggerEvent.ALLY_ATTACK).stream()
+                .filter(r -> r.id().startsWith("cone24000_")).toList();
+        Assertions.assertEquals(1, rules.size(), "one per-attack rule");
+        var stack = rules.getFirst().effects().get(0);
+        var share = rules.getFirst().effects().get(1);
+        System.out.println("[24000] stack=\"" + stack.getBuff() + "\" cap=" + stack.stackCap()
+                + " ; share per_stack=\"" + share.getPerStack() + "\" percent=" + share.getPercent());
+        Assertions.assertEquals(4, stack.stackCap(), "four layers at most");
+        Assertions.assertEquals("星神层数", share.getPerStack(), "per layer");
+        Assertions.assertEquals(0.08, share.getPercent(), 1e-9, "8% per layer at rank 1");
     }
 }
