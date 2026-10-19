@@ -15,7 +15,34 @@
         }
       ],
       "source": "光锥 23017: 「我方目标施放终结技时，装备者为当前生命值百分比最低的我方目标回复等同于其#2[i]%生命上限的生命值」",
-      "note": "⭐ 常数半（能量恢复效率）由引擎的 `ability_property` 发放 ✓（第 136 条 ✓）。⭐ 治疗半：`ULT_CAST` ✓ + **`actor is_ally`** ✓（「我方目标施放终结技时」✓）+ `HEAL` ✓ 与 **`scale: \"target_max_hp\"`** ✓（「等同于**其**生命上限的 #2%」✓，写法同 1001 ✓）+ **`target: \"lowest_hp_ally\"`** ✓（选择器已有 ✓）。⚠ **第三句已登记** ✗：「**当装备者为我方目标提供治疗时**，使该目标攻击力提高 2.4%，最多 5 层，持续 2 回合」需要**\"装备者施加治疗\"这个事件** ✗（`HEALED` 是**接受方**的视角 ✗）。"
+      "note": "「我方目标施放终结技时，为**当前生命值百分比最低**的我方目标回复等同于**其**生命上限 #2% 的生命值」—— `ULT_CAST` ＋ `actor is_ally` ＋ `HEAL{scale: target_max_hp, target: lowest_hp_ally}` ✓（10/11/12/13/14% ✓，用**接受治疗者**的上限 ✓）；「能量恢复效率提高 #1%」由光锥属性给 ✓。"
+    },
+    {
+      "on": "HEALED",
+      "id": "cone23017_healed_ally_attack",
+      "when": [
+        "target is_ally"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "惊魂夜攻击",
+          "amount": 1,
+          "max_stacks": 5,
+          "turns": 2,
+          "target": "target"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.024,
+          "per_stack": "惊魂夜攻击",
+          "turns": 2,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 23017 惊魂夜: 「当装备者为我方目标提供治疗时，使该目标的攻击力提高 #3%，该效果最多叠加 #4 层，持续 #5 回合。」",
+      "note": "「当装备者为我方目标提供治疗时，使**该目标**的攻击力提高 2.4%，**最多 5 层**，**持续 2 回合**」—— `HEALED` ＋ `target is_ally` ＋ `ADD_STACK{max_stacks: 5, turns: 2}` ＋ `MODIFY_ATTR ATTACK{per_stack: 惊魂夜攻击, turns: 2, target: target}` ✓（2.4/2.8/3.2/3.6/4% ✓）。\n⚠⚠ **2026-10-19 逐句核时补的**：原文件**只有终结技治疗那一句** ✗，这一句**整块没有** ✗。"
     }
   ],
   "2": [
@@ -34,7 +61,34 @@
         }
       ],
       "source": "光锥 23017: 「我方目标施放终结技时，装备者为当前生命值百分比最低的我方目标回复等同于其#2[i]%生命上限的生命值」",
-      "note": "⭐ 常数半（能量恢复效率）由引擎的 `ability_property` 发放 ✓（第 136 条 ✓）。⭐ 治疗半：`ULT_CAST` ✓ + **`actor is_ally`** ✓（「我方目标施放终结技时」✓）+ `HEAL` ✓ 与 **`scale: \"target_max_hp\"`** ✓（「等同于**其**生命上限的 #2%」✓，写法同 1001 ✓）+ **`target: \"lowest_hp_ally\"`** ✓（选择器已有 ✓）。⚠ **第三句已登记** ✗：「**当装备者为我方目标提供治疗时**，使该目标攻击力提高 2.4%，最多 5 层，持续 2 回合」需要**\"装备者施加治疗\"这个事件** ✗（`HEALED` 是**接受方**的视角 ✗）。"
+      "note": "「我方目标施放终结技时，为**当前生命值百分比最低**的我方目标回复等同于**其**生命上限 #2% 的生命值」—— `ULT_CAST` ＋ `actor is_ally` ＋ `HEAL{scale: target_max_hp, target: lowest_hp_ally}` ✓（10/11/12/13/14% ✓，用**接受治疗者**的上限 ✓）；「能量恢复效率提高 #1%」由光锥属性给 ✓。"
+    },
+    {
+      "on": "HEALED",
+      "id": "cone23017_healed_ally_attack",
+      "when": [
+        "target is_ally"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "惊魂夜攻击",
+          "amount": 1,
+          "max_stacks": 5,
+          "turns": 2,
+          "target": "target"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.028,
+          "per_stack": "惊魂夜攻击",
+          "turns": 2,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 23017 惊魂夜: 「当装备者为我方目标提供治疗时，使该目标的攻击力提高 #3%，该效果最多叠加 #4 层，持续 #5 回合。」",
+      "note": "「当装备者为我方目标提供治疗时，使**该目标**的攻击力提高 2.4%，**最多 5 层**，**持续 2 回合**」—— `HEALED` ＋ `target is_ally` ＋ `ADD_STACK{max_stacks: 5, turns: 2}` ＋ `MODIFY_ATTR ATTACK{per_stack: 惊魂夜攻击, turns: 2, target: target}` ✓（2.4/2.8/3.2/3.6/4% ✓）。\n⚠⚠ **2026-10-19 逐句核时补的**：原文件**只有终结技治疗那一句** ✗，这一句**整块没有** ✗。"
     }
   ],
   "3": [
@@ -53,7 +107,34 @@
         }
       ],
       "source": "光锥 23017: 「我方目标施放终结技时，装备者为当前生命值百分比最低的我方目标回复等同于其#2[i]%生命上限的生命值」",
-      "note": "⭐ 常数半（能量恢复效率）由引擎的 `ability_property` 发放 ✓（第 136 条 ✓）。⭐ 治疗半：`ULT_CAST` ✓ + **`actor is_ally`** ✓（「我方目标施放终结技时」✓）+ `HEAL` ✓ 与 **`scale: \"target_max_hp\"`** ✓（「等同于**其**生命上限的 #2%」✓，写法同 1001 ✓）+ **`target: \"lowest_hp_ally\"`** ✓（选择器已有 ✓）。⚠ **第三句已登记** ✗：「**当装备者为我方目标提供治疗时**，使该目标攻击力提高 2.4%，最多 5 层，持续 2 回合」需要**\"装备者施加治疗\"这个事件** ✗（`HEALED` 是**接受方**的视角 ✗）。"
+      "note": "「我方目标施放终结技时，为**当前生命值百分比最低**的我方目标回复等同于**其**生命上限 #2% 的生命值」—— `ULT_CAST` ＋ `actor is_ally` ＋ `HEAL{scale: target_max_hp, target: lowest_hp_ally}` ✓（10/11/12/13/14% ✓，用**接受治疗者**的上限 ✓）；「能量恢复效率提高 #1%」由光锥属性给 ✓。"
+    },
+    {
+      "on": "HEALED",
+      "id": "cone23017_healed_ally_attack",
+      "when": [
+        "target is_ally"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "惊魂夜攻击",
+          "amount": 1,
+          "max_stacks": 5,
+          "turns": 2,
+          "target": "target"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.032,
+          "per_stack": "惊魂夜攻击",
+          "turns": 2,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 23017 惊魂夜: 「当装备者为我方目标提供治疗时，使该目标的攻击力提高 #3%，该效果最多叠加 #4 层，持续 #5 回合。」",
+      "note": "「当装备者为我方目标提供治疗时，使**该目标**的攻击力提高 2.4%，**最多 5 层**，**持续 2 回合**」—— `HEALED` ＋ `target is_ally` ＋ `ADD_STACK{max_stacks: 5, turns: 2}` ＋ `MODIFY_ATTR ATTACK{per_stack: 惊魂夜攻击, turns: 2, target: target}` ✓（2.4/2.8/3.2/3.6/4% ✓）。\n⚠⚠ **2026-10-19 逐句核时补的**：原文件**只有终结技治疗那一句** ✗，这一句**整块没有** ✗。"
     }
   ],
   "4": [
@@ -72,7 +153,34 @@
         }
       ],
       "source": "光锥 23017: 「我方目标施放终结技时，装备者为当前生命值百分比最低的我方目标回复等同于其#2[i]%生命上限的生命值」",
-      "note": "⭐ 常数半（能量恢复效率）由引擎的 `ability_property` 发放 ✓（第 136 条 ✓）。⭐ 治疗半：`ULT_CAST` ✓ + **`actor is_ally`** ✓（「我方目标施放终结技时」✓）+ `HEAL` ✓ 与 **`scale: \"target_max_hp\"`** ✓（「等同于**其**生命上限的 #2%」✓，写法同 1001 ✓）+ **`target: \"lowest_hp_ally\"`** ✓（选择器已有 ✓）。⚠ **第三句已登记** ✗：「**当装备者为我方目标提供治疗时**，使该目标攻击力提高 2.4%，最多 5 层，持续 2 回合」需要**\"装备者施加治疗\"这个事件** ✗（`HEALED` 是**接受方**的视角 ✗）。"
+      "note": "「我方目标施放终结技时，为**当前生命值百分比最低**的我方目标回复等同于**其**生命上限 #2% 的生命值」—— `ULT_CAST` ＋ `actor is_ally` ＋ `HEAL{scale: target_max_hp, target: lowest_hp_ally}` ✓（10/11/12/13/14% ✓，用**接受治疗者**的上限 ✓）；「能量恢复效率提高 #1%」由光锥属性给 ✓。"
+    },
+    {
+      "on": "HEALED",
+      "id": "cone23017_healed_ally_attack",
+      "when": [
+        "target is_ally"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "惊魂夜攻击",
+          "amount": 1,
+          "max_stacks": 5,
+          "turns": 2,
+          "target": "target"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.036,
+          "per_stack": "惊魂夜攻击",
+          "turns": 2,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 23017 惊魂夜: 「当装备者为我方目标提供治疗时，使该目标的攻击力提高 #3%，该效果最多叠加 #4 层，持续 #5 回合。」",
+      "note": "「当装备者为我方目标提供治疗时，使**该目标**的攻击力提高 2.4%，**最多 5 层**，**持续 2 回合**」—— `HEALED` ＋ `target is_ally` ＋ `ADD_STACK{max_stacks: 5, turns: 2}` ＋ `MODIFY_ATTR ATTACK{per_stack: 惊魂夜攻击, turns: 2, target: target}` ✓（2.4/2.8/3.2/3.6/4% ✓）。\n⚠⚠ **2026-10-19 逐句核时补的**：原文件**只有终结技治疗那一句** ✗，这一句**整块没有** ✗。"
     }
   ],
   "5": [
@@ -91,7 +199,34 @@
         }
       ],
       "source": "光锥 23017: 「我方目标施放终结技时，装备者为当前生命值百分比最低的我方目标回复等同于其#2[i]%生命上限的生命值」",
-      "note": "⭐ 常数半（能量恢复效率）由引擎的 `ability_property` 发放 ✓（第 136 条 ✓）。⭐ 治疗半：`ULT_CAST` ✓ + **`actor is_ally`** ✓（「我方目标施放终结技时」✓）+ `HEAL` ✓ 与 **`scale: \"target_max_hp\"`** ✓（「等同于**其**生命上限的 #2%」✓，写法同 1001 ✓）+ **`target: \"lowest_hp_ally\"`** ✓（选择器已有 ✓）。⚠ **第三句已登记** ✗：「**当装备者为我方目标提供治疗时**，使该目标攻击力提高 2.4%，最多 5 层，持续 2 回合」需要**\"装备者施加治疗\"这个事件** ✗（`HEALED` 是**接受方**的视角 ✗）。"
+      "note": "「我方目标施放终结技时，为**当前生命值百分比最低**的我方目标回复等同于**其**生命上限 #2% 的生命值」—— `ULT_CAST` ＋ `actor is_ally` ＋ `HEAL{scale: target_max_hp, target: lowest_hp_ally}` ✓（10/11/12/13/14% ✓，用**接受治疗者**的上限 ✓）；「能量恢复效率提高 #1%」由光锥属性给 ✓。"
+    },
+    {
+      "on": "HEALED",
+      "id": "cone23017_healed_ally_attack",
+      "when": [
+        "target is_ally"
+      ],
+      "do": [
+        {
+          "op": "ADD_STACK",
+          "buff": "惊魂夜攻击",
+          "amount": 1,
+          "max_stacks": 5,
+          "turns": 2,
+          "target": "target"
+        },
+        {
+          "op": "MODIFY_ATTR",
+          "attribute": "ATTACK",
+          "percent": 0.04,
+          "per_stack": "惊魂夜攻击",
+          "turns": 2,
+          "target": "target"
+        }
+      ],
+      "source": "光锥 23017 惊魂夜: 「当装备者为我方目标提供治疗时，使该目标的攻击力提高 #3%，该效果最多叠加 #4 层，持续 #5 回合。」",
+      "note": "「当装备者为我方目标提供治疗时，使**该目标**的攻击力提高 2.4%，**最多 5 层**，**持续 2 回合**」—— `HEALED` ＋ `target is_ally` ＋ `ADD_STACK{max_stacks: 5, turns: 2}` ＋ `MODIFY_ATTR ATTACK{per_stack: 惊魂夜攻击, turns: 2, target: target}` ✓（2.4/2.8/3.2/3.6/4% ✓）。\n⚠⚠ **2026-10-19 逐句核时补的**：原文件**只有终结技治疗那一句** ✗，这一句**整块没有** ✗。"
     }
   ]
 }
