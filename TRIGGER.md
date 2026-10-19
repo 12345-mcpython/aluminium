@@ -155,6 +155,7 @@
 | `self_summon_count` / `target_summon_count` | 召唤物数量 |
 | `enemy_count` / `ally_count` | 场上敌我数量 |
 | `skill_point_max` | 战技点上限 |
+| `skill_point` | **当前**战技点 —— 与上面那个**上限**是两个数（读者：1015 Archer 的行迹「若战技点大于等于 4 点」、战技的「战技点不足以再次施放战技则退出」） |
 | `eidolon` | 星魂等级 |
 | `from_skill_id` / `damage_skill_key` | 技能 id / key |
 | `counted_laughs` | 【笑点】计数 |
