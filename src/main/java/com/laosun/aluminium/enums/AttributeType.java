@@ -158,12 +158,12 @@ public enum AttributeType {
     @SerializedName("elation_damage_boost") ELATION_DAMAGE_BOOST("elation_damage_boost"),
 
     /**
-     * 增笑 -- Elation damage's OWN amplifier, distinct from {@link #ELATION_DAMAGE_BOOST} (欢榆度).
+     * 增笑 -- Elation damage's OWN amplifier, distinct from {@link #ELATION_DAMAGE_BOOST} (欢愉度).
      *
      * <p>The spec keeps them apart on purpose:
-     * {@code 基础值 × 欢榆倍率 × (1+欢榆度) × (1+增笑) × (1+笑点×5/(笑点+240))} -- two separate factors, so a rule that
+     * {@code 基础值 × 欢愉倍率 × (1+欢愉度) × (1+增笑) × (1+笑点×5/(笑点+240))} -- two separate factors, so a rule that
      * grants one must not be written as the other. The corpus glossary says the same: 增笑 is
-     * "影响欢榆伤害的特殊效果，可额外提高造成的欢榆伤害".
+     * "影响欢愉伤害的特殊效果，可额外提高造成的欢愉伤害".
      *
      * <p><b>No data column.</b> Measured: {@link #BY_GAME_PROPERTY}'s only Elation entry is
      * {@code ElationDamageAddedRatioBase} (the one above), and no game property mentions this concept. So a
