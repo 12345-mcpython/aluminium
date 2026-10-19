@@ -484,32 +484,60 @@ final class TriggerMagnitudes {
         return percent * holder.getBuffManager().stacksOf(name);
     }
 
+    /**
+     * The magnitude's share: a literal {@code percent}, or one of the four spellings that read it off a skill row / a
+     * counter - <b>and, when both kinds are stated, the product</b> ("that share's X%").
+     *
+     * <p><b>Why the product is a reading and not a precedence.</b> Two sentences in this corpus state a FRACTION OF a
+     * share rather than a share: 1206 Sushang (素裳)'s 「通过额外判定发动的【剑势】伤害为<b>原伤害的 50%</b>」 - the original
+     * 剑势 is {@code SKILL:1} (the skill row's own 100%→110% ATK), and the extra roll is half of <em>that</em>. Writing
+     * {@code percent: 0.5} alone froze it at half of the Lv10 row, which silently under-counts by 9% once Eidolon 5
+     * raises the skill to level 12 (measured: 0.5 instead of 0.55, and the row is 1.0 → 1.1).
+     *
+     * <p>Note: Before this, two stated shares were a load-time ERROR ("the share comes from exactly one of them"), and
+     * that guard is kept for two ROW spellings (a row and a counter cannot both be the share). {@code percent} beside
+     * exactly one row spelling is now legal on the damage path, where it multiplies: nothing is silently preferred, so
+     * the hole the guard closed stays closed. Measured across the shipped content: 0 of 1393 effects stated both, so no
+     * existing number moved.
+     */
     static double shareOf(EffectSpec effect, TriggerContext ctx) {
+        Double fraction = effect.getPercent();
         // A share CARRIED IN A RESOURCE, in basis points: how a number captured at cast time is used later.
         if (effect.getPercentFromResource() != null) {
             com.laosun.aluminium.models.Character holder = requireCharacterOwner(effect, ctx);
-            return holder.getResources().value(effect.getPercentFromResource().trim()) / 10000.0;
-        }
-        if (effect.getPercent() != null) {
-            return effect.getPercent();
+            return fractionOf(holder.getResources().value(effect.getPercentFromResource().trim()) / 10000.0, fraction);
         }
         if (effect.getPercentFromSkillParam() != null) {
             // The share out of one of the owner's OWN skills: "equal to Tribbie (缇宝)'s #3% Max HP", where #3 lives in HIS ultimate.
-            return ownerSkillParamValue(effect, ctx, effect.getPercentFromSkillParam().trim())
-                    + amendmentDelta(effect, ctx);
+            // Note: the amendment delta raises the ROW's share, so it is added before the fraction is taken.
+            return fractionOf(ownerSkillParamValue(effect, ctx, effect.getPercentFromSkillParam().trim())
+                    + amendmentDelta(effect, ctx), fraction);
         }
         if (effect.getPercentFromSummonParam() != null) {
             // The share out of the owner's MEMOSPRITE: its skills are keyed by data slot, which no SkillType can name.
-            return summonSkillParamValue(effect, ctx, effect.getPercentFromSummonParam().trim());
+            return fractionOf(summonSkillParamValue(effect, ctx, effect.getPercentFromSummonParam().trim()), fraction);
         }
         String spelled = effect.getPercentFromCastParam() == null ? null
                 : String.valueOf(effect.getPercentFromCastParam());
         if (spelled == null) {
+            if (fraction != null) {
+                return fraction;
+            }
             throw new IllegalStateException("a magnitude needs a share: neither \"percent\" nor one of its spellings "
                     + "(\"percent_from_cast_param\" / \"percent_from_skill_param\" / \"percent_from_summon_param\" / "
                     + "\"percent_from_resource\") is stated");
         }
-        return castParamValue(effect, ctx, spelled);
+        return fractionOf(castParamValue(effect, ctx, spelled), fraction);
+    }
+
+    /**
+     * A row/counter share, times an optional {@code percent} ("50% of the original"): see {@link #shareOf}.
+     *
+     * @param share    the share the row or the counter states
+     * @param fraction the {@code percent} stated beside it, or {@code null} when the share stands alone
+     */
+    private static double fractionOf(double share, Double fraction) {
+        return fraction == null ? share : share * fraction;
     }
 
     /**

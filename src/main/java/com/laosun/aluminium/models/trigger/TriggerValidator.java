@@ -368,7 +368,10 @@ final class TriggerValidator {
                         if (maxHpShare) {
                             requirePercent(effect, op, spec);
                         } else {
-                            requireDerivedScale(effect, op, spec, false);
+                            // Note: `true` = 「原伤害的 50%」 - `percent` may be a FRACTION of the one row share stated
+                            // beside it (1206 Sushang (素裳)'s extra 【剑势】). It is the damage path's own reading; every
+                            // other op keeps the "exactly one share" refusal.
+                            requireDerivedScale(effect, op, spec, false, true);
                         }
                         requireElement(effect, op, spec, true);
                     }
@@ -1199,6 +1202,15 @@ final class TriggerValidator {
      * </ul>
      */
     static void requireDerivedScale(EffectSpec effect, String op, TriggerSpec spec, boolean allowFlat) {
+        requireDerivedScale(effect, op, spec, allowFlat, false);
+    }
+
+    /**
+     * The same, optionally accepting {@code percent} BESIDE one row/counter share as a FRACTION of it
+     * (「原伤害的 50%」). Only the damage path passes {@code true}; see {@link #requirePercent(EffectSpec, String, TriggerSpec, boolean)}.
+     */
+    static void requireDerivedScale(EffectSpec effect, String op, TriggerSpec spec, boolean allowFlat,
+                                    boolean percentMayScaleRow) {
         boolean derived = effect.getScale() != null && !effect.getScale().isBlank();
         if (!derived) {
             if (effect.getAmount() != null && !allowFlat) {
@@ -1235,7 +1247,7 @@ final class TriggerValidator {
                         "Op " + op + " scales off skill parameter \"" + raw2
                                 + "\", which is not a zero-based index (source: " + spec.getSource() + ")");
             }
-            requirePercent(effect, op, spec);
+            requirePercent(effect, op, spec, percentMayScaleRow);
             return;
         }
         // The ACTOR's own attribute (1415 memosprite skill 10, whose share is of the CASTER's Max HP). Accepted here for
@@ -1249,7 +1261,7 @@ final class TriggerValidator {
                                 + "\" (source: " + spec.getSource() + ")");
             }
             AttributeType.fromString(actorAttr);
-            requirePercent(effect, op, spec);
+            requirePercent(effect, op, spec, percentMayScaleRow);
             return;
         }
         // The owner's OWN skill, named by slot: `<SKILLTYPE>:<index>`. Checked here for the reason the family below gives --
@@ -1258,7 +1270,7 @@ final class TriggerValidator {
         // one definition, so the two cannot drift.
         if (scale.startsWith(TriggerTable.SKILL_PARAM_PREFIX)) {
             requireSkillParamSpelling(scale.substring(TriggerTable.SKILL_PARAM_PREFIX.length()).trim(), "scale", op, spec);
-            requirePercent(effect, op, spec);
+            requirePercent(effect, op, spec, percentMayScaleRow);
             return;
         }
         if (scale.startsWith(TriggerTable.SUMMON_ATTR_PREFIX)) {
@@ -1269,7 +1281,7 @@ final class TriggerValidator {
                                 + "\" (source: " + spec.getSource() + ")");
             }
             AttributeType.fromString(summonAttr);
-            requirePercent(effect, op, spec);
+            requirePercent(effect, op, spec, percentMayScaleRow);
             return;
         }
         // The STATE-HOLDER's own attribute (`holder_attr:<STATE>:<ATTRIBUTE>`). Accepted/checked here for the reason the
@@ -1286,7 +1298,7 @@ final class TriggerValidator {
                                 + scale + "\"; e.g. \"holder_attr:同袍:DEFENCE\" (source: " + spec.getSource() + ")");
             }
             AttributeType.fromString(rest.substring(lastColon + 1).trim());
-            requirePercent(effect, op, spec);
+            requirePercent(effect, op, spec, percentMayScaleRow);
             return;
         }
         if (scale.startsWith(TriggerConditionParser.SELF_STACKS_PREFIX)
@@ -1297,13 +1309,13 @@ final class TriggerValidator {
                         "Op " + op + " scales off a counter but names none: \"" + scale + "\" "
                                 + "(source: " + spec.getSource() + ")");
             }
-            requirePercent(effect, op, spec);
+            requirePercent(effect, op, spec, percentMayScaleRow);
             return;
         }
         // The spelling and (for the attribute family) the name; also re-checks `percent`, because a scale with no
         // magnitude is not a number ("some share of my Speed" says nothing about how much).
         TriggerMagnitudes.scaleAttribute(effect, op, spec);
-        requirePercent(effect, op, spec);
+        requirePercent(effect, op, spec, percentMayScaleRow);
     }
 
     /**
@@ -1552,6 +1564,21 @@ final class TriggerValidator {
     }
 
     static void requirePercent(EffectSpec effect, String op, TriggerSpec spec) {
+        requirePercent(effect, op, spec, false);
+    }
+
+    /**
+     * The same, optionally allowing {@code percent} BESIDE one row/counter share, as a fraction OF it.
+     *
+     * <p>Only the damage path passes {@code true}, and only where the base is an attribute share: there the pair means
+     * 「原伤害的 50%」 - the row's share, times that fraction (reader: 1206 Sushang (素裳)'s extra 【剑势】rolls, whose base
+     * would otherwise freeze at the Lv10 row and under-count by 9% once Eidolon 5 raises the skill). How the pair is
+     * resolved lives in {@code TriggerMagnitudes.shareOf}; what this check keeps is the other half of the old guard:
+     * two ROW spellings are still refused, because a row and a counter cannot both be the share.
+     *
+     * @param percentMayScaleRow {@code true} to accept {@code percent} as a multiplier on the single row share
+     */
+    static void requirePercent(EffectSpec effect, String op, TriggerSpec spec, boolean percentMayScaleRow) {
         // Note: All five spellings are collected before anything is refused, so the message can name them and the
         // "exactly one" rule is stated once. The earlier version was a chain of ifs, and each new spelling had to
         // remember to check the ones before it -- which is how `percent_from_resource` once slipped through.
@@ -1571,7 +1598,9 @@ final class TriggerValidator {
         if (effect.getPercentFromSummonParam() != null) {
             stated.add("percent_from_summon_param");
         }
-        if (stated.size() > 1) {
+        // "50% of the original": `percent` (the fraction) beside exactly one row/counter share (the base).
+        boolean rowFraction = percentMayScaleRow && effect.getPercent() != null && stated.size() == 2;
+        if (stated.size() > 1 && !rowFraction) {
             throw new IllegalArgumentException(
                     "Op " + op + " states more than one share (" + String.join(" / ", stated)
                             + "); the share comes from exactly one of them (source: " + spec.getSource() + ")");

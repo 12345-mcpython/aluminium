@@ -71,4 +71,61 @@ public class PercentFromSkillParamTest {
                 "「等同于缇宝 #3% 生命上限」 (equal to #3% of Tribbie's Max HP)-- #3 of HIS ultimate, times Max HP");
         Assertions.assertNotEquals(neighbour, gained, Math.abs(expected) * 1e-6, "and the index is load-bearing");
     }
+
+    /**
+     * The same share, taken as a <b>fraction</b> of it: {@code percent} beside ONE row share multiplies ("50% of the
+     * original").
+     *
+     * <p>Reader: 1206 Sushang (素裳)'s extra 【剑势】rolls - 「通过额外判定发动的【剑势】伤害为原伤害的 50%」, where 原伤害 is
+     * {@code SKILL:1} and therefore moves with level. Before this reading existed, the only spelling was a literal
+     * {@code percent: 0.5}, which froze half of the Lv10 row and under-paid by 9% once Eidolon 5 raised the skill.
+     *
+     * <p>⚠ The assertion is a RATIO between two firings of the same rule shape (with and without the fraction), so the
+     * zones cancel and the row's own units never enter the expectation.
+     */
+    @Test
+    public void aPercentBesideARowShareIsAFractionOfIt() {
+        double whole = damageFromTheRow(null);
+        double half = damageFromTheRow(0.5);
+        double quarter = damageFromTheRow(0.25);
+        System.out.println("[skill_share] row damage " + whole + " ; x0.5 " + half + " ; x0.25 " + quarter);
+        Assertions.assertTrue(whole > 0, "precondition: the row-scaled instance lands");
+        Assertions.assertEquals(0.5, half / whole, 1e-9, "「原伤害的 50%」⇒ 正好一半");
+        Assertions.assertEquals(0.25, quarter / whole, 1e-9, "and the fraction is the stated one, not a fixed half");
+    }
+
+    /**
+     * What one {@code DAMAGE} scaled by {@code ULTRA:2} settles, optionally taken as a fraction of that share.
+     *
+     * @param fraction the {@code percent} stated beside the row share, or {@code null} for the share itself
+     */
+    private static double damageFromTheRow(Double fraction) {
+        Character tribbie = CharacterFactory.create(TRIBBIE, LEVEL);
+        Battle battle = new Battle(List.of(tribbie), List.of(BattleFixture.dummy()), BattleFixture.seeded());
+        battle.startBattle();
+        battle.processRequests();
+        tribbie = battle.characters.getFirst();
+
+        EffectSpec effect = new EffectSpec();
+        TriggerSpecs.set(effect, "op", "DAMAGE");
+        TriggerSpecs.set(effect, "scale", "self_attr:ATTACK");
+        TriggerSpecs.set(effect, "percentFromSkillParam", "ULTRA:2");
+        if (fraction != null) {
+            TriggerSpecs.set(effect, "percent", fraction);
+        }
+        TriggerSpecs.set(effect, "element", "Physical");
+        TriggerSpecs.set(effect, "target", "target");
+        TriggerSpecs.set(effect, "critRate", 0.0);
+        TriggerSpecs.set(effect, "critDamage", 0.0);
+        tribbie.setTriggerTable(new TriggerTable(TRIBBIE, List.of(
+                TriggerSpecs.rule("TURN_START", List.of(), effect))));
+
+        var enemy = battle.enemyUnits().getFirst();
+        double before = enemy.getCurrentHp();
+        // Note: the actor and the target are stated, because the rule aims at `target` (a firing with no party cannot
+        // resolve it - measured: "Effect targets \"target\" but this event has no such party").
+        battle.fireTriggers(TriggerEvent.TURN_START, tribbie, enemy, 0, 0);
+        battle.processRequests();
+        return before - enemy.getCurrentHp();
+    }
 }
