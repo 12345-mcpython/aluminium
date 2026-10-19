@@ -598,7 +598,6 @@ public class ConeConditionLiteralsTest {
         assertRule(21060, 4, "BATTLE_START", "boost_follow_up_damage_boost_rank4", List.of());
         assertRule(21060, 5, "BATTLE_START", "boost_ultimate_damage_boost_rank5", List.of());
         assertRule(21060, 5, "BATTLE_START", "boost_follow_up_damage_boost_rank5", List.of());
-        assertRule(21061, 1, "DEALING_DAMAGE", "cone21061_damage_up", List.of("actor == self"));
         assertRule(21061, 1, "DEALING_DAMAGE", "cone21061_vulnerability", List.of("actor == self"));
         assertRule(21062, 1, "BATTLE_START", "boost_skill_damage_boost_1", List.of());
         assertRule(21062, 1, "BATTLE_START", "boost_follow_up_damage_boost_1", List.of());

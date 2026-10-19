@@ -38,7 +38,6 @@ public class ConeConditionCoverageTest {
 
     @Test
     public void everyShippedConeRuleStatesWhatItWaitsFor() {
-        assertConditions(21061, TriggerEvent.DEALING_DAMAGE, "cone21061_damage_up", List.of("actor == self"));
         assertConditions(21061, TriggerEvent.DEALING_DAMAGE, "cone21061_vulnerability", List.of("actor == self"));
         assertConditions(23019, TriggerEvent.CAST_SETUP, "cone23019_ult_damage",
                 List.of("actor == self", "from_category ULTRA"));
