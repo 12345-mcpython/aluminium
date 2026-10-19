@@ -159,40 +159,50 @@ public class ConeConditionLiteralsTest {
         assertRule(20017, 4, "BREAK", "cone20017_heal_on_break", List.of("actor == self"));
         assertRule(20017, 5, "BREAK", "cone20017_heal_on_break", List.of("actor == self"));
         assertRule(20018, 1, "SKILL_CAST", "cone20018_arm_next_basic", List.of("actor == self"));
-        assertRule(20018, 1, "DEALING_DAMAGE", "cone20018_spend_marker", List.of("actor == self", "self_stacks:下一次普攻待命 >= 1.0"));
+        assertRule(20018, 1, "DEALING_DAMAGE", "cone20018_spend_marker", List.of("actor == self", "from_skill COMMON", "self_stacks:下一次普攻待命 >= 1.0"));
         assertRule(20018, 2, "SKILL_CAST", "cone20018_arm_next_basic", List.of("actor == self"));
-        assertRule(20018, 2, "DEALING_DAMAGE", "cone20018_spend_marker", List.of("actor == self", "self_stacks:下一次普攻待命 >= 1.0"));
+        assertRule(20018, 2, "DEALING_DAMAGE", "cone20018_spend_marker", List.of("actor == self", "from_skill COMMON", "self_stacks:下一次普攻待命 >= 1.0"));
         assertRule(20018, 3, "SKILL_CAST", "cone20018_arm_next_basic", List.of("actor == self"));
-        assertRule(20018, 3, "DEALING_DAMAGE", "cone20018_spend_marker", List.of("actor == self", "self_stacks:下一次普攻待命 >= 1.0"));
+        assertRule(20018, 3, "DEALING_DAMAGE", "cone20018_spend_marker", List.of("actor == self", "from_skill COMMON", "self_stacks:下一次普攻待命 >= 1.0"));
         assertRule(20018, 4, "SKILL_CAST", "cone20018_arm_next_basic", List.of("actor == self"));
-        assertRule(20018, 4, "DEALING_DAMAGE", "cone20018_spend_marker", List.of("actor == self", "self_stacks:下一次普攻待命 >= 1.0"));
+        assertRule(20018, 4, "DEALING_DAMAGE", "cone20018_spend_marker", List.of("actor == self", "from_skill COMMON", "self_stacks:下一次普攻待命 >= 1.0"));
         assertRule(20018, 5, "SKILL_CAST", "cone20018_arm_next_basic", List.of("actor == self"));
-        assertRule(20018, 5, "DEALING_DAMAGE", "cone20018_spend_marker", List.of("actor == self", "self_stacks:下一次普攻待命 >= 1.0"));
+        assertRule(20018, 5, "DEALING_DAMAGE", "cone20018_spend_marker", List.of("actor == self", "from_skill COMMON", "self_stacks:下一次普攻待命 >= 1.0"));
         assertRule(20019, 1, "BATTLE_START", "cone20019_party_speed", List.of());
         assertRule(20019, 2, "BATTLE_START", "cone20019_party_speed", List.of());
         assertRule(20019, 3, "BATTLE_START", "cone20019_party_speed", List.of());
         assertRule(20019, 4, "BATTLE_START", "cone20019_party_speed", List.of());
         assertRule(20019, 5, "BATTLE_START", "cone20019_party_speed", List.of());
-        assertRule(20020, 1, "ULT_CAST", "cone20020_attack_on_ult", List.of());
-        assertRule(20020, 2, "ULT_CAST", "cone20020_attack_on_ult", List.of());
-        assertRule(20020, 3, "ULT_CAST", "cone20020_attack_on_ult", List.of());
-        assertRule(20020, 4, "ULT_CAST", "cone20020_attack_on_ult", List.of());
-        assertRule(20020, 5, "ULT_CAST", "cone20020_attack_on_ult", List.of());
+        assertRule(20020, 1, "ULT_CAST", "cone20020_attack_on_ult", List.of("actor == self"));
+        assertRule(20020, 2, "ULT_CAST", "cone20020_attack_on_ult", List.of("actor == self"));
+        assertRule(20020, 3, "ULT_CAST", "cone20020_attack_on_ult", List.of("actor == self"));
+        assertRule(20020, 4, "ULT_CAST", "cone20020_attack_on_ult", List.of("actor == self"));
+        assertRule(20020, 5, "ULT_CAST", "cone20020_attack_on_ult", List.of("actor == self"));
         assertRule(20021, 1, "SUMMONED", "cone20021_first_summon", List.of("actor == self"));
         assertRule(20021, 2, "SUMMONED", "cone20021_first_summon", List.of("actor == self"));
         assertRule(20021, 3, "SUMMONED", "cone20021_first_summon", List.of("actor == self"));
         assertRule(20021, 4, "SUMMONED", "cone20021_first_summon", List.of("actor == self"));
         assertRule(20021, 5, "SUMMONED", "cone20021_first_summon", List.of("actor == self"));
         assertRule(20022, 1, "TURN_START", "cone20022_memorial_on_memosprite_turn", List.of("actor == summon"));
-        assertRule(20022, 1, "KILL", "cone20022_memorial_removed_when_it_is_killed", List.of("target == summon"));
+        // ⚠ It pinned KILL + `target == summon`: a summon that LEAVES the field is `SUMMON_LEFT`, and `target == summon`
+        // filters on isDeath() - which throws for the unit this event is about (§3.7w).
+        assertRule(20022, 1, "SUMMON_LEFT", "cone20022_memorial_removed_when_it_is_killed", List.of("actor is_summon"));
         assertRule(20022, 2, "TURN_START", "cone20022_memorial_on_memosprite_turn", List.of("actor == summon"));
-        assertRule(20022, 2, "KILL", "cone20022_memorial_removed_when_it_is_killed", List.of("target == summon"));
+        // ⚠ It pinned KILL + `target == summon`: a summon that LEAVES the field is `SUMMON_LEFT`, and `target == summon`
+        // filters on isDeath() - which throws for the unit this event is about (§3.7w).
+        assertRule(20022, 2, "SUMMON_LEFT", "cone20022_memorial_removed_when_it_is_killed", List.of("actor is_summon"));
         assertRule(20022, 3, "TURN_START", "cone20022_memorial_on_memosprite_turn", List.of("actor == summon"));
-        assertRule(20022, 3, "KILL", "cone20022_memorial_removed_when_it_is_killed", List.of("target == summon"));
+        // ⚠ It pinned KILL + `target == summon`: a summon that LEAVES the field is `SUMMON_LEFT`, and `target == summon`
+        // filters on isDeath() - which throws for the unit this event is about (§3.7w).
+        assertRule(20022, 3, "SUMMON_LEFT", "cone20022_memorial_removed_when_it_is_killed", List.of("actor is_summon"));
         assertRule(20022, 4, "TURN_START", "cone20022_memorial_on_memosprite_turn", List.of("actor == summon"));
-        assertRule(20022, 4, "KILL", "cone20022_memorial_removed_when_it_is_killed", List.of("target == summon"));
+        // ⚠ It pinned KILL + `target == summon`: a summon that LEAVES the field is `SUMMON_LEFT`, and `target == summon`
+        // filters on isDeath() - which throws for the unit this event is about (§3.7w).
+        assertRule(20022, 4, "SUMMON_LEFT", "cone20022_memorial_removed_when_it_is_killed", List.of("actor is_summon"));
         assertRule(20022, 5, "TURN_START", "cone20022_memorial_on_memosprite_turn", List.of("actor == summon"));
-        assertRule(20022, 5, "KILL", "cone20022_memorial_removed_when_it_is_killed", List.of("target == summon"));
+        // ⚠ It pinned KILL + `target == summon`: a summon that LEAVES the field is `SUMMON_LEFT`, and `target == summon`
+        // filters on isDeath() - which throws for the unit this event is about (§3.7w).
+        assertRule(20022, 5, "SUMMON_LEFT", "cone20022_memorial_removed_when_it_is_killed", List.of("actor is_summon"));
         assertRule(20024, 1, "RESOURCE_CHANGED", "cone20024_threshold_met", List.of("actor == self", "self_resource:笑点 >= 10.0"));
         assertRule(20024, 1, "RESOURCE_CHANGED", "cone20024_threshold_lost", List.of("actor == self", "self_resource:笑点 < 10.0"));
         assertRule(20024, 2, "RESOURCE_CHANGED", "cone20024_threshold_met", List.of("actor == self", "self_resource:笑点 >= 10.0"));
