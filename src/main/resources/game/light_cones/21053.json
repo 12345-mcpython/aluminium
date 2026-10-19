@@ -12,8 +12,8 @@
           "target": "self"
         }
       ],
-      "source": "光锥 21053 使装备者提供的护盾量提高#1[i]%。",
-      "note": "⭐ **这半必须由我们写** ✓：本椎的 `ability_property` **是空的** ✗（与 22003/23009/23015 相反 ✓）⇒ 写成 `BATTLE_START` + `SHIELD_BOOST` + `permanent` ✓（遗器 103/128 已有同款先例 ✓）。数值取自数据行 `skill_value[0]` ✓。"
+      "source": "光锥 21053 愿旅途永远坦然: 「使装备者提供的护盾量提高 #1%」",
+      "note": "「使装备者提供的**护盾量**提高 #1%」—— SHIELD_BOOST ✓（12/15/18/21/24% ✓）。⚠ 本条没有光锥属性可代替 ✓（weapons.json 的 \u0007bility_property 为空 ✓）。"
     },
     {
       "on": "DEALING_DAMAGE",
@@ -26,11 +26,11 @@
         {
           "op": "BOOST_DAMAGE",
           "percent": 0.12,
-          "target": "self"
+          "target": "actor"
         }
       ],
       "source": "光锥 21053 使装备者提供的护盾量提高#1[i]%，我方目标持有护盾时，造成的伤害提高#2[i]%。",
-      "note": "⭐⭐ **\"*我方目标*持有护盾时\" 用已有谓词就能写** ✓：`actor is_ally` ✓（—— 已在 1215/1504 实测可用 ✓）加 **`actor has_shield`** ✓。⭐ 常数半（护盾量）由引擎的 `ability_property` 发放 ✓（第 136 条 ✓）⇒ **我们只写条件半** ✓。⭐ 数值取自数据行 ✓（第 106 条 ✓）。"
+      "note": "「**我方目标持有护盾时**，造成的伤害提高 #2%」—— 触发 `DEALING_DAMAGE` ＋ `actor is_ally` ＋ `actor has_shield` ✓、增幅落在**出手的那位**身上（`target: actor` ✓ —— 原文件写 `self` ✗，那样只有装备者自己吃到 ✓）；12/14/16/18/20% ✓。⚠ 「使装备者提供的**护盾量**提高 #1%」用 `SHIELD_BOOST` ✓（12/15/18/21/24% ✓）。"
     }
   ],
   "2": [
@@ -41,13 +41,13 @@
         {
           "op": "MODIFY_ATTR",
           "attribute": "SHIELD_BOOST",
-          "percent": 0.15,
+          "percent": 0.12,
           "permanent": true,
           "target": "self"
         }
       ],
-      "source": "光锥 21053 使装备者提供的护盾量提高#1[i]%。",
-      "note": "⭐ **这半必须由我们写** ✓：本椎的 `ability_property` **是空的** ✗（与 22003/23009/23015 相反 ✓）⇒ 写成 `BATTLE_START` + `SHIELD_BOOST` + `permanent` ✓（遗器 103/128 已有同款先例 ✓）。数值取自数据行 `skill_value[0]` ✓。"
+      "source": "光锥 21053 愿旅途永远坦然: 「使装备者提供的护盾量提高 #1%」",
+      "note": "「使装备者提供的**护盾量**提高 #1%」—— SHIELD_BOOST ✓（12/15/18/21/24% ✓）。⚠ 本条没有光锥属性可代替 ✓（weapons.json 的 \u0007bility_property 为空 ✓）。"
     },
     {
       "on": "DEALING_DAMAGE",
@@ -60,11 +60,11 @@
         {
           "op": "BOOST_DAMAGE",
           "percent": 0.14,
-          "target": "self"
+          "target": "actor"
         }
       ],
       "source": "光锥 21053 使装备者提供的护盾量提高#1[i]%，我方目标持有护盾时，造成的伤害提高#2[i]%。",
-      "note": "⭐⭐ **\"*我方目标*持有护盾时\" 用已有谓词就能写** ✓：`actor is_ally` ✓（—— 已在 1215/1504 实测可用 ✓）加 **`actor has_shield`** ✓。⭐ 常数半（护盾量）由引擎的 `ability_property` 发放 ✓（第 136 条 ✓）⇒ **我们只写条件半** ✓。⭐ 数值取自数据行 ✓（第 106 条 ✓）。"
+      "note": "「**我方目标持有护盾时**，造成的伤害提高 #2%」—— 触发 `DEALING_DAMAGE` ＋ `actor is_ally` ＋ `actor has_shield` ✓、增幅落在**出手的那位**身上（`target: actor` ✓ —— 原文件写 `self` ✗，那样只有装备者自己吃到 ✓）；12/14/16/18/20% ✓。⚠ 「使装备者提供的**护盾量**提高 #1%」用 `SHIELD_BOOST` ✓（12/15/18/21/24% ✓）。"
     }
   ],
   "3": [
@@ -75,13 +75,13 @@
         {
           "op": "MODIFY_ATTR",
           "attribute": "SHIELD_BOOST",
-          "percent": 0.18,
+          "percent": 0.12,
           "permanent": true,
           "target": "self"
         }
       ],
-      "source": "光锥 21053 使装备者提供的护盾量提高#1[i]%。",
-      "note": "⭐ **这半必须由我们写** ✓：本椎的 `ability_property` **是空的** ✗（与 22003/23009/23015 相反 ✓）⇒ 写成 `BATTLE_START` + `SHIELD_BOOST` + `permanent` ✓（遗器 103/128 已有同款先例 ✓）。数值取自数据行 `skill_value[0]` ✓。"
+      "source": "光锥 21053 愿旅途永远坦然: 「使装备者提供的护盾量提高 #1%」",
+      "note": "「使装备者提供的**护盾量**提高 #1%」—— SHIELD_BOOST ✓（12/15/18/21/24% ✓）。⚠ 本条没有光锥属性可代替 ✓（weapons.json 的 \u0007bility_property 为空 ✓）。"
     },
     {
       "on": "DEALING_DAMAGE",
@@ -94,11 +94,11 @@
         {
           "op": "BOOST_DAMAGE",
           "percent": 0.16,
-          "target": "self"
+          "target": "actor"
         }
       ],
       "source": "光锥 21053 使装备者提供的护盾量提高#1[i]%，我方目标持有护盾时，造成的伤害提高#2[i]%。",
-      "note": "⭐⭐ **\"*我方目标*持有护盾时\" 用已有谓词就能写** ✓：`actor is_ally` ✓（—— 已在 1215/1504 实测可用 ✓）加 **`actor has_shield`** ✓。⭐ 常数半（护盾量）由引擎的 `ability_property` 发放 ✓（第 136 条 ✓）⇒ **我们只写条件半** ✓。⭐ 数值取自数据行 ✓（第 106 条 ✓）。"
+      "note": "「**我方目标持有护盾时**，造成的伤害提高 #2%」—— 触发 `DEALING_DAMAGE` ＋ `actor is_ally` ＋ `actor has_shield` ✓、增幅落在**出手的那位**身上（`target: actor` ✓ —— 原文件写 `self` ✗，那样只有装备者自己吃到 ✓）；12/14/16/18/20% ✓。⚠ 「使装备者提供的**护盾量**提高 #1%」用 `SHIELD_BOOST` ✓（12/15/18/21/24% ✓）。"
     }
   ],
   "4": [
@@ -109,13 +109,13 @@
         {
           "op": "MODIFY_ATTR",
           "attribute": "SHIELD_BOOST",
-          "percent": 0.21,
+          "percent": 0.12,
           "permanent": true,
           "target": "self"
         }
       ],
-      "source": "光锥 21053 使装备者提供的护盾量提高#1[i]%。",
-      "note": "⭐ **这半必须由我们写** ✓：本椎的 `ability_property` **是空的** ✗（与 22003/23009/23015 相反 ✓）⇒ 写成 `BATTLE_START` + `SHIELD_BOOST` + `permanent` ✓（遗器 103/128 已有同款先例 ✓）。数值取自数据行 `skill_value[0]` ✓。"
+      "source": "光锥 21053 愿旅途永远坦然: 「使装备者提供的护盾量提高 #1%」",
+      "note": "「使装备者提供的**护盾量**提高 #1%」—— SHIELD_BOOST ✓（12/15/18/21/24% ✓）。⚠ 本条没有光锥属性可代替 ✓（weapons.json 的 \u0007bility_property 为空 ✓）。"
     },
     {
       "on": "DEALING_DAMAGE",
@@ -128,11 +128,11 @@
         {
           "op": "BOOST_DAMAGE",
           "percent": 0.18,
-          "target": "self"
+          "target": "actor"
         }
       ],
       "source": "光锥 21053 使装备者提供的护盾量提高#1[i]%，我方目标持有护盾时，造成的伤害提高#2[i]%。",
-      "note": "⭐⭐ **\"*我方目标*持有护盾时\" 用已有谓词就能写** ✓：`actor is_ally` ✓（—— 已在 1215/1504 实测可用 ✓）加 **`actor has_shield`** ✓。⭐ 常数半（护盾量）由引擎的 `ability_property` 发放 ✓（第 136 条 ✓）⇒ **我们只写条件半** ✓。⭐ 数值取自数据行 ✓（第 106 条 ✓）。"
+      "note": "「**我方目标持有护盾时**，造成的伤害提高 #2%」—— 触发 `DEALING_DAMAGE` ＋ `actor is_ally` ＋ `actor has_shield` ✓、增幅落在**出手的那位**身上（`target: actor` ✓ —— 原文件写 `self` ✗，那样只有装备者自己吃到 ✓）；12/14/16/18/20% ✓。⚠ 「使装备者提供的**护盾量**提高 #1%」用 `SHIELD_BOOST` ✓（12/15/18/21/24% ✓）。"
     }
   ],
   "5": [
@@ -143,13 +143,13 @@
         {
           "op": "MODIFY_ATTR",
           "attribute": "SHIELD_BOOST",
-          "percent": 0.24,
+          "percent": 0.12,
           "permanent": true,
           "target": "self"
         }
       ],
-      "source": "光锥 21053 使装备者提供的护盾量提高#1[i]%。",
-      "note": "⭐ **这半必须由我们写** ✓：本椎的 `ability_property` **是空的** ✗（与 22003/23009/23015 相反 ✓）⇒ 写成 `BATTLE_START` + `SHIELD_BOOST` + `permanent` ✓（遗器 103/128 已有同款先例 ✓）。数值取自数据行 `skill_value[0]` ✓。"
+      "source": "光锥 21053 愿旅途永远坦然: 「使装备者提供的护盾量提高 #1%」",
+      "note": "「使装备者提供的**护盾量**提高 #1%」—— SHIELD_BOOST ✓（12/15/18/21/24% ✓）。⚠ 本条没有光锥属性可代替 ✓（weapons.json 的 \u0007bility_property 为空 ✓）。"
     },
     {
       "on": "DEALING_DAMAGE",
@@ -162,11 +162,11 @@
         {
           "op": "BOOST_DAMAGE",
           "percent": 0.2,
-          "target": "self"
+          "target": "actor"
         }
       ],
       "source": "光锥 21053 使装备者提供的护盾量提高#1[i]%，我方目标持有护盾时，造成的伤害提高#2[i]%。",
-      "note": "⭐⭐ **\"*我方目标*持有护盾时\" 用已有谓词就能写** ✓：`actor is_ally` ✓（—— 已在 1215/1504 实测可用 ✓）加 **`actor has_shield`** ✓。⭐ 常数半（护盾量）由引擎的 `ability_property` 发放 ✓（第 136 条 ✓）⇒ **我们只写条件半** ✓。⭐ 数值取自数据行 ✓（第 106 条 ✓）。"
+      "note": "「**我方目标持有护盾时**，造成的伤害提高 #2%」—— 触发 `DEALING_DAMAGE` ＋ `actor is_ally` ＋ `actor has_shield` ✓、增幅落在**出手的那位**身上（`target: actor` ✓ —— 原文件写 `self` ✗，那样只有装备者自己吃到 ✓）；12/14/16/18/20% ✓。⚠ 「使装备者提供的**护盾量**提高 #1%」用 `SHIELD_BOOST` ✓（12/15/18/21/24% ✓）。"
     }
   ]
 }
