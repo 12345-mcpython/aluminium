@@ -29,20 +29,33 @@ public class SushangUltimateAndTraceTest {
     private static final int LEVEL = 80;
 
     /**
-     * ⭐ 「并使素裳立即行动」: casting her ultimate puts Sushang at the front of the queue again.
+     * ⭐ 「并使素裳立即行动」: casting her ultimate clears her <b>wait</b>, so she is the next to act.
      *
-     * <p>⚠ Asserted on the SCHEDULED actor, not on a return value: {@code ULT_CAST} is an event she may not
-     * be the target of, so the clause is "who acts next", which is what {@code getExtraTurnActor} answers.
+     * <p>⚠ <b>CORRECTED (2026-10-19).</b> This case used to assert {@code getExtraTurnActor() == sushang} - i.e. it pinned
+     * `EXTRA_TURN` as the reading of 「立即行动」. The game's own ability data decides it against that: the ultimate's phase
+     * ({@code Avatar_Sushang_00_Skill03_Phase02}) ends with {@code SetActionDelay} on the Caster, {@code Value = 0} (her
+     * delay is zeroed), and it never uses {@code RPG.GameCore.TurnInsertAbility} - the game's inserted-turn primitive
+     * (measured: 1780 uses corpus-wide, none here). So the sentence is "clear the wait", and the two readings differ
+     * observably: an extra turn keeps the turn she already had, zeroing the wait consumes it.
+     *
+     * <p>⚠ Both sides are asserted, or the reading is not pinned: the remaining wait must become <b>0</b>, and <b>no</b>
+     * extra turn may be scheduled.
      */
     @Test
-    public void herUltimateSchedulesHerOwnExtraTurn() {
+    public void herUltimateMakesHerActImmediately() {
         Fixture f = new Fixture();
         Assertions.assertNull(f.battle.getExtraTurnActor(), "precondition: nothing is scheduled yet");
+        double before = f.remainingWaitOf(f.sushang);
+        Assertions.assertTrue(before > 0, "precondition: she is waiting her turn (" + before + ")");
 
         f.battle.fireTriggers(TriggerEvent.ULT_CAST, f.sushang, f.enemy, 0, 0);
 
-        Assertions.assertSame(f.sushang, f.battle.getExtraTurnActor(),
-                "「使素裳立即行动」 must schedule HER extra turn, not our ally's or nobody's");
+        double after = f.remainingWaitOf(f.sushang);
+        System.out.println("[1206] 大招前后的剩余等待: " + before + " -> " + after
+                + " ; extraTurnActor = " + f.battle.getExtraTurnActor());
+        Assertions.assertEquals(0.0, after, 1e-9, "「立即行动」= 等待清零（数据：`SetActionDelay` 的 `Value = 0`）");
+        Assertions.assertNull(f.battle.getExtraTurnActor(),
+                "「立即行动」≠「额外回合」：后者会插入一个回合（数据里那用的是 `TurnInsertAbility`）");
     }
 
     /**
@@ -131,6 +144,16 @@ public class SushangUltimateAndTraceTest {
         /** Her Skill at the enemy, through the engine's own immediate-cast entry point. */
         private void castSkill() {
             battle.castImmediate(sushang.getSkills().get(SkillType.SKILL), sushang, List.of(enemy));
+        }
+
+        /** A unit's remaining wait, read off the action bar's own snapshot (the battle clock does not move). */
+        private double remainingWaitOf(com.laosun.aluminium.models.CanHit unit) {
+            for (var signal : battle.queue.snapshot()) {
+                if (signal.getCanHit() == unit) {
+                    return battle.queue.getTimeRemaining(signal);
+                }
+            }
+            throw new AssertionError(unit.getName() + " is not on the action bar");
         }
     }
 }
