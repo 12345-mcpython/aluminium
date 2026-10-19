@@ -124,6 +124,53 @@ public class SilverWolfLV999LootPickTest {
     // ==================================================================
 
     /**
+     * The box's share is read from her Ultimate's row (#3), where the sentence states it - not from a literal.
+     *
+     * <p>⚠ This half is about the SPELLING, and it is separate from the number below on purpose: a revert to the literal would
+     * redden both, and keeping them apart is what lets the numeric case be read as a number rather than as a spelling check.
+     */
+    @Test
+    public void theBoxsShareIsReadFromHerUltimateRow() {
+        var box = compileBoxEffect();
+        System.out.println("[1506] the box's share: from_skill_param=" + box.getPercentFromSkillParam()
+                + " literal=" + box.getPercent());
+        Assertions.assertEquals("ULTRA:2", box.getPercentFromSkillParam(),
+                "「造成 90% 的虚数属性欢愉伤害」 states a share of the Ultimate's own row, item #3");
+        Assertions.assertNull(box.getPercent(), "and not a literal, which is what the page's Lv10 display row would give");
+    }
+
+    /**
+     * The box's own share is her ULTIMATE row's #3 <b>read at her level</b> - so 1.125, not the 0.9 the page prints.
+     *
+     * <p>⚠ The number's model, so it is not a magic constant: {@code elation_base(Lv80) × 1.125 × (1 + 欢愉度)} =
+     * 7535.107 × 1.125 × 1.10 = 9324.69 before zones, and this fixture's monster scales that by 0.34287 - measured on this very
+     * reading. Her page prints 90% because the generator substitutes the Lv10 display row (0.9); with that literal the same
+     * reading is 2557.63, i.e. 0.8 of this.
+     */
+    @Test
+    public void theBoxsOwnShareIsTheUltimateRowReadAtHerLevel() {
+        ScriptedRng rng = new ScriptedRng(PICK_POINTS);
+        Battle battle = battle(rng, 1);
+        Reading settled = fire(battle, rng);
+        System.out.println("[1506] the box settled " + settled.hpLost() + " with one enemy (the Lv10 literal 0.9 would "
+                + "read 2557.63)");
+        Assertions.assertEquals(3197.0383318342465, settled.hpLost(), 1e-6,
+                "the box settles elation_base x the row's 1.125 x her 欢愉度, through this fixture's zones");
+    }
+
+    /**
+     * The compiled box rule's own damage effect.
+     */
+    private static com.laosun.aluminium.beans.EffectSpec compileBoxEffect() {
+        Character wolf = CharacterFactory.create(WOLF, 80);
+        return wolf.getTriggerTable().rulesFor(TriggerEvent.SKILL_POINT_SPENT).stream()
+                .filter(rule -> rule.id().equals("p1506_zone_loot_box_on_a_spent_point"))
+                .findFirst().orElseThrow(() -> new AssertionError("her box rule is not on her table"))
+                .effects().stream().filter(e -> "DAMAGE".equals(e.getOp())).findFirst()
+                .orElseThrow(() -> new AssertionError("the box's own damage is not on that rule"));
+    }
+
+    /**
      * One firing with {@code enemies} identical enemies, 【爆爆爆炸蛋】 picked, returning what each enemy lost.
      */
     private static double boxsOwnDamagePerEnemy(int enemies) {

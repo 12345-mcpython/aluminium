@@ -188,13 +188,14 @@ public class SilverWolfLV999KitTest {
     }
 
     /**
-     * One slot's 40% rider, against an expectation built from the engine's own factors.
+     * One slot's rider - the talent row's share of her ATTACK, against an expectation built from the engine's own factors.
      *
-     * <p>⚠ Why the exact arithmetic rather than "it went up": a case that only compares the two runs leaves a mutation of
-     * the shipped 0.4 to 0.1 GREEN, because both readings move together. The identity used here has no free parameter -
-     * the rider is {@code 0.4 x ATTACK} folded with 欢愉度, 增笑 and the laugh snapshot, then settled through the SAME zones
-     * as the attack that carries it, so {@code delta / attackDamage} is {@code (0.4 / the row) x those factors} exactly.
-     * Measured: 0.43517, and the row it implies (1.4) is the slot-1 row the file pins at Lv10.
+     * <p>⚠ Why the exact arithmetic rather than "it went up": a case that only compares the two runs leaves a mutation of the
+     * rider's share GREEN, because both readings move together. The identity used here has no free parameter - the rider is
+     * {@code (the talent row's #3) x ATTACK} folded with 欢愉度, 增笑 and the laugh snapshot, then settled through the SAME
+     * zones as the attack that carries it, so {@code delta / attackDamage} is {@code (share / the row) x those factors}
+     * exactly. ⚠ The share is read from the SAME row the rule reads on purpose: a rule that went back to a literal (0.4, the
+     * document's Lv10 display) then disagrees with this expectation by 25%, which is the red this case owes.
      */
     private static void assertRider(SkillType slot, String label) {
         double without = attackDamage(newBattle(), false, slot);
@@ -206,13 +207,23 @@ public class SilverWolfLV999KitTest {
         double laughs = held.elationLaughMultiplier();
         var skill = wolf.getSkills().get(slot);
         double row = skill.getData().getSkills().get(wolf.skillLevel(skill) - 1).getFirst();
-        double expected = (0.4 / row) * without * boosts * laughs;
+        // The rider's share is no longer a literal: it is item #3 of HER TALENT row, read at the level `level_convention`
+        // raises the talent to. The document's prose prints 40% because the page generator substitutes the Lv10 display row
+        // (export_battle.py: `min(10, rows)` for everything that is not a Normal attack) - her talent is a 15-row table.
+        var talent = wolf.getSkills().get(SkillType.TALENT);
+        int talentLevel = wolf.skillLevel(talent);
+        double riderShare = talent.getData().getSkills().get(talentLevel - 1).get(2);
+        double expected = (riderShare / row) * without * boosts * laughs;
+        Assertions.assertEquals(15, talentLevel, "她的天赋被等级口径抬到 15 行表的最后一行");
+        Assertions.assertEquals(0.5, riderShare, 1e-9,
+                "天赋满级行的 #3 = 0.5（文档正文印的 40% 是它的 Lv10 显示行）");
         System.out.println("[1506] " + label + ": " + without + " -> " + with + " ; delta " + (with - without)
-                + " ; expected 40% of the same attack (row " + row + ", boosts " + boosts + ", laughs x" + laughs
-                + ") = " + expected);
+                + " ; expected the talent row's " + riderShare + " of the same attack (row " + row + ", boosts " + boosts
+                + ", laughs x" + laughs + ") = " + expected);
         Assertions.assertTrue(with > without, label + " pays the rider while she holds 【好活当赏】");
         Assertions.assertEquals(expected, with - without, 1e-6,
-                label + " pays exactly 40% of her ATTACK folded by 欢愉度/增笑/计入的笑点, settled through the same zones");
+                label + " pays exactly the talent row's share of her ATTACK folded by 欢愉度/增笑/计入的笑点, settled "
+                        + "through the same zones");
     }
 
     /**
