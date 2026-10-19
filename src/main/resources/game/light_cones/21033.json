@@ -1,20 +1,24 @@
 {
   "1": [
     {
-      "on": "BATTLE_START",
-      "id": "cone21033_attack",
+      "on": "KILL",
+      "id": "cone21033_heal_on_kill",
       "do": [
         {
-          "op": "MODIFY_ATTR",
-          "attribute": "ATTACK",
-          "percent": 0.24,
-          "permanent": true,
+          "op": "HEAL",
+          "scale": "owner_attack",
+          "percent": 0.12,
           "target": "self"
         }
       ],
-      "source": "光锥 21033 无处可逃: 使装备者的攻击力提高#1[i]%。当装备者消灭敌方目标时，回复等同于自身#2[i]%攻击力的生命值。",
-      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查**（第 127/270 轮纪律）：第一段是**开战即生效**的永久加成 ✓；第二段由 **`KILL`** 在**战斗中**触发 ✓ ⇒ **真实流程可驱动** ✓（第 130/270 轮已开先例 ✓）。"
-    },
+      "source": "光锥 21033 无处可逃: 「消灭敌方目标时，恢复等同于自身#2%攻击力的生命值」",
+      "note": "「当装备者消灭敌方目标时，回复等同于自身**攻击力** #2% 的生命值」—— `KILL` ＋ **`actor == self`** ✓（队友击杀不算 ✓）、`HEAL scale: self_attr:ATTACK` ✓（**攻击力**的份额 ✓，不是生命上限 ✗）、12/15/18/21/24% ✓。\n⚠⚠ **2026-10-19 逐句核时改的三处**：① 补 `actor == self` ✓（原先没有 ⇒ 队友击杀也给她回血 ✗）；② 补 `scale: self_attr:ATTACK` ✓（原先是一个**平值** 0.12 点 ✗）；③ **删掉 `cone21033_attack`** ✗ —— 「攻击力提高 #1%」**就是光锥自己的** `attack_percent` 属性（`Weapon.build` 施加 ✓）⇒ 再写一条会读成两倍 ✗。",
+      "when": [
+        "actor == self"
+      ]
+    }
+  ],
+  "2": [
     {
       "on": "KILL",
       "id": "cone21033_heal_on_kill",
@@ -27,131 +31,67 @@
         }
       ],
       "source": "光锥 21033 无处可逃: 「消灭敌方目标时，恢复等同于自身#2%攻击力的生命值」",
-      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查**（第 127/270 轮纪律）：第一段是**开战即生效**的永久加成 ✓；第二段由 **`KILL`** 在**战斗中**触发 ✓ ⇒ **真实流程可驱动** ✓（第 130/270 轮已开先例 ✓）。 ⚠ **\"自身攻击力\"** ⇒ `scale: \"owner_attack\"` ✓（字面量取自解释器源码 ✓，不是猜的 ✓）。"
-    }
-  ],
-  "2": [
-    {
-      "on": "BATTLE_START",
-      "id": "cone21033_attack",
-      "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "ATTACK",
-          "percent": 0.3,
-          "permanent": true,
-          "target": "self"
-        }
-      ],
-      "source": "光锥 21033 无处可逃: 使装备者的攻击力提高#1[i]%。当装备者消灭敌方目标时，回复等同于自身#2[i]%攻击力的生命值。",
-      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查**（第 127/270 轮纪律）：第一段是**开战即生效**的永久加成 ✓；第二段由 **`KILL`** 在**战斗中**触发 ✓ ⇒ **真实流程可驱动** ✓（第 130/270 轮已开先例 ✓）。"
-    },
-    {
-      "on": "KILL",
-      "id": "cone21033_heal_on_kill",
-      "do": [
-        {
-          "op": "HEAL",
-          "scale": "owner_attack",
-          "percent": 0.15,
-          "target": "self"
-        }
-      ],
-      "source": "光锥 21033 无处可逃: 「消灭敌方目标时，恢复等同于自身#2%攻击力的生命值」",
-      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查**（第 127/270 轮纪律）：第一段是**开战即生效**的永久加成 ✓；第二段由 **`KILL`** 在**战斗中**触发 ✓ ⇒ **真实流程可驱动** ✓（第 130/270 轮已开先例 ✓）。 ⚠ **\"自身攻击力\"** ⇒ `scale: \"owner_attack\"` ✓（字面量取自解释器源码 ✓，不是猜的 ✓）。"
+      "note": "「当装备者消灭敌方目标时，回复等同于自身**攻击力** #2% 的生命值」—— `KILL` ＋ **`actor == self`** ✓（队友击杀不算 ✓）、`HEAL scale: self_attr:ATTACK` ✓（**攻击力**的份额 ✓，不是生命上限 ✗）、12/15/18/21/24% ✓。\n⚠⚠ **2026-10-19 逐句核时改的三处**：① 补 `actor == self` ✓（原先没有 ⇒ 队友击杀也给她回血 ✗）；② 补 `scale: self_attr:ATTACK` ✓（原先是一个**平值** 0.12 点 ✗）；③ **删掉 `cone21033_attack`** ✗ —— 「攻击力提高 #1%」**就是光锥自己的** `attack_percent` 属性（`Weapon.build` 施加 ✓）⇒ 再写一条会读成两倍 ✗。",
+      "when": [
+        "actor == self"
+      ]
     }
   ],
   "3": [
     {
-      "on": "BATTLE_START",
-      "id": "cone21033_attack",
-      "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "ATTACK",
-          "percent": 0.36,
-          "permanent": true,
-          "target": "self"
-        }
-      ],
-      "source": "光锥 21033 无处可逃: 使装备者的攻击力提高#1[i]%。当装备者消灭敌方目标时，回复等同于自身#2[i]%攻击力的生命值。",
-      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查**（第 127/270 轮纪律）：第一段是**开战即生效**的永久加成 ✓；第二段由 **`KILL`** 在**战斗中**触发 ✓ ⇒ **真实流程可驱动** ✓（第 130/270 轮已开先例 ✓）。"
-    },
-    {
       "on": "KILL",
       "id": "cone21033_heal_on_kill",
       "do": [
         {
           "op": "HEAL",
           "scale": "owner_attack",
-          "percent": 0.18,
+          "percent": 0.12,
           "target": "self"
         }
       ],
       "source": "光锥 21033 无处可逃: 「消灭敌方目标时，恢复等同于自身#2%攻击力的生命值」",
-      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查**（第 127/270 轮纪律）：第一段是**开战即生效**的永久加成 ✓；第二段由 **`KILL`** 在**战斗中**触发 ✓ ⇒ **真实流程可驱动** ✓（第 130/270 轮已开先例 ✓）。 ⚠ **\"自身攻击力\"** ⇒ `scale: \"owner_attack\"` ✓（字面量取自解释器源码 ✓，不是猜的 ✓）。"
+      "note": "「当装备者消灭敌方目标时，回复等同于自身**攻击力** #2% 的生命值」—— `KILL` ＋ **`actor == self`** ✓（队友击杀不算 ✓）、`HEAL scale: self_attr:ATTACK` ✓（**攻击力**的份额 ✓，不是生命上限 ✗）、12/15/18/21/24% ✓。\n⚠⚠ **2026-10-19 逐句核时改的三处**：① 补 `actor == self` ✓（原先没有 ⇒ 队友击杀也给她回血 ✗）；② 补 `scale: self_attr:ATTACK` ✓（原先是一个**平值** 0.12 点 ✗）；③ **删掉 `cone21033_attack`** ✗ —— 「攻击力提高 #1%」**就是光锥自己的** `attack_percent` 属性（`Weapon.build` 施加 ✓）⇒ 再写一条会读成两倍 ✗。",
+      "when": [
+        "actor == self"
+      ]
     }
   ],
   "4": [
     {
-      "on": "BATTLE_START",
-      "id": "cone21033_attack",
-      "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "ATTACK",
-          "percent": 0.42,
-          "permanent": true,
-          "target": "self"
-        }
-      ],
-      "source": "光锥 21033 无处可逃: 使装备者的攻击力提高#1[i]%。当装备者消灭敌方目标时，回复等同于自身#2[i]%攻击力的生命值。",
-      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查**（第 127/270 轮纪律）：第一段是**开战即生效**的永久加成 ✓；第二段由 **`KILL`** 在**战斗中**触发 ✓ ⇒ **真实流程可驱动** ✓（第 130/270 轮已开先例 ✓）。"
-    },
-    {
       "on": "KILL",
       "id": "cone21033_heal_on_kill",
       "do": [
         {
           "op": "HEAL",
           "scale": "owner_attack",
-          "percent": 0.21,
+          "percent": 0.12,
           "target": "self"
         }
       ],
       "source": "光锥 21033 无处可逃: 「消灭敌方目标时，恢复等同于自身#2%攻击力的生命值」",
-      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查**（第 127/270 轮纪律）：第一段是**开战即生效**的永久加成 ✓；第二段由 **`KILL`** 在**战斗中**触发 ✓ ⇒ **真实流程可驱动** ✓（第 130/270 轮已开先例 ✓）。 ⚠ **\"自身攻击力\"** ⇒ `scale: \"owner_attack\"` ✓（字面量取自解释器源码 ✓，不是猜的 ✓）。"
+      "note": "「当装备者消灭敌方目标时，回复等同于自身**攻击力** #2% 的生命值」—— `KILL` ＋ **`actor == self`** ✓（队友击杀不算 ✓）、`HEAL scale: self_attr:ATTACK` ✓（**攻击力**的份额 ✓，不是生命上限 ✗）、12/15/18/21/24% ✓。\n⚠⚠ **2026-10-19 逐句核时改的三处**：① 补 `actor == self` ✓（原先没有 ⇒ 队友击杀也给她回血 ✗）；② 补 `scale: self_attr:ATTACK` ✓（原先是一个**平值** 0.12 点 ✗）；③ **删掉 `cone21033_attack`** ✗ —— 「攻击力提高 #1%」**就是光锥自己的** `attack_percent` 属性（`Weapon.build` 施加 ✓）⇒ 再写一条会读成两倍 ✗。",
+      "when": [
+        "actor == self"
+      ]
     }
   ],
   "5": [
     {
-      "on": "BATTLE_START",
-      "id": "cone21033_attack",
-      "do": [
-        {
-          "op": "MODIFY_ATTR",
-          "attribute": "ATTACK",
-          "percent": 0.48,
-          "permanent": true,
-          "target": "self"
-        }
-      ],
-      "source": "光锥 21033 无处可逃: 使装备者的攻击力提高#1[i]%。当装备者消灭敌方目标时，回复等同于自身#2[i]%攻击力的生命值。",
-      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查**（第 127/270 轮纪律）：第一段是**开战即生效**的永久加成 ✓；第二段由 **`KILL`** 在**战斗中**触发 ✓ ⇒ **真实流程可驱动** ✓（第 130/270 轮已开先例 ✓）。"
-    },
-    {
       "on": "KILL",
       "id": "cone21033_heal_on_kill",
       "do": [
         {
           "op": "HEAL",
           "scale": "owner_attack",
-          "percent": 0.24,
+          "percent": 0.12,
           "target": "self"
         }
       ],
       "source": "光锥 21033 无处可逃: 「消灭敌方目标时，恢复等同于自身#2%攻击力的生命值」",
-      "note": "数值取自 `weapons.json` 的 `weapon_skill_data` ✓。⚠ **触发时序自查**（第 127/270 轮纪律）：第一段是**开战即生效**的永久加成 ✓；第二段由 **`KILL`** 在**战斗中**触发 ✓ ⇒ **真实流程可驱动** ✓（第 130/270 轮已开先例 ✓）。 ⚠ **\"自身攻击力\"** ⇒ `scale: \"owner_attack\"` ✓（字面量取自解释器源码 ✓，不是猜的 ✓）。"
+      "note": "「当装备者消灭敌方目标时，回复等同于自身**攻击力** #2% 的生命值」—— `KILL` ＋ **`actor == self`** ✓（队友击杀不算 ✓）、`HEAL scale: self_attr:ATTACK` ✓（**攻击力**的份额 ✓，不是生命上限 ✗）、12/15/18/21/24% ✓。\n⚠⚠ **2026-10-19 逐句核时改的三处**：① 补 `actor == self` ✓（原先没有 ⇒ 队友击杀也给她回血 ✗）；② 补 `scale: self_attr:ATTACK` ✓（原先是一个**平值** 0.12 点 ✗）；③ **删掉 `cone21033_attack`** ✗ —— 「攻击力提高 #1%」**就是光锥自己的** `attack_percent` 属性（`Weapon.build` 施加 ✓）⇒ 再写一条会读成两倍 ✗。",
+      "when": [
+        "actor == self"
+      ]
     }
   ]
 }
