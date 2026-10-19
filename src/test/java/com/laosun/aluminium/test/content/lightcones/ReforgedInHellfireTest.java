@@ -1,5 +1,6 @@
 package com.laosun.aluminium.test.content.lightcones;
 
+import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Weapon;
@@ -33,14 +34,10 @@ public class ReforgedInHellfireTest {
         for (int rank = 1; rank <= 5; rank++) {
             var table = wearer(rank).getTriggerTable();
 
-            var hp = table.rulesFor(TriggerEvent.BATTLE_START).stream()
-                    .filter(r -> r.id().equals("cone23059_hp")).toList();
-            Assertions.assertEquals(1, hp.size(), "rank " + rank + ": the HP rule");
-            Assertions.assertEquals("HEALTH", hp.getFirst().effects().getFirst().getAttribute(),
-                    "rank " + rank + ": the attribute is HEALTH, not HP");
-            Assertions.assertEquals(HP[rank - 1], hp.getFirst().effects().getFirst().getPercent(), 1e-9,
-                    "rank " + rank + ": HP");
-
+            // 2026-10-19: the HP share is the cone's own health_percent property now (the rule was a duplicate).
+            double plainHp = CharacterFactory.create(WEARER, LEVEL, true).getAttribute(AttributeType.HEALTH).get();
+            Assertions.assertTrue(wearer(rank).getAttribute(AttributeType.HEALTH).get() > plainHp,
+                    "rank " + rank + ": the HP share reaches the panel");
             var energy = table.rulesFor(TriggerEvent.TURN_START).stream()
                     .filter(r -> r.id().equals("cone23059_wave_energy")).toList();
             Assertions.assertEquals(1, energy.size(), "rank " + rank + ": the energy rule");
