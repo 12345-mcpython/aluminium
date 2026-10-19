@@ -369,6 +369,7 @@ if (isSelected) buffer.setStyle(rowArea, highlightStyle);
 | **集合顺序** | 打印 / 遍历顺序要确定 | 【已把守：`DeterministicCollectionOrderTest`】 |
 | **技能等级表边界** | 等级越界要有定义 | 【已把守：`SkillLevelTableBoundTest`】 |
 | **读参数行只准走一个解析器** | 任何读参数行的地方都用 `CanHit.skillLevel` ✓（角色按 `SkillType`、忆灵按 data slot ✓）；写死行号 / `getFirst()` ✗ —— ⚠ 由**描述**驱动的那几个读法（弹射的份额与次数、Debuff 基础概率）曾是例外 ✓，在数值恰好平坦时**完全隐形** ✗（2026-10-17 实测：1004 瓦尔特 的弹射每段读 0.36 而第 10 行是 0.72 ✓） | 【已把守：`BounceSkillLevelTest`、`DebuffChanceDataTest.theLevelSelectsTheRow`】 |
+| **份额的分数** | `percent` 与**一个**行／计数份额**同时写** = 「**那个份额的** X%」✓（读者：1206「原伤害的 **50%**」✓ —— 那一份是 `SKILL:1`，E5 抬级后仍对 ✓）。⚠ **两条行份额**仍然互斥 ✓（一行与一个计数器不能都当份额 ✓）；⚠ 这个口子只在**伤害路径**开 ✓（`requireDerivedScale(…, percentMayScaleRow)` ✓） | 【已把守：`PercentFromSkillParamTest.aPercentBesideARowShareIsAFractionOfIt`、`SushangExtraRollFollowsTheRowTest`（E0／E5 两端）】 |
 
 ### 3.7b 数据版本与迁移（**2026-10-18**）
 
@@ -1308,6 +1309,14 @@ C 层全是**填口子** ✓，依赖已完成的机制，**不该出现新架�
   ⇒ **"引擎没做"与"句子写不了"是两件事** ✓：前者是**待补的能力** ✓，后者才是**真的缺口** ✗。
 - **撤回留在原地** ✓（§1.3）—— 而**本仓库那两次的撤回原文已经随旧台账被删** ✓
   ⇒ 所以它现在**只活在本节** ✓，别再去别的文件里找 ✗。
+- ⭐ **读法选择也能被数据定下来 —— 去找「那个语义独有的原语」用没用上** ✓（2026-10-19 实证 ✓）：
+  1206「并使素裳立即行动」一直是**读法选择** ✓（`EXTRA_TURN` 还是 `ADVANCE 100%` —— `HSR.md` 只定义「额外回合」
+  与「行动提前/延后」，而正文用的是**第三个词** ✓），登记了几天没人推翻 ✓。**定下来的是官方 ability 数据** ✓：
+  她大招那一 phase 收尾对 **Caster** 发 `RPG.GameCore.SetActionDelay` 且 **`Value = 0`** ✓（等待清零 ✓），
+  而全库「插入一个回合」的原语是 **`TurnInsertAbility`**（实测 **1780** 处 ✓）—— 她**没有用** ✓ ⇒ 读法 = **清零** ✓。
+  ⇒ **规矩**：一个词没有定义时，**别投票、也别找攻略** ✓ —— 去数据里找**那个语义独有的原语**用没用上 ✓；
+  ⚠ 两种读法**可观测地不同** ✓（额外回合**保留**原本那一回合 ✓、清零**消耗**它 ✓）⇒ 判据必须**两侧都钉** ✓
+  （`SushangUltimateAndTraceTest.herUltimateMakesHerActImmediately` ✓：剩余等待 → 0 ✓ **且**没有待执行额外回合 ✓）。
 
 ### 6.3 判据
 
