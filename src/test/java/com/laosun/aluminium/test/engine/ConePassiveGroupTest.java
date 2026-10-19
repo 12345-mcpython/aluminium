@@ -40,7 +40,9 @@ public class ConePassiveGroupTest {
 
     @Test
     public void cone21008GivesEffectHitRateAndDotBoost() {
-        Assertions.assertEquals(0.2, gain(21008, 1, AttributeType.EFFECT_HIT_RATE, 1), 1e-6, "effect hit rate");
+        // 2026-10-19: the effect-hit share comes from the cone's own bility_property (the file used to state it twice, so the
+        // panel read +40%); gain(...) only sees RULES, so this reading is a panel difference against no cone at all.
+        Assertions.assertEquals(0.2, panelGain(21008, AttributeType.EFFECT_HIT_RATE), 1e-6, "effect hit rate (property only)");
         Assertions.assertEquals(0.24, gain(21008, 1, AttributeType.DOT_DAMAGE_BOOST, 1), 1e-6, "damage over time");
     }
 
@@ -53,13 +55,21 @@ public class ConePassiveGroupTest {
         double healBoost = unit.getAttribute(AttributeType.OUTGOING_HEALING_BOOST).get();
         double allyEnergy = ally.getCurrentEnergy();
         battle.startBattle();
-        Assertions.assertEquals(0.1, unit.getAttribute(AttributeType.OUTGOING_HEALING_BOOST).get() - healBoost, 1e-6,
-                "the healing boost");
+        // 2026-10-19: the healing share is the cone's bility_property, and Weapon.build puts it in the panel BEFORE the
+        // battle starts - so the reading is against a cone-less wearer, not across startBattle.
+        Assertions.assertEquals(0.1, panelGain(21007, AttributeType.OUTGOING_HEALING_BOOST), 1e-6,
+                "the healing boost (property only)");
         battle.currentMove = new Signal(unit);
         battle.beforeMove();
         battle.fireTriggers(TriggerEvent.SKILL_CAST, unit, target, 0, 0);
         Assertions.assertTrue(ally.getCurrentEnergy() > allyEnergy,
                 "the ally gains energy: " + allyEnergy + " -> " + ally.getCurrentEnergy());
+    }
+
+    /** The panel difference for one attribute: with the cone minus without. */
+    private static double panelGain(int cone, AttributeType type) {
+        return wearer(cone, 1).getAttribute(type).get()
+                - CharacterFactory.create(1002, 80).getAttribute(type).get();
     }
 
     private static Character wearer(int cone, int rank) {
