@@ -19,14 +19,21 @@ import java.util.List;
 /**
  * Light cone 20003: "防御力提高#1%。当装备者当前生命值百分比小于#2%时，其防御力额外提高#3%" at rank 5.
  *
- * <p>DEFENCE is flat (each share scales the post-start base). The two clauses are mutually exclusive branches, so exactly one modifier exists at any time.
+ * <p>DEFENCE is flat (each share scales the post-start base).
+ *
+ * <p>⚠⚠ <b>This case used to pin a bug.</b> It asserted that the rule adds {@code #1} above the threshold and {@code #1+#3}
+ * below it - true of the SHIPPED FILE at the time, and wrong as a statement about the panel, because the cone's own
+ * {@code ability_property} already carries {@code #1} ({@code Weapon.build}) and the file's base rule added it again. The
+ * old assertions read only the RULE's gain, never the panel, so nothing noticed (measured 2026-10-19: 1007.795 where one
+ * share gives 947.665). The file now states only the EXTRA share below the threshold, and this case pins both halves:
+ * <b>no rule gain at or above the threshold</b>, and <b>{@code #3} below it</b>.
  */
 public class AmberTest {
     private static final int WEARER = 1001;
     private static final int LEVEL = 80;
 
     @Test
-    public void theBaseBranchAppliesAndTheThresholdBranchStatesTheSum() {
+    public void thePropertyCarriesTheBaseAndTheRuleAddsTheExtraShare() {
         double[] healthy = defence(0.0);
         double[] middle = defence(0.7);
         double[] hurt = defence(0.5);
@@ -36,11 +43,12 @@ public class AmberTest {
         // The band between the two thresholds: above #2, so ONLY the base branch may apply. Without this reading, a file whose
         // branches stop being exhaustive (e.g. base gated on hp >= 90%) would still pass.
         Assertions.assertTrue(middle[2] >= 0.5 && middle[2] < 0.9, "precondition: inside the untested band");
-        Assertions.assertEquals(0.32 * middle[1], middle[0], 1e-6, "above the threshold only #1 applies");
-        Assertions.assertEquals(0.32 * healthy[1], healthy[0], 1e-6, "the base branch is unconditional");
+        // The base share is the cone's `ability_property`, so NO rule may add anything at or above the threshold.
+        Assertions.assertEquals(0.0, middle[0], 1e-6, "above the threshold: the property alone carries #1");
+        Assertions.assertEquals(0.0, healthy[0], 1e-6, "the same at full HP");
         Assertions.assertTrue(hurt[2] < 0.5, "precondition: below the threshold");
-        Assertions.assertEquals(0.64 * hurt[1], hurt[0], 1e-6,
-                "below 50% the exclusive branch states #1 + #3");
+        Assertions.assertEquals(0.32 * hurt[1], hurt[0], 1e-6,
+                "below 50% the rule adds the EXTRA share #3 only (0.32 at rank 5), on top of the property");
     }
 
     /**

@@ -61,15 +61,10 @@ public class ConeConditionLiteralsTest {
         assertRule(20002, 4, "BATTLE_START", "boost_skill_damage_boost_4", List.of());
         assertRule(20002, 5, "BATTLE_START", "boost_basic_attack_damage_boost_5", List.of());
         assertRule(20002, 5, "BATTLE_START", "boost_skill_damage_boost_5", List.of());
-        assertRule(20003, 1, "TURN_START", "cone20003_defence_base", List.of("hp_percent >="));
         assertRule(20003, 1, "TURN_START", "cone20003_defence_below_threshold", List.of("hp_percent <"));
-        assertRule(20003, 2, "TURN_START", "cone20003_defence_base", List.of("hp_percent >="));
         assertRule(20003, 2, "TURN_START", "cone20003_defence_below_threshold", List.of("hp_percent <"));
-        assertRule(20003, 3, "TURN_START", "cone20003_defence_base", List.of("hp_percent >="));
         assertRule(20003, 3, "TURN_START", "cone20003_defence_below_threshold", List.of("hp_percent <"));
-        assertRule(20003, 4, "TURN_START", "cone20003_defence_base", List.of("hp_percent >="));
         assertRule(20003, 4, "TURN_START", "cone20003_defence_below_threshold", List.of("hp_percent <"));
-        assertRule(20003, 5, "TURN_START", "cone20003_defence_base", List.of("hp_percent >="));
         assertRule(20003, 5, "TURN_START", "cone20003_defence_below_threshold", List.of("hp_percent <"));
         assertRule(20004, 1, "BATTLE_START", "cone20004_ehr", List.of());
         assertRule(20004, 2, "BATTLE_START", "cone20004_ehr", List.of());
