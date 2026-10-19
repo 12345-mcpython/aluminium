@@ -15,21 +15,29 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * The literal-ratio conversions from round 188's audit: the three rules that pointed at slot 1 (COMMON).
+ * The literal-ratio conversions from round 188's audit, kept as a census of what that audit decided - and narrowed on
+ * 2026-10-19, when one of the two files was measured again.
  *
- * <p>Why they were converted: `data/skills.json` puts 1.4 in the COMMON row's Lv10 parameter while every document says 100%, so a row reference deals a number
- * nobody stated. This census reads the shipped file, so an edit back to a row (or to another percent) fails here.
+ * <p>Why they were converted: `data/skills.json` puts 1.4 in the <b>COMMON</b> row's Lv10 parameter while every document says
+ * 100%, so a row reference <b>to that slot</b> deals a number nobody stated.
+ *
+ * <p>⚠ <b>The narrowing, and what the old expectation was pinning.</b> Round 188's conversion covered three rules: 1109's
+ * {@code talent_followup_against_burning} and 1206's two 剑势 rules. The two 1206 rules stayed literals until the 2026-10-19
+ * audit pointed out that the number they quote is not a COMMON number at all: it is item <b>#2 of her SKILL row</b>
+ * ({@code [2.1, 1, 0.33]} at Lv10 - the sentence's 「100% 攻击力」 is that column, and it scales, 1.1 at Lv12 after Eidolon 5).
+ * So they read {@code percent_from_skill_param: "SKILL:1"} now, which is the fix this census was protecting the *wrong half*
+ * of: the bug was "pointed at COMMON", not "reads a row". Their number is pinned at BOTH ends of the level by
+ * {@code SushangLevelRowsTest} instead - a literal census cannot see a level-dependent share at all.
  */
 public class LiteralDamageCensusTest {
     private static final double DOCUMENT = 1.0;
 
     /**
-     * Note: The three converted rules state the document's 100% literally, with an element and no row.
+     * Note: The converted rule still states the document's 100% literally, with an element and no row.
      */
     @Test
     public void theConvertedRulesStateTheDocumentNumberLiterally() {
-        for (Object[] target : new Object[][]{{1109, "talent_followup_against_burning"},
-                {1206, "skill_sword_stance_chance"}, {1206, "skill_sword_stance_guaranteed"}}) {
+        for (Object[] target : new Object[][]{{1109, "talent_followup_against_burning"}}) {
             String cid = String.valueOf(target[0]);
             String id = (String) target[1];
             JsonObject effect = damageEffectOf(cid, id);
