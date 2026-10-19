@@ -586,8 +586,9 @@ public class RelicAbilityBatchTest {
      */
     @Test
     public void theBanditryBreakEffectNeedsAFireWeakEnemy() {
-        Assertions.assertEquals(0.2, breakEffectAfterHit(true), 1e-6,
-                "「命中具有火属性弱点的敌方目标时」 (when hitting an enemy target with a Fire Weakness) -- +20% for 2 turns");
+        // 2026-10-19: the text says 40% for 1 turn; the shipped file said 0.2 / 2 turns and is fixed.
+        Assertions.assertEquals(0.4, breakEffectAfterHit(true), 1e-6,
+                "「命中具有火属性弱点的敌方目标时」 (when hitting an enemy target with a Fire Weakness) -- +40% for 1 turn");
         Assertions.assertEquals(0, breakEffectAfterHit(false), 1e-6,
                 "the same hit on an enemy without that weakness grants nothing");
     }
