@@ -83,6 +83,72 @@ public class HimekoAuditTest {
 
     // ==================================================================
 
+    /**
+     * 行迹 道标: +15% crit rate at or above 80% HP - read by rolling just under the boosted rate.
+     *
+     * <p>Why not the panel: the share is an INSTANCE modifier, so the panel never moves, and the `CritArea` only differs
+     * when the instance actually crits (measured: reading it under a 0.99 roll answered 1.0 for both cases, which says
+     * nothing). Her base crit rate is 5%, so a 0.10 roll misses at 5% and hits at 20%.
+     */
+    @Test
+    public void traceBeaconNeedsTheHpLine() {
+        boolean full = critWith(new java.util.Random(0) {
+            @Override
+            public double nextDouble() {
+                return 0.10;
+            }
+        }, false);
+        boolean wounded = critWith(new java.util.Random(0) {
+            @Override
+            public double nextDouble() {
+                return 0.10;
+            }
+        }, true);
+        System.out.println("[1003] 道标: 满血暴击=" + full + " ; 掉到 80% 以下暴击=" + wounded);
+        Assertions.assertTrue(full, "「若当前生命值百分比 ≥80%，暴击率提高 15%」: 0.10 应当在 5%+15% 之下命中");
+        Assertions.assertFalse(wounded, "血线之下不加成: 0.10 应当落在 5% 之外");
+    }
+
+    /**
+     * 星魂 3 / 5: the raises are filed on the per-slot bonus, which is what the damage readings resolve against.
+     *
+     * <p>Why not `skill.getLevel()`: that is the skill's own base level and never moves (the engine's `CanHit.skillLevel`
+     * adds `skillLevelBonus(slot)` on top), so a judge reading it would answer 1 -> 1 for every character forever.
+     */
+    @Test
+    public void eidolonThreeAndFiveRaiseTheLevels() {
+        Character plain = CharacterFactory.create(HIMEKO, LEVEL);
+        Character invested = CharacterFactory.create(HIMEKO, LEVEL, false, null, null, 5);
+        new Battle(List.of(plain), List.of(BattleFixture.monster()), always(0.99)).startBattle();
+        new Battle(List.of(invested), List.of(BattleFixture.monster()), always(0.99)).startBattle();
+
+        int skillDelta = invested.skillLevelBonus(SkillType.SKILL) - plain.skillLevelBonus(SkillType.SKILL);
+        int commonDelta = invested.skillLevelBonus(SkillType.COMMON) - plain.skillLevelBonus(SkillType.COMMON);
+        int ultraDelta = invested.skillLevelBonus(SkillType.ULTRA) - plain.skillLevelBonus(SkillType.ULTRA);
+        int talentDelta = invested.skillLevelBonus(SkillType.TALENT) - plain.skillLevelBonus(SkillType.TALENT);
+        System.out.println("[1003] 等级加成增量: 战技 " + skillDelta + " ; 普攻 " + commonDelta
+                + " ; 终结技 " + ultraDelta + " ; 天赋 " + talentDelta);
+        Assertions.assertEquals(2, skillDelta, "星魂 3：战技等级 +2");
+        Assertions.assertEquals(1, commonDelta, "星魂 3：普攻等级 +1");
+        Assertions.assertEquals(2, ultraDelta, "星魂 5：终结技等级 +2");
+        Assertions.assertEquals(2, talentDelta, "星魂 5：天赋等级 +2");
+    }
+
+    private static boolean critWith(java.util.Random rolls, boolean wound) {
+        Character her = CharacterFactory.create(HIMEKO, LEVEL);
+        if (wound) {
+            her.consumeHp(her.getMaxHp() * 0.3);
+        }
+        Enemy victim = BattleFixture.monster();
+        Battle battle = new Battle(List.of(her), List.of(victim), rolls);
+        battle.startBattle();
+        java.util.List<com.laosun.aluminium.models.Damage> settled = new java.util.ArrayList<>();
+        battle.addDamageObserver((damage, applied, hpLoss, shieldAbsorbed, died) -> settled.add(damage));
+        battle.castImmediate(her.getSkills().get(SkillType.COMMON), her, List.of(victim));
+        battle.processRequests();
+        return settled.get(0).isCrit();
+    }
+
     private static double critAfterOneHit(boolean wound) {
         // 道标是伤害时的**实例修饰**，面板上永远看不到它 ✗ → 读那一发的 CritArea。
         Character her = CharacterFactory.create(HIMEKO, LEVEL);
