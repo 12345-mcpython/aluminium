@@ -29,10 +29,13 @@ public class SigoniaCritTest {
         Character unit = CharacterFactory.create(WEARER, LEVEL, true, null, RelicFactory.suit(313, 2, RELIC_LEVEL));
         Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
-        double before = unit.getAttribute(AttributeType.CRIT_CHANCE).get();
+        // 2026-10-19: the crit rate is the two-piece properties value, so it is already in the panel before the battle
+        // starts (the shipped rule that added it again was a duplicate and is gone).
         battle.startBattle();
-        Assertions.assertEquals(0.04, unit.getAttribute(AttributeType.CRIT_CHANCE).get() - before, 1e-6,
-                "crit rate from battle start");
+        double plain = CharacterFactory.create(WEARER, LEVEL, true).getAttribute(AttributeType.CRIT_CHANCE).get();
+        System.out.println("[313] crit=" + unit.getAttribute(AttributeType.CRIT_CHANCE).get() + " plain=" + plain);
+        Assertions.assertEquals(0.04 + plain, unit.getAttribute(AttributeType.CRIT_CHANCE).get(), 1e-6,
+                "crit rate comes from the two-piece properties");
     }
 
     @Test
