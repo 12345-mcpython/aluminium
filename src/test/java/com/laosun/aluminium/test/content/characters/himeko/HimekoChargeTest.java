@@ -225,39 +225,32 @@ public class HimekoChargeTest {
         Assertions.assertEquals(secondBefore, second.getCurrentHp(), EPS);
     }
 
-    // ==================================================================
-    // What is deliberately NOT in the file
-    // ==================================================================
-
     /**
-     * The rest of her kit is <b>registered, not approximated</b>.
+     * The rest of her kit is <b>authored as of 2026-10-19</b>; this case is what keeps it authored.
      *
-     * <p>Four clauses exist and each is pinned above; the counts here are what says nothing else was written. The one
-     * missing clause would be a wrong number if it were spelled with the vocabulary that exists: the ultimate's
-     * "recovers an extra 5 energy for each enemy target killed" needs to know the kill came from <b>that</b> ultimate - and while the
-     * attribution now exists ({@code from_skill}, which is what Eidolon (星魂) 4 needs), what is still unresolved is a
-     * <b>data</b> question: the engine's own rule already credits 5 energy to the killer, and the sentence says
-     * "an extra 5 recovered" - whether those are the same 5 has to be settled against the game's numbers, because guessing
-     * it is a silent +/-5 energy that nothing checks.
+     * <p>It used to assert the opposite (「registered, not approximated」), with the counts saying "nothing else was
+     * written". The three traces, Eidolon (星魂) 1's speed, Eidolon 2's gate on the low-HP share and Eidolon 3/5's level
+     * statements all landed in that pass, so the same counts now say the opposite: every event her text needs carries a
+     * rule, and the only clauses still registered are the ones with no vocabulary (see the status row).
      */
     @Test
-    public void theRestOfHerKitIsNotAuthored() {
+    public void theRestOfHerKitIsAuthored() {
         TriggerTable table = TriggerTables.of(HIMEKO);
-        // Note: 3 rules: "战斗开始时获得1点充能", the rule that states which level her talent's numbers were quoted at
-        // ("quoted at Lv10" as a TALENT +9 raise) - before that the level lived in a `damage_level` field on the
-        // follow-up's damage effect - and `technique_incomplete_combustion`, her 秘技.
-        Assertions.assertEquals(3, table.ruleCount(TriggerEvent.BATTLE_START),
-                "「战斗开始时获得1点充能」 (gains 1 point of Charge at the start of battle), the talent's level statement, "
-                        + "and her 秘技 「不完全燃烧」 (Incomplete Combustion), gated on `self has_state 秘技` like the other 38");
+        // 5 rules: 「战斗开始时获得1点充能」, the talent's level statement, 秘技, and the two eidolon level statements (3 and 5).
+        Assertions.assertEquals(5, table.ruleCount(TriggerEvent.BATTLE_START),
+                "start-of-battle charge, the talent's level statement, her 秘技, and the E3/E5 level statements");
         Assertions.assertEquals(2, table.ruleCount(TriggerEvent.BREAK),
-                "\"when an enemy target's Weakness is Broken\" (「当有敌方目标的弱点被击破时」) (anybody's break) and Eidolon (星魂) 4's \"when casting the Skill ... causing a Weakness Break\" (「施放战技…造成弱点击破时」)");
-        Assertions.assertEquals(1, table.ruleCount(TriggerEvent.ALLY_ATTACK), "\"after one of our targets casts an attack\" (「当我方目标施放攻击后」)");
+                "anybody's break, and Eidolon 4's Skill-triggered break");
+        Assertions.assertEquals(1, table.ruleCount(TriggerEvent.ALLY_ATTACK),
+                "「当我方目标施放攻击后」 (after one of our targets casts an attack)");
+        Assertions.assertEquals(1, table.ruleCount(TriggerEvent.ATTACK_FINISHED),
+                "行迹 星火 (Starfire): her attack can set 灼烧 on fire (2026-10-19)");
         Assertions.assertEquals(0, table.ruleCount(TriggerEvent.ULT_CAST), "her ultimate is the engine's ordinary path");
-        Assertions.assertEquals(1, table.ruleCount(TriggerEvent.KILL),
-                "「每消灭1个敌方目标额外恢复姬子5点能量」 (every time an enemy target is killed, Himeko restores 5 extra Energy) -- shipped on 2026-09-28 once 「额外」 (extra) was read against the "
-                        + "engine's general kill credit (HimekoKillEnergyTest)");
+        Assertions.assertEquals(1, table.ruleCount(TriggerEvent.KILL), "「每消灭1个敌方目标额外恢复5点能量」");
+        Assertions.assertEquals(1, table.ruleCount(TriggerEvent.FOLLOW_UP),
+                "Eidolon 1's speed rides on her own follow-up (2026-10-19)");
         Assertions.assertEquals(0, table.ruleCount(TriggerEvent.SKILL_CAST),
-                "Eidolon (星魂) 4's charge rides on BREAK with `from_skill SKILL`, not on a cast event of its own");
+                "Eidolon 4's charge rides on BREAK with `from_skill SKILL`, not on a cast event of its own");
         Assertions.assertEquals(1, table.resources().size(), "and she declares exactly one resource");
         Assertions.assertEquals(CHARGE, table.referencedResources().iterator().next(),
                 "every resource a rule names is the one she declares -- checked when she is built");

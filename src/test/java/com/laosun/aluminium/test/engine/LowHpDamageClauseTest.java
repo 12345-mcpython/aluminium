@@ -37,7 +37,8 @@ public class LowHpDamageClauseTest {
     }
 
     private static double damageAgainst(boolean wound) {
-        Character wearer = CharacterFactory.create(WEARER, LEVEL);
+        // 2026-10-19: 「≤50% 生命的目标伤害 +15%」是**星魂 2** 的句子，所以夹具要穿 2 星魂。
+        Character wearer = CharacterFactory.create(WEARER, LEVEL, false, null, null, 2);
         Enemy victim = BattleFixture.monster();
         victim.setAttribute(AttributeType.HEALTH, new DoubleValue(900000));
         victim.heal(900000);
