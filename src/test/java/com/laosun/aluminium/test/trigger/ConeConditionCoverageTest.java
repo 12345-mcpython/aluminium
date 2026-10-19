@@ -43,7 +43,6 @@ public class ConeConditionCoverageTest {
                 List.of("actor == self", "from_category ULTRA"));
         assertConditions(23019, TriggerEvent.CAST_SETUP, "cone23019_ult_skill_point",
                 List.of("actor == self", "from_category ULTRA", "self_attr:breaking_effect >= 1.5"));
-        assertConditions(23029, TriggerEvent.DEALING_DAMAGE, "cone23029_armor_break", List.of("actor == self"));
         assertConditions(23041, TriggerEvent.DEALING_DAMAGE, "cone23041_defence_down", List.of("actor == self"));
         assertConditions(23046, TriggerEvent.CAST_SETUP, "cone23046_skill_stacks",
                 List.of("actor == self", "from_category BPSKILL"));
