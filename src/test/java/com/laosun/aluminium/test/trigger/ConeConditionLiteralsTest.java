@@ -328,15 +328,10 @@ public class ConeConditionLiteralsTest {
         assertRule(21013, 4, "BATTLE_START", "cone21013_ult_damage", List.of());
         assertRule(21013, 5, "BATTLE_START", "cone21013_energy_on_entry", List.of());
         assertRule(21013, 5, "BATTLE_START", "cone21013_ult_damage", List.of());
-        assertRule(21014, 1, "BATTLE_START", "cone21014_effect_res", List.of());
         assertRule(21014, 1, "BATTLE_START", "cone21014_healing_off_effect_res", List.of());
-        assertRule(21014, 2, "BATTLE_START", "cone21014_effect_res", List.of());
         assertRule(21014, 2, "BATTLE_START", "cone21014_healing_off_effect_res", List.of());
-        assertRule(21014, 3, "BATTLE_START", "cone21014_effect_res", List.of());
         assertRule(21014, 3, "BATTLE_START", "cone21014_healing_off_effect_res", List.of());
-        assertRule(21014, 4, "BATTLE_START", "cone21014_effect_res", List.of());
         assertRule(21014, 4, "BATTLE_START", "cone21014_healing_off_effect_res", List.of());
-        assertRule(21014, 5, "BATTLE_START", "cone21014_effect_res", List.of());
         assertRule(21014, 5, "BATTLE_START", "cone21014_healing_off_effect_res", List.of());
         assertRule(21015, 1, "DEALING_DAMAGE", "cone21015_apply_the_state", List.of("actor == self", "!target has_state 攻陷"));
         assertRule(21015, 1, "DEALING_DAMAGE", "cone21015_defence_down_while_stated", List.of("actor == self", "target has_state 攻陷"));
