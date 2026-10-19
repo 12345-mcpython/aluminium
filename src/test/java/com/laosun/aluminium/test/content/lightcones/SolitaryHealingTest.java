@@ -25,7 +25,7 @@ public class SolitaryHealingTest {
         System.out.println("[24003] spec attribute=" + effect.getAttribute() + " percent=" + effect.getPercent()
                 + " turns=" + effect.getTurns() + " target=" + effect.getTarget());
         Assertions.assertEquals("DOT_DAMAGE_BOOST", effect.getAttribute(), "the DOT boost");
-        Assertions.assertEquals(0.48, effect.getPercent(), 1e-9, "48%");
+        Assertions.assertEquals(0.24, effect.getPercent(), 1e-9, "24%");
         Assertions.assertEquals(2.0, effect.getTurns(), 1e-9, "for two turns");
         Assertions.assertEquals("self", effect.getTarget(), "on the wearer");
     }

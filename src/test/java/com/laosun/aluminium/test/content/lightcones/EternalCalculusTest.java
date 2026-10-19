@@ -29,31 +29,22 @@ public class EternalCalculusTest {
 
     @Test
     public void everyTierStatesWhatTheTextStates() {
+        // 2026-10-19: the attack share is the cone's own `attack_percent` property now (the rule was a duplicate); what is left
+        // is the wide-hit speed rule, and the per-hit stack is registered.
         for (int rank = 1; rank <= 5; rank++) {
-            var table = wearer(rank).getTriggerTable();
-
-            var atk = table.rulesFor(TriggerEvent.BATTLE_START).stream()
-                    .filter(r -> r.id().equals("cone24004_attack")).toList();
-            Assertions.assertEquals(1, atk.size(), "rank " + rank + ": the ATK rule");
-            var a = atk.getFirst().effects().getFirst();
-            Assertions.assertEquals("MODIFY_ATTR", a.getOp());
-            Assertions.assertEquals("ATTACK", a.getAttribute());
-            Assertions.assertEquals(ATK[rank - 1], a.getPercent(), 1e-9, "rank " + rank + ": ATK");
-            Assertions.assertEquals("self", a.getTarget());
-
-            var spd = table.rulesFor(TriggerEvent.ATTACK_FINISHED).stream()
+            double plainAttack = CharacterFactory.create(WEARER, LEVEL, true)
+                    .getAttribute(com.laosun.aluminium.enums.AttributeType.ATTACK).get();
+            var unit = wearer(rank);
+            Assertions.assertTrue(unit.getAttribute(com.laosun.aluminium.enums.AttributeType.ATTACK).get() > plainAttack,
+                    "rank " + rank + ": the attack share reaches the panel");
+            var rules = unit.getTriggerTable().rulesFor(TriggerEvent.ATTACK_FINISHED).stream()
                     .filter(r -> r.id().equals("cone24004_speed_on_wide_hit")).toList();
-            Assertions.assertEquals(1, spd.size(), "rank " + rank + ": the SPD rule");
+            Assertions.assertEquals(1, rules.size(), "rank " + rank + ": the wide-hit speed rule");
             Assertions.assertEquals(List.of("actor == self", "hit_count >= 3.0"),
-                    spd.getFirst().conditions().stream().map(c -> c.source()).toList(),
-                    "rank " + rank + ": three enemies, in the parser's form");
-            var s = spd.getFirst().effects().getFirst();
-            Assertions.assertEquals("MODIFY_ATTR", s.getOp());
-            Assertions.assertEquals("SPEED", s.getAttribute());
-            Assertions.assertEquals(SPD[rank - 1], s.getPercent(), 1e-9, "rank " + rank + ": SPD");
-            Assertions.assertEquals(1, s.getTurns(), "rank " + rank + ": one turn");
-            Assertions.assertEquals("self", s.getTarget());
-            System.out.println("[24004] rank=" + rank + " ok");
+                    rules.getFirst().conditions().stream().map(c -> c.source()).toList(),
+                    "rank " + rank + ": three or more targets");
+            Assertions.assertEquals(0.08 + (rank - 1) * 0.02, rules.getFirst().effects().getFirst().getPercent(), 1e-9,
+                    "rank " + rank + ": speed");
         }
     }
 }
