@@ -1,5 +1,6 @@
 package com.laosun.aluminium.test.content.lightcones;
 
+import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.Weapon;
@@ -37,13 +38,10 @@ public class TheFinaleOfALieTest {
         for (int rank = 1; rank <= 5; rank++) {
             var table = wearer(rank).getTriggerTable();
 
-            var crit = table.rulesFor(TriggerEvent.BATTLE_START).stream()
-                    .filter(r -> r.id().equals("cone23056_crit")).toList();
-            Assertions.assertEquals(1, crit.size(), "rank " + rank + ": the crit rule");
-            Assertions.assertEquals("CRIT_CHANCE", crit.getFirst().effects().getFirst().getAttribute());
-            Assertions.assertEquals(CRIT[rank - 1], crit.getFirst().effects().getFirst().getPercent(), 1e-9,
-                    "rank " + rank + ": crit rate");
-
+            // 2026-10-19: the crit share is the cone's own crit_chance property now (the rule was a duplicate).
+            double plainCrit = CharacterFactory.create(WEARER, LEVEL, true).getAttribute(AttributeType.CRIT_CHANCE).get();
+            Assertions.assertTrue(wearer(rank).getAttribute(AttributeType.CRIT_CHANCE).get() > plainCrit,
+                    "rank " + rank + ": the crit share reaches the panel");
             var shadow = table.rulesFor(TriggerEvent.BATTLE_START).stream()
                     .filter(r -> r.id().equals("cone23056_shadow")).toList();
             Assertions.assertEquals(1, shadow.size(), "rank " + rank + ": the battle-start half");
