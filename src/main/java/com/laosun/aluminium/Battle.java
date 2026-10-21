@@ -8,7 +8,6 @@ import com.laosun.aluminium.models.ai.TargetSelector;
 import com.laosun.aluminium.models.buff.AbstractBuff;
 import com.laosun.aluminium.models.buff.DotBuff;
 import com.laosun.aluminium.models.enemy.Enemy;
-import com.laosun.aluminium.models.enemy.SummonFactory;
 import com.laosun.aluminium.models.energy.EnergyGain;
 import com.laosun.aluminium.models.skill.DefaultSkill;
 import com.laosun.aluminium.models.skill.Skill;
@@ -668,33 +667,15 @@ public class Battle {
     /** Summons whose departure has already been announced (see {@code TriggerEvent.SUMMON_LEFT}). */
     private final java.util.Set<CanHit> summonsAnnouncedGone = java.util.Collections.newSetFromMap(new java.util.IdentityHashMap<>());
     /**
-     * Units whose technique was used before this battle.
-     *
-     * <p>A technique happens OUTSIDE the battle, so the engine cannot observe it; the caller says so with {@link #markTechniqueUsed}, and
-     * {@link #startBattle()} turns that into a plain {@code StateBuff} named "秘技" so content can ask for it with the vocabulary it already has
-     * (`self has_state 秘技`). 68 documents contain a "after using the technique" clause and 29 a "when the next battle starts" one, so this is the gate they were all
-     * waiting for.
+     * The facts the caller declared before the battle started.
      */
-    private final List<CanHit> techniqueUsers = new ArrayList<>();
-
-    /**
-     * Map basic attacks the caller declared before the battle started (see {@link #declareMapAttack}).
-     *
-     * <p>A map hit happens OUTSIDE the battle - the engine cannot observe it - so the caller states it and
-     * {@link #startBattle()} applies its only in-battle consequence: 「进入战斗后削弱敌方目标对应属性韧性」.
-     * The pair is kept because the effect belongs to both units: whose map skill (its element and stance value)
-     * and which enemy's bar.
-     */
-    private final List<MapAttack> mapAttacks = new ArrayList<>();
-
-    /** One declared map basic attack: who swung, and which enemy was struck. */
-    private record MapAttack(CanHit attacker, CanHit target) {
-    }
+    private final com.laosun.aluminium.models.battle.PreBattle preBattle =
+            new com.laosun.aluminium.models.battle.PreBattle();
 
     /**
      * The techniques the battle was CREATED with, or {@code null} when the caller marks them later.
      *
-     * <p>Kept beside {@link #techniqueUsers} rather than replacing it: the battle's own state is still
+     * <p>Kept beside {@link com.laosun.aluminium.models.battle.PreBattle#techniqueUsers()} rather than replacing it: the battle's own state is still
      * "which units hold 秘技", and this is only the construction-time answer to that question. Both routes
      * end in the same list, so nothing downstream can tell which one was used.
      *
@@ -778,50 +759,6 @@ public class Battle {
     }
 
     /**
-     * How many targets the <b>cast being delivered right now</b> has actually applied each named state to
-     * ("each target the ultimate freezes restores 6 energy to March 7th (三月七)").
-     *
-     * <p><b>Why the engine has to count it.</b> The number is not the number of targets <i>aimed at</i> - that one is
-     * the event's hit count, which {@code per_target} already multiplies by. It is the number the <b>roll let
-     * through</b>, and only {@code Battle.tryApplyDebuff} knows it: with a 50% base chance against three enemies the
-     * answer can be 0, 1, 2 or 3, and a rule that guessed "3" would pay three times what the text says.
-     *
-     * <p><b>Why it lives on the battle and not on the cast token.</b> The cast window is <i>closed</i> before the cast
-     * events are delivered ({@code SkillExecutor.execute} calls {@code endCast} in a {@code finally}, and only then
-     * broadcasts {@code ULT_CAST}) - which is precisely when a rule gets to read this. So the record outlives the
-     * token and is cleared at the end of the delivery instead.
-     *
-     * <p>Note: <b>Cleared twice on purpose</b>: at {@link #beginCast} (so a new cast never sees the previous one's
-     * numbers) and after the cast's own events have been delivered ({@link #endCastOutcome}). A rule firing outside
-     * that window reads 0 - and content cannot get there by accident: the loader refuses
-     * {@code "scale": "cast_applied:…"} on any event that is not a cast (see {@code TriggerInterpreter}).
-     */
-    private final Map<String, Integer> castApplied = new HashMap<>();
-
-    /**
-     * The laugh count the cast being resolved is settled with, or {@code null} when that cast stated none.
-     *
-     * <p>Reader of the content spelling: {@code CAST_SKILL} with {@code cast_counted_laughs} - 「使其立即施放 1 次固定计入
-     * 20 笑点的欢愉技」. Priority at the one fold site ({@link #elationLaughMultiplier()}): an effect's own
-     * {@code counted_laughs} first (that is one instance), then this (that is the whole cast), then the merged snapshot.
-     *
-     * <p>Note: It outlives the cast TOKEN on purpose, exactly like {@code castApplied}: {@code SkillExecutor} closes the
-     * window before it delivers the cast's own events, and that delivery is when a rider reads this.
-     */
-    private Integer castCountedLaughs;
-
-    /**
-     * A count a cast has claimed but not started yet: {@code CAST_SKILL} sets it and the cast it is about consumes it in
-     * {@link #beginCast}.
-     *
-     * <p>Two facts force the extra slot: the marker runs <b>before</b> {@code SkillExecutor.execute} (the only place the
-     * count can be stated), and that method's first act is {@code beginCast}, which clears the previous cast's record so
-     * a new cast never sees stale numbers. Consuming a claim at that begin keeps both properties - and nothing else can
-     * start a cast in between, so the claim cannot be taken by the wrong one.
-     */
-    private Integer nextCastCountedLaughs;
-
-    /**
      * Records one <b>landed</b> application of a named state during the current cast.
      *
      * <p>Called by the ops that roll for a state ({@code APPLY_CONTROL}, {@code APPLY_DOT}) and only when the roll
@@ -830,10 +767,7 @@ public class Battle {
      * @param stateName the state's name as the documents spell it (Frozen / Burn / ...)
      */
     public void recordCastApplied(String stateName) {
-        if (stateName == null || stateName.isBlank()) {
-            return;
-        }
-        castApplied.merge(stateName, 1, Integer::sum);
+        castOutcome.recordApplied(stateName);
     }
 
     /**
@@ -843,7 +777,7 @@ public class Battle {
      * @return the landed count for this cast
      */
     public int castAppliedCount(String stateName) {
-        return stateName == null ? 0 : castApplied.getOrDefault(stateName, 0);
+        return castOutcome.appliedCount(stateName);
     }
 
     /**
@@ -853,9 +787,7 @@ public class Battle {
      * a hit taken next turn - can read a stale count.
      */
     public void endCastOutcome() {
-        castApplied.clear();
-        // This cast's own laugh count goes with its outcome: a rule firing later must not fold its damage with it.
-        castCountedLaughs = null;
+        castOutcome.end();
         // "when casting ..." ends here: every event of this cast has been delivered, so a modifier stating
         // `"until": "cast_end"` has covered every heal the cast performed and nothing after it. Swept on both sides,
         // because either camp may carry one.
@@ -875,11 +807,8 @@ public class Battle {
      * @return the token identifying this cast
      */
     public PendingCast beginCast(Skill skill, CanHit caster) {
-        // A new cast's outcome starts empty: see `castApplied`, and the same for the laugh count a commanded cast
-        // claimed just before this call (see `nextCastCountedLaughs`).
-        castApplied.clear();
-        castCountedLaughs = nextCastCountedLaughs;
-        nextCastCountedLaughs = null;
+        // A new cast's outcome starts empty, consuming the count a commanded cast claimed just before this call.
+        castOutcome.begin();
         pendingCast = new PendingCast(caster, skill == null ? 0 : skill.getSkillSlot(), pendingCast);
         return pendingCast;
     }
@@ -1116,8 +1045,11 @@ public class Battle {
      * that belongs to the party, not to whoever happened to declare it -- `ResourceManager` refuses to keep such a thing
      * per character, and this is the owner it asks for. Registered once at the start of the battle from the declarations.
      */
-    private final Map<String, com.laosun.aluminium.models.Resource> partyResources =
-            new java.util.LinkedHashMap<>();
+    private final com.laosun.aluminium.models.battle.PartyResources partyResources =
+            new com.laosun.aluminium.models.battle.PartyResources();
+    private final com.laosun.aluminium.models.battle.SummonService summons;
+    private final com.laosun.aluminium.models.battle.CastOutcome castOutcome =
+            new com.laosun.aluminium.models.battle.CastOutcome();
 
 
     public record SkillRequest(Skill skill, CanHit object, List<? extends CanHit> target) {
@@ -1152,6 +1084,7 @@ public class Battle {
      */
     public Battle(List<Character> characterQueue, List<? extends CanHit> enemyQueue, Random rng, GameData data) {
         this.data = java.util.Objects.requireNonNull(data, "data");
+        this.summons = new com.laosun.aluminium.models.battle.SummonService(this, data, justSummoned::add);
         characterRoster = new ArrayList<>(characterQueue);
         // The camp view of our side: the same instances, one more list. A friendly summon is appended here
         // (and only here) by summon(...), so `characters` stays exactly "our characters".
@@ -1470,22 +1403,7 @@ public class Battle {
     }
 
     private void registerPartyResources() {
-        for (CanHit ally : allies) {
-            if (!(ally instanceof Character character) || character.getTriggerTable() == null) {
-                continue;
-            }
-            for (com.laosun.aluminium.beans.ResourceSpec spec : character.getTriggerTable().resources()) {
-                if (!"PARTY".equalsIgnoreCase(spec.scope() == null ? "" : spec.scope().trim())) {
-                    continue;
-                }
-                partyResources.putIfAbsent(spec.id(), new com.laosun.aluminium.models.Resource(
-                        spec.id(), com.laosun.aluminium.enums.ResourceScope.PARTY, spec.max(),
-                        spec.initial() == null ? 0 : spec.initial()));
-                if (spec.overflow() != null) {
-                    partyResources.get(spec.id()).setMaxOverflow(spec.overflow());
-                }
-            }
-        }
+        partyResources.registerFrom(allies);
     }
 
     /*
@@ -1515,7 +1433,8 @@ public class Battle {
     public double elationLaughMultiplier() {
         // The cast's own count wins while that cast is being resolved: 「固定计入 20 笑点」 is a fact about the CAST, and
         // its damage is assembled from the skill's row, so nothing else could carry it. Otherwise the merged snapshot.
-        double laughs = castCountedLaughs != null ? castCountedLaughs : countedLaughPoints();
+        Integer claimed = castOutcome.countedLaughs();
+        double laughs = claimed != null ? claimed : countedLaughPoints();
         return 1 + laughs * 5.0 / (laughs + 240);
     }
 
@@ -1523,12 +1442,12 @@ public class Battle {
      * Claims the laugh count for the NEXT cast to begin: 「使其立即施放 1 次固定计入 20 笑点的欢愉技」.
      *
      * <p>Called by {@code CAST_SKILL} right before it executes the cast it commands - see
-     * {@link #nextCastCountedLaughs} for why the claim and the cast cannot be the same moment.
+     * {@link com.laosun.aluminium.models.battle.CastOutcome} for why the claim and the cast cannot be the same moment.
      *
      * @param laughs the count that cast's Elation damage is folded with (0 is legal: "counting nothing")
      */
     public void markNextCastCountedLaughs(int laughs) {
-        nextCastCountedLaughs = laughs;
+        castOutcome.markNextCountedLaughs(laughs);
     }
 
     /**
@@ -1538,7 +1457,7 @@ public class Battle {
      * not outlive its cast, and "the window is empty again" is the fact the behavioural readings are compared against.
      */
     public Integer castCountedLaughs() {
-        return castCountedLaughs;
+        return castOutcome.countedLaughs();
     }
 
     /**
@@ -1551,31 +1470,8 @@ public class Battle {
      * every Elation expectation in the suite at once.
      */
     public int countedLaughPoints() {
-        int total = 0;
-        for (Snapshot snapshot : laughSnapshots.values()) {
-            if (!snapshot.hasExpired()) {
-                total += snapshot.points();
-            }
-        }
-        return total;
+        return partyResources.countedLaughPoints();
     }
-
-    /**
-     * One holder's frozen laugh count and its own remaining turns.
-     *
-     * <p>「各个【好活当赏】的持续时间各自独立计算」: each instance runs down on its OWN holder's turns, so the holder is
-     * part of the record rather than the battle carrying one shared deadline.
-     */
-    private record Snapshot(int points, int turnsLeft) {
-        boolean hasExpired() {
-            return turnsLeft <= 0;
-        }
-    }
-
-    /**
-     * One record per holder, replaced when the state is granted again.
-     */
-    private final java.util.Map<CanHit, Snapshot> laughSnapshots = new java.util.IdentityHashMap<>();
 
     /**
      * A unit received 【好活当赏】: freeze the party's 笑点 as ITS count, to run down over {@code turns} of its own turns.
@@ -1586,41 +1482,21 @@ public class Battle {
      * @param turns how many of the holder's turns it lasts (the document states 2)
      */
     public void noteElationGift(CanHit holder, int turns) {
-        if (holder == null || holder.isDeath()) {
-            return;
-        }
-        laughSnapshots.put(holder, new Snapshot(partyResourceValue("笑点"), Math.max(1, turns)));
+        partyResources.noteElationGift(holder, turns);
     }
 
     /**
      * One holder's frozen count, 0 when it holds none. For judges, and for the demo's output.
      */
     public int laughSnapshotOf(CanHit holder) {
-        Snapshot snapshot = laughSnapshots.get(holder);
-        return snapshot == null || snapshot.hasExpired() ? 0 : snapshot.points();
+        return partyResources.laughSnapshotOf(holder);
     }
 
     /**
      * How many holders are counted right now - the "how many【好活当赏】" a judge can read.
      */
     public int laughSnapshotHolders() {
-        return (int) laughSnapshots.values().stream().filter(s -> !s.hasExpired()).count();
-    }
-
-    /**
-     * Counts one of the unit's own turns against its snapshot, dropping it when the last one is gone.
-     */
-    private void tickLaughSnapshots(CanHit holder) {
-        Snapshot snapshot = laughSnapshots.get(holder);
-        if (snapshot == null) {
-            return;
-        }
-        int left = snapshot.turnsLeft() - 1;
-        if (left <= 0) {
-            laughSnapshots.remove(holder);
-        } else {
-            laughSnapshots.put(holder, new Snapshot(snapshot.points(), left));
-        }
+        return partyResources.laughSnapshotHolders();
     }
 
     /**
@@ -1636,17 +1512,16 @@ public class Battle {
         if (unit == null) {
             return;
         }
-        tickLaughSnapshots(unit);
+        partyResources.tick(unit);
         fire(TriggerPayload.Simple.of(TriggerEvent.TURN_END, unit, unit, 0, 0));
     }
 
     public int partyResourceValue(String id) {
-        com.laosun.aluminium.models.Resource resource = partyResources.get(id);
-        return resource == null ? 0 : resource.value();
+        return partyResources.value(id);
     }
 
     public com.laosun.aluminium.models.Resource partyResource(String id) {
-        return partyResources.get(id);
+        return partyResources.resource(id);
     }
 
     /* Notes which resource a change is about, then fires. */
@@ -1765,7 +1640,7 @@ public class Battle {
      * than being guessed at (the data really does contain such skills).
      */
     private void applyDeclaredMapAttacks() {
-        for (MapAttack hit : mapAttacks) {
+        for (com.laosun.aluminium.models.battle.PreBattle.MapAttack hit : preBattle.mapAttacks()) {
             // The cast is safe: `declareMapAttack` refuses a target that is not an enemy.
             Enemy enemy = (Enemy) hit.target();
             if (enemy.isDeath()) {
@@ -4443,26 +4318,7 @@ public class Battle {
      *                                  if the summon id / level group is unknown
      */
     public Summon summon(CanHit master, int summonId, int hardLevelGroup) {
-        if (master == null) {
-            throw new IllegalArgumentException("A summon (" + summonId + ") needs a master to belong to");
-        }
-        if (master.isDeath()) {
-            throw new IllegalArgumentException(
-                    "A dead master cannot summon (" + master.getName() + " -> " + summonId + "): the summon "
-                            + "would enter already orphaned, and the very next removeDeadCombatants would "
-                            + "take it straight back out, so the call could never do anything");
-        }
-        if (master.getCamp() != Camp.ENEMY && master.getCamp() != Camp.PLAYER) {
-            throw new IllegalArgumentException(
-                    "A summon must join a camp that has a roster (master " + master.getName() + " is "
-                            + master.getCamp() + ", summon " + summonId + "): CAMP.NEUTRAL has none, and "
-                            + "putting it in either list would silently decide who it fights for");
-        }
-        Summon summon = SummonFactory.create(data, summonId, master.getLevel(), hardLevelGroup, master.getCamp());
-        summon.setMaster(master);
-        addCombatant(summon);                        // camp + pending entry, in one place
-        justSummoned.add(summon);                    // ...and then fires SUMMONED, with it already scheduled
-        return summon;
+        return summons.summon(master, summonId, hardLevelGroup);
     }
 
     /**
@@ -4486,41 +4342,11 @@ public class Battle {
      * @throws IllegalArgumentException if the master is null, already down, or has no memosprite spec
      */
     public Summon summonMemosprite(Character master) {
-        if (master == null) {
-            throw new IllegalArgumentException("A memosprite needs a summoner");
-        }
-        if (master.isDeath()) {
-            throw new IllegalArgumentException(
-                    "A dead character cannot summon a memosprite (" + master.getName() + "): it would enter "
-                            + "already orphaned, and the very next removeDeadCombatants would take it "
-                            + "straight back out");
-        }
-        Summon existing = memospriteOf(master);
-        if (existing != null) {
-            return existing;
-        }
-        Summon memosprite = SummonFactory.memosprite(master, this::partyResourceValue);
-        memosprite.setMaster(master);
-        addCombatant(memosprite);
-        justSummoned.add(memosprite);                // see the note in summon(...): SUMMONED fires after scheduling
-        return memosprite;
+        return summons.memosprite(master);
     }
 
     public Summon summonServant(Character master) {
-        if (master == null) {
-            throw new IllegalArgumentException("A servant needs a summoner");
-        }
-        if (master.isDeath()) {
-            throw new IllegalArgumentException(
-                    "A dead character cannot summon a servant (" + master.getName() + "): it would enter "
-                            + "already orphaned, and the very next removeDeadCombatants would take it "
-                            + "straight back out");
-        }
-        Summon servant = SummonFactory.servant(master, this::partyResourceValue);
-        servant.setMaster(master);
-        addCombatant(servant);
-        justSummoned.add(servant);                // see the note in summon(...): SUMMONED fires after scheduling
-        return servant;
+        return summons.servant(master);
     }
 
     /**
@@ -4531,12 +4357,7 @@ public class Battle {
      * in the roster like every other corpse, hence the {@code isDeath()} filter.
      */
     public Summon memospriteOf(CanHit master) {
-        for (CanHit unit : allies) {
-            if (unit instanceof Summon summon && summon.getMaster() == master && !summon.isDeath()) {
-                return summon;
-            }
-        }
-        return null;
+        return summons.memospriteOf(master);
     }
 
     /**
@@ -4552,16 +4373,7 @@ public class Battle {
      * @return the living summons whose master is {@code master} (a fresh list, never {@code null})
      */
     public List<Summon> summonsOf(CanHit master) {
-        if (master == null) {
-            return List.of();
-        }
-        List<Summon> owned = new ArrayList<>();
-        for (CanHit unit : campOf(master)) {
-            if (unit instanceof Summon summon && summon.getMaster() == master && !summon.isDeath()) {
-                owned.add(summon);
-            }
-        }
-        return List.copyOf(owned);
+        return summons.summonsOf(master);
     }
 
     /**
@@ -4577,8 +4389,7 @@ public class Battle {
      * @return the first living summon whose master is {@code master}, in roster order, or {@code null}
      */
     public Summon summonOf(CanHit master) {
-        List<Summon> owned = summonsOf(master);
-        return owned.isEmpty() ? null : owned.getFirst();
+        return summons.summonOf(master);
     }
 
     /**
@@ -4592,18 +4403,7 @@ public class Battle {
      * @return the number of living summons whose master is {@code master}
      */
     public int summonCountOf(CanHit master) {
-        return summonsOf(master).size();
-    }
-
-    /**
-     * The roster a unit belongs to, by camp.
-     *
-     * <p>An unknown camp falls back to the enemy roster, which is where anything on the battlefield that is
-     * not one of ours lives - {@code Camp.NEUTRAL} has no roster of its own, which is exactly why
-     * {@link #summon} refuses to create such a unit rather than picking one for it.
-     */
-    private List<CanHit> campOf(CanHit unit) {
-        return unit.getCamp() == Camp.PLAYER ? allies : enemies;
+        return summons.summonCountOf(master);
     }
 
     public List<Signal> getQueueSnapshot() {
@@ -4614,9 +4414,7 @@ public class Battle {
      * Records that this unit used its technique before the battle. Call before {@link #startBattle()}.
      */
     public void markTechniqueUsed(CanHit unit) {
-        if (unit != null && !techniqueUsers.contains(unit)) {
-            techniqueUsers.add(unit);
-        }
+        preBattle.markTechniqueUsed(unit);
     }
 
     /**
@@ -4635,17 +4433,7 @@ public class Battle {
      * @param target   the enemy it hit
      */
     public void declareMapAttack(CanHit attacker, CanHit target) {
-        if (attacker == null || target == null) {
-            throw new IllegalArgumentException(
-                    "declareMapAttack needs both the unit that swung and the enemy it hit: a half-declared hit has "
-                            + "no toughness value to apply");
-        }
-        if (!(target instanceof Enemy)) {
-            throw new IllegalArgumentException(
-                    "declareMapAttack names " + target.getName() + ", which is not an enemy: the map hit reduces an "
-                            + "enemy's toughness bar, and nothing else on the field has one");
-        }
-        mapAttacks.add(new MapAttack(attacker, target));
+        preBattle.declareMapAttack(attacker, target);
     }
 
     /**
@@ -4665,21 +4453,21 @@ public class Battle {
      * is the unit holding the mark, and {@code null} leaves the battle with none.
      */
     public void markArchetypeHolder(CanHit unit) {
-        techniqueArchetype = unit;
+        preBattle.markArchetypeHolder(unit);
     }
 
     /**
      * The unit 【美学底本】 sat on when the battle began, or {@code null} when the caller named none.
      */
     public CanHit archetypeHolder() {
-        return techniqueArchetype;
+        return preBattle.archetypeHolder();
     }
 
     /**
      * Gives every unit whose technique was used a permanent "秘技" state, before anything reads BATTLE_START.
      */
     private void applyTechniqueStates() {
-        for (CanHit unit : techniqueUsers) {
+        for (CanHit unit : preBattle.techniqueUsers()) {
             if (unit == null || unit.isDeath()) {
                 continue;
             }
@@ -4693,16 +4481,12 @@ public class Battle {
         // technique, which was my own invention: the map's answer already accounts for that (a holder is named only when
         // Pearl's technique put the mark somewhere), and the judge's "no archetype named" case is what showed the extra
         // condition was doing nothing but adding a way to disagree with the caller.
-        if (techniqueArchetype != null && !techniqueArchetype.isDeath()) {
-            techniqueArchetype.getBuffManager()
+        CanHit archetype = preBattle.archetypeHolder();
+        if (archetype != null && !archetype.isDeath()) {
+            archetype.getBuffManager()
                     .addBuff(new com.laosun.aluminium.models.buff.StateBuff("美学底本", 1, true));
         }
     }
-
-    /**
-     * The unit 【美学底本】 sat on at the start of the battle; see {@link #markArchetypeHolder}.
-     */
-    private CanHit techniqueArchetype;
 
 }
 
