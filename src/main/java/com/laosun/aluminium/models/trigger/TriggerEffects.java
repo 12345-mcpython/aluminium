@@ -395,7 +395,7 @@ final class TriggerEffects {
         // "after the surprise attack ends, grant Cerydra (刻律德菈) 1 point of charge"). The actor is still the actor; the target slot now answers "who was it cast on",
         // which is what that sentence needs -- and 1412's own subscriber states no target, so nothing shipped moves.
         CanHit aimed = victims.isEmpty() ? actor : victims.getFirst();
-        battle.fireTriggers(TriggerEvent.INSERTED_CAST_END, actor, aimed, 0, 0);
+        battle.fire(TriggerPayload.Simple.of(TriggerEvent.INSERTED_CAST_END, actor, aimed, 0, 0));
     }
 
     /**

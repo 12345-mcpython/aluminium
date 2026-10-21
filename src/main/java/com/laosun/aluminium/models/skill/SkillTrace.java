@@ -71,11 +71,23 @@ public final class SkillTrace {
      * @return the list of root trace nodes, or an empty list if none found
      */
     public static List<SkillTrace> init(int cid) {
-        return CACHE.computeIfAbsent(cid, unused -> buildTree(cid));
+        return CACHE.computeIfAbsent(cid, unused -> buildTree(Constant.SKILL_TRACES, cid));
     }
 
-    private static List<SkillTrace> buildTree(int cid) {
-        List<com.laosun.aluminium.beans.SkillTraceData> beanList = Constant.SKILL_TRACES.get(cid);
+    /**
+     * Builds the trace tree from a chosen trace table (no static cache).
+     *
+     * @param traces the trace table
+     * @param cid    the character id
+     * @return the root nodes, or an empty list
+     */
+    public static List<SkillTrace> init(Map<Integer, List<com.laosun.aluminium.beans.SkillTraceData>> traces, int cid) {
+        return buildTree(traces, cid);
+    }
+
+    private static List<SkillTrace> buildTree(
+            Map<Integer, List<com.laosun.aluminium.beans.SkillTraceData>> traces, int cid) {
+        List<com.laosun.aluminium.beans.SkillTraceData> beanList = traces.get(cid);
         if (beanList == null || beanList.isEmpty()) {
             return java.util.Collections.emptyList();
         }

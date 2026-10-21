@@ -20,6 +20,7 @@ import com.laosun.aluminium.models.enemy.EnemySkill;
 import com.laosun.aluminium.models.skill.DefaultSkill;
 import com.laosun.aluminium.models.battle.BattleDriver;
 import com.laosun.aluminium.models.battle.BattleNarrator;
+import com.laosun.aluminium.models.battle.TurnLoop;
 import com.laosun.aluminium.models.skill.Skill;
 import com.laosun.aluminium.utils.CharacterFactory;
 import com.laosun.aluminium.utils.MapUtils;
@@ -279,7 +280,7 @@ public class Main {
                     + battle.targetableEnemies().size() + ")";
         });
         System.out.println("=".repeat(78));
-        battle.printHp();
+        printHp(battle);
     }
 
     // ==================================================================
@@ -567,23 +568,28 @@ public class Main {
     // ==================================================================
 
     private static void step(Battle battle) {
-        battle.stepForward();
-        Signal current = battle.queue.getCurrentActor();
-        if (current == null) {
+        // The demo supplies only the action; TurnLoop owns the four turn boundaries, so the demo
+        // cannot accidentally skip beforeMove/afterMove or settle a queued request twice.
+        boolean moved = new TurnLoop(battle, (b, actor, turn) -> act(b, actor)).step(-1);
+        if (!moved) {
             System.out.println("[Action bar] no unit can act");
             return;
         }
-        CanHit actor = current.getCanHit();
+        printQueue(battle);
+    }
 
-        // 1) Turn start: enemies settle DOT first, then the buff and entity beforeMove hooks run
-        battle.beforeMove();
+    /**
+     * What the demo does with one actor's turn.
+     *
+     * <p>Called after the turn has started (DOT already settled), so a unit killed by a DOT reaches
+     * here dead and is reported rather than cast from.
+     */
+    private static void act(Battle battle, CanHit actor) {
         if (actor.isDeath()) {
             System.out.println("[Death] " + actor.getName() + " was settled by DOT before their turn began");
-            battle.afterMove();
             return;
         }
 
-        // 2) Cast
         // Note: Three actor kinds, not two (忆灵): a Summon can be the current actor -- an enemy's minion or
         // one of our memosprites. The `else` branch casts to Character, so a summon reaching its own turn
         // must be caught before it, or it would die with a ClassCastException rather than doing something
@@ -595,10 +601,6 @@ public class Main {
         } else {
             characterTurn(battle, (Character) actor);
         }
-
-        // 3) Turn end: action value reset / the dead are removed from the action bar / buffs settle
-        battle.afterMove();
-        printQueue(battle);
     }
 
     /**
@@ -883,6 +885,21 @@ public class Main {
                     + "(" + fmt(battle.queue.getTimeRemaining(signal)) + ")");
         }
         System.out.println("[Action bar] " + String.join(" → ", names));
+    }
+
+    /**
+     * The demo's own HP report. The engine no longer prints: a library that writes to stdout is a
+     * library a front end has to suppress.
+     */
+    private static void printHp(Battle battle) {
+        System.out.println("=== HP Status ===");
+        for (CanHit unit : battle.allies) {
+            System.out.printf("%s: %.0f / %.0f%n", unit.getName(), unit.getCurrentHp(), unit.getMaxHp());
+        }
+        for (CanHit unit : battle.enemies) {
+            System.out.printf("%s: %.0f / %.0f%n", unit.getName(), unit.getCurrentHp(), unit.getMaxHp());
+        }
+        System.out.println("================");
     }
 
     // ==================================================================

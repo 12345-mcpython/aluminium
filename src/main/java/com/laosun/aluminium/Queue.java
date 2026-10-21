@@ -753,24 +753,6 @@ public final class Queue {
         return list;
     }
 
-    /**
-     * Prints the current action queue status to stdout.
-     */
-    public void printActionQueue() {
-        if (heap.isEmpty()) {
-            System.out.println("Action queue is empty.");
-            return;
-        }
-        List<Signal> ordered = snapshot();
-        System.out.println("=== Action Queue Status (elapsed=" + String.format("%.2f", elapsed) + ") ===");
-        for (int i = 0; i < ordered.size(); i++) {
-            Signal s = ordered.get(i);
-            System.out.printf("[%d] name = %s, time=%.2f, length=%.2f, speed=%.2f%n",
-                    i, s.getCanHit().getName(), getTimeRemaining(s), getActionLength(s), s.getSpeed());
-        }
-        System.out.println("===========================");
-    }
-
     // --- Internal ------------------------------------------------------
 
     /**

@@ -2,6 +2,7 @@ package com.laosun.aluminium.utils;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.Constant;
+import com.laosun.aluminium.GameData;
 import com.laosun.aluminium.beans.StageBean;
 import com.laosun.aluminium.beans.WeaponData;
 import com.laosun.aluminium.enums.Path;
@@ -125,7 +126,18 @@ public final class StageFactory {
      *                                  {@code stage.json} has not been generated)
      */
     public static Battle load(int stageId) {
-        return load(stageId, realTeam(), new Random());
+        return load(GameData.DEFAULT, stageId);
+    }
+
+    /**
+     * The same, reading the spawned monsters from a chosen data pack.
+     *
+     * @param data    the data pack
+     * @param stageId the stage id
+     * @return the battle
+     */
+    public static Battle load(GameData data, int stageId) {
+        return load(data, stageId, realTeam(data), new Random());
     }
 
     /**
@@ -138,13 +150,26 @@ public final class StageFactory {
      * @throws IllegalArgumentException if the stage does not exist or the team is empty
      */
     public static Battle load(int stageId, List<Character> team, Random rng) {
+        return load(GameData.DEFAULT, stageId, team, rng);
+    }
+
+    /**
+     * The same, reading the spawned monsters from a chosen data pack.
+     *
+     * @param data    the data pack
+     * @param stageId the stage id
+     * @param team    our team
+     * @param rng     the random source
+     * @return the battle
+     */
+    public static Battle load(GameData data, int stageId, List<Character> team, Random rng) {
         StageBean stage = requireStage(stageId);
         if (team == null || team.isEmpty()) {
             throw new IllegalArgumentException("the team must not be empty (stage " + stageId + ")");
         }
         // the enemy team starts as an empty list: monsters are appended wave by wave by WaveManager
-        Battle battle = new Battle(team, new ArrayList<>(), rng == null ? new Random() : rng);
-        WaveManager waves = new WaveManager(battle, stage);
+        Battle battle = new Battle(team, new ArrayList<>(), rng == null ? new Random() : rng, data);
+        WaveManager waves = new WaveManager(battle, stage, data);
 
         battle.startBattle();
         if (!waves.nextWave()) {
@@ -203,6 +228,16 @@ public final class StageFactory {
      * @return a fresh team; each call builds new characters and new relics, so two calls never share state
      */
     public static List<Character> realTeam() {
+        return realTeam(GameData.DEFAULT);
+    }
+
+    /**
+     * The same team, read from a chosen data pack.
+     *
+     * @param data the data pack
+     * @return a fresh team
+     */
+    public static List<Character> realTeam(GameData data) {
         List<Character> team = new ArrayList<>();
         for (int cid : TEAM) {
             // The cone is chosen before the character is built: the stat-sheet pipeline consumes
@@ -211,8 +246,9 @@ public final class StageFactory {
             //
             // The path comes straight from the data rather than from a throwaway character just to
             // read it back.
-            Path path = Path.fromMt(CharacterFactory.data(cid).mt());
-            team.add(CharacterFactory.create(cid, TEAM_LEVEL, true, samePathWeapon(path), referenceRelics()));
+            Path path = Path.fromMt(CharacterFactory.data(data, cid).mt());
+            team.add(CharacterFactory.create(data, cid, TEAM_LEVEL, true, samePathWeapon(data, path),
+                    referenceRelics()));
         }
         return team;
     }
@@ -247,25 +283,36 @@ public final class StageFactory {
      * character unequipped rather than failing - a weapon is not required to fight)
      */
     static Weapon samePathWeapon(Path path) {
+        return samePathWeapon(GameData.DEFAULT, path);
+    }
+
+    /**
+     * The same pick against a chosen data pack.
+     *
+     * @param data the data pack
+     * @param path the character's path
+     * @return the cone, or {@code null}
+     */
+    static Weapon samePathWeapon(GameData data, Path path) {
         if (path == null || path == Path.OTHER) {
             return null;
         }
         int bestId = -1;
         int bestRarity = Integer.MIN_VALUE;
-        for (Map.Entry<Integer, WeaponData> entry : Constant.WEAPONS.entrySet()) {
-            WeaponData data = entry.getValue();
-            if (data == null || data.type() == null) {
+        for (Map.Entry<Integer, WeaponData> entry : data.weapons().entrySet()) {
+            WeaponData weaponData = entry.getValue();
+            if (weaponData == null || weaponData.type() == null) {
                 continue;
             }
             // `weapons.json` stores the path in `type`, using the same words as `Path`'s mt values
             // ("all"/"single"/"destruction"/"healing"/...), so Path is the join key rather than a
             // second hand-written table.
-            if (Path.fromMt(data.type()) != path) {
+            if (Path.fromMt(weaponData.type()) != path) {
                 continue;
             }
-            if (data.rarity() > bestRarity
-                    || (data.rarity() == bestRarity && entry.getKey() < bestId)) {
-                bestRarity = data.rarity();
+            if (weaponData.rarity() > bestRarity
+                    || (weaponData.rarity() == bestRarity && entry.getKey() < bestId)) {
+                bestRarity = weaponData.rarity();
                 bestId = entry.getKey();
             }
         }

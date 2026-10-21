@@ -2,6 +2,7 @@ package com.laosun.aluminium.models;
 
 import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.beans.CharacterData;
+import com.laosun.aluminium.beans.SkillTraceData;
 import com.laosun.aluminium.beans.Translate;
 import com.laosun.aluminium.enums.Camp;
 import com.laosun.aluminium.enums.DamageElement;
@@ -251,6 +252,14 @@ public class Character extends CanHit {
         private ExtraBasicPromote extraBasicPromote = new ExtraBasicPromote();
         private CharacterDataProvider characterDataProvider = new ConstantCharacterDataProvider();
         /**
+         * The trace table; {@code null} = {@link Constant#SKILL_TRACES}.
+         */
+        private Map<Integer, List<SkillTraceData>> skillTraces;
+        /**
+         * The skill table; {@code null} = {@link Constant#SKILLS}.
+         */
+        private Map<Integer, Map<Integer, com.laosun.aluminium.beans.Skill>> skills;
+        /**
          * An explicitly specified path; {@code null} = derive it from {@code mt} in the character data
          * (the default route).
          */
@@ -351,6 +360,28 @@ public class Character extends CanHit {
         }
 
         /**
+         * Supplies the trace table used while building the panel.
+         *
+         * @param skillTraces the trace table; {@code null} = {@link Constant#SKILL_TRACES}
+         * @return this builder
+         */
+        public Builder skillTraces(Map<Integer, List<SkillTraceData>> skillTraces) {
+            this.skillTraces = skillTraces;
+            return this;
+        }
+
+        /**
+         * Supplies the skill table used by the skill slots.
+         *
+         * @param skills the table; {@code null} = {@link Constant#SKILLS}
+         * @return this builder
+         */
+        public Builder skills(Map<Integer, Map<Integer, com.laosun.aluminium.beans.Skill>> skills) {
+            this.skills = skills;
+            return this;
+        }
+
+        /**
          * Attaches the character's trigger table.
          *
          * <p>This is the assembly point for character mechanics: whoever builds the character (the
@@ -386,7 +417,8 @@ public class Character extends CanHit {
             CharacterData characterData = validateAndGet(cid);
             double rate = LevelPromotionCalc.calcCharacterRate(level, isPromote);
             AttributeBuilder calcData = new Calculator(characterData, weapon, relicSuit, extraBasicPromote).calculate(rate);
-            SkillTrace.appendTo(SkillTrace.init(cid), calcData);
+            SkillTrace.appendTo(SkillTrace.init(skillTraces == null ? Constant.SKILL_TRACES : skillTraces, cid),
+                    calcData);
             Character character = new Character(characterData.name(), calcData.build());
             character.relicSuit = relicSuit;
             character.weapon = weapon;
@@ -406,7 +438,7 @@ public class Character extends CanHit {
                 if (slot == null) {
                     continue;
                 }
-                skills.put(type, new DefaultSkill(cid, slot, level));
+                skills.put(type, new DefaultSkill(cid, slot, level, this.skills));
             }
             skills.putAll(customSkills);
             character.setSkills(skills);

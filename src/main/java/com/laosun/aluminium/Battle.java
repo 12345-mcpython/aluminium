@@ -16,6 +16,7 @@ import com.laosun.aluminium.models.skill.SkillExecutor;
 import com.laosun.aluminium.models.skillpoint.SkillPointPolicy;
 import com.laosun.aluminium.models.skillpoint.StandardSkillPointPolicy;
 import com.laosun.aluminium.models.trigger.TriggerInterpreter;
+import com.laosun.aluminium.models.trigger.TriggerPayload;
 import com.laosun.aluminium.models.trigger.TriggerTable;
 import lombok.Getter;
 import lombok.Setter;
@@ -264,6 +265,24 @@ public class Battle {
     private volatile List<ShieldObserver> shieldObservers = List.of();
 
     /**
+     * A copy-on-write list without {@code item}; the registration lists are replaced, never mutated,
+     * so a removal cannot affect an announcement that is already iterating the old list.
+     *
+     * @param list the current observers
+     * @param item the one to drop, or {@code null}
+     * @param <T>  the observer type
+     * @return the list to install; the same list when {@code item} is {@code null}
+     */
+    private static <T> List<T> without(List<T> list, T item) {
+        if (item == null) {
+            return list;
+        }
+        List<T> next = new ArrayList<>(list);
+        next.remove(item);
+        return List.copyOf(next);
+    }
+
+    /**
      * Registers an observer for settled damage.
      *
      * @param observer the observer, ignored (rather than throwing) when {@code null}
@@ -278,6 +297,15 @@ public class Battle {
     }
 
     /**
+     * Removes a previously registered damage observer.
+     *
+     * @param observer the observer; ignored when {@code null} or not registered
+     */
+    public void removeDamageObserver(DamageObserver observer) {
+        damageObservers = without(damageObservers, observer);
+    }
+
+    /**
      * Registers an observer for weakness breaks.
      *
      * @param observer the observer, ignored (rather than throwing) when {@code null}
@@ -289,6 +317,15 @@ public class Battle {
         List<BreakObserver> next = new ArrayList<>(breakObservers);
         next.add(observer);
         breakObservers = List.copyOf(next);
+    }
+
+    /**
+     * Removes a previously registered break observer.
+     *
+     * @param observer the observer; ignored when {@code null} or not registered
+     */
+    public void removeBreakObserver(BreakObserver observer) {
+        breakObservers = without(breakObservers, observer);
     }
 
     /**
@@ -319,6 +356,15 @@ public class Battle {
     }
 
     /**
+     * Removes a previously registered control observer.
+     *
+     * @param observer the observer; ignored when {@code null} or not registered
+     */
+    public void removeControlObserver(ControlObserver observer) {
+        controlObservers = without(controlObservers, observer);
+    }
+
+    /**
      * Announces that a control landed.
      *
      * @param applier who applied it
@@ -346,6 +392,15 @@ public class Battle {
     }
 
     /**
+     * Removes a previously registered skip observer.
+     *
+     * @param observer the observer; ignored when {@code null} or not registered
+     */
+    public void removeSkipObserver(SkipObserver observer) {
+        skipObservers = without(skipObservers, observer);
+    }
+
+    /**
      * Announces that a turn was skipped.
      *
      * @param unit   whose turn it was
@@ -369,6 +424,15 @@ public class Battle {
         List<RuleObserver> next = new ArrayList<>(ruleObservers);
         next.add(observer);
         ruleObservers = List.copyOf(next);
+    }
+
+    /**
+     * Removes a previously registered rule observer.
+     *
+     * @param observer the observer; ignored when {@code null} or not registered
+     */
+    public void removeRuleObserver(RuleObserver observer) {
+        ruleObservers = without(ruleObservers, observer);
     }
 
     /**
@@ -400,6 +464,15 @@ public class Battle {
     }
 
     /**
+     * Removes a previously registered heal observer.
+     *
+     * @param observer the observer; ignored when {@code null} or not registered
+     */
+    public void removeHealObserver(HealObserver observer) {
+        healObservers = without(healObservers, observer);
+    }
+
+    /**
      * Registers an observer for granted shields.
      *
      * @param observer the observer, ignored (rather than throwing) when {@code null}
@@ -413,6 +486,15 @@ public class Battle {
         shieldObservers = List.copyOf(next);
     }
 
+    /**
+     * Removes a previously registered shield observer.
+     *
+     * @param observer the observer; ignored when {@code null} or not registered
+     */
+    public void removeShieldObserver(ShieldObserver observer) {
+        shieldObservers = without(shieldObservers, observer);
+    }
+
     public Queue queue;
 
     /**
@@ -423,7 +505,7 @@ public class Battle {
      */
     private final BattleEvents events = new BattleEvents(this);
 
-    public List<Character> characters;
+    public final List<Character> characters;
 
     /**
      * The <b>player camp's roster</b> - every combatant fighting for us, in battlefield order: our
@@ -456,7 +538,7 @@ public class Battle {
      * roster in the engine ({@code enemies} / {@code characters}): "is it alive" is asked with
      * {@code isDeath()}.
      */
-    public List<CanHit> allies;
+    public final List<CanHit> allies;
 
     /**
      * The <b>enemy camp's roster</b> - every combatant fighting against us, in battlefield order.
@@ -477,7 +559,7 @@ public class Battle {
      *
      * <p>Mutable on purpose: {@code WaveManager} appends each new wave's monsters to it.
      */
-    public List<CanHit> enemies;
+    public final List<CanHit> enemies;
 
     /**
      * One living unit from the other side, chosen with the battle's own seeded randomness (used by
@@ -537,7 +619,19 @@ public class Battle {
     @Setter
     private WaveManager waveManager;
 
-    public ArrayList<CanHit> addRequestItems = new ArrayList<>();
+    private final List<CanHit> addRequestItems = new ArrayList<>();
+
+    /**
+     * The combatants queued to enter the action bar at the next settle, in entry order.
+     *
+     * <p>A read-only view; {@link #addCombatant} is the only way in. Exists so a test can assert what
+     * is waiting without reaching into the engine's queue.
+     *
+     * @return an immutable copy of the pending entrants
+     */
+    public List<CanHit> pendingCombatants() {
+        return List.copyOf(addRequestItems);
+    }
 
     /**
      * The countdown units this battle has placed on the action order.
@@ -813,13 +907,40 @@ public class Battle {
      *
      * <p>The default is {@link StandardSkillPointPolicy} (start 3 / max 5 / our basic attack +1 / skill -1 /
      * everything else neutral). To swap in another rule set for the team (e.g. Sparkle (花火) raising the max),
-     * replace this field -- it is a controllable injection point and a stable API to callers
-     * (the three methods read/add/spend do not change).
+     * call {@link #setSkillPointPolicy}; it rewires the event reports, which a plain field assignment could not.
      */
-    public SkillPointPolicy skillPointPolicy = new StandardSkillPointPolicy();
+    private SkillPointPolicy skillPointPolicy = new StandardSkillPointPolicy();
 
     /**
-     * Current skill points. Equivalent to {@code skillPointPolicy.getValue()}.
+     * The policy that owns this battle's skill points.
+     *
+     * @return the current policy
+     */
+    public SkillPointPolicy getSkillPointPolicy() {
+        return skillPointPolicy;
+    }
+
+    /**
+     * Replaces the skill point policy and wires its reports into this battle's events.
+     *
+     * <p>The setter exists rather than a public field because the wiring is not optional: a policy that
+     * is installed without {@link #listenToSkillPointChanges()} still holds the points, but
+     * {@code SKILL_POINT_GAINED} / {@code SKILL_POINT_SPENT} never fire, so every rule gated on them
+     * silently stops working. The constructor wires the default; this method is the other way in.
+     *
+     * @param policy the new policy; must not be {@code null}
+     * @throws IllegalArgumentException when {@code policy} is {@code null}
+     */
+    public void setSkillPointPolicy(SkillPointPolicy policy) {
+        if (policy == null) {
+            throw new IllegalArgumentException("a battle needs a skill point policy");
+        }
+        this.skillPointPolicy = policy;
+        listenToSkillPointChanges();
+    }
+
+    /**
+     * Current skill points. Equivalent to {@code getSkillPointPolicy().getValue()}.
      */
     public int getSkillPoints() {
         return skillPointPolicy.getValue();
@@ -868,13 +989,13 @@ public class Battle {
         skillPointPolicy.gain(n);
         int gained = skillPointPolicy.getValue() - before;
         if (gained > 0) {
-            fireTriggers(TriggerEvent.SKILL_POINT_GAINED, null, null, 0, gained);
+            fire(TriggerPayload.Simple.of(TriggerEvent.SKILL_POINT_GAINED, null, null, 0, gained));
         }
         // What the pool refused: `asked - credited`. Both numbers are right here, which is why this is computed
         // at the call site rather than inside the policy -- the policy reports what it credited, not what it was asked for.
         int overflowed = n - gained;
         if (overflowed > 0) {
-            fireTriggers(TriggerEvent.SKILL_POINT_OVERFLOWED, null, null, 0, overflowed);
+            fire(TriggerPayload.Simple.of(TriggerEvent.SKILL_POINT_OVERFLOWED, null, null, 0, overflowed));
         }
     }
 
@@ -994,19 +1115,36 @@ public class Battle {
     public record SkillRequest(Skill skill, CanHit object, List<? extends CanHit> target) {
     }
 
+    /**
+     * The data pack this battle reads skills and summons from.
+     */
+    private final GameData data;
+
     public Battle(List<Character> characterQueue, List<? extends CanHit> enemyQueue) {
         this(characterQueue, enemyQueue, new Random());
     }
 
     /**
-     * @param characterQueue our side (characters; a player-side summon is added to the action bar directly)
+     * @param characterQueue our side. Copied, so the battle owns its roster and a caller that mutates
+     *                       its own list afterwards cannot desynchronise it from the action bar
      * @param enemyQueue     the enemy camp - monsters, and any summon fighting alongside them. Taken as
      *                       {@code ? extends CanHit} so that a caller's {@code List<Enemy>} still fits.
      *                       Copied, so the battle owns its roster and a later
      *                       {@code WaveManager} append does not write through to the caller's list.
      */
     public Battle(List<Character> characterQueue, List<? extends CanHit> enemyQueue, Random rng) {
-        characters = characterQueue;
+        this(characterQueue, enemyQueue, rng, GameData.DEFAULT);
+    }
+
+    /**
+     * @param characterQueue our side
+     * @param enemyQueue     the enemy camp
+     * @param rng            the random source
+     * @param data           the data pack skills and summons are read from
+     */
+    public Battle(List<Character> characterQueue, List<? extends CanHit> enemyQueue, Random rng, GameData data) {
+        this.data = java.util.Objects.requireNonNull(data, "data");
+        characters = new ArrayList<>(characterQueue);
         // The camp view of our side: the same instances, one more list. A friendly summon is appended here
         // (and only here) by summon(...), so `characters` stays exactly "our characters".
         allies = new ArrayList<>(characterQueue);
@@ -1139,7 +1277,7 @@ public class Battle {
      *
      * <p>Only {@link StandardSkillPointPolicy} is wired: other implementations that also want to emit events
      * can hook up {@code setListener} themselves at the assembly point -- the engine makes no special case for
-     * any one implementation.
+     * any one implementation. Called by the constructor and by {@link #setSkillPointPolicy}.
      */
     private void listenToSkillPointChanges() {
         if (skillPointPolicy instanceof StandardSkillPointPolicy standard) {
@@ -1152,7 +1290,7 @@ public class Battle {
                 @Override
                 public void onSpent(CanHit spender, int amount) {
                     broadcastSkillPointSpent(amount);
-                    fireTriggers(TriggerEvent.SKILL_POINT_SPENT, spender, null, 0, amount);
+                    fire(TriggerPayload.Simple.of(TriggerEvent.SKILL_POINT_SPENT, spender, null, 0, amount));
                 }
             });
         }
@@ -1488,7 +1626,7 @@ public class Battle {
             return;
         }
         tickLaughSnapshots(unit);
-        fireTriggers(TriggerEvent.TURN_END, unit, unit, 0, 0);
+        fire(TriggerPayload.Simple.of(TriggerEvent.TURN_END, unit, unit, 0, 0));
     }
 
     public int partyResourceValue(String id) {
@@ -1527,6 +1665,12 @@ public class Battle {
     }
 
     public void startBattle() {
+        if (status != Status.NOT_STARTED) {
+            throw new IllegalStateException(
+                    "startBattle() may be called once per battle; this one is already " + status
+                            + ". A second call would re-run every opening hook (BATTLE_START, party "
+                            + "resources, technique states) and double their effects.");
+        }
         status = Status.RUNNING;
         // [WAREHOUSE] "after the character is obtained, or while the character is in the party": a member carrying a `warehouse/<cid>.json` is heard through it, with her own
         // battle table untouched. Registered before every hook below, so a warehouse clause can answer the opening too.
@@ -1552,13 +1696,13 @@ public class Battle {
         // Note: after the opening hooks, let every combatant's trigger table see BATTLE_START.
         // Deliberately after `onBattleStart` so an opening buff is already in place when a trigger
         // reads its own state (e.g. "restore 30 energy at the start of battle").
-        fireTriggers(TriggerEvent.BATTLE_START);
+        fire(TriggerPayload.Simple.of(TriggerEvent.BATTLE_START));
         processRequests();
         // Note: the second phase. Some clauses read a fact that another BATTLE_START rule produces -- the team's
         // skill point cap, for instance, which a talent raises -- and BATTLE_START rules run in team order, so
         // such a clause would answer differently depending on where its raiser stood. Let the first phase settle,
         // then give those clauses their moment.
-        fireTriggers(TriggerEvent.BATTLE_READY);
+        fire(TriggerPayload.Simple.of(TriggerEvent.BATTLE_READY));
         processRequests();
         checkResult();
     }
@@ -1592,7 +1736,7 @@ public class Battle {
                 if (slot == null) {
                     continue;
                 }
-                character.setSkill(type, new DefaultSkill(character.getCid(), slot, 1));
+                character.setSkill(type, new DefaultSkill(character.getCid(), slot, 1, data.skills()));
             }
         }
     }
@@ -1656,7 +1800,8 @@ public class Battle {
         currentMove = queue.getCurrentActor();
         if (startingExtraTurn && currentMove != null) {
             extraTurnBeingTaken = currentMove.getCanHit();
-            fireTriggersWithSubject(TriggerEvent.EXTRA_TURN_STARTED, extraTurnBeingTaken, extraTurnBeingTaken, 0);
+            fire(TriggerPayload.Simple.of(TriggerEvent.EXTRA_TURN_STARTED, extraTurnBeingTaken,
+                    extraTurnBeingTaken, 0, 0));
         }
     }
 
@@ -1827,14 +1972,14 @@ public class Battle {
         // `performAction` and its settlement), so the lethal set is cleared at it.
         lethallyHitThisAction.clear();
         lostHpThisAction.clear();
-        fireTriggers(TriggerEvent.TURN_START, actor, actor, 0, 0);
+        fire(TriggerPayload.Simple.of(TriggerEvent.TURN_START, actor, actor, 0, 0));
         // "lasting until the start of the next ... turn" ends HERE: the owner's own turn is beginning.
         actor.getBuffManager().removeWithLifetime(AbstractBuff.Lifetime.NEXT_TURN_START);
         // A countdown exists to HAVE a turn -- this is the moment its reader waits for
         // ("at the start of the countdown turn, Robin (知更鸟) exits the [协奏] state and acts immediately"). The countdown has no table of its own, and our
         // characters' tables are what subscribe, so the ordinary ally broadcaster is the right one.
         if (actor instanceof Countdown countdown) {
-            fireTriggersForAlly(TriggerEvent.COUNTDOWN_TURN, countdown, countdown, 0);
+            fireForAlly(TriggerPayload.AllySubject.of(TriggerEvent.COUNTDOWN_TURN, countdown, countdown, 0));
         }
         actor.beforeMove(this);
     }
@@ -2057,7 +2202,7 @@ public class Battle {
         // Note: Fired before `processRequests()` for the same reason TURN_END is: the rules may still produce effects.
         if (extraTurnBeingTaken != null && extraTurnBeingTaken == actor) {
             extraTurnBeingTaken = null;
-            fireTriggersWithSubject(TriggerEvent.EXTRA_TURN_ENDED, actor, actor, 0);
+            fire(TriggerPayload.Simple.of(TriggerEvent.EXTRA_TURN_ENDED, actor, actor, 0, 0));
         }
         processRequests();
     }
@@ -2122,7 +2267,7 @@ public class Battle {
         List<CanHit> arrived = List.copyOf(justSummoned);
         justSummoned.clear();
         for (CanHit summon : arrived) {
-            fireTriggers(TriggerEvent.SUMMONED, summon, null, 0, 0);
+            fire(TriggerPayload.Simple.of(TriggerEvent.SUMMONED, summon, null, 0, 0));
         }
     }
 
@@ -2207,7 +2352,7 @@ public class Battle {
             if (!lethallyHitThisAction.contains(target)) {
                 lethallyHitThisAction.add(target);
             }
-            fireTriggersForAlly(TriggerEvent.LETHAL_DAMAGE, target, target, 0);
+            fireForAlly(TriggerPayload.AllySubject.of(TriggerEvent.LETHAL_DAMAGE, target, target, 0));
             // "temporarily defer falling into the unable-to-fight state" (140's Moon Cocoon's Ward (月茧之庇)): a state may hold the death instead of
             // committing it. Note: The victim really is at zero HP here -- that IS "deferring" -- so this is not a heal: what
             // saves it is the state being GONE by its own turn (a heal or a shield removes it, in content).
@@ -2230,7 +2375,8 @@ public class Battle {
         //     applyDamage returns above in exactly those cases (nothing landed).
         // The HP_LOST trigger below keeps its own stricter gate (`hpLoss > 0`), so the two events can
         // never be mistaken for one another.
-        fireTriggersForAlly(TriggerEvent.TAKING_HIT, damage.getAttacker(), target, settled);
+        fireForAlly(TriggerPayload.AllySubject.of(TriggerEvent.TAKING_HIT, damage.getAttacker(), target,
+                settled));
         // HP loss and being killed are two facts, both emitted here. Placed before the energy
         // settlement -- the event means "an HP change happened", independent of the energy rule (who gains how
         // much, whether it counts as an attack).
@@ -2241,25 +2387,27 @@ public class Battle {
             broadcastHpLoss(target, hpBefore, target.getCurrentHp(), damage.getAttacker(), hpLoss);
             // `actor` = whoever dealt the damage, `target` = the one who lost HP (i.e. the victim).
             // A counter rule keys off `target == self` -- see TriggerTable's DSL notes.
-            fireTriggersForAlly(TriggerEvent.HP_LOST, damage.getAttacker(), target, hpLoss);
+            fireForAlly(TriggerPayload.AllySubject.of(TriggerEvent.HP_LOST, damage.getAttacker(), target,
+                    hpLoss));
         }
         // The DEALER-side fact, and the only post-settlement number that reaches BOTH camps:
         // "how much did this hit I dealt actually settle". `TAKING_HIT` above carries the same number but is fired through
         // `fireTriggersForAlly`, which returns 0 for any target that is not on our side -- so an ENEMY victim never
         // announced it, and "to an enemy target ... equal to X% of the original damage" (Himeko (姬子)'s eidolon 6) had no way to read what it had just dealt.
         // The instance's cast category rides along, exactly like KILL below, so "ultimate"-scoped clauses work.
-        fireTriggersWithSubject(TriggerEvent.DAMAGE_SETTLED, damage.getAttacker(), target, settled,
-                damage, damage.getCastCategory());
+        fire(TriggerPayload.DamagePayload.of(TriggerEvent.DAMAGE_SETTLED, damage.getAttacker(), target,
+                settled, damage, damage.getCastCategory(), 0, List.of()));
         if (died) {
             broadcastKill(damage.getAttacker(), target);
             // The DYING-side fact, and the only event addressed to a corpse: 「当罗刹陷入无法战斗状态时，结界也会被解除」
             // needs the unit that fell to act on its own way out, and `fireTriggers` skips the dead (see its loop).
             // Delivered here, where the death is known, with the victim as BOTH actor and target so a rule can say
             // `when: ["target == self"]` -- the same spelling TAKING_HIT and the counter rules use.
-            fireTriggers(TriggerEvent.DEATH, target, target, 0, 0.0, damage, damage.getCastCategory());
+            fire(TriggerPayload.DamagePayload.of(TriggerEvent.DEATH, target, target, 0.0, damage,
+                    damage.getCastCategory(), 0, List.of()));
             // The causing instance's cast category rides along: "each time 1 enemy target is defeated"-style rules have to be able to
             // ask WHICH skill produced the kill (see the `from_skill` condition), and the instance already knows.
-            fireTriggersWithSubject(TriggerEvent.KILL, damage.getAttacker(), target, 0, castOf(damage));
+            fire(TriggerPayload.Subject.of(TriggerEvent.KILL, damage.getAttacker(), target, 0, castOf(damage)));
         }
         grantHitAndKillEnergy(target, damage, died, grant);     // hit energy gain / kill energy gain
         // The return value = the damage this hit actually had effect with = shield-absorbed + HP really lost.
@@ -2300,7 +2448,7 @@ public class Battle {
         if (added > 0) {
             broadcastEnergyGain(target, added);
             // Note: let the data-driven tables see it too (e.g. "when I gain energy, ...").
-            fireTriggersForAlly(TriggerEvent.ENERGY_GAINED, target, target, added);
+            fireForAlly(TriggerPayload.AllySubject.of(TriggerEvent.ENERGY_GAINED, target, target, added));
         }
         return added;
     }
@@ -2403,8 +2551,8 @@ public class Battle {
         // below -- crit, defence, toughness reduction, resistance -- has to read the mutated
         // numbers. Announcing after them would leave such a rule describing a number nobody used,
         // which is why this call cannot move to either side.
-        fireTriggers(TriggerEvent.DEALING_DAMAGE, attacker, defender, 0, damage.getSkillBaseValue(), damage,
-                damage.getCastCategory(), damage.getSkillKey());
+        fire(TriggerPayload.DamagePayload.of(TriggerEvent.DEALING_DAMAGE, attacker, defender,
+                damage.getSkillBaseValue(), damage, damage.getCastCategory(), damage.getSkillKey(), List.of()));
 
         // 2) Crit zone: only crittable types roll; an effect that already fixed the crit (fixedCrit) is not
         //    overwritten
@@ -2424,7 +2572,8 @@ public class Battle {
             // Note: The CAST CATEGORY goes with it. The crit belongs to this instance, and the instance knows which
             // skill produced it, so "战技造成的伤害触发暴击时" (reader: 1002 Dan Heng's Skill) can be scoped to the
             // Skill without inventing a predicate -- `from_skill` reads this field on the events that state one.
-            fireTriggersWithSubject(TriggerEvent.CRIT_DEALT, attacker, defender, 0, damage.getCastCategory());
+            fire(TriggerPayload.Subject.of(TriggerEvent.CRIT_DEALT, attacker, defender, 0,
+                    damage.getCastCategory()));
         }
 
         // 3) Defence zone: attacker level / victim defence / attacker defence ignore
@@ -2566,7 +2715,7 @@ public class Battle {
         // ⚠ And to the listener. `broadcastBreak` above reaches the buff hooks only, so a screen was never told a break had
         // happened -- measured: seven breaks in one battle, no log line for any of them.
         announceBroken(attacker, enemy, element);
-        fireTriggersWithSubject(TriggerEvent.BREAK, attacker, enemy, 0, fromCast);
+        fire(TriggerPayload.Subject.of(TriggerEvent.BREAK, attacker, enemy, 0, fromCast));
         // The break damage is settled right here, so the settled value must be carried out -- it belongs to
         // this attack, and dropping it would make AttackEvent.totalDamage miss a whole break chain.
         // KILL_ONLY: the break is extra damage derived from the main instance, so the victim gains no energy
@@ -2829,7 +2978,7 @@ public class Battle {
         // Tell the tables WHICH FAMILY landed, before the event goes out: the class is already read one line up for
         // the resistance roll, so it costs nothing to make the same fact askable.
         noteAppliedDebuffClass(buff.debuffClass());
-        fireTriggers(TriggerEvent.DEBUFF_APPLIED, caster, target, 0, 0);
+        fire(TriggerPayload.Subject.of(TriggerEvent.DEBUFF_APPLIED, caster, target, 0, null));
 
         return true;
     }
@@ -2926,7 +3075,7 @@ public class Battle {
         // only emit when HP was really restored (healing at full HP is 0 and is not a heal event)
         if (healed > 0) {
             broadcastHeal(healer, target, healed);
-            fireTriggersForAlly(TriggerEvent.HEALED, healer, target, healed);
+            fireForAlly(TriggerPayload.AllySubject.of(TriggerEvent.HEALED, healer, target, healed));
             // The restored amount exists only here: `CanHit.heal` caps it against the target's maximum and silently does
             // nothing for the dead, so the request is not the answer and the HP difference is not one either once
             // anything else moves HP.
@@ -3059,7 +3208,7 @@ public class Battle {
         // Note: The TIMED path (`SHIELD` with `turns`) does not come through here: its shield is installed by a
         // ShieldBuff, which has no Battle handle, so the interpreter announces that one itself.
         if (value > 0) {
-            fireTriggersForAlly(TriggerEvent.SHIELD_GRANTED, provider, target, value);
+            fireForAlly(TriggerPayload.AllySubject.of(TriggerEvent.SHIELD_GRANTED, provider, target, value));
             // The amount AFTER the provider's own shield boost -- the request would be a number the battle does not have.
             for (ShieldObserver observer : shieldObservers) {
                 observer.onShieldGranted(provider, target, value);
@@ -3320,12 +3469,106 @@ public class Battle {
      * place early left `ctx.amount` at zero -- which is what "50% of it" reads.
      */
     public void fireStateEnded(CanHit carrier, String stateName, int magnitude) {
+        fire(TriggerPayload.StateEnded.of(TriggerEvent.STATE_ENDED, carrier, stateName, magnitude));
+    }
+
+    /**
+     * Fires one typed trigger payload.
+     *
+     * <p>The typed entry exists so a cast-family call site cannot put a skill slot where a hit count
+     * belongs; the old positional overloads stay as adapters for the events that have not moved yet.
+     *
+     * @param payload the firing data
+     * @return how many rules fired
+     */
+    public int fire(TriggerPayload.Cast payload) {
+        return fireTriggers(payload.event(), payload.actor(), payload.target(), payload.hitCount(),
+                payload.amount(), null, payload.fromCast(), payload.skillId(), payload.weakHitCount(),
+                payload.attackHitTargets());
+    }
+
+    /**
+     * Fires a damage-bearing payload. Private because {@code Damage} already has exactly one public
+     * settlement entry point ({@link #applyDamage}); this is an announcement, not a second way in.
+     *
+     * @param payload the firing data
+     * @return how many rules fired
+     */
+    private int fire(TriggerPayload.DamagePayload payload) {
+        return fireTriggers(payload.event(), payload.actor(), payload.target(), 0, payload.amount(),
+                payload.damage(), payload.fromCast(), payload.skillId(), 0, payload.attackHitTargets());
+    }
+
+    /**
+     * Fires a subject-only payload ({@code KILL}, {@code BREAK}, {@code CRIT_DEALT}).
+     *
+     * @param payload the firing data
+     * @return how many rules fired
+     */
+    private int fire(TriggerPayload.Subject payload) {
+        return fireTriggers(payload.event(), payload.actor(), payload.target(), 0, payload.amount(),
+                null, payload.fromCast());
+    }
+
+    /**
+     * Fires an ally-only subject payload; an enemy subject is deliberately not announced to our tables.
+     *
+     * @param payload the firing data
+     * @return how many rules fired, or {@code 0} for a non-ally subject
+     */
+    public int fireForAlly(TriggerPayload.AllySubject payload) {
+        if (payload.target() == null || payload.target().getCamp() != Camp.PLAYER) {
+            return 0;
+        }
+        return fireTriggers(payload.event(), payload.actor(), payload.target(), 0, payload.amount(),
+                null, null);
+    }
+
+    /**
+     * Fires a plain event payload.
+     *
+     * @param payload the firing data
+     * @return how many rules fired
+     */
+    public int fire(TriggerPayload.Simple payload) {
+        return fireTriggers(payload.event(), payload.actor(), payload.target(), payload.hitCount(),
+                payload.amount(), null, null);
+    }
+
+    /**
+     * Fires a state-ended payload, scoping the state's name to this firing.
+     *
+     * @param payload the firing data
+     * @return how many rules fired
+     */
+    private int fire(TriggerPayload.StateEnded payload) {
         String previous = lastStateEndedName;
-        lastStateEndedName = stateName;
+        lastStateEndedName = payload.stateName();
         try {
-            fireTriggers(TriggerEvent.STATE_ENDED, carrier, carrier, 0, magnitude);
+            return fireTriggers(payload.event(), payload.actor(), payload.target(), 0, payload.amount(),
+                    null, null);
         } finally {
             lastStateEndedName = previous;
+        }
+    }
+
+    /**
+     * Fires a resource-changed payload, scoping the resource's name to this firing.
+     *
+     * <p>The save/restore lives here rather than in every caller: a nested firing may move another
+     * resource, and the rules of the outer firing must still see the outer resource's name.
+     *
+     * @param payload the firing data
+     * @return how many rules fired
+     */
+    public int fire(TriggerPayload.ResourceChanged payload) {
+        String previous = lastChangedResource;
+        lastChangedResource = payload.resource();
+        try {
+            return fireTriggers(payload.event(), payload.actor(), payload.target(), 0, payload.amount(),
+                    null, null);
+        } finally {
+            lastChangedResource = previous;
         }
     }
 
@@ -3677,8 +3920,8 @@ public class Battle {
         // The attack is over and its hit set is frozen, so content may now ask "a random one of the targets
         // that WAS HIT" -- the fact only this side holds (cone 21029). Note: Same early return
         // as above: an attack that hit nothing does not announce itself.
-        fireTriggers(TriggerEvent.ATTACK_FINISHED, attacker, mainTarget, targets.size(), totalDamage,
-                null, null, skillSlot, 0, targets);
+        fire(TriggerPayload.Cast.of(TriggerEvent.ATTACK_FINISHED, attacker, mainTarget, targets.size(),
+                totalDamage, null, skillSlot, 0, targets));
         for (CanHit ally : allies) {
             ally.afterAttack(this, attacker, mainTarget, targets, totalDamage);
         }
@@ -3882,7 +4125,7 @@ public class Battle {
         // earlier version gated this on `settled > 0`; it was dropped because the semantic was
         // questionable and, more decisively, `settled == 0` could not be produced reliably in a test,
         // so the branch would have shipped unverified.
-        fireTriggersWithSubject(TriggerEvent.FOLLOW_UP, attacker, target, settled);
+        fire(TriggerPayload.Subject.of(TriggerEvent.FOLLOW_UP, attacker, target, settled, null));
         return settled;
     }
 
@@ -3995,6 +4238,52 @@ public class Battle {
         return List.copyOf(lostHpThisAction);
     }
 
+    /**
+     * Queues a combatant to join its camp and enter the action bar at the next settle.
+     *
+     * <p><b>Why this is the entry point.</b> A unit that joins after construction used to be put in
+     * place by writing to {@code allies} / {@code enemies} and to the pending-entry list separately.
+     * Those are two facts ("on the roster", "in the action bar") and a caller could do one without the
+     * other, producing a unit that is targetable but never acts -- or acts but is not on a roster.
+     * This method does both, once, and is idempotent for a unit already present.
+     *
+     * <p>It does not announce {@code SUMMONED}: a wave arriving is not a summon. The summon methods
+     * record the newcomer in {@code justSummoned} themselves, which is where that event comes from.
+     *
+     * @param unit the combatant to add; must be alive and on a camp that has a roster
+     * @throws IllegalArgumentException when {@code unit} is {@code null}, dead, or neutral
+     */
+    public void addCombatant(CanHit unit) {
+        if (unit == null) {
+            throw new IllegalArgumentException("a battle cannot admit a null combatant");
+        }
+        if (unit.isDeath()) {
+            throw new IllegalArgumentException(
+                    "a dead combatant cannot join (" + unit.getName() + "): it would be removed by the "
+                            + "next removeDeadCombatants, so the call could never do anything");
+        }
+        if (unit.getCamp() != Camp.PLAYER && unit.getCamp() != Camp.ENEMY) {
+            throw new IllegalArgumentException(
+                    "a combatant must join a camp that has a roster (" + unit.getName() + " is "
+                            + unit.getCamp() + "); Camp.NEUTRAL has none, and picking one would silently "
+                            + "decide who it fights for");
+        }
+        List<CanHit> camp = campOf(unit);
+        if (!camp.contains(unit)) {
+            camp.add(unit);
+        }
+        if (unit instanceof Character character && !characters.contains(character)) {
+            characters.add(character);
+        }
+        if (!addRequestItems.contains(unit)) {
+            addRequestItems.add(unit);
+        }
+        // The constructor wires the speed listener for the opening roster only; a unit admitted later
+        // needs it too, otherwise a speed buff on it would never reorder the action bar.
+        unit.setSpeedChangeListener(this::onSpeedChanged);
+        unit.getBuffManager().setBattle(this);
+    }
+
     private void processAddRequests() {
         if (addRequestItems.isEmpty()) {
             return;
@@ -4051,7 +4340,7 @@ public class Battle {
         everyone.addAll(enemies);
         for (CanHit unit : everyone) {
             if (unit instanceof Summon && unit.isDeath() && summonsAnnouncedGone.add(unit)) {
-                fireTriggers(TriggerEvent.SUMMON_LEFT, unit, unit, 0, 0.0, null, null);
+                fire(TriggerPayload.Simple.of(TriggerEvent.SUMMON_LEFT, unit, unit, 0, 0.0));
             }
         }
     }
@@ -4158,15 +4447,10 @@ public class Battle {
                             + master.getCamp() + ", summon " + summonId + "): CAMP.NEUTRAL has none, and "
                             + "putting it in either list would silently decide who it fights for");
         }
-        List<CanHit> camp = master.getCamp() == Camp.PLAYER ? allies : enemies;
-        Summon summon = SummonFactory.create(summonId, master.getLevel(), hardLevelGroup, master.getCamp());
+        Summon summon = SummonFactory.create(data, summonId, master.getLevel(), hardLevelGroup, master.getCamp());
         summon.setMaster(master);
-        camp.add(summon);
-        addRequestItems.add(summon);                 // processRequests pushes it into the action bar
+        addCombatant(summon);                        // camp + pending entry, in one place
         justSummoned.add(summon);                    // ...and then fires SUMMONED, with it already scheduled
-        // The constructor wires the speed listener for the opening roster only; a unit admitted later
-        // needs it too, otherwise a speed buff on it would never reorder the action bar.
-        summon.setSpeedChangeListener(this::onSpeedChanged);
         return summon;
     }
 
@@ -4206,10 +4490,8 @@ public class Battle {
         }
         Summon memosprite = SummonFactory.memosprite(master, this::partyResourceValue);
         memosprite.setMaster(master);
-        allies.add(memosprite);
-        addRequestItems.add(memosprite);
+        addCombatant(memosprite);
         justSummoned.add(memosprite);                // see the note in summon(...): SUMMONED fires after scheduling
-        memosprite.setSpeedChangeListener(this::onSpeedChanged);
         return memosprite;
     }
 
@@ -4225,10 +4507,8 @@ public class Battle {
         }
         Summon servant = SummonFactory.servant(master, this::partyResourceValue);
         servant.setMaster(master);
-        allies.add(servant);
-        addRequestItems.add(servant);
+        addCombatant(servant);
         justSummoned.add(servant);                // see the note in summon(...): SUMMONED fires after scheduling
-        servant.setSpeedChangeListener(this::onSpeedChanged);
         return servant;
     }
 
@@ -4317,22 +4597,6 @@ public class Battle {
 
     public List<Signal> getQueueSnapshot() {
         return queue.snapshot();
-    }
-
-    public void printBattle() {
-        printHp();
-        queue.printActionQueue();
-    }
-
-    public void printHp() {
-        System.out.println("=== HP Status ===");
-        for (CanHit c : allies) {
-            System.out.printf("%s: %.0f / %.0f%n", c.getName(), c.getCurrentHp(), c.getMaxHp());
-        }
-        for (CanHit e : enemies) {
-            System.out.printf("%s: %.0f / %.0f%n", e.getName(), e.getCurrentHp(), e.getMaxHp());
-        }
-        System.out.println("================");
     }
 
     /**

@@ -10,6 +10,7 @@ import com.laosun.aluminium.models.CanHit;
 import com.laosun.aluminium.models.Damage;
 import com.laosun.aluminium.models.buff.SuperBreakBuff;
 import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.models.trigger.TriggerPayload;
 
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -90,8 +91,8 @@ public final class SkillExecutor {
             // fired while `from_skill_id == 16` and `== 1141516` did not. Passing it is what makes a NON-attack cast nameable: a
             // memosprite's skill is a BUFF, so it raises none of SKILL_CAST / ULT_CAST / BASIC_ATTACK (dispatch's switch fires those
             // only for BPSKILL / ULTRA / NORMAL).
-            battle.fireTriggers(TriggerEvent.CAST_SETUP, user, aimed, 0, 0, category,
-                    skill == null ? 0 : skill.getSkillSlot());
+            battle.fire(TriggerPayload.Cast.of(TriggerEvent.CAST_SETUP, user, aimed, 0, 0, category,
+                    skill == null ? 0 : skill.getSkillSlot(), 0, List.of()));
             if (!cast.damageDelegated()) {
                 resolveHits(battle, skill, user, targets, hitTargets);
             }
@@ -114,8 +115,9 @@ public final class SkillExecutor {
             // wearer's memosprite uses its skill" (cone 23042's vulnerability, 1512's own damage boost) was dead.
             // Measured: no firing site for a DefaultSkill cast by a Summon.
             if (user instanceof com.laosun.aluminium.models.Summon && !hitTargets.isEmpty()) {
-                battle.fireTriggers(com.laosun.aluminium.enums.TriggerEvent.SUMMON_ATTACK, user, null,
-                        hitTargets.size(), 0);
+                battle.fire(TriggerPayload.Simple.of(
+                        com.laosun.aluminium.enums.TriggerEvent.SUMMON_ATTACK, user, null,
+                        hitTargets.size(), 0));
             }
             battle.grantSkillEnergy(user, skill, hitTargets);
         } finally {
@@ -197,11 +199,14 @@ public final class SkillExecutor {
                 : skill.getData().getCategory();
         switch (category) {
             case ULTRA ->
-                    battle.fireTriggers(TriggerEvent.ULT_CAST, user, aimed, hits.size(), battle.getLastUltEnergySpent(), category, skill.getSkillSlot(), weakHitCount);
+                    battle.fire(TriggerPayload.Cast.of(TriggerEvent.ULT_CAST, user, aimed, hits.size(),
+                            battle.getLastUltEnergySpent(), category, skill.getSkillSlot(), weakHitCount, hits));
             case BPSKILL ->
-                    battle.fireTriggers(TriggerEvent.SKILL_CAST, user, aimed, hits.size(), 0, category, skill.getSkillSlot(), weakHitCount);
+                    battle.fire(TriggerPayload.Cast.of(TriggerEvent.SKILL_CAST, user, aimed, hits.size(),
+                            0, category, skill.getSkillSlot(), weakHitCount, hits));
             case NORMAL ->
-                    battle.fireTriggers(TriggerEvent.BASIC_ATTACK, user, aimed, hits.size(), 0, category, skill.getSkillSlot(), weakHitCount);
+                    battle.fire(TriggerPayload.Cast.of(TriggerEvent.BASIC_ATTACK, user, aimed, hits.size(),
+                            0, category, skill.getSkillSlot(), weakHitCount, hits));
             default -> {
                 // not an in-battle cast: see above
             }
@@ -213,7 +218,8 @@ public final class SkillExecutor {
             // Passing it would be information with no reader, which is the shape this project keeps refusing.
             // Note: category rides along: "cast a basic attack/Skill/Ultimate 2 times" must tell the three slots apart, and this
             // is the one event that fires once per CAST (DEALING_DAMAGE would count hits).
-            battle.fireTriggers(TriggerEvent.ALLY_ATTACK, user, aimed, hits.size(), 0, category, skill.getSkillSlot(), weakHitCount);
+            battle.fire(TriggerPayload.Cast.of(TriggerEvent.ALLY_ATTACK, user, aimed, hits.size(),
+                    0, category, skill.getSkillSlot(), weakHitCount, hits));
         }
     }
 

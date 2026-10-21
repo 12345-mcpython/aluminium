@@ -170,7 +170,19 @@ public class SkillData {
      *                                  {@code skill_effect} is missing or unknown
      */
     public static SkillData init(int cid, int skillID) {
-        Map<Integer, Skill> skillMap = Constant.SKILLS.get(cid);
+        return init(Constant.SKILLS, cid, skillID);
+    }
+
+    /**
+     * The same resolution against a chosen skill table.
+     *
+     * @param skills the skill table
+     * @param cid    character id
+     * @param skillID skill slot id
+     * @return the skill data
+     */
+    public static SkillData init(Map<Integer, Map<Integer, Skill>> skills, int cid, int skillID) {
+        Map<Integer, Skill> skillMap = skills.get(cid);
         if (skillMap == null) {
             return EMPTY;
         }

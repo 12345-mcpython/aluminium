@@ -361,7 +361,7 @@ public enum TriggerEvent {
      * {@code actor}.
      *
      * <p><b>Why it is fired at the settle point and not inside the summon call.</b> A summon enters the action
-     * bar through {@code addRequestItems}, which {@code processRequests} drains - so during the call itself the
+     * bar through {@code addCombatant}, whose pending list {@code processRequests} drains - so during the call itself the
      * unit is on the roster but <b>not yet scheduled</b>. A rule that answers "when summoned" almost always wants to
      * touch its action value ({@code ADVANCE}, i.e. "make itself act immediately"), and an advance against a unit with no
      * signal is silently lost. Note: That is also why this cannot simply be fired from

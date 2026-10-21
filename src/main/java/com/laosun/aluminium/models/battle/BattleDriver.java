@@ -3,8 +3,6 @@ package com.laosun.aluminium.models.battle;
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.models.CanHit;
 import com.laosun.aluminium.models.Character;
-import com.laosun.aluminium.models.Signal;
-import com.laosun.aluminium.models.enemy.Enemy;
 
 import java.util.List;
 import java.util.Objects;
@@ -22,15 +20,15 @@ import java.util.Random;
  * <p><b>The cycle, and why each part is here rather than in the engine.</b> {@link Battle} owns turn
  * <em>mechanics</em>: which unit acts, what a skill does, when buffs tick. It does not own the
  * <em>loop</em>, because the loop is where a policy lives and the engine must not know about policies.
- * So the driver does exactly four things per turn and nothing else:
+ * {@link TurnLoop} owns the four turn boundaries and the broken/control gate; this driver owns the
+ * run loop, the termination ceiling, and the listener/policy wiring. A stepped turn is therefore
+ * exactly one call to {@link TurnLoop#step(int)}, which:
  * <ol>
- *  <li>{@link Battle#stepForward()} -- advance the action bar to the next actor;</li>
- *  <li>{@link Battle#beforeMove()} -- let the turn start (damage over time settles here, so the actor
- *      may already be dead, and a suspended unit's turn passes without acting);</li>
- *  <li>ask the {@link SkillPolicy} for a decision and cast it;</li>
- *  <li>{@link Battle#afterMove()} -- let the turn end. That call also settles queued requests, so the
- *      driver does not call {@code processRequests} itself; doing it twice would resolve the same
- *      pending effect twice.</li>
+ *  <li>advances the action bar to the next actor;</li>
+ *  <li>lets the turn start (damage over time settles there, so the actor may already be dead);</li>
+ *  <li>asks the {@link SkillPolicy} for a decision and casts it;</li>
+ *  <li>lets the turn end, which also settles queued requests -- the driver never calls
+ *      {@code processRequests} itself, because doing it twice would resolve the same effect twice.</li>
  * </ol>
  *
  * <p><b>Termination.</b> A battle ends when one side is wiped out, which is {@link Battle#isOver()}.
@@ -203,12 +201,19 @@ public final class BattleDriver {
     }
 
     /**
-     * Start the battle and run until it is decided or the turn ceiling is reached.
+     * Make sure the battle is started, then run until it is decided or the turn ceiling is reached.
+     *
+     * <p>An already-started battle is not started again: a caller may have primed the field (or the
+     * TUI may have called {@link #startBattle()}) before handing the battle over.
      *
      * @return how it ended
      */
     public Result run() {
-        startBattle();
+        // A caller may already have started the battle (the TUI does, and some judges prime the field
+        // before driving it). `run()` is "make sure it is started, then play" -- not a second start.
+        if (battle.getStatus() == Battle.Status.NOT_STARTED) {
+            startBattle();
+        }
         int turns = 0;
         while (!battle.isOver() && turns < maxTurns) {
             if (!step(turns + 1)) {
@@ -259,129 +264,9 @@ public final class BattleDriver {
      * @return {@code false} when no unit could act, so the caller stops
      */
     public boolean step(int turn) {
-        battle.stepForward();
-        Signal current = battle.queue.getCurrentActor();
-        if (current == null) {
-            return false;
-        }
-        CanHit actor = current.getCanHit();
-        if (actor == null) {
-            return false;
-        }
-
-        if (turn > 0) {
-            listener.onTurnStart(actor, turn);
-        }
-        battle.beforeMove();
-
-        // The turn still has to end even when the actor cannot use it: damage over time may have killed
-        // it, and a control may forbid acting. `afterMove` is what re-times the bar and removes the dead,
-        // so skipping it would leave the queue inconsistent rather than merely skipping an action.
-        boolean mayAct = !actor.isDeath();
-
-        // ⚠ The BROKEN check comes FIRST, before `canAct()`, and the order is load-bearing.
-        //
-        // `handleBrokenTurn` is what ticks a broken unit's countdown and, at zero, recovers it -- and it must run
-        // whether or not the unit could otherwise act. Evaluating `canAct()` first meant that a unit which was broken
-        // AND blocked by a control never reached the branch: its countdown never ticked, so it stayed broken and silent
-        // for the rest of the battle. Measured, one unit frozen at its initial count for seventeen consecutive turns
-        // while the fight went on around it.
-        //
-        // ⚠ Note what the trigger is NOT. A broken unit in this engine still reports `canAct() == true`; being broken
-        // does not by itself block acting, so the first version of this comment was wrong and the first two cases
-        // written against it could not fail. The freeze needs broken AND a control (frozen, imprisoned, ...).
-        //
-        // ⚠ The two reasons a unit may not act are announced separately, because they are different facts: a broken unit
-        // is recovering from a break and a controlled one is not, and the log showed both as "cannot act". Measured over one
-        // battle: seven breaks and twenty-three turns with a control present, indistinguishable.
-        boolean wasBroken = !actor.isDeath() && actor instanceof Enemy foe && foe.isBroken();
-        if (!actor.isDeath() && actor instanceof Enemy broken && broken.isBroken()) {
-            // The answer is "is this turn skipped", and that is exactly the complement of "may it act" -- so it is used
-            // directly. The turn that ENDS a break answers false and the unit acts again on it, which is the contract
-            // `handleBrokenTurn` now documents.
-            boolean skippedByTheBreak = battle.handleBrokenTurn(broken);
-            mayAct = !skippedByTheBreak;
-            if (skippedByTheBreak) {
-                battle.announceTurnSkipped(actor, true);
-            } else {
-                // the countdown reached zero: this is the turn the unit recovers and acts again
-                listener.onBreakRecovered(actor);
-            }
-        } else if (!actor.isDeath()) {
-            mayAct = actor.getBuffManager().canAct();
-        }
-        if (!mayAct && !wasBroken) {
-            // not broken, so the reason is a control
-            battle.announceTurnSkipped(actor, false);
-        }
-        if (mayAct) {
-            SkillPolicy.Decision decision = policy.choose(battle, actor);
-            if (decision != null) {
-                if (turn > 0) {
-                    listener.onAction(actor, decision);
-                }
-                cast(actor, decision);
-            }
-        }
-
-        battle.afterMove();
-        // ⚠ No death check here, and that is deliberate: `CanHit.takeDamage` sets `death = true` the moment the damage lands,
-        // so `!isDeath()` was already false by this point and the check could never fire -- measured, a battle that ended with
-        // two deaths and not one line about either. The report belongs in the damage callback, where the engine states it.
-        if (turn > 0) {
-            listener.onTurnEnd(actor, turn);
-        }
-        return true;
-    }
-
-    /**
-     * Cast a decided action, paying a non-damaging skill's point cost the way a damaging one is paid.
-     *
-     * <p>Why the cost is charged here: {@code Battle.useSkill} charges through the skill point policy,
-     * but a healing or shielding skill is executed by {@code SkillExecutor} rather than through the
-     * damage pipeline, so nothing charges it on the way in. The demo charged it by hand at exactly this
-     * point; keeping that here means a policy cannot forget to pay.
-     *
-     * @param actor    the acting unit
-     * @param decision what it chose
-     */
-    private void cast(CanHit actor, SkillPolicy.Decision decision) {
-        if (decision.targets().isEmpty()) {
-            return;
-        }
-        // ⚠ An ultimate must go through `castUltra`, NOT through the ordinary action path.
-        //
-        // Measured: routing it through `performAction` left the bar untouched, so ultimates were FREE on the driven
-        // path -- 姬子 fired her 120-cost ultimate four times in one fight with the bar reading 120 before and 120
-        // after every cast, while calling `castUltra` directly in isolation drained it correctly to 15. The
-        // hand-written demo hid this because it calls `castUltra` itself; the moment the engine owned the choice,
-        // nothing paid for the ultimate.
-        //
-        // Note: `useSkill` now enforces the same gate and the same payment by itself, so this branch is no longer
-        // what keeps ultimates paid for -- it is kept because routing an ultimate through its own entry is the
-        // clearer call, and because `castUltra` owns the pre-cast checks (readiness, the extra-turn rule).
-        //
-        // Note: the order matters inside `castUltra`. It zeroes the bar BEFORE the ultimate body settles,
-        // deliberately, so the kill/break energy the ultimate itself earns is not wiped by the zeroing.
-        if (decision.skill() == actor.getSkills().get(com.laosun.aluminium.enums.SkillType.ULTRA)) {
-            battle.castUltra(actor, decision.targets());
-            return;
-        }
-        // ⚠ No skill-point charge here any more.
-        //
-        // The driver used to charge non-damaging skills itself, on the stated reasoning that "`Battle.useSkill`
-        // charges through the skill point policy, but a healing or shielding skill is executed by `SkillExecutor`
-        // rather than through the damage pipeline, so nothing charges it on the way in". That reasoning is false:
-        // `useSkill` charges through `skillPointPolicy.onSkillCast` for EVERY skill, damaging or not -- the charge is
-        // about deciding to act, not about which pipeline settles the effect.
-        //
-        // So the manual charge was a SECOND one on top. Measured: a Skill spent 3 → 2 through `useSkill` alone, and
-        // 3 → 1 through the driver's sequence. Every heal and every shield on the driven path cost double.
-        // The engine charges; a caller must not.
-        //
-        // `performAction` is the queue-aware entry: it reads the current actor, refuses when the unit is
-        // dead or controlled, and is the same call the demo used.
-        battle.performAction(decision.skill(), decision.targets());
+        // The four boundaries and the broken/control gate live in TurnLoop, so every caller shares one
+        // order. The driver keeps the run loop, the policy/listener wiring, and the result reporting.
+        return TurnLoop.policyDriven(battle, policy, listener).step(turn);
     }
 
     /**
