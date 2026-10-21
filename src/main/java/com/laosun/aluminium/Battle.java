@@ -797,6 +797,8 @@ public class Battle {
 
     private final com.laosun.aluminium.models.battle.SkillRequests skillRequests =
             new com.laosun.aluminium.models.battle.SkillRequests(this);
+    private final com.laosun.aluminium.models.battle.CastService cast =
+            new com.laosun.aluminium.models.battle.CastService(this, skillPoints, ultimates, skillRequests);
 
     /**
      * Injected random source (crit rolls / target selection); a fixed seed makes a
@@ -1727,46 +1729,7 @@ public class Battle {
     }
 
     public boolean useSkill(Skill skill, List<? extends CanHit> target) {
-        if (currentMove == null || skill == null || target == null) {
-            return false;
-        }
-        CanHit user = currentMove.getCanHit();
-        if (user.isDeath()) {
-            return false;
-        }
-        // ⚠ <b>An ultimate may not be cast through here without paying for it.</b>
-        //
-        // Note: This gate exists because the alternative already bit once, and silently. The ultimate's cost lived
-        // only in `castUltra`, so a caller that reached `useSkill` directly -- `BattleDriver` did exactly that, for
-        // EVERY action including ultimates -- cast a 120-cost ultimate for free: measured, 姬子 fired hers four times
-        // in one fight with the bar reading 120 before and 120 after each cast.
-        //
-        // A cost that lives in a sibling method is a cost any front end can skip, so the rule is now enforced where
-        // the cast actually happens. An ultimate that arrives here therefore has to be READY, and its bar is spent
-        // by the same code path `castUltra` uses.
-        if (skill == user.getSkills().get(SkillType.ULTRA)) {
-            if (!isUltraReady(user)) {
-                // Not ready: refuse, exactly as castUltra would. Refusing is the safe direction -- a front end that
-                // forgot to ask gets no cast rather than a free one.
-                return false;
-            }
-            CanHit extraTurnActor = queue.getExtraTurnActor();
-            if (extraTurnActor != null && extraTurnActor != user) {
-                return false;               // same extra-turn rule castUltra enforces
-            }
-            if (!skillPoints.onSkillCast(skill, user)) {
-                return false;
-            }
-            skillRequest(skill, user, target);
-            return ultimates.settle(user, skill);
-        }
-        // Skill points: all the rules are in skillPointPolicy (including the our-side/enemy-side camp
-        // check); Battle only asks once "does this action hold up" -- it knows no character.
-        if (!skillPoints.onSkillCast(skill, user)) {
-            return false;
-        }
-        skillRequest(skill, user, target);
-        return true;
+        return cast.useSkill(skill, target);
     }
 
     public void afterMove() {
