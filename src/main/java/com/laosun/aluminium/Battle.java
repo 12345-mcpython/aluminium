@@ -218,6 +218,15 @@ public class Battle {
      */
     private final com.laosun.aluminium.models.battle.BattleObservers observers =
             new com.laosun.aluminium.models.battle.BattleObservers();
+    private final com.laosun.aluminium.models.battle.UltimateService ultimates =
+            new com.laosun.aluminium.models.battle.UltimateService(this);
+    private final com.laosun.aluminium.models.battle.EnergyService energy =
+            new com.laosun.aluminium.models.battle.EnergyService(this::onEnergyCredited);
+    private final com.laosun.aluminium.models.battle.TriggerFiring firing =
+            new com.laosun.aluminium.models.battle.TriggerFiring();
+    private final com.laosun.aluminium.models.battle.SustainService sustain =
+            new com.laosun.aluminium.models.battle.SustainService(this,
+                    this::onHealSettled, this::onShieldGranted);
 
     /** @param observer the damage observer */
     public void addDamageObserver(DamageObserver observer) {
@@ -477,21 +486,17 @@ public class Battle {
         return List.copyOf(addRequestItems);
     }
 
-    /**
-     * The countdown units this battle has placed on the action order.
-     *
-     * <p>Kept in their own list, and Note: <b>not</b> in {@link #allies}: a countdown belongs to our camp (our rules react
-     * to its turn) but it is not a party member - were it in the roster, "all our side" would buff it, `lowest_hp_ally`
-     * could pick it, and it would be a legal target for every ally-directed effect. See {@link Countdown}.
-     */
-    private final List<Countdown> countdowns = new ArrayList<>();
+    private final com.laosun.aluminium.models.battle.Countdowns countdowns =
+            new com.laosun.aluminium.models.battle.Countdowns(this);
 
     /**
-     * Note: the read-only entry point for countdowns (1408's transformation countdown predicate, and the like predicates at 150/1309).
-     * The name avoids the field countdowns.
+     * The read-only entry point for countdowns (1408's transformation countdown predicate, and the like predicates at
+     * 150/1309).
+     *
+     * @return every countdown, in placement order
      */
     public List<Countdown> countdownUnits() {
-        return List.copyOf(countdowns);
+        return countdowns.all();
     }
 
     /**
@@ -499,7 +504,8 @@ public class Battle {
      * action bar (see {@link #fireSummoned}). Separate from {@link #addRequestItems} on purpose: that queue is
      * shared with wave entries, and a wave arriving is not a summon.
      */
-    private final List<CanHit> justSummoned = new ArrayList<>();
+    private final com.laosun.aluminium.models.battle.SummonedBuffer summoned =
+            new com.laosun.aluminium.models.battle.SummonedBuffer();
 
     /** Summons whose departure has already been announced (see {@code TriggerEvent.SUMMON_LEFT}). */
     private final java.util.Set<CanHit> summonsAnnouncedGone = java.util.Collections.newSetFromMap(new java.util.IdentityHashMap<>());
@@ -683,7 +689,9 @@ public class Battle {
      * everything else neutral). To swap in another rule set for the team (e.g. Sparkle (花火) raising the max),
      * call {@link #setSkillPointPolicy}; it rewires the event reports, which a plain field assignment could not.
      */
-    private SkillPointPolicy skillPointPolicy = new StandardSkillPointPolicy();
+    private final com.laosun.aluminium.models.battle.SkillPoints skillPoints =
+            new com.laosun.aluminium.models.battle.SkillPoints(this,
+                    this::broadcastSkillPointGained, this::onSkillPointSpent);
 
     /**
      * The policy that owns this battle's skill points.
@@ -691,14 +699,14 @@ public class Battle {
      * @return the current policy
      */
     public SkillPointPolicy getSkillPointPolicy() {
-        return skillPointPolicy;
+        return skillPoints.policy();
     }
 
     /**
      * Replaces the skill point policy and wires its reports into this battle's events.
      *
      * <p>The setter exists rather than a public field because the wiring is not optional: a policy that
-     * is installed without {@link #listenToSkillPointChanges()} still holds the points, but
+     * is installed without {@link com.laosun.aluminium.models.battle.SkillPoints} still holds the points, but
      * {@code SKILL_POINT_GAINED} / {@code SKILL_POINT_SPENT} never fire, so every rule gated on them
      * silently stops working. The constructor wires the default; this method is the other way in.
      *
@@ -706,25 +714,21 @@ public class Battle {
      * @throws IllegalArgumentException when {@code policy} is {@code null}
      */
     public void setSkillPointPolicy(SkillPointPolicy policy) {
-        if (policy == null) {
-            throw new IllegalArgumentException("a battle needs a skill point policy");
-        }
-        this.skillPointPolicy = policy;
-        listenToSkillPointChanges();
+        skillPoints.setPolicy(policy);
     }
 
     /**
      * Current skill points. Equivalent to {@code getSkillPointPolicy().getValue()}.
      */
     public int getSkillPoints() {
-        return skillPointPolicy.getValue();
+        return skillPoints.value();
     }
 
     /**
      * The regular skill point cap. Equivalent to {@code skillPointPolicy.getMax()}.
      */
     public int getSkillPointMax() {
-        return skillPointPolicy.getMax();
+        return skillPoints.max();
     }
 
     /**
@@ -735,14 +739,14 @@ public class Battle {
      * one used to be the only one on offer.
      */
     public boolean hasSkillPoint(int points) {
-        return skillPointPolicy.hasAtLeast(points);
+        return skillPoints.hasAtLeast(points);
     }
 
     /**
      * Whether there are enough skill points to cast one skill.
      */
     public boolean hasSkillPoint() {
-        return skillPointPolicy.canAfford();
+        return skillPoints.canAfford();
     }
 
     /**
@@ -759,18 +763,7 @@ public class Battle {
      * @param n the number of points to add; does nothing when {@code <= 0}
      */
     public void gainSkillPoint(int n) {
-        int before = skillPointPolicy.getValue();
-        skillPointPolicy.gain(n);
-        int gained = skillPointPolicy.getValue() - before;
-        if (gained > 0) {
-            fire(TriggerPayload.Simple.of(TriggerEvent.SKILL_POINT_GAINED, null, null, 0, gained));
-        }
-        // What the pool refused: `asked - credited`. Both numbers are right here, which is why this is computed
-        // at the call site rather than inside the policy -- the policy reports what it credited, not what it was asked for.
-        int overflowed = n - gained;
-        if (overflowed > 0) {
-            fire(TriggerPayload.Simple.of(TriggerEvent.SKILL_POINT_OVERFLOWED, null, null, 0, overflowed));
-        }
+        skillPoints.gain(n);
     }
 
     /**
@@ -779,7 +772,7 @@ public class Battle {
      * @return whether the spend succeeded; {@code false} means the count was already 0 (the caller should block this action)
      */
     public boolean spendSkillPoint() {
-        return skillPointPolicy.spend();
+        return skillPoints.spend();
     }
 
     /**
@@ -798,11 +791,12 @@ public class Battle {
      * @return whether this action may continue (enough skill points); basic attack/ultimate/follow-up attack are always true
      */
     public boolean applySkillPointCost(Skill skill, CanHit user) {
-        return skillPointPolicy.onSkillCast(user, skill);
+        return skillPoints.onSkillCast(skill, user);
     }
 
 
-    private final ArrayList<SkillRequest> skillRequests = new ArrayList<>();
+    private final com.laosun.aluminium.models.battle.SkillRequests skillRequests =
+            new com.laosun.aluminium.models.battle.SkillRequests(this);
 
     /**
      * Injected random source (crit rolls / target selection); a fixed seed makes a
@@ -909,7 +903,7 @@ public class Battle {
      */
     public Battle(List<Character> characterQueue, List<? extends CanHit> enemyQueue, Random rng, GameData data) {
         this.data = java.util.Objects.requireNonNull(data, "data");
-        this.summons = new com.laosun.aluminium.models.battle.SummonService(this, data, justSummoned::add);
+        this.summons = new com.laosun.aluminium.models.battle.SummonService(this, data, summoned::add);
         characterRoster = new ArrayList<>(characterQueue);
         // The camp view of our side: the same instances, one more list. A friendly summon is appended here
         // (and only here) by summon(...), so `characters` stays exactly "our characters".
@@ -932,7 +926,6 @@ public class Battle {
         for (CanHit e : enemyQueue) {
             e.setSpeedChangeListener(this::onSpeedChanged);
         }
-        listenToSkillPointChanges();
         // The units' buff managers hold the battle so a state that leaves a unit can be announced
         // (the STATE_ENDED event, whose reader is 1211's "when [生息] ends ...").
         for (Character c : characterQueue) {
@@ -1038,31 +1031,14 @@ public class Battle {
     }
 
     /**
-     * Wire the skill point policy's change reports into event broadcasting.
+     * Announces a policy-reported spend.
      *
-     * <p>The policy reports after it "really credited / really spent", and {@code Battle} only broadcasts --
-     * that way {@code Battle} does not need to know the skill point rules (nor to guess what just happened
-     * by "subtracting the before and after values", an inference that silently goes wrong at the cap).
-     *
-     * <p>Only {@link StandardSkillPointPolicy} is wired: other implementations that also want to emit events
-     * can hook up {@code setListener} themselves at the assembly point -- the engine makes no special case for
-     * any one implementation. Called by the constructor and by {@link #setSkillPointPolicy}.
+     * @param spender who spent it
+     * @param amount  how many were spent
      */
-    private void listenToSkillPointChanges() {
-        if (skillPointPolicy instanceof StandardSkillPointPolicy standard) {
-            standard.setListener(new StandardSkillPointPolicy.Listener() {
-                @Override
-                public void onGained(int amount) {
-                    broadcastSkillPointGained(amount);
-                }
-
-                @Override
-                public void onSpent(CanHit spender, int amount) {
-                    broadcastSkillPointSpent(amount);
-                    fire(TriggerPayload.Simple.of(TriggerEvent.SKILL_POINT_SPENT, spender, null, 0, amount));
-                }
-            });
-        }
+    private void onSkillPointSpent(CanHit spender, int amount) {
+        broadcastSkillPointSpent(amount);
+        fire(TriggerPayload.Simple.of(TriggerEvent.SKILL_POINT_SPENT, spender, null, 0, amount));
     }
 
     /**
@@ -1132,23 +1108,7 @@ public class Battle {
      * "consume the threshold" and "zero out" is ever needed, changing this place and {@link #castUltra} is enough.
      */
     public boolean isUltraReady(CanHit user) {
-        if (user == null) {
-            return false;
-        }
-        // The gate is the provider's to decide, not "energy is full". Characters who build a
-        // stack resource instead of energy (Acheron [残梦]/ Feixiao [飞黄]/ Cyrene [追忆] ...) become
-        // ready when their resource fills, and their energy stays at 0 by design -- so the old
-        // "must have an energy bar" test would lock them out forever.
-        //
-        // `hasEnergyBar` is therefore NOT checked here: the default implementation inside
-        // EnergyProvider still applies exactly that rule (plus the threshold), so conventional
-        // characters behave as before, while a stack provider may ignore energy entirely.
-        if (user.getBuffManager().hasState(ULTIMATE_ACTIVATED_STATE)) {
-            // "activating the ultimate" (1415's ultimate, "activates the ultimates of all teammates"): a clause can put a unit in a state where its ultimate is castable
-            // NOW, whatever its own provider would say. Without this the sentence had no spelling at all -- readiness was the provider's alone.
-            return true;
-        }
-        return user.getEnergyProvider().canCastUltra(user, ultraEnergyCost(user));
+        return ultimates.isReady(user);
     }
 
     /**
@@ -1156,75 +1116,18 @@ public class Battle {
      * otherwise falls back to {@code maxEnergy}.
      */
     public double ultraEnergyCost(CanHit user) {
-        if (user == null) {
-            return Double.MAX_VALUE;
-        }
-        Skill ultra = user.getSkills().get(SkillType.ULTRA);
-        Double spNeed = ultra == null || ultra.getData() == null ? null : ultra.getData().getSpNeed();
-        if (spNeed != null && spNeed > 0) {
-            return spNeed;
-        }
-        return user.getMaxEnergy();
+        return ultimates.energyCost(user);
     }
 
     public boolean castUltra(CanHit user, List<? extends CanHit> targets) {
-        if (user == null || user.isDeath() || !isUltraReady(user)) {
-            return false;                       // not enough accumulated, cannot cast (characters without an energy bar can never cast)
-        }
-        // During an extra turn, inserting someone else's ultimate is forbidden.
-        // Rule in HSR.md §3.1; without this block, an "extra turn" could be extended forever by ultimates.
-        CanHit extraTurnActor = queue.getExtraTurnActor();
-        if (extraTurnActor != null && extraTurnActor != user) {
-            return false;
-        }
-        Skill ultra = user.getSkills().get(SkillType.ULTRA);
-        if (ultra == null) {
-            return false;
-        }
-        // Note: The payment and settlement below are the SAME ones `useSkill` performs, deliberately duplicated
-        // rather than factored out -- see `useSkill`'s ultimate gate for why the gate has to exist in both places.
-        if (!requestSkill(ultra, user, targets)) {
-            return false;
-        }
-        return settleUltimate(user, ultra);
+        return ultimates.cast(user, targets);
     }
-
-    /**
-     * Zero the bar for an ultimate that is now in flight, settle its body, then credit its own gain.
-     *
-     * <p><b>Why the zeroing comes first.</b> The order is deliberate and was measured: the ultimate body can earn
-     * energy of its own (kill credit, break credit), and settling before zeroing wipes exactly those entries.
-     *
-     * @param user  the caster
-     * @param ultra its ultimate skill
-     * @return always {@code true}; the caller has already decided the cast is legal
-     */
-    private boolean settleUltimate(CanHit user, Skill ultra) {
-        lastUltEnergySpent = user.getCurrentEnergy();   // read it BEFORE the zeroing below
-        user.setCurrentEnergy(0);
-        processRequests();                      // ultimate body settles: the Ultra slot gains no energy in onSkillCast, so no double credit
-        EnergyGain ultraGain = user.getEnergyProvider().onUltCast(user, ultra);
-        if (ultraGain != null) {
-            applyEnergyGain(user, ultraGain);   // then the 5 points of its own ( x  energy gain rate)
-            lastUltEnergySpent = 0;             // Note: cleared, so the instance write cannot leak into later hits
-        }
-        return true;
-    }
-
-    /* Collects the PARTY-scoped declarations of our side into this battle's own store. */
-    /**
-     * The energy the ultimate now settling consumed, for {@code ULT_CAST}'s amount.
-     *
-     * <p>Note: It cannot be read one layer down: Battle zeroes the energy BEFORE the ultimate body settles
-     * (see the comment above), so by the time the event fires the unit already reads 0.
-     */
-    private double lastUltEnergySpent;
 
     /**
      * The energy the ultimate now settling consumed ({@code 0} when none is in flight).
      */
     public double getLastUltEnergySpent() {
-        return lastUltEnergySpent;
+        return ultimates.lastEnergySpent();
     }
 
     private void registerPartyResources() {
@@ -1851,15 +1754,15 @@ public class Battle {
             if (extraTurnActor != null && extraTurnActor != user) {
                 return false;               // same extra-turn rule castUltra enforces
             }
-            if (!skillPointPolicy.onSkillCast(user, skill)) {
+            if (!skillPoints.onSkillCast(skill, user)) {
                 return false;
             }
             skillRequest(skill, user, target);
-            return settleUltimate(user, skill);
+            return ultimates.settle(user, skill);
         }
         // Skill points: all the rules are in skillPointPolicy (including the our-side/enemy-side camp
         // check); Battle only asks once "does this action hold up" -- it knows no character.
-        if (!skillPointPolicy.onSkillCast(user, skill)) {
+        if (!skillPoints.onSkillCast(skill, user)) {
             return false;
         }
         skillRequest(skill, user, target);
@@ -1955,7 +1858,7 @@ public class Battle {
     }
 
     public void processRequests() {
-        processSkillRequests();
+        skillRequests.settle();
         processAddRequests();
         // The newly placed summons are on the roster AND in the action bar by now, which is what a rule
         // answering "when summoned" needs before it can touch their action value -- see TriggerEvent.SUMMONED.
@@ -1968,40 +1871,20 @@ public class Battle {
      *
      * <p>The list is drained <b>before</b> the events are fired: a rule that answers "when summoned" by summoning
      * something else must not make this loop chase its own tail (that recursion is bounded by
-     * {@code MAX_TRIGGER_DEPTH}, but there is no reason to build it), and the new arrival is picked up by the
+     * {@link com.laosun.aluminium.models.battle.TriggerFiring#MAX_DEPTH}, but there is no reason to build it), and the new arrival is picked up by the
      * next settle like any other.
      */
     private void fireSummoned() {
-        if (justSummoned.isEmpty()) {
+        if (summoned.isEmpty()) {
             return;
         }
-        List<CanHit> arrived = List.copyOf(justSummoned);
-        justSummoned.clear();
-        for (CanHit summon : arrived) {
+        for (CanHit summon : summoned.drain()) {
             fire(TriggerPayload.Simple.of(TriggerEvent.SUMMONED, summon, null, 0, 0));
         }
     }
 
-    private void processSkillRequests() {
-        if (skillRequests.isEmpty()) {
-            return;
-        }
-        List<SkillRequest> requests = new ArrayList<>(skillRequests);
-        skillRequests.clear();
-
-        for (SkillRequest req : requests) {
-            if (req.object.isDeath()) {
-                continue;
-            }
-            req.skill().execute(this, req.object(), req.target());
-        }
-    }
-
     private void skillRequest(Skill skill, CanHit user, List<? extends CanHit> target) {
-        if (skill == null || user == null || target == null) {
-            return;
-        }
-        skillRequests.add(new SkillRequest(skill, user, target));
+        skillRequests.add(skill, user, target);
     }
 
 
@@ -2049,7 +1932,7 @@ public class Battle {
         // absorption, so it is the same number DAMAGE_SETTLED announces to a rule - "the amount dealt", not what the
         // victim's HP happened to lose. It is added for every instance, of every camp, so a group action's total is the
         // sum its reader needs; the next outermost firing empties it again.
-        settledDamageThisEvent += settled;
+        firing.addSettledDamage(settled);
         double hpBefore = target.getCurrentHp();
         // Lethal blow: "when taking a lethal attack it will not fall into the unable-to-fight state, but instead restore health equal to 20%/50% of its own Max HP".
         // Note: THE ORDER IS THE WHOLE MECHANIC, and the first attempt got it wrong (measured): announcing BEFORE the damage leaves the
@@ -2151,17 +2034,18 @@ public class Battle {
      * @return the value actually credited (after truncation by the cap); 0 if nothing can be credited
      */
     public double applyEnergyGain(CanHit target, EnergyGain gain) {
-        if (target == null) {
-            return 0;
-        }
-        double added = target.gainEnergy(gain);
-        // Only emit when the amount actually credited > 0 -- "blocked by the cap" should not count as gaining energy
-        if (added > 0) {
-            broadcastEnergyGain(target, added);
-            // Note: let the data-driven tables see it too (e.g. "when I gain energy, ...").
-            fireForAlly(TriggerPayload.AllySubject.of(TriggerEvent.ENERGY_GAINED, target, target, added));
-        }
-        return added;
+        return energy.apply(target, gain);
+    }
+
+    /**
+     * Announces energy actually credited: the typed hook and the data-driven tables.
+     *
+     * @param target the one whose bar moved
+     * @param added  how much was credited
+     */
+    private void onEnergyCredited(CanHit target, double added) {
+        broadcastEnergyGain(target, added);
+        fireForAlly(TriggerPayload.AllySubject.of(TriggerEvent.ENERGY_GAINED, target, target, added));
     }
 
     /**
@@ -2172,7 +2056,7 @@ public class Battle {
      * @return the value actually credited
      */
     public double grantEnergy(CanHit target, double amount) {
-        return applyEnergyGain(target, EnergyGain.normal(amount));
+        return energy.grant(target, amount);
     }
 
     /**
@@ -2190,11 +2074,7 @@ public class Battle {
      * @return the value actually credited
      */
     public double grantSkillEnergy(CanHit user, Skill skill, Set<? extends CanHit> hitTargets) {
-        if (user == null) {
-            return 0;
-        }
-        EnergyGain gain = user.getEnergyProvider().onSkillCast(user, skill, hitTargets);
-        return gain == null ? 0 : applyEnergyGain(user, gain);
+        return energy.grantSkill(user, skill, hitTargets);
     }
 
     /*
@@ -2722,28 +2602,22 @@ public class Battle {
      * healing amount {@code <= 0})
      */
     public double heal(CanHit healer, CanHit target, double baseAmount) {
-        if (target == null || target.isDeath()) {
-            return 0;
+        return sustain.heal(healer, target, baseAmount);
+    }
+
+    /**
+     * Announces a heal that actually restored HP.
+     *
+     * @param healer who healed
+     * @param target who was healed
+     * @param healed how much was restored
+     */
+    private void onHealSettled(CanHit healer, CanHit target, double healed) {
+        broadcastHeal(healer, target, healed);
+        fireForAlly(TriggerPayload.AllySubject.of(TriggerEvent.HEALED, healer, target, healed));
+        for (HealObserver observer : observers.healObservers()) {
+            observer.onHealSettled(healer, target, healed);
         }
-        double amount = calculateHeal(healer, target, baseAmount);
-        if (amount <= 0) {
-            return 0;
-        }
-        double before = target.getCurrentHp();
-        target.heal(amount);
-        double healed = target.getCurrentHp() - before;
-        // only emit when HP was really restored (healing at full HP is 0 and is not a heal event)
-        if (healed > 0) {
-            broadcastHeal(healer, target, healed);
-            fireForAlly(TriggerPayload.AllySubject.of(TriggerEvent.HEALED, healer, target, healed));
-            // The restored amount exists only here: `CanHit.heal` caps it against the target's maximum and silently does
-            // nothing for the dead, so the request is not the answer and the HP difference is not one either once
-            // anything else moves HP.
-            for (HealObserver observer : observers.healObservers()) {
-                observer.onHealSettled(healer, target, healed);
-            }
-        }
-        return healed;
     }
 
     /*
@@ -2775,7 +2649,7 @@ public class Battle {
      * @return the countdown, for tests and logs
      */
     public Countdown startCountdown(String name, double speed) {
-        return startCountdown(null, name, speed);
+        return countdowns.start(name, speed);
     }
 
     /**
@@ -2784,34 +2658,25 @@ public class Battle {
      * @param owner who placed it ({@code null} = unattributed, and then no rule's {@code countdown} term matches it)
      */
     public Countdown startCountdown(CanHit owner, String name, double speed) {
-        Countdown countdown = new Countdown(owner, name, speed);
-        countdowns.add(countdown);
-        queue.addCombatant(countdown);
-        return countdown;
+        return countdowns.start(owner, name, speed);
     }
 
     /**
      * The countdown units placed so far, in the order they were started.
      */
     public List<Countdown> countdowns() {
-        return java.util.Collections.unmodifiableList(countdowns);
+        return countdowns.all();
     }
 
     /**
      * The countdowns a given unit placed - the list {@code actor == countdown} reads (mirrors {@code summonsOf}).
      */
     public List<Countdown> countdownsOf(CanHit owner) {
-        List<Countdown> mine = new ArrayList<>();
-        for (Countdown countdown : countdowns) {
-            if (countdown.getOwner() == owner) {
-                mine.add(countdown);
-            }
-        }
-        return mine;
+        return countdowns.ownedBy(owner);
     }
 
     public double grantShield(CanHit target, double amount) {
-        return grantShield(null, target, amount);
+        return sustain.grantShield(null, target, amount, "");
     }
 
     /**
@@ -2828,7 +2693,7 @@ public class Battle {
      * @return the shield value actually set
      */
     public double grantShield(CanHit provider, CanHit target, double amount) {
-        return grantShield(provider, target, amount, "");
+        return sustain.grantShield(provider, target, amount, "");
     }
 
     /*
@@ -2857,24 +2722,21 @@ public class Battle {
     }
 
     public double grantShield(CanHit provider, CanHit target, double amount, String ruleId) {
-        if (target == null || target.isDeath()) {
-            return 0;
+        return sustain.grantShield(provider, target, amount, ruleId);
+    }
+
+    /**
+     * Announces a shield that was actually granted.
+     *
+     * @param provider who granted it
+     * @param target   who received it
+     * @param value    the value actually set
+     */
+    private void onShieldGranted(CanHit provider, CanHit target, double value) {
+        fireForAlly(TriggerPayload.AllySubject.of(TriggerEvent.SHIELD_GRANTED, provider, target, value));
+        for (ShieldObserver observer : observers.shieldObservers()) {
+            observer.onShieldGranted(provider, target, value);
         }
-        double value = BattleDamage.boostedShield(provider, amount);
-        target.setShield(value, provider, ruleId);
-        // Note: "a shield was granted" is its own fact, so "when receiving a shield provided by a teammate" can subscribe to it.
-        // Note: Only a grant that leaves a shield standing (a grant of <= 0 is how this API spells "clear it"), and the
-        // actor is the provider -- null for the raw overload, which then correctly fails `actor is_ally`.
-        // Note: The TIMED path (`SHIELD` with `turns`) does not come through here: its shield is installed by a
-        // ShieldBuff, which has no Battle handle, so the interpreter announces that one itself.
-        if (value > 0) {
-            fireForAlly(TriggerPayload.AllySubject.of(TriggerEvent.SHIELD_GRANTED, provider, target, value));
-            // The amount AFTER the provider's own shield boost -- the request would be a number the battle does not have.
-            for (ShieldObserver observer : observers.shieldObservers()) {
-                observer.onShieldGranted(provider, target, value);
-            }
-        }
-        return value;
     }
 
 
@@ -3015,16 +2877,6 @@ public class Battle {
     // ==================================================================
 
     /**
-     * Depth of nested trigger firing, used only for diagnostics.
-     *
-     * <p>The recursion guard matters because a trigger may itself produce an event that triggers
-     * more tables (heal -> heal buff -> ...). The engine does not try to be clever about
-     * cycles; it caps the nesting and reports loudly, so a runaway table is caught rather than
-     * hanging the battle.
-     */
-    private int triggerDepth;
-
-    /**
      * How many attacks have FINISHED; see {@link #fireAfterAttack} and {@code CanHit.isAttackLimitReady}.
      */
     private int attackSequence;
@@ -3037,37 +2889,19 @@ public class Battle {
     }
 
     /**
-     * The damage settled so far <b>during the trigger firing in progress</b> - "the total damage value of this one".
+     * The settled damage of the firing in progress. Zero outside a firing, and zero at the start of one until something
+     * settles.
      *
-     * <p><b>Why it is not just a damage instance.</b> {@link TriggerEvent#DAMAGE_SETTLED} hands a rule ONE settled
-     * instance ({@code scale: "original_damage"}), which answers "X% of the damage I just dealt". A clause of the form
-     * "X% of the total damage of this one" asks about <b>every</b> instance of the action, which no single event has
-     * in hand: a group attack settles one instance per victim, so only the battle can hold their sum.
-     *
-     * <p><b>Where it is reset.</b> At the outermost firing only ({@code triggerDepth == 0}), so a nested event - a
-     * {@code DAMAGE_SETTLED} raised while the damage settles, a state that ends on the way - keeps adding to the same
-     * total instead of emptying it. The reader is 1506 Silver Wolf LV.999's 【头号补给盲盒】: the box settles its 90%
-     * on every enemy, and its 【超超超大剑】 then takes 20% of that whole.
-     */
-    private double settledDamageThisEvent;
-
-    /**
-     * The settled damage of the firing in progress; see the field. Zero outside a firing, and zero at the start of one
-     * until something settles.
+     * @return the total of the outermost firing
      */
     public double settledDamageThisEvent() {
-        return settledDamageThisEvent;
+        return firing.settledDamage();
     }
 
     /**
      * Nesting depth of buff-path reactions; see {@link #runCounter}. Per battle, never static.
      */
     private int counterDepth;
-
-    /**
-     * How deep nested trigger firing may go before the engine gives up (see {@link #triggerDepth}).
-     */
-    private static final int MAX_TRIGGER_DEPTH = 8;
 
     /**
      * Rolls a rule-level probability ("there is a 35% fixed probability ...") against the battle's own random source.
@@ -3353,18 +3187,7 @@ public class Battle {
     private int fireTriggers(TriggerEvent event, CanHit actor, CanHit target, int hitCount, double amount,
                              Damage damage, SkillCategory fromCast, int skillId, int weakHitCount,
                              List<CanHit> attackHitTargets) {
-        if (triggerDepth >= MAX_TRIGGER_DEPTH) {
-            throw new IllegalStateException(
-                    "Trigger recursion exceeded " + MAX_TRIGGER_DEPTH + " levels while firing "
-                            + event.value() + "; a trigger table is probably reacting to its own effect");
-        }
-        // A firing is starting from the outside, so "the total damage of THIS one" begins empty. Only here, not on
-        // every nested event: a DAMAGE_SETTLED raised while the damage settles is part of the same action, and
-        // emptying the total at each nesting level would leave the reader with the last instance instead of the sum.
-        if (triggerDepth == 0) {
-            settledDamageThisEvent = 0;
-        }
-        triggerDepth++;
+        firing.begin(event);
         try {
             int fired = 0;
             com.laosun.aluminium.models.trigger.CastFacts castFacts =
@@ -3416,7 +3239,7 @@ public class Battle {
             }
             return fired;
         } finally {
-            triggerDepth--;
+            firing.end();
         }
     }
 
@@ -3506,7 +3329,7 @@ public class Battle {
      * damage go straight through {@link #applyDamage} and are <em>part of</em> somebody else's attack. That
      * exclusion is not an oversight, it is what makes the notification safe to hand to arbitrary listeners:
      * listeners are allowed to answer an attack by dealing damage (that is how a third-party kit lands), so a
-     * derived hit that fired the event again would recurse until {@code MAX_TRIGGER_DEPTH} threw. A follow-up
+     * derived hit that fired the event again would recurse until {@link com.laosun.aluminium.models.battle.TriggerFiring#MAX_DEPTH} threw. A follow-up
      * attack therefore does <b>not</b> consume an {@code "until": "next_attack"} buff: that accepted
      * under-consumption is recorded rather than hidden.
      *
@@ -3604,7 +3427,7 @@ public class Battle {
         }
         EnergyGain hitGain = target.getEnergyProvider().onTakingHit(target, damage);
         if (hitGain != null) {
-            applyEnergyGain(target, hitGain);
+            energy.apply(target, hitGain);
         }
     }
 
@@ -3628,7 +3451,7 @@ public class Battle {
         }
         EnergyGain killGain = attacker.getEnergyProvider().onKill(attacker, target);
         if (killGain != null) {
-            applyEnergyGain(attacker, killGain);
+            energy.apply(attacker, killGain);
         }
     }
 
@@ -3654,7 +3477,7 @@ public class Battle {
     /**
      * Runs a <b>buff-path reaction</b> (today: a counter-attack) that must not nest.
      *
-     * <p>Note: Why this exists and why it is not {@code MAX_TRIGGER_DEPTH}: a counter is triggered by HP loss,
+     * <p>Note: Why this exists and why it is not {@link com.laosun.aluminium.models.battle.TriggerFiring#MAX_DEPTH}: a counter is triggered by HP loss,
      * and a counter's own damage causes HP loss. Two units wearing a counter would therefore hit each
      * other forever. The trigger-table version of a counter is stopped loudly by
      * {@link #fireTriggers}'s depth guard, because it is fired from there - but a buff reacts through
@@ -3882,7 +3705,7 @@ public class Battle {
      * This method does both, once, and is idempotent for a unit already present.
      *
      * <p>It does not announce {@code SUMMONED}: a wave arriving is not a summon. The summon methods
-     * record the newcomer in {@code justSummoned} themselves, which is where that event comes from.
+     * record the newcomer in the {@code SummonedBuffer} themselves, which is where that event comes from.
      *
      * @param unit the combatant to add; must be alive and on a camp that has a roster
      * @throws IllegalArgumentException when {@code unit} is {@code null}, dead, or neutral
