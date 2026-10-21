@@ -214,117 +214,29 @@ public class Battle {
     }
 
     /**
-     * Observers told about every settled damage instance.
-     *
-     * <p>Copy-on-write: registration is rare and a settlement is not, so iteration must not allocate or risk
-     * concurrent modification while a battle is running.
+     * Observer registration and announcement.
      */
-    private volatile List<DamageObserver> damageObservers = List.of();
+    private final com.laosun.aluminium.models.battle.BattleObservers observers =
+            new com.laosun.aluminium.models.battle.BattleObservers();
 
-    /**
-     * Observers told about every rule that fires.
-     *
-     * <p>Copy-on-write, as above.
-     */
-    private volatile List<RuleObserver> ruleObservers = List.of();
-
-    /**
-     * Observers told when a turn is skipped.
-     *
-     * <p>Copy-on-write, as above.
-     */
-    private volatile List<SkipObserver> skipObservers = List.of();
-
-    /**
-     * Observers told about weakness breaks.
-     *
-     * <p>Copy-on-write, as above.
-     */
-    private volatile List<BreakObserver> breakObservers = List.of();
-
-    /**
-     * Observers told about landed controls.
-     *
-     * <p>Copy-on-write, as above.
-     */
-    private volatile List<ControlObserver> controlObservers = List.of();
-
-    /**
-     * Observers told about every heal that restored something.
-     *
-     * <p>Copy-on-write for the same reason as {@link #damageObservers}: registration is rare, settlement is not.
-     */
-    private volatile List<HealObserver> healObservers = List.of();
-
-    /**
-     * Observers told about every shield that was granted.
-     *
-     * <p>Copy-on-write, as above.
-     */
-    private volatile List<ShieldObserver> shieldObservers = List.of();
-
-    /**
-     * A copy-on-write list without {@code item}; the registration lists are replaced, never mutated,
-     * so a removal cannot affect an announcement that is already iterating the old list.
-     *
-     * @param list the current observers
-     * @param item the one to drop, or {@code null}
-     * @param <T>  the observer type
-     * @return the list to install; the same list when {@code item} is {@code null}
-     */
-    private static <T> List<T> without(List<T> list, T item) {
-        if (item == null) {
-            return list;
-        }
-        List<T> next = new ArrayList<>(list);
-        next.remove(item);
-        return List.copyOf(next);
-    }
-
-    /**
-     * Registers an observer for settled damage.
-     *
-     * @param observer the observer, ignored (rather than throwing) when {@code null}
-     */
+    /** @param observer the damage observer */
     public void addDamageObserver(DamageObserver observer) {
-        if (observer == null) {
-            return;
-        }
-        List<DamageObserver> next = new ArrayList<>(damageObservers);
-        next.add(observer);
-        damageObservers = List.copyOf(next);
+        observers.addDamage(observer);
     }
 
-    /**
-     * Removes a previously registered damage observer.
-     *
-     * @param observer the observer; ignored when {@code null} or not registered
-     */
+    /** @param observer the damage observer */
     public void removeDamageObserver(DamageObserver observer) {
-        damageObservers = without(damageObservers, observer);
+        observers.removeDamage(observer);
     }
 
-    /**
-     * Registers an observer for weakness breaks.
-     *
-     * @param observer the observer, ignored (rather than throwing) when {@code null}
-     */
+    /** @param observer the break observer */
     public void addBreakObserver(BreakObserver observer) {
-        if (observer == null) {
-            return;
-        }
-        List<BreakObserver> next = new ArrayList<>(breakObservers);
-        next.add(observer);
-        breakObservers = List.copyOf(next);
+        observers.addBreak(observer);
     }
 
-    /**
-     * Removes a previously registered break observer.
-     *
-     * @param observer the observer; ignored when {@code null} or not registered
-     */
+    /** @param observer the break observer */
     public void removeBreakObserver(BreakObserver observer) {
-        breakObservers = without(breakObservers, observer);
+        observers.removeBreak(observer);
     }
 
     /**
@@ -335,32 +247,17 @@ public class Battle {
      * @param element  the element that broke it
      */
     public void announceBroken(CanHit attacker, CanHit target, DamageElement element) {
-        for (BreakObserver observer : breakObservers) {
-            observer.onBroken(attacker, target, element);
-        }
+        observers.announceBroken(attacker, target, element);
     }
 
-    /**
-     * Registers an observer for landed controls.
-     *
-     * @param observer the observer, ignored (rather than throwing) when {@code null}
-     */
+    /** @param observer the control observer */
     public void addControlObserver(ControlObserver observer) {
-        if (observer == null) {
-            return;
-        }
-        List<ControlObserver> next = new ArrayList<>(controlObservers);
-        next.add(observer);
-        controlObservers = List.copyOf(next);
+        observers.addControl(observer);
     }
 
-    /**
-     * Removes a previously registered control observer.
-     *
-     * @param observer the observer; ignored when {@code null} or not registered
-     */
+    /** @param observer the control observer */
     public void removeControlObserver(ControlObserver observer) {
-        controlObservers = without(controlObservers, observer);
+        observers.removeControl(observer);
     }
 
     /**
@@ -371,32 +268,17 @@ public class Battle {
      * @param name    the state's name
      */
     public void announceControl(CanHit applier, CanHit target, String name) {
-        for (ControlObserver observer : controlObservers) {
-            observer.onControl(applier, target, name);
-        }
+        observers.announceControl(applier, target, name);
     }
 
-    /**
-     * Registers an observer for skipped turns.
-     *
-     * @param observer the observer, ignored (rather than throwing) when {@code null}
-     */
+    /** @param observer the skip observer */
     public void addSkipObserver(SkipObserver observer) {
-        if (observer == null) {
-            return;
-        }
-        List<SkipObserver> next = new ArrayList<>(skipObservers);
-        next.add(observer);
-        skipObservers = List.copyOf(next);
+        observers.addSkip(observer);
     }
 
-    /**
-     * Removes a previously registered skip observer.
-     *
-     * @param observer the observer; ignored when {@code null} or not registered
-     */
+    /** @param observer the skip observer */
     public void removeSkipObserver(SkipObserver observer) {
-        skipObservers = without(skipObservers, observer);
+        observers.removeSkip(observer);
     }
 
     /**
@@ -406,92 +288,47 @@ public class Battle {
      * @param broken whether the cause was a break
      */
     public void announceTurnSkipped(CanHit unit, boolean broken) {
-        for (SkipObserver observer : skipObservers) {
-            observer.onTurnSkipped(unit, broken);
-        }
+        observers.announceTurnSkipped(unit, broken);
     }
 
-    /**
-     * Registers an observer for rules that fire.
-     *
-     * @param observer the observer, ignored (rather than throwing) when {@code null}
-     */
+    /** @param observer the rule observer */
     public void addRuleObserver(RuleObserver observer) {
-        if (observer == null) {
-            return;
-        }
-        List<RuleObserver> next = new ArrayList<>(ruleObservers);
-        next.add(observer);
-        ruleObservers = List.copyOf(next);
+        observers.addRule(observer);
     }
 
-    /**
-     * Removes a previously registered rule observer.
-     *
-     * @param observer the observer; ignored when {@code null} or not registered
-     */
+    /** @param observer the rule observer */
     public void removeRuleObserver(RuleObserver observer) {
-        ruleObservers = without(ruleObservers, observer);
+        observers.removeRule(observer);
     }
 
     /**
      * Announces that a rule effect was applied.
      *
-     * <p>Called from {@code TriggerInterpreter.applyOne}, the single place every rule effect passes through.
-     *
      * @param owner the unit the rule belongs to
      * @param op    the operation performed
      */
     public void announceRuleFired(CanHit owner, String op) {
-        for (RuleObserver observer : ruleObservers) {
-            observer.onRuleFired(owner, op);
-        }
+        observers.announceRuleFired(owner, op);
     }
 
-    /**
-     * Registers an observer for settled heals.
-     *
-     * @param observer the observer, ignored (rather than throwing) when {@code null}
-     */
+    /** @param observer the heal observer */
     public void addHealObserver(HealObserver observer) {
-        if (observer == null) {
-            return;
-        }
-        List<HealObserver> next = new ArrayList<>(healObservers);
-        next.add(observer);
-        healObservers = List.copyOf(next);
+        observers.addHeal(observer);
     }
 
-    /**
-     * Removes a previously registered heal observer.
-     *
-     * @param observer the observer; ignored when {@code null} or not registered
-     */
+    /** @param observer the heal observer */
     public void removeHealObserver(HealObserver observer) {
-        healObservers = without(healObservers, observer);
+        observers.removeHeal(observer);
     }
 
-    /**
-     * Registers an observer for granted shields.
-     *
-     * @param observer the observer, ignored (rather than throwing) when {@code null}
-     */
+    /** @param observer the shield observer */
     public void addShieldObserver(ShieldObserver observer) {
-        if (observer == null) {
-            return;
-        }
-        List<ShieldObserver> next = new ArrayList<>(shieldObservers);
-        next.add(observer);
-        shieldObservers = List.copyOf(next);
+        observers.addShield(observer);
     }
 
-    /**
-     * Removes a previously registered shield observer.
-     *
-     * @param observer the observer; ignored when {@code null} or not registered
-     */
+    /** @param observer the shield observer */
     public void removeShieldObserver(ShieldObserver observer) {
-        shieldObservers = without(shieldObservers, observer);
+        observers.removeShield(observer);
     }
 
     public Queue queue;
@@ -974,10 +811,6 @@ public class Battle {
     @Getter
     private final Random rng;
     /**
-     * The resource a RESOURCE_CHANGED event is about (1506's forwarding clause).
-     */
-    private String lastChangedResource;
-    /**
      * [WAVE SEQUENCE] how many waves have begun. A sequence, not a flag: a per-wave cap is a comparison against the
      * number a rule last fired in, so nothing has to be reset -- the same reason the per-attack cap works that way.
      */
@@ -1005,40 +838,30 @@ public class Battle {
      * roster the QUEUE is built from, so a listener put there would take turns of its own. They are asked by a second
      * loop instead, and because they are in neither `allies` nor the queue they are never targeted and never act.
      */
-    private final java.util.LinkedHashMap<Character, TriggerTable> warehouseListeners =
-            new java.util.LinkedHashMap<>();
+    private final com.laosun.aluminium.models.battle.WarehouseListeners warehouseListeners =
+            new com.laosun.aluminium.models.battle.WarehouseListeners();
+    private final com.laosun.aluminium.models.battle.DeferredTriggers deferredTriggers =
+            new com.laosun.aluminium.models.battle.DeferredTriggers();
 
-    /*
-     * Registers a unit whose rules are asked although it is not on the field (see {@link #warehouseListeners}).
-     *
-     * <p>Note: The caller sets the table: this is deliberately about WHOSE rules are heard, not about which rules exist, so a listener
-     * can carry exactly the global support clauses instead of its whole battle kit.
-     */
     /**
-     * The same, naming the table to ask.
+     * Registers a unit whose rules are asked although it is not on the field.
      *
-     * <p>This is the overload "after the character is obtained, or while the character is in the party" needs: a member of the party is heard through her WAREHOUSE clauses while
-     * keeping her own battle table, because replacing that table would silently delete her kit the moment she deployed.
+     * @param listener  the unit
+     * @param warehouse the table to ask
      */
     public void registerWarehouseListener(Character listener, TriggerTable warehouse) {
-        if (listener != null && warehouse != null && !warehouse.isEmpty()) {
-            warehouseListeners.put(listener, warehouse);
-        }
-    }
-
-    public void registerWarehouseListener(Character listener) {
-        if (listener != null) {
-            warehouseListeners.put(listener, listener.getTriggerTable());
-        }
+        warehouseListeners.register(listener, warehouse);
     }
 
     /**
-     * The CLASS of the debuff that just landed (1506's "the enemy applied a control-type
-     * debuff to our side"). Same shape as {@link #lastChangedResource}: a battle-level fact the condition DSL reads, set at the one chokepoint
-     * every landed debuff passes through. Note: Deliberately NOT folded into an existing argument slot -- the STATE_ENDED magnitude was once
-     * put in `hitCount` and every reading of it was 0 until that was found.
+     * Registers a unit whose own table is asked although it is not on the field.
+     *
+     * @param listener the unit
      */
-    private com.laosun.aluminium.enums.DebuffClass lastAppliedDebuffClass;
+    public void registerWarehouseListener(Character listener) {
+        warehouseListeners.register(listener);
+    }
+
 
     /**
      * The per-battle home of PARTY-scoped resources (the shared [笑点] (laughs) counter). A resource like
@@ -1047,6 +870,8 @@ public class Battle {
      */
     private final com.laosun.aluminium.models.battle.PartyResources partyResources =
             new com.laosun.aluminium.models.battle.PartyResources();
+    private final com.laosun.aluminium.models.battle.TriggerFacts triggerFacts =
+            new com.laosun.aluminium.models.battle.TriggerFacts();
     private final com.laosun.aluminium.models.battle.SummonService summons;
     private final com.laosun.aluminium.models.battle.CastOutcome castOutcome =
             new com.laosun.aluminium.models.battle.CastOutcome();
@@ -1529,25 +1354,25 @@ public class Battle {
      * Records the class of the debuff that just landed (see {@link #lastAppliedDebuffClass()}).
      */
     public void noteAppliedDebuffClass(com.laosun.aluminium.enums.DebuffClass debuffClass) {
-        lastAppliedDebuffClass = debuffClass;
+        triggerFacts.appliedDebuffClass(debuffClass);
     }
 
     /**
      * The class of the debuff that just landed, or {@code null} for a state belonging to neither family.
      */
     public com.laosun.aluminium.enums.DebuffClass lastAppliedDebuffClass() {
-        return lastAppliedDebuffClass;
+        return triggerFacts.appliedDebuffClass();
     }
 
     public void noteChangedResource(String resource) {
-        lastChangedResource = resource;
+        triggerFacts.changedResource(resource);
     }
 
     /**
      * The resource the change being evaluated is about, or null.
      */
     public String lastChangedResource() {
-        return lastChangedResource;
+        return triggerFacts.changedResource();
     }
 
     public void startBattle() {
@@ -2309,7 +2134,7 @@ public class Battle {
         // sees are intermediate: a caller reading them would display a figure the engine never settled. And the amount
         // cannot be assembled again to find out -- assembly is additive, so a second pass would count DMG boost,
         // vulnerability, reduction and weakness twice. So the settled figure is handed over at the moment it exists.
-        for (DamageObserver observer : damageObservers) {
+        for (DamageObserver observer : observers.damageObservers()) {
             observer.onDamageSettled(damage, applied, hpLoss, shieldAbsorbed, died);
         }
         return applied;
@@ -2705,7 +2530,7 @@ public class Battle {
     /**
      * A unit's current aggro value: it decides the probability of the enemy selecting it.
      *
-     * <p>This is the stated weight of {@link #baseAggroOf} with the unit's {@link AttributeType#AGGRO_ADDED_RATIO}
+     * <p>This is the stated weight of {@link com.laosun.aluminium.models.battle.AggroTable} with the unit's {@link AttributeType#AGGRO_ADDED_RATIO}
      * applied - "the probability of being attacked is greatly increased" is a <b>soft</b> modifier on the same weighted draw, which is why it is an
      * attribute and not a {@code TauntBuff} (a taunt is the hard "can only be selected", and
      * {@link TargetSelector} is where that lives).
@@ -2714,47 +2539,7 @@ public class Battle {
      * @return the aggro value (&gt; 0)
      */
     public double aggroOf(CanHit entity) {
-        double base = baseAggroOf(entity);
-        DoubleValue added = entity.getAttribute(AttributeType.AGGRO_ADDED_RATIO);
-        if (added == null) {
-            return base;
-        }
-        double multiplier = 1 + added.get();
-        // "the probability of being attacked is greatly increased" scales the weight; it never removes the unit from the draw. A stated change of
-        // -100% or worse would make the multiplier zero or negative, i.e. take a living unit out of the aggro table --
-        // the exact thing Memosprites.validateAggro refuses for a stated weight (a zero share is a wrong number with
-        // nothing to report) -- so the stated weight is kept instead of silently deleting the target.
-        return multiplier <= 0 ? base : base * multiplier;
-    }
-
-    /**
-     * The stated aggro weight, before any {@link AttributeType#AGGRO_ADDED_RATIO} is applied.
-     *
-     * <p>Priority: the {@code aggro} in the character data (it is the game multiplier itself: Preservation
-     * 150 / Destruction 125 / others 100 / Hunt-Erudition 75); when there is no data, fall back to the path's
-     * default tier; non-characters (enemies/summons) get 100.
-     *
-     * <p>Taunt is not here: taunt is the hard constraint of "can only be selected", handled by
-     * {@link TargetSelector}. Squeezing it into the aggro value by multiplication can only raise the
-     * probability and can never achieve "can only be selected".
-     *
-     * @param entity the unit to query
-     * @return the aggro value (&gt; 0)
-     */
-    private double baseAggroOf(CanHit entity) {
-        if (entity instanceof Character character) {
-            if (character.getAggro() > 0) {
-                return character.getAggro();
-            }
-            return character.getPath().getAggro();
-        }
-        // A unit with no character data can still state its own weight (CanHit.aggro): every servant document
-        // gives an aggro line (11413 / 11402 are both 125), and without this every summon sat at the 100 fallback
-        // -- a target the enemy treated as an ordinary character while the game makes it 25% more attractive.
-        if (entity.getAggro() > 0) {
-            return entity.getAggro();
-        }
-        return 100;                                  // enemies / summons with nothing stated: the regular tier
+        return com.laosun.aluminium.models.battle.AggroTable.aggroOf(entity);
     }
 
     /**
@@ -2764,18 +2549,7 @@ public class Battle {
      * @return an ordered unit to probability mapping; an empty list returns an empty table
      */
     public Map<CanHit, Double> getAggroTable(List<? extends CanHit> allies) {
-        Map<CanHit, Double> table = new LinkedHashMap<>();
-        double total = 0;
-        for (CanHit ally : allies) {
-            total += aggroOf(ally);
-        }
-        if (total <= 0) {
-            return table;
-        }
-        for (CanHit ally : allies) {
-            table.put(ally, aggroOf(ally) / total);
-        }
-        return table;
+        return com.laosun.aluminium.models.battle.AggroTable.table(allies);
     }
 
     /**
@@ -2965,7 +2739,7 @@ public class Battle {
             // The restored amount exists only here: `CanHit.heal` caps it against the target's maximum and silently does
             // nothing for the dead, so the request is not the answer and the HP difference is not one either once
             // anything else moves HP.
-            for (HealObserver observer : healObservers) {
+            for (HealObserver observer : observers.healObservers()) {
                 observer.onHealSettled(healer, target, healed);
             }
         }
@@ -3096,7 +2870,7 @@ public class Battle {
         if (value > 0) {
             fireForAlly(TriggerPayload.AllySubject.of(TriggerEvent.SHIELD_GRANTED, provider, target, value));
             // The amount AFTER the provider's own shield boost -- the request would be a number the battle does not have.
-            for (ShieldObserver observer : shieldObservers) {
+            for (ShieldObserver observer : observers.shieldObservers()) {
                 observer.onShieldGranted(provider, target, value);
             }
         }
@@ -3323,20 +3097,10 @@ public class Battle {
      * @return how many rules fired in total
      */
     /**
-     * The name of the state that just left a unit, for the duration of a {@link TriggerEvent#STATE_ENDED}
-     * firing.
-     *
-     * <p><b>Why a field and not a context component.</b> The firing chain is four overloads deep, and a name
-     * would be a parameter on every one of them for a fact that exactly one event carries. State also has to ride
-     * <i>here</i> rather than be read off the carrier: by the time the event fires the state is already gone.
-     */
-    private String lastStateEndedName;
-
-    /**
      * The state named by the {@link TriggerEvent#STATE_ENDED} currently being fired, or {@code null}.
      */
     public String getLastStateEndedName() {
-        return lastStateEndedName;
+        return triggerFacts.stateEndedName();
     }
 
     /**
@@ -3428,13 +3192,13 @@ public class Battle {
      * @return how many rules fired
      */
     private int fire(TriggerPayload.StateEnded payload) {
-        String previous = lastStateEndedName;
-        lastStateEndedName = payload.stateName();
+        String previous = triggerFacts.stateEndedName();
+        triggerFacts.stateEndedName(payload.stateName());
         try {
             return fireTriggers(payload.event(), payload.actor(), payload.target(), 0, payload.amount(),
                     null, null);
         } finally {
-            lastStateEndedName = previous;
+            triggerFacts.stateEndedName(previous);
         }
     }
 
@@ -3448,13 +3212,13 @@ public class Battle {
      * @return how many rules fired
      */
     public int fire(TriggerPayload.ResourceChanged payload) {
-        String previous = lastChangedResource;
-        lastChangedResource = payload.resource();
+        String previous = triggerFacts.changedResource();
+        triggerFacts.changedResource(payload.resource());
         try {
             return fireTriggers(payload.event(), payload.actor(), payload.target(), 0, payload.amount(),
                     null, null);
         } finally {
-            lastChangedResource = previous;
+            triggerFacts.changedResource(previous);
         }
     }
 
@@ -3603,6 +3367,8 @@ public class Battle {
         triggerDepth++;
         try {
             int fired = 0;
+            com.laosun.aluminium.models.trigger.CastFacts castFacts =
+                    new com.laosun.aluminium.models.trigger.CastFacts(skillId, weakHitCount, attackHitTargets);
             for (Character ally : characters) {
                 if (ally == null) {
                     continue;
@@ -3621,32 +3387,29 @@ public class Battle {
                 }
                 fired += TriggerInterpreter.fire(this, table, event,
                         new TriggerTable.TriggerContext(ally, actor, target, hitCount, amount, damage, this,
-                                fromCast).withSkillId(skillId).withWeakHitCount(weakHitCount)
-                                .withAttackHitTargets(attackHitTargets));
+                                fromCast).withCastFacts(castFacts));
             }
             // Takes effect as soon as the character is obtained, no deployment needed. Note: A SECOND pass, not extra entries in `characters`: that list is what
             // the queue is built from, so a listener in it would act. Note: The owner handed to the context is the listener itself,
             // which is what makes "self" mean "the character who owns this warehouse clause" rather than whoever is fighting.
-            for (Character listener : warehouseListeners.keySet()) {
+            for (java.util.Map.Entry<Character, TriggerTable> warehouse : warehouseListeners.entries()) {
+                Character listener = warehouse.getKey();
                 if (listener == null || listener.isDeath()) {
                     continue;
                 }
-                TriggerTable table = warehouseListeners.get(listener);
+                TriggerTable table = warehouse.getValue();
                 if (table == null || table.isEmpty()) {
                     continue;
                 }
                 fired += TriggerInterpreter.fire(this, table, event,
                         new TriggerTable.TriggerContext(listener, actor, target, hitCount, amount, damage, this,
-                                fromCast).withSkillId(skillId).withWeakHitCount(weakHitCount)
-                                .withAttackHitTargets(attackHitTargets));
+                                fromCast).withCastFacts(castFacts));
             }
             // Held triggers ("若触发前目标被消灭则对新入场的敌方目标触发"): the firing happened while nothing was on the field,
             // so its effects were kept - and a wave has just brought enemies in. Delivered INSIDE this firing, so a rider
             // reading "the damage settled this firing" sees the held rule's own damage: they are one firing, not two.
             if (event == TriggerEvent.WAVE_START && !deferredTriggers.isEmpty()) {
-                List<DeferredTrigger> held = List.copyOf(deferredTriggers);
-                deferredTriggers.clear();
-                for (DeferredTrigger trigger : held) {
+                for (com.laosun.aluminium.models.battle.DeferredTriggers.Held trigger : deferredTriggers.release()) {
                     TriggerInterpreter.apply(this, trigger.rule(), trigger.context());
                     fired++;
                 }
@@ -3658,28 +3421,13 @@ public class Battle {
     }
 
     /**
-     * A rule whose trigger happened with nobody to deliver it to, kept until a wave brings enemies in.
-     *
-     * <p>Note: The CONTEXT is kept, not just the rule: "self" and the event's own actor are facts about the firing, and
-     * the delivery must not re-derive them from the wave (a wave event carries no actor at all). The conditions are
-     * deliberately <b>not</b> re-checked - the trigger already happened.
-     */
-    private record DeferredTrigger(TriggerTable.CompiledRule rule, TriggerTable.TriggerContext context) {
-    }
-
-    /**
-     * Triggers held until a wave arrives; see {@link TriggerSpec#getDeferUntilWave()}.
-     */
-    private final List<DeferredTrigger> deferredTriggers = new ArrayList<>();
-
-    /**
      * Holds a rule's effects until a wave brings enemies in; called by the interpreter in place of applying them.
      *
      * @param rule    the rule that triggered
      * @param context the context it triggered with (its owner and actor are part of what is being held)
      */
     public void deferUntilWave(TriggerTable.CompiledRule rule, TriggerTable.TriggerContext context) {
-        deferredTriggers.add(new DeferredTrigger(rule, context));
+        deferredTriggers.hold(rule, context);
     }
 
     /**

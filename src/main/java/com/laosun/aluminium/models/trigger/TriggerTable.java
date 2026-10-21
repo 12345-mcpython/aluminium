@@ -1249,34 +1249,120 @@ public class TriggerTable {
      * battle (as several tests do) makes any such condition <b>fail</b>, the same way a missing party
      * does - never silently pass.
      *
-     * @param owner    the character this table belongs to ("self")
-     * @param actor    who caused the event (may be {@code null})
-     * @param target   the event's subject (may be {@code null})
-     * @param hitCount how many targets an attack connected with (0 for non-attack events)
-     * @param amount   the event's magnitude where it has one (energy credited, damage dealt, ...)
-     * @param damage   the instance being settled, for the one event that has one
-     *                 ({@link TriggerEvent#DEALING_DAMAGE}); {@code null} everywhere else
+     * @param subject    the "who": owner, actor and event subject
+     * @param eventFacts the event-scoped facts: hit count, amount, damage instance and cast category
      * @param battle   the battle in progress, for questions about the field (may be {@code null} in a
      *                 hand-built context, which makes those conditions fail rather than guess)
-     * @param fromCast the {@link SkillCategory} of the cast that produced this event's instance, when the event can
-     *                 name one ({@link TriggerEvent#BREAK} / {@link TriggerEvent#KILL} / {@link
-     *                 TriggerEvent#DEALING_DAMAGE}); {@code null} = "no cast caused it", which is what a break from a
-     *                 rule-driven toughness reduction honestly is
-     * @param ruleId   the {@code id} of the rule being applied ({@code ""} when it states none), written per <b>rule</b>
-     *                 by the interpreter. It is what lets a buff remember which rule created it
-     *                 ({@code AbstractBuff.getRuleId()}), which is how "战技提供的护盾" is asked about
+     * @param ruleScope the rule id and the effect's per-target filter
      */
-    public record TriggerContext(CanHit owner, CanHit actor, CanHit target, int hitCount, double amount,
-                                 Damage damage, Battle battle, SkillCategory fromCast, String ruleId,
-                                 List<Condition> targetFilter, int skillId, int weakHitCount,
-                                 List<CanHit> attackHitTargets) {
+    public record TriggerContext(TriggerSubject subject, EventFacts eventFacts, Battle battle,
+                                 RuleScope ruleScope, CastFacts castFacts) {
 
         /**
          * The same context for an event that carries no cast category - i.e. the common case.
          */
         public TriggerContext(CanHit owner, CanHit actor, CanHit target, int hitCount, double amount,
                               Damage damage, Battle battle, SkillCategory fromCast) {
-            this(owner, actor, target, hitCount, amount, damage, battle, fromCast, "", List.of(), 0, 0, List.of());
+            this(new TriggerSubject(owner, actor, target), new EventFacts(hitCount, amount, damage, fromCast),
+                    battle, RuleScope.EMPTY, CastFacts.EMPTY);
+        }
+
+        /**
+         * @return the character this table belongs to ("self")
+         */
+        public CanHit owner() {
+            return subject.owner();
+        }
+
+        /**
+         * @return who caused the event (may be {@code null})
+         */
+        public CanHit actor() {
+            return subject.actor();
+        }
+
+        /**
+         * @return the event's subject (may be {@code null})
+         */
+        public CanHit target() {
+            return subject.target();
+        }
+
+        /**
+         * @return how many targets an attack connected with
+         */
+        public int hitCount() {
+            return eventFacts.hitCount();
+        }
+
+        /**
+         * @return the event's magnitude
+         */
+        public double amount() {
+            return eventFacts.amount();
+        }
+
+        /**
+         * @return the damage instance being settled, or {@code null}
+         */
+        public Damage damage() {
+            return eventFacts.damage();
+        }
+
+        /**
+         * @return the cast category that produced this event, or {@code null}
+         */
+        public SkillCategory fromCast() {
+            return eventFacts.fromCast();
+        }
+
+        /**
+         * @return the id of the rule being applied ({@code ""} when it states none)
+         */
+        public String ruleId() {
+            return ruleScope.ruleId();
+        }
+
+        /**
+         * @return the effect's per-target conditions
+         */
+        public List<Condition> targetFilter() {
+            return ruleScope.targetFilter();
+        }
+
+        /**
+         * The same context carrying a complete cast-facts value.
+         *
+         * <p>Use this instead of chaining {@link #withSkillId}/{@link #withWeakHitCount}/
+         * {@link #withAttackHitTargets} when all three are known at once: each of those rebuilds the whole
+         * record, so the chain copied it three times.
+         *
+         * @param facts the cast facts
+         * @return the same context with those facts
+         */
+        public TriggerContext withCastFacts(CastFacts facts) {
+            return new TriggerContext(subject, eventFacts, battle, ruleScope, facts);
+        }
+
+        /**
+         * @return the skill row that produced this event (0 for a non-cast event)
+         */
+        public int skillId() {
+            return castFacts.skillId();
+        }
+
+        /**
+         * @return how many hit targets shared this attack's weakness
+         */
+        public int weakHitCount() {
+            return castFacts.weakHitCount();
+        }
+
+        /**
+         * @return the targets this attack hit
+         */
+        public List<CanHit> attackHitTargets() {
+            return castFacts.attackHitTargets();
         }
 
         /**
@@ -1287,8 +1373,7 @@ public class TriggerTable {
          * - a shared mutable field would report the inner rule to the outer one's remaining effects.
          */
         public TriggerContext withRule(String id) {
-            return new TriggerContext(owner, actor, target, hitCount, amount, damage, battle, fromCast,
-                    id == null ? "" : id, targetFilter, skillId, weakHitCount, attackHitTargets);
+            return new TriggerContext(subject, eventFacts, battle, ruleScope.withRuleId(id), castFacts);
         }
 
         /**
@@ -1300,8 +1385,7 @@ public class TriggerTable {
          * firings, so this is a copy like {@link #withRule(String)}.
          */
         public TriggerContext withSkillId(int id) {
-            return new TriggerContext(owner, actor, target, hitCount, amount, damage, battle, fromCast, ruleId,
-                    targetFilter, id, weakHitCount, List.of());
+            return new TriggerContext(subject, eventFacts, battle, ruleScope, castFacts.withSkillId(id));
         }
 
         /**
@@ -1309,7 +1393,8 @@ public class TriggerTable {
          */
         public TriggerContext(CanHit owner, CanHit actor, CanHit target, int hitCount, double amount,
                               Damage damage, Battle battle) {
-            this(owner, actor, target, hitCount, amount, damage, battle, null, "", List.of(), 0, 0, List.of());
+            this(new TriggerSubject(owner, actor, target), new EventFacts(hitCount, amount, damage, null),
+                    battle, RuleScope.EMPTY, CastFacts.EMPTY);
         }
 
         /**
@@ -1332,8 +1417,8 @@ public class TriggerTable {
          * silently dropped by every chain that starts from a compact one -- measured, and the reason this exists.
          */
         public TriggerContext withWeakHitCount(int count) {
-            return new TriggerContext(owner, actor, target, hitCount, amount, damage, battle, fromCast, ruleId,
-                    targetFilter, skillId, count, List.of());
+            return new TriggerContext(subject, eventFacts, battle, ruleScope,
+                    castFacts.withWeakHitCount(count));
         }
 
         /**
@@ -1343,8 +1428,8 @@ public class TriggerTable {
          * whole record, so one that resets a field it does not own would make the firing ORDER significant.
          */
         public TriggerContext withAttackHitTargets(List<CanHit> targets) {
-            return new TriggerContext(owner, actor, target, hitCount, amount, damage, battle, fromCast, ruleId,
-                    targetFilter, skillId, weakHitCount, List.copyOf(targets));
+            return new TriggerContext(subject, eventFacts, battle, ruleScope,
+                    castFacts.withAttackHitTargets(targets));
         }
 
         /**
@@ -1354,8 +1439,7 @@ public class TriggerTable {
          * place that decides which units an effect reaches, no op had to learn this vocabulary.
          */
         public TriggerContext withTargetFilter(List<Condition> filter) {
-            return new TriggerContext(owner, actor, target, hitCount, amount, damage, battle, fromCast, ruleId,
-                    filter == null ? List.of() : filter, skillId, weakHitCount, attackHitTargets);
+            return new TriggerContext(subject, eventFacts, battle, ruleScope.withTargetFilter(filter), castFacts);
         }
 
         /**
@@ -1364,15 +1448,16 @@ public class TriggerTable {
          * filter that is asking about it would recurse.
          */
         public TriggerContext withSubject(CanHit candidate) {
-            return new TriggerContext(owner, actor, candidate, hitCount, amount, damage, battle, fromCast, ruleId,
-                    List.of(), 0, weakHitCount, List.of());
+            return new TriggerContext(new TriggerSubject(subject.owner(), subject.actor(), candidate),
+                    eventFacts, battle, new RuleScope(ruleScope.ruleId(), List.of()),
+                    castFacts.withSkillId(0).withAttackHitTargets(List.of()));
         }
 
         /**
          * Whether {@code candidate} passes the per-target conditions (an empty filter admits everything).
          */
         public boolean passesTargetFilter(CanHit candidate) {
-            for (Condition condition : targetFilter) {
+            for (Condition condition : ruleScope.targetFilter()) {
                 if (!condition.test(withSubject(candidate))) {
                     return false;
                 }
@@ -1381,7 +1466,8 @@ public class TriggerTable {
         }
 
         public static TriggerContext of(CanHit owner, CanHit actor) {
-            return new TriggerContext(owner, actor, null, 0, 0, null, null, null, "", List.of(), 0, 0, List.of());
+            return new TriggerContext(new TriggerSubject(owner, actor, null), EventFacts.EMPTY, null,
+                    RuleScope.EMPTY, CastFacts.EMPTY);
         }
     }
 
