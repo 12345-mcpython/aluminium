@@ -505,7 +505,12 @@ public class Battle {
      */
     private final BattleEvents events = new BattleEvents(this);
 
+    /**
+     * The engine's roster of our characters. Read-only: admit a unit through
+     * {@link #addCombatant(CanHit)} rather than writing to this list.
+     */
     public final List<Character> characters;
+    private final List<Character> characterRoster;
 
     /**
      * The <b>player camp's roster</b> - every combatant fighting for us, in battlefield order: our
@@ -539,6 +544,7 @@ public class Battle {
      * {@code isDeath()}.
      */
     public final List<CanHit> allies;
+    private final List<CanHit> allyRoster;
 
     /**
      * The <b>enemy camp's roster</b> - every combatant fighting against us, in battlefield order.
@@ -557,9 +563,11 @@ public class Battle {
      * summon is not silently skipped anywhere: the places that genuinely only work on monsters now
      * say so.
      *
-     * <p>Mutable on purpose: {@code WaveManager} appends each new wave's monsters to it.
+     * <p>Read-only: {@code WaveManager} appends each new wave's monsters through
+     * {@link #addCombatant(CanHit)}.
      */
     public final List<CanHit> enemies;
+    private final List<CanHit> enemyRoster;
 
     /**
      * One living unit from the other side, chosen with the battle's own seeded randomness (used by
@@ -1071,7 +1079,7 @@ public class Battle {
     private final java.util.LinkedHashMap<Character, TriggerTable> warehouseListeners =
             new java.util.LinkedHashMap<>();
 
-    /**
+    /*
      * Registers a unit whose rules are asked although it is not on the field (see {@link #warehouseListeners}).
      *
      * <p>Note: The caller sets the table: this is deliberately about WHOSE rules are heard, not about which rules exist, so a listener
@@ -1144,11 +1152,14 @@ public class Battle {
      */
     public Battle(List<Character> characterQueue, List<? extends CanHit> enemyQueue, Random rng, GameData data) {
         this.data = java.util.Objects.requireNonNull(data, "data");
-        characters = new ArrayList<>(characterQueue);
+        characterRoster = new ArrayList<>(characterQueue);
         // The camp view of our side: the same instances, one more list. A friendly summon is appended here
         // (and only here) by summon(...), so `characters` stays exactly "our characters".
-        allies = new ArrayList<>(characterQueue);
-        enemies = new ArrayList<>(enemyQueue);
+        allyRoster = new ArrayList<>(characterQueue);
+        enemyRoster = new ArrayList<>(enemyQueue);
+        characters = java.util.Collections.unmodifiableList(characterRoster);
+        allies = java.util.Collections.unmodifiableList(allyRoster);
+        enemies = java.util.Collections.unmodifiableList(enemyRoster);
         this.rng = rng;
         queue = new Queue();
         queue.addCombatants(characterQueue);
@@ -1442,7 +1453,7 @@ public class Battle {
         return true;
     }
 
-    /** Collects the PARTY-scoped declarations of our side into this battle's own store. */
+    /* Collects the PARTY-scoped declarations of our side into this battle's own store. */
     /**
      * The energy the ultimate now settling consumed, for {@code ULT_CAST}'s amount.
      *
@@ -1477,13 +1488,13 @@ public class Battle {
         }
     }
 
-    /**
+    /*
      * The party's own counter, or {@code null} when this battle has none by that name.
      *
      * <p>Asked by both sides of the DSL: a `self_resource:NAME` read and a `GAIN_RESOURCE`/`SPEND_RESOURCE` write. They try the
      * unit first, exactly as before, and fall back here -- so nothing changes for a resource a character owns itself.
      */
-    /** The party counter's current value, or 0 when this battle has no such counter. */
+    /* The party counter's current value, or 0 when this battle has no such counter. */
     /**
      * The laugh-point factor of Elation damage: {@code 1 + 笑点×5/(笑点+240)}.
      *
@@ -1638,7 +1649,7 @@ public class Battle {
         return partyResources.get(id);
     }
 
-    /** Notes which resource a change is about, then fires. */
+    /* Notes which resource a change is about, then fires. */
     /**
      * Records the class of the debuff that just landed (see {@link #lastAppliedDebuffClass()}).
      */
@@ -1854,7 +1865,7 @@ public class Battle {
         return status;
     }
 
-    /**
+    /*
      * Give {@code actor} an extra turn: the next {@link #stepForward()} is taken by it,
      * and it costs no action value (the clock does not move, so the round does not change, see {@link #getRound()}).
      *
@@ -1984,7 +1995,7 @@ public class Battle {
         actor.beforeMove(this);
     }
 
-    /**
+    /*
      * Settle the damage over time on one unit: first applied, first settled (in application order).
      *
      * <p>DOT goes through the full damage zones (it takes DMG boost and defence/resistance; vulnerability/reduction
@@ -2486,7 +2497,7 @@ public class Battle {
         return gain == null ? 0 : applyEnergyGain(user, gain);
     }
 
-    /**
+    /*
      * Toughness reduction + weakness break trigger: the only toughness reduction entry point in
      * battle, called by {@link SkillExecutor} after each damage instance settles.
      *
@@ -3086,7 +3097,7 @@ public class Battle {
         return healed;
     }
 
-    /**
+    /*
      * Gain a shield.
      *
      * <p><b>No stacking</b>: it directly overwrites the current shield value (shields in this game normally do
@@ -3171,7 +3182,7 @@ public class Battle {
         return grantShield(provider, target, amount, "");
     }
 
-    /**
+    /*
      * The same, also recording <b>which rule</b> created the shield.
      *
      * <p>The rule id is what tells two shields from one giver apart: "the shield provided by the Skill" (1001 March 7th (三月七) eidolon 6) must not
@@ -3430,7 +3441,7 @@ public class Battle {
         return rng.nextDouble() < chance;
     }
 
-    /**
+    /*
      * Fires a trigger event with neither actor nor subject (BATTLE_START and similar).
      *
      * @param event the event
@@ -4170,7 +4181,7 @@ public class Battle {
     }
 
 
-    /**
+    /*
      * The allies a lethal blow has landed on during the CURRENT action.
      *
      * <p>140 Moon Cocoon's Ward (月茉之庇), "all of those hit by a lethal attack within one action". The set is what makes that ONE clause rather
@@ -4268,12 +4279,12 @@ public class Battle {
                             + unit.getCamp() + "); Camp.NEUTRAL has none, and picking one would silently "
                             + "decide who it fights for");
         }
-        List<CanHit> camp = campOf(unit);
+        List<CanHit> camp = unit.getCamp() == Camp.PLAYER ? allyRoster : enemyRoster;
         if (!camp.contains(unit)) {
             camp.add(unit);
         }
-        if (unit instanceof Character character && !characters.contains(character)) {
-            characters.add(character);
+        if (unit instanceof Character character && !characterRoster.contains(character)) {
+            characterRoster.add(character);
         }
         if (!addRequestItems.contains(unit)) {
             addRequestItems.add(unit);
@@ -4307,7 +4318,7 @@ public class Battle {
         checkResult();                               // decide the outcome right after clearing the corpses
     }
 
-    /**
+    /*
      * Takes off every buff whose duration was being spent by a unit that is now dead.
      *
      * <p><b>Why this has to exist.</b> A buff can state that its clock is somebody else's turns

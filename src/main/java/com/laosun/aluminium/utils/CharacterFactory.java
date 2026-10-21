@@ -5,9 +5,6 @@ import com.laosun.aluminium.GameData;
 import com.laosun.aluminium.beans.CharacterData;
 import com.laosun.aluminium.beans.ResourceSpec;
 import com.laosun.aluminium.data.Memosprites;
-import com.laosun.aluminium.data.RelicTriggerTables;
-import com.laosun.aluminium.data.TriggerTables;
-import com.laosun.aluminium.data.WeaponTriggerTables;
 import com.laosun.aluminium.exceptions.CharacterException;
 import com.laosun.aluminium.models.Character;
 import com.laosun.aluminium.models.RelicSuit;
@@ -218,10 +215,10 @@ public final class CharacterFactory {
         // file get the empty table, which is the normal state for the ones not data-ised yet.
         // Worn relic sets contribute their own rules on top (see `effectiveTriggerTable`).
         TriggerTable table = effectiveTriggerTable(data, cid, relicSuit);
-        // A light cone's own abilities are rules of the same kind (see WeaponTriggerTables), so they merge here, at the
-        // same assembly point as a relic set's -- one line, because the create method already receives the Weapon.
-        if (weapon != null && WeaponTriggerTables.has(weapon.getWid())) {
-            table = table.plus(WeaponTriggerTables.of(weapon.getWid(), weapon.getRank()));
+        // A light cone's own abilities are rules of the same kind, so they merge here, at the same
+        // assembly point as a relic set's -- one line, because the create method already receives the Weapon.
+        if (weapon != null) {
+            table = table.plus(data.weaponTriggerTables().of(weapon.getWid(), weapon.getRank()));
         }
         builder = builder.triggerTable(table);
         Character character = builder.build();
@@ -276,7 +273,7 @@ public final class CharacterFactory {
         TriggerTable table = data.triggerTables().of(cid);
         if (relicSuit != null) {
             for (Int2IntMap.Entry worn : relicSuit.piecesPerSet().int2IntEntrySet()) {
-                table = table.plus(RelicTriggerTables.of(worn.getIntKey()).at(worn.getIntValue()));
+                table = table.plus(data.relicTriggerTables().of(worn.getIntKey(), worn.getIntValue()));
             }
         }
         // ONE exit point, so the checks below cannot be skipped by a branch. It was written at both returns
@@ -284,6 +281,15 @@ public final class CharacterFactory {
         // exercises one path has to be exercising the only path.
         return requireReadableResources(cid, requireSummonable(cid, table));
     }
+
+    /**
+     * Counters the BATTLE owns, which no character declares.
+     *
+     * <p>「战技点」 is the first: it lives in {@code Battle.skillPointPolicy}, so a character cannot declare it and a
+     * declaration would have to invent a cap the battle already knows. Content still spells it like any other counter, and
+     * {@code TriggerInterpreter} routes the write to the battle.
+     */
+    private static final java.util.Set<String> BATTLE_OWNED_COUNTERS = java.util.Set.of("战技点");
 
     /**
      * Refuses a merged table that reads a resource this character never declares.
@@ -309,15 +315,6 @@ public final class CharacterFactory {
      * @return the same table, for chaining
      * @throws CharacterException when a rule reads or writes a resource that is not declared
      */
-    /**
-     * Counters the BATTLE owns, which no character declares.
-     *
-     * <p>「战技点」 is the first: it lives in {@code Battle.skillPointPolicy}, so a character cannot declare it and a
-     * declaration would have to invent a cap the battle already knows. Content still spells it like any other counter, and
-     * {@code TriggerInterpreter} routes the write to the battle.
-     */
-    private static final java.util.Set<String> BATTLE_OWNED_COUNTERS = java.util.Set.of("战技点");
-
     public static TriggerTable requireReadableResources(int cid, TriggerTable table) {
         for (String referenced : table.referencedResources().stream().sorted().toList()) {
             // The BATTLE's own counters are not declared by a character, because no character owns them: the skill points
