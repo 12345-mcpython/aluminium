@@ -1,6 +1,7 @@
 package com.laosun.aluminium.data;
 
 import com.laosun.aluminium.Constant;
+import com.laosun.aluminium.GameData;
 import com.laosun.aluminium.beans.Skill;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.SkillCategory;
@@ -20,7 +21,7 @@ import java.util.Map;
  * element {@link #getElement()} and the effect classification
  * {@link #getEffect()}. Access is immutable read-only; resolve lazily via
  * {@link #init(int, int)} which caches nothing but reads from
- * {@link Constant#SKILLS}.
+ * {@link GameData#skills()}.
  *
  * <p><b>Non-damaging skills</b> (heal / support / summon / ...) may have
  * {@code element == null} (the raw data uses {@code "Unknown"}); their
@@ -170,7 +171,7 @@ public class SkillData {
      *                                  {@code skill_effect} is missing or unknown
      */
     public static SkillData init(int cid, int skillID) {
-        return init(Constant.SKILLS, cid, skillID);
+        return init(GameData.DEFAULT.skills(), cid, skillID);
     }
 
     /**

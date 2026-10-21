@@ -1,6 +1,7 @@
 package com.laosun.aluminium.models.skill;
 
 import com.laosun.aluminium.Constant;
+import com.laosun.aluminium.GameData;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.models.DoubleValue;
 import com.laosun.aluminium.utils.AttributeBuilder;
@@ -64,14 +65,14 @@ public final class SkillTrace {
      * Builds (or returns from cache) the trace tree for a character.
      *
      * <p>The tree is constructed from the raw bean data loaded in
-     * {@link Constant#SKILL_TRACES}. Nodes with no prerequisites become roots.
+     * {@link GameData#skillTraces()}. Nodes with no prerequisites become roots.
      * Results are cached per character ID since the tree never changes.
      *
      * @param cid the character ID
      * @return the list of root trace nodes, or an empty list if none found
      */
     public static List<SkillTrace> init(int cid) {
-        return CACHE.computeIfAbsent(cid, unused -> buildTree(Constant.SKILL_TRACES, cid));
+        return CACHE.computeIfAbsent(cid, unused -> buildTree(GameData.DEFAULT.skillTraces(), cid));
     }
 
     /**
