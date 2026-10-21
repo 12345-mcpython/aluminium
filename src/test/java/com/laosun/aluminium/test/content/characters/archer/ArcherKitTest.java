@@ -145,10 +145,10 @@ public class ArcherKitTest {
     private static double critDamageGainFromASkillPointGain(int skillPoints) {
         Fixture f = new Fixture(1);
         while (f.battle.getSkillPoints() > skillPoints) {
-            f.battle.skillPointPolicy.spend();
+            f.battle.getSkillPointPolicy().spend();
         }
         while (f.battle.getSkillPoints() < skillPoints) {
-            f.battle.skillPointPolicy.gain(1);
+            f.battle.getSkillPointPolicy().gain(1);
         }
         double before = f.archer.getAttribute(AttributeType.CRIT_ATTACK).get();
         f.battle.fireTriggers(TriggerEvent.SKILL_POINT_GAINED, f.archer, f.archer, 0, 1);

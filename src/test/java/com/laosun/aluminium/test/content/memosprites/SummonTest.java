@@ -184,7 +184,7 @@ public class SummonTest {
      * A summon admitted after the battle started still joins the camp and the action bar.
      *
      * <p>The constructor wires the speed listener and the opening queue for the units it was handed; a unit
-     * that arrives later goes through {@code addRequestItems}, like a wave. Both halves matter, so both are
+     * that arrives later goes through {@code addCombatant}, like a wave. Both halves matter, so both are
      * asserted - and so does the fact that entering does not move the clock.
      */
     @Test
