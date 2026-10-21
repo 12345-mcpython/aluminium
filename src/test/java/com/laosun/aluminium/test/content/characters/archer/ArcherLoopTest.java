@@ -82,7 +82,7 @@ public class ArcherLoopTest {
         Assertions.assertTrue(f.archer.getBuffManager().hasState(LOOP), "precondition: the first cast entered the loop");
 
         while (f.battle.getSkillPoints() > 0) {
-            f.battle.skillPointPolicy.spend();
+            f.battle.getSkillPointPolicy().spend();
         }
         f.castSkillAndReadBoostFactor();
         System.out.println("[1015] 手里 0 点之后再施放一次战技: 状态 " + f.archer.getBuffManager().hasState(LOOP));
@@ -97,7 +97,7 @@ public class ArcherLoopTest {
         Fixture f = new Fixture();
         f.castSkillAndReadBoostFactor();
         while (f.battle.getSkillPoints() > 1) {
-            f.battle.skillPointPolicy.spend();
+            f.battle.getSkillPointPolicy().spend();
         }
         Assertions.assertEquals(1, f.battle.getSkillPoints(), "precondition: exactly one point left");
         f.castSkillAndReadBoostFactor();

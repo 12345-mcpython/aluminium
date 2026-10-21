@@ -568,8 +568,7 @@ public class SummonConditionTest {
     private static Summon place(Battle battle, Character master, MemospriteSpec spec) {
         Summon summon = SummonFactory.memosprite(master, spec);
         summon.setMaster(master);
-        battle.allies.add(summon);
-        battle.addRequestItems.add(summon);
+        battle.addCombatant(summon);
         battle.processRequests();
         return summon;
     }

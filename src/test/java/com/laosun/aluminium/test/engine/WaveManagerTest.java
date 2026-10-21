@@ -94,7 +94,7 @@ public class WaveManagerTest {
         Assertions.assertTrue(waves.nextWave());
         Assertions.assertEquals(0, waves.getWaveIndex());
         Assertions.assertEquals(3, battle.enemies.size(), "103201 wave 1 has 3 monsters");
-        Assertions.assertEquals(3, battle.addRequestItems.size(), "all queued waiting to enter");
+        Assertions.assertEquals(3, battle.pendingCombatants().size(), "all queued waiting to enter");
 
         battle.processRequests();
         Assertions.assertEquals(4, battle.queue.size(),

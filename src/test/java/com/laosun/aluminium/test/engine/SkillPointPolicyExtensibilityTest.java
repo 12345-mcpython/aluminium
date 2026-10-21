@@ -5,8 +5,10 @@ import com.laosun.aluminium.Constant;
 import com.laosun.aluminium.enums.SkillCategory;
 import com.laosun.aluminium.models.CanHit;
 import com.laosun.aluminium.models.Character;
+import com.laosun.aluminium.models.buff.TestBuff;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
+import com.laosun.aluminium.models.event.SkillPointEvent;
 import com.laosun.aluminium.models.skill.DefaultSkill;
 import com.laosun.aluminium.models.skill.Skill;
 import com.laosun.aluminium.models.skillpoint.SkillPointPolicy;
@@ -26,7 +28,7 @@ import java.util.function.Supplier;
  * <p>The requirement is that "the skill point policy must be pulled out of
  * {@code Battle} (see the finding ledger in {@code AGENT.md})", and this class is the acceptance test
  * for that sentence - without changing a single line of the engine, it only swaps
- * {@link Battle#skillPointPolicy} and sees whether the engine follows
+ * {@link Battle#setSkillPointPolicy} and sees whether the engine follows
  * the new rules.
  *
  * <p>The three assertions correspond to three kinds of real-world needs in the future:
@@ -70,7 +72,7 @@ public class SkillPointPolicyExtensibilityTest {
         Character hero = battle.characters.getFirst();
 
         // Swap the policy - this is the only "wiring" action, and not one line of Battle was changed
-        battle.skillPointPolicy = new DoubleGainPolicy();
+        battle.setSkillPointPolicy(new DoubleGainPolicy());
         Assertions.assertEquals(3, battle.getSkillPoints(), "the start is still 3 (the policy's initial value)");
 
         // Note: The policy starts at 3 and one basic attack gives +2 to 4 (capped at 5), so assert
@@ -94,7 +96,7 @@ public class SkillPointPolicyExtensibilityTest {
     @Test
     public void customPolicyRaisesTheCap() {
         Battle battle = newBattle(List.of(CharacterFactory.create(1003, 80)));
-        battle.skillPointPolicy = new StandardSkillPointPolicy(7, 3);
+        battle.setSkillPointPolicy(new StandardSkillPointPolicy(7, 3));
 
         Assertions.assertEquals(7, battle.getSkillPointMax(), "the cap follows the policy, no longer the constant 5");
         Assertions.assertEquals(3, battle.getSkillPoints());
@@ -114,10 +116,50 @@ public class SkillPointPolicyExtensibilityTest {
     @Test
     public void customPolicyCanChangeTheStartingValue() {
         Battle battle = newBattle(List.of(CharacterFactory.create(1003, 80)));
-        battle.skillPointPolicy = new StandardSkillPointPolicy(5, 4);
+        battle.setSkillPointPolicy(new StandardSkillPointPolicy(5, 4));
 
         Assertions.assertEquals(4, battle.getSkillPoints(), "the start is 4, no longer the constant 3");
         Assertions.assertEquals(5, battle.getSkillPointMax());
+    }
+
+    /**
+     * A replaced policy is still wired: a gain reaches the units' skill-point hooks.
+     *
+     * <p>This is the half a plain field assignment lost. The pool itself would move, so the values
+     * above would still look right; only a listener exposes the missing wiring. The gain goes through
+     * the POLICY's cast path, because {@code Battle.gainSkillPoint} fires its own trigger event and
+     * would pass even when the listener was never installed.
+     */
+    @Test
+    public void replacingThePolicyKeepsSkillPointEventsWired() {
+        Character owner = CharacterFactory.create(1003, 80);
+        Battle battle = newBattle(List.of(owner));
+        battle.setSkillPointPolicy(new StandardSkillPointPolicy(7, 3));
+
+        CountingSkillPointBuff buff = new CountingSkillPointBuff();
+        owner.getBuffManager().addBuff(buff);
+        battle.getSkillPointPolicy().onSkillCast(owner,
+                owner.getSkills().get(com.laosun.aluminium.enums.SkillType.COMMON));
+
+        Assertions.assertEquals(1, buff.gained,
+                "the replacement policy must still report the gain to the battle's event bus");
+    }
+
+    /**
+     * A buff that records skill-point gains; the engine's event surface includes buffs.
+     */
+    private static final class CountingSkillPointBuff extends TestBuff implements SkillPointEvent {
+
+        private int gained;
+
+        private CountingSkillPointBuff() {
+            super(99);
+        }
+
+        @Override
+        public void onSkillPointGained(Battle battle, int amount) {
+            gained += amount;
+        }
     }
 
     // ==================================================================
@@ -131,7 +173,7 @@ public class SkillPointPolicyExtensibilityTest {
     @Test
     public void battleFacadeNeverDivergesFromThePolicy() {
         Battle battle = newBattle(List.of(CharacterFactory.create(1003, 80)));
-        SkillPointPolicy policy = battle.skillPointPolicy;
+        SkillPointPolicy policy = battle.getSkillPointPolicy();
 
         battle.gainSkillPoint(1);
         Assertions.assertEquals(policy.getValue(), battle.getSkillPoints());
@@ -157,7 +199,7 @@ public class SkillPointPolicyExtensibilityTest {
     public void defaultPolicyIsStillTheVanillaRule() {
         Battle battle = newBattle(List.of(CharacterFactory.create(1003, 80)));
 
-        Assertions.assertTrue(battle.skillPointPolicy instanceof StandardSkillPointPolicy);
+        Assertions.assertTrue(battle.getSkillPointPolicy() instanceof StandardSkillPointPolicy);
         Assertions.assertEquals(Constant.SKILL_POINT_START, battle.getSkillPoints());
         Assertions.assertEquals(Constant.SKILL_POINT_MAX, battle.getSkillPointMax());
 
@@ -188,7 +230,7 @@ public class SkillPointPolicyExtensibilityTest {
 
         // Deliberately swap in a policy that does not check the camp: an enemy basic attack should gain a
         // point too (proving the policy is in charge, not the engine)
-        battle.skillPointPolicy = new StandardSkillPointPolicy() {
+        battle.setSkillPointPolicy(new StandardSkillPointPolicy() {
             @Override
             public boolean onSkillCast(CanHit user, Skill skill) {
                 if (skill != null && skill.getData() != null
@@ -197,7 +239,7 @@ public class SkillPointPolicyExtensibilityTest {
                 }
                 return true;
             }
-        };
+        });
 
         int before = battle.getSkillPoints();
         Assertions.assertTrue(actWithRealTurn(battle, enemy,

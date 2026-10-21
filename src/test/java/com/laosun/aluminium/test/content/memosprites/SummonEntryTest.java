@@ -29,7 +29,7 @@ import java.util.List;
  * an event. That is the whole gap this closes.
  *
  * <p><b>Why the timing is the interesting part.</b> A summon enters the action bar through
- * {@code addRequestItems}, which {@code processRequests} drains, so during the summon call itself the unit is on
+ * {@code addCombatant}, whose pending list {@code processRequests} drains, so during the summon call itself the unit is on
  * the roster but <b>not yet scheduled</b> - and the one thing a "when summoned" rule almost always wants to do is touch
  * its action value. Firing the event at the call site would therefore hand every such rule a unit whose
  * {@code ADVANCE} is silently dropped: the rule runs, nothing happens, and the log says nothing. So the event is

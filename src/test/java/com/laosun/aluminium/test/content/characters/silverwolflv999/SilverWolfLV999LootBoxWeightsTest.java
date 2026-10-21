@@ -153,10 +153,10 @@ public class SilverWolfLV999LootBoxWeightsTest {
      */
     private static void setSkillPoints(Battle battle, int wanted) {
         while (battle.getSkillPoints() > wanted) {
-            battle.skillPointPolicy.spend();
+            battle.getSkillPointPolicy().spend();
         }
         if (battle.getSkillPoints() < wanted) {
-            battle.skillPointPolicy.gain(wanted - battle.getSkillPoints());
+            battle.getSkillPointPolicy().gain(wanted - battle.getSkillPoints());
         }
         Assertions.assertEquals(wanted, battle.getSkillPoints(), "the fixture must start where the case says");
     }

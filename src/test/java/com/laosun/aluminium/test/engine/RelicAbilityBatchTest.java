@@ -707,8 +707,7 @@ public class RelicAbilityBatchTest {
                 List.of(new MemospriteSpec.Panel("HEALTH", 0.5, null),
                         new MemospriteSpec.Panel("SPEED", null, 999.0))));
         summon.setMaster(master);
-        battle.allies.add(summon);
-        battle.addRequestItems.add(summon);
+        battle.addCombatant(summon);
         battle.processRequests();
         return summon;
     }

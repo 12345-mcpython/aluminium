@@ -94,10 +94,10 @@ public class SkillPointConditionTest {
         battle.processRequests();
 
         while (battle.getSkillPoints() > skillPoints) {
-            battle.skillPointPolicy.spend();
+            battle.getSkillPointPolicy().spend();
         }
         while (battle.getSkillPoints() < skillPoints) {
-            battle.skillPointPolicy.gain(1);
+            battle.getSkillPointPolicy().gain(1);
         }
         Assertions.assertEquals(skillPoints, battle.getSkillPoints(), "precondition: the pool holds what the case asks");
         Assertions.assertEquals(5 + CAP_BONUS, battle.getSkillPointMax(), "precondition: the cap was raised");
