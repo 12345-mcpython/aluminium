@@ -414,7 +414,7 @@ public abstract class AbstractBuff implements Buff, AttackEvent, SkillCastEvent 
         remainingDuration--;
     }
 
-    /**
+    /*
      * Adds turns to this buff's remaining duration - "…的持续时间<b>增加1回合</b>".
      *
      * <p><b>Why this is on the base class.</b> Every timed buff already has a duration, and a whole family of

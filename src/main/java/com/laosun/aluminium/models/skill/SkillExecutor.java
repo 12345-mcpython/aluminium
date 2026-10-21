@@ -719,7 +719,7 @@ public final class SkillExecutor {
         return skill.getData().getEffect().isDamaging() || deliverableSpec(skill) != null;
     }
 
-    /**
+    /*
      * Settles one hit, reduces toughness and accumulates it into the attack summary.
      *
      * <p>Toughness reduction follows the "two chains share one nominal value" convention:

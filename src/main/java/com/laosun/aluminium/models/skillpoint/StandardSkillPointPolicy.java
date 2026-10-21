@@ -94,7 +94,7 @@ public class StandardSkillPointPolicy implements SkillPointPolicy {
          */
         void onGained(int amount);
 
-        /**
+        /*
          * Actually spent {@code amount} points ({@code > 0}).
          */
         /**

@@ -706,12 +706,6 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
     }
 
     /**
-     * Restores HP to this entity, capped at max HP.
-     * Has no effect on dead entities.
-     *
-     * @param amount the amount to heal
-     */
-    /**
      * Spends HP as a COST: "消耗等同于刃生命上限 30% 的生命值" (spends HP equal to 30% of Mortenax Blade (千冶-刃)'s Max HP).
      *
      * <p>Note: Deliberately NOT {@code takeDamage}: a price, not an attack -- no shield absorbs it, no {@code HP_LOST} fires
@@ -730,6 +724,12 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
         return spent;
     }
 
+    /**
+     * Restores HP to this entity, capped at max HP.
+     * Has no effect on dead entities.
+     *
+     * @param amount the amount to heal
+     */
     public void heal(double amount) {
         if (death || amount <= 0) {
             return;
@@ -827,7 +827,7 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
         onBattleStart.run();
     }
 
-    /**
+    /*
      * Whether a limited rule may fire right now.
      *
      * <p>Unlimited rules are never recorded, so they always answer {@code true}: adding this vocabulary
@@ -896,7 +896,7 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
         }
     }
 
-    /**
+    /*
      * Counts one of <b>this combatant's</b> turns off every cooldown, and clears every per-turn counter.
      *
      * <p>Called by {@code Battle.beforeMove} for the unit whose turn is beginning, just before the
@@ -1018,7 +1018,7 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
         }
     }
 
-    /**
+    /*
      * Raises one of this combatant's skill slots by {@code delta} for this battle.
      *
      * <p>Called by the {@code RAISE_SKILL_LEVEL} op, whose load-time validation already checked that the slot is a
@@ -1209,7 +1209,7 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
         return ruleId == null || ruleId.isBlank() ? 0 : rulePerTurnBonus.getOrDefault(ruleId.trim(), 0);
     }
 
-    /**
+    /*
      * How much extra base chance the rule named {@code ruleId} has this battle ({@code 0} = none).
      *
      * @param ruleId the rule's {@code id}

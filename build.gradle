@@ -32,6 +32,13 @@ java {
     targetCompatibility = JavaVersion.VERSION_25
 }
 
+// A dangling Javadoc comment is silently ignored by the javadoc tool, so a doc that drifted onto
+// the wrong declaration used to be invisible. `-Werror` makes this category a compile gate instead
+// of a warning; the option is JDK 21+ (measured on the project's JDK 25).
+tasks.withType(JavaCompile).configureEach {
+    options.compilerArgs += ['-Xlint:dangling-doc-comments', '-Werror']
+}
+
 repositories {
     mavenCentral()
 }

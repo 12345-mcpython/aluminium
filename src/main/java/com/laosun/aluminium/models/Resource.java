@@ -273,7 +273,7 @@ public class Resource {
         this.value = clamp(this.value);
     }
 
-    /**
+    /*
      * Raw write (unprotected, clamping only): for save restoration / debugging.
      *
      * <p>The clamping range is {@code [0, max + maxOverflow]}.

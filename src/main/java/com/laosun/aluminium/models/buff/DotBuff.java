@@ -79,7 +79,7 @@ public class DotBuff extends AbstractBuff {
      */
     private final double baseDamage;
 
-    /**
+    /*
      * @param source     the applier ({@code Damage}'s attacker is not allowed to be null, so it MUST
      *                   be recorded; it decides who is credited with a DOT kill)
      * @param element    the DoT element
@@ -206,7 +206,7 @@ public class DotBuff extends AbstractBuff {
         decreaseDuration();
     }
 
-    /**
+    /*
      * Always {@code false}: two DOTs are never "the same buff, re-applied" (see the class Javadoc).
      *
      * @param other the buff being attached

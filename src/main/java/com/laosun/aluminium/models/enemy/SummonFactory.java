@@ -275,7 +275,7 @@ public final class SummonFactory {
         return panel;
     }
 
-    /**
+    /*
      * Builds a memosprite from an already-loaded spec.
      *
      * <p>Split out so the panel derivation can be exercised on its own - including the ratio-attribute
@@ -368,7 +368,7 @@ public final class SummonFactory {
         return summon;
     }
 
-    /**
+    /*
      * Compiles the spec's {@code attack} block into the skill the memosprite acts with.
      *
      * <p>Note: The spec was validated immediately above, so an unknown element / base / shape cannot reach this

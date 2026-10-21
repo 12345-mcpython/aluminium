@@ -475,7 +475,7 @@ public class EffectSpec {
     @SerializedName("per_stack")
     private String perStack;
 
-    /**
+    /*
      * Which <b>kind</b> of incoming damage this modifier is about, or {@code null} for "all damage".
      *
      * <p>"[酩酊]使目标受到的<b>击破伤害</b>提高 12.00%" (1301 Gallagher's talent) names one of the kinds the engine settles,
@@ -679,7 +679,7 @@ public class EffectSpec {
     @SerializedName("to_max")
     private Boolean toMax;
 
-    /**
+    /*
      * For {@code RAISE_RESOURCE_CAP}: widen the resource's OVERFLOW to <b>no limit at all</b>, instead of by a count.
      *
      * <p>Reader: 1408 Phainon (白厄)'s Eidolon 6 - 「【火种】的可溢出点数<b>不再拥有上限</b>」. The declaration states one
@@ -910,7 +910,7 @@ public class EffectSpec {
     @SerializedName("damage_param")
     private Integer damageParam;
 
-    /**
+    /*
      * The share itself, read from the parameter table of the skill that produced the event (zero-based index into its row), at the
      * caster's CURRENT level -- "等同于德谬歌生命上限的 <b>#1%</b>", where #1 runs with the level. Exactly one of this and
      * {@code percent} may be stated. Note: It exists because some sentences multiply a skill parameter BY an attribute
@@ -1052,7 +1052,7 @@ public class EffectSpec {
     @SerializedName("per_target")
     private Boolean perTarget;
 
-    /**
+    /*
      * How many times this effect settles, <b>each time re-resolving its targets</b> -- "额外造成 N 次伤害，
      * 每次对随机敌方单体", which nine shipped clauses are registered on (1009, 1214, 1302, 1312, 1513, 1505,
      * 1510, 8005, 1221). Only {@code DAMAGE} reads it.
@@ -1062,7 +1062,7 @@ public class EffectSpec {
      * its own target. Stating both would have two readings, so the pair is refused at load time -- the same
      * house rule that refuses {@code scale} next to {@code per_target}.
      */
-    /**
+    /*
      * How many times the effect repeats, read from the triggering EVENT instead of a constant;
      * the only value today is {@code "event_amount"} ("每消耗 1 点…额外 1 次"). {@code null} = use {@code times}.
      */
