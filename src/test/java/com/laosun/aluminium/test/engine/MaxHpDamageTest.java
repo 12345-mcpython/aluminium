@@ -136,7 +136,7 @@ public class MaxHpDamageTest {
                 "an unreadable scale must be loud, not a silent zero (and loud at load time)");
     }
 
-    /**
+    /*
      * Runs one basic attack, optionally replacing the file's table with a single reference rule.
      *
      * <p>Built at Eidolon 6 because that is where the content rule lives: 「施放普攻时，额外造成等同于娜塔莎生命

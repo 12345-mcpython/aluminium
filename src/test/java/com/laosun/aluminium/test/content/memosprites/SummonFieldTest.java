@@ -107,7 +107,7 @@ public class SummonFieldTest {
         Fixture f = fixture();
         Summon second = SummonFactory.memosprite(f.owner);
         second.setMaster(f.owner);
-        f.battle.allies.add(second);
+        f.battle.addCombatant(second);
 
         Assertions.assertEquals(2, f.battle.summonCountOf(f.owner),
                 "a query that stopped at the first match would silently cap this at one");

@@ -254,7 +254,7 @@ public class MemospriteTest {
                 new MemospriteSpec.Panel("HEALTH", null, 1_000.0),
                 new MemospriteSpec.Panel("SPEED", null, 100.0))));
         plain.setMaster(aglaea);
-        battle.allies.add(plain);
+        battle.addCombatant(plain);
 
         Assertions.assertEquals(100, battle.aggroOf(plain), EPS);
     }

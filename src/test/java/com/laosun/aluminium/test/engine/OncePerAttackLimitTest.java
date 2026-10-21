@@ -97,7 +97,7 @@ public class OncePerAttackLimitTest {
         Assertions.assertEquals(3, after, "the counter is per attack, so the next attack gets three more");
     }
 
-    /** perAttackThree is named so the reason this file exists stays visible when it fails. */
+    /* perAttackThree is named so the reason this file exists stays visible when it fails. */
     /**
      * The contrast that proves the field is not `per_turn`: two attacks in ONE turn.
      */
