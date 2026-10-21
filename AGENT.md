@@ -715,7 +715,15 @@ if (isSelected) buffer.setStyle(rowArea, highlightStyle);
 
 | 任务 | 现状 | 验收 |
 |---|---|---|
-| **7.1** 战斗拆分（组装 / 主战斗 / 引擎原语） | **量过了**，第一小刀已落地 ✓（`Battle` 拆出 `BattleDamage` ✓、`TriggerTable` 拆出 `TriggerConditionParser` ✓） | ★`BattleEventRoutingTest` 三条 ✓（当事方 + 全队各一次 ✓ / 兼任两角色**只收一次** ✓ / …） |
+| **7.1** 战斗拆分（组装 / 主战斗 / 引擎原语） | 第一小刀已落地 ✓（`Battle` 拆出 `BattleDamage` ✓、`TriggerTable` 拆出 `TriggerConditionParser` ✓）；第二小刀已落地 ✓：回合生命周期收进 `TurnLoop`（`stepForward → beforeMove → action → afterMove`），`BattleDriver.step` 与 demo 的 `step` 都走它；第三小刀已落地 ✓：构造器复制 `characters`，`addRequestItems` 私有（入口 `addCombatant` / `pendingCombatants`），`startBattle` 二次调用报错，`skillPointPolicy` 私有 + setter 重接线，各类 observer 可退订，`BattleDriver.run` 只在未开战时启动；类型化载荷入口已收口 ✓：`TriggerPayload` + `Battle.fire(...)`，生产代码里的 `fireTriggers` 调用点已全部改为类型化入口——cast 五事件、damage family（`DEALING_DAMAGE` / `DAMAGE_SETTLED` / `DEATH`）、subject family（`KILL` / `BREAK` / `CRIT_DEALT`）、ally-only subject（`TAKING_HIT` / `HP_LOST` / `LETHAL_DAMAGE` / `HEALED` / `SHIELD_GRANTED` / `ENERGY_GAINED` / `COUNTDOWN_TURN`）、`DEBUFF_APPLIED`、`STATE_ENDED`、`RESOURCE_CHANGED`、`ATTACK_FINISHED` 与 simple family（战斗 / 回合 / 波次 / 召唤 / 技能点）；引擎已不再打印（`print*` 从 `Battle` / `Queue` 删除），`TestBuff*` / `TestSkillGroup1` 已移入 test source，`Main` / `Benchmark` / `compare/*` 已拆到 `src/demo` / `src/tools`（`run` 与 `test` 的 classpath 已接，引擎 jar 不含它们）；`GameData` 已抽出（表格加载/冻结在对象里，`Constant` 只是 `DEFAULT` 的门面，`GameData.load()` 可独立加载），`EnemyFactory` 已有 `create/resolve(GameData, ...)` 重载，`SummonFactory` 也有 `create(GameData, ...)`，`StageFactory` / `WaveManager` 也接受 `GameData`（队伍与波次都读它），`CharacterFactory` 的完整入口也接受 `GameData`（角色基础行、行迹表、技能表、触发表都读它），`Battle` 也接受 `GameData`（技能/召唤读它，默认仍走 `DEFAULT`）；`TriggerContext` 里无人读取的 `stateName` 字段与 `withStateName` 已删。⚠ 仍开：`characters` / `allies` / `enemies` 仍是 public（读取面大），部分测试仍直接 `allies.add`；`Battle` 的四个原语仍是 public（TUI 还在直接调，未迁）；旧 `fireTriggers` 重载只剩适配器与测试，`TriggerContext` 仍是宽 record | ★`BattleEventRoutingTest` 三条 ✓ / ★`TurnLoopTest`（边界顺序、DOT 击杀后仍收尾、policy 驱动路径）/ ★`BattleLifecycleTest`（二次开场被拒、名单复制、`addCombatant` 入场、policy 重接线、observer 退订）/ ★`TriggerPayloadTest`（cast 的 category / hit count / slot；damage / break / kill 的 cast category；ally 阵营过滤与 debuff 主语；治疗 / 护盾 / 回能；state / resource 名字；simple 事件） |
+
+#### 引擎结构任务（7.1 的后续，按顺序）
+
+1. **`TurnLoop`** ✓ 已落地：四个边界与 broken/control 门只写一次；`BattleDriver` 只留 `run`/终止/监听接线，`Main` 的 demo 只提供 action。
+2. **名单/生成/生命周期收口** 🚧 部分：`characters` 构造时复制且 `characters`/`allies`/`enemies` 为 final；`addRequestItems` 私有，入口 `addCombatant` / 只读 `pendingCombatants`；`startBattle` 二次调用报错；`skillPointPolicy` 私有 + `setSkillPointPolicy` 重接线；各类 observer 都有 `remove*`；`BattleDriver.run` 只在 `NOT_STARTED` 时启动。⚠ 仍开：三个名单本身仍 public（读取面大，测试仍有直接 `allies.add`），要彻底收口需先给读取方只读视图。
+3. **类型化事件载荷** ✅ 入口：`TriggerPayload` + `Battle.fire(...)` 已覆盖全部生产调用点（cast / damage / subject / ally-only / state / resource / simple；`ATTACK_FINISHED` 用 cast 形状），旧 `fireTriggers` 重载只剩适配器与测试；`TriggerContext` 的 `stateName` 死字段与 `withStateName` 已删。⚠ 下一步：把 `TriggerContext` 其余字段按事件收窄并删除旧重载；在那之前它仍是宽 record，类型化只保证入口不串位。
+4. **拆 `Battle`** ✗：按 Turn / Cast / Resource / Summon / Wave / TriggerBus 抽服务，`Battle` 退化为门面；`CanHit` 的组合化放到最后（改动面最大）。
+5. **demo/tools 移出 `src/main/java`、`GameData` 注入** 🚧 部分：`Main` / `Benchmark` / `compare/*` 已拆到 `src/demo` / `src/tools`，`run` 与 `test` 的 classpath 已接；`Battle.printHp` / `Battle.printBattle` / `Queue.printActionQueue` 已删（demo 自己打印），`TestBuff*` / `TestSkillGroup1` 已移入 test source；引擎 jar 不再含这些类；`GameData` 已抽出（加载/冻结在对象里，`Constant` 只是 `DEFAULT` 门面，`GameData.load()` 可独立加载）。`EnemyFactory` / `SummonFactory` / `StageFactory` / `WaveManager` / `CharacterFactory` / `Battle` 已接受 `GameData`，行迹表、技能表、触发表可分别由 `GameData.withSkillTraces(...)` / `GameData.withSkills(...)` / `GameData.withTriggerTables(...)` 提供；⚠ 仍开：`Battle` 的数值常量仍读 `Constant`，遗物/光锥的触发表仍走静态入口。
 
 ### 4.3 登记（**缺能力时来这里，不要近似**）
 
@@ -1288,6 +1296,11 @@ C 层全是**填口子** ✓，依赖已完成的机制，**不该出现新架�
 | **规则对象的键必须是 Gson 认得的**（写错的键会让规则以 "Unknown trigger event 'null'" 到场 ✓） | `RuleKeyGuardTest` |
 | **`scope_element` 的两处拒绝**（元素是封闭集 ✓ / 只许出现在收它的 op 上 ✓） | `ScopeElementGuardTest` |
 | **`DEALING_DAMAGE` 的规则不许够到队友的伤害**（缺 `actor == self` 会把句子悄悄扩到全队 ✓；量法是「队里有他 / 没他」两场的队友伤害必须一样 ✓） | `SelfScopedDamageGuardTest` |
+| **回合生命周期 / 名单入口 / 生命周期守卫**（四边界顺序、DOT 击杀后仍收尾、二次开场被拒、名单复制、`addCombatant` 入场、policy 重接线、observer 退订） | `TurnLoopTest` / `BattleLifecycleTest` |
+| **类型化载荷**（cast 的 category / hit count / slot 各由不同事件观测；damage / break / kill 的 cast category；ally 阵营过滤与 debuff 主语；治疗 / 护盾 / 回能；state / resource 名字；simple 事件） | `TriggerPayloadTest` |
+| **引擎不打印 / 不含 demo**（`Battle` / `Queue` 不得再暴露 `print*` 方法；验收命令另看 jar 条目） | `EngineApiSurfaceTest` |
+| **数据表可由对象独立加载**（第二次 `GameData.load()` 与 `Constant` 同内容、不同容器、冻结） | `GameDataTest` |
+| **工厂/战斗读传入的 `GameData`**（空怪物表必须报 Unknown monster，不许回落到 `Constant`；波次路径同；空角色表必须报 CharacterNotFound；空行迹表必须真的少掉行迹加成；空技能表必须留下未加载的占位；空触发表必须真的没有规则；战斗开场附带的技能槽也读传入表） | `EnemyFactoryDataTest` / `SummonFactoryDataTest` / `StageFactoryDataTest` / `CharacterFactoryDataTest` / `SkillTraceDataTest` / `SkillDataTest` / `TriggerTableDataTest` / `BattleDataTest` |
 | **台账不写"现在是什么"的数字**（套件 / 用例 / 文件 / 方法 / 类 / 规则数、`file:line`、大小、提交数、「N 处」） | `LedgerNumberGuardTest` |
 
 ### 7.2 **只靠散文**（所以上面必须写完整）
