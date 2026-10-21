@@ -13,8 +13,13 @@ import com.laosun.aluminium.beans.Skill;
 import com.laosun.aluminium.beans.SkillTraceData;
 import com.laosun.aluminium.beans.WeaponData;
 import com.laosun.aluminium.data.RelicSets;
+import com.laosun.aluminium.data.RelicTriggerTables;
 import com.laosun.aluminium.data.TriggerTables;
+import com.laosun.aluminium.data.WeaponTriggerTables;
+import com.laosun.aluminium.models.trigger.RelicTriggerTableProvider;
+import com.laosun.aluminium.models.trigger.TriggerTable;
 import com.laosun.aluminium.models.trigger.TriggerTableProvider;
+import com.laosun.aluminium.models.trigger.WeaponTriggerTableProvider;
 import com.laosun.aluminium.utils.JSONReader;
 import com.laosun.aluminium.utils.MapUtils;
 
@@ -57,6 +62,8 @@ public final class GameData {
     private final Map<Integer, Double> breakingRate;
     private final Map<Integer, EnemySkillData> enemySkills;
     private final TriggerTableProvider triggerTables;
+    private final RelicTriggerTableProvider relicTriggerTables;
+    private final WeaponTriggerTableProvider weaponTriggerTables;
 
     /**
      * Loads every table from the classpath.
@@ -99,6 +106,10 @@ public final class GameData {
         EnemySkillsFile enemySkillsFile = JSONReader.fromJSON("enemy_skills.json", EnemySkillsFile.class);
         enemySkills = Map.copyOf(enemySkillsFile.skills());
         triggerTables = TriggerTables::of;
+        relicTriggerTables = (setId, wornPieces) -> RelicTriggerTables.of(setId).at(wornPieces);
+        weaponTriggerTables = (weaponId, rank) -> WeaponTriggerTables.has(weaponId)
+                ? WeaponTriggerTables.of(weaponId, rank)
+                : TriggerTable.EMPTY;
     }
 
     /**
@@ -111,7 +122,7 @@ public final class GameData {
      */
     public static GameData withMonsterConfigs(Map<Integer, MonsterConfig> monsterConfigs) {
         return new GameData(DEFAULT, null, java.util.Objects.requireNonNull(monsterConfigs, "monsterConfigs"),
-                null, null, null);
+                null, null, null, null, null);
     }
 
     /**
@@ -123,7 +134,7 @@ public final class GameData {
      */
     public static GameData withCharacters(Map<Integer, CharacterData> characters) {
         return new GameData(DEFAULT, java.util.Objects.requireNonNull(characters, "characters"), null, null,
-                null, null);
+                null, null, null, null);
     }
 
     /**
@@ -135,7 +146,7 @@ public final class GameData {
      */
     public static GameData withSkillTraces(Map<Integer, List<SkillTraceData>> skillTraces) {
         return new GameData(DEFAULT, null, null,
-                java.util.Objects.requireNonNull(skillTraces, "skillTraces"), null, null);
+                java.util.Objects.requireNonNull(skillTraces, "skillTraces"), null, null, null, null);
     }
 
     /**
@@ -147,7 +158,7 @@ public final class GameData {
      */
     public static GameData withSkills(Map<Integer, Map<Integer, Skill>> skills) {
         return new GameData(DEFAULT, null, null, null,
-                java.util.Objects.requireNonNull(skills, "skills"), null);
+                java.util.Objects.requireNonNull(skills, "skills"), null, null, null);
     }
 
     /**
@@ -159,22 +170,50 @@ public final class GameData {
      */
     public static GameData withTriggerTables(TriggerTableProvider triggerTables) {
         return new GameData(DEFAULT, null, null, null, null,
-                java.util.Objects.requireNonNull(triggerTables, "triggerTables"));
+                java.util.Objects.requireNonNull(triggerTables, "triggerTables"), null, null);
     }
 
     /**
-     * @param base           the tables to copy
-     * @param characters     the replacement character rows, or {@code null} to keep {@code base}'s
-     * @param monsterConfigs the replacement monster rows, or {@code null} to keep {@code base}'s
-     * @param skillTraces    the replacement trace rows, or {@code null} to keep {@code base}'s
-     * @param skills         the replacement skill rows, or {@code null} to keep {@code base}'s
-     * @param triggerTables  the replacement trigger provider, or {@code null} to keep {@code base}'s
+     * A copy of {@link #DEFAULT} with the relic-rule provider replaced.
+     *
+     * @param relicTriggerTables the replacement provider
+     * @return the copy
+     * @throws NullPointerException when {@code relicTriggerTables} is {@code null}
+     */
+    public static GameData withRelicTriggerTables(RelicTriggerTableProvider relicTriggerTables) {
+        return new GameData(DEFAULT, null, null, null, null, null,
+                java.util.Objects.requireNonNull(relicTriggerTables, "relicTriggerTables"), null);
+    }
+
+    /**
+     * A copy of {@link #DEFAULT} with the light-cone-rule provider replaced.
+     *
+     * @param weaponTriggerTables the replacement provider
+     * @return the copy
+     * @throws NullPointerException when {@code weaponTriggerTables} is {@code null}
+     */
+    public static GameData withWeaponTriggerTables(WeaponTriggerTableProvider weaponTriggerTables) {
+        return new GameData(DEFAULT, null, null, null, null, null, null,
+                java.util.Objects.requireNonNull(weaponTriggerTables, "weaponTriggerTables"));
+    }
+
+    /**
+     * @param base                the tables to copy
+     * @param characters          the replacement character rows, or {@code null} to keep {@code base}'s
+     * @param monsterConfigs      the replacement monster rows, or {@code null} to keep {@code base}'s
+     * @param skillTraces         the replacement trace rows, or {@code null} to keep {@code base}'s
+     * @param skills              the replacement skill rows, or {@code null} to keep {@code base}'s
+     * @param triggerTables       the replacement trigger provider, or {@code null} to keep {@code base}'s
+     * @param relicTriggerTables  the replacement relic provider, or {@code null} to keep {@code base}'s
+     * @param weaponTriggerTables the replacement light-cone provider, or {@code null} to keep {@code base}'s
      */
     private GameData(GameData base, Map<Integer, CharacterData> characters,
                      Map<Integer, MonsterConfig> monsterConfigs,
                      Map<Integer, List<SkillTraceData>> skillTraces,
                      Map<Integer, Map<Integer, Skill>> skills,
-                     TriggerTableProvider triggerTables) {
+                     TriggerTableProvider triggerTables,
+                     RelicTriggerTableProvider relicTriggerTables,
+                     WeaponTriggerTableProvider weaponTriggerTables) {
         elationBasicLevelDamage = base.elationBasicLevelDamage;
         relicMainAttributes = base.relicMainAttributes;
         relicSubAttributes = base.relicSubAttributes;
@@ -189,6 +228,9 @@ public final class GameData {
         breakingRate = base.breakingRate;
         enemySkills = base.enemySkills;
         this.triggerTables = triggerTables == null ? base.triggerTables : triggerTables;
+        this.relicTriggerTables = relicTriggerTables == null ? base.relicTriggerTables : relicTriggerTables;
+        this.weaponTriggerTables = weaponTriggerTables == null
+                ? base.weaponTriggerTables : weaponTriggerTables;
     }
 
     /**
@@ -296,6 +338,20 @@ public final class GameData {
      */
     public TriggerTableProvider triggerTables() {
         return triggerTables;
+    }
+
+    /**
+     * @return the relic-rule provider
+     */
+    public RelicTriggerTableProvider relicTriggerTables() {
+        return relicTriggerTables;
+    }
+
+    /**
+     * @return the light-cone-rule provider
+     */
+    public WeaponTriggerTableProvider weaponTriggerTables() {
+        return weaponTriggerTables;
     }
 
     /**
