@@ -48,6 +48,42 @@ dependencies {
     implementation 'org.apache.logging.log4j:log4j-slf4j-impl:2.19.0'
 }
 
+// The engine is the `main` source set; the demo and the diagnostic tools are consumers of it,
+// not part of its artifact. Keeping them out of `src/main/java` is what stops `Main`, the capture
+// comparators and the benchmark from being compiled into the engine jar.
+sourceSets {
+    tools {
+        java.srcDir 'src/tools/java'
+        compileClasspath += sourceSets.main.output
+        runtimeClasspath += sourceSets.main.output
+    }
+    demo {
+        java.srcDir 'src/demo/java'
+        compileClasspath += sourceSets.main.output + sourceSets.tools.output
+        runtimeClasspath += sourceSets.main.output + sourceSets.tools.output
+    }
+}
+
+configurations {
+    demoImplementation.extendsFrom implementation
+    demoCompileOnly.extendsFrom compileOnly
+    demoAnnotationProcessor.extendsFrom annotationProcessor
+    demoRuntimeOnly.extendsFrom runtimeOnly
+    toolsImplementation.extendsFrom implementation
+    toolsCompileOnly.extendsFrom compileOnly
+    toolsAnnotationProcessor.extendsFrom annotationProcessor
+    toolsRuntimeOnly.extendsFrom runtimeOnly
+}
+
+// `Main` is the application entry point, but it lives in the demo source set now. `gradlew run`,
+// its five modes and the TUI's jar all keep working; the engine jar does not carry it.
+tasks.named('run') {
+    classpath = sourceSets.demo.runtimeClasspath
+}
+
+sourceSets.test.compileClasspath += sourceSets.demo.output + sourceSets.tools.output
+sourceSets.test.runtimeClasspath += sourceSets.demo.output + sourceSets.tools.output
+
 test {
     useJUnitPlatform()
     // AGENT.md is read by LedgerNumberGuardTest (§2.4). Without declaring it as an input, editing the ledger alone

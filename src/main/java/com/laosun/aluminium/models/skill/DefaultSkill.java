@@ -5,6 +5,7 @@ import com.laosun.aluminium.data.SkillData;
 import com.laosun.aluminium.models.CanHit;
 
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -29,13 +30,30 @@ public class DefaultSkill extends Skill {
     private final int cid;
     private final int skillId;
     private final int level;
+    /**
+     * A skill table supplied by the caller; {@code null} = the static {@code Constant.SKILLS}.
+     */
+    private final Map<Integer, Map<Integer, com.laosun.aluminium.beans.Skill>> skills;
+    private volatile SkillData dataFromTable;
 
     private static final ConcurrentMap<String, SkillData> DATA_CACHE = new ConcurrentHashMap<>();
 
     public DefaultSkill(int cid, int skillId, int level) {
+        this(cid, skillId, level, null);
+    }
+
+    /**
+     * @param cid     character id
+     * @param skillId skill slot id
+     * @param level   skill level
+     * @param skills  the skill table, or {@code null} for the static default
+     */
+    public DefaultSkill(int cid, int skillId, int level,
+                        Map<Integer, Map<Integer, com.laosun.aluminium.beans.Skill>> skills) {
         this.cid = cid;
         this.skillId = skillId;
         this.level = level;
+        this.skills = skills;
     }
 
     @Override
@@ -58,6 +76,14 @@ public class DefaultSkill extends Skill {
 
     @Override
     public SkillData getData() {
+        if (skills != null) {
+            SkillData resolved = dataFromTable;
+            if (resolved == null) {
+                resolved = SkillData.init(skills, cid, skillId);
+                dataFromTable = resolved;
+            }
+            return resolved;
+        }
         String key = cid + "_" + skillId;
         return DATA_CACHE.computeIfAbsent(key, k -> SkillData.init(cid, skillId));
     }

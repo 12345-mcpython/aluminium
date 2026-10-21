@@ -1,8 +1,10 @@
 package com.laosun.aluminium.models;
 
 import com.laosun.aluminium.Battle;
+import com.laosun.aluminium.GameData;
 import com.laosun.aluminium.beans.StageBean;
 import com.laosun.aluminium.enums.TriggerEvent;
+import com.laosun.aluminium.models.trigger.TriggerPayload;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.models.enemy.EnemyFactory;
 import lombok.Getter;
@@ -38,6 +40,7 @@ import java.util.List;
 public class WaveManager {
     private final Battle battle;
     private final StageBean stage;
+    private final GameData data;
     /**
      * Which wave has been entered already (starting from 0). {@code -1} = not even one wave
      * has been entered.
@@ -51,6 +54,15 @@ public class WaveManager {
      * @param stage  the stage data
      */
     public WaveManager(Battle battle, StageBean stage) {
+        this(battle, stage, GameData.DEFAULT);
+    }
+
+    /**
+     * @param battle the target battle (it registers itself with {@link Battle#setWaveManager})
+     * @param stage  the stage data
+     * @param data   the data pack the spawned monsters are read from
+     */
+    public WaveManager(Battle battle, StageBean stage, GameData data) {
         if (battle == null) {
             throw new IllegalArgumentException("battle must not be null");
         }
@@ -59,6 +71,7 @@ public class WaveManager {
         }
         this.battle = battle;
         this.stage = stage;
+        this.data = java.util.Objects.requireNonNull(data, "data");
         battle.setWaveManager(this);
     }
 
@@ -66,7 +79,7 @@ public class WaveManager {
      * Enter the next wave: create this wave's monsters, add them to {@code battle.enemies},
      * and queue them for entry.
      *
-     * <p>Entry goes through {@code Battle.addRequestItems} ({@code processAddRequests} of
+     * <p>Entry goes through {@link Battle#addCombatant} ({@code processAddRequests} of
      * {@code processRequests()} pushes it into the action bar), so the monsters start running
      * from the current action value and do not go back to 0 to restart a round - which is
      * exactly how waves should behave.
@@ -85,7 +98,7 @@ public class WaveManager {
         // and no subject, exactly like BATTLE_START -- a wave is a fact about the battle, not about one unit. Before
         // checkResult on purpose: the wave's own rules must see a battle that is still running.
         battle.beginWave();
-        battle.fireTriggers(TriggerEvent.WAVE_START);
+        battle.fire(TriggerPayload.Simple.of(TriggerEvent.WAVE_START));
         // A new wave came in to judge again (the checkResult before spawning may have
         // decided nothing)
         battle.checkResult();
@@ -141,10 +154,9 @@ public class WaveManager {
 
     private void spawnWave(int index) {
         for (int monsterId : stage.monsterIds(index)) {
-            Enemy enemy = EnemyFactory.create(monsterId, stage.level(), stage.hardLevelGroup());
+            Enemy enemy = EnemyFactory.create(data, monsterId, stage.level(), stage.hardLevelGroup());
             battle.noteWaveMonster(enemy);
-            battle.enemies.add(enemy);
-            battle.addRequestItems.add(enemy);           // processRequests pushes it into the action bar
+            battle.addCombatant(enemy);                  // camp + pending entry; processRequests schedules it
         }
     }
 }

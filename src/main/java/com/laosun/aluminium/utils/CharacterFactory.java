@@ -1,6 +1,7 @@
 package com.laosun.aluminium.utils;
 
 import com.laosun.aluminium.Constant;
+import com.laosun.aluminium.GameData;
 import com.laosun.aluminium.beans.CharacterData;
 import com.laosun.aluminium.beans.ResourceSpec;
 import com.laosun.aluminium.data.Memosprites;
@@ -150,6 +151,23 @@ public final class CharacterFactory {
     }
 
     /**
+     * The same, reading the character row from a chosen data pack.
+     *
+     * @param data      the data pack
+     * @param cid       character id
+     * @param level     level (1-80)
+     * @param promoted  whether the character is promoted
+     * @param weapon    the light cone, or {@code null}
+     * @param relicSuit the relic suit, or {@code null}
+     * @return the character
+     * @throws CharacterException if the character does not exist
+     */
+    public static Character create(GameData data, int cid, int level, boolean promoted, Weapon weapon,
+                                   RelicSuit relicSuit) {
+        return create(data, cid, level, promoted, weapon, relicSuit, 0);
+    }
+
+    /**
      * The full entry point: the same character, with a number of active Eidolon ranks (星魂).
      *
      * <p><b>Why the rank is a parameter here rather than a lookup.</b> This method is the assembly point - the
@@ -163,12 +181,29 @@ public final class CharacterFactory {
      */
     public static Character create(int cid, int level, boolean promoted, Weapon weapon, RelicSuit relicSuit,
                                    int eidolonRank) {
+        return create(GameData.DEFAULT, cid, level, promoted, weapon, relicSuit, eidolonRank);
+    }
+
+    /**
+     * The same, reading the character's base row from a chosen data pack.
+     *
+     * <p>The pack currently supplies the character row; skills and traces still resolve through the
+     * static tables (their data seam is a later cut).
+     *
+     * @param data the data pack
+     * @return the character
+     */
+    public static Character create(GameData data, int cid, int level, boolean promoted, Weapon weapon,
+                                   RelicSuit relicSuit, int eidolonRank) {
         if (eidolonRank < 0 || eidolonRank > Constant.EIDOLON_MAX_RANK) {
             throw new IllegalArgumentException(
                     "eidolonRank must be 0-" + Constant.EIDOLON_MAX_RANK + " (0 = no Eidolons), got "
                             + eidolonRank);
         }
-        Character.Builder builder = Character.builder().cid(cid).level(level).eidolonRank(eidolonRank);
+        Character.Builder builder = Character.builder().cid(cid).level(level).eidolonRank(eidolonRank)
+                .characterDataProvider(data.characters()::get)
+                .skillTraces(data.skillTraces())
+                .skills(data.skills());
         if (promoted) {
             builder = builder.isPromote();
         }
@@ -182,7 +217,7 @@ public final class CharacterFactory {
         // one place allowed to go from "which character" to "which rules". Characters with no
         // file get the empty table, which is the normal state for the ones not data-ised yet.
         // Worn relic sets contribute their own rules on top (see `effectiveTriggerTable`).
-        TriggerTable table = effectiveTriggerTable(cid, relicSuit);
+        TriggerTable table = effectiveTriggerTable(data, cid, relicSuit);
         // A light cone's own abilities are rules of the same kind (see WeaponTriggerTables), so they merge here, at the
         // same assembly point as a relic set's -- one line, because the create method already receives the Weapon.
         if (weapon != null && WeaponTriggerTables.has(weapon.getWid())) {
@@ -232,12 +267,13 @@ public final class CharacterFactory {
      *       team's build, so no existing battle changes behaviour).</li>
      * </ul>
      *
+     * @param data      the data pack
      * @param cid       the character id
      * @param relicSuit the worn suit, or {@code null}
      * @return the effective table; never {@code null}
      */
-    private static TriggerTable effectiveTriggerTable(int cid, RelicSuit relicSuit) {
-        TriggerTable table = TriggerTables.of(cid);
+    private static TriggerTable effectiveTriggerTable(GameData data, int cid, RelicSuit relicSuit) {
+        TriggerTable table = data.triggerTables().of(cid);
         if (relicSuit != null) {
             for (Int2IntMap.Entry worn : relicSuit.piecesPerSet().int2IntEntrySet()) {
                 table = table.plus(RelicTriggerTables.of(worn.getIntKey()).at(worn.getIntValue()));
@@ -356,7 +392,18 @@ public final class CharacterFactory {
      * {@link CharacterException}.
      */
     public static boolean exists(int cid) {
-        return Constant.CHARACTERS.containsKey(cid);
+        return exists(GameData.DEFAULT, cid);
+    }
+
+    /**
+     * Whether the character exists in a chosen data pack.
+     *
+     * @param data the data pack
+     * @param cid  the character id
+     * @return whether the id is present
+     */
+    public static boolean exists(GameData data, int cid) {
+        return data.characters().containsKey(cid);
     }
 
     /**
@@ -367,11 +414,23 @@ public final class CharacterFactory {
      * @throws CharacterException if the character does not exist
      */
     public static CharacterData data(int cid) {
-        CharacterData data = Constant.CHARACTERS.get(cid);
-        if (data == null) {
+        return data(GameData.DEFAULT, cid);
+    }
+
+    /**
+     * Get the raw character row from a chosen data pack.
+     *
+     * @param data the data pack
+     * @param cid  the character id
+     * @return the data row
+     * @throws CharacterException if the character does not exist
+     */
+    public static CharacterData data(GameData data, int cid) {
+        CharacterData row = data.characters().get(cid);
+        if (row == null) {
             throw new CharacterException.CharacterNotFoundException(
                     String.format("Character '%s' not found", cid));
         }
-        return data;
+        return row;
     }
 }

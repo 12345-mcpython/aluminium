@@ -3,11 +3,9 @@ package com.laosun.aluminium;
 import com.google.gson.reflect.TypeToken;
 import com.laosun.aluminium.beans.*;
 import com.laosun.aluminium.beans.CharacterData;
-import com.laosun.aluminium.data.RelicSets;
 import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.DamageElement;
 import com.laosun.aluminium.enums.SkillType;
-import com.laosun.aluminium.utils.MapUtils;
 import com.laosun.aluminium.utils.JSONReader;
 
 import java.util.*;
@@ -73,7 +71,7 @@ public final class Constant {
     public static final Map<Integer, MonsterTemplate> MONSTER_TEMPLATES;
     /**
      * Monster instance data ({@code monster_config.json}): monster_id to instance ratios / weakness / resistance.
-     * Missing ratios are already filled in at load time by {@link #normalizeMonsterConfigs}, so downstream code
+     * Missing ratios are already filled in at load time by {@link GameData}, so downstream code
      * is guaranteed to get non-null values.
      */
     public static final Map<Integer, MonsterConfig> MONSTER_CONFIGS;
@@ -651,159 +649,19 @@ public final class Constant {
     public static final Map<Integer, Double> ELATION_BASIC_LEVEL_DAMAGE;
 
     static {
-        ELATION_BASIC_LEVEL_DAMAGE = frozen(JSONReader.fromJSON("elation_basic_level_damage.json",
-                new TypeToken<Map<Integer, Double>>() {
-                }.getType()));
-        RELIC_MAIN_ATTRIBUTES = JSONReader.fromJSON("main_attribute.json", RelicMainAttribute.class);
-        RELIC_SUB_ATTRIBUTES = JSONReader.fromJSON("sub_attribute.json", RelicSubAttribute.class);
-        // Relic set bonuses come from a file whose top level is a map (so not JSONReader), and are
-        // leniently loaded (a missing file is an empty table) because the relic affix tables above are
-        // already enough to run a battle -- only the set bonuses would be missing.
-        // Already immutable: RelicSets.index ends in Map.copyOf, and RelicSetTest pins the identity of
-        // this table ("read once and cached"), so wrapping it here would both be redundant and break that.
-        RELIC_SETS = RelicSets.table();
-        // Note: Every table below is `frozen(...)`. `public static final` locks the reference, not the
-        // contents, and Gson hands back mutable LinkedHashMaps whose nesting is mutable too
-        // (`SKILLS.get(cid)` is another map, `SKILL_TRACES.get(cid)` a list). One `clear()` or `put()` from
-        // any caller -- a test, a future UI, a plugin -- would have silently changed what every later
-        // consumer in the same JVM sees. The tables NOT wrapped here were already immutable at load:
-        // RELIC_SETS (RelicSets.index ends in Map.copyOf), MONSTER_CONFIGS (normalizeMonsterConfigs ends in
-        // Map.copyOf) and ENEMY_SKILLS (Map.copyOf).
-        WEAPONS = frozen(JSONReader.fromJSON("weapons.json", new TypeToken<Map<Integer, WeaponData>>() {
-        }.getType()));
-        CHARACTERS = frozen(JSONReader.fromJSON("character_data.json", new TypeToken<Map<Integer, CharacterData>>() {
-        }.getType()));
-        SKILL_TRACES = frozen(JSONReader.fromJSON("skill_traces.json", new TypeToken<Map<Integer, List<SkillTraceData>>>() {
-        }.getType()));
-        SKILLS = frozen(JSONReader.fromJSON("skills.json", new TypeToken<Map<Integer, Map<Integer, Skill>>>() {
-        }.getType()));
-        MONSTER_TEMPLATES = frozen(JSONReader.fromJSON("monster_template_config.json",
-                new TypeToken<Map<Integer, MonsterTemplate>>() {
-                }.getType()));
-        HARD_LEVEL_GROUPS = frozen(JSONReader.fromJSON("hard_level_group.json",
-                new TypeToken<Map<Integer, Map<Integer, HardLevelGroup>>>() {
-                }.getType()));
-        MONSTER_CONFIGS = normalizeMonsterConfigs(
-                JSONReader.fromJSON("monster_config.json", new TypeToken<Map<Integer, MonsterConfig>>() {
-                }.getType()),
-                JSONReader.fromJSON("monster_attack_modify_ratio.json", new TypeToken<Map<Integer, Double>>() {
-                }.getType()));
-        BREAKING_RATE = frozen(JSONReader.fromJSON("breaking_rate.json", new TypeToken<Map<Integer, Double>>() {
-        }.getType()));
-        // The top level of enemy_skills.json is { "_comment": [...], "skills": {monster id: {...}} };
-        // use an inline record to take only skills (Gson ignores the undeclared _comment).
-        EnemySkillsFile enemySkills = JSONReader.fromJSON("enemy_skills.json", EnemySkillsFile.class);
-        ENEMY_SKILLS = Map.copyOf(enemySkills.skills());
-    }
-
-
-    /**
-     * The top-level structure of {@code enemy_skills.json} (only to skip {@code _comment}).
-     */
-    private record EnemySkillsFile(Map<Integer, EnemySkillData> skills) {
-    }
-
-    /**
-     * Fill in the ratios missing from the instance data so that downstream code (EnemyScaler) always gets a
-     * definite value:
-     * <ul>
-     *   <li><b>Attack modifier</b>: this data set does not export tbgd's {@code AttackModifyRatio}
-     *   (444 of the 2649 monsters are != 1), so it is merged from the patch file
-     *   {@code monster_attack_modify_ratio.json}; anything not in the table is 1.0.</li>
-     *   <li>Other missing ratios are 1.0 (game semantics = no modification).</li>
-     *   <li>{@code stance_weak} missing (102 monster entries do not have this item) to empty list;
-     *   {@code damage_resistance} to empty map.</li>
-     * </ul>
-     */
-    /**
-     * Freezes a loaded table so that no caller can mutate shared engine data.
-     *
-     * <p><b>Why this exists.</b> {@code public static final} locks the <i>reference</i>, not the contents:
-     * every table in the static block is a mutable {@code LinkedHashMap} straight out of Gson, and
-     * the nesting was mutable as well - {@code SKILLS.get(cid)} is another map, {@code SKILL_TRACES.get(cid)}
-     * a list. One {@code Constant.SKILLS.clear()} from anywhere (a test, a future UI, a plugin) would have
-     * silently changed what every later consumer <b>in the same JVM</b> sees, with no compile error and no
-     * failing test.
-     *
-     * <p><b>Scope: containers, not beans.</b> Maps and lists are copied and wrapped; the beans inside are
-     * returned unchanged, because they <i>are</i> the data and nothing mutates them. That is the honest
-     * boundary of this fix - it stops "somebody emptied a table", not "somebody reassigned a field of a
-     * bean". (The two exposed bean-internal maps, {@code RelicMainAttribute.getAttributeByStar} and its
-     * {@code RelicSubAttribute} twin, therefore stay mutable and are still registered as N-11.)
-     *
-     * <p><b>Order is preserved</b>: {@link LinkedHashMap} and {@link ArrayList} rather than
-     * {@code Map.copyOf}/{@code List.copyOf}, whose iteration order is unspecified. Several of these tables
-     * are read in file order.
-     *
-     * <p>Costs one extra container copy per table at startup (the beans are shared, not duplicated), which
-     * is why it is applied at load time rather than by returning a defensive copy on every read.
-     *
-     * @param table a map, a list, or anything else
-     * @param <T>   the declared type of the table
-     * @return an unmodifiable deep copy of the containers, or the value itself when it is not a container
-     */
-    @SuppressWarnings("unchecked")
-    private static <T> T frozen(T table) {
-        if (table instanceof Map<?, ?> map) {
-            Map<Object, Object> copy = new LinkedHashMap<>();
-            map.forEach((key, value) -> copy.put(key, frozen(value)));
-            return (T) Collections.unmodifiableMap(copy);
-        }
-        if (table instanceof List<?> list) {
-            List<Object> copy = new ArrayList<>(list.size());
-            list.forEach(item -> copy.add(frozen(item)));
-            return (T) Collections.unmodifiableList(copy);
-        }
-        return table;
-    }
-
-    private static Map<Integer, MonsterConfig> normalizeMonsterConfigs(Map<Integer, MonsterConfig> raw,
-                                                                       Map<Integer, Double> attackRatios) {
-        Map<Integer, Double> patches = attackRatios == null ? Map.of() : attackRatios;
-        Map<Integer, MonsterConfig> normalized = new LinkedHashMap<>();
-        raw.forEach((id, config) -> normalized.put(id, new MonsterConfig(
-                config.name(),
-                config.templateId(),
-                config.eliteGroup(),
-                config.hardLevelGroup(),
-                config.stanceWeak() == null ? List.of() : List.copyOf(config.stanceWeak()),
-                orOne(config.hpRatio()),
-                patches.getOrDefault(id, orOne(config.attackRatio())),
-                orOne(config.defenceRatio()),
-                orOne(config.speedRatio()),
-                orOne(config.stanceRatio()),
-                config.damageResistance() == null ? Map.of() : MapUtils.orderedMap(config.damageResistance()),
-                config.debuffResistance() == null ? Map.of() : MapUtils.orderedMap(config.debuffResistance()),
-                // The summon roster. `summon_id` is spelled as a list even when a monster has none
-                // (`[]` for 195of them) and occasionally as `[0]` for "none" (one monster, 405301004), so
-                // non-positive entries are dropped here -- once, at load time -- rather than at every read.
-                // Deliberately NOT tolerant of unknown ids as well: a roster entry that names no monster is
-                // a data error, and dropping it would turn a broken summon into an absent one (see
-                // MonsterConfig#summonIds).
-                filterPositive(config.summonIds()))));
-        return MapUtils.orderedMap(normalized);
-    }
-
-    /**
-     * The positive entries of a summon roster, in order; missing field = empty roster.
-     */
-    private static List<Integer> filterPositive(List<Integer> ids) {
-        if (ids == null || ids.isEmpty()) {
-            return List.of();
-        }
-        List<Integer> kept = new ArrayList<>(ids.size());
-        for (Integer id : ids) {
-            if (id != null && id > 0) {
-                kept.add(id);
-            }
-        }
-        return List.copyOf(kept);
-    }
-
-    /**
-     * A missing modifier ratio is 1.0 (no modification).
-     */
-    private static double orOne(Double value) {
-        return value == null ? 1.0 : value;
+        GameData data = GameData.DEFAULT;
+        ELATION_BASIC_LEVEL_DAMAGE = data.elationBasicLevelDamage();
+        RELIC_MAIN_ATTRIBUTES = data.relicMainAttributes();
+        RELIC_SUB_ATTRIBUTES = data.relicSubAttributes();
+        RELIC_SETS = data.relicSets();
+        WEAPONS = data.weapons();
+        CHARACTERS = data.characters();
+        SKILL_TRACES = data.skillTraces();
+        SKILLS = data.skills();
+        MONSTER_TEMPLATES = data.monsterTemplates();
+        HARD_LEVEL_GROUPS = data.hardLevelGroups();
+        MONSTER_CONFIGS = data.monsterConfigs();
+        BREAKING_RATE = data.breakingRate();
+        ENEMY_SKILLS = data.enemySkills();
     }
 }

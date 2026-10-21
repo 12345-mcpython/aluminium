@@ -562,7 +562,7 @@ public final class TriggerInterpreter {
                         } else {
                             en.addWeakness(weakness);
                         }
-                        battle.fireTriggers(TriggerEvent.WEAKNESS_ADDED, ctx.owner(), en, 0, 0);
+                        battle.fire(TriggerPayload.Simple.of(TriggerEvent.WEAKNESS_ADDED, ctx.owner(), en, 0, 0));
                     }
                 }
             }
@@ -620,7 +620,8 @@ public final class TriggerInterpreter {
                         // so this is the only place that can announce it. Fired AFTER the buff is on, so a rule that
                         // answers "when a shield is gained" sees the shield it is reacting to.
                         if (amount > 0) {
-                            battle.fireTriggersForAlly(TriggerEvent.SHIELD_GRANTED, ctx.owner(), target, amount);
+                            battle.fireForAlly(TriggerPayload.AllySubject.of(
+                                    TriggerEvent.SHIELD_GRANTED, ctx.owner(), target, amount));
                         }
                     }
                 }
@@ -683,7 +684,7 @@ public final class TriggerInterpreter {
             case RAISE_RESOURCE_CAP -> raiseResourceCap(effect, ctx);
             // The pool is team-level and its owner is the policy, so this is the one op that goes
             // straight to the policy rather than through a unit's resources.
-            case RAISE_SKILL_POINT_CAP -> battle.skillPointPolicy.raiseMax((int) Math.round(effect.getAmount()));
+            case RAISE_SKILL_POINT_CAP -> battle.getSkillPointPolicy().raiseMax((int) Math.round(effect.getAmount()));
             case GAIN_RESOURCE -> {
                 // ⚠ The store that MOVED, not the rule owner's: an effect may grant to somebody else ("give that ally 2
                 // points"), and `resourceAmount(owner)` measured on a unit that does not carry the counter reads 0 on
@@ -810,7 +811,8 @@ public final class TriggerInterpreter {
                         double spent = spender.consumeHp(grantAmount(effect, spender, ctx));
                         if (spent > 0) {
                             // "take damage <b>or</b> consume HP": the second half gets its own event.
-                            battle.fireTriggers(TriggerEvent.HP_CONSUMED, spender, spender, (int) Math.round(spent), 0);
+                            battle.fire(TriggerPayload.Simple.of(TriggerEvent.HP_CONSUMED, spender, spender,
+                                    (int) Math.round(spent), 0));
                         }
                     }
                 }
@@ -1110,12 +1112,13 @@ public final class TriggerInterpreter {
                 return;
             }
         }
-        // The battle's SKILL POINTS: a counter the battle owns outright (`Battle.skillPointPolicy`), not a `Resource`, so
-        // `partyCounterOrNull` cannot answer with it and this is where a rule reaches it. Reader: 1506 Silver Wolf
+        // The battle's SKILL POINTS: a counter the battle owns outright (`Battle.getSkillPointPolicy()`), not a
+        // `Resource`, so `partyCounterOrNull` cannot answer with it and this is where a rule reaches it. Reader:
+        // 1506 Silver Wolf
         // LV.999's 【头号补给盲盒】 - 「【爆爆爆炸蛋】：恢复 2 个战技点」 - which is one of the three effects that rule picks
         // between. Measured: nothing anywhere gained or spent 战技点 before this, so the name had no readout at all.
         if (SKILL_POINT.equals(effect.getResource()) && ctx.battle() != null) {
-            ctx.battle().skillPointPolicy.gain(amount);
+            ctx.battle().getSkillPointPolicy().gain(amount);
             return;
         }
         // A PARTY-scoped counter has no home on the unit: the battle owns it, so any ally may add to it.
@@ -1839,18 +1842,12 @@ public final class TriggerInterpreter {
         if (battle == null || holder == null) {
             return;
         }
-        // ⚠ The fact is scoped to THIS firing: save and restore, exactly as `Battle.fireStateEnded` does with
-        // `lastStateEndedName`. Without it, a rule delivered for this event that moves ANOTHER resource (ordinary -
-        // 1506's forwarding clause grants 隐藏分 for a 笑点 move) overwrites the name, and the rules that come AFTER it
-        // in the same firing read the wrong one: their `resource_changed:<this one>` condition is false and they
-        // silently do not fire. The outer event's rules are about the outer event's resource.
-        String previous = battle.lastChangedResource();
-        battle.noteChangedResource(resource);
-        try {
-            battle.fireTriggers(TriggerEvent.RESOURCE_CHANGED, holder, holder, 0, delta);
-        } finally {
-            battle.noteChangedResource(previous);
-        }
+        // ⚠ The fact is scoped to THIS firing: `Battle.fire` saves and restores the resource name.
+        // Without it, a rule delivered for this event that moves ANOTHER resource (ordinary - 1506's
+        // forwarding clause grants 隐藏分 for a 笑点 move) overwrites the name, and the rules that come
+        // AFTER it in the same firing read the wrong one: their `resource_changed:<this one>` condition
+        // is false and they silently do not fire. The outer event's rules are about the outer resource.
+        battle.fire(TriggerPayload.ResourceChanged.of(TriggerEvent.RESOURCE_CHANGED, holder, resource, delta));
     }
 
     /**

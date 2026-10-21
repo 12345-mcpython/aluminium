@@ -1,5 +1,6 @@
 package com.laosun.aluminium.models.enemy;
 
+import com.laosun.aluminium.GameData;
 import com.laosun.aluminium.beans.MemospriteSpec;
 import com.laosun.aluminium.data.Memosprites;
 import com.laosun.aluminium.enums.*;
@@ -54,17 +55,31 @@ public final class SummonFactory {
      *                                  no monster is a data error, not something to skip)
      */
     public static Summon create(int monsterId, int level, int hardLevelGroup, Camp camp) {
+        return create(GameData.DEFAULT, monsterId, level, hardLevelGroup, camp);
+    }
+
+    /**
+     * Builds a summon from a chosen data pack.
+     *
+     * @param data           the data pack
+     * @param monsterId      the summon's own monster id
+     * @param level          the stage level
+     * @param hardLevelGroup the stage's hard level group
+     * @param camp           who the summon fights for
+     * @return the summon
+     */
+    public static Summon create(GameData data, int monsterId, int level, int hardLevelGroup, Camp camp) {
         if (camp == null) {
             throw new IllegalArgumentException("A summon must have a camp (summon " + monsterId + ")");
         }
-        EnemyFactory.Resolved resolved = EnemyFactory.resolve(monsterId, level, hardLevelGroup);
+        EnemyFactory.Resolved resolved = EnemyFactory.resolve(data, monsterId, level, hardLevelGroup);
 
         Summon summon = new Summon(displayName(resolved), camp,
                 EnemyFactory.statSheet(resolved.stats()).build());
         summon.setLevel(level);                                  // enters the defence zone like anything else
         // The summon acts with its *own* monster data, so a summon whose id has an entry in
         // enemy_skills.json uses it; everything else falls back to the ordinary default attack.
-        summon.setSkill(SkillType.COMMON, EnemyFactory.enemySkillFor(monsterId, resolved.template()));
+        summon.setSkill(SkillType.COMMON, EnemyFactory.enemySkillFor(data, monsterId, resolved.template()));
         return summon;
     }
 

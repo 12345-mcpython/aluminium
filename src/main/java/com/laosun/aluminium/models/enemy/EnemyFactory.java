@@ -1,6 +1,6 @@
 package com.laosun.aluminium.models.enemy;
 
-import com.laosun.aluminium.Constant;
+import com.laosun.aluminium.GameData;
 import com.laosun.aluminium.beans.EnemySkillData;
 import com.laosun.aluminium.beans.HardLevelGroup;
 import com.laosun.aluminium.beans.MonsterConfig;
@@ -67,16 +67,29 @@ public final class EnemyFactory {
      * @throws IllegalArgumentException if the instance / template / level-group level does not exist
      */
     static Resolved resolve(int monsterId, int level, int hardLevelGroup) {
-        MonsterConfig config = Constant.MONSTER_CONFIGS.get(monsterId);
+        return resolve(GameData.DEFAULT, monsterId, level, hardLevelGroup);
+    }
+
+    /**
+     * The same lookup against a chosen data pack.
+     *
+     * @param data           the data pack
+     * @param monsterId      the instance id
+     * @param level          the stage level
+     * @param hardLevelGroup the stage's hard level group
+     * @return the resolved data
+     */
+    static Resolved resolve(GameData data, int monsterId, int level, int hardLevelGroup) {
+        MonsterConfig config = data.monsterConfigs().get(monsterId);
         if (config == null) {
             throw new IllegalArgumentException("Unknown monster: " + monsterId);
         }
-        MonsterTemplate template = Constant.MONSTER_TEMPLATES.get(config.templateId());
+        MonsterTemplate template = data.monsterTemplates().get(config.templateId());
         if (template == null) {
             throw new IllegalArgumentException("Unknown monster template: " + config.templateId()
                     + " (monster " + monsterId + ")");
         }
-        HardLevelGroup group = Constant.HARD_LEVEL_GROUPS.getOrDefault(hardLevelGroup, Map.of()).get(level);
+        HardLevelGroup group = data.hardLevelGroups().getOrDefault(hardLevelGroup, Map.of()).get(level);
         if (group == null) {
             throw new IllegalArgumentException("No hard level group " + hardLevelGroup + " at level " + level);
         }
@@ -94,7 +107,20 @@ public final class EnemyFactory {
      * @throws IllegalArgumentException if the instance / template / level-group level does not exist
      */
     public static Enemy create(int monsterId, int level, int hardLevelGroup) {
-        Resolved resolved = resolve(monsterId, level, hardLevelGroup);
+        return create(GameData.DEFAULT, monsterId, level, hardLevelGroup);
+    }
+
+    /**
+     * Builds an enemy from a chosen data pack.
+     *
+     * @param data           the data pack
+     * @param monsterId      the instance id
+     * @param level          the stage level
+     * @param hardLevelGroup the stage's hard level group
+     * @return the enemy
+     */
+    public static Enemy create(GameData data, int monsterId, int level, int hardLevelGroup) {
+        Resolved resolved = resolve(data, monsterId, level, hardLevelGroup);
         MonsterConfig config = resolved.config();
         MonsterTemplate template = resolved.template();
 
@@ -108,7 +134,7 @@ public final class EnemyFactory {
         enemy.setStanceCount(template.stanceCount());
         enemy.setStanceType(template.stanceType());
         enemy.setSummonIds(List.copyOf(config.summonIds()));    // what this monster may bring in
-        enemy.setSkill(SkillType.COMMON, enemySkillFor(monsterId, template));
+        enemy.setSkill(SkillType.COMMON, enemySkillFor(data, monsterId, template));
         return enemy;
     }
 
@@ -133,7 +159,7 @@ public final class EnemyFactory {
     /**
      * Builds the skill an enemy acts with.
      *
-     * <p>The skill comes from {@code enemy_skills.json} ({@link Constant#ENEMY_SKILLS}).
+     * <p>The skill comes from {@code enemy_skills.json} ({@link GameData#enemySkills()}).
      * That table covers only the few monsters used for the demo; other monsters have no entry -
      * in that case it falls back to a default basic attack: multiplier 1.0, single hit, element
      * taken from the monster's own {@code stance_type}. That way "any monster can hit people" and
@@ -150,22 +176,34 @@ public final class EnemyFactory {
      * @return the skill, never {@code null}
      */
     static Skill enemySkillFor(int monsterId, MonsterTemplate template) {
-        EnemySkillData data = Constant.ENEMY_SKILLS.get(monsterId);
-        DamageElement element = data == null ? null : data.element();
+        return enemySkillFor(GameData.DEFAULT, monsterId, template);
+    }
+
+    /**
+     * The same skill lookup against a chosen data pack.
+     *
+     * @param data       the data pack
+     * @param monsterId  the monster id
+     * @param template   the monster template
+     * @return the skill
+     */
+    static Skill enemySkillFor(GameData data, int monsterId, MonsterTemplate template) {
+        EnemySkillData dataRow = data.enemySkills().get(monsterId);
+        DamageElement element = dataRow == null ? null : dataRow.element();
         if (element == null) {
             element = template.stanceType() == null ? null : template.stanceType();
         }
         if (element == null) {
             element = DamageElement.PHYSICAL;
         }
-        DamageType type = data == null || data.damageType() == null
+        DamageType type = dataRow == null || dataRow.damageType() == null
                 ? DamageType.NORMAL
-                : DamageType.fromString(data.damageType());
-        double multiplier = data == null ? 1.0 : data.multiplier();
-        int hits = data == null ? 1 : data.hits();
-        SkillEffectType effect = data == null || data.effect() == null
+                : DamageType.fromString(dataRow.damageType());
+        double multiplier = dataRow == null ? 1.0 : dataRow.multiplier();
+        int hits = dataRow == null ? 1 : dataRow.hits();
+        SkillEffectType effect = dataRow == null || dataRow.effect() == null
                 ? SkillEffectType.SINGLE_ATTACK
-                : SkillEffectType.fromString(data.effect());
+                : SkillEffectType.fromString(dataRow.effect());
         return new EnemySkill(element, multiplier, hits, type, effect);
     }
 
