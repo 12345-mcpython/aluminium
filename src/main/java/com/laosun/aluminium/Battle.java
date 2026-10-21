@@ -222,8 +222,16 @@ public class Battle {
             new com.laosun.aluminium.models.battle.UltimateService(this);
     private final com.laosun.aluminium.models.battle.EnergyService energy =
             new com.laosun.aluminium.models.battle.EnergyService(this::onEnergyCredited);
-    private final com.laosun.aluminium.models.battle.TriggerFiring firing =
-            new com.laosun.aluminium.models.battle.TriggerFiring();
+    private final com.laosun.aluminium.models.battle.TriggerFacts triggerFacts =
+            new com.laosun.aluminium.models.battle.TriggerFacts();
+    private final com.laosun.aluminium.models.battle.DamageMarks damageMarks =
+            new com.laosun.aluminium.models.battle.DamageMarks();
+    private final com.laosun.aluminium.models.battle.WaveState waveState =
+            new com.laosun.aluminium.models.battle.WaveState();
+    private final com.laosun.aluminium.models.battle.TriggerBus triggerBus =
+            new com.laosun.aluminium.models.battle.TriggerBus(this, triggerFacts);
+    private final com.laosun.aluminium.models.battle.DamageService damageService =
+            new com.laosun.aluminium.models.battle.DamageService(this, triggerBus);
     private final com.laosun.aluminium.models.battle.SustainService sustain =
             new com.laosun.aluminium.models.battle.SustainService(this,
                     this::onHealSettled, this::onShieldGranted);
@@ -807,37 +815,20 @@ public class Battle {
     @Getter
     private final Random rng;
     /**
-     * [WAVE SEQUENCE] how many waves have begun. A sequence, not a flag: a per-wave cap is a comparison against the
-     * number a rule last fired in, so nothing has to be reset -- the same reason the per-attack cap works that way.
-     */
-    private int waveSequence;
-
-    /**
      * Starts a wave: the counter every per-wave limit is compared against. Called by WaveManager before WAVE_START.
      */
     public void beginWave() {
-        waveSequence++;
+        waveState.begin();
     }
 
     /**
      * The current wave's number.
+     *
+     * @return the sequence
      */
     public int waveSequence() {
-        return waveSequence;
+        return waveState.sequence();
     }
-
-    /**
-     * Units that are OWNED but NOT DEPLOYED, whose rules are asked without them ever acting.
-     *
-     * <p>Two documents start with "takes effect as soon as the character is obtained, no deployment needed" (140's Moon Cocoon's Ward (月茇之庇), 1506's 999 Safety Guard (999安全卫士)), and the data files them under
-     * {@code AvatarGlobalBuffConfig} as global support skills. Note: Their tables cannot ride in `characters`: that list is the
-     * roster the QUEUE is built from, so a listener put there would take turns of its own. They are asked by a second
-     * loop instead, and because they are in neither `allies` nor the queue they are never targeted and never act.
-     */
-    private final com.laosun.aluminium.models.battle.WarehouseListeners warehouseListeners =
-            new com.laosun.aluminium.models.battle.WarehouseListeners();
-    private final com.laosun.aluminium.models.battle.DeferredTriggers deferredTriggers =
-            new com.laosun.aluminium.models.battle.DeferredTriggers();
 
     /**
      * Registers a unit whose rules are asked although it is not on the field.
@@ -846,7 +837,7 @@ public class Battle {
      * @param warehouse the table to ask
      */
     public void registerWarehouseListener(Character listener, TriggerTable warehouse) {
-        warehouseListeners.register(listener, warehouse);
+        triggerBus.registerWarehouseListener(listener, warehouse);
     }
 
     /**
@@ -855,7 +846,7 @@ public class Battle {
      * @param listener the unit
      */
     public void registerWarehouseListener(Character listener) {
-        warehouseListeners.register(listener);
+        triggerBus.registerWarehouseListener(listener);
     }
 
 
@@ -866,8 +857,6 @@ public class Battle {
      */
     private final com.laosun.aluminium.models.battle.PartyResources partyResources =
             new com.laosun.aluminium.models.battle.PartyResources();
-    private final com.laosun.aluminium.models.battle.TriggerFacts triggerFacts =
-            new com.laosun.aluminium.models.battle.TriggerFacts();
     private final com.laosun.aluminium.models.battle.SummonService summons;
     private final com.laosun.aluminium.models.battle.CastOutcome castOutcome =
             new com.laosun.aluminium.models.battle.CastOutcome();
@@ -1586,8 +1575,7 @@ public class Battle {
         actor.tickTriggerCooldowns();
         // "within one action" begins here: the action boundary already existed (this event brackets
         // `performAction` and its settlement), so the lethal set is cleared at it.
-        lethallyHitThisAction.clear();
-        lostHpThisAction.clear();
+        damageMarks.clear();
         fire(TriggerPayload.Simple.of(TriggerEvent.TURN_START, actor, actor, 0, 0));
         // "lasting until the start of the next ... turn" ends HERE: the owner's own turn is beginning.
         actor.getBuffManager().removeWithLifetime(AbstractBuff.Lifetime.NEXT_TURN_START);
@@ -1869,6 +1857,16 @@ public class Battle {
     }
 
     /**
+     * The assembly entry point, kept private so {@code applyDamage} stays the only public settlement path.
+     *
+     * @param damage the hit
+     * @return the settled damage
+     */
+    private double assemble(Damage damage) {
+        return damageService.assemble(damage);
+    }
+
+    /**
      * The internal settlement entry point: one parameter more than the public version, "which kind of energy
      * gain this instance is allowed to settle".
      *
@@ -1895,7 +1893,7 @@ public class Battle {
         // absorption, so it is the same number DAMAGE_SETTLED announces to a rule - "the amount dealt", not what the
         // victim's HP happened to lose. It is added for every instance, of every camp, so a group action's total is the
         // sum its reader needs; the next outermost firing empties it again.
-        firing.addSettledDamage(settled);
+        triggerBus.addSettledDamage(settled);
         double hpBefore = target.getCurrentHp();
         // Lethal blow: "when taking a lethal attack it will not fall into the unable-to-fight state, but instead restore health equal to 20%/50% of its own Max HP".
         // Note: THE ORDER IS THE WHOLE MECHANIC, and the first attempt got it wrong (measured): announcing BEFORE the damage leaves the
@@ -1906,9 +1904,7 @@ public class Battle {
         boolean died;
         if (lethal) {
             target.takeDamage(settled, false);
-            if (!lethallyHitThisAction.contains(target)) {
-                lethallyHitThisAction.add(target);
-            }
+            damageMarks.markLethal(target);
             fireForAlly(TriggerPayload.AllySubject.of(TriggerEvent.LETHAL_DAMAGE, target, target, 0));
             // "temporarily defer falling into the unable-to-fight state" (140's Moon Cocoon's Ward (月茧之庇)): a state may hold the death instead of
             // committing it. Note: The victim really is at zero HP here -- that IS "deferring" -- so this is not a heal: what
@@ -1938,9 +1934,7 @@ public class Battle {
         // settlement -- the event means "an HP change happened", independent of the energy rule (who gains how
         // much, whether it counts as an attack).
         if (hpLoss > 0) {
-            if (!lostHpThisAction.contains(target)) {
-                lostHpThisAction.add(target);
-            }
+            damageMarks.markLostHp(target);
             broadcastHpLoss(target, hpBefore, target.getCurrentHp(), damage.getAttacker(), hpLoss);
             // `actor` = whoever dealt the damage, `target` = the one who lost HP (i.e. the victim).
             // A counter rule keys off `target == self` -- see TriggerTable's DSL notes.
@@ -2080,104 +2074,6 @@ public class Battle {
      * @return the toughness reduction result of this instance (how much was actually reduced / how much
      * exceeded / whether a break was triggered)
      */
-    /**
-     * Assembles and settles one hit: the zones that run before the {@code DEALING_DAMAGE}
-     * announcement live in {@link com.laosun.aluminium.models.BattleDamage#applyZones}, and this
-     * half -- the announcement, then crit, defence, toughness reduction and resistance -- stays
-     * because the announcement calls {@link #fireTriggers}, and because everything after it has
-     * to read whatever that firing mutated on the instance.
-     *
-     * <p>Note: Private, and the assembly entry point for the whole engine, because
-     * {@code DamagePipelineTest} pins "the settlement entry point MUST be unique": a second public
-     * way to settle a {@code Damage} is what that invariant exists to prevent.
-     *
-     * @param damage the hit to assemble and settle
-     * @return the final damage of this hit, floored at 1
-     */
-    private double assemble(Damage damage) {
-        CanHit attacker = damage.getAttacker();
-        CanHit defender = damage.getDefender();
-
-        BattleDamage.applyZones(this, damage);
-
-        // The announcement sits between the two halves, and that placement IS the mechanic: a rule
-        // answering DEALING_DAMAGE may mutate this very instance (BOOST_DAMAGE), and every zone
-        // below -- crit, defence, toughness reduction, resistance -- has to read the mutated
-        // numbers. Announcing after them would leave such a rule describing a number nobody used,
-        // which is why this call cannot move to either side.
-        fire(TriggerPayload.DamagePayload.of(TriggerEvent.DEALING_DAMAGE, attacker, defender,
-                damage.getSkillBaseValue(), damage, damage.getCastCategory(), damage.getSkillKey(), List.of()));
-
-        // 2) Crit zone: only crittable types roll; an effect that already fixed the crit (fixedCrit) is not
-        //    overwritten
-        if (damage.getType().isCrittable() && !damage.isCritFixed()) {
-            double critRate = attacker.getAttribute(AttributeType.CRIT_CHANCE).get() + damage.getExtraCritChance();
-            boolean isCrit = critRate > 0 && rng.nextDouble() < critRate;
-            damage.crit(isCrit, attacker.getAttribute(AttributeType.CRIT_ATTACK).get() + damage.getExtraCritDamage());
-        }
-        // "this instance crit" -- the only moment the answer exists. Note: The SUBJECT is the ATTACKER: a crit is an event
-        // about the one who dealt it. Passing the victim here looks natural and silently does nothing, because
-        // `fireTriggersForAlly` refuses any subject that is not ours (measured exactly that).
-        if (damage.critArea().isCrit()) {
-            // subject = the VICTIM, actor = the critter. The victim has to be nameable, because a clause like
-            // "removes 1 buff from the attacked enemy target" acts on it. `fireTriggersWithSubject` (unlike its ally-only sibling)
-            // does not refuse a subject from the other camp -- and enemy crits still reach nobody, because every such
-            // rule says `actor == self` and the actor here is whoever dealt it.
-            // Note: The CAST CATEGORY goes with it. The crit belongs to this instance, and the instance knows which
-            // skill produced it, so "战技造成的伤害触发暴击时" (reader: 1002 Dan Heng's Skill) can be scoped to the
-            // Skill without inventing a predicate -- `from_skill` reads this field on the events that state one.
-            fire(TriggerPayload.Subject.of(TriggerEvent.CRIT_DEALT, attacker, defender, 0,
-                    damage.getCastCategory()));
-        }
-
-        // 3) Defence zone: attacker level / victim defence / attacker defence ignore
-        damage.defence(attacker.getLevel(),
-                defender.getAttribute(AttributeType.DEFENCE).get(),
-                attacker.getAttribute(AttributeType.DEFENCE_IGNORE).get());
-
-        // 3.5) Toughness damage reduction: an enemy whose toughness bar is not empty takes 10% less damage.
-        //      The author's ruling (2026-10-07): 「敌对物种最常见的减伤是韧性条不为0时10%的减伤。而该减伤当且仅当敌人处于弱点击破
-        //      状态时被移除。注意击破伤害一定会受该减伤影响。」 It is a MEMBER of the reduction zone - not a zone of its own -
-        //      so it multiplies with every other reduction and shares the 0.01 floor; that is also why `HSR.md` §6.4 lists
-        //      it inside the Elation formula while §2.2's overview omits it, and why the engine was ~11% high on every hit
-        //      against an unbroken enemy before this line.
-        //      ⚠ The BREAK instance is the one exception in TIME, not in kind: `reduceToughness` marks the enemy broken
-        //      BEFORE it settles the break damage, so asking "is it broken" there would drop the reduction the ruling says
-        //      break damage always takes. Super break is NOT excepted: it is settled against an already-broken enemy, where
-        //      the reduction is gone. And an enemy with no toughness bar at all never gets it ("韧性条不为0").
-        if (defender instanceof Enemy toughnessHolder && toughnessHolder.hasToughnessBar()
-                && (!toughnessHolder.isBroken() || damage.getType() == DamageType.BREAK)) {
-            damage.addReduction(Constant.TOUGHNESS_DAMAGE_REDUCTION);
-        }
-
-        // 4) Resistance zone: victim resistance - attacker penetration, then clamp (HSR.md §2.5, negative
-        //    resistance is fully effective)
-        //    Note: weakness break does not change resistance (§2.5)
-        double rawResist = defender instanceof Enemy enemy
-                ? enemy.getDamageResist().getOrDefault(damage.getElement(), 0.0)
-                : 0.0;
-        // "reduces the all-type resistance of all enemies by X%": the victim's side of the same zone, subtracted BEFORE
-        // penetration is applied -- see RESISTANCE_REDUCTION for why it is not folded into the attacker's
-        // penetration. Done here rather than inside `ResistArea` so that class's clamp (which exists for
-        // penetration) cannot swallow a reduction: negative resistance is meant to be fully effective.
-        rawResist -= defender.getAttribute(AttributeType.RESISTANCE_REDUCTION).get();
-        // The victim's own counterpart (cone 21002's "increases all-type resistance"):
-        // stated on the one being hit, so it is subtracted here beside the reducer rather than on the attacker.
-        // Note: Measured sign (cone 21002): a POSITIVE resistance has to be ADDED here. Writing it as a
-        // subtraction -- the way the reducer beside it reads -- turned "+8% resistance" into +8% DAMAGE taken
-        // (`11.28 -> 68.18 (x1.08)`), because the zone multiplies by (1 - rawResist).
-        rawResist += defender.getAttribute(AttributeType.ALL_TYPE_RESISTANCE).get();
-        damage.resist(rawResist, attacker.getAttribute(AttributeType.DAMAGE_PENETRATION).get());
-
-        // 5) Hook: entity-level DamageEvent (HSR.md §2.2: weakness = attacker's debuff, vulnerability = victim's
-        //    debuff, reduction = victim's buff)
-        //    Both sides are notified; the default implementation forwards to each one's BuffManager, and
-        //    subclasses can override it for talents/Boss mechanics
-        attacker.onDamage(this, damage);
-        defender.onDamage(this, damage);
-
-        return Math.max(1, damage.toValue());
-    }
 
     /**
      * The cast an event carries: the instance's own cast, or - for damage the engine derived from it (break / super break) -
@@ -2858,7 +2754,7 @@ public class Battle {
      * @return the total of the outermost firing
      */
     public double settledDamageThisEvent() {
-        return firing.settledDamage();
+        return triggerBus.settledDamage();
     }
 
     /**
@@ -2929,9 +2825,7 @@ public class Battle {
      * @return how many rules fired
      */
     public int fire(TriggerPayload.Cast payload) {
-        return fireTriggers(payload.event(), payload.actor(), payload.target(), payload.hitCount(),
-                payload.amount(), null, payload.fromCast(), payload.skillId(), payload.weakHitCount(),
-                payload.attackHitTargets());
+        return triggerBus.fire(payload);
     }
 
     /**
@@ -2942,8 +2836,7 @@ public class Battle {
      * @return how many rules fired
      */
     private int fire(TriggerPayload.DamagePayload payload) {
-        return fireTriggers(payload.event(), payload.actor(), payload.target(), 0, payload.amount(),
-                payload.damage(), payload.fromCast(), payload.skillId(), 0, payload.attackHitTargets());
+        return triggerBus.fire(payload);
     }
 
     /**
@@ -2953,8 +2846,7 @@ public class Battle {
      * @return how many rules fired
      */
     private int fire(TriggerPayload.Subject payload) {
-        return fireTriggers(payload.event(), payload.actor(), payload.target(), 0, payload.amount(),
-                null, payload.fromCast());
+        return triggerBus.fire(payload);
     }
 
     /**
@@ -2964,11 +2856,7 @@ public class Battle {
      * @return how many rules fired, or {@code 0} for a non-ally subject
      */
     public int fireForAlly(TriggerPayload.AllySubject payload) {
-        if (payload.target() == null || payload.target().getCamp() != Camp.PLAYER) {
-            return 0;
-        }
-        return fireTriggers(payload.event(), payload.actor(), payload.target(), 0, payload.amount(),
-                null, null);
+        return triggerBus.fireForAlly(payload);
     }
 
     /**
@@ -2978,8 +2866,7 @@ public class Battle {
      * @return how many rules fired
      */
     public int fire(TriggerPayload.Simple payload) {
-        return fireTriggers(payload.event(), payload.actor(), payload.target(), payload.hitCount(),
-                payload.amount(), null, null);
+        return triggerBus.fire(payload);
     }
 
     /**
@@ -2989,14 +2876,7 @@ public class Battle {
      * @return how many rules fired
      */
     private int fire(TriggerPayload.StateEnded payload) {
-        String previous = triggerFacts.stateEndedName();
-        triggerFacts.stateEndedName(payload.stateName());
-        try {
-            return fireTriggers(payload.event(), payload.actor(), payload.target(), 0, payload.amount(),
-                    null, null);
-        } finally {
-            triggerFacts.stateEndedName(previous);
-        }
+        return triggerBus.fire(payload);
     }
 
     /**
@@ -3009,14 +2889,7 @@ public class Battle {
      * @return how many rules fired
      */
     public int fire(TriggerPayload.ResourceChanged payload) {
-        String previous = triggerFacts.changedResource();
-        triggerFacts.changedResource(payload.resource());
-        try {
-            return fireTriggers(payload.event(), payload.actor(), payload.target(), 0, payload.amount(),
-                    null, null);
-        } finally {
-            triggerFacts.changedResource(previous);
-        }
+        return triggerBus.fire(payload);
     }
 
     public int fireTriggers(TriggerEvent event) {
@@ -3150,60 +3023,8 @@ public class Battle {
     private int fireTriggers(TriggerEvent event, CanHit actor, CanHit target, int hitCount, double amount,
                              Damage damage, SkillCategory fromCast, int skillId, int weakHitCount,
                              List<CanHit> attackHitTargets) {
-        firing.begin(event);
-        try {
-            int fired = 0;
-            com.laosun.aluminium.models.trigger.CastFacts castFacts =
-                    new com.laosun.aluminium.models.trigger.CastFacts(skillId, weakHitCount, attackHitTargets);
-            for (Character ally : characters) {
-                if (ally == null) {
-                    continue;
-                }
-                if (ally.isDeath()) {
-                    // Note: The ONE exception is DEATH, which is addressed to the unit that just fell. Every other
-                    // event keeps the rule that a dead unit reacts to nothing, because a corpse has no turn, no
-                    // energy and no say.
-                    if (event != TriggerEvent.DEATH || ally != target) {
-                        continue;
-                    }
-                }
-                TriggerTable table = ally.getTriggerTable();
-                if (table == null || table.isEmpty()) {
-                    continue;
-                }
-                fired += TriggerInterpreter.fire(this, table, event,
-                        new TriggerTable.TriggerContext(ally, actor, target, hitCount, amount, damage, this,
-                                fromCast).withCastFacts(castFacts));
-            }
-            // Takes effect as soon as the character is obtained, no deployment needed. Note: A SECOND pass, not extra entries in `characters`: that list is what
-            // the queue is built from, so a listener in it would act. Note: The owner handed to the context is the listener itself,
-            // which is what makes "self" mean "the character who owns this warehouse clause" rather than whoever is fighting.
-            for (java.util.Map.Entry<Character, TriggerTable> warehouse : warehouseListeners.entries()) {
-                Character listener = warehouse.getKey();
-                if (listener == null || listener.isDeath()) {
-                    continue;
-                }
-                TriggerTable table = warehouse.getValue();
-                if (table == null || table.isEmpty()) {
-                    continue;
-                }
-                fired += TriggerInterpreter.fire(this, table, event,
-                        new TriggerTable.TriggerContext(listener, actor, target, hitCount, amount, damage, this,
-                                fromCast).withCastFacts(castFacts));
-            }
-            // Held triggers ("若触发前目标被消灭则对新入场的敌方目标触发"): the firing happened while nothing was on the field,
-            // so its effects were kept - and a wave has just brought enemies in. Delivered INSIDE this firing, so a rider
-            // reading "the damage settled this firing" sees the held rule's own damage: they are one firing, not two.
-            if (event == TriggerEvent.WAVE_START && !deferredTriggers.isEmpty()) {
-                for (com.laosun.aluminium.models.battle.DeferredTriggers.Held trigger : deferredTriggers.release()) {
-                    TriggerInterpreter.apply(this, trigger.rule(), trigger.context());
-                    fired++;
-                }
-            }
-            return fired;
-        } finally {
-            firing.end();
-        }
+        return triggerBus.fire(event, actor, target, hitCount, amount, damage, fromCast, skillId, weakHitCount,
+                attackHitTargets);
     }
 
     /**
@@ -3213,7 +3034,7 @@ public class Battle {
      * @param context the context it triggered with (its owner and actor are part of what is being held)
      */
     public void deferUntilWave(TriggerTable.CompiledRule rule, TriggerTable.TriggerContext context) {
-        deferredTriggers.hold(rule, context);
+        triggerBus.deferUntilWave(rule, context);
     }
 
     /**
@@ -3590,72 +3411,48 @@ public class Battle {
     }
 
 
-    /*
-     * The allies a lethal blow has landed on during the CURRENT action.
-     *
-     * <p>140 Moon Cocoon's Ward (月茉之庇), "all of those hit by a lethal attack within one action". The set is what makes that ONE clause rather
-     * than one save per blow: the same action can land a lethal blow on several allies, and the effect reaches all of them.
-     *
-     * <p>Note: Cleared when an action starts ({@code TURN_START}, which brackets {@code performAction} and its settlement), so
-     * "this action" is the action boundary the engine already had -- not a new one.
-     */
-    /**
-     * The enemies that ENTERED with the current wave.
-     *
-     * <p>The word is the game own, and it is an EVENT rather than a target type:
-     * `MServant_CyreneServant_00_AmazingBuff_Mydeimos_OnWaveMonster` listens for `"Event": "OnWaveMonster"` and answers with a
-     * `TurnInsertAction` -- a wave monster has entered. 1415's memosprite skill 8,
-     * "if the target is defeated before the cast, then cast it on a newly entered enemy target".
-     */
-    private final List<CanHit> waveMonsters = new ArrayList<>();
-
     /**
      * Forgets the previous wave's monsters. Called by {@code WaveManager.nextWave} BEFORE the new spawn, because the order measured there
      * is `waveIndex++` -> `spawnWave` -> `beginWave` -> `WAVE_START`: clearing any later would erase the wave that just arrived.
      */
     public void forgetWaveMonsters() {
-        waveMonsters.clear();
+        waveState.forgetMonsters();
     }
 
     /**
      * Records an enemy that has just entered with a wave ({@code WaveManager.spawnWave}).
+     *
+     * @param enemy the newcomer
      */
     public void noteWaveMonster(CanHit enemy) {
-        if (enemy != null && !waveMonsters.contains(enemy)) {
-            waveMonsters.add(enemy);
-        }
+        waveState.noteMonster(enemy);
     }
 
     /**
      * The enemies that entered with the current wave.
+     *
+     * @return the wave's monsters
      */
     public List<CanHit> waveMonsters() {
-        return List.copyOf(waveMonsters);
+        return waveState.monsters();
     }
-
-    private final List<CanHit> lethallyHitThisAction = new ArrayList<>();
 
     /**
      * The allies a lethal blow has landed on since this action began, in the order it happened.
+     *
+     * @return the marks
      */
     public List<CanHit> lethallyHitThisAction() {
-        return List.copyOf(lethallyHitThisAction);
+        return damageMarks.lethalThisAction();
     }
-
-    private final List<CanHit> lostHpThisAction = new ArrayList<>();
 
     /**
      * The allies who <b>lost HP</b> since this action began, in the order it happened.
      *
-     * <p>1409 Hyacine (风堇) 忆灵技2: 「若除小伊卡外的我方目标生命值降低，小伊卡会…消耗自身 4% 生命上限的生命值，并为我方生命值
-     * 降低的目标回复…」 - the recipient is <b>whoever just lost HP</b>, which is NOT low/highest HP: lowest_hp_ally answers
-     * 「当前血量百分比最低」, and that ally may not have been hit at all.
-     *
-     * <p>⚠ Filled before {@code HP_LOST} is fired (see {@code broadcastHpLoss}), so a rule hanging on that event can
-     * already read this list; cleared at the action boundary beside the lethal set, for the same reason.
+     * @return the marks
      */
     public List<CanHit> lostHpThisAction() {
-        return List.copyOf(lostHpThisAction);
+        return damageMarks.lostHpThisAction();
     }
 
     /**
