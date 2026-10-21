@@ -1268,7 +1268,7 @@ final class TriggerConditionParser {
         }
     }
 
-    /**
+    /*
      * {@code from_skill COMMON|SKILL|ULTRA|TALENT} - the instance that caused this event came from that slot.
      *
      * <p><b>Why the DSL needs it.</b> 1003 Himeko (姬子)'s Eidolon (星魂) 4 says "when casting the Skill and breaking an enemy target's weakness, Himeko additionally gains 1 point of charge" and
@@ -1283,7 +1283,7 @@ final class TriggerConditionParser {
      * <p>Note: A break/kill with no causing instance (a rule that reduces toughness directly, an enemy skill that builds
      * its damage inline) answers <b>false</b>: the event happened, but nothing can say which skill produced it.
      */
-    /**
+    /*
      * {@code damage_is_attack} ? "the instance being settled counts as an attack".
      *
      * <p>Additional damage is an instance too, and it is deliberately marked {@code notCountsAsAttack()}, so this is the one
@@ -1318,7 +1318,7 @@ final class TriggerConditionParser {
         }
     }
 
-    /** "变化的是[NAME]": the guard that stops a forwarding rule from eating its own output. */
+    /* "变化的是[NAME]": the guard that stops a forwarding rule from eating its own output. */
     /**
      * "施加的是[X]类负面状态": the family of the debuff that just landed (control / dot).
      */
@@ -1443,7 +1443,7 @@ final class TriggerConditionParser {
         }
     }
 
-    /** The element half of {@link #DAMAGE_IS_ATTACK}: the instance's element against the rule owner's own. */
+    /* The element half of {@link #DAMAGE_IS_ATTACK}: the instance's element against the rule owner's own. */
     /**
      * The complement of {@link #DAMAGE_IS_ATTACK}: the instance is additional damage, not an ordinary attack.
      */
@@ -1739,7 +1739,7 @@ final class TriggerConditionParser {
         }
     }
 
-    /**
+    /*
      * Named-state test: {@code self has_state 协奏} / {@code target has_state 触电}.
      *
      * <p>Reads the state off the party named on the left through
@@ -2369,7 +2369,7 @@ final class TriggerConditionParser {
                     // event had zero readers before that clause, so nothing was written against its absence.
                     TriggerEvent.CRIT_DEALT);
 
-    /**
+    /*
      * The resource behind a {@code self_resource:<NAME>} variable, or {@code null} for anything else.
      *
      * <p>Only the <b>shape</b> is checked here; whether the character declares that resource is checked where
@@ -2387,7 +2387,7 @@ final class TriggerConditionParser {
      * @param spec     the owning rule, for the source
      * @return the resource name, or {@code null} when the variable is not a resource read
      */
-    /** The two spellings that read a named counter ({@code ADD_STACK}); the subject is the prefix. */
+    /* The two spellings that read a named counter ({@code ADD_STACK}); the subject is the prefix. */
     /**
      * The two counter spellings, shared with the interpreter's {@code scale} family: a condition says
      * "I have 3 layers", and a scale says "the number is a share of how many layers I have" -- one wording, and making
@@ -2451,7 +2451,7 @@ final class TriggerConditionParser {
         return path;
     }
 
-    /**
+    /*
      * The {@code is_party_first} keyword: "<b>that unit is the FIRST CHARACTER of the party</b>".
      *
      * <p>Read from {@code battle.characters} -- the roster of characters, in party order -- and NOT from

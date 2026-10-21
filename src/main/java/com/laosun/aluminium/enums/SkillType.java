@@ -54,7 +54,7 @@ public enum SkillType {
      * Active skill of a summoned entity.
      */
     SUMMON_SKILL,
-    /**
+    /*
      * Passive talent of a summoned entity.
      */
     /**

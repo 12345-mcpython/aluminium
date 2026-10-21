@@ -390,7 +390,7 @@ public final class DoubleValue implements Cloneable {
 
         // these need to call with number for example 18 represent to 18% boost
 
-        /**
+        /*
          * Creates an add-percent modifier from an integer percentage (e.g. 18 means 18%).
          */
         /**

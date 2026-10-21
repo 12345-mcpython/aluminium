@@ -24,7 +24,7 @@ import static com.laosun.aluminium.Constant.PERCENT_TO_BASE;
 @ToString
 @AllArgsConstructor
 public class Weapon implements Cloneable {
-    /**
+    /*
      * Display name (bilingual).
      */
     /**

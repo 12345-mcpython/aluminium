@@ -124,7 +124,7 @@ public class TriggerSpec {
     @SerializedName("once_per_battle")
     private Boolean oncePerBattle;
 
-    /**
+    /*
      * "该效果每次攻击只可触发 1 次": at most one firing per ATTACK.
      *
      * <p><b>Why {@code per_turn} is not enough.</b> An attack can settle several instances - a blast hits three enemies, a

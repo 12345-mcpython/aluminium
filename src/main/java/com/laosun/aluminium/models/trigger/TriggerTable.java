@@ -1183,7 +1183,7 @@ public class TriggerTable {
                                int perTurn, int perAttack, boolean oncePerWave,
                                List<List<Condition>> effectTargetFilters, String perSubject,
                                boolean oneOf, double chanceDecay, String oneOfNoRepeat, boolean deferUntilWave,
-                               /**
+                               /*
                                 * How many independent rolls of {@link #chance} one firing makes - 1 unless the
                                 * rule states "额外增加 N 次…判定". See {@code TriggerSpec.chanceRolls} for why
                                 * the count lives on the rule and not on a second, identical rule.

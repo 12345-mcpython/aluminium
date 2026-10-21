@@ -49,7 +49,7 @@ public record MemospriteSpec(@SerializedName("name") String name,
                              @SerializedName("aggro") Double aggro,
                              @SerializedName("servant_id") Integer servantId,
                              @SerializedName("skills") List<SkillRow> skills,
-                             /**
+                             /*
                               * Resources this summon DECLARES (1141526's [故事], which the sentence puts on the memosprite).
                               *
                               * <p>Without a declaration site, a `GAIN_RESOURCE` aimed at a summon is accepted by the loader and then silently grants nothing -- measured.

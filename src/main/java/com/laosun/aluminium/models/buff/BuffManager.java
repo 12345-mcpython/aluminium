@@ -184,7 +184,7 @@ public class BuffManager {
         return false;
     }
 
-    /**
+    /*
      * Removes up to {@code count} <b>debuffs</b> ("解除 N 个负面效果"), newest first.
      *
      * <p>The "which one comes off" choice is the same LIFO order {@link #removeStack} and
@@ -408,7 +408,7 @@ public class BuffManager {
         return null;
     }
 
-    /**
+    /*
      * The same lookup, for callers outside this class.
      *
      * <p><b>Who needs it.</b> The trigger interpreter records what a cast actually applied
@@ -783,7 +783,7 @@ public class BuffManager {
         return false;
     }
 
-    /**
+    /*
      * Whether a <b>named</b> state ([协奏]/[转魄]/[增幅]...) is currently attached.
      *
      * <p>Same family as {@link #hasBuff(Class)}, with one difference that is the whole point of states:
@@ -875,7 +875,7 @@ public class BuffManager {
         return false;
     }
 
-    /**
+    /*
      * Removes every buff that {@link #hasState(String)} would report for that name - the other half of the pair.
      *
      * <p><b>Why a "remove the named state" primitive.</b> "仅对…<b>最新的</b>施放目标生效" is a very common sentence
@@ -890,7 +890,7 @@ public class BuffManager {
      * @param state the state name as the data spells it (trimmed; blank or {@code null} = nothing to do)
      * @return how many buffs were removed; {@code 0} is the normal answer for "it was not there", not an error
      */
-    /**
+    /*
      * Whether any buff on this unit carries {@code suspendsTurns} - "不会进入自己的回合" (see
      * {@link AbstractBuff#isSuspendsTurns()}).
      *
@@ -1038,7 +1038,7 @@ public class BuffManager {
         return false;
     }
 
-    /**
+    /*
      * Takes off only the buffs <b>this source</b> applied, named by a state or by the attribute a modifier sits on.
      *
      * <p>The source filter is the whole point: `extendBuffsFrom` filters by origin too. 1415's ode of romance
@@ -1198,7 +1198,7 @@ public class BuffManager {
         return null;
     }
 
-    /**
+    /*
      * <b>A snapshot</b> of every buff of the given class, in <b>attachment order</b> (oldest first).
      *
      * <p><b>Why a snapshot and not the list.</b> It is deliberate that {@code getBuffs()} does not

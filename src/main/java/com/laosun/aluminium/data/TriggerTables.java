@@ -298,7 +298,7 @@ public final class TriggerTables {
         return TriggerTables.class.getResource(path) == null ? null : path;
     }
 
-    /**
+    /*
      * Refuses a key Gson would silently drop.
      *
      * <p>{@code value} is either one object (the file) or an array of them (the resource declarations); an

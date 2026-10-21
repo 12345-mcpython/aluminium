@@ -72,7 +72,7 @@ public class DamageScenario {
         /** The level the skill is cast at; absent = the data's row count (the convention this repo uses). */
         private Integer skillLevel;
 
-        /** Absolute attribute values to install on the attacker, so both sides use the same panel. */
+        /* Absolute attribute values to install on the attacker, so both sides use the same panel. */
         /**
          * When {@code true} the stand-in is built with an EMPTY trigger table, so its own kit contributes nothing and
          * only {@link #attributes} describes the hit.

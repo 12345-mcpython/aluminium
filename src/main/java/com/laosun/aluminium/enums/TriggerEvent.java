@@ -86,16 +86,6 @@ public enum TriggerEvent {
      */
     LETHAL_DAMAGE("LETHAL_DAMAGE", true),
     /**
-     * {@code Battle.startBattle()} - delivered once to <b>every character's own table</b>, after the opening
-     * hooks and before {@code processRequests}.
-     *
-     * <p>Note: <b>It carries no {@code actor} and no {@code target}.</b> Reading it as "once for every combatant" is
-     * true about the <i>delivery</i> and misleading about the <i>context</i>: a rule written here as
-     * {@code "when": ["actor == self"]} can never fire, and it looks entirely reasonable (hand-written that way
-     * once, and the loader now refuses the spelling). "My own battle start" needs no condition because the
-     * table being fired <b>is</b> the owner's.
-     */
-    /**
      * Fired once, after every {@link #BATTLE_START} rule has run and settled: the moment a clause may read a
      * fact that ANOTHER battle-start rule produced.
      *
@@ -109,6 +99,16 @@ public enum TriggerEvent {
      * runs twice.
      */
     BATTLE_READY("BATTLE_READY", true),
+    /**
+     * {@code Battle.startBattle()} - delivered once to <b>every character's own table</b>, after the opening
+     * hooks and before {@code processRequests}.
+     *
+     * <p>Note: <b>It carries no {@code actor} and no {@code target}.</b> Reading it as "once for every combatant" is
+     * true about the <i>delivery</i> and misleading about the <i>context</i>: a rule written here as
+     * {@code "when": ["actor == self"]} can never fire, and it looks entirely reasonable (hand-written that way
+     * once, and the loader now refuses the spelling). "My own battle start" needs no condition because the
+     * table being fired <b>is</b> the owner's.
+     */
     BATTLE_START("BATTLE_START", true),
     /**
      * An ally finished an attack. Carries the hit-target count.
@@ -318,7 +318,7 @@ public enum TriggerEvent {
      * stops that loudly instead of letting it run away.
      */
     FOLLOW_UP("FOLLOW_UP", true),
-    /**
+    /*
      * A <b>summon</b> finished an attack ( memosprites): fired by {@code EnemySkill.execute}
      * after every segment of its attack has been settled, with the summon as {@code actor} and the
      * hit-target count riding along like {@link #ALLY_ATTACK}'s.

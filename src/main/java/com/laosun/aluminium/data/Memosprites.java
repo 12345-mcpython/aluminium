@@ -162,7 +162,7 @@ public final class Memosprites {
         return spec;
     }
 
-    /**
+    /*
      * Checks the optional {@code attack} block (the memosprite half). Every rejection is a wrong attack that would
      * otherwise only show up as a number in a battle log:
      *

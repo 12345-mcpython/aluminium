@@ -90,7 +90,7 @@ public final class Signal implements Comparable<Signal>, Cloneable {
      */
     private boolean firstRound = false;
 
-    /**
+    /*
      * Creates a signal for the given combatant, caching its current speed.
      *
      * @param moveable the combatant to track
@@ -123,7 +123,7 @@ public final class Signal implements Comparable<Signal>, Cloneable {
         }
     }
 
-    /**
+    /*
      * Refreshes the cached speed from the underlying combatant.
      * Called when speed-changing buffs or debuffs are applied.
      * IT'S IMPORTANT TO CALL WHEN CHANGING SPEED!!!

@@ -1524,7 +1524,7 @@ final class TriggerValidator {
         }
     }
 
-    /**
+    /*
      * Whether the effect states a <b>share</b>, in any of its four spellings.
      *
      * <p>It exists so that "is a share stated?" has one answer: {@code requirePercent} accepts four spellings, and a
@@ -2049,7 +2049,7 @@ final class TriggerValidator {
         requireDotMagnitude(effect, op, spec);
     }
 
-    /**
+    /*
      * Validates the element of a per-turn damage: one of {@code DamageElement}'s spellings.
      * <p>An unknown name would otherwise become a DOT that applies to nothing - {@code DamageElement.fromString}
      * answers {@code null} for "Unknown" and for typos alike, so the check has to be here.

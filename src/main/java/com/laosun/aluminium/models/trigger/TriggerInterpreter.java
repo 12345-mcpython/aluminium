@@ -831,7 +831,7 @@ public final class TriggerInterpreter {
         }
     }
 
-    /**
+    /*
      * {@code DELEGATE_DAMAGE}: the cast in progress must not deal its own damage.
      *
      * <p>This is the one op that fires <b>before</b> a swing exists, and it can only touch the cast that is in
@@ -1334,7 +1334,7 @@ public final class TriggerInterpreter {
         fireResourceChanged(ctx.battle(), ctx, holder, counter.counter(), -amount);
     }
 
-    /**
+    /*
      * The effect's amount, scaled by the event's hit count when the rule asked for it.
      *
      * <p>See {@link EffectSpec#getPerTarget()}: the game states both "2 per attack" (Robin) and
@@ -1740,7 +1740,7 @@ public final class TriggerInterpreter {
     }
 
 
-    /**
+    /*
      * Reads an optional {@code damage_type} and turns it into the engine's own spelling.
      *
      * <p>Note: A misspelling that silently meant "all damage types" would be a wrong number with no symptom - the same hole the

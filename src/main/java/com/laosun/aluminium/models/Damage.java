@@ -194,7 +194,7 @@ public class Damage {
         this.causedByCast = causedByCast;
     }
 
-    /** Records the intended toughness reduction (fluent, like the other instance mutators). */
+    /* Records the intended toughness reduction (fluent, like the other instance mutators). */
     /**
      * The targets hit by the attack that produced this instance.
      *
@@ -557,7 +557,7 @@ public class Damage {
         return this;
     }
 
-    /**
+    /*
      * Defence zone: (200 + 10  x  attacker level) / (effective DEF + 200 + 10  x  attacker level).
      *
      * @param attackerLevel   attacker level
