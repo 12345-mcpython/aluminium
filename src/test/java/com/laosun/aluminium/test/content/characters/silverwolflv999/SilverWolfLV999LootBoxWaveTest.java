@@ -62,7 +62,7 @@ public class SilverWolfLV999LootBoxWaveTest {
                 "with nobody to hit, the box is HELD - a delivered one would have granted 2 skill points here");
 
         Enemy fresh = BattleFixture.monster();      // the next wave walks in
-        battle.enemies.add(fresh);
+        battle.addCombatant(fresh);
         double freshBefore = fresh.getCurrentHp();
         battle.fireTriggers(TriggerEvent.WAVE_START);
         battle.processRequests();
@@ -110,7 +110,7 @@ public class SilverWolfLV999LootBoxWaveTest {
         int pointsBefore = battle.getSkillPoints();
 
         Enemy fresh = BattleFixture.monster();
-        battle.enemies.add(fresh);
+        battle.addCombatant(fresh);
         rng.nextDoubleValue = 0.9;                 // would FAIL a 20% roll
         battle.fireTriggers(TriggerEvent.WAVE_START);
         battle.processRequests();

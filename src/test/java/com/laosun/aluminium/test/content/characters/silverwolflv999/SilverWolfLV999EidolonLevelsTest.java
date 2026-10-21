@@ -145,7 +145,7 @@ public class SilverWolfLV999EidolonLevelsTest {
         return skill == null ? -1 : unit.skillLevel(skill);
     }
 
-    /**
+    /*
      * Her Elation-degree boost with Speed forced to the given value, so the threshold is what moves.
      *
      * <p>Note: Speed is written BEFORE {@code startBattle()}, because the trace fires on {@code BATTLE_START} - setting it

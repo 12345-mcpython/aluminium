@@ -5,9 +5,13 @@ import com.laosun.aluminium.Queue;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
 import java.lang.reflect.Method;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Stream;
 
 /**
  * The engine artifact must not print: a library that writes to stdout is a library every front end
@@ -26,6 +30,31 @@ public class EngineApiSurfaceTest {
     public void theEngineHasNoConsolePrinters() {
         assertNoPrintMethods(Battle.class);
         assertNoPrintMethods(Queue.class);
+    }
+
+    /**
+     * Production code must enter triggers through {@code Battle.fire(TriggerPayload...)}, not the legacy
+     * {@code battle.fireTriggers(...)} overloads. Only {@code Battle}'s own adapters may call them.
+     *
+     * @throws IOException when the source tree cannot be read
+     */
+    @Test
+    public void productionDoesNotUseTheLegacyFireOverloads() throws IOException {
+        try (Stream<Path> files = Files.walk(Path.of("src/main/java"))) {
+            List<String> offenders = files
+                    .filter(path -> path.toString().endsWith(".java"))
+                    .filter(path -> {
+                        try {
+                            return Files.readString(path).contains("battle.fireTriggers(");
+                        } catch (IOException e) {
+                            throw new java.io.UncheckedIOException(e);
+                        }
+                    })
+                    .map(Path::toString)
+                    .toList();
+            Assertions.assertTrue(offenders.isEmpty(),
+                    "production must use Battle.fire(TriggerPayload...): " + offenders);
+        }
     }
 
     /**

@@ -176,7 +176,7 @@ public class PlayerSideSummonTest {
         Fixture f = fixture();
         RecordingSummon spy = new RecordingSummon();
         spy.setMaster(f.hero);
-        f.battle.allies.add(spy);                       // a hand-built summon, as EnemyCampSummonTest does
+        f.battle.addCombatant(spy);                     // a hand-built summon, as EnemyCampSummonTest does
         f.battle.startBattle();
 
         f.battle.applyDamage(f.hero, new Damage(f.monster, f.hero, DamageElement.PHYSICAL,
@@ -245,7 +245,7 @@ public class PlayerSideSummonTest {
     public void checkResultReadsOurCampAndNotJustOurCharacters() {
         Fixture f = fixture();
         RecordingSummon orphanSpy = new RecordingSummon();
-        f.battle.allies.add(orphanSpy);                 // no master: nothing will take it down with them
+        f.battle.addCombatant(orphanSpy);               // no master: nothing will take it down with them
         f.battle.startBattle();
         f.battle.processRequests();
 

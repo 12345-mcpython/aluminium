@@ -115,7 +115,7 @@ public class ServalShockTest {
         return settlements;
     }
 
-    /** The whole file is present, and the registered clauses are absent on purpose. */
+    /* The whole file is present, and the registered clauses are absent on purpose. */
     /**
      * The whole file is present, and the registered clauses are absent on purpose.
      */
