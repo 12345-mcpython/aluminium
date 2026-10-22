@@ -95,10 +95,10 @@ public class BattleNarrator implements BattleListener {
         sb.append("=".repeat(78)).append('\n');
         sb.append("Battle — driven headlessly by BattleDriver\n");
         sb.append("=".repeat(78)).append('\n');
-        sb.append("Party   ").append(names(battle.characters)).append('\n');
+        sb.append("Party   ").append(names(battle.characters())).append('\n');
         sb.append("Enemies ").append(names(battle.enemyUnits())).append('\n');
         sb.append('\n');
-        for (Character hero : battle.characters) {
+        for (Character hero : battle.characters()) {
             sb.append(String.format("[Ally]  %-14s HP %s/%s  ATK %s  SPD %s  Energy %s/%s%n",
                     hero.getName(), num(hero.getCurrentHp()), num(hero.getMaxHp()),
                     num(attr(hero, AttributeType.ATTACK)), num(attr(hero, AttributeType.SPEED)),
@@ -188,7 +188,7 @@ public class BattleNarrator implements BattleListener {
                     num(enemy.getCurrentHp()), num(enemy.getMaxHp()),
                     enemy.isDeath() ? "  [dead]" : "");
         }
-        for (Character hero : battle.characters) {
+        for (Character hero : battle.characters()) {
             out.printf("Final: %-14s HP %s/%s%s%n", hero.getName(),
                     num(hero.getCurrentHp()), num(hero.getMaxHp()),
                     hero.isDeath() ? "  [dead]" : "");
@@ -260,7 +260,7 @@ public class BattleNarrator implements BattleListener {
             if (signal.getCanHit() == null) {
                 continue;
             }
-            parts.add(signal.getCanHit().getName() + "(" + num(battle.queue.getTimeRemaining(signal)) + ")");
+            parts.add(signal.getCanHit().getName() + "(" + num(battle.queue().getTimeRemaining(signal)) + ")");
         }
         return String.join(" → ", parts);
     }
@@ -275,7 +275,7 @@ public class BattleNarrator implements BattleListener {
         if (battle == null) {
             return all;
         }
-        all.addAll(battle.characters);
+        all.addAll(battle.characters());
         all.addAll(battle.enemyUnits());
         return all;
     }

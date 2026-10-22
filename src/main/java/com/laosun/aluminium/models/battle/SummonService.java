@@ -126,7 +126,7 @@ public final class SummonService {
      * @return the living memosprite, or {@code null}
      */
     public Summon memospriteOf(CanHit master) {
-        for (CanHit unit : battle.allies) {
+        for (CanHit unit : battle.allies()) {
             if (unit instanceof Summon summon && summon.getMaster() == master && !summon.isDeath()) {
                 return summon;
             }
@@ -176,6 +176,6 @@ public final class SummonService {
      * The roster a unit belongs to, by camp.
      */
     private List<CanHit> campOf(CanHit unit) {
-        return unit.getCamp() == Camp.PLAYER ? battle.allies : battle.enemies;
+        return unit.getCamp() == Camp.PLAYER ? battle.allies() : battle.enemies();
     }
 }

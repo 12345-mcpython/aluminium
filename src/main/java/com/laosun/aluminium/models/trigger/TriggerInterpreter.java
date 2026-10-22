@@ -526,8 +526,8 @@ public final class TriggerInterpreter {
                 String named = effect.getElement().trim();
                 DamageElement weakness;
                 if ("party_first".equals(named)) {
-                    weakness = battle == null || battle.characters.isEmpty()
-                            ? null : battle.characters.getFirst().getElement();
+                    weakness = battle == null || battle.characters().isEmpty()
+                            ? null : battle.characters().getFirst().getElement();
                 } else if ("random_absent".equals(named)) {
                     weakness = null;
                     for (CanHit victim : TriggerTargets.resolveTargets(battle, effect, ctx)) {
@@ -678,7 +678,7 @@ public final class TriggerInterpreter {
                 // the list resolver is what tells them apart (it is the one HEAL/SHIELD already use for "our
                 // side"). Advancing several units is what the group selectors were resolved for.
                 for (CanHit target : TriggerTargets.resolveTargets(battle, effect, ctx)) {
-                    battle.queue.advanceActionByPercent(target, effect.getPercent());
+                    battle.queue().advanceActionByPercent(target, effect.getPercent());
                 }
             }
             case RAISE_RESOURCE_CAP -> raiseResourceCap(effect, ctx);
@@ -1440,7 +1440,7 @@ public final class TriggerInterpreter {
                 yield Math.max(weak, 0);
             }
             case "shielded_count" -> ctx == null || ctx.battle() == null ? 0
-                    : ctx.battle().allies.stream().filter(unit -> unit.getShield() > 0).count();
+                    : ctx.battle().allies().stream().filter(unit -> unit.getShield() > 0).count();
             default -> target.getBuffManager().stacksOf(name.trim());
         };
     }

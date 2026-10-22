@@ -43,9 +43,9 @@ public final class DeathService {
     public void removeDeadCombatants() {
         perishOrphanedSummons();
         announceSummonsThatLeft();
-        for (var signal : battle.queue.snapshot()) {
+        for (var signal : battle.queue().snapshot()) {
             if (signal.getCanHit().isDeath()) {
-                battle.queue.removeCombatant(signal.getCanHit());
+                battle.queue().removeCombatant(signal.getCanHit());
             }
         }
         releaseBuffsAnchoredToTheDead();
@@ -56,8 +56,8 @@ public final class DeathService {
      * Fires {@code SUMMON_LEFT} once per disappeared memosprite.
      */
     private void announceSummonsThatLeft() {
-        List<CanHit> everyone = new ArrayList<>(battle.allies);
-        everyone.addAll(battle.enemies);
+        List<CanHit> everyone = new ArrayList<>(battle.allies());
+        everyone.addAll(battle.enemies());
         for (CanHit unit : everyone) {
             if (unit instanceof Summon && unit.isDeath() && summonsAnnouncedGone.add(unit)) {
                 bus.fire(TriggerPayload.Simple.of(TriggerEvent.SUMMON_LEFT, unit, unit, 0, 0.0));
@@ -69,8 +69,8 @@ public final class DeathService {
      * Removes buffs whose clock was another unit's turns from carriers whose anchor died.
      */
     private void releaseBuffsAnchoredToTheDead() {
-        List<CanHit> everyone = new ArrayList<>(battle.allies);
-        everyone.addAll(battle.enemies);
+        List<CanHit> everyone = new ArrayList<>(battle.allies());
+        everyone.addAll(battle.enemies());
         for (CanHit carrier : everyone) {
             if (carrier == null || carrier.isDeath()) {
                 continue;
@@ -87,10 +87,10 @@ public final class DeathService {
      * Defeats every summon whose master is down.
      */
     private void perishOrphanedSummons() {
-        for (CanHit unit : battle.allies) {
+        for (CanHit unit : battle.allies()) {
             perishIfOrphaned(unit);
         }
-        for (CanHit unit : battle.enemies) {
+        for (CanHit unit : battle.enemies()) {
             perishIfOrphaned(unit);
         }
     }

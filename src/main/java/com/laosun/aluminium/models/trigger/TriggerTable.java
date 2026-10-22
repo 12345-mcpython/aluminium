@@ -1740,7 +1740,7 @@ public class TriggerTable {
                 return Double.NaN;
             }
             com.laosun.aluminium.enums.Path want = com.laosun.aluminium.enums.Path.fromName(pathName);
-            return ctx.battle().allies.stream()
+            return ctx.battle().allies().stream()
                     .filter(unit -> unit instanceof com.laosun.aluminium.models.Character character
                             && character.getPath() == want)
                     .count();
@@ -1928,10 +1928,10 @@ public class TriggerTable {
          * "there are none" are different answers, and only one of them has a symptom.
          */
         private static double allyCount(TriggerContext ctx) {
-            if (ctx.battle() == null || ctx.battle().allies == null) {
+            if (ctx.battle() == null || ctx.battle().allies() == null) {
                 return Double.NaN;
             }
-            return ctx.battle().allies.stream().filter(ally -> ally != null && !ally.isDeath()).count();
+            return ctx.battle().allies().stream().filter(ally -> ally != null && !ally.isDeath()).count();
         }
 
         /**

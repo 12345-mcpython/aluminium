@@ -44,10 +44,10 @@ public final class CastService {
      * @return whether the cast was accepted
      */
     public boolean useSkill(Skill skill, List<? extends CanHit> target) {
-        if (battle.currentMove == null || skill == null || target == null) {
+        if (battle.currentMove() == null || skill == null || target == null) {
             return false;
         }
-        CanHit user = battle.currentMove.getCanHit();
+        CanHit user = battle.currentMove().getCanHit();
         if (user.isDeath()) {
             return false;
         }
@@ -55,7 +55,7 @@ public final class CastService {
             if (!ultimates.isReady(user)) {
                 return false;
             }
-            CanHit extraTurnActor = battle.queue.getExtraTurnActor();
+            CanHit extraTurnActor = battle.queue().getExtraTurnActor();
             if (extraTurnActor != null && extraTurnActor != user) {
                 return false;
             }
@@ -70,5 +70,26 @@ public final class CastService {
         }
         requests.add(skill, user, target);
         return true;
+    }
+
+    /**
+     * Performs the current actor's action with the turn and skill-point gates.
+     *
+     * @param skill   the skill
+     * @param targets its targets
+     * @return whether the action was accepted
+     */
+    public boolean performAction(Skill skill, List<? extends CanHit> targets) {
+        if (battle.currentMove() == null || skill == null || targets == null) {
+            return false;
+        }
+        CanHit actor = battle.currentMove().getCanHit();
+        if (actor.isDeath()) {
+            return false;
+        }
+        if (!actor.getBuffManager().canAct()) {
+            return false;
+        }
+        return useSkill(skill, targets);
     }
 }

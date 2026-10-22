@@ -137,7 +137,7 @@ public final class SkillExecutor {
                                            Set<CanHit> hitTargets, List<? extends CanHit> targets) {
         List<CanHit> hits = List.copyOf(hitTargets);
         List<CanHit> chosen = targets == null ? List.of() : List.copyOf(targets);
-        for (CanHit ally : battle.allies) {
+        for (CanHit ally : battle.allies()) {
             ally.onSkillCast(battle, user, skill, hits, chosen);
         }
         // The same moment, delivered to the data-driven trigger tables.
@@ -551,7 +551,7 @@ public final class SkillExecutor {
 
             case BLAST -> {
                 List<CanHit> alive = battle.targetableEnemies();
-                int center = alive.indexOf(mainTarget);      // position order = battle.enemies order
+                int center = alive.indexOf(mainTarget);      // position order = battle.enemies() order
                 double centreStance = data.stanceFor(true);
                 double neighbourStance = data.stanceFor(false);
                 if (center < 0) {
