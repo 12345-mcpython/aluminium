@@ -91,7 +91,7 @@ public class CrossCidSkillParamTest {
                 List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        Character subject = battle.characters.get(0);
+        Character subject = battle.characters().get(0);
         double before = subject.getAttribute(AttributeType.ATTACK).get();
         // Note: fire it for the RULE OWNER only: the no-argument form fires for every unit, which made the two runs accumulate a different number of times
         battle.fireTriggers(TriggerEvent.TURN_START, subject, null, 0, 0);

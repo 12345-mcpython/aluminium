@@ -31,7 +31,7 @@ public class PasskeyTest {
         Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         double start = unit.getCurrentEnergy();
-        battle.currentMove = new Signal(unit);
+        battle.setCurrentMove(new Signal(unit));
         battle.beforeMove();
         battle.fireTriggers(TriggerEvent.SKILL_CAST, unit, enemy, 0, 0);
         double afterFirst = unit.getCurrentEnergy();
@@ -41,7 +41,7 @@ public class PasskeyTest {
         Assertions.assertEquals(afterFirst, unit.getCurrentEnergy(), 1e-6,
                 "per_turn: 1 -- a second skill in the same turn grants nothing");
         battle.afterMove();
-        battle.currentMove = new Signal(unit);
+        battle.setCurrentMove(new Signal(unit));
         battle.beforeMove();
         battle.fireTriggers(TriggerEvent.SKILL_CAST, unit, enemy, 0, 0);
         Assertions.assertEquals(16.0, unit.getCurrentEnergy() - start, 1e-6,

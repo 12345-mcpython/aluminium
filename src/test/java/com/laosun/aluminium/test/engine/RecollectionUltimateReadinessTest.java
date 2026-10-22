@@ -39,19 +39,19 @@ public class RecollectionUltimateReadinessTest {
         Battle battle = new Battle(List.of(her), List.of(EnemyFactory.create(1002011, 100, 1)), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        her = battle.characters.getFirst();
+        her = battle.characters().getFirst();
         if (insideTheRipple) {
             com.laosun.aluminium.models.skill.SkillExecutor.execute(battle, her.getSkills().get(SkillType.ULTRA),
-                    her, List.of(battle.enemies.getFirst()));
+                    her, List.of(battle.enemies().getFirst()));
             battle.processRequests();
-            her = battle.characters.getFirst();
+            her = battle.characters().getFirst();
             Assertions.assertTrue(her.getBuffManager().hasState("往昔的涟漪"),
                     "precondition: the ripple came up with her ultimate");
         }
         her.getResources().gain(MEMORY, seeded);
         com.laosun.aluminium.models.skill.SkillExecutor.execute(battle, her.getSkills().get(SkillType.COMMON), her,
-                List.of(battle.enemies.getFirst()));
+                List.of(battle.enemies().getFirst()));
         battle.processRequests();
-        return battle.isUltraReady(battle.characters.getFirst());
+        return battle.isUltraReady(battle.characters().getFirst());
     }
 }

@@ -28,9 +28,9 @@ public class PearlDeepStudyStateTest {
                 CharacterFactory.create(HUNTER, 80)), List.of(EnemyFactory.create(1002011, 100, 1)), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        Character pearl = battle.characters.get(0);
-        Character elation = battle.characters.get(1);
-        Character hunter = battle.characters.get(2);
+        Character pearl = battle.characters().get(0);
+        Character elation = battle.characters().get(1);
+        Character hunter = battle.characters().get(2);
 
         int before = (int) pearl.getResources().get(COUNTER).getValue();
         battle.fireTriggers(TriggerEvent.ULT_CAST, pearl, elation, 0, 0);

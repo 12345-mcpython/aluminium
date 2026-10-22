@@ -134,14 +134,14 @@ public class PearlEidolon4DoublingTest {
         Battle battle = new Battle(team, List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        Character pearl = battle.characters.get(0);
-        Character attacker = battle.characters.get(battle.characters.size() - 1);
+        Character pearl = battle.characters().get(0);
+        Character attacker = battle.characters().get(battle.characters().size() - 1);
         if (armTheTeam) {
             battle.fireTriggers(TriggerEvent.CAST_SETUP, pearl, pearl, 0, 0, SkillCategory.ELATION_DAMAGE);
         }
-        double before = battle.enemies.getFirst().getCurrentHp();
+        double before = battle.enemies().getFirst().getCurrentHp();
         battle.castImmediate(attacker.getSkills().get(SkillType.COMMON), attacker,
-                List.of(battle.enemies.getFirst()));
-        return before - battle.enemies.getFirst().getCurrentHp();
+                List.of(battle.enemies().getFirst()));
+        return before - battle.enemies().getFirst().getCurrentHp();
     }
 }

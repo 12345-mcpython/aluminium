@@ -44,8 +44,8 @@ public class LifeOdeNewBudOverflowTest {
                 List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        cyrene = battle.characters.get(0);
-        her = battle.characters.get(1);
+        cyrene = battle.characters().get(0);
+        her = battle.characters().get(1);
         if (castTheOde) {
             var sprite = battle.summonServant(cyrene);
             battle.processRequests();

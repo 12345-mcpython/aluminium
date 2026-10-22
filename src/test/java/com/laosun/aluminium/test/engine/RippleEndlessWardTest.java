@@ -35,17 +35,17 @@ public class RippleEndlessWardTest {
         Battle battle = new Battle(List.of(cyrene), List.of(EnemyFactory.create(1002011, 100, 1)), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        cyrene = battle.characters.getFirst();
+        cyrene = battle.characters().getFirst();
         com.laosun.aluminium.models.skill.SkillExecutor.execute(battle, cyrene.getSkills().get(SkillType.SKILL),
-                cyrene, List.of(battle.enemies.getFirst()));
+                cyrene, List.of(battle.enemies().getFirst()));
         battle.processRequests();
-        cyrene = battle.characters.getFirst();
+        cyrene = battle.characters().getFirst();
         Assertions.assertTrue(cyrene.getBuffManager().hasState(WARD), "precondition: the ward is up");
         if (thenTheUltimate) {
             com.laosun.aluminium.models.skill.SkillExecutor.execute(battle, cyrene.getSkills().get(SkillType.ULTRA),
-                    cyrene, List.of(battle.enemies.getFirst()));
+                    cyrene, List.of(battle.enemies().getFirst()));
             battle.processRequests();
-            cyrene = battle.characters.getFirst();
+            cyrene = battle.characters().getFirst();
             Assertions.assertTrue(cyrene.getBuffManager().hasState(WARD), "and her ultimate keeps it up");
         }
         return cyrene.getBuffManager().extendAllBuffs(1);

@@ -50,31 +50,31 @@ public class WorldOdeAddedFireHitsTest {
                 List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        him = battle.characters.getFirst();
+        him = battle.characters().getFirst();
         if (transform) {
             // The ode grants [永续的燃烧], so it must land before his transformation.
             var odeSprite = battle.summonServant(CharacterFactory.create(1415, LEVEL));
             battle.processRequests();
             var ode = odeSprite.skillAt(21);
             Assertions.assertNotNull(ode, "precondition: slot 21");
-            SkillExecutor.execute(battle, ode, odeSprite, List.of(battle.characters.getFirst()));
+            SkillExecutor.execute(battle, ode, odeSprite, List.of(battle.characters().getFirst()));
             battle.processRequests();
             var ult = him.getSkills().get(com.laosun.aluminium.enums.SkillType.ULTRA);
             Assertions.assertNotNull(ult, "precondition: he has an ultimate");
-            SkillExecutor.execute(battle, ult, him, List.of(battle.enemies.getFirst()));
+            SkillExecutor.execute(battle, ult, him, List.of(battle.enemies().getFirst()));
             battle.processRequests();
-            him = battle.characters.getFirst();
+            him = battle.characters().getFirst();
             Assertions.assertTrue(him.getBuffManager().stacksOf("永续的燃烧") > 0,
                     "precondition: the transformation granted the state");
         }
-        attack = battle.characters.getFirst().getAttribute(
+        attack = battle.characters().getFirst().getAttribute(
                 com.laosun.aluminium.enums.AttributeType.ATTACK).get();
-        var enemy = battle.enemies.getFirst();
+        var enemy = battle.enemies().getFirst();
         double before = enemy.getCurrentHp();
         // ONE attack, settled by the engine's own entry point: the rule under test hangs on DAMAGE_SETTLED with `damage_is_attack`
-        battle.applyDamage(enemy, new Damage(battle.characters.getFirst(), enemy,
+        battle.applyDamage(enemy, new Damage(battle.characters().getFirst(), enemy,
                 DamageElement.FIRE, DamageType.NORMAL, 1000));
         battle.processRequests();
-        return before - battle.enemies.getFirst().getCurrentHp();
+        return before - battle.enemies().getFirst().getCurrentHp();
     }
 }

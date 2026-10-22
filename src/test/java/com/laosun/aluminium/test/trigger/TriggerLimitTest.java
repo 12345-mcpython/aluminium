@@ -59,7 +59,7 @@ public class TriggerLimitTest {
     @Test
     public void oncePerBattleFiresExactlyOnce() {
         Battle battle = battleWith(limited(null, true));
-        Character owner = battle.characters.getFirst();
+        Character owner = battle.characters().getFirst();
 
         Assertions.assertEquals(1, fire(battle, owner), "the first event fires the rule");
         Assertions.assertEquals(0, fire(battle, owner), "the second is refused: can trigger only 1 time per battle");
@@ -74,7 +74,7 @@ public class TriggerLimitTest {
     @Test
     public void cooldownOneMeansOncePerOwnTurn() {
         Battle battle = battleWith(limited(1, null));
-        Character owner = battle.characters.getFirst();
+        Character owner = battle.characters().getFirst();
 
         Assertions.assertEquals(1, fire(battle, owner));
         Assertions.assertEquals(0, fire(battle, owner), "two firings in one turn: the cooldown refuses the second");
@@ -86,7 +86,7 @@ public class TriggerLimitTest {
     @Test
     public void cooldownTwoWaitsForTwoOfTheOwnersTurns() {
         Battle battle = battleWith(limited(2, null));
-        Character owner = battle.characters.getFirst();
+        Character owner = battle.characters().getFirst();
 
         Assertions.assertEquals(1, fire(battle, owner));
         takeTurn(battle, owner);
@@ -107,8 +107,8 @@ public class TriggerLimitTest {
     @Test
     public void otherPeoplesTurnsDoNotCountTheCooldownDown() {
         Battle battle = withAlly(limited(1, null));
-        Character owner = battle.characters.getFirst();
-        Character ally = battle.characters.get(1);
+        Character owner = battle.characters().getFirst();
+        Character ally = battle.characters().get(1);
 
         Assertions.assertEquals(1, fire(battle, ally), "the ally's action fires it");
         takeTurn(battle, ally);
@@ -129,7 +129,7 @@ public class TriggerLimitTest {
     @Test
     public void perTurnTwoLetsTheRuleFireTwiceInOneTurn() {
         Battle battle = battleWith(perTurn(2));
-        Character owner = battle.characters.getFirst();
+        Character owner = battle.characters().getFirst();
 
         Assertions.assertEquals(1, fire(battle, owner), "the first firing is allowed");
         Assertions.assertEquals(1, fire(battle, owner), "and the second");
@@ -143,7 +143,7 @@ public class TriggerLimitTest {
     @Test
     public void theTurnLimitComesBackOnTheOwnersOwnTurn() {
         Battle battle = battleWith(perTurn(2));
-        Character owner = battle.characters.getFirst();
+        Character owner = battle.characters().getFirst();
         Assertions.assertEquals(1, fire(battle, owner));
         Assertions.assertEquals(1, fire(battle, owner));
         Assertions.assertEquals(0, fire(battle, owner), "precondition: the two uses are spent");
@@ -165,8 +165,8 @@ public class TriggerLimitTest {
     @Test
     public void otherPeoplesTurnsDoNotClearTheTurnLimit() {
         Battle battle = withAlly(perTurn(1));
-        Character owner = battle.characters.getFirst();
-        Character ally = battle.characters.get(1);
+        Character owner = battle.characters().getFirst();
+        Character ally = battle.characters().get(1);
 
         Assertions.assertEquals(1, fire(battle, ally), "the ally's action fires it once");
         takeTurn(battle, ally);
@@ -186,7 +186,7 @@ public class TriggerLimitTest {
         TriggerSpec spec = perTurn(3);
         TriggerSpecs.set(spec, "oncePerBattle", true);
         Battle battle = battleWith(spec);
-        Character owner = battle.characters.getFirst();
+        Character owner = battle.characters().getFirst();
 
         Assertions.assertEquals(1, fire(battle, owner));
         Assertions.assertEquals(0, fire(battle, owner), "the battle limit is the tighter one here");
@@ -204,7 +204,7 @@ public class TriggerLimitTest {
     @Test
     public void anUnlimitedRuleNextToALimitedOneKeepsFiring() {
         Battle battle = battleWith(limited(1, null), unlimited(2));
-        Character owner = battle.characters.getFirst();
+        Character owner = battle.characters().getFirst();
 
         Assertions.assertEquals(2, fire(battle, owner), "both rules fire on the first event");
         Assertions.assertEquals(1, fire(battle, owner),
@@ -225,7 +225,7 @@ public class TriggerLimitTest {
         TriggerSpecs.set(limited, "cooldown", 1);
         TriggerSpec unlimited = TriggerSpecs.rule("ALLY_ATTACK", null, shared, gain(2));
         Battle battle = battleWith(limited, unlimited);
-        Character owner = battle.characters.getFirst();
+        Character owner = battle.characters().getFirst();
 
         Assertions.assertEquals(2, fire(battle, owner), "both fire the first time");
         Assertions.assertEquals(1, fire(battle, owner),
@@ -239,7 +239,7 @@ public class TriggerLimitTest {
     @Test
     public void startingABattleMakesEveryRuleReadyAgain() {
         Battle battle = battleWith(limited(null, true));
-        Character owner = battle.characters.getFirst();
+        Character owner = battle.characters().getFirst();
 
         Assertions.assertEquals(1, fire(battle, owner));
         Assertions.assertEquals(0, fire(battle, owner), "precondition: it is spent");

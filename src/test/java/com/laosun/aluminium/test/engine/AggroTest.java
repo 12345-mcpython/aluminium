@@ -63,7 +63,7 @@ public class AggroTest {
     public void enemyHasTheNeutralAggroWeight() {
         Battle battle = new Battle(List.of(withAggro(100)), List.of(dummy()), BattleFixture.seeded());
 
-        Assertions.assertEquals(100, battle.aggroOf(battle.enemies.getFirst()), EPS,
+        Assertions.assertEquals(100, battle.aggroOf(battle.enemies().getFirst()), EPS,
                 "an enemy has no path, so it uses the conventional tier");
 
         Map<com.laosun.aluminium.models.CanHit, Double> table = battle.getAggroTable(List.of(withAggro(150)));

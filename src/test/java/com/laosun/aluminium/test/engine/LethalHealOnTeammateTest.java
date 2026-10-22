@@ -56,7 +56,7 @@ public class LethalHealOnTeammateTest {
 
         double before = teammate.getCurrentHp();
         double damage = lethal ? before * 2.0 : before * 0.1;
-        battle.applyTrueDamage(battle.enemies.getFirst(), teammate, DamageElement.ICE, damage);
+        battle.applyTrueDamage(battle.enemies().getFirst(), teammate, DamageElement.ICE, damage);
         battle.processRequests();
         return new double[]{teammate.getCurrentHp(), healer.getMaxHp() * 0.18 + 480, before};
     }

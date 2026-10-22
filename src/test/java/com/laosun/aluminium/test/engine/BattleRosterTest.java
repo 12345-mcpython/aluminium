@@ -22,8 +22,8 @@ public class BattleRosterTest {
         Character character = CharacterFactory.create(1003, 80);
         Battle battle = new Battle(List.of(character), List.of(), new Random(0));
 
-        Assertions.assertThrows(UnsupportedOperationException.class, () -> battle.characters.clear());
-        Assertions.assertThrows(UnsupportedOperationException.class, () -> battle.allies.clear());
-        Assertions.assertThrows(UnsupportedOperationException.class, () -> battle.enemies.clear());
+        Assertions.assertThrows(UnsupportedOperationException.class, () -> battle.characters().clear());
+        Assertions.assertThrows(UnsupportedOperationException.class, () -> battle.allies().clear());
+        Assertions.assertThrows(UnsupportedOperationException.class, () -> battle.enemies().clear());
     }
 }

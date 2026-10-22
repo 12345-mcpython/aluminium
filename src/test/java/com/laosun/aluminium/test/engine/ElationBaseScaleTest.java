@@ -46,7 +46,7 @@ public class ElationBaseScaleTest {
         Battle battle = new Battle(List.of(pearl, CharacterFactory.create(1204, 80)), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        Character mine = battle.characters.getFirst();
+        Character mine = battle.characters().getFirst();
 
         EffectSpec instance = TriggerSpecs.damage(null, 0, null, "target");
         TriggerSpecs.set(instance, "scale", "elation_base");
@@ -70,7 +70,7 @@ public class ElationBaseScaleTest {
         }
 
         double before = enemy.getCurrentHp();
-        battle.fireTriggers(TriggerEvent.ULT_CAST, mine, battle.enemies.getFirst(), 0, 0);
+        battle.fireTriggers(TriggerEvent.ULT_CAST, mine, battle.enemies().getFirst(), 0, 0);
         return before - enemy.getCurrentHp();
     }
 }

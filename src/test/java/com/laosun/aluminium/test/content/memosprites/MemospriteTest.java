@@ -168,10 +168,10 @@ public class MemospriteTest {
         Summon tailor = battle.summonMemosprite(aglaea);
         battle.processRequests();
 
-        Assertions.assertTrue(battle.allies.contains(tailor));
-        Assertions.assertFalse(battle.characters.contains(tailor),
+        Assertions.assertTrue(battle.allies().contains(tailor));
+        Assertions.assertFalse(battle.characters().contains(tailor),
                 "it is on our side but it is not one of our characters");
-        Assertions.assertTrue(battle.queue.snapshot().stream().anyMatch(s -> s.getCanHit() == tailor),
+        Assertions.assertTrue(battle.queue().snapshot().stream().anyMatch(s -> s.getCanHit() == tailor),
                 "a positive speed is why SPEED is required in the spec: the action bar can schedule it");
         Assertions.assertSame(tailor, battle.memospriteOf(aglaea), "and it can be found by its summoner");
     }
@@ -191,7 +191,7 @@ public class MemospriteTest {
 
         Summon first = battle.summonMemosprite(aglaea);
         Assertions.assertSame(first, battle.summonMemosprite(aglaea), "still just the one");
-        Assertions.assertEquals(2, battle.allies.size(), "the hero and the one memosprite");
+        Assertions.assertEquals(2, battle.allies().size(), "the hero and the one memosprite");
 
         first.takeDamage(9_999_999);
         battle.processRequests();
@@ -200,7 +200,7 @@ public class MemospriteTest {
 
         Summon second = battle.summonMemosprite(aglaea);
         Assertions.assertNotSame(first, second, "so a new one can be summoned");
-        Assertions.assertEquals(3, battle.allies.size(), "and the dead one stays in the roster, as corpses do");
+        Assertions.assertEquals(3, battle.allies().size(), "and the dead one stays in the roster, as corpses do");
     }
 
     /**
@@ -239,7 +239,7 @@ public class MemospriteTest {
         Summon tailor = battle.summonMemosprite(aglaea);
 
         Assertions.assertEquals(125, battle.aggroOf(tailor), EPS, "\"aggro: 125\" (「仇恨: 125」)");
-        Assertions.assertEquals(100, battle.aggroOf(battle.enemies.getFirst()), EPS,
+        Assertions.assertEquals(100, battle.aggroOf(battle.enemies().getFirst()), EPS,
                 "and a unit that states nothing still gets the regular tier");
     }
 
@@ -298,7 +298,7 @@ public class MemospriteTest {
         // The immunity is what is being measured, so the ordinary resistance is zeroed out on both sides.
         evey.setAttribute(AttributeType.EFFECT_RESISTANCE, new DoubleValue(0));
         evernight.setAttribute(AttributeType.EFFECT_RESISTANCE, new DoubleValue(0));
-        CanHit caster = battle.enemies.getFirst();
+        CanHit caster = battle.enemies().getFirst();
 
         boolean landedOnEvey = battle.tryApplyDebuff(caster, evey, frozen(), 1.0, null);
         boolean landedOnEvernight = battle.tryApplyDebuff(caster, evernight, frozen(), 1.0, null);
@@ -322,7 +322,7 @@ public class MemospriteTest {
         Summon evey = battle.memospriteOf(evernight);
         evey.setAttribute(AttributeType.EFFECT_RESISTANCE, new DoubleValue(0));
 
-        boolean landed = battle.tryApplyDebuff(battle.enemies.getFirst(), evey,
+        boolean landed = battle.tryApplyDebuff(battle.enemies().getFirst(), evey,
                 new DotBuff(evey, com.laosun.aluminium.enums.DamageElement.FIRE, 100, 2), 1.0, null);
 
         Assertions.assertTrue(landed, "immunity to Crowd Control (免疫控制类) says nothing about DoT Debuffs (持续伤害类)");

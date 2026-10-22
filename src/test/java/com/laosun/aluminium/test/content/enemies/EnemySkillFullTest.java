@@ -52,7 +52,7 @@ public class EnemySkillFullTest {
     @Test
     public void singleTargetIsTheDefaultAndHitsOnlyTheMainTarget() {
         Battle battle = newBattle();
-        List<Character> team = battle.characters;
+        List<Character> team = battle.characters();
         Enemy attacker = battle.enemyUnits().getFirst();
 
         new EnemySkill(DamageElement.FIRE, 1.0, 1, DamageType.NORMAL)
@@ -69,7 +69,7 @@ public class EnemySkillFullTest {
     @Test
     public void anAoeSkillReachesEveryLivingCharacter() {
         Battle battle = newBattle();
-        List<Character> team = battle.characters;
+        List<Character> team = battle.characters();
         Enemy attacker = battle.enemyUnits().getFirst();
 
         new EnemySkill(DamageElement.FIRE, 1.0, 1, DamageType.NORMAL, SkillEffectType.AOE_ATTACK)
@@ -87,7 +87,7 @@ public class EnemySkillFullTest {
     @Test
     public void blastReachesTheMainTargetAndItsNeighbours() {
         Battle battle = newBattle();
-        List<Character> team = battle.characters;
+        List<Character> team = battle.characters();
         Enemy attacker = battle.enemyUnits().getFirst();
 
         new EnemySkill(DamageElement.FIRE, 1.0, 1, DamageType.NORMAL, SkillEffectType.BLAST)
@@ -107,7 +107,7 @@ public class EnemySkillFullTest {
     @Test
     public void blastOnTheEdgeCharacterDoesNotWrapAround() {
         Battle battle = newBattle();
-        List<Character> team = battle.characters;
+        List<Character> team = battle.characters();
         Enemy attacker = battle.enemyUnits().getFirst();
 
         new EnemySkill(DamageElement.FIRE, 1.0, 1, DamageType.NORMAL, SkillEffectType.BLAST)
@@ -131,16 +131,16 @@ public class EnemySkillFullTest {
         Battle oneSegment = newBattle();
         new EnemySkill(DamageElement.FIRE, 1.0, 1, DamageType.NORMAL, SkillEffectType.AOE_ATTACK)
                 .execute(oneSegment, oneSegment.enemyUnits().getFirst(),
-                        List.of(oneSegment.characters.getFirst()));
+                        List.of(oneSegment.characters().getFirst()));
 
         Battle twoSegments = newBattle();
         new EnemySkill(DamageElement.FIRE, 1.0, SEGMENTS, DamageType.NORMAL, SkillEffectType.AOE_ATTACK)
                 .execute(twoSegments, twoSegments.enemyUnits().getFirst(),
-                        List.of(twoSegments.characters.getFirst()));
+                        List.of(twoSegments.characters().getFirst()));
 
         for (int i = 0; i < 3; i++) {
-            double once = HERO_HP - oneSegment.characters.get(i).getCurrentHp();
-            double twice = HERO_HP - twoSegments.characters.get(i).getCurrentHp();
+            double once = HERO_HP - oneSegment.characters().get(i).getCurrentHp();
+            double twice = HERO_HP - twoSegments.characters().get(i).getCurrentHp();
             Assertions.assertTrue(once > 0, "character " + i + " was hit by the 1-segment AoE");
             Assertions.assertEquals(SEGMENTS * once, twice, once * 1e-6,
                     "character " + i + " should take " + SEGMENTS + " segments' worth of damage");
@@ -158,7 +158,7 @@ public class EnemySkillFullTest {
     @Test
     public void aDeadCharacterTakesNoDamageFromAnAoe() {
         Battle battle = newBattle();
-        List<Character> team = battle.characters;
+        List<Character> team = battle.characters();
         Enemy attacker = battle.enemyUnits().getFirst();
         team.get(1).takeDamage(HERO_HP * 2);
         Assertions.assertTrue(team.get(1).isDeath(), "the premise: the second character is dead");

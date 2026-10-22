@@ -61,13 +61,13 @@ public class SpentAmountIsPositiveTest {
                 List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        spare = battle.characters.getFirst();
+        spare = battle.characters().getFirst();
         // Room to grow AND something to spend: at the cap a gain credits nothing, and at zero a spend has nothing to take.
         spare.getResources().register(SPENT, 200, 100);
         spare.getResources().register(MARK, 9999, 0);
         spare.setTriggerTable(table(spendFirst));
         battle.fireTriggers(TriggerEvent.TURN_START, spare, null, 0, 0);
         battle.processRequests();
-        return battle.characters.getFirst().getResources().value(MARK);
+        return battle.characters().getFirst().getResources().value(MARK);
     }
 }

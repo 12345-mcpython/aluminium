@@ -126,11 +126,11 @@ public class ConeAuditBatchEightTest {
     // ==================================================================
 
     private static double wait(Fixture f, Character unit) {
-        Signal signal = f.battle.queue.snapshot().stream()
+        Signal signal = f.battle.queue().snapshot().stream()
                 .filter(s -> s.getCanHit() == unit)
                 .findFirst()
                 .orElseThrow(() -> new AssertionError("no signal"));
-        return f.battle.queue.getTimeRemaining(signal);
+        return f.battle.queue().getTimeRemaining(signal);
     }
 
     private static double critAfterKill(boolean wearerKills) {

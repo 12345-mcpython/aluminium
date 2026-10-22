@@ -64,7 +64,7 @@ public class ToughnessDamageReductionTest {
         Assertions.assertFalse(dummy.hasToughnessBar(), "precondition: this dummy has no toughness bar");
         Battle battle = battleWith(dummy);
 
-        double settled = battle.applyDamage(dummy, new Damage(battle.characters.getFirst(), dummy,
+        double settled = battle.applyDamage(dummy, new Damage(battle.characters().getFirst(), dummy,
                 DamageElement.ICE, DamageType.NORMAL, BASE));
         double defenceZone = 1000.0 / (dummy.getAttribute(AttributeType.DEFENCE).get() + 1000.0);
         System.out.println("[toughness_reduction] bar-less dummy = " + settled + " ; expected without it = "
@@ -82,14 +82,14 @@ public class ToughnessDamageReductionTest {
         Battle battle = battleWith(enemy);
         enemy.breakEnemy(DamageElement.ICE);
 
-        double asBreak = battle.applyDamage(enemy, new Damage(battle.characters.getFirst(), enemy,
+        double asBreak = battle.applyDamage(enemy, new Damage(battle.characters().getFirst(), enemy,
                 DamageElement.ICE, DamageType.BREAK, BASE));
         // A fresh enemy for the ordinary instance: `applyDamage` is the one place that reads the state, so the same
         // enemy can serve both readings - but its HP would move, so a second one keeps the comparison clean.
         Enemy twin = enemy();
         twin.breakEnemy(DamageElement.ICE);
         Battle twinBattle = battleWith(twin);
-        double asNormal = twinBattle.applyDamage(twin, new Damage(twinBattle.characters.getFirst(), twin,
+        double asNormal = twinBattle.applyDamage(twin, new Damage(twinBattle.characters().getFirst(), twin,
                 DamageElement.ICE, DamageType.NORMAL, BASE));
 
         System.out.println("[toughness_reduction] break instance on a broken enemy = " + asBreak
@@ -105,14 +105,14 @@ public class ToughnessDamageReductionTest {
     public void itMultipliesWithOtherReductions() {
         Enemy unbroken = enemy();
         Battle battle = battleWith(unbroken);
-        Damage plain = new Damage(battle.characters.getFirst(), unbroken, DamageElement.ICE, DamageType.NORMAL, BASE);
-        Damage withBuff = new Damage(battle.characters.getFirst(), unbroken, DamageElement.ICE, DamageType.NORMAL, BASE);
+        Damage plain = new Damage(battle.characters().getFirst(), unbroken, DamageElement.ICE, DamageType.NORMAL, BASE);
+        Damage withBuff = new Damage(battle.characters().getFirst(), unbroken, DamageElement.ICE, DamageType.NORMAL, BASE);
         withBuff.addReduction(0.1);         // a 10% "受到伤害降低" buff, the sentence's own example
 
         double one = battle.applyDamage(unbroken, plain);
         Enemy twin = enemy();
         Battle twinBattle = battleWith(twin);
-        Damage twinPlain = new Damage(twinBattle.characters.getFirst(), twin, DamageElement.ICE, DamageType.NORMAL, BASE);
+        Damage twinPlain = new Damage(twinBattle.characters().getFirst(), twin, DamageElement.ICE, DamageType.NORMAL, BASE);
         twinPlain.addReduction(0.1);
         double both = twinBattle.applyDamage(twin, twinPlain);
         System.out.println("[toughness_reduction] toughness only = " + one + " ; plus a 10% buff = " + both
@@ -121,11 +121,11 @@ public class ToughnessDamageReductionTest {
                 "the two reductions multiply (0.9 x 0.9 = 0.81), they do not add up to 0.8");
 
         // The floor belongs to the zone, not to this member: 「目前游戏中的减伤的叠加上限为 0.99」.
-        Damage heavy = new Damage(battle.characters.getFirst(), unbroken, DamageElement.ICE, DamageType.NORMAL, BASE);
+        Damage heavy = new Damage(battle.characters().getFirst(), unbroken, DamageElement.ICE, DamageType.NORMAL, BASE);
         heavy.addReduction(0.9999);
         Enemy third = enemy();
         Battle thirdBattle = battleWith(third);
-        Damage thirdPlain = new Damage(thirdBattle.characters.getFirst(), third, DamageElement.ICE,
+        Damage thirdPlain = new Damage(thirdBattle.characters().getFirst(), third, DamageElement.ICE,
                 DamageType.NORMAL, BASE);
         thirdPlain.addReduction(0.9999);
         double floored = thirdBattle.applyDamage(third, thirdPlain);
@@ -161,7 +161,7 @@ public class ToughnessDamageReductionTest {
      */
     private static double settle(Enemy enemy, DamageType type) {
         Battle battle = battleWith(enemy);
-        return battle.applyDamage(enemy, new Damage(battle.characters.getFirst(), enemy, DamageElement.ICE, type, BASE));
+        return battle.applyDamage(enemy, new Damage(battle.characters().getFirst(), enemy, DamageElement.ICE, type, BASE));
     }
 
     /**

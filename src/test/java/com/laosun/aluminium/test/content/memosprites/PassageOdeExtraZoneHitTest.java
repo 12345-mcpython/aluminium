@@ -46,28 +46,28 @@ public class PassageOdeExtraZoneHitTest {
                 List.of(EnemyFactory.create(MONSTER, 100, 1)), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        tribbie = battle.characters.get(1);
+        tribbie = battle.characters().get(1);
         var ult = tribbie.getSkills().get(SkillType.ULTRA);
         com.laosun.aluminium.models.skill.SkillExecutor.execute(battle, ult, tribbie,
-                List.of(battle.enemies.getFirst()));
+                List.of(battle.enemies().getFirst()));
         battle.processRequests();
         Assertions.assertTrue(tribbie.getBuffManager().hasState("结界"), "precondition: the zone is open");
-        var sprite = battle.summonServant(battle.characters.get(0));
+        var sprite = battle.summonServant(battle.characters().get(0));
         battle.processRequests();
         var ode = sprite.skillAt(ODE_SLOT);
         Assertions.assertNotNull(ode, "precondition: slot 15");
         com.laosun.aluminium.models.skill.SkillExecutor.execute(battle, ode, sprite, List.of(tribbie));
         battle.processRequests();
-        tribbie = battle.characters.get(1);
+        tribbie = battle.characters().get(1);
         Assertions.assertTrue(tribbie.getBuffManager().hasState(GATE), "precondition: the ode's state landed");
         if (!keepGate) {
             tribbie.getBuffManager().removeState(GATE);
         }
-        double before = battle.enemies.getFirst().getCurrentHp();
+        double before = battle.enemies().getFirst().getCurrentHp();
         var basic = tribbie.getSkills().get(SkillType.COMMON);
         com.laosun.aluminium.models.skill.SkillExecutor.execute(battle, basic, tribbie,
-                List.of(battle.enemies.getFirst()));
+                List.of(battle.enemies().getFirst()));
         battle.processRequests();
-        return before - battle.enemies.getFirst().getCurrentHp();
+        return before - battle.enemies().getFirst().getCurrentHp();
     }
 }

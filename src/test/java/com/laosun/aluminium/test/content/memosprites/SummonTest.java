@@ -167,11 +167,11 @@ public class SummonTest {
     public void eachSummonIsItsOwnInstance() {
         Battle battle = new Battle(List.of(hero()), List.of(master()), BattleFixture.seeded());
 
-        Summon first = battle.summon(battle.enemies.getFirst(), MINION, GROUP);
-        Summon second = battle.summon(battle.enemies.getFirst(), MINION, GROUP);
+        Summon first = battle.summon(battle.enemies().getFirst(), MINION, GROUP);
+        Summon second = battle.summon(battle.enemies().getFirst(), MINION, GROUP);
 
         Assertions.assertNotSame(first, second);
-        battle.applyDamage(first, overkill(battle.characters.getFirst(), first));
+        battle.applyDamage(first, overkill(battle.characters().getFirst(), first));
         Assertions.assertTrue(first.isDeath());
         Assertions.assertFalse(second.isDeath(), "one minion dying must not take the other one with it");
     }
@@ -191,21 +191,21 @@ public class SummonTest {
     public void aSummonAdmittedMidBattleJoinsTheCampAndTheActionBar() {
         Battle battle = startedBattle();
         Enemy master = battle.enemyUnits().getFirst();
-        int queueBefore = battle.queue.size();
+        int queueBefore = battle.queue().size();
         int roundBefore = battle.getRound();
 
         Summon summon = battle.summon(master, MINION, GROUP);
-        Assertions.assertEquals(queueBefore, battle.queue.size(), "not on the action bar until it is processed");
+        Assertions.assertEquals(queueBefore, battle.queue().size(), "not on the action bar until it is processed");
 
         battle.processRequests();
 
-        Assertions.assertEquals(queueBefore + 1, battle.queue.size());
-        Assertions.assertTrue(battle.enemies.contains(summon), "the camp holds it");
+        Assertions.assertEquals(queueBefore + 1, battle.queue().size());
+        Assertions.assertTrue(battle.enemies().contains(summon), "the camp holds it");
         Assertions.assertEquals(1, battle.enemyUnits().size(),
                 "enemyUnits() is still the monsters only -- that split is the whole point of");
         Assertions.assertEquals(roundBefore, battle.getRound(),
                 "entering costs no action value: it starts from the current clock, it does not restart a round");
-        Assertions.assertTrue(battle.queue.snapshot().stream().anyMatch(s -> s.getCanHit() == summon),
+        Assertions.assertTrue(battle.queue().snapshot().stream().anyMatch(s -> s.getCanHit() == summon),
                 "it has a signal of its own, so it will be handed turns");
     }
 
@@ -236,7 +236,7 @@ public class SummonTest {
         Battle battle = startedBattle();
         Summon summon = battle.summon(battle.enemyUnits().getFirst(), MINION, GROUP);
         battle.processRequests();
-        Signal signal = battle.queue.snapshot().stream()
+        Signal signal = battle.queue().snapshot().stream()
                 .filter(s -> s.getCanHit() == summon)
                 .findFirst()
                 .orElseThrow();
@@ -263,12 +263,12 @@ public class SummonTest {
         battle.processRequests();
         long aliveBefore = aliveCount(battle);
 
-        battle.applyDamage(summon, overkill(battle.characters.getFirst(), summon));
+        battle.applyDamage(summon, overkill(battle.characters().getFirst(), summon));
         battle.processRequests();
 
         Assertions.assertTrue(summon.isDeath());
         Assertions.assertEquals(aliveBefore - 1, aliveCount(battle), "the live count came back down");
-        Assertions.assertFalse(battle.queue.snapshot().stream().anyMatch(s -> s.getCanHit() == summon),
+        Assertions.assertFalse(battle.queue().snapshot().stream().anyMatch(s -> s.getCanHit() == summon),
                 "and it is off the action bar");
     }
 
@@ -286,7 +286,7 @@ public class SummonTest {
         battle.processRequests();
         double summonHpBefore = summon.getCurrentHp();
 
-        battle.applyDamage(master, overkill(battle.characters.getFirst(), master));
+        battle.applyDamage(master, overkill(battle.characters().getFirst(), master));
         battle.processRequests();
 
         Assertions.assertTrue(master.isDeath(), "precondition: the master is down");
@@ -294,7 +294,7 @@ public class SummonTest {
         Assertions.assertEquals(summonHpBefore, summon.getCurrentHp(), EPS,
                 "it *left*, it was not beaten down: 'still at full HP' and 'killed' are different facts, and "
                         + "content that asks how hurt it is must not be told the second one");
-        Assertions.assertFalse(battle.queue.snapshot().stream().anyMatch(s -> s.getCanHit() == summon));
+        Assertions.assertFalse(battle.queue().snapshot().stream().anyMatch(s -> s.getCanHit() == summon));
         Assertions.assertEquals(Battle.Status.WIN, battle.getStatus(),
                 "nothing is left standing on that side, so this is a win rather than a stalemate");
     }
@@ -308,12 +308,12 @@ public class SummonTest {
         Enemy master = battle.enemyUnits().getFirst();
         Summon summon = battle.summon(master, MINION, GROUP);      // deliberately NOT processed
 
-        battle.applyDamage(master, overkill(battle.characters.getFirst(), master));
+        battle.applyDamage(master, overkill(battle.characters().getFirst(), master));
         battle.processRequests();
 
         Assertions.assertTrue(master.isDeath());
         Assertions.assertTrue(summon.isDeath(), "it never got a turn, but it is still the master's summon");
-        Assertions.assertFalse(battle.queue.snapshot().stream().anyMatch(s -> s.getCanHit() == summon));
+        Assertions.assertFalse(battle.queue().snapshot().stream().anyMatch(s -> s.getCanHit() == summon));
     }
 
     /**
@@ -388,11 +388,11 @@ public class SummonTest {
         Summon ours = battle.summon(hero, MINION, GROUP);
         Summon theirs = battle.summon(battle.enemyUnits().getFirst(), MINION, GROUP);
 
-        Assertions.assertTrue(battle.allies.contains(ours), "a player-side master's summon is on our side");
-        Assertions.assertFalse(battle.characters.contains(ours),
+        Assertions.assertTrue(battle.allies().contains(ours), "a player-side master's summon is on our side");
+        Assertions.assertFalse(battle.characters().contains(ours),
                 "but it is not one of our characters -- the camp and the subset are two questions");
-        Assertions.assertTrue(battle.enemies.contains(theirs), "and an enemy's minion joins the enemy camp");
-        Assertions.assertFalse(battle.allies.contains(theirs));
+        Assertions.assertTrue(battle.enemies().contains(theirs), "and an enemy's minion joins the enemy camp");
+        Assertions.assertFalse(battle.allies().contains(theirs));
     }
 
     /**
@@ -408,7 +408,7 @@ public class SummonTest {
                 () -> battle.summon(master, MINION, GROUP));
 
         Assertions.assertTrue(refused.getMessage().contains("dead master"), refused.getMessage());
-        Assertions.assertEquals(1, battle.enemies.size(), "no half-born summon was left in the roster");
+        Assertions.assertEquals(1, battle.enemies().size(), "no half-born summon was left in the roster");
     }
 
     /**
@@ -422,7 +422,7 @@ public class SummonTest {
                 () -> battle.summon(battle.enemyUnits().getFirst(), 999_999_999, GROUP));
 
         Assertions.assertTrue(refused.getMessage().contains("Unknown monster"), refused.getMessage());
-        Assertions.assertEquals(1, battle.enemies.size());
+        Assertions.assertEquals(1, battle.enemies().size());
     }
 
     /**
@@ -477,7 +477,7 @@ public class SummonTest {
      * convention from the one the engine uses.
      */
     private static long aliveCount(Battle battle) {
-        return battle.enemies.stream().filter(unit -> !unit.isDeath()).count();
+        return battle.enemies().stream().filter(unit -> !unit.isDeath()).count();
     }
 
     /**

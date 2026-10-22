@@ -107,8 +107,8 @@ public class ConeAuditBatchOneTest {
     public void coneTwoThousandFiveRaisesTheWholeParty() {
         Fixture f = new Fixture(20005, 1002, true);
         Fixture bare = new Fixture(null, 1002, true);
-        Character teammate = f.battle.characters.get(1);
-        Character bareTeammate = bare.battle.characters.get(1);
+        Character teammate = f.battle.characters().get(1);
+        Character bareTeammate = bare.battle.characters().get(1);
         double raised = attack(teammate) - attack(bareTeammate);
         double base = bareTeammate.getAttribute(AttributeType.ATTACK).baseValue();
         System.out.println("[20005] 队友 " + teammate.getName() + " 的攻击增量 " + raised + " ; 基础攻击 " + base);
@@ -127,7 +127,7 @@ public class ConeAuditBatchOneTest {
     @Test
     public void coneTwoThousandOneBoostsTheHealOfThatCastOnly() {
         Fixture f = new Fixture(20001, 1409, true);
-        Character ally = f.battle.characters.get(1);
+        Character ally = f.battle.characters().get(1);
         ally.consumeHp(ally.getMaxHp() * 0.5);
         double before = ally.getCurrentHp();
         SkillExecutor.execute(f.battle, f.wearer.getSkills().get(SkillType.SKILL), f.wearer, List.of(ally));
@@ -239,7 +239,7 @@ public class ConeAuditBatchOneTest {
         private double defenceInsideTurn() {
             for (int step = 0; step < 40; step++) {
                 battle.stepForward();
-                boolean mine = battle.queue.getCurrentActor().getCanHit() == wearer;
+                boolean mine = battle.queue().getCurrentActor().getCanHit() == wearer;
                 if (mine) {
                     battle.beforeMove();
                     double inside = attribute(AttributeType.DEFENCE);

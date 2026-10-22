@@ -45,7 +45,7 @@ public class WelcomeToTheCosmicCityTest {
     }
 
     private double elationHit(Battle battle) {
-        Character wearer = battle.allies.getFirst() instanceof Character c ? c : null;
+        Character wearer = battle.allies().getFirst() instanceof Character c ? c : null;
         return battle.applyDamage(enemy, new Damage(wearer, enemy, DamageElement.FIRE, DamageType.ELATION, 1000));
     }
 
@@ -98,11 +98,11 @@ public class WelcomeToTheCosmicCityTest {
     @Test
     public void ordinaryDamageIsUntouched() {
         Battle armed = battle(true);
-        Character wearer = (Character) armed.allies.getFirst();
+        Character wearer = (Character) armed.allies().getFirst();
         double elation = armed.applyDamage(enemy, new Damage(wearer, enemy, DamageElement.FIRE, DamageType.ELATION, 1000));
         double normal = armed.applyDamage(enemy, new Damage(wearer, enemy, DamageElement.FIRE, DamageType.NORMAL, 1000));
         Battle plain = battle(false);
-        Character plainWearer = (Character) plain.allies.getFirst();
+        Character plainWearer = (Character) plain.allies().getFirst();
         double plainElation = plain.applyDamage(enemy, new Damage(plainWearer, enemy, DamageElement.FIRE, DamageType.ELATION, 1000));
         double plainNormal = plain.applyDamage(enemy, new Damage(plainWearer, enemy, DamageElement.FIRE, DamageType.NORMAL, 1000));
         System.out.println("[23057] elation ratio=" + (elation / plainElation)

@@ -85,7 +85,7 @@ public class PastAndFutureNextAllyTest {
                     int after = 0;
                     for (int k = 0; k < ord.size(); k++) {
                         CanHit u = ord.get(k);
-                        if (u != a && cand.allies.contains(u)) {
+                        if (u != a && cand.allies().contains(u)) {
                             if (k < idx) {
                                 before++;
                             } else {
@@ -111,14 +111,14 @@ public class PastAndFutureNextAllyTest {
         CanHit expected = null;
         for (int i = 1; i <= ord.size(); i++) {
             CanHit cand = ord.get((index + i) % ord.size());
-            if (cand != own && bt.allies.contains(cand)) {
+            if (cand != own && bt.allies().contains(cand)) {
                 expected = cand;
                 break;
             }
         }
         Assertions.assertNotNull(expected, "another ally acts later");
         final CanHit exp = expected;
-        CanHit firstAlly = ord.stream().filter(u -> u != own && bt.allies.contains(u)).findFirst().orElseThrow();
+        CanHit firstAlly = ord.stream().filter(u -> u != own && bt.allies().contains(u)).findFirst().orElseThrow();
         Assertions.assertNotEquals(firstAlly, exp, "the fixture must separate 'next to act' from 'first ally'");
 
         int fired = bt.fireTriggers(TriggerEvent.ATTACK_FINISHED, own, exp, 1, 0, SkillCategory.BPSKILL);

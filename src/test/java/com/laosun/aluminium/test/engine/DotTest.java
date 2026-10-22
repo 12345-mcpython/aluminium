@@ -152,7 +152,7 @@ public class DotTest {
         fast.getBuffManager().addBuff(new DotBuff(hero, DamageElement.FIRE, 500, 2));
 
         battle.stepForward();
-        Assertions.assertSame(fast, battle.queue.getCurrentActor().getCanHit());
+        Assertions.assertSame(fast, battle.queue().getCurrentActor().getCanHit());
         battle.beforeMove();
 
         Assertions.assertEquals(100_000 - 500 * 1000.0 / 1100.0, fast.getCurrentHp(), 1e-6,
@@ -202,7 +202,7 @@ public class DotTest {
         hero.getBuffManager().addBuff(new DotBuff(boss, DamageElement.FIRE, 500, 2));
 
         battle.stepForward();
-        Assertions.assertSame(hero, battle.queue.getCurrentActor().getCanHit(), "the hero acts first");
+        Assertions.assertSame(hero, battle.queue().getCurrentActor().getCanHit(), "the hero acts first");
         battle.beforeMove();
 
         Assertions.assertEquals(10_000 - 500 * 1000.0 / 1100.0, hero.getCurrentHp(), 1e-6,

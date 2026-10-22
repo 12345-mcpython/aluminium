@@ -23,12 +23,12 @@ public class UltimateActivationTest {
                 List.of(EnemyFactory.create(1002011, 100, 1)), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        boolean beforeAlly = battle.isUltraReady(battle.characters.get(1));
-        cyrene = battle.characters.get(0);
+        boolean beforeAlly = battle.isUltraReady(battle.characters().get(1));
+        cyrene = battle.characters().get(0);
         com.laosun.aluminium.models.skill.SkillExecutor.execute(battle, cyrene.getSkills().get(SkillType.ULTRA),
-                cyrene, List.of(battle.enemies.getFirst()));
+                cyrene, List.of(battle.enemies().getFirst()));
         battle.processRequests();
-        boolean afterAlly = battle.isUltraReady(battle.characters.get(1));
+        boolean afterAlly = battle.isUltraReady(battle.characters().get(1));
         System.out.println("[activate] the ally's ultimate readiness: " + beforeAlly + " -> " + afterAlly);
         Assertions.assertFalse(beforeAlly, "without energy the ally is not ready");
         Assertions.assertTrue(afterAlly, "her ultimate activates it");

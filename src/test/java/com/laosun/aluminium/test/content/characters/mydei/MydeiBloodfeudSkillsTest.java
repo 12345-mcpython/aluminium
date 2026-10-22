@@ -43,16 +43,16 @@ public class MydeiBloodfeudSkillsTest {
         him.getBuffManager().addBuff(new StateBuff(BLOODFEUD, 9, true));
         battle.processRequests();
 
-        battle.applyTrueDamage(battle.enemies.getFirst(), him, DamageElement.ICE, him.getCurrentHp() * 0.5);
+        battle.applyTrueDamage(battle.enemies().getFirst(), him, DamageElement.ICE, him.getCurrentHp() * 0.5);
         battle.processRequests();
         Assertions.assertTrue(him.getCurrentHp() < him.getMaxHp(), "precondition: he is wounded");
 
         double hpBefore = him.getCurrentHp();
         double maxHp = him.getMaxHp();
-        double enemyBefore = battle.enemies.getFirst().getCurrentHp();
+        double enemyBefore = battle.enemies().getFirst().getCurrentHp();
         spendTurnOf(battle, him);
         double hpAfter = him.getCurrentHp();
-        double enemyAfter = battle.enemies.getFirst().getCurrentHp();
+        double enemyAfter = battle.enemies().getFirst().getCurrentHp();
         System.out.println("[mydei-skills] cost: own hp " + hpBefore + " -> " + hpAfter + " (max " + maxHp
                 + ") ; enemy " + enemyBefore + " -> " + enemyAfter);
 
@@ -96,10 +96,10 @@ public class MydeiBloodfeudSkillsTest {
      * Note: Half a turn is `beforeMove()` alone; a full one is both halves (see `ArlanEidolonFourTest`).
      */
     private static void spendTurnOf(Battle battle, Character unit) {
-        Signal signal = battle.queue.snapshot().stream()
+        Signal signal = battle.queue().snapshot().stream()
                 .filter(candidate -> candidate.getCanHit() == unit).findFirst()
                 .orElseThrow(() -> new AssertionError("precondition: the unit is in the queue"));
-        battle.currentMove = signal;
+        battle.setCurrentMove(signal);
         battle.beforeMove();
         battle.afterMove();
         battle.processRequests();
@@ -121,9 +121,9 @@ public class MydeiBloodfeudSkillsTest {
         battle.processRequests();
         him.getBuffManager().addBuff(new StateBuff(BLOODFEUD, 9, true));
         battle.processRequests();
-        double before = battle.enemies.getFirst().getCurrentHp();
+        double before = battle.enemies().getFirst().getCurrentHp();
         spendTurnOf(battle, him);
-        double commanded = before - battle.enemies.getFirst().getCurrentHp();
+        double commanded = before - battle.enemies().getFirst().getCurrentHp();
 
         Character byHand = CharacterFactory.create(MYDEI, 80, false, null, null, 0);
         Battle other = new Battle(List.of(byHand),
@@ -133,11 +133,11 @@ public class MydeiBloodfeudSkillsTest {
         // Note: AFTER startBattle, so the slot carries the level the convention gives it -- the trap the earlier attempt fell into.
         byHand.getSkills().put(SkillType.SKILL, new com.laosun.aluminium.models.skill.DefaultSkill(
                 MYDEI, 9, byHand.getSkills().get(SkillType.SKILL).getLevel()));
-        double otherBefore = other.enemies.getFirst().getCurrentHp();
+        double otherBefore = other.enemies().getFirst().getCurrentHp();
         com.laosun.aluminium.models.skill.SkillExecutor.execute(other,
-                byHand.getSkills().get(SkillType.SKILL), byHand, List.of(other.enemies.getFirst()));
+                byHand.getSkills().get(SkillType.SKILL), byHand, List.of(other.enemies().getFirst()));
         other.processRequests();
-        double manual = otherBefore - other.enemies.getFirst().getCurrentHp();
+        double manual = otherBefore - other.enemies().getFirst().getCurrentHp();
         System.out.println("[mydei-skills] commanded=" + commanded + " ; slot-9 by hand=" + manual);
 
         Assertions.assertEquals(manual, commanded, manual * 1e-9,
@@ -159,7 +159,7 @@ public class MydeiBloodfeudSkillsTest {
 
         him.getResources().gain(CHARGE, 100);
         battle.noteChangedResource(CHARGE);
-        battle.fireTriggers(TriggerEvent.RESOURCE_CHANGED, him, battle.enemies.getFirst(), 0, 100);
+        battle.fireTriggers(TriggerEvent.RESOURCE_CHANGED, him, battle.enemies().getFirst(), 0, 100);
         battle.processRequests();
         int charge = him.getResources().value(CHARGE);
         System.out.println("[mydei-skills] charge after entering bloodfeud with 100 = " + charge);
@@ -184,11 +184,11 @@ public class MydeiBloodfeudSkillsTest {
 
         him.getResources().gain(CHARGE, 150);
         battle.noteChangedResource(CHARGE);
-        double enemyBefore = battle.enemies.getFirst().getCurrentHp();
-        battle.fireTriggers(TriggerEvent.RESOURCE_CHANGED, him, battle.enemies.getFirst(), 0, 150);
+        double enemyBefore = battle.enemies().getFirst().getCurrentHp();
+        battle.fireTriggers(TriggerEvent.RESOURCE_CHANGED, him, battle.enemies().getFirst(), 0, 150);
         battle.processRequests();
         int charge = him.getResources().value(CHARGE);
-        double enemyAfter = battle.enemies.getFirst().getCurrentHp();
+        double enemyAfter = battle.enemies().getFirst().getCurrentHp();
         System.out.println("[mydei-skills] 150: charge " + charge + " ; enemy " + enemyBefore + " -> " + enemyAfter
                 + " ; SKILL slot now=" + him.getSkills().get(SkillType.SKILL).getSkillSlot());
 

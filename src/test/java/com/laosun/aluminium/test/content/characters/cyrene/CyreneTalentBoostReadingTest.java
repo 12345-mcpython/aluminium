@@ -31,7 +31,7 @@ public class CyreneTalentBoostReadingTest {
                 List.of(EnemyFactory.create(MONSTER, 100, 1)), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        double boost = battle.characters.get(1).getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
+        double boost = battle.characters().get(1).getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
         System.out.println("[cyrene_boost] a teammate's ALL_DAMAGE_TYPE_BOOST reads " + boost
                 + " (the file states percent 0.2 with max_stacks 2)");
         Assertions.assertEquals(0.2, boost, 1e-9,

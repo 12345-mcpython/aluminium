@@ -111,7 +111,7 @@ public class UltCastTriggerTest {
     @Test
     public void ultCastDoesNotFireForOtherSkillTypes() {
         Battle battle = battleWith(rule("ULT_CAST", null, gainSkillPoint(ULT_CAST_POINTS)));
-        Character hero = battle.characters.getFirst();
+        Character hero = battle.characters().getFirst();
 
         drainSkillPoints(battle);
         cast(battle, hero, SkillType.COMMON);
@@ -144,7 +144,7 @@ public class UltCastTriggerTest {
         Battle battle = battleWith(
                 rule("ULT_CAST", null, gainSkillPoint(ULT_CAST_POINTS)),
                 rule("SKILL_CAST", null, gainSkillPoint(SKILL_CAST_POINTS)));
-        Character hero = battle.characters.getFirst();
+        Character hero = battle.characters().getFirst();
 
         drainSkillPoints(battle);
         Assertions.assertTrue(castUltimate(battle));
@@ -175,7 +175,7 @@ public class UltCastTriggerTest {
                 rule("BASIC_ATTACK", null, gainSkillPoint(BASIC_ATTACK_POINTS)));
         drainSkillPoints(battle);
 
-        cast(battle, battle.characters.getFirst(), SkillType.COMMON);
+        cast(battle, battle.characters().getFirst(), SkillType.COMMON);
         Assertions.assertEquals(BASIC_ATTACK_POINTS, battle.getSkillPoints(),
                 "a basic attack must fire ONLY the BASIC_ATTACK rule: " + SKILL_CAST_POINTS
                         + " would mean SKILL_CAST fired for a basic attack");
@@ -191,7 +191,7 @@ public class UltCastTriggerTest {
                 rule("ALLY_ATTACK", List.of("actor == self", "hit_count > 0"), gainSkillPoint(ALLY_ATTACK_POINTS)));
         drainSkillPoints(battle);
 
-        cast(battle, battle.characters.getFirst(), SkillType.COMMON);
+        cast(battle, battle.characters().getFirst(), SkillType.COMMON);
         Assertions.assertEquals(ALLY_ATTACK_POINTS, battle.getSkillPoints(),
                 "a basic attack that lands is an attack; " + (ALLY_ATTACK_POINTS + SKILL_CAST_POINTS)
                         + " would mean SKILL_CAST fired too");
@@ -207,7 +207,7 @@ public class UltCastTriggerTest {
                 rule("BASIC_ATTACK", null, gainSkillPoint(BASIC_ATTACK_POINTS)));
         drainSkillPoints(battle);
 
-        cast(battle, battle.characters.getFirst(), SkillType.SKILL);
+        cast(battle, battle.characters().getFirst(), SkillType.SKILL);
         Assertions.assertEquals(SKILL_CAST_POINTS, battle.getSkillPoints(),
                 "a Skill is not a basic attack: " + BASIC_ATTACK_POINTS + " would mean BASIC_ATTACK fired");
     }
@@ -226,7 +226,7 @@ public class UltCastTriggerTest {
                 rule("ULT_CAST", null, gainSkillPoint(ULT_CAST_POINTS)),
                 rule("SKILL_CAST", null, gainSkillPoint(SKILL_CAST_POINTS)),
                 rule("BASIC_ATTACK", null, gainSkillPoint(BASIC_ATTACK_POINTS)));
-        Character hero = battle.characters.getFirst();
+        Character hero = battle.characters().getFirst();
 
         drainSkillPoints(battle);
         cast(battle, hero, SkillType.MAZE);
@@ -277,9 +277,9 @@ public class UltCastTriggerTest {
      * Casts the hero's ultimate for real (through {@code Battle.castUltra}, energy gate included).
      */
     private static boolean castUltimate(Battle battle) {
-        Character hero = battle.characters.getFirst();
+        Character hero = battle.characters().getFirst();
         hero.setCurrentEnergy(hero.getMaxEnergy());
-        return battle.castUltra(hero, List.of(battle.enemies.getFirst()));
+        return battle.castUltra(hero, List.of(battle.enemies().getFirst()));
     }
 
     /**
@@ -290,7 +290,7 @@ public class UltCastTriggerTest {
         Assertions.assertNotNull(skill, "precondition: the character carries the " + slot + " slot");
         Assertions.assertNotEquals(SkillCategory.ULTRA, skill.getData().getCategory(),
                 "precondition: the " + slot + " slot used in this test is not an ultimate");
-        battle.castImmediate(skill, hero, List.of(battle.enemies.getFirst()));
+        battle.castImmediate(skill, hero, List.of(battle.enemies().getFirst()));
     }
 
     /**

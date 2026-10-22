@@ -42,7 +42,7 @@ public class CooldownAmendmentTest {
     @Test
     public void theAmendmentShortensTheWaitByOneTurn() {
         Battle shortened = battle(limited(2), shortening());
-        Character owner = shortened.characters.getFirst();
+        Character owner = shortened.characters().getFirst();
 
         Assertions.assertEquals(1, fire(shortened, owner), "the first event fires the rule");
         TestTurns.take(shortened, owner);
@@ -50,7 +50,7 @@ public class CooldownAmendmentTest {
                 "cooldown 2 amended by -1 is 1: one of the owner's turns is enough");
 
         Battle control = battle(limited(2));
-        Character controlOwner = control.characters.getFirst();
+        Character controlOwner = control.characters().getFirst();
         Assertions.assertEquals(1, fire(control, controlOwner));
         TestTurns.take(control, controlOwner);
         Assertions.assertEquals(0, fire(control, controlOwner),

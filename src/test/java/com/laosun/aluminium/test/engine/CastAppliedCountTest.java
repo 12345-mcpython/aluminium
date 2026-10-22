@@ -111,7 +111,7 @@ public class CastAppliedCountTest {
         Battle contaminated = ultimateBattle(heroWithAnOutOfCastFreeze(), 3, 0);
         // The freeze happens on a hit she takes, long before the ultimate: `attacker` is the one who gets frozen.
         contaminated.fireTriggers(TriggerEvent.TAKING_HIT, contaminated.enemyUnits().getFirst(),
-                contaminated.characters.getFirst(), 1, 0);
+                contaminated.characters().getFirst(), 1, 0);
 
         double withStale = castUltimate(contaminated);
         double clean = energyFromAnUltimate(3, 0);
@@ -248,7 +248,7 @@ public class CastAppliedCountTest {
      * One cast of March 7th (三月七)'s ultimate data, measured as the energy it granted.
      */
     private static double castUltimate(Battle battle) {
-        Character hero = battle.characters.getFirst();
+        Character hero = battle.characters().getFirst();
         double before = hero.getCurrentEnergy();
         battle.castImmediate(new DefaultSkill(MARCH_7TH, ULTIMATE_SLOT, 1), hero,
                 List.copyOf(battle.enemyUnits()));

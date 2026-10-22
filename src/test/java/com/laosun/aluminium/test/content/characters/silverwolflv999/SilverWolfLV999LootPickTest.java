@@ -198,7 +198,7 @@ public class SilverWolfLV999LootPickTest {
         double[] beforeHp = enemies.stream().mapToDouble(e -> e.getCurrentHp()).toArray();
         int pointsBefore = battle.getSkillPoints();
         int laughsBefore = battle.partyResourceValue(LAUGH);
-        Character wolf = battle.characters.getFirst();
+        Character wolf = battle.characters().getFirst();
         battle.fireTriggers(TriggerEvent.SKILL_POINT_SPENT, wolf, wolf, 0, 1);
         battle.processRequests();
         double[] lost = new double[beforeHp.length];
@@ -230,7 +230,7 @@ public class SilverWolfLV999LootPickTest {
                 List.of(CharacterFactory.create(WOLF, 80), CharacterFactory.create(ALLY, 80)), roster, rng);
         battle.startBattle();
         battle.processRequests();
-        Character wolf = battle.characters.getFirst();
+        Character wolf = battle.characters().getFirst();
         wolf.getResources().gain(GIFT, 1);
         wolf.setCurrentEnergy(wolf.getMaxEnergy());
         battle.castUltra(wolf, List.of(battle.enemyUnits().getFirst()));

@@ -26,22 +26,22 @@ public class EarthOdeRaisesTheBondmatesDamageTest {
         battle.startBattle();
         battle.processRequests();
         // his own skill hands [同袍] to the one it is aimed at
-        him = battle.characters.get(1);
+        him = battle.characters().get(1);
         com.laosun.aluminium.models.skill.SkillExecutor.execute(battle, him.getSkills().get(SkillType.SKILL), him,
-                List.of(battle.characters.get(2)));
+                List.of(battle.characters().get(2)));
         battle.processRequests();
-        Assertions.assertTrue(battle.characters.get(2).getBuffManager().hasState("同袍"),
+        Assertions.assertTrue(battle.characters().get(2).getBuffManager().hasState("同袍"),
                 "precondition: the ally holds 【同袍】 (Bondmate)");
-        double before = battle.characters.get(2).getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
+        double before = battle.characters().get(2).getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
         // the ode, cast at him
-        var sprite = battle.summonServant(battle.characters.get(0));
+        var sprite = battle.summonServant(battle.characters().get(0));
         battle.processRequests();
         var ode = sprite.skillAt(25);
         Assertions.assertNotNull(ode, "precondition: slot 25");
         com.laosun.aluminium.models.skill.SkillExecutor.execute(battle, ode, sprite,
-                List.of(battle.characters.get(1)));
+                List.of(battle.characters().get(1)));
         battle.processRequests();
-        double after = battle.characters.get(2).getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
+        double after = battle.characters().get(2).getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
         System.out.println("[earth_boost] the bondmate's damage boost reads " + before + " -> " + after);
         Assertions.assertEquals(0.0012, after - before, 1e-9, "0.12% lands on the 【同袍】 (Bondmate) holder");
     }

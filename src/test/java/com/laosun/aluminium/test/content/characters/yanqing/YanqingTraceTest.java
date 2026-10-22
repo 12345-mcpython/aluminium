@@ -26,7 +26,7 @@ public class YanqingTraceTest {
         Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
-        battle.currentMove = new Signal(unit);
+        battle.setCurrentMove(new Signal(unit));
         battle.beforeMove();
         double before = unit.getAttribute(AttributeType.EFFECT_RESISTANCE).get();
         battle.fireTriggers(TriggerEvent.SKILL_CAST, unit, enemy, 0, 0);

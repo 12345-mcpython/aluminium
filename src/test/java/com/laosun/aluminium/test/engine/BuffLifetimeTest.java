@@ -67,7 +67,7 @@ public class BuffLifetimeTest {
     @Test
     public void theOwnersAttackConsumesIt() {
         Battle battle = battleWithBuff("next_attack");
-        Character owner = battle.characters.getFirst();
+        Character owner = battle.characters().getFirst();
         Assertions.assertEquals(0.5, critRateBonus(owner), EPS, "precondition: the buff is up");
 
         attack(battle, owner, 1);        // slot 1 = the basic attack
@@ -86,8 +86,8 @@ public class BuffLifetimeTest {
     @Test
     public void aTeammatesAttackDoesNotConsumeIt() {
         Battle battle = battleWithBuff("next_attack", 2);
-        Character owner = battle.characters.getFirst();
-        Character teammate = battle.characters.get(1);
+        Character owner = battle.characters().getFirst();
+        Character teammate = battle.characters().get(1);
 
         attack(battle, teammate, 1);
 
@@ -105,7 +105,7 @@ public class BuffLifetimeTest {
     @Test
     public void turnBoundariesDoNotConsumeIt() {
         Battle battle = battleWithBuff("next_attack");
-        Character owner = battle.characters.getFirst();
+        Character owner = battle.characters().getFirst();
 
         for (int turn = 0; turn < 5; turn++) {
             owner.getBuffManager().beforeMove();
@@ -127,7 +127,7 @@ public class BuffLifetimeTest {
     @Test
     public void anAttackThatHitsNothingDoesNotConsumeIt() {
         Battle battle = battleWithBuff("next_attack");
-        Character owner = battle.characters.getFirst();
+        Character owner = battle.characters().getFirst();
         battle.enemyUnits().getFirst().takeDamage(9_999_999);
         battle.processRequests();
 
@@ -144,7 +144,7 @@ public class BuffLifetimeTest {
     public void theSpellingsNameDifferentEvents() {
         // next_skill: a basic attack does not consume it, a Skill does.
         Battle skillBattle = battleWithBuff("next_skill");
-        Character skillOwner = skillBattle.characters.getFirst();
+        Character skillOwner = skillBattle.characters().getFirst();
         attack(skillBattle, skillOwner, 1);
         Assertions.assertEquals(0.5, critRateBonus(skillOwner), EPS,
                 "a basic attack is not a Skill");
@@ -153,7 +153,7 @@ public class BuffLifetimeTest {
 
         // next_ultimate: a Skill does not consume it, the Ultimate does.
         Battle ultBattle = battleWithBuff("next_ultimate");
-        Character ultOwner = ultBattle.characters.getFirst();
+        Character ultOwner = ultBattle.characters().getFirst();
         attack(ultBattle, ultOwner, 2);
         Assertions.assertEquals(0.5, critRateBonus(ultOwner), EPS, "a Skill is not an Ultimate");
         attack(ultBattle, ultOwner, 3);
@@ -174,7 +174,7 @@ public class BuffLifetimeTest {
     @Test
     public void anElationCastIsItsOwnLifetime() {
         Battle battle = battleWithBuff("next_elation_skill");
-        Character owner = battle.characters.getFirst();
+        Character owner = battle.characters().getFirst();
 
         attack(battle, owner, 2);                                 // a Skill
         Assertions.assertEquals(0.5, critRateBonus(owner), EPS, "a Skill is not an Elation skill");
@@ -199,7 +199,7 @@ public class BuffLifetimeTest {
     public void aDisjunctionEndsAtTheFirstOfItsEvents() {
         // The half a lone `next_attack` cannot express: a cast that landed nothing still ends it.
         Battle bySkill = battleWithBuff(List.of("next_attack", "next_skill"));
-        Character skilled = bySkill.characters.getFirst();
+        Character skilled = bySkill.characters().getFirst();
         bySkill.enemyUnits().getFirst().takeDamage(9_999_999);
         bySkill.processRequests();
 
@@ -209,7 +209,7 @@ public class BuffLifetimeTest {
 
         // The other member, on its own: a basic attack ends it just as well.
         Battle byAttack = battleWithBuff(List.of("next_attack", "next_skill"));
-        Character attacker = byAttack.characters.getFirst();
+        Character attacker = byAttack.characters().getFirst();
 
         attack(byAttack, attacker, 1);
         Assertions.assertEquals(0, critRateBonus(attacker), EPS,
@@ -223,7 +223,7 @@ public class BuffLifetimeTest {
     @Test
     public void aWhiffedBasicAttackStillDoesNotConsumeTheDisjunction() {
         Battle battle = battleWithBuff(List.of("next_attack", "next_skill"));
-        Character owner = battle.characters.getFirst();
+        Character owner = battle.characters().getFirst();
         battle.enemyUnits().getFirst().takeDamage(9_999_999);
         battle.processRequests();
 

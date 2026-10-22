@@ -189,9 +189,9 @@ public class ElationGiftSnapshotTest {
                     List.of(BattleFixture.monster()), BattleFixture.seeded());
             battle.startBattle();
             battle.processRequests();
-            pearl = battle.characters.get(0);
-            ally = battle.characters.get(1);
-            other = battle.characters.get(2);
+            pearl = battle.characters().get(0);
+            ally = battle.characters().get(1);
+            other = battle.characters().get(2);
         }
 
         /**
@@ -224,7 +224,7 @@ public class ElationGiftSnapshotTest {
          * Puts one rule on the holder and empties every other table, so only this unit's turn is in play.
          */
         private void putOnly(Character holder, TriggerSpec rule) {
-            for (Character unit : battle.characters) {
+            for (Character unit : battle.characters()) {
                 List<TriggerSpec> rules = unit == holder && rule != null ? List.of(rule) : List.of();
                 unit.setTriggerTable(new TriggerTable(unit.getCid(), rules));
             }

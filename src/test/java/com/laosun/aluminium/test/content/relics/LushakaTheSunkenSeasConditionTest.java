@@ -37,7 +37,7 @@ public class LushakaTheSunkenSeasConditionTest {
         Battle battle = new Battle(List.of(ally, wearer), List.of(EnemyFactory.create(1002011, 90, 1)),
                 BattleFixture.seeded());
         battle.startBattle();
-        Assertions.assertSame(ally, battle.characters.getFirst(), "the party list order is what matters");
+        Assertions.assertSame(ally, battle.characters().getFirst(), "the party list order is what matters");
         Assertions.assertEquals(1,
                 RelicTriggerTables.of(317).at(2).matching(TriggerEvent.BATTLE_START, ctx(wearer, battle)).size(),
                 "wearer is NOT first => the rule matches");
@@ -48,7 +48,7 @@ public class LushakaTheSunkenSeasConditionTest {
         Battle other = new Battle(List.of(first, second), List.of(EnemyFactory.create(1002011, 90, 1)),
                 BattleFixture.seeded());
         other.startBattle();
-        Assertions.assertSame(first, other.characters.getFirst(), "the wearer leads the party here");
+        Assertions.assertSame(first, other.characters().getFirst(), "the wearer leads the party here");
         Assertions.assertEquals(0,
                 RelicTriggerTables.of(317).at(2).matching(TriggerEvent.BATTLE_START, ctx(first, other)).size(),
                 "wearer IS first => nothing may match");

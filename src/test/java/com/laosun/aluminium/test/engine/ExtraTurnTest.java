@@ -64,19 +64,19 @@ public class ExtraTurnTest {
     public void extraTurnDoesNotConsumeTheNormalTurn() {
         Character hero = character("hero", 100);
         Battle battle = new Battle(List.of(hero), List.of(dummy()), BattleFixture.seeded());
-        Queue q = battle.queue;
+        Queue q = battle.queue();
 
         battle.stepForward();                            // the 132-speed enemy acts first (113.64)
         battle.afterMove();
         battle.stepForward();                            // hero's first round 150
-        Assertions.assertEquals(hero, battle.currentMove.getCanHit());
+        Assertions.assertEquals(hero, battle.currentMove().getCanHit());
         battle.afterMove();                              // hero to 250
 
         Assertions.assertEquals(250, signalOf(q, hero).getNextActionTime(), EPS);
 
         Assertions.assertTrue(battle.grantExtraTurn(hero));
         battle.stepForward();                            // extra turn: hero, the clock does not move
-        Assertions.assertEquals(hero, battle.currentMove.getCanHit());
+        Assertions.assertEquals(hero, battle.currentMove().getCanHit());
         Assertions.assertEquals(150, q.getElapsed(), EPS, "the clock is still 150");
         battle.afterMove();                              // hero's normal schedule is pushed back to 250
 
@@ -264,7 +264,7 @@ public class ExtraTurnTest {
         battle.stepForward();
         battle.afterMove();
         battle.stepForward();                            // hero or ally acts
-        CanHit actor = battle.currentMove.getCanHit();
+        CanHit actor = battle.currentMove().getCanHit();
         battle.afterMove();
 
         battle.grantExtraTurn(actor);

@@ -77,7 +77,7 @@ public class HyacineMemospriteLeavesTest {
             battle.startBattle();
             battle.processRequests();
             SkillExecutor.execute(battle, hyacine.getSkills().get(SkillType.SKILL), hyacine,
-                    List.of(battle.enemies.getFirst()));
+                    List.of(battle.enemies().getFirst()));
             battle.processRequests();
             this.ika = (Summon) battle.memospriteOf(hyacine);
             Assertions.assertNotNull(ika, "precondition: 小伊卡 is out");
@@ -85,9 +85,9 @@ public class HyacineMemospriteLeavesTest {
 
         /** 风堇 的剩余等待，从行动条自己的快照读。 */
         double remainingWaitOf(com.laosun.aluminium.models.CanHit unit) {
-            for (var signal : battle.queue.snapshot()) {
+            for (var signal : battle.queue().snapshot()) {
                 if (signal.getCanHit() == unit) {
-                    return battle.queue.getTimeRemaining(signal);
+                    return battle.queue().getTimeRemaining(signal);
                 }
             }
             throw new AssertionError(unit.getName() + " is not on the action bar");

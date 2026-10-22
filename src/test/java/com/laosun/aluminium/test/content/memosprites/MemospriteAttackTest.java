@@ -221,7 +221,7 @@ public class MemospriteAttackTest {
     @Test
     public void theMemospriteOwnUntilBuffEndsWhenItAttacks() {
         Battle battle = battleWithUntilBuffsOn(true, false);
-        Summon evey = battle.memospriteOf(battle.characters.getFirst());
+        Summon evey = battle.memospriteOf(battle.characters().getFirst());
 
         Assertions.assertEquals(0.3, critDamageOf(evey), EPS, "precondition: the rule put the buff on it");
 
@@ -242,7 +242,7 @@ public class MemospriteAttackTest {
     @Test
     public void theSummonersOwnUntilBuffSurvivesTheMemospriteAttack() {
         Battle battle = battleWithUntilBuffsOn(false, true);
-        Character summoner = battle.characters.getFirst();
+        Character summoner = battle.characters().getFirst();
         Summon evey = battle.memospriteOf(summoner);
         double summonerBefore = critDamageOf(summoner);
 
@@ -265,7 +265,7 @@ public class MemospriteAttackTest {
     @Test
     public void anEnemyAttackConsumesNothingOnOurSide() {
         Battle battle = battleWithUntilBuffsOn(true, true);
-        Character summoner = battle.characters.getFirst();
+        Character summoner = battle.characters().getFirst();
         Summon evey = battle.memospriteOf(summoner);
         Enemy monster = battle.enemyUnits().getFirst();
 
@@ -466,7 +466,7 @@ public class MemospriteAttackTest {
             if (battle.isOver()) {
                 break;
             }
-            Signal current = battle.queue.getCurrentActor();
+            Signal current = battle.queue().getCurrentActor();
             battle.beforeMove();
             if (current != null && current.getCanHit() == summon) {
                 double targetBefore = targets.stream().mapToDouble(CanHit::getCurrentHp).sum();
@@ -557,7 +557,7 @@ public class MemospriteAttackTest {
     }
 
     private static double ourSideHp(Battle battle) {
-        return battle.allies.stream().mapToDouble(CanHit::getCurrentHp).sum();
+        return battle.allies().stream().mapToDouble(CanHit::getCurrentHp).sum();
     }
 
     private static List<MemospriteSpec.Panel> panel(double healthShare) {

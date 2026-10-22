@@ -110,8 +110,8 @@ public class ArcherEidolonLevelsTest {
      */
     private static double followUpPerAttack(int eidolonRank) {
         Battle battle = battle(eidolonRank);
-        Character archer = battle.characters.getFirst();
-        Character ally = battle.characters.get(1);
+        Character archer = battle.characters().getFirst();
+        Character ally = battle.characters().get(1);
         double atk = archer.getAttribute(com.laosun.aluminium.enums.AttributeType.ATTACK).get();
         List<Damage> settled = new ArrayList<>();
         battle.addDamageObserver((damage, applied, hpLoss, shieldAbsorbed, died) -> settled.add(damage));
@@ -126,7 +126,7 @@ public class ArcherEidolonLevelsTest {
      */
     private static double boostZoneOfTheUltimate(int eidolonRank) {
         Battle battle = battle(eidolonRank);
-        Character archer = battle.characters.getFirst();
+        Character archer = battle.characters().getFirst();
         archer.setCurrentEnergy(archer.getMaxEnergy());
         List<Damage> settled = new ArrayList<>();
         battle.addDamageObserver((damage, applied, hpLoss, shieldAbsorbed, died) -> settled.add(damage));
@@ -143,7 +143,7 @@ public class ArcherEidolonLevelsTest {
      */
     private static int skillPointGainOnHerTurn(int eidolonRank) {
         Battle battle = battle(eidolonRank);
-        Character archer = battle.characters.getFirst();
+        Character archer = battle.characters().getFirst();
         int before = battle.getSkillPoints();
         battle.fireTriggers(TriggerEvent.TURN_START, archer, archer, 0, 0);
         battle.processRequests();
@@ -155,7 +155,7 @@ public class ArcherEidolonLevelsTest {
      */
     private static int layersAtEidolon(int eidolonRank) {
         Battle battle = battle(eidolonRank);
-        Character archer = battle.characters.getFirst();
+        Character archer = battle.characters().getFirst();
         Skill skill = archer.getSkills().get(SkillType.SKILL);
         for (int cast = 0; cast < 4; cast++) {
             battle.castImmediate(skill, archer, List.of(battle.enemyUnits().getFirst()));
@@ -169,7 +169,7 @@ public class ArcherEidolonLevelsTest {
      */
     private static double defenceFactorOfASkillHit(int eidolonRank) {
         Battle battle = battle(eidolonRank);
-        Character archer = battle.characters.getFirst();
+        Character archer = battle.characters().getFirst();
         List<Damage> settled = new ArrayList<>();
         battle.addDamageObserver((damage, applied, hpLoss, shieldAbsorbed, died) -> settled.add(damage));
         battle.castImmediate(archer.getSkills().get(SkillType.SKILL), archer,
@@ -182,7 +182,7 @@ public class ArcherEidolonLevelsTest {
     }
 
     private static Character newBattle(int eidolonRank, int enemies) {
-        return battle(eidolonRank, enemies, true).characters.getFirst();
+        return battle(eidolonRank, enemies, true).characters().getFirst();
     }
 
     private static Battle battle(int eidolonRank) {
@@ -205,7 +205,7 @@ public class ArcherEidolonLevelsTest {
                 foes, BattleFixture.alwaysRoll(0.9999));
         battle.startBattle();
         battle.processRequests();
-        battle.characters.getFirst().getResources().get(CHARGE).setValue(4);
+        battle.characters().getFirst().getResources().get(CHARGE).setValue(4);
         return battle;
     }
 }

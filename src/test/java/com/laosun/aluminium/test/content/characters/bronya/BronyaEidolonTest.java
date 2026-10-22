@@ -44,8 +44,8 @@ public class BronyaEidolonTest {
     @Test
     public void herDefenceTraceBuffsTheWholePartyAtBattleStart() {
         Battle battle = battleWith(0, 0.5);
-        Character bronya = battle.characters.getFirst();
-        Character ally = battle.characters.get(1);
+        Character bronya = battle.characters().getFirst();
+        Character ally = battle.characters().get(1);
 
         Assertions.assertEquals(List.of(DEFENCE_TRACE), defenceBuffsOn(bronya), "20% DEF on the wearer");
         Assertions.assertEquals(List.of(DEFENCE_TRACE), defenceBuffsOn(ally),
@@ -55,7 +55,7 @@ public class BronyaEidolonTest {
     @Test
     public void theDefenceTraceExpiresAfterItsTwoTurns() {
         Battle battle = battleWith(0, 0.5);
-        Character bronya = battle.characters.getFirst();
+        Character bronya = battle.characters().getFirst();
         Assertions.assertEquals(1, defenceBuffsOn(bronya).size(), "precondition: it is on");
 
         for (int turn = 0; turn < 6 && !battle.isOver(); turn++) {
@@ -89,7 +89,7 @@ public class BronyaEidolonTest {
     @Test
     public void itsOneTurnCooldownStopsASecondCastInTheSameTurn() {
         Battle battle = battleWith(1, 0.1);
-        Character bronya = battle.characters.getFirst();
+        Character bronya = battle.characters().getFirst();
         drainSkillPoints(battle);
 
         castSkill(battle, bronya);
@@ -115,8 +115,8 @@ public class BronyaEidolonTest {
     @Test
     public void herSixthEidolonLengthensTheSkillDamageBoostAndNothingElse() {
         Battle battle = battleWith(6, 0.0);
-        Character bronya = battle.characters.getFirst();
-        Character ally = battle.characters.get(1);
+        Character bronya = battle.characters().getFirst();
+        Character ally = battle.characters().get(1);
         drainSkillPoints(battle);
 
         castSkillOn(battle, bronya, ally);
@@ -133,8 +133,8 @@ public class BronyaEidolonTest {
     @Test
     public void theSixthEidolonsExtensionIsGatedOnItsRank() {
         Battle battle = battleWith(5, 0.0);
-        Character bronya = battle.characters.getFirst();
-        Character ally = battle.characters.get(1);
+        Character bronya = battle.characters().getFirst();
+        Character ally = battle.characters().get(1);
         drainSkillPoints(battle);
 
         castSkillOn(battle, bronya, ally);
@@ -159,7 +159,7 @@ public class BronyaEidolonTest {
 
     private static int skillPointsFromOneSkillCast(int rank, double roll) {
         Battle battle = battleWith(rank, roll);
-        Character bronya = battle.characters.getFirst();
+        Character bronya = battle.characters().getFirst();
         drainSkillPoints(battle);
         castSkill(battle, bronya);
         return battle.getSkillPoints();

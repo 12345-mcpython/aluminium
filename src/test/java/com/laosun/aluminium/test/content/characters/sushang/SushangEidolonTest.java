@@ -44,7 +44,7 @@ public class SushangEidolonTest {
                 "「对陷入弱点击破状态的敌方目标…」 - a healthy target pays nothing");
 
         Fixture breaking = new Fixture(1, BattleFixture.dummy());
-        Enemy target = (Enemy) breaking.battle.enemies.getFirst();
+        Enemy target = (Enemy) breaking.battle.enemies().getFirst();
         Assertions.assertFalse(target.isBroken(), "precondition: not broken yet");
         // ⚠ The broken state is ENTERED directly through the enemy's own entry point rather than by emptying a
         // toughness bar: `BattleFixture.dummy()` is built by `fromAttributes` and has no bar at all, and which

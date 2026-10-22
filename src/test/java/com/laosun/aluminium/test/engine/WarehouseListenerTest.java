@@ -52,7 +52,7 @@ public class WarehouseListenerTest {
         battle.processRequests();
         double ownedGain = owned.getAttribute(AttributeType.ATTACK).get() - ownedAttackBefore;
         double fighterGain = fighter.getAttribute(AttributeType.ATTACK).get() - fighterAttackBefore;
-        boolean ownedInQueue = battle.queue.snapshot().stream()
+        boolean ownedInQueue = battle.queue().snapshot().stream()
                 .anyMatch(signal -> signal.getCanHit() == owned);
         System.out.println("[warehouse] listener gain=" + ownedGain + " fighter gain=" + fighterGain
                 + " listener in queue=" + ownedInQueue);

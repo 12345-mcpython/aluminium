@@ -31,14 +31,14 @@ public class HyacineEidolonOneTwoTest {
         battle.startBattle();
         battle.processRequests();
         SkillExecutor.execute(battle, hyacine.getSkills().get(SkillType.ULTRA), hyacine,
-                List.of(battle.enemies.getFirst()));
+                List.of(battle.enemies().getFirst()));
         battle.processRequests();
         double hyacineMax = hyacine.getAttribute(com.laosun.aluminium.enums.AttributeType.HEALTH).get();
 
         ally.consumeHp(ally.getAttribute(com.laosun.aluminium.enums.AttributeType.HEALTH).get() * 0.5);
         double wounded = ally.getCurrentHp();
         SkillExecutor.execute(battle, ally.getSkills().get(SkillType.COMMON), ally,
-                List.of(battle.enemies.getFirst()));
+                List.of(battle.enemies().getFirst()));
         battle.processRequests();
 
         double healed = ally.getCurrentHp() - wounded;
@@ -73,6 +73,6 @@ public class HyacineEidolonOneTwoTest {
     }
 
     private static com.laosun.aluminium.models.CanHit hypotheticalAttacker(Battle battle) {
-        return battle.enemies.getFirst();
+        return battle.enemies().getFirst();
     }
 }

@@ -39,7 +39,7 @@ public class EidolonBatchTest {
         Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
-        battle.currentMove = new Signal(unit);
+        battle.setCurrentMove(new Signal(unit));
         battle.beforeMove();
         double before = unit.getAttribute(attribute).get();
         battle.fireTriggers(event, unit, enemy, 0, 0);

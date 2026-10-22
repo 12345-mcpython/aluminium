@@ -71,7 +71,7 @@ public class EventBusTest {
     @Test
     public void damagingSkillFiresSkillCastWithHitTargets() {
         Battle battle = newBattle();
-        Character hero = battle.characters.getFirst();
+        Character hero = battle.characters().getFirst();
         Enemy enemy = firstEnemy(battle);
         Probe probe = attachProbe(hero);
 
@@ -116,7 +116,7 @@ public class EventBusTest {
     @Test
     public void skillCastFiresOncePerCastNotPerHit() {
         Battle battle = newBattle();
-        Character hero = battle.characters.getFirst();
+        Character hero = battle.characters().getFirst();
         Probe probe = attachProbe(hero);
 
         Skill aoe = new DefaultSkill(1003, 3, 1);   // Himeko's ultimate: AoE
@@ -135,7 +135,7 @@ public class EventBusTest {
     @Test
     public void energyEventCarriesTheActuallyCreditedAmount() {
         Battle battle = newBattle();
-        Character hero = battle.characters.getFirst();
+        Character hero = battle.characters().getFirst();
         Probe probe = attachProbe(hero);
 
         castNow(battle, hero, hero.getSkills().get(SkillType.COMMON), List.of(firstEnemy(battle)));
@@ -152,7 +152,7 @@ public class EventBusTest {
     @Test
     public void cappedEnergyFiresNoEvent() {
         Battle battle = newBattle();
-        Character hero = battle.characters.getFirst();
+        Character hero = battle.characters().getFirst();
         hero.setCurrentEnergy(hero.getMaxEnergy());
         Probe probe = attachProbe(hero);
 
@@ -191,7 +191,7 @@ public class EventBusTest {
     @Test
     public void hpLossReportsBeforeAndAfter() {
         Battle battle = newBattle();
-        Character hero = battle.characters.getFirst();
+        Character hero = battle.characters().getFirst();
         Enemy enemy = firstEnemy(battle);
         Probe probe = attachProbe(enemy);
 
@@ -218,7 +218,7 @@ public class EventBusTest {
     @Test
     public void fullyShieldedHitFiresNoHpLoss() {
         Battle battle = newBattle();
-        Character hero = battle.characters.getFirst();
+        Character hero = battle.characters().getFirst();
         Enemy enemy = firstEnemy(battle);
         Probe probe = attachProbe(enemy);
 
@@ -281,7 +281,7 @@ public class EventBusTest {
     @Test
     public void killEventNamesTheAttacker() {
         Battle battle = newBattle();
-        Character hero = battle.characters.getFirst();
+        Character hero = battle.characters().getFirst();
         Enemy enemy = firstEnemy(battle);
         Probe probe = attachProbe(enemy);
         probe.attachOn(hero);
@@ -307,7 +307,7 @@ public class EventBusTest {
     @Test
     public void additionalDamageKillStillFiresEvent() {
         Battle battle = newBattle();
-        Character hero = battle.characters.getFirst();
+        Character hero = battle.characters().getFirst();
         Enemy enemy = firstEnemy(battle);
         Probe probe = attachProbe(enemy);
 
@@ -337,7 +337,7 @@ public class EventBusTest {
     @Test
     public void dotKillAlsoFiresKillEvent() {
         Battle battle = newBattle();
-        Character hero = battle.characters.getFirst();
+        Character hero = battle.characters().getFirst();
         Enemy enemy = firstEnemy(battle);
         Probe probe = attachProbe(enemy);
 
@@ -357,7 +357,7 @@ public class EventBusTest {
     @Test
     public void trueDamageKillFiresEvent() {
         Battle battle = newBattle();
-        Character hero = battle.characters.getFirst();
+        Character hero = battle.characters().getFirst();
         Enemy enemy = firstEnemy(battle);
         Probe probe = attachProbe(enemy);
 
@@ -374,7 +374,7 @@ public class EventBusTest {
     @Test
     public void shieldedTargetIsNotReportedAsKilled() {
         Battle battle = newBattle();
-        Character hero = battle.characters.getFirst();
+        Character hero = battle.characters().getFirst();
         Enemy enemy = firstEnemy(battle);
         Probe probe = attachProbe(enemy);
 
@@ -395,7 +395,7 @@ public class EventBusTest {
     @Test
     public void skillPointGainFiresEvent() {
         Battle battle = newBattle();
-        Character hero = battle.characters.getFirst();
+        Character hero = battle.characters().getFirst();
         Probe probe = attachProbe(hero);
 
         Assertions.assertEquals(3, battle.getSkillPoints(), "precondition: 3 points at the start");
@@ -413,7 +413,7 @@ public class EventBusTest {
     @Test
     public void skillPointSpendFiresEvent() {
         Battle battle = newBattle();
-        Character hero = battle.characters.getFirst();
+        Character hero = battle.characters().getFirst();
         Probe probe = attachProbe(hero);
 
         actWithRealTurn(battle, hero, () -> hero.getSkills().get(SkillType.SKILL),
@@ -435,7 +435,7 @@ public class EventBusTest {
     @Test
     public void failedSkillSpendFiresNoSkillPointSpent() {
         Battle battle = newBattle();
-        Character hero = battle.characters.getFirst();
+        Character hero = battle.characters().getFirst();
         Probe probe = attachProbe(hero);
 
         while (battle.spendSkillPoint()) {
@@ -457,7 +457,7 @@ public class EventBusTest {
     @Test
     public void cappedSkillPointsFireNoGainEvent() {
         Battle battle = newBattle();
-        Character hero = battle.characters.getFirst();
+        Character hero = battle.characters().getFirst();
         Probe probe = attachProbe(hero);
 
         battle.gainSkillPoint(100);                       // push it to the cap of 5
@@ -489,7 +489,7 @@ public class EventBusTest {
     @Test
     public void skillCastIsBroadcastBeforeEnergyGain() {
         Battle battle = newBattle();
-        Character hero = battle.characters.getFirst();
+        Character hero = battle.characters().getFirst();
         Probe probe = attachProbe(hero);
 
         actWithRealTurn(battle, hero, () -> hero.getSkills().get(SkillType.COMMON),
@@ -511,7 +511,7 @@ public class EventBusTest {
     @Test
     public void hpLossIsReportedBeforeKill() {
         Battle battle = newBattle();
-        Character hero = battle.characters.getFirst();
+        Character hero = battle.characters().getFirst();
         Enemy enemy = firstEnemy(battle);
         Probe probe = attachProbe(enemy);
 
@@ -539,7 +539,7 @@ public class EventBusTest {
     @Test
     public void turnBoundariesAreStillMoveEvent() {
         Battle battle = newBattle();
-        Character hero = battle.characters.getFirst();
+        Character hero = battle.characters().getFirst();
         int[] beforeMoveCount = {0};
         int[] afterMoveCount = {0};
         hero.beforeMove = () -> beforeMoveCount[0]++;
@@ -729,10 +729,10 @@ public class EventBusTest {
                                                List<? extends CanHit> targets) {
         for (int i = 0; i < 30; i++) {
             battle.stepForward();
-            if (battle.currentMove == null) {
+            if (battle.currentMove() == null) {
                 break;
             }
-            if (battle.currentMove.getCanHit() == actor) {
+            if (battle.currentMove().getCanHit() == actor) {
                 battle.beforeMove();
                 return battle.performAction(skill.get(), targets);
             }

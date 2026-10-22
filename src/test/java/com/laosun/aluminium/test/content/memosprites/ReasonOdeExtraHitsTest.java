@@ -39,14 +39,14 @@ public class ReasonOdeExtraHitsTest {
                 List.of(EnemyFactory.create(MONSTER, 100, 1)), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        var sprite = battle.summonServant(battle.characters.get(0));
+        var sprite = battle.summonServant(battle.characters().get(0));
         battle.processRequests();
         var ode = sprite.skillAt(ODE_SLOT);
         Assertions.assertNotNull(ode, "precondition: slot 18");
-        Character aimed = battle.characters.get(1);
+        Character aimed = battle.characters().get(1);
         com.laosun.aluminium.models.skill.SkillExecutor.execute(battle, ode, sprite, List.of(aimed));
         battle.processRequests();
-        aimed = battle.characters.get(1);
+        aimed = battle.characters().get(1);
         var skill = aimed.getSkills().get(SkillType.SKILL);
         Assertions.assertNotNull(skill, "precondition: his skill");
         int slot = skill.getSkillSlot();
@@ -54,10 +54,10 @@ public class ReasonOdeExtraHitsTest {
             // Take back EXACTLY what is there, not a hard-coded three: a control that assumes the bonus sits on this slot cannot see a misdirected one.
             aimed.raiseSkillHits(slot, -aimed.skillHitBonus(slot));
         }
-        double before = battle.enemies.getFirst().getCurrentHp();
+        double before = battle.enemies().getFirst().getCurrentHp();
         com.laosun.aluminium.models.skill.SkillExecutor.execute(battle, skill, aimed,
-                List.of(battle.enemies.getFirst()));
+                List.of(battle.enemies().getFirst()));
         battle.processRequests();
-        return before - battle.enemies.getFirst().getCurrentHp();
+        return before - battle.enemies().getFirst().getCurrentHp();
     }
 }

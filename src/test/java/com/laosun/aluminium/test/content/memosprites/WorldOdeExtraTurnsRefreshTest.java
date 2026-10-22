@@ -15,7 +15,7 @@ import java.util.List;
 /**
  * 1415's memosprite skill 21, the refresh clause: "在卡厄斯兰那的额外回合耗尽后不会结束变身、刷新全部额外回合并获得 #9 点[毁伤]".
  * <p>
- * The countdown's turn is driven THE SHIPPED WAY (`battle.currentMove = signal; battle.beforeMove();`, as CountdownTest does) -- a hand-fired COUNTDOWN_TURN never reaches his
+ * The countdown's turn is driven THE SHIPPED WAY (`battle.setCurrentMove(signal); battle.beforeMove();`, as CountdownTest does) -- a hand-fired COUNTDOWN_TURN never reaches his
  * table, because the engine announces it with the ally broadcaster inside beforeMove.
  */
 public class WorldOdeExtraTurnsRefreshTest {
@@ -47,19 +47,19 @@ public class WorldOdeExtraTurnsRefreshTest {
                 List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        him = battle.characters.getFirst();
+        him = battle.characters().getFirst();
         // The ode grants [永续的燃烧], so it must land before his transformation.
         var odeSprite = battle.summonServant(CharacterFactory.create(1415, LEVEL));
         battle.processRequests();
         var ode = odeSprite.skillAt(21);
         Assertions.assertNotNull(ode, "precondition: slot 21");
-        SkillExecutor.execute(battle, ode, odeSprite, List.of(battle.characters.getFirst()));
+        SkillExecutor.execute(battle, ode, odeSprite, List.of(battle.characters().getFirst()));
         battle.processRequests();
         var ult = him.getSkills().get(com.laosun.aluminium.enums.SkillType.ULTRA);
         Assertions.assertNotNull(ult, "precondition: he has an ultimate");
-        SkillExecutor.execute(battle, ult, him, List.of(battle.enemies.getFirst()));
+        SkillExecutor.execute(battle, ult, him, List.of(battle.enemies().getFirst()));
         battle.processRequests();
-        him = battle.characters.getFirst();
+        him = battle.characters().getFirst();
         Assertions.assertTrue(him.getBuffManager().stacksOf("变身") > 0, "precondition: he transformed");
         if (!everBurning) {
             him.getBuffManager().removeState(STATE);
@@ -71,14 +71,14 @@ public class WorldOdeExtraTurnsRefreshTest {
         Countdown countdown = battle.startCountdown(him, "额外回合", 90);
         // The counter's declared cap is 8, so it starts at and the counting rule's own +1 makes this the eighth turn -- the exhausted one.
         him.getResources().gain(COUNTER, 7);
-        Signal signal = battle.queue.snapshot().stream()
+        Signal signal = battle.queue().snapshot().stream()
                 .filter(s -> s.getCanHit() == countdown)
                 .findFirst()
                 .orElseThrow(() -> new AssertionError("the countdown has no signal on the action order"));
-        battle.currentMove = signal;
+        battle.setCurrentMove(signal);
         battle.beforeMove();
         battle.processRequests();
-        him = battle.characters.getFirst();
+        him = battle.characters().getFirst();
         return new double[]{him.getBuffManager().stacksOf("变身"),
                 him.getResources().value(COUNTER), him.getResources().value(MARK)};
     }

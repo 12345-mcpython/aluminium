@@ -39,7 +39,7 @@ public class BloodfeudTest {
         Assertions.assertTrue(him.getBuffManager().hasState(STATE),
                 "\"when charge reaches 100, consume 100 points of charge to enter the [血仇] (Vendetta) state\"");
 
-        battle.applyTrueDamage(battle.enemies.getFirst(), him, DamageElement.ICE, him.getCurrentHp() * 2.0);
+        battle.applyTrueDamage(battle.enemies().getFirst(), him, DamageElement.ICE, him.getCurrentHp() * 2.0);
         battle.processRequests();
 
         Assertions.assertFalse(him.isDeath(), "\"will not enter the unable-to-fight state\"");
@@ -61,7 +61,7 @@ public class BloodfeudTest {
         battle.processRequests();
         Assertions.assertFalse(him.getBuffManager().hasState(STATE), "precondition: no [血仇] (Vendetta) yet");
 
-        battle.applyTrueDamage(battle.enemies.getFirst(), him, DamageElement.ICE, him.getCurrentHp() * 2.0);
+        battle.applyTrueDamage(battle.enemies().getFirst(), him, DamageElement.ICE, him.getCurrentHp() * 2.0);
         battle.processRequests();
         Assertions.assertTrue(him.isDeath(), "only while in the [血仇] (Vendetta) state does this clause exist");
     }
@@ -75,7 +75,7 @@ public class BloodfeudTest {
         Skill ult = him.getSkills().get(SkillType.ULTRA);
         Assertions.assertNotNull(ult, "precondition: he has an ultimate");
         for (int i = 0; i < 5; i++) {
-            SkillExecutor.execute(battle, ult, him, List.of(battle.enemies.getFirst()));
+            SkillExecutor.execute(battle, ult, him, List.of(battle.enemies().getFirst()));
             battle.processRequests();
         }
     }

@@ -30,11 +30,11 @@ public class BreakStateTest {
         Enemy iceEdge = EnemyFactory.create(ICE_EDGE, 90, 1);
         Battle battle = new Battle(List.of(himeko), List.of(iceEdge), BattleFixture.seeded());
         double cycle = 10000.0 / iceEdge.getAttribute(AttributeType.SPEED).get();
-        double before = battle.queue.getTimeRemaining(signalOf(battle, iceEdge));
+        double before = battle.queue().getTimeRemaining(signalOf(battle, iceEdge));
 
         breakIt(battle, himeko, iceEdge);
 
-        double after = battle.queue.getTimeRemaining(signalOf(battle, iceEdge));
+        double after = battle.queue().getTimeRemaining(signalOf(battle, iceEdge));
         Assertions.assertTrue(iceEdge.isBroken());
         Assertions.assertEquals(before + cycle * 0.25, after, 1e-6, "delay = 25% of the action cycle");
         Assertions.assertEquals(Constant.BROKEN_REMAIN_TURNS, iceEdge.getBrokenRemainTurns());

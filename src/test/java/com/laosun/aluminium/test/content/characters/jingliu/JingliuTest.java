@@ -69,9 +69,9 @@ public class JingliuTest {
         for (int i = 0; i < casts; i++) {
             battle.fireTriggers(TriggerEvent.SKILL_CAST, jingliu, enemy, 0, 0);
         }
-        for (com.laosun.aluminium.models.Signal signal : battle.queue.snapshot()) {
+        for (com.laosun.aluminium.models.Signal signal : battle.queue().snapshot()) {
             if (signal.getCanHit() == jingliu) {
-                return battle.queue.getTimeRemaining(signal);
+                return battle.queue().getTimeRemaining(signal);
             }
         }
         throw new IllegalStateException("she is not in the queue");

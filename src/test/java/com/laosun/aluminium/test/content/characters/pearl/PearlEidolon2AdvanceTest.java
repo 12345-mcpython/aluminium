@@ -91,10 +91,10 @@ public class PearlEidolon2AdvanceTest {
         Battle battle = new Battle(team(eidolonRank), List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        Character pearl = battle.characters.get(0);
-        Character elationA = battle.characters.get(1);
-        Character elationB = battle.characters.get(2);
-        Character archetype = battle.characters.get(3);
+        Character pearl = battle.characters().get(0);
+        Character elationA = battle.characters().get(1);
+        Character elationB = battle.characters().get(2);
+        Character archetype = battle.characters().get(3);
 
         double[] before = waits(battle, pearl, elationA, elationB, archetype);
         battle.fireTriggers(TriggerEvent.ULT_CAST, pearl, archetype, 0, 0);
@@ -110,10 +110,10 @@ public class PearlEidolon2AdvanceTest {
                                   Character archetype) {
         double[] out = new double[4];
         Character[] wanted = {pearl, elationA, elationB, archetype};
-        for (Signal signal : battle.queue.snapshot()) {
+        for (Signal signal : battle.queue().snapshot()) {
             for (int i = 0; i < wanted.length; i++) {
                 if (signal.getCanHit() == wanted[i]) {
-                    out[i] = battle.queue.getTimeRemaining(signal);
+                    out[i] = battle.queue().getTimeRemaining(signal);
                 }
             }
         }

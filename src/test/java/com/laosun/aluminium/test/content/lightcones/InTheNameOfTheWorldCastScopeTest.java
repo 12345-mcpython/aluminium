@@ -49,7 +49,7 @@ public class InTheNameOfTheWorldCastScopeTest {
         double atkBefore = unit.getAttribute(AttributeType.ATTACK).get();
         String printed = "[" + CONE + "] before: effectHit=" + hitBefore + " atk=" + atkBefore;
 
-        battle.castImmediate(unit.getSkills().get(SkillType.SKILL), unit, List.of(battle.enemies.getFirst()));
+        battle.castImmediate(unit.getSkills().get(SkillType.SKILL), unit, List.of(battle.enemies().getFirst()));
         battle.processRequests();
 
         double hitAfter = unit.getAttribute(AttributeType.EFFECT_HIT_RATE).get();

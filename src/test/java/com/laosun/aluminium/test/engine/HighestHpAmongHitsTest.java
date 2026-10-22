@@ -52,18 +52,18 @@ public class HighestHpAmongHitsTest {
                 List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        owner = battle.characters.getFirst();
+        owner = battle.characters().getFirst();
         owner.setTriggerTable(new TriggerTable(OWNER, List.of(
                 TriggerSpecs.rule("DEALING_DAMAGE", List.of(), speedBoost()))));
 
-        double[] before = battle.enemies.stream().mapToDouble(e -> e.getAttribute(AttributeType.SPEED).get()).toArray();
+        double[] before = battle.enemies().stream().mapToDouble(e -> e.getAttribute(AttributeType.SPEED).get()).toArray();
         Skill skill = owner.getSkills().values().stream()
                 .filter(s -> s != null && s.getData() != null && s.getData().getEffect().isDamaging())
                 .findFirst().orElse(null);
         Assertions.assertNotNull(skill, "precondition: the owner has a damaging skill");
-        SkillExecutor.execute(battle, skill, owner, List.of(battle.enemies.getFirst()));
+        SkillExecutor.execute(battle, skill, owner, List.of(battle.enemies().getFirst()));
         battle.processRequests();
-        double[] after = battle.enemies.stream().mapToDouble(e -> e.getAttribute(AttributeType.SPEED).get()).toArray();
+        double[] after = battle.enemies().stream().mapToDouble(e -> e.getAttribute(AttributeType.SPEED).get()).toArray();
 
         int raised = 0;
         for (int i = 0; i < after.length; i++) {
@@ -86,7 +86,7 @@ public class HighestHpAmongHitsTest {
                 List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        owner = battle.characters.getFirst();
+        owner = battle.characters().getFirst();
         owner.setTriggerTable(new TriggerTable(OWNER, List.of(
                 TriggerSpecs.rule("DEALING_DAMAGE", List.of(), speedBoost()))));
 

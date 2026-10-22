@@ -58,7 +58,7 @@ public class ButTheBattleIsnTOverTest {
     @Test
     public void everySecondUltimateOnAnAllyPays() {
         Battle battle = battle(true);
-        CanHit ally = battle.allies.get(1);
+        CanHit ally = battle.allies().get(1);
         ultOnAlly(battle, ally);
         int afterFirst = battle.getSkillPoints();
         int counted = wearer.getBuffManager().stacksOf(COUNT);
@@ -79,7 +79,7 @@ public class ButTheBattleIsnTOverTest {
     @Test
     public void theCounterItselfIsObservable() {
         Battle battle = battle(true);
-        CanHit ally = battle.allies.get(1);
+        CanHit ally = battle.allies().get(1);
         int atZero = rulesMatching(battle, ally);
         ultOnAlly(battle, ally);
         int atOne = rulesMatching(battle, ally);
@@ -102,7 +102,7 @@ public class ButTheBattleIsnTOverTest {
     @Test
     public void somebodyElsesUltimateDoesNotCount() {
         Battle battle = battle(true);
-        CanHit ally = battle.allies.get(1);
+        CanHit ally = battle.allies().get(1);
         battle.fireTriggers(TriggerEvent.ULT_CAST, ally, wearer, 0, 0);
         System.out.println("[23003] after the ALLY's ultimate: counter=" + wearer.getBuffManager().stacksOf(COUNT));
         Assertions.assertEquals(0, wearer.getBuffManager().stacksOf(COUNT), "the wearer's own casts (false case)");
@@ -111,7 +111,7 @@ public class ButTheBattleIsnTOverTest {
     @Test
     public void withoutTheConeNoRuleExists() {
         Battle battle = battle(false);
-        CanHit ally = battle.allies.get(1);
+        CanHit ally = battle.allies().get(1);
         int rules = rulesMatching(battle, ally);
         System.out.println("[23003] without the cone, rules matching: " + rules);
         Assertions.assertEquals(0, rules, "no cone, no rule (false case)");

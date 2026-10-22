@@ -64,14 +64,14 @@ public class WaveMonsterAimTest {
         // this judge counted all four. Exactly one enemy carries +100, and the other three are equal to each other.
         List<CanHit> boosted = new ArrayList<>();
         List<Double> speeds = new ArrayList<>();
-        for (CanHit enemy : battle.enemies) {
+        for (CanHit enemy : battle.enemies()) {
             double speed = enemy.getAttribute(AttributeType.SPEED).get();
             speeds.add(speed);
             if (speed > 100.0) {
                 boosted.add(enemy);
             }
         }
-        System.out.println("[aim] the wave brought " + battle.enemies.size() + " enemies ; the aim boosted " + boosted.size()
+        System.out.println("[aim] the wave brought " + battle.enemies().size() + " enemies ; the aim boosted " + boosted.size()
                 + " of them (speeds " + speeds + ")");
 
         Assertions.assertEquals(1, boosted.size(),

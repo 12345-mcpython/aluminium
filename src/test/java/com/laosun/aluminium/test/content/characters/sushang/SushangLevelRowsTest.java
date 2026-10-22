@@ -85,7 +85,7 @@ public class SushangLevelRowsTest {
      */
     private static double oneSkillCastAgainstOneEnemy(int eidolonRank) {
         Battle battle = newBattle(eidolonRank, RNG_ALWAYS_PASSES);
-        Character sushang = battle.characters.getFirst();
+        Character sushang = battle.characters().getFirst();
         Enemy victim = battle.enemyUnits().getFirst();
         double before = victim.getCurrentHp();
         battle.requestSkill(sushang.getSkills().get(SkillType.SKILL), sushang, List.of(victim));
@@ -102,7 +102,7 @@ public class SushangLevelRowsTest {
      */
     private static double attackGainFromTheUltimate(int eidolonRank) {
         Battle battle = newBattle(eidolonRank, BattleFixture.alwaysRoll(0.9999));
-        Character sushang = battle.characters.getFirst();
+        Character sushang = battle.characters().getFirst();
         double before = sushang.getAttribute(AttributeType.ATTACK).get();
         castUltimate(battle, sushang);
         double after = sushang.getAttribute(AttributeType.ATTACK).get();
@@ -114,7 +114,7 @@ public class SushangLevelRowsTest {
      */
     private static double speedGainAfterABreak(int eidolonRank) {
         Battle battle = newBattle(eidolonRank, BattleFixture.alwaysRoll(0.9999));
-        Character sushang = battle.characters.getFirst();
+        Character sushang = battle.characters().getFirst();
         Enemy victim = battle.enemyUnits().getFirst();
         double before = sushang.getAttribute(AttributeType.SPEED).get();
         // Note: the BREAK event's actor is the attacker and its target is the enemy whose toughness broke (Battle's own

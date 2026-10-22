@@ -118,7 +118,7 @@ public class PearlFormAExtraDamageTest {
         Battle battle = new Battle(team, List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        Character her = battle.characters.getFirst();
+        Character her = battle.characters().getFirst();
 
         // The Ultimate marks the aim and puts her into deep study, which is what swaps COMMON to slot 8.
         battle.fireTriggers(TriggerEvent.ULT_CAST, her, archetype, 0, 0);

@@ -45,10 +45,10 @@ public class PerStackLiveTest {
                 + " share=" + ((oneStack - base) / base));
 
         // a whole turn: TURN_START grants four more stacks; the aura is NOT re-applied
-        Signal signal = battle.queue.snapshot().stream()
-                .filter(candidate -> candidate.getCanHit() == battle.allies.getFirst()).findFirst()
+        Signal signal = battle.queue().snapshot().stream()
+                .filter(candidate -> candidate.getCanHit() == battle.allies().getFirst()).findFirst()
                 .orElseThrow(() -> new AssertionError("precondition: the owner is in the queue"));
-        battle.currentMove = signal;
+        battle.setCurrentMove(signal);
         battle.beforeMove();
         battle.afterMove();
         battle.processRequests();

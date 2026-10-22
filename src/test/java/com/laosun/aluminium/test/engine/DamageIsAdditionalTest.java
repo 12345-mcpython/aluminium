@@ -39,7 +39,7 @@ public class DamageIsAdditionalTest {
                 List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        owner = battle.characters.getFirst();
+        owner = battle.characters().getFirst();
 
         // the guard is observed through a heal of 1: harmless, and its own magnitude is not what is being read
         EffectSpec effect = new EffectSpec();
@@ -50,14 +50,14 @@ public class DamageIsAdditionalTest {
                 TriggerSpecs.rule("DAMAGE_SETTLED", List.of("damage_is_additional"), effect))));
 
         // damage the owner first, so a heal is visible
-        battle.applyDamage(owner, new Damage(battle.enemies.getFirst(), owner, DamageElement.ICE, DamageType.NORMAL, 400));
+        battle.applyDamage(owner, new Damage(battle.enemies().getFirst(), owner, DamageElement.ICE, DamageType.NORMAL, 400));
         double before = owner.getCurrentHp();
 
-        battle.applyAdditionalDamage(owner, battle.enemies.getFirst(), DamageElement.ICE, 10);
+        battle.applyAdditionalDamage(owner, battle.enemies().getFirst(), DamageElement.ICE, 10);
         double afterAdditional = owner.getCurrentHp();
 
-        battle.applyDamage(battle.enemies.getFirst(),
-                new Damage(owner, battle.enemies.getFirst(), DamageElement.ICE, DamageType.NORMAL, 10));
+        battle.applyDamage(battle.enemies().getFirst(),
+                new Damage(owner, battle.enemies().getFirst(), DamageElement.ICE, DamageType.NORMAL, 10));
         double afterOrdinary = owner.getCurrentHp();
 
         System.out.println("[is_additional] before = " + before + " ; after an ADDITIONAL instance = " + afterAdditional

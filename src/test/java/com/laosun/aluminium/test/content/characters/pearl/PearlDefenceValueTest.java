@@ -40,8 +40,8 @@ public class PearlDefenceValueTest {
     @Test
     public void herCounterBlocksTheAlliesDamage() {
         Battle rich = newBattle(30);
-        Character pearl = rich.characters.getFirst();
-        Character ally = rich.characters.get(1);
+        Character pearl = rich.characters().getFirst();
+        Character ally = rich.characters().get(1);
         double cost = hit(rich, ally, INSTANCE);
         int left = pearl.getResources().value(COUNTER);
         double control = hit(newBattle(0), null, INSTANCE);
@@ -66,7 +66,7 @@ public class PearlDefenceValueTest {
     @Test
     public void anEmptyCounterMeansNoProtection() {
         Battle battle = newBattle(0);
-        Character ally = battle.characters.get(1);
+        Character ally = battle.characters().get(1);
         double cost = hit(battle, ally, INSTANCE);
         double control = hit(newBattle(0), null, INSTANCE);
         System.out.println("[pearl_defence] empty counter: the hit cost " + cost + " (control " + control + ")");
@@ -82,8 +82,8 @@ public class PearlDefenceValueTest {
     @Test
     public void onePointBuysTwoHundred() {
         Battle battle = newBattle(1);
-        Character pearl = battle.characters.getFirst();
-        Character ally = battle.characters.get(1);
+        Character pearl = battle.characters().getFirst();
+        Character ally = battle.characters().get(1);
         double cost = hit(battle, ally, INSTANCE * 10);          // a share far larger than one point covers
         double control = hit(newBattle(0), null, INSTANCE * 10);
         System.out.println("[pearl_defence] one point: the hit cost " + cost + " (control " + control
@@ -106,8 +106,8 @@ public class PearlDefenceValueTest {
     @Test
     public void theSixtyPercentShareIsWhatCapsTheBlock() {
         Battle battle = newBattle(30);
-        Character pearl = battle.characters.getFirst();
-        Character ally = battle.characters.get(1);
+        Character pearl = battle.characters().getFirst();
+        Character ally = battle.characters().get(1);
         double cost = hit(battle, ally, 3000);
         int spent = 30 - pearl.getResources().value(COUNTER);
         double control = hit(newBattle(0), null, 3000);
@@ -133,7 +133,7 @@ public class PearlDefenceValueTest {
      * One settled hit on {@code ally} (the party's second slot when null), returning what it cost in HP.
      */
     private static double hit(Battle battle, Character ally, double instance) {
-        Character victim = ally == null ? battle.characters.get(1) : ally;
+        Character victim = ally == null ? battle.characters().get(1) : ally;
         Enemy attacker = battle.enemyUnits().getFirst();
         double before = victim.getCurrentHp();
         battle.applyDamage(victim, new Damage(attacker, victim, DamageElement.PHYSICAL, DamageType.NORMAL, instance));
@@ -149,7 +149,7 @@ public class PearlDefenceValueTest {
         battle.startBattle();
         battle.processRequests();
         if (points > 0) {
-            battle.characters.getFirst().getResources().gain(COUNTER, points);
+            battle.characters().getFirst().getResources().gain(COUNTER, points);
         }
         return battle;
     }

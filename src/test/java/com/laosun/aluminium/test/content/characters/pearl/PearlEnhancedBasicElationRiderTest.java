@@ -110,7 +110,7 @@ public class PearlEnhancedBasicElationRiderTest {
                 List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        Character her = battle.characters.getFirst();
+        Character her = battle.characters().getFirst();
 
         // The Ultimate marks the Elation aim and swaps COMMON to the enhanced form (slot 8).
         battle.fireTriggers(TriggerEvent.ULT_CAST, her, archetype, 0, 0);

@@ -99,7 +99,7 @@ public class SkillPointTest {
     @Test
     public void basicAttackInRealActionFlowGainsOnePoint() {
         Battle battle = newBattle();
-        Character hero = battle.characters.getFirst();
+        Character hero = battle.characters().getFirst();
 
         Assertions.assertEquals(3, battle.getSkillPoints());
         Assertions.assertTrue(actWithRealTurn(battle, hero, () -> skill(hero, Slot.COMMON),
@@ -113,7 +113,7 @@ public class SkillPointTest {
     @Test
     public void skillInRealActionFlowSpendsOnePoint() {
         Battle battle = newBattle();
-        Character hero = battle.characters.getFirst();
+        Character hero = battle.characters().getFirst();
 
         Assertions.assertTrue(actWithRealTurn(battle, hero, () -> skill(hero, Slot.SKILL),
                 () -> List.of(firstEnemy(battle))));
@@ -126,7 +126,7 @@ public class SkillPointTest {
     @Test
     public void repeatedBasicAttacksCapAtFive() {
         Battle battle = newBattle();
-        Character hero = battle.characters.getFirst();
+        Character hero = battle.characters().getFirst();
 
         for (int i = 0; i < 4; i++) {
             Assertions.assertTrue(
@@ -153,7 +153,7 @@ public class SkillPointTest {
     @Test
     public void skillWithNoPointsFailsAndDealsNoDamage() {
         Battle battle = newBattle();
-        Character hero = battle.characters.getFirst();
+        Character hero = battle.characters().getFirst();
         Enemy target = firstEnemy(battle);
 
         while (battle.spendSkillPoint()) {
@@ -202,7 +202,7 @@ public class SkillPointTest {
         Assertions.assertNull(talentLike.getData().getSkillType(), "precondition: the talent's attack_type is null");
 
         int before = battle.getSkillPoints();
-        Assertions.assertTrue(battle.applySkillPointCost(talentLike, battle.characters.getFirst()),
+        Assertions.assertTrue(battle.applySkillPointCost(talentLike, battle.characters().getFirst()),
                 "a neutral skill does not block the action");
         Assertions.assertEquals(before, battle.getSkillPoints(), "neither rises nor falls");
     }
@@ -216,7 +216,7 @@ public class SkillPointTest {
         Skill maze = skill(CharacterFactory.create(1003, 80), Slot.MAZE);
 
         int before = battle.getSkillPoints();
-        Assertions.assertTrue(battle.applySkillPointCost(maze, battle.characters.getFirst()));
+        Assertions.assertTrue(battle.applySkillPointCost(maze, battle.characters().getFirst()));
         Assertions.assertEquals(before, battle.getSkillPoints(), "MazeNormal is neutral");
     }
 
@@ -241,7 +241,7 @@ public class SkillPointTest {
     public void enemyBasicAttackDoesNotFeedThePlayerPool() {
         Battle battle = newBattle();
         Enemy enemy = firstEnemy(battle);
-        Character hero = battle.characters.getFirst();
+        Character hero = battle.characters().getFirst();
 
         // precondition self-check: the default enemy skill's getData() is null, so it cannot test the camp check
         Assertions.assertNull(enemySkill(enemy).getData(),
@@ -267,12 +267,12 @@ public class SkillPointTest {
     @Test
     public void skillPointCostIsAtomicAtZero() {
         Battle battle = newBattle();
-        Skill skill = battle.characters.getFirst().getSkills().get(SkillType.SKILL);
+        Skill skill = battle.characters().getFirst().getSkills().get(SkillType.SKILL);
 
         while (battle.spendSkillPoint()) {
             // zero it out
         }
-        Assertions.assertFalse(battle.applySkillPointCost(skill, battle.characters.getFirst()),
+        Assertions.assertFalse(battle.applySkillPointCost(skill, battle.characters().getFirst()),
                 "not enough points → failure");
         Assertions.assertEquals(0, battle.getSkillPoints(), "the failed attempt must not deduct to -1");
     }
@@ -336,10 +336,10 @@ public class SkillPointTest {
                                                List<? extends CanHit> targets) {
         for (int i = 0; i < 30; i++) {
             battle.stepForward();
-            if (battle.currentMove == null) {
+            if (battle.currentMove() == null) {
                 break;
             }
-            if (battle.currentMove.getCanHit() == actor) {
+            if (battle.currentMove().getCanHit() == actor) {
                 battle.beforeMove();
                 return battle.performAction(skill.get(), targets);
             }

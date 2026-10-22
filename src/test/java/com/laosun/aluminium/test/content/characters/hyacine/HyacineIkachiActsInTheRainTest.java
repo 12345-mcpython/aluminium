@@ -25,7 +25,7 @@ public class HyacineIkachiActsInTheRainTest {
         battle.startBattle();
         battle.processRequests();
         SkillExecutor.execute(battle, hyacine.getSkills().get(SkillType.ULTRA), hyacine,
-                List.of(battle.enemies.getFirst()));
+                List.of(battle.enemies().getFirst()));
         battle.processRequests();
         Summon ika = (Summon) battle.memospriteOf(hyacine);
         Assertions.assertNotNull(ika, "precondition: 小伊卡 is out");
@@ -33,7 +33,7 @@ public class HyacineIkachiActsInTheRainTest {
         List<Damage> settled = new ArrayList<>();
         battle.addDamageObserver((damage, applied, hpLoss, shieldAbsorbed, died) -> settled.add(damage));
         SkillExecutor.execute(battle, hyacine.getSkills().get(SkillType.SKILL), hyacine,
-                List.of(battle.enemies.getFirst()));
+                List.of(battle.enemies().getFirst()));
         battle.processRequests();
 
         Assertions.assertTrue(settled.stream().anyMatch(d -> d.getAttacker() == ika),

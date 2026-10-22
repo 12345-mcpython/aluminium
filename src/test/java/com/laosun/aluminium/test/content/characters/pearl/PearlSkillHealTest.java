@@ -25,8 +25,8 @@ public class PearlSkillHealTest {
                 List.of(EnemyFactory.create(1002011, 100, 1)), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        Character pearl = battle.characters.get(0);
-        Character ally = battle.characters.get(1);
+        Character pearl = battle.characters().get(0);
+        Character ally = battle.characters().get(1);
 
         pearl.takeDamage(pearl.getMaxHp() * 0.6);
         ally.takeDamage(ally.getMaxHp() * 0.8);

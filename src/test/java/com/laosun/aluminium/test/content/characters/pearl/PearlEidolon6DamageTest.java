@@ -146,7 +146,7 @@ public class PearlEidolon6DamageTest {
         Battle battle = new Battle(team, List.of(enemy), new NoCrit());
         battle.startBattle();
         battle.processRequests();
-        Character her = battle.characters.getFirst();
+        Character her = battle.characters().getFirst();
 
         // The Ultimate marks the aim on the ally and puts her into deep study, which is what swaps COMMON to slot 8.
         battle.fireTriggers(TriggerEvent.ULT_CAST, her, archetype, 0, 0);

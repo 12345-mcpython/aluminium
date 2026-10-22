@@ -30,16 +30,16 @@ public class CyreneFutureSpendTest {
                 List.of(EnemyFactory.create(MONSTER, 100, 1)), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        Character ally = battle.characters.get(1);
-        Character her = battle.characters.get(0);
+        Character ally = battle.characters().get(1);
+        Character her = battle.characters().get(0);
         Assertions.assertTrue(ally.getBuffManager().hasState(FUTURE), "precondition: the ally holds it");
         double before = her.getResources().has(MEMORY) ? her.getResources().value(MEMORY) : 0;
-        battle.currentMove = new Signal(ally);
+        battle.setCurrentMove(new Signal(ally));
         battle.beforeMove();
         battle.processRequests();
-        boolean still = battle.characters.get(1).getBuffManager().hasState(FUTURE);
-        double after = battle.characters.get(0).getResources().has(MEMORY)
-                ? battle.characters.get(0).getResources().value(MEMORY) : 0;
+        boolean still = battle.characters().get(1).getBuffManager().hasState(FUTURE);
+        double after = battle.characters().get(0).getResources().has(MEMORY)
+                ? battle.characters().get(0).getResources().value(MEMORY) : 0;
         System.out.println("[future_spend] after the ally acts: 【未来】 (the Future) still on it = " + still
                 + " ; Cyrene (昔涟)'s Recollection (【追忆】) " + before + " -> " + after);
         Assertions.assertFalse(still, "acting consumes it");

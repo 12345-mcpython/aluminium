@@ -56,7 +56,7 @@ public class PearlEidolon1ElationTest {
         Battle battle = new Battle(team, List.of(EnemyFactory.create(1002011, 100, 1)), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        Character mine = battle.characters.stream().filter(c -> c.getCid() == PEARL).findFirst().orElseThrow();
+        Character mine = battle.characters().stream().filter(c -> c.getCid() == PEARL).findFirst().orElseThrow();
         return mine.getAttribute(AttributeType.ELATION_DAMAGE_BOOST).get();
     }
 }

@@ -541,7 +541,7 @@ public class SelfAttributeConditionTest {
     private static double nextActionTime(Character unit) {
         Battle battle = new Battle(List.of(unit), List.of(dummy()), BattleFixture.seeded());
         battle.startBattle();
-        return battle.queue.snapshot().stream()
+        return battle.queue().snapshot().stream()
                 .filter(signal -> signal.getCanHit() == unit)
                 .findFirst()
                 .orElseThrow()

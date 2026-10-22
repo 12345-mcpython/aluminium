@@ -37,13 +37,13 @@ public class CyreneZoneRiderTest {
         battle.processRequests();
         // Her Skill opens the barrier.
         SkillExecutor.execute(battle, cyrene.getSkills().get(SkillType.SKILL), cyrene,
-                List.of(battle.enemies.get(0)));
+                List.of(battle.enemies().get(0)));
         battle.processRequests();
 
         List<Damage> settled = new ArrayList<>();
         battle.addDamageObserver((damage, applied, hpLoss, shieldAbsorbed, died) -> settled.add(damage));
         SkillExecutor.execute(battle, ally.getSkills().get(SkillType.COMMON), ally,
-                List.of(battle.enemies.get(0)));
+                List.of(battle.enemies().get(0)));
         battle.processRequests();
 
         List<Damage> trues = settled.stream().filter(d -> d.getType() == DamageType.TRUE).toList();

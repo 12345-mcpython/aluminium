@@ -50,7 +50,7 @@ public class AventurineWaveflairLaughterTest {
     public void aTeammateAttackGivesOne() {
         Scene scene = fight();
         scene.battle.castImmediate(scene.mate.getSkills().get(SkillType.COMMON), scene.mate,
-                List.of(scene.battle.enemies.getFirst()));
+                List.of(scene.battle.enemies().getFirst()));
         Assertions.assertEquals(1, scene.battle.partyResourceValue(LAUGH), "\"and 1 笑点\" (and 1 more Punchline)");
     }
 
@@ -63,7 +63,7 @@ public class AventurineWaveflairLaughterTest {
         scene.battle.castImmediate(scene.her.getSkills().get(SkillType.SKILL), scene.her, List.of());
         scene.battle.castImmediate(scene.her.getSkills().get(SkillType.ULTRA), scene.her, List.of());
         scene.battle.castImmediate(scene.mate.getSkills().get(SkillType.COMMON), scene.mate,
-                List.of(scene.battle.enemies.getFirst()));
+                List.of(scene.battle.enemies().getFirst()));
         Assertions.assertEquals(11, scene.battle.partyResourceValue(LAUGH), "4 + 6 + 1 on the SHARED counter");
     }
 

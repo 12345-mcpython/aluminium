@@ -60,7 +60,7 @@ public class CyreneEnhancedBasicTest {
         battle.processRequests();
         // The ultimate is what replaces her basic attack with the enhanced row (REPLACE_SKILL in 1415.json).
         SkillExecutor.execute(battle, cyrene.getSkills().get(SkillType.ULTRA), cyrene,
-                List.of(battle.enemies.get(0)));
+                List.of(battle.enemies().get(0)));
         battle.processRequests();
         Skill enhanced = cyrene.getSkills().get(SkillType.COMMON);
         Assertions.assertTrue(enhanced.getData().getDescription().contains("向着爱与明天"),
@@ -69,7 +69,7 @@ public class CyreneEnhancedBasicTest {
 
         List<Damage> settled = new ArrayList<>();
         battle.addDamageObserver((damage, applied, hpLoss, shieldAbsorbed, died) -> settled.add(damage));
-        SkillExecutor.execute(battle, enhanced, cyrene, List.of(battle.enemies.get(0)));
+        SkillExecutor.execute(battle, enhanced, cyrene, List.of(battle.enemies().get(0)));
         battle.processRequests();
 
         List<Damage> hits = settled.stream().filter(d -> d.getType() == DamageType.NORMAL).toList();
@@ -83,10 +83,10 @@ public class CyreneEnhancedBasicTest {
                     "each part takes its own #3 / #1 share from the current level row (at Lv10 both are 0.42 Max HP)");
         }
 
-        CanHit aimed = battle.enemies.get(0);
+        CanHit aimed = battle.enemies().get(0);
         Assertions.assertSame(aimed, hits.get(0).getDefender(), "the single-target half goes to the aimed enemy first");
         Assertions.assertSame(aimed, hits.get(1).getDefender(), "the area half reaches the aimed enemy too");
-        Assertions.assertSame(battle.enemies.get(1), hits.get(2).getDefender(), "and the second enemy");
+        Assertions.assertSame(battle.enemies().get(1), hits.get(2).getDefender(), "and the second enemy");
 
         Assertions.assertEquals(30, hits.get(0).getStance(), 1e-6, "the single part reads stance_list.single");
         Assertions.assertEquals(15, hits.get(1).getStance(), 1e-6, "the area part reads stance_list.all, per victim");

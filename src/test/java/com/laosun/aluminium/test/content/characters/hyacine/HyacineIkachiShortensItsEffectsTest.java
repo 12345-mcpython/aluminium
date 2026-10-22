@@ -24,14 +24,14 @@ public class HyacineIkachiShortensItsEffectsTest {
         battle.startBattle();
         battle.processRequests();
         SkillExecutor.execute(battle, hyacine.getSkills().get(SkillType.ULTRA), hyacine,
-                List.of(battle.enemies.getFirst()));
+                List.of(battle.enemies().getFirst()));
         battle.processRequests();
         Summon ika = (Summon) battle.memospriteOf(hyacine);
         Assertions.assertNotNull(ika, "precondition: 小伊卡 is out");
         ika.getBuffManager().addBuff(new StateBuff("测试持续效果", 3));
 
         SkillExecutor.execute(battle, hyacine.getSkills().get(SkillType.SKILL), hyacine,
-                List.of(battle.enemies.getFirst()));
+                List.of(battle.enemies().getFirst()));
         battle.processRequests();
 
         // One turn off -- the cast's own -1, and NOTHING from the free turn it acted on (3 would have become 1

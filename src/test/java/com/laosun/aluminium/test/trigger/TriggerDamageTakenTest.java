@@ -141,7 +141,7 @@ public class TriggerDamageTakenTest {
     @Test
     public void theTargetSelectorDecidesWhoGetsIt() {
         Battle battle = battleWith(takenRule(0.12, 2, "target"));
-        Character owner = battle.characters.getFirst();
+        Character owner = battle.characters().getFirst();
 
         fireOnDummy(battle);
         Assertions.assertTrue(dummy(battle).getBuffManager().hasBuff(VulnerabilityBuff.class),
@@ -153,8 +153,8 @@ public class TriggerDamageTakenTest {
     @Test
     public void allAlliesReachesTheWholeParty() {
         Battle battle = withAlly(takenRule(-0.08, 2, "all_allies"));
-        Character owner = battle.characters.getFirst();
-        Character ally = battle.characters.get(1);
+        Character owner = battle.characters().getFirst();
+        Character ally = battle.characters().get(1);
 
         fire(battle, owner);
         Assertions.assertTrue(owner.getBuffManager().hasBuff(ReductionBuff.class));
@@ -215,7 +215,7 @@ public class TriggerDamageTakenTest {
      * Settles one plain hit on the dummy and returns the HP it lost.
      */
     private static double dummyDamageTaken(Battle battle) {
-        Character attacker = battle.characters.getFirst();
+        Character attacker = battle.characters().getFirst();
         Enemy victim = dummy(battle);
         double before = victim.getCurrentHp();
         battle.applyDamage(victim, new Damage(attacker, victim, DamageElement.FIRE, DamageType.NORMAL, BASE));
@@ -235,7 +235,7 @@ public class TriggerDamageTakenTest {
      * Fires the rule with the dummy as the event's subject, which is what {@code target} selects.
      */
     private static void fireOnDummy(Battle battle) {
-        battle.fireTriggers(TriggerEvent.ALLY_ATTACK, battle.characters.getFirst(), dummy(battle), 1, 0);
+        battle.fireTriggers(TriggerEvent.ALLY_ATTACK, battle.characters().getFirst(), dummy(battle), 1, 0);
     }
 
     private static Enemy dummy(Battle battle) {
@@ -322,7 +322,7 @@ public class TriggerDamageTakenTest {
             if (battle.isOver()) {
                 throw new AssertionError("the battle ended before the requested unit acted");
             }
-            boolean mine = battle.queue.getCurrentActor().getCanHit() == who;
+            boolean mine = battle.queue().getCurrentActor().getCanHit() == who;
             if (mine) {
                 battle.beforeMove();
             }

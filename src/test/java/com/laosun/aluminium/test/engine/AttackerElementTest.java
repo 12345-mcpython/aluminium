@@ -30,7 +30,7 @@ public class AttackerElementTest {
         Battle battle = new Battle(List.of(pearl, CharacterFactory.create(1204, 80)), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        Character mine = battle.characters.getFirst();
+        Character mine = battle.characters().getFirst();
 
         EffectSpec instance = TriggerSpecs.damage(null, 0, null, "target");
         TriggerSpecs.set(instance, "scale", "elation_base");
@@ -41,7 +41,7 @@ public class AttackerElementTest {
                 TriggerSpecs.rule("ULT_CAST", List.of("actor == self"), instance))));
 
         double before = enemy.getCurrentHp();
-        battle.fireTriggers(com.laosun.aluminium.enums.TriggerEvent.ULT_CAST, mine, battle.enemies.getFirst(), 0, 0);
+        battle.fireTriggers(com.laosun.aluminium.enums.TriggerEvent.ULT_CAST, mine, battle.enemies().getFirst(), 0, 0);
         double dealt = before - enemy.getCurrentHp();
         System.out.println("[attacker_element] pearl is Ice; the instance dealt " + dealt);
         Assertions.assertTrue(dealt > 0, "the reserved word resolved to her own element and the hit landed");

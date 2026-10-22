@@ -66,7 +66,7 @@ public class TransformationHealsOnAttackTest {
         // Note: HALF OF CURRENT HP, never half of MAX HP: the transformation raises Max HP (to 3.x) WITHOUT filling the pool, so
         // "50% of Max HP" is lethal here -- and a dead unit heals nothing, which is exactly how the first three attempts
         // measured a healthy 0.0 and looked like a broken HEAL. Measured: hurt=0.0 of 5312.8 after that hit.
-        battle.applyTrueDamage(battle.enemies.get(0), owner, DamageElement.ICE, owner.getCurrentHp() * 0.5);
+        battle.applyTrueDamage(battle.enemies().get(0), owner, DamageElement.ICE, owner.getCurrentHp() * 0.5);
         battle.processRequests();
         double hurt = owner.getCurrentHp();
         double maxHp = owner.getMaxHp();
@@ -76,7 +76,7 @@ public class TransformationHealsOnAttackTest {
         // form attacks with the basic slot.
         Skill skill = owner.getSkills().get(SkillType.COMMON);
         Assertions.assertNotNull(skill, "precondition: she has a basic attack");
-        SkillExecutor.execute(battle, skill, owner, List.of(battle.enemies.get(0)));
+        SkillExecutor.execute(battle, skill, owner, List.of(battle.enemies().get(0)));
         battle.processRequests();
         return (owner.getCurrentHp() - hurt) / maxHp;
     }

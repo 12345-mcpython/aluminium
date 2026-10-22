@@ -38,7 +38,7 @@ public class AhaMomentTest {
 
         Skill elation = owner.getSkills().get(SkillType.ELATION_SKILL);
         Assertions.assertNotNull(elation, "precondition: she has an elation skill");
-        SkillExecutor.execute(battle, elation, owner, List.of(battle.enemies.get(0)));
+        SkillExecutor.execute(battle, elation, owner, List.of(battle.enemies().get(0)));
         battle.processRequests();
         Assertions.assertTrue(owner.getBuffManager().hasState(MOMENT),
                 "the elation cast applies the moment");

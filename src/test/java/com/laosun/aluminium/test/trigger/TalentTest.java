@@ -278,9 +278,9 @@ public class TalentTest {
         Assertions.assertTrue(acted, "Seele should have acted");
         Assertions.assertTrue(enemy.isDeath(), "the attack should have killed");
 
-        Assertions.assertNotNull(battle.queue.getExtraTurnActor(),
+        Assertions.assertNotNull(battle.queue().getExtraTurnActor(),
                 "the kill should have scheduled an extra turn");
-        Assertions.assertSame(seele, battle.queue.getExtraTurnActor(),
+        Assertions.assertSame(seele, battle.queue().getExtraTurnActor(),
                 "and it must be Seele's turn, not a teammate's");
     }
 
@@ -300,7 +300,7 @@ public class TalentTest {
 
         Assertions.assertTrue(acted);
         Assertions.assertTrue(enemy.isDeath(), "the teammate got the kill");
-        Assertions.assertNull(battle.queue.getExtraTurnActor(),
+        Assertions.assertNull(battle.queue().getExtraTurnActor(),
                 "Seele's talent keys off actor == self, so someone else's kill grants nothing");
     }
 
@@ -378,10 +378,10 @@ public class TalentTest {
                                         List<? extends CanHit> targets) {
         for (int i = 0; i < 40; i++) {
             battle.stepForward();
-            if (battle.currentMove == null) {
+            if (battle.currentMove() == null) {
                 break;
             }
-            if (battle.currentMove.getCanHit() == actor) {
+            if (battle.currentMove().getCanHit() == actor) {
                 battle.beforeMove();
                 boolean result = battle.performAction(skill.get(), targets);
                 battle.afterMove();
@@ -399,10 +399,10 @@ public class TalentTest {
     private static void letEnemyAttack(Battle battle, Enemy attacker, CanHit victim) {
         for (int i = 0; i < 40; i++) {
             battle.stepForward();
-            if (battle.currentMove == null) {
+            if (battle.currentMove() == null) {
                 break;
             }
-            Signal current = battle.currentMove;
+            Signal current = battle.currentMove();
             CanHit actor = current.getCanHit();
             battle.beforeMove();
             if (actor == attacker) {

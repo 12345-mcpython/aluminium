@@ -50,7 +50,7 @@ public class StateEndedEnergyProbeTest {
         if (missing > 0) {
             // Note: Measured: no HP setter exists, and DamageElement has no IMAGINARY. So she is damaged the way the game
             // damages -- through applyDamage -- with the enemy as attacker and an element the enum really has.
-            battle.applyDamage(owner, new com.laosun.aluminium.models.Damage(battle.enemies.get(0), owner,
+            battle.applyDamage(owner, new com.laosun.aluminium.models.Damage(battle.enemies().get(0), owner,
                     com.laosun.aluminium.enums.DamageElement.QUANTUM,
                     com.laosun.aluminium.enums.DamageType.NORMAL, owner.getMaxHp() * missing));
             battle.processRequests();

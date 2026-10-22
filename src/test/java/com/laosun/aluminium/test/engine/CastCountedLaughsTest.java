@@ -57,8 +57,8 @@ public class CastCountedLaughsTest {
     @Test
     public void theCountDoesNotLeakPastItsCast() {
         Battle battle = build(ELATION, 20);
-        Character commander = battle.characters.get(1);
-        Character caster = battle.characters.getFirst();
+        Character commander = battle.characters().get(1);
+        Character caster = battle.characters().getFirst();
         Enemy enemy = battle.enemyUnits().getFirst();
 
         double before = enemy.getCurrentHp();
@@ -95,7 +95,7 @@ public class CastCountedLaughsTest {
     @Test
     public void theClaimDoesNotSurviveTheCastThatConsumedIt() {
         Battle battle = build(ELATION, 20);
-        Character commander = battle.characters.get(1);
+        Character commander = battle.characters().get(1);
         Assertions.assertNull(battle.castCountedLaughs(), "precondition: no cast has claimed anything yet");
         battle.fireTriggers(TriggerEvent.TURN_START, commander, commander, 0, 0);
         battle.processRequests();
@@ -114,7 +114,7 @@ public class CastCountedLaughsTest {
      */
     private static double commandedCastDamage(Integer countedLaughs, String skill) {
         Battle battle = build(skill, countedLaughs);
-        Character commander = battle.characters.get(1);
+        Character commander = battle.characters().get(1);
         Enemy enemy = battle.enemyUnits().getFirst();
         double before = enemy.getCurrentHp();
         battle.fireTriggers(TriggerEvent.TURN_START, commander, commander, 0, 0);

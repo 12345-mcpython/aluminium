@@ -38,7 +38,7 @@ public class PearlChargeCounterTest {
     @Test
     public void theUltimateFillsTheCounterToThree() {
         Battle battle = newBattle(HUNTER);
-        Character pearl = battle.characters.get(0);
+        Character pearl = battle.characters().get(0);
         castUltimate(battle, pearl);
         System.out.println("[pearl_charge] after the Ultimate: charges=" + pearl.getResources().value(CHARGE)
                 + " deep=" + pearl.getBuffManager().hasState(DEEP));
@@ -52,7 +52,7 @@ public class PearlChargeCounterTest {
     @Test
     public void oneEnhancedBasicSpendsExactlyOneCharge() {
         Battle battle = newBattle(HUNTER);
-        Character pearl = battle.characters.get(0);
+        Character pearl = battle.characters().get(0);
         castUltimate(battle, pearl);
         attack(battle, pearl);
         int afterOne = pearl.getResources().value(CHARGE);
@@ -69,7 +69,7 @@ public class PearlChargeCounterTest {
     @Test
     public void theStateEndsWithTheLastCharge() {
         Battle battle = newBattle(HUNTER);
-        Character pearl = battle.characters.get(0);
+        Character pearl = battle.characters().get(0);
         castUltimate(battle, pearl);
 
         attack(battle, pearl);
@@ -99,7 +99,7 @@ public class PearlChargeCounterTest {
     @Test
     public void reEnteringRestoresToThreeAndDoesNotAddThree() {
         Battle battle = newBattle(HUNTER);
-        Character pearl = battle.characters.get(0);
+        Character pearl = battle.characters().get(0);
         castUltimate(battle, pearl);
         attack(battle, pearl);
         attack(battle, pearl);
@@ -132,7 +132,7 @@ public class PearlChargeCounterTest {
      */
     private static void castUltimate(Battle battle, Character pearl) {
         pearl.setCurrentEnergy(pearl.getMaxEnergy());
-        battle.castUltra(pearl, List.of(battle.characters.get(1)));
+        battle.castUltra(pearl, List.of(battle.characters().get(1)));
         battle.processRequests();
     }
 

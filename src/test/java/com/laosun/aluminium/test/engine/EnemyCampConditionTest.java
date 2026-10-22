@@ -29,7 +29,7 @@ public class EnemyCampConditionTest {
         Battle battle = new Battle(List.of(CharacterFactory.create(HERO, 80)), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        Character hero = battle.characters.getFirst();
+        Character hero = battle.characters().getFirst();
 
         // Told apart by the attribute each grants: the `is_enemy` rule grants ATTACK, the `is_ally` rule grants
         // CRIT_ATTACK. An enemy attack must satisfy the first and not the second.

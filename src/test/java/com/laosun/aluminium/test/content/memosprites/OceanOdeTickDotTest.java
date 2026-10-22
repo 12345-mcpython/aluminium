@@ -53,8 +53,8 @@ public class OceanOdeTickDotTest {
                 List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        cyrene = battle.characters.get(0);
-        hysilens = battle.characters.get(1);
+        cyrene = battle.characters().get(0);
+        hysilens = battle.characters().get(1);
 
         if (castTheOde) {
             var sprite = battle.summonServant(cyrene);
@@ -65,12 +65,12 @@ public class OceanOdeTickDotTest {
             battle.processRequests();
         }
 
-        var enemy = battle.enemies.getFirst();
+        var enemy = battle.enemies().getFirst();
         // the shipped way to put a damage-over-time on an enemy (WoofWalkTimeTest)
         enemy.getBuffManager().addBuff(new DotBuff(hysilens, DamageElement.FIRE, BURN, 3));
         double before = enemy.getCurrentHp();
         // fire the event by hand, with the skill key: only the clause is under test
-        battle.fireTriggers(TriggerEvent.ALLY_ATTACK, battle.characters.get(1), enemy, 1, 0.0, null, skillId);
+        battle.fireTriggers(TriggerEvent.ALLY_ATTACK, battle.characters().get(1), enemy, 1, 0.0, null, skillId);
         battle.processRequests();
         return before - enemy.getCurrentHp();
     }

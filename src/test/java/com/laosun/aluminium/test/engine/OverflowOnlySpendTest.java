@@ -53,13 +53,13 @@ public class OverflowOnlySpendTest {
                 List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        spare = battle.characters.getFirst();
+        spare = battle.characters().getFirst();
         spare.getResources().register(MARK, MAX, 0, OVERFLOW);
         spare.getResources().gain(MARK, start);
         int before = spare.getResources().value(MARK);
         spare.setTriggerTable(table());
         battle.fireTriggers(TriggerEvent.TURN_START, spare, null, 0, 0);
         battle.processRequests();
-        return new int[]{before, battle.characters.getFirst().getResources().value(MARK)};
+        return new int[]{before, battle.characters().getFirst().getResources().value(MARK)};
     }
 }

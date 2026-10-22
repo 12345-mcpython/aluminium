@@ -167,10 +167,10 @@ public class NatashaHealTest {
          * One full turn of the ally: the moment "目标每回合开始时" would name.
          */
         private void allyTurn() {
-            battle.currentMove = battle.queue.snapshot().stream()
+            battle.setCurrentMove(battle.queue().snapshot().stream()
                     .filter(signal -> signal.getCanHit() == ally)
                     .findFirst()
-                    .orElseThrow(() -> new AssertionError("no signal for the ally"));
+                    .orElseThrow(() -> new AssertionError("no signal for the ally")));
             battle.beforeMove();
             battle.afterMove();
         }

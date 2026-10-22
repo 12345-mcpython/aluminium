@@ -147,10 +147,10 @@ public class AlliesOfPathExceptSelectorTest {
                     List.of(BattleFixture.monster()), BattleFixture.seeded());
             battle.startBattle();
             battle.processRequests();
-            owner = battle.characters.get(0);
-            mate = battle.characters.get(1);
-            hunter = battle.characters.get(2);
-            offPath = battle.characters.get(3);
+            owner = battle.characters().get(0);
+            mate = battle.characters().get(1);
+            hunter = battle.characters().get(2);
+            offPath = battle.characters().get(3);
             aimed = hunter;
         }
 

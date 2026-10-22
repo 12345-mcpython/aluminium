@@ -63,7 +63,7 @@ public class SushangExtraRollFollowsTheRowTest {
                 List.of(BattleFixture.dummy()), BattleFixture.alwaysRoll(0.0));
         battle.startBattle();
         battle.processRequests();
-        Character sushang = battle.characters.getFirst();
+        Character sushang = battle.characters().getFirst();
 
         // "施放战技时额外增加 2 次【剑势】的发动判定": the ultimate installs it for 2 turns.
         sushang.setCurrentEnergy(sushang.getMaxEnergy());

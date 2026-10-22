@@ -64,10 +64,10 @@ public class TransformationEndsOnLastCountdownTest {
             if (clock == null) {
                 break;
             }
-            battle.queue.snapshot().stream()
+            battle.queue().snapshot().stream()
                     .filter(signal -> signal.getCanHit() == clock)
                     .findFirst()
-                    .ifPresent(signal -> battle.currentMove = signal);
+                    .ifPresent(signal -> battle.setCurrentMove(signal));
             battle.beforeMove();
             battle.processRequests();
         }

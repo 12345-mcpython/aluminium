@@ -133,7 +133,7 @@ public class PearlInsightTraceTest {
         Assertions.assertEquals(0, pearl.getResources().value(COUNTER), EPS,
                 "precondition: she holds none of the counter yet, so the aura cannot be up");
 
-        Character aim = battle.characters.get(1);
+        Character aim = battle.characters().get(1);
         battle.fireTriggers(TriggerEvent.ULT_CAST, pearl, aim, 0, 0);
         battle.processRequests();
         double pearlGain = pearl.getAttribute(AttributeType.EFFECT_RESISTANCE).get() - pearlBefore;
@@ -193,7 +193,7 @@ public class PearlInsightTraceTest {
                 List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        return battle.characters.getFirst();
+        return battle.characters().getFirst();
     }
 
     /**
@@ -219,7 +219,7 @@ public class PearlInsightTraceTest {
                 BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        Character her = battle.characters.getFirst();
+        Character her = battle.characters().getFirst();
         Enemy victim = battle.enemyUnits().getFirst();
         if (deepStudy) {
             // The Eidolon's own gate, which is also the sentence's: the Ultimate puts her into 深度学习.
@@ -227,7 +227,7 @@ public class PearlInsightTraceTest {
             // Aimed at herself she carries BOTH states the rule could name (【深度学习】 is hers and 【美学底本】
             // falls on the aim), so a mutant of the gate to the archetype state survived - the gate only becomes
             // observable when the aim is somebody else, which is also how the ability is actually played.
-            Character aim = battle.characters.get(1);
+            Character aim = battle.characters().get(1);
             battle.fireTriggers(TriggerEvent.ULT_CAST, her, aim, 0, 0);
             battle.processRequests();
             if (keepHerKit) {

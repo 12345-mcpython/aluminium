@@ -66,7 +66,7 @@ public class EnemyCountConditionTest {
         }
         Battle battle = new Battle(List.of(wearer), foes, BattleFixture.seeded());
         battle.startBattle();
-        battle.currentMove = new Signal(wearer);
+        battle.setCurrentMove(new Signal(wearer));
         battle.beforeMove();
         battle.afterMove();
         return battle.getSkillPoints();

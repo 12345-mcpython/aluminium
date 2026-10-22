@@ -61,7 +61,7 @@ public class OverflowOnlyFeedsTheCaptureTest {
                 List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        spare = battle.characters.getFirst();
+        spare = battle.characters().getFirst();
         spare.getResources().register(SPENT, MAX, 0, OVERFLOW);
         spare.getResources().register(MARK, 9999, 0);
         spare.getResources().gain(SPENT, MAX + OVERFLOW);
@@ -69,7 +69,7 @@ public class OverflowOnlyFeedsTheCaptureTest {
         spare.setTriggerTable(table(overflowOnly));
         battle.fireTriggers(TriggerEvent.TURN_START, spare, null, 0, 0);
         battle.processRequests();
-        spare = battle.characters.getFirst();
+        spare = battle.characters().getFirst();
         return new int[]{before, spare.getResources().value(SPENT), spare.getResources().value(MARK)};
     }
 }

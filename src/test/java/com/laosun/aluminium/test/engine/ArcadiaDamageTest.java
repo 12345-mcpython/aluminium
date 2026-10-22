@@ -100,7 +100,7 @@ public class ArcadiaDamageTest {
      * Note: A whole turn: SUMMONED and TURN_START both come out of a settle, so nothing may be read without one.
      */
     private static void driveTurn(Battle battle, Character unit) {
-        battle.currentMove = new Signal(unit);
+        battle.setCurrentMove(new Signal(unit));
         battle.beforeMove();
         battle.afterMove();
     }

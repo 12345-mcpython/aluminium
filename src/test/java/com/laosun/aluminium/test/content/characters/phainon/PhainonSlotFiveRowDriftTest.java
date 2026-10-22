@@ -84,7 +84,7 @@ public class PhainonSlotFiveRowDriftTest {
                 List.of(BattleFixture.monster()), BattleFixture.alwaysRoll(0.9999));
         battle.startBattle();
         battle.processRequests();
-        Character phainon = battle.characters.getFirst();
+        Character phainon = battle.characters().getFirst();
         double atkBefore = phainon.getAttribute(AttributeType.ATTACK).get();
         double hpBefore = phainon.getAttribute(AttributeType.HEALTH).get();
         phainon.setCurrentEnergy(phainon.getMaxEnergy());

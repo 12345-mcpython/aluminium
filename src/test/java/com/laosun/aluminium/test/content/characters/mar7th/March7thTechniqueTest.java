@@ -134,7 +134,7 @@ public class March7thTechniqueTest {
     @Test
     public void theFreezeCarriesItsDurationAndItsPerTurnDamage() {
         Battle battle = techniqueBattle(true);
-        Character march = battle.characters.getFirst();
+        Character march = battle.characters().getFirst();
         battle.startBattle();
 
         Enemy victim = frozenEnemy(battle);

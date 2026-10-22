@@ -181,7 +181,7 @@ public class RealTeamTest {
         assumeStageData();
 
         Battle battle = StageFactory.load(STAGE, StageFactory.realTeam(), new Random(1));
-        List<Character> team = battle.characters;
+        List<Character> team = battle.characters();
 
         Assertions.assertEquals(4, team.size());
         Assertions.assertEquals(4, team.stream().map(Character::getCid).distinct().count(),
@@ -193,14 +193,14 @@ public class RealTeamTest {
         // A full round without exceptions.
         for (int i = 0; i < 8 && !battle.isOver(); i++) {
             battle.stepForward();
-            if (battle.currentMove == null) {
+            if (battle.currentMove() == null) {
                 break;
             }
             battle.beforeMove();
             battle.afterMove();
         }
         Assertions.assertNotEquals(Battle.Status.NOT_STARTED, battle.getStatus());
-        Assertions.assertTrue(battle.queue.getElapsed() > 0);
+        Assertions.assertTrue(battle.queue().getElapsed() > 0);
     }
 
     /**
@@ -211,8 +211,8 @@ public class RealTeamTest {
         assumeStageData();
 
         Battle battle = StageFactory.load(STAGE);
-        Assertions.assertEquals(4, battle.characters.size());
-        for (Character character : battle.characters) {
+        Assertions.assertEquals(4, battle.characters().size());
+        for (Character character : battle.characters()) {
             Assertions.assertNotNull(character.getElement(),
                     character.getName() + " came from the placeholder path (no element)");
             Assertions.assertNotEquals(0, character.getCid(), character.getName() + " must be a real cid");

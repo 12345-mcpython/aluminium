@@ -39,17 +39,17 @@ public class FuxuanEidolonTwoTest {
 
         Skill skill = her.getSkills().get(SkillType.SKILL);
         Assertions.assertNotNull(skill, "precondition: she has a skill");
-        SkillExecutor.execute(battle, skill, her, List.of(battle.enemies.getFirst()));
+        SkillExecutor.execute(battle, skill, her, List.of(battle.enemies().getFirst()));
         battle.processRequests();
         Assertions.assertTrue(her.getBuffManager().hasState(ZONE), "precondition: the zone is open (her state)");
 
-        battle.applyTrueDamage(battle.enemies.getFirst(), ally, DamageElement.ICE, ally.getCurrentHp() * 2.0);
+        battle.applyTrueDamage(battle.enemies().getFirst(), ally, DamageElement.ICE, ally.getCurrentHp() * 2.0);
         battle.processRequests();
         Assertions.assertFalse(ally.isDeath(), "\"will not enter the unable-to-fight state\"");
         Assertions.assertEquals(ally.getMaxHp() * 0.70, ally.getCurrentHp(), ally.getMaxHp() * 0.01,
                 "\"restore HP equal to 70% of **its own** Max HP\"");
 
-        battle.applyTrueDamage(battle.enemies.getFirst(), ally, DamageElement.ICE, ally.getCurrentHp() * 2.0);
+        battle.applyTrueDamage(battle.enemies().getFirst(), ally, DamageElement.ICE, ally.getCurrentHp() * 2.0);
         battle.processRequests();
         Assertions.assertTrue(ally.isDeath(),
                 "\"this effect can trigger 1 time per battle\" -- the second one is not answered");

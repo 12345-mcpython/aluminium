@@ -163,7 +163,7 @@ public class DrivenRealBattleTest {
         BattleDriver.Result result = driver.run();
         Battle battle = driver.battle();
 
-        Assertions.assertEquals(3, battle.characters.size(), "the party is still three characters");
+        Assertions.assertEquals(3, battle.characters().size(), "the party is still three characters");
         Assertions.assertEquals(3, battle.enemyUnits().size(), "the camp keeps its roster, dead or not");
 
         double enemiesHurt = battle.enemyUnits().stream()

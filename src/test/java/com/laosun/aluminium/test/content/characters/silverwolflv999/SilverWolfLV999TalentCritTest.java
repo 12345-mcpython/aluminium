@@ -155,7 +155,7 @@ public class SilverWolfLV999TalentCritTest {
                 List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        Character wolf = battle.characters.getFirst();
+        Character wolf = battle.characters().getFirst();
         TriggerTable withGrant = wolf.getTriggerTable().plus(new TriggerTable(WOLF,
                 List.of(TriggerSpecs.rule("TURN_START", List.of("actor == self"),
                         TriggerSpecs.gainResource(HIDDEN, 1)))));

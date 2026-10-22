@@ -36,7 +36,7 @@ public class TribbieZoneStateTest {
                 "precondition: no zone before the ultimate");
 
         tribbie.setCurrentEnergy(tribbie.getMaxEnergy());
-        Assertions.assertTrue(battle.castUltra(tribbie, List.of(battle.enemies.getFirst())),
+        Assertions.assertTrue(battle.castUltra(tribbie, List.of(battle.enemies().getFirst())),
                 "precondition: the ultimate can be cast");
         battle.processRequests();
 

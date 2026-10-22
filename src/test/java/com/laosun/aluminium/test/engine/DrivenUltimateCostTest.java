@@ -114,7 +114,7 @@ public class DrivenUltimateCostTest {
 
         Battle battle = new Battle(List.of(hero), List.of(foe), BattleFixture.seeded());
         battle.startBattle();
-        battle.currentMove = new Signal(hero);
+        battle.setCurrentMove(new Signal(hero));
 
         // (a) not ready: the ordinary path must REFUSE rather than hand out a free ultimate.
         Assertions.assertFalse(battle.isUltraReady(hero), "precondition: the bar starts empty");

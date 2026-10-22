@@ -65,10 +65,10 @@ public class GiftCarriesTheLaughsTest {
     }
 
     private static void advance(Battle battle) {
-        Signal signal = battle.queue.snapshot().stream()
-                .filter(candidate -> candidate.getCanHit() == battle.allies.getFirst()).findFirst()
+        Signal signal = battle.queue().snapshot().stream()
+                .filter(candidate -> candidate.getCanHit() == battle.allies().getFirst()).findFirst()
                 .orElseThrow(() -> new AssertionError("precondition: a unit is in the queue"));
-        battle.currentMove = signal;
+        battle.setCurrentMove(signal);
         battle.beforeMove();
         battle.afterMove();
         battle.processRequests();

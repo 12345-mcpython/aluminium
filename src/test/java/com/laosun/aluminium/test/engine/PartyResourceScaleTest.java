@@ -42,10 +42,10 @@ public class PartyResourceScaleTest {
         Assertions.assertEquals(7, battle.partyResourceValue(COUNTER), "precondition: seven on the counter");
         double before = owner.getAttribute(AttributeType.ATTACK).get();
 
-        Signal signal = battle.queue.snapshot().stream()
-                .filter(candidate -> candidate.getCanHit() == battle.allies.getFirst()).findFirst()
+        Signal signal = battle.queue().snapshot().stream()
+                .filter(candidate -> candidate.getCanHit() == battle.allies().getFirst()).findFirst()
                 .orElseThrow(() -> new AssertionError("precondition: the owner is in the queue"));
-        battle.currentMove = signal;
+        battle.setCurrentMove(signal);
         battle.beforeMove();
         battle.afterMove();
         battle.processRequests();

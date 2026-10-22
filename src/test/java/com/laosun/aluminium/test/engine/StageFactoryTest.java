@@ -44,11 +44,11 @@ public class StageFactoryTest {
 
         Assertions.assertEquals(Battle.Status.RUNNING, battle.getStatus(),
                 "the battle produced by load should already be underway");
-        Assertions.assertEquals(3, battle.enemies.size(), "103201 wave 1 has 3 monsters");
+        Assertions.assertEquals(3, battle.enemies().size(), "103201 wave 1 has 3 monsters");
         Assertions.assertEquals(0, battle.getWaveManager().getWaveIndex(), "wave 1 has been entered");
 
-        int expectedQueueSize = battle.characters.size() + battle.enemies.size();
-        Assertions.assertEquals(expectedQueueSize, battle.queue.size(),
+        int expectedQueueSize = battle.characters().size() + battle.enemies().size();
+        Assertions.assertEquals(expectedQueueSize, battle.queue().size(),
                 "our side + wave 1's monsters should all be in the action bar (missing processRequests loses people)");
     }
 
@@ -85,7 +85,7 @@ public class StageFactoryTest {
         StageBean stage = StageFactory.requireStage(103201);
         Battle battle = StageFactory.load(103201, StageFactory.realTeam(), new Random(1));
 
-        Assertions.assertEquals(stage.monsterIds(0).size(), battle.enemies.size());
+        Assertions.assertEquals(stage.monsterIds(0).size(), battle.enemies().size());
         for (Enemy enemy : battle.enemyUnits()) {
             Assertions.assertFalse(enemy.isDeath());
             Assertions.assertTrue(enemy.getMaxHp() > 0);
@@ -118,14 +118,14 @@ public class StageFactoryTest {
 
         for (int i = 0; i < 5 && !battle.isOver(); i++) {
             battle.stepForward();
-            if (battle.currentMove == null) {
+            if (battle.currentMove() == null) {
                 break;
             }
             battle.beforeMove();
             battle.afterMove();
         }
 
-        Assertions.assertTrue(battle.queue.getElapsed() > 0, "the clock should have advanced");
+        Assertions.assertTrue(battle.queue().getElapsed() > 0, "the clock should have advanced");
         Assertions.assertNotEquals(Battle.Status.NOT_STARTED, battle.getStatus());
     }
 
@@ -149,11 +149,11 @@ public class StageFactoryTest {
 
         Assertions.assertEquals(Battle.Status.RUNNING, battle.getStatus(), "a next wave remains → no win judged");
 
-        int before = battle.enemies.size();
+        int before = battle.enemies().size();
         Assertions.assertTrue(waves.nextWave());
         battle.processRequests();
 
-        Assertions.assertTrue(battle.enemies.size() > before, "wave 2 is appended");
+        Assertions.assertTrue(battle.enemies().size() > before, "wave 2 is appended");
         Assertions.assertEquals(1, waves.getWaveIndex());
         Assertions.assertEquals(Battle.Status.RUNNING, battle.getStatus());
     }
@@ -196,9 +196,9 @@ public class StageFactoryTest {
 
         Battle battle = StageFactory.load(103201, team, new Random(0));
 
-        Assertions.assertEquals(1, battle.characters.size());
-        Assertions.assertEquals("solo", battle.characters.getFirst().getName());
-        Assertions.assertEquals(1 + battle.enemies.size(), battle.queue.size());
+        Assertions.assertEquals(1, battle.characters().size());
+        Assertions.assertEquals("solo", battle.characters().getFirst().getName());
+        Assertions.assertEquals(1 + battle.enemies().size(), battle.queue().size());
     }
 
     /**
@@ -239,11 +239,11 @@ public class StageFactoryTest {
      */
     private static String describe(Battle battle) {
         StringBuilder text = new StringBuilder();
-        text.append("elapsed=").append(battle.queue.getElapsed())
+        text.append("elapsed=").append(battle.queue().getElapsed())
                 .append(" status=").append(battle.getStatus())
                 .append(" round=").append(battle.getRound())
                 .append('\n');
-        for (var signal : battle.queue.snapshot()) {
+        for (var signal : battle.queue().snapshot()) {
             text.append(signal.getCanHit().getName())
                     .append('@').append(signal.getNextActionTime())
                     .append(" speed=").append(signal.getSpeed())

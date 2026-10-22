@@ -46,13 +46,13 @@ public class CountdownTest {
         Fixture f = new Fixture(markerOnCountdownTurn());
         Countdown countdown = f.battle.startCountdown("协奏倒计时", 90);
 
-        Signal signal = f.battle.queue.snapshot().stream()
+        Signal signal = f.battle.queue().snapshot().stream()
                 .filter(s -> s.getCanHit() == countdown)
                 .findFirst()
                 .orElseThrow(() -> new AssertionError("the countdown has no signal on the action order"));
         double before = f.hero.getAttribute(AttributeType.ATTACK).get();
 
-        f.battle.currentMove = signal;
+        f.battle.setCurrentMove(signal);
         f.battle.beforeMove();
 
         Assertions.assertTrue(f.hero.getAttribute(AttributeType.ATTACK).get() > before,
@@ -77,12 +77,12 @@ public class CountdownTest {
                 "the owner link is what tells them apart");
 
         double before = f.hero.getAttribute(AttributeType.ATTACK).get();
-        f.battle.currentMove = f.signalFor(theirs);
+        f.battle.setCurrentMove(f.signalFor(theirs));
         f.battle.beforeMove();
         Assertions.assertEquals(before, f.hero.getAttribute(AttributeType.ATTACK).get(), 1e-6,
                 "somebody else's countdown does not fire her rule");
 
-        f.battle.currentMove = f.signalFor(mine);
+        f.battle.setCurrentMove(f.signalFor(mine));
         f.battle.beforeMove();
         Assertions.assertTrue(f.hero.getAttribute(AttributeType.ATTACK).get() > before, "…and hers does");
     }
@@ -95,9 +95,9 @@ public class CountdownTest {
         Fixture f = new Fixture(null);
         Countdown countdown = f.battle.startCountdown("协奏倒计时", 90);
 
-        Assertions.assertEquals(2, f.battle.allies.size(),
+        Assertions.assertEquals(2, f.battle.allies().size(),
                 "the party is the two characters -- the countdown is scheduled but not one of them");
-        Assertions.assertTrue(f.battle.allies.stream().noneMatch(unit -> unit instanceof Countdown));
+        Assertions.assertTrue(f.battle.allies().stream().noneMatch(unit -> unit instanceof Countdown));
         Assertions.assertTrue(f.battle.getOpponents(f.hero).stream().noneMatch(unit -> unit instanceof Countdown),
                 "…and it is not an enemy either");
     }
@@ -135,7 +135,7 @@ public class CountdownTest {
         private final Battle battle;
 
         private Signal signalFor(CanHit unit) {
-            return battle.queue.snapshot().stream()
+            return battle.queue().snapshot().stream()
                     .filter(signal -> signal.getCanHit() == unit)
                     .findFirst()
                     .orElseThrow(() -> new AssertionError("no signal for that unit"));

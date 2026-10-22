@@ -452,16 +452,16 @@ public class SummonCommandTest {
     }
 
     private static double ourSideHp(Battle battle) {
-        return battle.allies.stream().mapToDouble(CanHit::getCurrentHp).sum();
+        return battle.allies().stream().mapToDouble(CanHit::getCurrentHp).sum();
     }
 
     /**
      * How much action value the unit still has - the number an action would reset.
      */
     private static double timeRemaining(Battle battle, CanHit target) {
-        for (Signal signal : battle.queue.snapshot()) {
+        for (Signal signal : battle.queue().snapshot()) {
             if (signal.getCanHit() == target) {
-                return battle.queue.getTimeRemaining(signal);
+                return battle.queue().getTimeRemaining(signal);
             }
         }
         return Double.NaN;

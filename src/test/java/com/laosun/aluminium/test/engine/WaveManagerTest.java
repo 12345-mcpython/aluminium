@@ -93,11 +93,11 @@ public class WaveManagerTest {
 
         Assertions.assertTrue(waves.nextWave());
         Assertions.assertEquals(0, waves.getWaveIndex());
-        Assertions.assertEquals(3, battle.enemies.size(), "103201 wave 1 has 3 monsters");
+        Assertions.assertEquals(3, battle.enemies().size(), "103201 wave 1 has 3 monsters");
         Assertions.assertEquals(3, battle.pendingCombatants().size(), "all queued waiting to enter");
 
         battle.processRequests();
-        Assertions.assertEquals(4, battle.queue.size(),
+        Assertions.assertEquals(4, battle.queue().size(),
                 "after entering they are in the action bar: 1 character + 3 monsters (the character joined the queue at construction)");
         Assertions.assertEquals(3, battle.targetableEnemies().size());
     }
@@ -110,12 +110,12 @@ public class WaveManagerTest {
     public void wavesJoinTheQueueAlongsideTheParty() {
         Battle battle = waveBattle(103201);
         battle.startBattle();
-        Assertions.assertEquals(1, battle.queue.size(), "at the start only our 1 character");
+        Assertions.assertEquals(1, battle.queue().size(), "at the start only our 1 character");
 
         battle.getWaveManager().nextWave();
         battle.processRequests();
 
-        Assertions.assertEquals(4, battle.queue.size(), "1 character + 3 monsters");
+        Assertions.assertEquals(4, battle.queue().size(), "1 character + 3 monsters");
         Assertions.assertEquals(3, battle.targetableEnemies().size());
     }
 
@@ -130,7 +130,7 @@ public class WaveManagerTest {
         Assertions.assertTrue(waves.nextWave());
         Assertions.assertFalse(waves.hasNextWave());
         Assertions.assertFalse(waves.nextWave(), "returns false when there is no next wave");
-        Assertions.assertEquals(3, battle.enemies.size(), "monsters are not spawned twice");
+        Assertions.assertEquals(3, battle.enemies().size(), "monsters are not spawned twice");
     }
 
     /**
@@ -146,10 +146,10 @@ public class WaveManagerTest {
         int secondWaveSize = stage.monsterIds(1).size();
 
         Assertions.assertTrue(waves.nextWave());
-        Assertions.assertEquals(firstWaveSize, battle.enemies.size());
+        Assertions.assertEquals(firstWaveSize, battle.enemies().size());
 
         Assertions.assertTrue(waves.nextWave());
-        Assertions.assertEquals(firstWaveSize + secondWaveSize, battle.enemies.size(),
+        Assertions.assertEquals(firstWaveSize + secondWaveSize, battle.enemies().size(),
                 "the second wave is **appended**, not a replacement");
         Assertions.assertEquals(1, waves.getWaveIndex());
     }
@@ -216,12 +216,12 @@ public class WaveManagerTest {
                 "wave 2 is still to come → must not judge a win");
         Assertions.assertTrue(waves.isCurrentWaveCleared());
 
-        int before = battle.enemies.size();
+        int before = battle.enemies().size();
         Assertions.assertTrue(waves.nextWave());
         battle.processRequests();
 
         Assertions.assertEquals(Battle.Status.RUNNING, battle.getStatus(), "a new wave has entered, keep fighting");
-        Assertions.assertTrue(battle.enemies.size() > before);
+        Assertions.assertTrue(battle.enemies().size() > before);
         Assertions.assertFalse(waves.isCurrentWaveCleared(), "the new wave is alive");
         Assertions.assertFalse(waves.aliveEnemies().isEmpty());
     }
@@ -235,7 +235,7 @@ public class WaveManagerTest {
         Battle battle = waveBattle(310030);
         battle.startBattle();
 
-        for (Character c : battle.characters) {
+        for (Character c : battle.characters()) {
             c.takeDamage(999_999_999);
         }
         battle.processRequests();
@@ -255,17 +255,17 @@ public class WaveManagerTest {
 
         battle.stepForward();
         battle.afterMove();                              // the clock has advanced a bit (the 132-speed enemy acts first)
-        double elapsedBefore = battle.queue.getElapsed();
+        double elapsedBefore = battle.queue().getElapsed();
         Assertions.assertTrue(elapsedBefore > 0);
 
         waves.nextWave();
         battle.processRequests();
 
         for (Enemy enemy : battle.enemyUnits()) {
-            double remaining = battle.queue.getTimeRemaining(signalOf(battle, enemy));
+            double remaining = battle.queue().getTimeRemaining(signalOf(battle, enemy));
             Assertions.assertTrue(remaining > 0 && remaining < Double.MAX_VALUE,
                     "a new monster's remaining action value is positive and finite");
-            Assertions.assertTrue(battle.queue.getElapsed() >= elapsedBefore,
+            Assertions.assertTrue(battle.queue().getElapsed() >= elapsedBefore,
                     "spawning monsters does not wind the clock back");
         }
     }
@@ -282,7 +282,7 @@ public class WaveManagerTest {
         battle.startBattle();
 
         Assertions.assertEquals(Battle.Status.RUNNING, battle.getStatus());
-        Assertions.assertEquals(1, battle.enemies.size());
+        Assertions.assertEquals(1, battle.enemies().size());
     }
 
     /**
@@ -352,7 +352,7 @@ public class WaveManagerTest {
     }
 
     private static com.laosun.aluminium.models.Signal signalOf(Battle battle, Enemy enemy) {
-        return battle.queue.getHeap().stream()
+        return battle.queue().getHeap().stream()
                 .filter(s -> s.getCanHit() == enemy)
                 .findFirst()
                 .orElseThrow(() -> new AssertionError(enemy.getName() + " is not in the action bar"));

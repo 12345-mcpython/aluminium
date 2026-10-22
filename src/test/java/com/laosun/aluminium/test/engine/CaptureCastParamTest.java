@@ -50,8 +50,8 @@ public class CaptureCastParamTest {
                 List.of(EnemyFactory.create(1002011, 90, 1)), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        cyrene = battle.characters.get(0);
-        cerydra = battle.characters.get(1);
+        cyrene = battle.characters().get(0);
+        cerydra = battle.characters().get(1);
         var demiurge = battle.summonServant(cyrene);
         battle.processRequests();
         var ode = demiurge.skillAt(23);

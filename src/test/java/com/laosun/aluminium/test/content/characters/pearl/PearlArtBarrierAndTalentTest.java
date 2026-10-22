@@ -37,9 +37,9 @@ public class PearlArtBarrierAndTalentTest {
     @Test
     public void theBarrierLandsOnlyOnAnElationArchetype() {
         Battle battle = newBattle();
-        Character pearl = battle.characters.get(0);
-        Character elation = battle.characters.get(1);
-        Character hunter = battle.characters.get(2);
+        Character pearl = battle.characters().get(0);
+        Character elation = battle.characters().get(1);
+        Character hunter = battle.characters().get(2);
 
         battle.fireTriggers(TriggerEvent.ULT_CAST, pearl, elation, 0, 0);
         battle.fireTriggers(TriggerEvent.ULT_CAST, pearl, hunter, 0, 0);
@@ -54,7 +54,7 @@ public class PearlArtBarrierAndTalentTest {
     @Test
     public void theTalentReductionFollowsTheHalfHpThreshold() {
         Battle battle = newBattle();
-        Character ally = battle.characters.get(2);
+        Character ally = battle.characters().get(2);
 
         ally.takeDamage(ally.getMaxHp() * 0.8);
         battle.fireTriggers(TriggerEvent.HP_LOST, ally, ally, 0, 0);
@@ -85,7 +85,7 @@ public class PearlArtBarrierAndTalentTest {
     @Test
     public void theTalentsReductionIsThirtyPercent() {
         Battle battle = newBattle();
-        Character ally = battle.characters.get(2);
+        Character ally = battle.characters().get(2);
         Enemy attacker = battle.enemyUnits().getFirst();
 
         // The talent's own gate is "at or below half HP", and its event is HP_LOST - so the ally has to really be

@@ -529,9 +529,9 @@ public class ControlTest {
      * Action value left before the target acts - the observable the delay really moves.
      */
     private static double timeRemaining(Battle battle, Enemy target) {
-        for (Signal signal : battle.queue.snapshot()) {
+        for (Signal signal : battle.queue().snapshot()) {
             if (signal.getCanHit() == target) {
-                return battle.queue.getTimeRemaining(signal);
+                return battle.queue().getTimeRemaining(signal);
             }
         }
         throw new AssertionError(target.getName() + " is not in the action bar");

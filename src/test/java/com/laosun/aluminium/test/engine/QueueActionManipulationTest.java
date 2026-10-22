@@ -112,7 +112,7 @@ public class QueueActionManipulationTest {
     public void speedChangeReSchedulesTheSignalImmediately() {
         Character hero = character("hero", 100);
         Battle battle = new Battle(List.of(hero), List.of(dummy()), BattleFixture.seeded());
-        Queue q = battle.queue;
+        Queue q = battle.queue();
 
         // enemy at 132 speed to first round 10000/132  x  1.5; earlier than hero's 150, so it acts first
         Assertions.assertEquals(10000.0 / 132 * 1.5, signalOf(q, dummyOf(battle)).getNextActionTime(), 1e-6);
@@ -145,7 +145,7 @@ public class QueueActionManipulationTest {
     public void removingTheSpeedBuffReSchedulesBack() {
         Character hero = character("hero", 100);
         Battle battle = new Battle(List.of(hero), List.of(dummy()), BattleFixture.seeded());
-        Queue q = battle.queue;
+        Queue q = battle.queue();
 
         SpeedBoostBuff buff = new SpeedBoostBuff(2, 1.0);
         hero.getBuffManager().addBuff(buff);             // hero speed 200 to cycle 50, first round 5
@@ -179,7 +179,7 @@ public class QueueActionManipulationTest {
     public void settingTheSpeedAttributeDirectlyAlsoReSchedules() {
         Character hero = character("hero", 100);
         Battle battle = new Battle(List.of(hero), List.of(dummy()), BattleFixture.seeded());
-        Queue q = battle.queue;
+        Queue q = battle.queue();
         Signal signal = signalOf(q, hero);
 
         Assertions.assertEquals(150, signal.getNextActionTime(), EPS, "before the change: first round 150");
@@ -340,7 +340,7 @@ public class QueueActionManipulationTest {
      * The enemy in the team (Ice Edge (冰锋), 132 speed): first round {@code 10000/132  x  1.5 ~= 113.64}, so it acts before a speed-100 character (150).
      */
     private static CanHit dummyOf(Battle battle) {
-        return battle.enemies.getFirst();
+        return battle.enemies().getFirst();
     }
 
     /**

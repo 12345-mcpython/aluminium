@@ -38,7 +38,7 @@ public class DrRatioFallbackTest {
         battle.startBattle();
         a.perish();
         Assertions.assertTrue(a.isDeath(), "the fixture must leave A defeated");
-        Assertions.assertTrue(battle.enemies.contains(a),
+        Assertions.assertTrue(battle.enemies().contains(a),
                 "isDeath() alone must not remove it -- that is the window the clause is about");
         TriggerTable.TriggerContext ctx = new TriggerTable.TriggerContext(ratio, ratio, a, 1, 0, null, battle,
                 SkillCategory.UNSPECIFIED);

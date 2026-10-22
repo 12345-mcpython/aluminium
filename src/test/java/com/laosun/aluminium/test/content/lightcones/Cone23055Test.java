@@ -63,17 +63,17 @@ public class Cone23055Test {
     public void theVulnerabilityAndTheDefenceHealLand() {
         Fixture f = new Fixture();
         // Precondition: everybody is hurt, so a heal is visible at all (a full-HP fixture reads 0 whatever the share is).
-        for (Character ally : f.battle.characters) {
+        for (Character ally : f.battle.characters()) {
             ally.consumeHp(ally.getMaxHp() * 0.5);
         }
-        double[] hpBefore = f.battle.characters.stream().mapToDouble(Character::getCurrentHp).toArray();
+        double[] hpBefore = f.battle.characters().stream().mapToDouble(Character::getCurrentHp).toArray();
         double defence = f.wearer.getAttribute(AttributeType.DEFENCE).get();
 
         f.castElationSkillAtAnAlly();
 
-        for (int i = 0; i < f.battle.characters.size(); i++) {
-            double healed = f.battle.characters.get(i).getCurrentHp() - hpBefore[i];
-            System.out.println("[23055] " + f.battle.characters.get(i).getName() + " 回复 " + healed
+        for (int i = 0; i < f.battle.characters().size(); i++) {
+            double healed = f.battle.characters().get(i).getCurrentHp() - hpBefore[i];
+            System.out.println("[23055] " + f.battle.characters().get(i).getName() + " 回复 " + healed
                     + "（= 防御 " + defence + " × " + HEAL_SHARE_OF_DEF + " = " + (defence * HEAL_SHARE_OF_DEF) + "）");
             Assertions.assertEquals(defence * HEAL_SHARE_OF_DEF, healed, 1e-6,
                     "「为我方全体回复等同于装备者防御力 20%」—— 是**防御力**的份额，不是生命上限");
@@ -150,7 +150,7 @@ public class Cone23055Test {
                     List.of(BattleFixture.dummy()), BattleFixture.alwaysRoll(0.9999));
             battle.startBattle();
             battle.processRequests();
-            return battle.characters.getFirst();
+            return battle.characters().getFirst();
         }
 
         /** 「对我方全体施放欢愉技」: the wearer's Elation skill, aimed at her teammate. */

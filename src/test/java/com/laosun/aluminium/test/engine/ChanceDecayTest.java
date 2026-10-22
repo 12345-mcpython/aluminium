@@ -43,7 +43,7 @@ public class ChanceDecayTest {
         Battle battle = battle(rng, List.of(
                 rule(BOX, "TURN_START", 1.0, 0.2, gainOne()),
                 rule("test_reset", "ULT_CAST", null, null, reset(BOX))));
-        Character wolf = battle.characters.getFirst();
+        Character wolf = battle.characters().getFirst();
 
         fire(battle, rng, 0.9);
         Assertions.assertEquals(1, wolf.getResources().value(COUNTER),
@@ -111,7 +111,7 @@ public class ChanceDecayTest {
      */
     private static void fire(Battle battle, ScriptedRng rng, double draw) {
         rng.nextDoubleValue = draw;
-        Character wolf = battle.characters.getFirst();
+        Character wolf = battle.characters().getFirst();
         battle.fireTriggers(TriggerEvent.TURN_START, wolf, wolf, 0, 0);
         battle.processRequests();
     }
@@ -122,7 +122,7 @@ public class ChanceDecayTest {
                 List.of(BattleFixture.monster()), rng);
         battle.startBattle();
         battle.processRequests();
-        battle.characters.getFirst().setTriggerTable(new TriggerTable(WOLF, specs));
+        battle.characters().getFirst().setTriggerTable(new TriggerTable(WOLF, specs));
         return battle;
     }
 

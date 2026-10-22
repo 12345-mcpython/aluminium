@@ -85,11 +85,11 @@ public class FeverDefenceIgnoreTest {
         battle.processRequests();
         List<Damage> settled = new ArrayList<>();
         battle.addDamageObserver((damage, applied, hpLoss, shieldAbsorbed, died) -> settled.add(damage));
-        SkillExecutor.execute(battle, ally.getSkills().get(SkillType.COMMON), ally, List.of(battle.enemies.get(0)));
+        SkillExecutor.execute(battle, ally.getSkills().get(SkillType.COMMON), ally, List.of(battle.enemies().get(0)));
         battle.processRequests();
         Assertions.assertEquals(1, settled.size(), "precondition: one settled instance");
 
-        double defence = battle.enemies.get(0).getAttribute(AttributeType.DEFENCE).get();
+        double defence = battle.enemies().get(0).getAttribute(AttributeType.DEFENCE).get();
         double levelTerm = 200.0 + 10.0 * 80;
         double zone = settled.get(0).breakdown().get("DefenceArea");
         // zone = levelTerm / (effectiveDef + levelTerm)  ->  effectiveDef = levelTerm/zone - levelTerm

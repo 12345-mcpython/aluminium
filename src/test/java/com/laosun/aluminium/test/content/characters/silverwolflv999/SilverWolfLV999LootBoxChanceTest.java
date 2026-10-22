@@ -85,7 +85,7 @@ public class SilverWolfLV999LootBoxChanceTest {
         rng.nextDoubleValue = draw;
         var enemies = battle.enemyUnits();
         double before = enemies.stream().mapToDouble(e -> e.getCurrentHp()).sum();
-        Character wolf = battle.characters.getFirst();
+        Character wolf = battle.characters().getFirst();
         battle.fireTriggers(TriggerEvent.SKILL_POINT_SPENT, wolf, wolf, 0, 1);
         battle.processRequests();
         return before - enemies.stream().mapToDouble(e -> e.getCurrentHp()).sum();
@@ -96,7 +96,7 @@ public class SilverWolfLV999LootBoxChanceTest {
      * {@code CAST_SETUP} with that slot.
      */
     private static void castHonkaiDemo(Battle battle) {
-        Character wolf = battle.characters.getFirst();
+        Character wolf = battle.characters().getFirst();
         var skill = wolf.getSkills().get(SkillType.ELATION_EXTRA);
         Assertions.assertNotNull(skill, "the fixture needs her 欢愉技·强化 (ELATION_EXTRA, slot 21) to cast at all");
         battle.castImmediate(skill, wolf, List.of(battle.enemyUnits().getFirst()));
@@ -112,7 +112,7 @@ public class SilverWolfLV999LootBoxChanceTest {
                 List.of(BattleFixture.monster(), BattleFixture.monster()), rng);
         battle.startBattle();
         battle.processRequests();
-        Character wolf = battle.characters.getFirst();
+        Character wolf = battle.characters().getFirst();
         wolf.getResources().gain(GIFT, 1);
         wolf.setCurrentEnergy(wolf.getMaxEnergy());
         battle.castUltra(wolf, List.of(battle.enemyUnits().getFirst()));

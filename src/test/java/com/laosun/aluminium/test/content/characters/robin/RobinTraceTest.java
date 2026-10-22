@@ -131,11 +131,11 @@ public class RobinTraceTest {
 
     private static double remainingAtBattleStart(boolean keepRules) {
         Battle battle = battleWithRobin(keepRules);
-        Character robin = battle.characters.getFirst();
-        return battle.queue.snapshot().stream()
+        Character robin = battle.characters().getFirst();
+        return battle.queue().snapshot().stream()
                 .filter(signal -> signal.getCanHit() == robin)
                 .findFirst()
-                .map(battle.queue::getTimeRemaining)
+                .map(battle.queue()::getTimeRemaining)
                 .orElseThrow(() -> new AssertionError("Robin is not on the action bar"));
     }
 
@@ -150,12 +150,12 @@ public class RobinTraceTest {
 
     private static double robinEnergyAfterSkillCast(boolean keepRules, int actorIndex, SkillType slot) {
         Battle battle = battleWithRobin(keepRules);
-        Character robin = battle.characters.getFirst();
-        Character actor = battle.characters.get(actorIndex);
+        Character robin = battle.characters().getFirst();
+        Character actor = battle.characters().get(actorIndex);
         double before = robin.getCurrentEnergy();
         Skill skill = actor.getSkills().get(slot);
         Assertions.assertNotNull(skill, "precondition: the actor carries the " + slot + " slot");
-        battle.castImmediate(skill, actor, List.of(battle.enemies.getFirst()));
+        battle.castImmediate(skill, actor, List.of(battle.enemies().getFirst()));
         return robin.getCurrentEnergy() - before;
     }
 

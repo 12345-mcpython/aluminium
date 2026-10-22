@@ -37,7 +37,7 @@ public class HyacineUltHealTest {
         // computed from the panel the cast started with (measured: 319.52864 = 1195.2864 x 0.1 + 200).
         double herMaxHpBefore = hyacine.getAttribute(AttributeType.HEALTH).get();
         SkillExecutor.execute(battle, hyacine.getSkills().get(SkillType.ULTRA), hyacine,
-                List.of(battle.enemies.get(0)));
+                List.of(battle.enemies().get(0)));
         battle.processRequests();
         double healed = ally.getCurrentHp() - before;
         double expected = herMaxHpBefore * 0.1 + 200.0;

@@ -187,10 +187,10 @@ public class ServalShockTest {
         }
 
         private void enemyTurn() {
-            battle.currentMove = battle.queue.snapshot().stream()
+            battle.setCurrentMove(battle.queue().snapshot().stream()
                     .filter(signal -> signal.getCanHit() == enemy)
                     .findFirst()
-                    .orElseThrow(() -> new AssertionError("no signal for the enemy"));
+                    .orElseThrow(() -> new AssertionError("no signal for the enemy")));
             battle.beforeMove();
             battle.afterMove();
         }

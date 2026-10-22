@@ -78,7 +78,7 @@ public class TalismanSavesAnAllyTest {
         // Her skill is what puts [禳命] ("Divine Provision") on her (2 turns, ticking on her own turns).
         Skill skill = her.getSkills().get(SkillType.SKILL);
         Assertions.assertNotNull(skill, "precondition: she has a skill");
-        SkillExecutor.execute(battle, skill, her, List.of(battle.enemies.getFirst()));
+        SkillExecutor.execute(battle, skill, her, List.of(battle.enemies().getFirst()));
         battle.processRequests();
         Assertions.assertTrue(her.getBuffManager().hasState(STATE), "precondition: [禳命] (\"Divine Provision\") is on her");
 
@@ -86,7 +86,7 @@ public class TalismanSavesAnAllyTest {
             if (ally.isDeath()) {
                 break;
             }
-            battle.applyTrueDamage(battle.enemies.getFirst(), ally, DamageElement.ICE, ally.getCurrentHp() * 2.0);
+            battle.applyTrueDamage(battle.enemies().getFirst(), ally, DamageElement.ICE, ally.getCurrentHp() * 2.0);
             battle.processRequests();
         }
         return new double[]{ally.isDeath() ? 0 : ally.getCurrentHp(), ally.getMaxHp()};

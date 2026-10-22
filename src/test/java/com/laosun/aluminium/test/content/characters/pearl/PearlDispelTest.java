@@ -25,12 +25,12 @@ public class PearlDispelTest {
     @Test
     public void theEnhancedBasicDispelsADebuffAndLeavesANamedState() {
         Battle battle = battle();
-        Character pearl = battle.characters.getFirst();
-        Character ally = battle.characters.get(1);
+        Character pearl = battle.characters().getFirst();
+        Character ally = battle.characters().get(1);
         ally.getBuffManager().addBuff(new DotBuff(ally, DamageElement.FIRE, 100, 3));
         ally.getBuffManager().addBuff(new StateBuff("_probe_state", 3));
 
-        battle.fireTriggers(TriggerEvent.BASIC_ATTACK, pearl, battle.enemies.getFirst(), 1, 0,
+        battle.fireTriggers(TriggerEvent.BASIC_ATTACK, pearl, battle.enemies().getFirst(), 1, 0,
                 (SkillCategory) null, 8);
 
         boolean dot = ally.getBuffManager().hasBuff(DotBuff.class);
@@ -44,11 +44,11 @@ public class PearlDispelTest {
     @Test
     public void anOrdinaryBasicLeavesTheDebuffInPlace() {
         Battle battle = battle();
-        Character pearl = battle.characters.getFirst();
-        Character ally = battle.characters.get(1);
+        Character pearl = battle.characters().getFirst();
+        Character ally = battle.characters().get(1);
         ally.getBuffManager().addBuff(new DotBuff(ally, DamageElement.FIRE, 100, 3));
 
-        battle.fireTriggers(TriggerEvent.BASIC_ATTACK, pearl, battle.enemies.getFirst(), 1, 0,
+        battle.fireTriggers(TriggerEvent.BASIC_ATTACK, pearl, battle.enemies().getFirst(), 1, 0,
                 (SkillCategory) null, 1);
 
         Assertions.assertTrue(ally.getBuffManager().hasBuff(DotBuff.class),

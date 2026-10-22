@@ -39,7 +39,7 @@ public class ClaraTraceTest {
     @Test
     public void herFamilyTraceDispelsADebuffWhenTheRollPasses() {
         Battle battle = battleWith(fixed(0.1));
-        Character clara = battle.characters.getFirst();
+        Character clara = battle.characters().getFirst();
         clara.getBuffManager().addBuff(new DotBuff(clara, DamageElement.FIRE, 100, 3));
         clara.getBuffManager().addBuff(new StateBuff("协奏", 3));
 
@@ -54,7 +54,7 @@ public class ClaraTraceTest {
     @Test
     public void aFailedRollLeavesTheDebuffInPlace() {
         Battle battle = battleWith(fixed(0.9));
-        Character clara = battle.characters.getFirst();
+        Character clara = battle.characters().getFirst();
         clara.getBuffManager().addBuff(new DotBuff(clara, DamageElement.FIRE, 100, 3));
 
         hit(battle, clara);
@@ -69,7 +69,7 @@ public class ClaraTraceTest {
     @Test
     public void herCounterTalentStillFires() {
         Battle battle = battleWith(fixed(0.9));
-        Character clara = battle.characters.getFirst();
+        Character clara = battle.characters().getFirst();
         Enemy enemy = battle.enemyUnits().getFirst();
         double before = enemy.getCurrentHp();
 
@@ -90,7 +90,7 @@ public class ClaraTraceTest {
     @Test
     public void herGuardianTraceResistsTheControlClass() {
         Battle battle = battleWith(fixed(0.9));
-        Character clara = battle.characters.getFirst();
+        Character clara = battle.characters().getFirst();
 
         Assertions.assertEquals(0.35, clara.getBuffManager().debuffResistOf(DebuffClass.CONTROL), 1e-9,
                 "「抵抗控制类负面状态的概率提高35%」 (raises RES to Crowd Control debuffs by 35%)");
@@ -107,7 +107,7 @@ public class ClaraTraceTest {
     @Test
     public void herGuardianTraceIsNotSpentByTurns() {
         Battle battle = battleWith(fixed(0.9));
-        Character clara = battle.characters.getFirst();
+        Character clara = battle.characters().getFirst();
 
         TestTurns.take(battle, clara);
         TestTurns.take(battle, clara);

@@ -106,9 +106,9 @@ public class FugueTest {
      * The unit's remaining wait, read off the queue's public snapshot (round 216's recipe).
      */
     private static double remaining(Battle battle, Character unit) {
-        for (Signal signal : battle.queue.snapshot()) {
+        for (Signal signal : battle.queue().snapshot()) {
             if (signal.getCanHit() == unit) {
-                return battle.queue.getTimeRemaining(signal);
+                return battle.queue().getTimeRemaining(signal);
             }
         }
         throw new IllegalStateException("the unit is not in the action queue");

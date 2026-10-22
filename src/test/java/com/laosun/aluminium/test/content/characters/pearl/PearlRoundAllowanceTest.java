@@ -37,14 +37,14 @@ public class PearlRoundAllowanceTest {
     @Test
     public void theRoundPaysFivePerTurnAndStopsAtFifty() {
         Battle battle = newBattle();
-        Character pearl = battle.characters.getFirst();
+        Character pearl = battle.characters().getFirst();
         drain(pearl);
 
         int total = 0;
         int turns = 0;
         // Well past ten turns, and each gain is spent back so the COUNTER's own cap of 50 cannot be what stops it.
         while (turns < 20) {
-            allyTurn(battle, battle.characters.get(2));
+            allyTurn(battle, battle.characters().get(2));
             total += pearl.getResources().value(COUNTER);
             drain(pearl);
             turns++;
@@ -60,12 +60,12 @@ public class PearlRoundAllowanceTest {
     @Test
     public void herOwnTurnStartsANewRound() {
         Battle battle = newBattle();
-        Character pearl = battle.characters.getFirst();
+        Character pearl = battle.characters().getFirst();
         drain(pearl);
 
         int total = 0;
         for (int i = 0; i < 20; i++) {
-            allyTurn(battle, battle.characters.get(2));
+            allyTurn(battle, battle.characters().get(2));
             total += pearl.getResources().value(COUNTER);
             drain(pearl);
         }
@@ -79,7 +79,7 @@ public class PearlRoundAllowanceTest {
         // And the new round can hand out a further 45 on top of her own 5.
         int second = 0;
         for (int i = 0; i < 20; i++) {
-            allyTurn(battle, battle.characters.get(2));
+            allyTurn(battle, battle.characters().get(2));
             second += pearl.getResources().value(COUNTER);
             drain(pearl);
         }

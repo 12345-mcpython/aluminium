@@ -89,7 +89,7 @@ public class LethalSetTest {
     }
 
     private static void blow(Battle battle, Character victim) {
-        battle.applyTrueDamage(battle.enemies.getFirst(), victim, DamageElement.ICE, victim.getCurrentHp() * 2.0);
+        battle.applyTrueDamage(battle.enemies().getFirst(), victim, DamageElement.ICE, victim.getCurrentHp() * 2.0);
         battle.processRequests();
     }
 

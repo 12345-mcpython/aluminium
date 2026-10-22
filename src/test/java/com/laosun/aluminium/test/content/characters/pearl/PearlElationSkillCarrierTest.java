@@ -52,12 +52,12 @@ public class PearlElationSkillCarrierTest {
         Battle battle = new Battle(team, List.of(EnemyFactory.create(1002011, 100, 1)), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        Character pearl = battle.characters.get(0);
+        Character pearl = battle.characters().get(0);
 
         battle.fireTriggers(TriggerEvent.CAST_SETUP, pearl, pearl, 0, 0, category);
 
         List<String> carriers = new ArrayList<>();
-        for (Character c : battle.characters) {
+        for (Character c : battle.characters()) {
             if (c.getBuffManager().hasState(CARRIER)) {
                 carriers.add(String.valueOf(c.getCid()));
             }

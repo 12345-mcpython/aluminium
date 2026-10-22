@@ -164,6 +164,6 @@ public class HimekoTechniqueTest {
         Battle battle = battle(technique);
         Enemy enemy = battle.enemyUnits().get(0);
         return battle.applyDamage(enemy,
-                new Damage(battle.characters.get(0), enemy, element, DamageType.NORMAL, 1000));
+                new Damage(battle.characters().get(0), enemy, element, DamageType.NORMAL, 1000));
     }
 }

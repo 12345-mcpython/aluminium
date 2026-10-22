@@ -65,11 +65,11 @@ public class ZoneAdditionalDamageTest {
                 List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        tribbie = battle.characters.getFirst();
-        attacker = battle.characters.get(1);
+        tribbie = battle.characters().getFirst();
+        attacker = battle.characters().get(1);
 
         tribbie.setCurrentEnergy(tribbie.getMaxEnergy());
-        Assertions.assertTrue(battle.castUltra(tribbie, List.of(battle.enemies.getFirst())),
+        Assertions.assertTrue(battle.castUltra(tribbie, List.of(battle.enemies().getFirst())),
                 "precondition: his ultimate opens the zone");
         battle.processRequests();
 
@@ -80,7 +80,7 @@ public class ZoneAdditionalDamageTest {
             Assertions.assertTrue(taken > 0, "precondition: the zone state was on him to remove");
         }
 
-        var enemy = battle.enemies.getFirst();
+        var enemy = battle.enemies().getFirst();
         double before = enemy.getCurrentHp();
         Skill skill = attacker.getSkills().values().stream()
                 .filter(s -> s != null && s.getData() != null && s.getData().getEffect().isDamaging())

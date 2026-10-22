@@ -102,10 +102,10 @@ public class EnemyStateCountTest {
     }
 
     private static double remainingWait(Fixture f, Character unit) {
-        return f.battle.queue.snapshot().stream()
+        return f.battle.queue().snapshot().stream()
                 .filter(signal -> signal.getCanHit() == unit)
                 .findFirst()
-                .map(f.battle.queue::getTimeRemaining)
+                .map(f.battle.queue()::getTimeRemaining)
                 .orElseThrow(() -> new AssertionError("no signal for " + unit.getName()));
     }
 

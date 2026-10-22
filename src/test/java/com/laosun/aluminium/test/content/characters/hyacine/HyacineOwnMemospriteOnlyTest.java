@@ -172,7 +172,7 @@ public class HyacineOwnMemospriteOnlyTest {
                     byIka.add(damage);
                 }
             });
-            SkillExecutor.execute(battle, slotOne, longNight, List.of(battle.enemies.getFirst()));
+            SkillExecutor.execute(battle, slotOne, longNight, List.of(battle.enemies().getFirst()));
             battle.processRequests();
             return byIka;
         }
@@ -187,9 +187,9 @@ public class HyacineOwnMemospriteOnlyTest {
 
         /** The unit's remaining wait, read off the action bar's own snapshot. */
         double remainingWaitOf(CanHit unit) {
-            for (var signal : battle.queue.snapshot()) {
+            for (var signal : battle.queue().snapshot()) {
                 if (signal.getCanHit() == unit) {
-                    return battle.queue.getTimeRemaining(signal);
+                    return battle.queue().getTimeRemaining(signal);
                 }
             }
             throw new AssertionError(unit.getName() + " is not on the action bar");

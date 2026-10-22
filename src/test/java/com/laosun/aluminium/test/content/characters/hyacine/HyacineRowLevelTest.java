@@ -113,7 +113,7 @@ public class HyacineRowLevelTest {
             hyacine.setCurrentEnergy(hyacine.getMaxEnergy());
             double herMaxHpAtCast = hyacine.getMaxHp();
             double before = ally.getCurrentHp();
-            Assertions.assertTrue(battle.castUltra(hyacine, List.of(battle.enemies.getFirst())),
+            Assertions.assertTrue(battle.castUltra(hyacine, List.of(battle.enemies().getFirst())),
                     "precondition: the ultimate went off");
             return new double[]{ally.getCurrentHp() - before, herMaxHpAtCast};
         }

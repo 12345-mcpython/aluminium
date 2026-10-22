@@ -72,11 +72,11 @@ public class LethalHitTest {
         battle.startBattle();
         battle.processRequests();
 
-        battle.applyTrueDamage(battle.enemies.getFirst(), her, DamageElement.ICE, her.getCurrentHp() * 2.0);
+        battle.applyTrueDamage(battle.enemies().getFirst(), her, DamageElement.ICE, her.getCurrentHp() * 2.0);
         battle.processRequests();
         Assertions.assertFalse(her.isDeath(), "precondition: the first blow is survived");
 
-        battle.applyTrueDamage(battle.enemies.getFirst(), her, DamageElement.ICE, her.getCurrentHp() * 2.0);
+        battle.applyTrueDamage(battle.enemies().getFirst(), her, DamageElement.ICE, her.getCurrentHp() * 2.0);
         battle.processRequests();
         Assertions.assertTrue(her.isDeath(),
                 "「该效果单场战斗中只能触发 1 次」 (this effect can only trigger once per battle)-- the second one is not saved");
@@ -103,7 +103,7 @@ public class LethalHitTest {
         }
         Assertions.assertFalse(her.isDeath(), "precondition: she starts alive");
 
-        battle.applyTrueDamage(battle.enemies.getFirst(), her, DamageElement.ICE, her.getCurrentHp() * 2.0);
+        battle.applyTrueDamage(battle.enemies().getFirst(), her, DamageElement.ICE, her.getCurrentHp() * 2.0);
         battle.processRequests();
         return her;
     }

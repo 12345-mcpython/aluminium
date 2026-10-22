@@ -51,7 +51,7 @@ public class SilverWolfLV999LootBoxWaveTest {
     public void aBoxWithNobodyToHitWaitsForTheWave() {
         ScriptedRng rng = new ScriptedRng(PICK_POINTS);
         Battle battle = battle(rng);
-        Character wolf = battle.characters.getFirst();
+        Character wolf = battle.characters().getFirst();
         for (Enemy enemy : battle.enemyUnits()) {
             enemy.perish();                       // 「触发前目标被消灭」: the field is empty when the point is spent
         }
@@ -81,7 +81,7 @@ public class SilverWolfLV999LootBoxWaveTest {
     public void aBoxWithSomeoneToHitIsNotHeld() {
         ScriptedRng rng = new ScriptedRng(PICK_POINTS);
         Battle battle = battle(rng);
-        Character wolf = battle.characters.getFirst();
+        Character wolf = battle.characters().getFirst();
         int pointsBefore = battle.getSkillPoints();
         battle.fireTriggers(TriggerEvent.SKILL_POINT_SPENT, wolf, wolf, 0, 1);
         battle.processRequests();
@@ -101,7 +101,7 @@ public class SilverWolfLV999LootBoxWaveTest {
     public void theHeldFiringAlreadyRolledAndDecayed() {
         ScriptedRng rng = new ScriptedRng(PICK_POINTS);
         Battle battle = battle(rng);
-        Character wolf = battle.characters.getFirst();
+        Character wolf = battle.characters().getFirst();
         for (Enemy enemy : battle.enemyUnits()) {
             enemy.perish();
         }
@@ -137,7 +137,7 @@ public class SilverWolfLV999LootBoxWaveTest {
                 List.of(BattleFixture.monster(), BattleFixture.monster()), rng);
         battle.startBattle();
         battle.processRequests();
-        Character wolf = battle.characters.getFirst();
+        Character wolf = battle.characters().getFirst();
         wolf.getResources().gain(GIFT, 1);
         wolf.setCurrentEnergy(wolf.getMaxEnergy());
         battle.castUltra(wolf, List.of(battle.enemyUnits().getFirst()));

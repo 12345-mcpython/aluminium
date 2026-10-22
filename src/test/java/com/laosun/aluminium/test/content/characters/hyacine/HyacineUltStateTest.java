@@ -36,7 +36,7 @@ public class HyacineUltStateTest {
         double before = ally.getAttribute(AttributeType.HEALTH).get();
 
         SkillExecutor.execute(battle, hyacine.getSkills().get(SkillType.ULTRA), hyacine,
-                List.of(battle.enemies.get(0)));
+                List.of(battle.enemies().get(0)));
         battle.processRequests();
         double after = ally.getAttribute(AttributeType.HEALTH).get();
 

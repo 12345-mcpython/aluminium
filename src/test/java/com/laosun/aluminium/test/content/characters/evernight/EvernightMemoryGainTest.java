@@ -59,7 +59,7 @@ public class EvernightMemoryGainTest {
         Summon ika = (Summon) f.battle.memospriteOf(f.hyacine);
         Assertions.assertNotNull(ika, "precondition: 小伊卡 is out");
 
-        SkillExecutor.execute(f.battle, ika.skillAt(RAINCLOUDS), ika, List.of(f.battle.enemies.getFirst()));
+        SkillExecutor.execute(f.battle, ika.skillAt(RAINCLOUDS), ika, List.of(f.battle.enemies().getFirst()));
         f.battle.processRequests();
 
         Assertions.assertEquals(0, f.memory(),
@@ -94,7 +94,7 @@ public class EvernightMemoryGainTest {
             Summon longNight = (Summon) battle.memospriteOf(evernight);
             Skill skill = longNight.skillAt(RAINCLOUDS);
             Assertions.assertNotNull(skill, "precondition: 长夜 carries data slot 1");
-            SkillExecutor.execute(battle, skill, longNight, List.of(battle.enemies.getFirst()));
+            SkillExecutor.execute(battle, skill, longNight, List.of(battle.enemies().getFirst()));
             battle.processRequests();
         }
     }

@@ -43,8 +43,8 @@ public class PhainonTraceBideInFlamesTest {
     @Test
     public void aTeammatesHealRaisesHisDamageForFourTurns() {
         Battle battle = newBattle();
-        Character phainon = battle.characters.getFirst();
-        Character ally = battle.characters.get(1);
+        Character phainon = battle.characters().getFirst();
+        Character ally = battle.characters().get(1);
         phainon.consumeHp(phainon.getMaxHp() * 0.3);
 
         double before = boost(phainon);
@@ -71,8 +71,8 @@ public class PhainonTraceBideInFlamesTest {
     @Test
     public void aTeammatesShieldAlsoRaisesIt() {
         Battle battle = newBattle();
-        Character phainon = battle.characters.getFirst();
-        Character ally = battle.characters.get(1);
+        Character phainon = battle.characters().getFirst();
+        Character ally = battle.characters().get(1);
         double before = boost(phainon);
         battle.grantShield(ally, phainon, 200);
         battle.processRequests();
@@ -87,7 +87,7 @@ public class PhainonTraceBideInFlamesTest {
     @Test
     public void hisOwnHealDoesNotCount() {
         Battle battle = newBattle();
-        Character phainon = battle.characters.getFirst();
+        Character phainon = battle.characters().getFirst();
         phainon.consumeHp(phainon.getMaxHp() * 0.3);
         double before = boost(phainon);
         battle.heal(phainon, phainon, phainon.getMaxHp() * 0.1);
@@ -106,7 +106,7 @@ public class PhainonTraceBideInFlamesTest {
      */
     @Test
     public void theRuleCarriesTheOncePerTurnLimit() {
-        Character phainon = newBattle().characters.getFirst();
+        Character phainon = newBattle().characters().getFirst();
         List<TriggerTable.CompiledRule> onHeal = rulesFor(phainon, TriggerEvent.HEALED);
         Assertions.assertEquals(1, onHeal.size(), "HEALED 上只该有这一条");
         Assertions.assertEquals(1, onHeal.getFirst().perTurn(), "「该效果单个回合内不可重复触发」= per_turn: 1");
@@ -122,7 +122,7 @@ public class PhainonTraceBideInFlamesTest {
     @Test
     public void theEnergyHalfIsStillANoOp() {
         Battle battle = newBattle();
-        Character phainon = battle.characters.getFirst();
+        Character phainon = battle.characters().getFirst();
         int before = phainon.getResources().value(COREFLAME);
         battle.applyEnergyGain(phainon, EnergyGain.normal(10));
         battle.processRequests();

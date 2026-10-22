@@ -82,6 +82,6 @@ public class ResourceOverflowUnboundedTest {
         Battle battle = new Battle(List.of(owner), List.of(BattleFixture.dummy()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        return battle.characters.getFirst().getResources().gain(COUNTER, amount);
+        return battle.characters().getFirst().getResources().gain(COUNTER, amount);
     }
 }

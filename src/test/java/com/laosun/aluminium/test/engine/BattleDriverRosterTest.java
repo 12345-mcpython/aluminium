@@ -153,7 +153,7 @@ public class BattleDriverRosterTest {
                 List.of(CharacterFactory.create(1407, LEVEL, false, null, null, 0)),
                 List.of(EnemyFactory.create(1002011, LEVEL, 1)));
         battle.startBattle();
-        Assertions.assertNotNull(battle.summonMemosprite(battle.characters.getFirst()),
+        Assertions.assertNotNull(battle.summonMemosprite(battle.characters().getFirst()),
                 "precondition: the memosprite is on the field before the driver runs");
 
         BattleDriver driver = new BattleDriver(battle, new AutoPolicy())

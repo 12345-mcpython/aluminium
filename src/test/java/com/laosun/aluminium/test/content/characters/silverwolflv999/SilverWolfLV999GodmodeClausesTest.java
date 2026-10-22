@@ -96,7 +96,7 @@ public class SilverWolfLV999GodmodeClausesTest {
     @Test
     public void theUltimateInstallsTheEnhancedElationSkillToo() {
         Battle battle = newBattle();
-        Character wolf = battle.characters.getFirst();
+        Character wolf = battle.characters().getFirst();
         Assertions.assertEquals(20, wolf.getSkills().get(SkillType.ELATION_SKILL).getSkillSlot(),
                 "premise: her Elation skill is slot 20 before the Ultimate");
         castUltimate(battle, wolf);
@@ -119,7 +119,7 @@ public class SilverWolfLV999GodmodeClausesTest {
      */
     private static double damageInsideTheZone(int eidolonRank) {
         Battle battle = newBattle(eidolonRank);
-        Character wolf = battle.characters.getFirst();
+        Character wolf = battle.characters().getFirst();
         castUltimate(battle, wolf);
         Assertions.assertTrue(wolf.getBuffManager().hasState(ZONE), "premise: the Ultimate deployed the Zone");
         Enemy victim = battle.enemyUnits().getFirst();

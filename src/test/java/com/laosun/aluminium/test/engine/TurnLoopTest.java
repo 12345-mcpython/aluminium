@@ -45,7 +45,7 @@ public class TurnLoopTest {
         Assertions.assertTrue(loop.step(1), "the first actor exists");
         Assertions.assertEquals(List.of("stepForward", "beforeMove", "act", "afterMove"), battle.calls,
                 "the loop must advance, start the turn, act, then end it");
-        Assertions.assertNull(battle.currentMove, "afterMove clears the current actor");
+        Assertions.assertNull(battle.currentMove(), "afterMove clears the current actor");
     }
 
     /**

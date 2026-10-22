@@ -38,8 +38,8 @@ public class WorldOdeFireSeedTest {
                 List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        cyrene = battle.characters.get(0);
-        him = battle.characters.get(1);
+        cyrene = battle.characters().get(0);
+        him = battle.characters().get(1);
         int before = him.getResources().value(FIRE_SEED);
         if (castTheOde) {
             var sprite = battle.summonServant(cyrene);
@@ -49,6 +49,6 @@ public class WorldOdeFireSeedTest {
             SkillExecutor.execute(battle, ode, sprite, List.of(him));
             battle.processRequests();
         }
-        return battle.characters.get(1).getResources().value(FIRE_SEED) - before;
+        return battle.characters().get(1).getResources().value(FIRE_SEED) - before;
     }
 }

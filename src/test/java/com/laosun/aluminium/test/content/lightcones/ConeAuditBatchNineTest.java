@@ -40,10 +40,10 @@ public class ConeAuditBatchNineTest {
     public void coneTwoInnocentTwoThreeHealsEveryonesLostHp() {
         Fixture f = new Fixture(21023, true);
         Fixture bare = new Fixture(null, true);
-        for (Character unit : f.battle.characters) {
+        for (Character unit : f.battle.characters()) {
             unit.consumeHp(unit.getMaxHp() * 0.5);
         }
-        for (Character unit : bare.battle.characters) {
+        for (Character unit : bare.battle.characters()) {
             unit.consumeHp(unit.getMaxHp() * 0.5);
         }
         // The share is 「已损失生命值」of each unit at the moment it fires, so the expectation is read off the
@@ -53,9 +53,9 @@ public class ConeAuditBatchNineTest {
         f.battle.fireTriggers(com.laosun.aluminium.enums.TriggerEvent.BATTLE_START, f.wearer, f.wearer, 0, 0);
         bare.battle.fireTriggers(com.laosun.aluminium.enums.TriggerEvent.BATTLE_START, bare.wearer, bare.wearer, 0, 0);
         for (int i = 0; i < 2; i++) {
-            double healed = f.battle.characters.get(i).getCurrentHp() - bare.battle.characters.get(i).getCurrentHp();
+            double healed = f.battle.characters().get(i).getCurrentHp() - bare.battle.characters().get(i).getCurrentHp();
             double expected = (i == 0 ? lostWearer : lostAlly) * 0.3;
-            System.out.println("[21023] " + f.battle.characters.get(i).getName() + " 治疗差 " + healed + " ; 期望 " + expected);
+            System.out.println("[21023] " + f.battle.characters().get(i).getName() + " 治疗差 " + healed + " ; 期望 " + expected);
             // ⚠ The absolute value is NOT pinned: the rule also fires inside startBattle, before this fixture damages the
             // party, so the difference spans two firings. What it does show is that the share lands, per unit.
             Assertions.assertTrue(healed > 0.0,

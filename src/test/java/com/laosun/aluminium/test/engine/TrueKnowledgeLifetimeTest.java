@@ -33,19 +33,19 @@ public class TrueKnowledgeLifetimeTest {
                 List.of(EnemyFactory.create(MONSTER, 100, 1)), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        var sprite = battle.summonServant(battle.characters.get(0));
+        var sprite = battle.summonServant(battle.characters().get(0));
         battle.processRequests();
         var ode = sprite.skillAt(ODE_SLOT);
         Assertions.assertNotNull(ode, "precondition: slot 18");
-        Character aimed = battle.characters.get(1);
+        Character aimed = battle.characters().get(1);
         com.laosun.aluminium.models.skill.SkillExecutor.execute(battle, ode, sprite, List.of(aimed));
         battle.processRequests();
-        aimed = battle.characters.get(1);
+        aimed = battle.characters().get(1);
         var basic = aimed.getSkills().get(SkillType.COMMON);
         com.laosun.aluminium.models.skill.SkillExecutor.execute(battle, basic, aimed,
-                List.of(battle.enemies.getFirst()));
+                List.of(battle.enemies().getFirst()));
         battle.processRequests();
-        boolean still = battle.characters.get(1).getBuffManager().hasState(KNOWLEDGE);
+        boolean still = battle.characters().get(1).getBuffManager().hasState(KNOWLEDGE);
         System.out.println("[knowledge_lifetime] after the cast that grants it, 【真知】 (True Knowledge) is "
                 + (still ? "still on him" : "gone"));
         Assertions.assertTrue(still, "the cast that grants 【真知】 (True Knowledge) must not also consume it");

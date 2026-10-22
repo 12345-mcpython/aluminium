@@ -66,12 +66,12 @@ public class PlayerSideSummonTest {
     public void aFriendlySummonJoinsOurCampAndNotOurCharacters() {
         Fixture f = fixture();
 
-        Assertions.assertEquals(2, f.battle.allies.size(), "the camp holds the hero and the summon");
-        Assertions.assertSame(f.summon, f.battle.allies.get(1));
-        Assertions.assertEquals(1, f.battle.characters.size(),
+        Assertions.assertEquals(2, f.battle.allies().size(), "the camp holds the hero and the summon");
+        Assertions.assertSame(f.summon, f.battle.allies().get(1));
+        Assertions.assertEquals(1, f.battle.characters().size(),
                 "characters is the subset view: 'on our side' and 'is a character' are two questions");
-        Assertions.assertSame(f.hero, f.battle.characters.getFirst());
-        Assertions.assertEquals(1, f.battle.enemies.size(), "and nothing leaked into the enemy camp");
+        Assertions.assertSame(f.hero, f.battle.characters().getFirst());
+        Assertions.assertEquals(1, f.battle.enemies().size(), "and nothing leaked into the enemy camp");
     }
 
     /**
@@ -93,8 +93,8 @@ public class PlayerSideSummonTest {
     public void itTakesItsTurnOnTheActionBar() {
         Fixture f = fixture();
 
-        Assertions.assertEquals(3, f.battle.queue.size(), "hero + monster + summon");
-        Assertions.assertTrue(f.battle.queue.snapshot().stream().anyMatch(s -> s.getCanHit() == f.summon),
+        Assertions.assertEquals(3, f.battle.queue().size(), "hero + monster + summon");
+        Assertions.assertTrue(f.battle.queue().snapshot().stream().anyMatch(s -> s.getCanHit() == f.summon),
                 "the summon has a signal, so it will be handed turns like any other unit");
     }
 
@@ -209,7 +209,7 @@ public class PlayerSideSummonTest {
         Assertions.assertTrue(f.hero.isDeath(), "precondition: the master is down");
         Assertions.assertTrue(f.summon.isDeath(),
                 "a sweep that only walked `enemies` would leave our own minion standing after its master");
-        Assertions.assertFalse(f.battle.queue.snapshot().stream().anyMatch(s -> s.getCanHit() == f.summon));
+        Assertions.assertFalse(f.battle.queue().snapshot().stream().anyMatch(s -> s.getCanHit() == f.summon));
     }
 
     /**
@@ -296,8 +296,8 @@ public class PlayerSideSummonTest {
                 () -> f.battle.summon(neutral, MINION, GROUP));
 
         Assertions.assertTrue(refused.getMessage().contains("camp"), refused.getMessage());
-        Assertions.assertEquals(2, f.battle.allies.size(), "and nothing was added to either roster");
-        Assertions.assertEquals(1, f.battle.enemies.size());
+        Assertions.assertEquals(2, f.battle.allies().size(), "and nothing was added to either roster");
+        Assertions.assertEquals(1, f.battle.enemies().size());
     }
 
     // ==================================================================

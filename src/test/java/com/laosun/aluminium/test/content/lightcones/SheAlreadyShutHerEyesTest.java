@@ -109,7 +109,7 @@ public class SheAlreadyShutHerEyesTest {
         boolean entered = battle.getWaveManager().nextWave();
         double healed = waveAlly.getCurrentHp() - before;
         System.out.println("[23011] REAL wave entry=" + entered + " lost=" + lost + " healed=" + healed
-                + " enemies=" + battle.enemies.size());
+                + " enemies=" + battle.enemies().size());
         Assertions.assertTrue(entered, "310030 has a wave to enter");
         Assertions.assertEquals(lost * SHARE, healed, 1e-6,
                 "entering a wave for real must fire WAVE_START -- that is the wiring, not the content");

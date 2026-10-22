@@ -58,9 +58,9 @@ public class SkyOdeHealingTotalTest {
                 List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        cyrene = battle.characters.get(0);
-        hyacine = battle.characters.get(1);
-        healer = battle.characters.get(2);
+        cyrene = battle.characters().get(0);
+        hyacine = battle.characters().get(1);
+        healer = battle.characters().get(2);
 
         if (castTheOde) {
             var sprite = battle.summonServant(cyrene);
@@ -93,15 +93,15 @@ public class SkyOdeHealingTotalTest {
         hyacine.takeDamage(hyacine.getMaxHp() * 0.5);
         battle.processRequests();
         System.out.println("[sky_heal]   diag: her captured share = "
-                + battle.characters.get(1).getResources().value("天空之诗的治疗份额")
-                + " ; the healer's mark = " + battle.characters.get(2).getBuffManager().stacksOf(MARK)
-                + " ; her HP " + battle.characters.get(1).getCurrentHp() + "/" + battle.characters.get(1).getMaxHp());
-        double before = battle.characters.get(1).getResources().value(TOTAL);
-        double hpBefore = battle.characters.get(1).getCurrentHp();
+                + battle.characters().get(1).getResources().value("天空之诗的治疗份额")
+                + " ; the healer's mark = " + battle.characters().get(2).getBuffManager().stacksOf(MARK)
+                + " ; her HP " + battle.characters().get(1).getCurrentHp() + "/" + battle.characters().get(1).getMaxHp());
+        double before = battle.characters().get(1).getResources().value(TOTAL);
+        double hpBefore = battle.characters().get(1).getCurrentHp();
         battle.fireTriggers(TriggerEvent.TURN_START, healer, null, 0, 0);
         battle.processRequests();
         // pair [the total it gained, the HP the heal actually restored]: the heal is capped by her missing HP, so the second number is the engine's own answer
-        return new double[]{battle.characters.get(1).getResources().value(TOTAL) - before,
-                battle.characters.get(1).getCurrentHp() - hpBefore};
+        return new double[]{battle.characters().get(1).getResources().value(TOTAL) - before,
+                battle.characters().get(1).getCurrentHp() - hpBefore};
     }
 }

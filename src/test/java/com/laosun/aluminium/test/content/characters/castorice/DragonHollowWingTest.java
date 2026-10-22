@@ -43,29 +43,29 @@ public class DragonHollowWingTest {
                 List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        her = battle.characters.getFirst();
-        double enemyBefore = battle.enemies.getFirst().getCurrentHp();
+        her = battle.characters().getFirst();
+        double enemyBefore = battle.enemies().getFirst().getCurrentHp();
         // BOTH of us must be wounded: a heal on a full unit gains exactly nothing, which is what the first reading measured.
         her.takeDamage(her.getMaxHp() * 0.5);
-        battle.characters.get(1).takeDamage(battle.characters.get(1).getMaxHp() * 0.5);
+        battle.characters().get(1).takeDamage(battle.characters().get(1).getMaxHp() * 0.5);
         battle.processRequests();
-        double partyBefore = battle.characters.get(1).getCurrentHp();
-        double herBefore = battle.characters.getFirst().getCurrentHp();
+        double partyBefore = battle.characters().get(1).getCurrentHp();
+        double herBefore = battle.characters().getFirst().getCurrentHp();
         // measure the enemy's mitigation with one plain 1000-damage hit of the same element, before the talent fires
-        double probeBefore = battle.enemies.getFirst().getCurrentHp();
-        battle.applyDamage(battle.enemies.getFirst(), new com.laosun.aluminium.models.Damage(
-                battle.characters.getFirst(), battle.enemies.getFirst(),
+        double probeBefore = battle.enemies().getFirst().getCurrentHp();
+        battle.applyDamage(battle.enemies().getFirst(), new com.laosun.aluminium.models.Damage(
+                battle.characters().getFirst(), battle.enemies().getFirst(),
                 com.laosun.aluminium.enums.DamageElement.QUANTUM,
                 com.laosun.aluminium.enums.DamageType.NORMAL, 1000));
         battle.processRequests();
-        double mitigation = (probeBefore - battle.enemies.getFirst().getCurrentHp()) / 1000.0;
-        enemyBefore = battle.enemies.getFirst().getCurrentHp();
-        double herMax = battle.characters.getFirst().getMaxHp();
+        double mitigation = (probeBefore - battle.enemies().getFirst().getCurrentHp()) / 1000.0;
+        enemyBefore = battle.enemies().getFirst().getCurrentHp();
+        double herMax = battle.characters().getFirst().getMaxHp();
         // The talent fires when the dragon ARRIVES; `summonMemosprite` uses the spec in memosprites/140.json (servant 1140).
         battle.summonMemosprite(her);
         battle.processRequests();
-        return new double[]{enemyBefore - battle.enemies.getFirst().getCurrentHp(),
-                battle.characters.get(1).getCurrentHp() - partyBefore,
-                herBefore - battle.characters.getFirst().getCurrentHp(), mitigation, herMax};
+        return new double[]{enemyBefore - battle.enemies().getFirst().getCurrentHp(),
+                battle.characters().get(1).getCurrentHp() - partyBefore,
+                herBefore - battle.characters().getFirst().getCurrentHp(), mitigation, herMax};
     }
 }

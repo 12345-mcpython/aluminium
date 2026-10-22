@@ -517,7 +517,7 @@ public class StatModifierStackingTest {
      * to the table is part of that.
      */
     private static void fire(Battle battle, int times) {
-        Character actor = battle.characters.getFirst();
+        Character actor = battle.characters().getFirst();
         for (int i = 0; i < times; i++) {
             battle.fireTriggers(TriggerEvent.ALLY_ATTACK, actor, null, 1, 0);
         }

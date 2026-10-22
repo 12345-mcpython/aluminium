@@ -37,7 +37,7 @@ public class SkillLevelTableBoundTest {
                 List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        Character her = battle.characters.getFirst();
+        Character her = battle.characters().getFirst();
         var common = her.getSkills().get(SkillType.COMMON);
         int rows = common.getData().getSkills().size();
         int level = her.skillLevel(common);
@@ -70,7 +70,7 @@ public class SkillLevelTableBoundTest {
                 List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        Character her = battle.characters.getFirst();
+        Character her = battle.characters().getFirst();
         var victim = battle.enemyUnits().getFirst();
         double before = victim.getCurrentHp();
         battle.castImmediate(her.getSkills().get(SkillType.COMMON), her, List.of(victim));
@@ -92,7 +92,7 @@ public class SkillLevelTableBoundTest {
                 List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        Character her = battle.characters.getFirst();
+        Character her = battle.characters().getFirst();
         var common = her.getSkills().get(SkillType.COMMON);
         int rows = common.getData().getSkills().size();
         System.out.println("[level-bound] COMMON at E0: level=" + her.skillLevel(common) + " table rows=" + rows);

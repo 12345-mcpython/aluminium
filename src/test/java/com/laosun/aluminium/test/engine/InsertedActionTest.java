@@ -45,14 +45,14 @@ public class InsertedActionTest {
 
         // stepping forward hands the inserted action out; afterMove() must not try to re-time a heap it is not in
         battle.stepForward();
-        Assertions.assertSame(demiurge, battle.queue.getCurrentActor().getCanHit(),
+        Assertions.assertSame(demiurge, battle.queue().getCurrentActor().getCanHit(),
                 "the inserted action is WHO steps forward -- a weaker reading would pass even if nothing was inserted");
         Assertions.assertDoesNotThrow(() -> battle.afterMove(),
                 "an actor with no place in the order has no cycle to re-time");
 
         // and the normal order is still intact afterwards: somebody from the party acts next
         battle.stepForward();
-        System.out.println("[insert] the step after the inserted action gives: " + battle.queue.getCurrentActor().getCanHit().getName());
-        Assertions.assertNotNull(battle.queue.getCurrentActor().getCanHit().getName(), "the action order still produces actors");
+        System.out.println("[insert] the step after the inserted action gives: " + battle.queue().getCurrentActor().getCanHit().getName());
+        Assertions.assertNotNull(battle.queue().getCurrentActor().getCanHit().getName(), "the action order still produces actors");
     }
 }

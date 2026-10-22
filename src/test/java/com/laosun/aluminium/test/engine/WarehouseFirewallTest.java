@@ -45,13 +45,13 @@ public class WarehouseFirewallTest {
 
         // Note: NOT a hand-fired event: the debuff CLASS the clause asks about is recorded by the real landing path
         // (`Battle.tryApplyDebuff`), so a synthesised DEBUFF_APPLIED carries no family and would match nothing.
-        boolean firstLanded = battle.tryApplyDebuff(battle.enemies.getFirst(), fighter,
+        boolean firstLanded = battle.tryApplyDebuff(battle.enemies().getFirst(), fighter,
                 new ControlBuff(com.laosun.aluminium.Constant.CONTROL_EFFECTS.get("FROZEN"), 2), 1.0, "STAT_CTRL_Frozen");
         battle.processRequests();
         boolean firewallOn = fighter.getBuffManager().hasState("防火墙");
 
         // and the payoff: the NEXT control on her is refused -- [防火墙] is what answers it
-        boolean landedAfter = battle.tryApplyDebuff(battle.enemies.getFirst(), fighter,
+        boolean landedAfter = battle.tryApplyDebuff(battle.enemies().getFirst(), fighter,
                 new ControlBuff(com.laosun.aluminium.Constant.CONTROL_EFFECTS.get("FROZEN"), 2), 1.0, "STAT_CTRL_Frozen");
         Assertions.assertTrue(firstLanded, "precondition: the TRIGGERING control really landed");
         System.out.println("[firewall] firewall granted=" + firewallOn + " ; next control landed=" + landedAfter

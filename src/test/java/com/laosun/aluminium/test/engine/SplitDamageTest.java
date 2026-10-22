@@ -74,7 +74,7 @@ public class SplitDamageTest {
         var roster = battle.enemyUnits();
         roster.get(1).perish();                       // one of the two is already down
         double before = roster.get(0).getCurrentHp();
-        Character wolf = battle.characters.getFirst();
+        Character wolf = battle.characters().getFirst();
         battle.fireTriggers(TriggerEvent.TURN_START, wolf, wolf, 0, 0);
         battle.processRequests();
         double alive = before - roster.get(0).getCurrentHp();
@@ -121,7 +121,7 @@ public class SplitDamageTest {
         Battle battle = battle(enemies, split);
         var roster = battle.enemyUnits();
         double before = roster.getFirst().getCurrentHp();
-        Character wolf = battle.characters.getFirst();
+        Character wolf = battle.characters().getFirst();
         battle.fireTriggers(TriggerEvent.TURN_START, wolf, wolf, 0, 0);
         battle.processRequests();
         return before - roster.getFirst().getCurrentHp();
@@ -130,7 +130,7 @@ public class SplitDamageTest {
     private static double totalLoss(int enemies) {
         Battle battle = battle(enemies, true);
         double before = battle.enemyUnits().stream().mapToDouble(e -> e.getCurrentHp()).sum();
-        Character wolf = battle.characters.getFirst();
+        Character wolf = battle.characters().getFirst();
         battle.fireTriggers(TriggerEvent.TURN_START, wolf, wolf, 0, 0);
         battle.processRequests();
         return before - battle.enemyUnits().stream().mapToDouble(e -> e.getCurrentHp()).sum();
@@ -145,7 +145,7 @@ public class SplitDamageTest {
                 List.of(CharacterFactory.create(WOLF, 80), CharacterFactory.create(ALLY, 80)), roster, new NoCrit());
         battle.startBattle();
         battle.processRequests();
-        battle.characters.getFirst().setTriggerTable(new TriggerTable(WOLF, List.of(
+        battle.characters().getFirst().setTriggerTable(new TriggerTable(WOLF, List.of(
                 TriggerSpecs.rule("TURN_START", List.of(), box(split)))));
         return battle;
     }

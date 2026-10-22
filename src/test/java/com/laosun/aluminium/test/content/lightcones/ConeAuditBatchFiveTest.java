@@ -71,9 +71,9 @@ public class ConeAuditBatchFiveTest {
         Fixture f = new Fixture(21002, true);
         Fixture bare = new Fixture(null, true);
         for (int i = 0; i < 2; i++) {
-            double delta = f.battle.characters.get(i).getAttribute(AttributeType.ALL_TYPE_RESISTANCE).get()
-                    - bare.battle.characters.get(i).getAttribute(AttributeType.ALL_TYPE_RESISTANCE).get();
-            System.out.println("[21002] " + f.battle.characters.get(i).getName() + " 全属性抗性增量 " + delta);
+            double delta = f.battle.characters().get(i).getAttribute(AttributeType.ALL_TYPE_RESISTANCE).get()
+                    - bare.battle.characters().get(i).getAttribute(AttributeType.ALL_TYPE_RESISTANCE).get();
+            System.out.println("[21002] " + f.battle.characters().get(i).getName() + " 全属性抗性增量 " + delta);
             Assertions.assertEquals(0.08, delta, 1e-9, "「我方全体…全属性抗性提高 8%」（叠影 1）");
         }
     }
@@ -170,7 +170,7 @@ public class ConeAuditBatchFiveTest {
             TriggerSpecs.set(slow, "target", "target");
             // ⚠ On the ALLY's table, not the wearer's: the wearer's table carries the cone's rules, and replacing it would
             // measure a fixture that has no cone at all (measured: every band read 0).
-            Character ally = battle.characters.get(1);
+            Character ally = battle.characters().get(1);
             ally.setTriggerTable(new TriggerTable(9300 + i, List.of(
                     TriggerSpecs.rule(TriggerEvent.ALLY_ATTACK.name(), List.of(), slow))));
             battle.fireTriggers(TriggerEvent.ALLY_ATTACK, ally, target, 1, 0);
@@ -222,7 +222,7 @@ public class ConeAuditBatchFiveTest {
          * The outgoing-healing boost the wearer carries right after the ultimate: read through a same-amount heal.
          */
         private double boostDuringUlt() {
-            Character ally0 = battle.characters.get(1);
+            Character ally0 = battle.characters().get(1);
             if (ally0.getCurrentHp() >= ally0.getMaxHp()) {
                 ally0.consumeHp(ally0.getMaxHp() * 0.4);
             }

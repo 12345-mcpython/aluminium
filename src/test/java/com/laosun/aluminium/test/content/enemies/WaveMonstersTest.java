@@ -68,7 +68,7 @@ public class WaveMonstersTest {
         boolean entered = battle.getWaveManager().nextWave();
         Assertions.assertTrue(entered, "310030 has a wave to enter");
         List<CanHit> first = battle.waveMonsters();
-        System.out.println("[wave] after wave 1: enemies=" + battle.enemies.size() + " in the set=" + first.size()
+        System.out.println("[wave] after wave 1: enemies=" + battle.enemies().size() + " in the set=" + first.size()
                 + " speeds=" + first.stream().map(e -> e.getAttribute(AttributeType.SPEED).get()).toList());
 
         Assertions.assertFalse(first.isEmpty(), "「新入场的敌方目标」 (newly entered enemy target)-- the wave brought enemies");

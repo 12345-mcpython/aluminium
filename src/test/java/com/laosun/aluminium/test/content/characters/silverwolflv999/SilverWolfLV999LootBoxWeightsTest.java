@@ -135,7 +135,7 @@ public class SilverWolfLV999LootBoxWeightsTest {
         // a lower value means SPENDING - and spending fires SKILL_POINT_SPENT. Nothing triggers here because the zone and
         // 【无敌玩家】 are not up yet; doing it after the ultimate would fire the box during the setup.
         setSkillPoints(battle, skillPoints);
-        Character wolf = battle.characters.getFirst();
+        Character wolf = battle.characters().getFirst();
         wolf.getResources().gain(GIFT, 1);
         wolf.setCurrentEnergy(wolf.getMaxEnergy());
         battle.castUltra(wolf, List.of(battle.enemyUnits().getFirst()));

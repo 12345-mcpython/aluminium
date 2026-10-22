@@ -39,14 +39,14 @@ public class PearlEnhancedBasicHealAmountTest {
                 List.of(EnemyFactory.create(1002011, 100, 1)), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        Character pearl = battle.characters.get(0);
-        Character other = battle.characters.get(1);
+        Character pearl = battle.characters().get(0);
+        Character other = battle.characters().get(1);
         // Leave room for the heal on both, so the amount is what the rule delivers and not the cap.
         pearl.takeDamage(pearl.getMaxHp() * 0.6);
         other.takeDamage(other.getMaxHp() * 0.8);
 
         double before = pearl.getCurrentHp();
-        battle.fireTriggers(TriggerEvent.BASIC_ATTACK, pearl, battle.enemies.getFirst(), 1, 0,
+        battle.fireTriggers(TriggerEvent.BASIC_ATTACK, pearl, battle.enemies().getFirst(), 1, 0,
                 (SkillCategory) null, 8);
         double healed = pearl.getCurrentHp() - before;
 

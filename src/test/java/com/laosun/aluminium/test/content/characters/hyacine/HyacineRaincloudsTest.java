@@ -113,7 +113,7 @@ public class HyacineRaincloudsTest {
         double castRainclouds() {
             Summon ika = (Summon) battle.memospriteOf(hyacine);
             Assertions.assertNotNull(ika, "precondition: 小伊卡 is out");
-            var enemy = battle.enemies.getFirst();
+            var enemy = battle.enemies().getFirst();
             double before = enemy.getCurrentHp();
             SkillExecutor.execute(battle, ika.skillAt(1), ika, List.of(enemy));
             battle.processRequests();

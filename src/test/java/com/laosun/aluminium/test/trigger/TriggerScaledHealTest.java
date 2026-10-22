@@ -46,7 +46,7 @@ public class TriggerScaledHealTest {
     @Test
     public void aHealScaledByTheTargetsMaxHpRestoresThatShare() {
         Battle battle = battleWith(healRule("target_max_hp", 0.08, null));
-        Character owner = battle.characters.getFirst();
+        Character owner = battle.characters().getFirst();
         double maxHp = owner.getMaxHp();
         owner.takeDamage(maxHp * 0.5);
         double before = owner.getCurrentHp();
@@ -59,8 +59,8 @@ public class TriggerScaledHealTest {
     @Test
     public void aHealScaledByTheOwnersMaxHpUsesTheHealersBar() {
         Battle battle = withAlly(healRule("owner_max_hp", 0.1, "target"));
-        Character healer = battle.characters.getFirst();
-        Character ally = battle.characters.get(1);
+        Character healer = battle.characters().getFirst();
+        Character ally = battle.characters().get(1);
         ally.takeDamage(ally.getMaxHp() * 0.5);
         double before = ally.getCurrentHp();
 
@@ -74,8 +74,8 @@ public class TriggerScaledHealTest {
     @Test
     public void everyRecipientOfAPartyHealUsesItsOwnBar() {
         Battle battle = withAlly(healRule("target_max_hp", 0.08, "all_allies"));
-        Character owner = battle.characters.getFirst();
-        Character ally = battle.characters.get(1);
+        Character owner = battle.characters().getFirst();
+        Character ally = battle.characters().get(1);
         owner.takeDamage(owner.getMaxHp() * 0.5);
         ally.takeDamage(ally.getMaxHp() * 0.5);
         double ownerBefore = owner.getCurrentHp();
@@ -91,7 +91,7 @@ public class TriggerScaledHealTest {
     @Test
     public void aShieldCanBeScaledToo() {
         Battle battle = battleWith(shieldRule("target_max_hp", 0.1, null));
-        Character owner = battle.characters.getFirst();
+        Character owner = battle.characters().getFirst();
 
         fire(battle, owner);
         Assertions.assertEquals(owner.getMaxHp() * 0.1, owner.getShield(), EPS);
@@ -103,7 +103,7 @@ public class TriggerScaledHealTest {
     @Test
     public void aFlatAmountStillMeansAFlatAmount() {
         Battle battle = battleWith(flatHealRule(500));
-        Character owner = battle.characters.getFirst();
+        Character owner = battle.characters().getFirst();
         owner.takeDamage(owner.getMaxHp() * 0.5);
         double before = owner.getCurrentHp();
 

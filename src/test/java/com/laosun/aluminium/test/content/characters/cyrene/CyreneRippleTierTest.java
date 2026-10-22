@@ -34,12 +34,12 @@ public class CyreneRippleTierTest {
         Battle battle = new Battle(List.of(her), List.of(EnemyFactory.create(1002011, 100, 1)), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        her = battle.characters.getFirst();
+        her = battle.characters().getFirst();
         Assertions.assertTrue(her.getSkills().containsKey(SkillType.ULTRA), "precondition: her ultimate");
         com.laosun.aluminium.models.skill.SkillExecutor.execute(battle, her.getSkills().get(SkillType.ULTRA), her,
-                List.of(battle.enemies.getFirst()));
+                List.of(battle.enemies().getFirst()));
         battle.processRequests();
-        her = battle.characters.getFirst();
+        her = battle.characters().getFirst();
         if (!enterTheRipple) {
             her.getBuffManager().removeState(STATE);
         }
@@ -50,8 +50,8 @@ public class CyreneRippleTierTest {
         her.getResources().gain(MEMORY, 11);
         // her basic is the writer that carries her to twelve
         com.laosun.aluminium.models.skill.SkillExecutor.execute(battle, her.getSkills().get(SkillType.COMMON), her,
-                List.of(battle.enemies.getFirst()));
+                List.of(battle.enemies().getFirst()));
         battle.processRequests();
-        return battle.characters.getFirst().getBuffManager().debuffCount();
+        return battle.characters().getFirst().getBuffManager().debuffCount();
     }
 }

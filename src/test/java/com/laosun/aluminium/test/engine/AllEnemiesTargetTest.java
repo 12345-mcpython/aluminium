@@ -174,6 +174,6 @@ public class AllEnemiesTargetTest {
     }
 
     private static double ourSideHp(Battle battle) {
-        return battle.allies.stream().mapToDouble(CanHit::getCurrentHp).sum();
+        return battle.allies().stream().mapToDouble(CanHit::getCurrentHp).sum();
     }
 }

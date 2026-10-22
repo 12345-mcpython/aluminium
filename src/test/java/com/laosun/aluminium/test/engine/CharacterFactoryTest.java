@@ -383,7 +383,7 @@ public class CharacterFactoryTest {
                 java.util.List.of(jingYuan, seele), java.util.List.of(enemy), new java.util.Random(0));
         battle.startBattle();
 
-        Assertions.assertEquals(3, battle.queue.size(), "2 characters + 1 monster");
+        Assertions.assertEquals(3, battle.queue().size(), "2 characters + 1 monster");
         Assertions.assertEquals(com.laosun.aluminium.Battle.Status.RUNNING, battle.getStatus());
         // aggro comes from the data (Jing Yuan 5 / Seele 5), so the chance of being hit is even
         Assertions.assertEquals(75, battle.aggroOf(jingYuan));

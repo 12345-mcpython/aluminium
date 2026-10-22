@@ -46,7 +46,7 @@ public class SilverWolfLV999ElationRowTest {
                 new NoCrit());
         battle.startBattle();
         battle.processRequests();
-        Character wolf = battle.characters.getFirst();
+        Character wolf = battle.characters().getFirst();
         var skill = wolf.getSkills().get(SkillType.ELATION_EXTRA);
         int level = wolf.skillLevel(skill);
         var row = skill.getData().getSkills().get(level - 1);
@@ -69,7 +69,7 @@ public class SilverWolfLV999ElationRowTest {
                 new NoCrit());
         battle.startBattle();
         battle.processRequests();
-        Character wolf = battle.characters.getFirst();
+        Character wolf = battle.characters().getFirst();
         var enemy = battle.enemyUnits().getFirst();
         double before = enemy.getCurrentHp();
         battle.castImmediate(wolf.getSkills().get(SkillType.ELATION_EXTRA), wolf, List.of(enemy));

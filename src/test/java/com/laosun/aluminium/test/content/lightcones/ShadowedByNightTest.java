@@ -45,7 +45,7 @@ public class ShadowedByNightTest {
         Enemy enemy = BattleFixture.monster();
         Battle battle = battle(unit, enemy);
         battle.startBattle();
-        battle.currentMove = new Signal(unit);
+        battle.setCurrentMove(new Signal(unit));
         battle.beforeMove();
         double beforeBlocked = unit.getAttribute(AttributeType.SPEED).get();
         battle.fireTriggers(TriggerEvent.BREAK, unit, enemy, 0, 0);
@@ -58,7 +58,7 @@ public class ShadowedByNightTest {
         Character unit = wearer();
         Enemy enemy = BattleFixture.monster();
         Battle battle = battle(unit, enemy);
-        battle.currentMove = new Signal(unit);
+        battle.setCurrentMove(new Signal(unit));
         battle.beforeMove();
         double before = unit.getAttribute(AttributeType.SPEED).get();
         double base = unit.getAttribute(AttributeType.SPEED).baseValue();

@@ -36,17 +36,17 @@ public class BoothillEnhancedBasicTest {
         Battle battle = new Battle(List.of(boothill), List.of(EnemyFactory.create(1002011, 100, 1)), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        boothill = battle.characters.getFirst();
+        boothill = battle.characters().getFirst();
         if (enhanced) {
-            battle.currentMove = new Signal(boothill);          // useSkill takes the actor from the current move
+            battle.setCurrentMove(new Signal(boothill));          // useSkill takes the actor from the current move
             Assertions.assertTrue(battle.useSkill(boothill.getSkills().get(SkillType.SKILL),
-                    List.of(battle.enemies.getFirst())), "precondition: his Skill is affordable");
+                    List.of(battle.enemies().getFirst())), "precondition: his Skill is affordable");
             battle.processRequests();
-            boothill = battle.characters.getFirst();
+            boothill = battle.characters().getFirst();
             Assertions.assertTrue(boothill.getBuffManager().hasState(STANDOFF), "precondition: Standoff is up");
         }
-        battle.currentMove = new Signal(boothill);
-        battle.useSkill(boothill.getSkills().get(SkillType.COMMON), List.of(battle.enemies.getFirst()));
+        battle.setCurrentMove(new Signal(boothill));
+        battle.useSkill(boothill.getSkills().get(SkillType.COMMON), List.of(battle.enemies().getFirst()));
         battle.processRequests();
         return battle.getSkillPoints();
     }

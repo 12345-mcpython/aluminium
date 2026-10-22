@@ -48,7 +48,7 @@ public class RuanMeiEidolonSixTest {
         battle.castImmediate(ruanMei.getSkills().get(SkillType.ULTRA), ruanMei, List.of(enemy));
         Assertions.assertEquals(0.25, penetrationOf(ally), EPS, "precondition: the zone is up after the cast");
         for (int i = 0; i < turns; i++) {
-            battle.currentMove = new Signal(ruanMei);
+            battle.setCurrentMove(new Signal(ruanMei));
             battle.beforeMove();
             battle.afterMove();
         }

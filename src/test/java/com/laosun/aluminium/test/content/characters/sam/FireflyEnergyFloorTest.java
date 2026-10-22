@@ -22,7 +22,7 @@ public class FireflyEnergyFloorTest {
         Battle battle = new Battle(List.of(firefly), List.of(EnemyFactory.create(1002011, 100, 1)), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        firefly = battle.characters.getFirst();
+        firefly = battle.characters().getFirst();
         double max = firefly.getMaxEnergy();
         Assertions.assertTrue(max > 0, "precondition: she has an energy bar");
 

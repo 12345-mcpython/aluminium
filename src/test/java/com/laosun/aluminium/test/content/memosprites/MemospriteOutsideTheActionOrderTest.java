@@ -56,7 +56,7 @@ public class MemospriteOutsideTheActionOrderTest {
         battle.processRequests();
 
         boolean inOrder = battle.getQueueSnapshot().stream().anyMatch(s -> s.getCanHit() == servant);
-        boolean inBattle = battle.allies.contains(servant);
+        boolean inBattle = battle.allies().contains(servant);
         boolean allyInOrder = battle.getQueueSnapshot().stream().anyMatch(s -> s.getCanHit() == ally);
         System.out.println("[order] memosprite in the action order = " + inOrder + " ; in the battle = " + inBattle
                 + " ; a normal ally in the order = " + allyInOrder);

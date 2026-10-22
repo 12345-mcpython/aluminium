@@ -55,7 +55,7 @@ public class PhainonEidolonTwoTest {
                 List.of(BattleFixture.monster()), BattleFixture.alwaysRoll(0.9999));
         battle.startBattle();
         battle.processRequests();
-        Character phainon = battle.characters.getFirst();
+        Character phainon = battle.characters().getFirst();
         phainon.setCurrentEnergy(phainon.getMaxEnergy());
         battle.castUltra(phainon, List.of(battle.enemyUnits().getFirst()));
         battle.processRequests();

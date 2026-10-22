@@ -33,7 +33,7 @@ public class CyreneMemospritePanelTest {
         battle.startBattle();
         battle.processRequests();
         SkillExecutor.execute(battle, cyrene.getSkills().get(SkillType.ULTRA), cyrene,
-                List.of(battle.enemies.get(0)));
+                List.of(battle.enemies().get(0)));
         battle.processRequests();
         CanHit demiurge = battle.memospriteOf(cyrene);
         Assertions.assertNotNull(demiurge, "precondition: 德谬歌 is on the field");

@@ -32,11 +32,11 @@ public class EvernightUltDarkeningTest {
         Battle battle = new Battle(List.of(evernight, ally), List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        ((com.laosun.aluminium.models.enemy.Enemy) battle.enemies.get(0)).breakEnemy(DamageElement.ICE);
+        ((com.laosun.aluminium.models.enemy.Enemy) battle.enemies().get(0)).breakEnemy(DamageElement.ICE);
 
         double before = allyHit(battle, ally);
         SkillExecutor.execute(battle, evernight.getSkills().get(SkillType.ULTRA), evernight,
-                List.of(battle.enemies.get(0)));
+                List.of(battle.enemies().get(0)));
         battle.processRequests();
         double after = allyHit(battle, ally);
 
@@ -46,10 +46,10 @@ public class EvernightUltDarkeningTest {
     }
 
     private static double allyHit(Battle battle, Character ally) {
-        double before = battle.enemies.get(0).getCurrentHp();
+        double before = battle.enemies().get(0).getCurrentHp();
         SkillExecutor.execute(battle, ally.getSkills().get(SkillType.COMMON), ally,
-                List.of(battle.enemies.get(0)));
+                List.of(battle.enemies().get(0)));
         battle.processRequests();
-        return before - battle.enemies.get(0).getCurrentHp();
+        return before - battle.enemies().get(0).getCurrentHp();
     }
 }
