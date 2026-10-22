@@ -570,6 +570,8 @@ if (isSelected) buffer.setStyle(rowArea, highlightStyle);
 | `ATTACK_FINISHED` 带 `from_skill_id` | 它传的 `skillId` 是 **0** ⇒ 无法说「施放**那一招**的攻击后」 | `fireAfterAttack` 新增带槽位的重载 ✓；四参数旧口子 = **未知**（`EnemySkill` 与既有判据仍在用 ✓） | `PhainonEidolonSixTest` |
 | `amountFromEvent` 作 `DAMAGE` 基数 | 字段早就有，**DAMAGE 路径没读者** ✗；`settled_damage_this_event` 在最外层 firing 清零 ⇒ 读它恒 **0** ✗ | `literalBase` 读 `amountFromEvent × percent` ✓，装载期**只准配真伤害** ✓。⚠ **不是**新造 `scale: "event_amount"` ✗（它被**撤回**过 ✓） | `EventAmountTest.theAttackTotalCanBeTheBaseOfATrueRider` |
 | `RAISE_RESOURCE_CAP{unbounded: true}` | 溢出额度是**一个数**，而「不再拥有上限」不是一个数 ✗（`MAX_VALUE - 3` 会在 `+raise` 里溢出成负数 ⇒ 夹回 0 ✗） | 额度置 `Integer.MAX_VALUE` ✓（与【毁伤】的 `max: 2147483647` 同一约定 ✓）；两个拼法互斥 ✓ | `ResourceOverflowUnboundedTest`（两端 ✓） |
+| `BOOST_DAMAGE` 的 `per_stack: target_debuff_count` | `boostDamage` **完全没读 `per_stack`** ✗：1/2 层都只加一次 0.12，只有「达到上限」的分支在涨（光锥 21001 逐句核时量到） | `boostDamage` 与 `MODIFY_ATTR` 的 instance 路径共用 `perStackFactor(effect, ctx.target(), ctx)` ✓ | `Cone21001Test`（`BoostArea` 0.12 / 0.24 / 0.36，4 层仍 0.36） |
+| `has_shield from_provider self\|actor\|target` | `has_shield` 只能问「有没有盾」或「哪条规则造的」✗；「装备者提供的护盾」问的是**谁造的** ✗（遗器 128 四件套只能用裸 `has_shield` 近似） | `TriggerConditionParser` 解析 `from_provider`，`TriggerTable.HasShield` 用 `CanHit.getShieldProvider()` 比对 ✓ | `ShieldProviderConditionTest`（装备者盾 ✓ / 队友盾 ✗） |
 
 ⚠ 同族仍开：**单位计数器的「这次花掉了多少」没有事件** ✗（唯一的「花掉」是 `SKILL_POINT_SPENT` ✓ 战技点专属 ✓）⇒ 1408 星魂 2 的后半写不了 ✓（不拿 `self_resource:毁伤 >= 4` 冒充 ✗：那是「持有 4 点」✓）。
 
