@@ -265,7 +265,7 @@ public class Main {
             // Note: the round is derived from the action bar's accumulated action value (150 for the first round,
             // 100 for every round after), not counted by hand
             System.out.println("────────── Round " + battle.getRound() + " (action " + actions
-                    + ", total action value " + fmt(battle.queue.getElapsed()) + ")──────────");
+                    + ", total action value " + fmt(battle.queue().getElapsed()) + ")──────────");
             step(battle);
             System.out.println();
         }
@@ -391,7 +391,7 @@ public class Main {
         int heroTurns = 0;
         while (!battle.isOver() && heroTurns < 4) {
             battle.stepForward();
-            Signal current = battle.queue.getCurrentActor();
+            Signal current = battle.queue().getCurrentActor();
             if (current == null) {
                 break;
             }
@@ -431,8 +431,8 @@ public class Main {
         Battle battle = new Battle(List.of(hero), List.of(monster, minion), new Random(7));
         battle.startBattle();
 
-        System.out.println("    camp holds " + battle.enemies.size() + " unit(s): "
-                + battle.enemies.stream().map(CanHit::getName).toList());
+        System.out.println("    camp holds " + battle.enemies().size() + " unit(s): "
+                + battle.enemies().stream().map(CanHit::getName).toList());
         System.out.println("    of which monsters: " + battle.enemyUnits().size()
                 + "  (enemyUnits() — 'on that side' and 'is a monster' are two questions)");
         System.out.println("    our target list: " + battle.targetableEnemies().size()
@@ -457,9 +457,9 @@ public class Main {
      * Remaining action value before the target acts - the observable every action-bar mechanic moves.
      */
     private static double timeRemaining(Battle battle, CanHit target) {
-        for (Signal signal : battle.queue.snapshot()) {
+        for (Signal signal : battle.queue().snapshot()) {
             if (signal.getCanHit() == target) {
-                return battle.queue.getTimeRemaining(signal);
+                return battle.queue().getTimeRemaining(signal);
             }
         }
         return 0;
@@ -527,7 +527,7 @@ public class Main {
         }
         System.out.println("    " + summoner.getName() + " summoned " + evey.getName()
                 + " at battle start (its own BATTLE_START rule); it stands in our camp ("
-                + battle.allies.size() + " unit(s), " + battle.enemyUnits().size() + " monster(s) across the way)");
+                + battle.allies().size() + " unit(s), " + battle.enemyUnits().size() + " monster(s) across the way)");
 
         MemospriteSpec spec = Memosprites.of(summoner.getCid());
         for (MemospriteSpec.Panel entry : spec.panel()) {
@@ -743,7 +743,7 @@ public class Main {
 
         // Candidate set = our living members (the caller filters "who can be targeted", do not pick a corpse)
         List<CanHit> candidates = new ArrayList<>();
-        for (Character c : battle.characters) {
+        for (Character c : battle.characters()) {
             if (!c.isDeath()) {
                 candidates.add(c);
             }
@@ -882,7 +882,7 @@ public class Main {
         List<String> names = new ArrayList<>();
         for (Signal signal : battle.getQueueSnapshot()) {
             names.add(signal.getCanHit().getName()
-                    + "(" + fmt(battle.queue.getTimeRemaining(signal)) + ")");
+                    + "(" + fmt(battle.queue().getTimeRemaining(signal)) + ")");
         }
         System.out.println("[Action bar] " + String.join(" → ", names));
     }
@@ -893,10 +893,10 @@ public class Main {
      */
     private static void printHp(Battle battle) {
         System.out.println("=== HP Status ===");
-        for (CanHit unit : battle.allies) {
+        for (CanHit unit : battle.allies()) {
             System.out.printf("%s: %.0f / %.0f%n", unit.getName(), unit.getCurrentHp(), unit.getMaxHp());
         }
-        for (CanHit unit : battle.enemies) {
+        for (CanHit unit : battle.enemies()) {
             System.out.printf("%s: %.0f / %.0f%n", unit.getName(), unit.getCurrentHp(), unit.getMaxHp());
         }
         System.out.println("================");
@@ -992,7 +992,7 @@ public class Main {
     private static Character lowestHpRateCharacter(Battle battle) {
         Character worst = null;
         double worstRate = Double.MAX_VALUE;
-        for (Character c : battle.characters) {
+        for (Character c : battle.characters()) {
             if (c.isDeath()) {
                 continue;
             }
