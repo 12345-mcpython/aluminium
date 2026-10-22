@@ -231,10 +231,15 @@ public class Battle {
     private final com.laosun.aluminium.models.battle.TriggerBus triggerBus =
             new com.laosun.aluminium.models.battle.TriggerBus(this, triggerFacts);
     private final com.laosun.aluminium.models.battle.DamageService damageService =
-            new com.laosun.aluminium.models.battle.DamageService(this, triggerBus);
+            new com.laosun.aluminium.models.battle.DamageService(this, triggerBus, damageMarks, energy,
+                    observers, this::broadcastHpLoss, this::broadcastKill);
+    private final com.laosun.aluminium.models.battle.DeathService deathService =
+            new com.laosun.aluminium.models.battle.DeathService(this, triggerBus);
     private final com.laosun.aluminium.models.battle.SustainService sustain =
             new com.laosun.aluminium.models.battle.SustainService(this,
                     this::onHealSettled, this::onShieldGranted);
+    private final com.laosun.aluminium.models.battle.TickService ticks =
+            new com.laosun.aluminium.models.battle.TickService(damageService, sustain);
 
     /** @param observer the damage observer */
     public void addDamageObserver(DamageObserver observer) {
@@ -480,18 +485,16 @@ public class Battle {
     @Setter
     private WaveManager waveManager;
 
-    private final List<CanHit> addRequestItems = new ArrayList<>();
+    private final com.laosun.aluminium.models.battle.PendingCombatants pendingCombatants =
+            new com.laosun.aluminium.models.battle.PendingCombatants(this);
 
     /**
      * The combatants queued to enter the action bar at the next settle, in entry order.
      *
-     * <p>A read-only view; {@link #addCombatant} is the only way in. Exists so a test can assert what
-     * is waiting without reaching into the engine's queue.
-     *
      * @return an immutable copy of the pending entrants
      */
     public List<CanHit> pendingCombatants() {
-        return List.copyOf(addRequestItems);
+        return pendingCombatants.view();
     }
 
     private final com.laosun.aluminium.models.battle.Countdowns countdowns =
@@ -515,8 +518,6 @@ public class Battle {
     private final com.laosun.aluminium.models.battle.SummonedBuffer summoned =
             new com.laosun.aluminium.models.battle.SummonedBuffer();
 
-    /** Summons whose departure has already been announced (see {@code TriggerEvent.SUMMON_LEFT}). */
-    private final java.util.Set<CanHit> summonsAnnouncedGone = java.util.Collections.newSetFromMap(new java.util.IdentityHashMap<>());
     /**
      * The facts the caller declared before the battle started.
      */
@@ -1622,51 +1623,11 @@ public class Battle {
      * @return the damage actually settled
      */
     public double tickDotStateNow(CanHit target, DamageElement element, double percent) {
-        if (target == null || target.isDeath() || element == null) {
-            return 0;
-        }
-        double total = 0;
-        Map<DamageElement, Integer> paidPerState = new HashMap<>();
-        for (DotBuff dot : target.getBuffManager().allBuffsOf(DotBuff.class)) {
-            int paid = paidPerState.merge(dot.getElement(), 1, Integer::sum);
-            if (dot.getElement() != element) {
-                continue;                                        // only the named state ticks
-            }
-            if (dot.getMaxStacks() > 0 && paid > dot.getMaxStacks()) {
-                continue;                                        // "stack at most N layers": this layer adds no damage
-            }
-            Damage damage = new Damage(dot.getSource(), target, dot.getElement(), DamageType.DOT,
-                    dot.getBaseDamage() * percent);
-            total += applyDamage(target, damage, EnergyGrant.KILL_ONLY);
-        }
-        return total;
+        return ticks.dotStateNow(target, element, percent);
     }
 
     public double tickDots(CanHit target) {
-        if (target == null || target.isDeath()) {
-            return 0;
-        }
-        double total = 0;
-        // A snapshot, so a DOT kill that removes or attaches buffs mid-loop cannot disturb the
-        // iteration. Attaching one here also does not settle it this turn -- it is not in the
-        // snapshot -- which is the old "attached this turn, burns from the next one" behaviour.
-        // Note: The layer ceiling is applied per DOCUMENT STATE (an element IS a state here), and the total is
-        // order-independent: the first `cap` layers of a state pay, the rest are inert.
-        java.util.Map<DamageElement, Integer> paidPerState = new java.util.HashMap<>();
-        for (DotBuff dot : target.getBuffManager().allBuffsOf(DotBuff.class)) {
-            int paidLayers = paidPerState.merge(dot.getElement(), 1, Integer::sum);
-            if (dot.getMaxStacks() > 0 && paidLayers > dot.getMaxStacks()) {
-                continue;                                        // "stack at most N layers": this layer adds no damage
-            }
-            if (target.isDeath()) {
-                break;                                           // killed by a DOT to the rest is not settled
-            }
-            Damage damage = new Damage(dot.getSource(), target, dot.getElement(),
-                    DamageType.DOT, dot.getBaseDamage());
-            // KILL_ONLY: a DOT is not "one attack action", so the victim gains no energy; but a DOT kill is still credited to the applier
-            total += applyDamage(target, damage, EnergyGrant.KILL_ONLY);
-        }
-        return total;
+        return ticks.dots(target);
     }
 
     /**
@@ -1686,19 +1647,7 @@ public class Battle {
      * @return the total restored this time
      */
     public double tickRegens(CanHit target) {
-        if (target == null || target.isDeath()) {
-            return 0;
-        }
-        double total = 0;
-        // A snapshot, for the same reason the DOT pass takes one: a heal that triggers something cannot disturb it.
-        for (com.laosun.aluminium.models.buff.RegenBuff regen
-                : target.getBuffManager().allBuffsOf(com.laosun.aluminium.models.buff.RegenBuff.class)) {
-            if (target.isDeath()) {
-                break;
-            }
-            total += heal(regen.getSource(), target, regen.getBaseHeal());
-        }
-        return total;
+        return ticks.regens(target);
     }
 
 
@@ -1853,7 +1802,7 @@ public class Battle {
      * @return the settled damage, or {@code 0} if the target was already dead
      */
     public double applyDamage(CanHit target, Damage damage) {
-        return applyDamage(target, damage, EnergyGrant.ALL);
+        return damageService.applyDamage(target, damage);
     }
 
     /**
@@ -1867,117 +1816,16 @@ public class Battle {
     }
 
     /**
-     * The internal settlement entry point: one parameter more than the public version, "which kind of energy
-     * gain this instance is allowed to settle".
+     * The internal settlement entry point with an explicit energy grant.
      *
-     * <p>Why it is needed (the rule): one attack action grants the victim energy only once.
-     * One attack can derive several damage types (skill damage to break damage to super break damage); if every
-     * instance granted the victim energy, the victim would gain more energy for "being hit harder" -- which
-     * is wrong. So only the main instance of a hit carries {@link EnergyGrant#ALL}; derived instances are
-     * always {@link EnergyGrant#KILL_ONLY}.
-     *
-     * @param grant which kinds of energy gain this instance may settle
+     * @param target the combatant taking the hit
+     * @param damage the hit
+     * @param grant  which energy gains this instance may settle
+     * @return the settled damage
      */
-    private double applyDamage(CanHit target, Damage damage, EnergyGrant grant) {
-        if (target.isDeath() || target.isInvulnerable()) {
-            return 0;                  // corpse / phase-transition invulnerability: not settled (so no hitting a corpse either)
-        }
-        double settled = assemble(damage);                       // damage after the zones (this is "how much was dealt")
-        // "our target takes damage, and Pearl may spend 抵御值 to block 60% of it": absorption reads the SETTLED
-        // amount - that is what "受到伤害时" means - and lowers it before anything else looks at the hit. It sits
-        // here rather than in the DamageEvent hooks because those run inside the zone arithmetic, where the settled
-        // amount does not exist yet, and it must precede the lethal check below: absorbing a hit down to zero is
-        // exactly "this was not a lethal blow".
-        settled = BattleDamage.absorbsInto(this, target, settled);
-        // The running total of the firing in progress ("X% of the total damage value of this one"). Placed AFTER
-        // absorption, so it is the same number DAMAGE_SETTLED announces to a rule - "the amount dealt", not what the
-        // victim's HP happened to lose. It is added for every instance, of every camp, so a group action's total is the
-        // sum its reader needs; the next outermost firing empties it again.
-        triggerBus.addSettledDamage(settled);
-        double hpBefore = target.getCurrentHp();
-        // Lethal blow: "when taking a lethal attack it will not fall into the unable-to-fight state, but instead restore health equal to 20%/50% of its own Max HP".
-        // Note: THE ORDER IS THE WHOLE MECHANIC, and the first attempt got it wrong (measured): announcing BEFORE the damage leaves the
-        // target at full HP, where a heal is a no-op and nothing can ever answer. So the target is dropped to 0 HP first WITHOUT
-        // being marked dead, the tables are asked, and `perish` is called only if nobody answered -- which is precisely
-        // "will not fall into the unable-to-fight state".
-        boolean lethal = settled >= hpBefore;
-        boolean died;
-        if (lethal) {
-            target.takeDamage(settled, false);
-            damageMarks.markLethal(target);
-            fireForAlly(TriggerPayload.AllySubject.of(TriggerEvent.LETHAL_DAMAGE, target, target, 0));
-            // "temporarily defer falling into the unable-to-fight state" (140's Moon Cocoon's Ward (月茧之庇)): a state may hold the death instead of
-            // committing it. Note: The victim really is at zero HP here -- that IS "deferring" -- so this is not a heal: what
-            // saves it is the state being GONE by its own turn (a heal or a shield removes it, in content).
-            died = target.getCurrentHp() <= 0 && !target.getBuffManager().defersDeath();
-            if (died) {
-                target.perish();
-            }
-        } else {
-            died = target.takeDamage(settled);
-        }
-        double hpLoss = hpBefore - target.getCurrentHp();
-        double shieldAbsorbed = target.getLastShieldAbsorbed();
-        // Note: "I was hit" -- a *different fact* from "I lost HP", and the difference is the whole
-        // point (see TriggerEvent.TAKING_HIT):
-        //   * it fires whenever an incoming damage instance lands, even when a shield absorbs all of
-        //     it (hpLoss == 0) -- which is what "after the wearer is hit / attacked" means in the
-        //     relic and talent texts, and what would otherwise make e.g. set 105 never accumulate
-        //     behind a shielder;
-        //   * it does NOT fire for a target that was already dead or invulnerable, because
-        //     applyDamage returns above in exactly those cases (nothing landed).
-        // The HP_LOST trigger below keeps its own stricter gate (`hpLoss > 0`), so the two events can
-        // never be mistaken for one another.
-        fireForAlly(TriggerPayload.AllySubject.of(TriggerEvent.TAKING_HIT, damage.getAttacker(), target,
-                settled));
-        // HP loss and being killed are two facts, both emitted here. Placed before the energy
-        // settlement -- the event means "an HP change happened", independent of the energy rule (who gains how
-        // much, whether it counts as an attack).
-        if (hpLoss > 0) {
-            damageMarks.markLostHp(target);
-            broadcastHpLoss(target, hpBefore, target.getCurrentHp(), damage.getAttacker(), hpLoss);
-            // `actor` = whoever dealt the damage, `target` = the one who lost HP (i.e. the victim).
-            // A counter rule keys off `target == self` -- see TriggerTable's DSL notes.
-            fireForAlly(TriggerPayload.AllySubject.of(TriggerEvent.HP_LOST, damage.getAttacker(), target,
-                    hpLoss));
-        }
-        // The DEALER-side fact, and the only post-settlement number that reaches BOTH camps:
-        // "how much did this hit I dealt actually settle". `TAKING_HIT` above carries the same number but is fired through
-        // `fireTriggersForAlly`, which returns 0 for any target that is not on our side -- so an ENEMY victim never
-        // announced it, and "to an enemy target ... equal to X% of the original damage" (Himeko (姬子)'s eidolon 6) had no way to read what it had just dealt.
-        // The instance's cast category rides along, exactly like KILL below, so "ultimate"-scoped clauses work.
-        fire(TriggerPayload.DamagePayload.of(TriggerEvent.DAMAGE_SETTLED, damage.getAttacker(), target,
-                settled, damage, damage.getCastCategory(), 0, List.of()));
-        if (died) {
-            broadcastKill(damage.getAttacker(), target);
-            // The DYING-side fact, and the only event addressed to a corpse: 「当罗刹陷入无法战斗状态时，结界也会被解除」
-            // needs the unit that fell to act on its own way out, and `fireTriggers` skips the dead (see its loop).
-            // Delivered here, where the death is known, with the victim as BOTH actor and target so a rule can say
-            // `when: ["target == self"]` -- the same spelling TAKING_HIT and the counter rules use.
-            fire(TriggerPayload.DamagePayload.of(TriggerEvent.DEATH, target, target, 0.0, damage,
-                    damage.getCastCategory(), 0, List.of()));
-            // The causing instance's cast category rides along: "each time 1 enemy target is defeated"-style rules have to be able to
-            // ask WHICH skill produced the kill (see the `from_skill` condition), and the instance already knows.
-            fire(TriggerPayload.Subject.of(TriggerEvent.KILL, damage.getAttacker(), target, 0, castOf(damage)));
-        }
-        grantHitAndKillEnergy(target, damage, died, grant);     // hit energy gain / kill energy gain
-        // The return value = the damage this hit actually had effect with = shield-absorbed + HP really lost.
-        // The goal is that "hitting a shielded target must not display as 0", while not adding settled to
-        // the shield absorption (settled is "the amount dealt", and the part the shield absorbed is already in
-        // it; adding them would exactly double it).
-        // Identity: settled == shieldAbsorbed + hpLoss (the shield is eaten first, HP is deducted only after it
-        // runs out); computing them separately is just so that both parts stay observable.
-        double applied = shieldAbsorbed + hpLoss;
-        // ⚠ The ONE place a front end can learn what a hit actually dealt, and it must be HERE.
-        //
-        // `DamageEvent.onDamage` runs inside the zone arithmetic, before the zones are multiplied, so the numbers it
-        // sees are intermediate: a caller reading them would display a figure the engine never settled. And the amount
-        // cannot be assembled again to find out -- assembly is additive, so a second pass would count DMG boost,
-        // vulnerability, reduction and weakness twice. So the settled figure is handed over at the moment it exists.
-        for (DamageObserver observer : observers.damageObservers()) {
-            observer.onDamageSettled(damage, applied, hpLoss, shieldAbsorbed, died);
-        }
-        return applied;
+    private double applyDamage(CanHit target, Damage damage,
+                               com.laosun.aluminium.models.battle.DamageService.EnergyGrant grant) {
+        return damageService.applyDamage(target, damage, grant);
     }
 
 
@@ -2075,29 +1923,6 @@ public class Battle {
      * exceeded / whether a break was triggered)
      */
 
-    /**
-     * The cast an event carries: the instance's own cast, or - for damage the engine derived from it (break / super break) -
-     * the cast of the instance that produced it.
-     *
-     * <p><b>Why only KILL, and why not the instance.</b> {@code getCastCategory()} is also what the scoped DMG boost and
-     * every {@code ADD_DAMAGE} / {@code BOOST_DAMAGE} / {@code original_damage} reader sees, and a derived instance must not
-     * be treated as the cast's own multiplier: measured, making {@code DAMAGE_SETTLED} follow the chain made 1003 Himeko
-     * (姬子)'s Eidolon 6 「原伤害的 40%」 fire on the <b>break</b> instance as well (and it then failed to resolve its
-     * {@code random_enemy}). The <b>kill</b> is the one question that is about the chain rather than about the multiplier -
-     * 「施放终结技消灭敌方目标时」 - so only {@code KILL} uses this, and it is what makes 1002 Dan Heng (丹恒)'s Eidolon 4 fire
-     * when his ultimate breaks the target and the break damage lands the killing blow.
-     */
-    private static SkillCategory castOf(Damage damage) {
-        if (damage == null) {
-            return SkillCategory.UNSPECIFIED;
-        }
-        SkillCategory own = damage.getCastCategory();
-        if (own != null && own != SkillCategory.UNSPECIFIED) {
-            return own;
-        }
-        SkillCategory cause = damage.getCausedByCast();
-        return cause == null ? SkillCategory.UNSPECIFIED : cause;
-    }
 
     public StanceResult reduceToughness(CanHit attacker, Enemy enemy, DamageElement element, double stanceDamage) {
         // No causing cast known (a test, a demo, an enemy skill that builds its damage inline): the break still
@@ -2176,7 +2001,7 @@ public class Battle {
         // carries the cast as `causedByCast` for the events that ask 「who caused this」 (see `Battle.castOf`).
         Damage breakHit = BreakDamageCalculator.build(attacker, enemy, element, consumed);
         breakHit.setCausedByCast(fromCast);
-        double breakDamage = applyDamage(enemy, breakHit, EnergyGrant.KILL_ONLY);
+        double breakDamage = applyDamage(enemy, breakHit, com.laosun.aluminium.models.battle.DamageService.EnergyGrant.KILL_ONLY);
         delayMovePercent(enemy, Constant.BREAK_DELAY_RATIO);                                       // action delay
         BattleDamage.attachBreakDot(this, attacker, enemy, element);                                                  // DOT
         BattleDamage.attachBreakControl(this, enemy, element);                                                        // control state
@@ -2735,16 +2560,18 @@ public class Battle {
     // trigger table three-way split).
     // ==================================================================
 
-    /**
-     * How many attacks have FINISHED; see {@link #fireAfterAttack} and {@code CanHit.isAttackLimitReady}.
-     */
-    private int attackSequence;
+    private final com.laosun.aluminium.models.battle.AttackSequence attackSequence =
+            new com.laosun.aluminium.models.battle.AttackSequence();
+    private final com.laosun.aluminium.models.battle.CounterNest counterNest =
+            new com.laosun.aluminium.models.battle.CounterNest();
 
     /**
      * How many attacks have finished -- the boundary a rule-level {@code once_per_attack} reads.
+     *
+     * @return the sequence number
      */
     public int attackSequence() {
-        return attackSequence;
+        return attackSequence.value();
     }
 
     /**
@@ -2756,11 +2583,6 @@ public class Battle {
     public double settledDamageThisEvent() {
         return triggerBus.settledDamage();
     }
-
-    /**
-     * Nesting depth of buff-path reactions; see {@link #runCounter}. Per battle, never static.
-     */
-    private int counterDepth;
 
     /**
      * Rolls a rule-level probability ("there is a 35% fixed probability ...") against the battle's own random source.
@@ -3156,7 +2978,7 @@ public class Battle {
         }
         // The attack is over, so the NEXT instance belongs to a new one. This is the boundary a rule-level
         // `once_per_attack` reads (see CanHit.isAttackLimitReady): every instance of ONE attack sees the same number.
-        attackSequence++;
+        attackSequence.next();
         List<CanHit> targets = List.copyOf(hitTargets);
         // The attack is over and its hit set is frozen, so content may now ask "a random one of the targets
         // that WAS HIT" -- the fact only this side holds (cone 21029). Note: Same early return
@@ -3168,95 +2990,6 @@ public class Battle {
         }
     }
 
-    /**
-     * Hit energy gain + kill energy gain.
-     *
-     * <p><b>The two rules differ, do not gate them with the same switch:</b>
-     * <ul>
-     *  <li><b>Hit energy gain</b>: requires this instance to "count as an attack" ({@code countsAsAttack}).
-     *       Additional damage / true damage, by the official definition, "does not count as dealing 1 attack"
-     *        to the one being hit gains no energy.</li>
-     *   <li><b>Kill energy gain</b>: it only looks at "did this instance kill the target", regardless of
-     *       whether that damage counts as an attack. Any damage attributed to the attacker (basic attack,
-     *       skill, break, super break, DOT, additional damage, true damage, ...), as long as it killed the
-     *  monster, settles kill energy gain for {@code damage.getAttacker()}.</li>
-     * </ul>
-     *
-     * <p>Why they are separate: additional damage/true damage can kill, but the "kill" itself still happened
-     * -- gating them together with {@code countsAsAttack} would leave additional damage's finishing blow
-     * without kill energy gain.
-     *
-     * @param target the one being hit
-     * @param damage this hit's damage
-     * @param died   whether this instance killed {@code target}
-     */
-    private void grantHitAndKillEnergy(CanHit target, Damage damage, boolean died, EnergyGrant grant) {
-        if (!died) {
-            grantHitEnergy(target, damage, grant);
-            return;
-        }
-        grantKillEnergy(target, damage, grant);
-    }
-
-    /**
-     * Hit energy gain: only the main instance of this attack grants energy to the side being hit.
-     *
-     * <p>Two gates: ① this instance must "count as an attack" (additional damage / true damage do not count
-     * as attacks); ② {@code grant} must allow hit energy gain (derived instances such as break / super break /
-     * DOT do not, otherwise one attack would give the victim more energy for "dealing more damage types").
-     */
-    private void grantHitEnergy(CanHit target, Damage damage, EnergyGrant grant) {
-        if (grant != EnergyGrant.ALL || !damage.isCountsAsAttack()) {
-            return;
-        }
-        EnergyGain hitGain = target.getEnergyProvider().onTakingHit(target, damage);
-        if (hitGain != null) {
-            energy.apply(target, hitGain);
-        }
-    }
-
-    /**
-     * Kill energy gain: credited to {@code damage.getAttacker()}, not looking at {@code countsAsAttack}
-     * (any damage attributed to a character that kills a monster should give energy, the rule).
-     *
-     * <p>But it does look at {@code grant}: a kill is settled only once. So the main instance carries
-     * {@link EnergyGrant#ALL} and derived instances (break / super break / DOT / additional damage / true
-     * damage) carry {@link EnergyGrant#KILL_ONLY} -- this way "the main instance did not kill, a derived
-     * instance finishes it off" does not miss the kill energy gain, while "the main instance already killed"
-     * does not give it twice from a derived instance (which would not settle anyway, the target being dead).
-     */
-    private void grantKillEnergy(CanHit target, Damage damage, EnergyGrant grant) {
-        if (grant == EnergyGrant.NONE) {
-            return;
-        }
-        CanHit attacker = damage.getAttacker();
-        if (attacker == null) {
-            return;
-        }
-        EnergyGain killGain = attacker.getEnergyProvider().onKill(attacker, target);
-        if (killGain != null) {
-            energy.apply(attacker, killGain);
-        }
-    }
-
-    /**
-     * Which energy gains this damage instance is allowed to settle (see the internal overload of
-     * {@code Battle.applyDamage}).
-     */
-    private enum EnergyGrant {
-        /**
-         * Main instance: both hit energy gain and kill energy gain are settled (the damage instance of a skill a character casts).
-         */
-        ALL,
-        /**
-         * Derived instance: only kill energy gain is settled (break / super break / DOT / additional damage / true damage).
-         */
-        KILL_ONLY,
-        /**
-         * Nothing is settled (reserved).
-         */
-        NONE
-    }
 
     /**
      * Runs a <b>buff-path reaction</b> (today: a counter-attack) that must not nest.
@@ -3280,16 +3013,7 @@ public class Battle {
      * in progress
      */
     public boolean runCounter(Runnable reaction) {
-        if (counterDepth > 0) {
-            return false;
-        }
-        counterDepth++;
-        try {
-            reaction.run();
-            return true;
-        } finally {
-            counterDepth--;
-        }
+        return counterNest.run(reaction);
     }
 
     /**
@@ -3300,7 +3024,7 @@ public class Battle {
      * as dealing 1 attack" -- so {@code notCountsAsAttack()} is set (the victim gains no energy, no
      * toughness is reduced, no attack-level event is triggered).
      * But it is attributed to the attacker, so on a kill the attacker still settles kill energy gain
-     * (see {@link #grantKillEnergy}).
+     * (see {@code DamageService#grantKillEnergy}).
      *
      * @param base the already-computed base value (e.g. Robin (知更鸟) 120% ATK / Tribbie (缇宝) 12% max HP)
      * @return the settled value of this instance (0 = no damage dealt)
@@ -3354,7 +3078,7 @@ public class Battle {
             extra.fixedCrit(fixedCritRate != 0.0, fixedCritDamage);
         }
         // KILL_ONLY: additional damage is extra damage derived from some attack, so the victim gains no energy; a kill is still credited to the attacker
-        double settled = applyDamage(target, extra.notCountsAsAttack(), EnergyGrant.KILL_ONLY);
+        double settled = applyDamage(target, extra.notCountsAsAttack(), com.laosun.aluminium.models.battle.DamageService.EnergyGrant.KILL_ONLY);
         // This is the engine's one and only notion of a follow-up attack, so the
         // data-facing FOLLOW_UP event is emitted here rather than from a second attack path.
         // Gated on the instance having really connected: an additional-damage sweep swallowed by
@@ -3376,7 +3100,7 @@ public class Battle {
      *
      * <p>{@code notCountsAsAttack()} is likewise set: the victim gains no energy and no toughness is reduced;
      * but it is attributed to the attacker, so on a kill the attacker still settles kill energy gain
-     * (see {@link #grantKillEnergy}).
+     * (see {@code DamageService#grantKillEnergy}).
      *
      * @param base the true damage amount (not affected by defence/resistance/DMG boost/crit/vulnerability)
      * @return the settled value of this instance (0 = no damage dealt)
@@ -3384,7 +3108,7 @@ public class Battle {
     public double applyTrueDamage(CanHit attacker, CanHit target, DamageElement element, double base) {
         Damage trueDamage = new Damage(attacker, target, element, DamageType.TRUE, base);
         // KILL_ONLY: true damage is likewise derived damage, so the victim gains no energy; a kill is still credited to the attacker
-        return applyDamage(target, trueDamage.trueDamage().notCountsAsAttack(), EnergyGrant.KILL_ONLY);
+        return applyDamage(target, trueDamage.trueDamage().notCountsAsAttack(), com.laosun.aluminium.models.battle.DamageService.EnergyGrant.KILL_ONLY);
     }
 
     /**
@@ -3492,9 +3216,7 @@ public class Battle {
         if (unit instanceof Character character && !characterRoster.contains(character)) {
             characterRoster.add(character);
         }
-        if (!addRequestItems.contains(unit)) {
-            addRequestItems.add(unit);
-        }
+        pendingCombatants.add(unit);
         // The constructor wires the speed listener for the opening roster only; a unit admitted later
         // needs it too, otherwise a speed buff on it would never reorder the action bar.
         unit.setSpeedChangeListener(this::onSpeedChanged);
@@ -3502,120 +3224,12 @@ public class Battle {
     }
 
     private void processAddRequests() {
-        if (addRequestItems.isEmpty()) {
-            return;
-        }
-        for (CanHit canHit : addRequestItems) {
-            queue.addCombatant(canHit);
-        }
-        addRequestItems.clear();
+        pendingCombatants.settle();
     }
 
 
     private void removeDeadCombatants() {
-        perishOrphanedSummons();                     // a summon goes when its master does
-        announceSummonsThatLeft();                   // 「消失时…」: the departure nobody kills
-        for (Signal signal : queue.snapshot()) {
-            if (signal.getCanHit().isDeath()) {
-                queue.removeCombatant(signal.getCanHit());
-            }
-        }
-        releaseBuffsAnchoredToTheDead();             // (3): a buff spent by MY turns has no clock left
-        checkResult();                               // decide the outcome right after clearing the corpses
-    }
-
-    /*
-     * Takes off every buff whose duration was being spent by a unit that is now dead.
-     *
-     * <p><b>Why this has to exist.</b> A buff can state that its clock is somebody else's turns
-     * ({@code AbstractBuff.ticksOn}, "at the start of Sunday (星期日)'s own every turn the [蒙福者] state's remaining turns are reduced by 1"). If that somebody dies, the
-     * clock never comes again - the buff would sit on its carrier for the rest of the battle, which is not "a long
-     * duration" but a different mechanic. Sunday's sentence says it outright ("when Sunday falls into the unable-to-fight state,
-     * [蒙福者] effect is also removed"); this is the generic version of it.
-     *
-     * <p>Swept from here rather than from the dying unit's own table because {@code fireTriggers} <b>skips dead
-     * units</b>: the unit that needs to react is gone before it could, and the buffs live on other units anyway.
-     *
-     * <p>Note: <b>BOTH camps.</b> Walking {@code allies} twice would leave the sweep reaching
-     * only buffs sitting on our own side. A caster on our side can anchor a modifier onto an ENEMY -- 1218's zone is
-     * {@code target: all_enemies} with {@code ticks_on: "self"} -- and that one was never taken off: measured at
-     * exactly 1.40x before and after she fell (the {@code AnchorDeathTest} that caught it). The buff's carrier is
-     * not necessarily on the dying unit's side.
-     */
-    /**
-     * Fires {@link TriggerEvent#SUMMON_LEFT} for every memosprite that is gone, once each.
-     *
-     * <p>Runs inside {@link #removeDeadCombatants}, which is the one place a departure becomes a fact: a memosprite
-     * either fell to damage or was taken off by {@code perish()} (its own master dying takes it too). The rule
-     * <b>owner</b> is alive and receives the event, which is what makes 「消失时使风堇行动提前 30%」 writable.
-     *
-     * <p>⚠ The announcement is remembered: the sweep runs on every settlement, and a rule that pays out per firing
-     * would otherwise advance the owner's action bar again and again for one departure.
-     */
-    private void announceSummonsThatLeft() {
-        List<CanHit> everyone = new ArrayList<>(allies);
-        everyone.addAll(enemies);
-        for (CanHit unit : everyone) {
-            if (unit instanceof Summon && unit.isDeath() && summonsAnnouncedGone.add(unit)) {
-                fire(TriggerPayload.Simple.of(TriggerEvent.SUMMON_LEFT, unit, unit, 0, 0.0));
-            }
-        }
-    }
-    private void releaseBuffsAnchoredToTheDead() {
-        List<CanHit> everyone = new ArrayList<>(allies);
-        everyone.addAll(enemies);
-        for (CanHit carrier : everyone) {
-            if (carrier == null || carrier.isDeath()) {
-                continue;
-            }
-            for (CanHit other : everyone) {
-                if (other != null && other != carrier && other.isDeath()) {
-                    carrier.getBuffManager().removeBuffsAnchoredTo(other);
-                }
-            }
-        }
-    }
-
-    /**
-     * Defeats every summon whose master is already down.
-     *
-     * <p>This runs at the top of {@link #removeDeadCombatants}, so the sweep right after it takes the
-     * orphan off the action bar in the same pass - the summon stops acting, stops being targetable, and
-     * stops counting as a survivor for {@link #checkResult}, all through the ordinary
-     * {@link CanHit#isDeath()} channel rather than a second notion of "gone".
-     *
-     * <p><b>Why {@code perish} and not a {@code takeDamage} call.</b> The minion left, it was not beaten
-     * down: {@code perish} keeps its HP, so nothing downstream is told "it was hurt". Where the
-     * reward-free property actually comes from is worth stating precisely, because it is easy to get
-     * backwards - {@code CanHit.takeDamage} fires <b>no</b> events either; {@code HpLoss}/{@code Kill} are
-     * emitted by {@link #applyDamage}, the pipeline's single settlement entry point. So what keeps a
-     * vanishing minion from paying out every on-kill talent in the game is that this sweep runs
-     * <b>outside</b> that entry point. See {@link CanHit#perish()}.
-     *
-     * <p>The orphan is deliberately <b>left in its camp roster</b> ({@code enemies} or {@code allies}), like
-     * any other corpse - the roster records who was in the fight, and "is it alive" is asked through
-     * {@code isDeath()} ({@code targetableEnemies} / {@code aliveEnemies} / {@code checkResult} all do
-     * exactly that). A master who is merely absent from that roster does <b>not</b> orphan anything: death is
-     * the signal, because it is the one thing every removal path in the engine sets.
-     *
-     * <p>Note: <b>Both camps are swept.</b> A summon can now be ours as well as theirs (the friendly half of
-     * the camp split), and a sweep that only walked {@code enemies} would leave a player-side minion standing after its
-     * master fell - still acting, still targetable, and still counted as a survivor by {@link #checkResult}.
-     */
-    private void perishOrphanedSummons() {
-        for (CanHit unit : allies) {
-            perishIfOrphaned(unit);
-        }
-        for (CanHit unit : enemies) {
-            perishIfOrphaned(unit);
-        }
-    }
-
-    private static void perishIfOrphaned(CanHit unit) {
-        if (unit instanceof Summon summon && !summon.isDeath()
-                && summon.getMaster() != null && summon.getMaster().isDeath()) {
-            summon.perish();
-        }
+        deathService.removeDeadCombatants();
     }
 
     /**
