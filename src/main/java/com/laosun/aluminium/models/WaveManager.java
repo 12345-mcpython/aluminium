@@ -141,7 +141,7 @@ public class WaveManager {
      * @return whether every enemy of the current wave has died
      */
     public boolean isCurrentWaveCleared() {
-        return battle.enemies.stream().allMatch(CanHit::isDeath);
+        return battle.enemies().stream().allMatch(CanHit::isDeath);
     }
 
     /**
@@ -149,7 +149,7 @@ public class WaveManager {
      * alongside the monsters counts as "not cleared" too.
      */
     public List<CanHit> aliveEnemies() {
-        return battle.enemies.stream().filter(e -> !e.isDeath()).toList();
+        return battle.enemies().stream().filter(e -> !e.isDeath()).toList();
     }
 
     private void spawnWave(int index) {

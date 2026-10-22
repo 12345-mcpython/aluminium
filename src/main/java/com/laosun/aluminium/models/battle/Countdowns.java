@@ -49,7 +49,7 @@ public final class Countdowns {
     public Countdown start(CanHit owner, String name, double speed) {
         Countdown countdown = new Countdown(owner, name, speed);
         countdowns.add(countdown);
-        battle.queue.addCombatant(countdown);
+        battle.queue().addCombatant(countdown);
         return countdown;
     }
 

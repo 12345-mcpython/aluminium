@@ -179,7 +179,7 @@ final class TriggerTargets {
                 // EVERY memosprite on our side, not just the rule owner's: the clause is "raise the CRIT DMG of all of our memosprites", and `summonsOf` is keyed
                 // by master -- so each of our characters is asked. `all_allies` answers "who is on that side" the same way.
                 List<CanHit> everySummon = new ArrayList<>();
-                for (com.laosun.aluminium.models.Character ally : battle.characters) {
+                for (com.laosun.aluminium.models.Character ally : battle.characters()) {
                     everySummon.addAll(battle.summonsOf(ally));
                 }
                 return List.copyOf(everySummon);
@@ -207,7 +207,7 @@ final class TriggerTargets {
                                 + "\" but no battle was supplied to take the party from");
             }
             List<CanHit> party = new ArrayList<>();
-            for (CanHit ally : battle.allies) {
+            for (CanHit ally : battle.allies()) {
                 // `other_allies` is the same camp minus the rule's owner ("other than oneself"); the order is the
                 // roster's either way, so a group effect reaches units in a stable order.
                 if (TriggerVocabulary.TARGET_OTHER_ALLIES.equals(selector) && ally == ctx.owner()) {
@@ -231,7 +231,7 @@ final class TriggerTargets {
                         "Effect targets \"" + selector + "\" but no battle was supplied to take the party from");
             }
             List<CanHit> ofPath = new ArrayList<>();
-            for (CanHit ally : battle.allies) {
+            for (CanHit ally : battle.allies()) {
                 if (ally instanceof com.laosun.aluminium.models.Character character && character.getPath() == wanted) {
                     ofPath.add(ally);
                 }
@@ -255,7 +255,7 @@ final class TriggerTargets {
                 }
                 CanHit lowest = null;
                 double lowestShare = Double.MAX_VALUE;
-                for (CanHit ally : battle.allies) {
+                for (CanHit ally : battle.allies()) {
                     if (ally == null || ally.isDeath() || !(ally.getMaxHp() > 0)) {
                         continue;                       // a corpse, or a unit with no health bar, has no share
                     }
@@ -369,7 +369,7 @@ final class TriggerTargets {
                     "Effect targets \"" + selector + "\" but no battle was supplied to take the party from");
         }
         List<CanHit> selected = new ArrayList<>();
-        for (CanHit ally : ctx.battle().allies) {
+        for (CanHit ally : ctx.battle().allies()) {
             if (ally instanceof com.laosun.aluminium.models.Character character && character.getPath() == wanted && !excluded.contains(ally)) {
                 selected.add(ally);
             }
@@ -393,7 +393,7 @@ final class TriggerTargets {
         if (ctx.battle() == null) {
             return null;
         }
-        for (com.laosun.aluminium.models.Character member : ctx.battle().characters) {
+        for (com.laosun.aluminium.models.Character member : ctx.battle().characters()) {
             if (member.getCid() == cid) {
                 return member;
             }
@@ -510,10 +510,10 @@ final class TriggerTargets {
      */
     static CanHit partyFirst(TriggerContext ctx) {
         Battle battle = ctx.battle();
-        if (battle == null || battle.characters.isEmpty()) {
+        if (battle == null || battle.characters().isEmpty()) {
             return null;
         }
-        return battle.characters.getFirst();
+        return battle.characters().getFirst();
     }
 
     /**
@@ -525,7 +525,7 @@ final class TriggerTargets {
      */
     static CanHit nextAllyToAct(TriggerContext ctx) {
         Battle battle = ctx.battle();
-        if (battle == null || battle.queue == null) {
+        if (battle == null || battle.queue() == null) {
             return null;
         }
         List<CanHit> order = new java.util.ArrayList<>();
@@ -538,7 +538,7 @@ final class TriggerTargets {
         int start = order.indexOf(ctx.owner()) + 1;
         for (int i = 0; i < order.size(); i++) {
             CanHit candidate = order.get((start + i) % order.size());
-            if (candidate != ctx.owner() && battle.allies.contains(candidate)) {
+            if (candidate != ctx.owner() && battle.allies().contains(candidate)) {
                 return candidate;
             }
         }
@@ -559,7 +559,7 @@ final class TriggerTargets {
             return null;
         }
         List<CanHit> eligible = new java.util.ArrayList<>();
-        for (CanHit ally : battle.allies) {
+        for (CanHit ally : battle.allies()) {
             if (ally == ctx.owner() || !(ally instanceof Character character)) {
                 continue;
             }

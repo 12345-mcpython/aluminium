@@ -74,7 +74,7 @@ public final class UltimateService {
         if (user == null || user.isDeath() || !isReady(user)) {
             return false;
         }
-        CanHit extraTurnActor = battle.queue.getExtraTurnActor();
+        CanHit extraTurnActor = battle.queue().getExtraTurnActor();
         if (extraTurnActor != null && extraTurnActor != user) {
             return false;
         }

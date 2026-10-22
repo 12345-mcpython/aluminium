@@ -992,7 +992,7 @@ final class TriggerConditionParser {
             if (mine == com.laosun.aluminium.enums.Path.OTHER) {
                 return false;
             }
-            for (CanHit ally : ctx.battle().allies) {
+            for (CanHit ally : ctx.battle().allies()) {
                 if (ally != me && !ally.isDeath() && ally instanceof com.laosun.aluminium.models.Character other && other.getPath() == mine) {
                     return true;
                 }
@@ -1061,7 +1061,7 @@ final class TriggerConditionParser {
             if (ctx.battle() == null || ctx.owner() == null) {
                 return false;
             }
-            for (CanHit ally : ctx.battle().allies) {
+            for (CanHit ally : ctx.battle().allies()) {
                 if (ally != ctx.owner() && !ally.isDeath() && isCompanion(ally)) {
                     return true;
                 }
@@ -1103,10 +1103,10 @@ final class TriggerConditionParser {
         @Override
         public boolean test(TriggerContext ctx) {
             CanHit who = partyOf(ctx);
-            if (who == null || ctx.battle() == null || ctx.battle().characters.isEmpty()) {
+            if (who == null || ctx.battle() == null || ctx.battle().characters().isEmpty()) {
                 return false;
             }
-            return ctx.battle().characters.getFirst() == who;
+            return ctx.battle().characters().getFirst() == who;
         }
 
         @Override
@@ -1147,7 +1147,7 @@ final class TriggerConditionParser {
             if (who == null || who == ctx.owner() || ctx.battle() == null) {
                 return false;
             }
-            return ctx.battle().allies.contains(who);
+            return ctx.battle().allies().contains(who);
         }
 
         @Override
@@ -1224,7 +1224,7 @@ final class TriggerConditionParser {
         @Override
         public boolean test(TriggerContext ctx) {
             CanHit who = partyOf(ctx);
-            return who != null && ctx.battle() != null && ctx.battle().allies.contains(who);
+            return who != null && ctx.battle() != null && ctx.battle().allies().contains(who);
         }
 
         @Override
@@ -1259,7 +1259,7 @@ final class TriggerConditionParser {
         @Override
         public boolean test(TriggerContext ctx) {
             CanHit who = partyOf(ctx);
-            return who != null && ctx.battle() != null && ctx.battle().enemies.contains(who);
+            return who != null && ctx.battle() != null && ctx.battle().enemies().contains(who);
         }
 
         @Override
@@ -1368,7 +1368,7 @@ final class TriggerConditionParser {
             if (mine == null || mine == com.laosun.aluminium.enums.Path.OTHER) {
                 return false;
             }
-            for (CanHit ally : ctx.battle().allies) {
+            for (CanHit ally : ctx.battle().allies()) {
                 if (ally != candidate && !ally.isDeath()
                         && ally instanceof com.laosun.aluminium.models.Character other && other.getPath() == mine) {
                     return true;

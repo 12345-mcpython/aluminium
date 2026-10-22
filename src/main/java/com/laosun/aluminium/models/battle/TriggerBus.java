@@ -85,7 +85,7 @@ public final class TriggerBus {
         try {
             int fired = 0;
             CastFacts castFacts = new CastFacts(skillId, weakHitCount, attackHitTargets);
-            for (Character ally : battle.characters) {
+            for (Character ally : battle.characters()) {
                 if (ally == null) {
                     continue;
                 }

@@ -67,7 +67,7 @@ final class BattleEvents {
                 consumer.accept(target);
             }
         }
-        for (CanHit ally : battle.allies) {
+        for (CanHit ally : battle.allies()) {
             if (notified.add(ally)) {
                 consumer.accept(ally);
             }

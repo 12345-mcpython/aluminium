@@ -157,7 +157,7 @@ public final class TurnLoop {
      */
     public boolean step(int turn) {
         battle.stepForward();
-        Signal current = battle.queue.getCurrentActor();
+        Signal current = battle.queue().getCurrentActor();
         if (current == null) {
             return false;
         }

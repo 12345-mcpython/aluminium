@@ -49,7 +49,7 @@ public final class PendingCombatants {
             return;
         }
         for (CanHit unit : pending) {
-            battle.queue.addCombatant(unit);
+            battle.queue().addCombatant(unit);
         }
         pending.clear();
     }

@@ -233,6 +233,9 @@ public class Battle {
     private final com.laosun.aluminium.models.battle.DamageService damageService =
             new com.laosun.aluminium.models.battle.DamageService(this, triggerBus, damageMarks, energy,
                     observers, this::broadcastHpLoss, this::broadcastKill);
+    private final com.laosun.aluminium.models.battle.BreakService breakService =
+            new com.laosun.aluminium.models.battle.BreakService(this, damageService, triggerBus,
+                    this::broadcastBreak);
     private final com.laosun.aluminium.models.battle.DeathService deathService =
             new com.laosun.aluminium.models.battle.DeathService(this, triggerBus);
     private final com.laosun.aluminium.models.battle.SustainService sustain =
@@ -240,6 +243,12 @@ public class Battle {
                     this::onHealSettled, this::onShieldGranted);
     private final com.laosun.aluminium.models.battle.TickService ticks =
             new com.laosun.aluminium.models.battle.TickService(damageService, sustain);
+    private final com.laosun.aluminium.models.battle.Battlefield battlefield =
+            new com.laosun.aluminium.models.battle.Battlefield(this);
+    private final com.laosun.aluminium.models.battle.ChanceService chances =
+            new com.laosun.aluminium.models.battle.ChanceService(this);
+    private final com.laosun.aluminium.models.battle.DebuffService debuffs =
+            new com.laosun.aluminium.models.battle.DebuffService(this, triggerBus);
 
     /** @param observer the damage observer */
     public void addDamageObserver(DamageObserver observer) {
@@ -353,7 +362,14 @@ public class Battle {
         observers.removeShield(observer);
     }
 
-    public Queue queue;
+    private Queue queue;
+
+    /**
+     * @return the action-order queue
+     */
+    public Queue queue() {
+        return queue;
+    }
 
     /**
      * The event-announcement surface: who is told about what (see {@link BattleEvents}).
@@ -367,7 +383,7 @@ public class Battle {
      * The engine's roster of our characters. Read-only: admit a unit through
      * {@link #addCombatant(CanHit)} rather than writing to this list.
      */
-    public final List<Character> characters;
+    private final List<Character> characters;
     private final List<Character> characterRoster;
 
     /**
@@ -401,7 +417,7 @@ public class Battle {
      * roster in the engine ({@code enemies} / {@code characters}): "is it alive" is asked with
      * {@code isDeath()}.
      */
-    public final List<CanHit> allies;
+    private final List<CanHit> allies;
     private final List<CanHit> allyRoster;
 
     /**
@@ -424,8 +440,29 @@ public class Battle {
      * <p>Read-only: {@code WaveManager} appends each new wave's monsters through
      * {@link #addCombatant(CanHit)}.
      */
-    public final List<CanHit> enemies;
+    private final List<CanHit> enemies;
     private final List<CanHit> enemyRoster;
+
+    /**
+     * @return the character roster
+     */
+    public List<Character> characters() {
+        return characters;
+    }
+
+    /**
+     * @return our camp's roster
+     */
+    public List<CanHit> allies() {
+        return allies;
+    }
+
+    /**
+     * @return the enemy camp's roster
+     */
+    public List<CanHit> enemies() {
+        return enemies;
+    }
 
     /**
      * One living unit from the other side, chosen with the battle's own seeded randomness (used by
@@ -437,13 +474,7 @@ public class Battle {
      * @return the chosen unit, or {@code null} when the other side is already empty
      */
     public CanHit randomOpponent(CanHit owner) {
-        List<CanHit> candidates = new ArrayList<>();
-        for (CanHit unit : getOpponents(owner)) {
-            if (unit != null && !unit.isDeath()) {
-                candidates.add(unit);
-            }
-        }
-        return candidates.isEmpty() ? null : candidates.get(rng.nextInt(candidates.size()));
+        return battlefield.randomOpponent(owner);
     }
 
     /**
@@ -457,23 +488,36 @@ public class Battle {
      * {@code !isDeath()} if that is what you mean)
      */
     public List<Enemy> enemyUnits() {
-        List<Enemy> monsters = new ArrayList<>();
-        for (CanHit unit : enemies) {
-            if (unit instanceof Enemy enemy) {
-                monsters.add(enemy);
-            }
-        }
-        return monsters;
+        return battlefield.enemyUnits();
     }
 
-    public Signal currentMove;
+    private Signal currentMove;
 
     /**
-     * The current battle status. It starts as {@link Status#NOT_STARTED}, and {@link #startBattle()}
-     * turns it into {@link Status#RUNNING}.
+     * @return the current action, or {@code null}
      */
-    @Getter
-    private Status status = Status.NOT_STARTED;
+    public Signal currentMove() {
+        return currentMove;
+    }
+
+    /**
+     * @param signal the current action
+     */
+    public void setCurrentMove(Signal signal) {
+        currentMove = signal;
+    }
+
+    private final com.laosun.aluminium.models.battle.BattleResult battleResult =
+            new com.laosun.aluminium.models.battle.BattleResult(this);
+
+    /**
+     * The current battle status.
+     *
+     * @return the status
+     */
+    public Status getStatus() {
+        return battleResult.status();
+    }
 
     /**
      * Wave management; {@code null} for a non-wave battle.
@@ -1271,13 +1315,13 @@ public class Battle {
     }
 
     public void startBattle() {
-        if (status != Status.NOT_STARTED) {
+        if (getStatus() != Status.NOT_STARTED) {
             throw new IllegalStateException(
-                    "startBattle() may be called once per battle; this one is already " + status
+                    "startBattle() may be called once per battle; this one is already " + getStatus()
                             + ". A second call would re-run every opening hook (BATTLE_START, party "
                             + "resources, technique states) and double their effects.");
         }
-        status = Status.RUNNING;
+        battleResult.start();
         // [WAREHOUSE] "after the character is obtained, or while the character is in the party": a member carrying a `warehouse/<cid>.json` is heard through it, with her own
         // battle table untouched. Registered before every hook below, so a warehouse clause can answer the opening too.
         for (Character member : characters) {
@@ -1395,7 +1439,7 @@ public class Battle {
         // that fact at exactly one moment - just before this move - so it is read here.
         // Firing BEFORE `move()` is deliberate: "at the start of this extra turn" has to be in place before the unit
         // acts (1503 grants a resource the archetype is about to spend), and after `move()` it is too late.
-        // The unit is remembered in `extraTurnBeingTaken` because the END cannot be announced here - the turn has not
+        // The unit is remembered in `ExtraTurnState` because the END cannot be announced here - the turn has not
         // been acted out yet. See `afterMove()`.
         // A grant that never becomes a turn (the holder dies or leaves the queue) never reaches this branch, so it
         // announces neither boundary: the honest reading is that no extra turn happened.
@@ -1405,26 +1449,20 @@ public class Battle {
         queue.move();
         currentMove = queue.getCurrentActor();
         if (startingExtraTurn && currentMove != null) {
-            extraTurnBeingTaken = currentMove.getCanHit();
-            fire(TriggerPayload.Simple.of(TriggerEvent.EXTRA_TURN_STARTED, extraTurnBeingTaken,
-                    extraTurnBeingTaken, 0, 0));
+            extraTurns.begin(currentMove.getCanHit());
+            fire(TriggerPayload.Simple.of(TriggerEvent.EXTRA_TURN_STARTED, extraTurns.actor(),
+                    extraTurns.actor(), 0, 0));
         }
     }
 
-    /**
-     * The unit whose extra turn is being acted out, or {@code null}.
-     *
-     * <p>Kept for one reason, and it is not derivable: between the start and the end of an extra turn the queue has
-     * already consumed everything that identifies it, and {@code currentMove} names whoever acts NEXT. It is set when
-     * the start is announced and cleared when the end is, so it cannot survive into an ordinary turn.
-     */
-    private CanHit extraTurnBeingTaken;
+    private final com.laosun.aluminium.models.battle.ExtraTurnState extraTurns =
+            new com.laosun.aluminium.models.battle.ExtraTurnState();
 
     /**
      * Whether the battle is already over (won or lost).
      */
     public boolean isOver() {
-        return status == Status.WIN || status == Status.LOSE;
+        return battleResult.isFinished();
     }
 
     /**
@@ -1444,20 +1482,7 @@ public class Battle {
      * @return the current status after the judgement
      */
     public Status checkResult() {
-        if (status != Status.RUNNING) {
-            return status;
-        }
-        // An empty enemy team with waves not yet entered only means "this wave has not entered", so no win.
-        boolean pendingWaves = waveManager != null && waveManager.hasPendingWaves();
-        // Both sides are judged by their CAMP, not by their "real units" list (the camp split on the enemy
-        // side, its friendly half here). Today the two readings coincide for our side anyway: a summon perishes with
-        // its master, so "every character is down" and "the whole camp is down" are the same state.
-        if (allies.stream().allMatch(CanHit::isDeath)) {
-            status = Status.LOSE;                    // our side being wiped out is a real loss, with or without pending waves
-        } else if (enemies.stream().allMatch(CanHit::isDeath) && !pendingWaves) {
-            status = Status.WIN;
-        }
-        return status;
+        return battleResult.check();
     }
 
     /*
@@ -1535,7 +1560,7 @@ public class Battle {
         // for a 1-turn DOT it burns for nothing. `DotBuff` is an early buff precisely so this line is
         // what counts it down.
         // 「不消耗回合数」: a free (extra / inserted) turn spends no duration.
-        boolean freeTurn = extraTurnBeingTaken != null && extraTurnBeingTaken == actor;
+        boolean freeTurn = extraTurns.isTakenBy(actor);
         if (!freeTurn) {
             actor.getBuffManager().beforeMove();
         }
@@ -1652,17 +1677,7 @@ public class Battle {
 
 
     public boolean performAction(Skill skill, List<? extends CanHit> targets) {
-        if (currentMove == null || skill == null || targets == null) {
-            return false;
-        }
-        CanHit actor = currentMove.getCanHit();
-        if (actor.isDeath()) {
-            return false;
-        }
-        if (!actor.getBuffManager().canAct()) {
-            return false;
-        }
-        return useSkill(skill, targets);
+        return cast.performAction(skill, targets);
     }
 
     public boolean useSkill(Skill skill, List<? extends CanHit> target) {
@@ -1688,7 +1703,7 @@ public class Battle {
         removeDeadCombatants();
         if (!actor.isDeath()) {
             actor.afterMove(this);
-            if (extraTurnBeingTaken == null || extraTurnBeingTaken != actor) {
+            if (!extraTurns.isTakenBy(actor)) {
                 actor.getBuffManager().afterMove();
                 tickForeignBuffs(actor, false);
             }
@@ -1714,8 +1729,8 @@ public class Battle {
         // that STARTED the turn - which the first version of this change did - would make "at the start" and "at the
         // end" the same instant, and a pair of events that cannot be told apart is not a pair.
         // Note: Fired before `processRequests()` for the same reason TURN_END is: the rules may still produce effects.
-        if (extraTurnBeingTaken != null && extraTurnBeingTaken == actor) {
-            extraTurnBeingTaken = null;
+        if (extraTurns.isTakenBy(actor)) {
+            extraTurns.clear();
             fire(TriggerPayload.Simple.of(TriggerEvent.EXTRA_TURN_ENDED, actor, actor, 0, 0));
         }
         processRequests();
@@ -1947,66 +1962,7 @@ public class Battle {
      */
     public StanceResult reduceToughness(CanHit attacker, Enemy enemy, DamageElement element, double stanceDamage,
                                         SkillCategory fromCast) {
-        if (attacker == null || enemy == null || stanceDamage <= 0) {
-            return StanceResult.NONE;
-        }
-        // The weakness check must come before the "already broken" branch: super break is "converting the
-        // toughness reduction that cannot enter the toughness bar", and its premise is still "this instance
-        // could reduce toughness in the first place" (only a weakness reduces). If broken were checked first
-        // and the whole instance returned as excess, a non-weakness attack on an already broken enemy would
-        // conjure a super break out of nothing -- which is wrong.
-        if (enemy.isDeath()) {
-            return StanceResult.NONE;
-        }
-        if (enemy.isBroken() || !enemy.hasToughnessBar()) {
-            // The toughness bar is empty (already broken / an enemy with stance = 0 in the data) so the whole
-            // nominal toughness reduction cannot enter the toughness bar, so all of it counts as "the excess
-            // part" -- that is the input to super break.
-            //
-            // The weakness check is deliberately skipped here: the official wording is "after attacking an
-            // enemy in the weakness-broken state, this attack's toughness reduction value is converted into 1
-            // super break damage" -- the only condition is "the enemy is already in the broken state", with no
-            // element restriction. So a non-weakness element hitting an already broken enemy still produces
-            // super break (using the whole nominal toughness reduction value).
-            // Compare the regular toughness reduction below: that step is still strictly "only a weakness
-            // reduces".
-            return new StanceResult(0, stanceDamage, 0, false);
-        }
-        if (!enemy.isWeakTo(element)) {
-            return StanceResult.NONE;        // while not broken: a non-weakness reduces nothing at all, so there is no excess part
-        }
-        // Break damage is computed from the value this instance actually reduced, not the skill's nominal toughness reduction
-        double consumed = enemy.reduceStance(stanceDamage);
-        double overkill = stanceDamage - consumed;                 // the excess part = the input to super break
-        if (enemy.getStance() > 0) {
-            return new StanceResult(consumed, 0, 0, false);        // not emptied: no excess part available
-        }
-        enemy.breakEnemy(element);
-        enemy.setBrokenRemainTurns(Constant.BROKEN_REMAIN_TURNS);
-        // the break fact is emitted here (the only entry point -- an already broken enemy never
-        // reaches this line a second time).
-        // Placed before damage/delay/DOT/energy: listeners want the moment of "just got broken".
-        broadcastBreak(attacker, enemy, element);
-        // ⚠ And to the listener. `broadcastBreak` above reaches the buff hooks only, so a screen was never told a break had
-        // happened -- measured: seven breaks in one battle, no log line for any of them.
-        announceBroken(attacker, enemy, element);
-        fire(TriggerPayload.Subject.of(TriggerEvent.BREAK, attacker, enemy, 0, fromCast));
-        // The break damage is settled right here, so the settled value must be carried out -- it belongs to
-        // this attack, and dropping it would make AttackEvent.totalDamage miss a whole break chain.
-        // KILL_ONLY: the break is extra damage derived from the main instance, so the victim gains no energy
-        // (one attack grants energy only once); but if the main instance did not kill and the break finishes it
-        // off, the kill energy gain is still credited to the attacker.
-        // The break damage is damage THIS cast caused, but it is not this cast's own multiplier: it keeps its own
-        // (UNSPECIFIED) category so the scoped DMG boost and every ADD_DAMAGE/BOOST_DAMAGE reader leave it alone, and it
-        // carries the cast as `causedByCast` for the events that ask 「who caused this」 (see `Battle.castOf`).
-        Damage breakHit = BreakDamageCalculator.build(attacker, enemy, element, consumed);
-        breakHit.setCausedByCast(fromCast);
-        double breakDamage = applyDamage(enemy, breakHit, com.laosun.aluminium.models.battle.DamageService.EnergyGrant.KILL_ONLY);
-        delayMovePercent(enemy, Constant.BREAK_DELAY_RATIO);                                       // action delay
-        BattleDamage.attachBreakDot(this, attacker, enemy, element);                                                  // DOT
-        BattleDamage.attachBreakControl(this, enemy, element);                                                        // control state
-        gainBreakEnergy(attacker, enemy);
-        return new StanceResult(consumed, overkill, breakDamage, true);
+        return breakService.reduce(attacker, enemy, element, stanceDamage, fromCast);
     }
 
     /**
@@ -2051,14 +2007,7 @@ public class Battle {
      * @return {@code true} = the target is in the action bar and was really delayed
      */
     public boolean delayMovePercent(CanHit target, double percent) {
-        if (target == null || percent <= 0) {
-            return false;
-        }
-        double speed = target.getAttribute(AttributeType.SPEED).get();
-        if (speed <= 0) {
-            return false;
-        }
-        return queue.delayAction(target, 10000.0 / speed * percent);
+        return breakService.delayMovePercent(target, percent);
     }
 
     /**
@@ -2078,17 +2027,7 @@ public class Battle {
      * @return {@code true} = still broken after this turn's count, so this turn is skipped
      */
     public boolean handleBrokenTurn(Enemy enemy) {
-        if (enemy == null || !enemy.isBroken()) {
-            return false;
-        }
-        enemy.setBrokenRemainTurns(enemy.getBrokenRemainTurns() - 1);
-        if (enemy.getBrokenRemainTurns() <= 0) {
-            enemy.recoverFromBroken();
-            // Recovered on this very turn, so this turn is NOT skipped: the countdown has now cost exactly the number
-            // of turns it announced, and the unit acts again straight away.
-            return false;
-        }
-        return true;
+        return breakService.handleBrokenTurn(enemy);
     }
 
     /**
@@ -2143,16 +2082,7 @@ public class Battle {
      * @return the application chance, falling in {@code [0, 1]}
      */
     public double hitChance(CanHit caster, CanHit target, double baseChance, String specificResistKey) {
-        if (caster == null || target == null) {
-            return 0;
-        }
-        double hit = caster.getAttribute(AttributeType.EFFECT_HIT_RATE).get();
-        double resist = target.getAttribute(AttributeType.EFFECT_RESISTANCE).get();
-        double specific = 0;
-        if (target instanceof Enemy enemy && specificResistKey != null) {
-            specific = enemy.getDebuffResist().getOrDefault(specificResistKey, 0.0);
-        }
-        return Math.clamp(baseChance * (1 + hit) * (1 - resist) * (1 - specific), 0, 1);
+        return chances.hitChance(caster, target, baseChance, specificResistKey);
     }
 
     /**
@@ -2167,7 +2097,7 @@ public class Battle {
      * @return {@code true} = it hit, so the buff may be applied
      */
     public boolean rollDebuff(CanHit caster, CanHit target, double baseChance, String specificResistKey) {
-        return rng.nextDouble() < hitChance(caster, target, baseChance, specificResistKey);
+        return chances.rollDebuff(caster, target, baseChance, specificResistKey);
     }
 
     /**
@@ -2185,26 +2115,7 @@ public class Battle {
      */
     public boolean tryApplyDebuff(CanHit caster, CanHit target, AbstractBuff buff,
                                   double baseChance, String specificResistKey) {
-        if (caster == null || target == null || buff == null || target.isDeath()) {
-            return false;
-        }
-        // Class resistance ("the probability of resisting control-type debuffs is increased by 35%" / "immune to control-type debuffs"): the family the state belongs to
-        // is a property of the state itself (`AbstractBuff.debuffClass`), so a control written tomorrow is covered by
-        // a resistance written today. Note: Multiplied rather than folded into `specific`: "probability increased by 35%" means 35% of the
-        // chances that would have landed do not, and 1.0 is immunity either way.
-        double classResist = target.getBuffManager().debuffResistOf(buff.debuffClass());
-        double chance = hitChance(caster, target, baseChance, specificResistKey) * (1 - classResist);
-        if (!(rng.nextDouble() < Math.clamp(chance, 0, 1))) {
-            return false;
-        }
-        target.getBuffManager().addBuff(buff);
-        // The one chokepoint every landed debuff passes through: tell the tables, with the applier as actor.
-        // Tell the tables WHICH FAMILY landed, before the event goes out: the class is already read one line up for
-        // the resistance roll, so it costs nothing to make the same fact askable.
-        noteAppliedDebuffClass(buff.debuffClass());
-        fire(TriggerPayload.Subject.of(TriggerEvent.DEBUFF_APPLIED, caster, target, 0, null));
-
-        return true;
+        return debuffs.tryApply(caster, target, buff, baseChance, specificResistKey);
     }
 
     /**
@@ -2435,10 +2346,7 @@ public class Battle {
      * @return the list of the opposing camp (it is {@code allies} / {@code enemies} itself, not a copy)
      */
     public List<? extends CanHit> getOpponents(CanHit self) {
-        if (self == null || self.getCamp() == null) {
-            return List.of();
-        }
-        return self.getCamp() == com.laosun.aluminium.enums.Camp.PLAYER ? enemies : allies;
+        return battlefield.opponents(self);
     }
 
     /**
@@ -2453,10 +2361,7 @@ public class Battle {
      * @return the list of the querier's own camp (it is {@code allies} / {@code enemies} itself, not a copy)
      */
     public List<? extends CanHit> getSideOf(CanHit self) {
-        if (self == null || self.getCamp() == null) {
-            return List.of();
-        }
-        return self.getCamp() == com.laosun.aluminium.enums.Camp.PLAYER ? allies : enemies;
+        return battlefield.side(self);
     }
 
     /**
@@ -2596,13 +2501,7 @@ public class Battle {
      * @return whether the roll passed
      */
     public boolean rollChance(double chance) {
-        if (chance >= 1) {
-            return true;
-        }
-        if (!(chance > 0)) {
-            return false;
-        }
-        return rng.nextDouble() < chance;
+        return chances.roll(chance);
     }
 
     /*
@@ -3125,13 +3024,7 @@ public class Battle {
      * @return a fresh list of the camp's alive units
      */
     public List<CanHit> targetableEnemies() {
-        List<CanHit> targets = new ArrayList<>();
-        for (CanHit enemy : enemies) {
-            if (!enemy.isDeath()) {
-                targets.add(enemy);
-            }
-        }
-        return targets;
+        return battlefield.targetableEnemies();
     }
 
 
