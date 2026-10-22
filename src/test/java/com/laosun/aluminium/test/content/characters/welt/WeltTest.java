@@ -2,9 +2,11 @@ package com.laosun.aluminium.test.content.characters.welt;
 
 import com.laosun.aluminium.Battle;
 import com.laosun.aluminium.data.TriggerTables;
+import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.SkillType;
 import com.laosun.aluminium.enums.TriggerEvent;
 import com.laosun.aluminium.models.Character;
+import com.laosun.aluminium.models.buff.StatModifierBuff;
 import com.laosun.aluminium.models.enemy.Enemy;
 import com.laosun.aluminium.utils.CharacterFactory;
 import org.junit.jupiter.api.Assertions;
@@ -20,8 +22,8 @@ import java.util.Random;
  * (round 131 measured `STAT_CTRL_Frozen` at 1.0, which clamps the chance to 0). A 100% BASE chance still rolls, so an
  * unresisting target is what makes this deterministic.
  *
- * <p>Registered in his file: the bounce (an engine bug today), the speed-down roll, [失重], the slow-gated (减速) talent, his
- * traces and eidolons.
+ * <p>Registered in his file: the bounce (an engine bug today), the speed-down roll, [失重], the enhanced forms, his
+ * traces and eidolons. The 60% slow-gated talent is now written and judged here.
  */
 public class WeltTest {
     private static final int WELT = 1004;
@@ -42,6 +44,7 @@ public class WeltTest {
     public void hisFileCarriesTheClauses() {
         var table = TriggerTables.of(WELT);
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.ULT_CAST), "the imprison");
+        Assertions.assertEquals(1, table.ruleCount(TriggerEvent.DEALING_DAMAGE), "the slow-gated talent");
         Assertions.assertEquals(1, table.ruleCount(TriggerEvent.BATTLE_START), "the level convention");
     }
 
@@ -58,6 +61,30 @@ public class WeltTest {
         private Fixture() {
             battle.startBattle();
         }
+    }
+
+    /**
+     * 「击中处于减速状态的敌方目标时，额外造成 1 次等同于瓦尔特 60% 攻击力的虚数属性附加伤害」: the slow-gated
+     * additional instance must land, and the same hit against an unslowed target must not produce it.
+     */
+    @Test
+    public void hisTalentAddsAnInstanceOnASlowedTarget() {
+        Fixture normal = new Fixture();
+        double beforeNormal = normal.enemy.getCurrentHp();
+        normal.battle.castImmediate(normal.welt.getSkills().get(SkillType.COMMON), normal.welt,
+                List.of(normal.enemy));
+        double normalLoss = beforeNormal - normal.enemy.getCurrentHp();
+
+        Fixture slowed = new Fixture();
+        slowed.enemy.getBuffManager().addBuff(
+                StatModifierBuff.percentDebuff(AttributeType.SPEED, -0.1, 2));
+        double beforeSlowed = slowed.enemy.getCurrentHp();
+        slowed.battle.castImmediate(slowed.welt.getSkills().get(SkillType.COMMON), slowed.welt,
+                List.of(slowed.enemy));
+        double slowedLoss = beforeSlowed - slowed.enemy.getCurrentHp();
+
+        Assertions.assertTrue(slowedLoss > normalLoss,
+                "the slow-gated talent must add an instance: normal " + normalLoss + ", slowed " + slowedLoss);
     }
 
     /**

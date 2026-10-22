@@ -33,7 +33,7 @@
       "id": "relic128_4_crit_damage_while_shielded",
       "when": [
         "actor is_ally",
-        "actor has_shield"
+        "actor has_shield from_provider self"
       ],
       "do": [
         {
@@ -43,7 +43,7 @@
         }
       ],
       "source": "遗器 128 四件套: 「我方目标持有装备者提供的护盾时，暴击伤害提高 #2%」",
-      "note": "「我方目标**持有装备者提供的护盾**时，暴击伤害提高 15%」—— `DEALING_DAMAGE` ＋ `actor is_ally` ＋ `actor has_shield` ＋ `BOOST_DAMAGE(0.15)` ✓。\n⚠⚠ **2026-10-19 逐句核时补的** ✗ —— 原文件的四件套只有一条 `SHIELD_BOOST 0.22`（两边合并后的护盾量 ✓），**暴击伤害那半整块没有** ✗。\n⚠ 引擎问的是「这一发是不是持盾者打的」✓，**问不了盾是不是「装备者提供的」** ✗ ⇒ 用 `has_shield` 近似 ✓（登记在 §4.3 ✓）。"
+      "note": "「我方目标**持有装备者提供的护盾**时，暴击伤害提高 15%」—— `DEALING_DAMAGE` ＋ `actor is_ally` ＋ `actor has_shield` ＋ `BOOST_DAMAGE(0.15)` ✓。\n⚠⚠ **2026-10-19 逐句核时补的** ✗ —— 原文件的四件套只有一条 `SHIELD_BOOST 0.22`（两边合并后的护盾量 ✓），**暴击伤害那半整块没有** ✗。\n✅ **2026-10-22 逐句核 + 修引擎**：`has_shield from_provider self` 现在能问「盾是不是装备者提供的」✓（`CanHit.getShieldProvider`）⇒ 不再用裸 `has_shield` 近似 ✓；判据 `ShieldProviderConditionTest`。"
     }
   ]
 }
