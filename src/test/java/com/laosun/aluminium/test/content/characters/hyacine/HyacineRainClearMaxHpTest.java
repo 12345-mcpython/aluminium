@@ -71,7 +71,7 @@ public class HyacineRainClearMaxHpTest {
                 "Rank 3 raises the ultimate by 2 (from the content's Lv10)");
         double before = hyacine.getAttribute(AttributeType.HEALTH).get();
         SkillExecutor.execute(battle, hyacine.getSkills().get(SkillType.ULTRA), hyacine,
-                List.of(battle.enemies.getFirst()));
+                List.of(battle.enemies().getFirst()));
         battle.processRequests();
         double after = hyacine.getAttribute(AttributeType.HEALTH).get();
         return after - before;

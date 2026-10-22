@@ -38,8 +38,8 @@ public class CastShortensOwnEffectsTest {
                 List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        cyrene = battle.characters.get(0);
-        ally = battle.characters.get(1);
+        cyrene = battle.characters().get(0);
+        ally = battle.characters().get(1);
 
         Summon demiurge = battle.summonServant(cyrene);
         battle.processRequests();
@@ -57,7 +57,7 @@ public class CastShortensOwnEffectsTest {
         Assertions.assertTrue(demiurge.getBuffManager().hasState(MARK), "precondition: so does the memosprite");
 
         Assertions.assertNotNull(demiurge.skillAt(1), "precondition: slot 1 exists");
-        SkillExecutor.execute(battle, demiurge.skillAt(1), demiurge, List.of(battle.enemies.getFirst()));
+        SkillExecutor.execute(battle, demiurge.skillAt(1), demiurge, List.of(battle.enemies().getFirst()));
         battle.processRequests();
 
         cyrene.afterMove(battle);

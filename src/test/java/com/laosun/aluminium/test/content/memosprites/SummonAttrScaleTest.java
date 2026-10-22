@@ -64,7 +64,7 @@ public class SummonAttrScaleTest {
 
         double before = cyrene.getAttribute(AttributeType.ATTACK).get();
         Skill skill = cyrene.getSkills().get(SkillType.SKILL);
-        SkillExecutor.execute(battle, skill, cyrene, List.of(battle.enemies.getFirst()));
+        SkillExecutor.execute(battle, skill, cyrene, List.of(battle.enemies().getFirst()));
         battle.processRequests();
         double gained = cyrene.getAttribute(AttributeType.ATTACK).get() - before;
 

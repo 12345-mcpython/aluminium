@@ -79,7 +79,7 @@ public class HyacineEidolonSixTest {
 
         void skillCast() {
             SkillExecutor.execute(battle, hyacine.getSkills().get(SkillType.SKILL), hyacine,
-                    List.of(battle.enemies.getFirst()));
+                    List.of(battle.enemies().getFirst()));
             battle.processRequests();
         }
 

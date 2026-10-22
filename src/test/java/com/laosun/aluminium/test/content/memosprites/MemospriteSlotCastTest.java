@@ -53,7 +53,7 @@ public class MemospriteSlotCastTest {
 
         Skill ode = demiurge.skillAt(ODE_OF_GENESIS);
         Assertions.assertNotNull(ode, "precondition: the memosprite carries slot 13");
-        Assertions.assertFalse(battle.queue.isInActionOrder(demiurge),
+        Assertions.assertFalse(battle.queue().isInActionOrder(demiurge),
                 "precondition: the memosprite has no place in the action order (the game pins its speed to 0)");
 
         // 1) the ode has to have reached him: the sentence spans the battle, so the mark must be true first
@@ -65,11 +65,11 @@ public class MemospriteSlotCastTest {
                 .filter(s -> s != null && s.getSkillSlot() == REINFORCED_BASIC_ATTACK)
                 .findFirst().orElse(null);
         Assertions.assertNotNull(reinforced, "precondition: 8007 has a skill in slot 4");
-        double before = battle.enemies.getFirst().getCurrentHp();
+        double before = battle.enemies().getFirst().getCurrentHp();
 
-        SkillExecutor.execute(battle, reinforced, recipient, List.of(battle.enemies.getFirst()));
+        SkillExecutor.execute(battle, reinforced, recipient, List.of(battle.enemies().getFirst()));
         battle.processRequests();
-        double after = battle.enemies.getFirst().getCurrentHp();
+        double after = battle.enemies().getFirst().getCurrentHp();
 
         // The cast is immediate, so it advances the battle itself: the inserted action is consumed INSIDE the rule (measured -- stepping
         // forward here hands out the next NORMAL actor). The insertion is judged on its own in InsertedActionTest; what belongs to THIS

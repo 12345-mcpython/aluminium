@@ -58,7 +58,7 @@ public class CoreflameOverflowTest {
             // resource read a constant 3 for every cast count: the first self-aimed cast landed (+2 for the skill, +1 for item 38's
             // "being targeted" rule) and the later ones did nothing at all. Measured step by step, aimed at an enemy, the pool is
             // 3, 5, , 9, 11, 13 -- the battle-start one plus exactly two per cast, up to and past its declared cap.
-            SkillExecutor.execute(battle, skill, owner, List.of(battle.enemies.get(0)));
+            SkillExecutor.execute(battle, skill, owner, List.of(battle.enemies().get(0)));
             battle.processRequests();
         }
         // Note: `owner.getResources().value(...)`, and NOT `battle.partyResource(...)`: Coreflame is not a party resource, so the

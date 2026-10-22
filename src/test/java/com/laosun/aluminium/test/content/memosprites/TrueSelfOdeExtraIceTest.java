@@ -32,7 +32,7 @@ public class TrueSelfOdeExtraIceTest {
         battle.processRequests();
         // `summonMemosprite` builds through `memospriteWith`, which does NOT install the spec's `skills` (measured: the map is empty);
         // `summonServant` does, and both make the same unit (measured in an earlier round).
-        var dragon = battle.summonServant(battle.characters.get(0));
+        var dragon = battle.summonServant(battle.characters().get(0));
         battle.processRequests();
         if (points > 0) {
             dragon.getResources().gain(COUNTER, points);
@@ -41,10 +41,10 @@ public class TrueSelfOdeExtraIceTest {
                 + " ; SkillType.COMMON present = " + dragon.getSkills().containsKey(SkillType.COMMON));
         var dance = dragon.skillAt(1);
         Assertions.assertNotNull(dance, "precondition: the dance is data slot 1");
-        double before = battle.enemies.getFirst().getCurrentHp();
+        double before = battle.enemies().getFirst().getCurrentHp();
         com.laosun.aluminium.models.skill.SkillExecutor.execute(battle, dance, dragon,
-                List.of(battle.enemies.getFirst()));
+                List.of(battle.enemies().getFirst()));
         battle.processRequests();
-        return before - battle.enemies.getFirst().getCurrentHp();
+        return before - battle.enemies().getFirst().getCurrentHp();
     }
 }

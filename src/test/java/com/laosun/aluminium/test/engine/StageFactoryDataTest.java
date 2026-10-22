@@ -48,7 +48,7 @@ public class StageFactoryDataTest {
     public void theDefaultOverloadStillBuilds() {
         Battle battle = StageFactory.load(GameData.DEFAULT, 103201);
 
-        Assertions.assertFalse(battle.enemies.isEmpty(), "wave 1 is on the field");
+        Assertions.assertFalse(battle.enemies().isEmpty(), "wave 1 is on the field");
         Assertions.assertFalse(battle.isOver(), "the battle is running");
     }
 }

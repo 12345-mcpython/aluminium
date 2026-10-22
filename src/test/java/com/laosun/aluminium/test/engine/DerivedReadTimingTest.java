@@ -46,7 +46,7 @@ public class DerivedReadTimingTest {
                 List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        Character her = battle.characters.getFirst();
+        Character her = battle.characters().getFirst();
 
         double elationBefore = her.getAttribute(AttributeType.ELATION_DAMAGE_BOOST).get();
         her.setTriggerTable(new TriggerTable(PEARL, List.of(

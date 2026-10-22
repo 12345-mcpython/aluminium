@@ -162,10 +162,10 @@ public class SpecialEnergyProviderTest {
         // Let the enemy hit her a few times: the enemy has 132 speed and acts first
         for (int i = 0; i < 6 && !battle.isOver(); i++) {
             battle.stepForward();
-            if (battle.currentMove == null) {
+            if (battle.currentMove() == null) {
                 break;
             }
-            CanHit actor = battle.currentMove.getCanHit();
+            CanHit actor = battle.currentMove().getCanHit();
             battle.beforeMove();
             if (actor == enemy) {
                 battle.performAction(enemySkill(enemy), List.of(acheron));
@@ -193,10 +193,10 @@ public class SpecialEnergyProviderTest {
 
         for (int i = 0; i < 6 && !battle.isOver(); i++) {
             battle.stepForward();
-            if (battle.currentMove == null) {
+            if (battle.currentMove() == null) {
                 break;
             }
-            CanHit actor = battle.currentMove.getCanHit();
+            CanHit actor = battle.currentMove().getCanHit();
             battle.beforeMove();
             if (actor == enemy) {
                 battle.performAction(enemySkill(enemy), List.of(jingYuan));
@@ -224,10 +224,10 @@ public class SpecialEnergyProviderTest {
 
             for (int i = 0; i < 6 && !battle.isOver(); i++) {
                 battle.stepForward();
-                if (battle.currentMove == null) {
+                if (battle.currentMove() == null) {
                     break;
                 }
-                CanHit actor = battle.currentMove.getCanHit();
+                CanHit actor = battle.currentMove().getCanHit();
                 battle.beforeMove();
                 if (actor == enemy) {
                     battle.performAction(enemySkill(enemy), List.of(c));

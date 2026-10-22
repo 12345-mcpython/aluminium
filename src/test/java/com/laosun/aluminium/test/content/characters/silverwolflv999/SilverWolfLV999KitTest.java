@@ -61,7 +61,7 @@ public class SilverWolfLV999KitTest {
     @Test
     public void theSkillGainsFiveLaughs() {
         Battle battle = newBattle();
-        Character wolf = battle.characters.getFirst();
+        Character wolf = battle.characters().getFirst();
         int before = battle.partyResourceValue(LAUGH);
         cast(battle, wolf, SkillType.SKILL, battle.enemyUnits().getFirst());
         int gained = battle.partyResourceValue(LAUGH) - before;
@@ -75,7 +75,7 @@ public class SilverWolfLV999KitTest {
     @Test
     public void theElationSkillGainsFifteenHidden() {
         Battle battle = newBattle();
-        Character wolf = battle.characters.getFirst();
+        Character wolf = battle.characters().getFirst();
         cast(battle, wolf, SkillType.SKILL, battle.enemyUnits().getFirst());
         int afterSkill = wolf.getResources().value(HIDDEN);
         fireElationSkill(battle, wolf);
@@ -91,7 +91,7 @@ public class SilverWolfLV999KitTest {
     @Test
     public void theUltimateEntersGodmodeAndPaysTheTrace() {
         Battle battle = newBattle();
-        Character wolf = battle.characters.getFirst();
+        Character wolf = battle.characters().getFirst();
         int before = wolf.getResources().value(HIDDEN);
         castUltimate(battle, wolf);
         System.out.println("[1506] after the Ultimate: state=" + wolf.getBuffManager().hasState(GOD)
@@ -110,7 +110,7 @@ public class SilverWolfLV999KitTest {
     @Test
     public void threeEnhancedBasicsEndGodmodeAndClearHidden() {
         Battle battle = newBattle();
-        Character wolf = battle.characters.getFirst();
+        Character wolf = battle.characters().getFirst();
         castUltimate(battle, wolf);
         wolf.getResources().gain(HIDDEN, 30);
         int beforeExit = wolf.getResources().value(HIDDEN);
@@ -201,7 +201,7 @@ public class SilverWolfLV999KitTest {
         double without = attackDamage(newBattle(), false, slot);
         Battle held = newBattle();
         double with = attackDamage(held, true, slot);
-        Character wolf = held.characters.getFirst();
+        Character wolf = held.characters().getFirst();
         double boosts = (1 + wolf.getAttribute(AttributeType.ELATION_DAMAGE_BOOST).get())
                 * (1 + wolf.getAttribute(AttributeType.ELATION_DAMAGE_AMP).get());
         double laughs = held.elationLaughMultiplier();
@@ -234,7 +234,7 @@ public class SilverWolfLV999KitTest {
      * rider would be measured under the wrong multiplier.
      */
     private static double attackDamage(Battle battle, boolean holding, SkillType slot) {
-        Character wolf = battle.characters.getFirst();
+        Character wolf = battle.characters().getFirst();
         if (holding) {
             battle.partyResource(LAUGH).gain(20);
             wolf.getResources().gain(GIFT, 1);
@@ -254,7 +254,7 @@ public class SilverWolfLV999KitTest {
      */
     private static int hiddenAfterLeavingGodmode(int eidolonRank) {
         Battle battle = newBattle(eidolonRank);
-        Character wolf = battle.characters.getFirst();
+        Character wolf = battle.characters().getFirst();
         castUltimate(battle, wolf);
         wolf.getResources().gain(HIDDEN, 60);
         int atExit = wolf.getResources().value(HIDDEN);
@@ -274,7 +274,7 @@ public class SilverWolfLV999KitTest {
      */
     private static int hiddenFromElationCastAt(int countedLaughs) {
         Battle battle = newBattle();
-        Character wolf = battle.characters.getFirst();
+        Character wolf = battle.characters().getFirst();
         battle.partyResource(LAUGH).gain(countedLaughs);
         battle.noteElationGift(wolf, 3);
         int before = wolf.getResources().value(HIDDEN);

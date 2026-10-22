@@ -35,7 +35,7 @@ public class ConeKillGroupTest {
         // ConeAuditBatchEightTest).
         Assertions.assertEquals(0.0, unit.getAttribute(AttributeType.ATTACK).get() - attackBefore, 1e-6,
                 "no attack is added at battle start (the property is already in the panel)");
-        battle.currentMove = new Signal(unit);
+        battle.setCurrentMove(new Signal(unit));
         battle.beforeMove();
         battle.fireTriggers(TriggerEvent.KILL, unit, enemy, 0, 0);
         Assertions.assertEquals(0.12, unit.getAttribute(AttributeType.CRIT_CHANCE).get() - critBefore, 1e-6,
@@ -49,7 +49,7 @@ public class ConeKillGroupTest {
         Battle battle = battle(unit, enemy);
         double critBefore = unit.getAttribute(AttributeType.CRIT_ATTACK).get();
         battle.startBattle();
-        battle.currentMove = new Signal(unit);
+        battle.setCurrentMove(new Signal(unit));
         battle.beforeMove();
         battle.fireTriggers(TriggerEvent.KILL, unit, enemy, 0, 0);
         Assertions.assertEquals(0.24, unit.getAttribute(AttributeType.CRIT_ATTACK).get() - critBefore, 1e-6,
@@ -62,7 +62,7 @@ public class ConeKillGroupTest {
         Enemy enemy = enemy();
         Battle battle = battle(unit, enemy);
         battle.startBattle();
-        battle.currentMove = new Signal(unit);
+        battle.setCurrentMove(new Signal(unit));
         battle.beforeMove();
         unit.takeDamage(unit.getMaxHp() * 0.5);
         double before = unit.getCurrentHp();

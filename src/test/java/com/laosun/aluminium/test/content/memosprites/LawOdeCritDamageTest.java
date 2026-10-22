@@ -36,9 +36,9 @@ public class LawOdeCritDamageTest {
                 List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        cyrene = battle.characters.get(0);
-        cerydra = battle.characters.get(1);
-        plain = battle.characters.get(2);
+        cyrene = battle.characters().get(0);
+        cerydra = battle.characters().get(1);
+        plain = battle.characters().get(2);
 
         // HER OWN skill is what grants [军功] -- cast it at herself, and no table is ever replaced
         var herSkill = cerydra.getSkills().get(SkillType.SKILL);

@@ -44,7 +44,7 @@ public class SigoniaCritTest {
         Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
-        battle.currentMove = new Signal(unit);
+        battle.setCurrentMove(new Signal(unit));
         battle.beforeMove();
         double before = unit.getAttribute(AttributeType.CRIT_ATTACK).get();
         int firings = 10 + 2;

@@ -53,7 +53,7 @@ public class WorldOdeFireSeedCritTest {
                 List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        him = battle.characters.getFirst();
+        him = battle.characters().getFirst();
         // Give him the seeds DIRECTLY. A hand-built table REPLACES his loaded one -- the trap this project has hit six times -- and that would delete
         // the very rules under test, along with his own transformation.
         him.getResources().gain(FIRE_SEED, seeds);
@@ -66,9 +66,9 @@ public class WorldOdeFireSeedCritTest {
         double before = him.getAttribute(AttributeType.CRIT_ATTACK).get();
         var ult = him.getSkills().get(com.laosun.aluminium.enums.SkillType.ULTRA);
         Assertions.assertNotNull(ult, "precondition: he has an ultimate");
-        SkillExecutor.execute(battle, ult, him, List.of(battle.enemies.getFirst()));
+        SkillExecutor.execute(battle, ult, him, List.of(battle.enemies().getFirst()));
         battle.processRequests();
-        double after = battle.characters.getFirst().getAttribute(AttributeType.CRIT_ATTACK).get();
+        double after = battle.characters().getFirst().getAttribute(AttributeType.CRIT_ATTACK).get();
         return new double[]{after - before, total};
     }
 }

@@ -44,27 +44,27 @@ public class EvernightCritForSummonsTest {
                 List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        cyrene = battle.characters.get(0);
-        longnight = battle.characters.get(1);
+        cyrene = battle.characters().get(0);
+        longnight = battle.characters().get(1);
 
         // cyrene's memosprite stands in for "our memosprites": it is one of ours, which is all the clause asks
         var sprite = battle.summonServant(cyrene);
         battle.processRequests();
         double before = sprite.getAttribute(AttributeType.CRIT_ATTACK).get();
 
-        double herCrit = battle.characters.get(1).getAttribute(AttributeType.CRIT_ATTACK).get();
-        var skill = battle.characters.get(1).getSkills().get(com.laosun.aluminium.enums.SkillType.SKILL);
+        double herCrit = battle.characters().get(1).getAttribute(AttributeType.CRIT_ATTACK).get();
+        var skill = battle.characters().get(1).getSkills().get(com.laosun.aluminium.enums.SkillType.SKILL);
         Assertions.assertNotNull(skill, "precondition: she has a skill");
         double param = skill.getData().getSkills()
-                .get(battle.characters.get(1).skillLevel(skill) - 1).get(0);
+                .get(battle.characters().get(1).skillLevel(skill) - 1).get(0);
         if (castHerSkill) {
-            SkillExecutor.execute(battle, skill, battle.characters.get(1), List.of(battle.enemies.getFirst()));
+            SkillExecutor.execute(battle, skill, battle.characters().get(1), List.of(battle.enemies().getFirst()));
             battle.processRequests();
         }
         double after = sprite.getAttribute(AttributeType.CRIT_ATTACK).get();
         // CORRECTED (2026-10-18): read her CRIT DMG AFTER the cast. Her talent raises her own CRIT DMG by 0.6 when the
         // skill's HP cost lands, and the share the memosprite gains is taken from the post-cast value.
-        double herCritAfter = battle.characters.get(1).getAttribute(AttributeType.CRIT_ATTACK).get();
+        double herCritAfter = battle.characters().get(1).getAttribute(AttributeType.CRIT_ATTACK).get();
         return new double[]{after - before, herCritAfter, param};
     }
 }

@@ -110,7 +110,7 @@ public class MooncocoonTest {
     }
 
     private static void strike(Scene scene) {
-        scene.battle.applyTrueDamage(scene.battle.enemies.getFirst(), scene.victim,
+        scene.battle.applyTrueDamage(scene.battle.enemies().getFirst(), scene.victim,
                 DamageElement.ICE, scene.victim.getMaxHp() * 2.0);
         scene.battle.processRequests();
     }
@@ -119,10 +119,10 @@ public class MooncocoonTest {
      * Note: A WHOLE turn: the early tick on `beforeMove`, the late tick and TURN_END on `afterMove`.
      */
     private static void takeItsTurn(Scene scene) {
-        Signal signal = scene.battle.queue.snapshot().stream()
+        Signal signal = scene.battle.queue().snapshot().stream()
                 .filter(candidate -> candidate.getCanHit() == scene.victim).findFirst()
                 .orElseThrow(() -> new AssertionError("precondition: the unit is in the queue"));
-        scene.battle.currentMove = signal;
+        scene.battle.setCurrentMove(signal);
         scene.battle.beforeMove();
         scene.battle.afterMove();
         scene.battle.processRequests();

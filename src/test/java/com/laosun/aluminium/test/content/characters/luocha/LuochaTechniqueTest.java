@@ -68,7 +68,7 @@ public class LuochaTechniqueTest {
     @Test
     public void theZoneIsNotOnHim() {
         Battle battle = battle(true);
-        Character luocha = battle.characters.get(0);
+        Character luocha = battle.characters().get(0);
         Assertions.assertFalse(luocha.getBuffManager().hasState("结界"),
                 "moving the zone onto Luocha is what made the technique heal nothing -- an ally never satisfies "
                         + "«target has_state 结界», because the target is the enemy our attack was aimed at");

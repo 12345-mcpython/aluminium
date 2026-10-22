@@ -65,7 +65,7 @@ public class ConeAttackEnergyTest {
     private static Battle turnBattle(Character unit, Enemy enemy) {
         Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
-        battle.currentMove = new Signal(unit);
+        battle.setCurrentMove(new Signal(unit));
         battle.beforeMove();
         return battle;
     }

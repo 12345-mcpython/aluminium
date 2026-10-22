@@ -63,7 +63,7 @@ public class EvernightServantSegmentsTest {
 
         List<Damage> settled = new ArrayList<>();
         battle.addDamageObserver((damage, applied, hpLoss, shieldAbsorbed, died) -> settled.add(damage));
-        SkillExecutor.execute(battle, skill, evey, List.of(battle.enemies.get(0)));
+        SkillExecutor.execute(battle, skill, evey, List.of(battle.enemies().get(0)));
         battle.processRequests();
 
         List<Damage> hits = settled.stream().filter(d -> d.getType() == DamageType.NORMAL).toList();
@@ -74,7 +74,7 @@ public class EvernightServantSegmentsTest {
             Damage hit = hits.get(i);
             Assertions.assertEquals(SPLITS[i] * LV10_SHARE * maxHp, hit.breakdown().get("base"), 1e-6,
                     "instance " + (i + 1) + " carries HitSplitRatio " + SPLITS[i] + " of #1 (Lv10 = 0.7)");
-            Assertions.assertSame(battle.enemies.get(0), hit.getDefender(),
+            Assertions.assertSame(battle.enemies().get(0), hit.getDefender(),
                     "all six are the single-target skill's own target");
         }
         // The 30-point toughness is ONE number for the cast, spread over the instances (the engine's documented

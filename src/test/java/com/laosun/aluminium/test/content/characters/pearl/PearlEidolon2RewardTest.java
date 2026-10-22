@@ -105,8 +105,8 @@ public class PearlEidolon2RewardTest {
 
     private static Reading run(int eidolonRank, int spendAfterGrant) {
         Battle battle = newBattle(eidolonRank);
-        Character pearl = battle.characters.getFirst();
-        Character archetype = battle.characters.get(1);
+        Character pearl = battle.characters().getFirst();
+        Character archetype = battle.characters().get(1);
 
         int punchlineStart = battle.partyResource(PUNCHLINE).value();
         battle.fireTriggers(TriggerEvent.EXTRA_TURN_STARTED, archetype, archetype, 0, 0);
@@ -133,7 +133,7 @@ public class PearlEidolon2RewardTest {
                 List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        battle.characters.get(1).getBuffManager()
+        battle.characters().get(1).getBuffManager()
                 .addBuff(new com.laosun.aluminium.models.buff.StateBuff("美学底本", 3, false));
         return battle;
     }

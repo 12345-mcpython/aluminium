@@ -25,8 +25,8 @@ public class PearlTraceCounterTest {
                 List.of(EnemyFactory.create(1002011, 100, 1)), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        Character pearl = battle.characters.get(0);
-        Character ally = battle.characters.get(1);
+        Character pearl = battle.characters().get(0);
+        Character ally = battle.characters().get(1);
 
         int before = (int) pearl.getResources().get(COUNTER).getValue();
         battle.fireTriggers(TriggerEvent.TURN_START, ally, ally, 0, 0);

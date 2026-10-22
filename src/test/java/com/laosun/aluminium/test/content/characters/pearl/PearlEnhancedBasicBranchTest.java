@@ -52,8 +52,8 @@ public class PearlEnhancedBasicBranchTest {
                 List.of(EnemyFactory.create(1002011, 100, 1)), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        Character pearl = battle.characters.get(0);
-        Character target = battle.characters.stream().filter(c -> c.getCid() == archetype).findFirst()
+        Character pearl = battle.characters().get(0);
+        Character target = battle.characters().stream().filter(c -> c.getCid() == archetype).findFirst()
                 .orElseThrow();
 
         battle.fireTriggers(TriggerEvent.ULT_CAST, pearl, target, 0, 0);

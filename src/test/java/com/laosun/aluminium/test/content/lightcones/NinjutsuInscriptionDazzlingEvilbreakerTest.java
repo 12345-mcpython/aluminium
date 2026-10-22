@@ -115,7 +115,7 @@ public class NinjutsuInscriptionDazzlingEvilbreakerTest {
     }
 
     private double actionTime(Battle battle) {
-        return battle.queue.getHeap().stream()
+        return battle.queue().getHeap().stream()
                 .filter(signal -> signal.getCanHit() == wearer)
                 .mapToDouble(signal -> signal.nextActionTime)
                 .findFirst().orElseThrow(() -> new AssertionError("the wearer is not in the action bar"));

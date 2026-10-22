@@ -449,10 +449,10 @@ public class RelicAbilityBatchTest {
         Battle aimedAtEnemy = new Battle(List.of(wearing(MESSENGER), CharacterFactory.create(1210, LEVEL)),
                 List.of(dummy()), BattleFixture.seeded());
         aimedAtEnemy.startBattle();
-        Character second = aimedAtEnemy.characters.get(1);
+        Character second = aimedAtEnemy.characters().get(1);
         double secondBefore = boostOf(second, AttributeType.SPEED);
 
-        aimedAtEnemy.castImmediate(new DefaultSkill(WEARER, ULT_SLOT, 1), aimedAtEnemy.characters.getFirst(),
+        aimedAtEnemy.castImmediate(new DefaultSkill(WEARER, ULT_SLOT, 1), aimedAtEnemy.characters().getFirst(),
                 List.of(aimedAtEnemy.enemyUnits().getFirst()));
 
         Assertions.assertEquals(secondBefore, boostOf(second, AttributeType.SPEED), 1e-6,
@@ -668,7 +668,7 @@ public class RelicAbilityBatchTest {
 
         for (int guard = 0; guard < 40; guard++) {
             battle.stepForward();
-            if (battle.queue.getCurrentActor().getCanHit() == enemy) {
+            if (battle.queue().getCurrentActor().getCanHit() == enemy) {
                 battle.beforeMove();                  // where the DoT ticks (Battle.tickDots)
                 break;
             }

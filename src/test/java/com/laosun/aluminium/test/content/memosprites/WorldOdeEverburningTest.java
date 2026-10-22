@@ -42,26 +42,26 @@ public class WorldOdeEverburningTest {
                 List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        him = battle.characters.getFirst();
-        him = battle.characters.getFirst();
+        him = battle.characters().getFirst();
+        him = battle.characters().getFirst();
         if (castUlt) {
             // The ode grants [永续的燃烧], so it must land before his transformation.
             var odeSprite = battle.summonServant(CharacterFactory.create(1415, LEVEL));
             battle.processRequests();
             var ode = odeSprite.skillAt(21);
             Assertions.assertNotNull(ode, "precondition: slot 21");
-            SkillExecutor.execute(battle, ode, odeSprite, List.of(battle.characters.getFirst()));
+            SkillExecutor.execute(battle, ode, odeSprite, List.of(battle.characters().getFirst()));
             battle.processRequests();
         }
-        him = battle.characters.getFirst();
+        him = battle.characters().getFirst();
         double before = him.getAttribute(AttributeType.CRIT_CHANCE).get();
         if (castUlt) {
             var ult = him.getSkills().get(com.laosun.aluminium.enums.SkillType.ULTRA);
             Assertions.assertNotNull(ult, "precondition: he has an ultimate");
-            SkillExecutor.execute(battle, ult, him, List.of(battle.enemies.getFirst()));
+            SkillExecutor.execute(battle, ult, him, List.of(battle.enemies().getFirst()));
             battle.processRequests();
         }
-        him = battle.characters.getFirst();
+        him = battle.characters().getFirst();
         return new double[]{him.getAttribute(AttributeType.CRIT_CHANCE).get() - before,
                 him.getAttribute(AttributeType.CRIT_CHANCE).get(),
                 him.getBuffManager().stacksOf(STATE)};

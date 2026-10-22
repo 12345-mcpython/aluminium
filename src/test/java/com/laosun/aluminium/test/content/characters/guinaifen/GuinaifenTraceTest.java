@@ -51,7 +51,7 @@ public class GuinaifenTraceTest {
     @Test
     public void herDamageIsRaisedAgainstABurningTarget() {
         Battle battle = battleWithHerRules();
-        Character hero = battle.characters.getFirst();
+        Character hero = battle.characters().getFirst();
         Enemy target = dummy();
 
         double plain = hit(battle, hero, target);
@@ -65,7 +65,7 @@ public class GuinaifenTraceTest {
     @Test
     public void aHitAgainstATargetThatIsNotBurningGetsNothing() {
         Battle battle = battleWithHerRules();
-        Character hero = battle.characters.getFirst();
+        Character hero = battle.characters().getFirst();
         Enemy target = dummy();
 
         double plain = hit(battle, hero, target);
@@ -84,7 +84,7 @@ public class GuinaifenTraceTest {
     public void anAllysHitOnTheSameBurningTargetIsUntouched() {
         Character ally = CharacterFactory.create(ALLY, LEVEL);
         Battle battle = newBattle(List.of(CharacterFactory.create(GUINAIFEN, LEVEL), ally));
-        Character hero = battle.characters.getFirst();
+        Character hero = battle.characters().getFirst();
         Enemy target = dummy();
 
         double allyPlain = hit(battle, ally, target);
@@ -140,10 +140,10 @@ public class GuinaifenTraceTest {
         }
         Battle battle = new Battle(List.of(hero), List.of(dummy()), BattleFixture.seeded());
         battle.startBattle();
-        return battle.queue.snapshot().stream()
+        return battle.queue().snapshot().stream()
                 .filter(signal -> signal.getCanHit() == hero)
                 .findFirst()
-                .map(battle.queue::getTimeRemaining)
+                .map(battle.queue()::getTimeRemaining)
                 .orElseThrow(() -> new AssertionError("she is not on the action bar"));
     }
 

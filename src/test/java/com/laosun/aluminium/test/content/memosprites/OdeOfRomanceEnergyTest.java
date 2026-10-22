@@ -41,7 +41,7 @@ public class OdeOfRomanceEnergyTest {
     @Test
     public void theStateIsSpent() {
         Battle battle = battleWithTheOde();
-        Character aglaea = battle.characters.get(1);
+        Character aglaea = battle.characters().get(1);
         Assertions.assertTrue(aglaea.getBuffManager().hasState(STATE), "the ode reaches her and leaves the state");
         attack(battle);
         boolean stillThere = aglaea.getBuffManager().hasState(STATE);
@@ -51,8 +51,8 @@ public class OdeOfRomanceEnergyTest {
 
     private static Battle battleWithTheOde() {
         Battle battle = freshBattle();
-        Character aglaea = battle.characters.get(1);
-        Summon demiurge = battle.summonServant(battle.characters.getFirst());
+        Character aglaea = battle.characters().get(1);
+        Summon demiurge = battle.summonServant(battle.characters().getFirst());
         battle.processRequests();
         SkillExecutor.execute(battle, demiurge.skillAt(ODE_OF_ROMANCE), demiurge, List.of(aglaea));
         battle.processRequests();
@@ -61,7 +61,7 @@ public class OdeOfRomanceEnergyTest {
 
     private static Battle battleWithoutTheOde() {
         Battle battle = freshBattle();
-        battle.summonServant(battle.characters.getFirst());
+        battle.summonServant(battle.characters().getFirst());
         battle.processRequests();
         return battle;
     }
@@ -77,13 +77,13 @@ public class OdeOfRomanceEnergyTest {
     }
 
     private static double attack(Battle battle) {
-        Character aglaea = battle.characters.get(1);
+        Character aglaea = battle.characters().get(1);
         Skill skill = aglaea.getSkills().values().stream()
                 .filter(s -> s != null && s.getData() != null && s.getData().getEffect().isDamaging())
                 .findFirst().orElse(null);
         Assertions.assertNotNull(skill, "precondition: Aglaea has a damaging skill");
         double before = aglaea.getCurrentEnergy();
-        SkillExecutor.execute(battle, skill, aglaea, List.of(battle.enemies.getFirst()));
+        SkillExecutor.execute(battle, skill, aglaea, List.of(battle.enemies().getFirst()));
         battle.processRequests();
         return aglaea.getCurrentEnergy() - before;
     }

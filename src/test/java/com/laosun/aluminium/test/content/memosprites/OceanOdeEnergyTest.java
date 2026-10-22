@@ -33,8 +33,8 @@ public class OceanOdeEnergyTest {
                 List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        cyrene = battle.characters.get(0);
-        hysilens = battle.characters.get(1);
+        cyrene = battle.characters().get(0);
+        hysilens = battle.characters().get(1);
 
         var demiurge = battle.summonServant(cyrene);
         var ode = demiurge.skillAt(22);
@@ -46,7 +46,7 @@ public class OceanOdeEnergyTest {
 
         hysilens.setCurrentEnergy(20);
         double before = hysilens.getCurrentEnergy();
-        battle.fireTriggers(TriggerEvent.ALLY_ATTACK, cyrene, battle.enemies.getFirst(), 1, 0);
+        battle.fireTriggers(TriggerEvent.ALLY_ATTACK, cyrene, battle.enemies().getFirst(), 1, 0);
         battle.processRequests();
         double after = hysilens.getCurrentEnergy();
         boolean stillMarked = hysilens.getBuffManager().hasState(MARK);

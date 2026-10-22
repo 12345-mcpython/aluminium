@@ -37,9 +37,9 @@ public class PearlTechniqueArchetypeTest {
     @Test
     public void theTechniqueMarksTheArchetypeAndDeepStudiesIt() {
         Battle battle = newBattle(true, true);
-        Character pearl = battle.characters.get(0);
-        Character archetype = battle.characters.get(1);
-        Character other = battle.characters.get(2);
+        Character pearl = battle.characters().get(0);
+        Character archetype = battle.characters().get(1);
+        Character other = battle.characters().get(2);
         System.out.println("[pearl_technique] the archetype holds " + MARK + "="
                 + archetype.getBuffManager().hasState(MARK) + " " + DEEP + "="
                 + archetype.getBuffManager().hasState(DEEP)
@@ -68,8 +68,8 @@ public class PearlTechniqueArchetypeTest {
     @Test
     public void withoutTheTechniqueTheRuleProducesNothing() {
         Battle battle = newBattle(false, true);
-        Character pearl = battle.characters.get(0);
-        Character archetype = battle.characters.get(1);
+        Character pearl = battle.characters().get(0);
+        Character archetype = battle.characters().get(1);
         System.out.println("[pearl_technique] with no technique: deep="
                 + archetype.getBuffManager().hasState(DEEP) + " counter="
                 + pearl.getResources().value(COUNTER));
@@ -89,7 +89,7 @@ public class PearlTechniqueArchetypeTest {
     @Test
     public void theCallersAnswerIsTheArchetype() {
         Battle battle = newBattle(false, true);
-        Character archetype = battle.characters.get(1);
+        Character archetype = battle.characters().get(1);
         System.out.println("[pearl_technique] a named holder with no technique state: mark="
                 + archetype.getBuffManager().hasState(MARK) + " deep="
                 + archetype.getBuffManager().hasState(DEEP));
@@ -105,11 +105,11 @@ public class PearlTechniqueArchetypeTest {
     @Test
     public void nobodyNamedMeansNoArchetype() {
         Battle battle = newBattle(true, false);
-        Character pearl = battle.characters.get(0);
+        Character pearl = battle.characters().get(0);
         System.out.println("[pearl_technique] no archetype named: counter=" + pearl.getResources().value(COUNTER));
         Assertions.assertEquals(20, pearl.getResources().value(COUNTER),
                 "the counter half is about Pearl and happens anyway");
-        for (Character ally : battle.characters) {
+        for (Character ally : battle.characters()) {
             Assertions.assertFalse(ally.getBuffManager().hasState(MARK),
                     "and nobody was marked, because the caller named nobody");
         }

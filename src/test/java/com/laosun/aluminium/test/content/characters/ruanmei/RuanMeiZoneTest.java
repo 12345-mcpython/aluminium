@@ -59,7 +59,7 @@ public class RuanMeiZoneTest {
         Fixture f = fixture(0);
         f.battle.castImmediate(f.ruanMei.getSkills().get(SkillType.ULTRA), f.ruanMei, List.of(f.enemy));
         for (int i = 0; i < turns; i++) {
-            f.battle.currentMove = new Signal(f.ruanMei);
+            f.battle.setCurrentMove(new Signal(f.ruanMei));
             f.battle.beforeMove();
             f.battle.afterMove();
         }

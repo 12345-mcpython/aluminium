@@ -32,9 +32,9 @@ public class SkyOdeStackTest {
                 List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        cyrene = battle.characters.get(0);
-        hyacine = battle.characters.get(1);
-        other = battle.characters.get(2);
+        cyrene = battle.characters().get(0);
+        hyacine = battle.characters().get(1);
+        other = battle.characters().get(2);
 
         var demiurge = battle.summonServant(cyrene);
         battle.processRequests();
@@ -66,8 +66,8 @@ public class SkyOdeStackTest {
                 List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        cyrene = battle.characters.get(0);
-        other = battle.characters.get(1);
+        cyrene = battle.characters().get(0);
+        other = battle.characters().get(1);
 
         var demiurge = battle.summonServant(cyrene);
         battle.processRequests();
@@ -77,7 +77,7 @@ public class SkyOdeStackTest {
         // no assertion about layers -- the reading IS that this does not throw
         Assertions.assertDoesNotThrow(
                 () -> {
-                    SkillExecutor.execute(battle, ode, demiurge, List.of(battle.enemies.getFirst()));
+                    SkillExecutor.execute(battle, ode, demiurge, List.of(battle.enemies().getFirst()));
                     battle.processRequests();
                 },
                 "when the character the sentence names is not on the field, this clause should do nothing");

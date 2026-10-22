@@ -66,23 +66,23 @@ public class TrueKnowledgeSkillDamageTest {
                 List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        var sprite = battle.summonServant(battle.characters.get(0));
+        var sprite = battle.summonServant(battle.characters().get(0));
         battle.processRequests();
         var ode = sprite.skillAt(ODE_SLOT);
         Assertions.assertNotNull(ode, "precondition: slot 18");
         // the SAME cast either way; only the aim moves
-        Character aimed = battle.characters.get(atHim ? 1 : 0);
+        Character aimed = battle.characters().get(atHim ? 1 : 0);
         com.laosun.aluminium.models.skill.SkillExecutor.execute(battle, ode, sprite, List.of(aimed));
         battle.processRequests();
-        him = battle.characters.get(1);
+        him = battle.characters().get(1);
         double captured = him.getResources().has(CAPTURED) ? him.getResources().value(CAPTURED) : 0;
         var skill = him.getSkills().get(slot);
         Assertions.assertNotNull(skill, "precondition: " + slot);
-        double before = battle.enemies.getFirst().getCurrentHp();
+        double before = battle.enemies().getFirst().getCurrentHp();
         com.laosun.aluminium.models.skill.SkillExecutor.execute(battle, skill, him,
-                List.of(battle.enemies.getFirst()));
+                List.of(battle.enemies().getFirst()));
         battle.processRequests();
-        return new double[]{before - battle.enemies.getFirst().getCurrentHp(), captured,
+        return new double[]{before - battle.enemies().getFirst().getCurrentHp(), captured,
                 him.getAttribute(com.laosun.aluminium.enums.AttributeType.ATTACK).get()};
     }
 }

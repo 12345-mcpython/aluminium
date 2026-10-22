@@ -74,14 +74,14 @@ public class TransformationDispelsTest {
         // The debuff lands NOW -- after the transformation (see the class comment), and before her own cast.
         Skill theirs = applier.getSkills().get(SkillType.SKILL);
         Assertions.assertNotNull(theirs, "precondition: the applier has a skill");
-        SkillExecutor.execute(battle, theirs, applier, List.of(battle.enemies.getFirst()));
+        SkillExecutor.execute(battle, theirs, applier, List.of(battle.enemies().getFirst()));
         battle.processRequests();
         Assertions.assertTrue(owner.getBuffManager().hasState(DOT),
                 "precondition: the DOT landed on her (state name " + DOT + ")");
 
         Skill hers = owner.getSkills().get(SkillType.COMMON);
         Assertions.assertNotNull(hers, "precondition: she has a basic attack");
-        SkillExecutor.execute(battle, hers, owner, List.of(battle.enemies.getFirst()));
+        SkillExecutor.execute(battle, hers, owner, List.of(battle.enemies().getFirst()));
         battle.processRequests();
         return owner.getBuffManager().hasState(DOT);
     }

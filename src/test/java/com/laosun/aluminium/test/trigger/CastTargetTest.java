@@ -64,9 +64,9 @@ public class CastTargetTest {
     @Test
     public void theCastCarriesTheUnitItWasAimedAt() {
         Battle battle = party();
-        Character bronya = battle.characters.getFirst();
-        Character ally = battle.characters.get(1);
-        Character other = battle.characters.get(2);
+        Character bronya = battle.characters().getFirst();
+        Character ally = battle.characters().get(1);
+        Character other = battle.characters().get(2);
         double allyBefore = damageBoostOf(ally);
         double otherBefore = damageBoostOf(other);
 
@@ -111,8 +111,8 @@ public class CastTargetTest {
         Battle battle = new Battle(List.of(CharacterFactory.create(BRONYA, LEVEL),
                 CharacterFactory.create(ALLY, LEVEL)), List.of(dummy()), BattleFixture.seeded());
         battle.startBattle();
-        Character bronya = battle.characters.getFirst();
-        Character ally = battle.characters.get(1);
+        Character bronya = battle.characters().getFirst();
+        Character ally = battle.characters().get(1);
         double bronyaBefore = timeRemaining(battle, bronya);
         double bronyaBoostBefore = damageBoostOf(bronya);
 
@@ -135,7 +135,7 @@ public class CastTargetTest {
     @Test
     public void castingItOnHerselfSkipsOnlyTheImmediateAction() {
         Battle battle = new Battle(List.of(CharacterFactory.create(BRONYA, LEVEL)), List.of(dummy()), BattleFixture.seeded());
-        Character bronya = battle.characters.getFirst();
+        Character bronya = battle.characters().getFirst();
         double before = timeRemaining(battle, bronya);
         double boostBefore = damageBoostOf(bronya);
 
@@ -258,9 +258,9 @@ public class CastTargetTest {
      * How much action value the unit still has - zero means "acts now".
      */
     private static double timeRemaining(Battle battle, CanHit target) {
-        for (Signal signal : battle.queue.snapshot()) {
+        for (Signal signal : battle.queue().snapshot()) {
             if (signal.getCanHit() == target) {
-                return battle.queue.getTimeRemaining(signal);
+                return battle.queue().getTimeRemaining(signal);
             }
         }
         return Double.NaN;

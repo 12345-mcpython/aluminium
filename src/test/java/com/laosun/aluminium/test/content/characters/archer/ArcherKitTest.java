@@ -90,10 +90,10 @@ public class ArcherKitTest {
             hp += enemy.getMaxHp() - enemy.getCurrentHp();
         }
         System.out.println("[1015] 秘技开局: 敌方合计掉血 " + hp + " ; 充能 "
-                + withTechnique.characters.getFirst().getResources().value(CHARGE));
+                + withTechnique.characters().getFirst().getResources().value(CHARGE));
         Assertions.assertTrue(hp > 0, "「对敌方全体造成…伤害」");
         Assertions.assertEquals(withoutTechniqueCharge() + 1,
-                withTechnique.characters.getFirst().getResources().value(CHARGE),
+                withTechnique.characters().getFirst().getResources().value(CHARGE),
                 "「并获得 1 点充能」—— 与同一场没声明秘技相比**正好多 1 点**（开场那 1 点来自行迹，不算进来）");
 
         Battle withoutTechnique = battle(2, false);
@@ -108,7 +108,7 @@ public class ArcherKitTest {
      * The Charge a battle opens with when the technique was NOT declared: trace 1015102's 1 point.
      */
     private static int withoutTechniqueCharge() {
-        return battle(1, false).characters.getFirst().getResources().value(CHARGE);
+        return battle(1, false).characters().getFirst().getResources().value(CHARGE);
     }
 
     /**
@@ -164,7 +164,7 @@ public class ArcherKitTest {
         Battle battle = new Battle(List.of(CharacterFactory.create(ARCHER, 80), CharacterFactory.create(ALLY, 80)),
                 foes, BattleFixture.alwaysRoll(0.9999));
         if (technique) {
-            battle.markTechniqueUsed(battle.characters.getFirst());
+            battle.markTechniqueUsed(battle.characters().getFirst());
         }
         battle.startBattle();
         battle.processRequests();
@@ -178,8 +178,8 @@ public class ArcherKitTest {
 
         private Fixture(int enemies) {
             this.battle = battle(enemies, false);
-            this.archer = battle.characters.getFirst();
-            this.ally = battle.characters.get(1);
+            this.archer = battle.characters().getFirst();
+            this.ally = battle.characters().get(1);
         }
 
         /**

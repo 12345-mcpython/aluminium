@@ -35,7 +35,7 @@ public class FeixiaoFallbackTest {
         Battle battle = new Battle(List.of(feixiao, ally), List.of(a, b), BattleFixture.seeded());
         battle.startBattle();
         a.perish();
-        Assertions.assertTrue(a.isDeath() && battle.enemies.contains(a),
+        Assertions.assertTrue(a.isDeath() && battle.enemies().contains(a),
                 "the fixture must leave A defeated but still in the roster");
         TriggerTable.TriggerContext ctx = new TriggerTable.TriggerContext(feixiao, ally, a, 1, 0, null, battle,
                 SkillCategory.UNSPECIFIED);

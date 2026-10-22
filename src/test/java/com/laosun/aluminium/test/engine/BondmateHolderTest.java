@@ -220,9 +220,9 @@ public class BondmateHolderTest {
      * How much action value the unit still has - the action bar's own answer.
      */
     private static double timeRemaining(Battle battle, CanHit target) {
-        for (Signal signal : battle.queue.snapshot()) {
+        for (Signal signal : battle.queue().snapshot()) {
             if (signal.getCanHit() == target) {
-                return battle.queue.getTimeRemaining(signal);
+                return battle.queue().getTimeRemaining(signal);
             }
         }
         return Double.NaN;

@@ -47,7 +47,7 @@ public class AlliesWithPathTest {
         Battle battle = new Battle(team, List.of(EnemyFactory.create(1002011, 100, 1)), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        Character pearl = battle.characters.stream().filter(c -> c.getCid() == PEARL).findFirst().orElseThrow();
+        Character pearl = battle.characters().stream().filter(c -> c.getCid() == PEARL).findFirst().orElseThrow();
         pearl.setTriggerTable(new TriggerTable(PEARL, List.of(
                 TriggerSpecs.rule("TURN_START", List.of("allies_with_path:欢愉 >= 2"),
                         TriggerSpecs.modifyAttr("ATTACK", 0.5, 1)))));

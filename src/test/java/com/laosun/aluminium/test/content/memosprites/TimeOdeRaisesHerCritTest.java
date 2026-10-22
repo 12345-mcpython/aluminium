@@ -45,8 +45,8 @@ public class TimeOdeRaisesHerCritTest {
                 List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        cyrene = battle.characters.get(0);
-        longnight = battle.characters.get(1);
+        cyrene = battle.characters().get(0);
+        longnight = battle.characters().get(1);
 
         if (castTheOde) {
             var sprite = battle.summonServant(cyrene);
@@ -57,18 +57,18 @@ public class TimeOdeRaisesHerCritTest {
             battle.processRequests();
         }
 
-        var ourSprite = battle.summonServant(battle.characters.get(0));
+        var ourSprite = battle.summonServant(battle.characters().get(0));
         battle.processRequests();
         double before = ourSprite.getAttribute(AttributeType.CRIT_ATTACK).get();
-        double herCrit = battle.characters.get(1).getAttribute(AttributeType.CRIT_ATTACK).get();
-        var skill = battle.characters.get(1).getSkills().get(com.laosun.aluminium.enums.SkillType.SKILL);
+        double herCrit = battle.characters().get(1).getAttribute(AttributeType.CRIT_ATTACK).get();
+        var skill = battle.characters().get(1).getSkills().get(com.laosun.aluminium.enums.SkillType.SKILL);
         Assertions.assertNotNull(skill, "precondition: she has a skill");
-        double param = skill.getData().getSkills().get(battle.characters.get(1).skillLevel(skill) - 1).get(0);
-        SkillExecutor.execute(battle, skill, battle.characters.get(1), List.of(battle.enemies.getFirst()));
+        double param = skill.getData().getSkills().get(battle.characters().get(1).skillLevel(skill) - 1).get(0);
+        SkillExecutor.execute(battle, skill, battle.characters().get(1), List.of(battle.enemies().getFirst()));
         battle.processRequests();
         // CORRECTED (2026-10-18): her CRIT DMG is read AFTER the cast - her talent raises it by 0.6 when the
         // skill's HP cost lands, and the memosprite's share is taken from that post-cast value.
-        double herCritAfter = battle.characters.get(1).getAttribute(AttributeType.CRIT_ATTACK).get();
+        double herCritAfter = battle.characters().get(1).getAttribute(AttributeType.CRIT_ATTACK).get();
         return new double[]{ourSprite.getAttribute(AttributeType.CRIT_ATTACK).get() - before, herCritAfter, param};
     }
 }

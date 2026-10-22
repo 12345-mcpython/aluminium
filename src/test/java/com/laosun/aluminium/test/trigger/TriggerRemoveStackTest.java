@@ -47,7 +47,7 @@ public class TriggerRemoveStackTest {
     @Test
     public void removeStackTakesExactlyOneStackOff() {
         Battle battle = battleWith(stackRule(0.18, 3), removeRule(1));
-        Character owner = battle.characters.getFirst();
+        Character owner = battle.characters().getFirst();
 
         for (int i = 0; i < 3; i++) {
             fire(battle, owner);
@@ -61,7 +61,7 @@ public class TriggerRemoveStackTest {
     @Test
     public void removingMoreThanThereAreTakesWhatIsThereAndIsNotAnError() {
         Battle battle = battleWith(stackRule(0.18, 3), removeRule(5));
-        Character owner = battle.characters.getFirst();
+        Character owner = battle.characters().getFirst();
 
         fire(battle, owner);
         fire(battle, owner);
@@ -75,7 +75,7 @@ public class TriggerRemoveStackTest {
     @Test
     public void removingWithNothingToRemoveIsANoOp() {
         Battle battle = battleWith(removeRule(1));
-        Character owner = battle.characters.getFirst();
+        Character owner = battle.characters().getFirst();
 
         Assertions.assertEquals(1, remove(battle, owner),
                 "the rule does fire -- there is simply nothing on the attribute to take");
@@ -97,7 +97,7 @@ public class TriggerRemoveStackTest {
     public void theMostRecentlyAddedStackGoesFirst() {
         Battle battle = battleWith(stackRuleOn("ALLY_ATTACK", 0.1, 3),
                 stackRuleOn("HP_LOST", 0.5, 3), removeRule(1));
-        Character owner = battle.characters.getFirst();
+        Character owner = battle.characters().getFirst();
 
         fire(battle, owner);                                          // +10%
         battle.fireTriggers(TriggerEvent.HP_LOST, owner, owner, 0, 0); // +50% (same group -> a second stack)
@@ -114,8 +114,8 @@ public class TriggerRemoveStackTest {
     @Test
     public void stacksCanBeRemovedFromAnotherUnit() {
         Battle battle = withAlly(stackRule(0.18, 3), removeFromTargetRule(1));
-        Character owner = battle.characters.getFirst();
-        Character ally = battle.characters.get(1);
+        Character owner = battle.characters().getFirst();
+        Character ally = battle.characters().get(1);
 
         fire(battle, owner);
         Assertions.assertEquals(0.18, boostOf(owner), EPS);

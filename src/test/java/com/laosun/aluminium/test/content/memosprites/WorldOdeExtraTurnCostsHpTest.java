@@ -43,7 +43,7 @@ public class WorldOdeExtraTurnCostsHpTest {
                 List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        him = battle.characters.getFirst();
+        him = battle.characters().getFirst();
 
         // The ode lands first: it is the sentence that grants [永续的燃烧]
         var odeSprite = battle.summonServant(CharacterFactory.create(1415, LEVEL));
@@ -52,21 +52,21 @@ public class WorldOdeExtraTurnCostsHpTest {
         Assertions.assertNotNull(ode, "precondition: slot 21");
         SkillExecutor.execute(battle, ode, odeSprite, List.of(him));
         battle.processRequests();
-        him = battle.characters.getFirst();
+        him = battle.characters().getFirst();
         if (!everBurning) {
             him.getBuffManager().removeState(STATE);
         }
         Assertions.assertEquals(everBurning ? 1 : 0, Math.min(1, him.getBuffManager().stacksOf(STATE)), "precondition: the state");
 
         Countdown countdown = battle.startCountdown(him, "额外回合", 90);
-        Signal signal = battle.queue.snapshot().stream()
+        Signal signal = battle.queue().snapshot().stream()
                 .filter(s -> s.getCanHit() == countdown)
                 .findFirst()
                 .orElseThrow(() -> new AssertionError("the countdown has no signal on the action order"));
         double before = him.getCurrentHp();
-        battle.currentMove = signal;
+        battle.setCurrentMove(signal);
         battle.beforeMove();
         battle.processRequests();
-        return new double[]{before - battle.characters.getFirst().getCurrentHp(), before};
+        return new double[]{before - battle.characters().getFirst().getCurrentHp(), before};
     }
 }

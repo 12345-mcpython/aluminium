@@ -43,8 +43,8 @@ public class ElationFixedLaughCastTest {
     @Test
     public void theCommandedElationCastCountsTheFixedTwenty() {
         Battle battle = newBattle();
-        Character harmony = battle.characters.getFirst();
-        Character ally = battle.characters.get(1);
+        Character harmony = battle.characters().getFirst();
+        Character ally = battle.characters().get(1);
         Enemy enemy = battle.enemyUnits().getFirst();
 
         double before = enemy.getCurrentHp();

@@ -61,9 +61,9 @@ public class ConeAuditBatchFourTest {
         Fixture f = new Fixture(20019, true);
         Fixture bare = new Fixture(null, true);
         for (int i = 0; i < 2; i++) {
-            double delta = f.battle.characters.get(i).getAttribute(AttributeType.SPEED).get()
-                    - bare.battle.characters.get(i).getAttribute(AttributeType.SPEED).get();
-            System.out.println("[20019] " + f.battle.characters.get(i).getName() + " 速度增量 " + delta);
+            double delta = f.battle.characters().get(i).getAttribute(AttributeType.SPEED).get()
+                    - bare.battle.characters().get(i).getAttribute(AttributeType.SPEED).get();
+            System.out.println("[20019] " + f.battle.characters().get(i).getName() + " 速度增量 " + delta);
             Assertions.assertEquals(12.0, delta, 1e-9, "「我方全体…提高 12 **点**」（叠影 1）");
         }
         TestTurns.take(f.battle, f.wearer);

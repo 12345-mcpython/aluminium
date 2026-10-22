@@ -41,14 +41,14 @@ public class PearlEnhancedBasicHealTest {
                 List.of(EnemyFactory.create(1002011, 100, 1)), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        Character pearl = battle.characters.get(0);
-        Character other = battle.characters.get(1);
+        Character pearl = battle.characters().get(0);
+        Character other = battle.characters().get(1);
         pearl.takeDamage(pearl.getMaxHp() * 0.6);
         other.takeDamage(other.getMaxHp() * 0.8);
 
         double pearlBefore = pearl.getCurrentHp();
         double otherBefore = other.getCurrentHp();
-        battle.fireTriggers(TriggerEvent.BASIC_ATTACK, pearl, battle.enemies.getFirst(), 1, 0,
+        battle.fireTriggers(TriggerEvent.BASIC_ATTACK, pearl, battle.enemies().getFirst(), 1, 0,
                 (SkillCategory) null, slot);
         return new double[]{pearl.getCurrentHp() - pearlBefore, other.getCurrentHp() - otherBefore};
     }

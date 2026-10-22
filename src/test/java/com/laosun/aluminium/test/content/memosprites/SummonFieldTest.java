@@ -334,7 +334,7 @@ public class SummonFieldTest {
         }
         battle.startBattle();
         battle.stepForward();                       // opens the turn; beforeMove() is what emits TURN_START
-        Assertions.assertSame(wearer, battle.currentMove.getCanHit(),
+        Assertions.assertSame(wearer, battle.currentMove().getCanHit(),
                 "precondition: the first turn is the wearer's");
         battle.beforeMove();
         return wearer.getAttribute(AttributeType.CRIT_ATTACK).get();

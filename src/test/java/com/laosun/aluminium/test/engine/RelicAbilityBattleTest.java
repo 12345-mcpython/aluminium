@@ -192,7 +192,7 @@ public class RelicAbilityBattleTest {
     @Test
     public void ultimateCriticalDamageBonusApplies() {
         Battle battle = newBattle(List.of(wearing(HIMEKO, GLACIAL_FOREST)), true);
-        Character hero = battle.characters.getFirst();
+        Character hero = battle.characters().getFirst();
         double before = hero.getAttribute(AttributeType.CRIT_ATTACK).get();
 
         Assertions.assertTrue(castUltimate(battle, hero));
@@ -208,7 +208,7 @@ public class RelicAbilityBattleTest {
                 "Ability51041: +25% CRIT DMG after the wearer's Ultimate");
 
         Battle partialBattle = newBattle(List.of(partial(HIMEKO, GLACIAL_FOREST)), true);
-        Character control = partialBattle.characters.getFirst();
+        Character control = partialBattle.characters().getFirst();
         Assertions.assertTrue(castUltimate(partialBattle, control));
         Assertions.assertTrue(buffsOn(control, AttributeType.CRIT_ATTACK).isEmpty(),
                 "three pieces must not grant the 4-piece ability");
@@ -229,7 +229,7 @@ public class RelicAbilityBattleTest {
     @Test
     public void skillAttackBonusAppliesOnSkillButNotOnTheUltimate() {
         Battle onSkill = newBattle(List.of(wearing(HIMEKO, SIZZLING_THUNDER)), true);
-        Character skillUser = onSkill.characters.getFirst();
+        Character skillUser = onSkill.characters().getFirst();
         double skillBefore = skillUser.getAttribute(AttributeType.ATTACK).get();
         onSkill.castImmediate(skillUser.getSkills().get(SkillType.SKILL), skillUser,
                 List.of(onSkill.enemyUnits().getFirst()));
@@ -246,7 +246,7 @@ public class RelicAbilityBattleTest {
                 "the buff must actually raise the attribute");
 
         Battle onUltimate = newBattle(List.of(wearing(HIMEKO, SIZZLING_THUNDER)), true);
-        Character ultimateUser = onUltimate.characters.getFirst();
+        Character ultimateUser = onUltimate.characters().getFirst();
         double ultimateBefore = ultimateUser.getAttribute(AttributeType.ATTACK).get();
         Assertions.assertTrue(castUltimate(onUltimate, ultimateUser));
         Assertions.assertTrue(buffsOn(ultimateUser, AttributeType.ATTACK).isEmpty(),
@@ -261,7 +261,7 @@ public class RelicAbilityBattleTest {
     @Test
     public void ultimateAdvancesTheWearersAction() {
         Battle battle = newBattle(List.of(wearing(HIMEKO, TWILIGHT_EAGLE)), true);
-        Character hero = battle.characters.getFirst();
+        Character hero = battle.characters().getFirst();
         double remainingBefore = timeRemaining(battle, hero);
         Assertions.assertTrue(remainingBefore > 0, "precondition: the wearer has time left before acting");
 
@@ -271,7 +271,7 @@ public class RelicAbilityBattleTest {
                 "Ability51101: the wearer skips 25% of their remaining time to act");
 
         Battle partialBattle = newBattle(List.of(partial(HIMEKO, TWILIGHT_EAGLE)), true);
-        Character control = partialBattle.characters.getFirst();
+        Character control = partialBattle.characters().getFirst();
         double controlBefore = timeRemaining(partialBattle, control);
         Assertions.assertTrue(castUltimate(partialBattle, control));
         Assertions.assertEquals(controlBefore, timeRemaining(partialBattle, control), 1e-6,
@@ -308,7 +308,7 @@ public class RelicAbilityBattleTest {
     @Test
     public void streetwiseBoxingStacksOnAttackAndOnBeingHitUpToItsCap() {
         Battle battle = newBattle(List.of(wearing(HIMEKO, STREETWISE_BOXING)), true);
-        Character hero = battle.characters.getFirst();
+        Character hero = battle.characters().getFirst();
         int baseBuffs = buffsOn(hero, AttributeType.ATTACK).size();
         double attackWithoutStacks = hero.getAttribute(AttributeType.ATTACK).get();
 
@@ -350,7 +350,7 @@ public class RelicAbilityBattleTest {
     @Test
     public void streetwiseBoxingStacksOnAShieldedHitAsWell() {
         Battle battle = newBattle(List.of(wearing(HIMEKO, STREETWISE_BOXING)), true);
-        Character hero = battle.characters.getFirst();
+        Character hero = battle.characters().getFirst();
         int baseBuffs = buffsOn(hero, AttributeType.ATTACK).size();
 
         battle.grantShield(hero, 10_000_000);
@@ -385,7 +385,7 @@ public class RelicAbilityBattleTest {
     @Test
     public void streetwiseBoxingStacksLastForTheRestOfTheBattle() {
         Battle battle = newBattle(List.of(wearing(HIMEKO, STREETWISE_BOXING)), true);
-        Character hero = battle.characters.getFirst();
+        Character hero = battle.characters().getFirst();
         int baseBuffs = buffsOn(hero, AttributeType.ATTACK).size();
 
         battle.castImmediate(hero.getSkills().get(SkillType.COMMON), hero,
@@ -394,7 +394,7 @@ public class RelicAbilityBattleTest {
 
         for (int turn = 0; turn < 10; turn++) {
             battle.stepForward();
-            if (battle.currentMove == null) {
+            if (battle.currentMove() == null) {
                 break;
             }
             battle.beforeMove();
@@ -412,7 +412,7 @@ public class RelicAbilityBattleTest {
     @Test
     public void streetwiseBoxingNeedsAllFourPieces() {
         Battle battle = newBattle(List.of(partial(HIMEKO, STREETWISE_BOXING)), true);
-        Character hero = battle.characters.getFirst();
+        Character hero = battle.characters().getFirst();
         double baseAttack = hero.getAttribute(AttributeType.ATTACK).get();
 
         battle.castImmediate(hero.getSkills().get(SkillType.COMMON), hero,
@@ -553,20 +553,20 @@ public class RelicAbilityBattleTest {
     public void ashblazingTwoPieceRaisesFollowUpDamageAndLeavesOtherAttacksAlone() {
         Battle withBoost = newBattle(List.of(wearing(HIMEKO, ASHBLAZING)), true);
         Battle withoutBoost = newBattle(List.of(wearing(HIMEKO, ASHBLAZING)), true);
-        withoutBoost.characters.getFirst().getBuffManager().clearAll();
+        withoutBoost.characters().getFirst().getBuffManager().clearAll();
 
-        Character himeko = withBoost.characters.getFirst();
+        Character himeko = withBoost.characters().getFirst();
         Assertions.assertEquals(ASHBLAZING_BOOST,
                 himeko.getAttribute(AttributeType.FOLLOW_UP_DAMAGE_BOOST).get(), TOLERANCE,
                 "the 2-piece rule grants the follow-up-only boost at battle start");
         Assertions.assertEquals(0,
-                withoutBoost.characters.getFirst()
+                withoutBoost.characters().getFirst()
                         .getAttribute(AttributeType.FOLLOW_UP_DAMAGE_BOOST).get(), TOLERANCE,
                 "and clearing the buffs removes it, so the control battle really is the control");
 
         // A fixed crit state keeps both battles numerically comparable.
         for (Battle battle : List.of(withBoost, withoutBoost)) {
-            battle.characters.getFirst().setAttribute(AttributeType.CRIT_CHANCE, new DoubleValue(0));
+            battle.characters().getFirst().setAttribute(AttributeType.CRIT_CHANCE, new DoubleValue(0));
         }
 
         double followUpWith = hitFor(withBoost, true);
@@ -586,7 +586,7 @@ public class RelicAbilityBattleTest {
      */
     private static double hitFor(Battle battle, boolean followUp) {
         Enemy enemy = battle.enemyUnits().getFirst();
-        Character hero = battle.characters.getFirst();
+        Character hero = battle.characters().getFirst();
         double before = enemy.getCurrentHp();
         if (followUp) {
             battle.applyAdditionalDamage(hero, enemy, DamageElement.FIRE, 1000);
@@ -623,7 +623,7 @@ public class RelicAbilityBattleTest {
     @Test
     public void navigatorStacksGrowOnSkillAndShrinkAtTheWearersTurnStart() {
         Battle battle = newBattle(List.of(wearing(HIMEKO, NAVIGATOR)), true);
-        Character hero = battle.characters.getFirst();
+        Character hero = battle.characters().getFirst();
 
         Assertions.assertEquals(1, buffsOn(hero, AttributeType.SKILL_DAMAGE_BOOST).size(),
                 "entering combat grants one stack of the Skill DMG boost");
@@ -656,7 +656,7 @@ public class RelicAbilityBattleTest {
     @Test
     public void navigatorLosesAStackAfterTheWearersUltimate() {
         Battle battle = newBattle(List.of(wearing(HIMEKO, NAVIGATOR)), true);
-        Character hero = battle.characters.getFirst();
+        Character hero = battle.characters().getFirst();
 
         castSkill(battle, hero);
         Assertions.assertEquals(2, buffsOn(hero, AttributeType.ULTIMATE_DAMAGE_BOOST).size(),
@@ -675,7 +675,7 @@ public class RelicAbilityBattleTest {
     @Test
     public void navigatorNeedsAllFourPieces() {
         Battle battle = newBattle(List.of(partial(HIMEKO, NAVIGATOR)), true);
-        Character hero = battle.characters.getFirst();
+        Character hero = battle.characters().getFirst();
 
         Assertions.assertEquals(0, buffsOn(hero, AttributeType.SKILL_DAMAGE_BOOST).size());
         Assertions.assertEquals(0, buffsOn(hero, AttributeType.ULTIMATE_DAMAGE_BOOST).size());
@@ -703,7 +703,7 @@ public class RelicAbilityBattleTest {
     @Test
     public void guardOfSnowReducesTheDamageTheWearerTakes() {
         Battle battle = newBattle(List.of(wearing(HIMEKO, GUARD_OF_SNOW)), true);
-        Character hero = battle.characters.getFirst();
+        Character hero = battle.characters().getFirst();
         Assertions.assertTrue(hero.getBuffManager().hasBuff(ReductionBuff.class),
                 "the 2-piece is attached at battle start (BATTLE_START -> MODIFY_DAMAGE_TAKEN, negative)");
 
@@ -722,10 +722,10 @@ public class RelicAbilityBattleTest {
     @Test
     public void guardOfSnowIsATwoPieceAbility() {
         Battle threePieces = newBattle(List.of(partial(HIMEKO, GUARD_OF_SNOW)), true);
-        Assertions.assertTrue(threePieces.characters.getFirst().getBuffManager().hasBuff(ReductionBuff.class));
+        Assertions.assertTrue(threePieces.characters().getFirst().getBuffManager().hasBuff(ReductionBuff.class));
 
         Battle none = newBattle(List.of(plain(HIMEKO)), true);
-        Assertions.assertFalse(none.characters.getFirst().getBuffManager().hasBuff(ReductionBuff.class));
+        Assertions.assertFalse(none.characters().getFirst().getBuffManager().hasBuff(ReductionBuff.class));
     }
 
     /**
@@ -738,7 +738,7 @@ public class RelicAbilityBattleTest {
     @Test
     public void guardOfSnowFourPieceHealsAndGrantsEnergyBelowHalfHealth() {
         Battle battle = newBattle(List.of(wearing(HIMEKO, GUARD_OF_SNOW)), true);
-        Character hero = battle.characters.getFirst();
+        Character hero = battle.characters().getFirst();
         double maxHp = hero.getMaxHp();
         hero.takeDamage(maxHp * 0.6);                     // down to 40%: below the threshold
         double hpBefore = hero.getCurrentHp();
@@ -757,7 +757,7 @@ public class RelicAbilityBattleTest {
     @Test
     public void guardOfSnowFourPieceDoesNothingAboveHalfHealth() {
         Battle battle = newBattle(List.of(wearing(HIMEKO, GUARD_OF_SNOW)), true);
-        Character hero = battle.characters.getFirst();
+        Character hero = battle.characters().getFirst();
         hero.takeDamage(hero.getMaxHp() * 0.2);           // 80%: above the threshold
         double hpBefore = hero.getCurrentHp();
         double energyBefore = hero.getCurrentEnergy();
@@ -854,7 +854,7 @@ public class RelicAbilityBattleTest {
             if (battle.isOver()) {
                 throw new AssertionError("the battle ended before the requested unit acted");
             }
-            boolean mine = battle.queue.getCurrentActor().getCanHit() == who;
+            boolean mine = battle.queue().getCurrentActor().getCanHit() == who;
             if (mine) {
                 battle.beforeMove();
             }
@@ -877,9 +877,9 @@ public class RelicAbilityBattleTest {
      * How much action value the unit still has to accumulate before its next turn.
      */
     private static double timeRemaining(Battle battle, CanHit unit) {
-        for (Signal signal : battle.queue.snapshot()) {
+        for (Signal signal : battle.queue().snapshot()) {
             if (signal.getCanHit() == unit) {
-                return battle.queue.getTimeRemaining(signal);
+                return battle.queue().getTimeRemaining(signal);
             }
         }
         throw new IllegalStateException(unit.getName() + " is not on the action bar");

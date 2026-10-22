@@ -29,8 +29,8 @@ public class MemospriteSkillsSymmetryTest {
         battle.startBattle();
         battle.processRequests();
         var dragon = viaServant
-                ? battle.summonServant(battle.characters.get(0))
-                : battle.summonMemosprite(battle.characters.get(0));
+                ? battle.summonServant(battle.characters().get(0))
+                : battle.summonMemosprite(battle.characters().get(0));
         battle.processRequests();
         return new java.util.TreeSet<>(dragon.skillsByDataSlot().keySet()).toString();
     }

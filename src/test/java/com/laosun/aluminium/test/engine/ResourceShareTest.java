@@ -33,8 +33,8 @@ public class ResourceShareTest {
                 List.of(EnemyFactory.create(1002011, 90, 1)), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        cyrene = battle.characters.get(0);
-        cerydra = battle.characters.get(1);
+        cyrene = battle.characters().get(0);
+        cerydra = battle.characters().get(1);
 
         double before = cerydra.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
         battle.fireTriggers(TriggerEvent.TURN_START, cerydra, null, 0, 0);

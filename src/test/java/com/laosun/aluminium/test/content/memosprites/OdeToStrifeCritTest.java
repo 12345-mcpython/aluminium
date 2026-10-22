@@ -61,7 +61,7 @@ public class OdeToStrifeCritTest {
         bloodfeud.setSource(mydei);
         mydei.getBuffManager().addBuff(bloodfeud);
 
-        CanHit enemy = battle.enemies.getFirst();
+        CanHit enemy = battle.enemies().getFirst();
         double before = enemy.getCurrentHp();
         Skill ode = demiurge.skillAt(ODE_TO_STRIFE);
         SkillExecutor.execute(battle, ode, demiurge, List.of(mydei));

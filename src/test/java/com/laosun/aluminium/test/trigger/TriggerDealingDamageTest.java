@@ -56,10 +56,10 @@ public class TriggerDealingDamageTest {
     public void aBoostConditionedOnTheTargetsStateAppliesOnlyToThatInstance() {
         Battle battle = battleWith(burnRule());
         Enemy target = dummy(battle);
-        double plain = hit(battle, battle.characters.getFirst(), target);
+        double plain = hit(battle, battle.characters().getFirst(), target);
 
-        burn(target, battle.characters.getFirst());
-        Assertions.assertEquals(plain * (1 + BURN_RATIO), hit(battle, battle.characters.getFirst(), target), EPS,
+        burn(target, battle.characters().getFirst());
+        Assertions.assertEquals(plain * (1 + BURN_RATIO), hit(battle, battle.characters().getFirst(), target), EPS,
                 "the target is burning now, so the rule fires and raises this hit by 20%");
     }
 
@@ -70,7 +70,7 @@ public class TriggerDealingDamageTest {
     @Test
     public void theBoostDoesNotLeakIntoTheNextHit() {
         Battle battle = battleWith(burnRule());
-        Character owner = battle.characters.getFirst();
+        Character owner = battle.characters().getFirst();
         Enemy target = dummy(battle);
         double plain = hit(battle, owner, target);
 
@@ -90,8 +90,8 @@ public class TriggerDealingDamageTest {
     public void theActorConditionScopesItToTheOwnersOwnDamage() {
         Battle battle = withAlly(TriggerSpecs.rule("DEALING_DAMAGE",
                 List.of("target has_state 灼烧", "actor == self"), boostOp(BURN_RATIO)));
-        Character owner = battle.characters.getFirst();
-        Character ally = battle.characters.get(1);
+        Character owner = battle.characters().getFirst();
+        Character ally = battle.characters().get(1);
         Enemy target = dummy(battle);
 
         double ownerPlain = hit(battle, owner, target);
@@ -129,7 +129,7 @@ public class TriggerDealingDamageTest {
      * Burns the dummy and returns what one DOT settlement deals to it.
      */
     private static double dotTickDamage(Battle battle) {
-        Character owner = battle.characters.getFirst();
+        Character owner = battle.characters().getFirst();
         Enemy target = dummy(battle);
         burn(target, owner);
         return battle.tickDots(target);
@@ -142,7 +142,7 @@ public class TriggerDealingDamageTest {
     @Test
     public void hasStateKnowsTheFourDotNames() {
         Battle battle = battleWith();
-        Character owner = battle.characters.getFirst();
+        Character owner = battle.characters().getFirst();
         Enemy target = dummy(battle);
 
         Assertions.assertFalse(target.getBuffManager().hasState("灼烧"), "nothing attached yet");
@@ -162,7 +162,7 @@ public class TriggerDealingDamageTest {
     @Test
     public void namedStatesStillWorkAlongsideTheDotNames() {
         Battle battle = battleWith();
-        Character owner = battle.characters.getFirst();
+        Character owner = battle.characters().getFirst();
 
         owner.getBuffManager().addBuff(new StateBuff("协奏", 2));
         Assertions.assertTrue(owner.getBuffManager().hasState("协奏"));

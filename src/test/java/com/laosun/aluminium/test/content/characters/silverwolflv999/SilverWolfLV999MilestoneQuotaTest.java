@@ -205,7 +205,7 @@ public class SilverWolfLV999MilestoneQuotaTest {
      */
     private CanHit takeOneTurn() {
         battle.stepForward();
-        CanHit actor = battle.currentMove.getCanHit();
+        CanHit actor = battle.currentMove().getCanHit();
         battle.beforeMove();
         battle.afterMove();
         return actor;

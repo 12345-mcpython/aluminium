@@ -48,7 +48,7 @@ public class LushakaTheSunkenSeasPartyFirstTest {
         Battle battle = new Battle(List.of(ally, wearer), List.of(EnemyFactory.create(1002011, 90, 1)),
                 BattleFixture.seeded());
         battle.startBattle();
-        Assertions.assertSame(ally, battle.characters.getFirst(),
+        Assertions.assertSame(ally, battle.characters().getFirst(),
                 "the party list order is what 'the first character' means");
         var rule = RelicTriggerTables.of(317).at(2).rulesFor(TriggerEvent.BATTLE_START).getFirst();
         var before = ally.getAttribute(AttributeType.ATTACK).get();

@@ -82,10 +82,10 @@ public class ArlanEidolonFourTest {
         // one (BuffManager.processBuffTick(true/false)), and a state's expiry is announced on the LATE half. Driving only
         // `beforeMove()` is therefore half a turn, which is what the first version of this judge measured by mistake.
         for (int turn = 0; turn < turns; turn++) {
-            Signal signal = battle.queue.snapshot().stream()
+            Signal signal = battle.queue().snapshot().stream()
                     .filter(candidate -> candidate.getCanHit() == him).findFirst()
                     .orElseThrow(() -> new AssertionError("precondition: he is in the queue"));
-            battle.currentMove = signal;
+            battle.setCurrentMove(signal);
             battle.beforeMove();
             battle.afterMove();
             battle.processRequests();
@@ -95,7 +95,7 @@ public class ArlanEidolonFourTest {
             if (him.isDeath()) {
                 break;
             }
-            battle.applyTrueDamage(battle.enemies.getFirst(), him, DamageElement.ICE, him.getCurrentHp() * 2.0);
+            battle.applyTrueDamage(battle.enemies().getFirst(), him, DamageElement.ICE, him.getCurrentHp() * 2.0);
             battle.processRequests();
         }
         return new double[]{him.isDeath() ? 0 : him.getCurrentHp(), him.getMaxHp()};

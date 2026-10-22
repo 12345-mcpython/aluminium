@@ -139,7 +139,7 @@ public class DerivedModifierTest {
         Battle battle = battleWith(owner -> owner.setAttribute(AttributeType.BREAKING_EFFECT,
                         new DoubleValue(OWNER_BREAK)),
                 rule("BATTLE_START", derived("BREAKING_EFFECT", "BREAKING_EFFECT", 0.5, 0.1, null)));
-        Character owner = battle.characters.getFirst();
+        Character owner = battle.characters().getFirst();
         List<StatModifierBuff> buffs = owner.getBuffManager().allBuffsOf(StatModifierBuff.class);
 
         Assertions.assertEquals(1, buffs.size(), "precondition: one derived modifier");
@@ -362,7 +362,7 @@ public class DerivedModifierTest {
      * is exactly the fact the case is asserting about.
      */
     private static double grantedTo(Battle battle, int index, AttributeType attribute, double bare) {
-        return boostOf(battle.characters.get(index), attribute) - bare;
+        return boostOf(battle.characters().get(index), attribute) - bare;
     }
 
     private static Enemy dummy() {

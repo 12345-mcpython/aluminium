@@ -38,9 +38,9 @@ public class AllyCidSelectorTest {
                 List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        owner = battle.characters.get(0);
-        named = battle.characters.get(1);
-        other = battle.characters.get(2);
+        owner = battle.characters().get(0);
+        named = battle.characters().get(1);
+        other = battle.characters().get(2);
 
         EffectSpec stacks = new EffectSpec();
         TriggerSpecs.set(stacks, "op", "ADD_STACK");

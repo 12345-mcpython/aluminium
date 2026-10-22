@@ -97,10 +97,10 @@ public class TriggerEventWiringTest {
         int actorTurns = 0;
         for (int step = 0; step < 10; step++) {
             battle.stepForward();
-            if (battle.currentMove == null) {
+            if (battle.currentMove() == null) {
                 break;
             }
-            CanHit current = battle.currentMove.getCanHit();
+            CanHit current = battle.currentMove().getCanHit();
             double energyBefore = actor.getCurrentEnergy();
             battle.beforeMove();
             if (current == actor) {
@@ -424,10 +424,10 @@ public class TriggerEventWiringTest {
     private static void reachTurnOf(Battle battle, CanHit unit) {
         for (int step = 0; step < 30; step++) {
             battle.stepForward();
-            if (battle.currentMove == null) {
+            if (battle.currentMove() == null) {
                 break;
             }
-            if (battle.currentMove.getCanHit() == unit) {
+            if (battle.currentMove().getCanHit() == unit) {
                 battle.beforeMove();
                 return;
             }

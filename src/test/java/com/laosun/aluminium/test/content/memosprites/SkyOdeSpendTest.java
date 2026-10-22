@@ -36,8 +36,8 @@ public class SkyOdeSpendTest {
                 List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        hyacine = battle.characters.get(0);
-        ally = battle.characters.get(1);
+        hyacine = battle.characters().get(0);
+        ally = battle.characters().get(1);
 
         // Note:Note: The layers are placed by ANOTHER character rule, NOT by replacing Hyacine own table: the two rules under test live in that table, and
         // `setTriggerTable` would have deleted them. This exact mistake has been made six times in this project; it is why every such test in this project restores the table it borrowed.
@@ -77,7 +77,7 @@ public class SkyOdeSpendTest {
         };
         var skill = who.getSkills().get(type);
         Assertions.assertNotNull(skill, "precondition: slot " + slot + " exists");
-        SkillExecutor.execute(battle, skill, who, List.of(battle.enemies.getFirst()));
+        SkillExecutor.execute(battle, skill, who, List.of(battle.enemies().getFirst()));
         battle.processRequests();
         return who.getBuffManager().stacksOf(MARK);
     }

@@ -40,8 +40,8 @@ public class PearlExtraTurnRewardTest {
     @Test
     public void theExtraTurnPaysThirtyAndSixty() {
         Battle battle = newBattle();
-        Character pearl = battle.characters.getFirst();
-        Character archetype = battle.characters.get(1);
+        Character pearl = battle.characters().getFirst();
+        Character archetype = battle.characters().get(1);
         int partyBefore = battle.partyResource(PUNCHLINE).value();
 
         battle.fireTriggers(TriggerEvent.EXTRA_TURN_STARTED, archetype, archetype, 0, 0);
@@ -61,8 +61,8 @@ public class PearlExtraTurnRewardTest {
     @Test
     public void theRewardIsTakenBackWhenTheTurnEnds() {
         Battle battle = newBattle();
-        Character pearl = battle.characters.getFirst();
-        Character archetype = battle.characters.get(1);
+        Character pearl = battle.characters().getFirst();
+        Character archetype = battle.characters().get(1);
         battle.fireTriggers(TriggerEvent.EXTRA_TURN_STARTED, archetype, archetype, 0, 0);
         battle.processRequests();
         int partyAfterGrant = battle.partyResource(PUNCHLINE).value();
@@ -87,7 +87,7 @@ public class PearlExtraTurnRewardTest {
     @Test
     public void aPartlySpentRewardIsTakenBackUpToWhatIsLeft() {
         Battle battle = newBattle();
-        Character pearl = battle.characters.getFirst();
+        Character pearl = battle.characters().getFirst();
         battle.fireTriggers(TriggerEvent.EXTRA_TURN_STARTED, pearl, pearl, 0, 0);
         battle.processRequests();
         pearl.getResources().spend(COUNTER, 12);                // 30 granted, 12 already used
@@ -107,8 +107,8 @@ public class PearlExtraTurnRewardTest {
     @Test
     public void anAlreadyEmptyRewardIsNotAnError() {
         Battle battle = newBattle();
-        Character pearl = battle.characters.getFirst();
-        Character archetype = battle.characters.get(1);
+        Character pearl = battle.characters().getFirst();
+        Character archetype = battle.characters().get(1);
         battle.fireTriggers(TriggerEvent.EXTRA_TURN_STARTED, archetype, archetype, 0, 0);
         battle.processRequests();
         pearl.getResources().spend(COUNTER, 30);                // all of it gone
@@ -128,8 +128,8 @@ public class PearlExtraTurnRewardTest {
     @Test
     public void aUnitWithoutTheArchetypeMarkIsNotPaid() {
         Battle battle = newBattle();
-        Character pearl = battle.characters.getFirst();
-        Character hunter = battle.characters.get(2);
+        Character pearl = battle.characters().getFirst();
+        Character hunter = battle.characters().get(2);
         battle.fireTriggers(TriggerEvent.EXTRA_TURN_STARTED, hunter, hunter, 0, 0);
         battle.processRequests();
         System.out.println("[pearl_extra_turn] the Hunt ally's extra turn paid " + pearl.getResources().value(COUNTER));
@@ -150,7 +150,7 @@ public class PearlExtraTurnRewardTest {
         battle.processRequests();
         // The archetype mark is normally applied by her ultimate; this case is about the reward, so it is set directly
         // (the same way HolderAttrScaleTest marks a holder).
-        battle.characters.get(1).getBuffManager()
+        battle.characters().get(1).getBuffManager()
                 .addBuff(new com.laosun.aluminium.models.buff.StateBuff("美学底本", 3, false));
         return battle;
     }

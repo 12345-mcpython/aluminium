@@ -114,7 +114,7 @@ public class SkillPointGameParityTest {
     @Test
     public void zeroPointsMeansSkillUnavailable() {
         Battle battle = newBattle(List.of(CharacterFactory.create(1003, 80)));
-        Character hero = battle.characters.getFirst();
+        Character hero = battle.characters().getFirst();
         Enemy target = firstEnemy(battle);
 
         while (battle.spendSkillPoint()) {
@@ -166,7 +166,7 @@ public class SkillPointGameParityTest {
         Assertions.assertEquals("MazeNormal", maze.getData().getSkillType());
 
         int before = battle.getSkillPoints();
-        Assertions.assertTrue(battle.applySkillPointCost(maze, battle.characters.getFirst()));
+        Assertions.assertTrue(battle.applySkillPointCost(maze, battle.characters().getFirst()));
         Assertions.assertEquals(before, battle.getSkillPoints(), "a map basic attack produces no skill point");
     }
 
@@ -229,7 +229,7 @@ public class SkillPointGameParityTest {
                 "premise: in the data the enhanced basic attack is also marked Normal, with no separate type");
 
         int before = battle.getSkillPoints();
-        Assertions.assertTrue(battle.applySkillPointCost(enhancedLikeBasic, battle.characters.getFirst()));
+        Assertions.assertTrue(battle.applySkillPointCost(enhancedLikeBasic, battle.characters().getFirst()));
         Assertions.assertEquals(before + 1, battle.getSkillPoints(),
                 "the row states bp_add 1, so an ordinary basic attack restores one point");
     }
@@ -268,7 +268,7 @@ public class SkillPointGameParityTest {
         Assertions.assertEquals(com.laosun.aluminium.enums.Camp.ENEMY, enemy.getCamp(),
                 "the enemy is ENEMY → kept outside the gate");
         Assertions.assertEquals(com.laosun.aluminium.enums.Camp.PLAYER,
-                battle.characters.getFirst().getCamp(), "the character is PLAYER → let through");
+                battle.characters().getFirst().getCamp(), "the character is PLAYER → let through");
     }
 
     // ==================================================================
@@ -285,7 +285,7 @@ public class SkillPointGameParityTest {
     @Test
     public void stunnedActorNeitherActsNorSpendsPoints() {
         Battle battle = newBattle(List.of(CharacterFactory.create(1003, 80)));
-        Character hero = battle.characters.getFirst();
+        Character hero = battle.characters().getFirst();
         hero.getBuffManager().addBuff(new StunBuff(2));
 
         int before = battle.getSkillPoints();
@@ -339,10 +339,10 @@ public class SkillPointGameParityTest {
                                                List<? extends CanHit> targets) {
         for (int i = 0; i < 30; i++) {
             battle.stepForward();
-            if (battle.currentMove == null) {
+            if (battle.currentMove() == null) {
                 break;
             }
-            if (battle.currentMove.getCanHit() == actor) {
+            if (battle.currentMove().getCanHit() == actor) {
                 battle.beforeMove();
                 return battle.performAction(skill.get(), targets);
             }

@@ -162,11 +162,11 @@ public class HanyaKitTest {
     }
 
     private static double remainingWait(Fixture f, Character unit) {
-        Signal signal = f.battle.queue.snapshot().stream()
+        Signal signal = f.battle.queue().snapshot().stream()
                 .filter(s -> s.getCanHit() == unit)
                 .findFirst()
                 .orElseThrow(() -> new AssertionError("no signal"));
-        return f.battle.queue.getTimeRemaining(signal);
+        return f.battle.queue().getTimeRemaining(signal);
     }
 
     private static Random fixed() {

@@ -63,26 +63,26 @@ public class LifeOdeRaisesTheDragonTalentTest {
         Battle battle = new Battle(List.of(her, cyrene), pack, BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        her = battle.characters.getFirst();
+        her = battle.characters().getFirst();
         if (castTheOde) {
-            var sprite = battle.summonServant(battle.characters.get(1));
+            var sprite = battle.summonServant(battle.characters().get(1));
             battle.processRequests();
             var ode = sprite.skillAt(ODE_SLOT);
             Assertions.assertNotNull(ode, "precondition: slot 17");
             com.laosun.aluminium.models.skill.SkillExecutor.execute(battle, ode, sprite, List.of(her));
             battle.processRequests();
-            her = battle.characters.getFirst();
+            her = battle.characters().getFirst();
         }
         battle.partyResource(BUD).gain(CAP + OVERFLOW + 1000);
         battle.processRequests();
         double before = 0;
-        for (var e : battle.enemies) {
+        for (var e : battle.enemies()) {
             before += e.getCurrentHp();
         }
         battle.summonMemosprite(her);
         battle.processRequests();
         double after = 0;
-        for (var e : battle.enemies) {
+        for (var e : battle.enemies()) {
             after += e.getCurrentHp();
         }
         return before - after;

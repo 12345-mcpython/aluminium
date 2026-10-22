@@ -302,7 +302,7 @@ public class March7thKitTest {
         Assertions.assertEquals(expected, march.getShield(), EPS,
                 "the first unit in the party order takes it, because everybody is at 100% at battle start");
         Assertions.assertEquals(0, ally.getShield(), EPS, "and only one unit is the lowest");
-        Assertions.assertEquals(MARCH, ((Character) battle.allies.getFirst()).getCid(),
+        Assertions.assertEquals(MARCH, ((Character) battle.allies().getFirst()).getCid(),
                 "precondition: she is first in the party order");
     }
 

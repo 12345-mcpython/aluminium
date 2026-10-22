@@ -35,8 +35,8 @@ public class SummonedClearsControlTest {
                 List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        cyrene = battle.characters.get(0);
-        Character finalAlly = battle.characters.get(1);
+        cyrene = battle.characters().get(0);
+        Character finalAlly = battle.characters().get(1);
 
         EffectSpec control = new EffectSpec();
         TriggerSpecs.set(control, "op", "APPLY_CONTROL");

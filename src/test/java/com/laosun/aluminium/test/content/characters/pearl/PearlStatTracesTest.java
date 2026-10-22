@@ -52,7 +52,7 @@ public class PearlStatTracesTest {
                 List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        Character her = battle.characters.getFirst();
+        Character her = battle.characters().getFirst();
 
         double effectRes = her.getAttribute(AttributeType.EFFECT_RESISTANCE).get();
         double elation = her.getAttribute(AttributeType.ELATION_DAMAGE_BOOST).get();
@@ -127,7 +127,7 @@ public class PearlStatTracesTest {
                 BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        return battle.characters.getFirst().getAttribute(AttributeType.SPEED).get();
+        return battle.characters().getFirst().getAttribute(AttributeType.SPEED).get();
     }
 
     /**
@@ -151,6 +151,6 @@ public class PearlStatTracesTest {
                 BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        return battle.characters.getFirst().getAttribute(attribute).get();
+        return battle.characters().getFirst().getAttribute(attribute).get();
     }
 }

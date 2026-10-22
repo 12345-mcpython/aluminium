@@ -32,7 +32,7 @@ public class SkyOdeEnergyTest {
                 List.of(BattleFixture.monster()), BattleFixture.seeded());
         probe.startBattle();
         probe.processRequests();
-        var demiurge = probe.summonServant(probe.characters.get(0));
+        var demiurge = probe.summonServant(probe.characters().get(0));
         var ode = demiurge.skillAt(19);
         Assertions.assertNotNull(ode, "precondition: the memosprite carries slot 19");
         // Note: Energy is granted as a WHOLE number -- `gainEnergyFor` rounds the derived amount -- so the expectation is the rounded row value, not the row value.
@@ -53,8 +53,8 @@ public class SkyOdeEnergyTest {
                 List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        cyrene = battle.characters.get(0);
-        hyacine = battle.characters.get(1);
+        cyrene = battle.characters().get(0);
+        hyacine = battle.characters().get(1);
 
         hyacine.setCurrentEnergy(0);
         if (castTheOde) {

@@ -67,13 +67,13 @@ public class ExtendAllBuffsTest {
 
         Skill theirs = first.getSkills().get(SkillType.SKILL);
         Assertions.assertNotNull(theirs, "precondition: unit A (甲) has a skill");
-        SkillExecutor.execute(battle, theirs, first, List.of(battle.enemies.getFirst()));
+        SkillExecutor.execute(battle, theirs, first, List.of(battle.enemies().getFirst()));
         battle.processRequests();
         Assertions.assertTrue(second.getBuffManager().hasState(MARK), "precondition: unit B (乙) carries unit A's (甲’s) buff");
 
         Skill hers = second.getSkills().get(SkillType.SKILL);
         Assertions.assertNotNull(hers, "precondition: unit B (乙) has a skill");
-        SkillExecutor.execute(battle, hers, second, List.of(battle.enemies.getFirst()));
+        SkillExecutor.execute(battle, hers, second, List.of(battle.enemies().getFirst()));
         battle.processRequests();
 
         // Note: The decrement site, measured in round 1619: `BuffManager.beforeMove()` -> `processBuffTick`.

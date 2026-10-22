@@ -71,8 +71,8 @@ public class BossMechanicTest {
         Battle countered = newBattle(true);
 
         Assertions.assertTrue(heroHp(countered) < heroHp(control), "the counter really landed");
-        Assertions.assertEquals(control.characters.getFirst().getCurrentEnergy(),
-                countered.characters.getFirst().getCurrentEnergy(), 1e-9,
+        Assertions.assertEquals(control.characters().getFirst().getCurrentEnergy(),
+                countered.characters().getFirst().getCurrentEnergy(), 1e-9,
                 "additional damage grants the victim no energy, so the counter must not have credited any");
     }
 
@@ -89,7 +89,7 @@ public class BossMechanicTest {
     @Test
     public void aMutualPairOfCountersResolves() {
         Battle battle = newBattle(true);
-        Character hero = battle.characters.getFirst();
+        Character hero = battle.characters().getFirst();
         hero.getBuffManager().addBuff(new CounterMechanic(DURATION, DamageElement.PHYSICAL, RATIO));
 
         Assertions.assertDoesNotThrow(() -> attack(battle),
@@ -195,15 +195,15 @@ public class BossMechanicTest {
      * The hero's basic attack on the enemy.
      */
     private static void attack(Battle battle) {
-        battle.castImmediate(battle.characters.getFirst().getSkills().get(SkillType.COMMON),
-                battle.characters.getFirst(), List.of(battle.enemyUnits().getFirst()));
+        battle.castImmediate(battle.characters().getFirst().getSkills().get(SkillType.COMMON),
+                battle.characters().getFirst(), List.of(battle.enemyUnits().getFirst()));
     }
 
     private static double heroHp(Battle battle) {
-        return battle.characters.getFirst().getCurrentHp();
+        return battle.characters().getFirst().getCurrentHp();
     }
 
     private static double heroMaxHp(Battle battle) {
-        return battle.characters.getFirst().getMaxHp();
+        return battle.characters().getFirst().getMaxHp();
     }
 }

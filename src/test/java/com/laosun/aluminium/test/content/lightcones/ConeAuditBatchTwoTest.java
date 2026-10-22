@@ -75,10 +75,10 @@ public class ConeAuditBatchTwoTest {
         Fixture f = new Fixture(20008, true);
         Fixture bare = new Fixture(null, true);
         System.out.println("[20008] 有锥时的能量: " + f.wearer.getCurrentEnergy() + " ; 无锥: " + bare.wearer.getCurrentEnergy());
-        for (int i = 0; i < f.battle.characters.size(); i++) {
-            double gained = f.battle.characters.get(i).getCurrentEnergy()
-                    - bare.battle.characters.get(i).getCurrentEnergy();
-            System.out.println("[20008] " + f.battle.characters.get(i).getName() + " 能量增量 " + gained);
+        for (int i = 0; i < f.battle.characters().size(); i++) {
+            double gained = f.battle.characters().get(i).getCurrentEnergy()
+                    - bare.battle.characters().get(i).getCurrentEnergy();
+            System.out.println("[20008] " + f.battle.characters().get(i).getName() + " 能量增量 " + gained);
             Assertions.assertEquals(6.0, gained, 1e-9, "「我方全体」—— 每人 6 点（叠影 1）");
         }
     }
@@ -141,7 +141,7 @@ public class ConeAuditBatchTwoTest {
         Fixture f = new Fixture(20007, true);
         double before = attack(f.wearer);
         Enemy victim = f.battle.enemyUnits().getFirst();
-        Character killer = wearerKills ? f.wearer : f.battle.characters.get(1);
+        Character killer = wearerKills ? f.wearer : f.battle.characters().get(1);
         f.battle.applyDamage(victim, new Damage(killer, victim, DamageElement.PHYSICAL, DamageType.NORMAL, 1e9));
         f.battle.processRequests();
         return attack(f.wearer) - before;

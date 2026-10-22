@@ -48,12 +48,12 @@ public class HuohuoTalismanLosesATurnTest {
         // Her skill is what puts [禳命] on her -- and it is aimed at the ENEMY, exactly as the shipped judge drives it.
         Skill skill = her.getSkills().get(SkillType.SKILL);
         Assertions.assertNotNull(skill, "precondition: she has a skill");
-        SkillExecutor.execute(battle, skill, her, List.of(battle.enemies.getFirst()));
+        SkillExecutor.execute(battle, skill, her, List.of(battle.enemies().getFirst()));
         battle.processRequests();
         Assertions.assertTrue(her.getBuffManager().hasState(STATE), "precondition: 【禳命】 (Divine Provision) is on her");
         int before = her.getBuffManager().findBuff(StateBuff.class).duration();
 
-        battle.applyTrueDamage(battle.enemies.getFirst(), ally, DamageElement.ICE, ally.getCurrentHp() * 2.0);
+        battle.applyTrueDamage(battle.enemies().getFirst(), ally, DamageElement.ICE, ally.getCurrentHp() * 2.0);
         battle.processRequests();
 
         int after = her.getBuffManager().findBuff(StateBuff.class).duration();

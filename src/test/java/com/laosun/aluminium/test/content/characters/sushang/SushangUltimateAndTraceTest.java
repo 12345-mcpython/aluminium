@@ -148,9 +148,9 @@ public class SushangUltimateAndTraceTest {
 
         /** A unit's remaining wait, read off the action bar's own snapshot (the battle clock does not move). */
         private double remainingWaitOf(com.laosun.aluminium.models.CanHit unit) {
-            for (var signal : battle.queue.snapshot()) {
+            for (var signal : battle.queue().snapshot()) {
                 if (signal.getCanHit() == unit) {
-                    return battle.queue.getTimeRemaining(signal);
+                    return battle.queue().getTimeRemaining(signal);
                 }
             }
             throw new AssertionError(unit.getName() + " is not on the action bar");

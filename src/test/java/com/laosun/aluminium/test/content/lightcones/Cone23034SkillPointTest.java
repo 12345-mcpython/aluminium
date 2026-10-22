@@ -38,14 +38,14 @@ public class Cone23034SkillPointTest {
         Battle battle = new Battle(List.of(wearer, ally), List.of(EnemyFactory.create(1002011, 100, 1)), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        wearer = battle.characters.getFirst();
-        ally = battle.characters.get(1);
+        wearer = battle.characters().getFirst();
+        ally = battle.characters().get(1);
         for (int i = 0; i < casts; i++) {
             wearer.setCurrentEnergy(200);
             Assertions.assertTrue(battle.castUltra(wearer, List.of(ally)), "precondition: the ultimate lands on the ally");
             battle.processRequests();
-            wearer = battle.characters.getFirst();
-            ally = battle.characters.get(1);
+            wearer = battle.characters().getFirst();
+            ally = battle.characters().get(1);
         }
         return battle.getSkillPoints();
     }

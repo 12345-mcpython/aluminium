@@ -73,7 +73,7 @@ public class HyacineIkachisCharityTest {
             battle.processRequests();
             if (summon) {
                 SkillExecutor.execute(battle, hyacine.getSkills().get(SkillType.SKILL), hyacine,
-                        List.of(battle.enemies.getFirst()));
+                        List.of(battle.enemies().getFirst()));
                 battle.processRequests();
             }
             this.ika = (Summon) battle.memospriteOf(hyacine);
@@ -83,7 +83,7 @@ public class HyacineIkachisCharityTest {
         }
 
         void hitOnce() {
-            battle.applyDamage(wounded, new Damage(battle.enemies.getFirst(), wounded, DamageElement.PHYSICAL,
+            battle.applyDamage(wounded, new Damage(battle.enemies().getFirst(), wounded, DamageElement.PHYSICAL,
                     DamageType.NORMAL, wounded.getMaxHp() * 0.2));
             battle.processRequests();
             this.woundedAfter = wounded.getCurrentHp();

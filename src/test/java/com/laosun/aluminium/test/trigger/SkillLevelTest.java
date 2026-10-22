@@ -258,7 +258,7 @@ public class SkillLevelTest {
             original.setTriggerTable(new TriggerTable(HIMEKO, rules));
             battle = new Battle(List.of(original), List.of(enemy), fixed());
             battle.startBattle();
-            hero = (Character) battle.allies.stream()
+            hero = (Character) battle.allies().stream()
                     .filter(unit -> unit instanceof Character)
                     .findFirst()
                     .orElseThrow(() -> new IllegalStateException("the battle has no character of ours"));

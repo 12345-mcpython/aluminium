@@ -115,7 +115,7 @@ public class SettledDamageTotalTest {
                 new Random(SEED));
         battle.startBattle();
         battle.processRequests();
-        Character wolf = battle.characters.getFirst();
+        Character wolf = battle.characters().getFirst();
         wolf.setTriggerTable(new TriggerTable(WOLF, specs));
         var enemies = battle.enemyUnits();
         double[] losses = new double[firings];

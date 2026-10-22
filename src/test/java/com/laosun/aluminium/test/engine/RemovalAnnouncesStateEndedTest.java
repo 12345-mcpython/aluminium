@@ -33,7 +33,7 @@ public class RemovalAnnouncesStateEndedTest {
     @Test
     public void anExplicitRemovalAnnounces() {
         Battle battle = elation();
-        Character owner = (Character) battle.allies.get(0);
+        Character owner = (Character) battle.allies().get(0);
         Assertions.assertTrue(owner.getBuffManager().hasState(MOMENT), "precondition: the moment is on");
         // Note: Measured: 1513's reader grants [好活当赏] as a STATE (APPLY_BUFF), not as a resource -- the first draft of
         // this judge asserted a resource and read 0 -> 0 while the engine was in fact working.
@@ -58,7 +58,7 @@ public class RemovalAnnouncesStateEndedTest {
         battle.processRequests();
         Skill skill = owner.getSkills().get(SkillType.ELATION_SKILL);
         Assertions.assertNotNull(skill, "precondition: she has an elation skill");
-        SkillExecutor.execute(battle, skill, owner, List.of(battle.enemies.get(0)));
+        SkillExecutor.execute(battle, skill, owner, List.of(battle.enemies().get(0)));
         battle.processRequests();
         return battle;
     }

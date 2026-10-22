@@ -101,7 +101,7 @@ public class HyacineWindstormTraceTest {
         double before = hyacine.getAttribute(AttributeType.HEALTH).get();
 
         SkillExecutor.execute(battle, hyacine.getSkills().get(SkillType.ULTRA), hyacine,
-                List.of(battle.enemies.getFirst()));
+                List.of(battle.enemies().getFirst()));
         battle.processRequests();
 
         Assertions.assertEquals(base * 0.30 + 600.0, hyacine.getAttribute(AttributeType.HEALTH).get() - before,

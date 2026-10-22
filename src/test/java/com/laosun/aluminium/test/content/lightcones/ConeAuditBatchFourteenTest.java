@@ -37,9 +37,9 @@ public class ConeAuditBatchFourteenTest {
         Fixture f = new Fixture(21056, true, WEARER);
         Fixture bare = new Fixture(null, true, WEARER);
         for (int i = 0; i < 2; i++) {
-            double delta = f.battle.characters.get(i).getAttribute(AttributeType.BREAK_DAMAGE_BOOST).get()
-                    - bare.battle.characters.get(i).getAttribute(AttributeType.BREAK_DAMAGE_BOOST).get();
-            System.out.println("[21056] " + f.battle.characters.get(i).getName() + " 击破伤害增量 " + delta);
+            double delta = f.battle.characters().get(i).getAttribute(AttributeType.BREAK_DAMAGE_BOOST).get()
+                    - bare.battle.characters().get(i).getAttribute(AttributeType.BREAK_DAMAGE_BOOST).get();
+            System.out.println("[21056] " + f.battle.characters().get(i).getName() + " 击破伤害增量 " + delta);
             Assertions.assertEquals(0.16, delta, 1e-9, "「我方全体造成的击破伤害提高 16%」");
         }
     }

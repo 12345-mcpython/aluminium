@@ -75,7 +75,7 @@ public class ControlImmunityTest {
         // BATTLE_START is simply there when the transformation begins, and immunity cannot retroactively remove it.
         Skill theirs = applier.getSkills().get(SkillType.SKILL);
         Assertions.assertNotNull(theirs, "precondition: the applier has a skill");
-        SkillExecutor.execute(battle, theirs, applier, List.of(battle.enemies.getFirst()));
+        SkillExecutor.execute(battle, theirs, applier, List.of(battle.enemies().getFirst()));
         battle.processRequests();
         return owner.getBuffManager().hasState(FREEZE);
     }

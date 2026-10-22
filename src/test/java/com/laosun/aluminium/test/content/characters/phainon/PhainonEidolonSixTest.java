@@ -102,7 +102,7 @@ public class PhainonEidolonSixTest {
         // Note: ONE enemy. With several, a `BOUNCE` re-draws its target from an unseeded `Random` (`alwaysRoll` pins only
         // `nextDouble`), so which victim takes how much varies between runs - and with a single target it cannot.
         Battle battle = newBattle(eidolonRank, 1);
-        Character phainon = battle.characters.getFirst();
+        Character phainon = battle.characters().getFirst();
         List<Damage> settled = new ArrayList<>();
         battle.addDamageObserver((damage, applied, hpLoss, shieldAbsorbed, died) -> settled.add(damage));
         Skill skill = slot == BASIC_ATTACK_SLOT
@@ -132,11 +132,11 @@ public class PhainonEidolonSixTest {
     }
 
     private static int coreflameAtBattleStart(int eidolonRank) {
-        return newBattle(eidolonRank, 1).characters.getFirst().getResources().value(COREFLAME);
+        return newBattle(eidolonRank, 1).characters().getFirst().getResources().value(COREFLAME);
     }
 
     private static int coreflameAfterGaining(int eidolonRank, int amount) {
-        Character phainon = newBattle(eidolonRank, 1).characters.getFirst();
+        Character phainon = newBattle(eidolonRank, 1).characters().getFirst();
         phainon.getResources().gain(COREFLAME, amount);
         return phainon.getResources().value(COREFLAME);
     }

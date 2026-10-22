@@ -41,7 +41,7 @@ public class WarmthShortensColdNightsTest {
         Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(wearer, ally), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
-        battle.currentMove = new Signal(wearer);
+        battle.setCurrentMove(new Signal(wearer));
         battle.beforeMove();
         ally.takeDamage(ally.getMaxHp() * 0.3);
         double allyBefore = ally.getCurrentHp();

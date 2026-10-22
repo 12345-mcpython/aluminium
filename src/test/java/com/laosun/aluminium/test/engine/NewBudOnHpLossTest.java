@@ -42,7 +42,7 @@ public class NewBudOnHpLossTest {
                 "the new bud must be reachable as a party resource");
         double before = battle.partyResource(RES).value();
 
-        double dealt = battle.applyTrueDamage(battle.enemies.get(0), owner, DamageElement.ICE, 50.0);
+        double dealt = battle.applyTrueDamage(battle.enemies().get(0), owner, DamageElement.ICE, 50.0);
         battle.processRequests();
         Assertions.assertEquals(50.0, dealt, "precondition: the battle really took 50 HP off her");
 

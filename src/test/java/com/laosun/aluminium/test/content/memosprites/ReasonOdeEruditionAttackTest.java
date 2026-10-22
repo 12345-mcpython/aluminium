@@ -70,22 +70,22 @@ public class ReasonOdeEruditionAttackTest {
         battle.startBattle();
         battle.processRequests();
         if (castTheOde) {
-            var sprite = battle.summonServant(battle.characters.get(0));
+            var sprite = battle.summonServant(battle.characters().get(0));
             battle.processRequests();
             var ode = sprite.skillAt(ODE_SLOT);
             Assertions.assertNotNull(ode, "precondition: slot 18");
             com.laosun.aluminium.models.skill.SkillExecutor.execute(battle, ode, sprite,
-                    List.of(battle.characters.get(1)));
+                    List.of(battle.characters().get(1)));
             battle.processRequests();
         }
         double[] out = new double[4];
         BASE.set(new double[]{
-                battle.characters.get(0).getAttribute(AttributeType.ATTACK).baseValue(),
-                battle.characters.get(1).getAttribute(AttributeType.ATTACK).baseValue(),
-                battle.characters.get(2).getAttribute(AttributeType.ATTACK).baseValue(),
-                battle.characters.get(3).getAttribute(AttributeType.ATTACK).baseValue()});
+                battle.characters().get(0).getAttribute(AttributeType.ATTACK).baseValue(),
+                battle.characters().get(1).getAttribute(AttributeType.ATTACK).baseValue(),
+                battle.characters().get(2).getAttribute(AttributeType.ATTACK).baseValue(),
+                battle.characters().get(3).getAttribute(AttributeType.ATTACK).baseValue()});
         for (int i = 0; i < 4; i++) {
-            out[i] = battle.characters.get(i).getAttribute(AttributeType.ATTACK).get();
+            out[i] = battle.characters().get(i).getAttribute(AttributeType.ATTACK).get();
         }
         return out;
     }

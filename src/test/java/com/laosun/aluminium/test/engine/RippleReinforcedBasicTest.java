@@ -22,12 +22,12 @@ public class RippleReinforcedBasicTest {
         Battle battle = new Battle(List.of(cyrene), List.of(EnemyFactory.create(1002011, 100, 1)), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        cyrene = battle.characters.getFirst();
+        cyrene = battle.characters().getFirst();
         int before = cyrene.getSkills().get(SkillType.COMMON).getSkillSlot();
         com.laosun.aluminium.models.skill.SkillExecutor.execute(battle, cyrene.getSkills().get(SkillType.ULTRA),
-                cyrene, List.of(battle.enemies.getFirst()));
+                cyrene, List.of(battle.enemies().getFirst()));
         battle.processRequests();
-        int after = battle.characters.getFirst().getSkills().get(SkillType.COMMON).getSkillSlot();
+        int after = battle.characters().getFirst().getSkills().get(SkillType.COMMON).getSkillSlot();
         System.out.println("[reinforced] her basic slot went " + before + " -> " + after);
         Assertions.assertEquals(1, before, "the ordinary basic is data slot 1");
         Assertions.assertEquals(8, after, "and the ripple replaces it with 141508, data slot 8");
@@ -51,26 +51,26 @@ public class RippleReinforcedBasicTest {
         Battle battle = new Battle(List.of(her), List.of(EnemyFactory.create(1002011, 100, 1)), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        her = battle.characters.getFirst();
-        battle.currentMove = new Signal(her);
-        Assertions.assertTrue(battle.useSkill(her.getSkills().get(SkillType.SKILL), List.of(battle.enemies.getFirst())),
+        her = battle.characters().getFirst();
+        battle.setCurrentMove(new Signal(her));
+        Assertions.assertTrue(battle.useSkill(her.getSkills().get(SkillType.SKILL), List.of(battle.enemies().getFirst())),
                 "precondition: her Skill is affordable");
         battle.processRequests();
-        her = battle.characters.getFirst();
+        her = battle.characters().getFirst();
         if (insideTheRipple) {
-            battle.currentMove = new Signal(her);
+            battle.setCurrentMove(new Signal(her));
             // ⚠ `castUltra`, not `useSkill`: an ultimate is cast through its own entry, and the engine now refuses
             // an ultimate that reaches `useSkill` with a bar that is not full -- which this case used to get away
             // with, because nothing charged for it before. The subject here is skill points ("the ultimate spends
             // nothing"), so the ultimate still has to be a real, affordable cast or the case means nothing.
             her.gainEnergy(her.getMaxEnergy());
-            Assertions.assertTrue(battle.castUltra(her, List.of(battle.enemies.getFirst())),
+            Assertions.assertTrue(battle.castUltra(her, List.of(battle.enemies().getFirst())),
                     "precondition: her ultimate is affordable");
             battle.processRequests();
-            her = battle.characters.getFirst();
+            her = battle.characters().getFirst();
         }
-        battle.currentMove = new Signal(her);
-        battle.useSkill(her.getSkills().get(SkillType.COMMON), List.of(battle.enemies.getFirst()));
+        battle.setCurrentMove(new Signal(her));
+        battle.useSkill(her.getSkills().get(SkillType.COMMON), List.of(battle.enemies().getFirst()));
         battle.processRequests();
         return battle.getSkillPoints();
     }

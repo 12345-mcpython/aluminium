@@ -67,7 +67,7 @@ public class AmberTest {
             }
         }
         double before = unit.getAttribute(AttributeType.DEFENCE).get();
-        battle.currentMove = new Signal(unit);
+        battle.setCurrentMove(new Signal(unit));
         battle.beforeMove();
         return new double[]{unit.getAttribute(AttributeType.DEFENCE).get() - before,
                 unit.getAttribute(AttributeType.DEFENCE).baseValue(), unit.getCurrentHp() / unit.getMaxHp()};

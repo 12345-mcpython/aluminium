@@ -68,7 +68,7 @@ public class SkillTargetCoreflameTest {
         if (aimAtHer) {
             SkillExecutor.execute(battle, skill, support, List.of(owner));
         } else {
-            SkillExecutor.execute(battle, skill, support, List.of(battle.enemies.get(0)));
+            SkillExecutor.execute(battle, skill, support, List.of(battle.enemies().get(0)));
         }
         battle.processRequests();
 

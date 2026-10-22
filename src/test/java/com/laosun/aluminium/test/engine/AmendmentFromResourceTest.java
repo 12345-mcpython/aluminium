@@ -62,7 +62,7 @@ public class AmendmentFromResourceTest {
                 List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        spare = battle.characters.getFirst();
+        spare = battle.characters().getFirst();
         spare.getResources().register(SIZED_BY, 99999, 0);
         spare.getResources().gain(SIZED_BY, basisPoints);
         spare.setTriggerTable(table());
@@ -71,6 +71,6 @@ public class AmendmentFromResourceTest {
         double before = spare.getAttribute(AttributeType.ATTACK).get();
         battle.fireTriggers(TriggerEvent.TURN_START, spare, null, 0, 0);
         battle.processRequests();
-        return battle.characters.getFirst().getAttribute(AttributeType.ATTACK).get() - before;
+        return battle.characters().getFirst().getAttribute(AttributeType.ATTACK).get() - before;
     }
 }

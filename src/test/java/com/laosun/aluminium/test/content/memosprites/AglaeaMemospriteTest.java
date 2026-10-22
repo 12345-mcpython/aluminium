@@ -61,7 +61,7 @@ public class AglaeaMemospriteTest {
     @Test
     public void herSkillHealsTheMemospriteThatIsAlreadyOut() {
         Battle battle = battle();
-        Character aglaea = battle.characters.getFirst();
+        Character aglaea = battle.characters().getFirst();
         battle.startBattle();
         Summon tailor = battle.summonMemosprite(aglaea);
         battle.processRequests();
@@ -81,7 +81,7 @@ public class AglaeaMemospriteTest {
     @Test
     public void herSkillSummonsAndAdvancesHerWhenItIsNotOut() {
         Battle battle = battle();
-        Character aglaea = battle.characters.getFirst();
+        Character aglaea = battle.characters().getFirst();
         battle.startBattle();
         Assertions.assertEquals(0, battle.summonCountOf(aglaea), "precondition: nothing is out");
 
@@ -126,7 +126,7 @@ public class AglaeaMemospriteTest {
     @Test
     public void herUltimateBringsItOutAndAdvancesHer() {
         Battle battle = battle();
-        Character aglaea = battle.characters.getFirst();
+        Character aglaea = battle.characters().getFirst();
         battle.startBattle();
 
         battle.fireTriggers(TriggerEvent.ULT_CAST, aglaea, null, 0, 0);
@@ -145,7 +145,7 @@ public class AglaeaMemospriteTest {
     @Test
     public void herUltimateTopsUpTheOneAlreadyOut() {
         Battle battle = battle();
-        Character aglaea = battle.characters.getFirst();
+        Character aglaea = battle.characters().getFirst();
         battle.startBattle();
         Summon tailor = battle.summonMemosprite(aglaea);
         battle.processRequests();
@@ -192,7 +192,7 @@ public class AglaeaMemospriteTest {
         Assertions.assertEquals("summon", heal.getTarget());
 
         Battle empty = battle();
-        Character alone = empty.characters.getFirst();
+        Character alone = empty.characters().getFirst();
         empty.startBattle();
         List<TriggerTable.CompiledRule> absent = TriggerTables.of(AGLAEA).matching(TriggerEvent.SKILL_CAST,
                 new TriggerTable.TriggerContext(alone, alone, null, 0, 0, null, empty));
@@ -269,9 +269,9 @@ public class AglaeaMemospriteTest {
      * How much action value the unit still has - zero means "acts now".
      */
     private static double timeRemaining(Battle battle, CanHit target) {
-        for (Signal signal : battle.queue.snapshot()) {
+        for (Signal signal : battle.queue().snapshot()) {
             if (signal.getCanHit() == target) {
-                return battle.queue.getTimeRemaining(signal);
+                return battle.queue().getTimeRemaining(signal);
             }
         }
         return Double.NaN;

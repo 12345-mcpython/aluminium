@@ -490,7 +490,7 @@ public class SummonConditionTest {
     private static TriggerTable.Condition compiledCondition(Battle battle, String text, CanHit subject) {
         TriggerTable table = new TriggerTable(OWNER, List.of(rule("SUMMON_ATTACK", List.of(text))));
         List<TriggerTable.CompiledRule> hits = table.matching(TriggerEvent.SUMMON_ATTACK,
-                new TriggerTable.TriggerContext(battle.characters.getFirst(), subject, null, 0, 0, null, battle));
+                new TriggerTable.TriggerContext(battle.characters().getFirst(), subject, null, 0, 0, null, battle));
         Assertions.assertEquals(1, hits.size(), "'" + text + "' was expected to match this subject");
         return hits.getFirst().conditions().getFirst();
     }
@@ -524,7 +524,7 @@ public class SummonConditionTest {
             if (battle.isOver()) {
                 break;
             }
-            Signal current = battle.queue.getCurrentActor();
+            Signal current = battle.queue().getCurrentActor();
             battle.beforeMove();
             if (current != null && current.getCanHit() == actor) {
                 return;                                  // its turn has started; the buff is up
@@ -547,7 +547,7 @@ public class SummonConditionTest {
             if (battle.isOver()) {
                 break;
             }
-            Signal current = battle.queue.getCurrentActor();
+            Signal current = battle.queue().getCurrentActor();
             battle.beforeMove();
             if (current != null && current.getCanHit() == summon) {
                 Assertions.assertTrue(battle.performAction(summon.getSkills().get(SkillType.COMMON), targets),

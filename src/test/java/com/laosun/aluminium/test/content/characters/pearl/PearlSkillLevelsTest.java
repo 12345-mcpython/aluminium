@@ -51,7 +51,7 @@ public class PearlSkillLevelsTest {
                 List.of(EnemyFactory.create(1002011, 100, 1)), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        Character pearl = battle.characters.get(0);
+        Character pearl = battle.characters().get(0);
         return new int[]{
                 pearl.skillLevel(pearl.getSkills().get(SkillType.ULTRA)),
                 pearl.skillLevel(pearl.getSkills().get(SkillType.COMMON)),

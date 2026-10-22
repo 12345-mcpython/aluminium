@@ -36,13 +36,13 @@ public class EarthOdeMarksDanHengTest {
                 List.of(EnemyFactory.create(MONSTER, 100, 1)), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        var sprite = battle.summonServant(battle.characters.get(0));
+        var sprite = battle.summonServant(battle.characters().get(0));
         battle.processRequests();
         var ode = sprite.skillAt(ODE_SLOT);
         Assertions.assertNotNull(ode, "precondition: slot 25");
-        Character aimed = battle.characters.get(aimedAtHim ? 1 : 0);
+        Character aimed = battle.characters().get(aimedAtHim ? 1 : 0);
         com.laosun.aluminium.models.skill.SkillExecutor.execute(battle, ode, sprite, List.of(aimed));
         battle.processRequests();
-        return battle.characters.get(1).getBuffManager().hasState(STATE) ? 1 : 0;
+        return battle.characters().get(1).getBuffManager().hasState(STATE) ? 1 : 0;
     }
 }

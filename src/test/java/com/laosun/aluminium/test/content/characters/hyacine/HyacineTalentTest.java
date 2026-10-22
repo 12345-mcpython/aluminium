@@ -61,7 +61,7 @@ public class HyacineTalentTest {
         }
         List<Damage> settled = new ArrayList<>();
         battle.addDamageObserver((damage, applied, hpLoss, shieldAbsorbed, died) -> settled.add(damage));
-        SkillExecutor.execute(battle, ika.skillAt(1), ika, List.of(battle.enemies.get(0)));
+        SkillExecutor.execute(battle, ika.skillAt(1), ika, List.of(battle.enemies().get(0)));
         battle.processRequests();
         Assertions.assertFalse(settled.isEmpty(), "precondition: 小伊卡's hit settled");
         // ⚠ 2026-10-18: 忆灵技1 的「按累计治疗出伤害」现在是 CAST_SETUP 上的一条**规则**，它在数据那一发**之前**结算

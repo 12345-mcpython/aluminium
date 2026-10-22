@@ -51,7 +51,7 @@ public class ShieldBoostTest {
     @Test
     public void theProvidersBoostMultipliesTheShield() {
         Battle battle = fixture();
-        Character giver = battle.characters.getFirst();
+        Character giver = battle.characters().getFirst();
         giver.setAttribute(AttributeType.SHIELD_BOOST, new DoubleValue(0.2));
 
         double installed = battle.grantShield(giver, giver, 100);
@@ -70,8 +70,8 @@ public class ShieldBoostTest {
     @Test
     public void aBoostOnTheReceiverChangesNothing() {
         Battle battle = fixture();
-        Character giver = battle.characters.getFirst();
-        Character shielded = battle.characters.getLast();
+        Character giver = battle.characters().getFirst();
+        Character shielded = battle.characters().getLast();
         shielded.setAttribute(AttributeType.SHIELD_BOOST, new DoubleValue(0.5));
 
         double installed = battle.grantShield(giver, shielded, 100);
@@ -86,7 +86,7 @@ public class ShieldBoostTest {
     @Test
     public void anUnknownProviderAppliesNoBoost() {
         Battle battle = fixture();
-        Character shielded = battle.characters.getFirst();
+        Character shielded = battle.characters().getFirst();
         shielded.setAttribute(AttributeType.SHIELD_BOOST, new DoubleValue(0.5));
 
         Assertions.assertEquals(100, battle.grantShield(shielded, 100), EPS,
@@ -108,7 +108,7 @@ public class ShieldBoostTest {
     @Test
     public void twoBoostsOnTheSameProviderAdd() {
         Battle battle = fixture();
-        Character giver = battle.characters.getFirst();
+        Character giver = battle.characters().getFirst();
         giver.getAttribute(AttributeType.SHIELD_BOOST)
                 .addModifier(DoubleValue.Modifier.pure(0.1, DoubleValue.Modifier.ModifierSource.BUFF));
         giver.getAttribute(AttributeType.SHIELD_BOOST)
@@ -123,7 +123,7 @@ public class ShieldBoostTest {
     @Test
     public void aBoostDoesNotCreateOrUnclearAShield() {
         Battle battle = fixture();
-        Character giver = battle.characters.getFirst();
+        Character giver = battle.characters().getFirst();
         giver.setAttribute(AttributeType.SHIELD_BOOST, new DoubleValue(0.2));
 
         Assertions.assertEquals(0, battle.grantShield(giver, giver, 0), EPS);
@@ -140,8 +140,8 @@ public class ShieldBoostTest {
     @Test
     public void theTimedShieldInstallsTheSameBoostedNumber() {
         Battle battle = fixture();
-        Character giver = battle.characters.getFirst();
-        Character shielded = battle.characters.getLast();
+        Character giver = battle.characters().getFirst();
+        Character shielded = battle.characters().getLast();
         giver.setAttribute(AttributeType.SHIELD_BOOST, new DoubleValue(0.2));
         giver.setTriggerTable(new TriggerTable(WEARER,
                 List.of(TriggerSpecs.rule("ALLY_ATTACK", null, shieldWithTurns(100, 3)))));
@@ -159,8 +159,8 @@ public class ShieldBoostTest {
     @Test
     public void theRawGrantFromARuleIsBoostedToo() {
         Battle battle = fixture();
-        Character giver = battle.characters.getFirst();
-        Character shielded = battle.characters.getLast();
+        Character giver = battle.characters().getFirst();
+        Character shielded = battle.characters().getLast();
         giver.setAttribute(AttributeType.SHIELD_BOOST, new DoubleValue(0.2));
         giver.setTriggerTable(new TriggerTable(WEARER,
                 List.of(TriggerSpecs.rule("ALLY_ATTACK", null, shield(100)))));

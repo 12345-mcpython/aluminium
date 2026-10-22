@@ -65,7 +65,7 @@ public class AllyCountConditionTest {
         Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(team, List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
-        battle.currentMove = new Signal(wearer);
+        battle.setCurrentMove(new Signal(wearer));
         battle.beforeMove();
         battle.afterMove();
         return battle.getSkillPoints();

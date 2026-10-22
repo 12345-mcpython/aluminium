@@ -56,9 +56,9 @@ public class BattleLifecycleTest {
 
         party.clear();
 
-        Assertions.assertEquals(1, battle.characters.size(),
+        Assertions.assertEquals(1, battle.characters().size(),
                 "the battle copied the party; the caller's later clear() is not its business");
-        Assertions.assertSame(hero, battle.characters.getFirst());
+        Assertions.assertSame(hero, battle.characters().getFirst());
     }
 
     /**
@@ -72,7 +72,7 @@ public class BattleLifecycleTest {
 
         battle.addCombatant(late);
 
-        Assertions.assertEquals(2, battle.enemies.size(), "it is on the enemy camp");
+        Assertions.assertEquals(2, battle.enemies().size(), "it is on the enemy camp");
         Assertions.assertEquals(List.of(late), battle.pendingCombatants(), "and waiting to enter");
         battle.processRequests();
         Assertions.assertTrue(battle.pendingCombatants().isEmpty(), "the queue was drained");

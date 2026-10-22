@@ -41,8 +41,8 @@ public class OceanOdeDamageTest {
                 List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        cyrene = battle.characters.get(0);
-        hysilens = battle.characters.get(1);
+        cyrene = battle.characters().get(0);
+        hysilens = battle.characters().get(1);
 
         var demiurge = battle.summonServant(cyrene);
         battle.processRequests();
@@ -64,8 +64,8 @@ public class OceanOdeDamageTest {
                 List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        battle.summonServant(battle.characters.get(0));
+        battle.summonServant(battle.characters().get(0));
         battle.processRequests();
-        return battle.characters.get(1).getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
+        return battle.characters().get(1).getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
     }
 }

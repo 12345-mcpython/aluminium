@@ -80,7 +80,7 @@ public class SummonOpTest {
         Assertions.assertEquals(160, nightfall.getAttribute(
                         com.laosun.aluminium.enums.AttributeType.SPEED).get(), EPS,
                 "with the panel from its own spec, not a monster row");
-        Assertions.assertTrue(battle.queue.snapshot().stream().anyMatch(s -> s.getCanHit() == nightfall),
+        Assertions.assertTrue(battle.queue().snapshot().stream().anyMatch(s -> s.getCanHit() == nightfall),
                 "and it is on the action bar: startBattle's processRequests() admits it");
     }
 
@@ -132,7 +132,7 @@ public class SummonOpTest {
         battle.fireTriggers(TriggerEvent.ULT_CAST, aglaea, null, 0, 0);
 
         Assertions.assertSame(first, battle.memospriteOf(aglaea), "still the one");
-        Assertions.assertEquals(2, battle.allies.size(), "the hero and the one memosprite");
+        Assertions.assertEquals(2, battle.allies().size(), "the hero and the one memosprite");
     }
 
     // ==================================================================

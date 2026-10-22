@@ -174,8 +174,8 @@ public class SundaySkillTest {
     @Test
     public void theUltimateBlessesTheTargetAndItsSummon() {
         Battle battle = ultimateBattle(MEMOSPRITE_ALLY, null);
-        Character sunday = battle.characters.getFirst();
-        Character first = battle.characters.get(1);
+        Character sunday = battle.characters().getFirst();
+        Character first = battle.characters().get(1);
 
         Assertions.assertTrue(first.getBuffManager().hasState("蒙福者"), "「使目标及其召唤物成为【蒙福者】」 (makes the target and its summons The Beatified (【蒙福者】))");
         Assertions.assertEquals(0.12 * critDamageOf(sunday) + 0.08, critDamageOf(first) - HARMONY_BARE_CRIT_DMG, EPS,
@@ -226,8 +226,8 @@ public class SundaySkillTest {
     @Test
     public void hisDeathTakesTheStateOff() {
         Battle battle = ultimateBattle(MEMOSPRITE_ALLY, null);
-        Character sunday = battle.characters.getFirst();
-        Character ally = battle.characters.get(1);
+        Character sunday = battle.characters().getFirst();
+        Character ally = battle.characters().get(1);
         Assertions.assertTrue(ally.getBuffManager().hasState("蒙福者"), "precondition");
 
         sunday.takeDamage(9_999_999);
@@ -244,8 +244,8 @@ public class SundaySkillTest {
     @Test
     public void theStateIsSpentByHisTurns() {
         Battle battle = ultimateBattle(ERUDITION_ALLY, null);
-        Character sunday = battle.characters.getFirst();
-        Character ally = battle.characters.get(1);
+        Character sunday = battle.characters().getFirst();
+        Character ally = battle.characters().get(1);
 
         takeTurn(battle, ally);
         Assertions.assertEquals(3, blessingDuration(ally), "her turn does not spend it");
@@ -260,8 +260,8 @@ public class SundaySkillTest {
     @Test
     public void theSkillRefundsItsPointOnTheBlessed() {
         Battle battle = ultimateBattle(ERUDITION_ALLY, null);
-        Character sunday = battle.characters.getFirst();
-        Character ally = battle.characters.get(1);
+        Character sunday = battle.characters().getFirst();
+        Character ally = battle.characters().get(1);
         Assertions.assertTrue(ally.getBuffManager().hasState("蒙福者"), "precondition: he is the blessed one");
         drainSkillPoints(battle);
 
@@ -329,9 +329,9 @@ public class SundaySkillTest {
      * How much action value the unit still has - zero means "acts now".
      */
     private static double timeRemaining(Battle battle, CanHit target) {
-        for (Signal signal : battle.queue.snapshot()) {
+        for (Signal signal : battle.queue().snapshot()) {
             if (signal.getCanHit() == target) {
-                return battle.queue.getTimeRemaining(signal);
+                return battle.queue().getTimeRemaining(signal);
             }
         }
         return Double.NaN;
@@ -389,7 +389,7 @@ public class SundaySkillTest {
             if (battle.isOver()) {
                 throw new AssertionError("the battle ended before the requested unit acted");
             }
-            boolean mine = battle.queue.getCurrentActor().getCanHit() == who;
+            boolean mine = battle.queue().getCurrentActor().getCanHit() == who;
             if (mine) {
                 battle.beforeMove();
                 battle.afterMove();

@@ -41,7 +41,7 @@ public class UltraThresholdTest {
     @Test
     public void ultraCostComesFromTheSkillData() {
         Battle battle = newBattle(CharacterFactory.create(1221, 80));   // Yunli (云璃)
-        Character yunli = battle.characters.getFirst();
+        Character yunli = battle.characters().getFirst();
 
         Assertions.assertEquals(240, yunli.getMaxEnergy(), EPS, "the stat cap is 240");
         Assertions.assertEquals(120, battle.ultraEnergyCost(yunli), EPS,
@@ -54,7 +54,7 @@ public class UltraThresholdTest {
     @Test
     public void regularCharactersThresholdEqualsTheirCap() {
         Battle battle = newBattle(CharacterFactory.create(1204, 80));
-        Character jingYuan = battle.characters.getFirst();
+        Character jingYuan = battle.characters().getFirst();
 
         Assertions.assertEquals(130, battle.ultraEnergyCost(jingYuan), EPS);
         Assertions.assertEquals(jingYuan.getMaxEnergy(), battle.ultraEnergyCost(jingYuan), EPS);
@@ -186,10 +186,10 @@ public class UltraThresholdTest {
         // run a few rounds of a real battle: her energy must stay at 0, so the threshold is never met
         for (int i = 0; i < 8 && !battle.isOver(); i++) {
             battle.stepForward();
-            if (battle.currentMove == null) {
+            if (battle.currentMove() == null) {
                 break;
             }
-            var actor = battle.currentMove.getCanHit();
+            var actor = battle.currentMove().getCanHit();
             battle.beforeMove();
             if (actor == cyrene) {
                 Assertions.assertFalse(battle.isUltraReady(cyrene),

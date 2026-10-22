@@ -48,8 +48,8 @@ public class TrickeryOdeDamageTest {
                 List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        cyrene = battle.characters.get(0);
-        cipher = battle.characters.get(1);
+        cyrene = battle.characters().get(0);
+        cipher = battle.characters().get(1);
 
         double expected = 0.0;
         if (castTheOde) {

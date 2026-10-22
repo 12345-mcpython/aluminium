@@ -83,8 +83,8 @@ public class ElationLaughMultiplierTest {
         Battle battle = new Battle(List.of(pearl, CharacterFactory.create(ALLY, 80)), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        Character mine = battle.characters.getFirst();
-        Character ally = battle.characters.get(1);
+        Character mine = battle.characters().getFirst();
+        Character ally = battle.characters().get(1);
 
         EffectSpec instance = TriggerSpecs.damage(null, 0, null, "target");
         TriggerSpecs.set(instance, "scale", "elation_base");
@@ -107,7 +107,7 @@ public class ElationLaughMultiplierTest {
         battle.partyResource(LAUGH).gain(after - battle.partyResourceValue(LAUGH));
 
         double before = enemy.getCurrentHp();
-        battle.fireTriggers(TriggerEvent.ULT_CAST, mine, battle.enemies.getFirst(), 0, 0);
+        battle.fireTriggers(TriggerEvent.ULT_CAST, mine, battle.enemies().getFirst(), 0, 0);
         return before - enemy.getCurrentHp();
     }
 
@@ -124,8 +124,8 @@ public class ElationLaughMultiplierTest {
         Battle battle = new Battle(List.of(pearl, CharacterFactory.create(ALLY, 80)), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        Character mine = battle.characters.getFirst();
-        Character ally = battle.characters.get(1);
+        Character mine = battle.characters().getFirst();
+        Character ally = battle.characters().get(1);
 
         EffectSpec instance = TriggerSpecs.damage(null, 0, null, "target");
         TriggerSpecs.set(instance, "scale", "elation_base");
@@ -154,7 +154,7 @@ public class ElationLaughMultiplierTest {
         }
 
         double before = enemy.getCurrentHp();
-        battle.fireTriggers(TriggerEvent.ULT_CAST, mine, battle.enemies.getFirst(), 0, 0);
+        battle.fireTriggers(TriggerEvent.ULT_CAST, mine, battle.enemies().getFirst(), 0, 0);
         return before - enemy.getCurrentHp();
     }
 }

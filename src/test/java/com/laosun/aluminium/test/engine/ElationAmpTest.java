@@ -76,7 +76,7 @@ public class ElationAmpTest {
                 List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        return battle.characters.getFirst()
+        return battle.characters().getFirst()
                 .getAttribute(com.laosun.aluminium.enums.AttributeType.ELATION_DAMAGE_BOOST).get();
     }
 
@@ -89,7 +89,7 @@ public class ElationAmpTest {
         Battle battle = new Battle(List.of(pearl, CharacterFactory.create(1204, 80)), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        Character mine = battle.characters.getFirst();
+        Character mine = battle.characters().getFirst();
 
         EffectSpec instance = TriggerSpecs.damage(null, 0, null, "target");
         TriggerSpecs.set(instance, "scale", "elation_base");
@@ -118,7 +118,7 @@ public class ElationAmpTest {
         }
 
         double before = enemy.getCurrentHp();
-        battle.fireTriggers(com.laosun.aluminium.enums.TriggerEvent.ULT_CAST, mine, battle.enemies.getFirst(), 0, 0);
+        battle.fireTriggers(com.laosun.aluminium.enums.TriggerEvent.ULT_CAST, mine, battle.enemies().getFirst(), 0, 0);
         return before - enemy.getCurrentHp();
     }
 }

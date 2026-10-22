@@ -46,7 +46,7 @@ public class EidolonGateTest {
     public void aGatedRuleStaysQuietBelowItsRank() {
         for (int rank = 0; rank < 2; rank++) {
             Battle battle = battleWith(rank, gatedRule(2));
-            Assertions.assertEquals(0, fire(battle, battle.characters.getFirst()),
+            Assertions.assertEquals(0, fire(battle, battle.characters().getFirst()),
                     "rank " + rank + " is below the rule's min_eidolon 2");
         }
     }
@@ -55,7 +55,7 @@ public class EidolonGateTest {
     public void aGatedRuleFiresAtItsRankAndAbove() {
         for (int rank : List.of(2, 3, Constant.EIDOLON_MAX_RANK)) {
             Battle battle = battleWith(rank, gatedRule(2));
-            Assertions.assertEquals(1, fire(battle, battle.characters.getFirst()),
+            Assertions.assertEquals(1, fire(battle, battle.characters().getFirst()),
                     "rank " + rank + " unlocks min_eidolon 2");
         }
     }
@@ -63,7 +63,7 @@ public class EidolonGateTest {
     @Test
     public void theGateIsPerRule() {
         Battle battle = battleWith(0, gatedRule(2), ungatedRule());
-        Assertions.assertEquals(1, fire(battle, battle.characters.getFirst()),
+        Assertions.assertEquals(1, fire(battle, battle.characters().getFirst()),
                 "the ungated rule in the same table still fires at rank 0");
     }
 

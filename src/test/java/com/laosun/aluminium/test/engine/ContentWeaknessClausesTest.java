@@ -29,7 +29,7 @@ public class ContentWeaknessClausesTest {
     private static final int LEVEL = 80;
 
     private static Enemy enemyOf(Battle battle) {
-        return (Enemy) battle.getOpponents(battle.characters.getFirst()).getFirst();
+        return (Enemy) battle.getOpponents(battle.characters().getFirst()).getFirst();
     }
 
     /**

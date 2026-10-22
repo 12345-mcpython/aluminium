@@ -84,7 +84,7 @@ public class FeverDamageBoostTest {
         Assertions.assertNotNull(memo, "precondition: the memosprite is out");
         List<Damage> settled = new ArrayList<>();
         battle.addDamageObserver((damage, applied, hpLoss, shieldAbsorbed, died) -> settled.add(damage));
-        SkillExecutor.execute(battle, memo.skillAt(1), memo, List.of(battle.enemies.get(0)));
+        SkillExecutor.execute(battle, memo.skillAt(1), memo, List.of(battle.enemies().get(0)));
         battle.processRequests();
         Assertions.assertFalse(settled.isEmpty(), "precondition: the memosprite's cast settled");
         return settled.get(0).breakdown().get("BoostArea");
@@ -110,13 +110,13 @@ public class FeverDamageBoostTest {
         }
         battle.processRequests();
         SkillExecutor.execute(battle, robin.getSkills().get(SkillType.COMMON), robin,
-                List.of(battle.enemies.get(0)));
+                List.of(battle.enemies().get(0)));
         battle.processRequests();
 
         List<Damage> settled = new ArrayList<>();
         battle.addDamageObserver((damage, applied, hpLoss, shieldAbsorbed, died) -> settled.add(damage));
         SkillExecutor.execute(battle, robin.getSkills().get(SkillType.COMMON), robin,
-                List.of(battle.enemies.get(0)));
+                List.of(battle.enemies().get(0)));
         battle.processRequests();
         Assertions.assertFalse(settled.isEmpty(), "precondition: the measured cast settled");
         return settled.get(0).breakdown().get("BoostArea");

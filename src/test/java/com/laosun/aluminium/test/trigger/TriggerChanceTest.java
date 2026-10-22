@@ -41,7 +41,7 @@ public class TriggerChanceTest {
         Battle battle = battleWith(fixed(0.5), chanceRule(0.6, null));
         drainSkillPoints(battle);
 
-        Assertions.assertEquals(1, fire(battle, battle.characters.getFirst()), "0.5 < 0.6");
+        Assertions.assertEquals(1, fire(battle, battle.characters().getFirst()), "0.5 < 0.6");
         Assertions.assertEquals(1, battle.getSkillPoints());
     }
 
@@ -50,7 +50,7 @@ public class TriggerChanceTest {
         Battle battle = battleWith(fixed(0.5), chanceRule(0.4, null));
         drainSkillPoints(battle);
 
-        Assertions.assertEquals(0, fire(battle, battle.characters.getFirst()), "0.5 is not below 0.4");
+        Assertions.assertEquals(0, fire(battle, battle.characters().getFirst()), "0.5 is not below 0.4");
         Assertions.assertEquals(0, battle.getSkillPoints(), "and nothing ran");
     }
 
@@ -68,7 +68,7 @@ public class TriggerChanceTest {
     @Test
     public void aFailedRollDoesNotStartTheCooldown() {
         Battle battle = battleWith(sequence(0.9, 0.1), chanceRule(0.4, 1));
-        Character owner = battle.characters.getFirst();
+        Character owner = battle.characters().getFirst();
         drainSkillPoints(battle);
 
         Assertions.assertEquals(0, fire(battle, owner), "the first roll fails");
@@ -85,7 +85,7 @@ public class TriggerChanceTest {
         drainSkillPoints(battle);
         int drawsBefore = rng.draws();
 
-        Assertions.assertEquals(1, fire(battle, battle.characters.getFirst()));
+        Assertions.assertEquals(1, fire(battle, battle.characters().getFirst()));
         Assertions.assertEquals(drawsBefore, rng.draws(),
                 "a certainty is not a coin flip, so it must not consume a draw from the battle's generator");
     }

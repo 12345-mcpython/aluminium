@@ -37,7 +37,7 @@ public class SilverWolfLV999EidolonLevelsTest {
      */
     @Test
     public void theLevelConventionPutsEverySlotAtItsTableMaximum() {
-        Character wolf = battleAt(0).characters.getFirst();
+        Character wolf = battleAt(0).characters().getFirst();
         int common = levelOf(wolf, SkillType.COMMON);
         int skill = levelOf(wolf, SkillType.SKILL);
         int ultra = levelOf(wolf, SkillType.ULTRA);
@@ -60,9 +60,9 @@ public class SilverWolfLV999EidolonLevelsTest {
      */
     @Test
     public void theEidolonIncrementsAreClampedAwayAtFullLevels() {
-        Character atZero = battleAt(0).characters.getFirst();
-        Character atThree = battleAt(3).characters.getFirst();
-        Character atFive = battleAt(5).characters.getFirst();
+        Character atZero = battleAt(0).characters().getFirst();
+        Character atThree = battleAt(3).characters().getFirst();
+        Character atFive = battleAt(5).characters().getFirst();
         System.out.println("[1506] SKILL at E0/E3: " + levelOf(atZero, SkillType.SKILL) + "/"
                 + levelOf(atThree, SkillType.SKILL) + " ; ULTRA at E0/E5: " + levelOf(atZero, SkillType.ULTRA) + "/"
                 + levelOf(atFive, SkillType.ULTRA));
@@ -118,7 +118,7 @@ public class SilverWolfLV999EidolonLevelsTest {
     @Test
     public void eidolonSixAmpsOnlyAfterTheUltimate() {
         Battle battle = battleAt(6);
-        Character wolf = battle.characters.getFirst();
+        Character wolf = battle.characters().getFirst();
         double before = wolf.getAttribute(AttributeType.ELATION_DAMAGE_AMP).get();
         wolf.setCurrentEnergy(wolf.getMaxEnergy());
         battle.castUltra(wolf, List.of(battle.enemyUnits().getFirst()));
@@ -171,7 +171,7 @@ public class SilverWolfLV999EidolonLevelsTest {
                 + wolf.getAttribute(AttributeType.SPEED).get());
         battle.startBattle();
         battle.processRequests();
-        return battle.characters.getFirst().getAttribute(AttributeType.ELATION_DAMAGE_BOOST).get();
+        return battle.characters().getFirst().getAttribute(AttributeType.ELATION_DAMAGE_BOOST).get();
     }
 
     private static Battle battleAt(int eidolonRank) {

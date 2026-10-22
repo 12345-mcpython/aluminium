@@ -30,8 +30,8 @@ public class ReasonOdePointAndActionTest {
                 List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        cyrene = battle.characters.get(0);
-        anaxa = battle.characters.get(1);
+        cyrene = battle.characters().get(0);
+        anaxa = battle.characters().get(1);
 
         var demiurge = battle.summonServant(cyrene);
         battle.processRequests();
@@ -57,9 +57,9 @@ public class ReasonOdePointAndActionTest {
      * How much action value the unit still has -- zero means "acts now" (mirrors AglaeaMemospriteTest).
      */
     private static double timeRemaining(Battle battle, com.laosun.aluminium.models.CanHit target) {
-        for (var signal : battle.queue.snapshot()) {
+        for (var signal : battle.queue().snapshot()) {
             if (signal.getCanHit() == target) {
-                return battle.queue.getTimeRemaining(signal);
+                return battle.queue().getTimeRemaining(signal);
             }
         }
         return Double.NaN;

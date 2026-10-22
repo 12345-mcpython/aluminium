@@ -51,7 +51,7 @@ public class EnergyBattleTest {
         hero.setAttribute(AttributeType.ENERGY_REGENERATION_RATE, new DoubleValue(0.5));
         Battle battle = newBattle(hero, dummy(1_000_000));
 
-        battle.castImmediate(new DefaultSkill(1001, 1, 1), hero, battle.enemies);
+        battle.castImmediate(new DefaultSkill(1001, 1, 1), hero, battle.enemies());
 
         Assertions.assertEquals(30, hero.getCurrentEnergy(), EPS, "20 × (1 + 0.5)");
     }
@@ -62,11 +62,11 @@ public class EnergyBattleTest {
         hero.setSkill(SkillType.ULTRA, new DefaultSkill(1001, 3, 1));
         Battle battle = newBattle(hero, dummy(1_000_000));
 
-        Assertions.assertFalse(battle.castUltra(hero, battle.enemies), "energy not full → cannot cast");
+        Assertions.assertFalse(battle.castUltra(hero, battle.enemies()), "energy not full → cannot cast");
         Assertions.assertEquals(0, hero.getCurrentEnergy(), EPS);
 
         hero.setCurrentEnergy(120);
-        Assertions.assertTrue(battle.castUltra(hero, battle.enemies));
+        Assertions.assertTrue(battle.castUltra(hero, battle.enemies()));
         Assertions.assertEquals(5, hero.getCurrentEnergy(), EPS, "order defined: clear to zero first, then regain 5 for itself");
     }
 
@@ -86,7 +86,7 @@ public class EnergyBattleTest {
         Battle battle = newBattle(hero, victim);
         hero.setCurrentEnergy(120);
 
-        Assertions.assertTrue(battle.castUltra(hero, battle.enemies));
+        Assertions.assertTrue(battle.castUltra(hero, battle.enemies()));
         Assertions.assertTrue(victim.isDeath(), "this ultimate MUST kill on the spot, otherwise the kill energy gain cannot be measured");
         Assertions.assertEquals(10, hero.getCurrentEnergy(), EPS, "kill 5 + ultimate's own 5, must not be eaten by the clear to zero");
     }
@@ -103,7 +103,7 @@ public class EnergyBattleTest {
         Battle battle = newBattle(hero, iceEdge);
         hero.setCurrentEnergy(120);
 
-        Assertions.assertTrue(battle.castUltra(hero, battle.enemies));
+        Assertions.assertTrue(battle.castUltra(hero, battle.enemies()));
         Assertions.assertTrue(iceEdge.isBroken(), "60 points of toughness reduction drains 60 toughness → break");
         Assertions.assertEquals(10, hero.getCurrentEnergy(), EPS, "break 5 + ultimate's own 5, must not be eaten by the clear to zero");
     }
@@ -314,7 +314,7 @@ public class EnergyBattleTest {
         hero.setAttribute(AttributeType.ENERGY_REGENERATION_RATE, new DoubleValue(0.5));
         Battle battle = newBattle(hero, dummy(1_000_000));
 
-        Assertions.assertEquals(7.5, battle.gainBreakEnergy(hero, battle.enemies.getFirst()), EPS);
+        Assertions.assertEquals(7.5, battle.gainBreakEnergy(hero, battle.enemies().getFirst()), EPS);
     }
 
     private static Character character(String name, double maxEnergy) {

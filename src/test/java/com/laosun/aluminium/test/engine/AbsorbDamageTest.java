@@ -103,8 +103,8 @@ public class AbsorbDamageTest {
     @Test
     public void theCounterComesFromThePayerNotTheVictim() {
         Battle battle = newBattle();
-        Character pearl = battle.characters.getFirst();
-        Character ally = battle.characters.get(1);
+        Character pearl = battle.characters().getFirst();
+        Character ally = battle.characters().get(1);
         pearl.getResources().register(COUNTER, 0, 100);      // the payer is empty
         ally.getResources().register(COUNTER, 30, 100);      // the victim is rich
         armTheParty(battle, pearl, 0.6, 200);
@@ -126,8 +126,8 @@ public class AbsorbDamageTest {
     @Test
     public void aFallenPayerBlocksNothing() {
         Battle battle = newBattle();
-        Character pearl = battle.characters.getFirst();
-        Character ally = battle.characters.get(1);
+        Character pearl = battle.characters().getFirst();
+        Character ally = battle.characters().get(1);
         pearl.getResources().register(COUNTER, 30, 100);
         armTheParty(battle, pearl, 0.6, 200);
         pearl.perish();
@@ -151,8 +151,8 @@ public class AbsorbDamageTest {
 
     private static Reading absorb(int points, double instance, double percent, double unitAmount, boolean arm) {
         Battle battle = newBattle();
-        Character pearl = battle.characters.getFirst();
-        Character ally = battle.characters.get(1);
+        Character pearl = battle.characters().getFirst();
+        Character ally = battle.characters().get(1);
         pearl.getResources().register(COUNTER, points, 100);
         if (arm) {
             armTheParty(battle, pearl, percent, unitAmount);

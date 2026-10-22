@@ -30,7 +30,7 @@ public class MultiplicationAndSubscribeForMoreTest {
         Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
-        battle.currentMove = new Signal(unit);
+        battle.setCurrentMove(new Signal(unit));
         battle.beforeMove();
         double before = timeRemaining(battle, unit);
         battle.fireTriggers(TriggerEvent.BASIC_ATTACK, unit, enemy, 0, 0);
@@ -61,9 +61,9 @@ public class MultiplicationAndSubscribeForMoreTest {
      * Copied verbatim from CastTargetTest: how much action value the unit still has.
      */
     private static double timeRemaining(Battle battle, CanHit target) {
-        for (Signal signal : battle.queue.snapshot()) {
+        for (Signal signal : battle.queue().snapshot()) {
             if (signal.getCanHit() == target) {
-                return battle.queue.getTimeRemaining(signal);
+                return battle.queue().getTimeRemaining(signal);
             }
         }
         return Double.NaN;

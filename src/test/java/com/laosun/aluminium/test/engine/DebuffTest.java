@@ -69,7 +69,7 @@ public class DebuffTest {
     @Test
     public void aStatModifierIsNegativeExactlyWhenItsSignWas() {
         Battle battle = battleWith(modifierRule(-0.3), modifierRule(0.5));
-        Character owner = battle.characters.getFirst();
+        Character owner = battle.characters().getFirst();
 
         fire(battle, owner);
 
@@ -87,7 +87,7 @@ public class DebuffTest {
     @Test
     public void theCountIsDebuffsOnly() {
         Battle battle = battleWith();
-        Character owner = battle.characters.getFirst();
+        Character owner = battle.characters().getFirst();
         owner.getBuffManager().addBuff(new DotBuff(owner, DamageElement.FIRE, 100, 3));
         owner.getBuffManager().addBuff(new VulnerabilityBuff(3, 0.2));
         owner.getBuffManager().addBuff(new StateBuff("协奏", 3));
@@ -103,7 +103,7 @@ public class DebuffTest {
     @Test
     public void aDispelTakesTheNewestDebuffAndLeavesTheBuffsAlone() {
         Battle battle = battleWith(dispelRule(1));
-        Character owner = battle.characters.getFirst();
+        Character owner = battle.characters().getFirst();
         owner.getBuffManager().addBuff(new StateBuff("协奏", 3));
         owner.getBuffManager().addBuff(new DotBuff(owner, DamageElement.FIRE, 100, 3));
         owner.getBuffManager().addBuff(new VulnerabilityBuff(3, 0.2));
@@ -120,7 +120,7 @@ public class DebuffTest {
     @Test
     public void aDispelWithNothingToRemoveIsANoOp() {
         Battle battle = battleWith(dispelRule(1));
-        Character owner = battle.characters.getFirst();
+        Character owner = battle.characters().getFirst();
         owner.getBuffManager().addBuff(new StateBuff("协奏", 3));
 
         Assertions.assertEquals(1, fire(battle, owner), "the rule fires; there is simply nothing negative");
@@ -130,7 +130,7 @@ public class DebuffTest {
     @Test
     public void dispellingTwoAtOnceTakesBoth() {
         Battle battle = battleWith(dispelRule(2));
-        Character owner = battle.characters.getFirst();
+        Character owner = battle.characters().getFirst();
         owner.getBuffManager().addBuff(new DotBuff(owner, DamageElement.FIRE, 100, 3));
         owner.getBuffManager().addBuff(new VulnerabilityBuff(3, 0.2));
 
@@ -145,7 +145,7 @@ public class DebuffTest {
     @Test
     public void theDebuffCountConditionReadsTheEventSubject() {
         Battle battle = withAlly(TriggerSpecs.rule("ALLY_ATTACK", List.of("target_debuff_count >= 2"), gain(1)));
-        Character actor = battle.characters.getFirst();
+        Character actor = battle.characters().getFirst();
         Enemy dummy = battle.enemyUnits().getFirst();
         dummy.getBuffManager().addBuff(new DotBuff(actor, DamageElement.FIRE, 100, 3));
         dummy.getBuffManager().addBuff(new VulnerabilityBuff(3, 0.2));
@@ -167,7 +167,7 @@ public class DebuffTest {
     @Test
     public void theCountDoesNotReadTheRulesOwner() {
         Battle battle = withAlly(TriggerSpecs.rule("ALLY_ATTACK", List.of("target_debuff_count >= 1"), gain(1)));
-        Character actor = battle.characters.getFirst();
+        Character actor = battle.characters().getFirst();
         Enemy dummy = battle.enemyUnits().getFirst();
         actor.getBuffManager().addBuff(new DotBuff(actor, DamageElement.FIRE, 100, 3));
 

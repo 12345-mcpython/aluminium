@@ -34,7 +34,7 @@ public class ValorousFollowUpTest {
         Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(wearer, ally), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
-        battle.currentMove = new Signal(wearer);
+        battle.setCurrentMove(new Signal(wearer));
         battle.beforeMove();
         double baseline = wearer.getAttribute(AttributeType.FOLLOW_UP_DAMAGE_BOOST).get();
         battle.fireTriggers(TriggerEvent.FOLLOW_UP, wearer, enemy, 0, 0);
@@ -52,7 +52,7 @@ public class ValorousFollowUpTest {
         Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(wearer, ally), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
-        battle.currentMove = new Signal(wearer);
+        battle.setCurrentMove(new Signal(wearer));
         battle.beforeMove();
         double boostBefore = wearer.getAttribute(AttributeType.FOLLOW_UP_DAMAGE_BOOST).get();
         double critDamageBefore = wearer.getAttribute(AttributeType.CRIT_ATTACK).get();

@@ -51,8 +51,8 @@ public class TickAnchorTest {
     @Test
     public void theCastersTurnsSpendItAndTheCarriersDoNot() {
         Battle battle = battleWith(grantToAlly(true, 3), BattleFixture.seeded());
-        Character owner = battle.characters.getFirst();
-        Character ally = battle.characters.get(1);
+        Character owner = battle.characters().getFirst();
+        Character ally = battle.characters().get(1);
         Assertions.assertEquals(3, durationOf(ally), "precondition: 3 turns");
 
         takeTurn(battle, ally);
@@ -68,8 +68,8 @@ public class TickAnchorTest {
     @Test
     public void itExpiresOnTheCastersTurns() {
         Battle battle = battleWith(grantToAlly(true, 2), BattleFixture.seeded());
-        Character owner = battle.characters.getFirst();
-        Character ally = battle.characters.get(1);
+        Character owner = battle.characters().getFirst();
+        Character ally = battle.characters().get(1);
 
         takeTurn(battle, owner);
         takeTurn(battle, owner);
@@ -87,8 +87,8 @@ public class TickAnchorTest {
     @Test
     public void anUnanchoredBuffStillTicksOnItsCarrier() {
         Battle battle = battleWith(grantToAlly(false, 3), BattleFixture.seeded());
-        Character owner = battle.characters.getFirst();
-        Character ally = battle.characters.get(1);
+        Character owner = battle.characters().getFirst();
+        Character ally = battle.characters().get(1);
 
         takeTurn(battle, ally);
         Assertions.assertEquals(2, durationOf(ally), "her own turn spends it");
@@ -111,8 +111,8 @@ public class TickAnchorTest {
     @Test
     public void theAnchorsDeathTakesTheBuffOff() {
         Battle battle = battleWith(grantToAlly(true, 5), BattleFixture.seeded());
-        Character owner = battle.characters.getFirst();
-        Character ally = battle.characters.get(1);
+        Character owner = battle.characters().getFirst();
+        Character ally = battle.characters().get(1);
         Assertions.assertEquals(5, durationOf(ally), "precondition");
 
         owner.takeDamage(9_999_999);
@@ -212,7 +212,7 @@ public class TickAnchorTest {
         Battle battle = new Battle(List.of(owner, CharacterFactory.create(ALLY, LEVEL)), List.of(dummy()), rng);
         battle.startBattle();
         // The rule fires on an event we drive, with the ally as the subject.
-        battle.fireTriggers(TriggerEvent.ALLY_ATTACK, owner, battle.characters.get(1), 1, 0);
+        battle.fireTriggers(TriggerEvent.ALLY_ATTACK, owner, battle.characters().get(1), 1, 0);
         return battle;
     }
 
@@ -245,7 +245,7 @@ public class TickAnchorTest {
             if (battle.isOver()) {
                 throw new AssertionError("the battle ended before the requested unit acted");
             }
-            boolean mine = battle.queue.getCurrentActor().getCanHit() == who;
+            boolean mine = battle.queue().getCurrentActor().getCanHit() == who;
             if (mine) {
                 battle.beforeMove();
                 battle.afterMove();

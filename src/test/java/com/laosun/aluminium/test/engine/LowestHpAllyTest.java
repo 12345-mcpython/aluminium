@@ -61,7 +61,7 @@ public class LowestHpAllyTest {
         Character hero = character("hero", 1000);
         Character ally = character("ally", 1000);
         Fixture f = new Fixture(hero, List.of(hero, ally), TriggerSpecs.heal(100, "lowest_hp_ally"));
-        Assertions.assertSame(hero, f.battle.allies.getFirst(), "precondition: the party order is hero, ally");
+        Assertions.assertSame(hero, f.battle.allies().getFirst(), "precondition: the party order is hero, ally");
         hero.takeDamage(500);
         ally.takeDamage(500);
         Assertions.assertEquals(hero.getCurrentHp() / hero.getMaxHp(), ally.getCurrentHp() / ally.getMaxHp(), EPS,

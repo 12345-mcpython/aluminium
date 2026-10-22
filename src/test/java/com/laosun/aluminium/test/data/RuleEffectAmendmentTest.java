@@ -98,10 +98,10 @@ public class RuleEffectAmendmentTest {
         battle.startBattle();
         Assertions.assertTrue(hero.getBuffManager().hasState("测试状态"), "precondition: the state landed");
         for (int i = 0; i < turns; i++) {
-            battle.currentMove = battle.queue.snapshot().stream()
+            battle.setCurrentMove(battle.queue().snapshot().stream()
                     .filter(signal -> signal.getCanHit() == hero)
                     .findFirst()
-                    .orElseThrow(() -> new AssertionError("no signal for the owner"));
+                    .orElseThrow(() -> new AssertionError("no signal for the owner")));
             battle.beforeMove();
             battle.afterMove();
         }

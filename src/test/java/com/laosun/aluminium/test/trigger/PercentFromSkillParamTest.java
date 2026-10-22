@@ -41,7 +41,7 @@ public class PercentFromSkillParamTest {
                 List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        tribbie = battle.characters.getFirst();
+        tribbie = battle.characters().getFirst();
 
         Skill ultra = tribbie.getSkills().get(SkillType.ULTRA);
         Assertions.assertNotNull(ultra, "precondition: 1403 has an ULTRA skill");
@@ -104,7 +104,7 @@ public class PercentFromSkillParamTest {
         Battle battle = new Battle(List.of(tribbie), List.of(BattleFixture.dummy()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        tribbie = battle.characters.getFirst();
+        tribbie = battle.characters().getFirst();
 
         EffectSpec effect = new EffectSpec();
         TriggerSpecs.set(effect, "op", "DAMAGE");

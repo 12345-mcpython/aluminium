@@ -39,7 +39,7 @@ public class PearlEidolon2AmpTest {
                 List.of(EnemyFactory.create(1002011, 100, 1)), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        Character ally = battle.characters.get(1);
+        Character ally = battle.characters().get(1);
         return ally.getAttribute(AttributeType.ELATION_DAMAGE_AMP).get();
     }
 }

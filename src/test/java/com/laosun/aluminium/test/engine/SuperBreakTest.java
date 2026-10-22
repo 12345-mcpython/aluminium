@@ -123,7 +123,7 @@ public class SuperBreakTest {
         }
         List<TriggerSpec> specs = extra == null ? List.of() : List.of(extra);
         c.hero.setTriggerTable(new TriggerTable(CID, specs));
-        c.battle.currentMove = null;
+        c.battle.setCurrentMove(null);
         double before = c.enemy.getCurrentHp();
         c.battle.castImmediate(c.hero.getSkills().get(SkillType.COMMON), c.hero, List.of(c.enemy));
         return before - c.enemy.getCurrentHp();

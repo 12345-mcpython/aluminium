@@ -50,8 +50,8 @@ public class TimeOdeBoostTest {
                 List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        cyrene = battle.characters.get(0);
-        longnight = battle.characters.get(1);
+        cyrene = battle.characters().get(0);
+        longnight = battle.characters().get(1);
         var sprite = battle.summonServant(cyrene);
         battle.processRequests();
         var ode = sprite.skillAt(ODE_SLOT);
@@ -61,14 +61,14 @@ public class TimeOdeBoostTest {
             SkillExecutor.execute(battle, ode, sprite, List.of(longnight));
             battle.processRequests();
         }
-        longnight = battle.characters.get(1);
+        longnight = battle.characters().get(1);
         int captured = longnight.getResources().value(SHARE);
         var evey = battle.summonServant(longnight);
         battle.processRequests();
         Assertions.assertNotNull(evey, "precondition: her memosprite is out");
         var dream = evey.skillAt(DREAM_SLOT);
         Assertions.assertNotNull(dream, "precondition: data slot 7");
-        SkillExecutor.execute(battle, dream, evey, List.of(battle.enemies.getFirst()));
+        SkillExecutor.execute(battle, dream, evey, List.of(battle.enemies().getFirst()));
         battle.processRequests();
         return new double[]{evey.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get(), captured, rowValue};
     }

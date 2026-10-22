@@ -26,16 +26,16 @@ public class TrueSelfOdeDistinctAlliesTest {
                 List.of(EnemyFactory.create(1002011, 100, 1)), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        var dragon = battle.summonMemosprite(battle.characters.get(0));
+        var dragon = battle.summonMemosprite(battle.characters().get(0));
         battle.processRequests();
         act(battle, 1);
         int afterOne = counter(dragon);
         act(battle, 2);
         int afterTwo = counter(dragon);
         // her ultimate hands [未来] out afresh, so the FIRST ally can act again
-        Character her = battle.characters.get(0);
+        Character her = battle.characters().get(0);
         // "after she acts" is her TURN_END, which is what hands the future out again.
-        battle.currentMove = new Signal(her);
+        battle.setCurrentMove(new Signal(her));
         battle.afterMove();
         battle.processRequests();
         act(battle, 1);
@@ -48,7 +48,7 @@ public class TrueSelfOdeDistinctAlliesTest {
     }
 
     private static void act(Battle battle, int index) {
-        battle.currentMove = new Signal(battle.characters.get(index));
+        battle.setCurrentMove(new Signal(battle.characters().get(index)));
         battle.beforeMove();
         battle.processRequests();
     }

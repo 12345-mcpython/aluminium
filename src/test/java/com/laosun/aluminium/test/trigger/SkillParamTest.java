@@ -40,7 +40,7 @@ public class SkillParamTest {
                 List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        tribbie = battle.characters.getFirst();
+        tribbie = battle.characters().getFirst();
 
         Skill ultra = tribbie.getSkills().get(SkillType.ULTRA);
         Assertions.assertNotNull(ultra, "precondition: 1403 has an ULTRA skill");

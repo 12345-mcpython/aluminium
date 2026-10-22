@@ -27,7 +27,7 @@ public class CyreneRecollectionCapTest {
         Battle battle = new Battle(List.of(her), List.of(EnemyFactory.create(MONSTER, 100, 1)), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        her = battle.characters.getFirst();
+        her = battle.characters().getFirst();
         var res = her.getResources().get(MEMORY);
         System.out.println("[recollection] max=" + res.getMax() + " overflow=" + res.getMaxOverflow());
         Assertions.assertEquals(24, res.getMax(), "the stated cap");
@@ -40,16 +40,16 @@ public class CyreneRecollectionCapTest {
         Battle battle = new Battle(List.of(her), List.of(EnemyFactory.create(MONSTER, 100, 1)), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        her = battle.characters.getFirst();
+        her = battle.characters().getFirst();
         var control = com.laosun.aluminium.Constant.CONTROL_EFFECTS.get("IMPRISONED");
         her.getBuffManager().addBuff(new ControlBuff(control, 3));
         Assertions.assertTrue(her.getBuffManager().debuffCount() > 0, "precondition: she carries a debuff");
         her.getResources().gain(MEMORY, 23);
         var basic = her.getSkills().get(SkillType.COMMON);
         com.laosun.aluminium.models.skill.SkillExecutor.execute(battle, basic, her,
-                List.of(battle.enemies.getFirst()));
+                List.of(battle.enemies().getFirst()));
         battle.processRequests();
-        int left = battle.characters.getFirst().getBuffManager().debuffCount();
+        int left = battle.characters().getFirst().getBuffManager().debuffCount();
         System.out.println("[recollection] after reaching 24, her debuffs read " + left);
         Assertions.assertEquals(0, left, "a full [追忆] (Recollection) cleanses her");
     }

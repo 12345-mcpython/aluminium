@@ -63,7 +63,7 @@ public class TriggerStateTest {
     @Test
     public void applyBuffPutsTheNamedStateOnTheOwner() {
         Battle battle = battleWith(stateOp("ALLY_ATTACK", "协奏", 2, null));
-        Character owner = battle.characters.getFirst();
+        Character owner = battle.characters().getFirst();
 
         Assertions.assertEquals(1, fire(battle, owner), "the rule applies the state");
         Assertions.assertTrue(owner.getBuffManager().hasState("协奏"), "the owner is now in 【协奏】");
@@ -76,7 +76,7 @@ public class TriggerStateTest {
         Battle battle = battleWith(
                 stateOp("ALLY_ATTACK", "协奏", 2, null),
                 TriggerSpecs.rule("SKILL_CAST", List.of("self has_state 协奏"), gain(1)));
-        Character owner = battle.characters.getFirst();
+        Character owner = battle.characters().getFirst();
         drainSkillPoints(battle);
 
         Assertions.assertEquals(0, battle.fireTriggers(TriggerEvent.SKILL_CAST, owner, null, 0, 0),
@@ -92,8 +92,8 @@ public class TriggerStateTest {
     @Test
     public void hasStateOnTheTargetReadsTheEventSubject() {
         Battle battle = withAlly(TriggerSpecs.rule("ALLY_ATTACK", List.of("target has_state 触电"), gain(1)));
-        Character owner = battle.characters.getFirst();
-        Character ally = battle.characters.get(1);
+        Character owner = battle.characters().getFirst();
+        Character ally = battle.characters().get(1);
         ally.getBuffManager().addBuff(new StateBuff("触电", 2));
         drainSkillPoints(battle);
 
@@ -115,7 +115,7 @@ public class TriggerStateTest {
         Battle battle = battleWith(
                 stateOp("ALLY_ATTACK", "协奏", 2, null),
                 stateOp("SKILL_CAST", "转魄", 2, null));
-        Character owner = battle.characters.getFirst();
+        Character owner = battle.characters().getFirst();
 
         fire(battle, owner);
         battle.fireTriggers(TriggerEvent.SKILL_CAST, owner, null, 0, 0);
@@ -130,7 +130,7 @@ public class TriggerStateTest {
     @Test
     public void theSameStateRefreshesInsteadOfStacking() {
         Battle battle = battleWith(stateOp("ALLY_ATTACK", "协奏", 2, null));
-        Character owner = battle.characters.getFirst();
+        Character owner = battle.characters().getFirst();
 
         fire(battle, owner);
         takeTurn(battle, owner);
@@ -148,7 +148,7 @@ public class TriggerStateTest {
     @Test
     public void aStateExpiresAfterItsTurns() {
         Battle battle = battleWith(stateOp("ALLY_ATTACK", "协奏", 1, null));
-        Character owner = battle.characters.getFirst();
+        Character owner = battle.characters().getFirst();
 
         fire(battle, owner);
         Assertions.assertTrue(owner.getBuffManager().hasState("协奏"));
@@ -160,7 +160,7 @@ public class TriggerStateTest {
     @Test
     public void aPermanentStateNeverExpires() {
         Battle battle = battleWith(stateOp("ALLY_ATTACK", "协奏", null, true));
-        Character owner = battle.characters.getFirst();
+        Character owner = battle.characters().getFirst();
 
         fire(battle, owner);
         for (int turn = 0; turn < 3; turn++) {
@@ -230,7 +230,7 @@ public class TriggerStateTest {
         Battle battle = battleWith(
                 stateOp("ALLY_ATTACK", "蒙福者", 3, null),
                 removeStateOn("SKILL_CAST", "蒙福者"));
-        Character owner = battle.characters.getFirst();
+        Character owner = battle.characters().getFirst();
 
         Assertions.assertEquals(1, fire(battle, owner), "the state was applied");
         Assertions.assertTrue(owner.getBuffManager().hasState("蒙福者"), "precondition: it is on");
@@ -251,7 +251,7 @@ public class TriggerStateTest {
                 stateOp("ALLY_ATTACK", "协奏", 3, null),
                 stateOp("ALLY_ATTACK", "转魄", 3, null),
                 removeStateOn("SKILL_CAST", "协奏"));
-        Character owner = battle.characters.getFirst();
+        Character owner = battle.characters().getFirst();
 
         fire(battle, owner);
         fire(battle, owner, TriggerEvent.SKILL_CAST);
@@ -271,7 +271,7 @@ public class TriggerStateTest {
     @Test
     public void removeStateUnderstandsTheDotSpelling() {
         Battle battle = battleWith(removeStateOn("ALLY_ATTACK", "触电"));
-        Character owner = battle.characters.getFirst();
+        Character owner = battle.characters().getFirst();
         owner.getBuffManager().addBuff(new DotBuff(owner, DamageElement.THUNDER, 100, 2));
         Assertions.assertTrue(owner.getBuffManager().hasState("触电"), "precondition: the thunder DoT is on");
 
@@ -287,7 +287,7 @@ public class TriggerStateTest {
     @Test
     public void removingAStateThatIsNotThereIsQuiet() {
         Battle battle = battleWith(removeStateOn("ALLY_ATTACK", "蒙福者"));
-        Character owner = battle.characters.getFirst();
+        Character owner = battle.characters().getFirst();
 
         Assertions.assertEquals(1, fire(battle, owner), "the rule runs; there was simply nothing to take off");
         Assertions.assertFalse(owner.getBuffManager().hasState("蒙福者"));
@@ -337,8 +337,8 @@ public class TriggerStateTest {
     @Test
     public void isAllyReadsTheUnitsSide() {
         Battle battle = withAlly(TriggerSpecs.rule("ALLY_ATTACK", List.of("target is_ally"), gain(1)));
-        Character owner = battle.characters.getFirst();
-        Character ally = battle.characters.get(1);
+        Character owner = battle.characters().getFirst();
+        Character ally = battle.characters().get(1);
         Enemy enemy = dummy();
         drainSkillPoints(battle);
 
@@ -354,8 +354,8 @@ public class TriggerStateTest {
     @Test
     public void isAllyNegatedIsTheOtherSide() {
         Battle battle = withAlly(TriggerSpecs.rule("ALLY_ATTACK", List.of("!target is_ally"), gain(1)));
-        Character owner = battle.characters.getFirst();
-        Character ally = battle.characters.get(1);
+        Character owner = battle.characters().getFirst();
+        Character ally = battle.characters().get(1);
         Enemy enemy = dummy();
         drainSkillPoints(battle);
 
@@ -392,18 +392,18 @@ public class TriggerStateTest {
     public void hasSamePathAllyReadsTheParty() {
         Battle same = withAllyOf(1013, pathRule(gain(1)));
         drainSkillPoints(same);
-        Assertions.assertEquals(1, same.fireTriggers(TriggerEvent.ALLY_ATTACK, same.characters.getFirst(), null, 1, 0),
+        Assertions.assertEquals(1, same.fireTriggers(TriggerEvent.ALLY_ATTACK, same.characters().getFirst(), null, 1, 0),
                 "Herta (黑塔) is Erudition, like Himeko (姬子)");
 
         Battle other = withAllyOf(1210, pathRule(gain(1)));
         drainSkillPoints(other);
         Assertions.assertEquals(0,
-                other.fireTriggers(TriggerEvent.ALLY_ATTACK, other.characters.getFirst(), null, 1, 0),
+                other.fireTriggers(TriggerEvent.ALLY_ATTACK, other.characters().getFirst(), null, 1, 0),
                 "Guinaifen (桂乃芬) is Nihility: 「same Path」 does not hold");
 
         Battle alone = battleWith(pathRule(gain(1)));
         drainSkillPoints(alone);
-        Assertions.assertEquals(0, alone.fireTriggers(TriggerEvent.ALLY_ATTACK, alone.characters.getFirst(), null, 1, 0),
+        Assertions.assertEquals(0, alone.fireTriggers(TriggerEvent.ALLY_ATTACK, alone.characters().getFirst(), null, 1, 0),
                 "nobody else on the field is not 「at least one teammate exists」");
     }
 
@@ -413,8 +413,8 @@ public class TriggerStateTest {
     @Test
     public void aDeadSamePathAllyDoesNotCount() {
         Battle battle = withAllyOf(1013, pathRule(gain(1)));
-        Character owner = battle.characters.getFirst();
-        Character ally = battle.characters.get(1);
+        Character owner = battle.characters().getFirst();
+        Character ally = battle.characters().get(1);
         drainSkillPoints(battle);
         ally.takeDamage(9_999_999);
         battle.processRequests();
@@ -429,7 +429,7 @@ public class TriggerStateTest {
     @Test
     public void hasSamePathAllyCanBeNegated() {
         Battle battle = withAllyOf(1210, pathRule(gain(1)));
-        Character owner = battle.characters.getFirst();
+        Character owner = battle.characters().getFirst();
         drainSkillPoints(battle);
 
         Assertions.assertEquals(0, battle.fireTriggers(TriggerEvent.ALLY_ATTACK, owner, null, 1, 0),
@@ -439,7 +439,7 @@ public class TriggerStateTest {
                 TriggerSpecs.rule("ALLY_ATTACK", List.of("!self has_same_path_ally"), gain(1)));
         drainSkillPoints(negated);
         Assertions.assertEquals(1,
-                negated.fireTriggers(TriggerEvent.ALLY_ATTACK, negated.characters.getFirst(), null, 1, 0));
+                negated.fireTriggers(TriggerEvent.ALLY_ATTACK, negated.characters().getFirst(), null, 1, 0));
     }
 
     /**
@@ -467,7 +467,7 @@ public class TriggerStateTest {
     @Test
     public void hasWeaknessReadsTheEnemysBar() {
         Battle battle = withAlly(TriggerSpecs.rule("ALLY_ATTACK", List.of("target has_weakness Fire"), gain(1)));
-        Character owner = battle.characters.getFirst();
+        Character owner = battle.characters().getFirst();
         Enemy weak = dummy();
         weak.setStanceWeak(Set.of(DamageElement.FIRE));
         Enemy resistant = dummy();
@@ -514,8 +514,8 @@ public class TriggerStateTest {
         Battle battle = withAllyOf(8010,
                 TriggerSpecs.rule("ALLY_ATTACK", List.of("target has_skill ELATION_SKILL"), gain(1)),
                 TriggerSpecs.rule("ALLY_ATTACK", List.of("target has_skill COMMON"), gain(2)));
-        Character owner = battle.characters.getFirst();
-        Character elation = battle.characters.get(1);
+        Character owner = battle.characters().getFirst();
+        Character elation = battle.characters().get(1);
         drainSkillPoints(battle);
 
         Assertions.assertTrue(elation.getSkills().get(SkillType.ELATION_SKILL).getData().isLoaded(),
@@ -549,8 +549,8 @@ public class TriggerStateTest {
     public void hasSkillNegationIsTheOtherBranch() {
         Battle battle = withAllyOf(8010,
                 TriggerSpecs.rule("ALLY_ATTACK", List.of("!target has_skill ELATION_SKILL"), gain(1)));
-        Character owner = battle.characters.getFirst();
-        Character elation = battle.characters.get(1);
+        Character owner = battle.characters().getFirst();
+        Character elation = battle.characters().get(1);
         drainSkillPoints(battle);
 
         Assertions.assertEquals(1, battle.fireTriggers(TriggerEvent.ALLY_ATTACK, owner, owner, 1, 0),
@@ -592,8 +592,8 @@ public class TriggerStateTest {
         Battle battle = withAlly(
                 TriggerSpecs.rule("ALLY_ATTACK", List.of("target has_path 同谐"), gain(1)),
                 TriggerSpecs.rule("ALLY_ATTACK", List.of("target has_path 智识"), gain(2)));
-        Character owner = battle.characters.getFirst();
-        Character harmony = battle.characters.get(1);
+        Character owner = battle.characters().getFirst();
+        Character harmony = battle.characters().get(1);
         drainSkillPoints(battle);
 
         Assertions.assertEquals(1, battle.fireTriggers(TriggerEvent.ALLY_ATTACK, owner, harmony, 1, 0),
@@ -624,8 +624,8 @@ public class TriggerStateTest {
     public void negationInvertsTheCondition() {
         Battle battle = withAlly(
                 TriggerSpecs.rule("ALLY_ATTACK", List.of("!target has_path 同谐"), gain(1)));
-        Character owner = battle.characters.getFirst();
-        Character harmony = battle.characters.get(1);
+        Character owner = battle.characters().getFirst();
+        Character harmony = battle.characters().get(1);
         drainSkillPoints(battle);
 
         Assertions.assertEquals(0, battle.fireTriggers(TriggerEvent.ALLY_ATTACK, owner, harmony, 1, 0),
@@ -646,7 +646,7 @@ public class TriggerStateTest {
     public void negatedConditionStillFailsWhenThePartyIsMissing() {
         Battle battle = battleWith(
                 TriggerSpecs.rule("ALLY_ATTACK", List.of("!target has_path 同谐"), gain(1)));
-        Character owner = battle.characters.getFirst();
+        Character owner = battle.characters().getFirst();
         drainSkillPoints(battle);
 
         Assertions.assertEquals(0, battle.fireTriggers(TriggerEvent.ALLY_ATTACK, owner, null, 1, 0),
@@ -772,7 +772,7 @@ public class TriggerStateTest {
             if (battle.isOver()) {
                 throw new AssertionError("the battle ended before the requested unit acted");
             }
-            boolean mine = battle.queue.getCurrentActor().getCanHit() == who;
+            boolean mine = battle.queue().getCurrentActor().getCanHit() == who;
             if (mine) {
                 battle.beforeMove();
             }

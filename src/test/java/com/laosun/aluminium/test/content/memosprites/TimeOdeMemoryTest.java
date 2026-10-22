@@ -39,8 +39,8 @@ public class TimeOdeMemoryTest {
                 List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        cyrene = battle.characters.get(0);
-        longnight = battle.characters.get(1);
+        cyrene = battle.characters().get(0);
+        longnight = battle.characters().get(1);
 
         if (castTheOde) {
             var sprite = battle.summonServant(cyrene);
@@ -51,14 +51,14 @@ public class TimeOdeMemoryTest {
             battle.processRequests();
         }
 
-        Character her = battle.characters.get(1);
+        Character her = battle.characters().get(1);
         int before = her.getResources().value(MEM);
         // The sentence covers Skill OR Ultimate, and her own kit has a DELEGATE_DAMAGE rule on the skill slot that names the ultimate -- measured: casting the skill
         // trips that rule with "names ULTRA (slot 3) but the cast in progress is slot 2". The ultimate path is the same clause and does not collide.
         var skill = her.getSkills().get(com.laosun.aluminium.enums.SkillType.ULTRA);
         Assertions.assertNotNull(skill, "precondition: she has an ultimate");
-        SkillExecutor.execute(battle, skill, her, List.of(battle.enemies.getFirst()));
+        SkillExecutor.execute(battle, skill, her, List.of(battle.enemies().getFirst()));
         battle.processRequests();
-        return battle.characters.get(1).getResources().value(MEM) - before;
+        return battle.characters().get(1).getResources().value(MEM) - before;
     }
 }

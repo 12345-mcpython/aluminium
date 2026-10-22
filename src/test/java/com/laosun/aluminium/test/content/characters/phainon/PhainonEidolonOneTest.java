@@ -47,7 +47,7 @@ public class PhainonEidolonOneTest {
     @Test
     public void theKillingBlowHealsAQuarterOfMaxHp() {
         Battle battle = newBattle();
-        Character phainon = battle.characters.getFirst();
+        Character phainon = battle.characters().getFirst();
         phainon.setCurrentEnergy(phainon.getMaxEnergy());
         battle.castUltra(phainon, List.of(battle.enemyUnits().getFirst()));
         battle.processRequests();
@@ -73,7 +73,7 @@ public class PhainonEidolonOneTest {
 
     private static double criticalDamageGainFromTheUltimate(int eidolonRank) {
         Battle battle = newBattle(eidolonRank);
-        Character phainon = battle.characters.getFirst();
+        Character phainon = battle.characters().getFirst();
         double before = phainon.getAttribute(AttributeType.CRIT_ATTACK).get();
         phainon.setCurrentEnergy(phainon.getMaxEnergy());
         battle.castUltra(phainon, List.of(battle.enemyUnits().getFirst()));

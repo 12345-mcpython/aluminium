@@ -51,15 +51,15 @@ public class EidolonSixExtendsSoulsteelTest {
         // Her skill applies [智剑连心] for one turn.
         Skill skill = her.getSkills().get(SkillType.SKILL);
         Assertions.assertNotNull(skill, "precondition: she has a skill");
-        SkillExecutor.execute(battle, skill, her, List.of(battle.enemies.getFirst()));
+        SkillExecutor.execute(battle, skill, her, List.of(battle.enemies().getFirst()));
         battle.processRequests();
         Assertions.assertTrue(her.getBuffManager().hasState(STATE), "precondition: the skill applied it");
 
         // She lands the kill, so the EVENT's actor is her -- which the rule requires ("actor == self").
-        battle.applyTrueDamage(her, battle.enemies.getFirst(), DamageElement.ICE,
-                battle.enemies.getFirst().getCurrentHp());
+        battle.applyTrueDamage(her, battle.enemies().getFirst(), DamageElement.ICE,
+                battle.enemies().getFirst().getCurrentHp());
         battle.processRequests();
-        Assertions.assertTrue(battle.enemies.getFirst().isDeath(), "precondition: the enemy died");
+        Assertions.assertTrue(battle.enemies().getFirst().isDeath(), "precondition: the enemy died");
 
         // Note: The decrement site measured in round 1619: `BuffManager.beforeMove()` -> `processBuffTick`.
         her.getBuffManager().beforeMove();

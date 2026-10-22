@@ -69,7 +69,7 @@ public class SkillPointPolicyExtensibilityTest {
     @Test
     public void customPolicyChangesTheBasicAttackGain() {
         Battle battle = newBattle(List.of(CharacterFactory.create(1003, 80)));
-        Character hero = battle.characters.getFirst();
+        Character hero = battle.characters().getFirst();
 
         // Swap the policy - this is the only "wiring" action, and not one line of Battle was changed
         battle.setSkillPointPolicy(new DoubleGainPolicy());
@@ -203,7 +203,7 @@ public class SkillPointPolicyExtensibilityTest {
         Assertions.assertEquals(Constant.SKILL_POINT_START, battle.getSkillPoints());
         Assertions.assertEquals(Constant.SKILL_POINT_MAX, battle.getSkillPointMax());
 
-        Character hero = battle.characters.getFirst();
+        Character hero = battle.characters().getFirst();
         Assertions.assertTrue(actWithRealTurn(battle, hero, () -> skill(hero, 1),
                 () -> List.of(firstEnemy(battle))));
         Assertions.assertEquals(Constant.SKILL_POINT_START + Constant.SKILL_POINT_GAIN_BASIC,
@@ -243,7 +243,7 @@ public class SkillPointPolicyExtensibilityTest {
 
         int before = battle.getSkillPoints();
         Assertions.assertTrue(actWithRealTurn(battle, enemy,
-                () -> new DefaultSkill(1003, 1, 1), () -> List.of(battle.characters.getFirst())));
+                () -> new DefaultSkill(1003, 1, 1), () -> List.of(battle.characters().getFirst())));
         Assertions.assertEquals(before + 1, battle.getSkillPoints(),
                 "with a policy that does not check the camp, an enemy basic attack gains a point too → so the camp judgement lives in the policy, not in Battle");
     }
@@ -274,10 +274,10 @@ public class SkillPointPolicyExtensibilityTest {
                                                List<? extends CanHit> targets) {
         for (int i = 0; i < 30; i++) {
             battle.stepForward();
-            if (battle.currentMove == null) {
+            if (battle.currentMove() == null) {
                 break;
             }
-            if (battle.currentMove.getCanHit() == actor) {
+            if (battle.currentMove().getCanHit() == actor) {
                 battle.beforeMove();
                 return battle.performAction(skill.get(), targets);
             }

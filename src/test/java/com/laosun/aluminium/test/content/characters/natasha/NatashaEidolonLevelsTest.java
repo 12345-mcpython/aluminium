@@ -94,6 +94,6 @@ public class NatashaEidolonLevelsTest {
         Battle battle = new Battle(List.of(natasha),
                 List.of(EnemyFactory.create(MONSTER, LEVEL, 1)), BattleFixture.alwaysRoll(1.0));
         battle.startBattle();
-        return battle.characters.getFirst().skillLevelBonus(slot);
+        return battle.characters().getFirst().skillLevelBonus(slot);
     }
 }

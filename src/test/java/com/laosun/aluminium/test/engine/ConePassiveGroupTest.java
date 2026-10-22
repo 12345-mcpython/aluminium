@@ -59,7 +59,7 @@ public class ConePassiveGroupTest {
         // battle starts - so the reading is against a cone-less wearer, not across startBattle.
         Assertions.assertEquals(0.1, panelGain(21007, AttributeType.OUTGOING_HEALING_BOOST), 1e-6,
                 "the healing boost (property only)");
-        battle.currentMove = new Signal(unit);
+        battle.setCurrentMove(new Signal(unit));
         battle.beforeMove();
         battle.fireTriggers(TriggerEvent.SKILL_CAST, unit, target, 0, 0);
         Assertions.assertTrue(ally.getCurrentEnergy() > allyEnergy,

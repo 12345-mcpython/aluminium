@@ -111,7 +111,7 @@ public class TriggerTableTest {
         Battle battle = newBattle(List.of(tribbie, himeko), 1);
 
         double before = tribbie.getCurrentEnergy();
-        strike(battle, himeko, battle.enemies.getFirst());
+        strike(battle, himeko, battle.enemies().getFirst());
         double gained = tribbie.getCurrentEnergy() - before;
 
         assertEnergyEquals(gained, 1.5, "1.5 per target x 1 target");
@@ -148,7 +148,7 @@ public class TriggerTableTest {
         Battle battle = newBattle(List.of(robin), 1);
 
         double before = robin.getCurrentEnergy();
-        strike(battle, robin, battle.enemies.getFirst());
+        strike(battle, robin, battle.enemies().getFirst());
         double gained = robin.getCurrentEnergy() - before;
 
         // Her own attack still grants the ordinary skill energy (20), so compare against that rather
@@ -168,7 +168,7 @@ public class TriggerTableTest {
         Battle battle = newBattle(List.of(tribbie), 1);
 
         double before = tribbie.getCurrentEnergy();
-        strike(battle, tribbie, battle.enemies.getFirst());
+        strike(battle, tribbie, battle.enemies().getFirst());
         double gained = tribbie.getCurrentEnergy() - before;
 
         double skillEnergy = 20 * (1 + tribbie.getAttribute(
@@ -200,7 +200,7 @@ public class TriggerTableTest {
 
         Battle battle = newBattle(List.of(plain), 1);
         double before = plain.getCurrentEnergy();
-        strike(battle, plain, battle.enemies.getFirst());
+        strike(battle, plain, battle.enemies().getFirst());
 
         double skillEnergy = 20 * (1 + plain.getAttribute(
                 com.laosun.aluminium.enums.AttributeType.ENERGY_REGENERATION_RATE).get());
@@ -698,7 +698,7 @@ public class TriggerTableTest {
      */
     private static void attackAllEnemies(Battle battle, Character attacker) {
         battle.castImmediate(attacker.getSkills().get(SkillType.ULTRA), attacker,
-                List.of(battle.enemies.getFirst()));
+                List.of(battle.enemies().getFirst()));
     }
 
     /**

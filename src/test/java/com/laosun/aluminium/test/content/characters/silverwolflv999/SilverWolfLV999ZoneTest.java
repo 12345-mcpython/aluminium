@@ -36,8 +36,8 @@ public class SilverWolfLV999ZoneTest {
     @Test
     public void theUltimateDeploysTheZoneOnHer() {
         Battle battle = newBattle();
-        Character wolf = battle.characters.getFirst();
-        Character ally = battle.characters.get(1);
+        Character wolf = battle.characters().getFirst();
+        Character ally = battle.characters().get(1);
         Assertions.assertFalse(wolf.getBuffManager().hasState(ZONE), "precondition: no Zone before the Ultimate");
 
         castUltimate(battle, wolf);
@@ -54,7 +54,7 @@ public class SilverWolfLV999ZoneTest {
     @Test
     public void aSpentSkillPointTriggersTheLootBox() {
         Battle battle = newBattle();
-        Character wolf = battle.characters.getFirst();
+        Character wolf = battle.characters().getFirst();
         castUltimate(battle, wolf);
 
         double before = totalEnemyHp(battle);
@@ -73,7 +73,7 @@ public class SilverWolfLV999ZoneTest {
     @Test
     public void withoutTheZoneASpentPointDoesNothing() {
         Battle battle = newBattle();
-        Character wolf = battle.characters.getFirst();
+        Character wolf = battle.characters().getFirst();
         double before = totalEnemyHp(battle);
         battle.fireTriggers(TriggerEvent.SKILL_POINT_SPENT, wolf, wolf, 0, 1);
         battle.processRequests();

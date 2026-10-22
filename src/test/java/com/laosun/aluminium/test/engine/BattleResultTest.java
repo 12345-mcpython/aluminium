@@ -53,19 +53,19 @@ public class BattleResultTest {
         Battle battle = newBattle();
         battle.startBattle();
 
-        battle.enemies.getFirst().takeDamage(999_999);
+        battle.enemies().getFirst().takeDamage(999_999);
         battle.processRequests();                     // public entry point: triggers death cleanup + judgment
 
         Assertions.assertEquals(Battle.Status.WIN, battle.getStatus());
         Assertions.assertTrue(battle.isOver());
 
-        double elapsedBefore = battle.queue.getElapsed();
+        double elapsedBefore = battle.queue().getElapsed();
         battle.stepForward();
         battle.stepForward();
 
-        Assertions.assertEquals(elapsedBefore, battle.queue.getElapsed(), EPS,
+        Assertions.assertEquals(elapsedBefore, battle.queue().getElapsed(), EPS,
                 "after a terminal state stepForward() no longer advances the clock");
-        Assertions.assertNull(battle.currentMove, "and nobody is at their action point");
+        Assertions.assertNull(battle.currentMove(), "and nobody is at their action point");
     }
 
     /**
@@ -76,7 +76,7 @@ public class BattleResultTest {
         Battle battle = newBattle();
         battle.startBattle();
 
-        for (Character c : battle.characters) {
+        for (Character c : battle.characters()) {
             c.takeDamage(999_999);
         }
         battle.processRequests();
@@ -96,10 +96,10 @@ public class BattleResultTest {
         Battle battle = newBattle();
         battle.startBattle();
 
-        for (Character c : battle.characters) {
+        for (Character c : battle.characters()) {
             c.takeDamage(999_999);
         }
-        battle.enemies.getFirst().takeDamage(999_999);
+        battle.enemies().getFirst().takeDamage(999_999);
         battle.processRequests();
 
         Assertions.assertEquals(Battle.Status.LOSE, battle.getStatus());
@@ -112,7 +112,7 @@ public class BattleResultTest {
     @Test
     public void nothingIsJudgedBeforeTheBattleStarts() {
         Battle battle = newBattle();
-        battle.enemies.getFirst().takeDamage(999_999);
+        battle.enemies().getFirst().takeDamage(999_999);
 
         Assertions.assertEquals(Battle.Status.NOT_STARTED, battle.checkResult());
         Assertions.assertEquals(Battle.Status.NOT_STARTED, battle.getStatus());
@@ -127,11 +127,11 @@ public class BattleResultTest {
         Battle battle = newBattle();
         battle.startBattle();
 
-        battle.enemies.getFirst().takeDamage(999_999);
+        battle.enemies().getFirst().takeDamage(999_999);
         battle.processRequests();
         Assertions.assertEquals(Battle.Status.WIN, battle.getStatus());
 
-        for (Character c : battle.characters) {
+        for (Character c : battle.characters()) {
             c.takeDamage(999_999);
         }
         battle.processRequests();
@@ -160,7 +160,7 @@ public class BattleResultTest {
     public void statusIsPerBattleInstance() {
         Battle first = newBattle();
         first.startBattle();
-        first.enemies.getFirst().takeDamage(999_999);
+        first.enemies().getFirst().takeDamage(999_999);
         first.processRequests();
         Assertions.assertEquals(Battle.Status.WIN, first.getStatus());
 

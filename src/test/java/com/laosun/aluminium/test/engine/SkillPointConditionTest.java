@@ -104,6 +104,6 @@ public class SkillPointConditionTest {
 
         battle.fireTriggers(TriggerEvent.SKILL_POINT_GAINED, owner, owner, 0, 1);
         battle.processRequests();
-        return battle.characters.getFirst().getResources().value(COUNTER);
+        return battle.characters().getFirst().getResources().value(COUNTER);
     }
 }

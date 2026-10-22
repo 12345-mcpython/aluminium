@@ -58,10 +58,10 @@ public class HuohuoTalismanDurationTest {
      * Note: Half a turn is `beforeMove()` alone; a full one is both halves, and expiry lands on the late half.
      */
     private static void spendTurnOf(Battle battle, Character unit) {
-        Signal signal = battle.queue.snapshot().stream()
+        Signal signal = battle.queue().snapshot().stream()
                 .filter(candidate -> candidate.getCanHit() == unit).findFirst()
                 .orElseThrow(() -> new AssertionError("precondition: the unit is in the queue"));
-        battle.currentMove = signal;
+        battle.setCurrentMove(signal);
         battle.beforeMove();
         battle.afterMove();
         battle.processRequests();

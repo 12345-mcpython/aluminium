@@ -123,10 +123,10 @@ public class TurnSuspensionTest {
         }
 
         private void turn(Character unit) {
-            battle.currentMove = battle.queue.snapshot().stream()
+            battle.setCurrentMove(battle.queue().snapshot().stream()
                     .filter(signal -> signal.getCanHit() == unit)
                     .findFirst()
-                    .orElseThrow(() -> new AssertionError("no signal for " + unit.getName()));
+                    .orElseThrow(() -> new AssertionError("no signal for " + unit.getName())));
             battle.beforeMove();
         }
     }

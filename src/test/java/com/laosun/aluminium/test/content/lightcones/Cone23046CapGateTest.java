@@ -46,7 +46,7 @@ public class Cone23046CapGateTest {
         Battle battle = new Battle(team, List.of(EnemyFactory.create(1002011, 100, 1)), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        Character mine = battle.characters.stream()
+        Character mine = battle.characters().stream()
                 .filter(c -> c.getCid() == WEARER)
                 .findFirst()
                 .orElseThrow();

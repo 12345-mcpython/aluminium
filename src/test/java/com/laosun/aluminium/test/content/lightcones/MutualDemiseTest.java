@@ -45,7 +45,7 @@ public class MutualDemiseTest {
                     unit.getMaxHp() * 0.15));
         }
         double before = unit.getAttribute(AttributeType.CRIT_CHANCE).get();
-        battle.currentMove = new Signal(unit);
+        battle.setCurrentMove(new Signal(unit));
         battle.beforeMove();
         return unit.getAttribute(AttributeType.CRIT_CHANCE).get() - before;
     }

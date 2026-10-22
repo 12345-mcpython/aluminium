@@ -41,7 +41,7 @@ public class TrueSelfOdeGivesStoryTest {
                 List.of(EnemyFactory.create(MONSTER, 100, 1)), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        cyrene = battle.characters.getFirst();
+        cyrene = battle.characters().getFirst();
         if (castTheOde) {
             var sprite = battle.summonServant(cyrene);
             battle.processRequests();
@@ -49,15 +49,15 @@ public class TrueSelfOdeGivesStoryTest {
             Assertions.assertNotNull(ode, "precondition: slot 26");
             com.laosun.aluminium.models.skill.SkillExecutor.execute(battle, ode, sprite, List.of(cyrene));
             battle.processRequests();
-            cyrene = battle.characters.getFirst();
+            cyrene = battle.characters().getFirst();
         }
         var dragon = battle.summonMemosprite(cyrene);
         battle.processRequests();
-        cyrene = battle.characters.getFirst();
+        cyrene = battle.characters().getFirst();
         var ult = cyrene.getSkills().get(com.laosun.aluminium.enums.SkillType.ULTRA);
         Assertions.assertNotNull(ult, "precondition: her ultimate");
         com.laosun.aluminium.models.skill.SkillExecutor.execute(battle, ult, cyrene,
-                List.of(battle.enemies.getFirst()));
+                List.of(battle.enemies().getFirst()));
         battle.processRequests();
         return dragon.getResources().has(STORY) ? dragon.getResources().value(STORY) : 0;
     }

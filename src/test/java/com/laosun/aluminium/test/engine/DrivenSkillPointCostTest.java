@@ -88,7 +88,7 @@ public class DrivenSkillPointCostTest {
         Battle battle = new Battle(List.of(asTheDemoDoesIt), List.of(enemy()));
         battle.startBattle();
         battle.processRequests();
-        asTheDemoDoesIt = battle.characters.getFirst();
+        asTheDemoDoesIt = battle.characters().getFirst();
 
         int before = battle.getSkillPoints();
         Assertions.assertTrue(battle.applySkillPointCost(asTheDemoDoesIt.getSkills().get(SkillType.SKILL),

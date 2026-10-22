@@ -77,9 +77,9 @@ public class ExtraTurnEventTest {
         System.out.println("[probe] scheduled=" + battle.getExtraTurnActor()
                 + " ; counter registered=" + ally.getResources().has(COUNTER));
         battle.stepForward();
-        System.out.println("[probe] after the move: current=" + battle.currentMove.getCanHit().getName()
+        System.out.println("[probe] after the move: current=" + battle.currentMove().getCanHit().getName()
                 + " counter=" + ally.getResources().value(COUNTER));
-        Assertions.assertEquals(ally, battle.currentMove.getCanHit(),
+        Assertions.assertEquals(ally, battle.currentMove().getCanHit(),
                 "precondition: the extra turn is the ally's");
         Assertions.assertEquals(1, ally.getResources().value(COUNTER), EPS,
                 "EXTRA_TURN_STARTED fired ONCE, at the move that hands the turn over (before the unit acts)");

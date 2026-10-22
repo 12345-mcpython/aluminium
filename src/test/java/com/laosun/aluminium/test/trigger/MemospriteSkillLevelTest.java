@@ -275,7 +275,7 @@ public class MemospriteSkillLevelTest {
             if ("percent".equals(spelling)) {
                 battle.fireTriggers(TriggerEvent.TURN_START);
             } else {
-                SkillExecutor.execute(battle, ode(), demiurge, List.of(battle.characters.get(1)));
+                SkillExecutor.execute(battle, ode(), demiurge, List.of(battle.characters().get(1)));
             }
             battle.processRequests();
             return cyrene.getAttribute(AttributeType.ATTACK).get() - before;

@@ -39,7 +39,7 @@ public class BladeEidolonStateTest {
             unit.getBuffManager().addBuff(new StateBuff(STATE, 3));
         }
         double before = unit.getAttribute(AttributeType.CRIT_CHANCE).get();
-        battle.currentMove = new Signal(unit);
+        battle.setCurrentMove(new Signal(unit));
         battle.beforeMove();
         return unit.getAttribute(AttributeType.CRIT_CHANCE).get() - before;
     }

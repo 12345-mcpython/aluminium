@@ -62,7 +62,7 @@ public class ElationRowTest {
         battle.startBattle();
         battle.processRequests();
         battle.castImmediate(him.getSkills().get(SkillType.ELATION_SKILL), him,
-                List.of(battle.enemies.getFirst()));
+                List.of(battle.enemies().getFirst()));
         int instances = him.getBuffManager().stacksOf(COUNTER);
         System.out.println("[" + AVENTURINE + "] damage instances settled by the Elation row: " + instances);
         return instances;

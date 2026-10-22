@@ -130,10 +130,10 @@ public class TrailblazerHarmonyTest {
          * `tickForeignBuffs(actor, false)` inside `afterMove`. Two earlier versions of this case failed on exactly that.
          */
         private void fullTurnOf(Character unit) {
-            battle.currentMove = battle.queue.snapshot().stream()
+            battle.setCurrentMove(battle.queue().snapshot().stream()
                     .filter(signal -> signal.getCanHit() == unit)
                     .findFirst()
-                    .orElseThrow(() -> new AssertionError("no signal for that unit"));
+                    .orElseThrow(() -> new AssertionError("no signal for that unit")));
             battle.beforeMove();
             battle.afterMove();
         }

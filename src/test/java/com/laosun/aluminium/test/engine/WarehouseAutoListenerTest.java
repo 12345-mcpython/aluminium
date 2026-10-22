@@ -35,13 +35,13 @@ public class WarehouseAutoListenerTest {
         battle.beginWave();
 
         // two real landings: the class the clause asks about is recorded by the landing path, not by a synthesised event
-        boolean firstLanded = battle.tryApplyDebuff(battle.enemies.getFirst(), fighter,
+        boolean firstLanded = battle.tryApplyDebuff(battle.enemies().getFirst(), fighter,
                 new ControlBuff(com.laosun.aluminium.Constant.CONTROL_EFFECTS.get("FROZEN"), 2), 1.0, "STAT_CTRL_Frozen");
         battle.processRequests();
         boolean firewallOn = fighter.getBuffManager().hasState("防火墙");
-        boolean secondLanded = battle.tryApplyDebuff(battle.enemies.getFirst(), fighter,
+        boolean secondLanded = battle.tryApplyDebuff(battle.enemies().getFirst(), fighter,
                 new ControlBuff(com.laosun.aluminium.Constant.CONTROL_EFFECTS.get("FROZEN"), 2), 1.0, "STAT_CTRL_Frozen");
-        boolean wolfInQueue = battle.queue.snapshot().stream().anyMatch(signal -> signal.getCanHit() == wolf);
+        boolean wolfInQueue = battle.queue().snapshot().stream().anyMatch(signal -> signal.getCanHit() == wolf);
         System.out.println("[auto-warehouse] first landed=" + firstLanded + " firewall=" + firewallOn
                 + " second landed=" + secondLanded + " owner still in queue=" + wolfInQueue);
 

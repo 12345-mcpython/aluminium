@@ -45,8 +45,8 @@ public class EnemyCampSummonTest {
     public void theEnemyCampHoldsANonMonsterAndTheMonsterViewDoesNot() {
         Fixture f = fixture();
 
-        Assertions.assertEquals(2, f.battle.enemies.size(), "the camp holds the monster and the summon");
-        Assertions.assertSame(f.summon, f.battle.enemies.get(1));
+        Assertions.assertEquals(2, f.battle.enemies().size(), "the camp holds the monster and the summon");
+        Assertions.assertSame(f.summon, f.battle.enemies().get(1));
         Assertions.assertEquals(1, f.battle.enemyUnits().size(),
                 "enemyUnits() is the monsters only -- 'on that side' and 'is a monster' are now two questions");
         Assertions.assertSame(f.monster, f.battle.enemyUnits().getFirst());
@@ -105,9 +105,9 @@ public class EnemyCampSummonTest {
     public void theSummonTakesItsTurnOnTheActionBar() {
         Fixture f = fixture();
 
-        Assertions.assertEquals(3, f.battle.queue.size(), "hero + monster + summon are all combatants");
+        Assertions.assertEquals(3, f.battle.queue().size(), "hero + monster + summon are all combatants");
 
-        List<Signal> signals = f.battle.queue.snapshot();
+        List<Signal> signals = f.battle.queue().snapshot();
         Assertions.assertTrue(signals.stream().anyMatch(s -> s.getCanHit() == f.summon),
                 "the summon has a signal of its own, so it will be handed turns like any other unit");
     }

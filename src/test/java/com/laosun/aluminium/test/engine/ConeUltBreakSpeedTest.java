@@ -31,7 +31,7 @@ public class ConeUltBreakSpeedTest {
         Enemy enemy = enemy();
         Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
-        battle.currentMove = new Signal(unit);
+        battle.setCurrentMove(new Signal(unit));
         battle.beforeMove();
         double before = unit.getAttribute(AttributeType.ATTACK).get();
         double base = unit.getAttribute(AttributeType.ATTACK).baseValue();
@@ -47,7 +47,7 @@ public class ConeUltBreakSpeedTest {
         Enemy enemy = enemy();
         Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
-        battle.currentMove = new Signal(unit);
+        battle.setCurrentMove(new Signal(unit));
         battle.beforeMove();
         unit.takeDamage(unit.getMaxHp() * 0.5);
         double before = unit.getCurrentHp();

@@ -186,7 +186,7 @@ public class OneOfEffectTest {
                 List.of(BattleFixture.monster()), new Random(seed));
         battle.startBattle();
         battle.processRequests();
-        Character wolf = battle.characters.getFirst();
+        Character wolf = battle.characters().getFirst();
         EffectSpec constant = mark(C);
         TriggerSpecs.set(constant, "always", true);
         TriggerSpec spec = TriggerSpecs.rule("TURN_START", List.of("actor == self"), mark(A), mark(B), constant);
@@ -215,7 +215,7 @@ public class OneOfEffectTest {
                 List.of(BattleFixture.monster()), new Random(seed));
         battle.startBattle();
         battle.processRequests();
-        Character wolf = battle.characters.getFirst();
+        Character wolf = battle.characters().getFirst();
         wolf.setTriggerTable(table(spec(oneOf, 3)));
         battle.fireTriggers(TriggerEvent.TURN_START, wolf, wolf, 0, 0);
         battle.processRequests();

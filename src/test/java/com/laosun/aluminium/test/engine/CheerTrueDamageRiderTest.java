@@ -55,11 +55,11 @@ public class CheerTrueDamageRiderTest {
             ally.getBuffManager().removeState(CHEER);
             battle.processRequests();
         }
-        double before = battle.enemies.get(0).getCurrentHp();
+        double before = battle.enemies().get(0).getCurrentHp();
         Skill hers = ally.getSkills().get(SkillType.SKILL);
         Assertions.assertNotNull(hers, "precondition: the ally has a skill");
-        SkillExecutor.execute(battle, hers, ally, List.of(battle.enemies.get(0)));
+        SkillExecutor.execute(battle, hers, ally, List.of(battle.enemies().get(0)));
         battle.processRequests();
-        return before - battle.enemies.get(0).getCurrentHp();
+        return before - battle.enemies().get(0).getCurrentHp();
     }
 }

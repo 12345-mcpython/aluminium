@@ -79,7 +79,7 @@ public class GainResourceToMaxTest {
         Battle battle = new Battle(List.of(pearl), List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        Character unit = battle.characters.getFirst();
+        Character unit = battle.characters().getFirst();
 
         // The counter is the fixture's own, declared with an overflow allowance - the case is about the FIELD, so the
         // counter is built to have one. `setMaxOverflow` is the raw write the declaration path uses.

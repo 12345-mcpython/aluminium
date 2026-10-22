@@ -174,10 +174,10 @@ public class ArgentiStacksTest {
         }
 
         private void argentiTurn() {
-            battle.currentMove = battle.queue.snapshot().stream()
+            battle.setCurrentMove(battle.queue().snapshot().stream()
                     .filter(signal -> signal.getCanHit() == argenti)
                     .findFirst()
-                    .orElseThrow(() -> new AssertionError("no signal for her"));
+                    .orElseThrow(() -> new AssertionError("no signal for her")));
             battle.beforeMove();
             battle.afterMove();
         }

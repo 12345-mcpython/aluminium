@@ -58,11 +58,11 @@ public class PeeragePierceDamageTest {
             battle.processRequests();
         }
 
-        double before = battle.enemies.get(0).getCurrentHp();
+        double before = battle.enemies().get(0).getCurrentHp();
         Skill his = ally.getSkills().get(SkillType.SKILL);
         Assertions.assertNotNull(his, "precondition: the ally has a skill");
-        SkillExecutor.execute(battle, his, ally, List.of(battle.enemies.get(0)));
+        SkillExecutor.execute(battle, his, ally, List.of(battle.enemies().get(0)));
         battle.processRequests();
-        return before - battle.enemies.get(0).getCurrentHp();
+        return before - battle.enemies().get(0).getCurrentHp();
     }
 }

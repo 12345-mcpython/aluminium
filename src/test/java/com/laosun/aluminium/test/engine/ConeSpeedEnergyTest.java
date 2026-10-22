@@ -34,7 +34,7 @@ public class ConeSpeedEnergyTest {
         // 2026-10-19: the break share is the cone's own `breaking_effect` property (it is in the panel before the
         // battle starts), so no rule states it any more.
         Assertions.assertTrue(true, "the break share is the property - pinned in ConeAuditBatchTwelveTest");
-        battle.currentMove = new Signal(unit);
+        battle.setCurrentMove(new Signal(unit));
         battle.beforeMove();
         double speedBefore = unit.getAttribute(AttributeType.SPEED).get();
         double base = unit.getAttribute(AttributeType.SPEED).baseValue();
@@ -50,7 +50,7 @@ public class ConeSpeedEnergyTest {
         Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
-        battle.currentMove = new Signal(unit);
+        battle.setCurrentMove(new Signal(unit));
         battle.beforeMove();
         double before = unit.getCurrentEnergy();
         battle.fireTriggers(TriggerEvent.BASIC_ATTACK, unit, enemy, 0, 0);
@@ -73,7 +73,7 @@ public class ConeSpeedEnergyTest {
         Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
-        battle.currentMove = new Signal(unit);
+        battle.setCurrentMove(new Signal(unit));
         battle.beforeMove();
         battle.reduceToughness(unit, enemy, enemy.getStanceWeak().iterator().next(), 999);
         double before = unit.getCurrentEnergy();

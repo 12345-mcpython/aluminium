@@ -173,11 +173,11 @@ public class ConeAuditBatchThreeTest {
         f.battle.castImmediate(f.wearer.getSkills().get(SkillType.COMMON), f.wearer,
                 List.of(f.battle.enemyUnits().getFirst()));
         f.battle.processRequests();
-        Signal signal = f.battle.queue.snapshot().stream()
+        Signal signal = f.battle.queue().snapshot().stream()
                 .filter(s -> s.getCanHit() == f.wearer)
                 .findFirst()
                 .orElseThrow(() -> new AssertionError("no signal for the wearer"));
-        return f.battle.queue.getTimeRemaining(signal);
+        return f.battle.queue().getTimeRemaining(signal);
     }
 
     private static double healAfterBreak(boolean wearerBreaks) {
@@ -201,7 +201,7 @@ public class ConeAuditBatchThreeTest {
         f.wearer.consumeHp(f.wearer.getMaxHp() * (1 - hpFraction));
         for (int step = 0; step < 40; step++) {
             f.battle.stepForward();
-            boolean mine = f.battle.queue.getCurrentActor().getCanHit() == f.wearer;
+            boolean mine = f.battle.queue().getCurrentActor().getCanHit() == f.wearer;
             if (mine) {
                 f.battle.beforeMove();
                 double crit = f.wearer.getAttribute(AttributeType.CRIT_CHANCE).get();

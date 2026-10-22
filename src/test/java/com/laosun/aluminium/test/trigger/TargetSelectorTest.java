@@ -141,7 +141,7 @@ public class TargetSelectorTest {
         Assertions.assertInstanceOf(EnemySkill.class, iceEdge.getSkills().get(SkillType.COMMON), "the EnemySkill is properly installed on the enemy");
 
         battle.stepForward();                                 // Ice Edge SPD 132 > 100, it acts first
-        CanHit actor = battle.queue.getCurrentActor().getCanHit();
+        CanHit actor = battle.queue().getCurrentActor().getCanHit();
         Assertions.assertSame(iceEdge, actor);
 
         CanHit target = TargetSelector.select(battle, List.of(victim), TargetSelector.Intent.SINGLE, battle.getRng());

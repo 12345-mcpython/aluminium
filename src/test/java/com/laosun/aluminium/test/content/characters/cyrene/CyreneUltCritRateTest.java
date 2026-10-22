@@ -32,7 +32,7 @@ public class CyreneUltCritRateTest {
         battle.processRequests();
         double before = cyrene.getAttribute(AttributeType.CRIT_CHANCE).get();
         SkillExecutor.execute(battle, cyrene.getSkills().get(SkillType.ULTRA), cyrene,
-                List.of(battle.enemies.get(0)));
+                List.of(battle.enemies().get(0)));
         battle.processRequests();
         double after = cyrene.getAttribute(AttributeType.CRIT_CHANCE).get();
         Assertions.assertEquals(0.5, after - before, 1e-6,

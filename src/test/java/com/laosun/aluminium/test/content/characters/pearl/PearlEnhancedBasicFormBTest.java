@@ -38,10 +38,10 @@ public class PearlEnhancedBasicFormBTest {
     @Test
     public void theSlotNineFormHealsThePartyAndTheLowestAllyAgain() {
         Battle battle = newBattle();
-        Character pearl = battle.characters.get(0);
-        Character archetype = battle.characters.get(2);      // the Hunt ally: NOT Elation, so slot 9
-        Character secondLowest = battle.characters.get(1);
-        Character other = battle.characters.get(3);
+        Character pearl = battle.characters().get(0);
+        Character archetype = battle.characters().get(2);      // the Hunt ally: NOT Elation, so slot 9
+        Character secondLowest = battle.characters().get(1);
+        Character other = battle.characters().get(3);
         battle.fireTriggers(TriggerEvent.ULT_CAST, pearl, archetype, 0, 0);
         battle.processRequests();
         // ⚠ CORRECTED (2026-10-18, data migration): data slot **10**, not 9 (150309 no longer exists).
@@ -49,7 +49,7 @@ public class PearlEnhancedBasicFormBTest {
                 "precondition: a non-Elation archetype installs the SLOT-10 form, which is what this case is about");
 
         // Hurt the party, with ONE ally clearly the lowest so the "additional heal" has a unique target.
-        for (Character ally : battle.characters) {
+        for (Character ally : battle.characters()) {
             ally.takeDamage(ally.getMaxHp() * 0.5);
         }
         secondLowest.takeDamage(secondLowest.getMaxHp() * 0.3);
@@ -77,16 +77,16 @@ public class PearlEnhancedBasicFormBTest {
     @Test
     public void theOrdinaryBasicDoesNotHealTheParty() {
         Battle battle = newBattle();
-        Character pearl = battle.characters.get(0);
-        for (Character ally : battle.characters) {
+        Character pearl = battle.characters().get(0);
+        for (Character ally : battle.characters()) {
             ally.takeDamage(ally.getMaxHp() * 0.5);
         }
-        double before = battle.characters.get(3).getCurrentHp();
+        double before = battle.characters().get(3).getCurrentHp();
         attack(battle, pearl);
         System.out.println("[pearl_form_b] with no Ultimate the ally gained "
-                + (battle.characters.get(3).getCurrentHp() - before));
+                + (battle.characters().get(3).getCurrentHp() - before));
         // The ordinary basic is a single-target attack with no healing clause of its own, so nobody gains HP.
-        Assertions.assertEquals(0, battle.characters.get(3).getCurrentHp() - before, 1e-9,
+        Assertions.assertEquals(0, battle.characters().get(3).getCurrentHp() - before, 1e-9,
                 "her unenhanced basic carries no party heal - the healing belongs to the enhanced forms");
     }
 
@@ -108,8 +108,8 @@ public class PearlEnhancedBasicFormBTest {
      */
     private static int slotAfterUltimate() {
         Battle battle = newBattle();
-        Character pearl = battle.characters.get(0);
-        battle.fireTriggers(TriggerEvent.ULT_CAST, pearl, battle.characters.get(2), 0, 0);
+        Character pearl = battle.characters().get(0);
+        battle.fireTriggers(TriggerEvent.ULT_CAST, pearl, battle.characters().get(2), 0, 0);
         battle.processRequests();
         for (SkillType slot : SkillType.values()) {
             if (pearl.getSkills().get(SkillType.COMMON) != null

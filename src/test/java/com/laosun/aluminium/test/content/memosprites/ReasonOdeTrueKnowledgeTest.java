@@ -45,14 +45,14 @@ public class ReasonOdeTrueKnowledgeTest {
                 List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        var sprite = battle.summonServant(battle.characters.get(0));
+        var sprite = battle.summonServant(battle.characters().get(0));
         battle.processRequests();
         var ode = sprite.skillAt(ODE_SLOT);
         Assertions.assertNotNull(ode, "precondition: slot 18");
-        Character aimed = battle.characters.get(aimedAtHim ? 1 : 2);
+        Character aimed = battle.characters().get(aimedAtHim ? 1 : 2);
         com.laosun.aluminium.models.skill.SkillExecutor.execute(battle, ode, sprite, List.of(aimed));
         battle.processRequests();
-        Character target = battle.characters.get(1);
+        Character target = battle.characters().get(1);
         return new double[]{target.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get(),
                 target.getBuffManager().hasState(TRUE_KNOWLEDGE) ? 1 : 0};
     }

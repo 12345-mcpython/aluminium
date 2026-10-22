@@ -37,7 +37,7 @@ public final class TestTurns {
             if (battle.isOver()) {
                 throw new AssertionError("the battle ended before the requested unit acted");
             }
-            boolean mine = battle.queue.getCurrentActor().getCanHit() == who;
+            boolean mine = battle.queue().getCurrentActor().getCanHit() == who;
             if (mine) {
                 battle.beforeMove();
             }

@@ -84,7 +84,7 @@ public class CastSkillParamScaleTest {
             owner.setTriggerTable(new TriggerTable(CYRENE, List.of(
                     TriggerSpecs.rule("CAST_SETUP", List.of("actor is_summon"), effect))));
             double before = owner.getAttribute(AttributeType.ATTACK).get();
-            SkillExecutor.execute(battle, ode, demiurge, List.of(battle.characters.get(1)));
+            SkillExecutor.execute(battle, ode, demiurge, List.of(battle.characters().get(1)));
             battle.processRequests();
             return owner.getAttribute(AttributeType.ATTACK).get() - before;
         }

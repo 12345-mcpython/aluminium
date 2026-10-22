@@ -31,8 +31,8 @@ public class EnemyAttackEventTest {
                 List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        Character hit = battle.characters.get(0);
-        Character spared = battle.characters.get(1);
+        Character hit = battle.characters().get(0);
+        Character spared = battle.characters().get(1);
 
         // The same rule on both characters: "when an enemy attacks ME, my ATK rises". `target == self` is what
         // makes it "me" -- the event is delivered to every table, and its target is the victim.

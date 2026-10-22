@@ -67,8 +67,8 @@ public class SpendAllTest {
 
     private static double lossByCast(int start) {
         Battle battle = primed(start);
-        Character owner = (Character) battle.allies.get(0);
-        Enemy enemy = (Enemy) battle.enemies.get(0);
+        Character owner = (Character) battle.allies().get(0);
+        Enemy enemy = (Enemy) battle.enemies().get(0);
         Assertions.assertEquals(start, owner.getResources().value(RES),
                 "precondition: her own rule primed it to " + start);
         double before = enemy.getCurrentHp();

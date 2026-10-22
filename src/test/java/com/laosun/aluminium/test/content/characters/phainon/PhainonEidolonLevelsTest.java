@@ -66,7 +66,7 @@ public class PhainonEidolonLevelsTest {
      * COMMON, SKILL, ULTRA and TALENT's EFFECTIVE levels (base plus every raise), in that order.
      */
     private static int[] levelsAt(int eidolonRank) {
-        Character phainon = newBattle(eidolonRank).characters.getFirst();
+        Character phainon = newBattle(eidolonRank).characters().getFirst();
         return new int[]{
                 phainon.skillLevel(phainon.getSkills().get(SkillType.COMMON)),
                 phainon.skillLevel(phainon.getSkills().get(SkillType.SKILL)),
@@ -79,8 +79,8 @@ public class PhainonEidolonLevelsTest {
      */
     private static double critDamageFromAnAlliesAbility(int eidolonRank) {
         Battle battle = newBattle(eidolonRank);
-        Character phainon = battle.characters.getFirst();
-        Character ally = battle.characters.get(1);
+        Character phainon = battle.characters().getFirst();
+        Character ally = battle.characters().get(1);
         double before = phainon.getAttribute(AttributeType.CRIT_ATTACK).get();
         battle.fireTriggers(TriggerEvent.SKILL_CAST, ally, phainon, 0, 0);
         battle.processRequests();

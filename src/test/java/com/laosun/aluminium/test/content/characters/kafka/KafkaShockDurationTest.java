@@ -88,7 +88,7 @@ public class KafkaShockDurationTest {
         int burning = 0;
         for (int turn = 0; turn < HORIZON && !enemy.isDeath(); turn++) {
             double before = enemy.getCurrentHp();
-            battle.currentMove = new Signal(enemy);
+            battle.setCurrentMove(new Signal(enemy));
             battle.beforeMove();
             battle.afterMove();
             if (enemy.getCurrentHp() < before) {

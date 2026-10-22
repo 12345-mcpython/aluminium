@@ -71,15 +71,15 @@ public class OtherAlliesTargetTest {
     @Test
     public void otherAlliesLeavesTheOwnerOut() {
         Battle battle = new Battle(party(), List.of(dummy()), BattleFixture.seeded());
-        Character owner = battle.characters.getFirst();
+        Character owner = battle.characters().getFirst();
         battle.startBattle();
         double ownerBefore = timeRemaining(battle, owner);
 
         int fired = battle.fireTriggers(TriggerEvent.ULT_CAST, owner, null, 0, 0);
 
         Assertions.assertEquals(1, fired);
-        Assertions.assertEquals(0, timeRemaining(battle, battle.characters.get(1)), EPS, "teammate 1 acts now");
-        Assertions.assertEquals(0, timeRemaining(battle, battle.characters.get(2)), EPS, "teammate 2 acts now");
+        Assertions.assertEquals(0, timeRemaining(battle, battle.characters().get(1)), EPS, "teammate 1 acts now");
+        Assertions.assertEquals(0, timeRemaining(battle, battle.characters().get(2)), EPS, "teammate 2 acts now");
         Assertions.assertEquals(ownerBefore, timeRemaining(battle, owner), EPS,
                 "…and the owner keeps their place: that is what 「除自身以外」 (other than herself) means");
         Assertions.assertTrue(timeRemaining(battle, battle.enemyUnits().getFirst()) > 0,
@@ -95,14 +95,14 @@ public class OtherAlliesTargetTest {
     @Test
     public void allAlliesIncludesTheOwner() {
         Battle battle = new Battle(party("all_allies"), List.of(dummy()), BattleFixture.seeded());
-        Character owner = battle.characters.getFirst();
+        Character owner = battle.characters().getFirst();
         battle.startBattle();
 
         battle.fireTriggers(TriggerEvent.ULT_CAST, owner, null, 0, 0);
 
         Assertions.assertEquals(0, timeRemaining(battle, owner), EPS, "「我方全体」 (all allies) includes the wearer");
-        Assertions.assertEquals(0, timeRemaining(battle, battle.characters.get(1)), EPS);
-        Assertions.assertEquals(0, timeRemaining(battle, battle.characters.get(2)), EPS);
+        Assertions.assertEquals(0, timeRemaining(battle, battle.characters().get(1)), EPS);
+        Assertions.assertEquals(0, timeRemaining(battle, battle.characters().get(2)), EPS);
     }
 
     /**
@@ -111,7 +111,7 @@ public class OtherAlliesTargetTest {
     @Test
     public void aSummonInOurCampIsOneOfUs() {
         Battle battle = new Battle(party(), List.of(dummy()), BattleFixture.seeded());
-        Character owner = battle.characters.getFirst();
+        Character owner = battle.characters().getFirst();
         battle.startBattle();
         Summon minion = battle.summon(owner, MONSTER, 1);
         battle.processRequests();
@@ -199,8 +199,8 @@ public class OtherAlliesTargetTest {
     @Test
     public void thePairIsTheChosenUnitAndItsOwnSummon() {
         Battle battle = new Battle(party(TARGET_AND_SUMMON), List.of(dummy()), BattleFixture.seeded());
-        Character owner = battle.characters.getFirst();
-        Character chosen = battle.characters.get(1);
+        Character owner = battle.characters().getFirst();
+        Character chosen = battle.characters().get(1);
         battle.startBattle();
         Summon ownersSummon = battle.summon(owner, MONSTER, 1);
         Summon chosenSummon = battle.summon(chosen, MONSTER, 1);
@@ -227,8 +227,8 @@ public class OtherAlliesTargetTest {
     @Test
     public void aChosenUnitWithoutASummonIsJustTheUnit() {
         Battle battle = new Battle(party(TARGET_AND_SUMMON), List.of(dummy()), BattleFixture.seeded());
-        Character owner = battle.characters.getFirst();
-        Character chosen = battle.characters.get(1);
+        Character owner = battle.characters().getFirst();
+        Character chosen = battle.characters().get(1);
         battle.startBattle();
 
         int fired = battle.fireTriggers(TriggerEvent.ULT_CAST, owner, chosen, 0, 0);
@@ -243,8 +243,8 @@ public class OtherAlliesTargetTest {
     @Test
     public void aDeadSummonIsNotPartOfThePair() {
         Battle battle = new Battle(party(TARGET_AND_SUMMON), List.of(dummy()), BattleFixture.seeded());
-        Character owner = battle.characters.getFirst();
-        Character chosen = battle.characters.get(1);
+        Character owner = battle.characters().getFirst();
+        Character chosen = battle.characters().get(1);
         battle.startBattle();
         Summon chosenSummon = battle.summon(chosen, MONSTER, 1);
         battle.processRequests();
@@ -313,9 +313,9 @@ public class OtherAlliesTargetTest {
      * How much action value the unit still has - zero means "acts now".
      */
     private static double timeRemaining(Battle battle, CanHit target) {
-        for (Signal signal : battle.queue.snapshot()) {
+        for (Signal signal : battle.queue().snapshot()) {
             if (signal.getCanHit() == target) {
-                return battle.queue.getTimeRemaining(signal);
+                return battle.queue().getTimeRemaining(signal);
             }
         }
         return Double.NaN;

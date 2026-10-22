@@ -69,7 +69,7 @@ public class PearlEidolon1SaveTest {
     @Test
     public void theAllowanceIsTwoSavesInOneBattle() {
         Battle battle = newBattle(1);
-        Character ally = battle.characters.get(1);
+        Character ally = battle.characters().get(1);
         Enemy attacker = battle.enemyUnits().getFirst();
 
         double first = lethalBlow(battle, attacker, ally);
@@ -91,7 +91,7 @@ public class PearlEidolon1SaveTest {
      */
     private static double hpFractionAfterLethalBlow(int eidolonRank) {
         Battle battle = newBattle(eidolonRank);
-        Character ally = battle.characters.get(1);
+        Character ally = battle.characters().get(1);
         return lethalBlow(battle, battle.enemyUnits().getFirst(), ally);
     }
 
