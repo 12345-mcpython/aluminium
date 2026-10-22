@@ -47,7 +47,7 @@ public class CornucopiaAndPostOpConversationTest {
         double base = wearer.getAttribute(AttributeType.OUTGOING_HEALING_BOOST).get();
         var skill = wearer.getSkills().values().iterator().next();
         var token = battle.beginCast(skill, wearer);
-        battle.fireTriggers(TriggerEvent.CAST_SETUP, wearer, ally, 0, 0, category);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Cast.of(TriggerEvent.CAST_SETUP, wearer, ally, 0, 0, category, 0, 0, java.util.List.of()));
         double inside = wearer.getAttribute(AttributeType.OUTGOING_HEALING_BOOST).get();
         battle.endCastOutcome();
         double after = wearer.getAttribute(AttributeType.OUTGOING_HEALING_BOOST).get();

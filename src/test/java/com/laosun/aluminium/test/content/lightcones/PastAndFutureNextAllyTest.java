@@ -121,7 +121,7 @@ public class PastAndFutureNextAllyTest {
         CanHit firstAlly = ord.stream().filter(u -> u != own && bt.allies().contains(u)).findFirst().orElseThrow();
         Assertions.assertNotEquals(firstAlly, exp, "the fixture must separate 'next to act' from 'first ally'");
 
-        int fired = bt.fireTriggers(TriggerEvent.ATTACK_FINISHED, own, exp, 1, 0, SkillCategory.BPSKILL);
+        int fired = bt.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Cast.of(TriggerEvent.ATTACK_FINISHED, own, exp, 1, 0, SkillCategory.BPSKILL, 0, 0, java.util.List.of()));
         Assertions.assertTrue(fired >= 1, "the wearer's rule fires");
         Assertions.assertEquals(0.16, exp.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get(), 1e-9,
                 "the ally who acts NEXT gets the boost");

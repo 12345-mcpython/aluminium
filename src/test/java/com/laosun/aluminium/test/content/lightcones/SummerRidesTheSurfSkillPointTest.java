@@ -44,7 +44,7 @@ public class SummerRidesTheSurfSkillPointTest {
     private void cast(Battle battle, SkillCategory category) {
         var skill = wearer.getSkills().values().iterator().next();
         var token = battle.beginCast(skill, wearer);
-        battle.fireTriggers(TriggerEvent.CAST_SETUP, wearer, enemy, 0, 0, category);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Cast.of(TriggerEvent.CAST_SETUP, wearer, enemy, 0, 0, category, 0, 0, java.util.List.of()));
         battle.endCastOutcome();
         battle.endCast(token);
     }

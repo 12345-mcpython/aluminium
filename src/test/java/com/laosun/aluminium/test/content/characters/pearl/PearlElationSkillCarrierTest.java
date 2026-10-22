@@ -54,7 +54,7 @@ public class PearlElationSkillCarrierTest {
         battle.processRequests();
         Character pearl = battle.characters().get(0);
 
-        battle.fireTriggers(TriggerEvent.CAST_SETUP, pearl, pearl, 0, 0, category);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Cast.of(TriggerEvent.CAST_SETUP, pearl, pearl, 0, 0, category, 0, 0, java.util.List.of()));
 
         List<String> carriers = new ArrayList<>();
         for (Character c : battle.characters()) {

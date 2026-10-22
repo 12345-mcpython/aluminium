@@ -48,8 +48,8 @@ public class PearlEnhancedBasicHealTest {
 
         double pearlBefore = pearl.getCurrentHp();
         double otherBefore = other.getCurrentHp();
-        battle.fireTriggers(TriggerEvent.BASIC_ATTACK, pearl, battle.enemies().getFirst(), 1, 0,
-                (SkillCategory) null, slot);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Cast.of(TriggerEvent.BASIC_ATTACK, pearl, battle.enemies().getFirst(), 1, 0,
+                (SkillCategory) null, slot, 0, java.util.List.of()));
         return new double[]{pearl.getCurrentHp() - pearlBefore, other.getCurrentHp() - otherBefore};
     }
 }

@@ -39,7 +39,7 @@ public class EpochEtchedInGoldenBloodRuleTargetRuntimeTest {
 
         Assertions.assertEquals(0.0, wearer.getAttribute(AttributeType.SKILL_DAMAGE_BOOST).get(), 1e-9,
                 "nothing yet");
-        int fired = battle.fireTriggers(TriggerEvent.CAST_SETUP, wearer, ally, 0, 0, SkillCategory.BPSKILL);
+        int fired = battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Cast.of(TriggerEvent.CAST_SETUP, wearer, ally, 0, 0, SkillCategory.BPSKILL, 0, 0, java.util.List.of()));
         Assertions.assertEquals(1, fired, "the wearer's CAST_SETUP rule fires");
         Assertions.assertEquals(0.54, ally.getAttribute(AttributeType.SKILL_DAMAGE_BOOST).get(), 1e-9,
                 "the event target gets the buff -- rank 1's #4");
