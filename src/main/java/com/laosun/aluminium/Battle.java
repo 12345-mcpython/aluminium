@@ -2613,10 +2613,6 @@ public class Battle {
         return triggerBus.fire(payload);
     }
 
-    public int fireTriggers(TriggerEvent event) {
-        return fireTriggers(event, null, null, 0, 0);
-    }
-
     /**
      * Fires a trigger event to the tables of our characters.
      *
@@ -2637,25 +2633,10 @@ public class Battle {
      * @param amount   the event's magnitude where it has one
      * @return how many rules fired in total
      */
-    public int fireTriggers(TriggerEvent event, CanHit actor, CanHit target, int hitCount, double amount) {
+    private int fireTriggers(TriggerEvent event, CanHit actor, CanHit target, int hitCount, double amount) {
         // Note: Both nulls spelled out: with a 6-arg (..., Damage) and a 6-arg (..., SkillCategory) overload, a single bare
         // null is ambiguous (measured: the compiler refused it).
         return fireTriggers(event, actor, target, hitCount, amount, null, null);
-    }
-
-    /**
-     * The same, stating <b>which cast</b> produced the event - the form {@code ALLY_ATTACK} uses.
-     *
-     * <p>"each time one of our targets ... casts <b>2 basic attacks, Skills, ultimates</b>" (1215 Hanya (寒鸦)) has to tell the three slots apart, and an attack
-     * event is the only place that count can be taken <b>once per cast</b>: counting on {@code DEALING_DAMAGE} would
-     * count <i>hits</i> instead (a multi-hit skill would mark several times for one cast - a wrong number with no
-     * symptom).
-     *
-     * @param fromCast the category of the cast that produced this attack ({@code null} = nothing can name one)
-     */
-    public int fireTriggers(TriggerEvent event, CanHit actor, CanHit target, int hitCount, double amount,
-                            SkillCategory fromCast) {
-        return fireTriggers(event, actor, target, hitCount, amount, null, fromCast);
     }
 
     /**
@@ -2687,42 +2668,6 @@ public class Battle {
     private int fireTriggers(TriggerEvent event, CanHit actor, CanHit target, int hitCount, double amount,
                              Damage damage, SkillCategory fromCast) {
         return fireTriggers(event, actor, target, hitCount, amount, damage, fromCast, 0);
-    }
-
-    /**
-     * The same, naming the <b>data row</b> of the skill that produced the event.
-     *
-     * <p>Note: The row, not the slot: an enhanced attack is a row of its own, so "an enhanced basic attack hits ..." and "an enhanced basic attack consumes 2 layers" can be
-     * told apart from the ordinary basic attack they replace. Events that no skill produced (a DOT tick, a break) leave it 0.
-     */
-    public int fireTriggers(TriggerEvent event, CanHit actor, CanHit target, int hitCount, double amount,
-                            SkillCategory fromCast, int skillId) {
-        return fireTriggers(event, actor, target, hitCount, amount, null, fromCast, skillId, 0);
-    }
-
-    /**
-     * The same, plus how many of the hit targets carry the attack's own element weakness (cone
-     * 21040's "if no fewer than 2 of the attacked enemy targets have the corresponding attribute weakness").
-     *
-     * <p>A count over a predicate cannot be assembled from the parts: a multi-target attack fires the damage event once
-     * per target, so "how many of them were weak" only exists where the whole set is in hand -- the caster's side.
-     */
-    public int fireTriggers(TriggerEvent event, CanHit actor, CanHit target, int hitCount, double amount,
-                            SkillCategory fromCast, int skillId, int weakHitCount) {
-        return fireTriggers(event, actor, target, hitCount, amount, null, fromCast, skillId, weakHitCount);
-    }
-
-    /**
-     * The same, plus the targets the whole attack hit (cone 21029).
-     *
-     * <p>Only the side holding the whole set can pass it: a per-hit event fires once per target, so "a random
-     * one of the targets that WAS HIT" cannot be assembled from the parts (Note: the argument {@code weakHitCount} makes).
-     */
-    public int fireTriggers(TriggerEvent event, CanHit actor, CanHit target, int hitCount, double amount,
-                            SkillCategory fromCast, int skillId, int weakHitCount,
-                            List<CanHit> attackHitTargets) {
-        return fireTriggers(event, actor, target, hitCount, amount, null, fromCast, skillId, weakHitCount,
-                attackHitTargets);
     }
 
     private int fireTriggers(TriggerEvent event, CanHit actor, CanHit target, int hitCount, double amount,
