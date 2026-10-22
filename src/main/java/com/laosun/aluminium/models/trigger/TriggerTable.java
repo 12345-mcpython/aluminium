@@ -1525,11 +1525,13 @@ public class TriggerTable {
     static final class HasShield implements Condition, PartyCondition {
         private final String subject;
         final String ruleId;
+        final String provider;
         final String raw;
 
-        HasShield(String subject, String ruleId, String raw, TriggerSpec spec) {
+        HasShield(String subject, String ruleId, String provider, String raw, TriggerSpec spec) {
             this.subject = subject;
             this.ruleId = ruleId == null ? "" : ruleId;
+            this.provider = provider == null ? "" : provider;
             this.raw = raw;
         }
 
@@ -1549,9 +1551,22 @@ public class TriggerTable {
             if (who == null || who.getShield() <= 0) {
                 return false;
             }
-            // No qualifier: any living shield counts. With one: the shield must have come from THAT rule, which is
-            // what makes "战技提供的" different from "三月七给的" (see CanHit.getShieldRuleId).
-            return ruleId.isEmpty() || ruleId.equals(who.getShieldRuleId());
+            // No qualifier: any living shield counts. A rule qualifier asks which rule created it
+            // (CanHit.getShieldRuleId); a provider qualifier asks which unit created it
+            // (CanHit.getShieldProvider) - "the shield the wearer provided" is the second question.
+            if (!ruleId.isEmpty() && !ruleId.equals(who.getShieldRuleId())) {
+                return false;
+            }
+            if (!provider.isEmpty()) {
+                CanHit expected = switch (provider) {
+                    case "self" -> ctx.owner();
+                    case "actor" -> ctx.actor();
+                    case "target" -> ctx.target();
+                    default -> null;
+                };
+                return expected != null && who.getShieldProvider() == expected;
+            }
+            return true;
         }
 
         @Override
