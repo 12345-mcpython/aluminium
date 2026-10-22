@@ -300,7 +300,7 @@ public class ShieldDurationTest {
          * Fires the attack event with the ally as its subject -- the shield's target.
          */
         private int fire() {
-            return battle.fireTriggers(TriggerEvent.ALLY_ATTACK, caster, ally, 1, 0);
+            return battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, caster, ally, 1, 0));
         }
     }
 
@@ -308,7 +308,7 @@ public class ShieldDurationTest {
      * Fires the same event and reports whether the condition-only rule matched.
      */
     private static int fireCondition(Fixture f) {
-        return f.battle.fireTriggers(TriggerEvent.ALLY_ATTACK, f.caster, f.ally, 1, 0);
+        return f.battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, f.caster, f.ally, 1, 0));
     }
 
     /**

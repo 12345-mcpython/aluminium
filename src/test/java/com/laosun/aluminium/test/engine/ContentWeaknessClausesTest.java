@@ -69,7 +69,7 @@ public class ContentWeaknessClausesTest {
         Battle b2 = battleWith(ana);
         Enemy e2 = enemyOf(b2);
         List<DamageElement> before = weaknesses(e2);
-        b2.fireTriggers(TriggerEvent.ALLY_ATTACK, ana, e2, 0, 0);
+        b2.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, ana, e2, 0, 0));
         List<DamageElement> added = new ArrayList<>(weaknesses(e2));
         added.removeAll(before);
         System.out.println("[content] 1405 ally-attack -> had=" + before.size() + " added=" + added);
@@ -81,7 +81,7 @@ public class ContentWeaknessClausesTest {
         Battle b3 = battleWith(sw);
         Enemy e3 = enemyOf(b3);
         Assertions.assertFalse(e3.isWeakTo(sw.getElement()), "the enemy must not already have the wearer's element");
-        b3.fireTriggers(TriggerEvent.SKILL_CAST, sw, e3, 0, 0);
+        b3.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, sw, e3, 0, 0));
         System.out.println("[content] 1006 skill -> " + sw.getElement() + "=" + e3.isWeakTo(sw.getElement()));
         Assertions.assertTrue(e3.isWeakTo(sw.getElement()), "the first party member's element is what its text names");
     }
@@ -117,7 +117,7 @@ public class ContentWeaknessClausesTest {
         // Note: WAVE_START is fired by WaveManager.nextWave() (it is not inside startBattle()).
         // Note: it carries no actor and no subject, and like BATTLE_START it is "a fact about the battle".
         // Note: it is fired directly here, because what this case must prove is "1310's clause is wired to the engine"; "WAVE_START does get fired" already has 10 precedents.
-        battle.fireTriggers(TriggerEvent.WAVE_START);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.WAVE_START, null, null, 0, 0));
         System.out.println("[content] 1310 technique -> a=" + a.isWeakTo(DamageElement.FIRE)
                 + " b=" + b.isWeakTo(DamageElement.FIRE));
         Assertions.assertTrue(a.isWeakTo(DamageElement.FIRE) && b.isWeakTo(DamageElement.FIRE),

@@ -40,7 +40,7 @@ public class SparkleEidolonTest {
         Battle battle = new Battle(List.of(sparkle, ally), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         for (int i = 0; i < layers; i++) {
-            battle.fireTriggers(TriggerEvent.SKILL_POINT_SPENT, sparkle, enemy, 1, 1);
+            battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_POINT_SPENT, sparkle, enemy, 1, 1));
         }
         Assertions.assertEquals(layers, sparkle.getBuffManager().stacksOf(COUNTER),
                 "precondition: the talent counted " + layers + " layer(s)");

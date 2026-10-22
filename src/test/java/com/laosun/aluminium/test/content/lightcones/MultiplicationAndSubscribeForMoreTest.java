@@ -33,7 +33,7 @@ public class MultiplicationAndSubscribeForMoreTest {
         battle.setCurrentMove(new Signal(unit));
         battle.beforeMove();
         double before = timeRemaining(battle, unit);
-        battle.fireTriggers(TriggerEvent.BASIC_ATTACK, unit, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.BASIC_ATTACK, unit, enemy, 0, 0));
         double after = timeRemaining(battle, unit);
         System.out.println("[20015] avBefore=" + before + " avAfter=" + after + " ratio=" + (after / before));
         Assertions.assertFalse(Double.isNaN(before), "precondition: the wearer is in the queue");

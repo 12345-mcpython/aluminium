@@ -60,7 +60,7 @@ public class TimedWeaknessTest {
         battle.startBattle();
         Assertions.assertFalse(enemy.isWeakTo(chosen), "the enemy must not already have it");
 
-        battle.fireTriggers(TriggerEvent.SKILL_CAST, wearer, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, wearer, enemy, 0, 0));
         Assertions.assertTrue(enemy.isWeakTo(chosen), "the insertion itself must land");
 
         int steps = 0;

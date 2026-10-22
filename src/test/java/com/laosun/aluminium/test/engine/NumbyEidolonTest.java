@@ -32,7 +32,7 @@ public class NumbyEidolonTest {
         battle.beforeMove();
         double before = unit.getAttribute(AttributeType.ATTACK).get();
         unit.getAttribute(AttributeType.ATTACK).baseValue();
-        battle.fireTriggers(TriggerEvent.ULT_CAST, unit, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, unit, enemy, 0, 0));
         double gain = unit.getAttribute(AttributeType.ATTACK).get() - before;
         double base = unit.getAttribute(AttributeType.ATTACK).baseValue();
         Assertions.assertEquals(0.3, gain / base, 1e-6,

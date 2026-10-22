@@ -52,7 +52,7 @@ public class DerivedReadTimingTest {
         her.setTriggerTable(new TriggerTable(PEARL, List.of(
                 grant("ELATION_DAMAGE_BOOST", 0.5),
                 derive("OUTGOING_HEALING_BOOST", "ELATION_DAMAGE_BOOST", 0.2))));
-        battle.fireTriggers(TriggerEvent.BATTLE_START, her, her, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.BATTLE_START, her, her, 0, 0));
         battle.processRequests();
 
         double elation = her.getAttribute(AttributeType.ELATION_DAMAGE_BOOST).get();

@@ -54,7 +54,7 @@ public class SummerRidesTheSurfSkillPointTest {
         Battle battle = battle(true);
         Assertions.assertTrue(battle.spendSkillPoint(), "make room first: the pool is capped");
         int before = battle.getSkillPoints();
-        battle.fireTriggers(TriggerEvent.WAVE_START);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.WAVE_START, null, null, 0, 0));
         int afterWave = battle.getSkillPoints();
         Assertions.assertTrue(battle.spendSkillPoint(), "make room again");
         int beforeCasts = battle.getSkillPoints();

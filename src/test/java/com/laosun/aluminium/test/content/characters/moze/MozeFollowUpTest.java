@@ -51,7 +51,7 @@ public class MozeFollowUpTest {
         Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
-        battle.fireTriggers(TriggerEvent.SKILL_CAST, unit, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, unit, enemy, 0, 0));
         double plain = battle.applyDamage(enemy, new Damage(unit, enemy, DamageElement.THUNDER, DamageType.NORMAL, 1000));
         double followUp = battle.applyAdditionalDamage(unit, enemy, DamageElement.THUNDER, 1000, null, null);
         System.out.println("[1223] plain=" + plain + " followUp=" + followUp + " ratio=" + (followUp / plain));
@@ -65,7 +65,7 @@ public class MozeFollowUpTest {
         Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         int before = battle.getSkillPoints();
-        battle.fireTriggers(TriggerEvent.FOLLOW_UP, unit, enemy, 500, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.FOLLOW_UP, unit, enemy, 500, 0));
         int after = battle.getSkillPoints();
         System.out.println("[1223] skillPoints " + before + " -> " + after);
         Assertions.assertEquals(1, after - before, "the trace grants exactly one skill point");

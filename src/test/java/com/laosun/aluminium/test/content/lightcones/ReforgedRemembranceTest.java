@@ -49,7 +49,7 @@ public class ReforgedRemembranceTest {
     }
 
     private void strike() {
-        battle.fireTriggers(TriggerEvent.DEALING_DAMAGE, wearer, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.DEALING_DAMAGE, wearer, enemy, 0, 0));
     }
 
     @Test

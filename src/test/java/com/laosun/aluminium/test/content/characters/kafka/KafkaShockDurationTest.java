@@ -80,7 +80,7 @@ public class KafkaShockDurationTest {
         Battle battle = new Battle(List.of(applier), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         // ALLY_ATTACK, not BATTLE_START: a battle start has no aimed party, so `target: target` is refused there.
-        battle.fireTriggers(TriggerEvent.ALLY_ATTACK, applier, enemy, 1, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, applier, enemy, 1, 0));
         return burningTurns(battle, enemy);
     }
 

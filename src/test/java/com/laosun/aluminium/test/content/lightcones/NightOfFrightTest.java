@@ -39,7 +39,7 @@ public class NightOfFrightTest {
                 com.laosun.aluminium.enums.DamageElement.PHYSICAL,
                 com.laosun.aluminium.enums.DamageType.NORMAL, hurt.getMaxHp() * 0.5));
         double before = hurt.getCurrentHp();
-        battle.fireTriggers(TriggerEvent.ULT_CAST, wearer, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, wearer, enemy, 0, 0));
         return hurt.getCurrentHp() - before;
     }
 

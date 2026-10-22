@@ -59,7 +59,7 @@ public class ConeAuditBatchTwentySixTest {
                 "「施放终结技时重置可触发次数」");
 
         int before = f.battle.getSkillPoints();
-        f.battle.fireTriggers(TriggerEvent.WEAKNESS_ADDED, f.wearer, f.battle.enemyUnits().getFirst(), 0, 0);
+        f.battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.WEAKNESS_ADDED, f.wearer, f.battle.enemyUnits().getFirst(), 0, 0));
         System.out.println("[23050] 添加弱点后战技点 " + before + " -> " + f.battle.getSkillPoints());
         Assertions.assertEquals(before + 1, f.battle.getSkillPoints(), "「恢复 1 个战技点」");
     }

@@ -32,7 +32,7 @@ public class ConsumeHpTest {
         double maxHp = unit.getMaxHp();
         double before = unit.getCurrentHp();
         Assertions.assertEquals(maxHp, before, 1e-6, "precondition: she starts whole");
-        battle.fireTriggers(TriggerEvent.SKILL_CAST, unit, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, unit, enemy, 0, 0));
         double spent = before - unit.getCurrentHp();
         System.out.println("[1205] maxHp=" + maxHp + " spent=" + spent + " fraction=" + (spent / maxHp));
         Assertions.assertEquals(0.30 * maxHp, spent, 1e-6, "the skill pays 30% of her max HP");
@@ -52,7 +52,7 @@ public class ConsumeHpTest {
                     unit.getMaxHp() * 0.02));
         }
         double before = unit.getCurrentHp();
-        battle.fireTriggers(TriggerEvent.SKILL_CAST, unit, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, unit, enemy, 0, 0));
         double after = unit.getCurrentHp();
         System.out.println("[1205] floorTest before=" + before + " after=" + after
                 + " beforeFraction=" + (before / unit.getMaxHp()));

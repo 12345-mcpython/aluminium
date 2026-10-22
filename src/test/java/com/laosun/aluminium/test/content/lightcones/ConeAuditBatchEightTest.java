@@ -112,7 +112,7 @@ public class ConeAuditBatchEightTest {
         Fixture f = new Fixture(21021, true);
         f.wearer.setCurrentEnergy(0);
         f.ally.setCurrentEnergy(0);
-        f.battle.fireTriggers(TriggerEvent.TURN_START, f.wearer, f.wearer, 0, 0);
+        f.battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, f.wearer, f.wearer, 0, 0));
         System.out.println("[21021] 她的回合开始后: 自己 " + f.wearer.getCurrentEnergy()
                 + " ; 队友 " + f.ally.getCurrentEnergy()
                 + "（今天落在队友身上、不是那个随机的低能量目标 —— 见状态表）");

@@ -45,7 +45,7 @@ public class WarmthShortensColdNightsTest {
         battle.beforeMove();
         ally.takeDamage(ally.getMaxHp() * 0.3);
         double allyBefore = ally.getCurrentHp();
-        battle.fireTriggers(TriggerEvent.BASIC_ATTACK, wearer, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.BASIC_ATTACK, wearer, enemy, 0, 0));
         double afterBasic = ally.getCurrentHp();
         Assertions.assertTrue(afterBasic > allyBefore,
                 "a basic attack heals the ally: " + allyBefore + " -> " + afterBasic);
@@ -53,7 +53,7 @@ public class WarmthShortensColdNightsTest {
         // 1% of max HP: the heal is 2%, so this is visible AND cannot kill anyone.
         ally.takeDamage(ally.getMaxHp() * 0.01);
         double before2 = ally.getCurrentHp();
-        battle.fireTriggers(TriggerEvent.SKILL_CAST, wearer, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, wearer, enemy, 0, 0));
         Assertions.assertTrue(ally.getCurrentHp() > before2,
                 "and so does a skill, through on_any: " + before2 + " -> " + ally.getCurrentHp());
     }

@@ -70,7 +70,7 @@ public class ArlanTest {
         Assertions.assertTrue(arlan.getCurrentHp() / arlan.getMaxHp() <= 0.3,
                 "the fixture must be below the threshold, was " + (arlan.getCurrentHp() / arlan.getMaxHp()));
 
-        battle.fireTriggers(TriggerEvent.KILL, arlan, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.KILL, arlan, enemy, 0, 0));
 
         Assertions.assertTrue(arlan.getCurrentHp() > before,
                 "「立即回复等同于自身生命上限20%的生命值」 (immediately restores HP equal to 20% of his own Max HP): " + before + " -> " + arlan.getCurrentHp());

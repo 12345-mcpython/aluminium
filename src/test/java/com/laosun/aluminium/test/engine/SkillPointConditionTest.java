@@ -102,7 +102,7 @@ public class SkillPointConditionTest {
         Assertions.assertEquals(skillPoints, battle.getSkillPoints(), "precondition: the pool holds what the case asks");
         Assertions.assertEquals(5 + CAP_BONUS, battle.getSkillPointMax(), "precondition: the cap was raised");
 
-        battle.fireTriggers(TriggerEvent.SKILL_POINT_GAINED, owner, owner, 0, 1);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_POINT_GAINED, owner, owner, 0, 1));
         battle.processRequests();
         return battle.characters().getFirst().getResources().value(COUNTER);
     }

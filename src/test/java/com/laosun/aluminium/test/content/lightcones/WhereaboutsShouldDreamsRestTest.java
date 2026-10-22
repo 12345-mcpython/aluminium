@@ -49,7 +49,7 @@ public class WhereaboutsShouldDreamsRestTest {
     public void breakingCollapsesAndSlows() {
         build(true);
         double speedBefore = enemy.getAttribute(AttributeType.SPEED).get();
-        battle.fireTriggers(TriggerEvent.BREAK, wearer, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.BREAK, wearer, enemy, 0, 0));
         int collapse = enemy.getBuffManager().stacksOf(COLLAPSE);
         double speedAfter = enemy.getAttribute(AttributeType.SPEED).get();
         System.out.println("[23025] collapse stacks=" + collapse + " (hasState="
@@ -63,7 +63,7 @@ public class WhereaboutsShouldDreamsRestTest {
     @Test
     public void withoutTheConeNothingCollapses() {
         build(false);
-        battle.fireTriggers(TriggerEvent.BREAK, wearer, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.BREAK, wearer, enemy, 0, 0));
         System.out.println("[23025] without the cone: stacks=" + enemy.getBuffManager().stacksOf(COLLAPSE));
         Assertions.assertEquals(0, enemy.getBuffManager().stacksOf(COLLAPSE), "no cone, no collapse (false case)");
     }

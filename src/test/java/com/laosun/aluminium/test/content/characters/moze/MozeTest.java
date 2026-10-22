@@ -81,7 +81,7 @@ public class MozeTest {
             enemy.getBuffManager().addBuff(new com.laosun.aluminium.models.buff.StateBuff("猎物", 1, true));
         }
         double before = enemy.getCurrentHp();
-        battle.fireTriggers(TriggerEvent.ALLY_ATTACK, ally, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, ally, enemy, 0, 0));
         return before - enemy.getCurrentHp();
     }
 
@@ -95,7 +95,7 @@ public class MozeTest {
         Battle battle = new Battle(List.of(moze, ally), List.of(enemy), fixed());
         battle.startBattle();
         double before = enemy.getCurrentHp();
-        battle.fireTriggers(TriggerEvent.ULT_CAST, moze, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, moze, enemy, 0, 0));
         return before - enemy.getCurrentHp();
     }
 

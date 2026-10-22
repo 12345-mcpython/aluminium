@@ -53,7 +53,7 @@ public class SheAlreadyShutHerEyesTest {
         double lost = ally.getMaxHp() - ally.getCurrentHp();
         double before = ally.getCurrentHp();
         double wearerBefore = wearer.getCurrentHp();
-        battle.fireTriggers(TriggerEvent.WAVE_START);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.WAVE_START, null, null, 0, 0));
         double healed = ally.getCurrentHp() - before;
         double wearerHealed = wearer.getCurrentHp() - wearerBefore;
         System.out.println("[23011] lost=" + lost + " alliedHealed=" + healed + " expected=" + (lost * SHARE)
@@ -120,7 +120,7 @@ public class SheAlreadyShutHerEyesTest {
         Battle battle = battle(false);
         battle.applyDamage(ally, new Damage(enemy, ally, DamageElement.FIRE, DamageType.NORMAL, 400));
         double before = ally.getCurrentHp();
-        battle.fireTriggers(TriggerEvent.WAVE_START);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.WAVE_START, null, null, 0, 0));
         System.out.println("[23011] without the cone: " + before + " -> " + ally.getCurrentHp());
         Assertions.assertEquals(before, ally.getCurrentHp(), 1e-9, "no cone, no heal (false case)");
     }

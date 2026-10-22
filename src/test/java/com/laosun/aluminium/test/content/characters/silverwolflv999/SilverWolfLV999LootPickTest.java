@@ -199,7 +199,7 @@ public class SilverWolfLV999LootPickTest {
         int pointsBefore = battle.getSkillPoints();
         int laughsBefore = battle.partyResourceValue(LAUGH);
         Character wolf = battle.characters().getFirst();
-        battle.fireTriggers(TriggerEvent.SKILL_POINT_SPENT, wolf, wolf, 0, 1);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_POINT_SPENT, wolf, wolf, 0, 1));
         battle.processRequests();
         double[] lost = new double[beforeHp.length];
         double totalLost = 0;

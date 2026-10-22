@@ -101,7 +101,7 @@ public class CipherTest {
             enemy.getBuffManager().addBuff(new com.laosun.aluminium.models.buff.StateBuff("老主顾", 1, true));
         }
         double before = enemy.getCurrentHp();
-        battle.fireTriggers(TriggerEvent.ALLY_ATTACK, ally, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, ally, enemy, 0, 0));
         return before - enemy.getCurrentHp();
     }
 

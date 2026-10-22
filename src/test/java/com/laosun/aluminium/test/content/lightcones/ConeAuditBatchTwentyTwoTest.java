@@ -33,7 +33,7 @@ public class ConeAuditBatchTwentyTwoTest {
         Fixture f = new Fixture(23026);
         double start = f.attribute(AttributeType.ENERGY_REGENERATION_RATE);
         for (int i = 0; i < 6; i++) {
-            f.battle.fireTriggers(TriggerEvent.ALLY_ATTACK, f.ally, f.battle.enemyUnits().getFirst(), 0, 0);
+            f.battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, f.ally, f.battle.enemyUnits().getFirst(), 0, 0));
         }
         double stacked = f.attribute(AttributeType.ENERGY_REGENERATION_RATE) - start;
         System.out.println("[23026] 六次队友攻击后的能量恢复增量 " + stacked + "（5 层 × 3% = 0.15）");

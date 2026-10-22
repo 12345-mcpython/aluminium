@@ -42,7 +42,7 @@ public class EidolonBatchTest {
         battle.setCurrentMove(new Signal(unit));
         battle.beforeMove();
         double before = unit.getAttribute(attribute).get();
-        battle.fireTriggers(event, unit, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(event, unit, enemy, 0, 0));
         double gain = unit.getAttribute(attribute).get() - before;
         return flat ? gain / unit.getAttribute(attribute).baseValue() : gain;
     }

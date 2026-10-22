@@ -35,7 +35,7 @@ public class ConeUltBreakSpeedTest {
         battle.beforeMove();
         double before = unit.getAttribute(AttributeType.ATTACK).get();
         double base = unit.getAttribute(AttributeType.ATTACK).baseValue();
-        battle.fireTriggers(TriggerEvent.ULT_CAST, unit, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, unit, enemy, 0, 0));
         double gain = unit.getAttribute(AttributeType.ATTACK).get() - before;
         Assertions.assertEquals(0.24 * base, gain, 1e-3,
                 "rank 1: base=" + base + " gain=" + gain + " (share 0.24)");
@@ -51,7 +51,7 @@ public class ConeUltBreakSpeedTest {
         battle.beforeMove();
         unit.takeDamage(unit.getMaxHp() * 0.5);
         double before = unit.getCurrentHp();
-        battle.fireTriggers(TriggerEvent.BREAK, unit, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.BREAK, unit, enemy, 0, 0));
         double healed = unit.getCurrentHp() - before;
         Assertions.assertEquals(unit.getMaxHp() * 0.12, healed, 1.0,
                 "rank 1 heals 12% of max HP: " + healed + " of " + unit.getMaxHp());

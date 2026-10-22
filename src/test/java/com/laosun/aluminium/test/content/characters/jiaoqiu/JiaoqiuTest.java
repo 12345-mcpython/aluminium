@@ -33,7 +33,7 @@ public class JiaoqiuTest {
         battle.startBattle();
 
         for (int i = 0; i < 7; i++) {
-            battle.fireTriggers(TriggerEvent.ALLY_ATTACK, jiaoqiu, enemy, 0, 0);
+            battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, jiaoqiu, enemy, 0, 0));
         }
 
         Assertions.assertEquals(5, jiaoqiu.getBuffManager() == null ? enemy.getBuffManager().stacksOf("烬煨") : enemy.getBuffManager().stacksOf("烬煨"),

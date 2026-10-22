@@ -41,7 +41,7 @@ public class AttackerElementTest {
                 TriggerSpecs.rule("ULT_CAST", List.of("actor == self"), instance))));
 
         double before = enemy.getCurrentHp();
-        battle.fireTriggers(com.laosun.aluminium.enums.TriggerEvent.ULT_CAST, mine, battle.enemies().getFirst(), 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(com.laosun.aluminium.enums.TriggerEvent.ULT_CAST, mine, battle.enemies().getFirst(), 0, 0));
         double dealt = before - enemy.getCurrentHp();
         System.out.println("[attacker_element] pearl is Ice; the instance dealt " + dealt);
         Assertions.assertTrue(dealt > 0, "the reserved word resolved to her own element and the hit landed");

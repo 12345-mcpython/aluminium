@@ -97,7 +97,7 @@ public class PearlEidolon2AdvanceTest {
         Character archetype = battle.characters().get(3);
 
         double[] before = waits(battle, pearl, elationA, elationB, archetype);
-        battle.fireTriggers(TriggerEvent.ULT_CAST, pearl, archetype, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, pearl, archetype, 0, 0));
         battle.processRequests();
         double[] after = waits(battle, pearl, elationA, elationB, archetype);
         return new Fraction(after[3] / before[3], after[1] / before[1], after[2] / before[2]);

@@ -52,7 +52,7 @@ public class TopazFollowUpTakenTest {
         Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
-        battle.fireTriggers(TriggerEvent.SKILL_CAST, unit, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, unit, enemy, 0, 0));
         double plain = battle.applyDamage(enemy, new Damage(unit, enemy, DamageElement.FIRE, DamageType.NORMAL, 1000));
         double followUp = battle.applyAdditionalDamage(unit, enemy, DamageElement.FIRE, 1000, null, null);
         System.out.println("[1112] plain=" + plain + " followUp=" + followUp + " ratio=" + (followUp / plain));

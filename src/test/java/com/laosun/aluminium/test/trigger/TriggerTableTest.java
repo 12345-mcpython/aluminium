@@ -244,13 +244,13 @@ public class TriggerTableTest {
         Character himeko = CharacterFactory.create(1402, 80);
         Battle battle = newBattle(List.of(robin, himeko), 1);
 
-        Assertions.assertEquals(1, battle.fireTriggers(TriggerEvent.BATTLE_START),
+        Assertions.assertEquals(1, battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.BATTLE_START, null, null, 0, 0)),
                 "only her Coloratura Cadenza (华彩花腔) trace listens to BATTLE_START");
 
-        Assertions.assertEquals(0, battle.fireTriggers(TriggerEvent.BASIC_ATTACK, robin, null, 1, 0),
+        Assertions.assertEquals(0, battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.BASIC_ATTACK, robin, null, 1, 0)),
                 "nothing in her file listens to BASIC_ATTACK: Basic ATK (普攻) is not Skill (战技)");
 
-        int fired = battle.fireTriggers(TriggerEvent.ALLY_ATTACK, himeko, null, 1, 0);
+        int fired = battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, himeko, null, 1, 0));
         Assertions.assertEquals(1, fired, "only Robin's table has an ALLY_ATTACK rule");
     }
 
@@ -354,20 +354,20 @@ public class TriggerTableTest {
         Battle battle = newBattle(List.of(owner), 1);
 
         owner.setTriggerTable(exact);
-        Assertions.assertEquals(1, battle.fireTriggers(TriggerEvent.ALLY_ATTACK, owner, null, 2, 0),
+        Assertions.assertEquals(1, battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, null, 2, 0)),
                 "an exact hit count now parses as a number");
-        Assertions.assertEquals(0, battle.fireTriggers(TriggerEvent.ALLY_ATTACK, owner, null, 3, 0),
+        Assertions.assertEquals(0, battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, null, 3, 0)),
                 "…and really compares it");
 
         owner.setTriggerTable(notExact);
-        Assertions.assertEquals(0, battle.fireTriggers(TriggerEvent.ALLY_ATTACK, owner, null, 2, 0));
-        Assertions.assertEquals(1, battle.fireTriggers(TriggerEvent.ALLY_ATTACK, owner, null, 3, 0));
+        Assertions.assertEquals(0, battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, null, 2, 0)));
+        Assertions.assertEquals(1, battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, null, 3, 0)));
 
         // The identity reading is untouched: `self` is still an identity, not a number ...
         TriggerTable selfIdentity = new TriggerTable(1, List.of(
                 trigger("ALLY_ATTACK", List.of("actor == self"), energy(1))));
         owner.setTriggerTable(selfIdentity);
-        Assertions.assertEquals(1, battle.fireTriggers(TriggerEvent.ALLY_ATTACK, owner, null, 1, 0));
+        Assertions.assertEquals(1, battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, null, 1, 0)));
 
         // ... and two *names* still get the clearer message rather than "no numeric literal".
         IllegalArgumentException twoVariables = Assertions.assertThrows(IllegalArgumentException.class,

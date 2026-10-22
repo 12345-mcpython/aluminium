@@ -33,11 +33,11 @@ public class SilverWolfTest {
         Assertions.assertTrue(before > 0, "the fixture must have defence to shred: " + before);
 
         // A control: firing an unrelated event must not shred anything.
-        battle.fireTriggers(TriggerEvent.ALLY_ATTACK, silverWolf, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, silverWolf, enemy, 0, 0));
         Assertions.assertEquals(0.0, (before - enemy.getAttribute(AttributeType.DEFENCE).get()) / before, 1e-9,
                 "an unrelated event must not shred defence");
 
-        battle.fireTriggers(TriggerEvent.ULT_CAST, silverWolf, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, silverWolf, enemy, 0, 0));
         double after = enemy.getAttribute(AttributeType.DEFENCE).get();
 
         Assertions.assertEquals(0.45, (before - after) / before, 1e-6,

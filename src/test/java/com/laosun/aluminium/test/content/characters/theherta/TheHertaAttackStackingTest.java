@@ -51,7 +51,7 @@ public class TheHertaAttackStackingTest {
         battle.startBattle();
         battle.processRequests();
         if (castUlt) {
-            battle.fireTriggers(TriggerEvent.ULT_CAST, owner, owner, 0, 0);
+            battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, owner, owner, 0, 0));
             battle.processRequests();
         }
         return owner.getAttribute(AttributeType.ATTACK).get();

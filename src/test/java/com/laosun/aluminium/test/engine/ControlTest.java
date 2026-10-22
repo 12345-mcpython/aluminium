@@ -466,7 +466,7 @@ public class ControlTest {
          * The same for any event (some cases need a second event to observe what the first one applied).
          */
         private int fire(com.laosun.aluminium.enums.TriggerEvent event) {
-            return battle.fireTriggers(event, hero, enemy, 1, 0);
+            return battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(event, hero, enemy, 1, 0));
         }
     }
 

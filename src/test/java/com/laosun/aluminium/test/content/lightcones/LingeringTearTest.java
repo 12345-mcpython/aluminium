@@ -48,7 +48,7 @@ public class LingeringTearTest {
     }
 
     private void changed(Battle battle) {
-        battle.fireTriggers(TriggerEvent.RESOURCE_CHANGED, wearer, wearer, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.RESOURCE_CHANGED, wearer, wearer, 0, 0));
     }
 
     @Test
@@ -154,7 +154,7 @@ public class LingeringTearTest {
         Battle battle = new Battle(List.of(unit), List.of(target), BattleFixture.seeded());
         battle.startBattle();
         double base = unit.getAttribute(AttributeType.CRIT_ATTACK).get();
-        battle.fireTriggers(TriggerEvent.TURN_START, unit, unit, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, unit, unit, 0, 0));
         double delta = unit.getAttribute(AttributeType.CRIT_ATTACK).get() - base;
         System.out.println("[20024] real GAIN_RESOURCE: value=" + unit.getResources().value(LAUGHTER)
                 + " crit damage +" + delta);

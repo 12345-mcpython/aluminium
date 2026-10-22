@@ -119,7 +119,7 @@ public class ChanceRollsTest {
 
         /** The ultimate's own marker rule, fired as the ultimate would fire it. */
         private void mark() {
-            battle.fireTriggers(com.laosun.aluminium.enums.TriggerEvent.ULT_CAST, sushang, enemy, 0, 0);
+            battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(com.laosun.aluminium.enums.TriggerEvent.ULT_CAST, sushang, enemy, 0, 0));
         }
 
         private void castSkill() {

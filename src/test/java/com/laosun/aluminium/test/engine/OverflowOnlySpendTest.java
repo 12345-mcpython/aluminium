@@ -58,7 +58,7 @@ public class OverflowOnlySpendTest {
         spare.getResources().gain(MARK, start);
         int before = spare.getResources().value(MARK);
         spare.setTriggerTable(table());
-        battle.fireTriggers(TriggerEvent.TURN_START, spare, null, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, spare, null, 0, 0));
         battle.processRequests();
         return new int[]{before, battle.characters().getFirst().getResources().value(MARK)};
     }

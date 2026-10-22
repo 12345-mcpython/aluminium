@@ -175,7 +175,7 @@ public class AbsorbDamageTest {
         TriggerSpecs.set(effect, "target", "all_allies");
         TriggerSpec rule = TriggerSpecs.rule("BATTLE_START", List.of(), effect);
         payer.setTriggerTable(new TriggerTable(payer.getCid(), List.of(rule)));
-        battle.fireTriggers(TriggerEvent.BATTLE_START, payer, payer, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.BATTLE_START, payer, payer, 0, 0));
         battle.processRequests();
     }
 

@@ -233,7 +233,7 @@ public class SkillLevelTest {
         rules.add(damageRule(slot, level));
         f.hero.setTriggerTable(new TriggerTable(HIMEKO, rules));
         double before = f.enemy.getCurrentHp();
-        f.battle.fireTriggers(TriggerEvent.ALLY_ATTACK, f.hero, f.enemy, 0, 0);
+        f.battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, f.hero, f.enemy, 0, 0));
         return before - f.enemy.getCurrentHp();
     }
 

@@ -29,7 +29,7 @@ public class IndeliblePromiseAndHeyOverHeresandTest {
         battle.startBattle();
         double breakEffect = unit.getAttribute(AttributeType.BREAKING_EFFECT).get() - breakBefore;
         double critBefore = unit.getAttribute(AttributeType.CRIT_CHANCE).get();
-        battle.fireTriggers(TriggerEvent.ULT_CAST, unit, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, unit, enemy, 0, 0));
         double crit = unit.getAttribute(AttributeType.CRIT_CHANCE).get() - critBefore;
         System.out.println("[21042] breakEffect=" + breakEffect + " critAfterUlt=" + crit);
         // 2026-10-19: the break share is the cone's own `breaking_effect` property (it is in the panel before the
@@ -48,7 +48,7 @@ public class IndeliblePromiseAndHeyOverHeresandTest {
         double health = unit.getAttribute(AttributeType.HEALTH).get() - healthBefore;
         double base = unit.getAttribute(AttributeType.HEALTH).baseValue();
         double healingBefore = unit.getAttribute(AttributeType.OUTGOING_HEALING_BOOST).get();
-        battle.fireTriggers(TriggerEvent.SKILL_CAST, unit, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, unit, enemy, 0, 0));
         double healing = unit.getAttribute(AttributeType.OUTGOING_HEALING_BOOST).get() - healingBefore;
         System.out.println("[22001] healthGain=" + health + " base=" + base + " healingAfterSkill=" + healing);
         // 2026-10-19: the health share is the cone's own health_percent property (it is in the panel before the battle

@@ -70,9 +70,9 @@ public class NewestHolderOnlyTest {
         Battle battle = new Battle(List.of(wearer, a), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
 
-        battle.fireTriggers(TriggerEvent.SKILL_CAST, wearer, a, 0, 0);      // Note: a gets the mark
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, wearer, a, 0, 0));      // Note: a gets the mark
         boolean aHad = marked(battle, a);
-        battle.fireTriggers(TriggerEvent.SKILL_CAST, wearer, enemy, 0, 0);  // Note: switch it to the enemy
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, wearer, enemy, 0, 0));  // Note: switch it to the enemy
         return new boolean[]{aHad, marked(battle, a), marked(battle, enemy)};
     }
 

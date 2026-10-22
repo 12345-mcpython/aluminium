@@ -44,7 +44,7 @@ public class QuidProQuoEnergyTest {
         double w0 = wearer.getCurrentEnergy();
         double l0 = low.getCurrentEnergy();
         double f0 = full.getCurrentEnergy();
-        battle.fireTriggers(TriggerEvent.TURN_START, wearer, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, wearer, enemy, 0, 0));
         return new double[]{wearer.getCurrentEnergy() - w0,
                 low.getCurrentEnergy() - l0, full.getCurrentEnergy() - f0};
     }
@@ -88,7 +88,7 @@ public class QuidProQuoEnergyTest {
         double w0 = wearer.getCurrentEnergy();
         double a0 = a.getCurrentEnergy();
         double b0 = b.getCurrentEnergy();
-        battle.fireTriggers(TriggerEvent.TURN_START, wearer, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, wearer, enemy, 0, 0));
         double w = wearer.getCurrentEnergy() - w0;
         double x = a.getCurrentEnergy() - a0;
         double y = b.getCurrentEnergy() - b0;

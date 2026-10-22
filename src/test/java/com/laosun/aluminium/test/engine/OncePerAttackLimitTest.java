@@ -40,7 +40,7 @@ public class OncePerAttackLimitTest {
     }
 
     private int fire(Battle battle) {
-        return battle.fireTriggers(TriggerEvent.DEALING_DAMAGE, owner, enemy, 0, 0);
+        return battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.DEALING_DAMAGE, owner, enemy, 0, 0));
     }
 
     private void endAttack(Battle battle) {

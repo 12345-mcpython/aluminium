@@ -61,7 +61,7 @@ public class PercentFromSkillParamTest {
                 TriggerSpecs.rule("TURN_START", List.of(), effect))));
 
         double before = tribbie.getAttribute(AttributeType.ATTACK).get();
-        battle.fireTriggers(TriggerEvent.TURN_START);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, null, null, 0, 0));
         battle.processRequests();
         double gained = tribbie.getAttribute(AttributeType.ATTACK).get() - before;
         System.out.println("[skill_share] row = " + row + " ; maxHp = " + maxHp + " ; expected " + expected
@@ -124,7 +124,7 @@ public class PercentFromSkillParamTest {
         double before = enemy.getCurrentHp();
         // Note: the actor and the target are stated, because the rule aims at `target` (a firing with no party cannot
         // resolve it - measured: "Effect targets \"target\" but this event has no such party").
-        battle.fireTriggers(TriggerEvent.TURN_START, tribbie, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, tribbie, enemy, 0, 0));
         battle.processRequests();
         return before - enemy.getCurrentHp();
     }

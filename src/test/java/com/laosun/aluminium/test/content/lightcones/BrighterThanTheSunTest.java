@@ -62,7 +62,7 @@ public class BrighterThanTheSunTest {
         double base = unit.getAttribute(AttributeType.ATTACK).baseValue();
         double before = unit.getAttribute(AttributeType.ATTACK).get();
         double erBefore = unit.getAttribute(AttributeType.ENERGY_REGENERATION_RATE).get();
-        battle.fireTriggers(TriggerEvent.BASIC_ATTACK, unit, unit, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.BASIC_ATTACK, unit, unit, 0, 0));
         double afterOne = unit.getAttribute(AttributeType.ATTACK).get();
         double erAfterOne = unit.getAttribute(AttributeType.ENERGY_REGENERATION_RATE).get();
         System.out.println("[23015] after one: attack " + before + " -> " + afterOne
@@ -71,7 +71,7 @@ public class BrighterThanTheSunTest {
         Assertions.assertEquals(base * 0.18, afterOne - before, base * 0.02, "one layer is 18% of BASE attack");
         Assertions.assertEquals(0.06, erAfterOne - erBefore, 1e-9, "one layer is 6 points of energy regen");
         for (int i = 0; i < 3; i++) {
-            battle.fireTriggers(TriggerEvent.BASIC_ATTACK, unit, unit, 0, 0);
+            battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.BASIC_ATTACK, unit, unit, 0, 0));
         }
         double afterFour = unit.getAttribute(AttributeType.ATTACK).get();
         System.out.println("[23015] after four: delta=" + (afterFour - before) + " (base*0.36=" + (base * 0.36) + ")");

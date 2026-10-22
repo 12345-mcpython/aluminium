@@ -146,7 +146,7 @@ public class ShieldBoostTest {
         giver.setTriggerTable(new TriggerTable(WEARER,
                 List.of(TriggerSpecs.rule("ALLY_ATTACK", null, shieldWithTurns(100, 3)))));
 
-        battle.fireTriggers(com.laosun.aluminium.enums.TriggerEvent.ALLY_ATTACK, giver, shielded, 1, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(com.laosun.aluminium.enums.TriggerEvent.ALLY_ATTACK, giver, shielded, 1, 0));
 
         ShieldBuff buff = shielded.getBuffManager().allBuffsOf(ShieldBuff.class).getFirst();
         Assertions.assertEquals(120, buff.getAmount(), EPS, "the buff's amount is the boosted one");
@@ -165,7 +165,7 @@ public class ShieldBoostTest {
         giver.setTriggerTable(new TriggerTable(WEARER,
                 List.of(TriggerSpecs.rule("ALLY_ATTACK", null, shield(100)))));
 
-        battle.fireTriggers(com.laosun.aluminium.enums.TriggerEvent.ALLY_ATTACK, giver, shielded, 1, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(com.laosun.aluminium.enums.TriggerEvent.ALLY_ATTACK, giver, shielded, 1, 0));
 
         Assertions.assertEquals(120, shielded.getShield(), EPS);
         Assertions.assertEquals(0, shielded.getBuffManager().allBuffsOf(ShieldBuff.class).size(),

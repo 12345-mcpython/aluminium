@@ -52,8 +52,8 @@ public class PerSubjectLimitTest {
         }
         owner.setTriggerTable(new TriggerTable(OWNER, List.of(rule)));
 
-        battle.fireTriggers(TriggerEvent.SKILL_CAST, a, enemy, 0, 0);
-        battle.fireTriggers(TriggerEvent.SKILL_CAST, b, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, a, enemy, 0, 0));
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, b, enemy, 0, 0));
         return owner.getBuffManager().stacksOf("探针");
     }
 

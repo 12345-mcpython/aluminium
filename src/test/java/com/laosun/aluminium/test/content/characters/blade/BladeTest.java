@@ -67,7 +67,7 @@ public class BladeTest {
         battle.startBattle();
 
         for (int i = 0; i < 6; i++) {
-            battle.fireTriggers(TriggerEvent.TAKING_HIT, enemy, blade, 0, 0);
+            battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.TAKING_HIT, enemy, blade, 0, 0));
         }
 
         Assertions.assertEquals(5, blade.getBuffManager().stacksOf("充能"),

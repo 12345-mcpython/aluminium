@@ -46,7 +46,7 @@ public class ConeBreakAndAuraTest {
         // The state application rolls: give the applier effect hit rate first (discipline 145).
         withCone.getAttribute(AttributeType.EFFECT_HIT_RATE)
                 .addModifier(DoubleValue.Modifier.pure(2.0, DoubleValue.Modifier.ModifierSource.BUFF, 230350));
-        battle.fireTriggers(TriggerEvent.BREAK, withCone, target, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.BREAK, withCone, target, 0, 0));
         // Note: ADD_STACK builds a COUNTER, not a state hasState() reports (measured: hasState was false while the
         // damage ratio below did move). So the stacking is asserted where it is observable: the ratio and the spec.
         int spec = 0;
@@ -92,7 +92,7 @@ public class ConeBreakAndAuraTest {
         Character plainWearer = CharacterFactory.create(WEARER, LEVEL);
         Battle plainBattle = battle(plainWearer, reference);
         double baseline = reference.getAttribute(AttributeType.CRIT_ATTACK).get();
-        battle.fireTriggers(TriggerEvent.FOLLOW_UP, wearer, enemyOf(battle, wearer), 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.FOLLOW_UP, wearer, enemyOf(battle, wearer), 0, 0));
         double afterFollowUp = ally.getAttribute(AttributeType.CRIT_ATTACK).get();
         System.out.println("[23038] ally crit damage baseline(no cone)=" + baseline + " with cone=" + afterFollowUp
                 + " ; state on the wearer=" + wearer.getBuffManager().hasState("谕示"));
@@ -115,7 +115,7 @@ public class ConeBreakAndAuraTest {
         Assertions.assertEquals(1, pinnedTurns, "exactly one party aura rule on FOLLOW_UP");
         Assertions.assertTrue(wearer.getBuffManager().hasState("谕示"), "carried by the state");
         // A battle without the cone: the same stimulus changes nothing.
-        plainBattle.fireTriggers(TriggerEvent.FOLLOW_UP, plainWearer, enemyOf(plainBattle, plainWearer), 0, 0);
+        plainBattle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.FOLLOW_UP, plainWearer, enemyOf(plainBattle, plainWearer), 0, 0));
         System.out.println("[23038] without the cone, after the same stimulus: "
                 + reference.getAttribute(AttributeType.CRIT_ATTACK).get() + " (baseline " + baseline + ")");
         Assertions.assertEquals(baseline, reference.getAttribute(AttributeType.CRIT_ATTACK).get(), 1e-9,

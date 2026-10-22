@@ -44,7 +44,7 @@ public class PearlExtraTurnRewardTest {
         Character archetype = battle.characters().get(1);
         int partyBefore = battle.partyResource(PUNCHLINE).value();
 
-        battle.fireTriggers(TriggerEvent.EXTRA_TURN_STARTED, archetype, archetype, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.EXTRA_TURN_STARTED, archetype, archetype, 0, 0));
         battle.processRequests();
 
         int gained = pearl.getResources().value(COUNTER);
@@ -63,11 +63,11 @@ public class PearlExtraTurnRewardTest {
         Battle battle = newBattle();
         Character pearl = battle.characters().getFirst();
         Character archetype = battle.characters().get(1);
-        battle.fireTriggers(TriggerEvent.EXTRA_TURN_STARTED, archetype, archetype, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.EXTRA_TURN_STARTED, archetype, archetype, 0, 0));
         battle.processRequests();
         int partyAfterGrant = battle.partyResource(PUNCHLINE).value();
 
-        battle.fireTriggers(TriggerEvent.EXTRA_TURN_ENDED, archetype, archetype, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.EXTRA_TURN_ENDED, archetype, archetype, 0, 0));
         battle.processRequests();
 
         int left = pearl.getResources().value(COUNTER);
@@ -88,11 +88,11 @@ public class PearlExtraTurnRewardTest {
     public void aPartlySpentRewardIsTakenBackUpToWhatIsLeft() {
         Battle battle = newBattle();
         Character pearl = battle.characters().getFirst();
-        battle.fireTriggers(TriggerEvent.EXTRA_TURN_STARTED, pearl, pearl, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.EXTRA_TURN_STARTED, pearl, pearl, 0, 0));
         battle.processRequests();
         pearl.getResources().spend(COUNTER, 12);                // 30 granted, 12 already used
 
-        battle.fireTriggers(TriggerEvent.EXTRA_TURN_ENDED, pearl, pearl, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.EXTRA_TURN_ENDED, pearl, pearl, 0, 0));
         battle.processRequests();
 
         int left = pearl.getResources().value(COUNTER);
@@ -109,11 +109,11 @@ public class PearlExtraTurnRewardTest {
         Battle battle = newBattle();
         Character pearl = battle.characters().getFirst();
         Character archetype = battle.characters().get(1);
-        battle.fireTriggers(TriggerEvent.EXTRA_TURN_STARTED, archetype, archetype, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.EXTRA_TURN_STARTED, archetype, archetype, 0, 0));
         battle.processRequests();
         pearl.getResources().spend(COUNTER, 30);                // all of it gone
 
-        battle.fireTriggers(TriggerEvent.EXTRA_TURN_ENDED, archetype, archetype, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.EXTRA_TURN_ENDED, archetype, archetype, 0, 0));
         battle.processRequests();
 
         System.out.println("[pearl_extra_turn] removal against an empty count left "
@@ -130,7 +130,7 @@ public class PearlExtraTurnRewardTest {
         Battle battle = newBattle();
         Character pearl = battle.characters().getFirst();
         Character hunter = battle.characters().get(2);
-        battle.fireTriggers(TriggerEvent.EXTRA_TURN_STARTED, hunter, hunter, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.EXTRA_TURN_STARTED, hunter, hunter, 0, 0));
         battle.processRequests();
         System.out.println("[pearl_extra_turn] the Hunt ally's extra turn paid " + pearl.getResources().value(COUNTER));
         Assertions.assertEquals(0, pearl.getResources().value(COUNTER),

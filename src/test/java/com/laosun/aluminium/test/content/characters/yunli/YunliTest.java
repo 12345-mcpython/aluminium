@@ -38,7 +38,7 @@ public class YunliTest {
         double before = yunli.getCurrentHp();
         double expected = yunli.getAttribute(AttributeType.ATTACK).get() * 0.3 + 200;
 
-        battle.fireTriggers(TriggerEvent.SKILL_CAST, yunli, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, yunli, enemy, 0, 0));
 
         Assertions.assertEquals(expected, yunli.getCurrentHp() - before, expected * 0.02,
                 "「恢复等同于云璃30.00%攻击力+200的生命值」 (restores HP equal to 30.00% of Yunli's ATK + 200): expected " + expected);
@@ -60,7 +60,7 @@ public class YunliTest {
         double bystanderBefore = bystander.getCurrentHp();
         double energyBefore = yunli.getCurrentEnergy();
 
-        battle.fireTriggers(TriggerEvent.TAKING_HIT, attacker, yunli, 0, 100);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.TAKING_HIT, attacker, yunli, 0, 100));
 
         Assertions.assertEquals(15.0, yunli.getCurrentEnergy() - energyBefore, 1e-6,
                 "「额外恢复15点能量」 (restores 15 extra Energy)");
@@ -92,7 +92,7 @@ public class YunliTest {
         Battle battle = new Battle(List.of(yunli), List.of(attacker, bystander), fixed());
         battle.startBattle();
         double before = attacker.getCurrentHp();
-        battle.fireTriggers(TriggerEvent.TAKING_HIT, attacker, yunli, 0, 100);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.TAKING_HIT, attacker, yunli, 0, 100));
         return before - attacker.getCurrentHp();
     }
 

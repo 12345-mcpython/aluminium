@@ -59,7 +59,7 @@ public class SkillParamTest {
                 TriggerSpecs.rule("TURN_START", List.of(), effect))));
 
         double before = tribbie.getAttribute(AttributeType.ATTACK).get();
-        battle.fireTriggers(TriggerEvent.TURN_START);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, null, null, 0, 0));
         battle.processRequests();
         double gained = tribbie.getAttribute(AttributeType.ATTACK).get() - before;
 

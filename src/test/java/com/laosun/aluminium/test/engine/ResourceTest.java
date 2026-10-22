@@ -387,13 +387,13 @@ public class ResourceTest {
                 rule("ALLY_ATTACK", List.of("actor != self"), gainResource("charge", 3, false)))));
 
         Battle battle = newBattle(hero);
-        battle.fireTriggers(TriggerEvent.ALLY_ATTACK, battle.enemies().getFirst(), null, 1, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, battle.enemies().getFirst(), null, 1, 0));
         Assertions.assertEquals(3, hero.getResources().value("charge"));
 
         // A second rule spends it: a spend that fits succeeds.
         hero.setTriggerTable(new TriggerTable(TRIBBIE, List.of(
                 rule("ALLY_ATTACK", List.of("actor != self"), spendResource("charge", 3)))));
-        battle.fireTriggers(TriggerEvent.ALLY_ATTACK, battle.enemies().getFirst(), null, 1, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, battle.enemies().getFirst(), null, 1, 0));
         Assertions.assertEquals(0, hero.getResources().value("charge"), "spent back to 0");
     }
 
@@ -413,7 +413,7 @@ public class ResourceTest {
 
         Battle battle = newBattle(hero);
         IllegalStateException e = Assertions.assertThrows(IllegalStateException.class,
-                () -> battle.fireTriggers(TriggerEvent.ALLY_ATTACK, battle.enemies().getFirst(), null, 1, 0));
+                () -> battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, battle.enemies().getFirst(), null, 1, 0)));
         Assertions.assertTrue(e.getMessage().contains("needs 5"), e.getMessage());
     }
 
@@ -428,7 +428,7 @@ public class ResourceTest {
 
         Battle battle = newBattle(hero);
         IllegalStateException e = Assertions.assertThrows(IllegalStateException.class,
-                () -> battle.fireTriggers(TriggerEvent.ALLY_ATTACK, battle.enemies().getFirst(), null, 1, 0));
+                () -> battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, battle.enemies().getFirst(), null, 1, 0)));
         Assertions.assertTrue(e.getMessage().contains("no such resource"), e.getMessage());
     }
 

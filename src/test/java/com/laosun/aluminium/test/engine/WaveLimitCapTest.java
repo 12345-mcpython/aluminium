@@ -48,13 +48,13 @@ public class WaveLimitCapTest {
         battle.beginWave();
 
         double before = owner.getCurrentEnergy();
-        battle.fireTriggers(TriggerEvent.SKILL_CAST, owner, null, 0, 0);
-        battle.fireTriggers(TriggerEvent.SKILL_CAST, owner, null, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, owner, null, 0, 0));
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, owner, null, 0, 0));
         double firstWave = owner.getCurrentEnergy() - before;
 
         double beforeSecond = owner.getCurrentEnergy();
         battle.beginWave();
-        battle.fireTriggers(TriggerEvent.SKILL_CAST, owner, null, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, owner, null, 0, 0));
         double secondWave = owner.getCurrentEnergy() - beforeSecond;
         System.out.println("[wave-cap] two casts in wave 1 -> " + firstWave + " ; one more in wave 2 -> " + secondWave);
 

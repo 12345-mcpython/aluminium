@@ -92,7 +92,7 @@ public class NamedBuffTest {
 
         private void fire(List<TriggerSpec> rules) {
             hero.setTriggerTable(new TriggerTable(MARCH, rules));
-            battle.fireTriggers(TriggerEvent.BATTLE_START, hero, hero, 0, 0);
+            battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.BATTLE_START, hero, hero, 0, 0));
         }
     }
 

@@ -58,7 +58,7 @@ public class SilverWolfLV999ZoneTest {
         castUltimate(battle, wolf);
 
         double before = totalEnemyHp(battle);
-        battle.fireTriggers(TriggerEvent.SKILL_POINT_SPENT, wolf, wolf, 0, 1);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_POINT_SPENT, wolf, wolf, 0, 1));
         battle.processRequests();
         double after = totalEnemyHp(battle);
         System.out.println("[1506] enemy HP before/after one spent Skill Point: " + before + " -> " + after
@@ -75,7 +75,7 @@ public class SilverWolfLV999ZoneTest {
         Battle battle = newBattle();
         Character wolf = battle.characters().getFirst();
         double before = totalEnemyHp(battle);
-        battle.fireTriggers(TriggerEvent.SKILL_POINT_SPENT, wolf, wolf, 0, 1);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_POINT_SPENT, wolf, wolf, 0, 1));
         battle.processRequests();
         double after = totalEnemyHp(battle);
         System.out.println("[1506] with no Ultimate: enemy HP " + before + " -> " + after);

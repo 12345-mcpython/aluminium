@@ -46,7 +46,7 @@ public class WelcomeToTheCosmicCityLaughterTest {
     }
 
     private void selfUlt(Battle battle) {
-        battle.fireTriggers(TriggerEvent.ULT_CAST, wearer, wearer, 1, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, wearer, wearer, 1, 0));
     }
 
     private void normalAttack(Battle battle) {
@@ -96,7 +96,7 @@ public class WelcomeToTheCosmicCityLaughterTest {
     @Test
     public void anEnemyTargetedUltGrantsNothing() {
         Battle battle = battle(true);
-        battle.fireTriggers(TriggerEvent.ULT_CAST, wearer, enemy, 1, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, wearer, enemy, 1, 0));
         System.out.println("[23057] ult on an enemy: laughter=" + laughter());
         Assertions.assertEquals(0, laughter(), "on oneself is the clause (false case)");
     }

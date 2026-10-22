@@ -43,7 +43,7 @@ public class ConeEnergyHealTest {
         battle.startBattle();
         unit.takeDamage(unit.getMaxHp() * 0.5);
         double before = unit.getCurrentHp();
-        battle.fireTriggers(TriggerEvent.ULT_CAST, unit, null, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, unit, null, 0, 0));
         double healed = unit.getCurrentHp() - before;
         Assertions.assertTrue(healed > 0, "the ultimate heals: " + before + " -> " + unit.getCurrentHp());
         Assertions.assertEquals(unit.getMaxHp() * 0.18, healed, 1.0,

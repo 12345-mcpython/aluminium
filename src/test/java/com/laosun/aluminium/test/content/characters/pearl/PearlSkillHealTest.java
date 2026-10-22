@@ -35,7 +35,7 @@ public class PearlSkillHealTest {
         double allyBefore = ally.getCurrentHp();
         int counterBefore = (int) pearl.getResources().get(COUNTER).getValue();
 
-        battle.fireTriggers(TriggerEvent.SKILL_CAST, pearl, ally, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, pearl, ally, 0, 0));
 
         double pearlGain = pearl.getCurrentHp() - pearlBefore;
         double allyGain = ally.getCurrentHp() - allyBefore;

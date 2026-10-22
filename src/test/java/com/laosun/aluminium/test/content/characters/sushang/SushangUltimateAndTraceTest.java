@@ -48,7 +48,7 @@ public class SushangUltimateAndTraceTest {
         double before = f.remainingWaitOf(f.sushang);
         Assertions.assertTrue(before > 0, "precondition: she is waiting her turn (" + before + ")");
 
-        f.battle.fireTriggers(TriggerEvent.ULT_CAST, f.sushang, f.enemy, 0, 0);
+        f.battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, f.sushang, f.enemy, 0, 0));
 
         double after = f.remainingWaitOf(f.sushang);
         System.out.println("[1206] 大招前后的剩余等待: " + before + " -> " + after
@@ -70,7 +70,7 @@ public class SushangUltimateAndTraceTest {
         double before = f.sushang.getAttribute(AttributeType.ATTACK).get();
         double allyBefore = f.ally.getAttribute(AttributeType.ATTACK).get();
 
-        f.battle.fireTriggers(TriggerEvent.ULT_CAST, f.sushang, f.enemy, 0, 0);
+        f.battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, f.sushang, f.enemy, 0, 0));
 
         Assertions.assertTrue(f.sushang.getAttribute(AttributeType.ATTACK).get() > before,
                 "「攻击力提高30%」 must raise her ATTACK: " + before + " -> "

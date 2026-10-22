@@ -437,7 +437,7 @@ public class TriggerEventWiringTest {
     }
 
     private static void fireAllyAttack(Battle battle, CanHit actor) {
-        battle.fireTriggers(TriggerEvent.ALLY_ATTACK, actor, null, 1, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, actor, null, 1, 0));
     }
 
     private static Damage damage(CanHit attacker, CanHit target, double amount) {

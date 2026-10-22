@@ -44,8 +44,8 @@ public class ConeAuditBatchSeventeenTest {
 
         Fixture g = new Fixture(23000, 2);
         double before = g.attribute(AttributeType.ALL_DAMAGE_TYPE_BOOST);
-        g.battle.fireTriggers(TriggerEvent.BREAK, g.battle.enemyUnits().getFirst(),
-                g.battle.enemyUnits().getFirst(), 0, 0);
+        g.battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.BREAK, g.battle.enemyUnits().getFirst(),
+                g.battle.enemyUnits().getFirst(), 0, 0));
         double after = g.attribute(AttributeType.ALL_DAMAGE_TYPE_BOOST) - before;
         System.out.println("[23000] 击破后的增伤 " + after);
         Assertions.assertEquals(0.3, after, 1e-9, "「弱点被击破时造成伤害 +30%，持续 1 回合」");

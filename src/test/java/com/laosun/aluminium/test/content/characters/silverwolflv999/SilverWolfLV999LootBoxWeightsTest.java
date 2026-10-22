@@ -96,7 +96,7 @@ public class SilverWolfLV999LootBoxWeightsTest {
     private record Fixture(Battle battle, Character wolf, ScriptedRng rng, int pointsBefore, double[] enemyHp) {
         int roll() {
             rng.lastBound = -1;
-            battle.fireTriggers(TriggerEvent.SKILL_POINT_SPENT, wolf, wolf, 0, 1);
+            battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_POINT_SPENT, wolf, wolf, 0, 1));
             battle.processRequests();
             Assertions.assertTrue(rng.lastBound > 0, "the pick must roll against the weight total");
             return rng.lastBound;

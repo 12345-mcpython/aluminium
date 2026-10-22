@@ -97,7 +97,7 @@ public class FugueTest {
             battle.castImmediate(fugue.getSkills().get(SkillType.SKILL), fugue, List.of(ally));
             before = enemy.getAttribute(AttributeType.DEFENCE).get();
         }
-        battle.fireTriggers(TriggerEvent.ALLY_ATTACK, ally, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, ally, enemy, 0, 0));
         double after = enemy.getAttribute(AttributeType.DEFENCE).get();
         return (before - after) / before;
     }

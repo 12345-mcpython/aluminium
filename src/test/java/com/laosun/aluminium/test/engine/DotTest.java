@@ -348,7 +348,7 @@ public class DotTest {
         }
 
         private int fire() {
-            return battle.fireTriggers(TriggerEvent.ALLY_ATTACK, hero, enemy, 1, 0);
+            return battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, hero, enemy, 1, 0));
         }
 
         /**

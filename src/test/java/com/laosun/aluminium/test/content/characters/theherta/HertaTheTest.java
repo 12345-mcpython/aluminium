@@ -68,7 +68,7 @@ public class HertaTheTest {
 
         // Note: The document's cap: five more ultimates must stop at 4, not keep counting (this is what makes the cap testable at all).
         for (int i = 0; i < 5; i++) {
-            battle.fireTriggers(TriggerEvent.ULT_CAST, herta, herta, 0, 0);
+            battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, herta, herta, 0, 0));
         }
         Assertions.assertEquals(4, herta.getBuffManager().stacksOf("灵感"),
                 "「【灵感】最多持有4层」 ([灵感] can be held up to 4 stacks)");

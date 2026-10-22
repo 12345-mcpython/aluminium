@@ -162,7 +162,7 @@ public class SilverWolfLV999TalentCritTest {
         wolf.setTriggerTable(withGrant);
         for (int gain : gains) {
             for (int step = 0; step < gain; step++) {
-                battle.fireTriggers(TriggerEvent.TURN_START, wolf, wolf, 0, 0);
+                battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, wolf, wolf, 0, 0));
                 battle.processRequests();
             }
         }

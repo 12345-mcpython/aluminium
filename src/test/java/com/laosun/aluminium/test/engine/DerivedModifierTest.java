@@ -170,7 +170,7 @@ public class DerivedModifierTest {
         battle.startBattle();
         double allyBare = ally.getAttribute(AttributeType.BREAKING_EFFECT).get();
 
-        battle.fireTriggers(TriggerEvent.SKILL_CAST, owner, ally, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, owner, ally, 0, 0));
 
         Assertions.assertEquals(1.0, boostOf(ally, AttributeType.BREAKING_EFFECT) - allyBare, EPS,
                 "0.5 x the OWNER's 2.0 = 1.0 -- not 0.5 x the receiver's 9.0, which is what the two readings "

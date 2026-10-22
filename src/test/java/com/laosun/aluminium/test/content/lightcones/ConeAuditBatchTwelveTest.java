@@ -102,7 +102,7 @@ public class ConeAuditBatchTwelveTest {
         f.wearer.setCurrentEnergy(0);
         f.battle.enemyUnits().getFirst().getBuffManager().addBuff(new StateBuff(BuffManager.BROKEN_STATE, 2, false));
         for (int i = 0; i < 3; i++) {
-            f.battle.fireTriggers(TriggerEvent.BASIC_ATTACK, f.wearer, f.battle.enemyUnits().getFirst(), 0, 0);
+            f.battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.BASIC_ATTACK, f.wearer, f.battle.enemyUnits().getFirst(), 0, 0));
         }
         System.out.println("[21048] energy after three attacks " + f.wearer.getCurrentEnergy() + " (2 x 3 = 6)");
         Assertions.assertEquals(6.0, f.wearer.getCurrentEnergy(), 1e-9, "「每回合最多触发 2 次」");

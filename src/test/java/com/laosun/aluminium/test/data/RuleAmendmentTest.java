@@ -224,7 +224,7 @@ public class RuleAmendmentTest {
 
         int fired = 0;
         for (int hit = 0; hit < 3; hit++) {
-            fired += battle.fireTriggers(TriggerEvent.TAKING_HIT, monster(), hero, 1, 0);
+            fired += battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.TAKING_HIT, monster(), hero, 1, 0));
         }
         return fired;
     }
@@ -240,7 +240,7 @@ public class RuleAmendmentTest {
 
         int fired = 0;
         for (int hit = 0; hit < 3; hit++) {
-            fired += battle.fireTriggers(TriggerEvent.TAKING_HIT, monster(), hero, 1, 0);
+            fired += battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.TAKING_HIT, monster(), hero, 1, 0));
         }
         return fired;
     }
@@ -255,7 +255,7 @@ public class RuleAmendmentTest {
         Battle battle = new Battle(List.of(hero), List.of(monster()), fixed(roll));
         battle.startBattle();
 
-        battle.fireTriggers(TriggerEvent.ULT_CAST, hero, null, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, hero, null, 0, 0));
 
         return battle.enemyUnits().getFirst().getBuffManager().hasState("冻结");
     }
@@ -275,7 +275,7 @@ public class RuleAmendmentTest {
         Battle battle = new Battle(List.of(hero), List.of(monster()), fixed(roll));
         battle.startBattle();
 
-        battle.fireTriggers(TriggerEvent.ULT_CAST, hero, null, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, hero, null, 0, 0));
 
         return battle.enemyUnits().getFirst().getBuffManager().hasState("冻结");
     }

@@ -67,7 +67,7 @@ public class ShieldGrantedEventTest {
         f.ally.setTriggerTable(new TriggerTable(ALLY, List.of(timedShieldRule())));
         f.hurt();
 
-        f.battle.fireTriggers(TriggerEvent.SKILL_CAST, f.ally, f.dahlia, 0, 0);
+        f.battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, f.ally, f.dahlia, 0, 0));
 
         Assertions.assertTrue(f.dahlia.getShield() > 0, "precondition: the timed shield is on her");
         Assertions.assertEquals(HEAL, f.healed(), EPS,

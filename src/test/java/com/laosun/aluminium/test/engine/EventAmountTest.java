@@ -121,7 +121,7 @@ public class EventAmountTest {
         // the carrier as the target, three repetitions were clamped by its own 1358-point health bar (104instead of
         // 3 x 60.83).
         battle.noteChangedResource("充能");
-        battle.fireTriggers(TriggerEvent.RESOURCE_CHANGED, owner, enemy, 0, -spent);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.RESOURCE_CHANGED, owner, enemy, 0, -spent));
         battle.processRequests();
         return before - enemy.getCurrentHp();
     }

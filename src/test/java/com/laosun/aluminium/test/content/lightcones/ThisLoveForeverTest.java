@@ -54,7 +54,7 @@ public class ThisLoveForeverTest {
         build(true);
         double before = wearableHit();
         Summon sprite = battle.summonMemosprite(wearer);
-        battle.fireTriggers(TriggerEvent.SKILL_CAST, sprite, ally, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, sprite, ally, 0, 0));
         int blank = wearer.getBuffManager().stacksOf(BLANK);
         double after = wearableHit();
         System.out.println("[23052] blank=" + blank + " ; damage on the enemy " + before + " -> " + after
@@ -68,7 +68,7 @@ public class ThisLoveForeverTest {
         build(true);
         double before = wearer.getAttribute(AttributeType.CRIT_ATTACK).get();
         Summon sprite = battle.summonMemosprite(wearer);
-        battle.fireTriggers(TriggerEvent.SKILL_CAST, sprite, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, sprite, enemy, 0, 0));
         int poem = wearer.getBuffManager().stacksOf(POEM);
         double after = wearer.getAttribute(AttributeType.CRIT_ATTACK).get();
         System.out.println("[23052] poem=" + poem + " ; party crit damage " + before + " -> " + after
@@ -81,7 +81,7 @@ public class ThisLoveForeverTest {
     @Test
     public void theWearerCastingIsNotTheMemospriteCasting() {
         build(true);
-        battle.fireTriggers(TriggerEvent.SKILL_CAST, wearer, ally, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, wearer, ally, 0, 0));
         System.out.println("[23052] after the WEARER casts: blank=" + wearer.getBuffManager().stacksOf(BLANK)
                 + " poem=" + wearer.getBuffManager().stacksOf(POEM));
         Assertions.assertEquals(0, wearer.getBuffManager().stacksOf(BLANK), "actor == summon (false case)");
@@ -92,7 +92,7 @@ public class ThisLoveForeverTest {
     public void withoutTheConeNothingHappens() {
         build(false);
         Summon sprite = battle.summonMemosprite(wearer);
-        battle.fireTriggers(TriggerEvent.SKILL_CAST, sprite, ally, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, sprite, ally, 0, 0));
         System.out.println("[23052] without the cone: blank=" + wearer.getBuffManager().stacksOf(BLANK));
         Assertions.assertEquals(0, wearer.getBuffManager().stacksOf(BLANK), "no cone, no mark (false case)");
     }

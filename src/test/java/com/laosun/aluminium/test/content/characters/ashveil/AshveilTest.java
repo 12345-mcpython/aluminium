@@ -50,13 +50,13 @@ public class AshveilTest {
         battle.castImmediate(ashveil.getSkills().get(com.laosun.aluminium.enums.SkillType.SKILL), ashveil, List.of(enemy));
 
         // Her declaration gives 2 charges. One firing is one layer (ADD_STACK's `amount` is not a layer count, round 12).
-        battle.fireTriggers(TriggerEvent.ALLY_ATTACK, ally, enemy, 0, 0);
-        battle.fireTriggers(TriggerEvent.ALLY_ATTACK, ally, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, ally, enemy, 0, 0));
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, ally, enemy, 0, 0));
         Assertions.assertEquals(2, ashveil.getBuffManager().stacksOf("婪酣"),
                 "two firings, one layer each");
 
         Assertions.assertThrows(IllegalStateException.class,
-                () -> battle.fireTriggers(TriggerEvent.ALLY_ATTACK, ally, enemy, 0, 0),
+                () -> battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, ally, enemy, 0, 0)),
                 "the engine refuses to spend a charge she does not have");
     }
 
@@ -88,7 +88,7 @@ public class AshveilTest {
         battle.startBattle();
         battle.castImmediate(ashveil.getSkills().get(com.laosun.aluminium.enums.SkillType.SKILL), ashveil, List.of(enemy));
         double before = ashveil.getCurrentEnergy();
-        battle.fireTriggers(TriggerEvent.ALLY_ATTACK, teammate ? ally : ashveil, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, teammate ? ally : ashveil, enemy, 0, 0));
         return ashveil.getCurrentEnergy() - before;
     }
 

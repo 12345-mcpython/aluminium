@@ -120,7 +120,7 @@ public class CountedLaughsTest {
                 TriggerSpecs.rule("ULT_CAST", List.of("actor == self"), instance))));
 
         double before = enemy.getCurrentHp();
-        battle.fireTriggers(TriggerEvent.ULT_CAST, mine, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, mine, enemy, 0, 0));
         battle.processRequests();
         return before - enemy.getCurrentHp();
     }

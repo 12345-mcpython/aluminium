@@ -85,7 +85,7 @@ public class TheUnreachableSideTest {
         Battle battle = new Battle(List.of(withCone), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         double before = withCone.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
-        battle.fireTriggers(TriggerEvent.HP_CONSUMED, withCone, withCone, 100, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.HP_CONSUMED, withCone, withCone, 100, 0));
         double after = withCone.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
         System.out.println("[23009] HP price: boost " + before + " -> " + after);
         Assertions.assertEquals(before + 0.24, after, 1e-9, "spending HP raises damage dealt by 24 points");

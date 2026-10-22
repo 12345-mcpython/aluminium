@@ -66,7 +66,7 @@ public class SpentAmountIsPositiveTest {
         spare.getResources().register(SPENT, 200, 100);
         spare.getResources().register(MARK, 9999, 0);
         spare.setTriggerTable(table(spendFirst));
-        battle.fireTriggers(TriggerEvent.TURN_START, spare, null, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, spare, null, 0, 0));
         battle.processRequests();
         return battle.characters().getFirst().getResources().value(MARK);
     }

@@ -110,8 +110,8 @@ public class CastAppliedCountTest {
         // Freezable enemies, so the out-of-cast freeze really lands (a1) and the ultimate then lands its own (3).
         Battle contaminated = ultimateBattle(heroWithAnOutOfCastFreeze(), 3, 0);
         // The freeze happens on a hit she takes, long before the ultimate: `attacker` is the one who gets frozen.
-        contaminated.fireTriggers(TriggerEvent.TAKING_HIT, contaminated.enemyUnits().getFirst(),
-                contaminated.characters().getFirst(), 1, 0);
+        contaminated.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.TAKING_HIT, contaminated.enemyUnits().getFirst(),
+                contaminated.characters().getFirst(), 1, 0));
 
         double withStale = castUltimate(contaminated);
         double clean = energyFromAnUltimate(3, 0);

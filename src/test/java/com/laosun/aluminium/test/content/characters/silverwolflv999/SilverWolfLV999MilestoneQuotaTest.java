@@ -196,7 +196,7 @@ public class SilverWolfLV999MilestoneQuotaTest {
      * One party-scoped laugh gain, which 「获得笑点时，获得等量【隐藏分】」 turns into hidden points.
      */
     private void feederLaughs() {
-        battle.fireTriggers(TriggerEvent.DAMAGE_SETTLED, feeder, feeder, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.DAMAGE_SETTLED, feeder, feeder, 0, 0));
         battle.processRequests();
     }
 

@@ -89,7 +89,7 @@ public class AventurineWaveflairMilestoneTest {
         wolf.getResources().gain(FERVOR, 12);
         double before = enemy.getCurrentHp();
 
-        battle.fireTriggers(TriggerEvent.TURN_START, wolf, wolf, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, wolf, wolf, 0, 0));
         battle.processRequests();
 
         System.out.println("[1513] a turn start with 12 points: damage " + (before - enemy.getCurrentHp())
@@ -165,7 +165,7 @@ public class AventurineWaveflairMilestoneTest {
      * ally's swing: what is under test here is the counter and what the crossing does with it.
      */
     private void alleyAttacks() {
-        battle.fireTriggers(TriggerEvent.ALLY_ATTACK, ally, enemy, 1, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, ally, enemy, 1, 0));
         battle.processRequests();
     }
 

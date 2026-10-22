@@ -36,11 +36,11 @@ public class TrailblazerSiblingTest {
         battle.startBattle();
         double before = tb.getAttribute(AttributeType.ATTACK).get();
 
-        battle.fireTriggers(TriggerEvent.BREAK, tb, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.BREAK, tb, enemy, 0, 0));
         double afterOne = tb.getAttribute(AttributeType.ATTACK).get();
-        battle.fireTriggers(TriggerEvent.BREAK, tb, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.BREAK, tb, enemy, 0, 0));
         double afterTwo = tb.getAttribute(AttributeType.ATTACK).get();
-        battle.fireTriggers(TriggerEvent.BREAK, tb, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.BREAK, tb, enemy, 0, 0));
         double afterThree = tb.getAttribute(AttributeType.ATTACK).get();
 
         Assertions.assertTrue(afterOne > before, "\"after each time an enemy target's Weakness is Broken, ATK is raised by 20%\" (「每次击破敌方目标的弱点后，攻击力提高20%」): " + before + " -> " + afterOne);

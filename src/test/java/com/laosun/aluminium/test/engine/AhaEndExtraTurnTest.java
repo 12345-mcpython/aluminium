@@ -44,7 +44,7 @@ public class AhaEndExtraTurnTest {
         TriggerSpecs.set(lay, "target", "all_allies");
         ally.setTriggerTable(new TriggerTable(ALLY, List.of(
                 TriggerSpecs.rule(TriggerEvent.SKILL_CAST.name(), List.of(), lay))));
-        battle.fireTriggers(TriggerEvent.SKILL_CAST, ally, owner, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, ally, owner, 0, 0));
         battle.processRequests();
         Assertions.assertTrue(owner.getBuffManager().hasState(MOMENT), "precondition: the moment is on her");
 

@@ -137,7 +137,7 @@ public class YukongCommandTest {
          * One unit's turn end, the way the engine delivers it.
          */
         private void turnEndOf(Character unit) {
-            battle.fireTriggers(TriggerEvent.TURN_END, unit, unit, 0, 0);
+            battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_END, unit, unit, 0, 0));
         }
     }
 

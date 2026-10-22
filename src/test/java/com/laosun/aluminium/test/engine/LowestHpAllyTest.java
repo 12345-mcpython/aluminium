@@ -167,7 +167,7 @@ public class LowestHpAllyTest {
         }
 
         private int fire() {
-            return battle.fireTriggers(TriggerEvent.ALLY_ATTACK, hero, null, 1, 0);
+            return battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, hero, null, 1, 0));
         }
     }
 

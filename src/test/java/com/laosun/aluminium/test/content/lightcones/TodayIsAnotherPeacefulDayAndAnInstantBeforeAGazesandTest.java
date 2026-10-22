@@ -47,7 +47,7 @@ public class TodayIsAnotherPeacefulDayAndAnInstantBeforeAGazesandTest {
         battle.startBattle();
         double crit = unit.getAttribute(AttributeType.CRIT_ATTACK).get() - critBefore;
         double boostBefore = unit.getAttribute(AttributeType.ULTIMATE_DAMAGE_BOOST).get();
-        battle.fireTriggers(TriggerEvent.ULT_CAST, unit, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, unit, enemy, 0, 0));
         double ultBoost = unit.getAttribute(AttributeType.ULTIMATE_DAMAGE_BOOST).get() - boostBefore;
         double expected = Math.min(energy * 0.006, 1.08);
         System.out.println("[23018] crit=" + crit + " maxEnergy=" + energy + " ultBoost=" + ultBoost

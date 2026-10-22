@@ -81,7 +81,7 @@ public class LightConeSlowedTargetTest {
             TriggerSpecs.set(slow, "target", "target");
             ally.setTriggerTable(new TriggerTable(9301, List.of(TriggerSpecs.rule(
                     TriggerEvent.ALLY_ATTACK.name(), List.of(), slow))));
-            battle.fireTriggers(TriggerEvent.ALLY_ATTACK, ally, enemy, 1, 0);
+            battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, ally, enemy, 1, 0));
         }
         double before = enemy.getCurrentHp();
         battle.castImmediate(wearer.getSkills().get(SkillType.SKILL), wearer, List.of(enemy));

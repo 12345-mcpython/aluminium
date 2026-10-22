@@ -199,7 +199,7 @@ public class ShieldOriginConditionTest {
      */
     private static boolean turnStartHeals(Battle battle, Character hero, Character ally) {
         double before = ally.getCurrentHp();
-        battle.fireTriggers(TriggerEvent.TURN_START, ally, ally, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, ally, ally, 0, 0));
         return ally.getCurrentHp() > before;
     }
 
@@ -296,10 +296,10 @@ public class ShieldOriginConditionTest {
         battle.startBattle();
         if (throughTheSkill) {
             // The Skill's shield overwrites the battle-start one, and it is the one Eidolon 6 names.
-            battle.fireTriggers(TriggerEvent.SKILL_CAST, hero, ally, 0, 0);
+            battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, hero, ally, 0, 0));
         }
         double before = ally.getCurrentHp();
-        battle.fireTriggers(TriggerEvent.TURN_START, ally, ally, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, ally, ally, 0, 0));
         return ally.getCurrentHp() - before;
     }
 

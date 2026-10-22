@@ -32,7 +32,7 @@ public class SushangTest {
         Fixture f = new Fixture();
         double before = f.sushang.getAttribute(AttributeType.SPEED).get();
 
-        f.battle.fireTriggers(TriggerEvent.BREAK, f.sushang, f.enemy, 0, 0);
+        f.battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.BREAK, f.sushang, f.enemy, 0, 0));
 
         Assertions.assertTrue(f.sushang.getAttribute(AttributeType.SPEED).get() > before,
                 "\"when an enemy target's Weakness is Broken on the field, Sushang's SPD is raised by 20% for 2 turns\" (「当场上有敌方目标的弱点被击破，素裳的速度提高20%，持续2回合」): "

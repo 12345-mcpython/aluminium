@@ -55,11 +55,11 @@ public class WorrisomeBlissfulTest {
     @Test
     public void aFollowUpTamesUpToTwoLayers() {
         build(true);
-        battle.fireTriggers(TriggerEvent.FOLLOW_UP, wearer, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.FOLLOW_UP, wearer, enemy, 0, 0));
         int one = enemy.getBuffManager().stacksOf(TAME);
-        battle.fireTriggers(TriggerEvent.FOLLOW_UP, wearer, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.FOLLOW_UP, wearer, enemy, 0, 0));
         int two = enemy.getBuffManager().stacksOf(TAME);
-        battle.fireTriggers(TriggerEvent.FOLLOW_UP, wearer, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.FOLLOW_UP, wearer, enemy, 0, 0));
         int three = enemy.getBuffManager().stacksOf(TAME);
         System.out.println("[23016] tame layers after 1/2/3 follow-ups = " + one + "/" + two + "/" + three);
         Assertions.assertEquals(1, one, "a follow-up tames one layer");
@@ -73,9 +73,9 @@ public class WorrisomeBlissfulTest {
         build(false);
         untamed = critHit();
         build(true);
-        battle.fireTriggers(TriggerEvent.FOLLOW_UP, wearer, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.FOLLOW_UP, wearer, enemy, 0, 0));
         double atOne = critHit();
-        battle.fireTriggers(TriggerEvent.FOLLOW_UP, wearer, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.FOLLOW_UP, wearer, enemy, 0, 0));
         double atTwo = critHit();
         System.out.println("[23016] untamed=" + untamed + " at 1 layer=" + atOne + " at 2 layers=" + atTwo
                 + " ; one layer=" + (atOne - untamed) + " second layer=" + (atTwo - atOne));

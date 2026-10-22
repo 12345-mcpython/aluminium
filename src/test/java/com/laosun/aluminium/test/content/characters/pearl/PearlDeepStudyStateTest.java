@@ -33,14 +33,14 @@ public class PearlDeepStudyStateTest {
         Character hunter = battle.characters().get(2);
 
         int before = (int) pearl.getResources().get(COUNTER).getValue();
-        battle.fireTriggers(TriggerEvent.ULT_CAST, pearl, elation, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, pearl, elation, 0, 0));
         boolean archetype = elation.getBuffManager().hasState(ARCHETYPE);
         boolean deep = pearl.getBuffManager().hasState(DEEP);
         boolean hunterUntouched = hunter.getBuffManager().hasState(ARCHETYPE);
         int after = (int) pearl.getResources().get(COUNTER).getValue();
 
         // a second ultimate on the other ally must mark THAT one
-        battle.fireTriggers(TriggerEvent.ULT_CAST, pearl, hunter, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, pearl, hunter, 0, 0));
         boolean hunterMarked = hunter.getBuffManager().hasState(ARCHETYPE);
         System.out.println("[pearl_states] archetype on the target = " + archetype + " ; deep study on Pearl = "
                 + deep + " ; the other ally marked? " + hunterUntouched + " then " + hunterMarked

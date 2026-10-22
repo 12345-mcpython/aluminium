@@ -65,7 +65,7 @@ public class HimekoAuditTest {
         Battle battle = new Battle(List.of(her), List.of(victim), always(0.99));
         battle.startBattle();
         double before = her.getAttribute(AttributeType.SPEED).get();
-        battle.fireTriggers(com.laosun.aluminium.enums.TriggerEvent.FOLLOW_UP, her, victim, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(com.laosun.aluminium.enums.TriggerEvent.FOLLOW_UP, her, victim, 0, 0));
         battle.processRequests();
         double gained = her.getAttribute(AttributeType.SPEED).get() - before;
         System.out.println("[1003] 星魂1 追加攻击后速度增量 " + gained);

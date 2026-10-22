@@ -56,7 +56,7 @@ public class RemoveBySourceTest {
         TriggerSpecs.set(theirs, "target", "all_allies");
         other.setTriggerTable(new TriggerTable(OTHER, List.of(
                 TriggerSpecs.rule("TURN_START", List.of(), theirs))));
-        battle.fireTriggers(TriggerEvent.TURN_START);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, null, null, 0, 0));
         battle.processRequests();
 
         double boosted = attackOf(owner);
@@ -70,7 +70,7 @@ public class RemoveBySourceTest {
         TriggerSpecs.set(strip, "target", "self");
         owner.setTriggerTable(new TriggerTable(OWNER, List.of(
                 TriggerSpecs.rule("BATTLE_START", List.of(), strip))));
-        battle.fireTriggers(TriggerEvent.BATTLE_START);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.BATTLE_START, null, null, 0, 0));
         battle.processRequests();
 
         System.out.println("[by_source] applied by the OTHER unit: " + unpolluted + " -> " + boosted

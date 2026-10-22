@@ -32,7 +32,7 @@ public class YanqingTest {
         double critBefore = yanqing.getAttribute(AttributeType.CRIT_CHANCE).get();
         double dmgBefore = yanqing.getAttribute(AttributeType.CRIT_ATTACK).get();
 
-        battle.fireTriggers(TriggerEvent.SKILL_CAST, yanqing, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, yanqing, enemy, 0, 0));
 
         Assertions.assertTrue(yanqing.getBuffManager().hasState("智剑连心"),
                 "「并为彦卿附加【智剑连心】」 (and applies Soulsteel Sync (【智剑连心】) to Yanqing)");
@@ -83,7 +83,7 @@ public class YanqingTest {
             yanqing.getBuffManager().addBuff(new com.laosun.aluminium.models.buff.StateBuff("智剑连心", 1, false));
         }
         double before = yanqing.getAttribute(AttributeType.CRIT_ATTACK).get();
-        battle.fireTriggers(TriggerEvent.ULT_CAST, yanqing, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, yanqing, enemy, 0, 0));
         return yanqing.getAttribute(AttributeType.CRIT_ATTACK).get() - before;
     }
 
@@ -96,7 +96,7 @@ public class YanqingTest {
         Battle battle = new Battle(List.of(yanqing), List.of(enemy), fixed(roll));
         battle.startBattle();
         double before = enemy.getCurrentHp();
-        battle.fireTriggers(TriggerEvent.ALLY_ATTACK, yanqing, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, yanqing, enemy, 0, 0));
         return before - enemy.getCurrentHp();
     }
 

@@ -69,7 +69,7 @@ public class WeaknessElementSourceTest {
     }
 
     private static void fire(Battle battle, Character wearer, Enemy enemy) {
-        battle.fireTriggers(TriggerEvent.SKILL_CAST, wearer, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, wearer, enemy, 0, 0));
     }
 
     @Test

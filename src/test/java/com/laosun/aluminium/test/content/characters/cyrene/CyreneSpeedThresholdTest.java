@@ -52,7 +52,7 @@ public class CyreneSpeedThresholdTest {
                 List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        battle.fireTriggers(TriggerEvent.TURN_START, owner, owner, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, owner, owner, 0, 0));
         battle.processRequests();
         return owner.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
     }

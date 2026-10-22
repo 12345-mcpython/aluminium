@@ -40,7 +40,7 @@ public class AttributeShareResourceTest {
         if (effects.length > 0) {
             wearer.setTriggerTable(new TriggerTable(WEARER, List.of(
                     TriggerSpecs.rule("BATTLE_START", List.of(), effects))));
-            battle.fireTriggers(TriggerEvent.BATTLE_START, wearer, null, 0, 0);
+            battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.BATTLE_START, wearer, null, 0, 0));
         }
     }
 
@@ -70,7 +70,7 @@ public class AttributeShareResourceTest {
         wearer.setTriggerTable(new TriggerTable(WEARER, List.of(
                 TriggerSpecs.rule("BATTLE_START", List.of(), shareOf("CRIT_ATTACK", 0.5)))));
         double critDamage = wearer.getAttribute(AttributeType.CRIT_ATTACK).get();
-        int added = gained(() -> battle.fireTriggers(TriggerEvent.BATTLE_START, wearer, null, 0, 0));
+        int added = gained(() -> battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.BATTLE_START, wearer, null, 0, 0)));
         System.out.println("[share] crit damage=" + critDamage + " -> the gain was " + added
                 + " (half of the panel is " + Math.round(critDamage * 0.5) + ")");
         Assertions.assertEquals((int) Math.round(critDamage * 0.5), added, "the gain is 50% of the panel value");
@@ -82,7 +82,7 @@ public class AttributeShareResourceTest {
         wearer.setTriggerTable(new TriggerTable(WEARER, List.of(
                 TriggerSpecs.rule("BATTLE_START", List.of(), shareOf("CRIT_ATTACK", null)))));
         double critDamage = wearer.getAttribute(AttributeType.CRIT_ATTACK).get();
-        int whole = gained(() -> battle.fireTriggers(TriggerEvent.BATTLE_START, wearer, null, 0, 0));
+        int whole = gained(() -> battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.BATTLE_START, wearer, null, 0, 0)));
         System.out.println("[share] with no percent the gain is the whole value: " + whole + " (panel " + critDamage + ")");
         Assertions.assertEquals((int) Math.round(critDamage), whole, "no percent means the whole value");
 
@@ -93,7 +93,7 @@ public class AttributeShareResourceTest {
         build();
         wearer.setTriggerTable(new TriggerTable(WEARER, List.of(
                 TriggerSpecs.rule("BATTLE_START", List.of(), literal))));
-        int added = gained(() -> battle.fireTriggers(TriggerEvent.BATTLE_START, wearer, null, 0, 0));
+        int added = gained(() -> battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.BATTLE_START, wearer, null, 0, 0)));
         System.out.println("[share] a literal amount of 1 still adds 1 (the resource has a max, so a big literal would be capped): " + added);
         Assertions.assertEquals(1, added, "literals are untouched (false case)");
     }
@@ -106,7 +106,7 @@ public class AttributeShareResourceTest {
                 TriggerSpecs.rule("BATTLE_START", List.of(), bad))));
         int added = gained(() -> {
             try {
-                battle.fireTriggers(TriggerEvent.BATTLE_START, wearer, null, 0, 0);
+                battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.BATTLE_START, wearer, null, 0, 0));
             } catch (IllegalArgumentException expected) {
                 System.out.println("[share] refused loudly: " + expected.getMessage());
                 return;

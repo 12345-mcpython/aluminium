@@ -33,17 +33,17 @@ public class PasskeyTest {
         double start = unit.getCurrentEnergy();
         battle.setCurrentMove(new Signal(unit));
         battle.beforeMove();
-        battle.fireTriggers(TriggerEvent.SKILL_CAST, unit, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, unit, enemy, 0, 0));
         double afterFirst = unit.getCurrentEnergy();
         Assertions.assertEquals(8.0, afterFirst - start, 1e-6,
                 "rank 1 grants eight energy: " + start + " -> " + afterFirst);
-        battle.fireTriggers(TriggerEvent.SKILL_CAST, unit, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, unit, enemy, 0, 0));
         Assertions.assertEquals(afterFirst, unit.getCurrentEnergy(), 1e-6,
                 "per_turn: 1 -- a second skill in the same turn grants nothing");
         battle.afterMove();
         battle.setCurrentMove(new Signal(unit));
         battle.beforeMove();
-        battle.fireTriggers(TriggerEvent.SKILL_CAST, unit, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, unit, enemy, 0, 0));
         Assertions.assertEquals(16.0, unit.getCurrentEnergy() - start, 1e-6,
                 "the next turn grants again: " + unit.getCurrentEnergy());
     }

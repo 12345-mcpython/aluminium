@@ -170,7 +170,7 @@ public class ArgentiStacksTest {
         }
 
         private void fireAttack(TriggerEvent event, int hits) {
-            battle.fireTriggers(event, argenti, enemy, hits, 0);
+            battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(event, argenti, enemy, hits, 0));
         }
 
         private void argentiTurn() {

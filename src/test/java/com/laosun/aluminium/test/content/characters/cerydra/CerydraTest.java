@@ -71,7 +71,7 @@ public class CerydraTest {
             battle.castImmediate(cerydra.getSkills().get(com.laosun.aluminium.enums.SkillType.SKILL), cerydra, List.of(ally));
         }
         double before = enemy.getCurrentHp();
-        battle.fireTriggers(TriggerEvent.ALLY_ATTACK, ally, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, ally, enemy, 0, 0));
         return before - enemy.getCurrentHp();
     }
 

@@ -49,7 +49,7 @@ public class SigoniaCritTest {
         double before = unit.getAttribute(AttributeType.CRIT_ATTACK).get();
         int firings = 10 + 2;
         for (int i = 0; i < firings; i++) {
-            battle.fireTriggers(TriggerEvent.KILL, unit, enemy, 0, 0);
+            battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.KILL, unit, enemy, 0, 0));
         }
         double gain = unit.getAttribute(AttributeType.CRIT_ATTACK).get() - before;
         Assertions.assertEquals(0.04 * 10, gain, 1e-6,

@@ -61,7 +61,7 @@ public class SparxieTest {
         Assertions.assertTrue(battle.spendSkillPoint(), "and a second one");
         int before = battle.getSkillPoints();
 
-        battle.fireTriggers(TriggerEvent.BATTLE_START, sparxie, sparxie, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.BATTLE_START, sparxie, sparxie, 0, 0));
 
         Assertions.assertEquals(before + 2, battle.getSkillPoints(),
                 "\"and restores 2 Skill Points to our side\" (「并为我方恢复2个战技点」): " + before + " -> " + battle.getSkillPoints());

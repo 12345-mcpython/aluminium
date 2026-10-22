@@ -109,7 +109,7 @@ public class PearlEidolon2RewardTest {
         Character archetype = battle.characters().get(1);
 
         int punchlineStart = battle.partyResource(PUNCHLINE).value();
-        battle.fireTriggers(TriggerEvent.EXTRA_TURN_STARTED, archetype, archetype, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.EXTRA_TURN_STARTED, archetype, archetype, 0, 0));
         battle.processRequests();
         int granted = pearl.getResources().value(COUNTER);
         int punchlineGranted = battle.partyResource(PUNCHLINE).value() - punchlineStart;
@@ -117,7 +117,7 @@ public class PearlEidolon2RewardTest {
             pearl.getResources().spend(COUNTER, spendAfterGrant);
         }
 
-        battle.fireTriggers(TriggerEvent.EXTRA_TURN_ENDED, archetype, archetype, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.EXTRA_TURN_ENDED, archetype, archetype, 0, 0));
         battle.processRequests();
 
         // What is left after the closing clause, measured against where the turn started on each counter.

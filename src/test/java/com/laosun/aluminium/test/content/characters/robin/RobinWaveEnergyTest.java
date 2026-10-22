@@ -49,7 +49,7 @@ public class RobinWaveEnergyTest {
         battle.startBattle();
         battle.processRequests();
         double before = robin.getCurrentEnergy();
-        battle.fireTriggers(TriggerEvent.WAVE_START);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.WAVE_START, null, null, 0, 0));
         battle.processRequests();
         return robin.getCurrentEnergy() - before;
     }

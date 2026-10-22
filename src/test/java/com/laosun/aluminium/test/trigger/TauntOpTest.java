@@ -44,7 +44,7 @@ public class TauntOpTest {
         Battle battle = new Battle(List.of(owner), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
 
-        battle.fireTriggers(TriggerEvent.ALLY_ATTACK, owner, enemy, 1, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, enemy, 1, 0));
 
         List<TauntBuff> buffs = enemy.getBuffManager().allBuffsOf(TauntBuff.class);
         Assertions.assertEquals(1, buffs.size(), "the enemy is taunted");
@@ -61,7 +61,7 @@ public class TauntOpTest {
         Battle battle = new Battle(List.of(owner), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
 
-        battle.fireTriggers(TriggerEvent.ALLY_ATTACK, owner, enemy, 1, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, enemy, 1, 0));
 
         Assertions.assertTrue(owner.getBuffManager().allBuffsOf(TauntBuff.class).isEmpty(),
                 "the rule owner is not taunted -- `target` names the event's subject");

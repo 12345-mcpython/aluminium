@@ -37,12 +37,12 @@ public class PreservationTrailblazerTest {
         battle.startBattle();
 
         for (int i = 0; i < 8; i++) {
-            battle.fireTriggers(TriggerEvent.TAKING_HIT, enemy, tb, 0, 0);
+            battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.TAKING_HIT, enemy, tb, 0, 0));
         }
         Assertions.assertEquals(8, tb.getBuffManager().stacksOf("灼热意志"),
                 "「每受到1次攻击，叠加1层【灼热意志】，最多可叠加8层」 (every time it is attacked once, gains 1 stack of Magma Will (【灼热意志】), up to 8 stacks)");
 
-        battle.fireTriggers(TriggerEvent.TAKING_HIT, enemy, tb, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.TAKING_HIT, enemy, tb, 0, 0));
         Assertions.assertEquals(8, tb.getBuffManager().stacksOf("灼热意志"), "the ninth hit must not pass the cap");
     }
 

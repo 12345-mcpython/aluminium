@@ -40,7 +40,7 @@ public class RaceToTheHorizonTest {
     }
 
     private double followUpAndRead() {
-        battle.fireTriggers(TriggerEvent.FOLLOW_UP, wearer, null, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.FOLLOW_UP, wearer, null, 0, 0));
         return wearer.getAttribute(AttributeType.CRIT_ATTACK).get();
     }
 
@@ -64,8 +64,8 @@ public class RaceToTheHorizonTest {
     @Test
     public void onlyFollowUpsCount() {
         build(true);
-        battle.fireTriggers(TriggerEvent.ALLY_ATTACK, wearer, null, 0, 0);
-        battle.fireTriggers(TriggerEvent.SKILL_CAST, wearer, null, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, wearer, null, 0, 0));
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, wearer, null, 0, 0));
         // Compared against the BASELINE, not against zero: the wearer's own crit damage is 0.5 (measured), and the
         // assertion `== 0` was a mistake about the unit's starting panel rather than about the cone.
         System.out.println("[22008] after a plain attack and a skill: crit damage is still "

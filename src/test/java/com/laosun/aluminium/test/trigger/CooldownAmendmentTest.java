@@ -150,7 +150,7 @@ public class CooldownAmendmentTest {
     }
 
     private static int fire(Battle battle, Character actor) {
-        return battle.fireTriggers(TriggerEvent.ALLY_ATTACK, actor, null, 1, 0);
+        return battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, actor, null, 1, 0));
     }
 
     private static Enemy dummy() {

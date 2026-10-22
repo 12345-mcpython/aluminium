@@ -33,7 +33,7 @@ public class ForTomorrowSJourneyAndCruisingInTheStellarSeasandTest {
         Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         double boostBefore = unit.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
-        battle.fireTriggers(TriggerEvent.ULT_CAST, unit, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, unit, enemy, 0, 0));
         double boost = unit.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get() - boostBefore;
         System.out.println("[22002] damageBoostAfterUlt=" + boost);
         Assertions.assertEquals(0.3, boost, 1e-6, "rank 5 states 30% after the ultimate");

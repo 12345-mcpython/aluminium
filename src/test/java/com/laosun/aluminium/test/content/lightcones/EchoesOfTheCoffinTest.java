@@ -86,7 +86,7 @@ public class EchoesOfTheCoffinTest {
         battle.startBattle();
         double wearerBefore = unit.getAttribute(AttributeType.SPEED).get();
         double allyBefore = ally.getAttribute(AttributeType.SPEED).get();
-        battle.fireTriggers(TriggerEvent.ULT_CAST, unit, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, unit, enemy, 0, 0));
         double wearerDelta = unit.getAttribute(AttributeType.SPEED).get() - wearerBefore;
         double allyDelta = ally.getAttribute(AttributeType.SPEED).get() - allyBefore;
         System.out.println("[23008] ultimate: wearer speed +" + wearerDelta + ", ally speed +" + allyDelta);

@@ -34,7 +34,7 @@ public class ElationAccumulatorTest {
 
     private int gain(double energy) {
         int before = elation.getResources().value(ACC);
-        battle.fireTriggers(TriggerEvent.ENERGY_GAINED, elation, elation, 1, energy);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ENERGY_GAINED, elation, elation, 1, energy));
         return elation.getResources().value(ACC) - before;
     }
 

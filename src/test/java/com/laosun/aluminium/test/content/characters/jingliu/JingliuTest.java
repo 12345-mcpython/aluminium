@@ -31,12 +31,12 @@ public class JingliuTest {
         Battle battle = new Battle(List.of(jingliu), List.of(enemy), fixed());
         battle.startBattle();
 
-        battle.fireTriggers(TriggerEvent.SKILL_CAST, jingliu, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, jingliu, enemy, 0, 0));
         Assertions.assertEquals(1, jingliu.getBuffManager().stacksOf("朔望"),
                 "「并获得1层【朔望】」 (and gains 1 stack of [朔望])");
 
         for (int i = 0; i < 4; i++) {
-            battle.fireTriggers(TriggerEvent.SKILL_CAST, jingliu, enemy, 0, 0);
+            battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, jingliu, enemy, 0, 0));
         }
         Assertions.assertEquals(3, jingliu.getBuffManager().stacksOf("朔望"),
                 "「【朔望】最多可累计3层」 ([朔望] accumulates at most 3 stacks) -- five casts must still read three");
@@ -67,7 +67,7 @@ public class JingliuTest {
         Battle battle = new Battle(List.of(jingliu), List.of(enemy), fixed());
         battle.startBattle();
         for (int i = 0; i < casts; i++) {
-            battle.fireTriggers(TriggerEvent.SKILL_CAST, jingliu, enemy, 0, 0);
+            battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, jingliu, enemy, 0, 0));
         }
         for (com.laosun.aluminium.models.Signal signal : battle.queue().snapshot()) {
             if (signal.getCanHit() == jingliu) {

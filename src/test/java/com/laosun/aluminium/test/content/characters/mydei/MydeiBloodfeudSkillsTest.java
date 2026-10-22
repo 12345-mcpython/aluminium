@@ -159,7 +159,7 @@ public class MydeiBloodfeudSkillsTest {
 
         him.getResources().gain(CHARGE, 100);
         battle.noteChangedResource(CHARGE);
-        battle.fireTriggers(TriggerEvent.RESOURCE_CHANGED, him, battle.enemies().getFirst(), 0, 100);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.RESOURCE_CHANGED, him, battle.enemies().getFirst(), 0, 100));
         battle.processRequests();
         int charge = him.getResources().value(CHARGE);
         System.out.println("[mydei-skills] charge after entering bloodfeud with 100 = " + charge);
@@ -185,7 +185,7 @@ public class MydeiBloodfeudSkillsTest {
         him.getResources().gain(CHARGE, 150);
         battle.noteChangedResource(CHARGE);
         double enemyBefore = battle.enemies().getFirst().getCurrentHp();
-        battle.fireTriggers(TriggerEvent.RESOURCE_CHANGED, him, battle.enemies().getFirst(), 0, 150);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.RESOURCE_CHANGED, him, battle.enemies().getFirst(), 0, 150));
         battle.processRequests();
         int charge = him.getResources().value(CHARGE);
         double enemyAfter = battle.enemies().getFirst().getCurrentHp();

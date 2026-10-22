@@ -125,9 +125,9 @@ public class SelfAttributeConditionTest {
         Battle battle = new Battle(List.of(slow, fast), List.of(dummy()), BattleFixture.seeded());
         battle.startBattle();
 
-        Assertions.assertEquals(0, battle.fireTriggers(TriggerEvent.ALLY_ATTACK, fast, null, 1, 0),
+        Assertions.assertEquals(0, battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, fast, null, 1, 0)),
                 "the actor is fast, but the rule belongs to the slow character, so it must not fire");
-        Assertions.assertEquals(0, battle.fireTriggers(TriggerEvent.ALLY_ATTACK, slow, null, 1, 0),
+        Assertions.assertEquals(0, battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, slow, null, 1, 0)),
                 "and not even when the slow one acts: 100 speed is below the threshold either way");
     }
 
@@ -140,7 +140,7 @@ public class SelfAttributeConditionTest {
         Battle battle = new Battle(List.of(fast), List.of(dummy()), BattleFixture.seeded());
         battle.startBattle();
 
-        Assertions.assertEquals(1, battle.fireTriggers(TriggerEvent.ALLY_ATTACK, fast, null, 1, 0));
+        Assertions.assertEquals(1, battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, fast, null, 1, 0)));
     }
 
     /**
@@ -468,7 +468,7 @@ public class SelfAttributeConditionTest {
 
         Battle battle = new Battle(List.of(owner), List.of(dummy()), BattleFixture.seeded());
         battle.startBattle();
-        return battle.fireTriggers(TriggerEvent.ALLY_ATTACK, owner, null, 1, 0);
+        return battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, null, 1, 0));
     }
 
     /**
@@ -482,7 +482,7 @@ public class SelfAttributeConditionTest {
         Character owner = ownerWithTrigger(spec, speed);
         Battle battle = new Battle(List.of(owner), List.of(dummy()), BattleFixture.seeded());
         battle.startBattle();
-        return battle.fireTriggers(TriggerEvent.ALLY_ATTACK, owner, null, 1, 0);
+        return battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, null, 1, 0));
     }
 
     /**

@@ -106,7 +106,7 @@ public class CastSkillTest {
         battle.startBattle();
         double before = enemy.getCurrentHp();
         if (commanded) {
-            battle.fireTriggers(TriggerEvent.ULT_CAST, owner, caster, 0, 0);
+            battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, owner, caster, 0, 0));
         } else {
             caster.getSkills().get(SkillType.ULTRA).execute(battle, caster, List.of(enemy));
         }
@@ -140,7 +140,7 @@ public class CastSkillTest {
 
         // Note: A commanded cast is aimed at the FIRST living opponent (the op's `target` names who CASTS, not who is
         // hit), so the blast is centred on the left unit and its only neighbour is the middle one.
-        battle.fireTriggers(TriggerEvent.ULT_CAST, owner, caster, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, owner, caster, 0, 0));
 
         double centreHits = before[0] - left.getCurrentHp();
         double neighbourHits = before[1] - centre.getCurrentHp();
@@ -204,7 +204,7 @@ public class CastSkillTest {
         Battle battle = new Battle(List.of(owner, caster), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         double before = enemy.getCurrentHp();
-        battle.fireTriggers(TriggerEvent.ULT_CAST, owner, caster, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, owner, caster, 0, 0));
         return before - enemy.getCurrentHp();
     }
 
@@ -228,7 +228,7 @@ public class CastSkillTest {
         battle.processRequests();
 
         double before = enemy.getCurrentHp();
-        battle.fireTriggers(TriggerEvent.TURN_START, him, him, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, him, him, 0, 0));
 
         Assertions.assertTrue(before - enemy.getCurrentHp() > 0,
                 "the commanded cast moved the enemy's HP (" + before + " -> " + enemy.getCurrentHp() + ")");
@@ -245,7 +245,7 @@ public class CastSkillTest {
         battle.startBattle();
 
         double before = enemy.getCurrentHp();
-        battle.fireTriggers(TriggerEvent.ULT_CAST, him, him, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, him, him, 0, 0));
 
         Assertions.assertTrue(before - enemy.getCurrentHp() > 0,
                 "the commanded talent moved the enemy's HP (" + before + " -> " + enemy.getCurrentHp() + ")");
@@ -341,7 +341,7 @@ public class CastSkillTest {
         battle.startBattle();
 
         IllegalStateException refused = Assertions.assertThrows(IllegalStateException.class,
-                () -> battle.fireTriggers(TriggerEvent.ULT_CAST, owner, caster, 0, 0));
+                () -> battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, owner, caster, 0, 0)));
 
         Assertions.assertTrue(refused.getMessage().contains("skill_effects.json"), refused.getMessage());
     }

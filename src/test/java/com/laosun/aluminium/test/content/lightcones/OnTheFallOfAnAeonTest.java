@@ -40,7 +40,7 @@ public class OnTheFallOfAnAeonTest {
     }
 
     private void attack() {
-        battle.fireTriggers(TriggerEvent.ALLY_ATTACK, wearer, enemy, 1, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, wearer, enemy, 1, 0));
     }
 
     private double attackValue() {
@@ -71,11 +71,11 @@ public class OnTheFallOfAnAeonTest {
     public void breakingAWeaknessLiftsTheDamage() {
         build(true);
         double before = wearer.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
-        battle.fireTriggers(TriggerEvent.BREAK, wearer, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.BREAK, wearer, enemy, 0, 0));
         double afterBreak = wearer.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
         build(false);
         double plainAfterBreak = wearer.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
-        battle.fireTriggers(TriggerEvent.BREAK, wearer, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.BREAK, wearer, enemy, 0, 0));
         double plain = wearer.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
         System.out.println("[24000] all-damage boost before=" + before + " after a break=" + afterBreak
                 + " ; without the cone " + plainAfterBreak + " -> " + plain);
@@ -88,8 +88,8 @@ public class OnTheFallOfAnAeonTest {
     public void anotherEventGrantsNothing() {
         build(true);
         double before = attackValue();
-        battle.fireTriggers(TriggerEvent.SKILL_CAST, wearer, enemy, 0, 0);
-        battle.fireTriggers(TriggerEvent.TURN_START, wearer, null, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, wearer, enemy, 0, 0));
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, wearer, null, 0, 0));
         System.out.println("[24000] after a skill and a turn start: " + attackValue());
         Assertions.assertEquals(before, attackValue(), 1e-9, "the trigger is an attack (false case)");
     }

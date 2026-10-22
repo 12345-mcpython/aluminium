@@ -114,11 +114,11 @@ public class ElationAmpTest {
         rules.add(TriggerSpecs.rule("ULT_CAST", List.of("actor == self"), instance));
         mine.setTriggerTable(new TriggerTable(PEARL, rules));
         if (!grants.isEmpty()) {
-            battle.fireTriggers(com.laosun.aluminium.enums.TriggerEvent.TURN_START, mine, mine, 0, 0);
+            battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(com.laosun.aluminium.enums.TriggerEvent.TURN_START, mine, mine, 0, 0));
         }
 
         double before = enemy.getCurrentHp();
-        battle.fireTriggers(com.laosun.aluminium.enums.TriggerEvent.ULT_CAST, mine, battle.enemies().getFirst(), 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(com.laosun.aluminium.enums.TriggerEvent.ULT_CAST, mine, battle.enemies().getFirst(), 0, 0));
         return before - enemy.getCurrentHp();
     }
 }

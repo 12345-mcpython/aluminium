@@ -37,10 +37,10 @@ public class ValorousFollowUpTest {
         battle.setCurrentMove(new Signal(wearer));
         battle.beforeMove();
         double baseline = wearer.getAttribute(AttributeType.FOLLOW_UP_DAMAGE_BOOST).get();
-        battle.fireTriggers(TriggerEvent.FOLLOW_UP, wearer, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.FOLLOW_UP, wearer, enemy, 0, 0));
         Assertions.assertEquals(baseline, wearer.getAttribute(AttributeType.FOLLOW_UP_DAMAGE_BOOST).get(), 1e-6,
                 "the wearer's own follow-up must not mark Merit (功勋)");
-        battle.fireTriggers(TriggerEvent.FOLLOW_UP, ally, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.FOLLOW_UP, ally, enemy, 0, 0));
         Assertions.assertTrue(wearer.getAttribute(AttributeType.FOLLOW_UP_DAMAGE_BOOST).get() > baseline,
                 "an ally's follow-up does: " + baseline + " -> " + wearer.getAttribute(AttributeType.FOLLOW_UP_DAMAGE_BOOST).get());
     }
@@ -58,7 +58,7 @@ public class ValorousFollowUpTest {
         double critDamageBefore = wearer.getAttribute(AttributeType.CRIT_ATTACK).get();
         int firings = CAP + 2;
         for (int i = 0; i < firings; i++) {
-            battle.fireTriggers(TriggerEvent.FOLLOW_UP, ally, enemy, 0, 0);
+            battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.FOLLOW_UP, ally, enemy, 0, 0));
         }
         Assertions.assertEquals(0.05 * CAP, wearer.getAttribute(AttributeType.FOLLOW_UP_DAMAGE_BOOST).get() - boostBefore, 1e-6,
                 "of " + firings + " follow-ups only " + CAP + " may stack");

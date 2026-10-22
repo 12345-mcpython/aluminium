@@ -86,7 +86,7 @@ public class SilverWolfLV999LootBoxChanceTest {
         var enemies = battle.enemyUnits();
         double before = enemies.stream().mapToDouble(e -> e.getCurrentHp()).sum();
         Character wolf = battle.characters().getFirst();
-        battle.fireTriggers(TriggerEvent.SKILL_POINT_SPENT, wolf, wolf, 0, 1);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_POINT_SPENT, wolf, wolf, 0, 1));
         battle.processRequests();
         return before - enemies.stream().mapToDouble(e -> e.getCurrentHp()).sum();
     }

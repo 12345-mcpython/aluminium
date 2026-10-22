@@ -64,7 +64,7 @@ public class ResourceChangeScopeTest {
         receiver.setTriggerTable(new TriggerTable(1, rules));
 
         Battle battle = battleWith(receiver, grantOuterAtTurnStart());
-        battle.fireTriggers(TriggerEvent.TURN_START, battle.characters().get(1), battle.characters().get(1), 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, battle.characters().get(1), battle.characters().get(1), 0, 0));
         battle.processRequests();
 
         System.out.println("[scope] outer " + value(receiver, OUTER) + " -> inner " + value(receiver, INNER)
@@ -108,10 +108,10 @@ public class ResourceChangeScopeTest {
                         oneInto(LATE)))));
         Battle battle = battleWith(receiver, grantOuterAtTurnStart());
         Character giver = battle.characters().get(1);
-        battle.fireTriggers(TriggerEvent.TURN_START, giver, giver, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, giver, giver, 0, 0));
         battle.processRequests();
         Assertions.assertEquals(3, value(receiver, INNER), "precondition: the nested move happened");
-        battle.fireTriggers(TriggerEvent.DAMAGE_SETTLED, giver, giver, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.DAMAGE_SETTLED, giver, giver, 0, 0));
         battle.processRequests();
         return receiver;
     }

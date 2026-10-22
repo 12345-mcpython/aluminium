@@ -55,7 +55,7 @@ public class ElysiumZoneTest {
         battle.startBattle();
         if (zone) {
             // Her skill is a support skill (no damage of its own), so announcing the cast is exactly what the marker rule needs.
-            battle.fireTriggers(TriggerEvent.SKILL_CAST, cyrene, enemy, 0, 0);
+            battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, cyrene, enemy, 0, 0));
         }
         double before = enemy.getCurrentHp();
         ally.getSkills().get(SkillType.COMMON).execute(battle, ally, List.of(enemy));

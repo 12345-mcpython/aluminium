@@ -51,7 +51,7 @@ public class AllyCidSelectorTest {
         TriggerSpecs.set(stacks, "target", "ally_cid:" + NAMED);
         owner.setTriggerTable(new TriggerTable(OWNER, List.of(
                 TriggerSpecs.rule("BATTLE_START", List.of(), stacks))));
-        battle.fireTriggers(com.laosun.aluminium.enums.TriggerEvent.BATTLE_START);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(com.laosun.aluminium.enums.TriggerEvent.BATTLE_START, null, null, 0, 0));
 
         int namedHas = named.getBuffManager().stacksOf(MARK);
         int otherHas = other.getBuffManager().stacksOf(MARK);
