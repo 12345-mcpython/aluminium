@@ -43,7 +43,7 @@ public class NinjutsuInscriptionDazzlingEvilbreakerTest {
     }
 
     private void basicAttack(Battle battle) {
-        battle.fireTriggers(TriggerEvent.ALLY_ATTACK, wearer, enemy, 1, 100, SkillCategory.NORMAL);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Cast.of(TriggerEvent.ALLY_ATTACK, wearer, enemy, 1, 100, SkillCategory.NORMAL, 0, 0, java.util.List.of()));
     }
 
     @Test
@@ -138,7 +138,7 @@ public class NinjutsuInscriptionDazzlingEvilbreakerTest {
     public void aNonNormalAttackDoesNotCount() {
         Battle battle = battle(true);
         battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, wearer, enemy, 0, 0));
-        battle.fireTriggers(TriggerEvent.ALLY_ATTACK, wearer, enemy, 1, 100, SkillCategory.BPSKILL);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Cast.of(TriggerEvent.ALLY_ATTACK, wearer, enemy, 1, 100, SkillCategory.BPSKILL, 0, 0, java.util.List.of()));
         System.out.println("[23033] after a Skill used as an attack: count="
                 + wearer.getBuffManager().stacksOf(COUNT));
         Assertions.assertEquals(0, wearer.getBuffManager().stacksOf(COUNT), "Basic ATK (普攻) only");

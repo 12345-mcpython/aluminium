@@ -137,7 +137,7 @@ public class PearlEidolon4DoublingTest {
         Character pearl = battle.characters().get(0);
         Character attacker = battle.characters().get(battle.characters().size() - 1);
         if (armTheTeam) {
-            battle.fireTriggers(TriggerEvent.CAST_SETUP, pearl, pearl, 0, 0, SkillCategory.ELATION_DAMAGE);
+            battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Cast.of(TriggerEvent.CAST_SETUP, pearl, pearl, 0, 0, SkillCategory.ELATION_DAMAGE, 0, 0, java.util.List.of()));
         }
         double before = battle.enemies().getFirst().getCurrentHp();
         battle.castImmediate(attacker.getSkills().get(SkillType.COMMON), attacker,

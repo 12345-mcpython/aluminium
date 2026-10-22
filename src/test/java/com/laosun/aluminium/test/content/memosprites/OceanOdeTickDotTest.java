@@ -70,7 +70,7 @@ public class OceanOdeTickDotTest {
         enemy.getBuffManager().addBuff(new DotBuff(hysilens, DamageElement.FIRE, BURN, 3));
         double before = enemy.getCurrentHp();
         // fire the event by hand, with the skill key: only the clause is under test
-        battle.fireTriggers(TriggerEvent.ALLY_ATTACK, battle.characters().get(1), enemy, 1, 0.0, null, skillId);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Cast.of(TriggerEvent.ALLY_ATTACK, battle.characters().get(1), enemy, 1, 0.0, null, skillId, 0, java.util.List.of()));
         battle.processRequests();
         return before - enemy.getCurrentHp();
     }

@@ -121,7 +121,7 @@ public class HanyaBurdenTest {
          * One attack by Hanya herself ("我方目标" -- our targets -- includes her), stating the cast category the event now carries.
          */
         private void allyAttacks(Enemy target, com.laosun.aluminium.enums.SkillCategory category, int hits) {
-            battle.fireTriggers(TriggerEvent.ALLY_ATTACK, ally, target, hits, 0, category);
+            battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Cast.of(TriggerEvent.ALLY_ATTACK, ally, target, hits, 0, category, 0, 0, java.util.List.of()));
         }
     }
 

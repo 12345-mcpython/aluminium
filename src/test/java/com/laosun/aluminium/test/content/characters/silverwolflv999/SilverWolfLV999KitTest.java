@@ -286,8 +286,8 @@ public class SilverWolfLV999KitTest {
      * Fires the Elation skill's cast event, which is what her trace and her slot-20 rule both hang on.
      */
     private static void fireElationSkill(Battle battle, Character wolf) {
-        battle.fireTriggers(TriggerEvent.CAST_SETUP, wolf, battle.enemyUnits().getFirst(), 0, 0,
-                com.laosun.aluminium.enums.SkillCategory.ELATION_DAMAGE, 20);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Cast.of(TriggerEvent.CAST_SETUP, wolf, battle.enemyUnits().getFirst(), 0, 0,
+                com.laosun.aluminium.enums.SkillCategory.ELATION_DAMAGE, 20, 0, java.util.List.of()));
         battle.processRequests();
     }
 

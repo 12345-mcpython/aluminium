@@ -30,8 +30,8 @@ public class PearlDispelTest {
         ally.getBuffManager().addBuff(new DotBuff(ally, DamageElement.FIRE, 100, 3));
         ally.getBuffManager().addBuff(new StateBuff("_probe_state", 3));
 
-        battle.fireTriggers(TriggerEvent.BASIC_ATTACK, pearl, battle.enemies().getFirst(), 1, 0,
-                (SkillCategory) null, 8);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Cast.of(TriggerEvent.BASIC_ATTACK, pearl, battle.enemies().getFirst(), 1, 0,
+                (SkillCategory) null, 8, 0, java.util.List.of()));
 
         boolean dot = ally.getBuffManager().hasBuff(DotBuff.class);
         boolean state = ally.getBuffManager().hasBuff(StateBuff.class);
@@ -48,8 +48,8 @@ public class PearlDispelTest {
         Character ally = battle.characters().get(1);
         ally.getBuffManager().addBuff(new DotBuff(ally, DamageElement.FIRE, 100, 3));
 
-        battle.fireTriggers(TriggerEvent.BASIC_ATTACK, pearl, battle.enemies().getFirst(), 1, 0,
-                (SkillCategory) null, 1);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Cast.of(TriggerEvent.BASIC_ATTACK, pearl, battle.enemies().getFirst(), 1, 0,
+                (SkillCategory) null, 1, 0, java.util.List.of()));
 
         Assertions.assertTrue(ally.getBuffManager().hasBuff(DotBuff.class),
                 "slot 1 is not the enhanced basic, so no rule of hers dispels");

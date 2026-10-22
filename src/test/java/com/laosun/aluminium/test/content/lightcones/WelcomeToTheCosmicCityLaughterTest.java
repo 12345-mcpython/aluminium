@@ -50,7 +50,7 @@ public class WelcomeToTheCosmicCityLaughterTest {
     }
 
     private void normalAttack(Battle battle) {
-        battle.fireTriggers(TriggerEvent.ALLY_ATTACK, wearer, enemy, 1, 0, SkillCategory.NORMAL);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Cast.of(TriggerEvent.ALLY_ATTACK, wearer, enemy, 1, 0, SkillCategory.NORMAL, 0, 0, java.util.List.of()));
     }
 
     private int laughter() {
@@ -104,7 +104,7 @@ public class WelcomeToTheCosmicCityLaughterTest {
     @Test
     public void aNonNormalAttackDoesNotCount() {
         Battle battle = battle(true);
-        battle.fireTriggers(TriggerEvent.ALLY_ATTACK, wearer, enemy, 1, 0, SkillCategory.BPSKILL);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Cast.of(TriggerEvent.ALLY_ATTACK, wearer, enemy, 1, 0, SkillCategory.BPSKILL, 0, 0, java.util.List.of()));
         System.out.println("[23057] a Skill used as an attack: Basic ATK (普攻) counter = "
                 + wearer.getBuffManager().stacksOf(COUNT));
         Assertions.assertEquals(0, wearer.getBuffManager().stacksOf(COUNT), "only basic attacks count");

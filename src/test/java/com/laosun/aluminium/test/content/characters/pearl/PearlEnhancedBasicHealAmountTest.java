@@ -46,8 +46,8 @@ public class PearlEnhancedBasicHealAmountTest {
         other.takeDamage(other.getMaxHp() * 0.8);
 
         double before = pearl.getCurrentHp();
-        battle.fireTriggers(TriggerEvent.BASIC_ATTACK, pearl, battle.enemies().getFirst(), 1, 0,
-                (SkillCategory) null, 8);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Cast.of(TriggerEvent.BASIC_ATTACK, pearl, battle.enemies().getFirst(), 1, 0,
+                (SkillCategory) null, 8, 0, java.util.List.of()));
         double healed = pearl.getCurrentHp() - before;
 
         double base = SHARE_AT_LV10 * pearl.getAttribute(AttributeType.DEFENCE).get() + FLAT_AT_LV10;
