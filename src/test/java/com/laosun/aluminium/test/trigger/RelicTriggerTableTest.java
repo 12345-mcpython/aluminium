@@ -312,8 +312,8 @@ public class RelicTriggerTableTest {
             "322/2",
             // Authored on, the day a shield could remember WHO created it: "提供的护盾量提高 X%" is the
             // giver's own number (`AttributeType.SHIELD_BOOST`, read by `Battle.boostedShield` from the provider).
-            // Note: Set 128's 4-piece ships one of its two sentences: the other one asks, per ally, whether the shield
-            // that ally holds is the wearer's, and a whole-rule condition cannot say that.
+            // Note: Set 128's 4-piece now ships both sentences: `actor has_shield from_provider self` asks, per ally,
+            // whether the shield that ally holds is the wearer's (see ShieldProviderConditionTest).
             "103/4",
             "128/2",
             "128/4",
