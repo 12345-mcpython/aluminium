@@ -1547,6 +1547,13 @@ public final class TriggerInterpreter {
         double magnitude = effect.getScale() == null || effect.getScale().isBlank()
                 ? TriggerMagnitudes.shareOf(effect, ctx)
                 : TriggerMagnitudes.derivedMagnitude(effect, ctx);
+        // `per_stack` on a BOOST_DAMAGE is a LIVE count on the event's target (cone 21001: "for each
+        // debuff the enemy has, the wearer's damage +12%"). This method used to drop it, so the
+        // per-stack branch silently behaved as one stack while the at-cap rule produced the only
+        // increasing number.
+        if (effect.getPerStack() != null && !effect.getPerStack().isBlank() && ctx.target() != null) {
+            magnitude *= perStackFactor(effect, ctx.target(), ctx);
+        }
         damage.addBoost(TriggerMagnitudes.applyDerivedCeiling(effect, ctx, magnitude));
     }
 

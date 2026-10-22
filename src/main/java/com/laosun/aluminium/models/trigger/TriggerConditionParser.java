@@ -252,24 +252,36 @@ final class TriggerConditionParser {
             String subject = normalize(text.substring(0, hasShield.start()));
             String trailing = text.substring(hasShield.end()).trim();
             String ruleId = "";
+            String provider = "";
             if (!trailing.isEmpty()) {
                 Matcher fromRule = FROM_RULE.matcher(trailing);
-                if (!fromRule.lookingAt()) {
+                Matcher fromProvider = FROM_PROVIDER.matcher(trailing);
+                if (fromRule.lookingAt()) {
+                    ruleId = trailing.substring(fromRule.end()).trim();
+                    if (ruleId.isEmpty()) {
+                        throw new IllegalArgumentException(
+                                "Condition '" + raw + "' says \"from_rule\" but names no rule; give the id of the rule "
+                                        + "that creates the shield (that rule states \"id\": \"…\") "
+                                        + "(source: " + spec.getSource() + ")");
+                    }
+                } else if (fromProvider.lookingAt()) {
+                    provider = trailing.substring(fromProvider.end()).trim();
+                    if (!provider.equals("self") && !provider.equals("actor") && !provider.equals("target")) {
+                        throw new IllegalArgumentException(
+                                "Condition '" + raw + "' says \"from_provider\" but names '" + provider
+                                        + "'; write self, actor or target "
+                                        + "(source: " + spec.getSource() + ")");
+                    }
+                } else {
                     throw new IllegalArgumentException(
-                            "Condition '" + raw + "' writes something after \"has_shield\": it takes no argument, or "
-                                    + "\"from_rule <id>\" to ask which rule created the shield "
-                                    + "(source: " + spec.getSource() + ")");
-                }
-                ruleId = trailing.substring(fromRule.end()).trim();
-                if (ruleId.isEmpty()) {
-                    throw new IllegalArgumentException(
-                            "Condition '" + raw + "' says \"from_rule\" but names no rule; give the id of the rule "
-                                    + "that creates the shield (that rule states \"id\": \"…\") "
+                            "Condition '" + raw + "' writes something after \"has_shield\": it takes no argument, "
+                                    + "\"from_rule <id>\" to ask which rule created the shield, or "
+                                    + "\"from_provider self|actor|target\" to ask who created it "
                                     + "(source: " + spec.getSource() + ")");
                 }
             }
             return new TriggerTable.HasShield(requireCarriedParty(requireStateSubject(subject, raw, spec), raw, spec),
-                    ruleId, raw, spec);
+                    ruleId, provider, raw, spec);
         }
 
         // `is_slowed`: "<who> is_slowed" - argument-less like `has_shield`, and the question is about a STATE the
@@ -2268,6 +2280,13 @@ final class TriggerConditionParser {
      */
     private static final Pattern FROM_RULE =
             Pattern.compile("(?<![\\w])from_rule(?![\\w])\\s*", Pattern.CASE_INSENSITIVE);
+
+    /**
+     * The {@code from_provider} qualifier of {@code has_shield}: the shield was created by this unit,
+     * not necessarily by one named rule.
+     */
+    private static final Pattern FROM_PROVIDER =
+            Pattern.compile("(?<![\\w])from_provider(?![\\w])\\s*", Pattern.CASE_INSENSITIVE);
 
     /**
      * The {@code from_skill} keyword: "the instance that caused this event came from this slot"
