@@ -95,7 +95,7 @@ public class GainResourceToMaxTest {
         }
         unit.setTriggerTable(new TriggerTable(PEARL, List.of(
                 TriggerSpecs.rule("TURN_START", List.of("actor == self"), effect))));
-        battle.fireTriggers(TriggerEvent.TURN_START, unit, unit, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, unit, unit, 0, 0));
         battle.processRequests();
         return unit.getResources().value(COUNTER);
     }

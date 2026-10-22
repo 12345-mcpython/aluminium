@@ -42,7 +42,7 @@ public class PearlEnhancedBasicFormBTest {
         Character archetype = battle.characters().get(2);      // the Hunt ally: NOT Elation, so slot 9
         Character secondLowest = battle.characters().get(1);
         Character other = battle.characters().get(3);
-        battle.fireTriggers(TriggerEvent.ULT_CAST, pearl, archetype, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, pearl, archetype, 0, 0));
         battle.processRequests();
         // ⚠ CORRECTED (2026-10-18, data migration): data slot **10**, not 9 (150309 no longer exists).
         Assertions.assertEquals(10, pearl.getSkills().get(SkillType.COMMON).getSkillSlot(),
@@ -109,7 +109,7 @@ public class PearlEnhancedBasicFormBTest {
     private static int slotAfterUltimate() {
         Battle battle = newBattle();
         Character pearl = battle.characters().get(0);
-        battle.fireTriggers(TriggerEvent.ULT_CAST, pearl, battle.characters().get(2), 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, pearl, battle.characters().get(2), 0, 0));
         battle.processRequests();
         for (SkillType slot : SkillType.values()) {
             if (pearl.getSkills().get(SkillType.COMMON) != null

@@ -129,7 +129,7 @@ public class TickDotNowTest {
                 TriggerSpecs.set(dot, "maxStacks", 1);
             }
             owner.setTriggerTable(new TriggerTable(OWNER, List.of(TriggerSpecs.rule("KILL", List.of("actor == self"), dot))));
-            battle.fireTriggers(TriggerEvent.KILL, owner, enemy, 0, 0);
+            battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.KILL, owner, enemy, 0, 0));
             Assertions.assertFalse(enemy.getBuffManager().allBuffsOf(DotBuff.class).isEmpty(), "precondition: the DOT landed");
         }
     }

@@ -41,8 +41,8 @@ public class PearlArtBarrierAndTalentTest {
         Character elation = battle.characters().get(1);
         Character hunter = battle.characters().get(2);
 
-        battle.fireTriggers(TriggerEvent.ULT_CAST, pearl, elation, 0, 0);
-        battle.fireTriggers(TriggerEvent.ULT_CAST, pearl, hunter, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, pearl, elation, 0, 0));
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, pearl, hunter, 0, 0));
         boolean onElation = elation.getBuffManager().hasState(BARRIER);
         boolean onHunter = hunter.getBuffManager().hasState(BARRIER);
         System.out.println("[pearl_barrier] on the Elation ally = " + onElation + " ; on the Hunt ally = " + onHunter);
@@ -57,11 +57,11 @@ public class PearlArtBarrierAndTalentTest {
         Character ally = battle.characters().get(2);
 
         ally.takeDamage(ally.getMaxHp() * 0.8);
-        battle.fireTriggers(TriggerEvent.HP_LOST, ally, ally, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.HP_LOST, ally, ally, 0, 0));
         boolean below = ally.getBuffManager().hasState(GRIT);
 
         ally.heal(ally.getMaxHp());
-        battle.fireTriggers(TriggerEvent.HEALED, ally, ally, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.HEALED, ally, ally, 0, 0));
         boolean above = ally.getBuffManager().hasState(GRIT);
         System.out.println("[pearl_talent] reduction below half = " + below + " ; after healing above half = " + above);
 
@@ -105,7 +105,7 @@ public class PearlArtBarrierAndTalentTest {
 
         double withTalent = hurtBy(battle, attacker, ally, readingInstance);
         ally.getBuffManager().removeState(GRIT);
-        battle.fireTriggers(TriggerEvent.HEALED, ally, ally, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.HEALED, ally, ally, 0, 0));
         Assertions.assertFalse(ally.getBuffManager().hasState(GRIT),
                 "precondition: the reduction is off for the control reading");
         double without = hurtBy(battle, attacker, ally, readingInstance);

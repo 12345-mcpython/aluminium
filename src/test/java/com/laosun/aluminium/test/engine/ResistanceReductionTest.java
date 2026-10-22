@@ -43,7 +43,7 @@ public class ResistanceReductionTest {
         battle.startBattle();
         double before = hit(battle, caster, enemy);
 
-        battle.fireTriggers(TriggerEvent.TURN_START, applier, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, applier, enemy, 0, 0));
         double after = hit(battle, caster, enemy);
 
         Assertions.assertEquals(0.2, enemy.getAttribute(AttributeType.RESISTANCE_REDUCTION).get(), EPS,

@@ -54,7 +54,7 @@ public class RappaBreakTakenTest {
         Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         double normal = battle.applyDamage(enemy, new Damage(unit, enemy, DamageElement.FIRE, DamageType.NORMAL, 1000));
-        battle.fireTriggers(TriggerEvent.BREAK, unit, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.BREAK, unit, enemy, 0, 0));
         double breaking = battle.applyDamage(enemy, new Damage(unit, enemy, DamageElement.FIRE, DamageType.BREAK, 1000));
         System.out.println("[1317] normal=" + normal + " break=" + breaking + " ratio=" + (breaking / normal));
         Assertions.assertEquals(1.02, breaking / normal, 1e-6, "break damage rises by exactly the authored 2%");

@@ -59,7 +59,7 @@ public class SpendAllTest {
         Battle battle = BattleFixture.battle(List.of(owner, ally), List.of(BattleFixture.monster()));
         battle.startBattle();
         for (int i = 0; i < start; i++) {
-            battle.fireTriggers(TriggerEvent.ALLY_ATTACK, ally, ally, 0, 0);
+            battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, ally, ally, 0, 0));
         }
         battle.processRequests();
         return battle;

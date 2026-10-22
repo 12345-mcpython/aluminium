@@ -120,7 +120,7 @@ public class SecretLightConeTest {
         }
 
         void wearerTurn() {
-            battle.fireTriggers(TriggerEvent.TURN_START, wearer, wearer, 0, 0);
+            battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, wearer, wearer, 0, 0));
             battle.processRequests();
         }
     }

@@ -299,7 +299,7 @@ public class SilverWolfLV999KitTest {
         battle.processRequests();
         // Note: Driven here because the fixture casts directly rather than through a move, so the engine's own
         // end-of-attack announcement never runs. The rule that ends 【无敌玩家】 hangs on this event.
-        battle.fireTriggers(TriggerEvent.ATTACK_FINISHED, unit, victim, 1, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ATTACK_FINISHED, unit, victim, 1, 0));
         battle.processRequests();
     }
 

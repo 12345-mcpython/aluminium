@@ -145,7 +145,7 @@ public class ArcherEidolonLevelsTest {
         Battle battle = battle(eidolonRank);
         Character archer = battle.characters().getFirst();
         int before = battle.getSkillPoints();
-        battle.fireTriggers(TriggerEvent.TURN_START, archer, archer, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, archer, archer, 0, 0));
         battle.processRequests();
         return battle.getSkillPoints() - before;
     }

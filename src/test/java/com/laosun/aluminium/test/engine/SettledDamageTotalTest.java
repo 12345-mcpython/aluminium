@@ -121,7 +121,7 @@ public class SettledDamageTotalTest {
         double[] losses = new double[firings];
         for (int firing = 0; firing < firings; firing++) {
             double before = enemies.stream().mapToDouble(e -> e.getCurrentHp()).sum();
-            battle.fireTriggers(TriggerEvent.SKILL_POINT_SPENT, wolf, wolf, 0, 1);
+            battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_POINT_SPENT, wolf, wolf, 0, 1));
             battle.processRequests();
             losses[firing] = before - enemies.stream().mapToDouble(e -> e.getCurrentHp()).sum();
         }

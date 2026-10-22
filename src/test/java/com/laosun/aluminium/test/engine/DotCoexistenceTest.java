@@ -41,9 +41,9 @@ public class DotCoexistenceTest {
         Fixture f = fixture();
         f.hero.setTriggerTable(table(f.hero));
 
-        f.battle.fireTriggers(TriggerEvent.KILL, f.hero, f.enemy, 0, 0);
+        f.battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.KILL, f.hero, f.enemy, 0, 0));
         int afterOne = f.enemy.getBuffManager().allBuffsOf(DotBuff.class).size();
-        f.battle.fireTriggers(TriggerEvent.KILL, f.hero, f.enemy, 0, 0);
+        f.battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.KILL, f.hero, f.enemy, 0, 0));
         int afterTwo = f.enemy.getBuffManager().allBuffsOf(DotBuff.class).size();
 
         Assertions.assertEquals(1, afterOne, "precondition: one application, one DOT");

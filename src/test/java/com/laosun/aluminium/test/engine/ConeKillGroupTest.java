@@ -37,7 +37,7 @@ public class ConeKillGroupTest {
                 "no attack is added at battle start (the property is already in the panel)");
         battle.setCurrentMove(new Signal(unit));
         battle.beforeMove();
-        battle.fireTriggers(TriggerEvent.KILL, unit, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.KILL, unit, enemy, 0, 0));
         Assertions.assertEquals(0.12, unit.getAttribute(AttributeType.CRIT_CHANCE).get() - critBefore, 1e-6,
                 "crit rate after a kill");
     }
@@ -51,7 +51,7 @@ public class ConeKillGroupTest {
         battle.startBattle();
         battle.setCurrentMove(new Signal(unit));
         battle.beforeMove();
-        battle.fireTriggers(TriggerEvent.KILL, unit, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.KILL, unit, enemy, 0, 0));
         Assertions.assertEquals(0.24, unit.getAttribute(AttributeType.CRIT_ATTACK).get() - critBefore, 1e-6,
                 "crit damage after a kill");
     }
@@ -67,7 +67,7 @@ public class ConeKillGroupTest {
         unit.takeDamage(unit.getMaxHp() * 0.5);
         double before = unit.getCurrentHp();
         double attack = unit.getAttribute(AttributeType.ATTACK).get();
-        battle.fireTriggers(TriggerEvent.KILL, unit, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.KILL, unit, enemy, 0, 0));
         double healed = unit.getCurrentHp() - before;
         Assertions.assertEquals(0.12 * attack, healed, 1.0,
                 "healed " + healed + " for an attack of " + attack);

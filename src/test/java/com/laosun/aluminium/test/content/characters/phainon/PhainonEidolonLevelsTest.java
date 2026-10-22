@@ -82,7 +82,7 @@ public class PhainonEidolonLevelsTest {
         Character phainon = battle.characters().getFirst();
         Character ally = battle.characters().get(1);
         double before = phainon.getAttribute(AttributeType.CRIT_ATTACK).get();
-        battle.fireTriggers(TriggerEvent.SKILL_CAST, ally, phainon, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, ally, phainon, 0, 0));
         battle.processRequests();
         return phainon.getAttribute(AttributeType.CRIT_ATTACK).get() - before;
     }

@@ -114,7 +114,7 @@ public class ArcherLoopTest {
         f.castSkillAndReadBoostFactor();
         Assertions.assertTrue(f.archer.getBuffManager().hasState(LOOP), "precondition: the loop is on");
 
-        f.battle.fireTriggers(TriggerEvent.WAVE_START);
+        f.battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.WAVE_START, null, null, 0, 0));
         f.battle.processRequests();
         Assertions.assertFalse(f.archer.getBuffManager().hasState(LOOP), "波次清空 ⇒ 退出");
         Assertions.assertEquals(0, f.archer.getResources().value(CYCLES), "并清空计数器");

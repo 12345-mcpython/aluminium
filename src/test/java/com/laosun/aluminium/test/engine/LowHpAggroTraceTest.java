@@ -49,7 +49,7 @@ public class LowHpAggroTraceTest {
                             + "1 + (-0.5) => x0.5 (cid " + cid + ")");
 
             // A second loss while already below the gate must not stack a second modifier.
-            battle.fireTriggers(TriggerEvent.HP_LOST, enemy, owner, 0, 0);
+            battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.HP_LOST, enemy, owner, 0, 0));
             Assertions.assertEquals(full * 0.5, battle.aggroOf(owner), EPS,
                     "re-applying a named modifier must not stack (cid " + cid + ")");
 

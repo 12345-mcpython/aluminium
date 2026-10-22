@@ -85,7 +85,7 @@ public class TribbieTest {
         Battle battle = new Battle(List.of(tribbie, ally), List.of(enemy), fixed());
         battle.startBattle();
         double before = enemy.getCurrentHp();
-        battle.fireTriggers(TriggerEvent.ULT_CAST, teammate ? ally : tribbie, tribbie, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, teammate ? ally : tribbie, tribbie, 0, 0));
         return before - enemy.getCurrentHp();
     }
 
@@ -123,7 +123,7 @@ public class TribbieTest {
         Battle battle = new Battle(List.of(tribbie, ally), List.of(enemy), fixed());
         battle.startBattle();
         double before = enemy.getCurrentHp();
-        battle.fireTriggers(TriggerEvent.ULT_CAST, ally, tribbie, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, ally, tribbie, 0, 0));
         return before - enemy.getCurrentHp();
     }
 

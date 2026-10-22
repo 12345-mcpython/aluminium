@@ -64,7 +64,7 @@ public class TriggerScaledHealTest {
         ally.takeDamage(ally.getMaxHp() * 0.5);
         double before = ally.getCurrentHp();
 
-        battle.fireTriggers(TriggerEvent.ALLY_ATTACK, healer, ally, 1, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, healer, ally, 1, 0));
 
         Assertions.assertEquals(before + healer.getMaxHp() * 0.1, ally.getCurrentHp(), EPS,
                 "10% of the HEALER's Max HP -- the two scales are not interchangeable, and the ally's bar is a "
@@ -237,7 +237,7 @@ public class TriggerScaledHealTest {
     }
 
     private static void fire(Battle battle, Character actor) {
-        battle.fireTriggers(TriggerEvent.ALLY_ATTACK, actor, null, 1, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, actor, null, 1, 0));
     }
 
     private static Enemy dummy() {

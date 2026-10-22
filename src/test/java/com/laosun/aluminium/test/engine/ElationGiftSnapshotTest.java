@@ -207,7 +207,7 @@ public class ElationGiftSnapshotTest {
             TriggerSpecs.set(effect, "target", "self");
             TriggerSpec rule = TriggerSpecs.rule("TURN_START", List.of("actor == self"), effect);
             putOnly(holder, rule);
-            battle.fireTriggers(TriggerEvent.TURN_START, holder, holder, 0, 0);
+            battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, holder, holder, 0, 0));
             battle.processRequests();
             putOnly(holder, null);                              // the rule has served its purpose
         }

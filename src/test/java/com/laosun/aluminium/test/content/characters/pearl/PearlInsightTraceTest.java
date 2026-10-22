@@ -134,7 +134,7 @@ public class PearlInsightTraceTest {
                 "precondition: she holds none of the counter yet, so the aura cannot be up");
 
         Character aim = battle.characters().get(1);
-        battle.fireTriggers(TriggerEvent.ULT_CAST, pearl, aim, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, pearl, aim, 0, 0));
         battle.processRequests();
         double pearlGain = pearl.getAttribute(AttributeType.EFFECT_RESISTANCE).get() - pearlBefore;
         double allyGain = ally.getAttribute(AttributeType.EFFECT_RESISTANCE).get() - allyBefore;
@@ -228,7 +228,7 @@ public class PearlInsightTraceTest {
             // falls on the aim), so a mutant of the gate to the archetype state survived - the gate only becomes
             // observable when the aim is somebody else, which is also how the ability is actually played.
             Character aim = battle.characters().get(1);
-            battle.fireTriggers(TriggerEvent.ULT_CAST, her, aim, 0, 0);
+            battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, her, aim, 0, 0));
             battle.processRequests();
             if (keepHerKit) {
                 // Only assertable with her rules in place: 深度学习 is a state HER OWN Ultimate rule applies, so a

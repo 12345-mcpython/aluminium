@@ -184,7 +184,7 @@ public class DefenceIgnoreTest {
         Battle battle = new Battle(List.of(jade), List.of(freshMonster()), BattleFixture.seeded());
         battle.startBattle();
 
-        battle.fireTriggers(TriggerEvent.ULT_CAST, jade, null, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, jade, null, 0, 0));
 
         Assertions.assertEquals(0.12, jade.getAttribute(AttributeType.DEFENCE_IGNORE).get(), EPS);
     }
@@ -198,7 +198,7 @@ public class DefenceIgnoreTest {
         Battle battle = new Battle(List.of(jade), List.of(freshMonster()), BattleFixture.seeded());
         battle.startBattle();
 
-        battle.fireTriggers(TriggerEvent.ULT_CAST, jade, null, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, jade, null, 0, 0));
 
         Assertions.assertEquals(0, jade.getAttribute(AttributeType.DEFENCE_IGNORE).get(), EPS,
                 "at Eidolon 3 the ability does not exist yet");
@@ -214,7 +214,7 @@ public class DefenceIgnoreTest {
         Battle battle = new Battle(List.of(jade, ally), List.of(freshMonster()), BattleFixture.seeded());
         battle.startBattle();
 
-        battle.fireTriggers(TriggerEvent.ULT_CAST, ally, null, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, ally, null, 0, 0));
 
         Assertions.assertEquals(0, jade.getAttribute(AttributeType.DEFENCE_IGNORE).get(), EPS,
                 "the text says when casting the ultimate -- HER ultimate, so `actor == self` is doing its job");

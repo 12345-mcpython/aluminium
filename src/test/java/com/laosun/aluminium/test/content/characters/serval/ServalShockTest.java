@@ -164,7 +164,7 @@ public class ServalShockTest {
         Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(serval, CharacterFactory.create(ALLY, LEVEL)), List.of(enemy), roll(roll));
         battle.startBattle();
-        battle.fireTriggers(TriggerEvent.KILL, serval, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.KILL, serval, enemy, 0, 0));
         return enemy.getBuffManager().hasState("触电");
     }
 

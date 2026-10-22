@@ -74,7 +74,7 @@ public class ThresholdConditionTest {
                 TriggerEvent.ALLY_ATTACK.name(), List.of(condition), energy()))));
         Battle battle = new Battle(List.of(owner), List.of(enemy), fixed());
         battle.startBattle();
-        return battle.fireTriggers(TriggerEvent.ALLY_ATTACK, owner, enemy, 0, 0);
+        return battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, enemy, 0, 0));
     }
 
     /**
@@ -87,7 +87,7 @@ public class ThresholdConditionTest {
                 TriggerEvent.ALLY_ATTACK.name(), List.of(condition), energy()))));
         Battle battle = new Battle(List.of(owner), List.of(enemy), fixed());
         battle.startBattle();
-        return battle.fireTriggers(TriggerEvent.ALLY_ATTACK, owner, enemy, hitCount, 0);
+        return battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, enemy, hitCount, 0));
     }
 
     /**
@@ -104,7 +104,7 @@ public class ThresholdConditionTest {
             battle.applyDamage(owner, new Damage(enemy, owner, com.laosun.aluminium.enums.DamageElement.PHYSICAL,
                     com.laosun.aluminium.enums.DamageType.NORMAL, owner.getMaxHp() * 0.9));
         }
-        return battle.fireTriggers(TriggerEvent.ALLY_ATTACK, owner, enemy, 0, 0);
+        return battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, enemy, 0, 0));
     }
 
     private static EffectSpec energy() {

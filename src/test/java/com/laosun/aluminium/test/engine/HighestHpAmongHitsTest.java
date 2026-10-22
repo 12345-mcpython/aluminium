@@ -92,7 +92,7 @@ public class HighestHpAmongHitsTest {
 
         boolean threw = false;
         try {
-            battle.fireTriggers(com.laosun.aluminium.enums.TriggerEvent.DEALING_DAMAGE);
+            battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(com.laosun.aluminium.enums.TriggerEvent.DEALING_DAMAGE, null, null, 0, 0));
         } catch (IllegalArgumentException | IllegalStateException expected) {
             threw = true;
             String message = String.valueOf(expected.getMessage());

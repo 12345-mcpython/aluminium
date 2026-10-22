@@ -36,7 +36,7 @@ public class HimekoNovaTest {
         battle.startBattle();
         double allyBoostBefore = ally.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
 
-        battle.fireTriggers(TriggerEvent.SKILL_CAST, himeko, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, himeko, enemy, 0, 0));
 
         Assertions.assertTrue(himeko.getBuffManager().hasState("领航旗语"),
                 "「姬子•启行获得【领航旗语】」 (Himeko - Nova gains Navigator's Semaphore (【领航旗语】))");

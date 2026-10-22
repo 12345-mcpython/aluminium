@@ -29,11 +29,11 @@ public class MoonConsumedTest {
         Battle battle = new Battle(List.of(observer, payer), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         // Chain: 1 layer on SKILL_CAST, 1 on ULT_CAST -> 2 layers -> the entry rule grants [转魄].
-        battle.fireTriggers(TriggerEvent.SKILL_CAST, observer, enemy, 0, 0);
-        battle.fireTriggers(TriggerEvent.ULT_CAST, observer, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, observer, enemy, 0, 0));
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, observer, enemy, 0, 0));
         // Note: The entry rule listens on SKILL_CAST and its condition is `>= 2` layers, so the event that PUSHES the count to two cannot be the
         // one that observes it: one more SKILL_CAST is what actually fires the entry (round 228/240).
-        battle.fireTriggers(TriggerEvent.SKILL_CAST, observer, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, observer, enemy, 0, 0));
         System.out.println("[1212] syzygy=" + observer.getBuffManager().stacksOf("朔望")
                 + " inZhuanpo=" + observer.getBuffManager().hasState("转魄"));
         Assertions.assertTrue(observer.getBuffManager().hasState("转魄"),
@@ -47,7 +47,7 @@ public class MoonConsumedTest {
         Character payer = CharacterFactory.create(PAYER, LEVEL);
         Enemy enemy = BattleFixture.monster();
         Battle battle = ready(observer, payer, enemy);
-        battle.fireTriggers(TriggerEvent.SKILL_CAST, payer, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, payer, enemy, 0, 0));
         int layers = observer.getBuffManager().stacksOf("月色");
         System.out.println("[1212] afterPrice layers=" + layers + " payerHp=" + payer.getCurrentHp());
         Assertions.assertEquals(1, layers, "paying an HP price stacks one layer of Moon");
@@ -61,7 +61,7 @@ public class MoonConsumedTest {
         Battle battle = ready(observer, payer, enemy);
         battle.applyDamage(observer, new Damage(enemy, observer, DamageElement.PHYSICAL, DamageType.NORMAL, 40));
         int afterHit = observer.getBuffManager().stacksOf("月色");
-        battle.fireTriggers(TriggerEvent.SKILL_CAST, payer, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, payer, enemy, 0, 0));
         int afterPrice = observer.getBuffManager().stacksOf("月色");
         System.out.println("[1212] afterHit=" + afterHit + " afterPrice=" + afterPrice);
         Assertions.assertEquals(1, afterPrice - afterHit, "only the price half is driven here");

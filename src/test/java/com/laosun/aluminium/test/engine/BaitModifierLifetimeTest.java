@@ -72,10 +72,10 @@ public class BaitModifierLifetimeTest {
         });
         battle.startBattle();
         if (baits >= 1) {
-            battle.fireTriggers(TriggerEvent.SKILL_CAST, bait, first, 0, 0);
+            battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, bait, first, 0, 0));
         }
         if (baits >= 2) {
-            battle.fireTriggers(TriggerEvent.SKILL_CAST, bait, second, 0, 0);
+            battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, bait, second, 0, 0));
         }
         double before = first.getCurrentHp();
         battle.castImmediate(ally.getSkills().get(com.laosun.aluminium.enums.SkillType.COMMON), ally, List.of(first));

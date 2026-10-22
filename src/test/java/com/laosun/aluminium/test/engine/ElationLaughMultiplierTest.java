@@ -102,12 +102,12 @@ public class ElationLaughMultiplierTest {
         TriggerSpecs.set(gain, "target", "self");
         ally.setTriggerTable(new TriggerTable(ALLY, List.of(
                 TriggerSpecs.rule("TURN_START", List.of("actor == self"), gain))));
-        battle.fireTriggers(TriggerEvent.TURN_START, ally, ally, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, ally, ally, 0, 0));
         battle.processRequests();
         battle.partyResource(LAUGH).gain(after - battle.partyResourceValue(LAUGH));
 
         double before = enemy.getCurrentHp();
-        battle.fireTriggers(TriggerEvent.ULT_CAST, mine, battle.enemies().getFirst(), 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, mine, battle.enemies().getFirst(), 0, 0));
         return before - enemy.getCurrentHp();
     }
 
@@ -149,12 +149,12 @@ public class ElationLaughMultiplierTest {
             TriggerSpecs.set(gain, "target", "self");
             ally.setTriggerTable(new TriggerTable(ALLY, List.of(
                     TriggerSpecs.rule("TURN_START", List.of("actor == self"), gain))));
-            battle.fireTriggers(TriggerEvent.TURN_START, ally, ally, 0, 0);
+            battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, ally, ally, 0, 0));
             battle.processRequests();
         }
 
         double before = enemy.getCurrentHp();
-        battle.fireTriggers(TriggerEvent.ULT_CAST, mine, battle.enemies().getFirst(), 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, mine, battle.enemies().getFirst(), 0, 0));
         return before - enemy.getCurrentHp();
     }
 }

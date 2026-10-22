@@ -45,15 +45,15 @@ public class StackCounterTest {
         Battle battle = new Battle(List.of(hero), List.of(enemy), fixed());
         battle.startBattle();
 
-        battle.fireTriggers(TriggerEvent.ALLY_ATTACK, hero, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, hero, enemy, 0, 0));
         Assertions.assertEquals(1, enemy.getBuffManager().stacksOf("承负"),
                 "one mark is not two: \"after every 2 times ...\" has not been reached");
 
-        battle.fireTriggers(TriggerEvent.ALLY_ATTACK, hero, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, hero, enemy, 0, 0));
         Assertions.assertEquals(0, enemy.getBuffManager().stacksOf("承负"),
                 "the second mark reached the threshold, and the rule that answered it cleared the counter");
 
-        battle.fireTriggers(TriggerEvent.ALLY_ATTACK, hero, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, hero, enemy, 0, 0));
         Assertions.assertEquals(1, enemy.getBuffManager().stacksOf("承负"),
                 "…and counting starts again (the cap stops a stray event from pushing it past the threshold)");
     }
@@ -69,8 +69,8 @@ public class StackCounterTest {
         Battle battle = new Battle(List.of(hero), List.of(enemy), fixed());
         battle.startBattle();
 
-        battle.fireTriggers(TriggerEvent.ALLY_ATTACK, hero, enemy, 0, 0);
-        battle.fireTriggers(TriggerEvent.ALLY_ATTACK, hero, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, hero, enemy, 0, 0));
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, hero, enemy, 0, 0));
         Assertions.assertEquals(2, enemy.getBuffManager().stacksOf("承负"), "two marks");
 
         Assertions.assertEquals(2, enemy.getBuffManager().removeState("承负"),

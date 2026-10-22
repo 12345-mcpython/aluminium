@@ -66,11 +66,11 @@ public class ElationBaseScaleTest {
         // The table is installed after startBattle(), so BATTLE_START has already passed: drive the boost's own
         // event, then read what the instance settles.
         if (attackBoost > 0) {
-            battle.fireTriggers(TriggerEvent.TURN_START, mine, mine, 0, 0);
+            battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, mine, mine, 0, 0));
         }
 
         double before = enemy.getCurrentHp();
-        battle.fireTriggers(TriggerEvent.ULT_CAST, mine, battle.enemies().getFirst(), 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, mine, battle.enemies().getFirst(), 0, 0));
         return before - enemy.getCurrentHp();
     }
 }

@@ -58,11 +58,11 @@ public class ConeAuditBatchTwentyFourTest {
     public void coneTwoThreeZeroEightOnlyHerFollowUpPays() {
         Fixture f = new Fixture(23038);
         f.wearer.setCurrentEnergy(0);
-        f.battle.fireTriggers(TriggerEvent.FOLLOW_UP, f.ally, f.battle.enemyUnits().getFirst(), 0, 0);
+        f.battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.FOLLOW_UP, f.ally, f.battle.enemyUnits().getFirst(), 0, 0));
         System.out.println("[23038] 队友追加攻击后她的能量 " + f.wearer.getCurrentEnergy() + "（应为 0）");
         Assertions.assertEquals(0.0, f.wearer.getCurrentEnergy(), 1e-9, "「**装备者**施放追加攻击后」—— 队友的不算");
 
-        f.battle.fireTriggers(TriggerEvent.FOLLOW_UP, f.wearer, f.battle.enemyUnits().getFirst(), 0, 0);
+        f.battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.FOLLOW_UP, f.wearer, f.battle.enemyUnits().getFirst(), 0, 0));
         System.out.println("[23038] 她自己追加攻击后 " + f.wearer.getCurrentEnergy());
         Assertions.assertEquals(12.0, f.wearer.getCurrentEnergy(), 1e-9, "「额外恢复 12 点能量」");
         double allyCrit = f.ally.getAttribute(AttributeType.CRIT_ATTACK).get()
@@ -112,7 +112,7 @@ public class ConeAuditBatchTwentyFourTest {
     public void coneTwoThreeFourOneTurnEnergyAndDefenceDown() {
         Fixture f = new Fixture(23041);
         f.wearer.setCurrentEnergy(0);
-        f.battle.fireTriggers(TriggerEvent.TURN_START, f.wearer, f.wearer, 0, 0);
+        f.battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, f.wearer, f.wearer, 0, 0));
         System.out.println("[23041] 回合开始能量 " + f.wearer.getCurrentEnergy());
         Assertions.assertTrue(f.wearer.getCurrentEnergy() >= 10, "「回合开始时恢复 10 点能量」");
 

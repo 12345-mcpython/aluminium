@@ -81,7 +81,7 @@ public class AglaeaFissureTest {
         // "while the Garmentmaker (衣匠) is on the field" -- held fixed, and it is also the condition the rule needs.
         battle.summonMemosprite(aglaea);
         if (threaded) {
-            battle.fireTriggers(TriggerEvent.ALLY_ATTACK, ally, enemy, 1, 0);
+            battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, ally, enemy, 1, 0));
         }
         double before = enemy.getCurrentHp();
         // Note: COMMON, not SKILL: her Skill heals/summons the Garmentmaker (衣匠) (no damage at all), so her attack is the basic one.

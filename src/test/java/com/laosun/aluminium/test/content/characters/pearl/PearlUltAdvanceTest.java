@@ -117,7 +117,7 @@ public class PearlUltAdvanceTest {
         battle.startBattle();
         battle.processRequests();
         Character archetype = battle.characters().get(battle.characters().size() - 1);
-        battle.fireTriggers(TriggerEvent.ULT_CAST, battle.characters().get(0), archetype, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, battle.characters().get(0), archetype, 0, 0));
         battle.processRequests();
         CanHit actor = battle.getExtraTurnActor();
         return actor instanceof Character character ? character : null;
@@ -169,7 +169,7 @@ public class PearlUltAdvanceTest {
         battle.processRequests();
         Character archetype = battle.characters().get(battle.characters().size() - 1);
         if (fireTheUltimate) {
-            battle.fireTriggers(TriggerEvent.ULT_CAST, battle.characters().get(0), archetype, 0, 0);
+            battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, battle.characters().get(0), archetype, 0, 0));
             battle.processRequests();
         }
         for (Signal signal : battle.queue().snapshot()) {

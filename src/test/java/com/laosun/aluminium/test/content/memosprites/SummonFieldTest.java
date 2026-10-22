@@ -187,7 +187,7 @@ public class SummonFieldTest {
         double ownerBefore = f.owner.getAttribute(AttributeType.ATTACK).get();
 
         f.owner.setTriggerTable(new TriggerTable(AGLAEA, List.of(summonAttackRule())));
-        f.battle.fireTriggers(TriggerEvent.BATTLE_START, f.owner, null, 0, 0);
+        f.battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.BATTLE_START, f.owner, null, 0, 0));
 
         Assertions.assertEquals(memospriteBefore * 1.5,
                 f.memosprite.getAttribute(AttributeType.ATTACK).get(), 1e-6,
@@ -211,7 +211,7 @@ public class SummonFieldTest {
         owner.setTriggerTable(new TriggerTable(AGLAEA, List.of(summonAttackRule())));
 
         IllegalStateException refused = Assertions.assertThrows(IllegalStateException.class,
-                () -> battle.fireTriggers(TriggerEvent.BATTLE_START, owner, null, 0, 0));
+                () -> battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.BATTLE_START, owner, null, 0, 0)));
 
         Assertions.assertTrue(refused.getMessage().contains("self_summon_count >= 1"),
                 "the message has to say what to add: " + refused.getMessage());
@@ -300,7 +300,7 @@ public class SummonFieldTest {
         owner.setTriggerTable(new TriggerTable(AGLAEA, List.of(
                 TriggerSpecs.rule("BATTLE_START", List.of("self_summon_count >= 1"),
                         TriggerSpecs.modifyAttr("ATTACK", 0.1, 1)))));
-        return battle.fireTriggers(TriggerEvent.BATTLE_START, owner, null, 0, 0);
+        return battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.BATTLE_START, owner, null, 0, 0));
     }
 
     /**

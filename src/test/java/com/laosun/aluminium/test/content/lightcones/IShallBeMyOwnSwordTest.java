@@ -53,7 +53,7 @@ public class IShallBeMyOwnSwordTest {
     }
 
     private void teammateIsHit() {
-        battle.fireTriggers(TriggerEvent.TAKING_HIT, enemy, ally, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.TAKING_HIT, enemy, ally, 0, 0));
     }
 
     @Test
@@ -61,7 +61,7 @@ public class IShallBeMyOwnSwordTest {
         build(true);
         teammateIsHit();
         int one = wearer.getBuffManager().stacksOf(MOON);
-        battle.fireTriggers(TriggerEvent.HP_CONSUMED, ally, null, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.HP_CONSUMED, ally, null, 0, 0));
         int two = wearer.getBuffManager().stacksOf(MOON);
         teammateIsHit();
         teammateIsHit();
@@ -96,7 +96,7 @@ public class IShallBeMyOwnSwordTest {
         build(true);
         teammateIsHit();
         teammateIsHit();
-        battle.fireTriggers(TriggerEvent.ALLY_ATTACK, wearer, enemy, 1, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, wearer, enemy, 1, 0));
         int after = wearer.getBuffManager().stacksOf(MOON);
         System.out.println("[23014] stacks after the wearer attacks=" + after);
         Assertions.assertEquals(0, after, "removed after casting an attack (施放攻击后解除)");

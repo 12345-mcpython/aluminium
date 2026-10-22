@@ -151,7 +151,7 @@ public class ArcherKitTest {
             f.battle.getSkillPointPolicy().gain(1);
         }
         double before = f.archer.getAttribute(AttributeType.CRIT_ATTACK).get();
-        f.battle.fireTriggers(TriggerEvent.SKILL_POINT_GAINED, f.archer, f.archer, 0, 1);
+        f.battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_POINT_GAINED, f.archer, f.archer, 0, 1));
         f.battle.processRequests();
         return f.archer.getAttribute(AttributeType.CRIT_ATTACK).get() - before;
     }

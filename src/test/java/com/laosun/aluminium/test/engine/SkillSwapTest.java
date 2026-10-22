@@ -177,7 +177,7 @@ public class SkillSwapTest {
             TriggerSpecs.set(effect, "target", "self");
             gallagher.setTriggerTable(new TriggerTable(GALLAGHER,
                     List.of(TriggerSpecs.rule("KILL", List.of("actor == self"), effect))));
-            battle.fireTriggers(TriggerEvent.KILL, gallagher, gallagher, 0, 0);
+            battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.KILL, gallagher, gallagher, 0, 0));
 
             List<SkillSwapBuff> swaps = swaps().stream().filter(swap -> swap.getSlot() == slot).toList();
             Assertions.assertEquals(1, swaps.size(), "precondition: the swap for " + slot + " landed");

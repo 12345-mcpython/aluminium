@@ -41,7 +41,7 @@ public class ConeStackingTest {
         Battle battle = battleWith(unit);
         double before = unit.getAttribute(AttributeType.ATTACK).get();
         for (int i = 0; i < 4; i++) {
-            battle.fireTriggers(TriggerEvent.SKILL_CAST, unit, unit, 0, 0);
+            battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, unit, unit, 0, 0));
         }
         double after = unit.getAttribute(AttributeType.ATTACK).get();
         System.out.println("[22005] attack " + before + " -> " + after + " (delta=" + (after - before) + ")");
@@ -59,11 +59,11 @@ public class ConeStackingTest {
         battle.startBattle();
         double before = unit.getAttribute(AttributeType.ATTACK).get();
         // A non-kill event must not move it.
-        battle.fireTriggers(TriggerEvent.SKILL_CAST, unit, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, unit, enemy, 0, 0));
         Assertions.assertEquals(before, unit.getAttribute(AttributeType.ATTACK).get(), 1e-9,
                 "only a kill stacks this cone");
         for (int i = 0; i < 4; i++) {
-            battle.fireTriggers(TriggerEvent.KILL, unit, enemy, 0, 0);
+            battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.KILL, unit, enemy, 0, 0));
         }
         double after = unit.getAttribute(AttributeType.ATTACK).get();
         double base = unit.getAttribute(AttributeType.ATTACK).baseValue();

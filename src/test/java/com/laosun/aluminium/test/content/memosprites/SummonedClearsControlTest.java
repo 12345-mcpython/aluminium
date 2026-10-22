@@ -55,7 +55,7 @@ public class SummonedClearsControlTest {
         finalAlly.setTriggerTable(new TriggerTable(ALLY, List.of(
                 TriggerSpecs.rule("BATTLE_START", List.of(), control),
                 TriggerSpecs.rule("BATTLE_START", List.of(), dot))));
-        battle.fireTriggers(TriggerEvent.BATTLE_START);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.BATTLE_START, null, null, 0, 0));
 
         Assertions.assertTrue(finalAlly.getBuffManager().hasState(CONTROL), "precondition: the control landed");
         Assertions.assertTrue(finalAlly.getBuffManager().hasState(DOT), "precondition: the DOT landed");

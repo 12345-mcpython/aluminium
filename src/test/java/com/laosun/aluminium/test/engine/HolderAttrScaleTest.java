@@ -71,7 +71,7 @@ public class HolderAttrScaleTest {
                 "precondition: the bystander's Defence differs from the holder's too");
 
         holder.getBuffManager().addBuff(new StateBuff(MARK, 3, false));
-        battle.fireTriggers(TriggerEvent.SKILL_CAST, owner, holder, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, owner, holder, 0, 0));
         battle.processRequests();
 
         double gained = holder.getAttribute(AttributeType.DEFENCE).get() - holderBefore;
@@ -109,7 +109,7 @@ public class HolderAttrScaleTest {
         double ownerBefore = owner.getAttribute(AttributeType.DEFENCE).get();
 
         IllegalStateException refused = Assertions.assertThrows(IllegalStateException.class,
-                () -> battle.fireTriggers(TriggerEvent.SKILL_CAST, owner, bystander, 0, 0),
+                () -> battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, owner, bystander, 0, 0)),
                 "a share of a unit that is not on the field is not a number");
 
         Assertions.assertTrue(refused.getMessage().contains(MARK), refused.getMessage());
@@ -202,7 +202,7 @@ public class HolderAttrScaleTest {
         battle.startBattle();
 
         IllegalStateException refused = Assertions.assertThrows(IllegalStateException.class,
-                () -> battle.fireTriggers(TriggerEvent.SKILL_CAST, owner, bystander, 0, 0),
+                () -> battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, owner, bystander, 0, 0)),
                 "a DAMAGE scaled by a state-holder reads the same lookup, so an absent holder is the same error");
         Assertions.assertTrue(refused.getMessage().contains(MARK), refused.getMessage());
     }
@@ -232,7 +232,7 @@ public class HolderAttrScaleTest {
 
         marked.getBuffManager().addBuff(new StateBuff(MARK, 3, false));
         double before = enemy.getCurrentHp();
-        battle.fireTriggers(TriggerEvent.SKILL_CAST, owner, marked, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, owner, marked, 0, 0));
         battle.processRequests();
         return before - enemy.getCurrentHp();
     }

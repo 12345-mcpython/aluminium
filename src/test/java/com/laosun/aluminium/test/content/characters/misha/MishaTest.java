@@ -33,13 +33,13 @@ public class MishaTest {
         double before = misha.getCurrentEnergy();
 
         // A control: an event that is not "a Skill Point was spent" must do nothing.
-        battle.fireTriggers(TriggerEvent.ALLY_ATTACK, ally, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, ally, enemy, 0, 0));
         Assertions.assertEquals(0.0, misha.getCurrentEnergy() - before, 1e-9,
                 "「我方全体每消耗 1 个战技点」 (every time all allies consume 1 Skill Point) -- an attack is not a spend");
 
         //: the amount is the number of points spent -- 1, not 0. It used to be 0, which only passed
         // while the literal `amount: 2` ignored the context entirely (measured rounds 680-682).
-        battle.fireTriggers(TriggerEvent.SKILL_POINT_SPENT, ally, enemy, 0, 1);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_POINT_SPENT, ally, enemy, 0, 1));
         Assertions.assertEquals(2.0, misha.getCurrentEnergy() - before, 1e-6,
                 "「同时米沙恢复2.00点能量」 (and Misha restores 2.00 Energy)");
     }

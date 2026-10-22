@@ -48,7 +48,7 @@ public class TrailblazerDefencePerStackTest {
         double base = trailblazer.getAttribute(AttributeType.DEFENCE).baseValue();
         double before = trailblazer.getAttribute(AttributeType.DEFENCE).get();
         for (int i = 0; i < layers; i++) {
-            battle.fireTriggers(TriggerEvent.BREAK, trailblazer, enemy, 1, 1000);
+            battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.BREAK, trailblazer, enemy, 1, 1000));
         }
         Assertions.assertEquals(layers, trailblazer.getBuffManager().stacksOf(counter),
                 "precondition: the talent marked exactly " + layers + " layer(s)");

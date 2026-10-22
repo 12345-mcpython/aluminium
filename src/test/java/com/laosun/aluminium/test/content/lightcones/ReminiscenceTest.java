@@ -52,7 +52,7 @@ public class ReminiscenceTest {
     public void theMemospriteTurnGrantsOneToEach() {
         Battle battle = battle(true);
         Summon sprite = battle.summonMemosprite(wearer);
-        battle.fireTriggers(TriggerEvent.TURN_START, sprite, null, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, sprite, null, 0, 0));
         int onWearer = wearer.getBuffManager().stacksOf(MEMORIAL);
         int onSprite = sprite.getBuffManager().stacksOf(MEMORIAL);
         System.out.println("[20022] after one memosprite turn: wearer=" + onWearer + " sprite=" + onSprite);
@@ -64,7 +64,7 @@ public class ReminiscenceTest {
     public void theWearersOwnTurnGrantsNothing() {
         Battle battle = battle(true);
         battle.summonMemosprite(wearer);
-        battle.fireTriggers(TriggerEvent.TURN_START, wearer, null, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, wearer, null, 0, 0));
         System.out.println("[20022] after the WEARER's turn start: " + wearer.getBuffManager().stacksOf(MEMORIAL));
         Assertions.assertEquals(0, wearer.getBuffManager().stacksOf(MEMORIAL), "the memosprite's turn (忆灵的回合) -- the false case");
     }
@@ -73,11 +73,11 @@ public class ReminiscenceTest {
     public void theStacksGoWhenTheMemospriteIsKilled() {
         Battle battle = battle(true);
         Summon sprite = battle.summonMemosprite(wearer);
-        battle.fireTriggers(TriggerEvent.TURN_START, sprite, null, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, sprite, null, 0, 0));
         int before = wearer.getBuffManager().stacksOf(MEMORIAL);
         // ⚠ `SUMMON_LEFT` is the event the sentence means (a memosprite that leaves the field - killed, replaced or
         // dismissed). The audit moved the rule off `KILL`, which only covers the killed path.
-        battle.fireTriggers(TriggerEvent.SUMMON_LEFT, sprite, sprite, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SUMMON_LEFT, sprite, sprite, 0, 0));
         int after = wearer.getBuffManager().stacksOf(MEMORIAL);
         System.out.println("[20022] the memosprite was killed: wearer stacks " + before + " -> " + after
                 + " ; sprite dead=" + sprite.isDeath());

@@ -273,7 +273,7 @@ public class MemospriteSkillLevelTest {
 
             before = cyrene.getAttribute(AttributeType.ATTACK).get();
             if ("percent".equals(spelling)) {
-                battle.fireTriggers(TriggerEvent.TURN_START);
+                battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, null, null, 0, 0));
             } else {
                 SkillExecutor.execute(battle, ode(), demiurge, List.of(battle.characters().get(1)));
             }

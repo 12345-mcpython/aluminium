@@ -52,7 +52,7 @@ public class CastShortensOwnEffectsTest {
         TriggerSpecs.set(mark, "target", "all_allies");
         ally.setTriggerTable(new TriggerTable(ALLY, List.of(
                 TriggerSpecs.rule("TURN_START", List.of(), mark))));
-        battle.fireTriggers(TriggerEvent.TURN_START);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, null, null, 0, 0));
         Assertions.assertTrue(cyrene.getBuffManager().hasState(MARK), "precondition: the master wears the 2-turn mark");
         Assertions.assertTrue(demiurge.getBuffManager().hasState(MARK), "precondition: so does the memosprite");
 

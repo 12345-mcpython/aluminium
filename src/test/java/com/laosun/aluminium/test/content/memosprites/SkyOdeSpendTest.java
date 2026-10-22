@@ -50,7 +50,7 @@ public class SkyOdeSpendTest {
         TriggerSpecs.set(layers, "target", "ally_cid:" + HYACINE);
         ally.setTriggerTable(new TriggerTable(ALLY, List.of(
                 TriggerSpecs.rule("BATTLE_START", List.of(), layers))));
-        battle.fireTriggers(TriggerEvent.BATTLE_START);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.BATTLE_START, null, null, 0, 0));
         Assertions.assertEquals(3, hyacine.getBuffManager().stacksOf(MARK), "precondition: three layers");
 
         System.out.println("[sky_spend] the engine slot ids: common="

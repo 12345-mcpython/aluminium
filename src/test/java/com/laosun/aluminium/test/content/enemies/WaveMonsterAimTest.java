@@ -102,7 +102,7 @@ public class WaveMonsterAimTest {
 
         boolean threw = false;
         try {
-            battle.fireTriggers(TriggerEvent.WAVE_START);
+            battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.WAVE_START, null, null, 0, 0));
         } catch (IllegalArgumentException | IllegalStateException expected) {
             threw = true;
             System.out.println("[aim] empty wave -> " + expected.getClass().getSimpleName() + ": "

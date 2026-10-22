@@ -34,16 +34,16 @@ public class CastoriceTest {
         double before = castorice.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
 
         // Only HP_LOST moves it: an unrelated event must not.
-        battle.fireTriggers(TriggerEvent.ALLY_ATTACK, ally, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, ally, enemy, 0, 0));
         Assertions.assertEquals(0.0, castorice.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get() - before, 1e-9,
                 "「我方损失生命值时」 (when our side loses HP) -- an attack that costs no HP does nothing");
 
-        battle.fireTriggers(TriggerEvent.HP_LOST, ally, ally, 0, 100);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.HP_LOST, ally, ally, 0, 100));
         Assertions.assertEquals(0.2, castorice.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get() - before, 1e-6,
                 "「造成的伤害提高20%」 (DMG dealt is raised by 20%)");
 
         for (int i = 0; i < 4; i++) {
-            battle.fireTriggers(TriggerEvent.HP_LOST, ally, ally, 0, 100);
+            battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.HP_LOST, ally, ally, 0, 100));
         }
         Assertions.assertEquals(0.6, castorice.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get() - before, 1e-6,
                 "「最多叠加3层」 (stacks at most 3 times) -- five firings must still read three stacks of 20%");

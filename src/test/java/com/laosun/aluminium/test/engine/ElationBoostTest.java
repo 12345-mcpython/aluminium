@@ -45,7 +45,7 @@ public class ElationBoostTest {
             TriggerSpecs.set(spec, "target", "self");
             wearer.setTriggerTable(new TriggerTable(WEARER, List.of(
                     TriggerSpecs.rule("BATTLE_START", List.of(), spec))));
-            battle.fireTriggers(TriggerEvent.BATTLE_START, wearer, null, 0, 0);
+            battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.BATTLE_START, wearer, null, 0, 0));
         }
     }
 

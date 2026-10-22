@@ -106,9 +106,9 @@ public class HimekoChargeTest {
 
         // Two more breaks: the third point lands, the fourth is swallowed by the cap (overflow is 0 by default,
         // so "上限3点" is enforced by the declaration rather than by arithmetic in the rule).
-        battle.fireTriggers(TriggerEvent.BREAK, himeko, iceEdge, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.BREAK, himeko, iceEdge, 0, 0));
         Assertions.assertEquals(3, himeko.getResources().value(CHARGE), "the cap is reached");
-        battle.fireTriggers(TriggerEvent.BREAK, himeko, iceEdge, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.BREAK, himeko, iceEdge, 0, 0));
         Assertions.assertEquals(3, himeko.getResources().value(CHARGE), "and cannot be passed");
     }
 
@@ -190,7 +190,7 @@ public class HimekoChargeTest {
         chargeTo(himeko, first, battle);
 
         double secondBefore = second.getCurrentHp();
-        battle.fireTriggers(TriggerEvent.ALLY_ATTACK, himeko, null, 1, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, himeko, null, 1, 0));
         double dealt = secondBefore - second.getCurrentHp();
         Assertions.assertTrue(dealt > 0, "precondition: the follow-up landed on the second enemy");
 
@@ -217,10 +217,10 @@ public class HimekoChargeTest {
         battle.startBattle();
         chargeTo(himeko, first, battle);
 
-        Assertions.assertEquals(1, battle.fireTriggers(TriggerEvent.ALLY_ATTACK, ally, null, 1, 0),
+        Assertions.assertEquals(1, battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, ally, null, 1, 0)),
                 "the rule fires once");
         double secondBefore = second.getCurrentHp();
-        Assertions.assertEquals(0, battle.fireTriggers(TriggerEvent.ALLY_ATTACK, ally, null, 1, 0),
+        Assertions.assertEquals(0, battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, ally, null, 1, 0)),
                 "the charge is gone, so nothing fires again");
         Assertions.assertEquals(secondBefore, second.getCurrentHp(), EPS);
     }
@@ -278,7 +278,7 @@ public class HimekoChargeTest {
      */
     private static void chargeTo(Character himeko, Enemy enemy, Battle battle) {
         while (himeko.getResources().value(CHARGE) < 3) {
-            Assertions.assertEquals(1, battle.fireTriggers(TriggerEvent.BREAK, himeko, enemy, 0, 0),
+            Assertions.assertEquals(1, battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.BREAK, himeko, enemy, 0, 0)),
                     "her break rule must fire for an enemy break");
         }
     }

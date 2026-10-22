@@ -104,7 +104,7 @@ public class FixedCritTest {
         battle.startBattle();
 
         double before = enemy.getCurrentHp();
-        battle.fireTriggers(TriggerEvent.ALLY_ATTACK, hero, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, hero, enemy, 0, 0));
         return before - enemy.getCurrentHp();
     }
 

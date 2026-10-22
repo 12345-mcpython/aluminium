@@ -29,7 +29,7 @@ public class YanqingTraceTest {
         battle.setCurrentMove(new Signal(unit));
         battle.beforeMove();
         double before = unit.getAttribute(AttributeType.EFFECT_RESISTANCE).get();
-        battle.fireTriggers(TriggerEvent.SKILL_CAST, unit, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, unit, enemy, 0, 0));
         double gain = unit.getAttribute(AttributeType.EFFECT_RESISTANCE).get() - before;
         System.out.println("[1209] effectResGain=" + gain + " hasState="
                 + unit.getBuffManager().hasState("智剑连心"));

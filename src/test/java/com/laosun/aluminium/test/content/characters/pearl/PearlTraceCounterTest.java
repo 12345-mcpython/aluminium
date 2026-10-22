@@ -29,12 +29,12 @@ public class PearlTraceCounterTest {
         Character ally = battle.characters().get(1);
 
         int before = (int) pearl.getResources().get(COUNTER).getValue();
-        battle.fireTriggers(TriggerEvent.TURN_START, ally, ally, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, ally, ally, 0, 0));
         int afterAlly = (int) pearl.getResources().get(COUNTER).getValue();
 
         // Push it to the declared cap and fire again: the resource's own max must hold it at 50.
         for (int i = 0; i < 20; i++) {
-            battle.fireTriggers(TriggerEvent.TURN_START, ally, ally, 0, 0);
+            battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, ally, ally, 0, 0));
         }
         int capped = (int) pearl.getResources().get(COUNTER).getValue();
         System.out.println("[pearl_trace] counter " + before + " -> " + afterAlly + " after one ally turn ; capped at " + capped);

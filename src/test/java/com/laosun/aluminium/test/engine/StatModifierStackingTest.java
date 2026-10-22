@@ -519,7 +519,7 @@ public class StatModifierStackingTest {
     private static void fire(Battle battle, int times) {
         Character actor = battle.characters().getFirst();
         for (int i = 0; i < times; i++) {
-            battle.fireTriggers(TriggerEvent.ALLY_ATTACK, actor, null, 1, 0);
+            battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, actor, null, 1, 0));
         }
     }
 }

@@ -35,7 +35,7 @@ public class NightOnTheMilkyWayTest {
         Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         double before = unit.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
-        battle.fireTriggers(TriggerEvent.BREAK, unit, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.BREAK, unit, enemy, 0, 0));
         double after = unit.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
         System.out.println("[23000] break: damage boost " + before + " -> " + after);
         Assertions.assertEquals(before + 0.3, after, 1e-9, "rank 1 states 30 points on a break");
@@ -60,7 +60,7 @@ public class NightOnTheMilkyWayTest {
         Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         double before = unit.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
-        battle.fireTriggers(TriggerEvent.BREAK, unit, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.BREAK, unit, enemy, 0, 0));
         System.out.println("[23000] without the cone: " + before + " -> "
                 + unit.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get());
         Assertions.assertEquals(before, unit.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get(), 1e-9,

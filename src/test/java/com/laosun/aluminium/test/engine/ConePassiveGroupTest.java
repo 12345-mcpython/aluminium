@@ -61,7 +61,7 @@ public class ConePassiveGroupTest {
                 "the healing boost (property only)");
         battle.setCurrentMove(new Signal(unit));
         battle.beforeMove();
-        battle.fireTriggers(TriggerEvent.SKILL_CAST, unit, target, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, unit, target, 0, 0));
         Assertions.assertTrue(ally.getCurrentEnergy() > allyEnergy,
                 "the ally gains energy: " + allyEnergy + " -> " + ally.getCurrentEnergy());
     }

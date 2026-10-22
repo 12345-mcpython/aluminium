@@ -43,7 +43,7 @@ public class TheAshblazingGrandDukeFourPieceTest {
 
     private void followUps(Battle battle, int count) {
         for (int i = 0; i < count; i++) {
-            battle.fireTriggers(TriggerEvent.FOLLOW_UP, wearer, enemy, 0, 0);
+            battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.FOLLOW_UP, wearer, enemy, 0, 0));
         }
     }
 

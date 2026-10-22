@@ -35,7 +35,7 @@ public class FireflyTest {
         double before = remaining(battle, firefly);
         Assertions.assertTrue(before > 0, "the fixture must have a wait to skip: " + before);
 
-        battle.fireTriggers(TriggerEvent.SKILL_CAST, firefly, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, firefly, enemy, 0, 0));
         double after = remaining(battle, firefly);
 
         Assertions.assertEquals(0.75, after / before, 1e-6,
@@ -54,7 +54,7 @@ public class FireflyTest {
         double before = remaining(battle, firefly);
         Assertions.assertTrue(before > 0, "the fixture must have a wait to skip: " + before);
 
-        battle.fireTriggers(TriggerEvent.ULT_CAST, firefly, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, firefly, enemy, 0, 0));
 
         Assertions.assertEquals(0.0, remaining(battle, firefly), 1e-6,
                 "「自身行动提前100%」 (advances her own action by 100%): " + before + " -> 0");

@@ -235,7 +235,7 @@ public class TriggerDamageTakenTest {
      * Fires the rule with the dummy as the event's subject, which is what {@code target} selects.
      */
     private static void fireOnDummy(Battle battle) {
-        battle.fireTriggers(TriggerEvent.ALLY_ATTACK, battle.characters().getFirst(), dummy(battle), 1, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, battle.characters().getFirst(), dummy(battle), 1, 0));
     }
 
     private static Enemy dummy(Battle battle) {
@@ -310,7 +310,7 @@ public class TriggerDamageTakenTest {
     }
 
     private static void fire(Battle battle, Character actor) {
-        battle.fireTriggers(TriggerEvent.ALLY_ATTACK, actor, null, 1, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, actor, null, 1, 0));
     }
 
     /**

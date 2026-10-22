@@ -108,7 +108,7 @@ public class DotCeilingTest {
                 return 0.0;
             }
         });
-        battle.fireTriggers(TriggerEvent.KILL, owner, victim, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.KILL, owner, victim, 0, 0));
 
         List<DotBuff> dots = victim.getBuffManager().allBuffsOf(DotBuff.class);
         Assertions.assertEquals(1, dots.size(), "precondition: one DOT landed");

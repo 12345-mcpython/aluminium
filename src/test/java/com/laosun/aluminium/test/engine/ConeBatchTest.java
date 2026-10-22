@@ -66,7 +66,7 @@ public class ConeBatchTest {
         Battle battle = battleWith(unit);
         battle.startBattle();
         double before = unit.getAttribute(AttributeType.SPEED).get();
-        battle.fireTriggers(TriggerEvent.KILL, unit, null, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.KILL, unit, null, 0, 0));
         return unit.getAttribute(AttributeType.SPEED).get() - before;
     }
 

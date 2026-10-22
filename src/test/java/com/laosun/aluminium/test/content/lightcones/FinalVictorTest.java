@@ -101,7 +101,7 @@ public class FinalVictorTest {
         forceCrit(unit);
         battle.applyDamage(enemy, new Damage(unit, enemy, DamageElement.FIRE, DamageType.NORMAL, 100));
         double stacked = unit.getAttribute(AttributeType.CRIT_ATTACK).get();
-        battle.fireTriggers(TriggerEvent.TURN_END, unit, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_END, unit, enemy, 0, 0));
         double cleared = unit.getAttribute(AttributeType.CRIT_ATTACK).get();
         System.out.println("[21037] stacked=" + stacked + " after turn end=" + cleared + " (baseline " + before + ")");
         Assertions.assertEquals(before + 0.08, stacked, 1e-9, "one crit is one layer");

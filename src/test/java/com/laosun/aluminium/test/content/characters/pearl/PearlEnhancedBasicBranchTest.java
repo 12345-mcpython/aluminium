@@ -56,7 +56,7 @@ public class PearlEnhancedBasicBranchTest {
         Character target = battle.characters().stream().filter(c -> c.getCid() == archetype).findFirst()
                 .orElseThrow();
 
-        battle.fireTriggers(TriggerEvent.ULT_CAST, pearl, target, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, pearl, target, 0, 0));
 
         SkillSwapBuff swap = pearl.getBuffManager().findBuff(SkillSwapBuff.class);
         Assertions.assertNotNull(swap, "the Ultimate installs a skill swap on Pearl");

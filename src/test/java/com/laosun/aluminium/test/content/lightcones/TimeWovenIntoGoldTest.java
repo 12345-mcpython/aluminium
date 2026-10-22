@@ -47,7 +47,7 @@ public class TimeWovenIntoGoldTest {
     }
 
     private void attack(com.laosun.aluminium.models.CanHit attacker) {
-        battle.fireTriggers(TriggerEvent.ALLY_ATTACK, attacker, enemy, 1, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, attacker, enemy, 1, 0));
     }
 
     private double critHit() {

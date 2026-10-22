@@ -32,13 +32,13 @@ public class CyreneTest {
         battle.startBattle();
 
         Assertions.assertEquals(0, recollectionOf(cyrene), "the document states no initial value, so it starts at 0");
-        battle.fireTriggers(TriggerEvent.BASIC_ATTACK, cyrene, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.BASIC_ATTACK, cyrene, enemy, 0, 0));
         Assertions.assertEquals(1, recollectionOf(cyrene), "「获得1点【追忆】」 (gains 1 point of Recollection (【追忆】))");
-        battle.fireTriggers(TriggerEvent.SKILL_CAST, cyrene, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, cyrene, enemy, 0, 0));
         Assertions.assertEquals(4, recollectionOf(cyrene), "「获得3点【追忆】」 (gains 3 points of Recollection) -- the other writer");
 
         for (int i = 0; i < 8; i++) {
-            battle.fireTriggers(TriggerEvent.SKILL_CAST, cyrene, enemy, 0, 0);
+            battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, cyrene, enemy, 0, 0));
         }
         Assertions.assertEquals(27, recollectionOf(cyrene),
                 "「【追忆】达到24点时可激活终结技」 (at 24 points of Recollection the Ultimate can be activated) -- thirty-two casts must still read twenty-four");

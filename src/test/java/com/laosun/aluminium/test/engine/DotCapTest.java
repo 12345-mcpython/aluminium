@@ -91,7 +91,7 @@ public class DotCapTest {
         });
         battle.startBattle();
         for (int i = 0; i < applications; i++) {
-            battle.fireTriggers(TriggerEvent.KILL, owner, enemy, 0, 0);
+            battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.KILL, owner, enemy, 0, 0));
         }
         return battle.tickDots(enemy);
     }

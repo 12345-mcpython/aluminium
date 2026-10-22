@@ -239,7 +239,7 @@ public class ExtendBuffTest {
         }
 
         private int fire(TriggerEvent event) {
-            return battle.fireTriggers(event, owner, target, 1, 0);
+            return battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(event, owner, target, 1, 0));
         }
 
         /**

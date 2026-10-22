@@ -48,7 +48,7 @@ public class ShadowedByNightTest {
         battle.setCurrentMove(new Signal(unit));
         battle.beforeMove();
         double beforeBlocked = unit.getAttribute(AttributeType.SPEED).get();
-        battle.fireTriggers(TriggerEvent.BREAK, unit, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.BREAK, unit, enemy, 0, 0));
         Assertions.assertEquals(0.0, unit.getAttribute(AttributeType.SPEED).get() - beforeBlocked, 1e-6,
                 "the battle-start grant already used this turn's allowance, so a break grants nothing");
     }
@@ -62,7 +62,7 @@ public class ShadowedByNightTest {
         battle.beforeMove();
         double before = unit.getAttribute(AttributeType.SPEED).get();
         double base = unit.getAttribute(AttributeType.SPEED).baseValue();
-        battle.fireTriggers(TriggerEvent.BREAK, unit, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.BREAK, unit, enemy, 0, 0));
         double gain = unit.getAttribute(AttributeType.SPEED).get() - before;
         Assertions.assertEquals(0.08 * base, gain, 1e-3,
                 "a break grants speed through on_any: base=" + base + " gain=" + gain);

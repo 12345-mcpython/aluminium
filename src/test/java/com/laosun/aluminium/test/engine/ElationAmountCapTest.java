@@ -30,7 +30,7 @@ public class ElationAmountCapTest {
                 List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         int before = elation.getResources().value(GIFTS);
-        battle.fireTriggers(TriggerEvent.ENERGY_GAINED, elation, elation, 1, energy);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ENERGY_GAINED, elation, elation, 1, energy));
         return elation.getResources().value(GIFTS) - before;
     }
 

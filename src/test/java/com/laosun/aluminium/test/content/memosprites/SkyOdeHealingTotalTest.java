@@ -88,7 +88,7 @@ public class SkyOdeHealingTotalTest {
                 TriggerSpecs.rule("TURN_START", List.of(), heal))));
 
         // fire BATTLE_START by hand: a hand-built table is not registered the way loaded content is, so the engine's own battle-start event does not reach it
-        battle.fireTriggers(TriggerEvent.BATTLE_START, healer, null, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.BATTLE_START, healer, null, 0, 0));
         battle.processRequests();
         hyacine.takeDamage(hyacine.getMaxHp() * 0.5);
         battle.processRequests();
@@ -98,7 +98,7 @@ public class SkyOdeHealingTotalTest {
                 + " ; her HP " + battle.characters().get(1).getCurrentHp() + "/" + battle.characters().get(1).getMaxHp());
         double before = battle.characters().get(1).getResources().value(TOTAL);
         double hpBefore = battle.characters().get(1).getCurrentHp();
-        battle.fireTriggers(TriggerEvent.TURN_START, healer, null, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, healer, null, 0, 0));
         battle.processRequests();
         // pair [the total it gained, the HP the heal actually restored]: the heal is capped by her missing HP, so the second number is the engine's own answer
         return new double[]{battle.characters().get(1).getResources().value(TOTAL) - before,

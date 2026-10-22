@@ -94,7 +94,7 @@ public class ConeEventsTest {
         battle.startBattle();
         double before = unit.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
         for (int i = 0; i < 4; i++) {
-            battle.fireTriggers(TriggerEvent.DEBUFF_APPLIED, unit, enemy, 0, 0);
+            battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.DEBUFF_APPLIED, unit, enemy, 0, 0));
         }
         double after = unit.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
         System.out.println("[21041] damage boost " + before + " -> " + after + " (delta=" + (after - before) + ")");

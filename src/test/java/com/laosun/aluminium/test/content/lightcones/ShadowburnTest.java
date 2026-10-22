@@ -42,10 +42,10 @@ public class ShadowburnTest {
         Battle battle = battle(true);
         double energy = wearer.getCurrentEnergy();
         int points = battle.getSkillPoints();
-        battle.fireTriggers(TriggerEvent.SUMMONED, wearer, null, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SUMMONED, wearer, null, 0, 0));
         double afterFirst = wearer.getCurrentEnergy() - energy;
         int pointsFirst = battle.getSkillPoints() - points;
-        battle.fireTriggers(TriggerEvent.SUMMONED, wearer, null, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SUMMONED, wearer, null, 0, 0));
         double afterSecond = wearer.getCurrentEnergy() - energy - afterFirst;
         int pointsSecond = battle.getSkillPoints() - points - pointsFirst;
         System.out.println("[20021] first summon: energy +" + afterFirst + " points +" + pointsFirst
@@ -78,7 +78,7 @@ public class ShadowburnTest {
         Battle battle = battle(false);
         double energy = wearer.getCurrentEnergy();
         int points = battle.getSkillPoints();
-        battle.fireTriggers(TriggerEvent.SUMMONED, wearer, null, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SUMMONED, wearer, null, 0, 0));
         System.out.println("[20021] without the cone: energy +" + (wearer.getCurrentEnergy() - energy)
                 + " points +" + (battle.getSkillPoints() - points));
         Assertions.assertEquals(0.0, wearer.getCurrentEnergy() - energy, 1e-9, "no cone, no energy (false case)");

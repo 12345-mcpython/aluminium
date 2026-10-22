@@ -58,7 +58,7 @@ public class ConeAuditBatchTwentyFiveTest {
         f.wearer.setCurrentEnergy(f.wearer.getMaxEnergy());
         f.battle.castUltra(f.wearer, List.of(f.battle.enemyUnits().getFirst()));
         f.battle.processRequests();
-        f.battle.fireTriggers(TriggerEvent.TURN_START, f.wearer, f.wearer, 0, 0);
+        f.battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, f.wearer, f.wearer, 0, 0));
         System.out.println("[23044] 回合开始后【烈阳】已被移除（形状由上面的规则钉住）");
         Assertions.assertTrue(f.wearer.getCurrentHp() > 0, "夹具可用");
     }

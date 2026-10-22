@@ -49,7 +49,7 @@ public class FeixiaoTest {
         battle.startBattle();
         double before = feixiao.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
 
-        battle.fireTriggers(TriggerEvent.ALLY_ATTACK, ally, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, ally, enemy, 0, 0));
 
         Assertions.assertEquals(0.6, feixiao.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get() - before, 1e-9,
                 "「发动此攻击时使自身造成的伤害提高60%」 (this attack raises her own DMG dealt by 60%)");
@@ -66,7 +66,7 @@ public class FeixiaoTest {
         battle.startBattle();
         double before = enemy.getCurrentHp();
         for (int i = 0; i < times; i++) {
-            battle.fireTriggers(TriggerEvent.ALLY_ATTACK, byTeammate ? ally : feixiao, enemy, 0, 0);
+            battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, byTeammate ? ally : feixiao, enemy, 0, 0));
         }
         return before - enemy.getCurrentHp();
     }

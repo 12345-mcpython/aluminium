@@ -54,7 +54,7 @@ public class ConeAggroAndStateTest {
         // Deterministic instances: never crit, so the only variable is FOLLOW_UP_DAMAGE_BOOST.
         double noStack = battle.applyAdditionalDamage(unit, enemy, DamageElement.FIRE, 1000, 0.0, 1.5);
         for (int i = 0; i < 4; i++) {
-            battle.fireTriggers(TriggerEvent.ULT_CAST, unit, unit, 0, 0);
+            battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, unit, unit, 0, 0));
         }
         double stacked = battle.applyAdditionalDamage(unit, enemy, DamageElement.FIRE, 1000, 0.0, 1.5);
         int pinned = 0;
@@ -91,7 +91,7 @@ public class ConeAggroAndStateTest {
         if (applyState) {
             unit.getAttribute(AttributeType.EFFECT_HIT_RATE)
                     .addModifier(DoubleValue.Modifier.pure(2.0, DoubleValue.Modifier.ModifierSource.BUFF, 230320));
-            battle.fireTriggers(TriggerEvent.ULT_CAST, unit, enemy, 0, 0);
+            battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, unit, enemy, 0, 0));
         }
         return battle.applyDamage(enemy, new Damage(unit, enemy, DamageElement.PHYSICAL, DamageType.NORMAL, 1000));
     }

@@ -50,7 +50,7 @@ public class MemorySCurtainNeverFallsTest {
     public void aSkillLiftsTheWholeParty() {
         Battle battle = battle(true);
         double before = partyBoost();
-        battle.fireTriggers(TriggerEvent.SKILL_CAST, wearer, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, wearer, enemy, 0, 0));
         double after = partyBoost();
         System.out.println("[24005] party damage boost before=" + before + " after a Skill=" + after);
         Assertions.assertEquals(2 * BOOST, after - before, 1e-9, "8% each for the wearer and the ally");
@@ -60,7 +60,7 @@ public class MemorySCurtainNeverFallsTest {
     public void somebodyElsesSkillDoesNotCount() {
         Battle battle = battle(true);
         double before = partyBoost();
-        battle.fireTriggers(TriggerEvent.SKILL_CAST, ally, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, ally, enemy, 0, 0));
         System.out.println("[24005] after the ALLY's Skill: +" + (partyBoost() - before));
         Assertions.assertEquals(0.0, partyBoost() - before, 1e-9, "the wearer's own cast (false case)");
     }
@@ -91,7 +91,7 @@ public class MemorySCurtainNeverFallsTest {
     public void withoutTheConeNothingMoves() {
         Battle battle = battle(false);
         double before = partyBoost();
-        battle.fireTriggers(TriggerEvent.SKILL_CAST, wearer, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, wearer, enemy, 0, 0));
         System.out.println("[24005] without the cone: +" + (partyBoost() - before));
         Assertions.assertEquals(0.0, partyBoost() - before, 1e-9, "no cone, no boost (false case)");
     }

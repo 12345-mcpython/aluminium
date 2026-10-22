@@ -70,7 +70,7 @@ public class BondmateHolderTest {
         double firstBefore = first.getAttribute(AttributeType.ATTACK).get();
         double secondBefore = second.getAttribute(AttributeType.ATTACK).get();
 
-        battle.fireTriggers(TriggerEvent.SKILL_CAST, him, first, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, him, first, 0, 0));
         Assertions.assertEquals(firstBefore, first.getAttribute(AttributeType.ATTACK).get(), EPS,
                 "nobody holds " + BONDMATE + " yet, so the effect must reach nobody (and must not throw)");
         Assertions.assertEquals(secondBefore, second.getAttribute(AttributeType.ATTACK).get(), EPS,
@@ -78,7 +78,7 @@ public class BondmateHolderTest {
 
         second.getBuffManager().addBuff(new StateBuff(BONDMATE, 3, false));
         double hisAttack = him.getAttribute(AttributeType.ATTACK).get();
-        battle.fireTriggers(TriggerEvent.SKILL_CAST, him, first, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, him, first, 0, 0));
 
         Assertions.assertEquals(secondBefore + 0.15 * hisAttack, second.getAttribute(AttributeType.ATTACK).get(), EPS,
                 "the holder is buffed by 15% of HIS attack (" + hisAttack + ")");
@@ -146,7 +146,7 @@ public class BondmateHolderTest {
         double himBefore = him.getAttribute(AttributeType.ATTACK).get();
         double allyBefore = ally.getAttribute(AttributeType.ATTACK).get();
 
-        battle.fireTriggers(TriggerEvent.SKILL_CAST, him, ally, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, him, ally, 0, 0));
 
         Assertions.assertTrue(ally.getBuffManager().hasState(BONDMATE),
                 "precondition: the cast designated the aimed ally as " + BONDMATE);
@@ -188,12 +188,12 @@ public class BondmateHolderTest {
         battle.startBattle();
 
         double before = him.getCurrentEnergy();
-        battle.fireTriggers(TriggerEvent.ALLY_ATTACK, him, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, him, enemy, 0, 0));
         Assertions.assertEquals(before, him.getCurrentEnergy(), EPS,
                 "the attacker does not hold " + BONDMATE + ", so nothing is paid");
 
         ally.getBuffManager().addBuff(new StateBuff(BONDMATE, 3, false));
-        battle.fireTriggers(TriggerEvent.ALLY_ATTACK, ally, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, ally, enemy, 0, 0));
         Assertions.assertEquals(before + 6, him.getCurrentEnergy(), EPS,
                 "and when the Bondmate attacks, he gets 6");
     }

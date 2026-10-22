@@ -37,7 +37,7 @@ public class ConeAuditBatchThirteenTest {
 
         Summon sprite = f.battle.summonServant(f.wearer);
         double before = f.ally.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
-        f.battle.fireTriggers(TriggerEvent.SKILL_CAST, sprite, f.ally, 0, 0);
+        f.battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, sprite, f.ally, 0, 0));
         double after = f.ally.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
         System.out.println("[21050] 忆灵对队友施放技能后，队友的增伤 " + before + " -> " + after);
         Assertions.assertEquals(0.08, after - before, 1e-9, "「忆灵对我方目标施放技能时，我方全体伤害 +8%」");
@@ -91,7 +91,7 @@ public class ConeAuditBatchThirteenTest {
         Summon sprite = f.battle.summonServant(f.wearer);
         double wearerBefore = f.wearer.getAttribute(AttributeType.OUTGOING_HEALING_BOOST).get();
         double spriteBefore = sprite.getAttribute(AttributeType.OUTGOING_HEALING_BOOST).get();
-        f.battle.fireTriggers(TriggerEvent.SUMMON_ATTACK, sprite, f.battle.enemyUnits().getFirst(), 0, 0);
+        f.battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SUMMON_ATTACK, sprite, f.battle.enemyUnits().getFirst(), 0, 0));
         System.out.println("[21054] 治疗加成: 她 " + wearerBefore + " -> "
                 + f.wearer.getAttribute(AttributeType.OUTGOING_HEALING_BOOST).get() + " ; 忆灵 " + spriteBefore + " -> "
                 + sprite.getAttribute(AttributeType.OUTGOING_HEALING_BOOST).get());
@@ -109,7 +109,7 @@ public class ConeAuditBatchThirteenTest {
         Fixture f = new Fixture(21055);
         double allyBefore = f.ally.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
         double wearerBefore = f.wearer.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
-        f.battle.fireTriggers(TriggerEvent.DEALING_DAMAGE, f.ally, f.battle.enemyUnits().getFirst(), 0, 0);
+        f.battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.DEALING_DAMAGE, f.ally, f.battle.enemyUnits().getFirst(), 0, 0));
         System.out.println("[21055] 队友的增伤 " + allyBefore + " -> "
                 + f.ally.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get() + " ; 她的 " + wearerBefore + " -> "
                 + f.wearer.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get());

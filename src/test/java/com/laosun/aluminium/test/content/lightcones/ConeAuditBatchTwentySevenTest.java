@@ -90,8 +90,8 @@ public class ConeAuditBatchTwentySevenTest {
         Assertions.assertEquals(3, rules(23059), "回合回能、波次重置、【炼狱】");
 
         f.wearer.setCurrentEnergy(0);
-        f.battle.fireTriggers(com.laosun.aluminium.enums.TriggerEvent.TURN_START, f.wearer, f.wearer, 0, 0);
-        f.battle.fireTriggers(com.laosun.aluminium.enums.TriggerEvent.TURN_START, f.wearer, f.wearer, 0, 0);
+        f.battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(com.laosun.aluminium.enums.TriggerEvent.TURN_START, f.wearer, f.wearer, 0, 0));
+        f.battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(com.laosun.aluminium.enums.TriggerEvent.TURN_START, f.wearer, f.wearer, 0, 0));
         System.out.println("[23059] 两次回合开始后的能量 " + f.wearer.getCurrentEnergy() + "（每波次只 1 次）");
         Assertions.assertEquals(20.0, f.wearer.getCurrentEnergy(), 1e-9, "「每个波次可触发 1 次」");
 

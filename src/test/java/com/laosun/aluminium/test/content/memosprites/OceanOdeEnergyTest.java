@@ -46,7 +46,7 @@ public class OceanOdeEnergyTest {
 
         hysilens.setCurrentEnergy(20);
         double before = hysilens.getCurrentEnergy();
-        battle.fireTriggers(TriggerEvent.ALLY_ATTACK, cyrene, battle.enemies().getFirst(), 1, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, cyrene, battle.enemies().getFirst(), 1, 0));
         battle.processRequests();
         double after = hysilens.getCurrentEnergy();
         boolean stillMarked = hysilens.getBuffManager().hasState(MARK);

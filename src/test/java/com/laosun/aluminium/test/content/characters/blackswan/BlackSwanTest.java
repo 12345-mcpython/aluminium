@@ -33,14 +33,14 @@ public class BlackSwanTest {
         Assertions.assertTrue(defenceBefore > 0, "the fixture must have defence to shred: " + defenceBefore);
         Assertions.assertEquals(0, enemy.getBuffManager().stacksOf("奥迹"), "nothing before the Skill");
 
-        battle.fireTriggers(TriggerEvent.SKILL_CAST, blackSwan, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, blackSwan, enemy, 0, 0));
         Assertions.assertEquals(1, enemy.getBuffManager().stacksOf("奥迹"),
                 "「使目标…陷入1层【奥迹】」 (puts the target ... into 1 stack of [奥迹])");
         Assertions.assertEquals(0.208, (defenceBefore - enemy.getAttribute(AttributeType.DEFENCE).get()) / defenceBefore, 1e-6,
                 "「防御力降低20.80%」 (lowers DEF by 20.80%) of its own defence");
 
         for (int i = 0; i < 60; i++) {
-            battle.fireTriggers(TriggerEvent.SKILL_CAST, blackSwan, enemy, 0, 0);
+            battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, blackSwan, enemy, 0, 0));
         }
         Assertions.assertEquals(50, enemy.getBuffManager().stacksOf("奥迹"),
                 "「【奥迹】最多叠加50层」 ([奥迹] stacks at most 50 times) -- sixty-one casts must still read fifty");

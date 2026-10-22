@@ -139,14 +139,14 @@ public class SushangEidolonTest {
                         > rankZero.sushang.getAttribute(AttributeType.SPEED).get(),
                 "「进入战斗后素裳立即获得1层天赋的加速效果」 - rank 6 starts faster before anything breaks");
 
-        atSix.battle.fireTriggers(TriggerEvent.BREAK, atSix.sushang, atSix.enemy, 0, 0);
+        atSix.battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.BREAK, atSix.sushang, atSix.enemy, 0, 0));
         double afterOne = atSix.sushang.getAttribute(AttributeType.SPEED).get();
-        atSix.battle.fireTriggers(TriggerEvent.BREAK, atSix.sushang, atSix.enemy, 0, 0);
+        atSix.battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.BREAK, atSix.sushang, atSix.enemy, 0, 0));
         double afterTwo = atSix.sushang.getAttribute(AttributeType.SPEED).get();
         Assertions.assertTrue(afterTwo > afterOne,
                 "「天赋的加速效果可以叠加」 - a second break stacks: " + afterOne + " -> " + afterTwo);
 
-        atSix.battle.fireTriggers(TriggerEvent.BREAK, atSix.sushang, atSix.enemy, 0, 0);
+        atSix.battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.BREAK, atSix.sushang, atSix.enemy, 0, 0));
         Assertions.assertEquals(afterTwo, atSix.sushang.getAttribute(AttributeType.SPEED).get(), 1e-9,
                 "「最多叠加2层」 - a third break changes nothing");
     }

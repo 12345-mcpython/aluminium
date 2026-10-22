@@ -217,14 +217,14 @@ public class DanHengKitCompletionTest {
     public void theTalentAnswersOnlyToAnAllySkillAimedAtHim() {
         // (1) an ENEMY skill aimed at him: 「我方技能」 says no
         Fixture enemySkill = new Fixture(0);
-        enemySkill.battle.fireTriggers(TriggerEvent.SKILL_CAST, enemySkill.enemy, enemySkill.danheng, 0, 0);
+        enemySkill.battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, enemySkill.enemy, enemySkill.danheng, 0, 0));
         Assertions.assertEquals(0.0,
                 enemySkill.danheng.getAttribute(AttributeType.DAMAGE_PENETRATION).get(), 1e-9,
                 "「我方技能」 - an enemy's Skill aimed at him must not raise his penetration");
 
         // (2) an ALLY skill aimed at somebody ELSE: 「的施放目标」 says no
         Fixture elsewhere = new Fixture(0);
-        elsewhere.battle.fireTriggers(TriggerEvent.SKILL_CAST, elsewhere.ally, elsewhere.ally, 0, 0);
+        elsewhere.battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, elsewhere.ally, elsewhere.ally, 0, 0));
         Assertions.assertEquals(0.0,
                 elsewhere.danheng.getAttribute(AttributeType.DAMAGE_PENETRATION).get(), 1e-9,
                 "being on his team is not enough - the Skill has to be aimed at HIM");
@@ -232,7 +232,7 @@ public class DanHengKitCompletionTest {
         // (3) the ally's BASIC attack aimed at him: 「技能」 in this document includes a basic attack (the rule's note
         // records that reading), so this one DOES fire - it is the control that the gate is 「我方」, not 「战技」.
         Fixture allyBasic = new Fixture(0);
-        allyBasic.battle.fireTriggers(TriggerEvent.SKILL_CAST, allyBasic.ally, allyBasic.danheng, 0, 0);
+        allyBasic.battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, allyBasic.ally, allyBasic.danheng, 0, 0));
         Assertions.assertTrue(allyBasic.danheng.getAttribute(AttributeType.DAMAGE_PENETRATION).get() > 0,
                 "an ally's attack aimed at him does trigger it: the gate is 「我方技能」, not a particular slot");
     }
@@ -246,8 +246,8 @@ public class DanHengKitCompletionTest {
         Fixture f = new Fixture(0);
         double before = f.danheng.getAttribute(AttributeType.SPEED).get();
 
-        f.battle.fireTriggers(com.laosun.aluminium.enums.TriggerEvent.ALLY_ATTACK,
-                f.danheng, f.enemy, 0, 0);
+        f.battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(com.laosun.aluminium.enums.TriggerEvent.ALLY_ATTACK,
+                f.danheng, f.enemy, 0, 0));
 
         double after = f.danheng.getAttribute(AttributeType.SPEED).get();
         // The VALUE, not just the direction: `> before` would stay green for a 2% raise. Provenance: `1002102`'s

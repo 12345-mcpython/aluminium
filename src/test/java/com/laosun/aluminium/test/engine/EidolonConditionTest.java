@@ -94,7 +94,7 @@ public class EidolonConditionTest {
         TriggerSpecs.set(effect, "target", "self");
         her.setTriggerTable(new TriggerTable(PEARL, List.of(
                 TriggerSpecs.rule("BATTLE_START", List.of(condition), effect))));
-        battle.fireTriggers(TriggerEvent.BATTLE_START, her, her, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.BATTLE_START, her, her, 0, 0));
         battle.processRequests();
         return her.getBuffManager().stacksOf(MARK);
     }

@@ -55,7 +55,7 @@ public class JiaoqiuUltTakenTest {
         Enemy enemy = BattleFixture.monster();
         Battle battle = new Battle(List.of(unit), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
-        battle.fireTriggers(TriggerEvent.ULT_CAST, unit, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, unit, enemy, 0, 0));
         double normal = battle.applyDamage(enemy, new Damage(unit, enemy, DamageElement.FIRE, DamageType.NORMAL, 1000));
         double ultra = battle.applyDamage(enemy, new Damage(unit, enemy, DamageElement.FIRE, DamageType.ULTRA, 1000));
         System.out.println("[1218] normal=" + normal + " ultra=" + ultra + " ratio=" + (ultra / normal));
@@ -70,7 +70,7 @@ public class JiaoqiuUltTakenTest {
         battle.startBattle();
         // Note: `matching` EVALUATES the rule's conditions, so the counter must really be stacked: the character's own ADD_STACK rule
         // (on ALLY_ATTACK) is what creates it -- a hand-made state does not register (round 219/240).
-        battle.fireTriggers(TriggerEvent.ALLY_ATTACK, unit, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, unit, enemy, 0, 0));
         System.out.println("[1218] layers=" + enemy.getBuffManager().stacksOf("烬煨"));
         var rules = unit.getTriggerTable().matching(TriggerEvent.DEALING_DAMAGE,
                 new TriggerTable.TriggerContext(unit, unit, enemy, 0, 0));

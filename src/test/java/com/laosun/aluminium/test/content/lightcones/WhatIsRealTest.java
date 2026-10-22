@@ -62,7 +62,7 @@ public class WhatIsRealTest {
         Battle battle = started(unit, enemy);
         unit.takeDamage(unit.getMaxHp() * 0.5);
         double before = unit.getCurrentHp();
-        battle.fireTriggers(TriggerEvent.BASIC_ATTACK, unit, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.BASIC_ATTACK, unit, enemy, 0, 0));
         return unit.getCurrentHp() - before;
     }
 }

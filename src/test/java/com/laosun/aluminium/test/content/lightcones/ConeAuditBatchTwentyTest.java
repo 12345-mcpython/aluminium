@@ -54,7 +54,7 @@ public class ConeAuditBatchTwentyTest {
         Fixture f = new Fixture(23017);
         f.ally.consumeHp(f.ally.getMaxHp() * 0.7);
         double allyBefore = f.ally.getCurrentHp();
-        f.battle.fireTriggers(TriggerEvent.ULT_CAST, f.ally, f.wearer, 0, 0);
+        f.battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, f.ally, f.wearer, 0, 0));
         f.battle.processRequests();
         double healed = f.ally.getCurrentHp() - allyBefore;
         System.out.println("[23017] 队友被治疗 " + healed + " ; 其上限 × 0.1 = " + (f.ally.getMaxHp() * 0.1));
@@ -95,9 +95,9 @@ public class ConeAuditBatchTwentyTest {
                 > bare.wearer.getAttribute(AttributeType.BREAKING_EFFECT).get(), "「击破特攻提高 60%」");
 
         double partyBefore = f.ally.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
-        f.battle.fireTriggers(TriggerEvent.WAVE_START, f.wearer, f.wearer, 0, 0);
+        f.battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.WAVE_START, f.wearer, f.wearer, 0, 0));
         int pointsBefore = f.battle.getSkillPoints();
-        f.battle.fireTriggers(TriggerEvent.CAST_SETUP, f.wearer, f.wearer, 0, 0);
+        f.battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.CAST_SETUP, f.wearer, f.wearer, 0, 0));
         System.out.println("[23019] 波次能量/终结技后队友增伤 " + (f.ally.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get()
                 - partyBefore) + " ; 战技点 " + pointsBefore + " -> " + f.battle.getSkillPoints());
 

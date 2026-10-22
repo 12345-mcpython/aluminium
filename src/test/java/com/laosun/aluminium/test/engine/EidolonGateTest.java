@@ -79,7 +79,7 @@ public class EidolonGateTest {
                 List.of(dummy()), BattleFixture.seeded());
         battle.startBattle();
 
-        Assertions.assertEquals(0, battle.fireTriggers(TriggerEvent.ALLY_ATTACK, unranked, null, 1, 0),
+        Assertions.assertEquals(0, battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, unranked, null, 1, 0)),
                 "a rank-2 ally's rank must not unlock the rank-0 character's Eidolon");
     }
 
@@ -149,7 +149,7 @@ public class EidolonGateTest {
     }
 
     private static int fire(Battle battle, Character actor) {
-        return battle.fireTriggers(TriggerEvent.ALLY_ATTACK, actor, null, 1, 0);
+        return battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, actor, null, 1, 0));
     }
 
     private static Enemy dummy() {

@@ -32,11 +32,11 @@ public class YanqingCritChanceStackingTest {
         battle.processRequests();
         double base = owner.getAttribute(AttributeType.CRIT_CHANCE).get();
 
-        battle.fireTriggers(TriggerEvent.SKILL_CAST, owner, owner, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, owner, owner, 0, 0));
         battle.processRequests();
         double afterSkill = owner.getAttribute(AttributeType.CRIT_CHANCE).get();
 
-        battle.fireTriggers(TriggerEvent.ULT_CAST, owner, owner, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, owner, owner, 0, 0));
         battle.processRequests();
         double afterUlt = owner.getAttribute(AttributeType.CRIT_CHANCE).get();
 

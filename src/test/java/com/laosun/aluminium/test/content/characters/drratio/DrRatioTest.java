@@ -65,10 +65,10 @@ public class DrRatioTest {
         Battle battle = new Battle(List.of(ratio, ally), List.of(enemy), fixed());
         battle.startBattle();
         if (mark) {
-            battle.fireTriggers(TriggerEvent.ULT_CAST, ratio, enemy, 0, 0);
+            battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, ratio, enemy, 0, 0));
         }
         double before = enemy.getCurrentHp();
-        battle.fireTriggers(TriggerEvent.ALLY_ATTACK, ally, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, ally, enemy, 0, 0));
         return before - enemy.getCurrentHp();
     }
 

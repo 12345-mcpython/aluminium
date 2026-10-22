@@ -73,7 +73,7 @@ public class StackScaledMagnitudeTest {
 
     private static void mark(Fixture f, int stacks) {
         for (int i = 0; i < stacks; i++) {
-            f.battle.fireTriggers(TriggerEvent.ALLY_ATTACK, f.jiaoqiu, f.enemy, 1, 1000);
+            f.battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, f.jiaoqiu, f.enemy, 1, 1000));
         }
         Assertions.assertEquals(stacks, f.enemy.getBuffManager().stacksOf(COUNTER),
                 "precondition: the talent marked exactly " + stacks + " stack(s)");

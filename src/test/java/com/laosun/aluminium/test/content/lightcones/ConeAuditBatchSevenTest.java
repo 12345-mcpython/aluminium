@@ -112,7 +112,7 @@ public class ConeAuditBatchSevenTest {
         double base = f.attribute(AttributeType.BASIC_ATTACK_DAMAGE_BOOST) + f.attribute(AttributeType.SKILL_DAMAGE_BOOST);
         f.wearer.setCurrentEnergy(f.wearer.getMaxEnergy());
         // The rule re-reads at the wearer's own turn start (mid-turn ENERGY_GAINED doubled the layers - measured, reverted).
-        f.battle.fireTriggers(TriggerEvent.TURN_START, f.wearer, f.wearer, 0, 0);
+        f.battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, f.wearer, f.wearer, 0, 0));
         double full = f.attribute(AttributeType.BASIC_ATTACK_DAMAGE_BOOST) + f.attribute(AttributeType.SKILL_DAMAGE_BOOST);
         System.out.println("[21017] 两档合计: 一般 " + base + " ; 满能量 " + full);
         Assertions.assertEquals(0.48, full - base, 1e-9, "「能量满时，该效果额外提高 24%」⇒ 两档各多 0.24（合计 +0.48）");

@@ -65,7 +65,7 @@ public class GepardKitTest {
         Fixture f = new Fixture(0);
         double before = f.gepard.getAttribute(AttributeType.ATTACK).get();
 
-        f.battle.fireTriggers(TriggerEvent.TURN_START, f.gepard, f.gepard, 0, 0);
+        f.battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, f.gepard, f.gepard, 0, 0));
 
         Assertions.assertTrue(f.gepard.getAttribute(AttributeType.ATTACK).get() > before,
                 "「提高等同于自身当前防御力35%的攻击力，每回合开始时刷新」 (raises ATK by an amount equal to 35% of his current DEF, refreshed at the start of every turn)");

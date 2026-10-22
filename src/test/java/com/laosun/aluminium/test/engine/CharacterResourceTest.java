@@ -231,7 +231,7 @@ public class CharacterResourceTest {
         Battle battle = new Battle(List.of(charged, empty), List.of(dummy()), BattleFixture.seeded());
         battle.startBattle();
 
-        Assertions.assertEquals(1, battle.fireTriggers(TriggerEvent.ALLY_ATTACK, empty, null, 1, 0),
+        Assertions.assertEquals(1, battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, empty, null, 1, 0)),
                 "the actor holds none, but the rule belongs to the charged owner");
 
         Character chargedAgain = characterWithCharge(0);
@@ -241,7 +241,7 @@ public class CharacterResourceTest {
         Battle mirror = new Battle(List.of(chargedAgain, fullActor), List.of(dummy()), BattleFixture.seeded());
         mirror.startBattle();
 
-        Assertions.assertEquals(0, mirror.fireTriggers(TriggerEvent.ALLY_ATTACK, fullActor, null, 1, 0),
+        Assertions.assertEquals(0, mirror.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, fullActor, null, 1, 0)),
                 "and the other way round: the actor's stacks are none of this rule's business");
     }
 
@@ -263,7 +263,7 @@ public class CharacterResourceTest {
         Battle battle = new Battle(List.of(owner), List.of(dummy()), BattleFixture.seeded());
         battle.startBattle();
 
-        Assertions.assertEquals(0, battle.fireTriggers(TriggerEvent.ALLY_ATTACK, owner, null, 1, 0),
+        Assertions.assertEquals(0, battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, null, 1, 0)),
                 "cannot read it -> the condition fails, the same rule every other unreadable variable follows");
     }
 
@@ -394,7 +394,7 @@ public class CharacterResourceTest {
         owner.setTriggerTable(new TriggerTable(PLAIN, List.of(chargeThresholdRule())));
         Battle battle = new Battle(List.of(owner), List.of(dummy()), BattleFixture.seeded());
         battle.startBattle();
-        return battle.fireTriggers(TriggerEvent.ALLY_ATTACK, owner, null, 1, 0);
+        return battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, null, 1, 0));
     }
 
     /**

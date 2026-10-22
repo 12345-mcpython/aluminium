@@ -68,7 +68,7 @@ public class AglaeaMemospriteTest {
         tailor.takeDamage(tailor.getMaxHp() * 0.8);
         double before = tailor.getCurrentHp();
 
-        battle.fireTriggers(TriggerEvent.SKILL_CAST, aglaea, null, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, aglaea, null, 0, 0));
 
         Assertions.assertEquals(before + tailor.getMaxHp() * 0.5, tailor.getCurrentHp(), EPS,
                 "「回复等同于其 50% 生命上限的生命值」 (restores HP equal to 50% of its Max HP)");
@@ -85,7 +85,7 @@ public class AglaeaMemospriteTest {
         battle.startBattle();
         Assertions.assertEquals(0, battle.summonCountOf(aglaea), "precondition: nothing is out");
 
-        battle.fireTriggers(TriggerEvent.SKILL_CAST, aglaea, null, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, aglaea, null, 0, 0));
         battle.processRequests();
 
         Summon tailor = battle.memospriteOf(aglaea);
@@ -107,7 +107,7 @@ public class AglaeaMemospriteTest {
         battle.processRequests();
         double out = timeRemaining(battle, aglaea);
 
-        battle.fireTriggers(TriggerEvent.SKILL_CAST, aglaea, null, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, aglaea, null, 0, 0));
 
         Assertions.assertEquals(out, timeRemaining(battle, aglaea), EPS,
                 "with the memosprite out, the summon branch must not run -- so she is not advanced");
@@ -129,7 +129,7 @@ public class AglaeaMemospriteTest {
         Character aglaea = battle.characters().getFirst();
         battle.startBattle();
 
-        battle.fireTriggers(TriggerEvent.ULT_CAST, aglaea, null, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, aglaea, null, 0, 0));
         battle.processRequests();
 
         Assertions.assertEquals(1, battle.summonCountOf(aglaea), "「召唤忆灵衣匠」 (summons the memosprite Garmentmaker (忆灵衣匠))");
@@ -152,7 +152,7 @@ public class AglaeaMemospriteTest {
         tailor.takeDamage(tailor.getMaxHp() * 0.7);
         Assertions.assertTrue(tailor.getCurrentHp() < tailor.getMaxHp(), "precondition: it is damaged");
 
-        battle.fireTriggers(TriggerEvent.ULT_CAST, aglaea, null, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, aglaea, null, 0, 0));
         battle.processRequests();
 
         Assertions.assertEquals(1, battle.summonCountOf(aglaea), "no second memosprite");
@@ -240,7 +240,7 @@ public class AglaeaMemospriteTest {
         battle.processRequests();
         Assertions.assertNotNull(tailor, "precondition: the memosprite is out");
 
-        battle.fireTriggers(TriggerEvent.ULT_CAST, aglaea, null, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, aglaea, null, 0, 0));
         battle.processRequests();
         Assertions.assertTrue(aglaea.getBuffManager().hasState(STANCE), "「阿格莱雅进入【至高之姿】状态」 (Aglaea enters the Supreme Stance (【至高之姿】) state)");
 

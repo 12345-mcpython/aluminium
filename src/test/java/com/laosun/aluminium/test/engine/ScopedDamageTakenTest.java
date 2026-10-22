@@ -161,7 +161,7 @@ public class ScopedDamageTakenTest {
                 return roll;
             }
         });
-        battle.fireTriggers(TriggerEvent.KILL, owner, defender, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.KILL, owner, defender, 0, 0));
         Damage damage = new Damage(owner, defender, DamageElement.FIRE, DamageType.DOT, BASE);
         return battle.applyDamage(defender, damage);
     }

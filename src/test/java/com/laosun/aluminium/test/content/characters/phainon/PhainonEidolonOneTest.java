@@ -58,7 +58,7 @@ public class PhainonEidolonOneTest {
         // full-HP fixture would read 0 whatever the share is - and a raw "set HP to 0" write is not an API this engine has.
         phainon.consumeHp(maxHp * 0.5);
         double before = phainon.getCurrentHp();
-        battle.fireTriggers(TriggerEvent.LETHAL_DAMAGE, phainon, phainon, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.LETHAL_DAMAGE, phainon, phainon, 0, 0));
         battle.processRequests();
         double healed = phainon.getCurrentHp() - before;
         System.out.println("[1408] a killing blow during 【变身】 heals " + healed + " of " + maxHp

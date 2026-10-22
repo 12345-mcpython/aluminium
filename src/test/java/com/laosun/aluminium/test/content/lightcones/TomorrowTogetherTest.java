@@ -47,7 +47,7 @@ public class TomorrowTogetherTest {
         Battle battle = battle(true);
         double wearerBase = wearer.getAttribute(AttributeType.ELATION_DAMAGE_BOOST).get();
         double allyBase = ally.getAttribute(AttributeType.ELATION_DAMAGE_BOOST).get();
-        battle.fireTriggers(TriggerEvent.ULT_CAST, wearer, enemy, 1, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, wearer, enemy, 1, 0));
         double wearerDelta = wearer.getAttribute(AttributeType.ELATION_DAMAGE_BOOST).get() - wearerBase;
         double allyDelta = ally.getAttribute(AttributeType.ELATION_DAMAGE_BOOST).get() - allyBase;
         System.out.println("[22007] after the Ultimate: wearer +" + wearerDelta + " ally +" + allyDelta);
@@ -59,7 +59,7 @@ public class TomorrowTogetherTest {
     public void aSkillCastDoesNothing() {
         Battle battle = battle(true);
         double base = ally.getAttribute(AttributeType.ELATION_DAMAGE_BOOST).get();
-        battle.fireTriggers(TriggerEvent.SKILL_CAST, wearer, ally, 1, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_CAST, wearer, ally, 1, 0));
         System.out.println("[22007] after a Skill: ally +"
                 + (ally.getAttribute(AttributeType.ELATION_DAMAGE_BOOST).get() - base));
         Assertions.assertEquals(0.0, ally.getAttribute(AttributeType.ELATION_DAMAGE_BOOST).get() - base, 1e-9,
@@ -70,7 +70,7 @@ public class TomorrowTogetherTest {
     public void aNonWearerUltimateDoesNothing() {
         Battle battle = battle(true);
         double base = wearer.getAttribute(AttributeType.ELATION_DAMAGE_BOOST).get();
-        battle.fireTriggers(TriggerEvent.ULT_CAST, ally, enemy, 1, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, ally, enemy, 1, 0));
         System.out.println("[22007] after the ALLY's Ultimate: wearer +"
                 + (wearer.getAttribute(AttributeType.ELATION_DAMAGE_BOOST).get() - base));
         Assertions.assertEquals(0.0, wearer.getAttribute(AttributeType.ELATION_DAMAGE_BOOST).get() - base, 1e-9,
@@ -105,7 +105,7 @@ public class TomorrowTogetherTest {
     public void withoutTheConeNothingMoves() {
         Battle battle = battle(false);
         double base = ally.getAttribute(AttributeType.ELATION_DAMAGE_BOOST).get();
-        battle.fireTriggers(TriggerEvent.ULT_CAST, wearer, enemy, 1, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, wearer, enemy, 1, 0));
         Assertions.assertEquals(base, ally.getAttribute(AttributeType.ELATION_DAMAGE_BOOST).get(), 1e-9,
                 "no cone, no change (false case)");
     }

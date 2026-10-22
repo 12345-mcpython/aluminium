@@ -57,10 +57,10 @@ public class ThusBurnsTheDawnTest {
         double plain = hit();
         build(true);
         double withCone = hit();
-        battle.fireTriggers(TriggerEvent.ULT_CAST, wearer, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, wearer, enemy, 0, 0));
         boolean sun = wearer.getBuffManager().stacksOf(SUN) >= 1;
         double withSun = hit();
-        battle.fireTriggers(TriggerEvent.TURN_START, wearer, null, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, wearer, null, 0, 0));
         boolean sunGone = wearer.getBuffManager().stacksOf(SUN) == 0;
         double afterTurnStart = hit();
         System.out.println("[23044] plain=" + plain + " cone=" + withCone + " (x" + (withCone / plain) + ")"
@@ -82,7 +82,7 @@ public class ThusBurnsTheDawnTest {
     public void somebodyElsesUltimateDoesNotRaiseTheSun() {
         build(true);
         com.laosun.aluminium.models.CanHit ally = battle.allies().get(1);
-        battle.fireTriggers(TriggerEvent.ULT_CAST, ally, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, ally, enemy, 0, 0));
         System.out.println("[23044] after the ALLY's ultimate: sun stacks=" + wearer.getBuffManager().stacksOf(SUN));
         Assertions.assertEquals(0, wearer.getBuffManager().stacksOf(SUN), "the wearer's own Ultimate (false case)");
     }

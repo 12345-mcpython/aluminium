@@ -46,7 +46,7 @@ public class ConeStateAndDebuffTest {
         unit.getAttribute(AttributeType.EFFECT_HIT_RATE)
                 .addModifier(DoubleValue.Modifier.pure(2.0, DoubleValue.Modifier.ModifierSource.BUFF, 210150));
         double before = enemy.getAttribute(AttributeType.DEFENCE).get();
-        battle.fireTriggers(TriggerEvent.DEALING_DAMAGE, unit, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.DEALING_DAMAGE, unit, enemy, 0, 0));
         System.out.println("[21015] state=" + enemy.getBuffManager().hasState("攻陷")
                 + " defence " + before + " -> " + enemy.getAttribute(AttributeType.DEFENCE).get());
         Assertions.assertTrue(enemy.getBuffManager().hasState("攻陷"), "the state landed");
@@ -172,7 +172,7 @@ public class ConeStateAndDebuffTest {
         // Comparing two different enemies conflated the per-debuff crit rule (measured 1.424 instead of 1.0).
         double additionalBefore = battle.applyAdditionalDamage(unit, enemy, DamageElement.FIRE, 1000, 0.0, 1.5);
         double ordinaryBefore = battle.applyDamage(enemy, new Damage(unit, enemy, DamageElement.FIRE, DamageType.NORMAL, 1000));
-        battle.fireTriggers(TriggerEvent.ULT_CAST, unit, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, unit, enemy, 0, 0));
         System.out.println("[23020] debate state=" + unit.getBuffManager().hasState("论辩")
                 + " damage boost=" + unit.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get());
         Assertions.assertTrue(unit.getBuffManager().hasState("论辩"), "the debate state is on the wearer");

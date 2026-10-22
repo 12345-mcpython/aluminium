@@ -39,7 +39,7 @@ public class FireflyEnergyFloorTest {
      */
     private static double energyAfterTrigger(Battle battle, Character firefly, double start) {
         firefly.setCurrentEnergy(start);
-        battle.fireTriggers(TriggerEvent.BATTLE_START, firefly, null, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.BATTLE_START, firefly, null, 0, 0));
         return firefly.getCurrentEnergy();
     }
 }

@@ -219,7 +219,7 @@ public class PerStepsTest {
                 List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         battle.processRequests();
-        battle.fireTriggers(TriggerEvent.TURN_START, unit, unit, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, unit, unit, 0, 0));
         battle.processRequests();
     }
 

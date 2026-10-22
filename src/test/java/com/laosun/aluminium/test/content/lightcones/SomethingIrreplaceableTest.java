@@ -46,9 +46,9 @@ public class SomethingIrreplaceableTest {
             double energy = wearer.getCurrentEnergy();
             double boost = wearer.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
             if (event == TriggerEvent.KILL) {
-                battle.fireTriggers(event, wearer, enemy, 0, 0);
+                battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(event, wearer, enemy, 0, 0));
             } else {
-                battle.fireTriggers(event, enemy, wearer, 0, 100);
+                battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(event, enemy, wearer, 0, 100));
             }
             double energyDelta = wearer.getCurrentEnergy() - energy;
             double boostDelta = wearer.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get() - boost;
@@ -88,7 +88,7 @@ public class SomethingIrreplaceableTest {
     public void aKillBySomebodyElseIsNotTheWearers() {
         Battle battle = battle(true);
         double boost = wearer.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
-        battle.fireTriggers(TriggerEvent.KILL, enemy, null, 0, 0);   // the enemy did the killing
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.KILL, enemy, null, 0, 0));   // the enemy did the killing
         System.out.println("[23002] after someone else's kill: boost +"
                 + (wearer.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get() - boost));
         Assertions.assertEquals(0.0, wearer.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get() - boost, 1e-9,

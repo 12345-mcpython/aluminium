@@ -132,7 +132,7 @@ public class StepsScaleTest {
         battle.startBattle();
         battle.processRequests();
         double before = unit.getAttribute(AttributeType.ATTACK).get();
-        battle.fireTriggers(TriggerEvent.TURN_START, unit, unit, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.TURN_START, unit, unit, 0, 0));
         battle.processRequests();
         double after = unit.getAttribute(AttributeType.ATTACK).get();
         // Measured: the ATTACK delta IS the step count (one step under `percent: 1.0` moved it by exactly 1.0), so the

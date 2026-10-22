@@ -104,7 +104,7 @@ public class TurnSuspensionTest {
          */
         private void suspendMarchFromARule() {
             march.setTriggerTable(new TriggerTable(MARCH, List.of(turnStartMarker(), suspendingState())));
-            battle.fireTriggers(TriggerEvent.BATTLE_START, march, march, 0, 0);
+            battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.BATTLE_START, march, march, 0, 0));
             Assertions.assertTrue(march.getBuffManager().suspendsTurns(),
                     "precondition: the state carries the flag");
             march.getBuffManager().addBuff(new DotBuff(ally, DamageElement.FIRE, 200, 3));

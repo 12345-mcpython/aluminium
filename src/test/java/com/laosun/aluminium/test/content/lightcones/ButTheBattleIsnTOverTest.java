@@ -46,7 +46,7 @@ public class ButTheBattleIsnTOverTest {
     }
 
     private void ultOnAlly(Battle battle, CanHit ally) {
-        battle.fireTriggers(TriggerEvent.ULT_CAST, wearer, ally, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, wearer, ally, 0, 0));
     }
 
     private int rulesMatching(Battle battle, CanHit ally) {
@@ -91,7 +91,7 @@ public class ButTheBattleIsnTOverTest {
     @Test
     public void anUltimateOnAnEnemyNeverCounts() {
         Battle battle = battle(true);
-        battle.fireTriggers(TriggerEvent.ULT_CAST, wearer, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, wearer, enemy, 0, 0));
         int counted = wearer.getBuffManager().stacksOf(COUNT);
         System.out.println("[23003] after an ultimate aimed at an ENEMY: counter=" + counted
                 + " points=" + battle.getSkillPoints());
@@ -103,7 +103,7 @@ public class ButTheBattleIsnTOverTest {
     public void somebodyElsesUltimateDoesNotCount() {
         Battle battle = battle(true);
         CanHit ally = battle.allies().get(1);
-        battle.fireTriggers(TriggerEvent.ULT_CAST, ally, wearer, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, ally, wearer, 0, 0));
         System.out.println("[23003] after the ALLY's ultimate: counter=" + wearer.getBuffManager().stacksOf(COUNT));
         Assertions.assertEquals(0, wearer.getBuffManager().stacksOf(COUNT), "the wearer's own casts (false case)");
     }

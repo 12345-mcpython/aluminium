@@ -88,7 +88,7 @@ public class RolledStateTest {
             }
         });
         battle.startBattle();
-        battle.fireTriggers(TriggerEvent.KILL, pela, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.KILL, pela, enemy, 0, 0));
         return enemy.getBuffManager().hasState("通解");
     }
 

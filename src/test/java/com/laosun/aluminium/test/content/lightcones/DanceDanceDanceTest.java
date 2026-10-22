@@ -62,7 +62,7 @@ public class DanceDanceDanceTest {
         Battle battle = new Battle(List.of(wearer, ally), List.of(enemy), BattleFixture.seeded());
         battle.startBattle();
         double before = timeRemaining(battle, ally);
-        battle.fireTriggers(TriggerEvent.ULT_CAST, wearer, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, wearer, enemy, 0, 0));
         double after = timeRemaining(battle, ally);
         System.out.println("[21018] ally av " + before + " -> " + after + " ratio=" + (after / before));
         Assertions.assertFalse(Double.isNaN(before), "precondition: the ally is in the queue");
@@ -75,7 +75,7 @@ public class DanceDanceDanceTest {
         Battle plain = new Battle(List.of(plainWearer, plainAlly), List.of(other), BattleFixture.seeded());
         plain.startBattle();
         double plainBefore = timeRemaining(plain, plainAlly);
-        plain.fireTriggers(TriggerEvent.ULT_CAST, plainWearer, other, 0, 0);
+        plain.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, plainWearer, other, 0, 0));
         double plainAfter = timeRemaining(plain, plainAlly);
         System.out.println("[21018] without the cone: " + plainBefore + " -> " + plainAfter);
         Assertions.assertEquals(plainBefore, plainAfter, 1e-9, "no cone, no advance (false case)");

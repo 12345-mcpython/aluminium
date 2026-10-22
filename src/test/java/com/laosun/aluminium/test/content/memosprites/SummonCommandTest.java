@@ -83,7 +83,7 @@ public class SummonCommandTest {
         battle.summonMemosprite(owner);
         double before = critDamageOf(owner);
 
-        int fired = battle.fireTriggers(TriggerEvent.ULT_CAST, owner, null, 0, 0);
+        int fired = battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, owner, null, 0, 0));
 
         Assertions.assertEquals(1, fired, "the command ran");
         Assertions.assertEquals(before + 0.5, critDamageOf(owner), EPS,
@@ -128,7 +128,7 @@ public class SummonCommandTest {
         double secondBefore = second.getCurrentHp();
         double ourSideBefore = ourSideHp(battle);
 
-        battle.fireTriggers(TriggerEvent.ULT_CAST, owner, null, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, owner, null, 0, 0));
 
         Assertions.assertTrue(first.getCurrentHp() < firstBefore, "the aimed-at enemy was hit");
         Assertions.assertTrue(second.getCurrentHp() < secondBefore, "and so was the other one");
@@ -167,7 +167,7 @@ public class SummonCommandTest {
         battle.processRequests();
         double queueBefore = timeRemaining(battle, evey);
 
-        battle.fireTriggers(TriggerEvent.ULT_CAST, owner, null, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, owner, null, 0, 0));
 
         Assertions.assertEquals(queueBefore, timeRemaining(battle, evey), EPS,
                 "the summon did not take an action");
@@ -204,7 +204,7 @@ public class SummonCommandTest {
         Battle battle = new Battle(List.of(owner), List.of(dummy()), BattleFixture.seeded());
 
         IllegalStateException refused = Assertions.assertThrows(IllegalStateException.class,
-                () -> battle.fireTriggers(TriggerEvent.ULT_CAST, owner, null, 0, 0));
+                () -> battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, owner, null, 0, 0)));
 
         Assertions.assertTrue(refused.getMessage().contains("self_summon_count >= 1"), refused.getMessage());
     }
@@ -220,7 +220,7 @@ public class SummonCommandTest {
         battle.summonMemosprite(owner);
 
         IllegalStateException refused = Assertions.assertThrows(IllegalStateException.class,
-                () -> battle.fireTriggers(TriggerEvent.ULT_CAST, owner, null, 0, 0));
+                () -> battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, owner, null, 0, 0)));
 
         Assertions.assertTrue(refused.getMessage().contains("damaging"), refused.getMessage());
     }
@@ -239,7 +239,7 @@ public class SummonCommandTest {
         battle.summonMemosprite(owner);
 
         IllegalStateException refused = Assertions.assertThrows(IllegalStateException.class,
-                () -> battle.fireTriggers(TriggerEvent.ULT_CAST, owner, null, 0, 0));
+                () -> battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, owner, null, 0, 0)));
 
         Assertions.assertTrue(refused.getMessage().contains("damage_level"), refused.getMessage());
         Assertions.assertTrue(refused.getMessage().contains("99"), refused.getMessage());
@@ -263,7 +263,7 @@ public class SummonCommandTest {
         battle.processRequests();
         double secondBefore = second.getCurrentHp();
 
-        battle.fireTriggers(TriggerEvent.ULT_CAST, owner, null, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, owner, null, 0, 0));
 
         Assertions.assertTrue(first.isDeath(), "precondition: the first enemy is down");
         Assertions.assertTrue(second.getCurrentHp() < secondBefore,
@@ -291,7 +291,7 @@ public class SummonCommandTest {
         double firstBefore = first.getCurrentHp();
         double secondBefore = second.getCurrentHp();
 
-        battle.fireTriggers(TriggerEvent.ULT_CAST, owner, null, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, owner, null, 0, 0));
 
         Assertions.assertEquals(1, battle.summonCountOf(owner), "「召唤忆灵「长夜」」 (summons the memosprite Evey) came first");
         Assertions.assertTrue(first.getCurrentHp() < firstBefore, "…and then the command hit the enemies");
@@ -419,7 +419,7 @@ public class SummonCommandTest {
         tweakOwner.accept(owner);
         double before = target.getCurrentHp();
 
-        battle.fireTriggers(TriggerEvent.ULT_CAST, owner, null, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, owner, null, 0, 0));
 
         return before - target.getCurrentHp();
     }
@@ -434,7 +434,7 @@ public class SummonCommandTest {
         battle.summonMemosprite(owner);
         double before = target.getCurrentHp();
 
-        battle.fireTriggers(TriggerEvent.ULT_CAST, owner, null, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, owner, null, 0, 0));
 
         return before - target.getCurrentHp();
     }

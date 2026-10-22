@@ -70,7 +70,7 @@ public class BeforeDawnTest {
     public void theUltimateArmsTheFollowUp() {
         Battle battle = battle(true);
         double before = wearer.getAttribute(com.laosun.aluminium.enums.AttributeType.FOLLOW_UP_DAMAGE_BOOST).get();
-        battle.fireTriggers(TriggerEvent.ULT_CAST, wearer, enemy, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, wearer, enemy, 0, 0));
         double after = wearer.getAttribute(com.laosun.aluminium.enums.AttributeType.FOLLOW_UP_DAMAGE_BOOST).get();
         int pinned = 0;
         for (var rule : wearer.getTriggerTable().matching(TriggerEvent.ULT_CAST,

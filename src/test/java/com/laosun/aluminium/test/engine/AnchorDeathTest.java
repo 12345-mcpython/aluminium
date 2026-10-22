@@ -65,7 +65,7 @@ public class AnchorDeathTest {
         battle.startBattle();
 
         double baseline = hit(battle, probe, victim);                       // Note: no ultimate yet: no cut anywhere
-        battle.fireTriggers(TriggerEvent.ULT_CAST, caster, victim, 0, 0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ULT_CAST, caster, victim, 0, 0));
         double withCut = hit(battle, probe, victim);
 
         caster.takeDamage(9_999_999);

@@ -55,7 +55,7 @@ public class EventAmountModifierTest {
                 List.of(BattleFixture.monster()), BattleFixture.seeded());
         battle.startBattle();
         double before = owner.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get();
-        battle.fireTriggers(TriggerEvent.SKILL_POINT_SPENT, owner, owner, 0, spent);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.SKILL_POINT_SPENT, owner, owner, 0, spent));
         battle.processRequests();
         return owner.getAttribute(AttributeType.ALL_DAMAGE_TYPE_BOOST).get() - before;
     }

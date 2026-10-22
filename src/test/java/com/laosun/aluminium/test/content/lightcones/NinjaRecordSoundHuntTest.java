@@ -104,7 +104,7 @@ public class NinjaRecordSoundHuntTest {
         // write the same modifier (same value, so the second replaces the first and nothing moves). Emitting HEALED directly
         // isolates this half, which is exactly what the clause says ("after recovering HP").
         double before = target.getAttribute(AttributeType.CRIT_ATTACK).get();
-        battle.fireTriggers(TriggerEvent.HEALED, healer, target, 0, 200.0);
+        battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.HEALED, healer, target, 0, 200.0));
         double afterHeal = target.getAttribute(AttributeType.CRIT_ATTACK).get();
         System.out.println("[22003] heal half: crit " + before + " -> " + afterHeal);
         Assertions.assertEquals(before + 0.18, afterHeal, 1e-9, "recovering HP raises crit damage by 18 points");

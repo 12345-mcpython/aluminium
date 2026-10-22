@@ -148,7 +148,7 @@ public class AllEnemiesTargetTest {
         }
 
         private int fire() {
-            return battle.fireTriggers(TriggerEvent.ALLY_ATTACK, owner, null, 1, 0);
+            return battle.fire(com.laosun.aluminium.models.trigger.TriggerPayload.Simple.of(TriggerEvent.ALLY_ATTACK, owner, null, 1, 0));
         }
     }
 
