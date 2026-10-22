@@ -41,7 +41,7 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
     /**
      * Combat attributes indexed by {@link AttributeType#ordinal()}.
      */
-    private final DoubleValue[] attributes;
+    private final AttributeSheet attributes;
     /**
      * Faction alignment.
      */
@@ -66,52 +66,95 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
     @Setter
     private int aggro;
 
-    @Setter
-    private EnumMap<SkillType, Skill> skills;
-    /**
-     * Current hit points.
-     */
-    private double currentHp;
-    /**
-     * Whether this entity has been defeated.
-     */
-    private boolean death = false;
+    private final SkillSet skills = new SkillSet();
 
     /**
-     * Temporarily cannot take damage: boss phase transition / invulnerability window
-     * (invulnerable during a phase transition, a scripted HP lock).
-     *
-     * <p>Orthogonal to {@link #death}: an invulnerable target is still a legal target
-     * (an AOE still "hits" it, for 0 damage) but {@code Battle.applyDamage} settles
-     * nothing on it - this is what keeps a transitioning boss from having its corpse hit over and over.
+     * @return the slot-to-skill map
      */
-    @Setter
-    private boolean invulnerable = false;
+    public Map<SkillType, Skill> getSkills() {
+        return skills.all();
+    }
 
     /**
-     * Current energy. Characters with no energy bar are always 0.
+     * @param skills the new slot map
      */
-    @Setter
-    private double currentEnergy = 0;
+    public void setSkills(Map<SkillType, Skill> skills) {
+        this.skills.copyFrom(skills);
+    }
+
+    private final HealthState health = new HealthState();
 
     /**
-     * Energy cap. {@code 0} = no energy bar (140 Castorice is like this): {@link #hasEnergyBar()} is
-     * {@code false}, no energy gain is ever credited, and there is no such thing as "casting the ultimate
-     * at full energy".
-     *
-     * <p>The real caps come from {@code max_energy} in {@code character_data.json} (of the 93 characters
-     * only Castorice is null). Many are way off the common tier: Feixiao/Mydei 12, Acheron 9, Cyrene 24,
-     * Firefly/Yunli/Evernight 240, Argenti/Yao Guang 180, Aglaea 350, Evanescia 480.
+     * @return current HP
      */
-    @Setter
-    private double maxEnergy = 0;
+    public double getCurrentHp() {
+        return health.hp();
+    }
 
     /**
-     * Energy gain rules. Regular characters use {@link StandardEnergyProvider}; special characters
-     * each implement this interface themselves.
+     * @return whether the unit is dead
      */
-    @Setter
-    private EnergyProvider energyProvider = new StandardEnergyProvider();
+    public boolean isDeath() {
+        return health.isDead();
+    }
+
+    /**
+     * @return whether the unit is invulnerable
+     */
+    public boolean isInvulnerable() {
+        return health.isInvulnerable();
+    }
+
+    /**
+     * @param invulnerable the new flag
+     */
+    public void setInvulnerable(boolean invulnerable) {
+        health.setInvulnerable(invulnerable);
+    }
+
+    private final EnergyState energy = new EnergyState();
+
+    /**
+     * @return current energy
+     */
+    public double getCurrentEnergy() {
+        return energy.current();
+    }
+
+    /**
+     * @param currentEnergy the new value
+     */
+    public void setCurrentEnergy(double currentEnergy) {
+        energy.setCurrent(currentEnergy);
+    }
+
+    /**
+     * @return the energy cap
+     */
+    public double getMaxEnergy() {
+        return energy.max();
+    }
+
+    /**
+     * @param maxEnergy the cap
+     */
+    public void setMaxEnergy(double maxEnergy) {
+        energy.setMax(maxEnergy);
+    }
+
+    /**
+     * @return the energy provider
+     */
+    public EnergyProvider getEnergyProvider() {
+        return energy.provider();
+    }
+
+    /**
+     * @param energyProvider the provider
+     */
+    public void setEnergyProvider(EnergyProvider energyProvider) {
+        energy.setProvider(energyProvider);
+    }
 
     private final BuffManager buffManager;
 
@@ -141,53 +184,26 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
      * four methods below, so nothing can tick or clear somebody else's limits by accident - the same
      * reasoning that made {@code Queue}'s exposed live heap a registered defect.
      */
-    @Getter(AccessLevel.NONE)
-    private final Map<String, Integer> triggerCooldowns = new HashMap<>();
-    /**
-     * How many times each per-turn-limited rule has fired <b>in the current turn</b> ({@code per_turn}).
-     *
-     * <p>Kept next to the cooldowns because it is the same kind of fact (battle state, per combatant, keyed by
-     * the rule) and because both are cleared at the same moment: the start of this combatant's own turn. A
-     * counter stored on the rule would be shared by every wearer of a relic set and by every battle in the JVM
-     * - the reason the cooldowns live here in the first place.
-     */
-    @Getter(AccessLevel.NONE)
-    private final Map<String, Integer> triggerTurnUses = new HashMap<>();
+    private final TriggerCooldowns triggerCooldowns = new TriggerCooldowns();
 
-    /**
-     * Per rule, the attack sequence of its last "once per attack" firing (see {@link #isAttackLimitReady}).
-     */
-    private final Map<String, Integer> ruleAttackUses = new HashMap<>();
-    /**
-     * Per rule, the wave sequence of its last "once per wave" firing (see {@link #isWaveLimitReady}).
-     */
-    private final Map<String, Integer> ruleWaveUses = new HashMap<>();
+    private final RuleLimits ruleLimits = new RuleLimits();
 
     /**
      * The same question as {@link #isAttackLimitReady}, for a WAVE: the sequence is {@code Battle.waveSequence()}, and because a new
      * wave is a new number, nothing has to be cleared when one starts.
      */
     public boolean isWaveLimitReady(String key, int waveSequence) {
-        Integer sequence = ruleWaveUses.get(key);
-        return sequence == null || sequence.intValue() != waveSequence;
+        return ruleLimits.isWaveReady(key, waveSequence);
     }
 
     /**
      * Records that the rule has had its wave allowance in {@code waveSequence}.
      */
     public void recordWaveUse(String key, int waveSequence) {
-        ruleWaveUses.put(key, waveSequence);
+        ruleLimits.recordWave(key, waveSequence);
     }
 
-    /**
-     * Per rule, how many times it has fired inside that attack (the cap is {@code per_attack}).
-     */
-    private final Map<String, Integer> ruleAttackFirings = new HashMap<>();
-    /**
-     * The rules that have used up a {@code once_per_battle} limit; they never fire again this battle.
-     */
-    @Getter(AccessLevel.NONE)
-    private final Set<String> triggerSpentOnce = new HashSet<>();
+
 
     /**
      * Per-battle <b>amendments to another rule's own numbers</b>, keyed by that rule's {@code id}
@@ -202,37 +218,7 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
      * <p>Note: Two fields, not one: the two sentences raise two different things, and a single "delta" would make it
      * impossible to say which. A rule can carry both (nothing in the corpus does).
      */
-    @Getter(AccessLevel.NONE)
-    private final Map<String, Integer> rulePerTurnBonus = new HashMap<>();
-    @Getter(AccessLevel.NONE)
-    private final Map<String, Double> ruleBaseChanceBonus = new HashMap<>();
-    /**
-     * "终结技的持续时间额外增加 1 回合"/"天赋的伤害提高效果额外提高 10%": amendments to a named rule's own
-     * <b>effect values</b>.
-     *
-     * <p>Note: Kept separate from {@link #rulePerTurnBonus} / {@link #ruleBaseChanceBonus} because those two change how
-     * <i>often</i> a rule runs, while these change what it <i>does</i> - and unlike a second rule with a bigger number
-     * (which would <b>replace</b> the first, since same-kind modifiers refresh rather than stack), these raise the one
-     * that is already there.
-     */
-    private final Map<String, Double> ruleEffectPercentBonus = new HashMap<>();
-    /**
-     * The duration half of the same idea: "持续时间额外增加 N 回合".
-     */
-    private final Map<String, Integer> ruleEffectTurnsBonus = new HashMap<>();
-    /**
-     * The firing-rate half of the same idea: "天赋的冷却时间减少 1 回合" (1002's Eidolon 2) lowers the named
-     * rule's {@code cooldown}.
-     *
-     * <p>Note: A delta stored beside the others rather than a replacement value: the rule keeps stating the
-     * cooldown its document writes, and the amendment is what an Eidolon corrects it by - the same split as
-     * {@link #ruleEffectTurnsBonus}.
-     */
-    private final Map<String, Integer> ruleCooldownDelta = new HashMap<>();
-    /**
-     * The cap half: "可叠加上限提高 N 层" - filed at battle start, so it is in place before any stack is attached.
-     */
-    private final Map<String, Integer> ruleEffectMaxStacksBonus = new HashMap<>();
+    private final RuleAmendments ruleAmendments = new RuleAmendments();
 
     /**
      * Heal bonuses that are conditional on <b>who is being healed</b>, held by the healer.
@@ -259,7 +245,7 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
     /**
      * The conditional heal bonuses registered on this unit, in registration order.
      */
-    private final List<ConditionalHealBonus> conditionalHealBonuses = new ArrayList<>();
+    private final ConditionalHealBonuses conditionalHealBonuses = new ConditionalHealBonuses();
 
     /**
      * Files a heal bonus whose applicability is decided per heal, not per unit.
@@ -269,7 +255,7 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
      */
     public void addConditionalHealBonus(TriggerTable.Condition condition, double percent) {
         if (condition != null) {
-            conditionalHealBonuses.add(new ConditionalHealBonus(condition, percent));
+            conditionalHealBonuses.add(condition, percent);
         }
     }
 
@@ -279,7 +265,7 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
      * @return the list, never {@code null}; empty when the unit has none
      */
     public List<ConditionalHealBonus> conditionalHealBonuses() {
-        return conditionalHealBonuses;
+        return conditionalHealBonuses.all();
     }
 
     /**
@@ -295,21 +281,7 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
      * the initial value", which is why {@link #resetRuleChance} is a removal rather than a write.
      */
     @Getter(AccessLevel.NONE)
-    private final Map<String, Double> ruleCurrentChance = new HashMap<>();
-
-    /**
-     * Per-battle <b>what each named pick last chose</b>, keyed by the memory name a rule states
-     * ({@code TriggerSpec.one_of_no_repeat}).
-     *
-     * <p>"随机生效 1 个效果…替换上次的效果且本次不会与上次重复" (light cone 21032): the value is the effect index the last pick
-     * landed on, and the next pick excludes it. It is keyed by a NAME rather than by the rule because the two rules that
-     * share it are one mechanism in the game - the cone's battle-start pick and its turn-start pick - and the document
-     * says the first turn-start pick must differ from the battle-start one.
-     *
-     * <p>Note: Per battle, cleared with the firing counters - "上次" is this fight's last effect.
-     */
-    @Getter(AccessLevel.NONE)
-    private final Map<String, Integer> rulePickMemory = new HashMap<>();
+    private final RuleChanceState ruleChances = new RuleChanceState();
 
     /**
      * Per-battle <b>skill level raises</b>, keyed by slot: "战技等级+1""终结技等级+1" (1001 Eidolon (星魂) 3/5, and the
@@ -325,31 +297,7 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
      * file's optional {@code "skill_levels"} (see {@code CharacterFactory}), because the document's figure is quoted
      * at a particular level.
      */
-    @Getter(AccessLevel.NONE)
-    private final Map<SkillType, Integer> skillLevelBonus = new HashMap<>();
-
-    /**
-     * Per-battle skill level raises for a <b>memosprite</b>'s own skills, keyed by the <b>data slot</b>.
-     *
-     * <p><b>Why a second map and not the one above.</b> A character's skills are stored by {@link SkillType} (six entries,
-     * five of them meaningful), while a memosprite's run to the eighteen-plus data slots the game's own servant table
-     * uses ({@code Summon.skillsByDataSlot}, and {@code skillHitBonus} next door is keyed the same way for the same
-     * reason). A raise the game spells 「忆灵技等级+1」 names one of THOSE slots, which no {@code SkillType} can address.
-     *
-     * <p>Reader: {@link #skillLevel}, which is the one resolver every read site goes through (a skill's own execution,
-     * a rule-driven {@code DAMAGE}, a {@code cast_skill_param:} magnitude). Empty until a rule raises something.
-     */
-    @Getter(AccessLevel.NONE)
-    private final Map<Integer, Integer> memospriteSkillLevelBonus = new HashMap<>();
-
-    /**
-     * Extra damage SEGMENTS per DATA SLOT (the reader is 1405's "使其战技的伤害次数增加 3 次", the ode of reason).
-     *
-     * <p>Keyed by the slot number because that is what `Skill.getSkillSlot()` answers with -- the same number `CAST_SKILL{skill_id}` names -- and a skill's hit count itself comes from the data's
-     * description (see `SkillExecutor`'s BOUNCE branch), so this is how a rule adds to it at run time.
-     */
-    @Getter(AccessLevel.NONE)
-    private final Map<Integer, Integer> skillHitBonus = new HashMap<>();
+    private final SkillBonuses skillBonuses = new SkillBonuses();
 
     // test event behavior
     public Runnable beforeMove = () -> {
@@ -369,9 +317,9 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
     public CanHit(String name, Camp camp, DoubleValue[] attributes) {
         this.name = name;
         this.camp = camp;
-        this.attributes = attributes;
-        this.currentHp = attributes[AttributeType.HEALTH.ordinal()].get();
-        this.skills = new EnumMap<>(SkillType.class);
+        this.attributes = new AttributeSheet(attributes);
+        health.hp(this.attributes.maxHp());
+
         this.buffManager = new BuffManager(this);
         this.resources = new ResourceManager(this);
     }
@@ -386,36 +334,18 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
         this.name = other.name;
         this.camp = other.camp;
         this.level = other.level;
-        this.skills = new EnumMap<>(other.skills);
-        // Note: Deep-clone the attribute sheet. `other.attributes.clone()` clones the ARRAY and
-        // nothing else, so every DoubleValue inside stayed the same object as the original's -- and
-        // buffs mutate those objects in place (BoostDamageBuff.applyEffect calls addModifier on the
-        // target's value), so a buff on one combatant showed up on the other's panel. DoubleValue.clone()
-        // is a true deep copy; null slots (the percentage placeholders) stay null, exactly like the
-        // original array.
-        DoubleValue[] clonedAttributes = new DoubleValue[other.attributes.length];
-        for (int i = 0; i < clonedAttributes.length; i++) {
-            DoubleValue source = other.attributes[i];
-            clonedAttributes[i] = source == null ? null : source.clone();
-        }
-        this.attributes = clonedAttributes;
-        // don't need to clone
-        this.currentHp = attributes[AttributeType.HEALTH.ordinal()].get();
-        this.death = false;
-        // Battle state, like `death` / `currentEnergy` / `resources`: a copy is a fresh participant, not
-        // a snapshot of a fight in progress, so it starts vulnerable (invulnerable is what a boss turns on
-        // to lock its HP bar mid-phase). Named explicitly because the old review read the omission as a
-        // forgotten copy -- it is a decision, and this is where the decision lives.
-        this.invulnerable = false;
+        skills.copyFrom(other.getSkills());
+        this.attributes = AttributeSheet.copyOf(other.attributes);
+        health.hp(attributes.maxHp());
         this.buffManager = new BuffManager(this);
         // Resources are per-battle state, like currentEnergy: the copy starts empty rather than
         // inheriting the original's stacks.
         this.resources = new ResourceManager(this);
         // Configuration-like fields must be copied along too; currentEnergy belongs to a new battle
         // instance and deliberately starts at 0
-        this.maxEnergy = other.maxEnergy;
-        this.currentEnergy = 0;
-        this.energyProvider = other.energyProvider;
+        energy.setMax(other.getMaxEnergy());
+        energy.setCurrent(0);
+        energy.setProvider(other.getEnergyProvider());
         this.beforeMove = () -> {
         };
         this.afterMove = () -> {
@@ -431,11 +361,11 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
      * @return the corresponding value object, or {@code null} for percentage-type attributes
      */
     public DoubleValue getAttribute(AttributeType attributeType) {
-        return attributes[attributeType.ordinal()];
+        return attributes.get(attributeType);
     }
 
     public void setSkill(SkillType skillType, Skill skill) {
-        skills.put(skillType, skill);
+        skills.set(skillType, skill);
     }
 
     /**
@@ -451,8 +381,8 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
      * @param value         the new value object
      */
     public void setAttribute(AttributeType attributeType, DoubleValue value) {
-        DoubleValue previous = attributes[attributeType.ordinal()];
-        attributes[attributeType.ordinal()] = value;
+        DoubleValue previous = attributes.get(attributeType);
+        attributes.set(attributeType, value);
         if (attributeType == AttributeType.SPEED) {
             double oldSpeed = previous == null ? 0 : previous.get();
             double newSpeed = value == null ? 0 : value.get();
@@ -466,7 +396,7 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
      * Returns the maximum hit points from the HEALTH attribute.
      */
     public double getMaxHp() {
-        return attributes[AttributeType.HEALTH.ordinal()].get();
+        return attributes.maxHp();
     }
 
     /**
@@ -498,53 +428,21 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
         this.speedChangeListener = listener;
     }
 
-    /**
-     * Current shield value. {@code 0} = no shield.
-     *
-     * <p>The shield is drained before HP ({@link #takeDamage(double)}), and it does not stack:
-     * a new shield has {@code Battle.grantShield} overwrite the old value outright, with no addition.
-     *
-     * <p>Note: Read it through {@link #getShield()}; write it through {@link #setShield(double)} (a raw write that
-     * installs nothing) or {@link #installShield(double, AbstractBuff)} (a timed shield that takes itself off
-     * again - see {@link com.laosun.aluminium.models.buff.ShieldBuff}).
-     */
-    private double shield = 0;
+    private final ShieldState shieldState = new ShieldState();
 
     /**
-     * Which buff installed the shield currently up, or {@code null} when nobody owns it (a raw grant, or none).
-     *
-     * <p>A new shield overwrites the old one, and the old shield's buff expires later - at which moment
-     * "clear the shield" would be wrong: the shield standing there is somebody else's. The value alone cannot
-     * tell the two apart (two shields of the same size look identical), so the installer is remembered.
-     *
-     * @see #installShield(double, AbstractBuff)
-     * @see #removeShieldFrom(AbstractBuff)
+     * @return the current shield value
      */
-    private AbstractBuff shieldInstaller;
-
-    /**
-     * Who provided the shield currently up, and <b>which rule</b> created it, or {@code null} / {@code ""}.
-     *
-     * <p><b>Why the shield has to remember this.</b> Two sentences ask about the shield's origin, not its existence:
-     * "在战技提供的护盾保护下的我方目标..." (1001 March 7th, Eidolon (星魂) 6) and "我方目标持有装备者提供的护盾时..." (relic (遗器) 128's
-     * 4-piece). Neither can be answered from the number - March 7th's Skill shield and her Eidolon (星魂) 2 shield are both hers - so
-     * the pair is recorded when the shield is installed and read by the {@code has_shield from_rule ...} condition.
-     *
-     * <p>Note: A raw {@link #setShield(double)} says "somebody set the number directly", so it clears both: a shield with
-     * no stated origin must not answer "yes" to a question about one.
-     */
-    private CanHit shieldProvider;
-    private String shieldRuleId = "";
+    public double getShield() {
+        return shieldState.value();
+    }
 
     /**
      * A raw shield write, which <b>clears the ownership</b>: "somebody set the number directly" is not a timed
      * shield, so no buff may take it off again.
      */
     public void setShield(double value) {
-        this.shield = value;
-        this.shieldInstaller = null;
-        this.shieldProvider = null;
-        this.shieldRuleId = "";
+        shieldState.set(value);
     }
 
     /**
@@ -555,10 +453,7 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
      * @param ruleId   the id of the rule that granted it ({@code ""} = unnamed)
      */
     public void setShield(double value, CanHit provider, String ruleId) {
-        this.shield = value;
-        this.shieldInstaller = null;
-        this.shieldProvider = provider;
-        this.shieldRuleId = ruleId == null ? "" : ruleId;
+        shieldState.set(value, provider, ruleId);
     }
 
     /**
@@ -571,24 +466,28 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
      * @param installer the timed shield that installed it
      */
     public void installShield(double value, AbstractBuff installer) {
-        this.shield = value;
-        this.shieldInstaller = installer;
-        this.shieldProvider = installer == null ? null : installer.getSource();
-        this.shieldRuleId = installer == null || installer.getRuleId() == null ? "" : installer.getRuleId();
+        shieldState.install(value, installer);
     }
 
     /**
      * Who provided the shield currently up, or {@code null} (a raw number, no shield, or an anonymous giver).
      */
     public CanHit getShieldProvider() {
-        return shieldProvider;
+        return shieldState.provider();
     }
 
     /**
      * The {@code id} of the rule that created the shield currently up ({@code ""} when it names none).
      */
     public String getShieldRuleId() {
-        return shieldRuleId;
+        return shieldState.ruleId();
+    }
+
+    /**
+     * @return how much of the last hit the shield absorbed
+     */
+    public double getLastShieldAbsorbed() {
+        return shieldState.lastAbsorbed();
     }
 
     /**
@@ -602,34 +501,16 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
      * @return whether this call took the shield off
      */
     public boolean removeShieldFrom(AbstractBuff installer) {
-        if (shieldInstaller != installer) {
-            return false;
-        }
-        this.shield = 0;
-        this.shieldInstaller = null;
-        this.shieldProvider = null;
-        this.shieldRuleId = "";
-        return true;
+        return shieldState.removeFrom(installer);
     }
-
-    /**
-     * How much of the last {@link #takeDamage(double)} was blocked by the shield.
-     *
-     * <p>Why it exists: the damage absorbed by the shield is also damage dealt by this hit - the return
-     * value of {@code Battle.applyDamage} has to count "the part that went into the shield", otherwise
-     * "hitting a shielded target" would show as dealing 0 damage (kill energy gain / the total damage of
-     * the attack event would both be distorted). Every {@code takeDamage} overwrites it.
-     */
-    @Setter
-    private double lastShieldAbsorbed = 0;
 
     /**
      * Applies damage to this entity, reducing current HP.
      * If HP drops to zero or below, the entity is marked dead.
      *
-     * <p><b>The shield is drained first</b>: damage is absorbed by {@link #shield} first, and only
+     * <p><b>The shield is drained first</b>: damage is absorbed by {@link ShieldState} first, and only
      * what is left after the shield is emptied is deducted from HP. So "you cannot die while shielded" holds
-     * automatically; the absorbed amount is recorded in {@link #lastShieldAbsorbed}.
+     * automatically; the absorbed amount is recorded by {@link ShieldState}.
      *
      * @param damage the amount of damage to take
      * @return {@code true} if the entity died from this damage
@@ -648,32 +529,7 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
      * answered -- which is exactly "不会陷入无法战斗状态" (it does not enter the unable-to-fight state).
      */
     public boolean takeDamage(double damage, boolean mayDie) {
-        lastShieldAbsorbed = 0;                      // clear it at the start of every settlement so a stale value cannot be read
-        if (death || damage <= 0) {
-            return false;
-        }
-        if (shield > 0) {
-            double absorbed = Math.min(shield, damage);
-            shield -= absorbed;
-            damage -= absorbed;
-            // Note: This assignment MUST come before any return: when the shield eats all the damage the
-            //   code below returns early, and missing this line would let the caller read a stale value
-            //   from the previous hit (measured once: the returned damage came out doubled).
-            lastShieldAbsorbed = absorbed;
-            if (damage <= 0) {
-                return false;                        // all eaten by the shield: HP untouched, and certainly not dead
-            }
-        }
-        currentHp -= damage;
-        if (currentHp <= 0) {
-            currentHp = 0;
-            if (!mayDie) {
-                return false;                        // at 0, alive, waiting to be asked
-            }
-            death = true;
-            return true;
-        }
-        return false;
+        return health.takeDamage(damage, mayDie, shieldState);
     }
 
     /**
@@ -681,7 +537,7 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
      * keeping its HP.
      *
      * <p><b>What this is for.</b> A summon leaves with its master, and it did not take damage on the way
-     * out. So {@link #currentHp} is deliberately left alone: "it left" and "it was beaten to 0 HP" are two
+     * out. So {@link HealthState} deliberately leaves HP alone: "it left" and "it was beaten to 0 HP" are two
      * different facts, and content that later asks "how hurt is it" must not be told the second one. The
      * pinned consequence is that a summon which perishes keeps its HP, asserted by
      * {@code SummonTest.theMasterFallingTakesItsSummonWithIt}.
@@ -702,7 +558,7 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
      * <p>Idempotent; a combatant that is already dead stays dead (and keeps the HP it had).
      */
     public void perish() {
-        death = true;
+        health.perish();
     }
 
     /**
@@ -715,13 +571,7 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
      * @return the HP actually spent
      */
     public double consumeHp(double amount) {
-        if (amount <= 0 || isDeath()) {
-            return 0;
-        }
-        double spendable = Math.max(0, currentHp - 1);
-        double spent = Math.min(amount, spendable);
-        currentHp -= spent;
-        return spent;
+        return health.consume(amount);
     }
 
     /**
@@ -731,10 +581,7 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
      * @param amount the amount to heal
      */
     public void heal(double amount) {
-        if (death || amount <= 0) {
-            return;
-        }
-        currentHp = Math.min(currentHp + amount, getMaxHp());
+        health.heal(amount, getMaxHp());
     }
 
     /**
@@ -743,7 +590,7 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
      * @return {@code true} if this entity has an energy bar
      */
     public boolean hasEnergyBar() {
-        return maxEnergy > 0;
+        return energy.hasBar();
     }
 
     /**
@@ -753,7 +600,7 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
      * @return {@code true} if the energy bar is full
      */
     public boolean isEnergyFull() {
-        return hasEnergyBar() && currentEnergy >= maxEnergy;
+        return energy.isFull();
     }
 
     /**
@@ -793,9 +640,7 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
         // setCurrentEnergy is a raw write, the same "unprotected" style as Resource.setValue), and
         // `Math.min(negative, gain)` then LOWERED the energy by the whole over-cap amount. Take 0 instead:
         // capping an over-cap value is a separate operation, not something a gain should do on the way past.
-        double added = Math.min(Math.max(0, maxEnergy - currentEnergy), proposed);
-        currentEnergy += added;
-        return added;
+        return energy.add(proposed);
     }
 
     /**
@@ -847,31 +692,18 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
      * it is the same kind of fact (how often a rule has run) and is cleared with it.
      */
     public boolean isAttackLimitReady(String key, int attackSequence, int cap) {
-        Integer sequence = ruleAttackUses.get(key);
-        if (sequence == null || sequence.intValue() != attackSequence) {
-            return true;                             // no firing recorded for THIS attack yet
-        }
-        return ruleAttackFirings.getOrDefault(key, 0) < cap;
+        return ruleLimits.isAttackReady(key, attackSequence, cap);
     }
 
     /**
      * Records one firing of a rule inside the attack identified by {@code attackSequence}.
      */
     public void recordAttackUse(String key, int attackSequence) {
-        Integer sequence = ruleAttackUses.get(key);
-        if (sequence == null || sequence.intValue() != attackSequence) {
-            ruleAttackUses.put(key, attackSequence);
-            ruleAttackFirings.put(key, 1);
-        } else {
-            ruleAttackFirings.merge(key, 1, Integer::sum);
-        }
+        ruleLimits.recordAttack(key, attackSequence);
     }
 
     public boolean isTriggerReady(String key, int perTurn) {
-        if (triggerSpentOnce.contains(key) || triggerCooldowns.getOrDefault(key, 0) > 0) {
-            return false;
-        }
-        return perTurn <= 0 || triggerTurnUses.getOrDefault(key, 0) < perTurn;
+        return triggerCooldowns.isReady(key, perTurn, ruleLimits.hasSpentOnce(key));
     }
 
     /**
@@ -884,15 +716,9 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
      *                      use is counted here, which is what makes {@code per_turn} work at all
      */
     public void startTriggerCooldown(String key, int cooldownTurns, boolean oncePerBattle, int perTurn) {
-        if (perTurn > 0) {
-            triggerTurnUses.merge(key, 1, Integer::sum);
-        }
+        triggerCooldowns.record(key, cooldownTurns, perTurn, oncePerBattle);
         if (oncePerBattle) {
-            triggerSpentOnce.add(key);
-            return;
-        }
-        if (cooldownTurns > 0) {
-            triggerCooldowns.put(key, cooldownTurns);
+            ruleLimits.spendOnce(key);
         }
     }
 
@@ -911,18 +737,12 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
      * this combatant, and ULT_CAST carries unrelated rules too.
      */
     public void resetTriggerLimit(String key) {
-        triggerTurnUses.remove(key);
-        triggerSpentOnce.remove(key);
-        triggerCooldowns.remove(key);
+        triggerCooldowns.reset(key);
+        ruleLimits.reset(key);
     }
 
     public void tickTriggerCooldowns() {
-        triggerTurnUses.clear();
-        if (triggerCooldowns.isEmpty()) {
-            return;
-        }
-        triggerCooldowns.replaceAll((key, turns) -> turns - 1);
-        triggerCooldowns.values().removeIf(turns -> turns <= 0);
+        triggerCooldowns.tick();
     }
 
     /**
@@ -930,17 +750,10 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
      */
     public void resetTriggerLimits() {
         triggerCooldowns.clear();
-        triggerSpentOnce.clear();
-        triggerTurnUses.clear();
-        rulePerTurnBonus.clear();
-        ruleBaseChanceBonus.clear();
-        ruleEffectPercentBonus.clear();
-        ruleEffectTurnsBonus.clear();
-        ruleEffectMaxStacksBonus.clear();
-        ruleCurrentChance.clear();
-        rulePickMemory.clear();
-        skillLevelBonus.clear();
-        memospriteSkillLevelBonus.clear();
+        ruleLimits.clear();
+        ruleAmendments.clearForNewBattle();
+        ruleChances.clear();
+        skillBonuses.clearLevels();
     }
 
     /**
@@ -950,10 +763,7 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
      * @param memory the name the rule states in {@code one_of_no_repeat}
      */
     public int lastPick(String memory) {
-        if (memory == null || memory.isBlank()) {
-            return -1;
-        }
-        return rulePickMemory.getOrDefault(memory.trim(), -1);
+        return ruleChances.lastPick(memory);
     }
 
     /**
@@ -967,14 +777,12 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
      * @param effectIndex the effect this pick landed on
      */
     public void rememberPick(String memory, int effectIndex) {
-        if (memory != null && !memory.isBlank()) {
-            rulePickMemory.put(memory.trim(), effectIndex);
-        }
+        ruleChances.rememberPick(memory, effectIndex);
     }
 
     /**
      * The probability the rule named {@code ruleId} has <b>right now</b>: the rule's own initial chance, or what its
-     * decays have left it at (see {@link #ruleCurrentChance}).
+     * decays have left it at (see {@link RuleChanceState}).
      *
      * <p>Read on every firing instead of once, which is the whole point: a rule that never states
      * {@code chance_decay} has no entry here and answers its initial {@code chance} forever - measured, adding this
@@ -984,7 +792,7 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
      * @param initial the rule's own {@code chance} ({@code 1.0} = always)
      */
     public double currentRuleChance(String ruleId, double initial) {
-        return ruleId == null || ruleId.isBlank() ? initial : ruleCurrentChance.getOrDefault(ruleId.trim(), initial);
+        return ruleChances.currentChance(ruleId, initial);
     }
 
     /**
@@ -998,10 +806,7 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
      * @param decay   the factor stated by {@code chance_decay}
      */
     public void decayRuleChance(String ruleId, double initial, double decay) {
-        if (ruleId == null || ruleId.isBlank() || !(decay > 0)) {
-            return;
-        }
-        ruleCurrentChance.put(ruleId.trim(), currentRuleChance(ruleId, initial) * decay);
+        ruleChances.decay(ruleId, initial, decay);
     }
 
     /**
@@ -1013,9 +818,7 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
      * @param ruleId the rule's {@code id}
      */
     public void resetRuleChance(String ruleId) {
-        if (ruleId != null && !ruleId.isBlank()) {
-            ruleCurrentChance.remove(ruleId.trim());
-        }
+        ruleChances.resetChance(ruleId);
     }
 
     /*
@@ -1031,24 +834,18 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
      * Adds {@code delta} damage segments to a data slot for the rest of the battle. A NEGATIVE delta takes them back, which is how a rule states a duration.
      */
     public void raiseSkillHits(int slot, int delta) {
-        if (slot <= 0 || delta == 0) {
-            return;
-        }
-        skillHitBonus.merge(slot, delta, Integer::sum);
+        skillBonuses.raiseHits(slot, delta);
     }
 
     /**
      * The extra segments a data slot has been granted, or {@code 0}.
      */
     public int skillHitBonus(int slot) {
-        return skillHitBonus.getOrDefault(slot, 0);
+        return skillBonuses.hitBonus(slot);
     }
 
     public void raiseSkillLevel(SkillType slot, int delta) {
-        if (slot == null || delta == 0) {
-            return;
-        }
-        skillLevelBonus.merge(slot, delta, Integer::sum);
+        skillBonuses.raiseLevel(slot, delta);
     }
 
     /**
@@ -1063,10 +860,7 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
      * @param delta    how many levels to add (negative takes them away)
      */
     public void raiseMemospriteSkillLevel(int dataSlot, int delta) {
-        if (dataSlot <= 0 || delta == 0) {
-            return;
-        }
-        memospriteSkillLevelBonus.merge(dataSlot, delta, Integer::sum);
+        skillBonuses.raiseMemospriteLevel(dataSlot, delta);
     }
 
     /**
@@ -1077,7 +871,7 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
      * when a {@code BATTLE_START} rule runs), so a summon has to ask its master. A unit with no raises answers 0.
      */
     public int memospriteSkillLevelBonus(int dataSlot) {
-        return memospriteSkillLevelBonus.getOrDefault(dataSlot, 0);
+        return skillBonuses.memospriteLevel(dataSlot);
     }
 
     /**
@@ -1113,10 +907,10 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
                     break;
                 }
             }
-            level = skill.getLevel() + (slot == null ? 0 : skillLevelBonus.getOrDefault(slot, 0));
+            level = skill.getLevel() + skillBonuses.level(slot);
         } else {
             Integer dataSlot = dataSlotOf(skill);
-            int bonus = dataSlot == null ? 0 : memospriteSkillLevelBonus.getOrDefault(dataSlot, 0);
+            int bonus = dataSlot == null ? 0 : skillBonuses.memospriteLevel(dataSlot);
             // The raise is filed on the SUMMONER (see `raiseMemospriteSkillLevel`): a memosprite's Eidolon (星魂)/trace raise
             // is a fact about its master's kit, and the memosprite does not exist yet when a BATTLE_START rule runs.
             if (dataSlot != null && this instanceof Summon summon
@@ -1167,7 +961,7 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
      * How many levels this battle has raised the given slot by ({@code 0} = none).
      */
     public int skillLevelBonus(SkillType slot) {
-        return slot == null ? 0 : skillLevelBonus.getOrDefault(slot, 0);
+        return skillBonuses.level(slot);
     }
 
     /**
@@ -1180,10 +974,7 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
      * @param delta  how many extra firings per turn (a positive whole number)
      */
     public void addRulePerTurnBonus(String ruleId, int delta) {
-        if (ruleId == null || ruleId.isBlank()) {
-            return;
-        }
-        rulePerTurnBonus.merge(ruleId.trim(), delta, Integer::sum);
+        ruleAmendments.addPerTurn(ruleId, delta);
     }
 
     /**
@@ -1193,10 +984,7 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
      * @param delta  the extra probability, as a fraction of 1 ({@code 0.15} = "提高15%")
      */
     public void addRuleBaseChanceBonus(String ruleId, double delta) {
-        if (ruleId == null || ruleId.isBlank()) {
-            return;
-        }
-        ruleBaseChanceBonus.merge(ruleId.trim(), delta, Double::sum);
+        ruleAmendments.addBaseChance(ruleId, delta);
     }
 
     /**
@@ -1206,7 +994,7 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
      * @return the amendment, or {@code 0}
      */
     public int rulePerTurnBonus(String ruleId) {
-        return ruleId == null || ruleId.isBlank() ? 0 : rulePerTurnBonus.getOrDefault(ruleId.trim(), 0);
+        return ruleAmendments.perTurn(ruleId);
     }
 
     /*
@@ -1219,9 +1007,7 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
      * Adds {@code delta} to every {@code percent} read of the named rule's effects.
      */
     public void amendRuleEffectPercent(String ruleId, double delta) {
-        if (ruleId != null && !ruleId.isBlank()) {
-            ruleEffectPercentBonus.merge(ruleId.trim(), delta, Double::sum);
-        }
+        ruleAmendments.addEffectPercent(ruleId, delta);
     }
 
     /**
@@ -1234,10 +1020,7 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
      * @param delta  how many of the owner's turns to add (negative = "comes back sooner")
      */
     public void addRuleCooldownDelta(String ruleId, int delta) {
-        if (ruleId == null || ruleId.isBlank()) {
-            return;
-        }
-        ruleCooldownDelta.merge(ruleId.trim(), delta, Integer::sum);
+        ruleAmendments.addCooldownDelta(ruleId, delta);
     }
 
     /**
@@ -1250,50 +1033,46 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
      * @return the amendment, or {@code 0}
      */
     public int ruleCooldownDelta(String ruleId) {
-        return ruleId == null || ruleId.isBlank() ? 0 : ruleCooldownDelta.getOrDefault(ruleId.trim(), 0);
+        return ruleAmendments.cooldownDelta(ruleId);
     }
 
     /**
      * Adds {@code delta} to every {@code turns} read of the named rule's effects.
      */
     public void amendRuleEffectTurns(String ruleId, int delta) {
-        if (ruleId != null && !ruleId.isBlank()) {
-            ruleEffectTurnsBonus.merge(ruleId.trim(), delta, Integer::sum);
-        }
+        ruleAmendments.addEffectTurns(ruleId, delta);
     }
 
     /**
      * Adds {@code delta} layers to the stack cap of every {@code max_stacks} read of the named rule's effects.
      */
     public void amendRuleEffectMaxStacks(String ruleId, int delta) {
-        if (ruleId != null && !ruleId.isBlank()) {
-            ruleEffectMaxStacksBonus.merge(ruleId.trim(), delta, Integer::sum);
-        }
+        ruleAmendments.addEffectMaxStacks(ruleId, delta);
     }
 
     /**
      * The cap amendment for a rule, or {@code null} when nothing raised it.
      */
     public Integer ruleEffectMaxStacksBonus(String ruleId) {
-        return ruleId == null || ruleId.isBlank() ? null : ruleEffectMaxStacksBonus.get(ruleId.trim());
+        return ruleAmendments.effectMaxStacks(ruleId);
     }
 
     /**
      * The value amendment for a rule, or {@code null} when nothing raised it.
      */
     public Double ruleEffectPercentBonus(String ruleId) {
-        return ruleId == null || ruleId.isBlank() ? null : ruleEffectPercentBonus.get(ruleId.trim());
+        return ruleAmendments.effectPercent(ruleId);
     }
 
     /**
      * The duration amendment for a rule, or {@code null} when nothing raised it.
      */
     public Integer ruleEffectTurnsBonus(String ruleId) {
-        return ruleId == null || ruleId.isBlank() ? null : ruleEffectTurnsBonus.get(ruleId.trim());
+        return ruleAmendments.effectTurns(ruleId);
     }
 
     public double ruleBaseChanceBonus(String ruleId) {
-        return ruleId == null || ruleId.isBlank() ? 0 : ruleBaseChanceBonus.getOrDefault(ruleId.trim(), 0.0);
+        return ruleAmendments.baseChance(ruleId);
     }
 
     /**
