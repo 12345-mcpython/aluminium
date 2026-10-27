@@ -90,8 +90,8 @@ public class MemospriteAttackTest {
         Assertions.assertEquals(DamageElement.ICE, direct.getElement(), "memosprite skill 1 is ice");
         Assertions.assertEquals(0.5, direct.getMultiplier(), EPS, "「50% of Max HP」 - the figure the text quotes");
         Assertions.assertEquals(AttributeType.HEALTH, direct.getBaseAttribute(),
-                "its OWN Max HP: the panel halves it on the way in, so a base read off the summoner would be "
-                        + "twice this and would still look plausible");
+                "the row names HEALTH; WHOSE Max HP that is at damage time is Summon.damageBase's answer (the "
+                        + "summoner's - AGENT.md 3.7ze), not something this spec decides");
         Assertions.assertEquals(1, direct.getHits(), "memosprite skill 1 is a single segment");
         Assertions.assertNull(attack.getData(),
                 "not a character skill: there is no multiplier table for it in the generated data at all");
@@ -145,21 +145,33 @@ public class MemospriteAttackTest {
     }
 
     /**
-     * The damage is proportional to the memosprite's <b>own</b> Max HP.
+     * The damage is proportional to the <b>summoner's</b> Max HP.
      *
-     * <p>Two specs that differ only in the panel's HEALTH share, the same summoner, the same seed. Doubling the
-     * share doubles the derived Max HP and must double the hit - the ratio is exact because a direct hit's only
-     * randomness is the crit roll, and both runs draw it from the same seed. Comparing two runs, rather than
-     * comparing against an absolute number, is what keeps this case from re-implementing the damage zones.
+     * <p>⚠ <b>This case used to assert the opposite</b> ("two specs that differ only in the panel's HEALTH share …
+     * doubling the share doubles the hit"), and that is what the engine did until 2026-10-27. The recorded fight says
+     * otherwise: every memosprite cast's base is {@code row share × the summoner's 生命上限} (长夜 0.06 × 2960.0287,
+     * 晴空乐手 1.5 × 5249.7811), and the game's {@code ServantConfig.SyncPropertyExceptList} keeps a servant's Max HP
+     * synced with its summoner's. So the panel share is what the servant's own HP <b>bar</b> starts at; it does not
+     * move this number (see {@link com.laosun.aluminium.models.Summon#damageBase}).
      */
     @Test
-    public void theDamageIsProportionalToItsOwnMaxHp() {
-        double half = damageFrom(CharacterFactory.create(AGLAEA, LEVEL), healthShareSpec(0.5));
-        double whole = damageFrom(CharacterFactory.create(AGLAEA, LEVEL), healthShareSpec(1.0));
+    public void theDamageIsProportionalToTheSummonersMaxHp() {
+        Character plain = CharacterFactory.create(AGLAEA, LEVEL);
+        Character fatter = CharacterFactory.create(AGLAEA, LEVEL);
+        fatter.setAttribute(AttributeType.HEALTH, new DoubleValue(fatter.getMaxHp() * 2));
 
-        Assertions.assertTrue(half > 0, "precondition: the smaller share still dealt damage");
-        Assertions.assertEquals(2.0, whole / half, 1e-6,
-                "twice the Max HP, twice the hit (" + half + " → " + whole + ")");
+        double before = damageFrom(plain, healthShareSpec(0.5));
+        double after = damageFrom(fatter, healthShareSpec(0.5));
+        Assertions.assertTrue(before > 0, "precondition: the hit dealt damage");
+        Assertions.assertEquals(2.0, after / before, 1e-6,
+                "twice the SUMMONER's Max HP, twice the hit (" + before + " → " + after + ")");
+
+        // And the servant's own share does not move it: the same summoner, two panel shares, the same number.
+        double smallerShare = damageFrom(CharacterFactory.create(AGLAEA, LEVEL), healthShareSpec(0.5));
+        double biggerShare = damageFrom(CharacterFactory.create(AGLAEA, LEVEL), healthShareSpec(1.0));
+        Assertions.assertEquals(smallerShare, biggerShare, 1e-6,
+                "the panel share is the servant's HP bar, not the damage base (" + smallerShare + " vs "
+                        + biggerShare + ")");
     }
 
     /**

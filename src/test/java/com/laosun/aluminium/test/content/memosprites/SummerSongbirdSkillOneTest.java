@@ -86,10 +86,15 @@ public class SummerSongbirdSkillOneTest {
 
         Assertions.assertEquals(2, settled.size(),
                 "the row is an AoE attack: one instance per living enemy, not one per cast");
-        double expected = share * songbird.getMaxHp();
+        // ⚠ The multiplier applies to the SUMMONER's Max HP, not the servant's own (which is 70% of it). This judge was
+        // written against the servant's sheet one turn before the recorded fight settled the question - 1.5 × 5249.7811
+        // is 知更鸟•晴歌's panel, and ServantConfig keeps the servant's Max HP synced with it (Summon.damageBase).
+        double expected = share * robin.getMaxHp();
         for (Damage hit : settled) {
             Assertions.assertEquals(expected, hit.breakdown().get("base"), 1e-6,
-                    "every enemy's instance is #2 × 「晴空乐手」's Max HP (" + why + ")");
+                    "every enemy's instance is #2 × the summoner's Max HP (" + why + ")");
         }
+        Assertions.assertNotEquals(songbird.getMaxHp(), robin.getMaxHp(), 1e-6,
+                "「晴空乐手」's own sheet is 70% of hers, so the two candidates are different numbers");
     }
 }

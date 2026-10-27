@@ -237,7 +237,7 @@ public class EnemySkill extends Skill {
             return 0;
         }
         hitTargets.add(victim);
-        double base = user.getAttribute(baseAttribute).get() * multiplier;
+        double base = user.damageBase(baseAttribute) * multiplier;
         double total = 0;
         for (int i = 0; i < hits; i++) {
             if (victim.isDeath()) {

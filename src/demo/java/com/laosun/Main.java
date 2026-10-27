@@ -544,8 +544,11 @@ public class Main {
                     + "  → " + fmt(evey.getAttribute(attribute).get()));
         }
         MemospriteSpec.Attack attack = spec.attack();
+        // 「等同于「长夜」50%生命上限」 is read off the SUMMONER's Max HP, not the servant's own sheet (the servant's Max HP
+        // is synced from hers; see Summon.damageBase). The label says which of the two the number comes from.
+        String ofWhat = "HEALTH".equals(attack.base()) ? "the summoner's " : "its own ";
         System.out.println("    attack: " + attack.shape() + " " + attack.element() + " = "
-                + pct(attack.percent()) + " of its own " + attack.base()
+                + pct(attack.percent()) + " of " + ofWhat + attack.base()
                 + " — no ATK anywhere, because the text gives 「长夜」 (Evey) no ATK to use");
 
         // Who acts first is the action bar's answer, not an assumption: step until the next actor is the
@@ -808,13 +811,14 @@ public class Main {
             System.out.println("        → no attack of its own, nothing to do");
             return;
         }
-        // The damage base is worth printing for a memosprite: its damage is written as a share of an
-        // attribute of *its own* ("等同于'长夜'50%生命上限"), which is the whole reason this class takes
-        // the attribute as a parameter instead of assuming ATK.
+        // The damage base is worth printing for a memosprite: its damage is written as a share of an attribute
+        // ("等同于'长夜'50%生命上限"), and for HEALTH that attribute is the SUMMONER's - the servant's own Max HP is a
+        // share of hers and is synced with it (Summon.damageBase). Printing the number the hit actually multiplies
+        // keeps the demo from showing one figure while the engine uses another.
         if (attack instanceof EnemySkill direct) {
-            System.out.println("        → damage base " + pct(direct.getMultiplier()) + " of its own "
+            System.out.println("        → damage base " + pct(direct.getMultiplier()) + " of "
                     + direct.getBaseAttribute().name() + " ("
-                    + fmt(summon.getAttribute(direct.getBaseAttribute()).get()) + ") × "
+                    + fmt(summon.damageBase(direct.getBaseAttribute())) + ") × "
                     + direct.getHits() + " hit(s), " + direct.getElement());
         }
 

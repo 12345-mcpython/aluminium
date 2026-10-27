@@ -574,7 +574,8 @@ public class SummonConditionTest {
     }
 
     /**
-     * A memosprite that hits every enemy for a share of its own Max HP - only reachable through the seam.
+     * A memosprite that hits every enemy for a share of Max HP (the summoner's, at damage time - see
+     * {@code Summon.damageBase}) - only reachable through the seam.
      */
     private static MemospriteSpec aoeSpec() {
         return new MemospriteSpec("fixture", "SummonConditionTest", null,

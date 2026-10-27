@@ -91,14 +91,19 @@ public class SummonCommandTest {
     }
 
     /**
-     * The share is read from the <b>summon's</b> attribute.
+     * The share is read from the <b>owner's</b> attribute.
      *
-     * <p>Two runs, changing one unit's Max HP each time: doubling the summon's doubles the damage, doubling the
-     * owner's leaves it untouched. Nothing else about the battle differs, so the two numbers say exactly which
+     * <p>Two runs, changing one unit's Max HP each time: doubling the owner's doubles the damage, doubling the
+     * summon's leaves it untouched. Nothing else about the battle differs, so the two numbers say exactly which
      * unit the base came off.
+     *
+     * <p>⚠ <b>This case used to assert the mirror image</b> (the summon's own attribute), and that is what the engine
+     * did until 2026-10-27. It flipped when the recorded fight was reconciled: a memosprite's 「%生命上限」 row is
+     * {@code share × the summoner's 生命上限} to the last digit, and the game's {@code ServantConfig} keeps the
+     * servant's Max HP synced with its summoner's (see {@link com.laosun.aluminium.models.Summon#damageBase}).
      */
     @Test
-    public void theBaseIsTheSummonsOwnAttribute() {
+    public void theBaseIsTheOwnersMaxHp() {
         double plain = commandedDamage(summon -> {
         });
         double summonFatter = commandedDamage(summon -> summon.setAttribute(AttributeType.HEALTH,
@@ -108,10 +113,10 @@ public class SummonCommandTest {
                 new DoubleValue(owner.getMaxHp() * 2)));
 
         Assertions.assertTrue(plain > 0, "precondition: the commanded attack dealt damage");
-        Assertions.assertEquals(2.0, summonFatter / plain, 1e-6,
-                "twice the summon's Max HP, twice the damage (" + plain + " -> " + summonFatter + ")");
-        Assertions.assertEquals(plain, ownerFatter, 1e-6,
-                "…and the owner's Max HP is not what it reads");
+        Assertions.assertEquals(2.0, ownerFatter / plain, 1e-6,
+                "twice the OWNER's Max HP, twice the damage (" + plain + " -> " + ownerFatter + ")");
+        Assertions.assertEquals(plain, summonFatter, 1e-6,
+                "…and the summon's own Max HP is not what it reads");
     }
 
     /**

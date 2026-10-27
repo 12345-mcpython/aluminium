@@ -131,13 +131,18 @@ public record MemospriteSpec(@SerializedName("name") String name,
      *
      * <p><b>Why this lives here and not in a rule file.</b> A memosprite's attack is not a trigger - nothing
      * in the battle fires it, a turn does - so it is not a {@code TriggerSpec}. It also cannot live on the
-     * summoning character, because the numbers are stated against the <em>memosprite</em>: Evernight (长夜月)'s "长夜"
-     * hits for "equal to 200% of '长夜''s Max HP", which is the memosprite's own Max HP, not the summoner's.
-     * Reading it off the summoner would produce a number 2 x  too large (the panel gives 长夜 half of Evernight (长夜月)'s
-     * HP) - a wrong number that looks plausible, which is the worst kind.
+     * summoning character, because the numbers are stated against the memosprite: Evernight (长夜月)'s "长夜"
+     * hits for "equal to 200% of '长夜''s Max HP".
      *
-     * <p>Note: {@code base} names an attribute of the <b>memosprite</b>. Where a document instead scales off the
-     * <em>summoner</em> (Jing Yuan (景元)'s "神君" hits for "equal to 66% of Jing Yuan (景元)'s ATK"), the panel carries the share and the
+     * <p>⚠ <b>What "「长夜」's Max HP" means at damage time</b> (measured 2026-10-27, {@code AGENT.md} §3.7ze): it is
+     * the <b>summoner's</b> Max HP, because the game's {@code ServantConfig.SyncPropertyExceptList} keeps a
+     * memosprite's Max HP synced with its summoner's (only speed is excluded). The reading this javadoc used to carry -
+     * "its own, which is half of hers, so reading the summoner would be 2 x too large" - had the sign backwards: the
+     * engine was 2 x too <b>small</b> against the recorded fight, whose memosprite instances are exactly
+     * {@code share x the summoner's panel}. Where that is decided now is {@link com.laosun.aluminium.models.Summon#damageBase};
+     * {@code base} and {@code percent} here still say which attribute the row names and what share it takes.
+     *
+     * <p>Note: where a document instead scales off the <em>summoner</em> (Jing Yuan (景元)'s "神君" hits for "equal to 66% of Jing Yuan (景元)'s ATK"), the panel carries the share and the
      * attack then scales off the memosprite's own ATTACK: the same number, stated the same way every other
      * inherited attribute is, and consistent with the panel's snapshot semantics.
      *

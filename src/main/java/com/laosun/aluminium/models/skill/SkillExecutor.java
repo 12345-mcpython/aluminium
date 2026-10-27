@@ -457,13 +457,13 @@ public final class SkillExecutor {
         // Note: The description names the base: "DEF" -> DEF, "Max HP" -> Max HP, otherwise ATK. 18 documents scale a DAMAGE clause
         // off Max HP and 3 off DEF, and multiplying ATTACK for those dealt the wrong damage.
         AttributeType baseAttribute = data.damageBaseAttribute();
-        double base = user.getAttribute(baseAttribute).get() * params.getFirst();
+        double base = user.damageBase(baseAttribute) * params.getFirst();
         // Note: A blast states TWO multipliers: the centre and the neighbours. 1008's ultimate row is
         // `[1.92, 0.96]`..`[3.2, 1.6]` - the second exactly half the first, matching "320%...and 160% to enemies adjacent to it".
         // Applying the centre value to the neighbours too would double the documented damage on every
         // blast skill in the corpus.
         double neighbourBase = params.size() > 1
-                ? user.getAttribute(baseAttribute).get() * params.get(1)
+                ? user.damageBase(baseAttribute) * params.get(1)
                 : base;
         CanHit mainTarget = targets.getFirst();
 
@@ -494,7 +494,7 @@ public final class SkillExecutor {
                 || "ELATION_SKILL".equalsIgnoreCase(elationKind))) {
             int elationHits = (int) Math.round(params.getFirst());
             double perHit = params.size() > 1 ? params.get(1) : params.getFirst();
-            double perHitBase = user.getAttribute(baseAttribute).get() * perHit;
+            double perHitBase = user.damageBase(baseAttribute) * perHit;
             // The rule, applied here too: the row's stance value is the WHOLE skill's toughness reduction, so it is spread
             // evenly over the instances this row settles (the hits plus the one final split instance).
             double elationStance = data.stanceFor(true) / Math.max(1, elationHits + 1);
@@ -510,7 +510,7 @@ public final class SkillExecutor {
             if (params.size() > 2) {
                 List<CanHit> everyone = battle.targetableEnemies();
                 if (!everyone.isEmpty()) {
-                    double share = user.getAttribute(baseAttribute).get() * params.get(2) / everyone.size();
+                    double share = user.damageBase(baseAttribute) * params.get(2) / everyone.size();
                     for (CanHit victim : everyone) {
                         totalDamage += hit(battle, data, user, element, share, victim, hitTargets, elationStance,
                                 skill.getSkillSlot());
@@ -576,7 +576,7 @@ public final class SkillExecutor {
                 Double bounceShare = data.bounceDamageShare(user.skillLevel(skill));
                 double bounceBase = bounceShare == null
                         ? base
-                        : user.getAttribute(baseAttribute).get() * bounceShare;
+                        : user.damageBase(baseAttribute) * bounceShare;
                 Integer additional = data.bounceAdditionalHits(bounceShare, user.skillLevel(skill));
                 int hits = (additional == null ? 0 : additional) + 1;
                 // plus whatever a rule has granted this slot.
@@ -648,7 +648,7 @@ public final class SkillExecutor {
                 throw new IllegalStateException("skill_effects.json's damage part names the unknown shape '"
                         + part.getShape() + "'");
             }
-            double partBase = user.getAttribute(baseAttribute).get() * params.get(index);
+            double partBase = user.damageBase(baseAttribute) * params.get(index);
             switch (shape) {
                 case SINGLE_ATTACK -> total += hit(battle, data, user, element, partBase, mainTarget, hitTargets,
                         data.getStanceList().single(), skill.getSkillSlot());
