@@ -1,5 +1,6 @@
 package com.laosun.aluminium.models;
 
+import com.laosun.aluminium.enums.AttributeType;
 import com.laosun.aluminium.enums.Camp;
 import lombok.Getter;
 import lombok.Setter;
@@ -77,6 +78,31 @@ public class Summon extends CanHit {
      * cleaned up.
      */
     private CanHit master;
+
+    /**
+     * A summon's 「%生命上限」 damage reads the <b>summoner's</b> Max HP, not its own.
+     *
+     * <p><b>Why this is not the servant's own sheet.</b> Three sources agree, and they were checked in this order:
+     * <ol>
+     *   <li>the recorded fight: every memosprite cast's {@code raw_damage_before_modifiers} is exactly
+     *       {@code row share × the summoner's 生命上限} - 长夜 0.06 × 2960.0287, 晴空乐手 1.5 × 5249.7811 - including
+     *       three different panels in one window ({@code scenarios/veritas-085418.replay.json});</li>
+     *   <li>{@code ConfigEntity}'s {@code ServantConfig.SyncPropertyExceptList} names the properties that are
+     *       <b>not</b> synced from the summoner: for 长夜 it is speed alone, so {@code MaxHP} follows the summoner's;
+     *       the two servants that keep their own HP (死龙 {@code Castorice}, 德谬歌 {@code Cyrene}) list {@code MaxHP};</li>
+     *   <li>and the ability files follow the same split: every servant uses {@code "FormulaType": "ByMaxHP"} except
+     *       死龙, the one whose HP is its own - it is the only user of {@code "BySummonerMaxHP"}.</li>
+     * </ol>
+     * The {@code memosprites/<cid>.json} share (0.5 for 长夜, 0.7 for 晴空乐手) is what the servant's <b>own HP bar</b>
+     * starts at, and the engine still uses it there; it is not what the damage row multiplies.
+     */
+    @Override
+    public double damageBase(AttributeType attribute) {
+        if (attribute == AttributeType.HEALTH && master != null) {
+            return master.getAttribute(AttributeType.HEALTH).get();
+        }
+        return super.damageBase(attribute);
+    }
 
     /**
      * Constructs a summoned entity.

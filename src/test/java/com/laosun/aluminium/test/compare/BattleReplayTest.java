@@ -93,27 +93,35 @@ public class BattleReplayTest {
     }
 
     /**
-     * The reconciliation compares the <b>base</b>, and a difference is <b>named</b>: a memosprite's row reads
-     * 「%生命上限」 off its own sheet (half of 长夜月's, 70% of 知更鸟•晴歌's), while every capture row's base is the same
-     * share of the <b>summoner's</b> panel - so the factor IS the servant's health share.
+     * The reconciliation compares the <b>base</b> - and after the memosprite rule landed, the memosprite casts reproduce
+     * it.
      *
-     * <p>This is the judge for the comparison itself: a run whose verdicts drift back to the settled total, or whose
-     * factor stops being printed, goes red here. The verdict is one token so the table stays parseable (see
-     * {@link #assertRow}).
+     * <p><b>What this case used to say</b> (until 2026-10-27): every memosprite row was the servant's share of the
+     * capture's base (`DIFFERS-x0.50` / `x0.70`), because the engine read the servant's own Max HP. The recorded fight
+     * said the game reads the summoner's, the engine now does too ({@code Summon.damageBase}), and those factors are
+     * gone - which is exactly what this case now pins, in the negative: a run that starts printing them again has
+     * regressed the rule.
+     *
+     * <p>The one comparable difference left is cast 4, and it is <b>named</b>: 「每有 #3 点【忆质】额外造成 #2%」 is folded
+     * into the same six instances by the game (0.09 vs the row's 0.06 ⇒ ×0.67) and is registered in {@code AGENT.md}
+     * §3.7h. Rows whose base came from a tally say {@code base-n/a} rather than claiming a verdict.
      */
     @Test
-    public void theReportComparesTheBaseAndNamesTheServantShare() {
+    public void theReportComparesTheBaseAndNamesWhatIsLeft() {
         String out = run(PLAN).out;
         Assertions.assertTrue(out.contains("bases: capture"),
                 "every driven cast prints both sides' per-instance bases; output was:\n" + out);
         Assertions.assertTrue(out.contains("base-ok"),
-                "1415's basic attack is driven at the capture's own panel and level, so its base agrees; output was:\n"
-                        + out);
-        Assertions.assertTrue(out.contains("DIFFERS-x0.50"),
-                "长夜's rows are half the capture's base - that 0.5 IS the servant's health share (1413's ultimate too, "
-                        + "because it is delivered by 长夜); output was:\n" + out);
-        Assertions.assertTrue(out.contains("DIFFERS-x0.70"),
-                "晴空乐手's row is 70% of the capture's base - its own share of 知更鸟•晴歌; output was:\n" + out);
+                "the memosprite and basic-attack rows are driven at the capture's own panel and level, so their bases "
+                        + "agree; output was:\n" + out);
+        Assertions.assertFalse(out.contains("DIFFERS-x0.5"),
+                "a memosprite row is no longer the servant's share of the capture's base - the engine reads the "
+                        + "summoner's Max HP now (Summon.damageBase); output was:\n" + out);
+        Assertions.assertFalse(out.contains("DIFFERS-x0.7"),
+                "…the same for 晴空乐手's 70% share; output was:\n" + out);
+        Assertions.assertTrue(out.contains("DIFFERS-x0.67"),
+                "the 【忆质】 half is still folded into cast 4 by the game (0.06 row vs 0.09 captured) and must be "
+                        + "reported as that factor, not as a bare difference; output was:\n" + out);
         Assertions.assertTrue(out.contains("base-n/a"),
                 "1409's tally-delivered hits have damage_percentage 0, so there is no share to compare - they must say "
                         + "so instead of claiming a verdict; output was:\n" + out);

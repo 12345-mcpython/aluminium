@@ -69,14 +69,21 @@ public class EvernightServantSegmentsTest {
         List<Damage> hits = settled.stream().filter(d -> d.getType() == DamageType.NORMAL).toList();
         Assertions.assertEquals(SPLITS.length, hits.size(),
                 "the ability states six damage tasks (Skill01 Phase02), not one");
-        double maxHp = evey.getMaxHp();
+        // ⚠ The base is the SUMMONER's Max HP, not the servant's own (which is half of it). This case used to multiply
+        // by `evey.getMaxHp()`; the recorded fight turned that around on 2026-10-27 - its six instances are
+        // 0.06 × 2960.0287 five times plus 0.30 × 2960.0287 once, i.e. 长夜月's panel, and the game's ServantConfig
+        // keeps the servant's Max HP synced with hers (Summon.damageBase).
+        double maxHp = evernight.getMaxHp();
         for (int i = 0; i < SPLITS.length; i++) {
             Damage hit = hits.get(i);
             Assertions.assertEquals(SPLITS[i] * LV10_SHARE * maxHp, hit.breakdown().get("base"), 1e-6,
-                    "instance " + (i + 1) + " carries HitSplitRatio " + SPLITS[i] + " of #1 (Lv10 = 0.7)");
+                    "instance " + (i + 1) + " carries HitSplitRatio " + SPLITS[i] + " of #1 (Lv10 = 0.7) × the "
+                            + "summoner's Max HP");
             Assertions.assertSame(battle.enemies().get(0), hit.getDefender(),
                     "all six are the single-target skill's own target");
         }
+        Assertions.assertNotEquals(evey.getMaxHp(), maxHp, 1e-6,
+                "长夜's own sheet is half of hers, so the two candidates are different numbers");
         // The 30-point toughness is ONE number for the cast, spread over the instances (the engine's documented
         // convention for a multi-instance single-target skill): 6 x 5 = 30.
         double stance = hits.stream().mapToDouble(Damage::getStance).sum();

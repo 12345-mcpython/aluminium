@@ -364,6 +364,20 @@ public abstract class CanHit implements BattleEvent, MoveEvent, DamageEvent, Att
         return attributes.get(attributeType);
     }
 
+    /**
+     * The number a damage multiplier applies to: {@code attribute} read off this unit.
+     *
+     * <p>Overridden where the game's answer differs from "this unit's own sheet" - see
+     * {@link Summon#damageBase(AttributeType)}: a servant's 「%生命上限」 row reads its <b>summoner's</b> Max HP.
+     * Two readings of the same number would drift, so every damage base goes through here.
+     *
+     * @param attribute the attribute the row names ({@code ATK} by default, {@code HEALTH} for 「%生命上限」)
+     * @return the value the multiplier applies to
+     */
+    public double damageBase(AttributeType attribute) {
+        return getAttribute(attribute).get();
+    }
+
     public void setSkill(SkillType skillType, Skill skill) {
         skills.set(skillType, skill);
     }
