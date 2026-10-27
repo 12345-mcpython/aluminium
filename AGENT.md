@@ -560,8 +560,8 @@ if (isSelected) buffer.setStyle(rowArea, highlightStyle);
 ⭐ 它开箱抓到一个真 bug：`actor is_summon` 会把**别人的**忆灵也算进来 ⇒ 六条门改成 `actor == summon` ✓【已把守：`HyacineOwnMemospriteOnlyTest`（4 例）】
 ⭐ ✅ **`11512` 槽 1 的倍率在 `#2`**（`#1` 每一档都是 0 ⇒ 默认读法结算出 0 ✓）：`skill_effects` 用 **`damage_parts[].index`** 声明 ✓，默认读法不动（改默认会把语料其余每一行读错 ✗）【已把守：`SummerSongbirdSkillOneTest`（Lv10 `#2`=2.1 / Lv6 `#2`=1.5 两档 ✓）】
 ⭐ ✅ **对账口径改为 `base`**（`zones.raw_damage_before_modifiers` ↔ `breakdown().base`，逐实例、按多重集比）✓：settled 总额**只打印、不对账** ✗ —— 计划故意不装暴击/增伤，而捕获是打了一半的窗口 ⇒ 总额**按构造就不可比** ✓。每发三种判词：`base-ok` / `base-ok/count`（值同、实例数不同：捕获里另两只敌人已经倒了，引擎把它们都算活着）/ `base-n/a`（`damage_percentage == 0` ⇒ 这一发的基数是**计数**不是行份额，见 1409）。**每一发按捕获自己那一发的面板驱动** ✓（窗口里 1413 的生命上限 2960 → 4526 → 4309 是三次不同的题 ✓），忆灵的表按其生命上限份额跟着走 ✓。
-⭐ **差异的形状现在是可读的** ✓：凡对不上的忆灵发，倍数**恰好是该忆灵的生命上限份额** —— 长夜 ×0.5、晴空乐手 ×0.7（1413 的终结技也 ×0.5，因为它由「长夜」交付）✓；cast 4 是 ×0.33 = 0.5 × (0.06/0.09)，后一个因子是「每 3 点【忆质】额外 #2%」被游戏折进同一发（见 3.7h）✓。⇒ **引擎读忆灵自己的生命上限，捕获的算术读主人的面板** ✓ —— payload 只给一个 `attacker_hp_lp`，所以"读谁的"仍**分不开** ✓，但**差多少不再需要重新推导** ✓（工具直接打印倍数）✓。
-**仍开（对账差异，逐条登记）**：忆灵的「%生命上限」读主人还是自己（**分不开** ✓，形状 = 生命上限份额 ✓）· 忆灵技的行号（捕获像 Lv8/Lv6，规格写 10 ⇒ 计划用 `level` 逐发声明 ✓）· `skills.json` 缺「长夜」的强化普攻（槽 8/11 ✓）· 敌人没有韧性条（不加那 10% 减伤 ✓）· 窗口前缀（捕获是一段已经在打的战斗 ✓）。
+⭐ **差异的形状先被读出来了** ✓：对不上的忆灵发，倍数**恰好是该忆灵的生命上限份额** —— 长夜 ×0.5、晴空乐手 ×0.7（1413 的终结技也 ×0.5，因为它由「长夜」交付）✓。⚠ 这条当时被写成"读谁的仍分不开" ✗ —— **它是分得开的**，办法不在 payload 里，在游戏数据里（见 3.7ze ✓）。现在这些发是 `base-ok` ✓，只剩 cast 4 的 ×0.67 = 0.06/0.09（「每 3 点【忆质】额外 #2%」被游戏折进同一发，见 3.7h ✓）。
+**仍开（对账差异，逐条登记）**：忆灵技的行号（捕获像 Lv8/Lv6，规格写 10 ⇒ 计划用 `level` 逐发声明 ✓）· `skills.json` 缺「长夜」的强化普攻（槽 8/11 ✓）· 敌人没有韧性条（不加那 10% 减伤 ✓）· 窗口前缀（捕获是一段已经在打的战斗 ✓）。
 
 #### 3.7zc 1413 忆灵技 1 的「施放后获得 #4 点【亿质】」
 `CAST_SETUP` ＋ `actor == summon` ＋ `from_skill_id == 1` → `GAIN_RESOURCE 亿质 amount_from_cast_param: 3` ✓（点数**读这一发自己的行** ✓）。⚠ 资源名是数据里的「**亿质**」不是「忆质」✗（写错只会得到一个恒 0 的计数器 ✓）。【已把守：`EvernightMemoryGainTest`（他人的忆灵施放一点不给 ✓）】
@@ -577,6 +577,19 @@ if (isSelected) buffer.setStyle(rowArea, highlightStyle);
 | `has_shield from_provider self\|actor\|target` | `has_shield` 只能问「有没有盾」或「哪条规则造的」✗；「装备者提供的护盾」问的是**谁造的** ✗（遗器 128 四件套只能用裸 `has_shield` 近似） | `TriggerConditionParser` 解析 `from_provider`，`TriggerTable.HasShield` 用 `CanHit.getShieldProvider()` 比对 ✓ | `ShieldProviderConditionTest`（装备者盾 ✓ / 队友盾 ✗） |
 
 ⚠ 同族仍开：**单位计数器的「这次花掉了多少」没有事件** ✗（唯一的「花掉」是 `SKILL_POINT_SPENT` ✓ 战技点专属 ✓）⇒ 1408 星魂 2 的后半写不了 ✓（不拿 `self_resource:毁伤 >= 4` 冒充 ✗：那是「持有 4 点」✓）。
+
+#### 3.7ze（引擎）忆灵的「%生命上限」读**召唤者**的生命上限
+
+`CanHit.damageBase(attribute)` 是**伤害基数的唯一读口** ✓（`SkillExecutor` 的六处装配与 `EnemySkill.strike` 都走它 ✓）；`Summon` 覆盖它：`HEALTH` ⇒ 读 `master` 的生命上限 ✓，其余属性读自己的 ✓。
+
+⭐ **三份证据，按查的顺序**（payload 一个字段确实分不开，但游戏数据分得开 ✓）：
+1. **捕获**：忆灵每一发的 `raw_damage_before_modifiers` 逐位等于 `行份额 × 召唤者的生命上限` ✓（长夜 0.06 × 2960.0287、晴空乐手 1.5 × 5249.7811 ✓，同一段窗口里三个不同面板都对 ✓）。对账口径改成 `base` 后，这些发从 `DIFFERS-x0.5` / `x0.7` 变成 `base-ok` ✓。
+2. **`ServantConfig.SyncPropertyExceptList`**（`Config/ConfigCharacter/Servant/*_Config.json`）列的是**不同步**的属性 ✓：长夜 / 晴空乐手 / 衣匠 / 迷迷只列 Speed（晴空乐手还列 `BaseHP`）⇒ **MaxHP 跟着召唤者走** ✓；死龙（Castorice）与德谬歌（Cyrene）列了 `MaxHP`/`CurrentHP` ⇒ 它们有自己的血条 ✓。
+3. **ability 的 `FormulaType`**：绝大多数的伤害任务写 `ByMaxHP` ✓，而 `BySummonerMaxHP` **只出现在死龙的配置里** ✓ —— 正好是第 2 条里"HP 不同步"的那一只 ✓。两种拼法互补，说明 `ByMaxHP` 对"HP 同步"的忆灵就等于召唤者的 ✓。
+
+⚠ 这条**不动忆灵自己的面板** ✓：`memosprites/<cid>.json` 的 0.5 / 0.7 仍是它**血条**的起点 ✓（`getMaxHp()` 读到的还是它 ✓），只是伤害基数不再用它 ✓。
+
+【已把守：`EvernightServantSegmentsTest`（六段 × 0.7 × **主人**的上限 ✓）、`SummerSongbirdSkillOneTest`（Lv10/Lv6 两档 ✓）、`SummonCommandTest.theBaseIsTheOwnersMaxHp`（主人翻倍⇒×2 ✓，忆灵翻倍⇒不动 ✓）、`MemospriteAttackTest.theDamageIsProportionalToTheSummonersMaxHp`（同 ✓）、`BattleReplayTest.theReportComparesTheBaseAndNamesWhatIsLeft`（`DIFFERS-x0.5`/`x0.7` 不再出现 ✓）】
 
 ### 3.8 数据文件速查
 
