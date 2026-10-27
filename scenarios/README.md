@@ -359,6 +359,11 @@ gradlew run --args="compare-capture ...json --limit 5"                        # 
 比对 `base` 与 `final`，逐行打印 `# / type / element / game / engine / relative`，末尾给 `reproduced: n/m`，
 退出码 0/1。
 
+⚠ **输入必须是「整场捕获」** ✓：文件顶层要有 `damage_events` 数组（现成的例子是
+`src/test/resources/captures/veritas-085418.json`，82 条 ✓）。**本目录下的 `scenarios/capture-*.json` 不是这种文件** ✗ ——
+它们是**一次施放**的场景（`attacker` / `target` / `expect`），那是给 `compare` 用的 ✓；
+喂给本工具只会得到 `… has no damage_events`，并以 **2** 退出 ✓（`capture-flow` 同样拒绝，退出码 **1** ✓）。
+
 事件到场景的换算（全部取自捕获，不来自引擎）：
 
 | 输入 | 取自 |
@@ -382,6 +387,8 @@ gradlew run --args="compare-capture ...json --limit 5"                        # 
 ```bash
 gradlew run --args="capture-flow src/test/resources/captures/veritas-085418.json"
 ```
+
+⚠ 输入要求与上一节相同：**整场捕获** ✓；本目录的 `capture-*.json`（单次施放场景）在这里也会被拒 ✓。
 
 捕获里的事件是平铺的（没有回合号、没有施放 id），但三条性质让分组可判定：
 

@@ -178,7 +178,7 @@
 
 ---
 
-## 4. 事件（`on`，共 39 个）
+## 4. 事件（`on`，共 40 个）
 
 | 分类 | 事件 |
 |---|---|
@@ -188,7 +188,11 @@
 | **伤害与生命** | `HP_LOST` `HP_CONSUMED` `LETHAL_DAMAGE` `HEALED` `SHIELD_GRANTED` `DEATH` `KILL` |
 | **击破与控制** | `BREAK` `WEAKNESS_ADDED` `DEBUFF_APPLIED` `STATE_ENDED` |
 | **资源** | `ENERGY_GAINED` `SKILL_POINT_GAINED` `SKILL_POINT_SPENT` `SKILL_POINT_OVERFLOWED` `RESOURCE_CHANGED` |
-| **召唤** | `SUMMONED` |
+| **召唤** | `SUMMONED` `SUMMON_LEFT` |
+
+⚠ **`SUMMON_LEFT` 是「忆灵离场」，不等于「死亡」** ✓ —— 忆灵可以没被打死就消失（`CanHit.perish()`），
+那种消失 `DEATH` 收不到 ✓、只有它收得到 ✓。收到它的是**还活着的规则持有者**（离场的那位自己没有表可以动 ✓），
+所以条件写 `actor is_summon` ✓；`target == summon` 在这里会失效 ✗（该选择器拒绝已经不在场的单位 ✓）。
 
 ⚠ **`BATTLE_START` 是最常用的一类** ✓ —— 秘技（`self has_state 秘技`）、星魂等级声明、开战加攻都属于它 ✓
 ⚠ 而它的效果**在任何回合开始之前结算** ✓ —— 前端要记得把这段写进日志 ✓（本项目为此专门修过一次 ✓）
