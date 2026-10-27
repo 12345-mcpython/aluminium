@@ -15,6 +15,7 @@ import com.laosun.aluminium.models.Damage;
 import com.laosun.aluminium.models.DoubleValue;
 import com.laosun.aluminium.models.Summon;
 import com.laosun.aluminium.models.enemy.Enemy;
+import com.laosun.aluminium.models.skill.DefaultSkill;
 import com.laosun.aluminium.models.skill.Skill;
 import com.laosun.aluminium.utils.CharacterFactory;
 import lombok.Getter;
@@ -186,6 +187,13 @@ public final class BattleReplay {
 
         /** The data slot, spelled as a number when {@code caster} is {@code memosprite}. */
         private Integer slotNumber;
+
+        /**
+         * The row to read this cast at. Absent = the skill's own level: for a memosprite that is the level its spec
+         * states (10), while the capture's fight may have been played at a lower one (measured: 长夜's slot 1 is the
+         * Lv8 row, 晴空乐手's is Lv6), so the plan states it per cast rather than the tool guessing.
+         */
+        private Integer level;
 
         /** Which of the plan's enemies was the main target, 1-based. */
         private Integer target;
@@ -362,6 +370,8 @@ public final class BattleReplay {
         int driven = 0;
         int matched = 0;
         int undrivable = 0;
+        int differed = 0;
+        int notComparable = 0;
         for (Row row : rows) {
             String captureCell = row.hits + "h/" + row.targets + "t";
             if (row.spec == null) {
@@ -378,6 +388,9 @@ public final class BattleReplay {
                 continue;
             }
             CanHit caster = casterOf(row.spec, battle, byCid);
+            // The capture's own panel for THIS cast: a window is a fight already in progress, and a panel that moves
+            // inside it (1413's 生命上限 2960 -> 4526 -> 4309) makes one static sheet wrong for two thirds of the rows.
+            applyCastPanel(row, battle, byCid);
             CanHit target = row.spec.getTarget() == null || row.spec.getTarget() < 1
                     || row.spec.getTarget() > enemies.size()
                     ? null : enemies.get(row.spec.getTarget() - 1);
@@ -388,14 +401,22 @@ public final class BattleReplay {
             }
             driven++;
             double settled = window.stream().mapToDouble(Settled::applied).sum();
-            boolean same = row.captureDamage > 0
-                    && Math.abs(settled - row.captureDamage) <= Math.max(TOLERANCE, row.captureDamage * TOLERANCE);
-            if (same) {
+            List<Double> engineBases = window.stream()
+                    .map(each -> each.damage().breakdown().getOrDefault("base", 0.0))
+                    .toList();
+            BaseVerdict verdict = compareBases(row.group, engineBases);
+            if (verdict.agrees()) {
                 matched++;
+            } else if (verdict.comparable()) {
+                differed++;
+            } else {
+                notComparable++;
             }
             System.out.printf(Locale.ROOT, "%-4d %-6d %-10s %-10s %16.2f %16d %16.2f %10s%n",
                     row.cast, row.actor, row.kind, captureCell, row.captureDamage, window.size(), settled,
-                    same ? "match" : "differs");
+                    verdict.label());
+            System.out.printf(Locale.ROOT, "     bases: capture %s%n", describeBases(row.group.hitBases()));
+            System.out.printf(Locale.ROOT, "            engine  %s%n", describeBases(engineBases));
             if (detail) {
                 // Which row the engine actually read: the first thing a reconciliation has to know, because a
                 // multiplier that disagrees is either the wrong row or the wrong attribute and the two look alike.
@@ -415,15 +436,22 @@ public final class BattleReplay {
         }
         System.out.println("-".repeat(104));
         System.out.printf(Locale.ROOT,
-                "casts: %d in the capture ; driven: %d ; not drivable: %d ; reproduced: %d%n",
+                "casts: %d in the capture ; driven: %d ; not drivable: %d ; bases reproduced: %d%n",
                 rows.size(), driven, undrivable, matched);
+        System.out.printf(Locale.ROOT, "bases: %d agree, %d differ, %d not comparable, of %d driven%n",
+                matched, differed, notComparable, driven);
         System.out.printf(Locale.ROOT, "groups: %d of %d capture groups accounted for (casts, derived hits, breaks)%n",
                 rows.size(), flow.size());
         System.out.println();
-        System.out.println("What a difference means is registered in AGENT.md §3.7zb: the window's unobserved prefix "
-                + "(states and resources standing before event 0), the servants' own multiplier rows, and an enemy "
-                + "with no toughness bar (so the capture's 10% unbroken reduction is absent here).");
-        return strict && matched != driven ? 1 : 0;
+        System.out.println("What is compared is the BASE (pre-zone), not the settled total: the capture is a window of a "
+                + "fight already in progress and the plan deliberately installs no crit/boost, so a settled total is "
+                + "not comparable by construction (AGENT.md §3.7zb). A differing base has one of three causes:");
+        System.out.println("  · the row's SERVANT reads 「%生命上限」 off its own HP while the capture's arithmetic "
+                + "follows the summoner's panel (长夜 50%, 晴空乐手 70% - the payload cannot say whose HP the game read);");
+        System.out.println("  · the row is read at a level the plan does not state (a memosprite's spec says 10);");
+        System.out.println("  · the base did not come from a row at all (damage_percentage 0: a tally the window "
+                + "does not carry) - those rows say \"base n/a\" instead of pretending to compare.");
+        return strict && differed > 0 ? 1 : 0;
     }
 
     /**
@@ -431,7 +459,7 @@ public final class BattleReplay {
      * names it, the entry that drives it.
      */
     private record Row(int cast, long actor, String kind, double base, int hits, int targets, double captureDamage,
-                       CastSpec spec) {
+                       CaptureFlow.Cast group, CastSpec spec) {
     }
 
     /**
@@ -454,10 +482,11 @@ public final class BattleReplay {
         int cast = 0;
         long actor = 0;
         String kind = "";
+        CaptureFlow.Cast last = null;
         for (CaptureFlow.Cast group : flow) {
             if ("cast".equals(group.classification())) {
                 if (cast != 0) {
-                    rows.add(new Row(cast, actor, kind, base, hits, targets, damage, byCast.get(cast)));
+                    rows.add(new Row(cast, actor, kind, base, hits, targets, damage, last, byCast.get(cast)));
                 }
                 cast = group.index();
                 actor = group.actor();
@@ -466,6 +495,7 @@ public final class BattleReplay {
                 hits = group.hits();
                 targets = group.targets();
                 damage = group.damage() + group.companion();
+                last = group;
                 continue;
             }
             if (cast == 0) {
@@ -475,7 +505,7 @@ public final class BattleReplay {
             damage += group.damage() + group.companion();
         }
         if (cast != 0) {
-            rows.add(new Row(cast, actor, kind, base, hits, targets, damage, byCast.get(cast)));
+            rows.add(new Row(cast, actor, kind, base, hits, targets, damage, last, byCast.get(cast)));
         }
         return rows;
     }
@@ -500,6 +530,19 @@ public final class BattleReplay {
      * The skill a plan entry names, or {@code null} when the data has no such row.
      */
     private static Skill skillOf(CastSpec spec, Battle battle, Map<Integer, Character> byCid) {
+        Skill atSpecLevel = skillAtSpecLevel(spec, battle, byCid);
+        if (atSpecLevel == null || spec.getLevel() == null) {
+            return atSpecLevel;
+        }
+        // The plan states the level the capture's numbers were taken at; the row is read at THAT level, not at the one
+        // the spec happens to declare (a memosprite's all say 10).
+        return new DefaultSkill(atSpecLevel.getCid(), atSpecLevel.getSkillSlot(), Math.max(1, spec.getLevel()));
+    }
+
+    /**
+     * The skill a plan entry names, at whatever level the data gives it, or {@code null} when the data has no such row.
+     */
+    private static Skill skillAtSpecLevel(CastSpec spec, Battle battle, Map<Integer, Character> byCid) {
         if ("memosprite".equalsIgnoreCase(spec.getCaster())) {
             Summon summon = battle.memospriteOf(byCid.get(spec.getActor()));
             if (summon == null) {
@@ -517,6 +560,172 @@ public final class BattleReplay {
         } catch (IllegalArgumentException e) {
             return null;
         }
+    }
+
+    /**
+     * Installs the panel the capture's <b>own arithmetic</b> used for this cast.
+     *
+     * <p>A replay is a window of a fight already in progress, and a panel can move inside it (1413's 生命上限 reads
+     * 2960.0287, then 4526.4984, then 4309.8792 - her own ultimate's base is 2.0 x that number, so one static sheet
+     * cannot be right for all three). The payload states the panel per event, so each cast is driven at the panel its
+     * own events carry.
+     *
+     * <p>For a <b>memosprite</b> cast the panel that matters is the servant's, which is frozen as a share of its
+     * master's at summon time - so the share is re-stated against this cast's panel rather than inherited from the
+     * sheet the battle started with. Its current life is left alone: nothing damages it in a scripted replay, and
+     * healing it would fire events this window never saw.
+     */
+    private static void applyCastPanel(Row row, Battle battle, Map<Integer, Character> byCid) {
+        Character master = byCid.get((int) row.actor);
+        if (master == null || row.group == null) {
+            return;
+        }
+        applyOverrides(master, Map.of(
+                "ATTACK", row.group.attack(),
+                "HEALTH", row.group.health(),
+                "DEFENCE", row.group.defence()));
+        // A memosprite's sheet is a share of its master's, so it moves with the master EVEN when the cast is the
+        // character's own: 1413's ultimate is delivered by 长夜, and a stale servant sheet would price it at the panel of
+        // an earlier cast (measured: 4526 instead of 4309 for cast 13).
+        Summon servant = battle.memospriteOf(master);
+        if (servant != null) {
+            servant.setAttribute(AttributeType.HEALTH,
+                    new DoubleValue(servantHealthRatio((int) row.actor) * row.group.health()));
+        }
+    }
+
+    /**
+     * What share of its summoner's Max HP a memosprite's own sheet takes, from the same file the engine reads.
+     */
+    private static double servantHealthRatio(int ownerCid) {
+        com.laosun.aluminium.beans.MemospriteSpec spec = com.laosun.aluminium.data.Memosprites.of(ownerCid);
+        if (spec == null || spec.panel() == null) {
+            return 1.0;
+        }
+        for (com.laosun.aluminium.beans.MemospriteSpec.Panel panel : spec.panel()) {
+            if ("HEALTH".equalsIgnoreCase(panel.attribute()) && panel.percent() != null) {
+                return panel.percent();
+            }
+        }
+        return 1.0;
+    }
+
+    /**
+     * The verdict on one cast's bases: whether they agree, and - when they do not - whether the difference is the
+     * <b>servant's own HP share</b> (every engine instance exactly {@code ratio ×} the capture's).
+     *
+     * <p>That last shape is worth naming rather than printing a bare "differs": a memosprite's row says 「%生命上限」 and
+     * the engine reads the <b>memorprite's</b> sheet (half of 长夜月's, 70% of 知更鸟•晴歌's), while every capture row's
+     * base is {@code share × the summoner's panel} to the last digit. A run that reports the factor says which of the
+     * two readings produced it; a run that reports "differs" leaves the next reader to re-derive it.
+     */
+    private static BaseVerdict compareBases(CaptureFlow.Cast group, List<Double> engineBases) {
+        if (group == null || group.percentage() == 0) {
+            return new BaseVerdict("base-n/a", false, false);
+        }
+        List<Double> capture = group.hitBases();
+        if (capture.isEmpty() || engineBases.isEmpty()) {
+            return new BaseVerdict("DIFFERS", false, true);
+        }
+        if (sameValues(capture, engineBases)) {
+            boolean sameCount = capture.size() == engineBases.size();
+            return new BaseVerdict(sameCount ? "base-ok" : "base-ok/count", true, true);
+        }
+        Double factor = uniformFactor(capture, engineBases);
+        return new BaseVerdict(factor == null ? "DIFFERS"
+                : String.format(Locale.ROOT, "DIFFERS-x%.2f", factor), false, true);
+    }
+
+    /**
+     * The same <b>distinct</b> base values on both sides - so a cast driven against three living enemies where the
+     * capture had one still reads as the same row, with the count reported separately.
+     */
+    private static boolean sameValues(List<Double> capture, List<Double> engine) {
+        List<Double> left = new ArrayList<>(distinct(capture));
+        for (double each : distinct(engine)) {
+            int at = -1;
+            for (int i = 0; i < left.size(); i++) {
+                if (Math.abs(left.get(i) - each) <= Math.max(TOLERANCE, Math.abs(each) * TOLERANCE)) {
+                    at = i;
+                    break;
+                }
+            }
+            if (at < 0) {
+                return false;
+            }
+            left.remove(at);
+        }
+        return left.isEmpty();
+    }
+
+    private static List<Double> distinct(List<Double> values) {
+        List<Double> unique = new ArrayList<>();
+        for (double value : values) {
+            boolean seen = false;
+            for (double kept : unique) {
+                if (Math.abs(kept - value) <= Math.max(TOLERANCE, Math.abs(value) * TOLERANCE)) {
+                    seen = true;
+                    break;
+                }
+            }
+            if (!seen) {
+                unique.add(value);
+            }
+        }
+        return unique;
+    }
+
+    /**
+     * The single factor every engine base carries over its capture counterpart, or {@code null} when there is none.
+     *
+     * <p>Compared over the <b>distinct</b> values, so a cast driven against more living enemies than the capture had
+     * still reports its factor (casts 5 and 13 hit two enemies in the window and three on the replayed field).
+     */
+    private static Double uniformFactor(List<Double> capture, List<Double> engine) {
+        List<Double> captureValues = distinct(capture);
+        List<Double> engineValues = distinct(engine);
+        if (captureValues.isEmpty() || captureValues.size() != engineValues.size()
+                || Math.abs(captureValues.get(0)) <= TOLERANCE) {
+            return null;
+        }
+        double factor = engineValues.get(0) / captureValues.get(0);
+        for (int i = 0; i < captureValues.size(); i++) {
+            if (Math.abs(engineValues.get(i) - factor * captureValues.get(i))
+                    > Math.max(TOLERANCE, Math.abs(engineValues.get(i)) * 1e-6)) {
+                return null;
+            }
+        }
+        return factor;
+    }
+
+    /**
+     * One cast's base verdict: what to print, whether it counts as reproduced, and whether it was comparable at all.
+     */
+    private record BaseVerdict(String label, boolean agrees, boolean comparable) {
+    }
+
+    /**
+     * The bases as {@code "177.6017×5, 888.0086"}, so one line says both the value and the instance shape.
+     */
+    private static String describeBases(List<Double> bases) {
+        if (bases == null || bases.isEmpty()) {
+            return "(none)";
+        }
+        Map<String, Integer> counts = new LinkedHashMap<>();
+        for (double base : bases) {
+            counts.merge(String.format(Locale.ROOT, "%.4f", base), 1, Integer::sum);
+        }
+        StringBuilder text = new StringBuilder();
+        counts.forEach((value, count) -> {
+            if (text.length() > 0) {
+                text.append(", ");
+            }
+            text.append(value);
+            if (count > 1) {
+                text.append('×').append(count);
+            }
+        });
+        return text.toString();
     }
 
     /**
@@ -556,7 +765,7 @@ public final class BattleReplay {
     /**
      * Installs absolute attribute values, so the engine's sheet is the one the capture's numbers came from.
      */
-    private static void applyOverrides(Character unit, Map<String, Double> attributes) {
+    private static void applyOverrides(CanHit unit, Map<String, Double> attributes) {
         if (attributes == null) {
             return;
         }

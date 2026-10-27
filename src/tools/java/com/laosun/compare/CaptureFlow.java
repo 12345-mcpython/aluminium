@@ -63,9 +63,17 @@ public final class CaptureFlow {
      * @param firstTarget    the {@code target_max_hp} of the group's FIRST hit - which unit the cast was aimed at,
      *                       as the payload's only identity for a target. {@code BattleReplay} uses it to check that
      *                       its plan names the same target the capture does.
+     * @param hitBases       every hit's {@code raw_damage_before_modifiers}, in the order the payload lists them -
+     *                       {@code BattleReplay} compares these against the engine's own settled bases, one for one
+     * @param percentage     the first hit's {@code damage_percentage} - {@code 0} means the base did not come from a
+     *                       multiplier row at all (1409's tally-delivered hits), so there is no share to compare
+     * @param attack         the first hit's {@code attacker_attack_lp}, i.e. the attacker's panel as the game saw it
+     * @param health         the first hit's {@code attacker_hp_lp}
+     * @param defence        the first hit's {@code attacker_defence}
      */
     record Cast(int index, long actor, String kind, String classification, double base, int hits, int targets,
-                double damage, double companion, int covered, double firstTarget) {
+                double damage, double companion, int covered, double firstTarget, List<Double> hitBases,
+                double percentage, double attack, double health, double defence) {
     }
 
     /**
@@ -79,7 +87,12 @@ public final class CaptureFlow {
         private final String classification;
         private final int attackType;
         private final LinkedHashSet<Double> targets = new LinkedHashSet<>();
+        private final List<Double> hitBases = new ArrayList<>();
         private double base;
+        private double percentage;
+        private double attack;
+        private double health;
+        private double defence;
         private int hits;
         private double damage;
         private double companion;
@@ -96,7 +109,7 @@ public final class CaptureFlow {
 
         private Cast toCast() {
             return new Cast(index, actor, kind, classification, base, hits, targets.size(), damage, companion, covered,
-                    firstTarget);
+                    firstTarget, List.copyOf(hitBases), percentage, attack, health, defence);
         }
     }
 
@@ -215,8 +228,15 @@ public final class CaptureFlow {
             if (current.hits == 0) {
                 current.base = base;
                 current.firstTarget = numberOr(zones, "target_max_hp", 0);
+                // The panel the game itself used for this hit: BattleReplay installs it before driving the cast, so a
+                // window whose panel moved mid-fight is replayed at the panel the capture's own arithmetic used.
+                current.percentage = numberOr(zones, "damage_percentage", 0);
+                current.attack = numberOr(zones, "attacker_attack_lp", 0);
+                current.health = numberOr(zones, "attacker_hp_lp", 0);
+                current.defence = numberOr(zones, "attacker_defence", 0);
             }
             current.hits++;
+            current.hitBases.add(base);
             current.damage += numberOr(event, "damage", 0);
             current.targets.add(numberOr(zones, "target_max_hp", 0));
             current.covered++;

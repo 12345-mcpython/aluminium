@@ -108,6 +108,7 @@
       "actor": 1413,
       "caster": "memosprite",
       "slot": 1,
+      "level": 8,
       "target": 1,
       "note": "长夜's 忆灵技1「追忆，蹁跹，如雨」: six instances on one target (skill_segments.json servants.11413 Skill01 = 6, main=6), ice, base 0.06 x 生命上限 each = the game's 5 x 0.1 + 1 x 0.5 split of one 0.6 row."
     },
@@ -124,6 +125,7 @@
       "actor": 1413,
       "caster": "memosprite",
       "slot": 1,
+      "level": 8,
       "target": 1,
       "note": "Same slot as cast 1. The capture's per-instance base is 0.09 x 生命上限 = 0.9 for the whole cast, i.e. 0.6 + the 「每有 #3 点【忆质】额外造成 #2%」 the game folds into the same six instances (registered gap, AGENT.md §3.7h)."
     },
@@ -148,6 +150,7 @@
       "actor": 1415,
       "caster": "character",
       "slot": "COMMON",
+      "level": 6,
       "target": 2,
       "note": "1415's basic attack (attack_type 1), base 0.5 x 生命上限 - her row states its damage off Max HP, not ATK."
     },
@@ -188,6 +191,7 @@
       "actor": 1415,
       "caster": "memosprite",
       "slot": 1,
+      "level": 6,
       "target": 3,
       "repeat": 4,
       "note": "德谬歌's 忆灵技1 (skill_segments.json servants.11415 = one hit per cast), base 0.6 x 生命上限. The flow groups four consecutive same-actor same-type hits as one cast; the segment table says each cast is ONE hit, so this entry is driven four times."
@@ -197,6 +201,7 @@
       "actor": 1512,
       "caster": "memosprite",
       "slot": 1,
+      "level": 6,
       "target": 3,
       "note": "晴空乐手's 忆灵技1: the share is 11512 slot 1's SECOND parameter (the row's #1 is 0 at every level). ✅ Read from #2 now - skill_effects.json declares it via damage_parts[].index (judge SummerSongbirdSkillOneTest), so the engine's base is 2.1 x the SERVANT's Max HP = 7717.18 at the spec's Lv10. The capture's 1.5 x 5249.7811 = 7874.67 is the Lv6 row against the OWNER's Max HP - close by coincidence, not agreement: both differences (level 10 vs 6, servant vs owner HP) stay registered in AGENT.md §3.7zb."
     },
@@ -205,6 +210,7 @@
       "actor": 1415,
       "caster": "memosprite",
       "slot": 1,
+      "level": 6,
       "target": 3,
       "repeat": 4,
       "note": "Same as cast 16: four more one-hit casts of 德谬歌's slot 1."
