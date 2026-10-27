@@ -430,25 +430,34 @@ gradlew run --args="replay scenarios/veritas-085418.replay.json --detail"  # 再
 
 1. 用捕获里**每一个目标**的 `target_max_hp` / `target_defence` / `target_resistance` 造敌人（`Enemy.fromAttributes` +
    `setDamageResist`）—— 不是按 `monster_id` 猜；
-2. 用捕获里每个攻方的 `attacker_attack_lp` / `attacker_hp_lp` / `attacker_defence` 当**绝对面板**装到角色上；
+2. 每一发**按捕获自己那一发**的 `attacker_attack_lp` / `attacker_hp_lp` / `attacker_defence` 装面板（窗口里 1413 的生命上限
+   2960 → 4526 → 4309 是三道不同的题）；忆灵的表按其生命上限份额**跟着**该发的面板走；
 3. 按计划的 `casts` 表**依次**用 `Battle.castImmediate(skill, 施放者, 目标)` 施放 —— 不看行动条，捕获说了算；
-4. 每一发施放窗口里**结算了多少**（`DamageObserver` 的 `applied` 之和）与捕获那一发的 `damage + companion`
-   （加上紧跟它的派生组）逐行对账。
+4. ⭐ 每发对的是 **`base`**（捕获的 `raw_damage_before_modifiers` ↔ 引擎的 `Damage.breakdown().get("base")`），逐实例、
+   按多重集比。**settled 总额只打印、不对账** —— 计划故意不装暴击/增伤，捕获又是打了一半的窗口，总额按构造就不可比。
+
+判词只有四种：
+
+| 判词 | 意思 |
+|---|---|
+| `base-ok` | 值、实例数都对上 |
+| `base-ok/count` | 值对上了，实例数不同 —— 通常是捕获里别的敌人已经倒了，而重放场上它们还活着 |
+| `base-n/a` | 捕获那一发的 `damage_percentage == 0`：基数是**计数**（1409 的累计治疗），不是行份额 ⇒ 窗口前缀不在，判不了 |
+| `DIFFERS` / `DIFFERS-x0.50` | 值不同；带倍数时，**每个实例都恰好是同一个倍数**（忆灵读自己的生命上限、捕获读主人的面板，倍数就是该忆灵的生命上限份额）|
 
 **计划文件**（`scenarios/<fixture>.replay.json`）的形状：
 
 | 字段 | 内容 |
 |---|---|
 | `capture` | 要重放的捕获，相对工作目录 |
-| `party[]` | 每个攻方 uid：`owner`（捕获用的 uid）/ `cid` / `level` / `eidolon` / `memosprite`（是否先把它摆在场上）/ `attributes`（**绝对**面板） |
+| `party[]` | 每个攻方 uid：`owner`（捕获用的 uid）/ `cid` / `level` / `eidolon` / `memosprite`（是否先把它摆在场上）/ `attributes`（**绝对**面板，未按发覆盖时用） |
 | `enemies[]` | 捕获里的目标：`health` / `defence` / `level` / `speed` / `resistance`（元素名 → 抗性） |
-| `casts[]` | 一次施放：`cast`（**捕获 flow 里的序号**，连接键）/ `actor`（uid）/ `caster`（`character` 或 `memosprite`）/ `slot`（角色用 `SkillType` 名，忆灵用**数据槽**）/ `target`（`enemies` 的 1 基下标）/ `repeat`（连放几次）/ `note`（为什么是这个槽） |
+| `casts[]` | 一次施放：`cast`（**捕获 flow 里的序号**，连接键）/ `actor`（uid）/ `caster`（`character` 或 `memosprite`）/ `slot`（角色用 `SkillType` 名，忆灵用**数据槽**）/ `level`（这一发读的那一行；省略 = 技能自己的等级，忆灵一律 10）/ `target`（`enemies` 的 1 基下标）/ `repeat`（连放几次）/ `note`（为什么是这个槽） |
 
 ⚠ 计划**不能**跟捕获打架：驱动会核对每一发的 `actor` 与**第一发的 `target_max_hp`**，不一致就退 2（`BattleReplayTest`
 有一条反向用例钉它）。⚠ 一次施放驱动不了时（数据里没有那一槽），工具**指名**它，不静默跳过。
 
-⚠ **它不校验的东西**：settled 的总额现在还不是契约 —— 捕获是"已经在打"的一段窗口，前缀状态不在载荷里。
-差在哪、为什么差，登记在 `AGENT.md` §3.7zb；`--strict` 只是把那行差异变成退出码，给以后"对平了"的那天用。
+⚠ **`--strict`** 现在的判据是**有没有 `DIFFERS`**（`base-n/a` 不算）—— 差额的原因登记在 `AGENT.md` §3.7zb。
 
 ### 为什么需要 `attributes` 覆盖
 
