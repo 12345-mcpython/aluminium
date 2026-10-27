@@ -443,7 +443,7 @@ gradlew run --args="replay scenarios/veritas-085418.replay.json --detail"  # 再
 | `base-ok` | 值、实例数都对上 |
 | `base-ok/count` | 值对上了，实例数不同 —— 通常是捕获里别的敌人已经倒了，而重放场上它们还活着 |
 | `base-n/a` | 捕获那一发的 `damage_percentage == 0`：基数是**计数**（1409 的累计治疗），不是行份额 ⇒ 窗口前缀不在，判不了 |
-| `DIFFERS` / `DIFFERS-x0.50` | 值不同；带倍数时，**每个实例都恰好是同一个倍数**（忆灵读自己的生命上限、捕获读主人的面板，倍数就是该忆灵的生命上限份额）|
+| `DIFFERS` / `DIFFERS-x0.67` | 值不同；带倍数说明**每个实例都恰好差同一个倍数**（例：cast 4 是 0.06 vs 0.09 —— 游戏把「每 3 点【忆质】额外 #2%」折进了同一发，见 `AGENT.md` §3.7h）|
 
 **计划文件**（`scenarios/<fixture>.replay.json`）的形状：
 

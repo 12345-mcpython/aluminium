@@ -203,7 +203,7 @@
       "slot": 1,
       "level": 6,
       "target": 3,
-      "note": "晴空乐手's 忆灵技1: the share is 11512 slot 1's SECOND parameter (the row's #1 is 0 at every level). ✅ Read from #2 now - skill_effects.json declares it via damage_parts[].index (judge SummerSongbirdSkillOneTest), so the engine's base is 2.1 x the SERVANT's Max HP = 7717.18 at the spec's Lv10. The capture's 1.5 x 5249.7811 = 7874.67 is the Lv6 row against the OWNER's Max HP - close by coincidence, not agreement: both differences (level 10 vs 6, servant vs owner HP) stay registered in AGENT.md §3.7zb."
+      "note": "晴空乐手's 忆灵技1: the share is 11512 slot 1's SECOND parameter (the row's #1 is 0 at every level). ✅ Read from #2 - skill_effects.json declares it via damage_parts[].index (judge SummerSongbirdSkillOneTest) - and ✅ the multiplier applies to the SUMMONER's Max HP (Summon.damageBase; AGENT.md 3.7ze), so at this cast's Lv6 row the base is 1.5 x 5249.7811 = 7874.67 and the engine reproduces it."
     },
     {
       "cast": 18,
