@@ -127,7 +127,7 @@ public class BattleReplayTest {
         Assertions.assertTrue(out.lines().noneMatch(line -> line.contains("DIFFERS")),
                 "no cast may still differ; a factor coming back means either the Max-HP rule or the fold regressed; "
                         + "output was:\n" + out);
-        Assertions.assertTrue(out.contains("seeded: {亿质=10}"),
+        Assertions.assertTrue(out.contains("seeded: {亿质=10.0}"),
                 "cast 4's prefix is declared and printed as such - a reader must be able to tell it from a number the "
                         + "engine reproduced; output was:\n" + out);
         Assertions.assertTrue(out.contains("base-n/a"),

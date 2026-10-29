@@ -336,7 +336,7 @@ public final class NumberProviders {
             throw new IllegalStateException("a \"resource\" provider needs its rule owner to be a character, but this"
                     + " rule's owner is " + (ctx.owner() == null ? "nobody" : ctx.owner().getClass().getSimpleName()));
         }
-        double raw = owner.getResources().value(provider.getResource().trim());
+        double raw = owner.getResources().get(provider.getResource().trim()).exactValue();
         return Boolean.TRUE.equals(provider.getBasisPoints()) ? raw / 10000.0 : raw;
     }
 
