@@ -484,7 +484,8 @@ if (isSelected) buffer.setStyle(rowArea, highlightStyle);
 #### 3.7h 忆灵的多段（分裂比 ＋ 段数都从上游数据来）
 落地：`skill_effects.json` 的 `segments` ✓（11413 = `[0.1×5, 0.5]` ✓，总份额不变、变的是**六次独立结算** ✓）【已把守：`EvernightServantSegmentsTest`、`SegmentCountAgreementTest`】。
 ⚠ 「捕获 5 段」**撤回** ✓：那是 `capture-flow` 按 `raw_damage_before_modifiers` 分组的伪影 ✓（已改成按 `attack_type` 分组 ✓）。
-**仍开**：① 「每有 #3 点【忆质】额外造成 #2%」游戏是**并进那六发**（总份额 0.6→0.9 ✓），引擎没有这条口径 ✗；② 演示/回合路径仍走忆灵规格里的单段攻击（`COMMON` ✓），换成数据技能会改 demo 输出 ✓ 属另一件事 ✗。
+⭐ ✅ **「每有 #3 点【忆质】额外造成 #2%」已落地**（2026-10-29）：`skill_effects.json` 的 `resource_share` ⇒ `(资源 / #3) × #2` **并进那六发的份额** ✓（不是额外实例 ✓ —— 捕获同一发 0.06 → 0.09、段数仍是六 ✓）。读到的是**召唤者**的资源 ✓（句子写「长夜月当前每有…」，与 `Summon.damageBase` 同一条"用主人的面板"规则 ✓）；资源未注册时按 0 ✓。⚠ 顺手修了**一半**：原来那条「施放后获得 #4 点」挂在 `CAST_SETUP`（伤害展开**之前**）⇒ 这一发白吃 1 点（0.06 读成 0.063 ✗）；改成 `ATTACK_FINISHED` 后与正文「施放后」一致 ✓，捕获也支持（窗口里第一发的份额正是 0.06 ✓）。【已把守：`EvernightMemoryFoldTest`（0 / 4 / 10 点 ⇒ 0.60 / 0.72 / 0.90，Lv10 另测一次 ✓）】
+**仍开**：① 演示/回合路径仍走忆灵规格里的单段攻击（`COMMON` ✓），换成数据技能会改 demo 输出 ✓ 属另一件事 ✗；② replay 的 cast 4 仍是**窗口前缀**（游戏那一发带 10 点，重放从 0 开始、只有第一发给的那 1 点）⇒ 工具报 `DIFFERS-x0.70` ✓，这是**它不该凭空造状态**，不是引擎缺口 ✓。
 
 #### 3.7i 两段式强化普攻（一行多段、各段自己的目标形状）
 落地：`skill_effects.json` 的 **`damage_parts`**（每段 `shape` ＋ `index` ✓，按表顺序结算 ✓，削韧各取自己的列 ✓）【已把守：`CyreneEnhancedBasicTest`、`CyreneEnhancedBasicPartsTest`】。
@@ -564,8 +565,8 @@ if (isSelected) buffer.setStyle(rowArea, highlightStyle);
 **仍开（对账差异，逐条登记）**：忆灵技的行号（捕获像 Lv8/Lv6，规格写 10 ⇒ 计划用 `level` 逐发声明 ✓）· `skills.json` 缺「长夜」的强化普攻（槽 8/11 ✓）· 敌人没有韧性条（不加那 10% 减伤 ✓）· 窗口前缀（捕获是一段已经在打的战斗 ✓）。
 
 #### 3.7zc 1413 忆灵技 1 的「施放后获得 #4 点【亿质】」
-`CAST_SETUP` ＋ `actor == summon` ＋ `from_skill_id == 1` → `GAIN_RESOURCE 亿质 amount_from_cast_param: 3` ✓（点数**读这一发自己的行** ✓）。⚠ 资源名是数据里的「**亿质**」不是「忆质」✗（写错只会得到一个恒 0 的计数器 ✓）。【已把守：`EvernightMemoryGainTest`（他人的忆灵施放一点不给 ✓）】
-⚠ 仍开：「每有 #3 点【亿质】额外造成 #2%」游戏是**并进那六发**的 `DamagePercentage` ✓（同 3.7h）。
+`ATTACK_FINISHED` ＋ `actor == summon` ＋ `from_skill_id == 1` → `GAIN_RESOURCE 亿质 amount_from_cast_param: 3` ✓（点数**读这一发自己的行** ✓）。⚠ 资源名是数据里的「**亿质**」不是「忆质」✗（写错只会得到一个恒 0 的计数器 ✓）。⚠ **事件在 2026-10-29 从 `CAST_SETUP` 换成 `ATTACK_FINISHED`** ✓：正文说「施放**后**」，而 `CAST_SETUP` 在伤害展开之前 ⇒ 那一发会白吃 1 点（实测 0.06 → 0.063 ✗）；捕获里第一发的份额正是 0.06 ✓。【已把守：`EvernightMemoryGainTest`（他人的忆灵施放一点不给 ✓）、`EvernightMemoryFoldTest`（0 点 ⇒ 份额 0.60 ✓）】
+✅ 另一半「每有 #3 点【亿质】额外造成 #2%」也已落地（`resource_share`，见 3.7h ✓）。
 
 #### 3.7zd（引擎）三个「句子缺一个读数」的补口
 | 能力 | 之前为什么写不出来 | 现在是什么 | 判据 |
